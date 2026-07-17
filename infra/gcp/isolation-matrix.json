@@ -56,7 +56,8 @@
     "Human-readable companions: projects.matrix.md, service-accounts.matrix.md, storage-buckets.matrix.md, iam-boundaries.md, wif/.",
     "BB-010 WIF/OIDC deploy identities are designed under infra/gcp/wif/ (not applied; GitHub numeric IDs TBD until remote exists).",
     "No secrets are stored here; secret material lives only in Secret Manager per environment.",
-    "BB-078 (ADR-012, 2026-07-17): mode/currentProject/deferredMultiProjectTarget above still describe the LIVE single-project state and are unchanged by this update. productionResplitTarget and the crossProjectGrants entries below describe the ADR-012 three-project target, not yet applied (BB-079). serviceAccounts entries promotion and submissions-puller are ADR-012-target-only identities living in blackbook-internal, not black-book-efaaf."
+    "BB-078 (ADR-012, 2026-07-17): mode/currentProject/deferredMultiProjectTarget above still describe the LIVE single-project state and are unchanged by this update. productionResplitTarget and the crossProjectGrants entries below describe the ADR-012 three-project target, not yet applied (BB-079). serviceAccounts entries promotion and submissions-puller are ADR-012-target-only identities living in blackbook-internal, not black-book-efaaf.",
+    "black-book-2ve (BB-078 course-correction, 2026-07-17): serviceAccounts entries admin, research, publication, and security, and the private-evidence bucket entry, are updated in place to their ADR-012 target project (blackbook-internal) - they were left describing the superseded black-book-efaaf placement after BB-078, which was itself the gap this fix closes (see docs/runbooks/production-cloud-apply-checklist.md's 'Gaps found during consolidation' #1-#2). infra/gcp/terraform/locals.tf and buckets.tf now match: those four identities and the private-evidence bucket are no longer created in blackbook-prod's Terraform. The environments[] array's production-research entry is intentionally left describing the pre-ADR-012 same-project namespace concept as historical record, same convention as deferredMultiProjectTarget."
   ],
   "adrRefs": ["ADR-001", "ADR-003", "ADR-005", "ADR-006", "ADR-009", "ADR-012"],
   "threatRefs": ["T-03", "T-08", "T-09", "T-12", "T-14", "T-16", "T-17"],
@@ -195,23 +196,23 @@
       "id": "admin",
       "beadRequired": true,
       "surface": "apps/admin",
-      "project": "black-book-efaaf",
-      "purpose": "Admin / research console runtime identity (Cloud Run + IAP).",
+      "project": "blackbook-internal",
+      "purpose": "[ADR-012 target, not yet applied (BB-079)] Relocated from blackbook-prod (black-book-efaaf) to blackbook-internal; account id becomes admin-app there (the 5-char id 'admin' is invalid, see infra/gcp/wif/deploy-roles.md). Admin / research console runtime identity (Cloud Run + IAP, attached directly to the service - no load balancer).",
       "dbRole": "role_admin_app",
       "roles": [
         "roles/secretmanager.secretAccessor (scoped)",
         "roles/cloudsql.client",
         "roles/monitoring.metricWriter",
-        "roles/iap.httpsResourceAccessor (via IAP)"
+        "roles/iap.httpsResourceAccessor (via IAP)",
+        "roles/datastore.viewer (scoped, both blackbook-internal named databases; cross-project condition, see multi-project/iam-cross-project.tf admin_reads_internal_databases)"
       ],
       "bucketAccess": [
-        { "bucket": "public-media", "access": "objectViewer" },
-        { "bucket": "private-evidence", "access": "objectViewer" },
-        { "bucket": "quarantine", "access": "objectViewer" }
+        { "bucket": "private-evidence", "access": "objectViewer (same-project in blackbook-internal)" }
       ],
       "mustNotHave": [
         "public internet ingress without IAP",
-        "ability to bypass the publication workflow for release activation"
+        "ability to bypass the publication workflow for release activation",
+        "any IAM grant in blackbook-prod - ADR-012's cross-project grant list (promotion, security, submissions-puller) does not include admin-app"
       ]
     },
     {
@@ -233,55 +234,62 @@
       "id": "research",
       "beadRequired": true,
       "surface": "workers/research",
-      "project": "black-book-efaaf",
-      "purpose": "Source discovery, ingestion, and evidence staging under a dedicated production identity in the shared project.",
+      "project": "blackbook-internal",
+      "purpose": "[ADR-012 target, not yet applied (BB-079)] Relocated from blackbook-prod (black-book-efaaf) to blackbook-internal. Source discovery, ingestion, and evidence staging; writes only the raw-ingest named Firestore database (see multi-project/iam-cross-project.tf research_writes_raw_ingest) - never curated, never blackbook-prod.",
       "dbRole": "role_research",
       "roles": [
         "roles/run.invoker (self, jobs)",
         "roles/secretmanager.secretAccessor (scoped)",
-        "roles/monitoring.metricWriter"
+        "roles/monitoring.metricWriter",
+        "roles/datastore.user (scoped to raw-ingest named database only, blackbook-internal)"
       ],
-      "bucketAccess": [{ "bucket": "private-evidence", "access": "objectAdmin" }],
+      "bucketAccess": [
+        { "bucket": "private-evidence", "access": "objectAdmin (same-project in blackbook-internal)" }
+      ],
       "mustNotHave": [
         "any publication, deployment, project-admin, or service-account impersonation role",
         "write on public-media or public projections",
         "publication, promotion, or release-activation permission",
-        "ability to modify canonical release pointers"
+        "ability to modify canonical release pointers",
+        "any IAM grant in blackbook-prod or blackbook-staging",
+        "write access to the curated named database"
       ]
     },
     {
       "id": "publication",
       "beadRequired": true,
       "surface": "workers/publication",
-      "project": "black-book-efaaf",
-      "purpose": "Projection, snapshot, indexing, and release worker.",
+      "project": "blackbook-internal",
+      "purpose": "[ADR-012 target, not yet applied (BB-079)] Relocated from blackbook-prod (black-book-efaaf) to blackbook-internal, and its role narrows to the curation worker: reads raw-ingest, writes curated (see multi-project/iam-cross-project.tf publication_reads_raw_ingest / publication_writes_curated). The prior projection/snapshot/release-worker role - including the public-media/exports bucket writes below - now belongs to the new cross-project promotion identity (see serviceAccounts[].id=promotion), not this one.",
       "dbRole": "role_publication",
       "roles": [
         "roles/secretmanager.secretAccessor (scoped)",
-        "roles/cloudsql.client",
-        "roles/monitoring.metricWriter"
+        "roles/monitoring.metricWriter",
+        "roles/datastore.viewer (scoped to raw-ingest named database, blackbook-internal)",
+        "roles/datastore.user (scoped to curated named database, blackbook-internal)"
       ],
       "bucketAccess": [
-        { "bucket": "public-media", "access": "objectAdmin" },
-        { "bucket": "exports", "access": "objectAdmin" }
+        { "bucket": "private-evidence", "access": "objectViewer (same-project in blackbook-internal, read-only)" }
       ],
       "mustNotHave": [
         "write access to raw evidence objects",
         "ability to alter raw evidence or research staging",
-        "public internet ingress"
+        "public internet ingress",
+        "any IAM grant in blackbook-prod - cross-project public/** writes belong only to promotion"
       ]
     },
     {
       "id": "security",
       "beadRequired": false,
       "surface": "workers/security",
-      "project": "black-book-efaaf",
-      "purpose": "Quarantine, content validation, malware scan, integrity worker. Required by ADR-005 (not in the BB-005 nine).",
+      "project": "blackbook-internal",
+      "purpose": "[ADR-012 target, not yet applied (BB-079)] Relocated from blackbook-prod (black-book-efaaf) to blackbook-internal. Quarantine, content validation, malware scan, integrity worker. Required by ADR-005 (not in the BB-005 nine).",
       "dbRole": "role_security",
       "roles": ["roles/secretmanager.secretAccessor (scoped)", "roles/monitoring.metricWriter"],
       "bucketAccess": [
-        { "bucket": "quarantine", "access": "objectAdmin" },
-        { "bucket": "public-media", "access": "objectCreator" }
+        { "bucket": "quarantine", "access": "objectAdmin (cross-project into blackbook-prod, see crossProjectGrants id=security-quarantine-prod)" },
+        { "bucket": "public-media", "access": "objectCreator (cross-project into blackbook-prod, post-scan promotion, see crossProjectGrants id=security-quarantine-prod)" },
+        { "bucket": "private-evidence", "access": "objectAdmin (same-project in blackbook-internal)" }
       ],
       "mustNotHave": ["public internet ingress", "publication or release-activation permission"]
     },
@@ -394,15 +402,15 @@
     },
     {
       "id": "private-evidence",
-      "namePattern": "black-book-efaaf-private-evidence",
-      "project": "black-book-efaaf",
+      "namePattern": "blackbook-internal-private-evidence",
+      "project": "blackbook-internal",
       "classification": "private",
       "publicAccessPrevention": "enforced",
       "uniformBucketLevelAccess": true,
       "writers": ["research", "security"],
-      "readers": ["publication (read-only)", "admin", "api-internal"],
+      "readers": ["publication (read-only)", "admin"],
       "publiclyServable": false,
-      "notes": "Raw research evidence. Never public. Same-project placement increases blast radius, so public SAs must have no bucket IAM and the research DB role must remain non-publishing."
+      "notes": "[ADR-012 target, not yet applied (BB-079)] Relocated from blackbook-prod (black-book-efaaf) to blackbook-internal because both writers (research, security) move there too - colocating the bucket with its only writers is more defensible than keeping it in blackbook-prod and adding a new cross-project grant. See infra/gcp/terraform/multi-project/buckets.tf. Raw research evidence. Never public. api-internal (blackbook-prod) is no longer a reader: the ADR-012 'prod -> internal: none' invariant means no blackbook-prod principal may hold any IAM in blackbook-internal, and moving the bucket removes the need for a cross-project grant that would otherwise be required to preserve that read."
     },
     {
       "id": "exports",

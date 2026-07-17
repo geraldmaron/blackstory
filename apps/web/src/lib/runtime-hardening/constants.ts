@@ -29,6 +29,36 @@ export const SEARCH_PAGE_PARAM_ALLOWLIST = [
 
 export type SearchPageParam = (typeof SEARCH_PAGE_PARAM_ALLOWLIST)[number];
 
+/**
+ * Allowed filter/viewport keys on /explore — shareable map state (BB-051).
+ * All other query keys are stripped at the edge.
+ */
+export const EXPLORE_PAGE_PARAM_ALLOWLIST = [
+  'era',
+  'kind',
+  'theme',
+  'confidence',
+  'lat',
+  'lng',
+  'zoom',
+  'selected',
+  'density',
+] as const;
+
+export type ExplorePageParam = (typeof EXPLORE_PAGE_PARAM_ALLOWLIST)[number];
+
+/**
+ * Allowed browse keys on /history — decade stepper + selection (BB-093).
+ */
+export const HISTORY_PAGE_PARAM_ALLOWLIST = [
+  'decade',
+  'kind',
+  'selected',
+  'edge',
+] as const;
+
+export type HistoryPageParam = (typeof HISTORY_PAGE_PARAM_ALLOWLIST)[number];
+
 /** Tracking / analytics prefixes stripped even when allowlisted routes accept other params. */
 export const TRACKING_QUERY_PREFIXES = ['utm_', 'mc_', 'pk_', 'vero_'] as const;
 

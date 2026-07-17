@@ -35,3 +35,5 @@ export const PACKAGE_SCOPE = '@black-book' as const;
 export * from './surfaces.js';
 export * from './kill-switches.js';
 export * from './scheduled-jobs/index.js';
+
+export * from './launch-gate/index.js';

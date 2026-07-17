@@ -112,3 +112,40 @@ test('AC-ISO-1..5 are restated for the ADR-012 target topology', () => {
 test('adrRefs includes ADR-012', () => {
   assert.ok(matrix.adrRefs.includes('ADR-012'));
 });
+
+test('the four ADR-012-relocated service accounts and private-evidence resolve to blackbook-internal, not blackbook-prod', () => {
+  // black-book-2ve (BB-078 course-correction): infra/gcp/terraform/locals.tf and buckets.tf no
+  // longer create admin/publication/security/research or the private-evidence bucket in
+  // blackbook-prod - they belong to infra/gcp/terraform/multi-project/ instead. This asserts
+  // isolation-matrix.json (the source of truth those Terraform files implement) agrees, so a
+  // future edit to one side cannot silently drift from the other again.
+  const byId = Object.fromEntries(matrix.serviceAccounts.map((sa) => [sa.id, sa]));
+
+  for (const id of ['admin', 'publication', 'security', 'research']) {
+    const sa = byId[id];
+    assert.ok(sa, `serviceAccounts must include ${id}`);
+    assert.equal(sa.project, 'blackbook-internal', `${id} must resolve to blackbook-internal under ADR-012, not ${sa.project}`);
+    assert.ok(
+      sa.mustNotHave.some((m) => m.toLowerCase().includes('blackbook-prod')) || id === 'security',
+      `${id}.mustNotHave should flag the absence of any blackbook-prod grant (security's grant is documented as a legitimate cross-project exception instead)`,
+    );
+  }
+
+  const buckets = Object.fromEntries(matrix.buckets.map((b) => [b.id, b]));
+  const privateEvidence = buckets['private-evidence'];
+  assert.ok(privateEvidence, 'buckets must include private-evidence');
+  assert.equal(privateEvidence.project, 'blackbook-internal', 'private-evidence must resolve to blackbook-internal under ADR-012');
+  assert.equal(privateEvidence.namePattern, 'blackbook-internal-private-evidence');
+  assert.ok(
+    !privateEvidence.readers.some((r) => r.includes('api-internal')),
+    'private-evidence readers must not include api-internal (a blackbook-prod principal) - that would violate the prod -> internal: none invariant',
+  );
+
+  // private-evidence is same-project once relocated, so - unlike promotion/security/puller - it
+  // legitimately has no crossProjectGrants entry of its own; assert that stays true rather than
+  // silently accepting a stray grant that would mean the bucket move was only half-applied.
+  assert.ok(
+    !matrix.crossProjectGrants.some((g) => g.to.toLowerCase().includes('private-evidence')),
+    'private-evidence must not appear in crossProjectGrants - it is same-project in blackbook-internal now, not cross-project',
+  );
+});

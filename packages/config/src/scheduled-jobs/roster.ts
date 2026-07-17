@@ -96,14 +96,20 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 3,
   },
 
-  // --- Reddit deletion-sync (contractual 48h window). Registers the job SHAPE only — BB-074/
-  // BB-077 own the actual purge/deletion-sync mechanics (BB-077 may be building them in
-  // parallel with this bead right now).
+  // --- REAL: Reddit deletion-sync (BB-074/BB-077, closed). Wired to @black-book/domain's
+  // Reddit deletion-sync sweep (sweepRedditPointerLiveness/applyRedditPointerPurge, which wrap
+  // BB-077's shared planDeletionSyncPurge/applyDeletionSyncPurge) via
+  // ./jobs/reddit-deletion-sync.ts. Honors the contractual 48h deletion window
+  // (packages/domain/src/rights/obligations.ts's reddit entry). The Reddit adapter itself still
+  // ships DISABLED in the BB-037 registry pending the Responsible Builder application (a HUMAN
+  // STEP — see packages/domain/src/adapters/reddit/contract.ts) — this job can run against
+  // whatever pointers are already stored (none, until that approval lands and the adapter is
+  // flipped on) without waiting on that approval itself.
   {
     id: 'reddit-deletion-sync',
     owner: 'BB-074/BB-077',
     description:
-      'Reddit deletion-sync: honors the contractual 48h deletion window. Job shape only — BB-074/BB-077 own the purge mechanics.',
+      'Reddit deletion-sync: honors the contractual 48h deletion window by re-checking liveness and purging deleted pointers (including snippets).',
     cadence: { cronExpression: '0 */6 * * *', nominalIntervalMs: 6 * HOUR_MS, humanReadable: 'every 6 hours' },
     budget: { unit: 'items', maxPerRun: 1_000 },
     timeoutSec: 1_800,
@@ -112,9 +118,28 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     targetWorker: { package: 'research', function: 'reddit.deletion_sync.run' },
     environment: 'blackbook-internal',
     publicEffect: 'none',
-    rosterStatus: 'stub',
-    implementationOwnerBead: 'BB-074/BB-077',
+    rosterStatus: 'real',
     consecutiveMissedRunThreshold: 4,
+  },
+
+  // --- REAL: legal change monitoring (BB-087, closed). Fixture-first adapters propose
+  // review_queue events (Congress.gov / eCFR / CourtListener / LegiScan); humans dispose.
+  // Live vendor keys (api.data.gov, LegiScan) remain a human follow-up — tests stay offline.
+  {
+    id: 'legal-change-monitoring',
+    owner: 'BB-087',
+    description:
+      'Legal landscape change monitoring: propose review_queue events from free public sources; never auto-apply public writes.',
+    cadence: { cronExpression: '0 8 * * *', nominalIntervalMs: DAY_MS, humanReadable: 'daily, 08:00 UTC' },
+    budget: { unit: 'items', maxPerRun: 500 },
+    timeoutSec: 1_800,
+    idempotencyKeyScheme: 'job:{jobId}:{dayStart}',
+    killSwitchId: scheduledJobKillSwitchId('legal-change-monitoring'),
+    targetWorker: { package: 'research', function: 'legal.change_monitoring.run' },
+    environment: 'blackbook-internal',
+    publicEffect: 'none',
+    rosterStatus: 'real',
+    consecutiveMissedRunThreshold: 2,
   },
 
   // --- REAL: citation link-health sweeps (BB-083, closed). Wired to @black-book/domain's

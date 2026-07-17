@@ -1,16 +1,24 @@
-# Production deploy via GitHub OIDC + GCP Workload Identity Federation (BB-010).
-# workflow_dispatch only — not a required status check; full pipeline is BB-062.
-# Does not use pull_request or credentials_json. Requires protected Environment "production".
-# Placeholders GCP_WORKLOAD_IDENTITY_PROVIDER / GCP_SERVICE_ACCOUNT must be set on that environment
-# after infra/github/scripts/apply-wif.sh --apply. Auth step is skipped until they exist.
+# Production deploy via GitHub OIDC + GCP Workload Identity Federation (BB-010 / BB-062).
+# workflow_dispatch only — not a required status check. Requires protected Environment "production".
+# Deploys only a pinned, staging-tested commit SHA. Automatic App Hosting rollouts stay disabled;
+# explicit promote step runs after Firestore rules/indexes migrate and before traffic shift.
+# No live cloud apply in repo acceptance — dry-run scripts document human operator steps.
 
-name: Deploy Production (OIDC stub)
+name: Deploy Production
 
 on:
   workflow_dispatch:
     inputs:
+      commit_sha:
+        description: Full 40-char commit SHA validated on staging (required)
+        required: true
+        type: string
+      prior_release_sha:
+        description: Prior known-good SHA for rollback reference (optional)
+        required: false
+        type: string
       confirm:
-        description: "Type deploy to run the OIDC auth + provenance stub (no cloud rollout yet)"
+        description: Type deploy to run production pipeline
         required: true
         default: ""
 
@@ -21,9 +29,63 @@ concurrency:
   group: deploy-production
   cancel-in-progress: false
 
+env:
+  FIREBASE_PROJECT_ID: black-book-efaaf
+  FIREBASE_CONFIG: infra/firebase/firebase.json
+
 jobs:
-  oidc-auth-and-provenance:
-    name: OIDC Auth And Provenance
+  gate:
+    name: Gate / Pin Commit SHA
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      commit_sha: ${{ steps.resolve.outputs.commit_sha }}
+      prior_sha: ${{ steps.resolve.outputs.prior_sha }}
+    steps:
+      - name: Validate dispatch inputs
+        id: resolve
+        env:
+          SHA: ${{ inputs.commit_sha }}
+          PRIOR: ${{ inputs.prior_release_sha }}
+        run: |
+          if [[ "${{ inputs.confirm }}" != "deploy" ]]; then
+            echo "Refusing to run: set confirm=deploy"
+            exit 1
+          fi
+          if [[ ! "$SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "commit_sha must be a full 40-char git SHA (never deploy floating main)"
+            exit 1
+          fi
+          if [[ -n "$PRIOR" && ! "$PRIOR" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "prior_release_sha must be a full 40-char git SHA when set"
+            exit 1
+          fi
+          echo "commit_sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "prior_sha=$PRIOR" >> "$GITHUB_OUTPUT"
+          echo "Production deploy pinned to: $SHA"
+
+      - name: Checkout policy files
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Assert automatic rollouts disabled
+        run: node infra/github/release-pipeline/assert-no-auto-rollout.mjs
+
+  migrate-firestore:
+    name: Migrate Firestore Rules Indexes
+    needs: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+      - name: Firestore rules and indexes before traffic (dry-run)
+        run: bash infra/github/release-pipeline/migrate-firestore-dry-run.sh "${{ needs.gate.outputs.commit_sha }}"
+
+  oidc-auth:
+    name: OIDC Auth Production
+    needs: [gate, migrate-firestore]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
@@ -31,15 +93,10 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - name: Verify dispatch confirmation
-        run: |
-          if [[ "${{ inputs.confirm }}" != "deploy" ]]; then
-            echo "Refusing to run: set confirm=deploy"
-            exit 1
-          fi
-
-      - name: Checkout
+      - name: Checkout exact commit
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
 
       - name: Authenticate to Google Cloud (OIDC)
         id: auth
@@ -57,58 +114,154 @@ jobs:
         run: |
           echo "GCP_WORKLOAD_IDENTITY_PROVIDER / GCP_SERVICE_ACCOUNT not set on Environment production."
           echo "Apply WIF (infra/github/scripts/apply-wif.sh) then set environment variables."
-          echo "Continuing to write provenance stub with authMethod github-oidc-wif (pending)."
+          echo "Continuing dry-run pipeline — no cloud mutations."
 
-      - name: Write deployment provenance stub
-        env:
-          WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          DEPLOY_SA: ${{ vars.GCP_SERVICE_ACCOUNT }}
+  deploy-surfaces:
+    name: Deploy Surfaces Dry Run
+    needs: [gate, oidc-auth]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+      - name: Surface deploy plan (no live apply)
         run: |
-          mkdir -p artifacts
-          DEPLOYED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-          PROVIDER="${WIF_PROVIDER:-projects/332234323945/locations/global/workloadIdentityPools/black-book-github/providers/github-actions}"
-          SA="${DEPLOY_SA:-github-deploy@black-book-efaaf.iam.gserviceaccount.com}"
-          cat > artifacts/deployment-provenance.json <<EOF
-          {
-            "schemaVersion": 1,
-            "projectId": "black-book-efaaf",
-            "environment": "production",
-            "git": {
-              "commitSha": "${{ github.sha }}",
-              "ref": "${{ github.ref }}"
-            },
-            "github": {
-              "repository": "${{ github.repository }}",
-              "repositoryId": "${{ github.repository_id }}",
-              "ownerId": "${{ github.event.repository.owner.id }}",
-              "workflow": "${{ github.workflow }}",
-              "workflowRef": "${{ github.repository }}/.github/workflows/deploy-production.yml@${{ github.ref }}",
-              "runId": "${{ github.run_id }}",
-              "runAttempt": "${{ github.run_attempt }}",
-              "serverUrl": "${{ github.server_url }}"
-            },
-            "identity": {
-              "authMethod": "github-oidc-wif",
-              "workloadIdentityProvider": "${PROVIDER}",
-              "serviceAccountEmail": "${SA}"
-            },
-            "deployedAt": "${DEPLOYED_AT}",
-            "artifacts": [],
-            "notes": "BB-010 stub: OIDC identity path only; App Hosting/Cloud Run rollout is BB-062."
-          }
-          EOF
-          python3 - <<'PY'
-          import json, pathlib
-          path = pathlib.Path("artifacts/deployment-provenance.json")
-          data = json.loads(path.read_text())
-          assert data["identity"]["authMethod"] == "github-oidc-wif"
-          assert data["environment"] == "production"
-          print("provenance stub ok:", path)
-          PY
+          SHA="${{ needs.gate.outputs.commit_sha }}"
+          echo "[DRY-RUN] Deploy surfaces for ${SHA}"
+          echo "  - deploy-web-app-hosting → black-book-web-production (web-runtime SA)"
+          echo "  - deploy-api-public → Cloud Run black-book-api-public"
+          echo "  - deploy-api-submissions → Cloud Run black-book-api-submissions"
+          echo "  - deploy-api-internal → Cloud Run black-book-api-internal (internal ingress)"
+          echo "  - deploy-admin → Cloud Run black-book-admin (IAP)"
+          echo "See infra/gcp/surfaces/README.md for impersonation boundaries."
 
-      - name: Upload provenance artifact
+  promote-app-hosting:
+    name: Promote App Hosting Production
+    needs: [gate, deploy-surfaces]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+      - name: Explicit App Hosting promote (auto rollouts disabled)
+        run: bash infra/github/release-pipeline/promote-app-hosting-dry-run.sh "${{ needs.gate.outputs.commit_sha }}" production
+
+  health-check:
+    name: Health Check Production
+    needs: [gate, promote-app-hosting]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    env:
+      HEALTH_CHECK_URL: ${{ vars.HEALTH_CHECK_URL }}
+      CI_REQUIRE_HEALTH_CHECK: ${{ vars.CI_REQUIRE_HEALTH_CHECK }}
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+      - name: Post-promote health gate
+        run: node infra/github/release-pipeline/health-check-dry-run.mjs
+
+  e2e-smoke:
+    name: E2E Smoke Production
+    needs: [gate, promote-app-hosting]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    env:
+      E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
+      CI_REQUIRE_E2E: ${{ vars.CI_REQUIRE_E2E }}
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Post-deploy smoke (skip without E2E_BASE_URL; fail-closed when CI_REQUIRE_E2E=1)
+        run: node scripts/release/smoke-post-deploy.mjs
+
+  provenance-and-changelog:
+    name: Provenance And Changelog
+    needs: [gate, health-check, e2e-smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+          fetch-depth: 0
+
+      - name: Generate changelog
+        env:
+          CHANGELOG_TO_SHA: ${{ needs.gate.outputs.commit_sha }}
+          CHANGELOG_FROM_SHA: ${{ needs.gate.outputs.prior_sha }}
+          CHANGELOG_OUTPUT: artifacts/release-changelog.md
+        run: node infra/github/release-pipeline/generate-changelog.mjs
+
+      - name: Write deployment provenance
+        env:
+          PROVENANCE_ENVIRONMENT: production
+          PROVENANCE_COMMIT_SHA: ${{ needs.gate.outputs.commit_sha }}
+          PROVENANCE_GIT_REF: refs/heads/main
+          PROVENANCE_REPOSITORY: ${{ github.repository }}
+          PROVENANCE_REPOSITORY_ID: ${{ github.repository_id }}
+          PROVENANCE_OWNER_ID: ${{ github.event.repository.owner.id }}
+          PROVENANCE_WORKFLOW: ${{ github.workflow }}
+          PROVENANCE_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/deploy-production.yml@${{ github.ref }}
+          PROVENANCE_RUN_ID: ${{ github.run_id }}
+          PROVENANCE_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PROVENANCE_SERVER_URL: ${{ github.server_url }}
+          PROVENANCE_WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          PROVENANCE_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT || 'github-deploy@black-book-efaaf.iam.gserviceaccount.com' }}
+          PROVENANCE_NOTES: BB-062 production deploy — pinned SHA; explicit promote; health + smoke gates passed.
+        run: |
+          node infra/github/release-pipeline/write-provenance.mjs
+          node infra/github/release-pipeline/validate-provenance.mjs artifacts/deployment-provenance.json
+
+      - name: Upload release artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: deployment-provenance
-          path: artifacts/deployment-provenance.json
+          name: deployment-provenance-${{ needs.gate.outputs.commit_sha }}
+          path: |
+            artifacts/deployment-provenance.json
+            artifacts/release-changelog.md
           if-no-files-found: error
+
+  rollback-on-failure:
+    name: Rollback On Failure
+    needs: [gate, health-check, e2e-smoke, provenance-and-changelog]
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+      - name: Rollback dry-run rehearsal
+        env:
+          PRIOR_SHA: ${{ needs.gate.outputs.prior_sha }}
+        run: |
+          PRIOR="${PRIOR_SHA:-0000000000000000000000000000000000000000}"
+          bash infra/github/release-pipeline/rollback-dry-run.sh "$PRIOR" "${{ needs.gate.outputs.commit_sha }}" production
+          echo "::error::Production deploy failed health/smoke gates — execute rollback runbook before re-enabling traffic."

@@ -18,7 +18,12 @@ create_new_projects                 = false # 1. create blackbook-staging + blac
 provision_internal_databases        = false # 2. requires blackbook-internal to exist
 provision_staging_service_accounts  = false # 2. requires blackbook-staging to exist
 provision_internal_service_accounts = false # 2. requires blackbook-internal to exist
-apply_cross_project_iam             = false # 3. requires step 2's blackbook-internal SAs
+provision_internal_buckets          = false # 3. requires blackbook-internal + step 2's internal SAs
+apply_cross_project_iam             = false # 4. requires step 2's blackbook-internal SAs
+
+# Named-database PITR (raw-ingest/curated in blackbook-internal). Defaults disabled, like every
+# other provisioning switch in this module; flip only after a human reviews cost/RPO tradeoffs.
+internal_firestore_pitr_enabled = false
 
 billing_budget_amount_units = {
   prod     = 0 # fill after review; notify-only, never a kill switch (ADR-012)

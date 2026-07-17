@@ -1,27 +1,26 @@
 /**
  * CSS custom properties for Black Book themes, focus, motion, and layout tokens.
  * Import via `@black-book/ui/styles.css` in consuming apps.
- * Palette: the "Pinned Page" brand package (2026-07-17) — Archive Paper /
- * Black Ink / Copper Pin / Page Sand. Mirrors packages/ui/src/tokens/colors.ts —
- * keep the two in sync.
+ * Palette: white / Black Ink primaries with Copper Pin / Page Sand accents.
+ * Mirrors packages/ui/src/tokens/colors.ts — keep the two in sync.
  */
 
 :root,
 [data-theme='light'] {
   color-scheme: light;
 
-  --bb-canvas: #f4efe5;
-  --bb-surface: #f4efe5;
-  --bb-surface-raised: #fbf7ef;
+  --bb-canvas: #ffffff;
+  --bb-surface: #ffffff;
+  --bb-surface-raised: #fafafa;
   --bb-ink: #0a0a0a;
-  --bb-ink-muted: #2b2620;
-  --bb-ink-subtle: #5c5548;
-  --bb-border: #e3dccb;
+  --bb-ink-muted: #404040;
+  --bb-ink-subtle: #737373;
+  --bb-border: #e5e5e5;
   --bb-border-strong: #0a0a0a;
   --bb-focus-ring: #0a0a0a;
-  --bb-focus-ring-offset: #f4efe5;
+  --bb-focus-ring-offset: #ffffff;
   --bb-inverse: #0a0a0a;
-  --bb-inverse-ink: #f4efe5;
+  --bb-inverse-ink: #ffffff;
   --bb-overlay: rgba(10, 10, 10, 0.55);
 
   --bb-accent: #7a4318;
@@ -54,25 +53,25 @@
 
   --bb-viz-1: #0a0a0a;
   --bb-viz-2: #b86b2a;
-  --bb-viz-3: #5c5548;
+  --bb-viz-3: #737373;
   --bb-viz-4: #d8a178;
-  --bb-viz-grid: #e3dccb;
+  --bb-viz-grid: #e5e5e5;
 }
 
 [data-theme='dark'] {
   color-scheme: dark;
 
   --bb-canvas: #0a0a0a;
-  --bb-surface: #141210;
-  --bb-surface-raised: #1e1a15;
-  --bb-ink: #f4efe5;
-  --bb-ink-muted: #d9d2c4;
-  --bb-ink-subtle: #a69c89;
-  --bb-border: #2e2a22;
-  --bb-border-strong: #f4efe5;
-  --bb-focus-ring: #f4efe5;
+  --bb-surface: #141414;
+  --bb-surface-raised: #1a1a1a;
+  --bb-ink: #ffffff;
+  --bb-ink-muted: #a3a3a3;
+  --bb-ink-subtle: #8c8c8c;
+  --bb-border: #2a2a2a;
+  --bb-border-strong: #ffffff;
+  --bb-focus-ring: #ffffff;
   --bb-focus-ring-offset: #0a0a0a;
-  --bb-inverse: #f4efe5;
+  --bb-inverse: #ffffff;
   --bb-inverse-ink: #0a0a0a;
   --bb-overlay: rgba(0, 0, 0, 0.72);
 
@@ -104,11 +103,11 @@
   --bb-elevation-md: none;
   --bb-elevation-lg: none;
 
-  --bb-viz-1: #f4efe5;
+  --bb-viz-1: #ffffff;
   --bb-viz-2: #d8a178;
-  --bb-viz-3: #a69c89;
+  --bb-viz-3: #a3a3a3;
   --bb-viz-4: #b86b2a;
-  --bb-viz-grid: #2e2a22;
+  --bb-viz-grid: #2a2a2a;
 }
 
 :root {

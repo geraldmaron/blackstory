@@ -13,8 +13,9 @@ export type SecurityHeader = {
 export const REFERRER_POLICY = 'strict-origin-when-cross-origin';
 
 /**
- * Permissions-Policy: disable powerful features on the public read surface.
- * Adjust when corrections uploads or media require explicit grants.
+ * Permissions-Policy: disable powerful features on the public read surface by default.
+ * `geolocation=(self)` is required for BB-050 `/locate` consent-gated browser location
+ * (explicit user click only); other sensors stay denied.
  */
 export const PERMISSIONS_POLICY = [
   'accelerometer=()',
@@ -23,7 +24,7 @@ export const PERMISSIONS_POLICY = [
   'display-capture=()',
   'encrypted-media=()',
   'fullscreen=(self)',
-  'geolocation=()',
+  'geolocation=(self)',
   'gyroscope=()',
   'magnetometer=()',
   'microphone=()',

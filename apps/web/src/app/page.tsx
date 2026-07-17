@@ -1,50 +1,59 @@
 /**
- * Public home page — Gen Z news first viewport + modular story rail.
+ * Public home page — interactive US map teaser that enters the Explore premier experience.
  */
 
-import { SeedDataNotice } from '../components/SeedDataNotice';
+import { US_CONUS_BOUNDS } from '@black-book/domain/map/geography';
 import { FEATURED_SEED_IDS, getPublicEntity } from '../data/public-seed';
+import { listPublicEntityViews } from '../lib/public-data/source';
+import { HomeMapHero } from './HomeMapHero';
+import { buildExploreViewModel } from './explore/explore-view-model';
+import { buildExploreMapStyle } from './map/explore-style';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const entities = await listPublicEntityViews();
+  const explore = buildExploreViewModel({}, entities.data, entities.source);
+  const featureCollection = {
+    type: 'FeatureCollection' as const,
+    features: [...explore.filteredFeatures],
+  };
+  const mapStyle = buildExploreMapStyle({
+    featureCollection,
+    jurisdictionAreaFeatures: explore.source.jurisdictionAreaFeatures,
+    densityLayerEnabled: false,
+  });
+  // Seed fixtures are D.C.-local — bias east so circular pins sit clear of the left hero copy.
+  const initialViewport = {
+    lat: 38.9072,
+    lng: -76.9,
+    zoom: 5.2,
+  } as const;
+
   const featured = FEATURED_SEED_IDS.map((id) => getPublicEntity(id)).filter(
     (entity): entity is NonNullable<typeof entity> => Boolean(entity),
   );
 
   return (
     <>
-      <section className="bb-hero" aria-labelledby="hero-brand">
-        <div className="bb-hero__inner">
-          <p id="hero-brand" className="bb-hero__brand">
-            Black Book
-          </p>
-          <h1 className="bb-hero__headline">History, pinned to place.</h1>
-          <p className="bb-hero__support">
-            Only records that clear the evidence bar — released, cited, and never a residential
-            dossier.
-          </p>
-          <div className="bb-hero__actions">
-            <a className="bb-cta bb-cta--solid" href="/search">
-              Search now
-            </a>
-            <a className="bb-cta bb-cta--ghost" href="/explore">
-              Explore places
-            </a>
-          </div>
-        </div>
-      </section>
+      <HomeMapHero
+        mapStyle={mapStyle}
+        featureCollection={featureCollection}
+        bounds={US_CONUS_BOUNDS}
+        densityLevels={explore.densityLevels}
+        initialViewport={initialViewport}
+        showSeedNotice={explore.dataSource !== 'live'}
+        featureCount={explore.filteredFeatures.length}
+      />
 
       <main id="main">
         <div className="bb-container bb-page">
           <section className="bb-section bb-section--flush" aria-labelledby="featured-heading">
-            <div style={{ marginBottom: 'var(--bb-space-6)' }}>
-              <SeedDataNotice compact />
-            </div>
-            <p className="bb-section__kicker">On the board</p>
+            <p className="bb-section__kicker">On the map</p>
             <h2 className="bb-section__title" id="featured-heading">
               Featured sample records
             </h2>
             <p className="bb-section__lede">
-              Seed fixtures for the public shell — not a live release.
+              Seed fixtures for the public shell — select a pin on the map above, or open a full
+              record here.
             </p>
             <ul className="bb-story-rail">
               {featured.map((entity) => (

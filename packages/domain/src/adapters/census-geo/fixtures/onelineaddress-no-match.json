@@ -1,0 +1,9 @@
+{
+  "result": {
+    "input": {
+      "address": { "address": "not a real address, nowhere, ZZ 00000" },
+      "benchmark": { "isDefault": true, "benchmarkDescription": "Public Address Ranges - Current Benchmark", "id": "4", "benchmarkName": "Public_AR_Current" }
+    },
+    "addressMatches": []
+  }
+}

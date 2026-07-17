@@ -165,6 +165,10 @@ test('cursor round-trip returns the next page, not the same page', async () => {
   const secondId = second.results[0]?.id;
 
   assert.notEqual(firstId, secondId, 'the second page must not repeat the first page');
-  assert.equal(firstId, PLACE_ID);
-  assert.equal(secondId, SCHOOL_ID);
+  // BB-092: relatedCount is now the real graph-adjacency size, not relatedIds.length — the school
+  // is connected to both the place and the commemoration event, so it outranks the place
+  // (relatedCount 2 vs 1) once the equal "education" topic-tier tie is broken by connection
+  // strength.
+  assert.equal(firstId, SCHOOL_ID);
+  assert.equal(secondId, PLACE_ID);
 });

@@ -78,6 +78,26 @@ export type { FirebaseHarness } from './harness/firebase.js';
 export { auditHtmlSmoke } from './a11y/html-smoke.js';
 export type { A11yFixtureIssue } from './a11y/html-smoke.js';
 
+export { auditHtmlFixture } from './a11y/audit.js';
+export type { A11yAuditResult } from './a11y/audit.js';
+export { CORE_JOURNEY_FIXTURES } from './a11y/journey-fixtures.js';
+export type { CoreJourneyFixture, CoreJourneyId } from './a11y/journey-fixtures.js';
+export { MAP_SEARCH_ACCESSIBLE_PEERS } from './a11y/map-search-peers.js';
+
+export {
+  assertPerformanceBudget,
+  DEFAULT_PERFORMANCE_BUDGET,
+  evaluatePerformanceBudget,
+} from './release-gates/index.js';
+export type {
+  PerformanceBudgetConfig,
+  PerformanceBudgetEvaluation,
+  PerformanceBudgetThreshold,
+  PerformanceBudgetViolation,
+  PerformanceMetricId,
+  PerformanceMetricSample,
+} from './release-gates/index.js';
+
 export { assertHealthContract } from './contract/health.js';
 export type { HealthContract } from './contract/health.js';
 
@@ -100,3 +120,7 @@ export type {
 
 export * from './security-gates/index.js';
 export * from './gold-corpus/index.js';
+export * from './load-abuse/index.js';
+export * from './adversarial-integrity/index.js';
+
+export * from './launch-gate/index.js';

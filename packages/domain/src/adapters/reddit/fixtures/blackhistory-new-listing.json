@@ -1,0 +1,57 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": null,
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "id": "bh1live",
+          "name": "t3_bh1live",
+          "subreddit": "BlackHistory",
+          "title": "My grandmother's church program from Rosewood Baptist, 1949 dedication",
+          "selftext": "Found this in a box while cleaning out her house. The historical society didn't have a copy.",
+          "permalink": "/r/BlackHistory/comments/bh1live/my_grandmothers_church_program_from_rosewood/",
+          "author": "descendant_of_rosewood",
+          "created_utc": 1752770400,
+          "num_comments": 6,
+          "score": 34,
+          "removed_by_category": null
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "id": "bh1removed",
+          "name": "t3_bh1removed",
+          "subreddit": "BlackHistory",
+          "title": "[removed]",
+          "selftext": "[removed]",
+          "permalink": "/r/BlackHistory/comments/bh1removed/removed_post/",
+          "author": "some_user",
+          "created_utc": 1752769000,
+          "num_comments": 0,
+          "score": 1,
+          "removed_by_category": "moderator"
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "id": "bh1deleted",
+          "name": "t3_bh1deleted",
+          "subreddit": "BlackHistory",
+          "title": "Deleted post title still visible",
+          "selftext": "[deleted]",
+          "permalink": "/r/BlackHistory/comments/bh1deleted/deleted_post/",
+          "author": "[deleted]",
+          "created_utc": 1752768500,
+          "num_comments": 2,
+          "score": 5,
+          "removed_by_category": null
+        }
+      }
+    ]
+  }
+}

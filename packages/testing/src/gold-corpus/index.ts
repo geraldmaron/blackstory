@@ -9,3 +9,4 @@ export * from './report.js';
 export * from './types.js';
 export * from './retrieval-embedding.js';
 export * from './retrieval-eval.js';
+export * from './hybrid-retrieval-eval.js';

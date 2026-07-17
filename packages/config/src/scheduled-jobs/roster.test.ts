@@ -20,13 +20,15 @@ test('roster job ids are unique', () => {
   assert.equal(new Set(ids).size, ids.length);
 });
 
-test('exactly six real job bodies are registered (four from BB-084 plus BB-081s recalibration-report and BB-083s citation-link-health-sweep)', () => {
+test('exactly eight real job bodies are registered (four from BB-084 plus BB-081 recalibration-report, BB-083 citation-link-health-sweep, BB-074 reddit-deletion-sync, and BB-087 legal-change-monitoring)', () => {
   const store = createDefaultScheduledJobRegistry();
   const real = listScheduledJobs(store, { rosterStatus: 'real' }).map((job) => job.id).sort();
   assert.deepEqual(real, [
     'backup-verification-daily',
     'citation-link-health-sweep',
     'gold-corpus-regression',
+    'legal-change-monitoring',
+    'reddit-deletion-sync',
     'relevance-confidence-recalibration-report',
     'restore-drill-quarterly',
     'source-drift-run-health-check',
@@ -81,6 +83,7 @@ test('the roster covers every acceptance-criterion job family', () => {
   const expectedFamilies = [
     'discovery-campaign-',
     'reddit-deletion-sync',
+    'legal-change-monitoring',
     'citation-link-health-sweep',
     'external-dataset-refresh-',
     'relevance-confidence-recalibration-report',
@@ -92,8 +95,8 @@ test('the roster covers every acceptance-criterion job family', () => {
   ];
   for (const family of expectedFamilies) {
     assert.ok(
-      [...ids].some((id) => id.startsWith(family)),
-      `expected a roster entry starting with "${family}"`,
+      [...ids].some((id) => id === family || id.startsWith(family)),
+      `expected a roster entry matching "${family}"`,
     );
   }
 });

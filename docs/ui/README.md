@@ -8,7 +8,7 @@ geometry, palette, typography, and usage rules; and [`story.md`](./story.md)
 
 ## What shipped
 
-- **Palette (v2):** Archive Paper canvas / Black Ink primary; Copper Pin +
+- **Palette (v2):** White canvas / Black Ink primary; Copper Pin +
   Page Sand brand accent; light and dark themes via `data-theme` (dark is
   first-class, not an afterthought)
 - **Status colors:** warning, confidence, dispute, error only, re-derived
@@ -21,7 +21,8 @@ geometry, palette, typography, and usage rules; and [`story.md`](./story.md)
   pigment-anchored data-viz
 - **Components:** Card, Citation, Confidence, Timeline, MapFrame, ResultList, FilterBar, Dialog, Notice, EmptyState, Button, ThemeToggle
 - **Fixtures:** public route `/design-system` (Storybook equivalent)
-- **Public shell (BB-048):** news shell on port **3048** — warm paper/near-black-ink primary, full-bleed hero, story rails, sticky masthead
+- **Public shell (BB-048 + map-led home):** news shell — white/black primary,
+  map-led homepage hero, story rails, sticky masthead
 
 
 ## Usage

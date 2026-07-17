@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "attestations": [
+    {
+      "gateId": "published-claims-with-evidence",
+      "attestedBy": "publication-operator@example.com",
+      "attestedAt": "2026-07-17T12:00:00.000Z",
+      "evidenceRef": "release-ticket-1234",
+      "notes": "Manual evidence audit complete for beta candidate."
+    },
+    {
+      "gateId": "unsupported-narrative-zero",
+      "attestedBy": "publication-operator@example.com",
+      "attestedAt": "2026-07-17T12:00:00.000Z"
+    },
+    {
+      "gateId": "living-addresses-zero",
+      "attestedBy": "privacy-reviewer@example.com",
+      "attestedAt": "2026-07-17T12:00:00.000Z"
+    },
+    {
+      "gateId": "untracked-publication-decisions-zero",
+      "attestedBy": "publication-operator@example.com",
+      "attestedAt": "2026-07-17T12:00:00.000Z"
+    },
+    {
+      "gateId": "source-policy-violations-zero",
+      "attestedBy": "research-lead@example.com",
+      "attestedAt": "2026-07-17T12:00:00.000Z"
+    },
+    {
+      "gateId": "incident-exercise-complete",
+      "attestedBy": "platform-oncall@example.com",
+      "attestedAt": "2026-07-17T12:00:00.000Z",
+      "evidenceRef": "docs/runbooks/incident-response.md#tabletop-2026-07"
+    },
+    {
+      "gateId": "legal-privacy-review-tracked",
+      "attestedBy": "legal-counsel@example.com",
+      "attestedAt": "2026-07-17T12:00:00.000Z",
+      "evidenceRef": "legal-review-queue-export.json"
+    }
+  ]
+}

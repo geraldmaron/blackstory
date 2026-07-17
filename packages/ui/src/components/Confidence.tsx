@@ -2,8 +2,14 @@
  * Confidence indicator with text/mono cue so status is never color-only.
  */
 
+import React from 'react';
 import type { ConfidenceLevel } from '../tokens/colors.js';
 import { cx } from '../utils/cx.js';
+
+// `React` is otherwise unused under this package's own automatic JSX runtime, but keeping it
+// imported makes this file safe to cross-transpile from a consumer whose own tsconfig uses a
+// classic JSX transform (see Notice.tsx's identical note).
+void React;
 
 export type ConfidenceProps = {
   readonly level: ConfidenceLevel;

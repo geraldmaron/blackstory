@@ -10,3 +10,8 @@ export * from './facets.js';
 export * from './explain.js';
 export * from './index-build.js';
 export * from './query.js';
+export * from './rrf.js';
+export * from './lanes.js';
+export * from './fusion.js';
+export * from './hybrid-explain.js';
+export * from './hybrid.js';

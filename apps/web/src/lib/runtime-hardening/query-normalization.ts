@@ -4,6 +4,8 @@
  */
 
 import {
+  EXPLORE_PAGE_PARAM_ALLOWLIST,
+  HISTORY_PAGE_PARAM_ALLOWLIST,
   SEARCH_PAGE_PARAM_ALLOWLIST,
   TRACKING_QUERY_KEYS,
   TRACKING_QUERY_PREFIXES,
@@ -27,6 +29,12 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   const path = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
   if (path === '/search') {
     return SEARCH_PAGE_PARAM_ALLOWLIST;
+  }
+  if (path === '/explore') {
+    return EXPLORE_PAGE_PARAM_ALLOWLIST;
+  }
+  if (path === '/history') {
+    return HISTORY_PAGE_PARAM_ALLOWLIST;
   }
   return [];
 }

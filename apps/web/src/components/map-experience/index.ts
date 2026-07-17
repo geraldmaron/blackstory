@@ -1,0 +1,7 @@
+/**
+ * Barrel export for BB-051 map-experience UI components.
+ */
+export { DensityLayerToggle } from './DensityLayerToggle';
+export { MapExperienceLegend } from './MapExperienceLegend';
+export { NarrativeCard } from './NarrativeCard';
+export { SynchronizedResultList } from './SynchronizedResultList';

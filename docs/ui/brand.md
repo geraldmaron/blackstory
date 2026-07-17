@@ -45,9 +45,9 @@ it from sliding into cliché:
 | Role | Hex | Name | Use |
 |---|---|---|---|
 | Ink | `#0A0A0A` | Black Ink | Primary ink; near-black, not pure `#000` |
-| Canvas | `#F4EFE5` | Archive Paper | Primary canvas; warm off-white, not pure `#FFF` |
+| Canvas | `#FFFFFF` | White | Primary light-theme canvas and surfaces |
 | Accent (graphic) | `#B86B2A` | Copper Pin | The mark's pin; large-scale/graphic UI use (icons, borders, tags) — **3:1 contrast only, not body text** |
-| Accent (text-safe) | `#7A4318` | Copper Ink | Darkened Copper Pin for links/text on the light theme's Archive Paper canvas (6.9:1) |
+| Accent (text-safe) | `#7A4318` | Copper Ink | Darkened Copper Pin for links/text on the light theme's white canvas |
 | Accent (muted) | `#D8A178` | Page Sand | Page-edge bands, decorative fills; text-safe as the **dark theme's** accent (8.8:1 on Black Ink) |
 
 Fixed swatches live in `packages/ui/src/tokens/brand-palette.ts`
@@ -57,7 +57,7 @@ is safe for text vs. graphics, per theme) live in
 `accentMuted` roles — see that file's `criticalTextPairs` /
 `criticalUiPairs` and `contrast.test.ts` for the enforced ratios. Never use
 raw Copper Pin (`#B86B2A`) as small/body text color on the light theme's
-Archive Paper canvas — it only clears the 3:1 UI/large-text bar (3.54:1),
+white canvas — it only clears the 3:1 UI/large-text bar,
 not the 4.5:1 body-text bar. Page Sand (`#D8A178`) is a fill/graphic color
 on light canvases only (1.97:1) — never foreground text there.
 
@@ -139,9 +139,9 @@ both at request time from the same shared `BlackBookMark` component, so
 there is exactly one source of truth for the interactive contexts:
 
 - `apps/web/src/app/icon.tsx` — 64x64 PNG via `next/og` `ImageResponse`.
-  Black Ink tile with the mark in Archive Paper/Copper Pin, centered.
+  Black Ink tile with the mark in white/Copper Pin, centered.
 - `apps/web/src/app/opengraph-image.tsx` — 1200x630 PNG, same mechanism,
-  Archive Paper canvas with the full mark, wordmark, and tagline.
+  white canvas with the full mark, wordmark, and tagline.
 
 ## Clearspace and minimum sizes
 

@@ -1,0 +1,198 @@
+# Black Book — staging deploy pipeline (BB-062).
+# Deploys only a pinned commit SHA via GitHub OIDC + WIF. No live cloud apply in repo acceptance.
+# Firestore rules/indexes migrate BEFORE App Hosting traffic. Automatic App Hosting rollouts stay disabled.
+
+name: Deploy Staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: Full 40-char commit SHA that passed CI (required)
+        required: true
+        type: string
+      confirm:
+        description: Type deploy-staging to run
+        required: true
+        default: ""
+  push:
+    branches: [staging]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+env:
+  FIREBASE_PROJECT_ID: black-book-efaaf
+  FIREBASE_CONFIG: infra/firebase/firebase.json
+
+jobs:
+  gate:
+    name: Gate / Pin Commit SHA
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      commit_sha: ${{ steps.resolve.outputs.commit_sha }}
+    steps:
+      - name: Resolve pinned commit SHA
+        id: resolve
+        env:
+          INPUT_SHA: ${{ inputs.commit_sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            SHA="${{ github.sha }}"
+          else
+            SHA="$INPUT_SHA"
+            if [[ "${{ inputs.confirm }}" != "deploy-staging" ]]; then
+              echo "Refusing to run: set confirm=deploy-staging"
+              exit 1
+            fi
+          fi
+          if [[ ! "$SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "commit_sha must be a full 40-char git SHA"
+            exit 1
+          fi
+          echo "commit_sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "Pinned deploy SHA: $SHA"
+
+      - name: Checkout policy files
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Assert automatic rollouts disabled
+        run: node infra/github/release-pipeline/assert-no-auto-rollout.mjs
+
+  checkout-pinned:
+    name: Checkout Pinned Commit
+    needs: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+
+  migrate-firestore:
+    name: Migrate Firestore Rules Indexes
+    needs: [gate, checkout-pinned]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+      - name: Firestore rules and indexes sequencing (dry-run)
+        run: bash infra/github/release-pipeline/migrate-firestore-dry-run.sh "${{ needs.gate.outputs.commit_sha }}"
+
+  oidc-auth:
+    name: OIDC Auth Staging
+    needs: [gate, migrate-firestore]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+
+      - name: Authenticate to Google Cloud (OIDC)
+        if: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && vars.GCP_SERVICE_ACCOUNT != '' }}
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID || 'black-book-efaaf' }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          export_environment_variables: true
+
+      - name: Skip auth when WIF vars unset
+        if: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER == '' || vars.GCP_SERVICE_ACCOUNT == '' }}
+        run: |
+          echo "GCP_WORKLOAD_IDENTITY_PROVIDER / GCP_SERVICE_ACCOUNT not set on Environment staging."
+          echo "Apply WIF (infra/github/scripts/apply-wif.sh) then set environment variables."
+
+  promote-app-hosting:
+    name: Promote App Hosting Staging
+    needs: [gate, oidc-auth]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: staging
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+      - name: Explicit App Hosting promote (dry-run — auto rollouts disabled)
+        run: bash infra/github/release-pipeline/promote-app-hosting-dry-run.sh "${{ needs.gate.outputs.commit_sha }}" staging
+
+  provenance:
+    name: Write Staging Provenance
+    needs: [gate, promote-app-hosting]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+      - name: Write and validate provenance
+        env:
+          PROVENANCE_ENVIRONMENT: staging
+          PROVENANCE_COMMIT_SHA: ${{ needs.gate.outputs.commit_sha }}
+          PROVENANCE_GIT_REF: ${{ github.ref }}
+          PROVENANCE_REPOSITORY: ${{ github.repository }}
+          PROVENANCE_REPOSITORY_ID: ${{ github.repository_id }}
+          PROVENANCE_OWNER_ID: ${{ github.event.repository.owner.id }}
+          PROVENANCE_WORKFLOW: ${{ github.workflow }}
+          PROVENANCE_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/deploy-staging.yml@${{ github.ref }}
+          PROVENANCE_RUN_ID: ${{ github.run_id }}
+          PROVENANCE_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PROVENANCE_SERVER_URL: ${{ github.server_url }}
+          PROVENANCE_WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          PROVENANCE_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT || 'github-deploy-staging@black-book-efaaf.iam.gserviceaccount.com' }}
+          PROVENANCE_NOTES: BB-062 staging deploy — pinned SHA only; cloud promote is human step.
+        run: |
+          node infra/github/release-pipeline/write-provenance.mjs
+          node infra/github/release-pipeline/validate-provenance.mjs artifacts/deployment-provenance.json
+      - name: Upload staging provenance
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: staging-provenance-${{ needs.gate.outputs.commit_sha }}
+          path: artifacts/deployment-provenance.json
+          if-no-files-found: error
+
+  e2e-smoke:
+    name: E2E Smoke Staging
+    needs: [gate, promote-app-hosting]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
+      CI_REQUIRE_E2E: ${{ vars.CI_REQUIRE_E2E }}
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Post-deploy smoke (skip without E2E_BASE_URL; fail-closed when CI_REQUIRE_E2E=1)
+        run: node scripts/release/smoke-post-deploy.mjs

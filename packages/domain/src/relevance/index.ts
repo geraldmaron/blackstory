@@ -85,3 +85,50 @@ export {
   loadRelevanceGoldFixture,
   getRelevanceFixtureCase,
 } from './fixtures.js';
+
+// BB-054: public "why this appears" surface — story-dimension balance, editorial euphemism
+// checks, trauma-content notices, missing-perspective indicators, and the auditable BB-090
+// notabilityBasis renderer. Composes ./why.js, ./public.js, and ../entity-status.js; introduces
+// no new relevance gate and does not modify ./engine.js or ./gates.js.
+export {
+  STORY_DIMENSIONS,
+  STORY_DIMENSION_LABELS,
+  classifyStoryDimensions,
+  isViolenceOnlyCollapse,
+  assertResultsNotViolenceOnlyCollapse,
+  type StoryDimension,
+} from './why-public-dimensions.js';
+
+export {
+  PASSIVE_EUPHEMISM_PHRASES,
+  findPassiveEuphemisms,
+  assertNoPassiveEuphemisms,
+  type PassiveEuphemismPhrase,
+  type EditorialFinding,
+} from './why-public-editorial.js';
+
+export {
+  deriveTraumaContentNotice,
+  type TraumaContentNoticeDecision,
+} from './why-public-notice.js';
+
+export {
+  deriveMissingPerspectiveIndicators,
+  type MissingPerspectiveIndicator,
+} from './why-public-missing-perspective.js';
+
+export {
+  NOTABILITY_CRITERION_LABELS,
+  buildPublicNotabilityBasis,
+  assertPublicNotabilityBasisNeverScored,
+  type PublicNotabilityBasisItem,
+} from './why-public-basis.js';
+
+export {
+  assertSubstantiveConnectionExplained,
+  assertReasonNotIdentityAttendanceOrJobAlone,
+  assertExplanationDerivesFromAcceptedEvidence,
+  buildPublicWhyThisAppears,
+  type PublicWhyThisAppearsInput,
+  type PublicWhyThisAppears,
+} from './why-public-explanation.js';

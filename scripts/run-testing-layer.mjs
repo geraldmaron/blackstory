@@ -1,7 +1,7 @@
 /**
  * Runs Node.js test files for @black-book/testing by layer.
  * Usage: node scripts/run-testing-layer.mjs <layer>
- * Layers: unit | contract | security | a11y | integration | migration | e2e | all | coverage
+ * Layers: unit | contract | security | a11y | release-gates | integration | migration | e2e | all | coverage
  */
 import { spawnSync } from 'node:child_process';
 import { readdirSync } from 'node:fs';
@@ -24,8 +24,10 @@ const matchers = {
     /quarantine\/registry\.test\.ts$/.test(file),
   contract: (file) => /contract\/.*\.test\.ts$/.test(file),
   security: (file) =>
-    /security\/.*\.test\.ts$/.test(file) || /guards\/production\.test\.ts$/.test(file),
+    /(?:security|load-abuse|adversarial-integrity)\/.*\.test\.ts$/.test(file) ||
+    /guards\/production\.test\.ts$/.test(file),
   a11y: (file) => /a11y\/.*\.test\.ts$/.test(file),
+  'release-gates': (file) => /(?:release-gates|launch-gate)\/.*\.test\.ts$/.test(file),
   integration: (file) => /\.integration\.test\.ts$/.test(file),
   migration: (file) => /migration\/.*\.test\.ts$/.test(file),
   e2e: (file) => /e2e\/.*\.test\.ts$/.test(file),

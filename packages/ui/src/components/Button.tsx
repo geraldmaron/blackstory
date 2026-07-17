@@ -2,8 +2,11 @@
  * Primary/secondary button primitives using semantic native button elements.
  */
 
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import React, { type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { cx } from '../utils/cx.js';
+
+// Defensive: apps/web SSR tests may classic-transform this package's TSX source.
+void React;
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   readonly variant?: 'primary' | 'secondary';

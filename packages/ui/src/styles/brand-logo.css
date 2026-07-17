@@ -1,7 +1,7 @@
 .bb-logo {
   --bb-logo-size: 112px;
   --bb-logo-ink: #0a0a0a;
-  --bb-logo-paper: #f4efe5;
+  --bb-logo-paper: #ffffff;
   --bb-logo-accent: #b86b2a;
 
   display: inline-flex;

@@ -428,6 +428,12 @@ importers:
 
   packages/testing:
     devDependencies:
+      '@black-book/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@black-book/security':
+        specifier: workspace:*
+        version: link:../security
       '@black-book/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config

@@ -1,0 +1,82 @@
+/**
+ * Presentational result panel for the `/locate` geocode experience (BB-050) — renders either a
+ * resolved jurisdiction (state/county/city names + a link into BB-049's `/search`) or the
+ * manual-place-search fallback notice (acceptance criterion 4). Pure and server-safe (no hooks)
+ * so it stays trivially SSR-render-testable with `renderToStaticMarkup`, matching this app's
+ * existing `DegradedModeNotice.test.ts` pattern.
+ *
+ * Never renders `precision.lat`/`precision.lng` even when present (acceptance criterion 3: exact
+ * coordinates are reduced when no longer needed) — this component only ever reads the
+ * jurisdiction names and ids off a resolution, never its coordinate fields.
+ */
+import React from 'react';
+import { Notice } from '@black-book/ui';
+import type { LocateClientResult } from '../../lib/geocode/locate-client';
+
+// See LocationPrivacyNotice.tsx's identical note: keeps this file safe under a classic JSX
+// runtime (this app's own test runner) even though the automatic runtime doesn't need it.
+void React;
+
+export type LocationResolutionPanelProps = {
+  readonly result: LocateClientResult;
+};
+
+const RATE_LIMIT_MESSAGE =
+  'Too many location lookups in a row. Wait a moment and try again, or search by place name below.';
+const APP_CHECK_MESSAGE =
+  'This browser session could not be verified. Reload the page, or search by place name below.';
+const NETWORK_ERROR_MESSAGE =
+  'The location lookup service is temporarily unreachable. Search by place name below.';
+const INVALID_QUERY_MESSAGE = 'That input could not be read as an address, ZIP, or coordinate.';
+
+export function LocationResolutionPanel({ result }: LocationResolutionPanelProps) {
+  if (result.kind === 'resolved') {
+    const { match, jurisdictionIds } = result.resolution;
+    const parts = [match.placeName, match.countyName, match.stateName].filter(
+      (part): part is string => Boolean(part),
+    );
+    return (
+      <Notice tone="warning" title="Location resolved">
+        <p className="bb-sans">
+          {parts.length > 0 ? parts.join(', ') : 'A U.S. jurisdiction was resolved for this input.'}
+        </p>
+        <p className="bb-mono" style={{ fontSize: '0.8125rem' }}>
+          Jurisdiction: {jurisdictionIds.countyId ?? jurisdictionIds.stateId ?? jurisdictionIds.countryId}
+        </p>
+        <p className="bb-sans">
+          <a className="bb-cta bb-cta--ink" href="/search">
+            Search records
+          </a>
+        </p>
+      </Notice>
+    );
+  }
+
+  if (result.kind === 'fallback') {
+    return (
+      <Notice tone="dispute" title="No address match">
+        <p className="bb-sans">{result.fallback.message}</p>
+        <p className="bb-sans">
+          <a className="bb-cta bb-cta--ink" href={result.fallback.searchHref}>
+            Go to search
+          </a>
+        </p>
+      </Notice>
+    );
+  }
+
+  const message =
+    result.kind === 'rate_limited'
+      ? RATE_LIMIT_MESSAGE
+      : result.kind === 'app_check_denied'
+        ? APP_CHECK_MESSAGE
+        : result.kind === 'invalid_query'
+          ? INVALID_QUERY_MESSAGE
+          : NETWORK_ERROR_MESSAGE;
+
+  return (
+    <Notice tone="error" title="Lookup unavailable">
+      <p className="bb-sans">{message}</p>
+    </Notice>
+  );
+}

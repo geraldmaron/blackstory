@@ -1,0 +1,117 @@
+# Black Book — progressive release metadata (BB-062).
+# Generates changelog + release provenance for a tested commit SHA before production promote.
+# Does not mutate cloud resources. Pairs with deploy-production.yml workflow_dispatch.
+
+name: Progressive Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: Tested 40-char commit SHA from staging deploy
+        required: true
+        type: string
+      prior_release_sha:
+        description: Optional prior release SHA for changelog range
+        required: false
+        type: string
+      confirm:
+        description: Type release to generate artifacts
+        required: true
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: progressive-release-${{ inputs.commit_sha }}
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    name: Gate / Pin Release SHA
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      commit_sha: ${{ steps.resolve.outputs.commit_sha }}
+      prior_sha: ${{ steps.resolve.outputs.prior_sha }}
+    steps:
+      - name: Validate inputs
+        id: resolve
+        env:
+          SHA: ${{ inputs.commit_sha }}
+          PRIOR: ${{ inputs.prior_release_sha }}
+        run: |
+          if [[ "${{ inputs.confirm }}" != "release" ]]; then
+            echo "Refusing to run: set confirm=release"
+            exit 1
+          fi
+          if [[ ! "$SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "commit_sha must be a full 40-char git SHA"
+            exit 1
+          fi
+          if [[ -n "$PRIOR" && ! "$PRIOR" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "prior_release_sha must be a full 40-char git SHA when set"
+            exit 1
+          fi
+          echo "commit_sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "prior_sha=$PRIOR" >> "$GITHUB_OUTPUT"
+
+  release-artifacts:
+    name: Release Provenance And Changelog
+    needs: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+          fetch-depth: 0
+
+      - name: Generate changelog
+        env:
+          CHANGELOG_TO_SHA: ${{ needs.gate.outputs.commit_sha }}
+          CHANGELOG_FROM_SHA: ${{ needs.gate.outputs.prior_sha }}
+          CHANGELOG_OUTPUT: artifacts/release-changelog.md
+        run: node infra/github/release-pipeline/generate-changelog.mjs
+
+      - name: Write release provenance
+        env:
+          PROVENANCE_ENVIRONMENT: production
+          PROVENANCE_COMMIT_SHA: ${{ needs.gate.outputs.commit_sha }}
+          PROVENANCE_GIT_REF: refs/heads/main
+          PROVENANCE_REPOSITORY: ${{ github.repository }}
+          PROVENANCE_REPOSITORY_ID: ${{ github.repository_id }}
+          PROVENANCE_OWNER_ID: ${{ github.event.repository.owner.id }}
+          PROVENANCE_WORKFLOW: ${{ github.workflow }}
+          PROVENANCE_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/progressive-release.yml@${{ github.ref }}
+          PROVENANCE_RUN_ID: ${{ github.run_id }}
+          PROVENANCE_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PROVENANCE_SERVER_URL: ${{ github.server_url }}
+          PROVENANCE_NOTES: BB-062 progressive release metadata — awaiting production approval deploy.
+        run: |
+          node infra/github/release-pipeline/write-provenance.mjs
+          node infra/github/release-pipeline/validate-provenance.mjs artifacts/deployment-provenance.json
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-artifacts-${{ needs.gate.outputs.commit_sha }}
+          path: |
+            artifacts/release-changelog.md
+            artifacts/deployment-provenance.json
+          if-no-files-found: error
+
+  policy-check:
+    name: Assert No Auto Rollouts
+    needs: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.gate.outputs.commit_sha }}
+      - name: Assert automatic rollouts disabled
+        run: node infra/github/release-pipeline/assert-no-auto-rollout.mjs

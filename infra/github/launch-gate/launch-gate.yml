@@ -1,0 +1,30 @@
+name: Launch gate (optional)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'packages/testing/src/launch-gate/**'
+      - 'packages/config/src/launch-gate/**'
+      - 'scripts/launch/**'
+      - 'docs/launch/**'
+      - 'infra/github/launch-gate/**'
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Run beta launch gate (expect NO_GO without attestations)
+        run: node scripts/launch/evaluate-beta-gate.mjs --evaluator github-actions --output docs/launch/ci-smoke-decision.json
+      - name: Run launch gate unit tests
+        run: node --conditions development --import tsx --test packages/testing/src/launch-gate/launch-gate.test.ts packages/config/src/launch-gate/beta-kill-switch.test.ts

@@ -1,0 +1,3 @@
+{"urlkey": "org,examplecountyhistory)/freedom-riders", "timestamp": "20160307012345", "url": "https://piedmontcountyhistory.example.org/freedom-riders", "mime": "text/html", "status": "200", "digest": "3I42H3S6NNFQ2MSVX7XZKYAYSCX5QBYJ", "length": "12345", "filename": "crawl-data/CC-MAIN-2016-07/segments/example.warc.gz"}
+{"urlkey": "org,examplecountyhistory)/about", "timestamp": "20160308093012", "url": "https://piedmontcountyhistory.example.org/about", "mime": "text/html", "status": "200", "digest": "4J53I4T7OOGR3NTWY8YAKZBZTDY6RCZK"}
+{"not_a_valid_record": true}

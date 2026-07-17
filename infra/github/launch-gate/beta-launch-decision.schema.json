@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://black-book.local/schemas/beta-launch-decision.schema.json",
+  "title": "Black Book beta launch decision (BB-063)",
+  "description": "Recorded go/no-go decision against measurable launch gate evidence. No secrets.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "bead",
+    "evaluator",
+    "evaluatedAt",
+    "decision",
+    "requiredFailed",
+    "requiredPassed",
+    "optionalFailed",
+    "gates"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "bead": {
+      "type": "string",
+      "const": "BB-063"
+    },
+    "evaluator": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evaluatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["GO", "NO_GO"]
+    },
+    "requiredFailed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "requiredPassed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "optionalFailed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "kind", "required", "status", "message", "evidence"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "kind": { "type": "string", "enum": ["machine", "human"] },
+          "required": { "type": "boolean" },
+          "status": { "type": "string", "enum": ["pass", "fail", "skipped"] },
+          "message": { "type": "string" },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["type", "ref"],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["file", "doc", "command", "artifact"]
+                },
+                "ref": { "type": "string" },
+                "description": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

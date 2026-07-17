@@ -37,10 +37,10 @@ and copy that line into `bd show black-book-bb079`'s notes/comments (the parent 
   in full before starting section 3 — this checklist references that runbook's 19 steps rather
   than repeating them.
 - Read the **"Gaps found during consolidation"** section near the end of this document before
-  running section 4 or section 3 — two of BB-078's own artifacts disagree with each other about
-  where `research`/`publication`/`security`/`admin` service accounts and the `private-evidence`
-  bucket actually live, and applying the wrong Terraform stub first will create resources in the
-  wrong project.
+  running section 4 or section 3. Gaps 1–4 (service-account topology, `private-evidence` home,
+  named-database Firebase deploy targets, named-database PITR gate) were reconciled by
+  `black-book-2ve`; remaining items (IAP README rewrite, Memorystore artifact, submissions-puller
+  implementation) still apply.
 
 ---
 
@@ -222,10 +222,9 @@ firebase apps:create WEB "Black Book Admin" --project=blackbook-internal
 Source config: `infra/firebase/firebase.json`, `infra/firebase/firestore.rules`,
 `infra/firebase/firestore.indexes.json`, `infra/firebase/.firebaserc.example`.
 
-**GAP (see "Gaps found during consolidation" below):** `infra/firebase/firebase.json` declares a
-single default-database `firestore` target only — there is no rules/indexes artifact or
-`firebase.json` target wired for the named databases `raw-ingest`/`curated` inside
-`blackbook-internal`. Step 3's `firebase deploy` cannot reach those two databases as written.
+**Resolved by `black-book-2ve`:** `infra/firebase/firebase.json` now declares deploy targets for
+the named databases `raw-ingest` and `curated` (rules + indexes). Deploy with
+`firebase deploy --only firestore:rules,firestore:indexes` after the databases exist.
 
 **Verify:**
 
@@ -252,15 +251,13 @@ joined there by two new cross-project identities (`promotion`, `submissions-pull
 `web-runtime`, `api-public`, `api-submissions`, `api-internal`, `migrations`, `backup` stay in
 `blackbook-prod` (mirrored into `blackbook-staging`).
 
-**Read the gap note below before running any command in this section.** Applying
-`infra/gcp/terraform/` (the original single-project stub) unmodified alongside
-`infra/gcp/terraform/multi-project/` will create duplicate `research`/`publication`/`security`/
-`admin` service accounts in **both** `blackbook-prod` and `blackbook-internal`, and leaves the
-`private-evidence` bucket's project ambiguous. Resolve that (see "Gaps found during
-consolidation") before applying — it requires editing `infra/gcp/terraform/locals.tf` and
-`buckets.tf`, which are outside this document's authority to edit.
+**Resolved by `black-book-2ve`:** the single-project stub no longer lists the four ADR-012-relocated
+identities; `private-evidence` is provisioned as `blackbook-internal-private-evidence` in the
+multi-project module. Apply multi-project gates in order per `infra/gcp/terraform/multi-project/README.md`
+(`provision_internal_buckets` before relying on that bucket). If a legacy
+`black-book-efaaf-private-evidence` bucket exists in prod, migrate objects before decommissioning it.
 
-**Commands (once the gap above is resolved by whoever holds design authority):**
+**Commands:**
 
 ```bash
 # 1. blackbook-prod: reconciled SA list (web-runtime, api-public, api-submissions, api-internal,
@@ -673,55 +670,24 @@ appears in any log-based metric (redaction check, per the BB-034 sign-off list).
 
 ## Gaps found during consolidation
 
-These are genuine inconsistencies in the closed beads' own artifacts, discovered while writing
-this checklist — not this document's opinion, and not fixed here (file ownership for this bead is
-this one new file only). Resolve each before the affected section is applied for real.
+Gaps **1–4** below were reconciled by `black-book-2ve` (Terraform + Firebase artifacts validated;
+no live cloud apply). Gaps **5–7** remain open before those sections are applied for real.
 
-1. **Service-account topology conflict (blocks section 4).** `infra/gcp/terraform/locals.tf`
-   (BB-005's original single-project stub) still lists `admin`, `publication`, `security`, and
-   `research` in its `service_accounts` map, unchanged since BB-078. But `infra/gcp/wif/
-   deploy-roles.md` states explicitly: *"ADR-012 change: publication, security, research, and
-   admin are no longer in github-deploy's (blackbook-prod) ActAs list — those surfaces move to
-   blackbook-internal."* Applying both `infra/gcp/terraform/` and `infra/gcp/terraform/
-   multi-project/` as literally written would create these four identities in **both**
-   `black-book-efaaf` and `blackbook-internal`. `infra/gcp/terraform/multi-project/README.md`
-   says its module "deliberately does NOT duplicate... the original BB-005 single-project stubs,
-   which keep owning blackbook-prod's own service accounts... unchanged" — but that statement
-   itself appears to be the oversight, since the original stub was never edited to drop the four
-   relocated identities. Someone with design authority needs to edit `infra/gcp/terraform/
-   locals.tf` (and `service_accounts.tf` if account-ID-length concerns from `deploy-roles.md`
-   apply) before section 4 is safe to apply.
+1. **Service-account topology conflict (section 4) — RESOLVED (`black-book-2ve`).**
+   Single-project `locals.tf` no longer lists the four ADR-012-relocated identities; multi-project
+   README documents the split.
 
-2. **`private-evidence` bucket location is undefined (blocks section 4).**
-   `infra/gcp/terraform/buckets.tf` still creates `black-book-efaaf-private-evidence` in
-   `blackbook-prod`. `infra/gcp/terraform/multi-project/iam-cross-project.tf` and
-   `infra/gcp/isolation-matrix.json`'s `crossProjectGrants` array grant `blackbook-internal`
-   identities (`promotion`, `security`) cross-project access into `blackbook-prod`'s
-   `public-media`, `exports`, and `quarantine` buckets only — **no grant or bucket resource for
-   `private-evidence` exists anywhere in either Terraform module.** Yet
-   `production-environment-resplit-migration.md`'s own AC-ISO-3 verification row checks
-   `gcloud storage buckets get-iam-policy gs://blackbook-internal-private-evidence`, assuming a
-   bucket that no Terraform resource creates. Since `private-evidence`'s writers (`research`,
-   `security`) both move to `blackbook-internal` under ADR-012, it should logically move too, but
-   nothing provisions it there, and nothing removes it from the original `blackbook-prod` stub.
-   Resolve by either (a) adding a `blackbook-internal-private-evidence` bucket resource to
-   `infra/gcp/terraform/multi-project/` plus a data-migration plan, and dropping `private-evidence`
-   from `infra/gcp/terraform/buckets.tf`, or (b) keeping it in `blackbook-prod` and adding the
-   missing cross-project grant, and correcting the runbook's verification step to match.
+2. **`private-evidence` bucket location (section 4) — RESOLVED (`black-book-2ve`).**
+   Bucket lives in multi-project as `blackbook-internal-private-evidence`; removed from the
+   single-project stub; isolation matrix updated. Migrate any legacy prod bucket objects before
+   decommissioning.
 
-3. **Named-database rules/indexes have no deploy target (affects section 3).**
-   `infra/firebase/firebase.json` declares a single default-database `firestore` block
-   (`rules`/`indexes` keys, no `database` selector). The named databases `raw-ingest`/`curated`
-   inside `blackbook-internal` have no corresponding rules file, indexes file, or `firebase.json`
-   target array entry anywhere in the repo. `firebase deploy --only firestore:rules` as currently
-   configured cannot reach either named database.
+3. **Named-database rules/indexes deploy target (section 3) — RESOLVED (`black-book-2ve`).**
+   `firebase.json` targets `raw-ingest` and `curated` with rules + indexes files.
 
-4. **Named-database PITR is hardcoded off (affects section 8).**
-   `infra/gcp/terraform/multi-project/firestore.tf`'s `google_firestore_database.internal`
-   resource hardcodes `point_in_time_recovery_enablement = "POINT_IN_TIME_RECOVERY_DISABLED"`
-   with no variable gate, unlike every other provisioning switch in that module. If PITR is
-   intended for `raw-ingest`/`curated` (BB-020's RPO/RTO doc doesn't exclude them), this needs a
-   follow-up Terraform edit, not just a `gcloud` flag at apply time.
+4. **Named-database PITR gate (section 8) — RESOLVED (`black-book-2ve`).**
+   `internal_firestore_pitr_enabled` (default `false`) gates PITR consistently with other
+   multi-project switches. Enable in tfvars after cost/RPO review.
 
 5. **`infra/gcp/iap/README.md` describes a superseded IAP pattern (affects section 9).** Already
    flagged by BB-078 itself as a "Known follow-up, not fixed by this runbook" — the document still

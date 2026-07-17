@@ -1,5 +1,6 @@
-// blackbook-staging and blackbook-internal service accounts. blackbook-prod's identities are
-// unchanged and stay owned by ../*.tf (the original single-project stubs) - not duplicated here.
+// blackbook-staging and blackbook-internal service accounts. blackbook-prod's identities stay
+// owned by ../*.tf (the original single-project stubs, corrected to drop the four
+// ADR-012-relocated identities created here instead) - not duplicated here.
 
 resource "google_service_account" "staging" {
   for_each = var.provision_staging_service_accounts ? local.staging_service_accounts : {}

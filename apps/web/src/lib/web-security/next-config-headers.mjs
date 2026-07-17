@@ -5,21 +5,33 @@
 
 /** @returns {{ key: string, value: string }[]} */
 export function securityHeadersForNextConfig() {
-  const csp = [
+  const isDev = process.env.NODE_ENV !== 'production';
+  const scriptSrc = isDev
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+    : "script-src 'self'";
+  const mapTiles = 'https://demotiles.maplibre.org';
+  const connectSrc = isDev
+    ? `connect-src 'self' ws: wss: ${mapTiles}`
+    : `connect-src 'self' ${mapTiles}`;
+  const cspParts = [
     "default-src 'self'",
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
     "object-src 'none'",
-    "script-src 'self'",
+    scriptSrc,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data:",
-    "font-src 'self'",
-    "connect-src 'self'",
+    `img-src 'self' data: blob: ${mapTiles}`,
+    `font-src 'self' ${mapTiles}`,
+    connectSrc,
     "manifest-src 'self'",
-    "worker-src 'self'",
-    'upgrade-insecure-requests',
-  ].join('; ');
+    "worker-src 'self' blob:",
+    "child-src 'self' blob:",
+  ];
+  if (!isDev) {
+    cspParts.push('upgrade-insecure-requests');
+  }
+  const csp = cspParts.join('; ');
 
   const permissionsPolicy = [
     'accelerometer=()',
@@ -28,7 +40,7 @@ export function securityHeadersForNextConfig() {
     'display-capture=()',
     'encrypted-media=()',
     'fullscreen=(self)',
-    'geolocation=()',
+    'geolocation=(self)',
     'gyroscope=()',
     'magnetometer=()',
     'microphone=()',

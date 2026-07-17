@@ -1,5 +1,4 @@
-# Deployment provenance / release metadata (BB-010 stub for BB-062).
-# Schema for artifacts written when a production deploy job obtains WIF credentials.
+# Deployment provenance / release metadata (BB-010 schema; BB-062 producers).
 
 Every production deploy must emit a provenance document that records **who/what** deployed
 (commit, workflow, run, environment, federated principal) without storing secrets.
@@ -11,13 +10,17 @@ Every production deploy must emit a provenance document that records **who/what*
 | `deployment-provenance.schema.json` | JSON Schema (Draft 2020-12) |
 | `example.deployment-provenance.json` | Example stub (synthetic IDs) |
 
-## Producer (BB-062)
+## Producers (BB-062)
 
-`.github/workflows/deploy-production.yml` writes a stub artifact today. BB-062 should:
+| Producer | Role |
+|----------|------|
+| `infra/github/release-pipeline/write-provenance.mjs` | Build provenance JSON for staging/production |
+| `infra/github/release-pipeline/validate-provenance.mjs` | Validate against this schema |
+| `.github/workflows/deploy-staging.yml` | Emits staging provenance artifact |
+| `.github/workflows/deploy-production.yml` | Emits production provenance + changelog |
+| `.github/workflows/progressive-release.yml` | Pre-promote provenance/changelog for a pinned SHA |
 
-1. Validate the JSON against this schema before upload.
-2. Attach the artifact to the GitHub Actions run.
-3. Persist an immutable copy beside release pointers / publication metadata.
+Operator runbook: `docs/runbooks/production-release.md`.
 
 ## Non-goals
 

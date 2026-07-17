@@ -41,5 +41,7 @@ test('relatedCount and claimCount are populated from the seed fixture, never lef
   const place = index.find((doc) => doc.id === 'ent_seed_place_001');
   assert.ok(place);
   assert.equal(place.relatedCount, 1);
-  assert.equal(place.claimCount, 1);
+  // BB-052: the place now carries a second accepted claim (the contested land-use dispute) that
+  // backs its BB-095 sensitivity flag's basisClaimIds.
+  assert.equal(place.claimCount, 2);
 });

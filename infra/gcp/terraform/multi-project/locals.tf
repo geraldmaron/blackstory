@@ -34,6 +34,16 @@ locals {
     "curated"    = "Reviewed/normalized data staged for promotion; distinct IAM from raw-ingest."
   }
 
+  // Buckets inside blackbook-internal. private-evidence relocates here from the original
+  // BB-005 single-project stub (../buckets.tf) because both of its writers - research and
+  // security - move to blackbook-internal under ADR-012; colocating the bucket with its only
+  // writers is the more defensible default now that it need not be same-project with
+  // publication/admin/api-internal (which read it, but under ADR-012 only admin-app and
+  // publication remain reachable without a new cross-project grant - see buckets.tf).
+  internal_buckets = {
+    "private-evidence" = "enforced"
+  }
+
   // The entire ADR-012 cross-project grant list (internal -> prod only; zero prod -> internal).
   // Mirrors infra/gcp/isolation-matrix.json's crossProjectGrants array.
   cross_project_grants = {

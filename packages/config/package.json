@@ -8,6 +8,11 @@
       "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./launch-gate": {
+      "development": "./src/launch-gate/index.ts",
+      "types": "./dist/launch-gate/index.d.ts",
+      "import": "./dist/launch-gate/index.js"
     }
   },
   "files": [
@@ -16,7 +21,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/index.test.ts src/surfaces.test.ts src/kill-switches.test.ts src/scheduled-jobs/registry.test.ts src/scheduled-jobs/roster.test.ts src/scheduled-jobs/run-record.test.ts src/scheduled-jobs/health.test.ts src/scheduled-jobs/alerting.test.ts src/scheduled-jobs/publish-guard.test.ts src/scheduled-jobs/audit.test.ts src/scheduled-jobs/jobs/source-drift-run-health.test.ts src/scheduled-jobs/jobs/gold-corpus-regression.test.ts src/scheduled-jobs/jobs/backup-verification.test.ts src/scheduled-jobs/jobs/restore-drill.test.ts src/scheduled-jobs/jobs/recalibration-report.test.ts src/scheduled-jobs/jobs/citation-link-health-sweep.test.ts",
+    "test": "node --conditions development --import tsx --test src/index.test.ts src/surfaces.test.ts src/kill-switches.test.ts src/launch-gate/beta-kill-switch.test.ts src/scheduled-jobs/registry.test.ts src/scheduled-jobs/roster.test.ts src/scheduled-jobs/run-record.test.ts src/scheduled-jobs/health.test.ts src/scheduled-jobs/alerting.test.ts src/scheduled-jobs/publish-guard.test.ts src/scheduled-jobs/audit.test.ts src/scheduled-jobs/jobs/source-drift-run-health.test.ts src/scheduled-jobs/jobs/gold-corpus-regression.test.ts src/scheduled-jobs/jobs/backup-verification.test.ts src/scheduled-jobs/jobs/restore-drill.test.ts src/scheduled-jobs/jobs/recalibration-report.test.ts src/scheduled-jobs/jobs/citation-link-health-sweep.test.ts src/scheduled-jobs/jobs/reddit-deletion-sync.test.ts src/scheduled-jobs/jobs/legal-change-monitoring.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

@@ -535,3 +535,21 @@ export * from './relevance-feedback/index.js';
 // Public search domain layer (BB-049): deterministic ranking, facets, explanations, and the
 // notability-gate-enforcing search-index builder. Mirrors ./graph/index.js's own barrel.
 export * from './search/index.js';
+
+// Quality-first national seed campaigns (BB-058): curated fixtures + fail-closed gate validators.
+export * from './seed-campaigns/index.js';
+
+// Canonical fact registry (BB-086): FactRecord + publish gate + JSON-LD + subjects.
+export * from './facts/index.js';
+
+// BB-050 geocode domain (Census Geocoder pipeline + jurisdiction resolution).
+export * from './geocode/index.js';
+
+// BB-082 historic safety / place-context engine (layered signals; crime stats never score).
+export * from './historic-safety/index.js';
+
+// Editorial trust vocabulary + ClaimReview path exclusivity (BB-088).
+export * from './trust/index.js';
+
+// Legal landscape snapshot + monitoring (BB-087).
+export * from './legal/index.js';

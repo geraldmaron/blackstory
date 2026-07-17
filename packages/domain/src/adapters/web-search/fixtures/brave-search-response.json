@@ -1,0 +1,26 @@
+{
+  "type": "search",
+  "web": {
+    "type": "search",
+    "results": [
+      {
+        "title": "Piedmont County Historical Society -- Freedom Riders Remembered",
+        "url": "https://piedmontcountyhistory.example.org/freedom-riders",
+        "description": "A local historical society page recalling Piedmont County residents who joined the Freedom Rides through Alabama in the early 1960s.",
+        "page_age": "2019-03-04T00:00:00"
+      },
+      {
+        "title": "Personal blog: my grandmother's civil rights activism in Montgomery",
+        "url": "https://janedoe-example-blog.example.net/grandmother-montgomery",
+        "description": "A grandchild's blog post about her grandmother's involvement in the Montgomery civil rights movement."
+      },
+      {
+        "url": "https://malformed-example.test/no-title-result"
+      },
+      {
+        "title": "unrelated result with no url",
+        "description": "should be rejected, not thrown, for missing url"
+      }
+    ]
+  }
+}

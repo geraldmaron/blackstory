@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 1,
+  "bead": "BB-063",
+  "evaluator": "parent-wiring@local",
+  "evaluatedAt": "2026-07-17T21:06:14.036Z",
+  "decision": "NO_GO",
+  "requiredFailed": 7,
+  "requiredPassed": 8,
+  "optionalFailed": 0,
+  "gates": [
+    {
+      "id": "published-claims-with-evidence",
+      "title": "Published claims have qualifying evidence (100%)",
+      "kind": "human",
+      "required": true,
+      "status": "fail",
+      "message": "Human attestation missing — fail-closed until recorded.",
+      "evidence": [
+        {
+          "type": "doc",
+          "ref": "docs/runbooks/production-release.md",
+          "description": "Release checklist references publication evidence review."
+        }
+      ]
+    },
+    {
+      "id": "unsupported-narrative-zero",
+      "title": "Unsupported narrative statements (0)",
+      "kind": "human",
+      "required": true,
+      "status": "fail",
+      "message": "Human attestation missing — fail-closed until recorded.",
+      "evidence": [
+        {
+          "type": "file",
+          "ref": "packages/domain/src/claims/publication.ts",
+          "description": "Publication threshold helpers."
+        }
+      ]
+    },
+    {
+      "id": "living-addresses-zero",
+      "title": "Living residential addresses displayed (0)",
+      "kind": "human",
+      "required": true,
+      "status": "fail",
+      "message": "Human attestation missing — fail-closed until recorded.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "node --import tsx scripts/run-testing-layer.mjs security",
+          "description": "Includes living-address adversarial scenarios (BB-060)."
+        },
+        {
+          "type": "file",
+          "ref": "packages/testing/src/adversarial-integrity/scenarios.ts"
+        }
+      ]
+    },
+    {
+      "id": "untracked-publication-decisions-zero",
+      "title": "Untracked publication decisions (0)",
+      "kind": "human",
+      "required": true,
+      "status": "fail",
+      "message": "Human attestation missing — fail-closed until recorded.",
+      "evidence": [
+        {
+          "type": "file",
+          "ref": "packages/config/src/scheduled-jobs/publish-guard.ts"
+        }
+      ]
+    },
+    {
+      "id": "source-policy-violations-zero",
+      "title": "Source-policy violations (0)",
+      "kind": "human",
+      "required": true,
+      "status": "fail",
+      "message": "Human attestation missing — fail-closed until recorded.",
+      "evidence": [
+        {
+          "type": "file",
+          "ref": "packages/domain/src/provenance",
+          "description": "Source lineage and policy modules."
+        }
+      ]
+    },
+    {
+      "id": "gold-corpus-precision",
+      "title": "High-impact claim precision target met (gold corpus)",
+      "kind": "machine",
+      "required": true,
+      "status": "pass",
+      "message": "Machine evidence checks passed.",
+      "evidence": [
+        {
+          "type": "file",
+          "ref": "packages/testing/src/gold-corpus/fixtures/gold-corpus.v1.json"
+        },
+        {
+          "type": "file",
+          "ref": "packages/testing/src/gold-corpus/fixtures/predictions.after.v1.json"
+        },
+        {
+          "type": "command",
+          "ref": "node scripts/gold-corpus/eval.mjs evaluate --predictions packages/testing/src/gold-corpus/fixtures/predictions.after.v1.json"
+        }
+      ]
+    },
+    {
+      "id": "restore-rehearsal-complete",
+      "title": "Restore rehearsal complete (BB-061)",
+      "kind": "machine",
+      "required": true,
+      "status": "pass",
+      "message": "Machine evidence checks passed.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only"
+        },
+        {
+          "type": "artifact",
+          "ref": "scripts/recovery-rehearsal/fixtures/last-rehearsal-report.json"
+        },
+        {
+          "type": "command",
+          "ref": "bash infra/github/release-pipeline/rollback-dry-run.sh 0000000000000000000000000000000000000001"
+        }
+      ]
+    },
+    {
+      "id": "incident-exercise-complete",
+      "title": "Incident exercise complete",
+      "kind": "human",
+      "required": true,
+      "status": "fail",
+      "message": "Human attestation missing — fail-closed until recorded.",
+      "evidence": [
+        {
+          "type": "doc",
+          "ref": "docs/runbooks/incident-response.md"
+        }
+      ]
+    },
+    {
+      "id": "load-abuse-verified",
+      "title": "Load and abuse limits verified (BB-059)",
+      "kind": "machine",
+      "required": true,
+      "status": "pass",
+      "message": "Machine evidence checks passed.",
+      "evidence": [
+        {
+          "type": "doc",
+          "ref": "docs/testing/load-abuse.md"
+        },
+        {
+          "type": "file",
+          "ref": "packages/testing/src/load-abuse/scenarios.ts"
+        },
+        {
+          "type": "command",
+          "ref": "node --import tsx scripts/run-testing-layer.mjs security"
+        }
+      ]
+    },
+    {
+      "id": "adversarial-integrity-verified",
+      "title": "Adversarial integrity exercise (BB-060)",
+      "kind": "machine",
+      "required": true,
+      "status": "pass",
+      "message": "Machine evidence checks passed.",
+      "evidence": [
+        {
+          "type": "doc",
+          "ref": "docs/testing/adversarial-integrity.md"
+        },
+        {
+          "type": "file",
+          "ref": "packages/testing/src/adversarial-integrity/scenarios.ts"
+        }
+      ]
+    },
+    {
+      "id": "methodology-corrections-available",
+      "title": "Public methodology and correction process (BB-088)",
+      "kind": "machine",
+      "required": true,
+      "status": "pass",
+      "message": "Machine evidence checks passed.",
+      "evidence": [
+        {
+          "type": "file",
+          "ref": "apps/web/src/app/methodology/page.tsx"
+        },
+        {
+          "type": "file",
+          "ref": "apps/web/src/app/corrections/page.tsx"
+        },
+        {
+          "type": "file",
+          "ref": "apps/web/src/app/errata/page.tsx"
+        },
+        {
+          "type": "file",
+          "ref": "apps/web/src/app/myths/page.tsx"
+        }
+      ]
+    },
+    {
+      "id": "legal-privacy-review-tracked",
+      "title": "Legal and privacy review issues tracked",
+      "kind": "human",
+      "required": true,
+      "status": "fail",
+      "message": "Human attestation missing — fail-closed until recorded.",
+      "evidence": [
+        {
+          "type": "file",
+          "ref": "packages/domain/src/legal/review-queue.ts"
+        }
+      ]
+    },
+    {
+      "id": "disclaimer-framework-live",
+      "title": "Disclaimer framework live on public surfaces (BB-095)",
+      "kind": "machine",
+      "required": true,
+      "status": "pass",
+      "message": "Machine evidence checks passed.",
+      "evidence": [
+        {
+          "type": "file",
+          "ref": "packages/domain/src/disclaimers.ts"
+        },
+        {
+          "type": "file",
+          "ref": "packages/domain/src/disclaimers.test.ts"
+        }
+      ]
+    },
+    {
+      "id": "release-pipeline-ready",
+      "title": "Production release pipeline ready (BB-062)",
+      "kind": "machine",
+      "required": true,
+      "status": "pass",
+      "message": "Machine evidence checks passed.",
+      "evidence": [
+        {
+          "type": "doc",
+          "ref": "docs/runbooks/production-release.md"
+        },
+        {
+          "type": "file",
+          "ref": "infra/github/release-pipeline/rollback-dry-run.sh"
+        },
+        {
+          "type": "file",
+          "ref": "infra/github/release-metadata/deployment-provenance.schema.json"
+        }
+      ]
+    },
+    {
+      "id": "beta-disable-path-ready",
+      "title": "Public beta disable / static read-only path documented",
+      "kind": "machine",
+      "required": true,
+      "status": "pass",
+      "message": "Machine evidence checks passed.",
+      "evidence": [
+        {
+          "type": "doc",
+          "ref": "docs/launch/disable-public-beta.md"
+        },
+        {
+          "type": "file",
+          "ref": "packages/config/src/kill-switches.ts"
+        },
+        {
+          "type": "file",
+          "ref": "apps/web/apphosting.production.yaml",
+          "description": "PUBLIC_READ_API_DISABLED runtime env."
+        }
+      ]
+    }
+  ]
+}

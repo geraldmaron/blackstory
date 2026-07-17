@@ -2,7 +2,10 @@
  * Vertical timeline for chronological claim and event narratives.
  */
 
-import type { ReactNode } from 'react';
+import React, { type  ReactNode  } from 'react';
+
+// Defensive: apps/web SSR tests may classic-transform this package's TSX source.
+void React;
 import { cx } from '../utils/cx.js';
 
 export type TimelineItem = {

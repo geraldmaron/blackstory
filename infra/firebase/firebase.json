@@ -1,9 +1,22 @@
 {
   "$schema": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase-config.json",
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
+  "firestore": [
+    {
+      "database": "(default)",
+      "rules": "firestore.rules",
+      "indexes": "firestore.indexes.json"
+    },
+    {
+      "database": "raw-ingest",
+      "rules": "firestore.raw-ingest.rules",
+      "indexes": "firestore.raw-ingest.indexes.json"
+    },
+    {
+      "database": "curated",
+      "rules": "firestore.curated.rules",
+      "indexes": "firestore.curated.indexes.json"
+    }
+  ],
   "storage": {
     "rules": "storage.rules"
   },

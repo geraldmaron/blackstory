@@ -124,3 +124,17 @@ export {
   type CitationLinkHealthSweepJobInput,
   type CitationLinkHealthSweepJobResult,
 } from './jobs/citation-link-health-sweep.js';
+
+export {
+  REDDIT_DELETION_SYNC_JOB_ID,
+  runRedditDeletionSyncJob,
+  type RedditDeletionSyncJobInput,
+  type RedditDeletionSyncJobResult,
+} from './jobs/reddit-deletion-sync.js';
+
+export {
+  LEGAL_CHANGE_MONITORING_JOB_ID,
+  runLegalChangeMonitoringJob,
+  type LegalChangeMonitoringJobInput,
+  type LegalChangeMonitoringJobResult,
+} from './jobs/legal-change-monitoring.js';

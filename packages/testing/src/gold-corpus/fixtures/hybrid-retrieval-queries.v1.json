@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "hybrid-retrieval-queries.v1",
+  "querySetVersion": "hybrid-retrieval.v1",
+  "description": "Labeled hybrid retrieval queries for BB-072 eval: name lookups, misspellings, descriptive queries, and place-anchored queries.",
+  "queries": [
+    {
+      "id": "hq_name_exact",
+      "text": "Rosewood School",
+      "category": "name_lookup",
+      "relevantEntityIds": ["ent_exact"],
+      "placeAnchored": false
+    },
+    {
+      "id": "hq_name_misspell",
+      "text": "rosewod school",
+      "category": "misspelling",
+      "relevantEntityIds": ["ent_exact"],
+      "placeAnchored": false
+    },
+    {
+      "id": "hq_descriptive",
+      "text": "freedmen chapel oral histories",
+      "category": "descriptive",
+      "relevantEntityIds": ["ent_vector_only"],
+      "placeAnchored": false
+    },
+    {
+      "id": "hq_place",
+      "text": "school florida education",
+      "category": "place_query",
+      "relevantEntityIds": ["ent_exact", "ent_famous"],
+      "placeAnchored": true,
+      "stateFilter": "FL"
+    },
+    {
+      "id": "hq_era",
+      "text": "1860s chapel georgia",
+      "category": "place_query",
+      "relevantEntityIds": ["ent_vector_only"],
+      "placeAnchored": true,
+      "stateFilter": "GA",
+      "eraFilter": "1860s"
+    }
+  ]
+}

@@ -2,25 +2,30 @@
 
 Unapplied Terraform for the [ADR-012](../../../../docs/adr/ADR-012-production-environment-resplit.md)
 target topology: `blackbook-prod` (retained `black-book-efaaf`), `blackbook-staging` (new),
-`blackbook-internal` (new). This module is additive to, and deliberately does **not** duplicate,
+`blackbook-internal` (new). This module is additive to, and does **not** duplicate,
 [`../`](../) (the original BB-005 single-project stubs, which keep owning `blackbook-prod`'s own
-service accounts, buckets, and same-project IAM unchanged).
+service accounts, buckets, and same-project IAM). `../locals.tf` and `../buckets.tf` were
+corrected to drop the four ADR-012-relocated identities (`admin`, `publication`, `security`,
+`research`) and the `private-evidence` bucket, so there is no overlap between `../` and this
+module's `blackbook-internal` resources.
 
 ## What this module creates (all gated, all `false`/empty by default)
 
 | Resource | File | Gate variable |
 |----------|------|----------------|
 | `blackbook-staging`, `blackbook-internal` projects | `projects.tf` | `create_new_projects` |
-| Named Firestore databases `raw-ingest`, `curated` in `blackbook-internal` | `firestore.tf` | `provision_internal_databases` |
+| Named Firestore databases `raw-ingest`, `curated` in `blackbook-internal` | `firestore.tf` | `provision_internal_databases` (PITR separately gated by `internal_firestore_pitr_enabled`, default `false`) |
 | `blackbook-staging` mirrored service accounts | `service_accounts.tf` | `provision_staging_service_accounts` |
 | `blackbook-internal` service accounts (`research`, `publication`, `security`, `admin-app`, `promotion`, `submissions-puller`) | `service_accounts.tf` | `provision_internal_service_accounts` |
+| `private-evidence` bucket in `blackbook-internal` (relocated from the original BB-005 stub) + same-project IAM (research/security write, admin-app/publication read) | `buckets.tf` | `provision_internal_buckets` (IAM also requires `provision_internal_service_accounts`) |
 | One-way promotion cross-project IAM (`promotion`/`security`/`submissions-puller` into `blackbook-prod`; per-database IAM conditions inside `blackbook-internal`) | `iam-cross-project.tf` | `apply_cross_project_iam` |
 | Per-project org policy backstops (`iam.disableServiceAccountKeyCreation`, `sql.restrictPublicIp`) | `iam-org-policies.tf` | `manage_org_policies` |
 | Per-project billing budgets (notify-only for prod; kill-switch-eligible label only for internal) | `budgets.tf` | `billing_account != ""` |
 
 ## What this module deliberately does NOT create
 
-- `blackbook-prod`'s own service accounts, buckets, or same-project IAM — see `../*.tf`.
+- `blackbook-prod`'s own service accounts, buckets, or same-project IAM (other than the
+  cross-project grants in `iam-cross-project.tf`) — see `../*.tf`.
 - Any IAM grant from a `blackbook-prod` identity into `blackbook-internal`, in either direction.
   There is no resource anywhere in this module that does this; that absence is the ADR-012
   invariant, not an oversight (see `iam-cross-project.tf`'s header comment).
@@ -36,9 +41,11 @@ service accounts, buckets, and same-project IAM unchanged).
    `billing_account` and, if an org exists, `org_id`.
 2. `provision_internal_databases`, `provision_staging_service_accounts`,
    `provision_internal_service_accounts = true` — requires step 1's projects to exist.
-3. `apply_cross_project_iam = true` — requires step 2's `blackbook-internal` service accounts to
+3. `provision_internal_buckets = true` — requires step 1's `blackbook-internal` project to
+   exist; requires step 2's `provision_internal_service_accounts` for the bucket's IAM members.
+4. `apply_cross_project_iam = true` — requires step 2's `blackbook-internal` service accounts to
    exist (references them by Terraform resource, not by string).
-4. Set `billing_account` and `billing_budget_amount_units` after human review to create budgets.
+5. Set `billing_account` and `billing_budget_amount_units` after human review to create budgets.
 
 Flip these independently, in order, reviewing each `terraform plan` before applying — do not set
 all gates to `true` in one apply.

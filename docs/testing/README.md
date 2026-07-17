@@ -9,8 +9,9 @@ Automated quality layers for Black Book. Production services are fail-closed; fl
 | Preflight | `pnpm test:preflight` | Production identifier guard + quarantine registry health |
 | Unit | `pnpm test:unit` | Package/app unit tests + Python pytest |
 | Contract | `pnpm test:contract` | API health contract helpers |
-| Security | `pnpm test:security` | Threat corpus (BB-004) + production guards |
-| Accessibility | `pnpm test:a11y` | HTML landmark/alt smoke fixtures |
+| Security | `pnpm test:security` | Threat corpus (BB-004) + production guards + BB-059 load/abuse scenarios (`docs/testing/load-abuse.md`) + BB-060 adversarial integrity (`docs/testing/adversarial-integrity.md`) |
+| Accessibility | `pnpm test:a11y` | HTML landmark/alt smoke fixtures + BB-057 journey audits (`docs/testing/a11y-seo-perf-privacy.md`) |
+| Release gates | `pnpm --filter @black-book/testing test:release-gates` | Performance budgets + public degraded-mode contracts |
 | Integration | `pnpm test:integration` | Postgres disposable schema + Firebase emulator probes |
 | Migration | `pnpm test:migration` | Forward-only `schema_migrations` harness on disposable DB |
 | E2E | `pnpm test:e2e` | Harness; live fetch only when `E2E_BASE_URL` is local |

@@ -7,6 +7,7 @@
 export {
   US_STATES,
   US_BOUNDS,
+  US_CONUS_BOUNDS,
   isWithinUsBounds,
   findUsStateForPoint,
   findUsStateByPostalCode,

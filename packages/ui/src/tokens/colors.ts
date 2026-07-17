@@ -1,8 +1,8 @@
 /**
- * Black Book color tokens: warm paper/near-black ink primary palette, the
- * Copper Pin/Page Sand brand accent, and reserved status hues.
+ * Black Book color tokens: white/black primary surfaces and ink, Copper Pin /
+ * Page Sand brand accent, and reserved status hues.
  * Status colors are only for warning, confidence, dispute, and error — never decorative chrome.
- * Palette source: brandPalette (brand-palette.ts) — the owner-supplied "Pinned Page" brand package.
+ * Palette source: brandPalette (brand-palette.ts).
  */
 
 import { brandPalette } from './brand-palette.js';
@@ -52,11 +52,11 @@ export type ConfidencePalette = Record<ConfidenceLevel, StatusPalette>;
 export const lightTheme: ThemePalette = {
   canvas: brandPalette.archivePaper,
   surface: brandPalette.archivePaper,
-  surfaceRaised: '#FBF7EF',
+  surfaceRaised: '#FAFAFA',
   ink: brandPalette.blackInk,
-  inkMuted: '#2B2620',
-  inkSubtle: '#5C5548',
-  border: '#E3DCCB',
+  inkMuted: '#404040',
+  inkSubtle: '#737373',
+  border: '#E5E5E5',
   borderStrong: brandPalette.blackInk,
   focusRing: brandPalette.blackInk,
   focusRingOffset: brandPalette.archivePaper,
@@ -70,12 +70,12 @@ export const lightTheme: ThemePalette = {
 
 export const darkTheme: ThemePalette = {
   canvas: brandPalette.blackInk,
-  surface: '#141210',
-  surfaceRaised: '#1E1A15',
+  surface: '#141414',
+  surfaceRaised: '#1A1A1A',
   ink: brandPalette.archivePaper,
-  inkMuted: '#D9D2C4',
-  inkSubtle: '#A69C89',
-  border: '#2E2A22',
+  inkMuted: '#A3A3A3',
+  inkSubtle: '#8C8C8C',
+  border: '#2A2A2A',
   borderStrong: brandPalette.archivePaper,
   focusRing: brandPalette.archivePaper,
   focusRingOffset: brandPalette.blackInk,

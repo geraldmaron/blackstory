@@ -1,12 +1,15 @@
 /**
- * Local module surface for the BB-091 Census TIGER/Gazetteer source-registry contract.
+ * Local module surface for the Census adapters: the BB-091 TIGER/Gazetteer bulk source-registry
+ * contract (`./contract.ts`) AND the BB-050 live Census Geocoder API client
+ * (`./url-builder.ts`, `./response-parser.ts`, `./normalizer.ts`, `./fetch-geocode.ts`).
  *
- * NOT re-exported from ../index.ts (the adapters package barrel) or ../../index.ts (the
- * @black-book/domain package barrel) — per this session's barrel-ownership rule, only the
- * parent session merges new symbols into those files. Until that merge lands, consumers
- * outside this package must import this module by its own relative path within the domain
- * package's source (or wait for the barrel wiring); see the final report's "still needs
- * wiring" note.
+ * IS re-exported through the package barrels: `../index.ts` (the adapters package barrel)
+ * already does `export * from './census-geo/index.js';` (added for BB-091), and
+ * `../../index.ts` (the `@black-book/domain` package barrel) already does
+ * `export * from './adapters/index.js';` — so every symbol exported from THIS file is already
+ * reachable as `@black-book/domain` today with no further barrel edit required. This is
+ * different from the brand-new `../../geocode/` module (see its index.ts doc comment), which
+ * has no existing wildcard chain and does need a parent-session merge.
  */
 export {
   CENSUS_GEO_ADAPTER_ID,
@@ -17,3 +20,44 @@ export {
   createCensusGeoAdapterContract,
   createCensusGeoEvidenceSource,
 } from './contract.js';
+
+export {
+  CENSUS_GEOCODER_BENCHMARK,
+  CENSUS_GEOCODER_VINTAGE,
+  type CensusGeocodeBatch,
+  type CensusGeocodeMatch,
+  type CensusGeocodeRejection,
+  type RawCensusAddressGeocodeResponse,
+  type RawCensusAddressMatch,
+  type RawCensusCoordinates,
+  type RawCensusCoordinatesGeocodeResponse,
+  type RawCensusGeographiesBlock,
+  type RawCensusGeographyEntry,
+} from './types.js';
+
+export {
+  CENSUS_GEOCODER_BASE_URL,
+  buildCensusCoordinatesUrl,
+  buildCensusOneLineAddressUrl,
+  type BuildCensusCoordinatesUrlInput,
+  type BuildCensusOneLineAddressUrlInput,
+} from './url-builder.js';
+
+export {
+  parseCensusAddressGeocodeResponse,
+  parseCensusCoordinatesGeocodeResponse,
+} from './response-parser.js';
+
+export {
+  extractCensusGeography,
+  normalizeCensusAddressMatch,
+  normalizeCensusCoordinatesGeographies,
+  type ExtractedCensusGeography,
+} from './normalizer.js';
+
+export {
+  fetchCensusAddressGeocode,
+  fetchCensusCoordinatesGeocode,
+  type FetchCensusAddressGeocodeInput,
+  type FetchCensusCoordinatesGeocodeInput,
+} from './fetch-geocode.js';

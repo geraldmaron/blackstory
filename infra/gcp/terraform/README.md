@@ -1,9 +1,14 @@
 # Terraform single-project isolation stubs (BB-005)
 
-These unapplied stubs target only the existing production project `black-book-efaaf`. They model
-eleven per-surface SAs, four buckets with UBLA/PAP posture, and bucket-scoped IAM. They do not create
-projects, apps, App Hosting backends, Cloud SQL, Armor, IAP, App Check, WIF, secrets, or standing
-human access. WIF lives in a sibling module: [`../wif/`](../wif/).
+These unapplied stubs target only the existing production project `black-book-efaaf`
+(`blackbook-prod` under [ADR-012](../../../docs/adr/ADR-012-production-environment-resplit.md)).
+They model seven per-surface SAs, three buckets with UBLA/PAP posture, and bucket-scoped IAM. The
+four ADR-012-relocated identities (`admin`, `publication`, `security`, `research`) and the
+`private-evidence` bucket are intentionally absent here — they live in
+[`multi-project/`](./multi-project/) (`blackbook-internal`) instead; see that module's
+`locals.tf`/`buckets.tf` and `infra/gcp/wif/deploy-roles.md`. These stubs do not create projects,
+apps, App Hosting backends, Cloud SQL, Armor, IAP, App Check, WIF, secrets, or standing human
+access. WIF lives in a sibling module: [`../wif/`](../wif/).
 
 Do not apply to the live project without first inventorying existing resources and importing any
 matching objects into state. A plan that proposes replacing or deleting a live resource must stop

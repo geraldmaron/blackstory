@@ -9,8 +9,13 @@
  * apps/web/src/app/design-system/page.tsx) renders exactly as before.
  */
 
-import type { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import { cx } from '../utils/cx.js';
+
+// `React` is otherwise unused under this package's own automatic JSX runtime, but keeping it
+// imported makes this file safe to cross-transpile from a consumer whose own tsconfig uses a
+// classic JSX transform (see Notice.tsx's identical note).
+void React;
 
 export type CitationLinkStatus = 'alive' | 'redirected' | 'drifted' | 'dead';
 

@@ -4,7 +4,10 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, {  useEffect, useState  } from 'react';
+
+// Defensive: apps/web SSR tests may classic-transform this package's TSX source.
+void React;
 import type { ThemeName } from '../tokens/colors.js';
 import { cx } from '../utils/cx.js';
 

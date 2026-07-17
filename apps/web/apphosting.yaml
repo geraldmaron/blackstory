@@ -19,6 +19,9 @@
 #     gcloud run services describe BACKEND --region=REGION \
 #       --format='yaml(spec.template.spec.containerConcurrency,spec.template.metadata.annotations)'
 #   Expect: containerConcurrency=40, maxScale annotation <= 6 for production backends.
+#
+# BB-062: automatic App Hosting rollouts are disabled. Production/staging traffic
+# changes run only via explicit GitHub Actions promote (see docs/runbooks/production-release.md).
 
 runConfig:
   minInstances: 1

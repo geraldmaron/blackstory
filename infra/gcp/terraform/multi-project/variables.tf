@@ -1,9 +1,10 @@
 // Inputs for the ADR-012 (BB-078) three-project re-split. Defaults describe the target
 // topology; nothing here is applied by this bead. blackbook-prod's own service accounts,
 // buckets, and same-project IAM stay owned by ../*.tf (the original BB-005 single-project
-// stubs, unchanged) since blackbook-prod is the retained black-book-efaaf project. This
-// module adds only what's new: blackbook-staging, blackbook-internal, the named Firestore
-// databases inside blackbook-internal, and the cross-project IAM asymmetry between them.
+// stubs, corrected to drop the four ADR-012-relocated identities) since blackbook-prod is
+// the retained black-book-efaaf project. This module adds only what's new: blackbook-staging,
+// blackbook-internal, the named Firestore databases and private-evidence bucket inside
+// blackbook-internal, and the cross-project IAM asymmetry between them.
 
 variable "prod_project_id" {
   description = "blackbook-prod GCP project ID. Retained as black-book-efaaf (ADR-012); not recreated by this module."
@@ -58,6 +59,12 @@ variable "provision_internal_databases" {
   default     = false
 }
 
+variable "internal_firestore_pitr_enabled" {
+  description = "When true, enable Point-in-Time Recovery on the raw-ingest/curated named Firestore databases in blackbook-internal. Defaults to disabled, matching every other provisioning switch in this module (opt-in only, flipped by a human at apply time after reviewing cost and BB-020's RPO/RTO targets - see docs/runbooks/production-cloud-apply-checklist.md's 'Gaps found during consolidation' #4)."
+  type        = bool
+  default     = false
+}
+
 variable "provision_staging_service_accounts" {
   description = "When true, create the mirrored blackbook-staging service accounts. Requires blackbook-staging to already exist."
   type        = bool
@@ -66,6 +73,12 @@ variable "provision_staging_service_accounts" {
 
 variable "provision_internal_service_accounts" {
   description = "When true, create the blackbook-internal service accounts (research, publication, security, admin-app, promotion, submissions-puller). Requires blackbook-internal to already exist."
+  type        = bool
+  default     = false
+}
+
+variable "provision_internal_buckets" {
+  description = "When true, create the blackbook-internal buckets (private-evidence). Requires blackbook-internal to already exist. Bucket IAM (research/security write, admin-app/publication read) additionally requires provision_internal_service_accounts=true."
   type        = bool
   default     = false
 }

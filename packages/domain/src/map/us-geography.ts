@@ -99,6 +99,14 @@ export const US_BOUNDS: readonly [west: number, south: number, east: number, nor
   Math.max(...US_STATES.map((s) => s.bbox[3])),
 ];
 
+/**
+ * Continental U.S. + D.C. camera frame for the national map. Excludes Alaska so MapLibre
+ * maxBounds / fitBounds are not pulled to the Pacific; AK/HI remain in `US_STATES` for
+ * selection once the user pans or Phase-2 insets land.
+ */
+export const US_CONUS_BOUNDS: readonly [west: number, south: number, east: number, north: number] =
+  [-125.2, 24.2, -66.5, 49.5];
+
 export function isWithinUsBounds(lat: number, lng: number): boolean {
   const [west, south, east, north] = US_BOUNDS;
   return lat >= south && lat <= north && lng >= west && lng <= east;

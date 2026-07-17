@@ -1,0 +1,22 @@
+{
+  "status": "success",
+  "masterlist": {
+    "session": {
+      "session_id": 2025,
+      "state_id": 10,
+      "year_start": 2025,
+      "year_end": 2025
+    },
+    "bills": [
+      {
+        "bill_id": 1900123,
+        "change_hash": "abc123seed",
+        "number": "SB202",
+        "title": "Election Integrity Act of 2025",
+        "status": 4,
+        "status_date": "2025-03-25",
+        "state_link": "https://www.legis.ga.gov/legislation/71972"
+      }
+    ]
+  }
+}

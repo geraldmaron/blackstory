@@ -1,0 +1,20 @@
+{
+  "laws": [
+    {
+      "congress": 88,
+      "type": "pub",
+      "number": "352",
+      "title": "Civil Rights Act of 1964",
+      "latestAction": { "actionDate": "1964-07-02", "text": "Signed by President." },
+      "url": "https://api.congress.gov/v3/law/88/pub/352"
+    },
+    {
+      "congress": 89,
+      "type": "pub",
+      "number": "110",
+      "title": "Voting Rights Act of 1965",
+      "latestAction": { "actionDate": "1965-08-06", "text": "Signed by President." },
+      "url": "https://api.congress.gov/v3/law/89/pub/110"
+    }
+  ]
+}

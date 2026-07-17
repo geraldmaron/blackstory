@@ -80,22 +80,10 @@ Native Land's presence rendering.
 
 ## Homepage narrative arc
 
-**Target arc (map-led, pending BB-070/BB-051):** the homepage opens on the
-national map already populated — "everywhere" proven visually before a
-word is read — then offers paths into places, people, and eras. The
-current homepage (BB-048, pre-map) is text-led: a full-bleed hero states
-the thesis directly ("History, pinned to place.") backed by the evidence-
-bar promise, followed by a featured-records rail and a methodology teaser.
-This is the correct *interim* arc given no map component exists yet —
-copy carries the thesis until the map can prove it visually — but it is
-explicitly interim. When BB-070 (map data platform) and BB-051 (national
-map experience) land, the hero's job shifts from *stating* presence to
-*showing* it, and the text becomes support copy under the map rather than
-the lead.
-
-Do not add a decorative hero image or generic stock photography to fill
-this gap in the meantime — an empty, honest text-led hero is more on-
-brand than a placeholder that isn't the map.
+**Map-led (current):** the homepage opens on the national map already
+populated — "everywhere" proven visually before a word is read — then
+offers paths into Explore, Search, and featured entity records. Brand and
+thesis copy sit as support chrome over the map; the map is the proof.
 
 ## Methodology and About as brand surfaces
 
@@ -161,7 +149,7 @@ enter the composite — see `docs/security/threat-model.md`).
 | Design system tokens/components | `docs/ui/README.md` |
 | Legal status vocabulary + unsupported language | `packages/schemas/constitution/policy.v1.json` |
 | Sensitivity/living-person rules | `packages/schemas/constitution/policy.v1.json` (`sensitivityRules`, `livingPersonRules`) |
-| Current homepage (interim, pre-map) | `apps/web/src/app/page.tsx` |
+| Current homepage (map-led) | `apps/web/src/app/page.tsx`, `apps/web/src/app/HomeMapHero.tsx` |
 | Methodology page | `apps/web/src/app/methodology/page.tsx` |
 | About page | `apps/web/src/app/about/page.tsx` |
 

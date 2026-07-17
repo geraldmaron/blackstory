@@ -18,7 +18,12 @@
  */
 import { NextResponse } from 'next/server';
 import { encodeSearchCursor, evaluateSearchQueryGuardrails, type SearchQueryInput } from '@black-book/security';
-import { runPublicSearch, type PublicSearchIndexDoc } from '@black-book/domain';
+import type { PublicSearchIndexDoc } from '@black-book/domain';
+import {
+  readHybridFlagFromParams,
+  readLaneKillSwitchParams,
+  runWebHybridSearch,
+} from '../../../lib/search/hybrid-search';
 import type { SearchAppCheckGuard } from './app-check-guard';
 import type { createSearchRateLimitGuard } from './rate-limit-guard';
 
@@ -136,16 +141,24 @@ export async function handleSearchRequest(
 
     const { canonical } = decision;
     const offset = (canonical.depth - 1) * canonical.pageSize;
-    const result = runPublicSearch(
-      {
-        normalizedQuery: canonical.q,
-        filters: canonical.filters,
-        sort: canonical.sort,
-        offset,
-        pageSize: canonical.pageSize,
-      },
-      deps.searchIndex,
-    );
+    const searchInput = {
+      normalizedQuery: canonical.q,
+      filters: canonical.filters,
+      sort: canonical.sort,
+      offset,
+      pageSize: canonical.pageSize,
+    };
+
+    const hybridFlag = readHybridFlagFromParams(url.searchParams);
+    const laneKillSwitchParams = readLaneKillSwitchParams(url.searchParams);
+    const hybridResponse = await runWebHybridSearch(searchInput, {
+      searchIndex: deps.searchIndex,
+      ...(hybridFlag !== null ? { hybridFlag } : {}),
+      laneKillSwitchParams,
+      ...(url.searchParams.get('vectorUnavailable') === '1' ? { vectorLaneUnavailable: true } : {}),
+    });
+    const result = hybridResponse.result;
+    const retrievalTelemetry = hybridResponse.telemetry;
 
     // Deviation from BB-049 spec step 6: the cursor embeds `depth: canonical.depth`, NOT
     // `canonical.depth + 1`. `evaluateSearchQueryGuardrails` already increments a decoded cursor's
@@ -172,6 +185,15 @@ export async function handleSearchRequest(
         totalMatched: result.totalMatched,
         hasMore: result.hasMore,
         ...(nextCursor !== undefined ? { nextCursor } : {}),
+        ...(retrievalTelemetry !== undefined
+          ? {
+              retrieval: {
+                mode: retrievalTelemetry.mode,
+                degraded: retrievalTelemetry.degraded,
+                lanes: retrievalTelemetry.lanes,
+              },
+            }
+          : {}),
       },
       { status: 200 },
     );

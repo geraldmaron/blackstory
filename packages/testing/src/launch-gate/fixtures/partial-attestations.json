@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "attestations": [
+    {
+      "gateId": "published-claims-with-evidence",
+      "attestedBy": "publication-operator@example.com",
+      "attestedAt": "2026-07-17T12:00:00.000Z"
+    }
+  ]
+}

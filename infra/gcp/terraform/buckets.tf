@@ -1,5 +1,7 @@
-// Four distinct same-project buckets with Uniform Bucket-Level Access. Every bucket
-// except public-media has Public Access Prevention ENFORCED.
+// Three distinct same-project buckets with Uniform Bucket-Level Access. Every bucket
+// except public-media has Public Access Prevention ENFORCED. private-evidence is not
+// provisioned here under ADR-012 - see locals.tf's buckets map and
+// infra/gcp/terraform/multi-project/buckets.tf.
 
 resource "google_storage_bucket" "boundary" {
   for_each = local.buckets
@@ -10,8 +12,4 @@ resource "google_storage_bucket" "boundary" {
   uniform_bucket_level_access = true
   public_access_prevention    = each.value == "enforced" ? "enforced" : "inherited"
   force_destroy               = false
-
-  versioning {
-    enabled = each.key == "private-evidence"
-  }
 }

@@ -11,6 +11,7 @@ export const QUERY_NORMALIZATION_MATCHER = [
   '/search',
   '/entity/:path*',
   '/explore',
+  '/history',
   '/about',
   '/methodology',
   '/topics',

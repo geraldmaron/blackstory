@@ -1,0 +1,41 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_pc1def",
+    "before": null,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "id": "pc1abc",
+          "name": "t3_pc1abc",
+          "subreddit": "AskHistorians",
+          "title": "Sources for a Freedmen's Bureau field office in Piedmont County, 1866-1870?",
+          "selftext": "I'm trying to track down correspondence from a specific field office. The county historical society's finding aid mentions 214 letters but I can't find a digitized copy anywhere.",
+          "permalink": "/r/AskHistorians/comments/pc1abc/sources_for_a_freedmens_bureau_field_office_in/",
+          "author": "piedmont_researcher",
+          "created_utc": 1752768000,
+          "num_comments": 4,
+          "score": 12,
+          "removed_by_category": null
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "id": "pc1def",
+          "name": "t3_pc1def",
+          "subreddit": "AskHistorians",
+          "title": "Best secondary sources on Rosewood-area segregated schools in the 1950s?",
+          "selftext": "Looking for anything beyond the usual state-archive finding aids.",
+          "permalink": "/r/AskHistorians/comments/pc1def/best_secondary_sources_on_rosewoodarea/",
+          "author": "rosewood_history_fan",
+          "created_utc": 1752764400,
+          "num_comments": 1,
+          "score": 3,
+          "removed_by_category": null
+        }
+      }
+    ]
+  }
+}

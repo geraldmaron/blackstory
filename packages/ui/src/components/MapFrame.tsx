@@ -2,6 +2,11 @@
  * Accessible map frame placeholder for geographic result context (pin + caption).
  */
 
+import React from 'react';
+
+// Defensive: apps/web SSR tests may classic-transform this package's TSX source.
+void React;
+
 import { cx } from '../utils/cx.js';
 
 export type MapPin = {

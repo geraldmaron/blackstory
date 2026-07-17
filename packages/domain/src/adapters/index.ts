@@ -83,5 +83,20 @@ export * from './rss/index.js';
 export * from './internet-archive/index.js';
 export * from './dpla/index.js';
 
+// BB-074: Reddit discovery adapter (gated channel). Ships registered but DISABLED — see
+// ./reddit/contract.ts for the HUMAN STEP (Responsible Builder application) that blocks
+// ever moving this adapter's registry entry out of 'disabled'.
+export * from './reddit/index.js';
+
+// BB-075: web-search (Brave Search API) and Common Crawl retrospective discovery. The web-search
+// adapter ships registered DISABLED — see ./web-search/normalizer.ts's assertStorageTermsConfirmed
+// for the second, independent gate that blocks persistence until a human obtains real written
+// storage-rights confirmation from the vendor. Common Crawl needs no such gate (free/fair-use).
+export * from './web-search/index.js';
+export * from './common-crawl/index.js';
+
 // BB-091: Census TIGER/Gazetteer source registry entry (jurisdiction reference data).
 export * from './census-geo/index.js';
+
+// Legal landscape adapters — fixtures-first (BB-087).
+export * from './legal/index.js';

@@ -1,0 +1,223 @@
+/**
+ * Layout and presentation styles for BB-051's map-first `/explore` experience. Uses the shared
+ * Black Book token vocabulary from `@black-book/ui/styles.css` — no new colors introduced here.
+ */
+.bb-explore-page__body {
+  margin-top: var(--bb-space-4);
+}
+
+.bb-explore-mast {
+  display: grid;
+  gap: var(--bb-space-2);
+  max-width: 40rem;
+}
+
+.bb-explore-mast__title {
+  margin: 0;
+  font-family: var(--bb-font-display);
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--bb-ink);
+}
+
+.bb-explore-mast__lede {
+  margin: 0;
+  font-family: var(--bb-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--bb-ink-muted);
+}
+
+.bb-explore {
+  display: grid;
+  gap: var(--bb-space-4);
+}
+
+.bb-explore__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bb-space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bb-explore__settings {
+  font-family: var(--bb-font-sans);
+  font-size: 0.875rem;
+}
+
+.bb-explore__settings summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.bb-explore__settings-body {
+  max-width: 28rem;
+  margin-top: var(--bb-space-2);
+  padding: var(--bb-space-3);
+  border: var(--bb-border-width) solid var(--bb-border);
+  background: var(--bb-surface);
+}
+
+.bb-explore__settings-body p {
+  margin: 0 0 var(--bb-space-2);
+}
+
+.bb-explore__settings-body p:last-child {
+  margin-bottom: 0;
+}
+
+.bb-explore__settings-fieldset {
+  margin: 0 0 var(--bb-space-3);
+  padding: 0;
+  border: 0;
+}
+
+.bb-explore__settings-fieldset legend {
+  padding: 0;
+  margin-bottom: var(--bb-space-2);
+  font-weight: 600;
+}
+
+.bb-explore__settings-note {
+  margin-top: var(--bb-space-2) !important;
+  color: var(--bb-ink-muted);
+  font-size: 0.8125rem;
+}
+
+.bb-explore__decade-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bb-space-2);
+}
+
+.bb-explore__layout {
+  display: grid;
+  gap: var(--bb-space-4);
+}
+
+@media (min-width: 56rem) {
+  .bb-explore__layout {
+    grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 0.9fr);
+    align-items: stretch;
+    min-height: calc(100svh - 14rem);
+  }
+}
+
+.bb-explore__map-panel {
+  display: grid;
+  gap: var(--bb-space-3);
+  min-height: min(70svh, 36rem);
+}
+
+@media (min-width: 56rem) {
+  .bb-explore__map-panel {
+    min-height: calc(100svh - 14rem);
+  }
+}
+
+.bb-explore-map__canvas {
+  width: 100%;
+  min-height: min(70svh, 36rem);
+  height: 100%;
+  border: var(--bb-border-width) solid var(--bb-border);
+  background: #0a0a0a;
+}
+
+@media (min-width: 56rem) {
+  .bb-explore-map__canvas {
+    min-height: calc(100svh - 14rem);
+  }
+}
+
+.bb-explore__narrative {
+  max-width: 36rem;
+}
+
+.bb-explore-narrative-card {
+  position: relative;
+}
+
+.bb-explore-narrative-card__close {
+  margin-bottom: var(--bb-space-2);
+}
+
+.bb-explore-narrative-card__facts {
+  display: grid;
+  gap: var(--bb-space-2);
+  margin: var(--bb-space-3) 0;
+  font-family: var(--bb-font-sans);
+}
+
+.bb-explore-narrative-card__facts dt {
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.bb-explore-narrative-card__facts dd {
+  margin: 0;
+}
+
+.bb-explore-narrative-card__precision {
+  color: var(--bb-ink-subtle);
+  font-size: 0.875rem;
+}
+
+.bb-explore__list-panel {
+  display: grid;
+  gap: var(--bb-space-3);
+  align-content: start;
+}
+
+.bb-explore__results-count {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.bb-explore-result-list {
+  max-height: min(60svh, 32rem);
+  overflow: auto;
+}
+
+@media (min-width: 56rem) {
+  .bb-explore-result-list {
+    max-height: calc(100svh - 22rem);
+  }
+}
+
+.bb-explore-legend {
+  margin-top: var(--bb-space-2);
+}
+
+.bb-explore-legend__list {
+  display: grid;
+  gap: var(--bb-space-3);
+  margin: var(--bb-space-3) 0 0;
+  font-family: var(--bb-font-sans);
+}
+
+.bb-explore-legend__list dt {
+  font-weight: 700;
+}
+
+.bb-explore-legend__list dd {
+  margin: var(--bb-space-1) 0 0;
+  color: var(--bb-ink-muted);
+}
+
+.bb-explore__locate-link {
+  margin: 0;
+  color: var(--bb-ink-subtle);
+}
+
+.bb-explore__noscript {
+  display: grid;
+  gap: var(--bb-space-4);
+}

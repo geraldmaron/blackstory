@@ -48,6 +48,7 @@ ui-debug.log
 tmp/
 .tmp/
 .local/
+artifacts/
 
 # Docker volumes
 infra/database/data/
@@ -59,7 +60,6 @@ packages/data-access/generated/*/
 
 # Construct — generated adapters, launcher, and runtime state.
 # Machine-specific, recreated by `construct sync`; never source (ADR-0027).
-.construct/
 .claude/*
 # Exception: Black Book product skills (BB-085) are committed source — thin
 # callers over tested @black-book/* packages, not Construct-generated state.

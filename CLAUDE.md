@@ -67,13 +67,3 @@ _Add a brief overview of your project architecture_
 ## Conventions & Patterns
 
 _Add your project-specific conventions here_
-
-<!-- BEGIN CONSTRUCT INTEGRATION v:2 hash:a696cf94871d -->
-## Construct integration
-
-@AGENTS.md
-
-The Construct integration guidance for this project lives in `AGENTS.md`, imported
-above so Claude Code loads it at session start. Address `@construct` and ask for the
-outcome — Construct routes to the right specialist chain.
-<!-- END CONSTRUCT INTEGRATION -->

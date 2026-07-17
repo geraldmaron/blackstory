@@ -71,3 +71,33 @@ test('normalizeSearchParamsRecord returns trimmed filter bag', () => {
     { q: 'dc', kind: 'place' },
   );
 });
+
+test('normalizeQueryString keeps allowlisted /explore map params', () => {
+  const qs = normalizeQueryString('/explore', {
+    era: '1950s',
+    kind: 'school',
+    lat: '38.9',
+    lng: '-77.0',
+    zoom: '6',
+    selected: 'ent_seed_school_001',
+    density: '1',
+    utm_source: 'x',
+    junk: '1',
+  });
+  assert.equal(
+    qs,
+    'density=1&era=1950s&kind=school&lat=38.9&lng=-77.0&selected=ent_seed_school_001&zoom=6',
+  );
+});
+
+test('normalizeQueryString keeps allowlisted /history browse params', () => {
+  const qs = normalizeQueryString('/history', {
+    decade: '1950s',
+    kind: 'event',
+    selected: 'ent_seed_event_001',
+    edge: 'edge_1',
+    fbclid: 'abc',
+    junk: '1',
+  });
+  assert.equal(qs, 'decade=1950s&edge=edge_1&kind=event&selected=ent_seed_event_001');
+});
