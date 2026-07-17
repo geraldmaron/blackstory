@@ -56,6 +56,17 @@ Owner realization: Black Book is a first-class-Entity index of Black history —
 
 **Amended existing beads** (new dependency + appended acceptance-criteria items, originals untouched): BB-086, BB-087, BB-082, BB-051, BB-052, BB-049, BB-050, BB-054, BB-063 (dep only), BB-072, BB-088. No-change (verified type-agnostic or independently scoped): BB-053, BB-055, BB-057, BB-058, BB-059, BB-060, BB-062, BB-048, BB-074, BB-075, `black-book-2ve`.
 
+### Stress-test pass (2026-07-17, same day) — refinements to BB-090/091/092/082/086/094/095
+
+Walked the design against four concrete cases (redlining, Trayvon Martin, March on Washington, sundown towns) before any code was written. No new beads — everything landed as amendments to already-open, not-yet-executed beads, respecting exclusive path ownership (entity.ts stays BB-090's file, relationship.ts stays BB-092's).
+
+- **BB-090**: added a 12th `EntityKind`, `movement` (Civil Rights Movement, Great Migration, etc. — the connective multi-decade phenomenon individual events/orgs are `part_of`), status vocabulary `active|historic`; explicitly scoped `statusHistory[]` to entity lifecycle only (not a catch-all for area conditions).
+- **BB-092**: added `authored` edge (creation attribution) and an optional `role` qualifier on `attended` (organizer vs. participant); reconciled graph-view materialization to also treat BB-086 `subjects[]` as an edge source (closing a blind spot where fact-only entity links, e.g. victim-of-event, would be invisible to the browse graph); added a `caused`/`enabled`-vs-`cites` guardrail for contested individual causation; decade-view bucketing now explicit about active-span not creation-date; succession-chain non-leakage now an explicit acceptance criterion.
+- **BB-082**: **corrected** (not just appended) — the prior pass's "sundown designations become BB-090 statusHistory records" language conflated entity lifecycle status with place condition records; sundown/redlining/exclusion designations are now explicitly BB-082's own layer records, never merged into `statusHistory`. Named HOLC/redlining grades explicitly under the exclusion-infrastructure layer; added a precision-fidelity rendering rule (never interpolate a county-level designation down to town-level specificity).
+- **BB-086**: noted `subjects[]` is a BB-092 graph-view input, not just fact-page display.
+- **BB-094**: named Mapping Inequality (Univ. of Richmond/NARA, public domain HOLC maps) as a launch corpus — the first requiring real historic polygon ingestion rather than point+radius.
+- **BB-095**: added an explicit non-goal — sensitivity flags require a conduct-based rationale, never an identity attribute (e.g. a closeted historical figure's sexuality is never itself a flag condition).
+
 ## Multi-agent coordination (2026-07-17 wave 8 — complete)
 
 | Bead | Exclusive ownership | Status |
