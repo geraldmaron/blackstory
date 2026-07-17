@@ -531,3 +531,7 @@ export * from './rights/index.js';
 export * from './consensus-review/index.js';
 export * from './citations/index.js';
 export * from './relevance-feedback/index.js';
+
+// Public search domain layer (BB-049): deterministic ranking, facets, explanations, and the
+// notability-gate-enforcing search-index builder. Mirrors ./graph/index.js's own barrel.
+export * from './search/index.js';

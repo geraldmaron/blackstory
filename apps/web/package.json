@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start --port 3048",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/lib/runtime-hardening/query-normalization.test.ts src/lib/runtime-hardening/runtime-hardening.test.ts src/lib/web-security/sanitize.test.ts src/lib/web-security/redirects.test.ts src/lib/web-security/web-security.test.ts src/app/submit/lead-intake.test.ts src/app/submit/rate-limit-guard.test.ts src/app/submit/app-check-guard.test.ts src/components/banners.test.ts src/components/DegradedModeNotice.test.ts src/app/error.test.ts",
+    "test": "node --conditions development --import tsx --test src/lib/runtime-hardening/query-normalization.test.ts src/lib/runtime-hardening/runtime-hardening.test.ts src/lib/web-security/sanitize.test.ts src/lib/web-security/redirects.test.ts src/lib/web-security/web-security.test.ts src/app/submit/lead-intake.test.ts src/app/submit/rate-limit-guard.test.ts src/app/submit/app-check-guard.test.ts src/components/banners.test.ts src/components/DegradedModeNotice.test.ts src/app/error.test.ts src/lib/search/snapshot-search-index.test.ts src/app/search/api/route.test.ts src/app/search/search-view-model.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

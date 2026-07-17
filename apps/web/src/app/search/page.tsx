@@ -1,32 +1,33 @@
 /**
- * Browse/search — modular news index over seed fixtures (BB-049 stand-in).
+ * Public search page (BB-049): wired to the real `@black-book/domain` search pipeline
+ * (`runPublicSearch`) over the snapshot search index, replacing the earlier hand-rolled
+ * `filterPublicEntities` seed-filter stand-in.
+ *
+ * This Server Component stays intentionally thin — `buildSearchViewModel` in the co-located
+ * `./search-view-model.ts` (plain, synchronously testable, no Next.js runtime dependency) does all
+ * query-parsing, filter-building, and result/facet shaping. It lives in a separate module rather
+ * than this file because Next's generated typed-route check
+ * (`.next/types/app/search/page.ts`) rejects any named export from `page.tsx` other than the
+ * framework's own allowlisted route conventions — see `./search-view-model.ts`'s module doc.
  */
 
-import { Confidence, EmptyState, FilterBar, ResultList } from '@black-book/ui';
+import { EmptyState, FilterBar, ResultList } from '@black-book/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
-import { filterPublicEntities } from '../../data/public-seed';
+import { getSnapshotSearchIndex } from '../../lib/search/snapshot-search-index';
+import { buildSearchPageHref, buildSearchViewModel, type RawSearchParams } from './search-view-model';
 
 export const metadata = {
   title: 'Search',
-  description: 'Browse sample Black Book records by keyword, kind, era, and topic.',
+  description: 'Search sample Black Book records by keyword, kind, status, and era.',
 };
 
 type SearchPageProps = {
-  readonly searchParams: Promise<{
-    q?: string;
-    kind?: string;
-    era?: string;
-    topic?: string;
-  }>;
+  readonly searchParams: Promise<RawSearchParams>;
 };
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
-  const q = params.q ?? '';
-  const kind = params.kind ?? 'all';
-  const era = params.era ?? 'all';
-  const topic = params.topic ?? 'all';
-  const results = filterPublicEntities({ q, kind, era, topic });
+  const view = buildSearchViewModel(params, getSnapshotSearchIndex());
 
   return (
     <main className="bb-container bb-page" id="main">
@@ -34,7 +35,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <p className="bb-page__eyebrow">Index</p>
         <h1 className="bb-page__title">Search</h1>
         <p className="bb-page__lede">
-          Filter sample records now. Live search lands in BB-049.
+          Search runs against the current sample/snapshot catalog through the real Black Book
+          search pipeline — matches, facet counts, and match explanations below reflect that
+          pipeline, not a hardcoded seed filter. The underlying records are still sample data.
         </p>
       </header>
 
@@ -52,47 +55,31 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               label: 'Search',
               type: 'search',
               placeholder: 'School, place, neighborhood…',
-              defaultValue: q,
+              defaultValue: view.q,
             },
             {
               id: 'kind',
               name: 'kind',
               label: 'Kind',
               type: 'select',
-              defaultValue: kind,
-              options: [
-                { value: 'all', label: 'All kinds' },
-                { value: 'place', label: 'Place' },
-                { value: 'school', label: 'School' },
-                { value: 'event', label: 'Event' },
-                { value: 'institution', label: 'Institution' },
-              ],
+              defaultValue: view.kind,
+              options: view.kindOptions,
+            },
+            {
+              id: 'status',
+              name: 'status',
+              label: 'Status',
+              type: 'select',
+              defaultValue: view.status,
+              options: view.statusOptions,
             },
             {
               id: 'era',
               name: 'era',
               label: 'Era',
               type: 'select',
-              defaultValue: era,
-              options: [
-                { value: 'all', label: 'All eras' },
-                { value: 'reconstruction', label: 'Reconstruction' },
-                { value: 'civil-rights', label: 'Civil rights' },
-              ],
-            },
-            {
-              id: 'topic',
-              name: 'topic',
-              label: 'Topic',
-              type: 'select',
-              defaultValue: topic,
-              options: [
-                { value: 'all', label: 'All topics' },
-                { value: 'education', label: 'Education' },
-                { value: 'community', label: 'Community' },
-                { value: 'freedmen', label: 'Freedmen' },
-                { value: 'schools', label: 'Schools' },
-              ],
+              defaultValue: view.era,
+              options: view.eraOptions,
             },
           ]}
         />
@@ -108,10 +95,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             textTransform: 'uppercase',
           }}
         >
-          {results.length} sample result{results.length === 1 ? '' : 's'}
+          {view.totalMatched} sample result{view.totalMatched === 1 ? '' : 's'}
         </p>
 
-        {results.length === 0 ? (
+        {view.results.length === 0 ? (
           <EmptyState
             title="No sample records matched"
             action={
@@ -120,34 +107,49 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               </a>
             }
           >
-            Try a broader keyword or set Kind / Era / Topic back to “All”.
+            Try a broader keyword or set Kind / Status / Era back to “All”.
           </EmptyState>
         ) : (
-          <ResultList
-            labelledBy="search-results-heading"
-            items={results.map((entity) => ({
-              id: entity.id,
-              href: `/entity/${entity.id}`,
-              title: entity.displayName,
-              summary: entity.summary,
-              meta: (
-                <>
-                  <span className="bb-mono">{entity.kind}</span>
-                  <span>{entity.jurisdictionLabel}</span>
-                  <Confidence
-                    level={
-                      entity.researchCoverage === 'substantial'
-                        ? 'high'
-                        : entity.researchCoverage === 'partial'
-                          ? 'medium'
-                          : 'low'
-                    }
-                    label={`Coverage: ${entity.researchCoverage}`}
-                  />
-                </>
-              ),
-            }))}
-          />
+          <>
+            <ResultList
+              labelledBy="search-results-heading"
+              items={view.results.map((result) => ({
+                id: result.id,
+                href: `/entity/${result.id}`,
+                title: result.displayName,
+                summary: result.summary ?? '',
+                meta: (
+                  <>
+                    <span className="bb-mono">{result.kind}</span>
+                    {result.status ? <span className="bb-mono">{result.status}</span> : null}
+                    <span className="bb-sans">Matched: {result.matchedText}</span>
+                    <span className="bb-sans">{result.explanation}</span>
+                  </>
+                ),
+              }))}
+            />
+
+            {view.previousOffset !== undefined || view.nextOffset !== undefined ? (
+              <nav className="bb-row" aria-label="Search results pages">
+                {view.previousOffset !== undefined ? (
+                  <a
+                    className="bb-button bb-button--secondary"
+                    href={buildSearchPageHref(view, view.previousOffset)}
+                  >
+                    Previous page
+                  </a>
+                ) : null}
+                {view.nextOffset !== undefined ? (
+                  <a
+                    className="bb-button bb-button--secondary"
+                    href={buildSearchPageHref(view, view.nextOffset)}
+                  >
+                    Next page
+                  </a>
+                ) : null}
+              </nav>
+            ) : null}
+          </>
         )}
       </div>
     </main>

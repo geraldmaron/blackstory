@@ -1,0 +1,39 @@
+/**
+ * Public search endpoint (BB-049). Node.js runtime (App Check's Admin SDK verifier requires it —
+ * never edge). This file is deliberately thin: Next.js's route-file validator only permits the HTTP
+ * method handlers and route config to be exported here, so the testable, dependency-injectable core
+ * lives in `./handler` (`handleSearchRequest`) and this module just wires production singletons.
+ *
+ * The endpoint sits behind App Check + BB-025 rate limits and runs BB-026's search guardrails
+ * before executing the pure `runPublicSearch` pipeline over `getSnapshotSearchIndex()` — see
+ * `./handler` for the full request flow and the snapshot/live-reader seam.
+ */
+import { getSnapshotSearchIndex } from '../../../lib/search/snapshot-search-index';
+import { createSearchAppCheckGuard, type SearchAppCheckGuard } from './app-check-guard';
+import { createSearchRateLimitGuard } from './rate-limit-guard';
+import { handleSearchRequest } from './handler';
+
+export const runtime = 'nodejs';
+
+// Module-level singletons: one in-memory rate-limit store per server instance, matching the submit
+// route's posture. A shared store for a multi-instance deployment is an infra concern, not a change
+// to the algorithm. The App Check guard is created lazily (its factory dynamically imports
+// `@black-book/firebase` — see `./app-check-guard.ts`) and cached so only one is built per instance.
+const defaultRateLimitGuard = createSearchRateLimitGuard();
+
+let defaultAppCheckGuardPromise: Promise<SearchAppCheckGuard> | undefined;
+function getDefaultAppCheckGuard(): Promise<SearchAppCheckGuard> {
+  if (!defaultAppCheckGuardPromise) {
+    defaultAppCheckGuardPromise = createSearchAppCheckGuard();
+  }
+  return defaultAppCheckGuardPromise;
+}
+
+export async function GET(request: Request): Promise<Response> {
+  const appCheckGuard = await getDefaultAppCheckGuard();
+  return handleSearchRequest(request, {
+    appCheckGuard,
+    rateLimitGuard: defaultRateLimitGuard,
+    searchIndex: getSnapshotSearchIndex(),
+  });
+}

@@ -31,14 +31,20 @@ export const searchSortKeys = [
   'distance',
 ] as const satisfies readonly SearchSortKey[];
 
-/** Allowlisted filter fields — no arbitrary column selection. */
-export type SearchFilterField = 'kind' | 'state' | 'precision' | 'releaseId';
+/**
+ * Allowlisted filter fields — no arbitrary column selection. `status` and `era` were added for
+ * BB-049 AC5 ("the filter allowlist extends to status and era"), matching the 6 fields
+ * `@black-book/domain`'s search layer filters on (see `packages/domain/src/search/types.ts`).
+ */
+export type SearchFilterField = 'kind' | 'state' | 'precision' | 'releaseId' | 'status' | 'era';
 
 export const searchFilterFields = [
   'kind',
   'state',
   'precision',
   'releaseId',
+  'status',
+  'era',
 ] as const satisfies readonly SearchFilterField[];
 
 /** Approved query shapes executed by api-public (no ad-hoc SQL). */

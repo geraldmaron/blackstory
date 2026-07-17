@@ -861,6 +861,66 @@ export const publicEntityProjectionSchema = z.object({
 
 export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSchema>;
 
+/**
+ * BB-049 persisted search index document — the server-read shape @black-book/domain's
+ * `buildPublicSearchIndexDocs` produces (`packages/domain/src/search/`). Follows the exact
+ * conventions of `publicEntityProjectionSchema` above: reuses `entityKindSchema` /
+ * `sensitivityClassSchema`, and every field is non-numeric BY STANDING POLICY except the two
+ * counts explicitly called out below.
+ *
+ * `relatedCount` (connection-strength proxy) and `claimCount` are the ONLY numeric fields, and are
+ * SERVER-INTERNAL ranking inputs only: search runs server-side and projects results into the
+ * client-facing `SearchResultView` (defined in @black-book/domain), which carries neither count
+ * nor any score — mirroring BB-092's rule that adjacency `evidenceCount` is an ordering key, never
+ * a public payload field. `notabilityBasis` is retained as the auditable inclusion basis backing
+ * the AC5 gate; it carries only string leaves (criterion, note, evidenceIds — the same category as
+ * this file's already-public `claimIds`) and never a numeric score, and is not projected to the
+ * client.
+ */
+export const publicSearchIndexSchema = z.object({
+  id: z.string().min(1),
+  releaseId: z.string().min(1),
+  kind: entityKindSchema,
+  displayName: z.string().min(1),
+  /** Lowercased displayName, precomputed for query-time matching. */
+  nameLower: z.string().min(1),
+  /** Lowercased alias strings, flattened from EntityAlias[] by the release builder. */
+  aliases: z.array(z.string().min(1)).default([]),
+  summary: z.string().optional(),
+  topicTags: z.array(z.string().min(1)).default([]),
+  /** State-level jurisdiction label (BB-090) — backs the `state` facet/filter. */
+  jurisdictionState: z.string().min(1).optional(),
+  /** Derived current lifecycle status label (e.g. "active", "in_force") — never hand-edited. */
+  status: z.string().min(1).optional(),
+  /** Decade labels the entity's dated span overlaps (e.g. ["1950s", "1960s"]). */
+  eraBuckets: z.array(z.string().min(1)).default([]),
+  /** Auditable inclusion basis (BB-090 / BB-049 AC5) — string-only leaves, never a score. */
+  notabilityBasis: z
+    .array(
+      z.object({
+        criterion: z.string().min(1),
+        note: z.string().min(1),
+        evidenceIds: z.array(z.string().min(1)).default([]),
+      }),
+    )
+    .default([]),
+  /** Human-readable notability rubric labels (never the raw criterion enum alone, never a score). */
+  notabilityLabels: z.array(z.string().min(1)).default([]),
+  /** Sensitivity classification label, when the entity carries one — presentation is BB-095. */
+  sensitivityClass: sensitivityClassSchema.optional(),
+  recordMaturity: z.string().min(1),
+  researchCoverage: z.enum(['minimal', 'partial', 'substantial']),
+  /**
+   * SERVER-INTERNAL ranking inputs ONLY — the two permitted numeric fields on this schema. Never
+   * projected into the client-facing SearchResultView. `relatedCount` is a connection-strength
+   * proxy (count of related/adjacency entries); `claimCount` is the supporting-claim count.
+   */
+  relatedCount: z.number().int().min(0),
+  claimCount: z.number().int().min(0),
+});
+
+export type PublicSearchIndexDoc = z.infer<typeof publicSearchIndexSchema>;
+
 export const submissionInboxSchema = z.object({
   status: z.literal('quarantined'),
   createdBy: z.string().min(1),

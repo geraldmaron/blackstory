@@ -4,8 +4,28 @@
  * overrides live in apphosting*.yaml runConfig blocks.
  */
 
-/** Allowed search/filter keys on /search — all other query keys are stripped at the edge. */
-export const SEARCH_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'era', 'topic'] as const;
+/**
+ * Allowed search/filter keys on /search — all other query keys are stripped at the edge.
+ * Extended for BB-049 to cover every param the `/search/api` route actually reads (q + the 6
+ * allowlisted filters + sort/pageSize/cursor/date range), so the CDN cache-key/vary normalization
+ * does not silently drop params the route respects. `topic` is retained for the legacy seed-browse
+ * page (`filterPublicEntities`), which still accepts it.
+ */
+export const SEARCH_PAGE_PARAM_ALLOWLIST = [
+  'q',
+  'kind',
+  'state',
+  'precision',
+  'releaseId',
+  'status',
+  'era',
+  'sort',
+  'pageSize',
+  'cursor',
+  'dateFrom',
+  'dateTo',
+  'topic',
+] as const;
 
 export type SearchPageParam = (typeof SEARCH_PAGE_PARAM_ALLOWLIST)[number];
 

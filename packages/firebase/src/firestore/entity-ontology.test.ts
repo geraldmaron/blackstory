@@ -10,6 +10,7 @@ import {
   canonicalEntitySchema,
   entityKindSchema,
   publicEntityProjectionSchema,
+  publicSearchIndexSchema,
   schoolFieldsSchema,
 } from './types.js';
 
@@ -132,6 +133,60 @@ test('publicEntityProjectionSchema rejects numeric values for every BB-090 addit
   );
   assert.equal(
     publicEntityProjectionSchema.safeParse({ ...base, sensitivityClass: 1 }).success,
+    false,
+  );
+});
+
+const VALID_SEARCH_DOC = {
+  id: 'ent-law-1',
+  releaseId: 'rel-1',
+  kind: 'law' as const,
+  displayName: 'Example Statute',
+  nameLower: 'example statute',
+  aliases: ['the statute'],
+  summary: 'A landmark civil-rights statute.',
+  topicTags: ['civil_rights'],
+  jurisdictionState: 'Alabama',
+  status: 'in_force',
+  eraBuckets: ['1960s'],
+  notabilityBasis: [{ criterion: 'court_precedent', note: 'Landmark ruling.', evidenceIds: ['ev-1'] }],
+  notabilityLabels: ['Set binding precedent affecting civil rights.'],
+  sensitivityClass: 'contested_legacy' as const,
+  recordMaturity: 'partial_enrichment',
+  researchCoverage: 'substantial' as const,
+  relatedCount: 4,
+  claimCount: 2,
+};
+
+test('publicSearchIndexSchema (BB-049) round-trips a valid search index doc', () => {
+  const parsed = publicSearchIndexSchema.parse(VALID_SEARCH_DOC);
+  assert.equal(parsed.id, 'ent-law-1');
+  assert.equal(parsed.releaseId, 'rel-1');
+  assert.equal(parsed.nameLower, 'example statute');
+  assert.equal(parsed.notabilityBasis[0]?.criterion, 'court_precedent');
+  assert.equal(parsed.relatedCount, 4);
+});
+
+test('publicSearchIndexSchema exposes NO numeric field beyond the two internal-ranking counts', () => {
+  const parsed = publicSearchIndexSchema.parse(VALID_SEARCH_DOC);
+  const { relatedCount, claimCount, ...publicFacing } = parsed;
+  // relatedCount/claimCount are the only permitted numerics (server-internal ranking inputs); the
+  // rest of the doc must be free of numeric leaves by standing policy.
+  assertNoNumericLeaf(publicFacing);
+  assert.equal(typeof relatedCount, 'number');
+  assert.equal(typeof claimCount, 'number');
+});
+
+test('publicSearchIndexSchema rejects a numeric score smuggled into a non-count field', () => {
+  // Defense-in-depth: a stray relevanceScore-style number in any string field must fail parsing.
+  assert.equal(publicSearchIndexSchema.safeParse({ ...VALID_SEARCH_DOC, status: 0.9 }).success, false);
+  assert.equal(publicSearchIndexSchema.safeParse({ ...VALID_SEARCH_DOC, nameLower: 42 }).success, false);
+  assert.equal(
+    publicSearchIndexSchema.safeParse({ ...VALID_SEARCH_DOC, notabilityLabels: [7] }).success,
+    false,
+  );
+  assert.equal(
+    publicSearchIndexSchema.safeParse({ ...VALID_SEARCH_DOC, sensitivityClass: 3 }).success,
     false,
   );
 });
