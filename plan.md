@@ -1,10 +1,10 @@
 # Black Book — Execution Plan
 
-Tracks the Execution Beads (BB-001–BB-066 from *Black Book Web Application Execution Beads*, plus the BB-067–BB-089 course-correction expansion). Update status as work completes. Delete this file when the plan is fully executed or superseded by durable project docs.
+Tracks the Execution Beads (BB-001–BB-066 from *Black Book Web Application Execution Beads*, plus the BB-067–BB-095 course-correction expansion). Update status as work completes. Delete this file when the plan is fully executed or superseded by durable project docs.
 
-**Source:** versioned copy at `docs/source-spec/Black Book Web Application Execution Beads.pdf` (BB-001–066) + owner brief & research 2026-07-17 (BB-067–089)  
+**Source:** versioned copy at `docs/source-spec/Black Book Web Application Execution Beads.pdf` (BB-001–066) + owner brief & research 2026-07-17 (BB-067–089) + owner brief 2026-07-17 second message, entity ontology (BB-090–095)  
 **Workspace:** `/Users/geralddagher/Developer/Projects/black-book` (greenfield as of 2026-07-16)  
-**Active focus:** Waves 7+8 complete. Design (BB-067/068/069), map data platform (BB-070), vector search (BB-071), production re-split design (BB-078), UGC compliance (BB-077), automation backbone (BB-084), operator lane (BB-085), community discovery adapters (BB-073), community submission/consensus (BB-076), citation integrity (BB-083), relevance feedback loop (BB-081), pre-launch resilience (BB-089), and the consolidated cloud-apply checklist (BB-079) are all done. BB-048 remains partial. Newly unblocked: BB-051 (national map, still needs BB-049/050 too), BB-062 (release pipeline path), BB-063 (beta launch gate), BB-072 (hybrid retrieval), BB-074/075 (gated/paid discovery), BB-087 (legal landscape). Remaining tranche-5/6 public-product beads (BB-049/050/052-055/057-060) are the next major surface.
+**Active focus:** Waves 7+8 complete. Design (BB-067/068/069), map data platform (BB-070), vector search (BB-071), production re-split design (BB-078), UGC compliance (BB-077), automation backbone (BB-084), operator lane (BB-085), community discovery adapters (BB-073), community submission/consensus (BB-076), citation integrity (BB-083), relevance feedback loop (BB-081), pre-launch resilience (BB-089), and the consolidated cloud-apply checklist (BB-079) are all done. BB-048 remains partial. Entity-ontology pass (BB-090–095, see below) added 2026-07-17: BB-090 (entity status/notability/era) and BB-091 (jurisdiction registry) are the new front of queue — both depend only on closed beads and unblock BB-092 (history graph substrate) plus amended dependencies on BB-049/050/051/052/054/072/082/086/087/088/063. Remaining tranche-5/6 public-product beads (BB-049/050/052-055/057-060) are the next major surface once BB-090/091 land.
 
 ## Course-correction expansion (2026-07-17) — BB-067–BB-089
 
@@ -38,6 +38,23 @@ Research-backed review of the whole tracker + owner brief. All labeled `course-c
 | BB-089 | Pre-launch resilience + operator protection | P0 | `done` — Sybil signals, robots/ai.txt/security.txt live, human-only checklist for real-world actions; unblocks BB-063 |
 
 **Operating principles (pinned in `bd` memory):** free-first; everything Firebase-native for now; self-updating (budget-capped jobs with kill switches; review queues batchable in minutes); one-time setup over recurring labor; reuse existing packages over parallel systems; U.S. only.
+
+## Entity ontology & history graph expansion (2026-07-17, owner second message) — BB-090–BB-095
+
+Owner realization: Black Book is a first-class-Entity index of Black history — status lifecycle per kind, notability/inclusion rubric, jurisdiction-anchored geography with a precision-radius policy, a typed history graph with all-time + decade views, controversy shielding for flaggable-but-notable people, present-day advisories (never scoring), a disclaimer framework, and a vetted-corpus bulk-intake lane for settled record classes (laws, documented massacres/riots, National Register sites). Full design captured in `/Users/geralddagher/.claude/plans/quirky-moseying-cosmos.md`. Every new bead **extends** existing substrate (CanonicalEntity, EntityRelationship, Jurisdiction type, the BB-086 FactRecord spec) rather than building parallel systems — none of it existed as code prior to this pass, only as scattered spec fragments inside BB-086/082/087.
+
+| Bead | Theme | Prio | Notes |
+|------|-------|------|-------|
+| BB-090 | Entity ontology: status lifecycle, notability basis, era model | P0 | Extends `entity.ts`; kind-specific status vocabularies, time-scoped `statusHistory`, auditable `notabilityBasis` gate, shared era/decade derivation; ready (deps closed only) |
+| BB-091 | Jurisdiction registry + geographic reference substrate | P0 | Instantiates the existing `Jurisdiction` type into Firestore (states + ~3,143 counties, Census public domain); cities on-demand, ZIPs never stored; precision-radius policy; ready (deps closed only) |
+| BB-092 | History graph substrate: edge vocabulary + derived decade/all-time views | P0 | Extends `EntityRelationship` with causal edge types; containment-chain materialization; derived graph views as BB-019-pattern release artifacts, no graph DB; blocked on BB-090/091 |
+| BB-093 | History graph and decade browse experience | P1 | `/history` reader surface consuming only BB-092's published artifacts; deliberately post-launch (flagged owner assumption — promote to P0 with a BB-063 dep if it should gate launch instead); blocked on BB-092 |
+| BB-094 | Vetted-corpus bulk intake lane | P1 | Corpus-vetting gate on top of the existing BB-085 bulk-import CLI; named launch corpora (NRHP, HABS/HAER, NYPL Green Book, EJI-documented massacres/riots, HBCU list, Rosenwald schools); blocked on BB-090/091 |
+| BB-095 | Sensitivity presentation, present-day advisories, disclaimer framework | P0 | Include-with-context banners for flagged entities; advisories as sourced dated claims, presentation-only by test (crime-stats-never-scores rule extended); single disclaimer registry; gates BB-063; blocked on BB-090 |
+
+**Flagged owner assumption (unconfirmed, proceeded on recommended default):** cultural-figure notability calibration in BB-090 defaults to icons-and-firsts-only (commercial milestones alone never qualify) — ships as reviewable rubric text, ratify or widen before BB-094 auto-derives notability from corpus membership. BB-093's P1/post-launch priority is the second flagged default. Both are one-line changes if the owner wants otherwise.
+
+**Amended existing beads** (new dependency + appended acceptance-criteria items, originals untouched): BB-086, BB-087, BB-082, BB-051, BB-052, BB-049, BB-050, BB-054, BB-063 (dep only), BB-072, BB-088. No-change (verified type-agnostic or independently scoped): BB-053, BB-055, BB-057, BB-058, BB-059, BB-060, BB-062, BB-048, BB-074, BB-075, `black-book-2ve`.
 
 ## Multi-agent coordination (2026-07-17 wave 8 — complete)
 
