@@ -3,9 +3,9 @@
   "version": "3.0.0-final",
   "assets": [
     {
-      "path": "README.md",
-      "bytes": 1261,
-      "sha256": "01e846d8ea9cbbe264e3ac1ea074e1e3b1a2523d1aa9a11d589da87030781a16"
+      "path": "readme.md",
+      "bytes": 1332,
+      "sha256": "e1636051488700d834e0629e46f123c150c9512aa282119e51812f107b1ae0b7"
     },
     {
       "path": "assets/icons/apple-touch-icon-dark-180.png",
@@ -203,12 +203,12 @@
       "sha256": "e0a3724dc0932e2401a8b08055d2ce56921574c8989211370ed0689516def551"
     },
     {
-      "path": "guide/Black-Book-Brand-Guide-Final.pdf",
+      "path": "guide/black-book-brand-guide-final.pdf",
       "bytes": 636121,
       "sha256": "89813d3f52031112f52f1cdd8cabf6ef273948e319052b382b756a6403240623"
     },
     {
-      "path": "implementation/ASSET-USAGE.md",
+      "path": "implementation/asset-usage.md",
       "bytes": 529,
       "sha256": "c45cc644d218be1a1cd06e3afe8493662d8c83ad1da7ee79fdcbde819bf3a5ed"
     },
@@ -229,8 +229,8 @@
     },
     {
       "path": "tokens/black-book-brand-tokens.json",
-      "bytes": 916,
-      "sha256": "4da661d0b024818bd793fa0ab9f3713a011a8438ba8114e69acae818461587dc"
+      "bytes": 922,
+      "sha256": "43e232d442fb0922f5727582935606243aa51de510a48af26256a7d593404c16"
     },
     {
       "path": "tokens/black-book-brand.css",
