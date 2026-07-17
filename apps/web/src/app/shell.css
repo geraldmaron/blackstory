@@ -35,23 +35,50 @@
 .bb-shell-wordmark {
   display: inline-flex;
   align-items: center;
-  gap: var(--bb-space-2);
-  font-family: var(--bb-font-display);
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--bb-ink);
+  /* Clear space: padding exceeds the pin's visible width at this scale. */
+  padding: var(--bb-space-2);
   text-decoration: none;
   line-height: 1;
-  text-transform: none;
 }
 
-.bb-shell-wordmark__mark {
+.bb-shell-wordmark__img {
   display: block;
-  flex: none;
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--bb-ink);
+  /* Brand minimum lockup width: 168px. */
+  width: 10.5rem;
+  height: auto;
+}
+
+.bb-shell-wordmark__mini {
+  display: none;
+}
+
+.bb-shell-wordmark__mini .bb-shell-wordmark__img {
+  width: var(--bb-space-8);
+  height: var(--bb-space-8);
+}
+
+/* CSS-only theme swap keyed off the existing data-theme attribute. */
+.bb-shell-wordmark__img--dark {
+  display: none;
+}
+
+[data-theme='dark'] .bb-shell-wordmark__img--light {
+  display: none;
+}
+
+[data-theme='dark'] .bb-shell-wordmark__img--dark {
+  display: block;
+}
+
+/* Below the lockup's minimum width, swap to the compact mark instead of shrinking. */
+@media (max-width: 30rem) {
+  .bb-shell-wordmark__full {
+    display: none;
+  }
+
+  .bb-shell-wordmark__mini {
+    display: block;
+  }
 }
 
 .bb-shell-wordmark:hover {

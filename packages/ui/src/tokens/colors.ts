@@ -1,7 +1,7 @@
 
 /**
- * Black Book color tokens: white/black primary surfaces and ink, Copper Pin
- * Page Sand brand accent, and reserved status hues.
+ * Black Book color tokens: Archive Paper / Black Ink primary surfaces and ink,
+ * Copper Pin Page Sand brand accent, and reserved status hues.
  * Status colors are only for warning, confidence, dispute, and error never decorative chrome.
  * Palette source: brandPalette (brand-palette.ts).
  */
@@ -52,40 +52,40 @@ export type ConfidencePalette = Record<ConfidenceLevel, StatusPalette>;
 
 export const lightTheme: ThemePalette = {
   canvas: brandPalette.archivePaper,
-  surface: brandPalette.archivePaper,
-  surfaceRaised: '#FAFAFA',
+  surface: brandPalette.surface,
+  surfaceRaised: brandPalette.surface,
   ink: brandPalette.blackInk,
-  inkMuted: '#404040',
-  inkSubtle: '#737373',
-  border: '#E5E5E5',
+  inkMuted: brandPalette.stone,
+  inkSubtle: brandPalette.stone,
+  border: brandPalette.rule,
   borderStrong: brandPalette.blackInk,
   focusRing: brandPalette.blackInk,
   focusRingOffset: brandPalette.archivePaper,
   inverse: brandPalette.blackInk,
   inverseInk: brandPalette.archivePaper,
   overlay: 'rgba(10, 10, 10, 0.55)',
-  accent: brandPalette.copperInk,
+  accent: brandPalette.copperTextLight,
   accentGraphic: brandPalette.copperPin,
   accentMuted: brandPalette.pageSand,
 };
 
 export const darkTheme: ThemePalette = {
   canvas: brandPalette.blackInk,
-  surface: '#141414',
-  surfaceRaised: '#1A1A1A',
+  surface: brandPalette.charcoal,
+  surfaceRaised: '#1C1B18',
   ink: brandPalette.archivePaper,
-  inkMuted: '#A3A3A3',
-  inkSubtle: '#8C8C8C',
-  border: '#2A2A2A',
+  inkMuted: '#BDB5A9',
+  inkSubtle: '#BDB5A9',
+  border: '#34302C',
   borderStrong: brandPalette.archivePaper,
   focusRing: brandPalette.archivePaper,
   focusRingOffset: brandPalette.blackInk,
   inverse: brandPalette.archivePaper,
   inverseInk: brandPalette.blackInk,
   overlay: 'rgba(0, 0, 0, 0.72)',
-  accent: brandPalette.pageSand,
-  accentGraphic: brandPalette.copperPin,
-  accentMuted: brandPalette.copperPin,
+  accent: brandPalette.copperDark,
+  accentGraphic: brandPalette.copperDark,
+  accentMuted: brandPalette.pageSand,
 };
 
 export const lightStatus: Record<'warning' | 'dispute' | 'error', StatusPalette> = {

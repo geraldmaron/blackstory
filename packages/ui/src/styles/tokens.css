@@ -2,7 +2,7 @@
 /**
  * CSS custom properties for Black Book themes, focus, motion, and layout tokens.
  * Import via `@black-book/ui/styles.css` in consuming apps.
- * Palette: white Black Ink primaries with Copper Pin Page Sand accents.
+ * Palette: Archive Paper Black Ink primaries with Copper Pin Page Sand accents.
  * Mirrors packages/ui/src/tokens/colors.ts keep the two in sync.
  */
 
@@ -10,21 +10,22 @@
 [data-theme='light'] {
   color-scheme: light;
 
-  --bb-canvas: #ffffff;
-  --bb-surface: #ffffff;
-  --bb-surface-raised: #fafafa;
+  --bb-canvas: #f4efe5;
+  --bb-surface: #fbf8f2;
+  --bb-surface-raised: #fbf8f2;
   --bb-ink: #0a0a0a;
-  --bb-ink-muted: #404040;
-  --bb-ink-subtle: #737373;
-  --bb-border: #e5e5e5;
+  --bb-ink-muted: #6d675f;
+  --bb-ink-subtle: #6d675f;
+  --bb-border: #d7d0c4;
+  --bb-rule: #d7d0c4;
   --bb-border-strong: #0a0a0a;
   --bb-focus-ring: #0a0a0a;
-  --bb-focus-ring-offset: #ffffff;
+  --bb-focus-ring-offset: #f4efe5;
   --bb-inverse: #0a0a0a;
-  --bb-inverse-ink: #ffffff;
+  --bb-inverse-ink: #f4efe5;
   --bb-overlay: rgba(10, 10, 10, 0.55);
 
-  --bb-accent: #7a4318;
+  --bb-accent: #8e4f2a;
   --bb-accent-graphic: #b86b2a;
   --bb-accent-muted: #d8a178;
 
@@ -54,31 +55,32 @@
 
   --bb-viz-1: #0a0a0a;
   --bb-viz-2: #b86b2a;
-  --bb-viz-3: #737373;
+  --bb-viz-3: #6d675f;
   --bb-viz-4: #d8a178;
-  --bb-viz-grid: #e5e5e5;
+  --bb-viz-grid: #d7d0c4;
 }
 
 [data-theme='dark'] {
   color-scheme: dark;
 
   --bb-canvas: #0a0a0a;
-  --bb-surface: #141414;
-  --bb-surface-raised: #1a1a1a;
-  --bb-ink: #ffffff;
-  --bb-ink-muted: #a3a3a3;
-  --bb-ink-subtle: #8c8c8c;
-  --bb-border: #2a2a2a;
-  --bb-border-strong: #ffffff;
-  --bb-focus-ring: #ffffff;
+  --bb-surface: #161616;
+  --bb-surface-raised: #1c1b18;
+  --bb-ink: #f4efe5;
+  --bb-ink-muted: #bdb5a9;
+  --bb-ink-subtle: #bdb5a9;
+  --bb-border: #34302c;
+  --bb-rule: #34302c;
+  --bb-border-strong: #f4efe5;
+  --bb-focus-ring: #f4efe5;
   --bb-focus-ring-offset: #0a0a0a;
-  --bb-inverse: #ffffff;
+  --bb-inverse: #f4efe5;
   --bb-inverse-ink: #0a0a0a;
   --bb-overlay: rgba(0, 0, 0, 0.72);
 
-  --bb-accent: #d8a178;
-  --bb-accent-graphic: #b86b2a;
-  --bb-accent-muted: #b86b2a;
+  --bb-accent: #d07a32;
+  --bb-accent-graphic: #d07a32;
+  --bb-accent-muted: #d8a178;
 
   --bb-warning-fg: #f0ce8e;
   --bb-warning-bg: #3a2a0e;
@@ -104,15 +106,20 @@
   --bb-elevation-md: none;
   --bb-elevation-lg: none;
 
-  --bb-viz-1: #ffffff;
-  --bb-viz-2: #d8a178;
-  --bb-viz-3: #a3a3a3;
-  --bb-viz-4: #b86b2a;
-  --bb-viz-grid: #2a2a2a;
+  --bb-viz-1: #f4efe5;
+  --bb-viz-2: #d07a32;
+  --bb-viz-3: #bdb5a9;
+  --bb-viz-4: #d8a178;
+  --bb-viz-grid: #34302c;
 }
 
 :root {
-  --bb-font-display: 'Sora', 'Segoe UI', system-ui, sans-serif;
+  /*
+   * Display register rides the loaded Inter variable family (next/font injects
+   * --bb-font-sans with the opsz axis; its upper optical master is Inter
+   * Display). Weight 650 and -0.035em tracking live in the type-scale tokens.
+   */
+  --bb-font-display: var(--bb-font-sans, 'Inter Display', 'Inter', system-ui, sans-serif);
   --bb-font-editorial:
     'Source Serif 4', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
   --bb-font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
@@ -129,9 +136,9 @@
   --bb-space-12: 3rem;
   --bb-space-16: 4rem;
 
-  --bb-radius-sm: 0;
-  --bb-radius-md: 0;
-  --bb-radius-lg: 0;
+  --bb-radius-sm: 8px;
+  --bb-radius-md: 16px;
+  --bb-radius-lg: 28px;
 
   --bb-border-width: 1px;
   --bb-border-width-strong: 2px;

@@ -24,55 +24,6 @@
   overflow: visible;
 }
 
-.bb-logo__copy {
-  display: flex;
-  min-width: 0;
-}
-
-.bb-logo__wordmark {
-  color: var(--bb-logo-ink);
-  font-family: var(--bb-font-display), var(--bb-font-sans), 'Inter', 'Helvetica Neue', Arial, sans-serif;
-  font-size: calc(var(--bb-logo-size) * 0.31);
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  line-height: 0.92;
-  white-space: nowrap;
-}
-
-.bb-logo__tagline {
-  color: var(--bb-logo-accent);
-  font-family: var(--bb-font-sans), 'Inter', 'Helvetica Neue', Arial, sans-serif;
-  font-size: calc(var(--bb-logo-size) * 0.092);
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  line-height: 1.35;
-  text-transform: uppercase;
-}
-
-.bb-logo--horizontal {
-  align-items: center;
-  gap: calc(var(--bb-logo-size) * 0.18);
-}
-
-.bb-logo--horizontal .bb-logo__copy {
-  align-items: flex-start;
-  flex-direction: column;
-  gap: calc(var(--bb-logo-size) * 0.075);
-}
-
-.bb-logo--stacked {
-  align-items: center;
-  flex-direction: column;
-  gap: calc(var(--bb-logo-size) * 0.12);
-  text-align: center;
-}
-
-.bb-logo--stacked .bb-logo__copy {
-  align-items: center;
-  flex-direction: column;
-  gap: calc(var(--bb-logo-size) * 0.075);
-}
-
 .bb-logo--mark {
   width: var(--bb-logo-size);
   height: var(--bb-logo-size);
@@ -91,10 +42,4 @@
 .bb-logo--app-icon .bb-logo__mark {
   height: auto;
   width: 100%;
-}
-
-@media (max-width: 540px) {
-  .bb-logo--horizontal .bb-logo__wordmark {
-    letter-spacing: 0.02em;
-  }
 }

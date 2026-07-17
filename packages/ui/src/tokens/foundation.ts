@@ -3,14 +3,18 @@
  * Elevation, border, focus, icon, motion, and data-visualization tokens.
  */
 
+/**
+ * Flat system: no shadows hairline borders (Rule) carry separation.
+ * The object shape is kept for call-site stability; every value is 'none'.
+ */
 export const elevation = {
   none: 'none',
-  sm: '0 1px 2px rgba(24, 24, 27, 0.06)',
-  md: '0 4px 12px rgba(24, 24, 27, 0.08)',
-  lg: '0 12px 28px rgba(24, 24, 27, 0.12)',
-  darkSm: '0 1px 2px rgba(0, 0, 0, 0.45)',
-  darkMd: '0 4px 14px rgba(0, 0, 0, 0.5)',
-  darkLg: '0 14px 32px rgba(0, 0, 0, 0.55)',
+  sm: 'none',
+  md: 'none',
+  lg: 'none',
+  darkSm: 'none',
+  darkMd: 'none',
+  darkLg: 'none',
 } as const;
 
 export const borders = {
@@ -18,9 +22,9 @@ export const borders = {
   widthDefault: '1px',
   widthStrong: '2px',
   radiusNone: '0',
-  radiusSm: '0.25rem',
-  radiusMd: '0.375rem',
-  radiusLg: '0.5rem',
+  radiusSm: '8px',
+  radiusMd: '16px',
+  radiusLg: '28px',
 } as const;
 
 export const focus = {
@@ -38,11 +42,11 @@ export const icons = {
 
 export const motion = {
   durationInstant: '0ms',
-  durationFast: '150ms',
-  durationBase: '220ms',
-  durationSlow: '360ms',
-  easingStandard: 'cubic-bezier(0.2, 0, 0, 1)',
-  easingEmphasized: 'cubic-bezier(0.2, 0, 0, 1)',
+  durationFast: '160ms',
+  durationBase: '280ms',
+  durationSlow: '480ms',
+  easingStandard: 'cubic-bezier(0.16, 1, 0.3, 1)',
+  easingEmphasized: 'cubic-bezier(0.16, 1, 0.3, 1)',
   reducedMotionQuery: '(prefers-reduced-motion: reduce)',
 } as const;
 
@@ -56,6 +60,6 @@ export const dataViz = {
   sequential: ['#EFE2D0', '#D8A178', '#B86B2A', '#8A4E1C', '#4A2E13', '#0A0A0A'] as const,
   emphasis: '#B86B2A',
   muted: '#A69884',
-  gridLine: '#E3DCCB',
-  gridLineDark: '#2E2A22',
+  gridLine: '#D7D0C4',
+  gridLineDark: '#34302C',
 } as const;

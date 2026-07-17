@@ -10,7 +10,12 @@
 import * as React from 'react';
 import { brandPalette } from '../tokens/brand-palette.js';
 
-export type BlackBookLogoVariant = 'mark' | 'horizontal' | 'stacked' | 'app-icon';
+/**
+ * The lockup itself is outlined artwork (the symbol IS the first B); typed
+ * wordmark variants are intentionally absent. Full lockups are served as
+ * static SVGs from the brand pack — this component only renders the symbol.
+ */
+export type BlackBookLogoVariant = 'mark' | 'app-icon';
 
 export type BlackBookLogoDetail = 'full' | 'compact';
 
@@ -19,8 +24,6 @@ export interface BlackBookLogoProps
 
   /**
    * mark: symbol only
-   * horizontal: symbol + wordmark
-   * stacked: symbol above wordmark
    * app-icon: rounded-square application icon
  */
   variant?: BlackBookLogoVariant;
@@ -40,8 +43,6 @@ export interface BlackBookLogoProps
   pageColors?: readonly string[];
   /** Reduces page detail for favicons and very small UI placements. */
   detail?: BlackBookLogoDetail;
-  /** Optional line beneath the wordmark. */
-  tagline?: string;
   /** Accessible label for the complete logo. */
   label?: string;
   /** Rounded-corner radius (percent) used by the app-icon variant. */
@@ -170,22 +171,19 @@ export function BlackBookMark({
 }
 
 export function BlackBookLogo({
-  variant = 'horizontal',
+  variant = 'mark',
   size = 112,
   ink = brandPalette.blackInk,
   paper = brandPalette.archivePaper,
   accent = brandPalette.copperPin,
   pageColors = DEFAULT_PAGE_COLORS,
   detail = 'full',
-  tagline,
   label = 'Black Book',
   iconRadius = 26,
   className,
   style,
   ...divProps
 }: BlackBookLogoProps): React.JSX.Element {
-  const isSymbolOnly = variant === 'mark' || variant === 'app-icon';
-
   const rootStyle = {
     '--bb-logo-size': `${size}px`,
     '--bb-logo-ink': ink,
@@ -223,13 +221,6 @@ export function BlackBookLogo({
       aria-label={label}
     >
       {mark}
-
-      {!isSymbolOnly && (
-        <span className="bb-logo__copy" aria-hidden="true">
-          <span className="bb-logo__wordmark">BLACK BOOK</span>
-          {tagline ? <span className="bb-logo__tagline">{tagline}</span> : null}
-        </span>
-      )}
     </div>
   );
 }

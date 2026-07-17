@@ -13,8 +13,7 @@
   },
   "files": [
     "dist",
-    "src/styles",
-    "src/brand/assets"
+    "src/styles"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json && node ./scripts/copy-styles.mjs",

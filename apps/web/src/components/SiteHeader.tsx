@@ -1,12 +1,12 @@
 /**
- * Public site header with wordmark, primary navigation, and theme toggle.
+ * Public site header with the brand lockup, primary navigation, and theme toggle.
  */
 
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { BlackBookMark, ThemeToggle } from '@black-book/ui';
+import { ThemeToggle } from '@black-book/ui';
 import { isNavActive, PRIMARY_NAV } from '../lib/nav';
 
 const DESKTOP_NAV_MQ = '(min-width: 48rem)';
@@ -73,17 +73,41 @@ export function SiteHeader() {
   return (
     <header className="bb-shell-header">
       <div className="bb-container bb-shell-header__inner">
-        <a className="bb-shell-wordmark" href="/">
-          <span className="bb-shell-wordmark__mark" aria-hidden="true">
-            <BlackBookMark
-              ink="var(--bb-ink)"
-              paper="var(--bb-canvas)"
-              accent="var(--bb-accent-graphic)"
-              pageColors={['var(--bb-accent-graphic)', 'var(--bb-canvas)']}
-              detail="compact"
+        {/*
+          Official lockup artwork only — the symbol IS the first B, so the
+          product name is never typed beside the mark. Light/dark variants are
+          both rendered and swapped with CSS on [data-theme] (no JS, no
+          hydration flash); the link carries the stable accessible name.
+        */}
+        <a className="bb-shell-wordmark" href="/" aria-label="Black Book — home">
+          <span className="bb-shell-wordmark__full">
+            <img
+              className="bb-shell-wordmark__img bb-shell-wordmark__img--light"
+              src="/brand/black-book-primary-light.svg"
+              alt=""
+              aria-hidden="true"
+            />
+            <img
+              className="bb-shell-wordmark__img bb-shell-wordmark__img--dark"
+              src="/brand/black-book-primary-dark.svg"
+              alt=""
+              aria-hidden="true"
             />
           </span>
-          Black Book
+          <span className="bb-shell-wordmark__mini">
+            <img
+              className="bb-shell-wordmark__img bb-shell-wordmark__img--light"
+              src="/brand/black-book-mark-compact-light.svg"
+              alt=""
+              aria-hidden="true"
+            />
+            <img
+              className="bb-shell-wordmark__img bb-shell-wordmark__img--dark"
+              src="/brand/black-book-mark-compact-dark.svg"
+              alt=""
+              aria-hidden="true"
+            />
+          </span>
         </a>
 
         <details
