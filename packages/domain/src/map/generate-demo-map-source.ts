@@ -33,7 +33,6 @@ function main(): void {
   });
 
   writeFileSync(OUTPUT_PATH, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
-  // eslint-disable-next-line no-console
   console.log(
     `Wrote ${result.featureCollection.features.length} feature(s), ` +
       `${result.stateAggregates.length} state aggregate(s), ` +

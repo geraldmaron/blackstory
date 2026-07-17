@@ -33,6 +33,19 @@ export default tseslint.config(
       'no-console': 'off',
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
+      // Leading-underscore is this codebase's established convention for an
+      // intentionally-unused binding (e.g. destructuring a field out of an
+      // object just to omit it: `const { locator: _locator, ...rest } = x`).
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
   },
   {

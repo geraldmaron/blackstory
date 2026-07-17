@@ -237,6 +237,9 @@ function mergeLimits(partial?: Partial<QueryGuardrailLimits>): QueryGuardrailLim
 export function normalizeSearchText(raw: string): string {
   return raw
     .normalize('NFKC')
+    // Deliberate control-character strip (C0/C1, zero-width, line/paragraph
+    // separators, BOM) — this is input sanitization, not an accidental regex.
+    // eslint-disable-next-line no-control-regex
     .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u2029\ufeff]/g, '')
     .trim()
     .replace(/\s+/g, ' ');

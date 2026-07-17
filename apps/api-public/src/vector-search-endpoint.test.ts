@@ -91,7 +91,6 @@ test('find_nearest denies with 429 once the anonymous/search token bucket is exh
   // anonymous/search token bucket capacity is 8 (packages/security/src/rate-limits.ts) — the
   // 9th sequential request from the same subject/IP must be denied.
   for (let i = 0; i < 9; i += 1) {
-    // eslint-disable-next-line no-await-in-loop
     const response = await endpoint.handle(baseRequest({ query: { q: `query number ${i}` } }));
     statuses.push(response.status);
   }

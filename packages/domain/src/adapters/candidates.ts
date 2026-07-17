@@ -52,7 +52,6 @@ export function assertAdapterCandidateValid(
   }
   if (candidate.canonicalUrl) {
     try {
-      // eslint-disable-next-line no-new
       new URL(candidate.canonicalUrl);
     } catch {
       throw new Error(`Candidate canonicalUrl is not a valid URL: ${candidate.canonicalUrl}`);

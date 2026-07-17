@@ -46,10 +46,10 @@ async function discoverWorkspaces() {
   return workspaces;
 }
 
-function workspaceDependencies(workspace, workspaceNames) {
+function workspaceDependencies(workspace, workspaceNames, { includeDevDependencies = true } = {}) {
   const sections = [
     workspace.manifest.dependencies,
-    workspace.manifest.devDependencies,
+    includeDevDependencies ? workspace.manifest.devDependencies : undefined,
     workspace.manifest.optionalDependencies,
     workspace.manifest.peerDependencies,
   ];
@@ -141,7 +141,14 @@ async function main() {
     }
 
     const dependencies = workspaceDependencies(workspace, workspaceNames);
-    graph.set(workspace.name, dependencies);
+    // Cycle detection is runtime-dependency-only: a devDependency (e.g. a
+    // package's tests depending on another package that itself has a real
+    // runtime dependency back on the first) is a legitimate, common pattern
+    // that doesn't affect production bundling and isn't a boundary violation.
+    graph.set(
+      workspace.name,
+      workspaceDependencies(workspace, workspaceNames, { includeDevDependencies: false }),
+    );
 
     if (workspace.kind === 'app') {
       if (workspace.manifest.private !== true) {

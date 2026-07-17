@@ -69,7 +69,7 @@ export async function runBackupVerificationJob(
   try {
     report = JSON.parse(stdout);
   } catch {
-    report = null;
+    // stdout wasn't valid JSON — report stays null.
   }
 
   const ok = exitCode === 0;

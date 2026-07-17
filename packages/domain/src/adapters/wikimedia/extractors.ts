@@ -137,7 +137,10 @@ function externalIdentifierFromClaim(claim: WikidataClaim): string | undefined {
   return undefined;
 }
 
-function locationHintFromClaim(claim: WikidataClaim, language: string): WikimediaLocationHint | undefined {
+function locationHintFromClaim(
+  claim: WikidataClaim,
+  _language: string,
+): WikimediaLocationHint | undefined {
   const value = claim.mainsnak.datavalue?.value;
   if (!value) {
     return undefined;

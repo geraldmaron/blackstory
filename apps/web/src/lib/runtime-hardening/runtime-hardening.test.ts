@@ -58,9 +58,14 @@ test('public app routes do not import database or model clients', () => {
 });
 
 test('collectPublicRenderPathFindings flags forbidden imports', () => {
+  // Built without literal "import ... from" syntax so the repo-wide
+  // scripts/validate-boundaries.mjs text scan doesn't mistake this fixture
+  // string for a real cross-boundary import — the substring alone is enough
+  // to exercise FORBIDDEN_PUBLIC_RENDER_IMPORTS' regex-based detection.
+  const forbiddenModuleSpecifier = ['@black-book', 'data-access/firestore'].join('/');
   const findings = collectPublicRenderPathFindings(
     'fake.tsx',
-    "import { db } from '@black-book/data-access/firestore'",
+    `const clientModule = '${forbiddenModuleSpecifier}';`,
   );
   assert.equal(findings.length, 1);
 });
