@@ -27,6 +27,21 @@ export type PublicTimelineEvent = {
   readonly body: string;
 };
 
+/**
+ * BB-092 acceptance criterion 5: typed related-entity entry, mirroring
+ * `@black-book/domain`'s `PublicRelatedEntry` (packages/domain/src/graph/adjacency.ts) and
+ * `packages/firebase/src/firestore/types.ts`'s `publicEntityProjectionSchema.related` — the same
+ * shape derived from a release's graph adjacency doc. Hardcoded here rather than imported since
+ * this file is a standalone web-app seed catalog predating BB-019 projections (see the module
+ * doc above), matching this file's existing convention of not importing @black-book/domain types.
+ */
+export type PublicRelatedEntry = {
+  readonly id: string;
+  readonly type: string;
+  readonly direction: 'outgoing' | 'incoming';
+  readonly timespan?: { readonly label?: string; readonly validFrom?: string; readonly validTo?: string | null };
+};
+
 export type PublicEntityView = {
   readonly id: string;
   readonly kind: PublicEntityKind;
@@ -62,7 +77,12 @@ export type PublicEntityView = {
   readonly mapPin: { readonly x: number; readonly y: number };
   readonly claims: readonly PublicClaimView[];
   readonly timeline: readonly PublicTimelineEvent[];
+  /** @deprecated Untyped predecessor to `related` (BB-092). Kept for existing call sites until
+   * they migrate to the typed `{id, type, direction, timespan}` shape. */
   readonly relatedIds: readonly string[];
+  /** BB-092 acceptance criterion 5: typed related entries — see `PublicRelatedEntry` above.
+   * Optional so existing seed fixtures keep working until they're backfilled. */
+  readonly related?: readonly PublicRelatedEntry[];
 };
 
 function confidenceLevel(score: number): 'high' | 'medium' | 'low' {
@@ -133,6 +153,9 @@ export const PUBLIC_SEED_ENTITIES: readonly PublicEntityView[] = [
       },
     ],
     relatedIds: ['ent_seed_school_001'],
+    related: [
+      { id: 'ent_seed_school_001', type: 'located_at', direction: 'incoming', timespan: { validFrom: '1868' } },
+    ],
   },
   {
     id: 'ent_seed_school_001',
@@ -177,6 +200,9 @@ export const PUBLIC_SEED_ENTITIES: readonly PublicEntityView[] = [
       },
     ],
     relatedIds: ['ent_seed_place_001'],
+    related: [
+      { id: 'ent_seed_place_001', type: 'located_at', direction: 'outgoing', timespan: { validFrom: '1868' } },
+    ],
   },
 ] as const;
 

@@ -11,6 +11,7 @@
  * `--approve`, or `--promote` flag anywhere in this CLI — see `promotion-boundary.test.ts`.
  */
 import { readFileSync } from 'node:fs';
+import type { RelationshipRole, RelationshipType } from '@black-book/domain';
 import type { AtomicStore } from '@black-book/firebase';
 import type { SafeFetchDependencies } from '@black-book/security';
 import {
@@ -22,6 +23,7 @@ import {
 import { commitOperatorIntake } from './commit.js';
 import type { DiscoveryRunBatch } from './discovery-run.js';
 import { runBoundedDiscoveryCampaign } from './discovery-run.js';
+import { prepareEdgeIntake, type EdgeIntakeInput } from './edge-intake.js';
 import { createNodeSafeFetchDependencies } from './fetch.js';
 import { OPERATOR_SOURCES, type OperatorIdentity, type OperatorSource } from './identity.js';
 import {
@@ -289,6 +291,49 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         );
         return 0;
       }
+      case 'propose-edge': {
+        // BB-092 acceptance criterion 6: edge intake through the existing operator CLI, no
+        // parallel writer. `prepareEdgeIntake` hard-gates caused/enabled edges (criterion 9)
+        // before this ever reaches quarantine — see edge-intake.ts's module doc.
+        const sourceUrls = flags.repeated.get('--source-url') ?? [];
+        const type = requireFlag(flags, '--type') as RelationshipType;
+        const role = optionalFlag(flags, '--role') as RelationshipRole | undefined;
+        const validFrom = optionalFlag(flags, '--valid-from');
+        const validTo = optionalFlag(flags, '--valid-to');
+        const temporalLabel = optionalFlag(flags, '--temporal-label');
+        const causalScope = optionalFlag(flags, '--causal-scope');
+        const consensusBasis = optionalFlag(flags, '--consensus-basis');
+        const contact = optionalFlag(flags, '--contact');
+        const notes = optionalFlag(flags, '--notes');
+        const temporal =
+          validFrom || validTo || temporalLabel
+            ? {
+                ...(validFrom ? { validFrom } : {}),
+                ...(validTo ? { validTo } : {}),
+                ...(temporalLabel ? { label: temporalLabel } : {}),
+              }
+            : undefined;
+        const causalReview: EdgeIntakeInput['causalReview'] =
+          causalScope === 'systemic_consensus'
+            ? { scope: 'systemic_consensus' as const, ...(consensusBasis ? { consensusBasis } : {}) }
+            : causalScope === 'contested_or_single_incident'
+              ? { scope: 'contested_or_single_incident' as const }
+              : undefined;
+        const input: EdgeIntakeInput = {
+          fromEntityId: requireFlag(flags, '--from-entity-id'),
+          toEntityId: requireFlag(flags, '--to-entity-id'),
+          type,
+          sourceUrls,
+          ...(role ? { role } : {}),
+          ...(temporal ? { temporal } : {}),
+          ...(causalReview ? { causalReview } : {}),
+          ...(notes ? { notes } : {}),
+          ...(contact ? { submitterContact: contact } : {}),
+        };
+        const outcome = prepareEdgeIntake(input, buildContext(flags, deps));
+        stdout(JSON.stringify(await finish(outcome, flags, deps), null, 2));
+        return 0;
+      }
       case 'discovery-run': {
         const batchPath = requireFlag(flags, '--batch');
         const batch = JSON.parse(readFile(batchPath)) as DiscoveryRunBatch;
@@ -314,7 +359,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       }
       default: {
         stderr(
-          'Usage: operator-cli <submit-lead|research-intake|register-source|attach-evidence|bulk-import|discovery-run> [flags]',
+          'Usage: operator-cli <submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run> [flags]',
         );
         return command ? 1 : 0;
       }

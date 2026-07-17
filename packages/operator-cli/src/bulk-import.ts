@@ -1,5 +1,8 @@
 /**
- * CSV and markdown bulk-import parsing for operator leads, plus the batch runner.
+ * CSV and markdown bulk-import parsing for operator leads, plus the batch runner. Also carries
+ * the BB-094 corpus-vetted bulk-import batch runner (see the module doc further down this file,
+ * above `prepareCorpusBulkImportBatch`) — the exclusive execution surface for vetted-corpus bulk
+ * intake; no second import framework exists anywhere in this repo.
  *
  * Parsing is pure and network-free: it only turns text into `LeadInput[]`. Each parsed row is
  * still run through the real BB-029 validation inside `prepareOperatorIntake` — malformed rows
@@ -7,11 +10,29 @@
  * the per-row outcome, exactly like a single `submit-lead` call would be.
  */
 import {
+  assertCorpusVettedForBulkImport,
+  assertWithinCorpusBulkImportBudget,
+  buildCorpusBulkImportBatchReport,
+  evaluateCorpusBulkPromotion,
+  selectSpotCheckSampleIndices,
+  type CorpusBulkImportBatchReport,
+  type CorpusBulkImportBatchRow,
+  type CorpusBulkImportBudget,
+  type CorpusBulkRecordCandidate,
+  type CorpusVettingGateResult,
+  type CorpusVettingStore,
+  type SourceKillSwitchState,
+  type SourceRegistryStore,
+  type SpotCheckVerdict,
+} from '@black-book/domain';
+import { buildOperatorAuditEvent, buildOperatorOutboxMessage } from './audit.js';
+import {
   buildLeadSubmission,
   prepareOperatorIntake,
   type LeadInput,
   type OperatorIntakeContext,
   type OperatorIntakeOutcome,
+  type OperatorSubmission,
 } from './intake.js';
 
 /**
@@ -241,4 +262,196 @@ export function prepareBulkLeadIntake(
     rejectedCount: outcomes.filter((outcome) => !outcome.accepted).length,
     rows: outcomes,
   };
+}
+
+// ---------------------------------------------------------------------------
+// BB-094: vetted-corpus bulk-import batch runner — the exclusive execution surface for
+// corpus-vetted bulk intake (acceptance criterion 2). Every hard gate from the standard pipeline
+// survives (citation completeness, precision, notability — see
+// `@black-book/domain`'s `evaluateCorpusBulkPromotion`); this function's own job is: (1) the
+// fail-closed corpus-vetting + kill-switch gate, (2) the per-batch budget cap, (3) idempotent
+// duplicate detection, (4) routing every non-duplicate row through the SAME `prepareOperatorIntake`
+// quarantine path `prepareBulkLeadIntake` above uses — a corpus_fast_track record is still an
+// ordinary quarantine submission, just pre-annotated with its auto-derived notability/precision
+// facts (BB-094 acceptance criterion 3), never a second writer. Pure: like every other `prepare*`
+// function in this file, it returns unexecuted mutations for a caller to pass to `commitOperatorIntake`
+// (`./commit.ts`) — nothing is written here.
+// ---------------------------------------------------------------------------
+
+export type CorpusBulkImportRowResult = {
+  readonly row: CorpusBulkImportBatchRow;
+  /** Absent only for `outcome === 'skipped_duplicate'` rows — those never reach real intake. */
+  readonly intakeOutcome?: OperatorIntakeOutcome;
+};
+
+export type CorpusBulkImportBatchResult = {
+  readonly report: CorpusBulkImportBatchReport;
+  readonly rows: readonly CorpusBulkImportRowResult[];
+  readonly gate: CorpusVettingGateResult;
+  readonly auditEvent: ReturnType<typeof buildOperatorAuditEvent>;
+  readonly outboxMessage: ReturnType<typeof buildOperatorOutboxMessage>;
+};
+
+export type PrepareCorpusBulkImportBatchInput = {
+  readonly corpusId: string;
+  readonly batchId: string;
+  readonly candidates: readonly CorpusBulkRecordCandidate[];
+  readonly registryStore: SourceRegistryStore;
+  readonly vettingStore: CorpusVettingStore;
+  readonly killSwitch?: SourceKillSwitchState | null;
+  readonly budget: CorpusBulkImportBudget;
+  readonly priorRecordsInWindow?: number;
+  /** `sourceRecordId`s already imported for this corpus in a prior run (idempotent re-runs —
+   *  BB-094 acceptance criterion 2). The caller derives this from real prior-batch reports;
+   *  this function never re-derives it from a live store. */
+  readonly alreadyImportedSourceRecordIds: ReadonlySet<string>;
+  /** Human spot-check verdicts recorded so far, keyed by `sourceRecordId`. Omit entirely for the
+   *  first pass over a batch (the sample is selected but every selected row demotes to
+   *  `standard_consensus` with `spot_check_not_yet_sampled` until a verdict is supplied here on
+   *  a follow-up call) — this mirrors `evaluateCorpusBulkPromotion`'s own two-phase design. */
+  readonly spotCheckVerdicts?: ReadonlyMap<string, SpotCheckVerdict>;
+  readonly spotCheckSampleFraction?: number;
+  readonly context: OperatorIntakeContext;
+  readonly generatedAt?: string;
+};
+
+function candidateSourceUrls(candidate: CorpusBulkRecordCandidate): readonly string[] {
+  const urls = candidate.citations
+    .map((citation) => (citation.location.kind === 'url' ? citation.location.url : undefined))
+    .filter((url): url is string => Boolean(url));
+  return [...new Set(urls)];
+}
+
+function stringifyRejection(outcome: OperatorIntakeOutcome): string | undefined {
+  if (outcome.accepted) return undefined;
+  return outcome.rejection.issues.map((issue) => `${issue.field}: ${issue.message}`).join('; ') || 'rejected';
+}
+
+/**
+ * Runs one corpus-vetted bulk-import batch through every hard gate and the standard quarantine
+ * intake path. Never throws on a per-record basis — an ineligible or duplicate record demotes /
+ * skips rather than failing the whole batch; only the fail-closed corpus-vetting gate and the
+ * budget cap can throw for the batch as a whole (BB-094 acceptance criterion 1 and 2).
+ */
+export function prepareCorpusBulkImportBatch(
+  input: PrepareCorpusBulkImportBatchInput,
+): CorpusBulkImportBatchResult {
+  const gate = assertCorpusVettedForBulkImport(
+    input.registryStore,
+    input.vettingStore,
+    input.corpusId,
+    input.killSwitch,
+  );
+  assertWithinCorpusBulkImportBudget({
+    budget: input.budget,
+    batchRecordCount: input.candidates.length,
+    ...(input.priorRecordsInWindow !== undefined
+      ? { priorRecordsInWindow: input.priorRecordsInWindow }
+      : {}),
+  });
+
+  const newCandidates = input.candidates.filter(
+    (candidate) => !input.alreadyImportedSourceRecordIds.has(candidate.sourceRecordId),
+  );
+  const sampleIndices = new Set(
+    selectSpotCheckSampleIndices(newCandidates.length, input.spotCheckSampleFraction),
+  );
+
+  const generatedAt = input.generatedAt ?? new Date().toISOString();
+  const rows: CorpusBulkImportRowResult[] = [];
+  let newCandidateIndex = 0;
+
+  for (const candidate of input.candidates) {
+    if (input.alreadyImportedSourceRecordIds.has(candidate.sourceRecordId)) {
+      // Duplicate: evaluated only so the report carries a consistent decision shape — never
+      // routed through intake a second time.
+      const decision = evaluateCorpusBulkPromotion({
+        vetting: gate.vetting,
+        candidate,
+        spotCheckSelected: false,
+        evidenceIds: [],
+      });
+      rows.push({ row: { candidate, decision, outcome: 'skipped_duplicate' } });
+      continue;
+    }
+
+    const spotCheckSelected = sampleIndices.has(newCandidateIndex);
+    newCandidateIndex += 1;
+    const spotCheckVerdict = input.spotCheckVerdicts?.get(candidate.sourceRecordId);
+
+    const decision = evaluateCorpusBulkPromotion({
+      vetting: gate.vetting,
+      candidate,
+      spotCheckSelected,
+      ...(spotCheckVerdict ? { spotCheckVerdict } : {}),
+      evidenceIds: candidate.citations.map(
+        (_citation, citationIndex) => `${input.corpusId}:${candidate.sourceRecordId}:citation:${citationIndex}`,
+      ),
+    });
+
+    const submission: OperatorSubmission = {
+      kind: 'contribution',
+      title: candidate.title,
+      statement:
+        `Corpus-vetted bulk import candidate.\n\n` +
+        `Corpus: ${gate.vetting.corpusDisplayName} (${input.corpusId})\n` +
+        `Batch: ${input.batchId}\n` +
+        `Source record: ${candidate.sourceRecordId}\n` +
+        `Promotion lane: ${decision.lane}` +
+        (decision.reasons.length > 0 ? ` (${decision.reasons.join(', ')})` : ''),
+      sourceUrls: candidateSourceUrls(candidate),
+    };
+
+    const rowContext: OperatorIntakeContext = {
+      ...input.context,
+      reason: `BB-094 corpus bulk import: ${input.corpusId}/${input.batchId}/${candidate.sourceRecordId}`,
+    };
+    const intakeOutcome = prepareOperatorIntake('bulk_import_row', submission, rowContext, {
+      openDraftCase: false,
+      caseTitle: candidate.title,
+    });
+
+    const rejectionReason = stringifyRejection(intakeOutcome);
+    rows.push({
+      row: {
+        candidate,
+        decision,
+        outcome: intakeOutcome.accepted ? 'accepted' : 'rejected',
+        ...(rejectionReason !== undefined ? { rejectionReason } : {}),
+      },
+      intakeOutcome,
+    });
+  }
+
+  const report = buildCorpusBulkImportBatchReport({
+    corpusId: input.corpusId,
+    batchId: input.batchId,
+    generatedAt,
+    rows: rows.map((result) => result.row),
+  });
+
+  const idempotencyKey = `corpus-bulk-import:${input.corpusId}:${input.batchId}`;
+  const auditEvent = buildOperatorAuditEvent({
+    action: 'research.created',
+    subject: {
+      type: 'corpusBulkImportBatch',
+      id: input.batchId,
+      path: `corpusBulkImportBatches/${input.corpusId}/${input.batchId}`,
+    },
+    identity: input.context.identity,
+    reason: `BB-094 corpus-vetted bulk import batch: ${report.counts.accepted}/${report.counts.total} accepted.`,
+    now: generatedAt,
+    idempotencyKey,
+    data: { report: report as unknown as Readonly<Record<string, unknown>> },
+  });
+  const outboxMessage = buildOperatorOutboxMessage({
+    auditEvent,
+    topic: 'operator.corpus_bulk_import.batch_completed',
+    aggregateType: 'corpusBulkImportBatch',
+    aggregateId: input.batchId,
+    payload: { corpusId: input.corpusId, batchId: input.batchId, counts: report.counts },
+    now: generatedAt,
+  });
+
+  return { report, rows, gate, auditEvent, outboxMessage };
 }

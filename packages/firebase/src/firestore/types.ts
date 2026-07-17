@@ -366,25 +366,49 @@ export const canonicalEntitySchema = z.object({
 
 export type CanonicalEntityDoc = z.infer<typeof canonicalEntitySchema>;
 
+/**
+ * BB-092: historical-causation edges (caused/enabled/influenced/participated_in/overturned/
+ * commemorates) plus `authored` (creation attribution, distinct from `founded`). Direction and
+ * temporal semantics for every type are documented in `@black-book/domain`'s
+ * `RELATIONSHIP_TYPE_SEMANTICS` (packages/domain/src/relationship.ts) — hardcoded here, not
+ * imported, to match this file's existing convention (see the entityKindSchema comment above).
+ */
+export const relationshipTypeSchema = z.enum([
+  'located_at',
+  'occurred_at',
+  'attended',
+  'founded',
+  'employed_by',
+  'member_of',
+  'related_to',
+  'depicts',
+  'cites',
+  'governed_by',
+  'part_of',
+  'successor_of',
+  'caused',
+  'enabled',
+  'influenced',
+  'participated_in',
+  'overturned',
+  'commemorates',
+  'authored',
+  'other',
+]);
+
+export type RelationshipTypeDoc = z.infer<typeof relationshipTypeSchema>;
+
+/** BB-092: role qualifier valid ONLY on `type: 'attended'` — see
+ * `@black-book/domain`'s `assertRelationshipRoleValidForType`. */
+export const relationshipRoleSchema = z.enum(['organizer', 'speaker', 'participant']);
+
+export type RelationshipRoleDoc = z.infer<typeof relationshipRoleSchema>;
+
 export const entityRelationshipSchema = z.object({
   id: z.string().min(1),
   fromEntityId: z.string().min(1),
   toEntityId: z.string().min(1),
-  type: z.enum([
-    'located_at',
-    'occurred_at',
-    'attended',
-    'founded',
-    'employed_by',
-    'member_of',
-    'related_to',
-    'depicts',
-    'cites',
-    'governed_by',
-    'part_of',
-    'successor_of',
-    'other',
-  ]),
+  type: relationshipTypeSchema,
   evidenceIds: z.array(z.string().min(1)).min(1),
   temporal: z
     .object({
@@ -400,6 +424,8 @@ export const entityRelationshipSchema = z.object({
       notes: z.string().optional(),
     })
     .optional(),
+  /** BB-092: only meaningful when `type === 'attended'`. */
+  role: relationshipRoleSchema.optional(),
   notes: z.string().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -807,6 +833,30 @@ export const publicEntityProjectionSchema = z.object({
   notabilityLabels: z.array(z.string().min(1)).optional(),
   /** Sensitivity classification label, when the entity carries one — presentation is BB-095. */
   sensitivityClass: sensitivityClassSchema.optional(),
+  /**
+   * BB-092 acceptance criterion 5: typed related entries derived from the release's graph
+   * adjacency doc (`@black-book/domain`'s `toPublicRelatedEntries` /
+   * `publicRelatedEntriesByEntityId`, packages/domain/src/graph/adjacency.ts + build.ts) —
+   * sufficient for BB-052's "related people, places…" and "timelines" sections. Never carries a
+   * numeric field beyond what's already elsewhere on this schema (evidence counts are an
+   * internal ranking key on the adjacency doc, not part of this public shape).
+   */
+  related: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        type: relationshipTypeSchema,
+        direction: z.enum(['outgoing', 'incoming']),
+        timespan: z
+          .object({
+            label: z.string().optional(),
+            validFrom: z.string().optional(),
+            validTo: z.string().nullable().optional(),
+          })
+          .optional(),
+      }),
+    )
+    .optional(),
 });
 
 export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSchema>;

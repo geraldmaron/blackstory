@@ -2,8 +2,14 @@
  * Status notice for warning, dispute, and error with mono cue labels (not color-only).
  */
 
-import type { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import { cx } from '../utils/cx.js';
+
+// `React` is otherwise unused under this package's own automatic JSX runtime, but keeping it
+// imported makes this file safe to cross-transpile from a consumer whose own tsconfig uses a
+// classic JSX transform (e.g. Next.js apps with `"jsx": "preserve"`), where the JSX below
+// compiles to `React.createElement(...)` calls that need `React` in scope.
+void React;
 
 export type NoticeTone = 'warning' | 'dispute' | 'error';
 

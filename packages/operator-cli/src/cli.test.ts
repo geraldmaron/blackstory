@@ -164,3 +164,79 @@ test('an unknown command prints usage and exits non-zero', async () => {
   assert.equal(code, 1);
   assert.match(out.errors[0] ?? '', /Usage/);
 });
+
+test('propose-edge without --commit prepares a real quarantine proposal but writes nothing (BB-092)', async () => {
+  const out = capture();
+  const store = new MemoryAtomicStore();
+  const code = await runCli(
+    [
+      'propose-edge',
+      '--from-entity-id',
+      'ent-mlk',
+      '--to-entity-id',
+      'ent-i-have-a-dream',
+      '--type',
+      'authored',
+      '--source-url',
+      'https://archive.example.org/authored-citation',
+      ...BASE_FLAGS,
+    ],
+    { store, stdout: out.stdout, stderr: out.stderr, nowMs: Date.parse('2026-07-17T04:00:00.000Z') },
+  );
+  assert.equal(code, 0);
+  const result = JSON.parse(out.lines[0] ?? '{}');
+  assert.equal(result.accepted, true);
+  assert.equal(result.committed, false);
+  assert.equal(store.writes.length, 0);
+});
+
+test('propose-edge rejects a caused/enabled edge with no --causal-scope, at the CLI layer, before quarantine (BB-092 acceptance criterion 9)', async () => {
+  const out = capture();
+  const code = await runCli(
+    [
+      'propose-edge',
+      '--from-entity-id',
+      'ent-statute',
+      '--to-entity-id',
+      'ent-incident',
+      '--type',
+      'enabled',
+      '--valid-from',
+      '1965',
+      '--source-url',
+      'https://archive.example.org/contested-claim',
+      ...BASE_FLAGS,
+    ],
+    { stdout: out.stdout, stderr: out.stderr },
+  );
+  assert.equal(code, 1);
+  assert.match(out.errors[0] ?? '', /reserved for consensus/);
+});
+
+test('propose-edge accepts a caused edge with --causal-scope systemic_consensus and a consensus basis', async () => {
+  const out = capture();
+  const code = await runCli(
+    [
+      'propose-edge',
+      '--from-entity-id',
+      'ent-holc',
+      '--to-entity-id',
+      'ent-disinvestment',
+      '--type',
+      'caused',
+      '--valid-from',
+      '1935',
+      '--source-url',
+      'https://archive.example.org/holc-citation',
+      '--causal-scope',
+      'systemic_consensus',
+      '--consensus-basis',
+      'Multiple peer-reviewed secondary sources document this as systemic.',
+      ...BASE_FLAGS,
+    ],
+    { stdout: out.stdout, stderr: out.stderr, nowMs: Date.parse('2026-07-17T04:00:00.000Z') },
+  );
+  assert.equal(code, 0);
+  const result = JSON.parse(out.lines[0] ?? '{}');
+  assert.equal(result.accepted, true);
+});

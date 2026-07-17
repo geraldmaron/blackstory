@@ -166,13 +166,167 @@ export type {
   ArtifactFields,
 } from './specialized.js';
 
-export { RELATIONSHIP_TYPES, assertRelationshipHasEvidence } from './relationship.js';
+export {
+  RELATIONSHIP_TYPES,
+  RELATIONSHIP_ROLES,
+  assertRelationshipHasEvidence,
+  RELATIONSHIP_TYPE_SEMANTICS,
+  CAUSAL_HISTORICAL_RELATIONSHIP_TYPES,
+  relationshipRequiresTemporalContext,
+  assertRelationshipTemporalRequirement,
+  assertRelationshipRoleValidForType,
+  CAUSAL_ASSERTION_RELATIONSHIP_TYPES,
+  isCausalAssertionRelationshipType,
+  CAUSATION_SCOPES,
+  evaluateCausalEdgeGuardrail,
+  assertCausalEdgeGuardrail,
+} from './relationship.js';
 export type {
   RelationshipType,
+  RelationshipRole,
   TemporalContext,
   GeographicRelationshipContext,
   EntityRelationship,
+  RelationshipTypeSemantics,
+  CausalAssertionRelationshipType,
+  CausationScope,
+  CausalEdgeReview,
+  CausalGuardrailResult,
 } from './relationship.js';
+
+// BB-092: history graph substrate — containment-chain materialization, derived per-entity
+// adjacency / per-decade / all-time release views, succession-chain non-leakage, and BB-086
+// FactRecord subjects[] mirroring. Mirrors ./graph/index.js's own barrel EXCEPT
+// GRAPH_GOLD_FIXTURES, which stays internal-only (same convention as ./map/fixtures.js below).
+export {
+  CONTAINMENT_RELATIONSHIP_TYPES,
+  isContainmentRelationshipType,
+  MAX_CONTAINMENT_DEPTH,
+  buildContainmentIndex,
+  resolveEntityContainmentPath,
+  resolveEntityContainmentPaths,
+  createInMemoryJurisdictionParentLookup,
+  extendJurisdictionChain,
+  mirrorFactSubjectsIntoRelationships,
+  DEFAULT_ADJACENCY_CAP,
+  buildEntityAdjacency,
+  buildAllEntityAdjacency,
+  toPublicRelatedEntries,
+  deriveActiveDecadeBuckets,
+  buildDecadeViews,
+  buildAllTimeView,
+  resolveSuccessionEndpoints,
+  buildSuccessionLinkedContext,
+  buildSuccessorPublicView,
+  publicGraphAdjacencyPath,
+  publicGraphDecadePath,
+  publicGraphAllTimePath,
+  buildGraphReleaseArtifact,
+  assertGraphReleaseArtifactReproducible,
+  publicRelatedEntriesByEntityId,
+} from './graph/index.js';
+export type {
+  ContainmentRelationshipType,
+  ContainmentEdgeInput,
+  ContainmentEntityInput,
+  ContainmentChainHop,
+  ContainmentPath,
+  JurisdictionParentLookup,
+  ExtendJurisdictionChainResult,
+  FactSubjectRef,
+  FactSubjectSource,
+  MirroredFactSubjectRelationship,
+  AdjacencyDirection,
+  PublicRelatedEntry,
+  AdjacencyEntry,
+  EntityAdjacency,
+  BuildEntityAdjacencyOptions,
+  DecadeBucketEntityInput,
+  DeriveActiveDecadeBucketsOptions,
+  DecadeGraphView,
+  BuildDecadeViewsInput,
+  AllTimeGraphView,
+  SuccessionEdge,
+  LinkedHistoricalContextEntry,
+  SuccessorPublicView,
+  GraphReleaseArtifactInput,
+  GraphReleaseArtifact,
+} from './graph/index.js';
+
+// BB-095: sensitivity presentation, present-day advisories, disclaimer registry.
+export {
+  ADVISORY_CLASSES,
+  isAdvisoryClass,
+  ADVISORY_CLASS_LABELS,
+  SUGGESTED_ADVISORY_REVIEW_CADENCES,
+  AdvisoryValidationError,
+  assertAdvisoryRecordValid,
+  PROHIBITED_ADVISORY_LANGUAGE,
+  assertProceduralAdvisoryLanguage,
+  buildAdvisoryStatement,
+  ADVISORY_SCORING_BANNED_KEYS,
+  assertAdvisoryAbsentFromScoringInput,
+  ADVISORY_SCORING_TYPE_INVARIANTS,
+} from './advisory.js';
+export type { AdvisoryClass, PlaceAdvisoryRecord } from './advisory.js';
+
+export {
+  DISCLAIMER_REGISTRY_VERSION,
+  DISCLAIMER_CLASSES,
+  DISCLAIMER_REGISTRY,
+  getDisclaimer,
+  assertDisclaimerRegistryComplete,
+  SENSITIVITY_CLASS_PRESENTATION_LABELS,
+  IDENTITY_ATTRIBUTE_TERMS,
+  assertNoIdentityAttributeFraming,
+} from './disclaimers.js';
+export type { DisclaimerClass, DisclaimerRecord } from './disclaimers.js';
+
+// BB-094: vetted-corpus bulk intake lane — corpus-vetting gate + launch-corpus registrations.
+// Streamlined-promotion logic (spot-check sampling, batch reporting) lives in
+// ./promotion/corpus-promotion.js, re-exported via ./promotion/index.js below.
+export {
+  LICENSE_VERDICTS,
+  isLicenseVerdict,
+  BULK_IMPORT_ELIGIBLE_LICENSE_VERDICTS,
+  isBulkImportEligibleLicenseVerdict,
+  CORPUS_AUTHORITY_TIERS,
+  isCorpusAuthorityTier,
+  REFRESH_CADENCES,
+  isRefreshCadence,
+  EXCLUDED_CORPUS_LANES,
+  assertCorpusNotInExcludedLane,
+  assertCorpusVettingRecordValid,
+  createInMemoryCorpusVettingStore,
+  corpusSourceRegistryEntryId,
+  corpusAdapterId,
+  registerCorpusVetting,
+  quarantineCorpusRegistryEntry,
+  CORPUS_BULK_IMPORT_KILL_SWITCH_PREFIX,
+  corpusBulkImportKillSwitchId,
+  parseCorpusBulkImportKillSwitchId,
+  assertCorpusBulkImportBudgetValid,
+  assertWithinCorpusBulkImportBudget,
+  assertCorpusVettedForBulkImport,
+  isCorpusVettedForBulkImport,
+} from './corpus-vetting.js';
+export type {
+  LicenseVerdict,
+  CorpusAuthorityTier,
+  RefreshCadence,
+  CorpusVettingRecord,
+  CorpusVettingStore,
+  RegisterCorpusVettingInput,
+  CorpusBulkImportBudget,
+  CorpusVettingGateResult,
+} from './corpus-vetting.js';
+
+export {
+  buildLaunchCorpusVettingInputs,
+  registerLaunchCorpora,
+  LAUNCH_CORPUS_SLUGS,
+  BOUNDARY_EXCLUDED_CORPUS_SLUGS,
+} from './launch-corpora.js';
 
 export { assertMergeReversible, reverseMerge, isMergeActive } from './merge.js';
 export type { EntityMergeStatus, EntityMergeRecord } from './merge.js';
