@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 1,
+  "releaseId": "rel_demo_fixture_001",
+  "generatedAt": "2026-07-17T00:00:00.000Z",
+  "featureCollection": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "ent_fixture_place_dc",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -77.04,
+            38.91
+          ]
+        },
+        "properties": {
+          "entityId": "ent_fixture_place_dc",
+          "kind": "place",
+          "displayName": "Seed Historical Place (D.C.)",
+          "precision": "city",
+          "matchMethod": "manual_research",
+          "stateFips": "11",
+          "statePostalCode": "DC",
+          "stateName": "District of Columbia"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "ent_fixture_school_dc",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -77.0147,
+            38.9101
+          ]
+        },
+        "properties": {
+          "entityId": "ent_fixture_school_dc",
+          "kind": "school",
+          "displayName": "Seed Freedmen School (D.C.)",
+          "precision": "campus",
+          "matchMethod": "geocode_other",
+          "stateFips": "11",
+          "statePostalCode": "DC",
+          "stateName": "District of Columbia"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "ent_fixture_place_harlem_ny",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.795,
+            40.728
+          ]
+        },
+        "properties": {
+          "entityId": "ent_fixture_place_harlem_ny",
+          "kind": "place",
+          "displayName": "Seed Cultural Institution (Queens, NY)",
+          "precision": "neighborhood",
+          "matchMethod": "manual_research",
+          "stateFips": "36",
+          "statePostalCode": "NY",
+          "stateName": "New York"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "ent_fixture_institution_nyc_ny",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.87,
+            40.78
+          ]
+        },
+        "properties": {
+          "entityId": "ent_fixture_institution_nyc_ny",
+          "kind": "institution",
+          "displayName": "Seed Civic Institution (Queens, NY)",
+          "precision": "city",
+          "matchMethod": "manual_research",
+          "stateFips": "36",
+          "statePostalCode": "NY",
+          "stateName": "New York"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "ent_fixture_institution_atl_ga",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -84.388,
+            33.749
+          ]
+        },
+        "properties": {
+          "entityId": "ent_fixture_institution_atl_ga",
+          "kind": "institution",
+          "displayName": "Seed Sensitive Site (Atlanta, GA)",
+          "precision": "neighborhood",
+          "matchMethod": "manual_research",
+          "stateFips": "13",
+          "statePostalCode": "GA",
+          "stateName": "Georgia"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "ent_fixture_place_ca_state",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -118.2,
+            34.1
+          ]
+        },
+        "properties": {
+          "entityId": "ent_fixture_place_ca_state",
+          "kind": "place",
+          "displayName": "Seed Statewide Reference (California)",
+          "precision": "state",
+          "matchMethod": "manual_research",
+          "stateFips": "06",
+          "statePostalCode": "CA",
+          "stateName": "California"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "ent_fixture_person_living_houston_tx",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -95.37,
+            29.76
+          ]
+        },
+        "properties": {
+          "entityId": "ent_fixture_person_living_houston_tx",
+          "kind": "person",
+          "displayName": "Seed Living Person (Houston, TX)",
+          "precision": "city",
+          "matchMethod": "geocode_other",
+          "stateFips": "48",
+          "statePostalCode": "TX",
+          "stateName": "Texas"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "ent_fixture_person_unknown_living_chicago_il",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.63,
+            41.88
+          ]
+        },
+        "properties": {
+          "entityId": "ent_fixture_person_unknown_living_chicago_il",
+          "kind": "person",
+          "displayName": "Seed Person, Unknown Living Status (Chicago, IL)",
+          "precision": "city",
+          "matchMethod": "geocode_other",
+          "stateFips": "17",
+          "statePostalCode": "IL",
+          "stateName": "Illinois"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "ent_fixture_person_deceased_residence_kc_mo",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -94.579,
+            39.1
+          ]
+        },
+        "properties": {
+          "entityId": "ent_fixture_person_deceased_residence_kc_mo",
+          "kind": "person",
+          "displayName": "Seed Deceased Person, Historical Residence (Kansas City, MO)",
+          "precision": "neighborhood",
+          "matchMethod": "manual_research",
+          "stateFips": "29",
+          "statePostalCode": "MO",
+          "stateName": "Missouri"
+        }
+      }
+    ]
+  },
+  "stateAggregates": [
+    {
+      "stateFips": "11",
+      "statePostalCode": "DC",
+      "stateName": "District of Columbia",
+      "count": 2
+    },
+    {
+      "stateFips": "36",
+      "statePostalCode": "NY",
+      "stateName": "New York",
+      "count": 2
+    },
+    {
+      "stateFips": "06",
+      "statePostalCode": "CA",
+      "stateName": "California",
+      "count": 1
+    },
+    {
+      "stateFips": "13",
+      "statePostalCode": "GA",
+      "stateName": "Georgia",
+      "count": 1
+    },
+    {
+      "stateFips": "17",
+      "statePostalCode": "IL",
+      "stateName": "Illinois",
+      "count": 1
+    },
+    {
+      "stateFips": "29",
+      "statePostalCode": "MO",
+      "stateName": "Missouri",
+      "count": 1
+    },
+    {
+      "stateFips": "48",
+      "statePostalCode": "TX",
+      "stateName": "Texas",
+      "count": 1
+    }
+  ],
+  "countyAggregates": [
+    {
+      "stateFips": "36",
+      "statePostalCode": "NY",
+      "countyName": "Queens County",
+      "countyFips": "36081",
+      "count": 2
+    }
+  ],
+  "meta": {
+    "totalEntities": 10,
+    "totalWithLocation": 9,
+    "totalFeatures": 9,
+    "skippedNoLocation": 1,
+    "skippedRedactedToNothing": 0,
+    "skippedOutsideUsBounds": 0
+  }
+}
