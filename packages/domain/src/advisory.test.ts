@@ -1,7 +1,7 @@
 /**
- * Tests for the present-day advisory record model (BB-095) — including the scoring-exclusion
- * discipline (BB-095 AC1), extending the standing "crime stats never enter the composite" rule
- * from BB-082's design to advisory data ahead of BB-082 itself landing.
+ * Tests for the present-day advisory record model including the scoring-exclusion
+ * discipline, extending the standing "crime stats never enter the composite" rule
+ * from design to advisory data ahead of itself landing.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -100,7 +100,7 @@ test('assertAdvisoryRecordValid requires >=1 sourcedClaimId, a non-blank asOf, a
 });
 
 // ---------------------------------------------------------------------------
-// Copy discipline: dated, cited, procedural — never "dangerous today"
+// Copy discipline: dated, cited, procedural never "dangerous today"
 // ---------------------------------------------------------------------------
 
 test('buildAdvisoryStatement renders a dated, cited, procedural sentence for every class', () => {
@@ -128,7 +128,7 @@ test('advisory copy never uses "dangerous today" or any danger-framing language'
 });
 
 // ---------------------------------------------------------------------------
-// Scoring exclusion — advisory data never enters any composite/scoring input
+// Scoring exclusion advisory data never enters any composite/scoring input
 // ---------------------------------------------------------------------------
 
 function loadAdapterBatch() {
@@ -143,7 +143,7 @@ function loadQueryPack() {
   return parseQueryPackFixture(raw).pack;
 }
 
-// Note: deliberately named without the substring "advisory" — these ids end up serialized into
+// Note: deliberately named without the substring "advisory" these ids end up serialized into
 // the composite output, and this test asserts that serialized output contains no "advisory"
 // substring anywhere; an id containing that substring would be a false positive, not a real leak.
 function buildRealRelevanceAssessment(): RelevanceAssessment {
@@ -230,7 +230,7 @@ test('RELEVANCE_DIMENSIONS and CONFIDENCE_COMPONENT_WEIGHTS keys never overlap w
 });
 
 test('compile-time no-overlap invariants hold (the real gate is `pnpm --filter @black-book/domain typecheck`)', () => {
-  // These booleans are typed `NoKeyOverlap<...>` in advisory.ts, not plain `boolean` — if a
+  // These booleans are typed `NoKeyOverlap<...>` in advisory.ts, not plain `boolean` if a
   // future field name collision is ever introduced, advisory.ts itself fails to typecheck before
   // this runtime assertion is even reached.
   assert.equal(ADVISORY_SCORING_TYPE_INVARIANTS.noOverlapWithRelevanceFeatureValue, true);

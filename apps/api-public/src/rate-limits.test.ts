@@ -1,5 +1,5 @@
 /**
- * Public API rate-limit guard tests (BB-025).
+ * Public API rate-limit guard tests.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

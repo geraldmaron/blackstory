@@ -1,5 +1,5 @@
 /**
- * Unit tests for BB-093 history URL state parse/serialize helpers.
+ * Unit tests for history URL state parse/serialize helpers.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

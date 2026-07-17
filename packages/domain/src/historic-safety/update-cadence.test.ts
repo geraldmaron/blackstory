@@ -1,5 +1,5 @@
 /**
- * Tests for per-source update cadence metadata compatible with BB-084 job registry shape (AC5).
+ * Tests for per-source update cadence metadata compatible with job registry shape.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

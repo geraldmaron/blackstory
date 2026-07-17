@@ -1,15 +1,15 @@
 /**
- * Evidence-pointer doctrine (BB-077): the strongest fair-use posture available for
+ * Evidence-pointer doctrine: the strongest fair-use posture available for
  * third-party/UGC material. Store an outbound URL, a short judge-relevance snippet, a
- * mandatory Wayback/Internet Archive capture pointer, and retrieval metadata — never a
+ * mandatory Wayback/Internet Archive capture pointer, and retrieval metadata never a
  * self-hosted full-page copy.
  *
  * Research basis: search-caching (Field v. Google) and Google Books precedents protect
  * indexing plus minimal excerpts that do not substitute for the original work; archive
  * posture is strongest when the viewable portion is minimized and full-page preservation is
- * delegated to the Internet Archive / Wayback Machine rather than self-hosted. This module
+ * delegated to the Internet Archive Wayback Machine rather than self-hosted. This module
  * encodes that as a type/schema constraint, not just a comment: the `EvidencePointer` type
- * has no field capable of holding a full page body, and `assertEvidencePointerValid` /
+ * has no field capable of holding a full page body, and `assertEvidencePointerValid`
  * `assertNoFullPageFields` fail closed at construction time.
  */
 
@@ -52,11 +52,11 @@ export type EvidencePointerRetrievalMetadata = {
 
 /**
  * The evidence-pointer doctrine's storage shape. There is deliberately no field here that
- * can hold page bytes/markup — full-page preservation is Wayback's job, not ours.
+ * can hold page bytes/markup full-page preservation is Wayback's job, not ours.
  */
 export type EvidencePointer = {
   readonly id: string;
-  /** Mandatory outbound link — the doctrine always links out rather than republishing. */
+  /** Mandatory outbound link the doctrine always links out rather than republishing. */
   readonly sourceUrl: string;
   /** Short excerpt only: the minimum needed to judge relevance. */
   readonly snippet: string;

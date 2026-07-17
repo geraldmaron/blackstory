@@ -1,6 +1,7 @@
+
 /**
- * BB-060 acceptance tests: adversarial integrity scenarios against real domain/security gates.
- * No live network attacks — fixtures import evaluators directly from workspace packages.
+ * acceptance tests: adversarial integrity scenarios against real domain/security gates.
+ * No live network attacks fixtures import evaluators directly from workspace packages.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';

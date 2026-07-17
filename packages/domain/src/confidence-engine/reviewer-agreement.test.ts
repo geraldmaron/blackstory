@@ -1,6 +1,6 @@
 /**
- * Unit tests for the BB-076 reviewer-agreement corroboration signal — an additive input to
- * BB-043's confidence engine. These tests intentionally exercise `computeReviewerAgreementSignal`
+ * Unit tests for the reviewer-agreement corroboration signal an additive input to
+ * confidence engine. These tests intentionally exercise `computeReviewerAgreementSignal`
  * and `withReviewerAgreementCorroboration` in isolation from `recalculateConfidence` to prove
  * the addition is self-contained and does not alter the existing scorer.
  */

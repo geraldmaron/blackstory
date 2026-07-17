@@ -1,6 +1,6 @@
 /**
- * Deterministic relevance assessment types (BB-040).
- * Composite scores and feature values are private research metadata — never public numeric output.
+ * Deterministic relevance assessment types.
+ * Composite scores and feature values are private research metadata never public numeric output.
  */
 import type { RelevanceDecision } from '@black-book/schemas';
 import type { DiscoveryCandidateRecord } from '../discovery/types.js';
@@ -32,8 +32,8 @@ export type RelevanceFeatureValue = {
 };
 
 /**
- * The 7 discovery-time gates (BB-040) plus `notability_basis` (BB-090 AC3) — an 8th,
- * publish-time gate over an entity's own `notabilityBasis[]` (../entity-status.ts). It EXTENDS
+ * The 7 discovery-time gates plus `notability_basis` an 8th,
+ * publish-time gate over an entity's own `notabilityBasis` (../entity-status.ts). It EXTENDS
  * this list, it never replaces any of the original 7: see ../relevance/notability-gate.ts for
  * its evaluator and ./gates.ts for the discovery-time 7.
  */
@@ -70,7 +70,7 @@ export type RelevanceEvidence = {
   readonly detail?: string;
 };
 
-/** Manual override requires a non-empty human reason (BB-040). */
+/** Manual override requires a non-empty human reason. */
 export type RelevanceOverride = {
   readonly decision: RelevanceDecision;
   readonly reason: string;
@@ -82,7 +82,7 @@ export type RelevanceAssessment = {
   readonly schemaVersion: typeof RELEVANCE_ASSESSMENT_SCHEMA_VERSION;
   readonly candidateId: string;
   readonly decision: RelevanceDecision;
-  /** Private composite score — must not appear in public projections. */
+  /** Private composite score must not appear in public projections. */
   readonly compositeScore: number;
   readonly policyVersion: string;
   readonly passes: boolean;
@@ -97,7 +97,7 @@ export type RelevanceAssessment = {
   readonly assessedAt: string;
 };
 
-/** Public-safe relevance explanation — numeric scores are intentionally omitted. */
+/** Public-safe relevance explanation numeric scores are intentionally omitted. */
 export type PublicRelevanceExplanation = {
   readonly whyThisAppears: string;
   readonly decision: RelevanceDecision;

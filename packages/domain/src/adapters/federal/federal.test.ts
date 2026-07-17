@@ -1,5 +1,5 @@
 /**
- * Federal archive adapter tests: per-source fixtures, retention, export filtering, failure isolation (BB-046).
+ * Federal archive adapter tests: per-source fixtures, retention, export filtering, failure isolation.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

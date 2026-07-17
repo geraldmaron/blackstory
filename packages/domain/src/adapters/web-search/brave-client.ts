@@ -1,15 +1,15 @@
 /**
- * Brave Web Search API request/response handling (BB-075).
+ * Brave Web Search API request/response handling.
  *
  * Endpoint and auth shape follow Brave's documented Web Search API contract: GET
  * https://api.search.brave.com/res/v1/web/search?q=... with the API key passed as the
  * `X-Subscription-Token` header (never as a query param, so it never leaks into logs/URLs or
- * request-cache keys). This has not been exercised against a live endpoint — no real key exists
+ * request-cache keys). This has not been exercised against a live endpoint no real key exists
  * in this environment, deliberately (see ./provider-decision.ts and ../normalizer.ts's
- * storage-terms gate) — so verify the exact field names against Brave's current docs before
+ * storage-terms gate) so verify the exact field names against Brave's current docs before
  * flipping the adapter out of `disabled`/canary. Response parsing is defensive (tolerant of a
  * missing `web.results` array or missing per-result fields), in the same spirit as
- * ../dpla/client.ts's tolerance for DPLA's shape churn: a field rename should degrade one result,
+ * `../dpla/client.ts`'s tolerance for DPLA's shape churn: a field rename should degrade one result,
  * never poison the whole batch or throw.
  */
 import type { WebSearchParsedBatch, WebSearchRawResult } from './types.js';

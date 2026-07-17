@@ -1,5 +1,5 @@
 /**
- * schema.org trust markup builders for BB-088 — site-level NewsMediaOrganization, per-page
+ * schema.org trust markup builders for site-level NewsMediaOrganization, per-page
  * publishingPrinciples, and ClaimReview (myths surface ONLY). Canonical fact pages must never
  * emit ClaimReview; see `../facts/jsonld.ts` and `assertClaimReviewPathExclusive`.
  */
@@ -41,7 +41,7 @@ export type MythClaimReviewInput = {
   readonly authorName: string;
 };
 
-/** Paths where ClaimReview JSON-LD is permitted — the myths surface only (BB-088 AC6). */
+/** Paths where ClaimReview JSON-LD is permitted the myths surface only. */
 export const CLAIM_REVIEW_ALLOWED_PATH_PREFIX = '/myths/';
 
 export function assertClaimReviewPathExclusive(pagePath: string): void {

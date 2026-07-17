@@ -1,9 +1,9 @@
 /**
- * SSR markup smoke test for LocationConsentButton (BB-050 "explicit user action before access").
+ * SSR markup smoke test for LocationConsentButton.
  * Proves the idle button never carries any indication of an in-flight/granted permission before
  * a click, and that the status region is wired for assistive technology (`aria-live`,
  * `aria-describedby`). The click-driven `navigator.geolocation` flow itself is covered by
- * `../../lib/geocode/browser-geolocation.test.ts` against a fake API — this test only proves the
+ * `../../lib/geocode/browser-geolocation.test.ts` against a fake API this test only proves the
  * button never calls it on render/mount (no effect runs during a static SSR render).
  */
 import assert from 'node:assert/strict';
@@ -18,8 +18,7 @@ const { createElement } = React;
 // Notice.tsx/EmptyState.tsx in the same package, they don't import React for cross-transpile
 // safety under a classic JSX runtime — see this app's `test` script, which resolves
 // `@black-book/ui` through its `development` package-export condition straight to `.tsx` source).
-// Filed as a follow-up (see this bead's final report); binding the global here is test-only and
-// touches no file outside this bead's ownership.
+// Binding the global here is test-only.
 (globalThis as Record<string, unknown>).React = React;
 
 test('renders an idle, enabled button labelled "Use my current location"', () => {

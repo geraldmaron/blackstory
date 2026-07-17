@@ -1,5 +1,5 @@
 /**
- * Acceptance tests for Sybil / source-independence signals (BB-089): shared-infrastructure
+ * Acceptance tests for Sybil source-independence signals: shared-infrastructure
  * lineage collapse, advisory timing signals, the top-tier-source publication gate, and
  * backward-compatible parity with plain confidence recalculation.
  */

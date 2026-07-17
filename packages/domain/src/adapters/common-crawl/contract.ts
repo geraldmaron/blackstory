@@ -1,8 +1,8 @@
 /**
- * Common Crawl adapter contract defaults aligned with BB-037 SourceAdapterContract (BB-075).
+ * Common Crawl adapter contract defaults aligned with SourceAdapterContract.
  * Starts disabled by default -- same isolation as every other adapter (../gates.ts) -- even
  * though Common Crawl itself needs no storage-rights gate (see types.ts's module doc comment):
- * the BB-037 registry approval requirement is independent of that question.
+ * the registry approval requirement is independent of that question.
  */
 import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from '../candidates.js';
 import type { SourceAdapterContract } from '../types.js';

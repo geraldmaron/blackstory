@@ -1,10 +1,10 @@
 'use client';
 
 /**
- * The public "submit a lead" form (BB-076). Posts to `./api/route.ts`, which is the only place
- * this lane ever writes — into BB-029 quarantine, create-only. Nothing submitted here is ever
+ * The public "submit a lead" form. Posts to `./api/route.ts`, which is the only place
+ * this lane ever writes into quarantine, create-only. Nothing submitted here is ever
  * public: it enters a moderated queue and only advances via independent-reviewer consensus
- * (`packages/domain/src/consensus-review/`) and, after that, the standard BB-044 research
+ * (`packages/domain/src/consensus-review/`) and, after that, the standard research
  * pipeline.
  */
 import { useId, useState, type FormEvent } from 'react';

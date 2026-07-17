@@ -1,9 +1,10 @@
+
 /**
- * REAL roster entry: restore-drill scheduling (BB-020/BB-061, closed). Invokes the actual,
+ * REAL roster entry: restore-drill scheduling. Invokes the actual,
  * already-existing print-only script (scripts/backup-restore/staging-restore.stub.sh, which in
  * turn calls infra/firebase/backup/gcloud/staging-import.stub.sh) as a subprocess, the same
  * pattern as jobs/backup-verification.ts. That script is DRY_RUN=1 by default and this wrapper
- * never overrides that — it only ever prints the staging-import plan for a human to review and
+ * never overrides that it only ever prints the staging-import plan for a human to review and
  * execute; the human-execution step is the runbook's design (docs/runbooks/backup-restore.md),
  * not a missing implementation here.
  */

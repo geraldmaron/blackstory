@@ -1,5 +1,5 @@
 /**
- * RSS/Atom discovery adapter types (BB-073).
+ * RSS/Atom discovery adapter types.
  * Publisher-syndicated feeds are the lowest-risk, cheapest community channel: publishers
  * deliberately push title + link + summary for syndication, so storing that trio is low-risk
  * by design (see ../../rights/evidence-pointer.ts for the snippet-cap doctrine this still obeys).
@@ -12,7 +12,7 @@ export const RSS_STABLE_ID_SCHEME = 'rss-item' as const;
 export const RSS_PAYLOAD_SCHEMA_VERSION = 'rss-payload.v1' as const;
 
 /**
- * The constitution's low-authority source tiers this bead maps community feeds onto
+ * The constitution's low-authority source tiers this maps community feeds onto
  * (packages/schemas/constitution/policy.v1.json `sourceClassifications`). A feed registry
  * entry picks the tier that best matches its publisher type; see feed-registry.ts.
  */
@@ -55,7 +55,7 @@ export type RssCandidatePayload = {
   readonly feedUrl: string;
   readonly feedFormat: ParsedFeedFormat;
   readonly itemGuid?: string;
-  /** Capped to the BB-077 evidence-pointer snippet limits — never a full article body. */
+  /** Capped to the evidence-pointer snippet limits never a full article body. */
   readonly summary?: string;
   readonly publishedAt?: string;
   readonly classification: RssFeedClassification;

@@ -1,21 +1,21 @@
 /**
- * BB-054 "Why this appears" public composer. The single place that assembles BB-040's relevance
- * evidence/prose (./why.js, ./public.js) and BB-090's notabilityBasis (../entity-status.js) into
+ * "Why this appears" public composer. The single place that assembles relevance
+ * evidence/prose (`./why.js`, `./public.js`) and notabilityBasis (`../entity-status.js`) into
  * the one auditable, per-entity payload apps/web's `<WhyThisAppears>` component renders. Composes
- * ./why-public-dimensions.js, ./why-public-editorial.js, ./why-public-notice.js,
- * ./why-public-missing-perspective.js, and ./why-public-basis.js — it introduces no new relevance
- * gate and rewrites none of ./engine.js or ./gates.js.
+ * `./why-public-dimensions.js`, `./why-public-editorial.js`, `./why-public-notice.js`,
+ * `./why-public-missing-perspective.js`, and `./why-public-basis.js` — it introduces no new
+ * relevance gate and rewrites none of `./engine.js` or `./gates.js`.
  *
- * Enforces BB-054's five acceptance criteria structurally, not only by prose review:
- *   AC1 `assertSubstantiveConnectionExplained`     — every entity explains its substantive connection.
- *   AC2 `assertReasonNotIdentityAttendanceOrJobAlone` — race/fame/attendance/employment/residence
- *       alone is never presented as the reason (the deeper structural guarantee is BB-090's closed
- *       `NOTABILITY_CRITERIA` vocabulary itself — see ../entity-status.js — which contains no
- *       criterion reducible to a bare identity attribute; this is the additional prose-level guard).
- *   AC3 `assertResultsNotViolenceOnlyCollapse` (./why-public-dimensions.js) — result-SET level.
- *   AC4 `assertExplanationDerivesFromAcceptedEvidence` — explanations derive from accepted evidence.
- *   AC5 `assertPublicNotabilityBasisNeverScored` (./why-public-basis.js) + the final numeric-leaf
- *       sweep below — notabilityBasis renders in approved language, auditable, never a score.
+ * Enforces these invariants structurally, not only by prose review:
+ * `assertSubstantiveConnectionExplained` — every entity explains its substantive connection.
+ * `assertReasonNotIdentityAttendanceOrJobAlone` — race/fame/attendance/employment/residence
+ * alone is never presented as the reason (the deeper structural guarantee is the closed
+ * `NOTABILITY_CRITERIA` vocabulary itself — see `../entity-status.js` — which contains no
+ * criterion reducible to a bare identity attribute; this is the additional prose-level guard).
+ * `assertResultsNotViolenceOnlyCollapse` (`./why-public-dimensions.js`) — result-SET level.
+ * `assertExplanationDerivesFromAcceptedEvidence` — explanations derive from accepted evidence.
+ * `assertPublicNotabilityBasisNeverScored` (`./why-public-basis.js`) + the final numeric-leaf
+ * sweep below — notabilityBasis renders in approved language, auditable, never a score.
  */
 import type { RelevanceEvidence } from './types.js';
 import type { NotabilityBasisRecord } from '../entity-status.js';
@@ -40,15 +40,15 @@ import {
 } from './why-public-basis.js';
 
 export type PublicWhyThisAppearsInput = {
-  /** Public-safe prose — typically `buildWhyThisAppears`'s output (./why.js) or an entity's
+  /** Public-safe prose typically `buildWhyThisAppears`'s output (./why.js) or an entity's
    * `relevanceExplanation` field. Never a numeric-score-bearing string. */
   readonly explanation: string;
-  /** Accepted relevance evidence backing the explanation (AC4). */
+  /** Accepted relevance evidence backing the explanation. */
   readonly evidence: readonly RelevanceEvidence[];
-  /** BB-090 structured inclusion basis (AC1, AC5). */
+  /** structured inclusion basis. */
   readonly notabilityBasis: readonly NotabilityBasisRecord[] | undefined;
   /** Additional accepted prose (claim summaries, historical-context copy) to classify into story
-   * dimensions alongside `explanation` — never new, unsourced text invented by this module. */
+   * dimensions alongside `explanation` never new, unsourced text invented by this module. */
   readonly storyTexts?: readonly string[];
 };
 
@@ -62,7 +62,7 @@ export type PublicWhyThisAppears = {
 
 const MIN_EXPLANATION_LENGTH = 20;
 
-/** AC1: every entity explains its substantive connection — composes BB-090's own
+/** every entity explains its substantive connection composes own
  * `hasRequiredNotabilityBasis` gate rather than re-deriving the >=1-record rule. */
 export function assertSubstantiveConnectionExplained(input: {
   readonly explanation: string;
@@ -82,9 +82,9 @@ export function assertSubstantiveConnectionExplained(input: {
 }
 
 /**
- * AC2: a Black person's race, fame, attendance, employment, or residence alone is never presented
+ * a Black person's race, fame, attendance, employment, or residence alone is never presented
  * as the reason. Non-exhaustive prose-level guard, extended as editorial review finds new phrasing
- * — the deeper structural guarantee is BB-090's closed `NOTABILITY_CRITERIA` vocabulary itself
+ * the deeper structural guarantee is closed `NOTABILITY_CRITERIA` vocabulary itself
  * (../entity-status.js), none of whose 8 values reduces to a bare identity attribute.
  */
 const INSUFFICIENT_STANDALONE_REASON_PHRASES = [
@@ -117,7 +117,7 @@ export function assertReasonNotIdentityAttendanceOrJobAlone(explanation: string)
   }
 }
 
-/** AC4: explanations derive from accepted relevance evidence — mirrors ./why.js's own
+/** explanations derive from accepted relevance evidence mirrors./why.js's own
  * `joinEvidenceSummaries` filter (a `gate`-kind entry alone is a rejection record, not evidence). */
 export function assertExplanationDerivesFromAcceptedEvidence(
   evidence: readonly RelevanceEvidence[],
@@ -149,9 +149,9 @@ function assertNoNumericLeaf(value: unknown, path = '$'): void {
 }
 
 /**
- * Composes the full public "why this appears" payload, enforcing AC1/AC2/AC4/AC5 structurally
- * (throws rather than silently rendering non-compliant content). AC3 is enforced at the result-SET
- * level by ./why-public-dimensions.js's `assertResultsNotViolenceOnlyCollapse`, which callers
+ * Composes the full public "why this appears" payload, enforcing structurally
+ * (throws rather than silently rendering non-compliant content). is enforced at the result-SET
+ * level by./why-public-dimensions.js's `assertResultsNotViolenceOnlyCollapse`, which callers
  * rendering multiple entities together should also invoke over the returned `storyDimensions`.
  */
 export function buildPublicWhyThisAppears(input: PublicWhyThisAppearsInput): PublicWhyThisAppears {

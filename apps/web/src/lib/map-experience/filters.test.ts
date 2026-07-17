@@ -1,5 +1,5 @@
 /**
- * Confirms the BB-051 filter/facet pure logic: opt-in filtering (never silently hides), and
+ * Confirms the filter/facet pure logic: opt-in filtering (never silently hides), and
  * facet-option counting/labeling.
  */
 import assert from 'node:assert/strict';

@@ -1,5 +1,5 @@
 /**
- * Tests for BB-053/055 dispute compatibility: layer records map to underlying claim dispute targets.
+ * Tests for /055 dispute compatibility: layer records map to underlying claim dispute targets.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

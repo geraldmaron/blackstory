@@ -1,20 +1,15 @@
 /**
- * Builds the BB-051 `/explore` map + list dataset from the active release (the seed catalog
- * standing in for a live BB-019 projection release, same posture as `../../data/public-seed.ts`
- * itself). Reuses BB-070's redaction-injected `buildMapSource` and the BB-090/BB-091 era and
- * precision primitives from `@black-book/domain` — this module adds NO new redaction logic; it
- * only enriches `buildMapSource`'s already-redacted output with the extra fields the map/list
- * narrative card needs (BB-051 acceptance criteria: name, era, one-line story, evidence count,
- * confidence affordance, precision-radius affordance).
+ * Builds the `/explore` map + list dataset from the active release (seed catalog until live
+ * projections are wired — same posture as `../../data/public-seed.ts`). Reuses the
+ * redaction-injected `buildMapSource` plus era and precision helpers from `@black-book/domain`.
+ * This module adds no redaction of its own; it only enriches already-redacted map features with
+ * fields the map/list UI needs (name, era, one-line story, evidence count, confidence, and
+ * precision-radius affordances).
  *
- * INTEGRATION POINT (documented, not live-wired — matching this session's established pattern,
- * e.g. `packages/domain/src/map/map-source.ts`'s and
- * `packages/domain/src/geography/jurisdiction-refs.ts`'s "INTEGRATION POINT" comments):
- * `buildJurisdictionAreaFeatures` below is real and tested but has no live caller today because
- * the active release carries no law/area-condition entity kind yet (BB-086/BB-087/BB-082, all in
- * flight in sibling agents at the time this bead was executed). Wire it in by mapping those
- * records' resolved jurisdiction bbox into `AreaRecordInput` once they exist; per BB-091, such
- * records must render as polygon geometry, never as a point.
+ * Jurisdiction area polygons: `buildJurisdictionAreaFeatures` is implemented and tested but has
+ * no live caller yet — the active release has no law/area-condition entity kinds. When those
+ * exist, map each record’s resolved jurisdiction bbox into `AreaRecordInput`. Area records must
+ * render as polygon geometry, never as a point.
  */
 import { redactLocationForPublic } from '@black-book/security';
 import {
@@ -31,8 +26,8 @@ import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from '
 
 export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
 
-/** Highest confidence tier among an entity's accepted claims — a transparency affordance about
- * how strongly evidenced the record is, never a numeric score (BB-049's ranking-signal ban). */
+/** Highest confidence tier among an entity's accepted claims a transparency affordance about
+ * how strongly evidenced the record is, never a numeric score (ranking-signal ban). */
 function highestConfidence(claims: readonly PublicClaimView[]): ConfidenceTier {
   if (claims.some((claim) => claim.confidenceLevel === 'high')) return 'high';
   if (claims.some((claim) => claim.confidenceLevel === 'medium')) return 'medium';
@@ -53,7 +48,7 @@ export type ExploreMapFeatureProperties = {
   readonly status?: string;
   readonly notabilityLabels: readonly string[];
   /** Count of this record's own already-publicly-enumerated accepted claims (see the entity
-   * page's "Accepted claims" section) — a transparency affordance, not a hidden ranking input. */
+   * page's "Accepted claims" section) a transparency affordance, not a hidden ranking input. */
   readonly evidenceCount: number;
   readonly confidenceTier: ConfidenceTier;
   readonly topicTags: readonly string[];
@@ -74,8 +69,8 @@ export type ExploreMapFeatureCollection = {
   readonly features: readonly ExploreMapFeature[];
 };
 
-/** BB-091 acceptance criterion: jurisdiction-scoped area records (laws, area conditions) render
- * as polygon geometry, never as a point — see the module doc's INTEGRATION POINT above. */
+/** Jurisdiction-scoped area records (laws, area conditions) render as polygon geometry,
+ * never as a point — see the module header. */
 export type AreaRecordInput = {
   readonly id: string;
   readonly href: string;
@@ -99,9 +94,9 @@ export type JurisdictionAreaFeature = {
   };
 };
 
-/** Pure polygon builder for jurisdiction-scoped area records — see the INTEGRATION POINT above
- * for why nothing calls this with live data yet. Coarse (bbox-cornered) polygon geometry only,
- * matching this repo's existing state-bbox-not-survey-grade posture (ADR-013). */
+/** Pure polygon builder for jurisdiction-scoped area records. Coarse (bbox-cornered) polygon
+ * geometry only, matching this repo's existing state-bbox-not-survey-grade posture (ADR-013).
+ * Callers supply live area records when projection data is available. */
 export function buildJurisdictionAreaFeatures(
   records: readonly AreaRecordInput[],
 ): readonly JurisdictionAreaFeature[] {
@@ -155,7 +150,7 @@ export type ExploreMapSource = {
 export type BuildExploreMapSourceOptions = {
   readonly releaseId?: string;
   readonly generatedAt?: string;
-  /** Test/DI seam — production callers get the real `../../data/public-seed.ts`-scoped table. */
+  /** Test/DI seam production callers get the real `../../data/public-seed.ts`-scoped table.  */
   readonly geoAnchorFor?: (entityId: string) => EntityGeoAnchor | undefined;
   readonly jurisdictionAreaRecords?: readonly AreaRecordInput[];
 };
@@ -165,7 +160,7 @@ function toMapSourceInput(entity: PublicEntityView, anchor: EntityGeoAnchor): Ma
     entityId: entity.id,
     kind: entity.kind,
     displayName: entity.displayName,
-    // None of the active release's kinds (place/school/event/institution) are `person` — this is
+    // None of the active release's kinds (place/school/event/institution) are `person`; this is
     // inert for them, but explicit rather than omitted so a future person-kind addition to this
     // table can't silently skip the living-person redaction path by relying on an unset default.
     livingStatus: 'unknown',

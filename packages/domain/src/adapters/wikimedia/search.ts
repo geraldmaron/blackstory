@@ -1,5 +1,5 @@
 /**
- * MediaWiki search parsing for fixture-driven discovery (BB-045). No live network in tests.
+ * MediaWiki search parsing for fixture-driven discovery. No live network in tests.
  */
 import type { MediaWikiSearchHit, MediaWikiSearchResponse } from './types.js';
 
@@ -20,7 +20,7 @@ export function searchHitPageIds(hits: readonly MediaWikiSearchHit[]): readonly 
   return hits.map((hit) => hit.pageid);
 }
 
-/** Search snippets are discovery hints only — never copied into candidate prose by default. */
+/** Search snippets are discovery hints only never copied into candidate prose by default. */
 export function assertSearchSnippetsNotCopied(payload: Readonly<Record<string, unknown>>): void {
   if ('extract' in payload || 'prose' in payload || 'snippet' in payload) {
     throw new Error('Wikipedia prose or search snippets must not be copied into candidate payload');

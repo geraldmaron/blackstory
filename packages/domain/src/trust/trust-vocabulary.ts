@@ -1,5 +1,5 @@
 /**
- * Editorial trust vocabulary for BB-088 — Trust Project indicator schema properties (CC-BY-SA
+ * Editorial trust vocabulary for Trust Project indicator schema properties (CC-BY-SA
  * vocabulary, never the trademarked program name or badge) and IFCN commitment text published as
  * "aligned with" (the signatory badge requires paid membership; the commitment language is public).
  */
@@ -66,7 +66,7 @@ export const TRUST_PROJECT_INDICATORS = [
 
 export type TrustProjectIndicator = (typeof TRUST_PROJECT_INDICATORS)[number];
 
-/** IFCN five commitments — verbatim public text, published as editorial alignment, not signatory status. */
+/** IFCN five commitments verbatim public text, published as editorial alignment, not signatory status. */
 export const IFCN_COMMITMENTS = [
   {
     id: 'nonpartisanship',
@@ -102,7 +102,7 @@ export const IFCN_COMMITMENTS = [
 
 export type IfcnCommitment = (typeof IFCN_COMMITMENTS)[number];
 
-/** Pre-bunking copy naming manipulation techniques, never people or groups (BB-088 voice rule). */
+/** Pre-bunking copy naming manipulation techniques, never people or groups. */
 export const PREBUNK_TECHNIQUE_FRAMES = [
   {
     id: 'out_of_context',

@@ -1,5 +1,5 @@
 /**
- * Primary navigation items for the public Black Book application shell (BB-048).
+ * Primary navigation items for the public Black Book application shell.
  */
 
 export type NavItem = {
@@ -21,7 +21,7 @@ export const PRIMARY_NAV: readonly NavItem[] = [
   { href: '/corrections', label: 'Corrections' },
 ] as const;
 
-/** Compact footer links — editorial close + dev fixtures. */
+/** Compact footer links editorial close + dev fixtures.  */
 export const FOOTER_NAV: readonly NavItem[] = [
   { href: '/explore', label: 'Explore' },
   { href: '/search', label: 'Search' },

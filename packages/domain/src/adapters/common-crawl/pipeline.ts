@@ -1,7 +1,7 @@
 /**
- * Wires Common Crawl candidates into the standard BB-039 discovery pipeline via the SAME BB-073
- * Wayback capture gate every other community adapter uses (bead acceptance criterion 6) -- no
- * parallel ingestion path. Mirrors ../web-search/pipeline.ts exactly.
+ * Wires Common Crawl candidates into the standard discovery pipeline via the SAME 
+ * Wayback capture gate every other community adapter uses -- no
+ * parallel ingestion path. Mirrors../web-search/pipeline.ts exactly.
  */
 import { ingestApiCandidate } from '../../discovery/ingestion.js';
 import type { DiscoveryCandidateRecord } from '../../discovery/types.js';

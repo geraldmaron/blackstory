@@ -1,5 +1,5 @@
 /**
- * Confirms the BB-051 explore map source (a) reproduces the real active-release population with
+ * Confirms the explore map source (a) reproduces the real active-release population with
  * real entity links, (b) never leaks a raw/exact coordinate for a living person even when a
  * caller supplies one (the redaction invariant is `buildMapSource`'s, but this test proves this
  * module's wiring of it is real, not bypassed), and (c) builds jurisdiction-area polygon geometry

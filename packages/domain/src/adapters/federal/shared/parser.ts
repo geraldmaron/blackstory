@@ -1,5 +1,5 @@
 /**
- * Parses federal adapter fixture exports into normalized candidate records (BB-046).
+ * Parses federal adapter fixture exports into normalized candidate records.
  */
 import { stampCandidateProvenance } from '../../candidates.js';
 import type { SourceRegistryEntry } from '../../types.js';

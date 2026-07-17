@@ -1,7 +1,7 @@
 /**
- * Shapes the public BB-055 correction form into the exact `SubmissionInput` that
- * `createQuarantinedSubmission` (BB-029, `@black-book/security`) accepts. Pure and synchronous —
- * no Firebase, App Check, or rate limiting — so field rules are trivially testable in isolation.
+ * Shapes the public correction form into the exact `SubmissionInput` that
+ * `createQuarantinedSubmission` accepts. Pure and synchronous 
+ * no Firebase, App Check, or rate limiting so field rules are trivially testable in isolation.
  */
 import type { SubmissionInput } from '@black-book/security';
 import {

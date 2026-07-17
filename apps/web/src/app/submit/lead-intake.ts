@@ -1,15 +1,15 @@
 /**
  * Shapes a public "submit a lead" form payload into the exact `SubmissionInput` shape
- * `createQuarantinedSubmission` (BB-029, `@black-book/security`) accepts. Pure and
- * synchronous — no Firebase, no App Check, no rate limiting — so the field rules here are
+ * `createQuarantinedSubmission` accepts. Pure and
+ * synchronous no Firebase, no App Check, no rate limiting so the field rules here are
  * trivially testable in isolation. See `api/route.ts` for where this plugs into the real
  * quarantine intake.
  *
- * Known constraint (not something this file can fix): BB-029's own validator requires at
+ * Known constraint (not something this file can fix): own validator requires at
  * least one HTTPS source URL for `kind: 'contribution'` submissions. A description-only lead
  * with no URL at all (e.g. a purely oral-history account) will pass this file's validation but
  * still be rejected by `createQuarantinedSubmission` downstream with a `source_url_invalid`
- * issue — the same behavior `packages/operator-cli`'s lead intake has today. This file does not
+ * issue the same behavior `packages/operator-cli`'s lead intake has today. This file does not
  * duplicate or relax that rule; it surfaces the real rejection to the submitter instead.
  */
 import type { SubmissionInput } from '@black-book/security';

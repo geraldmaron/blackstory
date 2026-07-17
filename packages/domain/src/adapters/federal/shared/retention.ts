@@ -1,5 +1,5 @@
 /**
- * Candidate retention rules for federal archive adapters (BB-046).
+ * Candidate retention rules for federal archive adapters.
  * Only qualifying metadata and evidence fields proceed toward discovery.
  */
 import type { FederalRejectedRecord, FederalRetentionRules, RawFederalExportRecord } from './types.js';

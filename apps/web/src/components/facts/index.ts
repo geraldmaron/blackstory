@@ -1,5 +1,5 @@
 /**
- * Barrel for BB-086 fact registry presentation components.
+ * Barrel for fact registry presentation components.
  */
 export * from './format.js';
 export * from './FactStatusBanner.js';

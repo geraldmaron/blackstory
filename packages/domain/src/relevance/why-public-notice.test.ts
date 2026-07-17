@@ -1,5 +1,5 @@
 /**
- * Tests for the BB-054 trauma-content notice derivation, composing the existing BB-095
+ * Tests for the trauma-content notice derivation, composing the existing 
  * `sensitive_content` disclaimer registry entry (../disclaimers.js).
  */
 import assert from 'node:assert/strict';

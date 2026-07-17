@@ -1,5 +1,5 @@
 /**
- * `review_queue` event shape for BB-087 legal change monitoring. Automation proposes events with
+ * `review_queue` event shape for legal change monitoring. Automation proposes events with
  * archived evidence; humans dispose. Dedupe key is `(source, externalId, changeHashNew)`.
  */
 import type { LegalTopic } from './types.js';
@@ -29,7 +29,7 @@ export type ReviewQueueEvidence = {
   readonly diffHint?: string;
 };
 
-/** Proposed change event landing in Firestore `review_queue` (BB-087 AC5). */
+/** Proposed change event landing in Firestore `review_queue`. */
 export type LegalReviewQueueEvent = {
   readonly source: string;
   readonly eventType: ReviewQueueEventType;

@@ -1,5 +1,5 @@
 /**
- * Exposes research-case workflow contracts and deterministic domain operations for BB-044.
+ * Exposes research-case workflow contracts and deterministic domain operations.
  */
 export * from './model.js';
 export * from './workflow.js';

@@ -1,5 +1,5 @@
 /**
- * Normalize parsed RSS/Atom feed items into BB-037 AdapterCandidateRecord output (BB-073).
+ * Normalize parsed RSS/Atom feed items into AdapterCandidateRecord output.
  */
 import { hashUtf8 } from '../../provenance/hashes.js';
 import { MAX_EVIDENCE_SNIPPET_CHARACTERS, MAX_EVIDENCE_SNIPPET_WORDS } from '../../rights/evidence-pointer.js';
@@ -11,8 +11,8 @@ import { RSS_ADAPTER_ID, RSS_PAYLOAD_SCHEMA_VERSION } from './types.js';
 import type { ParsedFeedItem, RssCandidatePayload, RssCandidateRecord } from './types.js';
 
 /**
- * Caps a syndicated summary to the BB-077 evidence-pointer snippet limits even though this
- * payload field is not itself an EvidencePointer — publishers already deliver a short summary
+ * Caps a syndicated summary to the evidence-pointer snippet limits even though this
+ * payload field is not itself an EvidencePointer publishers already deliver a short summary
  * for RSS syndication, but a defensive cap keeps every stored value inside the doctrine's bound
  * regardless of what an individual feed happens to put in `<description>`.
  */

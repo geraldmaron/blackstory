@@ -1,5 +1,5 @@
 /**
- * Global security response headers for Next.js and edge middleware (BB-028).
+ * Global security response headers for Next.js and edge middleware.
  */
 
 import { buildContentSecurityPolicy } from './csp';
@@ -9,12 +9,12 @@ export type SecurityHeader = {
   value: string;
 };
 
-/** Referrer-Policy: strict-origin-when-cross-origin limits query leakage. */
+/** Referrer-Policy: strict-origin-when-cross-origin limits query leakage.  */
 export const REFERRER_POLICY = 'strict-origin-when-cross-origin';
 
 /**
  * Permissions-Policy: disable powerful features on the public read surface by default.
- * `geolocation=(self)` is required for BB-050 `/locate` consent-gated browser location
+ * `geolocation=(self)` is required for `/locate` consent-gated browser location
  * (explicit user click only); other sensors stay denied.
  */
 export const PERMISSIONS_POLICY = [
@@ -39,7 +39,7 @@ export const PERMISSIONS_POLICY = [
   'xr-spatial-tracking=()',
 ].join(', ');
 
-/** Build global security headers applied to all public routes. */
+/** Build global security headers applied to all public routes.  */
 export function buildGlobalSecurityHeaders(): SecurityHeader[] {
   const csp = buildContentSecurityPolicy({
     allowInlineStyles: true,
@@ -58,19 +58,19 @@ export function buildGlobalSecurityHeaders(): SecurityHeader[] {
   ];
 }
 
-/** Convert to Next.js headers() config entries. */
+/** Convert to Next.js headers config entries.  */
 export function securityHeadersForNextConfig(): SecurityHeader[] {
   return buildGlobalSecurityHeaders();
 }
 
-/** Apply security headers onto an existing Headers instance. */
+/** Apply security headers onto an existing Headers instance.  */
 export function applySecurityHeaders(headers: Headers): void {
   for (const { key, value } of buildGlobalSecurityHeaders()) {
     headers.set(key, value);
   }
 }
 
-/** Clickjacking protection is covered by X-Frame-Options DENY and CSP frame-ancestors 'none'. */
+/** Clickjacking protection is covered by X-Frame-Options DENY and CSP frame-ancestors 'none'.  */
 export function clickjackingProtectionHeaders(): SecurityHeader[] {
   return [
     { key: 'X-Frame-Options', value: 'DENY' },
@@ -78,7 +78,7 @@ export function clickjackingProtectionHeaders(): SecurityHeader[] {
   ];
 }
 
-/** MIME sniffing protection header. */
+/** MIME sniffing protection header.  */
 export function mimeSniffingProtectionHeader(): SecurityHeader {
   return { key: 'X-Content-Type-Options', value: 'nosniff' };
 }

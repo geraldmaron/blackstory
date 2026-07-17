@@ -1,6 +1,6 @@
 /**
  * Pure-logic tests for buildMapSource using a stub redaction port (no
- * @black-book/security dependency here — see map-source.redaction.test.ts for
+ * @black-book/security dependency here; see map-source.redaction.test.ts for
  * the integration regression test against the real redaction functions).
  */
 import assert from 'node:assert/strict';
@@ -23,7 +23,7 @@ const passthroughRedact: MapRedactLocationFn = (input) => {
   return { precision: input.precision, lat: input.lat, lng: input.lng, geohash: input.geohash };
 };
 
-/** Stub that always returns undefined — simulates "nothing safe to publish". */
+/** Stub that always returns undefined simulates "nothing safe to publish". */
 const alwaysHideRedact: MapRedactLocationFn = () => undefined;
 
 test('buildMapSource skips entities with no location field', () => {

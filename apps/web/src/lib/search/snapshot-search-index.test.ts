@@ -1,5 +1,5 @@
 /**
- * Confirms the seed-catalog adapter produces a real, gate-passing search index (BB-049).
+ * Confirms the seed-catalog adapter produces a real, gate-passing search index.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -25,7 +25,7 @@ test('the index is memoized across calls', () => {
 
 test('synthesized notabilityBasis falls back to documented_site for hand-authored seed prose that paraphrases (not quotes) the rubric', () => {
   // The seed catalog's labels are paraphrases of NOTABILITY_RUBRIC text, not verbatim quotes, so
-  // the exact-string reverse-lookup in the adapter is expected to miss and fall back — this test
+  // the exact-string reverse-lookup in the adapter is expected to miss and fall back this test
   // documents that behavior rather than asserting a criterion the seed data can't actually prove.
   resetSnapshotSearchIndexCache();
   const index = getSnapshotSearchIndex();
@@ -41,7 +41,7 @@ test('relatedCount and claimCount are populated from the seed fixture, never lef
   const place = index.find((doc) => doc.id === 'ent_seed_place_001');
   assert.ok(place);
   assert.equal(place.relatedCount, 1);
-  // BB-052: the place now carries a second accepted claim (the contested land-use dispute) that
-  // backs its BB-095 sensitivity flag's basisClaimIds.
+  // : the place now carries a second accepted claim (the contested land-use dispute) that
+  // backs its sensitivity flag's basisClaimIds.
   assert.equal(place.claimCount, 2);
 });

@@ -1,6 +1,6 @@
 /**
- * Provenance stamping for every external web-search query and the results it produces (BB-075
- * acceptance criterion 5): API name, query text, timestamp, and plan/terms version.
+ * Provenance stamping for every external web-search query and the results it produces (
+ * ): API name, query text, timestamp, and plan/terms version.
  */
 import type { ExternalQueryProvenance, WebSearchProvider } from './types.js';
 

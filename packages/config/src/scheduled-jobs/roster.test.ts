@@ -1,7 +1,8 @@
+
 /**
- * BB-084 acceptance: the initial job roster registers cleanly, every entry declares owner /
- * cadence / budget / timeout / idempotency scheme / kill switch / target worker, and the
- * real-vs-stub split matches what this bead actually shipped.
+ * The initial job roster registers cleanly, every entry declares owner
+ * cadence budget timeout idempotency scheme kill switch target worker, and the
+ * real-vs-stub split matches what this actually shipped.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

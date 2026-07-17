@@ -1,6 +1,6 @@
 /**
- * Server-only rate-limit guard for the `/explore/api` refine route (BB-051). Reuses BB-049's
- * search endpoint class and evaluator — explore refinement is an expensive read, not a mutation.
+ * Server-only rate-limit guard for the `/explore/api` refine route. Reuses 
+ * search endpoint class and evaluator explore refinement is an expensive read, not a mutation.
  */
 export {
   createSearchRateLimitGuard as createExploreRateLimitGuard,

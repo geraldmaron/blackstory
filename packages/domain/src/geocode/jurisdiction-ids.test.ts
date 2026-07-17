@@ -1,5 +1,5 @@
 /**
- * Tests for BB-050 jurisdiction-id resolution — proves the id scheme matches
+ * Tests for jurisdiction-id resolution proves the id scheme matches
  * `packages/firebase/src/jurisdictions/schema.ts` exactly (`us`, `us-{state}`,
  * `us-{state}-{county}`) and that place/city resolution stays on-demand-only (ADR-016).
  */

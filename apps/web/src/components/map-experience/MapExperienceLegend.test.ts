@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke test confirming the BB-051 legend explains every visual distinction in words
+ * SSR markup smoke test confirming the legend explains every visual distinction in words
  * (WCAG 1.4.1 Use of Color), not color/glyph alone.
  */
 import assert from 'node:assert/strict';

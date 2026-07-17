@@ -1,7 +1,7 @@
 /**
- * Raw Census geography rows -> `CensusGeocodeMatch` (BB-050). Extracts only the fields this
- * product needs (state/county/place FIPS + names, lat/lng) from the "States" / "Counties" /
- * "Incorporated Places" layers Census returns under `geographies` — never the full row (which
+ * Raw Census geography rows -> `CensusGeocodeMatch`. Extracts only the fields this
+ * product needs (state/county/place FIPS + names, lat/lng) from the "States" "Counties"
+ * "Incorporated Places" layers Census returns under `geographies` never the full row (which
  * also carries TIGER/MTFCC/area fields this product has no use for and would otherwise be
  * tempted to pass through unbounded).
  */
@@ -22,7 +22,7 @@ function firstEntry(
 /**
  * County FIPS from Census geography rows is a 3-digit code (`COUNTY`) that must be paired with
  * the 2-digit `STATE` code to form the 5-digit county GEOID this product's jurisdiction ids use
- * (see `../../geocode/jurisdiction-ids.ts`) — kept as the raw 3-digit form here; the state
+ * (see `../../geocode/jurisdiction-ids.ts`) kept as the raw 3-digit form here; the state
  * prefix is joined at the jurisdiction-id layer, not here, so this module stays a pure
  * Census-shape extractor.
  */

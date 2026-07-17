@@ -1,20 +1,20 @@
 /**
- * Relevance and confidence feedback-loop calibration layer (BB-081).
+ * Relevance and confidence feedback-loop calibration layer.
  *
- * This module is a read-only LAYER around BB-040's deterministic relevance engine
- * (../relevance/) and BB-044's append-only research-case history (../research-case/). It never
+ * This module is a read-only LAYER around deterministic relevance engine
+ * (../relevance/) and append-only research-case history (../research-case/). It never
  * mutates either engine, never computes a live relevance/confidence score itself, and never
  * writes anywhere. The core invariant carried through every type and function here: automation
- * PROPOSES, humans APPROVE — no silent auto-tuning, no learned ranker.
+ * PROPOSES, humans APPROVE no silent auto-tuning, no learned ranker.
  *
- * Clarified interpretation of one bead detail: the bead text says the decision log is keyed by
- * "the input fingerprints BB-043 already stamps." BB-043's `ConfidenceInputFingerprints`
+ * Clarified interpretation of one detail: the text says the decision log is keyed by
+ * "the input fingerprints already stamps." `ConfidenceInputFingerprints`
  * (packages/domain/src/confidence-engine/engine.ts) fingerprints CLAIM confidence inputs
- * (evidence links + policy) — it has no direct analog for a relevance candidate, which is scored
+ * (evidence links + policy) it has no direct analog for a relevance candidate, which is scored
  * before any claim exists. Rather than force an import of confidence-engine internals that don't
- * actually apply here, this module reuses the *same deterministic pattern* BB-043 established
+ * actually apply here, this module reuses the *same deterministic pattern* established
  * (canonicalize -> JSON -> sha256, via the already-shared `hashUtf8` helper from
- * ../provenance/hashes.js) applied to the relevance-assessment inputs a decision was made from.
+ * ./provenance/hashes.js) applied to the relevance-assessment inputs a decision was made from.
  * See decision-log.ts's `computeRelevanceInputFingerprint`.
  */
 import type { RelevanceDecision } from '@black-book/schemas';
@@ -30,18 +30,18 @@ export const RELEVANCE_FEEDBACK_SCHEMA_VERSION = 'relevance-feedback.v1' as cons
 
 /**
  * How a human's case transition compared to what the relevance engine recommended:
- *  - 'accept': the human's transition matches the engine's non-overridden decision.
- *  - 'reject': the human's transition goes the other way (e.g. excluded a candidate the engine
- *    scored includable, or confirmed one the engine scored exclude) WITHOUT a formal override.
- *  - 'override': a formal `RelevanceOverride` (../relevance/types.js) is present on the
- *    assessment — the strongest, most explicit disagreement signal available.
+ * - 'accept': the human's transition matches the engine's non-overridden decision.
+ * - 'reject': the human's transition goes the other way (e.g. excluded a candidate the engine
+ * scored includable, or confirmed one the engine scored exclude) WITHOUT a formal override.
+ * - 'override': a formal `RelevanceOverride` (../relevance/types.js) is present on the
+ * assessment the strongest, most explicit disagreement signal available.
  */
 export const HUMAN_DISPOSITIONS = ['accept', 'reject', 'override'] as const;
 export type HumanDisposition = (typeof HUMAN_DISPOSITIONS)[number];
 
 /** The research-case transition target states that represent a relevance verdict. Transitions
- *  to any other state (enrichment progression, merges, retraction) are not relevance verdicts
- *  and are out of scope for this calibration dataset. */
+ * to any other state (enrichment progression, merges, retraction) are not relevance verdicts
+ * and are out of scope for this calibration dataset. */
 export const RELEVANCE_VERDICT_TARGET_STATES: ReadonlySet<ResearchCaseState> = new Set([
   'relevance_confirmed',
   'excluded',
@@ -59,8 +59,8 @@ export type RelevanceDecisionLogEntry = {
   readonly reasonCode: ResearchCaseReasonCode;
   readonly actorId: string;
   readonly occurredAt: string;
-  /** The RelevanceAssessment.decision in effect at this transition — override-adjusted when an
-   *  override was applied (see overrideApplied). */
+  /** The RelevanceAssessment.decision in effect at this transition override-adjusted when an
+   * override was applied (see overrideApplied). */
   readonly assessmentDecision: RelevanceDecision;
   readonly compositeScore: number;
   readonly policyVersion: string;
@@ -69,12 +69,12 @@ export type RelevanceDecisionLogEntry = {
   readonly overrideApplied: boolean;
   readonly overrideReason?: string;
   /** Deterministic sha256 fingerprint over the relevance-assessment inputs that produced
-   *  assessmentDecision/compositeScore/featureValues (see module docstring). */
+   * assessmentDecision/compositeScore/featureValues (see module docstring). */
   readonly inputFingerprint: string;
   readonly assessedAt: string;
   /** Optional enrichment, populated only when the caller supplies a candidatesById lookup to
-   *  extractRelevanceDecisionLog. Absent entries are excluded from source-tier precision, not
-   *  treated as a failure. */
+   * extractRelevanceDecisionLog. Absent entries are excluded from source-tier precision, not
+   * treated as a failure. */
   readonly adapterId?: string;
   readonly sourceTier?: string;
 };
@@ -93,8 +93,8 @@ export type DimensionDisagreementSummary = {
   readonly meanValueOnAgreement: number;
   readonly meanValueOnDisagreement: number;
   /** abs(meanValueOnAgreement - meanValueOnDisagreement); dimensions are ranked by this,
-   *  descending, in buildRecalibrationReport — the higher the divergence, the more that
-   *  dimension's feature value differs between cases humans agreed with vs disagreed with. */
+   * descending, in buildRecalibrationReport the higher the divergence, the more that
+   * dimension's feature value differs between cases humans agreed with vs disagreed with. */
   readonly divergence: number;
 };
 
@@ -122,7 +122,7 @@ export type GraylistYieldInput = {
   readonly parkedSignalId: string;
   readonly parkedAt: string;
   /** Present once a parked weak signal was later corroborated (promoted, or matched by an
-   *  independent lineage) — absence means it is still parked / never corroborated. */
+   * independent lineage) absence means it is still parked never corroborated. */
   readonly corroboratedAt?: string;
 };
 

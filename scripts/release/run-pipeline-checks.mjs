@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+
 /**
- * Local release pipeline acceptance checks (BB-062). Safe dry-run — no cloud mutations.
+ * Local release pipeline acceptance checks. Safe dry-run no cloud mutations.
  */
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';

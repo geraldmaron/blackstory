@@ -1,9 +1,9 @@
 /**
- * /ai.txt (BB-089 perimeter hygiene). An emerging, AI-specific complement to /robots.txt that a
+ * /ai.txt. An emerging, AI-specific complement to /robots.txt that a
  * subset of AI-training crawlers check independently of the standard robots convention. Same
- * caveat as robots.ts: this is a courtesy signal, not an access control — real enforcement lives
- * in rate limits / App Check / cache-busting normalization (docs/security/threat-model.md T-19).
- * Reuses the single AI_TRAINING_USER_AGENTS list from ../robots.ts so the two files can never
+ * caveat as robots.ts: this is a courtesy signal, not an access control real enforcement lives
+ * in rate limits App Check cache-busting normalization (docs/security/threat-model.md T-19).
+ * Reuses the single AI_TRAINING_USER_AGENTS list from../robots.ts so the two files can never
  * drift out of sync.
  */
 import { AI_TRAINING_USER_AGENTS } from '../robots.js';

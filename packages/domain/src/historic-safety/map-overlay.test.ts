@@ -1,5 +1,5 @@
 /**
- * Tests for BB-051 map-overlay dignity-rule contract hooks (AC7).
+ * Tests for map-overlay dignity-rule contract hooks.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,6 +1,7 @@
+
 /**
- * Verifies commitOperatorIntake calls the real BB-018 commitWithAudit atomically, including
- * idempotent replay on a repeated call — proving this package does not reimplement that path.
+ * Verifies commitOperatorIntake calls the real commitWithAudit atomically, including
+ * idempotent replay on a repeated call proving this package does not reimplement that path.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

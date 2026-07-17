@@ -1,5 +1,6 @@
+
 /**
- * Verifies BB-029 validation, immutable originals, spam scoring, and campaign detection.
+ * Verifies validation, immutable originals, spam scoring, and campaign detection.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

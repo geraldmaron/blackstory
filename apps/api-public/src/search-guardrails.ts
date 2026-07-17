@@ -1,6 +1,6 @@
 /**
- * Public API search guardrails — HTTP query parsing + BB-026 validation (BB-026).
- * Composes with BB-025 rate limits via shared endpoint class metadata.
+ * Public API search guardrails HTTP query parsing + validation.
+ * Composes with rate limits via shared endpoint class metadata.
  */
 import {
   evaluateSearchQueryGuardrails,
@@ -51,7 +51,7 @@ export type PublicSearchGuardDeniedResponse = {
 
 const SEARCH_PATH = /^\/v1\/search(?:\/|$)/i;
 
-/** Parses allowlisted query-string params into SearchQueryInput. */
+/** Parses allowlisted query-string params into SearchQueryInput.  */
 export function parsePublicSearchQuery(raw: PublicSearchHttpQuery): SearchQueryInput {
   const filters: Record<string, string> = {};
   if (raw.kind !== undefined) {
@@ -138,7 +138,7 @@ export function createPublicSearchGuard() {
       return formatSearchGuardDeniedResponse(decision);
     },
 
-    /** Re-export for middleware that chains BB-025 denial formatting. */
+    /** Re-export for middleware that chains denial formatting.  */
     formatRateLimitDenied(decision: Parameters<typeof formatRateLimitResponse>[0]) {
       return formatRateLimitResponse(decision);
     },

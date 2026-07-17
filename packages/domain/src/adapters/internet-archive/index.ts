@@ -1,5 +1,5 @@
 /**
- * Internet Archive community discovery adapter public surface (BB-073).
+ * Internet Archive community discovery adapter public surface.
  */
 export {
   INTERNET_ARCHIVE_ADAPTER_ID,

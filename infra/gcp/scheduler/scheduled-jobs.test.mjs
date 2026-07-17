@@ -1,8 +1,8 @@
 /**
- * BB-084 acceptance checks for the declarative Cloud Scheduler mirror. Validates shape only
+ * Acceptance checks for the declarative Cloud Scheduler mirror. Validates shape only
  * (no live GCP calls, no cross-package dynamic import — mirrors infra/gcp/cost-controls/
- * cost-controls.test.mjs, which validates its JSON standalone against BB-033's shipped values
- * by hand-kept-in-sync convention, not a build-time import).
+ * cost-controls.test.mjs, which validates its JSON standalone against the shipped cost-control
+ * values by hand-kept-in-sync convention, not a build-time import).
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

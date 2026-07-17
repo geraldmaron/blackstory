@@ -1,5 +1,5 @@
 /**
- * Claims, contradictions, and confidence model surface (BB-017).
+ * Claims, contradictions, and confidence model surface.
  */
 export {
   asClaimId,

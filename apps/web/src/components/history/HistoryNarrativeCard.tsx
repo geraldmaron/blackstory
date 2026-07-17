@@ -1,6 +1,6 @@
 /**
- * Narrative off-ramp card for a selected history graph node (BB-093). Mirrors BB-051's
- * `NarrativeCard` — name, kind, status-as-of-decade, evidence count, and links to the entity page
+ * Narrative off-ramp card for a selected history graph node. Mirrors 
+ * `NarrativeCard` name, kind, status-as-of-decade, evidence count, and links to the entity page
  * and any published facts.
  */
 import React from 'react';

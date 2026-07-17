@@ -1,7 +1,7 @@
 /**
- * Deterministic, auditable text-relevance ranking (BB-049 AC1).
+ * Deterministic, auditable text-relevance ranking.
  *
- * Ranking is a stable, explainable tier system — never an opaque score. Match strength is a small
+ * Ranking is a stable, explainable tier system never an opaque score. Match strength is a small
  * integer tier (exact name > name prefix > name substring > alias exact/prefix/substring >
  * topic/summary substring > bounded fuzzy). Connection strength (`relatedCount`) is a STRICTLY
  * SECONDARY sort key: it breaks ties within an equal text tier but can never override a stronger
@@ -26,8 +26,8 @@ const TIER_FUZZY = 10;
 /** Empty query = browse-all: every record is included, ordered purely by connection strength. */
 const TIER_BROWSE = 0;
 
-/** Minimum query length before fuzzy (Levenshtein) matching is attempted — avoids pathological
- * false positives on short queries and stays clear of BB-026's `minQueryLength: 2` floor. */
+/** Minimum query length before fuzzy (Levenshtein) matching is attempted avoids pathological
+ * false positives on short queries and stays clear of `minQueryLength: 2` floor. */
 export const MIN_FUZZY_QUERY_LENGTH = 4;
 
 /** Maximum edit distance treated as a fuzzy match. */

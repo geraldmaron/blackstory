@@ -1,8 +1,8 @@
 /**
- * Fetches Census Geocoder results through the shared BB-030 safe HTTP port (BB-050) — never a
- * bare `fetch`, same posture as `../web-search/fetch-search.ts` and every other BB-073-style
+ * Fetches Census Geocoder results through the shared safe HTTP port never a
+ * bare `fetch`, same posture as `../web-search/fetch-search.ts` and every other -style
  * adapter in this directory tree. No API key: the Census Geocoder is free and unauthenticated
- * (see ./types.ts's module doc); this adapter's own call volume is bounded by the BB-025
+ * (see ./types.ts's module doc); this adapter's own call volume is bounded by the 
  * `geocoding` endpoint-class quota at the route layer (outside this package), not a vendor key.
  */
 import {

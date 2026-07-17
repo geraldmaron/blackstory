@@ -1,5 +1,5 @@
 /**
- * Hybrid search wiring for the public web app (BB-072).
+ * Hybrid search wiring for the public web app.
  *
  * Composes domain hybrid retrieval over the snapshot index + in-memory vector lane. Telemetry
  * stays server-side; HTTP responses use `toPublicHybridSearchPayload`.
@@ -70,12 +70,12 @@ export async function runWebHybridSearch(
   };
 }
 
-/** Reads hybrid feature flag from URL search params. */
+/** Reads hybrid feature flag from URL search params.  */
 export function readHybridFlagFromParams(params: URLSearchParams): string | null {
   return params.get('hybrid');
 }
 
-/** Reads per-lane kill switch overrides from URL search params. */
+/** Reads per-lane kill switch overrides from URL search params.  */
 export function readLaneKillSwitchParams(params: URLSearchParams): {
   readonly structured?: string;
   readonly vector?: string;

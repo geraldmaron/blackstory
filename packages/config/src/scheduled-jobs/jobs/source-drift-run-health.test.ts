@@ -1,6 +1,7 @@
+
 /**
- * BB-084: proves the source-drift-run-health job body is REAL — it calls @black-book/domain's
- * evaluateRunHealth/shouldQuarantineRun/shouldDeadLetterRun (the same functions the BB-037
+ * Proves the source-drift-run-health job body is REAL it calls @black-book/domain's
+ * evaluateRunHealth/shouldQuarantineRun/shouldDeadLetterRun (the same functions the
  * source-adapter pipeline itself uses) rather than reimplementing drift evaluation.
  */
 import assert from 'node:assert/strict';

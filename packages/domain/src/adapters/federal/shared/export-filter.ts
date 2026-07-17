@@ -1,5 +1,5 @@
 /**
- * Filters large federal archive exports before they enter the canonical application database (BB-046).
+ * Filters large federal archive exports before they enter the canonical application database.
  * Bulk blobs are stripped; only essential metadata keys are retained.
  */
 import type { FederalExportFilterPolicy } from './types.js';

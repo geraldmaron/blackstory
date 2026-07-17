@@ -1,6 +1,6 @@
 /**
- * URL construction for the U.S. Census Bureau Geocoder API (BB-050). Two operations only —
- * the two this bead needs: forward geocode-with-geographies (`onelineaddress`, address or ZIP
+ * URL construction for the U.S. Census Bureau Geocoder API. Two operations only 
+ * the two this needs: forward geocode-with-geographies (`onelineaddress`, address or ZIP
  * text -> match + FIPS geographies) and reverse geocode-with-geographies (`coordinates`,
  * lat/lng -> FIPS geographies). Both request `returntype=geographies` and pin
  * `benchmark`/`vintage` to the constants in `./types.ts` so results are reproducible across
@@ -11,7 +11,7 @@ import { CENSUS_GEOCODER_BENCHMARK, CENSUS_GEOCODER_VINTAGE } from './types.js';
 export const CENSUS_GEOCODER_BASE_URL = 'https://geocoding.geo.census.gov/geocoder' as const;
 
 export type BuildCensusOneLineAddressUrlInput = {
-  /** Free-text single-line address, city/state, or ZIP — whatever the caller normalized. */
+  /** Free-text single-line address, city/state, or ZIP whatever the caller normalized. */
   readonly address: string;
   readonly benchmark?: string;
   readonly vintage?: string;

@@ -1,22 +1,23 @@
+
 /**
- * REAL roster entry: relevance/confidence recalibration report (BB-081, closed). Wraps
- * @black-book/domain's relevance-feedback module — buildRecalibrationReport (per-dimension
+ * REAL roster entry: relevance/confidence recalibration report. Wraps
+ * @black-book/domain's relevance-feedback module buildRecalibrationReport (per-dimension
  * disagreement, query-pack effectiveness, graylist yield, source-tier precision) and
- * evaluateRelevanceDriftAlarm — the same way gold-corpus-regression.ts wraps
+ * evaluateRelevanceDriftAlarm the same way gold-corpus-regression.ts wraps
  * @black-book/testing's evaluateCorpus: this wrapper does not reimplement any analysis, it only
  * adapts the domain module's pure functions into the generic JobRunRecord shape so the report can
  * be scheduled through this registry.
  *
  * Report-only, always: this job produces a RecalibrationReport + a drift-alarm evaluation (and,
- * only if the disagreement rate is sustained above threshold, a BB-034 alert). It never proposes,
- * gates, or approves a weight change — proposeWeightChange / requireGoldCorpusGatePassed /
+ * only if the disagreement rate is sustained above threshold, a alert). It never proposes,
+ * gates, or approves a weight change proposeWeightChange requireGoldCorpusGatePassed
  * approveWeightChange (@black-book/domain) are a separate, human-triggered path with their own
  * distinct-approver and gold-corpus-gate requirements (see relevance-feedback.test.ts in
  * @black-book/domain), deliberately not invoked anywhere in this file. No publish, no live
  * weight mutation.
  *
- * Drift alerts reuse BB-034's SEC-SRC-01 policy via the exact call shape
- * ../alerting.ts's buildMissedRunAlert already uses — see that file's docstring for why
+ * Drift alerts reuse SEC-SRC-01 policy via the exact call shape
+ * ../alerting.ts's buildMissedRunAlert already uses see that file's docstring for why
  * SEC-SRC-01 ("source adapter anomaly burst") is the closest existing "anomaly burst" kind to
  * reuse for a non-source-adapter drift signal (missed-run silence is the existing precedent for
  * this same stretch).
@@ -38,8 +39,8 @@ export const RECALIBRATION_REPORT_JOB_ID = 'relevance-confidence-recalibration-r
 const DRIFT_ALERT_POLICY_ID = 'SEC-SRC-01';
 
 /** Conservative defaults; callers may override per run. Sustained disagreement above 25% across
- *  at least 10 decisions in the window is the trigger — a handful of disagreements should not
- *  page anyone (see evaluateRelevanceDriftAlarm's minimumSampleSize gate). */
+ * at least 10 decisions in the window is the trigger a handful of disagreements should not
+ * page anyone (see evaluateRelevanceDriftAlarm's minimumSampleSize gate). */
 export const DEFAULT_RECALIBRATION_DRIFT_THRESHOLDS: RelevanceDriftAlarmThresholds = {
   disagreementRateThreshold: 0.25,
   minimumSampleSize: 10,

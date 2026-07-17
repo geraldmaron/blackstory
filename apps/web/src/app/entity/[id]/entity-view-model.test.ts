@@ -1,5 +1,5 @@
 /**
- * Unit tests for the entity detail page's BB-090-driven framing derivation (BB-052).
+ * Unit tests for the entity detail page's status-driven framing derivation.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

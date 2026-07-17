@@ -1,5 +1,6 @@
+
 /**
- * Validates GitHub repository governance artifacts and workflow policy (BB-009).
+ * Validates GitHub repository governance artifacts and workflow policy.
  * Checks: required files, SHA-pinned actions, read-only permissions, forbidden events,
  * ruleset required-check alignment, and optional remote ruleset verification.
  */

@@ -1,6 +1,7 @@
+
 /**
- * Verifies that lead/source/evidence proposals land in the real BB-029 quarantine pipeline
- * and, for leads, open a real BB-044 draft research case — never a canonical or promoted record.
+ * Verifies that lead/source/evidence proposals land in the real quarantine pipeline
+ * and, for leads, open a real draft research case never a canonical or promoted record.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -48,7 +49,7 @@ test('submitting a lead lands a real quarantine record and opens a real draft re
   assert.equal(outcome.researchCase?.state, 'candidate');
   assert.equal(outcome.researchCase?.candidateId, outcome.submission.id);
 
-  // Mutations only ever target submissionInbox and researchCases — never a canonical/public path.
+  // Mutations only ever target submissionInbox and researchCases never a canonical/public path.
   assert.equal(outcome.mutations.length, 2);
   for (const mutation of outcome.mutations) {
     assert.ok(

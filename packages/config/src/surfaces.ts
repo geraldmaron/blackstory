@@ -1,5 +1,6 @@
+
 /**
- * Typed surface identity and capability matrix for Black Book deployables (ADR-005 / BB-021).
+ * Typed surface identity and capability matrix for Black Book deployables (ADR-005).
  * Fail-closed operation and auth checks mirror infra/gcp/surfaces/surface-matrix.json.
  */
 

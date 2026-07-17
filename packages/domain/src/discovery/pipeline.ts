@@ -1,6 +1,6 @@
 /**
- * Discovery campaign pipeline orchestration (BB-039).
- * Produces private research candidates only — never public entities.
+ * Discovery campaign pipeline orchestration.
+ * Produces private research candidates only never public entities.
  */
 import type { AdapterCandidateRecord } from '../adapters/types.js';
 import {

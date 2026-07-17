@@ -1,30 +1,30 @@
 /**
- * Streamlined corpus-bulk promotion path (BB-094): the "vet once, import bulk" optimization
+ * Streamlined corpus-bulk promotion path: the "vet once, import bulk" optimization
  * documented on `../corpus-vetting.ts`. This module is a promotion-path OPTIMIZATION, not a
- * gate removal — every hard gate from the standard pipeline survives:
+ * gate removal every hard gate from the standard pipeline survives:
  *
- *  - citation completeness (reuses `isCitationStructurallyComplete` from `../citations/citation.js`,
- *    the same structural bar `../citations/completeness-gate.ts` enforces at publish time);
- *  - geo stored at best-documented precision with `precisionBasis: 'source-documented'`
- *    (BB-091 — bulk-loaded records are never default-coarsened, mirroring
- *    `../geography/precision.ts`'s `resolveEntityLocationPrecision` policy note);
- *  - `notabilityBasis` auto-derived from corpus class (BB-090) — corpus membership itself is the
- *    notability criterion, recorded per record via the vetting record's `notabilityCriterion`;
- *  - a mandatory per-batch human spot-check sample (deterministic selection reusing
- *    `selectCanaryRecordIndices` from `../adapters/gates.js`, the same sampling primitive BB-037
- *    canary rollout already uses — no second sampling algorithm invented);
- *  - any failing check, or a record flagged ambiguous by the importer, demotes that record to
- *    the `standard_consensus` lane. Nothing in this module ever marks a record published —
- *    `standard_consensus` records are ordinary quarantine submissions bound for the existing
- *    BB-076 consensus-review lane; `corpus_fast_track` records are still ordinary quarantine
- *    submissions (identical BB-085 pipeline, see `packages/operator-cli/src/bulk-import.ts`),
- *    just annotated with the auto-derived notability/precision facts a downstream reviewer or
- *    the eventual claim-promotion step (`./controls.js`) can use instead of re-deriving them.
+ * - citation completeness (reuses `isCitationStructurallyComplete` from `../citations/citation.js`,
+ * the same structural bar `../citations/completeness-gate.ts` enforces at publish time);
+ * - geo stored at best-documented precision with `precisionBasis: 'source-documented'`
+ * (bulk-loaded records are never default-coarsened, mirroring
+ * `../geography/precision.ts`'s `resolveEntityLocationPrecision` policy note);
+ * - `notabilityBasis` auto-derived from corpus class corpus membership itself is the
+ * notability criterion, recorded per record via the vetting record's `notabilityCriterion`;
+ * - a mandatory per-batch human spot-check sample (deterministic selection reusing
+ * `selectCanaryRecordIndices` from `../adapters/gates.js`, the same sampling primitive 
+ * canary rollout already uses no second sampling algorithm invented);
+ * - any failing check, or a record flagged ambiguous by the importer, demotes that record to
+ * the `standard_consensus` lane. Nothing in this module ever marks a record published 
+ * `standard_consensus` records are ordinary quarantine submissions bound for the existing
+ * consensus-review lane; `corpus_fast_track` records are still ordinary quarantine
+ * submissions (identical pipeline, see `packages/operator-cli/src/bulk-import.ts`),
+ * just annotated with the auto-derived notability/precision facts a downstream reviewer or
+ * the eventual claim-promotion step (`./controls.js`) can use instead of re-deriving them.
  *
  * Deliberately does NOT reuse `evaluatePromotionGate`/`PromotionClaim` from `./model.js` and
  * `./controls.js`: those evaluate independent-lineage corroboration across MULTIPLE sources for
  * one claim, which is the exact cost a vetted corpus is meant to replace with corpus-level
- * authority — forcing bulk corpus records through that machinery would silently require multiple
+ * authority forcing bulk corpus records through that machinery would silently require multiple
  * independent lineages the corpus was vetted specifically so single-lineage records don't need.
  */
 import { isCitationStructurallyComplete, type Citation } from '../citations/citation.js';
@@ -39,8 +39,8 @@ import type { CorpusVettingRecord } from '../corpus-vetting.js';
 
 export type CorpusGeometryType = 'Point' | 'Polygon';
 
-/** One parsed record out of a corpus batch, prior to intake (BB-094 acceptance criterion 2:
- *  per-record provenance is corpusId + batchId + sourceRecordId). */
+/** One parsed record out of a corpus batch, prior to intake (
+ * per-record provenance is corpusId + batchId + sourceRecordId). */
 export type CorpusBulkRecordCandidate = {
   readonly corpusId: string;
   readonly batchId: string;
@@ -48,10 +48,10 @@ export type CorpusBulkRecordCandidate = {
   readonly title: string;
   /** At least one must be structurally complete (citation completeness gate). */
   readonly citations: readonly Pick<Citation, 'sourceName' | 'location' | 'capture' | 'retrievalDate'>[];
-  /** Finest tier this specific record is actually documented at — never coarsened by default. */
+  /** Finest tier this specific record is actually documented at never coarsened by default. */
   readonly documentedGeoPrecisionTier: GeoPrecisionTier;
   readonly geometryType: CorpusGeometryType;
-  /** Set by the importer/parser when a record reads as contested or unclear — always demotes. */
+  /** Set by the importer/parser when a record reads as contested or unclear always demotes. */
   readonly ambiguousFlag?: boolean;
   readonly ambiguousReason?: string;
 };
@@ -71,9 +71,9 @@ export type SpotCheckSample = {
 };
 
 /**
- * Deterministically selects the mandatory per-batch human spot-check sample (BB-094 acceptance
- * criterion 3). Reuses `selectCanaryRecordIndices` (BB-037) rather than a second sampling
- * algorithm — it already guarantees >=1 index for any non-empty input, which is what makes the
+ * Deterministically selects the mandatory per-batch human spot-check sample (acceptance
+ * criterion 3). Reuses `selectCanaryRecordIndices` rather than a second sampling
+ * algorithm it already guarantees >=1 index for any non-empty input, which is what makes the
  * sample "mandatory" rather than "mandatory unless the batch is small."
  */
 export function selectSpotCheckSampleIndices(
@@ -113,9 +113,9 @@ export type CorpusBulkPromotionResult = {
   readonly reasons: readonly CorpusBulkPromotionReason[];
   readonly notabilityBasis: NotabilityBasisRecord;
   readonly geoPrecisionTier: GeoPrecisionTier;
-  /** Always 'source-documented' for bulk-vetted corpus records — BB-091 bans default coarsening
-   *  for this lane; a record needing coarsening (e.g. a living-person redaction rule firing)
-   *  does not belong in a settled-corpus bulk batch and must demote instead. */
+  /** Always 'source-documented' for bulk-vetted corpus records bans default coarsening
+   * for this lane; a record needing coarsening (e.g. a living-person redaction rule firing)
+   * does not belong in a settled-corpus bulk batch and must demote instead. */
   readonly precisionBasis: PrecisionBasis;
   readonly citationComplete: boolean;
   readonly spotCheckSelected: boolean;
@@ -133,8 +133,8 @@ export type EvaluateCorpusBulkPromotionInput = {
 
 /**
  * Evaluates one corpus-vetted candidate record against every hard gate the streamlined path must
- * keep (BB-094 acceptance criterion 3). Never throws — an ineligible record demotes to
- * `standard_consensus` rather than failing the whole batch; the caller (the BB-085 bulk-import
+ * keep. Never throws an ineligible record demotes to
+ * `standard_consensus` rather than failing the whole batch; the caller (the bulk-import
  * pipeline) still runs every record, fast-tracked or not, through the identical quarantine
  * intake call.
  */
@@ -186,7 +186,7 @@ export function evaluateCorpusBulkPromotion(
 }
 
 // ---------------------------------------------------------------------------
-// Per-batch report (BB-094 acceptance criterion 6)
+// Per-batch report 
 // ---------------------------------------------------------------------------
 
 export type CorpusBulkImportRowOutcome = 'accepted' | 'rejected' | 'skipped_duplicate';
@@ -228,9 +228,9 @@ const EMPTY_TIER_COUNTS: Readonly<Record<GeoPrecisionTier, number>> = {
 };
 
 /**
- * Builds the per-batch operator-audit report (BB-094 acceptance criterion 6): counts, precision
- * tiers, spot-check results, rejects. Pure and deterministic — the caller (bulk-import CLI)
- * attaches it to the existing BB-018 audit/outbox mechanism, no new audit sink invented.
+ * Builds the per-batch operator-audit report: counts, precision
+ * tiers, spot-check results, rejects. Pure and deterministic the caller (bulk-import CLI)
+ * attaches it to the existing audit/outbox mechanism, no new audit sink invented.
  */
 export function buildCorpusBulkImportBatchReport(input: {
   readonly corpusId: string;

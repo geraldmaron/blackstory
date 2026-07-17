@@ -1,3 +1,4 @@
+
 /**
  * Component-level styles for Black Book design-system primitives.
  */
@@ -178,10 +179,11 @@
   font-size: 0.8125rem;
 }
 
-/*
- * MapExplorer (BB-070): real geographic map + accessible legend. The canvas
+
+/**
+ * MapExplorer: real geographic map + accessible legend. The canvas
  * is always the dark/desaturated "archive of record" register regardless of
- * the surrounding site theme (see docs/adr/ADR-013-map-stack.md) — it is a
+ * the surrounding site theme (see docs/adr/ADR-013-map-stack.md) it is a
  * fixed editorial choice, not a light/dark theme variant, the same way a
  * printed archival map insert doesn't change color with the page around it.
  */

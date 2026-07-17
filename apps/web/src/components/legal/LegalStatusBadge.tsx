@@ -1,5 +1,5 @@
 /**
- * Law status badge using BB-090 `LawStatus` vocabulary (BB-087 AC8).
+ * Law status badge using `LawStatus` vocabulary.
  */
 import React from 'react';
 import { type LawStatus } from '@black-book/domain';

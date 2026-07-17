@@ -1,3 +1,4 @@
+
 /**
  * PostgreSQL integration tests against a disposable schema.
  * Skips locally when Docker/Postgres is down; fails closed when CI_REQUIRE_POSTGRES=1.

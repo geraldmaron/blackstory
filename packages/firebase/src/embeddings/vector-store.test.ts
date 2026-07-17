@@ -1,9 +1,10 @@
+
 /**
- * Tests for the Firestore vector index store (BB-071).
+ * Tests for the Firestore vector index store.
  *
  * `createInMemoryVectorIndexStore` is exercised directly against Firestore's documented KNN
  * semantics (equality pre-filters, DOT_PRODUCT `distance >= threshold`, sort descending, then
- * limit). `createAdminVectorIndexStore` is exercised via a fake Firestore-shaped collection —
+ * limit). `createAdminVectorIndexStore` is exercised via a fake Firestore-shaped collection
  * this repo's tests don't spin up the Firestore emulator for "unit"-tier files, matching the
  * existing firestore.unit.test.ts convention.
  */

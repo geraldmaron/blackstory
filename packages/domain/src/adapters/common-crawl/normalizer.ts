@@ -1,7 +1,7 @@
 /**
- * Normalize Common Crawl CDX records into BB-037 AdapterCandidateRecord output (BB-075). No
- * storage-rights gate here (unlike ../web-search/normalizer.ts) -- Common Crawl's research/fair-use
- * terms already permit this use per the bead's research; see types.ts's module doc comment.
+ * Normalize Common Crawl CDX records into AdapterCandidateRecord output. No storage-rights
+ * gate here (unlike `../web-search/normalizer.ts`) — Common Crawl's research/fair-use terms
+ * already permit this use; see `types.ts`'s module doc comment.
  */
 import { hashUtf8 } from '../../provenance/hashes.js';
 import { stampCandidateProvenance } from '../candidates.js';

@@ -1,5 +1,6 @@
+
 /**
- * BB-034 security telemetry — event vocabulary, redaction, metrics, anomaly rules, and adapters.
+ * security telemetry event vocabulary, redaction, metrics, anomaly rules, and adapters.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

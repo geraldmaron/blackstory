@@ -1,9 +1,9 @@
 /**
- * Reddit OAuth listing URL builders and defensive JSON parsing (BB-074). Every URL targets
+ * Reddit OAuth listing URL builders and defensive JSON parsing. Every URL targets
  * `oauth.reddit.com` — the unauthenticated `www.reddit.com/*.json` surface returns 403 as of
- * May 2026 (see ../../adapters/reddit/types.ts module doc) — and every request requires a
+ * May 2026 (see ../../adapters/reddit/types.ts module doc) and every request requires a
  * caller-supplied bearer token; this module never reads one from an environment variable or
- * hardcodes one (mirrors ../dpla/fetch-search.ts's DPLA_API_KEY discipline).
+ * hardcodes one (mirrors../dpla/fetch-search.ts's DPLA_API_KEY discipline).
  */
 import { REDDIT_LISTING_MAX_PAGE_SIZE } from './types.js';
 import type { RawRedditPostData, RedditParsedListing, RedditRejectedPost } from './types.js';
@@ -16,7 +16,7 @@ export type BuildRedditListingUrlInput = {
   readonly after?: string;
 };
 
-/** Builds a `/r/<sub>/new` listing URL — chronological, the only ordering this adapter polls. */
+/** Builds a `/r/<sub>/new` listing URL chronological, the only ordering this adapter polls. */
 export function buildRedditNewListingUrl(input: BuildRedditListingUrlInput): string {
   if (!input.subredditName.trim()) {
     throw new Error('subredditName is required to build a Reddit listing URL');
@@ -31,8 +31,8 @@ export function buildRedditNewListingUrl(input: BuildRedditListingUrlInput): str
   return url.toString();
 }
 
-/** Builds an `/api/info` lookup URL for one or more post fullnames (e.g. `t3_abc123`) — used by
- *  the liveness re-check (see ./liveness.ts), not the discovery poll. */
+/** Builds an `/api/info` lookup URL for one or more post fullnames (e.g. `t3_abc123`) used by
+ * the liveness re-check (see ./liveness.ts), not the discovery poll. */
 export function buildRedditInfoUrl(fullnames: readonly string[]): string {
   if (!fullnames.length) {
     throw new Error('At least one fullname is required to build a Reddit /api/info URL');
@@ -81,8 +81,8 @@ function extractPostData(child: unknown, index: number, rejected: RedditRejected
 /**
  * Defensively parses a Reddit `Listing` JSON envelope (shared by `/r/<sub>/new` and
  * `/api/info`) into typed posts. A malformed/unexpected child is recorded in `rejected` rather
- * than thrown — one bad entry never poisons a whole page (mirrors ../dpla/client.ts's tolerance
- * pattern) — but a response that isn't a `Listing` at all throws, since that means the caller
+ * than thrown one bad entry never poisons a whole page (mirrors../dpla/client.ts's tolerance
+ * pattern) but a response that isn't a `Listing` at all throws, since that means the caller
  * built the wrong URL or Reddit changed the envelope shape entirely.
  */
 export function parseRedditListingResponse(raw: unknown): RedditParsedListing {
@@ -102,7 +102,7 @@ export function parseRedditListingResponse(raw: unknown): RedditParsedListing {
 }
 
 /** True when Reddit has marked a post removed (moderator/admin/Reddit) or the author account has
- *  been deleted — the two signals the /new listing and /api/info responses actually expose. */
+ * been deleted the two signals the /new listing and ./api/info responses actually expose. */
 export function isPostRemovedOrDeleted(post: RawRedditPostData): boolean {
   return Boolean(post.removed_by_category) || post.author === '[deleted]';
 }

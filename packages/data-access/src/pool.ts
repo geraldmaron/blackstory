@@ -1,5 +1,5 @@
 /**
- * Bounded connection pool abstraction with fail-closed exhaustion (T-13 / BB-012).
+ * Bounded connection pool abstraction with fail-closed exhaustion (T-13).
  * Does not open real sockets; callers supply a client factory for runtime adapters.
  */
 import { assertServerOnly } from './server-only.js';

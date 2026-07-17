@@ -1,10 +1,10 @@
 /**
- * schema.org `Article` JSON-LD for a `FactRecord` (BB-086 acceptance criterion 6).
+ * schema.org `Article` JSON-LD for a `FactRecord`.
  *
- * Canonical facts are NEVER wrapped in `ClaimReview` — that schema.org type asserts "a review of
+ * Canonical facts are NEVER wrapped in `ClaimReview` that schema.org type asserts "a review of
  * someone else's claim," which misdescribes a first-party canonical assertion and is outside
  * Google's `ClaimReview` eligibility rules for this use. `ClaimReview` is reserved exclusively
- * for the BB-088 myths/pre-bunking surface, a different page type entirely. `assertNeverClaimReview`
+ * for the myths/pre-bunking surface, a different page type entirely. `assertNeverClaimReview`
  * below is a standing structural guard (and the direct subject of `./jsonld.test.ts`'s adversarial
  * case) proving this module can never regress into emitting one.
  *
@@ -81,7 +81,7 @@ export function buildFactArticleJsonLd(
  * Fail-closed structural guard: throws if a JSON-LD document (this module's output, or any
  * document a caller is about to emit for a canonical fact page) declares `@type: "ClaimReview"`
  * anywhere at the top level. Canonical facts must never be described as a review of a claim
- * (BB-086 AC6) — `ClaimReview` belongs only to the BB-088 myths surface.
+ * `ClaimReview` belongs only to the myths surface.
  */
 export function assertNeverClaimReview(jsonLd: Record<string, unknown>): void {
   if (jsonLd['@type'] === 'ClaimReview') {

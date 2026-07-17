@@ -1,10 +1,10 @@
 /**
- * Public "submit a lead" entry point (BB-076). Covers channels with no compliant automated
+ * Public "submit a lead" entry point. Covers channels with no compliant automated
  * API — Facebook Groups, Discord, closed forums, family papers, oral memory — by accepting a
- * human-submitted lead into the BB-029 moderated quarantine queue. Nothing submitted here is
+ * human-submitted lead into the moderated quarantine queue. Nothing submitted here is
  * public. It only ever seeds research after independent-reviewer consensus
- * (`packages/domain/src/consensus-review/`) and the standard BB-044 research pipeline —
- * see `../corrections/page.tsx` for the sibling correction-intake surface and
+ * (`packages/domain/src/consensus-review/`) and the standard research pipeline —
+ * see `../corrections/page.tsx` for the related correction-intake surface and
  * `docs/runbooks/moderator-wellbeing.md` for how the review queue is staffed.
  */
 import { EmptyState, Notice } from '@black-book/ui';

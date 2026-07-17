@@ -1,12 +1,12 @@
 /**
- * Pure embedding-vector math shared by candidate recall and near-duplicate detection (BB-071).
+ * Pure embedding-vector math shared by candidate recall and near-duplicate detection.
  *
  * Deliberately duplicated (in miniature) from @black-book/firebase's embeddings/vector-math.ts
  * rather than imported: @black-book/firebase depends on @black-book/domain (not the reverse),
  * and this package's discovery/research logic must stay Firestore-free so it can run inside
  * research workers without pulling in Admin SDK credentials. Both copies assert the same
  * invariant (finite, unit-normalized, equal length) and will be trivial to reconcile if a
- * future bead extracts a shared math-only package.
+ * future extracts a shared math-only package.
  */
 
 export type EmbeddingVector = readonly number[];
@@ -18,7 +18,7 @@ export class InvalidEmbeddingVectorError extends Error {
   }
 }
 
-/** Raw dot product — for unit-normalized vectors this equals cosine similarity. */
+/** Raw dot product for unit-normalized vectors this equals cosine similarity. */
 export function dotProduct(a: EmbeddingVector, b: EmbeddingVector): number {
   if (a.length !== b.length) {
     throw new InvalidEmbeddingVectorError(
@@ -40,7 +40,7 @@ function magnitude(vector: EmbeddingVector): number {
   return Math.sqrt(sumSquares);
 }
 
-/** General cosine similarity — normalizes internally, so callers need not pre-normalize. */
+/** General cosine similarity normalizes internally, so callers need not pre-normalize. */
 export function cosineSimilarity(a: EmbeddingVector, b: EmbeddingVector): number {
   const magA = magnitude(a);
   const magB = magnitude(b);

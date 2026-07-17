@@ -1,9 +1,7 @@
 /**
- * Deterministic "Try searching for" suggestion (BB-083 acceptance criterion 4 / owner brief
- * 2026-07-17): built entirely from fields already stored on a citation (source title, author,
- * named entities) — NO LLM call, no network call, no randomness. This function is synchronous
- * and pure: same input always produces the same output, and there is nothing in its signature
- * or implementation capable of making a model or network round trip.
+ * Deterministic "Try searching for" suggestion built entirely from fields already stored on a
+ * citation (source title, author, named entities) — no LLM call, no network call, no randomness.
+ * This function is synchronous and pure: same input always produces the same output.
  */
 import type { Citation } from './citation.js';
 
@@ -23,7 +21,7 @@ function clean(value: string | undefined): string | undefined {
  * Builds a search-query string like `Rosewood massacre grand jury report 1923 Florida` from a
  * citation's stored title/author/named-entities. Falls back to the source name when no title is
  * stored. Returns an empty-subject fallback phrase when a citation has none of these fields
- * populated, rather than throwing — degraded citations should never crash the reader UI.
+ * populated, rather than throwing degraded citations should never crash the reader UI.
  */
 export function buildTrySearchingForSubject(citation: TrySearchingForCitationInput): string {
   const parts: string[] = [];

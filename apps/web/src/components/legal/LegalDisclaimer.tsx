@@ -1,5 +1,5 @@
 /**
- * Standing not-legal-advice disclaimer for every BB-087 legal explainer surface (AC6).
+ * Standing not-legal-advice disclaimer for every legal explainer surface.
  */
 import React from 'react';
 import { Notice } from '@black-book/ui';

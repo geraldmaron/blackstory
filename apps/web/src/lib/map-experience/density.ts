@@ -1,6 +1,6 @@
 /**
- * Presence/coverage classification for the national density layer (BB-051 "presence, not just
- * incidents" — the Native Land model). Pure display-tier bucketing over BB-070's state aggregate
+ * Presence/coverage classification for the national density layer ("presence, not just
+ * incidents" the Native Land model). Pure display-tier bucketing over state aggregate
  * counts; never a crime/incident heatmap (see `dignity-style.ts` for the color-only half of the
  * dignity rule this layer must hold to).
  */

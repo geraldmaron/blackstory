@@ -1,5 +1,5 @@
 /**
- * Wikimedia discovery adapter public surface (BB-045).
+ * Wikimedia discovery adapter public surface.
  */
 export {
   DEFAULT_WIKIMEDIA_CATEGORY_GRAPH,

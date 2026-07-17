@@ -1,0 +1,48 @@
+/**
+ * Learning-index topic / era / notability chips linking into search and explore filters.
+ */
+import React from 'react';
+import type { PublicEntityView } from '../../data/public-seed';
+
+void React;
+
+export type EntityTopicTagsProps = {
+  readonly entity: PublicEntityView;
+};
+
+function chipHref(kind: 'theme' | 'era', value: string): string {
+  if (kind === 'theme') {
+    return `/search?topic=${encodeURIComponent(value)}`;
+  }
+  return `/explore?era=${encodeURIComponent(value)}`;
+}
+
+export function EntityTopicTags({ entity }: EntityTopicTagsProps) {
+  const themes = entity.topicTags ?? [];
+  const eras = entity.eraBuckets ?? [];
+  const notability = entity.notabilityLabels ?? [];
+
+  if (themes.length === 0 && eras.length === 0 && notability.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="bb-entity-tags" role="group" aria-label="Topics and eras">
+      {themes.map((tag) => (
+        <a key={`theme-${tag}`} className="bb-entity-tag" href={chipHref('theme', tag)}>
+          {tag}
+        </a>
+      ))}
+      {eras.map((era) => (
+        <a key={`era-${era}`} className="bb-entity-tag bb-entity-tag--era" href={chipHref('era', era)}>
+          {era}
+        </a>
+      ))}
+      {notability.slice(0, 2).map((label) => (
+        <span key={`note-${label.slice(0, 24)}`} className="bb-entity-tag bb-entity-tag--note">
+          {label.length > 72 ? `${label.slice(0, 69)}…` : label}
+        </span>
+      ))}
+    </div>
+  );
+}

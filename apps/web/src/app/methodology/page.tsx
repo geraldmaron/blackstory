@@ -1,5 +1,5 @@
 /**
- * Methodology and transparency page (BB-088) — full editorial trust surface with JSON-LD.
+ * Methodology and transparency page full editorial trust surface with JSON-LD.
  */
 import {
   PublishingPrinciplesJsonLdScript,

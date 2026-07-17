@@ -1,5 +1,5 @@
 /**
- * Branded identifiers for claims, versions, and claim–evidence links (BB-017).
+ * Branded identifiers for claims, versions, and claim–evidence links.
  */
 
 export type ClaimId = string & { readonly __brand: 'ClaimId' };

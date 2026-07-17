@@ -1,5 +1,5 @@
 /**
- * Tests for BB-092 acceptance criterion 3 (per-entity bounded adjacency) and acceptance
+ * Tests for (per-entity bounded adjacency) and acceptance
  * criterion 5 (public related-entry projection: {id, type, direction, timespan}).
  */
 import assert from 'node:assert/strict';

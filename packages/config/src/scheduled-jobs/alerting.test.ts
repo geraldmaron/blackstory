@@ -1,6 +1,7 @@
+
 /**
- * BB-084 acceptance: a job that exceeds its budget triggers an operator alert, and N consecutive
- * missed runs (silence) trigger an operator alert — both delivered through BB-034's existing
+ * A job that exceeds its budget triggers an operator alert, and N consecutive
+ * missed runs (silence) trigger an operator alert both delivered through existing
  * alert-policy pattern (packages/observability), not a new alert channel.
  */
 import assert from 'node:assert/strict';
@@ -43,7 +44,7 @@ test('N consecutive missed runs (silence, no failure record needed) raises a BB-
     correlationId: 'job-run-missed-check-1',
   });
   assert.ok(alert);
-  // Reuses the real, already-shipped BB-034 policy verbatim — not a new alert channel.
+  // Reuses the real, already-shipped policy verbatim not a new alert channel.
   const policy = DEFAULT_ALERT_POLICIES.find((p) => p.id === 'SEC-SRC-01');
   assert.ok(policy);
   assert.equal(alert.policyId, 'SEC-SRC-01');

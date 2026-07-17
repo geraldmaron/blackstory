@@ -1,6 +1,7 @@
+
 /**
- * BB-084: proves the gold-corpus-regression job body is REAL — it calls @black-book/testing's
- * evaluateCorpus (the same BB-047 evaluator the gold-corpus CLI runs) rather than reimplementing
+ * Proves the gold-corpus-regression job body is REAL it calls @black-book/testing's
+ * evaluateCorpus (the same evaluator the gold-corpus CLI runs) rather than reimplementing
  * evaluation, and that a failing evaluation still just reports (no publish side effect).
  */
 import assert from 'node:assert/strict';
@@ -92,7 +93,7 @@ test('a failing prediction set completes the job as quarantined and reports fail
   assert.equal(result.evaluation.passed, false);
   assert.equal(result.run.status, 'quarantined');
   assert.ok(result.run.issues && result.run.issues.length > 0);
-  // The job wrapper's result type has no publish/write side-channel at all — it only returns a
+  // The job wrapper's result type has no publish/write side-channel at all it only returns a
   // report. There is nothing here for a scheduled dispatcher to call that could publish.
   assert.deepEqual(Object.keys(result).sort(), ['evaluation', 'run']);
 });

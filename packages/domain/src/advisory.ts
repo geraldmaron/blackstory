@@ -1,28 +1,28 @@
 /**
- * Present-day advisory record model for place-kind entities (BB-095).
+ * Present-day advisory record model for place-kind entities.
  *
- * An advisory answers "is this place currently visitable" — a DIFFERENT question than the
- * entity's historic significance (BB-090 notabilityBasis/statusHistory) or its documented
- * historical condition (BB-082's sundown-town / redlining-grade layer records). Advisories are
+ * An advisory answers "is this place currently visitable" a DIFFERENT question than the
+ * entity's historic significance or its documented
+ * historical condition (sundown-town redlining-grade layer records). Advisories are
  * CLAIMS: every record requires >=1 `sourcedClaimIds` entry, a dated `asOf`, and a `reviewCadence`
- * — never an unsourced editorial label. See docs/security/entity-sensitivity-lanes.md for how
- * this lane relates to BB-090 sensitivity and BB-082 place-condition designations.
+ * never an unsourced editorial label. See docs/security/entity-sensitivity-lanes.md for how
+ * this lane relates to sensitivity and place-condition designations.
  *
  * PRESENTATION-ONLY BY CONSTRUCTION AND BY TEST. This module deliberately exposes no function
  * that feeds an `AdvisoryClass` or `PlaceAdvisoryRecord` field into any scoring/composite
- * pipeline — there is no `advisoryToFeatureValue`-shaped export here, on purpose. `advisory.test.ts`
+ * pipeline there is no `advisoryToFeatureValue`-shaped export here, on purpose. `advisory.test.ts`
  * extends the standing "crime stats never enter the composite" discipline (the same discipline
- * BB-082's modern-context layer will follow when it lands): it exercises the REAL relevance
+ * modern-context layer will follow when it lands): it exercises the REAL relevance
  * (`packages/domain/src/relevance`) and confidence (`packages/domain/src/claims`) composite
  * outputs and proves, both by a compile-time key-overlap check and by a runtime structural scan
  * (`assertAdvisoryAbsentFromScoringInput`), that no advisory field ever appears in them.
  *
  * COPY DISCIPLINE (dignity rules): "dangerous today" must never appear as copy, a badge, or a
- * classification label. Advisory statements are dated, cited, procedural sentences only — see
+ * classification label. Advisory statements are dated, cited, procedural sentences only see
  * `buildAdvisoryStatement` and `assertProceduralAdvisoryLanguage`. No red/danger iconography is
  * defined or implied here; presentation components (apps/web/src/components/AdvisoryNotice.tsx)
  * render advisories through the same muted `Notice` treatment used for seed-data/offline notices
- * — never a distinct "danger" tone.
+ * never a distinct "danger" tone.
  */
 import type { DatePrecision } from './era.js';
 import type { EntityId } from './ids.js';
@@ -48,7 +48,7 @@ export function isAdvisoryClass(value: string): value is AdvisoryClass {
 }
 
 /**
- * Procedural, dated-statement-ready labels — conduct/fact framing, never a danger label. Kept in
+ * Procedural, dated-statement-ready labels conduct/fact framing, never a danger label. Kept in
  * this module (not a UI package) so both apps/web and any future editorial tooling render
  * identical wording.
  */
@@ -61,13 +61,13 @@ export const ADVISORY_CLASS_LABELS: Readonly<Record<AdvisoryClass, string>> = {
 };
 
 // ---------------------------------------------------------------------------
-// Advisory record — a sourced, dated CLAIM on a place-kind entity
+// Advisory record a sourced, dated CLAIM on a place-kind entity
 // ---------------------------------------------------------------------------
 
 /**
  * Recommended (non-exhaustive) cadence vocabulary for `reviewCadence`. The field is a free-form
- * string, not an enum — different sources warrant different cadences (an NAACP travel advisory
- * might review quarterly, a property-record lookup annually) — these are documentation, not a
+ * string, not an enum different sources warrant different cadences (an NAACP travel advisory
+ * might review quarterly, a property-record lookup annually) these are documentation, not a
  * closed set.
  */
 export const SUGGESTED_ADVISORY_REVIEW_CADENCES = [
@@ -79,18 +79,18 @@ export const SUGGESTED_ADVISORY_REVIEW_CADENCES = [
 export type PlaceAdvisoryRecord = {
   readonly id: string;
   /** The place-kind entity this advisory is attached to. Never merged into CanonicalEntity
-   * fields owned by BB-090 — advisories are their own record type, referenced by id. */
+   * fields owned by advisories are their own record type, referenced by id. */
   readonly placeEntityId: EntityId;
   readonly advisoryClass: AdvisoryClass;
-  /** >=1 required — advisories are sourced claims (property records, a dated NAACP-style travel
+  /** >=1 required advisories are sourced claims (property records, a dated NAACP-style travel
    * advisory, news of demolition), never unsourced editorial labels. */
   readonly sourcedClaimIds: readonly string[];
-  /** The date the underlying claim(s) were true/observed as of — required, never omitted. */
+  /** The date the underlying claim(s) were true/observed as of required, never omitted. */
   readonly asOf: string;
   readonly datePrecision: DatePrecision;
   /** When this advisory is next due for review (free-form; see SUGGESTED_ADVISORY_REVIEW_CADENCES). */
   readonly reviewCadence: string;
-  /** Optional short human context beyond the class label — still procedural, never danger framing. */
+  /** Optional short human context beyond the class label still procedural, never danger framing. */
   readonly note?: string;
 };
 
@@ -98,7 +98,7 @@ export class AdvisoryValidationError extends Error {}
 
 /**
  * Fails closed: every advisory must carry a recognized class, >=1 sourced claim, a non-blank
- * asOf date, and a non-blank reviewCadence. Citations required on every advisory (BB-095 AC1).
+ * asOf date, and a non-blank reviewCadence. Citations required on every advisory.
  */
 export function assertAdvisoryRecordValid(
   record: Pick<PlaceAdvisoryRecord, 'advisoryClass' | 'sourcedClaimIds' | 'asOf' | 'reviewCadence'>,
@@ -121,7 +121,7 @@ export function assertAdvisoryRecordValid(
 }
 
 // ---------------------------------------------------------------------------
-// Procedural copy — dated, cited, no danger framing
+// Procedural copy dated, cited, no danger framing
 // ---------------------------------------------------------------------------
 
 /**
@@ -153,7 +153,7 @@ export function assertProceduralAdvisoryLanguage(text: string): void {
 }
 
 /**
- * Builds the single dated, cited, procedural sentence every advisory renders as — the only
+ * Builds the single dated, cited, procedural sentence every advisory renders as the only
  * approved shape for advisory copy ("Private property as of 2024-03-01, per County Assessor's
  * Office parcel record."). `sourceLabel` is a short human-readable citation label resolved
  * upstream from the advisory's `sourcedClaimIds` (citation formatting itself belongs to the
@@ -172,7 +172,7 @@ export function buildAdvisoryStatement(
 }
 
 // ---------------------------------------------------------------------------
-// Scoring-exclusion guard — the crime-stats discipline, extended to advisories
+// Scoring-exclusion guard the crime-stats discipline, extended to advisories
 // ---------------------------------------------------------------------------
 
 /**
@@ -218,10 +218,10 @@ export function assertAdvisoryAbsentFromScoringInput(value: unknown, path = '$')
 }
 
 // ---------------------------------------------------------------------------
-// Compile-time proof — enforced by `pnpm --filter @black-book/domain typecheck`, not only by the
+// Compile-time proof enforced by `pnpm --filter @black-book/domain typecheck`, not only by the
 // runtime scan above. If a future edit to relevance/types.ts or claims/confidence.ts ever
 // introduces a field name colliding with PlaceAdvisoryRecord's own field names, the object literal
-// below stops satisfying its type and `tsc --noEmit` fails the build — the "never enters scoring"
+// below stops satisfying its type and `tsc --noEmit` fails the build the "never enters scoring"
 // guarantee holds by construction, not only by whichever runtime tests happen to be run.
 // ---------------------------------------------------------------------------
 type NoKeyOverlap<A, B> = Extract<keyof A, keyof B> extends never ? true : false;

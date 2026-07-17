@@ -1,6 +1,6 @@
 /**
  * Corrections and contribution intake API entrypoint (Cloud Run target).
- * Quarantine-write-only posture enforced via surface capabilities (BB-021).
+ * Quarantine-write-only posture enforced via surface capabilities.
  */
 import { buildSurfaceHealth, parseNodeEnv } from '@black-book/config';
 import { SURFACE_ID } from './posture.js';

@@ -1,7 +1,8 @@
+
 /**
- * Representative HTML fixtures for BB-057 core public journeys.
+ * Representative HTML fixtures for core public journeys.
  * Strings mirror the server-rendered structure of search, explore, entity, locate,
- * corrections, and degraded-mode shells — not live fetches.
+ * corrections, and degraded-mode shells not live fetches.
  */
 
 export type CoreJourneyId =
@@ -18,7 +19,7 @@ export type CoreJourneyFixture = {
   readonly html: string;
 };
 
-/** Minimal accessible search results page shell (BB-049). */
+/** Minimal accessible search results page shell. */
 const SEARCH_FIXTURE = `
   <main id="main">
     <header>
@@ -45,7 +46,7 @@ const SEARCH_FIXTURE = `
   </main>
 `;
 
-/** Explore page with accessible list peer beside map region (BB-051). */
+/** Explore page with accessible list peer beside map region. */
 const EXPLORE_FIXTURE = `
   <main id="main">
     <header>
@@ -76,7 +77,7 @@ const EXPLORE_FIXTURE = `
   </main>
 `;
 
-/** Entity detail shell with section landmarks (BB-052). */
+/** Entity detail shell with section landmarks. */
 const ENTITY_FIXTURE = `
   <main id="main">
     <header>
@@ -95,7 +96,7 @@ const ENTITY_FIXTURE = `
   </main>
 `;
 
-/** Locate page with privacy notice and no-JS fallback (BB-050). */
+/** Locate page with privacy notice and no-JS fallback. */
 const LOCATE_FIXTURE = `
   <main id="main">
     <header>
@@ -117,7 +118,7 @@ const LOCATE_FIXTURE = `
   </main>
 `;
 
-/** Corrections intake shell (BB-055). */
+/** Corrections intake shell. */
 const CORRECTIONS_FIXTURE = `
   <main id="main">
     <p>Trust</p>
@@ -135,7 +136,7 @@ const CORRECTIONS_FIXTURE = `
   </main>
 `;
 
-/** Root shell degraded banner paired with stable main content (BB-022). */
+/** Root shell degraded banner paired with stable main content. */
 const DEGRADED_SHELL_FIXTURE = `
   <a class="bb-skip-link" href="#main">Skip to main content</a>
   <div role="status">

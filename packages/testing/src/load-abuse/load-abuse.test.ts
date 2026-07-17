@@ -1,6 +1,7 @@
+
 /**
- * BB-059 acceptance tests: load, abuse, and cost simulations against security guardrails.
- * No live network attacks — fixtures import @black-book/security evaluators directly.
+ * acceptance tests: load, abuse, and cost simulations against security guardrails.
+ * No live network attacks fixtures import @black-book/security evaluators directly.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';

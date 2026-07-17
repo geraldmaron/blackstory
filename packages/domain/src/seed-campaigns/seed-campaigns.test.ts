@@ -1,6 +1,6 @@
 /**
- * BB-058 national seed campaign validators — calls real BB-090 notability, BB-083 citation,
- * and BB-094 corpus promotion gates; aligns with BB-047 gold-corpus included_school patterns.
+ * national seed campaign validators calls real notability, citation,
+ * and corpus promotion gates; aligns with gold-corpus included_school patterns.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -1,6 +1,7 @@
+
 /**
- * Deterministic cost-per-abusive-request estimates for BB-059.
- * Uses policy metadata from BB-025/026/033 — not live billing data.
+ * Deterministic cost-per-abusive-request estimates.
+ * Uses policy metadata from /026/033 not live billing data.
  */
 import {
   DEFAULT_DAILY_BUDGETS,
@@ -56,7 +57,7 @@ function expensiveReadCost(endpointClass: 'search' | 'geocoding' | 'nearbyDiscov
   return base + (policy.costTier === 'expensive_read' ? 15 : 0);
 }
 
-/** Returns documented cost estimates for each BB-059 scenario. */
+/** Returns documented cost estimates for each scenario. */
 export function estimateScenarioCosts(): readonly CostEstimate[] {
   const geocoderDaily = DEFAULT_DAILY_BUDGETS.geocoder.dailyCap;
   const searchCost = expensiveReadCost('search');

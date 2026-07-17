@@ -1,9 +1,9 @@
 /**
- * 50-states-+-D.C. product scope gate for geocode results (BB-050 acceptance criterion 1;
+ * 50-states-+-D.C. product scope gate for geocode results (;
  * ADR-008 "Product scope for address discovery is U.S.-oriented (50 states + D.C.)").
  *
- * Scope membership is derived from the SAME `US_STATES` table BB-070/BB-091 already treat as
- * the single source of truth (`../map/us-geography.ts`) — never a second, hand-typed FIPS list.
+ * Scope membership is derived from the SAME `US_STATES` table already treat as
+ * the single source of truth (`../map/us-geography.ts`) never a second, hand-typed FIPS list.
  * A Census Geocoder match for a U.S. territory (Puerto Rico `72`, Guam `66`, U.S. Virgin Islands
  * `78`, American Samoa `60`, Northern Mariana Islands `69`) has a real state-equivalent FIPS
  * code but is out of this product's scope; `evaluateGeocodeProductScope` reports that rather

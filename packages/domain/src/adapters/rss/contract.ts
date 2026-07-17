@@ -1,6 +1,6 @@
 /**
- * RSS/Atom adapter contract defaults aligned with BB-037 SourceAdapterContract (BB-073).
- * Starts disabled by default — same isolation as BB-045/046 — and requires an approved policy
+ * RSS/Atom adapter contract defaults aligned with SourceAdapterContract.
+ * Starts disabled by default same isolation as /046 and requires an approved policy
  * before `assertAdapterMayRun` (../gates.ts) will let it run.
  */
 import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from '../candidates.js';

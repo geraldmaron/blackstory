@@ -1,5 +1,5 @@
 /**
- * Deterministic fixture citations for the citation-health dashboard tile (BB-083), matching the
+ * Deterministic fixture citations for the citation-health dashboard tile, matching the
  * `/console` shell's convention: fixture data, no live mutation handlers. Real telemetry would
  * come from the citation store the `citation-link-health-sweep` scheduled job
  * (packages/config/src/scheduled-jobs/jobs/citation-link-health-sweep.ts) writes to; nothing here

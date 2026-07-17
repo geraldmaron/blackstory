@@ -1,5 +1,5 @@
 /**
- * Contradiction preservation for credible alternate claim values (BB-017).
+ * Contradiction preservation for credible alternate claim values.
  * Contradictory credible values are retained rather than silently resolved.
  */
 import type { PreservedClaimValue } from './claim.js';

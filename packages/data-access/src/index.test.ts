@@ -1,5 +1,5 @@
 /**
- * Unit tests for role matrix, config guards, and pool exhaustion (BB-012).
+ * Unit tests for role matrix, config guards, and pool exhaustion.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

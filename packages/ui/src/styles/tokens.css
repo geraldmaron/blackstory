@@ -1,8 +1,9 @@
+
 /**
  * CSS custom properties for Black Book themes, focus, motion, and layout tokens.
  * Import via `@black-book/ui/styles.css` in consuming apps.
- * Palette: white / Black Ink primaries with Copper Pin / Page Sand accents.
- * Mirrors packages/ui/src/tokens/colors.ts — keep the two in sync.
+ * Palette: white Black Ink primaries with Copper Pin Page Sand accents.
+ * Mirrors packages/ui/src/tokens/colors.ts keep the two in sync.
  */
 
 :root,

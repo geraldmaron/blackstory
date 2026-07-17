@@ -1,5 +1,5 @@
 /**
- * LegiScan free-tier adapter definition for BB-087 state law monitoring (fixtures-only in tests).
+ * LegiScan free-tier adapter definition for state law monitoring (fixtures-only in tests).
  */
 import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from '../../candidates.js';
 import type { SourceAdapterContract } from '../../types.js';

@@ -1,10 +1,10 @@
+
 /**
- * Firestore-backed (and in-memory, for tests/dev) storage for entity embeddings (BB-071).
+ * Firestore-backed (and in-memory, for tests/dev) storage for entity embeddings.
  *
  * Vectors live in a sibling collection (`entityEmbeddings`, one document per canonical entity),
- * not on the existing `publicEntityProjectionSchema` document — that schema lives in
- * ../firestore/types.ts, which this bead's file ownership does not permit editing beyond
- * additive barrel exports. A sibling collection also avoids re-embedding on every immutable
+ * not on the existing `publicEntityProjectionSchema` document in ../firestore/types.ts.
+ * A sibling collection also avoids re-embedding on every immutable
  * release: an entity's vector reflects its latest canonical text and is recomputed only when
  * that text changes (see pipeline.ts's sourceTextHash), independent of how many releases get
  * cut. `queryNearestEntities` callers are expected to cross-check matches against the currently
@@ -37,10 +37,11 @@ export type EntityEmbeddingDoc = {
   readonly updatedAt: string;
 };
 
+
 /**
  * Query-side `kind` is a plain string (not the narrow EntityKindDoc enum): it originates from
- * an HTTP query parameter, and the existing BB-026 text-search `kind` filter (search-guardrails.ts)
- * is equally untyped at that boundary — this stays consistent with that precedent rather than
+ * an HTTP query parameter, and the existing text-search `kind` filter (search-guardrails.ts)
+ * is equally untyped at that boundary this stays consistent with that precedent rather than
  * adding enum validation the base search guardrail doesn't itself apply.
  */
 export type VectorQueryInput = {
@@ -48,7 +49,7 @@ export type VectorQueryInput = {
   readonly kind?: string;
   readonly state?: string;
   readonly eraBucket?: string;
-  /** Neighbor count — callers (apps/api-public) must clamp this below the platform ceiling. */
+  /** Neighbor count callers (apps/api-public) must clamp this below the platform ceiling. */
   readonly limit: number;
   /** DOT_PRODUCT threshold: Firestore keeps matches where distance >= threshold (higher = closer). */
   readonly distanceThreshold?: number;
@@ -81,9 +82,10 @@ function clampLimit(limit: number): number {
   return Math.min(limit, PLATFORM_MAX_NEIGHBORS);
 }
 
+
 /**
  * Real Admin SDK-backed implementation. Uses `firestore.collection(...).where(...).findNearest(...)`
- * — the exact shape documented for the Node Admin SDK's native KNN support.
+ * the exact shape documented for the Node Admin SDK's native KNN support.
  */
 export function createAdminVectorIndexStore(firestore: Firestore): VectorIndexStore {
   const collection = firestore.collection(ENTITY_EMBEDDINGS_COLLECTION);
@@ -145,9 +147,10 @@ export function createAdminVectorIndexStore(firestore: Firestore): VectorIndexSt
   };
 }
 
+
 /**
  * In-memory implementation replicating Firestore's KNN semantics exactly (equality pre-filters,
- * DOT_PRODUCT `distance >= threshold` — note the direction is inverted vs COSINE/EUCLIDEAN,
+ * DOT_PRODUCT `distance >= threshold` note the direction is inverted vs COSINE/EUCLIDEAN,
  * sort descending by distance, then limit). Useful for tests and for local dev without an
  * emulator; also gives the gold-corpus retrieval eval and near-duplicate tests a fast, dependency-free
  * substrate that behaves like the real thing.

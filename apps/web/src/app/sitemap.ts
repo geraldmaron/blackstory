@@ -1,5 +1,5 @@
 /**
- * BB-057 sitemap route — derives URLs from the bundled release snapshot until BB-019
+ * sitemap route derives URLs from the bundled release snapshot until 
  * projection fetchers supply live active-release catalogs in production.
  */
 import type { MetadataRoute } from 'next';

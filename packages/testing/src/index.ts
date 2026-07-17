@@ -1,6 +1,7 @@
+
 /**
  * Shared test builders, guards, harnesses, and deterministic helpers for Black Book.
- * Expanded under BB-008 for multi-layer automated quality foundations.
+ * Expanded under for multi-layer automated quality foundations.
  */
 export const TESTING_PACKAGE = '@black-book/testing' as const;
 

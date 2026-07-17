@@ -1,5 +1,5 @@
 /**
- * Validates BB-034 security alert and dashboard design stubs.
+ * Validates security alert and dashboard design stubs.
  */
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';

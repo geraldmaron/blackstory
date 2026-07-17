@@ -1,5 +1,5 @@
 /**
- * Methodology-page definitions for BB-088 — reuses BB-090 notability rubric and BB-086 fact status
+ * Methodology-page definitions for reuses notability rubric and fact status
  * lifecycle vocabulary as the single source of truth for the public definitions section.
  */
 import { FACT_STATUSES, type FactStatus } from '../facts/status.js';
@@ -10,7 +10,7 @@ import {
   type EntityStatusValue,
 } from '../entity-status.js';
 
-/** Workflow-rank definitions for canonical fact records (BB-086). */
+/** Workflow-rank definitions for canonical fact records. */
 export const FACT_STATUS_LIFECYCLE_DEFINITIONS: Readonly<Record<FactStatus, string>> = {
   draft:
     'Pre-publication work in progress. Draft facts never appear in the public projection or search index.',
@@ -26,7 +26,7 @@ export const FACT_STATUS_LIFECYCLE_DEFINITIONS: Readonly<Record<FactStatus, stri
     'Withdrawn from active use while remaining resolvable. A plain-language reason is always shown.',
 };
 
-/** Entity-level status vocabulary summaries for place-like, law, and movement kinds (BB-090). */
+/** Entity-level status vocabulary summaries for place-like, law, and movement kinds. */
 export const ENTITY_STATUS_VOCABULARY: Readonly<
   Record<'place_like' | 'law' | 'movement', readonly { readonly value: EntityStatusValue; readonly definition: string }[]>
 > = {

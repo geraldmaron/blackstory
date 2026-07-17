@@ -1,5 +1,5 @@
 /**
- * National Archives (NARA) catalog adapter definition (BB-046).
+ * National Archives (NARA) catalog adapter definition.
  */
 import {
   buildFederalAdapterDefinition,

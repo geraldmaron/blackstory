@@ -1,6 +1,6 @@
 /**
- * Integration tests for BB-049 `runPublicSearch`: the full filter -> facet -> rank -> paginate ->
- * explain pipeline (AC1/AC4), plus AC3 (sparse records stay discoverable — ranking orders, it
+ * Integration tests for `runPublicSearch`: the full filter -> facet -> rank -> paginate ->
+ * explain pipeline, plus (sparse records stay discoverable ranking orders, it
  * never filters low-richness records out).
  */
 import assert from 'node:assert/strict';

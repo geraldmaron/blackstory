@@ -1,8 +1,8 @@
 /**
- * Reciprocal rank fusion (RRF) for hybrid search (BB-072).
+ * Reciprocal rank fusion (RRF) for hybrid search.
  *
  * Merges multiple deterministic ranked lanes into one id-ordered list without a learned ranker.
- * RRF scores are internal ordering keys only — they are never surfaced in public payloads.
+ * RRF scores are internal ordering keys only they are never surfaced in public payloads.
  */
 export type RrfRankedItem = {
   readonly id: string;
@@ -10,7 +10,7 @@ export type RrfRankedItem = {
 
 export type RrfLaneContribution = {
   readonly laneId: string;
-  /** Per-lane weight; changes require re-running the BB-047 hybrid eval (see fusion.ts). */
+  /** Per-lane weight; changes require re-running the hybrid eval (see fusion.ts). */
   readonly weight: number;
   readonly items: readonly RrfRankedItem[];
 };
@@ -24,7 +24,7 @@ export const DEFAULT_RRF_K = 60;
 
 export type RrfFusedEntry = {
   readonly id: string;
-  /** Internal fusion score — never exposed publicly. */
+  /** Internal fusion score never exposed publicly. */
   readonly fusionScore: number;
 };
 

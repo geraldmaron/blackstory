@@ -1,5 +1,5 @@
 /**
- * Source adapter contract validation (BB-037).
+ * Source adapter contract validation.
  */
 import { assertEvidenceSourceValid } from '../provenance/source.js';
 import type { GeographicCoverage, RateLimitPolicy, SourceAdapterContract, VolumeExpectation } from './types.js';

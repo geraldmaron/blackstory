@@ -1,14 +1,14 @@
 /**
- * `FactRecord.status` workflow-rank axis (BB-086 acceptance criterion 1).
+ * `FactRecord.status` workflow-rank axis.
  *
- * Deliberately independent from `./confidence.ts`'s evidence-grade axis — never conflate the
+ * Deliberately independent from `./confidence.ts`'s evidence-grade axis never conflate the
  * two. A `contested` (low-confidence) fact can still be `published` (workflow-ready, with the
- * contest disclosed via `confidenceNote` and `counterClaims[]`); a high-confidence fact can sit
+ * contest disclosed via `confidenceNote` and `counterClaims`); a high-confidence fact can sit
  * in `draft` simply because it has not cleared editorial review yet. `assertStatusConfidenceAxesIndependent`
  * below is a structural guard against a caller trying to derive one axis from the other.
  *
  * `deprecated`/`superseded` records must stay resolvable at their permalink with a banner and
- * reason — never 404 (the Wikipedia-style "this page has been superseded" pattern, not a
+ * reason never 404 (the Wikipedia-style "this page has been superseded" pattern, not a
  * dead link). `draft`/`under_review` are pre-publication: they are never part of the public
  * projection at all, so there is no public permalink to keep alive for them in the first place.
  */
@@ -39,7 +39,7 @@ export function isPublishableFactStatus(value: FactStatus): value is Publishable
 /**
  * Statuses whose permalink must keep resolving to real content (never 404), because the record
  * has at some point been public. `superseded`/`deprecated` render with a banner + reason
- * (BB-086 acceptance criterion 1) instead of disappearing.
+ * instead of disappearing.
  */
 export const PUBLICLY_RESOLVABLE_FACT_STATUSES = PUBLISHABLE_FACT_STATUSES;
 
@@ -48,7 +48,7 @@ export function isPubliclyResolvableFactStatus(status: FactStatus): boolean {
 }
 
 /**
- * Statuses eligible for the BB-049 searchable library (AC5: "searchable fact library over
+ * Statuses eligible for the searchable library ("searchable fact library over
  * PUBLISHED facts"). `corrected` counts as published-with-a-correction-note, not a retirement;
  * `superseded`/`deprecated` remain individually resolvable via direct permalink but drop out of
  * the browsable/searchable library surface.
@@ -69,7 +69,7 @@ export function assertFactStatusNeverResolvesTo404(status: FactStatus): void {
 }
 
 /**
- * A human-facing banner reason for `superseded`/`deprecated` records — never silently omitted.
+ * A human-facing banner reason for `superseded`/`deprecated` records never silently omitted.
  * `supersededByFactId` is required for `superseded` (a superseded fact always points at its
  * replacement); `deprecated` may or may not have one (a fact can be deprecated outright, with no
  * successor, e.g. found to rest on a fabricated source).

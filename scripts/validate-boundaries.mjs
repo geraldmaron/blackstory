@@ -1,3 +1,4 @@
+
 /**
  * Validates workspace dependency direction, deployable isolation, and dependency cycles.
  */
@@ -167,7 +168,7 @@ async function main() {
       }
     }
 
-    // Public web must never depend on server DB helpers (BB-012 / ADR-003).
+    // Public web must never depend on server DB helpers.
     if (workspace.name === '@black-book/web' && dependencies.has('@black-book/data-access')) {
       errors.push(
         '@black-book/web cannot depend on @black-book/data-access (no browser DB credentials)',

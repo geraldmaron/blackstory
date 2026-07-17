@@ -1,5 +1,5 @@
 /**
- * Web application security controls for the public surface (BB-028):
+ * Web application security controls for the public surface:
  * CSP, Trusted Types stubs, cookies, CSRF, sanitization, clickjacking/MIME headers,
  * referrer/permissions policy, safe redirects, request limits, content-disposition.
  */

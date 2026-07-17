@@ -1,5 +1,5 @@
 /**
- * Tests for BB-087 legal snapshot types and validation gates.
+ * Tests for legal snapshot types and validation gates.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

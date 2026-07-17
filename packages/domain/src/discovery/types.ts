@@ -1,6 +1,6 @@
 /**
- * Discovery pipeline types: candidates, campaigns, budgets, and run receipts (BB-039).
- * Discovery produces private research candidates only — never public entities.
+ * Discovery pipeline types: candidates, campaigns, budgets, and run receipts.
+ * Discovery produces private research candidates only never public entities.
  */
 import type { AdapterCandidateRecord } from '../adapters/types.js';
 import type { ContentHash } from '../provenance/hashes.js';

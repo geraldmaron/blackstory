@@ -1,8 +1,9 @@
+
 /**
- * BB-084 acceptance: proves the citation-link-health-sweep job body is REAL — it drives
+ * Proves the citation-link-health-sweep job body is REAL: it drives
  * @black-book/domain's citation link-health/repair-ladder logic (not a reimplementation), the
  * one automatic write it makes matches the roster's declared 'link-repair-archived-copy' effect
- * exactly, and permanent-redirect / retroactive-SPN repairs are proposed rather than
+ * exactly, and permanent-redirect retroactive-SPN repairs are proposed rather than
  * auto-applied.
  */
 import assert from 'node:assert/strict';
@@ -196,8 +197,9 @@ test('a batch is processed in order, and the summary tallies match the individua
   assert.equal(result.outcomes[1]?.appliedRepair?.step, 'dead_mark');
 });
 
+
 /**
- * Proves `checkCitationLinkThroughSafeFetch` genuinely drives BB-030's real `executeSafeFetch`
+ * Proves `checkCitationLinkThroughSafeFetch` genuinely drives real `executeSafeFetch`
  * (not a stand-in) and correctly recovers `httpStatus`/`permanentRedirect` from the transport,
  * which `executeSafeFetch`'s own return type does not expose.
  */

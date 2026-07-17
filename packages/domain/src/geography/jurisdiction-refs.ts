@@ -1,28 +1,22 @@
 /**
- * Fail-closed jurisdiction-reference gate for projection build (BB-091 acceptance criterion 5).
+ * Fail-closed jurisdiction-reference gate for projection build.
  *
- * `LawFields.jurisdictionId` (packages/domain/src/specialized.ts) and
+ * `LawFields.jurisdictionId` (`packages/domain/src/specialized.ts`) and
  * `EntityLocation.jurisdictionIds` / `PlaceFields.jurisdictionIds`
- * (packages/domain/src/geography/location.ts) are plain string references today — nothing
+ * (`packages/domain/src/geography/location.ts`) are plain string references today — nothing
  * validates that the id they point at actually resolves to a `jurisdictions/{id}` document.
  * This module is the gate that closes that hole: it does not decide *when* projection build
  * runs, only whether a given set of jurisdiction references is safe to publish.
  *
- * INTEGRATION POINT (documented, not live-wired — matching this session's established pattern;
- * see packages/domain/src/citations/completeness-gate.ts's "INTEGRATION POINT" comment and
- * packages/domain/src/map/map-source.ts's for the same convention, and BB-091's file-ownership
- * scope, which does not include packages/domain/src/specialized.ts, entity.ts, or the
- * projection-build pipeline itself):
- *
- * Call `assertJurisdictionReferencesResolve` with every `jurisdictionId` /
+ * Not wired live: call `assertJurisdictionReferencesResolve` with every `jurisdictionId` /
  * `jurisdictionIds` entry collected off the claims/entities/locations slated for a projection
  * build, and a `JurisdictionResolver` backed by the real `jurisdictions` Firestore collection
- * (see `@black-book/firebase`'s `packages/firebase/src/jurisdictions/resolver.ts`,
+ * (see `packages/firebase/src/jurisdictions/resolver.ts`,
  * `createFirestoreJurisdictionResolver`), immediately before the release manifest is built
- * (`buildReleaseManifest` in packages/domain/src/publication/index.ts, or its Python
- * equivalent in workers/publication/ per ADR-007). Do not proceed to build/activate the
- * release if it throws. Because the gate fails closed (throws rather than returning a boolean
- * the caller could silently ignore), wiring it in is a single guarded call, not a refactor.
+ * (`buildReleaseManifest` in `packages/domain/src/publication/index.ts`, or its Python
+ * equivalent in `workers/publication/` per ADR-007). Do not proceed to build/activate the
+ * release if it throws. The gate fails closed (throws rather than returning a boolean), so
+ * wiring is a single guarded call.
  */
 
 /** Minimal read port a projection build supplies; a real implementation is Firestore-backed. */
@@ -62,7 +56,7 @@ export type JurisdictionReferenceCheckResult =
 /**
  * Evaluates every jurisdiction reference across a batch of subjects against a resolver.
  * Aggregates all failures (rather than throwing on the first) so a single build attempt
- * surfaces every dangling reference at once — mirrors
+ * surfaces every dangling reference at once mirrors
  * `evaluateProjectionCitationCompleteness`'s aggregate-then-report shape.
  */
 export async function evaluateJurisdictionReferences(

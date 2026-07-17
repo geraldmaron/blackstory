@@ -1,5 +1,5 @@
 /**
- * Design-system fixture gallery (Storybook equivalent) for BB-007 component and token states.
+ * Design-system fixture gallery (Storybook equivalent) for component and token states.
  */
 
 import {

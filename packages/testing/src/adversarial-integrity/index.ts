@@ -1,5 +1,6 @@
+
 /**
- * Public exports for BB-060 adversarial integrity exercise harnesses.
+ * Public exports for adversarial integrity exercise harnesses.
  */
 export {
   summarizeAdversarialScenario,

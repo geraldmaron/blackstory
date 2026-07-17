@@ -1,3 +1,4 @@
+
 /**
  * Shared Firebase project constants and registered production app identifiers.
  * Client apiKey values are Firebase identifiers, not server secrets.

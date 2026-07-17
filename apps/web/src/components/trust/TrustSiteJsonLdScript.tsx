@@ -1,5 +1,5 @@
 /**
- * Site-wide NewsMediaOrganization JSON-LD script (BB-088) — Trust Project schema vocabulary
+ * Site-wide NewsMediaOrganization JSON-LD script Trust Project schema vocabulary
  * without trademark or badge usage.
  */
 import React from 'react';

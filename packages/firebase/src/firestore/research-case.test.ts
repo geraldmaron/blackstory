@@ -1,5 +1,6 @@
+
 /**
- * Verifies server-side BB-044 authorization for research transitions, assignments,
+ * Verifies server-side authorization for research transitions, assignments,
  * publication promotion, and replacement-release retraction.
  */
 import assert from 'node:assert/strict';

@@ -1,6 +1,7 @@
+
 /**
- * BB-083: the degraded-citation UI additions to Citation.tsx. Confirms the new props are
- * additive (the default, no-`linkStatus` render is byte-for-byte the pre-BB-083 markup) and
+ * Tests for the degraded-citation UI additions to Citation.tsx. Confirms the new props are
+ * additive (the default, no-`linkStatus` render is byte-for-byte the pre-existing markup) and
  * that the dead/drifted treatments render the expected accessible, non-color-only cues.
  */
 import assert from 'node:assert/strict';

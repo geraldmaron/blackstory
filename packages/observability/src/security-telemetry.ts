@@ -1,6 +1,7 @@
+
 /**
- * Security telemetry recorder — redacts, emits metrics, evaluates anomalies, and
- * builds alert payloads from normalized security events (BB-034).
+ * Security telemetry recorder redacts, emits metrics, evaluates anomalies, and
+ * builds alert payloads from normalized security events.
  */
 import {
   buildAlertPayload,

@@ -1,5 +1,5 @@
 /**
- * User-facing copy for the BB-055 corrections experience — privacy notice, status labels, and
+ * User-facing copy for the corrections experience privacy notice, status labels, and
  * form guidance. Keeps procedural tone per docs/ui/story.md (corrections are normal system
  * function, not an admission of failure).
  */

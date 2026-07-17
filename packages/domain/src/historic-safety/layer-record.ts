@@ -1,19 +1,19 @@
 /**
- * BB-082's OWN time-scoped, evidence-backed place-condition layer records: sundown-town
+ * OWN time-scoped, evidence-backed place-condition layer records: sundown-town
  * designations (Tougaloo College Historical Database taxonomy, preserved verbatim as
- * possible/probable/surely — a claim confidence, never flattened to a boolean) and redlining
- * grades (HOLC A-D, a distinct vocabulary and a distinct designation record type — see AC12).
+ * possible/probable/surely a claim confidence, never flattened to a boolean) and redlining
+ * grades (HOLC A-D, a distinct vocabulary and a distinct designation record type see ).
  *
- * SCOPE GUARDRAIL (mirrors ../entity-status.ts's own guardrail comment verbatim in spirit): these
+ * SCOPE GUARDRAIL (mirrors../entity-status.ts's own guardrail comment verbatim in spirit): these
  * records are NOT `StatusHistoryEntry` and NEVER live on `CanonicalEntity.statusHistory`
- * (BB-090's lane). They follow the same {validFrom, validTo, datePrecision, basisClaimIds}
- * time-scoping *pattern* BB-090 established, reusing BB-090's own `statusAsOf`/`currentStatus`
+ * (lane). They follow the same {validFrom, validTo, datePrecision, basisClaimIds}
+ * time-scoping *pattern* established, reusing own `statusAsOf`/`currentStatus`
  * point-in-time algorithms by composition (mapping this module's designation-specific field onto
- * that generic algorithm's `status` slot) rather than duplicating the date-window logic — but the
- * storage location, record identity, and vocabulary are entirely BB-082's own.
+ * that generic algorithm's `status` slot) rather than duplicating the date-window logic but the
+ * storage location, record identity, and vocabulary are entirely own.
  *
- * GEOMETRY BINDING (BB-091, AC9/AC11): an area condition binds to jurisdiction/place geometry as
- * an AREA over a time range — a Polygon or BBox, never a Point marker — and is rendered only at
+ * GEOMETRY BINDING: an area condition binds to jurisdiction/place geometry as
+ * an AREA over a time range a Polygon or BBox, never a Point marker and is rendered only at
  * the precision level its source documentation actually supports. A county-level-only source
  * renders as a county polygon; it is never interpolated down to shade or point-mark individual
  * towns within it as if independently documented. `assertAreaConditionRenderPrecisionValid`
@@ -25,7 +25,7 @@ import type { GeoGeometry } from '../geography/location.js';
 import { isCoarserGeoPrecisionTier, type GeoPrecisionTier } from '../geography/precision.js';
 
 // ---------------------------------------------------------------------------
-// Vocabularies — kept distinct per bead stress-test correction
+// Vocabularies kept distinct per stress-test correction
 // ---------------------------------------------------------------------------
 
 /** Tougaloo College Historical Database of Sundown Towns taxonomy, preserved verbatim. */
@@ -36,7 +36,7 @@ export function isSundownTownConfidence(value: string): value is SundownTownConf
   return (SUNDOWN_TOWN_CONFIDENCE_LEVELS as readonly string[]).includes(value);
 }
 
-/** HOLC Residential Security Map grades (Mapping Inequality) — A-D, distinct from the taxonomy above. */
+/** HOLC Residential Security Map grades (Mapping Inequality) A-D, distinct from the taxonomy above. */
 export const HOLC_GRADES = ['A', 'B', 'C', 'D'] as const;
 export type HolcGrade = (typeof HOLC_GRADES)[number];
 
@@ -51,8 +51,8 @@ export const HOLC_GRADE_LABELS: Readonly<Record<HolcGrade, string>> = {
   D: 'Grade D ("Hazardous")',
 };
 
-/** Digitized racially restrictive covenant projects — free-text project type, no fixed vocabulary
- *  exists across the digitization projects this layer draws on. */
+/** Digitized racially restrictive covenant projects free-text project type, no fixed vocabulary
+ * exists across the digitization projects this layer draws on. */
 export const PLACE_CONDITION_DESIGNATION_KINDS = [
   'sundown_town',
   'redlining_grade',
@@ -61,16 +61,16 @@ export const PLACE_CONDITION_DESIGNATION_KINDS = [
 export type PlaceConditionDesignationKind = (typeof PLACE_CONDITION_DESIGNATION_KINDS)[number];
 
 // ---------------------------------------------------------------------------
-// Area-condition geometry binding (BB-091)
+// Area-condition geometry binding 
 // ---------------------------------------------------------------------------
 
-/** An area-only geometry — a sundown town or redlining grade covers a place over a time range,
- *  never a point marker (AC9). */
+/** An area-only geometry a sundown town or redlining grade covers a place over a time range,
+ * never a point marker. */
 export type AreaGeometry = Extract<GeoGeometry, { readonly type: 'Polygon' | 'BBox' }>;
 
 export type AreaConditionGeometry = {
   readonly shape: AreaGeometry;
-  /** The FINEST tier the underlying source documentation actually supports — never invented. */
+  /** The FINEST tier the underlying source documentation actually supports never invented. */
   readonly documentedPrecisionTier: GeoPrecisionTier;
   readonly jurisdictionId?: string;
 };
@@ -85,7 +85,7 @@ export function assertAreaConditionGeometryValid(geometry: AreaConditionGeometry
 }
 
 /**
- * Fails closed when a requested render tier is FINER than the documented tier (AC11): a
+ * Fails closed when a requested render tier is FINER than the documented tier: a
  * county-level-only source must render as a county polygon, never interpolated down to a finer
  * tier that implies independent town-level documentation it does not have.
  */
@@ -103,14 +103,14 @@ export function assertAreaConditionRenderPrecisionValid(input: {
 }
 
 // ---------------------------------------------------------------------------
-// Time-scoped designation records — BB-082's own record type, not BB-090 statusHistory
+// Time-scoped designation records own record type, not statusHistory
 // ---------------------------------------------------------------------------
 
 type BaseDesignationRecord = {
   readonly id: string;
   readonly placeEntityId: string;
   readonly validFrom?: string;
-  /** Omitted or null means open-ended (still current as of now) — same idiom as StatusHistoryEntry. */
+  /** Omitted or null means open-ended (still current as of now) same idiom as StatusHistoryEntry. */
   readonly validTo?: string | null;
   readonly datePrecision: DatePrecision;
   readonly basisClaimIds: readonly string[];
@@ -130,7 +130,7 @@ export type RedliningGradeDesignationRecord = BaseDesignationRecord & {
 export type RestrictiveCovenantDesignationRecord = BaseDesignationRecord & {
   readonly designation: 'restrictive_covenant';
   /** Free-text digitization-project vocabulary (e.g. "Mapping Prejudice"); no fixed enum exists
-   *  across projects. */
+   * across projects. */
   readonly covenantProjectLabel: string;
 };
 
@@ -186,7 +186,7 @@ export function assertPlaceConditionDesignationValid(record: PlaceConditionDesig
 }
 
 // ---------------------------------------------------------------------------
-// Point-in-time queries — composes BB-090's proven statusAsOf/currentStatus algorithm
+// Point-in-time queries composes proven statusAsOf/currentStatus algorithm
 // ---------------------------------------------------------------------------
 
 function toStatusHistoryEntry<S extends string>(
@@ -202,7 +202,7 @@ function toStatusHistoryEntry<S extends string>(
   };
 }
 
-/** Answers "what was this place's sundown-town confidence in decade D" for any decade — AC8. */
+/** Answers "what was this place's sundown-town confidence in decade D" for any decade. */
 export function sundownTownConfidenceAsOf(
   records: readonly SundownTownDesignationRecord[],
   asOf: string,
@@ -211,7 +211,7 @@ export function sundownTownConfidenceAsOf(
   return statusAsOf(entries, asOf);
 }
 
-/** Current (open-ended) sundown-town confidence, derived the same way BB-090 derives current status. */
+/** Current (open-ended) sundown-town confidence, derived the same way derives current status. */
 export function currentSundownTownConfidence(
   records: readonly SundownTownDesignationRecord[],
 ): SundownTownConfidence | undefined {
@@ -219,7 +219,7 @@ export function currentSundownTownConfidence(
   return currentStatus(entries);
 }
 
-/** Answers "what was this place's redlining grade in decade D" for any decade — AC8. */
+/** Answers "what was this place's redlining grade in decade D" for any decade. */
 export function redliningGradeAsOf(
   records: readonly RedliningGradeDesignationRecord[],
   asOf: string,
@@ -236,7 +236,7 @@ export function currentRedliningGrade(
 }
 
 // ---------------------------------------------------------------------------
-// Storage boundary (Firestore adapter is a later bead, same shape convention as elsewhere)
+// Storage boundary (Firestore adapter is a later, same shape convention as elsewhere)
 // ---------------------------------------------------------------------------
 
 export type PlaceConditionLayerStore = {

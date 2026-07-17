@@ -1,5 +1,5 @@
 /**
- * Relevance and confidence feedback-loop calibration layer (BB-081) — public surface.
+ * Relevance and confidence feedback-loop calibration layer public surface.
  * See types.ts for the full design docstring and the invariants this module holds.
  */
 export {

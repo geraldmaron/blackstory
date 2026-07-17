@@ -1,18 +1,18 @@
 /**
- * Reddit deletion-sync wiring (BB-074 acceptance criterion 4): a thin, Reddit-specific adapter
- * over BB-077's shared purge framework (../../rights/deletion-sync.ts `planDeletionSyncPurge` /
- * `applyDeletionSyncPurge`). This module does NOT reimplement purge mechanics — it only builds
+ * Reddit deletion-sync wiring: a thin, Reddit-specific adapter
+ * over shared purge framework (../../rights/deletion-sync.ts `planDeletionSyncPurge`
+ * `applyDeletionSyncPurge`). This module does NOT reimplement purge mechanics it only builds
  * the Reddit-specific cascade targets (quarantine/graylist/research-case-attachment paths for a
  * given stored pointer) and sequences the liveness check that decides whether a purge is needed
  * at all. Reddit's obligation is contractual and binding at 48 hours regardless of privacy-law
  * analysis (../../rights/obligations.ts `defaultSourceObligationsSeed`'s `reddit` entry,
- * `deletionSync.maxHours: 48`) — `REDDIT_DELETION_SYNC_MAX_HOURS` below is asserted equal to
+ * `deletionSync.maxHours: 48`) `REDDIT_DELETION_SYNC_MAX_HOURS` below is asserted equal to
  * that registered value in reddit.test.ts so the two never silently drift apart.
  *
- * This is the SCHEDULED, batch sweep half of liveness re-checking. The other, mandatory half —
- * a synchronous re-check immediately before human review / case attachment — lives in
+ * This is the SCHEDULED, batch sweep half of liveness re-checking. The other, mandatory half 
+ * a synchronous re-check immediately before human review case attachment lives in
  * ./liveness.ts `assertPointerLiveBeforeReview` and is NOT a special case of this sweep; both
- * must exist and both are tested (see reddit.test.ts and BB-084's
+ * must exist and both are tested (see reddit.test.ts and 
  * packages/config/src/scheduled-jobs/jobs/reddit-deletion-sync.ts, which calls this module's
  * `sweepRedditPointerLiveness` on a 6-hour cadence).
  */
@@ -28,9 +28,9 @@ import type { RedditLivenessChecker, RedditLivenessCheckResult } from './livenes
 import { REDDIT_ADAPTER_ID } from './types.js';
 import type { RedditStoredPointer } from './types.js';
 
-/** Reddit's contractual deletion-sync window (BB-077 obligations entry, ../../rights/
- *  obligations.ts). Purges — including snippets — must complete within this many hours of an
- *  upstream deletion being observed. */
+/** Reddit's contractual deletion-sync window (obligations entry,../../rights/
+ * obligations.ts). Purges including snippets must complete within this many hours of an
+ * upstream deletion being observed. */
 export const REDDIT_DELETION_SYNC_MAX_HOURS = 48;
 
 export type RedditPointerCascadePaths = {
@@ -40,11 +40,11 @@ export type RedditPointerCascadePaths = {
 };
 
 /** Builds the store-agnostic cascade targets for one dead pointer. Always includes the
- *  quarantine path (where a freshly-ingested candidate lives before promotion); graylist and
- *  research-case-attachment paths are included only when the caller knows the pointer reached
- *  those stages — "even if disassociated, de-identified or anonymized" retention violates
- *  Reddit's terms (bead text), so every stage a pointer or its snippet could be sitting in must
- *  be purged, not just the earliest one. */
+ * quarantine path (where a freshly-ingested candidate lives before promotion); graylist and
+ * research-case-attachment paths are included only when the caller knows the pointer reached
+ * those stages "even if disassociated, de-identified or anonymized" retention violates
+ * Reddit's terms (text), so every stage a pointer or its snippet could be sitting in must
+ * be purged, not just the earliest one. */
 export function buildRedditPointerCascadeTargets(
   pointer: RedditStoredPointer,
   paths: RedditPointerCascadePaths,
@@ -70,8 +70,8 @@ export type PlanRedditPointerPurgeInput = {
   readonly actor: AuditActor;
 };
 
-/** Builds a purge plan for one dead Reddit pointer via the REAL BB-077 `planDeletionSyncPurge` —
- *  never a Reddit-specific reimplementation of purge/audit/outbox mechanics. */
+/** Builds a purge plan for one dead Reddit pointer via the REAL `planDeletionSyncPurge` 
+ * never a Reddit-specific reimplementation of purge/audit/outbox mechanics. */
 export function planRedditPointerPurge(input: PlanRedditPointerPurgeInput): DeletionSyncPlan {
   return planDeletionSyncPurge({
     sourceId: input.pointer.id,
@@ -88,8 +88,8 @@ export type RedditDeletionSyncSweepOutcome = {
   readonly pointerId: string;
   readonly live: boolean;
   readonly livenessResult: RedditLivenessCheckResult;
-  /** Present only for pointers the fresh liveness check found dead — the caller (a scheduled
-   *  job) applies this plan via the REAL `applyDeletionSyncPurge`, see below. */
+  /** Present only for pointers the fresh liveness check found dead the caller (a scheduled
+   * job) applies this plan via the REAL `applyDeletionSyncPurge`, see below. */
   readonly purgePlan?: DeletionSyncPlan;
 };
 
@@ -105,9 +105,9 @@ export type SweepRedditPointerLivenessInput = {
 
 /**
  * Scheduled sweep: re-checks liveness for every supplied stored pointer and builds a real purge
- * plan for any pointer no longer live. Pure aside from the injected `checkLiveness` I/O port —
+ * plan for any pointer no longer live. Pure aside from the injected `checkLiveness` I/O port 
  * callers execute the returned `purgePlan.mutations` against their own store via
- * `applyRedditPointerPurge` below (re-exported straight from BB-077, not reimplemented).
+ * `applyRedditPointerPurge` below (re-exported straight from, not reimplemented).
  */
 export async function sweepRedditPointerLiveness(
   input: SweepRedditPointerLivenessInput,
@@ -133,7 +133,7 @@ export async function sweepRedditPointerLiveness(
   return outcomes;
 }
 
-/** Re-exported, not reimplemented — applies a purge plan's mutations against any store exposing
- *  `delete` (../../rights/deletion-sync.ts). */
+/** Re-exported, not reimplemented applies a purge plan's mutations against any store exposing
+ * `delete` (../../rights/deletion-sync.ts). */
 export { applyDeletionSyncPurge as applyRedditPointerPurge };
 export type { PurgeableStore as RedditPurgeableStore };

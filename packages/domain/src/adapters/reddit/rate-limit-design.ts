@@ -1,6 +1,6 @@
 /**
- * Polling-cadence math for BB-074 acceptance criterion 2 ("polling adapter respects the 100 QPM
- * free tier"). Pure arithmetic — no I/O — so reddit.test.ts can assert the curated subreddit
+ * Polling-cadence math for ("polling adapter respects the 100 QPM
+ * free tier"). Pure arithmetic no I/O so reddit.test.ts can assert the curated subreddit
  * list + cadence design actually stays under Reddit's ceiling, not just document it in a
  * comment.
  */
@@ -10,8 +10,8 @@ export type RateLimitDesignInput = {
   readonly subredditCount: number;
   readonly cadenceMinutes: number;
   /** Defaults to the worst case: every subreddit returns a full 1000-item backlog every cycle,
-   *  requiring the maximum number of 100-item pages to walk it. Real curated subreddits post far
-   *  less frequently — this is a deliberately pessimistic upper bound, not an expected value. */
+   * requiring the maximum number of 100-item pages to walk it. Real curated subreddits post far
+   * less frequently this is a deliberately pessimistic upper bound, not an expected value. */
   readonly maxPagesPerSubredditPerCycle?: number;
 };
 

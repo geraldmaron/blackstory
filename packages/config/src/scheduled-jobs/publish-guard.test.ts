@@ -1,7 +1,8 @@
+
 /**
- * BB-084 acceptance: nothing scheduled can publish. This proves assertScheduledJobOperationAllowed
- * calls through the REAL BB-039 guard (assertDiscoveryCannotPublish from @black-book/domain) —
- * not a locally invented check that doesn't connect to anything — and that a job cannot bypass
+ * Nothing scheduled can publish. This proves assertScheduledJobOperationAllowed
+ * calls through the REAL guard (assertDiscoveryCannotPublish from @black-book/domain)
+ * not a locally invented check that doesn't connect to anything and that a job cannot bypass
  * promotion gates even when it declares one of the two pre-approved public-facing exceptions.
  */
 import assert from 'node:assert/strict';
@@ -59,7 +60,7 @@ test('a non-forbidden operation is allowed through the same real guard', () => {
 });
 
 test('assertScheduledJobOperationAllowed calls the exact same underlying function as the discovery pipeline', () => {
-  // Same input, same guard, same outcome — proves this is a pass-through, not a parallel check.
+  // Same input, same guard, same outcome proves this is a pass-through, not a parallel check.
   const attempt = { operation: 'activate_release', target: 'release-1' };
   let directError: unknown;
   let wrappedError: unknown;

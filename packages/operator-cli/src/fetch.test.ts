@@ -1,10 +1,11 @@
+
 /**
  * Verifies the real DNS-resolve + pinned-transport dependencies (against a local loopback
- * server — no external network required) and the pure citation-prefill / capture-plan helpers.
+ * server no external network required) and the pure citation-prefill capture-plan helpers.
  *
  * The pinned transport is tested directly, not through `executeSafeFetch`, because
- * `executeSafeFetch`'s own policy layer correctly refuses loopback/private addresses (BB-030's
- * SSRF protection) — that policy is exercised by `packages/security`'s own tests. This file
+ * `executeSafeFetch`'s own policy layer correctly refuses loopback/private addresses (
+ * SSRF protection) that policy is exercised by `packages/security`'s own tests. This file
  * only proves our transport implementation speaks the `PinnedTransport` contract correctly.
  */
 import assert from 'node:assert/strict';

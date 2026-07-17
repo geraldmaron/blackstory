@@ -1,5 +1,5 @@
 /**
- * Evidence records with source-item resolution, locator, excerpts, and rights (BB-016).
+ * Evidence records with source-item resolution, locator, excerpts, and rights.
  * Every evidence record must resolve to a source item before use.
  */
 import type { ExcerptKind, PublicationPermission, ProhibitedUse, RightsStatus } from './rights.js';
@@ -17,11 +17,11 @@ export type EvidenceLocator = {
 
 export type EvidenceRecord = {
   readonly id: string;
-  /** Required: every evidence record resolves to a source item (BB-016 acceptance). */
+  /** Required: every evidence record resolves to a source item. */
   readonly sourceItemId: string;
   readonly sourceId: string;
   readonly captureId?: string;
-  /** GCS / Storage object for media or full capture blob; never embed bytes. */
+  /** GCS Storage object for media or full capture blob; never embed bytes. */
   readonly storageObject?: string;
   readonly locator?: EvidenceLocator;
   readonly excerpt?: string;
@@ -31,7 +31,7 @@ export type EvidenceRecord = {
   readonly rightsStatus: RightsStatus;
   readonly publicationPermissions: readonly PublicationPermission[];
   readonly prohibitedUses: readonly ProhibitedUse[];
-  /** Root evidence id for a syndication lineage (BB-017 counts lineage once). */
+  /** Root evidence id for a syndication lineage. */
   readonly lineageRootId?: string;
   readonly syndicatedFromEvidenceId?: string;
   readonly createdAt: string;

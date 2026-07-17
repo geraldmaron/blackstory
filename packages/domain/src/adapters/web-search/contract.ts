@@ -1,5 +1,5 @@
 /**
- * Web-search adapter contract defaults aligned with BB-037 SourceAdapterContract (BB-075).
+ * Web-search adapter contract defaults aligned with SourceAdapterContract.
  * Starts disabled by default -- same isolation as every other adapter (../gates.ts) -- but note
  * this is only ONE of two independent gates for this adapter family: even an approved/canary
  * registry entry cannot produce a persisted result unless the caller's

@@ -1,3 +1,4 @@
+
 /**
  * Modal dialog built on the native <dialog> element with Escape close and labelled title.
  */

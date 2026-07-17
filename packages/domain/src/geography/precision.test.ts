@@ -1,5 +1,5 @@
 /**
- * Tests for the BB-091 geoPrecision tier vocabulary and precision-radius policy.
+ * Tests for the geoPrecision tier vocabulary and precision-radius policy.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -96,7 +96,7 @@ test('resolveEntityLocationPrecision: bulk-loaded records default to best-docume
       documentedBasis: record.documentedBasis,
       redactionRequired: false,
     });
-    // Unredacted records keep their documented tier and basis exactly — no silent coarsening.
+    // Unredacted records keep their documented tier and basis exactly no silent coarsening.
     assert.equal(resolved.tier, record.documentedTier);
     assert.equal(resolved.basis, record.documentedBasis);
     assert.notEqual(resolved.basis, 'redacted-by-rule');

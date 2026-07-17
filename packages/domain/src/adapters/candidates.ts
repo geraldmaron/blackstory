@@ -1,5 +1,5 @@
 /**
- * Adapter candidate validation and provenance stamping (BB-037).
+ * Adapter candidate validation and provenance stamping.
  */
 import type { AdapterCandidateProvenance, AdapterCandidateRecord, SourceRegistryEntry } from './types.js';
 

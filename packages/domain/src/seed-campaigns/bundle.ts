@@ -1,5 +1,5 @@
 /**
- * Assembles the BB-058 national seed campaign bundle from curated campaign metadata and records.
+ * Assembles the national seed campaign bundle from curated campaign metadata and records.
  */
 import { SEED_CAMPAIGN_METADATA } from './campaigns.js';
 import { ALL_SEED_RECORDS } from './records.js';
@@ -12,7 +12,7 @@ import {
 
 export const NATIONAL_SEED_CAMPAIGN_VERSION = '1.0.0' as const;
 
-/** Hard ceiling proving this module is not a bulk U.S. school import (BB-058 AC4). */
+/** Hard ceiling proving this module is not a bulk U.S. school import. */
 export const NATIONAL_SEED_MAX_RECORDS = 50 as const;
 
 export function buildNationalSeedCampaignBundle(input: {

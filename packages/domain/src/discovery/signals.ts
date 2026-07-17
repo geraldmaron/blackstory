@@ -1,5 +1,5 @@
 /**
- * Strong / medium / weak signal extraction integrating query-pack classification (BB-039).
+ * Strong medium weak signal extraction integrating query-pack classification.
  */
 import type { AdapterCandidateRecord } from '../adapters/types.js';
 import {

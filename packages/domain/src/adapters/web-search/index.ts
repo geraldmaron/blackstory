@@ -1,8 +1,8 @@
 /**
- * Web-search discovery adapter public surface (BB-075). Primary provider: Brave Search API --
- * see ./provider-decision.ts for the full reasoning. Storage-rights gated -- see
- * ./normalizer.ts's `assertStorageTermsConfirmed` and ./types.ts's `WebSearchProviderConfig` doc
- * comment for the fail-closed boundary this bead's acceptance criterion 1 requires.
+ * Web-search discovery adapter public surface. Primary provider: Brave Search API —
+ * see `./provider-decision.ts` for the full reasoning. Storage-rights gated — see
+ * `./normalizer.ts`'s `assertStorageTermsConfirmed` and `./types.ts`'s
+ * `WebSearchProviderConfig` doc comment for the fail-closed persistence boundary.
  */
 export {
   WEB_SEARCH_PROVIDERS,

@@ -1,9 +1,9 @@
 /**
- * Tests for the Common Crawl retrospective discovery adapter (BB-075). Fixture-driven; every
+ * Tests for the Common Crawl retrospective discovery adapter. Fixture-driven; every
  * HTTP call goes through a mock SafeHttpClient injected by the test, never a real fetch. Common
  * Crawl needs no storage-rights gate (unlike ../web-search/), but still starts disabled by
- * default in the BB-037 registry and still routes discovered URLs through the Wayback capture
- * gate before BB-039 ingestion.
+ * default in the registry and still routes discovered URLs through the Wayback capture
+ * gate before ingestion.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -78,7 +78,7 @@ function commonCrawlRegistryEntry(): SourceRegistryEntry {
 }
 
 // ---------------------------------------------------------------------------------------------
-// BB-037 registry gate
+// registry gate
 // ---------------------------------------------------------------------------------------------
 
 test('Common Crawl adapter starts disabled by default in the BB-037 registry', () => {
@@ -146,7 +146,7 @@ test('parseCdxResponse treats a "no captures found" response as zero records, no
 });
 
 // ---------------------------------------------------------------------------------------------
-// Query generation from BB-038 packs -- researchOnlyOffensive filter (acceptance criterion 3)
+// Query generation from packs -- researchOnlyOffensive filter
 // ---------------------------------------------------------------------------------------------
 
 test('buildCommonCrawlFilterPattern includes public-safe positive/alias/geographic terms and never a researchOnlyOffensive term', () => {
@@ -225,7 +225,7 @@ function sampleQueryProvenance() {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Provenance stamping (acceptance criterion 5)
+// Provenance stamping
 // ---------------------------------------------------------------------------------------------
 
 test('stampCommonCrawlQueryProvenance stamps API name, query text, timestamp, and plan/terms version', () => {
@@ -266,7 +266,7 @@ test('normalizeCdxRecord produces a candidate with query provenance stamped and 
 });
 
 // ---------------------------------------------------------------------------------------------
-// fetchCommonCrawlCdx / fetchCommonCrawlCdxBatch: injected SafeHttpClient
+// fetchCommonCrawlCdx fetchCommonCrawlCdxBatch: injected SafeHttpClient
 // ---------------------------------------------------------------------------------------------
 
 test('fetchCommonCrawlCdx goes through the injected SafeHttpClient (mock, no live network)', async () => {
@@ -332,7 +332,7 @@ test('fetchCommonCrawlCdx rejects a response whose content type is outside the a
 });
 
 // ---------------------------------------------------------------------------------------------
-// Pipeline integration (acceptance criterion 6): Wayback capture gate -> BB-039 ingestApiCandidate
+// Pipeline integration: Wayback capture gate -> ingestApiCandidate
 // ---------------------------------------------------------------------------------------------
 
 test('ingestCommonCrawlCandidatesThroughPipeline routes candidates through the Wayback capture gate before BB-039 ingestion', async () => {

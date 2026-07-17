@@ -1,6 +1,6 @@
 /**
- * Progressive-disclosure graph panel for BB-093 `/history`. Groups nodes by kind with equal visual
- * weight (dignity rule — no violence heat styling). Selected nodes reveal their evidence-backed
+ * Progressive-disclosure graph panel for `/history`. Groups nodes by kind with equal visual
+ * weight (dignity rule: no violence-heat styling). Selected nodes reveal their evidence-backed
  * edges; every node links to its entity page.
  */
 import React from 'react';

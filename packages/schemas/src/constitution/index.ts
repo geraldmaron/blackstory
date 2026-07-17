@@ -1,7 +1,7 @@
 /**
- * Public surface for the machine-readable product constitution (BB-003).
+ * Public surface for the machine-readable product constitution.
  * Exports are intentionally read-only: loaders and evaluators only.
- * Do not add mutation, update, or remote-write APIs here — policy is not
+ * Do not add mutation, update, or remote-write APIs here policy is not
  * changeable through public endpoints.
  */
 export {

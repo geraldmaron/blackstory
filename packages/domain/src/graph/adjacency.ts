@@ -1,18 +1,18 @@
 /**
- * Per-entity bounded/capped adjacency (BB-092 acceptance criterion 3): typed, time-scoped,
+ * Per-entity bounded/capped adjacency: typed, time-scoped,
  * evidence-count-ordered, capped top-N per entity. Bounding doc size and forcing editorial
- * ranking by evidence (not volume) is a deliberate design choice — see BB-092's DESIGN note
+ * ranking by evidence (not volume) is a deliberate design choice see DESIGN note
  * ("Bounded top-N adjacency caps doc sizes and forces editorial ranking by evidence, not
  * volume").
  *
  * Pure and deterministic: given the same relationship set, `buildEntityAdjacency` always returns
- * the same ordering — ties broken by neighbor entity id, then relationship type, then
- * relationship id — so re-running the release build never reshuffles equal-evidence edges.
+ * the same ordering ties broken by neighbor entity id, then relationship type, then
+ * relationship id so re-running the release build never reshuffles equal-evidence edges.
  */
 import { deriveEraBuckets } from '../era.js';
 import type { EntityRelationship, RelationshipType, TemporalContext } from '../relationship.js';
 
-/** Default per-entity cap (BB-092: "capped top-N"). */
+/** Default per-entity cap. */
 export const DEFAULT_ADJACENCY_CAP = 25;
 
 export type AdjacencyDirection = 'outgoing' | 'incoming';
@@ -26,8 +26,8 @@ export type PublicRelatedEntry = {
 
 export type AdjacencyEntry = PublicRelatedEntry & {
   readonly relationshipId: string;
-  /** Count of evidence ids backing this edge — the ranking key. Never a numeric score; this is a
-   * plain evidence count, the one numeric field BB-092 acceptance criterion 5 explicitly allows
+  /** Count of evidence ids backing this edge the ranking key. Never a numeric score; this is a
+   * plain evidence count, the one numeric field explicitly allows
    * on the public projection. */
   readonly evidenceCount: number;
 };
@@ -37,14 +37,14 @@ export type EntityAdjacency = {
   /** Capped, ordered top-N (evidence-count desc, then neighbor id asc, then type asc, then
    * relationship id asc for full determinism). */
   readonly entries: readonly AdjacencyEntry[];
-  /** Count of edges that matched before the cap was applied — read-cost/transparency bound. */
+  /** Count of edges that matched before the cap was applied read-cost/transparency bound. */
   readonly totalCandidates: number;
 };
 
 export type BuildEntityAdjacencyOptions = {
   readonly cap?: number;
   /** When set, restrict to edges whose own TemporalContext overlaps this decade label (e.g.
-   * "1960s") — edges with no temporal context are treated as timeless and always included, since
+   * "1960s") edges with no temporal context are treated as timeless and always included, since
    * an edge without a documented window cannot be excluded from any decade without evidence. */
   readonly decade?: string;
 };
@@ -77,7 +77,7 @@ function compareEntries(a: AdjacencyEntry, b: AdjacencyEntry): number {
 
 /**
  * Builds one entity's capped, ordered adjacency list from the full relationship set. Self-loops
- * (`fromEntityId === toEntityId === entityId`) are skipped — they carry no adjacency information.
+ * (`fromEntityId === toEntityId === entityId`) are skipped they carry no adjacency information.
  */
 export function buildEntityAdjacency(
   entityId: string,
@@ -127,12 +127,10 @@ export function buildAllEntityAdjacency(
 
 /**
  * Projects a build-internal `EntityAdjacency` down to the public `{id, type, direction,
- * timespan}` shape (BB-092 acceptance criterion 5). Drops `relationshipId` (an internal Firestore
- * document pointer with no public meaning) and `evidenceCount` — evidence counts are explicitly
- * public-safe by policy ("nothing numeric beyond evidence counts appears publicly"), but the
- * public related-entry shape itself is exactly `{id, type, direction, timespan}` per the
- * acceptance criterion text, so evidence count stays an internal ranking key rather than a public
- * field on this particular projection.
+ * timespan}` shape. Drops `relationshipId` (an internal Firestore document pointer with no
+ * public meaning) and `evidenceCount` — evidence counts may be used as an internal ranking key,
+ * but the public related-entry shape itself is exactly `{id, type, direction, timespan}`, so
+ * evidence count stays internal rather than a public field on this projection.
  */
 export function toPublicRelatedEntries(adjacency: EntityAdjacency): readonly PublicRelatedEntry[] {
   return adjacency.entries.map((entry) => ({

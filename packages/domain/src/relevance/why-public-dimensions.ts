@@ -1,18 +1,18 @@
 /**
- * BB-054 story-composition dimension taxonomy — the "balance" half of the public "why this
- * appears" surface (BB-054 Deliver #2: balancing harm, achievement, joy, family, community,
- * institution-building, resistance, culture, and everyday life). This module classifies already
- * ACCEPTED evidence/claim prose (BB-040 relevance evidence, ./why.ts; BB-052 historicalContext-
- * style claim text) into the nine dimensions below by deterministic keyword matching — it invents
- * no new evidence, assigns no numeric weight per dimension, and records presence/absence only.
+ * Story-composition dimension taxonomy — the "balance" half of the public "why this appears"
+ * surface (balancing harm, achievement, joy, family, community, institution-building,
+ * resistance, culture, and everyday life). This module classifies already accepted
+ * evidence/claim prose (relevance evidence, `./why.ts`; historicalContext-style claim text) into
+ * the nine dimensions below by deterministic keyword matching — it invents no new evidence,
+ * assigns no numeric weight per dimension, and records presence/absence only.
  *
- * `isViolenceOnlyCollapse` and `assertResultsNotViolenceOnlyCollapse` compose this classification
- * into BB-054 acceptance criterion 3 ("results do not collapse Black history into violence-only
- * content"): a SINGLE entity may legitimately classify as harm-only when that is the honest state
- * of its accepted evidence (a massacre site has no obligation to invent an unrelated joy claim) —
- * the AC's plural "results" wording is enforced at the result-SET level by the assert below, which
- * ./why-public-missing-perspective.ts's per-entity indicator softens further by naming the gap
- * honestly rather than silently narrowing the record.
+ * `isViolenceOnlyCollapse` and `assertResultsNotViolenceOnlyCollapse` enforce that results do
+ * not collapse Black history into violence-only content: a single entity may legitimately
+ * classify as harm-only when that is the honest state of its accepted evidence (a massacre site
+ * has no obligation to invent an unrelated joy claim). The plural "results" wording is enforced
+ * at the result-SET level by the assert below, which `./why-public-missing-perspective.ts`'s
+ * per-entity indicator softens further by naming the gap honestly rather than silently narrowing
+ * the record.
  */
 
 export const STORY_DIMENSIONS = [
@@ -29,7 +29,7 @@ export const STORY_DIMENSIONS = [
 
 export type StoryDimension = (typeof STORY_DIMENSIONS)[number];
 
-/** Approved-language labels for each dimension — never a raw enum token in public copy. */
+/** Approved-language labels for each dimension never a raw enum token in public copy. */
 export const STORY_DIMENSION_LABELS: Readonly<Record<StoryDimension, string>> = {
   harm: 'Documented harm',
   achievement: 'Achievement',
@@ -44,7 +44,7 @@ export const STORY_DIMENSION_LABELS: Readonly<Record<StoryDimension, string>> = 
 
 /**
  * Deterministic keyword sets per dimension. Non-exhaustive by design (this is a coarse editorial
- * classifier, not an NLP model) — false negatives (missing a dimension that is present) are safe,
+ * classifier, not an NLP model) false negatives (missing a dimension that is present) are safe,
  * since the composer treats absence as "not yet documented" rather than "does not exist" (see
  * ./why-public-missing-perspective.ts). Lowercase, matched as substrings against lowercased text.
  */
@@ -98,16 +98,16 @@ export function classifyStoryDimensions(texts: readonly string[]): readonly Stor
   );
 }
 
-/** True only when `harm` is the SOLE classified dimension — never true for an entity with no
+/** True only when `harm` is the SOLE classified dimension never true for an entity with no
  * classified dimensions at all (that is a coverage gap, not a violence-only collapse). */
 export function isViolenceOnlyCollapse(dimensions: readonly StoryDimension[]): boolean {
   return dimensions.length === 1 && dimensions[0] === 'harm';
 }
 
 /**
- * BB-054 acceptance criterion 3, enforced at the result-SET level ("results do not collapse...").
+ * enforced at the result-SET level ("results do not collapse...").
  * Throws only when every harm-classified entity in the provided set is itself harm-only AND the
- * set contains at least one harm-classified entity — i.e. the visible result set reads as wall-
+ * set contains at least one harm-classified entity i.e. the visible result set reads as wall-
  * to-wall violence with no counterbalancing dimension anywhere in it. A set that mixes a harm-only
  * entity with other, more balanced entities passes.
  */

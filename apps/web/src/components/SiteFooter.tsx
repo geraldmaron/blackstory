@@ -1,5 +1,5 @@
 /**
- * Public site footer — inverse news masthead close.
+ * Public site footer inverse news masthead close.
  */
 
 import { FOOTER_NAV } from '../lib/nav';

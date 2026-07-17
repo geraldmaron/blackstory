@@ -1,5 +1,5 @@
 /**
- * Changelog generation from git history (BB-062).
+ * Changelog generation from git history.
  * Prefers conventional commit prefixes; falls back to subject lines.
  */
 import { spawnSync } from 'node:child_process';

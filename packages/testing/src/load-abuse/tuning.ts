@@ -1,6 +1,7 @@
+
 /**
- * Concrete tuning recommendations derived from BB-059 load/abuse simulations.
- * Values reference current policy defaults in @black-book/security — adjust after staging soak.
+ * Concrete tuning recommendations derived from load/abuse simulations.
+ * Values reference current policy defaults in @black-book/security adjust after staging soak.
  */
 import {
   DEFAULT_DAILY_BUDGETS,
@@ -14,7 +15,7 @@ const searchAnon = resolveEndpointPolicy(DEFAULT_ENDPOINT_QUOTA_MATRIX, 'search'
 const geocodeAnon = resolveEndpointPolicy(DEFAULT_ENDPOINT_QUOTA_MATRIX, 'geocoding', 'anonymous');
 const entityAnon = resolveEndpointPolicy(DEFAULT_ENDPOINT_QUOTA_MATRIX, 'entityRetrieval', 'anonymous');
 
-/** Actionable tuning rows for operators — not auto-applied. */
+/** Actionable tuning rows for operators not auto-applied. */
 export function loadAbuseTuningRecommendations(): readonly TuningRecommendation[] {
   return [
     {

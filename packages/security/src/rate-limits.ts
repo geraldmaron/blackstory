@@ -1,12 +1,13 @@
+
 /**
- * Endpoint rate limits and abuse quotas (BB-025).
+ * Endpoint rate limits and abuse quotas.
  *
  * Pure deterministic policy matrix + token-bucket evaluator with bounded in-memory
  * state. Layered controls: subject quotas, endpoint classes, rolling/daily windows,
  * concurrency caps, and distributed risk-signal aggregation. No external store dependency.
  */
 
-/** Caller identity tier — anonymous receives the smallest quota. */
+/** Caller identity tier anonymous receives the smallest quota. */
 export type RateLimitSubject = 'anonymous' | 'authenticated' | 'admin' | 'service';
 
 /** Endpoint cost class mapped to quota policy rows. */
@@ -100,7 +101,7 @@ export type EndpointQuotaPolicy = {
   readonly dailyCap: number;
   /** Max concurrent in-flight requests for this key. */
   readonly maxConcurrency: number;
-  /** Cost tier for documentation / ordering checks. */
+  /** Cost tier for documentation ordering checks. */
   readonly costTier: 'static_read' | 'expensive_read' | 'mutation' | 'auth' | 'admin';
 };
 
@@ -161,7 +162,7 @@ const SUBJECT_ORDER: Record<RateLimitSubject, number> = {
   service: 3,
 };
 
-/** Default quota matrix — expensive endpoints are stricter than static reads. */
+/** Default quota matrix expensive endpoints are stricter than static reads. */
 export const DEFAULT_ENDPOINT_QUOTA_MATRIX: Record<
   EndpointClass,
   Record<RateLimitSubject, EndpointQuotaPolicy>

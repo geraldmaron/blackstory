@@ -1,11 +1,10 @@
 /**
- * Degraded snapshot-mode signalling (BB-051 acceptance criterion: "degraded snapshot mode
- * works"). `/explore` is server-rendered directly from the bundled snapshot catalog
- * (`../../data/public-seed.ts`) — the dynamic `/explore/api` refine endpoint (viewport/filter
- * re-query) is a progressive enhancement layered on top of that render, never a requirement for
- * the page to function. This module is the single source of truth for what counts as "degraded"
- * so the client orchestrator and its tests agree on one definition, and so the copy shown to
- * users is consistent and never alarmist.
+ * Degraded snapshot-mode signalling for Explore. `/explore` is server-rendered directly from
+ * the bundled snapshot catalog (`../../data/public-seed.ts`); the dynamic `/explore/api` refine
+ * endpoint (viewport/filter re-query) is a progressive enhancement layered on top of that render,
+ * never a requirement for the page to function. This module is the single source of truth for what
+ * counts as "degraded" so the client orchestrator and its tests agree on one definition, and so
+ * the copy shown to users is consistent and never alarmist.
  */
 export type ExploreDegradedReason =
   | 'refine_network_error'
@@ -24,7 +23,7 @@ export function degradedFor(reason: ExploreDegradedReason): ExploreDegradedState
   return { degraded: true, reason };
 }
 
-/** Human-readable, non-alarming copy for each degraded reason — always paired with "showing the
+/** Human-readable, non-alarming copy for each degraded reason always paired with "showing the
  * last-loaded snapshot," never a bare error message. */
 export const DEGRADED_MODE_COPY: Readonly<Record<ExploreDegradedReason, string>> = {
   refine_network_error: 'Live refinement is unavailable right now — showing the last-loaded snapshot.',

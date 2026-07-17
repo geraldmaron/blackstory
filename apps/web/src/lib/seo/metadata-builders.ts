@@ -1,5 +1,5 @@
 /**
- * BB-057 public metadata builders — canonical URLs and Open Graph previews with protected
+ * public metadata builders canonical URLs and Open Graph previews with protected
  * fields stripped before anything is emitted to HTML head tags or link unfurlers.
  */
 import type { Metadata } from 'next';
@@ -15,6 +15,7 @@ export type EntityMetadataSource = {
   readonly displayName: string;
   readonly summary?: string;
   readonly kind?: string;
+  readonly imageUrl?: string;
   readonly confidenceScore?: number;
   readonly mapPin?: { readonly x: number; readonly y: number };
   readonly sensitivity?: { readonly class: string; readonly note?: string; readonly basisClaimIds?: readonly string[] };
@@ -30,6 +31,9 @@ function siteOrigin(): string {
 }
 
 function absoluteUrl(path: string): string {
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
   const normalized = path.startsWith('/') ? path : `/${path}`;
   return new URL(normalized, siteOrigin()).toString();
 }
@@ -39,8 +43,8 @@ function absoluteUrl(path: string): string {
  */
 export function buildStaticPageMetadata(source: StaticPageMetadataSource): Metadata {
   const preview = buildPublicMetadataPreview({
-    title: source.title,
-    description: source.description,
+    ...(source.title !== undefined ? { title: source.title } : {}),
+    ...(source.description !== undefined ? { description: source.description } : {}),
     canonicalPath: source.path,
     ...(source.imageUrl !== undefined ? { imageUrl: source.imageUrl } : {}),
     ...(source.noIndex !== undefined ? { noIndex: source.noIndex } : {}),
@@ -62,6 +66,9 @@ export function buildEntityPageMetadata(source: EntityMetadataSource): Metadata 
     title,
     description,
     canonicalPath: `/entity/${source.id}`,
+    ...(typeof safe.imageUrl === 'string' && safe.imageUrl.length > 0
+      ? { imageUrl: safe.imageUrl }
+      : {}),
   });
   return toNextMetadata(preview);
 }

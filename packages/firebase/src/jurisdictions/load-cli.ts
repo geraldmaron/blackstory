@@ -1,11 +1,12 @@
+
 /**
- * Idempotent load/refresh CLI for the BB-091 `jurisdictions` collection.
+ * Idempotent load/refresh CLI for the `jurisdictions` collection.
  *
- * Loads 51 state docs (from `@black-book/domain`'s `US_STATES` — see `./us-states-source.ts`)
- * plus ~3,143 county docs (from a Census Gazetteer county file — see `./tiger-gazetteer.ts`).
+ * Loads 51 state docs (from `@black-book/domain`'s `US_STATES` see `./us-states-source.ts`)
+ * plus ~3,143 county docs (from a Census Gazetteer county file see `./tiger-gazetteer.ts`).
  * Structurally mirrors `packages/firebase/src/embeddings/backfill-cli.ts`: every dependency
  * (writer) is injected so `runJurisdictionLoad` is fully unit-testable without Firestore, and
- * only the `if (import.meta.url === ...)` block at the bottom touches real infrastructure or
+ * only the `if (import.meta.url ===...)` block at the bottom touches real infrastructure or
  * the filesystem.
  *
  * Idempotency: `createFirestoreJurisdictionWriter` reads the existing doc before writing and
@@ -14,17 +15,15 @@
  * avoids a no-op `updatedAt` churn on every re-run).
  *
  * Run directly with tsx, e.g.:
- *   node --conditions development --import tsx \
- *     packages/firebase/src/jurisdictions/load-cli.ts --gazetteer-file /path/to/2024_Gaz_counties_national.txt
+ * node --conditions development --import tsx \
+ * packages/firebase/src/jurisdictions/load-cli.ts --gazetteer-file /path/to/2024_Gaz_counties_national.txt
  *
  * Obtaining the real Census Gazetteer file: see ./tiger-gazetteer.ts's module doc for the
- * download URL and format. States never require a download — they come from the
+ * download URL and format. States never require a download they come from the
  * already-committed `US_STATES` table.
  *
- * NO LIVE APPLY IN THIS SESSION: this script is written and unit-tested against an injected
- * fake writer only. It has not been, and per project standing policy must not be, run against
- * a real Firestore instance from this agent session. See the final report's human cloud-apply
- * checklist for how a project owner runs it for real.
+ * No live apply from automation: this script is unit-tested against an injected fake writer
+ * only. Per project policy, a human operator must run the live apply against Firestore.
  */
 import { createServerFirebaseApp } from '../server.js';
 import { FIRESTORE_ROOT } from '../firestore/paths.js';

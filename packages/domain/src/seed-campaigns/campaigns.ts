@@ -1,5 +1,5 @@
 /**
- * BB-058 seed campaign metadata. Quality determines count — soft targets are ceilings for
+ * seed campaign metadata. Quality determines count soft targets are ceilings for
  * planning, not quotas to fill with weak records.
  */
 import type { SeedCampaignMeta } from './types.js';

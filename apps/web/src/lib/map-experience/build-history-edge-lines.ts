@@ -31,7 +31,7 @@ export type HistoryEdgeLineCollection = {
   readonly features: readonly HistoryEdgeLineFeature[];
 };
 
-/** ~400m east at mid-latitudes — enough to see a stub when two entities share a campus pin. */
+/** ~400m east at mid-latitudes enough to see a stub when two entities share a campus pin.  */
 const COINCIDENT_LNG_NUDGE = 0.004;
 
 export function buildHistoryEdgeLineCollection(

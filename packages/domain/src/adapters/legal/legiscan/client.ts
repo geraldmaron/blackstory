@@ -1,5 +1,5 @@
 /**
- * Fixture-only LegiScan client for BB-087. Parses bundled masterlist JSON — no live network in tests.
+ * Fixture-only LegiScan client. Parses bundled masterlist JSON no live network in tests.
  */
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

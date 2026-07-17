@@ -1,5 +1,5 @@
 /**
- * Unit tests for the client-side coarse location analytics builder (BB-050), mirroring
+ * Unit tests for the client-side coarse location analytics builder, mirroring
  * `packages/domain/src/geocode/analytics.ts`'s own test coverage so both stay behavior-identical.
  */
 import assert from 'node:assert/strict';

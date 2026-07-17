@@ -1,7 +1,7 @@
 /**
- * BB-050 geocode pipeline: orchestrates address normalization, the (injected) Census Geocoder
+ * geocode pipeline: orchestrates address normalization, the (injected) Census Geocoder
  * fetch, jurisdiction-id resolution, exact-coordinate reduction, product-scope evaluation, the
- * geocode cache, and the manual-place-search fallback into two entry points —
+ * geocode cache, and the manual-place-search fallback into two entry points 
  * `geocodeAddress` (forward: address/ZIP text -> jurisdiction ids) and `reverseGeocodeCoordinates`
  * (browser location -> jurisdiction ids). Neither entry point performs network I/O itself; both
  * take a fetcher port backed, in production, by `../adapters/census-geo/fetch-geocode.ts`.
@@ -45,7 +45,7 @@ export type GeocodeAddressInput = {
   readonly fetchAddressGeocode: CensusAddressGeocodeFetcher;
   readonly cache?: GeocodeCache<GeocodeResolution>;
   readonly now?: () => number;
-  /** Opt-in only — see `./coordinate-precision.ts`'s module doc for the fail-safe default. */
+  /** Opt-in only see `./coordinate-precision.ts`'s module doc for the fail-safe default. */
   readonly retainExactCoordinates?: boolean;
 };
 
@@ -123,7 +123,7 @@ export async function reverseGeocodeCoordinates(input: ReverseGeocodeInput): Pro
   }
 
   // Browser-location reverse geocodes resolve to the containing jurisdiction, not a street
-  // address — never treated as an exact-site match regardless of `retainExactCoordinates`.
+  // address never treated as an exact-site match regardless of `retainExactCoordinates`.
   const resolution = toResolution(match, false);
   input.cache?.set(cacheKey, resolution, nowMs);
   return { ok: true, resolution, cacheHit: false };

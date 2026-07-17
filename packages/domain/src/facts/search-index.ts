@@ -1,20 +1,20 @@
 /**
- * Search-index adapter hook: published `FactRecord`s -> the BB-049 search lane (BB-086
- * acceptance criterion 5).
+ * Search-index adapter hook: published `FactRecord`s -> the search lane (
+ * ).
  *
  * Produces docs that are STRUCTURALLY `PublicSearchIndexDoc` (`../search/types.ts`) — the exact
- * shape `rankRecords`/`applyFilters`/`computeFacetCounts`/`runPublicSearch` already consume — so
- * a fact-search page can call the real BB-049 pipeline functions directly, and a future combined
- * index can concatenate `[...entityDocs, ...factDocs]` into one `PublicSearchIndexDoc[]` without
+ * shape `rankRecords`/`applyFilters`/`computeFacetCounts`/`runPublicSearch` already consume so
+ * a fact-search page can call the real pipeline functions directly, and a future combined
+ * index can concatenate `[...entityDocs,...factDocs]` into one `PublicSearchIndexDoc` without
  * a shape mismatch.
  *
  * Deliberately DOES NOT reuse `../search/index-build.ts`'s `buildPublicSearchIndexDocs`: that
- * function enforces the BB-090 entity `notabilityBasis` gate
+ * function enforces the entity `notabilityBasis` gate
  * (`../relevance/notability-gate.ts`), whose closed criterion vocabulary
  * (first_to_do_x/major_honor_or_hall_of_fame/…) describes why an ENTITY belongs in the registry
- * and does not describe a fact. Facts have their own, already-appropriate fail-closed gate — the
- * citation-completeness publish gate (`./publish-gate.ts`) — so this module's `notabilityBasis`
- * field is always `[]` (structurally valid, semantically "not applicable") and indexability is
+ * and does not describe a fact. Facts have their own, already-appropriate fail-closed gate the
+ * citation-completeness publish gate (`./publish-gate.ts`) so this module's `notabilityBasis`
+ * field is always `` (structurally valid, semantically "not applicable") and indexability is
  * governed by `isFactSearchIndexable` + the publish gate instead.
  */
 import { deriveEraBuckets } from '../era.js';
@@ -36,9 +36,9 @@ export type BuildFactSearchIndexResult = {
 };
 
 /**
- * Maps `FactConfidenceGrade` -> the BB-049 `researchCoverage` union. `established`/`corroborated`
+ * Maps `FactConfidenceGrade` -> the `researchCoverage` union. `established`/`corroborated`
  * (independently-checked evidence) count as `substantial`; `single-source` as `partial`;
- * `contested` as `minimal` — a deterministic, documented mapping, not a hidden score.
+ * `contested` as `minimal` a deterministic, documented mapping, not a hidden score.
  */
 function researchCoverageFromConfidence(confidence: FactRecord['confidence']): SearchableEntityRecord['researchCoverage'] {
   switch (confidence) {
@@ -61,7 +61,7 @@ function nameVariantAliases(fact: FactRecord): readonly string[] {
 
 /**
  * Builds one fact's searchable doc. Returns `undefined` (never throws) when the fact is not
- * currently indexable — the caller (`buildFactSearchIndexDocs`) reports the reason in `skipped`
+ * currently indexable the caller (`buildFactSearchIndexDocs`) reports the reason in `skipped`
  * so a bad/incomplete record never aborts the whole index build, mirroring
  * `../search/index-build.ts`'s skip-not-abort posture.
  */
@@ -87,8 +87,8 @@ export function buildFactSearchIndexDoc(
     topicTags: [fact.claimType],
     status: fact.status,
     eraBuckets: fact.when ? deriveEraBuckets(fact.when) : [],
-    // Facts are gated by ./publish-gate.ts's citation-completeness check, not the entity
-    // notability rubric — see this module's doc comment.
+    // Facts are gated by./publish-gate.ts's citation-completeness check, not the entity
+    // notability rubric see this module's doc comment.
     notabilityBasis: [],
     notabilityLabels: [],
     recordMaturity: fact.status,

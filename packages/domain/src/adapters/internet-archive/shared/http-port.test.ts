@@ -1,10 +1,10 @@
 /**
- * Proves the `SafeHttpClient` port (./http-port.ts) is realizable against the REAL BB-030
- * primitives — not a stub — and that an SSRF-targeted URL is rejected before any adapter fetch
+ * Proves the `SafeHttpClient` port (./http-port.ts) is realizable against the REAL 
+ * primitives not a stub and that an SSRF-targeted URL is rejected before any adapter fetch
  * proceeds.
  *
  * `@black-book/security` is a devDependency of this package for this test only (see
- * package.json); it is never imported by http-port.ts or any other shipped adapter file — see
+ * package.json); it is never imported by http-port.ts or any other shipped adapter file see
  * http-port.ts's header comment for the circular-dependency reason. This mirrors
  * `../../../map/map-source.redaction.test.ts`'s pattern exactly: the port is defined and
  * consumed with zero runtime dependency on `@black-book/security`, and only the test proves the
@@ -32,11 +32,11 @@ async function* chunks(...values: readonly string[]): AsyncGenerator<Uint8Array>
 }
 
 /**
- * A reference `SafeHttpClient` implementation backed by the REAL BB-030 safety primitives.
- * This is what production wiring (outside this package) is expected to look like — GET-only,
+ * A reference `SafeHttpClient` implementation backed by the REAL safety primitives.
+ * This is what production wiring (outside this package) is expected to look like GET-only,
  * enough to prove the seam is sound; POST/header support for Wayback SPN needs a pinned
  * transport with method/body support, which is exactly why the port is generalized beyond
- * BB-030's `executeSafeFetch`.
+ * `executeSafeFetch`.
  */
 function buildRealSafeHttpClient(deps: { readonly resolveHost: ResolveHost; readonly transport: PinnedTransport }): SafeHttpClient {
   return async (request): Promise<SafeHttpResponse> => {

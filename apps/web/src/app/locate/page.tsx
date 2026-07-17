@@ -1,6 +1,6 @@
 /**
- * Public "find your jurisdiction" page (BB-050): U.S. address and current-location discovery.
- * Thin Server Component — the privacy disclosure (`LocationPrivacyNotice`) and a no-JS-safe
+ * Public "find your jurisdiction" page: U.S. address and current-location discovery.
+ * Thin Server Component the privacy disclosure (`LocationPrivacyNotice`) and a no-JS-safe
  * fallback link render on the server; the one interactive client island
  * (`LocateExperience`, which owns browser-location consent, manual address/ZIP entry, and the
  * `/locate/api` fetch/result lifecycle) hydrates on top of it.

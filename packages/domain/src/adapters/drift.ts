@@ -1,5 +1,5 @@
 /**
- * Parser drift metrics: types and recording helpers (BB-037).
+ * Parser drift metrics: types and recording helpers.
  */
 import type { EvaluateRunHealthInput, EvaluateRunHealthResult } from './run-health.js';
 

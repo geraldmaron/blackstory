@@ -1,6 +1,6 @@
 /**
- * Unit tests for the public "submit a lead" rate-limit guard (BB-025 reuse, BB-076).
- * Uses a deterministic fake clock — no real timers — so results are reproducible.
+ * Unit tests for the public "submit a lead" rate-limit guard.
+ * Uses a deterministic fake clock no real timers so results are reproducible.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -37,7 +37,7 @@ test('allows a verified anonymous submission and denies once the rolling window 
   assert.equal(second.allowed, true);
   if (second.allowed) guard.release(second.key);
 
-  // The default `corrections`/anonymous window cap is 2 within the window — a third
+  // The default `corrections`/anonymous window cap is 2 within the window a third
   // submission in the same window must be denied, not silently allowed through.
   const third = guard.evaluate(request);
   assert.equal(third.allowed, false);

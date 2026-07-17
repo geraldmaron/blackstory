@@ -1,5 +1,5 @@
 /**
- * Deterministic relevance engine public surface (BB-040).
+ * Deterministic relevance engine public surface.
  */
 export {
   RELEVANCE_ASSESSMENT_SCHEMA_VERSION,
@@ -86,8 +86,8 @@ export {
   getRelevanceFixtureCase,
 } from './fixtures.js';
 
-// BB-054: public "why this appears" surface — story-dimension balance, editorial euphemism
-// checks, trauma-content notices, missing-perspective indicators, and the auditable BB-090
+// public "why this appears" surface story-dimension balance, editorial euphemism
+// checks, trauma-content notices, missing-perspective indicators, and the auditable
 // notabilityBasis renderer. Composes ./why.js, ./public.js, and ../entity-status.js; introduces
 // no new relevance gate and does not modify ./engine.js or ./gates.js.
 export {

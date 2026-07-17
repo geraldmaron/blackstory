@@ -1,5 +1,5 @@
 /**
- * Unit tests for BB-055 admin research-case conversion hook.
+ * Unit tests for admin research-case conversion hook.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

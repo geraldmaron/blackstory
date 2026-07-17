@@ -1,5 +1,5 @@
 /**
- * Barrel smoke test: the BB-049 search subsystem index re-exports every public entry point.
+ * Barrel smoke test: the search subsystem index re-exports every public entry point.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

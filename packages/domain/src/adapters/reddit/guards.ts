@@ -1,11 +1,11 @@
 /**
- * Fail-closed compliance guards for the Reddit adapter (BB-074). These are runtime assertions —
- * not just comments — that the adapter's exported surface and normalized payloads never grow a
+ * Fail-closed compliance guards for the Reddit adapter. These are runtime assertions 
+ * not just comments that the adapter's exported surface and normalized payloads never grow a
  * republication path, an ML-training path, or an identity-resolving field. reddit.test.ts calls
  * every one of these against the adapter's real module exports and real normalized output, so a
  * future change that adds a forbidden function/field fails the test suite, not just review.
  *
- * Deanonymization itself is governed by the existing BB-077 guard
+ * Deanonymization itself is governed by the existing guard
  * (../../rights/living-person-ugc.ts assertNoDeanonymization) — this module does not
  * reimplement that check, it only proves nothing in this adapter tries to route around it (see
  * reddit.test.ts).
@@ -34,7 +34,7 @@ const FORBIDDEN_EXPORT_NAME_PATTERNS: readonly RegExp[] = [
 /**
  * Throws if any exported name in `moduleExports` matches a forbidden pattern. Call with
  * `import * as redditAdapter from './index.js'` to check the adapter's real, live export
- * surface — not a hand-maintained list that could drift from what's actually exported.
+ * surface not a hand-maintained list that could drift from what's actually exported.
  */
 export function assertNoForbiddenExportSurface(moduleExports: Readonly<Record<string, unknown>>): void {
   for (const name of Object.keys(moduleExports)) {
@@ -52,7 +52,7 @@ export function assertNoForbiddenExportSurface(moduleExports: Readonly<Record<st
 /**
  * Field keys that would indicate real-identity data (as opposed to a pseudonymous handle) is
  * being smuggled into a Reddit payload/pointer. Checked defensively wherever untyped/adapter-
- * sourced data is normalized — mirrors ../../rights/evidence-pointer.ts's
+ * sourced data is normalized mirrors../../rights/evidence-pointer.ts's
  * `assertNoFullPageFields` pattern for the same class of defect.
  */
 const PROHIBITED_IDENTITY_KEYS = new Set([
@@ -72,8 +72,8 @@ const PROHIBITED_IDENTITY_KEYS = new Set([
   'accountid',
 ]);
 
-/** Field keys that would indicate a full post body / comment tree is being stored, rather than
- *  the mandatory-capped triage snippet. Mirrors evidence-pointer.ts's full-page-field guard. */
+/** Field keys that would indicate a full post body comment tree is being stored, rather than
+ * the mandatory-capped triage snippet. Mirrors evidence-pointer.ts's full-page-field guard. */
 const PROHIBITED_FULL_CONTENT_KEYS = new Set([
   'body',
   'bodyhtml',

@@ -1,5 +1,6 @@
+
 /**
- * Tests for BB-072 hybrid retrieval eval harness (precision/recall/MRR gates).
+ * Tests for hybrid retrieval eval harness (precision/recall/MRR gates).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

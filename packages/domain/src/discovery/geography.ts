@@ -1,6 +1,6 @@
 /**
- * Basic geographic extraction helpers for discovery candidates (BB-039).
- * Heuristic text extraction only — full geocoding deferred to BB-041/BB-050.
+ * Basic geographic extraction helpers for discovery candidates.
+ * Heuristic text extraction only full geocoding deferred to /.
  */
 import type { AdapterCandidateRecord } from '../adapters/types.js';
 import type { GeographicHint } from './types.js';

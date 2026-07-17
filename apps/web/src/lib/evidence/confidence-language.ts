@@ -1,15 +1,15 @@
 /**
- * Confidence, relevance, connection-strength, and research-coverage copy for the BB-053 evidence
+ * Confidence, relevance, connection-strength, and research-coverage copy for the evidence
  * interface.
  *
- * AC1: confidence is always labeled as a deterministic evidence score derived from BB-017's
+ * Confidence is always labeled as a deterministic evidence score derived from the
  * component-weighted engine (`@black-book/domain`'s `calculateClaimConfidence`), never framed as
- * a probability that a claim is true — unless the caller passes an explicit `calibrated: true`
+ * a probability that a claim is true unless the caller passes an explicit `calibrated: true`
  * flag proving the score has been statistically calibrated against an observed outcome
- * distribution. BB-017 ships no such calibration today, so every real call site in this codebase
- * uses the default (`calibrated: false`) evidence-score phrasing.
+ * distribution. This codebase ships no such calibration today, so every real call site uses the
+ * default (`calibrated: false`) evidence-score phrasing.
  *
- * AC2: `EVIDENCE_DIMENSION_COPY` gives confidence, relevance, connection strength, and research
+ * `EVIDENCE_DIMENSION_COPY` gives confidence, relevance, connection strength, and research
  * coverage each their own label and description so a reader (and a future maintainer) never
  * conflates "how strong is the evidence for this claim" with "does this record belong here",
  * "how substantively is this entity connected to the corpus theme", or "how much research has
@@ -32,7 +32,7 @@ const PROBABILITY_LANGUAGE_PATTERN = /\bprobability\b|\bchance(?:s)? (?:of|that)
 
 /**
  * Defense-in-depth guard: fails closed if uncalibrated confidence copy drifts toward probability
- * language (AC1). Mirrors this codebase's existing scoring-poisoning-guard pattern
+ * language. Mirrors this codebase's existing scoring-poisoning-guard pattern
  * (`packages/domain/src/confidence-engine`) of proving a policy invariant with a runtime check
  * rather than only a code-review convention.
  */
@@ -45,7 +45,7 @@ export function assertNoUncalibratedProbabilityLanguage(text: string, calibrated
 /**
  * Format the evidence-score label shown alongside a claim's confidence. Always reads as a score
  * ("Evidence score: high (0.78 of 1.00)"), never as a probability, unless `calibration.calibrated`
- * is explicitly set — in which case the label switches to calibrated-confidence phrasing.
+ * is explicitly set in which case the label switches to calibrated-confidence phrasing.
  */
 export function formatEvidenceScoreLabel(
   score: number,
@@ -69,7 +69,7 @@ export type EvidenceDimensionCopy = {
   readonly description: string;
 };
 
-/** Distinguishing copy for each measurement dimension (AC2) — deliberately never merged into one
+/** Distinguishing copy for each measurement dimension — deliberately never merged into one
  * blended figure or label. Each answers a different question about a claim or record. */
 export const EVIDENCE_DIMENSION_COPY: Readonly<Record<EvidenceDimensionKey, EvidenceDimensionCopy>> = {
   confidence: {

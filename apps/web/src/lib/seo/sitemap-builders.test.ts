@@ -1,5 +1,5 @@
 /**
- * BB-057 sitemap builder tests — active release entities become canonical entity URLs.
+ * sitemap builder tests active release entities become canonical entity URLs.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

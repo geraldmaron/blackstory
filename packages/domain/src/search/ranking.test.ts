@@ -1,5 +1,5 @@
 /**
- * Tests for BB-049 AC1: deterministic, auditable ranking by text relevance + connection strength
+ * Tests for deterministic, auditable ranking by text relevance + connection strength
  * (not fame alone), with bounded misspelling tolerance that never fires below the fuzzy floor.
  */
 import assert from 'node:assert/strict';

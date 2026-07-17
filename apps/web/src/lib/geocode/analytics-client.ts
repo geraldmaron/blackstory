@@ -1,14 +1,14 @@
 /**
- * Client-side coarse-only location analytics (BB-050 "coarse analytics only; no persistent
+ * Client-side coarse-only location analytics ("coarse analytics only; no persistent
  * precise-location history"). Structurally mirrors `packages/domain/src/geocode/analytics.ts`'s
  * `buildCoarseLocationAnalyticsEvent` event shape (no lat/lng/address/ZIP fields).
  *
- * `recordCoarseLocationAnalyticsEvent` is the ONLY sink this bead wires: it logs the event shape
- * (never a resolution, coordinate, address, or ZIP — the `CoarseLocationAnalyticsEvent` type has
+ * `recordCoarseLocationAnalyticsEvent` is the ONLY sink this wires: it logs the event shape
+ * (never a resolution, coordinate, address, or ZIP the `CoarseLocationAnalyticsEvent` type has
  * no field for any of them) to the console, the same "real sink is a future integration, this is
  * the structurally-safe interim" posture `../../app/submit/app-check-guard.ts`'s
  * `consoleTelemetry` already uses for App Check events. Wiring a real analytics backend (e.g.
- * BigQuery export, a metrics service) is out of this bead's scope.
+ * BigQuery export, a metrics service) is out of this module's scope.
  */
 
 export type CoarseLocationAnalyticsEventKind =
@@ -18,7 +18,7 @@ export type CoarseLocationAnalyticsEventKind =
   | 'manual_fallback_used';
 
 /**
- * Deliberately excludes `lat`/`lng`/address/ZIP fields — the type itself is the enforcement that
+ * Deliberately excludes `lat`/`lng`/address/ZIP fields the type itself is the enforcement that
  * no precise location can be threaded into an analytics event, not just a convention.
  */
 export type CoarseLocationAnalyticsEvent = {

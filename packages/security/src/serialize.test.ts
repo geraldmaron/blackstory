@@ -1,6 +1,7 @@
+
 /**
  * Tests for the public serialization choke point: projections, search docs, exports,
- * and the fail-closed safety assertion (BB-015). Proves stored exact addresses are
+ * and the fail-closed safety assertion. Proves stored exact addresses are
  * reduced before publication and prohibited precision can never be returned publicly.
  */
 import assert from 'node:assert/strict';
@@ -38,10 +39,15 @@ const storedExactResidence = {
   label: '20 W 34th St',
 };
 
+const LEARNING_SUMMARY =
+  'A historically documented public record in the Black Book learning index, ' +
+  'with published claims and provenance suitable for educators and researchers.';
+
 test('public projection reduces a stored exact address before publication (living)', () => {
   const projection = toPublicEntityProjection(livingPerson, {
     releaseId: 'rel_001',
-    summary: 'A living person; residence must never publish.',
+    summary: LEARNING_SUMMARY,
+    topicTags: ['community'],
     location: storedExactResidence,
   });
 
@@ -50,6 +56,8 @@ test('public projection reduces a stored exact address before publication (livin
   assert.equal(projection.location?.lng, -73.99);
   assert.equal(projection.location?.geohash, 'dr5r');
   assert.equal(projection.nameLower, 'living subject');
+  assert.equal(projection.summary, LEARNING_SUMMARY);
+  assert.deepEqual(projection.topicTags, ['community']);
   // Fail-closed assertion already ran inside the serializer.
   assert.doesNotThrow(() => assertPublicProjectionSafe(projection));
 });
@@ -57,10 +65,22 @@ test('public projection reduces a stored exact address before publication (livin
 test('public projection reduces a deceased historical residence to neighborhood', () => {
   const projection = toPublicEntityProjection(deceasedPerson, {
     releaseId: 'rel_001',
+    summary: LEARNING_SUMMARY,
     location: storedExactResidence,
   });
   assert.equal(projection.location?.precision, 'neighborhood');
   assert.equal(projection.location?.geohash?.length, 5);
+});
+
+test('public projection rejects summaries below the learning-index minimum', () => {
+  assert.throws(
+    () =>
+      toPublicEntityProjection(livingPerson, {
+        releaseId: 'rel_001',
+        summary: 'too short',
+      }),
+    /Learning-index projection rejected/,
+  );
 });
 
 test('public serializer cannot return prohibited precision', () => {

@@ -1,5 +1,5 @@
 /**
- * Map data-platform source builder for BB-070.
+ * Map data-platform source builder.
  *
  * This module builds the public map GeoJSON + state/county presence aggregates
  * from active public projections. It is a pure, dependency-injected module: it
@@ -7,23 +7,22 @@
  * depends on `@black-book/domain`, so the reverse edge would be a circular
  * workspace dependency) and it never reads a raw coordinate for output.
  *
- * The hard invariant (BB-015 / BB-070 acceptance criterion 3): every location
+ * The hard invariant: every location
  * that reaches a feature or aggregate MUST come from the return value of the
  * injected `redactLocation` port, never from the raw `location` field on the
  * input. `redactLocation` is structurally typed to match
- * `redactLocationForPublic` from `@black-book/security` — callers wire the
+ * `redactLocationForPublic` from `@black-book/security` callers wire the
  * real function in; see `fixtures.ts` and `map-source.redaction.test.ts` for
  * the wiring and the regression test that proves the invariant against the
  * real security package.
  *
- * INTEGRATION POINT (not yet wired live — see docs/adr/ADR-013-map-stack.md
- * "Release-coupled build" and workers/publication/MAP_SOURCE_INTEGRATION.md):
- * on release activation, the release pipeline should call `buildMapSource`
- * with every active public projection that carries a location, using
- * `redactLocationForPublic` (or `toPublicEntityProjection`'s location step)
- * from `@black-book/security` as the `redactLocation` port, then persist the
- * result alongside the release manifest (BB-019) so rollback restores the
- * prior map version the same way it restores the prior search-index version.
+ * Not wired live: see docs/adr/ADR-013-map-stack.md ("Release-coupled build") and
+ * workers/publication/MAP_SOURCE_INTEGRATION.md. On release activation, the release
+ * pipeline should call `buildMapSource` with every active public projection that
+ * carries a location, using `redactLocationForPublic` (or `toPublicEntityProjection`'s
+ * location step) from `@black-book/security` as the `redactLocation` port, then
+ * persist the result alongside the release manifest so rollback restores the prior
+ * map version the same way it restores the prior search-index version.
  */
 
 import { US_BOUNDS, findUsStateForPoint, isWithinUsBounds } from './us-geography.js';
@@ -42,7 +41,7 @@ export type MapSourceRawLocation = {
   /**
    * Optional county hint resolved upstream from the entity's jurisdiction
    * records (see `@black-book/domain` geography `Jurisdiction`). This module
-   * never derives a county from coordinates — real county attribution needs
+   * never derives a county from coordinates real county attribution needs
    * polygon boundary data this repo does not vendor (see ADR-013). Without a
    * hint, the entity's point still contributes to the state aggregate; it is
    * simply absent from the county aggregate.
@@ -150,8 +149,8 @@ export type BuildMapSourceInput = {
 
 /**
  * Build the public map GeoJSON FeatureCollection and state/county presence
- * aggregates for every geo-anchored entity ("everything-active" population —
- * BB-070 acceptance criterion 3). Every coordinate in the output is the
+ * aggregates for every geo-anchored entity ("everything-active" population 
+ * ). Every coordinate in the output is the
  * return value of `redactLocation`; raw `location.lat`/`location.lng` values
  * are only ever passed as arguments into that function, never read back out.
  */

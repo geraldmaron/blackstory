@@ -1,7 +1,7 @@
 /**
- * Testable core of the `/history/api` refine endpoint (BB-093). Applies BB-049 guardrails to
+ * Testable core of the `/history/api` refine endpoint. Applies guardrails to
  * kind/decade filter dimensions, then filters the bundled graph release snapshot. The page itself
- * is SSR-first — this route is progressive enhancement proving App Check + guardrails on dynamic
+ * is SSR-first this route is progressive enhancement proving App Check + guardrails on dynamic
  * history queries without requiring a full navigation.
  */
 import { NextResponse } from 'next/server';

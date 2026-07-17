@@ -1,5 +1,6 @@
+
 /**
- * BB-084: proves the restore-drill job body is REAL — hermetic unit coverage plus a genuine
+ * Proves the restore-drill job body is REAL hermetic unit coverage plus a genuine
  * integration test that runs the actual, already-existing scripts/backup-restore/
  * staging-restore.stub.sh in its default DRY_RUN=1 (print-only) mode. No live gcloud command is
  * ever executed by this job or this test.
@@ -69,7 +70,7 @@ test('integration: runs the real staging-restore.stub.sh, which stays print-only
   assert.equal(result.ok, true, result.printedPlan);
   assert.equal(result.run.status, 'success');
   // Proves this run stayed print-only: the plan text is the printed gcloud command, not
-  // evidence of a real import (no "async" import actually ran — this process just printed it).
+  // evidence of a real import (no "async" import actually ran this process just printed it).
   assert.match(result.printedPlan, /gcloud firestore import/);
   assert.match(result.printedPlan, /verify-restore\.mjs/);
 });

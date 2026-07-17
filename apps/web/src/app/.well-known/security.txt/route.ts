@@ -1,7 +1,7 @@
 /**
- * /.well-known/security.txt (BB-089, RFC 9116). Points researchers/reporters at a role security
- * contact instead of a personal one — the operator OPSEC half of this bead. Every value below is
- * a clearly-templated placeholder (the `.example` TLD is reserved by RFC 2606 and will never
+ * /.well-known/security.txt. Points researchers/reporters at a role security
+ * contact instead of a personal one — the operator-OPSEC half of this surface. Every value below
+ * is a clearly-templated placeholder (the `.example` TLD is reserved by RFC 2606 and will never
  * resolve) until the pre-launch-operator-protection runbook's domain-registration and
  * role-mailbox steps are actually executed by a human; see
  * docs/runbooks/pre-launch-operator-protection.md. Swap PLACEHOLDER_DOMAIN and the contact
@@ -12,8 +12,8 @@ const PLACEHOLDER_SECURITY_CONTACT = `security@${PLACEHOLDER_DOMAIN}`;
 const EXPIRES_WINDOW_DAYS = 365;
 
 /** RFC 9116 requires an Expires field; this repo has no scheduler wired up yet (that is a
- *  documented forward-reference to BB-084 in the runbook), so the value is computed relative to
- *  request time as an interim measure — renew this file's cached copy at least yearly regardless. */
+ * documented forward-reference in the runbook), so the value is computed relative to
+ * request time as an interim measure — renew this file's cached copy at least yearly regardless. */
 function expiresAt(now: Date): string {
   const expires = new Date(now.getTime());
   expires.setUTCDate(expires.getUTCDate() + EXPIRES_WINDOW_DAYS);

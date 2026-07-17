@@ -1,5 +1,5 @@
 /**
- * Tests for Layer 3 — exclusion infrastructure: HOLC A-D grade weights and covenant combination.
+ * Tests for Layer 3 exclusion infrastructure: HOLC A-D grade weights and covenant combination.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

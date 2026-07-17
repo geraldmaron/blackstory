@@ -1,7 +1,7 @@
 /**
- * Server-only rate-limit guard for BB-055 correction intake. Reuses `@black-book/security`'s
- * shared evaluator under the existing `corrections` endpoint class — anonymous capacity 2 /
- * window cap 2 / daily 8 — so coordinated brigading cannot exhaust the lane silently.
+ * Server-only rate-limit guard for correction intake. Reuses `@black-book/security`'s
+ * shared evaluator under the existing `corrections` endpoint class anonymous capacity 2
+ * window cap 2 daily 8 so coordinated brigading cannot exhaust the lane silently.
  */
 import {
   aggregateDistributedRisk,

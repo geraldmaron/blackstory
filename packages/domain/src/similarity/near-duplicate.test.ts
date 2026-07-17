@@ -1,5 +1,5 @@
 /**
- * Tests for semantic near-duplicate detection (BB-071) — a recall safety net alongside the
+ * Tests for semantic near-duplicate detection a recall safety net alongside the
  * exact content-hash dedup in ../discovery/deduplication.ts.
  */
 import assert from 'node:assert/strict';

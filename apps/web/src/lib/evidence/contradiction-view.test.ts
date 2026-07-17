@@ -1,6 +1,6 @@
 /**
- * Unit tests for BB-053 dispute/contradiction presentation (acceptance criterion 3: disagreement
- * is visible rather than silently resolved).
+ * Unit tests for dispute/contradiction presentation (disagreement is visible rather than
+ * silently resolved).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

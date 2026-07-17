@@ -1,5 +1,5 @@
 /**
- * Regression tests for the BB-092 graph release artifact seed used by `/history`.
+ * Regression tests for the graph release artifact seed used by `/history`.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,5 +1,5 @@
 /**
- * Content hashing and reproducibility fingerprints for discovery candidates (BB-039).
+ * Content hashing and reproducibility fingerprints for discovery candidates.
  */
 import type { AdapterCandidateRecord } from '../adapters/types.js';
 import { hashUtf8, type ContentHash } from '../provenance/hashes.js';

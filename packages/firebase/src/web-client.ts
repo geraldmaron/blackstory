@@ -1,3 +1,4 @@
+
 /**
  * Public web Firebase client initialization boundary.
  */
@@ -13,6 +14,7 @@ export type WebFirebaseClient = {
 };
 
 const WEB_APP_NAME = 'black-book-web';
+
 
 /**
  * Initialize (or reuse) the public web Firebase app. Emulator hosts are connected

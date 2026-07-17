@@ -1,9 +1,9 @@
 /**
- * CDX-index query construction from BB-038 query packs (BB-075) -- geographically seeded per
+ * CDX-index query construction from query packs -- geographically seeded per
  * state/county via caller-supplied seed hosts (see types.ts's module doc comment for why this
  * adapter does not invent domain names).
  *
- * CRITICAL constraint (bead acceptance criterion 3, shared with ../web-search/): the CDX
+ * CRITICAL constraint: the CDX
  * `filter` regex built from a query pack must never contain a `researchOnlyOffensive` term's
  * text. This module builds the filter pattern exclusively from
  * `toPublicSafeTerms(pack.terms)` (../../query-packs/terms.js), which already omits those terms.

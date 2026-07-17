@@ -1,10 +1,10 @@
 /**
- * Fetches Brave Web Search results through the BB-030 safe HTTP port (BB-075). Never calls
+ * Fetches Brave Web Search results through the safe HTTP port. Never calls
  * `fetch` directly -- see ../internet-archive/shared/http-port.ts for why. The API key is always
  * supplied by the caller (e.g. `BRAVE_SEARCH_API_KEY`) -- never hardcoded or read from an env var
  * here; tests pass a deterministic fake key, mirroring ../dpla/fetch-search.ts's convention.
  *
- * `fetchBraveWebSearchBudgeted` checks the BB-033-backed budget guard (./budget-guard.ts) BEFORE
+ * `fetchBraveWebSearchBudgeted` checks the -backed budget guard (./budget-guard.ts) BEFORE
  * issuing the query at all -- a denied budget never reaches the network. `fetchBraveWebSearch`
  * performs the HTTP call and normalization; normalization's own storage-terms gate
  * (./normalizer.ts `assertStorageTermsConfirmed`) is a separate, independent check -- a search
@@ -98,7 +98,7 @@ export type FetchBraveWebSearchBudgetedResult = {
   readonly budgetDecision: WebSearchBudgetDecision;
 };
 
-/** Checks the BB-033-backed budget guard BEFORE issuing the query; throws (fails closed) when denied. */
+/** Checks the -backed budget guard BEFORE issuing the query; throws (fails closed) when denied. */
 export async function fetchBraveWebSearchBudgeted(
   input: FetchBraveWebSearchBudgetedInput,
 ): Promise<FetchBraveWebSearchBudgetedResult> {

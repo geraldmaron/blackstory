@@ -1,6 +1,6 @@
 /**
- * Shareable URL state for `/explore` (BB-051): viewport + filters + selected entity + density
- * toggle + selected state + optional relationship lines / decade / selected edge. Pure
+ * Shareable URL state for `/explore`: viewport + filters + selected entity + density
+ * toggle + selected state + optional relationship lines decade selected edge. Pure
  * parse/serialize so the server-rendered page and the client orchestrator read and write the
  * exact same shape.
  */
@@ -16,14 +16,14 @@ export type ExploreViewState = {
   readonly filters: ExploreFilterState;
   readonly viewport?: ExploreViewport;
   readonly selected?: string;
-  /** USPS state / DC postal code when a state shape is selected on the map. */
+  /** USPS state DC postal code when a state shape is selected on the map.  */
   readonly state?: string;
   readonly density: boolean;
-  /** Draw evidence-backed History relationship lines between entity anchors. */
+  /** Draw evidence-backed History relationship lines between entity anchors.  */
   readonly lines: boolean;
-  /** When set with lines, filter edges to this decade slice (e.g. `1950s`). */
+  /** When set with lines, filter edges to this decade slice (e.g. `1950s`).  */
   readonly decade?: string;
-  /** Selected History edge id when a relationship line is clicked. */
+  /** Selected History edge id when a relationship line is clicked.  */
   readonly edge?: string;
 };
 

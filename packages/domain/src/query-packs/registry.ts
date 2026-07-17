@@ -1,5 +1,5 @@
 /**
- * In-memory query pack registry for versioned pack lookup (BB-038).
+ * In-memory query pack registry for versioned pack lookup.
  */
 import { assertQueryPackValid } from './pack.js';
 import type { EntityKind } from '../entity-kinds.js';

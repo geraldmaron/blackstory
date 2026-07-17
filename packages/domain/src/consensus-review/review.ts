@@ -1,6 +1,6 @@
 /**
  * Deterministic reviewer-log accumulation, tallying, and agreement-threshold routing for
- * BB-076 consensus review. Every function here is pure: no clocks, no randomness, no I/O —
+ * consensus review. Every function here is pure: no clocks, no randomness, no I/O 
  * callers supply `now` and persist the returned values themselves.
  */
 import {
@@ -39,7 +39,7 @@ function assertSameSubmission(
   }
 }
 
-/** Throws if any two reviews in the log share a reviewerId — reviews must be independent. */
+/** Throws if any two reviews in the log share a reviewerId reviews must be independent. */
 export function assertIndependentReviews(reviews: readonly ReviewerClassification[]): void {
   const seen = new Set<string>();
   for (const review of reviews) {
@@ -58,7 +58,7 @@ export function assertIndependentReviews(reviews: readonly ReviewerClassificatio
 
 /**
  * Appends one independent reviewer classification to a review log. This is the only supported
- * way to record a review — it enforces the independence invariant (one review per reviewer per
+ * way to record a review it enforces the independence invariant (one review per reviewer per
  * submission) at write time rather than leaving it to be discovered at tally time.
  */
 export function recordReview(
@@ -135,7 +135,7 @@ function assertValidPolicy(policy: ConsensusPolicy): void {
 /**
  * Routes a quarantined lead by reviewer agreement (Zooniverse/Caesar pattern): below the
  * minimum independent-review count, routing is withheld; a tie or below-threshold agreement
- * is genuine disagreement and always produces the distinct `expert_review` status — it is
+ * is genuine disagreement and always produces the distinct `expert_review` status it is
  * never averaged, defaulted, or silently folded into an auto-advance/auto-reject outcome.
  */
 export function routeConsensusReview(
@@ -168,7 +168,7 @@ export function routeConsensusReview(
     reason = 'agreement_threshold_met';
   } else {
     // Strong agreement landed on a verdict the policy doesn't wire to advance/reject (e.g. a
-    // confident 'unclear'). Still never silently resolved — routes to a human.
+    // confident 'unclear'). Still never silently resolved routes to a human.
     status = 'expert_review';
     reason = 'majority_verdict_is_unclear';
   }

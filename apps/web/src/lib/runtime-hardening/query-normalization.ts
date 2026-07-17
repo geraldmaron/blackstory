@@ -1,5 +1,5 @@
 /**
- * Query-string normalization for public routes (BB-022).
+ * Query-string normalization for public routes.
  * Random tracking params must not alter cache keys or force regeneration.
  */
 
@@ -24,7 +24,7 @@ function firstString(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
-/** Routes that may carry user-facing filters; all other paths ignore query strings for caching. */
+/** Routes that may carry user-facing filters; all other paths ignore query strings for caching.  */
 export function getAllowedQueryParamsForPath(pathname: string): readonly string[] {
   const path = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
   if (path === '/search') {
@@ -74,7 +74,7 @@ export function normalizeQueryString(
   return normalized.toString();
 }
 
-/** Canonical URL pathname + optional query for redirects and cache keys. */
+/** Canonical URL pathname + optional query for redirects and cache keys.  */
 export function buildNormalizedUrl(url: URL): URL {
   const normalized = new URL(url.toString());
   const qs = normalizeQueryString(normalized.pathname, normalized.searchParams);
@@ -82,13 +82,13 @@ export function buildNormalizedUrl(url: URL): URL {
   return normalized;
 }
 
-/** True when the incoming URL carries params that should be stripped via redirect. */
+/** True when the incoming URL carries params that should be stripped via redirect.  */
 export function needsQueryNormalizationRedirect(url: URL): boolean {
   const cleaned = buildNormalizedUrl(url);
   return cleaned.pathname + cleaned.search !== url.pathname + url.search;
 }
 
-/** Normalize App Router searchParams records for server components. */
+/** Normalize App Router searchParams records for server components.  */
 export function normalizeSearchParamsRecord(
   pathname: string,
   params: QueryParamBag,

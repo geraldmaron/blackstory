@@ -1,6 +1,7 @@
+
 /**
- * Tests for the BB-091 idempotent jurisdiction load/refresh orchestration (`runJurisdictionLoad`).
- * Uses an injected in-memory writer — no Firestore/network dependency, matching
+ * Tests for the idempotent jurisdiction load/refresh orchestration (`runJurisdictionLoad`).
+ * Uses an injected in-memory writer no Firestore/network dependency, matching
  * embeddings/backfill-cli.test.ts's approach for the same reason.
  */
 import assert from 'node:assert/strict';
@@ -85,7 +86,7 @@ test('runJurisdictionLoad is idempotent: re-running with identical inputs writes
   assert.equal(second.created, 0);
   assert.equal(second.updated, 0);
   assert.equal(second.unchanged, 56);
-  // The store still has exactly 56 docs — nothing duplicated, nothing dropped.
+  // The store still has exactly 56 docs nothing duplicated, nothing dropped.
   assert.equal(writer.store.size, 56);
 });
 

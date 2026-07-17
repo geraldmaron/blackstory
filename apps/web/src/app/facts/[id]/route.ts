@@ -1,6 +1,6 @@
 /**
  * Content-negotiated JSON export and canonical slug redirect for `/facts/{id}` and
- * `/facts/{id}.json` (BB-086 AC3/AC6).
+ * `/facts/{id}.json`.
  */
 import { NextResponse } from 'next/server';
 import { buildFactPath, slugifyFactStatement } from '@black-book/domain';

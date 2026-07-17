@@ -1,5 +1,5 @@
 /**
- * Public App Hosting runtime hardening (BB-022): cache keys, query normalization,
+ * Public App Hosting runtime hardening: cache keys, query normalization,
  * response limits, degraded snapshot reads, and production-safe error surfacing.
  */
 

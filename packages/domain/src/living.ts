@@ -1,6 +1,6 @@
 /**
  * Living-status helpers backed by the product constitution (@black-book/schemas).
- * Unknown living status is treated as living at the model level (BB-003 / BB-014).
+ * Unknown living status is treated as living at the model level.
  */
 import { evaluateLivingStatus, loadProductConstitution } from '@black-book/schemas';
 
@@ -16,5 +16,5 @@ export function treatAsLiving(status: LivingStatus): boolean {
   return evaluateLivingStatus(status).treatAsLiving;
 }
 
-/** Default living status when writers omit one — unknown, therefore treated as living. */
+/** Default living status when writers omit one unknown, therefore treated as living. */
 export const DEFAULT_LIVING_STATUS: LivingStatus = 'unknown';

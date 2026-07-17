@@ -1,5 +1,6 @@
+
 /**
- * In-memory transaction tests for BB-019 atomic activation, rollback, idempotency,
+ * In-memory transaction tests for atomic activation, rollback, idempotency,
  * immutable manifests, and active-release public-read guards.
  */
 import assert from 'node:assert/strict';

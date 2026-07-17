@@ -1,5 +1,5 @@
 /**
- * Discovery publication guard — discovery NEVER creates public entities (BB-039).
+ * Discovery publication guard discovery NEVER creates public entities.
  */
 export const FORBIDDEN_DISCOVERY_OPERATIONS = [
   'write_public_projection',

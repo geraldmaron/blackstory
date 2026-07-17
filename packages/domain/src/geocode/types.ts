@@ -1,5 +1,5 @@
 /**
- * Shared types for the BB-050 geocode domain module — the business-rule layer built on top of
+ * Shared types for the geocode domain module the business-rule layer built on top of
  * the raw Census Geocoder adapter (`../adapters/census-geo/`). This module owns: address
  * normalization, jurisdiction-id resolution, the geocode cache, exact-coordinate reduction, the
  * ZIP translate-then-discard contract, and the manual-place-search fallback decision. It does
@@ -9,7 +9,7 @@
 import type { CensusGeocodeMatch } from '../adapters/census-geo/types.js';
 import type { GeoPrecisionTier } from '../geography/precision.js';
 
-/** BB-091 jurisdiction ids resolved from a geocode match — state is required, county/place are not always resolvable. */
+/** jurisdiction ids resolved from a geocode match state is required, county/place are not always resolvable. */
 export type ResolvedJurisdictionIds = {
   readonly countryId: string;
   readonly stateId?: string;
@@ -17,10 +17,10 @@ export type ResolvedJurisdictionIds = {
   /**
    * On-demand place id (Census place FIPS-keyed), per ADR-016 "cities: on-demand only." This
    * product does not yet have a live `jurisdictions/{id}` writer for the `city` kind
-   * (packages/firebase is out of this bead's file ownership) — `placeId` is the deterministic
-   * id a future on-demand-city-creation pass should use, and `placeCreateHint` carries the
-   * minimal fields that pass would need to actually create the doc. Neither is written to
-   * Firestore by this module.
+   * (`packages/firebase` owns that write path). `placeId` is the deterministic id a future
+   * on-demand-city-creation pass should use, and `placeCreateHint` carries the minimal fields
+   * that pass would need to actually create the doc. Neither is written to Firestore by this
+   * module.
    */
   readonly placeId?: string;
   readonly placeCreateHint?: PlaceCreateHint;
@@ -43,10 +43,10 @@ export type GeocodePrecisionResult = {
 };
 
 /**
- * Deliberately excludes `lat`/`lng` — the exact coordinate ONLY ever appears on
- * `GeocodeResolution.precision` (and only when `exactCoordinatesRetained` is true). This is the
- * type-level enforcement of BB-050 acceptance criterion 3: there is no field on this summary a
- * caller could read an exact coordinate from once precision has been reduced.
+ * Deliberately excludes `lat`/`lng` — the exact coordinate only ever appears on
+ * `GeocodeResolution.precision` (and only when `exactCoordinatesRetained` is true). This is
+ * type-level enforcement: there is no field on this summary a caller could read an exact
+ * coordinate from once precision has been reduced.
  */
 export type GeocodeMatchSummary = {
   readonly matchedAddress?: string;
@@ -72,7 +72,7 @@ export type ManualPlaceSearchFallback = {
   readonly available: true;
   readonly reason: ManualPlaceSearchReason;
   readonly message: string;
-  /** Where the UI should send the user for a manual place search (BB-049's search page). */
+  /** Where the UI should send the user for a manual place search (search page). */
   readonly searchHref: string;
 };
 
@@ -90,7 +90,7 @@ export type CensusCoordinatesGeocodeFetcher = (point: {
   readonly lng: number;
 }) => Promise<CensusGeocodeMatch>;
 
-/** Coarse, aggregate-safe analytics event — never an exact coordinate or a raw address string. */
+/** Coarse, aggregate-safe analytics event never an exact coordinate or a raw address string. */
 export type CoarseLocationAnalyticsEvent = {
   readonly kind: 'geocode_resolved' | 'geocode_failed' | 'browser_location_used' | 'manual_fallback_used';
   readonly jurisdictionId?: string;

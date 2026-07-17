@@ -1,5 +1,6 @@
+
 /**
- * Firestore model surface for Black Book (ADR-011 / BB-013–019).
+ * Firestore model surface for Black Book (ADR-011 019).
  */
 export { FIRESTORE_ROOT, firestorePaths } from './paths.js';
 export type { FirestoreRootCollection } from './paths.js';

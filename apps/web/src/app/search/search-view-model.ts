@@ -1,18 +1,18 @@
 /**
- * Pure query-building + result/facet-shaping core for the search page (BB-049).
+ * Pure query-building + result/facet-shaping core for the search page.
  *
  * Split out of `page.tsx` (not merely "kept in the same file") because Next.js's generated typed
  * route module (`.next/types/app/search/page.ts`) rejects any named export from a `page.tsx` other
  * than the framework's own allowlisted route conventions (`default`, `metadata`,
- * `generateStaticParams`, etc.) — exporting `buildSearchViewModel` etc. directly from `page.tsx`
- * fails `tsc` there. This co-located module is what the BB-049 spec's test guidance calls out as
+ * `generateStaticParams`, etc.) exporting `buildSearchViewModel` etc. directly from `page.tsx`
+ * fails `tsc` there. This co-located module is what the spec's test guidance calls out as
  * the fallback ("in the same file or a co-located helper"). No Next.js runtime dependency, so it's
- * directly unit-testable — see `./search-view-model.test.ts`.
+ * directly unit-testable see `./search-view-model.test.ts`.
  *
  * Pagination note (deliberate scope boundary): the page's own "next/previous page" links use a
- * plain, page-local `offset` query param — NOT `@black-book/security`'s BB-026 opaque `cursor`
+ * plain, page-local `offset` query param NOT `@black-book/security`'s opaque `cursor`
  * token. That signed cursor is bound to a specific `queryHash` and is meant to be minted by the
- * HTTP search route (`apps/web/src/app/search/api/route.ts`, a sibling BB-049 workstream) for
+ * HTTP search route (`apps/web/src/app/search/api/route.ts`) for
  * external/programmatic callers, not hand-constructed here. A plain offset is the simplest correct
  * mechanism for this server-rendered page's own forward/back links.
  */
@@ -24,8 +24,8 @@ import type {
 } from '@black-book/domain';
 import { normalizeSearchText } from '@black-book/security';
 
-/** Matches BB-026's `DEFAULT_QUERY_GUARDRAIL_LIMITS.defaultPageSize` — kept as a local constant
- * since this page intentionally does not import the guardrails module (sibling agent's scope). */
+/** Matches `DEFAULT_QUERY_GUARDRAIL_LIMITS.defaultPageSize`. Kept as a local constant
+ * since this page intentionally does not import the guardrails module. */
 export const SEARCH_PAGE_SIZE = 20;
 
 export type RawSearchParams = {
@@ -57,20 +57,20 @@ export type SearchViewModel = {
   readonly eraOptions: readonly FacetOption[];
 };
 
-/** Trims a select-style param and defaults an empty value to `'all'`. */
+/** Trims a select-style param and defaults an empty value to `'all'`.  */
 function cleanSelectParam(raw: string | undefined): string {
   const trimmed = (raw ?? '').trim();
   return trimmed === '' ? 'all' : trimmed;
 }
 
-/** Parses the page-local `offset` param: non-negative integer, defaulting to 0 on anything else. */
+/** Parses the page-local `offset` param: non-negative integer, defaulting to 0 on anything else.  */
 export function parseOffset(raw: string | undefined): number {
   const parsed = Number.parseInt(raw ?? '', 10);
   if (!Number.isFinite(parsed) || parsed < 0) return 0;
   return parsed;
 }
 
-/** `in_force` -> `In Force`, `1860s` -> `1860s` (no separators, first-char uppercase is a no-op). */
+/** `in_force` -> `In Force`, `1860s` -> `1860s` (no separators, first-char uppercase is a no-op).  */
 function humanizeFacetKey(key: string): string {
   return key
     .split(/[_-]/)
@@ -80,7 +80,7 @@ function humanizeFacetKey(key: string): string {
 }
 
 /**
- * Builds a `FilterBar` field's option list from real facet counts (BB-049 AC5 — no hardcoded
+ * Builds a `FilterBar` field's option list from real facet counts (no hardcoded
  * era/topic vocabulary). Always leads with an "All ___" option; when the facet carries zero keys
  * (e.g. no records have that dimension under the current filters), the list is just that one
  * option rather than an empty/broken select.
@@ -151,7 +151,7 @@ export function buildSearchViewModel(
   };
 }
 
-/** Builds a plain `/search?...` href for a pagination link, preserving the current filters. */
+/** Builds a plain `/search?...` href for a pagination link, preserving the current filters.  */
 export function buildSearchPageHref(view: SearchViewModel, offset: number): string {
   const params = new URLSearchParams();
   if (view.q) params.set('q', view.q);

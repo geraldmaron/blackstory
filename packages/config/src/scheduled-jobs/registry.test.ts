@@ -1,5 +1,6 @@
+
 /**
- * BB-084 acceptance: no unregistered recurring job can run, and every field the registry
+ * No unregistered recurring job can run, and every field the registry
  * requires (owner, cadence, budget, timeout, idempotency scheme, kill switch, target worker) is
  * actually validated at register-time.
  */

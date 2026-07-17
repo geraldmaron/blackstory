@@ -1,5 +1,5 @@
 /**
- * BB-055 correction status page keyed by receipt code. Server-rendered lookup with no
+ * correction status page keyed by receipt code. Server-rendered lookup with no
  * moderation-sensitive fields and no enumeration of other submissions.
  */
 import { EmptyState, Notice } from '@black-book/ui';

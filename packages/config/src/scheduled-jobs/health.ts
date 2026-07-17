@@ -1,8 +1,9 @@
+
 /**
  * Missed-run and over-budget evaluation for scheduled jobs. Silence is a failure mode: a job
  * that simply stops running (no explicit failure, just nothing happening) must still be
- * detectable and alertable — see alerting.ts, which turns a `triggered: true` evaluation from
- * this module into a BB-034 operator alert.
+ * detectable and alertable see alerting.ts, which turns a `triggered: true` evaluation from
+ * this module into a operator alert.
  */
 import type { ScheduledJobDefinition } from './types.js';
 import type { JobRunRecord } from './run-record.js';
@@ -17,15 +18,15 @@ export type MissedRunEvaluation = {
 };
 
 /** `runs` should be one job's run history, any order; only completed success/quarantined runs
- *  count as "the job ran" for silence-detection purposes (a bare 'running' record with no
- *  completedAt does not reset the silence clock, nor does an explicit 'failure' — a job that
- *  keeps failing loudly is a different, already-visible problem from one that goes silent). */
+ * count as "the job ran" for silence-detection purposes (a bare 'running' record with no
+ * completedAt does not reset the silence clock, nor does an explicit 'failure' a job that
+ * keeps failing loudly is a different, already-visible problem from one that goes silent). */
 export function evaluateMissedRuns(input: {
   readonly job: ScheduledJobDefinition;
   readonly runs: readonly JobRunRecord[];
   readonly nowIso: string;
   /** When the job became due for the first time (e.g. registration time), used when there is
-   *  no run history yet at all. */
+   * no run history yet at all. */
   readonly registeredAtIso: string;
 }): MissedRunEvaluation {
   const { job, runs, nowIso, registeredAtIso } = input;
@@ -56,8 +57,8 @@ export type BudgetEvaluation = {
   readonly observed: number;
   readonly threshold: number;
   readonly unit: string;
-  /** observed as a percentage of threshold, rounded — used to align with BB-034's SEC-COST-01
-   *  percentage-of-budget-guardrail alert semantics (see alerting.ts). */
+  /** observed as a percentage of threshold, rounded used to align with SEC-COST-01
+   * percentage-of-budget-guardrail alert semantics (see alerting.ts). */
   readonly percentOfBudget: number;
 };
 

@@ -1,3 +1,4 @@
+
 /**
  * Accessibility-layer smoke tests for landmark and alt-text fixtures.
  */

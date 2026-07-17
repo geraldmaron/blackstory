@@ -1,31 +1,27 @@
 /**
- * Human-approved weight changes ONLY (BB-081 acceptance criterion 3).
+ * Human-approved weight changes only.
  *
- * This is the hard boundary: a RecalibrationReport (recalibration-report.ts) can motivate a
- * proposal, but nothing in this module — or anywhere in this bead — can make a proposal take
- * effect by itself. The flow is strictly:
+ * This is the hard boundary: a `RecalibrationReport` (`recalibration-report.ts`) can motivate a
+ * proposal, but nothing in this module can make a proposal take effect by itself. The flow is
+ * strictly:
  *
- *   report finding -> proposeWeightChange (pure, data only)
- *                   -> gold-corpus gate result supplied by caller (real evaluation happens in
- *                      @black-book/testing; this module never imports or reimplements it — see
- *                      requireGoldCorpusGatePassed's structural GoldCorpusGateInput type, which
- *                      packages/config/src/scheduled-jobs/jobs/recalibration-report.ts fills in
- *                      from a real CorpusEvaluationRecord, exactly the shape testing's
- *                      evaluateCorpus/assertCorpusEvaluationPassed produce)
- *                   -> approveWeightChange (throws unless a DISTINCT human approver + a passing
- *                      gate are both present)
- *                   -> RelevanceWeightPolicy (a versioned artifact — mirrors the constitution
- *                      versioning pattern at packages/schemas/src/constitution/: a policyVersion
- *                      semver + immutable, content-hashed object)
+ * report finding → `proposeWeightChange` (pure, data only)
+ * → gold-corpus gate result supplied by caller (real evaluation happens in
+ * `@black-book/testing`; this module never imports or reimplements it — see
+ * `requireGoldCorpusGatePassed`'s structural `GoldCorpusGateInput` type, which
+ * `packages/config/src/scheduled-jobs/jobs/recalibration-report.ts` fills in from a real
+ * `CorpusEvaluationRecord`)
+ * → `approveWeightChange` (throws unless a distinct human approver + a passing gate are both
+ * present)
+ * → `RelevanceWeightPolicy` (a versioned artifact mirroring the constitution versioning
+ * pattern at `packages/schemas/src/constitution/`: a `policyVersion` semver + immutable,
+ * content-hashed object)
  *
- * This module deliberately has NO "active policy" registry, NO setter, and NO code path that
- * reads a RelevanceWeightPolicy back into ../relevance/dimensions.ts's RELEVANCE_DIMENSION_WEIGHTS
- * — wiring an approved policy into the live engine is a distinct, future, human-triggered deploy
- * step outside this bead's scope (touching ../relevance/dimensions.ts is also outside this
- * bead's file ownership, to avoid colliding with concurrent agents' additive signal work in the
- * same relevance/confidence engine files). What this module proves is the *shape* of the
- * gate — see relevance-feedback.test.ts's "report alone cannot mutate live weights" tests, which
- * assert this module exports no live-mutating function at all.
+ * This module deliberately has no "active policy" registry, no setter, and no code path that
+ * reads a `RelevanceWeightPolicy` back into `../relevance/dimensions.ts`'s
+ * `RELEVANCE_DIMENSION_WEIGHTS` — wiring an approved policy into the live engine is a distinct,
+ * future, human-triggered deploy step. What this module proves is the shape of the gate; see
+ * `relevance-feedback.test.ts`'s "report alone cannot mutate live weights" tests.
  */
 import { hashUtf8 } from '../provenance/hashes.js';
 import { RELEVANCE_DIMENSIONS, RELEVANCE_DIMENSION_WEIGHTS, type RelevanceDimension } from '../relevance/index.js';
@@ -70,9 +66,9 @@ function assertWeightsValid(weights: Readonly<Record<RelevanceDimension, number>
   }
 }
 
-/** The current, live-engine weight policy expressed as a RelevanceWeightPolicy artifact — a
- *  read-only snapshot of ../relevance/dimensions.js's RELEVANCE_DIMENSION_WEIGHTS, not a copy
- *  that engine reads from. Useful as `currentPolicy` when calling proposeWeightChange. */
+/** The current, live-engine weight policy expressed as a RelevanceWeightPolicy artifact a
+ * read-only snapshot of../relevance/dimensions.js's RELEVANCE_DIMENSION_WEIGHTS, not a copy
+ * that engine reads from. Useful as `currentPolicy` when calling proposeWeightChange. */
 export function currentRelevanceWeightPolicy(input: {
   readonly policyVersion: string;
   readonly createdAt: string;
@@ -111,9 +107,9 @@ export function buildRelevanceWeightPolicy(input: {
 export type WeightChangeProposal = {
   readonly schemaVersion: typeof RELEVANCE_FEEDBACK_SCHEMA_VERSION;
   readonly proposalId: string;
-  /** Always a system/report identity (e.g. 'system:recalibration-report') — never a human. A
-   *  proposal is a report finding, not a human's own initiative; approveWeightChange still
-   *  requires a distinct human approver regardless of what this field says. */
+  /** Always a system/report identity (e.g. 'system:recalibration-report') never a human. A
+   * proposal is a report finding, not a human's own initiative; approveWeightChange still
+   * requires a distinct human approver regardless of what this field says. */
   readonly proposedBy: string;
   readonly proposedAt: string;
   readonly rationale: string;
@@ -152,13 +148,13 @@ export function proposeWeightChange(input: {
   });
 }
 
-/** Structural (not imported) shape of BB-047's CorpusEvaluationRecord
- *  (packages/testing/src/gold-corpus/types.ts). Kept structural, rather than importing
- *  @black-book/testing into @black-book/domain, to avoid adding a new cross-package dependency
- *  to a foundational package — the real evaluation always happens in @black-book/testing
- *  (evaluateCorpus / assertCorpusEvaluationPassed), and a real CorpusEvaluationRecord already
- *  satisfies this shape, so callers (e.g. packages/config/src/scheduled-jobs/jobs/
- *  recalibration-report.ts, which already depends on both packages) pass it straight through. */
+/** Structural (not imported) shape of CorpusEvaluationRecord
+ * (packages/testing/src/gold-corpus/types.ts). Kept structural, rather than importing
+ * @black-book/testing into @black-book/domain, to avoid adding a new cross-package dependency
+ * to a foundational package the real evaluation always happens in @black-book/testing
+ * (evaluateCorpus assertCorpusEvaluationPassed), and a real CorpusEvaluationRecord already
+ * satisfies this shape, so callers (e.g. packages/config/src/scheduled-jobs/jobs/
+ * recalibration-report.ts, which already depends on both packages) pass it straight through. */
 export type GoldCorpusGateInput = {
   readonly corpusVersion: string;
   readonly algorithmVersion: string;
@@ -190,14 +186,14 @@ export type WeightChangeApproval = {
 };
 
 /**
- * The explicit, separate human-approval step (mirrors BB-085's proposer-never-approver pattern
+ * The explicit, separate human-approval step (mirrors proposer-never-approver pattern
  * for promotion, packages/domain/src/promotion/controls.js's evaluatePromotionGate
  * proposer_approver_conflict check, and packages/operator-cli/src/promotion-boundary.test.ts's
  * proof shape). Throws if:
- *   - approvedBy is empty or equal to the proposal's proposedBy (same identity proposing and
- *     approving is exactly the conflict this function exists to prevent);
- *   - the gold-corpus gate did not pass.
- * Only on success does it return a WeightChangeApproval carrying the now-activatable policy —
+ * - approvedBy is empty or equal to the proposal's proposedBy (same identity proposing and
+ * approving is exactly the conflict this function exists to prevent);
+ * - the gold-corpus gate did not pass.
+ * Only on success does it return a WeightChangeApproval carrying the now-activatable policy 
  * still just a data record. Nothing here writes it anywhere.
  */
 export function approveWeightChange(input: {

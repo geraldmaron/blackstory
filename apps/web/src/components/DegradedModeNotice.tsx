@@ -1,6 +1,6 @@
 /**
- * Server banner that surfaces BB-022's snapshot-only degraded posture
- * (`PUBLIC_READ_API_DISABLED=1`) — distinct from `OfflineNotice`'s client-side
+ * Server banner that surfaces snapshot-only degraded posture
+ * (`PUBLIC_READ_API_DISABLED=1`) distinct from `OfflineNotice`'s client-side
  * connectivity check. Renders nothing when live reads are not disabled.
  */
 

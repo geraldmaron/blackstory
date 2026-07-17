@@ -1,11 +1,11 @@
 /**
- * Layer 2 — sundown-town designation history: Tougaloo College Historical Database of Sundown
- * Towns taxonomy preserved verbatim (possible/probable/surely — never flattened to a boolean).
+ * Layer 2 sundown-town designation history: Tougaloo College Historical Database of Sundown
+ * Towns taxonomy preserved verbatim (possible/probable/surely never flattened to a boolean).
  * Their statuses are claims with confidence, exactly this product's own claims model.
  *
  * Designation storage (the taxonomy, the time-scoping, the area-geometry binding) lives in
- * ./layer-record.ts as BB-082's own record type. This module only turns a point-in-time query
- * against that record type into a composite-eligible `LayerSignal` — it adds published weights
+ * ./layer-record.ts as own record type. This module only turns a point-in-time query
+ * against that record type into a composite-eligible `LayerSignal` it adds published weights
  * for the taxonomy, nothing else.
  */
 import {
@@ -21,7 +21,7 @@ export const SUNDOWN_TOWN_METHODOLOGY_VERSION = 'sundown-town-methodology.v1' as
 
 /**
  * Published confidence-to-signal weights (methodology, versioned above). The Tougaloo taxonomy
- * ITSELF is never collapsed to these numbers in storage or presentation — `layerSignal.notes`
+ * ITSELF is never collapsed to these numbers in storage or presentation `layerSignal.notes`
  * always carries the verbatim confidence label alongside the numeric contribution.
  */
 export const SUNDOWN_TOWN_CONFIDENCE_WEIGHTS: Readonly<Record<SundownTownConfidence, number>> = {
@@ -56,7 +56,7 @@ export type ComputeSundownTownLayerInput = {
 };
 
 /**
- * Never fabricates a signal when no designation covers the requested point in time — an absent
+ * Never fabricates a signal when no designation covers the requested point in time an absent
  * Tougaloo entry means "no data," never "confirmed not a sundown town."
  */
 export function computeSundownTownLayerSignal(

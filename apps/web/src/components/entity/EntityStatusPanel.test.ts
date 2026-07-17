@@ -1,8 +1,8 @@
 /**
- * SSR markup smoke tests for the BB-090 kind-appropriate status panel (BB-052 acceptance criterion
- * 5). Covers the three shapes it must render: a place/school/institution's status + full
- * statusHistory record, an event's when-span (never active/historic), and the approved gap
- * notice for a status-eligible kind that happens to carry no history.
+ * SSR markup smoke tests for the kind-appropriate status panel. Covers the three shapes it
+ * must render: a place/school/institution's status + full statusHistory record, an event's
+ * when-span (never active/historic), and the approved gap notice for a status-eligible kind that
+ * happens to carry no history.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';

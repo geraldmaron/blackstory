@@ -1,14 +1,14 @@
 /**
- * Public geocode endpoint (BB-050). Node.js runtime (App Check's Admin SDK verifier requires it —
- * never edge). This file is deliberately thin: Next.js's route-file validator only permits the
+ * Public geocode endpoint. Node.js runtime (App Check's Admin SDK verifier requires it — not
+ * the Edge runtime). This file is deliberately thin: Next.js's route-file validator only permits the
  * HTTP method handlers and route config to be exported here, so the testable,
  * dependency-injectable core lives in `./handler` (`handleLocateRequest`) and this module just
  * wires production singletons.
  *
- * The endpoint sits behind App Check + BB-025 `geocoding` rate limits and geocodes an address/ZIP
+ * The endpoint sits behind App Check + `geocoding` rate limits and geocodes an address/ZIP
  * (`?address=`) or reverse-geocodes browser coordinates (`?lat=&lng=`) via the real U.S. Census
- * Geocoder adapter (`@black-book/domain`'s `fetchCensusAddressGeocode` /
- * `fetchCensusCoordinatesGeocode`, backed by `../../../lib/geocode/safe-http-client.ts`) — see
+ * Geocoder adapter (`@black-book/domain`'s `fetchCensusAddressGeocode` and
+ * `fetchCensusCoordinatesGeocode`, backed by `../../../lib/geocode/safe-http-client.ts`); see
  * `./handler` for the full request flow.
  */
 import { createLocateCache } from '../../../lib/geocode/pipeline';

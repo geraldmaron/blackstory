@@ -1,20 +1,21 @@
+
 /**
- * Bridges scheduled-job health evaluations into BB-034's existing operator-alert pattern
+ * Bridges scheduled-job health evaluations into existing operator-alert pattern
  * (packages/observability/src/security-alerts.ts + security-anomaly.ts) instead of inventing a
- * new alert channel. Reuses two already-shipped BB-034 policies verbatim:
- *   - SEC-SRC-01 "Source adapter anomaly burst" for missed-run silence (closest existing kind:
- *     source_adapter.anomaly; a scheduled job going silent is exactly the kind of drift that
- *     policy exists to surface).
- *   - SEC-COST-01 "Cost anomaly score exceeds budget guardrail" for budget overruns.
+ * new alert channel. Reuses two already-shipped policies verbatim:
+ * - SEC-SRC-01 "Source adapter anomaly burst" for missed-run silence (closest existing kind:
+ * source_adapter.anomaly; a scheduled job going silent is exactly the kind of drift that
+ * policy exists to surface).
+ * - SEC-COST-01 "Cost anomaly score exceeds budget guardrail" for budget overruns.
  *
- * Known limitation (documented, not hidden): the *trigger decision* is this module's own —
+ * Known limitation (documented, not hidden): the *trigger decision* is this module's own
  * evaluateMissedRuns/evaluateJobBudget in health.ts use each job's own configured threshold and
  * budget, not SEC-SRC-01/SEC-COST-01's static threshold fields. Those two policies are reused
  * only for delivery plumbing (severity, runbook, notification channels, payload shape). The
- * alert payload's `threshold` field therefore reflects the BB-034 policy's generic threshold,
+ * alert payload's `threshold` field therefore reflects the policy's generic threshold,
  * not the job's specific one; percentOfBudget is included precisely so the payload stays
  * meaningful despite that. A follow-up could add dedicated SEC-JOB-* policies to
- * packages/observability (out of this bead's file ownership).
+ * packages/observability if dedicated job-alert policies are needed.
  */
 import { DEFAULT_ALERT_POLICIES, buildAlertPayload, type SecurityAlertPayload } from '@black-book/observability';
 import type { BudgetEvaluation, MissedRunEvaluation } from './health.js';

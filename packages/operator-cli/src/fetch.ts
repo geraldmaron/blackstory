@@ -1,14 +1,15 @@
+
 /**
- * Real BB-030 safe-fetch dependencies (DNS pinning + HTTP transport) plus citation prefill
+ * Real safe-fetch dependencies (DNS pinning + HTTP transport) plus citation prefill
  * and a capture-plan preview for the admin quick-add surface and the CLI's URL-based intake.
  *
  * This module never fetches a URL directly. It only supplies the dependency-injected
  * `resolveHost`/`transport` that `executeSafeFetch` (packages/security/src/url-safety/fetch.ts)
- * requires, and calls that real function — the SSRF-safe DNS pinning, redirect re-validation,
+ * requires, and calls that real function the SSRF-safe DNS pinning, redirect re-validation,
  * response-size/content-type limits, and sandboxed parsing all stay in `@black-book/security`.
  *
  * Wayback capture: NOT wired. Nothing in this repo calls the Internet Archive's Save Page Now
- * API yet (see `packages/domain/src/provenance/capture.ts` — `SourceCapture.snapshotStorageObject`
+ * API yet (see `packages/domain/src/provenance/capture.ts` `SourceCapture.snapshotStorageObject`
  * models a pointer to a *selective* stored snapshot, but no writer populates it from Wayback).
  * `planSelectiveCapture` below only documents where that call would go; it never fakes one.
  */
@@ -40,6 +41,7 @@ function normalizeHeaders(headers: IncomingMessage['headers']): Record<string, s
   }
   return normalized;
 }
+
 
 /**
  * Connects directly to `pinnedAddress` (never re-resolves the hostname) while retaining
@@ -84,7 +86,7 @@ export function createNodeSafeFetchDependencies(
   };
 }
 
-/** Runs one BB-030-safe fetch. Thin call-through to `executeSafeFetch` — no policy logic here. */
+/** Runs one -safe fetch. Thin call-through to `executeSafeFetch` no policy logic here. */
 export async function runQuickAddFetch(
   url: string,
   dependencies: SafeFetchDependencies = createNodeSafeFetchDependencies(),
@@ -101,8 +103,8 @@ export type CitationPrefill = {
   readonly fetchedAt: string;
   readonly contentHash: string;
   readonly contentType: string;
-  /** Best-effort heuristic from the parser's stripped text — not a true `<title>` extraction;
-   *  `executeSafeFetch`'s sandbox parser discards markup before this package ever sees it. */
+  /** Best-effort heuristic from the parser's stripped text not a true `<title>` extraction;
+   * `executeSafeFetch`'s sandbox parser discards markup before this package ever sees it. */
   readonly suggestedTitle: string;
   readonly excerpt: string;
 };
@@ -113,7 +115,7 @@ function deriveSuggestedTitle(extractedText: string, maxLength = 120): string {
   return trimmed.length <= maxLength ? trimmed : `${trimmed.slice(0, maxLength - 1).trimEnd()}…`;
 }
 
-/** Pre-fills citation metadata from a successful safe-fetch result. Pure — no I/O. */
+/** Pre-fills citation metadata from a successful safe-fetch result. Pure no I/O. */
 export function buildCitationPrefill(
   url: string,
   result: Extract<SafeFetchResult, { ok: true }>,
@@ -136,9 +138,10 @@ export type CapturePlan = {
   readonly notes: string;
 };
 
+
 /**
  * Documents where a Wayback (or other archival) capture would be triggered for this fetch.
- * Deliberately does NOT call any archival API — see the module doc comment above.
+ * Deliberately does NOT call any archival API see the module doc comment above.
  */
 export function planSelectiveCapture(
   result: Extract<SafeFetchResult, { ok: true }>,

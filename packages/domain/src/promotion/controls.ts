@@ -1,5 +1,5 @@
 /**
- * Deterministic lineage, reputation, corroboration, review, and approval controls (BB-032).
+ * Deterministic lineage, reputation, corroboration, review, and approval controls.
  */
 import {
   DEFAULT_PROMOTION_POLICY,

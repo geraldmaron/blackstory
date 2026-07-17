@@ -1,5 +1,5 @@
 /**
- * Fetches Common Crawl CDX index results through the BB-030 safe HTTP port (BB-075). Never calls
+ * Fetches Common Crawl CDX index results through the safe HTTP port. Never calls
  * `fetch` directly -- see ../internet-archive/shared/http-port.ts for why.
  */
 import {

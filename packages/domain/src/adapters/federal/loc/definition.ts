@@ -1,5 +1,5 @@
 /**
- * Library of Congress adapter definition, rights, rate limits, and kill switch (BB-046).
+ * Library of Congress adapter definition, rights, rate limits, and kill switch.
  */
 import {
   buildFederalAdapterDefinition,

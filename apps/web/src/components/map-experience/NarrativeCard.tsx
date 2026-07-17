@@ -1,9 +1,8 @@
 /**
- * Narrative off-ramp card for a single selected map point (BB-051 acceptance criterion: "every
- * point opens a card with name, era, one-line story, evidence count, and confidence affordance
- * linking to the entity page"). Purely presentational and SSR-render-safe — the map canvas and
- * the synchronized list both open the same card for the same feature, so the two experiences stay
- * observably in sync.
+ * Narrative off-ramp card for a single selected map point: every point opens a card with
+ * name, era, one-line story, evidence count, and confidence affordance linking to the entity
+ * page. Purely presentational and SSR-render-safe — the map canvas and the synchronized list both
+ * open the same card for the same feature, so the two experiences stay observably in sync.
  */
 import React from 'react';
 import { Card } from '@black-book/ui';
@@ -62,6 +61,20 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
       ) : null}
 
       <p className="bb-sans">{properties.oneLineStory}</p>
+
+      {properties.topicTags.length > 0 ? (
+        <p className="bb-explore-narrative-card__tags" aria-label="Topics">
+          {properties.topicTags.slice(0, 2).map((tag) => (
+            <a
+              key={tag}
+              className="bb-entity-tag"
+              href={`/search?topic=${encodeURIComponent(tag)}`}
+            >
+              {tag}
+            </a>
+          ))}
+        </p>
+      ) : null}
 
       <dl className="bb-explore-narrative-card__facts">
         <div>

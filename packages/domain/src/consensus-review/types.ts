@@ -1,17 +1,17 @@
 /**
- * Domain contracts for the BB-076 community-lead consensus review lane.
+ * Domain contracts for the community-lead consensus review lane.
  *
- * Design references named by the bead:
- *  - Zooniverse/Caesar pattern: independent reviewer classifications ("N independent reviews")
- *    are tallied and routed by a deterministic agreement threshold; disagreement never
- *    silently resolves into a default — it produces its own distinct routing state.
- *  - Wikipedia pending-changes pattern: untrusted content stays invisible until reviewed.
- *    `advance.ts` in this module is the only place a lead may exit quarantine, and it only
- *    ever produces a BB-044 research case in its earliest `candidate` state (see
- *    `../research-case/index.js`) — never a promoted or published claim. This module never
- *    imports from `@black-book/security` or `@black-book/firebase`: it is pure, deterministic
- *    domain logic over already-quarantined submission identifiers supplied by a caller
- *    (the public intake surface in `apps/web/src/app/submit/`).
+ * Design references named by the:
+ * - Zooniverse/Caesar pattern: independent reviewer classifications ("N independent reviews")
+ * are tallied and routed by a deterministic agreement threshold; disagreement never
+ * silently resolves into a default it produces its own distinct routing state.
+ * - Wikipedia pending-changes pattern: untrusted content stays invisible until reviewed.
+ * `advance.ts` in this module is the only place a lead may exit quarantine, and it only
+ * ever produces a research case in its earliest `candidate` state (see
+ * `../research-case/index.js`) never a promoted or published claim. This module never
+ * imports from `@black-book/security` or `@black-book/firebase`: it is pure, deterministic
+ * domain logic over already-quarantined submission identifiers supplied by a caller
+ * (the public intake surface in `apps/web/src/app/submit/`).
  */
 
 export const CONSENSUS_REVIEW_POLICY_VERSION = '1.0.0' as const;
@@ -82,7 +82,7 @@ export type ConsensusRoutingReason =
   | 'tie_no_majority'
   | 'majority_verdict_is_unclear';
 
-/** A distinct, visible outcome for every case — including disagreement. Never averaged, never defaulted. */
+/** A distinct, visible outcome for every case including disagreement. Never averaged, never defaulted. */
 export type ConsensusRoutingDecision = {
   readonly submissionId: string;
   readonly status: ConsensusRoutingStatus;

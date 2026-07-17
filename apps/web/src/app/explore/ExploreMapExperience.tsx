@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Client orchestrator for BB-051's `/explore` national map experience. Wires the MapLibre canvas,
+ * Client orchestrator for `/explore` national map experience. Wires the MapLibre canvas,
  * synchronized accessible list, narrative card, density toggle, relationship lines, decade
  * settings, filter form, and shareable URL state. The server-rendered snapshot catalog is the
  * source of truth; `/explore/api` refine is optional progressive enhancement when App Check is

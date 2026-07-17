@@ -1,8 +1,8 @@
 /**
- * Entity detail page for place/school/event/institution public records (BB-052). Shared layout,
- * type-specific sections: relevance (BB-054 WhyThisAppears), historical context, BB-090 status,
- * accepted claims via BB-053 EntityEvidencePanel, BB-092 graph-derived related records and
- * timeline, location precision, record maturity, revision metadata, and a BB-095 sensitivity
+ * Entity detail page for place/school/event/institution public records. Shared layout,
+ * type-specific sections: relevance, historical context, status,
+ * accepted claims via EntityEvidencePanel, graph-derived related records and
+ * timeline, location precision, record maturity, revision metadata, and a sensitivity
  * context banner when the record carries one. Sparse sections render the approved
  * `RecordGapNotice` copy instead of a silent empty list.
  */
@@ -14,6 +14,8 @@ import { SeedDataNotice } from '../../../components/SeedDataNotice';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
 import { EntityRelatedList } from '../../../components/entity/EntityRelatedList';
+import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
+import { EntityPrimaryImage } from '../../../components/entity/EntityPrimaryImage';
 import { RecordGapNotice } from '../../../components/entity/RecordGapNotice';
 import { EntityEvidencePanel } from '../../../components/evidence';
 import { CompactFactReference } from '../../../components/facts';
@@ -22,6 +24,7 @@ import { WhyThisAppears } from '../../../components/why-appears';
 import { seedFactsForEntity } from '../../../data/facts-seed';
 import { listPublicEntities } from '../../../data/public-seed';
 import { buildExploreHref, geoAnchorFor } from '../../../lib/map-experience';
+import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
 import { resolvePublicEntityView } from '../../../lib/public-data/source';
 import { buildWhyThisAppearsForEntity, toEvidenceClaimInputs } from './adapters';
 import { deriveHistoricalFraming } from './entity-view-model';
@@ -40,10 +43,15 @@ export async function generateMetadata({ params }: EntityPageProps) {
   if (!resolved.data) {
     return { title: 'Record not found' };
   }
-  return {
-    title: resolved.data.displayName,
-    description: resolved.data.summary,
-  };
+  return buildEntityPageMetadata({
+    id: resolved.data.id,
+    displayName: resolved.data.displayName,
+    summary: resolved.data.summary,
+    kind: resolved.data.kind,
+    ...(resolved.data.primaryImage !== undefined
+      ? { imageUrl: resolved.data.primaryImage.url }
+      : {}),
+  });
 }
 
 export default async function EntityPage({ params }: EntityPageProps) {
@@ -78,6 +86,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
         </p>
         <h1 className="bb-page__title">{entity.displayName}</h1>
         <p className="bb-page__lede">{entity.summary}</p>
+        <EntityTopicTags entity={entity} />
       </header>
 
       <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
@@ -105,8 +114,22 @@ export default async function EntityPage({ params }: EntityPageProps) {
               <h2 className="bb-section__title" id="context-heading">
                 Historical context
               </h2>
-              <p className="bb-section__lede">{entity.historicalContext}</p>
+              {entity.historicalContext.trim().length > 0 ? (
+                <p className="bb-section__lede">{entity.historicalContext}</p>
+              ) : (
+                <RecordGapNotice kind="context" />
+              )}
             </section>
+
+            {entity.extendedNarrative ? (
+              <section aria-labelledby="further-heading">
+                <p className="bb-section__kicker">Reading</p>
+                <h2 className="bb-section__title" id="further-heading">
+                  Further reading
+                </h2>
+                <p className="bb-section__lede">{entity.extendedNarrative}</p>
+              </section>
+            ) : null}
 
             <section aria-labelledby="status-heading">
               <p className="bb-section__kicker">Status</p>
@@ -177,9 +200,33 @@ export default async function EntityPage({ params }: EntityPageProps) {
                 <EntityRelatedList entity={entity} labelledBy="related-heading" />
               </div>
             </section>
+
+            {(entity.continueLearning?.length ?? 0) > 0 ? (
+              <section aria-labelledby="continue-heading">
+                <p className="bb-section__kicker">Continue</p>
+                <h2 className="bb-section__title" id="continue-heading">
+                  Also connected
+                </h2>
+                <p className="bb-section__lede">
+                  Nearby records one step further in the published graph — keep learning without
+                  dead ends.
+                </p>
+                <div style={{ marginTop: 'var(--bb-space-4)' }}>
+                  <EntityRelatedList
+                    entity={entity}
+                    labelledBy="continue-heading"
+                    continueLearning
+                  />
+                </div>
+              </section>
+            ) : null}
           </div>
 
           <aside className="bb-entity-aside" aria-label="Record context">
+            {entity.primaryImage ? (
+              <EntityPrimaryImage image={entity.primaryImage} entityName={entity.displayName} />
+            ) : null}
+
             <Notice tone="warning" title={`Location precision: ${entity.locationPrecision}`}>
               Showing {entity.locationLabel}. Exact residential addresses are never rendered on
               public pages.

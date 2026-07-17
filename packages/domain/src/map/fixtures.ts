@@ -1,17 +1,17 @@
 /**
- * Demo/test fixtures for the BB-070 map data platform. There is no live Firebase
+ * Demo/test fixtures for the map data platform. There is no live Firebase
  * release yet (apps/web reads `src/data/public-seed.ts` fixtures the same way),
  * so this module is the map-source equivalent: raw (pre-redaction) entity +
  * location inputs spanning several states, including the critical negative-case
  * fixture — a living person with a precise residential coordinate — used by the
- * BB-070 redaction regression test and by the `/map` demo route.
+ * redaction regression test and by the `/map` demo route.
  *
  * Shapes mirror `packages/firebase/fixtures/firestore-seed.ts` in spirit but are
- * independent (that file is outside this bead's file ownership).
+ * independent.
  */
 import type { MapSourceEntityInput } from './map-source.js';
 
-/** Public place/school entities — safe, coarse precision, no living-person risk. */
+/** Public place/school entities safe, coarse precision, no living-person risk. */
 export const PLACE_DC_FIXTURE: MapSourceEntityInput = {
   entityId: 'ent_fixture_place_dc',
   kind: 'place',
@@ -42,7 +42,7 @@ export const SCHOOL_DC_FIXTURE: MapSourceEntityInput = {
   },
 };
 
-// Queens coordinates are used deliberately (rather than Lower Manhattan) — see
+// Queens coordinates are used deliberately (rather than Lower Manhattan) see
 // us-geography.test.ts "documented limitation": Manhattan's lng/lat also falls
 // inside New Jersey's approximate bounding box and would misattribute there.
 export const PLACE_HARLEM_NY_FIXTURE: MapSourceEntityInput = {
@@ -108,7 +108,7 @@ export const PLACE_CALIFORNIA_STATE_FIXTURE: MapSourceEntityInput = {
   },
 };
 
-/** No geographic anchor at all — must be excluded, not silently coarsened. */
+/** No geographic anchor at all must be excluded, not silently coarsened. */
 export const EVENT_NO_LOCATION_FIXTURE: MapSourceEntityInput = {
   entityId: 'ent_fixture_event_no_location',
   kind: 'event',
@@ -117,7 +117,7 @@ export const EVENT_NO_LOCATION_FIXTURE: MapSourceEntityInput = {
 };
 
 /**
- * THE CRITICAL FIXTURE (BB-070 acceptance criterion 3 / redaction regression test):
+ * THE CRITICAL FIXTURE:
  * a living person with a precise residential coordinate. `redactLocationForPublic`
  * must coarsen this to city precision (per the constitution's
  * `livingResidenceMaxPublicPrecision`) — the exact residential lat/lng below must
@@ -138,7 +138,7 @@ export const LIVING_PERSON_RESIDENCE_FIXTURE: MapSourceEntityInput = {
   },
 };
 
-/** Second negative case: unknown living status defaults to "treat as living" (BB-003/BB-014). */
+/** Second negative case: unknown living status defaults to "treat as living". */
 export const UNKNOWN_LIVING_STATUS_EXACT_COORDINATES_FIXTURE: MapSourceEntityInput = {
   entityId: 'ent_fixture_person_unknown_living_chicago_il',
   kind: 'person',
@@ -169,7 +169,7 @@ export const DECEASED_RESIDENCE_FIXTURE: MapSourceEntityInput = {
   },
 };
 
-/** Full demo/test population — everything-active fixture set across 7 states + D.C. */
+/** Full demo/test population everything-active fixture set across 7 states + D.C. */
 export const MAP_SOURCE_DEMO_FIXTURES: readonly MapSourceEntityInput[] = [
   PLACE_DC_FIXTURE,
   SCHOOL_DC_FIXTURE,

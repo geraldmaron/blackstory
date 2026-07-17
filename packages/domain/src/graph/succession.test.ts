@@ -1,8 +1,8 @@
 /**
- * Tests for BB-092 acceptance criterion 11 (CRITICAL): a `successor_of` edge must never leak the
- * superseded predecessor's own statusHistory/condition designation onto the successor as the
- * successor's CURRENT status — it must surface only as linked historical context. Canonical case
- * from the bead text: a historical place is annexed/renamed into a modern municipality.
+ * Tests that a `successor_of` edge must never leak the superseded predecessor's own
+ * statusHistory/condition designation onto the successor as the successor's CURRENT status —
+ * it must surface only as linked historical context. Canonical case: a historical place is
+ * annexed/renamed into a modern municipality.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -23,13 +23,13 @@ test('successor_of direction: fromEntityId is the modern successor, toEntityId i
 });
 
 test('THE CRITICAL PROOF: the successor’s own current status is derived ONLY from its own statusHistory and does not equal the predecessor’s historic designation', () => {
-  // The successor's current status comes from BB-090's real currentStatus, applied ONLY to the
-  // successor's OWN statusHistory array — this test never passes the predecessor's array in.
+  // The successor's current status comes from real currentStatus, applied ONLY to the
+  // successor's OWN statusHistory array this test never passes the predecessor's array in.
   const successorCurrentStatus = currentStatus(successorStatusHistory);
   const predecessorCurrentDesignation = currentStatus(predecessorStatusHistory);
 
   assert.equal(successorCurrentStatus, 'active');
-  // The predecessor's OWN current designation is "historic" — proving the two are genuinely
+  // The predecessor's OWN current designation is "historic" proving the two are genuinely
   // different values in this scenario, so a passing comparison below is meaningful, not vacuous.
   assert.equal(predecessorCurrentDesignation, 'historic');
   assert.notEqual(successorCurrentStatus, predecessorCurrentDesignation);
@@ -77,7 +77,7 @@ test('buildSuccessorPublicView keeps linkedHistoricalContext structurally separa
 
 test('buildSuccessorPublicView only attaches edges where the queried id is actually the successor side', () => {
   // Querying from the PREDECESSOR's own id must not accidentally pull in its own history as if
-  // it were "linked context" about itself — the function only matches edges whose successor
+  // it were "linked context" about itself the function only matches edges whose successor
   // endpoint equals the queried id.
   const predecessorStatusHistoryById = new Map([
     ['gg-place-historic-town', predecessorStatusHistory],
@@ -92,7 +92,7 @@ test('buildSuccessorPublicView only attaches edges where the queried id is actua
 
 test('end-to-end scenario proof: querying the modern successor never returns "historic"/"annexed" as its own status', () => {
   // Simulates what a public entity-page builder would do: resolve the successor's OWN current
-  // status via BB-090, and separately attach linked historical context. Assert the two never
+  // status via, and separately attach linked historical context. Assert the two never
   // collapse into the same field or value.
   const successorEntity = {
     id: 'gg-place-modern-city',

@@ -1,5 +1,5 @@
 /**
- * Tests for hybrid match explanations — no numeric scores in public affordances (BB-072).
+ * Tests for hybrid match explanations no numeric scores in public affordances.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

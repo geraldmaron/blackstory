@@ -1,17 +1,17 @@
 /**
- * Deletion-sync framework (BB-077): a shared, scheduler-agnostic purge mechanism that a
- * scheduled job (BB-084) or a manual operator invocation can call whenever an upstream
- * source requires deletion sync (e.g. Reddit's <=48h contractual obligation — see
+ * Deletion-sync framework: a shared, scheduler-agnostic purge mechanism that a
+ * scheduled job or a manual operator invocation can call whenever an upstream
+ * source requires deletion sync (e.g. Reddit's <=48h contractual obligation see
  * ./obligations.js). A purge cascades through quarantine, graylist, and research-case
  * attachment targets, and produces an audit record that captures the FACT of deletion
  * (source id, timestamp, reason, correlation id) without retaining the deleted content.
  *
  * This module is pure and framework-independent: it does not touch Firestore. It follows
- * BB-018's audit/outbox shape at the domain layer (DomainAuditEvent / DomainOutboxMessage,
- * ../audit/index.js) so a storage adapter can hand `auditEvent` + `outboxMessage` straight to
+ * audit/outbox shape at the domain layer (DomainAuditEvent DomainOutboxMessage,
+ * ./audit/index.js) so a storage adapter can hand `auditEvent` + `outboxMessage` straight to
  * the existing `commitWithAudit` path (packages/firebase/src/firestore/audit-outbox.ts) the
  * same way every other audited mutation in this repo does, and can translate `mutations` into
- * real deletes against its own store. packages/firebase is out of scope for this bead (read-only
+ * real deletes against its own store. packages/firebase is out of scope for this (read-only
  * context), so that translation step is deliberately left to the caller.
  */
 import { randomUUID } from 'node:crypto';
@@ -49,7 +49,7 @@ export type DeletionSyncMutation = {
   readonly operation: 'purge';
 };
 
-/** The fact of deletion only — never the deleted content. A queryable audit-of-deletion record. */
+/** The fact of deletion only never the deleted content. A queryable audit-of-deletion record. */
 export type DeletionSyncRecord = {
   readonly id: string;
   readonly sourceId: string;
@@ -71,8 +71,8 @@ export type DeletionSyncPlan = {
 /**
  * Build a purge plan for a deletion-sync request. Pure function: no I/O, no scheduler
  * dependency, callable by a cron handler or an operator CLI identically. Callers execute
- * `mutations` against their own store and persist `auditEvent` / `outboxMessage` through the
- * existing BB-018 commit path.
+ * `mutations` against their own store and persist `auditEvent` `outboxMessage` through the
+ * existing commit path.
  */
 export function planDeletionSyncPurge(request: DeletionSyncRequest): DeletionSyncPlan {
   if (!request.cascadeTargets.length) {
@@ -147,7 +147,7 @@ export type PurgeableStore = {
 
 /**
  * Apply a purge plan's mutations against any store exposing `delete`. Scheduler-agnostic: a
- * cron job (BB-084) or a manual operator invocation can call this the same way.
+ * cron job or a manual operator invocation can call this the same way.
  */
 export function applyDeletionSyncPurge(store: PurgeableStore, plan: DeletionSyncPlan): void {
   for (const mutation of plan.mutations) {

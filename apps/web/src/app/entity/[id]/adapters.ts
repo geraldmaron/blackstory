@@ -1,7 +1,7 @@
 /**
- * Parent-owned adapters that map BB-052 seed entity views into BB-053 evidence inputs and
- * BB-054 public "why this appears" payloads. Keeps the entity page free of field-renaming clutter
- * and reuses the same notability-label → BB-090 criterion synthesis as the snapshot search index.
+ * Parent-owned adapters that map seed entity views into evidence inputs and
+ * public "why this appears" payloads. Keeps the entity page free of field-renaming clutter
+ * and reuses the same notability-label → criterion synthesis as the snapshot search index.
  */
 import {
   NOTABILITY_RUBRIC,
@@ -34,7 +34,7 @@ function synthesizeNotabilityBasis(
   }));
 }
 
-/** Maps seed `PublicClaimView` rows into BB-053 `EvidenceClaimInput` (citation field rename + dispute). */
+/** Maps seed `PublicClaimView` rows into `EvidenceClaimInput` (citation field rename + dispute).  */
 export function toEvidenceClaimInputs(
   claims: readonly PublicClaimView[],
 ): readonly EvidenceClaimInput[] {
@@ -80,7 +80,7 @@ function relevanceEvidenceForEntity(entity: PublicEntityView): readonly Relevanc
   return evidence;
 }
 
-/** Builds the BB-054 public why-this-appears payload from a seed entity view. */
+/** Builds the public why-this-appears payload from a seed entity view.  */
 export function buildWhyThisAppearsForEntity(entity: PublicEntityView): PublicWhyThisAppears {
   return buildPublicWhyThisAppears({
     explanation: entity.relevanceExplanation,

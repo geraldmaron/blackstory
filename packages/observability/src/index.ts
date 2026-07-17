@@ -1,3 +1,4 @@
+
 /**
  * Structured logging, operational errors, and security telemetry shared across services.
  */
@@ -109,10 +110,11 @@ export interface Logger {
   error(message: string, error?: unknown, context?: LogContext): void;
 }
 
+
 /**
  * Redacts a structured log record before it is written. Wire the central redactor
  * from @black-book/security here so protected values (residential addresses, exact
- * coordinates) never reach log output or error telemetry (BB-015).
+ * coordinates) never reach log output or error telemetry.
  */
 export type LogRedactor = (record: LogContext) => LogContext;
 

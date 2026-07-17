@@ -1,6 +1,6 @@
 /**
- * Integration tests for the `/history/api` refine route (BB-093): App Check, BB-025 rate limits,
- * and BB-049 guardrails over the bundled graph snapshot.
+ * Integration tests for the `/history/api` refine route: App Check, rate limits,
+ * and guardrails over the bundled graph snapshot.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

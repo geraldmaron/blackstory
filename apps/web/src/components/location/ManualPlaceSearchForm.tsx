@@ -1,10 +1,10 @@
 'use client';
 
 /**
- * Manual address/ZIP entry form for the `/locate` geocode experience (BB-050). This is a purely
- * presentational, controlled component — it validates and hands the trimmed input string to
+ * Manual address/ZIP entry form for the `/locate` geocode experience. This is a purely
+ * presentational, controlled component it validates and hands the trimmed input string to
  * `onSubmit`; `LocateExperience.tsx` owns the actual fetch to `/locate/api` and all loading/error
- * state. Kept separate so it stays trivially SSR-render-testable and so BB-050 acceptance
+ * state. Kept separate so it stays trivially SSR-render-testable and so acceptance
  * criterion 4 ("geocoder failure provides manual place search") has one obvious re-entry point:
  * this same form renders again after a fallback, with the fallback's `message` passed through
  * `helperText`.

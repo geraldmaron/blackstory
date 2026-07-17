@@ -1,8 +1,9 @@
+
 /**
- * REAL roster entry: backup verification + restore-drill scheduling (BB-020, closed). Rather
+ * REAL roster entry: backup verification + restore-drill scheduling. Rather
  * than re-importing scripts/backup-restore's plain-.mjs verification helpers into this
  * TypeScript package (a fragile cross-format coupling), this wrapper invokes the actual,
- * already-tested CLI (scripts/backup-restore/verify-restore.mjs --json) as a subprocess — which
+ * already-tested CLI (scripts/backup-restore/verify-restore.mjs --json) as a subprocess which
  * is also the realistic shape of how a Cloud Run Job actually runs this today: a container
  * invoking a script, not a function call. The exec function is injected so tests can run both
  * hermetically (fake exec) and as a genuine integration test against the real script (see
@@ -69,7 +70,7 @@ export async function runBackupVerificationJob(
   try {
     report = JSON.parse(stdout);
   } catch {
-    // stdout wasn't valid JSON — report stays null.
+    // stdout wasn't valid JSON report stays null.
   }
 
   const ok = exitCode === 0;

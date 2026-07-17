@@ -1,29 +1,22 @@
 /**
- * Fail-closed citation-completeness gate for projection build (BB-083 acceptance criterion 1).
+ * Fail-closed citation-completeness gate for projection build.
  *
  * "Unsourced" must never be a publishable state: every published claim needs at least one
- * structurally complete citation (source name, URL-or-offline-designation, capture pointer,
- * retrieval date — see ./citation.ts). This module is the gate; it does not decide *when*
+ * structurally complete citation (source name, URL-or-offline designation, capture pointer,
+ * retrieval date — see `./citation.ts`). This module is the gate; it does not decide *when*
  * projection build runs.
  *
- * INTEGRATION POINT (documented, not live-wired — matching this session's established pattern
- * for wiring that is genuinely out of this bead's file-ownership/risk budget; see
- * packages/domain/src/map/map-source.ts's "INTEGRATION POINT" comment for the same convention):
+ * Not wired live: the primary claim → public-projection path that calls
+ * `buildReleaseManifest` (`packages/domain/src/publication/index.ts`) lives in
+ * `workers/publication/` (Python) per ADR-007, not in this package. The one TS call site,
+ * `retractResearchCase` in `packages/domain/src/research-case/workflow.ts`, assembles
+ * `ReleaseArtifact` immediately before that call.
  *
- * The actual claim -> public-projection assembly step that ultimately calls
- * `buildReleaseManifest` (packages/domain/src/publication/index.ts) lives outside this TS
- * package for the *primary* publish path — per ADR-007, worker code (including the
- * projection-build pipeline) lives in workers/publication/ (Python), not packages/domain. The
- * one call site to `buildReleaseManifest` that does exist in this TS package,
- * `retractResearchCase` in packages/domain/src/research-case/workflow.ts (owned by other beads
- * this session, not touched here), assembles `ReleaseArtifact[]` immediately before that call.
- *
- * The integration point for both the Python pipeline and any future TS caller is identical:
- * call `assertProjectionCitationCompletenessGate` with every claim slated for this projection
- * build and a `claimId -> Citation[]` map immediately before `buildReleaseManifest` (or its
- * Python equivalent) runs, and do not proceed to build/activate the release if it throws.
- * Because the gate fails closed (throws rather than returning a boolean the caller could
- * ignore), wiring it in is a single guarded call, not a refactor.
+ * Callers (Python pipeline or future TS) should invoke
+ * `assertProjectionCitationCompletenessGate` with every claim slated for the projection
+ * build and a `claimId → Citation` map immediately before `buildReleaseManifest` (or its
+ * Python equivalent), and must not build/activate the release if it throws. The gate fails
+ * closed (throws rather than returning a boolean), so wiring is a single guarded call.
  */
 import type { Citation } from './citation.js';
 import { isCitationStructurallyComplete } from './citation.js';
@@ -39,7 +32,7 @@ export type CitationCompletenessResult =
 
 /**
  * A claim passes when at least one of its citations is structurally complete. Citations that
- * exist but are incomplete (e.g. missing a capture pointer) do not count — "some citation
+ * exist but are incomplete (e.g. missing a capture pointer) do not count "some citation
  * object exists" is not the bar; "at least one *complete* citation" is.
  */
 export function evaluateClaimCitationCompleteness(
@@ -95,9 +88,9 @@ export function evaluateProjectionCitationCompleteness(
 }
 
 /**
- * Fail-closed gate: call immediately before building/activating a projection release (see the
- * INTEGRATION POINT note above). Throws — never returns a value the caller could ignore — when
- * any claim lacks a structurally complete citation.
+ * Fail-closed gate: call immediately before building/activating a projection release.
+ * Throws (never returns a value the caller could ignore) when any claim lacks a
+ * structurally complete citation.
  */
 export function assertProjectionCitationCompletenessGate(
   claims: readonly { readonly id: string }[],

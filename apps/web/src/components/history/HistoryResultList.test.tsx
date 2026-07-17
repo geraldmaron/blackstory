@@ -1,5 +1,5 @@
 /**
- * Smoke tests for BB-093 history browse UI components — accessible markup and link targets.
+ * Smoke tests for history browse UI components accessible markup and link targets.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

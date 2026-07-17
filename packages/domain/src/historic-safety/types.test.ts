@@ -1,5 +1,5 @@
 /**
- * Tests for the BB-082 shared layer vocabulary and signal shape.
+ * Tests for the shared layer vocabulary and signal shape.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -11,7 +11,7 @@ import {
   isHistoricSafetyLayerId,
 } from './types.js';
 
-test('HISTORIC_SAFETY_LAYER_IDS carries exactly the five layers in bead order', () => {
+test('HISTORIC_SAFETY_LAYER_IDS carries exactly the five layers in registry order', () => {
   assert.deepEqual(HISTORIC_SAFETY_LAYER_IDS, [
     'documented_events',
     'sundown_town',

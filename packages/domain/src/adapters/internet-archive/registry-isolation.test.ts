@@ -1,11 +1,10 @@
 /**
- * BB-073 acceptance criterion 1 (the isolation half): proves canary sampling, drift-quarantine,
- * and kill-switch machinery — all generic BB-037 primitives (../gates.ts, ../run-health.ts,
- * ../drift.ts) — compose correctly with each of the three new adapter contracts (RSS, Internet
- * Archive, DPLA v2), the same isolation BB-045/046 already rely on. Unlike the federal adapter
- * family, these three don't get a bespoke `buildIsolatedFederalRunResult`-style wrapper — the
- * generic primitives already cover the need, so this test exercises them directly against each
- * contract rather than duplicating a wrapper.
+ * Tests that canary sampling, drift-quarantine, and kill-switch machinery — all generic
+ * primitives (`../gates.ts`, `../run-health.ts`, `./drift.ts`) — compose correctly with each of
+ * the three community adapter contracts (RSS, Internet Archive, DPLA v2). Unlike the federal
+ * adapter family, these three don't get a bespoke `buildIsolatedFederalRunResult`-style wrapper;
+ * the generic primitives already cover the need, so this test exercises them directly against
+ * each contract rather than duplicating a wrapper.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,5 +1,5 @@
 /**
- * Constitution-aligned source classifications for provenance (BB-016 / BB-003).
+ * Constitution-aligned source classifications for provenance.
  */
 import { loadProductConstitution } from '@black-book/schemas';
 

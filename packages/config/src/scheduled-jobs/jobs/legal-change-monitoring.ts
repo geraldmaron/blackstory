@@ -1,6 +1,7 @@
+
 /**
- * REAL roster entry: legal change monitoring (BB-087). Wraps `@black-book/domain`'s legal
- * monitoring module and fixture-only adapter clients — automation proposes review_queue events,
+ * REAL roster entry: legal change monitoring. Wraps `@black-book/domain`'s legal
+ * monitoring module and fixture-only adapter clients automation proposes review_queue events,
  * humans dispose. No live network in tests; live adapter wiring requires api.data.gov and
  * LegiScan keys documented as human follow-up.
  */
@@ -50,9 +51,10 @@ function collectMonitoringRows(): readonly LegalMonitoringSourceSnapshot[] {
   return clients.flatMap((client) => client.parseFixtures().monitoringRows);
 }
 
+
 /**
  * Runs one legal monitoring sweep over fixture adapter outputs. Pure aside from the injected
- * prior state — proposes deduped review_queue events without applying any public writes.
+ * prior state proposes deduped review_queue events without applying any public writes.
  */
 export function runLegalChangeMonitoringJob(
   input: LegalChangeMonitoringJobInput,

@@ -1,6 +1,7 @@
+
 /**
  * Shared domain fixture shapes used by test data builders.
- * Aligned with @black-book/domain entity kinds (BB-014); builders remain test-only.
+ * Aligned with @black-book/domain entity kinds; builders remain test-only.
  */
 
 export type EntityKind =
@@ -41,7 +42,7 @@ export interface SourceFixture {
   authority: 'primary' | 'secondary' | 'tertiary';
   rights: 'public-domain' | 'fair-use' | 'licensed' | 'unknown';
   capturedAt: string;
-  /** Optional BB-016 fields for provenance-aware tests. */
+  /** Optional fields for provenance-aware tests. */
   organizationId?: string;
   classification?: string;
   adapterId?: string;
@@ -63,7 +64,7 @@ export interface EvidenceFixture {
   id: string;
   claimId: string;
   sourceId: string;
-  /** BB-016: every evidence record resolves to a source item. */
+  /** Every evidence record resolves to a source item. */
   sourceItemId?: string;
   excerpt: string;
   excerptKind?: 'none' | 'short' | 'substantial';

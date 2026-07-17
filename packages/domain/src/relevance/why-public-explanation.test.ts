@@ -1,5 +1,5 @@
 /**
- * Tests for the BB-054 "why this appears" public composer — exercises the five acceptance
+ * Tests for the "why this appears" public composer exercises the five acceptance
  * criteria end to end against `buildPublicWhyThisAppears`.
  */
 import assert from 'node:assert/strict';

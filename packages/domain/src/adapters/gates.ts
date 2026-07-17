@@ -1,5 +1,5 @@
 /**
- * Fail-closed adapter run gates (BB-037). No adapter runs without approved source policy.
+ * Fail-closed adapter run gates. No adapter runs without approved source policy.
  */
 import {
   assertSourceAdapterCanCreateCandidates,

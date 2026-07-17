@@ -1,12 +1,12 @@
 /**
- * Versioned curated feed registry with add/remove audit (BB-073 acceptance criterion 6).
+ * Versioned curated feed registry with add/remove audit.
  *
- * Reuses the BB-018 append-only audit contract (`../../audit/index.ts`) rather than inventing a
+ * Reuses the append-only audit contract (`../../audit/index.ts`) rather than inventing a
  * parallel audit shape: every mutation returns a `DomainAuditEvent` using the existing
- * `administrative.configuration_changed` action (the closest fit in `AUDIT_EVENT_ACTIONS` — that
- * union is BB-018's and out of this bead's file ownership, so this module composes with it
- * instead of adding a bespoke `feed.added` action). Callers persist the returned event through
- * whatever audit sink BB-018 wires in production; the in-memory log here exists for tests.
+ * `administrative.configuration_changed` action (the closest fit in `AUDIT_EVENT_ACTIONS`;
+ * this module composes with that closed union instead of adding a bespoke `feed.added`
+ * action). Callers persist the returned event through whatever audit sink wires in
+ * production; the in-memory log here exists for tests.
  */
 import type { AuditActor, DomainAuditEvent } from '../../audit/index.js';
 import type { RssFeedClassification, RssFeedInstitutionType } from './types.js';

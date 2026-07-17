@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke tests for the BB-053 record-level research-coverage / source-lineage /
+ * SSR markup smoke tests for the record-level research-coverage source-lineage
  * retraction summary.
  */
 import assert from 'node:assert/strict';

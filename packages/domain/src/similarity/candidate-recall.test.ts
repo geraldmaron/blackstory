@@ -1,5 +1,5 @@
 /**
- * Tests for semantic candidate recall (BB-071): "find sources similar to this accepted one."
+ * Tests for semantic candidate recall: "find sources similar to this accepted one."
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

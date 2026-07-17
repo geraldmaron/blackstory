@@ -1,5 +1,5 @@
 /**
- * Wikimedia adapter contract defaults aligned with BB-037 SourceAdapterContract.
+ * Wikimedia adapter contract defaults aligned with SourceAdapterContract.
  */
 import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from '../candidates.js';
 import type { SourceAdapterContract } from '../types.js';

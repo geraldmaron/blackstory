@@ -1,7 +1,7 @@
 /**
  * Default OG/social preview image, generated at request time from the same
  * mark geometry that drives <BlackBookLogo /> (packages/ui/src/brand/BlackBookLogo.tsx)
- * — one source of truth, no static asset to keep in sync by hand.
+ * one source of truth, no static asset to keep in sync by hand.
  */
 import { ImageResponse } from 'next/og';
 import { BlackBookMark, brandPalette } from '@black-book/ui';

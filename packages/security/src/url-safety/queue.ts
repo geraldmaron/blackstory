@@ -1,3 +1,4 @@
+
 /**
  * Defines the asynchronous URL-evaluation job and quarantine lifecycle.
  * Submission handlers may enqueue this immutable contract but must never fetch;

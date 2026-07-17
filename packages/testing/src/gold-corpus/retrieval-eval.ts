@@ -1,11 +1,12 @@
+
 /**
- * Retrieval-quality eval over BB-047's gold corpus, for BB-071's semantic search (recall@k).
+ * Retrieval-quality eval over gold corpus, for semantic search (recall@k).
  *
  * Reuses the existing gold corpus (gold-corpus.v1.json, loaded via load.ts) rather than
  * inventing a new fixture. IMPORTANT CAVEAT, stated up front: this corpus was built for
  * classification-style adjudication (relevance/publication/confidence/citation/entity-resolution
- * labels — see gate.ts/metrics.ts), not for distinct per-item retrieval. Its 120 examples are
- *10 near-duplicate "scenario N" variants within each of 12 categories, differing mostly by an
+ * labels see gate.ts/metrics.ts), not for distinct per-item retrieval. Its 120 examples are
+ * 10 near-duplicate "scenario N" variants within each of 12 categories, differing mostly by an
  * incrementing number rather than distinguishing content. A literal per-item recall@k (query
  * text = document text, target = that exact example) would be tautologically 1.0 for any
  * consistent embedding function and would test nothing.
@@ -13,10 +14,10 @@
  * To get a meaningful, non-tautological number instead, queries here are synthesized from a
  * *different, coarser* view of each example (subject type + category labels) than the stored
  * document text (the title), and "relevant" is the full set of same-category examples rather
- * than one exact id. recall@k is then the standard IR definition: |topK ∩ relevant| / |relevant|,
+ * than one exact id. recall@k is then the standard IR definition: |topK ∩ relevant| |relevant|,
  * averaged over all queries. This measures whether the embedding pipeline's ranking correctly
- * groups semantically-related records together under a generic query — a fair, if modest, proxy
- * for "find what the user means" — while being honest that it cannot measure fine-grained
+ * groups semantically-related records together under a generic query a fair, if modest, proxy
+ * for "find what the user means" while being honest that it cannot measure fine-grained
  * scenario-level discrimination given this corpus's shape.
  */
 import type { GoldCorpus, GoldCorpusExample } from './types.js';
@@ -42,8 +43,9 @@ export function buildRetrievalDocuments(corpus: GoldCorpus): readonly RetrievalE
   }));
 }
 
+
 /**
- * One query per example, built from subjectType + categories — deliberately not the example's
+ * One query per example, built from subjectType + categories deliberately not the example's
  * title, so the query is a different string than any single stored document (see module doc).
  */
 export function buildRetrievalQueries(corpus: GoldCorpus): readonly RetrievalEvalQuery[] {
@@ -79,17 +81,18 @@ export type RetrievalEvalResult = {
   readonly documentCount: number;
   readonly queryCount: number;
   readonly kValues: readonly number[];
-  /** Mean recall@k across every query, keyed by k (stringified — plain objects can't key on number). */
+  /** Mean recall@k across every query, keyed by k (stringified plain objects can't key on number). */
   readonly recallAtK: Readonly<Record<string, number>>;
   readonly meanReciprocalRank: number;
 };
 
 const DEFAULT_K_VALUES = [5, 10] as const;
 
+
 /**
  * Runs the retrieval eval end to end: embeds every document and query with the injected
  * provider, ranks documents per query by cosine similarity, and reports recall@k + MRR.
- * Pass `createDeterministicMockEvalProvider()` (retrieval-embedding.ts) for a CI-safe run with
+ * Pass `createDeterministicMockEvalProvider` (retrieval-embedding.ts) for a CI-safe run with
  * no network access, or a real provider (e.g. `@black-book/firebase`'s
  * `createGeminiEmbeddingProvider`, wired in by a caller outside this package) for a real number.
  */

@@ -1,5 +1,6 @@
+
 /**
- * Search and query resource guardrails (BB-026).
+ * Search and query resource guardrails.
  *
  * Pure deterministic validation for public search: Unicode normalization, approved query
  * shapes only, bounded filters/radius/date/page depth, opaque cursor pagination, cache keys,
@@ -10,10 +11,10 @@ import type { EndpointClass } from './rate-limits.js';
 
 export const QUERY_GUARDRAIL_POLICY_VERSION = '1.0.0' as const;
 
-/** Endpoint class metadata for BB-025 rate-limit integration. */
+/** Endpoint class metadata for rate-limit integration. */
 export const SEARCH_ENDPOINT_CLASS = 'search' as const satisfies EndpointClass;
 
-/** Allowlisted sort keys — no user-defined sort expressions. */
+/** Allowlisted sort keys no user-defined sort expressions. */
 export type SearchSortKey =
   | 'relevance'
   | 'name_asc'
@@ -31,9 +32,10 @@ export const searchSortKeys = [
   'distance',
 ] as const satisfies readonly SearchSortKey[];
 
+
 /**
- * Allowlisted filter fields — no arbitrary column selection. `status` and `era` were added for
- * BB-049 AC5 ("the filter allowlist extends to status and era"), matching the 6 fields
+ * Allowlisted filter fields no arbitrary column selection. `status` and `era` were added for
+ * AC5 ("the filter allowlist extends to status and era"), matching the 6 fields
  * `@black-book/domain`'s search layer filters on (see `packages/domain/src/search/types.ts`).
  */
 export type SearchFilterField = 'kind' | 'state' | 'precision' | 'releaseId' | 'status' | 'era';
@@ -72,7 +74,7 @@ export type SearchDateRange = {
   readonly to: string;
 };
 
-/** Raw search input from HTTP handlers — reject prohibited keys early. */
+/** Raw search input from HTTP handlers reject prohibited keys early. */
 export type SearchQueryInput = {
   readonly q?: string;
   readonly filters?: Readonly<Record<string, string | undefined>>;
@@ -84,7 +86,7 @@ export type SearchQueryInput = {
   readonly radiusM?: number;
   readonly dateFrom?: string;
   readonly dateTo?: string;
-  /** Prohibited — presence triggers denial. */
+  /** Prohibited presence triggers denial. */
   readonly fields?: readonly string[];
   readonly select?: readonly string[];
   readonly orderBy?: string;
@@ -527,7 +529,7 @@ function resolvePageSize(raw: number | undefined, limits: QueryGuardrailLimits):
   return pageSize;
 }
 
-/** Deterministic cost estimate for fuzz/load budgeting — not wall-clock time. */
+/** Deterministic cost estimate for fuzz/load budgeting not wall-clock time. */
 export function estimateQueryCost(
   canonical: CanonicalSearchQuery,
   limits: QueryGuardrailLimits = DEFAULT_QUERY_GUARDRAIL_LIMITS,
@@ -674,7 +676,7 @@ export function getQueryTimeoutPolicy(
   };
 }
 
-/** Fail-closed timeout decision — callers must abort work and release pool slots. */
+/** Fail-closed timeout decision callers must abort work and release pool slots. */
 export function createTimeoutFailure(
   queryHash: string,
   durationMs: number,
@@ -715,7 +717,7 @@ export function createSlowQueryLogEvent(input: {
   };
 }
 
-/** Metadata for BB-025 endpoint class wiring without rewriting the rate limiter. */
+/** Metadata for endpoint class wiring without rewriting the rate limiter. */
 export function searchQueryEndpointMetadata(decision: QueryGuardrailDecisionAllowed): {
   readonly endpointClass: typeof SEARCH_ENDPOINT_CLASS;
   readonly costTier: 'expensive_read';
@@ -731,6 +733,7 @@ export function searchQueryEndpointMetadata(decision: QueryGuardrailDecisionAllo
     estimatedCost: decision.estimatedCost,
   };
 }
+
 
 /**
  * Validates and canonicalizes a public search query.

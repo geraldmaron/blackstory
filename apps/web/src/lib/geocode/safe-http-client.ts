@@ -1,15 +1,15 @@
 /**
- * Production `SafeHttpClient` for the BB-050 Census Geocoder adapter (`@black-book/domain`'s
- * `../adapters/census-geo/fetch-geocode.ts`), backed by the REAL BB-030 URL-safety primitives
+ * Production `SafeHttpClient` for the Census Geocoder adapter (`@black-book/domain`'s
+ * `../adapters/census-geo/fetch-geocode.ts`), backed by the REAL URL-safety primitives
  * from `@black-book/security` (`evaluateExternalUrl`, `resolveAndPinDestination`) — the exact
  * seam `packages/domain/src/adapters/internet-archive/shared/http-port.ts` defines and
  * `http-port.test.ts`'s `buildRealSafeHttpClient` reference implementation demonstrates. This is
  * that reference implementation made real: DNS is resolved once via Node's `dns.promises`,
  * private/loopback/link-local/metadata answers are rejected before any socket opens, and the
  * TLS connection is made to the pinned IP while sending the original hostname for SNI and the
- * `Host` header — never a second, unpinned DNS lookup.
+ * `Host` header never a second, unpinned DNS lookup.
  *
- * Server-only (Node `dns`/`https` modules) — never import this from a Client Component or the
+ * Server-only (Node `dns`/`https` modules) never import this from a Client Component or the
  * Edge runtime. GET-only: the Census Geocoder needs nothing else.
  */
 import { lookup } from 'node:dns/promises';
@@ -21,8 +21,8 @@ import {
 
 /**
  * Structurally matches `@black-book/domain`'s `SafeHttpClient` port
- * (`packages/domain/src/adapters/internet-archive/shared/http-port.ts`) exactly — including the
- * `'GET' | 'POST'` method union and optional `body` — even though this client only ever performs
+ * (`packages/domain/src/adapters/internet-archive/shared/http-port.ts`) exactly including the
+ * `'GET' | 'POST'` method union and optional `body` even though this client only ever performs
  * GET requests for the Census Geocoder (see `handleRequest`'s runtime guard below). Matching the
  * port's type shape (not narrowing it) is required for this client to satisfy `SafeHttpClient`
  * under `exactOptionalPropertyTypes`.
@@ -103,7 +103,7 @@ function performPinnedRequest(input: {
   });
 }
 
-/** Real, BB-030-backed `SafeHttpClient` for outbound Census Geocoder calls (server-only). */
+/** DNS-pinned `SafeHttpClient` for outbound Census Geocoder calls (server-only). */
 export async function safeHttpClient(request: SafeHttpRequest): Promise<SafeHttpResponse> {
   if (request.method !== undefined && request.method !== 'GET') {
     throw new Error(`safeHttpClient only supports GET; got "${request.method}"`);

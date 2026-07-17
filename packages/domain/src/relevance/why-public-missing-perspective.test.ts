@@ -1,5 +1,5 @@
 /**
- * Tests for the BB-054 missing-perspective indicator derivation.
+ * Tests for the missing-perspective indicator derivation.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

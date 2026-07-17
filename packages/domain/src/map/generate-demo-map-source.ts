@@ -1,18 +1,16 @@
 /**
  * One-off generator for the `/map` demo route's static artifact
- * (apps/web/src/app/map/map-source.seed.json).
+ * (`apps/web/src/app/map/map-source.seed.json`).
  *
- * This is deliberately a script, not part of any package's normal build: it
- * exists to stand in for the release pipeline described in map-source.ts's
- * "INTEGRATION POINT" comment, since there is no live release worker wired
- * up yet (see workers/publication/MAP_SOURCE_INTEGRATION.md). Running this
- * script against fixture data is the same shape of operation a real release
- * activation would perform against live public projections — build the
- * source once, write an immutable artifact, let the app read it statically
- * (ADR-008 bounded/static-first doctrine).
+ * This is deliberately a script, not part of any package's normal build: it stands in for the
+ * release pipeline described in `map-source.ts` (not wired live yet; see
+ * `workers/publication/MAP_SOURCE_INTEGRATION.md`). Running this script against fixture data
+ * is the same shape of operation a real release activation would perform against live public
+ * projections — build the source once, write an immutable artifact, let the app read it
+ * statically (ADR-008 bounded/static-first doctrine).
  *
  * Run with: pnpm --filter @black-book/domain exec tsx
- *   src/map/generate-demo-map-source.ts
+ * src/map/generate-demo-map-source.ts
  */
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

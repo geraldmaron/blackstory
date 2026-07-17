@@ -1,11 +1,11 @@
 /**
- * Public search endpoint (BB-049). Node.js runtime (App Check's Admin SDK verifier requires it —
- * never edge). This file is deliberately thin: Next.js's route-file validator only permits the HTTP
+ * Public search endpoint. Node.js runtime (App Check's Admin SDK verifier requires it — not
+ * the Edge runtime). This file is deliberately thin: Next.js's route-file validator only permits the HTTP
  * method handlers and route config to be exported here, so the testable, dependency-injectable core
  * lives in `./handler` (`handleSearchRequest`) and this module just wires production singletons.
  *
- * The endpoint sits behind App Check + BB-025 rate limits and runs BB-026's search guardrails
- * before executing the pure `runPublicSearch` pipeline over `getSnapshotSearchIndex()` — see
+ * The endpoint sits behind App Check + rate limits and runs search guardrails
+ * before executing the pure `runPublicSearch` pipeline over `getSnapshotSearchIndex`; see
  * `./handler` for the full request flow and the snapshot/live-reader seam.
  */
 import { getPublicSearchIndex } from '../../../lib/public-data/source';
@@ -18,7 +18,7 @@ export const runtime = 'nodejs';
 // Module-level singletons: one in-memory rate-limit store per server instance, matching the submit
 // route's posture. A shared store for a multi-instance deployment is an infra concern, not a change
 // to the algorithm. The App Check guard is created lazily (its factory dynamically imports
-// `@black-book/firebase` — see `./app-check-guard.ts`) and cached so only one is built per instance.
+// `@black-book/firebase`; see `./app-check-guard.ts`) and cached so only one is built per instance.
 const defaultRateLimitGuard = createSearchRateLimitGuard();
 
 let defaultAppCheckGuardPromise: Promise<SearchAppCheckGuard> | undefined;

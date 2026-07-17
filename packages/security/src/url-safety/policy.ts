@@ -1,3 +1,4 @@
+
 /**
  * Parses external URLs and classifies every literal or DNS-resolved destination.
  * The policy fails closed for non-web schemes, credentials, ambiguous DNS, and

@@ -1,6 +1,6 @@
 /**
- * Unit tests for the browser-safe `/locate/api` fetch wrapper (BB-050), against a stubbed global
- * `fetch` — no real network call, no DOM environment required.
+ * Unit tests for the browser-safe `/locate/api` fetch wrapper, against a stubbed global
+ * `fetch` no real network call, no DOM environment required.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

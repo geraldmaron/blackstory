@@ -1,5 +1,5 @@
 /**
- * Public location precision helpers aligned with constitution publicPrecisionRules (BB-014).
+ * Public location precision helpers aligned with constitution publicPrecisionRules.
  */
 import { evaluatePublicPrecision, loadProductConstitution } from '@black-book/schemas';
 import type { LivingStatus } from '../living.js';
@@ -18,7 +18,7 @@ export function prohibitedPublicPrecisionLevels(): readonly string[] {
 
 /**
  * Evaluate whether a precision level may appear on public projections.
- * Living residential / street / unit are rejected when livingStatus treats as living.
+ * Living residential street unit are rejected when livingStatus treats as living.
  */
 export function assertPublicPrecisionAllowed(
   precision: PublicPrecisionLevel,
@@ -44,17 +44,17 @@ export function isPublicPrecisionAllowed(
 }
 
 /**
- * geoPrecision tier vocabulary (BB-091).
+ * geoPrecision tier vocabulary.
  *
  * This is the ONE canonical definition of the exact-site|block|locality|county|state tier
- * scale. BB-086's fact-registry spec (`FactRecord.geoPrecision`) imports this vocabulary
- * rather than redefining it — see .beads/issues.jsonl black-book-bb086 "Ontology alignment"
+ * scale. fact-registry spec (`FactRecord.geoPrecision`) imports this vocabulary
+ * rather than redefining it see ./issues.jsonl "Ontology alignment"
  * note: "datePrecision and geoPrecision vocabularies are imported from the shared domain
- * modules established by BB-090/BB-091 — single definition, no local redefinition." Any
+ * modules established by single definition, no local redefinition." Any
  * future caller (fact records, entity locations, map popups) must reuse `GeoPrecisionTier`,
  * never invent a parallel enum.
  *
- * Ordered finest to coarsest — the same ordering direction as `GEO_PRECISION_TIER_RANK` below.
+ * Ordered finest to coarsest the same ordering direction as `GEO_PRECISION_TIER_RANK` below.
  * This is intentionally a DIFFERENT vocabulary from `packages/security/src/redaction.ts`'s
  * `PRECISION_RANK` (country|state|county|city|neighborhood|institution|...|exact_coordinates):
  * that scale governs public-output REDACTION of internal precision levels; this scale governs
@@ -93,7 +93,7 @@ export function coarserGeoPrecisionTier(a: GeoPrecisionTier, b: GeoPrecisionTier
  * How a stored location/fact coordinate's precision was arrived at. Recorded per
  * EntityLocation (see `packages/domain/src/geography/location.ts` `EntityLocation`) so
  * "why is this coarse" is always answerable. `redacted-by-rule` is reserved for the
- * EXCEPTION path only — see the module doc below for the fail-closed default policy.
+ * EXCEPTION path only see the module doc below for the fail-closed default policy.
  */
 export const PRECISION_BASES = [
   'source-documented',
@@ -115,7 +115,7 @@ export function isPrecisionBasis(value: string): value is PrecisionBasis {
  * jurisdiction bbox is the wrong basis for the circle (a building site or a city block does
  * not scale with county size). `locality`, `county`, and `state` radii are DERIVED from the
  * relevant jurisdiction's bbox (see `boundingRadiusMeters`) rather than hand-stored per
- * entity — this keeps the radius governed by jurisdiction reference data (BB-091) instead of
+ * entity this keeps the radius governed by jurisdiction reference data instead of
  * an ungovernable free number that drifts entity by entity.
  */
 export const FIXED_TIER_RADIUS_METERS: Readonly<Record<'exact-site' | 'block', number>> = {
@@ -123,7 +123,7 @@ export const FIXED_TIER_RADIUS_METERS: Readonly<Record<'exact-site' | 'block', n
   block: 200,
 };
 
-/** [west, south, east, north] in decimal degrees — same shape as `UsStateInfo.bbox`. */
+/** [west, south, east, north] in decimal degrees same shape as `UsStateInfo.bbox`. */
 export type JurisdictionBBox = readonly [west: number, south: number, east: number, north: number];
 
 const METERS_PER_DEGREE_LATITUDE = 111_320;
@@ -132,7 +132,7 @@ const METERS_PER_DEGREE_LATITUDE = 111_320;
  * Approximate bounding radius (meters) of a lng/lat bbox: half the corner-to-corner diagonal,
  * measured from the bbox center. Longitude degrees are scaled by cos(latitude) so the estimate
  * stays reasonable away from the equator. This is deliberately the same order of precision as
- * `packages/domain/src/map/us-geography.ts`'s bounding boxes — "good enough for national-zoom
+ * `packages/domain/src/map/us-geography.ts`'s bounding boxes "good enough for national-zoom
  * presence/density aggregates," never survey-grade.
  */
 export function boundingRadiusMeters(bbox: JurisdictionBBox): number {
@@ -154,7 +154,7 @@ export type DisplayRadiusInput = {
 /**
  * Deterministic geoPrecision tier -> display radius (meters). Fixed for exact-site/block;
  * derived from the jurisdiction bbox for locality/county/state. Throws (fails closed) rather
- * than guessing when a bbox-derived tier is requested without a bbox — a missing jurisdiction
+ * than guessing when a bbox-derived tier is requested without a bbox a missing jurisdiction
  * reference must be an error, not a silently wrong radius.
  */
 export function displayRadiusMeters(input: DisplayRadiusInput): number {
@@ -170,25 +170,25 @@ export function displayRadiusMeters(input: DisplayRadiusInput): number {
 }
 
 /**
- * Precision-basis default policy (BB-091 acceptance criterion 4).
+ * Precision-basis default policy.
  *
  * Redaction stays the EXCEPTION, never a default: `redactLocationForPublic` and
  * `PRECISION_RANK` in `packages/security/src/redaction.ts` remain the sole authority for
- * what may be PUBLISHED, and this function does not call into or replace them — it governs
+ * what may be PUBLISHED, and this function does not call into or replace them it governs
  * the internal `precisionBasis` a location is stored with, one layer earlier. A bulk-loaded
  * record (e.g. a vetted historic-sites corpus import) with a documented or geocoded
  * coordinate keeps that tier and basis untouched. Only when a redaction rule has actually
- * fired (BB-015 living-person residence, etc. — signaled by the caller via
+ * fired (living-person residence, etc. signaled by the caller via
  * `redactionRequired: true`, normally derived from `reducePublicPrecision`/
  * `redactLocationForPublic`'s `reduced` result) does the resolved basis become
  * `redacted-by-rule` and the tier coarsen. This function never coarsens on its own
- * initiative — it only reflects a redaction decision the caller has already made.
+ * initiative it only reflects a redaction decision the caller has already made.
  */
 export type ResolveEntityLocationPrecisionInput = {
   /** Finest tier the location is actually documented/geocoded at. */
   readonly documentedTier: GeoPrecisionTier;
   readonly documentedBasis: Exclude<PrecisionBasis, 'redacted-by-rule'>;
-  /** True only when a redaction rule (BB-015) requires this location to be coarsened. */
+  /** True only when a redaction rule requires this location to be coarsened. */
   readonly redactionRequired: boolean;
   /**
    * Tier to coarsen to when `redactionRequired` is true. Must be coarser than or equal to

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Client-only App Check token acquisition for the `/history` refine API (BB-093). Mirrors
+ * Client-only App Check token acquisition for the `/history` refine API. Mirrors
  * `apps/web/src/app/explore/app-check-client.ts`.
  */
 import { initializeApp, type FirebaseApp } from 'firebase/app';

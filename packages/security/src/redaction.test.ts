@@ -1,5 +1,6 @@
+
 /**
- * Tests for precision reduction, location redaction, and the deep value scrubber (BB-015).
+ * Tests for precision reduction, location redaction, and the deep value scrubber.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -85,7 +86,7 @@ test('redactLocationForPublic strips exact coordinates for a living residence (m
   });
   assert.ok(publicLocation);
   assert.equal(publicLocation.precision, 'city');
-  // Coordinates are coarsened to city precision (2 decimals) — no rooftop pin.
+  // Coordinates are coarsened to city precision (2 decimals) no rooftop pin.
   assert.equal(publicLocation.lat, 38.91);
   assert.equal(publicLocation.lng, -77.04);
   // Geohash is truncated to the city cell.

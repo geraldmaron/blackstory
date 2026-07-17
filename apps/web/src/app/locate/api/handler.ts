@@ -1,17 +1,17 @@
 /**
- * Testable core of the public `/locate` geocode endpoint (BB-050), kept OUT of `route.ts` on
- * purpose — same reason as `apps/web/src/app/search/api/handler.ts`: Next.js's route-file type
+ * Testable core of the public `/locate` geocode endpoint, kept OUT of `route.ts` on
+ * purpose same reason as `apps/web/src/app/search/api/handler.ts`: Next.js's route-file type
  * validator rejects any export from a `route.ts` other than HTTP method handlers and route
  * config, so the dependency-injectable handler lives here where `route.test.ts` can import it.
  * `route.ts` is a thin Next entry that wires production singletons and delegates to
  * `handleLocateRequest` below.
  *
- * One query parameter selects the lookup mode — `address` (free text or ZIP), or `lat`+`lng`
+ * One query parameter selects the lookup mode `address` (free text or ZIP), or `lat`+`lng`
  * (browser geolocation reverse lookup). Exactly one mode must be present; a request with none or
- * more than one is a 400. Every success/failure path returns HTTP 200 (`{ ok: true, ... }` or
+ * more than one is a 400. Every success/failure path returns HTTP 200 (`{ ok: true,... }` or
  * `{ ok: false, fallback }`) rather than a 4xx/5xx for "no match" or "geocoder unavailable" —
- * those are expected, handleable outcomes for this endpoint's caller (BB-050 acceptance criterion
- * 4, "geocoder failure provides manual place search"), not request errors.
+ * those are expected, handleable outcomes for this endpoint's caller (geocoder failure
+ * provides manual place search), not request errors.
  */
 import { NextResponse } from 'next/server';
 import {
@@ -28,7 +28,7 @@ export type LocateRouteDependencies = {
   readonly appCheckGuard: LocateAppCheckGuard;
   readonly rateLimitGuard: ReturnType<typeof createLocateRateLimitGuard>;
   readonly cache: LocateCache;
-  /** Test-only injection seams — production wiring (`./route.ts`) never overrides these; the
+  /** Test-only injection seams production wiring (`./route.ts`) never overrides these; the
    * pipeline's real defaults (backed by `../../../lib/geocode/safe-http-client.ts`) apply. */
   readonly fetchAddressGeocode?: typeof fetchCensusAddressGeocode;
   readonly fetchCoordinatesGeocode?: typeof fetchCensusCoordinatesGeocode;
@@ -49,7 +49,7 @@ const ZIP_ONLY_PATTERN = /^\d{5}(-\d{4})?$/;
 /**
  * Shared handler used by both the exported Next.js `GET` (production defaults) and `route.test.ts`
  * (injected fake App Check verifier, deterministic rate-limit clock, injected fetch fakes so no
- * real Census network call ever happens in tests). Ordering mirrors BB-049's search route: App
+ * real Census network call ever happens in tests). Ordering mirrors search route: App
  * Check guard -> rate-limit guard -> input parsing -> geocode pipeline, with a `finally` that
  * always releases the concurrency slot.
  */

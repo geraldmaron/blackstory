@@ -1,6 +1,6 @@
 /**
- * Filter state for the BB-093 `/history` browse surface. Mirrors BB-051's facet convention
- * (`../map-experience/filters.ts`) but scoped to graph-node kind filtering only — decade selection
+ * Filter state for the `/history` browse surface. Mirrors facet convention
+ * (`../map-experience/filters.ts`) but scoped to graph-node kind filtering only decade selection
  * lives in URL state separately (`./url-state.ts`).
  */
 

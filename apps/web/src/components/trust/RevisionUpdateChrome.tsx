@@ -1,5 +1,5 @@
 /**
- * MediaWiki-style revision chrome (BB-088) — "Updated {date} — see what changed" ambient booster
+ * MediaWiki-style revision chrome "Updated {date} see what changed" ambient booster
  * linking to per-revision permalinks and the errata log when corrections exist.
  */
 import React from 'react';

@@ -1,14 +1,23 @@
+
 /**
- * Public serialization choke point for Black Book (BB-015).
+ * Public serialization choke point for Black Book.
  *
- * Every value that becomes public — entity projections, search-index documents, and
- * exports — must pass through this module. It reduces location precision, strips
+ * Every value that becomes public entity projections, search-index documents, and
+ * exports must pass through this module. It reduces location precision, strips
  * residential/address fields, and fails closed (`assertPublicProjectionSafe`) if any
  * prohibited precision or protected value would otherwise reach a public surface.
+ * Learning-index fields (required summary, topic tags, optional prose/photo) are
+ * gated via `@black-book/domain` assertLearningIndexProjection.
  */
-import { allowedPublicPrecisionLevels, prohibitedPublicPrecisionLevels } from '@black-book/domain';
+import type { LivingStatus, PublicEntityPrimaryImage, PublicRelatedEntry } from '@black-book/domain';
+import {
+  allowedPublicPrecisionLevels,
+  assertLearningIndexProjection,
+  hasPreferredTopicTags,
+  prohibitedPublicPrecisionLevels,
+  sanitizePrimaryImageForRelease,
+} from '@black-book/domain';
 import { evaluatePublicPrecision } from '@black-book/schemas';
-import type { LivingStatus } from '@black-book/domain';
 import {
   createSensitiveDataRedactor,
   redactLocationForPublic,
@@ -37,7 +46,12 @@ export type PublicEntityProjection = {
   readonly kind: string;
   readonly displayName: string;
   readonly nameLower: string;
-  readonly summary?: string;
+  readonly summary: string;
+  readonly topicTags: readonly string[];
+  readonly historicalContext?: string;
+  readonly extendedNarrative?: string;
+  readonly primaryImage?: PublicEntityPrimaryImage;
+  readonly related?: readonly PublicRelatedEntry[];
   readonly location?: PublicProjectionLocation;
   readonly claimIds: readonly string[];
 };
@@ -102,6 +116,7 @@ export function assertNoProhibitedPublicPrecision(
     throw new Error(`Public precision not allowed: ${precision} (${result.reason ?? 'denied'})`);
   }
 }
+
 
 /**
  * Fail-closed structural audit of a payload bound for a public surface.
@@ -181,20 +196,47 @@ function toProjectionLocation(
 
 export type PublicEntityProjectionOptions = {
   readonly releaseId: string;
-  readonly summary?: string;
+  /** Required learning-index summary (120–400 chars). */
+  readonly summary: string;
   readonly claimIds?: readonly string[];
   readonly location?: InternalLocationInput;
+  readonly topicTags?: readonly string[];
+  readonly historicalContext?: string;
+  readonly extendedNarrative?: string;
+  readonly primaryImage?: PublicEntityPrimaryImage;
+  readonly related?: readonly PublicRelatedEntry[];
 };
+
 
 /**
  * Build a public entity projection from a canonical entity and an optional internal
  * location. The location is reduced through {@link redactLocationForPublic} using the
  * entity's living status, and the finished projection is verified fail-closed.
+ * Learning-index summary/image gates run before the structural safety audit.
  */
 export function toPublicEntityProjection(
   entity: PublicSerializableEntity,
   options: PublicEntityProjectionOptions,
 ): PublicEntityProjection {
+  const primaryImage = sanitizePrimaryImageForRelease(options.primaryImage);
+  assertLearningIndexProjection({
+    summary: options.summary,
+    ...(options.topicTags !== undefined ? { topicTags: options.topicTags } : {}),
+    ...(options.historicalContext !== undefined
+      ? { historicalContext: options.historicalContext }
+      : {}),
+    ...(options.extendedNarrative !== undefined
+      ? { extendedNarrative: options.extendedNarrative }
+      : {}),
+    ...(primaryImage !== undefined ? { primaryImage } : {}),
+    ...(options.related !== undefined ? { related: options.related } : {}),
+  });
+
+  if (!hasPreferredTopicTags(options.topicTags)) {
+    // Soft preference: empty tags are allowed but should be rare in curated releases.
+    // Hard gate remains summary (+ image rights when present).
+  }
+
   const publicLocation = options.location
     ? redactLocationForPublic({
         ...options.location,
@@ -210,7 +252,12 @@ export function toPublicEntityProjection(
     kind: string;
     displayName: string;
     nameLower: string;
-    summary?: string;
+    summary: string;
+    topicTags: readonly string[];
+    historicalContext?: string;
+    extendedNarrative?: string;
+    primaryImage?: PublicEntityPrimaryImage;
+    related?: readonly PublicRelatedEntry[];
     location?: PublicProjectionLocation;
     claimIds: readonly string[];
   } = {
@@ -219,11 +266,22 @@ export function toPublicEntityProjection(
     kind: entity.kind,
     displayName: entity.displayName,
     nameLower: entity.displayName.toLowerCase(),
+    summary: options.summary.trim(),
+    topicTags: options.topicTags ?? [],
     claimIds: options.claimIds ?? [],
   };
 
-  if (options.summary !== undefined) {
-    projection.summary = options.summary;
+  if (options.historicalContext !== undefined) {
+    projection.historicalContext = options.historicalContext;
+  }
+  if (options.extendedNarrative !== undefined) {
+    projection.extendedNarrative = options.extendedNarrative;
+  }
+  if (primaryImage !== undefined) {
+    projection.primaryImage = primaryImage;
+  }
+  if (options.related !== undefined) {
+    projection.related = options.related;
   }
   const location = toProjectionLocation(publicLocation);
   if (location !== undefined) {
@@ -234,9 +292,10 @@ export function toPublicEntityProjection(
   return projection;
 }
 
+
 /**
  * Build a search-index document. Search docs deliberately carry no coordinates or
- * address fields — only a name token and a coarse geohash — so queries can never
+ * address fields only a name token and a coarse geohash so queries can never
  * match a prohibited address field.
  */
 export function toPublicSearchDocument(
@@ -274,6 +333,7 @@ export function toPublicSearchDocument(
   assertPublicProjectionSafe(doc);
   return doc;
 }
+
 
 /**
  * Redact an arbitrary record for public export. Deep-strips address components and

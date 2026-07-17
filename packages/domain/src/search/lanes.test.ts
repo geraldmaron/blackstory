@@ -1,5 +1,5 @@
 /**
- * Tests for hybrid lane execution, era pre-filter (BB-090), and kill switches (BB-072).
+ * Tests for hybrid lane execution, era pre-filter, and kill switches.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

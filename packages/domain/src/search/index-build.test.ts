@@ -1,5 +1,5 @@
 /**
- * Tests for BB-049 AC5: the notability-basis inclusion gate holds AT THE SEARCH BOUNDARY as
+ * Tests for the notability-basis inclusion gate holds AT THE SEARCH BOUNDARY as
  * defense-in-depth. A record lacking a notability basis is SKIPPED (not indexed) and reported,
  * and one bad record never aborts the whole batch.
  */

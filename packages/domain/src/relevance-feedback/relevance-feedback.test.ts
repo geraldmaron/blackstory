@@ -1,8 +1,8 @@
 /**
- * BB-081: relevance/confidence feedback-loop calibration layer.
- * Covers decision-log extraction (from real BB-044 research-case transitions), the
+ * relevance/confidence feedback-loop calibration layer.
+ * Covers decision-log extraction (from real research-case transitions), the
  * recalibration report's four analyses, the weight-change propose/gate/approve boundary (proving
- * the determinism invariant — report proposes, humans approve, gold-corpus gates), and the pure
+ * the determinism invariant report proposes, humans approve, gold-corpus gates), and the pure
  * drift-alarm evaluator.
  */
 import assert from 'node:assert/strict';
@@ -544,9 +544,9 @@ test('this module exports no function capable of applying, activating, or writin
 let driftEntrySequence = 0;
 
 /** 'accept' -> confirmed relevant, engine agreed (decision 'include'); 'reject' -> excluded an
- *  engine-includable candidate, no formal override — both are legal state transitions, mirroring
- *  the already-verified accept/reject fixtures above. Every entry's occurredAt is LATER (fixed
- *  by caseWithVerdict), which the window tests below account for explicitly. */
+ * engine-includable candidate, no formal override both are legal state transitions, mirroring
+ * the already-verified accept/reject fixtures above. Every entry's occurredAt is LATER (fixed
+ * by caseWithVerdict), which the window tests below account for explicitly. */
 function driftEntry(disposition: 'accept' | 'reject'): ResearchCaseRecord {
   driftEntrySequence += 1;
   const id = `drift-${driftEntrySequence}-${disposition}`;

@@ -1,6 +1,6 @@
 /**
- * Server-only rate-limit guard for the public search route (BB-025 reuse, BB-049). Reuses the
- * exact shared evaluator from `@black-book/security` — `createRateLimitEvaluator`,
+ * Server-only rate-limit guard for the public search route. Reuses the
+ * exact shared evaluator from `@black-book/security` `createRateLimitEvaluator`,
  * `buildRateLimitKey`, `aggregateDistributedRisk`, `formatRateLimitResponse`,
  * `releaseConcurrency` — the same primitives `apps/web/src/app/submit/rate-limit-guard.ts` uses.
  * This is not a new rate-limit algorithm.
@@ -8,11 +8,11 @@
  * Deliberate deviation from the submit guard: this endpoint is routed under the `search` endpoint
  * class, not `corrections`. `@black-book/security`'s policy matrix (`DEFAULT_ENDPOINT_QUOTA_MATRIX`
  * in `rate-limits.ts`) gives `search` a distinct, more generous `expensive_read` tier
- * (anonymous: capacity 8 / window cap 8 / daily 40 / concurrency 1) than the `corrections`
- * `mutation` tier (anonymous: capacity 2 / window cap 2 / daily 8) — appropriate for an
+ * (anonymous: capacity 8 window cap 8 daily 40 concurrency 1) than the `corrections`
+ * `mutation` tier (anonymous: capacity 2 window cap 2 daily 8) appropriate for an
  * idempotent read path a user can legitimately fire repeatedly (typeahead, pagination), while
  * still requiring verified App Check for anonymous callers (the `expensive_read` cost tier gate in
- * `evaluateQuota`). `SEARCH_ENDPOINT_CLASS` from the BB-026 guardrails is the canonical name for
+ * `evaluateQuota`). `SEARCH_ENDPOINT_CLASS` from the guardrails is the canonical name for
  * this class.
  */
 import {

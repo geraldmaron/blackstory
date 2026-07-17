@@ -1,5 +1,6 @@
+
 /**
- * Firestore and Storage security rules tests against local emulators (BB-013 / BB-018 / ADR-011).
+ * Firestore and Storage security rules tests against local emulators.
  * Skips when emulators are down unless CI_REQUIRE_FIREBASE=1.
  */
 import assert from 'node:assert/strict';

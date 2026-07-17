@@ -1,5 +1,5 @@
 /**
- * Tests for BB-088 trust JSON-LD builders and errata taxonomy guards.
+ * Tests for trust JSON-LD builders and errata taxonomy guards.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

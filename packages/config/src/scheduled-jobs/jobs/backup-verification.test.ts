@@ -1,10 +1,11 @@
+
 /**
- * BB-084: proves the backup-verification job body is REAL. Two layers:
- *  1. A hermetic unit test with an injected fake execFile, proving argument-building and
- *     stdout/exit-code handling.
- *  2. A genuine integration test that spawns the actual, already-tested BB-020 script
- *     (scripts/backup-restore/verify-restore.mjs) as a real subprocess — no mocking — proving
- *     this job body is wired to real, working code rather than a stub that merely looks real.
+ * Proves the backup-verification job body is REAL. Two layers:
+ * 1. A hermetic unit test with an injected fake execFile, proving argument-building and
+ * stdout/exit-code handling.
+ * 2. A genuine integration test that spawns the actual, already-tested script
+ * (scripts/backup-restore/verify-restore.mjs) as a real subprocess no mocking proving
+ * this job body is wired to real, working code rather than a stub that merely looks real.
  */
 import assert from 'node:assert/strict';
 import { execFile as execFileCb } from 'node:child_process';

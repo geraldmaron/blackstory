@@ -1,6 +1,6 @@
 /**
- * Static guardrails for the public render path (BB-022).
- * Ensures app routes do not import DB/model clients — seed/snapshot data only.
+ * Static guardrails for the public render path.
+ * Ensures app routes do not import DB/model clients seed/snapshot data only.
  */
 
 import { FORBIDDEN_PUBLIC_RENDER_IMPORTS } from './constants';
@@ -13,7 +13,7 @@ export type PublicRenderPathFinding = {
   readonly snippet: string;
 };
 
-/** Scan source text for imports that must not appear on the public render path. */
+/** Scan source text for imports that must not appear on the public render path.  */
 export function collectPublicRenderPathFindings(
   filePath: string,
   source: string,
@@ -31,7 +31,7 @@ export function collectPublicRenderPathFindings(
   return findings;
 }
 
-/** Fail closed when a public route module imports forbidden backends. */
+/** Fail closed when a public route module imports forbidden backends.  */
 export function assertPublicRenderPathSafe(filePath: string, source: string): void {
   const findings = collectPublicRenderPathFindings(filePath, source);
   if (findings.length === 0) return;

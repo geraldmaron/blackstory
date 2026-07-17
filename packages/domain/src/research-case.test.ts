@@ -1,5 +1,5 @@
 /**
- * Verifies BB-044 research-case states, evidence gates, queues, previews, promotion,
+ * Verifies research-case states, evidence gates, queues, previews, promotion,
  * exclusion reconsideration, replacement-release retraction, and backfill scheduling.
  */
 import assert from 'node:assert/strict';

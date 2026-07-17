@@ -1,8 +1,8 @@
 /**
- * Approved presentation copy for the BB-054 "why this appears" surface. Headings and static
- * labels only — the substantive explanation, notabilityBasis, story dimensions, missing-
+ * Approved presentation copy for the "why this appears" surface. Headings and static
+ * labels only the substantive explanation, notabilityBasis, story dimensions, missing-
  * perspective notes, and trauma-content disclaimer text all come from
- * `@black-book/domain`'s `buildPublicWhyThisAppears` (BB-054) and its own approved-language
+ * `@black-book/domain`'s `buildPublicWhyThisAppears` and its own approved-language
  * registries; nothing editorial is authored in this file.
  */
 

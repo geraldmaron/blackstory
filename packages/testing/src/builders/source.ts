@@ -1,5 +1,6 @@
+
 /**
- * Test data builder for provenance source fixtures (BB-016-aware).
+ * Test data builder for provenance source fixtures.
  */
 import { createIdFactory, type IdFactory } from '../ids.js';
 import type { SourceFixture } from './types.js';

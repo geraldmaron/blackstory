@@ -1,26 +1,26 @@
 /**
- * Named launch corpora for the BB-094 vetted bulk-import lane (BB-094 acceptance criteria 4, 5,
- * 7). These are vetting-record REGISTRATIONS ONLY — corpus metadata (licensing, custodian,
- * provenance fields, expected precision, notability basis) — never live-ingested data. No
- * network call, no fabricated sample record, happens anywhere in this file.
+ * Named launch corpora for the vetted bulk-import lane. These are vetting-record
+ * registrations only — corpus metadata (licensing, custodian, provenance fields, expected
+ * precision, notability basis) — never live-ingested data. No network call, no fabricated
+ * sample record, happens anywhere in this file.
  *
  * Seven corpora, six license-cleared, one deliberately deferred:
- *  - `nrhp`                  — NPS National Register of Historic Places (public domain)
- *  - `habs-haer`             — Library of Congress HABS/HAER survey (public domain)
- *  - `nypl-green-book`       — NYPL Green Book digitizations + extracted listing data
- *                              (public-domain marks, verified per derivative)
- *  - `documented-massacres-riots` — EJI-linked, NPS/state-archive corroborated (link+attribute)
- *  - `hbcu-list`             — NCES/ED Historically Black Colleges and Universities list
- *                              (public domain)
- *  - `rosenwald-schools`     — Fisk University Rosenwald Fund Card File database — DEFERRED,
- *                              terms not yet verified; see `licenseVerdict: 'deferred-unverified'`
- *  - `mapping-inequality-holc` — Univ. of Richmond DSL HOLC redlining maps, sourced from NARA
- *                              (public domain) — first launch corpus requiring real polygon
- *                              geometry (BB-094 acceptance criterion 7); see the module doc note
- *                              at the bottom of this file for the BB-070 map-tile follow-up.
+ * - `nrhp` NPS National Register of Historic Places (public domain)
+ * - `habs-haer` Library of Congress HABS/HAER survey (public domain)
+ * - `nypl-green-book` NYPL Green Book digitizations + extracted listing data
+ * (public-domain marks, verified per derivative)
+ * - `documented-massacres-riots` EJI-linked, NPS/state-archive corroborated (link+attribute)
+ * - `hbcu-list` NCES/ED Historically Black Colleges and Universities list
+ * (public domain)
+ * - `rosenwald-schools` Fisk University Rosenwald Fund Card File database DEFERRED,
+ * terms not yet verified; see `licenseVerdict: 'deferred-unverified'`
+ * - `mapping-inequality-holc` Univ. of Richmond DSL HOLC redlining maps, sourced from NARA
+ * (public domain) first launch corpus requiring real polygon
+ * geometry; see the module doc note
+ * at the bottom of this file for the map-tile follow-up.
  *
- * Boundary rules (BB-094 acceptance criterion 5): statutes/cases (BB-087's legal corpus) and
- * Tougaloo sundown-town data (BB-082's exclusion-infrastructure lane) are deliberately absent
+ * Boundary rules: statutes/cases (legal corpus) and
+ * Tougaloo sundown-town data (exclusion-infrastructure lane) are deliberately absent
  * from this list — `registerCorpusVetting` / `assertCorpusVettingRecordValid` would reject them
  * outright via `assertCorpusNotInExcludedLane` if anyone tried to add them here.
  */
@@ -52,7 +52,7 @@ const ATTRIBUTION_REQUIRED_RIGHTS: RightsPolicy = {
   prohibitedUses: ['full_text_republication', 'unattributed_reuse', 'commercial_reuse'],
 };
 
-/** Rosenwald: terms not yet verified — no publication permission is granted pending review. */
+/** Rosenwald: terms not yet verified no publication permission is granted pending review. */
 const UNVERIFIED_TERMS_RIGHTS: RightsPolicy = {
   defaultStatus: 'unknown',
   publicationPermissions: [],
@@ -229,7 +229,7 @@ export function buildLaunchCorpusVettingInputs(input: {
       custodian: 'Fisk University, Rosenwald Fund Card File Database',
       // DEFERRED, not rejected: Fisk's database terms of use have not yet been verified as
       // compatible with bulk import. `registerCorpusVetting` will register this corpus's
-      // vetting record and BB-037 registry entry but will NOT approve the registry entry, so
+      // vetting record and registry entry but will NOT approve the registry entry, so
       // `assertCorpusVettedForBulkImport` fails closed on it exactly like an unvetted corpus
       // until a real license verdict replaces this one.
       licenseVerdict: 'deferred-unverified',
@@ -279,7 +279,7 @@ export function buildLaunchCorpusVettingInputs(input: {
         'sourceUrl',
       ],
       precisionExpectation: 'locality',
-      // BB-094 acceptance criterion 7: the first launch corpus requiring real polygon geometry
+      // the first launch corpus requiring real polygon geometry
       // (graded neighborhood boundaries), never point+radius.
       requiresPolygonGeometry: true,
       refreshCadence: 'static',
@@ -311,11 +311,11 @@ export function buildLaunchCorpusVettingInputs(input: {
 }
 
 /**
- * Registers every launch corpus's vetting record and BB-037 registry entry. Returns the records
+ * Registers every launch corpus's vetting record and registry entry. Returns the records
  * in the same order as `buildLaunchCorpusVettingInputs`. Idempotent per corpus in the sense that
  * re-running with the same `vettedAt` replaces (not duplicates) each corpus's stored vetting
- * record — `CorpusVettingStore.save` and `registerSource`'s underlying map are keyed by corpus /
- * registry-entry id — though re-registering an already-registered BB-037 entry a second time
+ * record `CorpusVettingStore.save` and `registerSource`'s underlying map are keyed by corpus
+ * registry-entry id though re-registering an already-registered entry a second time
  * will throw (`registerSource` rejects a duplicate id) unless the caller passes a fresh store, so
  * callers that truly need "re-run the whole registration" idempotency should pass the store from
  * the first run rather than a blank one.
@@ -341,7 +341,7 @@ export const LAUNCH_CORPUS_SLUGS: readonly string[] = [
   'mapping-inequality-holc',
 ];
 
-/** Slugs deliberately excluded from this bead's corpus list (BB-094 acceptance criterion 5). */
+/** Slugs deliberately excluded from this module's corpus list. */
 export const BOUNDARY_EXCLUDED_CORPUS_SLUGS: readonly { readonly slug: string; readonly ownerBead: string }[] = [
   { slug: 'statutes', ownerBead: 'BB-087' },
   { slug: 'cases', ownerBead: 'BB-087' },

@@ -1,13 +1,11 @@
 /**
- * Production MapLibre style builder for BB-051's `/explore` national map experience — the
- * production evolution of `dark-archive-style.ts`'s BB-070 demo style. Only type-level
- * `maplibre-gl` imports here (matching `dark-archive-style.ts`'s own convention), so this module
- * has zero runtime WebGL dependency and is safe to unit test in plain Node.
+ * Production MapLibre style builder for the `/explore` national map — the production evolution
+ * of `dark-archive-style.ts`. Only type-level `maplibre-gl` imports (same convention as the demo
+ * style), so this module has zero runtime WebGL dependency and is safe to unit test in plain Node.
  *
- * Every color comes from `../../lib/map-experience/dignity-style.ts` (which itself only reuses
- * `@black-book/ui`'s brand palette) — this file introduces no new color, honoring the BB-051
- * dignity rule (no red violence markers, no crime-heat) at the actual render layer, not just in
- * the token module.
+ * Every color comes from `../../lib/map-experience/dignity-style.ts` (which reuses
+ * `@black-book/ui`'s brand palette). This file introduces no new hues, so the dignity rule
+ * (no red violence markers, no crime-heat) holds at the render layer, not only in tokens.
  */
 import type { ExpressionSpecification, StyleSpecification } from 'maplibre-gl';
 import { brandPalette } from '@black-book/ui';
@@ -52,8 +50,8 @@ export {
 
 /**
  * Approximate meters-per-pixel at a given zoom under spherical Web Mercator, ignoring latitude
- * distortion (the same order of approximation this repo already uses for state bounding boxes —
- * see `packages/domain/src/map/us-geography.ts`'s module doc — "good enough for national-zoom …
+ * distortion (the same order of approximation this repo already uses for state bounding boxes 
+ * see `packages/domain/src/map/us-geography.ts`'s module doc "good enough for national-zoom …
  * never survey-grade"). Expressed as a MapLibre style expression so the radius-affordance circle
  * scales correctly as the user zooms, per-feature, from each point's own `radiusMeters` property.
  */
@@ -76,16 +74,16 @@ export type BuildExploreMapStyleInput = {
 
 /**
  * Builds the full `/explore` MapLibre style: clustered entity points with a radius-affordance
- * halo (precision-tier rendering — BB-091), an optional state-level presence/density fill (BB-051
- * "presence, not just incidents"), and a jurisdiction-area polygon layer (BB-091 — area records
- * render as geometry, never as a point; empty today, see `build-explore-map-source.ts`'s
- * INTEGRATION POINT). Clustering config (`EXPLORE_CLUSTER_CONFIG`) is the one place that governs
+ * halo (precision-tier rendering), an optional state-level presence/density fill (
+ * "presence, not just incidents"), and a jurisdiction-area polygon layer (area records
+ * render as geometry, never as a point; empty today, see `build-explore-map-source.ts`).
+ * Clustering config (`EXPLORE_CLUSTER_CONFIG`) is the one place that governs
  * "every cluster decomposes to named entities within two interactions."
  */
 export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpecification {
   return {
     version: 8,
-    name: 'Black Book — Explore (BB-051)',
+    name: 'Black Book — Explore',
     sources: {
       [EXPLORE_STATE_DENSITY_SOURCE_ID]: {
         type: 'geojson',
@@ -124,7 +122,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         id: EXPLORE_STATE_DENSITY_LAYER_ID,
         type: 'fill',
         source: EXPLORE_STATE_DENSITY_SOURCE_ID,
-        // Always hittable for state selection — density tint is optional chrome on top.
+        // Always hittable for state selection density tint is optional chrome on top.
         layout: { visibility: 'visible' },
         paint: {
           'fill-color': input.densityLayerEnabled
@@ -216,7 +214,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
         paint: {
-          // Circular entity markers — fixed px radii (not rectangular state fills). Precision
+          // Circular entity markers fixed px radii (not rectangular state fills). Precision
           // affordance copy remains on the entity page and explore list.
           'circle-radius': 22,
           'circle-color': DIGNITY_PALETTE.pointHalo,
@@ -249,9 +247,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
       },
       {
         // Cluster count label. No `glyphs` URL is configured on this style (same honest gap as
-        // `dark-archive-style.ts`'s demo style — no self-hosted font/sprite server wired up yet,
+        // `dark-archive-style.ts`'s demo style no self-hosted font/sprite server wired up yet,
         // see ADR-013 "known gaps"), so this renders as a silent no-op today rather than visible
-        // text; the cluster's real name-bearing content is never gated on it — the accessible
+        // text; the cluster's real name-bearing content is never gated on it the accessible
         // list and each point's own narrative card carry that information regardless.
         id: EXPLORE_CLUSTER_COUNT_LAYER_ID,
         type: 'symbol',

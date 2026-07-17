@@ -1,6 +1,6 @@
 /**
- * Quick-add: paste a URL, fetch it through BB-030 safety, and open a draft research case
- * through the same operator-cli package functions as `submit-lead`/`research-intake` (BB-085).
+ * Quick-add: paste a URL, fetch it through safety, and open a draft research case
+ * through the same operator-cli package functions as `submit-lead`/`research-intake`.
  */
 import Link from 'next/link';
 import { QuickAddForm } from './quick-add-form.js';

@@ -1,6 +1,7 @@
+
 /**
- * Adapters that normalize producer signals into security telemetry events (BB-034).
- * Structural contracts mirror existing producers — no rewrites required.
+ * Adapters that normalize producer signals into security telemetry events.
+ * Structural contracts mirror existing producers no rewrites required.
  */
 import type { DomainAuditEvent } from '@black-book/domain';
 import {

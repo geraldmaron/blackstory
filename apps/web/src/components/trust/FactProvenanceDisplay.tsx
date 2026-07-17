@@ -1,5 +1,5 @@
 /**
- * Per-fact provenance display (BB-088) — status, confidence with definitions link, "Our basis"
+ * Per-fact provenance display status, confidence with definitions link, "Our basis"
  * prose, and full citation list with archived copies. Composes existing fact citation rendering.
  */
 import React from 'react';

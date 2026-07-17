@@ -1,6 +1,6 @@
 /**
  * Joins presence/density tiers onto the vendored US state polygon FeatureCollection
- * so MapLibre fill paint can style “documented / emerging / concentrated” without
+ * so MapLibre fill paint can style “documented emerging concentrated” without
  * shipping rectangle bboxes.
  */
 import type { StateDensityLevel } from './density';

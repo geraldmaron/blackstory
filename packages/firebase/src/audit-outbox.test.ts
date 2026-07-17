@@ -1,5 +1,6 @@
+
 /**
- * In-memory transaction tests for BB-018 atomic commit, idempotent replay, retry, and dead letters.
+ * In-memory transaction tests for atomic commit, idempotent replay, retry, and dead letters.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,5 +1,5 @@
 /**
- * Safe redirect handling — open-redirect resistance (BB-028).
+ * Safe redirect handling open-redirect resistance.
  */
 
 import { SAFE_REDIRECT_PREFIX } from './constants';
@@ -20,7 +20,7 @@ function containsControlCharacters(value: string): boolean {
 }
 
 export type SafeRedirectOptions = {
-  /** When set, also allow absolute URLs on this origin (default: relative only). */
+  /** When set, also allow absolute URLs on this origin (default: relative only).  */
   allowedOrigin?: string;
 };
 
@@ -88,7 +88,7 @@ export function assertSafeRedirect(target: string, options: SafeRedirectOptions 
   return trimmed;
 }
 
-/** Returns true when assertSafeRedirect would succeed. */
+/** Returns true when assertSafeRedirect would succeed.  */
 export function isSafeRedirect(target: string, options: SafeRedirectOptions = {}): boolean {
   try {
     assertSafeRedirect(target, options);

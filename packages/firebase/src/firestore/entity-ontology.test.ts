@@ -1,5 +1,6 @@
+
 /**
- * Tests for the BB-090 entity-ontology Zod mirrors: entityKindSchema's 12th `movement` kind,
+ * Tests for the entity-ontology Zod mirrors: entityKindSchema's 12th `movement` kind,
  * canonicalEntitySchema's statusHistory/notabilityBasis/sensitivity/movement additions, and the
  * standing-policy hard rule that publicEntityProjectionSchema's non-numeric additions
  * (status/eraBuckets/notabilityLabels/sensitivityClass) never carry a numeric score.

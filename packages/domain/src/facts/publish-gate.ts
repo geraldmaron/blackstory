@@ -1,22 +1,20 @@
 /**
- * Fail-closed publish gate for `FactRecord` (BB-086 acceptance criteria 1 & 2).
+ * Fail-closed publish gate for `FactRecord`.
  *
  * "Unsourced" is not a publishable state: a fact may only transition to `published`/`corrected`
  * when every citation is structurally complete AND every web citation carries an archived-capture
- * pointer (`archivedUrl` + `archivedAt`) and a retrieval date (`accessedAt`) — see
- * `./citation.ts`. This mirrors `../citations/completeness-gate.ts`'s BB-083 claim-level gate and
- * `../publication/index.ts`'s BB-019 release-build discipline, applied to the fact registry's own
+ * pointer (`archivedUrl` + `archivedAt`) and a retrieval date (`accessedAt`) see
+ * `./citation.ts`. This mirrors `../citations/completeness-gate.ts`'s claim-level gate and
+ * `../publication/index.ts`'s release-build discipline, applied to the fact registry's own
  * record shape.
  *
- * INTEGRATION POINT (documented, not live-wired — same convention as
- * `../citations/completeness-gate.ts`'s own INTEGRATION POINT comment): the real BB-019
- * projection-build pipeline (workers/publication/, per ADR-007) is the intended caller. Call
- * `assertFactMayPublish` immediately before including a fact in a release/projection build and do
- * not proceed if it throws.
+ * Not wired live: the projection-build pipeline (`workers/publication/`, per ADR-007) is
+ * the intended caller. Call `assertFactMayPublish` immediately before including a fact in a
+ * release/projection build and do not proceed if it throws.
  *
- * Independence of axes (AC1): this gate checks `status` transitions and citation completeness; it
+ * Independence of axes: this gate checks `status` transitions and citation completeness; it
  * never reads or derives `confidence` as a publish precondition. A `contested`-confidence fact
- * may publish (with its dispute disclosed via `confidenceNote`/`counterClaims[]`) exactly as
+ * may publish (with its dispute disclosed via `confidenceNote`/`counterClaims`) exactly as
  * readily as an `established`-confidence one — confidence is a caveat, not a publish blocker.
  */
 import { isSearchIndexableFactStatus, isPubliclyResolvableFactStatus, type FactStatus } from './status.js';
@@ -35,7 +33,7 @@ export type FactPublishGateResult =
  * The statuses this gate applies to: a fact entering (or already in) `published`/`corrected`
  * must have complete citations. `draft`/`under_review` are exempt (still being assembled);
  * `superseded`/`deprecated` are exempt from a NEW completeness check (they keep whatever
- * citation set they had when superseded/deprecated — see `isPubliclyResolvableFactStatus`, which
+ * citation set they had when superseded/deprecated see `isPubliclyResolvableFactStatus`, which
  * governs a different concern: staying resolvable, not re-validating sourcing).
  */
 const STATUSES_REQUIRING_CITATION_COMPLETENESS: readonly FactStatus[] = ['published', 'corrected'];
@@ -73,7 +71,7 @@ export function assertFactMayPublish(fact: Pick<FactRecord, 'id' | 'citations' |
 }
 
 /**
- * Aggregates the publish gate across every fact slated for a projection build — mirrors
+ * Aggregates the publish gate across every fact slated for a projection build mirrors
  * `../citations/completeness-gate.ts`'s `evaluateProjectionCitationCompleteness`, surfacing every
  * failing fact in one pass rather than stopping at the first.
  */
@@ -104,7 +102,7 @@ export function assertFactProjectionPublishGate(
 }
 
 /**
- * AC1: `deprecated`/`superseded` facts must stay resolvable with a banner — never 404. This is
+ * `deprecated`/`superseded` facts must stay resolvable with a banner never 404. This is
  * the read-path counterpart to the write-path publish gate above: a fact viewer should call this
  * (or just `isPubliclyResolvableFactStatus` directly) to decide "render content + banner" vs.
  * "this status never had a public page in the first place" (draft/under_review).
@@ -118,7 +116,7 @@ export function assertFactRemainsResolvable(fact: Pick<FactRecord, 'id' | 'statu
   }
 }
 
-/** AC5: whether a fact belongs in the BB-049 searchable library surface right now. */
+/** whether a fact belongs in the searchable library surface right now. */
 export function isFactSearchIndexable(fact: Pick<FactRecord, 'status'>): boolean {
   return isSearchIndexableFactStatus(fact.status);
 }

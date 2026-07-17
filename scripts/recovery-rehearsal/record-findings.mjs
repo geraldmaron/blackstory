@@ -1,7 +1,8 @@
 #!/usr/bin/env node
+
 /**
- * Generates a findings draft from the latest rehearsal timing report (BB-061).
- * Dry-run by default — writes markdown to stdout or --output file.
+ * Generates a findings draft from the latest rehearsal timing report.
+ * Dry-run by default writes markdown to stdout or --output file.
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';

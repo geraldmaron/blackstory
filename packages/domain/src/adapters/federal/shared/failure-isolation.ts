@@ -1,5 +1,5 @@
 /**
- * Failure isolation for federal adapter runs (BB-046).
+ * Failure isolation for federal adapter runs.
  * Run failures quarantine or dead-letter without touching public publication state.
  */
 import { evaluateRunHealth } from '../../run-health.js';

@@ -1,3 +1,4 @@
+
 /**
  * Initializes browser App Check with reCAPTCHA Enterprise and confines debug
  * tokens to local or test runtimes.
@@ -58,6 +59,7 @@ export async function getAppCheckRequestHeaders(
   const result = await getToken(appCheck, forceRefresh);
   return { 'X-Firebase-AppCheck': result.token };
 }
+
 
 /**
  * Initializes automatic App Check token refresh. Server-side policy determines

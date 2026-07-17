@@ -1,7 +1,8 @@
+
 /**
- * Firestore document schemas for Black Book (ADR-011 / BB-013–018).
- * Entity/geography (BB-014), provenance (BB-016), claims/confidence (BB-017).
- * Shapes align with @black-book/domain; Cloud SQL / PostGIS are not the production path.
+ * Firestore document schemas for Black Book (ADR-011 018).
+ * Entity/geography, provenance, claims/confidence.
+ * Shapes align with @black-book/domain; Cloud SQL PostGIS are not the production path.
  */
 import { z } from 'zod';
 import {
@@ -32,7 +33,7 @@ export const entityKindSchema = z.enum([
   'case',
   'publication',
   'artifact',
-  // BB-090: 12th kind — sustained, multi-actor, multi-decade phenomena (Civil Rights Movement,
+  // 12th kind: sustained, multi-actor, multi-decade phenomena (Civil Rights Movement,
   // Great Migration, Black Power, Black Arts Movement, etc.) distinct from a single `event`.
   'movement',
   'other',
@@ -74,7 +75,7 @@ export type GeoGeometryDoc = z.infer<typeof geoGeometrySchema>;
 
 export const zipCodeInputSchema = z.object({
   zip: z.string().min(3).max(16),
-  /** ZIP is modern input/lookup only — never a historical boundary. */
+  /** ZIP is modern input/lookup only never a historical boundary. */
   role: z.enum(['modern_input', 'modern_lookup']),
   countryCode: z.string().min(2).max(3).optional(),
 });
@@ -160,11 +161,12 @@ export const schoolFieldsSchema = z.object({
       }),
     )
     .default([]),
+
   /**
-   * BB-090: renamed from `statusHistory` to `milestones` to resolve a naming collision with the
-   * new entity-level `canonicalEntitySchema.statusHistory` below (a different, closed-vocabulary
-   * shape — see packages/domain/src/school.ts for the full reconciliation note). This remains a
-   * free-text operational timeline ("opened", "relocated"), not the entity's lifecycle status.
+   * Renamed from `statusHistory` to `milestones` to resolve a naming collision with the
+   * entity-level `canonicalEntitySchema.statusHistory` below (a different, closed-vocabulary
+   * shape; see packages/domain/src/school.ts). This remains a free-text operational timeline
+   * ("opened", "relocated"), not the entity's lifecycle status.
    */
   milestones: z
     .array(
@@ -179,7 +181,7 @@ export const schoolFieldsSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
-// BB-090: entity ontology — shared date-precision model, entity-lifecycle status history,
+// Entity ontology: shared date-precision model, entity-lifecycle status history,
 // notability-basis inclusion rubric, and the schema-only sensitivity classification. Mirrors
 // packages/domain/src/era.ts and packages/domain/src/entity-status.ts. Vocabularies are
 // hardcoded here (not imported from @black-book/domain) to match this file's existing convention
@@ -190,11 +192,12 @@ export const datePrecisionSchema = z.enum(['day', 'month', 'year', 'decade', 'ci
 
 export type DatePrecisionDoc = z.infer<typeof datePrecisionSchema>;
 
+
 /**
- * Entity-lifecycle status only (BB-090 scope guardrail) — place/school/organization/institution
+ * Entity-lifecycle status only: place/school/organization/institution
  * active|historic|inactive, law in_force|amended|repealed|struck_down|enjoined, movement
  * active|historic. NEVER an area/condition designation (sundown-town, redlining grade,
- * exclusion infrastructure) — those are BB-082's own, separately-typed layer records.
+ * exclusion infrastructure) — those are their own, separately-typed layer records.
  */
 export const statusHistoryEntrySchema = z.object({
   status: z.string().min(1),
@@ -219,7 +222,7 @@ export const notabilityCriterionSchema = z.enum([
 
 export type NotabilityCriterionDoc = z.infer<typeof notabilityCriterionSchema>;
 
-/** Auditable inclusion basis — never a numeric score (standing policy bans numeric notability
+/** Auditable inclusion basis never a numeric score (standing policy bans numeric notability
  * scores from public payloads). */
 export const notabilityBasisRecordSchema = z.object({
   criterion: notabilityCriterionSchema,
@@ -238,7 +241,7 @@ export const sensitivityClassSchema = z.enum([
 
 export type SensitivityClassDoc = z.infer<typeof sensitivityClassSchema>;
 
-/** Schema only — presentation (disclaimers, content warnings) is BB-095. */
+/** Schema only presentation (disclaimers, content warnings) is. */
 export const entitySensitivitySchema = z.object({
   class: sensitivityClassSchema,
   note: z.string().min(1),
@@ -247,7 +250,7 @@ export const entitySensitivitySchema = z.object({
 
 export type EntitySensitivityDoc = z.infer<typeof entitySensitivitySchema>;
 
-/** Field bag for the `movement` entity kind (BB-090 stress-test amendment). */
+/** Field bag for the `movement` entity kind. */
 export const movementFieldsSchema = z.object({
   startYear: z.number().int().optional(),
   endYear: z.number().int().nullable().optional(),
@@ -283,13 +286,13 @@ export const canonicalEntitySchema = z.object({
   identifiers: z.array(entityIdentifierSchema).optional(),
   livingStatus: z.enum(['living', 'deceased', 'unknown']).default('unknown'),
   mergeState: entityMergeStateSchema.optional(),
-  /** Entity-lifecycle status only — omitted for `event`/`person` kinds by convention. See the
+  /** Entity-lifecycle status only omitted for `event`/`person` kinds by convention. See the
    * scope-guardrail comment on statusHistoryEntrySchema above. */
   statusHistory: z.array(statusHistoryEntrySchema).optional(),
-  /** >=1 record required to publish (BB-090 AC3) — enforced by
+  /** >=1 record required to publish enforced by
    * @black-book/domain's assertPublishableEntityHasNotabilityBasis, not by this schema alone. */
   notabilityBasis: z.array(notabilityBasisRecordSchema).optional(),
-  /** Schema-only; presentation is BB-095. */
+  /** Schema-only; presentation lives in the UI layer. */
   sensitivity: z.array(entitySensitivitySchema).optional(),
   person: z
     .object({
@@ -366,11 +369,12 @@ export const canonicalEntitySchema = z.object({
 
 export type CanonicalEntityDoc = z.infer<typeof canonicalEntitySchema>;
 
+
 /**
- * BB-092: historical-causation edges (caused/enabled/influenced/participated_in/overturned/
+ * Historical-causation edges (caused/enabled/influenced/participated_in/overturned/
  * commemorates) plus `authored` (creation attribution, distinct from `founded`). Direction and
  * temporal semantics for every type are documented in `@black-book/domain`'s
- * `RELATIONSHIP_TYPE_SEMANTICS` (packages/domain/src/relationship.ts) — hardcoded here, not
+ * `RELATIONSHIP_TYPE_SEMANTICS` (packages/domain/src/relationship.ts) hardcoded here, not
  * imported, to match this file's existing convention (see the entityKindSchema comment above).
  */
 export const relationshipTypeSchema = z.enum([
@@ -398,7 +402,7 @@ export const relationshipTypeSchema = z.enum([
 
 export type RelationshipTypeDoc = z.infer<typeof relationshipTypeSchema>;
 
-/** BB-092: role qualifier valid ONLY on `type: 'attended'` — see
+/** Role qualifier valid ONLY on `type: 'attended'`; see
  * `@black-book/domain`'s `assertRelationshipRoleValidForType`. */
 export const relationshipRoleSchema = z.enum(['organizer', 'speaker', 'participant']);
 
@@ -424,7 +428,7 @@ export const entityRelationshipSchema = z.object({
       notes: z.string().optional(),
     })
     .optional(),
-  /** BB-092: only meaningful when `type === 'attended'`. */
+  /** Only meaningful when `type === 'attended'`. */
   role: relationshipRoleSchema.optional(),
   notes: z.string().optional(),
   createdAt: z.string().datetime(),
@@ -540,7 +544,7 @@ export const connectionStrengthSchema = z.object({
   rationale: z.string().optional(),
 });
 
-/** Canonical atomic claim with versions, confidence, and measurements (BB-017). */
+/** Canonical atomic claim with versions, confidence, and measurements. */
 export const canonicalClaimSchema = z.object({
   id: z.string().min(1),
   entityId: z.string().min(1),
@@ -564,7 +568,7 @@ export const canonicalClaimSchema = z.object({
 
 export type CanonicalClaimDoc = z.infer<typeof canonicalClaimSchema>;
 
-/** Claim-to-evidence relationship (supporting / contradicting / contextual). */
+/** Claim-to-evidence relationship (supporting contradicting contextual). */
 export const claimEvidenceLinkSchema = z.object({
   id: z.string().min(1),
   claimId: z.string().min(1),
@@ -648,7 +652,7 @@ export const sourceDomainSchema = z.object({
 
 export type SourceDomainDoc = z.infer<typeof sourceDomainSchema>;
 
-/** Registered source adapter / policy (collection `evidenceSources`). */
+/** Registered source adapter policy (collection `evidenceSources`). */
 export const evidenceSourceSchema = z.object({
   id: z.string().min(1),
   organizationId: z.string().min(1).optional(),
@@ -664,7 +668,7 @@ export const evidenceSourceSchema = z.object({
     refreshSchedule: z.string().optional(),
     notes: z.string().optional(),
   }),
-  /** When false, adapter cannot create new candidates (BB-016). */
+  /** When false, adapter cannot create new candidates. */
   adapterEnabled: z.boolean(),
   killSwitchId: z.string().min(1).optional(),
   createdAt: z.string().datetime(),
@@ -731,11 +735,11 @@ export type EvidenceLocatorDoc = z.infer<typeof evidenceLocatorSchema>;
 
 export const evidenceRecordSchema = z.object({
   id: z.string().min(1),
-  /** Required: every evidence record resolves to a source item (BB-016). */
+  /** Required: every evidence record resolves to a source item. */
   sourceItemId: z.string().min(1),
   sourceId: z.string().min(1),
   captureId: z.string().min(1).optional(),
-  /** GCS / Storage object reference; never embed blob bytes in Firestore. */
+  /** GCS Storage object reference; never embed blob bytes in Firestore. */
   storageObject: z.string().min(1).optional(),
   locator: evidenceLocatorSchema.optional(),
   excerpt: z.string().optional(),
@@ -746,9 +750,10 @@ export const evidenceRecordSchema = z.object({
   prohibitedUses: z.array(prohibitedUseSchema).default([]),
   lineageRootId: z.string().min(1).optional(),
   syndicatedFromEvidenceId: z.string().min(1).optional(),
+
   /**
-   * @deprecated Prefer rightsStatus. Kept for transitional reads of early BB-013 seeds.
-   */
+   * @deprecated Prefer rightsStatus. Kept for transitional reads of early seeds.
+ */
   rights: rightsStatusSchema.optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime().optional(),
@@ -813,34 +818,56 @@ export const publicEntityProjectionSchema = z.object({
   kind: entityKindSchema,
   displayName: z.string().min(1),
   nameLower: z.string().min(1),
-  summary: z.string().optional(),
+  /** Learning-index lede — required at release (120–400 chars). */
+  summary: z.string().min(120).max(400),
   location: geoPointFieldsSchema.optional(),
   claimIds: z.array(z.string()).default([]),
+
   /**
-   * BB-090 public projection additions — every one non-numeric by standing policy (numeric
+   * Public projection additions — every one non-numeric by standing policy (numeric
    * notability/relevance scores are banned from public payloads; see
    * packages/domain/src/relevance/notability-gate.test.ts for the enforcing test).
    */
-  /** Derived current status label (e.g. "active", "in_force", "living") — never a scalar the
+  /** Derived current status label (e.g. "active", "in_force", "living") never a scalar the
    * reader hand-edits; always derived via @black-book/domain's `currentEntityStatus`. */
   status: z.string().min(1).optional(),
-  /** Decade labels the entity's dated span overlaps (e.g. ["1950s", "1960s"]) — derived via
+  /** Decade labels the entity's dated span overlaps (e.g. ["1950s", "1960s"]) derived via
    * @black-book/domain's `deriveEraBuckets`, replacing the free-text `era` string. */
   eraBuckets: z.array(z.string().min(1)).optional(),
   /** Human-readable notability rubric labels (never the raw criterion enum alone, never a
-   * score) — one per notabilityBasis record, sourced from @black-book/domain's
+   * score) one per notabilityBasis record, sourced from @black-book/domain's
    * `NOTABILITY_RUBRIC`. */
   notabilityLabels: z.array(z.string().min(1)).optional(),
-  /** Sensitivity classification label, when the entity carries one — presentation is BB-095. */
+  /** Sensitivity classification label when present; presentation lives in the UI layer. */
   sensitivityClass: sensitivityClassSchema.optional(),
+
+  /** Topic / theme tags aligned with search facets (learning-index discovery). */
+  topicTags: z.array(z.string().min(1)).default([]),
+  /** Framing prose for the Historical context section (not unsourced biography). */
+  historicalContext: z.string().min(1).optional(),
+  /** Optional multi-paragraph further reading; omit when not curated. */
+  extendedNarrative: z.string().min(1).optional(),
+  /** Optional rights-cleared hero image; omit entirely when absent. */
+  primaryImage: z
+    .object({
+      url: z.string().url(),
+      alt: z.string().min(1),
+      credit: z.string().min(1),
+      rightsStatus: z.enum(['public_domain', 'licensed', 'fair_use']),
+      width: z.number().int().positive().optional(),
+      height: z.number().int().positive().optional(),
+      objectPath: z.string().min(1).optional(),
+    })
+    .optional(),
+
   /**
-   * BB-092 acceptance criterion 5: typed related entries derived from the release's graph
-   * adjacency doc (`@black-book/domain`'s `toPublicRelatedEntries` /
-   * `publicRelatedEntriesByEntityId`, packages/domain/src/graph/adjacency.ts + build.ts) —
-   * sufficient for BB-052's "related people, places…" and "timelines" sections. Never carries a
+   * Typed related entries derived from the release's graph
+   * adjacency doc (`@black-book/domain`'s `toPublicRelatedEntries`
+   * `publicRelatedEntriesByEntityId`, packages/domain/src/graph/adjacency.ts + build.ts)
+   * sufficient for "related people, places…" and "timelines" sections. Never carries a
    * numeric field beyond what's already elsewhere on this schema (evidence counts are an
    * internal ranking key on the adjacency doc, not part of this public shape).
-   */
+ */
   related: z
     .array(
       z.object({
@@ -861,19 +888,20 @@ export const publicEntityProjectionSchema = z.object({
 
 export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSchema>;
 
+
 /**
- * BB-049 persisted search index document — the server-read shape @black-book/domain's
+ * persisted search index document the server-read shape @black-book/domain's
  * `buildPublicSearchIndexDocs` produces (`packages/domain/src/search/`). Follows the exact
- * conventions of `publicEntityProjectionSchema` above: reuses `entityKindSchema` /
+ * conventions of `publicEntityProjectionSchema` above: reuses `entityKindSchema`
  * `sensitivityClassSchema`, and every field is non-numeric BY STANDING POLICY except the two
  * counts explicitly called out below.
  *
  * `relatedCount` (connection-strength proxy) and `claimCount` are the ONLY numeric fields, and are
  * SERVER-INTERNAL ranking inputs only: search runs server-side and projects results into the
  * client-facing `SearchResultView` (defined in @black-book/domain), which carries neither count
- * nor any score — mirroring BB-092's rule that adjacency `evidenceCount` is an ordering key, never
+ * nor any score mirroring rule that adjacency `evidenceCount` is an ordering key, never
  * a public payload field. `notabilityBasis` is retained as the auditable inclusion basis backing
- * the AC5 gate; it carries only string leaves (criterion, note, evidenceIds — the same category as
+ * the AC5 gate; it carries only string leaves (criterion, note, evidenceIds the same category as
  * this file's already-public `claimIds`) and never a numeric score, and is not projected to the
  * client.
  */
@@ -884,17 +912,17 @@ export const publicSearchIndexSchema = z.object({
   displayName: z.string().min(1),
   /** Lowercased displayName, precomputed for query-time matching. */
   nameLower: z.string().min(1),
-  /** Lowercased alias strings, flattened from EntityAlias[] by the release builder. */
+  /** Lowercased alias strings, flattened from EntityAlias by the release builder. */
   aliases: z.array(z.string().min(1)).default([]),
   summary: z.string().optional(),
   topicTags: z.array(z.string().min(1)).default([]),
-  /** State-level jurisdiction label (BB-090) — backs the `state` facet/filter. */
+  /** State-level jurisdiction label backs the `state` facet/filter. */
   jurisdictionState: z.string().min(1).optional(),
-  /** Derived current lifecycle status label (e.g. "active", "in_force") — never hand-edited. */
+  /** Derived current lifecycle status label (e.g. "active", "in_force") never hand-edited. */
   status: z.string().min(1).optional(),
   /** Decade labels the entity's dated span overlaps (e.g. ["1950s", "1960s"]). */
   eraBuckets: z.array(z.string().min(1)).default([]),
-  /** Auditable inclusion basis (BB-090 / BB-049 AC5) — string-only leaves, never a score. */
+  /** Auditable inclusion basis string-only leaves, never a score. */
   notabilityBasis: z
     .array(
       z.object({
@@ -906,15 +934,16 @@ export const publicSearchIndexSchema = z.object({
     .default([]),
   /** Human-readable notability rubric labels (never the raw criterion enum alone, never a score). */
   notabilityLabels: z.array(z.string().min(1)).default([]),
-  /** Sensitivity classification label, when the entity carries one — presentation is BB-095. */
+  /** Sensitivity classification label when present; presentation lives in the UI layer. */
   sensitivityClass: sensitivityClassSchema.optional(),
   recordMaturity: z.string().min(1),
   researchCoverage: z.enum(['minimal', 'partial', 'substantial']),
+
   /**
-   * SERVER-INTERNAL ranking inputs ONLY — the two permitted numeric fields on this schema. Never
+   * SERVER-INTERNAL ranking inputs ONLY the two permitted numeric fields on this schema. Never
    * projected into the client-facing SearchResultView. `relatedCount` is a connection-strength
    * proxy (count of related/adjacency entries); `claimCount` is the supporting-claim count.
-   */
+ */
   relatedCount: z.number().int().min(0),
   claimCount: z.number().int().min(0),
 });

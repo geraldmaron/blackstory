@@ -1,12 +1,12 @@
 /**
- * Approved missing-information copy for sparse entity-page sections (BB-052 acceptance criterion
- * 2). Defined once here and reused by every section that can legitimately be empty (claims,
- * related records, timeline, status history) so the language stays consistent project-wide,
- * rather than each section improvising its own "empty" wording. Procedural tone: research
- * incompleteness is framed as a state of the record, never as an absence of history.
+ * Approved missing-information copy for sparse entity-page sections. Defined once here and
+ * reused by every section that can legitimately be empty (claims, related records, timeline,
+ * status history) so the language stays consistent project-wide, rather than each section
+ * improvising its own "empty" wording. Procedural tone: research incompleteness is framed as a
+ * state of the record, never as an absence of history.
  */
 
-export type RecordGapKind = 'claims' | 'related' | 'timeline' | 'statusHistory';
+export type RecordGapKind = 'claims' | 'related' | 'timeline' | 'statusHistory' | 'context';
 
 export type RecordGapCopy = {
   readonly title: string;
@@ -24,7 +24,7 @@ export const RECORD_GAP_COPY: Readonly<Record<RecordGapKind, RecordGapCopy>> = {
     title: 'No linked records yet',
     body:
       'No related people, places, institutions, or events have been linked through the published ' +
-      'history graph yet for this record.',
+      'history graph yet for this record. Try a topic tag or the map to keep learning.',
   },
   timeline: {
     title: 'No dated history yet',
@@ -35,5 +35,11 @@ export const RECORD_GAP_COPY: Readonly<Record<RecordGapKind, RecordGapCopy>> = {
   statusHistory: {
     title: 'No status history recorded',
     body: 'No time-scoped status designation has been entered for this record yet.',
+  },
+  context: {
+    title: 'Historical context forthcoming',
+    body:
+      'Framing prose for this record has not been published yet. Accepted claims below remain ' +
+      'the sourced factual layer when available.',
   },
 };

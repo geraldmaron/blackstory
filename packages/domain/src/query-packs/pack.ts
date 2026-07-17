@@ -1,5 +1,5 @@
 /**
- * Query pack construction, canonical hashing, and version identity (BB-038).
+ * Query pack construction, canonical hashing, and version identity.
  */
 import { hashUtf8 } from '../provenance/hashes.js';
 import { assertQueryTermsValid } from './terms.js';

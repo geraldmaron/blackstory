@@ -1,5 +1,5 @@
 /**
- * Presentation-only string helpers for BB-086 fact registry components.
+ * Presentation-only string helpers for fact registry components.
  */
 import type { FactConfidenceGrade, FactStatus } from '@black-book/domain';
 import { FACT_CONFIDENCE_DEFINITIONS } from '@black-book/domain';

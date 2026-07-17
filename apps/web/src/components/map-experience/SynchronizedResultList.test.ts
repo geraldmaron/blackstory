@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke tests for the BB-051 synchronized, accessible list peer.
+ * SSR markup smoke tests for the synchronized, accessible list peer.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';

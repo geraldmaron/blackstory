@@ -1,5 +1,5 @@
 /**
- * Barrel for the BB-053 evidence, confidence, dispute, and revision interface. The parent entity
+ * Barrel for the evidence, confidence, dispute, and revision interface. The parent entity
  * page mounts `EntityEvidencePanel`; the other exports are available for direct reuse/testing.
  */
 export { EntityEvidencePanel, type EntityEvidencePanelProps } from './EntityEvidencePanel';

@@ -1,5 +1,6 @@
+
 /**
- * In-memory transaction tests for atomic claim promotion and audit recording (BB-032).
+ * In-memory transaction tests for atomic claim promotion and audit recording.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

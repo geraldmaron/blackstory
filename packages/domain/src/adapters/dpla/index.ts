@@ -1,5 +1,5 @@
 /**
- * DPLA v2 community discovery adapter public surface (BB-073).
+ * DPLA v2 community discovery adapter public surface.
  */
 export {
   DPLA_V2_ADAPTER_ID,

@@ -1,29 +1,29 @@
 /**
- * Content-Security-Policy builder for the public web surface (BB-028).
- * Strict defaults in production; Next.js / MapLibre need limited relaxations in development
+ * Content-Security-Policy builder for the public web surface.
+ * Strict defaults in production; Next.js MapLibre need limited relaxations in development
  * (inline/eval scripts for hydration + HMR, blob workers for MapLibre GL).
  */
 
 export type CspBuildOptions = {
-  /** When true, allow inline styles required by Next.js hydration (default). */
+  /** When true, allow inline styles required by Next.js hydration (default).  */
   allowInlineStyles?: boolean;
-  /** When true, emit Trusted Types directives (report-only recommended first). */
+  /** When true, emit Trusted Types directives (report-only recommended first).  */
   enforceTrustedTypes?: boolean;
-  /** Extra host sources for img/connect (e.g. CDN). */
+  /** Extra host sources for img/connect (e.g. CDN).  */
   imgSrc?: string[];
   connectSrc?: string[];
-  /** Override NODE_ENV detection (tests). */
+  /** Override NODE_ENV detection (tests).  */
   isDev?: boolean;
 };
 
-/** MapLibre demo vector tiles / glyphs (empty dark canvas is not a readable map). */
+/** MapLibre demo vector tiles glyphs (empty dark canvas is not a readable map).  */
 const MAP_TILE_SRC = ['https://demotiles.maplibre.org'];
 
 const DEFAULT_IMG_SRC = ["'self'", 'data:', 'blob:', ...MAP_TILE_SRC];
 const DEFAULT_CONNECT_SRC = ["'self'", ...MAP_TILE_SRC];
 const DEFAULT_FONT_SRC = ["'self'", ...MAP_TILE_SRC];
 
-/** Build a semicolon-delimited CSP header value. */
+/** Build a semicolon-delimited CSP header value.  */
 export function buildContentSecurityPolicy(options: CspBuildOptions = {}): string {
   const {
     allowInlineStyles = true,

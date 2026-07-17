@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke tests for the BB-052 missing-information notice (acceptance criterion 2).
+ * SSR markup smoke tests for the missing-information notice.
  * Mirrors the render-to-static-markup pattern used by ../banners.test.ts.
  */
 import assert from 'node:assert/strict';

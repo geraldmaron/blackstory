@@ -1,5 +1,5 @@
 /**
- * National Park Service and National Register adapter definition (BB-046).
+ * National Park Service and National Register adapter definition.
  */
 import {
   buildFederalAdapterDefinition,

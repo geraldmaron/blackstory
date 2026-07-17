@@ -1,5 +1,5 @@
 /**
- * Internal test fixtures for the BB-086 fact registry — NOT re-exported from `./index.ts`, same
+ * Internal test fixtures for the fact registry NOT re-exported from `./index.ts`, same
  * convention as `../graph/fixtures.ts` and `../map/fixtures.ts` (imported by relative path from
  * this directory's own `*.test.ts` files only).
  */

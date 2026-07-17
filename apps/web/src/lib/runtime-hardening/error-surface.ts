@@ -1,5 +1,5 @@
 /**
- * Production-safe client error surfacing for the public web (BB-022).
+ * Production-safe client error surfacing for the public web.
  * Never expose stack traces, env vars, or internal paths to end users.
  */
 
@@ -18,7 +18,7 @@ export function isProductionPublicRuntime(): boolean {
   return runtimeAppEnv() === 'production';
 }
 
-/** Strip stack traces and long internal messages before client display or logs. */
+/** Strip stack traces and long internal messages before client display or logs.  */
 export function sanitizeClientErrorDisplay(
   error: Error & { digest?: string },
 ): ClientErrorDisplay {
@@ -48,7 +48,7 @@ export function sanitizeClientErrorDisplay(
   };
 }
 
-/** Server-side log line that redacts multiline stacks from stdout in production. */
+/** Server-side log line that redacts multiline stacks from stdout in production.  */
 export function formatServerErrorLog(error: unknown, digest?: string): string {
   const ref = digest ? ` digest=${digest}` : '';
   if (isProductionPublicRuntime()) {

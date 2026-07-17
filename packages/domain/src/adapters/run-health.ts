@@ -1,5 +1,5 @@
 /**
- * Adapter run health evaluation: record-count and schema drift → quarantine (BB-037).
+ * Adapter run health evaluation: record-count and schema drift → quarantine.
  */
 import type { AdapterRunOutcome } from './types.js';
 

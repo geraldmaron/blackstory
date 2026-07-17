@@ -1,17 +1,17 @@
 /**
- * BB-092 graph substrate feeding the entity detail page (BB-052).
+ * graph substrate feeding the entity detail page.
  *
  * Related-entity and timeline data for `./public-seed.ts`'s fixtures are DERIVED here through the
- * real BB-092 graph-view builders (`buildEntityAdjacency` / `toPublicRelatedEntries`) over a small
- * set of typed `EntityRelationship` edges — never hand-typed as a final related-entry array. This
+ * real graph-view builders (`buildEntityAdjacency` `toPublicRelatedEntries`) over a small
+ * set of typed `EntityRelationship` edges never hand-typed as a final related-entry array. This
  * is the same graph-view shape a real `publicReleases/{releaseId}/graph` build
  * (`packages/domain/src/graph/build.ts`) would produce; this module stands in for that pipeline
- * until BB-019's release build is wired to a live Firestore relationship collection (see
+ * until release build is wired to a live Firestore relationship collection (see
  * `public-seed.ts`'s own module doc for the parallel "seed stands in for a release" convention).
  *
- * Also carries the BB-090 time-scoped `statusHistory` and schema-only `sensitivity` fixtures the
+ * Also carries the time-scoped `statusHistory` and schema-only `sensitivity` fixtures the
  * entity page needs to render kind-appropriate status (derived via `currentStatus`, never a
- * hand-set scalar) and the BB-095 sensitivity context banner.
+ * hand-set scalar) and the sensitivity context banner.
  */
 import {
   buildEntityAdjacency,
@@ -25,7 +25,7 @@ import {
 } from '@black-book/domain';
 
 // ---------------------------------------------------------------------------
-// Raw typed edges (BB-092) — the only hand-authored graph input. `related` entries on
+// Raw typed edges the only hand-authored graph input. `related` entries on
 // `PublicEntityView` are computed FROM these via `relatedEntriesFor`, never typed directly.
 // ---------------------------------------------------------------------------
 
@@ -63,19 +63,19 @@ export const SEED_ENTITY_RELATIONSHIPS: readonly EntityRelationship[] = [
 ] as const;
 
 /**
- * Builds one entity's public related-entry list by running the REAL BB-092 adjacency builder over
+ * Builds one entity's public related-entry list by running the REAL adjacency builder over
  * `SEED_ENTITY_RELATIONSHIPS`, then projecting to the public `{id, type, direction, timespan}`
- * shape — the exact function pair a real release build calls (`packages/domain/src/graph/build.ts`
- * / `adjacency.ts`).
+ * shape the exact function pair a real release build calls (`packages/domain/src/graph/build.ts`
+ * `adjacency.ts`).
  */
 export function relatedEntriesFor(entityId: string): readonly PublicRelatedEntry[] {
   return toPublicRelatedEntries(buildEntityAdjacency(entityId, SEED_ENTITY_RELATIONSHIPS));
 }
 
 // ---------------------------------------------------------------------------
-// BB-090 time-scoped status history (place | school | institution — the PlaceLikeStatus
-// vocabulary). `event` entities intentionally have no entry here — their when-span is
-// authoritative (see `eventWindow` on `PublicEntityView` in ./public-seed.ts).
+// time-scoped status history (place | school | institution the PlaceLikeStatus
+// vocabulary). `event` entities intentionally have no entry here their when-span is
+// authoritative (see `eventWindow` on `PublicEntityView` in./public-seed.ts).
 // ---------------------------------------------------------------------------
 
 export const SEED_STATUS_HISTORY: Readonly<Record<string, readonly StatusHistoryEntry<EntityStatusValue>[]>> = {
@@ -97,9 +97,9 @@ export const SEED_STATUS_HISTORY: Readonly<Record<string, readonly StatusHistory
   ],
 };
 
-/** The entity's current status, ALWAYS derived from the open-ended `statusHistory` record — never
- * an independently hand-set scalar (BB-090 AC2). Returns `undefined` for kinds with no history
- * (e.g. `event`), matching `currentEntityStatus()`'s behavior for statusless kinds. */
+/** The entity's current status, ALWAYS derived from the open-ended `statusHistory` record never
+ * an independently hand-set scalar. Returns `undefined` for kinds with no history
+ * (e.g. `event`), matching `currentEntityStatus`'s behavior for statusless kinds. */
 export function currentStatusFor(entityId: string): EntityStatusValue | undefined {
   return currentStatus(SEED_STATUS_HISTORY[entityId]);
 }
@@ -109,7 +109,7 @@ export function statusHistoryFor(entityId: string): readonly StatusHistoryEntry<
 }
 
 // ---------------------------------------------------------------------------
-// BB-090 sensitivity flag (schema only — presentation is BB-095's `SensitivityContextBanner`).
+// sensitivity flag (schema only presentation is `SensitivityContextBanner`).
 // One flagged fixture demonstrates the banner; the note is conduct-based (a documented dispute
 // action), never an identity attribute, and cites a real claim on the entity's own claims list.
 // ---------------------------------------------------------------------------
@@ -130,7 +130,7 @@ export function sensitivityFor(entityId: string): EntitySensitivity | undefined 
 }
 
 // ---------------------------------------------------------------------------
-// Graph-driven timeline (BB-092 related edges + BB-090 status history — never hand-authored prose)
+// Graph-driven timeline
 // ---------------------------------------------------------------------------
 
 export type GraphTimelineEntry = {
@@ -179,7 +179,7 @@ const RELATIONSHIP_SENTENCE_TEMPLATES: Readonly<Record<string, (from: string, to
 };
 
 /** Exported so `apps/web/src/components/entity/EntityRelatedList.tsx` can render the identical
- * sentence the timeline uses — one description of a graph edge, not two independently-drifting
+ * sentence the timeline uses one description of a graph edge, not two independently-drifting
  * copies. */
 export function relationshipSentence(
   entry: TimelineRelatedEntry,
@@ -195,8 +195,8 @@ export function relationshipSentence(
 }
 
 /**
- * Builds one entity's timeline purely from its BB-090 status history and BB-092 related-entry
- * timespans — the two structured, evidence-backed inputs the entity page has, sorted
+ * Builds one entity's timeline purely from its status history and related-entry
+ * timespans the two structured, evidence-backed inputs the entity page has, sorted
  * chronologically. `entitiesById` resolves neighbor display names for the relationship sentences;
  * callers pass a lookup over the full seed catalog (see `./public-seed.ts`).
  */

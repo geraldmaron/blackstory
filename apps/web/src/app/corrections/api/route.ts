@@ -1,6 +1,6 @@
 /**
- * Public BB-055 correction intake endpoint. Node.js runtime (App Check Admin verifier).
- * Writes create-only into BB-029 quarantine via `createQuarantinedSubmission`.
+ * Public correction intake endpoint. Node.js runtime (App Check Admin verifier).
+ * Writes create-only into quarantine via `createQuarantinedSubmission`.
  */
 import {
   buildDefaultCorrectionRouteDependencies,

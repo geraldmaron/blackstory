@@ -1,14 +1,14 @@
 /**
- * Guardrails for the semantic (`find_nearest`) search endpoint (BB-071), layered directly on
- * top of the existing BB-026 text-search guardrails rather than reinventing them.
+ * Guardrails for the semantic (`find_nearest`) search endpoint, layered directly on
+ * top of the existing text-search guardrails rather than reinventing them.
  *
  * Reuse, concretely: the natural-language query text goes through the exact same
  * `evaluateSearchQueryGuardrails` validation as `/v1/search` (Unicode normalization, length
  * bounds, `kind`/`state` filter allowlisting), and the neighbor count `k` is mapped onto that
- * same function's `pageSize` field — so the "capped limit must be <= existing page-size caps"
+ * same function's `pageSize` field so the "capped limit must be <= existing page-size caps"
  * requirement is enforced by the *same* limits object (`DEFAULT_QUERY_GUARDRAIL_LIMITS`: default
  * 20, max 50), not a re-implemented one. `toBaseSearchQueryInput` only forwards the specific
- * fields this endpoint accepts (`q`, `kind`, `state`, `k`) — there is no way to smuggle a
+ * fields this endpoint accepts (`q`, `kind`, `state`, `k`) there is no way to smuggle a
  * prohibited field (`sql`, `regex`, `fields`, …) through this narrower HTTP query type, so that
  * part of the base guardrail's prohibited-field check is structurally unreachable here rather
  * than actively exercised. This file only adds validation for the two fields the base guardrail
@@ -16,8 +16,8 @@
  *
  * Route: `GET /v1/search/nearest`. That path is a sub-path of `/v1/search`, so it already
  * matches the existing `SEARCH_PATH` prefix regex in both `search-guardrails.ts` and
- * `rate-limits.ts` — `resolvePublicEndpointClass` (rate-limits.ts, unedited) therefore already
- * classifies it under the `search` endpoint class and BB-025 rate limiting applies without any
+ * `rate-limits.ts` `resolvePublicEndpointClass` (rate-limits.ts, unedited) therefore already
+ * classifies it under the `search` endpoint class and rate limiting applies without any
  * change to that file.
  */
 import {
@@ -40,9 +40,9 @@ export type VectorSearchHttpQuery = {
   readonly kind?: string;
   readonly state?: string;
   readonly eraBucket?: string;
-  /** Neighbor count. Reuses the base guardrail's pageSize bounds (default 20, max 50). */
+  /** Neighbor count. Reuses the base guardrail's pageSize bounds (default 20, max 50).  */
   readonly k?: string;
-  /** DOT_PRODUCT threshold — higher is more similar; must fall within [-1, 1]. */
+  /** DOT_PRODUCT threshold higher is more similar; must fall within [-1, 1].  */
   readonly distanceThreshold?: string;
 };
 
@@ -112,7 +112,7 @@ function parseOptionalInt(value: string | undefined): number | undefined {
   return Number.isFinite(parsed) ? parsed : Number.NaN;
 }
 
-/** Maps the vector-search HTTP query onto the shared BB-026 SearchQueryInput shape. */
+/** Maps the vector-search HTTP query onto the shared SearchQueryInput shape.  */
 export function toBaseSearchQueryInput(raw: VectorSearchHttpQuery): SearchQueryInput {
   const filters: Record<string, string> = {};
   if (raw.kind !== undefined) filters.kind = raw.kind;
@@ -129,7 +129,7 @@ export function toBaseSearchQueryInput(raw: VectorSearchHttpQuery): SearchQueryI
 
 /**
  * Validates a `/v1/search/nearest` request: the shared text/filter guardrail first, then the
- * vector-specific `distanceThreshold`/`eraBucket` fields. Fails closed — any invalid field
+ * vector-specific `distanceThreshold`/`eraBucket` fields. Fails closed any invalid field
  * denies the whole request rather than silently dropping it.
  */
 export function evaluateVectorSearchGuardrails(
@@ -213,5 +213,5 @@ export function formatVectorSearchGuardDeniedResponse(
   };
 }
 
-/** The max neighbor count this guard can ever allow — equals the base pageSize cap (<= platform ceiling). */
+/** The max neighbor count this guard can ever allow equals the base pageSize cap (<= platform ceiling).  */
 export const MAX_VECTOR_SEARCH_K = DEFAULT_QUERY_GUARDRAIL_LIMITS.maxPageSize;

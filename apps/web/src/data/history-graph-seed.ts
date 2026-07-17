@@ -1,10 +1,10 @@
 /**
- * BB-092 graph release artifact for the `/history` browse surface (BB-093).
+ * graph release artifact for the `/history` browse surface.
  *
  * Derives decade views and the all-time union from `./public-seed.ts` entities and
  * `./entity-graph-seed.ts` relationships via `buildGraphReleaseArtifact` — the same pure
  * publish-time pipeline `packages/domain/src/graph/build.ts` runs in production. This module
- * stands in for `publicReleases/{releaseId}/graph/*` until BB-019's release worker is wired.
+ * stands in for `publicReleases/{releaseId}/graph/*` until release worker is wired.
  */
 import {
   buildGraphReleaseArtifact,
@@ -56,7 +56,7 @@ function decadeBucketInputs(entities: readonly PublicEntityView[]): readonly Dec
 
 let cachedArtifact: GraphReleaseArtifact | undefined;
 
-/** Lazily builds and memoizes the seed graph release artifact for `/history`. */
+/** Lazily builds and memoizes the seed graph release artifact for `/history`.  */
 export function getHistoryGraphReleaseArtifact(): GraphReleaseArtifact {
   if (cachedArtifact) return cachedArtifact;
   const entities = listPublicEntities();
@@ -70,7 +70,7 @@ export function getHistoryGraphReleaseArtifact(): GraphReleaseArtifact {
   return cachedArtifact;
 }
 
-/** Resets the memoized artifact — test-only hook. */
+/** Resets the memoized artifact test-only hook.  */
 export function resetHistoryGraphReleaseArtifactForTests(): void {
   cachedArtifact = undefined;
 }

@@ -1,7 +1,8 @@
+
 /**
- * Composes the real BB-030 safe fetch + citation prefill + BB-044 draft-case creation into one
+ * Composes the real safe fetch + citation prefill + draft-case creation into one
  * operator workflow: "take a URL/topic, run it through capture + citation scaffolding + draft-
- * case creation." This is pure composition — no new fetch, quarantine, or case logic lives
+ * case creation." This is pure composition no new fetch, quarantine, or case logic lives
  * here. It only sequences `runQuickAddFetch`, `buildCitationPrefill`, `planSelectiveCapture`,
  * and `prepareLeadIntake`, each already real and independently tested in this package.
  *
@@ -40,11 +41,12 @@ export type ResearchIntakeOutcome = {
   readonly intake?: OperatorIntakeOutcome;
 };
 
+
 /**
- * Fetches `input.url` through BB-030, pre-fills citation metadata from what comes back, notes
+ * Fetches `input.url` through, pre-fills citation metadata from what comes back, notes
  * the (unwired) capture-plan integration point, then opens a draft research case through the
  * same `prepareLeadIntake` path `submit-lead` uses. If the fetch is denied, no intake is
- * attempted — the caller sees exactly why (`fetch.reason`) and nothing is proposed.
+ * attempted the caller sees exactly why (`fetch.reason`) and nothing is proposed.
  */
 export async function runResearchIntake(
   input: ResearchIntakeInput,

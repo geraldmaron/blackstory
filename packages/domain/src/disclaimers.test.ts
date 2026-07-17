@@ -1,12 +1,12 @@
 /**
- * Tests for the versioned disclaimer registry and sensitivity presentation labels (BB-095),
+ * Tests for the versioned disclaimer registry and sensitivity presentation labels,
  * including:
- *  - AC3's "every disclaimer carries a review date" and "renders only through shared components —
- *    a repo check finds no ad-hoc disclaimer strings in app code" requirements.
- *  - AC2's "copy passes the constitution's procedural language caps" requirement.
- *  - AC7's presentation-layer half of "identity attributes are never a valid rationale on their
- *    own" — this file only proves THIS module's own copy stays conduct-based; the BB-090
- *    data-entry gate is a separate system this bead does not own.
+ * - Every disclaimer carries a review date, and disclaimer copy renders only through shared
+ * components (a repo check finds no ad-hoc disclaimer strings in app code).
+ * - Copy passes the constitution's procedural language caps.
+ * - Presentation-layer half of "identity attributes are never a valid rationale on their
+ * own" — this file only proves THIS module's own copy stays conduct-based; the data-entry
+ * gate is a separate system.
  */
 import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
@@ -73,7 +73,7 @@ test('safety-advisory disclaimer never claims a real-time safety assessment', ()
 });
 
 // ---------------------------------------------------------------------------
-// AC2: copy passes the constitution's procedural language caps
+// copy passes the constitution's procedural language caps
 // ---------------------------------------------------------------------------
 
 test('every disclaimer body is free of unsupported procedural language (constitution caps)', () => {
@@ -93,7 +93,7 @@ test('sensitivity class presentation labels are free of unsupported procedural l
 });
 
 // ---------------------------------------------------------------------------
-// AC7 (presentation-layer half): conduct-based framing only, never identity attributes
+// conduct-based framing only, never identity attributes
 // ---------------------------------------------------------------------------
 
 test('sensitivity presentation labels cover every SensitivityClass and stay conduct-based', () => {
@@ -118,7 +118,7 @@ test('assertNoIdentityAttributeFraming actually catches identity-attribute langu
 });
 
 // ---------------------------------------------------------------------------
-// AC3: "renders only through shared components — a repo check finds no ad-hoc disclaimer
+// "renders only through shared components a repo check finds no ad-hoc disclaimer
 // strings in app code"
 // ---------------------------------------------------------------------------
 
@@ -143,8 +143,8 @@ async function collectSourceFiles(directory: string): Promise<string[]> {
 /**
  * Signature phrases lifted verbatim from the registry bodies above. If any of these literal
  * sentences shows up hand-typed in apps/web source, it means a surface duplicated disclaimer
- * copy instead of rendering it from `DISCLAIMER_REGISTRY` / `getDisclaimer` — exactly the
- * "ad-hoc disclaimer strings scattered through the codebase" AC3 prohibits. Test source files are
+ * copy instead of rendering it from `DISCLAIMER_REGISTRY` `getDisclaimer` exactly the
+ * "ad-hoc disclaimer strings scattered through the codebase" prohibits. Test source files are
  * exempt (a test asserting rendered disclaimer text legitimately contains these phrases via the
  * registry constant, not as hand-authored copy).
  */

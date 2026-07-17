@@ -1,3 +1,4 @@
+
 /**
  * Verifies operator identity stamping and its guardrails.
  */

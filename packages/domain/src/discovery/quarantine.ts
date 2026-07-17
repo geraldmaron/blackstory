@@ -1,5 +1,5 @@
 /**
- * Retry, quarantine, and dead-letter handling for discovery candidates (BB-039).
+ * Retry, quarantine, and dead-letter handling for discovery candidates.
  */
 import type {
   DiscoveryCandidateRecord,

@@ -1,5 +1,6 @@
+
 /**
- * Local barrel for BB-063 beta launch gate harness (parent merges package root).
+ * Local barrel for beta launch gate harness (parent merges package root).
  */
 export { BETA_LAUNCH_GATES, REQUIRED_HUMAN_GATE_IDS } from './criteria.js';
 export type { BetaLaunchGateId } from './criteria.js';

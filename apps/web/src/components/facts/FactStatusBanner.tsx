@@ -1,7 +1,7 @@
 /**
- * Workflow-status banner for corrected/superseded/deprecated facts (BB-086 AC1).
+ * Workflow-status banner for corrected/superseded/deprecated facts.
  *
- * Status (workflow rank) is rendered separately from the confidence badge — the two axes are
+ * Status (workflow rank) is rendered separately from the confidence badge the two axes are
  * never conflated in copy or layout.
  */
 import React from 'react';

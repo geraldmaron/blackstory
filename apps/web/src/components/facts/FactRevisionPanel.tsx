@@ -1,8 +1,8 @@
 /**
- * Append-only revision history panel for a fact page (BB-086 AC3/AC7).
+ * Append-only revision history panel for a fact page.
  *
  * Every revision carries a mandatory edit summary and links to its per-revision permalink
- * (`/facts/{id}/rev/{n}`) — the Wikipedia-oldid hostile-quoting defense named in the bead.
+ * (`/facts/{id}/rev/{n}`) — the Wikipedia-oldid hostile-quoting defense named in the.
  */
 import React from 'react';
 import type { FactRecord, FactRevision } from '@black-book/domain';

@@ -1,5 +1,5 @@
 /**
- * Degraded snapshot-mode signalling for `/history` (BB-093 acceptance criterion 6). The page is
+ * Degraded snapshot-mode signalling for `/history`. The page is
  * SSR-first from the bundled graph release artifact (`../../data/history-graph-seed.ts`); the
  * dynamic `/history/api` refine endpoint is progressive enhancement only.
  */

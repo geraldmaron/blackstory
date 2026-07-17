@@ -1,9 +1,9 @@
 /**
- * Decision-log extraction (BB-081 acceptance criterion 1): pulls accept/reject/override
- * transitions out of BB-044's append-only research-case history and pairs each with the
+ * Decision-log extraction: pulls accept/reject/override
+ * transitions out of append-only research-case history and pairs each with the
  * relevance engine's score at decision time.
  *
- * Input shape: `readonly ResearchCaseRecord[]` — a collection of research-case SNAPSHOTS, i.e.
+ * Input shape: `readonly ResearchCaseRecord` a collection of research-case SNAPSHOTS, i.e.
  * the record objects `transitionResearchCase` (../research-case/workflow.js) already returns
  * after each transition. Because ResearchCaseRecord is immutable and workflow.ts never mutates
  * in place, retaining every snapshot a case passes through is the natural way a caller (event
@@ -45,8 +45,8 @@ function canonicalize(value: unknown): unknown {
 }
 
 /**
- * Deterministic fingerprint over the relevance-assessment inputs that produced a decision —
- * same canonicalize -> JSON -> sha256 pattern BB-043's confidenceInputFingerprints established
+ * Deterministic fingerprint over the relevance-assessment inputs that produced a decision 
+ * same canonicalize -> JSON -> sha256 pattern confidenceInputFingerprints established
  * (packages/domain/src/confidence-engine/engine.ts), scoped to relevance-assessment inputs
  * rather than claim-confidence inputs (see types.ts module docstring for why).
  */
@@ -84,14 +84,14 @@ function classifyDisposition(
 
 export type ExtractRelevanceDecisionLogOptions = {
   /** Optional enrichment so entries can carry adapterId/sourceTier for source-tier precision
-   *  analysis. Mirrors the candidatesById lookup already used by ../relevance/engine.js. */
+   * analysis. Mirrors the candidatesById lookup already used by../relevance/engine.js. */
   readonly candidatesById?: ReadonlyMap<string, DiscoveryCandidateRecord>;
 };
 
 /** Extract one decision-log entry per relevance-verdict transition found across the supplied
- *  case snapshots. Snapshots with no relevanceAssessment, or whose latest transition is not a
- *  relevance verdict (see RELEVANCE_VERDICT_TARGET_STATES), contribute nothing — silently
- *  skipped, not an error, since most snapshots in a case's lifecycle are enrichment progress. */
+ * case snapshots. Snapshots with no relevanceAssessment, or whose latest transition is not a
+ * relevance verdict (see RELEVANCE_VERDICT_TARGET_STATES), contribute nothing silently
+ * skipped, not an error, since most snapshots in a case's lifecycle are enrichment progress. */
 export function extractRelevanceDecisionLog(
   caseSnapshots: readonly ResearchCaseRecord[],
   options: ExtractRelevanceDecisionLogOptions = {},
@@ -145,9 +145,9 @@ export function extractRelevanceDecisionLog(
   return entries;
 }
 
-/** Build the versioned calibration-dataset export around an already-extracted decision log —
- *  mirrors the shape of confidence-engine/calibration.js's exportConfidenceCalibrationDataset
- *  (stable sort, explicit schemaVersion + exportedAt) without depending on it. */
+/** Build the versioned calibration-dataset export around an already-extracted decision log 
+ * mirrors the shape of confidence-engine/calibration.js's exportConfidenceCalibrationDataset
+ * (stable sort, explicit schemaVersion + exportedAt) without depending on it. */
 export function buildRelevanceCalibrationDataset(input: {
   readonly entries: readonly RelevanceDecisionLogEntry[];
   readonly extractedAt: string;

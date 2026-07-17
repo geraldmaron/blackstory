@@ -1,5 +1,6 @@
+
 /**
- * Alert policy metadata contracts for BB-034 — severity, runbook, release, service,
+ * Alert policy metadata contracts for severity, runbook, release, service,
  * and correlation identifiers required on every alert payload.
  */
 import type { SecurityEventKind, SecurityEventSeverity } from './security-events.js';

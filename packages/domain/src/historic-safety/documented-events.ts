@@ -1,9 +1,9 @@
 /**
- * Layer 1 — documented historic events: proximity/density of events already in our corpus plus
+ * Layer 1 documented historic events: proximity/density of events already in our corpus plus
  * vetted external datasets (EJI/Seguin-Rigby lynching records; massacres and race riots;
  * documented displacement such as urban renewal or highway construction), time-banded by era.
  *
- * "Never decayed to zero — history does not expire" (bead design note): deliberately, NO
+ * "Never decayed to zero history does not expire" (design note): deliberately, NO
  * time-decay function exists anywhere in this module. An event's contribution depends only on
  * its documented category weight and proximity/density to the place, never on how long ago it
  * happened. `eraBandsForEvents` groups events into decade bands purely for presentation
@@ -27,7 +27,7 @@ export function isDocumentedEventCategory(value: string): value is DocumentedEve
 }
 
 /**
- * Published category weights (part of the versioned methodology — a change here is a
+ * Published category weights (part of the versioned methodology a change here is a
  * methodology-version bump, never a silent tuning edit). Displacement is weighted lower than
  * direct violence because it documents a different, though still significant, historical harm.
  */
@@ -44,7 +44,7 @@ export type DocumentedEventRecord = {
   readonly placeEntityId: string;
   readonly category: DocumentedEventCategory;
   readonly eraSpan: EraSpan;
-  /** How directly/closely this event ties to the place, in [0,1] — not a time-decay factor. */
+  /** How directly/closely this event ties to the place, in [0,1] not a time-decay factor. */
   readonly proximityWeight: number;
   readonly citation: LayerCitation;
 };
@@ -65,7 +65,7 @@ export function assertDocumentedEventRecordValid(record: DocumentedEventRecord):
   assertLayerCitationValid(record.citation);
 }
 
-/** Decade-band grouping for presentation only — see module doc: never used to decay a weight. */
+/** Decade-band grouping for presentation only see module doc: never used to decay a weight. */
 export function eraBandsForEvents(
   events: readonly DocumentedEventRecord[],
 ): ReadonlyMap<string, readonly DocumentedEventRecord[]> {

@@ -1,5 +1,5 @@
 /**
- * Browse list row for the BB-087 `/legal` index page.
+ * Browse list row for the `/legal` index page.
  */
 import React from 'react';
 import type { LawStatus } from '@black-book/domain';

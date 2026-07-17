@@ -1,5 +1,5 @@
 /**
- * Pure view-model for the BB-087 `/legal` browse and detail pages. No Next.js runtime dependency.
+ * Pure view-model for the `/legal` browse and detail pages. No Next.js runtime dependency.
  */
 import { slugifyFactStatement } from '@black-book/domain';
 import type { LegalBrowseItem } from '../../components/legal';

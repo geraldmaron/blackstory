@@ -1,5 +1,5 @@
 /**
- * The public search execution pipeline (BB-049): filter -> facet -> rank/sort -> paginate ->
+ * The public search execution pipeline: filter -> facet -> rank/sort -> paginate ->
  * explain. Pure and deterministic.
  */
 import { applyFilters, computeFacetCounts } from './facets.js';
@@ -86,16 +86,16 @@ function toResultView(ranked: RankedRecord, query: string): SearchResultView {
 
 /**
  * Executes a search over a persisted index. Steps:
- *  1. `applyFilters` narrows to the allowlisted-filter set.
- *  2. Facets are computed over that FILTERED set (independent of the text query, before
- *     pagination) so counts reflect the universe reachable under the current filters — the
- *     standard "what you'd get if you changed this filter" faceting model. (Per-dimension
- *     self-exclusion is intentionally not implemented; `computeFacetCounts` takes a single set.)
- *  3. `rankRecords` applies text matching + relevance/connection-strength ordering; `sortRanked`
- *     then reorders per the requested sort. Non-matching records are dropped here, so
- *     `totalMatched` reflects the text query.
- *  4. Pagination slices `[offset, offset + pageSize)`.
- *  5. Explanations are built for the page.
+ * 1. `applyFilters` narrows to the allowlisted-filter set.
+ * 2. Facets are computed over that FILTERED set (independent of the text query, before
+ * pagination) so counts reflect the universe reachable under the current filters the
+ * standard "what you'd get if you changed this filter" faceting model. (Per-dimension
+ * self-exclusion is intentionally not implemented; `computeFacetCounts` takes a single set.)
+ * 3. `rankRecords` applies text matching + relevance/connection-strength ordering; `sortRanked`
+ * then reorders per the requested sort. Non-matching records are dropped here, so
+ * `totalMatched` reflects the text query.
+ * 4. Pagination slices `[offset, offset + pageSize)`.
+ * 5. Explanations are built for the page.
  */
 export function runPublicSearch(
   input: SearchExecutionInput,

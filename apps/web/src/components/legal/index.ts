@@ -1,5 +1,5 @@
 /**
- * Public exports for BB-087 legal landscape web components.
+ * Public exports for legal landscape web components.
  */
 export { LegalDisclaimer } from './LegalDisclaimer';
 export { LegalStatusBadge } from './LegalStatusBadge';

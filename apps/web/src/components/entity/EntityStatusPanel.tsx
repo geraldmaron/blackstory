@@ -1,7 +1,7 @@
 /**
- * Kind-appropriate BB-090 status panel. Place/school/institution kinds render the derived current
+ * Kind-appropriate status panel. Place/school/institution kinds render the derived current
  * status plus the full time-scoped `statusHistory` record; `event` kinds have no status field by
- * design (their when-span is authoritative — BB-090 `STATUSLESS_ENTITY_KINDS`) and render an
+ * design (their when-span is authoritative `STATUSLESS_ENTITY_KINDS`) and render an
  * `eventWindow` panel instead. The historical-vs-present-day framing badge is a prop supplied by
  * the caller's derivation over the status field (see `../../app/entity/[id]/entity-view-model.ts`
  * `deriveHistoricalFraming`) — this component never re-derives it from prose.

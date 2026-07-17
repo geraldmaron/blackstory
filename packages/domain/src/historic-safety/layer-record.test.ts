@@ -1,6 +1,6 @@
 /**
- * Tests for BB-082's own time-scoped, evidence-backed place-condition layer records (AC8, AC9,
- * AC11, AC12) \u2014 distinct from BB-090 statusHistory, distinct vocabularies for sundown-town vs.
+ * Tests for own time-scoped, evidence-backed place-condition layer records (,,
+ * ) \u2014 distinct from statusHistory, distinct vocabularies for sundown-town vs.
  * redlining grade, area-only geometry, and the precision-fidelity rule.
  */
 import assert from 'node:assert/strict';

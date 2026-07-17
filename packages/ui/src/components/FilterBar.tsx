@@ -1,3 +1,4 @@
+
 /**
  * Native filter controls (fieldset + labelled inputs) for result refinement.
  */
@@ -42,7 +43,7 @@ export function FilterBar({
   actions,
 }: FilterBarProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    // Allow native GET/POST navigation when no client handler is provided (JS-off / PE).
+    // Allow native GET/POST navigation when no client handler is provided (JS-off PE).
     if (!onSubmit) {
       return;
     }

@@ -1,5 +1,5 @@
 /**
- * Normalize defensively-parsed DPLA v2 docs into BB-037 AdapterCandidateRecord output (BB-073).
+ * Normalize defensively-parsed DPLA v2 docs into AdapterCandidateRecord output.
  */
 import { MAX_EVIDENCE_SNIPPET_CHARACTERS, MAX_EVIDENCE_SNIPPET_WORDS } from '../../rights/evidence-pointer.js';
 import { stampCandidateProvenance } from '../candidates.js';

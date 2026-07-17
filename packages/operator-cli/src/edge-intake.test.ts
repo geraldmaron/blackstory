@@ -1,7 +1,8 @@
+
 /**
- * Verifies edge intake (BB-092 acceptance criterion 6) lands proposed EntityRelationship claims
- * in the same real BB-029 quarantine pipeline every other operator-cli proposal uses — never a
- * parallel writer — and that the caused/enabled consensus-causation guardrail (acceptance
+ * Verifies edge intake lands proposed EntityRelationship claims
+ * in the same real quarantine pipeline every other operator-cli proposal uses never a
+ * parallel writer and that the caused/enabled consensus-causation guardrail (acceptance
  * criterion 9) is enforced BEFORE quarantine, not left to submitter judgment.
  */
 import assert from 'node:assert/strict';

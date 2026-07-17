@@ -1,5 +1,5 @@
 /**
- * Domain tests for deterministic relevance engine (BB-040).
+ * Domain tests for deterministic relevance engine.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

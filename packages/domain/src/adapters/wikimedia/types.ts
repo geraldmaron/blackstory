@@ -1,5 +1,5 @@
 /**
- * Wikimedia discovery adapter types: raw API/bulk shapes and normalized payload fields (BB-045).
+ * Wikimedia discovery adapter types: raw API/bulk shapes and normalized payload fields.
  */
 import type { AdapterCandidateRecord } from '../types.js';
 
@@ -47,7 +47,7 @@ export type WikimediaCategoryGateResult = {
   readonly reason: string;
 };
 
-/** Normalized payload extension stored on AdapterCandidateRecord.payload (BB-045). */
+/** Normalized payload extension stored on AdapterCandidateRecord.payload. */
 export type WikimediaCandidatePayload = {
   readonly schemaVersion: typeof WIKIMEDIA_PAYLOAD_SCHEMA_VERSION;
   readonly ingestMode: WikimediaIngestMode;

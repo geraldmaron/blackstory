@@ -1,5 +1,5 @@
 /**
- * Quarantine-write-only posture helpers for the submissions API (ADR-005 / BB-021).
+ * Quarantine-write-only posture helpers for the submissions API (ADR-005).
  */
 import {
   assertOperationAllowed,

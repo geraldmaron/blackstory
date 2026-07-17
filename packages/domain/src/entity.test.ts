@@ -1,5 +1,5 @@
 /**
- * Tests for CanonicalEntity's BB-090 ontology extensions: kind-specific status lifecycle,
+ * Tests for CanonicalEntity's ontology extensions: kind-specific status lifecycle,
  * notability basis, sensitivity schema, and the 12th `movement` entity kind.
  */
 import assert from 'node:assert/strict';

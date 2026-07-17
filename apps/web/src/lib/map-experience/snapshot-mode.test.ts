@@ -1,5 +1,5 @@
 /**
- * Confirms the BB-051 degraded-mode helpers are total (every reason has copy) and never construct
+ * Confirms the degraded-mode helpers are total (every reason has copy) and never construct
  * a "degraded" state without a reason.
  */
 import assert from 'node:assert/strict';

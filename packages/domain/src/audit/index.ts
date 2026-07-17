@@ -1,5 +1,5 @@
 /**
- * Append-only audit contracts and publication-history reconstruction for BB-018.
+ * Append-only audit contracts and publication-history reconstruction.
  * These framework-independent types are shared by Firestore writers, consumers, and future APIs.
  */
 export const AUDIT_EVENT_ACTIONS = [

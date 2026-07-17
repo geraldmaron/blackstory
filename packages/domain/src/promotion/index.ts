@@ -1,8 +1,8 @@
 /**
- * Public domain surface for data-poisoning controls and staged claim promotion (BB-032).
+ * Public domain surface for data-poisoning controls and staged claim promotion.
  */
 export * from './controls.js';
 export * from './model.js';
 export * from './preview.js';
-// BB-094: streamlined corpus bulk-promotion path (spot-check sampling, batch reporting).
+// streamlined corpus bulk-promotion path (spot-check sampling, batch reporting).
 export * from './corpus-promotion.js';

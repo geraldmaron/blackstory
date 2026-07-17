@@ -1,13 +1,13 @@
 /**
- * Semantic near-duplicate detection over embeddings (BB-071) — a recall safety net that
- * complements the exact content-hash dedup in ../discovery/deduplication.ts (BB-039).
+ * Semantic near-duplicate detection over embeddings a recall safety net that
+ * complements the exact content-hash dedup in ../discovery/deduplication.ts.
  *
  * Content-hash dedup catches byte-identical re-syndication. It cannot catch two write-ups of
  * the same underlying fact that differ in wording. This module flags *semantically* close
  * candidates so weak-signal items surface for human corroboration instead of silently
- * duplicating research effort — it never merges or discards anything itself. Per BB-039
+ * duplicating research effort it never merges or discards anything itself. Per 
  * (../discovery/guard.ts), discovery must never publish or merge on its own authority; that
- * stays true here by construction — every function below is a pure read-only comparison.
+ * stays true here by construction every function below is a pure read-only comparison.
  */
 import { cosineSimilarity, type EmbeddingVector } from './vector-math.js';
 
@@ -28,7 +28,7 @@ export const DEFAULT_NEAR_DUPLICATE_THRESHOLD = 0.92;
  * Compares one candidate against a set of already-known items (e.g. existing discovery
  * candidates or accepted claims) and returns every item whose cosine similarity meets the
  * threshold, most-similar first. Intended call site: discovery ingestion, right after exact
- * content-hash dedup — see ../discovery/deduplication.ts.
+ * content-hash dedup see ../discovery/deduplication.ts.
  */
 export function findNearDuplicatesOf(
   candidate: NearDuplicateItem,
@@ -58,7 +58,7 @@ export type NearDuplicateCluster = {
 /**
  * Groups a batch of items into near-duplicate clusters via union-find over the threshold graph
  * (pairwise similarity >= threshold). Useful for periodic corpus-wide sweeps rather than
- * per-item ingestion checks. Singletons (no match above threshold) are omitted — callers only
+ * per-item ingestion checks. Singletons (no match above threshold) are omitted callers only
  * get clusters that actually need a human look.
  */
 export function clusterNearDuplicates(

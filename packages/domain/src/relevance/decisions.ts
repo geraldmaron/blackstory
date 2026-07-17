@@ -1,5 +1,5 @@
 /**
- * Include / exclude / supporting-context decision logic (BB-040).
+ * Include exclude supporting-context decision logic.
  */
 import type { ProductConstitution, RelevanceDecision } from '@black-book/schemas';
 import { evaluateRelevance, loadProductConstitution } from '@black-book/schemas';

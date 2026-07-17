@@ -1,39 +1,39 @@
 /**
- * Sybil / source-independence integrity signals (BB-089).
+ * Sybil source-independence integrity signals.
  *
  * A coordinated network of look-alike blogs/mirrors can manufacture the *appearance* of
  * independent corroboration even though every "source" traces back to one actor. This module
- * adds detection for that pattern on top of the BB-017 confidence engine, without duplicating
+ * adds detection for that pattern on top of the confidence engine, without duplicating
  * its scoring math:
  *
  * - Strong evidence of common control (shared RDAP registrant, shared ASN, or an overlapping
- *   nameserver set across otherwise-distinct lineage roots) collapses those lineage roots onto
- *   one canonical id *before* handing evidence links to {@link recalculateConfidence}. The
- *   existing syndicated-copy dedupe in `../claims/confidence.ts`
- *   (`uniqueLineageAggregates` / `lineageIndependenceFromCount`, reached via
- *   {@link recalculateConfidence}) then does the actual discounting — this module never
- *   recomputes score weights itself.
+ * nameserver set across otherwise-distinct lineage roots) collapses those lineage roots onto
+ * one canonical id *before* handing evidence links to {@link recalculateConfidence}. The
+ * existing syndicated-copy dedupe in `../claims/confidence.ts`
+ * (`uniqueLineageAggregates` `lineageIndependenceFromCount`, reached via
+ * {@link recalculateConfidence}) then does the actual discounting this module never
+ * recomputes score weights itself.
  * - Weaker, timing-only correlation (co-registration within a short window, a freshly
- *   first-seen domain, near-simultaneous publication) is surfaced as an advisory
- *   {@link SybilAdvisorySignals.independenceDiscount} for reviewer attention. It is recorded on
- *   the result but never silently changes the score — coincidental timing alone is not proof of
- *   common control.
+ * first-seen domain, near-simultaneous publication) is surfaced as an advisory
+ * {@link SybilAdvisorySignals.independenceDiscount} for reviewer attention. It is recorded on
+ * the result but never silently changes the score coincidental timing alone is not proof of
+ * common control.
  * - A new hard gate requires at least one top-tier source (archival, government-record, or
- *   peer-reviewed) among the surviving independent lineages before a claim can pass publication,
- *   regardless of how many lower-trust sources corroborate it. This ANDs with the existing
- *   `passesPublishThreshold`; it does not replace it.
+ * peer-reviewed) among the surviving independent lineages before a claim can pass publication,
+ * regardless of how many lower-trust sources corroborate it. This ANDs with the existing
+ * `passesPublishThreshold`; it does not replace it.
  *
  * All inputs here are optional and additive: callers that never supply
  * {@link SourceIndependenceMetadata} get byte-identical behavior to plain
  * {@link recalculateConfidence}.
  *
  * Test coverage: `./sybil-signals.test.ts` in this directory, plus five narrative-level Sybil
- * fixtures added to the BB-047 gold corpus (`packages/testing/src/gold-corpus/fixtures/
+ * fixtures added to the gold corpus (`packages/testing/src/gold-corpus/fixtures/
  * gold-corpus.v1.json`, ids `gc-121`–`gc-125`, category `source_lineage`) exercising shared-
  * registrant collapse, shared-ASN/nameserver collapse, advisory-only timing signals, and the
  * top-tier-source gate, plus a positive control showing genuine corroboration still publishes.
- * BB-060 (adversarial integrity exercise) does not exist as a bead yet — wiring these signals
- * into a live adversarial-exercise harness is a forward reference for whenever BB-060 is created,
+ * (adversarial integrity exercise) does not exist as a yet wiring these signals
+ * into a live adversarial-exercise harness is a forward reference for whenever is created,
  * not something this module or its fixtures do today.
  */
 import type { ClaimEvidenceLink } from '../claims/index.js';
@@ -67,12 +67,12 @@ export type SourceIndependenceMetadata = {
   readonly publishedAt?: string;
 };
 
-/** Archive/academic/government-of-record tiers — the only classifications that satisfy the
- *  top-tier publication gate. Deliberately excludes `news_reportage`: the current
- *  `sourceClassification` model (see `../claims/confidence.ts`) does not yet distinguish a
- *  newspaper-of-record from a tabloid, so treating all news reportage as top-tier would be
- *  unsound. Refining that distinction is a forward reference for a future classification bead,
- *  not solved here. */
+/** Archive/academic/government-of-record tiers the only classifications that satisfy the
+ * top-tier publication gate. Deliberately excludes `news_reportage`: the current
+ * `sourceClassification` model (see `../claims/confidence.ts`) does not yet distinguish a
+ * newspaper-of-record from a tabloid, so treating all news reportage as top-tier would be
+ * unsound. Refining that distinction is a forward reference for a future classification,
+ * not solved here. */
 export const TOP_TIER_SOURCE_CLASSIFICATIONS = [
   'primary_archival',
   'government_record',
@@ -167,7 +167,7 @@ function hoursBetween(a: string, b: string): number {
 }
 
 /** One row per lineage root (first wins) so a lineage's own syndicated copies never produce
- *  findings against themselves. */
+ * findings against themselves. */
 function oneRowPerLineage(
   metadata: readonly SourceIndependenceMetadata[],
 ): readonly SourceIndependenceMetadata[] {
@@ -269,7 +269,7 @@ function findSharedNameserverFindings(
 }
 
 /**
- * Detects strong shared-infrastructure evidence (registrant / ASN / nameserver overlap) and
+ * Detects strong shared-infrastructure evidence (registrant ASN nameserver overlap) and
  * groups the affected lineage roots into clusters via union-find so transitive sharing still
  * collapses to one cluster. Only lineage roots that actually share infrastructure are grouped;
  * everything else stays independent.
@@ -324,7 +324,7 @@ export function detectSharedInfrastructureClusters(
  * the cluster's canonical id. Returns new link objects; never mutates the input. Feeding the
  * result into {@link recalculateConfidence} reuses the existing syndicated-copy dedupe
  * (`uniqueLineageAggregates`) so a Sybil cluster is discounted exactly like syndicated wire
- * copies are today — one independent source, not N.
+ * copies are today one independent source, not N.
  */
 export function collapseSharedInfrastructureLineages(
   links: readonly ClaimEvidenceLink[],
@@ -420,7 +420,7 @@ export function assessAdvisorySignals(input: {
 }
 
 /** Full source-independence assessment: strong shared-infrastructure findings/clusters plus the
- *  weaker advisory signals, versioned for audit trails. */
+ * weaker advisory signals, versioned for audit trails. */
 export function assessSourceIndependence(input: {
   readonly metadata: readonly SourceIndependenceMetadata[];
   readonly referenceDate: string;
@@ -440,8 +440,8 @@ export function assessSourceIndependence(input: {
 }
 
 /**
- * At least one top-tier (archival / government-record / peer-reviewed) supporting, credible
- * lineage is required before a claim can reach published confidence — low-trust corroboration
+ * At least one top-tier (archival government-record peer-reviewed) supporting, credible
+ * lineage is required before a claim can reach published confidence low-trust corroboration
  * alone, however numerous, never publishes on its own.
  */
 export function evaluateTopTierSourceGate(
@@ -469,8 +469,8 @@ export type SybilAwareConfidenceResult = AuditedConfidenceResult & {
   readonly sourceIndependence: SourceIndependenceAssessment;
   readonly topTier: TopTierSourceGate;
   /** AND of the base engine's threshold result and the top-tier-source gate. The shared-
-   *  infrastructure discount already reached `passesPublishThreshold` upstream, by collapsing
-   *  Sybil-clustered lineages before scoring — it is not reapplied here. */
+   * infrastructure discount already reached `passesPublishThreshold` upstream, by collapsing
+   * Sybil-clustered lineages before scoring it is not reapplied here. */
   readonly passesPublishThreshold: boolean;
 };
 

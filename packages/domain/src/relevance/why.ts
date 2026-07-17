@@ -1,6 +1,6 @@
 /**
- * Human-readable “Why this appears” explanations (BB-040).
- * Explanations describe evidence and policy outcomes — never numeric scores.
+ * Human-readable “Why this appears” explanations.
+ * Explanations describe evidence and policy outcomes never numeric scores.
  */
 import type { RelevanceDecision } from '@black-book/schemas';
 import type { DiscoveryCandidateRecord } from '../discovery/types.js';

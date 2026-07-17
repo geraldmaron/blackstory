@@ -1,5 +1,5 @@
 /**
- * Tests for the composed `find_nearest` endpoint (BB-071) — every dependency is a fake or the
+ * Tests for the composed `find_nearest` endpoint every dependency is a fake or the
  * deterministic mock embedding provider, so this runs with no network access, no API key, and
  * no Firestore emulator.
  */
@@ -88,7 +88,7 @@ test('find_nearest denies with 429 once the anonymous/search token bucket is exh
   });
 
   const statuses: number[] = [];
-  // anonymous/search token bucket capacity is 8 (packages/security/src/rate-limits.ts) — the
+  // anonymous/search token bucket capacity is 8 (packages/security/src/rate-limits.ts) the
   // 9th sequential request from the same subject/IP must be denied.
   for (let i = 0; i < 9; i += 1) {
     const response = await endpoint.handle(baseRequest({ query: { q: `query number ${i}` } }));

@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke test for the segment error boundary (BB-048/BB-022): confirms
+ * SSR markup smoke test for the segment error boundary: confirms
  * it renders through the shared `sanitizeClientErrorDisplay` production-safe
  * surfacing instead of the raw digest-only branch it used to hand-roll.
  */

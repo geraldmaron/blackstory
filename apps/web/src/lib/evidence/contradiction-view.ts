@@ -1,9 +1,9 @@
 /**
- * Dispute/contradiction presentation for the BB-053 evidence interface (AC3: disagreement is
- * visible rather than silently resolved).
+ * Dispute/contradiction presentation for the evidence interface: disagreement is
+ * visible rather than silently resolved.
  *
  * Normalizes either the seed-depth `disputed`/`disputeNote` shape (mirroring
- * `apps/web/src/data/public-seed.ts`'s `PublicClaimView`) or a richer BB-017 `ContradictionSet`
+ * `apps/web/src/data/public-seed.ts`'s `PublicClaimView`) or a richer `ContradictionSet`
  * (`@black-book/domain`'s `preserveContradictoryValues` output) into one `EvidenceDisputeView` \u2014
  * every credible alternate value is always retained in the view model, never collapsed down to a
  * single answer.
@@ -21,7 +21,7 @@ export function buildDisputeView(input: EvidenceDisputeInput): EvidenceDisputeVi
   };
 }
 
-/** Adapt a full BB-017 `ContradictionSet` (richer than the seed shape) into the same view,
+/** Adapt a full `ContradictionSet` (richer than the seed shape) into the same view,
  * preserving every non-primary value \u2014 contradicting and alternative alike. */
 export function buildDisputeViewFromContradictionSet(set: ContradictionSet): EvidenceDisputeView {
   const alternates: EvidenceAlternateValue[] = set.values

@@ -1,8 +1,9 @@
+
 /**
- * BB-081: proves the recalibration-report job body is REAL — it calls @black-book/domain's
- * relevance-feedback module (buildRecalibrationReport / evaluateRelevanceDriftAlarm) rather than
+ * Proves the recalibration-report job body is REAL it calls @black-book/domain's
+ * relevance-feedback module (buildRecalibrationReport evaluateRelevanceDriftAlarm) rather than
  * reimplementing any analysis, produces report-only output (no publish, no weight mutation), and
- * raises a real BB-034 SEC-SRC-01 alert only when disagreement drift is actually triggered.
+ * raises a real SEC-SRC-01 alert only when disagreement drift is actually triggered.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

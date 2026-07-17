@@ -1,26 +1,26 @@
 /**
- * Derived graph-view release-artifact build (BB-092 acceptance criterion 3), following the BB-019
+ * Derived graph-view release-artifact build, following the 
  * immutable-release pattern (`../publication/index.ts`): `publicReleases/{releaseId}/graph/...`
- * docs, deterministic content hashing via the same `canonicalJson`/`sha256Json` the entity
+ * docs, deterministic content hashing via the same `canonicalJson`/`sha256Json` — the entity
  * projection/snapshot manifest uses, and the same `publicReleases/{releaseId}/...` path shape as
  * `publicEntityProjectionPath`.
  *
- * "Derived-at-publish over request-time traversal" (BB-092 DESIGN): this module never reads
- * Firestore itself — it is a pure function over already-loaded entities/relationships, run once
+ * "Derived-at-publish over request-time traversal": this module never reads
+ * Firestore itself it is a pure function over already-loaded entities/relationships, run once
  * per publication-worker release build (mirroring `../map/map-source.ts`'s `buildMapSource`
  * shape) and persisted as part of the release. No graph database, no per-request traversal.
  *
- * Deterministic / cycle-safe / bounded-depth / re-runnable (BB-092 acceptance criterion 3):
+ * Deterministic cycle-safe bounded-depth re-runnable:
  * - Deterministic: every sub-builder (`buildAllEntityAdjacency`, `buildDecadeViews`,
- *   `buildAllTimeView`) sorts its own output; this module adds no randomness or wall-clock reads
- *   beyond the caller-supplied `generatedAt`, and the resulting `contentHash` proves byte-for-byte
- *   reproducibility across runs (`assertGraphReleaseArtifactReproducible` below re-runs the build
- *   and compares hashes).
- * - Cycle-safe / bounded-depth: adjacency is single-hop (no traversal); the one multi-hop
- *   traversal in this subsystem (containment chains) lives in `./containment.ts` and is
- *   independently cycle-safe/bounded-depth there.
+ * `buildAllTimeView`) sorts its own output; this module adds no randomness or wall-clock reads
+ * beyond the caller-supplied `generatedAt`, and the resulting `contentHash` proves byte-for-byte
+ * reproducibility across runs (`assertGraphReleaseArtifactReproducible` below re-runs the build
+ * and compares hashes).
+ * - Cycle-safe bounded-depth: adjacency is single-hop (no traversal); the one multi-hop
+ * traversal in this subsystem (containment chains) lives in `./containment.ts` and is
+ * independently cycle-safe/bounded-depth there.
  * - Re-runnable: pure function, safe to invoke repeatedly against the same or updated inputs
- *   during a publication-worker retry.
+ * during a publication-worker retry.
  */
 import { sha256Json, type JsonValue, type Sha256Hash } from '../publication/index.js';
 import type { EntityRelationship } from '../relationship.js';
@@ -49,21 +49,21 @@ function assertSafePathSegment(value: string, field: string): void {
   }
 }
 
-/** `publicReleases/{releaseId}/graph/adjacency/{entityId}` — one bounded adjacency doc per entity. */
+/** `publicReleases/{releaseId}/graph/adjacency/{entityId}` one bounded adjacency doc per entity. */
 export function publicGraphAdjacencyPath(releaseId: string, entityId: string): string {
   assertSafePathSegment(releaseId, 'releaseId');
   assertSafePathSegment(entityId, 'entityId');
   return `publicReleases/${releaseId}/graph/adjacency/${entityId}`;
 }
 
-/** `publicReleases/{releaseId}/graph/decades/{decade}` — one node/edge-set doc per decade label. */
+/** `publicReleases/{releaseId}/graph/decades/{decade}` one node/edge-set doc per decade label. */
 export function publicGraphDecadePath(releaseId: string, decade: string): string {
   assertSafePathSegment(releaseId, 'releaseId');
   assertSafePathSegment(decade, 'decade');
   return `publicReleases/${releaseId}/graph/decades/${decade}`;
 }
 
-/** `publicReleases/{releaseId}/graph/all-time` — the all-time union view doc. */
+/** `publicReleases/{releaseId}/graph/all-time` the all-time union view doc. */
 export function publicGraphAllTimePath(releaseId: string): string {
   assertSafePathSegment(releaseId, 'releaseId');
   return `publicReleases/${releaseId}/graph/all-time`;
@@ -74,7 +74,7 @@ export type GraphReleaseArtifactInput = {
   readonly generatedAt: string;
   /** Every entity id the adjacency docs should be built for (typically every published entity). */
   readonly entityIds: readonly string[];
-  /** Active-span inputs for decade bucketing — see `./decades.ts`'s `DecadeBucketEntityInput`. */
+  /** Active-span inputs for decade bucketing see `./decades.ts`'s `DecadeBucketEntityInput`. */
   readonly entities: readonly DecadeBucketEntityInput[];
   readonly relationships: readonly EntityRelationship[];
   readonly adjacencyCap?: number;
@@ -87,7 +87,7 @@ export type GraphReleaseArtifact = {
   readonly adjacencyByEntityId: ReadonlyMap<string, EntityAdjacency>;
   readonly decadeViews: readonly DecadeGraphView[];
   readonly allTimeView: AllTimeGraphView;
-  /** sha256 over the canonicalized adjacency+decade+all-time payload — the reproducibility proof. */
+  /** sha256 over the canonicalized adjacency+decade+all-time payload the reproducibility proof. */
   readonly contentHash: Sha256Hash;
 };
 
@@ -134,7 +134,7 @@ function artifactPayload(
 
 /**
  * Builds the full graph release artifact: per-entity bounded adjacency, per-decade node/edge
- * sets (active-span bucketed — see `./decades.ts`), and the all-time union view, plus a
+ * sets (active-span bucketed see `./decades.ts`), and the all-time union view, plus a
  * deterministic content hash over all three.
  */
 export function buildGraphReleaseArtifact(input: GraphReleaseArtifactInput): GraphReleaseArtifact {
@@ -162,8 +162,8 @@ export function buildGraphReleaseArtifact(input: GraphReleaseArtifactInput): Gra
 /**
  * Re-runnability proof: rebuilds the artifact from the same input and asserts the content hash
  * (and therefore every derived view) is byte-for-byte identical. A publication-worker retry after
- * a transient failure must be safe to simply call `buildGraphReleaseArtifact` again — this
- * function is what a regression test (and BB-047-style gold-corpus fixtures, see `./fixtures.ts`)
+ * a transient failure must be safe to simply call `buildGraphReleaseArtifact` again this
+ * function is what a regression test (and -style gold-corpus fixtures, see `./fixtures.ts`)
  * exercises to prove that holds.
  */
 export function assertGraphReleaseArtifactReproducible(input: GraphReleaseArtifactInput): void {
@@ -178,7 +178,7 @@ export function assertGraphReleaseArtifactReproducible(input: GraphReleaseArtifa
   }
 }
 
-/** Per-entity public related entries for every entity in the artifact — BB-092 acceptance
+/** Per-entity public related entries for every entity in the artifact acceptance
  * criterion 5's `{id, type, direction, timespan}` shape, ready to merge into a public entity
  * projection. */
 export function publicRelatedEntriesByEntityId(

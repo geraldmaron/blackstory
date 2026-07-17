@@ -1,8 +1,8 @@
 /**
- * Public search domain surface (BB-049): pure, deterministic, auditable search index construction,
+ * Public search domain surface: pure, deterministic, auditable search index construction,
  * text-relevance ranking, faceting, filtering, per-result explanations, and the end-to-end
  * execution pipeline. Nothing here exposes a raw relevance score, evidence count, or other numeric
- * ranking signal to end users — connection strength is an internal ordering key only.
+ * ranking signal to end users connection strength is an internal ordering key only.
  */
 export * from './types.js';
 export * from './ranking.js';

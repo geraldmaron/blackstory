@@ -1,7 +1,8 @@
+
 /**
  * Verifies the research-intake composition: fetch -> citation prefill -> capture plan -> draft
  * case, using an injected fake `SafeFetchDependencies` (no real network access, no external
- * DNS) — the real BB-030 fetch state machine (`executeSafeFetch`) still runs underneath it.
+ * DNS) — the real fetch state machine (`executeSafeFetch`) still runs underneath it.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

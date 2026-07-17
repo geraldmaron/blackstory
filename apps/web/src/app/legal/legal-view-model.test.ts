@@ -1,5 +1,5 @@
 /**
- * Tests for BB-087 legal browse/detail view-model shaping.
+ * Tests for legal browse/detail view-model shaping.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

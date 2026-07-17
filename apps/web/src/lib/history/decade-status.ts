@@ -1,11 +1,11 @@
 /**
- * Point-in-time status resolution for BB-093 decade views. Uses BB-090's `statusAsOf` against
- * published `statusHistory` — never present-day `entity.status` when rendering a decade slice.
+ * Point-in-time status resolution for decade views. Uses `statusAsOf` against
+ * published `statusHistory` never present-day `entity.status` when rendering a decade slice.
  */
 import { statusAsOf, type EntityStatusValue, type StatusHistoryEntry } from '@black-book/domain/entity-status';
 import type { PublicEntityView } from '../../data/public-seed';
 
-/** Mid-decade representative year for status-as-of queries ("1950s" → "1955"). */
+/** Mid-decade representative year for status-as-of queries ("1950s" → "1955").  */
 export function decadeRepresentativeYear(decade: string): string {
   const match = /^(\d{4})s$/.exec(decade);
   if (!match) return decade;
@@ -33,7 +33,7 @@ function formatEventWindow(entity: PublicEntityView): string {
 }
 
 /**
- * Resolves the status label an entity should show in a decade view — point-in-time from
+ * Resolves the status label an entity should show in a decade view point-in-time from
  * `statusHistory`, event when-span for events, or an explicit undated gap label.
  */
 export function resolveDecadeStatusLabel(
@@ -65,7 +65,7 @@ export function resolveDecadeStatusLabel(
   };
 }
 
-/** All-time view uses present-day derived status for place-like kinds (open-ended record). */
+/** All-time view uses present-day derived status for place-like kinds (open-ended record).  */
 export function resolveAllTimeStatusLabel(entity: PublicEntityView): DecadeStatusResult {
   if (entity.kind === 'event') {
     return { kind: 'event-window', label: formatEventWindow(entity) };

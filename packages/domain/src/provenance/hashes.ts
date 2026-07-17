@@ -1,5 +1,5 @@
 /**
- * Content-hash helpers for capture deduplication (BB-016).
+ * Content-hash helpers for capture deduplication.
  * Duplicate captures with the same algorithm+hash resolve to the first capture.
  */
 import { createHash } from 'node:crypto';

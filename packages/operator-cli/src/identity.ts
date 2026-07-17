@@ -1,14 +1,15 @@
+
 /**
- * Operator identity and session stamping for BB-085's proposer contribution lane.
+ * Operator identity and session stamping for proposer contribution lane.
  *
  * Every record an operator proposes (lead, source registration, evidence, bulk-import row)
- * carries who proposed it and which session proposed it, so BB-018 audit events and BB-029
+ * carries who proposed it and which session proposed it, so audit events and
  * quarantine records stay attributable even though the pipeline that receives them is the
  * same one every other proposer (public submitter, adapter) uses.
  *
  * Invariant this module protects: an `OperatorIdentity` is a *proposer* identity only. It is
  * never accepted anywhere a `VerifiedAdminToken` (packages/firebase/src/admin-auth.ts) or a
- * fresh-reauth approver identity is required — see promotion-boundary.test.ts.
+ * fresh-reauth approver identity is required see promotion-boundary.test.ts.
  */
 import type { AuditActor } from '@black-book/domain';
 
@@ -20,7 +21,7 @@ export type OperatorSource = (typeof OPERATOR_SOURCES)[number];
 export type OperatorIdentity = {
   /** Stable id for the human operator (or the Claude session acting on their behalf). */
   readonly operatorId: string;
-  /** Id for *this* working session — distinct sessions must not share a session id. */
+  /** Id for *this* working session distinct sessions must not share a session id. */
   readonly sessionId: string;
   readonly source: OperatorSource;
   readonly displayName?: string;
@@ -38,9 +39,10 @@ export function assertOperatorIdentity(identity: OperatorIdentity): void {
   }
 }
 
+
 /**
- * Builds the BB-018 audit actor for an operator-proposed record. Operators are always
- * recorded as `type: 'user'` — never `system` — because a human (or a Claude session acting
+ * Builds the audit actor for an operator-proposed record. Operators are always
+ * recorded as `type: 'user'` never `system` because a human (or a Claude session acting
  * on the owner's behalf) is proposing, not an automated worker.
  */
 export function buildOperatorActor(identity: OperatorIdentity): AuditActor {

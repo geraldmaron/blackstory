@@ -1,5 +1,5 @@
 /**
- * Internet Archive adapter contract defaults aligned with BB-037 SourceAdapterContract (BB-073).
+ * Internet Archive adapter contract defaults aligned with SourceAdapterContract.
  * Starts disabled by default and requires an approved policy before it may run (../gates.ts).
  */
 import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from '../candidates.js';

@@ -1,12 +1,11 @@
 /**
- * Renders one BB-053 evidence card for a claim: an evidence-score confidence badge (never
- * probability language unless calibrated — acceptance criterion 1), a claim<->citation aria
- * association matching the entity page's existing claims-section pattern, a rights-limited
- * excerpt (or an explicit withheld notice — acceptance criterion 4), a preserved
- * contradiction/dispute notice when one exists (acceptance criterion 3), source-lineage /
+ * Renders one evidence card for a claim: an evidence-score confidence badge (never
+ * probability language unless calibrated), a claim↔citation aria association matching the
+ * entity page's existing claims-section pattern, a rights-limited excerpt (or an explicit
+ * withheld notice), a preserved contradiction/dispute notice when one exists, source-lineage /
  * research-coverage / last-checked metadata kept visually and structurally distinct from the
- * confidence badge (acceptance criterion 2), a collapsible revision history, and a retraction
- * notice when the claim has been retracted or corrected.
+ * confidence badge, a collapsible revision history, and a retraction notice when the claim has
+ * been retracted or corrected.
  *
  * Pure presentation over `../../lib/evidence`'s `EvidenceClaimView` — no derivation logic lives
  * here; see `buildEvidenceCard` for that.

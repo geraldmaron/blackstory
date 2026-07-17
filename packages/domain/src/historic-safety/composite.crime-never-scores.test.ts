@@ -1,6 +1,6 @@
 /**
- * Critical invariant tests: general crime statistics and advisory data must NEVER enter the BB-082
- * composite — exercises all four independent defense lines documented in ./composite.ts.
+ * Critical invariant tests: general crime statistics and advisory data must NEVER enter the 
+ * composite exercises all four independent defense lines documented in ./composite.ts.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

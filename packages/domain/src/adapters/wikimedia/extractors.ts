@@ -1,5 +1,5 @@
 /**
- * Wikidata identifier, alias, location, and relationship extraction (BB-045).
+ * Wikidata identifier, alias, location, and relationship extraction.
  */
 import type {
   MediaWikiPage,

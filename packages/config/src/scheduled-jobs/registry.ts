@@ -1,8 +1,9 @@
+
 /**
- * In-memory scheduled-job registry: register/get/list/require, mirroring the BB-037 adapter
- * registry (packages/domain/src/adapters/registry.ts) and BB-038 query-pack registry
+ * In-memory scheduled-job registry: register/get/list/require, mirroring the adapter
+ * registry (packages/domain/src/adapters/registry.ts) and query-pack registry
  * (packages/domain/src/query-packs/registry.ts) "versioned config, fail-closed if unregistered"
- * discipline. No unregistered recurring job can be dispatched — requireScheduledJob /
+ * discipline. No unregistered recurring job can be dispatched requireScheduledJob
  * assertJobMayBeDispatched throw for any id that was never registered.
  */
 import { assertValidCronExpression } from './cron.js';
@@ -167,7 +168,7 @@ export function listScheduledJobs(
 }
 
 /** The entry point a dispatcher (Cloud Scheduler -> Cloud Tasks handler) calls before running a
- *  job id. Fail-closed: an id that was never registered is rejected, not silently skipped. */
+ * job id. Fail-closed: an id that was never registered is rejected, not silently skipped. */
 export function assertJobMayBeDispatched(
   store: ScheduledJobRegistryStore,
   id: string,

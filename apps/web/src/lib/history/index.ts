@@ -1,5 +1,5 @@
 /**
- * Barrel export for the BB-093 history browse data layer.
+ * Barrel export for the history browse data layer.
  */
 export * from './build-history-graph';
 export * from './copy';

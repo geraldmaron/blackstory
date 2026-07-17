@@ -1,5 +1,5 @@
 /**
- * Internal API surface acceptance tests (BB-021).
+ * Internal API surface acceptance tests.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

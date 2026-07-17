@@ -1,3 +1,4 @@
+
 /**
  * Shared environment validation and package identity helpers for the Black Book monorepo.
  */

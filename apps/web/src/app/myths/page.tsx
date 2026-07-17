@@ -1,5 +1,5 @@
 /**
- * Myths and misconceptions index (BB-088) — pre-bunking reviews of circulating third-party claims.
+ * Myths and misconceptions index pre-bunking reviews of circulating third-party claims.
  * ClaimReview JSON-LD is emitted only on individual myth pages under /myths/[slug].
  */
 import {

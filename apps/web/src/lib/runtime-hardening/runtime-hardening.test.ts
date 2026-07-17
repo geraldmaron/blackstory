@@ -1,5 +1,5 @@
 /**
- * Public render path and response limit tests (BB-022).
+ * Public render path and response limit tests.
  */
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
@@ -61,7 +61,7 @@ test('collectPublicRenderPathFindings flags forbidden imports', () => {
   // A bare "from '...'" (no leading import/export keyword) satisfies
   // FORBIDDEN_PUBLIC_RENDER_IMPORTS' import-context requirement without
   // satisfying scripts/validate-boundaries.mjs's IMPORT_PATTERN (which
-  // requires a literal "import"/"export" keyword) — so this fixture
+  // requires a literal "import"/"export" keyword) so this fixture
   // exercises the real detector without the repo-wide boundary scanner
   // mistaking it for an actual cross-boundary import.
   const forbiddenModuleSpecifier = ['@black-book', 'data-access/firestore'].join('/');

@@ -1,5 +1,5 @@
 /**
- * BB-057 metadata builder tests — protected fields must never reach previews.
+ * metadata builder tests protected fields must never reach previews.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

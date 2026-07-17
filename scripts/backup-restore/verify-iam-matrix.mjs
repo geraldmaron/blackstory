@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+
 /**
- * Dry-run IAM matrix checker for BB-020. Ensures retention matrix and deny-delete design align.
+ * Dry-run IAM matrix checker. Ensures retention matrix and deny-delete design align.
  */
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';

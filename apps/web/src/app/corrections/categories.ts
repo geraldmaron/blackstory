@@ -1,7 +1,7 @@
 /**
- * Structured correction categories and target types for BB-055 public intake. These labels are
- * stable product vocabulary — they are embedded in the quarantine statement for moderators but
- * never imply automatic publication or confidence changes (BB-032).
+ * Structured correction categories and target types for public intake. These labels are
+ * stable product vocabulary they are embedded in the quarantine statement for moderators but
+ * never imply automatic publication or confidence changes.
  */
 
 export const CORRECTION_TARGET_TYPES = ['entity', 'claim', 'source', 'location'] as const;

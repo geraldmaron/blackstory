@@ -1,5 +1,5 @@
 /**
- * Public explore refine endpoint (BB-051). Node.js runtime (App Check Admin SDK). Thin entry
+ * Public explore refine endpoint. Node.js runtime (App Check Admin SDK). Thin entry
  * wiring production singletons; testable core lives in `./handler`.
  */
 import { createExploreAppCheckGuard, type ExploreAppCheckGuard } from './app-check-guard';

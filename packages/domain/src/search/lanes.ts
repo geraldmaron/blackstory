@@ -1,7 +1,7 @@
 /**
- * Parallel retrieval lanes for hybrid search (BB-072): bounded structured/prefix recall and vector
+ * Parallel retrieval lanes for hybrid search: bounded structured/prefix recall and vector
  * KNN recall. Each lane can be independently disabled via kill switches. Vector-lane era
- * pre-filters delegate to the shared BB-090 `deriveEraBuckets` / `deriveDecadeLabel` helpers.
+ * pre-filters delegate to the shared `deriveEraBuckets` `deriveDecadeLabel` helpers.
  */
 import { deriveDecadeLabel, deriveEraBuckets } from '../era.js';
 import { applyFilters } from './facets.js';
@@ -40,7 +40,7 @@ export type StructuredLaneResult = {
 
 export type VectorLaneMatch = {
   readonly entityId: string;
-  /** Internal distance/similarity — never exposed in public payloads. */
+  /** Internal distance/similarity never exposed in public payloads. */
   readonly distance: number;
 };
 
@@ -71,7 +71,7 @@ export const DEFAULT_LANE_LIMITS = {
 /**
  * Derives the decade bucket pre-filter for the vector lane. Prefers an explicit `era` search
  * filter; otherwise scans the query for a four-digit year and maps it through shared
- * `deriveDecadeLabel` (BB-090).
+ * `deriveDecadeLabel`.
  */
 export function deriveVectorEraPreFilter(input: {
   readonly normalizedQuery: string;
@@ -89,7 +89,7 @@ export function deriveVectorEraPreFilter(input: {
   return undefined;
 }
 
-/** Validates that era pre-filter labels match BB-090 decade bucket shape. */
+/** Validates that era pre-filter labels match decade bucket shape. */
 export function eraBucketOverlapsRecord(
   eraBucket: string | undefined,
   recordEraBuckets: readonly string[],
@@ -124,7 +124,7 @@ export function runStructuredLane(
 }
 
 /**
- * Runs the vector KNN lane through an injected port. Applies era pre-filter from shared BB-090
+ * Runs the vector KNN lane through an injected port. Applies era pre-filter from shared 
  * derivation before delegating to the store.
  */
 export async function runVectorLane(

@@ -1,11 +1,11 @@
 /**
- * Citation record shape for BB-083 (citation integrity and link-rot management).
+ * Citation record shape for (citation integrity and link-rot management).
  *
  * Every published claim must carry at least one citation with: a URL or a structured
  * offline-source designation, a source name, a capture pointer, and a retrieval date
- * (BB-083 acceptance criterion 1). This module models that record and adapts it from the
- * BB-016 provenance model (`../provenance/`) — `EvidenceRecord`, `SourceItem`,
- * `EvidenceSource`, `SourceCapture` — rather than inventing a parallel source-of-truth.
+ * This module models that record and adapts it from the
+ * provenance model (`../provenance/`) `EvidenceRecord`, `SourceItem`,
+ * `EvidenceSource`, `SourceCapture` rather than inventing a parallel source-of-truth.
  * "Unsourced" is not a publishable state; see `./completeness-gate.ts` for the fail-closed
  * check this type feeds.
  */
@@ -21,7 +21,7 @@ export const OFFLINE_SOURCE_KINDS = [
 
 export type OfflineSourceKind = (typeof OFFLINE_SOURCE_KINDS)[number];
 
-/** A structured designation for a source with no stable URL (BB-083 acceptance criterion 1). */
+/** A structured designation for a source with no stable URL. */
 export type OfflineSourceDesignation = {
   readonly kind: OfflineSourceKind;
   /** Human-readable locator, e.g. "Florida State Archives, Series 1234, Box 5, Folder 2". */
@@ -34,15 +34,15 @@ export type CitationLocation =
   | { readonly kind: 'offline'; readonly designation: OfflineSourceDesignation };
 
 /**
- * Points at the BB-016 `SourceCapture` (or, for offline sources, an equivalent captured
- * record — e.g. a photographed archive page) that evidences this citation's content at
+ * Points at the `SourceCapture` (or, for offline sources, an equivalent captured
+ * record e.g. a photographed archive page) that evidences this citation's content at
  * retrieval time. Required unconditionally: URL and offline citations alike must anchor to
  * something captured, not just an assertion that a source exists.
  */
 export type CitationCapturePointer = {
   readonly captureId: string;
   readonly contentHash?: ContentHash;
-  /** Wayback/Internet Archive capture URL, when one exists (BB-077 evidence-pointer doctrine). */
+  /** Wayback/Internet Archive capture URL, when one exists. */
   readonly waybackCaptureUrl?: string;
   readonly waybackCapturedAt?: string;
 };
@@ -54,20 +54,20 @@ export type Citation = {
   readonly id: string;
   readonly claimId: string;
   readonly sourceName: string;
-  /** Source classification vocabulary token (BB-016 `sourceClassifications()`), used to group
-   *  rot-rate telemetry by source class (BB-083 acceptance criterion 6). Optional because not
-   *  every caller resolves the owning `EvidenceSource` before building a citation. */
+  /** Source classification vocabulary token `), used to group
+   * rot-rate telemetry by source class. Optional because not
+   * every caller resolves the owning `EvidenceSource` before building a citation. */
   readonly sourceClassification?: string;
   readonly title?: string;
   readonly authorName?: string;
   /** Key named entities already present in the citation record (never derived via an LLM at
-   *  read time) — feeds the deterministic "Try searching for" suggestion (./try-searching-for.ts). */
+   * read time) feeds the deterministic "Try searching for" suggestion (./try-searching-for.ts). */
   readonly namedEntities?: readonly string[];
   readonly location: CitationLocation;
   readonly capture: CitationCapturePointer;
   readonly retrievalDate: string;
   /** Set once the repair ladder (./repair-ladder.ts) swaps the primary link away from the
-   *  original URL — the original is preserved as "originally published at", never discarded. */
+   * original URL the original is preserved as "originally published at", never discarded. */
   readonly originallyPublishedAtUrl?: string;
   readonly linkStatus?: LinkHealthStatus;
   readonly linkStatusAsOf?: string;
@@ -123,7 +123,7 @@ export function assertCitationCapturePointerValid(capture: CitationCapturePointe
 /**
  * Fail-closed structural validity for a single citation: source name, a valid location
  * (URL or offline designation), a capture pointer, and a retrieval date. This is necessary
- * but not sufficient for "may publish" — see `./completeness-gate.ts` for the claim-level
+ * but not sufficient for "may publish" see `./completeness-gate.ts` for the claim-level
  * publication gate this feeds.
  */
 export function assertCitationStructurallyComplete(
@@ -151,9 +151,9 @@ export function isCitationStructurallyComplete(
 }
 
 /**
- * Adapts a BB-016 evidence chain (evidence record + source item + evidence source + capture)
+ * Adapts a evidence chain (evidence record + source item + evidence source + capture)
  * into a `Citation`. This is the intended way to build citations from the existing provenance
- * model rather than duplicating it — pass either a `capture` (URL-backed evidence) or an
+ * model rather than duplicating it pass either a `capture` (URL-backed evidence) or an
  * `offlineDesignation` (analog source with no stable URL); exactly one is required.
  */
 export function buildCitationFromEvidence(input: {

@@ -1,12 +1,11 @@
 /**
- * Small presentation-only string helpers for the BB-053 evidence interface, kept local to this
- * module tree rather than importing `components/entity/format.ts` (owned by a different bead's
- * exclusive-path scope) — this file's own `humanizeToken` is a one-line duplicate of that same
- * general-purpose helper, not a divergent implementation.
+ * Small presentation-only string helpers for the evidence interface, kept local to this
+ * module tree rather than importing `components/entity/format.ts`. This file's `humanizeToken`
+ * is a one-line duplicate of that same general-purpose helper, not a divergent implementation.
  */
 
-/** `"reputable_secondary"` -> `"Reputable Secondary"`. Used for BB-016 source classifications,
- * BB-053 revision-change kinds, and research-coverage levels — none of which ship a human label
+/** `"reputable_secondary"` -> `"Reputable Secondary"`. Used for source classifications,
+ * revision-change kinds, and research-coverage levels none of which ship a human label
  * of their own on the wire. */
 export function humanizeToken(value: string): string {
   return value

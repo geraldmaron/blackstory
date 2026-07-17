@@ -1,6 +1,6 @@
 /**
  * Public read/search/location API entrypoint (Cloud Run target).
- * Read-only posture enforced via @black-book/config surface capabilities (BB-021).
+ * Read-only posture enforced via @black-book/config surface capabilities.
  */
 import { buildSurfaceHealth, parseNodeEnv } from '@black-book/config';
 import { SURFACE_ID } from './posture.js';

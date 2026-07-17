@@ -1,5 +1,5 @@
 /**
- * Submissions API rate-limit guard — corrections and auth intake quotas (BB-025).
+ * Submissions API rate-limit guard corrections and auth intake quotas.
  */
 import {
   aggregateDistributedRisk,

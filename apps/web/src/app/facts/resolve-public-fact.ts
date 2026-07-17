@@ -1,5 +1,5 @@
 /**
- * Public fact resolution helpers for BB-086 web routes.
+ * Public fact resolution helpers for web routes.
  *
  * Encodes the read-path rules from the domain publish/resolution gates: draft/under_review facts
  * are not public (404); deprecated/superseded/corrected facts stay resolvable with a banner, never
@@ -73,7 +73,7 @@ export function resolveFactRevision(
   return { kind: 'ok', fact, revision };
 }
 
-/** Parses `/facts/{id}.json` segment values and bare ids for the JSON route handler. */
+/** Parses `/facts/{id}.json` segment values and bare ids for the JSON route handler.  */
 export function parseFactIdParam(raw: string): string | undefined {
   const trimmed = raw.trim();
   if (trimmed.endsWith('.json')) {

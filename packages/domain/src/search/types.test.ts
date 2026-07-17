@@ -1,5 +1,5 @@
 /**
- * Type-level guarantees for BB-049 search types: a `PublicSearchIndexDoc` is a structural superset
+ * Type-level guarantees for search types: a `PublicSearchIndexDoc` is a structural superset
  * of `SearchableEntityRecord` (so it flows through the pure ranking/filter helpers without a cast),
  * and `SearchResultView` carries no numeric ranking field.
  */

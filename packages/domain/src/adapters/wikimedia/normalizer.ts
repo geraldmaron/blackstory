@@ -1,5 +1,5 @@
 /**
- * Normalize Wikimedia API/bulk fetches into BB-037 AdapterCandidateRecord output (BB-045).
+ * Normalize Wikimedia API/bulk fetches into AdapterCandidateRecord output.
  */
 import { stampCandidateProvenance } from '../candidates.js';
 import type { SourceRegistryEntry } from '../types.js';

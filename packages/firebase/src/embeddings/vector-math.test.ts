@@ -1,5 +1,6 @@
+
 /**
- * Tests for pure embedding-vector math (BB-071).
+ * Tests for pure embedding-vector math.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

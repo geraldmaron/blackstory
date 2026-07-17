@@ -1,13 +1,13 @@
 /**
- * Per-decade node/edge sets (BB-092 acceptance criterion 3), bucketed by ACTIVE SPAN, never
- * creation/founding date (BB-092 acceptance criterion 10 — CRITICAL).
+ * Per-decade node/edge sets, bucketed by ACTIVE SPAN, never
+ * creation/founding date.
  *
  * An entity with an open-ended or ongoing active period (an org, institution, movement, or law)
- * must appear in EVERY decade it was active — derived from BB-090's `statusHistory`/start-end
- * fields — not merely the decade it was founded. This module never re-derives BB-090's
+ * must appear in EVERY decade it was active derived from `statusHistory`/start-end
+ * fields not merely the decade it was founded. This module never re-derives 
  * status/statusHistory logic itself (that stays owned by `../entity-status.ts`, imported
  * read-only here); callers resolve an entity's own status-history windows (or event
- * startAt/endAt, or a single founding-year point) into `EraSpan` inputs before calling in — the
+ * startAt/endAt, or a single founding-year point) into `EraSpan` inputs before calling in the
  * same "caller resolves, this module composes" discipline `../graph/containment.ts` follows for
  * jurisdiction data.
  */
@@ -17,8 +17,8 @@ import type { EntityRelationship } from '../relationship.js';
 export type DecadeBucketEntityInput = {
   readonly entityId: string;
   /**
-   * Every window during which the entity counts as "active" for decade-view placement — e.g. one
-   * entry per BB-090 `statusHistory` record for place/org/institution/law/movement kinds, or a
+   * Every window during which the entity counts as "active" for decade-view placement e.g. one
+   * entry per `statusHistory` record for place/org/institution/law/movement kinds, or a
    * single `{validFrom: startAt, validTo: endAt}` window for an `event`, or a single
    * `{validFrom: birthYear, validTo: deathYear}` window for a `person`. An entity with several
    * disjoint active windows (e.g. an institution that closed and later reopened) supplies one
@@ -32,19 +32,17 @@ export type DeriveActiveDecadeBucketsOptions = {
    * Resolves an open-ended window (`validTo` omitted or null — "still active") through to this
    * cutoff year/date before decade-bucketing, so a still-active entity is placed in every
    * published decade through the present, not silently truncated at its founding decade. Defaults
-   * to leaving the span open, which `deriveEraBuckets` (BB-090) already resolves to a
-   * single-point span at `validFrom` alone — callers building a real release MUST supply the
-   * release's `generatedAt` year here to get the "every subsequent decade" behavior the
-   * acceptance criterion requires.
+   * to leaving the span open, which `deriveEraBuckets` already resolves to a single-point span
+   * at `validFrom` alone — callers building a real release MUST supply the release's
+   * `generatedAt` year here to get the "every subsequent decade" behavior.
    */
   readonly stillActiveCutoff?: string;
 };
 
 /**
- * Derives every decade bucket an entity's active spans overlap — the core of acceptance
- * criterion 10. An entity founded in the 1950s with an open-ended (still-active) status-history
- * record and `stillActiveCutoff: "2026"` yields `["1950s", "1960s", ..., "2020s"]`, not just
- * `["1950s"]`.
+ * Derives every decade bucket an entity's active spans overlap. An entity founded in the
+ * 1950s with an open-ended (still-active) status-history record and `stillActiveCutoff: "2026"`
+ * yields `["1950s", "1960s",..., "2020s"]`, not just `["1950s"]`.
  */
 export function deriveActiveDecadeBuckets(
   input: DecadeBucketEntityInput,
@@ -89,7 +87,7 @@ function edgeTemporalOverlapsDecade(rel: EntityRelationship, decade: string): bo
 /**
  * Builds one `DecadeGraphView` per decade touched by any entity's active span. Deterministic: the
  * decade list, node lists, and edge lists are all sorted, so re-running the build against the
- * same input always yields byte-identical output (required for the BB-019 release-snapshot
+ * same input always yields byte-identical output (required for the release-snapshot
  * discipline this feeds).
  */
 export function buildDecadeViews(
@@ -123,7 +121,7 @@ export function buildDecadeViews(
   });
 }
 
-/** Union of every decade view into one all-time node/edge set (BB-092 acceptance criterion 3's
+/** Union of every decade view into one all-time node/edge set ('s
  * "an all-time union view"). */
 export type AllTimeGraphView = {
   readonly nodeIds: readonly string[];

@@ -1,7 +1,7 @@
 /**
- * Server-side BB-050 geocode pipeline for the `/locate` route: normalizes address/ZIP text,
- * calls the real Census Geocoder adapter (`@black-book/domain`'s `fetchCensusAddressGeocode` /
- * `fetchCensusCoordinatesGeocode`, backed by `./safe-http-client.ts`), resolves BB-091
+ * Server-side geocode pipeline for the `/locate` route: normalizes address/ZIP text,
+ * calls the real Census Geocoder adapter (`@black-book/domain`'s `fetchCensusAddressGeocode`
+ * `fetchCensusCoordinatesGeocode`, backed by `./safe-http-client.ts`), resolves 
  * jurisdiction ids, reduces exact coordinates, checks the 50-states-+-D.C. product scope, and
  * falls back to manual place search on any failure.
  */
@@ -100,7 +100,7 @@ function toResolution(match: CensusGeocodeMatch, retainExactCoordinates: boolean
 }
 
 /**
- * Bounded in-memory TTL cache (BB-050 acceptance criterion 5, "cached") — one per server
+ * Bounded in-memory TTL cache one per server
  * instance, matching this app's established rate-limit-store convention
  * (`apps/web/src/app/search/api/route.ts`'s module doc). Keyed by normalized address/coordinate
  * text; a short TTL keeps this from becoming a persistent location-history store.
@@ -153,7 +153,7 @@ export type GeocodeAddressOptions = {
   readonly fetchAddressGeocode?: typeof fetchCensusAddressGeocode;
 };
 
-/** Forward geocode: free-text address, city/state, or ZIP -> jurisdiction ids, or a manual-search fallback. */
+/** Forward geocode: free-text address, city/state, or ZIP -> jurisdiction ids, or a manual-search fallback.  */
 export async function geocodeAddress(options: GeocodeAddressOptions): Promise<GeocodeOutcome> {
   const { queryText, cacheKey } = normalizeAddressInput(options.address);
   if (!queryText) {
@@ -200,7 +200,7 @@ export type ReverseGeocodeOptions = {
   readonly fetchCoordinatesGeocode?: typeof fetchCensusCoordinatesGeocode;
 };
 
-/** Reverse geocode: browser-supplied lat/lng -> jurisdiction ids, or a manual-search fallback. */
+/** Reverse geocode: browser-supplied lat/lng -> jurisdiction ids, or a manual-search fallback.  */
 export async function reverseGeocodeCoordinates(options: ReverseGeocodeOptions): Promise<GeocodeOutcome> {
   const nowMs = options.now?.() ?? Date.now();
   const cacheKey = coordinateCacheKey(options.lat, options.lng);
@@ -230,7 +230,7 @@ export async function reverseGeocodeCoordinates(options: ReverseGeocodeOptions):
 const ZIP_PATTERN = /^\d{5}(-\d{4})?$/;
 
 /**
- * ZIP-to-place translate-then-discard (BB-050 acceptance criterion 6; mirrors
+ * ZIP-to-place translate-then-discard (mirrors
  * `packages/domain/src/geocode/zip-translate.ts`): the raw ZIP is sent to the geocoder as a
  * one-shot lookup query and then discarded — this function's success branch carries no `zip`
  * field, so a caller cannot thread the raw ZIP through to anything persisted just by spreading
@@ -258,8 +258,8 @@ export async function translateZipToPlace(
     return outcome;
   }
 
-  // Translate-then-discard (BB-050 acceptance criterion 6): `matchedAddress` is Census's full
-  // echoed address string, which contains the raw ZIP as trailing text — dropped here so a ZIP
+  // Translate-then-discard: `matchedAddress` is Census's full
+  // echoed address string, which contains the raw ZIP as trailing text dropped here so a ZIP
   // lookup's response carries no field the raw ZIP could be read back out of. A full-address
   // lookup (`geocodeAddress` called directly, not through this function) legitimately keeps
   // `matchedAddress` since the caller already supplied the whole address, not just a ZIP.

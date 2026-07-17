@@ -1,5 +1,5 @@
 /**
- * Tests for the graylist recall lane (BB-073 acceptance criterion 4): below-threshold
+ * Tests for the graylist recall lane: below-threshold
  * candidates are parked with a disposition, never silently dropped, and remain queryable for
  * later corroboration.
  */

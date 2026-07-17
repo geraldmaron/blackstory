@@ -1,3 +1,4 @@
+
 /**
  * Launches the TypeScript gold-corpus evaluator with tsx while preserving a plain Node
  * entry point for local and CI dry runs.

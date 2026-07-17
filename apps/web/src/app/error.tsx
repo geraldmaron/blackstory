@@ -1,5 +1,5 @@
 /**
- * Segment error boundary for public routes — uses design-system Notice.
+ * Segment error boundary for public routes uses design-system Notice.
  */
 
 'use client';

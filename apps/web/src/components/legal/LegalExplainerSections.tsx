@@ -1,5 +1,5 @@
 /**
- * Five-section plain-language explainer layout for BB-087 legal detail pages (AC6).
+ * Five-section plain-language explainer layout for legal detail pages.
  */
 import React from 'react';
 import { Card } from '@black-book/ui';

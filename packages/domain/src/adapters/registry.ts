@@ -1,6 +1,6 @@
 /**
- * In-memory source registry with register/get/list/approve policy (BB-037).
- * Firestore persistence implements SourceRegistryStore in a later bead.
+ * In-memory source registry with register/get/list/approve policy.
+ * Firestore persistence implements SourceRegistryStore in a later.
  */
 import { assertEvidenceSourceValid } from '../provenance/source.js';
 import { assertSourceAdapterContractValid } from './contract.js';

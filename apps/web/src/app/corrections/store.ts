@@ -1,7 +1,7 @@
 /**
- * In-memory correction submission store for the BB-055 web intake lane. Production wiring
+ * In-memory correction submission store for the web intake lane. Production wiring
  * persists through Firestore `submissionInbox`; this module provides the same quarantine-only
- * contract for App Hosting routes and tests. Deliberately exposes lookup-by-receipt only — no
+ * contract for App Hosting routes and tests. Deliberately exposes lookup-by-receipt only no
  * list or enumerate API exists for submitters.
  */
 import type { QuarantinedSubmissionRecord } from '@black-book/security';

@@ -1,17 +1,17 @@
+
 /**
- * Embedding pipeline orchestration (BB-071): text -> provider -> truncate/normalize -> record.
+ * Embedding pipeline orchestration: text -> provider -> truncate/normalize -> record.
  *
  * This module has no Firestore dependency — it takes an injected EmbeddingProvider and returns
  * plain data. `vector-store.ts` is the thin layer that actually writes/queries Firestore.
  *
  * Integration point (documented, not yet wired): the on-write trigger belongs in the
- * publication/projection build step in `workers/publication/` — after a canonical entity's
+ * publication/projection build step in `workers/publication/`. After a canonical entity's
  * title/summary/place/era-relevant fields change (or an entity is (re)promoted into a release),
  * that worker should call `embedEntity` with the entity's resolved location/state and pass the
- * result to `createAdminVectorIndexStore(firestore).writeEmbedding(...)`. That worker does not
- * exist yet as a concrete Cloud Run Job in this pass; wiring it in was out of scope for BB-071
- * per the bead's own "hook description is fine" allowance. The backfill CLI
- * (`backfill-cli.ts`) exercises the identical `embedEntity` codepath today.
+ * result to `createAdminVectorIndexStore(firestore).writeEmbedding(...)`. That worker is not
+ * a concrete Cloud Run Job yet. The backfill CLI (`backfill-cli.ts`) exercises the identical
+ * `embedEntity` codepath today.
  */
 import { createHash } from 'node:crypto';
 import { APPROX_TOKENS_PER_CHAR, APPROX_USD_PER_1K_TOKENS, EMBEDDING_DIMS } from './constants.js';
@@ -87,7 +87,7 @@ export async function embedEntity(
 }
 
 export type BatchEmbedOptions = EmbedEntityOptions & {
-  /** Caps how many entities are embedded in one call — a simple budget/concurrency guard. */
+  /** Caps how many entities are embedded in one call a simple budget/concurrency guard. */
   readonly maxItems?: number;
   /** Stops the batch once cumulative estimated cost would exceed this (see cost.ts). */
   readonly maxEstimatedCostUsd?: number;
@@ -101,10 +101,11 @@ export type BatchEmbedResult = {
   readonly stoppedForBudget: boolean;
 };
 
+
 /**
  * Embeds a list of entities sequentially, honoring a soft item cap and a cost budget. Sequential
  * (not concurrent) on purpose: this keeps retry/backoff behavior simple and the call pattern
- * gentle on rate limits for what is, per the bead, an infrequent bulk operation.
+ * gentle on rate limits for what is, per the, an infrequent bulk operation.
  */
 export async function embedEntitiesBatch(
   provider: EmbeddingProvider,
@@ -146,8 +147,9 @@ export async function embedEntitiesBatch(
   return { results, skipped, stoppedForBudget };
 }
 
+
 /**
- * Rough cost estimate from the bead's own anchor (~$7.50 / 100k docs of ~500 tokens). This is a
+ * Rough cost estimate from the brief anchor (~$7.50 100k docs of ~500 tokens). This is a
  * planning heuristic for backfill budgeting, not a billing-accurate calculation.
  */
 export function estimateEmbeddingCostUsd(charCount: number): number {

@@ -1,5 +1,5 @@
 /**
- * Public Black Book shell — modern Gen Z news composition.
+ * Public Black Book shell modern Gen Z news composition.
  * Tight modular rhythm, black/white primary contrast, purposeful motion.
  */
 
@@ -13,7 +13,7 @@
   flex: 1 0 auto;
 }
 
-/* ——— Masthead ——— */
+/* —— Masthead ——  */
 .bb-shell-header {
   position: sticky;
   top: 0;
@@ -225,7 +225,7 @@
   color: color-mix(in srgb, var(--bb-inverse-ink) 55%, transparent);
 }
 
-/* ——— Page chrome ——— */
+/* —— Page chrome ——  */
 .bb-page {
   padding-block: var(--bb-space-8) var(--bb-space-16);
 }
@@ -258,7 +258,7 @@
   line-height: 1.45;
 }
 
-/* Skip link — visible on keyboard focus (WCAG 2.4.1) */
+/* Skip link visible on keyboard focus (WCAG 2.4.1)  */
 .bb-skip-link {
   position: absolute;
   width: 1px;
@@ -305,7 +305,7 @@
   margin-top: var(--bb-space-2);
 }
 
-/* ——— Map-led homepage hero (Black Ink / white — theme-independent overlay) ——— */
+/* —— Map-led homepage hero (Black Ink white theme-independent overlay) ——  */
 .bb-home-map-hero {
   position: relative;
   isolation: isolate;
@@ -326,7 +326,7 @@
   border: 0;
 }
 
-/* Circular HTML entity markers (MapLibre Marker) — readable on the dark map canvas */
+/* Circular HTML entity markers (MapLibre Marker) readable on the dark map canvas  */
 .bb-map-entity-marker {
   box-sizing: border-box;
   width: 2rem;
@@ -370,7 +370,7 @@
   min-height: min(92svh, 48rem);
   padding: clamp(4rem, 12vw, 7rem) 0 clamp(2.5rem, 6vw, 4rem);
   pointer-events: none;
-  /* Left-weighted veil so circular entity markers stay visible on the right/center */
+  /* Left-weighted veil so circular entity markers stay visible on the right/center  */
   background:
     linear-gradient(
       90deg,
@@ -491,7 +491,7 @@
   color: #0a0a0a;
 }
 
-/* Legacy hero class retained for any residual fixtures — white on black */
+/* Legacy hero class retained for any residual fixtures white on black  */
 .bb-hero {
   position: relative;
   isolation: isolate;
@@ -603,7 +603,7 @@
   color: var(--bb-inverse-ink);
 }
 
-/* ——— Modular sections ——— */
+/* —— Modular sections ——  */
 .bb-section {
   padding-block: var(--bb-space-10);
   border-bottom: 1px solid var(--bb-border);
@@ -657,7 +657,7 @@
   color: var(--bb-inverse-ink);
 }
 
-/* ——— Story rail (not cards) ——— */
+/* —— Story rail (not cards) ——  */
 .bb-story-rail {
   list-style: none;
   margin: var(--bb-space-6) 0 0;
@@ -749,7 +749,7 @@
   outline-offset: var(--bb-focus-offset);
 }
 
-/* Search / entity news layout */
+/* Search entity news layout  */
 .bb-entity-layout {
   display: grid;
   gap: var(--bb-space-8);
@@ -765,6 +765,70 @@
 .bb-entity-mast {
   padding-bottom: var(--bb-space-6);
   border-bottom: 2px solid var(--bb-ink);
+}
+
+.bb-entity-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bb-space-2);
+  margin-top: var(--bb-space-4);
+}
+
+.bb-entity-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--bb-ink);
+  font-family: var(--bb-font-mono);
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--bb-ink);
+  text-decoration: none;
+  background: transparent;
+}
+
+.bb-entity-tag:hover,
+.bb-entity-tag:focus-visible {
+  background: var(--bb-ink);
+  color: var(--bb-canvas);
+  outline: 2px solid var(--bb-focus, var(--bb-copper, #b87333));
+  outline-offset: 2px;
+}
+
+.bb-entity-tag--era {
+  border-style: dashed;
+}
+
+.bb-entity-tag--note {
+  max-width: 28rem;
+  border-color: color-mix(in srgb, var(--bb-ink) 45%, transparent);
+  color: var(--bb-ink-muted);
+  cursor: default;
+}
+
+.bb-entity-photo {
+  margin: 0;
+}
+
+.bb-entity-photo__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 2px solid var(--bb-ink);
+  background: var(--bb-canvas);
+}
+
+.bb-entity-photo__credit {
+  margin: var(--bb-space-2) 0 0;
+  color: var(--bb-ink-muted);
+  font-size: 0.85rem;
+}
+
+.bb-explore-narrative-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bb-space-2);
+  margin: 0 0 var(--bb-space-3);
 }
 
 .bb-placeholder {
@@ -802,7 +866,7 @@
   height: 1.25rem;
 }
 
-/* Punchier result list for news search */
+/* Punchier result list for news search  */
 .bb-result-list {
   border-top: 2px solid var(--bb-ink);
 }

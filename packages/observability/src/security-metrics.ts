@@ -1,5 +1,6 @@
+
 /**
- * Security metric descriptors and Cloud Monitoring mapping contracts for BB-034.
+ * Security metric descriptors and Cloud Monitoring mapping contracts.
  * Metrics are designed for synthetic validation before production traffic exists.
  */
 import type { SecurityEventKind } from './security-events.js';

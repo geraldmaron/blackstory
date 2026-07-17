@@ -1,5 +1,5 @@
 /**
- * Server-side Firestore collection map and publish guards (BB-013 / BB-016 / BB-017 / BB-018 / ADR-011).
+ * Server-side Firestore collection map and publish guards.
  * Mirrors @black-book/firebase path names without requiring a runtime Firebase import
  * for static allowlists used by APIs and workers.
  */
@@ -32,7 +32,7 @@ export const FIRESTORE_COLLECTIONS = [
   'idempotencyKeys',
   'outboxConsumerReceipts',
   'killSwitches',
-  /** Jurisdiction reference data (BB-091): states + counties wholesale, cities on-demand. */
+  /** Jurisdiction reference data: states + counties wholesale, cities on-demand.  */
   'jurisdictions',
 ] as const;
 

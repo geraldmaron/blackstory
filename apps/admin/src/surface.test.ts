@@ -1,5 +1,5 @@
 /**
- * Admin surface separation acceptance tests (BB-021).
+ * Admin surface separation acceptance tests.
  */
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';

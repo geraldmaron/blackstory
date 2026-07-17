@@ -1,5 +1,5 @@
 /**
- * Acceptance tests for BB-032 promotion stages, evidence controls, approvals, and previews.
+ * Acceptance tests for promotion stages, evidence controls, approvals, and previews.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

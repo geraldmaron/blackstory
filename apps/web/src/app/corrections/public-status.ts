@@ -1,5 +1,5 @@
 /**
- * Maps internal BB-029 moderation states to public-safe status surfaces for BB-055. Never
+ * Maps internal moderation states to public-safe status surfaces. Never
  * exposes spam scores, campaign detection, duplicate lists, or other moderation-sensitive data.
  */
 import type { SubmissionModerationState } from '@black-book/security';

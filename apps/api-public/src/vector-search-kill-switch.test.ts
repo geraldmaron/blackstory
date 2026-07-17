@@ -1,5 +1,5 @@
 /**
- * Tests for the BB-035 kill-switch wiring on semantic search (BB-071).
+ * Tests for the kill-switch wiring on semantic search.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

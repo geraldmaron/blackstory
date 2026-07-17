@@ -1,6 +1,6 @@
 /**
- * Fetches and normalizes a single curated RSS/Atom feed through the BB-030 safe-HTTP port
- * (BB-073). Never calls `fetch` directly — see ../internet-archive/shared/http-port.ts for why.
+ * Fetches and normalizes a single curated RSS/Atom feed through the safe-HTTP port
+ * Never calls `fetch` directly see ../internet-archive/shared/http-port.ts for why.
  */
 import {
   assertAllowedContentType,

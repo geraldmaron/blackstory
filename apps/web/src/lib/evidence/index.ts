@@ -1,5 +1,5 @@
 /**
- * Barrel for the BB-053 evidence view-model layer. Consumed by
+ * Barrel for the evidence view-model layer. Consumed by
  * `apps/web/src/components/evidence/**` and available for the parent entity page mount.
  */
 export * from './types.js';

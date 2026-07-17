@@ -1,6 +1,7 @@
+
 /**
  * Defines submission-quarantine schemas, validation, normalization, spam scoring,
- * campaign detection, privacy metadata, and immutable audit records for BB-029.
+ * campaign detection, privacy metadata, and immutable audit records.
  */
 import { createHash, randomUUID } from 'node:crypto';
 

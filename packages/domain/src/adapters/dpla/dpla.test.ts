@@ -1,5 +1,5 @@
 /**
- * Tests for the DPLA v2 community discovery adapter (BB-073). Fixture-driven; every HTTP call
+ * Tests for the DPLA v2 community discovery adapter. Fixture-driven; every HTTP call
  * goes through a mock SafeHttpClient injected by the test, never a real fetch or a real key.
  * Exercises both DPLA's current response shape and a plausible post-transition (Cleveland
  * Public Library) shape to prove the defensive parser tolerates the coming endpoint churn.
@@ -103,7 +103,7 @@ test('parses the current DPLA v2 response shape (array/object title, date object
   assert.deepEqual(batch.docs[0]?.subjects, ['Schools', 'Piedmont County']);
   assert.equal(batch.docs[0]?.providerName, 'State Digital Library');
   assert.equal(batch.docs[1]?.title, 'Rosewood Baptist Church cornerstone dedication program, 1949');
-  // doc[1] has neither `provider` nor `dataProvider` in the fixture — providerName stays absent.
+  // doc[1] has neither `provider` nor `dataProvider` in the fixture providerName stays absent.
   assert.equal(batch.docs[1]?.providerName, undefined);
 });
 

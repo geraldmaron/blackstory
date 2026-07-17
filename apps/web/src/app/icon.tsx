@@ -1,7 +1,7 @@
 /**
- * Browser tab / bookmark icon, generated at request time from the same
+ * Browser tab bookmark icon, generated at request time from the same
  * mark geometry that drives <BlackBookLogo variant="mark" />
- * (packages/ui/src/brand/BlackBookLogo.tsx) — one source of truth, no
+ * (packages/ui/src/brand/BlackBookLogo.tsx) one source of truth, no
  * static asset to keep in sync by hand.
  */
 import { ImageResponse } from 'next/og';

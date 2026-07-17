@@ -1,6 +1,6 @@
 /**
- * Builds display-ready history graph nodes and edges from BB-092 release artifacts (BB-093).
- * Consumes pre-derived `DecadeGraphView` / `AllTimeGraphView` docs — no request-time traversal.
+ * Builds display-ready history graph nodes and edges from release artifacts.
+ * Consumes pre-derived `DecadeGraphView` `AllTimeGraphView` docs no request-time traversal.
  */
 import type { EntityRelationship, GraphReleaseArtifact } from '@black-book/domain';
 import { seedFactsForEntity } from '../../data/facts-seed';

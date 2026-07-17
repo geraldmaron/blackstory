@@ -1,5 +1,6 @@
+
 /**
- * Extended HTML fixture audit tests (BB-057 heading order and nav naming).
+ * Extended HTML fixture audit tests.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

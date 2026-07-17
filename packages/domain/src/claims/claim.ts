@@ -1,5 +1,5 @@
 /**
- * Atomic claims, versions, temporal/geographic context, and procedural status (BB-017).
+ * Atomic claims, versions, temporal/geographic context, and procedural status.
  */
 import type { ClaimClass } from '@black-book/schemas';
 import { isRecognizedVocabulary, loadProductConstitution } from '@black-book/schemas';
@@ -35,11 +35,11 @@ export type ClaimVersion = {
   readonly entityId: string;
   /** Atomic predicate (one independently supportable assertion). */
   readonly predicate: string;
-  /** Primary asserted value / object for this version. */
+  /** Primary asserted value object for this version. */
   readonly object: string;
   readonly temporal?: TemporalContext;
   readonly geographic?: ClaimGeographicContext;
-  /** Legal / procedural vocabulary token from the constitution. */
+  /** Legal procedural vocabulary token from the constitution. */
   readonly proceduralStatus: string;
   readonly claimClass: ClaimClass;
   readonly workflowStatus: ClaimWorkflowStatus;
@@ -71,7 +71,7 @@ export type AtomicClaim = {
   readonly connectionStrength?: ConnectionStrengthMeasurement;
   readonly researchCoverage?: ResearchCoverage;
   /**
-   * Credible alternate / contradicting values preserved alongside the primary object
+   * Credible alternate contradicting values preserved alongside the primary object
    * (never silently collapsed).
    */
   readonly preservedValues: readonly PreservedClaimValue[];

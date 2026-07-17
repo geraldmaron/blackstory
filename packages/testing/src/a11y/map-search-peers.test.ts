@@ -1,6 +1,7 @@
+
 /**
- * BB-057 acceptance criterion 2: search and map must expose accessible list peers.
- * Asserts peer modules exist and document the no-JS / screen-reader path without
+ * Search and map must expose accessible list peers.
+ * Asserts peer modules exist and document the no-JS screen-reader path without
  * importing apps/web (path ownership stays in the web app).
  */
 import assert from 'node:assert/strict';

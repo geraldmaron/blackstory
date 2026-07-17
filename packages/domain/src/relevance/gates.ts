@@ -1,5 +1,5 @@
 /**
- * Sequential relevance gates applied before threshold decisions (BB-040).
+ * Sequential relevance gates applied before threshold decisions.
  */
 import type { ProductConstitution } from '@black-book/schemas';
 import { loadProductConstitution } from '@black-book/schemas';
@@ -212,19 +212,17 @@ export function hasIncludeEvidence(
 }
 
 /**
- * BB-073 source-tier trust wiring (additive — does not change the gate wiring above).
+ * Source-tier trust wiring (additive — does not change the gate wiring above).
  *
- * The constitution's `community_oral`/`self_published`/`news_reportage` classifications
- * (packages/schemas/constitution/policy.v1.json `sourceClassifications`) already carry low
- * authority weights in the composite score (../relevance/dimensions.ts
- * `SOURCE_AUTHORITY_VALUES`, paired with ../claims/confidence.ts `CLASSIFICATION_AUTHORITY` for
- * BB-043) — that weighting is pre-existing and out of this bead's file ownership. What was
- * missing was an explicit, nameable guarantee that BB-073's community adapters (RSS, Internet
- * Archive, DPLA v2) can name and test directly: a candidate whose ONLY discovery signal is weak
- * and whose source is one of these low-authority tiers must never independently reach
- * `include`, mirroring `isWeakOnlySignal`/`hasCorroboratingContext` above but keyed on source
- * tier so callers (this repo's own tests, and any future publish-time check) don't have to
- * re-derive the rule.
+ * The constitution's `community_oral` / `self_published` / `news_reportage` classifications
+ * (`packages/schemas/constitution/policy.v1.json` `sourceClassifications`) already carry low
+ * authority weights in the composite score (`../relevance/dimensions.ts`
+ * `SOURCE_AUTHORITY_VALUES`, paired with `../claims/confidence.ts` `CLASSIFICATION_AUTHORITY`).
+ * What this module adds is an explicit, nameable guarantee that community adapters (RSS,
+ * Internet Archive, DPLA v2) can name and test directly: a candidate whose only discovery
+ * signal is weak and whose source is one of these low-authority tiers must never independently
+ * reach `include`, mirroring `isWeakOnlySignal` / `hasCorroboratingContext` above but keyed on
+ * source tier so callers don't have to re-derive the rule.
  */
 export const LOW_AUTHORITY_SOURCE_TIERS = ['community_oral', 'self_published', 'news_reportage'] as const;
 
@@ -239,7 +237,7 @@ export function isLowAuthoritySourceTier(classification: string | undefined): bo
  * uncorroborated, low-authority-tier candidate somehow resolved to `include`, this downgrades
  * it to `supporting_context` rather than letting it publish independently. Callers apply this
  * the same way a confidence-side caller applies
- * `enforceCrowdsourcedCannotPublishAlone` (../confidence-engine/engine.ts) — it does not alter
+ * `enforceCrowdsourcedCannotPublishAlone` (../confidence-engine/engine.ts) it does not alter
  * `runRelevanceGates`'s existing gate array or `evaluateCandidateRelevance`'s own logic.
  */
 export function enforceLowAuthorityTierCannotIncludeIndependently(

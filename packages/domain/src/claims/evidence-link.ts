@@ -1,5 +1,5 @@
 /**
- * Claim-to-evidence relationships with supporting, contradicting, and contextual roles (BB-017).
+ * Claim-to-evidence relationships with supporting, contradicting, and contextual roles.
  */
 import { assertUnitInterval } from './measurements.js';
 
@@ -13,11 +13,11 @@ export type ClaimEvidenceLink = {
   readonly evidenceId: string;
   readonly role: ClaimEvidenceRole;
   /**
-   * Lineage root for syndication counting. Prefer evidence.lineageRootId from BB-016;
+   * Lineage root for syndication counting. Prefer evidence.lineageRootId from;
    * required here so confidence can dedupe without a join.
    */
   readonly lineageRootId: string;
-  /** Whether this link is treated as credible for confidence / contradiction preservation. */
+  /** Whether this link is treated as credible for confidence contradiction preservation. */
   readonly credible: boolean;
   readonly sourceClassification: string;
   /** Directness of the evidence to the assertion (0–1). */

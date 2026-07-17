@@ -1,5 +1,5 @@
 /**
- * Builds BB-037 adapter contracts for federal archive source families (BB-046).
+ * Builds adapter contracts for federal archive source families.
  */
 import type { RightsPolicy } from '../../../provenance/rights.js';
 import type { EvidenceSource } from '../../../provenance/source.js';

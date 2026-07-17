@@ -1,6 +1,6 @@
 /**
  * Internal publication, promotion, and control API (not internet-facing).
- * Service-identity-only auth posture (BB-021).
+ * Service-identity-only auth posture.
  */
 import { buildSurfaceHealth, parseNodeEnv } from '@black-book/config';
 import { SURFACE_ID } from './posture.js';

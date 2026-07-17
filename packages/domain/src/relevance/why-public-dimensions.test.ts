@@ -1,6 +1,6 @@
 /**
- * Tests for the BB-054 story-dimension taxonomy and the result-set-level violence-only-collapse
- * guard (BB-054 acceptance criterion 3).
+ * Tests for the story-dimension taxonomy and the result-set-level violence-only-collapse
+ * guard.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

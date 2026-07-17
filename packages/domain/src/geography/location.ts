@@ -1,13 +1,13 @@
 /**
- * Geography domain types for places, geometries, jurisdictions, and ZIP policy (BB-014).
- * Historical and current locations coexist; ZIP is modern input only — never a historical boundary.
+ * Geography domain types for places, geometries, jurisdictions, and ZIP policy.
+ * Historical and current locations coexist; ZIP is modern input only never a historical boundary.
  */
 import type { LocationId } from '../ids.js';
 import type { GeoPointFields } from './geohash.js';
 import type { PublicPrecisionLevel } from './precision.js';
 import type { GeoPrecisionTier, PrecisionBasis } from './precision.js';
 
-/** Firestore-friendly geometry shapes (no PostGIS / WKT required). */
+/** Firestore-friendly geometry shapes (no PostGIS WKT required). */
 export type GeoGeometry =
   | { readonly type: 'Point'; readonly coordinates: readonly [lng: number, lat: number] }
   | {
@@ -48,7 +48,7 @@ export type GeographicMatch = {
 };
 
 /**
- * ZIP / postal code is modern geography for input and lookup only.
+ * ZIP postal code is modern geography for input and lookup only.
  * It must never be treated as a permanent historical boundary.
  */
 export type ZipCodeRole = 'modern_input' | 'modern_lookup';
@@ -92,8 +92,8 @@ export type EntityLocation = {
   readonly point?: GeoPointFields;
   readonly precision: PublicPrecisionLevel;
   /**
-   * BB-091 geoPrecision anchor tier (exact-site|block|locality|county|state) and the basis it
-   * was resolved at — a DIFFERENT vocabulary from `precision` above (constitution public-output
+   * geoPrecision anchor tier (exact-site|block|locality|county|state) and the basis it
+   * was resolved at a DIFFERENT vocabulary from `precision` above (constitution public-output
    * scale); see `geography/precision.ts`'s module doc for why the two must not be conflated.
    * Both optional/additive: existing rows without them are unaffected.
    */
@@ -103,7 +103,7 @@ export type EntityLocation = {
   readonly validFrom?: string;
   readonly validTo?: string | null;
   readonly jurisdictionIds?: readonly string[];
-  /** Modern ZIP input only — never a substitute for historical boundaries. */
+  /** Modern ZIP input only never a substitute for historical boundaries. */
   readonly modernZip?: ZipCodeInput;
   readonly label?: string;
   readonly evidenceIds?: readonly string[];

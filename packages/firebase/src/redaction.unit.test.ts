@@ -1,7 +1,8 @@
+
 /**
  * Verifies the public entity projection converter routes writes through the central
  * redaction assertion (@black-book/security) so no prohibited precision or residential
- * address can be persisted to a public projection (BB-015).
+ * address can be persisted to a public projection.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

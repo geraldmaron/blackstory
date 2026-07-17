@@ -1,11 +1,12 @@
+
 /**
- * Security telemetry event vocabulary and typed envelopes for BB-034.
+ * Security telemetry event vocabulary and typed envelopes.
  * Producers emit domain-specific signals; adapters normalize them into this contract
  * before metrics, logs, and anomaly evaluation.
  */
 export const SECURITY_TELEMETRY_VERSION = '1.0.0' as const;
 
-/** Canonical security signal kinds aligned with BB-034 dashboard and alert coverage. */
+/** Canonical security signal kinds aligned with dashboard and alert coverage. */
 export const securityEventKinds = [
   'armor.deny',
   'armor.throttle',
@@ -56,11 +57,11 @@ export type SecurityTelemetryEvent = {
   readonly occurredAt: string;
   readonly context: SecurityEventContext;
   readonly dimensions: SecurityEventDimensions;
-  /** Optional detail payload — always passed through the security redactor before emit. */
+  /** Optional detail payload always passed through the security redactor before emit. */
   readonly metadata?: Readonly<Record<string, unknown>> | undefined;
 };
 
-/** Maps audit and security actions to telemetry kinds for BB-018 integration. */
+/** Maps audit and security actions to telemetry kinds for integration. */
 export const AUDIT_ACTION_TO_SECURITY_KIND: Readonly<
   Partial<Record<string, SecurityEventKind>>
 > = {
@@ -73,7 +74,7 @@ export const AUDIT_ACTION_TO_SECURITY_KIND: Readonly<
   'retraction.reversed': 'retraction.activity',
 };
 
-/** Events that require immediate notification per BB-034 acceptance. */
+/** Events that require immediate notification per acceptance. */
 export const IMMEDIATE_NOTIFICATION_KINDS = new Set<SecurityEventKind>([
   'administrator.role_changed',
   'publication.activity',

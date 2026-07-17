@@ -1,5 +1,5 @@
 /**
- * Tests for BB-049 AC4: each result explains WHY it matched, in a short factual sentence — never a
+ * Tests for each result explains WHY it matched, in a short factual sentence never a
  * numeric score, never a redacted field.
  */
 import assert from 'node:assert/strict';

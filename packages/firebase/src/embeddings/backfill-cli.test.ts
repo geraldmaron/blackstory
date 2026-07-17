@@ -1,5 +1,6 @@
+
 /**
- * Tests for the budget-aware backfill runner (BB-071), fully in-memory — no Firestore, no
+ * Tests for the budget-aware backfill runner, fully in-memory no Firestore, no
  * network access. Exercises: pagination, skip-unchanged-hash, --force, item cap, cost budget.
  */
 import assert from 'node:assert/strict';
@@ -42,7 +43,7 @@ test('runBackfill embeds every entity and writes to the store', async () => {
   assert.equal(summary.skippedUnchanged, 0);
   assert.deepEqual(summary.skippedErrors, []);
 
-  // Presence check only — ranking correctness against real KNN semantics is covered in
+  // Presence check only ranking correctness against real KNN semantics is covered in
   // vector-store.test.ts. A zero query vector still respects length-matching, just not order.
   const zeroQuery = new Array(768).fill(0);
   const matches = await store.findNearest({ queryVector: zeroQuery, limit: 10 });

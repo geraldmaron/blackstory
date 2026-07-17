@@ -36,7 +36,7 @@ function readJsonFile(path: string): unknown {
   return JSON.parse(readFileSync(path, 'utf8')) as unknown;
 }
 
-/** Load and validate the active product constitution (cached, read-only). */
+/** Load and validate the active product constitution (cached, read-only).  */
 export function loadProductConstitution(): ProductConstitution {
   if (cachedPolicy) {
     return cachedPolicy;
@@ -46,18 +46,18 @@ export function loadProductConstitution(): ProductConstitution {
   return cachedPolicy;
 }
 
-/** Return the policy version string from the loaded constitution. */
+/** Return the policy version string from the loaded constitution.  */
 export function getPolicyVersion(policy: ProductConstitution = loadProductConstitution()): string {
   return policy.policyVersion;
 }
 
-/** Load a named constitution fixture used by evaluation tests. */
+/** Load a named constitution fixture used by evaluation tests.  */
 export function loadConstitutionFixture(kind: FixtureKind): ConstitutionFixture {
   const fileName = FIXTURE_FILES[kind];
   return constitutionFixtureSchema.parse(readJsonFile(join(FIXTURES_DIR, fileName)));
 }
 
-/** Load all constitution fixtures (included, excluded, disputed, sparse, sensitive, living-person). */
+/** Load all constitution fixtures (included, excluded, disputed, sparse, sensitive, living-person).  */
 export function loadAllConstitutionFixtures(): Record<FixtureKind, ConstitutionFixture> {
   return {
     included: loadConstitutionFixture('included'),
@@ -69,7 +69,7 @@ export function loadAllConstitutionFixtures(): Record<FixtureKind, ConstitutionF
   };
 }
 
-/** Test helper: clear the in-memory policy cache. */
+/** Test helper: clear the in-memory policy cache.  */
 export function resetProductConstitutionCache(): void {
   cachedPolicy = undefined;
 }

@@ -1,10 +1,10 @@
 /**
- * Federal adapter kill-switch identifiers (BB-046 / BB-035 naming).
+ * Federal adapter kill-switch identifiers.
  * Stable logical ids use the `adapter:<adapterId>` prefix even when the ops
  * kill-switch package is not yet merged.
  */
 
-/** BB-035 logical kill-switch prefix for source adapters. */
+/** logical kill-switch prefix for source adapters. */
 export const FEDERAL_ADAPTER_KILL_SWITCH_PREFIX = 'adapter:' as const;
 
 export function federalAdapterKillSwitchId(adapterId: string): string {

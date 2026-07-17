@@ -1,5 +1,5 @@
 /**
- * Human-readable match explanations (BB-049 AC4: results indicate WHY each item matches the query).
+ * Human-readable match explanations.
  *
  * Explanations are short, factual sentences built only from display-safe text (the matched name,
  * alias, topic, or "summary"). They NEVER contain a numeric score, an evidence/connection count,

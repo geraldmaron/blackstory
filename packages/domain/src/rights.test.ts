@@ -1,5 +1,5 @@
 /**
- * Domain tests for the BB-077 UGC compliance and living-person ethics layer: per-source
+ * Domain tests for the UGC compliance and living-person ethics layer: per-source
  * obligations registry, evidence-pointer doctrine, deletion-sync framework, living-person
  * UGC guards, and takedown routing.
  */
@@ -29,7 +29,7 @@ import {
 
 const SEED_AT = '2026-07-17T00:00:00.000Z';
 
-// --- Per-source obligations registry (fail-closed, BB-037 pattern) -------------------------
+// --- Per-source obligations registry (fail-closed, pattern) -------------------------
 
 test('obligations registry rejects lookups for an unregistered source (fail-closed)', () => {
   const store = createInMemoryObligationsRegistry();

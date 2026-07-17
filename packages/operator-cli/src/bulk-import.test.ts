@@ -1,3 +1,4 @@
+
 /**
  * Verifies CSV/markdown bulk-import parsing and the per-row batch runner.
  */
@@ -103,10 +104,10 @@ test('a bad row in a batch is rejected individually without blocking the rest of
 });
 
 // ---------------------------------------------------------------------------
-// BB-094: prepareCorpusBulkImportBatch — the exclusive vetted-corpus bulk-intake execution
-// surface (acceptance criterion 2). Domain-layer evaluation logic (evaluateCorpusBulkPromotion,
+// prepareCorpusBulkImportBatch — the exclusive vetted-corpus bulk-intake execution
+// surface. Domain-layer evaluation logic (evaluateCorpusBulkPromotion,
 // the guardrail, budget/gate assertions) is already exhaustively covered by
-// packages/domain/src/corpus-vetting.test.ts and promotion/corpus-promotion.test.ts — these tests
+// packages/domain/src/corpus-vetting.test.ts and promotion/corpus-promotion.test.ts these tests
 // exercise only the INTEGRATION surface: gating, idempotency, and routing through real intake.
 // ---------------------------------------------------------------------------
 
@@ -222,8 +223,8 @@ test('prepareCorpusBulkImportBatch: a single-candidate batch is guaranteed spot-
   assert.equal(only?.row.decision.spotCheckSelected, true, 'a 1-record batch always selects its only record');
   assert.equal(only?.row.decision.lane, 'standard_consensus');
   assert.ok(only?.row.decision.reasons.includes('spot_check_not_yet_sampled'));
-  // Demoted to standard_consensus, but NOT dropped — it still runs through real quarantine intake,
-  // exactly like every fast-tracked record (BB-094: no record ever silently publishes OR silently
+  // Demoted to standard_consensus, but NOT dropped it still runs through real quarantine intake,
+  // exactly like every fast-tracked record (: no record ever silently publishes OR silently
   // disappears just for needing a human spot-check).
   assert.equal(only?.row.outcome, 'accepted');
   assert.ok(only?.intakeOutcome?.accepted);
@@ -297,15 +298,15 @@ test('prepareCorpusBulkImportBatch: an already-imported sourceRecordId is skippe
   assert.equal(result.report.counts.skippedDuplicate, 1);
   assert.equal(result.report.counts.total, 2);
   // Idempotency also means the guaranteed-at-least-1 spot-check sample draws only from the
-  // non-duplicate candidates — the duplicate is never itself spot-check-selected.
+  // non-duplicate candidates the duplicate is never itself spot-check-selected.
   assert.equal(duplicateRow?.row.decision.spotCheckSelected, false);
 });
 
 test('prepareCorpusBulkImportBatch: a citation missing a required field demotes to standard_consensus, independently of (and stricter than) real intake\'s own basic URL check', () => {
   const { registryStore, vettingStore } = vettedFixture();
-  // A URL is present (satisfies BB-029's real quarantine intake, which only requires a valid
+  // A URL is present (satisfies real quarantine intake, which only requires a valid
   // HTTPS source URL) but `sourceName` is blank, which fails the stricter, corpus-vetting-layer
-  // `isCitationStructurallyComplete` check — proving the two gates are independent and neither
+  // `isCitationStructurallyComplete` check proving the two gates are independent and neither
   // silently bypasses the other.
   const result = prepareCorpusBulkImportBatch({
     corpusId: 'nrhp',
@@ -332,7 +333,7 @@ test('prepareCorpusBulkImportBatch: a citation missing a required field demotes 
   const [only] = result.rows;
   assert.equal(only?.row.decision.lane, 'standard_consensus');
   assert.ok(only?.row.decision.reasons.includes('no_structurally_complete_citation'));
-  // Real BB-029 intake only requires a valid source URL (present here) — it still accepts the
+  // Real intake only requires a valid source URL (present here) it still accepts the
   // submission into quarantine even though the corpus-vetting layer demoted it. The record is
   // never silently dropped just for missing the stricter, corpus-specific completeness bar.
   assert.equal(only?.row.outcome, 'accepted');

@@ -1,5 +1,5 @@
 /**
- * Public relevance projection — hides numeric scores (BB-040).
+ * Public relevance projection hides numeric scores.
  */
 import type { PublicRelevanceExplanation, RelevanceAssessment } from './types.js';
 import { assertExplanationHasNoNumericScore } from './why.js';

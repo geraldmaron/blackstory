@@ -1,6 +1,6 @@
 /**
- * Curated high-confidence seed records for BB-058 national seed campaigns. Every entry is a
- * free, publicly documented entity with at least one structurally complete citation — no invented
+ * Curated high-confidence seed records for national seed campaigns. Every entry is a
+ * free, publicly documented entity with at least one structurally complete citation no invented
  * biographies or bulk U.S. school inventory.
  */
 import type { SeedRecord } from './types.js';

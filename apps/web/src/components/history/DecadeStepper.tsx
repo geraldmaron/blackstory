@@ -1,6 +1,6 @@
 /**
- * Decade stepper for BB-093 `/history` — keyboard-accessible tablist switching between all-time
- * and per-decade graph slices derived from BB-092 published decade artifacts.
+ * Decade stepper for `/history` keyboard-accessible tablist switching between all-time
+ * and per-decade graph slices derived from published decade artifacts.
  */
 import React from 'react';
 import { cx } from '@black-book/ui';

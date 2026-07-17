@@ -2,7 +2,7 @@
  * Shared type and initial value for the quick-add form's client/server boundary.
  *
  * Deliberately NOT inside `actions.ts`: a `'use server'` file may only export async
- * functions — a plain constant or type export there silently breaks on the client bundle.
+ * functions a plain constant or type export there silently breaks on the client bundle.
  */
 import type { ResearchIntakeOutcome } from '@black-book/operator-cli';
 

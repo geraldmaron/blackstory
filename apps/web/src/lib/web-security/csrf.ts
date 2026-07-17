@@ -1,5 +1,5 @@
 /**
- * CSRF protection helpers for state-changing forms (BB-028).
+ * CSRF protection helpers for state-changing forms.
  * Double-submit cookie pattern; corrections and future POST routes can import these.
  */
 
@@ -9,12 +9,12 @@ import { csrfCookieDefaults, serializeSetCookie } from './cookies';
 
 export { CSRF_COOKIE_NAME, CSRF_FORM_FIELD, CSRF_HEADER_NAME };
 
-/** Generate a cryptographically random CSRF token (hex). */
+/** Generate a cryptographically random CSRF token (hex).  */
 export function generateCsrfToken(byteLength = 32): string {
   return randomBytes(byteLength).toString('hex');
 }
 
-/** Build Set-Cookie header value for the CSRF double-submit cookie. */
+/** Build Set-Cookie header value for the CSRF double-submit cookie.  */
 export function buildCsrfSetCookieHeader(token: string): string {
   return serializeSetCookie(CSRF_COOKIE_NAME, token, csrfCookieDefaults());
 }

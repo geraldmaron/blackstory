@@ -1,5 +1,5 @@
 /**
- * Presentation-only string helpers for BB-087 legal landscape components.
+ * Presentation-only string helpers for legal landscape components.
  */
 import { LAW_STATUSES, type LawStatus } from '@black-book/domain';
 import { LEGAL_KIND_LABELS, LEGAL_TOPIC_LABELS } from './copy';

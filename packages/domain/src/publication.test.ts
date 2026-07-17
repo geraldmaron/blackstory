@@ -1,5 +1,5 @@
 /**
- * Unit tests for BB-019 immutable releases, signed manifests, snapshot layout,
+ * Unit tests for immutable releases, signed manifests, snapshot layout,
  * lifecycle transitions, and public-read guards.
  */
 import assert from 'node:assert/strict';

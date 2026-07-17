@@ -1,5 +1,5 @@
 /**
- * Tests for BB-087 legal change monitoring — proposes review_queue events from adapter diffs.
+ * Tests for legal change monitoring proposes review_queue events from adapter diffs.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,10 +1,10 @@
 /**
- * Address-text normalization (BB-050 deliverable "address normalization"). Purely textual —
+ * Address-text normalization. Purely textual 
  * collapses whitespace, trims stray punctuation, and upper-cases a small set of common street
  * abbreviations so visually-equivalent inputs ("123 Main St." vs "123 main street") produce the
  * same Census Geocoder query and the same geocode-cache key. This is intentionally a different,
- * address-shaped normalizer from `@black-book/security`'s `normalizeSearchText` (BB-026's free-
- * text search normalizer) — `@black-book/domain` cannot depend on `@black-book/security` at
+ * address-shaped normalizer from `@black-book/security`'s `normalizeSearchText` (free-
+ * text search normalizer) `@black-book/domain` cannot depend on `@black-book/security` at
  * runtime (see `./jurisdiction-ids.ts`'s module doc for the same circular-dependency rule), and
  * address normalization has different goals (preserve number/street-suffix structure for the
  * geocoder) than search-query normalization (fold for fuzzy matching).
@@ -39,7 +39,7 @@ export function normalizeAddressText(raw: string): string {
 /**
  * Expands common street-suffix abbreviations for the OUTGOING Census query (the geocoder
  * tolerates both forms, but a single canonical form maximizes cache-hit consistency). Word
- * boundaries only — never touches letters inside a longer word.
+ * boundaries only never touches letters inside a longer word.
  */
 export function expandCommonAbbreviations(text: string): string {
   return text.replace(/\b[A-Za-z]+\.?/g, (word) => {
@@ -52,7 +52,7 @@ export function expandCommonAbbreviations(text: string): string {
 export type NormalizedAddressInput = {
   /** Text to send to the Census Geocoder. */
   readonly queryText: string;
-  /** Case-folded, whitespace-collapsed key for the geocode cache — never logged verbatim. */
+  /** Case-folded, whitespace-collapsed key for the geocode cache never logged verbatim. */
   readonly cacheKey: string;
 };
 

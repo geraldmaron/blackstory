@@ -1,5 +1,5 @@
 /**
- * Congress.gov API v3 adapter definition for BB-087 federal statute monitoring (fixtures-only in tests).
+ * Congress.gov API v3 adapter definition for federal statute monitoring (fixtures-only in tests).
  */
 import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from '../../candidates.js';
 import type { SourceAdapterContract } from '../../types.js';

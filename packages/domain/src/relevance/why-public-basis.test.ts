@@ -1,5 +1,5 @@
 /**
- * Tests for the BB-054 / BB-090 public notabilityBasis renderer (BB-054 acceptance criterion 5).
+ * Tests for the public notabilityBasis renderer.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

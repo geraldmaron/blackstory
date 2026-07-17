@@ -1,3 +1,4 @@
+
 /**
  * Quarantine registry validation: owner + deadline required; expired entries fail.
  */

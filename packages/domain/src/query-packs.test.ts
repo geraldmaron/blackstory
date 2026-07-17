@@ -1,5 +1,5 @@
 /**
- * Domain tests for versioned historical query packs (BB-038).
+ * Domain tests for versioned historical query packs.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

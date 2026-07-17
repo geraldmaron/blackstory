@@ -1,7 +1,7 @@
 /**
- * SSR markup smoke test for DegradedModeNotice (BB-048/BB-022): confirms the
+ * SSR markup smoke test for DegradedModeNotice: confirms the
  * `PUBLIC_READ_API_DISABLED` env flag actually drives visible shell markup,
- * closing the gap where `isPublicReadApiDisabled()` had no caller anywhere in apps/web.
+ * closing the gap where `isPublicReadApiDisabled` had no caller anywhere in apps/web.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';

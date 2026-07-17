@@ -1,3 +1,4 @@
+
 /**
  * Provides deterministic clocks, sequences, and output capture for unit tests.
  */
@@ -21,6 +22,7 @@ export function fixedClock(instant: string | Date): () => Date {
   }
   return () => new Date(timestamp);
 }
+
 
 /**
  * Advances by a fixed step on each call, starting at `instant`.

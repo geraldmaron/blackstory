@@ -1,5 +1,6 @@
+
 /**
- * Tests for endpoint rate limits and abuse quotas (BB-025).
+ * Tests for endpoint rate limits and abuse quotas.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

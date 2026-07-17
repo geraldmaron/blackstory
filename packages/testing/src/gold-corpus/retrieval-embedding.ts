@@ -1,15 +1,16 @@
+
 /**
  * Minimal, dependency-free embedding math + a deterministic mock provider for the retrieval
- * eval in retrieval-eval.ts (BB-071).
+ * eval in retrieval-eval.ts.
  *
  * This is deliberately NOT imported from @black-book/firebase's real embedding pipeline:
  * docs/research/gold-corpus.md states the gold-corpus harness is local-only under ADR-011
  * ("evaluation does not read or write Firestore and neither CLI applies cloud changes"), and
- * @black-book/firebase pulls in firebase-admin + @google/genai — infra this package's harness
+ * @black-book/firebase pulls in firebase-admin + @google/genai infra this package's harness
  * is intentionally decoupled from. The interface below (`EvalEmbeddingProvider`) is shaped so a
  * caller *outside* this package can still plug in the real
  * `@black-book/firebase`'s `createGeminiEmbeddingProvider` (same `embed(texts)` signature) to
- * get a real recall number — see ADR-014 for exactly what that requires (a live
+ * get a real recall number see ADR-014 for exactly what that requires (a live
  * `GEMINI_API_KEY`).
  */
 
@@ -38,12 +39,13 @@ function makeSeededRandom(seed: number): () => number {
   };
 }
 
+
 /**
- * Deterministic, hash-seeded pseudo-random embedding — same algorithm shape as
+ * Deterministic, hash-seeded pseudo-random embedding same algorithm shape as
  * @black-book/firebase's createDeterministicMockEmbeddingProvider, reimplemented locally per
  * this file's no-new-dependency rationale above. NOT semantically meaningful: it is a stable
  * stand-in that exercises the eval's ranking/metric plumbing without network access or an API
- * key. A real recall@k number requires swapping in a real provider — see ADR-014.
+ * key. A real recall@k number requires swapping in a real provider see ADR-014.
  */
 export function createDeterministicMockEvalProvider(dims = 128): EvalEmbeddingProvider {
   return {

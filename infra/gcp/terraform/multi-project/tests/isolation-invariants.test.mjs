@@ -1,11 +1,11 @@
 /**
- * Asserts infra/gcp/isolation-matrix.json encodes the ADR-012 (BB-078) cross-project
+ * Asserts infra/gcp/isolation-matrix.json encodes the ADR-012 cross-project
  * invariants: the productionResplitTarget topology, the exact one-way crossProjectGrants
  * list (internal -> prod only, never the reverse), the two new cross-project service account
  * identities, and the AC-ISO-1..5 restatement for the three-project target. This does not
  * replace docs/security/environment-isolation.md's prose invariants or the JSON Schema check
  * documented in infra/gcp/README.md - it is an additional, narrower assertion focused on the
- * BB-078 delta so a future edit cannot silently drop the asymmetry the ADR depends on.
+ * ADR-012 migration delta so a future edit cannot silently drop the asymmetry the ADR depends on.
  */
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -38,9 +38,9 @@ test('productionResplitTarget names the ADR-012 three-project topology', () => {
 });
 
 test('mode/currentProject stay accurate to the live single-project state', () => {
-  // BB-078 must not overclaim the migration as applied - the live reality is unchanged
-  // until BB-079 runs. See docs/security/environment-isolation.md's "Verified live vs.
-  // designed" table for the same distinction in prose.
+  // The matrix must not overclaim the migration as applied — the live reality is unchanged
+  // until the follow-up migration is applied. See docs/security/environment-isolation.md's
+  // "Verified live vs. designed" table for the same distinction in prose.
   assert.equal(matrix.mode, 'single-project');
   assert.equal(matrix.currentProject.projectId, PROD_PROJECT_ID);
   assert.equal(matrix.currentProject.live, true);
@@ -114,7 +114,7 @@ test('adrRefs includes ADR-012', () => {
 });
 
 test('the four ADR-012-relocated service accounts and private-evidence resolve to blackbook-internal, not blackbook-prod', () => {
-  // black-book-2ve (BB-078 course-correction): infra/gcp/terraform/locals.tf and buckets.tf no
+  // Course correction: infra/gcp/terraform/locals.tf and buckets.tf no
   // longer create admin/publication/security/research or the private-evidence bucket in
   // blackbook-prod - they belong to infra/gcp/terraform/multi-project/ instead. This asserts
   // isolation-matrix.json (the source of truth those Terraform files implement) agrees, so a

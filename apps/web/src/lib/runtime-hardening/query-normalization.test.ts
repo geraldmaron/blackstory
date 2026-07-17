@@ -1,5 +1,5 @@
 /**
- * Unit tests for query normalization and cache key helpers (BB-022).
+ * Unit tests for query normalization and cache key helpers.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,5 +1,6 @@
+
 /**
- * BB-036 local security contracts: API abuse, browser attacks, SSRF, BOLA,
+ * local security contracts: API abuse, browser attacks, SSRF, BOLA,
  * mass assignment, resource exhaustion, suppression expiry, and release evidence.
  */
 import assert from 'node:assert/strict';

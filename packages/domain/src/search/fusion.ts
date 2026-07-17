@@ -1,7 +1,7 @@
 /**
- * Hybrid lane fusion configuration and RRF merge (BB-072).
+ * Hybrid lane fusion configuration and RRF merge.
  *
- * Fusion weights are versioned config — any change requires re-running the BB-047 hybrid
+ * Fusion weights are versioned config any change requires re-running the hybrid
  * retrieval eval (see packages/testing/src/gold-corpus/hybrid-retrieval-eval.ts).
  */
 import { reciprocalRankFusion, type RrfLaneContribution } from './rrf.js';
@@ -35,7 +35,7 @@ export type FusionOutput = {
 
 /**
  * Merges structured and vector lane rankings via weighted RRF. Vector matches contribute by
- * entity id only — distances stay internal to the lane and are not passed into fusion.
+ * entity id only distances stay internal to the lane and are not passed into fusion.
  */
 export function fuseHybridLanes(input: FusionInput): FusionOutput {
   const weights = input.weights ?? DEFAULT_FUSION_WEIGHTS;

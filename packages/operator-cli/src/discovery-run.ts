@@ -1,11 +1,12 @@
+
 /**
- * Thin wrapper over the real BB-039 discovery campaign gate (`@black-book/domain`).
+ * Thin wrapper over the real discovery campaign gate (`@black-book/domain`).
  *
- * This does NOT fetch adapter candidates from any real source — adapter fetching lives in
- * `packages/domain/src/adapters/**` and its worker callers, which are out of scope for BB-085.
+ * This does NOT fetch adapter candidates from any real source adapter fetching lives in
+ * `packages/domain/src/adapters/**` and its worker callers, which are out of scope.
  * This wrapper's job is to run an already-assembled batch of `AdapterCandidateRecord`s through
  * the real, bounded, quarantine-aware campaign gate (`runDiscoveryCampaign`) and summarize
- * yield — exactly what an operator session needs after kicking off (or receiving results from)
+ * yield exactly what an operator session needs after kicking off (or receiving results from)
  * a bounded discovery run, without re-deriving any of the budget/boundary/quarantine logic.
  */
 import {
@@ -53,6 +54,7 @@ export function summarizeDiscoveryYield(result: DiscoveryCampaignResult): Discov
     totalCandidates: result.candidates.length,
   };
 }
+
 
 /**
  * Runs one bounded discovery campaign over an already-assembled candidate batch and returns

@@ -1,5 +1,6 @@
+
 /**
- * Tests for cost and resource exhaustion controls (BB-033).
+ * Tests for cost and resource exhaustion controls.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,6 +1,6 @@
 /**
- * Evidence lineage and syndication relationships (BB-016).
- * Syndicated copies share a lineage root so BB-017 can count them once.
+ * Evidence lineage and syndication relationships.
+ * Syndicated copies share a lineage root so can count them once.
  */
 export const LINEAGE_KINDS = [
   'syndication',
@@ -17,7 +17,7 @@ export type EvidenceLineage = {
   readonly kind: LineageKind;
   readonly fromEvidenceId: string;
   readonly toEvidenceId: string;
-  /** Shared root for counting syndicated reporting as one lineage (BB-017). */
+  /** Shared root for counting syndicated reporting as one lineage. */
   readonly lineageRootId: string;
   readonly notes?: string;
   readonly createdAt: string;

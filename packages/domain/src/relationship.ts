@@ -1,15 +1,15 @@
 /**
- * Entity relationships with evidence and temporal/geographic context (BB-014).
+ * Entity relationships with evidence and temporal/geographic context.
  *
- * BB-092 extends the vocabulary with historical-causation edges (`caused`, `enabled`,
- * `influenced`, `participated_in`, `overturned`, `commemorates`), a creation-attribution edge
- * (`authored`, distinct from `founded`), and an optional `role` qualifier on `attended`. See
+ * Vocabulary includes historical-causation edges (`caused`, `enabled`, `influenced`,
+ * `participated_in`, `overturned`, `commemorates`), a creation-attribution edge (`authored`,
+ * distinct from `founded`), and an optional `role` qualifier on `attended`. See
  * `RELATIONSHIP_TYPE_SEMANTICS` below for the documented direction/temporal semantics every
- * type (new and pre-existing) carries, `assertRelationshipTemporalRequirement` for the
- * causal-edge TemporalContext requirement, and `evaluateCausalEdgeGuardrail` /
- * `assertCausalEdgeGuardrail` for the `caused`/`enabled` consensus-causation intake guardrail.
- * Graph-view materialization (per-entity adjacency, per-decade views, all-time union, containment
- * chains) lives in `./graph/` and consumes `EntityRelationship` read-only — see `./graph/index.ts`.
+ * type carries, `assertRelationshipTemporalRequirement` for the causal-edge TemporalContext
+ * requirement, and `evaluateCausalEdgeGuardrail` / `assertCausalEdgeGuardrail` for the
+ * `caused`/`enabled` consensus-causation intake guardrail. Graph-view materialization
+ * (per-entity adjacency, per-decade views, all-time union, containment chains) lives in
+ * `./graph/` and consumes `EntityRelationship` read-only — see `./graph/index.ts`.
  */
 export const RELATIONSHIP_TYPES = [
   'located_at',
@@ -24,14 +24,14 @@ export const RELATIONSHIP_TYPES = [
   'governed_by',
   'part_of',
   'successor_of',
-  // BB-092: historical-causation edges.
+  // historical-causation edges.
   'caused',
   'enabled',
   'influenced',
   'participated_in',
   'overturned',
   'commemorates',
-  // BB-092 stress-test amendment: creation attribution, distinct from `founded` (orgs/institutions only).
+  // stress-test amendment: creation attribution, distinct from `founded` (orgs/institutions only).
   'authored',
   'other',
 ] as const;
@@ -39,7 +39,7 @@ export const RELATIONSHIP_TYPES = [
 export type RelationshipType = (typeof RELATIONSHIP_TYPES)[number];
 
 /**
- * Role qualifier on the `attended` edge (BB-092 stress-test amendment) distinguishing
+ * Role qualifier on the `attended` edge distinguishing
  * organizing/speaking weight from rank-and-file attendance without minting a new edge type.
  * Meaningless (and rejected by `assertRelationshipRoleValidForType`) on any other edge type.
  */
@@ -63,12 +63,12 @@ export type EntityRelationship = {
   readonly fromEntityId: string;
   readonly toEntityId: string;
   readonly type: RelationshipType;
-  /** Evidence record ids supporting this relationship (BB-016 deepens evidence). Required for
-   * every relationship type, new and pre-existing alike — see `assertRelationshipHasEvidence`. */
+  /** Evidence record ids supporting this relationship. Required for
+   * every relationship type, new and pre-existing alike see `assertRelationshipHasEvidence`. */
   readonly evidenceIds: readonly string[];
   readonly temporal?: TemporalContext;
   readonly geographic?: GeographicRelationshipContext;
-  /** Only meaningful on `type: 'attended'` (BB-092) — see `assertRelationshipRoleValidForType`. */
+  /** Only meaningful on `type: 'attended'` see `assertRelationshipRoleValidForType`. */
   readonly role?: RelationshipRole;
   readonly notes?: string;
   readonly createdAt: string;
@@ -82,8 +82,7 @@ export function assertRelationshipHasEvidence(rel: Pick<EntityRelationship, 'evi
 }
 
 // ---------------------------------------------------------------------------
-// BB-092 acceptance criterion 1 & 7: documented direction/temporal semantics.
-//
+// documented direction/temporal semantics.
 // Every relationship reads as a sentence "fromEntity <TYPE> toEntity". This record is the
 // single documented source of truth for direction so graph-view builders, the operator-cli
 // edge-intake lane, and future readers never have to guess which endpoint is which.
@@ -234,7 +233,7 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, Rela
   },
 };
 
-/** The six BB-092 historical-causation edge types whose semantics require a TemporalContext. */
+/** The six historical-causation edge types whose semantics require a TemporalContext. */
 export const CAUSAL_HISTORICAL_RELATIONSHIP_TYPES = (
   Object.keys(RELATIONSHIP_TYPE_SEMANTICS) as readonly RelationshipType[]
 ).filter((type) => RELATIONSHIP_TYPE_SEMANTICS[type].requiresTemporalContext);
@@ -244,8 +243,8 @@ export function relationshipRequiresTemporalContext(type: RelationshipType): boo
 }
 
 /**
- * BB-092 acceptance criterion 1: causal edges (`caused`, `enabled`, `influenced`, `overturned`)
- * require a TemporalContext with at least `validFrom`. Fails closed — a causal edge proposed
+ * causal edges (`caused`, `enabled`, `influenced`, `overturned`)
+ * require a TemporalContext with at least `validFrom`. Fails closed a causal edge proposed
  * without a temporal anchor is rejected, not silently accepted with an implicit "always true"
  * reading.
  */
@@ -261,7 +260,7 @@ export function assertRelationshipTemporalRequirement(
 }
 
 /**
- * BB-092: `role` is only meaningful on `attended` edges. Fails closed on any other type so a
+ * `role` is only meaningful on `attended` edges. Fails closed on any other type so a
  * role qualifier can never silently attach to, say, a `caused` edge and be misread as weight.
  */
 export function assertRelationshipRoleValidForType(
@@ -275,18 +274,17 @@ export function assertRelationshipRoleValidForType(
 }
 
 // ---------------------------------------------------------------------------
-// BB-092 acceptance criterion 9: caused/enabled consensus-causation guardrail.
-//
+// caused/enabled consensus-causation guardrail.
 // `caused` and `enabled` are reserved for consensus, citable SYSTEMIC historical causation (the
 // HOLC-redlining-causes-disinvestment case). A contested or single-incident causal claim (whether
 // a specific statute "enabled" a specific act of violence) must never be asserted as a directed
-// causal edge with the same confidence as a settled claim — it routes through `cites` instead.
+// causal edge with the same confidence as a settled claim it routes through `cites` instead.
 // This is a structural intake gate, not a comment: `evaluateCausalEdgeGuardrail` requires the
 // caller to supply a `CausalEdgeReview.scope` explicitly, so the distinction is reviewed at
 // intake rather than left to submitter judgment.
 // ---------------------------------------------------------------------------
 
-/** The two BB-092 edge types the consensus-causation guardrail applies to. */
+/** The two edge types the consensus-causation guardrail applies to. */
 export const CAUSAL_ASSERTION_RELATIONSHIP_TYPES = ['caused', 'enabled'] as const;
 export type CausalAssertionRelationshipType = (typeof CAUSAL_ASSERTION_RELATIONSHIP_TYPES)[number];
 
@@ -300,7 +298,7 @@ export function isCausalAssertionRelationshipType(
  * `systemic_consensus`: settled, citable secondary-source historical causation (HOLC redlining
  * causing measurable disinvestment). `contested_or_single_incident`: a disputed causal claim or
  * one asserting a single incident's cause (whether a specific statute "enabled" a specific act of
- * violence) — never publishable as `caused`/`enabled`, must route through `cites`.
+ * violence) never publishable as `caused`/`enabled`, must route through `cites`.
  */
 export const CAUSATION_SCOPES = ['systemic_consensus', 'contested_or_single_incident'] as const;
 export type CausationScope = (typeof CAUSATION_SCOPES)[number];
@@ -319,7 +317,7 @@ export type CausalGuardrailResult =
  * Reviewed-at-intake guardrail for `caused`/`enabled`. Every other relationship type is always
  * allowed (the guardrail is scoped to the two causal-assertion types only). A
  * `contested_or_single_incident` scope is always rejected; a `systemic_consensus` scope without a
- * documented `consensusBasis` is also rejected — the reviewer must record *why* the claim is
+ * documented `consensusBasis` is also rejected the reviewer must record *why* the claim is
  * settled/systemic, not merely assert it.
  */
 export function evaluateCausalEdgeGuardrail(

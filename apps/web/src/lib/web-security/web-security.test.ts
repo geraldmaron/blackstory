@@ -1,5 +1,5 @@
 /**
- * Web security module integration tests (BB-028).
+ * Web security module integration tests.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -1,6 +1,7 @@
+
 /**
  * Firebase client and Admin helpers shared across Black Book surfaces.
- * Production project: black-book-efaaf. Local defaults: demo-black-book emulators.
+ * Production project:. Local defaults: demo-black-book emulators.
  */
 export {
   ADMIN_APP_ID,

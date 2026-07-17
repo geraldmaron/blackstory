@@ -1,7 +1,7 @@
 /**
- * Normalize parsed Reddit posts into BB-037 AdapterCandidateRecord output (BB-074). Mirrors
- * ../rss/normalizer.ts / ../dpla/normalizer.ts exactly: cap the triage snippet to the BB-077
- * evidence-pointer snippet limits, stamp BB-037 provenance, and fail closed on any doctrine
+ * Normalize parsed Reddit posts into AdapterCandidateRecord output. Mirrors
+ * ./rss/normalizer.ts /../dpla/normalizer.ts exactly: cap the triage snippet to the 
+ * evidence-pointer snippet limits, stamp provenance, and fail closed on any doctrine
  * violation via ./guards.ts rather than silently dropping a field.
  */
 import { MAX_EVIDENCE_SNIPPET_CHARACTERS, MAX_EVIDENCE_SNIPPET_WORDS } from '../../rights/evidence-pointer.js';
@@ -14,7 +14,7 @@ import { REDDIT_ADAPTER_ID, REDDIT_PAYLOAD_SCHEMA_VERSION } from './types.js';
 import type { RawRedditPostData, RedditCandidatePayload, RedditCandidateRecord } from './types.js';
 
 /**
- * Caps a title + short excerpt to the BB-077 evidence-pointer snippet limits — the minimum
+ * Caps a title + short excerpt to the evidence-pointer snippet limits the minimum
  * needed for reviewer triage, never a full post body (see ./guards.ts assertNoFullContentFields
  * for the structural backstop).
  */
@@ -63,7 +63,7 @@ export function normalizeRedditPost(input: NormalizeRedditPostInput): RedditCand
     subreddit: input.post.subreddit,
     postId: input.post.id,
     permalink,
-    // Handle only — never the internal author_fullname account id (see types.ts module doc).
+    // Handle only never the internal author_fullname account id (see types.ts module doc).
     ...(input.post.author !== undefined ? { authorHandle: input.post.author } : {}),
     postedAt: new Date(input.post.created_utc * 1000).toISOString(),
     ...(snippet !== undefined ? { snippet } : {}),
@@ -88,7 +88,7 @@ export function normalizeRedditPost(input: NormalizeRedditPostInput): RedditCand
 
 /**
  * Normalizes a batch of posts, silently skipping any already removed/deleted by the time this
- * poll observed them (see ../../adapters/reddit/client.ts `isPostRemovedOrDeleted`) — there is
+ * poll observed them (see ../../adapters/reddit/client.ts `isPostRemovedOrDeleted`) there is
  * no discovery value in ingesting a pointer to content that is already gone, and skipping at
  * ingest keeps the deletion-sync purge queue to genuinely-live-then-removed content only.
  */

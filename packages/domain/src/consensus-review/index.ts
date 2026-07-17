@@ -1,6 +1,6 @@
 /**
- * Public boundary for BB-076 community-lead consensus review: independent reviewer tallying,
- * agreement-threshold routing, and the sole bridge into a BB-044 discovery-candidate research
+ * Public boundary for community-lead consensus review: independent reviewer tallying,
+ * agreement-threshold routing, and the sole bridge into a discovery-candidate research
  * case. See `types.ts` for the design references (Zooniverse/Caesar, Wikipedia pending-changes).
  */
 export {

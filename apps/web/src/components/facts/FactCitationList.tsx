@@ -1,9 +1,9 @@
 /**
- * Renders a fact's CSL-JSON citations plus Black Book extension fields (BB-086 AC2/AC7).
+ * Renders a fact's CSL-JSON citations plus Black Book extension fields.
  *
  * Web citations prefer the archived capture URL as the outbound link; offline citations show the
  * excerpt and retrieval date without inventing a live URL. Full bibliography formatting via
- * citation.js is a parent-package dependency — this component renders the stored CSL-JSON fields
+ * citation.js is a parent-package dependency this component renders the stored CSL-JSON fields
  * directly until `@citation-js/core` is wired in `apps/web/package.json`.
  */
 import React from 'react';

@@ -1,26 +1,26 @@
 /**
- * Containment-chain materialization (BB-092 acceptance criterion 2).
+ * Containment-chain materialization.
  *
- * The owner's "anchor most things around state" rule: `located_at`/`part_of` chains
+ * The ownerthe "anchor most things around state" rule: `located_at`/`part_of` chains
  * (spot -> city -> county -> state) are walked at projection build time into a single
- * denormalized containment path carrying BB-091 jurisdiction ids, computed once per
+ * denormalized containment path carrying jurisdiction ids, computed once per
  * geo-anchored entity rather than re-derived per request. Lat/lng+radius stays the *rendering*
  * attribute (see `../geography/precision.ts`'s `displayRadiusMeters`); the containment path is
  * the *identity* attribute this module produces.
  *
  * Two composable layers, matching `../geography/jurisdiction-refs.ts`'s dependency-injected
- * resolver-port pattern (read, not modified, by this bead):
+ * resolver-port pattern (read, not modified, by this):
  *
  * 1. `resolveEntityContainmentPaths` walks the ENTITY graph across `located_at`/`part_of`
- *    `EntityRelationship` edges (spot -> city -> county -> state as separate CanonicalEntity
- *    records) and collects each hop's own BB-091 jurisdiction ids.
- * 2. `extendJurisdictionChain` optionally continues upward through the BB-091 jurisdiction
- *    registry's own `parentId` hierarchy (`Jurisdiction` from `../geography/location.js`) via an
- *    injected `JurisdictionParentLookup` port, for cases where the entity chain runs out before
- *    reaching `state` but the jurisdiction registry itself knows the rest of the ancestry.
+ * `EntityRelationship` edges (spot -> city -> county -> state as separate CanonicalEntity
+ * records) and collects each hop's own jurisdiction ids.
+ * 2. `extendJurisdictionChain` optionally continues upward through the jurisdiction
+ * registry's own `parentId` hierarchy (`Jurisdiction` from `../geography/location.js`) via an
+ * injected `JurisdictionParentLookup` port, for cases where the entity chain runs out before
+ * reaching `state` but the jurisdiction registry itself knows the rest of the ancestry.
  *
- * Both layers are pure, deterministic, cycle-safe (visited-set), and bounded-depth — safe to
- * re-run on every projection build (BB-019 discipline: derived-at-publish, never a live graph
+ * Both layers are pure, deterministic, cycle-safe (visited-set), and bounded-depth safe to
+ * re-run on every projection build (discipline: derived-at-publish, never a live graph
  * traversal at request time).
  */
 import type { Jurisdiction } from '../geography/location.js';
@@ -47,7 +47,7 @@ export type ContainmentEdgeInput = {
 
 export type ContainmentEntityInput = {
   readonly entityId: string;
-  /** BB-091 jurisdiction ids directly attached to this entity (EntityLocation.jurisdictionIds /
+  /** jurisdiction ids directly attached to this entity (EntityLocation.jurisdictionIds
    * PlaceFields.jurisdictionIds), finest-tier-first when more than one. */
   readonly jurisdictionIds?: readonly string[];
 };
@@ -73,7 +73,7 @@ export type ContainmentPath = {
  * Builds a deterministic `fromEntityId -> toEntityId` index restricted to containment edges
  * (`located_at`/`part_of`). When an entity has more than one outgoing containment edge (a
  * data-entry ambiguity), the target is chosen deterministically (lexicographically smallest
- * `toEntityId`) rather than arbitrarily by input order — required for the build to be
+ * `toEntityId`) rather than arbitrarily by input order required for the build to be
  * re-runnable and byte-identical across runs.
  */
 export function buildContainmentIndex(
@@ -148,7 +148,7 @@ export function resolveEntityContainmentPath(
 }
 
 /**
- * Resolves containment paths for every geo-anchored entity (BB-092 acceptance criterion 2: "on
+ * Resolves containment paths for every geo-anchored entity ("on
  * every geo-anchored entity"). `geoAnchoredEntityIds` is the caller-supplied set of entities that
  * carry a location (EntityLocation row or a `place`/`school`/`institution`-kind
  * `jurisdictionIds`) — this module does not itself decide what counts as geo-anchored, matching
@@ -172,14 +172,14 @@ export function resolveEntityContainmentPaths(
 // ---------------------------------------------------------------------------
 
 /** Minimal read port a projection build supplies; a real implementation is Firestore-backed
- * against the BB-091 `jurisdictions` collection. Mirrors `JurisdictionResolver`'s shape in
+ * against the `jurisdictions` collection. Mirrors `JurisdictionResolver`'s shape in
  * `../geography/jurisdiction-refs.ts` (sync-or-async, structurally typed, no import needed). */
 export type JurisdictionParentLookup = {
   parentOf(jurisdictionId: string): Promise<string | undefined> | string | undefined;
 };
 
-/** In-memory lookup built from already-loaded `Jurisdiction` rows — for tests and small builds,
- * the same role `createInMemoryJurisdictionResolver` plays for the BB-091 gate. */
+/** In-memory lookup built from already-loaded `Jurisdiction` rows for tests and small builds,
+ * the same role `createInMemoryJurisdictionResolver` plays for the gate. */
 export function createInMemoryJurisdictionParentLookup(
   jurisdictions: readonly Pick<Jurisdiction, 'id' | 'parentId'>[],
 ): JurisdictionParentLookup {
@@ -198,7 +198,7 @@ export type ExtendJurisdictionChainResult = {
 };
 
 /**
- * Extends an already-resolved jurisdiction id list upward through the BB-091 jurisdiction
+ * Extends an already-resolved jurisdiction id list upward through the jurisdiction
  * registry's own `parentId` hierarchy, for cases where the entity containment chain (layer 1)
  * runs out before reaching `state` but the jurisdiction registry itself knows the rest of the
  * ancestry (e.g. a `city` jurisdiction id whose `county`/`state` ancestors are registry data, not

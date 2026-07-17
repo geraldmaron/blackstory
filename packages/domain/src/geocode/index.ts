@@ -1,22 +1,11 @@
 /**
- * Local module surface for the BB-050 geocode domain module (address normalization,
+ * Local module surface for the geocode domain module (address normalization,
  * jurisdiction-id resolution, geocode cache, exact-coordinate reduction, ZIP translate-then-
  * discard, manual-place-search fallback, and the forward/reverse geocode pipeline).
  *
- * NOT yet re-exported from `../index.ts` (the `@black-book/domain` package barrel) — per this
- * session's barrel-ownership rule, only the parent session merges new symbols into that file.
- * Unlike `../adapters/census-geo/index.ts` (already wired through an existing
- * `export * from './census-geo/index.js'` wildcard in `../adapters/index.ts`), this is a
- * brand-new top-level module directory with no existing wildcard chain reaching it — the parent
- * session needs to add exactly one line to `packages/domain/src/index.ts`:
- *
- *   export * from './geocode/index.js';
- *
- * Until that lands, `apps/web`'s `locate` route/components cannot import this module directly
- * through `@black-book/domain` — see the final report's "still needs wiring" note and
- * `apps/web/src/lib/geocode/`'s module docs for the documented mirror this bead ships in the
- * meantime (the same "documented duplication pending barrel merge" convention
- * `packages/firebase/src/jurisdictions/resolver.ts` already established this session).
+ * Not yet re-exported from `../index.ts` (the `@black-book/domain` package barrel). Until that
+ * lands, `apps/web`'s `locate` route/components import via the documented mirror under
+ * `apps/web/src/lib/geocode/` (same pattern as `packages/firebase/src/jurisdictions/resolver.ts`).
  */
 export {
   countryJurisdictionId,

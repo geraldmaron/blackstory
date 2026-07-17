@@ -1,11 +1,12 @@
+
 /**
- * REAL roster entry: gold-corpus regression on engine changes (BB-047, closed). Wraps
+ * REAL roster entry: gold-corpus regression on engine changes. Wraps
  * @black-book/testing's evaluateCorpus (packages/testing/src/gold-corpus/metrics.ts) — the same
  * evaluator the gold-corpus CLI (packages/testing/src/gold-corpus/cli.ts) already runs. This
  * wrapper does not reimplement evaluation or the automatic-publication gate
- * (assertCorpusEvaluationPassed / corpusEvaluationAllowsAutomaticPublication stay in
+ * (assertCorpusEvaluationPassed corpusEvaluationAllowsAutomaticPublication stay in
  * @black-book/testing and are called at the point something would actually gate on the result,
- * not here) — it only adapts evaluateCorpus's input/output into the generic JobRunRecord shape
+ * not here) it only adapts evaluateCorpus's input/output into the generic JobRunRecord shape
  * so the regression check can be scheduled through this registry. A failing evaluation never
  * publishes anything by itself; it produces a report + issues that feed run-health/alerting.
  */

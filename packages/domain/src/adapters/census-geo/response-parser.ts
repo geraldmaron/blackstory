@@ -1,5 +1,5 @@
 /**
- * Defensive JSON parsing for Census Geocoder responses (BB-050) — mirrors
+ * Defensive JSON parsing for Census Geocoder responses mirrors
  * `../web-search/brave-client.ts`'s `parseBraveSearchResponse` posture: a missing/renamed field
  * degrades one match (or the whole geographies block, for the coordinates endpoint) rather than
  * throwing on a shape the vendor is free to evolve without notice.

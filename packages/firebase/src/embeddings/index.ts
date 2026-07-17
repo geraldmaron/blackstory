@@ -1,5 +1,6 @@
+
 /**
- * Embedding pipeline + Firestore vector-search public surface (BB-071).
+ * Embedding pipeline + Firestore vector-search public surface.
  */
 export {
   EMBEDDING_MODEL,

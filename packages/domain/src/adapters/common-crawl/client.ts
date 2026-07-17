@@ -1,7 +1,7 @@
 /**
- * Common Crawl CDX Index Server request/response handling (BB-075). Builds
+ * Common Crawl CDX Index Server request/response handling. Builds
  * `https://index.commoncrawl.org/<crawlId>-index` query URLs and parses the newline-delimited
- * JSON (NDJSON) response defensively. CDX also returns a plain-text `No captures found for ...`
+ * JSON (NDJSON) response defensively. CDX also returns a plain-text `No captures found for...`
  * body (not JSON, sometimes with a non-200 status) when a host/pattern has zero captures in a
  * given crawl -- that is treated as zero records, not an error, since "no captures for this seed
  * in this crawl" is an expected, common outcome, not a malformed response.

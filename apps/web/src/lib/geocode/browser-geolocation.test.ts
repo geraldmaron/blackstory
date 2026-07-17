@@ -1,5 +1,5 @@
 /**
- * Unit tests for the `navigator.geolocation` wrapper (BB-050) against a fake `GeolocationApi` —
+ * Unit tests for the `navigator.geolocation` wrapper against a fake `GeolocationApi` 
  * no DOM/browser environment required.
  */
 import assert from 'node:assert/strict';

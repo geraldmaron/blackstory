@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke tests for the BB-053 per-claim evidence card, covering all four acceptance
+ * SSR markup smoke tests for the per-claim evidence card, covering all four acceptance
  * criteria.
  */
 import assert from 'node:assert/strict';

@@ -1,6 +1,7 @@
+
 /**
  * Unit tests for Firestore claim helpers and converters (no emulator required).
- * Covers BB-014 entity/geography, BB-016 provenance, and BB-017 claims/confidence.
+ * Covers entity/geography, provenance, and claims/confidence.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

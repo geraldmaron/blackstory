@@ -1,6 +1,6 @@
 /**
- * Opaque receipt codes for BB-055 correction intake. Submitters receive a single code at
- * acceptance time; status lookup requires the exact code — there is no browse or enumerate API.
+ * Opaque receipt codes for correction intake. Submitters receive a single code at
+ * acceptance time; status lookup requires the exact code there is no browse or enumerate API.
  */
 import { createHash, timingSafeEqual } from 'node:crypto';
 

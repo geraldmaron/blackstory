@@ -1,6 +1,6 @@
 /**
- * Public fact library over published facts (BB-086 AC5). Search runs through the real BB-049
- * `runPublicSearch` pipeline over the seed fact search index — not a hand-rolled filter.
+ * Public fact library over published facts. Search runs through the real 
+ * `runPublicSearch` pipeline over the seed fact search index not a hand-rolled filter.
  */
 import { EmptyState, FilterBar, ResultList } from '@black-book/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';

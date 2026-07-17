@@ -1,5 +1,5 @@
 /**
- * Snapshot-mode vector lane for hybrid search (BB-072).
+ * Snapshot-mode vector lane for hybrid search.
  *
  * Provides an in-memory deterministic vector recall port over the bundled seed index so hybrid
  * fusion can run locally without Firestore `findNearest`. Production wiring swaps this for a
@@ -20,7 +20,7 @@ export type VectorLaneResult = {
   readonly matches: readonly { readonly entityId: string; readonly distance: number }[];
 };
 
-/** Deterministic pseudo-embedding from text — stable across runs, no network. */
+/** Deterministic pseudo-embedding from text stable across runs, no network.  */
 export function deterministicTextEmbedding(text: string, dims = 16): EmbeddingVector {
   const vector = new Array<number>(dims).fill(0);
   const normalized = text.trim().toLowerCase();
@@ -38,7 +38,7 @@ export type SnapshotVectorIndexEntry = {
   readonly vector: EmbeddingVector;
 };
 
-/** Builds deterministic vectors from index display names + summaries. */
+/** Builds deterministic vectors from index display names + summaries.  */
 export function buildSnapshotVectorIndex(
   docs: readonly PublicSearchIndexDoc[],
 ): readonly SnapshotVectorIndexEntry[] {

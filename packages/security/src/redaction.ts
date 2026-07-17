@@ -1,9 +1,10 @@
+
 /**
- * Central redaction primitives for Black Book (BB-015).
+ * Central redaction primitives for Black Book.
  *
  * This module is the single policy-driven engine that reduces location precision
  * before publication and scrubs protected values (residential addresses, exact
- * coordinates) out of any serialized payload — public projections, search index
+ * coordinates) out of any serialized payload public projections, search index
  * documents, logs, error telemetry, and exports. All rules derive from the product
  * constitution (@black-book/schemas); nothing here weakens those rules.
  */
@@ -83,6 +84,7 @@ function reduceTo(current: string, target: string): string {
   return rankOf(target) < rankOf(current) ? target : current;
 }
 
+
 /**
  * Reduce a source precision to a value that is safe to publish.
  *
@@ -112,7 +114,7 @@ export function reducePublicPrecision(input: PrecisionReductionInput): Precision
     policyVersion,
   });
 
-  // Unknown / unclassified precision → drop to nothing (fail closed).
+  // Unknown unclassified precision → drop to nothing (fail closed).
   if (
     !precisionRules.allowedLevels.includes(source) &&
     !precisionRules.prohibitedLevels.includes(source)
@@ -210,6 +212,7 @@ function coarsenCoordinate(value: number, precision: string): number | undefined
   const factor = 10 ** decimals;
   return Math.round(value * factor) / factor;
 }
+
 
 /**
  * Produce a public-safe location, or `undefined` when nothing may be shown.
@@ -339,6 +342,7 @@ export type RedactorOptions = {
   readonly dropKeys?: boolean;
   readonly maxDepth?: number;
 };
+
 
 /**
  * Build a deep redactor that strips protected values from arbitrary structures.

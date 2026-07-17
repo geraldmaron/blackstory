@@ -1,6 +1,6 @@
 /**
- * Server-only rate-limit guard for the public "submit a lead" route (BB-025). Reuses the
- * exact shared evaluator from `@black-book/security` — `createRateLimitEvaluator`,
+ * Server-only rate-limit guard for the public "submit a lead" route. Reuses the
+ * exact shared evaluator from `@black-book/security` `createRateLimitEvaluator`,
  * `buildRateLimitKey`, `aggregateDistributedRisk`, `formatRateLimitResponse`,
  * `releaseConcurrency` — the same primitives `apps/api-submissions/src/rate-limits.ts` uses for
  * every other public submissions-style mutation. This is deliberately not a new rate-limit

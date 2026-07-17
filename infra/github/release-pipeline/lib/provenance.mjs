@@ -1,5 +1,5 @@
 /**
- * Build and validate deployment provenance documents (BB-062).
+ * Build and validate deployment provenance documents.
  * Schema: infra/github/release-metadata/deployment-provenance.schema.json
  */
 import { readFile } from 'node:fs/promises';

@@ -1,12 +1,14 @@
+
 /**
  * Lightweight accessibility fixture helpers for representative a11y tests.
- * Full browser axe/Playwright coverage lands with UI beads; this layer stays executable now.
+ * Full browser axe/Playwright coverage lands with UI; this layer stays executable now.
  */
 
 export type A11yFixtureIssue = {
   readonly code: string;
   readonly message: string;
 };
+
 
 /**
  * Validates a minimal HTML string for landmark/heading presence used in smoke a11y checks.

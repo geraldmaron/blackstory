@@ -1,15 +1,15 @@
 /**
- * `FactRecord` — the canonical, versioned, citable atom of the BB-086 fact registry.
+ * `FactRecord` the canonical, versioned, citable atom of the fact registry.
  *
  * Modeled on Wikidata's statement + qualifiers + structured references + rank discipline: a
- * `statement` is the citable text; `qualifiers[]` are small typed key/values that add nuance
- * without changing the statement; `citations[]` (`./citation.ts`) are first-class structured
- * references, never a bare URL; `status` (`./status.ts`) is the rank axis. Reuses BB-014/BB-016
- * claims/evidence and provenance vocabulary rather than inventing a parallel one — a `FactRecord`
+ * `statement` is the citable text; `qualifiers` are small typed key/values that add nuance
+ * without changing the statement; `citations` (`./citation.ts`) are first-class structured
+ * references, never a bare URL; `status` (`./status.ts`) is the rank axis. Reuses
+ * claims/evidence and provenance vocabulary rather than inventing a parallel one a `FactRecord`
  * is the shared-reference atom that entity/place/event pages, the map, and the evidence UI all
  * embed via `./embed.ts`'s `CompactFactView`, from one canonical URL and one citation set.
  *
- * Ontology alignment (BB-090/BB-091 — see `.beads/issues.jsonl` black-book-bb086 "Ontology
+ * Ontology alignment (/ see `./issues.jsonl` "Ontology
  * alignment" note): `datePrecision` and `geoPrecision` are IMPORTED from the shared domain
  * modules below, never redefined locally.
  */
@@ -23,13 +23,13 @@ import { assertRevisionsAppendOnly, type FactRevision } from './revision.js';
 import { isFactId, type FactId } from './ids.js';
 import { isFactStatus, type FactStatus } from './status.js';
 
-/** A typed edge from a fact to a CanonicalEntity it is about (BB-092 graph-view input). Every
- * edge resolves to a real entity id AND its kind — see `./subjects.ts`'s `assertFactSubjectsResolve`
- * for the fail-closed check against a live entity resolver (BB-086 acceptance criterion 8). */
+/** A typed edge from a fact to a CanonicalEntity it is about. Every
+ * edge resolves to a real entity id AND its kind see `./subjects.ts`'s `assertFactSubjectsResolve`
+ * for the fail-closed check against a live entity resolver. */
 export type FactSubjectEdge = {
   readonly entityId: string;
   readonly kind: EntityKind;
-  /** Structural role note (e.g. "victim", "actor", "location") — provenance only, never a
+  /** Structural role note (e.g. "victim", "actor", "location") provenance only, never a
    * closed vocabulary the mirroring/graph logic interprets (see `./subjects.ts`). */
   readonly role?: string;
 };
@@ -48,9 +48,9 @@ export type FactQualifier = {
   readonly value: string;
 };
 
-/** A circulating misreading of the fact plus its one-line refutation — feeds BB-088 pre-bunking
+/** A circulating misreading of the fact plus its one-line refutation feeds pre-bunking
  * and the myths surface. Never a place to relitigate the dispute at length; that belongs in
- * `confidenceNote` / `counterClaims[].refutation` being deliberately terse. */
+ * `confidenceNote` `counterClaims.refutation` being deliberately terse. */
 export type FactCounterClaim = {
   readonly misreading: string;
   readonly refutation: string;
@@ -78,7 +78,7 @@ export type FactProvenance = {
   readonly method: string;
 };
 
-/** A single point-or-range date at a stated precision — reuses `EraSpan`'s validFrom/validTo
+/** A single point-or-range date at a stated precision reuses `EraSpan`'s validFrom/validTo
  * idiom (`../era.ts`) so a fact's `when` composes with the same decade-bucket derivation every
  * other dated record in this package uses. */
 export type FactWhen = {
@@ -95,7 +95,7 @@ export type FactGeo = {
 
 export type FactRecord = {
   readonly id: FactId;
-  /** Cosmetic, re-derivable slug — never part of identity (see `./ids.ts`). */
+  /** Cosmetic, re-derivable slug never part of identity (see `./ids.ts`). */
   readonly slug: string;
   /** The one declarative citable sentence. */
   readonly statement: string;
@@ -123,8 +123,8 @@ function isNonEmpty(value: string | undefined): value is string {
 }
 
 /**
- * Fail-closed structural validity for a `FactRecord` (BB-086 AC1). Does NOT enforce the
- * publish-time citation-completeness gate — see `./publish-gate.ts` for that (a `draft` fact may
+ * Fail-closed structural validity for a `FactRecord`. Does NOT enforce the
+ * publish-time citation-completeness gate see `./publish-gate.ts` for that (a `draft` fact may
  * legitimately have zero citations yet; this function only checks internal consistency of
  * whatever is present).
  */
@@ -191,9 +191,9 @@ export function assertFactRecordStructurallyValid(fact: FactRecord): void {
   assertRevisionsAppendOnly([], fact.revisions);
 }
 
-/** True when every citation is structurally complete AND at least one citation exists — the
+/** True when every citation is structurally complete AND at least one citation exists the
  * per-record predicate `./publish-gate.ts` uses before allowing a status transition to
- * published/corrected (AC2). Does not itself decide publishability; see that module. */
+ * published/corrected. Does not itself decide publishability; see that module. */
 export function hasCompleteFactCitations(fact: Pick<FactRecord, 'citations'>): boolean {
   return fact.citations.length > 0 && fact.citations.every((citation) => {
     try {

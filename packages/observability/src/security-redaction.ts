@@ -1,6 +1,7 @@
+
 /**
- * Security telemetry redaction — strips App Check tokens, credentials, and protected
- * addresses before events reach logs or exported metrics (BB-034 / BB-015).
+ * Security telemetry redaction strips App Check tokens, credentials, and protected
+ * addresses before events reach logs or exported metrics.
  */
 import { createSensitiveDataRedactor } from '@black-book/security';
 import type { SecurityTelemetryEvent } from './security-events.js';

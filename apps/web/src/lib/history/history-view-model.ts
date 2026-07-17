@@ -1,7 +1,7 @@
 /**
- * Pure server-side view-model builder for the BB-093 `/history` page. Parses URL search params,
- * loads the BB-092 graph release artifact snapshot, resolves the active decade or all-time slice,
- * and shapes nodes/edges for the graph panel and synchronized list peer — no Next.js runtime
+ * Pure server-side view-model builder for the `/history` page. Parses URL search params,
+ * loads the graph release artifact snapshot, resolves the active decade or all-time slice,
+ * and shapes nodes/edges for the graph panel and synchronized list peer no Next.js runtime
  * dependency so it is directly unit-testable (see `./history-view-model.test.ts`).
  */
 import { SEED_ENTITY_RELATIONSHIPS } from '../../data/entity-graph-seed';

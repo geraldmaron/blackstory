@@ -1,5 +1,6 @@
+
 /**
- * CLI entry for BB-063 beta launch gate evaluation.
+ * CLI entry for beta launch gate evaluation.
  */
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

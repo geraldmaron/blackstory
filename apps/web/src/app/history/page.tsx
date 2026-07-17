@@ -1,5 +1,5 @@
 /**
- * Temporal history graph browse page (BB-093): all-time union view plus decade stepper over BB-092
+ * Temporal history graph browse page: all-time union view plus decade stepper over 
  * published graph release artifacts, synchronized accessible list peer, progressive-disclosure
  * graph rendering, and shareable URL state. SSR-first from the bundled snapshot; filters use
  * native GET navigation (no-JS safe).

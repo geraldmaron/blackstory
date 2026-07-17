@@ -1,16 +1,16 @@
 /**
- * BB-054 / BB-090 public notabilityBasis renderer (BB-054 acceptance criterion 5). Renders an
- * entity's structured `NotabilityBasisRecord[]` (../entity-status.js) into the auditable public
- * shape the "why this appears" surface renders — a short approved-language criterion label, the
- * full reviewable rubric sentence (`NOTABILITY_RUBRIC`, ../entity-status.js), the reviewer's
+ * public notabilityBasis renderer. Renders an
+ * entity's structured `NotabilityBasisRecord` (../entity-status.js) into the auditable public
+ * shape the "why this appears" surface renders a short approved-language criterion label, the
+ * full reviewable rubric sentence (`NOTABILITY_RUBRIC`,../entity-status.js), the reviewer's
  * entity-specific note, and the record's `evidenceIds` for traceability. It never renders, derives,
- * or accepts a numeric score — composes `NOTABILITY_RUBRIC` and the existing publish gate
+ * or accepts a numeric score composes `NOTABILITY_RUBRIC` and the existing publish gate
  * (./notability-gate.js); it does not reimplement either.
  */
 import type { NotabilityBasisRecord, NotabilityCriterion } from '../entity-status.js';
 import { NOTABILITY_RUBRIC } from '../entity-status.js';
 
-/** Short approved-language label per criterion — the exact BB-090 `NOTABILITY_CRITERIA`
+/** Short approved-language label per criterion the exact `NOTABILITY_CRITERIA`
  * vocabulary (../entity-status.js), never a raw enum token in public copy. */
 export const NOTABILITY_CRITERION_LABELS: Readonly<Record<NotabilityCriterion, string>> = {
   first_to_do_x: 'Documented first',
@@ -28,7 +28,7 @@ export type PublicNotabilityBasisItem = {
   readonly criterionLabel: string;
   readonly rubric: string;
   readonly note: string;
-  /** Traceable, auditable evidence reference ids — never a numeric weight or score. */
+  /** Traceable, auditable evidence reference ids never a numeric weight or score. */
   readonly evidenceIds: readonly string[];
 };
 

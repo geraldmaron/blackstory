@@ -1,5 +1,5 @@
 /**
- * Query term validation and public-safe projection (BB-038).
+ * Query term validation and public-safe projection.
  * Offensive historical terminology is never emitted as default public language.
  */
 import type { PublicSafeTerm, QueryTerm, TermClass } from './types.js';

@@ -1,5 +1,5 @@
 /**
- * Tests for Layer 4 — presence/affirmation counterweight layer.
+ * Tests for Layer 4 presence/affirmation counterweight layer.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

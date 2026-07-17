@@ -1,6 +1,6 @@
 /**
- * Layout and presentation styles for BB-093's `/history` temporal browse experience. Uses BB-068
- * brand tokens via the shared `@black-book/ui/styles.css` vocabulary — Archive Paper canvas,
+ * Layout and presentation styles for `/history` temporal browse experience. Uses 
+ * brand tokens via the shared `@black-book/ui/styles.css` vocabulary Archive Paper canvas,
  * Copper Pin accents, no violence heat colors.
  */
 .bb-history {

@@ -1,5 +1,5 @@
 /**
- * `FactRecord.claimType` vocabulary (BB-086) — drives which geo/time fields a fact requires and
+ * `FactRecord.claimType` vocabulary drives which geo/time fields a fact requires and
  * which schema.org type its JSON-LD `about` entry emits (see `../facts/jsonld.ts`). Closed
  * vocabulary, same discipline as `../entity-kinds.ts` and `../relationship.ts`'s
  * `RELATIONSHIP_TYPES`: add a new claim type here, in one place, rather than letting call sites
@@ -51,7 +51,7 @@ export const CLAIM_TYPE_REQUIRES_WHEN: Readonly<Record<FactClaimType, boolean>> 
 
 /**
  * schema.org type hint for the JSON-LD `about` entry (never the fact's own `@type`, which is
- * always `Article` — see `./jsonld.ts`). Chosen from stable, widely-supported schema.org types;
+ * always `Article` see `./jsonld.ts`). Chosen from stable, widely-supported schema.org types;
  * `quantity` and `place-designation` map to the closest fit rather than inventing a bespoke type.
  */
 export const CLAIM_TYPE_ABOUT_SCHEMA_TYPE: Readonly<Record<FactClaimType, string>> = {

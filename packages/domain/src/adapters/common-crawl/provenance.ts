@@ -1,6 +1,6 @@
 /**
  * Provenance stamping for every external Common Crawl CDX query and the results it produces
- * (BB-075 acceptance criterion 5): API name, query text, timestamp, and plan/terms version.
+ * API name, query text, timestamp, and plan/terms version.
  */
 import type { CommonCrawlQuery, CommonCrawlQueryProvenance } from './types.js';
 

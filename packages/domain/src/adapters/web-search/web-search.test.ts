@@ -1,9 +1,9 @@
 /**
- * Tests for the web-search discovery adapter (BB-075). Fixture-driven; every HTTP call goes
+ * Tests for the web-search discovery adapter. Fixture-driven; every HTTP call goes
  * through a mock SafeHttpClient injected by the test, never a real fetch or a real key. Proves
- * the two independent fail-closed gates (BB-037 registry disabled-by-default, and the
+ * the two independent fail-closed gates (registry disabled-by-default, and the
  * storageTermsConfirmed persistence gate), the researchOnlyOffensive query filter, and that the
- * BB-033 budget guard can be backed by the real `evaluateDailyBudget` evaluator.
+ * budget guard can be backed by the real `evaluateDailyBudget` evaluator.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -98,7 +98,7 @@ test('provider decision is recorded and explicitly does NOT claim storage terms 
 });
 
 // ---------------------------------------------------------------------------------------------
-// BB-037 registry gate (first of two independent gates)
+// registry gate (first of two independent gates)
 // ---------------------------------------------------------------------------------------------
 
 test('Brave search adapter starts disabled by default in the BB-037 registry', () => {
@@ -149,7 +149,7 @@ test('parseBraveSearchResponse tolerates missing title/description and rejects r
 });
 
 // ---------------------------------------------------------------------------------------------
-// Query generation from BB-038 packs -- researchOnlyOffensive filter (acceptance criterion 3)
+// Query generation from packs -- researchOnlyOffensive filter
 // ---------------------------------------------------------------------------------------------
 
 test('buildWebSearchQueryTexts includes geographic seeds but never a researchOnlyOffensive term', () => {
@@ -207,7 +207,7 @@ test('buildWebSearchQueryTexts excludes a researchOnlyOffensive term even when i
 });
 
 // ---------------------------------------------------------------------------------------------
-// Provenance stamping (acceptance criterion 5)
+// Provenance stamping
 // ---------------------------------------------------------------------------------------------
 
 test('stampExternalQueryProvenance stamps API name, query text, timestamp, and plan/terms version', () => {
@@ -225,7 +225,7 @@ test('stampExternalQueryProvenance stamps API name, query text, timestamp, and p
 });
 
 // ---------------------------------------------------------------------------------------------
-// CRITICAL: storage-terms persistence gate (acceptance criterion 1)
+// CRITICAL: storage-terms persistence gate
 // ---------------------------------------------------------------------------------------------
 
 test('assertStorageTermsConfirmed throws when false, passes when true', () => {
@@ -349,7 +349,7 @@ test('fetchBraveWebSearch performs the live query even when storageTermsConfirme
 });
 
 // ---------------------------------------------------------------------------------------------
-// Budget guard (acceptance criterion 4)
+// Budget guard
 // ---------------------------------------------------------------------------------------------
 
 function fakeEvaluator(decision: DailyBudgetDecision): DailyBudgetEvaluator {
@@ -453,7 +453,7 @@ test('fetchBraveWebSearchBudgeted proceeds and reports the budget decision when 
 });
 
 // ---------------------------------------------------------------------------------------------
-// Pipeline integration (acceptance criterion 6): Wayback capture gate -> BB-039 ingestApiCandidate
+// Pipeline integration: Wayback capture gate -> ingestApiCandidate
 // ---------------------------------------------------------------------------------------------
 
 test('ingestWebSearchCandidatesThroughPipeline routes candidates through the Wayback capture gate before BB-039 ingestion', async () => {
@@ -544,7 +544,7 @@ test('ingestWebSearchCandidatesThroughPipeline fails closed when the Wayback cap
 });
 
 // ---------------------------------------------------------------------------------------------
-// Real BB-033 wiring: proves the budget-guard port can be backed by the real evaluateDailyBudget
+// Real wiring: proves the budget-guard port can be backed by the real evaluateDailyBudget
 // ---------------------------------------------------------------------------------------------
 
 test('a real BB-033-backed DailyBudgetEvaluator (thin wrapper over the real evaluateDailyBudget) composes correctly', async () => {

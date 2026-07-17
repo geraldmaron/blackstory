@@ -1,7 +1,8 @@
+
 /**
- * WCAG-oriented HTML fixture audits for core public journeys (BB-057).
+ * WCAG-oriented HTML fixture audits for core public journeys.
  * Complements lightweight smoke checks with heading order, landmark, and form-label rules
- * executable without a browser stack — full axe/Playwright coverage lands separately.
+ * executable without a browser stack full axe/Playwright coverage lands separately.
  */
 
 import type { A11yFixtureIssue } from './html-smoke.js';
@@ -13,6 +14,7 @@ export type A11yAuditResult = {
 };
 
 const HEADING_TAG = /<(h[1-6])\b[^>]*>/gi;
+
 
 /**
  * Runs smoke checks plus heading-order and supplementary landmark assertions.

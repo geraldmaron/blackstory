@@ -17,7 +17,7 @@ function withVersion<T extends Record<string, unknown>>(
   return { ...result, policyVersion: policy.policyVersion };
 }
 
-/** Unknown living status is treated as living when the constitution says so. */
+/** Unknown living status is treated as living when the constitution says so.  */
 export function evaluateLivingStatus(
   status: string,
   policy: ProductConstitution = loadProductConstitution(),
@@ -95,7 +95,7 @@ export function evaluateProceduralLanguage(
   });
 }
 
-/** Evaluate a relevance score against constitution thresholds for a decision class. */
+/** Evaluate a relevance score against constitution thresholds for a decision class.  */
 export function evaluateRelevance(
   score: number,
   decision: RelevanceDecision,
@@ -111,7 +111,7 @@ export function evaluateRelevance(
   return withVersion(policy, { passes, decision, score });
 }
 
-/** Evaluate claim confidence against standard or high-impact publish thresholds. */
+/** Evaluate claim confidence against standard or high-impact publish thresholds.  */
 export function evaluateClaimConfidence(
   score: number,
   claimClass: ClaimClass,
@@ -135,7 +135,7 @@ export function evaluateClaimConfidence(
   });
 }
 
-/** Confirm a maturity / source / legal-status token is in the constitution vocabulary. */
+/** Confirm a maturity source legal-status token is in the constitution vocabulary.  */
 export function isRecognizedVocabulary(
   kind: 'maturity' | 'source' | 'legalStatus',
   value: string,

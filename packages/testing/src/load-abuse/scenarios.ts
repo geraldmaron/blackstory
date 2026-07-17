@@ -1,5 +1,6 @@
+
 /**
- * BB-059 abuse scenario runners — deterministic fixtures against security guardrails.
+ * abuse scenario runners deterministic fixtures against security guardrails.
  */
 import {
   DEFAULT_DAILY_BUDGETS,

@@ -1,7 +1,8 @@
+
 /**
- * REAL roster entry: Reddit deletion-sync (BB-074/BB-077/BB-084). Wraps `@black-book/domain`'s
+ * REAL roster entry: Reddit deletion-sync. Wraps `@black-book/domain`'s
  * Reddit deletion-sync module (packages/domain/src/adapters/reddit/deletion-sync.ts), which in
- * turn wraps BB-077's shared purge framework (`planDeletionSyncPurge`/`applyDeletionSyncPurge`,
+ * turn wraps shared purge framework (`planDeletionSyncPurge`/`applyDeletionSyncPurge`,
  * packages/domain/src/rights/deletion-sync.ts) — this file does not reimplement purge, audit, or
  * liveness-classification mechanics; it only sequences the scheduled sweep and hands its output
  * to `startJobRun`/`completeJobRun` so it can be dispatched through this registry, exactly like
@@ -9,15 +10,15 @@
  *
  * `checkLiveness` (the Reddit liveness-checking I/O port,
  * packages/domain/src/adapters/reddit/liveness.ts `RedditLivenessChecker`) is a REQUIRED input
- * with no default network implementation here — unlike ./citation-link-health-sweep.ts, which
- * defaults to a real BB-030-backed fetcher because arbitrary citation URLs need no special
+ * with no default network implementation here unlike ./citation-link-health-sweep.ts, which
+ * defaults to a Node-backed fetcher because arbitrary citation URLs need no special
  * authentication. Reddit's liveness lookup requires an OAuth bearer token that does not exist
- * until the Responsible Builder application (a HUMAN STEP — see
+ * until the Responsible Builder application (a HUMAN STEP see
  * packages/domain/src/adapters/reddit/contract.ts) is approved and credentials are provisioned;
- * encoding an unauthenticated default here would just reproduce the exact 403 the bead's own
- * research documents. Once approval lands, production wiring supplies a real checker built on
+ * encoding an unauthenticated default here would just reproduce the exact 403 those
+ * research documents describe. Once approval lands, production wiring supplies a real checker built on
  * `checkRedditPostLivenessViaListingLookup` (same domain module) plus a concrete
- * `SafeHttpClient`. Tests inject a fixture-driven fake — zero live network calls happen here or
+ * `SafeHttpClient`. Tests inject a fixture-driven fake zero live network calls happen here or
  * in this file's test.
  *
  * `pointers` and `purgeStore` are likewise caller-supplied: this job is store-agnostic (mirrors
@@ -60,11 +61,12 @@ export type RedditDeletionSyncJobResult = {
   };
 };
 
+
 /**
  * Runs one scheduled Reddit deletion-sync sweep: re-checks liveness for every supplied pointer
  * via the real domain-layer sweep, then applies every resulting purge plan's mutations against
- * `purgeStore` via the real BB-077 `applyDeletionSyncPurge` (re-exported as
- * `applyRedditPointerPurge`) — never a re-derived delete.
+ * `purgeStore` via the real `applyDeletionSyncPurge` (re-exported as
+ * `applyRedditPointerPurge`) never a re-derived delete.
  */
 export async function runRedditDeletionSyncJob(
   input: RedditDeletionSyncJobInput,

@@ -1,5 +1,5 @@
 /**
- * Unit tests for BB-055 opaque receipt codes.
+ * Unit tests for opaque receipt codes.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

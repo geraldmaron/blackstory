@@ -1,5 +1,6 @@
+
 /**
- * Unit tests for BB-061 recovery rehearsal dry-run helpers.
+ * Unit tests for recovery rehearsal dry-run helpers.
  */
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';

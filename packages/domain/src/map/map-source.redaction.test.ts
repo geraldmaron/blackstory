@@ -1,11 +1,11 @@
 /**
- * THE critical BB-070 regression test: proves buildMapSource, wired to the
+ * THE critical regression test: proves buildMapSource, wired to the
  * REAL `redactLocationForPublic` from `@black-book/security` (not a stub),
  * never lets a precise living-person residential coordinate reach the
  * generated map source at full precision.
  *
  * `@black-book/security` is a devDependency of this package for this test
- * only (see package.json) — it is never imported by map-source.ts itself,
+ * only (see package.json) it is never imported by map-source.ts itself,
  * so there is no runtime circular dependency (security already depends on
  * domain at runtime; domain's shipped code has zero dependency on security).
  */
@@ -36,14 +36,14 @@ test('CRITICAL: a living person with a precise residential coordinate never appe
   });
 
   // The exact raw residential coordinate must not appear anywhere in the
-  // serialized output — not truncated float noise, the literal value.
+  // serialized output not truncated float noise, the literal value.
   const serialized = JSON.stringify(result);
   assert.doesNotMatch(serialized, new RegExp(String(rawLocation.lat)));
   assert.doesNotMatch(serialized, new RegExp(String(rawLocation.lng)));
   assert.doesNotMatch(serialized, /Bayou Street/); // the address-shaped label
 
   // The entity still appears (constitution allows city-level presence for a
-  // living person's associated place — it is not fully hidden), but only at
+  // living person's associated place it is not fully hidden), but only at
   // the constitution's living-residence ceiling: city precision, coarsened
   // to 2 decimal places, with the street-address label stripped.
   const feature = result.featureCollection.features.find(

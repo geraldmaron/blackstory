@@ -1,5 +1,6 @@
+
 /**
- * BB-057 automated accessibility checks for core journey HTML fixtures.
+ * automated accessibility checks for core journey HTML fixtures.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

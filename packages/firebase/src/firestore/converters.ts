@@ -1,5 +1,6 @@
+
 /**
- * Zod-backed Firestore converters and parse helpers for Black Book documents (BB-013–018).
+ * Zod-backed Firestore converters and parse helpers for Black Book documents.
  */
 import type { FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase/firestore';
 import type { z } from 'zod';

@@ -1,18 +1,18 @@
 /**
- * The BB-082 "place context" composite: a single procedural summary derived ONLY from layers 1-4
+ * The "place context" composite: a single procedural summary derived ONLY from layers 1-4
  * (documented events, sundown-town, exclusion infrastructure, presence/affirmation) with
  * published weights, versioned methodology, input fingerprints, and audited recalculation \u2014
- * the exact BB-043 pattern (../confidence-engine/engine.ts) applied to this engine.
+ * the exact pattern (../confidence-engine/engine.ts) applied to this engine.
  *
  * CRITICAL INVARIANT: layer 5 (modern-context \u2014 hate-crime signal, general-crime context,
  * advisories) NEVER enters this composite. That is enforced FOUR independent ways here:
- *   1. `CompositeLayerInputs` has no slot for a layer-5 signal \u2014 there is nowhere to put one.
- *   2. `assertNoExcludedLayerInComposite` runtime-checks every present signal's own `layerId`
- *      discriminant against its expected slot and throws on any `modern_context` signal.
- *   3. `assertScoringInputFreeOfExcludedData` (../scoring-guard.js) recursively scans the
- *      resolved input for general-crime-stats and advisory field names.
- *   4. `HISTORIC_SAFETY_COMPOSITE_TYPE_INVARIANTS` proves at compile time that `CompositeResult`
- *      shares no field name with `GeneralCrimeContextRecord` or `PlaceAdvisoryRecord`.
+ * 1. `CompositeLayerInputs` has no slot for a layer-5 signal \u2014 there is nowhere to put one.
+ * 2. `assertNoExcludedLayerInComposite` runtime-checks every present signal's own `layerId`
+ * discriminant against its expected slot and throws on any `modern_context` signal.
+ * 3. `assertScoringInputFreeOfExcludedData` (../scoring-guard.js) recursively scans the
+ * resolved input for general-crime-stats and advisory field names.
+ * 4. `HISTORIC_SAFETY_COMPOSITE_TYPE_INVARIANTS` proves at compile time that `CompositeResult`
+ * shares no field name with `GeneralCrimeContextRecord` or `PlaceAdvisoryRecord`.
  * `composite.crime-never-scores.test.ts` exercises all four against the REAL functions below.
  *
  * There is never one opaque safety score even here: `layerContributions` always accompanies
@@ -48,7 +48,7 @@ export const COMPOSITE_LAYER_WEIGHTS: Readonly<Record<Exclude<CompositeEligibleL
 };
 
 /** Presence/affirmation can reduce the harm composite by at most this fraction \u2014 a bounded,
- *  published counterweight, never enough to fully erase documented harm on its own. */
+ * published counterweight, never enough to fully erase documented harm on its own. */
 export const COUNTERWEIGHT_MAX_REDUCTION = 0.3;
 
 export type CompositeLayerInputs = {
@@ -96,9 +96,8 @@ export type CompositeLayerContributions = Readonly<Record<CompositeEligibleLayer
 
 export type CompositeResult = {
   readonly placeEntityId: string;
-  /** The single procedural "place context" summary value in [0,1] \u2014 NEVER presented alone;
-   *  `layerContributions` is always one interaction away, per the bead's "never one opaque
-   *  score" invariant. */
+  /** The single procedural "place context" summary value in [0,1] — NEVER presented alone;
+   * `layerContributions` is always one interaction away ("never one opaque score"). */
   readonly value: number;
   readonly layerContributions: CompositeLayerContributions;
   /** Layers with no data for this place \u2014 distinct from a documented zero. */
@@ -177,7 +176,7 @@ export function computeComposite(input: ComputeCompositeInput): CompositeResult 
 }
 
 // ---------------------------------------------------------------------------
-// BB-043 pattern: versioned methodology, input fingerprints, audited recalculation
+// pattern: versioned methodology, input fingerprints, audited recalculation
 // ---------------------------------------------------------------------------
 
 export type CompositeInputFingerprints = Readonly<Record<CompositeEligibleLayerId | 'weights', string>>;
@@ -241,7 +240,7 @@ function changedInputs(
 }
 
 /**
- * Recalculates the composite and stamps a full audit trail (BB-043 pattern): engine/methodology
+ * Recalculates the composite and stamps a full audit trail: engine/methodology
  * versions, the published weights actually used, per-layer input fingerprints, and which inputs
  * changed since `previous` (or "all of them" on a first calculation).
  */

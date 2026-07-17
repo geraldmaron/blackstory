@@ -1,6 +1,6 @@
 /**
- * Fail-closed validators for BB-058 seed campaigns. Calls real BB-090 notability gates,
- * BB-083 citation completeness gates, and BB-094 corpus promotion gates — never parallel
+ * Fail-closed validators for seed campaigns. Calls real notability gates,
+ * citation completeness gates, and corpus promotion gates never parallel
  * check logic that could drift from production gates.
  */
 import { isCitationStructurallyComplete } from '../citations/citation.js';
@@ -42,7 +42,7 @@ function failure(recordId: string, gate: string, reason: string): SeedValidation
   return { recordId, gate, reason };
 }
 
-/** Structural schema validation — fails closed on malformed fixture shape. */
+/** Structural schema validation fails closed on malformed fixture shape. */
 export function assertSeedRecordSchemaValid(record: SeedRecord): void {
   if (!record.id.trim()) throw new Error('Seed record id is required');
   if (!(SEED_CAMPAIGN_IDS as readonly string[]).includes(record.campaignId)) {
@@ -72,7 +72,7 @@ export function assertSeedRecordSchemaValid(record: SeedRecord): void {
   }
 }
 
-/** BB-083 evidence gate — every claim must have a structurally complete citation. */
+/** evidence gate every claim must have a structurally complete citation. */
 export function assertSeedRecordEvidenceGate(record: SeedRecord): void {
   for (const claim of record.claims) {
     const citations = record.citations.map((citation) => ({
@@ -89,7 +89,7 @@ export function assertSeedRecordEvidenceGate(record: SeedRecord): void {
   }
 }
 
-/** BB-090 notability gate — publishable entities require >=1 notability basis record. */
+/** notability gate publishable entities require >=1 notability basis record. */
 export function assertSeedRecordNotabilityGate(record: SeedRecord): void {
   const gate = evaluateNotabilityGate(record.notabilityBasis ? [record.notabilityBasis] : undefined);
   if (!gate.passed) {
@@ -101,7 +101,7 @@ export function assertSeedRecordNotabilityGate(record: SeedRecord): void {
   });
 }
 
-/** Campaign thematic fit — notability criterion must match campaign preferences. */
+/** Campaign thematic fit notability criterion must match campaign preferences. */
 export function assertSeedRecordCampaignThematicFit(record: SeedRecord): void {
   const meta = seedCampaignMeta(record.campaignId);
   if (!meta.preferredNotabilityCriteria.includes(record.notabilityBasis.criterion)) {
@@ -112,7 +112,7 @@ export function assertSeedRecordCampaignThematicFit(record: SeedRecord): void {
   }
 }
 
-/** BB-094 corpus promotion gate when a record declares a launch-corpus source. */
+/** corpus promotion gate when a record declares a launch-corpus source. */
 export function assertSeedRecordCorpusPromotionGate(
   record: SeedRecord,
   input: { readonly vettedBy: string; readonly vettedAt: string },
@@ -206,7 +206,7 @@ export function assertAllSeedRecordsPassGates(
   }
 }
 
-/** BB-058 AC4 — seed must not approach bulk U.S. school inventory scale. */
+/** seed must not approach bulk U.S. school inventory scale. */
 export function assertNationalSeedNotBulkImport(records: readonly SeedRecord[]): void {
   if (records.length > NATIONAL_SEED_MAX_RECORDS) {
     throw new Error(

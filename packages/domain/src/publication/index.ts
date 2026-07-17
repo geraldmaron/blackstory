@@ -1,6 +1,6 @@
 /**
  * Immutable publication-release contracts, deterministic hashing, signed manifests,
- * snapshot layout, lifecycle rules, and public response metadata for BB-019.
+ * snapshot layout, lifecycle rules, and public response metadata.
  */
 import { createHash, sign as signBytes, verify as verifyBytes, type KeyLike } from 'node:crypto';
 

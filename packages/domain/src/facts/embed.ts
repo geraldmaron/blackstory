@@ -1,12 +1,12 @@
 /**
- * Compact embed/reference view (BB-086 acceptance criteria 4 & 8) — the ONE shared shape the
- * map (BB-051/070), entity/place/event pages (BB-052), and the evidence UI (BB-053) all render
+ * Compact embed/reference view the ONE shared shape the
+ * map, entity/place/event pages, and the evidence UI all render
  * when they cite a fact inline. Every embed carries the SAME canonical URL and the SAME citation
  * set as the fact's own page: there is exactly one place a reader can go to see "why do we say
  * this," no matter which surface they clicked through from.
  *
- * Deliberately display-safe and small: no raw confidence score, no internal ordering key — just
- * what BB-053's `EvidenceCitationView`/`Confidence` components already know how to render, so a
+ * Deliberately display-safe and small: no raw confidence score, no internal ordering key just
+ * what `EvidenceCitationView`/`Confidence` components already know how to render, so a
  * consuming surface can drop this straight into that existing UI vocabulary.
  */
 import { buildFactPath } from './ids.js';
@@ -23,7 +23,7 @@ export type CompactFactCitationView = {
   readonly sourceTitle: string;
   readonly sourceClass: string;
   readonly role: string;
-  /** Prefers the archived capture (BB-016) as the outbound link so a link-rot event on the
+  /** Prefers the archived capture as the outbound link so a link-rot event on the
    * original never breaks the embed; falls back to the live URL when no archive exists yet
    * (e.g. an offline/non-web citation with no archivedUrl at all). */
   readonly href?: string;
@@ -89,8 +89,8 @@ export function buildCompactFactView(fact: FactRecord): CompactFactView {
   };
 }
 
-/** Builds embed views for every fact that names `entityId` as a subject — the call an
- * entity/place/event page makes to render its "Facts about this record" section (AC4). */
+/** Builds embed views for every fact that names `entityId` as a subject the call an
+ * entity/place/event page makes to render its "Facts about this record" section. */
 export function buildCompactFactViewsForEntity(
   entityId: string,
   facts: readonly FactRecord[],

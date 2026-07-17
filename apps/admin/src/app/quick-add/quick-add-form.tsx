@@ -1,9 +1,9 @@
 'use client';
 
 /**
- * Quick-add form (BB-085): paste a URL, fetch it through BB-030 safety, review the pre-filled
+ * Quick-add form: paste a URL, fetch it through safety, review the pre-filled
  * citation and capture-plan note, and see the draft research case `runResearchIntake` prepared.
- * All the real work happens server-side in `./actions.ts` — this component only renders state.
+ * All the real work happens server-side in `./actions.ts`; this component only renders state.
  */
 import { useActionState } from 'react';
 import { submitQuickAdd } from './actions.js';

@@ -1,5 +1,5 @@
 /**
- * Approved structured school-history sources adapter definition (BB-046).
+ * Approved structured school-history sources adapter definition.
  */
 import {
   buildFederalAdapterDefinition,

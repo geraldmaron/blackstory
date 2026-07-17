@@ -29,7 +29,7 @@ export type ApplicationSchema = (typeof APPLICATION_SCHEMAS)[number];
 
 export type RolePrivilege = 'read' | 'write' | 'none';
 
-/** Schema privilege matrix used by session guards and static tests. */
+/** Schema privilege matrix used by session guards and static tests.  */
 export const ROLE_SCHEMA_MATRIX: Readonly<
   Record<DatabaseRole, Readonly<Record<ApplicationSchema, RolePrivilege>>>
 > = {
@@ -131,7 +131,7 @@ export function roleMayAccess(
   return privilege === 'write';
 }
 
-/** Invariants from product constitution / ADR-003 expressed as matrix assertions. */
+/** Invariants from product constitution ADR-003 expressed as matrix assertions.  */
 export function assertRoleIsolationInvariants(): void {
   if (roleMayAccess('role_research', 'bb_public', 'write')) {
     throw new Error('role_research must not write bb_public');

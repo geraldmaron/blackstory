@@ -1,10 +1,12 @@
 /**
  * Public-facing seed catalog for the web UI.
  * Mirrors safe fields from packages/firebase/fixtures/firestore-seed.ts for
- * demonstrable pages until BB-019 public projections and BB-049 search land.
+ * demonstrable pages until public projections and search land.
  * Never includes residential addresses or unpublished high-impact claims.
  */
 import {
+  buildRelatedNeighborStubs,
+  composeContinueLearningStubs,
   type DatePrecision,
   type EntitySensitivity,
   type EntityStatusValue,
@@ -37,11 +39,11 @@ export type PublicClaimView = {
 export type PublicTimelineEvent = GraphTimelineEntry;
 
 /**
- * BB-092 acceptance criterion 5: typed related-entity entry, mirroring
- * `@black-book/domain`'s `PublicRelatedEntry` (packages/domain/src/graph/adjacency.ts) and
+ * Typed related-entity entry, mirroring `@black-book/domain`'s `PublicRelatedEntry`
+ * (packages/domain/src/graph/adjacency.ts) and
  * `packages/firebase/src/firestore/types.ts`'s `publicEntityProjectionSchema.related` — the same
  * shape derived from a release's graph adjacency doc. Hardcoded here rather than imported since
- * this file is a standalone web-app seed catalog predating BB-019 projections (see the module
+ * this file is a standalone web-app seed catalog predating projections (see the module
  * doc above), matching this file's existing convention of not importing @black-book/domain types.
  */
 export type PublicRelatedEntry = {
@@ -51,8 +53,8 @@ export type PublicRelatedEntry = {
   readonly timespan?: { readonly label?: string; readonly validFrom?: string; readonly validTo?: string | null };
 };
 
-/** BB-090: the event kind's when-span is authoritative in place of a `statusHistory` field — an
- * event is never "active" or "historic" (see `STATUSLESS_ENTITY_KINDS`). */
+/** Event when-span: the event kind's when-span is authoritative in place of a `statusHistory`
+ * field — an event is never "active" or "historic" (see `STATUSLESS_ENTITY_KINDS`). */
 export type PublicEventWindow = {
   readonly startAt?: string;
   readonly endAt?: string | null;
@@ -60,13 +62,40 @@ export type PublicEventWindow = {
   readonly eventType?: string;
 };
 
-/** Minimal BB-019 release/revision provenance. Full claim-version diffing and revision browsing
- * is BB-053's job (see the entity page's own "Evidence & projection depth" placeholder); this is
- * the honest scaffold-depth metadata available from a seed fixture standing in for a release. */
+/** Minimal release/revision provenance. Full claim-version diffing and revision browsing
+ * is a separate concern (see the entity page's own "Evidence & projection depth" placeholder);
+ * this is the honest scaffold-depth metadata available from a seed fixture standing in for a
+ * release. */
 export type PublicRevisionMetadata = {
   readonly releaseId: string;
   readonly generatedAt: string;
   readonly recordUpdatedAt: string;
+};
+
+/** Rights-cleared optional hero image for learning-index entity pages. */
+export type PublicEntityPrimaryImageView = {
+  readonly url: string;
+  readonly alt: string;
+  readonly credit: string;
+  readonly rightsStatus: 'public_domain' | 'licensed' | 'fair_use';
+  readonly width?: number;
+  readonly height?: number;
+  readonly objectPath?: string;
+};
+
+/** Denormalized related neighbor for entity-page learning links (1-hop or 2-hop). */
+export type RelatedNeighborView = {
+  readonly id: string;
+  readonly displayName: string;
+  readonly kind: PublicEntityKind | string;
+  readonly summary: string;
+  readonly relationType: string;
+  readonly direction: 'outgoing' | 'incoming';
+  readonly timespan?: {
+    readonly label?: string;
+    readonly validFrom?: string;
+    readonly validTo?: string | null;
+  };
 };
 
 export type PublicEntityView = {
@@ -74,57 +103,66 @@ export type PublicEntityView = {
   readonly kind: PublicEntityKind;
   readonly displayName: string;
   readonly summary: string;
-  /** @deprecated Free-text era label predating BB-090's structured era model. Prefer
+  /** @deprecated Free-text era label predating structured era model. Prefer
    * `eraBuckets`, derived from @black-book/domain's `deriveEraBuckets`. Kept for existing
    * filter/display call sites until they migrate. */
   readonly era: string;
   /**
-   * BB-090 public projection additions — every one non-numeric by standing policy (numeric
+   * Public projection additions — every one non-numeric by standing policy (numeric
    * notability/relevance scores are banned from public payloads).
    */
   /** Derived current lifecycle status label (e.g. "active", "in_force"), when the entity kind
    * carries one. Never hand-edited — derived via @black-book/domain's `currentEntityStatus`. */
   readonly status?: string;
-  /** Time-scoped BB-090 status-lifecycle designations for place/school/institution kinds — omitted
+  /** Time-scoped status-lifecycle designations for place/school/institution kinds omitted
    * for `event` (see `eventWindow`). `status` above is always `currentStatus(statusHistory)`,
    * never an independent hand-set value. */
   readonly statusHistory?: readonly StatusHistoryEntry<EntityStatusValue>[];
-  /** `event`-kind entities carry this instead of `statusHistory`/`status` (BB-090). */
+  /** `event`-kind entities carry this instead of `statusHistory`/`status`.  */
   readonly eventWindow?: PublicEventWindow;
   /** Decade labels the entity's dated span overlaps, derived via @black-book/domain's
-   * `deriveEraBuckets` — replaces the free-text `era` string above. */
+   * `deriveEraBuckets` replaces the free-text `era` string above. */
   readonly eraBuckets?: readonly string[];
   /** Human-readable notability rubric labels (never the raw criterion id alone, never a score),
-   * one per notabilityBasis record — sourced from @black-book/domain's `NOTABILITY_RUBRIC`. */
+   * one per notabilityBasis record sourced from @black-book/domain's `NOTABILITY_RUBRIC`. */
   readonly notabilityLabels?: readonly string[];
-  /** Sensitivity classification label, when the entity carries one. Presentation is BB-095. */
+  /** Sensitivity classification label, when the entity carries one. Presentation is via
+   * `SensitivityContextBanner`. */
   readonly sensitivityClass?: string;
-  /** Full schema-only BB-090 sensitivity record ({class, note, basisClaimIds}) — the shape the
-   * BB-095 `SensitivityContextBanner` consumes. `sensitivityClass` above stays a plain string for
+  /** Full schema-only sensitivity record ({class, note, basisClaimIds}) — the shape the
+   * `SensitivityContextBanner` consumes. `sensitivityClass` above stays a plain string for
    * the pre-existing search-index adapter; this is the richer projection the entity page renders. */
   readonly sensitivity?: EntitySensitivity;
   readonly topicTags: readonly string[];
   readonly jurisdictionLabel: string;
-  /** City / campus / neighborhood — never street or residence. */
+  /** City, campus, or neighborhood — never street or residence. */
   readonly locationPrecision: 'city' | 'neighborhood' | 'campus' | 'institution';
   readonly locationLabel: string;
   readonly relevanceExplanation: string;
-  /** Concise framing of this record's place within documented Black history — general context,
+  /** Concise framing of this record's place within documented Black history general context,
    * not new unsourced facts about this specific record (those live in `claims`). Guards against a
    * page reading as a generic biography unrelated to place/Black history. */
   readonly historicalContext: string;
+  /** Optional multi-paragraph further reading; omit UI when absent. */
+  readonly extendedNarrative?: string;
+  /** Optional rights-cleared primary image; omit UI when absent. */
+  readonly primaryImage?: PublicEntityPrimaryImageView;
   readonly recordMaturity: string;
   readonly researchCoverage: 'minimal' | 'partial' | 'substantial';
   readonly mapPin: { readonly x: number; readonly y: number };
   readonly claims: readonly PublicClaimView[];
   readonly timeline: readonly PublicTimelineEvent[];
   readonly revision: PublicRevisionMetadata;
-  /** @deprecated Untyped predecessor to `related` (BB-092). Kept for existing call sites until
+  /** @deprecated Untyped predecessor to `related`. Kept for existing call sites until
    * they migrate to the typed `{id, type, direction, timespan}` shape. */
   readonly relatedIds: readonly string[];
-  /** BB-092 acceptance criterion 5: typed related entries — see `PublicRelatedEntry` above.
+  /** Typed related entries — see `PublicRelatedEntry` above.
    * Optional so existing seed fixtures keep working until they're backfilled. */
   readonly related?: readonly PublicRelatedEntry[];
+  /** Hydrated 1-hop neighbors for learning links (populated at read time). */
+  readonly relatedNeighbors?: readonly RelatedNeighborView[];
+  /** Capped 2-hop continue-learning stubs (composed at read time, not stored). */
+  readonly continueLearning?: readonly RelatedNeighborView[];
 };
 
 function confidenceLevel(score: number): 'high' | 'medium' | 'low' {
@@ -140,7 +178,7 @@ function revisionFor(recordUpdatedAt: string): PublicRevisionMetadata {
   return { releaseId: SEED_RELEASE_ID, generatedAt: SEED_GENERATED_AT, recordUpdatedAt };
 }
 
-// Precomputed BB-090/BB-092 derived values, spread conditionally below (exactOptionalPropertyTypes
+// Precomputed derived values, spread conditionally below (exactOptionalPropertyTypes
 // forbids assigning a possibly-`undefined`-typed value directly to an optional property).
 const PLACE_STATUS = currentStatusFor('ent_seed_place_001');
 const PLACE_STATUS_HISTORY = statusHistoryFor('ent_seed_place_001');
@@ -151,15 +189,15 @@ const INSTITUTION_STATUS = currentStatusFor('ent_seed_institution_001');
 const INSTITUTION_STATUS_HISTORY = statusHistoryFor('ent_seed_institution_001');
 
 /**
- * Seed entities aligned with firestore-seed public projections. One fixture per kind this bead
- * covers (place, school, event, institution) — a small, connected graph (school located_at place;
- * event occurred_at school; institution commemorates event) so the BB-092 graph-view builders in
+ * Seed entities aligned with firestore-seed public projections. One fixture per kind this 
+ * covers (place, school, event, institution) a small, connected graph (school located_at place;
+ * event occurred_at school; institution commemorates event) so the graph-view builders in
  * `./entity-graph-seed.ts` have real edges to derive `related`/`timeline` from. Person fixtures are
- * intentionally omitted from public browse (BB-015 living-person).
+ * intentionally omitted from public browse.
  *
  * `timeline` is filled in below via a second pass over this draft array (`PUBLIC_SEED_ENTITIES`)
  * so its relationship sentences can resolve neighbor display names across fixtures; `related` is
- * already the real BB-092 graph-builder output (see `relatedEntriesFor`), not hand-authored.
+ * already the real graph-builder output (see `relatedEntriesFor`), not hand-authored.
  */
 const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
   {
@@ -167,7 +205,8 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     kind: 'place',
     displayName: 'Seed Historical Place',
     summary:
-      'Fixture projection for a historically documented Black community place in the District of Columbia area.',
+      'A historically documented Black community place in the District of Columbia area, ' +
+      'tied to education and mutual-aid networks with published archival claims for learners.',
     era: 'reconstruction',
     ...(PLACE_STATUS !== undefined ? { status: PLACE_STATUS } : {}),
     ...(PLACE_STATUS_HISTORY !== undefined ? { statusHistory: PLACE_STATUS_HISTORY } : {}),
@@ -224,7 +263,8 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     kind: 'school',
     displayName: 'Seed Freedmen School',
     summary:
-      'School with documented historical and current campus locations (campus precision only).',
+      'Freedmen school with documented historical and current campus locations at campus ' +
+      'precision only — a multi-era educational anchor for Black public schooling in D.C.',
     era: 'reconstruction',
     ...(SCHOOL_STATUS !== undefined ? { status: SCHOOL_STATUS } : {}),
     ...(SCHOOL_STATUS_HISTORY !== undefined ? { statusHistory: SCHOOL_STATUS_HISTORY } : {}),
@@ -242,6 +282,18 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
       'Freedmen schools, often founded by formerly enslaved communities and northern aid societies, ' +
       'were among the first formal Black educational institutions in the post-Emancipation District ' +
       'of Columbia. See Accepted claims below for statements specific to this record.',
+    extendedNarrative:
+      'This seed further-reading block shows how longer curated prose can deepen a record without ' +
+      'replacing Accepted claims. Educators can use it as a bridge from the short summary into ' +
+      'primary-source investigation. Sample seed data — not a live public release.',
+    primaryImage: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Flag_of_the_United_States.svg/320px-Flag_of_the_United_States.svg.png',
+      alt: 'Schematic stand-in image representing a historic school campus record',
+      credit: 'Public-domain schematic fixture for emulator and seed demos only',
+      rightsStatus: 'public_domain',
+      width: 320,
+      height: 168,
+    },
     recordMaturity: 'minimum_record',
     researchCoverage: 'partial',
     mapPin: { x: 55, y: 50 },
@@ -274,7 +326,8 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     kind: 'event',
     displayName: 'Seed Emancipation Day Commemoration',
     summary:
-      'A documented 1954 commemoration held on the connected school\u2019s campus, marking its relocation.',
+      'A documented 1954 campus commemoration marking the connected school\u2019s relocation, ' +
+      'linking educational transition to mid-century community organizing in Washington, D.C.',
     era: 'mid_20th_century',
     eventWindow: { startAt: '1954', endAt: null, datePrecision: 'year', eventType: 'commemoration' },
     eraBuckets: ['1950s'],
@@ -316,7 +369,8 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     kind: 'institution',
     displayName: 'Seed Heritage Preservation Society',
     summary:
-      'A community anchor institution documenting and commemorating the school\u2019s history since 1975.',
+      'A community heritage society documenting and commemorating the connected school\u2019s ' +
+      'history since 1975 — an institutional memory keepers for place-based learning.',
     era: 'late_20th_century',
     ...(INSTITUTION_STATUS !== undefined ? { status: INSTITUTION_STATUS } : {}),
     ...(INSTITUTION_STATUS_HISTORY !== undefined ? { statusHistory: INSTITUTION_STATUS_HISTORY } : {}),
@@ -359,10 +413,66 @@ const DISPLAY_NAME_LOOKUP: ReadonlyMap<string, { readonly displayName: string }>
   SEED_ENTITY_DRAFTS.map((entity) => [entity.id, { displayName: entity.displayName }]),
 );
 
-export const PUBLIC_SEED_ENTITIES: readonly PublicEntityView[] = SEED_ENTITY_DRAFTS.map((entity) => ({
-  ...entity,
-  timeline: buildGraphTimeline(entity, DISPLAY_NAME_LOOKUP),
-}));
+function hydrateLearningLinks(
+  entities: readonly PublicEntityView[],
+): readonly PublicEntityView[] {
+  const neighborsById = new Map(
+    entities.map((entity) => [
+      entity.id,
+      {
+        id: entity.id,
+        displayName: entity.displayName,
+        kind: entity.kind,
+        summary: entity.summary,
+        ...(entity.related !== undefined ? { related: entity.related } : {}),
+      },
+    ]),
+  );
+
+  return entities.map((entity) => {
+    const relatedNeighborStubs = buildRelatedNeighborStubs(entity.related, neighborsById);
+    const continueLearningStubs = composeContinueLearningStubs(
+      entity.id,
+      relatedNeighborStubs,
+      neighborsById,
+    );
+
+    const toView = (stub: (typeof relatedNeighborStubs)[number]): RelatedNeighborView =>
+      stub.timespan !== undefined
+        ? {
+            id: stub.id,
+            displayName: stub.displayName,
+            kind: stub.kind,
+            summary: stub.summary,
+            relationType: stub.relationType,
+            direction: stub.direction,
+            timespan: stub.timespan,
+          }
+        : {
+            id: stub.id,
+            displayName: stub.displayName,
+            kind: stub.kind,
+            summary: stub.summary,
+            relationType: stub.relationType,
+            direction: stub.direction,
+          };
+
+    const relatedNeighbors = relatedNeighborStubs.map(toView);
+    const continueLearning = continueLearningStubs.map(toView);
+    return {
+      ...entity,
+      ...(relatedNeighbors.length > 0 ? { relatedNeighbors } : {}),
+      ...(continueLearning.length > 0 ? { continueLearning } : {}),
+    };
+  });
+}
+
+export const PUBLIC_SEED_ENTITIES: readonly PublicEntityView[] = hydrateLearningLinks(
+  SEED_ENTITY_DRAFTS.map((entity) => ({
+    ...entity,
+    timeline: buildGraphTimeline(entity, DISPLAY_NAME_LOOKUP),
+  })),
+);
 
 export const FEATURED_SEED_IDS = ['ent_seed_school_001', 'ent_seed_place_001'] as const;
 

@@ -1,5 +1,5 @@
 /**
- * Testable core of BB-055 correction intake routes. Next.js `route.ts` files stay thin because
+ * Testable core of correction intake routes. Next.js `route.ts` files stay thin because
  * the App Router type validator rejects non-handler exports from route modules.
  */
 import { createHash, randomUUID } from 'node:crypto';

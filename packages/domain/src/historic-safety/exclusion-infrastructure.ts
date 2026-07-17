@@ -1,8 +1,8 @@
 /**
- * Layer 3 — exclusion infrastructure: HOLC redlining grades (Mapping Inequality, University of
+ * Layer 3 exclusion infrastructure: HOLC redlining grades (Mapping Inequality, University of
  * Richmond DSL, sourced from NARA) and racially restrictive covenant projects where digitized.
  *
- * AC12: HOLC/redlining grades are their OWN designation record type (A/B/C/D, ./layer-record.ts's
+ * HOLC/redlining grades are their OWN designation record type (A/B/C/D; see ./layer-record.ts's
  * `RedliningGradeDesignationRecord`) — a distinct vocabulary from the sundown-town taxonomy in
  * ./sundown-town.ts, never conflated with or dropped in favor of it. Covenant records are a
  * third, separate designation kind (`RestrictiveCovenantDesignationRecord`) folded into this same
@@ -22,8 +22,8 @@ import { assertLayerCitationValid, type LayerCitation, type LayerSignal } from '
 export const EXCLUSION_INFRASTRUCTURE_METHODOLOGY_VERSION =
   'exclusion-infrastructure-methodology.v1' as const;
 
-/** Published HOLC-grade weights (methodology, versioned above) — grade D ("Hazardous") is the
- *  most exclusionary designation under the original HOLC scheme. */
+/** Published HOLC-grade weights (methodology, versioned above) grade D ("Hazardous") is the
+ * most exclusionary designation under the original HOLC scheme. */
 export const HOLC_GRADE_WEIGHTS: Readonly<Record<HolcGrade, number>> = {
   A: 0,
   B: 0.33,
@@ -69,7 +69,7 @@ export type ComputeExclusionInfrastructureLayerInput = {
 
 /**
  * Never fabricates a signal when neither a redlining-grade nor a covenant record exists for the
- * place — an absence of digitized HOLC/covenant data means "not documented," never "cleared."
+ * place an absence of digitized HOLC/covenant data means "not documented," never "cleared."
  */
 export function computeExclusionInfrastructureLayerSignal(
   input: ComputeExclusionInfrastructureLayerInput,

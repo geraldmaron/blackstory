@@ -1,5 +1,5 @@
 /**
- * Launch-corpus vetting-record registrations (BB-094 acceptance criteria 4, 5, 7).
+ * Launch-corpus vetting-record registrations.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

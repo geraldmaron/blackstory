@@ -1,5 +1,5 @@
 /**
- * Tests for reciprocal rank fusion determinism (BB-072 AC1).
+ * Tests for reciprocal rank fusion determinism.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

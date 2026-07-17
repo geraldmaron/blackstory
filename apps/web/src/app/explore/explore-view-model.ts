@@ -1,7 +1,7 @@
 /**
- * Pure server-side view-model builder for the BB-051 `/explore` page. Parses URL search params,
+ * Pure server-side view-model builder for the `/explore` page. Parses URL search params,
  * builds the explore map source from the active release snapshot, applies filters, and shapes
- * facet options — no Next.js runtime dependency so it is directly unit-testable (see
+ * facet options no Next.js runtime dependency so it is directly unit-testable (see
  * `./explore-view-model.test.ts`). Precomputes History edge line catalogs so the client can
  * toggle lines/decade without importing the graph release builder.
  */
@@ -47,7 +47,7 @@ export type ExploreViewModel = {
   readonly totalMatched: number;
   readonly dataSource: PublicReadSource;
   readonly availableDecades: readonly string[];
-  /** All-time + per-decade edge/line catalogs for client toggles without graph rebuild. */
+  /** All-time + per-decade edge/line catalogs for client toggles without graph rebuild.  */
   readonly edgeLineCatalog: ExploreEdgeLineCatalog;
   readonly historyEdges: readonly HistoryEdgeView[];
   readonly edgeLineCollection: ExploreEdgeLineSlice['lineCollection'];

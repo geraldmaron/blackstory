@@ -1,5 +1,5 @@
 /**
- * Deterministic added, changed, removed, and unchanged claim diff for release previews (BB-032).
+ * Deterministic added, changed, removed, and unchanged claim diff for release previews.
  */
 export type PreviewClaim = {
   readonly claimId: string;

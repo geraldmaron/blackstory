@@ -1,3 +1,4 @@
+
 /**
  * Defines the dependency-injected safe-fetch state machine used only by the
  * asynchronous URL worker. Each redirect is reparsed and re-resolved, the
@@ -179,6 +180,7 @@ export async function parseContentInSandbox(
     extractedText: extractedText.slice(0, 100_000),
   };
 }
+
 
 /**
  * Performs a bounded fetch through a transport that must connect directly to

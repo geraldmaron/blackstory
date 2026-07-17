@@ -1,5 +1,5 @@
 /**
- * Public BB-055 correction status page. Shows coarse phases only — never spam scores, campaign
+ * Public correction status page. Shows coarse phases only never spam scores, campaign
  * flags, duplicate lists, or other moderation-sensitive metadata.
  */
 import { EmptyState, Notice } from '@black-book/ui';

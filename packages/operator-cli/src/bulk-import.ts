@@ -1,11 +1,12 @@
+
 /**
  * CSV and markdown bulk-import parsing for operator leads, plus the batch runner. Also carries
- * the BB-094 corpus-vetted bulk-import batch runner (see the module doc further down this file,
+ * the corpus-vetted bulk-import batch runner (see the module doc further down this file,
  * above `prepareCorpusBulkImportBatch`) — the exclusive execution surface for vetted-corpus bulk
  * intake; no second import framework exists anywhere in this repo.
  *
- * Parsing is pure and network-free: it only turns text into `LeadInput[]`. Each parsed row is
- * still run through the real BB-029 validation inside `prepareOperatorIntake` — malformed rows
+ * Parsing is pure and network-free: it only turns text into `LeadInput`. Each parsed row is
+ * still run through the real validation inside `prepareOperatorIntake` malformed rows
  * are rejected individually (never silently dropped, never force-accepted) and reported in
  * the per-row outcome, exactly like a single `submit-lead` call would be.
  */
@@ -35,10 +36,11 @@ import {
   type OperatorSubmission,
 } from './intake.js';
 
+
 /**
  * CSV columns (header row required, order-independent): title, description, url, sourceUrls
  * (semicolon-separated), location, era, targetRecordId, submitterContact. Only `description`
- * is required by this parser — BB-029 validation still requires at least one source URL.
+ * is required by this parser validation still requires at least one source URL.
  */
 export function parseLeadsFromCsv(csvText: string): LeadInput[] {
   const rows = parseCsvRows(csvText);
@@ -129,10 +131,11 @@ const MARKDOWN_FIELD_KEYS: Record<string, keyof LeadInput> = {
   contact: 'submitterContact',
 };
 
+
 /**
  * Markdown bulk-import format: one `### <title>` heading per lead, followed by `Key: value`
  * lines (case-insensitive; `Description` may wrap multiple lines until the next key). `Source`
- * / `Url` may repeat to attach more than one source URL. See
+ * `Url` may repeat to attach more than one source URL. See
  * `.claude/skills/black-book/research-intake/SKILL.md` and
  * `docs/runbooks/operator-session.md` for a worked example.
  */
@@ -242,6 +245,7 @@ export type BulkImportSummary = {
   readonly rows: readonly BulkImportRowOutcome[];
 };
 
+
 /**
  * Runs every parsed row through the same intake path as `submit-lead`, one row at a time.
  * A rejected row never blocks the rest of the batch and never receives special-cased handling.
@@ -265,22 +269,22 @@ export function prepareBulkLeadIntake(
 }
 
 // ---------------------------------------------------------------------------
-// BB-094: vetted-corpus bulk-import batch runner — the exclusive execution surface for
-// corpus-vetted bulk intake (acceptance criterion 2). Every hard gate from the standard pipeline
-// survives (citation completeness, precision, notability — see
+// Vetted-corpus bulk-import batch runner — the exclusive execution surface for
+// corpus-vetted bulk intake. Every hard gate from the standard pipeline
+// survives (citation completeness, precision, notability; see
 // `@black-book/domain`'s `evaluateCorpusBulkPromotion`); this function's own job is: (1) the
 // fail-closed corpus-vetting + kill-switch gate, (2) the per-batch budget cap, (3) idempotent
 // duplicate detection, (4) routing every non-duplicate row through the SAME `prepareOperatorIntake`
-// quarantine path `prepareBulkLeadIntake` above uses — a corpus_fast_track record is still an
+// quarantine path `prepareBulkLeadIntake` above uses a corpus_fast_track record is still an
 // ordinary quarantine submission, just pre-annotated with its auto-derived notability/precision
-// facts (BB-094 acceptance criterion 3), never a second writer. Pure: like every other `prepare*`
+// facts, never a second writer. Pure: like every other `prepare*`
 // function in this file, it returns unexecuted mutations for a caller to pass to `commitOperatorIntake`
-// (`./commit.ts`) — nothing is written here.
+// (`./commit.ts`) nothing is written here.
 // ---------------------------------------------------------------------------
 
 export type CorpusBulkImportRowResult = {
   readonly row: CorpusBulkImportBatchRow;
-  /** Absent only for `outcome === 'skipped_duplicate'` rows — those never reach real intake. */
+  /** Absent only for `outcome === 'skipped_duplicate'` rows those never reach real intake. */
   readonly intakeOutcome?: OperatorIntakeOutcome;
 };
 
@@ -301,14 +305,14 @@ export type PrepareCorpusBulkImportBatchInput = {
   readonly killSwitch?: SourceKillSwitchState | null;
   readonly budget: CorpusBulkImportBudget;
   readonly priorRecordsInWindow?: number;
-  /** `sourceRecordId`s already imported for this corpus in a prior run (idempotent re-runs —
-   *  BB-094 acceptance criterion 2). The caller derives this from real prior-batch reports;
-   *  this function never re-derives it from a live store. */
+  /** `sourceRecordId`s already imported for this corpus in a prior run (idempotent re-runs).
+   * The caller derives this from real prior-batch reports; this function never re-derives it
+   * from a live store. */
   readonly alreadyImportedSourceRecordIds: ReadonlySet<string>;
   /** Human spot-check verdicts recorded so far, keyed by `sourceRecordId`. Omit entirely for the
-   *  first pass over a batch (the sample is selected but every selected row demotes to
-   *  `standard_consensus` with `spot_check_not_yet_sampled` until a verdict is supplied here on
-   *  a follow-up call) — this mirrors `evaluateCorpusBulkPromotion`'s own two-phase design. */
+   * first pass over a batch (the sample is selected but every selected row demotes to
+   * `standard_consensus` with `spot_check_not_yet_sampled` until a verdict is supplied here on
+   * a follow-up call) — this mirrors `evaluateCorpusBulkPromotion`'s own two-phase design. */
   readonly spotCheckVerdicts?: ReadonlyMap<string, SpotCheckVerdict>;
   readonly spotCheckSampleFraction?: number;
   readonly context: OperatorIntakeContext;
@@ -327,11 +331,12 @@ function stringifyRejection(outcome: OperatorIntakeOutcome): string | undefined 
   return outcome.rejection.issues.map((issue) => `${issue.field}: ${issue.message}`).join('; ') || 'rejected';
 }
 
+
 /**
  * Runs one corpus-vetted bulk-import batch through every hard gate and the standard quarantine
- * intake path. Never throws on a per-record basis — an ineligible or duplicate record demotes /
+ * intake path. Never throws on a per-record basis an ineligible or duplicate record demotes
  * skips rather than failing the whole batch; only the fail-closed corpus-vetting gate and the
- * budget cap can throw for the batch as a whole (BB-094 acceptance criterion 1 and 2).
+ * budget cap can throw for the batch as a whole.
  */
 export function prepareCorpusBulkImportBatch(
   input: PrepareCorpusBulkImportBatchInput,
@@ -363,7 +368,7 @@ export function prepareCorpusBulkImportBatch(
 
   for (const candidate of input.candidates) {
     if (input.alreadyImportedSourceRecordIds.has(candidate.sourceRecordId)) {
-      // Duplicate: evaluated only so the report carries a consistent decision shape — never
+      // Duplicate: evaluated only so the report carries a consistent decision shape never
       // routed through intake a second time.
       const decision = evaluateCorpusBulkPromotion({
         vetting: gate.vetting,

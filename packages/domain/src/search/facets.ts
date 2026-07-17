@@ -1,5 +1,5 @@
 /**
- * Faceted-search aggregation and allowlisted filtering (BB-049, BB-090 status/era additions).
+ * Faceted-search aggregation and allowlisted filtering.
  *
  * Both functions are pure. `computeFacetCounts` is a plain counting aggregation; `applyFilters`
  * enforces the 6 allowlisted filter fields with AND semantics across fields.
@@ -66,7 +66,7 @@ function recordSatisfies(record: SearchableEntityRecord, filter: SearchFilter): 
       return releaseId === undefined || releaseId === filter.value;
     }
     case 'precision':
-      // No `precision` field on the domain search record — pass-through no-op (documented above).
+      // No `precision` field on the domain search record pass-through no-op (documented above).
       return true;
     default:
       return true;
@@ -75,7 +75,7 @@ function recordSatisfies(record: SearchableEntityRecord, filter: SearchFilter): 
 
 /**
  * Narrows records to those satisfying EVERY filter (AND across fields). Generic in the record type
- * so a `PublicSearchIndexDoc[]` in yields a `PublicSearchIndexDoc[]` out — preserving `releaseId`
+ * so a `PublicSearchIndexDoc` in yields a `PublicSearchIndexDoc` out preserving `releaseId`
  * for downstream use in `runPublicSearch`.
  */
 export function applyFilters<T extends SearchableEntityRecord>(

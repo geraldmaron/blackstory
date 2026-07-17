@@ -1,15 +1,12 @@
+
 /**
- * Firestore-backed jurisdiction lookups for the BB-091 `jurisdictions` collection.
+ * Firestore-backed jurisdiction lookups for the `jurisdictions` collection.
  *
  * `createFirestoreJurisdictionResolver`'s return value is structurally compatible with
  * `@black-book/domain`'s `JurisdictionResolver` interface
- * (`packages/domain/src/geography/jurisdiction-refs.ts` — `{ exists(id): Promise<boolean> }`)
- * by shape, not by import: this bead's file ownership does not include editing
- * `packages/domain/src/index.ts` to re-export that new module, so a cross-package type import
- * isn't resolvable yet (see the final report's "still needs wiring" note). Once the parent
- * session adds `jurisdiction-refs.ts`'s exports to the domain barrel, this resolver can be
- * passed directly to `assertJurisdictionReferencesResolve` with no changes on either side —
- * the shape already matches exactly.
+ * (`packages/domain/src/geography/jurisdiction-refs.ts` `{ exists(id): Promise<boolean> }`)
+ * by shape. Once `jurisdiction-refs.ts` is exported from the domain barrel, this resolver
+ * can be passed directly to `assertJurisdictionReferencesResolve` — the shape already matches.
  */
 import type { Firestore } from 'firebase-admin/firestore';
 import { FIRESTORE_ROOT } from '../firestore/paths.js';

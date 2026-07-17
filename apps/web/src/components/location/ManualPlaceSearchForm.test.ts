@@ -1,7 +1,7 @@
 /**
- * SSR markup smoke test for ManualPlaceSearchForm (BB-050 acceptance criterion 4's always-
- * available re-entry point). Confirms the address/ZIP field is properly labelled (WCAG:
- * `<label for>` bound to the input) and that helper text / disabled state render.
+ * SSR markup smoke test for ManualPlaceSearchForm (always-available re-entry point).
+ * Confirms the address/ZIP field is properly labelled (WCAG: `<label for>` bound to the input)
+ * and that helper text / disabled state render.
  */
 import assert from 'node:assert/strict';
 import * as React from 'react';
@@ -11,7 +11,7 @@ import { ManualPlaceSearchForm } from './ManualPlaceSearchForm';
 
 const { createElement } = React;
 
-// Workaround for a pre-existing gap in `@black-book/ui`'s FilterBar.tsx/Button.tsx — see
+// Workaround for a pre-existing gap in `@black-book/ui`'s FilterBar.tsx/Button.tsx see
 // `./LocationConsentButton.test.ts`'s identical note.
 (globalThis as Record<string, unknown>).React = React;
 

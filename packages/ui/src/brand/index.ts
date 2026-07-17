@@ -1,3 +1,4 @@
+
 /**
  * Barrel export for the Black Book brand mark (the "Pinned Page" identity).
  */

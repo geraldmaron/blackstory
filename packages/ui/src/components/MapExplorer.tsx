@@ -1,11 +1,12 @@
+
 /**
- * Presentational shell for the BB-070 map data platform's real geographic map.
+ * Presentational shell for the map data platform's real geographic map.
  *
  * This component is deliberately MapLibre-agnostic: it renders the accessible
  * legend/feature list (server-render-safe, testable via renderToStaticMarkup)
  * and a `children` slot for the interactive canvas. The actual MapLibre GL JS
  * wiring lives in `apps/web` (see apps/web/src/app/map/MapLibreCanvas.tsx),
- * which is the only place `maplibre-gl` is an actual dependency — keeping
+ * which is the only place `maplibre-gl` is an actual dependency keeping
  * this shared UI package free of a heavy WebGL dependency and free of a
  * client-only import that would break plain Node test execution.
  *

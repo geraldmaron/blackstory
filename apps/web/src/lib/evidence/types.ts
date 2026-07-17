@@ -1,16 +1,16 @@
 /**
- * View-model types for the BB-053 evidence, confidence, dispute, and revision interface.
+ * View-model types for the evidence, confidence, dispute, and revision interface.
  *
  * These types intentionally sit one layer above `apps/web/src/data/public-seed.ts`'s
- * `PublicClaimView` (a BB-052 seed-depth placeholder ahead of BB-019 public projections): every
+ * `PublicClaimView` (a seed-depth placeholder ahead of public projections): every
  * field already on `PublicClaimView` (id, predicate, object, confidenceScore, confidenceLevel,
  * citationSource/citationHref/citationLabel, disputed/disputeNote) has a structurally-compatible
  * counterpart here, so a caller can pass seed claims through with light field renaming and get a
  * working panel today, while the richer optional fields (source lineage, excerpts, research
- * coverage, revision history, retraction notices) are ready to receive real BB-017/BB-019 data
+ * coverage, revision history, retraction notices) are ready to receive real data
  * once projections land, without a breaking shape change.
  *
- * Reuses BB-017/BB-016 domain vocabulary directly (`RightsStatus`, `ExcerptKind`,
+ * Reuses domain vocabulary directly (`RightsStatus`, `ExcerptKind`,
  * `PublicationPermission`, `ProhibitedUse`, `ContradictionSet`-compatible alternate-value kinds)
  * rather than re-declaring a parallel vocabulary.
  */
@@ -33,7 +33,7 @@ export type EvidenceResearchCoverageInput = {
   readonly lastCheckedAt?: string;
 };
 
-/** Independent-lineage rollup (BB-017 `uniqueLineageAggregates` output shape, display-depth). */
+/** Independent-lineage rollup.  */
 export type EvidenceSourceLineageInput = {
   readonly independentLineageCount: number;
   readonly supportingEvidenceCount?: number;
@@ -60,7 +60,7 @@ export type EvidenceCitationInput = {
    * True when this citation resolves to evidence containing private or otherwise protected
    * material (e.g. an internal-only capture, a living-person-sensitive record). The outbound
    * link and any excerpt must never render publicly, even when a URL exists internally
-   * (AC4: source links do not leak private evidence or protected information).
+   * (source links do not leak private evidence or protected information).
    */
   readonly protectedFromPublicLink?: boolean;
   readonly protectedReason?: string;
@@ -82,7 +82,7 @@ export type EvidenceAlternateValue = {
 };
 
 /** Seed-depth-compatible dispute input: `disputed`/`disputeNote` mirror `PublicClaimView` exactly;
- * `alternates` is the additive slot for full BB-017 `ContradictionSet` values once available. */
+ * `alternates` is the additive slot for full `ContradictionSet` values once available. */
 export type EvidenceDisputeInput = {
   readonly primaryValue: string;
   readonly disputed?: boolean;
@@ -128,11 +128,11 @@ export type EvidenceClaimInput = {
   readonly lastCheckedAt?: string;
   readonly revisionHistory?: readonly EvidenceRevisionEntry[];
   readonly retraction?: EvidenceRetractionNotice;
-  /** Free-text rationale for this claim's relevance, kept visibly distinct from confidence
-   * (AC2) — never blended into the confidence score or label. */
+  /** Free-text rationale for this claim's relevance, kept visibly distinct from confidence —
+   * never blended into the confidence score or label. */
   readonly relevanceNote?: string;
   /** Free-text rationale for this claim's connection strength, kept visibly distinct from
-   * confidence (AC2) — never blended into the confidence score or label. */
+   * confidence — never blended into the confidence score or label. */
   readonly connectionStrengthNote?: string;
 };
 

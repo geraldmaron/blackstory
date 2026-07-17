@@ -1,13 +1,14 @@
+
 /**
- * Real gemini-embedding-001 provider (BB-071), built on the official `@google/genai` client.
+ * Real gemini-embedding-001 provider, built on the official `@google/genai` client.
  *
- * Uses the Gemini Developer API (API-key auth), not Vertex AI — ADR-014 explicitly rejects
+ * Uses the Gemini Developer API (API-key auth), not Vertex AI ADR-014 explicitly rejects
  * Vertex AI *Vector Search* for the index itself (always-on per-node cost floor), and this
  * keeps the embedding *call* on the same minimal, non-Vertex surface rather than pulling in
  * Vertex project/location plumbing this project otherwise avoids.
  *
- * The API key is read from environment/secret-manager-injected env vars only — never
- * hardcoded, and never required at import time (only when `.embed()` is actually invoked), so
+ * The API key is read from environment/secret-manager-injected env vars only never
+ * hardcoded, and never required at import time (only when `.embed` is actually invoked), so
  * this module is safe to import in environments without network access or a live key (tests
  * use `createDeterministicMockEmbeddingProvider` from ./provider.js instead).
  */
@@ -16,7 +17,7 @@ import type { EnvironmentLike } from '../guard.js';
 import { EMBEDDING_DIMS, EMBEDDING_MODEL } from './constants.js';
 import { EmbeddingProviderError, type EmbeddingProvider } from './provider.js';
 
-/** Minimal structural slice of the SDK client this module actually calls — keeps tests cheap. */
+/** Minimal structural slice of the SDK client this module actually calls keeps tests cheap. */
 export type GeminiEmbedContentClient = {
   models: {
     embedContent(params: {
@@ -32,7 +33,7 @@ export type GeminiEmbeddingProviderOptions = {
   readonly model?: string;
   /** Requests server-side truncation too; the pipeline still truncates+renormalizes locally. */
   readonly outputDimensionality?: number;
-  /** Injectable for tests — defaults to a real `GoogleGenAI` client built from the API key. */
+  /** Injectable for tests defaults to a real `GoogleGenAI` client built from the API key. */
   readonly clientFactory?: (apiKey: string) => GeminiEmbedContentClient;
 };
 
@@ -53,10 +54,11 @@ function defaultClientFactory(apiKey: string): GeminiEmbedContentClient {
   return new GoogleGenAI({ apiKey }) as unknown as GeminiEmbedContentClient;
 }
 
+
 /**
  * Creates a provider that calls the real Gemini Developer API. Construction never touches the
- * network or throws for a missing key — the key is resolved and the client is built lazily on
- * the first `.embed()` call, so importing/wiring this module is always safe.
+ * network or throws for a missing key the key is resolved and the client is built lazily on
+ * the first `.embed` call, so importing/wiring this module is always safe.
  */
 export function createGeminiEmbeddingProvider(
   options: GeminiEmbeddingProviderOptions = {},

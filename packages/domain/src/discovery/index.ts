@@ -1,6 +1,6 @@
 /**
- * Candidate discovery pipeline public surface (BB-039).
- * Discovery produces private research candidates only — never public entities.
+ * Candidate discovery pipeline public surface.
+ * Discovery produces private research candidates only never public entities.
  */
 export {
   DISCOVERY_CANDIDATE_SCHEMA_VERSION,
@@ -94,7 +94,7 @@ export {
 
 export { runDiscoveryCampaign, type RunDiscoveryCampaignInput } from './pipeline.js';
 
-// BB-073: graylist recall lane — below-threshold candidates parked with disposition, never
+// graylist recall lane below-threshold candidates parked with disposition, never
 // silently dropped, queryable for later corroboration.
 export {
   GRAYLIST_SCHEMA_VERSION,

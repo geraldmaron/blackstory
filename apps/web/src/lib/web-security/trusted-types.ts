@@ -1,5 +1,5 @@
 /**
- * Trusted Types helpers and rollout notes (BB-028).
+ * Trusted Types helpers and rollout notes.
  *
  * Full enforcement (`require-trusted-types-for 'script'`) is opt-in via CSP because
  * Next.js App Router still emits inline bootstrap scripts. Rollout plan:
@@ -16,7 +16,7 @@ export type TrustedTypesPolicy = {
   createScript: (input: string) => string;
 };
 
-/** Identity stub until a browser policy is registered on the client. */
+/** Identity stub until a browser policy is registered on the client.  */
 export function createTrustedTypesPolicyStub(): TrustedTypesPolicy {
   return {
     createHTML: (input) => input,

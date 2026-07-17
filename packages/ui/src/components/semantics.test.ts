@@ -1,5 +1,6 @@
+
 /**
- * Semantic HTML / a11y smoke tests for design-system components via SSR markup.
+ * Semantic HTML a11y smoke tests for design-system components via SSR markup.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';

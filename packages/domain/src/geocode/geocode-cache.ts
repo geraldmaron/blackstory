@@ -1,18 +1,18 @@
 /**
- * Bounded in-memory TTL cache for geocode results (BB-050 acceptance criterion 5, "cached").
- * Deliberately generic over the cached value type — callers cache `GeocodeResolution` /
+ * Bounded in-memory TTL cache for geocode results.
+ * Deliberately generic over the cached value type callers cache `GeocodeResolution`
  * `ManualPlaceSearchFallback` shapes, never a raw address-history record. Mirrors
  * `packages/security/src/rate-limits.ts`'s `createInMemoryRateLimitStore` shape (bounded size,
- * TTL eviction, size()) so this cache reads the same way to anyone already familiar with that
+ * TTL eviction, size) so this cache reads the same way to anyone already familiar with that
  * store, without importing `@black-book/security` (circular-dependency rule, see
  * `./jurisdiction-ids.ts`'s module doc).
  *
  * Privacy note: entries are keyed by a normalized address/coordinate/ZIP hash (see
- * `./address-normalize.ts`), not a user or session id — this cache has no notion of "whose"
+ * `./address-normalize.ts`), not a user or session id this cache has no notion of "whose"
  * lookup a cached entry came from, so it cannot become a per-user location history by
  * construction. A short default TTL (`DEFAULT_GEOCODE_CACHE_TTL_MS`) keeps entries from
  * accumulating into a long-lived reference corpus, which matters especially for ZIP lookups
- * (`../geography/location.ts`'s ZIP-is-modern-input-only guard — this cache is a request-
+ * (`../geography/location.ts`'s ZIP-is-modern-input-only guard this cache is a request-
  * deduplication mechanism, never a stored ZIP corpus).
  */
 

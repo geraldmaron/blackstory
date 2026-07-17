@@ -1,5 +1,6 @@
+
 /**
- * Test data builder for evidence fixtures linking claims to sources (BB-016-aware).
+ * Test data builder for evidence fixtures linking claims to sources.
  */
 import { createIdFactory, type IdFactory } from '../ids.js';
 import type { EvidenceFixture } from './types.js';

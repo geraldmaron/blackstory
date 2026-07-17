@@ -1,6 +1,6 @@
 /**
- * SSR markup smoke tests for the BB-092 graph-derived related-records list (BB-052 acceptance
- * criterion 6). Confirms it renders the real `PublicRelatedEntry[]` output of the graph adjacency
+ * SSR markup smoke tests for the graph-derived related-records list (acceptance
+ * criterion 6). Confirms it renders the real `PublicRelatedEntry` output of the graph adjacency
  * builder (never a hand-authored `relatedIds` string list) and falls back to the approved gap
  * notice when a record has no published graph edges.
  */
@@ -29,7 +29,10 @@ test('renders a linked entry for each BB-092 graph-adjacency related record, wit
 test('renders the approved missing-information notice when related is empty, not a bare empty list', () => {
   const school = requireEntity('ent_seed_school_001');
   const html = renderToStaticMarkup(
-    createElement(EntityRelatedList, { entity: { ...school, related: [] }, labelledBy: 'related-heading' }),
+    createElement(EntityRelatedList, {
+      entity: { ...school, related: [], relatedNeighbors: [], continueLearning: [] },
+      labelledBy: 'related-heading',
+    }),
   );
   assert.match(html, /No linked records yet/);
   assert.doesNotMatch(html, /<ul/);

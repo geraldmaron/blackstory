@@ -1,5 +1,6 @@
+
 /**
- * Contracts for BB-063 beta launch gate evaluation, attestation, and recorded decisions.
+ * Contracts for beta launch gate evaluation, attestation, and recorded decisions.
  */
 
 export const BETA_LAUNCH_DECISION_SCHEMA_VERSION = 1 as const;

@@ -1,5 +1,5 @@
 /**
- * Unit tests for BB-055 correction form shaping and validation.
+ * Unit tests for correction form shaping and validation.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

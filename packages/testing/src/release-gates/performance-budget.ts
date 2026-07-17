@@ -1,5 +1,6 @@
+
 /**
- * BB-057 performance regression budgets — config-driven thresholds that fail CI when exceeded.
+ * performance regression budgets config-driven thresholds that fail CI when exceeded.
  * Metrics are supplied by Lighthouse CI, bundle analyzers, or synthetic harnesses; this module
  * evaluates them deterministically without network I/O.
  */
@@ -48,7 +49,7 @@ export type PerformanceBudgetEvaluation = {
   readonly violations: readonly PerformanceBudgetViolation[];
 };
 
-/** Default public-surface budgets — tighten as real bundles stabilize post-BB-057. */
+/** Default public-surface budgets tighten as real bundles stabilize post-. */
 export const DEFAULT_PERFORMANCE_BUDGET = Object.freeze({
   version: 'bb-057-v1',
   journeys: Object.freeze(['search', 'explore', 'entity', 'locate', 'corrections']),
@@ -69,6 +70,7 @@ export const DEFAULT_PERFORMANCE_BUDGET = Object.freeze({
 function thresholdKey(threshold: PerformanceBudgetThreshold): string {
   return `${threshold.journey ?? 'global'}:${threshold.metric}`;
 }
+
 
 /**
  * Evaluates sampled metrics against configured budgets. Returns violations for CI gates.
@@ -103,7 +105,7 @@ export function evaluatePerformanceBudget(
   });
 }
 
-/** Assert helper for test runners — throws with actionable violation detail. */
+/** Assert helper for test runners throws with actionable violation detail. */
 export function assertPerformanceBudget(
   samples: readonly PerformanceMetricSample[],
   config: PerformanceBudgetConfig = DEFAULT_PERFORMANCE_BUDGET,

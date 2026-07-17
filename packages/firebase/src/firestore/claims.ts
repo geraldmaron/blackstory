@@ -1,5 +1,6 @@
+
 /**
- * Auth custom-claim helpers for Black Book staff roles (BB-027 will mint claims).
+ * Auth custom-claim helpers for Black Book staff roles.
  */
 import type { AuthClaimFlags } from './types.js';
 

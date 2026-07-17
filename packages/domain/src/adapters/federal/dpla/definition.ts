@@ -1,5 +1,5 @@
 /**
- * Digital Public Library of America (DPLA) adapter definition (BB-046).
+ * Digital Public Library of America (DPLA) adapter definition.
  */
 import {
   buildFederalAdapterDefinition,

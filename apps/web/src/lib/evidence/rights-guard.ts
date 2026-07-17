@@ -1,8 +1,8 @@
 /**
- * Rights-limited excerpt and source-link resolution for the BB-053 evidence interface (AC4:
- * source links do not leak private evidence or protected information).
+ * Rights-limited excerpt and source-link resolution for the evidence interface:
+ * source links do not leak private evidence or protected information.
  *
- * Reuses BB-016's rights-status publication gate (`canPublishWithRights` from
+ * Reuses rights-status publication gate (`canPublishWithRights` from
  * `@black-book/domain`) rather than re-implementing excerpt/media publication rules, and
  * additionally withholds any citation link explicitly flagged as resolving to private or
  * protected evidence (e.g. a living-person-sensitive capture, an internal-only source) even when
@@ -23,7 +23,7 @@ function excerptContentKind(excerptKind: EvidenceExcerptInput['excerptKind']): P
 }
 
 /** Resolve whether an evidence excerpt may render publicly given its rights status, deferring to
- * BB-016's constitution-driven gate rather than a locally-invented rule. */
+ * constitution-driven gate rather than a locally-invented rule. */
 export function resolveExcerptForDisplay(input: EvidenceExcerptInput): EvidenceExcerptView {
   const contentKind = excerptContentKind(input.excerptKind);
   const publishable = canPublishWithRights({

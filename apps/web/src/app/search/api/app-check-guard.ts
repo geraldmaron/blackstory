@@ -1,5 +1,5 @@
 /**
- * Server-only App Check verification for the public search route (BB-049). Mirrors
+ * Server-only App Check verification for the public search route. Mirrors
  * `apps/web/src/app/submit/app-check-guard.ts` (itself a mirror of
  * `apps/api-submissions/src/app-check.ts`) so this public read endpoint enforces App Check
  * through the same guard factory (`createAppCheckGuard`), verifier
@@ -9,19 +9,19 @@
  *
  * Deliberate deviation from the submit guard: `replayProtection` is `false` here. App Check
  * replay protection consumes a single-use token (each token is accepted at most once). That is
- * correct for a mutation like `submit` — a replayed create is a duplicate write — but wrong for a
+ * correct for a mutation like `submit` a replayed create is a duplicate write but wrong for a
  * GET/read search endpoint, where a browser legitimately issues many idempotent requests
  * (typeahead, pagination, back/forward) in quick succession. Enabling replay protection here would
  * reject those as replays. Reads carry no write side effect, so single-use enforcement buys no
  * safety and breaks normal usage; the token is still cryptographically verified, just not consumed.
  *
- * The `@black-book/firebase` import below is a dynamic `import()`, not a static one, on purpose:
+ * The `@black-book/firebase` import below is a dynamic `import`, not a static one, on purpose:
  * `apps/web`'s package.json (like `apps/admin`'s) is CommonJS-rooted, while `@black-book/firebase`
  * is an ESM package whose module graph includes a top-level `await`
  * (`embeddings/backfill-cli.ts`). A static import forces the whole graph through a CJS-compatible
  * transform, which cannot represent that top-level `await` and fails to even load. A dynamic
- * `import()` loads it through real ESM semantics instead, which is exactly what CJS-to-ESM interop
- * is for.
+ * `import` loads it through real ESM semantics instead, which is exactly what CJS-to-ESM interop
+ * is.
  */
 import type {
   AppCheckDecision,

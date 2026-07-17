@@ -1,5 +1,6 @@
+
 /**
- * Imports the BB-001–BB-066 execution plan into the repository's Beads tracker.
+ * Imports the execution plan into the repository's tracker.
  *
  * The script is intentionally idempotent: stable issue IDs and external references
  * let it update metadata/statuses without creating duplicate work items.

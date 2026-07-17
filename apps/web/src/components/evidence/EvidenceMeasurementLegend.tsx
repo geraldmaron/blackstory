@@ -1,8 +1,8 @@
 /**
- * Renders the BB-053 measurement-dimension legend so a reader can tell confidence, relevance,
- * connection strength, and research coverage apart (acceptance criterion 2) rather than treating
- * them as one blended trust figure. Copy is centralized in
- * `../../lib/evidence/confidence-language.ts`'s `EVIDENCE_DIMENSION_COPY`, never hand-typed here.
+ * Renders the measurement-dimension legend so a reader can tell confidence, relevance,
+ * connection strength, and research coverage apart rather than treating them as one blended
+ * trust figure. Copy is centralized in `../../lib/evidence/confidence-language.ts`'s
+ * `EVIDENCE_DIMENSION_COPY`, never hand-typed here.
  */
 
 import React from 'react';

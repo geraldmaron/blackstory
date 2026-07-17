@@ -1,5 +1,5 @@
 /**
- * Tests for the Internet Archive community discovery adapter (BB-073). Fixture-driven; every
+ * Tests for the Internet Archive community discovery adapter. Fixture-driven; every
  * HTTP call goes through a mock SafeHttpClient injected by the test, never a real fetch.
  */
 import assert from 'node:assert/strict';

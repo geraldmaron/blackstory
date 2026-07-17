@@ -1,9 +1,8 @@
 /**
- * BB-082 historic safety and place-context engine \u2014 public surface for this module tree.
- * NOT yet re-exported from `packages/domain/src/index.ts` (the domain root barrel is a
- * parent-merge file, out of this bead's exclusive file-ownership scope) \u2014 downstream callers
- * inside this package can import from `../historic-safety/index.js` directly until the parent
- * merges `export * from './historic-safety/index.js'` into the root barrel.
+ * Historic safety and place-context engine — public surface for this module tree.
+ * Not yet re-exported from `packages/domain/src/index.ts`; callers inside this package can
+ * import from `../historic-safety/index.js` directly until the root barrel adds
+ * `export * from './historic-safety/index.js'`.
  */
 export {
   HISTORIC_SAFETY_LAYER_IDS,

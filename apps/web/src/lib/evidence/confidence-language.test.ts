@@ -1,6 +1,5 @@
 /**
- * Unit tests for BB-053 confidence/relevance/connection-strength/research-coverage copy
- * (acceptance criteria 1 and 2).
+ * Unit tests for confidence/relevance/connection-strength/research-coverage copy.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -38,8 +37,8 @@ test('EVIDENCE_DIMENSION_COPY gives confidence, relevance, connection strength, 
   const descriptions = new Set(Object.values(EVIDENCE_DIMENSION_COPY).map((entry) => entry.description));
   assert.equal(labels.size, 4, 'every dimension must have a unique label');
   assert.equal(descriptions.size, 4, 'every dimension must have a unique description');
-  // The confidence description explicitly clarifies it is a score, not a probability — the
-  // negation itself is the AC1 guard; other dimensions must not mention probability at all.
+  // The confidence description explicitly clarifies it is a score, not a probability —
+  // the negation itself is the guard; other dimensions must not mention probability at all.
   assert.match(EVIDENCE_DIMENSION_COPY.confidence.description, /not a probability/i);
   assert.doesNotMatch(EVIDENCE_DIMENSION_COPY.relevance.description, /probability/i);
   assert.doesNotMatch(EVIDENCE_DIMENSION_COPY.connectionStrength.description, /probability/i);

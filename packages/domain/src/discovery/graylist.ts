@@ -1,19 +1,16 @@
 /**
- * Graylist recall lane (BB-073 acceptance criterion 4): below-threshold discovery candidates
- * are parked with a disposition tag instead of being silently dropped, so they remain queryable
- * for corroboration when new evidence arrives later (the "things that fall through the cracks"
- * safety net from the owner brief this bead traces back to).
+ * Graylist recall lane: below-threshold discovery candidates are parked with a disposition
+ * tag instead of being silently dropped, so they remain queryable for corroboration when new
+ * evidence arrives later.
  *
- * This is new scaffolding — nothing named "graylist" existed in packages/domain/src before this
- * bead (confirmed via `grep -rl graylist packages/domain/src`). It composes with the existing
- * discovery pipeline (./pipeline.ts, ./quarantine.ts) and relevance engine
- * (../relevance/engine.ts) rather than replacing either: a candidate that
- * `evaluateCandidateRelevance` (../relevance/index.ts) does not resolve to `include` is a
+ * Composes with the existing discovery pipeline (`./pipeline.ts`, `./quarantine.ts`) and
+ * relevance engine (`../relevance/engine.ts`) rather than replacing either: a candidate that
+ * `evaluateCandidateRelevance` (`../relevance/index.ts`) does not resolve to `include` is a
  * graylist candidate, not a discarded one. Distinct from `./quarantine.ts`, which handles
- * adapter/ingestion *failures* (retry/quarantine/dead-letter) — graylist parking is for
+ * adapter/ingestion failures (retry/quarantine/dead-letter) — graylist parking is for
  * candidates that ingested and scored fine but didn't clear the relevance bar on their own.
  *
- * Parking never bypasses `assertDiscoveryCannotPublish` (./guard.ts) — a promoted graylist
+ * Parking never bypasses `assertDiscoveryCannotPublish` (`./guard.ts`): a promoted graylist
  * entry only re-enters ordinary relevance/confidence review; nothing here writes a public
  * projection.
  */
@@ -77,7 +74,7 @@ export function createInMemoryGraylistStore(seed: readonly GraylistEntry[] = [])
   };
 }
 
-/** A candidate is parked whenever relevance did not resolve it to `include` — never dropped. */
+/** A candidate is parked whenever relevance did not resolve it to `include` never dropped. */
 export function shouldPark(assessment: Pick<RelevanceAssessment, 'decision'>): boolean {
   return assessment.decision !== 'include';
 }
@@ -146,7 +143,7 @@ export function buildGraylistEntry(
 }
 
 /**
- * Parks a below-threshold candidate. Never silently drops it — `shouldPark` gates the caller,
+ * Parks a below-threshold candidate. Never silently drops it `shouldPark` gates the caller,
  * and this function itself throws rather than parking a candidate that already reached
  * `include` (parking an included candidate would be a bug in the caller, not a valid state).
  */
@@ -186,8 +183,8 @@ export function listGraylistByDisposition(
 
 /**
  * Marks a parked entry as promoted when new corroborating evidence arrives. This does NOT
- * publish or re-run relevance itself — "crowdsourced items seed research cases, they never
- * publish" (BB-073) — it only flags the entry for the ordinary review pipeline to pick back up.
+ * publish or re-run relevance itself "crowdsourced items seed research cases, they never
+ * publish" it only flags the entry for the ordinary review pipeline to pick back up.
  */
 export function promoteGraylistEntry(
   store: GraylistStore,

@@ -1,5 +1,5 @@
 /**
- * Guards against automatic App Hosting rollouts (ADR-006 / BB-062 AC #1).
+ * Guards against automatic App Hosting rollouts (ADR-006 acceptance criterion #1).
  * Validates repo docs/config and deploy workflows — not the live Firebase console.
  */
 import { readFile, readdir } from 'node:fs/promises';

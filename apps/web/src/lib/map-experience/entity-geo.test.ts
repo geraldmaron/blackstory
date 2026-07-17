@@ -1,5 +1,5 @@
 /**
- * Confirms the BB-051 geo-anchor table stays in sync with the active release and produces valid
+ * Confirms the geo-anchor table stays in sync with the active release and produces valid
  * U.S. coordinates + geohashes.
  */
 import assert from 'node:assert/strict';

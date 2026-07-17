@@ -1,5 +1,5 @@
 /**
- * Relevance, connection-strength, and research-coverage measurements (BB-017).
+ * Relevance, connection-strength, and research-coverage measurements.
  * These are distinct from confidence: they answer different questions and must not be conflated.
  */
 import type { RelevanceDecision } from '@black-book/schemas';

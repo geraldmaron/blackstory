@@ -1,31 +1,27 @@
 /**
- * Versioned disclaimer-text registry and sensitivity presentation labels (BB-095).
+ * Versioned disclaimer-text registry and sensitivity presentation labels.
  *
- * ONE registry, keyed by class — site-wide (educational purpose / accuracy limits / not legal or
+ * One registry, keyed by class: site-wide (educational purpose, accuracy limits, not legal or
  * travel advice), per-class (visiting historic sites, private property, sensitive content),
  * non-endorsement (flagged individuals), and safety-advisory language. Every disclaimer carries a
- * `reviewDate`. This is the ONLY place disclaimer text is authored: presentation components in
- * apps/web/src/components/ render these records through shared components — never hand-write a
- * disclaimer string inline (see `disclaimers.test.ts`'s repo check, which fails the build if an
- * ad-hoc disclaimer-shaped string shows up in apps/web app code outside this registry and its
- * consuming components).
+ * `reviewDate`. This is the only place disclaimer text is authored: presentation components in
+ * `apps/web/src/components/` render these records through shared components and must never
+ * hand-write a disclaimer string inline (see `disclaimers.test.ts`, which fails the build if an
+ * ad-hoc disclaimer-shaped string shows up in apps/web outside this registry and its consumers).
  *
- * THREE LANES THIS FILE DOES NOT OWN OR DUPLICATE — see docs/security/entity-sensitivity-lanes.md
- * for the full delineation:
- *   1. BB-090's entity-level `sensitivity` flag schema (packages/domain/src/entity-status.ts) —
- *      this file only adds PRESENTATION labels/copy for that schema, never new flag semantics.
- *   2. BB-015's living-person UGC compliance rules (packages/domain/src/rights/living-person-ugc.ts,
- *      docs/security/ugc-legal-posture.md) — a different system entirely; not touched here.
- *   3. BB-082's historical place-condition designations (sundown-town / redlining-grade layer
- *      records) — a different, still-unbuilt system; this file's `safety_advisory` disclaimer
- *      covers BB-095's own present-day `advisory.ts` claims only, not BB-082's historic layers.
+ * Three lanes this file does not own or duplicate — see
+ * `docs/security/entity-sensitivity-lanes.md`:
+ * 1. Entity-level `sensitivity` flag schema (`packages/domain/src/entity-status.ts`) —
+ * this file only adds presentation labels/copy for that schema, never new flag semantics.
+ * 2. Living-person UGC compliance rules (`packages/domain/src/rights/living-person-ugc.ts`,
+ * `docs/security/ugc-legal-posture.md`) — a different system entirely.
+ * 3. Historical place-condition designations (sundown-town / redlining-grade layer records) —
+ * still separate; this file's `safety_advisory` disclaimer covers present-day `advisory.ts`
+ * claims only, not historic layers.
  *
- * INTEGRATION POINT (documented, not wired live — outside this bead's file-ownership boundary):
- * BB-088 (Editorial trust and pre-bunking surfaces, still unbuilt) should import
- * `DISCLAIMER_REGISTRY` / `getDisclaimer` as its disclaimer source rather than authoring its own
- * copy. BB-063's launch checklist already carries the corresponding launch condition ("Disclaimer
- * framework (BB-095) live on all public surfaces... rendering from the versioned registry" — see
- * `bd show black-book-bb063`), so no further bd edit was made by this bead.
+ * Not wired live: editorial trust and pre-bunking surfaces should import
+ * `DISCLAIMER_REGISTRY` / `getDisclaimer` as their disclaimer source rather than authoring
+ * their own copy.
  */
 import type { SensitivityClass } from './entity-status.js';
 
@@ -47,7 +43,7 @@ export type DisclaimerRecord = {
   readonly class: DisclaimerClass;
   readonly title: string;
   readonly body: string;
-  /** ISO date this disclaimer's language was last reviewed. Required on every record (BB-095 AC3). */
+  /** ISO date this disclaimer's language was last reviewed. Required on every record. */
   readonly reviewDate: string;
 };
 
@@ -121,7 +117,7 @@ export function getDisclaimer(disclaimerClass: DisclaimerClass): DisclaimerRecor
   return DISCLAIMER_REGISTRY[disclaimerClass];
 }
 
-/** Fails closed if any registry entry is missing required fields — the AC3 "every disclaimer
+/** Fails closed if any registry entry is missing required fields the "every disclaimer
  * carries a review date" guarantee, checked structurally rather than only by inspection. */
 export function assertDisclaimerRegistryComplete(): void {
   for (const disclaimerClass of DISCLAIMER_CLASSES) {
@@ -142,13 +138,13 @@ export function assertDisclaimerRegistryComplete(): void {
 }
 
 // ---------------------------------------------------------------------------
-// Sensitivity presentation labels (BB-090 schema -> BB-095 presentation)
+// Sensitivity presentation labels 
 // ---------------------------------------------------------------------------
 
 /**
- * Human-facing, CONDUCT-based labels for BB-090's `SensitivityClass` vocabulary. Every label
+ * Human-facing, CONDUCT-based labels for `SensitivityClass` vocabulary. Every label
  * names a documented category of conduct (perpetration, violence, contested legacy, enslaver/
- * segregationist action) — never an identity attribute. This mirrors the BB-090 non-goal
+ * segregationist action) never an identity attribute. This mirrors the non-goal
  * (sensitivity flags require a conduct-based rationale, never an identity attribute) at the
  * presentation layer: `disclaimers.test.ts` asserts none of these labels, or the non-endorsement
  * copy above, contain identity-attribute language (sexual orientation, disability, religion,
@@ -164,9 +160,8 @@ export const SENSITIVITY_CLASS_PRESENTATION_LABELS: Readonly<Record<SensitivityC
 /**
  * Terms that would signal an identity attribute being treated as a flagging rationale rather than
  * conduct. Non-exhaustive by design (this is a presentation-layer regression guard, not the
- * BB-090 data-entry gate — that gate is BB-090's own responsibility and is out of this bead's
- * file-ownership boundary); it exists to prove THIS module's own copy never smuggles identity
- * framing into presentation text.
+ * data-entry gate); it exists to prove this module's own copy never smuggles identity framing
+ * into presentation text.
  */
 export const IDENTITY_ATTRIBUTE_TERMS = [
   'gay',

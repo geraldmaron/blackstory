@@ -1,6 +1,6 @@
 /**
- * Fetches Internet Archive Advanced Search / Scrape / Metadata results through the BB-030 safe
- * HTTP port (BB-073). Never calls `fetch` directly — see shared/http-port.ts for why.
+ * Fetches Internet Archive Advanced Search Scrape Metadata results through the safe
+ * HTTP port. Never calls `fetch` directly see shared/http-port.ts for why.
  */
 import {
   assertAllowedContentType,

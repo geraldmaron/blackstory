@@ -1,6 +1,6 @@
 /**
- * Curated Wikipedia category graph for bounded discovery traversal (BB-045).
- * Membership in any category does not imply inclusion — see category-gate.ts.
+ * Curated Wikipedia category graph for bounded discovery traversal.
+ * Membership in any category does not imply inclusion see category-gate.ts.
  */
 export type CategoryGraphNodeRole = 'seed' | 'expand' | 'reference';
 

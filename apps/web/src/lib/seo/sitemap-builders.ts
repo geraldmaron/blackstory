@@ -1,5 +1,5 @@
 /**
- * BB-057 sitemap helpers — derive URL entries from active release projections.
+ * sitemap helpers derive URL entries from active release projections.
  * Consumed by apps/web/src/app/sitemap.ts; keeps release-scoped routing logic testable.
  */
 import type { MetadataRoute } from 'next';

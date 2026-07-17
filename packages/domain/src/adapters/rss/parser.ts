@@ -1,10 +1,10 @@
 /**
- * Minimal, dependency-free RSS 2.0 / Atom 1.0 parser (BB-073).
+ * Minimal, dependency-free RSS 2.0 Atom 1.0 parser.
  *
  * Deliberately narrow: it extracts exactly the fields the curated feed registry needs
  * (title, link, guid/id, summary, published date) from a small set of vetted publisher feeds,
  * not a general-purpose XML parser for arbitrary/adversarial input. No new npm dependency was
- * added for this — `packages/domain` has no XML library as a direct dependency, and adding one
+ * added for this `packages/domain` has no XML library as a direct dependency, and adding one
  * for a handful of well-known feed shapes was judged not worth the new supply-chain surface.
  * Fixture-driven tests exercise real (trimmed) RSS and Atom samples; see fixtures/.
  */

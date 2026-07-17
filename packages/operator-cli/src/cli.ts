@@ -1,5 +1,6 @@
+
 /**
- * Thin argument-parsing CLI over this package's real, tested functions — mirrors the
+ * Thin argument-parsing CLI over this package's real, tested functions mirrors the
  * parse-args-then-call-a-tested-function shape of
  * packages/firebase/src/embeddings/backfill-cli.ts elsewhere in this repo. No business logic
  * lives in this file: every command below builds an input object and calls a `prepare*`/`run*`
@@ -7,8 +8,8 @@
  *
  * SAFE BY DEFAULT: every command only *prepares* an outcome and prints it as JSON. Passing
  * `--commit` is required to write anything, and `--commit` only ever calls
- * `commitOperatorIntake` (BB-018's real `commitWithAudit`). There is no `--publish`,
- * `--approve`, or `--promote` flag anywhere in this CLI — see `promotion-boundary.test.ts`.
+ * `commitOperatorIntake` (real `commitWithAudit`). There is no `--publish`,
+ * `--approve`, or `--promote` flag anywhere in this CLI see `promotion-boundary.test.ts`.
  */
 import { readFileSync } from 'node:fs';
 import type { RelationshipRole, RelationshipType } from '@black-book/domain';
@@ -292,9 +293,9 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         return 0;
       }
       case 'propose-edge': {
-        // BB-092 acceptance criterion 6: edge intake through the existing operator CLI, no
-        // parallel writer. `prepareEdgeIntake` hard-gates caused/enabled edges (criterion 9)
-        // before this ever reaches quarantine — see edge-intake.ts's module doc.
+        // Edge intake through the existing operator CLI, no parallel writer.
+        // `prepareEdgeIntake` hard-gates caused/enabled edges before quarantine;
+        // see edge-intake.ts's module doc.
         const sourceUrls = flags.repeated.get('--source-url') ?? [];
         const type = requireFlag(flags, '--type') as RelationshipType;
         const role = optionalFlag(flags, '--role') as RelationshipRole | undefined;

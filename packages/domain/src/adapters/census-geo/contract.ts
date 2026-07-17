@@ -1,23 +1,23 @@
 /**
- * BB-037 source-registry contract for the U.S. Census Bureau TIGER/Gazetteer bulk reference
- * files that back the BB-091 `jurisdictions` collection (51 state docs + ~3,143 county docs).
+ * source-registry contract for the U.S. Census Bureau TIGER/Gazetteer bulk reference
+ * files that back the `jurisdictions` collection (51 state docs + ~3,143 county docs).
  *
  * This is deliberately NOT built on `../federal/shared/contract-builder.ts`'s
  * `buildFederalAdapterDefinition`: that helper's `family` field is typed to a closed union
- * (`FederalAdapterFamily`) owned by BB-046, and extending it is outside BB-091's file
+ * (`FederalAdapterFamily`) owned by, and extending it is outside file
  * ownership. The two are structurally compatible (`SourceAdapterContract` is the same generic
  * type either way) but this module builds its contract directly rather than widening another
- * bead's closed enum.
+ * 's closed enum.
  *
  * License verdict: U.S. Census Bureau TIGER/Line and Gazetteer Files are produced by a federal
- * agency and are U.S. Government Works — not subject to copyright protection in the United
+ * agency and are U.S. Government Works not subject to copyright protection in the United
  * States (17 U.S.C. § 105; see https://www.census.gov/about/policies/open-gov/open-data.html
  * and the Census Bureau's data usage terms, which impose no fee or license restriction).
  * `rights.defaultStatus` below is `public_domain` accordingly. No paid geocoding/boundary API
- * is used anywhere in this bead (BB-091 acceptance criterion 7).
+ * is used anywhere in this.
  *
  * This is a bulk static reference-file source (annual-at-most refresh), not a live scraping
- * adapter — `rateLimits`/`volume` are populated because `SourceAdapterContract` requires them,
+ * adapter `rateLimits`/`volume` are populated because `SourceAdapterContract` requires them,
  * sized for "download the whole file, once, rarely" rather than a request-per-record API.
  */
 import type { RightsPolicy } from '../../provenance/rights.js';
@@ -30,7 +30,7 @@ export const CENSUS_GEO_PARSER_VERSION = 'parser-1.0.0' as const;
 export const CENSUS_GEO_SOURCE_ID = 'src_census_tiger_gazetteer' as const;
 export const CENSUS_GEO_ORGANIZATION_ID = 'org_us_census_bureau' as const;
 
-/** U.S. Government Work — public domain (17 U.S.C. § 105). No paid API involved. */
+/** U.S. Government Work public domain (17 U.S.C. § 105). No paid API involved. */
 export const CENSUS_GEO_RIGHTS: RightsPolicy = {
   defaultStatus: 'public_domain',
   publicationPermissions: ['cite', 'short_excerpt', 'substantial_excerpt', 'redistribute'],

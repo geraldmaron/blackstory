@@ -1,3 +1,4 @@
+
 /**
  * Search/result list with title, summary, and optional meta row.
  */

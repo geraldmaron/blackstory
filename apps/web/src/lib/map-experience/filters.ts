@@ -1,7 +1,7 @@
 /**
- * Pure filter application + facet-option building for the BB-051 map/list shared state. Mirrors
- * BB-049's search-page facet convention (`apps/web/src/app/search/search-view-model.ts`) but
- * operates over `ExploreMapFeature[]` so the map canvas and the synchronized list can share one
+ * Pure filter application + facet-option building for the map/list shared state. Mirrors
+ * search-page facet convention (`apps/web/src/app/search/search-view-model.ts`) but
+ * operates over `ExploreMapFeature` so the map canvas and the synchronized list can share one
  * filter/facet computation.
  */
 import type { ExploreMapFeature } from './build-explore-map-source';
@@ -21,10 +21,9 @@ export const DEFAULT_EXPLORE_FILTERS: ExploreFilterState = {
 };
 
 /**
- * Filters never hide an entity's era/status lifecycle by default (BB-090 acceptance criterion:
- * "status filters, never silently hides") — every kind/era/theme/confidence value is opt-IN via
- * an explicit non-"all" filter value, so an unfiltered view always shows the full active-release
- * population, historic entities included.
+ * Filters never hide an entity's era/status lifecycle by default — every kind/era/theme/
+ * confidence value is opt-IN via an explicit non-"all" filter value, so an unfiltered view
+ * always shows the full active-release population, historic entities included.
  */
 export function applyExploreFilters(
   features: readonly ExploreMapFeature[],
@@ -88,7 +87,7 @@ export type ExploreFacetOptions = {
 };
 
 /** Facet counts (and thus options) are always derived from the CURRENT filtered set the caller
- * passes in — pass the full unfiltered collection to build "browse" options, or the
+ * passes in pass the full unfiltered collection to build "browse" options, or the
  * already-filtered collection to reflect what's left after other filters are applied. */
 export function buildExploreFacetOptions(features: readonly ExploreMapFeature[]): ExploreFacetOptions {
   return {

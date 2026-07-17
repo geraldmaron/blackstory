@@ -1,5 +1,5 @@
 /**
- * Gold-fixture tests for claims, contradictions, and deterministic confidence (BB-017).
+ * Gold-fixture tests for claims, contradictions, and deterministic confidence.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

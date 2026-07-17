@@ -1,3 +1,4 @@
+
 /**
  * Elevation, border, focus, icon, motion, and data-visualization tokens.
  */
@@ -45,9 +46,10 @@ export const motion = {
   reducedMotionQuery: '(prefers-reduced-motion: reduce)',
 } as const;
 
+
 /**
- * Restrained categorical/sequential colors for charts — pigment-anchored
- * (Black Ink / Copper Pin / Page Sand), not neon, not pure grayscale.
+ * Restrained categorical/sequential colors for charts pigment-anchored
+ * (Black Ink Copper Pin Page Sand), not neon, not pure grayscale.
  */
 export const dataViz = {
   categorical: ['#0A0A0A', '#B86B2A', '#5C5548', '#D8A178', '#7A4318', '#2B2620'] as const,

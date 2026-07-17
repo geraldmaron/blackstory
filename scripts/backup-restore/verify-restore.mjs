@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+
 /**
- * Dry-run restore verification CLI (BB-020). Reads export metadata JSON and optional baselines.
+ * Dry-run restore verification CLI. Reads export metadata JSON and optional baselines.
  * Default: --dry-run (no gcloud, no network). Exits 0 when all checks pass.
  */
 import { readFile } from 'node:fs/promises';

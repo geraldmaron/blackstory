@@ -1,8 +1,8 @@
 /**
- * Record-level BB-053 summary: research coverage, total source lineage count across every
+ * Record-level summary: research coverage, total source lineage count across every
  * evidenced claim, the most recent last-checked date, and any record-level retraction or
  * correction notices that apply beyond a single claim. Kept as its own `Card` so this rollup
- * reads as a distinct fact from any individual claim's confidence (acceptance criterion 2).
+ * reads as a distinct fact from any individual claim's confidence.
  */
 
 import React from 'react';

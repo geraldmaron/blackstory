@@ -1,5 +1,5 @@
 /**
- * Public home page — interactive US map teaser that enters the Explore premier experience.
+ * Public home page interactive US map teaser that enters the Explore premier experience.
  */
 
 import { US_CONUS_BOUNDS } from '@black-book/domain/map/geography';
@@ -21,7 +21,7 @@ export default async function HomePage() {
     jurisdictionAreaFeatures: explore.source.jurisdictionAreaFeatures,
     densityLayerEnabled: false,
   });
-  // Seed fixtures are D.C.-local — bias east so circular pins sit clear of the left hero copy.
+  // Seed fixtures are D.C.-local bias east so circular pins sit clear of the left hero copy.
   const initialViewport = {
     lat: 38.9072,
     lng: -76.9,

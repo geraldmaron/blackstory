@@ -1,5 +1,5 @@
 /**
- * Tests for the shared date-precision/era-bucket model (BB-090).
+ * Tests for the shared date-precision/era-bucket model.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

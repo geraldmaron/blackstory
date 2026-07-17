@@ -1,5 +1,5 @@
 /**
- * Read-only posture helpers for the public API surface (ADR-005 / BB-021).
+ * Read-only posture helpers for the public API surface (ADR-005).
  */
 import {
   assertOperationAllowed,

@@ -1,5 +1,6 @@
+
 /**
- * Machine-checkable evidence probes for BB-063 launch gates (filesystem + harness smoke).
+ * Machine-checkable evidence probes for launch gates (filesystem + harness smoke).
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';

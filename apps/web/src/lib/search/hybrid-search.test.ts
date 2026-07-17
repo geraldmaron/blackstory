@@ -1,5 +1,5 @@
 /**
- * Tests for snapshot vector lane and web hybrid wiring (BB-072).
+ * Tests for snapshot vector lane and web hybrid wiring.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

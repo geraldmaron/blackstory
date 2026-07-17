@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Client orchestrator for BB-093's `/history` temporal browse experience. Wires the decade
+ * Client orchestrator for `/history` temporal browse experience. Wires the decade
  * stepper, progressive-disclosure graph panel, synchronized accessible list, narrative/edge cards,
  * and shareable URL state. The server-rendered graph release snapshot is the source of truth;
  * `/history/api` refine is optional progressive enhancement when App Check is configured.

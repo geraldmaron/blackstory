@@ -1,5 +1,6 @@
+
 /**
- * Tests for the real Gemini embedding provider (BB-071) — request/response shaping only, via
+ * Tests for the real Gemini embedding provider request/response shaping only, via
  * an injected fake client. No network access or API key is used or required.
  */
 import assert from 'node:assert/strict';

@@ -1,5 +1,5 @@
 /**
- * Tests for `/v1/search/nearest` guardrails (BB-071) — the shared BB-026 text/filter layer
+ * Tests for `/v1/search/nearest` guardrails the shared text/filter layer
  * plus the vector-specific distanceThreshold/eraBucket/k bounds.
  */
 import assert from 'node:assert/strict';

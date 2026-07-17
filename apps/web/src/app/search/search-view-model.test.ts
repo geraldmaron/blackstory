@@ -1,10 +1,10 @@
 /**
- * Unit tests for the search page's pure query-building / result-shaping core (BB-049).
+ * Unit tests for the search page's pure query-building result-shaping core.
  *
  * `SearchPage` itself is an async Server Component reading a `Promise<searchParams>`, which isn't
  * renderable outside a real Next.js request (no `renderToStaticMarkup` support for async
- * components / no `next/navigation` runtime here). Per the BB-049 test guidance, this file instead
- * exercises `buildSearchViewModel` and its small helpers directly — the same logic the page's JSX
+ * components no `next/navigation` runtime here). Per the test guidance, this file instead
+ * exercises `buildSearchViewModel` and its small helpers directly the same logic the page's JSX
  * consumes, extracted so it's synchronously testable.
  */
 import assert from 'node:assert/strict';
@@ -20,7 +20,7 @@ import {
   type SearchViewModel,
 } from './search-view-model';
 
-/** Minimal, type-complete `PublicSearchIndexDoc` fixture builder for synthetic index tests. */
+/** Minimal, type-complete `PublicSearchIndexDoc` fixture builder for synthetic index tests.  */
 function fixtureDoc(
   overrides: Partial<PublicSearchIndexDoc> & Pick<PublicSearchIndexDoc, 'id' | 'displayName'>,
 ): PublicSearchIndexDoc {

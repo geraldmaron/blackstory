@@ -1,14 +1,15 @@
+
 /**
- * Initial scheduled-job roster (BB-084 acceptance criterion 2). Registry ENTRIES only — most
- * job bodies belong to beads that are not built yet, or are being built in parallel by other
- * agents right now (BB-073/074/075/077/081/083). Each entry's `rosterStatus` says plainly
+ * Initial scheduled-job roster. Registry ENTRIES only most
+ * job bodies belong to that are not built yet, or are being built in parallel by other
+ * agents right now. Each entry's `rosterStatus` says plainly
  * whether it is wired to real, already-shipped code ('real') or is a documented stub a future
- * bead fills in ('stub'). See ./jobs/ for the three real job bodies this bead wires directly.
+ * fills in ('stub'). See./jobs/ for the three real job bodies this wires directly.
  *
  * Cadence/budget/timeout numbers here are deliberately consistent with the numbers already
- * shipped in infra/gcp/cost-controls/cost-controls-matrix.json (BB-033, closed) where a job's
+ * shipped in infra/gcp/cost-controls/cost-controls-matrix.json where a job's
  * work maps onto an existing cost-controlled category (e.g. research campaign candidate/day
- * caps); they are new, first-declared values for jobs that don't have a BB-033 analog yet.
+ * caps); they are new, first-declared values for jobs that don't have a analog yet.
  */
 import { EVENT_DRIVEN_CADENCE_SENTINEL } from './cron.js';
 import { scheduledJobKillSwitchId } from './kill-switch.js';
@@ -25,10 +26,10 @@ const YEAR_MS = 365 * DAY_MS;
 const RESEARCH_CAMPAIGNS_KILL_SWITCH = 'research-campaigns' as const;
 
 export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
-  // --- Discovery campaigns per adapter, grouped by the cadence class the bead describes.
+  // --- Discovery campaigns per adapter, grouped by the cadence class the describes.
   // One representative registry entry per class; fanning this out to one row per literal
-  // adapter id (wikimedia, loc, nara, nps, dpla, school-history, ...) is a cheap, purely
-  // mechanical follow-up once BB-073/BB-075 land — it needs zero framework changes.
+  // adapter id (wikimedia, loc, nara, nps, dpla, school-history,...) is a cheap, purely
+  // mechanical follow-up once land it needs zero framework changes.
   {
     id: 'discovery-campaign-wikimedia-federal',
     owner: 'BB-039/BB-073',
@@ -96,13 +97,13 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 3,
   },
 
-  // --- REAL: Reddit deletion-sync (BB-074/BB-077, closed). Wired to @black-book/domain's
+  // --- REAL: Reddit deletion-sync. Wired to @black-book/domain's
   // Reddit deletion-sync sweep (sweepRedditPointerLiveness/applyRedditPointerPurge, which wrap
-  // BB-077's shared planDeletionSyncPurge/applyDeletionSyncPurge) via
+  // shared planDeletionSyncPurge/applyDeletionSyncPurge) via
   // ./jobs/reddit-deletion-sync.ts. Honors the contractual 48h deletion window
   // (packages/domain/src/rights/obligations.ts's reddit entry). The Reddit adapter itself still
-  // ships DISABLED in the BB-037 registry pending the Responsible Builder application (a HUMAN
-  // STEP — see packages/domain/src/adapters/reddit/contract.ts) — this job can run against
+  // ships DISABLED in the registry pending the Responsible Builder application (a HUMAN
+  // STEP; see packages/domain/src/adapters/reddit/contract.ts) — this job can run against
   // whatever pointers are already stored (none, until that approval lands and the adapter is
   // flipped on) without waiting on that approval itself.
   {
@@ -122,9 +123,9 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 4,
   },
 
-  // --- REAL: legal change monitoring (BB-087, closed). Fixture-first adapters propose
-  // review_queue events (Congress.gov / eCFR / CourtListener / LegiScan); humans dispose.
-  // Live vendor keys (api.data.gov, LegiScan) remain a human follow-up — tests stay offline.
+  // --- REAL: legal change monitoring. Fixture-first adapters propose
+  // review_queue events (Congress.gov eCFR CourtListener LegiScan); humans dispose.
+  // Live vendor keys (api.data.gov, LegiScan) remain a human follow-up tests stay offline.
   {
     id: 'legal-change-monitoring',
     owner: 'BB-087',
@@ -142,10 +143,10 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 2,
   },
 
-  // --- REAL: citation link-health sweeps (BB-083, closed). Wired to @black-book/domain's
+  // --- REAL: citation link-health sweeps. Wired to @black-book/domain's
   // citation link-health/repair-ladder logic via ./jobs/citation-link-health-sweep.ts. This is
   // one of the two pre-approved automatic public-facing exceptions (mechanical + reversible:
-  // swap in an archived-copy URL only) — confirmed still true of the job body: it auto-commits
+  // swap in an archived-copy URL only) confirmed still true of the job body: it auto-commits
   // only the wayback_swap/dead_mark steps and returns permanent-redirect/retroactive-SPN repairs
   // as proposals, never auto-applying them (see the job file's module doc for the exact scope).
   {
@@ -165,7 +166,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 2,
   },
 
-  // --- External dataset refresh checks (BB-082).
+  // --- External dataset refresh checks.
   {
     id: 'external-dataset-refresh-fbi-hate-crime',
     owner: 'BB-082',
@@ -199,11 +200,11 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 1,
   },
 
-  // --- REAL: relevance/confidence recalibration report (BB-081, closed). Wired to
+  // --- REAL: relevance/confidence recalibration report. Wired to
   // @black-book/domain's relevance-feedback module (decision-log extraction, per-dimension
   // disagreement, query-pack effectiveness, source-tier precision, drift alarm) via
   // ./jobs/recalibration-report.ts. Report-only: proposal/approval/gold-corpus-gate for an
-  // actual weight change is a separate, human-triggered path — never part of this cron job.
+  // actual weight change is a separate, human-triggered path never part of this cron job.
   {
     id: 'relevance-confidence-recalibration-report',
     owner: 'BB-081',
@@ -220,7 +221,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 1,
   },
 
-  // --- REAL: source drift + adapter run-health checks (BB-037, closed). Wired to
+  // --- REAL: source drift + adapter run-health checks. Wired to
   // @black-book/domain's evaluateRunHealth via ./jobs/source-drift-run-health.ts.
   {
     id: 'source-drift-run-health-check',
@@ -238,7 +239,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 2,
   },
 
-  // --- REAL: gold-corpus regression (BB-047, closed). Wired to @black-book/testing's
+  // --- REAL: gold-corpus regression. Wired to @black-book/testing's
   // evaluateCorpus via ./jobs/gold-corpus-regression.ts.
   {
     id: 'gold-corpus-regression',
@@ -256,15 +257,14 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 2,
   },
 
-  // --- REAL: backup verification (BB-020, closed). Wired to scripts/backup-restore/
+  // --- REAL: backup verification. Wired to scripts/backup-restore/
   // verify-restore.mjs via ./jobs/backup-verification.ts.
-  //
   // Disclosed ADR-007 gap: ADR-007 says worker code lives only in research/publication/
   // security. scripts/backup-restore/ predates that decision and lives outside all three
-  // worker packages. targetWorker.package below is 'security' (closest fit — ops/ops-adjacent
+  // worker packages. targetWorker.package below is 'security' (closest fit ops/ops-adjacent
   // concerns already live there) as the *container* this job runs in; the script itself has not
   // moved. Migrating scripts/backup-restore's logic into workers/security is a reasonable
-  // follow-up, not something this bead's file ownership permits touching.
+  // follow-up outside this module.
   {
     id: 'backup-verification-daily',
     owner: 'BB-020',
@@ -281,9 +281,9 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 2,
   },
 
-  // --- REAL: restore-drill scheduling (BB-020/BB-061). Prompts the quarterly drill runbook
+  // --- REAL: restore-drill scheduling. Prompts the quarterly drill runbook
   // (docs/runbooks/backup-restore.md); scripts/backup-restore/staging-restore.stub.sh is
-  // print-only by design (a human executes the printed gcloud import) — that human gate is the
+  // print-only by design (a human executes the printed gcloud import) that human gate is the
   // runbook's design, not a missing implementation here.
   {
     id: 'restore-drill-quarterly',
@@ -301,8 +301,8 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 1,
   },
 
-  // --- Cost/budget report (BB-033). Stub: BB-033's real evaluator (evaluateDailyBudget) lives
-  // in packages/security/src/resource-controls.ts, not packages/config — outside a "cheap to
+  // --- Cost/budget report. Stub: real evaluator (evaluateDailyBudget) lives
+  // in packages/security/src/resource-controls.ts, not packages/config outside a "cheap to
   // wire" claim without adding @black-book/security as a new dependency here, so this stays a
   // documented stub rather than a rushed wiring.
   {
@@ -323,7 +323,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 2,
   },
 
-  // --- Release-coupled rebuild (BB-070). The second pre-approved automatic public-facing
+  // --- Release-coupled rebuild. The second pre-approved automatic public-facing
   // exception: rebuilding a derived, regenerable artifact tied to an already-activated release.
   // Primarily release-activation-triggered (event-driven); the cadence below is the safety-net
   // poll, mirroring infra/firebase/backup/export-schedule.md's firestore-export-on-release entry.

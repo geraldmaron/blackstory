@@ -1,9 +1,9 @@
 /**
- * Renders typed `subjects[]` edges from a fact to CanonicalEntity records (BB-086 AC8/AC9).
+ * Renders typed `subjects` edges from a fact to CanonicalEntity records.
  *
  * Each subject links to the entity detail page when the id is known in the seed catalog. The list
- * documents that these edges are also graph-view input for BB-092 (mirrored into synthetic `cites`
- * relationships at publish time — see `packages/domain/src/facts/subjects.ts`).
+ * documents that these edges are also graph-view input for (mirrored into synthetic `cites`
+ * relationships at publish time see `packages/domain/src/facts/subjects.ts`).
  */
 import React from 'react';
 import type { FactRecord } from '@black-book/domain';

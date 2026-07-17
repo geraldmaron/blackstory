@@ -1,8 +1,8 @@
 /**
- * Citation health telemetry (BB-083 acceptance criterion 6): rot rate per source class, feeding
- * (a) BB-043's confidence-engine authority signals — see the small, additive
+ * Citation health telemetry: rot rate per source class, feeding
+ * (a) confidence-engine authority signals see the small, additive
  * `citationRotRateAuthoritySignal` in packages/domain/src/confidence-engine/engine.ts, which
- * consumes the `rotRate` this module computes — and (b) an admin dashboard tile
+ * consumes the `rotRate` this module computes and (b) an admin dashboard tile
  * (apps/admin/src/app/citation-health/).
  */
 import type { Citation } from './citation.js';
@@ -12,9 +12,9 @@ export type SourceClassRotRate = {
   readonly totalCitations: number;
   readonly deadCount: number;
   readonly driftedCount: number;
-  /** deadCount / totalCitations, 0..1. */
+  /** deadCount totalCitations, 0..1. */
   readonly rotRate: number;
-  /** (deadCount + driftedCount) / totalCitations, 0..1 — a broader "needs attention" rate. */
+  /** (deadCount + driftedCount) totalCitations, 0..1 a broader "needs attention" rate. */
   readonly attentionRate: number;
 };
 
@@ -22,7 +22,7 @@ const UNCLASSIFIED = 'unclassified' as const;
 
 /**
  * Aggregates rot rate by `sourceClassification`. Citations without a recorded classification
- * are grouped under `'unclassified'` rather than dropped — a missing classification is itself
+ * are grouped under `'unclassified'` rather than dropped a missing classification is itself
  * a data-quality signal worth surfacing, not something to silently discard.
  */
 export function computeRotRateBySourceClass(

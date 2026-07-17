@@ -1,5 +1,5 @@
 /**
- * BB-083: citation structural-completeness and the claim-level / projection-level fail-closed
+ * citation structural-completeness and the claim-level projection-level fail-closed
  * gates it feeds. Proves "unsourced" cannot pass projection build.
  */
 import assert from 'node:assert/strict';
@@ -150,9 +150,9 @@ test('evaluateProjectionCitationCompleteness aggregates failures across every cl
 });
 
 /**
- * Direct proof for BB-083 acceptance criterion 1: a claim without a valid citation cannot pass
- * projection build. Simulates the guarded build path — the fail-closed gate must run and throw
- * before `buildReleaseManifest` (the real BB-019 projection-build primitive) is ever reached.
+ * Direct proof for a claim without a valid citation cannot pass
+ * projection build. Simulates the guarded build path the fail-closed gate must run and throw
+ * before `buildReleaseManifest` (the real projection-build primitive) is ever reached.
  */
 test('a claim without a valid citation cannot pass projection build', () => {
   const claims = [{ id: 'claim-unsourced' }];
@@ -178,7 +178,7 @@ test('a claim without a valid citation cannot pass projection build', () => {
   assert.throws(guardedBuildReleaseManifest, /Projection build blocked/);
 
   // Once a complete citation exists, the same guarded path proceeds and actually builds the
-  // manifest — proving the gate is the only thing standing between "unsourced" and "published".
+  // manifest proving the gate is the only thing standing between "unsourced" and "published".
   citationsByClaimId.set('claim-unsourced', [urlCitation({ claimId: 'claim-unsourced' })]);
   assert.doesNotThrow(guardedBuildReleaseManifest);
 });

@@ -1,5 +1,6 @@
+
 /**
- * Documented accessible peers for search/map journeys (BB-057 AC2).
+ * Documented accessible peers for search/map journeys.
  * Kept outside test files so `@black-book/testing` can re-export the contract.
  */
 

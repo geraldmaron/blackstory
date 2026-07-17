@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke tests for the BB-053 top-level `EntityEvidencePanel` export — the component the
+ * SSR markup smoke tests for the top-level `EntityEvidencePanel` export the component the
  * parent entity page mounts. Confirms the panel renders the measurement legend, a record-level
  * coverage summary, one card per claim (or the approved gap notice when there are none), and that
  * a record-level source-lineage rollup derives correctly from per-claim data when not supplied

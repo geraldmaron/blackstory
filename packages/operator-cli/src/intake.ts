@@ -1,21 +1,22 @@
+
 /**
  * Core operator-proposal intake: submit a lead, register a source, or attach evidence.
  *
- * Every operation in this file lands in the *existing* BB-029 submission-quarantine pipeline
+ * Every operation in this file lands in the *existing* submission-quarantine pipeline
  * (`createQuarantinedSubmission` from `@black-book/security`) and, for leads, opens a real
- * BB-044 draft research case (`createResearchCase` from `@black-book/domain`). Nothing here
+ * draft research case (`createResearchCase` from `@black-book/domain`). Nothing here
  * writes a canonical record, touches `evidenceSources`, mutates a research-case checklist, or
- * evaluates a promotion gate — see `../docs` in the repo root (`docs/runbooks/operator-session.md`)
+ * evaluates a promotion gate see `../docs` in the repo root (`docs/runbooks/operator-session.md`)
  * and `promotion-boundary.test.ts` for the boundary this module cannot cross.
  *
- * "Register a source" does not write directly to the `evidenceSources` registry (BB-016):
+ * "Register a source" does not write directly to the `evidenceSources` registry:
  * enabling a source affects automated candidate generation and is gated by the source-registry
  * workflow, not by this proposer lane. Registering a source here *proposes* it into the same
  * quarantine queue a lead uses, tagged `proposalKind: 'source_registration'`, for a reviewer to
  * action through the existing registry tooling.
  *
  * "Attach evidence" does not call `transitionResearchCase` or mutate a case's evidence
- * checklist directly: that stays behind BB-044's `record_evidence` server gate
+ * checklist directly: that stays behind `record_evidence` server gate
  * (`assertResearchCaseActionAuthorized`, packages/firebase/src/firestore/research-case.ts),
  * which requires a `research:write` permission this proposer-only identity does not carry.
  * This function only queues the proposed evidence against the target case id.
@@ -45,7 +46,7 @@ export const OPERATOR_PROPOSAL_KINDS = [
 
 export type OperatorProposalKind = (typeof OPERATOR_PROPOSAL_KINDS)[number];
 
-/** Only the two BB-029 kinds an operator proposer may submit; `abuse_report` is public-only. */
+/** Only the two kinds an operator proposer may submit; `abuse_report` is public-only. */
 export type OperatorSubmissionKind = 'correction' | 'contribution';
 
 export type OperatorSubmission = {
@@ -72,8 +73,8 @@ export type OperatorIntakeAccepted = {
   readonly proposalKind: OperatorProposalKind;
   readonly submission: QuarantinedSubmissionRecord;
   readonly researchCase?: ResearchCaseRecord;
-  /** Mutations targeting only `submissionInbox` and (optionally) `researchCases` — never
-   *  a canonical, published, or promotion collection. */
+  /** Mutations targeting only `submissionInbox` and (optionally) `researchCases` never
+   * a canonical, published, or promotion collection. */
   readonly mutations: readonly StateMutation[];
   readonly auditEvent: ReturnType<typeof buildOperatorAuditEvent>;
   readonly outboxMessage: ReturnType<typeof buildOperatorOutboxMessage>;
@@ -96,15 +97,16 @@ const AUDIT_ACTION_BY_PROPOSAL: Record<OperatorProposalKind, 'research.created' 
 };
 
 export type PrepareOperatorIntakeOptions = {
-  /** Opens a real BB-044 draft research case (`state: 'candidate'`) alongside the quarantine
-   *  record. Defaults to `true` for leads, `false` otherwise. */
+  /** Opens a real draft research case (`state: 'candidate'`) alongside the quarantine
+   * record. Defaults to `true` for leads, `false` otherwise. */
   readonly openDraftCase?: boolean;
   readonly caseTitle?: string;
 };
 
+
 /**
- * Runs one operator submission through the real BB-029 quarantine intake and, optionally,
- * opens a real BB-044 draft research case. Returns data only — nothing is written until a
+ * Runs one operator submission through the real quarantine intake and, optionally,
+ * opens a real draft research case. Returns data only nothing is written until a
  * caller passes the result to `commitOperatorIntake` (`./commit.ts`).
  */
 export function prepareOperatorIntake(
@@ -248,7 +250,7 @@ export function buildLeadSubmission(input: LeadInput): OperatorSubmission {
   };
 }
 
-/** Submit a lead: proposes it into quarantine and opens a real BB-044 draft research case. */
+/** Submit a lead: proposes it into quarantine and opens a real draft research case. */
 export function prepareLeadIntake(
   input: LeadInput,
   context: OperatorIntakeContext,
@@ -295,6 +297,7 @@ export type EvidenceAttachmentInput = {
   readonly sourceUrls: readonly string[];
   readonly submitterContact?: string;
 };
+
 
 /**
  * Attach evidence to a research case: queues the proposal against `researchCaseId`. Applying

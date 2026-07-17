@@ -1,7 +1,7 @@
 /**
- * Enforces the BB-051 dignity rule programmatically: no color token used for the map's points,
- * clusters, or density layer may be red-hued (the "no red violence markers, no crime-heat"
- * acceptance criterion), so this cannot silently regress as the brand palette evolves.
+ * Enforces the dignity rule programmatically: no color token used for the map's points,
+ * clusters, or density layer may be red-hued (no red violence markers, no crime-heat),
+ * so this cannot silently regress as the brand palette evolves.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -21,7 +21,7 @@ function rgbaToRgb(value: string): readonly [number, number, number] | undefined
   return [Number(match[1]), Number(match[2]), Number(match[3])];
 }
 
-/** Hue in degrees [0, 360) from an RGB triple. */
+/** Hue in degrees [0, 360) from an RGB triple.  */
 function hue([r, g, b]: readonly [number, number, number]): number {
   const rn = r / 255;
   const gn = g / 255;
@@ -51,7 +51,7 @@ function saturation([r, g, b]: readonly [number, number, number]): number {
 }
 
 /** "Red-hued" per the dignity rule: a saturated color whose hue sits in the red band. Warm
- * copper/brown/orange tones (hue ~15-45) are explicitly allowed — the brand's own palette. */
+ * copper/brown/orange tones (hue ~15-45) are explicitly allowed the brand's own palette. */
 function isRedHued(rgb: readonly [number, number, number]): boolean {
   const h = hue(rgb);
   const s = saturation(rgb);

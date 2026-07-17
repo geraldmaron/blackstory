@@ -1,5 +1,5 @@
 /**
- * Shared federal adapter types for fixture-based discovery (BB-046).
+ * Shared federal adapter types for fixture-based discovery.
  */
 import type { AdapterCandidateRecord, AdapterRunOutcome, SourceAdapterContract } from '../../types.js';
 import type { EvidenceSource } from '../../../provenance/source.js';

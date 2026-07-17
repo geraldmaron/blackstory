@@ -1,9 +1,9 @@
+
 /**
- * Tests for the BB-091 jurisdiction resolver's in-memory implementation (no Firestore
+ * Tests for the jurisdiction resolver's in-memory implementation (no Firestore
  * dependency). The Firestore-backed `createFirestoreJurisdictionResolver` shares the exact
  * same `{exists, get}` shape, exercised here structurally via the in-memory variant, and used
- * for real in `load-cli.ts`'s CLI entry (not unit-testable without a live Firestore instance,
- * which this session must not touch — see the final report's cloud-apply checklist).
+ * for real in `load-cli.ts`'s CLI entry (not unit-testable without a live Firestore instance).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

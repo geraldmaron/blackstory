@@ -1,5 +1,5 @@
 /**
- * Domain model tests for entities, geography, merge lineage, and living-status (BB-014).
+ * Domain model tests for entities, geography, merge lineage, and living-status.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

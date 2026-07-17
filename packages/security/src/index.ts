@@ -1,5 +1,6 @@
+
 /**
- * @black-book/security — central redaction and public serialization layer (BB-015).
+ * @black-book/security central redaction and public serialization layer.
  *
  * This package is the single choke point that reduces location precision and scrubs
  * protected values (living residential addresses, exact coordinates) before anything

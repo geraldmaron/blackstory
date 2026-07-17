@@ -1,5 +1,6 @@
+
 /**
- * JSON decision artifact schema validation and writer for BB-063 launch records.
+ * JSON decision artifact schema validation and writer for launch records.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';

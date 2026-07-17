@@ -1,5 +1,5 @@
 /**
- * Edge middleware security checks composed with BB-022 query normalization (BB-028).
+ * Edge middleware security checks composed with query normalization.
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
@@ -13,7 +13,7 @@ import {
 
 const STATE_CHANGING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
-/** Run request guards, attach security headers, then delegate query normalization. */
+/** Run request guards, attach security headers, then delegate query normalization.  */
 export function handleWebSecurity(request: NextRequest): NextResponse {
   try {
     enforceRequestSizeLimit(request);

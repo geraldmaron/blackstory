@@ -1,6 +1,6 @@
 /**
  * Defines the research-case lifecycle, review work, evidence completeness, publication,
- * retraction, and backfill contracts for BB-044.
+ * retraction, and backfill contracts.
  */
 import type { RelevanceAssessment } from '../relevance/index.js';
 import type { ReleaseClaimPreview } from '../promotion/index.js';

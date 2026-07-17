@@ -1,8 +1,9 @@
+
 /**
  * Job-run records generalize the research worker's run-health pattern (workers/research/src/
  * black_book_research/adapters/run_health.py, mirrored in packages/domain/src/adapters/
  * run-health.ts): started/completed/failed, duration, item counts, error summary. This module
- * does not reimplement adapter-specific health evaluation (record-count/schema drift) — that
+ * does not reimplement adapter-specific health evaluation (record-count/schema drift) that
  * stays in @black-book/domain's evaluateRunHealth, reused as-is by jobs/source-drift-run-
  * health.ts. This module is the broader, job-agnostic run-record shape every scheduled job
  * (not just source adapters) produces one of per dispatch.
@@ -12,7 +13,7 @@ export const JOB_RUN_STATUSES = ['running', 'success', 'quarantined', 'failure']
 export type JobRunStatus = (typeof JOB_RUN_STATUSES)[number];
 
 export type JobRunRecord = {
-  /** The BB-018 audit/outbox correlation id for every write this run makes — see audit.ts. */
+  /** The audit/outbox correlation id for every write this run makes see audit.ts. */
   readonly jobRunId: string;
   readonly jobId: string;
   readonly startedAt: string;

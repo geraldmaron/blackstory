@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * Client-only App Check token acquisition for BB-055 correction, appeal, and abuse forms.
- * Does not import `@black-book/firebase` — see `apps/web/src/app/submit/app-check-client.ts`.
+ * Client-only App Check token acquisition for correction, appeal, and abuse forms.
+ * Does not import `@black-book/firebase`; see `apps/web/src/app/submit/app-check-client.ts`.
  */
 import { initializeApp, type FirebaseApp } from 'firebase/app';
 import {

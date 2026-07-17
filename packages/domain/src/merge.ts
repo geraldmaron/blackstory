@@ -1,5 +1,5 @@
 /**
- * Duplicate detection and reversible, audited entity merge lineage (BB-014).
+ * Duplicate detection and reversible, audited entity merge lineage.
  */
 export type EntityMergeStatus = 'active' | 'reversed';
 
@@ -17,7 +17,7 @@ export type EntityMergeRecord = {
   readonly reversedAt?: string;
   readonly reversedBy?: string;
   readonly reverseReason?: string;
-  /** Audit event ids written for this merge / reverse. */
+  /** Audit event ids written for this merge reverse. */
   readonly auditEventIds: readonly string[];
 };
 
@@ -35,7 +35,7 @@ export function assertMergeReversible(merge: EntityMergeRecord): void {
 
 /**
  * Produce a reversed merge record. Callers must restore absorbed entities to active
- * and append an audit event (BB-018 deepens outbox).
+ * and append an audit event.
  */
 export function reverseMerge(
   merge: EntityMergeRecord,

@@ -1,5 +1,5 @@
 /**
- * Public history refine endpoint (BB-093). Node.js runtime (App Check Admin SDK). Thin entry
+ * Public history refine endpoint. Node.js runtime (App Check Admin SDK). Thin entry
  * wiring production singletons; testable core lives in `./handler`.
  */
 import { createHistoryAppCheckGuard, type HistoryAppCheckGuard } from './app-check-guard';

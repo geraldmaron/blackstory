@@ -1,8 +1,8 @@
 /**
- * Internet Archive discovery adapter types (BB-073).
+ * Internet Archive discovery adapter types.
  * Covers three IA surfaces: Advanced Search (small result sets), the cursor-based Scrape API
- * (large result sets), and the per-item Metadata API. All three are open — no API key/approval
- * gate at IA's side — but the adapter itself still starts disabled in the BB-037 registry until
+ * (large result sets), and the per-item Metadata API. All three are open no API key/approval
+ * gate at IA's side but the adapter itself still starts disabled in the registry until
  * an operator approves the source policy, same isolation as every other adapter in this repo.
  */
 import type { AdapterCandidateRecord } from '../types.js';
@@ -15,10 +15,9 @@ export const INTERNET_ARCHIVE_PAYLOAD_SCHEMA_VERSION = 'internet-archive-payload
 /**
  * IA hosts everything from institutional newspaper microfilm to raw community uploads with no
  * reliable machine-readable signal distinguishing the two from search/scrape results alone.
- * This adapter classifies every item `community_oral` by default (documented gap — see
- * ../../../ contract.ts and this bead's final report: a follow-up could refine per-collection
- * authority using IA's `collection` metadata field once a vetted allowlist of institutional
- * collections exists).
+ * This adapter classifies every item `community_oral` by default (documented gap — a follow-up
+ * could refine per-collection authority using IA's `collection` metadata field once a vetted
+ * allowlist of institutional collections exists).
  */
 export const INTERNET_ARCHIVE_DEFAULT_CLASSIFICATION = 'community_oral' as const;
 
@@ -70,7 +69,7 @@ export type InternetArchiveCandidatePayload = {
   readonly date?: string;
   readonly subject?: readonly string[];
   readonly collection?: readonly string[];
-  /** Capped to the BB-077 evidence-pointer snippet limits — never the full item description. */
+  /** Capped to the evidence-pointer snippet limits never the full item description. */
   readonly summary?: string;
 };
 

@@ -1,5 +1,6 @@
+
 /**
- * BB-063 public beta disable controls — App Hosting env keys and kill-switch ids.
+ * public beta disable controls App Hosting env keys and kill-switch ids.
  * Operators can return to static read-only without redeploying product code.
  */
 import { existsSync, readFileSync } from 'node:fs';
@@ -8,10 +9,10 @@ import { CORE_KILL_SWITCH_IDS } from '../kill-switches.js';
 
 export const BETA_DISABLE_POLICY_VERSION = '1.0.0' as const;
 
-/** App Hosting / Next.js runtime flag — when "1", serves snapshot read-only shell. */
+/** App Hosting Next.js runtime flag when "1", serves snapshot read-only shell. */
 export const PUBLIC_READ_API_DISABLED_ENV = 'PUBLIC_READ_API_DISABLED' as const;
 
-/** Firestore / Remote Config kill switch for immutable snapshot serving. */
+/** Firestore Remote Config kill switch for immutable snapshot serving. */
 export const PUBLIC_STATIC_MODE_SWITCH_ID = 'public-static-mode' as const;
 
 /** Workloads stopped immediately when entering static read-only containment. */

@@ -1,5 +1,5 @@
 /**
- * Tests for Wikimedia discovery adapter (BB-045). Fixture-driven; no live network.
+ * Tests for Wikimedia discovery adapter. Fixture-driven; no live network.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

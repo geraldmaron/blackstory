@@ -1,6 +1,6 @@
 /**
- * Tests for BB-092 acceptance criterion 10 (CRITICAL): per-decade view materialization buckets an
- * entity into EVERY decade of its active span (derived from BB-090 status/statusHistory and
+ * Tests for per-decade view materialization buckets an
+ * entity into EVERY decade of its active span (derived from status/statusHistory and
  * start/end fields), never only the decade of creation/founding. Also covers acceptance
  * criterion 3's per-decade node/edge sets and all-time union view.
  */
@@ -26,15 +26,15 @@ function rel(overrides: Partial<EntityRelationship> & Pick<EntityRelationship, '
 
 // ---------------------------------------------------------------------------
 // The CRITICAL proof: an entity founded in one decade and still active appears in every
-// subsequent published decade view up to the "still active" cutoff — not only its founding decade.
+// subsequent published decade view up to the "still active" cutoff not only its founding decade.
 // ---------------------------------------------------------------------------
 
 test('an entity founded in the 1950s with an open-ended (still active) status appears in EVERY decade through the cutoff, not just its founding decade', () => {
-  // Real BB-090 statusHistory shape: founded 1957, open-ended (still active) record.
+  // Real statusHistory shape: founded 1957, open-ended (still active) record.
   const statusHistory: readonly StatusHistoryEntry<EntityStatusValue>[] = [
     { status: 'active', validFrom: '1957', validTo: null, datePrecision: 'year', basisClaimIds: ['c1'] },
   ];
-  // Caller resolves statusHistory into EraSpan windows (this module never re-derives BB-090 logic).
+  // Caller resolves statusHistory into EraSpan windows (this module never re-derives logic).
   const activeSpans = statusHistory.map((entry) => ({
     validFrom: entry.validFrom!,
     validTo: entry.validTo,
@@ -46,7 +46,7 @@ test('an entity founded in the 1950s with an open-ended (still active) status ap
     { stillActiveCutoff: '2026' },
   );
 
-  // NOT just ["1950s"] — every decade from founding through the cutoff.
+  // NOT just ["1950s"] every decade from founding through the cutoff.
   assert.deepEqual(buckets, [
     '1950s', '1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s',
   ]);
@@ -87,7 +87,7 @@ test('multiple disjoint active windows union into one decade-bucket set', () => 
 });
 
 // ---------------------------------------------------------------------------
-// Acceptance criterion 3: per-decade node/edge sets + all-time union view.
+// per-decade node/edge sets + all-time union view.
 // ---------------------------------------------------------------------------
 
 test('buildDecadeViews places the still-active org in every decade view through the cutoff, and the single-decade event in only its own decade', () => {
@@ -116,7 +116,7 @@ test('buildDecadeViews places the still-active org in every decade view through 
   assert.ok(!byDecade.get('2020s')?.nodeIds.includes('gg-event-rally'));
 
   // The participated_in edge only appears in decades where BOTH endpoints are present AND its
-  // own temporal window overlaps — i.e. only 1960s, not 2020s (event isn't a 2020s node at all).
+  // own temporal window overlaps i.e. only 1960s, not 2020s (event isn't a 2020s node at all).
   assert.ok(byDecade.get('1960s')?.edgeIds.includes('r-participated'));
   assert.ok(!(byDecade.get('2020s')?.edgeIds.includes('r-participated') ?? false));
 });
@@ -146,7 +146,7 @@ test('buildAllTimeView unions every decade view into one deduplicated, sorted no
   assert.deepEqual(allTime.nodeIds, [...new Set(allTime.nodeIds)]); // deduplicated
 });
 
-// Sanity: confirms this test exercises the real BB-090 currentStatus derivation (never
+// Sanity: confirms this test exercises the real currentStatus derivation (never
 // reimplemented locally) so the "still active" premise above is grounded in the real function.
 test('sanity: currentStatus derives "active" from the same open-ended record used above', () => {
   const statusHistory: readonly StatusHistoryEntry<EntityStatusValue>[] = [

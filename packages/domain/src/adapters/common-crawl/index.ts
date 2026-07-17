@@ -1,5 +1,5 @@
 /**
- * Common Crawl retrospective discovery adapter public surface (BB-075). Free (AWS Open Data +
+ * Common Crawl retrospective discovery adapter public surface. Free (AWS Open Data +
  * Hugging Face), no storage-rights gate -- see ./types.ts's module doc comment for how "CDX-index
  * query construction for name/place mentions" is implemented given CDX is URL/host-pattern based,
  * not full-text search.

@@ -1,6 +1,7 @@
+
 /**
  * Tests for the embedding provider abstraction: retry/backoff and the deterministic mock
- * provider used by every other test in this bead instead of live network calls (BB-071).
+ * provider used by every other test in this instead of live network calls.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

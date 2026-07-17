@@ -1,5 +1,5 @@
 /**
- * Tests for the BB-070 U.S. state reference table and approximate point lookup.
+ * Tests for the U.S. state reference table and approximate point lookup.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -43,7 +43,7 @@ test('documented limitation: bbox approximation can misattribute dense coastal-m
   // Lower Manhattan's coordinates also fall inside New Jersey's rectangular
   // bounding box (NJ's box extends across the Hudson to cover NYC's lng/lat),
   // and NJ's smaller bbox area wins the smallest-first tie-break. This is a
-  // known, intentionally-tested gap (see ADR-013 "known gaps") — real
+  // known, intentionally-tested gap (see ADR-013 "known gaps") real
   // administrative attribution needs polygon boundary data this module does
   // not vendor. Fixtures and demo data pick unambiguous points instead.
   const result = findUsStateForPoint(40.7128, -74.006);

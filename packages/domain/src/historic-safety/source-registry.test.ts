@@ -1,5 +1,5 @@
 /**
- * Tests for BB-082-owned source registrations (EJI, Tougaloo) and read-only launch-corpus pointers.
+ * Tests for -owned source registrations (EJI, Tougaloo) and read-only launch-corpus pointers.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

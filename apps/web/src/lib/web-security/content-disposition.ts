@@ -1,5 +1,5 @@
 /**
- * Safe Content-Disposition header builder (BB-028).
+ * Safe Content-Disposition header builder.
  * Prevents header injection and path traversal in downloaded filenames.
  */
 
@@ -13,7 +13,7 @@ function containsControlCharacters(value: string): boolean {
   return false;
 }
 
-/** Sanitize a filename for Content-Disposition (no path segments or control chars). */
+/** Sanitize a filename for Content-Disposition (no path segments or control chars).  */
 export function sanitizeFilename(filename: string): string {
   const base = filename.split(/[/\\]/).pop() ?? 'download';
   const withoutControl = [...base]
@@ -42,7 +42,7 @@ export function buildSafeContentDisposition(
   return `${disposition}; filename="${asciiFallback}"; filename*=UTF-8''${encodeURIComponent(safeName)}`;
 }
 
-/** Reject values that could break out of the header (CRLF injection). */
+/** Reject values that could break out of the header (CRLF injection).  */
 export function assertSafeContentDispositionValue(value: string): void {
   if (value.includes('\r') || value.includes('\n') || containsControlCharacters(value)) {
     throw new Error('Content-Disposition value must not contain CR or LF.');

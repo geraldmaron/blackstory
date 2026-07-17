@@ -1,6 +1,7 @@
+
 /**
- * REAL roster entry: source drift + adapter run-health checks (BB-037). Wraps
- * @black-book/domain's evaluateRunHealth/shouldQuarantineRun/shouldDeadLetterRun — the exact
+ * REAL roster entry: source drift + adapter run-health checks. Wraps
+ * @black-book/domain's evaluateRunHealth/shouldQuarantineRun/shouldDeadLetterRun the exact
  * same functions the source-adapter pipeline itself uses (packages/domain/src/adapters/
  * run-health.ts), which in turn mirror the research worker's Python run_health module
  * (workers/research/src/black_book_research/adapters/run_health.py). This wrapper does not

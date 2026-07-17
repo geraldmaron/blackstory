@@ -3,8 +3,10 @@
 Shared package: `@black-book/ui` (`packages/ui`).
 
 See also [`brand.md`](./brand.md) (BB-067/BB-068) for the "Pinned Page" mark:
-geometry, palette, typography, and usage rules; and [`story.md`](./story.md)
-(BB-069) for brand voice, narrative arc, and microcopy standards.
+geometry, palette, typography, and usage rules; [`story.md`](./story.md)
+(BB-069) for brand voice, narrative arc, and microcopy standards; and
+[`learning-index-entity.md`](./learning-index-entity.md) for the learning-index
+entity contract (summary, tags, related hops, enrichable prose, photo).
 
 ## What shipped
 

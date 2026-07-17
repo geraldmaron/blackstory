@@ -1,12 +1,12 @@
 /**
- * MapLibre GL JS wiring for the BB-070 `/map` demo route.
+ * MapLibre GL JS wiring for the `/map` demo route.
  *
- * `maplibre-gl` (and its CSS) are only ever imported here — a client-only
- * leaf component — never from `@black-book/ui`'s MapExplorer shell. That
+ * `maplibre-gl` (and its CSS) are only ever imported here a client-only
+ * leaf component never from `@black-book/ui`'s MapExplorer shell. That
  * keeps the shared UI package free of a WebGL dependency and safe for its
  * plain Node/tsx test runner (no bundler CSS loader available there).
  *
- * Large inline styles are applied with `addSource` / `addLayer` after `load`
+ * Large inline styles are applied with `addSource` `addLayer` after `load`
  * (same pattern as `ExploreMapCanvas`) so style loading cannot hang.
  */
 'use client';

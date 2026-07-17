@@ -1,5 +1,5 @@
 /**
- * Tests for BB-087 law status badge vocabulary — imports BB-090 LAW_STATUSES.
+ * Tests for law status badge vocabulary imports LAW_STATUSES.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

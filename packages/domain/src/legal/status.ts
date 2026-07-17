@@ -1,5 +1,5 @@
 /**
- * Law status badge vocabulary for BB-087 — imports BB-090 `LAW_STATUSES` as the single shared
+ * Law status badge vocabulary for imports `LAW_STATUSES` as the single shared
  * definition rather than redefining status strings locally.
  */
 import { LAW_STATUSES, type LawStatus } from '../entity-status.js';
@@ -34,7 +34,7 @@ export function lawStatusDescription(status: LawStatus): string {
   return LAW_STATUS_DESCRIPTIONS[status];
 }
 
-/** UI tone hint — maps to Notice/ badge variants without importing UI packages. */
+/** UI tone hint maps to Notice/ badge variants without importing UI packages. */
 export type LawStatusTone = 'neutral' | 'info' | 'warning' | 'error';
 
 export function lawStatusTone(status: LawStatus): LawStatusTone {

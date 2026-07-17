@@ -2,7 +2,7 @@
  * US state (+ DC) polygon asset for the national map.
  *
  * Source: U.S. Census Bureau 2010 cartographic boundary states at 1:20,000,000
- * (public domain / U.S. Government work), via Eric Celeste’s GeoJSON conversion of
+ * (public domain U.S. Government work), via Eric Celeste’s GeoJSON conversion of
  * gz_2010_us_040_00_20m. Coordinates rounded; properties enriched with USPS postal codes.
  * Cite the Census Bureau when redistributing.
  *

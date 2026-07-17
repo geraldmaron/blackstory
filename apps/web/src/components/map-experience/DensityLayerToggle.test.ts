@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke test for the BB-051 density-layer toggle's accessible state exposure.
+ * SSR markup smoke test for the density-layer toggle's accessible state exposure.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';

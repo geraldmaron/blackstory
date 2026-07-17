@@ -1,5 +1,5 @@
 /**
- * Versioned confidence orchestration built on the BB-017 deterministic scorer.
+ * Versioned confidence orchestration built on the deterministic scorer.
  * Records input fingerprints, component versions, recalculation causes, and public-language gates.
  */
 import { createHash } from 'node:crypto';
@@ -253,17 +253,16 @@ export function evaluatePublicLanguage(input: {
 }
 
 /**
- * BB-073 source-tier trust wiring (additive — does not change `recalculateConfidence` above).
+ * Source-tier trust wiring (additive — does not change `recalculateConfidence` above).
  *
- * `../claims/confidence.ts` `CLASSIFICATION_AUTHORITY` (BB-043, out of this bead's file
- * ownership) already assigns `community_oral`/`self_published`/`news_reportage` a low weight in
- * the weighted composite score. But a weighted average alone cannot GUARANTEE that a claim
- * resting on a single crowdsourced lineage never crosses a publish threshold — if every other
- * component (directness, temporal proximity, geographic precision, entity match, extraction
- * quality) happens to be high, the 25%-weighted sourceAuthority component alone may not be
- * enough to hold the line. BB-073 acceptance criterion 3 is explicit that this must be a hard
- * guarantee: "crowdsourced items SEED research cases, they never publish [directly]." This
- * module makes that guarantee explicit, testable, and additive: apply
+ * `../claims/confidence.ts` `CLASSIFICATION_AUTHORITY` already assigns
+ * `community_oral` / `self_published` / `news_reportage` a low weight in the weighted
+ * composite score. But a weighted average alone cannot guarantee that a claim resting on a
+ * single crowdsourced lineage never crosses a publish threshold — if every other component
+ * (directness, temporal proximity, geographic precision, entity match, extraction quality)
+ * happens to be high, the source-authority component alone may not be enough to hold the
+ * line. Crowdsourced items must seed research cases and never publish directly. This module
+ * makes that guarantee explicit, testable, and additive: apply
  * `enforceCrowdsourcedCannotPublishAlone` to a `ConfidenceEngineResult` wherever supporting
  * evidence for a claim traces back to these adapters (RSS, Internet Archive, DPLA v2) before
  * treating `passesPublishThreshold` as authoritative.
@@ -282,8 +281,8 @@ export type EvidenceSourceTierSummary = {
 };
 
 /**
- * True when every contributing supporting lineage is a crowdsourced tier — i.e. there is no
- * independent institutional/archival corroboration at all, the case BB-073 says must never
+ * True when every contributing supporting lineage is a crowdsourced tier i.e. there is no
+ * independent institutional/archival corroboration at all, the case says must never
  * publish on its own regardless of how the weighted score computes.
  */
 export function isPurelyCrowdsourcedEvidence(supportingSources: readonly EvidenceSourceTierSummary[]): boolean {
@@ -294,8 +293,8 @@ export function isPurelyCrowdsourcedEvidence(supportingSources: readonly Evidenc
 /**
  * Hard override applied on top of a confidence result: crowdsourced-only supporting evidence is
  * capped below every claim-class publish threshold until at least one non-crowdsourced (or
- * additional independent) lineage corroborates it. The underlying `score` is left untouched —
- * the candidate can still surface as a research lead — only `passesPublishThreshold` is forced
+ * additional independent) lineage corroborates it. The underlying `score` is left untouched 
+ * the candidate can still surface as a research lead only `passesPublishThreshold` is forced
  * closed.
  */
 export function enforceCrowdsourcedCannotPublishAlone<T extends { readonly passesPublishThreshold: boolean }>(
@@ -309,13 +308,13 @@ export function enforceCrowdsourcedCannotPublishAlone<T extends { readonly passe
 }
 
 /**
- * BB-083 additive authority signal: a source class whose citations rot (go dead) quickly is a
+ * additive authority signal: a source class whose citations rot (go dead) quickly is a
  * durability signal worth surfacing alongside the existing confidence components above. This is
- * deliberately a small, separate, named function — not a change to `calculateClaimConfidence`'s
+ * deliberately a small, separate, named function not a change to `calculateClaimConfidence`'s
  * weighted computation (see `../claims/confidence.ts`) or its component weights. `rotRate` comes
  * from `../citations/rot-telemetry.ts`'s `computeRotRateBySourceClass` (per-source-class
- * deadCount / totalCitations, 0..1). Consuming this signal inside the weighted score itself is a
- * follow-up integration decision for whichever bead owns confidence-component reweighting, not
+ * deadCount totalCitations, 0..1). Consuming this signal inside the weighted score itself is a
+ * follow-up integration decision for whichever owns confidence-component reweighting, not
  * decided here.
  */
 export function citationRotRateAuthoritySignal(rotRate: number): number {
@@ -327,9 +326,9 @@ export function citationRotRateAuthoritySignal(rotRate: number): number {
 }
 
 /**
- * BB-076 additive signal: turns independent-reviewer agreement (see
+ * additive signal: turns independent-reviewer agreement (see
  * `../consensus-review/index.js`) into a small, capped corroboration input the confidence
- * engine can incorporate. Deliberately isolated from `recalculateConfidence` above — it does
+ * engine can incorporate. Deliberately isolated from `recalculateConfidence` above it does
  * not change that function, its inputs, or its fingerprints. A caller may optionally apply the
  * bounded adjustment via `withReviewerAgreementCorroboration` below; nothing here is wired
  * into the default recalculation path.
@@ -338,7 +337,7 @@ export function citationRotRateAuthoritySignal(rotRate: number): number {
  * package boundary should not need to know that module's shapes): 'corroborates' means the
  * reviewer majority agreed the lead is legitimate; 'disputes' and 'inconclusive' cover
  * everything else, including ties and below-threshold agreement, and must never contribute a
- * score adjustment — that mirrors consensus-review's own rule that disagreement is never
+ * score adjustment that mirrors consensus-review's own rule that disagreement is never
  * silently resolved.
  */
 export const REVIEWER_AGREEMENT_SIGNAL_VERSION = 'reviewer-agreement-signal.v1' as const;
@@ -358,7 +357,7 @@ export type ReviewerAgreementSignal = {
   readonly reviewCount: number;
   readonly agreementRatio: number;
   readonly verdict: ReviewerAgreementVerdict;
-  /** Bounded contribution in [0, REVIEWER_AGREEMENT_MAX_WEIGHT] — never enough alone to cross a gate. */
+  /** Bounded contribution in [0, REVIEWER_AGREEMENT_MAX_WEIGHT] never enough alone to cross a gate. */
   readonly corroborationWeight: number;
   readonly fingerprint: string;
 };
@@ -400,7 +399,7 @@ export function computeReviewerAgreementSignal(
 /**
  * Applies a reviewer-agreement signal on top of an already-computed confidence result.
  * A no-op (returns `result` unchanged) unless the signal both `corroborates` and carries a
- * positive weight — 'disputes' and 'inconclusive' must reach a human reviewer upstream in
+ * positive weight 'disputes' and 'inconclusive' must reach a human reviewer upstream in
  * consensus review, never a silent score change here. The adjustment is clamped to [0, 1] and
  * cannot by itself flip `passesPublishThreshold` from false to true unless the unadjusted
  * score was already within `REVIEWER_AGREEMENT_MAX_WEIGHT` of the threshold.

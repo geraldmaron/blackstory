@@ -1,5 +1,6 @@
+
 /**
- * Fail-closed BB-063 beta launch gate evaluator — aggregates machine checks and human attestations.
+ * Fail-closed beta launch gate evaluator aggregates machine checks and human attestations.
  */
 import { BETA_LAUNCH_GATES, REQUIRED_HUMAN_GATE_IDS } from './criteria.js';
 import { checkEvidencePointersExist, runMachineGateCheck } from './evidence-checks.js';
@@ -145,7 +146,7 @@ export function evaluateBetaLaunchGate(
   };
 }
 
-/** Throws when decision is NO_GO — for programmatic fail-closed callers. */
+/** Throws when decision is NO_GO for programmatic fail-closed callers. */
 export function assertBetaLaunchGo(report: BetaLaunchEvaluationReport): void {
   if (report.decision !== 'GO') {
     const failed = report.gates

@@ -1,14 +1,13 @@
 /**
- * Integration tests for the public `/locate` geocode route (BB-050). These exercise the REAL
- * route handler end-to-end — App Check guard, BB-025 `geocoding` rate limiter, address/ZIP/
- * coordinate parsing, and the full geocode pipeline (`../../../lib/geocode/pipeline.ts`) — with a
+ * Integration tests for the public `/locate` geocode route. These exercise the REAL
+ * route handler end-to-end App Check guard, `geocoding` rate limiter, address/ZIP/
+ * coordinate parsing, and the full geocode pipeline (`../../../lib/geocode/pipeline.ts`) with a
  * fake Census fetcher injected so no real network call is ever made (style follows
  * `../../search/api/route.test.ts`: plain `node:test`, real objects, no mocking framework).
  *
- * Covers every BB-050 acceptance criterion this route layer is responsible for: territory scope
- * (AC1), exact coordinates never leaving the resolution (AC3), manual-place-search fallback on
- * geocoder failure/no-match/ambiguous match (AC4), rate limiting (AC5), and jurisdiction-id +
- * ZIP-translate-then-discard resolution (AC6).
+ * Covers territory scope, exact coordinates never leaving the resolution, manual-place-search
+ * fallback on geocoder failure/no-match/ambiguous match, rate limiting, and jurisdiction-id +
+ * ZIP-translate-then-discard resolution.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

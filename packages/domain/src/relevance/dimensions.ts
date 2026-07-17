@@ -1,5 +1,5 @@
 /**
- * Relevance scoring dimensions and feature-value extraction (BB-040).
+ * Relevance scoring dimensions and feature-value extraction.
  */
 import type { DiscoveryCandidateRecord } from '../discovery/types.js';
 import type { RelevanceDimension, RelevanceFeatureValue } from './types.js';

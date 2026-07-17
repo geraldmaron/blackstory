@@ -1,5 +1,5 @@
 /**
- * Category membership gate — category presence never implies automatic inclusion (BB-045).
+ * Category membership gate category presence never implies automatic inclusion.
  */
 import {
   DEFAULT_WIKIMEDIA_CATEGORY_GRAPH,

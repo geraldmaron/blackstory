@@ -1,5 +1,5 @@
 /**
- * Deterministic claim confidence engine (BB-017).
+ * Deterministic claim confidence engine.
  * Scores retain component values and constitution policyVersion.
  * Syndicated copies sharing lineageRootId count as one independent lineage.
  */
@@ -36,7 +36,7 @@ export type ConfidenceScore = {
   readonly calculatedAt: string;
 };
 
-/** Fixed component weights — deterministic; not tunable at runtime without a policy version bump. */
+/** Fixed component weights deterministic; not tunable at runtime without a policy version bump. */
 export const CONFIDENCE_COMPONENT_WEIGHTS = {
   sourceAuthority: 0.25,
   directness: 0.15,
@@ -125,7 +125,7 @@ function linkQuality(link: ClaimEvidenceLink): number {
 }
 
 /**
- * Collapse syndicated / mirrored evidence onto one row per lineageRootId.
+ * Collapse syndicated mirrored evidence onto one row per lineageRootId.
  * When blockSyndicatedCopiesAsIndependent is on (constitution default), copies count once.
  */
 export function uniqueLineageAggregates(

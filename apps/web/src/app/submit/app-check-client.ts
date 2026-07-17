@@ -9,7 +9,7 @@
  * Component would pull `firebase-admin` (Node-only) into the browser build. The
  * security-critical verification stays server-only in `./app-check-guard.ts`, reusing
  * `@black-book/firebase` exactly. This file only calls the vendor `firebase` client SDK
- * directly to obtain a token — there is no Black Book–owned business logic here to duplicate.
+ * directly to obtain a token there is no Black Book–owned business logic here to duplicate.
  *
  * Gracefully degrades: if App Check isn't configured for this environment (e.g. local dev
  * without a real Firebase project), it returns no header, and the server-side guard falls back
@@ -75,7 +75,7 @@ function getOrInitAppCheck(): AppCheck | undefined {
   }
 }
 
-/** Resolves to App Check request headers, or `{}` when App Check isn't configured for this build. */
+/** Resolves to App Check request headers, or `{}` when App Check isn't configured for this build.  */
 export async function getSubmitLeadAppCheckHeaders(): Promise<Readonly<Record<string, string>>> {
   const appCheck = getOrInitAppCheck();
   if (!appCheck) return {};

@@ -1,5 +1,5 @@
 /**
- * Tests for BB-087 legal source adapters — fixture-only, no live network.
+ * Tests for legal source adapters fixture-only, no live network.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

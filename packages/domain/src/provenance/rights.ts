@@ -1,5 +1,5 @@
 /**
- * Rights status and publication gates for evidence media and substantial excerpts (BB-016).
+ * Rights status and publication gates for evidence media and substantial excerpts.
  * Constitution publicationRestrictions.requireRightsStatus drives the gate.
  */
 import { loadProductConstitution } from '@black-book/schemas';
@@ -72,7 +72,7 @@ export function isPublishableRightsStatus(status: RightsStatus): boolean {
 
 /**
  * True when publishing this content kind requires an explicit non-unknown rights status.
- * Citation-only / short excerpts may proceed with unknown under constitution review;
+ * Citation-only short excerpts may proceed with unknown under constitution review;
  * media and substantial excerpts always require resolved rights.
  */
 export function requiresResolvedRights(contentKind: PublicationContentKind): boolean {

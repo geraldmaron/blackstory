@@ -1,5 +1,5 @@
 /**
- * Browser / client bundle denial surface for @black-book/data-access.
+ * Browser client bundle denial surface for @black-book/data-access.
  * Any bundler that resolves the `browser` export condition loads this module.
  */
 throw new Error(

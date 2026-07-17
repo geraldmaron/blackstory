@@ -1,3 +1,4 @@
+
 /**
  * Launches the TypeScript gold-corpus comparison reporter with tsx while preserving a
  * plain Node entry point for local and CI dry runs.

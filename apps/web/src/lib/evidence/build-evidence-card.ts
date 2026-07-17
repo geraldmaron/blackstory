@@ -1,10 +1,10 @@
 /**
- * Builds the full BB-053 evidence-card view model for one claim: evidence-score confidence
- * language (AC1), rights-limited excerpt/citation resolution (AC4), preserved dispute
- * presentation (AC3), and source-lineage / research-coverage / last-checked / revision /
- * retraction metadata kept visibly distinct from confidence (AC2). Pure and synchronously
- * testable \u2014 no I/O, no React \u2014 so `apps/web/src/components/evidence/EntityEvidencePanel.tsx`
- * stays a thin rendering layer over this module, matching this codebase's existing
+ * Builds the full evidence-card view model for one claim: evidence-score confidence
+ * language, rights-limited excerpt/citation resolution, preserved dispute presentation,
+ * and source-lineage / research-coverage / last-checked / revision / retraction metadata
+ * kept visibly distinct from confidence. Pure and synchronously testable — no I/O, no
+ * React — so `apps/web/src/components/evidence/EntityEvidencePanel.tsx` stays a thin
+ * rendering layer over this module, matching this codebase's existing
  * `entity-view-model.ts` convention of separating decision logic from JSX.
  */
 import { formatEvidenceScoreLabel } from './confidence-language.js';
@@ -43,7 +43,7 @@ export function buildEvidenceCards(inputs: readonly EvidenceClaimInput[]): reado
 }
 
 /** Sum of each claim's independent-lineage count, for a record-level source-lineage rollup when
- * the caller has not supplied one explicitly (e.g. from a real BB-019 projection aggregate). */
+ * the caller has not supplied one explicitly (e.g. from a real projection aggregate). */
 export function totalSourceLineageCount(cards: readonly EvidenceClaimView[]): number {
   return cards.reduce((sum, card) => sum + (card.sourceLineage?.independentLineageCount ?? 0), 0);
 }

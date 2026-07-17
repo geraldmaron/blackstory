@@ -1,6 +1,6 @@
 /**
- * Accessible legend for the BB-051 map: explains the density/coverage layer, the precision-radius
- * affordance, and the confidence glyphs in words — this is the a11y peer of the map's visual
+ * Accessible legend for the map: explains the density/coverage layer, the precision-radius
+ * affordance, and the confidence glyphs in words this is the a11y peer of the map's visual
  * legend, not a caption underneath it (WCAG 1.4.1 Use of Color: every visual distinction here also
  * has a text/glyph explanation).
  */

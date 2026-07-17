@@ -1,5 +1,5 @@
 /**
- * Discovery-run stamping with query-pack version for reproducibility (BB-038).
+ * Discovery-run stamping with query-pack version for reproducibility.
  */
 import type { DiscoveryRunContext, QueryPack, StampedDiscoveryRun } from './types.js';
 

@@ -1,5 +1,6 @@
+
 /**
- * Declarative anomaly detection rules and synthetic evaluator for BB-034.
+ * Declarative anomaly detection rules and synthetic evaluator.
  * Rules operate on metric samples and security events without external dependencies.
  */
 import type { SecurityMetricSample } from './security-metrics.js';
@@ -281,6 +282,7 @@ function compare(value: number, threshold: number, comparator: AnomalyComparator
 function parseTimestamp(iso: string): number {
   return Date.parse(iso);
 }
+
 
 /**
  * Evaluate anomaly rules against metric samples within each rule's time window.

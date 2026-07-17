@@ -1,7 +1,7 @@
 /**
- * Static privacy disclosure for the `/locate` geocode experience (BB-050). Plain, server-safe
+ * Static privacy disclosure for the `/locate` geocode experience. Plain, server-safe
  * (no hooks, no `'use client'`) so it renders in the initial HTML even before
- * `LocateExperience.tsx` hydrates — a no-JS visitor still sees exactly what this feature does
+ * `LocateExperience.tsx` hydrates a no-JS visitor still sees exactly what this feature does
  * with their input before any interactive control appears.
  */
 import React from 'react';

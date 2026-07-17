@@ -1,3 +1,4 @@
+
 /**
  * Verifies the CLI is a thin dispatcher: it parses flags, calls the real prepare/commit
  * functions, and is safe-by-default (no writes without an explicit `--commit`).

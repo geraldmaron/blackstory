@@ -1,6 +1,6 @@
 /**
- * Public errata log seed data (BB-088) — reverse-chronological editorial changes wired to BB-086
- * fact revisions and BB-055 corrections policy. Production replaces this with a live projection.
+ * Public errata log seed data reverse-chronological editorial changes wired to 
+ * fact revisions and corrections policy. Production replaces this with a live projection.
  */
 import { listSeedFacts } from '../../data/facts-seed.js';
 import {

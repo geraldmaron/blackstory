@@ -1,15 +1,15 @@
 /**
- * Polls a curated subreddit's `/new` listing through the BB-030 safe-HTTP port (BB-074). Never
- * calls `fetch` directly — see ../internet-archive/shared/http-port.ts for why this repo uses a
+ * Polls a curated subreddit's `/new` listing through the safe-HTTP port. Never
+ * calls `fetch` directly see ../internet-archive/shared/http-port.ts for why this repo uses a
  * dependency-injected `SafeHttpClient` port instead. Production wiring (outside this package)
- * must implement `SafeHttpClient` with the real BB-030 primitives AND attach a valid Reddit
- * OAuth bearer token via `SafeHttpRequest.headers.Authorization` — that token only exists once
+ * must implement `SafeHttpClient` with the real primitives AND attach a valid Reddit
+ * OAuth bearer token via `SafeHttpRequest.headers.Authorization` that token only exists once
  * the HUMAN STEP (Responsible Builder application, see ./contract.ts) is approved and
  * credentials are provisioned. Every test in reddit.test.ts injects a mock client; zero live
  * network calls happen anywhere in this adapter or its tests.
  *
  * Pagination honors Reddit's own structural caps (../../adapters/reddit/types.ts
- * REDDIT_LISTING_MAX_ITEMS / REDDIT_LISTING_MAX_PAGE_SIZE): walks the `after` cursor up to a
+ * REDDIT_LISTING_MAX_ITEMS REDDIT_LISTING_MAX_PAGE_SIZE): walks the `after` cursor up to a
  * 1000-item ceiling, 100 items per request, and stops early once a page is short or has no
  * further cursor.
  */
@@ -37,8 +37,8 @@ export type FetchSubredditListingInput = {
   readonly client: SafeHttpClient;
   readonly retries?: number;
   /** Caps how many items this poll walks via `after`-cursor pagination. Defaults to Reddit's
-   *  own 1000-item listing ceiling; tests pass a small value to exercise the pagination loop
-   *  without needing 1000-item fixtures. */
+   * own 1000-item listing ceiling; tests pass a small value to exercise the pagination loop
+   * without needing 1000-item fixtures. */
   readonly maxItems?: number;
   readonly pageSize?: number;
 };
@@ -91,8 +91,8 @@ export async function fetchSubredditNewListing(
   return candidates.slice(0, maxItems);
 }
 
-/** Modest-concurrency fan-out across the active curated subreddit registry — mirrors
- *  ../rss/fetch-feed.ts's `fetchAndNormalizeFeeds`. */
+/** Modest-concurrency fan-out across the active curated subreddit registry mirrors
+ * ./rss/fetch-feed.ts's `fetchAndNormalizeFeeds`. */
 export async function fetchSubredditNewListings(input: {
   readonly subreddits: readonly SubredditRegistryEntry[];
   readonly registryEntry: SourceRegistryEntry;

@@ -1,12 +1,12 @@
 /**
- * Stable identity and permalink helpers for the BB-086 canonical fact registry.
+ * Stable identity and permalink helpers for the canonical fact registry.
  *
  * Fact ids are immutable and never reused: `BB-F-######` (a zero-padded, monotonically
- * assigned 6-digit sequence — never re-derived from mutable content like the statement text,
+ * assigned 6-digit sequence never re-derived from mutable content like the statement text,
  * unlike the cosmetic slug below). The slug is deliberately the ONLY part of a fact's
- * permalink that may ever change: `/facts/{id}/{slug}` — a slug change must 301 (see
+ * permalink that may ever change: `/facts/{id}/{slug}` a slug change must 301 (see
  * `apps/web/src/app/facts/[id]/[slug]/page.tsx`) rather than mint a new id. Per-revision
- * permalinks (`/facts/{id}/rev/{n}`) follow the Wikipedia "oldid" pattern named in BB-086's
+ * permalinks (`/facts/{id}/rev/{n}`) follow the Wikipedia "oldid" pattern named in 
  * design note: the single most important defense against a hostile out-of-context screenshot,
  * because the cited revision never changes even when the current record is later corrected.
  */
@@ -64,7 +64,7 @@ export function buildFactRevisionPath(id: FactId, revisionNumber: number): strin
   return `/facts/${id}/rev/${revisionNumber}`;
 }
 
-/** Path for the content-negotiated CSL-JSON + extension-block representation (AC6). */
+/** Path for the content-negotiated CSL-JSON + extension-block representation. */
 export function buildFactJsonPath(id: FactId): string {
   return `/facts/${id}.json`;
 }
@@ -72,7 +72,7 @@ export function buildFactJsonPath(id: FactId): string {
 /**
  * True when a stored slug no longer matches the slug freshly derived from the current
  * `shortStatement` — the caller (the `/facts/{id}/{slug}` page) must respond with a redirect to
- * the current canonical path rather than serving content at a stale slug silently (BB-086:
+ * the current canonical path rather than serving content at a stale slug silently (:
  * "cosmetic slug 301s on change").
  */
 export function slugNeedsRedirect(requestedSlug: string, currentShortStatement: string): boolean {

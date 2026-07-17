@@ -1,9 +1,10 @@
+
 /**
- * Shared types for BB-060 adversarial integrity exercise harnesses.
- * Scenarios compose @black-book/security and @black-book/domain gates locally — no live attacks.
+ * Shared types for adversarial integrity exercise harnesses.
+ * Scenarios compose @black-book/security and @black-book/domain gates locally no live attacks.
  */
 
-/** Red-team scenario identifiers aligned with BB-060 acceptance criteria. */
+/** Red-team scenario identifiers aligned with acceptance criteria. */
 export type AdversarialIntegrityScenarioId =
   | 'false_source_submissions'
   | 'source_laundering'

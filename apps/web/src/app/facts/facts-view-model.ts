@@ -1,11 +1,11 @@
 /**
- * Pure query-building + result-shaping core for the BB-086 fact library page (BB-049 lane).
+ * Pure query-building + result-shaping core for the fact library page.
  *
  * Runs the real `runPublicSearch` pipeline over the seed fact search index produced by
- * `../../data/facts-seed.ts`'s `getSeedFactSearchIndex()` — the same BB-049 primitives the entity
+ * `../../data/facts-seed.ts`'s `getSeedFactSearchIndex` — the same primitives the entity
  * search page uses (`../search/search-view-model.ts`), scoped to published/corrected facts only.
  * Claim-type and confidence sidebar filters are applied as a pre-pass over the index docs (the
- * generic BB-049 filter vocabulary has no dedicated claimType/confidence fields — see
+ * generic filter vocabulary has no dedicated claimType/confidence fields see
  * `packages/domain/src/facts/search-index.ts`'s mapping of claimType -> `topicTags` and
  * confidence -> `researchCoverage`). No Next.js runtime dependency so this module is directly
  * unit-testable.

@@ -1,19 +1,19 @@
 /**
- * Testable core of the public search endpoint (BB-049), kept OUT of `route.ts` on purpose:
+ * Testable core of the public search endpoint, kept OUT of `route.ts` on purpose:
  * Next.js's route-file type validator rejects any export from a `route.ts` other than the HTTP
  * method handlers (`GET`, …) and route config (`runtime`), so the dependency-injectable handler and
  * its deps type live here where `route.test.ts` can import them. `route.ts` is a thin Next entry
  * that wires production singletons and delegates to `handleSearchRequest` below.
  *
- * This is the first REAL caller of BB-026's `evaluateSearchQueryGuardrails`: adversarial input
+ * This is the first REAL caller of `evaluateSearchQueryGuardrails`: adversarial input
  * (SQL/regex/field-selection injection, wildcard-only scans, oversize pages, forged cursors) is
  * bounded by the shared guardrail before any query runs, closing the gap where the guardrail
  * existed but had no wired caller. On allow it runs the pure `runPublicSearch` pipeline over an
  * in-memory snapshot of the seed catalog.
  *
- * Snapshot data source: the injected `searchIndex` comes from `getSnapshotSearchIndex()`, matching
- * this app's `resolvePublicEntity` (BB-022) snapshot-first posture. A live Firestore
- * `publicSearchIndex` reader is a future seam (BB-050/BB-052) that plugs in behind this same
+ * Snapshot data source: the injected `searchIndex` comes from `getSnapshotSearchIndex`, matching
+ * this app's `resolvePublicEntity` snapshot-first posture. A live Firestore
+ * `publicSearchIndex` reader is a future seam that plugs in behind this same
  * contract; it is out of scope here.
  */
 import { NextResponse } from 'next/server';
@@ -44,14 +44,14 @@ function clientIpFrom(request: Request): string | undefined {
 }
 
 /**
- * Parses the GET query string into a BB-026 `SearchQueryInput`. Filters follow
+ * Parses the GET query string into a `SearchQueryInput`. Filters follow
  * `apps/api-public`'s `parsePublicSearchQuery` convention: only keys actually present are
  * included, never emitted as `undefined`. The prohibited keys (`sql`, `regex`, `pattern`,
  * `orderBy`, `fields`, `select`) are deliberately FORWARDED when present rather than dropped, so
  * the guardrail's `assertNoProhibitedQueryFields` path is exercised by the real route and returns
  * a precise denial reason (`sql_not_allowed`, `regex_not_allowed`, …) instead of a generic
  * `empty_query` — this is the security-relevant behavior the endpoint exists to prove. `lat`/`lng`/
- * `radiusM` are intentionally omitted: there is no geo search in this bead.
+ * `radiusM` are intentionally omitted: there is no geo search on this route.
  */
 export function parseSearchQuery(params: URLSearchParams): SearchQueryInput {
   const filters: Record<string, string> = {};
@@ -68,7 +68,7 @@ export function parseSearchQuery(params: URLSearchParams): SearchQueryInput {
   const pageSizeRaw = params.get('pageSize');
   const pageSize = pageSizeRaw !== null ? Number.parseInt(pageSizeRaw, 10) : undefined;
 
-  // Prohibited keys — forwarded (not silently stripped) so the guardrail denies them explicitly.
+  // Prohibited keys forwarded (not silently stripped) so the guardrail denies them explicitly.
   const sql = params.get('sql');
   const regex = params.get('regex');
   const pattern = params.get('pattern');
@@ -96,7 +96,7 @@ export function parseSearchQuery(params: URLSearchParams): SearchQueryInput {
 /**
  * Shared handler used by both the exported Next.js `GET` (production defaults) and `route.test.ts`
  * (injected fake App Check verifier, deterministic rate-limit clock, real snapshot index). Ordering
- * mirrors BB-076's submit route: App Check guard → rate-limit guard → guardrails → search, with a
+ * mirrors submit route: App Check guard → rate-limit guard → guardrails → search, with a
  * `finally` that always releases the concurrency slot.
  */
 export async function handleSearchRequest(
@@ -160,14 +160,14 @@ export async function handleSearchRequest(
     const result = hybridResponse.result;
     const retrievalTelemetry = hybridResponse.telemetry;
 
-    // Deviation from BB-049 spec step 6: the cursor embeds `depth: canonical.depth`, NOT
+    // Deviation from spec step 6: the cursor embeds `depth: canonical.depth`, NOT
     // `canonical.depth + 1`. `evaluateSearchQueryGuardrails` already increments a decoded cursor's
     // depth by one (`depth = cursorResult.depth + 1` in query-guardrails.ts), so embedding
     // `canonical.depth + 1` here would double-increment and skip a page on the next request.
     // Embedding the current page's depth lets the guardrail's own +1 land on exactly the next page.
     // Verified by the cursor round-trip test. `position` is an opaque offset-string: this in-memory
     // snapshot index has no real Firestore document cursor to encode. Encoding a live Firestore
-    // cursor here is the future seam that lands with the live index reader (BB-050/BB-052).
+    // cursor here is the future seam that lands with the live index reader.
     let nextCursor: string | undefined;
     if (result.hasMore) {
       nextCursor = encodeSearchCursor({

@@ -1,16 +1,16 @@
 /**
- * BB-075 acceptance criterion 1 (decision half): records the Brave-vs-Exa provider decision and
- * the reasoning behind it. Deliberately a plain module rather than a new `docs/adr/` entry — the
- * only thing actually being locked in here is a config default (which provider this codebase
- * builds a concrete client for first), not an irreversible architectural commitment; Exa can be
- * added later behind the same `WebSearchProvider` union (./types.ts) without revisiting this
- * decision's structure.
+ * Records the Brave-vs-Exa provider decision and the reasoning behind it. Deliberately a
+ * plain module rather than a new `docs/adr/` entry — the only thing locked in here is a
+ * config default (which provider this codebase builds a concrete client for first), not an
+ * irreversible architectural commitment; Exa can be added later behind the same
+ * `WebSearchProvider` union (`./types.ts`) without revisiting this decision's structure.
  *
- * IMPORTANT — what this constant does NOT claim: `storageTermsConfirmedInWriting` is `false` and
- * must stay that way until a human obtains real written confirmation from Brave's storage-rights
- * tier (or renegotiates with Exa) outside of this repository. No code path in this adapter
- * derives or flips that value from this record; see ./types.ts's `WebSearchProviderConfig` and
- * ./normalizer.ts's `assertStorageTermsConfirmed` for the actual enforcement.
+ * IMPORTANT — what this constant does NOT claim: `storageTermsConfirmedInWriting` is `false`
+ * and must stay that way until a human obtains real written confirmation from Brave's
+ * storage-rights tier (or renegotiates with Exa) outside of this repository. No code path in
+ * this adapter derives or flips that value from this record; see `./types.ts`'s
+ * `WebSearchProviderConfig` and `./normalizer.ts`'s `assertStorageTermsConfirmed` for the
+ * actual enforcement.
  */
 
 export const WEB_SEARCH_PROVIDER_DECISION = {

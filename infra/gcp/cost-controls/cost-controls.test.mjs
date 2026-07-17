@@ -1,5 +1,5 @@
 /**
- * BB-033 acceptance checks for cost and resource exhaustion control artifacts.
+ * Acceptance checks for cost and resource exhaustion control artifacts.
  * Validates JSON schema, bounded scaling, retry policies, soft-shutdown ordering,
  * and billing alert / automated response pairing.
  */

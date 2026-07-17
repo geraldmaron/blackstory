@@ -1,11 +1,11 @@
 /**
  * Core legal landscape vocabulary: license tags, archive evidence, citation fields, and topic
- * tags for the BB-087 curated snapshot corpus. Reuses BB-090 `LawStatus` and BB-086
+ * tags for the curated snapshot corpus. Reuses `LawStatus` and 
  * `FactRecord` (`claimType: 'law'`) — this module never defines a parallel law store.
  */
 import type { LawStatus } from '../entity-status.js';
 
-/** Per-source licensing discipline recorded on every stored legal object (BB-087 AC4). */
+/** Per-source licensing discipline recorded on every stored legal object. */
 export const LEGAL_LICENSE_TAGS = ['public-domain', 'cc-by-nc', 'link-only'] as const;
 export type LegalLicenseTag = (typeof LEGAL_LICENSE_TAGS)[number];
 
@@ -42,7 +42,7 @@ export function isLegalTopic(value: string): value is LegalTopic {
   return (LEGAL_TOPICS as readonly string[]).includes(value);
 }
 
-/** Archive + retrieval evidence every legal object must carry before publish (BB-087 AC4). */
+/** Archive + retrieval evidence every legal object must carry before publish. */
 export type LegalArchiveEvidence = {
   readonly sourceUrl: string;
   readonly officialUrl?: string;
@@ -64,7 +64,7 @@ export type LegalExternalId = {
   readonly externalId: string;
 };
 
-/** A curated legal snapshot document — the corpus atom before plain-language layering. */
+/** A curated legal snapshot document the corpus atom before plain-language layering. */
 export type LegalSnapshot = {
   readonly id: string;
   readonly slug: string;
@@ -75,7 +75,7 @@ export type LegalSnapshot = {
   readonly topics: readonly LegalTopic[];
   readonly citation: LegalCitationFields;
   readonly externalIds: readonly LegalExternalId[];
-  /** Optional link to a BB-086 `FactRecord` permalink when the snapshot is also a published fact. */
+  /** Optional link to a `FactRecord` permalink when the snapshot is also a published fact. */
   readonly factId?: string;
 };
 

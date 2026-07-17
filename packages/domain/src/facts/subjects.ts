@@ -1,17 +1,14 @@
 /**
- * `FactRecord.subjects[]` as a BB-092 graph-view input (BB-086 acceptance criteria 8 & 9).
+ * `FactRecord.subjects` as a graph-view input.
  *
- * This module is the concrete FactRecord-shaped counterpart to
- * `../graph/fact-subjects.ts`'s dependency-injected `FactSubjectSource`/`FactSubjectRef`
- * structural port — that module documented "BB-086 has not landed yet" and modeled the minimal
- * shape it would need; this module is the landing: `toFactSubjectSource` adapts a real
- * `FactRecord` into that exact shape so `mirrorFactSubjectsIntoRelationships` can fold a fact's
- * subjects into the published browse graph at publish time (directly, or via publish-time
- * mirroring into `EntityRelationship`, per BB-092 AC8's requirement). A fact linked to an entity
- * ONLY through `subjects[]` is therefore never invisible to the graph.
+ * Concrete FactRecord-shaped counterpart to `../graph/fact-subjects.ts`'s dependency-injected
+ * `FactSubjectSource` / `FactSubjectRef` structural port. `toFactSubjectSource` adapts a real
+ * `FactRecord` into that shape so `mirrorFactSubjectsIntoRelationships` can fold a fact's
+ * subjects into the published browse graph at publish time. A fact linked to an entity only
+ * through `subjects` is therefore never invisible to the graph.
  *
- * AC8 also requires that every `subjects[]` edge resolve to a real `CanonicalEntity` id AND its
- * kind — `assertFactSubjectsResolve` is the fail-closed check against an injected resolver
+ * Every `subjects` edge must resolve to a real `CanonicalEntity` id with a matching kind —
+ * `assertFactSubjectsResolve` is the fail-closed check against an injected resolver
  * (dependency-injected, matching `../geography/jurisdiction-refs.ts`'s `JurisdictionResolver`
  * convention), so a fact can never reference an entity that does not exist or was resolved under
  * the wrong kind.
@@ -35,7 +32,7 @@ export type DanglingFactSubjectReference = {
 
 /**
  * Evaluates every subject edge on a fact against the injected resolver. Aggregates ALL failures
- * (never stops at the first) so one call surfaces the complete dangling-reference list — same
+ * (never stops at the first) so one call surfaces the complete dangling-reference list same
  * posture as `../geography/jurisdiction-refs.ts`'s `evaluateJurisdictionReferences`.
  */
 export function evaluateFactSubjectReferences(
@@ -67,7 +64,7 @@ export function evaluateFactSubjectReferences(
   return dangling;
 }
 
-/** Fail-closed: throws when any `subjects[]` edge is dangling or kind-mismatched (AC8). */
+/** Fail-closed: throws when any `subjects` edge is dangling or kind-mismatched. */
 export function assertFactSubjectsResolve(
   fact: Pick<FactRecord, 'id' | 'subjects'>,
   resolve: FactSubjectEntityResolver,
@@ -87,7 +84,7 @@ export function assertFactSubjectsResolve(
 
 /**
  * Adapts a `FactRecord` into `../graph/fact-subjects.ts`'s `FactSubjectSource` shape so
- * `mirrorFactSubjectsIntoRelationships` can fold it into the published browse graph (AC9). A
+ * `mirrorFactSubjectsIntoRelationships` can fold it into the published browse graph. A
  * fact's own citations double as the mirrored edge's evidence (facts are citation-backed by
  * construction), matching that module's own documented convention.
  */

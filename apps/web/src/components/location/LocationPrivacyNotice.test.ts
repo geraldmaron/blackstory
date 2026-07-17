@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke test for LocationPrivacyNotice (BB-050) — proves the privacy disclosure
+ * SSR markup smoke test for LocationPrivacyNotice proves the privacy disclosure
  * (explicit consent, translate-then-discard, no history, manual fallback) is real rendered
  * markup, not just a design note. Pattern follows `../DegradedModeNotice.test.ts`.
  */

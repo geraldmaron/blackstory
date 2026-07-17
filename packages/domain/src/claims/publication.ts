@@ -1,5 +1,5 @@
 /**
- * Publication thresholds and narrative citation gates for claims (BB-017).
+ * Publication thresholds and narrative citation gates for claims.
  * High-impact claims use the higher constitution threshold.
  * Narratives cannot cite unpublished claims.
  */

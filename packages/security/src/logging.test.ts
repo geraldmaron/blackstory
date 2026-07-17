@@ -1,6 +1,7 @@
+
 /**
  * Proves the observability logger, wired with the central redactor, keeps residential
- * addresses and exact coordinates out of log output and error telemetry (BB-015).
+ * addresses and exact coordinates out of log output and error telemetry.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

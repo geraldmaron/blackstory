@@ -1,13 +1,13 @@
 /**
- * Typed admin hook to convert an accepted BB-055 correction quarantine record into a BB-044
+ * Typed admin hook to convert an accepted correction quarantine record into a 
  * draft research case. Operators invoke this from the admin console or CLI after reviewing the
- * quarantined submission — it never writes canonical records or changes public confidence.
+ * quarantined submission it never writes canonical records or changes public confidence.
  *
  * Documented operator path:
  * 1. Locate the quarantined submission in `submissionInbox` (receipt code lookup is public-only;
- *    operators use admin tooling with submission id).
+ * operators use admin tooling with submission id).
  * 2. Call `prepareCorrectionResearchCaseConversion(submissionId, store, context)`.
- * 3. Persist returned `researchCase` via the existing research-case create gate (BB-044).
+ * 3. Persist returned `researchCase` via the existing research-case create gate.
  */
 import { randomUUID } from 'node:crypto';
 import { createResearchCase, type ResearchCaseRecord } from '@black-book/domain';

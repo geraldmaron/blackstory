@@ -1,5 +1,5 @@
 /**
- * Integration tests for hybrid search: fallback ladder, re-rank, public payload safety (BB-072).
+ * Integration tests for hybrid search: fallback ladder, re-rank, public payload safety.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

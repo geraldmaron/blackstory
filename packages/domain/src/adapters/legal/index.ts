@@ -1,6 +1,6 @@
 /**
- * BB-087 legal source adapters public surface. Fixture-only clients — no live network in tests.
- * NOT yet re-exported from `packages/domain/src/adapters/index.ts` (parent-merge file).
+ * Legal source adapters public surface. Fixture-only clients — no live network in tests.
+ * Not yet re-exported from `packages/domain/src/adapters/index.ts`.
  */
 export {
   CONGRESS_GOV_ADAPTER_ID,

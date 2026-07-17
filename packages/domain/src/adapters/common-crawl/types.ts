@@ -1,24 +1,24 @@
 /**
- * Common Crawl retrospective discovery adapter types (BB-075).
+ * Common Crawl retrospective discovery adapter types.
  *
  * Common Crawl (AWS Open Data + Hugging Face mirrors) publishes its CDX capture index and
  * WARC/WAT/WET data under research/fair-use terms that already match this project's posture --
  * unlike the paid web-search leg (../web-search/), there is no storage-rights gate here (see the
- * bead's own research). The CDX Index Server is genuinely URL/host-pattern based, not a
+ * 's own research). The CDX Index Server is genuinely URL/host-pattern based, not a
  * full-text keyword search: it answers "what did Common Crawl capture under this host/URL
  * pattern, and when" across a given monthly/quarterly crawl (`crawlId`, e.g. "CC-MAIN-2016-07").
  * There is no CDX operation that greps page content for a name/place mention.
  *
  * This adapter therefore implements "name/place mentions" the way CDX actually supports it:
  * 1. Seed hosts are geographically labeled and must correspond to a `geographic` term already
- *    present in the driving BB-038 query pack (query-builder.ts
- *    `assertSeedGeographicLabelMatchesPack`) -- the place-relevance comes from *which* domain is
- *    queried, supplied by the campaign operator (mirrors ../rss/feed-registry.ts: this adapter
- *    does not invent domain names, it queries whatever seed hosts ops register).
+ * present in the driving query pack (query-builder.ts
+ * `assertSeedGeographicLabelMatchesPack`) -- the place-relevance comes from *which* domain is
+ * queried, supplied by the campaign operator (mirrors../rss/feed-registry.ts: this adapter
+ * does not invent domain names, it queries whatever seed hosts ops register).
  * 2. Within a seed host's captures, CDX's own `filter` parameter narrows to URLs whose path
- *    matches a regex built from the pack's public-safe positive/alias term text (never
- *    `researchOnlyOffensive` terms -- see query-builder.ts), which is the closest real "mention"
- *    signal CDX exposes without downloading WARC/WET bodies.
+ * matches a regex built from the pack's public-safe positive/alias term text (never
+ * `researchOnlyOffensive` terms -- see query-builder.ts), which is the closest real "mention"
+ * signal CDX exposes without downloading WARC/WET bodies.
  */
 import type { AdapterCandidateRecord } from '../types.js';
 
@@ -75,7 +75,7 @@ export type CommonCrawlParsedBatch = {
   readonly rejected: readonly CommonCrawlRejectedRecord[];
 };
 
-/** Stamped on every external CDX query and every result it produces (bead acceptance criterion 5). */
+/** Stamped on every external CDX query and every result it produces. */
 export type CommonCrawlQueryProvenance = {
   readonly apiName: string;
   readonly queryText: string;

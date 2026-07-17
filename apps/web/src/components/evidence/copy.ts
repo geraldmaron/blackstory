@@ -1,8 +1,7 @@
 /**
- * Approved copy for the BB-053 evidence panel's empty/gap states, kept local to this component
- * tree (a small, deliberate duplication of the pattern in `components/entity/copy.ts`, which is
- * owned by a different bead's exclusive-path scope) so every gap in this panel reads consistently
- * without cross-agent file coupling.
+ * Approved copy for the evidence panel's empty/gap states, kept local to this component
+ * tree (a small, deliberate duplication of the pattern in `components/entity/copy.ts`) so every
+ * gap in this panel reads consistently without coupling the two trees.
  */
 
 export type EvidenceGapKind = 'claims' | 'revisionHistory';

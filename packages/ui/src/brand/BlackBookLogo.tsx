@@ -1,7 +1,8 @@
+
 /**
  * The Black Book "Pinned Page" mark: a closed-book cover forms an
  * asymmetric B, curved page-edge bands are exposed at the spine, and a
- * location pin is integrated into the lower-left of the cover — "history,
+ * location pin is integrated into the lower-left of the cover "history,
  * pinned to place." Geometry is original (not a font glyph or stock icon);
  * source of truth is this component, ported from the owner-supplied brand
  * package (2026-07-17). See docs/ui/brand.md for usage rules.
@@ -15,12 +16,13 @@ export type BlackBookLogoDetail = 'full' | 'compact';
 
 export interface BlackBookLogoProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'color'> {
+
   /**
    * mark: symbol only
    * horizontal: symbol + wordmark
    * stacked: symbol above wordmark
    * app-icon: rounded-square application icon
-   */
+ */
   variant?: BlackBookLogoVariant;
   /** Width of the symbol in CSS pixels. */
   size?: number;
@@ -30,10 +32,11 @@ export interface BlackBookLogoProps
   paper?: string;
   /** Location marker color. */
   accent?: string;
+
   /**
    * Individual page-edge colors. Supply between 2 and 6 values. The logo
    * remains readable with a single repeated color.
-   */
+ */
   pageColors?: readonly string[];
   /** Reduces page detail for favicons and very small UI placements. */
   detail?: BlackBookLogoDetail;
@@ -59,6 +62,7 @@ const DEFAULT_PAGE_COLORS = [
   brandPalette.archivePaper,
   brandPalette.copperInk,
 ] as const;
+
 
 /**
  * Custom Black Book symbol.
@@ -98,9 +102,10 @@ export function BlackBookMark({
       <path fill={ink} d="M54 58H110c16 0 27 6 39 19v206c-12 13-23 19-39 19H54Z" />
 
       {/*
+      /**
        * Custom B bowls. The lower bowl is deliberately larger and extends
        * farther right, which keeps the mark from reading like a stock glyph.
-       */}
+ */}
       <path
         fill={ink}
         fillRule="evenodd"

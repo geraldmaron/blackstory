@@ -1,11 +1,11 @@
 /**
- * Integration-style test for BB-076's pending-changes invariant (Wikipedia model): a
- * community lead must pass BOTH consensus review AND the standard BB-044 research-case /
- * BB-032 promotion pipeline before anything from this lane could ever become visible on a
- * public read path. This test walks the real chain — BB-029 quarantine
- * (`@black-book/security`) → consensus review → discovery-candidate research case — and stops
+ * Integration-style test for pending-changes invariant (Wikipedia model): a
+ * community lead must pass BOTH consensus review AND the standard research-case
+ * promotion pipeline before anything from this lane could ever become visible on a
+ * public read path. This test walks the real chain quarantine
+ * (`@black-book/security`) → consensus review → discovery-candidate research case and stops
  * there deliberately: it never imports `../promotion`, never builds a `PromotionClaim`, and
- * proves with the *existing*, unmodified BB-044 gate (`markResearchCasePublished`) that the
+ * proves with the *existing*, unmodified gate (`markResearchCasePublished`) that the
  * research case this lane produces cannot be published from where consensus review leaves it.
  */
 import assert from 'node:assert/strict';
@@ -28,7 +28,7 @@ function review(
 }
 
 test('a community lead cannot reach a public read path without both consensus review and the standard research pipeline', () => {
-  // Step 1: the public submission lands in BB-029 quarantine — never a canonical write.
+  // Step 1: the public submission lands in quarantine never a canonical write.
   const intakeContext: SubmissionIntakeContext = {
     receivedAtMs: NOW_MS,
     privacyPepper: 'test-pepper-do-not-use-in-prod',
@@ -53,7 +53,7 @@ test('a community lead cannot reach a public read path without both consensus re
   assert.equal(quarantined.canonicalWriteAllowed, false);
   assert.equal(quarantined.inboxState, 'accepted');
 
-  // Step 2: three independent reviewers agree it is a legitimate lead — consensus routes to
+  // Step 2: three independent reviewers agree it is a legitimate lead consensus routes to
   // auto_advance only because the agreement threshold was actually cleared.
   const submissionId = quarantined.id;
   const decision = routeConsensusReview(
@@ -67,8 +67,8 @@ test('a community lead cannot reach a public read path without both consensus re
   );
   assert.equal(decision.status, 'auto_advance');
 
-  // Step 3: the only artifact consensus review may produce — a discovery-candidate research
-  // case in BB-044's earliest `candidate` state.
+  // Step 3: the only artifact consensus review may produce a discovery-candidate research
+  // case in earliest `candidate` state.
   const advancement = advanceToDiscoveryCandidate({
     decision,
     lead: { submissionId, title: quarantined.normalized.title },
@@ -81,9 +81,9 @@ test('a community lead cannot reach a public read path without both consensus re
   assert.equal(researchCase.history.length, 0, 'consensus review must not itself advance the case further');
   assert.equal(researchCase.publication, undefined, 'a fresh candidate is never published');
 
-  // Step 4 (the invariant): the standard, unmodified BB-044 gate refuses to publish this case.
+  // Step 4 (the invariant): the standard, unmodified gate refuses to publish this case.
   // Reaching a public read path still requires relevance review, minimum-record evidence, and
-  // (separately, out of this lane's reach) a BB-032 promotion approval — none of which this
+  // (separately, out of this lane's reach) a promotion approval none of which this
   // lane can skip.
   const promotionPreview = prepareResearchCasePromotion({
     record: researchCase,

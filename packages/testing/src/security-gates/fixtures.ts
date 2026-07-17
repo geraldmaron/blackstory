@@ -1,3 +1,4 @@
+
 /**
  * Harmless, deterministic attack fixtures for local API and policy contract tests.
  * No fixture sends network traffic or targets a live service.

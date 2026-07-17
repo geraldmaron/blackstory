@@ -1,3 +1,4 @@
+
 /**
  * Firebase emulator harness for Auth/Firestore integration tests.
  * Requires local Java + running emulators unless CI_REQUIRE_FIREBASE=1 fails closed.
@@ -58,6 +59,7 @@ function tcpReachable(hostPort: string | undefined, timeoutMs = 1000): boolean {
     ).status === 0
   );
 }
+
 
 /**
  * Probes configured Firebase emulator endpoints for demo-only testing.

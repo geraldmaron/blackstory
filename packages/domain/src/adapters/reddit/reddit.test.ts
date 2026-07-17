@@ -1,9 +1,9 @@
 /**
- * Tests for the Reddit discovery adapter (BB-074, gated channel). Fixture/mock-driven; no live
- * network — every HTTP call goes through a mock SafeHttpClient injected by the test, never a
+ * Tests for the Reddit discovery adapter. Fixture/mock-driven; no live
+ * network every HTTP call goes through a mock SafeHttpClient injected by the test, never a
  * real fetch. Reddit access itself is gated behind the Responsible Builder application (a HUMAN
  * STEP, see ./contract.ts) that has not been submitted/approved as of this build, so this suite
- * exists to prove the adapter is correct and safe to flip on later — not to exercise a live
+ * exists to prove the adapter is correct and safe to flip on later not to exercise a live
  * Reddit account.
  */
 import assert from 'node:assert/strict';
@@ -105,7 +105,7 @@ function blackHistory(): SubredditRegistryEntry {
   };
 }
 
-// --- Registry lifecycle / obligations -------------------------------------------------------
+// --- Registry lifecycle obligations -------------------------------------------------------
 
 test('Reddit adapter starts disabled by default and requires an approved policy to run', () => {
   const store = createInMemorySourceRegistry();
@@ -158,7 +158,7 @@ test('structural gaps are documented as constraints, not bugs', () => {
   );
 });
 
-// --- Polling / rate-limit design ------------------------------------------------------------
+// --- Polling rate-limit design ------------------------------------------------------------
 
 test('the curated seed list at a 15-minute cadence stays far under the 100 QPM free tier, even worst-case', () => {
   const seed = defaultSubredditRegistrySeed(FIXED_NOW);
@@ -166,7 +166,7 @@ test('the curated seed list at a 15-minute cadence stays far under the 100 QPM f
   assert.ok(worstCase < REDDIT_FREE_TIER_QPM_LIMIT, `worst-case ${worstCase} req/min must be under ${REDDIT_FREE_TIER_QPM_LIMIT}`);
 });
 
-// --- Parsing / normalization -----------------------------------------------------------------
+// --- Parsing normalization -----------------------------------------------------------------
 
 test('parses a Reddit /new listing page into normalized candidates', () => {
   const entry = { ...redditRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
@@ -282,11 +282,11 @@ test('the default subreddit seed is a small, realistic, versioned list', () => {
   assert.ok(names.includes('AskHistorians'));
   assert.ok(names.includes('BlackHistory'));
   assert.ok(seed.some((entry) => entry.category === 'city' || entry.category === 'state'));
-  // Revisions are monotonic starting at 1 — versioned config, not a flat unordered list.
+  // Revisions are monotonic starting at 1 versioned config, not a flat unordered list.
   assert.deepEqual(seed.map((entry) => entry.revision), seed.map((_, index) => index + 1));
 });
 
-// --- Fetch / pagination -----------------------------------------------------------------------
+// --- Fetch pagination -----------------------------------------------------------------------
 
 test('fetchSubredditNewListing paginates via the after cursor through an injected SafeHttpClient (mock, no live network)', async () => {
   const entry = { ...redditRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
@@ -473,7 +473,7 @@ test('assertPointerLiveBeforeReview passes on a fresh live check and throws on a
   await assert.rejects(() => assertPointerLiveBeforeReview(pointer, deadChecker), /no longer live/);
 });
 
-// --- Deletion-sync (real BB-077 wiring) ---------------------------------------------------------
+// --- Deletion-sync (real wiring) ---------------------------------------------------------
 
 test('planRedditPointerPurge builds a real BB-077 DeletionSyncPlan covering every cascade stage', () => {
   const pointer = storedPointer();

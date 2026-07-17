@@ -1,9 +1,9 @@
 /**
- * Emulator / local seed fixtures for Firestore (demo-black-book only).
- * BB-014: schools/people/places with historical vs current locations and merge lineage.
- * BB-016: source organizations, items, captures, evidence rights, lineage, kill switches.
- * BB-017: atomic claims, evidence links, confidence scores, preserved contradictions.
- * Never load these into production `black-book-efaaf` without explicit promotion workflows.
+ * Emulator local seed fixtures for Firestore (demo-black-book only).
+ * : schools/people/places with historical vs current locations and merge lineage.
+ * : source organizations, items, captures, evidence rights, lineage, kill switches.
+ * : atomic claims, evidence links, confidence scores, preserved contradictions.
+ * Never load these into production `` without explicit promotion workflows.
  */
 import {
   buildGeoPointFields,
@@ -77,9 +77,15 @@ export const seedPublicEntity: PublicEntityProjectionDoc = {
   kind: 'place',
   displayName: 'Seed Historical Place',
   nameLower: 'seed historical place',
-  summary: 'Fixture projection for emulator reads.',
+  summary:
+    'A historically documented Black community place in the District of Columbia area, ' +
+    'tied to education and mutual-aid networks with published archival claims for learners.',
   location: placeCurrentPoint,
   claimIds: ['claim_seed_001'],
+  topicTags: ['community', 'education', 'reconstruction'],
+  historicalContext:
+    'Reconstruction-era Black communities in the District of Columbia organized schools and mutual aid networks.',
+  eraBuckets: ['1860s', '1870s'],
 };
 
 export const seedSubmission: SubmissionInboxDoc = {
@@ -182,7 +188,7 @@ export const seedSchoolEntity: CanonicalEntityDoc = {
         validTo: null,
       },
     ],
-    // BB-090: renamed from `statusHistory` to `milestones` to resolve a naming collision with
+    // : renamed from `statusHistory` to `milestones` to resolve a naming collision with
     // the new entity-level CanonicalEntityDoc.statusHistory (see packages/domain/src/school.ts).
     milestones: [
       { status: 'opened', at: '1868', evidenceIds: ['ev_seed_school_open'] },
@@ -298,9 +304,25 @@ export const seedPublicSchoolEntity: PublicEntityProjectionDoc = {
   kind: 'school',
   displayName: 'Seed Freedmen School',
   nameLower: 'seed freedmen school',
-  summary: 'School with historical and current campus locations.',
+  summary:
+    'Freedmen school with documented historical and current campus locations at campus ' +
+    'precision only — a multi-era educational anchor for Black public schooling in D.C.',
   location: schoolCurrentPoint,
   claimIds: [],
+  topicTags: ['education', 'freedmen', 'schools'],
+  historicalContext:
+    'Freedmen schools were among the first formal Black educational institutions in post-Emancipation D.C.',
+  extendedNarrative:
+    'This seed further-reading block shows how longer curated prose can deepen a record without replacing Accepted claims.',
+  primaryImage: {
+    url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Flag_of_the_United_States.svg/320px-Flag_of_the_United_States.svg.png',
+    alt: 'Schematic stand-in image representing a historic school campus record',
+    credit: 'Public-domain schematic fixture for emulator and seed demos only',
+    rightsStatus: 'public_domain',
+    width: 320,
+    height: 168,
+  },
+  eraBuckets: ['1860s', '1870s', '1900s', '1910s'],
 };
 
 const seedCaptureHash = hashUtf8('seed-nara-catalog-item-body-v1');
@@ -657,7 +679,7 @@ export const seedHighImpactClaim: CanonicalClaimDoc = {
   updatedAt: FIXED_NOW,
 };
 
-/** Flat list for Admin SDK / emulator import scripts. */
+/** Flat list for Admin SDK emulator import scripts.  */
 export const firestoreSeedDocuments: readonly SeedDocument[] = [
   { path: 'policy/active', data: seedPolicyActive },
   {

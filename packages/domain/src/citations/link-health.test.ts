@@ -1,7 +1,7 @@
 /**
- * BB-083: link-health classification (alive/redirected/drifted/dead) and the
+ * link-health classification (alive/redirected/drifted/dead) and the
  * retry-before-declaring-dead state machine. The final test in this file proves the
- * `LinkCheckFetchResult` port is actually adaptable from BB-030's real `executeSafeFetch` —
+ * `LinkCheckFetchResult` port is actually adaptable from real `executeSafeFetch` 
  * `@black-book/security` is a devDependency of this package for exactly this kind of proof (see
  * packages/domain/src/map/map-source.redaction.test.ts for the established precedent).
  */
@@ -138,9 +138,9 @@ test('an explicit dead classification (e.g. 404) is not subject to the retry bud
 });
 
 /**
- * Proves the `LinkCheckFetchResult` port genuinely adapts from BB-030's real
- * `executeSafeFetch` — not just a structurally-similar type asserted in a comment. Builds a
- * minimal fake DNS resolver + pinned transport (the same dependency-injection shape BB-030's
+ * Proves the `LinkCheckFetchResult` port genuinely adapts from real
+ * `executeSafeFetch` not just a structurally-similar type asserted in a comment. Builds a
+ * minimal fake DNS resolver + pinned transport (the same dependency-injection shape 
  * own tests use) and confirms the adapted result classifies as expected.
  */
 test('the link-health port adapts a real executeSafeFetch(...) result from @black-book/security', async () => {
@@ -166,7 +166,7 @@ test('the link-health port adapts a real executeSafeFetch(...) result from @blac
   assert.equal(safeFetchResult.ok, true);
   if (!safeFetchResult.ok) return;
 
-  // Adapt the real BB-030 result into the link-health port — this is exactly what the
+  // Adapt the real result into the link-health port this is exactly what the
   // scheduled job wrapper does (packages/config/src/scheduled-jobs/jobs/
   // citation-link-health-sweep.ts).
   const port: LinkCheckFetchResult = {

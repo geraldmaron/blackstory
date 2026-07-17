@@ -1,7 +1,7 @@
 /**
- * Content-negotiated JSON export for a canonical fact (BB-086 AC6): CSL-JSON citations plus the
+ * Content-negotiated JSON export for a canonical fact: CSL-JSON citations plus the
  * Black Book extension block, wrapped with stable permalink metadata. Canonical facts are exported
- * as data records only — never as ClaimReview (see `assertNeverClaimReview` in the JSON-LD helper).
+ * as data records only never as ClaimReview (see `assertNeverClaimReview` in the JSON-LD helper).
  */
 import {
   assertNeverClaimReview,

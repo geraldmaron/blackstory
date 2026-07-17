@@ -1,10 +1,10 @@
 /**
- * The accessible list peer for the BB-051 map (acceptance criterion: "synchronized list is full
- * keyboard+screen-reader peer with shared filter/viewport URL state" — a peer, not an
- * afterthought). Every item is a real link to the entity page; selection state (`selectedId`)
- * mirrors whatever point is open on the map, in both directions — selecting a list item and
- * selecting a map point produce the same `onSelect` callback, so keyboard-only and
- * screen-reader users reach every narrative off-ramp the map offers without touching the canvas.
+ * The accessible list peer for the map — synchronized list is a full keyboard + screen-reader
+ * peer with shared filter/viewport URL state (a peer, not an afterthought). Every item is a real
+ * link to the entity page; selection state (`selectedId`) mirrors whatever point is open on the
+ * map, in both directions — selecting a list item and selecting a map point produce the same
+ * `onSelect` callback, so keyboard-only and screen-reader users reach every narrative off-ramp
+ * the map offers without touching the canvas.
  */
 import React from 'react';
 import { cx } from '@black-book/ui';
@@ -53,7 +53,7 @@ export function SynchronizedResultList({
                 onSelect
                   ? (event) => {
                       // A synchronized selection (highlight on the map + open its narrative card)
-                      // is a progressive enhancement over the always-working link navigation —
+                      // is a progressive enhancement over the always-working link navigation 
                       // only intercept the click when a live map is actually mounted to react to it.
                       event.preventDefault();
                       onSelect(properties.entityId);

@@ -1,5 +1,5 @@
 /**
- * Per-page publishingPrinciples JSON-LD helper (BB-088) — links each trust surface back to the
+ * Per-page publishingPrinciples JSON-LD helper links each trust surface back to the
  * canonical methodology page as its principles document.
  */
 import React from 'react';

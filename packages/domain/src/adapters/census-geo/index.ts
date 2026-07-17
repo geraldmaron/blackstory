@@ -1,12 +1,12 @@
 /**
- * Local module surface for the Census adapters: the BB-091 TIGER/Gazetteer bulk source-registry
- * contract (`./contract.ts`) AND the BB-050 live Census Geocoder API client
+ * Local module surface for the Census adapters: the TIGER/Gazetteer bulk source-registry
+ * contract (`./contract.ts`) AND the live Census Geocoder API client
  * (`./url-builder.ts`, `./response-parser.ts`, `./normalizer.ts`, `./fetch-geocode.ts`).
  *
  * IS re-exported through the package barrels: `../index.ts` (the adapters package barrel)
- * already does `export * from './census-geo/index.js';` (added for BB-091), and
+ * already does `export * from './census-geo/index.js';` (added for), and
  * `../../index.ts` (the `@black-book/domain` package barrel) already does
- * `export * from './adapters/index.js';` — so every symbol exported from THIS file is already
+ * `export * from './adapters/index.js';` so every symbol exported from THIS file is already
  * reachable as `@black-book/domain` today with no further barrel edit required. This is
  * different from the brand-new `../../geocode/` module (see its index.ts doc comment), which
  * has no existing wildcard chain and does need a parent-session merge.

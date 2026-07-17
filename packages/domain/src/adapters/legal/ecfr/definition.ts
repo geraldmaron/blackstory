@@ -1,5 +1,5 @@
 /**
- * eCFR Versioner adapter definition for BB-087 federal regulation monitoring (fixtures-only in tests).
+ * eCFR Versioner adapter definition for federal regulation monitoring (fixtures-only in tests).
  */
 import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from '../../candidates.js';
 import type { SourceAdapterContract } from '../../types.js';

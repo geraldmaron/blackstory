@@ -1,5 +1,5 @@
 /**
- * JSON Feed export for the public errata log (BB-088).
+ * JSON Feed export for the public errata log.
  */
 import { buildErrataJsonFeed } from '../../../lib/trust/errata-feed.js';
 import { listErrataEntries } from '../../../lib/trust/errata-seed.js';

@@ -1,6 +1,7 @@
+
 /**
- * BB-060 adversarial integrity harness — composes BB-029 quarantine, BB-032 promotion,
- * BB-043 confidence/lineage, BB-044 research-case workflow, and BB-055 correction quarantine
+ * adversarial integrity harness composes quarantine, promotion,
+ * confidence/lineage, research-case workflow, and correction quarantine
  * without network I/O or live endpoint attacks.
  */
 import type {

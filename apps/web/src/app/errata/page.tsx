@@ -1,5 +1,5 @@
 /**
- * Public errata log (BB-088) — reverse-chronological corrections policy and change history with
+ * Public errata log reverse-chronological corrections policy and change history with
  * four-way taxonomy. Companion feeds at /errata/feed.json and /errata/feed.xml.
  */
 import {

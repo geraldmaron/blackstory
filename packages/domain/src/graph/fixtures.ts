@@ -1,21 +1,18 @@
 /**
- * Gold-corpus-style graph fixtures (BB-092 acceptance criterion 6) — synthetic, adjudicated
- * scenarios exercising the graph-view build's hard invariants: determinism, cycle-safety,
- * bounded-depth containment, active-span decade bucketing, succession non-leakage, the
- * caused/enabled consensus guardrail, and FactRecord `subjects[]` mirroring. Every entity/event
- * name is a generic synthetic fixture label (never a real person, place, or event) — same
- * discipline `packages/testing/src/gold-corpus/fixtures/gold-corpus.v1.json`'s `synthetic: true`
- * examples follow, and the same reason: these exercise mechanics, not real historical claims.
+ * Gold-corpus-style graph fixtures: synthetic, adjudicated scenarios exercising the
+ * graph-view build's hard invariants — determinism, cycle-safety, bounded-depth
+ * containment, active-span decade bucketing, succession non-leakage, the caused/enabled
+ * consensus guardrail, and FactRecord `subjects` mirroring. Every entity/event name is a
+ * generic synthetic fixture label (never a real person, place, or event), matching the
+ * discipline of `packages/testing/src/gold-corpus/fixtures/gold-corpus.v1.json`'s
+ * `synthetic: true` examples: these exercise mechanics, not real historical claims.
  *
- * INTEGRATION POINT (documented, not live-wired — matching this repo's established convention;
- * see `../geography/jurisdiction-refs.ts` and `../map/map-source.ts` for the same pattern): a
- * future pass wiring these into `packages/testing/src/gold-corpus`'s BB-047 regression harness
- * (`evaluateCorpus`) should extend `GoldCorpusExample.subjectType` with a `'graph'` variant, or
- * add a parallel `graph-corpus.v1.json` + evaluator alongside the existing relevance-adjudication
- * corpus. This bead's file-ownership scope is `packages/domain/src` only, so until that
- * integration lands, `GRAPH_GOLD_FIXTURES` is regression-tested by this package's own suite
- * (`./build.test.ts`, `./containment.test.ts`, `./succession.test.ts`, `./decades.test.ts`,
- * `../relationship.test.ts`) — every fixture below is exercised by at least one of those files.
+ * Not wired live: a future pass can wire these into `packages/testing/src/gold-corpus`'s
+ * regression harness (`evaluateCorpus`) by extending `GoldCorpusExample.subjectType` with a
+ * `'graph'` variant, or by adding a parallel `graph-corpus.v1.json` + evaluator alongside the
+ * existing relevance-adjudication corpus. Until then, `GRAPH_GOLD_FIXTURES` is covered by this
+ * package's own suite (`./build.test.ts`, `./containment.test.ts`, `./succession.test.ts`,
+ * `./decades.test.ts`, `../relationship.test.ts`).
  */
 import type { EraSpan } from '../era.js';
 import type { EntityStatusValue, StatusHistoryEntry } from '../entity-status.js';
@@ -38,7 +35,7 @@ function rel(
 }
 
 // ---------------------------------------------------------------------------
-// Scenario 1: containment chain, spot -> city -> county -> state (BB-092 acceptance criterion 2).
+// Scenario 1: containment chain, spot -> city -> county -> state.
 // ---------------------------------------------------------------------------
 export const CONTAINMENT_CHAIN_ENTITIES: readonly ContainmentEntityInput[] = [
   { entityId: 'gg-place-spot', jurisdictionIds: [] },
@@ -54,7 +51,7 @@ export const CONTAINMENT_CHAIN_RELATIONSHIPS: readonly EntityRelationship[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Scenario 2: a deliberate part_of cycle — must not hang the build (cycle-safety proof).
+// Scenario 2: a deliberate part_of cycle must not hang the build (cycle-safety proof).
 // ---------------------------------------------------------------------------
 export const CONTAINMENT_CYCLE_ENTITIES: readonly ContainmentEntityInput[] = [
   { entityId: 'gg-place-cycle-a', jurisdictionIds: ['gg-jur-cycle-a'] },
@@ -67,10 +64,10 @@ export const CONTAINMENT_CYCLE_RELATIONSHIPS: readonly EntityRelationship[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Scenario 3: historical-causation vocabulary + attended role + authored (acceptance criteria
-// 1 & 7). `gg-rel-caused-1` models the bead's own settled-systemic-causation example shape (a
-// documented policy causing measurable disinvestment) WITHOUT naming the real historical policy —
-// see `../relationship.test.ts` for the guardrail evaluation this fixture is paired with.
+// Scenario 3: historical-causation vocabulary + attended role + authored.
+// `gg-rel-caused-1` models a settled-systemic-causation example shape (a documented policy
+// causing measurable disinvestment) WITHOUT naming the real historical policy — see
+// `../relationship.test.ts` for the guardrail evaluation this fixture is paired with.
 // ---------------------------------------------------------------------------
 export const CAUSATION_VOCAB_RELATIONSHIPS: readonly EntityRelationship[] = [
   rel({
@@ -130,8 +127,7 @@ export const CAUSATION_VOCAB_RELATIONSHIPS: readonly EntityRelationship[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Scenario 4: succession chain non-leakage (BB-092 acceptance criterion 11 — the canonical
-// place-annexation case from the bead text).
+// Scenario 4: succession chain non-leakage (canonical place-annexation case).
 // ---------------------------------------------------------------------------
 export const SUCCESSION_RELATIONSHIP: EntityRelationship = rel({
   id: 'gg-rel-successor-1',
@@ -169,7 +165,7 @@ export const MODERN_SUCCESSOR_STATUS_HISTORY: readonly StatusHistoryEntry<Entity
 ];
 
 // ---------------------------------------------------------------------------
-// Scenario 5: active-span decade bucketing (BB-092 acceptance criterion 10 — CRITICAL). An
+// Scenario 5: active-span decade bucketing. An
 // organization founded in the 1950s with an OPEN-ENDED (still active) status-history record must
 // appear in every published decade through the "still active" cutoff, not only its founding decade.
 // ---------------------------------------------------------------------------
@@ -182,14 +178,14 @@ export const STILL_ACTIVE_ORG_DECADE_INPUT: DecadeBucketEntityInput = {
   activeSpans: STILL_ACTIVE_ORG_ACTIVE_SPANS,
 };
 
-/** A one-decade-only comparison entity — a single event, so its decade bucket never expands. */
+/** A one-decade-only comparison entity a single event, so its decade bucket never expands. */
 export const SINGLE_DECADE_EVENT_DECADE_INPUT: DecadeBucketEntityInput = {
   entityId: 'gg-event-rally',
   activeSpans: [{ validFrom: '1963', validTo: '1963', datePrecision: 'year' }],
 };
 
 // ---------------------------------------------------------------------------
-// Scenario 6: BB-086 FactRecord subjects[] mirroring (BB-092 acceptance criterion 8) — an entity
+// Scenario 6: FactRecord subjects mirroring an entity
 // connected to another ONLY through shared fact subjects, no formal EntityRelationship anywhere.
 // ---------------------------------------------------------------------------
 export const FACT_SUBJECT_FIXTURES: readonly FactSubjectSource[] = [

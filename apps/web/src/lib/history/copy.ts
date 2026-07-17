@@ -1,5 +1,5 @@
 /**
- * Approved copy for the BB-093 `/history` browse surface — sparse-decade gaps, dignity framing,
+ * Approved copy for the `/history` browse surface sparse-decade gaps, dignity framing,
  * and degraded-mode messaging. Centralized here so the page, list peer, and graph panel never
  * improvise inconsistent "empty history" language.
  */

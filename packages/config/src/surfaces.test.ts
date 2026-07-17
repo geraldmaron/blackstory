@@ -1,5 +1,6 @@
+
 /**
- * Acceptance tests for ADR-005 surface capability matrix (BB-021).
+ * Acceptance tests for ADR-005 surface capability matrix.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,9 +1,10 @@
+
 /**
- * Cost and resource exhaustion controls (BB-033).
+ * Cost and resource exhaustion controls.
  *
  * Deterministic policy matrix for bounded scaling, queue/job limits, database caps,
- * daily budgets, circuit breakers, and soft-shutdown ordering. Complements BB-022
- * App Hosting limits and BB-025 endpoint quotas without duplicating their evaluators.
+ * daily budgets, circuit breakers, and soft-shutdown ordering. Complements
+ * App Hosting limits and endpoint quotas without duplicating their evaluators.
  * Fail closed when limits are exceeded or policy is unknown.
  */
 
@@ -11,7 +12,7 @@ import { RATE_LIMIT_POLICY_VERSION } from './rate-limits.js';
 
 export const RESOURCE_CONTROL_POLICY_VERSION = '1.0.0' as const;
 
-/** Workload priority — optional research stops before public serving under pressure. */
+/** Workload priority optional research stops before public serving under pressure. */
 export type WorkloadTier = 'public_serving' | 'essential_ops' | 'optional_research';
 
 export type ServiceId =
@@ -76,7 +77,7 @@ export type ServiceScalingLimits = {
   readonly concurrency: number;
   readonly cpu: number;
   readonly memoryMiB: number;
-  /** Reference to BB-022 apphosting*.yaml when applicable. */
+  /** Reference to apphosting*.yaml when applicable. */
   readonly bb022Ref?: string;
 };
 
@@ -172,8 +173,9 @@ export type ResourceControlDecision =
   | ResourceControlDecisionAllowed
   | ResourceControlDecisionDenied;
 
+
 /**
- * BB-022 App Hosting caps — mirrored here for cross-service validation only.
+ * App Hosting caps mirrored here for cross-service validation only.
  * Authoritative values remain in apps/web/apphosting*.yaml (do not duplicate edits).
  */
 export const BB022_APP_HOSTING_LIMITS = {
@@ -193,7 +195,7 @@ export const BB022_APP_HOSTING_LIMITS = {
   },
 } as const;
 
-/** Conservative Cloud Run + App Hosting scaling matrix — every service has a hard max. */
+/** Conservative Cloud Run + App Hosting scaling matrix every service has a hard max. */
 export const DEFAULT_SERVICE_SCALING_LIMITS: Record<ServiceId, ServiceScalingLimits> = {
   web: {
     serviceId: 'web',
@@ -255,7 +257,7 @@ const DEFAULT_RETRY: RetryPolicy = {
   multiplier: 2,
 };
 
-/** Cloud Tasks queue limits — rate, concurrency, depth, and capped retries. */
+/** Cloud Tasks queue limits rate, concurrency, depth, and capped retries. */
 export const DEFAULT_CLOUD_TASKS_POLICIES: Record<CloudTasksQueueId, CloudTasksQueuePolicy> = {
   'submissions-intake': {
     queueId: 'submissions-intake',
@@ -539,7 +541,7 @@ export function computeRetryDelay(
   return Math.min(Math.floor(delay), policy.maxBackoffMs);
 }
 
-/** Returns true when attempt exceeds configured max (fail closed — no further retries). */
+/** Returns true when attempt exceeds configured max (fail closed no further retries). */
 export function isRetryBudgetExhausted(attempt: number, policy: RetryPolicy): boolean {
   return attempt >= policy.maxAttempts;
 }
@@ -764,7 +766,7 @@ export type CircuitBreakerSnapshot = {
   readonly halfOpenAttempts: number;
 };
 
-/** Simple circuit breaker — opens after threshold failures, fail closed while open. */
+/** Simple circuit breaker opens after threshold failures, fail closed while open. */
 export function evaluateCircuitBreaker(
   snapshot: CircuitBreakerSnapshot,
   config: CircuitBreakerConfig,
@@ -843,6 +845,7 @@ export type AbusiveTrafficSimulationResult = {
   readonly publicServingPreserved: boolean;
   readonly maxObservedInstances: Record<ServiceId, number>;
 };
+
 
 /**
  * Simulates abusive traffic pattern: spike scaling, queue flood, budget burn.

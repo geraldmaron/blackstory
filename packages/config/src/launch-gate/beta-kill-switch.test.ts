@@ -1,5 +1,6 @@
+
 /**
- * Contract tests for BB-063 beta disable config keys and runbook hooks.
+ * Contract tests for beta disable config keys and runbook hooks.
  */
 import assert from 'node:assert/strict';
 import { dirname, join } from 'node:path';

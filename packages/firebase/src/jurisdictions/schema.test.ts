@@ -1,5 +1,6 @@
+
 /**
- * Tests for the BB-091 `jurisdictions` Firestore doc schema/converter.
+ * Tests for the `jurisdictions` Firestore doc schema/converter.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

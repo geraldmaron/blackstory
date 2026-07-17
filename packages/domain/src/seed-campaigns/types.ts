@@ -1,6 +1,6 @@
 /**
- * Versioned contracts for BB-058 national seed campaigns: quality-first, fixture-only
- * seed records grouped by thematic campaign. These are structured fixtures and validators —
+ * Versioned contracts for national seed campaigns: quality-first, fixture-only
+ * seed records grouped by thematic campaign. These are structured fixtures and validators 
  * never live Firestore apply payloads.
  */
 import type { GeoPrecisionTier } from '../geography/precision.js';
@@ -9,7 +9,7 @@ import type { Citation } from '../citations/citation.js';
 
 export const SEED_CAMPAIGN_SCHEMA_VERSION = 'seed-campaign.v1' as const;
 
-/** Thematic campaigns required by BB-058 acceptance criteria. */
+/** Thematic campaigns for national seed fixtures. */
 export const SEED_CAMPAIGN_IDS = [
   'rosenwald-schools',
   'freedmens-schools',
@@ -31,14 +31,14 @@ export type UsCensusRegion = (typeof US_CENSUS_REGIONS)[number];
 
 export type SeedRecordCompleteness = 'sparse' | 'partial' | 'substantial';
 
-/** Citation fields required by BB-083 structural completeness — no invented capture content. */
+/** Citation fields required by structural completeness no invented capture content. */
 export type SeedCitation = Pick<Citation, 'sourceName' | 'location' | 'capture' | 'retrievalDate'> & {
   readonly id: string;
 };
 
 export type SeedClaim = {
   readonly id: string;
-  /** Factual, source-backed statement — never an invented biography. */
+  /** Factual, source-backed statement never an invented biography. */
   readonly statement: string;
 };
 
@@ -60,7 +60,7 @@ export type SeedRecord = {
   readonly citations: readonly SeedCitation[];
   readonly claims: readonly SeedClaim[];
   readonly completeness: SeedRecordCompleteness;
-  /** Launch-corpus slug when BB-094 vetting applies (e.g. nrhp, hbcu-list). */
+  /** Launch-corpus slug when vetting applies (e.g. nrhp, hbcu-list). */
   readonly sourceCorpus?: string;
   readonly inclusionRationale: string;
   readonly externalIds?: readonly { readonly system: string; readonly value: string }[];
@@ -70,7 +70,7 @@ export type SeedCampaignMeta = {
   readonly id: SeedCampaignId;
   readonly displayName: string;
   readonly description: string;
-  /** Soft target — actual count may be lower when quality gates thin the set. */
+  /** Soft target actual count may be lower when quality gates thin the set. */
   readonly qualityTargetCount: number;
   readonly preferredNotabilityCriteria: readonly NotabilityBasisRecord['criterion'][];
 };

@@ -1,8 +1,8 @@
 /**
- * Testable core of the `/explore/api` refine endpoint (BB-051). Applies BB-049's
+ * Testable core of the `/explore/api` refine endpoint. Applies 
  * `evaluateSearchQueryGuardrails` to the kind/era dimensions (the two filter fields that overlap
- * the BB-026 allowlist), validates theme/confidence locally, then filters the bundled explore map
- * snapshot. The page itself is SSR-first — this route is the progressive-enhancement seam that
+ * the allowlist), validates theme/confidence locally, then filters the bundled explore map
+ * snapshot. The page itself is SSR-first this route is the progressive-enhancement seam that
  * proves App Check + guardrails on dynamic explore queries without requiring a full navigation.
  */
 import { NextResponse } from 'next/server';
@@ -39,7 +39,7 @@ function cleanSelectParam(raw: string | null): string {
   return trimmed === '' ? 'all' : trimmed;
 }
 
-/** Validates a locally-scoped filter value (theme/confidence) — bounded length, no regex/sql keys. */
+/** Validates a locally-scoped filter value (theme/confidence) bounded length, no regex/sql keys.  */
 function assertLocalFilterValue(field: string, value: string): string | null {
   const normalized = value.trim();
   if (normalized === 'all') return 'all';
@@ -55,12 +55,12 @@ function assertLocalFilterValue(field: string, value: string): string | null {
 }
 
 /**
- * Maps explore query params into a BB-026 `SearchQueryInput` for the overlapping kind/era filters,
+ * Maps explore query params into a `SearchQueryInput` for the overlapping kind/era filters,
  * forwarding prohibited keys so the guardrail denies them explicitly (same posture as search).
  */
 export function parseExploreRefineQuery(params: URLSearchParams): SearchQueryInput {
-  // Always anchor to the active snapshot release so BB-026 sees a filters_only shape even when
-  // the caller did not pass any user-visible filters — avoids empty_query on "browse all".
+  // Always anchor to the active snapshot release so sees a filters_only shape even when
+  // the caller did not pass any user-visible filters avoids empty_query on "browse all".
   const filters: Record<string, string> = { releaseId: 'seed-snapshot' };
   for (const field of GUARDRAIL_FILTER_KEYS) {
     const value = params.get(field);

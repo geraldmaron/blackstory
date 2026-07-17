@@ -1,6 +1,6 @@
 /**
- * Tests for Layer 5 — modern context: hate-crime signal display, general-crime labeled context
- * only, and BB-095 advisory pointer (advisory-only presentation, never scored).
+ * Tests for Layer 5 modern context: hate-crime signal display, general-crime labeled context
+ * only, and advisory pointer (advisory-only presentation, never scored).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

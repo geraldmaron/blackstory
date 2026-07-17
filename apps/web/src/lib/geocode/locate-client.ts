@@ -1,13 +1,13 @@
 /**
- * Browser-safe fetch wrapper for the `/locate/api` geocode endpoint (BB-050). Deliberately
- * separate from `./pipeline.ts` and `./safe-http-client.ts` — both of those pull in Node's
+ * Browser-safe fetch wrapper for the `/locate/api` geocode endpoint. Deliberately
+ * separate from `./pipeline.ts` and `./safe-http-client.ts` both of those pull in Node's
  * `dns`/`https` modules and must never reach a browser bundle. This module only ever calls
- * `fetch('/locate/api', ...)` from a Client Component and re-shapes the JSON response into a
+ * `fetch('/locate/api',...)` from a Client Component and re-shapes the JSON response into a
  * small discriminated union the UI can switch on directly, instead of the UI parsing raw HTTP
  * status codes and route-specific error bodies itself.
  *
  * App Check headers are passed in by the caller (`components/location/LocateExperience.tsx`,
- * sourced from `../../app/locate/app-check-client.ts`) rather than fetched by this module —
+ * sourced from `../../app/locate/app-check-client.ts`) rather than fetched by this module 
  * keeping this file free of any `app/` import mirrors how `apps/web/src/app/submit/SubmitLeadForm.tsx`
  * calls its own co-located `app-check-client.ts` directly rather than through a shared `lib/`
  * layer, and keeps this module usable from any future caller with a different App Check source.
@@ -101,7 +101,7 @@ async function callLocateApi(
   return { kind: 'fallback', fallback: failure.fallback };
 }
 
-/** Forward geocode: free-text address, city/state, or ZIP. */
+/** Forward geocode: free-text address, city/state, or ZIP.  */
 export function fetchLocateByAddress(
   address: string,
   appCheckHeaders: Readonly<Record<string, string>> = {},
@@ -109,7 +109,7 @@ export function fetchLocateByAddress(
   return callLocateApi(new URLSearchParams({ address }), appCheckHeaders);
 }
 
-/** Reverse geocode: browser-supplied coordinates (only ever called after explicit user consent). */
+/** Reverse geocode: browser-supplied coordinates (only ever called after explicit user consent).  */
 export function fetchLocateByCoordinates(
   lat: number,
   lng: number,

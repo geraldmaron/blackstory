@@ -1,5 +1,5 @@
 /**
- * Versioned historical query packs public surface (BB-038).
+ * Versioned historical query packs public surface.
  */
 export {
   QUERY_PACK_SCHEMA_VERSION,

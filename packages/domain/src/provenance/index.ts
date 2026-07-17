@@ -1,5 +1,5 @@
 /**
- * Provenance package surface: sources, captures, rights, evidence, lineage (BB-016).
+ * Provenance package surface: sources, captures, rights, evidence, lineage.
  */
 export {
   asSourceOrganizationId,

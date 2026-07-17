@@ -1,5 +1,5 @@
 /**
- * Tests for product constitution loaders and evaluation helpers (BB-003).
+ * Tests for product constitution loaders and evaluation helpers.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

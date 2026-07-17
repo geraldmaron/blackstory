@@ -1,6 +1,7 @@
 /**
- * Unit tests for the BB-053 top-level evidence-card view-model builder, covering all four
- * acceptance criteria end to end from a single claim input.
+ * Unit tests for the top-level evidence-card view-model builder, covering confidence language,
+ * rights-limited excerpts, dispute presentation, and research-coverage metadata end to end from
+ * a single claim input.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

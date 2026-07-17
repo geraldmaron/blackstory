@@ -1,12 +1,13 @@
+
 /**
- * Budget-aware bulk (re)embedding CLI for existing canonical entities (BB-071).
+ * Budget-aware bulk (re)embedding CLI for existing canonical entities.
  *
  * Run directly with tsx, e.g.:
- *   GEMINI_API_KEY=... node --conditions development --import tsx \
- *     packages/firebase/src/embeddings/backfill-cli.ts --max-items 500 --max-cost-usd 1
+ * GEMINI_API_KEY=... node --conditions development --import tsx \
+ * packages/firebase/src/embeddings/backfill-cli.ts --max-items 500 --max-cost-usd 1
  *
  * Every dependency (entity source, provider, store) is injected so `runBackfill` itself is
- * fully unit-testable without Firestore or network access — only the `if (import.meta.url ...)`
+ * fully unit-testable without Firestore or network access only the `if (import.meta.url...)`
  * block at the bottom touches real infrastructure, mirroring apps/api-public/src/index.ts's CLI
  * entry pattern.
  */
@@ -59,6 +60,7 @@ export type BackfillSummary = {
   readonly stoppedForBudget: boolean;
   readonly stoppedForMaxItems: boolean;
 };
+
 
 /**
  * Iterates the entity source page by page, embedding entities whose source text changed since
@@ -157,12 +159,13 @@ export async function runBackfill(options: BackfillOptions): Promise<BackfillSum
 
 const CANONICAL_ENTITIES_PAGE_SIZE = 200;
 
+
 /**
  * Real Firestore-backed entity source. Location/state resolution is intentionally out of
- * scope here — entity documents don't carry a resolved state code directly, and joining the
- * `locations` subcollection + geocode cache (BB-050) per entity is a documented integration
- * gap, not implemented in this pass. Backfilled vectors therefore get `kind`/`eraBucket`
- * pre-filters but generally not `state` until that join is wired in.
+ * scope here: entity documents don't carry a resolved state code directly, and joining the
+ * `locations` subcollection + geocode cache per entity is a documented integration gap.
+ * Backfilled vectors therefore get `kind`/`eraBucket` pre-filters but generally not `state`
+ * until that join is wired in.
  */
 export function createFirestoreCanonicalEntitySource(
   firestore: Firestore,

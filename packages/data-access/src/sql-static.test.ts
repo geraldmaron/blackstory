@@ -1,5 +1,5 @@
 /**
- * Static validation of infra/database SQL init scripts and role matrix (BB-012).
+ * Static validation of infra/database SQL init scripts and role matrix.
  * Does not require a live Postgres; CI Integration Postgres runs runtime checks.
  */
 import assert from 'node:assert/strict';

@@ -1,8 +1,9 @@
+
 /**
- * Thin BB-018 audit/outbox builders for operator proposals.
+ * Thin audit/outbox builders for operator proposals.
  *
  * These functions only *shape data* to the contract `commitWithAudit`
- * (packages/firebase/src/firestore/audit-outbox.ts) already enforces — they do not
+ * (packages/firebase/src/firestore/audit-outbox.ts) already enforces they do not
  * reimplement audit, outbox, or idempotency semantics. The actual atomic write happens in
  * `./commit.ts`, which calls the real `commitWithAudit`.
  */
@@ -28,7 +29,7 @@ export type BuildOperatorAuditEventInput = {
   readonly data?: Readonly<Record<string, unknown>>;
 };
 
-/** Builds one immutable BB-018 audit event, actor-stamped with the proposing operator. */
+/** Builds one immutable audit event, actor-stamped with the proposing operator. */
 export function buildOperatorAuditEvent(input: BuildOperatorAuditEventInput): DomainAuditEvent {
   return {
     id: randomUUID(),
@@ -56,7 +57,7 @@ export type BuildOperatorOutboxMessageInput = {
   readonly maxAttempts?: number;
 };
 
-/** Builds one pending BB-018 outbox message paired to the audit event above. */
+/** Builds one pending outbox message paired to the audit event above. */
 export function buildOperatorOutboxMessage(
   input: BuildOperatorOutboxMessageInput,
 ): DomainOutboxMessage {

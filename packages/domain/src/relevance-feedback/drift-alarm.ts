@@ -1,12 +1,12 @@
 /**
- * Drift alarm (BB-081 acceptance criterion 4): pure evaluation of whether sustained
+ * Drift alarm: pure evaluation of whether sustained
  * human-vs-engine disagreement over a window exceeds a threshold. This is the calibration
- * equivalent of BB-037's schema-drift quarantine / BB-084's missed-run silence detection
- * (packages/config/src/scheduled-jobs/health.js's evaluateMissedRuns) — deliberately shaped the
- * same way: a pure "did this trip?" evaluator here, with the actual BB-034 alert payload built
+ * equivalent of schema-drift quarantine missed-run silence detection
+ * (packages/config/src/scheduled-jobs/health.js's evaluateMissedRuns) deliberately shaped the
+ * same way: a pure "did this trip?" evaluator here, with the actual alert payload built
  * one layer up (packages/config/src/scheduled-jobs/jobs/recalibration-report.ts), exactly the
  * split health.ts/alerting.ts already use. This module has no dependency on
- * @black-book/observability — @black-book/domain does not (and should not) depend on it.
+ * @black-book/observability @black-book/domain does not (and should not) depend on it.
  */
 import type { RelevanceDecisionLogEntry } from './types.js';
 
@@ -19,7 +19,7 @@ export type RelevanceDriftAlarmThresholds = {
   /** 0..1 fraction of non-'accept' dispositions ('reject' + 'override') within the window. */
   readonly disagreementRateThreshold: number;
   /** Below this many decisions in the window, the evaluation is not triggered regardless of
-   *  rate — a handful of disagreements should not page anyone. */
+   * rate a handful of disagreements should not page anyone. */
   readonly minimumSampleSize: number;
 };
 

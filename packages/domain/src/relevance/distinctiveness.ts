@@ -1,5 +1,5 @@
 /**
- * Distinctiveness and duplication checks for relevance assessments (BB-040).
+ * Distinctiveness and duplication checks for relevance assessments.
  */
 import { contentHashesEqual } from '../provenance/hashes.js';
 import type { DiscoveryCandidateRecord } from '../discovery/types.js';

@@ -1,5 +1,6 @@
+
 /**
- * Verifies the discovery-run wrapper calls the real BB-039 campaign gate and summarizes yield,
+ * Verifies the discovery-run wrapper calls the real campaign gate and summarizes yield,
  * using this monorepo's existing domain fixtures rather than inventing new candidate shapes.
  */
 import assert from 'node:assert/strict';

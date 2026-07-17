@@ -1,14 +1,14 @@
 /**
- * Append-only `FactRecord.revisions[]` (BB-086 acceptance criteria 3 & 7).
+ * Append-only `FactRecord.revisions`.
  *
- * PROV-O naming (per BB-086's design note, so a future RDF export is mechanical): a `FactRevision`
- * is a PROV-O `Activity` (`wasRevisionOf` the prior revision, transitively the `Entity` — the
+ * PROV-O naming (per design note, so a future RDF export is mechanical): a `FactRevision`
+ * is a PROV-O `Activity` (`wasRevisionOf` the prior revision, transitively the `Entity` the
  * `FactRecord` itself); `agent` is a PROV-O `Agent` (`wasAssociatedWith` the activity). This
- * module does not depend on an RDF library — it just keeps the field names and relationships
+ * module does not depend on an RDF library it just keeps the field names and relationships
  * PROV-O-shaped so a later exporter has no renaming to do.
  *
- * `changeType` uses the PolitiFact taxonomy named in the bead (correction | clarification |
- * update | style). Every revision requires a non-empty `summary` — mandatory edit summaries are
+ * `changeType` uses the PolitiFact taxonomy named in the (correction | clarification |
+ * update | style). Every revision requires a non-empty `summary` mandatory edit summaries are
  * the whole point of an append-only revision log; a revision with no stated reason is as bad as
  * no revision log at all.
  */
@@ -20,7 +20,7 @@ export function isFactRevisionChangeType(value: string): value is FactRevisionCh
   return (FACT_REVISION_CHANGE_TYPES as readonly string[]).includes(value);
 }
 
-/** PROV-O `Agent` — the actor responsible for the revision `Activity`. */
+/** PROV-O `Agent` the actor responsible for the revision `Activity`. */
 export type FactRevisionAgent = {
   readonly id: string;
   readonly type: 'user' | 'service' | 'system';
@@ -39,7 +39,7 @@ export type FactRevision = {
   readonly timestamp: string;
   readonly agent: FactRevisionAgent;
   readonly changeType: FactRevisionChangeType;
-  /** Mandatory edit summary — never empty (BB-086 AC3/AC7). */
+  /** Mandatory edit summary never empty. */
   readonly summary: string;
   readonly diff: readonly FactRevisionDiffEntry[];
 };
@@ -70,7 +70,7 @@ export function assertFactRevisionValid(revision: FactRevision): void {
  * Fail-closed append-only invariant: revision numbers must be a gapless 1..N sequence in
  * ascending order, and every revision already recorded in `previous` must remain byte-identical
  * in `next` (an append-only log that could silently rewrite history is not append-only). This is
- * the structural proof of "append-only" — not just a naming convention.
+ * the structural proof of "append-only" not just a naming convention.
  */
 export function assertRevisionsAppendOnly(
   previous: readonly FactRevision[],
@@ -94,7 +94,7 @@ export function assertRevisionsAppendOnly(
   });
 }
 
-/** Builds the next revision entry, appended by the caller to the existing `revisions[]`. */
+/** Builds the next revision entry, appended by the caller to the existing `revisions`. */
 export function buildNextRevision(input: {
   readonly previousRevisions: readonly FactRevision[];
   readonly timestamp: string;

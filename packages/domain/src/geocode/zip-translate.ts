@@ -1,7 +1,7 @@
 /**
- * ZIP-to-place translate-then-discard (BB-050 acceptance criterion 6; ADR-016 "ZIPs: never
+ * ZIP-to-place translate-then-discard (; ADR-016 "ZIPs: never
  * stored as reference data"). A user-entered ZIP is used ONLY to ask the Census Geocoder what
- * place/state/county it falls within — the raw ZIP is never returned by this function. This is
+ * place/state/county it falls within the raw ZIP is never returned by this function. This is
  * enforced at the type level, not just by convention: `ZipTranslation` carries no `zip` field,
  * so a caller cannot accidentally thread the raw ZIP through to a persisted record just by
  * spreading this function's return value.
@@ -43,7 +43,7 @@ export async function translateZipToPlace(input: TranslateZipToPlaceInput): Prom
     return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
   }
 
-  // Role gate mirroring BB-014's guard: this ZIP is used for lookup only, never as a stored
+  // Role gate mirroring guard: this ZIP is used for lookup only, never as a stored
   // historical boundary. Throws (fails closed) if this call site is ever changed to pass a
   // different role literal.
   assertZipNotHistoricalBoundary('modern_lookup');
@@ -63,7 +63,7 @@ export async function translateZipToPlace(input: TranslateZipToPlaceInput): Prom
   const jurisdictionIds = resolveJurisdictionIdsFromMatch(best);
 
   // `zip` (the input) and `best.zip` (echoed back by Census, when present) are deliberately
-  // NOT included below — translate-then-discard.
+  // NOT included below translate-then-discard.
   return {
     ok: true,
     ...(best.placeName ? { placeName: best.placeName } : {}),

@@ -1,5 +1,5 @@
 /**
- * Manual relevance override with required human reason (BB-040).
+ * Manual relevance override with required human reason.
  */
 import type { RelevanceDecision } from '@black-book/schemas';
 import type { RelevanceOverride } from './types.js';

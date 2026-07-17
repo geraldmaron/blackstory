@@ -1,5 +1,5 @@
 /**
- * Public API search guardrail tests (BB-026).
+ * Public API search guardrail tests.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

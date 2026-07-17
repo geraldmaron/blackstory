@@ -1,11 +1,12 @@
+
 /**
- * Tests for the BB-091 Census Gazetteer county file parser and bbox approximation.
+ * Tests for the Census Gazetteer county file parser and bbox approximation.
  *
  * The fixture (./fixtures/sample-gazetteer-counties.txt) is a small, structurally-correct
- * illustrative sample in the real Gazetteer tab-delimited format — NOT claimed to be a byte-
- * exact excerpt of a downloaded live Census file (this agent session has no network access
- * and did not fetch one). It exists to prove the parser/transform logic is correct against
- * the documented format; see ./tiger-gazetteer.ts's module doc for how to obtain the real file.
+ * illustrative sample in the real Gazetteer tab-delimited format NOT claimed to be a byte-
+ * exact excerpt of a downloaded live Census file (fixtures are hand-authored, not fetched).
+ * It exists to prove the parser/transform logic is correct against the documented format;
+ * see ./tiger-gazetteer.ts's module doc for how to obtain the real file.
  */
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';

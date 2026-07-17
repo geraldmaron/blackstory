@@ -1,5 +1,5 @@
 /**
- * RSS export for the public errata log (BB-088).
+ * RSS export for the public errata log.
  */
 import { buildErrataRssFeed } from '../../../lib/trust/errata-feed.js';
 import { listErrataEntries } from '../../../lib/trust/errata-seed.js';

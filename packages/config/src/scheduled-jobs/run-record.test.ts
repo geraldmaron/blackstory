@@ -1,5 +1,6 @@
+
 /**
- * BB-084 acceptance: a normal run records success (started/completed, duration, item counts).
+ * A normal run records success (started/completed, duration, item counts).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

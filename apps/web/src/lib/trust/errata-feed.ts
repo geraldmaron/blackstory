@@ -1,5 +1,5 @@
 /**
- * RSS and JSON feed builders for the public errata log (BB-088).
+ * RSS and JSON feed builders for the public errata log.
  */
 import { ERRATA_CHANGE_TYPE_LABELS } from './domain-trust.js';
 import { TRUST_SITE_NAME } from './site-identity.js';

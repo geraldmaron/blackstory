@@ -1,6 +1,6 @@
 /**
- * Reddit discovery adapter public surface (BB-074, gated channel). Ships registered but
- * DISABLED in the BB-037 registry — see ./contract.ts's module doc for the HUMAN STEP
+ * Reddit discovery adapter public surface. Ships registered but
+ * DISABLED in the registry see ./contract.ts's module doc for the HUMAN STEP
  * (Responsible Builder application) that must be recorded before an operator may ever change
  * that registry entry's state.
  */

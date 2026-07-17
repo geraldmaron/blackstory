@@ -1,15 +1,15 @@
 'use client';
 
 /**
- * Client orchestrator for the `/locate` geocode experience (BB-050): wires
+ * Client orchestrator for the `/locate` geocode experience: wires
  * `LocationConsentButton` (explicit browser-location consent) and `ManualPlaceSearchForm`
  * (always-available manual fallback) to `../../lib/geocode/locate-client.ts`'s `/locate/api`
  * fetch wrapper, and renders the outcome through `LocationResolutionPanel`. Kept out of
  * `app/locate/page.tsx` because that file is a Server Component (Next's route-file conventions
- * aside, this feature genuinely needs client state for the fetch/loading/result lifecycle) —
+ * aside, this feature genuinely needs client state for the fetch/loading/result lifecycle) 
  * `page.tsx` renders this component as its one client island.
  *
- * Every outcome — resolved, manual-place-search fallback, rate limited, or errored — is recorded
+ * Every outcome resolved, manual-place-search fallback, rate limited, or errored is recorded
  * as one coarse analytics event via `../../lib/geocode/analytics-client.ts` (never the resolution
  * itself, never a coordinate/address/ZIP; see that module's doc for the console-only interim
  * sink).

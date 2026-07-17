@@ -1,7 +1,7 @@
 /**
- * Tests for the Wayback SPN2 capture layer (BB-073). Fixture-driven; every HTTP call goes
+ * Tests for the Wayback SPN2 capture layer. Fixture-driven; every HTTP call goes
  * through a mock SafeHttpClient injected by the test, never a real fetch. Proves the ordering
- * invariant from acceptance criterion 2: a candidate can only become "review eligible" after a
+ * invariant from a candidate can only become "review eligible" after a
  * successful capture is awaited and validated.
  */
 import assert from 'node:assert/strict';

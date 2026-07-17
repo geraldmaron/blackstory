@@ -1,5 +1,6 @@
+
 /**
- * Typed BB-035 runtime kill switches and fail-safe evaluation helpers.
+ * Typed runtime kill switches and fail-safe evaluation helpers.
  * Switches are independently addressable; an engaged switch denies only its workload,
  * while static mode preserves immutable public-corpus reads and queue pause retains tasks.
  */
@@ -191,6 +192,7 @@ export function sourceAdapterKillSwitchId(adapterId: string): SourceAdapterKillS
   }
   return `source-adapter-${normalized}`;
 }
+
 
 /**
  * Evaluates one switch independently.

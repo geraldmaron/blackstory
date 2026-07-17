@@ -1,18 +1,17 @@
 /**
- * BB-054 public "why this appears" explanation surface. Renders the auditable payload produced by
- * `@black-book/domain`'s `buildPublicWhyThisAppears` (BB-054, composing BB-040's relevance
- * explanation and BB-090's notabilityBasis) — this component performs no editorial composition of
- * its own; it only presents the already-validated `PublicWhyThisAppears` structure.
+ * Public "why this appears" explanation surface. Renders the auditable payload produced by
+ * `@black-book/domain`'s `buildPublicWhyThisAppears` (composing relevance explanation and
+ * `notabilityBasis`). This component performs no editorial composition of its own; it only
+ * presents the already-validated `PublicWhyThisAppears` structure.
  *
  * Never renders a score: `notabilityBasis` renders as a labeled, sourced, auditable list (rubric
  * label + reviewer note + evidence-source count); nothing here is a numeric ranking. A trauma-
- * content notice (from the shared BB-095 disclaimer registry) and honest "coverage note" missing-
- * perspective indicators render additively alongside the explanation — never in place of it.
+ * content notice (from the shared disclaimer registry) and honest "coverage note" missing-
+ * perspective indicators render additively alongside the explanation, never in place of it.
  *
- * INTEGRATION POINT (documented, not wired live — parent mount is out of this bead's file-
- * ownership boundary): a real caller resolves a `PublicWhyThisAppears` value via
- * `buildPublicWhyThisAppears` from `@black-book/domain` (typically from an entity's
- * `relevanceExplanation`/`historicalContext`/claim text and BB-090 `notabilityBasis`) and mounts
+ * Callers resolve a `PublicWhyThisAppears` value via `buildPublicWhyThisAppears` from
+ * `@black-book/domain` (typically from an entity's `relevanceExplanation` /
+ * `historicalContext` / claim text and `notabilityBasis`) and mount
  * `<WhyThisAppears result={...} />` on the entity detail page.
  */
 

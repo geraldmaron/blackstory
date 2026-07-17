@@ -1,5 +1,5 @@
 /**
- * SSR smoke tests for BB-088 trust components — technique-based copy, disclaimer integration, and
+ * SSR smoke tests for trust components technique-based copy, disclaimer integration, and
  * accessibility roles.
  */
 import assert from 'node:assert/strict';

@@ -1,13 +1,13 @@
 /**
- * Sample `FactRecord` catalog for the BB-086 fact registry web surfaces.
+ * Sample `FactRecord` catalog for the fact registry web surfaces.
  *
- * Stands in for a real BB-019 `publicReleases/{releaseId}/facts` projection the same way
+ * Stands in for a real `publicReleases/{releaseId}/facts` projection the same way
  * `./public-seed.ts` stands in for the entity projection (see that file's own module doc for the
- * parallel convention). `subjects[]` deliberately reuse `./public-seed.ts`'s existing seed entity
+ * parallel convention). `subjects` deliberately reuse `./public-seed.ts`'s existing seed entity
  * ids (`ent_seed_place_001`, `ent_seed_school_001`, `ent_seed_event_001`,
  * `ent_seed_institution_001`) so a fact page and an entity page can genuinely link to the SAME
- * canonical record from both directions — the owner's core "both surfaces linking to the same
- * reference info" requirement — without inventing a parallel, disconnected entity catalog. This
+ * canonical record from both directions the owner's core "both surfaces linking to the same
+ * reference info" requirement without inventing a parallel, disconnected entity catalog. This
  * file only ADDS facts; it never edits `./public-seed.ts` or `./entity-graph-seed.ts`.
  */
 import {
@@ -283,13 +283,13 @@ export function listSeedFacts(): readonly FactRecord[] {
   return SEED_FACTS;
 }
 
-/** Facts naming `entityId` as a subject — input for entity-page CompactFactReference embeds. */
+/** Facts naming `entityId` as a subject input for entity-page CompactFactReference embeds.  */
 export function seedFactsForEntity(entityId: string): readonly FactRecord[] {
   return SEED_FACTS.filter((fact) => fact.subjects.some((subject) => subject.entityId === entityId));
 }
 
-/** The BB-049 lane hook applied to this seed catalog — the same real
- * `buildFactSearchIndexDocs` a live BB-019 release build would call. */
+/** The lane hook applied to this seed catalog the same real
+ * `buildFactSearchIndexDocs` a live release build would call. */
 export function getSeedFactSearchIndex() {
   return buildFactSearchIndexDocs(FACTS_SEED_RELEASE_ID, SEED_FACTS);
 }

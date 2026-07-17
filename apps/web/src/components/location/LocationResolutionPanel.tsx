@@ -1,13 +1,13 @@
 /**
- * Presentational result panel for the `/locate` geocode experience (BB-050) — renders either a
- * resolved jurisdiction (state/county/city names + a link into BB-049's `/search`) or the
- * manual-place-search fallback notice (acceptance criterion 4). Pure and server-safe (no hooks)
- * so it stays trivially SSR-render-testable with `renderToStaticMarkup`, matching this app's
- * existing `DegradedModeNotice.test.ts` pattern.
+ * Presentational result panel for the `/locate` geocode experience — renders either a
+ * resolved jurisdiction (state/county/city names + a link into `/search`) or the
+ * manual-place-search fallback notice. Pure and server-safe (no hooks) so it stays trivially
+ * SSR-render-testable with `renderToStaticMarkup`, matching this app's existing
+ * `DegradedModeNotice.test.ts` pattern.
  *
- * Never renders `precision.lat`/`precision.lng` even when present (acceptance criterion 3: exact
- * coordinates are reduced when no longer needed) — this component only ever reads the
- * jurisdiction names and ids off a resolution, never its coordinate fields.
+ * Never renders `precision.lat`/`precision.lng` even when present — exact coordinates are
+ * reduced when no longer needed. This component only ever reads the jurisdiction names and ids
+ * off a resolution, never its coordinate fields.
  */
 import React from 'react';
 import { Notice } from '@black-book/ui';

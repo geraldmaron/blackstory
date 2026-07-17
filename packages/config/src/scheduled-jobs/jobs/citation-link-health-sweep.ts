@@ -1,34 +1,35 @@
+
 /**
- * REAL roster entry: citation link-health sweep (BB-083). Wraps `@black-book/domain`'s citation
- * link-health / repair-ladder logic (packages/domain/src/citations/) — the pure classification,
+ * REAL roster entry: citation link-health sweep. Wraps `@black-book/domain`'s citation
+ * link-health repair-ladder logic (packages/domain/src/citations/) — the pure classification,
  * retry-before-dead state machine, and repair ladder all live there and are unit-tested there
  * (packages/domain/src/citations/*.test.ts). This file is the thin adapter layer that:
  *
- *   (a) performs the actual BB-030-safe re-verification fetch through
- *       `@black-book/security`'s `executeSafeFetch`, since `@black-book/domain` cannot depend on
- *       `@black-book/security` (security depends on domain; the reverse edge would be a circular
- *       workspace dependency — see packages/domain/src/citations/link-health.ts's module doc for
- *       the same constraint elsewhere in this bead). `packages/config` has no such constraint, so
- *       this is the one place BB-083's real network wiring happens. The Node DNS/HTTP transport
- *       below intentionally mirrors `packages/operator-cli/src/fetch.ts`'s
- *       `nodeResolveHost`/`nodePinnedTransport` (the only other real BB-030 Node transport in
- *       this repo) rather than inventing a third shape — `packages/config` does not depend on
- *       `@black-book/operator-cli` (that dependency direction would be backwards: a CLI package
- *       depending on it, not a scheduled-job framework), so this is a deliberate, small,
- *       documented near-duplicate rather than a new cross-package edge.
+ * (a) performs the SSRF-safe re-verification fetch through
+ * `@black-book/security`'s `executeSafeFetch`, since `@black-book/domain` cannot depend on
+ * `@black-book/security` (security depends on domain; the reverse edge would be a circular
+ * workspace dependency; see packages/domain/src/citations/link-health.ts's module doc for
+ * the same constraint). `packages/config` has no such constraint, so
+ * this is the one place real network wiring happens. The Node DNS/HTTP transport
+ * below intentionally mirrors `packages/operator-cli/src/fetch.ts`'s
+ * `nodeResolveHost`/`nodePinnedTransport` (the only other real Node transport in
+ * this repo) rather than inventing a third shape `packages/config` does not depend on
+ * `@black-book/operator-cli` (that dependency direction would be backwards: a CLI package
+ * depending on it, not a scheduled-job framework), so this is a deliberate, small,
+ * documented near-duplicate rather than a new cross-package edge.
  *
- *   (b) enforces the ONE pre-approved automatic public effect this job may make. The roster
- *       entry's `publicEffect` is exactly `'link-repair-archived-copy'` — not a general
- *       "link repair" catch-all (see ../types.ts's `ALLOWED_AUTOMATIC_PUBLIC_EFFECTS`). So this
- *       job automatically applies only the repair ladder's step 2 (wayback_swap: swapping a dead
- *       citation's primary link to an *already-stored* Wayback capture) and step 4 (dead_mark, a
- *       status flag, not a link rewrite). Steps 1 (permanent-redirect update) and 3 (retroactive
- *       Save Page Now, which mints a brand-new archive.org capture) are computed via the same
- *       domain-layer repair ladder and returned as PROPOSED repairs for a human/reviewer to apply
- *       through a separate, explicit action — matching BB-084's "automation proposes, humans
- *       dispose" operating principle. The one applied write (wayback_swap) still goes through
- *       `assertScheduledJobOperationAllowed` before being applied, exactly like every other
- *       scheduled-job write with a declared public effect.
+ * (b) enforces the ONE pre-approved automatic public effect this job may make. The roster
+ * entry's `publicEffect` is exactly `'link-repair-archived-copy'` not a general
+ * "link repair" catch-all (see ../types.ts's `ALLOWED_AUTOMATIC_PUBLIC_EFFECTS`). So this
+ * job automatically applies only the repair ladder's step 2 (wayback_swap: swapping a dead
+ * citation's primary link to an *already-stored* Wayback capture) and step 4 (dead_mark, a
+ * status flag, not a link rewrite). Steps 1 (permanent-redirect update) and 3 (retroactive
+ * Save Page Now, which mints a brand-new archive.org capture) are computed via the same
+ * domain-layer repair ladder and returned as PROPOSED repairs for a human/reviewer to apply
+ * through a separate, explicit action matching "automation proposes, humans
+ * dispose" operating principle. The one applied write (wayback_swap) still goes through
+ * `assertScheduledJobOperationAllowed` before being applied, exactly like every other
+ * scheduled-job write with a declared public effect.
  */
 import { lookup } from 'node:dns/promises';
 import { request as httpRequest, type IncomingMessage } from 'node:http';
@@ -58,7 +59,7 @@ import type { ScheduledJobDefinition } from '../types.js';
 
 export const CITATION_LINK_HEALTH_SWEEP_JOB_ID = 'citation-link-health-sweep';
 
-/** Resolves a hostname via the real system resolver — mirrors operator-cli's `nodeResolveHost`. */
+/** Resolves a hostname via the real system resolver mirrors operator-cli's `nodeResolveHost`. */
 export const nodeResolveHost: ResolveHost = async (hostname) => {
   const results = await lookup(hostname, { all: true, verbatim: true });
   return results.map((entry) => ({ address: entry.address, family: entry.family as 4 | 6 }));
@@ -72,7 +73,7 @@ function normalizeHeaders(headers: IncomingMessage['headers']): Record<string, s
   return normalized;
 }
 
-/** Connects directly to `pinnedAddress` — mirrors operator-cli's `nodePinnedTransport`. */
+/** Connects directly to `pinnedAddress` mirrors operator-cli's `nodePinnedTransport`. */
 export const nodePinnedTransport: PinnedTransport = (pinnedRequest) =>
   new Promise<PinnedTransportResponse>((resolve, reject) => {
     const target = new URL(pinnedRequest.url);
@@ -100,12 +101,13 @@ export const nodePinnedTransport: PinnedTransport = (pinnedRequest) =>
     clientRequest.end();
   });
 
+
 /**
  * Wraps a `PinnedTransport` to additionally record every hop's HTTP status. `executeSafeFetch`'s
  * own return type discards per-hop status codes (see packages/domain/src/citations/
- * link-health.ts's disclosed gap) — this is how the real fetcher below recovers `httpStatus`
+ * link-health.ts's disclosed gap); this is how the real fetcher below recovers `httpStatus`
  * (final hop) and `permanentRedirect` (whether the *first* hop was 301/308) without modifying
- * BB-030 itself.
+ * itself.
  */
 function withStatusCapture(base: PinnedTransport): { transport: PinnedTransport; statuses: () => readonly number[] } {
   const statuses: number[] = [];
@@ -117,8 +119,9 @@ function withStatusCapture(base: PinnedTransport): { transport: PinnedTransport;
   return { transport, statuses: () => statuses };
 }
 
+
 /**
- * The real BB-030-backed link-health fetcher: performs one SSRF-safe re-verification fetch and
+ * The Node-backed link-health fetcher: performs one SSRF-safe re-verification fetch and
  * adapts `executeSafeFetch`'s result into the `LinkCheckFetchResult` port
  * (packages/domain/src/citations/link-health.ts) that the pure classifier consumes.
  */
@@ -171,10 +174,10 @@ export type CitationLinkHealthCheckOutcome = {
   readonly classification?: LinkCheckClassification;
   readonly state: LinkHealthState;
   /** Automatically committed — always exactly the roster's declared 'link-repair-archived-copy'
-   *  effect (wayback_swap) or the non-effect dead_mark status flag. */
+   * effect (wayback_swap) or the non-effect dead_mark status flag. */
   readonly appliedRepair?: CitationLinkHealthRepair;
-  /** Computed by the same repair ladder but NOT auto-applied — outside this job's declared
-   *  public effect; a human/reviewer action must apply these separately. */
+  /** Computed by the same repair ladder but NOT auto-applied outside this job's declared
+   * public effect; a human/reviewer action must apply these separately. */
   readonly proposedRepair?: CitationLinkHealthRepair;
   readonly flaggedForDriftReview: boolean;
 };
@@ -184,7 +187,7 @@ export type CitationLinkHealthSweepJobInput = {
   readonly startedAt: string;
   readonly completedAt: string;
   readonly checks: readonly CitationLinkHealthCheckInput[];
-  /** Defaults to the real BB-030-backed fetcher; tests inject a fake. */
+  /** Defaults to the Node-backed fetcher; tests inject a fake. */
   readonly fetchLink?: (url: string) => Promise<LinkCheckFetchResult>;
   readonly attemptSpn: (url: string) => Promise<SpnCaptureOutcome>;
   readonly maxRetriesBeforeDead?: number;
@@ -222,9 +225,10 @@ const NEVER_ATTEMPT_SPN: (url: string) => Promise<SpnCaptureOutcome> = async () 
   reason: 'not_attempted_this_step_does_not_require_spn',
 });
 
+
 /**
  * Runs one scheduled sweep over the supplied citation checks. Pure aside from the injected
- * `fetchLink`/`attemptSpn` I/O ports — the classification, retry state machine, and repair-ladder
+ * `fetchLink`/`attemptSpn` I/O ports the classification, retry state machine, and repair-ladder
  * ordering are entirely `@black-book/domain`'s tested logic; this function only sequences calls
  * to it and decides which resulting repair step is allowed to auto-commit (see module doc).
  */
@@ -267,7 +271,7 @@ export async function runCitationLinkHealthSweepJob(
     let proposedRepair: CitationLinkHealthRepair | undefined;
 
     if (classification.status === 'redirected' && classification.permanentRedirect) {
-      // Step 1 is always computed but never auto-committed here — see module doc.
+      // Step 1 is always computed but never auto-committed here; see module doc.
       const outcome = await applyRepairLadder({
         citation: check.citation,
         classification,

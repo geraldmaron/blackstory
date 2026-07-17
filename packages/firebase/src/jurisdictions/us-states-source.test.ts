@@ -1,6 +1,7 @@
+
 /**
  * Tests proving state jurisdiction docs are sourced solely from the existing
- * `@black-book/domain` `US_STATES` table (BB-091 acceptance criterion 1 — "no duplicate table").
+ * `@black-book/domain` `US_STATES` table.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

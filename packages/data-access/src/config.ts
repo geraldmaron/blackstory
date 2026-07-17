@@ -1,5 +1,5 @@
 /**
- * Server-only database configuration for trusted runtimes (Cloud Run / jobs).
+ * Server-only database configuration for trusted runtimes (Cloud Run jobs).
  * Rejects browser-facing env patterns and requires an explicit role.
  */
 import { assertServerOnly } from './server-only.js';

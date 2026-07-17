@@ -1,5 +1,6 @@
+
 /**
- * Verifies operator-stamped BB-018 audit events and paired outbox messages.
+ * Verifies operator-stamped audit events and paired outbox messages.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

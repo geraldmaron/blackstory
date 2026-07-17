@@ -1,5 +1,6 @@
+
 /**
- * Hybrid retrieval evaluation harness (BB-072 / BB-047).
+ * Hybrid retrieval evaluation harness.
  *
  * Runs labeled name/misspelling/descriptive/place queries against the domain hybrid pipeline
  * and reports precision/recall/MRR with configurable gates. Fusion weight changes require

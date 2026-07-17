@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * Client-only App Check token acquisition for the public `/locate` geocode UI (BB-050). Mirrors
- * `apps/web/src/app/submit/app-check-client.ts` exactly — same vendor `firebase` client SDK call,
+ * Client-only App Check token acquisition for the public `/locate` geocode UI. Mirrors
+ * `apps/web/src/app/submit/app-check-client.ts` exactly same vendor `firebase` client SDK call,
  * same graceful degrade to `{}` when App Check isn't configured for this build environment (so
  * local dev without a real Firebase project still works, and the server-side guard falls back to
  * its default `monitor` mode instead of hard-failing the request).
@@ -71,7 +71,7 @@ function getOrInitAppCheck(): AppCheck | undefined {
   }
 }
 
-/** Resolves to App Check request headers, or `{}` when App Check isn't configured for this build. */
+/** Resolves to App Check request headers, or `{}` when App Check isn't configured for this build.  */
 export async function getLocateAppCheckHeaders(): Promise<Readonly<Record<string, string>>> {
   const appCheck = getOrInitAppCheck();
   if (!appCheck) return {};

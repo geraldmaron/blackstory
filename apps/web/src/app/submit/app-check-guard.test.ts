@@ -1,6 +1,6 @@
 /**
- * Unit tests for the public "submit a lead" App Check guard (BB-076). Injects a fake verifier
- * and telemetry sink so these tests never touch real Firebase Admin credentials — the same
+ * Unit tests for the public "submit a lead" App Check guard. Injects a fake verifier
+ * and telemetry sink so these tests never touch real Firebase Admin credentials the same
  * dependency-injection seam `apps/api-submissions/src/app-check.ts` exposes.
  */
 import assert from 'node:assert/strict';

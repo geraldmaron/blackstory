@@ -1,5 +1,5 @@
 /**
- * Shared types for BB-087 legal source adapters (Congress.gov, eCFR, CourtListener, LegiScan).
+ * Shared types for legal source adapters (Congress.gov, eCFR, CourtListener, LegiScan).
  */
 import type { LegalMonitoringSourceSnapshot } from '../../legal/monitoring.js';
 import type { LegalSnapshot } from '../../legal/types.js';
@@ -11,5 +11,5 @@ export type LegalAdapterParseResult = {
 
 export type LegalFixtureClient = {
   readonly adapterId: string;
-  readonly parseFixtures(): LegalAdapterParseResult;
+  parseFixtures(): LegalAdapterParseResult;
 };

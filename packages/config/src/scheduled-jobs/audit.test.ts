@@ -1,8 +1,9 @@
+
 /**
- * BB-084 acceptance: every automated write a job makes carries the job-run id as (or alongside)
- * the BB-018 correlation id, and is traceable back to the exact run that made it. This test
+ * Every automated write a job makes carries the job-run id as (or alongside)
+ * the correlation id, and is traceable back to the exact run that made it. This test
  * imports the REAL commitWithAudit (packages/firebase/src/firestore/audit-outbox.ts, devDep-only
- * import — @black-book/config does not depend on @black-book/firebase at runtime, see audit.ts's
+ * import @black-book/config does not depend on @black-book/firebase at runtime, see audit.ts's
  * module doc) and proves objects built by buildJobRunAuditEvent/buildJobRunOutboxMessage are
  * accepted by it unmodified, i.e. this module follows commitWithAudit's exact calling
  * convention rather than a parallel one that merely looks similar.
@@ -85,8 +86,8 @@ test('a job-run audit event and outbox message are accepted by the real commitWi
   assert.equal(result.eventId, auditEvent.id);
   assert.equal(result.outboxMessageId, outboxMessage.id);
 
-  // The write, the audit event, and the outbox message all carry the same correlation id — the
-  // job-run id — so the write is traceable back to the exact run that made it.
+  // The write, the audit event, and the outbox message all carry the same correlation id the
+  // job-run id so the write is traceable back to the exact run that made it.
   assert.equal(auditEvent.correlationId, jobRunId);
   assert.equal(outboxMessage.correlationId, jobRunId);
   const written = store.read(`jobRuns/${jobRunId}`);

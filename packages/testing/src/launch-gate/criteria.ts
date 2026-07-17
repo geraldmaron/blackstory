@@ -1,5 +1,6 @@
+
 /**
- * BB-063 launch gate inventory — measurable machine checks plus fail-closed human attestations.
+ * launch gate inventory measurable machine checks plus fail-closed human attestations.
  */
 import type { LaunchGateDefinition } from './types.js';
 

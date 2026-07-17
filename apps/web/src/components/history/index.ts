@@ -1,5 +1,5 @@
 /**
- * Barrel export for BB-093 history browse UI components.
+ * Barrel export for history browse UI components.
  */
 export { DecadeStepper } from './DecadeStepper';
 export { HistoryEdgePanel } from './HistoryEdgePanel';

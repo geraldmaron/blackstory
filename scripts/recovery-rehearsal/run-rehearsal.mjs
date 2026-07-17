@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+
 /**
- * Recovery and rollback rehearsal runner (BB-061). Dry-run only — simulates all procedures,
+ * Recovery and rollback rehearsal runner. Dry-run only simulates all procedures,
  * records measured times from fixtures, validates break-glass paths. No live GCP restore.
  */
 import { writeFile } from 'node:fs/promises';

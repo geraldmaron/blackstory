@@ -1,5 +1,5 @@
 /**
- * Tests for the BB-091 fail-closed jurisdiction-reference gate.
+ * Tests for the fail-closed jurisdiction-reference gate.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,7 +1,7 @@
 /**
  * Thin, dependency-injectable wrapper around the browser's `navigator.geolocation` Web API
- * (BB-050 "browser location permission flow: explicit user action before access"). This module
- * never calls `getCurrentPosition` on its own — it is only ever invoked from
+ * . This module
+ * never calls `getCurrentPosition` on its own it is only ever invoked from
  * `../../components/location/LocationConsentButton.tsx`'s click handler, so the permission
  * prompt (and any real GPS/network location lookup) can only ever follow a deliberate button
  * press, never a page-load effect or any other implicit trigger.
@@ -27,7 +27,7 @@ export type GeolocationOutcome =
   | { readonly ok: true; readonly position: BrowserCoordinates }
   | { readonly ok: false; readonly reason: GeolocationDenialReason };
 
-/** Structural subset of the DOM `Geolocation` interface this module actually calls. */
+/** Structural subset of the DOM `Geolocation` interface this module actually calls.  */
 export type GeolocationApi = {
   getCurrentPosition(
     onSuccess: (position: { readonly coords: { readonly latitude: number; readonly longitude: number } }) => void,
@@ -48,7 +48,7 @@ const DEFAULT_OPTIONS: PositionOptionsLike = {
   maximumAge: 0,
 };
 
-/** Standard `GeolocationPositionError.code` values (1=PERMISSION_DENIED, 2=POSITION_UNAVAILABLE, 3=TIMEOUT). */
+/** Standard `GeolocationPositionError.code` values (1=PERMISSION_DENIED, 2=POSITION_UNAVAILABLE, 3=TIMEOUT).  */
 function reasonForErrorCode(code: number): GeolocationDenialReason {
   if (code === 1) return 'permission_denied';
   if (code === 2) return 'position_unavailable';
@@ -58,7 +58,7 @@ function reasonForErrorCode(code: number): GeolocationDenialReason {
 
 /**
  * Requests the browser's current position exactly once. `geolocation` is `undefined` on
- * browsers/contexts where the API doesn't exist (or where a Permissions-Policy has disabled it) —
+ * browsers/contexts where the API doesn't exist (or where a Permissions-Policy has disabled it) 
  * that resolves to `{ ok: false, reason: 'unsupported' }` rather than throwing, so the caller can
  * always fall through to `ManualPlaceSearchForm`.
  */

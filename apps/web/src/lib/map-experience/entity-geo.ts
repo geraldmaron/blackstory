@@ -1,15 +1,15 @@
 /**
- * Geo-anchor table for the active release's map-eligible entities (BB-051).
+ * Geo-anchor table for the active release's map-eligible entities.
  *
  * The active release (`../../data/public-seed.ts`) does not yet carry structured
- * `EntityLocation` documents with lat/lng (BB-019 projections are not live) — this module is the
- * map-specific stand-in, in the same spirit as BB-070's own `packages/domain/src/map/fixtures.ts`
- * standing in for a live release read. Precision comes from each entity's own `locationPrecision`
- * field (never duplicated here) so this table can never drift from what the entity page itself
- * displays; this file supplies ONLY the coordinate anchor.
+ * `EntityLocation` documents with lat/lng — this module is the map-specific stand-in, in the
+ * same spirit as `packages/domain/src/map/fixtures.ts` standing in for a live release read.
+ * Precision comes from each entity's own `locationPrecision` field (never duplicated here) so
+ * this table can never drift from what the entity page itself displays; this file supplies ONLY
+ * the coordinate anchor.
  *
  * Scope: only entities present in the active release get an anchor. An entity without one is
- * excluded from the map (not silently placed at a guessed point) — mirrors BB-070's
+ * excluded from the map (not silently placed at a guessed point) — mirrors
  * `buildMapSource` "skippedNoLocation" accounting.
  */
 import { encodeGeohash } from '@black-book/domain';
@@ -27,12 +27,11 @@ function anchor(lat: number, lng: number, matchMethod = 'manual_research'): Enti
 }
 
 /**
- * Washington, D.C. carries no county subdivision — every anchor below sits inside the single
+ * Washington, D.C. carries no county subdivision every anchor below sits inside the single
  * District of Columbia jurisdiction (FIPS 11), matching every current seed entity's
  * `jurisdictionLabel`. As the active release grows beyond D.C., new entities get a new row here
- * (or, once BB-019 projections are live, this whole module retires in favor of a real
- * `EntityLocation` read — see the module doc's "INTEGRATION POINT" framing used elsewhere in this
- * codebase for that exact seam).
+ * (or, once projections are live, this whole module retires in favor of a real
+ * `EntityLocation` read from the published release).
  */
 export const ENTITY_GEO_ANCHORS: Readonly<Record<string, EntityGeoAnchor>> = {
   ent_seed_place_001: anchor(38.9072, -77.0369),

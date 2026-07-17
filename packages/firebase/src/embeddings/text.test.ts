@@ -1,5 +1,6 @@
+
 /**
- * Tests for embedding text construction and pre-filter derivation (BB-071).
+ * Tests for embedding text construction and pre-filter derivation.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,5 +1,5 @@
 /**
- * Per-revision permalink page at `/facts/{id}/rev/{n}` (BB-086 AC3).
+ * Per-revision permalink page at `/facts/{id}/rev/{n}`.
  *
  * The Wikipedia-oldid pattern: pins a specific revision so an out-of-context screenshot can be
  * answered by linking the cited revision and its edit summary. The record stays resolvable even

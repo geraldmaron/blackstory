@@ -1,9 +1,9 @@
 /**
- * Plain-JS security headers for next.config.mjs (BB-028).
- * Keep in sync with security-headers.ts / csp.ts — tested via web-security.test.ts.
+ * Plain-JS security headers for next.config.mjs.
+ * Keep in sync with security-headers.ts csp.ts tested via web-security.test.ts.
  */
 
-/** @returns {{ key: string, value: string }[]} */
+/** @returns {{ key: string, value: string }}  */
 export function securityHeadersForNextConfig() {
   const isDev = process.env.NODE_ENV !== 'production';
   const scriptSrc = isDev

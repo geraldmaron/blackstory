@@ -1,5 +1,6 @@
+
 /**
- * Atomic Firestore promotion to publication candidacy with audit, outbox, and idempotency (BB-032).
+ * Atomic Firestore promotion to publication candidacy with audit, outbox, and idempotency.
  */
 import type { AtomicStore } from './audit-outbox.js';
 import {

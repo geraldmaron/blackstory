@@ -1,9 +1,9 @@
 /**
- * Tests for the live Census Geocoder API adapter (BB-050) — URL building, defensive response
+ * Tests for the live Census Geocoder API adapter: URL building, defensive response
  * parsing, normalization to `CensusGeocodeMatch`, and the `SafeHttpClient`-based fetch wrapper.
- * Fixtures-first per this bead's mandate: `fetchCensusAddressGeocode` /
- * `fetchCensusCoordinatesGeocode` are exercised against a fake `SafeHttpClient` returning the
- * committed fixtures in `./fixtures/` — no live network call is made by this suite.
+ * Fixtures-first: `fetchCensusAddressGeocode` / `fetchCensusCoordinatesGeocode` are exercised
+ * against a fake `SafeHttpClient` returning the committed fixtures in `./fixtures/` — no live
+ * network call is made by this suite.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

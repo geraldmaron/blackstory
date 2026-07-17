@@ -1,8 +1,8 @@
 /**
- * Integration tests for the public search route (BB-049). These exercise the REAL route handler
- * end-to-end — App Check guard, BB-025 rate limiter, BB-026 `evaluateSearchQueryGuardrails`, and
- * the `runPublicSearch` pipeline over the real seed snapshot index — not any component in
- * isolation. That is the point: BB-026's guardrail was unit-tested but had zero wired callers, so
+ * Integration tests for the public search route. These exercise the REAL route handler
+ * end-to-end App Check guard, rate limiter, `evaluateSearchQueryGuardrails`, and
+ * the `runPublicSearch` pipeline over the real seed snapshot index not any component in
+ * isolation. That is the point: guardrail was unit-tested but had zero wired callers, so
  * these tests prove adversarial input is bounded by the guardrail through the actual HTTP route.
  *
  * Style follows `apps/web/src/app/submit/*.test.ts`: plain `node:test`, real objects, no mocking
@@ -28,7 +28,7 @@ function acceptingVerifier(appId = 'test-app-id'): AppCheckVerifier {
   };
 }
 
-/** Fresh dependency set per test — a new rate-limit bucket so quotas never leak between tests. */
+/** Fresh dependency set per test a new rate-limit bucket so quotas never leak between tests.  */
 async function buildDeps(
   overrides: Partial<SearchRouteDependencies> = {},
 ): Promise<SearchRouteDependencies> {
@@ -165,7 +165,7 @@ test('cursor round-trip returns the next page, not the same page', async () => {
   const secondId = second.results[0]?.id;
 
   assert.notEqual(firstId, secondId, 'the second page must not repeat the first page');
-  // BB-092: relatedCount is now the real graph-adjacency size, not relatedIds.length — the school
+  // : relatedCount is now the real graph-adjacency size, not relatedIds.length the school
   // is connected to both the place and the commemoration event, so it outranks the place
   // (relatedCount 2 vs 1) once the equal "education" topic-tier tie is broken by connection
   // strength.

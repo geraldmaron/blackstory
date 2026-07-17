@@ -1,5 +1,5 @@
 /**
- * Unit tests for BB-076 reviewer-log accumulation, tallying, and agreement-threshold routing.
+ * Unit tests for reviewer-log accumulation, tallying, and agreement-threshold routing.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -159,7 +159,7 @@ test('routeConsensusReview never silently resolves a tie — it always routes to
   );
   assert.equal(decision.status, 'expert_review');
   assert.equal(decision.reason, 'tie_no_majority');
-  // No leading verdict is asserted anywhere in the decision — nothing was averaged or defaulted.
+  // No leading verdict is asserted anywhere in the decision nothing was averaged or defaulted.
   assert.equal(decision.tally.leadingVerdict, undefined);
 });
 
@@ -175,7 +175,7 @@ test('routeConsensusReview never silently resolves below-threshold agreement', (
     ],
     NOW,
   );
-  // 3/5 = 0.6, below the default 0.66 threshold, with a clear (non-tied) leader — must still be
+  // 3/5 = 0.6, below the default 0.66 threshold, with a clear (non-tied) leader must still be
   // visible disagreement, not silently rounded up into auto_advance.
   assert.equal(decision.tally.leadingVerdict, 'legitimate_lead');
   assert.equal(decision.status, 'expert_review');

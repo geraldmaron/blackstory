@@ -1,3 +1,4 @@
+
 /**
  * Migration-layer harness test: applies a representative schema_migrations DDL.
  * Uses the Postgres disposable harness; skips unless Postgres is available.

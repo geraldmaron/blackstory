@@ -1,13 +1,13 @@
 /**
- * Query generation from BB-038 query packs for web-search adapters (BB-075), geographically
+ * Query generation from query packs for web-search adapters, geographically
  * seeded per state/county.
  *
- * CRITICAL constraint (bead acceptance criterion 3): `researchOnlyOffensive` terms must never
+ * CRITICAL constraint: `researchOnlyOffensive` terms must never
  * reach an external API. This module builds query text exclusively from
  * `toPublicSafeTerms(pack.terms)` (../../query-packs/terms.js), which already omits
  * `researchOnlyOffensive` entries, and then re-checks the built string against the pack's full
- * term list as defense in depth — see `assertQueryTextHasNoResearchOnlyOffensiveTerms`, which is
- * also exported so callers of ../fetch-search.ts and tests can assert the guarantee directly
+ * term list as defense in depth see `assertQueryTextHasNoResearchOnlyOffensiveTerms`, which is
+ * also exported so callers of../fetch-search.ts and tests can assert the guarantee directly
  * rather than trusting it implicitly.
  */
 import { toPublicSafeTerms } from '../../query-packs/terms.js';
@@ -57,7 +57,7 @@ export type BuildWebSearchQueryTextsInput = {
 /**
  * Builds one query text per geographic seed, combining the pack's public-safe positive/alias
  * terms with the seed's state/county. `researchOnlyOffensive` terms never reach this function's
- * output — see the module doc comment.
+ * output see the module doc comment.
  */
 export function buildWebSearchQueryTexts(input: BuildWebSearchQueryTextsInput): readonly string[] {
   const publicTerms = toPublicSafeTerms(input.pack.terms);

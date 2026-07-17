@@ -1,5 +1,5 @@
 /**
- * BB-023 acceptance checks for Cloud Armor and ingress design artifacts.
+ * Acceptance checks for Cloud Armor and ingress design artifacts.
  * Validates JSON schema, required rules, and LB-only ingress assertions.
  */
 import assert from 'node:assert/strict';

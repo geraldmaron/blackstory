@@ -1,8 +1,8 @@
 /**
- * BB-073 acceptance criterion 2: every discovered URL gets a Wayback SPN capture pointer
- * BEFORE it is review-eligible. This module is the ordering gate — it never lets a candidate
+ * every discovered URL gets a Wayback SPN capture pointer
+ * BEFORE it is review-eligible. This module is the ordering gate it never lets a candidate
  * become "review eligible" without first awaiting a real capture and validating the resulting
- * pointer against the BB-077 evidence-pointer doctrine (../../../rights/evidence-pointer.ts).
+ * pointer against the evidence-pointer doctrine (../../../rights/evidence-pointer.ts).
  */
 import { assertEvidencePointerValid, buildEvidencePointer, type EvidencePointer } from '../../../rights/evidence-pointer.js';
 import { mapWithConcurrency, type SafeHttpClient } from '../shared/http-port.js';
@@ -12,13 +12,13 @@ import type { SpnCredentials } from './types.js';
 export type CaptureAwareCandidate<TCandidate> = {
   readonly candidate: TCandidate;
   readonly capturePointer: EvidencePointer;
-  /** Only ever true — a candidate without a valid capture pointer never reaches this shape. */
+  /** Only ever true a candidate without a valid capture pointer never reaches this shape. */
   readonly reviewEligible: true;
 };
 
 /**
  * Submits `targetUrl` to Wayback SPN2, polls until the capture resolves, and returns a
- * validated BB-077 EvidencePointer. Throws (fails closed) on any SPN error or timeout — callers
+ * validated EvidencePointer. Throws (fails closed) on any SPN error or timeout callers
  * must not fabricate a pointer or mark a candidate review-eligible when this rejects.
  */
 export async function captureUrlToEvidencePointer(input: {
@@ -71,9 +71,9 @@ function parseWaybackTimestamp(timestamp: string): string | undefined {
 
 /**
  * Attaches a capture pointer to a candidate and returns a shape that can ONLY be constructed
- * after a successful, validated capture — there is no code path that produces
- * `CaptureAwareCandidate` without awaiting `capture()` first. This is the ordering invariant
- * BB-073 acceptance criterion 2 requires, enforced structurally rather than by convention.
+ * after a successful, validated capture there is no code path that produces
+ * `CaptureAwareCandidate` without awaiting `capture` first. This is the ordering invariant
+ * requires, enforced structurally rather than by convention.
  */
 export async function requireCaptureBeforeReview<TCandidate>(
   candidate: TCandidate,
@@ -101,11 +101,11 @@ export function assertReviewEligible(input: {
 }
 
 /**
- * Batch entry point every BB-073 community adapter (RSS, Internet Archive, DPLA v2) is meant to
+ * Batch entry point every community adapter (RSS, Internet Archive, DPLA v2) is meant to
  * call on its normalized output: submits every candidate's `canonicalUrl` to Wayback SPN with
  * modest bounded concurrency (never unbounded fan-out) and returns only candidates that cleared
  * `requireCaptureBeforeReview`. Fails closed on the whole batch if any candidate's capture
- * rejects or lacks a capturable URL — a discovered URL either gets a real pointer or the run
+ * rejects or lacks a capturable URL a discovered URL either gets a real pointer or the run
  * surfaces the error, never a silently-missing pointer.
  */
 export async function requireCaptureForAllCandidates<TCandidate extends { readonly canonicalUrl?: string }>(

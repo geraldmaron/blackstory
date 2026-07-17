@@ -1,5 +1,5 @@
 /**
- * Unit tests for the sole consensus-review exit into a BB-044 discovery-candidate research case.
+ * Unit tests for the sole consensus-review exit into a discovery-candidate research case.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

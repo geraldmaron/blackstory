@@ -1,5 +1,5 @@
 /**
- * Domain contracts for the controlled claim-promotion pipeline (BB-032).
+ * Domain contracts for the controlled claim-promotion pipeline.
  */
 import type { ClaimClass } from '@black-book/schemas';
 

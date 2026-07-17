@@ -1,5 +1,6 @@
+
 /**
- * BB-057 degraded-mode and public-page stability contracts.
+ * degraded-mode and public-page stability contracts.
  * Canonical copy strings must stay aligned with apps/web snapshot-mode and DegradedModeNotice.
  */
 import assert from 'node:assert/strict';

@@ -1,7 +1,7 @@
 /**
- * Content-drift detection (BB-083 acceptance criterion 5): compares a live-fetched page's
+ * Content-drift detection: compares a live-fetched page's
  * content against the stored capture via exact hash and, when text is available, a fuzzy
- * token-shingle similarity. Divergence is flagged for research review — this module never
+ * token-shingle similarity. Divergence is flagged for research review this module never
  * auto-resolves a drift; the capture remains the evidentiary anchor either way.
  */
 import type { ContentHash } from '../provenance/hashes.js';
@@ -10,13 +10,13 @@ import { contentHashesEqual } from '../provenance/hashes.js';
 export type ContentDriftResult = {
   readonly hashMatches: boolean;
   /** Jaccard similarity over word-trigram shingles, 0..1. Undefined when no text was supplied
-   *  for a fuzzy comparison (hash-only comparison). */
+   * for a fuzzy comparison (hash-only comparison). */
   readonly similarity?: number;
   /** True when the live content differs enough from the capture that the claim's citation may
-   *  now point at something different from what it originally supported. */
+   * now point at something different from what it originally supported. */
   readonly diverged: boolean;
-  /** True whenever `diverged` is true — kept as a distinct, explicitly named field so a
-   *  research-review queue can filter on intent rather than re-deriving it from `diverged`. */
+  /** True whenever `diverged` is true kept as a distinct, explicitly named field so a
+   * research-review queue can filter on intent rather than re-deriving it from `diverged`. */
   readonly flaggedForReview: boolean;
 };
 
@@ -59,7 +59,7 @@ export function jaccardSimilarity(a: string, b: string): number {
  * Compares captured content against a fresh live fetch. Exact hash match short-circuits to
  * "not diverged". Otherwise, when text is available for both sides, a fuzzy similarity check
  * tolerates minor drift (ads, timestamps, byline updates) below the divergence threshold. With
- * a hash mismatch and no text to compare, this fails closed toward "diverged" — an
+ * a hash mismatch and no text to compare, this fails closed toward "diverged" an
  * unverifiable difference is treated as a difference worth a human's attention, never silently
  * accepted.
  */

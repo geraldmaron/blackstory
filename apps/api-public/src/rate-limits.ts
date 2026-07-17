@@ -1,5 +1,5 @@
 /**
- * Public API rate-limit guard — maps read/search/location routes to quota policies (BB-025).
+ * Public API rate-limit guard maps read/search/location routes to quota policies.
  * Uses in-memory store by default; inject a shared store for production rollouts.
  */
 import {
@@ -50,7 +50,7 @@ const PUBLIC_PATH_PATTERNS: ReadonlyArray<{ pattern: RegExp; endpointClass: Endp
   { pattern: /^\/v1\/auth(?:\/|$)/i, endpointClass: 'authentication' },
 ];
 
-/** Resolves a public API path to an endpoint quota class. */
+/** Resolves a public API path to an endpoint quota class.  */
 export function resolvePublicEndpointClass(path: string, method: string): EndpointClass | null {
   const normalized = path.split('?')[0] ?? path;
   if (method.toUpperCase() !== 'GET' && method.toUpperCase() !== 'HEAD') {

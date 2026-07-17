@@ -1,7 +1,8 @@
+
 /**
- * Black Book color tokens: white/black primary surfaces and ink, Copper Pin /
+ * Black Book color tokens: white/black primary surfaces and ink, Copper Pin
  * Page Sand brand accent, and reserved status hues.
- * Status colors are only for warning, confidence, dispute, and error — never decorative chrome.
+ * Status colors are only for warning, confidence, dispute, and error never decorative chrome.
  * Palette source: brandPalette (brand-palette.ts).
  */
 
@@ -35,7 +36,7 @@ export type ThemePalette = {
   readonly accent: string;
   /** Large-scale/graphic-only application of the brand accent (3:1 on canvas; not for body text). */
   readonly accentGraphic: string;
-  /** Decorative fill/background tint only — never used as a foreground color. */
+  /** Decorative fill/background tint only never used as a foreground color. */
   readonly accentMuted: string;
 };
 
@@ -211,7 +212,7 @@ export function criticalTextPairs(
   ];
 }
 
-/** UI component / focus indicator pairs that must meet 3:1. */
+/** UI component focus indicator pairs that must meet 3:1. */
 export function criticalUiPairs(
   theme: ThemeName,
 ): ReadonlyArray<readonly [string, string, string]> {

@@ -1,6 +1,6 @@
 /**
- * Versioned curated subreddit registry with add/remove audit (BB-074, mirrors ../rss/
- * feed-registry.ts's BB-073 acceptance criterion 6 pattern exactly). Reuses the BB-018
+ * Versioned curated subreddit registry with add/remove audit ( mirrors../rss/
+ * feed-registry.ts's pattern exactly). Reuses the 
  * append-only audit contract (../../audit/index.ts) rather than inventing a parallel shape:
  * every mutation returns a `DomainAuditEvent` using the existing
  * `administrative.configuration_changed` action.
@@ -107,7 +107,7 @@ function buildAuditEvent(input: {
 }
 
 /** Adds a curated subreddit to the registry. Throws if the id already exists or the name is
- *  not a valid Reddit community name. */
+ * not a valid Reddit community name. */
 export function addSubredditToRegistry(
   store: SubredditRegistryStore,
   input: AddSubredditInput,
@@ -150,7 +150,7 @@ export function addSubredditToRegistry(
 }
 
 /** Removes (soft-deletes) a curated subreddit. Throws if the id is missing, already removed, or
- *  no reason is supplied. */
+ * no reason is supplied. */
 export function removeSubredditFromRegistry(
   store: SubredditRegistryStore,
   id: string,
@@ -195,10 +195,9 @@ export function listActiveSubreddits(store: SubredditRegistryStore): readonly Su
 }
 
 /**
- * Small, realistic seed list per the bead's own text: r/AskHistorians, r/BlackHistory, and a
- * handful of city/state subs where family-history and neighborhood-memory leads plausibly
- * surface. Deliberately short — adding more is a one-line `addSubredditToRegistry` call, not a
- * code change (BB-074 acceptance criterion 2's "versioned config with add/remove capability").
+ * Small, realistic seed list: r/AskHistorians, r/BlackHistory, and a handful of city/state
+ * subs where family-history and neighborhood-memory leads plausibly surface. Deliberately
+ * short — adding more is a one-line `addSubredditToRegistry` call, not a code change.
  */
 export function defaultSubredditRegistrySeed(seedAt: string, addedBy = 'system:bb074-seed'): readonly SubredditRegistryEntry[] {
   const entries: Array<Omit<SubredditRegistryEntry, 'revision'>> = [

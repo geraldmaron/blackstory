@@ -1,5 +1,5 @@
 /**
- * Unit tests for BB-055 public status mapping — no moderation-sensitive leakage.
+ * Unit tests for public status mapping no moderation-sensitive leakage.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

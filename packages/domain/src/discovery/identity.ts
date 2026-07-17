@@ -1,5 +1,5 @@
 /**
- * Candidate identity and source reference helpers (BB-039).
+ * Candidate identity and source reference helpers.
  */
 import type { AdapterCandidateRecord } from '../adapters/types.js';
 import { hashUtf8, type ContentHash } from '../provenance/hashes.js';

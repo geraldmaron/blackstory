@@ -1,5 +1,5 @@
 /**
- * Server-only App Check verification for the public `/locate` geocode route (BB-050). Mirrors
+ * Server-only App Check verification for the public `/locate` geocode route. Mirrors
  * `apps/web/src/app/search/api/app-check-guard.ts` (itself a mirror of
  * `apps/web/src/app/submit/app-check-guard.ts`) so this endpoint enforces App Check through the
  * same guard factory (`createAppCheckGuard`), verifier (`createFirebaseAppCheckVerifier`), and
@@ -10,10 +10,10 @@
  * Same read-endpoint deviation as the search guard: `replayProtection` is `false`. This is a
  * GET/read endpoint (address/ZIP/coordinate lookup, never a write), and a browser legitimately
  * issues several idempotent lookups in quick succession (typing an address, retrying a location
- * permission prompt) — single-use token consumption would reject those as replays. The token is
+ * permission prompt) single-use token consumption would reject those as replays. The token is
  * still cryptographically verified either way.
  *
- * The `@black-book/firebase` import below is a dynamic `import()`, not a static one, for the same
+ * The `@black-book/firebase` import below is a dynamic `import`, not a static one, for the same
  * CJS/ESM interop reason documented in `../../search/api/app-check-guard.ts`.
  */
 import type {

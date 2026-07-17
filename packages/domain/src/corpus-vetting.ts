@@ -1,31 +1,31 @@
 /**
  * Corpus vetting record model + storage: one auditable vetting record per bulk-import corpus,
- * registered through the BB-037 source registry (BB-094).
+ * registered through the source registry.
  *
- * "Vet once, import bulk" (BB-094 design): rather than re-litigating licensing, custodianship,
- * and authority for every record a settled corpus (National Register, HABS/HAER, ...)
+ * "Vet once, import bulk": rather than re-litigating licensing, custodianship,
+ * and authority for every record a settled corpus (National Register, HABS/HAER,...)
  * contributes, the corpus itself is vetted ONCE and the verdict recorded here
- * (`CorpusVettingRecord`). Bulk batches then run exclusively through the existing BB-085
+ * (`CorpusVettingRecord`). Bulk batches then run exclusively through the existing 
  * CLI/quarantine pipeline (`packages/operator-cli/src/bulk-import.ts`), gated by
- * `assertCorpusVettedForBulkImport` below — an unvetted corpus, a corpus whose license verdict
+ * `assertCorpusVettedForBulkImport` below an unvetted corpus, a corpus whose license verdict
  * was never cleared for bulk import, or a corpus whose registry entry is
  * disabled/quarantined/dead-lettered/kill-switched all fail closed before a single record is
- * imported (BB-094 acceptance criterion 1).
+ * imported.
  *
- * Registration deliberately reuses the real BB-037 registry (`./adapters/registry.js`,
+ * Registration deliberately reuses the real registry (`./adapters/registry.js`,
  * `./adapters/gates.js`) instead of inventing a parallel enable/disable/kill-switch mechanism:
  * each vetted corpus becomes its own `SourceRegistryEntry` (adapterId `bulk-corpus:<corpus>`),
  * and clearing a corpus for import calls the existing `approveSourcePolicy` — the same
- * `registryState` / `approvedAt` / `approvedBy` / kill-switch fail-closed gate BB-037 already
+ * `registryState` `approvedAt` `approvedBy` kill-switch fail-closed gate already
  * built and tested (`assertAdapterMayRun`) is reused verbatim here, not re-implemented. Corpora
  * whose `licenseVerdict` is not cleared (e.g. `deferred-unverified`) are registered but never
- * approved, so `assertAdapterMayRun` fails closed on them automatically — no separate check
+ * approved, so `assertAdapterMayRun` fails closed on them automatically no separate check
  * could accidentally diverge from the registry's own state.
  *
- * These are dedicated, BB-094-owned registry entries distinct from any live discovery adapter —
- * e.g. the BB-046 federal adapter `nps-national-register-v1` also touches NPS data, but for a
+ * These are dedicated, -owned registry entries distinct from any live discovery adapter 
+ * e.g. the federal adapter `nps-national-register-v1` also touches NPS data, but for a
  * different, continuously-polled discovery workload with its own volume/canary expectations.
- * BB-094's corpus registry entries never mutate or depend on another bead's adapter state.
+ * corpus registry entries never mutate or depend on another team's adapter state.
  */
 import {
   approveSourcePolicy,
@@ -47,7 +47,7 @@ import { NOTABILITY_CRITERIA, type NotabilityCriterion } from './entity-status.j
 
 /**
  * License clearance verdict for a corpus. `deferred-unverified` and `rejected` are recorded
- * (never silently omitted) but are NOT eligible for bulk import — see
+ * (never silently omitted) but are NOT eligible for bulk import see
  * `isBulkImportEligibleLicenseVerdict`.
  */
 export const LICENSE_VERDICTS = [
@@ -64,7 +64,7 @@ export function isLicenseVerdict(value: string): value is LicenseVerdict {
   return (LICENSE_VERDICTS as readonly string[]).includes(value);
 }
 
-/** Verdicts cleared for bulk import; everything else fails closed (BB-094 acceptance criterion 1). */
+/** Verdicts cleared for bulk import; everything else fails closed. */
 export const BULK_IMPORT_ELIGIBLE_LICENSE_VERDICTS: readonly LicenseVerdict[] = [
   'public-domain',
   'permissive-license',
@@ -75,9 +75,9 @@ export function isBulkImportEligibleLicenseVerdict(verdict: LicenseVerdict): boo
   return (BULK_IMPORT_ELIGIBLE_LICENSE_VERDICTS as readonly string[]).includes(verdict);
 }
 
-/** Custodian authority tier — a corpus-level analog of source reputation, deliberately kept
- *  distinct from `promotion/model.ts`'s `SourceReputation` (that vocabulary evaluates individual
- *  evidence items across independent lineages; a corpus custodian isn't a lineage). */
+/** Custodian authority tier a corpus-level analog of source reputation, deliberately kept
+ * distinct from `promotion/model.ts`'s `SourceReputation` (that vocabulary evaluates individual
+ * evidence items across independent lineages; a corpus custodian isn't a lineage). */
 export const CORPUS_AUTHORITY_TIERS = [
   'federal_government',
   'state_or_local_government',
@@ -101,12 +101,12 @@ export function isRefreshCadence(value: string): value is RefreshCadence {
 }
 
 // ---------------------------------------------------------------------------
-// Boundary rules (BB-094 acceptance criterion 5)
+// Boundary rules 
 // ---------------------------------------------------------------------------
 
 /**
- * Corpora that belong to another bead's lane and must never be registered here. Statutes/cases
- * are BB-087's legal corpus; Tougaloo sundown-town data is BB-082's exclusion-infrastructure
+ * Corpora that belong to another team's lane and must never be registered here. Statutes/cases
+ * are legal corpus; Tougaloo sundown-town data is exclusion-infrastructure
  * layer. Both patterns are checked case-insensitively against the corpus slug so a differently
  * cased or hyphenated attempt still fails closed.
  */
@@ -128,7 +128,7 @@ export const EXCLUDED_CORPUS_LANES: readonly {
   },
 ];
 
-/** Fails closed when a corpus slug matches a lane reserved for another bead. */
+/** Fails closed when a corpus slug matches a lane reserved for another. */
 export function assertCorpusNotInExcludedLane(corpus: string): void {
   const match = EXCLUDED_CORPUS_LANES.find((exclusion) => exclusion.corpusSlugPattern.test(corpus));
   if (match) {
@@ -143,10 +143,10 @@ export function assertCorpusNotInExcludedLane(corpus: string): void {
 // ---------------------------------------------------------------------------
 
 /**
- * One vetting record per corpus (BB-094 acceptance criterion 1 shape):
+ * One vetting record per corpus:
  * `{corpus, custodian, licenseVerdict, authorityTier, provenanceFieldsRetained,
  * precisionExpectation, refreshCadence, vettedBy, vettedAt}`, plus the linkage back to its
- * BB-037 registry entry and the BB-090 notability criterion its corpus membership auto-derives.
+ * registry entry and the notability criterion its corpus membership auto-derives.
  */
 export type CorpusVettingRecord = {
   /** Stable corpus slug, e.g. "nrhp". Also the registry adapter suffix (`bulk-corpus:<corpus>`). */
@@ -156,19 +156,19 @@ export type CorpusVettingRecord = {
   readonly licenseVerdict: LicenseVerdict;
   readonly licenseNotes: string;
   readonly authorityTier: CorpusAuthorityTier;
-  /** Provenance fields retained per record (BB-016) — never fewer than the source documents. */
+  /** Provenance fields retained per record never fewer than the source documents. */
   readonly provenanceFieldsRetained: readonly string[];
-  /** Best-documented geoPrecision tier (BB-091) this corpus's records are expected at. */
+  /** Best-documented geoPrecision tier this corpus's records are expected at. */
   readonly precisionExpectation: GeoPrecisionTier;
-  /** True only for corpora whose records carry real polygon geometry (e.g. Mapping Inequality —
-   *  BB-094 acceptance criterion 7), never point+radius. */
+  /** True only for corpora whose records carry real polygon geometry (e.g. Mapping Inequality 
+   * ), never point+radius. */
   readonly requiresPolygonGeometry: boolean;
   readonly refreshCadence: RefreshCadence;
   readonly vettedBy: string;
   readonly vettedAt: string;
-  /** BB-037 registry entry id this vetting record is registered through. */
+  /** registry entry id this vetting record is registered through. */
   readonly sourceRegistryEntryId: string;
-  /** BB-090 notability criterion corpus membership in this corpus auto-derives per record. */
+  /** notability criterion corpus membership in this corpus auto-derives per record. */
   readonly notabilityCriterion: NotabilityCriterion;
   readonly citationRequirements?: string;
   readonly boundaryNotes?: string;
@@ -207,8 +207,8 @@ export function assertCorpusVettingRecordValid(record: CorpusVettingRecord): voi
 // Storage
 // ---------------------------------------------------------------------------
 
-/** Persistence boundary for corpus vetting records (Firestore adapter is a later bead, same
- *  shape as `./adapters/registry.js`'s `SourceRegistryStore`). */
+/** Persistence boundary for corpus vetting records (Firestore adapter is a later, same
+ * shape as `./adapters/registry.js`'s `SourceRegistryStore`). */
 export type CorpusVettingStore = {
   get(corpus: string): CorpusVettingRecord | undefined;
   list(): readonly CorpusVettingRecord[];
@@ -233,7 +233,7 @@ export function createInMemoryCorpusVettingStore(
 }
 
 // ---------------------------------------------------------------------------
-// Registration (BB-037 registry integration)
+// Registration 
 // ---------------------------------------------------------------------------
 
 export function corpusSourceRegistryEntryId(corpus: string): string {
@@ -260,7 +260,7 @@ export type RegisterCorpusVettingInput = {
   readonly notabilityCriterion: NotabilityCriterion;
   readonly citationRequirements?: string;
   readonly boundaryNotes?: string;
-  /** BB-016 `sourceClassifications()` token, e.g. "government_record". */
+  /** `sourceClassifications` token, e.g. "government_record". */
   readonly classification: string;
   readonly rights: RightsPolicy;
   readonly permittedClaimClasses: readonly string[];
@@ -272,7 +272,7 @@ export type RegisterCorpusVettingInput = {
 };
 
 /**
- * Registers (or re-registers) a corpus vetting record and its backing BB-037 registry entry in
+ * Registers (or re-registers) a corpus vetting record and its backing registry entry in
  * one step. Approves the registry entry immediately IFF the license verdict is bulk-import
  * eligible; otherwise the entry stays `disabled` so `assertCorpusVettedForBulkImport` fails
  * closed without any parallel check that could drift from the registry's own state.
@@ -365,8 +365,8 @@ export function registerCorpusVetting(
 
 /**
  * Explicitly blocks a previously-registered corpus (e.g. a license verdict is revoked, or the
- * kill switch needs to be engaged at the registry level). Mirrors `setRegistryState` — no
- * separate BB-094 disable path exists.
+ * kill switch needs to be engaged at the registry level). Mirrors `setRegistryState` no
+ * separate disable path exists.
  */
 export function quarantineCorpusRegistryEntry(
   registryStore: SourceRegistryStore,
@@ -381,9 +381,9 @@ export function quarantineCorpusRegistryEntry(
 }
 
 // ---------------------------------------------------------------------------
-// Kill switch (BB-035 pattern — mirrors `./adapters/federal/shared/kill-switch.ts` and
+// Kill switch (pattern mirrors `./adapters/federal/shared/kill-switch.ts` and
 // `./adapters/internet-archive/shared/kill-switch.ts`'s `adapter:<id>` convention exactly, with
-// a `corpus-bulk-import:` sub-scope so BB-094 kill switches can never collide with a live
+// a `corpus-bulk-import:` sub-scope so kill switches can never collide with a live
 // discovery adapter's kill switch id).
 // ---------------------------------------------------------------------------
 
@@ -425,7 +425,7 @@ export function assertCorpusBulkImportBudgetValid(budget: CorpusBulkImportBudget
   }
 }
 
-/** Fail-closed budget-cap gate (BB-094 acceptance criterion 2). */
+/** Fail-closed budget-cap gate. */
 export function assertWithinCorpusBulkImportBudget(input: {
   readonly budget: CorpusBulkImportBudget;
   readonly batchRecordCount: number;
@@ -451,7 +451,7 @@ export function assertWithinCorpusBulkImportBudget(input: {
 }
 
 // ---------------------------------------------------------------------------
-// The fail-closed gate (BB-094 acceptance criterion 1)
+// The fail-closed gate 
 // ---------------------------------------------------------------------------
 
 export type CorpusVettingGateResult = {
@@ -461,8 +461,8 @@ export type CorpusVettingGateResult = {
 
 /**
  * Fail-closed gate: throws unless the corpus has a vetting record, that record's license verdict
- * is cleared for bulk import, and its backing BB-037 registry entry may run (approved/canary
- * registry state, approved policy, kill switch not engaged) — see `assertAdapterMayRun`.
+ * is cleared for bulk import, and its backing registry entry may run (approved/canary
+ * registry state, approved policy, kill switch not engaged) see `assertAdapterMayRun`.
  */
 export function assertCorpusVettedForBulkImport(
   registryStore: SourceRegistryStore,

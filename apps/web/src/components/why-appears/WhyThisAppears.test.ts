@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke tests for the BB-054 "why this appears" component. Exercises the REAL
+ * SSR markup smoke tests for the "why this appears" component. Exercises the REAL
  * `buildPublicWhyThisAppears` composer from `@black-book/domain` rather than a hand-shaped fixture
  * object, so these tests fail if the domain composer's output shape ever drifts from what this
  * component renders.
@@ -40,7 +40,7 @@ test('renders the explanation and an auditable notabilityBasis list, never a sco
   assert.match(html, /Documented site/);
   assert.match(html, /Primary-source evidence ties this campus/);
   assert.match(html, /2 documented sources/);
-  // The heading copy explicitly reassures "not a score" — assert no actual numeric SCORE VALUE
+  // The heading copy explicitly reassures "not a score" assert no actual numeric SCORE VALUE
   // (a decimal like 0.82) ever renders, rather than banning the reassurance word itself.
   assert.doesNotMatch(html, /\b0\.\d{2,}\b/);
 });

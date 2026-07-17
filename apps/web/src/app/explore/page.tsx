@@ -1,5 +1,5 @@
 /**
- * Map-first national explore page (BB-051): full U.S. view of every geo-anchored entity in the
+ * Map-first national explore page: full U.S. view of every geo-anchored entity in the
  * active release, synchronized accessible results list, shareable URL state, narrative off-ramps,
  * and degraded snapshot mode. Filters use native GET navigation (no-JS safe); the client island
  * adds the interactive MapLibre canvas, cluster drill-down, and viewport URL sync.

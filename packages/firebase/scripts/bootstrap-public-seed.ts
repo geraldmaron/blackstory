@@ -1,17 +1,17 @@
 /**
- * Bootstrap a minimal public Firestore seed into black-book-efaaf (default DB).
+ * Bootstrap a minimal public Firestore seed into (default DB).
  *
  * Writes ONLY the public-read projection subset + policy pointer + a stub publication
  * release so `publicMeta/activeRelease` is coherent. Does NOT write quarantine/canonical
  * research collections.
  *
  * Requires:
- *   BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1
- *   Application Default Credentials with Firestore write access
+ * BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1
+ * Application Default Credentials with Firestore write access
  *
  * Usage:
- *   BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
- *     packages/firebase/scripts/bootstrap-public-seed.ts
+ * BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
+ * packages/firebase/scripts/bootstrap-public-seed.ts
  */
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
@@ -32,7 +32,7 @@ if (!ALLOW) {
   process.exit(2);
 }
 
-/** Public browse surface only — not submissions/canonical research. */
+/** Public browse surface only not submissions/canonical research.  */
 const PUBLIC_PATH_PREFIXES = [
   'policy/',
   'policyVersions/',

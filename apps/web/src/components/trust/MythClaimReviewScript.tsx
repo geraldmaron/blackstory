@@ -1,5 +1,5 @@
 /**
- * ClaimReview JSON-LD for the /myths surface ONLY (BB-088 AC6) — reviews of circulating third-party
+ * ClaimReview JSON-LD for the /myths surface ONLY reviews of circulating third-party
  * claims with a distinct external origin per Google eligibility rules.
  */
 import React from 'react';

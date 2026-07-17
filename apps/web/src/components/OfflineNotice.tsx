@@ -1,5 +1,5 @@
 /**
- * Client banner that surfaces an offline / degraded connectivity notice.
+ * Client banner that surfaces an offline degraded connectivity notice.
  */
 
 'use client';

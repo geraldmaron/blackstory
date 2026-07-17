@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke tests for the BB-051 narrative off-ramp card.
+ * SSR markup smoke tests for the narrative off-ramp card.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';

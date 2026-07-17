@@ -1,8 +1,8 @@
 /**
- * Tests for the BB-092 EntityRelationship vocabulary extensions: historical-causation edges,
+ * Tests for the EntityRelationship vocabulary extensions: historical-causation edges,
  * `authored`, the `attended` role qualifier, documented direction/temporal semantics, the causal
- * TemporalContext requirement (acceptance criterion 1), and the caused/enabled consensus-causation
- * guardrail (acceptance criterion 9 — CRITICAL).
+ * TemporalContext requirement, and the caused/enabled consensus-causation
+ * guardrail.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -32,7 +32,7 @@ const BASE: Pick<EntityRelationship, 'id' | 'fromEntityId' | 'toEntityId' | 'evi
 };
 
 // ---------------------------------------------------------------------------
-// Acceptance criterion 1 & 7: vocabulary extension + documented direction/temporal semantics.
+// vocabulary extension + documented direction/temporal semantics.
 // ---------------------------------------------------------------------------
 
 test('RELATIONSHIP_TYPES carries the full BB-092 vocabulary extension', () => {
@@ -80,7 +80,7 @@ test('assertRelationshipHasEvidence still holds for every BB-092 edge type, new 
 });
 
 // ---------------------------------------------------------------------------
-// Acceptance criterion 1: causal edges require a TemporalContext.
+// causal edges require a TemporalContext.
 // ---------------------------------------------------------------------------
 
 test('CAUSAL_HISTORICAL_RELATIONSHIP_TYPES requires TemporalContext for caused/enabled/influenced/overturned', () => {
@@ -115,7 +115,7 @@ test('assertRelationshipTemporalRequirement does not require TemporalContext for
 });
 
 // ---------------------------------------------------------------------------
-// Acceptance criterion 7: attended role qualifier.
+// attended role qualifier.
 // ---------------------------------------------------------------------------
 
 test('RELATIONSHIP_ROLES carries organizer|speaker|participant', () => {
@@ -148,7 +148,7 @@ test('a full attended EntityRelationship with role and evidence is well-formed',
 });
 
 // ---------------------------------------------------------------------------
-// Acceptance criterion 9 (CRITICAL): caused/enabled consensus-causation guardrail. Proves the
+// caused/enabled consensus-causation guardrail. Proves the
 // distinction is enforced, not merely commented: a contested/single-incident causal claim is
 // rejected and routed to `cites`; a settled systemic claim with a documented basis is allowed.
 // ---------------------------------------------------------------------------
@@ -216,8 +216,8 @@ test('guardrail is a no-op (always allowed) for every non-caused/enabled type, i
 });
 
 test('guardrail distinction is exercised end-to-end: two claims about the same predicate, different scope, different outcome', () => {
-  // Same edge type ("enabled"), same entities — the ONLY difference is the reviewed scope. This
-  // is the exact distinction acceptance criterion 9 requires: a specific statute "enabling" a
+  // Same edge type ("enabled"), same entities the ONLY difference is the reviewed scope. This
+  // is the exact distinction requires: a specific statute "enabling" a
   // specific act of violence (contested/single-incident) must be rejected, while a documented
   // systemic policy enabling a measurable, consensus-recognized outcome is allowed.
   const contestedSingleIncident = evaluateCausalEdgeGuardrail('enabled', {

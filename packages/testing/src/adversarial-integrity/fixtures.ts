@@ -1,5 +1,6 @@
+
 /**
- * Deterministic fixtures shared by BB-060 adversarial integrity scenario runners.
+ * Deterministic fixtures shared by adversarial integrity scenario runners.
  */
 import type { ClaimEvidenceLink } from '@black-book/domain';
 import type { PromotionClaim, PromotionEvidence } from '@black-book/domain';

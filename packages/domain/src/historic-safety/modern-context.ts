@@ -1,21 +1,21 @@
 /**
- * Layer 5 — modern context. Handled with extreme care, per the bead design:
+ * Layer 5 modern context. Handled with extreme care, per the design:
  *
- *   - FBI annual hate-crime statistics (bias-motivated incidents) are the primary modern signal.
- *     They render as an ordinary `LayerSignal` (methodology, citations, as-of date) so they get
- *     the same layered-signal treatment as layers 1-4 for DISPLAY purposes \u2014 but layer 5 is
- *     NEVER composite-eligible (see ../types.js's `COMPOSITE_ELIGIBLE_LAYER_IDS`, which omits
- *     `modern_context` entirely) and this module's `methodologyNote.biasCaveat` is always
- *     populated (AC2's "explicit bias caveat" requirement).
- *   - General crime reporting (FBI CDE/NIBRS) is recorded ONLY as clearly labeled context with an
- *     explicit bias caveat, using `GeneralCrimeContextRecord` from ./scoring-guard.ts \u2014 a type
- *     that deliberately has NO numeric "score" field a caller could mistake for a `LayerSignal`
- *     and feed into anything. `buildGeneralCrimeContextView` never returns a `LayerSignal`.
- *   - NAACP-style travel advisories are BB-095's own claims (../advisory.ts `PlaceAdvisoryRecord`)
- *     and surface EXCLUSIVELY through BB-095's advisory presentation \u2014 this module does not
- *     define a parallel advisory type; `modernContextAdvisoryPointer` is a thin, read-only
- *     pointer helper so a caller assembling a Layer 5 view can find a place's advisories without
- *     this module ever holding, deriving from, or scoring advisory data itself.
+ * - FBI annual hate-crime statistics (bias-motivated incidents) are the primary modern signal.
+ * They render as an ordinary `LayerSignal` (methodology, citations, as-of date) so they get
+ * the same layered-signal treatment as layers 1-4 for DISPLAY purposes \u2014 but layer 5 is
+ * NEVER composite-eligible (see ../types.js's `COMPOSITE_ELIGIBLE_LAYER_IDS`, which omits
+ * `modern_context` entirely) and this module's `methodologyNote.biasCaveat` is always
+ * populated.
+ * - General crime reporting (FBI CDE/NIBRS) is recorded ONLY as clearly labeled context with an
+ * explicit bias caveat, using `GeneralCrimeContextRecord` from ./scoring-guard.ts \u2014 a type
+ * that deliberately has NO numeric "score" field a caller could mistake for a `LayerSignal`
+ * and feed into anything. `buildGeneralCrimeContextView` never returns a `LayerSignal`.
+ * - NAACP-style travel advisories are own claims (../advisory.ts `PlaceAdvisoryRecord`)
+ * and surface EXCLUSIVELY through advisory presentation \u2014 this module does not
+ * define a parallel advisory type; `modernContextAdvisoryPointer` is a thin, read-only
+ * pointer helper so a caller assembling a Layer 5 view can find a place's advisories without
+ * this module ever holding, deriving from, or scoring advisory data itself.
  */
 import type { PlaceAdvisoryRecord } from '../advisory.js';
 import { GENERAL_CRIME_CONTEXT_BIAS_CAVEAT, type GeneralCrimeContextRecord } from './scoring-guard.js';
@@ -30,7 +30,7 @@ export const HATE_CRIME_BIAS_CAVEAT =
   'but is still one dated, cited data point \u2014 not a real-time safety assessment.';
 
 /** Published linear saturation cap (methodology, versioned above): incident counts at or above
- *  this threshold reach the maximum [0,1] signal value; below it, the value scales linearly. */
+ * this threshold reach the maximum [0,1] signal value; below it, the value scales linearly. */
 export const HATE_CRIME_SATURATION_INCIDENT_COUNT = 5;
 
 export type HateCrimeStatRecord = {
@@ -104,7 +104,7 @@ export function computeModernContextLayerSignal(
 }
 
 // ---------------------------------------------------------------------------
-// General crime — labeled context only, never a LayerSignal, never scored
+// General crime labeled context only, never a LayerSignal, never scored
 // ---------------------------------------------------------------------------
 
 export type BuildGeneralCrimeContextViewInput = {
@@ -136,7 +136,7 @@ export function buildGeneralCrimeContextView(
 }
 
 /** Fails closed if the mandatory bias caveat is missing or altered \u2014 the caveat text is not
- *  caller-configurable. */
+ * caller-configurable. */
 export function assertGeneralCrimeContextValid(record: GeneralCrimeContextRecord): void {
   if (!record.placeEntityId.trim()) throw new Error('GeneralCrimeContextRecord.placeEntityId is required');
   if (!Number.isFinite(Date.parse(record.asOf))) {
@@ -151,7 +151,7 @@ export function assertGeneralCrimeContextValid(record: GeneralCrimeContextRecord
   }
   // Defense-in-depth: even this labeled-context-only record must never carry a composite/scoring
   // shape (e.g. an accidental `value` or `score` field bolted on by a future edit). Its own
-  // crime-context field names (nibrsOffenseCount, etc.) are expected here — only composite shapes
+  // crime-context field names (nibrsOffenseCount, etc.) are expected here only composite shapes
   // are forbidden.
   const forbiddenScoringShapeKeys = ['value', 'score', 'layerContributions', 'layerId', 'missingLayers'] as const;
   for (const key of forbiddenScoringShapeKeys) {
@@ -165,12 +165,12 @@ export function assertGeneralCrimeContextValid(record: GeneralCrimeContextRecord
 }
 
 // ---------------------------------------------------------------------------
-// Advisory pointer — BB-095 owns the record and the presentation, this is read-only
+// Advisory pointer owns the record and the presentation, this is read-only
 // ---------------------------------------------------------------------------
 
 /**
  * Filters an already-loaded advisory list down to one place \u2014 a convenience pointer, not a
- * new advisory type or a scoring path. Callers should render the result through BB-095's own
+ * new advisory type or a scoring path. Callers should render the result through own
  * presentation (`apps/web/src/components/AdvisoryNotice.tsx`, `../disclaimers.js`'s
  * `safety_advisory` disclaimer), never through this package's own historic-safety presenters.
  */

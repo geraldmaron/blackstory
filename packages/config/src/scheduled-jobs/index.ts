@@ -1,7 +1,8 @@
+
 /**
- * BB-084: scheduled-job registry public surface. The framework other beads' recurring jobs
- * plug into — see types.ts for the full design note and packages/config/src/scheduled-jobs/
- * roster.ts for the initial job roster (real vs stub entries clearly marked).
+ * Scheduled-job registry public surface. Other packages' recurring jobs plug into this
+ * framework — see types.ts for the design note and roster.ts for the initial job roster
+ * (real vs stub entries clearly marked).
  */
 export {
   SCHEDULED_JOB_REGISTRY_VERSION,

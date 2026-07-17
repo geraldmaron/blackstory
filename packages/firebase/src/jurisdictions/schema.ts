@@ -1,8 +1,9 @@
+
 /**
- * Firestore document schema for the BB-091 `jurisdictions` collection.
+ * Firestore document schema for the `jurisdictions` collection.
  *
  * Instantiates the existing `Jurisdiction` domain type
- * (packages/domain/src/geography/location.ts — `id`, `kind`, `name`, `parentId`, `validFrom`,
+ * (packages/domain/src/geography/location.ts `id`, `kind`, `name`, `parentId`, `validFrom`,
  * `validTo`) as real storage, extended with the fields the collection actually needs to be
  * useful (FIPS code, bbox, centroid, source dataset provenance). This mirrors the existing
  * convention in packages/firebase/src/firestore/types.ts of a Firestore doc schema that
@@ -10,19 +11,15 @@
  * `entityKindSchema` there, a local zod enum mirroring domain's `EntityKind`).
  *
  * `jurisdictionKindSchema` mirrors `packages/domain/src/geography/location.ts`'s
- * `JurisdictionKind` values exactly — kept in sync by hand today because the domain barrel
- * (`packages/domain/src/index.ts`) already exports `JurisdictionKind`, but importing it here
- * would require also importing GeoGeometry-adjacent types across the package boundary in a
- * way this bead's file ownership does not extend to touching (`firestore/types.ts`). If a
- * future pass adds `city`-kind values here (on-demand place docs, see the ADR), update this
- * enum and the domain enum together.
+ * `JurisdictionKind` values. Kept in sync by hand because importing from the domain barrel
+ * would also pull GeoGeometry-adjacent types across the package boundary. If a future pass
+ * adds `city`-kind values here (on-demand place docs, see the ADR), update this enum and the
+ * domain enum together.
  *
- * This module intentionally lives in its own `jurisdictions/` directory rather than being
- * folded into `firestore/types.ts` / `firestore/converters.ts` / `firestore/index.ts`: this
- * bead's file ownership does not include editing those files (they are barrel-shaped and
- * actively edited elsewhere this session), so the schema, converter, loader, and resolver for
- * this one new collection are fully self-contained here. See the final report for the
- * follow-up barrel-wiring this implies.
+ * This module lives in its own `jurisdictions/` directory rather than being folded into
+ * `firestore/types.ts` / `firestore/converters.ts` / `firestore/index.ts`, so the schema,
+ * converter, loader, and resolver for this collection stay self-contained. Barrel exports
+ * can be wired from those files when ready.
  */
 import { z } from 'zod';
 
@@ -39,7 +36,7 @@ export const jurisdictionKindSchema = z.enum([
 
 export type JurisdictionKindDoc = z.infer<typeof jurisdictionKindSchema>;
 
-/** [west, south, east, north] in decimal degrees — same shape used throughout this repo. */
+/** [west, south, east, north] in decimal degrees same shape used throughout this repo. */
 export const jurisdictionBBoxSchema = z.tuple([z.number(), z.number(), z.number(), z.number()]);
 
 export type JurisdictionBBoxDoc = z.infer<typeof jurisdictionBBoxSchema>;
@@ -50,6 +47,7 @@ export const jurisdictionCentroidSchema = z.object({
 });
 
 export type JurisdictionCentroidDoc = z.infer<typeof jurisdictionCentroidSchema>;
+
 
 /**
  * Where the bbox came from, so a coarse Gazetteer-only approximation is never confused with a
@@ -109,10 +107,11 @@ export function countyJurisdictionId(stateFips: string, countyFips3: string): st
   return `us-${stateFips}-${countyFips3}`;
 }
 
+
 /**
  * Minimal Firestore data-converter shape, duplicated locally (not imported from
  * `firestore/converters.ts`'s private `createConverter` helper, which is not exported and
- * whose file this bead does not own) so this module has no dependency on files outside its
+ * whose file this does not own) so this module has no dependency on files outside its
  * own directory.
  */
 export type MinimalFirestoreConverter<T> = {

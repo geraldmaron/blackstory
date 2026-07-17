@@ -1,5 +1,5 @@
 /**
- * Edge citation panel for BB-093 progressive disclosure — exposes relationship evidence within
+ * Edge citation panel for progressive disclosure exposes relationship evidence within
  * two interactions (select edge → view citations). No evidence-free connection renders in the
  * graph slice builder; this panel surfaces the backing citations for the selected edge.
  */

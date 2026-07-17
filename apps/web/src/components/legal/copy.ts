@@ -1,5 +1,5 @@
 /**
- * Presentation copy for BB-087 legal landscape web components.
+ * Presentation copy for legal landscape web components.
  */
 export const LEGAL_DISCLAIMER_TITLE = 'Not legal advice';
 export const LEGAL_DISCLAIMER_BODY =

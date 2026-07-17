@@ -1,5 +1,5 @@
 /**
- * Unit tests for BB-018 audit categories and deterministic publication-history reconstruction.
+ * Unit tests for audit categories and deterministic publication-history reconstruction.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

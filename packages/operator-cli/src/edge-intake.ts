@@ -1,21 +1,19 @@
+
 /**
- * Edge intake: propose a new `EntityRelationship` (BB-092 acceptance criterion 6 — "edge intake
- * flows through the existing operator CLI/research-case pipeline, no parallel writer"). Every
- * proposal lands in the SAME BB-029 quarantine pipeline `./intake.ts`'s `prepareOperatorIntake`
- * already uses (`createQuarantinedSubmission`, `@black-book/security`) and opens a draft BB-044
- * research case exactly like `prepareLeadIntake` does — this file adds ZERO new Firestore write
- * paths; it only shapes an `OperatorSubmission` describing the proposed edge and calls the
- * existing exported `prepareOperatorIntake`. Nothing here writes an `entityRelationships`
- * document directly — that stays the reviewer-gated promotion path's job, same as every other
- * operator-cli proposal (see `./intake.ts`'s module doc for the boundary this package cannot
- * cross).
+ * Edge intake: propose a new `EntityRelationship` through the existing operator
+ * CLI/research-case pipeline (no parallel writer). Every proposal lands in the SAME quarantine
+ * pipeline `./intake.ts`'s `prepareOperatorIntake` already uses (`createQuarantinedSubmission`,
+ * `@black-book/security`) and opens a draft research case exactly like `prepareLeadIntake` does.
+ * This file adds ZERO new Firestore write paths; it only shapes an `OperatorSubmission`
+ * describing the proposed edge and calls the existing exported `prepareOperatorIntake`. Nothing
+ * here writes an `entityRelationships` document directly — that stays the reviewer-gated
+ * promotion path's job (see `./intake.ts`'s module doc).
  *
  * `caused`/`enabled` edges are hard-gated at THIS layer via `assertCausalEdgeGuardrail`
- * (`@black-book/domain`, BB-092 acceptance criterion 9) — a `contested_or_single_incident` scope,
- * or an omitted `causalReview` altogether, is REJECTED here before the proposal ever reaches
- * quarantine, with an explicit instruction to submit via `cites` instead. This is the "reviewed
- * at intake, not left to submitter judgment" enforcement point the acceptance criterion requires:
- * silence (no `causalReview` supplied) defaults to rejection, never to permissiveness.
+ * (`@black-book/domain`). A `contested_or_single_incident` scope, or an omitted `causalReview`
+ * altogether, is REJECTED here before the proposal ever reaches quarantine, with an explicit
+ * instruction to submit via `cites` instead. Silence (no `causalReview` supplied) defaults to
+ * rejection, never to permissiveness.
  */
 import {
   assertCausalEdgeGuardrail,
@@ -37,12 +35,12 @@ export type EdgeIntakeInput = {
   readonly fromEntityId: string;
   readonly toEntityId: string;
   readonly type: RelationshipType;
-  /** Only valid when `type === 'attended'` (BB-092) — see `assertRelationshipRoleValidForType`. */
+  /** Only valid when `type === 'attended'` see `assertRelationshipRoleValidForType`. */
   readonly role?: RelationshipRole;
   readonly temporal?: TemporalContext;
   readonly notes?: string;
   readonly sourceUrls: readonly string[];
-  /** Required for `caused`/`enabled` (BB-092 acceptance criterion 9); ignored for every other
+  /** Required for `caused`/`enabled`; ignored for every other
    * type. Omitting it for a `caused`/`enabled` proposal is a hard rejection, not a soft default. */
   readonly causalReview?: CausalEdgeReview;
   readonly submitterContact?: string;
@@ -114,21 +112,22 @@ function assertTemporalRequirement(input: EdgeIntakeInput): void {
   }
 }
 
+
 /**
- * Validates and prepares a proposed `EntityRelationship` for the same BB-029 quarantine intake
+ * Validates and prepares a proposed `EntityRelationship` for the same quarantine intake
  * path every other operator-cli proposal uses. Throws (fails closed) BEFORE calling into
  * quarantine when:
- *  - `type` is not a recognized `RelationshipType` (fail closed on typos);
- *  - `role` is set on a non-`attended` type, or is not a recognized `RelationshipRole`;
- *  - a historical-causation type (`caused`/`enabled`/`influenced`/`overturned`) is missing a
- *    `TemporalContext.validFrom`;
- *  - `type` is `caused`/`enabled` and the causal-edge guardrail rejects the proposal (BB-092
- *    acceptance criterion 9) — always true when `causalReview` is omitted or its scope is
- *    `contested_or_single_incident`.
+ * - `type` is not a recognized `RelationshipType` (fail closed on typos);
+ * - `role` is set on a non-`attended` type, or is not a recognized `RelationshipRole`;
+ * - a historical-causation type (`caused`/`enabled`/`influenced`/`overturned`) is missing a
+ * `TemporalContext.validFrom`;
+ * - `type` is `caused`/`enabled` and the causal-edge guardrail rejects the proposal
+ * (always true when `causalReview` is omitted or its scope is
+ * `contested_or_single_incident`).
  *
  * Downstream validation (title/statement length, source-URL requirements, rate limiting) is left
- * entirely to the real `createQuarantinedSubmission` this delegates to — this function does not
- * duplicate that logic, only the edge-specific checks above that have no equivalent there.
+ * entirely to the real `createQuarantinedSubmission` — this delegates to. This function does not
+ * duplicate that logic — only the edge-specific checks above that have no equivalent there.
  */
 export function prepareEdgeIntake(
   input: EdgeIntakeInput,

@@ -1,14 +1,14 @@
 /**
- * BB-082's own source registrations for datasets with specific citation requirements: EJI
+ * own source registrations for datasets with specific citation requirements: EJI
  * (Seguin-Rigby lynching records) and the Tougaloo College Historical Database of Sundown Towns.
  *
- * BOUNDARY (mirrors ../launch-corpora.ts's own boundary rule exactly): Mapping Inequality (HOLC
+ * BOUNDARY (mirrors../launch-corpora.ts's own boundary rule exactly): Mapping Inequality (HOLC
  * redlining, Univ. of Richmond DSL/NARA) and the EJI-linked "documented massacres and riots"
- * corpus are ALREADY registered ONCE through the BB-037/BB-094 launch-corpus lane
- * (`../launch-corpora.ts`'s `mapping-inequality-holc` and `documented-massacres-riots`, AC12).
+ * corpus are ALREADY registered ONCE through the launch-corpus lane
+ * (`../launch-corpora.ts`'s `mapping-inequality-holc` and `documented-massacres-riots`, ).
  * This module never re-registers them \u2014 `referenceExistingLaunchCorpus` below only points at
  * their existing `corpusSourceRegistryEntryId`, exactly as `mapping-inequality-holc`'s own
- * `boundaryNotes` field already documents ("referenced by BB-082, never re-ingested by BB-082 as
+ * `boundaryNotes` field already documents ("referenced by, never re-ingested by as
  * a second copy").
  *
  * Tougaloo sundown-town data is explicitly EXCLUDED from that lane
@@ -16,7 +16,7 @@
  * this module) because it is not a bulk-geometry corpus import \u2014 it is individual,
  * claims-with-confidence town designations (../layer-record.ts's `SundownTownDesignationRecord`).
  * EJI's lynching-record dataset (distinct from the already-registered massacres/riots corpus)
- * gets the same treatment: its own BB-082-owned registration, with EJI's specific citation terms
+ * gets the same treatment: its own -owned registration, with EJI's specific citation terms
  * recorded verbatim.
  */
 import {
@@ -31,17 +31,17 @@ import type { RightsPolicy } from '../provenance/rights.js';
 import type { HistoricSafetyLayerId } from './types.js';
 
 // ---------------------------------------------------------------------------
-// References to already-registered BB-094 launch corpora (read-only pointers, no re-registration)
+// References to already-registered launch corpora (read-only pointers, no re-registration)
 // ---------------------------------------------------------------------------
 
-/** Launch-corpus slugs this engine's layers draw on without re-registering (AC12 boundary rule). */
+/** Launch-corpus slugs this engine's layers draw on without re-registering. */
 export const REFERENCED_LAUNCH_CORPUS_SLUGS = {
   exclusion_infrastructure: 'mapping-inequality-holc',
   documented_events_massacres_riots: 'documented-massacres-riots',
 } as const;
 
-/** Resolves the BB-037 registry entry id an already-registered BB-094 launch corpus uses \u2014
- *  a pure pointer helper, never a second registration. */
+/** Resolves the registry entry id an already-registered launch corpus uses \u2014
+ * a pure pointer helper, never a second registration. */
 export function referencedLaunchCorpusRegistryEntryId(
   corpusSlug: (typeof REFERENCED_LAUNCH_CORPUS_SLUGS)[keyof typeof REFERENCED_LAUNCH_CORPUS_SLUGS],
 ): string {
@@ -49,7 +49,7 @@ export function referencedLaunchCorpusRegistryEntryId(
 }
 
 // ---------------------------------------------------------------------------
-// BB-082-owned registrations: EJI lynching records, Tougaloo sundown towns
+// -owned registrations: EJI lynching records, Tougaloo sundown towns
 // ---------------------------------------------------------------------------
 
 export const HISTORIC_SAFETY_SOURCE_IDS = ['eji-lynching-records', 'tougaloo-sundown-towns'] as const;
@@ -60,10 +60,10 @@ export function isHistoricSafetySourceId(value: string): value is HistoricSafety
 }
 
 /**
- * One registration per BB-082-owned dataset: custodian, licensing notes, the layer it feeds, and
- * MANDATORY citation requirements (unlike ../corpus-vetting.ts's `CorpusVettingRecord`, where
- * `citationRequirements` is optional \u2014 EJI and Tougaloo both have specific, non-optional
- * citation terms per the bead's own text, so this field is required here).
+ * One registration per owned dataset: custodian, licensing notes, the layer it feeds, and
+ * mandatory citation requirements (unlike `../corpus-vetting.ts`'s `CorpusVettingRecord`, where
+ * `citationRequirements` is optional — EJI and Tougaloo both have specific, non-optional
+ * citation terms, so this field is required here).
  */
 export type HistoricSafetySourceRegistration = {
   readonly sourceId: HistoricSafetySourceId;
@@ -73,7 +73,7 @@ export type HistoricSafetySourceRegistration = {
   readonly citationRequirements: string;
   readonly licenseNotes: string;
   readonly refreshCadence: string;
-  /** BB-037 registry entry id this registration is backed by (see `registerHistoricSafetySource`). */
+  /** registry entry id this registration is backed by (see `registerHistoricSafetySource`). */
   readonly sourceRegistryEntryId: string;
   readonly registeredBy: string;
   readonly registeredAt: string;
@@ -149,9 +149,9 @@ export type RegisterHistoricSafetySourceInput = {
 };
 
 /**
- * Registers a BB-082-owned dataset through the SAME low-level BB-037 registry primitive every
+ * Registers a -owned dataset through the SAME low-level registry primitive every
  * other adapter uses (`registerSource`, `../adapters/registry.js`) \u2014 approved immediately
- * (BB-082's own registrations are not subject to BB-094's bulk-import license-verdict gate,
+ * (own registrations are not subject to bulk-import license-verdict gate,
  * which is a different gate for a different lane) \u2014 and records the citation-requirement
  * metadata alongside it.
  */
@@ -227,7 +227,7 @@ export function registerHistoricSafetySource(
 }
 
 /**
- * Registration inputs for both BB-082-owned sources, ready for a caller to pass to
+ * Registration inputs for both -owned sources, ready for a caller to pass to
  * `registerHistoricSafetySource` (mirrors `../launch-corpora.ts`'s
  * `buildLaunchCorpusVettingInputs` shape/convention). `rights`/`permittedClaimClasses` are
  * supplied by the caller so a real registration always carries an accountable, reviewed rights
@@ -287,7 +287,7 @@ export function buildHistoricSafetySourceRegistrationInputs(input: {
   ];
 }
 
-/** Registers both BB-082-owned sources in one step; returns the registrations in list order. */
+/** Registers both -owned sources in one step; returns the registrations in list order. */
 export function registerHistoricSafetySources(
   registryStore: SourceRegistryStore,
   sourceRegistryStore: HistoricSafetySourceRegistryStore,

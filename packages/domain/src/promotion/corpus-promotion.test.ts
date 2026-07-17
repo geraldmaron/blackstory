@@ -1,5 +1,5 @@
 /**
- * Streamlined corpus-bulk promotion decision logic and per-batch report (BB-094).
+ * Streamlined corpus-bulk promotion decision logic and per-batch report.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

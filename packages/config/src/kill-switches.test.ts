@@ -1,5 +1,6 @@
+
 /**
- * BB-035 acceptance tests for independent, default-safe runtime kill switches.
+ * acceptance tests for independent, default-safe runtime kill switches.
  * Covers static read-only serving, queue retention, adapter isolation, and containment order.
  */
 

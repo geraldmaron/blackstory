@@ -1,6 +1,6 @@
 /**
  * Tests for kind-specific entity status vocabularies, time-scoped status history, the
- * notability-basis rubric, and the sensitivity schema (BB-090).
+ * notability-basis rubric, and the sensitivity schema.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -22,7 +22,7 @@ import {
 test('kind-specific status vocabularies match the BB-090 spec exactly', () => {
   assert.deepEqual(PLACE_LIKE_STATUSES, ['active', 'historic', 'inactive']);
   assert.deepEqual(LAW_STATUSES, ['in_force', 'amended', 'repealed', 'struck_down', 'enjoined']);
-  // Movements conclude, they don't pause — no "inactive".
+  // Movements conclude, they don't pause no "inactive".
   assert.deepEqual(MOVEMENT_STATUSES, ['active', 'historic']);
 });
 

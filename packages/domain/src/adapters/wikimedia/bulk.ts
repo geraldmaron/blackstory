@@ -1,5 +1,5 @@
 /**
- * Bulk Wikimedia dump-style processing path (BB-045). Avoids high-volume public SPARQL dependence.
+ * Bulk Wikimedia dump-style processing path. Avoids high-volume public SPARQL dependence.
  */
 import type { WikimediaBulkBatch, WikimediaBulkPageRecord } from './types.js';
 

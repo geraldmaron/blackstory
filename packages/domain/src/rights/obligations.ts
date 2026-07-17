@@ -1,18 +1,18 @@
 /**
- * Per-source legal/contractual obligations registry (BB-077).
+ * Per-source legal/contractual obligations registry.
  *
- * Extends the BB-016 rights model (../provenance/rights.js, ../provenance/source.js) with
- * per-source-class obligations that the crowdsource/UGC lane (BB-073/074/075/076) must honor:
+ * Extends the rights model (../provenance/rights.js,../provenance/source.js) with
+ * per-source-class obligations that the crowdsource/UGC lane must honor:
  * deletion-sync windows, republication/ML-training prohibitions, storage-rights-tier gates,
  * and attribution/liveness re-check requirements.
  *
- * This mirrors the BB-037 adapter registry's fail-closed pattern exactly
- * (../adapters/registry.ts, ../adapters/gates.ts assertAdapterMayRun): a lookup with no
+ * This mirrors the adapter registry's fail-closed pattern exactly
+ * (../adapters/registry.ts,../adapters/gates.ts assertAdapterMayRun): a lookup with no
  * matching entry throws rather than defaulting to "no obligations". An adapter cannot run
- * without both an approved BB-037 registry entry *and* a registered BB-077 obligations entry.
+ * without both an approved registry entry *and* a registered obligations entry.
  */
 
-/** Named source classes the bead calls out explicitly; extend as new UGC adapters land. */
+/** Named source classes the calls out explicitly; extend as new UGC adapters land. */
 export const OBLIGATION_SOURCE_CLASSES = [
   'reddit',
   'brave_search',
@@ -35,7 +35,7 @@ export type DeletionSyncObligation = {
 };
 
 export type SourceObligations = {
-  /** Matches SourceAdapterContract.adapterId / EvidenceSource.adapterId (BB-016/BB-037). */
+  /** Matches SourceAdapterContract.adapterId EvidenceSource.adapterId. */
   readonly adapterId: string;
   readonly sourceClass: ObligationSourceClass;
   readonly deletionSync: DeletionSyncObligation;
@@ -46,7 +46,7 @@ export type SourceObligations = {
   /** A resolved storage-rights tier is required before caching beyond a pointer/snippet. */
   readonly storageRightsTierRequired: boolean;
   readonly attributionRequired: boolean;
-  /** Periodic re-check that the underlying source item / account still exists and is public. */
+  /** Periodic re-check that the underlying source item account still exists and is public. */
   readonly livenessRecheckRequired: boolean;
   readonly livenessRecheckIntervalDays?: number;
   readonly notes?: string;
@@ -120,7 +120,7 @@ export function assertAdapterHasObligations(store: ObligationsRegistryStore, ada
 }
 
 /**
- * Default obligations seed for the sources named in the BB-077 bead. `seedAt` is supplied by
+ * Default obligations seed for the sources named in the. `seedAt` is supplied by
  * the caller so seeding stays deterministic in tests and reproducible in migrations.
  */
 export function defaultSourceObligationsSeed(seedAt: string): readonly SourceObligations[] {

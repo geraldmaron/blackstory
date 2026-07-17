@@ -1,3 +1,4 @@
+
 /**
  * Fail-closed production service guards for the test suite.
  * Tests must never target production Firebase, Cloud SQL, or GCP projects.
@@ -22,9 +23,10 @@ const LOCAL_HOST_PATTERN =
 
 const DEMO_PROJECT_PATTERN = /^(demo-|test-|local-|dev-)/i;
 
+
 /**
  * Explicit override for rare break-glass scenarios. Prefer never setting this.
- * Even with the override, Cloud SQL / Firebase production project IDs still fail.
+ * Even with the override, Cloud SQL Firebase production project IDs still fail.
  */
 export const PRODUCTION_OVERRIDE_ENV = 'BLACK_BOOK_ALLOW_PRODUCTION_TESTS';
 

@@ -1,6 +1,7 @@
+
 /**
- * Embedding provider abstraction (BB-071). Everything downstream (the pipeline, the backfill
- * CLI, the gold-corpus eval) depends on this interface, not on any specific SDK — that's the
+ * Embedding provider abstraction. Everything downstream (the pipeline, the backfill
+ * CLI, the gold-corpus eval) depends on this interface, not on any specific SDK that's the
  * "control over model, dims, retries" the pre-GA `firestore-vector-search` extension can't give
  * us. `gemini-provider.ts` implements it against the real API; `createDeterministicMockEmbeddingProvider`
  * below implements it for tests/CI without any network access.
@@ -25,7 +26,7 @@ export type EmbeddingProvider = {
 export type RetryOptions = {
   readonly maxAttempts?: number;
   readonly baseDelayMs?: number;
-  /** Injectable for deterministic tests — defaults to a real setTimeout-based sleep. */
+  /** Injectable for deterministic tests defaults to a real setTimeout-based sleep. */
   readonly sleep?: (ms: number) => Promise<void>;
 };
 
@@ -36,8 +37,9 @@ function defaultSleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+
 /**
- * Wraps a provider with bounded exponential-backoff retries. Retries the whole batch call —
+ * Wraps a provider with bounded exponential-backoff retries. Retries the whole batch call
  * gemini-embedding-001 batches are small enough (one entity's text per call) that partial-retry
  * bookkeeping isn't worth the complexity.
  */
@@ -77,7 +79,7 @@ export function createRetryingEmbeddingProvider(
 }
 
 function stableStringHash(value: string): number {
-  // FNV-1a — fast, dependency-free, and stable across Node versions.
+  // FNV-1a fast, dependency-free, and stable across Node versions.
   let hash = 0x811c9dc5;
   for (let index = 0; index < value.length; index += 1) {
     hash ^= value.charCodeAt(index);
@@ -86,7 +88,7 @@ function stableStringHash(value: string): number {
   return hash >>> 0;
 }
 
-/** xorshift32 — small, deterministic, seedable PRNG (not cryptographic; not meant to be). */
+/** xorshift32 small, deterministic, seedable PRNG (not cryptographic; not meant to be). */
 function makeSeededRandom(seed: number): () => number {
   let state = seed || 1;
   return () => {
@@ -103,14 +105,15 @@ export type MockEmbeddingProviderOptions = {
   readonly model?: string;
 };
 
+
 /**
  * Deterministic, dependency-free fake embedding provider for tests and CI. It hashes each input
- * text to seed a PRNG and produces a stable pseudo-random vector — NOT a semantically meaningful
+ * text to seed a PRNG and produces a stable pseudo-random vector NOT a semantically meaningful
  * embedding. Two different texts get uncorrelated (near-orthogonal) vectors; the *same* text
  * always gets the *same* vector. This is sufficient to exercise the pipeline's plumbing
  * (truncation, normalization, storage, KNN ranking, recall computation) end-to-end without
  * network access or an API key. A real recall number requires `createGeminiEmbeddingProvider`
- * with a live `GEMINI_API_KEY` — see docs/adr/ADR-014-vector-search.md.
+ * with a live `GEMINI_API_KEY` see docs/adr/ADR-014-vector-search.md.
  */
 export function createDeterministicMockEmbeddingProvider(
   options: MockEmbeddingProviderOptions = {},

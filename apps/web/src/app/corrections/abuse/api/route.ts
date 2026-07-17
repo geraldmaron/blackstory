@@ -1,5 +1,5 @@
 /**
- * Public BB-055 abuse-report endpoint for harassing or coordinated correction activity.
+ * Public abuse-report endpoint for harassing or coordinated correction activity.
  */
 import {
   buildDefaultCorrectionRouteDependencies,

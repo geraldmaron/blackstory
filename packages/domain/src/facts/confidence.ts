@@ -1,5 +1,5 @@
 /**
- * `FactRecord.confidence` evidence-grade axis (BB-086 acceptance criterion 1) — independent of
+ * `FactRecord.confidence` evidence-grade axis independent of
  * `./status.ts`'s workflow-rank axis (see that module's doc comment for the non-conflation
  * rule). A small closed scale plus rich prose (`confidenceNote`), per the industry move away
  * from single numeric confidence scores: definitions are published on the methodology page
@@ -20,7 +20,7 @@ export function isFactConfidenceGrade(value: string): value is FactConfidenceGra
   return (FACT_CONFIDENCE_GRADES as readonly string[]).includes(value);
 }
 
-/** Methodology-page copy — the definitions readers see when they follow a confidence badge. */
+/** Methodology-page copy the definitions readers see when they follow a confidence badge. */
 export const FACT_CONFIDENCE_DEFINITIONS: Readonly<Record<FactConfidenceGrade, string>> = {
   established:
     'Corroborated by multiple independent, high-authority sources with no credible ' +
@@ -38,7 +38,7 @@ export const FACT_CONFIDENCE_DEFINITIONS: Readonly<Record<FactConfidenceGrade, s
 
 /**
  * Grades whose nuance cannot be captured by the grade alone and therefore require a non-empty
- * `confidenceNote` prose explanation (fail-closed — see `assertFactConfidenceValid`).
+ * `confidenceNote` prose explanation (fail-closed see `assertFactConfidenceValid`).
  * `established`/`corroborated` may still carry an optional note but are not required to.
  */
 export const CONFIDENCE_GRADES_REQUIRING_NOTE = ['single-source', 'contested'] as const;
@@ -66,9 +66,9 @@ export function assertFactConfidenceValid(input: {
 
 /**
  * Structural guard proving the two axes are never derived one-from-the-other in this module:
- * every (status, confidence) pairing is valid — a `contested`-confidence fact may be
+ * every (status, confidence) pairing is valid a `contested`-confidence fact may be
  * `published`, and an `established`-confidence fact may still be `draft`. Callers that find
- * themselves computing `confidence` from `status` (or vice versa) have violated BB-086's "two
+ * themselves computing `confidence` from `status` (or vice versa) have violated "two
  * independent axes, never conflated" design rule.
  */
 export function assertStatusConfidenceAxesIndependent(input: {
@@ -78,7 +78,7 @@ export function assertStatusConfidenceAxesIndependent(input: {
   if (!isFactConfidenceGrade(input.confidence)) {
     throw new Error(`Unknown FactRecord confidence grade "${input.confidence}"`);
   }
-  // No cross-axis rule exists by design — this function's only job is to exist as the named,
+  // No cross-axis rule exists by design this function's only job is to exist as the named,
   // testable proof that no such rule was smuggled in elsewhere.
   void input.status;
 }

@@ -1,5 +1,5 @@
 /**
- * Public BB-055 appeal endpoint for rejected corrections or disputed classifications.
+ * Public appeal endpoint for rejected corrections or disputed classifications.
  */
 import {
   buildDefaultCorrectionRouteDependencies,

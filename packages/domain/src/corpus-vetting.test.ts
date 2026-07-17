@@ -1,6 +1,6 @@
 /**
- * Corpus vetting record model, BB-037 registry registration, and the fail-closed bulk-import
- * gate (BB-094).
+ * Corpus vetting record model, registry registration, and the fail-closed bulk-import
+ * gate.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -145,7 +145,7 @@ test('bulk batches fail closed when the vetting record points at a missing regis
   const vettingStore = createInMemoryCorpusVettingStore();
   const record = registerCorpusVetting(registryStore, vettingStore, baseInput({ corpus: 'orphaned-corpus' }));
   // Simulate the registry entry disappearing (or never having been registered) independently of
-  // the vetting record — the gate must still fail closed rather than assume approval.
+  // the vetting record the gate must still fail closed rather than assume approval.
   const orphaned: CorpusVettingRecord = { ...record, sourceRegistryEntryId: 'corpus_registry:does-not-exist' };
   vettingStore.save(orphaned);
 

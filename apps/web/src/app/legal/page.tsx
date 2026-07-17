@@ -1,5 +1,5 @@
 /**
- * Public legal landscape browse surface at `/legal` (BB-087 AC6).
+ * Public legal landscape browse surface at `/legal`.
  */
 import { EmptyState, FilterBar } from '@black-book/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';

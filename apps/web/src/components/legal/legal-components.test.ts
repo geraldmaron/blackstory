@@ -1,5 +1,5 @@
 /**
- * Smoke tests for BB-087 legal component copy and status helpers.
+ * Smoke tests for legal component copy and status helpers.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

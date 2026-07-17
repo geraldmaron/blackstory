@@ -1,5 +1,5 @@
 /**
- * DPLA v2 adapter contract defaults aligned with BB-037 SourceAdapterContract (BB-073).
+ * DPLA v2 adapter contract defaults aligned with SourceAdapterContract.
  * Starts disabled by default and requires an approved policy before it may run (../gates.ts).
  * Distinct from the fixture-only federal DPLA adapter (../federal/dpla/definition.ts,
  * adapterId `dpla-items-v1`) — this one is the live api.dp.la/v2 integration.

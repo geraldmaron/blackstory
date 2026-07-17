@@ -1,5 +1,5 @@
 /**
- * Federal archive and public-history adapter registry (BB-046).
+ * Federal archive and public-history adapter registry.
  * Exports adapter definitions, shared utilities, and fixture parsers for five source families.
  */
 export { locAdapterDefinition, LOC_ADAPTER_ID, LOC_PARSER_VERSION } from './loc/definition.js';

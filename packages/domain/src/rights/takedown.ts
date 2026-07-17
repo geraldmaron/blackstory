@@ -1,18 +1,18 @@
 /**
- * Public takedown/contest routing (BB-077).
+ * Public takedown/contest routing.
  *
- * BB-055 (Correction and challenge experience) owns the actual public-facing takedown page
- * UI and is not built yet — this module is the routing/data-model piece only: it produces a
- * takedown-request record shaped to land in the same intake path BB-029 already built
- * (packages/security/src/submissions/quarantine.ts — SubmissionKind/SubmissionInput), tagged
- * distinctly so a moderation queue (or BB-076) can special-case it, plus a documented SLA.
+ * The public-facing takedown page UI is not built yet — this module is the routing/data-model
+ * piece only: it produces a takedown-request record shaped to land in the same intake path
+ * already built (`packages/security/src/submissions/quarantine.ts`
+ * `SubmissionKind`/`SubmissionInput`), tagged distinctly so a moderation queue can
+ * special-case it, plus a documented SLA.
  *
- * @black-book/domain cannot import @black-book/security (security depends on domain, so the
- * reverse would be a circular workspace dependency). The shape below is intentionally
- * structurally compatible with BB-029's SubmissionInput
- * (kind/title/statement/sourceUrls/targetRecordId/submitterContact) so a future integration —
- * BB-055 or BB-076's job, not this bead's — can map one onto the other without redesigning
- * either side. Do not build the public page here; it does not exist yet.
+ * `@black-book/domain` cannot import `@black-book/security` (security depends on domain, so
+ * the reverse would be a circular workspace dependency). The shape below is intentionally
+ * structurally compatible with `SubmissionInput`
+ * (`kind`/`title`/`statement`/`sourceUrls`/`targetRecordId`/`submitterContact`) so a future
+ * integration can map one onto the other without redesigning either side. Do not build the
+ * public page here; it does not exist yet.
  */
 import { evaluateLivingStatus, loadProductConstitution, type ProductConstitution } from '@black-book/schemas';
 
@@ -30,8 +30,8 @@ export type TakedownReason = (typeof TAKEDOWN_REASONS)[number];
 export const TAKEDOWN_DISTINCT_TAG = 'takedown' as const;
 
 /**
- * Closest existing BB-029 SubmissionKind a takedown maps onto for shared intake, pending a
- * native 'takedown' SubmissionKind — that addition is BB-055/BB-076's call, out of scope here.
+ * Closest existing SubmissionKind a takedown maps onto for shared intake, pending a
+ * native 'takedown' SubmissionKind that addition is /call, out of scope here.
  */
 export const TAKEDOWN_BRIDGE_SUBMISSION_KIND = 'abuse_report' as const;
 
@@ -82,8 +82,8 @@ function addDays(iso: string, days: number): string {
 }
 
 /**
- * Build a takedown request record ready to land in BB-029's intake path. Data-model/routing
- * only — see module doc for what this deliberately does not build (the public page).
+ * Build a takedown request record ready to land in intake path. Data-model/routing
+ * only see module doc for what this deliberately does not build (the public page).
  */
 export function buildTakedownRequestRecord(
   id: string,

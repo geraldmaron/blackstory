@@ -1,8 +1,8 @@
 /**
- * BB-077 UGC compliance and living-person ethics layer: per-source obligations registry,
+ * UGC compliance and living-person ethics layer: per-source obligations registry,
  * evidence-pointer doctrine, deletion-sync framework, living-person UGC guards, and
- * takedown-request routing. Extends BB-016 provenance/rights (../provenance/index.js) rather
- * than replacing it — see each module's header for the specific BB-016/BB-037 pattern mirrored.
+ * takedown-request routing. Extends provenance/rights (../provenance/index.js) rather
+ * than replacing it see each module's header for the specific pattern mirrored.
  */
 export {
   OBLIGATION_SOURCE_CLASSES,

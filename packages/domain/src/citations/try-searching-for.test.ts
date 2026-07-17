@@ -1,5 +1,5 @@
 /**
- * BB-083 acceptance criterion 4: the deterministic "Try searching for" suggestion. Explicitly
+ * the deterministic "Try searching for" suggestion. Explicitly
  * verifies determinism and the "no LLM required" property.
  */
 import assert from 'node:assert/strict';

@@ -1,6 +1,6 @@
 /**
  * Root layout for the public Black Book web application.
- * Loads display + editorial + sans + mono fonts, design-system stylesheet, and BB-048 app shell.
+ * Loads display + editorial + sans + mono fonts, design-system stylesheet, and app shell.
  */
 import type { ReactNode } from 'react';
 import { Sora, Inter, Source_Serif_4, IBM_Plex_Mono } from 'next/font/google';

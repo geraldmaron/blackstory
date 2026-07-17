@@ -1,14 +1,14 @@
 /**
- * Public search page (BB-049): wired to the real `@black-book/domain` search pipeline
+ * Public search page: wired to the real `@black-book/domain` search pipeline
  * (`runPublicSearch`) over the snapshot search index, replacing the earlier hand-rolled
  * `filterPublicEntities` seed-filter stand-in.
  *
- * This Server Component stays intentionally thin — `buildSearchViewModel` in the co-located
+ * This Server Component stays intentionally thin `buildSearchViewModel` in the co-located
  * `./search-view-model.ts` (plain, synchronously testable, no Next.js runtime dependency) does all
  * query-parsing, filter-building, and result/facet shaping. It lives in a separate module rather
  * than this file because Next's generated typed-route check
  * (`.next/types/app/search/page.ts`) rejects any named export from `page.tsx` other than the
- * framework's own allowlisted route conventions — see `./search-view-model.ts`'s module doc.
+ * framework's own allowlisted route conventions see `./search-view-model.ts`'s module doc.
  */
 
 import { EmptyState, FilterBar, ResultList } from '@black-book/ui';

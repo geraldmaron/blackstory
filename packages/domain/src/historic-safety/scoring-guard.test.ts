@@ -1,6 +1,6 @@
 /**
- * Fail-closed tests for the BB-082 scoring exclusion guard: general crime stats and advisory
- * data must never enter any composite or scoring input (critical invariant, AC2/AC10).
+ * Fail-closed tests for the scoring exclusion guard: general crime stats and advisory
+ * data must never enter any composite or scoring input (critical invariant, ).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

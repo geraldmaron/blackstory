@@ -1,5 +1,6 @@
+
 /**
- * Tests for embedding pipeline orchestration (BB-071), using the deterministic mock provider —
+ * Tests for embedding pipeline orchestration, using the deterministic mock provider
  * no network access or API key required. See ADR-014 for what a real recall number needs.
  */
 import assert from 'node:assert/strict';
@@ -85,7 +86,7 @@ test('embedEntitiesBatch records per-item failures without aborting the batch', 
   assert.equal(result.skipped[0]!.entityId, 'blank');
 });
 
-test('estimateEmbeddingCostUsd matches the bead anchor: ~$7.50 for 100k docs of ~500 tokens', () => {
+test('estimateEmbeddingCostUsd matches the documented cost anchor: ~$7.50 for 100k docs of ~500 tokens', () => {
   const perDocCharCount = 500 / 0.25; // inverse of APPROX_TOKENS_PER_CHAR
   const perDocCost = estimateEmbeddingCostUsd(perDocCharCount);
   assert.ok(Math.abs(perDocCost * 100_000 - 7.5) < 1e-6);

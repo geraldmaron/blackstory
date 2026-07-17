@@ -1,9 +1,9 @@
 /**
- * Normalize web-search results into BB-037 AdapterCandidateRecord output (BB-075).
+ * Normalize web-search results into AdapterCandidateRecord output.
  *
- * CRITICAL fail-closed gate (bead acceptance criterion 1): `assertStorageTermsConfirmed` throws
+ * CRITICAL fail-closed gate: `assertStorageTermsConfirmed` throws
  * unless `config.storageTermsConfirmed === true`. This is independent of, and in addition to,
- * the BB-037 registry's disabled-by-default state (../gates.ts) -- a registry approval alone can
+ * the registry's disabled-by-default state (../gates.ts) -- a registry approval alone can
  * never cause a result to be persisted; storage-rights confirmation is a second, separate gate
  * that only a human sets after obtaining real written confirmation from the vendor. Every
  * normalize/persist entry point in this module calls this assertion before constructing a

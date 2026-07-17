@@ -1,5 +1,6 @@
+
 /**
- * Atomic Firestore release activation and rollback for BB-019.
+ * Atomic Firestore release activation and rollback.
  *
  * The active pointer, release lifecycle statuses, audit event, outbox message, and
  * idempotency marker commit in one transaction. Signed manifests and release artifacts
@@ -64,10 +65,11 @@ export type ActivateReleaseInput = {
   readonly now: string;
   readonly auditEvent: AuditEventDoc;
   readonly outboxMessage: OutboxMessageDoc;
+
   /**
    * Synchronous verification against a trusted publication public key.
    * It must not perform I/O because Firestore may retry transaction callbacks.
-   */
+ */
   readonly verifySignedManifest: (release: ImmutablePublicationReleaseDoc) => boolean;
 };
 
@@ -193,6 +195,7 @@ function assertActivationAudit(
     throw new Error('Activation outbox message must match its audit event and start pending');
   }
 }
+
 
 /**
  * Atomically flips the public pointer to a signed release. Normal activation accepts only

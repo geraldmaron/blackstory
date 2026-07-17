@@ -1,5 +1,5 @@
 /**
- * Fixture-only eCFR client for BB-087. Parses bundled JSON — no live network in tests.
+ * Fixture-only eCFR client. Parses bundled JSON no live network in tests.
  */
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

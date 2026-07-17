@@ -1,6 +1,6 @@
 /**
- * Tests for BB-092 acceptance criterion 8: BB-086 FactRecord subjects[] mirrored into the graph
- * as edges, so an entity connected to a fact ONLY through subjects[] is not invisible to the
+ * Tests for FactRecord subjects mirrored into the graph
+ * as edges, so an entity connected to a fact ONLY through subjects is not invisible to the
  * published browse graph.
  */
 import assert from 'node:assert/strict';
@@ -18,7 +18,7 @@ test('a fact with two subjects and no formal EntityRelationship mirrors to one c
     'gg-event-incident',
     'gg-person-subject',
   ]);
-  // Every mirrored edge carries evidence — assertRelationshipHasEvidence must still hold.
+  // Every mirrored edge carries evidence assertRelationshipHasEvidence must still hold.
   assert.ok(edge!.evidenceIds.length > 0);
 });
 

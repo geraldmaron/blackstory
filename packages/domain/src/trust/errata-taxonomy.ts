@@ -1,5 +1,5 @@
 /**
- * Public errata change taxonomy (BB-088) — PolitiFact four-way classification for the reverse-
+ * Public errata change taxonomy PolitiFact four-way classification for the reverse-
  * chronological errata log. Distinct from `FactRevision.changeType` in `../facts/revision.ts`,
  * which uses `style` for cosmetic edits; errata entries use `editors_note` for editorial framing
  * that does not change the underlying fact statement.

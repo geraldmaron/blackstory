@@ -1,9 +1,9 @@
 /**
- * BB-057 protected-field registry for public metadata and social previews.
+ * protected-field registry for public metadata and social previews.
  * Fields listed here must never appear in title, description, openGraph, or twitter tags.
  */
 
-/** Keys stripped recursively from metadata source objects before preview serialization. */
+/** Keys stripped recursively from metadata source objects before preview serialization.  */
 export const PROTECTED_METADATA_KEYS: readonly string[] = Object.freeze([
   'confidenceScore',
   'confidenceLevel',
@@ -31,7 +31,7 @@ export const PROTECTED_METADATA_KEYS: readonly string[] = Object.freeze([
   'relevanceScore',
 ]);
 
-/** Regex patterns that invalidate a preview string if matched. */
+/** Regex patterns that invalidate a preview string if matched.  */
 export const PROTECTED_METADATA_PATTERNS: readonly RegExp[] = Object.freeze([
   /\b\d{1,5}\s+\w+\s+(st|street|ave|avenue|rd|road|blvd|boulevard|ln|lane|dr|drive)\b/i,
   /\b\d{5}(-\d{4})?\b.*\b(st|street|ave|avenue)\b/i,
@@ -85,7 +85,7 @@ export function stripProtectedFields<T extends Record<string, unknown>>(source: 
 }
 
 /**
- * Sanitizes a single preview string — returns empty when protected content is detected.
+ * Sanitizes a single preview string returns empty when protected content is detected.
  */
 export function sanitizePreviewText(value: string | undefined, fallback: string): string {
   const trimmed = value?.trim() ?? '';

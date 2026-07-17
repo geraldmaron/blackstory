@@ -1,5 +1,5 @@
 /**
- * Editorial trust domain surface (BB-088) — local barrel pending merge into `../index.ts`.
+ * Editorial trust domain surface local barrel pending merge into `../index.ts`.
  */
 export {
   ERRATA_CHANGE_TYPES,

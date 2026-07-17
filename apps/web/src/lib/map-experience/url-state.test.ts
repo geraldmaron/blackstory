@@ -1,5 +1,5 @@
 /**
- * Confirms BB-051's shareable URL state round-trips: parse(build(state)) reproduces the same
+ * Confirms shareable URL state round-trips: parse(build(state)) reproduces the same
  * filters/viewport/selection/density, so a copied `/explore?...` URL reproduces the same view.
  */
 import assert from 'node:assert/strict';

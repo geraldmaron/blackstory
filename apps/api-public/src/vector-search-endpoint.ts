@@ -1,21 +1,21 @@
 /**
- * `find_nearest` semantic search endpoint composition (BB-071).
+ * `find_nearest` semantic search endpoint composition.
  *
- * Exposed ONLY through this server-side apps/api-public module — Firestore's `findNearest` KNN
+ * Exposed ONLY through this server-side apps/api-public module Firestore's `findNearest` KNN
  * is not supported by client/web SDKs at all, so there is no parallel client surface to
  * accidentally create. Every dependency (App Check verifier, rate limiter, kill-switch
  * snapshot, embedding provider, vector store) is injected, matching the factory-function style
  * already used by `createPublicSearchGuard`/`createPublicRateLimitGuard`/`createPublicApiAppCheckGuard`
- * in this same directory — so this composes with those guards rather than replacing them.
+ * in this same directory so this composes with those guards rather than replacing them.
  *
- * Guardrail order (fail-closed at every step, matching BB-026/BB-025/BB-035 precedent):
- *   1. App Check verification (`createPublicApiAppCheckGuard`, imported not modified)
- *   2. Kill switch (`vector-search-kill-switch.ts`, reusing the existing `search` switch)
- *   3. Rate limit (`createPublicRateLimitGuard`, imported not modified — `/v1/search/nearest`
- *      already resolves to the `search` endpoint class via the existing path regex)
- *   4. Query guardrails (`vector-search-guardrails.ts`: shared BB-026 text/filter validation +
- *      vector-specific distanceThreshold/eraBucket/k bounds)
- *   5. Embed the validated query text, then run the capped, thresholded KNN query.
+ * Guardrail order (fail-closed at every step, matching precedent):
+ * 1. App Check verification (`createPublicApiAppCheckGuard`, imported not modified)
+ * 2. Kill switch (`vector-search-kill-switch.ts`, reusing the existing `search` switch)
+ * 3. Rate limit (`createPublicRateLimitGuard`, imported not modified `/v1/search/nearest`
+ * already resolves to the `search` endpoint class via the existing path regex)
+ * 4. Query guardrails (`vector-search-guardrails.ts`: shared text/filter validation +
+ * vector-specific distanceThreshold/eraBucket/k bounds)
+ * 5. Embed the validated query text, then run the capped, thresholded KNN query.
  */
 import type { AppCheckDecision, AppCheckHeaders } from '@black-book/firebase';
 import type { EmbeddingProvider, VectorIndexStore, VectorQueryMatch } from '@black-book/firebase';
@@ -80,7 +80,7 @@ export type FindNearestEndpoint = {
 
 /**
  * Builds the composed `find_nearest` handler. Construction never touches Firestore or the
- * network — every side effect happens inside `.handle()`.
+ * network every side effect happens inside `.handle`.
  */
 export function createFindNearestEndpoint(options: FindNearestEndpointOptions): FindNearestEndpoint {
   const rateLimitGuard = createPublicRateLimitGuard(options.rateLimitGuardOptions ?? {});

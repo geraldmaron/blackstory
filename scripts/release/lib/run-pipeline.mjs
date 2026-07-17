@@ -1,5 +1,6 @@
+
 /**
- * Thin wrappers for release pipeline scripts (BB-062).
+ * Thin wrappers for release pipeline scripts.
  * Core logic lives in infra/github/release-pipeline/.
  */
 import { spawnSync } from 'node:child_process';
@@ -9,9 +10,10 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PIPELINE = path.join(ROOT, 'infra/github/release-pipeline');
 
+
 /**
  * @param {string} scriptName
- * @param {string[]} args
+ * @param {string} args
  */
 export function runPipelineScript(scriptName, args = []) {
   const scriptPath = path.join(PIPELINE, scriptName);

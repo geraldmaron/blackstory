@@ -1,10 +1,10 @@
 /**
- * Site identity constants for trust JSON-LD and feed builders (BB-088).
+ * Site identity constants for trust JSON-LD and feed builders.
  */
 
 export const TRUST_SITE_NAME = 'Black Book';
 
-/** Root-relative paths for trust surfaces — absolute URLs are composed at render time when needed. */
+/** Root-relative paths for trust surfaces absolute URLs are composed at render time when needed.  */
 export const TRUST_PATHS = {
   methodology: '/methodology',
   errata: '/errata',

@@ -1,6 +1,6 @@
 /**
- * Signal-strength classification for query-pack matches (BB-038).
- * Weak signals may produce candidates only — never independent promotion.
+ * Signal-strength classification for query-pack matches.
+ * Weak signals may produce candidates only never independent promotion.
  */
 import type {
   MatchOutcome,
@@ -33,7 +33,7 @@ function hasAnyClass(classes: readonly TermClass[], targets: ReadonlySet<TermCla
 }
 
 /**
- * Classify matched terms into strong / medium / weak signal strength.
+ * Classify matched terms into strong medium weak signal strength.
  * - strong: positive paired with historical/modern, or positive + geographic
  * - medium: positive alone, or alias/source_specific with supporting context
  * - weak: negative-only, alias-only, or geographic-only matches

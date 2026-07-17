@@ -1,6 +1,6 @@
 /**
- * Unit tests for BB-053 rights-limited excerpt/citation resolution (acceptance criterion 4:
- * source links do not leak private evidence or protected information).
+ * Unit tests for rights-limited excerpt/citation resolution (source links do not leak private
+ * evidence or protected information).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

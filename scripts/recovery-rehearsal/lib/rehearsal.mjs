@@ -1,6 +1,7 @@
+
 /**
- * Core recovery rehearsal logic (BB-061). Simulates procedure timing from fixtures,
- * validates break-glass paths, and aggregates measured recovery times — no live GCP calls.
+ * Core recovery rehearsal logic. Simulates procedure timing from fixtures,
+ * validates break-glass paths, and aggregates measured recovery times no live GCP calls.
  */
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';

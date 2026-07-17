@@ -1,3 +1,4 @@
+
 /**
  * Test data builder for publication release fixtures.
  */

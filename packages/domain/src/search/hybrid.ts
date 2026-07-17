@@ -1,7 +1,7 @@
 /**
- * Hybrid retrieval orchestration (BB-072): parallel lanes, RRF fusion, deterministic re-rank,
+ * Hybrid retrieval orchestration: parallel lanes, RRF fusion, deterministic re-rank,
  * fallback ladder, and degraded telemetry. Numeric fusion scores and vector distances stay
- * internal — public payloads carry only human-readable explanations.
+ * internal public payloads carry only human-readable explanations.
  */
 import { applyFilters, computeFacetCounts } from './facets.js';
 import { fuseHybridLanes, type FusionWeights } from './fusion.js';
@@ -93,12 +93,12 @@ type RerankEntry = {
 };
 
 /**
- * Deterministic re-rank on the fused list (BB-040 principles):
- *  - text relevance tier (structured match strength) over connection strength
- *  - era overlap boost when era filter/pre-filter is active
- *  - geographic proximity when query is place-anchored
- *  - researchCoverage as confidence tiebreaker (never a filter)
- *  - id ascending final tie-break
+ * Deterministic re-rank on the fused list:
+ * - text relevance tier (structured match strength) over connection strength
+ * - era overlap boost when era filter/pre-filter is active
+ * - geographic proximity when query is place-anchored
+ * - researchCoverage as confidence tiebreaker (never a filter)
+ * - id ascending final tie-break
  */
 export function deterministicHybridRerank(
   fusedIds: readonly string[],
@@ -335,7 +335,7 @@ export function shouldUseHybridSearch(input: {
   return flag && input.normalizedQuery.trim().length > 0;
 }
 
-/** Parses per-lane kill switch overrides from query params (BB-035 pattern). */
+/** Parses per-lane kill switch overrides from query params. */
 export function parseLaneKillSwitches(params: {
   readonly structured?: string;
   readonly vector?: string;

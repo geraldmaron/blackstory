@@ -1,19 +1,19 @@
 /**
- * `FactRecord.citations[]` shape (BB-086 acceptance criterion 2): CSL-JSON (MIT-licensed schema,
- * rendered client-side via citation.js — see `../facts/index.ts`'s module doc for the pointer)
+ * `FactRecord.citations` shape: CSL-JSON (MIT-licensed schema,
+ * rendered client-side via citation.js see `../facts/index.ts`'s module doc for the pointer)
  * plus a Black Book extension block. Deliberately a DIFFERENT, sibling type from
- * `../citations/citation.ts`'s `Citation` (the BB-083 link-rot-management record keyed by
- * `claimId`): that type models one BB-017 atomic claim's citation for link-health monitoring;
+ * `../citations/citation.ts`'s `Citation` (the link-rot-management record keyed by
+ * `claimId`): that type models one atomic claim's citation for link-health monitoring;
  * this type models one CSL-JSON bibliographic reference plus the Black Book fields a fact
- * citation must carry per BB-086's spec. Both ultimately anchor to the same BB-016
+ * citation must carry per spec. Both ultimately anchor to the same 
  * `SourceCapture`/`archivedUrl` discipline, but this module does not import or re-export the
- * other's `Citation` — a future adapter (mirroring `buildCitationFromEvidence`) can bridge them
+ * other's `Citation` a future adapter (mirroring `buildCitationFromEvidence`) can bridge them
  * if a caller needs both.
  *
- * Fail-closed rule (AC2): "unsourced" is not a publishable state. Every WEB citation
+ * Fail-closed rule: "unsourced" is not a publishable state. Every WEB citation
  * (`csl.URL` present) must carry `archivedUrl` + `archivedAt` (the archived-capture pointer,
- * BB-016) and `accessedAt` (the retrieval date) before a fact may reach `published`/`corrected`
- * — see `./publish-gate.ts` for the gate this type feeds.
+ * ) and `accessedAt` (the retrieval date) before a fact may reach `published`/`corrected`
+ * see `./publish-gate.ts` for the gate this type feeds.
  */
 
 export const CITATION_SOURCE_CLASSES = ['primary', 'secondary', 'tertiary'] as const;
@@ -42,10 +42,10 @@ export type CslJsonReference = {
 };
 
 /**
- * The Black Book extension block layered onto every CSL-JSON reference (BB-086 AC2's field
+ * The Black Book extension block layered onto every CSL-JSON reference ('s field
  * list). `sourceClass`/`role` classify the citation's evidentiary weight and stance toward the
  * fact's statement; `excerpt` is the supporting passage (never left implicit); `documentId`
- * points into the primary-document store (BB-016, DocumentCloud-pending / self-host + SHA-256
+ * points into the primary-document store ( DocumentCloud-pending self-host + SHA-256
  * fallback) so hosting stays swappable.
  */
 export type FactCitationExtension = {
@@ -73,16 +73,16 @@ function isIsoDate(value: string): boolean {
   return Number.isFinite(Date.parse(value));
 }
 
-/** A "web source" is any citation carrying a URL — either on the CSL reference or the extension. */
+/** A "web source" is any citation carrying a URL either on the CSL reference or the extension. */
 export function isWebFactCitation(citation: FactCitation): boolean {
   return isNonEmpty(citation.csl.URL) || isNonEmpty(citation.url);
 }
 
 /**
- * Fail-closed structural validity for one fact citation (AC2). Every citation needs a
+ * Fail-closed structural validity for one fact citation. Every citation needs a
  * sourceClass, role, and non-empty excerpt. Web citations additionally require
  * `archivedUrl` + `archivedAt` (the archived-capture pointer) and `accessedAt` (the retrieval
- * date) — "unsourced" (and, for a web source, "unarchived") is never a publishable state.
+ * date) "unsourced" (and, for a web source, "unarchived") is never a publishable state.
  */
 export function assertFactCitationStructurallyComplete(citation: FactCitation): void {
   if (!isNonEmpty(citation.csl.id)) {

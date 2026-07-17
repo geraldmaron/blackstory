@@ -1,7 +1,7 @@
 /**
- * Compact embed/reference card for map, entity, and evidence surfaces (BB-086 AC4).
+ * Compact embed/reference card for map, entity, and evidence surfaces.
  *
- * Renders the shared `CompactFactView` shape from `@black-book/domain` — one canonical URL and one
+ * Renders the shared `CompactFactView` shape from `@black-book/domain` one canonical URL and one
  * citation set, identical to the fact's own page.
  */
 import React from 'react';

@@ -1,5 +1,5 @@
 /**
- * Secure HTTP-only SameSite cookie defaults for the public web surface (BB-028).
+ * Secure HTTP-only SameSite cookie defaults for the public web surface.
  * The public site is mostly cookieless; helpers exist for CSRF/session when needed.
  */
 
@@ -21,7 +21,7 @@ export type SerializedCookie = {
     Pick<SecureCookieOptions, 'maxAge' | 'domain'>;
 };
 
-/** Production-safe defaults: HttpOnly, Secure, SameSite=Lax. */
+/** Production-safe defaults: HttpOnly, Secure, SameSite=Lax.  */
 export function secureCookieDefaults(overrides: SecureCookieOptions = {}): SerializedCookie['options'] & Pick<SecureCookieOptions, 'maxAge' | 'domain'> {
   const isProduction = process.env.NODE_ENV === 'production';
   return {
@@ -34,7 +34,7 @@ export function secureCookieDefaults(overrides: SecureCookieOptions = {}): Seria
   };
 }
 
-/** Stricter defaults for CSRF double-submit cookies (__Host- prefix requires Secure, Path=/, no Domain). */
+/** Stricter defaults for CSRF double-submit cookies (__Host- prefix requires Secure, Path=/, no Domain).  */
 export function csrfCookieDefaults(overrides: SecureCookieOptions = {}): SerializedCookie['options'] & Pick<SecureCookieOptions, 'maxAge'> {
   return {
     httpOnly: true,
@@ -45,7 +45,7 @@ export function csrfCookieDefaults(overrides: SecureCookieOptions = {}): Seriali
   };
 }
 
-/** Serialize a Set-Cookie header fragment (single cookie). */
+/** Serialize a Set-Cookie header fragment (single cookie).  */
 export function serializeSetCookie(name: string, value: string, options: SecureCookieOptions = {}): string {
   const resolved = name.startsWith('__Host-')
     ? csrfCookieDefaults(options)

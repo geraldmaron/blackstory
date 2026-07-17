@@ -1,7 +1,7 @@
 /**
- * Kill-switch identifiers for the BB-073 community discovery adapters (RSS, Internet Archive,
- * DPLA v2). Mirrors `../../federal/shared/kill-switch.ts` (BB-046) exactly — same BB-035
- * logical `adapter:<adapterId>` prefix — so ops tooling that already understands the federal
+ * Kill-switch identifiers for the community discovery adapters (RSS, Internet Archive,
+ * DPLA v2). Mirrors `../../federal/shared/kill-switch.ts` exactly same 
+ * logical `adapter:<adapterId>` prefix so ops tooling that already understands the federal
  * adapters' kill switches needs no special case for the community adapters.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Site-wide "How to read this record" pre-bunking component (BB-088) — forewarning plus
+ * Site-wide "How to read this record" pre-bunking component forewarning plus
  * technique-based reader empowerment. Names manipulation techniques, never people or groups.
  */
 import React from 'react';

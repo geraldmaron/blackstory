@@ -1,5 +1,5 @@
 /**
- * Integration tests for BB-055 correction intake routes — quarantine entry, rate limits,
+ * Integration tests for correction intake routes quarantine entry, rate limits,
  * receipt lookup, appeals, abuse reports, and non-enumerable status surfaces.
  */
 import assert from 'node:assert/strict';

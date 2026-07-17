@@ -1,7 +1,7 @@
 /**
- * Evidence-grade confidence panel for a fact page (BB-086 AC1).
+ * Evidence-grade confidence panel for a fact page.
  *
- * Renders the confidence axis independently from workflow `status` — definitions come from the
+ * Renders the confidence axis independently from workflow `status` definitions come from the
  * shared domain vocabulary (`FACT_CONFIDENCE_DEFINITIONS`), not a numeric score.
  */
 import React from 'react';

@@ -1,5 +1,6 @@
+
 /**
- * Local barrel for BB-063 launch-gate kill-switch configuration hooks.
+ * Local barrel for launch-gate kill-switch configuration hooks.
  */
 export {
   APP_HOSTING_PUBLIC_READ_PROBES,

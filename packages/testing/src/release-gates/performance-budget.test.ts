@@ -1,5 +1,6 @@
+
 /**
- * BB-057 performance budget gate tests — synthetic samples prove CI can fail on regressions.
+ * performance budget gate tests synthetic samples prove CI can fail on regressions.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

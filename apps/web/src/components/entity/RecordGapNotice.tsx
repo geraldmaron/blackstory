@@ -1,5 +1,5 @@
 /**
- * Approved missing-information notice for sparse entity-page sections (BB-052 acceptance
+ * Approved missing-information notice for sparse entity-page sections (acceptance
  * criterion 2). Renders through the shared `EmptyState` component so every gap reads
  * consistently; copy is centralized in `./copy.ts`, never hand-typed at the call site.
  */

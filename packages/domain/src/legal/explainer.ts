@@ -1,5 +1,5 @@
 /**
- * Plain-language explainer structure for BB-087 access layer. Five sections at ~6th–8th grade
+ * Plain-language explainer structure for access layer. Five sections at ~6th–8th grade
  * reading level; term-of-art links point to Wex rather than re-defining; complaint channels
  * link to official agencies only.
  */
@@ -23,15 +23,15 @@ export type LegalPrimarySourceLink = {
   readonly licenseTag: LegalLicenseTag;
 };
 
-/** Authoring pattern per law/case (BB-087 AC6). */
+/** Authoring pattern per law/case. */
 export type LegalPlainLanguageExplainer = {
   /** One-sentence holding/provision plus exact citation reference. */
   readonly whatItSays: string;
-  /** 2–4 short active-voice paragraphs — one idea per sentence. */
+  /** 2–4 short active-voice paragraphs one idea per sentence. */
   readonly whatItMeans: readonly string[];
   /** Historical context tied to Black American experience. */
   readonly whyItMatters: readonly string[];
-  /** Bullets linking official complaint channels — never paraphrasing ACLU. */
+  /** Bullets linking official complaint channels never paraphrasing ACLU. */
   readonly rightsToday: readonly LegalRightsBullet[];
   readonly primarySources: readonly LegalPrimarySourceLink[];
   /** Editorial review stamp ("reviewed YYYY-MM-DD"). */

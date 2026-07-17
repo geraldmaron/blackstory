@@ -1,6 +1,6 @@
 /**
  * Versioned historical query pack types: term classes, themes, signal strength,
- * and discovery-run stamping (BB-038).
+ * and discovery-run stamping.
  */
 import type { EntityKind } from '../entity-kinds.js';
 

@@ -1,12 +1,12 @@
 /**
- * Wires web-search candidates into the standard BB-039 discovery pipeline via the SAME BB-073
- * Wayback capture gate every other community adapter uses (bead acceptance criterion 6) -- no
+ * Wires web-search candidates into the standard discovery pipeline via the SAME 
+ * Wayback capture gate every other community adapter uses -- no
  * parallel ingestion path. `requireCaptureForAllCandidates` submits every candidate's
- * `canonicalUrl` through the injected `SafeHttpClient` (which production wiring backs with BB-030
- * safety, ../internet-archive/shared/http-port.ts), so a discovered URL only becomes
- * review-eligible after both BB-030 evaluation and a real Wayback capture succeed. Accepted
- * candidates then flow through `ingestApiCandidate` (BB-039) -- the same API-ingestion entry
- * point BB-073's adapters use -- rather than a bespoke ingestion function.
+ * `canonicalUrl` through the injected `SafeHttpClient` (which production wiring backs with 
+ * safety,../internet-archive/shared/http-port.ts), so a discovered URL only becomes
+ * review-eligible after both evaluation and a real Wayback capture succeed. Accepted
+ * candidates then flow through `ingestApiCandidate` -- the same API-ingestion entry
+ * point adapters use -- rather than a bespoke ingestion function.
  */
 import { ingestApiCandidate } from '../../discovery/ingestion.js';
 import type { DiscoveryCandidateRecord } from '../../discovery/types.js';

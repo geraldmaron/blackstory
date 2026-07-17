@@ -1,5 +1,5 @@
 /**
- * Domain tests for source registry, adapter contract, run health, drift, and fixtures (BB-037).
+ * Domain tests for source registry, adapter contract, run health, drift, and fixtures.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

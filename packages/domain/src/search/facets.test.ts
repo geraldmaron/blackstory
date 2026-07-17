@@ -1,6 +1,6 @@
 /**
- * Tests for BB-049 faceting + allowlisted filtering, including the BB-090 `status` and `era`
- * additions (AC5). Fixtures reuse the real BB-090 status vocabularies and `deriveEraBuckets` era
+ * Tests for faceting + allowlisted filtering, including the `status` and `era`
+ * additions. Fixtures reuse the real status vocabularies and `deriveEraBuckets` era
  * labels rather than inventing parallel vocab.
  */
 import assert from 'node:assert/strict';

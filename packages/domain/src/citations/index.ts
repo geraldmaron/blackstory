@@ -1,5 +1,5 @@
 /**
- * Citation integrity and link-rot management surface (BB-083).
+ * Citation integrity and link-rot management surface.
  */
 export {
   OFFLINE_SOURCE_KINDS,

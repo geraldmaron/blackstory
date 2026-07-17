@@ -1,11 +1,11 @@
 /**
- * Public search domain types (BB-049).
+ * Public search domain types.
  *
  * These are the pure, testable shapes the search index is built from and the search pipeline
  * produces. Nothing here exposes a raw relevance score, an evidence count, or any other numeric
  * ranking signal to end users: the only numeric fields (`relatedCount`, `claimCount`) live on the
  * server-internal record/index-doc shapes as ordering inputs and are explicitly NEVER carried into
- * the client-facing `SearchResultView` (see the field comments below). This mirrors BB-092's rule
+ * the client-facing `SearchResultView` (see the field comments below). This mirrors rule
  * that adjacency `evidenceCount` is an internal ordering key only, never a public payload field.
  */
 import type { NotabilityBasisRecord } from '../entity-status.js';
@@ -13,13 +13,13 @@ import type { NotabilityBasisRecord } from '../entity-status.js';
 /**
  * The domain-layer input record the search index is built FROM.
  *
- * Structurally compatible with `apps/web`'s `PublicEntityView` (a sibling agent adapts
- * `PublicEntityView` -> this record in a later tranche; the domain package cannot import from
- * `apps/web`, so this type is defined here and its field names deliberately mirror
- * `PublicEntityView`'s so that adapter is trivial). `aliases` are already-lowercased flat strings:
- * the caller extracts them from the real `EntityAlias[]` (whose alias text lives on the `.value`
- * field, with `kind: 'former_name' | 'aka' | 'spelling' | 'translated' | 'other'`) and lowercases
- * them; this type consumes flat strings only, so it never depends on the `EntityAlias` shape.
+ * Structurally compatible with `apps/web`'s `PublicEntityView` (an adapter maps
+ * `PublicEntityView` → this record; the domain package cannot import from `apps/web`, so this
+ * type is defined here and its field names deliberately mirror `PublicEntityView`'s so that
+ * adapter is trivial). `aliases` are already-lowercased flat strings: the caller extracts them
+ * from the real `EntityAlias` (whose alias text lives on the `.value` field, with
+ * `kind: 'former_name' | 'aka' | 'spelling' | 'translated' | 'other'`) and lowercases them;
+ * this type consumes flat strings only, so it never depends on the `EntityAlias` shape.
  */
 export type SearchableEntityRecord = {
   readonly id: string;
@@ -27,21 +27,21 @@ export type SearchableEntityRecord = {
   readonly displayName: string;
   /** Lowercased `displayName`, precomputed once for query-time matching. */
   readonly nameLower: string;
-  /** Lowercased alias strings, already extracted+flattened from `EntityAlias[]` by the caller. */
+  /** Lowercased alias strings, already extracted+flattened from `EntityAlias` by the caller. */
   readonly aliases: readonly string[];
   readonly summary?: string;
   readonly topicTags: readonly string[];
-  /** State-level jurisdiction label (BB-090), used by the `state` facet + filter. */
+  /** State-level jurisdiction label, used by the `state` facet + filter. */
   readonly jurisdictionState?: string;
-  /** Derived current lifecycle status (BB-090) — never hand-edited; used by the `status` filter. */
+  /** Derived current lifecycle status never hand-edited; used by the `status` filter. */
   readonly status?: string;
-  /** Decade labels the entity's dated span overlaps (BB-090), used by the `era` filter. */
+  /** Decade labels the entity's dated span overlaps, used by the `era` filter. */
   readonly eraBuckets: readonly string[];
   /**
-   * Auditable inclusion basis records (BB-090). Required on this build-input shape so
+   * Auditable inclusion basis records. Required on this build-input shape so
    * `buildPublicSearchIndexDocs` can independently enforce the notability gate at the search
-   * boundary (BB-049 AC5) as defense-in-depth. Carries only string leaves (criterion, note,
-   * evidenceIds) — never a numeric score.
+   * boundary as defense-in-depth. Carries only string leaves (criterion, note,
+   * evidenceIds) never a numeric score.
    */
   readonly notabilityBasis: readonly NotabilityBasisRecord[];
   /** Human-readable notability rubric labels (never a raw criterion id alone, never a score). */
@@ -51,9 +51,9 @@ export type SearchableEntityRecord = {
   readonly researchCoverage: 'minimal' | 'partial' | 'substantial';
   /**
    * Connection-strength proxy (count of related/adjacency entries). A SERVER-INTERNAL ordering
-   * input only: it nudges/breaks ties in ranking (BB-049 AC1 "ranked by relevance and connection
+   * input only: it nudges/breaks ties in ranking ( "ranked by relevance and connection
    * strength, not fame alone") but is NEVER projected into `SearchResultView` or any client
-   * payload — mirroring BB-092's adjacency `evidenceCount` policy.
+   * payload mirroring adjacency `evidenceCount` policy.
    */
   readonly relatedCount: number;
   /** Server-internal supporting-claim count. Same policy as `relatedCount`: never client-facing. */
@@ -61,11 +61,11 @@ export type SearchableEntityRecord = {
 };
 
 /**
- * The Firestore-persisted search index document (BB-049).
+ * The Firestore-persisted search index document.
  *
  * A structural superset of `SearchableEntityRecord` (all of its fields plus `releaseId`), so a
  * `PublicSearchIndexDoc` can be passed anywhere a `SearchableEntityRecord` is expected without a
- * cast — that is what lets `runPublicSearch` reuse the pure `applyFilters` / `rankRecords` helpers
+ * cast that is what lets `runPublicSearch` reuse the pure `applyFilters` `rankRecords` helpers
  * directly. This doc is read SERVER-SIDE only: its numeric ranking inputs (`relatedCount`,
  * `claimCount`) and raw `notabilityBasis` never reach the client, which only ever sees
  * `SearchResultView`.
@@ -89,12 +89,12 @@ export type SearchFacetCounts = {
   readonly researchCoverage: Record<string, number>;
 };
 
-/** Which field a query matched on — determines the explanation text. */
+/** Which field a query matched on determines the explanation text. */
 export type SearchMatchField = 'displayName' | 'alias' | 'summary' | 'topicTags';
 
 /**
  * A single client-facing search result. Deliberately carries NO numeric relevance score, NO
- * evidence/connection count, and NO redacted field — only display-safe text (BB-049 AC4: results
+ * evidence/connection count, and NO redacted field only display-safe text (results
  * indicate WHY they match, in words, not a number).
  */
 export type SearchResultView = {
@@ -111,7 +111,7 @@ export type SearchResultView = {
   readonly sensitivityClass?: string;
 };
 
-/** The 6 allowlisted filter fields (BB-049 + BB-090 status/era additions). */
+/** The 6 allowlisted filter fields. */
 export type SearchFilterField = 'kind' | 'state' | 'precision' | 'releaseId' | 'status' | 'era';
 
 export type SearchFilter = {
@@ -119,7 +119,7 @@ export type SearchFilter = {
   readonly value: string;
 };
 
-/** Sort modes (BB-049). `relevance` is the default text-relevance + connection-strength order. */
+/** Sort modes. `relevance` is the default text-relevance + connection-strength order. */
 export type SearchSort =
   | 'relevance'
   | 'name_asc'
@@ -130,7 +130,7 @@ export type SearchSort =
 
 /**
  * Fully-normalized search execution input. `offset`/`pageSize` are computed upstream by the route
- * from BB-026's cursor depth — this layer just consumes them.
+ * from cursor depth this layer just consumes them.
  */
 export type SearchExecutionInput = {
   readonly normalizedQuery: string;

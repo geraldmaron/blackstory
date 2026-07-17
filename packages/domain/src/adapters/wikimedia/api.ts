@@ -1,5 +1,5 @@
 /**
- * MediaWiki page and Wikidata entity parsing for API mode (BB-045).
+ * MediaWiki page and Wikidata entity parsing for API mode.
  */
 import type {
   MediaWikiPage,

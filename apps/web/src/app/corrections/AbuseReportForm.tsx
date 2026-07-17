@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * BB-055 abuse-report form for harassing or coordinated correction activity.
+ * abuse-report form for harassing or coordinated correction activity.
  */
 import { useId, useState, type FormEvent } from 'react';
 import { Button, Notice } from '@black-book/ui';

@@ -1,7 +1,7 @@
 /**
- * SSR markup smoke test for the entity-page BB-095 sensitivity banner wrapper (BB-052 acceptance
- * criterion 7). Confirms it resolves the real registry-backed label/disclaimer text — never a
- * hand-typed duplicate — and that no non-endorsement disclaimer leaks onto a non-person kind.
+ * SSR markup smoke test for the entity-page sensitivity banner wrapper. Confirms it resolves
+ * the real registry-backed label/disclaimer text — never a hand-typed duplicate — and that no
+ * non-endorsement disclaimer leaks onto a non-person kind.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';

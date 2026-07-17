@@ -1,5 +1,5 @@
 /**
- * Calibration dataset export for later model calibration and BB-047 evaluation.
+ * Calibration dataset export for later model calibration and evaluation.
  * Exports only deterministic, versioned confidence records with optional observed outcomes.
  */
 import type { ClaimClass } from '@black-book/schemas';

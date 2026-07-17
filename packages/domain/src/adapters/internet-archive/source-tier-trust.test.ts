@@ -1,13 +1,9 @@
 /**
- * BB-073 acceptance criterion 3: community_oral/self_published/news_reportage tiers cannot
+ * Low-authority source tiers (`community_oral` / `self_published` / `news_reportage`) cannot
  * independently reach include (weak-signal rule holds); crowdsourced items seed research cases
  * and never publish directly. Exercises the additive source-tier trust wiring in
- * ../../relevance/gates.ts and ../../confidence-engine/engine.ts against realistic RSS /
+ * `../../relevance/gates.ts` and `../../confidence-engine/engine.ts` against realistic RSS /
  * Internet Archive / DPLA-shaped candidates and evidence links.
- *
- * Deep-imports gates.js/engine.js directly rather than the relevance/confidence-engine barrels
- * (relevance/index.ts is outside this bead's file ownership and BB-081 is concurrently editing
- * relevance/ — this avoids touching that shared barrel file at all).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -70,7 +66,7 @@ function communityCandidate(overrides: Partial<DiscoveryCandidateRecord> = {}): 
   return { ...base, ...overrides };
 }
 
-test('LOW_AUTHORITY_SOURCE_TIERS matches the three constitution tiers this bead maps', () => {
+test('LOW_AUTHORITY_SOURCE_TIERS matches the three constitution tiers this module maps', () => {
   assert.deepEqual([...LOW_AUTHORITY_SOURCE_TIERS].sort(), ['community_oral', 'news_reportage', 'self_published']);
   assert.equal(isLowAuthoritySourceTier('community_oral'), true);
   assert.equal(isLowAuthoritySourceTier('self_published'), true);
@@ -83,14 +79,14 @@ test('a weak-signal RSS/community_oral candidate does not independently reach in
   const candidate = communityCandidate();
   const assessment = evaluateCandidateRelevance({ candidate, assessedAt: FIXED_NOW });
   assert.notEqual(assessment.decision, 'include');
-  // The hard downgrade is a no-op here because the existing gate pipeline already blocked it —
+  // The hard downgrade is a no-op here because the existing gate pipeline already blocked it 
   // proving the two layers agree rather than fighting each other.
   assert.equal(enforceLowAuthorityTierCannotIncludeIndependently(candidate, assessment.decision), assessment.decision);
 });
 
 test('enforceLowAuthorityTierCannotIncludeIndependently downgrades a hypothetical include for an uncorroborated weak/low-tier candidate', () => {
   const candidate = communityCandidate();
-  // Simulate a caller that (incorrectly) resolved this to include — the hard gate must still catch it.
+  // Simulate a caller that (incorrectly) resolved this to include the hard gate must still catch it.
   assert.equal(enforceLowAuthorityTierCannotIncludeIndependently(candidate, 'include'), 'supporting_context');
 });
 
@@ -133,7 +129,7 @@ test('isPurelyCrowdsourcedEvidence / isCrowdsourcedClaimSourceTier identify RSS,
 
 test('enforceCrowdsourcedCannotPublishAlone caps passesPublishThreshold for single-lineage crowdsourced evidence even when the weighted score alone crossed the bar', () => {
   // Simulates the exact scenario the module header warns about: every other component maxed
-  // out, only sourceAuthority low — the weighted average alone can still be quite high.
+  // out, only sourceAuthority low the weighted average alone can still be quite high.
   const highScoreResult = { passesPublishThreshold: true, score: 0.79 };
   const onlyRssEvidence: readonly EvidenceSourceTierSummary[] = [
     { lineageRootId: 'lineage_rss_1', sourceClassification: 'news_reportage' },

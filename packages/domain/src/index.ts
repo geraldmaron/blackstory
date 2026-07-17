@@ -1,10 +1,10 @@
 /**
- * Shared domain primitives for Black Book entities, geography (BB-014), provenance (BB-016),
- * claims / confidence (BB-017), append-only audit contracts (BB-018), immutable
- * publication releases (BB-019), and source adapter registry contracts (BB-037).
+ * Shared domain primitives for Black Book entities, geography, provenance,
+ * claims confidence, append-only audit contracts, immutable
+ * publication releases, and source adapter registry contracts.
  * Living-status and public precision rules come from
  * @black-book/schemas (constitution). Firestore converters live in @black-book/firebase;
- * Cloud SQL / PostGIS are deferred (ADR-011).
+ * Cloud SQL PostGIS are deferred (ADR-011).
  */
 export { asEntityId, asRelationshipId, asMergeId, asLocationId } from './ids.js';
 export type { EntityId, RelationshipId, MergeId, LocationId } from './ids.js';
@@ -103,16 +103,16 @@ export type {
   SchoolName,
   SchoolCampus,
   SchoolCampusStatus,
-  /** @deprecated alias of SchoolMilestone — see school.ts (BB-090 naming-collision fix). */
+  /** @deprecated alias of SchoolMilestone see school.ts. */
   SchoolStatusEntry,
   SchoolMilestone,
   SchoolFields,
 } from './school.js';
 
-// BB-090: entity ontology — shared era/date-precision model, kind-specific status vocabularies,
+// entity ontology shared era/date-precision model, kind-specific status vocabularies,
 // notability-basis inclusion rubric, and the schema-only sensitivity classification. Additive
 // barrel export so packages/firebase/src/embeddings/text.ts can import the shared
-// `deriveEraBuckets` (replacing its local duplicate) and so BB-086/BB-087/BB-092/BB-095 have a
+// `deriveEraBuckets` (replacing its local duplicate) and so have a
 // single vocabulary source to import from — see ADR-015.
 export {
   DATE_PRECISIONS,
@@ -194,9 +194,9 @@ export type {
   CausalGuardrailResult,
 } from './relationship.js';
 
-// BB-092: history graph substrate — containment-chain materialization, derived per-entity
-// adjacency / per-decade / all-time release views, succession-chain non-leakage, and BB-086
-// FactRecord subjects[] mirroring. Mirrors ./graph/index.js's own barrel EXCEPT
+// history graph substrate containment-chain materialization, derived per-entity
+// adjacency per-decade all-time release views, succession-chain non-leakage, and 
+// FactRecord subjects mirroring. Mirrors ./graph/index.js's own barrel EXCEPT
 // GRAPH_GOLD_FIXTURES, which stays internal-only (same convention as ./map/fixtures.js below).
 export {
   CONTAINMENT_RELATIONSHIP_TYPES,
@@ -253,7 +253,7 @@ export type {
   GraphReleaseArtifact,
 } from './graph/index.js';
 
-// BB-095: sensitivity presentation, present-day advisories, disclaimer registry.
+// sensitivity presentation, present-day advisories, disclaimer registry.
 export {
   ADVISORY_CLASSES,
   isAdvisoryClass,
@@ -282,7 +282,7 @@ export {
 } from './disclaimers.js';
 export type { DisclaimerClass, DisclaimerRecord } from './disclaimers.js';
 
-// BB-094: vetted-corpus bulk intake lane — corpus-vetting gate + launch-corpus registrations.
+// vetted-corpus bulk intake lane corpus-vetting gate + launch-corpus registrations.
 // Streamlined-promotion logic (spot-check sampling, batch reporting) lives in
 // ./promotion/corpus-promotion.js, re-exported via ./promotion/index.js below.
 export {
@@ -368,8 +368,8 @@ export type {
   ResolvedEntityLocationPrecision,
 } from './geography/precision.js';
 
-// BB-091: jurisdiction reference registry — fail-closed dangling-reference gate for the
-// projection build. See geography/jurisdiction-refs.ts's INTEGRATION POINT comment.
+// Jurisdiction reference registry — fail-closed dangling-reference gate for the
+// projection build. See geography/jurisdiction-refs.ts for the not-wired-live call site.
 export {
   createInMemoryJurisdictionResolver,
   evaluateJurisdictionReferences,
@@ -490,7 +490,7 @@ export type {
 export * from './adapters/index.js';
 export * from './publication/index.js';
 
-// Map data platform (BB-070). Demo/test fixtures in ./map/fixtures.js are
+// Map data platform. Demo/test fixtures in ./map/fixtures.js are
 // intentionally NOT re-exported here — they are internal to this package
 // (imported by relative path from map-source.test.ts and the demo generator
 // script), the same way packages/firebase/fixtures/ sits outside that
@@ -532,24 +532,27 @@ export * from './consensus-review/index.js';
 export * from './citations/index.js';
 export * from './relevance-feedback/index.js';
 
-// Public search domain layer (BB-049): deterministic ranking, facets, explanations, and the
+// Public search domain layer: deterministic ranking, facets, explanations, and the
 // notability-gate-enforcing search-index builder. Mirrors ./graph/index.js's own barrel.
 export * from './search/index.js';
 
-// Quality-first national seed campaigns (BB-058): curated fixtures + fail-closed gate validators.
+// Quality-first national seed campaigns: curated fixtures + fail-closed gate validators.
 export * from './seed-campaigns/index.js';
 
-// Canonical fact registry (BB-086): FactRecord + publish gate + JSON-LD + subjects.
+// Canonical fact registry: FactRecord + publish gate + JSON-LD + subjects.
 export * from './facts/index.js';
 
-// BB-050 geocode domain (Census Geocoder pipeline + jurisdiction resolution).
+// geocode domain (Census Geocoder pipeline + jurisdiction resolution).
 export * from './geocode/index.js';
 
-// BB-082 historic safety / place-context engine (layered signals; crime stats never score).
+// historic safety place-context engine (layered signals; crime stats never score).
 export * from './historic-safety/index.js';
 
-// Editorial trust vocabulary + ClaimReview path exclusivity (BB-088).
+// Editorial trust vocabulary + ClaimReview path exclusivity.
 export * from './trust/index.js';
 
-// Legal landscape snapshot + monitoring (BB-087).
+// Legal landscape snapshot + monitoring.
 export * from './legal/index.js';
+
+// Learning-index entity contract (summary bars, tags, related hops, optional prose/photo).
+export * from './learning-index/index.js';

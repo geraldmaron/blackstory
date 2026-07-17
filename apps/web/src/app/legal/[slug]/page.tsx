@@ -1,5 +1,5 @@
 /**
- * Legal landscape detail page at `/legal/{slug}` with plain-language explainer sections (BB-087 AC6).
+ * Legal landscape detail page at `/legal/{slug}` with plain-language explainer sections.
  */
 import { notFound } from 'next/navigation';
 import { Card } from '@black-book/ui';

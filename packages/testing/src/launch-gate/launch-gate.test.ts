@@ -1,5 +1,6 @@
+
 /**
- * BB-063 beta launch gate tests — fail-closed human attestations and non-zero exit on NO_GO.
+ * beta launch gate tests fail-closed human attestations and non-zero exit on NO_GO.
  */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';

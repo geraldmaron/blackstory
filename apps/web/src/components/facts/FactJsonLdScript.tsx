@@ -1,5 +1,5 @@
 /**
- * Injects per-fact schema.org Article JSON-LD (BB-086 AC6). Never emits ClaimReview — the domain
+ * Injects per-fact schema.org Article JSON-LD. Never emits ClaimReview the domain
  * helper already enforces that invariant before this component serializes the payload.
  */
 import React from 'react';

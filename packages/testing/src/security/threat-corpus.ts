@@ -1,5 +1,6 @@
+
 /**
- * BB-004 threat corpus loader and validators for security test scaffolds.
+ * threat corpus loader and validators for security test scaffolds.
  * Reads docs/security/threat-corpus.json and asserts acceptance criteria.
  */
 import { readFileSync } from 'node:fs';
@@ -35,7 +36,7 @@ export interface ThreatCorpus {
   threats: ThreatRecord[];
 }
 
-/** Expected BB-004 threat IDs from the execution beads PDF (order fixed). */
+/** Expected threat IDs from the execution PDF (order fixed). */
 export const REQUIRED_THREAT_IDS = [
   'T-01',
   'T-02',
@@ -101,7 +102,7 @@ export interface CorpusValidationIssue {
   message: string;
 }
 
-/** Validate BB-004 acceptance: quadrants, P0→beads, residual risk, 1:1 abuse ids. */
+/** Validate corpus shape: quadrants, P0→, residual risk, 1:1 abuse ids. */
 export function validateThreatCorpus(corpus: ThreatCorpus): CorpusValidationIssue[] {
   const issues: CorpusValidationIssue[] = [];
 

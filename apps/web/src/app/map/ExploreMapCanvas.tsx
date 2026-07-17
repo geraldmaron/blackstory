@@ -4,8 +4,8 @@
  * Interactive MapLibre canvas for the national map experience.
  *
  * Branded dark-archive canvas (black ink + white state strokes + copper HTML markers).
- * Optional History relationship LineStrings. No world basemap tiles — the rest of the globe
- * stays out of frame / uncolored until we deliberately add countries.
+ * Optional History relationship LineStrings. No world basemap tiles the rest of the globe
+ * stays out of frame uncolored until we deliberately add countries.
  */
 import { useEffect, useRef } from 'react';
 import type {
@@ -53,7 +53,7 @@ export type ExploreMapCanvasProps = {
   readonly historyEdgesEnabled?: boolean;
   readonly historyEdgeCollection?: HistoryEdgeLineCollection;
   readonly selectedEdge?: string;
-  /** When true, empty-map clicks (not on a pin/state/edge) call onActivate. */
+  /** When true, empty-map clicks (not on a pin/state/edge) call onActivate.  */
   readonly activateOnBackgroundClick?: boolean;
   readonly className?: string;
   readonly onSelect?: (entityId: string) => void;
@@ -86,7 +86,7 @@ const ARCHIVE_BASE_STYLE: StyleSpecification = {
     {
       id: 'background',
       type: 'background',
-      // Near-black plate: the “rest of the world” stays unmapped / grayed by absence.
+      // Near-black plate: the “rest of the world” stays unmapped grayed by absence.
       paint: { 'background-color': '#121212' },
     },
   ],

@@ -1,5 +1,5 @@
 /**
- * Confirms the BB-051 `/explore` MapLibre style builder: clustering config is wired through,
+ * Confirms the `/explore` MapLibre style builder: clustering config is wired through,
  * the density layer visibility toggle works, jurisdiction-area geometry stays polygon-typed, and
  * every paint color traces back to the dignity palette (no new/red hue introduced at the render
  * layer).
@@ -24,7 +24,7 @@ function buildStyleFixture(densityLayerEnabled: boolean) {
   });
 }
 
-test('the entities source is configured to cluster with the shared BB-051 cluster config', () => {
+test('the entities source is configured to cluster with the shared explore cluster config', () => {
   const style = buildStyleFixture(true);
   const entitiesSource = style.sources['explore-entities'] as { cluster?: boolean; clusterRadius?: number };
   assert.equal(entitiesSource.cluster, true);

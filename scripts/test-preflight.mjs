@@ -1,3 +1,4 @@
+
 /**
  * Preflight guard: refuse test execution when production identifiers are present.
  * Invoked by root test scripts and CI before any suite runs.

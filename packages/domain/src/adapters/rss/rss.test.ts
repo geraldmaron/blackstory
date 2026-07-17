@@ -1,5 +1,5 @@
 /**
- * Tests for the RSS/Atom community discovery adapter (BB-073). Fixture-driven; no live network —
+ * Tests for the RSS/Atom community discovery adapter. Fixture-driven; no live network 
  * every HTTP call goes through a mock SafeHttpClient injected by the test, never a real fetch.
  */
 import assert from 'node:assert/strict';
@@ -133,7 +133,7 @@ test('normalizes feed items into provenance-stamped, syndication-only candidates
   assert.equal(candidates[0]?.classification, 'community_oral');
   assert.ok(candidates[0]?.stableIdentifier.startsWith('rss:feed_piedmont_historical_society:'));
   assert.ok(candidates[0]?.payload.summary!.length <= 320);
-  // Never a full page body — only title/link/short summary.
+  // Never a full page body only title/link/short summary.
   assert.equal('body' in candidates[0]!.payload, false);
   assert.equal('fullText' in candidates[0]!.payload, false);
 });

@@ -1,5 +1,6 @@
+
 /**
- * Search and query resource guardrail tests (BB-026).
+ * Search and query resource guardrail tests.
  */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -92,7 +93,7 @@ test('allowlists sort keys and filter fields only', () => {
 
 test('allowlists the BB-049 status and era filter fields', () => {
   // AC5: the filter allowlist extends to status and era. Both must now be accepted (allowed:true)
-  // and appear on the canonical filter set — previously they were rejected as
+  // and appear on the canonical filter set previously they were rejected as
   // filter_field_not_allowed.
   assert.ok(searchFilterFields.includes('status'));
   assert.ok(searchFilterFields.includes('era'));
@@ -115,7 +116,7 @@ test('allowlists the BB-049 status and era filter fields', () => {
     );
   }
 
-  // A still-unknown field remains rejected — the allowlist grew by exactly two entries.
+  // A still-unknown field remains rejected the allowlist grew by exactly two entries.
   assert.equal(
     evaluateSearchQueryGuardrails({ q: 'test', filters: { status: 'active', bogus: 'x' } }).allowed,
     false,

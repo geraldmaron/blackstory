@@ -1,5 +1,5 @@
 /**
- * Bulk and API candidate ingestion interfaces (BB-039).
+ * Bulk and API candidate ingestion interfaces.
  */
 import {
   assertAdapterCandidateValid,

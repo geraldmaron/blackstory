@@ -145,6 +145,7 @@ enter the composite — see `docs/security/threat-model.md`).
 | What | Where |
 |---|---|
 | This document | `docs/ui/story.md` |
+| Learning-index entity contract (summary, tags, related, prose, photo) | `docs/ui/learning-index-entity.md` |
 | Brand mark/palette/type | `docs/ui/brand.md` |
 | Design system tokens/components | `docs/ui/README.md` |
 | Legal status vocabulary + unsupported language | `packages/schemas/constitution/policy.v1.json` |

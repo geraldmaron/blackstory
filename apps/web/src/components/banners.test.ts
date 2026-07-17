@@ -1,5 +1,5 @@
 /**
- * SSR markup smoke tests for the BB-095 disclaimer/sensitivity/advisory banner components.
+ * SSR markup smoke tests for the disclaimer/sensitivity/advisory banner components.
  * Mirrors the render-to-static-markup pattern used by @black-book/ui's semantics.test.ts.
  */
 import assert from 'node:assert/strict';
@@ -28,9 +28,9 @@ const SAFETY_ADVISORY_COPY: DisclaimerCopy = {
   reviewDate: '2026-07-17',
 };
 
-// A phrase list mirroring PROHIBITED_ADVISORY_LANGUAGE / IDENTITY_ATTRIBUTE_TERMS in
-// packages/domain — kept local (not imported) since those symbols aren't in the domain package's
-// public barrel yet; see the BB-095 handoff notes.
+// A phrase list mirroring PROHIBITED_ADVISORY_LANGUAGE IDENTITY_ATTRIBUTE_TERMS in
+// packages/domain kept local (not imported) since those symbols aren't in the domain package's
+// public barrel yet.
 const DANGER_FRAMING_TERMS = ['dangerous', 'danger', 'unsafe', 'hazardous', 'risky'];
 
 test('DisclaimerBanner renders title, body, and review date through the shared Notice (warning tone, status role)', () => {
@@ -99,10 +99,10 @@ test('SensitivityContextBanner never renders a suppression/hide affordance — i
       sensitiveContentDisclaimer: SENSITIVE_CONTENT_COPY,
     }),
   );
-  // The component always renders visible content for a given flag — there is no prop or branch
+  // The component always renders visible content for a given flag there is no prop or branch
   // that yields an empty/hidden result while a sensitivity record is passed in. Matches the
   // standalone "hidden" token (an HTML `hidden` attribute or `visibility: hidden`) but not
-  // `aria-hidden`/`bb-visually-hidden` — those are legitimate, unrelated accessibility markup
+  // `aria-hidden`/`bb-visually-hidden` those are legitimate, unrelated accessibility markup
   // (a decorative icon and screen-reader-only text respectively), not content suppression.
   assert.ok(html.length > 0);
   assert.doesNotMatch(html, /(?<![\w-])hidden(?![\w-])/i);

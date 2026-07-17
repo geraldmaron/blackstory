@@ -1,14 +1,15 @@
+
 /**
- * PROVES the acceptance-critical invariant for BB-085: an operator can PROPOSE (submit a lead,
+ * PROVES the acceptance-critical invariant for: an operator can PROPOSE (submit a lead,
  * register a source, attach evidence) but publishing always requires a distinct, fresh-auth
- * promotion action — never the same call, never the same identity, never something this
+ * promotion action never the same call, never the same identity, never something this
  * package's own surface can perform.
  *
  * This test does not reimplement the promotion gate or the research-case authorization gate.
- * It imports and exercises the real BB-019/032 code
- * (`evaluatePromotionGate`, packages/domain/src/promotion/controls.ts) and the real BB-044
+ * It imports and exercises the real /032 code
+ * (`evaluatePromotionGate`, packages/domain/src/promotion/controls.ts) and the real
  * server authorization gate (`assertResearchCaseActionAuthorized`,
- * packages/firebase/src/firestore/research-case.ts / admin-auth.ts) directly.
+ * packages/firebase/src/firestore/research-case.ts admin-auth.ts) directly.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -86,7 +87,7 @@ test('the domain promotion gate approves the same claim once a distinct approver
 });
 
 test('the operator identity that proposed a lead has no permission to promote or publish anything', () => {
-  // The operator's proposer-only permission set is `research:write` (no publication role) —
+  // The operator's proposer-only permission set is `research:write` (no publication role)
   // exactly what packages/operator-cli stamps onto every proposal, and never more than that.
   const proposerToken = adminToken({ bb_claims_version: 1, bb_roles: ['research'] });
   assert.throws(

@@ -1,6 +1,6 @@
 /**
- * Source adapter registry types: contract fields, lifecycle states, run outcomes (BB-037).
- * Extends BB-016 EvidenceSource / SourceAdapterPolicy without duplicating provenance models.
+ * Source adapter registry types: contract fields, lifecycle states, run outcomes.
+ * Extends EvidenceSource SourceAdapterPolicy without duplicating provenance models.
  */
 import type { EvidenceSource, SourceAdapterPolicy } from '../provenance/source.js';
 import type { RightsPolicy } from '../provenance/rights.js';
@@ -40,7 +40,7 @@ export type GeographicCoverage = {
 
 /**
  * Full adapter contract: identity, rights, permitted claims, operational limits, and parser version.
- * Mirrors Firestore `evidenceSources` plus BB-037 operational metadata.
+ * Mirrors Firestore `evidenceSources` plus operational metadata.
  */
 export type SourceAdapterContract = {
   readonly adapterId: string;
@@ -74,7 +74,7 @@ export type SourceRegistryEntry = {
   readonly updatedAt: string;
 };
 
-/** Provenance stamped on every adapter-produced candidate (BB-037 acceptance). */
+/** Provenance stamped on every adapter-produced candidate. */
 export type AdapterCandidateProvenance = {
   readonly sourceId: string;
   readonly adapterId: string;

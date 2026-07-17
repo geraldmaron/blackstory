@@ -1,5 +1,6 @@
+
 /**
- * Unit tests for BB-020 backup-restore verification helpers (dry-run safe).
+ * Unit tests for backup-restore verification helpers (dry-run safe).
  */
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';

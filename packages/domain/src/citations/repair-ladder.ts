@@ -1,14 +1,14 @@
 /**
- * Automatic repair ladder (BB-083 acceptance criterion 3), applied in a fixed order:
- *   1. permanent_redirect — follow and record a permanent redirect to its new URL.
- *   2. wayback_swap       — swap the primary public link to the stored Wayback capture; the
- *                            original URL is preserved as "originally published at", never
- *                            discarded.
- *   3. retroactive_spn    — if no capture exists yet, attempt a retroactive Save Page Now
- *                            (./spn-client.ts) and swap to that fresh capture on success.
- *   4. dead_mark          — only once none of the above apply/succeed, mark the citation dead.
+ * Automatic repair ladder, applied in a fixed order:
+ * 1. permanent_redirect follow and record a permanent redirect to its new URL.
+ * 2. wayback_swap swap the primary public link to the stored Wayback capture; the
+ * original URL is preserved as "originally published at", never
+ * discarded.
+ * 3. retroactive_spn if no capture exists yet, attempt a retroactive Save Page Now
+ * (./spn-client.ts) and swap to that fresh capture on success.
+ * 4. dead_mark only once none of the above apply/succeed, mark the citation dead.
  *
- * `decideRepairLadderStep` is the pure, synchronous priority decision (no I/O — see
+ * `decideRepairLadderStep` is the pure, synchronous priority decision (no I/O see
  * repair-ladder.test.ts for the explicit order proof). `applyRepairLadder` is the small
  * orchestrator that additionally attempts the one step requiring I/O (retroactive_spn) through
  * an injected port and falls through to dead_mark on failure, never throwing for an ordinary
@@ -33,7 +33,7 @@ export type RepairLadderDecisionInput = {
 
 /**
  * Pure priority decision, no I/O. Only steps 1, 2, and the *choice* to attempt step 3 are
- * decidable up front — whether step 3 actually succeeds (and thus whether step 4 is reached)
+ * decidable up front whether step 3 actually succeeds (and thus whether step 4 is reached)
  * requires the async attempt in `applyRepairLadder`.
  */
 export function decideRepairLadderStep(input: RepairLadderDecisionInput): RepairLadderStep {
@@ -64,7 +64,7 @@ function urlLocation(url: string): CitationLocation {
 /**
  * Executes the repair ladder for one citation, in the fixed order documented above.
  * `attemptSpn` is invoked only when the ladder reaches step 3 (dead, no Wayback capture yet
- * exists) — never for a redirect or a wayback_swap outcome, and never more than once per call.
+ * exists) never for a redirect or a wayback_swap outcome, and never more than once per call.
  */
 export async function applyRepairLadder(input: {
   readonly citation: Citation;

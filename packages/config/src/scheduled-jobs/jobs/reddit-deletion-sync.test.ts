@@ -1,8 +1,9 @@
+
 /**
- * BB-084/BB-074: proves the Reddit deletion-sync job body is REAL — it calls
+ * /: proves the Reddit deletion-sync job body is REAL it calls
  * `@black-book/domain`'s `sweepRedditPointerLiveness`/`applyRedditPointerPurge` (which in turn
- * wrap BB-077's `planDeletionSyncPurge`/`applyDeletionSyncPurge`) rather than reimplementing
- * liveness classification or purge mechanics. Fixture/fake-driven throughout — no live network.
+ * wrap `planDeletionSyncPurge`/`applyDeletionSyncPurge`) rather than reimplementing
+ * liveness classification or purge mechanics. Fixture/fake-driven throughout no live network.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

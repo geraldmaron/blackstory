@@ -1,5 +1,5 @@
 /**
- * Source organizations, domains, adapters/policies, and kill-switch gates (BB-016).
+ * Source organizations, domains, adapters/policies, and kill-switch gates.
  * Snapshots are selective (never automatic full crawl). Disabled adapters cannot create candidates.
  */
 import type { RightsPolicy } from './rights.js';
@@ -50,7 +50,7 @@ export type EvidenceSource = {
   readonly adapterId: string;
   readonly stableIdScheme: string;
   readonly policy: SourceAdapterPolicy;
-  /** When false, adapter must not create new candidates (BB-016 acceptance). */
+  /** When false, adapter must not create new candidates. */
   readonly adapterEnabled: boolean;
   /** Optional link to `killSwitches/{id}` for ops-level disable. */
   readonly killSwitchId?: string;

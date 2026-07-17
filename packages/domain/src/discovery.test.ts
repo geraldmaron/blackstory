@@ -1,5 +1,5 @@
 /**
- * Domain tests for candidate discovery pipeline (BB-039).
+ * Domain tests for candidate discovery pipeline.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

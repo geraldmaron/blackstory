@@ -1,5 +1,5 @@
 /**
- * Deterministic relevance engine orchestration (BB-040).
+ * Deterministic relevance engine orchestration.
  */
 import { evaluateRelevance, loadProductConstitution } from '@black-book/schemas';
 import type { ProductConstitution } from '@black-book/schemas';

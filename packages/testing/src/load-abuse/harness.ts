@@ -1,7 +1,8 @@
+
 /**
- * Layered load/abuse simulation harness for BB-059.
- * Composes BB-025 rate limits, BB-026 query guardrails, BB-029 submission controls,
- * and BB-033 resource caps without network I/O.
+ * Layered load/abuse simulation harness.
+ * Composes rate limits, query guardrails, submission controls,
+ * and resource caps without network I/O.
  */
 import {
   aggregateDistributedRisk,

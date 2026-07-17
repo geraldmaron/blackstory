@@ -1,5 +1,6 @@
+
 /**
- * Pure vector arithmetic for the embedding pipeline (BB-071). No I/O, no Firestore — every
+ * Pure vector arithmetic for the embedding pipeline. No I/O, no Firestore every
  * function here is a deterministic, synchronously testable building block for truncation,
  * unit-normalization, and DOT_PRODUCT similarity.
  */
@@ -36,7 +37,7 @@ export function magnitude(vector: EmbeddingVector): number {
   return Math.sqrt(sumSquares);
 }
 
-/** Scales a vector to unit L2 norm. Throws on the zero vector — it has no direction. */
+/** Scales a vector to unit L2 norm. Throws on the zero vector it has no direction. */
 export function normalizeVector(vector: EmbeddingVector): EmbeddingVector {
   assertFiniteVector(vector, 'normalizeVector');
   const norm = magnitude(vector);
@@ -46,10 +47,11 @@ export function normalizeVector(vector: EmbeddingVector): EmbeddingVector {
   return vector.map((value) => value / norm);
 }
 
+
 /**
  * Matryoshka-safe truncation: gemini-embedding-001's representation is trained so that any
  * prefix of the native output is itself a valid (lower-fidelity) embedding. Truncating is
- * therefore just a slice — but the slice is no longer unit-norm, so callers must renormalize.
+ * therefore just a slice but the slice is no longer unit-norm, so callers must renormalize.
  */
 export function truncateVector(vector: EmbeddingVector, dims: number = EMBEDDING_DIMS): EmbeddingVector {
   assertFiniteVector(vector, 'truncateVector');
@@ -69,7 +71,7 @@ export function truncateVector(vector: EmbeddingVector, dims: number = EMBEDDING
   return vector.slice(0, dims);
 }
 
-/** Truncate to `dims` and renormalize in one step — the pipeline's standard prep for storage. */
+/** Truncate to `dims` and renormalize in one step the pipeline's standard prep for storage. */
 export function truncateAndNormalize(
   vector: EmbeddingVector,
   dims: number = EMBEDDING_DIMS,
@@ -91,9 +93,10 @@ export function dotProduct(a: EmbeddingVector, b: EmbeddingVector): number {
   return sum;
 }
 
+
 /**
  * DOT_PRODUCT "distance" as Firestore reports it: for unit-normalized vectors this equals
- * cosine similarity, and — unlike COSINE/EUCLIDEAN — *higher* values mean *more* similar.
+ * cosine similarity, and unlike COSINE/EUCLIDEAN *higher* values mean *more* similar.
  */
 export function dotProductDistance(a: EmbeddingVector, b: EmbeddingVector): number {
   return dotProduct(a, b);
@@ -104,9 +107,10 @@ export function isUnitVector(vector: EmbeddingVector, epsilon: number = UNIT_NOR
   return Math.abs(magnitude(vector) - 1) <= epsilon;
 }
 
+
 /**
  * Asserts the invariant every stored/query vector must satisfy: finite values, the expected
- * dimensionality, and unit norm. Fail-closed — callers should never silently store or query
+ * dimensionality, and unit norm. Fail-closed callers should never silently store or query
  * with a malformed vector.
  */
 export function assertValidEmbeddingVector(

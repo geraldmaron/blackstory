@@ -1,3 +1,4 @@
+
 /**
  * Contract tests for corpus coverage, metric arithmetic, comparison reports, schemas,
  * command help, and the fail-closed automatic-publication gate.

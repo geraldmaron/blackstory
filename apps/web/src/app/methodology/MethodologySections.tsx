@@ -1,5 +1,5 @@
 /**
- * Methodology page sections and copy assembly (BB-088) — mission, definitions, source hierarchy,
+ * Methodology page sections and copy assembly mission, definitions, source hierarchy,
  * verification, limitations, cadence, report-an-error, funding, masthead, Trust Project vocabulary,
  * and IFCN alignment text.
  */

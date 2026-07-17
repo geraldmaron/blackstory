@@ -1,7 +1,7 @@
 /**
- * Tests for BB-092 acceptance criterion 2: containment-chain materialization
+ * Tests for containment-chain materialization
  * (located_at/part_of: spot -> city -> county -> state resolved into a denormalized path
- * carrying BB-091 jurisdiction ids), including cycle-safety and bounded-depth proofs.
+ * carrying jurisdiction ids), including cycle-safety and bounded-depth proofs.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

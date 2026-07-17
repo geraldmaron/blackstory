@@ -1,5 +1,5 @@
 /**
- * Confirms the BB-093 history page view-model: graph release artifact drives all-time and decade
+ * Confirms the history page view-model: graph release artifact drives all-time and decade
  * slices, decade views use point-in-time status (never present-day backfill), and URL state parses
  * shareable decade/filter/selection params.
  */

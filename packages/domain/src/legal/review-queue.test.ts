@@ -1,5 +1,5 @@
 /**
- * Tests for BB-087 review_queue event shape, dedupe, and fail-closed archive gate.
+ * Tests for review_queue event shape, dedupe, and fail-closed archive gate.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

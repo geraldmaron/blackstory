@@ -1,12 +1,12 @@
 /**
- * Shared runtime hardening limits for public App Hosting (BB-022).
+ * Shared runtime hardening limits for public App Hosting.
  * Values are conservative defaults for cost and abuse resistance; staging/production
  * overrides live in apphosting*.yaml runConfig blocks.
  */
 
 /**
- * Allowed search/filter keys on /search — all other query keys are stripped at the edge.
- * Extended for BB-049 to cover every param the `/search/api` route actually reads (q + the 6
+ * Allowed search/filter keys on /search all other query keys are stripped at the edge.
+ * Extended to cover every param the `/search/api` route actually reads (q + the 6
  * allowlisted filters + sort/pageSize/cursor/date range), so the CDN cache-key/vary normalization
  * does not silently drop params the route respects. `topic` is retained for the legacy seed-browse
  * page (`filterPublicEntities`), which still accepts it.
@@ -30,7 +30,7 @@ export const SEARCH_PAGE_PARAM_ALLOWLIST = [
 export type SearchPageParam = (typeof SEARCH_PAGE_PARAM_ALLOWLIST)[number];
 
 /**
- * Allowed filter/viewport keys on /explore — shareable map state (BB-051).
+ * Allowed filter/viewport keys on /explore shareable map state.
  * All other query keys are stripped at the edge.
  */
 export const EXPLORE_PAGE_PARAM_ALLOWLIST = [
@@ -48,7 +48,7 @@ export const EXPLORE_PAGE_PARAM_ALLOWLIST = [
 export type ExplorePageParam = (typeof EXPLORE_PAGE_PARAM_ALLOWLIST)[number];
 
 /**
- * Allowed browse keys on /history — decade stepper + selection (BB-093).
+ * Allowed browse keys on /history decade stepper + selection.
  */
 export const HISTORY_PAGE_PARAM_ALLOWLIST = [
   'decade',
@@ -59,10 +59,10 @@ export const HISTORY_PAGE_PARAM_ALLOWLIST = [
 
 export type HistoryPageParam = (typeof HISTORY_PAGE_PARAM_ALLOWLIST)[number];
 
-/** Tracking / analytics prefixes stripped even when allowlisted routes accept other params. */
+/** Tracking analytics prefixes stripped even when allowlisted routes accept other params.  */
 export const TRACKING_QUERY_PREFIXES = ['utm_', 'mc_', 'pk_', 'vero_'] as const;
 
-/** Exact tracking query keys stripped on every public route. */
+/** Exact tracking query keys stripped on every public route.  */
 export const TRACKING_QUERY_KEYS = new Set([
   'fbclid',
   'gclid',
@@ -75,7 +75,7 @@ export const TRACKING_QUERY_KEYS = new Set([
   'igshid',
 ]);
 
-/** Upper bounds for serialized public responses (UTF-8 bytes). */
+/** Upper bounds for serialized public responses (UTF-8 bytes).  */
 export const RESPONSE_SIZE_LIMITS = {
   html: 512 * 1024,
   json: 256 * 1024,
@@ -87,7 +87,7 @@ export type ResponseSizeKind = keyof typeof RESPONSE_SIZE_LIMITS;
 /**
  * Post-deploy validation targets (documented in apphosting*.yaml).
  * Confirm with Cloud Run after backend creation:
- *   gcloud run services describe BACKEND --region=REGION --format='yaml(spec.template.spec.containerConcurrency,spec.template.metadata.annotations)'
+ * gcloud run services describe BACKEND --region=REGION --format='yaml(spec.template.spec.containerConcurrency,spec.template.metadata.annotations)'
  */
 export const APP_HOSTING_RUN_LIMITS = {
   production: {
@@ -115,7 +115,7 @@ export const APP_HOSTING_RUN_LIMITS = {
 
 /**
  * Module specifiers that must never appear on the public render path (seed/snapshot only).
- * Each pattern requires actual import/require syntax around the specifier — a bare substring
+ * Each pattern requires actual import/require syntax around the specifier a bare substring
  * match (e.g. plain `/anthropic/`) would also flag unrelated prose or string literals, such as
  * an AI-crawler name in robots.ts's disallow list, that never import anything.
  */

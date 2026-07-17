@@ -1,3 +1,4 @@
+
 /**
  * Production-vs-emulator runtime guards for Firebase initialization.
  * Local and test runtimes default to demo emulators and refuse the production

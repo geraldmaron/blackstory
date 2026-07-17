@@ -1,5 +1,5 @@
 /**
- * Individual myth review page (BB-088) — the ONLY pages that emit schema.org ClaimReview markup.
+ * Individual myth review page the ONLY pages that emit schema.org ClaimReview markup.
  */
 import { notFound } from 'next/navigation';
 import {

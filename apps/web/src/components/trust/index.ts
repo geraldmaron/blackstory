@@ -1,5 +1,5 @@
 /**
- * Trust and pre-bunking UI components (BB-088).
+ * Trust and pre-bunking UI components.
  */
 export * from './HowToReadThisRecord.js';
 export * from './ConfidenceLabelWithNuance.js';

@@ -1,5 +1,5 @@
 /**
- * Per-fact "Common misreadings" section powered by BB-086 counterClaims[] (BB-088) — names
+ * Per-fact "Common misreadings" section powered by counterClaims names
  * techniques in refutation copy, never people or groups.
  */
 import React from 'react';

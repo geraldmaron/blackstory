@@ -1,6 +1,7 @@
+
 /**
- * Automated BB-004 acceptance checks for the threat / abuse corpus.
- * Full security CI gates land in BB-036; this scaffold only validates the corpus.
+ * Automated acceptance checks for the threat abuse corpus.
+ * Full security CI gates land in; this scaffold only validates the corpus.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -12,7 +13,7 @@ import {
 } from './threat-corpus.ts';
 
 describe('BB-004 threat corpus', () => {
-  it('loads nineteen P0 threats with full control quadrants and bead maps', () => {
+  it('loads nineteen P0 threats with full control quadrants and implementation refs', () => {
     const corpus = loadThreatCorpus();
     const issues = validateThreatCorpus(corpus);
     assert.deepEqual(issues, [], issues.map((i) => `${i.code}: ${i.message}`).join('\n'));

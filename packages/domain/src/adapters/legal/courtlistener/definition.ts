@@ -1,5 +1,5 @@
 /**
- * CourtListener bulk CSV adapter definition for BB-087 landmark case corpus (fixtures-only in tests).
+ * CourtListener bulk CSV adapter definition for landmark case corpus (fixtures-only in tests).
  */
 import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from '../../candidates.js';
 import type { SourceAdapterContract } from '../../types.js';

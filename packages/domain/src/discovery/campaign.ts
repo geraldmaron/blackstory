@@ -1,5 +1,5 @@
 /**
- * Discovery campaign boundaries and budget enforcement (BB-039).
+ * Discovery campaign boundaries and budget enforcement.
  */
 import type { AdapterCandidateRecord } from '../adapters/types.js';
 import type {

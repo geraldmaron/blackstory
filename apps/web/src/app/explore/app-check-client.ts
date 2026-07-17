@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * Client-only App Check token acquisition for the `/explore` refine API (BB-051). Mirrors
- * `apps/web/src/app/locate/app-check-client.ts` — same vendor SDK, same graceful degrade to `{}`
+ * Client-only App Check token acquisition for the `/explore` refine API. Mirrors
+ * `apps/web/src/app/locate/app-check-client.ts` same vendor SDK, same graceful degrade to `{}`
  * when App Check is not configured for this build environment.
  */
 import { initializeApp, type FirebaseApp } from 'firebase/app';

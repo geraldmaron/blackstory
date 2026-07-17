@@ -1,8 +1,9 @@
+
 /**
- * Public surface of @black-book/operator-cli (BB-085).
+ * Public surface of @black-book/operator-cli.
  *
- * Every operation here PROPOSES data into the existing BB-029 quarantine / BB-044 research-case
- * pipeline. Nothing exported from this package can approve, promote, or publish anything —
+ * Every operation here PROPOSES data into the existing quarantine research-case
+ * pipeline. Nothing exported from this package can approve, promote, or publish anything
  * see `promotion-boundary.test.ts`, which enumerates this exact export list to prove it.
  */
 export {

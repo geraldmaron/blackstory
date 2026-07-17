@@ -1,6 +1,6 @@
 /**
- * Semantic candidate recall over pre-computed embeddings (BB-071): "find sources similar to
- * this accepted one." Pure ranking math — callers are responsible for supplying the vectors
+ * Semantic candidate recall over pre-computed embeddings: "find sources similar to
+ * this accepted one." Pure ranking math callers are responsible for supplying the vectors
  * (computed by @black-book/firebase's embedding pipeline) and for whatever they do with the
  * ranked result (e.g. surface as corroboration suggestions; this module never mutates state).
  */
@@ -19,7 +19,7 @@ export type RecallMatch<TPayload = unknown> = {
 };
 
 export type FindSimilarCandidatesOptions = {
-  /** Caps how many matches come back — mirrors the app-level KNN limit, kept small on purpose. */
+  /** Caps how many matches come back mirrors the app-level KNN limit, kept small on purpose. */
   readonly limit?: number;
   /** Cosine-similarity floor; candidates below this are dropped even if they'd fit in `limit`. */
   readonly minSimilarity?: number;
@@ -33,7 +33,7 @@ const DEFAULT_LIMIT = 10;
  * Ranks `corpus` by cosine similarity to `target`, descending, applying an optional similarity
  * floor and an id exclusion. This is the same ranking shape as the Firestore KNN query path in
  * @black-book/firebase, but works entirely in memory over whatever embeddings the caller already
- * has loaded — appropriate for research-worker-side recall, not for querying the full index.
+ * has loaded appropriate for research-worker-side recall, not for querying the full index.
  */
 export function findSimilarCandidates<TPayload = unknown>(
   target: EmbeddingVector,

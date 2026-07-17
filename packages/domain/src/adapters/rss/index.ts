@@ -1,5 +1,5 @@
 /**
- * RSS/Atom community discovery adapter public surface (BB-073).
+ * RSS/Atom community discovery adapter public surface.
  */
 export {
   RSS_ADAPTER_ID,

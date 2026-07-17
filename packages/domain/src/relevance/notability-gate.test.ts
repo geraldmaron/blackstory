@@ -1,5 +1,5 @@
 /**
- * Tests for the notability-basis publish gate (BB-090 AC3) and the standing-policy hard rule
+ * Tests for the notability-basis publish gate and the standing-policy hard rule
  * that numeric scores never appear in a public entity payload.
  */
 import assert from 'node:assert/strict';
@@ -86,8 +86,8 @@ function assertNoNumericLeaf(value: unknown, path = '$'): void {
 }
 
 /** Standing policy hard rule: numeric notability/relevance scores are banned from public
- * payloads. A public entity payload is status (string) + eraBuckets (string[]) + notability
- * criterion labels (string[]) + sensitivity class (string) — every one non-numeric. */
+ * payloads. A public entity payload is status (string) + eraBuckets (string) + notability
+ * criterion labels (string) + sensitivity class (string) every one non-numeric. */
 test('public entity payload never exposes a numeric notability, status, or relevance score', () => {
   const entity: CanonicalEntity = {
     id: 'ent-law-notable-1',

@@ -1,7 +1,7 @@
 /**
- * Layer 4 — presence/affirmation: the counterweight layer. This engine must show life, not only
- * harm — Green Book sites, historic Black churches/schools/business districts, HBCUs, and
- * heritage markers already in our corpus. Structurally mirrors ./documented-events.ts (a
+ * Layer 4 presence/affirmation: the counterweight layer. This engine must show life, not only
+ * harm Green Book sites, historic Black churches/schools/business districts, HBCUs, and
+ * heritage markers already in our corpus. Structurally mirrors./documented-events.ts (a
  * saturating density aggregation over cited records, no time decay) but scores presence rather
  * than harm, and is the fourth and final layer eligible for the composite.
  */
@@ -24,8 +24,8 @@ export function isPresenceAffirmationCategory(value: string): value is PresenceA
 }
 
 /** Published category weights (methodology, versioned below). HBCUs and churches/schools are
- *  weighted as strong, durable community anchors; a single heritage marker is weighted lower
- *  because a marker documents remembrance of a site rather than an ongoing institution. */
+ * weighted as strong, durable community anchors; a single heritage marker is weighted lower
+ * because a marker documents remembrance of a site rather than an ongoing institution. */
 export const PRESENCE_AFFIRMATION_CATEGORY_WEIGHTS: Readonly<Record<PresenceAffirmationCategory, number>> = {
   green_book_site: 0.7,
   historic_black_church: 0.85,
@@ -81,7 +81,7 @@ export type ComputePresenceAffirmationLayerInput = {
 };
 
 /** Never fabricates a zero-value signal when no presence/affirmation records exist \u2014 absence
- *  of a documented Green Book site, church, school, HBCU, or marker is not itself a claim. */
+ * of a documented Green Book site, church, school, HBCU, or marker is not itself a claim. */
 export function computePresenceAffirmationLayerSignal(
   input: ComputePresenceAffirmationLayerInput,
 ): LayerSignal | undefined {

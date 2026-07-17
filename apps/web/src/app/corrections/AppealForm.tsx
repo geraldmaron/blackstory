@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * BB-055 appeal form for rejected corrections or disputed classifications. Posts to
+ * appeal form for rejected corrections or disputed classifications. Posts to
  * `/corrections/appeal/api` and never exposes moderation-sensitive details.
  */
 import { useId, useState, type FormEvent } from 'react';

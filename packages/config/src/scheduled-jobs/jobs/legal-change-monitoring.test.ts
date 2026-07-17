@@ -1,5 +1,6 @@
+
 /**
- * BB-084: proves the legal-change-monitoring job proposes review_queue events from fixture adapters.
+ * Proves the legal-change-monitoring job proposes review_queue events from fixture adapters.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,6 +1,6 @@
 /**
- * Server-only App Check verification for the public corrections routes (BB-055). Mirrors
- * `apps/web/src/app/submit/app-check-guard.ts` — same guard factory and verifier posture.
+ * Server-only App Check verification for the public corrections routes. Mirrors
+ * `apps/web/src/app/submit/app-check-guard.ts` same guard factory and verifier posture.
  */
 import type {
   AppCheckDecision,

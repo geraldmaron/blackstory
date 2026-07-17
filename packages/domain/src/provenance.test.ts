@@ -1,5 +1,5 @@
 /**
- * Domain tests for sources, captures, rights gates, hash dedup, and lineage (BB-016).
+ * Domain tests for sources, captures, rights gates, hash dedup, and lineage.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

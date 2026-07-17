@@ -1,13 +1,14 @@
+
 /**
- * Runs the BB-071 gold-corpus retrieval eval against the deterministic mock embedding provider
- * (no network access, no API key) and records real recall@k / MRR numbers.
+ * Runs the gold-corpus retrieval eval against the deterministic mock embedding provider
+ * (no network access, no API key) and records real recall@k MRR numbers.
  *
- * These numbers are NOT a measure of real semantic retrieval quality — the mock provider
+ * These numbers are NOT a measure of real semantic retrieval quality the mock provider
  * produces hash-seeded pseudo-random vectors uncorrelated with meaning (see
  * retrieval-embedding.ts). What this test *does* verify: the eval pipeline runs end to end
  * against the real corpus fixture, produces a well-formed, reproducible result, and clears a
  * low sanity floor. A real recall@k number requires swapping in a live provider (e.g.
- * `@black-book/firebase`'s `createGeminiEmbeddingProvider` with a `GEMINI_API_KEY`) — see
+ * `@black-book/firebase`'s `createGeminiEmbeddingProvider` with a `GEMINI_API_KEY`) see
  * docs/adr/ADR-014-vector-search.md.
  */
 import assert from 'node:assert/strict';
@@ -77,6 +78,6 @@ test('runRetrievalEval against the mock provider produces real, recorded recall@
     `recall@10 (${result.recallAtK['10']}) is implausibly low even for a random-ranking sanity floor`,
   );
 
-  // Recorded for the human report — see this bead's final report for the exact numbers.
+  // Recorded for operator review; see console output for the exact numbers.
   console.log(`BB-071 gold-corpus retrieval eval (mock provider): ${JSON.stringify(result)}`);
 });

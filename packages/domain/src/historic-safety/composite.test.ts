@@ -1,6 +1,6 @@
 /**
- * Tests for the BB-082 composite: layers 1-4 only, published weights, BB-043 audit trail, and
- * fail-closed exclusion of layer 5 / crime stats / advisories (critical invariant).
+ * Tests for the composite: layers 1-4 only, published weights, audit trail, and
+ * fail-closed exclusion of layer 5 crime stats advisories (critical invariant).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

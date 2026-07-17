@@ -1,9 +1,9 @@
+
 /**
- * Adapts `@black-book/domain`'s existing `US_STATES` table (51 states + D.C., BB-070) into
- * `jurisdictions` collection docs. BB-091 acceptance criterion 1 requires state docs to be
- * "sourced from the existing us-geography module (single source of truth, no duplicate
- * table)" — this file is the ONLY place state jurisdiction data is derived, and it derives
- * every field from `US_STATES` rather than re-encoding a second state table.
+ * Adapts `@black-book/domain`'s existing `US_STATES` table (51 states + D.C.) into
+ * `jurisdictions` collection docs. State docs must be sourced from the existing us-geography
+ * module (single source of truth, no duplicate table). This file is the only place state
+ * jurisdiction data is derived, and it derives every field from `US_STATES`.
  */
 import { US_STATES, type UsStateInfo } from '@black-book/domain';
 import { countryJurisdictionId, stateJurisdictionId, type JurisdictionDoc } from './schema.js';
@@ -51,9 +51,10 @@ function toStateJurisdictionDoc(
   };
 }
 
+
 /**
  * Builds all 51 state jurisdiction docs (50 states + D.C.) plus the single country row, every
- * field traced back to `US_STATES` — never re-deriving state bbox/FIPS/name/postal from any
+ * field traced back to `US_STATES` never re-deriving state bbox/FIPS/name/postal from any
  * other source. Deterministic ids make repeated calls (and repeated Firestore writes) a no-op
  * write of the same content, satisfying the "idempotent" requirement at the state layer.
  */

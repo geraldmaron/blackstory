@@ -1,5 +1,5 @@
 /**
- * Public BB-055 corrections entry point. Challenge published records through quarantine-only
+ * Public corrections entry point. Challenge published records through quarantine-only
  * intake tied to entity/claim/source/location targets, with privacy notice and receipt codes.
  */
 import { Suspense } from 'react';

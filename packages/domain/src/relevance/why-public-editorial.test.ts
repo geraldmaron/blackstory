@@ -1,5 +1,5 @@
 /**
- * Tests for the BB-054 passive-euphemism editorial check.
+ * Tests for the passive-euphemism editorial check.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

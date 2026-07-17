@@ -1,6 +1,6 @@
 /**
- * Integration tests for the `/explore/api` refine route (BB-051): App Check, BB-025 rate limits,
- * and BB-026 `evaluateSearchQueryGuardrails` bound dynamic explore filter queries.
+ * Integration tests for the `/explore/api` refine route: App Check, rate limits,
+ * and `evaluateSearchQueryGuardrails` bound dynamic explore filter queries.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

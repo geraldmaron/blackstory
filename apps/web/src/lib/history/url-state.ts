@@ -1,7 +1,7 @@
 /**
- * Shareable URL state for `/history` (BB-093): decade (or all-time), kind filter, selected node,
+ * Shareable URL state for `/history`: decade (or all-time), kind filter, selected node,
  * and optional selected edge. Pure parse/serialize so the SSR page and client orchestrator read and
- * write the same shape — copied URLs reproduce the same browse view.
+ * write the same shape copied URLs reproduce the same browse view.
  */
 import { DEFAULT_HISTORY_FILTERS, type HistoryFilterState } from './filters';
 
@@ -9,7 +9,7 @@ export type HistoryViewMode = 'all-time' | 'decade';
 
 export type HistoryViewState = {
   readonly mode: HistoryViewMode;
-  /** Decade label (e.g. "1950s") when `mode === 'decade'`. */
+  /** Decade label (e.g. "1950s") when `mode === 'decade'`.  */
   readonly decade?: string;
   readonly filters: HistoryFilterState;
   readonly selected?: string;

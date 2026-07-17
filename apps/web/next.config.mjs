@@ -1,5 +1,5 @@
 /**
- * Next.js config for the public web surface (BB-022 runtime hardening, BB-028 security).
+ * Next.js config for the public web surface.
  * Static entity routes prefer CDN caching; middleware strips unknown query params.
  */
 
@@ -7,12 +7,12 @@ import { securityHeadersForNextConfig } from './src/lib/web-security/next-config
 
 const globalSecurityHeaders = securityHeadersForNextConfig();
 
-/** @type {import('next').NextConfig} */
+/**  {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Allow local verification via 127.0.0.1 as well as localhost (BB-048 port 3048).
+  // Allow local verification via 127.0.0.1 as well as localhost.
   allowedDevOrigins: ['127.0.0.1', 'localhost'],
-  // App Hosting / CI run lint + typecheck as separate gates; keep `next build` focused on
+  // App Hosting CI run lint + typecheck as separate gates; keep `next build` focused on
   // emit so monorepo package-dist skew cannot block image publish.
   eslint: {
     ignoreDuringBuilds: true,

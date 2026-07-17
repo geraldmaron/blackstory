@@ -1,8 +1,8 @@
 /**
- * Wayback SPN2 client: submit-and-poll, through the BB-030 safe HTTP port (BB-073).
+ * Wayback SPN2 client: submit-and-poll, through the safe HTTP port.
  * Authenticated (`Authorization: LOW <access>:<secret>`), modest concurrency via
- * ../shared/http-port.ts's `mapWithConcurrency`, retry-on-429 via `withRetry`. Never calls
- * `fetch` directly. The API key pair is always injected by the caller — never read from a
+ * ./shared/http-port.ts's `mapWithConcurrency`, retry-on-429 via `withRetry`. Never calls
+ * `fetch` directly. The API key pair is always injected by the caller never read from a
  * hardcoded constant in this module (see .env.example DPLA_API_KEY entry for the analogous
  * "production values live in Secret Manager" convention; SPN credentials follow the same rule).
  */

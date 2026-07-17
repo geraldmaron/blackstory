@@ -1,6 +1,6 @@
 /**
- * Barrel export for the BB-051 map-experience data layer. Own module — does not touch
- * `@black-book/domain`'s or `@black-book/security`'s barrels, only re-exports this bead's own
+ * Barrel export for the map-experience data layer. Does not re-export from
+ * `@black-book/domain` or `@black-book/security`; only re-exports this package's own
  * additive files.
  */
 export * from './entity-geo';

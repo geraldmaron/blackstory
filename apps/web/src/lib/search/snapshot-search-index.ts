@@ -1,15 +1,15 @@
 /**
  * Adapts the hand-authored seed catalog (`../../data/public-seed.ts`) into
- * `@black-book/domain`'s search-index shape (BB-049), so the real search pipeline
+ * `@black-book/domain`'s search-index shape, so the real search pipeline
  * (`runPublicSearch`) has something to query today. This is the same "snapshot" posture as
- * `resolvePublicEntity` (BB-022): a `liveFetch`-shaped seam exists for BB-050/BB-052 to plug a
- * live Firestore `publicSearchIndex` reader into later, without changing the search route/page
+ * `resolvePublicEntity`: a `liveFetch`-shaped seam exists so a later live Firestore
+ * `publicSearchIndex` reader can plug in without changing the search route/page
  * contract — see `getSnapshotSearchIndex` below.
  *
  * `notabilityBasis` synthesis: the seed catalog only carries hand-authored `notabilityLabels`
- * (display strings), not the structured `NotabilityBasisRecord[]` a real entity carries. Since
- * BB-049 AC5 requires the notability gate to run at the search boundary regardless of data
- * source, this adapter reverse-maps each label back to its rubric criterion (exact string match
+ * (display strings), not the structured `NotabilityBasisRecord` a real entity carries. The
+ * notability gate must run at the search boundary regardless of data
+ * source, so this adapter reverse-maps each label back to its rubric criterion (exact string match
  * against `NOTABILITY_RUBRIC`) so the real gate — not a bypass — is what lets these fixtures
  * into the index. A label with no exact rubric match falls back to `documented_site` (the
  * broadest criterion) rather than being dropped, since seed fixtures are known-good by
@@ -49,7 +49,7 @@ function toSearchableRecord(entity: PublicEntityView): SearchableEntityRecord {
     kind: entity.kind,
     displayName: entity.displayName,
     nameLower: entity.displayName.toLowerCase(),
-    // The seed catalog has no EntityAlias[] data yet — no fixture entity has recorded aliases.
+    // The seed catalog has no EntityAlias data yet no fixture entity has recorded aliases.
     aliases: [],
     ...(entity.summary !== undefined ? { summary: entity.summary } : {}),
     topicTags: entity.topicTags,
@@ -72,7 +72,7 @@ let cachedIndex: readonly PublicSearchIndexDoc[] | undefined;
 
 /**
  * Builds (and memoizes) the search index from the bundled seed catalog. Any fixture missing a
- * notability basis is skipped by the real AC5 gate, not silently included — see
+ * notability basis is skipped by the real notability gate, not silently included — see
  * `buildPublicSearchIndexDocs`. Call `resetSnapshotSearchIndexCache` in tests that mutate
  * process state the gate depends on.
  */

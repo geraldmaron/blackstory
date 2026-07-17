@@ -1,7 +1,7 @@
 /**
- * Human-readable "why this result" affordances for hybrid search (BB-072 / BB-054).
+ * Human-readable "why this result" affordances for hybrid search.
  *
- * Explanations describe match reasons in plain language — never numeric scores, ranks, or
+ * Explanations describe match reasons in plain language never numeric scores, ranks, or
  * internal fusion weights.
  */
 import { eraBucketOverlapsRecord } from './lanes.js';

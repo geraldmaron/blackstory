@@ -1,5 +1,6 @@
+
 /**
- * BB-060 red-team scenario runners — deterministic fixtures against real integrity gates.
+ * red-team scenario runners deterministic fixtures against real integrity gates.
  */
 import {
   advancePromotionRecord,

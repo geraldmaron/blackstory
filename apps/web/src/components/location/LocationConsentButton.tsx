@@ -1,14 +1,14 @@
 'use client';
 
 /**
- * Explicit-consent trigger for the browser's location permission prompt (BB-050 "browser
+ * Explicit-consent trigger for the browser's location permission prompt ("browser
  * location permission flow: explicit user action before access"). `navigator.geolocation` is
  * read and passed to `../../lib/geocode/browser-geolocation.ts`'s `requestBrowserLocation` only
- * inside this button's own `onClick` handler — never in a `useEffect`, never on mount, never as
+ * inside this button's own `onClick` handler never in a `useEffect`, never on mount, never as
  * a side effect of any other control. There is no code path in this component that can trigger
  * the permission prompt without a user press.
  *
- * Status changes (requesting / denied / unsupported) are announced through a visually-hidden
+ * Status changes (requesting denied unsupported) are announced through a visually-hidden
  * `aria-live="polite"` region rather than relying on the button's own visible label text alone,
  * so screen reader users get the same feedback sighted users see in the label change.
  */

@@ -1,8 +1,8 @@
 /**
- * SSR markup smoke tests for LocationResolutionPanel (BB-050). Covers every `LocateClientResult`
- * variant and asserts acceptance criterion 3 directly: even when a (hypothetical) resolution
- * carried `precision.lat`/`precision.lng`, this component's rendered markup never contains them —
- * it only ever reads jurisdiction names/ids.
+ * SSR markup smoke tests for LocationResolutionPanel. Covers every `LocateClientResult`
+ * variant and asserts that even when a (hypothetical) resolution carried `precision.lat`/
+ * `precision.lng`, this component's rendered markup never contains them — it only ever reads
+ * jurisdiction names/ids.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';

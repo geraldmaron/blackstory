@@ -1,3 +1,4 @@
+
 /**
  * Defines administrator custom claims, server authorization gates, recent-authentication
  * requirements, session revocation operations, and authentication alert contracts.

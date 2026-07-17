@@ -1,5 +1,5 @@
 /**
- * BB-083 acceptance criterion 3: the repair ladder, tested explicitly in order —
+ * the repair ladder, tested explicitly in order 
  * permanent_redirect -> wayback_swap -> retroactive_spn -> dead_mark.
  */
 import assert from 'node:assert/strict';

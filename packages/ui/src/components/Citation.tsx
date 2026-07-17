@@ -1,12 +1,11 @@
+
 /**
  * Citation block with source label and optional external link (non-color provenance cue).
  *
- * BB-083 additive: an optional `linkStatus` prop renders the reader-facing degraded-citation
- * treatment (owner brief 2026-07-17's "mark dead links, offer a search term" pattern) for
- * 'dead' or 'drifted' citations. Every prop below `className` is optional and defaults to the
- * original alive-citation rendering, so every existing `<Citation source=... href=... />`
- * call site (apps/web/src/app/entity/[id]/page.tsx, apps/web/src/app/methodology/page.tsx,
- * apps/web/src/app/design-system/page.tsx) renders exactly as before.
+ * An optional `linkStatus` prop renders the reader-facing degraded-citation treatment
+ * (mark dead links, offer a search term) for 'dead' or 'drifted' citations. Every prop
+ * below `className` is optional and defaults to the original alive-citation rendering, so
+ * existing `<Citation source=... href=... />` call sites render exactly as before.
  */
 
 import React, { type ReactNode } from 'react';
@@ -25,15 +24,15 @@ export type CitationProps = {
   readonly href?: string;
   readonly children?: ReactNode;
   readonly className?: string;
-  /** BB-083: when set to 'dead' or 'drifted', renders the degraded-citation notice below the
-   *  normal citation block. Omitted (the default) renders exactly as before this addition. */
+  /** When set to 'dead' or 'drifted', renders the degraded-citation notice below the
+   * normal citation block. Omitted (the default) renders exactly as before this addition. */
   readonly linkStatus?: CitationLinkStatus;
-  /** ISO date the link was last confirmed dead — rendered as "link dead as of <date>". */
+  /** ISO date the link was last confirmed dead rendered as "link dead as of <date>". */
   readonly deadAsOfDate?: string;
   /** Archived-copy URL (typically a Wayback capture), shown when available for a dead link. */
   readonly archivedHref?: string;
   /** Deterministic suggestion text from `buildTrySearchingForSuggestion`
-   *  (packages/domain/src/citations/try-searching-for.ts) — no LLM call is made to produce it. */
+   * (packages/domain/src/citations/try-searching-for.ts); no LLM call is made to produce it. */
   readonly trySearchingFor?: string;
 };
 

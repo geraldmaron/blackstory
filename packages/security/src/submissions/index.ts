@@ -1,5 +1,6 @@
+
 /**
- * Exposes the BB-029 submission quarantine contract from one package-local boundary.
+ * Exposes the submission quarantine contract from one package-local boundary.
  */
 export {
   SUBMISSION_QUARANTINE_POLICY_VERSION,

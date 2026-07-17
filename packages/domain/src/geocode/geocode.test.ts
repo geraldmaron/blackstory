@@ -1,6 +1,6 @@
 /**
- * Tests for the BB-050 geocode pipeline, cache, coordinate-precision reduction, ZIP
- * translate-then-discard, manual fallback, product scope, and coarse analytics — all against a
+ * Tests for the geocode pipeline, cache, coordinate-precision reduction, ZIP
+ * translate-then-discard, manual fallback, product scope, and coarse analytics all against a
  * fake `CensusAddressGeocodeFetcher`/`CensusCoordinatesGeocodeFetcher` (no network I/O; the
  * live Census HTTP call is covered separately in
  * `../adapters/census-geo/geocoder-client.test.ts`).

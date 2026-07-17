@@ -1,6 +1,6 @@
 /**
- * Wayback Machine Save Page Now (SPN2) capture types (BB-073).
- * This is the first real archival-API integration in this repo — every other adapter to date
+ * Wayback Machine Save Page Now (SPN2) capture types.
+ * This is the first real archival-API integration in this repo every other adapter to date
  * (Wikimedia, federal) only parses fixture/pre-fetched shapes. SPN is authenticated, submits a
  * URL for capture, and returns a job id the caller polls until the capture resolves to a
  * `https://web.archive.org/web/<timestamp>/<url>` pointer.

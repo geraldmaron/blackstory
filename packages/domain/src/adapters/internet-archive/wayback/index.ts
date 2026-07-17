@@ -1,5 +1,5 @@
 /**
- * Wayback Save Page Now (SPN2) capture layer public surface (BB-073).
+ * Wayback Save Page Now (SPN2) capture layer public surface.
  */
 export {
   WAYBACK_SPN_SUBMIT_URL,

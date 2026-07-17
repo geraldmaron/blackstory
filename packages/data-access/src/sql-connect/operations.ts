@@ -1,5 +1,5 @@
 /**
- * SQL Connect / Data Connect operation allowlist with explicit authorization metadata.
+ * SQL Connect Data Connect operation allowlist with explicit authorization metadata.
  * Every deployable operation must appear here before runtime use (ADR-003).
  */
 import type { DatabaseRole } from '../roles.js';
@@ -29,7 +29,7 @@ export type SqlConnectOperation = {
 
 /**
  * Allowlist mirrors infra/database/sql-connect connectors.
- * authLevel is always NO_ACCESS: only Admin SDK / privileged servers may execute.
+ * authLevel is always NO_ACCESS: only Admin SDK privileged servers may execute.
  */
 export const SQL_CONNECT_OPERATIONS: readonly SqlConnectOperation[] = [
   {

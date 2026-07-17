@@ -1,7 +1,7 @@
 /**
- * Unit tests for the BB-092/BB-090 seed graph substrate feeding the entity page (BB-052).
+ * Unit tests for the seed graph substrate feeding the entity page.
  * Confirms `related`/`timeline` are genuinely DERIVED through the real domain graph-view builders
- * over typed edges — not hand-typed final arrays — and that status/sensitivity fixtures resolve
+ * over typed edges not hand-typed final arrays and that status/sensitivity fixtures resolve
  * as expected.
  */
 import assert from 'node:assert/strict';
@@ -38,7 +38,7 @@ test('currentStatusFor / statusHistoryFor derive status from the open-ended hist
   assert.equal(history?.length, 2);
   assert.equal(history?.[0]?.status, 'historic');
   assert.equal(history?.[1]?.status, 'active');
-  // event kinds are statusless by design (BB-090 STATUSLESS_ENTITY_KINDS) — no history entry exists.
+  // event kinds are statusless by design no history entry exists.
   assert.equal(currentStatusFor('ent_seed_event_001'), undefined);
   assert.equal(statusHistoryFor('ent_seed_event_001'), undefined);
 });

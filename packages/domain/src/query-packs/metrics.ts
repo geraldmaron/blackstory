@@ -1,5 +1,5 @@
 /**
- * Query-pack effectiveness metrics: record and aggregate helpers (BB-038).
+ * Query-pack effectiveness metrics: record and aggregate helpers.
  */
 import type {
   QueryPackEffectivenessMetrics,

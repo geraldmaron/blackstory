@@ -1,8 +1,8 @@
 /**
- * Tests for BB-092 acceptance criterion 3: the derived graph release artifact (per-entity
+ * Tests for the derived graph release artifact (per-entity
  * adjacency, per-decade views, all-time union) is deterministic, cycle-safe, bounded-depth, and
- * re-runnable — plus acceptance criterion 4's path-shape convention (BB-019 pattern) and
- * acceptance criterion 5's public related-entry projection.
+ * re-runnable plus path-shape convention and
+ * public related-entry projection.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -69,7 +69,7 @@ test('RE-RUNNABLE: building twice in sequence (simulating a publication-worker r
 
 test('CYCLE-SAFE / BOUNDED-DEPTH: a build over cyclic containment fixtures still terminates and produces output', () => {
   // The graph-view build itself doesn't traverse containment (that's ./containment.ts's job,
-  // independently proven cycle-safe in containment.test.ts) — this proves the overall build
+  // independently proven cycle-safe in containment.test.ts); this proves the overall build
   // pipeline tolerates a relationship set that happens to contain a cycle without hanging.
   const input: GraphReleaseArtifactInput = {
     releaseId: 'release-cycle-check',

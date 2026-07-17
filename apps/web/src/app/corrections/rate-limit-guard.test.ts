@@ -1,5 +1,5 @@
 /**
- * Unit tests for BB-055 correction rate-limit guard reuse under the corrections endpoint class.
+ * Unit tests for correction rate-limit guard reuse under the corrections endpoint class.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

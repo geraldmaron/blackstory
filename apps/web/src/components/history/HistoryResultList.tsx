@@ -1,5 +1,5 @@
 /**
- * Synchronized list peer for BB-093 `/history` (BB-051 parity rule). Every item links to the
+ * Synchronized list peer for `/history`. Every item links to the
  * entity page; selection state mirrors the graph panel and narrative card. Keyboard and
  * screen-reader users reach every node and edge off-ramp without relying on the graph visualization.
  */

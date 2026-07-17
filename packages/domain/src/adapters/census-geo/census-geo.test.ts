@@ -1,6 +1,6 @@
 /**
- * Tests proving the BB-091 Census TIGER/Gazetteer source is registered through the BB-037
- * registry with a public-domain license verdict (BB-091 acceptance criterion 7).
+ * Tests proving the Census TIGER/Gazetteer source is registered through the 
+ * registry with a public-domain license verdict.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

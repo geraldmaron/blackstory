@@ -1,7 +1,7 @@
 /**
- * Curated legal landscape seed catalog for BB-087 web surfaces. Fixtures only — stands in for
- * Firestore `legalSnapshots` + published `FactRecord` projections. Fact ids BB-F-000010+
- * deliberately avoid collision with `facts-seed.ts` (BB-F-000001–000005).
+ * Curated legal landscape seed catalog for web surfaces. Fixtures only — stands in for
+ * Firestore `legalSnapshots` + published `FactRecord` projections. Fact ids `BB-F-000010`+
+ * deliberately avoid collision with `facts-seed.ts` (`BB-F-000001`–`000005`).
  */
 import { asFactId, type FactRecord } from '@black-book/domain';
 import type {

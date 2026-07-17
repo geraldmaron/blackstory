@@ -1,5 +1,5 @@
 /**
- * Local barrel for BB-057 SEO helpers under apps/web.
+ * Local barrel for SEO helpers under apps/web.
  */
 
 export * from './protected-fields';

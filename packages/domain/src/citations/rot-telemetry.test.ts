@@ -1,5 +1,5 @@
 /**
- * BB-083 acceptance criterion 6: rot-rate telemetry per source class, plus the additive
+ * rot-rate telemetry per source class, plus the additive
  * confidence-engine authority signal it feeds.
  */
 import assert from 'node:assert/strict';

@@ -1,7 +1,8 @@
+
 /**
- * BB-084 acceptance: silence is a failure mode, not just explicit failure. A job that simply
- * stops running (no run records at all in the missed window) must be detected, and a job that
- * exceeds its declared budget must be detected — both independent of whether any run recorded
+ * Silence is a failure mode, not just explicit failure. A job that simply
+ * stops running (no run records at) must be detected, and a job that
+ * exceeds its declared budget must be detected both independent of whether any run recorded
  * an explicit 'failure' status.
  */
 import assert from 'node:assert/strict';
@@ -68,7 +69,7 @@ test('an explicit failure run does not reset the silence clock — a job that ke
     registeredAtIso: '2026-07-05T04:00:00.000Z',
     nowIso: '2026-07-14T04:00:00.000Z',
   });
-  // No completed success/quarantined run exists, so silence is measured from registration —
+  // No completed success/quarantined run exists, so silence is measured from registration
   // an explicit failure record must not mask the underlying missed-successful-run silence.
   assert.equal(evaluation.triggered, true);
   assert.equal(evaluation.lastSuccessAt, undefined);

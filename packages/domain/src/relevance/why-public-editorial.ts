@@ -1,8 +1,8 @@
 /**
- * BB-054 editorial check: passive-euphemism scan for public "why this appears" prose (BB-054
+ * editorial check: passive-euphemism scan for public "why this appears" prose (
  * Deliver #3). Mirrors the existing, adjacent editorial-guard pattern already used for advisory
- * copy (`PROHIBITED_ADVISORY_LANGUAGE` / `assertProceduralAdvisoryLanguage`, ../advisory.js) and
- * identity-attribute framing (`assertNoIdentityAttributeFraming`, ../disclaimers.js), but targets
+ * copy (`PROHIBITED_ADVISORY_LANGUAGE` `assertProceduralAdvisoryLanguage`,../advisory.js) and
+ * identity-attribute framing (`assertNoIdentityAttributeFraming`,../disclaimers.js), but targets
  * a different failure mode: agentless, euphemistic phrasing that launders documented harm
  * (violence, enslavement, discrimination) into vague language with no named actor or action
  * ("an incident occurred", "tensions arose") rather than describing what is actually documented.
@@ -12,7 +12,7 @@
  */
 
 /**
- * Non-exhaustive by design — a coarse, reviewable phrase list rather than a passive-voice parser.
+ * Non-exhaustive by design a coarse, reviewable phrase list rather than a passive-voice parser.
  * False negatives (an euphemism this list misses) are the accepted failure mode; the list is
  * extended as editorial review finds new instances, the same discipline `unsupportedProceduralLanguage`
  * (packages/schemas/constitution/policy.v1.json) uses for its own banned-phrase list.
@@ -46,7 +46,7 @@ export type EditorialFinding = {
   readonly index: number;
 };
 
-/** Non-throwing scan — returns every matched phrase and its position, for review tooling and
+/** Non-throwing scan returns every matched phrase and its position, for review tooling and
  * tests. Case-insensitive; matches are reported against the original (non-lowercased) `text`. */
 export function findPassiveEuphemisms(text: string): readonly EditorialFinding[] {
   const normalized = text.toLowerCase();

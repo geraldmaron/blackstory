@@ -1,28 +1,28 @@
 /**
- * Link-health checker state machine (BB-083 acceptance criterion 2): pure, dependency-injected
- * classification of a re-verification fetch into alive / redirected / drifted / dead, plus a
+ * Link-health checker state machine: pure, dependency-injected
+ * classification of a re-verification fetch into alive redirected drifted dead, plus a
  * retry-before-declaring-dead state machine across scheduled sweeps.
  *
  * `@black-book/domain` cannot import `@black-book/security` (security depends on domain; the
- * reverse edge would be a circular workspace dependency) — see
+ * reverse edge would be a circular workspace dependency) see
  * packages/domain/src/rights/takedown.ts and packages/domain/src/map/map-source.ts for the same
  * port pattern used here. `LinkCheckFetchResult` below is structurally compatible with (a
- * superset of) `SafeFetchResult` from `@black-book/security`'s BB-030 url-safety fetch policy
- * (`executeSafeFetch`). The real wiring — calling `executeSafeFetch` and adapting its result
- * into this port — lives in
+ * superset of) `SafeFetchResult` from `@black-book/security`'s url-safety fetch policy
+ * (`executeSafeFetch`). The real wiring calling `executeSafeFetch` and adapting its result
+ * into this port lives in
  * packages/config/src/scheduled-jobs/jobs/citation-link-health-sweep.ts, the one layer allowed
  * to depend on both packages. This module never performs network I/O itself.
  *
  * Disclosed gap: `executeSafeFetch`'s success branch does not surface the numeric HTTP status
  * of the final response (any non-redirect status it accepts is treated as fetchable content),
  * and its redirect-following loop does not preserve which hop's status code was 301/308
- * (permanent) versus 302/303/307 (temporary) — it only returns a final `redirectCount`. Precise
+ * (permanent) versus 302/303/307 (temporary) it only returns a final `redirectCount`. Precise
  * "404/410/paywalled" classification and "permanent vs temporary redirect" therefore require the
- * caller's transport wrapper to additionally report `httpStatus` / `permanentRedirect` on this
- * port (obtainable from the same `PinnedTransportResponse.status` BB-030's transport already
- * sees, before `executeSafeFetch` discards it) — see the job wrapper for how that's done. Absent
- * that extra reporting, this module still safely classifies alive / redirected (via
- * `redirectCount`) / a DNS-failure flavor of dead, and treats other failures as retryable rather
+ * caller's transport wrapper to additionally report `httpStatus` `permanentRedirect` on this
+ * port (obtainable from the same `PinnedTransportResponse.status` transport already
+ * sees, before `executeSafeFetch` discards it) see the job wrapper for how that's done. Absent
+ * that extra reporting, this module still safely classifies alive redirected (via
+ * `redirectCount`) a DNS-failure flavor of dead, and treats other failures as retryable rather
  * than guessing at a reason it cannot verify.
  */
 import type { ContentHash } from '../provenance/hashes.js';
@@ -34,7 +34,7 @@ import type { LinkHealthStatus } from './citation.js';
 export const DEAD_LINK_REASONS = ['not_found', 'gone', 'dns_not_found', 'paywalled', 'other'] as const;
 export type DeadLinkReason = (typeof DEAD_LINK_REASONS)[number];
 
-/** Structural port for a BB-030-driven re-verification fetch — see module doc above. */
+/** Structural port for a -driven re-verification fetch see module doc above. */
 export type LinkCheckFetchResult =
   | {
       readonly ok: true;
@@ -46,8 +46,8 @@ export type LinkCheckFetchResult =
     }
   | {
       readonly ok: false;
-      /** Structurally matches BB-030's `SafeFetchFailureReason`, kept as `string` here so this
-       *  port does not need to import the security package's type. */
+      /** Structurally matches `SafeFetchFailureReason`, kept as `string` here so this
+       * port does not need to import the security package's type. */
       readonly reason: string;
       readonly httpStatus?: number;
     };
@@ -75,7 +75,7 @@ function deadReasonForHttpStatus(httpStatus: number | undefined): DeadLinkReason
 /**
  * Classifies a single fetch attempt. Retry state (whether this attempt's failure should
  * actually flip the citation to 'dead' yet) is decided separately by `advanceLinkHealthState`
- * below — this function only interprets one attempt in isolation.
+ * below this function only interprets one attempt in isolation.
  */
 export function classifyLinkCheckAttempt(input: {
   readonly fetch: LinkCheckFetchResult;
@@ -125,8 +125,8 @@ export function classifyLinkCheckAttempt(input: {
   if (fetch.reason === 'dns_resolution_failed' || fetch.reason === 'dns_answer_not_public') {
     return { status: 'dead', deadReason: 'dns_not_found' };
   }
-  // Any other BB-030 failure (transport error, size/content-type limits, duration exceeded,
-  // redirect limit exceeded, etc.) is treated as retryable rather than immediately dead — a
+  // Any other failure (transport error, size/content-type limits, duration exceeded,
+  // redirect limit exceeded, etc.) is treated as retryable rather than immediately dead a
   // transient failure must not be conflated with a confirmed-gone resource.
   return { status: 'pending_retry' };
 }
@@ -143,8 +143,8 @@ export const DEFAULT_MAX_RETRIES_BEFORE_DEAD = 3;
 
 /**
  * Advances a citation's link-health state by one scheduled check. A single failed/ambiguous
- * attempt does not declare death — only after `maxRetriesBeforeDead` *consecutive* failed
- * attempts does the status flip to 'dead' (BB-083 acceptance criterion 2: "retry before
+ * attempt does not declare death only after `maxRetriesBeforeDead` *consecutive* failed
+ * attempts does the status flip to 'dead' ("retry before
  * declaring death"). An explicit dead classification (404/410/NXDOMAIN/paywalled) short-circuits
  * the retry budget immediately since it is not ambiguous.
  */

@@ -1,6 +1,6 @@
 /**
- * Confirms the BB-051 explore page view-model: every active-release entity with a geo anchor
- * appears, era filters use BB-090 decade buckets, and default filters never silently hide records.
+ * Confirms the explore page view-model: every active-release entity with a geo anchor
+ * appears, era filters use decade buckets, and default filters never silently hide records.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

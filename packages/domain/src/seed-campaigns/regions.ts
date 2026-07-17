@@ -1,6 +1,6 @@
 /**
- * Maps U.S. state postal codes to Census Bureau regions for BB-058 geographic diversity
- * reporting. Product scope is 50 states + D.C. (no territories), matching BB-070.
+ * Maps U.S. state postal codes to Census Bureau regions for geographic diversity
+ * reporting. Product scope is 50 states + D.C. (no territories), matching.
  */
 import type { UsCensusRegion } from './types.js';
 

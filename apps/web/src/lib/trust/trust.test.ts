@@ -1,5 +1,5 @@
 /**
- * Tests for BB-088 web trust helpers — errata feeds, myth exclusivity, and seed wiring.
+ * Tests for web trust helpers errata feeds, myth exclusivity, and seed wiring.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

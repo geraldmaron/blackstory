@@ -29,6 +29,18 @@ export type PublicProjectionInput = {
   readonly eraBuckets?: readonly string[];
   readonly notabilityLabels?: readonly string[];
   readonly sensitivityClass?: string;
+  readonly topicTags?: readonly string[];
+  readonly historicalContext?: string;
+  readonly extendedNarrative?: string;
+  readonly primaryImage?: {
+    readonly url: string;
+    readonly alt: string;
+    readonly credit: string;
+    readonly rightsStatus: 'public_domain' | 'licensed' | 'fair_use';
+    readonly width?: number;
+    readonly height?: number;
+    readonly objectPath?: string;
+  };
   readonly related?: readonly {
     readonly id: string;
     readonly type: string;
@@ -50,6 +62,21 @@ function locationPrecisionFromProjection(
   return 'city';
 }
 
+function mapPrimaryImage(
+  image: PublicProjectionInput['primaryImage'],
+): PublicEntityView['primaryImage'] {
+  if (!image) return undefined;
+  return {
+    url: image.url,
+    alt: image.alt,
+    credit: image.credit,
+    rightsStatus: image.rightsStatus,
+    ...(image.width !== undefined ? { width: image.width } : {}),
+    ...(image.height !== undefined ? { height: image.height } : {}),
+    ...(image.objectPath !== undefined ? { objectPath: image.objectPath } : {}),
+  };
+}
+
 /**
  * Convert a public projection doc into a page-ready view.
  * Prefer bundled seed fields when present so UI sections stay populated during
@@ -59,11 +86,22 @@ export function mapProjectionToPublicEntityView(
   projection: PublicProjectionInput,
 ): PublicEntityView {
   const seed = getPublicEntity(projection.id);
+  const summary =
+    projection.summary && projection.summary.trim().length > 0
+      ? projection.summary
+      : (seed?.summary ?? '');
+  const topicTags =
+    projection.topicTags && projection.topicTags.length > 0
+      ? projection.topicTags
+      : (seed?.topicTags ?? []);
+  const primaryImage = mapPrimaryImage(projection.primaryImage) ?? seed?.primaryImage;
+
   if (seed) {
     return {
       ...seed,
       displayName: projection.displayName,
-      summary: projection.summary ?? seed.summary,
+      summary,
+      topicTags,
       revision: {
         releaseId: projection.releaseId,
         generatedAt: seed.revision.generatedAt,
@@ -77,6 +115,15 @@ export function mapProjectionToPublicEntityView(
       ...(projection.sensitivityClass !== undefined
         ? { sensitivityClass: projection.sensitivityClass }
         : {}),
+      ...(projection.historicalContext !== undefined
+        ? { historicalContext: projection.historicalContext }
+        : {}),
+      ...(projection.extendedNarrative !== undefined
+        ? { extendedNarrative: projection.extendedNarrative }
+        : seed.extendedNarrative !== undefined
+          ? { extendedNarrative: seed.extendedNarrative }
+          : {}),
+      ...(primaryImage !== undefined ? { primaryImage } : {}),
       ...(projection.related !== undefined
         ? {
             related: projection.related.map((entry) => ({
@@ -105,7 +152,7 @@ export function mapProjectionToPublicEntityView(
     id: projection.id,
     kind: projection.kind as PublicEntityView['kind'],
     displayName: projection.displayName,
-    summary: projection.summary ?? '',
+    summary,
     era: projection.eraBuckets?.[0] ?? 'unknown',
     ...(projection.status !== undefined ? { status: projection.status } : {}),
     ...(projection.eraBuckets !== undefined ? { eraBuckets: projection.eraBuckets } : {}),
@@ -115,14 +162,19 @@ export function mapProjectionToPublicEntityView(
     ...(projection.sensitivityClass !== undefined
       ? { sensitivityClass: projection.sensitivityClass }
       : {}),
-    topicTags: [],
+    topicTags,
     jurisdictionLabel: 'Unknown',
     locationPrecision: locationPrecisionFromProjection(projection.location?.precision),
     locationLabel: projection.displayName,
     relevanceExplanation:
       'This record is served from the live public release projection. Supporting claims and evidence panels may still be sparse until the full publication pipeline lands.',
     historicalContext:
+      projection.historicalContext ??
       'Live projection scaffolding — historical framing expands as curated release content is published.',
+    ...(projection.extendedNarrative !== undefined
+      ? { extendedNarrative: projection.extendedNarrative }
+      : {}),
+    ...(primaryImage !== undefined ? { primaryImage } : {}),
     recordMaturity: 'projection_stub',
     researchCoverage: 'minimal',
     mapPin,

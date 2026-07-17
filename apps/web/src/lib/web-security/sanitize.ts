@@ -1,5 +1,5 @@
 /**
- * Output encoding and HTML sanitization without third-party deps (BB-028).
+ * Output encoding and HTML sanitization without third-party deps.
  * Prefer escapeHtml for plain text; sanitizeRichText for markdown/HTML fragments.
  */
 
@@ -17,12 +17,12 @@ const HTML_ESCAPE_MAP: Record<string, string> = {
   "'": '&#39;',
 };
 
-/** Encode plain text for HTML text nodes and attributes. */
+/** Encode plain text for HTML text nodes and attributes.  */
 export function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (char) => HTML_ESCAPE_MAP[char] ?? char);
 }
 
-/** Encode for embedding inside a double-quoted HTML attribute. */
+/** Encode for embedding inside a double-quoted HTML attribute.  */
 export function escapeHtmlAttribute(value: string): string {
   return escapeHtml(value);
 }
@@ -39,7 +39,7 @@ const DANGEROUS_URI_PATTERN =
 const TAG_PATTERN = /<\/?([a-zA-Z][\w-]*)([^>]*)>/g;
 
 /**
- * Strip executable markup from rich text / markdown HTML fragments.
+ * Strip executable markup from rich text markdown HTML fragments.
  * Allows a conservative tag allowlist; removes events, scripts, and dangerous URIs.
  */
 export function sanitizeRichText(input: string): string {
@@ -102,5 +102,5 @@ function isAllowedUri(value: string): boolean {
   return RICH_TEXT_ALLOWED_URI_SCHEMES.has(schemeMatch[1]!.toLowerCase());
 }
 
-/** Alias for HTML fragment sanitization (same allowlist policy). */
+/** Alias for HTML fragment sanitization (same allowlist policy).  */
 export const sanitizeHtml = sanitizeRichText;

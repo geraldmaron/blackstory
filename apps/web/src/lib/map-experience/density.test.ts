@@ -1,5 +1,5 @@
 /**
- * Confirms the BB-051 density-tier bucketing never demotes a present state to a "none" bucket.
+ * Confirms the density-tier bucketing never demotes a present state to a "none" bucket.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

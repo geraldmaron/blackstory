@@ -1,7 +1,7 @@
 /**
- * BB-087 legal landscape module public surface. NOT yet re-exported from
- * `packages/domain/src/index.ts` (parent-merge file) — import from
- * `../legal/index.js` directly until the parent merges the barrel export.
+ * Legal landscape module public surface. Not yet re-exported from
+ * `packages/domain/src/index.ts` — import from `../legal/index.js` directly until the root
+ * barrel adds the export.
  */
 export {
   LEGAL_LICENSE_TAGS,

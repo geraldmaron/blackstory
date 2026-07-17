@@ -1,8 +1,8 @@
 /**
- * Canonical fact detail page at `/facts/{id}/{slug}` (BB-086 AC3/AC4/AC6).
+ * Canonical fact detail page at `/facts/{id}/{slug}`.
  *
  * Cosmetic slug mismatches 301 to the current slug. Deprecated/superseded/corrected records stay
- * resolvable with a banner — never 404. Emits Article JSON-LD (never ClaimReview).
+ * resolvable with a banner never 404. Emits Article JSON-LD (never ClaimReview).
  */
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Card } from '@black-book/ui';

@@ -1,5 +1,5 @@
 /**
- * Relevance fixture loading for gold calibration cases (BB-040).
+ * Relevance fixture loading for gold calibration cases.
  */
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

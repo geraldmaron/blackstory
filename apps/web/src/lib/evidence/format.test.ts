@@ -1,5 +1,5 @@
 /**
- * Unit tests for BB-053 presentation string helpers.
+ * Unit tests for presentation string helpers.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

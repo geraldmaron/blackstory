@@ -1,5 +1,5 @@
 /**
- * Source captures and retrieval events with parser versions and selective snapshots (BB-016).
+ * Source captures and retrieval events with parser versions and selective snapshots.
  */
 import type { ContentHash } from './hashes.js';
 import { normalizeContentHash } from './hashes.js';

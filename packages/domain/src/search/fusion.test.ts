@@ -1,5 +1,5 @@
 /**
- * Tests for hybrid fusion weights config (BB-072 AC5).
+ * Tests for hybrid fusion weights config.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

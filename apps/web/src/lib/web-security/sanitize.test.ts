@@ -1,5 +1,5 @@
 /**
- * XSS-oriented unit tests for HTML sanitization (BB-028).
+ * XSS-oriented unit tests for HTML sanitization.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

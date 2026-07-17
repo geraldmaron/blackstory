@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+
 /**
- * Evaluates BB-063 beta launch gate criteria and exits non-zero on NO_GO.
+ * Evaluates beta launch gate criteria and exits non-zero on NO_GO.
  */
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';

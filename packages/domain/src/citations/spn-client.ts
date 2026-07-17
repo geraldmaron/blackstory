@@ -1,22 +1,16 @@
 /**
  * Minimal Save Page Now (archive.org) client for the repair ladder's step 3: "if no capture
- * exists, attempt a retroactive Save Page Now" (BB-083 acceptance criterion 3).
+ * exists, attempt a retroactive Save Page Now".
  *
- * BB-073 (adapters, this session's parallel territory, read-only to this bead) may build its
- * own Internet Archive / Save Page Now client under packages/domain/src/adapters/ — at the time
- * this module was written, no such client existed there (checked: no save-page-now / SPN
- * references anywhere in packages/domain/src/adapters, packages/security, or packages/config).
- * Rather than block on in-flight parallel work this bead cannot safely depend on mid-session,
- * this is a deliberately minimal, independent SPN caller following the same
- * dependency-injected/port pattern as ../citations/link-health.ts. If BB-073 lands an
- * equivalent client, merging the two into one (retiring whichever is thinner) is a clean,
- * low-risk follow-up — noting the near-duplicate here rather than silently leaving it.
+ * Adapters under `packages/domain/src/adapters/` may eventually own a fuller Internet Archive
+ * SPN client; this module is a deliberately minimal, independent SPN caller following the same
+ * dependency-injected/port pattern as `../citations/link-health.ts`. If an equivalent adapter
+ * client lands later, merging the two (retiring whichever is thinner) is a clean follow-up.
  *
- * Like link-health.ts, this module performs no network I/O itself and cannot import
+ * Like `link-health.ts`, this module performs no network I/O itself and cannot import
  * `@black-book/security` (circular dependency). `SpnFetchResult` is the same structural port
  * shape as `LinkCheckFetchResult`; the real POST to `https://web.archive.org/save/<url>` through
- * BB-030's safe-fetch policy is wired in packages/config/src/scheduled-jobs/jobs/
- * citation-link-health-sweep.ts.
+ * safe-fetch policy is wired in `packages/config/src/scheduled-jobs/jobs/citation-link-health-sweep.ts`.
  */
 
 const WAYBACK_HOST_PATTERN = /(^|\.)web\.archive\.org$/i;
@@ -29,7 +23,7 @@ export type SpnCaptureOutcome =
   | { readonly ok: true; readonly waybackCaptureUrl: string; readonly capturedAt: string }
   | { readonly ok: false; readonly reason: string };
 
-/** Builds the Save Page Now request URL for a target page (archive.org's "save" endpoint). */
+/** Builds the Save Page Now request URL for a target page (archive.orgthe "save" endpoint). */
 export function buildSpnSaveUrl(targetUrl: string): string {
   if (!targetUrl.trim()) {
     throw new Error('buildSpnSaveUrl requires a non-empty targetUrl');
@@ -52,7 +46,7 @@ function isWaybackCaptureResponseUrl(value: string): boolean {
 }
 
 /**
- * Interprets the result of a Save Page Now request (already fetched through BB-030 by the
+ * Interprets the result of a Save Page Now request (already fetched through by the
  * caller) into a capture outcome. SPN redirects the final URL to the newly minted
  * `web.archive.org/web/<timestamp>/<url>` capture location on success.
  */

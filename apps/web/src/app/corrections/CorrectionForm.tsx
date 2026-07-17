@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Public BB-055 correction intake form. Posts to `/corrections/api` — quarantine-only, never
+ * Public correction intake form. Posts to `/corrections/api` quarantine-only, never
  * public. Supports entity/claim/source/location targets, structured categories, source URL,
  * privacy consent, and returns a receipt code on success.
  */

@@ -1,5 +1,5 @@
 /**
- * Branded identifiers for sources, captures, evidence, and related provenance records (BB-016).
+ * Branded identifiers for sources, captures, evidence, and related provenance records.
  */
 
 export type SourceOrganizationId = string & { readonly __brand: 'SourceOrganizationId' };

@@ -1,11 +1,11 @@
 /**
- * Strict cache key builders for public pages (BB-022).
- * Keys incorporate normalized query strings only — never raw tracking params.
+ * Strict cache key builders for public pages.
+ * Keys incorporate normalized query strings only never raw tracking params.
  */
 
 import { normalizeQueryString, type QueryParamBag } from './query-normalization';
 
-/** Build a deterministic cache key for a public HTML route. */
+/** Build a deterministic cache key for a public HTML route.  */
 export function buildPublicPageCacheKey(
   pathname: string,
   search?: URLSearchParams | QueryParamBag,
@@ -19,7 +19,7 @@ export function buildPublicPageCacheKey(
   return qs ? `${path}?${qs}` : path || '/';
 }
 
-/** Cache key for entity detail pages (path-param only; query strings ignored). */
+/** Cache key for entity detail pages (path-param only; query strings ignored).  */
 export function buildEntityCacheKey(entityId: string): string {
   const id = entityId.trim();
   if (!id) {
@@ -28,7 +28,7 @@ export function buildEntityCacheKey(entityId: string): string {
   return `/entity/${id}`;
 }
 
-/** Cache key for the public search index given normalized filters. */
+/** Cache key for the public search index given normalized filters.  */
 export function buildSearchCacheKey(filters: QueryParamBag): string {
   return buildPublicPageCacheKey('/search', filters);
 }

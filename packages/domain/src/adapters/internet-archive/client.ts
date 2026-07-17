@@ -1,7 +1,7 @@
 /**
  * Defensive parsing for Internet Archive Advanced Search, Scrape (cursor-based), and Metadata
- * API responses (BB-073). Malformed individual docs are rejected (recorded, not thrown) so one
- * bad record never poisons an entire batch — the same posture the DPLA adapter uses, since IA
+ * API responses. Malformed individual docs are rejected (recorded, not thrown) so one
+ * bad record never poisons an entire batch the same posture the DPLA adapter uses, since IA
  * aggregates uploads from thousands of independent contributors with inconsistent metadata
  * hygiene.
  */

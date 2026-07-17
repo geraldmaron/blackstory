@@ -1,5 +1,5 @@
 /**
- * Admin console surface contract — separate deployable from apps/web (ADR-005 / BB-021).
+ * Admin console surface contract separate deployable from apps/web (ADR-005).
  */
 import {
   buildSurfaceHealth,

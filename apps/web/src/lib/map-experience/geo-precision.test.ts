@@ -1,6 +1,6 @@
 /**
- * Confirms the BB-051 public-precision -> GeoPrecisionTier mapping and the fail-closed
- * display-radius resolution (BB-091 acceptance criterion: no fabricated radius).
+ * Confirms the public-precision -> GeoPrecisionTier mapping and the fail-closed
+ * display-radius resolution.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

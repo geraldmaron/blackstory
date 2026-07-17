@@ -1,5 +1,5 @@
 /**
- * Unit tests for the public "submit a lead" form-field shaping (BB-076).
+ * Unit tests for the public "submit a lead" form-field shaping.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,12 +1,12 @@
 /**
- * U.S.-only geography reference table for the map data platform (BB-070).
+ * U.S.-only geography reference table for the map data platform.
  *
- * Product scope is 50 states + D.C. (no territories) — same scope line used by
- * ADR-008 / BB-050. This module intentionally does NOT vendor county or state
+ * Product scope is 50 states + D.C. (no territories) same scope line used by
+ * ADR-008 /. This module intentionally does NOT vendor county or state
  * polygon boundary data (e.g. Census TIGER shapefiles): that is a real, honest
  * gap documented in docs/adr/ADR-013-map-stack.md rather than something faked
  * here. State attribution below is an approximate bounding-box test, good
- * enough for national-zoom presence/density aggregates — it is not a survey-
+ * enough for national-zoom presence/density aggregates it is not a survey-
  * grade point-in-polygon spatial join and must never be presented as one.
  */
 
@@ -20,7 +20,7 @@ export type UsStateInfo = {
 };
 
 /**
- * Approximate bounding boxes for the 50 states + D.C. Deliberately coarse —
+ * Approximate bounding boxes for the 50 states + D.C. Deliberately coarse 
  * only used for presence bucketing over already-coarsened public coordinates,
  * never for anything that needs administrative-boundary precision.
  */
@@ -101,7 +101,7 @@ export const US_BOUNDS: readonly [west: number, south: number, east: number, nor
 
 /**
  * Continental U.S. + D.C. camera frame for the national map. Excludes Alaska so MapLibre
- * maxBounds / fitBounds are not pulled to the Pacific; AK/HI remain in `US_STATES` for
+ * maxBounds fitBounds are not pulled to the Pacific; AK/HI remain in `US_STATES` for
  * selection once the user pans or Phase-2 insets land.
  */
 export const US_CONUS_BOUNDS: readonly [west: number, south: number, east: number, north: number] =
@@ -119,7 +119,7 @@ function pointInBbox(lat: number, lng: number, bbox: UsStateInfo['bbox']): boole
 
 /**
  * Approximate state attribution for a public (already-coarsened) coordinate.
- * Bounding-box test only — near-border points may resolve to a neighboring
+ * Bounding-box test only near-border points may resolve to a neighboring
  * state. Sufficient for national/state-zoom presence aggregates; not a
  * substitute for real polygon boundary data (see ADR-013 "known gaps").
  */

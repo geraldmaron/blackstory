@@ -1,5 +1,5 @@
 /**
- * Unit tests for BB-062 release pipeline helpers (dry-run safe).
+ * Unit tests for release pipeline helpers (dry-run safe).
  */
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';

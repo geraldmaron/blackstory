@@ -1,5 +1,5 @@
 /**
- * Map data-platform module (BB-070): U.S. geography reference data and the
+ * Map data-platform module: U.S. geography reference data and the
  * pure, redaction-injected map-source builder. See map-source.ts for the
  * hard invariant this module enforces and the release-pipeline integration
  * point that is not yet wired live.

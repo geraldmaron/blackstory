@@ -1,15 +1,15 @@
 /**
- * Living-person UGC ethics layer (BB-077): runtime guards for the constitution's
- * `ugcLivingPersonRules` extension (packages/schemas/constitution/policy.v1.json). Extends
- * BB-015's living-person enforcement above the legal floor, specifically for user-generated
- * and third-party content.
+ * Living-person UGC ethics layer: runtime guards for the constitution's
+ * `ugcLivingPersonRules` extension (`packages/schemas/constitution/policy.v1.json`). Extends
+ * living-person enforcement above the legal floor, specifically for user-generated and
+ * third-party content.
  *
  * Honesty note on "no cross-source aggregation into profiles": this is fundamentally an
  * architectural constraint, not something one function can guarantee end-to-end.
  * `assertNoCrossSourceProfileAggregation` mechanically rejects aggregation *that is routed
- * through it* — any write path that bypasses this function is invisible to it. The
- * remaining surface (making sure every profile-field write actually calls this guard) is a
- * documented policy constraint enforced by code review, matching the bead's own framing.
+ * through it* — any write path that bypasses this function is invisible to it. The remaining
+ * surface (making sure every profile-field write actually calls this guard) is a documented
+ * policy constraint enforced by code review.
  */
 import {
   evaluateClaimConfidence,
@@ -67,12 +67,12 @@ export type UgcLivingPersonClaimInput = {
 /**
  * Elevated verification threshold: a UGC-derived claim about a living (or unknown-status,
  * treated-as-living) person must clear the constitution's existing high-impact publish
- * threshold (claimConfidenceThresholds.highImpactPublish, currently 0.9 —
+ * threshold (claimConfidenceThresholds.highImpactPublish, currently 0.9 
  * packages/schemas/constitution/policy.v1.json) before it may advance.
  *
  * Decision: reuse the existing 0.9 high-impact tier rather than add a parallel threshold.
  * Living-person UGC claims are exactly the outsized-consequence category that tier already
- * models (BB-017/BB-043's confidence engine), so a second threshold would just be a second
+ * models, so a second threshold would just be a second
  * name for the same number. See `ugcLivingPersonRules.elevatedClaimClass` in the constitution.
  */
 export function assertUgcLivingPersonClaimMayAdvance(
@@ -107,8 +107,8 @@ export type DeanonymizationAttempt = {
  * pseudonymous/anonymous UGC subject is rejected outright.
  *
  * Mirrors the fail-closed assertion pattern used by `assertPublicProjectionSafe`
- * (packages/security/src/serialize.ts). This module cannot import packages/security — that
- * package depends on @black-book/domain, so the reverse import would be circular — so the
+ * (packages/security/src/serialize.ts). This module cannot import packages/security that
+ * package depends on @black-book/domain, so the reverse import would be circular so the
  * pattern is reproduced here rather than shared.
  */
 export function assertNoDeanonymization(

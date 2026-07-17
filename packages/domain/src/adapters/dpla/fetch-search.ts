@@ -1,7 +1,7 @@
 /**
- * Fetches DPLA v2 search results through the BB-030 safe HTTP port (BB-073). Never calls
- * `fetch` directly — see ../internet-archive/shared/http-port.ts for why. The API key is always
- * supplied by the caller (`DPLA_API_KEY`, see .env.example) — this module never reads an
+ * Fetches DPLA v2 search results through the safe HTTP port. Never calls
+ * `fetch` directly see ../internet-archive/shared/http-port.ts for why. The API key is always
+ * supplied by the caller (`DPLA_API_KEY`, see .env.example); this module never reads an
  * environment variable or hardcodes a key itself; tests pass a deterministic fake key.
  */
 import {

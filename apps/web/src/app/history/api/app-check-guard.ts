@@ -1,6 +1,6 @@
 /**
- * Server-only App Check verification for the `/history/api` refine route (BB-093). Reuses the
- * search route's guard factory verbatim — same policy as `/explore/api` (BB-051).
+ * Server-only App Check verification for the `/history/api` refine route. Reuses the
+ * search route's guard factory verbatim same policy as `/explore/api`.
  */
 export {
   createSearchAppCheckGuard as createHistoryAppCheckGuard,

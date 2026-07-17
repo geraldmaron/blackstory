@@ -1,12 +1,12 @@
 /**
- * BB-004 acceptance: real adversarial-submission fixtures from the shared threat corpus
- * (`@black-book/testing`'s BB-036 security-gate fixtures, the harmless deterministic attack
+ * acceptance: real adversarial-submission fixtures from the shared threat corpus
+ * (`@black-book/testing`'s security-gate fixtures, the harmless deterministic attack
  * payloads used across this repo's API and policy contract tests) run through the exact
- * BB-029 quarantine entry point this lane's public submission path calls
+ * quarantine entry point this lane's public submission path calls
  * (`createQuarantinedSubmission` from `@black-book/security`) and are confirmed to never reach
  * canonical storage or a discovery candidate. These are not synthetic fixtures written for
- * this test — they are the corpus already used to gate T-01/T-02 (resource exhaustion),
- * T-04 (mass assignment / BOLA), and T-07 (data poisoning) in `docs/security/threat-corpus.json`.
+ * this test they are the corpus already used to gate T-01/T-02 (resource exhaustion),
+ * T-04 (mass assignment BOLA), and T-07 (data poisoning) in `docs/security/threat-corpus.json`.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -67,7 +67,7 @@ test('XSS payloads land inert in quarantine, never as a canonical write', () => 
     assert.equal(result.accepted, true, `expected ${payload} to be accepted into quarantine, not silently dropped`);
     if (!result.accepted) continue;
     // The payload is stored verbatim (for moderator review) but only ever inside the
-    // quarantine record — never marked eligible for a canonical or public write.
+    // quarantine record never marked eligible for a canonical or public write.
     assert.equal(result.record.destination, 'submission_quarantine');
     assert.equal(result.record.canonicalWriteAllowed, false);
     assert.ok(result.record.original.payload.statement.includes(payload));

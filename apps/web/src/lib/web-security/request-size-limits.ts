@@ -1,5 +1,5 @@
 /**
- * Canonical incoming request size limits (BB-028).
+ * Canonical incoming request size limits.
  */
 
 import { REQUEST_SIZE_LIMITS, type RequestSizeKind } from './constants';
@@ -13,7 +13,7 @@ export class RequestTooLargeError extends Error {
   }
 }
 
-/** Fail closed when Content-Length exceeds the configured limit. */
+/** Fail closed when Content-Length exceeds the configured limit.  */
 export function assertRequestWithinLimit(
   contentLength: number | null | undefined,
   kind: RequestSizeKind,
@@ -32,7 +32,7 @@ export function assertRequestWithinLimit(
   }
 }
 
-/** Returns true when within limit; null/undefined Content-Length is treated as unknown (allowed at edge). */
+/** Returns true when within limit; null/undefined Content-Length is treated as unknown (allowed at edge).  */
 export function isRequestWithinLimit(
   contentLength: number | null | undefined,
   kind: RequestSizeKind,
@@ -45,7 +45,7 @@ export function isRequestWithinLimit(
   }
 }
 
-/** Map Content-Type to the appropriate request size kind. */
+/** Map Content-Type to the appropriate request size kind.  */
 export function requestSizeKindForContentType(contentType: string | null): RequestSizeKind {
   if (!contentType) return 'jsonBody';
   const normalized = contentType.toLowerCase();

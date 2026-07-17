@@ -1,5 +1,5 @@
 /**
- * Edge middleware — BB-028 web security composed with BB-022 query normalization.
+ * Edge middleware web security composed with query normalization.
  */
 
 import { type NextRequest } from 'next/server';

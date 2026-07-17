@@ -1,7 +1,7 @@
 /**
- * Citation health (BB-083): operator dashboard tile showing rot rate by source class, plus a
+ * Citation health: operator dashboard tile showing rot rate by source class, plus a
  * preview of the reader-facing degraded-citation treatment. Fixture data only, matching the
- * `/console` shell's and `/quick-add`'s conventions for this new, sibling route — no live
+ * `/console` shell's and `/quick-add`'s conventions for this new, sibling route no live
  * service connection, no mutation handlers.
  */
 import Link from 'next/link';

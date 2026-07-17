@@ -1,6 +1,6 @@
 /**
- * Defensive DPLA v2 response parsing (BB-073). See types.ts's module header for why this is
- * deliberately tolerant of field renames/relocations rather than assuming a rigid shape —
+ * Defensive DPLA v2 response parsing. See types.ts's module header for why this is
+ * deliberately tolerant of field renames/relocations rather than assuming a rigid shape 
  * DPLA's aggregation program transitions to Cleveland Public Library starting July 2026.
  */
 import type { DplaNormalizedDoc, DplaParsedBatch, DplaRejectedDoc } from './types.js';
@@ -84,7 +84,7 @@ function parseDoc(raw: unknown, index: number): { doc: DplaNormalizedDoc } | { r
   }
 
   // sourceResource is the conventional container; tolerate it being absent (fields at top level)
-  // or a wholly different shape post-transition — every extractor below is independently defensive.
+  // or a wholly different shape post-transition every extractor below is independently defensive.
   const sourceResource =
     record.sourceResource && typeof record.sourceResource === 'object'
       ? (record.sourceResource as Record<string, unknown>)
@@ -116,7 +116,7 @@ function parseDoc(raw: unknown, index: number): { doc: DplaNormalizedDoc } | { r
 /**
  * Parses a DPLA v2 `/v2/items` search response. Accepts `docs` (current DPLA v2 shape) and
  * falls back to `items` (a plausible post-transition rename) so a shape change does not
- * immediately break discovery — see types.ts's module header.
+ * immediately break discovery see types.ts's module header.
  */
 export function parseDplaSearchResponse(raw: unknown): DplaParsedBatch {
   if (!raw || typeof raw !== 'object') {

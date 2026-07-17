@@ -1,5 +1,5 @@
 /**
- * Confidence label with gotcha-preempting nuance (BB-088) — never a bare disputed badge; always
+ * Confidence label with gotcha-preempting nuance never a bare disputed badge; always
  * links to methodology definitions for the evidence-grade vocabulary.
  */
 import React from 'react';

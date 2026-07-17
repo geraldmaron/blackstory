@@ -1,11 +1,11 @@
 /**
- * Edge middleware handler that strips unknown query params before SSR/cache (BB-022).
+ * Edge middleware handler that strips unknown query params before SSR/cache.
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { buildNormalizedUrl, needsQueryNormalizationRedirect } from './query-normalization';
 
-/** Paths where query normalization runs (public HTML routes). */
+/** Paths where query normalization runs (public HTML routes).  */
 export const QUERY_NORMALIZATION_MATCHER = [
   '/',
   '/search',
