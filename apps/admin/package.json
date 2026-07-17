@@ -13,6 +13,7 @@
   "dependencies": {
     "@black-book/config": "workspace:*",
     "@black-book/domain": "workspace:*",
+    "@black-book/operator-cli": "workspace:*",
     "@black-book/ui": "workspace:*",
     "next": "^15.4.2",
     "react": "^19.1.0",

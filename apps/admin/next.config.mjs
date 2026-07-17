@@ -1,7 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ['@black-book/domain', '@black-book/schemas', '@black-book/ui'],
+  transpilePackages: [
+    '@black-book/domain',
+    '@black-book/schemas',
+    '@black-book/ui',
+    '@black-book/operator-cli',
+    '@black-book/security',
+    '@black-book/firebase',
+  ],
   webpack: (config) => {
     // NodeNext packages emit `.js` specifiers that map to `.ts`/`.tsx` sources.
     config.resolve.extensionAlias = {

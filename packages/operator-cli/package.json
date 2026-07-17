@@ -1,0 +1,37 @@
+{
+  "name": "@black-book/operator-cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "operator-cli": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --conditions development --import tsx --test src/identity.test.ts src/audit.test.ts src/intake.test.ts src/bulk-import.test.ts src/commit.test.ts src/fetch.test.ts src/research-intake.test.ts src/discovery-run.test.ts src/promotion-boundary.test.ts src/cli.test.ts",
+    "lint": "echo 'lint: use root pnpm lint'"
+  },
+  "dependencies": {
+    "@black-book/domain": "workspace:*",
+    "@black-book/firebase": "workspace:*",
+    "@black-book/security": "workspace:*",
+    "firebase-admin": "^13.4.0"
+  },
+  "devDependencies": {
+    "@black-book/typescript-config": "workspace:^",
+    "@types/node": "^22.20.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}
