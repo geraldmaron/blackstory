@@ -1,0 +1,13 @@
+{
+  "stableIdentifier": "naid-missing-provenance",
+  "title": "Invalid fixture — provenance fields empty",
+  "provenance": {
+    "sourceId": "",
+    "adapterId": "nara-catalog-v1",
+    "parserVersion": "parser-1.2.0",
+    "registryEntryId": "reg_nara",
+    "runId": "run_fixture_invalid",
+    "capturedAt": "2026-07-16T20:00:00.000Z",
+    "schemaVersion": "candidate-record.v1"
+  }
+}

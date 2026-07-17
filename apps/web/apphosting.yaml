@@ -13,19 +13,29 @@
 #
 # Staging is an optional separately named backend in this same production project, not a security boundary.
 # Backend creation is blocked until the project is on Blaze (firebaseapphosting.googleapis.com).
+#
+# BB-022 runtime hardening — conservative defaults (overridden per environment):
+#   Post-deploy validation (replace BACKEND and REGION after backend creation):
+#     gcloud run services describe BACKEND --region=REGION \
+#       --format='yaml(spec.template.spec.containerConcurrency,spec.template.metadata.annotations)'
+#   Expect: containerConcurrency=40, maxScale annotation <= 6 for production backends.
 
 runConfig:
-  minInstances: 2
-  maxInstances: 10
-  concurrency: 80
+  minInstances: 1
+  maxInstances: 6
+  concurrency: 40
   cpu: 1
-  memoryMiB: 512
+  memoryMiB: 384
 
 env:
   - variable: NEXT_PUBLIC_APP_ENV
     value: production
     availability:
       - BUILD
+      - RUNTIME
+  - variable: PUBLIC_READ_API_DISABLED
+    value: '0'
+    availability:
       - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
     value: black-book-efaaf

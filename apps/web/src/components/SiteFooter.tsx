@@ -2,6 +2,8 @@
  * Public site footer — inverse news masthead close.
  */
 
+import { FOOTER_NAV } from '../lib/nav';
+
 export function SiteFooter() {
   return (
     <footer className="bb-shell-footer">
@@ -13,22 +15,15 @@ export function SiteFooter() {
         </p>
         <nav aria-label="Footer">
           <ul className="bb-shell-footer__links">
-            <li>
-              <a href="/methodology">Methodology</a>
-            </li>
-            <li>
-              <a href="/about">About</a>
-            </li>
-            <li>
-              <a href="/corrections">Corrections</a>
-            </li>
-            <li>
-              <a href="/design-system">Design system</a>
-            </li>
+            {FOOTER_NAV.map((item) => (
+              <li key={item.href}>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))}
           </ul>
         </nav>
         <p className="bb-shell-footer__meta bb-mono">
-          Public shell · BB-048 · no authentication required
+          Public shell · sample seed data · BB-048 · no authentication required
         </p>
       </div>
     </footer>

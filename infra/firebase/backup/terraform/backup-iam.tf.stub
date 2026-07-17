@@ -1,0 +1,21 @@
+// BB-020 stub — explicit deny matrix documentation as Terraform comments + optional deny policy.
+// IAM deny policies require organization-level enablement; prefer least-privilege custom roles first.
+
+/*
+Runtime SAs that must NEVER hold storage.objects.delete on firestore-backups:
+
+- web-runtime@
+- api-public@
+- api-submissions@
+- api-internal@
+- admin@
+- publication@
+- research@
+- security@
+- migrations@
+- github-deploy@
+
+Only lifecycle automation and break-glass humans may delete aged daily prefixes.
+*/
+
+// Optional: google_iam_deny_policy when org supports it — see iam-backup-protection.md JSON example.

@@ -3,6 +3,7 @@
  */
 
 import { EmptyState, Notice } from '@black-book/ui';
+import { SeedDataNotice } from '../../components/SeedDataNotice';
 
 export const metadata = {
   title: 'Corrections',
@@ -20,6 +21,7 @@ export default function CorrectionsPage() {
       </p>
 
       <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
+        <SeedDataNotice compact />
         <Notice tone="warning" title="Intake form not connected">
           Do not submit personal data here yet. The live correction experience will require explicit
           consent, quarantine scanning, and human review before any public change.

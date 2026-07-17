@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Black Book administrator IAP policy design",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "status",
+    "projectId",
+    "cloudRunService",
+    "region",
+    "backendService",
+    "iapAudience",
+    "cloudRunIngress",
+    "allowUnauthenticatedInvoker",
+    "iap",
+    "applicationAuthorization"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": "1.0.0" },
+    "status": { "const": "design-only" },
+    "projectId": { "const": "black-book-efaaf" },
+    "cloudRunService": { "const": "black-book-admin" },
+    "region": { "type": "string", "minLength": 1 },
+    "backendService": { "type": "string", "minLength": 1 },
+    "iapAudience": {
+      "type": "string",
+      "pattern": "^/projects/332234323945/global/backendServices/"
+    },
+    "cloudRunIngress": { "const": "internal-and-cloud-load-balancing" },
+    "allowUnauthenticatedInvoker": { "const": false },
+    "iap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "accessorPrincipals",
+        "requiredRole",
+        "identityHeader",
+        "validateJwtAudience",
+        "validateJwtIssuer"
+      ],
+      "properties": {
+        "enabled": { "const": true },
+        "accessorPrincipals": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "^(group|user):" }
+        },
+        "requiredRole": { "const": "roles/iap.httpsResourceAccessor" },
+        "identityHeader": { "const": "x-goog-iap-jwt-assertion" },
+        "validateJwtAudience": { "const": true },
+        "validateJwtIssuer": { "const": true }
+      }
+    },
+    "applicationAuthorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "requireVerifiedIdToken",
+        "checkRevoked",
+        "requireMfa",
+        "customClaimsVersion",
+        "serverSideOnly"
+      ],
+      "properties": {
+        "provider": { "const": "firebase-auth" },
+        "requireVerifiedIdToken": { "const": true },
+        "checkRevoked": { "const": true },
+        "requireMfa": { "const": true },
+        "customClaimsVersion": { "const": 1 },
+        "serverSideOnly": { "const": true }
+      }
+    }
+  }
+}

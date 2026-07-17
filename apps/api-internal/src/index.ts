@@ -1,13 +1,16 @@
 /**
  * Internal publication, promotion, and control API (not internet-facing).
- * Must remain inaccessible from public ingress (BB-021).
+ * Service-identity-only auth posture (BB-021).
  */
-import { parseNodeEnv } from '@black-book/config';
+import { buildSurfaceHealth, parseNodeEnv } from '@black-book/config';
+import { SURFACE_ID } from './posture.js';
+
+export {
+  guardIncomingAuth,
+  guardPublicationOperation,
+  rejectEndUserToken,
+} from './posture.js';
 
 export function health() {
-  return {
-    service: 'api-internal',
-    status: 'ok' as const,
-    env: parseNodeEnv(process.env.NODE_ENV),
-  };
+  return buildSurfaceHealth(SURFACE_ID, parseNodeEnv(process.env.NODE_ENV));
 }

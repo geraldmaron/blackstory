@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-__all__ = ["health"]
+__all__ = ["adapters", "health"]
 
 
 def health() -> dict[str, str]:

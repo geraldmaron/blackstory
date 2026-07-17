@@ -1,0 +1,21 @@
+[
+  {
+    "stableIdentifier": "naid-12345678",
+    "title": "Sample archival record",
+    "canonicalUrl": "https://catalog.archives.gov/id/12345678",
+    "classification": "primary_archival",
+    "payload": {
+      "recordGroup": "RG-123",
+      "series": "Entry 45"
+    },
+    "provenance": {
+      "sourceId": "src_nara",
+      "adapterId": "nara-catalog-v1",
+      "parserVersion": "parser-1.2.0",
+      "registryEntryId": "reg_nara",
+      "runId": "run_fixture_valid",
+      "capturedAt": "2026-07-16T20:00:00.000Z",
+      "schemaVersion": "candidate-record.v1"
+    }
+  }
+]

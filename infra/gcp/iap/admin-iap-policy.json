@@ -1,0 +1,28 @@
+{
+  "$schema": "./admin-iap-policy.schema.json",
+  "version": "1.0.0",
+  "status": "design-only",
+  "projectId": "black-book-efaaf",
+  "cloudRunService": "black-book-admin",
+  "region": "${ADMIN_REGION}",
+  "backendService": "${ADMIN_BACKEND_SERVICE}",
+  "iapAudience": "/projects/332234323945/global/backendServices/${ADMIN_BACKEND_SERVICE_ID}",
+  "cloudRunIngress": "internal-and-cloud-load-balancing",
+  "allowUnauthenticatedInvoker": false,
+  "iap": {
+    "enabled": true,
+    "accessorPrincipals": ["group:${ADMIN_IAP_ACCESS_GROUP}"],
+    "requiredRole": "roles/iap.httpsResourceAccessor",
+    "identityHeader": "x-goog-iap-jwt-assertion",
+    "validateJwtAudience": true,
+    "validateJwtIssuer": true
+  },
+  "applicationAuthorization": {
+    "provider": "firebase-auth",
+    "requireVerifiedIdToken": true,
+    "checkRevoked": true,
+    "requireMfa": true,
+    "customClaimsVersion": 1,
+    "serverSideOnly": true
+  }
+}

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start --port 3048",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "echo 'web browser e2e: pnpm test:e2e (harness; set E2E_BASE_URL for live smoke)'",
+    "test": "node --conditions development --import tsx --test src/lib/runtime-hardening/query-normalization.test.ts src/lib/runtime-hardening/runtime-hardening.test.ts src/lib/web-security/sanitize.test.ts src/lib/web-security/redirects.test.ts src/lib/web-security/web-security.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
@@ -23,6 +23,7 @@
     "@types/node": "^22.16.5",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }
 }

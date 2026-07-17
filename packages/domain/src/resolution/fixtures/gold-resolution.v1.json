@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "resolution-gold.v1",
+  "cases": [
+    {
+      "id": "school-former-name",
+      "candidate": {
+        "id": "candidate-school-1961",
+        "name": "Booker T Washington High School",
+        "kind": "school",
+        "address": "45 History Ave, Atlanta, GA 30303",
+        "year": 1961,
+        "geographicHints": ["Atlanta, GA"],
+        "sourceReferenceIds": ["nara:1001"]
+      },
+      "expectedOutcome": "proposed_match",
+      "expectedEntityId": "school-1"
+    },
+    {
+      "id": "same-name-people",
+      "candidate": {
+        "id": "candidate-alex-johnson",
+        "name": "Alex Johnson",
+        "kind": "person",
+        "year": 1965,
+        "sourceReferenceIds": ["archive:2002"]
+      },
+      "expectedOutcome": "review_required"
+    },
+    {
+      "id": "organization-suffix",
+      "candidate": {
+        "id": "candidate-freedom-league",
+        "name": "Freedom League, Incorporated",
+        "kind": "organization",
+        "identifiers": { "archives": "FL-77" },
+        "sourceReferenceIds": ["archive:3003"]
+      },
+      "expectedOutcome": "proposed_match",
+      "expectedEntityId": "org-1"
+    }
+  ]
+}

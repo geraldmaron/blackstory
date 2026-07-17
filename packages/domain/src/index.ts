@@ -1,8 +1,10 @@
 /**
  * Shared domain primitives for Black Book entities, geography (BB-014), provenance (BB-016),
- * claims / confidence (BB-017), and append-only audit contracts (BB-018).
- * Living-status and public precision rules come from @black-book/schemas (constitution).
- * Firestore document converters live in @black-book/firebase; Cloud SQL / PostGIS are deferred.
+ * claims / confidence (BB-017), append-only audit contracts (BB-018), immutable
+ * publication releases (BB-019), and source adapter registry contracts (BB-037).
+ * Living-status and public precision rules come from
+ * @black-book/schemas (constitution). Firestore converters live in @black-book/firebase;
+ * Cloud SQL / PostGIS are deferred (ADR-011).
  */
 export { asEntityId, asRelationshipId, asMergeId, asLocationId } from './ids.js';
 export type { EntityId, RelationshipId, MergeId, LocationId } from './ids.js';
@@ -245,3 +247,10 @@ export type {
   DomainOutboxMessage,
   PublicationHistoryEntry,
 } from './audit/index.js';
+
+export * from './adapters/index.js';
+export * from './publication/index.js';
+export * from './query-packs/index.js';
+export * from './discovery/index.js';
+export * from './relevance/index.js';
+export * from './resolution/index.js';

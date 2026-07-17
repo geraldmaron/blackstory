@@ -1,5 +1,5 @@
 /**
- * Firestore model surface for Black Book (ADR-011 / BB-013–018).
+ * Firestore model surface for Black Book (ADR-011 / BB-013–019).
  */
 export { FIRESTORE_ROOT, firestorePaths } from './paths.js';
 export type { FirestoreRootCollection } from './paths.js';
@@ -146,3 +146,17 @@ export type {
 
 export { resolveStaffRoles, canPublish, canResearchWrite, researchMayPublish } from './claims.js';
 export type { StaffRole } from './claims.js';
+
+export {
+  RELEASE_ACTIVATION_STATUSES,
+  parseImmutablePublicationRelease,
+  resolveActivePublicRelease,
+  activatePublicationRelease,
+} from './release-activation.js';
+export type {
+  ReleaseActivationStatus,
+  ImmutablePublicationReleaseDoc,
+  ActivePublicReleasePointer,
+  ActivateReleaseInput,
+  ActivateReleaseResult,
+} from './release-activation.js';

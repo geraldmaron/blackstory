@@ -15,6 +15,9 @@ BB-011/012 verifies or provisions them.
 | [`iam-boundaries.md`](./iam-boundaries.md) | Same-project IAM contract |
 | [`terraform/`](./terraform/) | Unapplied single-project stubs |
 | [`wif/`](./wif/) | BB-010 GitHub OIDC / Workload Identity Federation stubs (not applied) |
+| [`surfaces/`](./surfaces/) | BB-021 deployable surface matrix + pipeline stubs |
+| [`armor/`](./armor/) | BB-023 Cloud Armor, global external ALB, NEG, and CDN design stubs |
+| [`cost-controls/`](./cost-controls/) | BB-033 scaling caps, queue/job limits, budgets, hard-stop runbook |
 
 Validate:
 

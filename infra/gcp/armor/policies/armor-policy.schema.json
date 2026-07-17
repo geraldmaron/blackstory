@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://black-book/infra/gcp/armor/armor-policy.schema.json",
+  "title": "Black Book Cloud Armor policy stub",
+  "description": "Schema for BB-023 Cloud Armor security policy design files.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "type", "projectId", "backendService", "rules"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "type": { "type": "string", "const": "CLOUD_ARMOR" },
+    "description": { "type": "string" },
+    "projectId": { "type": "string", "const": "black-book-efaaf" },
+    "backendService": { "type": "string", "minLength": 1 },
+    "adaptiveProtectionConfig": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["priority", "description", "action", "match"],
+        "properties": {
+          "priority": { "type": "integer", "minimum": 1 },
+          "description": { "type": "string", "minLength": 1 },
+          "action": {
+            "type": "string",
+            "enum": ["allow", "deny(403)", "rate_based_ban"]
+          },
+          "match": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "rateLimitOptions": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rateLimitThreshold", "conformAction", "exceedAction", "enforceOnKey"],
+            "properties": {
+              "rateLimitThreshold": {
+                "type": "object",
+                "required": ["count", "intervalSec"],
+                "properties": {
+                  "count": { "type": "integer", "minimum": 1 },
+                  "intervalSec": { "type": "integer", "minimum": 1 }
+                }
+              },
+              "conformAction": { "type": "string" },
+              "exceedAction": { "type": "string", "pattern": "^deny\\(429\\)$" },
+              "enforceOnKey": { "type": "string" },
+              "banDurationSec": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "preview": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

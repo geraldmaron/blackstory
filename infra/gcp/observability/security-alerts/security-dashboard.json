@@ -1,0 +1,140 @@
+{
+  "$schema": "./security-dashboard.schema.json",
+  "version": "1.0.0",
+  "status": "design-only",
+  "projectId": "black-book-efaaf",
+  "bead": "BB-034",
+  "dashboardId": "black-book-security-telemetry",
+  "panels": [
+    {
+      "id": "edge-traffic-codes",
+      "title": "Edge requests by status (2xx / 4xx / 5xx / 429)",
+      "metric": "loadbalancing.googleapis.com/https/backend_request_count",
+      "visualization": "stacked_bar",
+      "description": "Per-backend traffic split; surfaces DDoS and mis-tuned rate limits",
+      "groupBy": ["backend_service_name", "response_code"],
+      "gcpMetricType": "loadbalancing.googleapis.com/https/backend_request_count"
+    },
+    {
+      "id": "armor-throttle-deny",
+      "title": "Cloud Armor throttled vs denied vs allowed",
+      "metric": "networksecurity.googleapis.com/https/request_count",
+      "visualization": "stacked_bar",
+      "description": "Armor policy outcomes for api-public and api-submissions",
+      "groupBy": ["security_policy_name", "action"],
+      "gcpMetricType": "networksecurity.googleapis.com/https/request_count"
+    },
+    {
+      "id": "app-check-failures",
+      "title": "App Check failures by mode and reason",
+      "metric": "black_book/security/app_check_failures_total",
+      "visualization": "line",
+      "description": "Monitor and enforce failure rates before tightening policy",
+      "groupBy": ["service", "mode", "reason"]
+    },
+    {
+      "id": "auth-failures",
+      "title": "Authentication failures",
+      "metric": "black_book/security/authentication_failures_total",
+      "visualization": "line",
+      "description": "Failed sign-in and token validation attempts",
+      "groupBy": ["service", "provider"]
+    },
+    {
+      "id": "admin-role-changes",
+      "title": "Administrator role changes",
+      "metric": "black_book/security/administrator_role_changes_total",
+      "visualization": "single_stat",
+      "description": "Immediate-notification events — pager on any change",
+      "groupBy": ["service", "actor_type"]
+    },
+    {
+      "id": "submission-volume",
+      "title": "Submission and correction intake",
+      "metric": "black_book/security/submission_requests_total",
+      "visualization": "line",
+      "description": "Detect submission spikes and abuse",
+      "groupBy": ["service", "endpoint_class"]
+    },
+    {
+      "id": "search-geocoder-abuse",
+      "title": "Search and geocoder guardrail denials",
+      "metric": "black_book/security/search_guardrail_denials_total",
+      "visualization": "stacked_bar",
+      "description": "Combined view of search and geocoder abuse signals",
+      "groupBy": ["service", "reason"]
+    },
+    {
+      "id": "database-health",
+      "title": "Database connections and slow queries",
+      "metric": "black_book/security/database_slow_queries_total",
+      "visualization": "line",
+      "description": "Connection pressure and slow query rate by role",
+      "groupBy": ["service", "endpoint_class"]
+    },
+    {
+      "id": "queue-depth-retries",
+      "title": "Queue depth and retries",
+      "metric": "black_book/security/queue_depth",
+      "visualization": "heatmap",
+      "description": "Outbox and task queue backlog by topic",
+      "groupBy": ["service", "topic"]
+    },
+    {
+      "id": "source-adapter-anomalies",
+      "title": "Source adapter anomalies",
+      "metric": "black_book/security/source_adapter_anomalies_total",
+      "visualization": "table",
+      "description": "Fetch/parse anomalies by adapter",
+      "groupBy": ["service", "adapter_id"]
+    },
+    {
+      "id": "publication-retraction",
+      "title": "Publication and retraction activity",
+      "metric": "black_book/security/publication_events_total",
+      "visualization": "single_stat",
+      "description": "Release lifecycle — immediate notification on activation",
+      "groupBy": ["service", "action"]
+    },
+    {
+      "id": "unexpected-public-writes",
+      "title": "Unexpected public schema writes",
+      "metric": "black_book/security/database_unexpected_public_writes_total",
+      "visualization": "single_stat",
+      "description": "Writes outside publication pipeline — critical alert",
+      "groupBy": ["service", "table"]
+    },
+    {
+      "id": "storage-denials",
+      "title": "Storage access denials",
+      "metric": "black_book/security/storage_access_denials_total",
+      "visualization": "line",
+      "description": "Firebase Storage rule denials by bucket",
+      "groupBy": ["service", "bucket"]
+    },
+    {
+      "id": "error-rate-latency",
+      "title": "Service error rate and p95 latency",
+      "metric": "black_book/security/service_errors_total",
+      "visualization": "stacked_bar",
+      "description": "Origin health under abuse or load",
+      "groupBy": ["service", "route"]
+    },
+    {
+      "id": "cost-anomaly-score",
+      "title": "Cost anomaly score",
+      "metric": "black_book/security/cost_anomaly_score",
+      "visualization": "line",
+      "description": "Normalized billing anomaly score (0–100)",
+      "groupBy": ["service", "sku"]
+    },
+    {
+      "id": "cdn-cache-hit",
+      "title": "CDN cache hit ratio (api-public)",
+      "metric": "loadbalancing.googleapis.com/https/backend_request_count",
+      "visualization": "line",
+      "description": "Cache effectiveness for read-heavy endpoints (BB-023)",
+      "groupBy": ["backend_service_name", "cache_result"]
+    }
+  ]
+}

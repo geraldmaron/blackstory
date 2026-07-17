@@ -4,19 +4,28 @@
 # No secret values here — only Secret Manager references by name (resolved at deploy time).
 # Production rollouts are triggered explicitly by GitHub Actions with protected-environment
 # approval (ADR-006); automatic App Hosting rollouts are disabled.
+#
+# BB-022: production caps — minInstances=2, maxInstances=6, concurrency=40, memoryMiB=384.
+# Post-deploy validation:
+#   gcloud run services describe black-book-web-production --region=REGION \
+#     --format='yaml(spec.template.spec.containerConcurrency,spec.template.metadata.annotations)'
 
 runConfig:
   minInstances: 2
-  maxInstances: 10
-  concurrency: 80
+  maxInstances: 6
+  concurrency: 40
   cpu: 1
-  memoryMiB: 512
+  memoryMiB: 384
 
 env:
   - variable: NEXT_PUBLIC_APP_ENV
     value: production
     availability:
       - BUILD
+      - RUNTIME
+  - variable: PUBLIC_READ_API_DISABLED
+    value: '0'
+    availability:
       - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
     value: black-book-efaaf

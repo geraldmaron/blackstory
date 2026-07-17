@@ -1,0 +1,78 @@
+// BB-020 stub — dedicated Firestore export bucket (fifth bucket).
+// Merge into infra/gcp/terraform/ after review. Do not terraform apply from CI.
+
+resource "google_storage_bucket" "firestore_backups" {
+  project                     = var.project_id
+  name                        = "${var.project_id}-firestore-backups"
+  location                    = var.region
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+  force_destroy               = false
+
+  versioning {
+    enabled = true
+  }
+
+  lifecycle_rule {
+    condition {
+      age = 90
+      matches_prefix = ["exports/daily/"]
+    }
+    action {
+      type = "Delete"
+    }
+  }
+
+  lifecycle_rule {
+    condition {
+      age = 30
+      matches_prefix = ["exports/weekly/"]
+    }
+    action {
+      type          = "SetStorageClass"
+      storage_class = "NEARLINE"
+    }
+  }
+
+  lifecycle_rule {
+    condition {
+      age = 365
+      matches_prefix = ["exports/weekly/"]
+    }
+    action {
+      type          = "SetStorageClass"
+      storage_class = "COLDLINE"
+    }
+  }
+}
+
+// Custom role: create and read backup objects without delete.
+resource "google_project_iam_custom_role" "backup_storage_writer_no_delete" {
+  project     = var.project_id
+  role_id     = "backupStorageWriterNoDelete"
+  title       = "Backup bucket writer without delete"
+  description = "BB-020: export landing zone write without object delete"
+  permissions = [
+    "storage.objects.create",
+    "storage.objects.get",
+    "storage.objects.list",
+  ]
+}
+
+resource "google_storage_bucket_iam_member" "backup_bucket_writer" {
+  bucket = google_storage_bucket.firestore_backups.name
+  role   = google_project_iam_custom_role.backup_storage_writer_no_delete.id
+  member = "serviceAccount:backup@${var.project_id}.iam.gserviceaccount.com"
+}
+
+resource "google_storage_bucket_iam_member" "backup_bucket_viewer_breakglass" {
+  bucket = google_storage_bucket.firestore_backups.name
+  role   = "roles/storage.objectViewer"
+  member = "group:security-breakglass@${var.project_id}.iam.gserviceaccount.com" # replace with real group
+}
+
+resource "google_project_iam_member" "backup_firestore_export" {
+  project = var.project_id
+  role    = "roles/datastore.importExportAdmin"
+  member  = "serviceAccount:backup@${var.project_id}.iam.gserviceaccount.com"
+}

@@ -98,6 +98,7 @@ async function seedPublicProjection(env: RulesTestEnvironment): Promise<void> {
       releaseId: 'rel_rules_001',
       activatedAt: '2026-07-16T18:00:00.000Z',
       searchIndexVersion: 'search_rules_001',
+      manifestHash: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
     });
     await db.doc('publicReleases/rel_rules_001/entities/ent_1').set({
       id: 'ent_1',

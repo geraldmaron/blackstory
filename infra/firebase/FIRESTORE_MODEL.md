@@ -126,3 +126,51 @@ pnpm firebase:emulators
 # other terminal
 CI_REQUIRE_FIREBASE=1 pnpm --filter @black-book/firebase test
 ```
+
+## Public projection and immutable releases (BB-019)
+
+Public traffic resolves `publicMeta/activeRelease`, then reads only
+`publicReleases/{releaseId}/entities/{entityId}` documents whose immutable `releaseId`
+matches that pointer. Canonical entities, claims, draft releases, and preview releases are
+never public render inputs.
+
+### Release document
+
+`publicationReleases/{releaseId}` carries:
+
+- lifecycle `status`: `draft` · `preview` · `active` · `superseded` · `rolled_back`;
+- a signed manifest envelope containing the immutable manifest, its canonical-JSON
+  `sha256` digest, signing algorithm, key id, and signature;
+- `searchIndexVersion`, which must equal the version inside the signed manifest;
+- creation metadata and lifecycle timestamps.
+
+Manifest entries bind each entity revision to both its Firestore projection path and
+its JSON snapshot object path, with an independent `sha256` content hash for each
+payload. Entries are sorted by entity id before signing. Existing manifest, projection,
+snapshot, and search-index objects are never edited to correct a release; correction
+creates a new release.
+
+### Snapshot object layout
+
+```text
+public/releases/{releaseId}/entities/{entityId}.json
+```
+
+Each entity JSON object has `schemaVersion`, an `entity` projection produced through
+`@black-book/security`, and metadata containing `releaseId`, canonical entity
+`revision`, `searchIndexVersion`, and `manifestHash`. Object ids are validated as single,
+non-traversing path segments.
+
+### Activation and rollback
+
+`activatePublicationRelease` uses one Firestore transaction for the target lifecycle
+status, prior lifecycle status, `publicMeta/activeRelease` pointer, append-only audit
+event, pending outbox message, and idempotency marker. Normal activation accepts only
+`preview`; rollback accepts only an existing `superseded` or `rolled_back` release and
+does not rebuild projections, snapshots, or search data. Before staging writes, activation
+requires synchronous signature verification against a trusted publication public key;
+verification performs no I/O because Firestore may retry the transaction callback.
+
+The active pointer stores `releaseId`, `activatedAt`, `searchIndexVersion`, and
+`manifestHash`. Public resolvers fail closed unless the pointed release is `active` and
+all pointer fields match its signed immutable manifest.

@@ -1,0 +1,106 @@
+{
+  "name": "black-book-api-submissions-armor",
+  "type": "CLOUD_ARMOR",
+  "description": "Strict edge protection for black-book-api-submissions intake (BB-023).",
+  "projectId": "black-book-efaaf",
+  "backendService": "black-book-api-submissions-backend",
+  "adaptiveProtectionConfig": {
+    "layer7DdosDefenseConfig": {
+      "enable": true,
+      "ruleVisibility": "STANDARD"
+    }
+  },
+  "rules": [
+    {
+      "priority": 10,
+      "description": "Emergency deny — default allow; flip action to deny(403) without deploy (see emergency-deny-runbook.md)",
+      "action": "allow",
+      "match": {
+        "expr": { "expression": "true" }
+      },
+      "preview": false
+    },
+    {
+      "priority": 100,
+      "description": "Preconfigured WAF — SQLi",
+      "action": "deny(403)",
+      "match": {
+        "expr": { "expression": "evaluatePreconfiguredExpr('sqli-v33-stable')" }
+      },
+      "preview": false
+    },
+    {
+      "priority": 110,
+      "description": "Preconfigured WAF — XSS",
+      "action": "deny(403)",
+      "match": {
+        "expr": { "expression": "evaluatePreconfiguredExpr('xss-v33-stable')" }
+      },
+      "preview": false
+    },
+    {
+      "priority": 120,
+      "description": "Preconfigured WAF — RCE / protocol attacks",
+      "action": "deny(403)",
+      "match": {
+        "expr": { "expression": "evaluatePreconfiguredExpr('rce-v33-stable')" }
+      },
+      "preview": false
+    },
+    {
+      "priority": 200,
+      "description": "Rate limit — submission POST burst per IP",
+      "action": "rate_based_ban",
+      "match": {
+        "expr": {
+          "expression": "request.method == 'POST' && request.path.matches('/v1/submissions.*')"
+        }
+      },
+      "rateLimitOptions": {
+        "rateLimitThreshold": { "count": 20, "intervalSec": 60 },
+        "conformAction": "allow",
+        "exceedAction": "deny(429)",
+        "enforceOnKey": "IP",
+        "banDurationSec": 1800
+      },
+      "preview": false
+    },
+    {
+      "priority": 210,
+      "description": "Rate limit — global per-IP ceiling for submissions API",
+      "action": "rate_based_ban",
+      "match": {
+        "expr": { "expression": "true" }
+      },
+      "rateLimitOptions": {
+        "rateLimitThreshold": { "count": 60, "intervalSec": 60 },
+        "conformAction": "allow",
+        "exceedAction": "deny(429)",
+        "enforceOnKey": "IP",
+        "banDurationSec": 900
+      },
+      "preview": false
+    },
+    {
+      "priority": 900,
+      "description": "Geographic control placeholder — DISABLED by default; enable only with evidence (geo-controls.md)",
+      "action": "allow",
+      "match": {
+        "expr": {
+          "expression": "false"
+        }
+      },
+      "preview": true
+    },
+    {
+      "priority": 2147483647,
+      "description": "Default allow — lower-priority rules enforce policy",
+      "action": "allow",
+      "match": {
+        "versionedExpr": "SRC_IPS_V1",
+        "config": { "srcIpRanges": ["*"] }
+      },
+      "preview": false
+    }
+  ]
+}

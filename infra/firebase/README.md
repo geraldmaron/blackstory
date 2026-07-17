@@ -86,3 +86,10 @@ Minimal Firebase-facing IAM design: [`iam-minimal.md`](./iam-minimal.md). No key
 Set the backend runtime identity at creation to
 `web-runtime@black-book-efaaf.iam.gserviceaccount.com`. YAML contains Secret Manager names only for
 server secrets; public Firebase client identifiers are plain env values.
+
+## Backup and restore (BB-020)
+
+Firestore export schedule, retention matrix, PITR design, IAM deny-delete notes, and Terraform/gcloud
+stubs: [`backup/`](./backup/). Operator runbook:
+[`../../docs/runbooks/backup-restore.md`](../../docs/runbooks/backup-restore.md). Verification scripts
+(dry-run default): [`../../scripts/backup-restore/`](../../scripts/backup-restore/).

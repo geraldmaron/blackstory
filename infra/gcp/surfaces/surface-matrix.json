@@ -1,0 +1,154 @@
+{
+  "$schema": "../isolation-matrix.schema.json",
+  "version": "1.0.0",
+  "bead": "BB-021",
+  "title": "Black Book deployable surface matrix",
+  "updatedAt": "2026-07-17",
+  "status": "design",
+  "projectId": "black-book-efaaf",
+  "adrRefs": ["ADR-005", "ADR-011"],
+  "notes": [
+    "Runtime capability checks are implemented in packages/config/src/surfaces.ts.",
+    "Firestore is the system of record (ADR-011); dbRole fields describe Firestore Admin SDK posture, not Cloud SQL.",
+    "Cloud resources, IAP, private ingress, and per-surface deploy jobs are designed—not provisioned."
+  ],
+  "surfaces": [
+    {
+      "id": "web",
+      "appPath": "apps/web",
+      "runtime": "firebase-app-hosting",
+      "serviceAccountId": "web-runtime",
+      "networkPosture": "public-cdn",
+      "appHostingBackend": "black-book-web-production",
+      "configFiles": ["apps/web/apphosting.yaml", "apps/web/apphosting.production.yaml"],
+      "allowedOperations": ["read:public-projections", "read:search", "read:location"],
+      "deniedOperations": ["write:canonical", "write:quarantine", "publish:projection", "promote:release"],
+      "acceptedAuth": ["anonymous", "end-user-token"],
+      "mustNotAcceptAuth": ["service-identity"],
+      "deployPipeline": {
+        "workflow": ".github/workflows/deploy-production.yml",
+        "job": "deploy-web-app-hosting",
+        "status": "stub",
+        "impersonates": "web-runtime@black-book-efaaf.iam.gserviceaccount.com"
+      }
+    },
+    {
+      "id": "api-public",
+      "appPath": "apps/api-public",
+      "runtime": "cloud-run",
+      "serviceAccountId": "api-public",
+      "networkPosture": "public-read",
+      "cloudRunService": "black-book-api-public",
+      "ingress": "all",
+      "allowedOperations": ["read:public-projections", "read:search", "read:location"],
+      "deniedOperations": ["write:canonical", "write:quarantine", "publish:projection", "promote:release"],
+      "acceptedAuth": ["anonymous", "end-user-token"],
+      "mustNotAcceptAuth": ["service-identity"],
+      "firestorePosture": "read public/** only via Admin SDK",
+      "deployPipeline": {
+        "workflow": ".github/workflows/deploy-production.yml",
+        "job": "deploy-api-public",
+        "status": "stub",
+        "impersonates": "api-public@black-book-efaaf.iam.gserviceaccount.com"
+      }
+    },
+    {
+      "id": "api-submissions",
+      "appPath": "apps/api-submissions",
+      "runtime": "cloud-run",
+      "serviceAccountId": "api-submissions",
+      "networkPosture": "public-rate-limited",
+      "cloudRunService": "black-book-api-submissions",
+      "ingress": "all-with-armor-rate-limits",
+      "allowedOperations": ["write:quarantine", "write:submission-metadata"],
+      "deniedOperations": ["write:canonical", "publish:projection", "promote:release"],
+      "acceptedAuth": ["anonymous", "end-user-token"],
+      "mustNotAcceptAuth": ["service-identity", "iap-session"],
+      "firestorePosture": "write submissions/** and quarantine metadata only",
+      "deployPipeline": {
+        "workflow": ".github/workflows/deploy-production.yml",
+        "job": "deploy-api-submissions",
+        "status": "stub",
+        "impersonates": "api-submissions@black-book-efaaf.iam.gserviceaccount.com"
+      }
+    },
+    {
+      "id": "api-internal",
+      "appPath": "apps/api-internal",
+      "runtime": "cloud-run",
+      "serviceAccountId": "api-internal",
+      "networkPosture": "private-network",
+      "cloudRunService": "black-book-api-internal",
+      "ingress": "internal-and-cloud-load-balancing",
+      "allowedOperations": ["write:canonical", "publish:projection", "promote:release", "read:public-projections"],
+      "deniedOperations": [],
+      "acceptedAuth": ["service-identity"],
+      "mustNotAcceptAuth": ["anonymous", "end-user-token", "iap-session"],
+      "firestorePosture": "privileged publication writes via Admin SDK",
+      "deployPipeline": {
+        "workflow": ".github/workflows/deploy-production.yml",
+        "job": "deploy-api-internal",
+        "status": "stub",
+        "impersonates": "api-internal@black-book-efaaf.iam.gserviceaccount.com"
+      }
+    },
+    {
+      "id": "admin",
+      "appPath": "apps/admin",
+      "runtime": "cloud-run",
+      "serviceAccountId": "admin",
+      "networkPosture": "iap-protected",
+      "cloudRunService": "black-book-admin",
+      "ingress": "internal-and-cloud-load-balancing-with-iap",
+      "allowedOperations": ["read:public-projections", "admin:research-console", "admin:publication-review"],
+      "deniedOperations": ["publish:projection", "promote:release"],
+      "acceptedAuth": ["iap-session", "app-authorization"],
+      "mustNotAcceptAuth": ["anonymous"],
+      "firestorePosture": "research/admin reads; publication activation via internal workflow only",
+      "deployPipeline": {
+        "workflow": ".github/workflows/deploy-production.yml",
+        "job": "deploy-admin",
+        "status": "stub",
+        "impersonates": "admin@black-book-efaaf.iam.gserviceaccount.com"
+      }
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-SURF-1",
+      "criterion": "Submissions compromise cannot publish",
+      "enforcedBy": [
+        "packages/config/src/surfaces.ts denies publish:projection and promote:release on api-submissions",
+        "apps/api-submissions/src/posture.ts guardPublishAttempt",
+        "api-submissions SA has no publication IAM (infra/gcp/isolation-matrix.json)"
+      ]
+    },
+    {
+      "id": "AC-SURF-2",
+      "criterion": "Public API compromise cannot modify canonical data",
+      "enforcedBy": [
+        "packages/config/src/surfaces.ts denies write:canonical on api-public",
+        "apps/api-public/src/posture.ts guardMutationAttempt",
+        "api-public SA Firestore read-only posture"
+      ]
+    },
+    {
+      "id": "AC-SURF-3",
+      "criterion": "Admin paths do not share public route handlers",
+      "enforcedBy": [
+        "Separate apps/admin Next.js entrypoint (port 3001 locally)",
+        "apps/admin/src/surface.test.ts forbids apps/web imports",
+        "Distinct admin SA and Cloud Run service"
+      ]
+    },
+    {
+      "id": "AC-SURF-4",
+      "criterion": "Internal publication endpoints cannot be called with end-user tokens",
+      "enforcedBy": [
+        "packages/config/src/surfaces.ts mustNotAcceptAuth end-user-token on api-internal",
+        "apps/api-internal/src/posture.ts rejectEndUserToken",
+        "Private ingress + service identity at deploy time (human provision step)"
+      ]
+    }
+  ]
+}

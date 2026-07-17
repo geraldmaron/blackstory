@@ -9,6 +9,12 @@ Threat model, abuse-case corpus, environment isolation design, and security test
 | [`threat-corpus.json`](./threat-corpus.json) | Machine-readable corpus (source for tests) |
 | [`threat-corpus.schema.json`](./threat-corpus.schema.json) | JSON Schema for the corpus |
 | [`environment-isolation.md`](./environment-isolation.md) | BB-005/D-013 single-project production isolation and deferred migration |
+| [`ingress-armor.md`](./ingress-armor.md) | BB-023 Cloud Armor + LB-only ingress design |
+| [`rate-limits.md`](./rate-limits.md) | BB-025 application quota matrix and guard stubs |
+| [`query-guardrails.md`](./query-guardrails.md) | BB-026 search query validation, cursors, cache keys |
+| [`submission-quarantine.md`](./submission-quarantine.md) | BB-029 correction validation, quarantine, campaign detection, and moderation boundary |
+| [`telemetry-anomaly.md`](./telemetry-anomaly.md) | BB-034 security telemetry, metrics, anomaly rules, alerts |
+| [`cost-resource-controls.md`](./cost-resource-controls.md) | BB-033 scaling, queue/job budgets, circuit breakers, soft shutdown |
 | [`../infra/firebase/auth-and-app-check.md`](../../infra/firebase/auth-and-app-check.md) | BB-011 Auth plan + App Check scaffold (enforcement = BB-024) |
 | [`tests/checklist.md`](./tests/checklist.md) | Manual/CI security checklist scaffold |
 

@@ -644,11 +644,30 @@ export type EvidenceLineageDoc = z.infer<typeof evidenceLineageSchema>;
 
 export const publicationReleaseSchema = z.object({
   id: z.string().min(1),
-  status: z.enum(['draft', 'signed', 'active', 'retired']),
-  manifestHash: z.string().min(1),
+  status: z.enum(['draft', 'preview', 'active', 'superseded', 'rolled_back']),
   searchIndexVersion: z.string().min(1),
+  signedManifest: z.object({
+    manifest: z
+      .object({
+        releaseId: z.string().min(1),
+        searchIndexVersion: z.string().min(1),
+      })
+      .passthrough(),
+    manifestHash: z.object({
+      algorithm: z.literal('sha256'),
+      digest: z.string().regex(/^[a-f0-9]{64}$/),
+    }),
+    signature: z.object({
+      algorithm: z.literal('ecdsa-sha256'),
+      keyId: z.string().min(1),
+      value: z.string().min(1),
+    }),
+  }),
   createdAt: z.string().datetime(),
+  createdBy: z.string().min(1),
   activatedAt: z.string().datetime().optional(),
+  supersededAt: z.string().datetime().optional(),
+  rolledBackAt: z.string().datetime().optional(),
 });
 
 export type PublicationReleaseDoc = z.infer<typeof publicationReleaseSchema>;
@@ -657,6 +676,7 @@ export const publicActiveReleaseSchema = z.object({
   releaseId: z.string().min(1),
   activatedAt: z.string().datetime(),
   searchIndexVersion: z.string().min(1),
+  manifestHash: z.string().regex(/^[a-f0-9]{64}$/),
 });
 
 export type PublicActiveReleaseDoc = z.infer<typeof publicActiveReleaseSchema>;

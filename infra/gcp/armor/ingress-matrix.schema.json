@@ -1,0 +1,163 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://black-book/infra/gcp/armor/ingress-matrix.schema.json",
+  "title": "Black Book protected public API ingress matrix",
+  "description": "Schema for BB-023 machine-readable ingress, ALB, NEG, CDN, and Cloud Armor design.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "bead",
+    "title",
+    "status",
+    "projectId",
+    "region",
+    "internetTrafficOnlyThroughLb",
+    "directRunAppUrlsDisabled",
+    "loadBalancer",
+    "backends",
+    "geoControls",
+    "emergencyDeny",
+    "acceptanceCriteria"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "bead": { "type": "string", "const": "BB-023" },
+    "title": { "type": "string", "minLength": 1 },
+    "updatedAt": { "type": "string" },
+    "status": { "type": "string", "enum": ["design", "partial", "applied"] },
+    "projectId": { "type": "string", "const": "black-book-efaaf" },
+    "region": { "type": "string", "const": "us-central1" },
+    "adrRefs": { "type": "array", "items": { "type": "string", "pattern": "^ADR-\\d{3}$" } },
+    "threatRefs": { "type": "array", "items": { "type": "string", "pattern": "^T-\\d{2}$" } },
+    "notes": { "type": "array", "items": { "type": "string" } },
+    "internetTrafficOnlyThroughLb": { "type": "boolean", "const": true },
+    "directRunAppUrlsDisabled": { "type": "boolean", "const": true },
+    "loadBalancer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "scheme", "scope", "protocol", "frontends"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "scheme": { "type": "string", "const": "EXTERNAL_MANAGED" },
+        "scope": { "type": "string", "const": "global" },
+        "protocol": { "type": "string", "enum": ["HTTPS", "HTTP"] },
+        "sslPolicy": { "type": "string" },
+        "certificateMap": { "type": "string" },
+        "frontends": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "hostnames", "defaultBackend"],
+            "properties": {
+              "name": { "type": "string" },
+              "hostnames": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+              "defaultBackend": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "backends": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "cloudRunService",
+          "surfaceId",
+          "serverlessNeg",
+          "cloudRunIngress",
+          "armorPolicyRef"
+        ],
+        "properties": {
+          "id": { "type": "string", "enum": ["api-public", "api-submissions"] },
+          "name": { "type": "string" },
+          "cloudRunService": { "type": "string" },
+          "surfaceId": { "type": "string" },
+          "serverlessNeg": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "region", "cloudRun"],
+            "properties": {
+              "name": { "type": "string" },
+              "region": { "type": "string" },
+              "cloudRun": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["service"],
+                "properties": {
+                  "service": { "type": "string" },
+                  "tag": { "type": "string" }
+                }
+              }
+            }
+          },
+          "cloudRunIngress": {
+            "type": "string",
+            "const": "internal-and-cloud-load-balancing"
+          },
+          "armorPolicyRef": { "type": "string", "pattern": "^policies/.+\\.json$" },
+          "cdn": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["enabled"],
+            "properties": {
+              "enabled": { "type": "boolean" },
+              "reason": { "type": "string" },
+              "cacheMode": { "type": "string" },
+              "defaultTtlSec": { "type": "integer", "minimum": 0 },
+              "maxTtlSec": { "type": "integer", "minimum": 0 },
+              "cacheablePaths": { "type": "array", "items": { "type": "string" } },
+              "bypassCacheHeaders": { "type": "array", "items": { "type": "string" } },
+              "negativeCaching": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "geoControls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "policy", "defaultAction"],
+      "properties": {
+        "enabled": { "type": "boolean", "const": false },
+        "policy": { "type": "string", "const": "only-when-evidence-justifies" },
+        "documentation": { "type": "string" },
+        "defaultAction": { "type": "string", "const": "allow-all-regions" }
+      }
+    },
+    "emergencyDeny": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rulePriority", "activateWithoutDeploy", "runbook", "snippet"],
+      "properties": {
+        "rulePriority": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "defaultAction": { "type": "string" },
+        "activateWithoutDeploy": { "type": "boolean", "const": true },
+        "runbook": { "type": "string" },
+        "snippet": { "type": "string" }
+      }
+    },
+    "acceptanceCriteria": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "criterion", "enforcedBy"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^AC-ARMOR-\\d+$" },
+          "criterion": { "type": "string" },
+          "enforcedBy": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

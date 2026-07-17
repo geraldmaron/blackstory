@@ -1,7 +1,102 @@
 /**
- * Structured logging and typed operational errors shared across TypeScript services.
+ * Structured logging, operational errors, and security telemetry shared across services.
  */
 export const OBSERVABILITY_PACKAGE = '@black-book/observability' as const;
+
+export {
+  SECURITY_TELEMETRY_VERSION,
+  securityEventKinds,
+  securityEventSeverities,
+  AUDIT_ACTION_TO_SECURITY_KIND,
+  IMMEDIATE_NOTIFICATION_KINDS,
+  defaultSeverityForKind,
+  defaultRunbookForKind,
+  createSecurityEventId,
+} from './security-events.js';
+export type {
+  SecurityEventKind,
+  SecurityEventSeverity,
+  SecurityEventContext,
+  SecurityEventDimensions,
+  SecurityTelemetryEvent,
+} from './security-events.js';
+
+export {
+  SECURITY_SENSITIVE_KEYS,
+  redactSecurityMetadata,
+  redactSecurityEvent,
+  fingerprintDimension,
+} from './security-redaction.js';
+
+export {
+  SECURITY_METRICS_NAMESPACE,
+  SECURITY_METRIC_DESCRIPTORS,
+  EVENT_KIND_TO_METRICS,
+  buildMetricSample,
+  metricDescriptor,
+  fullyQualifiedMetricName,
+} from './security-metrics.js';
+export type {
+  SecurityMetricType,
+  SecurityMetricDescriptor,
+  SecurityMetricSample,
+} from './security-metrics.js';
+
+export {
+  SECURITY_ANOMALY_POLICY_VERSION,
+  DEFAULT_ANOMALY_RULES,
+  evaluateAnomalyRules,
+  triggeredAnomalies,
+  immediateNotificationAnomalies,
+} from './security-anomaly.js';
+export type { AnomalyComparator, AnomalyRule, AnomalyEvaluation } from './security-anomaly.js';
+
+export {
+  SECURITY_ALERT_POLICY_VERSION,
+  DEFAULT_ALERT_POLICIES,
+  buildAlertPayload,
+  alertPolicyById,
+  policiesRequiringImmediateNotification,
+} from './security-alerts.js';
+export type {
+  AlertNotificationChannel,
+  SecurityAlertPolicy,
+  SecurityAlertPayload,
+} from './security-alerts.js';
+
+export {
+  adaptAppCheckTelemetry,
+  adaptAuditEvent,
+  adaptRateLimitDenial,
+  adaptSlowQuery,
+  adaptQueueSignal,
+  adaptArmorSignal,
+  adaptStorageDenial,
+  adaptServiceHealth,
+  adaptCostAnomaly,
+  adaptSourceAdapterAnomaly,
+  adaptUnexpectedPublicWrite,
+  adaptDatabaseConnections,
+} from './security-adapters.js';
+export type {
+  AppCheckTelemetryInput,
+  RateLimitDenialInput,
+  SlowQueryInput,
+  QueueSignalInput,
+  ArmorSignalInput,
+  StorageDenialInput,
+  ServiceHealthInput,
+  CostAnomalyInput,
+} from './security-adapters.js';
+
+export {
+  createSecurityTelemetryRecorder,
+} from './security-telemetry.js';
+export type {
+  SecurityTelemetrySink,
+  SecurityTelemetryRecorderOptions,
+  SecurityTelemetryRecordResult,
+} from './security-telemetry.js';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 export type LogContext = Readonly<Record<string, unknown>>;

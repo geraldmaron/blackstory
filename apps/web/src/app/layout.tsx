@@ -44,7 +44,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${editorial.variable} ${sans.variable} ${mono.variable}`}
     >
       <body>
-        <a className="bb-visually-hidden" href="#main">
+        <a className="bb-skip-link" href="#main">
           Skip to main content
         </a>
         <SiteShell>{children}</SiteShell>

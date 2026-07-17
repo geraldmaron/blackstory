@@ -6,6 +6,7 @@
 
 import { useEffect } from 'react';
 import { Notice } from '@black-book/ui';
+import { StatusPage } from '../components/StatusPage';
 
 export default function Error({
   error,
@@ -19,12 +20,12 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="bb-container bb-page" id="main">
-      <h1 className="bb-page__title">Something went wrong</h1>
-      <p className="bb-page__lede">
-        The public shell hit an unexpected error. You can retry or return home.
-      </p>
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
+    <StatusPage
+      eyebrow="Error"
+      title="Something went wrong"
+      lede="The public shell hit an unexpected error. You can retry or return home."
+    >
+      <div className="bb-stack bb-page--status__body">
         <Notice tone="error" title="Page failed to render">
           {error.digest ? (
             <span className="bb-mono">digest {error.digest}</span>
@@ -41,6 +42,6 @@ export default function Error({
           </a>
         </div>
       </div>
-    </main>
+    </StatusPage>
   );
 }

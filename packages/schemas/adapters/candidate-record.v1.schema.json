@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blackbook.local/schemas/adapters/candidate-record.v1.schema.json",
+  "title": "AdapterCandidateRecord",
+  "description": "Normalized adapter output record with mandatory source and parser provenance (BB-037).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["stableIdentifier", "provenance"],
+  "properties": {
+    "stableIdentifier": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string"
+    },
+    "canonicalUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "classification": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "adapterId",
+        "parserVersion",
+        "registryEntryId",
+        "runId",
+        "capturedAt",
+        "schemaVersion"
+      ],
+      "properties": {
+        "sourceId": { "type": "string", "minLength": 1 },
+        "adapterId": { "type": "string", "minLength": 1 },
+        "parserVersion": { "type": "string", "minLength": 1 },
+        "registryEntryId": { "type": "string", "minLength": 1 },
+        "runId": { "type": "string", "minLength": 1 },
+        "capturedAt": { "type": "string", "format": "date-time" },
+        "sourceItemId": { "type": "string", "minLength": 1 },
+        "schemaVersion": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

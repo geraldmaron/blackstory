@@ -47,14 +47,39 @@ export {
 } from './emulators.js';
 export type { EmulatorHosts } from './emulators.js';
 
-export { initializeAppCheckScaffold } from './app-check.js';
-export type { AppCheckScaffoldOptions } from './app-check.js';
+export {
+  configureAppCheckDebugToken,
+  getAppCheckRequestHeaders,
+  initializeAppCheckScaffold,
+} from './app-check.js';
+export type { AppCheckClientRuntime, AppCheckScaffoldOptions } from './app-check.js';
+export {
+  APP_CHECK_HEADER,
+  createAppCheckGuard,
+  createFirebaseAppCheckVerifier,
+  parseAppCheckMode,
+  readAppCheckToken,
+} from './app-check-enforce.js';
+export type {
+  AppCheckDecision,
+  AppCheckFailureReason,
+  AppCheckGuardOptions,
+  AppCheckHeaders,
+  AppCheckMode,
+  AppCheckRequest,
+  AppCheckTelemetry,
+  AppCheckTelemetryEvent,
+  AppCheckVerifier,
+  TrustedServiceIdentity,
+  VerifiedAppCheckToken,
+} from './app-check-enforce.js';
 
 export { createWebFirebaseClient } from './web-client.js';
 export type { WebFirebaseClient } from './web-client.js';
 
 export { createAdminFirebaseClient } from './admin-client.js';
 export type { AdminFirebaseClient } from './admin-client.js';
+export * from './admin-auth.js';
 
 export { createServerFirebaseApp, getServerFirebaseApp } from './server.js';
 export type { ServerFirebaseApp } from './server.js';
@@ -144,6 +169,10 @@ export {
   canPublish,
   canResearchWrite,
   researchMayPublish,
+  RELEASE_ACTIVATION_STATUSES,
+  parseImmutablePublicationRelease,
+  resolveActivePublicRelease,
+  activatePublicationRelease,
 } from './firestore/index.js';
 export type {
   FirestoreRootCollection,
@@ -193,4 +222,9 @@ export type {
   CommitWithAuditResult,
   ConsumeOutboxResult,
   StaffRole,
+  ReleaseActivationStatus,
+  ImmutablePublicationReleaseDoc,
+  ActivePublicReleasePointer,
+  ActivateReleaseInput,
+  ActivateReleaseResult,
 } from './firestore/index.js';

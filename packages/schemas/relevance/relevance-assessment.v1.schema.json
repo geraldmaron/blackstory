@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blackbook.local/schemas/relevance/relevance-assessment.v1.schema.json",
+  "title": "RelevanceAssessment",
+  "description": "Private deterministic relevance assessment for discovery candidates (BB-040). Composite scores are never public.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "candidateId",
+    "decision",
+    "compositeScore",
+    "policyVersion",
+    "passes",
+    "featureValues",
+    "gates",
+    "evidence",
+    "whyThisAppears",
+    "distinctivenessKey",
+    "isDuplicate",
+    "assessedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "relevance-assessment.v1"
+    },
+    "candidateId": { "type": "string", "minLength": 1 },
+    "decision": {
+      "type": "string",
+      "enum": ["include", "exclude", "supporting_context"]
+    },
+    "compositeScore": { "type": "number", "minimum": 0, "maximum": 1 },
+    "policyVersion": { "type": "string", "minLength": 1 },
+    "passes": { "type": "boolean" },
+    "featureValues": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dimension", "value", "weight", "contribution", "rationale"],
+        "properties": {
+          "dimension": {
+            "type": "string",
+            "enum": [
+              "signal_strength",
+              "thematic_alignment",
+              "geographic_connection",
+              "source_authority",
+              "distinctiveness"
+            ]
+          },
+          "value": { "type": "number", "minimum": 0, "maximum": 1 },
+          "weight": { "type": "number", "minimum": 0, "maximum": 1 },
+          "contribution": { "type": "number", "minimum": 0, "maximum": 1 },
+          "rationale": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["gateId", "passed", "reason"],
+        "properties": {
+          "gateId": {
+            "type": "string",
+            "enum": [
+              "signal_present",
+              "weak_signal_independent",
+              "negative_only",
+              "threshold",
+              "distinctiveness",
+              "duplicate",
+              "include_evidence"
+            ]
+          },
+          "passed": { "type": "boolean" },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "summary"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["signal", "geographic", "thematic", "source", "gate", "override"]
+          },
+          "summary": { "type": "string", "minLength": 1 },
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "whyThisAppears": { "type": "string", "minLength": 1 },
+    "exclusionReason": { "type": "string" },
+    "override": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "reason", "overriddenBy", "overriddenAt"],
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["include", "exclude", "supporting_context"]
+        },
+        "reason": { "type": "string", "minLength": 12 },
+        "overriddenBy": { "type": "string", "minLength": 1 },
+        "overriddenAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "distinctivenessKey": { "type": "string", "minLength": 1 },
+    "isDuplicate": { "type": "boolean" },
+    "assessedAt": { "type": "string", "format": "date-time" }
+  }
+}

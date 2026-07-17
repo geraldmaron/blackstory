@@ -1,0 +1,139 @@
+{
+  "$schema": "./ingress-matrix.schema.json",
+  "version": "1.0.0",
+  "bead": "BB-023",
+  "title": "Black Book protected public API ingress",
+  "updatedAt": "2026-07-17",
+  "status": "design",
+  "projectId": "black-book-efaaf",
+  "region": "us-central1",
+  "adrRefs": ["ADR-005", "ADR-010"],
+  "threatRefs": ["T-01", "T-19"],
+  "notes": [
+    "Internet-facing public APIs terminate at a global external HTTP(S) load balancer with Cloud Armor.",
+    "Cloud Run services use internal-and-cloud-load-balancing ingress; direct *.run.app URLs must fail for public APIs.",
+    "Geographic restrictions default OFF; enable only with documented abuse evidence (see geo-controls.md).",
+    "Emergency deny rules are pre-provisioned at priority 10 and toggled via gcloud without code deploy."
+  ],
+  "internetTrafficOnlyThroughLb": true,
+  "directRunAppUrlsDisabled": true,
+  "loadBalancer": {
+    "name": "black-book-public-api-lb",
+    "scheme": "EXTERNAL_MANAGED",
+    "scope": "global",
+    "protocol": "HTTPS",
+    "sslPolicy": "black-book-modern-tls",
+    "certificateMap": "black-book-api-cert-map",
+    "frontends": [
+      {
+        "name": "black-book-api-public-fe",
+        "hostnames": ["api.blackbook.app"],
+        "defaultBackend": "black-book-api-public-backend"
+      },
+      {
+        "name": "black-book-api-submissions-fe",
+        "hostnames": ["submit.blackbook.app"],
+        "defaultBackend": "black-book-api-submissions-backend"
+      }
+    ]
+  },
+  "backends": [
+    {
+      "id": "api-public",
+      "name": "black-book-api-public-backend",
+      "cloudRunService": "black-book-api-public",
+      "surfaceId": "api-public",
+      "serverlessNeg": {
+        "name": "black-book-api-public-neg",
+        "region": "us-central1",
+        "cloudRun": {
+          "service": "black-book-api-public",
+          "tag": "latest"
+        }
+      },
+      "cloudRunIngress": "internal-and-cloud-load-balancing",
+      "armorPolicyRef": "policies/api-public-policy.json",
+      "cdn": {
+        "enabled": true,
+        "cacheMode": "CACHE_ALL_STATIC",
+        "defaultTtlSec": 300,
+        "maxTtlSec": 3600,
+        "cacheablePaths": ["/v1/search", "/v1/entities/*", "/v1/locations/nearby", "/health"],
+        "bypassCacheHeaders": ["Authorization", "X-Black-Book-App-Check"],
+        "negativeCaching": false
+      }
+    },
+    {
+      "id": "api-submissions",
+      "name": "black-book-api-submissions-backend",
+      "cloudRunService": "black-book-api-submissions",
+      "surfaceId": "api-submissions",
+      "serverlessNeg": {
+        "name": "black-book-api-submissions-neg",
+        "region": "us-central1",
+        "cloudRun": {
+          "service": "black-book-api-submissions",
+          "tag": "latest"
+        }
+      },
+      "cloudRunIngress": "internal-and-cloud-load-balancing",
+      "armorPolicyRef": "policies/api-submissions-policy.json",
+      "cdn": {
+        "enabled": false,
+        "reason": "Submissions are write-heavy and must not be edge-cached."
+      }
+    }
+  ],
+  "geoControls": {
+    "enabled": false,
+    "policy": "only-when-evidence-justifies",
+    "documentation": "geo-controls.md",
+    "defaultAction": "allow-all-regions"
+  },
+  "emergencyDeny": {
+    "rulePriority": 10,
+    "defaultAction": "allow",
+    "activateWithoutDeploy": true,
+    "runbook": "emergency-deny-runbook.md",
+    "snippet": "policies/emergency-deny-snippet.yaml"
+  },
+  "acceptanceCriteria": [
+    {
+      "id": "AC-ARMOR-1",
+      "criterion": "Internet traffic reaches public APIs only through the global external ALB",
+      "enforcedBy": [
+        "internetTrafficOnlyThroughLb=true",
+        "backends[].cloudRunIngress=internal-and-cloud-load-balancing",
+        "docs/security/ingress-armor.md"
+      ]
+    },
+    {
+      "id": "AC-ARMOR-2",
+      "criterion": "Direct Cloud Run run.app URLs fail for api-public and api-submissions",
+      "enforcedBy": [
+        "directRunAppUrlsDisabled=true",
+        "backends[].cloudRunIngress=internal-and-cloud-load-balancing",
+        "load-test-plan.md § direct-url-negative-test"
+      ]
+    },
+    {
+      "id": "AC-ARMOR-3",
+      "criterion": "Rate-based bans and throttles return 429 and emit metrics",
+      "enforcedBy": [
+        "policies/api-public-policy.json rateLimit rules",
+        "policies/api-submissions-policy.json rateLimit rules",
+        "metrics-alerts-checklist.md",
+        "load-test-plan.md"
+      ]
+    },
+    {
+      "id": "AC-ARMOR-4",
+      "criterion": "Emergency deny activatable without application deploy",
+      "enforcedBy": [
+        "emergencyDeny.activateWithoutDeploy=true",
+        "emergency-deny-runbook.md",
+        "policies/emergency-deny-snippet.yaml"
+      ]
+    }
+  ]
+}

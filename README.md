@@ -117,11 +117,14 @@ design (per-surface SAs / buckets / DB roles): `infra/gcp/` and
 BB-001 through BB-010 (BB-009/010 local; cloud/remote apply pending), **BB-007** design system,
 **BB-011** Firebase bootstrap, **BB-012** database foundation (local roles + SQL Connect
 templates; Cloud SQL instance not provisioned), and **BB-048** public application shell are in
-place. Public web (unique port): `http://localhost:3048/` — design fixtures at
+place. **BB-024** adds monitor/enforce App Check guards for public and submissions APIs, with
+replay consumption on submissions. **BB-029** validates corrections and abuse reports into an
+immutable, privacy-restricted quarantine with spam, duplicate, and coordinated-campaign detection;
+the submissions surface still cannot write canonical/public data. Public web (unique port): `http://localhost:3048/` — design fixtures at
 `http://localhost:3048/design-system` (`docs/ui/README.md`). Production `black-book-efaaf` has
 Hosting plus registered **Black Book Web** / **Black Book Admin** apps. Still blocked/deferred:
 Blaze/App Hosting backends, Firestore database enablement, GCP class buckets/SAs/IAM, Auth
-provider choice, App Check enforcement (BB-024), GitHub remote rulesets + live WIF apply, Cloud
+provider choice, App Check provider registration/console enforcement, GitHub remote rulesets + live WIF apply, Cloud
 SQL create — see `docs/bb-001/`, `docs/adr/`, `docs/security/`, `docs/testing/`, `docs/ui/`,
 `infra/firebase/`, `infra/gcp/` (incl. `wif/`), `infra/github/`, `infra/database/`.
 
@@ -148,6 +151,7 @@ Policy is read-only in both packages (no public mutation API). Changes ship as a
 - Index: [`docs/security/README.md`](./docs/security/README.md)
 - Threat model: [`docs/security/threat-model.md`](./docs/security/threat-model.md)
 - Abuse cases: [`docs/security/abuse-cases.md`](./docs/security/abuse-cases.md)
+- Submission quarantine: [`docs/security/submission-quarantine.md`](./docs/security/submission-quarantine.md)
 - Environment isolation (single-project production; BB-005/D-013): [`docs/security/environment-isolation.md`](./docs/security/environment-isolation.md)
 - Isolation matrices / Terraform stubs: [`infra/gcp/`](./infra/gcp/)
 - Corpus tests: `pnpm --filter @black-book/testing test`

@@ -1,0 +1,39 @@
+# Emergency deny snippet — apply with gcloud; no application redeploy required.
+# See emergency-deny-runbook.md for activation / rollback.
+#
+# ACTIVATE (blocks all traffic on the named policy):
+#   gcloud compute security-policies rules update 10 \
+#     --security-policy=POLICY_NAME \
+#     --action=deny-403 \
+#     --project=black-book-efaaf
+#
+# DEACTIVATE (restore normal allow at priority 10):
+#   gcloud compute security-policies rules update 10 \
+#     --security-policy=POLICY_NAME \
+#     --action=allow \
+#     --project=black-book-efaaf
+
+policies:
+  - name: black-book-api-public-armor
+    emergencyRulePriority: 10
+    activate:
+      action: deny(403)
+      match: "true"
+    deactivate:
+      action: allow
+      match: "true"
+  - name: black-book-api-submissions-armor
+    emergencyRulePriority: 10
+    activate:
+      action: deny(403)
+      match: "true"
+    deactivate:
+      action: allow
+      match: "true"
+
+# Optional: block a single abusive /24 without touching application code
+# (create at priority 15; remove when incident ends)
+scoped_block_example:
+  priority: 15
+  action: deny(403)
+  match: "inIpRange(origin.ip, '203.0.113.0/24')"

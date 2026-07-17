@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "relevance-fixture.v1",
+  "description": "Gold relevance calibration cases for deterministic include/exclude/supporting-context decisions (BB-040).",
+  "cases": [
+    {
+      "id": "included-civil-rights-activist",
+      "title": "Montgomery civil rights activist during segregation",
+      "expectedDecision": "include",
+      "expectedPasses": true,
+      "mustNotExposeScore": true,
+      "notes": "Strong positive + geographic + historical signal should include."
+    },
+    {
+      "id": "excluded-sports-biography",
+      "title": "sports biography of a quarterback",
+      "expectedDecision": "exclude",
+      "expectedPasses": true,
+      "expectedGateFailures": ["negative_only"],
+      "mustNotExposeScore": true,
+      "notes": "Negative-only off-scope signal."
+    },
+    {
+      "id": "excluded-unrelated-marine-biology",
+      "title": "unrelated marine biology field guide",
+      "expectedDecision": "exclude",
+      "expectedPasses": true,
+      "expectedGateFailures": ["signal_present"],
+      "mustNotExposeScore": true,
+      "notes": "Accurate but irrelevant — no query-pack terms matched."
+    },
+    {
+      "id": "excluded-celebrity-awards",
+      "title": "Celebrity visited the city for an unrelated awards show",
+      "expectedDecision": "exclude",
+      "expectedPasses": true,
+      "expectedGateFailures": ["signal_present"],
+      "mustNotExposeScore": true,
+      "notes": "Accurate but irrelevant to place-connected Black history scope."
+    },
+    {
+      "id": "supporting-geographic-only",
+      "title": "Montgomery city council budget report",
+      "expectedDecision": "supporting_context",
+      "expectedPasses": true,
+      "mustNotExposeScore": true,
+      "notes": "Geographic-only weak signal cannot independently include."
+    },
+    {
+      "id": "supporting-period-without-positive",
+      "title": "colored school enrollment ledger 1924",
+      "expectedDecision": "supporting_context",
+      "expectedPasses": true,
+      "mustNotExposeScore": true,
+      "notes": "Historical period term without positive anchor remains supporting context."
+    },
+    {
+      "id": "excluded-weak-montgomery-bulletin",
+      "title": "Montgomery community bulletin",
+      "expectedDecision": "supporting_context",
+      "expectedPasses": true,
+      "mustNotExposeScore": true,
+      "notes": "Weak geographic-only signal capped below include threshold."
+    }
+  ]
+}

@@ -1,13 +1,37 @@
 /**
  * Corrections and contribution intake API entrypoint (Cloud Run target).
- * Quarantine and promotion boundaries land in BB-029 / BB-032.
+ * Quarantine-write-only posture enforced via surface capabilities (BB-021).
  */
-import { parseNodeEnv } from '@black-book/config';
+import { buildSurfaceHealth, parseNodeEnv } from '@black-book/config';
+import { SURFACE_ID } from './posture.js';
+
+export { createSubmissionsApiAppCheckGuard } from './app-check.js';
+export type { SubmissionsApiAppCheckOptions } from './app-check.js';
+export {
+  createSubmissionsRateLimitGuard,
+  resolveSubmissionsEndpointClass,
+} from './rate-limits.js';
+export type {
+  SubmissionsRateLimitGuardDecision,
+  SubmissionsRateLimitGuardOptions,
+  SubmissionsRateLimitRequest,
+} from './rate-limits.js';
+export {
+  createInMemorySubmissionQuarantineRepository,
+  createSubmissionQuarantineService,
+} from './quarantine.js';
+export type {
+  SubmissionSecurityContext,
+  ModerationActor,
+  SubmissionAuditEvent,
+  BlockedSubject,
+  SubmissionQuarantineRepository,
+  QuarantineIntakeRequest,
+  QuarantineIntakeResponse,
+  SubmissionQuarantineServiceOptions,
+} from './quarantine.js';
+export { guardIncomingAuth, guardIntakeOperation, guardPublishAttempt } from './posture.js';
 
 export function health() {
-  return {
-    service: 'api-submissions',
-    status: 'ok' as const,
-    env: parseNodeEnv(process.env.NODE_ENV),
-  };
+  return buildSurfaceHealth(SURFACE_ID, parseNodeEnv(process.env.NODE_ENV));
 }

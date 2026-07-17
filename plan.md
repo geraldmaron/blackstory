@@ -4,7 +4,57 @@ Tracks the Execution Beads (BB-001–BB-066) from *Black Book Web Application Ex
 
 **Source:** `/Users/geralddagher/Downloads/Black Book Web Application Execution Beads.pdf`  
 **Workspace:** `/Users/geralddagher/Developer/Projects/black-book` (greenfield as of 2026-07-16)  
-**Active focus:** Tranche 2 — Firestore data boundary (**BB-013–014, BB-016–018** done; **BB-015** living-person enforcement may still be in flight; next **BB-019** immutable releases). Cloud SQL deferred (D-014 / ADR-011).
+**Active focus:** Wave 4 — **BB-030** SSRF, **BB-032** promotion, **BB-035** kill switches, **BB-042** claim extraction (stronger); **BB-045** Wikimedia, **BB-046** federal adapters (fast). BB-048 remains partial.
+
+## Multi-agent coordination (2026-07-17 wave 4)
+
+| Bead | Model tier | Exclusive ownership (do not cross) | Status |
+|------|------------|------------------------------------|--------|
+| BB-030 | stronger (SSRF) | `packages/security/src/url-safety/`, `workers/security/src/black_book_security/url_fetch/`, `docs/security/url-ssrf.md`, `packages/schemas/url-safety/` | `in_progress` |
+| BB-032 | stronger (promotion) | `packages/domain/src/promotion/`, `packages/domain/src/promotion.test.ts`, `packages/schemas/promotion/`, `docs/security/promotion-controls.md`, `packages/firebase/src/firestore/promotion*.ts` | `in_progress` |
+| BB-035 | stronger (incident) | `packages/config/src/kill-switches*.ts`, `infra/gcp/kill-switches/`, `docs/runbooks/incident-response.md`, `docs/runbooks/incidents/` | `in_progress` |
+| BB-042 | stronger (extraction) | `packages/domain/src/extraction/`, `packages/domain/src/extraction.test.ts`, `workers/research/**/extraction/`, `packages/schemas/extraction/` | `in_progress` |
+| BB-045 | fast | `packages/domain/src/adapters/wikimedia/`, `workers/research/**/adapters/wikimedia/`, `packages/schemas/adapters/wikimedia/` | `in_progress` |
+| BB-046 | fast | `packages/domain/src/adapters/federal/`, `workers/research/**/adapters/federal/`, `packages/schemas/adapters/federal/` | `in_progress` |
+
+**Shared (parent only):** `plan.md`, `packages/*/src/index.ts`, `packages/domain/src/adapters/index.ts`, `workers/*/src/*/__init__.py`, root `README.md`.
+
+**Rules:** one writer per path; agents export from local barrels only; parent merges `export *` after validation; fix exactOptionalPropertyTypes via conditional spreads; no live GCP/Firebase apply; close when repo acceptance met; launch newly unblocked beads immediately.
+
+## Multi-agent coordination (2026-07-17 wave 3 — complete)
+
+| Bead | Model tier | Exclusive ownership (do not cross) | Status |
+|------|------------|------------------------------------|--------|
+| BB-027 | stronger (authz) | `packages/firebase/src/admin-auth*.ts` / claims helpers, `apps/admin/src/auth/`, `docs/security/admin-identity.md`, `infra/gcp/iap/` | `done` |
+| BB-028 | fast | `apps/web/src/lib/web-security/`, security headers in `next.config.mjs` + compose into `middleware.ts` (re-read; preserve BB-022 query normalize) | `done` |
+| BB-039 | fast | `packages/domain/src/discovery/`, `workers/research/**/discovery*`, schemas under `packages/schemas/discovery/` | `done` |
+
+**Shared (parent only):** `plan.md`, `packages/domain/src/index.ts`, `packages/firebase/src/index.ts`.
+
+**Rules:** one writer per path; no live IAP/Auth console apply; no secrets; client route checks never sole authz; discovery never creates public entities; parent merges barrels after finish.
+
+## Multi-agent coordination (2026-07-17 wave 2)
+
+| Bead | Model tier | Exclusive ownership (do not cross) | Status |
+|------|------------|------------------------------------|--------|
+| BB-020 | fast | `infra/firebase/backup/`, `scripts/backup-restore/`, `docs/runbooks/backup-restore.md` | `done` |
+| BB-022 | fast | `apps/web/apphosting*.yaml`, `apps/web/next.config.mjs`, `apps/web/src/lib/runtime-hardening*` (not shell components) | `done` |
+| BB-023 | fast | `infra/gcp/armor/`, `docs/security/ingress-armor.md` | `done` |
+| BB-024 | stronger (enforcement) | `packages/firebase/src/app-check*.ts`, `apps/api-public|api-submissions` App Check middleware only | `done` |
+| BB-038 | fast | `packages/domain/src/query-packs/`, `workers/research/**/query_packs*`, `packages/schemas/query-packs/` | `done` |
+
+**Shared files (parent only):** `plan.md`, `packages/domain/src/index.ts`, `packages/firebase/src/index.ts`, root `README.md`.
+
+**Rules:** one writer per path; no live GCP/Firebase console apply; no secrets; ADR-011 Firestore rescope for BB-020 (not Cloud SQL PITR); validate with package tests; parent merges barrels after agents finish.
+
+## Multi-agent coordination (2026-07-17 wave 1 — complete)
+
+| Bead | Model tier | Exclusive ownership (do not cross) | Status |
+|------|------------|------------------------------------|--------|
+| BB-019 | strong (release/security core) | `packages/domain/src/publication/`, `packages/firebase/src/firestore/release*.ts`, `workers/publication/` (beyond health), FIRESTORE_MODEL § BB-019, release tests | `done` |
+| BB-021 | fast (scaffolding) | `apps/{api-public,api-submissions,api-internal,admin}/` surface contracts, `infra/gcp/surfaces/`, `docs/security/service-surfaces.md` | `done` |
+| BB-037 | fast (contracts) | `packages/domain/src/adapters/`, `workers/research/` adapter modules, schema fixtures under `packages/schemas` for adapters only | `done` |
+| BB-012 | hygiene | status only → `deferred` | `deferred` |
 
 ## Status legend
 
@@ -23,12 +73,12 @@ Tracks the Execution Beads (BB-001–BB-066) from *Black Book Web Application Ex
 | Tranche | Focus | Beads | Done |
 |---------|-------|-------|------|
 | 1 | Secure foundation | BB-001–006, 008–010 | 9/9 |
-| 2 | Data and publication boundary | BB-011–020 | 6/10 |
-| 3 | Hostile-environment protection | BB-021–030, 032–036 | 0/15 |
-| 4 | Research and evidence engine | BB-037–044, 047 | 0/9 |
-| 5 | Public beta product | BB-048–050, 052–057 | 0/9 |
-| 6 | Seed and launch | BB-045–046, 058–063 | 0/8 |
-| Deferred | Later capabilities | BB-031, 051, 064–066 | 0/5 |
+| 2 | Data and publication boundary | BB-011–020 | 9/10 (BB-012 deferred) |
+| 3 | Hostile-environment protection | BB-021–030, 032–036 | 9/15 (BB-021–029,033–034 done; 030/032/035 in progress) |
+| 4 | Research and evidence engine | BB-037–044, 047 | 5/9 (BB-037–041 done; 042 in progress) |
+| 5 | Public beta product | BB-048–050, 052–057 | 0/9 (BB-048 partial) |
+| 6 | Seed and launch | BB-045–046, 058–063 | 0/8 (045/046 in progress) |
+| Deferred | Later capabilities | BB-012, 031, 051, 064–066 | 0/6 |
 
 ---
 
@@ -145,15 +195,15 @@ infra/
 | ID | Title | P | Size | Deps | Status | Notes |
 |----|-------|---|------|------|--------|-------|
 | BB-011 | Firebase project bootstrap | P0 | M | BB-005, BB-006 | `done` | Apps registered; App Hosting/Blaze + Firestore DB + GCP buckets/IAM still blocked/deferred |
-| BB-012 | Cloud SQL PostgreSQL, PostGIS, and SQL Connect | P0 | L | BB-005, BB-011 | `partial` | Repo foundation parked; **Cloud SQL will not be provisioned** this phase (D-014 / ADR-011) |
+| BB-012 | Cloud SQL PostgreSQL, PostGIS, and SQL Connect | P0 | L | BB-005, BB-011 | `deferred` | ADR-011 / D-014 — Firestore SoR; Cloud SQL not provisioned this phase; scaffolds parked |
 | BB-013 | Database schema boundaries and migrations | P0 | L | BB-011, D-014 | `done` | **Rescoped:** Firestore collections, rules, converters, seeds, emulator tests — not SQL migrations |
 | BB-014 | Entity and geography domain model | P0 | L | BB-003, BB-013 | `done` | Firestore documents + geohash; `@black-book/domain` + converters/seeds |
 | BB-015 | Living-person and sensitive-location enforcement | P0 | L | BB-003, BB-014 | `done` | Central redaction/serialization in `@black-book/security`; constitution `sensitivityRules`; observability + public converter wired |
 | BB-016 | Sources, captures, rights, and provenance model | P0 | L | BB-013 | `done` | Evidence metadata in Firestore; blobs in Storage |
 | BB-017 | Claims, contradictions, and confidence model | P0 | L | BB-003, BB-014, BB-016 | `done` | Deterministic confidence + claim publication statuses |
 | BB-018 | Append-only audit and transactional outbox | P0 | M | BB-013, BB-017 | `done` | Atomic Firestore state/audit/outbox, idempotency, retry/DLQ, history |
-| BB-019 | Public projection and immutable release model | P0 | L | BB-015, BB-017, BB-018 | `todo` | |
-| BB-020 | Backup, PITR, and restore verification | P0 | M | BB-013, BB-019 | `todo` | Firestore export / Storage versioning (not Cloud SQL PITR) |
+| BB-019 | Public projection and immutable release model | P0 | L | BB-015, BB-017, BB-018 | `done` | Signed manifests + atomic activation/rollback; barrels wired |
+| BB-020 | Backup, PITR, and restore verification | P0 | M | BB-013, BB-019 | `todo` | Firestore export / Storage versioning (not Cloud SQL PITR); unblocked after BB-019 |
 
 ### BB-013 acceptance checklist (Firestore rescope)
 
@@ -191,7 +241,7 @@ infra/
 
 | ID | Title | P | Size | Deps | Status |
 |----|-------|---|------|------|--------|
-| BB-021 | Separate public, submissions, internal, and admin surfaces | P0 | L | BB-005, BB-011, BB-013 | `todo` |
+| BB-021 | Separate public, submissions, internal, and admin surfaces | P0 | L | BB-005, BB-011, BB-013 | `done` |
 | BB-022 | Public App Hosting runtime hardening | P0 | M | BB-011, BB-019, BB-021 | `todo` |
 | BB-023 | Cloud Armor and protected public API ingress | P0 | L | BB-021 | `todo` |
 | BB-024 | Firebase App Check enforcement | P0 | M | BB-011, BB-021 | `todo` |
@@ -200,11 +250,11 @@ infra/
 | BB-027 | Administrator identity and authorization | P0 | L | BB-011, BB-021 | `todo` |
 | BB-028 | Web application security controls | P0 | L | BB-007, BB-021 | `todo` |
 | BB-029 | Corrections and submission quarantine | P0 | L | BB-015, BB-021, BB-025 | `todo` |
-| BB-030 | Safe external URL handling and SSRF prevention | P0 | L | BB-004, BB-029 | `todo` |
-| BB-032 | Data-poisoning and promotion controls | P0 | L | BB-017–019, BB-029 | `todo` |
+| BB-030 | Safe external URL handling and SSRF prevention | P0 | L | BB-004, BB-029 | `in_progress` |
+| BB-032 | Data-poisoning and promotion controls | P0 | L | BB-017–019, BB-029 | `in_progress` |
 | BB-033 | Cost and resource exhaustion controls | P0 | L | BB-022, BB-023, BB-025 | `todo` |
 | BB-034 | Security telemetry and anomaly detection | P0 | L | BB-018, BB-023–025 | `todo` |
-| BB-035 | Incident response and kill switches | P0 | L | BB-019, BB-033 | `todo` |
+| BB-035 | Incident response and kill switches | P0 | L | BB-019, BB-033 | `in_progress` |
 | BB-036 | Security testing and CI gates | P0 | L | BB-008, BB-009, BB-028, BB-030 | `todo` |
 
 **Note:** BB-007 (design system) is Epic A but not listed in Tranche 1 sequence in the PDF; it is required before BB-028 and Tranche 5. Tracked below under Epic A remainder.
@@ -235,12 +285,12 @@ infra/
 
 | ID | Title | P | Size | Deps | Status |
 |----|-------|---|------|------|--------|
-| BB-037 | Source registry and adapter contract | P0 | L | BB-016, BB-018 | `todo` |
+| BB-037 | Source registry and adapter contract | P0 | L | BB-016, BB-018 | `done` |
 | BB-038 | Versioned historical query packs | P0 | M | BB-003, BB-037 | `todo` |
 | BB-039 | Candidate discovery pipeline | P0 | L | BB-037, BB-038 | `todo` |
 | BB-040 | Deterministic relevance engine | P0 | L | BB-003, BB-039 | `todo` |
 | BB-041 | Entity and historical-location resolution | P0 | L | BB-014, BB-039 | `todo` |
-| BB-042 | Atomic claim extraction and evidence registration | P0 | L | BB-016, BB-017, BB-041 | `todo` |
+| BB-042 | Atomic claim extraction and evidence registration | P0 | L | BB-016, BB-017, BB-041 | `in_progress` |
 | BB-043 | Confidence and source-lineage engine | P0 | L | BB-017, BB-042 | `todo` |
 | BB-044 | Research-case and publication workflow | P0 | L | BB-040–043 | `todo` |
 | BB-047 | Gold corpus and calibration harness | P0 | L | BB-040, BB-041, BB-043, BB-044 | `todo` |
@@ -267,8 +317,8 @@ infra/
 
 | ID | Title | P | Size | Deps | Status |
 |----|-------|---|------|------|--------|
-| BB-045 | Wikimedia discovery adapter | P1 | L | BB-037–039 | `todo` |
-| BB-046 | Federal archive and public-history adapters | P1 | L | BB-037, BB-039 | `todo` |
+| BB-045 | Wikimedia discovery adapter | P1 | L | BB-037–039 | `in_progress` |
+| BB-046 | Federal archive and public-history adapters | P1 | L | BB-037, BB-039 | `in_progress` |
 | BB-058 | Initial high-confidence national seed | P1 | XL | BB-044–047, BB-052 | `todo` |
 | BB-059 | Load, abuse, and cost testing | P0 | L | BB-023–026, BB-033, BB-049 | `todo` |
 | BB-060 | Adversarial integrity exercise | P0 | L | BB-032, BB-043, BB-044, BB-055 | `todo` |

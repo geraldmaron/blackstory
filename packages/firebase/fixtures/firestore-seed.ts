@@ -68,6 +68,7 @@ export const seedActiveRelease: PublicActiveReleaseDoc = {
   releaseId: 'rel_seed_001',
   activatedAt: FIXED_NOW,
   searchIndexVersion: 'search_seed_001',
+  manifestHash: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
 };
 
 export const seedPublicEntity: PublicEntityProjectionDoc = {

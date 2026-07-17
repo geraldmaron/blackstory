@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Black Book security dashboard panels (BB-034)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "status", "projectId", "bead", "dashboardId", "panels"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": "1.0.0" },
+    "status": { "const": "design-only" },
+    "projectId": { "const": "black-book-efaaf" },
+    "bead": { "const": "BB-034" },
+    "dashboardId": { "const": "black-book-security-telemetry" },
+    "panels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "metric", "visualization", "description"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "metric": { "type": "string" },
+          "visualization": {
+            "enum": ["stacked_bar", "line", "heatmap", "single_stat", "table"]
+          },
+          "description": { "type": "string" },
+          "groupBy": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "gcpMetricType": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,235 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://black-book/infra/gcp/cost-controls/cost-controls.schema.json",
+  "title": "Black Book cost and resource exhaustion controls matrix",
+  "description": "Schema for BB-033 machine-readable cost-control stubs (scaling, queues, jobs, budgets, billing alerts).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "bead",
+    "title",
+    "status",
+    "projectId",
+    "dependencyRefs",
+    "services",
+    "cloudTasksQueues",
+    "cloudRunJobs",
+    "databaseLimits",
+    "dailyBudgets",
+    "billingAlerts",
+    "softShutdown",
+    "acceptanceCriteria"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "bead": { "type": "string", "const": "BB-033" },
+    "title": { "type": "string", "minLength": 1 },
+    "updatedAt": { "type": "string" },
+    "status": { "type": "string", "enum": ["design", "partial", "applied"] },
+    "projectId": { "type": "string" },
+    "region": { "type": "string" },
+    "dependencyRefs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 3
+    },
+    "policyPackageRef": { "type": "string" },
+    "notes": { "type": "array", "items": { "type": "string" } },
+    "services": {
+      "type": "array",
+      "minItems": 5,
+      "items": { "$ref": "#/definitions/serviceScaling" }
+    },
+    "cloudTasksQueues": {
+      "type": "array",
+      "minItems": 5,
+      "items": { "$ref": "#/definitions/cloudTasksQueue" }
+    },
+    "cloudRunJobs": {
+      "type": "array",
+      "minItems": 6,
+      "items": { "$ref": "#/definitions/cloudRunJob" }
+    },
+    "databaseLimits": {
+      "type": "array",
+      "minItems": 4,
+      "items": { "$ref": "#/definitions/databaseLimit" }
+    },
+    "dailyBudgets": {
+      "type": "array",
+      "minItems": 5,
+      "items": { "$ref": "#/definitions/dailyBudget" }
+    },
+    "researchCampaignBudget": { "$ref": "#/definitions/researchCampaignBudget" },
+    "billingAlerts": {
+      "type": "array",
+      "minItems": 4,
+      "items": { "$ref": "#/definitions/billingAlert" }
+    },
+    "softShutdown": { "$ref": "#/definitions/softShutdown" },
+    "acceptanceCriteria": {
+      "type": "array",
+      "minItems": 5,
+      "items": { "$ref": "#/definitions/acceptanceCriterion" }
+    }
+  },
+  "definitions": {
+    "workloadTier": {
+      "type": "string",
+      "enum": ["public_serving", "essential_ops", "optional_research"]
+    },
+    "retryPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxAttempts", "initialBackoffMs", "maxBackoffMs", "multiplier"],
+      "properties": {
+        "maxAttempts": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "initialBackoffMs": { "type": "integer", "minimum": 100 },
+        "maxBackoffMs": { "type": "integer", "minimum": 1000 },
+        "multiplier": { "type": "number", "minimum": 1.5 }
+      }
+    },
+    "serviceScaling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "runtime", "tier", "minInstances", "maxInstances", "concurrency", "cpu", "memoryMiB"],
+      "properties": {
+        "id": { "type": "string" },
+        "runtime": { "type": "string", "enum": ["firebase-app-hosting", "cloud-run"] },
+        "tier": { "$ref": "#/definitions/workloadTier" },
+        "minInstances": { "type": "integer", "minimum": 0 },
+        "maxInstances": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "concurrency": { "type": "integer", "minimum": 1 },
+        "cpu": { "type": "number", "minimum": 0.25 },
+        "memoryMiB": { "type": "integer", "minimum": 128 },
+        "bb022Ref": { "type": "string" }
+      }
+    },
+    "cloudTasksQueue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "tier", "maxDispatchesPerSecond", "maxConcurrentDispatches", "maxAttempts", "retry", "maxQueueDepth"],
+      "properties": {
+        "id": { "type": "string" },
+        "tier": { "$ref": "#/definitions/workloadTier" },
+        "maxDispatchesPerSecond": { "type": "number", "minimum": 0.1 },
+        "maxConcurrentDispatches": { "type": "integer", "minimum": 1 },
+        "maxAttempts": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "retry": { "$ref": "#/definitions/retryPolicy" },
+        "maxQueueDepth": { "type": "integer", "minimum": 100 }
+      }
+    },
+    "cloudRunJob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "tier", "cpu", "memoryMiB", "maxDurationSec", "maxRetries", "retry", "taskCount", "parallelism"],
+      "properties": {
+        "id": { "type": "string" },
+        "tier": { "$ref": "#/definitions/workloadTier" },
+        "cpu": { "type": "number", "minimum": 0.25 },
+        "memoryMiB": { "type": "integer", "minimum": 128 },
+        "maxDurationSec": { "type": "integer", "minimum": 60 },
+        "maxRetries": { "type": "integer", "minimum": 0 },
+        "retry": { "$ref": "#/definitions/retryPolicy" },
+        "taskCount": { "type": "integer", "minimum": 1 },
+        "parallelism": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "databaseLimit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "maxConnections", "statementTimeoutMs", "idleTransactionTimeoutMs", "lockTimeoutMs"],
+      "properties": {
+        "role": { "type": "string" },
+        "maxConnections": { "type": "integer", "minimum": 1 },
+        "statementTimeoutMs": { "type": "integer", "minimum": 1000 },
+        "idleTransactionTimeoutMs": { "type": "integer", "minimum": 1000 },
+        "lockTimeoutMs": { "type": "integer", "minimum": 500 }
+      }
+    },
+    "dailyBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "dailyCap", "unit", "softShutdownAtPercent", "hardStopAtPercent", "automatedResponse"],
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["geocoder", "model", "ocr", "source_fetch", "research_campaign"]
+        },
+        "dailyCap": { "type": "integer", "minimum": 1 },
+        "unit": { "type": "string", "enum": ["requests", "tokens", "bytes", "usd_cents"] },
+        "softShutdownAtPercent": { "type": "integer", "minimum": 50, "maximum": 99 },
+        "hardStopAtPercent": { "type": "integer", "const": 100 },
+        "automatedResponse": {
+          "type": "string",
+          "enum": ["alert_only", "throttle_optional", "pause_research", "disable_geocoder", "disable_model", "disable_source_fetch"]
+        }
+      }
+    },
+    "researchCampaignBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxCandidatesPerRun", "maxConcurrentAdapters", "maxDailyRuns", "maxWallClockSec", "maxEgressBytes"],
+      "properties": {
+        "maxCandidatesPerRun": { "type": "integer", "minimum": 1 },
+        "maxConcurrentAdapters": { "type": "integer", "minimum": 1 },
+        "maxDailyRuns": { "type": "integer", "minimum": 1 },
+        "maxWallClockSec": { "type": "integer", "minimum": 60 },
+        "maxEgressBytes": { "type": "integer", "minimum": 1024 }
+      }
+    },
+    "billingAlert": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alertId", "thresholdPercent", "automatedResponse", "notifyChannels", "runbookRef"],
+      "properties": {
+        "alertId": { "type": "string" },
+        "thresholdPercent": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "automatedResponse": {
+          "type": "string",
+          "enum": ["alert_only", "throttle_optional", "pause_research", "disable_geocoder", "disable_model", "disable_source_fetch"]
+        },
+        "notifyChannels": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["email", "pagerduty", "slack"] },
+          "minItems": 1
+        },
+        "runbookRef": { "type": "string" }
+      }
+    },
+    "softShutdown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["autoDisablePublicCorpus", "shutdownOrder", "preserveTiers"],
+      "properties": {
+        "autoDisablePublicCorpus": { "type": "boolean", "const": false },
+        "shutdownOrder": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/workloadTier" },
+          "minItems": 2
+        },
+        "preserveTiers": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/workloadTier" },
+          "contains": { "const": "public_serving" }
+        }
+      }
+    },
+    "acceptanceCriterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "criterion", "enforcedBy"],
+      "properties": {
+        "id": { "type": "string" },
+        "criterion": { "type": "string" },
+        "enforcedBy": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        }
+      }
+    }
+  }
+}

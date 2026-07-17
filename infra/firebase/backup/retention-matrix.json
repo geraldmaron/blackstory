@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "projectId": "black-book-efaaf",
+  "backupBucket": "black-book-efaaf-firestore-backups",
+  "tiers": {
+    "canonical": {
+      "label": "Canonical structured data",
+      "collections": [
+        "policy",
+        "policyVersions",
+        "researchCases",
+        "canonicalEntities",
+        "canonicalClaims",
+        "claimEvidenceLinks",
+        "entityRelationships",
+        "entityMerges",
+        "killSwitches"
+      ],
+      "subcollections": ["canonicalEntities/*/locations/*"],
+      "exportCadence": "daily",
+      "retentionDays": 2555,
+      "retentionPolicy": "7 years minimum; legal hold may extend",
+      "pitrComplement": true,
+      "notes": "Excludes submissionInbox (quarantine tier). Subcollections export with parent."
+    },
+    "evidence": {
+      "label": "Evidence metadata and provenance",
+      "collections": [
+        "sourceOrganizations",
+        "sourceDomains",
+        "evidenceSources",
+        "sourceItems",
+        "sourceCaptures",
+        "retrievalEvents",
+        "evidenceRecords",
+        "evidenceLineage"
+      ],
+      "exportCadence": "daily",
+      "retentionDays": 2555,
+      "retentionPolicy": "7 years minimum; align with evidence provenance obligations",
+      "storageBlobs": {
+        "bucket": "black-book-efaaf-private-evidence",
+        "versioning": true,
+        "retentionDays": 2555
+      }
+    },
+    "audit": {
+      "label": "Append-only audit and outbox",
+      "collections": [
+        "auditEvents",
+        "outboxMessages",
+        "idempotencyKeys",
+        "outboxConsumerReceipts"
+      ],
+      "exportCadence": "daily",
+      "retentionDays": 2555,
+      "retentionPolicy": "Immutable; 7+ years; never shortened without legal review",
+      "pitrComplement": true
+    },
+    "publication": {
+      "label": "Release manifests and activation pointer",
+      "collections": ["publicationReleases", "publicMeta"],
+      "exportCadence": "daily_and_on_release",
+      "retentionDays": -1,
+      "retentionPolicy": "Indefinite for active/superseded/rolled_back releases; draft/preview 90 days",
+      "draftPreviewRetentionDays": 90,
+      "manifestVerification": "BB-019 signed manifest + sha256 envelope required on restore"
+    },
+    "public": {
+      "label": "Released projections and search index",
+      "collections": ["publicReleases", "publicSearchIndex"],
+      "subcollections": ["publicReleases/*/entities/*"],
+      "exportCadence": "daily_and_on_release",
+      "retentionDays": -1,
+      "retentionPolicy": "Indefinite per release; immutable snapshots in GCS",
+      "storageBlobs": {
+        "prefix": "public/releases/",
+        "bucket": "black-book-efaaf-public-media",
+        "versioning": true,
+        "retentionDays": -1
+      }
+    },
+    "quarantine": {
+      "label": "Submission inbox (short TTL)",
+      "collections": ["submissionInbox"],
+      "exportCadence": "optional_weekly",
+      "retentionDays": 30,
+      "retentionPolicy": "Operational recovery only; not part of long-term archive"
+    }
+  },
+  "lifecycleRules": [
+    {
+      "prefix": "exports/daily/",
+      "action": "Delete",
+      "conditionAgeDays": 90,
+      "tierScope": ["quarantine"],
+      "notes": "Daily tier-tagged copies roll off after cross-check against weekly full"
+    },
+    {
+      "prefix": "exports/weekly/",
+      "action": "SetStorageClass",
+      "conditionAgeDays": 30,
+      "storageClass": "NEARLINE"
+    },
+    {
+      "prefix": "exports/weekly/",
+      "action": "SetStorageClass",
+      "conditionAgeDays": 365,
+      "storageClass": "COLDLINE"
+    },
+    {
+      "prefix": "exports/releases/",
+      "action": "None",
+      "notes": "On-release exports retained per publication tier policy"
+    }
+  ]
+}

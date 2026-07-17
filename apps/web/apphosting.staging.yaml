@@ -3,19 +3,27 @@
 # Uses the same Black Book Web app registration; distinct Secret Manager names only.
 # Backend runtime: web-runtime@black-book-efaaf.iam.gserviceaccount.com.
 # No secret values here — only Secret Manager references by name (resolved at deploy time).
+#
+# BB-022: tighter staging caps than production (maxInstances=2, concurrency=20, memoryMiB=256).
+# Post-deploy: gcloud run services describe black-book-web-staging --region=REGION \
+#   --format='value(spec.template.metadata.annotations.autoscaling\.knative\.dev/maxScale)'
 
 runConfig:
-  minInstances: 1
-  maxInstances: 3
-  concurrency: 80
+  minInstances: 0
+  maxInstances: 2
+  concurrency: 20
   cpu: 1
-  memoryMiB: 512
+  memoryMiB: 256
 
 env:
   - variable: NEXT_PUBLIC_APP_ENV
     value: staging
     availability:
       - BUILD
+      - RUNTIME
+  - variable: PUBLIC_READ_API_DISABLED
+    value: '0'
+    availability:
       - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
     value: black-book-efaaf

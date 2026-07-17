@@ -3,16 +3,16 @@
  */
 
 import { EmptyState } from '@black-book/ui';
+import { StatusPage } from '../components/StatusPage';
 
 export default function NotFound() {
   return (
-    <main className="bb-container bb-page" id="main">
-      <p className="bb-page__eyebrow">404</p>
-      <h1 className="bb-page__title">Page not found</h1>
-      <p className="bb-page__lede">
-        That route is not part of the public shell, or the sample entity id is unknown.
-      </p>
-      <div style={{ marginTop: 'var(--bb-space-6)' }}>
+    <StatusPage
+      eyebrow="404"
+      title="Page not found"
+      lede="That route is not part of the public shell, or the sample entity id is unknown."
+    >
+      <div className="bb-page--status__body">
         <EmptyState
           title="Nothing to show here"
           action={
@@ -25,6 +25,6 @@ export default function NotFound() {
           /design-system.
         </EmptyState>
       </div>
-    </main>
+    </StatusPage>
   );
 }

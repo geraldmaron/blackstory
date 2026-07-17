@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blackbook.local/schemas/discovery/discovery-candidate.v1.schema.json",
+  "title": "DiscoveryCandidateRecord",
+  "description": "Private research candidate produced by the discovery pipeline (BB-039). Never a public entity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "identity",
+    "adapterRecord",
+    "status",
+    "ingestMode",
+    "signals",
+    "geographicHints",
+    "retryCount",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "discovery-candidate.v1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identityKey", "stableIdentifier", "contentHash", "sourceReferences"],
+      "properties": {
+        "identityKey": { "type": "string", "minLength": 1 },
+        "stableIdentifier": { "type": "string", "minLength": 1 },
+        "contentHash": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["algorithm", "digest"],
+          "properties": {
+            "algorithm": { "type": "string", "const": "sha256" },
+            "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+          }
+        },
+        "sourceReferences": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "sourceId",
+              "adapterId",
+              "parserVersion",
+              "registryEntryId",
+              "runId",
+              "capturedAt",
+              "stableIdentifier"
+            ],
+            "properties": {
+              "sourceId": { "type": "string", "minLength": 1 },
+              "adapterId": { "type": "string", "minLength": 1 },
+              "parserVersion": { "type": "string", "minLength": 1 },
+              "registryEntryId": { "type": "string", "minLength": 1 },
+              "runId": { "type": "string", "minLength": 1 },
+              "capturedAt": { "type": "string", "format": "date-time" },
+              "sourceItemId": { "type": "string", "minLength": 1 },
+              "stableIdentifier": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "adapterRecord": {
+      "$ref": "../adapters/candidate-record.v1.schema.json"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "accepted", "quarantined", "dead_letter", "merged"]
+    },
+    "ingestMode": {
+      "type": "string",
+      "enum": ["bulk", "api"]
+    },
+    "signals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strength", "outcome", "matchedClasses", "matchedTerms", "reasons"],
+      "properties": {
+        "strength": { "type": "string", "enum": ["strong", "medium", "weak"] },
+        "outcome": { "type": "string", "enum": ["promotable", "candidate_only"] },
+        "matchedClasses": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "matchedTerms": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "reasons": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "geographicHints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "kind", "confidence"],
+        "properties": {
+          "text": { "type": "string", "minLength": 1 },
+          "kind": {
+            "type": "string",
+            "enum": ["state", "city", "region", "country", "unknown"]
+          },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "failureOutcome": {
+      "type": "string",
+      "enum": ["retry", "quarantine", "dead_letter"]
+    },
+    "failureReason": { "type": "string" },
+    "retryCount": { "type": "integer", "minimum": 0 },
+    "mergedIntoId": { "type": "string" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

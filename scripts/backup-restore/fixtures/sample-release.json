@@ -1,0 +1,38 @@
+{
+  "id": "release-001",
+  "status": "active",
+  "searchIndexVersion": "search-001",
+  "signedManifest": {
+    "manifest": {
+      "schemaVersion": 1,
+      "releaseId": "release-001",
+      "generatedAt": "2026-07-17T04:00:00.000Z",
+      "searchIndexVersion": "search-001",
+      "entries": [
+        {
+          "entityId": "entity-a",
+          "revision": "revision-1",
+          "projectionPath": "publicReleases/release-001/entities/entity-a",
+          "projectionHash": {
+            "algorithm": "sha256",
+            "digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          },
+          "snapshotPath": "public/releases/release-001/entities/entity-a.json",
+          "snapshotHash": {
+            "algorithm": "sha256",
+            "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+          }
+        }
+      ]
+    },
+    "manifestHash": {
+      "algorithm": "sha256",
+      "digest": "2d98f832c5ca078523679ac29505d32c3b7ab9de7baa91c814dbd80587e89a97"
+    },
+    "signature": {
+      "algorithm": "ecdsa-sha256",
+      "keyId": "publication-key-1",
+      "value": "dGVzdA=="
+    }
+  }
+}

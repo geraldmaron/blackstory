@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "query-pack.v1",
+  "pack": {
+    "id": "qp-person-civil-rights",
+    "displayName": "Civil rights movement figures",
+    "entityKind": "person",
+    "theme": "civil_rights",
+    "version": {
+      "semver": "1.0.0"
+    },
+    "createdAt": "2026-07-16T20:00:00.000Z",
+    "notes": "Gold fixture for person/civil_rights query pack with match and exclusion expectations.",
+    "terms": [
+      {
+        "text": "civil rights activist",
+        "termClass": "positive"
+      },
+      {
+        "text": "freedom rider",
+        "termClass": "positive"
+      },
+      {
+        "text": "NAACP",
+        "termClass": "alias"
+      },
+      {
+        "text": "Montgomery",
+        "termClass": "geographic"
+      },
+      {
+        "text": "Alabama",
+        "termClass": "geographic"
+      },
+      {
+        "text": "segregation",
+        "termClass": "historical"
+      },
+      {
+        "text": "desegregation",
+        "termClass": "modern"
+      },
+      {
+        "text": "sports biography",
+        "termClass": "negative"
+      },
+      {
+        "text": "colored school",
+        "termClass": "historical",
+        "researchOnlyOffensive": true
+      },
+      {
+        "text": "naid:",
+        "termClass": "source_specific",
+        "sourceId": "src_nara"
+      }
+    ]
+  },
+  "expectations": [
+    {
+      "input": "Montgomery civil rights activist during segregation",
+      "shouldMatch": true,
+      "expectedOutcome": "promotable",
+      "matchedTermClasses": ["positive", "geographic", "historical"]
+    },
+    {
+      "input": "NAACP freedom rider in Alabama",
+      "shouldMatch": true,
+      "expectedOutcome": "promotable",
+      "matchedTermClasses": ["positive", "alias", "geographic"]
+    },
+    {
+      "input": "sports biography of a quarterback",
+      "shouldMatch": true,
+      "expectedOutcome": "candidate_only",
+      "matchedTermClasses": ["negative"]
+    },
+    {
+      "input": "Montgomery city council budget report",
+      "shouldMatch": true,
+      "expectedOutcome": "candidate_only",
+      "matchedTermClasses": ["geographic"]
+    },
+    {
+      "input": "unrelated marine biology field guide",
+      "shouldMatch": false
+    },
+    {
+      "input": "colored school enrollment ledger 1924",
+      "shouldMatch": true,
+      "expectedOutcome": "candidate_only",
+      "matchedTermClasses": ["historical"]
+    }
+  ]
+}
