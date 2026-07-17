@@ -1,0 +1,241 @@
+{
+  "package": "Black Book Brand Identity System",
+  "version": "3.0.0-final",
+  "assets": [
+    {
+      "path": "README.md",
+      "bytes": 1261,
+      "sha256": "01e846d8ea9cbbe264e3ac1ea074e1e3b1a2523d1aa9a11d589da87030781a16"
+    },
+    {
+      "path": "assets/icons/apple-touch-icon-dark-180.png",
+      "bytes": 10831,
+      "sha256": "9d5213b19b1233053bbbbd3d2e93b641a3ab5bef74ea50cdba44774033696133"
+    },
+    {
+      "path": "assets/icons/apple-touch-icon-light-180.png",
+      "bytes": 11627,
+      "sha256": "2a7014184f6dd17e7633fe1502a3fdc08c99b0a2897ef59acb7883c240286868"
+    },
+    {
+      "path": "assets/icons/favicon-dark-16.png",
+      "bytes": 706,
+      "sha256": "44b1eb0016e401a3b2ee3ed8a23c35e720b1cc588500ad18f15a7cd7abb210b2"
+    },
+    {
+      "path": "assets/icons/favicon-dark-32.png",
+      "bytes": 1478,
+      "sha256": "2172f6940a1ea56088a84379190ea69256e93bc89f95e50e842dbabaae195988"
+    },
+    {
+      "path": "assets/icons/favicon-dark-48.png",
+      "bytes": 2263,
+      "sha256": "6290f2d27330ffb9dd1e24ff14b71e53b4b7e222ea36ba7ba248ca44bcac8147"
+    },
+    {
+      "path": "assets/icons/favicon-light-16.png",
+      "bytes": 737,
+      "sha256": "73111a9d66098d8576cebb1984f537a212c558a5a84693e547fe7736268d7d1e"
+    },
+    {
+      "path": "assets/icons/favicon-light-32.png",
+      "bytes": 1591,
+      "sha256": "b1d428adde62ee25544b65c7824fa62541671be53864e1488b8e1534d68f60f4"
+    },
+    {
+      "path": "assets/icons/favicon-light-48.png",
+      "bytes": 2360,
+      "sha256": "24e32a69e08f9efc000c18809df1b39b04c30caabcc010564d8e9e2210adbd5e"
+    },
+    {
+      "path": "assets/icons/favicon.svg",
+      "bytes": 1848,
+      "sha256": "f63a51edba16befcf98f82f79f0d79f63ecf719dd526b1d6645b9a49b7c9612d"
+    },
+    {
+      "path": "assets/icons/social-avatar-dark-512.png",
+      "bytes": 37208,
+      "sha256": "11bf7bbf4d4e111f017104ac3d4805d6aae9be27ed4b33ad81bcc9573b400ed8"
+    },
+    {
+      "path": "assets/icons/social-avatar-light-512.png",
+      "bytes": 39159,
+      "sha256": "a0a3306dd32d68ff3db107070b1734bdc7e5b72d07fa10cc8514fa50ef54443e"
+    },
+    {
+      "path": "assets/png/black-book-app-icon-dark-1024.png",
+      "bytes": 51042,
+      "sha256": "9d59feb29f164352c21263967643516fc74db84655bcb8a8b4b22db467c39d64"
+    },
+    {
+      "path": "assets/png/black-book-app-icon-light-1024.png",
+      "bytes": 49673,
+      "sha256": "c55cd25221e0a6316edcbdd787a043adb8ce17f3954e5600c38dc6fbc8c04aa5"
+    },
+    {
+      "path": "assets/png/black-book-mark-compact-dark-transparent.png",
+      "bytes": 67233,
+      "sha256": "c73ec37add652aaba391944104a3332c95e109c9522148149de2379a81a192a9"
+    },
+    {
+      "path": "assets/png/black-book-mark-compact-light-transparent.png",
+      "bytes": 63832,
+      "sha256": "5ed1e2d08c628f456da0a1ce1915b241082051414c098e31e3f110f563c3daf9"
+    },
+    {
+      "path": "assets/png/black-book-mark-dark-transparent.png",
+      "bytes": 78005,
+      "sha256": "5d8fab332037a53a7b794c74bfdc08780809edf499436a4d3b38cffd3d5623a9"
+    },
+    {
+      "path": "assets/png/black-book-mark-light-transparent.png",
+      "bytes": 73856,
+      "sha256": "5c11c19d05e3596bbe84286530900504d631455a4f874c48968daed86b005231"
+    },
+    {
+      "path": "assets/png/black-book-mark-monochrome-black-transparent.png",
+      "bytes": 35332,
+      "sha256": "172e2daaeca94af8e1e7511ed7258a16043af433e3154f71e83babf5d9024bec"
+    },
+    {
+      "path": "assets/png/black-book-mark-monochrome-cream-transparent.png",
+      "bytes": 37102,
+      "sha256": "f8ba216369abd853d8b2bf1a83e2d0aad951789105553b9b41fb9f62b390577b"
+    },
+    {
+      "path": "assets/png/black-book-primary-dark-transparent.png",
+      "bytes": 79597,
+      "sha256": "89ab93c86cc659af27061ab81b7c4f1d6b39fc9548058b83a34382da42df7ad7"
+    },
+    {
+      "path": "assets/png/black-book-primary-light-transparent.png",
+      "bytes": 76353,
+      "sha256": "40583bc2feb4d32785e3cf1a5d06e1f89f0ff63756ddb7ee4e07e011d3b6e8a4"
+    },
+    {
+      "path": "assets/png/black-book-primary-monochrome-black-transparent.png",
+      "bytes": 62804,
+      "sha256": "a5fbd3e7a48c811b40a74e163ea073e79eaa82c1d5eeda913d94ca3c501c1666"
+    },
+    {
+      "path": "assets/png/black-book-primary-monochrome-cream-transparent.png",
+      "bytes": 65788,
+      "sha256": "4dfb16a75c5fa040a5c52b5d644deeb107c66978198b817236e1340b4dc8a7e6"
+    },
+    {
+      "path": "assets/social/black-book-open-graph-dark-1200x630.png",
+      "bytes": 33211,
+      "sha256": "eb1109e4f4cd19ae800b9c18ed664fd5a09a77b3478fb454ab3dcee3ccc36f06"
+    },
+    {
+      "path": "assets/social/black-book-open-graph-light-1200x630.png",
+      "bytes": 29696,
+      "sha256": "85936b886c6448a4eada36a159317fec8afb89f35761fe796c4d154d7f297a9e"
+    },
+    {
+      "path": "assets/social/black-book-social-banner-dark-1500x500.png",
+      "bytes": 32928,
+      "sha256": "0dc2c2b5de83b3985acd5aa37a8106c129e9b5c564953f53564f1b806d342995"
+    },
+    {
+      "path": "assets/social/black-book-social-banner-light-1500x500.png",
+      "bytes": 29456,
+      "sha256": "cc35c1374417fcca1267ceddd8e13a9c95e8f4505e5b2586eba912d618d73f54"
+    },
+    {
+      "path": "assets/svg/black-book-app-icon-dark.svg",
+      "bytes": 2551,
+      "sha256": "4a5f8df293b2ffe4b4a07742be211a4f006d7814e8da795eba25fae1965e02bd"
+    },
+    {
+      "path": "assets/svg/black-book-app-icon-light.svg",
+      "bytes": 2552,
+      "sha256": "2fb76be4b2d9f95bb96a092864fb81ea7154e9a6eb6ada02c30b3c7bf832899f"
+    },
+    {
+      "path": "assets/svg/black-book-mark-compact-dark.svg",
+      "bytes": 1847,
+      "sha256": "f76892a58a5ea07cf123f5586d624edfb2a4825e9b98cd82bdb96964bb46728e"
+    },
+    {
+      "path": "assets/svg/black-book-mark-compact-light.svg",
+      "bytes": 1848,
+      "sha256": "f63a51edba16befcf98f82f79f0d79f63ecf719dd526b1d6645b9a49b7c9612d"
+    },
+    {
+      "path": "assets/svg/black-book-mark-dark.svg",
+      "bytes": 2281,
+      "sha256": "c3b92fa257e6a773f63de8eaf6d34a89b599f3403ce8c52ab4ba4f97a6974d36"
+    },
+    {
+      "path": "assets/svg/black-book-mark-light.svg",
+      "bytes": 2282,
+      "sha256": "f58c9e5992cc9540f9488c4f94dd54fe0c1246b90a4dce5ac45282cb33b72a02"
+    },
+    {
+      "path": "assets/svg/black-book-mark-monochrome-black.svg",
+      "bytes": 2293,
+      "sha256": "25a8ecc2c6f3acd4b9d918ff455af6eca986e4dae0c671a3a230d2f9d6ebd3d6"
+    },
+    {
+      "path": "assets/svg/black-book-mark-monochrome-cream.svg",
+      "bytes": 2293,
+      "sha256": "1c52b5e4b867c0fe864b5acaed5cbe272a0133aa91b93123995dabfb0839a2d9"
+    },
+    {
+      "path": "assets/svg/black-book-primary-dark.svg",
+      "bytes": 5630,
+      "sha256": "0054d52585f9472a0479398362e6cad529f33b177eb80b25f8c69cbf90d50994"
+    },
+    {
+      "path": "assets/svg/black-book-primary-light.svg",
+      "bytes": 5631,
+      "sha256": "3feae0e79cfad240c0f61da0e6c802ab073c4148797fd9e695137b566c5df78a"
+    },
+    {
+      "path": "assets/svg/black-book-primary-monochrome-black.svg",
+      "bytes": 5642,
+      "sha256": "78678ae4165b5121fdd19e276afa8982f9abf2a227622b165b9350c27129bd56"
+    },
+    {
+      "path": "assets/svg/black-book-primary-monochrome-cream.svg",
+      "bytes": 5642,
+      "sha256": "e0a3724dc0932e2401a8b08055d2ce56921574c8989211370ed0689516def551"
+    },
+    {
+      "path": "guide/Black-Book-Brand-Guide-Final.pdf",
+      "bytes": 636121,
+      "sha256": "89813d3f52031112f52f1cdd8cabf6ef273948e319052b382b756a6403240623"
+    },
+    {
+      "path": "implementation/ASSET-USAGE.md",
+      "bytes": 529,
+      "sha256": "c45cc644d218be1a1cd06e3afe8493662d8c83ad1da7ee79fdcbde819bf3a5ed"
+    },
+    {
+      "path": "implementation/html-logo-example.html",
+      "bytes": 204,
+      "sha256": "e84b13e180f55444b56be9e8f5379e9fe84b11b3df496bac775dfb7daa8f3047"
+    },
+    {
+      "path": "implementation/nextjs-brand-assets.tsx",
+      "bytes": 338,
+      "sha256": "dd045d06b00a8ac88569ebc1bf29b33c71f55845be0287aec6c4865c33564d94"
+    },
+    {
+      "path": "implementation/theme-logo.css",
+      "bytes": 485,
+      "sha256": "f02457c143f9faf9b30e192b84efb5c86949b40174e6dda25b6cffbcd6931843"
+    },
+    {
+      "path": "tokens/black-book-brand-tokens.json",
+      "bytes": 916,
+      "sha256": "4da661d0b024818bd793fa0ab9f3713a011a8438ba8114e69acae818461587dc"
+    },
+    {
+      "path": "tokens/black-book-brand.css",
+      "bytes": 983,
+      "sha256": "df601e5821e1eeaff1d7641feea9794b3d212cb81546ab37277447ff8cb01cd9"
+    }
+  ]
+}
