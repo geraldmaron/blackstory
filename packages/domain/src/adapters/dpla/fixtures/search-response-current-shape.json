@@ -1,0 +1,28 @@
+{
+  "count": 2,
+  "start": 0,
+  "limit": 50,
+  "docs": [
+    {
+      "id": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+      "sourceResource": {
+        "title": ["Piedmont County Colored School, class photograph, 1931"],
+        "description": ["Class photograph from the Piedmont County Colored School, donated by the county historical society."],
+        "date": { "displayDate": "1931" },
+        "subject": [{ "name": "Schools" }, { "name": "Piedmont County" }]
+      },
+      "isShownAt": "https://digital.statelibrary.example.gov/items/piedmont-colored-school-1931",
+      "provider": { "name": "State Digital Library" },
+      "dataProvider": "Piedmont County Historical Society"
+    },
+    {
+      "id": "f6e5d4c3b2a1908070605040302010",
+      "sourceResource": {
+        "title": "Rosewood Baptist Church cornerstone dedication program, 1949",
+        "description": "Printed program for the cornerstone dedication ceremony.",
+        "date": "1949-09-11"
+      },
+      "isShownAt": "https://digital.statelibrary.example.gov/items/rosewood-baptist-dedication-1949"
+    }
+  ]
+}

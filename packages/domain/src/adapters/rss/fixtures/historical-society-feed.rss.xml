@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Piedmont Historical Society News</title>
+    <link>https://www.piedmonthistoricalsociety.example.org/</link>
+    <description>News and research notes from the Piedmont Historical Society archive.</description>
+    <item>
+      <title>Oral history collection digitized: Freedmen's Bureau correspondence, 1866-1870</title>
+      <link>https://www.piedmonthistoricalsociety.example.org/news/freedmens-bureau-correspondence</link>
+      <guid isPermaLink="true">https://www.piedmonthistoricalsociety.example.org/news/freedmens-bureau-correspondence</guid>
+      <description><![CDATA[The Society has completed digitization of 214 letters from the local Freedmen's Bureau office, now searchable in our reading room and via request.]]></description>
+      <pubDate>Wed, 15 Jul 2026 14:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Spring lecture series: Reconstruction-era churches of the county</title>
+      <link>https://www.piedmonthistoricalsociety.example.org/events/spring-lecture-churches</link>
+      <guid isPermaLink="true">https://www.piedmonthistoricalsociety.example.org/events/spring-lecture-churches</guid>
+      <description>A four-part lecture series on the founding congregations and their surviving records.</description>
+      <pubDate>Mon, 02 Mar 2026 18:30:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

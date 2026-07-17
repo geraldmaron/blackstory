@@ -1,0 +1,16 @@
+{
+  "count": 2,
+  "items": [
+    {
+      "_id": "cpl-0001",
+      "title": "Cross County Freedmen's School ledger, 1867-1869",
+      "description": "Financial ledger from the Freedmen's School, digitized by the successor aggregation program.",
+      "isShownAt": { "@id": "https://digital.crosscounty.example.gov/items/freedmens-school-ledger" },
+      "provider": "Cross County Public Library"
+    },
+    {
+      "_id": "cpl-0002",
+      "no_title_field_at_all": true
+    }
+  ]
+}

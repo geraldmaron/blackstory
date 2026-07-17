@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Cross County Public Library — Digital Collections</title>
+  <id>https://digital.crosscountylibrary.example.gov/feed</id>
+  <updated>2026-06-01T09:00:00Z</updated>
+  <entry>
+    <title>New collection: Rosewood School Photographs, 1948-1965</title>
+    <id>https://digital.crosscountylibrary.example.gov/collections/rosewood-school-photographs</id>
+    <link href="https://digital.crosscountylibrary.example.gov/collections/rosewood-school-photographs" />
+    <summary>Over 300 photographs from the Rosewood School yearbooks and community events, donated by alumni families and now available for public research.</summary>
+    <updated>2026-06-01T09:00:00Z</updated>
+  </entry>
+  <entry>
+    <title>Digitization grant awarded for county newspaper microfilm, 1901-1960</title>
+    <id>https://digital.crosscountylibrary.example.gov/news/newspaper-microfilm-grant</id>
+    <link href="https://digital.crosscountylibrary.example.gov/news/newspaper-microfilm-grant" />
+    <summary>The library will digitize six decades of the county's Black-owned weekly newspaper with support from a state preservation grant.</summary>
+    <published>2026-05-14T12:00:00Z</published>
+  </entry>
+</feed>

@@ -1,0 +1,17 @@
+{
+  "items": [
+    {
+      "identifier": "black-owned-weekly-newspaper-1912-07-04",
+      "title": "The Piedmont Beacon, July 4 1912",
+      "description": "Weekly newspaper serving the Black community of Piedmont County, digitized from library microfilm.",
+      "date": "1912-07-04",
+      "mediatype": "texts",
+      "subject": ["newspapers"],
+      "collection": ["state_library_archive"]
+    },
+    { "title": "Malformed entry with no identifier field at all", "not_identifier": true }
+  ],
+  "cursor": "cursor_page_2",
+  "count": 2,
+  "total": 3
+}

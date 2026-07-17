@@ -1,0 +1,26 @@
+{
+  "responseHeader": { "status": 0, "QTime": 12 },
+  "response": {
+    "numFound": 2,
+    "start": 0,
+    "docs": [
+      {
+        "identifier": "piedmont-county-directory-1923",
+        "title": "Piedmont County City Directory, 1923",
+        "description": "Annual city directory listing residents, businesses, and Black-owned enterprises in Piedmont County.",
+        "date": "1923-01-01",
+        "mediatype": "texts",
+        "subject": ["city directories", "Piedmont County"],
+        "collection": ["americana"]
+      },
+      {
+        "identifier": "rosewood-community-newsletter-1958-03",
+        "title": "Rosewood Community Newsletter, March 1958",
+        "description": "Monthly newsletter of the Rosewood community association, digitized from a private collection.",
+        "date": "1958-03-01",
+        "mediatype": "texts",
+        "subject": ["community newsletters"]
+      }
+    ]
+  }
+}
