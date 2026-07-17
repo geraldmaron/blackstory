@@ -13,12 +13,14 @@
   },
   "files": [
     "dist",
-    "src/styles"
+    "src/styles",
+    "src/brand/assets"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json && node ./scripts/copy-styles.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --conditions development --import tsx --test src/**/*.test.ts",
+    "generate:brand": "tsx scripts/generate-brand-marks.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "peerDependencies": {

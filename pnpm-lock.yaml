@@ -35,6 +35,9 @@ importers:
       '@black-book/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@black-book/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       next:
         specifier: ^15.4.2
         version: 15.5.20(@opentelemetry/api@1.9.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)

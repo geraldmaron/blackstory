@@ -2,6 +2,9 @@
 
 Shared package: `@black-book/ui` (`packages/ui`).
 
+See also [`brand.md`](./brand.md) (BB-067) for the BB mark: construction
+grid, pigment scale, variants, and usage rules.
+
 ## What shipped
 
 - **Palette:** black / white / neutral grays; light and dark themes via `data-theme`
@@ -63,4 +66,6 @@ Sample entity ids: `ent_seed_place_001`, `ent_seed_school_001`. Data is labeled 
 - Geocoding / nearby discovery (BB-050)
 - Full entity depth + evidence UI (BB-052 / BB-053)
 - Dedicated Storybook/Chromatic if visual regression CI is required later
-- Admin console theming (BB-056) should reuse these tokens
+- Admin now consumes `@black-book/ui` (transpiled + `.js`->`.ts` webpack
+  resolution, matching web's config) and renders the brand mark on its home
+  page; a full admin reskin onto these tokens is still open (BB-056/BB-068)

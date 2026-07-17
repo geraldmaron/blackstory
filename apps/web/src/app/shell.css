@@ -33,6 +33,9 @@
 }
 
 .bb-shell-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bb-space-2);
   font-family: var(--bb-font-editorial);
   font-size: 1.25rem;
   font-weight: 700;
@@ -41,6 +44,11 @@
   text-decoration: none;
   line-height: 1;
   text-transform: none;
+}
+
+.bb-shell-wordmark__mark {
+  flex: none;
+  color: var(--bb-ink);
 }
 
 .bb-shell-wordmark:hover {
