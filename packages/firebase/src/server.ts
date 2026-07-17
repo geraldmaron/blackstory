@@ -11,6 +11,7 @@ import {
   type App,
   type AppOptions,
 } from 'firebase-admin/app';
+import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 import { parseServerFirebaseEnv, type ParsedFirebaseServerEnv } from './env.js';
 import { applyAdminEmulatorEnvironment } from './emulators.js';
 import type { EnvironmentLike } from './guard.js';
@@ -67,4 +68,10 @@ export function createServerFirebaseApp(
 
 export function getServerFirebaseApp(): App {
   return getApp(SERVER_APP_NAME);
+}
+
+/** Firestore instance bound to the Black Book server Admin app. */
+export function getServerFirestore(environment: EnvironmentLike = process.env): Firestore {
+  const { app } = createServerFirebaseApp(environment);
+  return getFirestore(app);
 }

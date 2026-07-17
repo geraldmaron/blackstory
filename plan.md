@@ -1,660 +1,88 @@
-# Black Book — Execution Plan
+# Map as premier experience — plan
 
-Tracks the Execution Beads (BB-001–BB-066 from *Black Book Web Application Execution Beads*, plus the BB-067–BB-095 course-correction expansion). Update status as work completes. Delete this file when the plan is fully executed or superseded by durable project docs.
+## Product north star
 
-**Source:** versioned copy at `docs/source-spec/Black Book Web Application Execution Beads.pdf` (BB-001–066) + owner brief & research 2026-07-17 (BB-067–089) + owner brief 2026-07-17 second message, entity ontology (BB-090–095)  
-**Workspace:** `/Users/geralddagher/Developer/Projects/black-book` (greenfield as of 2026-07-16)  
-**Active focus:** Waves 7+8 complete. Design (BB-067/068/069), map data platform (BB-070), vector search (BB-071), production re-split design (BB-078), UGC compliance (BB-077), automation backbone (BB-084), operator lane (BB-085), community discovery adapters (BB-073), community submission/consensus (BB-076), citation integrity (BB-083), relevance feedback loop (BB-081), pre-launch resilience (BB-089), and the consolidated cloud-apply checklist (BB-079) are all done. BB-048 remains partial. Entity-ontology pass (BB-090–095, see below) added 2026-07-17: BB-090 (entity status/notability/era) and BB-091 (jurisdiction registry) are the new front of queue — both depend only on closed beads and unblock BB-092 (history graph substrate) plus amended dependencies on BB-049/050/051/052/054/072/082/086/087/088/063. Remaining tranche-5/6 public-product beads (BB-049/050/052-055/057-060) are the next major surface once BB-090/091 land.
+The **map is the primary product surface**. Search, entity pages, history, and methodology are off-ramps from the map — not peers that compete with it.
 
-## Course-correction expansion (2026-07-17) — BB-067–BB-089
-
-Research-backed review of the whole tracker + owner brief. All labeled `course-correction`. Details live in each bead (`bd show black-book-bbNNN`); dependencies wired in the tracker. Design beads are front of queue per owner direction.
-
-| Bead | Theme | Prio | Notes |
-|------|-------|------|-------|
-| BB-067 | Brand: the BB mark + pigment system | P0 | `done` — **revised** 2026-07-17: superseded by an owner-supplied brand package (the "Pinned Page" mark); Monk Skin Tone Scale concept retired, see BB-068 |
-| BB-068 | Design language v2 (proud, modern, black) | P0 | `done` — tokens v2 (Archive Paper/Black Ink/Copper Pin/Page Sand), Sora/Inter/Source Serif 4/IBM Plex Mono, dark theme first-class |
-| BB-069 | Brand story, voice, narrative | P0 | `done` — `docs/ui/story.md`; map-led homepage arc documented as target, blocked on BB-070/BB-051 |
-| BB-070 | Map data platform + tiles | P0 | `done` — MapLibre GL JS + PMTiles/MapTiler (ADR-013); redaction-safe geo pipeline; `/map` demo route |
-| BB-051 | National map experience | P0 | **Un-deferred** from P1; the map is the centerpiece; blocked on BB-049/BB-050 (BB-070 done) |
-| BB-071 | Embedding pipeline + Firestore vector search | P1 | `done` — Firestore native KNN, gemini-embedding-001@768d (ADR-014); unblocks BB-072 |
-| BB-072 | Hybrid retrieval + RRF ranking fusion | P1 | Deterministic, no learned ranker; ready |
-| BB-073 | Discovery adapters wave 1 (RSS/IA/DPLA/Wayback) | P1 | `done` — open sources, graylist recall lane, real Wayback SPN capture layer |
-| BB-074 | Reddit adapter (gated) | P2 | Responsible Builder policy; 48h deletion-sync; ready |
-| BB-075 | Web-search + Common Crawl discovery | P2 | Brave/Exa; budget-gated; ready |
-| BB-076 | Community submission + consensus review | P1 | `done` — Zooniverse/Caesar consensus engine, real BB-004 abuse-corpus proof |
-| BB-077 | UGC compliance + living-person ethics | P1 | `done` — evidence-pointer doctrine, deletion-sync, versioned constitution rules |
-| BB-078 | Production environment re-split (isolation) | P0 | `done` — three-project topology (ADR-012), declarative only, not applied |
-| BB-079 | Production cloud apply (consolidated) | P0 | `done` — consolidated 10-section human-apply checklist; found 4 real infra gaps (black-book-2ve) |
-| BB-080 | Tracker/plan/source-spec hygiene | P1 | `in_progress` — this reconciliation pass is part of it |
-| BB-081 | Relevance/discovery feedback loop | P2 | `done` — human-approved weight changes only, gold-corpus-gated |
-| BB-082 | Historic safety + place-context engine | P1 | Layered signals; crime stats never in composite; ready |
-| BB-083 | Citation integrity + link-rot management | P1 | `done` — repair ladder, no-LLM "Try searching for", rot-rate telemetry |
-| BB-084 | Self-updating operations (scheduler backbone) | P1 | `done` — fail-closed job registry, 4/15 roster entries real, unblocks BB-087 |
-| BB-085 | Operator contribution lane (CLI/admin/skills) | P1 | `done` — `.claude/skills/black-book/` as thin callers, verified live end to end |
-| BB-086 | Canonical fact registry (fact framework) | P0 | Wikidata-style records; per-revision permalinks; blocked |
-| BB-087 | Legal landscape (snapshot + monitoring + plain-language) | P0 | Free public sources; Firebase-native; law = a claimType; ready (unblocked by BB-084) |
-| BB-088 | Editorial trust + pre-bunking surfaces | P1 | Protection as rigor; gates launch (BB-063); blocked |
-| BB-089 | Pre-launch resilience + operator protection | P0 | `done` — Sybil signals, robots/ai.txt/security.txt live, human-only checklist for real-world actions; unblocks BB-063 |
-
-**Operating principles (pinned in `bd` memory):** free-first; everything Firebase-native for now; self-updating (budget-capped jobs with kill switches; review queues batchable in minutes); one-time setup over recurring labor; reuse existing packages over parallel systems; U.S. only.
-
-## Entity ontology & history graph expansion (2026-07-17, owner second message) — BB-090–BB-095
-
-Owner realization: Black Book is a first-class-Entity index of Black history — status lifecycle per kind, notability/inclusion rubric, jurisdiction-anchored geography with a precision-radius policy, a typed history graph with all-time + decade views, controversy shielding for flaggable-but-notable people, present-day advisories (never scoring), a disclaimer framework, and a vetted-corpus bulk-intake lane for settled record classes (laws, documented massacres/riots, National Register sites). Full design captured in `/Users/geralddagher/.claude/plans/quirky-moseying-cosmos.md`. Every new bead **extends** existing substrate (CanonicalEntity, EntityRelationship, Jurisdiction type, the BB-086 FactRecord spec) rather than building parallel systems — none of it existed as code prior to this pass, only as scattered spec fragments inside BB-086/082/087.
-
-| Bead | Theme | Prio | Notes |
-|------|-------|------|-------|
-| BB-090 | Entity ontology: status lifecycle, notability basis, era model | P0 | Extends `entity.ts`; kind-specific status vocabularies, time-scoped `statusHistory`, auditable `notabilityBasis` gate, shared era/decade derivation; ready (deps closed only) |
-| BB-091 | Jurisdiction registry + geographic reference substrate | P0 | Instantiates the existing `Jurisdiction` type into Firestore (states + ~3,143 counties, Census public domain); cities on-demand, ZIPs never stored; precision-radius policy; ready (deps closed only) |
-| BB-092 | History graph substrate: edge vocabulary + derived decade/all-time views | P0 | Extends `EntityRelationship` with causal edge types; containment-chain materialization; derived graph views as BB-019-pattern release artifacts, no graph DB; blocked on BB-090/091 |
-| BB-093 | History graph and decade browse experience | P1 | `/history` reader surface consuming only BB-092's published artifacts; deliberately post-launch (flagged owner assumption — promote to P0 with a BB-063 dep if it should gate launch instead); blocked on BB-092 |
-| BB-094 | Vetted-corpus bulk intake lane | P1 | Corpus-vetting gate on top of the existing BB-085 bulk-import CLI; named launch corpora (NRHP, HABS/HAER, NYPL Green Book, EJI-documented massacres/riots, HBCU list, Rosenwald schools); blocked on BB-090/091 |
-| BB-095 | Sensitivity presentation, present-day advisories, disclaimer framework | P0 | Include-with-context banners for flagged entities; advisories as sourced dated claims, presentation-only by test (crime-stats-never-scores rule extended); single disclaimer registry; gates BB-063; blocked on BB-090 |
-
-**Flagged owner assumption (unconfirmed, proceeded on recommended default):** cultural-figure notability calibration in BB-090 defaults to icons-and-firsts-only (commercial milestones alone never qualify) — ships as reviewable rubric text, ratify or widen before BB-094 auto-derives notability from corpus membership. BB-093's P1/post-launch priority is the second flagged default. Both are one-line changes if the owner wants otherwise.
-
-**Amended existing beads** (new dependency + appended acceptance-criteria items, originals untouched): BB-086, BB-087, BB-082, BB-051, BB-052, BB-049, BB-050, BB-054, BB-063 (dep only), BB-072, BB-088. No-change (verified type-agnostic or independently scoped): BB-053, BB-055, BB-057, BB-058, BB-059, BB-060, BB-062, BB-048, BB-074, BB-075, `black-book-2ve`.
-
-### Stress-test pass (2026-07-17, same day) — refinements to BB-090/091/092/082/086/094/095
-
-Walked the design against four concrete cases (redlining, Trayvon Martin, March on Washington, sundown towns) before any code was written. No new beads — everything landed as amendments to already-open, not-yet-executed beads, respecting exclusive path ownership (entity.ts stays BB-090's file, relationship.ts stays BB-092's).
-
-- **BB-090**: added a 12th `EntityKind`, `movement` (Civil Rights Movement, Great Migration, etc. — the connective multi-decade phenomenon individual events/orgs are `part_of`), status vocabulary `active|historic`; explicitly scoped `statusHistory[]` to entity lifecycle only (not a catch-all for area conditions).
-- **BB-092**: added `authored` edge (creation attribution) and an optional `role` qualifier on `attended` (organizer vs. participant); reconciled graph-view materialization to also treat BB-086 `subjects[]` as an edge source (closing a blind spot where fact-only entity links, e.g. victim-of-event, would be invisible to the browse graph); added a `caused`/`enabled`-vs-`cites` guardrail for contested individual causation; decade-view bucketing now explicit about active-span not creation-date; succession-chain non-leakage now an explicit acceptance criterion.
-- **BB-082**: **corrected** (not just appended) — the prior pass's "sundown designations become BB-090 statusHistory records" language conflated entity lifecycle status with place condition records; sundown/redlining/exclusion designations are now explicitly BB-082's own layer records, never merged into `statusHistory`. Named HOLC/redlining grades explicitly under the exclusion-infrastructure layer; added a precision-fidelity rendering rule (never interpolate a county-level designation down to town-level specificity).
-- **BB-086**: noted `subjects[]` is a BB-092 graph-view input, not just fact-page display.
-- **BB-094**: named Mapping Inequality (Univ. of Richmond/NARA, public domain HOLC maps) as a launch corpus — the first requiring real historic polygon ingestion rather than point+radius.
-- **BB-095**: added an explicit non-goal — sensitivity flags require a conduct-based rationale, never an identity attribute (e.g. a closeted historical figure's sexuality is never itself a flag condition).
-
-### BB-090 / BB-091 execution (2026-07-17, same day) — closed
-
-Dispatcher-recommended parallel execution: `construct` was tried first (per the dispatcher's routing) but is orchestration-only in this environment — read-only tools, no functional handoff to a write-capable specialist without the MCP broker — so both beads re-ran under `general-purpose` agents with full tool access and the same exclusive-path scoping. File ownership held disjoint throughout (BB-090: `entity.ts`/`entity-kinds.ts`/relevance-gates/era model; BB-091: `geography/precision.ts`/jurisdictions collection/Firestore rules); the parent session merged barrel exports, resolved an ADR-numbering collision (both agents independently picked ADR-015 — BB-091's was renumbered to ADR-016), added the `EntityLocation.geoPrecisionTier`/`precisionBasis` fields both agents flagged as unattached, and indexed both ADRs in `docs/adr/README.md`.
-
-- **BB-090 closed**: kind-specific `EntityStatus` vocabularies, time-scoped `statusHistory[]`, `notabilityBasis[]` as an 8th relevance gate (numeric-score-ban test passing), shared `deriveEraBuckets` (replaces the embeddings-local duplicate), schema-only `sensitivity` flag, 12th `movement` EntityKind. Resolved a real naming collision: `school.ts` already had its own differently-shaped `statusHistory` field — renamed to `milestones` rather than conflated. ADR-015. domain 499/499, firebase 142/142, web clean.
-- **BB-091 closed**: `jurisdictions/{id}` Firestore collection (51 states + ~3,143 counties via an idempotent Census TIGER/Gazetteer loader, registered through the BB-037 source registry with a public-domain license verdict), `geoPrecision` tier vocabulary + deterministic display-radius mapping + `precisionBasis`, fail-closed dangling-jurisdiction-reference gate. No live Firestore/GCP apply — ADR-016 records the full human cloud-apply checklist (rules/index deploy, obtaining the real Census file, running the loader) as follow-up. `redactLocationForPublic`/`PRECISION_RANK` untouched. domain 499/499, firebase 142/142, data-access 18/18.
-
-Both beads deliberately left the pre-existing, unrelated uncommitted carryover (`infra/gcp/terraform/*`, `packages/config/*`, `packages/domain/src/adapters/{reddit,web-search,common-crawl}/`, `infra/firebase/firebase.json`'s 3-database resplit — tied to the still-open `black-book-2ve` incident) untouched; two shared files (`packages/domain/package.json`'s test-file list, `packages/domain/src/adapters/index.ts`) had that carryover already mixed in from before this session, so the parent staged only this session's additive hunks via `git hash-object`/`update-index` rather than sweeping the carryover into the commit.
-
-Newly unblocked: BB-092 (history graph substrate), BB-094 (vetted-corpus bulk intake), BB-095 (sensitivity/advisories/disclaimers) — all now `bd ready`.
-
-### BB-092 / BB-094 / BB-095 execution (2026-07-17, same day) — closed
-
-Second dispatcher round: this time it caught two real shared-file collisions before dispatch — `packages/domain/src/index.ts` (all three would append) and `packages/operator-cli/src/cli.ts` (BB-092 and BB-094 both extend it) — and the carve-out held: neither file was touched by any of the three agents; the parent did the barrel merge and CLI wiring in one post-completion integration pass, same discipline as BB-090/091.
-
-Mid-session interruption: the harness process exited while all three agents were still running in the background. Resumed by inspecting the actual working-tree state (not the lost task IDs) — all three had made substantial real progress; none needed a full restart.
-
-- **BB-092 closed**: `EntityRelationship` extended with `caused|enabled|influenced|participated_in|overturned|commemorates|authored` plus an `attended` role qualifier; containment-chain materialization, per-entity/per-decade/all-time derived graph release views, and BB-086 `subjects[]` mirroring in a new `packages/domain/src/graph/` module. The three judgment-heavy invariants the dispatcher flagged for independent re-verification (causal guardrail, active-span decade bucketing, succession non-leakage) were re-checked by reading the actual test assertions rather than trusting the agent's self-report — all three are genuinely and rigorously proven against the exact bead-named scenarios. Edge intake wired end-to-end through a new `propose-edge` operator-cli command.
-- **BB-094 closed**: corpus-vetting fail-closed gate, budget caps, boundary-lane exclusions (statutes/cases stay BB-087's, Tougaloo stays BB-082's), streamlined promotion with every hard gate preserved, all 7 launch corpora registered. **Genuine gap found and fixed**: the executing agent's process was interrupted mid-function — `bulk-import.ts` had a doc-comment promising a `prepareCorpusBulkImportBatch` function and unused imports staged for it, but the function itself was never written. Completed from scratch by the parent (fail-closed gate, budget check, idempotent duplicate detection, per-record routing through the real BB-085 quarantine intake, BB-018 audit/outbox event) with 8 new integration tests. CLI subcommand wiring is a disclosed follow-up — no Firestore-backed `SourceRegistryStore`/`CorpusVettingStore` adapter exists anywhere in the repo yet (only in-memory test stores); building one was out of scope for this pass.
-- **BB-095 closed**: advisory model with procedural-language-only enforcement and a real scoring-poisoning test extending the standing crime-stats-never-scores rule; versioned disclaimer registry; shared banner components (include-with-context, never suppression). Two real test bugs found and fixed by actually running the suite: a stray `.tsx` import-extension violation, and an overly broad `/hidden/i` regex that false-positived on legitimate `aria-hidden`/`bb-visually-hidden` accessibility markup (replaced with a token-boundary regex). Also fixed a genuine cross-package JSX-transform gap: `packages/ui/src/components/Notice.tsx` had no explicit `React` import — harmless under its own package's automatic JSX runtime, but broke when `apps/web`'s Next.js `jsx: preserve` config caused the test loader to classic-transform it; added a defensive import, verified `packages/ui`'s own suite still passes.
-
-Same carryover discipline as before: `packages/domain/package.json`'s test-file list needed the same surgical `git hash-object`/`update-index` split (this session's new test entries only, carryover `reddit`/`web-search`/`common-crawl` entries left unstaged); `packages/domain/src/adapters/index.ts` was untouched by any of the three agents this round, so no split was even needed there.
-
-Final validation: domain 607/607, firebase 142/142 (+8 pre-existing emulator skips), operator-cli 57/57, web 62/62, ui 26/26, data-access 18/18 — 912 tests total, all green. `bd dep cycles`/`bd lint` clean, 69 closed / 97 total. No beads newly unblocked (remaining open beads have other unmet dependencies).
-
-## Multi-agent coordination (2026-07-17 wave 8 — complete)
-
-| Bead | Exclusive ownership | Status |
-|------|---------------------|--------|
-| BB-073 | `packages/domain/src/adapters/{rss,internet-archive,dpla}/`, `discovery/graylist.*` | `done` |
-| BB-076 | `packages/domain/src/consensus-review/`, `apps/web/src/app/submit/`, `docs/runbooks/moderator-wellbeing.md` | `done` |
-| BB-083 | `packages/domain/src/citations/`, `apps/admin/src/app/citation-health/`, `config/scheduled-jobs/jobs/citation-link-health-sweep.*` | `done` |
-| BB-081 | `packages/domain/src/relevance-feedback/`, `config/scheduled-jobs/jobs/recalibration-report.*` | `done` |
-| BB-089 | `packages/domain/src/confidence-engine/sybil-signals.*`, `apps/web/src/app/{robots.ts,ai.txt,.well-known}`, `.github/workflows/canary-uptime.yml`, runbooks | `done` |
-| BB-079 | `docs/runbooks/production-cloud-apply-checklist.md` (single new file, docs-only, zero live actions) | `done` |
-
-Four agents (BB-073/076/081/083/089 minus BB-081, which avoided it by design) made concurrent additive edits to `packages/domain/src/confidence-engine/engine.ts` and `packages/domain/src/relevance/gates.ts` — all landed cleanly side by side (verified by the parent session after every agent reported). BB-089's `robots.ts` legitimately naming "anthropic-ai" as a blocked crawler user-agent tripped a pre-existing false-positive in the public-render-path import guard (same bug class as `black-book-e9z`); fixed by the parent session by requiring real import/require syntax context in the detector's patterns.
-
-## Multi-agent coordination (2026-07-17 wave 7 — complete)
-
-| Bead | Exclusive ownership | Status |
-|------|---------------------|--------|
-| BB-070 | `apps/web/package.json` + root `pnpm-lock.yaml` (dependency add), `packages/ui/src/components/MapExplorer.tsx`, `packages/domain/src/map/`, `docs/adr/ADR-013-map-stack.md`, `apps/web/src/app/map/` | `done` |
-| BB-078 | `docs/adr/ADR-012-production-environment-resplit.md`, `.cx/decisions/` (D-013 supersede note), `docs/security/environment-isolation.md`, `infra/gcp/**`, `infra/firebase/**`, migration runbook | `done` |
-| BB-071 | `packages/firebase/src/embeddings/`, `apps/api-public/src/vector-search-*`, `packages/domain/src/similarity/`, `infra/firebase/firestore.indexes.json`, `docs/adr/ADR-014-vector-search.md` | `done` |
-
-**Shared (parent only):** `plan.md`, `docs/adr/README.md` (each agent appended one additive row), `.beads/`. No live GCP/Firebase/Terraform apply by any agent in either wave; parent validated + merged after each finished, including a full `pnpm validate` (boundaries + lint + governance) pass across the whole tree after each wave settled.
-
-## Multi-agent coordination (2026-07-17 wave 6)
-
-| Bead | Model tier | Exclusive ownership (do not cross) | Status |
-|------|------------|------------------------------------|--------|
-| BB-047 | stronger (eval) | `packages/testing/src/gold-corpus/`, `packages/schemas/gold-corpus/`, `docs/research/gold-corpus.md`, `scripts/gold-corpus/` | `done` |
-| BB-056 | stronger (admin UI) | `apps/admin/` (pages/components beyond existing auth), `docs/admin/research-console.md` | `done` |
-
-**Shared (parent only):** `plan.md`, `packages/testing/src/index.ts`, root `README.md`. Do not touch `apps/web/**` (BB-048).
-
-## Multi-agent coordination (2026-07-17 wave 5 — complete except BB-048)
-
-| Bead | Model tier | Exclusive ownership (do not cross) | Status |
-|------|------------|------------------------------------|--------|
-| BB-036 | stronger (security CI) | `.github/workflows/security*.yml`, `docs/security/tests/`, `infra/github/security-gates/`, `packages/testing/src/security-gates*` | `done` |
-| BB-061 | fast | `docs/runbooks/recovery-rollback-rehearsal.md`, `scripts/recovery-rehearsal/`, `infra/gcp/recovery-rehearsal/` | `done` |
-| BB-043 | stronger (confidence) | `packages/domain/src/confidence-engine/`, `packages/domain/src/confidence-engine.test.ts`, `workers/research/**/confidence_engine/`, `packages/schemas/confidence-engine/`, `docs/research/confidence-lineage.md` | `done` |
-| BB-044 | stronger (workflow) | `packages/domain/src/research-case/`, `packages/domain/src/research-case.test.ts`, `packages/firebase/src/firestore/research-case*.ts`, `packages/schemas/research-case/`, `docs/research/research-case-workflow.md` | `done` |
-
-**Shared (parent only):** `plan.md`, package root barrels, root `README.md`, `.github/workflows/ci.yml` (agents may add sibling workflow files only).
-
-## Multi-agent coordination (2026-07-17 wave 4)
-
-| Bead | Model tier | Exclusive ownership (do not cross) | Status |
-|------|------------|------------------------------------|--------|
-| BB-030 | stronger (SSRF) | `packages/security/src/url-safety/`, `workers/security/src/black_book_security/url_fetch/`, `docs/security/url-ssrf.md`, `packages/schemas/url-safety/` | `done` |
-| BB-032 | stronger (promotion) | `packages/domain/src/promotion/`, `packages/domain/src/promotion.test.ts`, `packages/schemas/promotion/`, `docs/security/promotion-controls.md`, `packages/firebase/src/firestore/promotion*.ts` | `done` |
-| BB-035 | stronger (incident) | `packages/config/src/kill-switches*.ts`, `infra/gcp/kill-switches/`, `docs/runbooks/incident-response.md`, `docs/runbooks/incidents/` | `done` |
-| BB-042 | stronger (extraction) | `packages/domain/src/extraction/`, `packages/domain/src/extraction.test.ts`, `workers/research/**/extraction/`, `packages/schemas/extraction/` | `done` |
-| BB-045 | fast | `packages/domain/src/adapters/wikimedia/`, `workers/research/**/adapters/wikimedia/`, `packages/schemas/adapters/wikimedia/` | `done` |
-| BB-046 | fast | `packages/domain/src/adapters/federal/`, `workers/research/**/adapters/federal/`, `packages/schemas/adapters/federal/` | `done` |
-
-**Shared (parent only):** `plan.md`, `packages/*/src/index.ts`, `packages/domain/src/adapters/index.ts`, `workers/*/src/*/__init__.py`, root `README.md`.
-
-**Rules:** one writer per path; agents export from local barrels only; parent merges `export *` after validation; fix exactOptionalPropertyTypes via conditional spreads; no live GCP/Firebase apply; close when repo acceptance met; launch newly unblocked beads immediately.
-
-## Multi-agent coordination (2026-07-17 wave 3 — complete)
-
-| Bead | Model tier | Exclusive ownership (do not cross) | Status |
-|------|------------|------------------------------------|--------|
-| BB-027 | stronger (authz) | `packages/firebase/src/admin-auth*.ts` / claims helpers, `apps/admin/src/auth/`, `docs/security/admin-identity.md`, `infra/gcp/iap/` | `done` |
-| BB-028 | fast | `apps/web/src/lib/web-security/`, security headers in `next.config.mjs` + compose into `middleware.ts` (re-read; preserve BB-022 query normalize) | `done` |
-| BB-039 | fast | `packages/domain/src/discovery/`, `workers/research/**/discovery*`, schemas under `packages/schemas/discovery/` | `done` |
-
-**Shared (parent only):** `plan.md`, `packages/domain/src/index.ts`, `packages/firebase/src/index.ts`.
-
-**Rules:** one writer per path; no live IAP/Auth console apply; no secrets; client route checks never sole authz; discovery never creates public entities; parent merges barrels after finish.
-
-## Multi-agent coordination (2026-07-17 wave 2)
-
-| Bead | Model tier | Exclusive ownership (do not cross) | Status |
-|------|------------|------------------------------------|--------|
-| BB-020 | fast | `infra/firebase/backup/`, `scripts/backup-restore/`, `docs/runbooks/backup-restore.md` | `done` |
-| BB-022 | fast | `apps/web/apphosting*.yaml`, `apps/web/next.config.mjs`, `apps/web/src/lib/runtime-hardening*` (not shell components) | `done` |
-| BB-023 | fast | `infra/gcp/armor/`, `docs/security/ingress-armor.md` | `done` |
-| BB-024 | stronger (enforcement) | `packages/firebase/src/app-check*.ts`, `apps/api-public|api-submissions` App Check middleware only | `done` |
-| BB-038 | fast | `packages/domain/src/query-packs/`, `workers/research/**/query_packs*`, `packages/schemas/query-packs/` | `done` |
-
-**Shared files (parent only):** `plan.md`, `packages/domain/src/index.ts`, `packages/firebase/src/index.ts`, root `README.md`.
-
-**Rules:** one writer per path; no live GCP/Firebase console apply; no secrets; ADR-011 Firestore rescope for BB-020 (not Cloud SQL PITR); validate with package tests; parent merges barrels after agents finish.
-
-## Multi-agent coordination (2026-07-17 wave 1 — complete)
-
-| Bead | Model tier | Exclusive ownership (do not cross) | Status |
-|------|------------|------------------------------------|--------|
-| BB-019 | strong (release/security core) | `packages/domain/src/publication/`, `packages/firebase/src/firestore/release*.ts`, `workers/publication/` (beyond health), FIRESTORE_MODEL § BB-019, release tests | `done` |
-| BB-021 | fast (scaffolding) | `apps/{api-public,api-submissions,api-internal,admin}/` surface contracts, `infra/gcp/surfaces/`, `docs/security/service-surfaces.md` | `done` |
-| BB-037 | fast (contracts) | `packages/domain/src/adapters/`, `workers/research/` adapter modules, schema fixtures under `packages/schemas` for adapters only | `done` |
-| BB-012 | hygiene | status only → `deferred` | `deferred` |
-
-## Status legend
-
-| Status | Meaning |
-|--------|---------|
-| `todo` | Not started |
-| `in_progress` | Active |
-| `blocked` | Waiting on dependency or decision |
-| `done` | Acceptance criteria met |
-| `deferred` | Intentionally later (Epic G / deferred list) |
-| `cancelled` | Superseded / will not execute as originally scoped |
-| `partial` | Delivered for original scope but superseded for production path |
-
-## Progress summary
-
-| Tranche | Focus | Beads | Done |
-|---------|-------|-------|------|
-| 1 | Secure foundation | BB-001–006, 008–010 | 9/9 |
-| 2 | Data and publication boundary | BB-011–020 | 9/10 (BB-012 deferred) |
-| 3 | Hostile-environment protection | BB-021–030, 032–036 | 15/15 |
-| 4 | Research and evidence engine | BB-037–044, 047 | 9/9 |
-| 5 | Public beta product | BB-048–050, 052–057 | 1/9 (BB-056 done; BB-048 partial) |
-| 6 | Seed and launch | BB-045–046, 058–063 | 3/8 (045/046/061 done) |
-| Deferred | Later capabilities | BB-012, 031, 064–066 | 0/5 (BB-051 un-deferred 2026-07-17 — see course-correction table) |
+Visual register (ADR-013 + current brand): **black ink canvas, white strokes/labels, copper entity markers**. Not a colorful tourism basemap. Not cream Archive Paper. Rest of the world is muted gray / out of frame until we deliberately add countries later.
 
 ---
 
-## Target architecture (reference)
+## What you asked for (mapped)
+
+| Ask | Intent |
+|-----|--------|
+| Match site color scheme | Dark archive canvas + copper pins + white UI chrome |
+| US-focused; gray other countries | `maxBounds` ≈ CONUS+pad; no world basemap; optional gray plate later |
+| States visible / selectable | Clickable state shapes → filter/zoom + URL `state=XX` |
+| Home map interactive → map experience | Pan/zoom on home; click → `/explore` with viewport (+ `selected` / `state`) |
+| Premier map experience | Explore is the hub: entities, filters, density, relationship lines, decade/settings |
+| Relationship lines + decade settings | Bridge History graph edges onto the map; settings panel for line mode / decade |
+
+## What you may have missed (design for)
+
+1. Deep links / shareable URLs  
+2. Keyboard + screen-reader list peer  
+3. Locate / near-me without residential precision  
+4. Empty / sparse state honesty  
+5. Precision / dignity (no street-level residence)  
+6. Degraded mode (map fail → list)  
+7. Performance (HTML markers → cluster/tiles)  
+8. Real state polygons (vs bbox)  
+9. AK / HI insets  
+10. History ↔ Explore bridge on the map  
+11. Mobile sheets  
+12. Analytics / abuse guards  
+
+---
+
+## Information architecture
 
 ```
-apps/
-  web/                 Public Next.js (Firebase App Hosting)
-  admin/               Private Next.js admin/research (Cloud Run + IAP)
-  api-public/          Public read/search/location API (Cloud Run)
-  api-submissions/     Corrections / contribution intake (Cloud Run)
-  api-internal/        Publication / promotion / internal control (Cloud Run, private)
-workers/
-  research/            Python source discovery & ingestion
-  publication/         Projection, snapshot, indexing, release
-  security/            Quarantine, content validation, integrity
-packages/
-  ui/ domain/ schemas/ firebase/ data-access/
-  security/ observability/ testing/ config/
-infra/
-  firebase/ gcp/ github/ database/
+Home (map teaser)
+  └─ interact / click → Explore (premier)
+        ├─ Map canvas (US, branded, states, entities, optional relationship lines)
+        ├─ Filters (kind, era, theme, confidence, state)
+        ├─ Settings sheet
+        │     ├─ Density presence layer
+        │     ├─ Relationship lines on/off
+        │     ├─ Line mode (all-time | decade)
+        │     └─ Decade stepper (when lines/decade mode)
+        ├─ Synchronized list + narrative card
+        └─ Off-ramps: entity page, history (full graph), locate, methodology
 ```
 
-**Platform choices (current phase — ADR-011 / D-014):** Next.js + TypeScript; Firebase App Hosting (public web); Cloud Run (APIs + admin); Firebase Auth + App Check (reCAPTCHA Enterprise); **Cloud Firestore** system of record; Firebase Storage / GCS for blobs; Cloud Armor / ALB / CDN; Cloud Tasks + Cloud Run Jobs; GitHub Actions + OIDC/WIF; OpenTelemetry + Sentry; **geohash + bounded Firestore queries** before a separate search platform (PostGIS / Cloud SQL **deferred**).
+---
 
-### Non-negotiable invariants
+## Phased delivery
 
-1. Anonymous users never write to canonical historical data.
-2. Public clients never connect directly to canonical database tables **or canonical Firestore collections**.
-3. A submission can never become public without the promotion workflow.
-4. Research workers cannot publish.
-5. LLMs cannot publish or approve their own claims.
-6. Public rendering never invokes an LLM.
-7. Public pages read only released publication projections or immutable snapshots.
-8. Living residential addresses are never stored as ordinary person-location fields or publicly returned.
-9. Unknown living status is treated as living.
-10. External URLs and files are untrusted; submitted URLs are not fetched synchronously in a user request.
-11. Public API credentials are read-only on **public projections**; research cannot modify public projections; publication cannot modify raw evidence.
-12. Every public fact maps to accepted claim and evidence records; publication/retraction is auditable.
-13. Every queue, worker, API, and model provider has bounded concurrency and cost limits.
-14. Immediate read-only degraded mode is supported.
-15. Production deploy requires security, test, migration, and rollback checks.
-16. No mobile-specific assumptions; contracts remain portable to Expo later.
+### Phase 1 — Branded US + home→explore
+- [x] Dark-archive canvas (no demotiles); CONUS `maxBounds`
+- [x] Circular HTML copper pins; clickable states (bbox stand-in)
+- [x] Home interactive → `/explore` with viewport / selected / state
+- [x] Explore settings stub
+- Bead: `black-book-0vf` (closed)
+
+### Phase 2 — Real state polygons
+- [x] Vendor simplified US state(+DC) GeoJSON (Census cartographic / public domain)
+- [x] Replace bbox rectangles in explore-style (URL race fixed: empty source + client `setData`)
+- [x] Keep selection + density on real shapes; CONUS camera without portrait-clipping maxBounds
+- Bead: `black-book-37j` (closed)
+
+### Phase 3 — Relationship lines + decade settings
+- [x] Project History edges as map lines between entity anchors
+- [x] Settings: lines on/off, all-time vs decade, decade stepper
+- [x] Line click → edge panel
+- Bead: `black-book-814` (closed)
+
+### Phase 4 — Scale / polish (**next**)
+- [ ] Clustering or vector tiles; mobile sheets; locate deep-link
+- [ ] Self-hosted PMTiles (ADR-013 target)
+- Bead: `black-book-w72`
 
 ---
 
-## Tranche 1: Secure foundation
+## Status
 
-| ID | Title | P | Size | Deps | Status | Notes |
-|----|-------|---|------|------|--------|-------|
-| BB-001 | Repository reconnaissance and implementation baseline | P0 | M | — | `done` | Report: `docs/bb-001/`; bootstrap/test/build/typecheck verified exit 0 |
-| BB-002 | Architecture decision records | P0 | M | BB-001 | `done` | 10 ADRs in `docs/adr/`; index + `.cx/decisions/` |
-| BB-003 | Machine-readable product constitution | P0 | M | BB-001 | `done` | Shared JSON + JSON Schema; TS `@black-book/schemas` + Python `black-book-constitution` |
-| BB-004 | Threat model and abuse-case corpus | P0 | L | BB-001, BB-003 | `done` | `docs/security/` + `@black-book/testing` corpus tests |
-| BB-005 | Environment and project isolation | P0 | L | BB-002, BB-004 | `done` | Delivered as single-project production design for live `black-book-efaaf`; per-SA/bucket/role isolation not yet provisioned; four-project split deferred (D-013) |
-| BB-006 | Monorepo and shared package foundation | P0 | L | BB-001, BB-002 | `done` | Shared configs/helpers, frozen bootstrap, boundary/cycle checks, emulator + PostGIS local scaffolds |
-| BB-008 | Automated quality and test foundation | P0 | M | BB-006 | `done` | Layers, builders, coverage, quarantine, production fail-closed, `.github/workflows/ci.yml` |
-| BB-009 | GitHub repository governance | P0 | M | BB-001, BB-008 | `done` | Local artifacts + Governance CI; remote rulesets **not** applied (no remote; `gh` auth invalid) |
-| BB-010 | GitHub OIDC deployment identities | P0 | M | BB-005, BB-009 | `done` | Declarative WIF + OIDC workflow stub; cloud not applied (no remote; IDs TBD) |
-
-### BB-001 acceptance checklist
-
-- [x] Current state and target state mapped → `docs/bb-001/baseline-report.md`, `repository-map.md`
-- [x] Build/test commands executed or failures documented → `pnpm bootstrap`, `pnpm test`, `pnpm build`, `pnpm typecheck` after build verified exit 0 on 2026-07-16
-- [x] Existing Firebase/GitHub integration understood (none yet → documented absence)
-- [x] Subsequent beads adjusted for actual repo without weakening requirements → see baseline-report §7 + notes below
-
-### Greenfield sequence adjustments (requirements unchanged)
-
-- **BB-006:** Foundation completed; `pnpm bootstrap`, validation, tests, builds, and typecheck verified.
-- **BB-007:** Schedule after BB-006 and **before BB-028** (not only before Tranche 5 UI). Tracked under Epic A remainder.
-- **BB-008 / BB-009:** BB-008 CI under `.github/workflows/ci.yml`; BB-009 local governance is checked in (`infra/github/`, CODEOWNERS, Dependabot, SECURITY.md, Governance job). **GitHub remote rulesets/secret-scanning not applied** until a remote exists and `gh auth login` succeeds — see `infra/github/README.md`.
-- **BB-010:** OIDC/WIF design delivered (`infra/gcp/wif/`, deploy stub workflow, provenance schema). **Cloud WIF not applied** until remote + numeric GitHub IDs + `gcloud` ADC + `github-deploy` SA exist.
-- **Emulate / deploy commands:** Local demo Firebase emulators are scaffolded; real project linkage remains BB-011; production rollout pipeline is BB-062 (unblocked for design by BB-010).
-
-### BB-006 acceptance checklist
-
-- [x] Frozen `pnpm-lock.yaml` and `uv.lock` drive one-command bootstrap
-- [x] Shared TypeScript, ESLint, formatting, environment, logging, error, and test utilities exist
-- [x] All five deployable applications build independently
-- [x] Boundary validation rejects app dependencies/imports and workspace dependency cycles
-- [x] Local tests require no production environment variables
-- [x] Firebase demo emulator and local PostgreSQL/PostGIS Compose scaffolds are documented
-
-### BB-008 acceptance checklist
-
-- [x] Unit, integration, contract, e2e, accessibility, migration, and security test layers exist with representative coverage
-- [x] Test data builders for entities, claims, evidence, sources, publication releases, submissions
-- [x] Coverage reporting via `pnpm test:coverage` (Node test coverage thresholds)
-- [x] Deterministic clocks (`fixedClock` / `steppingClock`) and ID factories
-- [x] CI sharding: JS packages vs apps unit jobs; dedicated Postgres / Firebase / coverage jobs
-- [x] Emulator-backed Firebase harness + disposable Postgres/migration harnesses (guarded locally; required in CI)
-- [x] PRs run appropriate suites via `.github/workflows/ci.yml`
-- [x] Tests fail closed on production identifiers/endpoints (`pnpm test:preflight`)
-- [x] Flaky quarantine registry requires owner + deadline (`packages/testing/quarantine.json`)
-- [x] Required checks have stable names (see `docs/testing/README.md`)
-- [x] Workflow permissions read-only; actions pinned to SHAs; no `pull_request_target`
-
-### BB-009 acceptance checklist
-
-- [x] Declarative main ruleset: PR required, required checks, block force-push/deletion, resolved conversations → `infra/github/rulesets/main-protection.json`
-- [x] CODEOWNERS for security, infra, policies, database, publication → `.github/CODEOWNERS`
-- [x] Dependabot updates config → `.github/dependabot.yml`
-- [x] Secret scanning / push protection / private reporting declared → `infra/github/security-settings.json` + `SECURITY.md`
-- [x] Allowed Actions restricted (selected patterns) → `infra/github/allowed-actions.json`
-- [x] Workflow permissions default read-only; third-party actions SHA-pinned; no `pull_request_target` → enforced by `pnpm validate:governance` + CI **Governance** job
-- [x] Automated policy check verifies branch-protection *declaration* + workflow policy locally
-- [ ] Remote ruleset / Actions allowlist / secret scanning **applied on GitHub** → blocked: no git remote; `gh` token invalid (apply: `infra/github/README.md`)
-
----
-
-## Tranche 2: Data and publication boundary
-
-| ID | Title | P | Size | Deps | Status | Notes |
-|----|-------|---|------|------|--------|-------|
-| BB-011 | Firebase project bootstrap | P0 | M | BB-005, BB-006 | `done` | Apps registered; App Hosting/Blaze + Firestore DB + GCP buckets/IAM still blocked/deferred |
-| BB-012 | Cloud SQL PostgreSQL, PostGIS, and SQL Connect | P0 | L | BB-005, BB-011 | `deferred` | ADR-011 / D-014 — Firestore SoR; Cloud SQL not provisioned this phase; scaffolds parked |
-| BB-013 | Database schema boundaries and migrations | P0 | L | BB-011, D-014 | `done` | **Rescoped:** Firestore collections, rules, converters, seeds, emulator tests — not SQL migrations |
-| BB-014 | Entity and geography domain model | P0 | L | BB-003, BB-013 | `done` | Firestore documents + geohash; `@black-book/domain` + converters/seeds |
-| BB-015 | Living-person and sensitive-location enforcement | P0 | L | BB-003, BB-014 | `done` | Central redaction/serialization in `@black-book/security`; constitution `sensitivityRules`; observability + public converter wired |
-| BB-016 | Sources, captures, rights, and provenance model | P0 | L | BB-013 | `done` | Evidence metadata in Firestore; blobs in Storage |
-| BB-017 | Claims, contradictions, and confidence model | P0 | L | BB-003, BB-014, BB-016 | `done` | Deterministic confidence + claim publication statuses |
-| BB-018 | Append-only audit and transactional outbox | P0 | M | BB-013, BB-017 | `done` | Atomic Firestore state/audit/outbox, idempotency, retry/DLQ, history |
-| BB-019 | Public projection and immutable release model | P0 | L | BB-015, BB-017, BB-018 | `done` | Signed manifests + atomic activation/rollback; barrels wired |
-| BB-020 | Backup, PITR, and restore verification | P0 | M | BB-013, BB-019 | `done` | Firestore export/retention/IAM deny-delete design + dry-run verify scripts; live PITR/bucket/scheduler + quarterly drill remain human cloud follow-up |
-
-### BB-013 acceptance checklist (Firestore rescope)
-
-- [x] Decision record D-014 + ADR-011 (Cloud SQL deferred; Firestore SoR)
-- [x] Collection map for policy, research, canonical, evidence, publication, public, submissions, audit, operations
-- [x] Security rules: public read projections only; no client canonical write; quarantine submissions; staff claim separation
-- [x] Emulator rules tests in `@black-book/firebase`
-- [x] Typed paths/converters/seeds; `@black-book/data-access` Firestore guards
-- [x] Postgres/SQL Connect parked (README banners; CI optional)
-
-### BB-014 acceptance checklist (Firestore entity/geography)
-
-- [x] Entities, aliases, identifiers, kinds, relationships (evidence + time/geo context)
-- [x] Places/geometries (Firestore-friendly + geohash), jurisdictions, precision; ZIP = modern input only
-- [x] Schools (names, campuses, status history); people/orgs/events/laws/cases/publications/artifacts/institutions
-- [x] Historical and current locations coexist; geographic matches record method + precision
-- [x] Duplicate/merge lineage reversible and audited (`entityMerges`)
-- [x] Unknown living → treat as living at model level
-- [x] Domain package + Firestore converters/seeds/tests; no Cloud SQL / PostGIS production path
-
-### BB-018 acceptance checklist (append-only audit / outbox)
-
-- [x] Controlled audit actions cover policy, source, research, moderation, publication, correction, retraction, authentication, and administrative activity
-- [x] Actor, reason, request, release, correlation, entity, subject, and idempotency identifiers are modeled
-- [x] `commitWithAudit` transaction atomically writes state + immutable audit + pending outbox + idempotency marker
-- [x] Repeated idempotency keys return the original event/outbox ids without applying state again
-- [x] Rules allow validated trusted-staff audit creates and deny every audit update/delete; outbox/idempotency/receipts remain client-denied
-- [x] Consumer receipts make Firestore effects replay-safe; bounded exponential retries terminate in `dead_letter`
-- [x] Entity publication/correction/retraction history reconstructs deterministically from append-only events
-- [x] BB-018 package tests/build/typecheck, workspace tests/lint/boundaries, formatting, and Standard-edition emulator rules tests pass
-
----
-
-## Tranche 3: Hostile-environment protection
-
-| ID | Title | P | Size | Deps | Status |
-|----|-------|---|------|------|--------|
-| BB-021 | Separate public, submissions, internal, and admin surfaces | P0 | L | BB-005, BB-011, BB-013 | `done` |
-| BB-022 | Public App Hosting runtime hardening | P0 | M | BB-011, BB-019, BB-021 | `done` |
-| BB-023 | Cloud Armor and protected public API ingress | P0 | L | BB-021 | `done` |
-| BB-024 | Firebase App Check enforcement | P0 | M | BB-011, BB-021 | `done` |
-| BB-025 | Endpoint rate limits and abuse quotas | P0 | L | BB-023, BB-024 | `done` |
-| BB-026 | Search and query resource guardrails | P0 | L | BB-019, BB-025 | `done` |
-| BB-027 | Administrator identity and authorization | P0 | L | BB-011, BB-021 | `done` |
-| BB-028 | Web application security controls | P0 | L | BB-007, BB-021 | `done` |
-| BB-029 | Corrections and submission quarantine | P0 | L | BB-015, BB-021, BB-025 | `done` |
-| BB-030 | Safe external URL handling and SSRF prevention | P0 | L | BB-004, BB-029 | `done` |
-| BB-032 | Data-poisoning and promotion controls | P0 | L | BB-017–019, BB-029 | `done` |
-| BB-033 | Cost and resource exhaustion controls | P0 | L | BB-022, BB-023, BB-025 | `done` |
-| BB-034 | Security telemetry and anomaly detection | P0 | L | BB-018, BB-023–025 | `done` |
-| BB-035 | Incident response and kill switches | P0 | L | BB-019, BB-033 | `done` |
-| BB-036 | Security testing and CI gates | P0 | L | BB-008, BB-009, BB-028, BB-030 | `done` |
-
-**Note:** BB-007 (design system) is Epic A but not listed in Tranche 1 sequence in the PDF; it is required before BB-028 and Tranche 5. Tracked below under Epic A remainder.
-
----
-
-## Epic A remainder (design system)
-
-| ID | Title | P | Size | Deps | Status | Notes |
-|----|-------|---|------|------|--------|-------|
-| BB-007 | Black Book design system | P0 | M | BB-006 | `done` | `@black-book/ui` tokens + components; fixtures at `/design-system`; a11y/contrast/motion tests |
-
-### BB-007 acceptance checklist
-
-- [x] Black/white/neutral primary palette with light and dark themes
-- [x] Status colors reserved for warning, confidence, dispute, error (with non-color cues)
-- [x] Editorial + restrained mono typography pairing
-- [x] Grid, spacing, elevation, border, icon, motion, focus, data-viz tokens
-- [x] Accessible cards, citations, confidence, timelines, maps, result lists, filters, dialogs, notices, empty states
-- [x] WCAG contrast tests (AA minimum; AAA for primary ink/canvas)
-- [x] Visible keyboard focus (`:focus-visible`) and reduced-motion support
-- [x] Fixture gallery covers important states at `/design-system` (mobile→desktop CSS)
-- [x] Avoid neon cyberpunk styling
-
----
-
-## Tranche 4: Research and evidence engine
-
-| ID | Title | P | Size | Deps | Status |
-|----|-------|---|------|------|--------|
-| BB-037 | Source registry and adapter contract | P0 | L | BB-016, BB-018 | `done` |
-| BB-038 | Versioned historical query packs | P0 | M | BB-003, BB-037 | `done` |
-| BB-039 | Candidate discovery pipeline | P0 | L | BB-037, BB-038 | `done` |
-| BB-040 | Deterministic relevance engine | P0 | L | BB-003, BB-039 | `done` |
-| BB-041 | Entity and historical-location resolution | P0 | L | BB-014, BB-039 | `done` |
-| BB-042 | Atomic claim extraction and evidence registration | P0 | L | BB-016, BB-017, BB-041 | `done` |
-| BB-043 | Confidence and source-lineage engine | P0 | L | BB-017, BB-042 | `done` |
-| BB-044 | Research-case and publication workflow | P0 | L | BB-040–043 | `done` |
-| BB-047 | Gold corpus and calibration harness | P0 | L | BB-040, BB-041, BB-043, BB-044 | `done` |
-
----
-
-## Tranche 5: Public beta product
-
-| ID | Title | P | Size | Deps | Status |
-|----|-------|---|------|------|--------|
-| BB-048 | Public application shell and navigation | P0 | L | BB-007, BB-019, BB-022 | `partial` |
-| BB-049 | Search API and experience | P0 | L | BB-019, BB-025, BB-026, BB-048 | `todo` |
-| BB-050 | U.S. address and current-location discovery | P0 | L | BB-015, BB-025, BB-049 | `todo` |
-| BB-052 | Entity, place, school, event, and institution pages | P0 | L | BB-019, BB-048, BB-049 | `todo` |
-| BB-053 | Evidence, confidence, dispute, and revision interface | P0 | L | BB-017, BB-019, BB-052 | `todo` |
-| BB-054 | “Why this appears” and balanced historical storytelling | P0 | M | BB-003, BB-040, BB-052 | `todo` |
-| BB-055 | Correction and challenge experience | P0 | L | BB-029, BB-032, BB-052 | `todo` |
-| BB-056 | Administration and research console | P0 | XL | BB-027, BB-037, BB-044 | `done` |
-| BB-057 | Accessibility, SEO, performance, and privacy review | P0 | L | BB-048–056 | `todo` |
-
----
-
-## Tranche 6: Seed and launch
-
-| ID | Title | P | Size | Deps | Status |
-|----|-------|---|------|------|--------|
-| BB-045 | Wikimedia discovery adapter | P1 | L | BB-037–039 | `done` |
-| BB-046 | Federal archive and public-history adapters | P1 | L | BB-037, BB-039 | `done` |
-| BB-058 | Initial high-confidence national seed | P1 | XL | BB-044–047, BB-052 | `todo` |
-| BB-059 | Load, abuse, and cost testing | P0 | L | BB-023–026, BB-033, BB-049 | `todo` |
-| BB-060 | Adversarial integrity exercise | P0 | L | BB-032, BB-043, BB-044, BB-055 | `todo` |
-| BB-061 | Recovery and rollback rehearsal | P0 | M | BB-020, BB-035 | `done` |
-| BB-062 | Production release pipeline | P0 | L | BB-010, BB-020, BB-036, BB-057 | `todo` |
-| BB-063 | Beta launch gate | P0 | M | BB-047, BB-058–062 | `todo` |
-
----
-
-## Deferred (Epic G + deferred list)
-
-| ID | Title | P | Size | Deps | Status |
-|----|-------|---|------|------|--------|
-| BB-031 | Future file-upload quarantine boundary | P1 | M | BB-005, BB-029 | `deferred` |
-| BB-064 | LLM provider and research-mode framework | P2 | L | BB-042–044, BB-063 | `deferred` |
-| BB-065 | Prompt-injection and model-tool isolation | P2 | L | BB-030, BB-064 | `deferred` |
-| BB-066 | Mobile-ready shared contracts | P2 | M | BB-049–053 | `deferred` |
-
-BB-051 ("Results list and national map experience") was **un-deferred** 2026-07-17 in the course-correction wave — it's now P0 XL, tracked in the course-correction table above (the map is the product's centerpiece per owner direction), not in this deferred list.
-
----
-
-## Session log
-
-### 2026-07-16
-
-- Imported full bead backlog into this plan.
-- Repo was empty (no git, no code) → BB-001 treated as greenfield baseline.
-- Monorepo skeleton appeared in parallel (`apps/`, `packages/`, `workers/`, `infra/`, root pnpm + uv).
-- BB-001 deliverables written:
-  - `docs/bb-001/baseline-report.md` — current vs target, gaps, commands, Firebase/GitHub absence, bead adjustments
-  - `docs/bb-001/repository-map.md` — quick tree map
-- Bootstrap agent verified `pnpm bootstrap`, `pnpm test`, `pnpm build`, and `pnpm typecheck` after build all exit 0.
-- Verification fixes applied: package `development` export conditions and root script `--if-present` placement.
-- BB-001 marked `done`; Tranche 1 progress is now 1/9.
-- Remaining gaps carried forward: Firebase (BB-011), real CI / workflow placement (BB-008/BB-009), Cloud SQL (BB-012), `format:check` style drift, typecheck build-order dependency, and local DB healthcheck not verified.
-- Sequence notes recorded: BB-006 skeleton ≠ done; BB-007 before BB-028; CI path → `.github/`; emulate/deploy deferred to BB-011 / BB-062.
-- BB-002 ADRs delivered under `docs/adr/` (ADR-001–010) with required sections; short summaries in `.cx/decisions/`.
-- ADRs explicitly mark scaffold vs aspirational; Cloud SQL / Firebase / App Hosting / OIDC remain unprovisioned.
-- No microservices beyond bead security boundaries (ADR-005). Tranche 1 progress was 2/9 after BB-002.
-- BB-003 machine-readable product constitution:
-  - Shared values: `packages/schemas/constitution/policy.v1.json` + `product-constitution.schema.json`
-  - TS loaders/evaluators: `@black-book/schemas` (read-only; every evaluation returns `policyVersion`)
-  - Python loaders/evaluators: `packages/constitution` (`black-book-constitution`), same JSON artifacts
-  - Fixtures: included, excluded, disputed, sparse, sensitive, living-person
-  - Domain `treatAsLiving` delegates to constitution (no duplicated thresholds)
-  - Marked `done`; Tranche 1 progress was 3/9 (BB-001, BB-002, BB-003)
-- BB-004 threat model and abuse-case corpus:
-  - `docs/security/threat-model.md` — 19 P0 threats with preventive/detective/containment/recovery
-  - `docs/security/abuse-cases.md` — AC-01–19 with bead mappings
-  - `docs/security/threat-corpus.json` (+ schema) — machine-readable source of truth
-  - `docs/security/tests/checklist.md` — security test scaffold toward BB-036
-  - `@black-book/testing` validates corpus completeness (`pnpm --filter @black-book/testing test`)
-  - Residual risk documented per threat + rollup; ADR-010 scaffold row updated
-  - Marked `done`; Tranche 1 progress is now 4/9 (BB-001–004)
-- Recommended next: **BB-005** (depends on BB-002, BB-004); BB-006 may proceed in parallel (deps BB-001, BB-002 only).
-- BB-006 monorepo and shared package foundation:
-  - Populated `@black-book/typescript-config` and `@black-book/eslint-config`; all TS workspaces consume the shared configs
-  - Added structured logging / `AppError`, runtime environment defaults, and deterministic test utilities
-  - Added `pnpm validate` boundary and cycle checks; deployable apps remain isolated
-  - Frozen `pnpm bootstrap`, full tests, build, independent app builds, typecheck, lint, and formatting all verified exit 0
-  - Added demo-only Firebase Auth/Firestore emulator config and documented local PostGIS; Compose config verified, runtime health deferred because Docker daemon was unavailable
-  - Marked `done`; Tranche 1 progress is now 5/9
-- Remaining foundation handoff: BB-008 adds real `.github/workflows` quality gates and fuller app tests; BB-011 links real Firebase projects and replaces deny-all placeholder rules.
-- BB-005 environment and project isolation (design; cloud not provisioned):
-  - Machine matrix: `infra/gcp/isolation-matrix.json` (+ schema) — 4 projects, 11 SAs, 5 bucket classes, 5 acceptance mappings
-  - Human matrices: `projects.matrix.md`, `service-accounts.matrix.md`, `storage-buckets.matrix.md`, `iam-boundaries.md`
-  - Terraform stubs under `infra/gcp/terraform/` (`terraform validate` Success against google provider; not applied)
-  - Firebase aliases: `infra/firebase/.firebaserc.example`; App Hosting stubs: `apps/web/apphosting.yaml` (+ staging/production)
-  - Design narrative + acceptance enforcement: `docs/security/environment-isolation.md`
-  - ADR-005 / ADR-009 scaffold rows updated to “designed, not provisioned”
-  - No production secrets in repo; no claim that GCP/Firebase projects exist
-  - Marked `done`; Tranche 1 progress is now 6/9 (BB-001–006)
-  - Still requires human org/console: create projects, billing, org policies, WIF (BB-010), Firebase bootstrap (BB-011), Cloud SQL (BB-012)
-  - BB-006 completed in parallel; no conflict (BB-005 avoided eslint/typescript-config packages)
-- BB-008 automated quality and test foundation:
-  - `@black-book/testing` builders, deterministic IDs/clocks, production fail-closed guards, quarantine registry
-  - Layer commands: `test:unit|contract|security|a11y|integration|migration|e2e|coverage` + `test:preflight`
-  - Real CI: `.github/workflows/ci.yml` (read-only permissions, SHA-pinned actions, stable check names)
-  - Guarded Postgres/Firebase/migration/e2e harnesses; CI requires Postgres service + Java emulators where applicable
-  - Docs: `docs/testing/README.md`
-  - Marked `done`; Tranche 1 progress was 7/9 (BB-001–006, BB-008)
-  - Next was **BB-009** (GitHub rulesets using documented check names) or BB-007 design system
-- Reconciled BB-005 to the authoritative single-project production reality (D-013):
-  - Existing `black-book-efaaf` (`332234323945`; Hosting `black-book-efaaf.web.app`) is the only cloud project and is production.
-  - Development stays on `demo-black-book` emulators; staging/research are same-project configuration scopes, not security boundaries.
-  - Isolation matrix, human matrices, Terraform, Firebase aliases, App Hosting templates, ADR-005/009, and architecture docs now use the real project.
-  - Per-surface SAs, four bucket boundaries, per-secret IAM, and later Postgres roles preserve research/public/submissions separation inside the project.
-  - The four-project BB-005 topology remains a documented deferred migration triggered by cloud non-prod, research blast radius, or compliance/billing/recovery needs.
-  - BB-011 must inventory before creating resources; no cloud resource was created or modified during reconciliation.
-  - Read-only Firebase checks confirmed zero registered apps and the default Hosting site; App Hosting inventory is blocked until a human-approved Blaze upgrade enables its API.
-- BB-009 GitHub repository governance (local done; remote partial):
-  - `.github/CODEOWNERS`, `.github/dependabot.yml`, root `SECURITY.md`
-  - Declarative ruleset + Actions allowlist + security settings under `infra/github/`
-  - Dry-run apply / read-only check scripts: `infra/github/scripts/{apply,check}-governance.sh`
-  - Policy checker: `pnpm validate:governance`; CI job **Governance**; wired into `pnpm validate`
-  - Verified: no git remote; `gh auth` token invalid — **did not** mutate GitHub settings; apply commands in `infra/github/README.md`
-  - Marked `done` locally; Tranche 1 progress was **8/9** (BB-001–006, BB-008, BB-009)
-  - Next was create remote + `gh auth login` + apply rulesets (still required before live WIF)
-- BB-007 Black Book design system:
-  - `@black-book/ui`: light/dark tokens, editorial+mono typography, status-only hues, grid/spacing/elevation/border/icon/motion/focus/data-viz
-  - Accessible components: Card, Citation, Confidence, Timeline, MapFrame, ResultList, FilterBar, Dialog, Notice, EmptyState (+ Button, ThemeToggle)
-  - Fixture gallery (Storybook equivalent): `http://localhost:3000/design-system`
-  - Tests: contrast (AA/AAA), reduced-motion CSS, focus rings, SSR semantic a11y smoke
-  - Docs: `docs/ui/README.md`; public web imports styles + fonts
-  - Marked `done`; Epic A remainder complete; Tranche 1 was **8/9** pending BB-010
-  - Remaining UI gaps: BB-048 product shell, Storybook/Chromatic optional later, admin theming reuse
-- BB-011 Firebase project bootstrap (partial cloud; repo complete):
-  - External: created **Black Book Web** (`1:332234323945:web:17be349ebc9c029b3bfd78`) and
-    **Black Book Admin** (`1:332234323945:web:e1b31c78e32d95943bfd78`) in `black-book-efaaf`
-  - Blocked: Blaze/App Hosting backends; Firestore API/database not enabled; `gcloud` ADC absent
-    (no SA/bucket provisioning); Auth providers not enabled (awaiting human choice)
-  - Repo: `@black-book/firebase` env/guards/init + App Check scaffold; deny-all Firestore/Storage
-    rules + emulator tests; Auth/App Check plan; minimal IAM doc; `.env.example`; App Hosting
-    Secret Manager refs + public client identifiers
-  - Marked `done` for bead acceptance with recorded blockers; Tranche 2 progress **1/10**
-  - Next cloud: human Blaze upgrade → App Hosting backends; `gcloud auth login` → SAs/buckets;
-    choose Auth providers; BB-012 Cloud SQL; BB-024 App Check enforcement
-- BB-012 Cloud SQL / PostGIS / SQL Connect (repo foundation; cloud partial):
-  - Product: Firebase **SQL Connect** (formerly Data Connect); CLI `dataconnect:*` (firebase-tools 15.x)
-  - Local: `infra/database/init/` extensions, `bb_*` schemas, roles/grants/timeouts, isolation SQL;
-    compose + optional PgBouncer profile; `pnpm db:init` / `db:verify`
-  - SQL Connect templates: `infra/database/sql-connect/` — `@auth(level: NO_ACCESS)`, Admin SDK only
-  - `@black-book/data-access`: server-only config, role matrix, pool exhaustion fail-closed, operation allowlist
-  - Cloud SQL design: `infra/database/cloud-sql/PRODUCTION.md` — **not** created (no gcloud auth; cost gate)
-  - Verified: unit/static tests + boundary browser denial; Docker daemon unavailable → no local runtime DB pass;
-    CI Integration Postgres applies init + isolation
-  - Marked `done` for repository acceptance with cloud blockers; Tranche 2 progress **2/10**
-  - Next: **BB-013** schema boundaries/migrations; human Cloud SQL provision when Blaze/`gcloud` ready
-- BB-010 GitHub OIDC deployment identities (declarative done; cloud not applied):
-  - WIF Terraform stubs: `infra/gcp/wif/terraform/` (pool `black-book-github`, provider
-    `github-actions`, trust CEL for numeric repo/owner IDs + `main` + workflow + `production`)
-  - Docs: `infra/gcp/wif/{README,trust-conditions,deploy-roles}.md`;
-    `infra/github/oidc/` (environment stubs + SA key removal path)
-  - Scripts (dry-run default): `infra/github/scripts/{apply,check}-wif.sh`
-  - Workflow stub: `.github/workflows/deploy-production.yml` (`workflow_dispatch` + Environment
-    `production`; not a required check; no `credentials_json`)
-  - Provenance schema: `infra/github/release-metadata/`
-  - Allowed Actions pattern: `google-github-actions/auth@*`
-  - Verified: no git remote; GitHub IDs TBD; WIF **not** created in GCP; no SA JSON secrets present
-  - Marked `done` for bead acceptance (design + dry-run); Tranche 1 progress **9/9**
-  - Unblocks BB-062 design/implementation once remote + WIF apply + App Hosting/SAs exist
-  - Human next: create remote → `gh auth login` → apply BB-009 → fill numeric IDs →
-    `gcloud auth login` → ensure `github-deploy` SA → `apply-wif.sh --apply`
-- **D-014 / ADR-011 Firestore pivot + BB-013 rescoped (done):**
-  - Authoritative decision: no Cloud SQL this phase; Firestore SoR; Storage/GCS for blobs
-  - Decision docs: `.cx/decisions/D-014-*.md`, `docs/adr/ADR-011-*.md`; ADR-002 superseded; ADR-003 deferred; ADR-008 amended for geohash
-  - Parked: `infra/database/` banners + Cloud SQL PRODUCTION deferral; Postgres CI optional (`ENABLE_POSTGRES_CI`)
-  - Firestore foundation: rules, indexes, `FIRESTORE_MODEL.md`, `@black-book/firebase` converters/seeds, `@black-book/data-access` Firestore guards
-  - BB-012 → `partial` (parked); BB-013 → `done` (Firestore, not SQL migrations); Tranche 2 progress **3/10**
-  - Next recommended: **BB-014** entity + geography domain model on Firestore
-- **BB-014 entity and geography domain model (done):**
-  - `@black-book/domain`: kinds, aliases/ids, relationships, merge lineage, schools, specialized kinds, geohash + precision/ZIP policy
-  - Firestore: expanded `canonicalEntities`, `locations` subcollection, `entityRelationships`, `entityMerges`; converters/seeds/unit tests
-  - Geo without PostGIS: geohash fields + server radius filter path; ZIP modern-only
-  - Tranche 2 progress **4/10**; next recommended: **BB-015** living-person / sensitive-location enforcement
-- **BB-016 / BB-017 dependency handoff (done):**
-  - Source/capture/rights/provenance records and deterministic claims/confidence/publication statuses are present in `@black-book/domain` and Firestore schemas.
-- **BB-018 append-only audit and transactional outbox (done):**
-  - Controlled audit vocabulary and full actor/reason/request/release/correlation/idempotency metadata
-  - Firestore transaction helper commits state + audit + outbox + replay marker atomically
-  - Consumer receipts, bounded exponential retry, dead letters, and deterministic entity publication history
-  - Standard-edition emulator rules verified trusted create plus immutable update/delete denial; production API remains disabled
-  - Full workspace build/typecheck currently stops in parallel `packages/testing` builder changes (`exactOptionalPropertyTypes`); BB-018 domain/firebase/data-access packages build and typecheck cleanly
-  - Tranche 2 progress **6/10**; BB-019 may build immutable release activation on `commitWithAudit`
-- **BB-015 living-person and sensitive-location enforcement (done):**
-  - Constitution extended with `sensitivityRules` (classes, precision-reduction reasons, residential precision levels, living/occupied/sensitive-site public caps, deceased occupied-residence rule); JSON value + JSON Schema + Zod kept in sync; policyVersion unchanged (`1.0.0`); Python loader still validates
-  - `@black-book/security` is the single public-serialization choke point:
-    - `sensitivity.ts` — evidence/internal/public precision tiers + constitution-backed sensitivity/reason vocab
-    - `redaction.ts` — `reducePublicPrecision` ladder (unknown⇒living), `redactLocationForPublic` (coarsens coords + geohash, strips address labels — protects maps), and `createSensitiveDataRedactor` deep scrubber for logs/telemetry/exports
-    - `serialize.ts` — `toPublicEntityProjection` / `toPublicSearchDocument` / `redactForPublicExport` + fail-closed `assertPublicProjectionSafe` / `assertNoProhibitedPublicPrecision`
-  - `@black-book/observability` logger gained a `redact` hook; security redactor keeps residential addresses + exact coordinates out of logs and error telemetry
-  - `@black-book/firebase` public projection converter (`toFirestore`) now routes through `assertPublicProjectionSafe` (rejects prohibited precision, address fields, exact coords)
-  - Tests: security 22 (living/unknown/deceased, residential reduction, prohibited precision, search/model/export/map/log paths, regression fixture proving stored exact address is reduced) + firebase 3 converter-wiring; observability/domain/schemas/Python suites still green
-  - Validated: `pnpm validate`, targeted typechecks + builds (schemas→domain→observability→security→firebase); no Cloud SQL, no secrets, no commit
-  - Coordinated with parallel BB-016/017/018/048 agents: kept edits in `packages/security`, redaction paths, `observability`, `converters.ts` (single converter line), and constitution — re-reading shared files before each edit
-  - Tranche 2 progress **7/10**; BB-019 must build public projections/search index exclusively through `@black-book/security` serializers
-
-### 2026-07-17 (continued — tracker hygiene, rebrand, wave 7)
-
-- Session-log entries between BB-015 and this point were not backfilled contemporaneously; `bd` remains the authoritative status source for that gap (BB-016–BB-047, BB-056, BB-061, BB-067 all closed — see the reconciled Tranche 2–6 tables above).
-- **BB-080 (tracker/plan/source-spec hygiene, in progress):** versioned the source PDF at `docs/source-spec/`; swapped `plan-todo`→`plan-done` on 31 closed beads; recorded defer rationale + re-entry triggers on BB-031/064/065/066; reconciled the Progress-summary and Tranche 2/3/4 tables against `bd` truth (BB-020, BB-022–029, BB-033/034, BB-038–041 were stale `todo` — now `done`; Tranche 3 is 15/15); fixed `docs/testing/README.md`'s stale `:3000` E2E URL and `docs/architecture.md`'s stale "active tranche" line; added `docs/research/` and `docs/admin/` to `docs/README.md`'s index. Inlining real Deliver/Acceptance text (from the versioned PDF) into BB-049/050/052/053/054/055/057/058/059/060/062/063 was delegated to a background agent — check `bd show` on those ids for current state before assuming this step finished.
-- **BB-067/068/069 (brand rebrand, all done):** the owner supplied a finished brand package (`~/Downloads/black-book-brand-package/`) mid-session — the "Pinned Page" mark (closed-book B + integrated location pin), Archive Paper/Black Ink/Copper Pin/Page Sand palette, Sora/Inter/Source Serif 4/IBM Plex Mono type system. This superseded BB-067's Monk-Skin-Tone-Scale grid mark (removed) and became BB-068/BB-069's implementation. All 12 `@black-book/ui` components + `apps/web/src/app/shell.css` reskin through the existing CSS-custom-property cascade (`packages/ui/src/styles/tokens.css`) — verified in-browser, light and dark, plus favicon/OG routes. `docs/ui/brand.md` and `docs/ui/story.md` (new) are the durable references. Contrast-tested (19/19 `@black-book/ui` tests). Filed `black-book-e9z` for a pre-existing, unrelated `pnpm validate:boundaries` failure found while validating (security↔observability dependency cycle + a runtime-hardening test boundary violation) — not caused by this work.
-- **Wave 7 landed (BB-070, BB-071, BB-078 — all done):** map data platform (ADR-013, redaction-tested geo pipeline, live `/map` demo route), embedding pipeline + Firestore vector search (ADR-014, real server-only `find_nearest` endpoint through existing guardrails), production environment re-split design (ADR-012, three-project topology, Terraform validated not applied). Each validated (typecheck/test/build, one verified live in-browser) and committed separately after the wave settled.
-- **Wave 8 landed (BB-073, BB-076, BB-081, BB-083, BB-089, BB-079 — all done):** community discovery adapters (RSS/IA/DPLA + the repo's first real Wayback capture layer), community submission + Zooniverse-pattern consensus review, a read-only relevance/confidence feedback loop with a human-gated weight-change path, citation integrity + link-rot repair ladder, pre-launch Sybil-detection/operator-protection signals with live robots/ai.txt/security.txt routes, and a consolidated production cloud-apply checklist (which surfaced 4 real infra-artifact gaps, filed as `black-book-2ve`). Four of six agents made concurrent additive edits to `confidence-engine/engine.ts` and `relevance/gates.ts`; all landed cleanly without collision, verified by a full-suite re-run after every agent reported.
-- **Cross-cutting fixes landed alongside these waves:** `black-book-e9z` (a false-positive workspace-cycle detection counting devDependencies, plus a test fixture that looked like a real cross-boundary import to the boundary scanner) and a second instance of the same import-scanner bug class (BB-089's legitimate "anthropic-ai" crawler-blocklist entry in `robots.ts` tripping the public-render-path guard) — both fixed by requiring real import/require syntax context in the respective detectors, rather than loosening the underlying security check. `pnpm validate` (boundaries + lint + governance) passes clean across the whole tree as of this point.
-- Newly unblocked by this pass: BB-051 (national map, still needs BB-049/050), BB-062 (release pipeline), BB-063 (beta launch gate), BB-072 (hybrid retrieval), BB-074/075 (gated/paid discovery adapters), BB-087 (legal landscape). Remaining ready work: the original tranche-5/6 public-product beads (BB-049/050/052–055/057–060), BB-072/074/075/082/086/087/088, and BB-080's own remaining item (verifying the delegated acceptance-criteria-inlining sub-agent's output on BB-049/050/052–055/057–060/062/063).
-
-### 2026-07-17 (continued — BB-090–095 entity ontology wave, then BB-048 unblock)
-
-- **BB-090–095 landed (entity ontology, jurisdiction registry, history graph substrate, corpus-vetting intake, sensitivity/advisory/disclaimer framework — all done).** Full detail in the two dedicated "BB-09x execution" sections above this one. Net effect: `bd ready` went empty afterward — nothing downstream had actually been unblocked, because the whole remaining P0 chain (BB-049→052→057→093, plus BB-051/052's own dependents) sat behind **BB-048**, which was `in_progress`/unassigned and stalled.
-- **BB-048 (public application shell and navigation) closed.** Routed through a `dispatcher` → `construct` two-stage analysis pass first (construct ran read-only, citing file:line evidence throughout — its own hand-off/`orchestration_run` remains non-functional in this solo deployment, consistent with the earlier BB-090/091 finding, so it self-answered via Read/Grep instead of reporting BLOCKED). Verdict: BB-048's PDF scope (`docs/source-spec/...pdf` p.30, Epic E) is the nav shell, not the data layer — "seed fixtures instead of live Firestore" is legitimately BB-049/BB-052's scope (BB-052 AC6 already forbids seed data explicitly), not a BB-048 blocker. The one real, provable BB-048 gap: two BB-022 helpers (`sanitizeClientErrorDisplay`, `isPublicReadApiDisabled`) had zero callers anywhere in `apps/web` despite being built and tested in BB-022.
-  - Implemented directly (small enough not to warrant a sub-agent): wired `sanitizeClientErrorDisplay` into `apps/web/src/app/error.tsx` (replacing its ad-hoc digest-only branch); added `apps/web/src/components/DegradedModeNotice.tsx` (wires `isPublicReadApiDisabled()` into a real shell-wide banner in `SiteShell`, alongside the existing client-side `OfflineNotice`).
-  - Fixed a latent "React is not defined" cross-transpile bug in `StatusPage.tsx` (same class as the earlier `packages/ui/Notice.tsx` fix — `jsx:"preserve"` + the `tsx`-based node test loader falls back to classic transform) — needed for `error.test.ts` to render at all.
-  - Added 4 tests (`DegradedModeNotice.test.ts`, `error.test.ts`), registered in `apps/web/package.json`'s explicit test list. Validated: `pnpm --filter @black-book/web test` (66/66), `typecheck`, `build`, `eslint --max-warnings 0` on changed files, `pnpm validate:boundaries` — all green. Verified live in-browser (homepage + entity page, no console errors).
-  - Recorded as the close-comment's explicit upgrade trigger: live entity/search reads are BB-049's and BB-052's job, not a new bead — the Firestore rules and typed path helpers (`infra/firebase/firestore.rules:281-299`, `packages/firebase/src/firestore/paths.ts:62-64`) already exist and need no new backend design, just a caller.
-- `bd ready` now surfaces **BB-049** (Search API and experience) as the next critical-path item.
-
-### 2026-07-17 (continued — BB-049 search API and experience, done)
-
-- **BB-049 (Search API and experience) closed.** Routed dispatcher → `construct` again first (construct's own `orchestration_run` hand-off still non-functional in solo deployment, third confirmation this session — self-answered via Read/Grep as before). Construct's scoping pass resolved two unknowns with citations before any code was written: (1) this repo's "public read API" convention is a Next.js Route Handler mirroring BB-076's `submit/api/route.ts` shape, never a call into the undeployed `apps/api-public` package (its Cloud Run surface is `"stub"` per `infra/gcp/surfaces/surface-matrix.json`); (2) BB-026's `evaluateSearchQueryGuardrails` had zero real callers anywhere in the repo — built and unit-tested in isolation only, the same "helper built, never wired" pattern BB-048 hit with `sanitizeClientErrorDisplay`.
-  - Executed in 3 tranches with the established exclusive-path-ownership pattern, `opus`-tier for the two security/core-domain agents per this session's own routing memory:
-    1. **Domain search module** (`opus`, sequential — everything else depends on it): new `packages/domain/src/search/` (`ranking.ts` deterministic tiered relevance + bounded Levenshtein fuzzy match, `facets.ts`, `explain.ts`, `index-build.ts`, `query.ts`) plus a new `publicSearchIndexSchema` in `packages/firebase/src/firestore/types.ts`. AC5 ("every published result carries a notabilityBasis — the gate holds at the search boundary") is enforced as defense-in-depth in `buildPublicSearchIndexDocs`, since `evaluateNotabilityGate`'s own intended call site (`packages/domain/src/publication/`) still doesn't call it — a gap this bead does not attempt to close, only route around. A failing record is skipped (not thrown), so one bad entity can't take down a whole index build. 639/639 domain tests pass; parent independently re-verified the AC5 gate and ranking-tier logic by reading the source, not just trusting the report.
-    2. **API route + guardrails** (`opus`, parallel with 3) and **frontend page wiring** (default tier, parallel with 2): `apps/web/src/app/search/api/route.ts` (thin Next entry) + `handler.ts` (testable core — Next's route-file type validator rejects any export from `route.ts` beyond HTTP methods/config, so the dependency-injectable handler had to live in a sibling file, same fix BB-048's `error.tsx`/`StatusPage.tsx` needed for its own reason); `packages/security/src/query-guardrails.ts` gained `'status' | 'era'` on `SearchFilterField` (the literal AC5 filter-allowlist requirement). The route is the first real caller of BB-026's guardrail — `route.test.ts` proves adversarial input (`?sql=`, `?q=***`) is rejected through the actual HTTP path, not just the bare function. `/search/page.tsx` now calls `runPublicSearch` directly (no self-fetch anti-pattern) over a snapshot search index; facet options are built from real counts, not the old hardcoded reconstruction/civil-rights seed-UI fiction.
-    3. **Shared snapshot-index adapter** (`apps/web/src/lib/search/snapshot-search-index.ts`) written directly by the parent, not delegated — connective tissue both tranche-2 agents needed, so writing it first avoided an ownership conflict. Adapts the 2-entity seed catalog into the domain search shape; synthesizes `notabilityBasis` from the seed's hand-authored `notabilityLabels` (reverse-mapped against `NOTABILITY_RUBRIC` text, falling back to `documented_site` when the seed prose paraphrases rather than quotes the rubric) so even the demo path exercises the real AC5 gate rather than bypassing it.
-  - One coordination incident, self-resolved: the frontend agent temporarily relocated the (untracked) `search/api/` directory to isolate a build failure while the route agent was actively writing to it, then restored all files immediately — parent verified via `git status`/`find` that nothing was lost.
-  - Validation: 639 domain + 145 firebase + 80 security + 88 web tests, typecheck, `pnpm validate:boundaries`, `eslint --max-warnings 0` on every changed file — all green. `pnpm --filter @black-book/web build` succeeds (`/search/api` now a real dynamic route). Verified via direct `curl` against both `next dev` and a `next start` production build that the server-rendered response contains real search results (`Matched: …`, real entity ids) — confirmed that a strange "stuck on loading.tsx forever" behavior seen in the automated preview-browser tool is a `next dev`-mode-only streaming/HMR instrumentation quirk specific to that tool (the inline React `$RC` boundary-swap script never executes in it), reproduced consistently but absent entirely under a production build; not a code defect, not filed as a bead.
-  - Surgical git staging reused again: `packages/domain/package.json`'s test-file list had pre-existing BB-074/075 carryover (reddit/web-search/common-crawl) mixed with this bead's new `search/*.test.ts` registrations — staged via `git hash-object`/`update-index` to include only the latter, leaving carryover unstaged exactly as found.
-  - Recorded scope boundary in the close reason: no live Firestore `publicSearchIndex` reader was built (the route/page both operate on the snapshot adapter) — a documented future seam, not a gap accidentally left open; BB-050/BB-052 are where a live reader would plug into the same `PublicSearchIndexDoc` contract without changing the route or page.
-- `bd ready` next.
+- Phases 1–3 done  
+- Phase 4 queued  

@@ -81,7 +81,7 @@ export { createAdminFirebaseClient } from './admin-client.js';
 export type { AdminFirebaseClient } from './admin-client.js';
 export * from './admin-auth.js';
 
-export { createServerFirebaseApp, getServerFirebaseApp } from './server.js';
+export { createServerFirebaseApp, getServerFirebaseApp, getServerFirestore } from './server.js';
 export type { ServerFirebaseApp } from './server.js';
 
 export {

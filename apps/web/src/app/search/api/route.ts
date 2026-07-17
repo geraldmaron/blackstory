@@ -8,7 +8,7 @@
  * before executing the pure `runPublicSearch` pipeline over `getSnapshotSearchIndex()` — see
  * `./handler` for the full request flow and the snapshot/live-reader seam.
  */
-import { getSnapshotSearchIndex } from '../../../lib/search/snapshot-search-index';
+import { getPublicSearchIndex } from '../../../lib/public-data/source';
 import { createSearchAppCheckGuard, type SearchAppCheckGuard } from './app-check-guard';
 import { createSearchRateLimitGuard } from './rate-limit-guard';
 import { handleSearchRequest } from './handler';
@@ -31,9 +31,10 @@ function getDefaultAppCheckGuard(): Promise<SearchAppCheckGuard> {
 
 export async function GET(request: Request): Promise<Response> {
   const appCheckGuard = await getDefaultAppCheckGuard();
+  const index = await getPublicSearchIndex();
   return handleSearchRequest(request, {
     appCheckGuard,
     rateLimitGuard: defaultRateLimitGuard,
-    searchIndex: getSnapshotSearchIndex(),
+    searchIndex: index.data,
   });
 }

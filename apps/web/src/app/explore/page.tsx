@@ -1,83 +1,111 @@
 /**
- * Location discovery entry page — UI scaffold until BB-050 geocoding lands.
+ * Map-first national explore page (BB-051): full U.S. view of every geo-anchored entity in the
+ * active release, synchronized accessible results list, shareable URL state, narrative off-ramps,
+ * and degraded snapshot mode. Filters use native GET navigation (no-JS safe); the client island
+ * adds the interactive MapLibre canvas, cluster drill-down, and viewport URL sync.
  */
-
-import { EmptyState, MapFrame, Notice } from '@black-book/ui';
+import React from 'react';
+import { FilterBar } from '@black-book/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
-import { listPublicEntities } from '../../data/public-seed';
+import { SynchronizedResultList } from '../../components/map-experience/SynchronizedResultList';
+import { listPublicEntityViews } from '../../lib/public-data/source';
+import { ExploreMapExperience } from './ExploreMapExperience';
+import { buildExploreViewModel } from './explore-view-model';
+import './explore.css';
+
+void React;
 
 export const metadata = {
   title: 'Explore',
-  description: 'Discover place-connected Black history near a U.S. location (scaffold).',
+  description:
+    'Map-first national view of documented Black history — every geo-anchored record in the active release.',
 };
 
-export default function ExplorePage() {
-  const entities = listPublicEntities();
-  const pins = entities.map((entity, index) => ({
-    id: entity.id,
-    label: entity.displayName,
-    x: entity.mapPin.x,
-    y: entity.mapPin.y + index * 2,
-  }));
+type ExplorePageProps = {
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function ExplorePage({ searchParams }: ExplorePageProps) {
+  const params = await searchParams;
+  const entities = await listPublicEntityViews();
+  const view = buildExploreViewModel(params, entities.data, entities.source);
 
   return (
-    <main className="bb-container bb-page" id="main">
-      <p className="bb-page__eyebrow">Location</p>
-      <h1 className="bb-page__title">Explore by place</h1>
-      <p className="bb-page__lede">
-        Enter a current U.S. city or ZIP to discover nearby historical records. Live geocoding and
-        radius search arrive in BB-050; this page shows schematic seed pins only.
-      </p>
+    <main className="bb-container bb-page bb-explore-page" id="main">
+      <header className="bb-explore-mast">
+        <h1 className="bb-explore-mast__title">Map</h1>
+        <p className="bb-explore-mast__lede">
+          The premier view — click a state or circular pin, filter records, and open map settings
+          for presence density, evidence-backed relationship lines, and decade scrubbing.
+        </p>
+      </header>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
-        <SeedDataNotice compact />
-        <Notice tone="warning" title="Geocoding not wired yet">
-          Address lookup, ZIP-to-history matching, and distance ranking are deferred to BB-050. No
-          residential street addresses are collected or displayed here.
-        </Notice>
+      <div className="bb-stack bb-explore-page__body">
+        {view.dataSource !== 'live' ? <SeedDataNotice compact /> : null}
 
-        <form className="bb-filters" method="get" action="/search" aria-label="Location discovery">
-          <fieldset className="bb-filters__fieldset">
-            <legend className="bb-filters__legend">Find history near a place</legend>
-            <div className="bb-filters__fields">
-              <div className="bb-filters__field">
-                <label className="bb-filters__label" htmlFor="explore-q">
-                  City or ZIP (modern input only)
-                </label>
-                <input
-                  className="bb-filters__control"
-                  id="explore-q"
-                  name="q"
-                  type="search"
-                  placeholder="e.g. Washington or 20001"
-                  autoComplete="address-level2"
-                />
-              </div>
-            </div>
-          </fieldset>
-          <div className="bb-filters__actions">
-            <button type="submit" className="bb-button bb-button--primary">
-              Search sample catalog
-            </button>
+        <noscript>
+          <div className="bb-explore__noscript">
+            <FilterBar
+              method="get"
+              action="/explore"
+              legend="Filter documented records"
+              fields={[
+                {
+                  id: 'explore-kind-njs',
+                  name: 'kind',
+                  label: 'Kind',
+                  type: 'select',
+                  defaultValue: view.viewState.filters.kind,
+                  options: view.facetOptions.kind,
+                },
+                {
+                  id: 'explore-era-njs',
+                  name: 'era',
+                  label: 'Era',
+                  type: 'select',
+                  defaultValue: view.viewState.filters.era,
+                  options: view.facetOptions.era,
+                },
+                {
+                  id: 'explore-theme-njs',
+                  name: 'theme',
+                  label: 'Theme',
+                  type: 'select',
+                  defaultValue: view.viewState.filters.theme,
+                  options: view.facetOptions.theme,
+                },
+                {
+                  id: 'explore-confidence-njs',
+                  name: 'confidence',
+                  label: 'Confidence',
+                  type: 'select',
+                  defaultValue: view.viewState.filters.confidence,
+                  options: view.facetOptions.confidence,
+                },
+              ]}
+            />
+            <p
+              className="bb-sans bb-explore__results-count"
+              id="explore-results-heading-njs"
+            >
+              {view.totalMatched} documented record{view.totalMatched === 1 ? '' : 's'} in view
+            </p>
+            <SynchronizedResultList
+              features={view.filteredFeatures}
+              labelledBy="explore-results-heading-njs"
+            />
           </div>
-        </form>
+        </noscript>
 
-        <MapFrame
-          title="Sample jurisdiction map"
-          caption="Schematic fixture pins for seed place and school records — city/campus precision only."
-          pins={pins}
-        />
+        <ExploreMapExperience initial={view} />
 
-        <EmptyState
-          title="Live nearby results coming later"
-          action={
-            <a className="bb-button bb-button--secondary" href="/search">
-              Browse all sample records
-            </a>
-          }
-        >
-          Until geocoding ships, use Search to open the two seed entities shown on this map.
-        </EmptyState>
+        <p className="bb-sans bb-explore__locate-link">
+          Looking for history near you?{' '}
+          <a className="bb-cta bb-cta--ink" href="/locate">
+            Find your jurisdiction
+          </a>
+          .
+        </p>
       </div>
     </main>
   );

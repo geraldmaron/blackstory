@@ -223,8 +223,8 @@ function parseArgs(argv: readonly string[]): {
   return result;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const args = parseArgs(process.argv.slice(2));
+async function mainCli(argv: string[]): Promise<void> {
+  const args = parseArgs(argv);
   const { app } = createServerFirebaseApp(process.env);
   const { getFirestore } = await import('firebase-admin/firestore');
   const firestore = getFirestore(app);
@@ -240,4 +240,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   });
 
   console.log(JSON.stringify(summary, null, 2));
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  void mainCli(process.argv.slice(2));
 }

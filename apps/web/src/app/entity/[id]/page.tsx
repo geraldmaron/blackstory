@@ -1,19 +1,30 @@
 /**
- * Entity detail scaffold for seed public records.
- * Full projection depth (BB-019) and evidence UI (BB-053) remain placeholders.
+ * Entity detail page for place/school/event/institution public records (BB-052). Shared layout,
+ * type-specific sections: relevance (BB-054 WhyThisAppears), historical context, BB-090 status,
+ * accepted claims via BB-053 EntityEvidencePanel, BB-092 graph-derived related records and
+ * timeline, location precision, record maturity, revision metadata, and a BB-095 sensitivity
+ * context banner when the record carries one. Sparse sections render the approved
+ * `RecordGapNotice` copy instead of a silent empty list.
  */
 
 import { notFound } from 'next/navigation';
-import {
-  Card,
-  Citation,
-  Confidence,
-  MapFrame,
-  Notice,
-  Timeline,
-} from '@black-book/ui';
+import { buildCompactFactViewsForEntity } from '@black-book/domain';
+import { Card, MapFrame, Notice, Timeline } from '@black-book/ui';
 import { SeedDataNotice } from '../../../components/SeedDataNotice';
-import { getPublicEntity, listPublicEntities } from '../../../data/public-seed';
+import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
+import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
+import { EntityRelatedList } from '../../../components/entity/EntityRelatedList';
+import { RecordGapNotice } from '../../../components/entity/RecordGapNotice';
+import { EntityEvidencePanel } from '../../../components/evidence';
+import { CompactFactReference } from '../../../components/facts';
+import { HowToReadThisRecord } from '../../../components/trust';
+import { WhyThisAppears } from '../../../components/why-appears';
+import { seedFactsForEntity } from '../../../data/facts-seed';
+import { listPublicEntities } from '../../../data/public-seed';
+import { buildExploreHref, geoAnchorFor } from '../../../lib/map-experience';
+import { resolvePublicEntityView } from '../../../lib/public-data/source';
+import { buildWhyThisAppearsForEntity, toEvidenceClaimInputs } from './adapters';
+import { deriveHistoricalFraming } from './entity-view-model';
 
 type EntityPageProps = {
   readonly params: Promise<{ id: string }>;
@@ -25,39 +36,57 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: EntityPageProps) {
   const { id } = await params;
-  const entity = getPublicEntity(id);
-  if (!entity) {
+  const resolved = await resolvePublicEntityView(id);
+  if (!resolved.data) {
     return { title: 'Record not found' };
   }
   return {
-    title: entity.displayName,
-    description: entity.summary,
+    title: resolved.data.displayName,
+    description: resolved.data.summary,
   };
 }
 
 export default async function EntityPage({ params }: EntityPageProps) {
   const { id } = await params;
-  const entity = getPublicEntity(id);
+  const resolved = await resolvePublicEntityView(id);
+  const entity = resolved.data;
   if (!entity) {
     notFound();
   }
 
-  const related = entity.relatedIds
-    .map((relatedId) => getPublicEntity(relatedId))
-    .filter((item): item is NonNullable<typeof item> => Boolean(item));
+  const framing = deriveHistoricalFraming(entity);
+  const framingLabel = framing === 'present_day' ? 'Present-day record' : 'Historical record';
+  const whyThisAppears = buildWhyThisAppearsForEntity(entity);
+  const evidenceClaims = toEvidenceClaimInputs(entity.claims);
+  const relatedFacts = buildCompactFactViewsForEntity(entity.id, seedFactsForEntity(entity.id));
+  const geoAnchor = geoAnchorFor(entity.id);
+  const exploreHref = buildExploreHref({
+    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    density: false,
+    lines: false,
+    selected: entity.id,
+    ...(geoAnchor
+      ? { viewport: { lat: geoAnchor.lat, lng: geoAnchor.lng, zoom: 11 } }
+      : {}),
+  });
 
   return (
     <main className="bb-container bb-page" id="main">
       <header className="bb-entity-mast">
         <p className="bb-page__eyebrow">
-          {entity.kind} · {entity.jurisdictionLabel}
+          {entity.kind} · {entity.jurisdictionLabel} · {framingLabel}
         </p>
         <h1 className="bb-page__title">{entity.displayName}</h1>
         <p className="bb-page__lede">{entity.summary}</p>
       </header>
 
       <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
-        <SeedDataNotice compact />
+        {resolved.source !== 'live' ? <SeedDataNotice compact /> : null}
+        <HowToReadThisRecord />
+
+        {entity.sensitivity ? (
+          <EntitySensitivityBanner sensitivity={entity.sensitivity} entityKind={entity.kind} />
+        ) : null}
 
         <div className="bb-entity-layout">
           <div className="bb-stack">
@@ -66,8 +95,27 @@ export default async function EntityPage({ params }: EntityPageProps) {
               <h2 className="bb-section__title" id="relevance-heading">
                 Why this appears
               </h2>
-              <p className="bb-section__lede">{entity.relevanceExplanation}</p>
-              {/* TODO(BB-054): replace with released “why this appears” narrative from projections */}
+              <div style={{ marginTop: 'var(--bb-space-4)' }}>
+                <WhyThisAppears result={whyThisAppears} instanceId={`entity-${entity.id}-why`} />
+              </div>
+            </section>
+
+            <section aria-labelledby="context-heading">
+              <p className="bb-section__kicker">Context</p>
+              <h2 className="bb-section__title" id="context-heading">
+                Historical context
+              </h2>
+              <p className="bb-section__lede">{entity.historicalContext}</p>
+            </section>
+
+            <section aria-labelledby="status-heading">
+              <p className="bb-section__kicker">Status</p>
+              <h2 className="bb-section__title" id="status-heading">
+                {entity.kind === 'event' ? 'When this happened' : 'Status and history'}
+              </h2>
+              <div style={{ marginTop: 'var(--bb-space-4)' }}>
+                <EntityStatusPanel entity={entity} framing={framing} />
+              </div>
             </section>
 
             <section aria-labelledby="claims-heading">
@@ -75,39 +123,32 @@ export default async function EntityPage({ params }: EntityPageProps) {
               <h2 className="bb-section__title" id="claims-heading">
                 Accepted claims
               </h2>
-              {entity.claims.length === 0 ? (
-                <p className="bb-sans" style={{ color: 'var(--bb-ink-muted)' }}>
-                  No published claims are attached to this seed fixture yet.
-                </p>
-              ) : (
+              <div style={{ marginTop: 'var(--bb-space-4)' }}>
+                {entity.claims.length === 0 ? (
+                  <RecordGapNotice kind="claims" />
+                ) : (
+                  <EntityEvidencePanel
+                    labelledBy="claims-heading"
+                    claims={evidenceClaims}
+                    researchCoverage={{ level: entity.researchCoverage }}
+                  />
+                )}
+              </div>
+            </section>
+
+            {relatedFacts.length > 0 ? (
+              <section aria-labelledby="facts-heading">
+                <p className="bb-section__kicker">Facts</p>
+                <h2 className="bb-section__title" id="facts-heading">
+                  Related fact records
+                </h2>
                 <div className="bb-stack" style={{ marginTop: 'var(--bb-space-4)' }}>
-                  {entity.claims.map((claim) => (
-                    <Card
-                      key={claim.id}
-                      title={`${claim.predicate.replaceAll('_', ' ')}: ${claim.object}`}
-                      meta={<span className="bb-mono">{claim.id}</span>}
-                    >
-                      <div className="bb-row" style={{ marginBottom: 'var(--bb-space-3)' }}>
-                        <Confidence level={claim.confidenceLevel} />
-                        <span className="bb-mono">score {claim.confidenceScore.toFixed(2)}</span>
-                      </div>
-                      <Citation
-                        source={claim.citationSource}
-                        label={claim.citationLabel}
-                        {...(claim.citationHref ? { href: claim.citationHref } : {})}
-                      />
-                      {claim.disputed ? (
-                        <div style={{ marginTop: 'var(--bb-space-3)' }}>
-                          <Notice tone="dispute" title="Preserved contradiction">
-                            {claim.disputeNote}
-                          </Notice>
-                        </div>
-                      ) : null}
-                    </Card>
+                  {relatedFacts.map((view) => (
+                    <CompactFactReference key={view.id} view={view} />
                   ))}
                 </div>
-              )}
-            </section>
+              </section>
+            ) : null}
 
             <section aria-labelledby="timeline-heading">
               <p className="bb-section__kicker">Chronology</p>
@@ -115,8 +156,16 @@ export default async function EntityPage({ params }: EntityPageProps) {
                 Timeline
               </h2>
               <div style={{ marginTop: 'var(--bb-space-4)' }}>
-                <Timeline labelledBy="timeline-heading" items={entity.timeline} />
+                {entity.timeline.length === 0 ? (
+                  <RecordGapNotice kind="timeline" />
+                ) : (
+                  <Timeline labelledBy="timeline-heading" items={entity.timeline} />
+                )}
               </div>
+              <p className="bb-sans" style={{ color: 'var(--bb-ink-muted)', marginTop: 'var(--bb-space-2)' }}>
+                Derived from this record&rsquo;s published BB-092 history graph and BB-090 status
+                history — never hand-authored prose.
+              </p>
             </section>
 
             <section aria-labelledby="related-heading">
@@ -124,34 +173,10 @@ export default async function EntityPage({ params }: EntityPageProps) {
               <h2 className="bb-section__title" id="related-heading">
                 Related records
               </h2>
-              {related.length === 0 ? (
-                <p className="bb-sans" style={{ color: 'var(--bb-ink-muted)' }}>
-                  No related sample records.
-                </p>
-              ) : (
-                <ul className="bb-story-rail" aria-labelledby="related-heading">
-                  {related.map((item) => (
-                    <li key={item.id}>
-                      <a className="bb-story-link" href={`/entity/${item.id}`}>
-                        <span className="bb-story-link__meta">{item.kind}</span>
-                        <h3 className="bb-story-link__title">{item.displayName}</h3>
-                        <p className="bb-story-link__summary">{item.summary}</p>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <div style={{ marginTop: 'var(--bb-space-4)' }}>
+                <EntityRelatedList entity={entity} labelledBy="related-heading" />
+              </div>
             </section>
-
-            <div className="bb-placeholder" role="note">
-              <p className="bb-placeholder__title">Evidence & projection depth</p>
-              <p style={{ margin: 0 }}>
-                Full evidence browser, revision history, and immutable snapshot payloads arrive with
-                BB-019 public projections and BB-053 evidence UI. This scaffold renders seed-safe
-                fields only.
-              </p>
-              {/* TODO(BB-015/BB-019): route person/location fields through public serializers + redaction */}
-            </div>
           </div>
 
           <aside className="bb-entity-aside" aria-label="Record context">
@@ -171,9 +196,18 @@ export default async function EntityPage({ params }: EntityPageProps) {
               </p>
             </Card>
 
+            <Card title="Revision" meta={<span className="bb-mono">{entity.revision.releaseId}</span>} as="section">
+              <dl className="bb-sans" style={{ margin: 0 }}>
+                <dt style={{ fontWeight: 600 }}>Record last updated</dt>
+                <dd style={{ margin: '0 0 var(--bb-space-2) 0' }}>{entity.revision.recordUpdatedAt}</dd>
+                <dt style={{ fontWeight: 600 }}>Release generated</dt>
+                <dd style={{ margin: 0 }}>{entity.revision.generatedAt}</dd>
+              </dl>
+            </Card>
+
             <MapFrame
               title={`${entity.displayName} map context`}
-              caption="Schematic pin — not survey-grade geometry."
+              caption="Schematic pin — not survey-grade geometry. Open the national map for the live geographic context."
               pins={[
                 {
                   id: entity.id,
@@ -183,6 +217,11 @@ export default async function EntityPage({ params }: EntityPageProps) {
                 },
               ]}
             />
+            <p style={{ margin: 0 }}>
+              <a className="bb-cta bb-cta--ink" href={exploreHref}>
+                View on map
+              </a>
+            </p>
           </aside>
         </div>
       </div>

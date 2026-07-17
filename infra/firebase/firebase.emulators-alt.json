@@ -1,0 +1,51 @@
+{
+  "$schema": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase-config.json",
+  "firestore": [
+    {
+      "database": "(default)",
+      "rules": "firestore.rules",
+      "indexes": "firestore.indexes.json"
+    },
+    {
+      "database": "raw-ingest",
+      "rules": "firestore.raw-ingest.rules",
+      "indexes": "firestore.raw-ingest.indexes.json"
+    },
+    {
+      "database": "curated",
+      "rules": "firestore.curated.rules",
+      "indexes": "firestore.curated.indexes.json"
+    }
+  ],
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "emulators": {
+    "auth": {
+      "host": "127.0.0.1",
+      "port": 9109
+    },
+    "firestore": {
+      "host": "127.0.0.1",
+      "port": 8180
+    },
+    "storage": {
+      "host": "127.0.0.1",
+      "port": 9299
+    },
+    "ui": {
+      "enabled": true,
+      "host": "127.0.0.1",
+      "port": 4500
+    },
+    "hub": {
+      "host": "127.0.0.1",
+      "port": 4501
+    },
+    "logging": {
+      "host": "127.0.0.1",
+      "port": 4502
+    },
+    "singleProjectMode": true
+  }
+}

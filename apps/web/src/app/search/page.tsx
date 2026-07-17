@@ -13,7 +13,7 @@
 
 import { EmptyState, FilterBar, ResultList } from '@black-book/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
-import { getSnapshotSearchIndex } from '../../lib/search/snapshot-search-index';
+import { getPublicSearchIndex } from '../../lib/public-data/source';
 import { buildSearchPageHref, buildSearchViewModel, type RawSearchParams } from './search-view-model';
 
 export const metadata = {
@@ -27,7 +27,8 @@ type SearchPageProps = {
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
-  const view = buildSearchViewModel(params, getSnapshotSearchIndex());
+  const index = await getPublicSearchIndex();
+  const view = buildSearchViewModel(params, index.data);
 
   return (
     <main className="bb-container bb-page" id="main">
@@ -35,14 +36,15 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <p className="bb-page__eyebrow">Index</p>
         <h1 className="bb-page__title">Search</h1>
         <p className="bb-page__lede">
-          Search runs against the current sample/snapshot catalog through the real Black Book
-          search pipeline — matches, facet counts, and match explanations below reflect that
-          pipeline, not a hardcoded seed filter. The underlying records are still sample data.
+          Search runs against the current{' '}
+          {index.source === 'live' ? 'live public release' : 'sample/snapshot catalog'} through the
+          real Black Book search pipeline — matches, facet counts, and match explanations below
+          reflect that pipeline, not a hardcoded seed filter.
         </p>
       </header>
 
       <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
-        <SeedDataNotice compact />
+        {index.source !== 'live' ? <SeedDataNotice compact /> : null}
 
         <FilterBar
           method="get"
