@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start --port 3001",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/surface.test.ts src/auth/server-authorization.test.ts",
+    "test": "node --conditions development --import tsx --test src/surface.test.ts src/auth/server-authorization.test.ts src/console.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

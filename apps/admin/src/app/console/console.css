@@ -1,0 +1,355 @@
+/**
+ * Styles the private console shell with the shared Black Book token vocabulary.
+ */
+
+.console-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bb-space-4);
+  min-height: 5rem;
+  padding: var(--bb-space-4) clamp(var(--bb-space-4), 3vw, var(--bb-space-8));
+  color: var(--bb-inverse-ink);
+  background: var(--bb-inverse);
+  border-bottom: var(--bb-border-width-strong) solid var(--bb-border-strong);
+}
+
+.console-brand {
+  color: inherit;
+  font-family: var(--bb-font-editorial);
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.console-kicker,
+.console-nav__label {
+  margin: 0;
+  font-family: var(--bb-font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.console-header .console-kicker {
+  color: var(--bb-inverse-ink);
+  opacity: 0.75;
+}
+
+.console-session {
+  margin: 0;
+  font-family: var(--bb-font-sans);
+  font-size: 0.8rem;
+}
+
+.console-frame {
+  display: grid;
+  min-height: calc(100vh - 5rem);
+}
+
+.console-nav {
+  padding: var(--bb-space-5) var(--bb-space-4);
+  font-family: var(--bb-font-sans);
+  background: var(--bb-surface);
+  border-bottom: var(--bb-border-width) solid var(--bb-border);
+}
+
+.console-nav__label {
+  margin-bottom: var(--bb-space-3);
+  color: var(--bb-ink-subtle);
+}
+
+.console-nav ul {
+  display: flex;
+  gap: var(--bb-space-2);
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+}
+
+.console-nav a {
+  display: block;
+  min-width: max-content;
+  padding: var(--bb-space-2) var(--bb-space-3);
+  color: var(--bb-ink);
+  border: var(--bb-border-width) solid var(--bb-border);
+  text-decoration: none;
+}
+
+.console-nav a:hover {
+  border-color: var(--bb-border-strong);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.console-main {
+  min-width: 0;
+}
+
+.console-page {
+  display: grid;
+  gap: var(--bb-space-8);
+  width: min(100% - (var(--bb-space-4) * 2), 78rem);
+  margin-inline: auto;
+  padding-block: clamp(var(--bb-space-6), 4vw, var(--bb-space-12));
+}
+
+.console-page__header {
+  max-width: 50rem;
+}
+
+.console-page__header h1 {
+  margin: var(--bb-space-2) 0;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.console-page__header > p:last-child {
+  margin: 0;
+  color: var(--bb-ink-muted);
+  font-family: var(--bb-font-sans);
+}
+
+.console-card-grid,
+.console-actions {
+  display: grid;
+  gap: var(--bb-space-4);
+}
+
+.console-card,
+.console-action {
+  padding: var(--bb-space-5);
+  background: var(--bb-surface-raised);
+  border: var(--bb-border-width) solid var(--bb-border);
+}
+
+.console-card h3 {
+  margin: var(--bb-space-2) 0;
+  font-size: 1.3rem;
+}
+
+.console-card h3 a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.console-card p,
+.console-action p {
+  font-family: var(--bb-font-sans);
+}
+
+.console-count,
+.console-permission,
+.console-action__note {
+  color: var(--bb-ink-subtle);
+  font-size: 0.8rem;
+}
+
+.console-notice {
+  padding: var(--bb-space-4);
+  color: var(--bb-warning-fg);
+  background: var(--bb-warning-bg);
+  border: var(--bb-border-width) solid var(--bb-warning-border);
+  font-family: var(--bb-font-sans);
+}
+
+.console-section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--bb-space-4);
+  margin-bottom: var(--bb-space-3);
+  border-bottom: var(--bb-border-width-strong) solid var(--bb-border-strong);
+}
+
+.console-section-heading h2 {
+  margin: 0 0 var(--bb-space-2);
+}
+
+.console-section-heading span {
+  color: var(--bb-ink-subtle);
+  font-family: var(--bb-font-sans);
+  font-size: 0.8rem;
+}
+
+.console-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.console-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--bb-font-sans);
+  font-size: 0.9rem;
+}
+
+.console-table-wrap th,
+.console-table-wrap td {
+  min-width: 11rem;
+  padding: var(--bb-space-3);
+  text-align: left;
+  vertical-align: top;
+  border-bottom: var(--bb-border-width) solid var(--bb-border);
+}
+
+.console-table-wrap thead th {
+  color: var(--bb-ink-subtle);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.console-table-wrap tbody th span {
+  display: block;
+}
+
+.console-mono,
+.console-action code {
+  font-family: var(--bb-font-mono);
+  font-size: 0.75rem;
+}
+
+.console-action {
+  display: grid;
+  gap: var(--bb-space-4);
+}
+
+.console-action > * {
+  margin-block: 0;
+}
+
+.console-action__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--bb-space-4);
+}
+
+.console-action__heading h3,
+.console-action__heading p {
+  margin: 0;
+}
+
+.console-badge {
+  padding: var(--bb-space-1) var(--bb-space-2);
+  border: var(--bb-border-width) solid var(--bb-border-strong);
+  font-family: var(--bb-font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.console-action fieldset {
+  display: grid;
+  gap: var(--bb-space-2);
+  margin: 0;
+  padding: var(--bb-space-4);
+  border: var(--bb-border-width) solid var(--bb-border-strong);
+  font-family: var(--bb-font-sans);
+}
+
+.console-action legend,
+.console-action label {
+  font-weight: 700;
+}
+
+.console-action textarea {
+  width: 100%;
+  padding: var(--bb-space-2);
+  color: var(--bb-ink);
+  background: var(--bb-surface);
+  border: var(--bb-border-width) solid var(--bb-border-strong);
+  font: inherit;
+}
+
+.console-diff {
+  padding: var(--bb-space-4);
+  background: var(--bb-surface);
+  border-left: var(--bb-border-width-strong) solid var(--bb-border-strong);
+}
+
+.console-diff__title {
+  margin: 0 0 var(--bb-space-2);
+  font-weight: 700;
+}
+
+.console-diff dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bb-space-4);
+  margin: 0;
+}
+
+.console-diff dl div {
+  display: grid;
+  gap: var(--bb-space-1);
+}
+
+.console-diff dt {
+  color: var(--bb-ink-subtle);
+  font-family: var(--bb-font-sans);
+  font-size: 0.75rem;
+}
+
+.console-diff dd {
+  margin: 0;
+  font-family: var(--bb-font-mono);
+  font-size: 1.1rem;
+}
+
+.console-button {
+  justify-self: start;
+  min-height: 2.75rem;
+  padding: var(--bb-space-2) var(--bb-space-4);
+  color: var(--bb-inverse-ink);
+  background: var(--bb-inverse);
+  border: var(--bb-border-width) solid var(--bb-border-strong);
+  font-family: var(--bb-font-sans);
+  font-weight: 700;
+}
+
+.console-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (min-width: 48rem) {
+  .console-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 72rem) {
+  .console-frame {
+    grid-template-columns: 16rem minmax(0, 1fr);
+  }
+
+  .console-nav {
+    border-right: var(--bb-border-width) solid var(--bb-border);
+    border-bottom: 0;
+  }
+
+  .console-nav ul {
+    display: grid;
+    overflow: visible;
+  }
+
+  .console-nav a {
+    min-width: 0;
+  }
+
+  .console-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .console-nav a {
+    scroll-behavior: auto;
+  }
+}

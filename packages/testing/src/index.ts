@@ -99,3 +99,4 @@ export type {
 } from './security/threat-corpus.js';
 
 export * from './security-gates/index.js';
+export * from './gold-corpus/index.js';

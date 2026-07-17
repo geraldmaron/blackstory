@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blackbook.local/schemas/gold-corpus/gold-corpus.v1.schema.json",
+  "title": "Black Book Gold Corpus",
+  "description": "Versioned, synthetic, human-adjudicated examples for cross-domain publication evaluation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "corpusVersion",
+    "adjudicatedAt",
+    "adjudicationProtocol",
+    "examples"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "gold-corpus.v1" },
+    "corpusVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "adjudicatedAt": { "type": "string", "format": "date-time" },
+    "adjudicationProtocol": { "type": "string", "minLength": 1 },
+    "examples": {
+      "type": "array",
+      "minItems": 100,
+      "maxItems": 200,
+      "items": { "$ref": "#/$defs/example" }
+    }
+  },
+  "$defs": {
+    "category": {
+      "enum": [
+        "included_school",
+        "excluded_school",
+        "relevant_person",
+        "irrelevant_person",
+        "disputed_claim",
+        "high_impact_claim",
+        "sparse_record",
+        "living_person",
+        "private_residence",
+        "sundown_town_candidate",
+        "geographic_ambiguity",
+        "source_lineage"
+      ]
+    },
+    "example": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "synthetic",
+        "categories",
+        "subjectType",
+        "adjudication",
+        "context"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^gc-[0-9]{3}$" },
+        "title": { "type": "string", "minLength": 1 },
+        "synthetic": { "const": true },
+        "categories": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/category" }
+        },
+        "subjectType": {
+          "enum": ["school", "person", "claim", "place", "source_lineage"]
+        },
+        "adjudication": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "relevance",
+            "publicationAllowed",
+            "claim",
+            "impact",
+            "citationEntailed",
+            "confidenceOutcome",
+            "entityResolution",
+            "rationale"
+          ],
+          "properties": {
+            "relevance": { "enum": ["include", "exclude", "supporting_context"] },
+            "publicationAllowed": { "type": "boolean" },
+            "claim": {
+              "enum": ["supported", "disputed", "unsupported", "not_applicable"]
+            },
+            "impact": { "enum": ["standard", "high_impact"] },
+            "citationEntailed": { "type": "boolean" },
+            "confidenceOutcome": { "type": "boolean" },
+            "entityResolution": { "enum": ["match", "no_match", "review_required"] },
+            "expectedEntityId": { "type": "string", "minLength": 1 },
+            "rationale": { "type": "string", "minLength": 20 }
+          }
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recordCompleteness",
+            "livingPerson",
+            "privateResidence",
+            "geographicAmbiguity",
+            "lineageRootIds"
+          ],
+          "properties": {
+            "recordCompleteness": { "enum": ["sparse", "partial", "substantial"] },
+            "livingPerson": { "type": "boolean" },
+            "privateResidence": { "type": "boolean" },
+            "geographicAmbiguity": { "type": "boolean" },
+            "lineageRootIds": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

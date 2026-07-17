@@ -1,0 +1,1025 @@
+{
+  "schemaVersion": "gold-predictions.v1",
+  "algorithmVersion": "policy.v1-before",
+  "corpusVersion": "1.0.0",
+  "generatedAt": "2026-07-17T00:00:00.000Z",
+  "predictions": [
+    {
+      "exampleId": "gc-001",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.25,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-002",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-002"
+    },
+    {
+      "exampleId": "gc-003",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-003"
+    },
+    {
+      "exampleId": "gc-004",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-004"
+    },
+    {
+      "exampleId": "gc-005",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-005"
+    },
+    {
+      "exampleId": "gc-006",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-006"
+    },
+    {
+      "exampleId": "gc-007",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-007"
+    },
+    {
+      "exampleId": "gc-008",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-008"
+    },
+    {
+      "exampleId": "gc-009",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-009"
+    },
+    {
+      "exampleId": "gc-010",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.25,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-011",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-012",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-013",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-014",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-015",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-016",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-017",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-018",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-019",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.75,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "incorrect-gc-019"
+    },
+    {
+      "exampleId": "gc-020",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-021",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-021"
+    },
+    {
+      "exampleId": "gc-022",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-022"
+    },
+    {
+      "exampleId": "gc-023",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-023"
+    },
+    {
+      "exampleId": "gc-024",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-024"
+    },
+    {
+      "exampleId": "gc-025",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-025"
+    },
+    {
+      "exampleId": "gc-026",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-026"
+    },
+    {
+      "exampleId": "gc-027",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-027"
+    },
+    {
+      "exampleId": "gc-028",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.25,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-029",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-029"
+    },
+    {
+      "exampleId": "gc-030",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-030"
+    },
+    {
+      "exampleId": "gc-031",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-032",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-033",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-034",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-035",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-036",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-037",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.75,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "incorrect-gc-037"
+    },
+    {
+      "exampleId": "gc-038",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-039",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-040",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "no_match"
+    },
+    {
+      "exampleId": "gc-041",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-042",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-043",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-044",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-045",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-046",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.75,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "incorrect-gc-046"
+    },
+    {
+      "exampleId": "gc-047",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-048",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-049",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-050",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-051",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-051"
+    },
+    {
+      "exampleId": "gc-052",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-052"
+    },
+    {
+      "exampleId": "gc-053",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-053"
+    },
+    {
+      "exampleId": "gc-054",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-054"
+    },
+    {
+      "exampleId": "gc-055",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.25,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-056",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-056"
+    },
+    {
+      "exampleId": "gc-057",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-057"
+    },
+    {
+      "exampleId": "gc-058",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-058"
+    },
+    {
+      "exampleId": "gc-059",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-059"
+    },
+    {
+      "exampleId": "gc-060",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-060"
+    },
+    {
+      "exampleId": "gc-061",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-061"
+    },
+    {
+      "exampleId": "gc-062",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-063",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-063"
+    },
+    {
+      "exampleId": "gc-064",
+      "relevance": "exclude",
+      "publish": true,
+      "confidence": 0.75,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "incorrect-gc-064"
+    },
+    {
+      "exampleId": "gc-065",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-065"
+    },
+    {
+      "exampleId": "gc-066",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-067",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-067"
+    },
+    {
+      "exampleId": "gc-068",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-069",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-069"
+    },
+    {
+      "exampleId": "gc-070",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-071",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-071"
+    },
+    {
+      "exampleId": "gc-072",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-072"
+    },
+    {
+      "exampleId": "gc-073",
+      "relevance": "exclude",
+      "publish": false,
+      "confidence": 0.25,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-074",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-074"
+    },
+    {
+      "exampleId": "gc-075",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-075"
+    },
+    {
+      "exampleId": "gc-076",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-076"
+    },
+    {
+      "exampleId": "gc-077",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-077"
+    },
+    {
+      "exampleId": "gc-078",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-078"
+    },
+    {
+      "exampleId": "gc-079",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-079"
+    },
+    {
+      "exampleId": "gc-080",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-080"
+    },
+    {
+      "exampleId": "gc-081",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-082",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.75,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "incorrect-gc-082"
+    },
+    {
+      "exampleId": "gc-083",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-084",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-085",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-086",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-087",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-088",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-089",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-090",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-091",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.75,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "incorrect-gc-091"
+    },
+    {
+      "exampleId": "gc-092",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-093",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-094",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-095",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-096",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-097",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-098",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-099",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-100",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.75,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "incorrect-gc-100"
+    },
+    {
+      "exampleId": "gc-101",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-102",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-103",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-104",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-105",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-106",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-107",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-108",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-109",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.75,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "incorrect-gc-109"
+    },
+    {
+      "exampleId": "gc-110",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-111",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-111"
+    },
+    {
+      "exampleId": "gc-112",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-112"
+    },
+    {
+      "exampleId": "gc-113",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-113"
+    },
+    {
+      "exampleId": "gc-114",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-114"
+    },
+    {
+      "exampleId": "gc-115",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-115"
+    },
+    {
+      "exampleId": "gc-116",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-116"
+    },
+    {
+      "exampleId": "gc-117",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-117"
+    },
+    {
+      "exampleId": "gc-118",
+      "relevance": "exclude",
+      "publish": true,
+      "confidence": 0.75,
+      "citationEntailed": true,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-119",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.78,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-119"
+    },
+    {
+      "exampleId": "gc-120",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.22,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-120"
+    }
+  ]
+}

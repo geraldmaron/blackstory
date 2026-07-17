@@ -1,0 +1,3448 @@
+{
+  "schemaVersion": "gold-corpus.v1",
+  "corpusVersion": "1.0.0",
+  "adjudicatedAt": "2026-07-17T00:00:00.000Z",
+  "adjudicationProtocol": "Synthetic two-person adjudication protocol: independent labels, disagreement review, and recorded consensus rationale.",
+  "examples": [
+    {
+      "id": "gc-001",
+      "title": "Included school with documented Black educational history — scenario 1",
+      "synthetic": true,
+      "categories": [
+        "included_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-001",
+        "rationale": "Two-person synthetic adjudication for included_school; scenario 1 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-001"
+        ]
+      }
+    },
+    {
+      "id": "gc-002",
+      "title": "Included school with documented Black educational history — scenario 2",
+      "synthetic": true,
+      "categories": [
+        "included_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-002",
+        "rationale": "Two-person synthetic adjudication for included_school; scenario 2 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-002"
+        ]
+      }
+    },
+    {
+      "id": "gc-003",
+      "title": "Included school with documented Black educational history — scenario 3",
+      "synthetic": true,
+      "categories": [
+        "included_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-003",
+        "rationale": "Two-person synthetic adjudication for included_school; scenario 3 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-003"
+        ]
+      }
+    },
+    {
+      "id": "gc-004",
+      "title": "Included school with documented Black educational history — scenario 4",
+      "synthetic": true,
+      "categories": [
+        "included_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-004",
+        "rationale": "Two-person synthetic adjudication for included_school; scenario 4 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-004"
+        ]
+      }
+    },
+    {
+      "id": "gc-005",
+      "title": "Included school with documented Black educational history — scenario 5",
+      "synthetic": true,
+      "categories": [
+        "included_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-005",
+        "rationale": "Two-person synthetic adjudication for included_school; scenario 5 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-005"
+        ]
+      }
+    },
+    {
+      "id": "gc-006",
+      "title": "Included school with documented Black educational history — scenario 6",
+      "synthetic": true,
+      "categories": [
+        "included_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-006",
+        "rationale": "Two-person synthetic adjudication for included_school; scenario 6 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-006"
+        ]
+      }
+    },
+    {
+      "id": "gc-007",
+      "title": "Included school with documented Black educational history — scenario 7",
+      "synthetic": true,
+      "categories": [
+        "included_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-007",
+        "rationale": "Two-person synthetic adjudication for included_school; scenario 7 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-007"
+        ]
+      }
+    },
+    {
+      "id": "gc-008",
+      "title": "Included school with documented Black educational history — scenario 8",
+      "synthetic": true,
+      "categories": [
+        "included_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-008",
+        "rationale": "Two-person synthetic adjudication for included_school; scenario 8 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-008"
+        ]
+      }
+    },
+    {
+      "id": "gc-009",
+      "title": "Included school with documented Black educational history — scenario 9",
+      "synthetic": true,
+      "categories": [
+        "included_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-009",
+        "rationale": "Two-person synthetic adjudication for included_school; scenario 9 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-009"
+        ]
+      }
+    },
+    {
+      "id": "gc-010",
+      "title": "Included school with documented Black educational history — scenario 10",
+      "synthetic": true,
+      "categories": [
+        "included_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-010",
+        "rationale": "Two-person synthetic adjudication for included_school; scenario 10 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-010"
+        ]
+      }
+    },
+    {
+      "id": "gc-011",
+      "title": "Excluded school with only a coincidental name match — scenario 1",
+      "synthetic": true,
+      "categories": [
+        "excluded_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "unsupported",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for excluded_school; scenario 1 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-011"
+        ]
+      }
+    },
+    {
+      "id": "gc-012",
+      "title": "Excluded school with only a coincidental name match — scenario 2",
+      "synthetic": true,
+      "categories": [
+        "excluded_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "unsupported",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for excluded_school; scenario 2 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-012"
+        ]
+      }
+    },
+    {
+      "id": "gc-013",
+      "title": "Excluded school with only a coincidental name match — scenario 3",
+      "synthetic": true,
+      "categories": [
+        "excluded_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "unsupported",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for excluded_school; scenario 3 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-013"
+        ]
+      }
+    },
+    {
+      "id": "gc-014",
+      "title": "Excluded school with only a coincidental name match — scenario 4",
+      "synthetic": true,
+      "categories": [
+        "excluded_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "unsupported",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for excluded_school; scenario 4 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-014"
+        ]
+      }
+    },
+    {
+      "id": "gc-015",
+      "title": "Excluded school with only a coincidental name match — scenario 5",
+      "synthetic": true,
+      "categories": [
+        "excluded_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "unsupported",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for excluded_school; scenario 5 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-015"
+        ]
+      }
+    },
+    {
+      "id": "gc-016",
+      "title": "Excluded school with only a coincidental name match — scenario 6",
+      "synthetic": true,
+      "categories": [
+        "excluded_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "unsupported",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for excluded_school; scenario 6 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-016"
+        ]
+      }
+    },
+    {
+      "id": "gc-017",
+      "title": "Excluded school with only a coincidental name match — scenario 7",
+      "synthetic": true,
+      "categories": [
+        "excluded_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "unsupported",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for excluded_school; scenario 7 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-017"
+        ]
+      }
+    },
+    {
+      "id": "gc-018",
+      "title": "Excluded school with only a coincidental name match — scenario 8",
+      "synthetic": true,
+      "categories": [
+        "excluded_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "unsupported",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for excluded_school; scenario 8 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-018"
+        ]
+      }
+    },
+    {
+      "id": "gc-019",
+      "title": "Excluded school with only a coincidental name match — scenario 9",
+      "synthetic": true,
+      "categories": [
+        "excluded_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "unsupported",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for excluded_school; scenario 9 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-019"
+        ]
+      }
+    },
+    {
+      "id": "gc-020",
+      "title": "Excluded school with only a coincidental name match — scenario 10",
+      "synthetic": true,
+      "categories": [
+        "excluded_school"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "unsupported",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for excluded_school; scenario 10 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-020"
+        ]
+      }
+    },
+    {
+      "id": "gc-021",
+      "title": "Relevant historical person connected to local Black history — scenario 1",
+      "synthetic": true,
+      "categories": [
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-021",
+        "rationale": "Two-person synthetic adjudication for relevant_person; scenario 1 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-021"
+        ]
+      }
+    },
+    {
+      "id": "gc-022",
+      "title": "Relevant historical person connected to local Black history — scenario 2",
+      "synthetic": true,
+      "categories": [
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-022",
+        "rationale": "Two-person synthetic adjudication for relevant_person; scenario 2 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-022"
+        ]
+      }
+    },
+    {
+      "id": "gc-023",
+      "title": "Relevant historical person connected to local Black history — scenario 3",
+      "synthetic": true,
+      "categories": [
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-023",
+        "rationale": "Two-person synthetic adjudication for relevant_person; scenario 3 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-023"
+        ]
+      }
+    },
+    {
+      "id": "gc-024",
+      "title": "Relevant historical person connected to local Black history — scenario 4",
+      "synthetic": true,
+      "categories": [
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-024",
+        "rationale": "Two-person synthetic adjudication for relevant_person; scenario 4 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-024"
+        ]
+      }
+    },
+    {
+      "id": "gc-025",
+      "title": "Relevant historical person connected to local Black history — scenario 5",
+      "synthetic": true,
+      "categories": [
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-025",
+        "rationale": "Two-person synthetic adjudication for relevant_person; scenario 5 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-025"
+        ]
+      }
+    },
+    {
+      "id": "gc-026",
+      "title": "Relevant historical person connected to local Black history — scenario 6",
+      "synthetic": true,
+      "categories": [
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-026",
+        "rationale": "Two-person synthetic adjudication for relevant_person; scenario 6 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-026"
+        ]
+      }
+    },
+    {
+      "id": "gc-027",
+      "title": "Relevant historical person connected to local Black history — scenario 7",
+      "synthetic": true,
+      "categories": [
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-027",
+        "rationale": "Two-person synthetic adjudication for relevant_person; scenario 7 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-027"
+        ]
+      }
+    },
+    {
+      "id": "gc-028",
+      "title": "Relevant historical person connected to local Black history — scenario 8",
+      "synthetic": true,
+      "categories": [
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-028",
+        "rationale": "Two-person synthetic adjudication for relevant_person; scenario 8 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-028"
+        ]
+      }
+    },
+    {
+      "id": "gc-029",
+      "title": "Relevant historical person connected to local Black history — scenario 9",
+      "synthetic": true,
+      "categories": [
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-029",
+        "rationale": "Two-person synthetic adjudication for relevant_person; scenario 9 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-029"
+        ]
+      }
+    },
+    {
+      "id": "gc-030",
+      "title": "Relevant historical person connected to local Black history — scenario 10",
+      "synthetic": true,
+      "categories": [
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-030",
+        "rationale": "Two-person synthetic adjudication for relevant_person; scenario 10 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-030"
+        ]
+      }
+    },
+    {
+      "id": "gc-031",
+      "title": "Irrelevant person sharing a name with a historical subject — scenario 1",
+      "synthetic": true,
+      "categories": [
+        "irrelevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for irrelevant_person; scenario 1 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-031"
+        ]
+      }
+    },
+    {
+      "id": "gc-032",
+      "title": "Irrelevant person sharing a name with a historical subject — scenario 2",
+      "synthetic": true,
+      "categories": [
+        "irrelevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for irrelevant_person; scenario 2 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-032"
+        ]
+      }
+    },
+    {
+      "id": "gc-033",
+      "title": "Irrelevant person sharing a name with a historical subject — scenario 3",
+      "synthetic": true,
+      "categories": [
+        "irrelevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for irrelevant_person; scenario 3 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-033"
+        ]
+      }
+    },
+    {
+      "id": "gc-034",
+      "title": "Irrelevant person sharing a name with a historical subject — scenario 4",
+      "synthetic": true,
+      "categories": [
+        "irrelevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for irrelevant_person; scenario 4 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-034"
+        ]
+      }
+    },
+    {
+      "id": "gc-035",
+      "title": "Irrelevant person sharing a name with a historical subject — scenario 5",
+      "synthetic": true,
+      "categories": [
+        "irrelevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for irrelevant_person; scenario 5 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-035"
+        ]
+      }
+    },
+    {
+      "id": "gc-036",
+      "title": "Irrelevant person sharing a name with a historical subject — scenario 6",
+      "synthetic": true,
+      "categories": [
+        "irrelevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for irrelevant_person; scenario 6 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-036"
+        ]
+      }
+    },
+    {
+      "id": "gc-037",
+      "title": "Irrelevant person sharing a name with a historical subject — scenario 7",
+      "synthetic": true,
+      "categories": [
+        "irrelevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for irrelevant_person; scenario 7 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-037"
+        ]
+      }
+    },
+    {
+      "id": "gc-038",
+      "title": "Irrelevant person sharing a name with a historical subject — scenario 8",
+      "synthetic": true,
+      "categories": [
+        "irrelevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for irrelevant_person; scenario 8 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-038"
+        ]
+      }
+    },
+    {
+      "id": "gc-039",
+      "title": "Irrelevant person sharing a name with a historical subject — scenario 9",
+      "synthetic": true,
+      "categories": [
+        "irrelevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for irrelevant_person; scenario 9 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-039"
+        ]
+      }
+    },
+    {
+      "id": "gc-040",
+      "title": "Irrelevant person sharing a name with a historical subject — scenario 10",
+      "synthetic": true,
+      "categories": [
+        "irrelevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "exclude",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "no_match",
+        "rationale": "Two-person synthetic adjudication for irrelevant_person; scenario 10 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-040"
+        ]
+      }
+    },
+    {
+      "id": "gc-041",
+      "title": "Disputed claim with credible contradictory accounts — scenario 1",
+      "synthetic": true,
+      "categories": [
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for disputed_claim; scenario 1 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-041"
+        ]
+      }
+    },
+    {
+      "id": "gc-042",
+      "title": "Disputed claim with credible contradictory accounts — scenario 2",
+      "synthetic": true,
+      "categories": [
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for disputed_claim; scenario 2 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-042"
+        ]
+      }
+    },
+    {
+      "id": "gc-043",
+      "title": "Disputed claim with credible contradictory accounts — scenario 3",
+      "synthetic": true,
+      "categories": [
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for disputed_claim; scenario 3 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-043"
+        ]
+      }
+    },
+    {
+      "id": "gc-044",
+      "title": "Disputed claim with credible contradictory accounts — scenario 4",
+      "synthetic": true,
+      "categories": [
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for disputed_claim; scenario 4 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-044"
+        ]
+      }
+    },
+    {
+      "id": "gc-045",
+      "title": "Disputed claim with credible contradictory accounts — scenario 5",
+      "synthetic": true,
+      "categories": [
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for disputed_claim; scenario 5 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-045"
+        ]
+      }
+    },
+    {
+      "id": "gc-046",
+      "title": "Disputed claim with credible contradictory accounts — scenario 6",
+      "synthetic": true,
+      "categories": [
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for disputed_claim; scenario 6 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-046"
+        ]
+      }
+    },
+    {
+      "id": "gc-047",
+      "title": "Disputed claim with credible contradictory accounts — scenario 7",
+      "synthetic": true,
+      "categories": [
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for disputed_claim; scenario 7 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-047"
+        ]
+      }
+    },
+    {
+      "id": "gc-048",
+      "title": "Disputed claim with credible contradictory accounts — scenario 8",
+      "synthetic": true,
+      "categories": [
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for disputed_claim; scenario 8 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-048"
+        ]
+      }
+    },
+    {
+      "id": "gc-049",
+      "title": "Disputed claim with credible contradictory accounts — scenario 9",
+      "synthetic": true,
+      "categories": [
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for disputed_claim; scenario 9 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-049"
+        ]
+      }
+    },
+    {
+      "id": "gc-050",
+      "title": "Disputed claim with credible contradictory accounts — scenario 10",
+      "synthetic": true,
+      "categories": [
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for disputed_claim; scenario 10 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-050"
+        ]
+      }
+    },
+    {
+      "id": "gc-051",
+      "title": "High-impact allegation requiring independent corroboration — scenario 1",
+      "synthetic": true,
+      "categories": [
+        "high_impact_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "high_impact",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-051",
+        "rationale": "Two-person synthetic adjudication for high_impact_claim; scenario 1 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-051"
+        ]
+      }
+    },
+    {
+      "id": "gc-052",
+      "title": "High-impact allegation requiring independent corroboration — scenario 2",
+      "synthetic": true,
+      "categories": [
+        "high_impact_claim",
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "high_impact",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-052",
+        "rationale": "Two-person synthetic adjudication for high_impact_claim; scenario 2 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-052"
+        ]
+      }
+    },
+    {
+      "id": "gc-053",
+      "title": "High-impact allegation requiring independent corroboration — scenario 3",
+      "synthetic": true,
+      "categories": [
+        "high_impact_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "high_impact",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-053",
+        "rationale": "Two-person synthetic adjudication for high_impact_claim; scenario 3 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-053"
+        ]
+      }
+    },
+    {
+      "id": "gc-054",
+      "title": "High-impact allegation requiring independent corroboration — scenario 4",
+      "synthetic": true,
+      "categories": [
+        "high_impact_claim",
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "high_impact",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-054",
+        "rationale": "Two-person synthetic adjudication for high_impact_claim; scenario 4 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-054"
+        ]
+      }
+    },
+    {
+      "id": "gc-055",
+      "title": "High-impact allegation requiring independent corroboration — scenario 5",
+      "synthetic": true,
+      "categories": [
+        "high_impact_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "high_impact",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-055",
+        "rationale": "Two-person synthetic adjudication for high_impact_claim; scenario 5 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-055"
+        ]
+      }
+    },
+    {
+      "id": "gc-056",
+      "title": "High-impact allegation requiring independent corroboration — scenario 6",
+      "synthetic": true,
+      "categories": [
+        "high_impact_claim",
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "high_impact",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-056",
+        "rationale": "Two-person synthetic adjudication for high_impact_claim; scenario 6 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-056"
+        ]
+      }
+    },
+    {
+      "id": "gc-057",
+      "title": "High-impact allegation requiring independent corroboration — scenario 7",
+      "synthetic": true,
+      "categories": [
+        "high_impact_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "high_impact",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-057",
+        "rationale": "Two-person synthetic adjudication for high_impact_claim; scenario 7 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-057"
+        ]
+      }
+    },
+    {
+      "id": "gc-058",
+      "title": "High-impact allegation requiring independent corroboration — scenario 8",
+      "synthetic": true,
+      "categories": [
+        "high_impact_claim",
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "high_impact",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-058",
+        "rationale": "Two-person synthetic adjudication for high_impact_claim; scenario 8 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-058"
+        ]
+      }
+    },
+    {
+      "id": "gc-059",
+      "title": "High-impact allegation requiring independent corroboration — scenario 9",
+      "synthetic": true,
+      "categories": [
+        "high_impact_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "high_impact",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-059",
+        "rationale": "Two-person synthetic adjudication for high_impact_claim; scenario 9 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-059"
+        ]
+      }
+    },
+    {
+      "id": "gc-060",
+      "title": "High-impact allegation requiring independent corroboration — scenario 10",
+      "synthetic": true,
+      "categories": [
+        "high_impact_claim",
+        "disputed_claim"
+      ],
+      "subjectType": "claim",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "high_impact",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-060",
+        "rationale": "Two-person synthetic adjudication for high_impact_claim; scenario 10 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-060"
+        ]
+      }
+    },
+    {
+      "id": "gc-061",
+      "title": "Sparse record with a minimally documented historical identity — scenario 1",
+      "synthetic": true,
+      "categories": [
+        "sparse_record"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-061",
+        "rationale": "Two-person synthetic adjudication for sparse_record; scenario 1 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "sparse",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-061"
+        ]
+      }
+    },
+    {
+      "id": "gc-062",
+      "title": "Sparse record with a minimally documented historical identity — scenario 2",
+      "synthetic": true,
+      "categories": [
+        "sparse_record",
+        "geographic_ambiguity"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sparse_record; scenario 2 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "sparse",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-062"
+        ]
+      }
+    },
+    {
+      "id": "gc-063",
+      "title": "Sparse record with a minimally documented historical identity — scenario 3",
+      "synthetic": true,
+      "categories": [
+        "sparse_record"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-063",
+        "rationale": "Two-person synthetic adjudication for sparse_record; scenario 3 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "sparse",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-063"
+        ]
+      }
+    },
+    {
+      "id": "gc-064",
+      "title": "Sparse record with a minimally documented historical identity — scenario 4",
+      "synthetic": true,
+      "categories": [
+        "sparse_record",
+        "geographic_ambiguity"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sparse_record; scenario 4 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "sparse",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-064"
+        ]
+      }
+    },
+    {
+      "id": "gc-065",
+      "title": "Sparse record with a minimally documented historical identity — scenario 5",
+      "synthetic": true,
+      "categories": [
+        "sparse_record"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-065",
+        "rationale": "Two-person synthetic adjudication for sparse_record; scenario 5 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "sparse",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-065"
+        ]
+      }
+    },
+    {
+      "id": "gc-066",
+      "title": "Sparse record with a minimally documented historical identity — scenario 6",
+      "synthetic": true,
+      "categories": [
+        "sparse_record",
+        "geographic_ambiguity"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sparse_record; scenario 6 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "sparse",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-066"
+        ]
+      }
+    },
+    {
+      "id": "gc-067",
+      "title": "Sparse record with a minimally documented historical identity — scenario 7",
+      "synthetic": true,
+      "categories": [
+        "sparse_record"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-067",
+        "rationale": "Two-person synthetic adjudication for sparse_record; scenario 7 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "sparse",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-067"
+        ]
+      }
+    },
+    {
+      "id": "gc-068",
+      "title": "Sparse record with a minimally documented historical identity — scenario 8",
+      "synthetic": true,
+      "categories": [
+        "sparse_record",
+        "geographic_ambiguity"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sparse_record; scenario 8 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "sparse",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-068"
+        ]
+      }
+    },
+    {
+      "id": "gc-069",
+      "title": "Sparse record with a minimally documented historical identity — scenario 9",
+      "synthetic": true,
+      "categories": [
+        "sparse_record"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-069",
+        "rationale": "Two-person synthetic adjudication for sparse_record; scenario 9 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "sparse",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-069"
+        ]
+      }
+    },
+    {
+      "id": "gc-070",
+      "title": "Sparse record with a minimally documented historical identity — scenario 10",
+      "synthetic": true,
+      "categories": [
+        "sparse_record",
+        "geographic_ambiguity"
+      ],
+      "subjectType": "school",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sparse_record; scenario 10 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "sparse",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-070"
+        ]
+      }
+    },
+    {
+      "id": "gc-071",
+      "title": "Living person represented by synthetic public-role evidence — scenario 1",
+      "synthetic": true,
+      "categories": [
+        "living_person",
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-071",
+        "rationale": "Two-person synthetic adjudication for living_person; scenario 1 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": true,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-071"
+        ]
+      }
+    },
+    {
+      "id": "gc-072",
+      "title": "Living person represented by synthetic public-role evidence — scenario 2",
+      "synthetic": true,
+      "categories": [
+        "living_person",
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-072",
+        "rationale": "Two-person synthetic adjudication for living_person; scenario 2 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": true,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-072"
+        ]
+      }
+    },
+    {
+      "id": "gc-073",
+      "title": "Living person represented by synthetic public-role evidence — scenario 3",
+      "synthetic": true,
+      "categories": [
+        "living_person",
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-073",
+        "rationale": "Two-person synthetic adjudication for living_person; scenario 3 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": true,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-073"
+        ]
+      }
+    },
+    {
+      "id": "gc-074",
+      "title": "Living person represented by synthetic public-role evidence — scenario 4",
+      "synthetic": true,
+      "categories": [
+        "living_person",
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-074",
+        "rationale": "Two-person synthetic adjudication for living_person; scenario 4 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": true,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-074"
+        ]
+      }
+    },
+    {
+      "id": "gc-075",
+      "title": "Living person represented by synthetic public-role evidence — scenario 5",
+      "synthetic": true,
+      "categories": [
+        "living_person",
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-075",
+        "rationale": "Two-person synthetic adjudication for living_person; scenario 5 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": true,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-075"
+        ]
+      }
+    },
+    {
+      "id": "gc-076",
+      "title": "Living person represented by synthetic public-role evidence — scenario 6",
+      "synthetic": true,
+      "categories": [
+        "living_person",
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-076",
+        "rationale": "Two-person synthetic adjudication for living_person; scenario 6 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": true,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-076"
+        ]
+      }
+    },
+    {
+      "id": "gc-077",
+      "title": "Living person represented by synthetic public-role evidence — scenario 7",
+      "synthetic": true,
+      "categories": [
+        "living_person",
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-077",
+        "rationale": "Two-person synthetic adjudication for living_person; scenario 7 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": true,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-077"
+        ]
+      }
+    },
+    {
+      "id": "gc-078",
+      "title": "Living person represented by synthetic public-role evidence — scenario 8",
+      "synthetic": true,
+      "categories": [
+        "living_person",
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-078",
+        "rationale": "Two-person synthetic adjudication for living_person; scenario 8 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": true,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-078"
+        ]
+      }
+    },
+    {
+      "id": "gc-079",
+      "title": "Living person represented by synthetic public-role evidence — scenario 9",
+      "synthetic": true,
+      "categories": [
+        "living_person",
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-079",
+        "rationale": "Two-person synthetic adjudication for living_person; scenario 9 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": true,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-079"
+        ]
+      }
+    },
+    {
+      "id": "gc-080",
+      "title": "Living person represented by synthetic public-role evidence — scenario 10",
+      "synthetic": true,
+      "categories": [
+        "living_person",
+        "relevant_person"
+      ],
+      "subjectType": "person",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-080",
+        "rationale": "Two-person synthetic adjudication for living_person; scenario 10 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": true,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-080"
+        ]
+      }
+    },
+    {
+      "id": "gc-081",
+      "title": "Private residence appearing in a historical source — scenario 1",
+      "synthetic": true,
+      "categories": [
+        "private_residence"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for private_residence; scenario 1 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": true,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-081"
+        ]
+      }
+    },
+    {
+      "id": "gc-082",
+      "title": "Private residence appearing in a historical source — scenario 2",
+      "synthetic": true,
+      "categories": [
+        "private_residence"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for private_residence; scenario 2 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": true,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-082"
+        ]
+      }
+    },
+    {
+      "id": "gc-083",
+      "title": "Private residence appearing in a historical source — scenario 3",
+      "synthetic": true,
+      "categories": [
+        "private_residence"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for private_residence; scenario 3 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": true,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-083"
+        ]
+      }
+    },
+    {
+      "id": "gc-084",
+      "title": "Private residence appearing in a historical source — scenario 4",
+      "synthetic": true,
+      "categories": [
+        "private_residence"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for private_residence; scenario 4 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": true,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-084"
+        ]
+      }
+    },
+    {
+      "id": "gc-085",
+      "title": "Private residence appearing in a historical source — scenario 5",
+      "synthetic": true,
+      "categories": [
+        "private_residence"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for private_residence; scenario 5 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": true,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-085"
+        ]
+      }
+    },
+    {
+      "id": "gc-086",
+      "title": "Private residence appearing in a historical source — scenario 6",
+      "synthetic": true,
+      "categories": [
+        "private_residence"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for private_residence; scenario 6 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": true,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-086"
+        ]
+      }
+    },
+    {
+      "id": "gc-087",
+      "title": "Private residence appearing in a historical source — scenario 7",
+      "synthetic": true,
+      "categories": [
+        "private_residence"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for private_residence; scenario 7 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": true,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-087"
+        ]
+      }
+    },
+    {
+      "id": "gc-088",
+      "title": "Private residence appearing in a historical source — scenario 8",
+      "synthetic": true,
+      "categories": [
+        "private_residence"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for private_residence; scenario 8 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": true,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-088"
+        ]
+      }
+    },
+    {
+      "id": "gc-089",
+      "title": "Private residence appearing in a historical source — scenario 9",
+      "synthetic": true,
+      "categories": [
+        "private_residence"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for private_residence; scenario 9 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": true,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-089"
+        ]
+      }
+    },
+    {
+      "id": "gc-090",
+      "title": "Private residence appearing in a historical source — scenario 10",
+      "synthetic": true,
+      "categories": [
+        "private_residence"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for private_residence; scenario 10 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": true,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-090"
+        ]
+      }
+    },
+    {
+      "id": "gc-091",
+      "title": "Candidate sundown town supported only by preliminary evidence — scenario 1",
+      "synthetic": true,
+      "categories": [
+        "sundown_town_candidate"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sundown_town_candidate; scenario 1 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-091"
+        ]
+      }
+    },
+    {
+      "id": "gc-092",
+      "title": "Candidate sundown town supported only by preliminary evidence — scenario 2",
+      "synthetic": true,
+      "categories": [
+        "sundown_town_candidate"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sundown_town_candidate; scenario 2 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-092"
+        ]
+      }
+    },
+    {
+      "id": "gc-093",
+      "title": "Candidate sundown town supported only by preliminary evidence — scenario 3",
+      "synthetic": true,
+      "categories": [
+        "sundown_town_candidate"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sundown_town_candidate; scenario 3 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-093"
+        ]
+      }
+    },
+    {
+      "id": "gc-094",
+      "title": "Candidate sundown town supported only by preliminary evidence — scenario 4",
+      "synthetic": true,
+      "categories": [
+        "sundown_town_candidate"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sundown_town_candidate; scenario 4 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-094"
+        ]
+      }
+    },
+    {
+      "id": "gc-095",
+      "title": "Candidate sundown town supported only by preliminary evidence — scenario 5",
+      "synthetic": true,
+      "categories": [
+        "sundown_town_candidate"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sundown_town_candidate; scenario 5 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-095"
+        ]
+      }
+    },
+    {
+      "id": "gc-096",
+      "title": "Candidate sundown town supported only by preliminary evidence — scenario 6",
+      "synthetic": true,
+      "categories": [
+        "sundown_town_candidate"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sundown_town_candidate; scenario 6 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-096"
+        ]
+      }
+    },
+    {
+      "id": "gc-097",
+      "title": "Candidate sundown town supported only by preliminary evidence — scenario 7",
+      "synthetic": true,
+      "categories": [
+        "sundown_town_candidate"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sundown_town_candidate; scenario 7 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-097"
+        ]
+      }
+    },
+    {
+      "id": "gc-098",
+      "title": "Candidate sundown town supported only by preliminary evidence — scenario 8",
+      "synthetic": true,
+      "categories": [
+        "sundown_town_candidate"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sundown_town_candidate; scenario 8 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-098"
+        ]
+      }
+    },
+    {
+      "id": "gc-099",
+      "title": "Candidate sundown town supported only by preliminary evidence — scenario 9",
+      "synthetic": true,
+      "categories": [
+        "sundown_town_candidate"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sundown_town_candidate; scenario 9 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-099"
+        ]
+      }
+    },
+    {
+      "id": "gc-100",
+      "title": "Candidate sundown town supported only by preliminary evidence — scenario 10",
+      "synthetic": true,
+      "categories": [
+        "sundown_town_candidate"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for sundown_town_candidate; scenario 10 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-100"
+        ]
+      }
+    },
+    {
+      "id": "gc-101",
+      "title": "Ambiguous place name shared by multiple jurisdictions — scenario 1",
+      "synthetic": true,
+      "categories": [
+        "geographic_ambiguity"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for geographic_ambiguity; scenario 1 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-101"
+        ]
+      }
+    },
+    {
+      "id": "gc-102",
+      "title": "Ambiguous place name shared by multiple jurisdictions — scenario 2",
+      "synthetic": true,
+      "categories": [
+        "geographic_ambiguity"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for geographic_ambiguity; scenario 2 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-102"
+        ]
+      }
+    },
+    {
+      "id": "gc-103",
+      "title": "Ambiguous place name shared by multiple jurisdictions — scenario 3",
+      "synthetic": true,
+      "categories": [
+        "geographic_ambiguity"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for geographic_ambiguity; scenario 3 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-103"
+        ]
+      }
+    },
+    {
+      "id": "gc-104",
+      "title": "Ambiguous place name shared by multiple jurisdictions — scenario 4",
+      "synthetic": true,
+      "categories": [
+        "geographic_ambiguity"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for geographic_ambiguity; scenario 4 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-104"
+        ]
+      }
+    },
+    {
+      "id": "gc-105",
+      "title": "Ambiguous place name shared by multiple jurisdictions — scenario 5",
+      "synthetic": true,
+      "categories": [
+        "geographic_ambiguity"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for geographic_ambiguity; scenario 5 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-105"
+        ]
+      }
+    },
+    {
+      "id": "gc-106",
+      "title": "Ambiguous place name shared by multiple jurisdictions — scenario 6",
+      "synthetic": true,
+      "categories": [
+        "geographic_ambiguity"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for geographic_ambiguity; scenario 6 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-106"
+        ]
+      }
+    },
+    {
+      "id": "gc-107",
+      "title": "Ambiguous place name shared by multiple jurisdictions — scenario 7",
+      "synthetic": true,
+      "categories": [
+        "geographic_ambiguity"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for geographic_ambiguity; scenario 7 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-107"
+        ]
+      }
+    },
+    {
+      "id": "gc-108",
+      "title": "Ambiguous place name shared by multiple jurisdictions — scenario 8",
+      "synthetic": true,
+      "categories": [
+        "geographic_ambiguity"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for geographic_ambiguity; scenario 8 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-108"
+        ]
+      }
+    },
+    {
+      "id": "gc-109",
+      "title": "Ambiguous place name shared by multiple jurisdictions — scenario 9",
+      "synthetic": true,
+      "categories": [
+        "geographic_ambiguity"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for geographic_ambiguity; scenario 9 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-109"
+        ]
+      }
+    },
+    {
+      "id": "gc-110",
+      "title": "Ambiguous place name shared by multiple jurisdictions — scenario 10",
+      "synthetic": true,
+      "categories": [
+        "geographic_ambiguity"
+      ],
+      "subjectType": "place",
+      "adjudication": {
+        "relevance": "supporting_context",
+        "publicationAllowed": false,
+        "claim": "not_applicable",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "review_required",
+        "rationale": "Two-person synthetic adjudication for geographic_ambiguity; scenario 10 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": true,
+        "lineageRootIds": [
+          "lineage-gc-110"
+        ]
+      }
+    },
+    {
+      "id": "gc-111",
+      "title": "Source set requiring syndicated-lineage deduplication — scenario 1",
+      "synthetic": true,
+      "categories": [
+        "source_lineage"
+      ],
+      "subjectType": "source_lineage",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-111",
+        "rationale": "Two-person synthetic adjudication for source_lineage; scenario 1 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-111-a",
+          "lineage-gc-111-b"
+        ]
+      }
+    },
+    {
+      "id": "gc-112",
+      "title": "Source set requiring syndicated-lineage deduplication — scenario 2",
+      "synthetic": true,
+      "categories": [
+        "source_lineage"
+      ],
+      "subjectType": "source_lineage",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-112",
+        "rationale": "Two-person synthetic adjudication for source_lineage; scenario 2 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-112-shared"
+        ]
+      }
+    },
+    {
+      "id": "gc-113",
+      "title": "Source set requiring syndicated-lineage deduplication — scenario 3",
+      "synthetic": true,
+      "categories": [
+        "source_lineage"
+      ],
+      "subjectType": "source_lineage",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-113",
+        "rationale": "Two-person synthetic adjudication for source_lineage; scenario 3 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-113-a",
+          "lineage-gc-113-b"
+        ]
+      }
+    },
+    {
+      "id": "gc-114",
+      "title": "Source set requiring syndicated-lineage deduplication — scenario 4",
+      "synthetic": true,
+      "categories": [
+        "source_lineage"
+      ],
+      "subjectType": "source_lineage",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-114",
+        "rationale": "Two-person synthetic adjudication for source_lineage; scenario 4 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-114-shared"
+        ]
+      }
+    },
+    {
+      "id": "gc-115",
+      "title": "Source set requiring syndicated-lineage deduplication — scenario 5",
+      "synthetic": true,
+      "categories": [
+        "source_lineage"
+      ],
+      "subjectType": "source_lineage",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-115",
+        "rationale": "Two-person synthetic adjudication for source_lineage; scenario 5 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-115-a",
+          "lineage-gc-115-b"
+        ]
+      }
+    },
+    {
+      "id": "gc-116",
+      "title": "Source set requiring syndicated-lineage deduplication — scenario 6",
+      "synthetic": true,
+      "categories": [
+        "source_lineage"
+      ],
+      "subjectType": "source_lineage",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-116",
+        "rationale": "Two-person synthetic adjudication for source_lineage; scenario 6 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-116-shared"
+        ]
+      }
+    },
+    {
+      "id": "gc-117",
+      "title": "Source set requiring syndicated-lineage deduplication — scenario 7",
+      "synthetic": true,
+      "categories": [
+        "source_lineage"
+      ],
+      "subjectType": "source_lineage",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-117",
+        "rationale": "Two-person synthetic adjudication for source_lineage; scenario 7 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-117-a",
+          "lineage-gc-117-b"
+        ]
+      }
+    },
+    {
+      "id": "gc-118",
+      "title": "Source set requiring syndicated-lineage deduplication — scenario 8",
+      "synthetic": true,
+      "categories": [
+        "source_lineage"
+      ],
+      "subjectType": "source_lineage",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-118",
+        "rationale": "Two-person synthetic adjudication for source_lineage; scenario 8 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-118-shared"
+        ]
+      }
+    },
+    {
+      "id": "gc-119",
+      "title": "Source set requiring syndicated-lineage deduplication — scenario 9",
+      "synthetic": true,
+      "categories": [
+        "source_lineage"
+      ],
+      "subjectType": "source_lineage",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": true,
+        "claim": "supported",
+        "impact": "standard",
+        "citationEntailed": true,
+        "confidenceOutcome": true,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-119",
+        "rationale": "Two-person synthetic adjudication for source_lineage; scenario 9 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "substantial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-119-a",
+          "lineage-gc-119-b"
+        ]
+      }
+    },
+    {
+      "id": "gc-120",
+      "title": "Source set requiring syndicated-lineage deduplication — scenario 10",
+      "synthetic": true,
+      "categories": [
+        "source_lineage"
+      ],
+      "subjectType": "source_lineage",
+      "adjudication": {
+        "relevance": "include",
+        "publicationAllowed": false,
+        "claim": "disputed",
+        "impact": "standard",
+        "citationEntailed": false,
+        "confidenceOutcome": false,
+        "entityResolution": "match",
+        "expectedEntityId": "entity-gc-120",
+        "rationale": "Two-person synthetic adjudication for source_lineage; scenario 10 exercises deterministic scope, evidence, privacy, and publication policy."
+      },
+      "context": {
+        "recordCompleteness": "partial",
+        "livingPerson": false,
+        "privateResidence": false,
+        "geographicAmbiguity": false,
+        "lineageRootIds": [
+          "lineage-gc-120-shared"
+        ]
+      }
+    }
+  ]
+}

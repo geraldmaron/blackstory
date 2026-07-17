@@ -4,14 +4,14 @@ Tracks the Execution Beads (BB-001–BB-066) from *Black Book Web Application Ex
 
 **Source:** `/Users/geralddagher/Downloads/Black Book Web Application Execution Beads.pdf`  
 **Workspace:** `/Users/geralddagher/Developer/Projects/black-book` (greenfield as of 2026-07-16)  
-**Active focus:** Wave 6 — **BB-047** gold corpus, **BB-056** admin console. BB-048 remains partial.
+**Active focus:** Wave 6 complete (BB-047/056). BB-048 remains partial; next public product beads still blocked.
 
 ## Multi-agent coordination (2026-07-17 wave 6)
 
 | Bead | Model tier | Exclusive ownership (do not cross) | Status |
 |------|------------|------------------------------------|--------|
-| BB-047 | stronger (eval) | `packages/testing/src/gold-corpus/`, `packages/schemas/gold-corpus/`, `docs/research/gold-corpus.md`, `scripts/gold-corpus/` | `in_progress` |
-| BB-056 | stronger (admin UI) | `apps/admin/` (pages/components beyond existing auth), `docs/admin/research-console.md` | `in_progress` |
+| BB-047 | stronger (eval) | `packages/testing/src/gold-corpus/`, `packages/schemas/gold-corpus/`, `docs/research/gold-corpus.md`, `scripts/gold-corpus/` | `done` |
+| BB-056 | stronger (admin UI) | `apps/admin/` (pages/components beyond existing auth), `docs/admin/research-console.md` | `done` |
 
 **Shared (parent only):** `plan.md`, `packages/testing/src/index.ts`, root `README.md`. Do not touch `apps/web/**` (BB-048).
 
@@ -95,8 +95,8 @@ Tracks the Execution Beads (BB-001–BB-066) from *Black Book Web Application Ex
 | 1 | Secure foundation | BB-001–006, 008–010 | 9/9 |
 | 2 | Data and publication boundary | BB-011–020 | 9/10 (BB-012 deferred) |
 | 3 | Hostile-environment protection | BB-021–030, 032–036 | 13/15 (BB-021–030,032–036 done) |
-| 4 | Research and evidence engine | BB-037–044, 047 | 8/9 (BB-037–044 done; 047 launching) |
-| 5 | Public beta product | BB-048–050, 052–057 | 0/9 (BB-048 partial) |
+| 4 | Research and evidence engine | BB-037–044, 047 | 9/9 |
+| 5 | Public beta product | BB-048–050, 052–057 | 1/9 (BB-056 done; BB-048 partial) |
 | 6 | Seed and launch | BB-045–046, 058–063 | 2/8 (045/046 done) |
 | Deferred | Later capabilities | BB-012, 031, 051, 064–066 | 0/6 |
 
@@ -313,7 +313,7 @@ infra/
 | BB-042 | Atomic claim extraction and evidence registration | P0 | L | BB-016, BB-017, BB-041 | `done` |
 | BB-043 | Confidence and source-lineage engine | P0 | L | BB-017, BB-042 | `done` |
 | BB-044 | Research-case and publication workflow | P0 | L | BB-040–043 | `done` |
-| BB-047 | Gold corpus and calibration harness | P0 | L | BB-040, BB-041, BB-043, BB-044 | `in_progress` |
+| BB-047 | Gold corpus and calibration harness | P0 | L | BB-040, BB-041, BB-043, BB-044 | `done` |
 
 ---
 
@@ -328,7 +328,7 @@ infra/
 | BB-053 | Evidence, confidence, dispute, and revision interface | P0 | L | BB-017, BB-019, BB-052 | `todo` |
 | BB-054 | “Why this appears” and balanced historical storytelling | P0 | M | BB-003, BB-040, BB-052 | `todo` |
 | BB-055 | Correction and challenge experience | P0 | L | BB-029, BB-032, BB-052 | `todo` |
-| BB-056 | Administration and research console | P0 | XL | BB-027, BB-037, BB-044 | `in_progress` |
+| BB-056 | Administration and research console | P0 | XL | BB-027, BB-037, BB-044 | `done` |
 | BB-057 | Accessibility, SEO, performance, and privacy review | P0 | L | BB-048–056 | `todo` |
 
 ---
