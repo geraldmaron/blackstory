@@ -1,5 +1,14 @@
 # D-013 — Single-project production
 
+> **Superseded 2026-07-17 by [ADR-012](../../docs/adr/ADR-012-production-environment-resplit.md)
+> (BB-078).** The re-split triggers named below ("independent compliance/billing/incident/recovery
+> boundaries") were judged met by the 2026-07-17 owner brief, at the cheapest point this migration
+> will ever be (nothing live yet). This entry is kept as history, not deleted — see ADR-012 for the
+> three-project topology (`blackbook-prod` = this same `black-book-efaaf` project retained,
+> `blackbook-staging`, `blackbook-internal`) and `docs/security/environment-isolation.md` for the
+> current design. Nothing described below has been undone; it simply stopped being the target the
+> moment ADR-012 was accepted.
+
 Use the existing live Firebase/GCP project `black-book-efaaf` (project `332234323945`, Hosting
 `black-book-efaaf.web.app`) as the one production project. Do not create the four BB-005 target
 projects now.

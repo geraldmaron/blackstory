@@ -37,12 +37,23 @@ resource "google_iam_workload_identity_pool_provider" "github_actions" {
   }
 }
 
-// Optional staging deploy SA (same project; configuration separation only).
+// Optional blackbook-staging deploy SA (ADR-012: distinct project, real isolation boundary
+// from blackbook-prod - unlike the pre-ADR-012 same-project optional identity this replaces).
 resource "google_service_account" "github_deploy_staging" {
   count = var.enable_staging_deploy_identity ? 1 : 0
 
-  project      = var.project_id
+  project      = var.staging_project_id
   account_id   = var.staging_deploy_sa_id
-  display_name = "GitHub Actions staging deploy (WIF, non-isolated)"
-  description  = "Optional same-project staging deploy identity. Not a security boundary."
+  display_name = "GitHub Actions blackbook-staging deploy (WIF)"
+  description  = "ADR-012 blackbook-staging deploy identity. Synthetic data only; still not a security-critical identity, but now project-isolated from blackbook-prod."
+}
+
+// Optional blackbook-internal deploy SA (ADR-012: research pipeline + admin project).
+resource "google_service_account" "github_deploy_internal" {
+  count = var.enable_internal_deploy_identity ? 1 : 0
+
+  project      = var.internal_project_id
+  account_id   = var.internal_deploy_sa_id
+  display_name = "GitHub Actions blackbook-internal deploy (WIF)"
+  description  = "ADR-012 blackbook-internal deploy identity for research/publication/security/admin. Never has any IAM in blackbook-prod."
 }

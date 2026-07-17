@@ -1,9 +1,14 @@
-# Production WIF inputs for black-book-efaaf. Copy to prod.tfvars after a GitHub remote exists.
-# No secrets belong in this file. Numeric IDs are TBD until gh can resolve the repository.
+# WIF inputs for the ADR-012 three-project topology (BB-078). One pool, hosted in blackbook-prod
+# (black-book-efaaf); per-project deploy SAs in blackbook-staging/blackbook-internal once those
+# projects exist. Copy to prod.tfvars after a GitHub remote exists. No secrets belong in this file.
+# Numeric IDs are TBD until gh can resolve the repository; new project IDs are TBD until BB-079
+# creates blackbook-staging/blackbook-internal.
 
-project_id     = "black-book-efaaf"
-project_number = "332234323945"
-region         = "us-central1"
+project_id          = "black-book-efaaf" # blackbook-prod (ADR-012: retained, not recreated)
+project_number      = "332234323945"
+region              = "us-central1"
+staging_project_id  = "blackbook-staging"  # TBD: fill after BB-079 creates the project
+internal_project_id = "blackbook-internal" # TBD: fill after BB-079 creates the project
 
 wif_pool_id     = "black-book-github"
 wif_provider_id = "github-actions"
@@ -18,9 +23,16 @@ production_environment   = "production"
 production_workflow_file = ".github/workflows/deploy-production.yml"
 production_deploy_sa_id  = "github-deploy"
 
-# Same-project staging is configuration only; keep false until a staging environment is needed.
+# blackbook-staging is now a distinct project (ADR-012), not same-project configuration. Keep
+# false until the project exists and a staging deploy workflow is reviewed.
 enable_staging_deploy_identity = false
 staging_environment            = "staging"
 staging_deploy_sa_id           = "github-deploy-staging"
+
+# blackbook-internal hosts research/publication/security/admin. Keep false until the project
+# exists and an internal deploy workflow is reviewed.
+enable_internal_deploy_identity = false
+internal_environment            = "internal"
+internal_deploy_sa_id           = "github-deploy-internal"
 
 manage_deploy_project_roles = true

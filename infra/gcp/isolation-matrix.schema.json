@@ -54,6 +54,34 @@
         }
       }
     },
+    "productionResplitTarget": {
+      "type": "object",
+      "description": "ADR-012 (BB-078) three-project re-split target. Additive to deferredMultiProjectTarget; does not change mode/currentProject, which still describe the live single-project state until BB-079 applies this.",
+      "additionalProperties": false,
+      "required": ["status", "adr", "migrationBead", "projects"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["design-not-applied", "in-progress", "applied"]
+        },
+        "adr": { "type": "string", "pattern": "^ADR-\\d{3}$" },
+        "migrationBead": { "type": "string", "minLength": 1 },
+        "projects": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["projectId", "role", "retainedFrom"],
+            "properties": {
+              "projectId": { "type": "string", "minLength": 1 },
+              "role": { "type": "string", "minLength": 1 },
+              "retainedFrom": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    },
     "updatedAt": { "type": "string" },
     "status": { "type": "string", "enum": ["design", "partial", "applied"] },
     "notes": { "type": "array", "items": { "type": "string" } },

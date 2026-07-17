@@ -43,7 +43,7 @@ Effects:
 
 ## IAM principal set (Workload Identity User)
 
-On `github-deploy@black-book-efaaf.iam.gserviceaccount.com`:
+On `github-deploy@black-book-efaaf.iam.gserviceaccount.com` (blackbook-prod):
 
 ```text
 principalSet://iam.googleapis.com/projects/332234323945/locations/global/workloadIdentityPools/black-book-github/attribute.environment/production
@@ -52,8 +52,22 @@ principalSet://iam.googleapis.com/projects/332234323945/locations/global/workloa
 Combined with the provider condition, only tokens that already cleared the CEL filter and carry
 `environment=production` may impersonate the deploy SA.
 
-Optional staging (same project, not a security boundary) uses environment `staging` and a separate
-SA when `enable_staging_deploy_identity=true`.
+### Per-project deploy identities (ADR-012)
+
+The pool and provider stay hosted in `blackbook-prod` (a WIF pool is a project-scoped resource), but
+the principal sets it mints are granted IAM in whichever project each deploy SA actually lives in:
+
+| Environment claim | Deploy SA | Deploy SA's project | Enabled by |
+|--------------------|-----------|----------------------|------------|
+| `production` | `github-deploy` | `blackbook-prod` (`black-book-efaaf`) | always (required) |
+| `staging` | `github-deploy-staging` | `blackbook-staging` | `enable_staging_deploy_identity=true` |
+| `internal` | `github-deploy-internal` | `blackbook-internal` | `enable_internal_deploy_identity=true` |
+
+A token minted with `environment=staging` satisfies only the `staging` principal set and can
+therefore only impersonate `github-deploy-staging`, which itself can only `ActAs` runtime SAs inside
+`blackbook-staging` (see `deploy-roles.md`). It has no path to `blackbook-prod` or
+`blackbook-internal` credentials. Same isolation applies to `internal`. This is the concrete
+mechanism behind ADR-012's "cross-environment deploys fail at IAM, not convention."
 
 ## Short-lived credentials
 

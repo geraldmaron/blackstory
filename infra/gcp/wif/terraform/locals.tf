@@ -18,10 +18,14 @@ locals {
     "${local.github_full_name}/.github/workflows/deploy-staging.yml@refs/heads/main"
   )
 
-  // Provider-level CEL: numeric IDs + main + (production | optional staging) environment/workflow.
-  // Empty IDs intentionally produce an impossible condition so plan/apply cannot
-  // accidentally create a wide-open provider. IAM principal sets further bind each
-  // environment claim to the matching deploy SA.
+  internal_workflow_ref_prefix = (
+    "${local.github_full_name}/.github/workflows/deploy-internal.yml@refs/heads/main"
+  )
+
+  // Provider-level CEL: numeric IDs + main + (production | optional staging | optional internal)
+  // environment/workflow. Empty IDs intentionally produce an impossible condition so plan/apply
+  // cannot accidentally create a wide-open provider. IAM principal sets further bind each
+  // environment claim to the matching per-project deploy SA (ADR-012: one pool, per-project SAs).
   production_trust = join(" && ", [
     "assertion.environment == \"${var.production_environment}\"",
     "assertion.workflow_ref.startsWith(\"${local.production_workflow_ref_prefix}\")",
@@ -32,11 +36,18 @@ locals {
     "assertion.workflow_ref.startsWith(\"${local.staging_workflow_ref_prefix}\")",
   ])
 
-  environment_trust = (
-    var.enable_staging_deploy_identity
-    ? "(${local.production_trust}) || (${local.staging_trust})"
-    : "(${local.production_trust})"
+  internal_trust = join(" && ", [
+    "assertion.environment == \"${var.internal_environment}\"",
+    "assertion.workflow_ref.startsWith(\"${local.internal_workflow_ref_prefix}\")",
+  ])
+
+  environment_trust_clauses = concat(
+    ["(${local.production_trust})"],
+    var.enable_staging_deploy_identity ? ["(${local.staging_trust})"] : [],
+    var.enable_internal_deploy_identity ? ["(${local.internal_trust})"] : [],
   )
+
+  environment_trust = join(" || ", local.environment_trust_clauses)
 
   attribute_condition = local.github_ids_ready ? join(" && ", [
     "assertion.repository_id == \"${var.github_repository_id}\"",
@@ -57,6 +68,10 @@ locals {
     "principalSet://iam.googleapis.com/${local.pool_name}/attribute.environment/${var.staging_environment}"
   )
 
+  internal_principal_set = (
+    "principalSet://iam.googleapis.com/${local.pool_name}/attribute.environment/${var.internal_environment}"
+  )
+
   deploy_project_roles = toset([
     "roles/run.admin",
     "roles/firebaseapphosting.admin",
@@ -64,5 +79,7 @@ locals {
   ])
 
   // Production deploy SA is created by BB-005/011 stubs; reference by email (no data source).
+  // ADR-012: lives in blackbook-prod (var.project_id); staging/internal deploy SAs live in their
+  // own projects even though the WIF pool that mints their tokens stays hosted in blackbook-prod.
   production_deploy_sa_email = "${var.production_deploy_sa_id}@${var.project_id}.iam.gserviceaccount.com"
 }

@@ -16,10 +16,19 @@ output "production_service_account_email" {
 }
 
 output "staging_service_account_email" {
-  description = "Optional staging deploy SA email (null when disabled)."
+  description = "Optional blackbook-staging deploy SA email (null when disabled)."
   value = (
     var.enable_staging_deploy_identity
     ? google_service_account.github_deploy_staging[0].email
+    : null
+  )
+}
+
+output "internal_service_account_email" {
+  description = "Optional blackbook-internal deploy SA email (null when disabled)."
+  value = (
+    var.enable_internal_deploy_identity
+    ? google_service_account.github_deploy_internal[0].email
     : null
   )
 }

@@ -16,7 +16,7 @@ Short pointers to formal ADRs under `docs/adr/`. Full text lives there.
 | D-010 | Hostile-internet assumptions; degraded read-only; layered abuse controls | [ADR-010](../../docs/adr/ADR-010-security-and-abuse-assumptions.md) |
 | D-011 | Threat model + abuse corpus (19 P0; residual risk explicit) | [threat-model](../../docs/security/threat-model.md) |
 | D-012 | BB-005 workload isolation design, reconciled by D-013 | [environment-isolation](../../docs/security/environment-isolation.md) |
-| D-013 | Existing `black-book-efaaf` is the one production project; four-project split deferred | [decision](./D-013-single-project-production.md) |
+| D-013 | Existing `black-book-efaaf` is the one production project; four-project split deferred (**superseded 2026-07-17** by [ADR-012](../../docs/adr/ADR-012-production-environment-resplit.md)) | [decision](./D-013-single-project-production.md) |
 | D-014 | Firestore SoR; Cloud SQL / PostGIS / SQL Connect deferred | [decision](./D-014-firestore-not-cloud-sql.md) / [ADR-011](../../docs/adr/ADR-011-firestore-system-of-record.md) |
 
 Updated: 2026-07-16 (D-014 Firestore pivot).

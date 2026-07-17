@@ -1,0 +1,30 @@
+# ADR-012 (BB-078) three-project re-split inputs. Copy to prod.tfvars only after human review.
+# All provisioning gates default false/empty so a bare `terraform plan` cannot create live
+# projects, databases, service accounts, cross-project IAM, or budgets. No secrets belong here.
+
+prod_project_id     = "black-book-efaaf" # blackbook-prod: retained, not recreated (ADR-012)
+staging_project_id  = "blackbook-staging"  # TBD until BB-079 creates the project
+internal_project_id = "blackbook-internal" # TBD until BB-079 creates the project
+region               = "us-central1"
+
+# No GCP organization exists yet (see README.md). Leave both empty/false until one does.
+org_id               = ""
+manage_org_policies  = false
+
+billing_account = "" # e.g. 012345-6789AB-CDEF01; leave empty until reviewed
+
+# Apply in this order once each prerequisite is human-verified:
+create_new_projects                 = false # 1. create blackbook-staging + blackbook-internal
+provision_internal_databases        = false # 2. requires blackbook-internal to exist
+provision_staging_service_accounts  = false # 2. requires blackbook-staging to exist
+provision_internal_service_accounts = false # 2. requires blackbook-internal to exist
+apply_cross_project_iam             = false # 3. requires step 2's blackbook-internal SAs
+
+billing_budget_amount_units = {
+  prod     = 0 # fill after review; notify-only, never a kill switch (ADR-012)
+  staging  = 0
+  internal = 0
+}
+
+# Documents intent only; the automated hard-stop action is a follow-up, not built by this module.
+internal_billing_kill_switch = false

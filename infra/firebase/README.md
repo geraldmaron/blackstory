@@ -1,5 +1,13 @@
 # Firebase configuration
 
+> **ADR-012 (BB-078) target:** `black-book-efaaf` becomes `blackbook-prod` (retained, not
+> recreated); `blackbook-staging` and `blackbook-internal` are new projects. Nothing below in
+> this file describes live state changing from this bead alone - the live root `.firebaserc`
+> (outside this bead's file ownership) is updated by a human as part of
+> [`docs/runbooks/production-environment-resplit-migration.md`](../../docs/runbooks/production-environment-resplit-migration.md).
+> [`.firebaserc.example`](./.firebaserc.example) in this directory now shows the target aliases
+> (`staging`, `internal`) additively, alongside the unchanged `default`/`production` aliases.
+
 ## Production project
 
 The repository root [`.firebaserc`](../../.firebaserc) maps `default` and `production` to the

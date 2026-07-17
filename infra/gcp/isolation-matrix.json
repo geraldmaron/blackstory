@@ -1,6 +1,6 @@
 {
   "$schema": "./isolation-matrix.schema.json",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "bead": "BB-005",
   "title": "Black Book single-project production isolation matrix",
   "mode": "single-project",
@@ -25,7 +25,29 @@
       "Independent environment recovery, billing, residency, or organization-policy boundaries become mandatory."
     ]
   },
-  "updatedAt": "2026-07-16",
+  "productionResplitTarget": {
+    "status": "design-not-applied",
+    "adr": "ADR-012",
+    "migrationBead": "BB-079",
+    "projects": [
+      {
+        "projectId": "black-book-efaaf",
+        "role": "blackbook-prod: public serving (App Hosting, Firestore public/** projections + create-only submissions, Auth, App Check enforced, prod secrets only)",
+        "retainedFrom": "black-book-efaaf"
+      },
+      {
+        "projectId": "blackbook-staging",
+        "role": "pre-production mirror of blackbook-prod, synthetic data only, minInstances 0",
+        "retainedFrom": null
+      },
+      {
+        "projectId": "blackbook-internal",
+        "role": "research pipeline + admin console; named Firestore databases raw-ingest and curated with per-database IAM conditions; admin runs Cloud Run + IAP attached directly to the service (no load balancer)",
+        "retainedFrom": null
+      }
+    ]
+  },
+  "updatedAt": "2026-07-17",
   "status": "design",
   "notes": [
     "Machine-readable source of truth for BB-005 isolation inside the existing production project black-book-efaaf.",
@@ -33,9 +55,10 @@
     "Development remains local and emulator-only. Staging is a configuration namespace or separately named App Hosting backend in the same production project, not a security boundary.",
     "Human-readable companions: projects.matrix.md, service-accounts.matrix.md, storage-buckets.matrix.md, iam-boundaries.md, wif/.",
     "BB-010 WIF/OIDC deploy identities are designed under infra/gcp/wif/ (not applied; GitHub numeric IDs TBD until remote exists).",
-    "No secrets are stored here; secret material lives only in Secret Manager per environment."
+    "No secrets are stored here; secret material lives only in Secret Manager per environment.",
+    "BB-078 (ADR-012, 2026-07-17): mode/currentProject/deferredMultiProjectTarget above still describe the LIVE single-project state and are unchanged by this update. productionResplitTarget and the crossProjectGrants entries below describe the ADR-012 three-project target, not yet applied (BB-079). serviceAccounts entries promotion and submissions-puller are ADR-012-target-only identities living in blackbook-internal, not black-book-efaaf."
   ],
-  "adrRefs": ["ADR-001", "ADR-003", "ADR-005", "ADR-006", "ADR-009"],
+  "adrRefs": ["ADR-001", "ADR-003", "ADR-005", "ADR-006", "ADR-009", "ADR-012"],
   "threatRefs": ["T-03", "T-08", "T-09", "T-12", "T-14", "T-16", "T-17"],
   "environments": [
     {
@@ -314,6 +337,46 @@
         ],
         "optionalStagingIdentity": "github-deploy-staging (enable_staging_deploy_identity; not a security boundary)"
       }
+    },
+    {
+      "id": "promotion",
+      "beadRequired": true,
+      "surface": "workers/publication (cross-project promotion identity)",
+      "project": "blackbook-internal",
+      "purpose": "ADR-012 target, not yet applied (BB-079): the only identity anywhere, including any blackbook-prod-native identity, that writes blackbook-prod's public/** Firestore projections. Reads the curated named database in blackbook-internal; writes cross-project into blackbook-prod.",
+      "dbRole": "role_publication",
+      "roles": [
+        "roles/datastore.user (scoped to blackbook-prod public/** via IAM condition, cross-project)",
+        "roles/storage.objectAdmin (blackbook-prod public-media, exports; cross-project)",
+        "roles/secretmanager.secretAccessor (scoped, blackbook-internal)"
+      ],
+      "bucketAccess": [
+        { "bucket": "public-media", "access": "objectAdmin (cross-project into blackbook-prod)" },
+        { "bucket": "exports", "access": "objectAdmin (cross-project into blackbook-prod)" }
+      ],
+      "mustNotHave": [
+        "write access to raw-ingest (reads curated only)",
+        "any IAM grant in blackbook-staging",
+        "public internet ingress",
+        "ability to be invoked by an end-user token"
+      ]
+    },
+    {
+      "id": "submissions-puller",
+      "beadRequired": true,
+      "surface": "workers/submissions-puller (new logical surface, ADR-012; implementation out of scope for BB-078)",
+      "project": "blackbook-internal",
+      "purpose": "ADR-012 target, not yet applied (BB-079): reverses the submissions data-flow direction. Pulls new documents from blackbook-prod's create-only submissions collection into blackbook-internal for triage; blackbook-prod never pushes into blackbook-internal.",
+      "dbRole": null,
+      "roles": [
+        "roles/datastore.viewer (scoped to blackbook-prod submissions collection via IAM condition, cross-project, read-only)"
+      ],
+      "bucketAccess": [],
+      "mustNotHave": [
+        "write access to any blackbook-prod resource",
+        "read access to blackbook-prod public/** projections beyond the submissions collection",
+        "any IAM grant in blackbook-staging"
+      ]
     }
   ],
   "buckets": [
@@ -366,7 +429,38 @@
       "notes": "Untrusted intake. Public Access Prevention enforced so quarantine objects can never be served publicly. Only the security worker reads/scans."
     }
   ],
-  "crossProjectGrants": [],
+  "crossProjectGrants": [
+    {
+      "id": "promotion-write-prod-firestore",
+      "from": "promotion@blackbook-internal.iam.gserviceaccount.com",
+      "to": "blackbook-prod Firestore (default) database, public/** projections",
+      "role": "roles/datastore.user (scoped)",
+      "condition": "resource.name.startsWith(\"projects/black-book-efaaf/databases/(default)/documents/public/\")",
+      "rationale": "ADR-012 target, not yet applied (BB-079): promotion is the only identity anywhere - including any blackbook-prod-native identity - that writes public projections. One-way push from blackbook-internal; no prod principal has any reciprocal grant into blackbook-internal."
+    },
+    {
+      "id": "promotion-write-prod-buckets",
+      "from": "promotion@blackbook-internal.iam.gserviceaccount.com",
+      "to": "blackbook-prod public-media and exports buckets",
+      "role": "roles/storage.objectAdmin",
+      "rationale": "ADR-012 target, not yet applied (BB-079): mirrors the prior same-project publication bucket grants (see serviceAccounts[].id=publication), now cross-project because public-media/exports live in blackbook-prod and the promotion pipeline runs in blackbook-internal."
+    },
+    {
+      "id": "security-quarantine-prod",
+      "from": "security@blackbook-internal.iam.gserviceaccount.com",
+      "to": "blackbook-prod quarantine bucket (admin) and public-media bucket (create)",
+      "role": "roles/storage.objectAdmin (quarantine); roles/storage.objectCreator (public-media)",
+      "rationale": "ADR-012 target, not yet applied (BB-079): same logical worker as serviceAccounts[].id=security above, which moves from black-book-efaaf to blackbook-internal at BB-079 migration time. Quarantine stays co-located with the public intake surface (api-submissions) in blackbook-prod; security scans and promotes cross-project from blackbook-internal."
+    },
+    {
+      "id": "submissions-puller-read-prod",
+      "from": "submissions-puller@blackbook-internal.iam.gserviceaccount.com",
+      "to": "blackbook-prod Firestore (default) database, submissions collection",
+      "role": "roles/datastore.viewer (scoped)",
+      "condition": "resource.name.startsWith(\"projects/black-book-efaaf/databases/(default)/documents/submissions/\")",
+      "rationale": "ADR-012 target, not yet applied (BB-079): reverses the pre-ADR-012 submissions flow. blackbook-internal pulls new submissions from prod's create-only collection for triage instead of prod pushing into a shared research-adjacent store. No corresponding write grant exists in either direction for this identity."
+    }
+  ],
   "orgPolicies": [
     {
       "constraint": "constraints/storage.publicAccessPrevention",
@@ -397,7 +491,8 @@
         "N/A as an environment-to-project invariant: black-book-efaaf is the only cloud project and is production.",
         "Local development and automated tests use demo-black-book emulators or disposable local services and fail closed when production identifiers are present.",
         "Any human or CI access to black-book-efaaf is production access; github-deploy is WIF-only and requires protected production context.",
-        "A separate cloud development project must be created before cloud-based development credentials or destructive integration tests are allowed."
+        "A separate cloud development project must be created before cloud-based development credentials or destructive integration tests are allowed.",
+        "[ADR-012 target, not yet applied] blackbook-staging gives cloud-based pre-production testing a real project boundary from blackbook-prod, satisfying the prior N/A trigger. github-deploy stays project-scoped to blackbook-prod with no binding in blackbook-staging or blackbook-internal."
       ],
       "threatRefs": ["T-12", "T-17"]
     },
@@ -408,7 +503,8 @@
         "research@black-book-efaaf is a distinct identity with no publication, deployment, service-account impersonation, release-pointer, or public-media write permission.",
         "role_research can write evidence staging and read a canonical subset but cannot write public projections or activate releases.",
         "Publication requires publication/api-internal identities even though they share the project (ADR-005, ADR-009).",
-        "research SA has no bucketAccess to public-media and no release-pointer permission."
+        "research SA has no bucketAccess to public-media and no release-pointer permission.",
+        "[ADR-012 target, not yet applied] research@blackbook-internal has no IAM binding in blackbook-prod at all (project boundary, not just role absence). Only promotion@blackbook-internal has a prod write grant (see crossProjectGrants), and promotion has no write access to the raw-ingest named database - only read on curated - so a compromised research adapter cannot reach promotion's prod grant via a shared database."
       ],
       "threatRefs": ["T-07", "T-16"]
     },
@@ -418,7 +514,8 @@
       "enforcedBy": [
         "web-runtime and api-public have no IAM binding on the private-evidence bucket.",
         "private-evidence has Public Access Prevention enforced and UBLA enabled; only research/security write and only publication/admin/api-internal read.",
-        "Project-level storage roles are forbidden for runtime identities because they would bypass per-bucket separation."
+        "Project-level storage roles are forbidden for runtime identities because they would bypass per-bucket separation.",
+        "[ADR-012 target, not yet applied] private-evidence moves to blackbook-internal, a project web-runtime/api-public (in blackbook-prod) have no membership in - project boundary plus bucket IAM, not bucket IAM alone."
       ],
       "threatRefs": ["T-15", "T-04"]
     },
@@ -428,7 +525,8 @@
       "enforcedBy": [
         "quarantine bucket has constraints/storage.publicAccessPrevention enforced and UBLA enabled (no allUsers/allAuthenticatedUsers possible).",
         "Only api-submissions (create) and security (read/scan) touch it; web-runtime and api-public have no access.",
-        "No CDN backend or signed-URL issuer is wired to the quarantine bucket."
+        "No CDN backend or signed-URL issuer is wired to the quarantine bucket.",
+        "[ADR-012 target, not yet applied] quarantine stays in blackbook-prod, co-located with the api-submissions surface that creates it; the only cross-project reader is security@blackbook-internal (see crossProjectGrants id=security-quarantine-prod), which holds no publish or release-activation grant in any project."
       ],
       "threatRefs": ["T-09", "T-08"]
     },
@@ -438,7 +536,8 @@
       "enforcedBy": [
         "api-submissions SA holds only role_submissions_write (write to quarantine/staging tables), objectCreator on quarantine, and scoped secret access.",
         "It has no canonical write, no publication/promotion permission, no private-evidence read, and no identity-impersonation access.",
-        "Promotion to public requires the separate publication workflow via internal/publication identities (ADR-004, ADR-005)."
+        "Promotion to public requires the separate publication workflow via internal/publication identities (ADR-004, ADR-005).",
+        "[ADR-012 target, not yet applied] even a full blackbook-prod project compromise (not just api-submissions) cannot reach blackbook-internal to fabricate a promotion, because promotion is a pull initiated from blackbook-internal (submissions-puller@blackbook-internal reads prod's create-only collection; see crossProjectGrants) - there is no callable path from prod into internal in either direction."
       ],
       "threatRefs": ["T-05", "T-07", "T-16"]
     }
