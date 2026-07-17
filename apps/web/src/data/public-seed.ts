@@ -32,7 +32,25 @@ export type PublicEntityView = {
   readonly kind: PublicEntityKind;
   readonly displayName: string;
   readonly summary: string;
+  /** @deprecated Free-text era label predating BB-090's structured era model. Prefer
+   * `eraBuckets`, derived from @black-book/domain's `deriveEraBuckets`. Kept for existing
+   * filter/display call sites until they migrate. */
   readonly era: string;
+  /**
+   * BB-090 public projection additions — every one non-numeric by standing policy (numeric
+   * notability/relevance scores are banned from public payloads).
+   */
+  /** Derived current lifecycle status label (e.g. "active", "in_force"), when the entity kind
+   * carries one. Never hand-edited — derived via @black-book/domain's `currentEntityStatus`. */
+  readonly status?: string;
+  /** Decade labels the entity's dated span overlaps, derived via @black-book/domain's
+   * `deriveEraBuckets` — replaces the free-text `era` string above. */
+  readonly eraBuckets?: readonly string[];
+  /** Human-readable notability rubric labels (never the raw criterion id alone, never a score),
+   * one per notabilityBasis record — sourced from @black-book/domain's `NOTABILITY_RUBRIC`. */
+  readonly notabilityLabels?: readonly string[];
+  /** Sensitivity classification label, when the entity carries one. Presentation is BB-095. */
+  readonly sensitivityClass?: string;
   readonly topicTags: readonly string[];
   readonly jurisdictionLabel: string;
   /** City / campus / neighborhood — never street or residence. */
@@ -65,6 +83,11 @@ export const PUBLIC_SEED_ENTITIES: readonly PublicEntityView[] = [
     summary:
       'Fixture projection for a historically documented Black community place in the District of Columbia area.',
     era: 'reconstruction',
+    status: 'historic',
+    eraBuckets: ['1860s', '1870s'],
+    notabilityLabels: [
+      'The entity is a documented site of a historically significant event or practice with primary-source evidence tying the site to the event.',
+    ],
     topicTags: ['community', 'education', 'reconstruction'],
     jurisdictionLabel: 'Washington, D.C.',
     locationPrecision: 'city',
@@ -118,6 +141,11 @@ export const PUBLIC_SEED_ENTITIES: readonly PublicEntityView[] = [
     summary:
       'School with documented historical and current campus locations (campus precision only).',
     era: 'reconstruction',
+    status: 'active',
+    eraBuckets: ['1860s', '1870s', '1900s', '1910s'],
+    notabilityLabels: [
+      'The entity served as a long-standing, evidenced community anchor institution with a documented multi-decade role in a specific community.',
+    ],
     topicTags: ['education', 'freedmen', 'schools'],
     jurisdictionLabel: 'Washington, D.C.',
     locationPrecision: 'campus',

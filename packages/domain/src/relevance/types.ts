@@ -31,14 +31,24 @@ export type RelevanceFeatureValue = {
   readonly rationale: string;
 };
 
-export type RelevanceGateId =
-  | 'signal_present'
-  | 'weak_signal_independent'
-  | 'negative_only'
-  | 'threshold'
-  | 'distinctiveness'
-  | 'duplicate'
-  | 'include_evidence';
+/**
+ * The 7 discovery-time gates (BB-040) plus `notability_basis` (BB-090 AC3) — an 8th,
+ * publish-time gate over an entity's own `notabilityBasis[]` (../entity-status.ts). It EXTENDS
+ * this list, it never replaces any of the original 7: see ../relevance/notability-gate.ts for
+ * its evaluator and ./gates.ts for the discovery-time 7.
+ */
+export const RELEVANCE_GATE_IDS = [
+  'signal_present',
+  'weak_signal_independent',
+  'negative_only',
+  'threshold',
+  'distinctiveness',
+  'duplicate',
+  'include_evidence',
+  'notability_basis',
+] as const;
+
+export type RelevanceGateId = (typeof RELEVANCE_GATE_IDS)[number];
 
 export type RelevanceGateResult = {
   readonly gateId: RelevanceGateId;

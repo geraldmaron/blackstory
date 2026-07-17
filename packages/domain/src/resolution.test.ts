@@ -55,7 +55,7 @@ const profiles: readonly ResolutionProfile[] = [
           { name: 'Washington Heritage Academy', validFrom: '1972', primary: true },
         ],
         campuses: [],
-        statusHistory: [],
+        milestones: [],
       },
     }),
     locations: [historicalSchoolLocation],

@@ -96,15 +96,64 @@ export type { LivingStatus } from './living.js';
 export { ENTITY_KINDS, isEntityKind } from './entity-kinds.js';
 export type { EntityKind } from './entity-kinds.js';
 
+export { currentEntityStatus } from './entity.js';
 export type { EntityAlias, EntityIdentifier, EntityMergeState, CanonicalEntity } from './entity.js';
 
 export type {
   SchoolName,
   SchoolCampus,
   SchoolCampusStatus,
+  /** @deprecated alias of SchoolMilestone — see school.ts (BB-090 naming-collision fix). */
   SchoolStatusEntry,
+  SchoolMilestone,
   SchoolFields,
 } from './school.js';
+
+// BB-090: entity ontology — shared era/date-precision model, kind-specific status vocabularies,
+// notability-basis inclusion rubric, and the schema-only sensitivity classification. Additive
+// barrel export so packages/firebase/src/embeddings/text.ts can import the shared
+// `deriveEraBuckets` (replacing its local duplicate) and so BB-086/BB-087/BB-092/BB-095 have a
+// single vocabulary source to import from — see ADR-015.
+export {
+  DATE_PRECISIONS,
+  deriveDecadeLabel,
+  deriveEraBuckets,
+  isDatePrecision,
+} from './era.js';
+export type { DatePrecision, EraSpan } from './era.js';
+
+export {
+  CULTURAL_FIGURE_NOTABILITY_CALIBRATION,
+  CULTURAL_FIGURE_NOTABILITY_CALIBRATION_NOTE,
+  LAW_STATUSES,
+  MOVEMENT_STATUSES,
+  NOTABILITY_CRITERIA,
+  NOTABILITY_RUBRIC,
+  PLACE_LIKE_STATUSES,
+  PLACE_LIKE_STATUS_KINDS,
+  SENSITIVITY_CLASSES,
+  STATUSLESS_ENTITY_KINDS,
+  currentStatus,
+  hasRequiredNotabilityBasis,
+  personStatusFromLiving,
+  statusAsOf,
+} from './entity-status.js';
+export type {
+  EntitySensitivity,
+  EntityStatusValue,
+  LawStatus,
+  MovementStatus,
+  NotabilityBasisRecord,
+  NotabilityCriterion,
+  PersonDerivedStatus,
+  PlaceLikeStatus,
+  PlaceLikeStatusKind,
+  SensitivityClass,
+  StatuslessEntityKind,
+  StatusHistoryEntry,
+} from './entity-status.js';
+
+export type { MovementFields } from './movement.js';
 
 export type {
   PersonFields,
@@ -143,8 +192,44 @@ export {
   prohibitedPublicPrecisionLevels,
   assertPublicPrecisionAllowed,
   isPublicPrecisionAllowed,
+  GEO_PRECISION_TIERS,
+  isGeoPrecisionTier,
+  GEO_PRECISION_TIER_RANK,
+  isCoarserGeoPrecisionTier,
+  coarserGeoPrecisionTier,
+  PRECISION_BASES,
+  isPrecisionBasis,
+  FIXED_TIER_RADIUS_METERS,
+  boundingRadiusMeters,
+  displayRadiusMeters,
+  resolveEntityLocationPrecision,
 } from './geography/precision.js';
-export type { PublicPrecisionLevel } from './geography/precision.js';
+export type {
+  PublicPrecisionLevel,
+  GeoPrecisionTier,
+  PrecisionBasis,
+  JurisdictionBBox,
+  DisplayRadiusInput,
+  ResolveEntityLocationPrecisionInput,
+  ResolvedEntityLocationPrecision,
+} from './geography/precision.js';
+
+// BB-091: jurisdiction reference registry — fail-closed dangling-reference gate for the
+// projection build. See geography/jurisdiction-refs.ts's INTEGRATION POINT comment.
+export {
+  createInMemoryJurisdictionResolver,
+  evaluateJurisdictionReferences,
+  assertJurisdictionReferencesResolve,
+  jurisdictionReferenceFromLaw,
+  jurisdictionReferenceFromLocation,
+} from './geography/jurisdiction-refs.js';
+export type {
+  JurisdictionResolver,
+  JurisdictionIdSet,
+  JurisdictionReferenceSubject,
+  DanglingJurisdictionReference,
+  JurisdictionReferenceCheckResult,
+} from './geography/jurisdiction-refs.js';
 
 export {
   GEOGRAPHIC_MATCH_METHODS,

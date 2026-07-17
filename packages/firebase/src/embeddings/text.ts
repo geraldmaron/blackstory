@@ -1,7 +1,13 @@
 /**
  * Builds the text an entity is embedded from, and the pre-filter fields (kind/state/eraBucket)
  * stored alongside its vector (BB-071). Pure string/number logic — no I/O.
+ *
+ * Decade-bucketing math delegates to @black-book/domain's shared `deriveEraBuckets` (BB-090,
+ * packages/domain/src/era.ts) rather than duplicating it locally — `deriveEraBucket` below is a
+ * thin single-bucket adapter over that shared function, kept for this module's existing
+ * single-value `eraBucket` pre-filter field (see ADR-014's composite vector indexes).
  */
+import { deriveEraBuckets } from '@black-book/domain';
 import type { CanonicalEntityDoc, EntityKindDoc } from '../firestore/types.js';
 
 /** Caller-resolved location context — the pipeline does not itself geocode/resolve state. */
@@ -79,7 +85,10 @@ export function resolveEntityYearSpan(entity: EntityEmbeddingSource): EntityYear
     case 'artifact':
       return yearSpan(yearOf(entity.artifact?.createdAtApprox), undefined);
     case 'school': {
-      const founded = entity.school?.statusHistory?.find((entry) =>
+      // BB-090: SchoolFields.statusHistory was renamed to `milestones` to resolve a naming
+      // collision with the new entity-level CanonicalEntity.statusHistory (see
+      // packages/domain/src/school.ts).
+      const founded = entity.school?.milestones?.find((entry) =>
         entry.status.toLowerCase().includes('found'),
       );
       return yearSpan(yearOf(founded?.at), undefined);
@@ -90,15 +99,21 @@ export function resolveEntityYearSpan(entity: EntityEmbeddingSource): EntityYear
 }
 
 /**
- * Buckets a year span into a decade label ("1950s"), preferring the start year. Undefined when
- * no temporal anchor exists at all — the pre-filter simply omits eraBucket for those entities.
+ * Buckets a year span into a single decade label ("1950s"), preferring the start year.
+ * Undefined when no temporal anchor exists at all — the pre-filter simply omits eraBucket for
+ * those entities. This is a thin, single-bucket adapter over the shared
+ * `deriveEraBuckets` (@black-book/domain, BB-090) — the anchor resolves to exactly one decade
+ * because it is passed as a single-point span (no end), matching this function's pre-existing
+ * anchor-only behavior. Multi-decade spans (e.g. a person's full birth–death range) are exposed
+ * via the plural `deriveEraBuckets` directly for callers that want every overlapping decade,
+ * not just the anchor's.
  */
 export function deriveEraBucket(entity: EntityEmbeddingSource): string | undefined {
   const { startYear, endYear } = resolveEntityYearSpan(entity);
   const anchor = startYear ?? endYear;
   if (anchor === undefined || !Number.isFinite(anchor)) return undefined;
-  const decade = Math.floor(anchor / 10) * 10;
-  return `${decade}s`;
+  const [bucket] = deriveEraBuckets({ validFrom: String(anchor), datePrecision: 'year' });
+  return bucket;
 }
 
 export type EntityVectorFilters = {

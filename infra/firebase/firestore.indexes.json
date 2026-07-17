@@ -130,6 +130,22 @@
         { "fieldPath": "eraBucket", "order": "ASCENDING" },
         { "fieldPath": "embedding", "vectorConfig": { "dimension": 768, "flat": {} } }
       ]
+    },
+    {
+      "collectionGroup": "jurisdictions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "parentId", "order": "ASCENDING" },
+        { "fieldPath": "name", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "jurisdictions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "kind", "order": "ASCENDING" },
+        { "fieldPath": "parentId", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

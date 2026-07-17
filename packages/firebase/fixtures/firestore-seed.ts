@@ -182,7 +182,9 @@ export const seedSchoolEntity: CanonicalEntityDoc = {
         validTo: null,
       },
     ],
-    statusHistory: [
+    // BB-090: renamed from `statusHistory` to `milestones` to resolve a naming collision with
+    // the new entity-level CanonicalEntityDoc.statusHistory (see packages/domain/src/school.ts).
+    milestones: [
       { status: 'opened', at: '1868', evidenceIds: ['ev_seed_school_open'] },
       { status: 'relocated', at: '1954', evidenceIds: ['ev_seed_school_move'] },
     ],

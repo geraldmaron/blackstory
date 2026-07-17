@@ -32,6 +32,8 @@ export const FIRESTORE_COLLECTIONS = [
   'idempotencyKeys',
   'outboxConsumerReceipts',
   'killSwitches',
+  /** Jurisdiction reference data (BB-091): states + counties wholesale, cities on-demand. */
+  'jurisdictions',
 ] as const;
 
 export type FirestoreCollectionId = (typeof FIRESTORE_COLLECTIONS)[number];
@@ -63,6 +65,7 @@ export const FIRESTORE_PATHS = {
   idempotencyKeys: 'idempotencyKeys',
   outboxConsumerReceipts: 'outboxConsumerReceipts',
   killSwitches: 'killSwitches',
+  jurisdictions: 'jurisdictions',
 } as const;
 
 export type StaffClaims = {

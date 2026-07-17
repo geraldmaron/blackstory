@@ -29,6 +29,8 @@ export const FIRESTORE_ROOT = {
   idempotencyKeys: 'idempotencyKeys',
   outboxConsumerReceipts: 'outboxConsumerReceipts',
   killSwitches: 'killSwitches',
+  /** Jurisdiction reference data (BB-091): states + counties wholesale, cities on-demand. */
+  jurisdictions: 'jurisdictions',
 } as const;
 
 export type FirestoreRootCollection = (typeof FIRESTORE_ROOT)[keyof typeof FIRESTORE_ROOT];
@@ -71,4 +73,6 @@ export const firestorePaths = {
   /** Convention: source adapter kill switches use this id pattern. */
   sourceAdapterKillSwitch: (adapterId: string) =>
     `${FIRESTORE_ROOT.killSwitches}/source-adapter-${adapterId}`,
+  /** Jurisdiction reference data (BB-091): flat `{id}` docs, e.g. `us`, `us-06`, `us-06-001`. */
+  jurisdiction: (jurisdictionId: string) => `${FIRESTORE_ROOT.jurisdictions}/${jurisdictionId}`,
 } as const;

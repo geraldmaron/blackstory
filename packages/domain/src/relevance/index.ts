@@ -5,6 +5,7 @@ export {
   RELEVANCE_ASSESSMENT_SCHEMA_VERSION,
   RELEVANCE_FIXTURE_SCHEMA_VERSION,
   RELEVANCE_DIMENSIONS,
+  RELEVANCE_GATE_IDS,
   type RelevanceDimension,
   type RelevanceFeatureValue,
   type RelevanceGateId,
@@ -41,6 +42,11 @@ export {
   hasIncludeEvidence,
   type RunRelevanceGatesInput,
 } from './gates.js';
+
+export {
+  evaluateNotabilityGate,
+  assertPublishableEntityHasNotabilityBasis,
+} from './notability-gate.js';
 
 export {
   deriveProvisionalDecision,

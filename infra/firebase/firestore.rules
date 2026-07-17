@@ -331,6 +331,16 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Jurisdiction reference data (BB-091): states + counties, public-domain Census-derived.
+    // Public read (no PII, no sensitive-site precision — bbox/centroid only); writes are
+    // Admin SDK only via the idempotent load/refresh script (packages/firebase/src/
+    // jurisdictions/load-cli.ts), same "allow write: if false" convention as every other
+    // collection in this file.
+    match /jurisdictions/{jurisdictionId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

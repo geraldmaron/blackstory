@@ -67,6 +67,17 @@ Walked the design against four concrete cases (redlining, Trayvon Martin, March 
 - **BB-094**: named Mapping Inequality (Univ. of Richmond/NARA, public domain HOLC maps) as a launch corpus — the first requiring real historic polygon ingestion rather than point+radius.
 - **BB-095**: added an explicit non-goal — sensitivity flags require a conduct-based rationale, never an identity attribute (e.g. a closeted historical figure's sexuality is never itself a flag condition).
 
+### BB-090 / BB-091 execution (2026-07-17, same day) — closed
+
+Dispatcher-recommended parallel execution: `construct` was tried first (per the dispatcher's routing) but is orchestration-only in this environment — read-only tools, no functional handoff to a write-capable specialist without the MCP broker — so both beads re-ran under `general-purpose` agents with full tool access and the same exclusive-path scoping. File ownership held disjoint throughout (BB-090: `entity.ts`/`entity-kinds.ts`/relevance-gates/era model; BB-091: `geography/precision.ts`/jurisdictions collection/Firestore rules); the parent session merged barrel exports, resolved an ADR-numbering collision (both agents independently picked ADR-015 — BB-091's was renumbered to ADR-016), added the `EntityLocation.geoPrecisionTier`/`precisionBasis` fields both agents flagged as unattached, and indexed both ADRs in `docs/adr/README.md`.
+
+- **BB-090 closed**: kind-specific `EntityStatus` vocabularies, time-scoped `statusHistory[]`, `notabilityBasis[]` as an 8th relevance gate (numeric-score-ban test passing), shared `deriveEraBuckets` (replaces the embeddings-local duplicate), schema-only `sensitivity` flag, 12th `movement` EntityKind. Resolved a real naming collision: `school.ts` already had its own differently-shaped `statusHistory` field — renamed to `milestones` rather than conflated. ADR-015. domain 499/499, firebase 142/142, web clean.
+- **BB-091 closed**: `jurisdictions/{id}` Firestore collection (51 states + ~3,143 counties via an idempotent Census TIGER/Gazetteer loader, registered through the BB-037 source registry with a public-domain license verdict), `geoPrecision` tier vocabulary + deterministic display-radius mapping + `precisionBasis`, fail-closed dangling-jurisdiction-reference gate. No live Firestore/GCP apply — ADR-016 records the full human cloud-apply checklist (rules/index deploy, obtaining the real Census file, running the loader) as follow-up. `redactLocationForPublic`/`PRECISION_RANK` untouched. domain 499/499, firebase 142/142, data-access 18/18.
+
+Both beads deliberately left the pre-existing, unrelated uncommitted carryover (`infra/gcp/terraform/*`, `packages/config/*`, `packages/domain/src/adapters/{reddit,web-search,common-crawl}/`, `infra/firebase/firebase.json`'s 3-database resplit — tied to the still-open `black-book-2ve` incident) untouched; two shared files (`packages/domain/package.json`'s test-file list, `packages/domain/src/adapters/index.ts`) had that carryover already mixed in from before this session, so the parent staged only this session's additive hunks via `git hash-object`/`update-index` rather than sweeping the carryover into the commit.
+
+Newly unblocked: BB-092 (history graph substrate), BB-094 (vetted-corpus bulk intake), BB-095 (sensitivity/advisories/disclaimers) — all now `bd ready`.
+
 ## Multi-agent coordination (2026-07-17 wave 8 — complete)
 
 | Bead | Exclusive ownership | Status |

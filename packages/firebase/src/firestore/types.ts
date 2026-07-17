@@ -32,6 +32,9 @@ export const entityKindSchema = z.enum([
   'case',
   'publication',
   'artifact',
+  // BB-090: 12th kind — sustained, multi-actor, multi-decade phenomena (Civil Rights Movement,
+  // Great Migration, Black Power, Black Arts Movement, etc.) distinct from a single `event`.
+  'movement',
   'other',
 ]);
 
@@ -157,7 +160,13 @@ export const schoolFieldsSchema = z.object({
       }),
     )
     .default([]),
-  statusHistory: z
+  /**
+   * BB-090: renamed from `statusHistory` to `milestones` to resolve a naming collision with the
+   * new entity-level `canonicalEntitySchema.statusHistory` below (a different, closed-vocabulary
+   * shape — see packages/domain/src/school.ts for the full reconciliation note). This remains a
+   * free-text operational timeline ("opened", "relocated"), not the entity's lifecycle status.
+   */
+  milestones: z
     .array(
       z.object({
         status: z.string().min(1),
@@ -168,6 +177,88 @@ export const schoolFieldsSchema = z.object({
     )
     .default([]),
 });
+
+// ---------------------------------------------------------------------------
+// BB-090: entity ontology — shared date-precision model, entity-lifecycle status history,
+// notability-basis inclusion rubric, and the schema-only sensitivity classification. Mirrors
+// packages/domain/src/era.ts and packages/domain/src/entity-status.ts. Vocabularies are
+// hardcoded here (not imported from @black-book/domain) to match this file's existing convention
+// (e.g. entityKindSchema above hardcodes ENTITY_KINDS rather than importing it).
+// ---------------------------------------------------------------------------
+
+export const datePrecisionSchema = z.enum(['day', 'month', 'year', 'decade', 'circa']);
+
+export type DatePrecisionDoc = z.infer<typeof datePrecisionSchema>;
+
+/**
+ * Entity-lifecycle status only (BB-090 scope guardrail) — place/school/organization/institution
+ * active|historic|inactive, law in_force|amended|repealed|struck_down|enjoined, movement
+ * active|historic. NEVER an area/condition designation (sundown-town, redlining grade,
+ * exclusion infrastructure) — those are BB-082's own, separately-typed layer records.
+ */
+export const statusHistoryEntrySchema = z.object({
+  status: z.string().min(1),
+  validFrom: z.string().optional(),
+  validTo: z.string().nullable().optional(),
+  datePrecision: datePrecisionSchema,
+  basisClaimIds: z.array(z.string().min(1)).default([]),
+});
+
+export type StatusHistoryEntryDoc = z.infer<typeof statusHistoryEntrySchema>;
+
+export const notabilityCriterionSchema = z.enum([
+  'first_to_do_x',
+  'major_honor_or_hall_of_fame',
+  'landmark_or_national_register',
+  'court_precedent',
+  'movement_significance',
+  'documented_site',
+  'community_anchor',
+  'only_or_oldest',
+]);
+
+export type NotabilityCriterionDoc = z.infer<typeof notabilityCriterionSchema>;
+
+/** Auditable inclusion basis — never a numeric score (standing policy bans numeric notability
+ * scores from public payloads). */
+export const notabilityBasisRecordSchema = z.object({
+  criterion: notabilityCriterionSchema,
+  note: z.string().min(1),
+  evidenceIds: z.array(z.string().min(1)).default([]),
+});
+
+export type NotabilityBasisRecordDoc = z.infer<typeof notabilityBasisRecordSchema>;
+
+export const sensitivityClassSchema = z.enum([
+  'contested_legacy',
+  'perpetrator_associated',
+  'violence_associated',
+  'enslaver_or_segregationist',
+]);
+
+export type SensitivityClassDoc = z.infer<typeof sensitivityClassSchema>;
+
+/** Schema only — presentation (disclaimers, content warnings) is BB-095. */
+export const entitySensitivitySchema = z.object({
+  class: sensitivityClassSchema,
+  note: z.string().min(1),
+  basisClaimIds: z.array(z.string().min(1)).default([]),
+});
+
+export type EntitySensitivityDoc = z.infer<typeof entitySensitivitySchema>;
+
+/** Field bag for the `movement` entity kind (BB-090 stress-test amendment). */
+export const movementFieldsSchema = z.object({
+  startYear: z.number().int().optional(),
+  endYear: z.number().int().nullable().optional(),
+  ongoing: z.boolean().optional(),
+  keyOrganizationIds: z.array(z.string().min(1)).default([]),
+  keyPersonIds: z.array(z.string().min(1)).default([]),
+  regionJurisdictionIds: z.array(z.string().min(1)).default([]),
+  summary: z.string().optional(),
+});
+
+export type MovementFieldsDoc = z.infer<typeof movementFieldsSchema>;
 
 export const policyActiveSchema = z.object({
   policyVersion: z.string().min(1),
@@ -192,6 +283,14 @@ export const canonicalEntitySchema = z.object({
   identifiers: z.array(entityIdentifierSchema).optional(),
   livingStatus: z.enum(['living', 'deceased', 'unknown']).default('unknown'),
   mergeState: entityMergeStateSchema.optional(),
+  /** Entity-lifecycle status only — omitted for `event`/`person` kinds by convention. See the
+   * scope-guardrail comment on statusHistoryEntrySchema above. */
+  statusHistory: z.array(statusHistoryEntrySchema).optional(),
+  /** >=1 record required to publish (BB-090 AC3) — enforced by
+   * @black-book/domain's assertPublishableEntityHasNotabilityBasis, not by this schema alone. */
+  notabilityBasis: z.array(notabilityBasisRecordSchema).optional(),
+  /** Schema-only; presentation is BB-095. */
+  sensitivity: z.array(entitySensitivitySchema).optional(),
   person: z
     .object({
       livingStatus: z.enum(['living', 'deceased', 'unknown']),
@@ -260,6 +359,7 @@ export const canonicalEntitySchema = z.object({
       holdingInstitutionId: z.string().optional(),
     })
     .optional(),
+  movement: movementFieldsSchema.optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -690,6 +790,23 @@ export const publicEntityProjectionSchema = z.object({
   summary: z.string().optional(),
   location: geoPointFieldsSchema.optional(),
   claimIds: z.array(z.string()).default([]),
+  /**
+   * BB-090 public projection additions — every one non-numeric by standing policy (numeric
+   * notability/relevance scores are banned from public payloads; see
+   * packages/domain/src/relevance/notability-gate.test.ts for the enforcing test).
+   */
+  /** Derived current status label (e.g. "active", "in_force", "living") — never a scalar the
+   * reader hand-edits; always derived via @black-book/domain's `currentEntityStatus`. */
+  status: z.string().min(1).optional(),
+  /** Decade labels the entity's dated span overlaps (e.g. ["1950s", "1960s"]) — derived via
+   * @black-book/domain's `deriveEraBuckets`, replacing the free-text `era` string. */
+  eraBuckets: z.array(z.string().min(1)).optional(),
+  /** Human-readable notability rubric labels (never the raw criterion enum alone, never a
+   * score) — one per notabilityBasis record, sourced from @black-book/domain's
+   * `NOTABILITY_RUBRIC`. */
+  notabilityLabels: z.array(z.string().min(1)).optional(),
+  /** Sensitivity classification label, when the entity carries one — presentation is BB-095. */
+  sensitivityClass: sensitivityClassSchema.optional(),
 });
 
 export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSchema>;

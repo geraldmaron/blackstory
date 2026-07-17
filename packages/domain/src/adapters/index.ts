@@ -82,3 +82,6 @@ export * from './federal/index.js';
 export * from './rss/index.js';
 export * from './internet-archive/index.js';
 export * from './dpla/index.js';
+
+// BB-091: Census TIGER/Gazetteer source registry entry (jurisdiction reference data).
+export * from './census-geo/index.js';

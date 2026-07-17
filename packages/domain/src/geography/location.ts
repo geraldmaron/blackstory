@@ -5,6 +5,7 @@
 import type { LocationId } from '../ids.js';
 import type { GeoPointFields } from './geohash.js';
 import type { PublicPrecisionLevel } from './precision.js';
+import type { GeoPrecisionTier, PrecisionBasis } from './precision.js';
 
 /** Firestore-friendly geometry shapes (no PostGIS / WKT required). */
 export type GeoGeometry =
@@ -90,6 +91,14 @@ export type EntityLocation = {
   /** Geohash fields when geometry is (or reduces to) a point suitable for nearby queries. */
   readonly point?: GeoPointFields;
   readonly precision: PublicPrecisionLevel;
+  /**
+   * BB-091 geoPrecision anchor tier (exact-site|block|locality|county|state) and the basis it
+   * was resolved at — a DIFFERENT vocabulary from `precision` above (constitution public-output
+   * scale); see `geography/precision.ts`'s module doc for why the two must not be conflated.
+   * Both optional/additive: existing rows without them are unaffected.
+   */
+  readonly geoPrecisionTier?: GeoPrecisionTier;
+  readonly precisionBasis?: PrecisionBasis;
   readonly match?: GeographicMatch;
   readonly validFrom?: string;
   readonly validTo?: string | null;
