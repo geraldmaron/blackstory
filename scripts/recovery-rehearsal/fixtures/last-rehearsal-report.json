@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "bead": "BB-061",
+  "scenarioId": "compromised-github-deploy-q3-2026",
+  "mode": "dry-run",
+  "compromisedIdentity": "github-deploy@black-book-efaaf.iam.gserviceaccount.com",
+  "breakGlassIdentity": "human-platform-admin",
+  "recordedAt": "2026-07-17T04:54:09.534Z",
+  "totalMeasuredMinutes": 14.2,
+  "allWithinRto": true,
+  "procedures": [
+    {
+      "stepId": "declare-and-isolate",
+      "order": 1,
+      "label": "Declare incident and engage containment switches",
+      "breakGlassIdentity": "human-platform-admin",
+      "rtoTargetMinutes": 10,
+      "measuredMinutes": 0.7,
+      "withinRto": true,
+      "startedAt": "2026-07-17T04:54:09.534Z",
+      "completedAt": "2026-07-17T04:54:51.534Z",
+      "durationMs": 42000
+    },
+    {
+      "stepId": "block-malicious-traffic",
+      "order": 2,
+      "label": "Block malicious traffic at edge (Cloud Armor emergency deny)",
+      "breakGlassIdentity": "human-platform-admin",
+      "rtoTargetMinutes": 5,
+      "measuredMinutes": 0.3,
+      "withinRto": true,
+      "startedAt": "2026-07-17T04:54:51.534Z",
+      "completedAt": "2026-07-17T04:55:09.534Z",
+      "durationMs": 18000
+    },
+    {
+      "stepId": "disable-submissions",
+      "order": 3,
+      "label": "Disable submissions and corrections intake",
+      "breakGlassIdentity": "human-platform-admin",
+      "rtoTargetMinutes": 10,
+      "measuredMinutes": 0.4,
+      "withinRto": true,
+      "startedAt": "2026-07-17T04:55:09.534Z",
+      "completedAt": "2026-07-17T04:55:33.534Z",
+      "durationMs": 24000
+    },
+    {
+      "stepId": "pause-queues",
+      "order": 4,
+      "label": "Pause affected Cloud Tasks queues without purge",
+      "breakGlassIdentity": "human-platform-admin",
+      "rtoTargetMinutes": 15,
+      "measuredMinutes": 0.6,
+      "withinRto": true,
+      "startedAt": "2026-07-17T04:55:33.534Z",
+      "completedAt": "2026-07-17T04:56:09.534Z",
+      "durationMs": 36000
+    },
+    {
+      "stepId": "revoke-compromised-deploy-identity",
+      "order": 5,
+      "label": "Revoke compromised deploy identity (WIF + SA disable)",
+      "breakGlassIdentity": "human-platform-admin",
+      "rtoTargetMinutes": 30,
+      "measuredMinutes": 1.3,
+      "withinRto": true,
+      "startedAt": "2026-07-17T04:56:09.534Z",
+      "completedAt": "2026-07-17T04:57:27.534Z",
+      "durationMs": 78000
+    },
+    {
+      "stepId": "rotate-secrets",
+      "order": 6,
+      "label": "Rotate exposed secrets via Secret Manager + 1Password",
+      "breakGlassIdentity": "human-platform-admin",
+      "rtoTargetMinutes": 60,
+      "measuredMinutes": 2.2,
+      "withinRto": true,
+      "startedAt": "2026-07-17T04:57:27.534Z",
+      "completedAt": "2026-07-17T04:59:39.534Z",
+      "durationMs": 132000
+    },
+    {
+      "stepId": "active-release-rollback",
+      "order": 7,
+      "label": "Roll back active release to last verified signed release (BB-019)",
+      "breakGlassIdentity": "human-platform-admin",
+      "rtoTargetMinutes": 120,
+      "measuredMinutes": 1.6,
+      "withinRto": true,
+      "startedAt": "2026-07-17T04:59:39.534Z",
+      "completedAt": "2026-07-17T05:01:15.534Z",
+      "durationMs": 96000
+    },
+    {
+      "stepId": "database-restore",
+      "order": 8,
+      "label": "Restore Firestore from weekly export (staging dry-run per BB-020)",
+      "breakGlassIdentity": "backup-restore-sa",
+      "rtoTargetMinutes": 480,
+      "measuredMinutes": 3,
+      "withinRto": true,
+      "startedAt": "2026-07-17T05:01:15.534Z",
+      "completedAt": "2026-07-17T05:04:15.534Z",
+      "durationMs": 180000
+    },
+    {
+      "stepId": "rebuild-public-projections",
+      "order": 9,
+      "label": "Rebuild public projections from canonical + on-release export",
+      "breakGlassIdentity": "human-platform-admin",
+      "rtoTargetMinutes": 240,
+      "measuredMinutes": 2.4,
+      "withinRto": true,
+      "startedAt": "2026-07-17T05:04:15.534Z",
+      "completedAt": "2026-07-17T05:06:39.534Z",
+      "durationMs": 144000
+    },
+    {
+      "stepId": "restore-deleted-public-object",
+      "order": 10,
+      "label": "Restore deleted public GCS object via generation rollback",
+      "breakGlassIdentity": "backup-restore-sa",
+      "rtoTargetMinutes": 240,
+      "measuredMinutes": 1.2,
+      "withinRto": true,
+      "startedAt": "2026-07-17T05:06:39.534Z",
+      "completedAt": "2026-07-17T05:07:51.534Z",
+      "durationMs": 72000
+    },
+    {
+      "stepId": "record-findings",
+      "order": 11,
+      "label": "Record measured times and publish findings to runbooks",
+      "breakGlassIdentity": "security-operator",
+      "rtoTargetMinutes": 30,
+      "measuredMinutes": 0.5,
+      "withinRto": true,
+      "startedAt": "2026-07-17T05:07:51.534Z",
+      "completedAt": "2026-07-17T05:08:21.534Z",
+      "durationMs": 30000
+    }
+  ],
+  "verifications": [
+    {
+      "stepId": "declare-and-isolate",
+      "breakGlassIdentity": "human-platform-admin",
+      "ok": true
+    },
+    {
+      "stepId": "block-malicious-traffic",
+      "breakGlassIdentity": "human-platform-admin",
+      "ok": true
+    },
+    {
+      "stepId": "disable-submissions",
+      "breakGlassIdentity": "human-platform-admin",
+      "ok": true
+    },
+    {
+      "stepId": "pause-queues",
+      "breakGlassIdentity": "human-platform-admin",
+      "ok": true
+    },
+    {
+      "stepId": "revoke-compromised-deploy-identity",
+      "breakGlassIdentity": "human-platform-admin",
+      "ok": true
+    },
+    {
+      "stepId": "rotate-secrets",
+      "breakGlassIdentity": "human-platform-admin",
+      "ok": true
+    },
+    {
+      "stepId": "active-release-rollback",
+      "breakGlassIdentity": "human-platform-admin",
+      "ok": true
+    },
+    {
+      "stepId": "database-restore",
+      "breakGlassIdentity": "backup-restore-sa",
+      "ok": true
+    },
+    {
+      "stepId": "rebuild-public-projections",
+      "breakGlassIdentity": "human-platform-admin",
+      "ok": true
+    },
+    {
+      "stepId": "restore-deleted-public-object",
+      "breakGlassIdentity": "backup-restore-sa",
+      "ok": true
+    },
+    {
+      "stepId": "record-findings",
+      "breakGlassIdentity": "security-operator",
+      "ok": true
+    }
+  ]
+}

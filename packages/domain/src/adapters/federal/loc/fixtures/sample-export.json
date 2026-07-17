@@ -1,0 +1,16 @@
+[
+  {
+    "stableIdentifier": "lccn-2016656001",
+    "title": "African American soldiers in World War I",
+    "canonicalUrl": "https://www.loc.gov/item/2016656001/",
+    "classification": "primary_archival",
+    "date": "1918",
+    "subjects": ["World War, 1914-1918", "African American soldiers"],
+    "lccn": "2016656001"
+  },
+  {
+    "stableIdentifier": "lccn-bulk-reject",
+    "title": "X",
+    "classification": "self_published"
+  }
+]

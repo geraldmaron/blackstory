@@ -1,0 +1,18 @@
+[
+  {
+    "stableIdentifier": "school-history-mlk-birmingham",
+    "title": "Birmingham and the Children’s Crusade (structured unit)",
+    "canonicalUrl": "https://example.edu/history/mlk/birmingham-unit",
+    "classification": "reputable_secondary",
+    "curriculumTier": "approved_national",
+    "gradeBand": "9-12",
+    "publisher": "Example State Department of Education",
+    "lessonPlanBody": "FULL LESSON PLAN TEXT SHOULD NOT ENTER CANONICAL DB"
+  },
+  {
+    "stableIdentifier": "school-history-incomplete",
+    "title": "Incomplete unit",
+    "canonicalUrl": "https://example.edu/history/incomplete",
+    "classification": "reputable_secondary"
+  }
+]

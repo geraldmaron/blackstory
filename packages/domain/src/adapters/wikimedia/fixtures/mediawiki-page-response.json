@@ -1,0 +1,22 @@
+{
+  "query": {
+    "pages": {
+      "5045871": {
+        "pageid": 5045871,
+        "title": "Rosa Parks",
+        "ns": 0,
+        "revisions": [
+          {
+            "revid": 1239876543,
+            "timestamp": "2026-06-01T14:22:10Z"
+          }
+        ],
+        "categories": [
+          { "title": "Category:African-American activists" },
+          { "title": "Category:Civil rights movement" },
+          { "title": "Category:Births by year" }
+        ]
+      }
+    }
+  }
+}

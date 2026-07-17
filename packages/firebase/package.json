@@ -16,7 +16,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/env.test.ts src/firestore.unit.test.ts src/audit-outbox.test.ts src/redaction.unit.test.ts src/rules.integration.test.ts src/firestore/release-activation.test.ts src/app-check-enforce.test.ts src/admin-auth.test.ts",
+    "test": "node --conditions development --import tsx --test src/env.test.ts src/firestore.unit.test.ts src/audit-outbox.test.ts src/redaction.unit.test.ts src/rules.integration.test.ts src/firestore/release-activation.test.ts src/firestore/promotion.test.ts src/firestore/research-case.test.ts src/app-check-enforce.test.ts src/admin-auth.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

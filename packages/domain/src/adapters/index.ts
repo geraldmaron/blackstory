@@ -74,3 +74,6 @@ export {
   validateAdapterCandidates,
   type ValidateCandidateOptions,
 } from './candidates.js';
+
+export * from './wikimedia/index.js';
+export * from './federal/index.js';

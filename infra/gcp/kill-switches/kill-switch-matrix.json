@@ -1,0 +1,116 @@
+{
+  "version": "1.0.0",
+  "bead": "BB-035",
+  "status": "design-only",
+  "projectId": "black-book-efaaf",
+  "policyPackageRef": "packages/config/src/kill-switches.ts",
+  "notes": [
+    "Declarative stubs only. No live GCP or Firebase configuration has been applied.",
+    "Runtime flags are mirrored between Remote Config and Firestore killSwitches/{id}; services fail closed on stale, invalid, or unavailable optional-workload flags.",
+    "The immutable public release corpus remains available unless an operator explicitly selects public-static-mode."
+  ],
+  "switches": [
+    {
+      "id": "corrections-submissions",
+      "workloadClass": "volume-sensitive",
+      "missingFlagBehavior": "allow",
+      "remoteConfigKey": "kill_switch_corrections_submissions",
+      "firestorePath": "killSwitches/corrections-submissions"
+    },
+    {
+      "id": "search",
+      "workloadClass": "volume-sensitive",
+      "missingFlagBehavior": "allow",
+      "remoteConfigKey": "kill_switch_search",
+      "firestorePath": "killSwitches/search"
+    },
+    {
+      "id": "geocoding",
+      "workloadClass": "optional",
+      "missingFlagBehavior": "deny",
+      "remoteConfigKey": "kill_switch_geocoding",
+      "firestorePath": "killSwitches/geocoding"
+    },
+    {
+      "id": "nearby-location",
+      "workloadClass": "optional",
+      "missingFlagBehavior": "deny",
+      "remoteConfigKey": "kill_switch_nearby_location",
+      "firestorePath": "killSwitches/nearby-location"
+    },
+    {
+      "id": "research-campaigns",
+      "workloadClass": "optional",
+      "missingFlagBehavior": "deny",
+      "remoteConfigKey": "kill_switch_research_campaigns",
+      "firestorePath": "killSwitches/research-campaigns"
+    },
+    {
+      "id": "llm-calls",
+      "workloadClass": "optional",
+      "missingFlagBehavior": "deny",
+      "remoteConfigKey": "kill_switch_llm_calls",
+      "firestorePath": "killSwitches/llm-calls"
+    },
+    {
+      "id": "file-uploads",
+      "workloadClass": "optional",
+      "missingFlagBehavior": "deny",
+      "remoteConfigKey": "kill_switch_file_uploads",
+      "firestorePath": "killSwitches/file-uploads",
+      "initiallyEngaged": true,
+      "reason": "BB-031 upload quarantine is deferred"
+    },
+    {
+      "id": "publication",
+      "workloadClass": "essential",
+      "missingFlagBehavior": "deny",
+      "remoteConfigKey": "kill_switch_publication",
+      "firestorePath": "killSwitches/publication"
+    },
+    {
+      "id": "administrative-exports",
+      "workloadClass": "optional",
+      "missingFlagBehavior": "deny",
+      "remoteConfigKey": "kill_switch_administrative_exports",
+      "firestorePath": "killSwitches/administrative-exports"
+    },
+    {
+      "id": "public-static-mode",
+      "workloadClass": "public-serving",
+      "missingFlagBehavior": "allow",
+      "remoteConfigKey": "public_static_mode",
+      "firestorePath": "killSwitches/public-static-mode"
+    },
+    {
+      "id": "queue-processing",
+      "workloadClass": "essential",
+      "missingFlagBehavior": "allow",
+      "remoteConfigKey": "queue_processing_paused",
+      "firestorePath": "killSwitches/queue-processing"
+    }
+  ],
+  "dynamicSwitches": [
+    {
+      "idPattern": "source-adapter-{adapterId}",
+      "workloadClass": "optional",
+      "missingFlagBehavior": "deny",
+      "firestorePathPattern": "killSwitches/source-adapter-{adapterId}",
+      "remoteConfigKeyPattern": "kill_switch_source_adapter_{normalizedAdapterId}"
+    }
+  ],
+  "containmentOrder": [
+    "research-campaigns",
+    "llm-calls",
+    "geocoding",
+    "nearby-location",
+    "file-uploads",
+    "administrative-exports",
+    "source-adapter-*",
+    "corrections-submissions",
+    "search",
+    "queue-processing",
+    "publication",
+    "public-static-mode"
+  ]
+}

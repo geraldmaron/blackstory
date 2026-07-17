@@ -4,18 +4,38 @@ Tracks the Execution Beads (BB-001–BB-066) from *Black Book Web Application Ex
 
 **Source:** `/Users/geralddagher/Downloads/Black Book Web Application Execution Beads.pdf`  
 **Workspace:** `/Users/geralddagher/Developer/Projects/black-book` (greenfield as of 2026-07-16)  
-**Active focus:** Wave 4 — **BB-030** SSRF, **BB-032** promotion, **BB-035** kill switches, **BB-042** claim extraction (stronger); **BB-045** Wikimedia, **BB-046** federal adapters (fast). BB-048 remains partial.
+**Active focus:** Wave 6 — **BB-047** gold corpus, **BB-056** admin console. BB-048 remains partial.
+
+## Multi-agent coordination (2026-07-17 wave 6)
+
+| Bead | Model tier | Exclusive ownership (do not cross) | Status |
+|------|------------|------------------------------------|--------|
+| BB-047 | stronger (eval) | `packages/testing/src/gold-corpus/`, `packages/schemas/gold-corpus/`, `docs/research/gold-corpus.md`, `scripts/gold-corpus/` | `in_progress` |
+| BB-056 | stronger (admin UI) | `apps/admin/` (pages/components beyond existing auth), `docs/admin/research-console.md` | `in_progress` |
+
+**Shared (parent only):** `plan.md`, `packages/testing/src/index.ts`, root `README.md`. Do not touch `apps/web/**` (BB-048).
+
+## Multi-agent coordination (2026-07-17 wave 5 — complete except BB-048)
+
+| Bead | Model tier | Exclusive ownership (do not cross) | Status |
+|------|------------|------------------------------------|--------|
+| BB-036 | stronger (security CI) | `.github/workflows/security*.yml`, `docs/security/tests/`, `infra/github/security-gates/`, `packages/testing/src/security-gates*` | `done` |
+| BB-061 | fast | `docs/runbooks/recovery-rollback-rehearsal.md`, `scripts/recovery-rehearsal/`, `infra/gcp/recovery-rehearsal/` | `done` |
+| BB-043 | stronger (confidence) | `packages/domain/src/confidence-engine/`, `packages/domain/src/confidence-engine.test.ts`, `workers/research/**/confidence_engine/`, `packages/schemas/confidence-engine/`, `docs/research/confidence-lineage.md` | `done` |
+| BB-044 | stronger (workflow) | `packages/domain/src/research-case/`, `packages/domain/src/research-case.test.ts`, `packages/firebase/src/firestore/research-case*.ts`, `packages/schemas/research-case/`, `docs/research/research-case-workflow.md` | `done` |
+
+**Shared (parent only):** `plan.md`, package root barrels, root `README.md`, `.github/workflows/ci.yml` (agents may add sibling workflow files only).
 
 ## Multi-agent coordination (2026-07-17 wave 4)
 
 | Bead | Model tier | Exclusive ownership (do not cross) | Status |
 |------|------------|------------------------------------|--------|
-| BB-030 | stronger (SSRF) | `packages/security/src/url-safety/`, `workers/security/src/black_book_security/url_fetch/`, `docs/security/url-ssrf.md`, `packages/schemas/url-safety/` | `in_progress` |
-| BB-032 | stronger (promotion) | `packages/domain/src/promotion/`, `packages/domain/src/promotion.test.ts`, `packages/schemas/promotion/`, `docs/security/promotion-controls.md`, `packages/firebase/src/firestore/promotion*.ts` | `in_progress` |
-| BB-035 | stronger (incident) | `packages/config/src/kill-switches*.ts`, `infra/gcp/kill-switches/`, `docs/runbooks/incident-response.md`, `docs/runbooks/incidents/` | `in_progress` |
-| BB-042 | stronger (extraction) | `packages/domain/src/extraction/`, `packages/domain/src/extraction.test.ts`, `workers/research/**/extraction/`, `packages/schemas/extraction/` | `in_progress` |
-| BB-045 | fast | `packages/domain/src/adapters/wikimedia/`, `workers/research/**/adapters/wikimedia/`, `packages/schemas/adapters/wikimedia/` | `in_progress` |
-| BB-046 | fast | `packages/domain/src/adapters/federal/`, `workers/research/**/adapters/federal/`, `packages/schemas/adapters/federal/` | `in_progress` |
+| BB-030 | stronger (SSRF) | `packages/security/src/url-safety/`, `workers/security/src/black_book_security/url_fetch/`, `docs/security/url-ssrf.md`, `packages/schemas/url-safety/` | `done` |
+| BB-032 | stronger (promotion) | `packages/domain/src/promotion/`, `packages/domain/src/promotion.test.ts`, `packages/schemas/promotion/`, `docs/security/promotion-controls.md`, `packages/firebase/src/firestore/promotion*.ts` | `done` |
+| BB-035 | stronger (incident) | `packages/config/src/kill-switches*.ts`, `infra/gcp/kill-switches/`, `docs/runbooks/incident-response.md`, `docs/runbooks/incidents/` | `done` |
+| BB-042 | stronger (extraction) | `packages/domain/src/extraction/`, `packages/domain/src/extraction.test.ts`, `workers/research/**/extraction/`, `packages/schemas/extraction/` | `done` |
+| BB-045 | fast | `packages/domain/src/adapters/wikimedia/`, `workers/research/**/adapters/wikimedia/`, `packages/schemas/adapters/wikimedia/` | `done` |
+| BB-046 | fast | `packages/domain/src/adapters/federal/`, `workers/research/**/adapters/federal/`, `packages/schemas/adapters/federal/` | `done` |
 
 **Shared (parent only):** `plan.md`, `packages/*/src/index.ts`, `packages/domain/src/adapters/index.ts`, `workers/*/src/*/__init__.py`, root `README.md`.
 
@@ -74,10 +94,10 @@ Tracks the Execution Beads (BB-001–BB-066) from *Black Book Web Application Ex
 |---------|-------|-------|------|
 | 1 | Secure foundation | BB-001–006, 008–010 | 9/9 |
 | 2 | Data and publication boundary | BB-011–020 | 9/10 (BB-012 deferred) |
-| 3 | Hostile-environment protection | BB-021–030, 032–036 | 9/15 (BB-021–029,033–034 done; 030/032/035 in progress) |
-| 4 | Research and evidence engine | BB-037–044, 047 | 5/9 (BB-037–041 done; 042 in progress) |
+| 3 | Hostile-environment protection | BB-021–030, 032–036 | 13/15 (BB-021–030,032–036 done) |
+| 4 | Research and evidence engine | BB-037–044, 047 | 8/9 (BB-037–044 done; 047 launching) |
 | 5 | Public beta product | BB-048–050, 052–057 | 0/9 (BB-048 partial) |
-| 6 | Seed and launch | BB-045–046, 058–063 | 0/8 (045/046 in progress) |
+| 6 | Seed and launch | BB-045–046, 058–063 | 2/8 (045/046 done) |
 | Deferred | Later capabilities | BB-012, 031, 051, 064–066 | 0/6 |
 
 ---
@@ -250,12 +270,12 @@ infra/
 | BB-027 | Administrator identity and authorization | P0 | L | BB-011, BB-021 | `todo` |
 | BB-028 | Web application security controls | P0 | L | BB-007, BB-021 | `todo` |
 | BB-029 | Corrections and submission quarantine | P0 | L | BB-015, BB-021, BB-025 | `todo` |
-| BB-030 | Safe external URL handling and SSRF prevention | P0 | L | BB-004, BB-029 | `in_progress` |
-| BB-032 | Data-poisoning and promotion controls | P0 | L | BB-017–019, BB-029 | `in_progress` |
+| BB-030 | Safe external URL handling and SSRF prevention | P0 | L | BB-004, BB-029 | `done` |
+| BB-032 | Data-poisoning and promotion controls | P0 | L | BB-017–019, BB-029 | `done` |
 | BB-033 | Cost and resource exhaustion controls | P0 | L | BB-022, BB-023, BB-025 | `todo` |
 | BB-034 | Security telemetry and anomaly detection | P0 | L | BB-018, BB-023–025 | `todo` |
-| BB-035 | Incident response and kill switches | P0 | L | BB-019, BB-033 | `in_progress` |
-| BB-036 | Security testing and CI gates | P0 | L | BB-008, BB-009, BB-028, BB-030 | `todo` |
+| BB-035 | Incident response and kill switches | P0 | L | BB-019, BB-033 | `done` |
+| BB-036 | Security testing and CI gates | P0 | L | BB-008, BB-009, BB-028, BB-030 | `done` |
 
 **Note:** BB-007 (design system) is Epic A but not listed in Tranche 1 sequence in the PDF; it is required before BB-028 and Tranche 5. Tracked below under Epic A remainder.
 
@@ -290,10 +310,10 @@ infra/
 | BB-039 | Candidate discovery pipeline | P0 | L | BB-037, BB-038 | `todo` |
 | BB-040 | Deterministic relevance engine | P0 | L | BB-003, BB-039 | `todo` |
 | BB-041 | Entity and historical-location resolution | P0 | L | BB-014, BB-039 | `todo` |
-| BB-042 | Atomic claim extraction and evidence registration | P0 | L | BB-016, BB-017, BB-041 | `in_progress` |
-| BB-043 | Confidence and source-lineage engine | P0 | L | BB-017, BB-042 | `todo` |
-| BB-044 | Research-case and publication workflow | P0 | L | BB-040–043 | `todo` |
-| BB-047 | Gold corpus and calibration harness | P0 | L | BB-040, BB-041, BB-043, BB-044 | `todo` |
+| BB-042 | Atomic claim extraction and evidence registration | P0 | L | BB-016, BB-017, BB-041 | `done` |
+| BB-043 | Confidence and source-lineage engine | P0 | L | BB-017, BB-042 | `done` |
+| BB-044 | Research-case and publication workflow | P0 | L | BB-040–043 | `done` |
+| BB-047 | Gold corpus and calibration harness | P0 | L | BB-040, BB-041, BB-043, BB-044 | `in_progress` |
 
 ---
 
@@ -308,7 +328,7 @@ infra/
 | BB-053 | Evidence, confidence, dispute, and revision interface | P0 | L | BB-017, BB-019, BB-052 | `todo` |
 | BB-054 | “Why this appears” and balanced historical storytelling | P0 | M | BB-003, BB-040, BB-052 | `todo` |
 | BB-055 | Correction and challenge experience | P0 | L | BB-029, BB-032, BB-052 | `todo` |
-| BB-056 | Administration and research console | P0 | XL | BB-027, BB-037, BB-044 | `todo` |
+| BB-056 | Administration and research console | P0 | XL | BB-027, BB-037, BB-044 | `in_progress` |
 | BB-057 | Accessibility, SEO, performance, and privacy review | P0 | L | BB-048–056 | `todo` |
 
 ---
@@ -317,12 +337,12 @@ infra/
 
 | ID | Title | P | Size | Deps | Status |
 |----|-------|---|------|------|--------|
-| BB-045 | Wikimedia discovery adapter | P1 | L | BB-037–039 | `in_progress` |
-| BB-046 | Federal archive and public-history adapters | P1 | L | BB-037, BB-039 | `in_progress` |
+| BB-045 | Wikimedia discovery adapter | P1 | L | BB-037–039 | `done` |
+| BB-046 | Federal archive and public-history adapters | P1 | L | BB-037, BB-039 | `done` |
 | BB-058 | Initial high-confidence national seed | P1 | XL | BB-044–047, BB-052 | `todo` |
 | BB-059 | Load, abuse, and cost testing | P0 | L | BB-023–026, BB-033, BB-049 | `todo` |
 | BB-060 | Adversarial integrity exercise | P0 | L | BB-032, BB-043, BB-044, BB-055 | `todo` |
-| BB-061 | Recovery and rollback rehearsal | P0 | M | BB-020, BB-035 | `todo` |
+| BB-061 | Recovery and rollback rehearsal | P0 | M | BB-020, BB-035 | `done` |
 | BB-062 | Production release pipeline | P0 | L | BB-010, BB-020, BB-036, BB-057 | `todo` |
 | BB-063 | Beta launch gate | P0 | M | BB-047, BB-058–062 | `todo` |
 

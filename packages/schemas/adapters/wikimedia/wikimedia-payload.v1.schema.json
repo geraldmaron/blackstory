@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blackbook.local/schemas/adapters/wikimedia/wikimedia-payload.v1.schema.json",
+  "title": "WikimediaCandidatePayload",
+  "description": "Normalized Wikimedia adapter payload extension (BB-045).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "ingestMode",
+    "pageId",
+    "pageTitle",
+    "revisionId",
+    "revisionTimestamp",
+    "namespace",
+    "aliases",
+    "locations",
+    "externalReferences",
+    "relationships",
+    "categories",
+    "categoryGate",
+    "includeProse",
+    "attribution"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "wikimedia-payload.v1"
+    },
+    "ingestMode": {
+      "type": "string",
+      "enum": ["api", "bulk"]
+    },
+    "pageId": { "type": "integer" },
+    "pageTitle": { "type": "string", "minLength": 1 },
+    "revisionId": { "type": "integer" },
+    "revisionTimestamp": { "type": "string", "format": "date-time" },
+    "namespace": { "type": "integer" },
+    "wikidataId": { "type": "string", "pattern": "^Q[0-9]+$" },
+    "aliases": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "locations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/locationHint" }
+    },
+    "externalReferences": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/externalReference" }
+    },
+    "relationships": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/relationship" }
+    },
+    "categories": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "categoryGate": { "$ref": "#/$defs/categoryGate" },
+    "includeProse": {
+      "const": false
+    },
+    "attribution": { "$ref": "#/$defs/attribution" }
+  },
+  "$defs": {
+    "locationHint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label"],
+      "properties": {
+        "label": { "type": "string" },
+        "wikidataId": { "type": "string", "pattern": "^Q[0-9]+$" },
+        "coordinate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["latitude", "longitude"],
+          "properties": {
+            "latitude": { "type": "number" },
+            "longitude": { "type": "number" }
+          }
+        }
+      }
+    },
+    "externalReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "identifier"],
+      "properties": {
+        "system": { "type": "string" },
+        "identifier": { "type": "string" },
+        "wikidataProperty": { "type": "string" },
+        "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["property", "targetWikidataId"],
+      "properties": {
+        "property": { "type": "string" },
+        "targetWikidataId": { "type": "string", "pattern": "^Q[0-9]+$" },
+        "targetLabel": { "type": "string" }
+      }
+    },
+    "categoryGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "matchedSeedCategories", "traversedCategories", "reason"],
+      "properties": {
+        "passed": { "type": "boolean" },
+        "matchedSeedCategories": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "traversedCategories": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "reason": { "type": "string" }
+      }
+    },
+    "attribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceProject", "license", "attributionUrl", "requiredNotice"],
+      "properties": {
+        "sourceProject": { "type": "string" },
+        "license": { "type": "string" },
+        "attributionUrl": { "type": "string", "format": "uri" },
+        "requiredNotice": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

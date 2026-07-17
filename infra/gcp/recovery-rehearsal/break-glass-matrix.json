@@ -1,0 +1,60 @@
+{
+  "version": "1.0.0",
+  "bead": "BB-061",
+  "status": "design-only",
+  "notes": [
+    "Critical recovery must not depend on a compromised deploy or runtime identity.",
+    "Use break-glass human identities (IAP + org admin) or backup@ for restore paths only.",
+    "Never paste secret values into this repository or drill tickets."
+  ],
+  "compromisedIdentityExamples": [
+    "github-deploy@black-book-efaaf.iam.gserviceaccount.com",
+    "api-internal@black-book-efaaf.iam.gserviceaccount.com"
+  ],
+  "breakGlassPaths": [
+    {
+      "id": "human-platform-admin",
+      "principalType": "human",
+      "authPath": "IAP + org/group admin via 1Password CLI",
+      "allowedActions": [
+        "kill-switch writes",
+        "Cloud Armor rule updates",
+        "credential disable",
+        "Secret Manager version disable",
+        "Cloud Tasks queue pause/resume"
+      ],
+      "mustNotUseFor": []
+    },
+    {
+      "id": "backup-restore-sa",
+      "principalType": "serviceAccount",
+      "email": "backup@black-book-efaaf.iam.gserviceaccount.com",
+      "allowedActions": [
+        "Firestore export read",
+        "staging import (human-executed gcloud with backup@ impersonation)"
+      ],
+      "mustNotUseFor": [
+        "runtime deploy",
+        "publication signing",
+        "live production mutation without runbook"
+      ]
+    },
+    {
+      "id": "security-operator",
+      "principalType": "human",
+      "authPath": "security@ group + incident-operator Firestore role",
+      "allowedActions": [
+        "audit review",
+        "credential revocation matrix execution",
+        "findings publication"
+      ],
+      "mustNotUseFor": []
+    }
+  ],
+  "rules": [
+    "If github-deploy is suspected compromised, revoke WIF binding — do not use github-deploy for recovery.",
+    "Publication rollback uses publication operator path with publication kill switch engaged; not api-internal if that SA is tainted.",
+    "Queue pause/resume uses human gcloud with platform-admin — not worker runtime SAs.",
+    "Secret rotation uses Secret Manager + 1Password; never commit replacement values."
+  ]
+}

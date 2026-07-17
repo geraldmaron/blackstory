@@ -1,0 +1,47 @@
+{
+  "$schemaVersion": 1,
+  "bead": "BB-036",
+  "severity": {
+    "productionBlocking": ["critical", "high"],
+    "warningOnly": ["medium", "low", "unknown"],
+    "failClosedOnScannerError": true
+  },
+  "requiredChecks": [
+    "Security / Policy and API Security",
+    "Security / CodeQL (javascript-typescript)",
+    "Security / CodeQL (python)",
+    "Security / Dependency Review",
+    "Security / Secret Scan",
+    "Security / SBOM",
+    "Security / Filesystem Vulnerabilities",
+    "Security / Image and Signature",
+    "Security / DAST Staging"
+  ],
+  "suppressionRegistry": "infra/github/security-gates/suppressions.json",
+  "suppressionSchema": "infra/github/security-gates/suppression.schema.json",
+  "artifacts": {
+    "retentionDays": 90,
+    "required": [
+      "codeql",
+      "dependency-review",
+      "secret-scan",
+      "sbom",
+      "vulnerability-scan",
+      "infrastructure-policy",
+      "api-security-tests",
+      "dast"
+    ],
+    "attachToRelease": true
+  },
+  "dast": {
+    "environment": "staging",
+    "productionForbidden": true,
+    "isolatedIdentityPrefix": "bb-security-dast-"
+  },
+  "release": {
+    "requireExactCommit": true,
+    "requireImageDigest": true,
+    "requireKeylessSignature": true,
+    "signatureIssuer": "https://token.actions.githubusercontent.com"
+  }
+}

@@ -1,8 +1,23 @@
-"""Security worker package: quarantine and integrity checks."""
+"""Security worker package: quarantine, integrity, and safe URL fetch (BB-030)."""
 
 from __future__ import annotations
 
-__all__ = ["health"]
+from .url_fetch import (
+    FetchLimits,
+    FetchOutcome,
+    evaluate_job,
+    parse_external_url,
+    pin_destination,
+)
+
+__all__ = [
+    "FetchLimits",
+    "FetchOutcome",
+    "evaluate_job",
+    "health",
+    "parse_external_url",
+    "pin_destination",
+]
 
 
 def health() -> dict[str, str]:

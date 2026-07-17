@@ -1,0 +1,302 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blackbook.local/schemas/extraction/extraction-record.v1.schema.json",
+  "title": "ExtractionRecord",
+  "description": "Auditable atomic-claim extraction decision with evidence spans and explicit uncertainty (BB-042).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "method",
+    "draft",
+    "evidenceSpans",
+    "evidenceLinks",
+    "contradictions",
+    "uncertainties",
+    "decision",
+    "workflowStatus",
+    "rejectionReasons",
+    "extractedAt",
+    "extractedBy"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "extraction-record.v1" },
+    "id": { "type": "string", "minLength": 1 },
+    "method": { "enum": ["deterministic", "manual"] },
+    "draft": { "$ref": "#/$defs/claimDraft" },
+    "evidenceSpans": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidenceSpan" }
+    },
+    "evidenceLinks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidenceLink" }
+    },
+    "contradictions": { "$ref": "#/$defs/contradictionSet" },
+    "uncertainties": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/uncertainty" }
+    },
+    "decision": { "enum": ["accepted", "rejected"] },
+    "workflowStatus": { "enum": ["accepted", "rejected"] },
+    "rejectionReasons": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "extractedAt": { "type": "string", "format": "date-time" },
+    "extractedBy": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "decision": { "const": "accepted" } },
+        "required": ["decision"]
+      },
+      "then": {
+        "properties": {
+          "workflowStatus": { "const": "accepted" },
+          "rejectionReasons": { "maxItems": 0 },
+          "draft": {
+            "properties": {
+              "atomicity": {
+                "properties": {
+                  "assertionCount": { "const": 1 },
+                  "independentlySupportable": { "const": true }
+                },
+                "required": ["assertionCount", "independentlySupportable"]
+              }
+            }
+          },
+          "evidenceSpans": { "minItems": 1 },
+          "evidenceLinks": {
+            "contains": {
+              "type": "object",
+              "properties": {
+                "role": { "const": "supporting" },
+                "credible": { "const": true },
+                "directness": { "type": "number", "exclusiveMinimum": 0 },
+                "extractionQuality": { "type": "number", "exclusiveMinimum": 0 }
+              },
+              "required": [
+                "role",
+                "credible",
+                "directness",
+                "extractionQuality",
+                "assertedValue"
+              ]
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "workflowStatus": { "const": "rejected" },
+          "rejectionReasons": { "minItems": 1 }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "temporalContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "validFrom": { "type": "string", "minLength": 1 },
+        "validTo": { "type": ["string", "null"], "minLength": 1 }
+      }
+    },
+    "geographicContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "locationId": { "type": "string", "minLength": 1 },
+        "jurisdictionId": { "type": "string", "minLength": 1 },
+        "notes": { "type": "string", "minLength": 1 },
+        "precision": { "type": "string", "minLength": 1 }
+      }
+    },
+    "atomicity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assertionCount", "independentlySupportable", "rationale"],
+      "properties": {
+        "assertionCount": { "type": "integer", "minimum": 1 },
+        "independentlySupportable": { "type": "boolean" },
+        "rationale": { "type": "string", "minLength": 1 }
+      }
+    },
+    "claimDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claimId",
+        "claimVersionId",
+        "entityId",
+        "predicate",
+        "object",
+        "claimClass",
+        "proceduralStatus",
+        "atomicity"
+      ],
+      "properties": {
+        "claimId": { "type": "string", "minLength": 1 },
+        "claimVersionId": { "type": "string", "minLength": 1 },
+        "entityId": { "type": "string", "minLength": 1 },
+        "predicate": { "type": "string", "minLength": 1 },
+        "object": { "type": "string", "minLength": 1 },
+        "claimClass": { "enum": ["standard", "high_impact"] },
+        "proceduralStatus": {
+          "enum": [
+            "alleged",
+            "charged",
+            "indicted",
+            "arraigned",
+            "convicted",
+            "acquitted",
+            "dismissed",
+            "settled_civil",
+            "ruled",
+            "enacted",
+            "repealed",
+            "unknown_procedural"
+          ]
+        },
+        "temporal": { "$ref": "#/$defs/temporalContext" },
+        "geographic": { "$ref": "#/$defs/geographicContext" },
+        "atomicity": { "$ref": "#/$defs/atomicity" }
+      }
+    },
+    "locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "page": { "type": "string", "minLength": 1 },
+        "pages": { "type": "string", "minLength": 1 },
+        "paragraph": { "type": "string", "minLength": 1 },
+        "offsetStart": { "type": "integer", "minimum": 0 },
+        "offsetEnd": { "type": "integer", "minimum": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "uriFragment": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidenceSpan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "evidenceId",
+        "sourceItemId",
+        "offsetStart",
+        "offsetEnd",
+        "text",
+        "exactQuotation",
+        "locator"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "evidenceId": { "type": "string", "minLength": 1 },
+        "sourceItemId": { "type": "string", "minLength": 1 },
+        "offsetStart": { "type": "integer", "minimum": 0 },
+        "offsetEnd": { "type": "integer", "minimum": 1 },
+        "text": { "type": "string", "minLength": 1 },
+        "exactQuotation": { "type": "boolean" },
+        "locator": { "$ref": "#/$defs/locator" }
+      }
+    },
+    "evidenceLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "claimId",
+        "claimVersionId",
+        "evidenceId",
+        "role",
+        "lineageRootId",
+        "credible",
+        "sourceClassification",
+        "directness",
+        "temporalProximity",
+        "geographicPrecision",
+        "entityMatchQuality",
+        "extractionQuality",
+        "createdAt"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "claimId": { "type": "string", "minLength": 1 },
+        "claimVersionId": { "type": "string", "minLength": 1 },
+        "evidenceId": { "type": "string", "minLength": 1 },
+        "role": { "enum": ["supporting", "contradicting", "contextual"] },
+        "lineageRootId": { "type": "string", "minLength": 1 },
+        "credible": { "type": "boolean" },
+        "sourceClassification": { "type": "string", "minLength": 1 },
+        "directness": { "type": "number", "minimum": 0, "maximum": 1 },
+        "temporalProximity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "geographicPrecision": { "type": "number", "minimum": 0, "maximum": 1 },
+        "entityMatchQuality": { "type": "number", "minimum": 0, "maximum": 1 },
+        "extractionQuality": { "type": "number", "minimum": 0, "maximum": 1 },
+        "assertedValue": { "type": "string", "minLength": 1 },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "preservedValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "evidenceLinkIds", "credible", "kind"],
+      "properties": {
+        "value": { "type": "string", "minLength": 1 },
+        "evidenceLinkIds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "credible": { "type": "boolean" },
+        "kind": { "enum": ["primary", "contradicting", "alternative"] }
+      }
+    },
+    "contradictionSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claimId", "primaryValue", "values", "hasCredibleContradiction"],
+      "properties": {
+        "claimId": { "type": "string", "minLength": 1 },
+        "primaryValue": { "type": "string", "minLength": 1 },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/preservedValue" }
+        },
+        "hasCredibleContradiction": { "type": "boolean" }
+      }
+    },
+    "uncertainty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "detail", "recordedBy"],
+      "properties": {
+        "code": {
+          "enum": [
+            "atomicity",
+            "entity",
+            "predicate",
+            "object",
+            "quotation",
+            "temporal",
+            "geographic",
+            "procedural_status",
+            "evidence"
+          ]
+        },
+        "detail": { "type": "string", "minLength": 1 },
+        "recordedBy": { "enum": ["parser", "researcher", "validator"] }
+      }
+    }
+  }
+}

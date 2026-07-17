@@ -1,0 +1,26 @@
+{
+  "document": "killSwitches/{switchId}",
+  "remoteConfigParameterPrefix": "kill_switch_",
+  "firestoreExample": {
+    "id": "research-campaigns",
+    "enabled": true,
+    "reason": "INC-000 containment",
+    "updatedAt": "SERVER_TIMESTAMP",
+    "updatedBy": "operator-uid",
+    "incidentId": "INC-000",
+    "expiresAt": "OPTIONAL_ISO_TIMESTAMP"
+  },
+  "remoteConfigExample": {
+    "parameter": "kill_switch_research_campaigns",
+    "defaultValue": "true",
+    "description": "BB-035: true stops research campaigns"
+  },
+  "resolution": {
+    "serverAuthority": "Firestore killSwitches/{switchId}",
+    "publicClientFastPath": "Firebase Remote Config",
+    "conflictRule": "engaged wins",
+    "staleOrInvalidOptionalRule": "deny",
+    "staleOrInvalidPublicCorpusRule": "continue immutable release snapshot",
+    "auditRule": "record every change through BB-018 audit/outbox with incident id"
+  }
+}

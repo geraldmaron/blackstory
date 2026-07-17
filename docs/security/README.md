@@ -13,6 +13,8 @@ Threat model, abuse-case corpus, environment isolation design, and security test
 | [`rate-limits.md`](./rate-limits.md) | BB-025 application quota matrix and guard stubs |
 | [`query-guardrails.md`](./query-guardrails.md) | BB-026 search query validation, cursors, cache keys |
 | [`submission-quarantine.md`](./submission-quarantine.md) | BB-029 correction validation, quarantine, campaign detection, and moderation boundary |
+| [`url-ssrf.md`](./url-ssrf.md) | BB-030 async URL evaluation, SSRF defenses, and egress-restricted fetch |
+| [`promotion-controls.md`](./promotion-controls.md) | BB-032 staged promotion, lineage/corroboration gates, and release preview diffs |
 | [`telemetry-anomaly.md`](./telemetry-anomaly.md) | BB-034 security telemetry, metrics, anomaly rules, alerts |
 | [`cost-resource-controls.md`](./cost-resource-controls.md) | BB-033 scaling, queue/job budgets, circuit breakers, soft shutdown |
 | [`../infra/firebase/auth-and-app-check.md`](../../infra/firebase/auth-and-app-check.md) | BB-011 Auth plan + App Check scaffold (enforcement = BB-024) |

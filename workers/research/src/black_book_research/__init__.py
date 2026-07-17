@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-__all__ = ["adapters", "health"]
+from . import adapters, confidence_engine, extraction
+
+__all__ = ["adapters", "confidence_engine", "extraction", "health"]
 
 
 def health() -> dict[str, str]:

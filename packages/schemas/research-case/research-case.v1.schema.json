@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blackbook.local/schemas/research-case/research-case.v1.schema.json",
+  "title": "Black Book Research Case",
+  "description": "Firestore system-of-record contract for the BB-044 research-case lifecycle.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "state",
+    "candidateId",
+    "title",
+    "checklist",
+    "history",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "state": {
+      "type": "string",
+      "enum": [
+        "candidate",
+        "relevance_review",
+        "relevance_confirmed",
+        "minimum_record",
+        "partial_enrichment",
+        "substantial_enrichment",
+        "insufficient_evidence",
+        "excluded",
+        "merged",
+        "retracted"
+      ]
+    },
+    "candidateId": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "relevanceAssessment": { "type": "object" },
+    "checklist": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["items"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["key", "complete", "evidenceIds"],
+            "properties": {
+              "key": {
+                "type": "string",
+                "enum": [
+                  "identity",
+                  "relevance_assessment",
+                  "source_citation",
+                  "public_summary",
+                  "rights_clearance",
+                  "dates",
+                  "geography",
+                  "corroboration",
+                  "contradiction_search",
+                  "historical_context"
+                ]
+              },
+              "complete": { "type": "boolean" },
+              "evidenceIds": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "type": "string", "minLength": 1 }
+              },
+              "note": { "type": "string" }
+            },
+            "allOf": [
+              {
+                "if": { "properties": { "complete": { "const": true } } },
+                "then": { "properties": { "evidenceIds": { "minItems": 1 } } }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "assignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["queue", "priority", "reviewerId", "assignedBy", "assignedAt"],
+      "properties": {
+        "queue": {
+          "enum": [
+            "relevance",
+            "minimum_record",
+            "enrichment",
+            "publication",
+            "retraction",
+            "backfill"
+          ]
+        },
+        "priority": { "enum": ["urgent", "high", "normal", "low"] },
+        "reviewerId": { "type": "string", "minLength": 1 },
+        "assignedBy": { "type": "string", "minLength": 1 },
+        "assignedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["releaseId", "publishedAt", "revision"],
+      "properties": {
+        "releaseId": { "type": "string", "minLength": 1 },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "revision": { "type": "string", "minLength": 1 }
+      }
+    },
+    "retraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "priorReleaseId",
+        "replacementReleaseId",
+        "reasonCode",
+        "reason",
+        "retractedAt",
+        "retractedBy"
+      ],
+      "properties": {
+        "priorReleaseId": { "type": "string", "minLength": 1 },
+        "replacementReleaseId": { "type": "string", "minLength": 1 },
+        "reasonCode": {
+          "enum": [
+            "material_correction",
+            "legal_or_rights_request",
+            "source_retracted",
+            "publication_error"
+          ]
+        },
+        "reason": { "type": "string", "minLength": 1 },
+        "retractedAt": { "type": "string", "format": "date-time" },
+        "retractedBy": { "type": "string", "minLength": 1 }
+      }
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "reasonCode", "reason", "actorId", "occurredAt", "evidenceIds"],
+        "properties": {
+          "from": { "$ref": "#/$defs/state" },
+          "to": { "$ref": "#/$defs/state" },
+          "reasonCode": { "$ref": "#/$defs/reasonCode" },
+          "reason": { "type": "string", "minLength": 1 },
+          "actorId": { "type": "string", "minLength": 1 },
+          "occurredAt": { "type": "string", "format": "date-time" },
+          "evidenceIds": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "mergedIntoCaseId": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "state": {
+      "enum": [
+        "candidate",
+        "relevance_review",
+        "relevance_confirmed",
+        "minimum_record",
+        "partial_enrichment",
+        "substantial_enrichment",
+        "insufficient_evidence",
+        "excluded",
+        "merged",
+        "retracted"
+      ]
+    },
+    "reasonCode": {
+      "enum": [
+        "relevance_confirmed",
+        "minimum_record_complete",
+        "partial_enrichment_complete",
+        "substantial_enrichment_complete",
+        "insufficient_source_evidence",
+        "identity_unresolved",
+        "relevance_not_established",
+        "duplicate_case",
+        "outside_scope",
+        "rights_restricted",
+        "merged_duplicate",
+        "new_evidence_received",
+        "material_correction",
+        "legal_or_rights_request",
+        "source_retracted",
+        "publication_error"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "state": { "const": "retracted" } } },
+      "then": { "required": ["publication", "retraction"] }
+    }
+  ]
+}

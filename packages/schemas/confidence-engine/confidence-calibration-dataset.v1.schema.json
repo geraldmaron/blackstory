@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blackbook.local/schemas/confidence-engine/confidence-calibration-dataset.v1.schema.json",
+  "title": "ConfidenceCalibrationDataset",
+  "description": "Versioned private calibration export for deterministic claim confidence (BB-043).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "exportedAt", "rows"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "confidence-calibration-dataset.v1"
+    },
+    "exportedAt": { "type": "string", "format": "date-time" },
+    "rows": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/row" }
+    }
+  },
+  "$defs": {
+    "unitInterval": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "componentVersions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceAuthority",
+        "directness",
+        "lineageIndependence",
+        "temporalProximity",
+        "geographicPrecision",
+        "entityMatchQuality",
+        "extractionQuality",
+        "contradictionPenalty",
+        "threshold"
+      ],
+      "properties": {
+        "sourceAuthority": { "const": "confidence-components.v1" },
+        "directness": { "const": "confidence-components.v1" },
+        "lineageIndependence": { "const": "confidence-components.v1" },
+        "temporalProximity": { "const": "confidence-components.v1" },
+        "geographicPrecision": { "const": "confidence-components.v1" },
+        "entityMatchQuality": { "const": "confidence-components.v1" },
+        "extractionQuality": { "const": "confidence-components.v1" },
+        "contradictionPenalty": { "const": "confidence-components.v1" },
+        "threshold": { "const": "constitution-policy.v1" }
+      }
+    },
+    "fingerprints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "evidence", "contradiction", "policy"],
+      "properties": {
+        "source": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "evidence": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "contradiction": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "policy": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    },
+    "components": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceAuthority",
+        "directness",
+        "lineageIndependence",
+        "temporalProximity",
+        "geographicPrecision",
+        "entityMatchQuality",
+        "extractionQuality",
+        "contradictionPenalty"
+      ],
+      "properties": {
+        "sourceAuthority": { "$ref": "#/$defs/unitInterval" },
+        "directness": { "$ref": "#/$defs/unitInterval" },
+        "lineageIndependence": { "$ref": "#/$defs/unitInterval" },
+        "temporalProximity": { "$ref": "#/$defs/unitInterval" },
+        "geographicPrecision": { "$ref": "#/$defs/unitInterval" },
+        "entityMatchQuality": { "$ref": "#/$defs/unitInterval" },
+        "extractionQuality": { "$ref": "#/$defs/unitInterval" },
+        "contradictionPenalty": { "$ref": "#/$defs/unitInterval" }
+      }
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claimId",
+        "claimVersionId",
+        "claimClass",
+        "score",
+        "threshold",
+        "passesPublishThreshold",
+        "components",
+        "policyVersion",
+        "engineVersion",
+        "componentVersions",
+        "independentLineageCount",
+        "supportingEvidenceCount",
+        "contradictingEvidenceCount",
+        "inputFingerprints",
+        "calculatedAt"
+      ],
+      "properties": {
+        "claimId": { "type": "string", "minLength": 1 },
+        "claimVersionId": { "type": "string", "minLength": 1 },
+        "claimClass": { "enum": ["standard", "high_impact"] },
+        "score": { "$ref": "#/$defs/unitInterval" },
+        "threshold": { "$ref": "#/$defs/unitInterval" },
+        "passesPublishThreshold": { "type": "boolean" },
+        "components": { "$ref": "#/$defs/components" },
+        "policyVersion": { "type": "string", "minLength": 1 },
+        "engineVersion": { "const": "confidence-engine.v1" },
+        "componentVersions": { "$ref": "#/$defs/componentVersions" },
+        "independentLineageCount": { "type": "integer", "minimum": 0 },
+        "supportingEvidenceCount": { "type": "integer", "minimum": 0 },
+        "contradictingEvidenceCount": { "type": "integer", "minimum": 0 },
+        "inputFingerprints": { "$ref": "#/$defs/fingerprints" },
+        "calculatedAt": { "type": "string", "format": "date-time" },
+        "observedOutcome": { "type": "boolean" },
+        "outcomeSource": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "status": "design-only",
+  "provider": "Google Cloud Tasks",
+  "queues": [
+    "submissions-intake",
+    "url-evaluation",
+    "publication-preview",
+    "outbox-dispatch",
+    "research-campaign"
+  ],
+  "pauseSemantics": {
+    "commandPattern": "gcloud tasks queues pause QUEUE_ID --location=REGION --project=PROJECT_ID",
+    "dispatch": "stopped",
+    "existingTasks": "retained",
+    "newTasks": "accepted and retained",
+    "purge": "forbidden during containment",
+    "resumeRequires": [
+      "incident commander approval",
+      "consumer credentials verified",
+      "backlog depth and oldest task age reviewed",
+      "rate-limited canary resume",
+      "idempotency and dead-letter monitoring"
+    ]
+  }
+}

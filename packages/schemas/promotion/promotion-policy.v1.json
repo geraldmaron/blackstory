@@ -1,0 +1,11 @@
+{
+  "$schema": "./promotion-policy.v1.schema.json",
+  "policyVersion": "1.0.0",
+  "minimumReputation": "limited",
+  "standardMinimumIndependentLineages": 2,
+  "highImpactMinimumIndependentLineages": 3,
+  "highImpactMinimumStrongLineages": 2,
+  "standardConfidenceThreshold": 0.7,
+  "highImpactConfidenceThreshold": 0.85,
+  "strongReputations": ["established", "authoritative"]
+}

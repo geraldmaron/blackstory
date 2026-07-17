@@ -1,9 +1,10 @@
-# Security test checklist (BB-004 scaffold)
+# Security test checklist (BB-004 / BB-036)
 
 > Manual and future-automated checks derived from [`../abuse-cases.md`](../abuse-cases.md).  
-> Expand into CI under **BB-036**. Do not mark production-ready from this checklist alone.
+> BB-036 automation is mapped below and in [`asvs-checklist.md`](./asvs-checklist.md).
+> Human and downstream checks remain release blockers where marked.
 
-**Last updated:** 2026-07-16  
+**Last updated:** 2026-07-17
 **Corpus version:** see `docs/security/threat-corpus.json` → `version`
 
 ## Always-on (repo / scaffold)
@@ -20,10 +21,10 @@
 
 | ID | Abuse | Check | Mode |
 |----|-------|-------|------|
-| A-04a | AC-04 | Public token cannot call `api-internal` publish | ci |
-| A-04b | AC-04 | Cannot read/modify another actor’s submission by ID | ci |
-| A-03a | AC-03 | End-user Firebase token rejected on admin/publication | ci |
-| A-16a | AC-16 | Research worker credentials cannot activate release | ci |
+| A-04a | AC-04 | Public token cannot call `api-internal` publish | ci (`security-gates.test.ts`) |
+| A-04b | AC-04 | Cannot read/modify another actor’s submission by ID | ci (`security-gates.test.ts`, BOLA) |
+| A-03a | AC-03 | End-user Firebase token rejected on admin/publication | ci (`security-gates.test.ts` → Firebase auth gate) |
+| A-16a | AC-16 | Research worker credentials cannot activate release | ci (`security-gates.test.ts`) |
 
 ## Abuse / quotas (BB-023–026, BB-029, BB-032)
 
@@ -31,9 +32,9 @@
 |----|-------|-------|------|
 | A-01a | AC-01 | Edge/app returns 429 under flood; snapshots still readable | manual / BB-059 |
 | A-02a | AC-02 | Cache-busting query params do not bypass CDN for static | ci |
-| A-02b | AC-02 | Over-complex search rejected or times out | ci |
+| A-02b | AC-02 | Over-complex search rejected or times out | ci (`security-gates.test.ts` → query guardrails) |
 | A-05a | AC-05 | Duplicate corrections do not raise confidence | ci |
-| A-05b | AC-05 | Submission burst hits quota | ci |
+| A-05b | AC-05 | Submission burst / oversized body hits quota | ci (`security-gates.test.ts`) |
 | A-19a | AC-19 | Sequential entity enumeration throttled | ci / BB-059 |
 
 ## URL / file / model (BB-030, BB-031, BB-065)
@@ -41,7 +42,7 @@
 | ID | Abuse | Check | Mode |
 |----|-------|-------|------|
 | A-08a | AC-08 | Request path never fetches submitted URL synchronously | ci |
-| A-08b | AC-08 | Fetcher denies link-local, RFC1918, rebind fixtures | ci |
+| A-08b | AC-08 | Fetcher denies link-local, RFC1918, metadata, and loopback fixtures | ci (`security-gates.test.ts` → URL safety) |
 | A-08c | AC-08 | Oversized response aborted | ci |
 | A-09a | AC-09 | Malware/polyglot upload rejected or quarantined | deferred BB-031 |
 | A-10a | AC-10 | Injection fixture cannot trigger publish or secret tool | deferred BB-065 |
@@ -58,9 +59,9 @@
 
 | ID | Abuse | Check | Mode |
 |----|-------|-------|------|
-| A-11a | AC-11 | Workflows use pinned Actions only | ci (`pnpm validate:governance`) |
+| A-11a | AC-11 | Workflows use pinned Actions only | ci (`pnpm validate:governance`; `security.yml`) |
 | A-11b | AC-11 | Deploy uses OIDC/WIF, not static keys | review (`infra/gcp/wif/`, `.github/workflows/deploy-production.yml`; no `credentials_json`) |
-| A-12a | AC-12 | Secret scanning + push protection enabled | repo setting (`infra/github/security-settings.json`; apply blocked until remote) |
+| A-12a | AC-12 | Secret scanning + push protection enabled | Gitleaks CI + human repo setting (`infra/github/security-gates/README.md`) |
 | A-12b | AC-12 | Web client bundle scan finds no private keys | ci |
 
 ## Publication integrity (BB-019, BB-035, BB-061)
@@ -89,3 +90,21 @@
 | Rollback rehearsal | BB-061 | BB-063 |
 
 When a check moves from scaffold → ci, update this table and link the test path (do not leave orphan checklist rows).
+
+## BB-036 production security gates
+
+| Gate | Automated evidence | Production rule |
+|------|--------------------|-----------------|
+| Code scanning | CodeQL security-extended SARIF | high/critical blocks |
+| Dependency review | PR dependency review | high/critical blocks |
+| Secrets | Gitleaks plus GitHub secret-scanning policy | any verified secret blocks |
+| SBOM | SPDX JSON artifact | retained and attached to release |
+| Vulnerabilities / IaC | Trivy filesystem, secret, misconfiguration, and image SARIF | high/critical blocks |
+| API / abuse | `packages/testing/src/security-gates/security-gates.test.ts` | any failure blocks |
+| DAST | protected manual staging ZAP baseline | production target forbidden |
+| Release | Cosign verification + release-evidence contract | exact commit and digest required |
+
+Suppressions are accepted only through
+`infra/github/security-gates/suppressions.json`; reason, `team/handle` owner, and
+future expiration are mandatory. Security artifacts are retained for at least 90 days
+and must be attached to the release before production promotion.

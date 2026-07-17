@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "bead": "BB-061",
+  "scenarioId": "compromised-github-deploy-q3-2026",
+  "compromisedIdentity": "github-deploy@black-book-efaaf.iam.gserviceaccount.com",
+  "breakGlassIdentity": "human-platform-admin",
+  "exportUri": "gs://black-book-efaaf-firestore-backups/exports/weekly/2026/Week-29/full/",
+  "stagingProject": "black-book-staging-restore",
+  "priorReleaseId": "release-000",
+  "badReleaseId": "release-001",
+  "queues": [
+    { "id": "publication-tasks", "depth": 12, "oldestAgeSeconds": 45 },
+    { "id": "research-tasks", "depth": 3, "oldestAgeSeconds": 120 }
+  ],
+  "publicObject": {
+    "bucket": "black-book-efaaf-public",
+    "objectPath": "public/releases/release-001/entities/entity-a.json",
+    "deletedGeneration": 1234567890,
+    "restoreGeneration": 1234567880
+  },
+  "simulatedDurationsMs": {
+    "declare-and-isolate": 42000,
+    "block-malicious-traffic": 18000,
+    "disable-submissions": 24000,
+    "pause-queues": 36000,
+    "revoke-compromised-deploy-identity": 78000,
+    "rotate-secrets": 132000,
+    "active-release-rollback": 96000,
+    "database-restore": 180000,
+    "rebuild-public-projections": 144000,
+    "restore-deleted-public-object": 72000,
+    "record-findings": 30000
+  },
+  "metadataFixture": "../backup-restore/fixtures/sample-export-metadata.json",
+  "baselineCountsFixture": "../backup-restore/fixtures/sample-baseline-counts.json",
+  "baselineHashesFixture": "../backup-restore/fixtures/sample-baseline-hashes.json",
+  "activePointerFixture": "../backup-restore/fixtures/sample-active-pointer.json",
+  "releaseFixture": "../backup-restore/fixtures/sample-release.json",
+  "priorReleaseFixture": "fixtures/prior-release.json"
+}

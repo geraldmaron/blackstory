@@ -254,3 +254,7 @@ export * from './query-packs/index.js';
 export * from './discovery/index.js';
 export * from './relevance/index.js';
 export * from './resolution/index.js';
+export * from './promotion/index.js';
+export * from './extraction/index.js';
+export * from './confidence-engine/index.js';
+export * from './research-case/index.js';

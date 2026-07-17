@@ -97,3 +97,5 @@ export type {
   ThreatCorpus,
   ThreatRecord,
 } from './security/threat-corpus.js';
+
+export * from './security-gates/index.js';

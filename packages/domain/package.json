@@ -16,7 +16,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/index.test.ts src/provenance.test.ts src/claims.test.ts src/audit.test.ts src/adapters.test.ts src/publication.test.ts src/query-packs.test.ts src/discovery.test.ts src/relevance.test.ts src/resolution.test.ts",
+    "test": "node --conditions development --import tsx --test src/index.test.ts src/provenance.test.ts src/claims.test.ts src/audit.test.ts src/adapters.test.ts src/adapters/federal/federal.test.ts src/adapters/wikimedia/wikimedia.test.ts src/publication.test.ts src/query-packs.test.ts src/discovery.test.ts src/relevance.test.ts src/resolution.test.ts src/promotion.test.ts src/extraction.test.ts src/confidence-engine.test.ts src/research-case.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

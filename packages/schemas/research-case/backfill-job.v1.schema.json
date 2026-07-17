@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blackbook.local/schemas/research-case/backfill-job.v1.schema.json",
+  "title": "Research Case Backfill Job",
+  "description": "A scheduled BB-044 job for evidence fields missing from a research case.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "caseId",
+    "status",
+    "missingFields",
+    "priority",
+    "scheduledFor",
+    "scheduledBy",
+    "createdAt"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "caseId": { "type": "string", "minLength": 1 },
+    "status": { "const": "scheduled" },
+    "missingFields": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "identity",
+          "relevance_assessment",
+          "source_citation",
+          "public_summary",
+          "rights_clearance",
+          "dates",
+          "geography",
+          "corroboration",
+          "contradiction_search",
+          "historical_context"
+        ]
+      }
+    },
+    "priority": { "enum": ["urgent", "high", "normal", "low"] },
+    "scheduledFor": { "type": "string", "format": "date-time" },
+    "scheduledBy": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" }
+  }
+}

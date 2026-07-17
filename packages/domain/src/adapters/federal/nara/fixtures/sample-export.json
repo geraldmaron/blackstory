@@ -1,0 +1,16 @@
+[
+  {
+    "stableIdentifier": "naid-12345678",
+    "title": "Sample archival record",
+    "canonicalUrl": "https://catalog.archives.gov/id/12345678",
+    "classification": "primary_archival",
+    "recordGroup": "RG-123",
+    "series": "Entry 45",
+    "fullText": "REDACTED_BULK_TEXT_SHOULD_BE_STRIPPED_FROM_CANDIDATE_PAYLOAD"
+  },
+  {
+    "stableIdentifier": "naid-no-url",
+    "title": "Missing URL record",
+    "classification": "primary_archival"
+  }
+]

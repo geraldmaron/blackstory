@@ -1,0 +1,12 @@
+[
+  {
+    "stableIdentifier": "nrhp-66000001",
+    "title": "Brown Chapel African Methodist Episcopal Church",
+    "canonicalUrl": "https://www.nps.gov/subjects/nationalregister/66000001",
+    "classification": "government_record",
+    "nrhpReference": "66000001",
+    "state": "AL",
+    "locality": "Selma",
+    "boundaryGeojson": { "type": "Polygon", "coordinates": [] }
+  }
+]

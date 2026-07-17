@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blackbook.local/schemas/adapters/federal/dpla-export.v1.schema.json",
+  "title": "DplaExportRecord",
+  "description": "Fixture-only DPLA item export shape for federal adapter ingestion (BB-046).",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["stableIdentifier", "title"],
+  "properties": {
+    "stableIdentifier": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "canonicalUrl": { "type": "string", "format": "uri" },
+    "classification": { "type": "string" },
+    "provider": { "type": "string" },
+    "date": { "type": "string" }
+  }
+}

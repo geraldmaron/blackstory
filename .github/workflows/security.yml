@@ -1,0 +1,306 @@
+# BB-036 security scanning, abuse contracts, staging-only DAST, and release evidence.
+# High/critical findings and scanner failures are production-blocking by policy.
+# All external actions are pinned to immutable commits; DAST never targets production.
+
+name: Security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      image_ref:
+        description: Immutable release image (registry/path@sha256:digest)
+        required: false
+        type: string
+      staging_base_url:
+        description: HTTPS staging URL for an authorized ZAP baseline scan
+        required: false
+        type: string
+      staging_identity_label:
+        description: Isolated identity label beginning bb-security-dast-
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  SECURITY_ARTIFACT_RETENTION_DAYS: '90'
+
+jobs:
+  policy-api-security:
+    name: Security / Policy and API Security
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Validate API abuse, infrastructure policy, suppressions, and release evidence
+        run: |
+          pnpm --filter @black-book/testing test:security 2>&1 | tee security-contracts.log
+          pnpm --filter @black-book/testing exec node --import tsx --test \
+            src/security-gates/security-gates.test.ts 2>&1 | tee -a security-contracts.log
+          pnpm exec tsc --noEmit --strict --exactOptionalPropertyTypes \
+            --target ES2022 --module NodeNext --moduleResolution NodeNext --skipLibCheck \
+            packages/testing/src/security-gates/contracts.ts \
+            packages/testing/src/security-gates/fixtures.ts \
+            packages/testing/src/security-gates/index.ts 2>&1 | tee -a security-contracts.log
+      - name: Retain policy and API security evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: security-policy-api-${{ github.sha }}
+          path: |
+            security-contracts.log
+            infra/github/security-gates/policy.json
+            infra/github/security-gates/suppressions.json
+          if-no-files-found: error
+          retention-days: 90
+
+  codeql:
+    name: Security / CodeQL (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript, python]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@b7351df727350dca84cb9d725d57dcf5bc82ba26 # v3, resolved 2026-07-17
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended
+      - name: Analyze
+        uses: github/codeql-action/analyze@b7351df727350dca84cb9d725d57dcf5bc82ba26 # v3, resolved 2026-07-17
+        with:
+          category: /language:${{ matrix.language }}
+          output: codeql-results
+          upload: always
+      - name: Retain CodeQL evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: codeql-${{ matrix.language }}-${{ github.sha }}
+          path: codeql-results
+          if-no-files-found: warn
+          retention-days: 90
+
+  dependency-review:
+    name: Security / Dependency Review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Block high and critical dependency findings
+        uses: actions/dependency-review-action@1e966ba708e4b64bb0c9bfb7abb5a232840be16a # resolved 2026-07-17
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: never
+      - name: Record dependency-review evidence
+        if: always()
+        run: |
+          printf '{"commit":"%s","runId":"%s","tool":"dependency-review","threshold":"high"}\n' \
+            "$GITHUB_SHA" "$GITHUB_RUN_ID" > dependency-review-evidence.json
+      - name: Retain dependency-review evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dependency-review-${{ github.sha }}
+          path: dependency-review-evidence.json
+          if-no-files-found: error
+          retention-days: 90
+
+  secret-scan:
+    name: Security / Secret Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - name: Scan for committed secrets
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2, resolved 2026-07-17
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Record secret-scan evidence
+        if: always()
+        run: |
+          printf '{"commit":"%s","runId":"%s","tool":"gitleaks"}\n' \
+            "$GITHUB_SHA" "$GITHUB_RUN_ID" > secret-scan-evidence.json
+      - name: Retain secret-scan evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: secret-scan-${{ github.sha }}
+          path: |
+            results.sarif
+            secret-scan-evidence.json
+          if-no-files-found: error
+          retention-days: 90
+
+  sbom:
+    name: Security / SBOM
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Generate SPDX JSON SBOM
+        uses: anchore/sbom-action@26ca99d710488389d655c50441b85fbf22179c0b # resolved 2026-07-17
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+          upload-artifact: false
+      - name: Retain SBOM with release inputs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: sbom-${{ github.sha }}
+          path: sbom.spdx.json
+          if-no-files-found: error
+          retention-days: 90
+
+  filesystem-vulnerabilities:
+    name: Security / Filesystem Vulnerabilities
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Scan dependencies, secrets, and infrastructure configuration
+        uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # resolved 2026-07-17
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          ignore-unfixed: false
+          exit-code: '1'
+          format: sarif
+          output: trivy-filesystem.sarif
+      - name: Retain vulnerability and infrastructure evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: trivy-filesystem-${{ github.sha }}
+          path: trivy-filesystem.sarif
+          if-no-files-found: error
+          retention-days: 90
+
+  image-signature:
+    name: Security / Image and Signature
+    if: github.event_name == 'workflow_dispatch' && inputs.image_ref != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Require immutable image digest
+        env:
+          IMAGE_REF: ${{ inputs.image_ref }}
+        run: |
+          if [[ ! "$IMAGE_REF" =~ @sha256:[0-9a-f]{64}$ ]]; then
+            echo "image_ref must be immutable registry/path@sha256:digest" >&2
+            exit 1
+          fi
+          printf '%s\n' "$IMAGE_REF" > tested-image-reference.txt
+      - name: Scan release image
+        uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # resolved 2026-07-17
+        with:
+          image-ref: ${{ inputs.image_ref }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: false
+          exit-code: '1'
+          format: sarif
+          output: trivy-image.sarif
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@3094a48ba06382e0e6cfa5a4af4fcc55fc6942b9 # resolved 2026-07-17
+      - name: Verify keyless release signature
+        env:
+          IMAGE_REF: ${{ inputs.image_ref }}
+        run: |
+          cosign verify "$IMAGE_REF" \
+            --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
+            --certificate-identity-regexp="^https://github.com/${GITHUB_REPOSITORY}/.github/workflows/.+@refs/heads/main$" \
+            | tee cosign-verification.json
+      - name: Retain image and signature evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: image-signature-${{ github.sha }}
+          path: |
+            tested-image-reference.txt
+            trivy-image.sarif
+            cosign-verification.json
+          if-no-files-found: warn
+          retention-days: 90
+
+  dast-staging:
+    name: Security / DAST Staging
+    if: github.event_name == 'workflow_dispatch' && inputs.staging_base_url != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: staging-security
+    permissions:
+      contents: read
+    env:
+      STAGING_BASE_URL: ${{ inputs.staging_base_url }}
+      STAGING_IDENTITY_LABEL: ${{ inputs.staging_identity_label }}
+      ZAP_AUTH_HEADER: Authorization
+      ZAP_AUTH_HEADER_VALUE: Bearer ${{ secrets.STAGING_DAST_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Prove staging target and isolated identity
+        run: |
+          node -e '
+            const url = new URL(process.env.STAGING_BASE_URL);
+            if (url.protocol !== "https:" || !/(^|[.-])staging([.-]|$)/i.test(url.hostname)) process.exit(1);
+            if (!process.env.STAGING_IDENTITY_LABEL.startsWith("bb-security-dast-")) process.exit(1);
+            if (!process.env.ZAP_AUTH_HEADER_VALUE || process.env.ZAP_AUTH_HEADER_VALUE === "Bearer ") process.exit(1);
+          '
+      - name: Run authorized ZAP baseline against staging only
+        uses: zaproxy/action-baseline@f948cb8d66e25e330a23e64e3fc72a5c0018b16d # resolved 2026-07-17
+        with:
+          target: ${{ inputs.staging_base_url }}
+          fail_action: true
+          allow_issue_writing: false
+          artifact_name: dast-staging-${{ github.sha }}
+          cmd_options: -a -j

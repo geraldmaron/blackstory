@@ -173,6 +173,12 @@ export {
   parseImmutablePublicationRelease,
   resolveActivePublicRelease,
   activatePublicationRelease,
+  promoteClaimToPublicationCandidate,
+  RESEARCH_CASE_SERVER_ACTIONS,
+  assertResearchCaseActionAuthorized,
+  assertResearchCaseTransitionAuthorized,
+  executeAuthorizedResearchCaseTransition,
+  executeAuthorizedResearchCaseAction,
 } from './firestore/index.js';
 export type {
   FirestoreRootCollection,
@@ -227,4 +233,10 @@ export type {
   ActivePublicReleasePointer,
   ActivateReleaseInput,
   ActivateReleaseResult,
+  AcceptedPromotionDoc,
+  PublicationCandidateDoc,
+  PromoteClaimInput,
+  PromoteClaimResult,
+  ResearchCaseServerAction,
+  ServerResearchCaseState,
 } from './firestore/index.js';

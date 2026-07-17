@@ -160,3 +160,23 @@ export type {
   ActivateReleaseInput,
   ActivateReleaseResult,
 } from './release-activation.js';
+
+export { promoteClaimToPublicationCandidate } from './promotion.js';
+export type {
+  AcceptedPromotionDoc,
+  PublicationCandidateDoc,
+  PromoteClaimInput,
+  PromoteClaimResult,
+} from './promotion.js';
+
+export {
+  RESEARCH_CASE_SERVER_ACTIONS,
+  assertResearchCaseActionAuthorized,
+  assertResearchCaseTransitionAuthorized,
+  executeAuthorizedResearchCaseTransition,
+  executeAuthorizedResearchCaseAction,
+} from './research-case.js';
+export type {
+  ResearchCaseServerAction,
+  ServerResearchCaseState,
+} from './research-case.js';

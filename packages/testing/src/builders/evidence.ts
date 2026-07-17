@@ -92,8 +92,8 @@ export class EvidenceBuilder {
       rightsStatus: this.rightsStatus,
       confidence: this.confidence,
       capturedAt: this.clock().toISOString(),
-      page: this.page,
-      observedAt: this.observedAt,
+      ...(this.page !== undefined ? { page: this.page } : {}),
+      ...(this.observedAt !== undefined ? { observedAt: this.observedAt } : {}),
     };
   }
 }

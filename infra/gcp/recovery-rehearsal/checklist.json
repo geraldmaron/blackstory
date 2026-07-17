@@ -1,0 +1,151 @@
+{
+  "version": "1.0.0",
+  "bead": "BB-061",
+  "title": "Recovery and rollback rehearsal — one developer checklist",
+  "status": "design-only",
+  "operatorAssumptions": [
+    "Single on-call developer under pressure with laptop and break-glass access.",
+    "No live GCP restore during rehearsal — dry-run scripts only.",
+    "Compromised identity is github-deploy; recovery uses human-platform-admin."
+  ],
+  "orderedSteps": [
+    {
+      "order": 1,
+      "id": "declare-and-isolate",
+      "label": "Declare incident and engage containment switches",
+      "rtoTargetMinutes": 10,
+      "breakGlassIdentity": "human-platform-admin",
+      "dryRunCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --step declare-and-isolate",
+      "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step declare-and-isolate",
+      "references": [
+        "docs/runbooks/incident-response.md",
+        "infra/gcp/kill-switches/kill-switch-matrix.json"
+      ]
+    },
+    {
+      "order": 2,
+      "id": "block-malicious-traffic",
+      "label": "Block malicious traffic at edge (Cloud Armor emergency deny)",
+      "rtoTargetMinutes": 5,
+      "breakGlassIdentity": "human-platform-admin",
+      "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/block-traffic.stub.sh",
+      "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step block-malicious-traffic",
+      "references": [
+        "infra/gcp/armor/emergency-deny-runbook.md"
+      ]
+    },
+    {
+      "order": 3,
+      "id": "disable-submissions",
+      "label": "Disable submissions and corrections intake",
+      "rtoTargetMinutes": 10,
+      "breakGlassIdentity": "human-platform-admin",
+      "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/disable-submissions.stub.sh",
+      "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step disable-submissions",
+      "references": [
+        "infra/gcp/kill-switches/kill-switch-matrix.json"
+      ]
+    },
+    {
+      "order": 4,
+      "id": "pause-queues",
+      "label": "Pause affected Cloud Tasks queues without purge",
+      "rtoTargetMinutes": 15,
+      "breakGlassIdentity": "human-platform-admin",
+      "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/pause-queues.stub.sh",
+      "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step pause-queues",
+      "references": [
+        "infra/gcp/kill-switches/queue-pause.stub.json"
+      ]
+    },
+    {
+      "order": 5,
+      "id": "revoke-compromised-deploy-identity",
+      "label": "Revoke compromised deploy identity (WIF + SA disable)",
+      "rtoTargetMinutes": 30,
+      "breakGlassIdentity": "human-platform-admin",
+      "mustNotUse": "github-deploy@black-book-efaaf.iam.gserviceaccount.com",
+      "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/revoke-deploy-identity.stub.sh",
+      "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step revoke-compromised-deploy-identity",
+      "references": [
+        "infra/gcp/wif/deploy-roles.md",
+        "infra/gcp/kill-switches/credential-revocation-matrix.json"
+      ]
+    },
+    {
+      "order": 6,
+      "id": "rotate-secrets",
+      "label": "Rotate exposed secrets via Secret Manager + 1Password",
+      "rtoTargetMinutes": 60,
+      "breakGlassIdentity": "human-platform-admin",
+      "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/rotate-secrets.stub.sh",
+      "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step rotate-secrets",
+      "references": [
+        "docs/runbooks/incidents/secret-leak.md"
+      ]
+    },
+    {
+      "order": 7,
+      "id": "active-release-rollback",
+      "label": "Roll back active release to last verified signed release (BB-019)",
+      "rtoTargetMinutes": 120,
+      "breakGlassIdentity": "human-platform-admin",
+      "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/release-rollback.stub.sh",
+      "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step active-release-rollback",
+      "references": [
+        "docs/runbooks/backup-restore.md",
+        "packages/domain/src/publication/index.ts"
+      ]
+    },
+    {
+      "order": 8,
+      "id": "database-restore",
+      "label": "Restore Firestore from weekly export (staging dry-run per BB-020)",
+      "rtoTargetMinutes": 480,
+      "breakGlassIdentity": "backup-restore-sa",
+      "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/database-restore.stub.sh",
+      "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step database-restore",
+      "references": [
+        "docs/runbooks/backup-restore.md",
+        "scripts/backup-restore/verify-restore.mjs"
+      ]
+    },
+    {
+      "order": 9,
+      "id": "rebuild-public-projections",
+      "label": "Rebuild public projections from canonical + on-release export",
+      "rtoTargetMinutes": 240,
+      "breakGlassIdentity": "human-platform-admin",
+      "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/rebuild-projections.stub.sh",
+      "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step rebuild-public-projections",
+      "references": [
+        "docs/adr/ADR-011-firestore-system-of-record.md",
+        "docs/adr/ADR-004-public-projection-immutable-snapshots.md"
+      ]
+    },
+    {
+      "order": 10,
+      "id": "restore-deleted-public-object",
+      "label": "Restore deleted public GCS object via generation rollback",
+      "rtoTargetMinutes": 240,
+      "breakGlassIdentity": "backup-restore-sa",
+      "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/restore-public-object.stub.sh",
+      "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step restore-deleted-public-object",
+      "references": [
+        "infra/firebase/backup/rpo-rto.md"
+      ]
+    },
+    {
+      "order": 11,
+      "id": "record-findings",
+      "label": "Record measured times and publish findings to runbooks",
+      "rtoTargetMinutes": 30,
+      "breakGlassIdentity": "security-operator",
+      "dryRunCommand": "node scripts/recovery-rehearsal/record-findings.mjs --dry-run",
+      "verificationCommand": "node scripts/recovery-rehearsal/record-findings.mjs --dry-run --validate",
+      "references": [
+        "infra/gcp/recovery-rehearsal/findings-template.md"
+      ]
+    }
+  ]
+}

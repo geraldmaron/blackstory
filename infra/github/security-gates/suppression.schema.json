@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://black-book.local/schemas/security-suppressions.schema.json",
+  "title": "Black Book security finding suppressions",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "suppressions"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "suppressions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "tool", "finding", "reason", "owner", "expiresAt"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^SUP-[0-9]{3,}$"
+          },
+          "tool": {
+            "type": "string",
+            "minLength": 1
+          },
+          "finding": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Stable rule, advisory, CVE, or finding identifier."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 20
+          },
+          "owner": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$",
+            "description": "Accountable team/handle."
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

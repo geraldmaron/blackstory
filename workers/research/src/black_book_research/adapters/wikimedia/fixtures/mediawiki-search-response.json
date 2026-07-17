@@ -1,0 +1,16 @@
+{
+  "query": {
+    "search": [
+      {
+        "pageid": 5045871,
+        "title": "Rosa Parks",
+        "snippet": "Rosa Louise McCauley Parks was an American activist..."
+      },
+      {
+        "pageid": 123456,
+        "title": "Montgomery bus boycott",
+        "snippet": "The Montgomery bus boycott was a political and social protest..."
+      }
+    ]
+  }
+}

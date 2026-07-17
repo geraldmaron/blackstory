@@ -1,0 +1,58 @@
+{
+  "version": "1.0.0",
+  "bead": "BB-061",
+  "status": "design-only",
+  "sourceRpoRto": "../../firebase/backup/rpo-rto.md",
+  "targets": {
+    "database-restore": {
+      "rpoHours": 24,
+      "rtoMinutes": 480,
+      "mechanism": "Weekly full export + staging import (BB-020)"
+    },
+    "active-release-rollback": {
+      "rpoHours": 0,
+      "rtoMinutes": 120,
+      "mechanism": "BB-019 atomic activeRelease pointer rollback"
+    },
+    "revoke-compromised-deploy-identity": {
+      "rpoHours": 0,
+      "rtoMinutes": 30,
+      "mechanism": "WIF binding removal + github-deploy SA disable"
+    },
+    "rotate-secrets": {
+      "rpoHours": 0,
+      "rtoMinutes": 60,
+      "mechanism": "Secret Manager version disable + 1Password replacement"
+    },
+    "pause-queues": {
+      "rpoHours": 0,
+      "rtoMinutes": 15,
+      "mechanism": "Cloud Tasks pause without purge"
+    },
+    "disable-submissions": {
+      "rpoHours": 0,
+      "rtoMinutes": 10,
+      "mechanism": "corrections-submissions kill switch + api-submissions Armor"
+    },
+    "block-malicious-traffic": {
+      "rpoHours": 0,
+      "rtoMinutes": 5,
+      "mechanism": "Cloud Armor priority-10 emergency deny (BB-023)"
+    },
+    "rebuild-public-projections": {
+      "rpoHours": 0,
+      "rtoMinutes": 240,
+      "mechanism": "Publication worker replay from canonical + on-release export"
+    },
+    "restore-deleted-public-object": {
+      "rpoHours": 0,
+      "rtoMinutes": 240,
+      "mechanism": "GCS object generation restore + manifest spot-check"
+    }
+  },
+  "rehearsalCadence": {
+    "frequency": "quarterly",
+    "owner": "platform + security",
+    "recordPath": "scripts/recovery-rehearsal/fixtures/last-rehearsal-report.json"
+  }
+}

@@ -87,9 +87,9 @@ export class SourceBuilder {
       authority: this.authority,
       rights: this.rights,
       capturedAt: this.clock().toISOString(),
-      organizationId: this.organizationId,
-      classification: this.classification,
-      adapterId: this.adapterId,
+      ...(this.organizationId !== undefined ? { organizationId: this.organizationId } : {}),
+      ...(this.classification !== undefined ? { classification: this.classification } : {}),
+      ...(this.adapterId !== undefined ? { adapterId: this.adapterId } : {}),
       adapterEnabled: this.adapterEnabled,
       stableIdentifier: this.stableIdentifier ?? `stable:${id}`,
     };
