@@ -4,9 +4,10 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Notice } from '@black-book/ui';
 import { StatusPage } from '../components/StatusPage';
+import { sanitizeClientErrorDisplay } from '../lib/runtime-hardening/error-surface';
 
 export default function Error({
   error,
@@ -19,6 +20,8 @@ export default function Error({
     console.error(error);
   }, [error]);
 
+  const display = sanitizeClientErrorDisplay(error);
+
   return (
     <StatusPage
       eyebrow="Error"
@@ -26,12 +29,8 @@ export default function Error({
       lede="The public shell hit an unexpected error. You can retry or return home."
     >
       <div className="bb-stack bb-page--status__body">
-        <Notice tone="error" title="Page failed to render">
-          {error.digest ? (
-            <span className="bb-mono">digest {error.digest}</span>
-          ) : (
-            'A transient client or server fault interrupted this view.'
-          )}
+        <Notice tone="error" title={display.title}>
+          {display.detail}
         </Notice>
         <div className="bb-row">
           <button type="button" className="bb-button bb-button--primary" onClick={reset}>

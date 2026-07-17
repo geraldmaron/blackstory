@@ -2,7 +2,7 @@
  * Shared page chrome for loading, error, and not-found states in the public shell.
  */
 
-import type { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 
 export type StatusPageProps = {
   readonly eyebrow?: string;
