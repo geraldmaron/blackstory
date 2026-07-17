@@ -102,3 +102,25 @@ export {
   type RestoreDrillJobInput,
   type RestoreDrillJobResult,
 } from './jobs/restore-drill.js';
+
+export {
+  RECALIBRATION_REPORT_JOB_ID,
+  DEFAULT_RECALIBRATION_DRIFT_THRESHOLDS,
+  runRecalibrationReportJob,
+  buildRecalibrationDriftAlert,
+  type RecalibrationReportJobInput,
+  type RecalibrationReportJobResult,
+} from './jobs/recalibration-report.js';
+
+export {
+  CITATION_LINK_HEALTH_SWEEP_JOB_ID,
+  nodeResolveHost as citationLinkHealthNodeResolveHost,
+  nodePinnedTransport as citationLinkHealthNodePinnedTransport,
+  checkCitationLinkThroughSafeFetch,
+  runCitationLinkHealthSweepJob,
+  type CitationLinkHealthCheckInput,
+  type CitationLinkHealthRepair,
+  type CitationLinkHealthCheckOutcome,
+  type CitationLinkHealthSweepJobInput,
+  type CitationLinkHealthSweepJobResult,
+} from './jobs/citation-link-health-sweep.js';

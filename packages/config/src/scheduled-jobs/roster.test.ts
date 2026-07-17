@@ -20,12 +20,14 @@ test('roster job ids are unique', () => {
   assert.equal(new Set(ids).size, ids.length);
 });
 
-test('exactly four real job bodies ship with this bead', () => {
+test('exactly six real job bodies are registered (four from BB-084 plus BB-081s recalibration-report and BB-083s citation-link-health-sweep)', () => {
   const store = createDefaultScheduledJobRegistry();
   const real = listScheduledJobs(store, { rosterStatus: 'real' }).map((job) => job.id).sort();
   assert.deepEqual(real, [
     'backup-verification-daily',
+    'citation-link-health-sweep',
     'gold-corpus-regression',
+    'relevance-confidence-recalibration-report',
     'restore-drill-quarterly',
     'source-drift-run-health-check',
   ]);

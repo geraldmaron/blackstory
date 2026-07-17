@@ -117,8 +117,12 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 4,
   },
 
-  // --- Citation link-health sweeps (BB-083). This is one of the two pre-approved automatic
-  // public-facing exceptions (mechanical + reversible: swap in an archived-copy URL only).
+  // --- REAL: citation link-health sweeps (BB-083, closed). Wired to @black-book/domain's
+  // citation link-health/repair-ladder logic via ./jobs/citation-link-health-sweep.ts. This is
+  // one of the two pre-approved automatic public-facing exceptions (mechanical + reversible:
+  // swap in an archived-copy URL only) — confirmed still true of the job body: it auto-commits
+  // only the wayback_swap/dead_mark steps and returns permanent-redirect/retroactive-SPN repairs
+  // as proposals, never auto-applying them (see the job file's module doc for the exact scope).
   {
     id: 'citation-link-health-sweep',
     owner: 'BB-083',
@@ -132,8 +136,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     targetWorker: { package: 'security', function: 'url_safety.link_health.sweep_citations' },
     environment: 'blackbook-internal',
     publicEffect: 'link-repair-archived-copy',
-    rosterStatus: 'stub',
-    implementationOwnerBead: 'BB-083',
+    rosterStatus: 'real',
     consecutiveMissedRunThreshold: 2,
   },
 
@@ -171,7 +174,11 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 1,
   },
 
-  // --- Relevance/confidence recalibration report (BB-081).
+  // --- REAL: relevance/confidence recalibration report (BB-081, closed). Wired to
+  // @black-book/domain's relevance-feedback module (decision-log extraction, per-dimension
+  // disagreement, query-pack effectiveness, source-tier precision, drift alarm) via
+  // ./jobs/recalibration-report.ts. Report-only: proposal/approval/gold-corpus-gate for an
+  // actual weight change is a separate, human-triggered path — never part of this cron job.
   {
     id: 'relevance-confidence-recalibration-report',
     owner: 'BB-081',
@@ -184,8 +191,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     targetWorker: { package: 'research', function: 'confidence_engine.recalibration_report.generate' },
     environment: 'blackbook-internal',
     publicEffect: 'none',
-    rosterStatus: 'stub',
-    implementationOwnerBead: 'BB-081',
+    rosterStatus: 'real',
     consecutiveMissedRunThreshold: 1,
   },
 

@@ -289,3 +289,6 @@ export * from './confidence-engine/index.js';
 export * from './research-case/index.js';
 export * from './similarity/index.js';
 export * from './rights/index.js';
+export * from './consensus-review/index.js';
+export * from './citations/index.js';
+export * from './relevance-feedback/index.js';
