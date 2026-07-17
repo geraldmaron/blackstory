@@ -63,15 +63,22 @@ export const APP_HOSTING_RUN_LIMITS = {
   },
 } as const;
 
-/** Module specifiers that must never appear on the public render path (seed/snapshot only). */
+/**
+ * Module specifiers that must never appear on the public render path (seed/snapshot only).
+ * Each pattern requires actual import/require syntax around the specifier — a bare substring
+ * match (e.g. plain `/anthropic/`) would also flag unrelated prose or string literals, such as
+ * an AI-crawler name in robots.ts's disallow list, that never import anything.
+ */
+const IMPORT_OR_REQUIRE = String.raw`(?:from\s+|import\s*\(\s*|require\s*\(\s*)['"][^'"]*`;
+
 export const FORBIDDEN_PUBLIC_RENDER_IMPORTS = [
-  /@black-book\/data-access/,
-  /@black-book\/firebase\/admin/,
-  /firebase-admin/,
-  /\/postgres/,
-  /pg\b/,
-  /openai/,
-  /anthropic/,
+  new RegExp(`${IMPORT_OR_REQUIRE}@black-book/data-access`),
+  new RegExp(`${IMPORT_OR_REQUIRE}@black-book/firebase/admin`),
+  new RegExp(`${IMPORT_OR_REQUIRE}firebase-admin`),
+  new RegExp(`${IMPORT_OR_REQUIRE}[^'"]*/postgres`),
+  new RegExp(`${IMPORT_OR_REQUIRE}pg['"]`),
+  new RegExp(`${IMPORT_OR_REQUIRE}[^'"]*openai`),
+  new RegExp(`${IMPORT_OR_REQUIRE}[^'"]*anthropic`),
   /from\s+['"]@google-cloud\/firestore['"]/,
   /from\s+['"]firebase\/firestore['"]/,
 ] as const;

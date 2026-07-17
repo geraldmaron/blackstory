@@ -1,0 +1,100 @@
+# BB-089 uptime / defacement canary. Fetches a canary URL on a schedule, hashes the response
+# body, and fails the run (which GitHub notifies watchers of by default for scheduled workflows)
+# on a non-200 status or a content hash change versus the last known-good hash. Persists the
+# baseline hash between runs via actions/cache (restore-keys prefix match), not a committed repo
+# file, since no production domain exists yet — see docs/runbooks/pre-launch-operator-protection.md.
+# Cannot run for real until `canary_url` points at a live domain and CANARY_URL/CANARY_SCHEDULE
+# are set up per that runbook; the schedule trigger is commented out until then so this workflow
+# does not silently fail on an empty target every 30 minutes.
+# Third-party actions are pinned to immutable SHAs, matching ci.yml / security.yml.
+
+name: Canary Uptime and Defacement Check
+
+on:
+  # Uncomment once a production canary URL exists (BB-089 runbook step "uptime canary go-live").
+  # schedule:
+  #   - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      canary_url:
+        description: HTTPS URL of the canary page to fetch and hash
+        required: true
+        type: string
+      reset_baseline:
+        description: Accept the current fetch as the new known-good baseline (use after a confirmed legitimate deploy)
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: canary-${{ github.workflow }}-${{ inputs.canary_url }}
+  cancel-in-progress: true
+
+env:
+  CACHE_KEY_PREFIX: canary-hash-${{ inputs.canary_url }}
+
+jobs:
+  check:
+    name: Canary / Fetch, Hash, and Compare
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate canary URL is HTTPS
+        env:
+          CANARY_URL: ${{ inputs.canary_url }}
+        run: |
+          if [[ ! "$CANARY_URL" =~ ^https:// ]]; then
+            echo "::error::canary_url must be an https:// URL, got: $CANARY_URL"
+            exit 1
+          fi
+
+      - name: Restore last known-good hash
+        uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: canary-hash.txt
+          key: ${{ env.CACHE_KEY_PREFIX }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ env.CACHE_KEY_PREFIX }}-
+
+      - name: Fetch canary page and compute hash
+        id: fetch
+        env:
+          CANARY_URL: ${{ inputs.canary_url }}
+        run: |
+          status=$(curl -sS -o response.body -w '%{http_code}' --max-time 15 --retry 2 "$CANARY_URL")
+          echo "HTTP status: $status"
+          if [[ "$status" != "200" ]]; then
+            echo "::error::Canary target returned HTTP $status (expected 200). Possible outage or takedown — see docs/runbooks/incidents/platform-takedown.md and the BB-033/035 kill-switch runbook."
+            exit 1
+          fi
+          sha256sum response.body | awk '{ print $1 }' > new-canary-hash.txt
+          echo "Computed hash: $(cat new-canary-hash.txt)"
+
+      - name: Compare against last known-good hash
+        env:
+          RESET_BASELINE: ${{ inputs.reset_baseline }}
+        run: |
+          if [[ "$RESET_BASELINE" == "true" ]]; then
+            echo "reset_baseline requested; accepting current fetch as the new baseline without comparing."
+          elif [[ ! -s canary-hash.txt ]]; then
+            echo "No cached baseline found; recording this run as the new baseline."
+          else
+            previous="$(cat canary-hash.txt)"
+            current="$(cat new-canary-hash.txt)"
+            if [[ "$previous" != "$current" ]]; then
+              echo "::error::Canary content hash changed. previous=$previous current=$current. Investigate for unauthorized publication/defacement before assuming a routine deploy — see docs/runbooks/incidents/platform-takedown.md and docs/runbooks/incidents/defacement.md. If this is a confirmed legitimate deploy, re-run this workflow with reset_baseline: true."
+              exit 1
+            fi
+            echo "Canary hash unchanged: $current"
+          fi
+          cp new-canary-hash.txt canary-hash.txt
+
+      - name: Save hash as the new baseline for the next run
+        if: success()
+        uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: canary-hash.txt
+          key: ${{ env.CACHE_KEY_PREFIX }}-${{ github.run_id }}
