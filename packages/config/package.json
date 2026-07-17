@@ -16,13 +16,17 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/index.test.ts src/surfaces.test.ts src/kill-switches.test.ts",
+    "test": "node --conditions development --import tsx --test src/index.test.ts src/surfaces.test.ts src/kill-switches.test.ts src/scheduled-jobs/registry.test.ts src/scheduled-jobs/roster.test.ts src/scheduled-jobs/run-record.test.ts src/scheduled-jobs/health.test.ts src/scheduled-jobs/alerting.test.ts src/scheduled-jobs/publish-guard.test.ts src/scheduled-jobs/audit.test.ts src/scheduled-jobs/jobs/source-drift-run-health.test.ts src/scheduled-jobs/jobs/gold-corpus-regression.test.ts src/scheduled-jobs/jobs/backup-verification.test.ts src/scheduled-jobs/jobs/restore-drill.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "@black-book/domain": "workspace:*",
+    "@black-book/observability": "workspace:*",
+    "@black-book/testing": "workspace:*"
   },
   "devDependencies": {
+    "@black-book/firebase": "workspace:*",
     "@black-book/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
