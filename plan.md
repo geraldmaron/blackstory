@@ -1,10 +1,43 @@
 # Black Book — Execution Plan
 
-Tracks the Execution Beads (BB-001–BB-066) from *Black Book Web Application Execution Beads*. Update status as work completes. Delete this file when the plan is fully executed or superseded by durable project docs.
+Tracks the Execution Beads (BB-001–BB-066 from *Black Book Web Application Execution Beads*, plus the BB-067–BB-089 course-correction expansion). Update status as work completes. Delete this file when the plan is fully executed or superseded by durable project docs.
 
-**Source:** `/Users/geralddagher/Downloads/Black Book Web Application Execution Beads.pdf`  
+**Source:** `/Users/geralddagher/Downloads/Black Book Web Application Execution Beads.pdf` (BB-001–066) + owner brief & research 2026-07-17 (BB-067–089)  
 **Workspace:** `/Users/geralddagher/Developer/Projects/black-book` (greenfield as of 2026-07-16)  
-**Active focus:** Wave 6 complete (BB-047/056). BB-048 remains partial; next public product beads still blocked.
+**Active focus:** Wave 6 complete (BB-047/056). Course-correction wave filed (BB-067–089) — design-first (BB-067/068) is front of queue; BB-048 remains partial; next public product beads still blocked. Full plan reconciliation is owned by BB-080.
+
+## Course-correction expansion (2026-07-17) — BB-067–BB-089
+
+Research-backed review of the whole tracker + owner brief. All labeled `course-correction`. Details live in each bead (`bd show black-book-bbNNN`); dependencies wired in the tracker. Design beads are front of queue per owner direction.
+
+| Bead | Theme | Prio | Notes |
+|------|-------|------|-------|
+| BB-067 | Brand: the BB mark + pigment system | P0 | Front of queue; Monk Skin Tone Scale (CC BY 4.0) |
+| BB-068 | Design language v2 (proud, modern, black) | P0 | Reskin; type with provenance; dark theme first-class |
+| BB-069 | Brand story, voice, narrative | P0 | Map-led homepage thesis |
+| BB-070 | Map data platform + tiles | P0 | MapLibre + PMTiles self-host (ADR-012) |
+| BB-051 | National map experience | P0 | **Un-deferred** from P1; the map is the centerpiece |
+| BB-071 | Embedding pipeline + Firestore vector search | P1 | Firestore native KNN, gemini-embedding-001@768d (ADR-013) |
+| BB-072 | Hybrid retrieval + RRF ranking fusion | P1 | Deterministic, no learned ranker |
+| BB-073 | Discovery adapters wave 1 (RSS/IA/DPLA/Wayback) | P1 | Open sources, graylist recall lane |
+| BB-074 | Reddit adapter (gated) | P2 | Responsible Builder policy; 48h deletion-sync |
+| BB-075 | Web-search + Common Crawl discovery | P2 | Brave/Exa; budget-gated |
+| BB-076 | Community submission + consensus review | P1 | Launch gated (BB-089) until reviewers exist |
+| BB-077 | UGC compliance + living-person ethics | P1 | Evidence-pointer doctrine, deletion-sync |
+| BB-078 | Production environment re-split (isolation) | P0 | Three-project topology |
+| BB-079 | Production cloud apply (consolidated) | P0 | Human-apply checklist |
+| BB-080 | Tracker/plan/source-spec hygiene | P1 | Owns full plan.md reconciliation |
+| BB-081 | Relevance/discovery feedback loop | P2 | Human-approved weight changes only |
+| BB-082 | Historic safety + place-context engine | P1 | Layered signals; crime stats never in composite |
+| BB-083 | Citation integrity + link-rot management | P1 | "Try searching for" degraded citations |
+| BB-084 | Self-updating operations (scheduler backbone) | P1 | Automation proposes, humans dispose |
+| BB-085 | Operator contribution lane (CLI/admin/skills) | P1 | `.claude/skills` as thin callers over tested packages |
+| BB-086 | Canonical fact registry (fact framework) | P0 | Wikidata-style records; per-revision permalinks |
+| BB-087 | Legal landscape (snapshot + monitoring + plain-language) | P0 | Free public sources; Firebase-native; law = a claimType |
+| BB-088 | Editorial trust + pre-bunking surfaces | P1 | Protection as rigor; gates launch (BB-063) |
+| BB-089 | Pre-launch resilience + operator protection | P0 | Operator/platform/impersonation delta; gates launch (BB-063) |
+
+**Operating principles (pinned in `bd` memory):** free-first; everything Firebase-native for now; self-updating (budget-capped jobs with kill switches; review queues batchable in minutes); one-time setup over recurring labor; reuse existing packages over parallel systems; U.S. only.
 
 ## Multi-agent coordination (2026-07-17 wave 6)
 
