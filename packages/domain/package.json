@@ -16,13 +16,14 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/index.test.ts src/provenance.test.ts src/claims.test.ts src/audit.test.ts src/adapters.test.ts src/adapters/federal/federal.test.ts src/adapters/wikimedia/wikimedia.test.ts src/publication.test.ts src/query-packs.test.ts src/discovery.test.ts src/relevance.test.ts src/resolution.test.ts src/promotion.test.ts src/extraction.test.ts src/confidence-engine.test.ts src/research-case.test.ts",
+    "test": "node --conditions development --import tsx --test src/index.test.ts src/provenance.test.ts src/claims.test.ts src/audit.test.ts src/adapters.test.ts src/adapters/federal/federal.test.ts src/adapters/wikimedia/wikimedia.test.ts src/publication.test.ts src/query-packs.test.ts src/discovery.test.ts src/relevance.test.ts src/resolution.test.ts src/promotion.test.ts src/extraction.test.ts src/confidence-engine.test.ts src/research-case.test.ts src/map/us-geography.test.ts src/map/map-source.test.ts src/map/map-source.redaction.test.ts src/rights.test.ts src/similarity/vector-math.test.ts src/similarity/candidate-recall.test.ts src/similarity/near-duplicate.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
     "@black-book/schemas": "workspace:*"
   },
   "devDependencies": {
+    "@black-book/security": "workspace:*",
     "@black-book/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",

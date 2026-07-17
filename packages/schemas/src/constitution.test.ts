@@ -115,6 +115,16 @@ test('fixtures cover included, excluded, disputed, sparse, sensitive, living-per
   );
 });
 
+test('ugcLivingPersonRules extends the constitution without bumping policyVersion (BB-077)', () => {
+  resetProductConstitutionCache();
+  const policy = loadProductConstitution();
+  assert.equal(policy.policyVersion, '1.0.0');
+  assert.equal(policy.ugcLivingPersonRules.crossSourceProfileAggregationProhibited, true);
+  assert.equal(policy.ugcLivingPersonRules.deanonymizationProhibited, true);
+  assert.equal(policy.ugcLivingPersonRules.elevatedClaimClass, 'high_impact');
+  assert.equal(policy.claimConfidenceThresholds.highImpactPublish, 0.9);
+});
+
 test('constitution package surface has no mutation API', () => {
   const banned = [
     'updateProductConstitution',

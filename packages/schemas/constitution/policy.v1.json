@@ -114,5 +114,10 @@
     "occupiedPrivateResidenceMaxPublicPrecision": "neighborhood",
     "sensitiveSiteMaxPublicPrecision": "neighborhood",
     "reduceOccupiedPrivateResidenceForDeceased": true
+  },
+  "ugcLivingPersonRules": {
+    "crossSourceProfileAggregationProhibited": true,
+    "elevatedClaimClass": "high_impact",
+    "deanonymizationProhibited": true
   }
 }

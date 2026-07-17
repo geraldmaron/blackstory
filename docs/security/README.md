@@ -17,6 +17,8 @@ Threat model, abuse-case corpus, environment isolation design, and security test
 | [`promotion-controls.md`](./promotion-controls.md) | BB-032 staged promotion, lineage/corroboration gates, and release preview diffs |
 | [`telemetry-anomaly.md`](./telemetry-anomaly.md) | BB-034 security telemetry, metrics, anomaly rules, alerts |
 | [`cost-resource-controls.md`](./cost-resource-controls.md) | BB-033 scaling, queue/job budgets, circuit breakers, soft shutdown |
+| [`ugc-compliance-layer.md`](./ugc-compliance-layer.md) | BB-077 per-source obligations registry, evidence-pointer doctrine, deletion-sync framework, living-person UGC ethics, takedown routing |
+| [`ugc-legal-posture.md`](./ugc-legal-posture.md) | BB-077 CCPA/CPRA publicly-available posture and fair-use ground truth for counsel review |
 | [`../infra/firebase/auth-and-app-check.md`](../../infra/firebase/auth-and-app-check.md) | BB-011 Auth plan + App Check scaffold (enforcement = BB-024) |
 | [`tests/checklist.md`](./tests/checklist.md) | Manual/CI security checklist scaffold |
 

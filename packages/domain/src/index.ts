@@ -250,6 +250,35 @@ export type {
 
 export * from './adapters/index.js';
 export * from './publication/index.js';
+
+// Map data platform (BB-070). Demo/test fixtures in ./map/fixtures.js are
+// intentionally NOT re-exported here — they are internal to this package
+// (imported by relative path from map-source.test.ts and the demo generator
+// script), the same way packages/firebase/fixtures/ sits outside that
+// package's public src/index.ts surface.
+export {
+  US_STATES,
+  US_BOUNDS,
+  isWithinUsBounds,
+  findUsStateForPoint,
+  findUsStateByPostalCode,
+  buildMapSource,
+} from './map/index.js';
+export type {
+  UsStateInfo,
+  MapSourceRawLocation,
+  MapSourceEntityInput,
+  MapRedactedLocation,
+  MapRedactLocationFn,
+  MapPointFeatureProperties,
+  MapPointFeature,
+  MapFeatureCollection,
+  MapStateAggregate,
+  MapCountyAggregate,
+  MapSourceMeta,
+  MapSourceBuildResult,
+  BuildMapSourceInput,
+} from './map/index.js';
 export * from './query-packs/index.js';
 export * from './discovery/index.js';
 export * from './relevance/index.js';
@@ -258,3 +287,5 @@ export * from './promotion/index.js';
 export * from './extraction/index.js';
 export * from './confidence-engine/index.js';
 export * from './research-case/index.js';
+export * from './similarity/index.js';
+export * from './rights/index.js';

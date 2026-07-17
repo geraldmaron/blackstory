@@ -28,6 +28,7 @@ export const AUDIT_EVENT_ACTIONS = [
   'administrative.role_changed',
   'administrative.configuration_changed',
   'administrative.exported',
+  'deletion.purged',
 ] as const;
 
 export type AuditEventAction = (typeof AUDIT_EVENT_ACTIONS)[number];

@@ -67,6 +67,13 @@ export const productConstitutionSchema = z
         reduceOccupiedPrivateResidenceForDeceased: z.boolean(),
       })
       .strict(),
+    ugcLivingPersonRules: z
+      .object({
+        crossSourceProfileAggregationProhibited: z.boolean(),
+        elevatedClaimClass: z.enum(['standard', 'high_impact']),
+        deanonymizationProhibited: z.boolean(),
+      })
+      .strict(),
   })
   .strict();
 

@@ -16,7 +16,8 @@
     "sourceClassifications",
     "publicationRestrictions",
     "livingPersonRules",
-    "sensitivityRules"
+    "sensitivityRules",
+    "ugcLivingPersonRules"
   ],
   "properties": {
     "policyVersion": {
@@ -179,6 +180,21 @@
         "occupiedPrivateResidenceMaxPublicPrecision": { "type": "string", "minLength": 1 },
         "sensitiveSiteMaxPublicPrecision": { "type": "string", "minLength": 1 },
         "reduceOccupiedPrivateResidenceForDeceased": { "type": "boolean" }
+      }
+    },
+    "ugcLivingPersonRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Living-person ethics above the legal floor for user-generated/third-party content (BB-077): no cross-source aggregation of personal details into profiles, an elevated confidence tier before UGC-derived claims about living people advance, and deanonymization prohibited everywhere.",
+      "required": [
+        "crossSourceProfileAggregationProhibited",
+        "elevatedClaimClass",
+        "deanonymizationProhibited"
+      ],
+      "properties": {
+        "crossSourceProfileAggregationProhibited": { "type": "boolean" },
+        "elevatedClaimClass": { "type": "string", "enum": ["standard", "high_impact"] },
+        "deanonymizationProhibited": { "type": "boolean" }
       }
     }
   }
