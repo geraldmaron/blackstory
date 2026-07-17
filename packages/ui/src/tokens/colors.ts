@@ -1,7 +1,11 @@
 /**
- * Black Book color tokens: black/white/neutral primary palette plus reserved status hues.
+ * Black Book color tokens: warm paper/near-black ink primary palette, the
+ * Copper Pin/Page Sand brand accent, and reserved status hues.
  * Status colors are only for warning, confidence, dispute, and error — never decorative chrome.
+ * Palette source: brandPalette (brand-palette.ts) — the owner-supplied "Pinned Page" brand package.
  */
+
+import { brandPalette } from './brand-palette.js';
 
 export const themes = ['light', 'dark'] as const;
 export type ThemeName = (typeof themes)[number];
@@ -27,6 +31,12 @@ export type ThemePalette = {
   readonly inverse: string;
   readonly inverseInk: string;
   readonly overlay: string;
+  /** Text/link-safe application of the brand accent (meets 4.5:1 on canvas). */
+  readonly accent: string;
+  /** Large-scale/graphic-only application of the brand accent (3:1 on canvas; not for body text). */
+  readonly accentGraphic: string;
+  /** Decorative fill/background tint only — never used as a foreground color. */
+  readonly accentMuted: string;
 };
 
 export type StatusPalette = {
@@ -40,117 +50,123 @@ export type StatusPalette = {
 export type ConfidencePalette = Record<ConfidenceLevel, StatusPalette>;
 
 export const lightTheme: ThemePalette = {
-  canvas: '#FFFFFF',
-  surface: '#FFFFFF',
-  surfaceRaised: '#FFFFFF',
-  ink: '#000000',
-  inkMuted: '#262626',
-  inkSubtle: '#525252',
-  border: '#E5E5E5',
-  borderStrong: '#000000',
-  focusRing: '#000000',
-  focusRingOffset: '#FFFFFF',
-  inverse: '#000000',
-  inverseInk: '#FFFFFF',
-  overlay: 'rgba(0, 0, 0, 0.55)',
+  canvas: brandPalette.archivePaper,
+  surface: brandPalette.archivePaper,
+  surfaceRaised: '#FBF7EF',
+  ink: brandPalette.blackInk,
+  inkMuted: '#2B2620',
+  inkSubtle: '#5C5548',
+  border: '#E3DCCB',
+  borderStrong: brandPalette.blackInk,
+  focusRing: brandPalette.blackInk,
+  focusRingOffset: brandPalette.archivePaper,
+  inverse: brandPalette.blackInk,
+  inverseInk: brandPalette.archivePaper,
+  overlay: 'rgba(10, 10, 10, 0.55)',
+  accent: brandPalette.copperInk,
+  accentGraphic: brandPalette.copperPin,
+  accentMuted: brandPalette.pageSand,
 };
 
 export const darkTheme: ThemePalette = {
-  canvas: '#000000',
-  surface: '#0A0A0A',
-  surfaceRaised: '#141414',
-  ink: '#FFFFFF',
-  inkMuted: '#E5E5E5',
-  inkSubtle: '#A3A3A3',
-  border: '#262626',
-  borderStrong: '#FFFFFF',
-  focusRing: '#FFFFFF',
-  focusRingOffset: '#000000',
-  inverse: '#FFFFFF',
-  inverseInk: '#000000',
+  canvas: brandPalette.blackInk,
+  surface: '#141210',
+  surfaceRaised: '#1E1A15',
+  ink: brandPalette.archivePaper,
+  inkMuted: '#D9D2C4',
+  inkSubtle: '#A69C89',
+  border: '#2E2A22',
+  borderStrong: brandPalette.archivePaper,
+  focusRing: brandPalette.archivePaper,
+  focusRingOffset: brandPalette.blackInk,
+  inverse: brandPalette.archivePaper,
+  inverseInk: brandPalette.blackInk,
   overlay: 'rgba(0, 0, 0, 0.72)',
+  accent: brandPalette.pageSand,
+  accentGraphic: brandPalette.copperPin,
+  accentMuted: brandPalette.copperPin,
 };
 
 export const lightStatus: Record<'warning' | 'dispute' | 'error', StatusPalette> = {
   warning: {
-    fg: '#713F12',
-    bg: '#FEF3C7',
-    border: '#D97706',
+    fg: '#6B4A17',
+    bg: '#F3E4C6',
+    border: '#B87A2A',
     cue: 'Warning',
   },
   dispute: {
-    fg: '#9F1239',
-    bg: '#FFE4E6',
-    border: '#E11D48',
+    fg: '#7A1F3D',
+    bg: '#F1DCE3',
+    border: '#B8395F',
     cue: 'Disputed',
   },
   error: {
-    fg: '#991B1B',
-    bg: '#FEE2E2',
-    border: '#DC2626',
+    fg: '#7A1F1F',
+    bg: '#F3DCD2',
+    border: '#B83A2A',
     cue: 'Error',
   },
 };
 
 export const darkStatus: Record<'warning' | 'dispute' | 'error', StatusPalette> = {
   warning: {
-    fg: '#FDE68A',
-    bg: '#422006',
-    border: '#F59E0B',
+    fg: '#F0CE8E',
+    bg: '#3A2A0E',
+    border: '#D6A354',
     cue: 'Warning',
   },
   dispute: {
-    fg: '#FECDD3',
-    bg: '#4C0519',
-    border: '#FB7185',
+    fg: '#F0B9C9',
+    bg: '#3A1420',
+    border: '#D66E8B',
     cue: 'Disputed',
   },
   error: {
-    fg: '#FECACA',
-    bg: '#450A0A',
-    border: '#F87171',
+    fg: '#F0B3A6',
+    bg: '#3A1610',
+    border: '#D66B54',
     cue: 'Error',
   },
 };
 
 export const lightConfidence: ConfidencePalette = {
   high: {
-    fg: '#14532D',
-    bg: '#DCFCE7',
-    border: '#16A34A',
+    fg: '#215A34',
+    bg: '#DCEBDD',
+    border: '#3E8B54',
     cue: 'High confidence',
   },
   medium: {
-    fg: '#713F12',
-    bg: '#FEF3C7',
-    border: '#D97706',
+    fg: '#6B4A17',
+    bg: '#F3E4C6',
+    border: '#B87A2A',
     cue: 'Medium confidence',
   },
   low: {
-    fg: '#3F3F46',
-    bg: '#E4E4E7',
-    border: '#71717A',
+    fg: '#4A453D',
+    bg: '#E7E1D3',
+    border: '#7A7364',
     cue: 'Low confidence',
   },
 };
 
 export const darkConfidence: ConfidencePalette = {
   high: {
-    fg: '#BBF7D0',
-    bg: '#052E16',
-    border: '#4ADE80',
+    fg: '#A9D9B4',
+    bg: '#12301C',
+    border: '#5CAD73',
     cue: 'High confidence',
   },
   medium: {
-    fg: '#FDE68A',
-    bg: '#422006',
-    border: '#FBBF24',
+    fg: '#F0CE8E',
+    bg: '#3A2A0E',
+    border: '#D6A354',
     cue: 'Medium confidence',
   },
   low: {
-    fg: '#D4D4D8',
-    bg: '#27272A',
-    border: '#A1A1AA',
+    fg: '#D4CDBE',
+    bg: '#2B2822',
+    border: '#8F8672',
     cue: 'Low confidence',
   },
 };
@@ -185,6 +201,7 @@ export function criticalTextPairs(
     ['inkMuted/surface', p.inkMuted, p.surface],
     ['inkSubtle/canvas', p.inkSubtle, p.canvas],
     ['inverseInk/inverse', p.inverseInk, p.inverse],
+    ['accent/canvas', p.accent, p.canvas],
     ['warning', status.warning.fg, status.warning.bg],
     ['dispute', status.dispute.fg, status.dispute.bg],
     ['error', status.error.fg, status.error.bg],
@@ -199,9 +216,18 @@ export function criticalUiPairs(
   theme: ThemeName,
 ): ReadonlyArray<readonly [string, string, string]> {
   const p = themePalettes[theme];
+  const status = statusPalettes[theme];
+  const confidence = confidencePalettes[theme];
   return [
     ['borderStrong/canvas', p.borderStrong, p.canvas],
     ['focusRing/canvas', p.focusRing, p.canvas],
     ['focusRing/surface', p.focusRing, p.surface],
+    ['accentGraphic/canvas', p.accentGraphic, p.canvas],
+    ['warning-border/canvas', status.warning.border, p.canvas],
+    ['dispute-border/canvas', status.dispute.border, p.canvas],
+    ['error-border/canvas', status.error.border, p.canvas],
+    ['confidence-high-border/canvas', confidence.high.border, p.canvas],
+    ['confidence-medium-border/canvas', confidence.medium.border, p.canvas],
+    ['confidence-low-border/canvas', confidence.low.border, p.canvas],
   ];
 }

@@ -110,4 +110,4 @@ Formal ADRs (BB-002): [`docs/adr/`](./adr/README.md). Session summaries: [`.cx/d
 
 ## Execution
 
-Bead order and status: [`../plan.md`](../plan.md). Active tranche: Data and publication boundary (BB-013–014 done; BB-016 provenance model; BB-015 living-person in parallel).
+Bead order and status: [`../plan.md`](../plan.md). Active focus: course-correction expansion (BB-067–089) — design language (BB-067/068/069), map platform (BB-070), vector search (BB-071), and hostile-environment/hygiene beads landing alongside the original Tranche 5/6 public-product backlog (BB-048–063). Tranches 1–4 are complete except deferred/parked items (BB-012, BB-031).

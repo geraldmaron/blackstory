@@ -6,7 +6,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { BrandMark, ThemeToggle } from '@black-book/ui';
+import { BlackBookMark, ThemeToggle } from '@black-book/ui';
 import { isNavActive, PRIMARY_NAV } from '../lib/nav';
 
 const DESKTOP_NAV_MQ = '(min-width: 48rem)';
@@ -74,7 +74,15 @@ export function SiteHeader() {
     <header className="bb-shell-header">
       <div className="bb-container bb-shell-header__inner">
         <a className="bb-shell-wordmark" href="/">
-          <BrandMark variant="mono" size={24} decorative className="bb-shell-wordmark__mark" />
+          <span className="bb-shell-wordmark__mark" aria-hidden="true">
+            <BlackBookMark
+              ink="var(--bb-ink)"
+              paper="var(--bb-canvas)"
+              accent="var(--bb-accent-graphic)"
+              pageColors={['var(--bb-accent-graphic)', 'var(--bb-canvas)']}
+              detail="compact"
+            />
+          </span>
           Black Book
         </a>
 

@@ -1,26 +1,17 @@
 /**
  * Default OG/social preview image, generated at request time from the same
- * construction-grid geometry that drives <BrandMark />
- * (packages/ui/src/brand/geometry.ts) — one source of truth, no static
- * asset to keep in sync by hand.
+ * mark geometry that drives <BlackBookLogo /> (packages/ui/src/brand/BlackBookLogo.tsx)
+ * — one source of truth, no static asset to keep in sync by hand.
  */
 import { ImageResponse } from 'next/og';
-import { PIGMENT_SCATTER_MAP, brandInk, buildSocialLayout, pigmentScale } from '@black-book/ui';
+import { BlackBookMark, brandPalette } from '@black-book/ui';
 
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-function blockColor(letter: 'first' | 'second', cellIndex: number): string {
-  if (letter === 'second') {
-    return brandInk.solid;
-  }
-  const toneIndex = PIGMENT_SCATTER_MAP[cellIndex] ?? 0;
-  return pigmentScale[toneIndex]?.hex ?? brandInk.solid;
-}
+const MARK_SIZE = 260;
 
 export default function OpengraphImage() {
-  const layout = buildSocialLayout(size.width, size.height, 260);
-
   return new ImageResponse(
     (
       <div
@@ -28,39 +19,44 @@ export default function OpengraphImage() {
           width: '100%',
           height: '100%',
           display: 'flex',
-          position: 'relative',
-          background: '#FFFFFF',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 40,
+          background: brandPalette.archivePaper,
         }}
       >
-        {layout.blocks.map((block) => (
-          <div
-            key={`${block.letter}-${block.cellIndex}`}
-            style={{
-              position: 'absolute',
-              left: layout.offsetX + block.x * layout.scale,
-              top: layout.offsetY + block.y * layout.scale,
-              width: block.size * layout.scale,
-              height: block.size * layout.scale,
-              background: blockColor(block.letter, block.cellIndex),
-              display: 'flex',
-            }}
+        <div style={{ display: 'flex', width: MARK_SIZE, height: MARK_SIZE }}>
+          <BlackBookMark
+            ink={brandPalette.blackInk}
+            paper={brandPalette.archivePaper}
+            accent={brandPalette.copperPin}
+            pageColors={[brandPalette.archivePaper, brandPalette.pageSand, brandPalette.archivePaper, brandPalette.copperInk]}
+            detail="full"
           />
-        ))}
+        </div>
         <div
           style={{
-            position: 'absolute',
-            left: 0,
-            top: layout.offsetY + 260 + 56,
-            width: '100%',
             display: 'flex',
-            justifyContent: 'center',
-            fontSize: 30,
+            fontSize: 42,
             fontWeight: 700,
-            letterSpacing: 10,
-            color: brandInk.solid,
+            letterSpacing: 12,
+            color: brandPalette.blackInk,
           }}
         >
           BLACK BOOK
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            fontSize: 22,
+            fontWeight: 600,
+            letterSpacing: 6,
+            textTransform: 'uppercase',
+            color: brandPalette.copperPin,
+          }}
+        >
+          History, pinned to place.
         </div>
       </div>
     ),

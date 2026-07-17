@@ -53,7 +53,7 @@ Flaky tests belong in `packages/testing/quarantine.json` with `owner`, `deadline
 ### E2E
 
 - Default CI run exercises the harness skip path (no browser stack yet).
-- Optional: set `E2E_BASE_URL=http://127.0.0.1:3000` and `CI_REQUIRE_E2E=1` when a full browser suite exists.
+- Optional: set `E2E_BASE_URL=http://127.0.0.1:3048` and `CI_REQUIRE_E2E=1` when a full browser suite exists.
 
 ## CI check names (ruleset-stable)
 

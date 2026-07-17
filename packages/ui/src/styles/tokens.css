@@ -1,109 +1,121 @@
 /**
  * CSS custom properties for Black Book themes, focus, motion, and layout tokens.
  * Import via `@black-book/ui/styles.css` in consuming apps.
+ * Palette: the "Pinned Page" brand package (2026-07-17) — Archive Paper /
+ * Black Ink / Copper Pin / Page Sand. Mirrors packages/ui/src/tokens/colors.ts —
+ * keep the two in sync.
  */
 
 :root,
 [data-theme='light'] {
   color-scheme: light;
 
-  --bb-canvas: #ffffff;
-  --bb-surface: #ffffff;
-  --bb-surface-raised: #ffffff;
-  --bb-ink: #000000;
-  --bb-ink-muted: #262626;
-  --bb-ink-subtle: #525252;
-  --bb-border: #e5e5e5;
-  --bb-border-strong: #000000;
-  --bb-focus-ring: #000000;
-  --bb-focus-ring-offset: #ffffff;
-  --bb-inverse: #000000;
-  --bb-inverse-ink: #ffffff;
-  --bb-overlay: rgba(0, 0, 0, 0.55);
+  --bb-canvas: #f4efe5;
+  --bb-surface: #f4efe5;
+  --bb-surface-raised: #fbf7ef;
+  --bb-ink: #0a0a0a;
+  --bb-ink-muted: #2b2620;
+  --bb-ink-subtle: #5c5548;
+  --bb-border: #e3dccb;
+  --bb-border-strong: #0a0a0a;
+  --bb-focus-ring: #0a0a0a;
+  --bb-focus-ring-offset: #f4efe5;
+  --bb-inverse: #0a0a0a;
+  --bb-inverse-ink: #f4efe5;
+  --bb-overlay: rgba(10, 10, 10, 0.55);
 
-  --bb-warning-fg: #713f12;
-  --bb-warning-bg: #fef3c7;
-  --bb-warning-border: #d97706;
-  --bb-dispute-fg: #9f1239;
-  --bb-dispute-bg: #ffe4e6;
-  --bb-dispute-border: #e11d48;
-  --bb-error-fg: #991b1b;
-  --bb-error-bg: #fee2e2;
-  --bb-error-border: #dc2626;
+  --bb-accent: #7a4318;
+  --bb-accent-graphic: #b86b2a;
+  --bb-accent-muted: #d8a178;
 
-  --bb-confidence-high-fg: #14532d;
-  --bb-confidence-high-bg: #dcfce7;
-  --bb-confidence-high-border: #16a34a;
-  --bb-confidence-medium-fg: #713f12;
-  --bb-confidence-medium-bg: #fef3c7;
-  --bb-confidence-medium-border: #d97706;
-  --bb-confidence-low-fg: #3f3f46;
-  --bb-confidence-low-bg: #e4e4e7;
-  --bb-confidence-low-border: #71717a;
+  --bb-warning-fg: #6b4a17;
+  --bb-warning-bg: #f3e4c6;
+  --bb-warning-border: #b87a2a;
+  --bb-dispute-fg: #7a1f3d;
+  --bb-dispute-bg: #f1dce3;
+  --bb-dispute-border: #b8395f;
+  --bb-error-fg: #7a1f1f;
+  --bb-error-bg: #f3dcd2;
+  --bb-error-border: #b83a2a;
+
+  --bb-confidence-high-fg: #215a34;
+  --bb-confidence-high-bg: #dcebdd;
+  --bb-confidence-high-border: #3e8b54;
+  --bb-confidence-medium-fg: #6b4a17;
+  --bb-confidence-medium-bg: #f3e4c6;
+  --bb-confidence-medium-border: #b87a2a;
+  --bb-confidence-low-fg: #4a453d;
+  --bb-confidence-low-bg: #e7e1d3;
+  --bb-confidence-low-border: #7a7364;
 
   --bb-elevation-sm: none;
   --bb-elevation-md: none;
   --bb-elevation-lg: none;
 
-  --bb-viz-1: #000000;
-  --bb-viz-2: #525252;
-  --bb-viz-3: #737373;
-  --bb-viz-4: #a3a3a3;
-  --bb-viz-grid: #e5e5e5;
+  --bb-viz-1: #0a0a0a;
+  --bb-viz-2: #b86b2a;
+  --bb-viz-3: #5c5548;
+  --bb-viz-4: #d8a178;
+  --bb-viz-grid: #e3dccb;
 }
 
 [data-theme='dark'] {
   color-scheme: dark;
 
-  --bb-canvas: #000000;
-  --bb-surface: #0a0a0a;
-  --bb-surface-raised: #141414;
-  --bb-ink: #ffffff;
-  --bb-ink-muted: #e5e5e5;
-  --bb-ink-subtle: #a3a3a3;
-  --bb-border: #262626;
-  --bb-border-strong: #ffffff;
-  --bb-focus-ring: #ffffff;
-  --bb-focus-ring-offset: #000000;
-  --bb-inverse: #ffffff;
-  --bb-inverse-ink: #000000;
+  --bb-canvas: #0a0a0a;
+  --bb-surface: #141210;
+  --bb-surface-raised: #1e1a15;
+  --bb-ink: #f4efe5;
+  --bb-ink-muted: #d9d2c4;
+  --bb-ink-subtle: #a69c89;
+  --bb-border: #2e2a22;
+  --bb-border-strong: #f4efe5;
+  --bb-focus-ring: #f4efe5;
+  --bb-focus-ring-offset: #0a0a0a;
+  --bb-inverse: #f4efe5;
+  --bb-inverse-ink: #0a0a0a;
   --bb-overlay: rgba(0, 0, 0, 0.72);
 
-  --bb-warning-fg: #fde68a;
-  --bb-warning-bg: #422006;
-  --bb-warning-border: #f59e0b;
-  --bb-dispute-fg: #fecdd3;
-  --bb-dispute-bg: #4c0519;
-  --bb-dispute-border: #fb7185;
-  --bb-error-fg: #fecaca;
-  --bb-error-bg: #450a0a;
-  --bb-error-border: #f87171;
+  --bb-accent: #d8a178;
+  --bb-accent-graphic: #b86b2a;
+  --bb-accent-muted: #b86b2a;
 
-  --bb-confidence-high-fg: #bbf7d0;
-  --bb-confidence-high-bg: #052e16;
-  --bb-confidence-high-border: #4ade80;
-  --bb-confidence-medium-fg: #fde68a;
-  --bb-confidence-medium-bg: #422006;
-  --bb-confidence-medium-border: #fbbf24;
-  --bb-confidence-low-fg: #d4d4d8;
-  --bb-confidence-low-bg: #27272a;
-  --bb-confidence-low-border: #a1a1aa;
+  --bb-warning-fg: #f0ce8e;
+  --bb-warning-bg: #3a2a0e;
+  --bb-warning-border: #d6a354;
+  --bb-dispute-fg: #f0b9c9;
+  --bb-dispute-bg: #3a1420;
+  --bb-dispute-border: #d66e8b;
+  --bb-error-fg: #f0b3a6;
+  --bb-error-bg: #3a1610;
+  --bb-error-border: #d66b54;
+
+  --bb-confidence-high-fg: #a9d9b4;
+  --bb-confidence-high-bg: #12301c;
+  --bb-confidence-high-border: #5cad73;
+  --bb-confidence-medium-fg: #f0ce8e;
+  --bb-confidence-medium-bg: #3a2a0e;
+  --bb-confidence-medium-border: #d6a354;
+  --bb-confidence-low-fg: #d4cdbe;
+  --bb-confidence-low-bg: #2b2822;
+  --bb-confidence-low-border: #8f8672;
 
   --bb-elevation-sm: none;
   --bb-elevation-md: none;
   --bb-elevation-lg: none;
 
-  --bb-viz-1: #ffffff;
-  --bb-viz-2: #e5e5e5;
-  --bb-viz-3: #a3a3a3;
-  --bb-viz-4: #737373;
-  --bb-viz-grid: #262626;
+  --bb-viz-1: #f4efe5;
+  --bb-viz-2: #d8a178;
+  --bb-viz-3: #a69c89;
+  --bb-viz-4: #b86b2a;
+  --bb-viz-grid: #2e2a22;
 }
 
 :root {
+  --bb-font-display: 'Sora', 'Segoe UI', system-ui, sans-serif;
   --bb-font-editorial:
     'Source Serif 4', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
-  --bb-font-sans: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+  --bb-font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
   --bb-font-mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
 
   --bb-space-1: 0.25rem;

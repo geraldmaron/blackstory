@@ -16,6 +16,9 @@ Operating docs for the Black Book monorepo: architecture, decisions, runbooks, a
 | [`security/README.md`](./security/README.md) | Threat model, abuse corpus, environment isolation (BB-004/005) |
 | [`testing/README.md`](./testing/README.md) | Test layers, CI check names, harnesses (BB-008) |
 | [`ui/README.md`](./ui/README.md) | Design system tokens, components, fixtures (BB-007) |
+| [`research/`](./research/) | Research/evidence engine docs: discovery, adapters, query packs, relevance, confidence lineage, research-case workflow, gold corpus (BB-037–044, BB-047) |
+| [`admin/research-console.md`](./admin/research-console.md) | Administration and research console (BB-056) |
+| [`source-spec/`](./source-spec/) | Versioned copy of the original *Black Book Web Application Execution Beads* PDF (BB-080) |
 | [`../infra/github/README.md`](../infra/github/README.md) | GitHub governance (BB-009) + OIDC/WIF operator docs (BB-010; cloud not applied) |
 | [`../infra/database/README.md`](../infra/database/README.md) | Parked PostGIS / SQL Connect (Cloud SQL deferred — ADR-011) |
 | [`../infra/firebase/FIRESTORE_MODEL.md`](../infra/firebase/FIRESTORE_MODEL.md) | Firestore collection map + rules (BB-013 / ADR-011) |
@@ -34,6 +37,9 @@ Operating docs for the Black Book monorepo: architecture, decisions, runbooks, a
 | `security/` | BB-004 threat model / abuse corpus; BB-005/D-013 single-project isolation design |
 | `testing/` | BB-008 test layers, CI check names, guarded harness docs |
 | `ui/` | BB-007 design system usage, fixtures, accessibility notes |
+| `research/` | BB-037–044/047 discovery, adapters, query packs, relevance, confidence, research-case workflow, gold corpus |
+| `admin/` | BB-056 administration and research console |
+| `source-spec/` | Versioned source PDF (BB-080) |
 | `../infra/github/` | BB-009 rulesets + BB-010 OIDC/WIF scripts, environments, release-metadata (not applied remotely yet) |
 | `bb-001/` | Bead BB-001 reports (owned by baseline work; do not clobber) |
 | `runbooks/` | Operational procedures (stubs as needed) |

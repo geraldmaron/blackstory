@@ -1,233 +1,195 @@
-# Brand mark (BB-067)
+# Brand mark: the Pinned Page (BB-067 / BB-068)
 
-The Black Book brand mark: two blocky "B" letterforms on a shared construction
-grid. The first letter carries a pigment scale spanning the diaspora's range
-of skin tones; the second letter is fixed brand ink. Source of truth is code,
-not artwork — every rendering (in-app component, favicon, OG image, static
-asset) is generated from the same construction grid in
-`packages/ui/src/brand/`, so the mark cannot drift out of sync with itself.
+The Black Book mark: a closed book cover forms an asymmetric "B," curved
+page-edge bands are exposed at the spine, and a location pin is integrated
+into the lower-left of the cover — **history, pinned to place.** Source of
+truth is code, not artwork: every in-app rendering (header, admin console,
+favicon, OG image) is generated from the same geometry in
+`packages/ui/src/brand/BlackBookLogo.tsx`, so the mark cannot drift out of
+sync with itself.
 
-This document is the mark's usage contract. If you're changing the mark, read
-it first; if you're placing the mark somewhere new, the rules below are not
-optional — they're what keeps "proud, modern, black" from sliding into
-gimmick.
+This document is the mark's usage contract, superseding the earlier
+BB-067 blocky-letterform/Monk-Skin-Tone-Scale concept. If you're changing
+the mark, read this first.
+
+## Provenance
+
+The mark, palette, and type system come from an owner-supplied brand
+package (2026-07-17, `black-book-brand-package/`) — reference PNGs and the
+original package README are archived at `docs/ui/brand-reference/` for
+comparison. The geometry is original to that package (not a font glyph or
+stock book/pin icon); it has not been run through a trademark clearance
+search — do that before any public launch or partner-facing use beyond this
+repo.
 
 ## Why this mark
 
 The brief: equality, pride, soul, modern, black — never gimmicky, dated, or
-side-projecty. "Minecraft blocky with a modern feel" was the internal
-direction for concepting; it is not public-facing language, and the
-execution deliberately steers away from it. Blocky construction reads as
-*deliberate and constructed* — closer to a quilt block or a woodblock print
-than a game sprite — because of three restraints applied everywhere:
+side-projecty. A pinned page is a literal, legible metaphor for the
+product's thesis (an archive of Black history anchored to place, not an
+abstract classification device), which is why it replaces the earlier
+diaspora-pigment-scale concept: that direction risked reading as a skin-tone
+classification tool even with careful framing, where this one reads
+immediately as "book + place" with no such adjacency. Three restraints keep
+it from sliding into cliché:
 
-1. **Generous, visible gutters** between blocks (not touching pixels). This
-   is the single biggest lever separating "quilt" from "sprite."
-2. **Flat matte fills only.** No bevels, no drop shadows, no glow, no
+1. **Flat matte fills only.** No bevels, no drop shadows, no glow, no
    gradients, no 3D, in any asset, ever.
-3. **Large, confident blocks** (20 per letterform on a 5x7 grid) — not fine
-   pixel detail.
+2. **One loaded accent color** (Copper Pin) carried by the pin and, sparingly,
+   by the page-edge bands — never scattered across unrelated chrome.
+3. **The pin is integrated, not applied.** It sits inside the cover
+   silhouette, not bolted on as a separate badge.
 
-Design precedent: Studio Museum in Harlem's identity proves 100%-black can
-be a premium primary, not an absence of color. Gee's Bend quilts anchor the
-block-composition idea in Black art history — a mosaic of large, deliberate
-pieces, not a sprite. The pigment scale is what makes the grid *mean*
-something rather than being decoration.
+## The palette
 
-## Construction grid
+| Role | Hex | Name | Use |
+|---|---|---|---|
+| Ink | `#0A0A0A` | Black Ink | Primary ink; near-black, not pure `#000` |
+| Canvas | `#F4EFE5` | Archive Paper | Primary canvas; warm off-white, not pure `#FFF` |
+| Accent (graphic) | `#B86B2A` | Copper Pin | The mark's pin; large-scale/graphic UI use (icons, borders, tags) — **3:1 contrast only, not body text** |
+| Accent (text-safe) | `#7A4318` | Copper Ink | Darkened Copper Pin for links/text on the light theme's Archive Paper canvas (6.9:1) |
+| Accent (muted) | `#D8A178` | Page Sand | Page-edge bands, decorative fills; text-safe as the **dark theme's** accent (8.8:1 on Black Ink) |
 
-Each letterform is a 5-column x 7-row grid of square blocks (a hand-drawn
-bitmap "B," not a rendered font):
+Fixed swatches live in `packages/ui/src/tokens/brand-palette.ts`
+(`brandPalette`). Theme-reactive, contrast-safe applications (which swatch
+is safe for text vs. graphics, per theme) live in
+`packages/ui/src/tokens/colors.ts` as the `accent` / `accentGraphic` /
+`accentMuted` roles — see that file's `criticalTextPairs` /
+`criticalUiPairs` and `contrast.test.ts` for the enforced ratios. Never use
+raw Copper Pin (`#B86B2A`) as small/body text color on the light theme's
+Archive Paper canvas — it only clears the 3:1 UI/large-text bar (3.54:1),
+not the 4.5:1 body-text bar. Page Sand (`#D8A178`) is a fill/graphic color
+on light canvases only (1.97:1) — never foreground text there.
 
-```
-X X X X .
-X . . . X
-X . . . X
-X X X X .
-X . . . X
-X . . . X
-X X X X .
-```
+## Typography
 
-20 filled blocks per letter, 40 total for the "BB" lockup. Default geometry:
-28px cell, 4px gutter, 48px gap between the two letters, 16px padding —
-tunable via `MarkGeometryOptions`, but the 5x7 grid itself is fixed. Changing
-cell/gutter/gap ratios is fine; changing the letterform grid is a brand
-decision, not a styling one.
+Site type system (owner-supplied, all open-source / Google Fonts — no
+licensing cost or budget gate):
 
-Source: `packages/ui/src/brand/glyph.ts` (grid data) and
-`packages/ui/src/brand/geometry.ts` (pure layout math — shared by the React
-component, the static-asset generator, and the Next.js icon/OG routes).
-
-## The pigment scale
-
-The first letter's 20 blocks are filled from a seven-tone pigment scale,
-**scattered, not gradiented** — no two blocks adjacent in reading order, or
-stacked in the same column, repeat a tone. This is deliberate: a top-to-
-bottom gradient reads as a color ramp; a scatter reads as gathered pigments.
-The arrangement is hand-curated and pinned by
-`packages/ui/src/brand/scatter-map.test.ts`, so it can't quietly collapse
-into a ramp during a future edit.
-
-| Monk level | Hex | Name |
+| Role | Family | Token |
 |---|---|---|
-| 4 | `#EADABA` | Sand |
-| 5 | `#D7BD96` | Wheat |
-| 6 | `#A07E56` | Copper |
-| 7 | `#825C43` | Clay |
-| 8 | `#604134` | Umber |
-| 9 | `#3A312A` | Walnut |
-| 10 | `#292420` | Ebony |
+| Headlines / display | Sora (SemiBold 600) | `--bb-font-display` |
+| UI / body (sans contexts) | Inter | `--bb-font-sans` |
+| Editorial / longform body | Source Serif 4 | `--bb-font-editorial` |
+| Data / citations / mono | IBM Plex Mono | `--bb-font-mono` |
 
-(Rendered swatches: see `/design-system` in the running app, or open any of
-the generated SVGs in `packages/ui/src/brand/assets/`.)
-
-**Attribution (required wherever the scale is reused):** swatch values are
-derived from the **Monk Skin Tone Scale**, © Google / Dr. Ellis Monk,
-licensed **CC BY 4.0** (<https://skintone.google>,
-<https://creativecommons.org/licenses/by/4.0/>). The code constant
-`MONK_SCALE_ATTRIBUTION` in `packages/ui/src/tokens/pigment.ts` carries this
-same line — keep the two in sync.
-
-**Framing — read this before touching the pigment tokens:**
-
-- This is a **pigment / material reference**, named for paint and wood
-  pigments (Sand, Wheat, Copper, Clay, Umber, Walnut, Ebony) — deliberately
-  *not* food words (no "caramel," "chocolate," etc.), which reduce people to
-  consumables.
-- It represents the **diaspora's range** in the abstract brand mark. It is
-  **never** a classification system, and it is **never** applied to depict,
-  tag, sort, or describe an individual person, photo, or dataset record. If
-  a future feature wants to talk about a real person's appearance, this
-  scale is the wrong tool — don't reach for it.
-- It is not a Fitzpatrick scale, not an emoji skin-tone picker, and should
-  never be presented as either.
+Loaded via `next/font/google` in `apps/web/src/app/layout.tsx`. Longform
+body copy stays serif (Source Serif 4); headlines, wordmark, section
+titles, and story-rail titles use the Sora display family — see
+`packages/ui/src/tokens/typography.ts` (`fontFamilies`, `typeScale`) and
+`apps/web/src/app/shell.css` (`.bb-page__title`, `.bb-section__title`,
+`.bb-story-link__title`, `.bb-shell-wordmark`, `.bb-hero__brand`).
 
 ## Variants
 
-Three variants, each with a distinct, non-interchangeable purpose:
-
-| Variant | First letter | Second letter | Use |
-|---|---|---|---|
-| `full-pigment` | Pigment scatter | Fixed solid black (`#000000`) | Light canvas — the hero mark |
-| `reversed` | Pigment scatter (unchanged) | Fixed solid white (`#FFFFFF`) | Dark canvas — solid black would vanish |
-| `mono` | `currentColor` | `currentColor` | Single-color contexts: header lockups, small/stamped placements, anywhere the mark must inherit the surrounding theme's ink color automatically |
-
-`full-pigment` and `reversed` use **fixed** colors independent of the app's
-light/dark theme tokens — the mark's identity doesn't shift with UI theme,
-only with which canvas it sits on. `mono` is the one variant that's
-theme-reactive (via CSS `currentColor`), which is why it's the correct
-choice for in-app chrome like the site header, where the mark should track
-`--bb-ink` automatically.
-
 ```tsx
-import { BrandMark } from '@black-book/ui';
+import { BlackBookLogo, BlackBookMark } from '@black-book/ui';
 
-<BrandMark variant="full-pigment" size={40} />
-<BrandMark variant="reversed" size={40} />
-<BrandMark variant="mono" size={24} decorative />
+<BlackBookLogo variant="horizontal" size={112} tagline="History, pinned to place." />
+<BlackBookLogo variant="stacked" size={96} />
+<BlackBookLogo variant="mark" size={40} />
+<BlackBookLogo variant="app-icon" size={96} />
 ```
 
-Pass `decorative` when adjacent visible text already provides the accessible
-name (e.g. a "Black Book" wordmark next to the mark) — it sets
-`aria-hidden="true"` instead of `role="img"` + `aria-label`, so the name
-isn't announced twice. Omit it when the mark stands alone.
+`variant`:
+
+| Variant | Renders | Use |
+|---|---|---|
+| `horizontal` | Symbol + "BLACK BOOK" wordmark side by side | Default lockup; masthead, share cards |
+| `stacked` | Symbol above wordmark | Square/social placements |
+| `mark` | Symbol only | Small chrome, favicons, inline references |
+| `app-icon` | Symbol on a rounded-square tile | App/PWA icon |
+
+For bare-symbol placements that need to track surrounding theme color
+automatically (site header, admin masthead), use the lower-level
+`BlackBookMark` directly with explicit `ink`/`paper`/`accent` props tied to
+CSS variables — see `apps/web/src/components/SiteHeader.tsx` and
+`apps/admin/src/app/page.tsx` for the pattern (`ink="var(--bb-ink)"`,
+`paper="var(--bb-canvas)"`, `accent="var(--bb-accent-graphic)"`).
+
+`paper` fills the small punch-through circle at the pin's base — always set
+it to whatever color the mark is sitting on, not a fixed brand color,
+or the "hole" reads as a solid dot instead of a cutout.
+
+Pass `decorative` (on `BlackBookLogo`) or wrap `BlackBookMark` in an
+`aria-hidden` element when adjacent visible text already provides the
+accessible name — don't announce "Black Book" twice.
 
 ## Committed static assets
 
-`packages/ui/src/brand/assets/` holds generated SVG files for contexts
-outside the app where CSS `currentColor` isn't available (letterhead, print,
-partner press kits, social profile uploads, README badges):
+`packages/ui/src/brand/assets/` holds authored SVG exports from the source
+brand package, for contexts outside the app where the React component isn't
+available (letterhead, print, partner press kits, social profile uploads,
+README badges):
 
-- `bb-mark-full-pigment.svg`
-- `bb-mark-mono.svg` (fixed black, not `currentColor` — static files can't
-  inherit CSS)
-- `bb-mark-reversed.svg` (on a black canvas rect)
-- `bb-mark-favicon.svg` — single letterform only (see below), gutter
-  collapsed to 0, solid ink
-- `bb-mark-social-og.svg` — 1200x630 composed lockup + wordmark, for
-  contexts that need a literal file rather than the generated route
+- `bb-logo-mark.svg` — full-color symbol
+- `bb-logo-mark-compact.svg` — reduced-detail symbol for small placements
+- `bb-logo-app-icon.svg` — rounded-square app icon
+- `bb-logo-lockup-horizontal.svg` — symbol + wordmark lockup
 
-Regenerate after any change to the geometry/pigment/scatter-map source:
-
-```bash
-pnpm --filter @black-book/ui generate:brand
-```
-
-**Never hand-edit files in `assets/`** — they're build output. Edit the
-source modules and regenerate.
+These are **authored assets, not generated output** — there is no
+`generate:brand` build step for this mark (unlike the superseded grid
+system). If the geometry changes, re-export from the design source and
+replace these files directly.
 
 ### In the Next.js app
 
-The public web app does **not** use the static favicon/OG files — it
-generates both at request time from the same shared geometry, so there is
-exactly one source of truth and no static asset to forget to update:
+The public web app does not use the static favicon/OG files — it generates
+both at request time from the same shared `BlackBookMark` component, so
+there is exactly one source of truth for the interactive contexts:
 
 - `apps/web/src/app/icon.tsx` — 64x64 PNG via `next/og` `ImageResponse`.
-  Solid black tile with the single-letterform glyph in white, centered with
-  aspect-correct fitting (the glyph is 5:7, not square — this must scale
-  both axes and center, not stretch to fill).
+  Black Ink tile with the mark in Archive Paper/Copper Pin, centered.
 - `apps/web/src/app/opengraph-image.tsx` — 1200x630 PNG, same mechanism,
-  reusing `buildSocialLayout` from the brand barrel.
-
-If the letterform grid or pigment scale ever changes, these two routes and
-the static assets all pick it up from the same edit — nothing to keep in
-sync by hand except running `generate:brand` for the static files.
+  Archive Paper canvas with the full mark, wordmark, and tagline.
 
 ## Clearspace and minimum sizes
 
-- **Clearspace:** the mark's own padding (16px at default 28px cell size, or
-  proportionally at any scale) is the minimum clearspace — don't crop
-  tighter than the mark's own bounding box when placing it near other
-  elements.
-- **Minimum size, two-letter lockup (`full-pigment` / `reversed` / `mono`):**
-  24px tall. Below that, the pigment scatter stops reading as distinct
-  tones — drop to the single-letter favicon treatment instead.
-- **Minimum size, single letterform (favicon-style):** 16px, gutter
-  collapsed to 0 so blocks touch and the silhouette survives anti-aliasing
-  at tab-icon scale. This is why the favicon is a *separate* asset, not the
-  two-letter mark scaled down.
+- **Clearspace:** treat the mark's own bounding box as the minimum
+  clearspace — don't crop tighter when placing it near other elements.
+- **Minimum size, full detail:** 32px tall. Below that, switch `detail` to
+  `"compact"` (2 page-edge bands instead of 4, thicker strokes) — used
+  automatically by the header/admin/favicon integrations above 24-28px.
+- **Minimum size, compact:** 16px. This is why favicons and small header
+  marks pass `detail="compact"` rather than scaling the full mark down.
 
 ## Do / never
 
 **Do:**
 
-- Use `full-pigment` on light/neutral surfaces, `reversed` on dark/near-black
-  surfaces, `mono` wherever the mark must inherit theme ink automatically.
-- Keep the pigment scatter arrangement exactly as generated — it's
-  test-enforced, not decorative choice.
-- Regenerate static assets from source after any geometry/pigment change.
-- Credit the Monk Skin Tone Scale (CC BY 4.0) wherever the pigment values
-  are reused, in code or in written material.
+- Use the horizontal lockup as the default hero mark; use `mark`/`app-icon`
+  for small/square chrome.
+- Keep `paper` matched to the actual surface behind the mark so the pin's
+  punch-through circle reads correctly.
+- Use Copper Pin (`#B86B2A`) for graphic/large-scale accents; use Copper Ink
+  (`#7A4318`) wherever the accent carries body text on a light canvas.
+- Credit the source brand package when reusing these assets outside this
+  repo (see `docs/ui/brand-reference/source-package-README.txt`).
 
 **Never:**
 
 - No bevels, 3D effects, drop shadows, glows, or gradients on the mark, in
-  any variant, in any context — this is the line between "constructed" and
-  "gamer," and it is absolute.
-- Never use "Minecraft" or "video game" language in public-facing copy about
-  the mark. The internal concepting reference is not brand voice.
-- Never recolor the pigment blocks to anything outside the seven-tone scale,
-  and never reorder them into a gradient ramp.
-- Never apply the pigment scale to a real person, photo, or dataset record —
-  it is a brand asset, not a classification tool (see Framing, above).
-- Never use Fitzpatrick-scale language, emoji skin-tone iconography, or
-  kente-cloth / other appropriated-pattern clip art anywhere near the mark.
-- Never crop a letterform mid-block, stretch the mark to a non-native aspect
-  ratio, or place it below its minimum size for the variant in use.
-- Never hand-edit the generated files in `packages/ui/src/brand/assets/`.
+  any variant, in any context.
+- Never use raw Copper Pin as small/body text color on a light canvas — it
+  fails the 4.5:1 text bar (see palette table above).
+- Never stretch the mark to a non-square aspect ratio, or place it below its
+  minimum size for the detail level in use.
+- Never reintroduce the retired Monk Skin Tone Scale pigment mapping
+  (superseded 2026-07-17) — if a future feature needs to discuss a real
+  person's appearance, neither that retired system nor this brand palette is
+  the right tool.
 
 ## Source map
 
 | What | Where |
 |---|---|
-| Grid data | `packages/ui/src/brand/glyph.ts` |
-| Pigment scale + attribution | `packages/ui/src/tokens/pigment.ts` |
-| Scatter arrangement | `packages/ui/src/brand/scatter-map.ts` (+ `.test.ts`) |
-| Layout math | `packages/ui/src/brand/geometry.ts` (+ `.test.ts`) |
-| React component | `packages/ui/src/brand/BrandMark.tsx` |
-| Static-asset generator | `packages/ui/scripts/generate-brand-marks.ts` |
-| Committed static assets | `packages/ui/src/brand/assets/` |
+| Fixed brand palette | `packages/ui/src/tokens/brand-palette.ts` |
+| Theme-safe accent roles + contrast enforcement | `packages/ui/src/tokens/colors.ts`, `contrast.test.ts` |
+| Type system | `packages/ui/src/tokens/typography.ts` |
+| Mark + logo component | `packages/ui/src/brand/BlackBookLogo.tsx` |
+| Logo layout CSS | `packages/ui/src/styles/brand-logo.css` |
+| Authored static assets | `packages/ui/src/brand/assets/` |
+| Reference PNGs + source package README | `docs/ui/brand-reference/` |
 | Web favicon (generated) | `apps/web/src/app/icon.tsx` |
 | Web OG image (generated) | `apps/web/src/app/opengraph-image.tsx` |
 | Header integration | `apps/web/src/components/SiteHeader.tsx` |

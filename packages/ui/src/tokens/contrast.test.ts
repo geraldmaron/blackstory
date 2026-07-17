@@ -7,7 +7,9 @@ import {
   contrastRatio,
   criticalTextPairs,
   criticalUiPairs,
+  dataViz,
   meetsContrast,
+  themePalettes,
   themes,
 } from './index.ts';
 
@@ -38,5 +40,13 @@ test('primary ink on canvas aims for AAA where practical', () => {
       meetsContrast(fg, bg, 'AAA'),
       `${theme} ink/canvas should meet AAA; got ${contrastRatio(fg, bg).toFixed(2)}:1`,
     );
+  }
+});
+
+test('data-viz emphasis color meets 3:1 against both canvases', () => {
+  for (const theme of themes) {
+    const canvas = themePalettes[theme].canvas;
+    const ratio = contrastRatio(dataViz.emphasis, canvas);
+    assert.ok(ratio >= 3, `${theme} dataViz.emphasis/canvas is ${ratio.toFixed(2)}:1 (need 3:1)`);
   }
 });

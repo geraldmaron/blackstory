@@ -36,10 +36,10 @@
   display: inline-flex;
   align-items: center;
   gap: var(--bb-space-2);
-  font-family: var(--bb-font-editorial);
+  font-family: var(--bb-font-display);
   font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.04em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--bb-ink);
   text-decoration: none;
   line-height: 1;
@@ -47,7 +47,10 @@
 }
 
 .bb-shell-wordmark__mark {
+  display: block;
   flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
   color: var(--bb-ink);
 }
 
@@ -239,9 +242,10 @@
 
 .bb-page__title {
   margin: var(--bb-space-3) 0 0;
+  font-family: var(--bb-font-display);
   font-size: clamp(2.25rem, 1.4rem + 3.5vw, 4rem);
-  font-weight: 700;
-  letter-spacing: -0.045em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   line-height: 0.98;
 }
 
@@ -301,7 +305,7 @@
   margin-top: var(--bb-space-2);
 }
 
-/* ——— Full-bleed news hero (always ink-black / paper-white — theme-independent) ——— */
+/* ——— Full-bleed news hero (always Black Ink / Archive Paper — theme-independent) ——— */
 .bb-hero {
   position: relative;
   isolation: isolate;
@@ -310,8 +314,8 @@
   display: flex;
   align-items: flex-end;
   padding: clamp(4rem, 12vw, 7rem) 0 clamp(2.5rem, 6vw, 4rem);
-  background: #000000;
-  color: #ffffff;
+  background: #0a0a0a;
+  color: #f4efe5;
   border-bottom: 0;
 }
 
@@ -321,20 +325,20 @@
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(180deg, transparent 35%, rgba(0, 0, 0, 0.35) 100%),
+    linear-gradient(180deg, transparent 35%, rgba(10, 10, 10, 0.35) 100%),
     repeating-linear-gradient(
       90deg,
       transparent 0,
       transparent 47px,
-      rgba(255, 255, 255, 0.06) 47px,
-      rgba(255, 255, 255, 0.06) 48px
+      rgba(244, 239, 229, 0.06) 47px,
+      rgba(244, 239, 229, 0.06) 48px
     ),
     repeating-linear-gradient(
       0deg,
       transparent 0,
       transparent 47px,
-      rgba(255, 255, 255, 0.04) 47px,
-      rgba(255, 255, 255, 0.04) 48px
+      rgba(244, 239, 229, 0.04) 47px,
+      rgba(244, 239, 229, 0.04) 48px
     );
   animation: bb-hero-grid 18s linear infinite;
 }
@@ -347,11 +351,12 @@
 .bb-hero__brand {
   margin: 0;
   max-width: 100%;
+  font-family: var(--bb-font-display);
   font-size: clamp(3rem, 12vw, 8.5rem);
-  font-weight: 700;
-  letter-spacing: -0.06em;
+  font-weight: 600;
+  letter-spacing: -0.03em;
   line-height: 0.88;
-  color: #ffffff;
+  color: #f4efe5;
   animation: bb-rise 0.7s var(--bb-easing) both;
 }
 
@@ -363,14 +368,14 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.2;
-  color: #ffffff;
+  color: #f4efe5;
   animation: bb-rise 0.7s var(--bb-easing) 0.08s both;
 }
 
 .bb-hero__support {
   margin: var(--bb-space-4) 0 0;
   max-width: 34rem;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(244, 239, 229, 0.78);
   font-family: var(--bb-font-sans);
   font-size: 1.0625rem;
   line-height: 1.45;
@@ -405,25 +410,25 @@
 }
 
 .bb-hero .bb-cta--solid {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
+  background: #f4efe5;
+  color: #0a0a0a;
+  border-color: #f4efe5;
 }
 
 .bb-hero .bb-cta--solid:hover {
   background: transparent;
-  color: #ffffff;
+  color: #f4efe5;
 }
 
 .bb-hero .bb-cta--ghost {
   background: transparent;
-  color: #ffffff;
-  border-color: #ffffff;
+  color: #f4efe5;
+  border-color: #f4efe5;
 }
 
 .bb-hero .bb-cta--ghost:hover {
-  background: #ffffff;
-  color: #000000;
+  background: #f4efe5;
+  color: #0a0a0a;
 }
 
 .bb-cta--ink {
@@ -449,14 +454,14 @@
 }
 
 .bb-band .bb-cta--solid {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
+  background: var(--bb-inverse-ink);
+  color: var(--bb-ink);
+  border-color: var(--bb-inverse-ink);
 }
 
 .bb-band .bb-cta--solid:hover {
   background: transparent;
-  color: #ffffff;
+  color: var(--bb-inverse-ink);
 }
 
 /* ——— Modular sections ——— */
@@ -484,9 +489,10 @@
 
 .bb-section__title {
   margin: 0;
+  font-family: var(--bb-font-display);
   font-size: clamp(1.75rem, 1.3rem + 1.5vw, 2.5rem);
-  font-weight: 700;
-  letter-spacing: -0.035em;
+  font-weight: 600;
+  letter-spacing: -0.015em;
   line-height: 1.05;
 }
 
@@ -546,9 +552,10 @@
 
 .bb-story-link__title {
   margin: 0;
+  font-family: var(--bb-font-display);
   font-size: clamp(1.25rem, 1.1rem + 0.8vw, 1.75rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  letter-spacing: -0.015em;
   line-height: 1.15;
 }
 

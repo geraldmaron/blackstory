@@ -45,12 +45,15 @@ export const motion = {
   reducedMotionQuery: '(prefers-reduced-motion: reduce)',
 } as const;
 
-/** Restrained categorical/sequential colors for charts — not neon. */
+/**
+ * Restrained categorical/sequential colors for charts — pigment-anchored
+ * (Black Ink / Copper Pin / Page Sand), not neon, not pure grayscale.
+ */
 export const dataViz = {
-  categorical: ['#000000', '#525252', '#737373', '#A3A3A3', '#404040', '#262626'] as const,
-  sequential: ['#E5E5E5', '#A3A3A3', '#737373', '#525252', '#404040', '#000000'] as const,
-  emphasis: '#000000',
-  muted: '#A1A1AA',
-  gridLine: '#D4D4D8',
-  gridLineDark: '#3F3F46',
+  categorical: ['#0A0A0A', '#B86B2A', '#5C5548', '#D8A178', '#7A4318', '#2B2620'] as const,
+  sequential: ['#EFE2D0', '#D8A178', '#B86B2A', '#8A4E1C', '#4A2E13', '#0A0A0A'] as const,
+  emphasis: '#B86B2A',
+  muted: '#A69884',
+  gridLine: '#E3DCCB',
+  gridLineDark: '#2E2A22',
 } as const;

@@ -1,16 +1,11 @@
 /**
- * Barrel export for the Black Book brand mark.
+ * Barrel export for the Black Book brand mark (the "Pinned Page" identity).
  */
 
-export { BrandMark, type BrandMarkProps, type BrandMarkVariant } from './BrandMark.js';
 export {
-  buildGlyphLayout,
-  buildMarkLayout,
-  buildSocialLayout,
-  type GlyphLayout,
-  type MarkBlock,
-  type MarkGeometryOptions,
-  type MarkLayout,
-} from './geometry.js';
-export { GLYPH_COLUMNS, GLYPH_ROWS, glyphBCells, type GlyphCell } from './glyph.js';
-export { PIGMENT_SCATTER_MAP } from './scatter-map.js';
+  BlackBookLogo,
+  BlackBookMark,
+  type BlackBookLogoDetail,
+  type BlackBookLogoProps,
+  type BlackBookLogoVariant,
+} from './BlackBookLogo.js';

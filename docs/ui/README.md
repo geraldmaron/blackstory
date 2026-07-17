@@ -1,19 +1,27 @@
-# Design system (BB-007)
+# Design system (BB-007 / BB-068 v2)
 
 Shared package: `@black-book/ui` (`packages/ui`).
 
-See also [`brand.md`](./brand.md) (BB-067) for the BB mark: construction
-grid, pigment scale, variants, and usage rules.
+See also [`brand.md`](./brand.md) (BB-067/BB-068) for the "Pinned Page" mark:
+geometry, palette, typography, and usage rules; and [`story.md`](./story.md)
+(BB-069) for brand voice, narrative arc, and microcopy standards.
 
 ## What shipped
 
-- **Palette:** black / white / neutral grays; light and dark themes via `data-theme`
-- **Status colors:** warning, confidence, dispute, error only (with text/mono cues — never color-alone)
-- **Typography:** Source Serif 4 (editorial) + Source Sans 3 + IBM Plex Mono (technical)
-- **Tokens:** grid, spacing, elevation, border, icon, motion, focus, data-viz
+- **Palette (v2):** Archive Paper canvas / Black Ink primary; Copper Pin +
+  Page Sand brand accent; light and dark themes via `data-theme` (dark is
+  first-class, not an afterthought)
+- **Status colors:** warning, confidence, dispute, error only, re-derived
+  to harmonize with the accent palette (with text/mono cues — never
+  color-alone)
+- **Typography (v2):** Sora (display/headlines) + Inter (UI/body) + Source
+  Serif 4 (editorial/longform) + IBM Plex Mono (data/citations) — all
+  free/open-source, no licensing budget gate
+- **Tokens:** grid, spacing, elevation, border, icon, motion, focus,
+  pigment-anchored data-viz
 - **Components:** Card, Citation, Confidence, Timeline, MapFrame, ResultList, FilterBar, Dialog, Notice, EmptyState, Button, ThemeToggle
 - **Fixtures:** public route `/design-system` (Storybook equivalent)
-- **Public shell (BB-048):** modern Gen Z news shell on port **3048** — black/white primary, full-bleed hero, story rails, sticky masthead
+- **Public shell (BB-048):** news shell on port **3048** — warm paper/near-black-ink primary, full-bleed hero, story rails, sticky masthead
 
 
 ## Usage
@@ -23,7 +31,7 @@ import '@black-book/ui/styles.css';
 import { Card, Confidence, Notice } from '@black-book/ui';
 ```
 
-In Next apps, add `@black-book/ui` to `transpilePackages` and prefer `next/font` variables mapped to `--bb-font-editorial`, `--bb-font-sans`, and `--bb-font-mono`.
+In Next apps, add `@black-book/ui` to `transpilePackages` and prefer `next/font` variables mapped to `--bb-font-display`, `--bb-font-editorial`, `--bb-font-sans`, and `--bb-font-mono`.
 
 ## Accessibility
 
@@ -67,5 +75,10 @@ Sample entity ids: `ent_seed_place_001`, `ent_seed_school_001`. Data is labeled 
 - Full entity depth + evidence UI (BB-052 / BB-053)
 - Dedicated Storybook/Chromatic if visual regression CI is required later
 - Admin now consumes `@black-book/ui` (transpiled + `.js`->`.ts` webpack
-  resolution, matching web's config) and renders the brand mark on its home
-  page; a full admin reskin onto these tokens is still open (BB-056/BB-068)
+  resolution, matching web's config) and renders the brand mark on its
+  home page; admin doesn't yet load the display/sans font families via
+  `next/font` (falls back to the CSS `font-family` string literals) — low
+  priority since the console isn't public-facing
+- Map-led homepage arc (`docs/ui/story.md`) is blocked on BB-070 (map data
+  platform) and BB-051 (national map experience) — the current hero is an
+  intentional text-led interim, not the target design
