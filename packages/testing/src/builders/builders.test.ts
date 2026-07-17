@@ -62,6 +62,9 @@ test('builders share deterministic clocks and identifiers', () => {
   assert.equal(claim.entityId, entity.id);
   assert.equal(evidence.claimId, claim.id);
   assert.equal(evidence.sourceId, source.id);
+  assert.equal(evidence.sourceItemId, 'sitm_0001');
+  assert.equal(source.adapterEnabled, true);
+  assert.ok(source.stableIdentifier);
   assert.equal(release.snapshotId, 'snp_0001');
   assert.equal(release.releasedAt, '2026-07-16T12:00:00.000Z');
   assert.equal(submission.status, 'quarantined');

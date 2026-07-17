@@ -14,11 +14,19 @@ export interface Logger {
   error(message: string, error?: unknown, context?: LogContext): void;
 }
 
+/**
+ * Redacts a structured log record before it is written. Wire the central redactor
+ * from @black-book/security here so protected values (residential addresses, exact
+ * coordinates) never reach log output or error telemetry (BB-015).
+ */
+export type LogRedactor = (record: LogContext) => LogContext;
+
 export interface LoggerOptions {
   readonly service: string;
   readonly level?: LogLevel;
   readonly clock?: () => Date;
   readonly sink?: LogSink;
+  readonly redact?: LogRedactor;
 }
 
 export interface AppErrorOptions {
@@ -71,18 +79,20 @@ export function createLogger(options: LoggerOptions): Logger {
   const threshold = LEVEL_PRIORITY[options.level ?? 'info'];
   const clock = options.clock ?? (() => new Date());
   const sink = options.sink ?? ((line: string) => console.log(line));
+  const redact = options.redact ?? ((record: LogContext) => record);
 
   function write(level: LogLevel, message: string, context: LogContext = {}): void {
     if (LEVEL_PRIORITY[level] < threshold) {
       return;
     }
+    const redactedContext = redact(context);
     sink(
       JSON.stringify({
         timestamp: clock().toISOString(),
         level,
         service: options.service,
         message,
-        ...context,
+        ...redactedContext,
       }),
     );
   }

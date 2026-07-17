@@ -1,10 +1,12 @@
 /**
  * Root layout for the public Black Book web application.
- * Loads editorial + mono fonts and the shared design-system stylesheet (BB-007).
+ * Loads editorial + mono fonts, design-system stylesheet, and BB-048 app shell.
  */
 import type { ReactNode } from 'react';
 import { Source_Sans_3, Source_Serif_4, IBM_Plex_Mono } from 'next/font/google';
 import '@black-book/ui/styles.css';
+import { SiteShell } from '../components/SiteShell';
+import './shell.css';
 
 const editorial = Source_Serif_4({
   subsets: ['latin'],
@@ -26,8 +28,12 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata = {
-  title: 'Black Book',
-  description: 'Place-connected Black history research',
+  title: {
+    default: 'Black Book',
+    template: '%s — Black Book',
+  },
+  description:
+    'Place-connected Black history research with published claims, provenance, and confidence.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -41,7 +47,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <a className="bb-visually-hidden" href="#main">
           Skip to main content
         </a>
-        {children}
+        <SiteShell>{children}</SiteShell>
       </body>
     </html>
   );

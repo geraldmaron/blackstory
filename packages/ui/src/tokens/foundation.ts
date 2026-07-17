@@ -47,9 +47,9 @@ export const motion = {
 
 /** Restrained categorical/sequential colors for charts — not neon. */
 export const dataViz = {
-  categorical: ['#18181B', '#52525B', '#71717A', '#A1A1AA', '#3F3F46', '#27272A'] as const,
-  sequential: ['#E4E4E7', '#A1A1AA', '#71717A', '#52525B', '#3F3F46', '#18181B'] as const,
-  emphasis: '#18181B',
+  categorical: ['#000000', '#525252', '#737373', '#A3A3A3', '#404040', '#262626'] as const,
+  sequential: ['#E5E5E5', '#A3A3A3', '#737373', '#525252', '#404040', '#000000'] as const,
+  emphasis: '#000000',
   muted: '#A1A1AA',
   gridLine: '#D4D4D8',
   gridLineDark: '#3F3F46',

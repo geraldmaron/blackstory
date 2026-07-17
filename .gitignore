@@ -46,6 +46,7 @@ firestore-debug.log
 ui-debug.log
 *.log
 tmp/
+.tmp/
 .local/
 
 # Docker volumes
@@ -55,3 +56,24 @@ infra/database/data/
 infra/database/sql-connect/dataconnect/.dataconnect/
 packages/data-access/generated/*/
 !packages/data-access/generated/README.md
+
+# Construct — generated adapters, launcher, and runtime state.
+# Machine-specific, recreated by `construct sync`; never source (ADR-0027).
+.construct/
+.claude/
+.codex/
+.cursor/
+.vscode/
+.opencode/
+.mcp.json
+.github/prompts/
+.github/agents/
+config.env
+embed.yaml
+plan.md
+inbox/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key

@@ -15,7 +15,8 @@
     "publicPrecisionRules",
     "sourceClassifications",
     "publicationRestrictions",
-    "livingPersonRules"
+    "livingPersonRules",
+    "sensitivityRules"
   ],
   "properties": {
     "policyVersion": {
@@ -140,6 +141,44 @@
         "treatUnknownAsLiving": { "type": "boolean" },
         "neverStoreResidentialAsOrdinaryPersonLocation": { "type": "boolean" },
         "neverReturnResidentialPublicly": { "type": "boolean" }
+      }
+    },
+    "sensitivityRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Sensitivity classes, precision-reduction reasons, and residential precision caps enforced by the central redaction/serialization layer (BB-015).",
+      "required": [
+        "classes",
+        "precisionReductionReasons",
+        "residentialPrecisionLevels",
+        "livingResidenceMaxPublicPrecision",
+        "occupiedPrivateResidenceMaxPublicPrecision",
+        "sensitiveSiteMaxPublicPrecision",
+        "reduceOccupiedPrivateResidenceForDeceased"
+      ],
+      "properties": {
+        "classes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "precisionReductionReasons": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "residentialPrecisionLevels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "livingResidenceMaxPublicPrecision": { "type": "string", "minLength": 1 },
+        "occupiedPrivateResidenceMaxPublicPrecision": { "type": "string", "minLength": 1 },
+        "sensitiveSiteMaxPublicPrecision": { "type": "string", "minLength": 1 },
+        "reduceOccupiedPrivateResidenceForDeceased": { "type": "boolean" }
       }
     }
   }

@@ -84,5 +84,35 @@
     "treatUnknownAsLiving": true,
     "neverStoreResidentialAsOrdinaryPersonLocation": true,
     "neverReturnResidentialPublicly": true
+  },
+  "sensitivityRules": {
+    "classes": [
+      "none",
+      "living_residence",
+      "historical_residence",
+      "occupied_private_residence",
+      "sensitive_site",
+      "protected_relationship"
+    ],
+    "precisionReductionReasons": [
+      "prohibited_location_precision",
+      "living_residential_precision_prohibited",
+      "occupied_private_residence_reduced",
+      "exact_coordinates_reduced",
+      "sensitivity_class_reduced",
+      "unknown_precision_level",
+      "not_needed_for_public"
+    ],
+    "residentialPrecisionLevels": [
+      "residence",
+      "street_address",
+      "unit",
+      "parcel",
+      "exact_coordinates"
+    ],
+    "livingResidenceMaxPublicPrecision": "city",
+    "occupiedPrivateResidenceMaxPublicPrecision": "neighborhood",
+    "sensitiveSiteMaxPublicPrecision": "neighborhood",
+    "reduceOccupiedPrivateResidenceForDeceased": true
   }
 }

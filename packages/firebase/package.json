@@ -16,11 +16,12 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/env.test.ts src/firestore.unit.test.ts src/rules.integration.test.ts",
+    "test": "node --conditions development --import tsx --test src/env.test.ts src/firestore.unit.test.ts src/audit-outbox.test.ts src/redaction.unit.test.ts src/rules.integration.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
     "@black-book/domain": "workspace:*",
+    "@black-book/security": "workspace:*",
     "firebase": "^11.10.0",
     "firebase-admin": "^13.4.0",
     "zod": "^3.25.76"

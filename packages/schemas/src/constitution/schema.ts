@@ -56,6 +56,17 @@ export const productConstitutionSchema = z
         neverReturnResidentialPublicly: z.boolean(),
       })
       .strict(),
+    sensitivityRules: z
+      .object({
+        classes: z.array(z.string().min(1)).nonempty(),
+        precisionReductionReasons: z.array(z.string().min(1)).nonempty(),
+        residentialPrecisionLevels: z.array(z.string().min(1)).nonempty(),
+        livingResidenceMaxPublicPrecision: z.string().min(1),
+        occupiedPrivateResidenceMaxPublicPrecision: z.string().min(1),
+        sensitiveSiteMaxPublicPrecision: z.string().min(1),
+        reduceOccupiedPrivateResidenceForDeceased: z.boolean(),
+      })
+      .strict(),
   })
   .strict();
 

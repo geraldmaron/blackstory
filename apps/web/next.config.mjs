@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Allow local verification via 127.0.0.1 as well as localhost (BB-048 port 3048).
+  allowedDevOrigins: ['127.0.0.1', 'localhost'],
   transpilePackages: ['@black-book/domain', '@black-book/schemas', '@black-book/ui'],
   webpack: (config) => {
     // NodeNext packages emit `.js` specifiers that map to `.ts`/`.tsx` sources.

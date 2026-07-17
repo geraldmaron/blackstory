@@ -15,6 +15,78 @@
         { "fieldPath": "releaseId", "order": "ASCENDING" },
         { "fieldPath": "geohash", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "sourceCaptures",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "contentHash.algorithm", "order": "ASCENDING" },
+        { "fieldPath": "contentHash.digest", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "sourceItems",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "sourceId", "order": "ASCENDING" },
+        { "fieldPath": "stableIdentifier", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "evidenceRecords",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "sourceItemId", "order": "ASCENDING" },
+        { "fieldPath": "rightsStatus", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "evidenceLineage",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "lineageRootId", "order": "ASCENDING" },
+        { "fieldPath": "kind", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "canonicalClaims",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "entityId", "order": "ASCENDING" },
+        { "fieldPath": "publicationStatus", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "claimEvidenceLinks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "claimId", "order": "ASCENDING" },
+        { "fieldPath": "role", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "claimEvidenceLinks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "lineageRootId", "order": "ASCENDING" },
+        { "fieldPath": "role", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "auditEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "entityId", "order": "ASCENDING" },
+        { "fieldPath": "occurredAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "outboxMessages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "availableAt", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

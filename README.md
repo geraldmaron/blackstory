@@ -76,6 +76,8 @@ pnpm firebase:test:rules
 ```
 
 **Data plane (current phase):** Cloud Firestore + Storage. See [`infra/firebase/FIRESTORE_MODEL.md`](./infra/firebase/FIRESTORE_MODEL.md) and [ADR-011](./docs/adr/ADR-011-firestore-system-of-record.md). Do not provision Cloud SQL.
+BB-018 audit/outbox helpers atomically commit state + immutable audit + pending delivery with
+idempotency, bounded retry/dead-letter handling, and publication-history reconstruction.
 Bootstrap uses frozen pnpm and uv lockfiles. Local tests default to `NODE_ENV=development` and
 `LOG_LEVEL=info`; no production environment variables or cloud credentials are required.
 Copy [`.env.example`](./.env.example) for local emulator-oriented Firebase placeholders.
@@ -113,9 +115,10 @@ design (per-surface SAs / buckets / DB roles): `infra/gcp/` and
 ## Current status
 
 BB-001 through BB-010 (BB-009/010 local; cloud/remote apply pending), **BB-007** design system,
-**BB-011** Firebase bootstrap, and **BB-012** database foundation (local roles + SQL Connect
-templates; Cloud SQL instance not provisioned) are in place. Design fixtures:
-`http://localhost:3000/design-system` (`docs/ui/README.md`). Production `black-book-efaaf` has
+**BB-011** Firebase bootstrap, **BB-012** database foundation (local roles + SQL Connect
+templates; Cloud SQL instance not provisioned), and **BB-048** public application shell are in
+place. Public web (unique port): `http://localhost:3048/` — design fixtures at
+`http://localhost:3048/design-system` (`docs/ui/README.md`). Production `black-book-efaaf` has
 Hosting plus registered **Black Book Web** / **Black Book Admin** apps. Still blocked/deferred:
 Blaze/App Hosting backends, Firestore database enablement, GCP class buckets/SAs/IAM, Auth
 provider choice, App Check enforcement (BB-024), GitHub remote rulesets + live WIF apply, Cloud
@@ -123,8 +126,10 @@ SQL create — see `docs/bb-001/`, `docs/adr/`, `docs/security/`, `docs/testing/
 `infra/firebase/`, `infra/gcp/` (incl. `wif/`), `infra/github/`, `infra/database/`.
 
 ```bash
-pnpm --filter @black-book/web dev
-# http://localhost:3000/design-system
+pnpm --filter @black-book/web exec next dev --port 3048
+# or: pnpm --filter @black-book/web dev
+# http://localhost:3048/
+# http://localhost:3048/design-system
 ```
 
 ## Product constitution (policy)

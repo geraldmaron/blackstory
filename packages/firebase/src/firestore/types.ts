@@ -1,8 +1,15 @@
 /**
- * Firestore document schemas for Black Book (ADR-011 / BB-013 foundation, BB-014 domain depth).
+ * Firestore document schemas for Black Book (ADR-011 / BB-013–018).
+ * Entity/geography (BB-014), provenance (BB-016), claims/confidence (BB-017).
  * Shapes align with @black-book/domain; Cloud SQL / PostGIS are not the production path.
  */
 import { z } from 'zod';
+import {
+  ACTOR_TYPES,
+  AUDIT_EVENT_ACTIONS,
+  OUTBOX_STATUSES,
+  auditCategoryFor,
+} from '@black-book/domain';
 
 export const authClaimFlagsSchema = z.object({
   admin: z.boolean().optional(),
@@ -317,16 +324,323 @@ export const entityMergeSchema = z.object({
 
 export type EntityMergeDoc = z.infer<typeof entityMergeSchema>;
 
-export const evidenceRecordSchema = z.object({
+const unitInterval = z.number().min(0).max(1);
+
+export const claimTemporalContextSchema = z.object({
+  label: z.string().optional(),
+  validFrom: z.string().optional(),
+  validTo: z.string().nullable().optional(),
+});
+
+export const claimGeographicContextSchema = z.object({
+  locationId: z.string().min(1).optional(),
+  jurisdictionId: z.string().min(1).optional(),
+  notes: z.string().optional(),
+  precision: z.string().min(1).optional(),
+});
+
+export const confidenceComponentsSchema = z.object({
+  sourceAuthority: unitInterval,
+  directness: unitInterval,
+  lineageIndependence: unitInterval,
+  temporalProximity: unitInterval,
+  geographicPrecision: unitInterval,
+  entityMatchQuality: unitInterval,
+  extractionQuality: unitInterval,
+  contradictionPenalty: unitInterval,
+});
+
+export type ConfidenceComponentsDoc = z.infer<typeof confidenceComponentsSchema>;
+
+export const confidenceScoreSchema = z.object({
+  score: unitInterval,
+  components: confidenceComponentsSchema,
+  policyVersion: z.string().min(1),
+  independentLineageCount: z.number().int().nonnegative(),
+  supportingEvidenceCount: z.number().int().nonnegative(),
+  contradictingEvidenceCount: z.number().int().nonnegative(),
+  contributingEvidenceIds: z.array(z.string().min(1)).default([]),
+  calculatedAt: z.string().datetime(),
+});
+
+export type ConfidenceScoreDoc = z.infer<typeof confidenceScoreSchema>;
+
+export const preservedClaimValueSchema = z.object({
+  value: z.string().min(1),
+  evidenceLinkIds: z.array(z.string().min(1)).default([]),
+  credible: z.boolean(),
+  kind: z.enum(['primary', 'contradicting', 'alternative']),
+});
+
+export type PreservedClaimValueDoc = z.infer<typeof preservedClaimValueSchema>;
+
+export const claimVersionSchema = z.object({
   id: z.string().min(1),
-  sourceId: z.string().min(1),
-  /** GCS / Storage object reference; never embed blob bytes in Firestore. */
-  storageObject: z.string().min(1),
-  rights: z.enum(['unknown', 'public_domain', 'licensed', 'restricted']).default('unknown'),
+  claimId: z.string().min(1),
+  versionNumber: z.number().int().positive(),
+  entityId: z.string().min(1),
+  predicate: z.string().min(1),
+  object: z.string().min(1),
+  temporal: claimTemporalContextSchema.optional(),
+  geographic: claimGeographicContextSchema.optional(),
+  proceduralStatus: z.string().min(1),
+  claimClass: z.enum(['standard', 'high_impact']),
+  workflowStatus: z.enum(['proposed', 'accepted', 'rejected', 'superseded']),
+  publicationStatus: z.enum(['unpublished', 'published', 'retracted']),
+  createdAt: z.string().datetime(),
+  createdBy: z.string().min(1).optional(),
+  supersedesVersionId: z.string().min(1).optional(),
+  notes: z.string().optional(),
+});
+
+export type ClaimVersionDoc = z.infer<typeof claimVersionSchema>;
+
+export const researchCoverageSchema = z.object({
+  level: z.enum(['none', 'minimal', 'partial', 'substantial', 'comprehensive']),
+  score: unitInterval.optional(),
+  notes: z.string().optional(),
+  lastCheckedAt: z.string().datetime().optional(),
+});
+
+export const relevanceMeasurementSchema = z.object({
+  score: unitInterval,
+  decision: z.enum(['include', 'exclude', 'supporting_context']),
+  policyVersion: z.string().min(1),
+  passes: z.boolean(),
+});
+
+export const connectionStrengthSchema = z.object({
+  score: unitInterval,
+  rationale: z.string().optional(),
+});
+
+/** Canonical atomic claim with versions, confidence, and measurements (BB-017). */
+export const canonicalClaimSchema = z.object({
+  id: z.string().min(1),
+  entityId: z.string().min(1),
+  predicate: z.string().min(1),
+  currentVersionId: z.string().min(1),
+  versions: z.array(claimVersionSchema).min(1),
+  claimClass: z.enum(['standard', 'high_impact']),
+  workflowStatus: z.enum(['proposed', 'accepted', 'rejected', 'superseded']),
+  publicationStatus: z.enum(['unpublished', 'published', 'retracted']),
+  proceduralStatus: z.string().min(1),
+  temporal: claimTemporalContextSchema.optional(),
+  geographic: claimGeographicContextSchema.optional(),
+  confidence: confidenceScoreSchema.optional(),
+  relevance: relevanceMeasurementSchema.optional(),
+  connectionStrength: connectionStrengthSchema.optional(),
+  researchCoverage: researchCoverageSchema.optional(),
+  preservedValues: z.array(preservedClaimValueSchema).default([]),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export type CanonicalClaimDoc = z.infer<typeof canonicalClaimSchema>;
+
+/** Claim-to-evidence relationship (supporting / contradicting / contextual). */
+export const claimEvidenceLinkSchema = z.object({
+  id: z.string().min(1),
+  claimId: z.string().min(1),
+  claimVersionId: z.string().min(1),
+  evidenceId: z.string().min(1),
+  role: z.enum(['supporting', 'contradicting', 'contextual']),
+  lineageRootId: z.string().min(1),
+  credible: z.boolean(),
+  sourceClassification: z.string().min(1),
+  directness: unitInterval,
+  temporalProximity: unitInterval,
+  geographicPrecision: unitInterval,
+  entityMatchQuality: unitInterval,
+  extractionQuality: unitInterval,
+  assertedValue: z.string().min(1).optional(),
+  notes: z.string().optional(),
   createdAt: z.string().datetime(),
 });
 
+export type ClaimEvidenceLinkDoc = z.infer<typeof claimEvidenceLinkSchema>;
+
+export const contentHashSchema = z.object({
+  algorithm: z.literal('sha256'),
+  digest: z.string().regex(/^[a-f0-9]{64}$/),
+});
+
+export type ContentHashDoc = z.infer<typeof contentHashSchema>;
+
+export const rightsStatusSchema = z.enum([
+  'unknown',
+  'public_domain',
+  'licensed',
+  'fair_use',
+  'restricted',
+  'prohibited',
+]);
+
+export const publicationPermissionSchema = z.enum([
+  'cite',
+  'short_excerpt',
+  'substantial_excerpt',
+  'display_media',
+  'redistribute',
+]);
+
+export const prohibitedUseSchema = z.enum([
+  'commercial_reuse',
+  'full_text_republication',
+  'biometric_extraction',
+  'living_person_doxxing',
+  'unattributed_reuse',
+  'other',
+]);
+
+export const rightsPolicySchema = z.object({
+  defaultStatus: rightsStatusSchema,
+  publicationPermissions: z.array(publicationPermissionSchema).default([]),
+  prohibitedUses: z.array(prohibitedUseSchema).default([]),
+});
+
+export type RightsPolicyDoc = z.infer<typeof rightsPolicySchema>;
+
+export const sourceOrganizationSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  homepageUrl: z.string().url().optional(),
+  notes: z.string().optional(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export type SourceOrganizationDoc = z.infer<typeof sourceOrganizationSchema>;
+
+export const sourceDomainSchema = z.object({
+  id: z.string().min(1),
+  organizationId: z.string().min(1),
+  hostname: z.string().min(1),
+  verified: z.boolean().optional(),
+  createdAt: z.string().datetime(),
+});
+
+export type SourceDomainDoc = z.infer<typeof sourceDomainSchema>;
+
+/** Registered source adapter / policy (collection `evidenceSources`). */
+export const evidenceSourceSchema = z.object({
+  id: z.string().min(1),
+  organizationId: z.string().min(1).optional(),
+  domainIds: z.array(z.string().min(1)).optional(),
+  displayName: z.string().min(1),
+  classification: z.string().min(1),
+  adapterId: z.string().min(1),
+  stableIdScheme: z.string().min(1),
+  policy: z.object({
+    snapshotMode: z.enum(['none', 'selective']),
+    rights: rightsPolicySchema,
+    permittedClaimClasses: z.array(z.string().min(1)).optional(),
+    refreshSchedule: z.string().optional(),
+    notes: z.string().optional(),
+  }),
+  /** When false, adapter cannot create new candidates (BB-016). */
+  adapterEnabled: z.boolean(),
+  killSwitchId: z.string().min(1).optional(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export type EvidenceSourceDoc = z.infer<typeof evidenceSourceSchema>;
+
+export const sourceItemSchema = z.object({
+  id: z.string().min(1),
+  sourceId: z.string().min(1),
+  stableIdentifier: z.string().min(1),
+  canonicalUrl: z.string().url().optional(),
+  title: z.string().optional(),
+  classification: z.string().min(1).optional(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export type SourceItemDoc = z.infer<typeof sourceItemSchema>;
+
+export const retrievalEventSchema = z.object({
+  id: z.string().min(1),
+  sourceId: z.string().min(1),
+  sourceItemId: z.string().min(1).optional(),
+  adapterId: z.string().min(1),
+  startedAt: z.string().datetime(),
+  completedAt: z.string().datetime().optional(),
+  status: z.enum(['success', 'failure', 'skipped_disabled', 'skipped_duplicate']),
+  httpStatus: z.number().int().optional(),
+  error: z.string().optional(),
+  parserVersion: z.string().min(1).optional(),
+});
+
+export type RetrievalEventDoc = z.infer<typeof retrievalEventSchema>;
+
+export const sourceCaptureSchema = z.object({
+  id: z.string().min(1),
+  sourceItemId: z.string().min(1),
+  sourceId: z.string().min(1),
+  contentHash: contentHashSchema,
+  parserVersion: z.string().min(1),
+  retrievedAt: z.string().datetime(),
+  retrievalEventId: z.string().min(1).optional(),
+  snapshotStorageObject: z.string().min(1).optional(),
+  snapshotMode: z.enum(['none', 'selective']),
+  dedupOfCaptureId: z.string().min(1).optional(),
+  createdAt: z.string().datetime(),
+});
+
+export type SourceCaptureDoc = z.infer<typeof sourceCaptureSchema>;
+
+export const evidenceLocatorSchema = z.object({
+  page: z.string().optional(),
+  pages: z.string().optional(),
+  paragraph: z.string().optional(),
+  offsetStart: z.number().int().nonnegative().optional(),
+  offsetEnd: z.number().int().nonnegative().optional(),
+  label: z.string().optional(),
+  uriFragment: z.string().optional(),
+});
+
+export type EvidenceLocatorDoc = z.infer<typeof evidenceLocatorSchema>;
+
+export const evidenceRecordSchema = z.object({
+  id: z.string().min(1),
+  /** Required: every evidence record resolves to a source item (BB-016). */
+  sourceItemId: z.string().min(1),
+  sourceId: z.string().min(1),
+  captureId: z.string().min(1).optional(),
+  /** GCS / Storage object reference; never embed blob bytes in Firestore. */
+  storageObject: z.string().min(1).optional(),
+  locator: evidenceLocatorSchema.optional(),
+  excerpt: z.string().optional(),
+  excerptKind: z.enum(['none', 'short', 'substantial']).default('none'),
+  observedAt: z.string().optional(),
+  rightsStatus: rightsStatusSchema.default('unknown'),
+  publicationPermissions: z.array(publicationPermissionSchema).default([]),
+  prohibitedUses: z.array(prohibitedUseSchema).default([]),
+  lineageRootId: z.string().min(1).optional(),
+  syndicatedFromEvidenceId: z.string().min(1).optional(),
+  /**
+   * @deprecated Prefer rightsStatus. Kept for transitional reads of early BB-013 seeds.
+   */
+  rights: rightsStatusSchema.optional(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime().optional(),
+});
+
 export type EvidenceRecordDoc = z.infer<typeof evidenceRecordSchema>;
+
+export const evidenceLineageSchema = z.object({
+  id: z.string().min(1),
+  kind: z.enum(['syndication', 'republication', 'derivative', 'same_capture', 'translation']),
+  fromEvidenceId: z.string().min(1),
+  toEvidenceId: z.string().min(1),
+  lineageRootId: z.string().min(1),
+  notes: z.string().optional(),
+  createdAt: z.string().datetime(),
+});
+
+export type EvidenceLineageDoc = z.infer<typeof evidenceLineageSchema>;
 
 export const publicationReleaseSchema = z.object({
   id: z.string().min(1),
@@ -371,16 +685,95 @@ export const submissionInboxSchema = z.object({
 
 export type SubmissionInboxDoc = z.infer<typeof submissionInboxSchema>;
 
-export const auditEventSchema = z.object({
-  id: z.string().min(1),
-  action: z.string().min(1),
-  actor: z.string().min(1),
-  resource: z.string().min(1),
-  at: z.string().datetime(),
-  detail: z.record(z.unknown()).optional(),
+export const auditActorSchema = z.object({
+  id: z.string().min(1).max(256),
+  type: z.enum(ACTOR_TYPES),
+  displayName: z.string().min(1).max(256).optional(),
 });
 
+export const auditSubjectSchema = z.object({
+  type: z.string().min(1).max(128),
+  id: z.string().min(1).max(512),
+  path: z.string().min(3).max(1_500),
+});
+
+export const auditEventSchema = z
+  .object({
+    id: z.string().min(1).max(512),
+    action: z.enum(AUDIT_EVENT_ACTIONS),
+    category: z.enum([
+      'policy',
+      'source',
+      'research',
+      'moderation',
+      'publication',
+      'correction',
+      'retraction',
+      'authentication',
+      'administrative',
+    ]),
+    actor: auditActorSchema,
+    subject: auditSubjectSchema,
+    reason: z.string().min(1).max(2_000),
+    requestId: z.string().min(1).max(512),
+    correlationId: z.string().min(1).max(512),
+    releaseId: z.string().min(1).max(512).optional(),
+    entityId: z.string().min(1).max(512).optional(),
+    idempotencyKey: z.string().min(1).max(512),
+    occurredAt: z.string().datetime(),
+    data: z.record(z.unknown()).optional(),
+  })
+  .superRefine((event, context) => {
+    if (event.category !== auditCategoryFor(event.action)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['category'],
+        message: `Category must match action ${event.action}`,
+      });
+    }
+  });
+
 export type AuditEventDoc = z.infer<typeof auditEventSchema>;
+
+export const outboxMessageSchema = z.object({
+  id: z.string().min(1).max(512),
+  eventId: z.string().min(1).max(512),
+  topic: z.string().min(1).max(256),
+  aggregateType: z.string().min(1).max(128),
+  aggregateId: z.string().min(1).max(512),
+  payload: z.record(z.unknown()),
+  status: z.enum(OUTBOX_STATUSES),
+  attempts: z.number().int().nonnegative(),
+  maxAttempts: z.number().int().positive().max(100),
+  availableAt: z.string().datetime(),
+  createdAt: z.string().datetime(),
+  processedAt: z.string().datetime().optional(),
+  lastError: z.string().min(1).max(2_000).optional(),
+  correlationId: z.string().min(1).max(512),
+  idempotencyKey: z.string().min(1).max(512),
+});
+
+export type OutboxMessageDoc = z.infer<typeof outboxMessageSchema>;
+
+export const idempotencyRecordSchema = z.object({
+  key: z.string().min(1).max(512),
+  eventId: z.string().min(1).max(512),
+  outboxMessageId: z.string().min(1).max(512),
+  correlationId: z.string().min(1).max(512),
+  createdAt: z.string().datetime(),
+});
+
+export type IdempotencyRecordDoc = z.infer<typeof idempotencyRecordSchema>;
+
+export const outboxConsumerReceiptSchema = z.object({
+  id: z.string().min(1).max(1_024),
+  consumerId: z.string().min(1).max(256),
+  messageId: z.string().min(1).max(512),
+  eventId: z.string().min(1).max(512),
+  processedAt: z.string().datetime(),
+});
+
+export type OutboxConsumerReceiptDoc = z.infer<typeof outboxConsumerReceiptSchema>;
 
 export const killSwitchSchema = z.object({
   id: z.string().min(1),

@@ -1,5 +1,5 @@
 /**
- * Firestore and Storage security rules tests against local emulators (BB-013 / ADR-011).
+ * Firestore and Storage security rules tests against local emulators (BB-013 / BB-018 / ADR-011).
  * Skips when emulators are down unless CI_REQUIRE_FIREBASE=1.
  */
 import assert from 'node:assert/strict';
@@ -212,6 +212,90 @@ test('research claim can read research but cannot write publication or canonical
   await assertFails(db.doc('canonicalEntities/ent_1').get());
 });
 
+test('trusted staff may append valid audit events but nobody may change them', async (t) => {
+  if (!testEnv) {
+    t.skip(skipReason ?? 'emulators unavailable');
+    return;
+  }
+  await testEnv.clearFirestore();
+  const uid = 'publisher-1';
+  const publisher = testEnv.authenticatedContext(uid, { publication: true });
+  const event = {
+    id: 'audit-rules-1',
+    action: 'publication.published',
+    category: 'publication',
+    actor: { id: uid, type: 'user' },
+    subject: { type: 'entity', id: 'entity-1', path: 'canonicalEntities/entity-1' },
+    reason: 'Approved publication',
+    requestId: 'request-rules-1',
+    correlationId: 'correlation-rules-1',
+    releaseId: 'release-rules-1',
+    entityId: 'entity-1',
+    idempotencyKey: 'publish:entity-1:release-rules-1',
+    occurredAt: '2026-07-16T20:00:00.000Z',
+  };
+  const ref = publisher.firestore().doc('auditEvents/audit-rules-1');
+
+  await assertSucceeds(ref.set(event));
+  await assertFails(ref.update({ reason: 'Rewritten history' }));
+  await assertFails(ref.delete());
+
+  const untrusted = testEnv.authenticatedContext('ordinary-user');
+  await assertFails(
+    untrusted
+      .firestore()
+      .doc('auditEvents/audit-rules-untrusted')
+      .set({ ...event, id: 'audit-rules-untrusted', actor: { id: 'ordinary-user', type: 'user' } }),
+  );
+});
+
+test('unauthenticated clients cannot read or write evidence or sources', async (t) => {
+  if (!testEnv) {
+    t.skip(skipReason ?? 'emulators unavailable');
+    return;
+  }
+  await testEnv.clearFirestore();
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    const db = context.firestore();
+    await db.doc('evidenceRecords/ev_1').set({
+      id: 'ev_1',
+      sourceItemId: 'sitm_1',
+      sourceId: 'src_1',
+      excerptKind: 'none',
+      rightsStatus: 'unknown',
+      publicationPermissions: [],
+      prohibitedUses: [],
+      createdAt: '2026-07-16T18:00:00.000Z',
+    });
+    await db.doc('evidenceSources/src_1').set({
+      id: 'src_1',
+      displayName: 'Fixture',
+      classification: 'primary_archival',
+      adapterId: 'fixture',
+      stableIdScheme: 'url',
+      policy: {
+        snapshotMode: 'selective',
+        rights: {
+          defaultStatus: 'public_domain',
+          publicationPermissions: [],
+          prohibitedUses: [],
+        },
+      },
+      adapterEnabled: true,
+      createdAt: '2026-07-16T18:00:00.000Z',
+      updatedAt: '2026-07-16T18:00:00.000Z',
+    });
+  });
+  const context = testEnv.unauthenticatedContext();
+  const db = context.firestore();
+  await assertFails(db.doc('evidenceRecords/ev_1').get());
+  await assertFails(db.doc('evidenceRecords/ev_1').set({ id: 'ev_hack' }));
+  await assertFails(db.doc('evidenceSources/src_1').get());
+  await assertFails(db.doc('sourceItems/sitm_1').set({ id: 'sitm_1' }));
+  await assertFails(db.doc('sourceCaptures/cap_1').set({ id: 'cap_1' }));
+  await assertFails(db.doc('evidenceLineage/elin_1').set({ id: 'elin_1' }));
+});
+
 test('storage deny-all rejects unauthenticated reads and writes', async (t) => {
   if (!testEnv) {
     t.skip(skipReason ?? 'emulators unavailable');
@@ -225,4 +309,12 @@ test('storage deny-all rejects unauthenticated reads and writes', async (t) => {
 
 test('rules harness stays on demo project id', () => {
   assert.equal(process.env.FIREBASE_PROJECT_ID ?? 'demo-black-book', 'demo-black-book');
+});
+
+test('audit rules express append-only and protected outbox intent', () => {
+  const rules = readFileSync(path.join(FIREBASE_DIR, 'firestore.rules'), 'utf8');
+  assert.match(rules, /match \/auditEvents\/\{eventId\}/);
+  assert.match(rules, /allow create: if isTrustedAuditWriter\(\)/);
+  assert.match(rules, /allow update, delete: if false/);
+  assert.match(rules, /match \/outboxMessages\/\{messageId\}[\s\S]*allow read, write: if false/);
 });

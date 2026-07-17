@@ -1,5 +1,5 @@
 /**
- * Server-side Firestore collection map and publish guards (BB-013 / ADR-011).
+ * Server-side Firestore collection map and publish guards (BB-013 / BB-016 / BB-017 / BB-018 / ADR-011).
  * Mirrors @black-book/firebase path names without requiring a runtime Firebase import
  * for static allowlists used by APIs and workers.
  */
@@ -11,16 +11,26 @@ export const FIRESTORE_COLLECTIONS = [
   'researchCases',
   'canonicalEntities',
   'canonicalClaims',
+  'claimEvidenceLinks',
   'entityRelationships',
   'entityMerges',
-  'evidenceRecords',
+  'sourceOrganizations',
+  'sourceDomains',
   'evidenceSources',
+  'sourceItems',
+  'sourceCaptures',
+  'retrievalEvents',
+  'evidenceRecords',
+  'evidenceLineage',
   'publicationReleases',
   'publicMeta',
   'publicReleases',
   'publicSearchIndex',
   'submissionInbox',
   'auditEvents',
+  'outboxMessages',
+  'idempotencyKeys',
+  'outboxConsumerReceipts',
   'killSwitches',
 ] as const;
 
@@ -32,16 +42,26 @@ export const FIRESTORE_PATHS = {
   researchCases: 'researchCases',
   canonicalEntities: 'canonicalEntities',
   canonicalClaims: 'canonicalClaims',
+  claimEvidenceLinks: 'claimEvidenceLinks',
   entityRelationships: 'entityRelationships',
   entityMerges: 'entityMerges',
-  evidenceRecords: 'evidenceRecords',
+  sourceOrganizations: 'sourceOrganizations',
+  sourceDomains: 'sourceDomains',
   evidenceSources: 'evidenceSources',
+  sourceItems: 'sourceItems',
+  sourceCaptures: 'sourceCaptures',
+  retrievalEvents: 'retrievalEvents',
+  evidenceRecords: 'evidenceRecords',
+  evidenceLineage: 'evidenceLineage',
   publicationReleases: 'publicationReleases',
   publicMeta: 'publicMeta',
   publicReleases: 'publicReleases',
   publicSearchIndex: 'publicSearchIndex',
   submissionInbox: 'submissionInbox',
   auditEvents: 'auditEvents',
+  outboxMessages: 'outboxMessages',
+  idempotencyKeys: 'idempotencyKeys',
+  outboxConsumerReceipts: 'outboxConsumerReceipts',
   killSwitches: 'killSwitches',
 } as const;
 

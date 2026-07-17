@@ -1,11 +1,15 @@
 /**
- * Firestore security rules for Black Book (BB-013 rescoped / ADR-011).
+ * Firestore security rules for Black Book (BB-013 / BB-016 / BB-017 / BB-018 / ADR-011).
  *
  * Client boundaries:
  * - Public may read only released public projections and the active release pointer.
  * - Authenticated users may create quarantine submissions; they cannot promote or publish.
- * - Canonical, evidence, publication, audit, and operations writes are Admin SDK only.
+ * - Canonical, claims, evidence/provenance, publication, outbox, and operations writes are Admin SDK only.
+ * - Trusted staff may append strictly validated user audit events; audit updates/deletes are impossible.
+ * - Evidence, sources, captures, lineage, and claim–evidence links are never client-writable.
  * - Research/admin custom claims may read research docs; research cannot publish.
+ * - Source adapter kill switches live in killSwitches; enforcement is server-side helpers
+ *   (canSourceAdapterCreateCandidates) — clients cannot toggle them.
  *
  * Custom claims (set by privileged backend only):
  * - admin: true | research: true | publication: true | security: true
@@ -56,6 +60,151 @@ service cloud.firestore {
         ]);
     }
 
+    function isTrustedAuditWriter() {
+      return isAdmin() || isResearch() || isPublication() || isSecurity();
+    }
+
+    function auditActionAllowed() {
+      let action = request.resource.data.action;
+      return isAdmin()
+        || (isPublication() && action in [
+          'moderation.approved',
+          'moderation.rejected',
+          'moderation.escalated',
+          'publication.published',
+          'publication.release_activated',
+          'publication.release_retired',
+          'correction.requested',
+          'correction.applied',
+          'retraction.retracted',
+          'retraction.reversed'
+        ])
+        || (isResearch() && action in [
+          'source.registered',
+          'source.updated',
+          'source.enabled',
+          'source.disabled',
+          'research.created',
+          'research.updated',
+          'research.completed',
+          'moderation.escalated'
+        ])
+        || (isSecurity() && action in [
+          'source.disabled',
+          'authentication.signed_in',
+          'authentication.failed',
+          'authentication.signed_out',
+          'authentication.mfa_changed'
+        ]);
+    }
+
+    function auditEventCreateValid() {
+      let data = request.resource.data;
+      return data.keys().hasAll([
+          'id',
+          'action',
+          'category',
+          'actor',
+          'subject',
+          'reason',
+          'requestId',
+          'correlationId',
+          'idempotencyKey',
+          'occurredAt'
+        ])
+        && data.keys().hasOnly([
+          'id',
+          'action',
+          'category',
+          'actor',
+          'subject',
+          'reason',
+          'requestId',
+          'correlationId',
+          'releaseId',
+          'entityId',
+          'idempotencyKey',
+          'occurredAt',
+          'data'
+        ])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 512
+        && data.action is string && data.action in [
+          'policy.changed',
+          'source.registered',
+          'source.updated',
+          'source.enabled',
+          'source.disabled',
+          'research.created',
+          'research.updated',
+          'research.completed',
+          'moderation.approved',
+          'moderation.rejected',
+          'moderation.escalated',
+          'publication.published',
+          'publication.release_activated',
+          'publication.release_retired',
+          'correction.requested',
+          'correction.applied',
+          'retraction.retracted',
+          'retraction.reversed',
+          'authentication.signed_in',
+          'authentication.failed',
+          'authentication.signed_out',
+          'authentication.mfa_changed',
+          'administrative.role_changed',
+          'administrative.configuration_changed',
+          'administrative.exported'
+        ]
+        && data.category is string
+        && data.category in [
+          'policy',
+          'source',
+          'research',
+          'moderation',
+          'publication',
+          'correction',
+          'retraction',
+          'authentication',
+          'administrative'
+        ]
+        && data.action.matches('^' + data.category + '\\..+$')
+        && data.actor is map
+        && data.actor.keys().hasAll(['id', 'type'])
+        && data.actor.keys().hasOnly(['id', 'type', 'displayName'])
+        && data.actor.id == request.auth.uid
+        && data.actor.type == 'user'
+        && (!('displayName' in data.actor)
+          || (data.actor.displayName is string
+            && data.actor.displayName.size() > 0
+            && data.actor.displayName.size() <= 256))
+        && data.subject is map
+        && data.subject.keys().hasAll(['type', 'id', 'path'])
+        && data.subject.keys().hasOnly(['type', 'id', 'path'])
+        && data.subject.type is string
+        && data.subject.type.size() > 0
+        && data.subject.type.size() <= 128
+        && data.subject.id is string
+        && data.subject.id.size() > 0
+        && data.subject.id.size() <= 512
+        && data.subject.path is string
+        && data.subject.path.size() >= 3
+        && data.subject.path.size() <= 1500
+        && data.reason is string && data.reason.size() > 0 && data.reason.size() <= 2000
+        && data.requestId is string && data.requestId.size() > 0 && data.requestId.size() <= 512
+        && data.correlationId is string
+        && data.correlationId.size() > 0
+        && data.correlationId.size() <= 512
+        && data.idempotencyKey is string
+        && data.idempotencyKey.size() > 0
+        && data.idempotencyKey.size() <= 512
+        && data.occurredAt is string && data.occurredAt.size() >= 20 && data.occurredAt.size() <= 64
+        && (!('releaseId' in data)
+          || (data.releaseId is string && data.releaseId.size() > 0 && data.releaseId.size() <= 512))
+        && (!('entityId' in data)
+          || (data.entityId is string && data.entityId.size() > 0 && data.entityId.size() <= 512))
+        && (!('data' in data) || (data.data is map && data.data.keys().size() <= 50));
+    }
+
     match /policy/{docId} {
       allow read: if true;
       allow write: if false;
@@ -83,6 +232,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Claim–evidence links (BB-017): Admin SDK only.
+    match /claimEvidenceLinks/{linkId} {
+      allow read, write: if false;
+    }
+
     match /entityRelationships/{relationshipId} {
       allow read, write: if false;
     }
@@ -91,12 +245,36 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Evidence / provenance (BB-016): Admin SDK only — never publicly writable.
+    match /sourceOrganizations/{organizationId} {
+      allow read, write: if false;
+    }
+
+    match /sourceDomains/{domainId} {
+      allow read, write: if false;
+    }
+
+    match /evidenceSources/{sourceId} {
+      allow read, write: if false;
+    }
+
+    match /sourceItems/{itemId} {
+      allow read, write: if false;
+    }
+
+    match /sourceCaptures/{captureId} {
+      allow read, write: if false;
+    }
+
+    match /retrievalEvents/{eventId} {
+      allow read, write: if false;
+    }
 
     match /evidenceRecords/{evidenceId} {
       allow read, write: if false;
     }
 
-    match /evidenceSources/{sourceId} {
+    match /evidenceLineage/{lineageId} {
       allow read, write: if false;
     }
 
@@ -128,6 +306,23 @@ service cloud.firestore {
     }
 
     match /auditEvents/{eventId} {
+      allow read: if isAdmin() || isSecurity();
+      allow create: if isTrustedAuditWriter()
+        && request.resource.data.id == eventId
+        && auditActionAllowed()
+        && auditEventCreateValid();
+      allow update, delete: if false;
+    }
+
+    match /outboxMessages/{messageId} {
+      allow read, write: if false;
+    }
+
+    match /idempotencyKeys/{keyId} {
+      allow read, write: if false;
+    }
+
+    match /outboxConsumerReceipts/{receiptId} {
       allow read, write: if false;
     }
 

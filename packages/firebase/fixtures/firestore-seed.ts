@@ -1,17 +1,36 @@
 /**
  * Emulator / local seed fixtures for Firestore (demo-black-book only).
  * BB-014: schools/people/places with historical vs current locations and merge lineage.
+ * BB-016: source organizations, items, captures, evidence rights, lineage, kill switches.
+ * BB-017: atomic claims, evidence links, confidence scores, preserved contradictions.
  * Never load these into production `black-book-efaaf` without explicit promotion workflows.
  */
-import { buildGeoPointFields } from '@black-book/domain';
+import {
+  buildGeoPointFields,
+  calculateClaimConfidence,
+  hashUtf8,
+  measureConnectionStrength,
+  measureRelevance,
+  preserveContradictoryValues,
+} from '@black-book/domain';
 import type {
+  CanonicalClaimDoc,
   CanonicalEntityDoc,
+  ClaimEvidenceLinkDoc,
   EntityLocationDoc,
   EntityMergeDoc,
   EntityRelationshipDoc,
+  EvidenceLineageDoc,
+  EvidenceRecordDoc,
+  EvidenceSourceDoc,
   PolicyActiveDoc,
   PublicActiveReleaseDoc,
   PublicEntityProjectionDoc,
+  RetrievalEventDoc,
+  SourceCaptureDoc,
+  SourceDomainDoc,
+  SourceItemDoc,
+  SourceOrganizationDoc,
   SubmissionInboxDoc,
 } from '../src/firestore/types.js';
 
@@ -281,6 +300,360 @@ export const seedPublicSchoolEntity: PublicEntityProjectionDoc = {
   claimIds: [],
 };
 
+const seedCaptureHash = hashUtf8('seed-nara-catalog-item-body-v1');
+
+export const seedSourceOrganization: SourceOrganizationDoc = {
+  id: 'org_seed_nara',
+  name: 'National Archives and Records Administration',
+  homepageUrl: 'https://www.archives.gov/',
+  notes: 'Federal archival source organization fixture',
+  createdAt: FIXED_NOW,
+  updatedAt: FIXED_NOW,
+};
+
+export const seedSourceDomain: SourceDomainDoc = {
+  id: 'dom_seed_archives_gov',
+  organizationId: 'org_seed_nara',
+  hostname: 'catalog.archives.gov',
+  verified: true,
+  createdAt: FIXED_NOW,
+};
+
+export const seedEvidenceSource: EvidenceSourceDoc = {
+  id: 'src_seed_nara_catalog',
+  organizationId: 'org_seed_nara',
+  domainIds: ['dom_seed_archives_gov'],
+  displayName: 'NARA Catalog (seed)',
+  classification: 'primary_archival',
+  adapterId: 'nara-catalog-v1',
+  stableIdScheme: 'nara-naid',
+  policy: {
+    snapshotMode: 'selective',
+    rights: {
+      defaultStatus: 'public_domain',
+      publicationPermissions: ['cite', 'short_excerpt', 'substantial_excerpt', 'display_media'],
+      prohibitedUses: ['biometric_extraction'],
+    },
+    permittedClaimClasses: ['existence', 'location', 'identity'],
+    refreshSchedule: 'weekly',
+    notes: 'Selective snapshots only; never automatic full crawl',
+  },
+  adapterEnabled: true,
+  killSwitchId: 'source-adapter-nara-catalog-v1',
+  createdAt: FIXED_NOW,
+  updatedAt: FIXED_NOW,
+};
+
+export const seedDisabledEvidenceSource: EvidenceSourceDoc = {
+  id: 'src_seed_disabled_wire',
+  organizationId: 'org_seed_nara',
+  displayName: 'Disabled wire adapter (seed)',
+  classification: 'news_reportage',
+  adapterId: 'wire-feed-v0',
+  stableIdScheme: 'url',
+  policy: {
+    snapshotMode: 'none',
+    rights: {
+      defaultStatus: 'restricted',
+      publicationPermissions: ['cite'],
+      prohibitedUses: ['full_text_republication', 'commercial_reuse'],
+    },
+  },
+  adapterEnabled: false,
+  killSwitchId: 'source-adapter-wire-feed-v0',
+  createdAt: FIXED_NOW,
+  updatedAt: FIXED_NOW,
+};
+
+export const seedSourceItem: SourceItemDoc = {
+  id: 'sitm_seed_nara_001',
+  sourceId: 'src_seed_nara_catalog',
+  stableIdentifier: 'NAID-SEED-001',
+  canonicalUrl: 'https://catalog.archives.gov/id/SEED-001',
+  title: 'Seed archival item',
+  classification: 'primary_archival',
+  createdAt: FIXED_NOW,
+  updatedAt: FIXED_NOW,
+};
+
+export const seedRetrievalEvent: RetrievalEventDoc = {
+  id: 'retr_seed_001',
+  sourceId: 'src_seed_nara_catalog',
+  sourceItemId: 'sitm_seed_nara_001',
+  adapterId: 'nara-catalog-v1',
+  startedAt: FIXED_NOW,
+  completedAt: FIXED_NOW,
+  status: 'success',
+  httpStatus: 200,
+  parserVersion: 'nara-parser-1.0.0',
+};
+
+export const seedSourceCapture: SourceCaptureDoc = {
+  id: 'cap_seed_001',
+  sourceItemId: 'sitm_seed_nara_001',
+  sourceId: 'src_seed_nara_catalog',
+  contentHash: seedCaptureHash,
+  parserVersion: 'nara-parser-1.0.0',
+  retrievedAt: FIXED_NOW,
+  retrievalEventId: 'retr_seed_001',
+  snapshotMode: 'selective',
+  snapshotStorageObject: 'gs://demo-black-book-evidence/captures/cap_seed_001.pdf',
+  createdAt: FIXED_NOW,
+};
+
+export const seedEvidenceRecord: EvidenceRecordDoc = {
+  id: 'ev_seed_place_hist',
+  sourceItemId: 'sitm_seed_nara_001',
+  sourceId: 'src_seed_nara_catalog',
+  captureId: 'cap_seed_001',
+  storageObject: 'gs://demo-black-book-evidence/captures/cap_seed_001.pdf',
+  locator: { page: '12', pages: '12-13', label: 'campus description' },
+  excerpt: 'The school stood near the river landing.',
+  excerptKind: 'short',
+  observedAt: '1868',
+  rightsStatus: 'public_domain',
+  publicationPermissions: ['cite', 'short_excerpt', 'substantial_excerpt', 'display_media'],
+  prohibitedUses: ['biometric_extraction'],
+  lineageRootId: 'ev_seed_place_hist',
+  createdAt: FIXED_NOW,
+  updatedAt: FIXED_NOW,
+};
+
+export const seedSyndicatedEvidenceRecord: EvidenceRecordDoc = {
+  id: 'ev_seed_wire_copy',
+  sourceItemId: 'sitm_seed_nara_001',
+  sourceId: 'src_seed_nara_catalog',
+  captureId: 'cap_seed_001',
+  locator: { page: '12' },
+  excerpt: 'The school stood near the river landing.',
+  excerptKind: 'short',
+  observedAt: '1868',
+  rightsStatus: 'public_domain',
+  publicationPermissions: ['cite', 'short_excerpt'],
+  prohibitedUses: ['full_text_republication'],
+  lineageRootId: 'ev_seed_place_hist',
+  syndicatedFromEvidenceId: 'ev_seed_place_hist',
+  createdAt: FIXED_NOW,
+  updatedAt: FIXED_NOW,
+};
+
+export const seedEvidenceLineage: EvidenceLineageDoc = {
+  id: 'elin_seed_001',
+  kind: 'syndication',
+  fromEvidenceId: 'ev_seed_place_hist',
+  toEvidenceId: 'ev_seed_wire_copy',
+  lineageRootId: 'ev_seed_place_hist',
+  notes: 'Wire copy of archival excerpt; counts as one lineage for confidence',
+  createdAt: FIXED_NOW,
+};
+
+export const seedClaimEvidenceSupporting: ClaimEvidenceLinkDoc = {
+  id: 'cel_seed_support_001',
+  claimId: 'claim_seed_001',
+  claimVersionId: 'cver_seed_001',
+  evidenceId: 'ev_seed_place_hist',
+  role: 'supporting',
+  lineageRootId: 'ev_seed_place_hist',
+  credible: true,
+  sourceClassification: 'primary_archival',
+  directness: 0.92,
+  temporalProximity: 0.88,
+  geographicPrecision: 0.85,
+  entityMatchQuality: 0.9,
+  extractionQuality: 0.9,
+  assertedValue: '1867',
+  createdAt: FIXED_NOW,
+};
+
+export const seedClaimEvidenceSyndicated: ClaimEvidenceLinkDoc = {
+  id: 'cel_seed_syndicated_001',
+  claimId: 'claim_seed_001',
+  claimVersionId: 'cver_seed_001',
+  evidenceId: 'ev_seed_wire_copy',
+  role: 'supporting',
+  lineageRootId: 'ev_seed_place_hist',
+  credible: true,
+  sourceClassification: 'news_reportage',
+  directness: 0.4,
+  temporalProximity: 0.5,
+  geographicPrecision: 0.5,
+  entityMatchQuality: 0.7,
+  extractionQuality: 0.6,
+  assertedValue: '1867',
+  notes: 'Syndicated wire copy — same lineageRootId as archival root',
+  createdAt: FIXED_NOW,
+};
+
+export const seedClaimEvidenceContradicting: ClaimEvidenceLinkDoc = {
+  id: 'cel_seed_contradict_001',
+  claimId: 'claim_seed_001',
+  claimVersionId: 'cver_seed_001',
+  evidenceId: 'ev_seed_place_hist',
+  role: 'contradicting',
+  lineageRootId: 'ev_seed_alt_year',
+  credible: true,
+  sourceClassification: 'government_record',
+  directness: 0.8,
+  temporalProximity: 0.75,
+  geographicPrecision: 0.8,
+  entityMatchQuality: 0.85,
+  extractionQuality: 0.8,
+  assertedValue: '1868',
+  notes: 'Credible alternate founding year preserved',
+  createdAt: FIXED_NOW,
+};
+
+const seedClaimLinks = [
+  seedClaimEvidenceSupporting,
+  seedClaimEvidenceSyndicated,
+  seedClaimEvidenceContradicting,
+] as const;
+
+const seedClaimConfidenceResult = calculateClaimConfidence({
+  claimClass: 'standard',
+  evidenceLinks: seedClaimLinks,
+  calculatedAt: FIXED_NOW,
+});
+
+const seedClaimConfidence = {
+  score: seedClaimConfidenceResult.score,
+  components: seedClaimConfidenceResult.components,
+  policyVersion: seedClaimConfidenceResult.policyVersion,
+  independentLineageCount: seedClaimConfidenceResult.independentLineageCount,
+  supportingEvidenceCount: seedClaimConfidenceResult.supportingEvidenceCount,
+  contradictingEvidenceCount: seedClaimConfidenceResult.contradictingEvidenceCount,
+  contributingEvidenceIds: seedClaimConfidenceResult.contributingEvidenceIds,
+  calculatedAt: seedClaimConfidenceResult.calculatedAt,
+};
+
+const seedPreservedValues = preserveContradictoryValues({
+  claimId: 'claim_seed_001',
+  primaryValue: '1867',
+  evidenceLinks: seedClaimLinks,
+}).values;
+
+export const seedCanonicalClaim: CanonicalClaimDoc = {
+  id: 'claim_seed_001',
+  entityId: 'ent_seed_place_001',
+  predicate: 'founded_year',
+  currentVersionId: 'cver_seed_001',
+  versions: [
+    {
+      id: 'cver_seed_001',
+      claimId: 'claim_seed_001',
+      versionNumber: 1,
+      entityId: 'ent_seed_place_001',
+      predicate: 'founded_year',
+      object: '1867',
+      temporal: { label: 'founding', validFrom: '1867-01-01' },
+      geographic: {
+        locationId: 'loc_place_historical',
+        precision: 'institution',
+      },
+      proceduralStatus: 'ruled',
+      claimClass: 'standard',
+      workflowStatus: 'accepted',
+      publicationStatus: 'published',
+      createdAt: FIXED_NOW,
+      createdBy: 'researcher_seed',
+    },
+  ],
+  claimClass: 'standard',
+  workflowStatus: 'accepted',
+  publicationStatus: 'published',
+  proceduralStatus: 'ruled',
+  temporal: { label: 'founding', validFrom: '1867-01-01' },
+  geographic: {
+    locationId: 'loc_place_historical',
+    precision: 'institution',
+  },
+  confidence: seedClaimConfidence,
+  relevance: measureRelevance(0.82, 'include'),
+  connectionStrength: measureConnectionStrength(
+    0.8,
+    'Founding year ties the place to Black educational history',
+  ),
+  researchCoverage: {
+    level: 'partial',
+    score: 0.55,
+    lastCheckedAt: FIXED_NOW,
+  },
+  preservedValues: [...seedPreservedValues],
+  createdAt: FIXED_NOW,
+  updatedAt: FIXED_NOW,
+};
+
+export const seedHighImpactClaim: CanonicalClaimDoc = {
+  id: 'claim_seed_high_impact',
+  entityId: 'ent_seed_person_001',
+  predicate: 'conviction_status',
+  currentVersionId: 'cver_seed_hi_001',
+  versions: [
+    {
+      id: 'cver_seed_hi_001',
+      claimId: 'claim_seed_high_impact',
+      versionNumber: 1,
+      entityId: 'ent_seed_person_001',
+      predicate: 'conviction_status',
+      object: 'alleged',
+      proceduralStatus: 'alleged',
+      claimClass: 'high_impact',
+      workflowStatus: 'accepted',
+      publicationStatus: 'unpublished',
+      createdAt: FIXED_NOW,
+    },
+  ],
+  claimClass: 'high_impact',
+  workflowStatus: 'accepted',
+  publicationStatus: 'unpublished',
+  proceduralStatus: 'alleged',
+  confidence: (() => {
+    const result = calculateClaimConfidence({
+      claimClass: 'high_impact',
+      evidenceLinks: [
+        {
+          id: 'cel_seed_hi_001',
+          claimId: 'claim_seed_high_impact',
+          claimVersionId: 'cver_seed_hi_001',
+          evidenceId: 'ev_seed_place_hist',
+          role: 'supporting',
+          lineageRootId: 'ev_seed_place_hist',
+          credible: true,
+          sourceClassification: 'news_reportage',
+          directness: 0.55,
+          temporalProximity: 0.5,
+          geographicPrecision: 0.5,
+          entityMatchQuality: 0.6,
+          extractionQuality: 0.55,
+          createdAt: FIXED_NOW,
+        },
+      ],
+      calculatedAt: FIXED_NOW,
+    });
+    return {
+      score: result.score,
+      components: result.components,
+      policyVersion: result.policyVersion,
+      independentLineageCount: result.independentLineageCount,
+      supportingEvidenceCount: result.supportingEvidenceCount,
+      contradictingEvidenceCount: result.contradictingEvidenceCount,
+      contributingEvidenceIds: result.contributingEvidenceIds,
+      calculatedAt: result.calculatedAt,
+    };
+  })(),
+  preservedValues: [
+    {
+      value: 'alleged',
+      evidenceLinkIds: ['cel_seed_hi_001'],
+      credible: true,
+      kind: 'primary',
+    },
+  ],
+  researchCoverage: { level: 'minimal', score: 0.3 },
+  createdAt: FIXED_NOW,
+  updatedAt: FIXED_NOW,
+};
+
 /** Flat list for Admin SDK / emulator import scripts. */
 export const firestoreSeedDocuments: readonly SeedDocument[] = [
   { path: 'policy/active', data: seedPolicyActive },
@@ -347,15 +720,40 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
   { path: 'canonicalEntities/ent_seed_person_dup', data: seedAbsorbedPersonEntity },
   { path: 'entityRelationships/rel_seed_attended_001', data: seedPersonSchoolRelationship },
   { path: 'entityMerges/merge_seed_001', data: seedEntityMerge },
+  { path: 'sourceOrganizations/org_seed_nara', data: seedSourceOrganization },
+  { path: 'sourceDomains/dom_seed_archives_gov', data: seedSourceDomain },
+  { path: 'evidenceSources/src_seed_nara_catalog', data: seedEvidenceSource },
+  { path: 'evidenceSources/src_seed_disabled_wire', data: seedDisabledEvidenceSource },
+  { path: 'sourceItems/sitm_seed_nara_001', data: seedSourceItem },
+  { path: 'retrievalEvents/retr_seed_001', data: seedRetrievalEvent },
+  { path: 'sourceCaptures/cap_seed_001', data: seedSourceCapture },
+  { path: 'evidenceRecords/ev_seed_place_hist', data: seedEvidenceRecord },
+  { path: 'evidenceRecords/ev_seed_wire_copy', data: seedSyndicatedEvidenceRecord },
+  { path: 'evidenceLineage/elin_seed_001', data: seedEvidenceLineage },
+  { path: 'canonicalClaims/claim_seed_001', data: seedCanonicalClaim },
+  { path: 'canonicalClaims/claim_seed_high_impact', data: seedHighImpactClaim },
+  { path: 'claimEvidenceLinks/cel_seed_support_001', data: seedClaimEvidenceSupporting },
+  { path: 'claimEvidenceLinks/cel_seed_syndicated_001', data: seedClaimEvidenceSyndicated },
+  { path: 'claimEvidenceLinks/cel_seed_contradict_001', data: seedClaimEvidenceContradicting },
   {
     path: 'auditEvents/audit_seed_merge_001',
     data: {
       id: 'audit_seed_merge_001',
-      action: 'entity.merge',
-      actor: 'researcher_seed',
-      resource: 'entityMerges/merge_seed_001',
-      at: FIXED_NOW,
-      detail: { survivorId: 'ent_seed_person_001', absorbedIds: ['ent_seed_person_dup'] },
+      action: 'research.updated',
+      category: 'research',
+      actor: { id: 'researcher_seed', type: 'user' },
+      subject: {
+        type: 'entity_merge',
+        id: 'merge_seed_001',
+        path: 'entityMerges/merge_seed_001',
+      },
+      reason: 'Duplicate entity merge',
+      requestId: 'request_seed_merge_001',
+      correlationId: 'correlation_seed_merge_001',
+      entityId: 'ent_seed_person_001',
+      idempotencyKey: 'merge:merge_seed_001',
+      occurredAt: FIXED_NOW,
+      data: { survivorId: 'ent_seed_person_001', absorbedIds: ['ent_seed_person_dup'] },
     },
   },
   {
@@ -364,6 +762,24 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
       id: 'public-search',
       enabled: false,
       reason: 'Fixture off',
+      updatedAt: FIXED_NOW,
+    },
+  },
+  {
+    path: 'killSwitches/source-adapter-nara-catalog-v1',
+    data: {
+      id: 'source-adapter-nara-catalog-v1',
+      enabled: false,
+      reason: 'Adapter enabled; kill switch disengaged',
+      updatedAt: FIXED_NOW,
+    },
+  },
+  {
+    path: 'killSwitches/source-adapter-wire-feed-v0',
+    data: {
+      id: 'source-adapter-wire-feed-v0',
+      enabled: true,
+      reason: 'Fixture: disabled adapter + engaged kill switch',
       updatedAt: FIXED_NOW,
     },
   },

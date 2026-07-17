@@ -33,6 +33,11 @@ Cloud SQL is deferred — see [`../database/README.md`](../database/README.md) (
 Model + rules: [`FIRESTORE_MODEL.md`](./FIRESTORE_MODEL.md), [`firestore.rules`](./firestore.rules),
 [`firestore.indexes.json`](./firestore.indexes.json).
 
+BB-018 adds append-only `auditEvents`, transactional `outboxMessages`, idempotency records, and
+per-consumer receipts. `@black-book/firebase` exposes `commitWithAudit`,
+`consumeOutboxMessage`, and `loadEntityPublicationHistory`. Firestore effects and consumer receipts
+are atomic; future external consumers must use the event id as their downstream idempotency key.
+
 ## Local emulators
 
 Isolated from production via explicit `demo-black-book`:
@@ -55,7 +60,7 @@ CI_REQUIRE_FIREBASE=1 pnpm --filter @black-book/firebase test
 
 | Resource | Repo status | Cloud status |
 |----------|-------------|--------------|
-| Firestore rules | Boundary rules in [`firestore.rules`](./firestore.rules) (BB-013) | API/database may still need enablement — do not deploy until database location is chosen |
+| Firestore rules | Boundary + append-only audit rules in [`firestore.rules`](./firestore.rules) (BB-013/018) | API/database is disabled — do not deploy until database location/edition is chosen |
 | Firestore indexes | [`firestore.indexes.json`](./firestore.indexes.json) | Deploy with rules when database exists |
 | Firebase Storage rules | deny-all in [`storage.rules`](./storage.rules) | Default bucket name appears in SDK config; enable/provision separately |
 | GCP class buckets | designed in `infra/gcp/storage-buckets.matrix.md` | Not provisioned (needs `gcloud auth` + confirmation) |

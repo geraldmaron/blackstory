@@ -26,7 +26,7 @@ Do not add deployable microservices beyond this set. See [ADR-005](./adr/ADR-005
 ## Platform intent (not yet configured)
 
 - **Data:** **Cloud Firestore** system of record (ADR-011 / D-014); blobs in Firebase Storage / GCS. Local PostGIS + SQL Connect under `infra/database/` are **parked / not production**.
-- **App data access:** Firestore Admin SDK + security rules; `@black-book/domain` entity/geography models; `@black-book/firebase` converters; `@black-book/data-access` Firestore guards. SQL Connect deferred with Cloud SQL.
+- **App data access:** Firestore Admin SDK + security rules; `@black-book/domain` entity/geography/provenance/claims models; `@black-book/firebase` converters; `@black-book/data-access` Firestore guards. SQL Connect deferred with Cloud SQL.
 - **Public web vs APIs:** App Hosting for `apps/web`; Cloud Run for APIs + admin — [ADR-001](./adr/ADR-001-firebase-app-hosting-vs-cloud-run.md)
 - **Auth / abuse:** Firebase Auth + App Check (reCAPTCHA Enterprise) — intent; assumptions in [ADR-010](./adr/ADR-010-security-and-abuse-assumptions.md)
 - **Ingress:** Cloud Armor / ALB / CDN — intent only
@@ -110,4 +110,4 @@ Formal ADRs (BB-002): [`docs/adr/`](./adr/README.md). Session summaries: [`.cx/d
 
 ## Execution
 
-Bead order and status: [`../plan.md`](../plan.md). Active tranche: Data and publication boundary (BB-013–014 done; next **BB-015** living-person enforcement).
+Bead order and status: [`../plan.md`](../plan.md). Active tranche: Data and publication boundary (BB-013–014 done; BB-016 provenance model; BB-015 living-person in parallel).

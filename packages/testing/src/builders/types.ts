@@ -41,6 +41,12 @@ export interface SourceFixture {
   authority: 'primary' | 'secondary' | 'tertiary';
   rights: 'public-domain' | 'fair-use' | 'licensed' | 'unknown';
   capturedAt: string;
+  /** Optional BB-016 fields for provenance-aware tests. */
+  organizationId?: string;
+  classification?: string;
+  adapterId?: string;
+  adapterEnabled?: boolean;
+  stableIdentifier?: string;
 }
 
 export interface ClaimFixture {
@@ -57,9 +63,21 @@ export interface EvidenceFixture {
   id: string;
   claimId: string;
   sourceId: string;
+  /** BB-016: every evidence record resolves to a source item. */
+  sourceItemId?: string;
   excerpt: string;
+  excerptKind?: 'none' | 'short' | 'substantial';
+  rightsStatus?:
+    | 'unknown'
+    | 'public_domain'
+    | 'licensed'
+    | 'fair_use'
+    | 'restricted'
+    | 'prohibited';
   confidence: number;
   capturedAt: string;
+  page?: string;
+  observedAt?: string;
 }
 
 export interface PublicationReleaseFixture {

@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
+    "dev": "next dev --port 3048",
     "build": "next build",
-    "start": "next start --port 3000",
+    "start": "next start --port 3048",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "echo 'web browser e2e: pnpm test:e2e (harness; set E2E_BASE_URL for live smoke)'",
     "lint": "echo 'lint: use root pnpm lint'"

@@ -16,12 +16,18 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --test --passWithNoTests 2>/dev/null || echo 'no tests yet'",
+    "test": "node --conditions development --import tsx --test src/redaction.test.ts src/serialize.test.ts src/logging.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
+  "dependencies": {
+    "@black-book/domain": "workspace:*",
+    "@black-book/schemas": "workspace:*"
+  },
   "devDependencies": {
+    "@black-book/observability": "workspace:*",
     "@black-book/typescript-config": "workspace:^",
-    "@types/node": "^26.1.1",
+    "@types/node": "^22.20.1",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }
 }

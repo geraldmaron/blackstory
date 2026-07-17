@@ -21,16 +21,29 @@ export type FilterBarProps = {
   readonly legend: string;
   readonly fields: readonly FilterField[];
   readonly onSubmit?: (values: Record<string, string>) => void;
+  /** Native form method for progressive enhancement when `onSubmit` is omitted. */
+  readonly method?: 'get' | 'post';
+  /** Native form action for progressive enhancement when `onSubmit` is omitted. */
+  readonly action?: string;
   readonly className?: string;
   readonly actions?: ReactNode;
 };
 
-export function FilterBar({ legend, fields, onSubmit, className, actions }: FilterBarProps) {
+export function FilterBar({
+  legend,
+  fields,
+  onSubmit,
+  method = 'get',
+  action,
+  className,
+  actions,
+}: FilterBarProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+    // Allow native GET/POST navigation when no client handler is provided (JS-off / PE).
     if (!onSubmit) {
       return;
     }
+    event.preventDefault();
     const data = new FormData(event.currentTarget);
     const values: Record<string, string> = {};
     for (const field of fields) {
@@ -41,8 +54,12 @@ export function FilterBar({ legend, fields, onSubmit, className, actions }: Filt
   }
 
   return (
-    <form className={cx('bb-filters', className)} onSubmit={handleSubmit}>
-      <fieldset className="bb-filters__fieldset">
+    <form
+      className={cx('bb-filters', className)}
+      method={method}
+      action={action}
+      onSubmit={handleSubmit}
+    >      <fieldset className="bb-filters__fieldset">
         <legend className="bb-filters__legend">{legend}</legend>
         <div className="bb-filters__fields">
           {fields.map((field) => (

@@ -4,7 +4,7 @@ Tracks the Execution Beads (BB-001–BB-066) from *Black Book Web Application Ex
 
 **Source:** `/Users/geralddagher/Downloads/Black Book Web Application Execution Beads.pdf`  
 **Workspace:** `/Users/geralddagher/Developer/Projects/black-book` (greenfield as of 2026-07-16)  
-**Active focus:** Tranche 2 — Firestore data boundary (BB-013–014 done; next **BB-015** living-person enforcement). Cloud SQL deferred (D-014 / ADR-011).
+**Active focus:** Tranche 2 — Firestore data boundary (**BB-013–014, BB-016–018** done; **BB-015** living-person enforcement may still be in flight; next **BB-019** immutable releases). Cloud SQL deferred (D-014 / ADR-011).
 
 ## Status legend
 
@@ -23,7 +23,7 @@ Tracks the Execution Beads (BB-001–BB-066) from *Black Book Web Application Ex
 | Tranche | Focus | Beads | Done |
 |---------|-------|-------|------|
 | 1 | Secure foundation | BB-001–006, 008–010 | 9/9 |
-| 2 | Data and publication boundary | BB-011–020 | 4/10 |
+| 2 | Data and publication boundary | BB-011–020 | 6/10 |
 | 3 | Hostile-environment protection | BB-021–030, 032–036 | 0/15 |
 | 4 | Research and evidence engine | BB-037–044, 047 | 0/9 |
 | 5 | Public beta product | BB-048–050, 052–057 | 0/9 |
@@ -148,10 +148,10 @@ infra/
 | BB-012 | Cloud SQL PostgreSQL, PostGIS, and SQL Connect | P0 | L | BB-005, BB-011 | `partial` | Repo foundation parked; **Cloud SQL will not be provisioned** this phase (D-014 / ADR-011) |
 | BB-013 | Database schema boundaries and migrations | P0 | L | BB-011, D-014 | `done` | **Rescoped:** Firestore collections, rules, converters, seeds, emulator tests — not SQL migrations |
 | BB-014 | Entity and geography domain model | P0 | L | BB-003, BB-013 | `done` | Firestore documents + geohash; `@black-book/domain` + converters/seeds |
-| BB-015 | Living-person and sensitive-location enforcement | P0 | L | BB-003, BB-014 | `todo` | |
-| BB-016 | Sources, captures, rights, and provenance model | P0 | L | BB-013 | `todo` | Evidence metadata in Firestore; blobs in Storage |
-| BB-017 | Claims, contradictions, and confidence model | P0 | L | BB-003, BB-014, BB-016 | `todo` | |
-| BB-018 | Append-only audit and transactional outbox | P0 | M | BB-013, BB-017 | `todo` | Firestore audit + outbox patterns |
+| BB-015 | Living-person and sensitive-location enforcement | P0 | L | BB-003, BB-014 | `done` | Central redaction/serialization in `@black-book/security`; constitution `sensitivityRules`; observability + public converter wired |
+| BB-016 | Sources, captures, rights, and provenance model | P0 | L | BB-013 | `done` | Evidence metadata in Firestore; blobs in Storage |
+| BB-017 | Claims, contradictions, and confidence model | P0 | L | BB-003, BB-014, BB-016 | `done` | Deterministic confidence + claim publication statuses |
+| BB-018 | Append-only audit and transactional outbox | P0 | M | BB-013, BB-017 | `done` | Atomic Firestore state/audit/outbox, idempotency, retry/DLQ, history |
 | BB-019 | Public projection and immutable release model | P0 | L | BB-015, BB-017, BB-018 | `todo` | |
 | BB-020 | Backup, PITR, and restore verification | P0 | M | BB-013, BB-019 | `todo` | Firestore export / Storage versioning (not Cloud SQL PITR) |
 
@@ -173,6 +173,17 @@ infra/
 - [x] Duplicate/merge lineage reversible and audited (`entityMerges`)
 - [x] Unknown living → treat as living at model level
 - [x] Domain package + Firestore converters/seeds/tests; no Cloud SQL / PostGIS production path
+
+### BB-018 acceptance checklist (append-only audit / outbox)
+
+- [x] Controlled audit actions cover policy, source, research, moderation, publication, correction, retraction, authentication, and administrative activity
+- [x] Actor, reason, request, release, correlation, entity, subject, and idempotency identifiers are modeled
+- [x] `commitWithAudit` transaction atomically writes state + immutable audit + pending outbox + idempotency marker
+- [x] Repeated idempotency keys return the original event/outbox ids without applying state again
+- [x] Rules allow validated trusted-staff audit creates and deny every audit update/delete; outbox/idempotency/receipts remain client-denied
+- [x] Consumer receipts make Firestore effects replay-safe; bounded exponential retries terminate in `dead_letter`
+- [x] Entity publication/correction/retraction history reconstructs deterministically from append-only events
+- [x] BB-018 package tests/build/typecheck, workspace tests/lint/boundaries, formatting, and Standard-edition emulator rules tests pass
 
 ---
 
@@ -240,7 +251,7 @@ infra/
 
 | ID | Title | P | Size | Deps | Status |
 |----|-------|---|------|------|--------|
-| BB-048 | Public application shell and navigation | P0 | L | BB-007, BB-019, BB-022 | `todo` |
+| BB-048 | Public application shell and navigation | P0 | L | BB-007, BB-019, BB-022 | `partial` |
 | BB-049 | Search API and experience | P0 | L | BB-019, BB-025, BB-026, BB-048 | `todo` |
 | BB-050 | U.S. address and current-location discovery | P0 | L | BB-015, BB-025, BB-049 | `todo` |
 | BB-052 | Entity, place, school, event, and institution pages | P0 | L | BB-019, BB-048, BB-049 | `todo` |
@@ -413,3 +424,24 @@ infra/
   - Firestore: expanded `canonicalEntities`, `locations` subcollection, `entityRelationships`, `entityMerges`; converters/seeds/unit tests
   - Geo without PostGIS: geohash fields + server radius filter path; ZIP modern-only
   - Tranche 2 progress **4/10**; next recommended: **BB-015** living-person / sensitive-location enforcement
+- **BB-016 / BB-017 dependency handoff (done):**
+  - Source/capture/rights/provenance records and deterministic claims/confidence/publication statuses are present in `@black-book/domain` and Firestore schemas.
+- **BB-018 append-only audit and transactional outbox (done):**
+  - Controlled audit vocabulary and full actor/reason/request/release/correlation/idempotency metadata
+  - Firestore transaction helper commits state + audit + outbox + replay marker atomically
+  - Consumer receipts, bounded exponential retry, dead letters, and deterministic entity publication history
+  - Standard-edition emulator rules verified trusted create plus immutable update/delete denial; production API remains disabled
+  - Full workspace build/typecheck currently stops in parallel `packages/testing` builder changes (`exactOptionalPropertyTypes`); BB-018 domain/firebase/data-access packages build and typecheck cleanly
+  - Tranche 2 progress **6/10**; BB-019 may build immutable release activation on `commitWithAudit`
+- **BB-015 living-person and sensitive-location enforcement (done):**
+  - Constitution extended with `sensitivityRules` (classes, precision-reduction reasons, residential precision levels, living/occupied/sensitive-site public caps, deceased occupied-residence rule); JSON value + JSON Schema + Zod kept in sync; policyVersion unchanged (`1.0.0`); Python loader still validates
+  - `@black-book/security` is the single public-serialization choke point:
+    - `sensitivity.ts` — evidence/internal/public precision tiers + constitution-backed sensitivity/reason vocab
+    - `redaction.ts` — `reducePublicPrecision` ladder (unknown⇒living), `redactLocationForPublic` (coarsens coords + geohash, strips address labels — protects maps), and `createSensitiveDataRedactor` deep scrubber for logs/telemetry/exports
+    - `serialize.ts` — `toPublicEntityProjection` / `toPublicSearchDocument` / `redactForPublicExport` + fail-closed `assertPublicProjectionSafe` / `assertNoProhibitedPublicPrecision`
+  - `@black-book/observability` logger gained a `redact` hook; security redactor keeps residential addresses + exact coordinates out of logs and error telemetry
+  - `@black-book/firebase` public projection converter (`toFirestore`) now routes through `assertPublicProjectionSafe` (rejects prohibited precision, address fields, exact coords)
+  - Tests: security 22 (living/unknown/deceased, residential reduction, prohibited precision, search/model/export/map/log paths, regression fixture proving stored exact address is reduced) + firebase 3 converter-wiring; observability/domain/schemas/Python suites still green
+  - Validated: `pnpm validate`, targeted typechecks + builds (schemas→domain→observability→security→firebase); no Cloud SQL, no secrets, no commit
+  - Coordinated with parallel BB-016/017/018/048 agents: kept edits in `packages/security`, redaction paths, `observability`, `converters.ts` (single converter line), and constitution — re-reading shared files before each edit
+  - Tranche 2 progress **7/10**; BB-019 must build public projections/search index exclusively through `@black-book/security` serializers
