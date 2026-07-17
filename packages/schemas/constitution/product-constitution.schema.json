@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://black-book.local/schemas/product-constitution.schema.json",
+  "title": "Black Book product constitution",
+  "description": "Versioned machine-readable product policy. Single structural source of truth for TypeScript and Python loaders.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "policyVersion",
+    "relevanceThresholds",
+    "claimConfidenceThresholds",
+    "legalStatusVocabulary",
+    "unsupportedProceduralLanguage",
+    "recordMaturityStates",
+    "publicPrecisionRules",
+    "sourceClassifications",
+    "publicationRestrictions",
+    "livingPersonRules"
+  ],
+  "properties": {
+    "policyVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semver policy version recorded on every evaluation."
+    },
+    "relevanceThresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "includeMinimum",
+        "supportingContextMinimum",
+        "excludeBelow",
+        "weakSignalIndependentCeiling"
+      ],
+      "properties": {
+        "includeMinimum": { "type": "number", "minimum": 0, "maximum": 1 },
+        "supportingContextMinimum": { "type": "number", "minimum": 0, "maximum": 1 },
+        "excludeBelow": { "type": "number", "minimum": 0, "maximum": 1 },
+        "weakSignalIndependentCeiling": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "claimConfidenceThresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["standardPublish", "highImpactPublish", "disputeSurface"],
+      "properties": {
+        "standardPublish": { "type": "number", "minimum": 0, "maximum": 1 },
+        "highImpactPublish": { "type": "number", "minimum": 0, "maximum": 1 },
+        "disputeSurface": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "legalStatusVocabulary": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "unsupportedProceduralLanguage": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "recordMaturityStates": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "publicPrecisionRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowedLevels",
+        "prohibitedLevels",
+        "livingResidentialProhibited",
+        "reduceExactCoordinatesWhenNotNeeded"
+      ],
+      "properties": {
+        "allowedLevels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "prohibitedLevels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "livingResidentialProhibited": { "type": "boolean" },
+        "reduceExactCoordinatesWhenNotNeeded": { "type": "boolean" }
+      }
+    },
+    "sourceClassifications": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "publicationRestrictions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requireRightsStatus",
+        "requireAcceptedClaimAndEvidence",
+        "blockSelfApprovingSourceAlone",
+        "blockVolumeOnlyConfidence",
+        "blockSyndicatedCopiesAsIndependent",
+        "highImpactRequiresHigherThreshold",
+        "publicLanguageCannotExceedProceduralStatus"
+      ],
+      "properties": {
+        "requireRightsStatus": { "type": "boolean" },
+        "requireAcceptedClaimAndEvidence": { "type": "boolean" },
+        "blockSelfApprovingSourceAlone": { "type": "boolean" },
+        "blockVolumeOnlyConfidence": { "type": "boolean" },
+        "blockSyndicatedCopiesAsIndependent": { "type": "boolean" },
+        "highImpactRequiresHigherThreshold": { "type": "boolean" },
+        "publicLanguageCannotExceedProceduralStatus": { "type": "boolean" }
+      }
+    },
+    "livingPersonRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statuses",
+        "treatUnknownAsLiving",
+        "neverStoreResidentialAsOrdinaryPersonLocation",
+        "neverReturnResidentialPublicly"
+      ],
+      "properties": {
+        "statuses": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "treatUnknownAsLiving": { "type": "boolean" },
+        "neverStoreResidentialAsOrdinaryPersonLocation": { "type": "boolean" },
+        "neverReturnResidentialPublicly": { "type": "boolean" }
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+/**
+ * Firebase Storage rules for the default Firebase Storage bucket.
+ *
+ * Deny all client access. Server workloads use distinct GCP buckets
+ * (public-media / private-evidence / exports / quarantine) with IAM as the
+ * authoritative control plane — see infra/gcp/storage-buckets.matrix.md.
+ * Those buckets are not provisioned yet and must not be assumed present.
+ */
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

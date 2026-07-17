@@ -1,0 +1,143 @@
+/**
+ * Firestore security rules for Black Book (BB-013 rescoped / ADR-011).
+ *
+ * Client boundaries:
+ * - Public may read only released public projections and the active release pointer.
+ * - Authenticated users may create quarantine submissions; they cannot promote or publish.
+ * - Canonical, evidence, publication, audit, and operations writes are Admin SDK only.
+ * - Research/admin custom claims may read research docs; research cannot publish.
+ *
+ * Custom claims (set by privileged backend only):
+ * - admin: true | research: true | publication: true | security: true
+ * - or bb_role: "admin" | "research" | "publication" | "security"
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function claimTrue(name) {
+      return signedIn() && request.auth.token[name] == true;
+    }
+
+    function roleIs(name) {
+      return signedIn() && request.auth.token.bb_role == name;
+    }
+
+    function isAdmin() {
+      return claimTrue('admin') || roleIs('admin');
+    }
+
+    function isResearch() {
+      return claimTrue('research') || roleIs('research') || isAdmin();
+    }
+
+    function isPublication() {
+      return claimTrue('publication') || roleIs('publication') || isAdmin();
+    }
+
+    function isSecurity() {
+      return claimTrue('security') || roleIs('security') || isAdmin();
+    }
+
+    function submissionCreateValid() {
+      return request.resource.data.keys().hasAll(['status', 'createdBy', 'createdAt'])
+        && request.resource.data.status == 'quarantined'
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.keys().hasOnly([
+          'status',
+          'createdBy',
+          'createdAt',
+          'kind',
+          'payload',
+          'sourceUrl'
+        ]);
+    }
+
+    match /policy/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /policyVersions/{versionId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /researchCases/{caseId} {
+      allow read: if isResearch();
+      allow write: if false;
+    }
+
+    match /canonicalEntities/{entityId} {
+      allow read, write: if false;
+
+      match /locations/{locationId} {
+        allow read, write: if false;
+      }
+    }
+
+    match /canonicalClaims/{claimId} {
+      allow read, write: if false;
+    }
+
+    match /entityRelationships/{relationshipId} {
+      allow read, write: if false;
+    }
+
+    match /entityMerges/{mergeId} {
+      allow read, write: if false;
+    }
+
+
+    match /evidenceRecords/{evidenceId} {
+      allow read, write: if false;
+    }
+
+    match /evidenceSources/{sourceId} {
+      allow read, write: if false;
+    }
+
+    match /publicationReleases/{releaseId} {
+      allow read: if isPublication();
+      allow write: if false;
+    }
+
+    match /publicMeta/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /publicReleases/{releaseId}/entities/{entityId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /publicSearchIndex/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /submissionInbox/{submissionId} {
+      allow create: if signedIn() && submissionCreateValid();
+      allow read: if signedIn()
+        && (resource.data.createdBy == request.auth.uid || isSecurity() || isAdmin());
+      allow update, delete: if false;
+    }
+
+    match /auditEvents/{eventId} {
+      allow read, write: if false;
+    }
+
+    match /killSwitches/{switchId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

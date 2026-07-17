@@ -1,0 +1,22 @@
+{
+  "$schema_note": "Declarative repository security_and_analysis settings (BB-009). Apply via infra/github/scripts/apply-governance.sh --apply when remote + admin token exist.",
+  "security_and_analysis": {
+    "secret_scanning": {
+      "status": "enabled"
+    },
+    "secret_scanning_push_protection": {
+      "status": "enabled"
+    },
+    "dependabot_security_updates": {
+      "status": "enabled"
+    },
+    "private_vulnerability_reporting": {
+      "status": "enabled"
+    }
+  },
+  "notes": [
+    "Secret scanning and push protection availability depend on repository visibility and GitHub plan / Advanced Security entitlements.",
+    "If the API returns 403/422, record the blocker; do not claim settings are applied.",
+    "Dependabot version updates are configured in .github/dependabot.yml; security updates are toggled here."
+  ]
+}

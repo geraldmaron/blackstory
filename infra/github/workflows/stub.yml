@@ -1,0 +1,11 @@
+# Historical placeholder — real PR CI is `.github/workflows/ci.yml` (BB-008/BB-009).
+# Governance apply/check scripts live in infra/github/scripts/ (not executed by Actions).
+# OIDC deploy stub: `.github/workflows/deploy-production.yml` (BB-010); full pipeline BB-062.
+name: stub-superseded
+on:
+  workflow_dispatch: {}
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Use .github/workflows/ci.yml"

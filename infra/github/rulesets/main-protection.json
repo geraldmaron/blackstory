@@ -1,0 +1,55 @@
+{
+  "$schema_note": "GitHub repository ruleset payload for POST/PUT /repos/{owner}/{repo}/rulesets (BB-009). Apply via infra/github/scripts/apply-governance.sh.",
+  "name": "main-protection",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/heads/main"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 1,
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": true,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": true,
+        "allowed_merge_methods": ["merge", "squash", "rebase"]
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          { "context": "Validate" },
+          { "context": "Unit Tests (JS Packages)" },
+          { "context": "Unit Tests (JS Apps)" },
+          { "context": "Unit Tests (Python)" },
+          { "context": "Contract Security Accessibility" },
+          { "context": "Coverage" },
+          { "context": "Integration Firebase" },
+          { "context": "Build and Typecheck" },
+          { "context": "E2E Harness" },
+          { "context": "Governance" }
+        ]
+      }
+    },
+    {
+      "type": "non_fast_forward"
+    },
+    {
+      "type": "deletion"
+    }
+  ],
+  "bypass_actors": [],
+  "metadata": {
+    "purpose": "Block unreviewed merges to main; require BB-008/BB-009 CI checks; forbid force-push and branch deletion; require resolved review conversations.",
+    "production_note": "Production deploy workflows (BB-010/BB-062) must target only main (or a protected release ref). Unreviewed branches cannot satisfy this ruleset and therefore cannot be the production deploy source of truth."
+  }
+}

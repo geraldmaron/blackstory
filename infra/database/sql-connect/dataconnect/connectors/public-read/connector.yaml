@@ -1,0 +1,7 @@
+# Public-read connector — server-only (api-public via Admin SDK).
+# Browsers must never hold SQL Connect credentials (ADR-003); no client SDK generation.
+connectorId: 'public-read'
+generate:
+  adminNodeSdk:
+    outputDir: '../../../../../../packages/data-access/generated/public-read'
+    package: '@black-book/sql-connect-public-read'

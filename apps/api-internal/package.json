@@ -1,0 +1,23 @@
+{
+  "name": "@black-book/api-internal",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/index.js",
+    "test": "node --conditions development --import tsx --test src/index.test.ts",
+    "lint": "echo 'lint: use root pnpm lint'"
+  },
+  "dependencies": {
+    "@black-book/config": "workspace:*",
+    "@black-book/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "@black-book/typescript-config": "workspace:^",
+    "@types/node": "^22.20.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}

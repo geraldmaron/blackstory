@@ -1,0 +1,90 @@
+/**
+ * JSON Schema for docs/security/threat-corpus.json (BB-004).
+ * Validates that each threat has P0 priority, four control quadrants, and bead mappings.
+ */
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://black-book.local/schemas/threat-corpus.json",
+  "title": "Black Book threat corpus",
+  "type": "object",
+  "required": ["version", "bead", "threats"],
+  "additionalProperties": true,
+  "properties": {
+    "version": { "type": "string" },
+    "bead": { "const": "BB-004" },
+    "updatedAt": { "type": "string" },
+    "assumptionsRef": { "type": "string" },
+    "threats": {
+      "type": "array",
+      "minItems": 19,
+      "maxItems": 19,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "priority",
+          "abuseCaseIds",
+          "implementationBeads",
+          "controls",
+          "residualRisk"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^T-(0[1-9]|1[0-9])$"
+          },
+          "name": { "type": "string", "minLength": 1 },
+          "priority": { "const": "P0" },
+          "assets": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "actors": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "abuseCaseIds": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^AC-[0-9]{2}$" }
+          },
+          "implementationBeads": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^BB-[0-9]{3}$" }
+          },
+          "controls": {
+            "type": "object",
+            "required": ["preventive", "detective", "containment", "recovery"],
+            "additionalProperties": false,
+            "properties": {
+              "preventive": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "minLength": 1 }
+              },
+              "detective": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "minLength": 1 }
+              },
+              "containment": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "minLength": 1 }
+              },
+              "recovery": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "minLength": 1 }
+              }
+            }
+          },
+          "residualRisk": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

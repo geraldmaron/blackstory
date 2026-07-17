@@ -1,0 +1,16 @@
+{
+  "_comment": "Declarative stub for GitHub Environment 'production' (BB-010). Apply with gh api after the remote exists. Replace reviewer placeholders with real users/teams. Not applied automatically.",
+  "wait_timer": 0,
+  "prevent_self_review": true,
+  "reviewers": [
+    {
+      "type": "Team",
+      "id": 0,
+      "_replace_with": "Numeric team id for production approvers (TBD)"
+    }
+  ],
+  "deployment_branch_policy": {
+    "protected_branches": true,
+    "custom_branch_policies": false
+  }
+}

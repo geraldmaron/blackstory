@@ -1,0 +1,16 @@
+{
+  "id": "fixture-disputed-001",
+  "fixtureKind": "disputed",
+  "livingStatus": "deceased",
+  "relevanceScore": 0.78,
+  "relevanceDecision": "include",
+  "claimConfidence": 0.55,
+  "claimClass": "standard",
+  "maturity": "partial_enrichment",
+  "publicPrecision": "county",
+  "sourceClassification": "reputable_secondary",
+  "proceduralStatus": "alleged",
+  "narrativeSnippet": "Contemporary accounts alleged discriminatory lending; later reporting disputes the scale.",
+  "disputePresent": true,
+  "publicationBlocked": false
+}

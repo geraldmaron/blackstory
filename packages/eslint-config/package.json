@@ -1,0 +1,21 @@
+{
+  "name": "@black-book/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./nextjs": "./nextjs.js"
+  },
+  "files": [
+    "index.js",
+    "nextjs.js"
+  ],
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "@next/eslint-plugin-next": "^16.2.10",
+    "eslint": "^10.7.0",
+    "globals": "^17.7.0",
+    "typescript-eslint": "^8.64.0"
+  }
+}

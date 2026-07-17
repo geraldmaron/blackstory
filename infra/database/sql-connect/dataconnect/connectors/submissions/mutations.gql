@@ -1,0 +1,6 @@
+# Intake mutations only. Cannot activate releases or touch public projections.
+# DB role_submissions_write enforces schema grants independently of this API.
+
+mutation CreateIntakeItem($payload: String!) @auth(level: NO_ACCESS) {
+  intakeItem_insert(data: { payload: $payload })
+}

@@ -1,0 +1,15 @@
+{
+  "id": "fixture-included-001",
+  "fixtureKind": "included",
+  "livingStatus": "deceased",
+  "relevanceScore": 0.86,
+  "relevanceDecision": "include",
+  "claimConfidence": 0.82,
+  "claimClass": "standard",
+  "maturity": "published",
+  "publicPrecision": "city",
+  "sourceClassification": "primary_archival",
+  "proceduralStatus": "enacted",
+  "narrativeSnippet": "State law enacted a segregated school district boundary in 1924.",
+  "publicationBlocked": false
+}

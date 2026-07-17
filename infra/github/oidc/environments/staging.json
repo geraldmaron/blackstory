@@ -1,0 +1,10 @@
+{
+  "_comment": "Optional same-project staging GitHub Environment (BB-010). Not a security boundary. Enable only with enable_staging_deploy_identity=true in WIF Terraform.",
+  "wait_timer": 0,
+  "prevent_self_review": false,
+  "reviewers": [],
+  "deployment_branch_policy": {
+    "protected_branches": true,
+    "custom_branch_policies": false
+  }
+}

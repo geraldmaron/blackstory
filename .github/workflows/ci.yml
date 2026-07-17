@@ -1,0 +1,339 @@
+# Black Book CI — pull request quality gates (BB-008) + governance policy (BB-009).
+# Stable job names below are wired into infra/github/rulesets/main-protection.json.
+# Permissions stay read-only. Third-party actions are pinned to immutable SHAs.
+# Do not use pull_request_target.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_ENV: test
+  LOG_LEVEL: info
+  FIREBASE_PROJECT_ID: demo-black-book
+  BLACK_BOOK_TEST_DATABASE_URL: postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Boundary validation and lint
+        run: pnpm validate
+      - name: Format check
+        run: pnpm format:check
+
+  unit-js-packages:
+    name: Unit Tests (JS Packages)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Test preflight (fail closed on production identifiers)
+        run: pnpm test:preflight
+      - name: Run package tests
+        run: pnpm -r --filter './packages/**' run --if-present test
+
+  unit-js-apps:
+    name: Unit Tests (JS Apps)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Test preflight (fail closed on production identifiers)
+        run: pnpm test:preflight
+      - name: Run app tests
+        run: pnpm -r --filter './apps/**' run --if-present test
+
+  unit-py:
+    name: Unit Tests (Python)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Sync Python workspace
+        run: |
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          uv sync --all-packages --frozen
+      - name: Setup pnpm (for shared preflight)
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Test preflight
+        run: pnpm test:preflight
+      - name: Run pytest
+        run: uv run pytest
+
+  contract-security-a11y:
+    name: Contract Security Accessibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Contract tests
+        run: pnpm test:contract
+      - name: Security corpus and production guards
+        run: pnpm test:security
+      - name: Accessibility smoke fixtures
+        run: pnpm test:a11y
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Testing package coverage thresholds
+        run: pnpm test:coverage
+
+  # ADR-011 / D-014: Postgres is parked — job kept for optional revisit, not required.
+  integration-postgres:
+    name: Integration Postgres
+    if: ${{ vars.ENABLE_POSTGRES_CI == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: blackbook
+          POSTGRES_PASSWORD: blackbook
+          POSTGRES_DB: blackbook
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U blackbook -d blackbook"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      CI_REQUIRE_POSTGRES: '1'
+      DATABASE_URL: postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook
+      BLACK_BOOK_TEST_DATABASE_URL: postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Integration and migration harnesses
+        run: |
+          pnpm --filter @black-book/testing exec node --import tsx --test \
+            src/harness/postgres.integration.test.ts \
+            src/migration/migration.harness.test.ts
+      - name: Apply DB foundation and role isolation checks
+        run: |
+          pnpm db:init
+          pnpm db:verify
+          pnpm test:db:integration
+
+  integration-firebase:
+    name: Integration Firebase
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI_REQUIRE_FIREBASE: '1'
+      FIREBASE_PROJECT_ID: demo-black-book
+      FIRESTORE_EMULATOR_HOST: 127.0.0.1:8080
+      FIREBASE_AUTH_EMULATOR_HOST: 127.0.0.1:9099
+      FIREBASE_STORAGE_EMULATOR_HOST: 127.0.0.1:9199
+      FIREBASE_CLI_DISABLE_UPDATE_CHECK: 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Setup Java (Firebase emulators)
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Start Firebase emulators
+        run: |
+          pnpm firebase:emulators > /tmp/firebase-emulators.log 2>&1 &
+          echo $! > /tmp/firebase-emulators.pid
+          for i in $(seq 1 90); do
+            if (echo > /dev/tcp/127.0.0.1/8080) >/dev/null 2>&1 && (echo > /dev/tcp/127.0.0.1/9199) >/dev/null 2>&1; then
+              echo "Firebase emulators are accepting TCP connections"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Firebase emulators failed to start"
+          cat /tmp/firebase-emulators.log || true
+          exit 1
+      - name: Firebase emulator integration tests
+        run: pnpm --filter @black-book/testing exec node --import tsx --test src/harness/firebase.integration.test.ts
+      - name: Firestore security rules (primary data path)
+        run: pnpm --filter @black-book/firebase test
+      - name: Stop Firebase emulators
+        if: always()
+        run: |
+          if [ -f /tmp/firebase-emulators.pid ]; then
+            kill "$(cat /tmp/firebase-emulators.pid)" || true
+          fi
+
+  build-typecheck:
+    name: Build and Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+      - name: Typecheck
+        run: pnpm typecheck
+
+  e2e-harness:
+    name: E2E Harness
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+      - name: E2E harness (skip without E2E_BASE_URL; no silent retries)
+        run: pnpm test:e2e
+
+  governance:
+    name: Governance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+      - name: Validate workflow pins, permissions, and governance files
+        # No dependency install: checker uses only Node builtins + checked-in scripts.
+        run: node scripts/validate-github-governance.mjs

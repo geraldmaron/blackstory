@@ -1,0 +1,30 @@
+# CODEOWNERS — required reviewers for high-risk paths (BB-009).
+# GitHub ignores unknown teams/users until they exist on the hosting org/user.
+#
+# Interim individual owner (verified via local git noreply → GitHub user geraldmaron).
+# After the remote org exists, replace path owners with teams:
+#   @<org>/security  @<org>/infra  @<org>/policies  @<org>/database  @<org>/publication
+# See infra/github/README.md for team creation and apply steps.
+
+* @geraldmaron
+
+# Security package, threat docs, and security worker
+/packages/security/ @geraldmaron
+/docs/security/ @geraldmaron
+/workers/security/ @geraldmaron
+/SECURITY.md @geraldmaron
+
+# Infrastructure (GCP, Firebase, GitHub, database compose)
+/infra/ @geraldmaron
+/.github/ @geraldmaron
+
+# Product policies / constitution
+/packages/schemas/constitution/ @geraldmaron
+/packages/constitution/ @geraldmaron
+
+# Database scaffolding and future schema/migrations
+/infra/database/ @geraldmaron
+
+# Publication surface (projection workers + internal promotion API)
+/workers/publication/ @geraldmaron
+/apps/api-internal/ @geraldmaron

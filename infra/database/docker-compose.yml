@@ -1,0 +1,57 @@
+# Local PostgreSQL + PostGIS for Black Book development (BB-006 / BB-012).
+# Init scripts under ./init run only on first empty data volume.
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: black-book-postgres
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: blackbook
+      POSTGRES_PASSWORD: blackbook
+      POSTGRES_DB: blackbook
+      # Local-only role passwords (override via compose env file; never production secrets)
+      BB_ROLE_PUBLIC_READ_PASSWORD: local-public-read
+      BB_ROLE_SUBMISSIONS_WRITE_PASSWORD: local-submissions-write
+      BB_ROLE_ADMIN_APP_PASSWORD: local-admin-app
+      BB_ROLE_RESEARCH_PASSWORD: local-research
+      BB_ROLE_PUBLICATION_PASSWORD: local-publication
+      BB_ROLE_MIGRATIONS_PASSWORD: local-migrations
+      BB_ROLE_BACKUP_READONLY_PASSWORD: local-backup-readonly
+      BB_ROLE_SECURITY_PASSWORD: local-security
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    command:
+      - postgres
+      - -c
+      - max_connections=200
+      - -c
+      - shared_buffers=256MB
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U blackbook -d blackbook']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Optional local pooler for exhaustion / pool-budget experiments (not required for unit tests).
+  pgbouncer:
+    image: edoburu/pgbouncer:1.22.1-p1
+    container_name: black-book-pgbouncer
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '6432:6432'
+    environment:
+      DB_USER: blackbook
+      DB_PASSWORD: blackbook
+      DB_HOST: postgres
+      DB_NAME: blackbook
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: 200
+      DEFAULT_POOL_SIZE: 20
+      RESERVE_POOL_SIZE: 5
+      SERVER_IDLE_TIMEOUT: 30
+    profiles:
+      - pool

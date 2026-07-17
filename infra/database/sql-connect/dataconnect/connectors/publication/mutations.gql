@@ -1,0 +1,14 @@
+# Projection / release writes. Must not expose raw evidence mutations.
+# DB role_publication cannot INSERT/UPDATE bb_evidence (init/30-grants.sql).
+
+mutation UpsertReleaseManifest($releaseId: String!) @auth(level: NO_ACCESS) {
+  releaseManifest_upsert(data: { releaseId: $releaseId })
+}
+
+mutation ActivateRelease($releaseId: String!, $activatedAt: Timestamp!) @auth(level: NO_ACCESS) {
+  releaseManifest_update(key: { releaseId: $releaseId }, data: { activatedAt: $activatedAt })
+}
+
+mutation PublishReleasedEntity($slug: String!, $displayName: String!) @auth(level: NO_ACCESS) {
+  releasedEntity_upsert(data: { slug: $slug, displayName: $displayName })
+}

@@ -1,0 +1,37 @@
+{
+  "name": "@black-book/testing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "quarantine.json"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --import tsx ../../scripts/run-testing-layer.mjs all",
+    "test:unit": "node --import tsx ../../scripts/run-testing-layer.mjs unit",
+    "test:contract": "node --import tsx ../../scripts/run-testing-layer.mjs contract",
+    "test:security": "node --import tsx ../../scripts/run-testing-layer.mjs security",
+    "test:a11y": "node --import tsx ../../scripts/run-testing-layer.mjs a11y",
+    "test:integration": "node --import tsx ../../scripts/run-testing-layer.mjs integration",
+    "test:migration": "node --import tsx ../../scripts/run-testing-layer.mjs migration",
+    "test:e2e": "node --import tsx ../../scripts/run-testing-layer.mjs e2e",
+    "test:coverage": "node --import tsx ../../scripts/run-testing-layer.mjs coverage",
+    "lint": "echo 'lint: deferred to root eslint'"
+  },
+  "devDependencies": {
+    "@black-book/typescript-config": "workspace:*",
+    "@types/node": "^22.20.1",
+    "tsx": "^4.23.1",
+    "typescript": "^5.8.3"
+  }
+}

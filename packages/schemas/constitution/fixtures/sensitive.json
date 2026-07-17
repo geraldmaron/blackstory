@@ -1,0 +1,17 @@
+{
+  "id": "fixture-sensitive-001",
+  "fixtureKind": "sensitive",
+  "livingStatus": "deceased",
+  "relevanceScore": 0.81,
+  "relevanceDecision": "include",
+  "claimConfidence": 0.88,
+  "claimClass": "high_impact",
+  "maturity": "substantial_enrichment",
+  "publicPrecision": "neighborhood",
+  "evidencePrecision": "street_address",
+  "sourceClassification": "government_record",
+  "proceduralStatus": "ruled",
+  "narrativeSnippet": "Evidence retains a historical street address that must not appear in public projection.",
+  "sensitivityClass": "historical_residence",
+  "publicationBlocked": false
+}

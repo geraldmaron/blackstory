@@ -1,0 +1,17 @@
+# Optional development namespace in the production project. Prefer demo-black-book emulators.
+# This file is not authorization to run tests against the live project.
+# No secrets belong in this file.
+
+environment = "development"
+project_id  = "black-book-efaaf"
+region      = "us-central1"
+
+# Org policies are managed against the one production project.
+manage_org_policies = false
+
+# Prefer CDN-fronted public media; direct public bucket read stays off.
+public_media_public_read = false
+
+# WIF trust inputs are only needed for deploy identities (BB-010).
+github_repository_id = ""
+github_owner_id      = ""

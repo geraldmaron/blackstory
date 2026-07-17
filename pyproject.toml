@@ -1,0 +1,41 @@
+# Black Book Python workspace for research, publication, and security workers.
+[project]
+name = "black-book-python"
+version = "0.0.0"
+description = "Python workers for Black Book research, publication, and security pipelines"
+requires-python = ">=3.12"
+dependencies = [
+  "black-book-constitution",
+  "black-book-research",
+  "black-book-publication",
+  "black-book-security-worker",
+]
+
+[tool.uv.workspace]
+members = [
+  "packages/constitution",
+  "workers/research",
+  "workers/publication",
+  "workers/security",
+]
+
+[tool.uv.sources]
+black-book-constitution = { workspace = true }
+black-book-research = { workspace = true }
+black-book-publication = { workspace = true }
+black-book-security-worker = { workspace = true }
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4.1",
+  "ruff>=0.12.3",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["packages/constitution", "workers"]
+pythonpath = [
+  "packages/constitution/src",
+  "workers/research/src",
+  "workers/publication/src",
+  "workers/security/src",
+]

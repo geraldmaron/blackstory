@@ -1,0 +1,16 @@
+{
+  "id": "fixture-sparse-001",
+  "fixtureKind": "sparse",
+  "livingStatus": "deceased",
+  "relevanceScore": 0.74,
+  "relevanceDecision": "include",
+  "claimConfidence": 0.76,
+  "claimClass": "standard",
+  "maturity": "minimum_record",
+  "publicPrecision": "city",
+  "sourceClassification": "government_record",
+  "proceduralStatus": "ruled",
+  "narrativeSnippet": "Court ruled the municipal ordinance unconstitutional; enrichment pending.",
+  "researchCoverage": "minimum",
+  "publicationBlocked": false
+}

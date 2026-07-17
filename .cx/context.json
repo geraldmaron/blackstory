@@ -1,0 +1,91 @@
+{
+  "project": "black-book",
+  "updatedAt": "2026-07-17T03:00:00Z",
+  "status": "bb-014-entity-geography-done",
+  "description": "Place-connected Black history research platform (TypeScript + Python monorepo)",
+  "stack": {
+    "languages": ["typescript", "python"],
+    "node": ">=22",
+    "packageManagers": ["pnpm", "uv"],
+    "surfaces": {
+      "web": "apps/web (Next.js → Firebase App Hosting, target)",
+      "admin": "apps/admin (Next.js → Cloud Run + IAP, target)",
+      "apis": ["apps/api-public", "apps/api-submissions", "apps/api-internal"],
+      "workers": ["workers/research", "workers/publication", "workers/security"]
+    },
+    "data": {
+      "target": "Cloud Firestore (ADR-011)",
+      "blobs": "Firebase Storage / GCS",
+      "model": "infra/firebase/FIRESTORE_MODEL.md",
+      "domain": "@black-book/domain",
+      "package": "@black-book/firebase",
+      "dataAccess": "@black-book/data-access (Firestore primary; Postgres parked)",
+      "postgres": {
+        "status": "deferred",
+        "path": "infra/database/",
+        "cloudSqlProvisioned": false
+      }
+    },
+    "platformIntent": ["Firebase", "GCP", "Cloud Run", "GitHub Actions OIDC"],
+    "firebase": {
+      "productionProjectId": "black-book-efaaf",
+      "appsRegistered": true,
+      "appHosting": "blocked-pending-blaze",
+      "package": "@black-book/firebase",
+      "docs": "infra/firebase/README.md"
+    },
+    "environmentIsolation": {
+      "status": "designed",
+      "provisioned": false,
+      "docs": "docs/security/environment-isolation.md",
+      "matrix": "infra/gcp/isolation-matrix.json",
+      "terraform": "infra/gcp/terraform/"
+    },
+    "testing": {
+      "package": "@black-book/testing",
+      "docs": "docs/testing/README.md",
+      "ci": ".github/workflows/ci.yml",
+      "primaryDataPath": "firestore emulator rules",
+      "postgresCi": "optional-ENABLE_POSTGRES_CI"
+    },
+    "githubGovernance": {
+      "status": "local-done-remote-pending",
+      "docs": "infra/github/README.md",
+      "policyCheck": "pnpm validate:governance",
+      "remoteApplied": false
+    },
+    "oidcWif": {
+      "status": "declarative-done-cloud-pending",
+      "docs": "infra/gcp/wif/README.md"
+    },
+    "configured": false,
+    "adrs": "docs/adr/",
+    "threatModel": "docs/security/"
+  },
+  "workflow": {
+    "id": "2026-07-16-bb-014-entity-geography",
+    "title": "BB-014 Entity and geography domain model on Firestore",
+    "state": "completed"
+  },
+  "activeFocus": {
+    "tranche": 2,
+    "name": "Data and publication boundary",
+    "bead": "BB-015"
+  },
+  "sourceOfTruth": {
+    "executionPlan": "plan.md",
+    "decision": ".cx/decisions/D-014-firestore-not-cloud-sql.md",
+    "adr": "docs/adr/ADR-011-firestore-system-of-record.md",
+    "firestoreModel": "infra/firebase/FIRESTORE_MODEL.md",
+    "architecture": "docs/architecture.md",
+    "adrs": "docs/adr/README.md",
+    "constitution": "packages/schemas/constitution/",
+    "security": "docs/security/README.md",
+    "environmentIsolation": "docs/security/environment-isolation.md",
+    "firebase": "infra/firebase/README.md",
+    "databaseParked": "infra/database/README.md",
+    "testing": "docs/testing/README.md",
+    "githubGovernance": "infra/github/README.md",
+    "docsIndex": "docs/README.md"
+  }
+}

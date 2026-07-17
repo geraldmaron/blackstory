@@ -1,0 +1,26 @@
+# Production WIF inputs for black-book-efaaf. Copy to prod.tfvars after a GitHub remote exists.
+# No secrets belong in this file. Numeric IDs are TBD until gh can resolve the repository.
+
+project_id     = "black-book-efaaf"
+project_number = "332234323945"
+region         = "us-central1"
+
+wif_pool_id     = "black-book-github"
+wif_provider_id = "github-actions"
+
+# Fill after: gh api repos/OWNER/REPO --jq '{owner:.owner.login,repo:.name,repository_id:.id,owner_id:.owner.id}'
+github_owner         = "" # e.g. my-org
+github_repository    = "" # e.g. black-book
+github_repository_id = "" # numeric string
+github_owner_id      = "" # numeric string
+
+production_environment   = "production"
+production_workflow_file = ".github/workflows/deploy-production.yml"
+production_deploy_sa_id  = "github-deploy"
+
+# Same-project staging is configuration only; keep false until a staging environment is needed.
+enable_staging_deploy_identity = false
+staging_environment            = "staging"
+staging_deploy_sa_id           = "github-deploy-staging"
+
+manage_deploy_project_roles = true

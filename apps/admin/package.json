@@ -1,0 +1,27 @@
+{
+  "name": "@black-book/admin",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "start": "next start --port 3001",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "echo 'admin browser e2e: pnpm test:e2e (harness; set E2E_BASE_URL for live smoke)'",
+    "lint": "echo 'lint: use root pnpm lint'"
+  },
+  "dependencies": {
+    "@black-book/domain": "workspace:*",
+    "next": "^15.4.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@black-book/eslint-config": "workspace:^",
+    "@black-book/typescript-config": "workspace:^",
+    "@types/node": "^22.16.5",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "typescript": "^5.8.3"
+  }
+}

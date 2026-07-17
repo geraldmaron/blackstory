@@ -1,0 +1,22 @@
+# Firebase SQL Connect service config (BB-012).
+# Product name: Firebase SQL Connect (formerly Firebase Data Connect).
+# CLI namespace remains `dataconnect:*` (firebase-tools 15.x).
+# Cloud SQL instance is NOT provisioned; instanceId is the intended production id.
+
+specVersion: 'v1'
+serviceId: 'black-book-sql'
+location: 'us-central1'
+schema:
+  source: './schema'
+  datasource:
+    postgresql:
+      database: 'blackbook'
+      cloudSql:
+        instanceId: 'black-book-pg-prod'
+        # Prefer COMPATIBLE once production data exists (BB-013/020).
+        # schemaValidation: "COMPATIBLE"
+connectorDirs:
+  - './connectors/public-read'
+  - './connectors/submissions'
+  - './connectors/admin'
+  - './connectors/publication'

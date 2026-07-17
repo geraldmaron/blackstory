@@ -1,0 +1,42 @@
+{
+  "$schemaComment": "Non-secret Firebase web app registrations for production project black-book-efaaf. Client apiKey values are Firebase identifiers restricted by domain/App Check, not server secrets.",
+  "project": {
+    "displayName": "black-book",
+    "projectId": "black-book-efaaf",
+    "projectNumber": "332234323945",
+    "hostingSite": "https://black-book-efaaf.web.app"
+  },
+  "apps": {
+    "web": {
+      "displayName": "Black Book Web",
+      "appId": "1:332234323945:web:17be349ebc9c029b3bfd78",
+      "platform": "WEB",
+      "surface": "apps/web"
+    },
+    "admin": {
+      "displayName": "Black Book Admin",
+      "appId": "1:332234323945:web:e1b31c78e32d95943bfd78",
+      "platform": "WEB",
+      "surface": "apps/admin"
+    }
+  },
+  "clientConfig": {
+    "projectId": "black-book-efaaf",
+    "authDomain": "black-book-efaaf.firebaseapp.com",
+    "storageBucket": "black-book-efaaf.firebasestorage.app",
+    "messagingSenderId": "332234323945",
+    "apiKey": "AIzaSyCS6qbiHo3KYAkMOhVbuORCwNa9PNbChFU"
+  },
+  "appHosting": {
+    "productionBackend": {
+      "proposedName": "black-book-web-production",
+      "status": "blocked_pending_blaze",
+      "runtimeServiceAccount": "web-runtime@black-book-efaaf.iam.gserviceaccount.com"
+    },
+    "stagingBackend": {
+      "proposedName": "black-book-web-staging",
+      "status": "blocked_pending_blaze",
+      "note": "Same production project; configuration namespace only, not a security boundary."
+    }
+  }
+}

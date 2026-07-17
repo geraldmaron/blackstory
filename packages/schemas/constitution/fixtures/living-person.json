@@ -1,0 +1,15 @@
+{
+  "id": "fixture-living-person-001",
+  "fixtureKind": "living_person",
+  "livingStatus": "unknown",
+  "relevanceScore": 0.8,
+  "relevanceDecision": "include",
+  "claimConfidence": 0.77,
+  "claimClass": "standard",
+  "maturity": "partial_enrichment",
+  "publicPrecision": "street_address",
+  "sourceClassification": "news_reportage",
+  "proceduralStatus": "alleged",
+  "narrativeSnippet": "Local coverage alleged discriminatory treatment of a living resident.",
+  "publicationBlocked": true
+}

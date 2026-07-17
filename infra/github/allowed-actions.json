@@ -1,0 +1,31 @@
+{
+  "$schema_note": "Declarative GitHub Actions permissions for selected-actions mode (BB-009). Applied by infra/github/scripts/apply-governance.sh when --apply is used against a remote.",
+  "actions_permissions": {
+    "enabled": true,
+    "allowed_actions": "selected",
+    "sha_pinning_required": true
+  },
+  "selected_actions": {
+    "github_owned_allowed": true,
+    "verified_allowed": false,
+    "patterns_allowed": [
+      "actions/checkout@*",
+      "actions/setup-node@*",
+      "actions/setup-python@*",
+      "actions/setup-java@*",
+      "actions/upload-artifact@*",
+      "pnpm/action-setup@*",
+      "google-github-actions/auth@*"
+    ]
+  },
+  "policy": {
+    "third_party_must_pin_commit_sha": true,
+    "forbidden_events": ["pull_request_target"],
+    "default_workflow_permissions": "read",
+    "notes": [
+      "Repo policy checker (scripts/validate-github-governance.mjs) enforces 40-char SHA pins in .github/workflows.",
+      "verified_allowed is false so only explicit patterns (plus GitHub-owned) may run; expand patterns deliberately.",
+      "Prefer pinning every uses: line to an immutable commit SHA even for GitHub-owned actions."
+    ]
+  }
+}

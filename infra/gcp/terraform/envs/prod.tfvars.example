@@ -1,0 +1,14 @@
+# Production inputs for the existing live project. Copy to prod.tfvars only after review.
+# No secrets belong in this file.
+
+environment = "production"
+project_id  = "black-book-efaaf"
+
+region = "us-central1"
+
+# Production may manage its project-level org policies if the pipeline identity is permitted.
+manage_org_policies      = true
+public_media_public_read = false
+
+github_repository_id = "" # numeric repo ID for WIF (BB-010)
+github_owner_id      = "" # numeric owner/org ID for WIF (BB-010)

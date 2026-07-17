@@ -1,0 +1,6 @@
+# Submissions connector — server-only (api-submissions via Admin SDK).
+connectorId: 'submissions'
+generate:
+  adminNodeSdk:
+    outputDir: '../../../../../../packages/data-access/generated/submissions'
+    package: '@black-book/sql-connect-submissions'

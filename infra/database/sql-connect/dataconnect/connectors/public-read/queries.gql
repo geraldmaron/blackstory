@@ -1,0 +1,18 @@
+# Server-only public projection reads. NO_ACCESS => Admin SDK / privileged server only.
+# Explicit authorization: api-public runtime SA + role_public_read at the DB layer.
+
+query ListReleasedEntities($limit: Int) @auth(level: NO_ACCESS) {
+  releasedEntities(limit: $limit, orderBy: [{ releasedAt: DESC }]) {
+    slug
+    displayName
+    releasedAt
+  }
+}
+
+query GetReleasedEntityBySlug($slug: String!) @auth(level: NO_ACCESS) {
+  releasedEntities(where: { slug: { eq: $slug } }, limit: 1) {
+    slug
+    displayName
+    releasedAt
+  }
+}

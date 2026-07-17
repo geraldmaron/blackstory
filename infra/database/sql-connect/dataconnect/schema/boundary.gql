@@ -1,0 +1,22 @@
+# Minimal SQL Connect application schema scaffold (BB-012).
+# Full domain tables and schema mapping to bb_* Postgres schemas are BB-013.
+# Tables here exist so `firebase dataconnect:compile` / SDK generation can run
+# against templates before Cloud SQL is provisioned.
+
+type ReleasedEntity @table(key: "slug") {
+  slug: String!
+  displayName: String!
+  releasedAt: Timestamp! @default(expr: "request.time")
+}
+
+type IntakeItem @table {
+  id: UUID! @default(expr: "uuidV4()")
+  payload: String!
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type ReleaseManifest @table(key: "releaseId") {
+  releaseId: String!
+  activatedAt: Timestamp
+  createdAt: Timestamp! @default(expr: "request.time")
+}

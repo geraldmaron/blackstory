@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://black-book.local/schemas/deployment-provenance.schema.json",
+  "title": "Black Book deployment provenance",
+  "description": "Release metadata written by production deploy jobs after GitHub OIDC/WIF auth (BB-010/BB-062). No secrets.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "projectId",
+    "environment",
+    "git",
+    "github",
+    "identity",
+    "deployedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "projectId": {
+      "type": "string",
+      "const": "black-book-efaaf"
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["production", "staging"]
+    },
+    "git": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commitSha", "ref"],
+      "properties": {
+        "commitSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "ref": {
+          "type": "string",
+          "description": "Fully qualified ref, e.g. refs/heads/main"
+        }
+      }
+    },
+    "github": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "repositoryId",
+        "ownerId",
+        "workflow",
+        "workflowRef",
+        "runId",
+        "runAttempt",
+        "serverUrl"
+      ],
+      "properties": {
+        "repository": { "type": "string" },
+        "repositoryId": { "type": "string", "pattern": "^[0-9]+$" },
+        "ownerId": { "type": "string", "pattern": "^[0-9]+$" },
+        "workflow": { "type": "string" },
+        "workflowRef": { "type": "string" },
+        "runId": { "type": "string" },
+        "runAttempt": { "type": "string" },
+        "serverUrl": { "type": "string", "format": "uri" }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authMethod",
+        "workloadIdentityProvider",
+        "serviceAccountEmail"
+      ],
+      "properties": {
+        "authMethod": {
+          "type": "string",
+          "const": "github-oidc-wif"
+        },
+        "workloadIdentityProvider": {
+          "type": "string",
+          "description": "Full GCP WIF provider resource name"
+        },
+        "serviceAccountEmail": {
+          "type": "string",
+          "format": "email"
+        }
+      }
+    },
+    "deployedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Optional digests of deployed images/bundles (filled by BB-062).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "digest"],
+        "properties": {
+          "name": { "type": "string" },
+          "digest": { "type": "string" },
+          "uri": { "type": "string" }
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

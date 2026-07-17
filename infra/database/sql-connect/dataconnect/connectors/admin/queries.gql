@@ -1,0 +1,8 @@
+# Admin read of release manifests. Release activation remains publication connector.
+query ListReleaseManifests($limit: Int) @auth(level: NO_ACCESS) {
+  releaseManifests(limit: $limit, orderBy: [{ createdAt: DESC }]) {
+    releaseId
+    activatedAt
+    createdAt
+  }
+}

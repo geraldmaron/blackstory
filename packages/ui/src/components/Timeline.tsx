@@ -1,0 +1,36 @@
+/**
+ * Vertical timeline for chronological claim and event narratives.
+ */
+
+import type { ReactNode } from 'react';
+import { cx } from '../utils/cx.js';
+
+export type TimelineItem = {
+  readonly id: string;
+  readonly time: string;
+  readonly title: string;
+  readonly body?: ReactNode;
+};
+
+export type TimelineProps = {
+  readonly items: readonly TimelineItem[];
+  readonly className?: string;
+  readonly labelledBy?: string;
+};
+
+export function Timeline({ items, className, labelledBy }: TimelineProps) {
+  return (
+    <ol className={cx('bb-timeline', className)} aria-labelledby={labelledBy}>
+      {items.map((item) => (
+        <li key={item.id} className="bb-timeline__item">
+          <span className="bb-timeline__marker" aria-hidden="true" />
+          <time className="bb-timeline__time" dateTime={item.time}>
+            {item.time}
+          </time>
+          <h3 className="bb-timeline__title">{item.title}</h3>
+          {item.body ? <div className="bb-timeline__body">{item.body}</div> : null}
+        </li>
+      ))}
+    </ol>
+  );
+}

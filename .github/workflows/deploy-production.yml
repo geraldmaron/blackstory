@@ -1,0 +1,114 @@
+# Production deploy via GitHub OIDC + GCP Workload Identity Federation (BB-010).
+# workflow_dispatch only — not a required status check; full pipeline is BB-062.
+# Does not use pull_request or credentials_json. Requires protected Environment "production".
+# Placeholders GCP_WORKLOAD_IDENTITY_PROVIDER / GCP_SERVICE_ACCOUNT must be set on that environment
+# after infra/github/scripts/apply-wif.sh --apply. Auth step is skipped until they exist.
+
+name: Deploy Production (OIDC stub)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type deploy to run the OIDC auth + provenance stub (no cloud rollout yet)"
+        required: true
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  oidc-auth-and-provenance:
+    name: OIDC Auth And Provenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Verify dispatch confirmation
+        run: |
+          if [[ "${{ inputs.confirm }}" != "deploy" ]]; then
+            echo "Refusing to run: set confirm=deploy"
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Authenticate to Google Cloud (OIDC)
+        id: auth
+        if: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && vars.GCP_SERVICE_ACCOUNT != '' }}
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID || 'black-book-efaaf' }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          export_environment_variables: true
+
+      - name: Skip auth when WIF vars unset
+        if: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER == '' || vars.GCP_SERVICE_ACCOUNT == '' }}
+        run: |
+          echo "GCP_WORKLOAD_IDENTITY_PROVIDER / GCP_SERVICE_ACCOUNT not set on Environment production."
+          echo "Apply WIF (infra/github/scripts/apply-wif.sh) then set environment variables."
+          echo "Continuing to write provenance stub with authMethod github-oidc-wif (pending)."
+
+      - name: Write deployment provenance stub
+        env:
+          WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          DEPLOY_SA: ${{ vars.GCP_SERVICE_ACCOUNT }}
+        run: |
+          mkdir -p artifacts
+          DEPLOYED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          PROVIDER="${WIF_PROVIDER:-projects/332234323945/locations/global/workloadIdentityPools/black-book-github/providers/github-actions}"
+          SA="${DEPLOY_SA:-github-deploy@black-book-efaaf.iam.gserviceaccount.com}"
+          cat > artifacts/deployment-provenance.json <<EOF
+          {
+            "schemaVersion": 1,
+            "projectId": "black-book-efaaf",
+            "environment": "production",
+            "git": {
+              "commitSha": "${{ github.sha }}",
+              "ref": "${{ github.ref }}"
+            },
+            "github": {
+              "repository": "${{ github.repository }}",
+              "repositoryId": "${{ github.repository_id }}",
+              "ownerId": "${{ github.event.repository.owner.id }}",
+              "workflow": "${{ github.workflow }}",
+              "workflowRef": "${{ github.repository }}/.github/workflows/deploy-production.yml@${{ github.ref }}",
+              "runId": "${{ github.run_id }}",
+              "runAttempt": "${{ github.run_attempt }}",
+              "serverUrl": "${{ github.server_url }}"
+            },
+            "identity": {
+              "authMethod": "github-oidc-wif",
+              "workloadIdentityProvider": "${PROVIDER}",
+              "serviceAccountEmail": "${SA}"
+            },
+            "deployedAt": "${DEPLOYED_AT}",
+            "artifacts": [],
+            "notes": "BB-010 stub: OIDC identity path only; App Hosting/Cloud Run rollout is BB-062."
+          }
+          EOF
+          python3 - <<'PY'
+          import json, pathlib
+          path = pathlib.Path("artifacts/deployment-provenance.json")
+          data = json.loads(path.read_text())
+          assert data["identity"]["authMethod"] == "github-oidc-wif"
+          assert data["environment"] == "production"
+          print("provenance stub ok:", path)
+          PY
+
+      - name: Upload provenance artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: deployment-provenance
+          path: artifacts/deployment-provenance.json
+          if-no-files-found: error

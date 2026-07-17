@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "projectId": "black-book-efaaf",
+  "environment": "production",
+  "git": {
+    "commitSha": "0000000000000000000000000000000000000000",
+    "ref": "refs/heads/main"
+  },
+  "github": {
+    "repository": "OWNER/REPO",
+    "repositoryId": "0",
+    "ownerId": "0",
+    "workflow": "Deploy Production (OIDC stub)",
+    "workflowRef": "OWNER/REPO/.github/workflows/deploy-production.yml@refs/heads/main",
+    "runId": "0",
+    "runAttempt": "1",
+    "serverUrl": "https://github.com"
+  },
+  "identity": {
+    "authMethod": "github-oidc-wif",
+    "workloadIdentityProvider": "projects/332234323945/locations/global/workloadIdentityPools/black-book-github/providers/github-actions",
+    "serviceAccountEmail": "github-deploy@black-book-efaaf.iam.gserviceaccount.com"
+  },
+  "deployedAt": "2026-07-16T00:00:00.000Z",
+  "artifacts": [],
+  "notes": "Stub example only. Real provenance is emitted by deploy-production.yml after OIDC auth."
+}

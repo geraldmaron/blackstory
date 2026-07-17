@@ -1,0 +1,446 @@
+{
+  "$schema": "./isolation-matrix.schema.json",
+  "version": "2.0.0",
+  "bead": "BB-005",
+  "title": "Black Book single-project production isolation matrix",
+  "mode": "single-project",
+  "currentProject": {
+    "projectId": "black-book-efaaf",
+    "projectNumber": "332234323945",
+    "hostingSite": "black-book-efaaf.web.app",
+    "tier": "prod",
+    "live": true
+  },
+  "deferredMultiProjectTarget": {
+    "status": "deferred",
+    "projectIds": [
+      "blackbook-dev",
+      "blackbook-staging",
+      "blackbook-prod",
+      "blackbook-research-prod"
+    ],
+    "migrationTriggers": [
+      "Production data or credentials must be used in a non-production environment.",
+      "Research workload risk, cost, or compliance can no longer be contained by per-service IAM, bucket IAM, database roles, quotas, and kill switches.",
+      "Independent environment recovery, billing, residency, or organization-policy boundaries become mandatory."
+    ]
+  },
+  "updatedAt": "2026-07-16",
+  "status": "design",
+  "notes": [
+    "Machine-readable source of truth for BB-005 isolation inside the existing production project black-book-efaaf.",
+    "The project and Hosting site are live; Firebase apps, App Hosting backends, service accounts, buckets, database roles, and listed IAM bindings are designed but not yet verified as provisioned.",
+    "Development remains local and emulator-only. Staging is a configuration namespace or separately named App Hosting backend in the same production project, not a security boundary.",
+    "Human-readable companions: projects.matrix.md, service-accounts.matrix.md, storage-buckets.matrix.md, iam-boundaries.md, wif/.",
+    "BB-010 WIF/OIDC deploy identities are designed under infra/gcp/wif/ (not applied; GitHub numeric IDs TBD until remote exists).",
+    "No secrets are stored here; secret material lives only in Secret Manager per environment."
+  ],
+  "adrRefs": ["ADR-001", "ADR-003", "ADR-005", "ADR-006", "ADR-009"],
+  "threatRefs": ["T-03", "T-08", "T-09", "T-12", "T-14", "T-16", "T-17"],
+  "environments": [
+    {
+      "key": "development",
+      "projectId": "black-book-efaaf",
+      "tier": "nonprod",
+      "purpose": "Local development through demo-black-book emulators and synthetic fixtures; no deployed development cloud environment.",
+      "servesPublic": false,
+      "researchColocated": true,
+      "configurationScope": "local emulator namespace demo-black-book",
+      "live": true,
+      "humanAccess": "developers use local emulators; any access to black-book-efaaf is production access",
+      "notes": "AC-ISO-1 project separation is not currently available. Tests and local development must fail closed against black-book-efaaf."
+    },
+    {
+      "key": "staging",
+      "projectId": "black-book-efaaf",
+      "tier": "nonprod",
+      "purpose": "Optional pre-production configuration namespace or separately named App Hosting backend; it shares the production trust boundary.",
+      "servesPublic": true,
+      "researchColocated": true,
+      "configurationScope": "proposed App Hosting backend black-book-web-staging and staging-prefixed resource names",
+      "live": false,
+      "humanAccess": "CI (staging deploy identity via WIF) + break-glass",
+      "notes": "Not provisioned and not a security boundary. Must use synthetic data and separate names; never treat it as safe for destructive tests."
+    },
+    {
+      "key": "production",
+      "projectId": "black-book-efaaf",
+      "tier": "prod",
+      "purpose": "The one live Firebase/GCP production project for public serving, canonical data, publication, research, and security workloads.",
+      "servesPublic": true,
+      "researchColocated": true,
+      "configurationScope": "production resources and proposed App Hosting backend black-book-web-production",
+      "live": true,
+      "humanAccess": "CI (production deploy identity via WIF) + protected environment approval + break-glass",
+      "notes": "Project number 332234323945; existing Hosting site black-book-efaaf.web.app. Treat every cloud resource here as production."
+    },
+    {
+      "key": "production-research",
+      "projectId": "black-book-efaaf",
+      "tier": "prod",
+      "purpose": "Production research configuration scope inside the same project, isolated by service account, bucket IAM, database role, network policy, quota, and kill switch.",
+      "servesPublic": false,
+      "researchColocated": true,
+      "configurationScope": "research-prefixed jobs, secrets, logs, quotas, and private-evidence bucket",
+      "live": false,
+      "humanAccess": "CI (research deploy identity via WIF) + break-glass",
+      "notes": "Designed, not verified as provisioned. Research must never receive public-media write, publication role, release-pointer access, or public ingress."
+    }
+  ],
+  "serviceAccounts": [
+    {
+      "id": "web-runtime",
+      "beadRequired": true,
+      "surface": "apps/web",
+      "project": "black-book-efaaf",
+      "purpose": "Firebase App Hosting backend runtime identity for the public web app.",
+      "dbRole": null,
+      "roles": [
+        "roles/secretmanager.secretAccessor (scoped)",
+        "roles/cloudtrace.agent",
+        "roles/monitoring.metricWriter"
+      ],
+      "bucketAccess": [{ "bucket": "public-media", "access": "objectViewer" }],
+      "mustNotHave": [
+        "any read on private-evidence, quarantine, or exports buckets",
+        "any canonical database write role",
+        "any publication or promotion permission"
+      ]
+    },
+    {
+      "id": "api-public",
+      "beadRequired": true,
+      "surface": "apps/api-public",
+      "project": "black-book-efaaf",
+      "purpose": "Public read/search/location API runtime identity.",
+      "dbRole": "role_public_read",
+      "roles": [
+        "roles/secretmanager.secretAccessor (scoped)",
+        "roles/cloudsql.client",
+        "roles/monitoring.metricWriter"
+      ],
+      "bucketAccess": [{ "bucket": "public-media", "access": "objectViewer" }],
+      "mustNotHave": [
+        "read on private-evidence or quarantine buckets",
+        "any write on the public schema or canonical tables",
+        "any publication, promotion, or migration permission"
+      ]
+    },
+    {
+      "id": "api-submissions",
+      "beadRequired": true,
+      "surface": "apps/api-submissions",
+      "project": "black-book-efaaf",
+      "purpose": "Corrections / contribution intake API runtime identity.",
+      "dbRole": "role_submissions_write",
+      "roles": [
+        "roles/secretmanager.secretAccessor (scoped)",
+        "roles/cloudsql.client",
+        "roles/monitoring.metricWriter"
+      ],
+      "bucketAccess": [{ "bucket": "quarantine", "access": "objectCreator" }],
+      "mustNotHave": [
+        "read of quarantine object contents (write/create only; scanning is the security worker)",
+        "any read on private-evidence or public-media buckets",
+        "any canonical write, publication, or promotion permission",
+        "any research, publication, or deploy identity impersonation"
+      ]
+    },
+    {
+      "id": "api-internal",
+      "beadRequired": false,
+      "surface": "apps/api-internal",
+      "project": "black-book-efaaf",
+      "purpose": "Private publication / promotion / internal control API. Required by ADR-005 (not in the BB-005 nine but part of the same boundary).",
+      "dbRole": "role_publication",
+      "roles": [
+        "roles/secretmanager.secretAccessor (scoped)",
+        "roles/cloudsql.client",
+        "roles/monitoring.metricWriter"
+      ],
+      "bucketAccess": [
+        { "bucket": "public-media", "access": "objectAdmin" },
+        { "bucket": "exports", "access": "objectAdmin" }
+      ],
+      "mustNotHave": [
+        "any public internet ingress",
+        "write access to raw evidence objects",
+        "callable by end-user tokens"
+      ]
+    },
+    {
+      "id": "admin",
+      "beadRequired": true,
+      "surface": "apps/admin",
+      "project": "black-book-efaaf",
+      "purpose": "Admin / research console runtime identity (Cloud Run + IAP).",
+      "dbRole": "role_admin_app",
+      "roles": [
+        "roles/secretmanager.secretAccessor (scoped)",
+        "roles/cloudsql.client",
+        "roles/monitoring.metricWriter",
+        "roles/iap.httpsResourceAccessor (via IAP)"
+      ],
+      "bucketAccess": [
+        { "bucket": "public-media", "access": "objectViewer" },
+        { "bucket": "private-evidence", "access": "objectViewer" },
+        { "bucket": "quarantine", "access": "objectViewer" }
+      ],
+      "mustNotHave": [
+        "public internet ingress without IAP",
+        "ability to bypass the publication workflow for release activation"
+      ]
+    },
+    {
+      "id": "migrations",
+      "beadRequired": true,
+      "surface": "database migration job",
+      "project": "black-book-efaaf",
+      "purpose": "Schema migration (DDL) runner; short-lived, invoked only by CI deploy pipeline.",
+      "dbRole": "role_migrations",
+      "roles": ["roles/cloudsql.client", "roles/secretmanager.secretAccessor (scoped)"],
+      "bucketAccess": [],
+      "mustNotHave": [
+        "runtime attachment to any long-running service",
+        "publication or promotion permission",
+        "read on private-evidence, quarantine, or public-media buckets"
+      ]
+    },
+    {
+      "id": "research",
+      "beadRequired": true,
+      "surface": "workers/research",
+      "project": "black-book-efaaf",
+      "purpose": "Source discovery, ingestion, and evidence staging under a dedicated production identity in the shared project.",
+      "dbRole": "role_research",
+      "roles": [
+        "roles/run.invoker (self, jobs)",
+        "roles/secretmanager.secretAccessor (scoped)",
+        "roles/monitoring.metricWriter"
+      ],
+      "bucketAccess": [{ "bucket": "private-evidence", "access": "objectAdmin" }],
+      "mustNotHave": [
+        "any publication, deployment, project-admin, or service-account impersonation role",
+        "write on public-media or public projections",
+        "publication, promotion, or release-activation permission",
+        "ability to modify canonical release pointers"
+      ]
+    },
+    {
+      "id": "publication",
+      "beadRequired": true,
+      "surface": "workers/publication",
+      "project": "black-book-efaaf",
+      "purpose": "Projection, snapshot, indexing, and release worker.",
+      "dbRole": "role_publication",
+      "roles": [
+        "roles/secretmanager.secretAccessor (scoped)",
+        "roles/cloudsql.client",
+        "roles/monitoring.metricWriter"
+      ],
+      "bucketAccess": [
+        { "bucket": "public-media", "access": "objectAdmin" },
+        { "bucket": "exports", "access": "objectAdmin" }
+      ],
+      "mustNotHave": [
+        "write access to raw evidence objects",
+        "ability to alter raw evidence or research staging",
+        "public internet ingress"
+      ]
+    },
+    {
+      "id": "security",
+      "beadRequired": false,
+      "surface": "workers/security",
+      "project": "black-book-efaaf",
+      "purpose": "Quarantine, content validation, malware scan, integrity worker. Required by ADR-005 (not in the BB-005 nine).",
+      "dbRole": "role_security",
+      "roles": ["roles/secretmanager.secretAccessor (scoped)", "roles/monitoring.metricWriter"],
+      "bucketAccess": [
+        { "bucket": "quarantine", "access": "objectAdmin" },
+        { "bucket": "public-media", "access": "objectCreator" }
+      ],
+      "mustNotHave": ["public internet ingress", "publication or release-activation permission"]
+    },
+    {
+      "id": "backup",
+      "beadRequired": true,
+      "surface": "backup / PITR / export job",
+      "project": "black-book-efaaf",
+      "purpose": "Database backup, point-in-time-recovery, and export runner.",
+      "dbRole": "role_backup_readonly",
+      "roles": [
+        "roles/cloudsql.viewer",
+        "roles/cloudsql.client",
+        "roles/secretmanager.secretAccessor (scoped)"
+      ],
+      "bucketAccess": [],
+      "mustNotHave": [
+        "any write on canonical tables or public projections",
+        "publication or promotion permission",
+        "bucket access unless a separately reviewed backup export bucket is added"
+      ]
+    },
+    {
+      "id": "github-deploy",
+      "beadRequired": true,
+      "surface": "GitHub Actions (OIDC/WIF)",
+      "project": "black-book-efaaf",
+      "purpose": "Production deployment identity impersonated by GitHub Actions via Workload Identity Federation (ADR-006 / BB-010). No standing JSON keys.",
+      "dbRole": null,
+      "roles": [
+        "roles/run.admin (scoped)",
+        "roles/firebaseapphosting.admin (scoped)",
+        "roles/iam.serviceAccountUser (deploy-time impersonation)",
+        "roles/artifactregistry.writer"
+      ],
+      "bucketAccess": [],
+      "mustNotHave": [
+        "trust from unprotected branches, pull requests, forks, or unapproved GitHub environments",
+        "runtime attachment to an application or worker",
+        "long-lived exported service-account keys"
+      ],
+      "wif": {
+        "status": "designed-not-applied",
+        "poolId": "black-book-github",
+        "providerId": "github-actions",
+        "docs": "infra/gcp/wif/",
+        "trust": [
+          "numeric repository_id (TBD)",
+          "numeric repository_owner_id (TBD)",
+          "refs/heads/main",
+          ".github/workflows/deploy-production.yml on main",
+          "protected GitHub environment production"
+        ],
+        "optionalStagingIdentity": "github-deploy-staging (enable_staging_deploy_identity; not a security boundary)"
+      }
+    }
+  ],
+  "buckets": [
+    {
+      "id": "public-media",
+      "namePattern": "black-book-efaaf-public-media",
+      "project": "black-book-efaaf",
+      "classification": "public",
+      "publicAccessPrevention": "inherited (the single documented public-serving exception; prefer CDN-fronted delivery)",
+      "uniformBucketLevelAccess": true,
+      "writers": ["publication", "security (post-scan promotion)", "api-internal"],
+      "readers": ["public (CDN)", "web-runtime", "api-public", "admin"],
+      "publiclyServable": true,
+      "notes": "Only vetted, scanned, promoted media lands here. Written only after security validation."
+    },
+    {
+      "id": "private-evidence",
+      "namePattern": "black-book-efaaf-private-evidence",
+      "project": "black-book-efaaf",
+      "classification": "private",
+      "publicAccessPrevention": "enforced",
+      "uniformBucketLevelAccess": true,
+      "writers": ["research", "security"],
+      "readers": ["publication (read-only)", "admin", "api-internal"],
+      "publiclyServable": false,
+      "notes": "Raw research evidence. Never public. Same-project placement increases blast radius, so public SAs must have no bucket IAM and the research DB role must remain non-publishing."
+    },
+    {
+      "id": "exports",
+      "namePattern": "black-book-efaaf-exports",
+      "project": "black-book-efaaf",
+      "classification": "restricted",
+      "publicAccessPrevention": "enforced",
+      "uniformBucketLevelAccess": true,
+      "writers": ["publication", "api-internal"],
+      "readers": ["time-limited signed URLs only"],
+      "publiclyServable": false,
+      "notes": "Generated exports delivered via short-TTL signed URLs; the bucket itself is never public."
+    },
+    {
+      "id": "quarantine",
+      "namePattern": "black-book-efaaf-quarantine",
+      "project": "black-book-efaaf",
+      "classification": "untrusted",
+      "publicAccessPrevention": "enforced",
+      "uniformBucketLevelAccess": true,
+      "writers": ["api-submissions (create only)", "security"],
+      "readers": ["security"],
+      "publiclyServable": false,
+      "notes": "Untrusted intake. Public Access Prevention enforced so quarantine objects can never be served publicly. Only the security worker reads/scans."
+    }
+  ],
+  "crossProjectGrants": [],
+  "orgPolicies": [
+    {
+      "constraint": "constraints/storage.publicAccessPrevention",
+      "setting": "enforced on black-book-efaaf where possible; public-media requires a documented exception or private CDN origin design"
+    },
+    {
+      "constraint": "constraints/iam.allowedPolicyMemberDomains",
+      "setting": "restrict IAM members to the org domain (block external principals)"
+    },
+    {
+      "constraint": "constraints/iam.disableServiceAccountKeyCreation",
+      "setting": "enforced (deploy uses WIF, not exported keys)"
+    },
+    {
+      "constraint": "constraints/gcp.resourceLocations",
+      "setting": "restrict resource creation to approved US locations"
+    },
+    {
+      "constraint": "constraints/sql.restrictPublicIp",
+      "setting": "enforced (Cloud SQL private IP only)"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-ISO-1",
+      "criterion": "Development credentials cannot access production (not currently enforceable as a cloud project boundary)",
+      "enforcedBy": [
+        "N/A as an environment-to-project invariant: black-book-efaaf is the only cloud project and is production.",
+        "Local development and automated tests use demo-black-book emulators or disposable local services and fail closed when production identifiers are present.",
+        "Any human or CI access to black-book-efaaf is production access; github-deploy is WIF-only and requires protected production context.",
+        "A separate cloud development project must be created before cloud-based development credentials or destructive integration tests are allowed."
+      ],
+      "threatRefs": ["T-12", "T-17"]
+    },
+    {
+      "id": "AC-ISO-2",
+      "criterion": "Research workers cannot publish",
+      "enforcedBy": [
+        "research@black-book-efaaf is a distinct identity with no publication, deployment, service-account impersonation, release-pointer, or public-media write permission.",
+        "role_research can write evidence staging and read a canonical subset but cannot write public projections or activate releases.",
+        "Publication requires publication/api-internal identities even though they share the project (ADR-005, ADR-009).",
+        "research SA has no bucketAccess to public-media and no release-pointer permission."
+      ],
+      "threatRefs": ["T-07", "T-16"]
+    },
+    {
+      "id": "AC-ISO-3",
+      "criterion": "Public services cannot read private evidence blobs",
+      "enforcedBy": [
+        "web-runtime and api-public have no IAM binding on the private-evidence bucket.",
+        "private-evidence has Public Access Prevention enforced and UBLA enabled; only research/security write and only publication/admin/api-internal read.",
+        "Project-level storage roles are forbidden for runtime identities because they would bypass per-bucket separation."
+      ],
+      "threatRefs": ["T-15", "T-04"]
+    },
+    {
+      "id": "AC-ISO-4",
+      "criterion": "Quarantine objects cannot be served publicly",
+      "enforcedBy": [
+        "quarantine bucket has constraints/storage.publicAccessPrevention enforced and UBLA enabled (no allUsers/allAuthenticatedUsers possible).",
+        "Only api-submissions (create) and security (read/scan) touch it; web-runtime and api-public have no access.",
+        "No CDN backend or signed-URL issuer is wired to the quarantine bucket."
+      ],
+      "threatRefs": ["T-09", "T-08"]
+    },
+    {
+      "id": "AC-ISO-5",
+      "criterion": "Compromise of submissions service does not grant canonical or publication permissions",
+      "enforcedBy": [
+        "api-submissions SA holds only role_submissions_write (write to quarantine/staging tables), objectCreator on quarantine, and scoped secret access.",
+        "It has no canonical write, no publication/promotion permission, no private-evidence read, and no identity-impersonation access.",
+        "Promotion to public requires the separate publication workflow via internal/publication identities (ADR-004, ADR-005)."
+      ],
+      "threatRefs": ["T-05", "T-07", "T-16"]
+    }
+  ]
+}

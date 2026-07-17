@@ -1,0 +1,59 @@
+{
+  "$schema": "./pool-config.schema.json",
+  "description": "Connection pool budgets for Black Book Postgres roles (BB-012). Align app pools under role CONNECTION LIMIT.",
+  "global": {
+    "maxConnectionsDatabase": 200,
+    "poolMode": "transaction",
+    "serverIdleTimeoutSeconds": 30,
+    "queryTimeoutMs": 30000,
+    "idleInTransactionTimeoutMs": 15000,
+    "lockTimeoutMs": 5000
+  },
+  "roles": {
+    "role_public_read": {
+      "appPoolMax": 20,
+      "roleConnectionLimit": 40,
+      "statementTimeoutMs": 10000
+    },
+    "role_submissions_write": {
+      "appPoolMax": 15,
+      "roleConnectionLimit": 30,
+      "statementTimeoutMs": 15000
+    },
+    "role_admin_app": {
+      "appPoolMax": 10,
+      "roleConnectionLimit": 20,
+      "statementTimeoutMs": 30000
+    },
+    "role_research": {
+      "appPoolMax": 12,
+      "roleConnectionLimit": 25,
+      "statementTimeoutMs": 300000
+    },
+    "role_publication": {
+      "appPoolMax": 12,
+      "roleConnectionLimit": 25,
+      "statementTimeoutMs": 300000
+    },
+    "role_security": {
+      "appPoolMax": 8,
+      "roleConnectionLimit": 15,
+      "statementTimeoutMs": 120000
+    },
+    "role_migrations": {
+      "appPoolMax": 1,
+      "roleConnectionLimit": 3,
+      "statementTimeoutMs": 0
+    },
+    "role_backup_readonly": {
+      "appPoolMax": 2,
+      "roleConnectionLimit": 5,
+      "statementTimeoutMs": 0
+    }
+  },
+  "exhaustionPolicy": {
+    "acquireTimeoutMs": 2000,
+    "onExhausted": "fail_closed",
+    "notes": "Surfaces must degrade read-only or reject writes rather than open unbounded connections (T-13)."
+  }
+}

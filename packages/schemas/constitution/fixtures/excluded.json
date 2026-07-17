@@ -1,0 +1,16 @@
+{
+  "id": "fixture-excluded-001",
+  "fixtureKind": "excluded",
+  "livingStatus": "deceased",
+  "relevanceScore": 0.22,
+  "relevanceDecision": "exclude",
+  "claimConfidence": 0.4,
+  "claimClass": "standard",
+  "maturity": "excluded",
+  "publicPrecision": "state",
+  "sourceClassification": "news_reportage",
+  "proceduralStatus": "unknown_procedural",
+  "narrativeSnippet": "A celebrity visited the city for an unrelated awards show.",
+  "exclusionReason": "Accurate but irrelevant to place-connected Black history scope",
+  "publicationBlocked": true
+}

@@ -1,0 +1,6 @@
+# Admin connector — server-only (admin app via Admin SDK + IAP).
+connectorId: 'admin'
+generate:
+  adminNodeSdk:
+    outputDir: '../../../../../../packages/data-access/generated/admin'
+    package: '@black-book/sql-connect-admin'

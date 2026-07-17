@@ -1,0 +1,12 @@
+# Optional staging namespace in the production project. This is not a security boundary.
+# No secrets belong in this file.
+
+environment = "staging"
+project_id  = "black-book-efaaf"
+region      = "us-central1"
+
+manage_org_policies      = false
+public_media_public_read = false
+
+github_repository_id = "" # numeric repo ID for WIF (BB-010)
+github_owner_id      = "" # numeric owner/org ID for WIF (BB-010)

@@ -1,0 +1,233 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://black-book/infra/gcp/isolation-matrix.schema.json",
+  "title": "Black Book environment/project isolation matrix",
+  "description": "Schema for the BB-005 machine-readable isolation matrix (projects, service accounts, buckets, IAM boundaries, and acceptance-criteria mapping).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "bead",
+    "title",
+    "mode",
+    "currentProject",
+    "deferredMultiProjectTarget",
+    "environments",
+    "serviceAccounts",
+    "buckets",
+    "crossProjectGrants",
+    "acceptanceCriteria"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "bead": { "type": "string", "const": "BB-005" },
+    "title": { "type": "string", "minLength": 1 },
+    "mode": { "type": "string", "const": "single-project" },
+    "currentProject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectId", "projectNumber", "hostingSite", "tier", "live"],
+      "properties": {
+        "projectId": { "type": "string", "const": "black-book-efaaf" },
+        "projectNumber": { "type": "string", "const": "332234323945" },
+        "hostingSite": { "type": "string", "const": "black-book-efaaf.web.app" },
+        "tier": { "type": "string", "const": "prod" },
+        "live": { "type": "boolean", "const": true }
+      }
+    },
+    "deferredMultiProjectTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "projectIds", "migrationTriggers"],
+      "properties": {
+        "status": { "type": "string", "const": "deferred" },
+        "projectIds": {
+          "type": "array",
+          "minItems": 4,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "migrationTriggers": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "updatedAt": { "type": "string" },
+    "status": { "type": "string", "enum": ["design", "partial", "applied"] },
+    "notes": { "type": "array", "items": { "type": "string" } },
+    "adrRefs": { "type": "array", "items": { "type": "string", "pattern": "^ADR-\\d{3}$" } },
+    "threatRefs": { "type": "array", "items": { "type": "string", "pattern": "^T-\\d{2}$" } },
+    "environments": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "projectId",
+          "tier",
+          "purpose",
+          "servesPublic",
+          "researchColocated",
+          "configurationScope",
+          "live"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": ["development", "staging", "production", "production-research"]
+          },
+          "projectId": { "type": "string", "minLength": 1 },
+          "tier": { "type": "string", "enum": ["nonprod", "prod"] },
+          "purpose": { "type": "string", "minLength": 1 },
+          "servesPublic": { "type": "boolean" },
+          "researchColocated": { "type": "boolean" },
+          "configurationScope": { "type": "string", "minLength": 1 },
+          "live": { "type": "boolean" },
+          "humanAccess": { "type": "string" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "serviceAccounts": {
+      "type": "array",
+      "minItems": 9,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "beadRequired",
+          "surface",
+          "project",
+          "purpose",
+          "roles",
+          "bucketAccess",
+          "mustNotHave"
+        ],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "beadRequired": { "type": "boolean" },
+          "surface": { "type": "string", "minLength": 1 },
+          "project": { "type": "string", "minLength": 1 },
+          "purpose": { "type": "string", "minLength": 1 },
+          "dbRole": { "type": ["string", "null"] },
+          "roles": { "type": "array", "items": { "type": "string" } },
+          "bucketAccess": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["bucket", "access"],
+              "properties": {
+                "bucket": { "type": "string" },
+                "access": { "type": "string" }
+              }
+            }
+          },
+          "mustNotHave": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "wif": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["status", "poolId", "providerId", "docs", "trust"],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["designed-not-applied", "applied", "disabled"]
+              },
+              "poolId": { "type": "string", "minLength": 1 },
+              "providerId": { "type": "string", "minLength": 1 },
+              "docs": { "type": "string", "minLength": 1 },
+              "trust": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "minLength": 1 }
+              },
+              "optionalStagingIdentity": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "buckets": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "namePattern",
+          "project",
+          "classification",
+          "publicAccessPrevention",
+          "uniformBucketLevelAccess",
+          "writers",
+          "readers",
+          "publiclyServable"
+        ],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "namePattern": { "type": "string", "minLength": 1 },
+          "project": { "type": "string", "minLength": 1 },
+          "classification": {
+            "type": "string",
+            "enum": ["public", "restricted", "private", "untrusted"]
+          },
+          "publicAccessPrevention": { "type": "string", "minLength": 1 },
+          "uniformBucketLevelAccess": { "type": "boolean" },
+          "writers": { "type": "array", "items": { "type": "string" } },
+          "readers": { "type": "array", "items": { "type": "string" } },
+          "publiclyServable": { "type": "boolean" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "crossProjectGrants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "from", "to", "role", "rationale"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "from": { "type": "string", "minLength": 1 },
+          "to": { "type": "string", "minLength": 1 },
+          "role": { "type": "string", "minLength": 1 },
+          "condition": { "type": "string" },
+          "rationale": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "orgPolicies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["constraint", "setting"],
+        "properties": {
+          "constraint": { "type": "string", "minLength": 1 },
+          "setting": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "acceptanceCriteria": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "criterion", "enforcedBy"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^AC-ISO-\\d+$" },
+          "criterion": { "type": "string", "minLength": 1 },
+          "enforcedBy": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "threatRefs": { "type": "array", "items": { "type": "string", "pattern": "^T-\\d{2}$" } }
+        }
+      }
+    }
+  }
+}

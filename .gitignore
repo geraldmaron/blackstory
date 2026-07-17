@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.uv/
+
+# Build
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+coverage/
+.turbo/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+!.env.1password
+*.pem
+credentials.json
+service-account*.json
+
+# Terraform
+**/.terraform/
+*.tfplan
+.wif.tfplan
+
+# IDE / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Emulators / local data
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+*.log
+tmp/
+.local/
+
+# Docker volumes
+infra/database/data/
+
+# SQL Connect local emulator / generated SDK churn
+infra/database/sql-connect/dataconnect/.dataconnect/
+packages/data-access/generated/*/
+!packages/data-access/generated/README.md
