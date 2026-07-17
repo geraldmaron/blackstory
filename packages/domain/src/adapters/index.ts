@@ -77,3 +77,8 @@ export {
 
 export * from './wikimedia/index.js';
 export * from './federal/index.js';
+
+// BB-073: community discovery adapters wave 1 (RSS/Atom, Internet Archive + Wayback SPN, DPLA v2).
+export * from './rss/index.js';
+export * from './internet-archive/index.js';
+export * from './dpla/index.js';

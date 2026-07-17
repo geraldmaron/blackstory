@@ -2,7 +2,7 @@
  * Discovery candidate deduplication — merge duplicates without losing provenance (BB-039).
  */
 import { contentHashesEqual } from '../provenance/hashes.js';
-import type { DiscoveryCandidateIdentity, DiscoveryCandidateRecord, SourceReference } from './types.js';
+import type { DiscoveryCandidateRecord, SourceReference } from './types.js';
 
 function uniqueSourceReferences(
   references: readonly SourceReference[],

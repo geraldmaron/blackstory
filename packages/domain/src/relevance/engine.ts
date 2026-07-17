@@ -21,10 +21,11 @@ import type {
   RelevanceAssessment,
   RelevanceGateResult,
 } from './types.js';
+import type { DiscoveryCandidateRecord } from '../discovery/types.js';
 
 export type EvaluateRelevanceOptions = EvaluateRelevanceInput & {
   readonly policy?: ProductConstitution;
-  readonly candidatesById?: ReadonlyMap<string, import('../discovery/types.js').DiscoveryCandidateRecord>;
+  readonly candidatesById?: ReadonlyMap<string, DiscoveryCandidateRecord>;
 };
 
 function finalizeIncludeEvidenceGate(
@@ -87,7 +88,7 @@ export function evaluateCandidateRelevance(
     policy,
   });
 
-  let provisional = deriveProvisionalDecision({
+  const provisional = deriveProvisionalDecision({
     candidate: input.candidate,
     compositeScore,
     gates,

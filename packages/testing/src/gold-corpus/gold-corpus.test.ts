@@ -53,7 +53,7 @@ describe('versioned gold corpus', () => {
   it('contains 100–200 unique adjudicated examples and every required category', () => {
     assert.equal(corpus.schemaVersion, 'gold-corpus.v1');
     assert.match(corpus.corpusVersion, /^\d+\.\d+\.\d+$/u);
-    assert.equal(corpus.examples.length, 120);
+    assert.equal(corpus.examples.length, 125);
     assert.equal(new Set(corpus.examples.map(({ id }) => id)).size, corpus.examples.length);
     for (const category of requiredCategories) {
       assert.ok(

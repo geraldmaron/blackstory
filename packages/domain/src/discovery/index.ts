@@ -93,3 +93,25 @@ export {
 } from './ingestion.js';
 
 export { runDiscoveryCampaign, type RunDiscoveryCampaignInput } from './pipeline.js';
+
+// BB-073: graylist recall lane — below-threshold candidates parked with disposition, never
+// silently dropped, queryable for later corroboration.
+export {
+  GRAYLIST_SCHEMA_VERSION,
+  GRAYLIST_DISPOSITIONS,
+  GRAYLIST_ENTRY_STATUSES,
+  type GraylistDisposition,
+  type GraylistEntryStatus,
+  type GraylistEntry,
+  type GraylistStore,
+  createInMemoryGraylistStore,
+  shouldPark,
+  deriveGraylistDisposition,
+  corroborationKeyFor,
+  buildGraylistEntry,
+  parkCandidate,
+  queryGraylistByCorroborationKey,
+  listGraylistByDisposition,
+  promoteGraylistEntry,
+  archiveGraylistEntry,
+} from './graylist.js';

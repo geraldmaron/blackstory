@@ -178,6 +178,88 @@
   font-size: 0.8125rem;
 }
 
+/*
+ * MapExplorer (BB-070): real geographic map + accessible legend. The canvas
+ * is always the dark/desaturated "archive of record" register regardless of
+ * the surrounding site theme (see docs/adr/ADR-013-map-stack.md) — it is a
+ * fixed editorial choice, not a light/dark theme variant, the same way a
+ * printed archival map insert doesn't change color with the page around it.
+ */
+.bb-map-explorer {
+  display: grid;
+  gap: var(--bb-space-4);
+  margin: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 64rem) {
+  .bb-map-explorer {
+    grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
+    align-items: start;
+  }
+}
+
+.bb-map-explorer__canvas {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: var(--bb-border-width) solid var(--bb-border-strong);
+  border-radius: var(--bb-radius-md);
+  background: #0a0a0a;
+}
+
+.bb-map-explorer__legend {
+  display: grid;
+  gap: var(--bb-space-2);
+  padding: var(--bb-space-4);
+  border: var(--bb-border-width) solid var(--bb-border);
+  border-radius: var(--bb-radius-md);
+  background: var(--bb-surface);
+  color: var(--bb-ink);
+}
+
+.bb-map-explorer__legend-title {
+  margin: 0;
+  font-family: var(--bb-font-display);
+  font-size: 1rem;
+}
+
+.bb-map-explorer__legend-subtitle {
+  margin: var(--bb-space-2) 0 0;
+  font-family: var(--bb-font-display);
+  font-size: 0.875rem;
+}
+
+.bb-map-explorer__caption,
+.bb-map-explorer__summary {
+  margin: 0;
+  color: var(--bb-ink-subtle);
+  font-family: var(--bb-font-sans);
+  font-size: 0.8125rem;
+}
+
+.bb-map-explorer__feature-list,
+.bb-map-explorer__state-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--bb-space-1);
+  max-height: 16rem;
+  overflow-y: auto;
+  font-family: var(--bb-font-sans);
+  font-size: 0.8125rem;
+}
+
+.bb-map-explorer__feature-name {
+  color: var(--bb-ink);
+  font-weight: 600;
+}
+
+.bb-map-explorer__feature-meta {
+  color: var(--bb-ink-subtle);
+}
+
 .bb-result-list {
   list-style: none;
   margin: 0;

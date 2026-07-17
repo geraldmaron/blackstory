@@ -7,12 +7,15 @@
     "build": "next build",
     "start": "next start --port 3048",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/lib/runtime-hardening/query-normalization.test.ts src/lib/runtime-hardening/runtime-hardening.test.ts src/lib/web-security/sanitize.test.ts src/lib/web-security/redirects.test.ts src/lib/web-security/web-security.test.ts",
+    "test": "node --conditions development --import tsx --test src/lib/runtime-hardening/query-normalization.test.ts src/lib/runtime-hardening/runtime-hardening.test.ts src/lib/web-security/sanitize.test.ts src/lib/web-security/redirects.test.ts src/lib/web-security/web-security.test.ts src/app/submit/lead-intake.test.ts src/app/submit/rate-limit-guard.test.ts src/app/submit/app-check-guard.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
     "@black-book/domain": "workspace:*",
+    "@black-book/firebase": "workspace:*",
+    "@black-book/security": "workspace:*",
     "@black-book/ui": "workspace:*",
+    "firebase": "^11.10.0",
     "maplibre-gl": "^5.24.0",
     "next": "^15.4.2",
     "react": "^19.1.0",

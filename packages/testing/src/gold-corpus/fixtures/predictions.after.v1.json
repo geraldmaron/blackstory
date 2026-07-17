@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gold-predictions.v1",
   "algorithmVersion": "policy.v2-after",
-  "corpusVersion": "1.0.0",
+  "corpusVersion": "1.1.0",
   "generatedAt": "2026-07-17T00:00:00.000Z",
   "predictions": [
     {
@@ -1018,6 +1018,49 @@
       "citationEntailed": false,
       "entityResolution": "match",
       "resolvedEntityId": "entity-gc-120"
+    },
+    {
+      "exampleId": "gc-121",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.1,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-121"
+    },
+    {
+      "exampleId": "gc-122",
+      "relevance": "include",
+      "publish": false,
+      "confidence": 0.1,
+      "citationEntailed": false,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-122"
+    },
+    {
+      "exampleId": "gc-123",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.1,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-124",
+      "relevance": "supporting_context",
+      "publish": false,
+      "confidence": 0.1,
+      "citationEntailed": false,
+      "entityResolution": "review_required"
+    },
+    {
+      "exampleId": "gc-125",
+      "relevance": "include",
+      "publish": true,
+      "confidence": 0.9,
+      "citationEntailed": true,
+      "entityResolution": "match",
+      "resolvedEntityId": "entity-gc-125"
     }
   ]
 }

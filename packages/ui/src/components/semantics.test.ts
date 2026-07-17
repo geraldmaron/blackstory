@@ -10,6 +10,7 @@ import { Citation } from '../components/Citation.tsx';
 import { Confidence } from '../components/Confidence.tsx';
 import { EmptyState } from '../components/EmptyState.tsx';
 import { MapFrame } from '../components/MapFrame.tsx';
+import { MapExplorer } from '../components/MapExplorer.tsx';
 import { Notice } from '../components/Notice.tsx';
 import { ResultList } from '../components/ResultList.tsx';
 import { Timeline } from '../components/Timeline.tsx';
@@ -58,6 +59,29 @@ test('MapFrame provides accessible name including pin labels', () => {
   );
   assert.match(html, /role="img"/);
   assert.match(html, /School site/);
+});
+
+test('MapExplorer renders an accessible feature legend independent of the map canvas', () => {
+  const html = renderToStaticMarkup(
+    createElement(MapExplorer, {
+      title: 'National presence map',
+      caption: 'Public precision only.',
+      features: [
+        { id: 'e1', displayName: 'Seed Historical Place', kind: 'place', precision: 'city', statePostalCode: 'DC' },
+      ],
+      stateAggregates: [{ stateName: 'District of Columbia', statePostalCode: 'DC', count: 1 }],
+    }),
+  );
+  assert.match(html, /Seed Historical Place/);
+  assert.match(html, /aria-hidden="true"/);
+  assert.match(html, /District of Columbia: 1/);
+});
+
+test('MapExplorer summarizes zero-feature state without erroring', () => {
+  const html = renderToStaticMarkup(
+    createElement(MapExplorer, { title: 'Empty map', features: [] }),
+  );
+  assert.match(html, /0 locations shown/);
 });
 
 test('ResultList links expose headings and summaries', () => {

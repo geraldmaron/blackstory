@@ -53,8 +53,8 @@ test('runRetrievalEval against the mock provider produces real, recorded recall@
   const result = await runRetrievalEval(corpus, provider, { kValues: [5, 10] });
 
   assert.equal(result.corpusVersion, corpus.corpusVersion);
-  assert.equal(result.documentCount, 120);
-  assert.equal(result.queryCount, 120);
+  assert.equal(result.documentCount, 125);
+  assert.equal(result.queryCount, 125);
   assert.equal(result.modelUsed, 'mock-deterministic-embedding');
 
   for (const k of [5, 10]) {

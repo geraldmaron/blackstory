@@ -16,7 +16,6 @@ import {
   assertDiscoveryCannotPublish,
   areDuplicateCandidates,
   createDiscoveryCampaignConfig,
-  extractGeographicHints,
   hashCandidateContent,
   ingestApiCandidate,
   ingestBulkCandidates,

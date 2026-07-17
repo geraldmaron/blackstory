@@ -3,3 +3,4 @@
  */
 export * from './calibration.js';
 export * from './engine.js';
+export * from './sybil-signals.js';
