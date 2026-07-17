@@ -7,7 +7,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "start": "node dist/index.js",
-    "test": "node --conditions development --import tsx --test src/index.test.ts src/rate-limits.test.ts src/search-guardrails.test.ts",
+    "test": "node --conditions development --import tsx --test src/index.test.ts src/rate-limits.test.ts src/search-guardrails.test.ts src/vector-search-guardrails.test.ts src/vector-search-kill-switch.test.ts src/vector-search-endpoint.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

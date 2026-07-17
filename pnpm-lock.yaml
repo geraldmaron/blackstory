@@ -35,6 +35,9 @@ importers:
       '@black-book/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@black-book/operator-cli':
+        specifier: workspace:*
+        version: link:../../packages/operator-cli
       '@black-book/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -347,6 +350,9 @@ importers:
       '@black-book/security':
         specifier: workspace:*
         version: link:../security
+      firebase-admin:
+        specifier: ^13.4.0
+        version: 13.10.0
     devDependencies:
       '@black-book/typescript-config':
         specifier: workspace:^

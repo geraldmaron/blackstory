@@ -7,3 +7,5 @@ export * from './load.js';
 export * from './metrics.js';
 export * from './report.js';
 export * from './types.js';
+export * from './retrieval-embedding.js';
+export * from './retrieval-eval.js';

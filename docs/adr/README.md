@@ -31,6 +31,7 @@ Formal decisions for Black Book platform topology, data, deployment, and securit
 | [ADR-011](./ADR-011-firestore-system-of-record.md) | Firestore as system of record (Cloud SQL deferred) | Accepted |
 | [ADR-012](./ADR-012-production-environment-resplit.md) | Production environment re-split (multi-project isolation) | Accepted (supersedes D-013; not yet applied — see BB-079) |
 | [ADR-013](./ADR-013-map-stack.md) | Map stack: MapLibre GL JS, PMTiles/MapTiler tile strategy, dark archive basemap | Accepted (demo-level integration; release-activation wiring pending — see BB-051) |
+| [ADR-014](./ADR-014-vector-search.md) | Vector search: embedding pipeline and Firestore native KNN | Accepted (on-write/research-pipeline wiring pending — see BB-072) |
 
 ## Security boundary set (do not expand)
 
