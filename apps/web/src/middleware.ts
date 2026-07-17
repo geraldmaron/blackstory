@@ -19,5 +19,7 @@ export const config = {
     '/methodology',
     '/topics',
     '/corrections',
+    '/submit',
+    '/submit/api',
   ],
 };
