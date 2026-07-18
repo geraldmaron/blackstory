@@ -126,6 +126,11 @@
 .bp-explore-stage {
   position: relative;
   z-index: 1;
+  /* Re-declared INSIDE the data-theme="dark" stamp: body's own `color:
+     var(--bp-ink)` resolves at body scope (reader theme) and inherits as a
+     concrete value — without this line, unstyled text in the cockpit would
+     arrive ink-on-ink in light theme. */
+  color: var(--bp-ink);
 }
 
 .bp-explore-stage__notice,

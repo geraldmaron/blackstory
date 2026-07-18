@@ -100,3 +100,29 @@ export function buildExploreFacetOptions(features: readonly ExploreMapFeature[])
     ),
   };
 }
+
+/** Earliest era-bucket start year for chronological ordering; undated records sort last. */
+function earliestEraYear(feature: ExploreMapFeature): number {
+  let earliest = Number.POSITIVE_INFINITY;
+  for (const bucket of feature.properties.eraBuckets) {
+    const year = Number.parseInt(bucket, 10);
+    if (Number.isFinite(year) && year < earliest) earliest = year;
+  }
+  return earliest;
+}
+
+/**
+ * Deterministic reading order for the synchronized list (cognitive-accessibility law:
+ * a list's order must be inferable at a glance, never arbitrary source order):
+ * chronological by earliest documented era, undated records last, ties alphabetical.
+ */
+export function sortFeaturesForList(
+  features: readonly ExploreMapFeature[],
+): readonly ExploreMapFeature[] {
+  return [...features].sort((a, b) => {
+    const eraA = earliestEraYear(a);
+    const eraB = earliestEraYear(b);
+    if (eraA !== eraB) return eraA - eraB;
+    return a.properties.displayName.localeCompare(b.properties.displayName);
+  });
+}

@@ -84,12 +84,14 @@ export function HistoryGraphPanel({
                       )}
                       aria-pressed={isSelected}
                       aria-expanded={isSelected}
-                      onClick={() => onSelectNode?.(node.entityId)}
+                      {...(onSelectNode
+                        ? { onClick: () => onSelectNode(node.entityId) }
+                        : {})}
                     >
                       <span className="bp-history-graph__node-name">{node.displayName}</span>
                       <span className="bp-mono bp-history-graph__node-status">{node.statusLabel}</span>
                     </button>
-                    <a className="bp-cta bp-cta--ghost bp-history-graph__node-link" href={node.href}>
+                    <a className="bp-cta bp-cta--quiet bp-history-graph__node-link" href={node.href}>
                       Open record
                     </a>
                   </div>
@@ -107,7 +109,9 @@ export function HistoryGraphPanel({
                                 selectedEdgeId === edge.edgeId && 'bp-history-graph__edge-button--selected',
                               )}
                               aria-pressed={selectedEdgeId === edge.edgeId}
-                              onClick={() => onSelectEdge?.(edge.edgeId)}
+                              {...(onSelectEdge
+                                ? { onClick: () => onSelectEdge(edge.edgeId) }
+                                : {})}
                             >
                               {edge.sentence}
                               <span className="bp-mono">

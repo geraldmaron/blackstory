@@ -14,7 +14,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FilterBar, Notice } from '@blap/ui';
+import { Notice } from '@blap/ui';
 import { US_CONUS_BOUNDS, findUsStateByPostalCode } from '@blap/domain/map/geography';
 import { HistoryEdgePanel } from '../../../components/history/HistoryEdgePanel';
 import { DensityLayerToggle } from '../../../components/map-experience/DensityLayerToggle';
@@ -30,7 +30,11 @@ import {
   type ExploreViewState,
   type ExploreViewport,
 } from '../../../lib/map-experience/url-state';
-import { applyExploreFilters } from '../../../lib/map-experience/filters';
+import {
+  applyExploreFilters,
+  sortFeaturesForList,
+  type ExploreFilterState,
+} from '../../../lib/map-experience/filters';
 import { useMapStage } from '../MapStage';
 import { pickExploreEdgeSlice } from './explore-edge-catalog';
 import type { ExploreViewModel } from './explore-view-model';
@@ -113,43 +117,14 @@ function resolveEdge(
   return {};
 }
 
-function facetFields(view: ExploreViewModel) {
-  const { facetOptions, viewState } = view;
-  return [
-    {
-      id: 'explore-kind',
-      name: 'kind',
-      label: 'Kind',
-      type: 'select' as const,
-      defaultValue: viewState.filters.kind,
-      options: facetOptions.kind,
-    },
-    {
-      id: 'explore-era',
-      name: 'era',
-      label: 'Era',
-      type: 'select' as const,
-      defaultValue: viewState.filters.era,
-      options: facetOptions.era,
-    },
-    {
-      id: 'explore-theme',
-      name: 'theme',
-      label: 'Theme',
-      type: 'select' as const,
-      defaultValue: viewState.filters.theme,
-      options: facetOptions.theme,
-    },
-    {
-      id: 'explore-confidence',
-      name: 'confidence',
-      label: 'Confidence',
-      type: 'select' as const,
-      defaultValue: viewState.filters.confidence,
-      options: facetOptions.confidence,
-    },
-  ];
-}
+/** Facet render order matches how people actually narrow: what (kind) → when
+ * (era) → about (theme) → how solid (confidence). One row each, auto-applying. */
+const FACET_ROWS: readonly { readonly key: keyof ExploreFilterState; readonly label: string }[] = [
+  { key: 'kind', label: 'Kind' },
+  { key: 'era', label: 'Era' },
+  { key: 'theme', label: 'Theme' },
+  { key: 'confidence', label: 'Confidence' },
+];
 
 export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const router = useRouter();
@@ -212,6 +187,23 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     },
     [pushViewState, view.allFeatures, view.edgeLineCatalog],
   );
+
+  // Facets apply the moment they change — no filter card, no Apply button
+  // (v5.1: pill selects inline with the content on primary surfaces).
+  const handleFilterChange = useCallback(
+    (key: keyof ExploreFilterState, value: string) => {
+      commitViewState(
+        mergeViewState(view.viewState, {
+          filters: { ...view.viewState.filters, [key]: value },
+        }),
+      );
+    },
+    [commitViewState, view.viewState],
+  );
+
+  // Deterministic reading order for the accessible list (chronological, undated
+  // last) — the GL canvas keeps source order; paint order is not reading order.
+  const sortedListFeatures = useMemo(() => sortFeaturesForList(filteredFeatures), [filteredFeatures]);
 
   // Every source-data-affecting slice of view state patches the shared canvas — never a style
   // rebuild the surface calls into (MapStage.patchData rebuilds the style internally).
@@ -438,7 +430,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const selectedStateName = view.viewState.state ? findUsStateByPostalCode(view.viewState.state)?.name : undefined;
 
   const listProps = {
-    features: filteredFeatures,
+    features: sortedListFeatures,
     labelledBy: 'explore-results-heading',
     ...(view.viewState.selected ? { selectedId: view.viewState.selected } : {}),
     ...(stage.mapAvailable ? { onSelect: handleSelect } : {}),
@@ -459,35 +451,28 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       ) : null}
 
       <div className="bp-explore-stage__filters" ref={filterRegionRef} tabIndex={-1} aria-label="Map filters">
-        <details className="bp-explore-stage__disclosure" open>
-          <summary className="bp-explore-stage__disclosure-summary">Filters</summary>
-          <FilterBar
-            method="get"
-            action="/explore"
-            legend="Filter documented records"
-            fields={facetFields(view)}
-            actions={
-              <>
-                {view.viewState.density ? <input type="hidden" name="density" value="1" /> : null}
-                {view.viewState.lines ? <input type="hidden" name="lines" value="1" /> : null}
-                {view.viewState.decade ? <input type="hidden" name="decade" value={view.viewState.decade} /> : null}
-                {view.viewState.edge ? <input type="hidden" name="edge" value={view.viewState.edge} /> : null}
-                {view.viewState.state ? <input type="hidden" name="state" value={view.viewState.state} /> : null}
-                {view.viewState.viewport ? (
-                  <>
-                    <input type="hidden" name="lat" value={view.viewState.viewport.lat.toFixed(4)} />
-                    <input type="hidden" name="lng" value={view.viewState.viewport.lng.toFixed(4)} />
-                    <input type="hidden" name="zoom" value={view.viewState.viewport.zoom.toFixed(2)} />
-                  </>
-                ) : null}
-                {view.viewState.selected ? <input type="hidden" name="selected" value={view.viewState.selected} /> : null}
-                <button type="submit" className="bp-button bp-button--primary">
-                  Apply filters
-                </button>
-              </>
-            }
-          />
-        </details>
+        <p className="bp-explore-stage__panel-title" id="explore-facets-heading">
+          Filters
+        </p>
+        <div className="bp-explore__facets" role="group" aria-labelledby="explore-facets-heading">
+          {FACET_ROWS.map(({ key, label }) => (
+            <label className="bp-pill-select bp-explore__facet" key={key} htmlFor={`explore-${key}`}>
+              <span className="bp-pill-select__label">{label}</span>
+              <select
+                className="bp-pill-select__control"
+                id={`explore-${key}`}
+                value={view.viewState.filters[key]}
+                onChange={(event) => handleFilterChange(key, event.currentTarget.value)}
+              >
+                {view.facetOptions[key].map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
 
         <div className="bp-explore-stage__toolbar">
           <DensityLayerToggle enabled={view.viewState.density} onToggle={handleDensityToggle} />
@@ -544,15 +529,6 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
               </p>
             </div>
           </details>
-          <p className="bp-sans bp-explore__results-count" id="explore-results-heading">
-            {filteredFeatures.length} documented record{filteredFeatures.length === 1 ? '' : 's'}
-            {selectedStateName ? ` in ${selectedStateName}` : ' in view'}
-            {view.viewState.lines
-              ? ` · ${view.edgeLineCollection.features.length} connection${
-                  view.edgeLineCollection.features.length === 1 ? '' : 's'
-                }`
-              : ''}
-          </p>
           {view.viewState.state ? (
             <button type="button" className="bp-button" onClick={handleClearState}>
               Clear state
@@ -562,6 +538,17 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       </div>
 
       <div className="bp-explore-stage__results">
+        {/* The count labels the list it sits above — oldest records first. */}
+        <p className="bp-sans bp-explore__results-count" id="explore-results-heading">
+          {filteredFeatures.length} documented record{filteredFeatures.length === 1 ? '' : 's'}
+          {selectedStateName ? ` in ${selectedStateName}` : ' in view'}
+          {view.viewState.lines
+            ? ` · ${view.edgeLineCollection.features.length} connection${
+                view.edgeLineCollection.features.length === 1 ? '' : 's'
+              }`
+            : ''}
+          {' · oldest first'}
+        </p>
         {view.selectedEdge ? (
           <div className="bp-explore__narrative">
             <HistoryEdgePanel edge={view.selectedEdge} onClose={handleCloseEdge} />

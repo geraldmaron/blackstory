@@ -134,25 +134,100 @@
 
 .bp-explore__narrative {
   max-width: 36rem;
+  padding-bottom: var(--bp-space-4);
+  border-bottom: var(--bp-border-width) solid var(--bp-rule);
 }
 
-.bp-explore-narrative-card {
-  position: relative;
-}
-
-.bp-explore-narrative-card__close {
-  margin-bottom: var(--bp-space-2);
-}
-
-.bp-explore-narrative-card__facts {
+/* —— Narrative card (v5.1 record anatomy) — sits flush inside the ink-glass
+   results panel: no box-in-box, hairlines and labeled facts carry the
+   structure. Same order as every other record surface: kind slug → name →
+   story → labeled facts → tags → precision → one action. ——  */
+.bp-nc {
   display: grid;
-  gap: var(--bp-space-2);
-  margin: var(--bp-space-3) 0;
-  font-family: var(--bp-font-sans);
+  gap: var(--bp-space-3);
 }
 
-/* Fact labels are data slugs — mono register (v5 typography law). */
-.bp-explore-narrative-card__facts dt {
+.bp-nc__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bp-space-3);
+}
+
+.bp-nc__slug {
+  margin: 0;
+  color: var(--bp-accent);
+  font-family: var(--bp-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Close is a quiet instrument key, never a competing pill action. */
+.bp-nc__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  padding: 0;
+  border: var(--bp-border-width) solid var(--bp-border);
+  border-radius: var(--bp-radius-full);
+  background: transparent;
+  color: var(--bp-ink-muted);
+  cursor: pointer;
+  transition:
+    color var(--bp-duration-fast) var(--bp-easing),
+    border-color var(--bp-duration-fast) var(--bp-easing);
+}
+
+.bp-nc__close:hover {
+  color: var(--bp-ink);
+  border-color: var(--bp-border-strong);
+}
+
+.bp-nc__close svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.bp-nc__title {
+  margin: 0;
+  font-family: var(--bp-font-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.bp-nc__story {
+  margin: 0;
+  font-family: var(--bp-font-editorial);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--bp-ink-muted);
+}
+
+/* Labeled facts: label left, value right, one per row — scannable without
+   reading, no inference from position. */
+.bp-nc__facts {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.bp-nc__fact {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: var(--bp-space-3);
+  align-items: baseline;
+  padding: var(--bp-space-2) 0;
+  border-top: var(--bp-border-width) solid var(--bp-rule);
+}
+
+.bp-nc__fact dt {
   font-family: var(--bp-font-mono);
   font-weight: 500;
   font-size: 0.6875rem;
@@ -161,19 +236,65 @@
   color: var(--bp-ink-muted);
 }
 
-.bp-explore-narrative-card__facts dd {
+.bp-nc__fact dd {
+  margin: 0;
+  font-family: var(--bp-font-sans);
+  font-size: 0.875rem;
+}
+
+.bp-nc__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bp-space-2);
   margin: 0;
 }
 
-.bp-explore-narrative-card__precision {
+.bp-nc__precision {
+  margin: 0;
   color: var(--bp-ink-subtle);
-  font-size: 0.875rem;
+  font-family: var(--bp-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.bp-nc__action {
+  justify-self: start;
 }
 
 .bp-explore__list-panel {
   display: grid;
   gap: var(--bp-space-3);
   align-content: start;
+}
+
+/* —— Compact facet rows (v5.1) — label left, pill select right, one row per
+   facet, auto-applying. Replaces the boxed FilterBar + Apply button. ——  */
+.bp-explore-stage__panel-title {
+  margin: 0;
+  font-family: var(--bp-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bp-ink-muted);
+}
+
+.bp-explore__facets {
+  display: grid;
+  gap: var(--bp-space-1);
+}
+
+.bp-explore__facet {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--bp-space-2);
+}
+
+.bp-explore__facet .bp-pill-select__control {
+  width: 100%;
+  min-height: 2.5rem;
+  font-size: 0.8125rem;
 }
 
 .bp-explore__results-count {

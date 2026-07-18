@@ -1392,6 +1392,90 @@
   border-radius: var(--bp-radius-sm);
 }
 
+/* —— At a glance — summary before story (cognitive-accessibility law).
+   Every record page opens with the whole picture as labeled facts: a reader
+   who never scrolls still leaves knowing what/where/when/how-solid. A framed
+   box is deliberate here — this IS a discrete object. ——  */
+.bp-at-a-glance {
+  margin-top: var(--bp-space-6);
+  padding: var(--bp-space-5) var(--bp-space-6);
+  border: var(--bp-border-width) solid var(--bp-border);
+  border-radius: var(--bp-radius-md);
+  background: var(--bp-surface-raised);
+}
+
+.bp-at-a-glance__title {
+  display: flex;
+  align-items: center;
+  gap: var(--bp-space-3);
+  margin: 0 0 var(--bp-space-2);
+  color: var(--bp-accent);
+  font-family: var(--bp-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.bp-at-a-glance__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 var(--bp-space-10);
+  margin: 0;
+}
+
+.bp-at-a-glance__row {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: var(--bp-space-3);
+  align-items: baseline;
+  padding: var(--bp-space-2) 0;
+  border-top: var(--bp-border-width) solid var(--bp-rule);
+}
+
+.bp-at-a-glance__row dt {
+  font-family: var(--bp-font-mono);
+  font-weight: 500;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bp-ink-muted);
+}
+
+.bp-at-a-glance__row dd {
+  margin: 0;
+  font-family: var(--bp-font-sans);
+  font-size: 0.9375rem;
+}
+
+@media (min-width: 48rem) {
+  .bp-at-a-glance__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* —— Record sections — chunked rooms with an automatic index numeral.
+   The counter lives on the container so conditional sections never leave
+   gaps in the numbering. ——  */
+.bp-entity-sections {
+  counter-reset: bp-rec;
+}
+
+.bp-entity-sections > .bp-record-section {
+  counter-increment: bp-rec;
+  padding-top: var(--bp-space-6);
+  border-top: var(--bp-border-width) solid var(--bp-rule);
+}
+
+.bp-kicker-index::before {
+  content: counter(bp-rec, decimal-leading-zero);
+  margin-right: var(--bp-space-2);
+  font-family: var(--bp-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--bp-ink-subtle);
+}
+
 /* —— Feature grid (topics) ——  */
 .bp-feature-grid {
   display: grid;

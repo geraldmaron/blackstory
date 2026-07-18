@@ -1,12 +1,15 @@
 /**
- * Narrative off-ramp card for a single selected map point: every point opens a card with
- * name, era, one-line story, evidence count, and confidence affordance linking to the entity
- * page. Purely presentational and SSR-render-safe — the map canvas and the synchronized list both
- * open the same card for the same feature, so the two experiences stay observably in sync.
+ * Narrative off-ramp card for a single selected map point. Anatomy follows the
+ * cognitive-accessibility law (design-direction-v5 §v5.1): one consistent record
+ * order everywhere — kind slug → name → one-line story → labeled facts → tags →
+ * precision note → single action. Every fact carries a literal label (Era,
+ * Evidence, Confidence, Status); nothing is inferred from position or glued
+ * together. Close is a small icon key in the top corner, not a competing action.
+ * Purely presentational and SSR-render-safe — the map canvas and the
+ * synchronized list both open the same card for the same feature.
  */
 import React from 'react';
 import Link from 'next/link';
-import { Card } from '@blap/ui';
 import { CONFIDENCE_TIER_GLYPH } from '../../lib/map-experience/dignity-style';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 
@@ -22,7 +25,7 @@ export type NarrativeCardProps = {
 function eraLabel(eraBuckets: readonly string[]): string {
   if (eraBuckets.length === 0) return 'Undated';
   if (eraBuckets.length === 1) return eraBuckets[0]!;
-  return `${eraBuckets[0]} \u2013 ${eraBuckets[eraBuckets.length - 1]}`;
+  return `${eraBuckets[0]} – ${eraBuckets[eraBuckets.length - 1]}`;
 }
 
 function radiusAffordanceLabel(feature: ExploreMapFeature): string {
@@ -32,7 +35,7 @@ function radiusAffordanceLabel(feature: ExploreMapFeature): string {
   }
   const km = radiusMeters / 1000;
   const distance = km >= 1 ? `${km.toFixed(km < 10 ? 1 : 0)} km` : `${Math.round(radiusMeters)} m`;
-  return `Shown at ${geoPrecisionTier} precision \u2014 the marker represents a \u00b1${distance} area, not an exact address.`;
+  return `Shown at ${geoPrecisionTier} precision — the marker represents a ±${distance} area, not an exact address.`;
 }
 
 export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
@@ -40,31 +43,59 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
   const glyph = CONFIDENCE_TIER_GLYPH[properties.confidenceTier] ?? CONFIDENCE_TIER_GLYPH.unrated;
 
   return (
-    <Card
-      title={properties.displayName}
-      meta={
-        <>
-          <span className="bp-mono">{properties.kind}</span>
-          <span className="bp-mono">{eraLabel(properties.eraBuckets)}</span>
-        </>
-      }
-      className="bp-explore-narrative-card"
-    >
-      {onClose ? (
-        <button
-          type="button"
-          className="bp-button bp-button--secondary bp-explore-narrative-card__close"
-          onClick={onClose}
-          aria-label={`Close ${properties.displayName} card`}
-        >
-          Close
-        </button>
-      ) : null}
+    <article className="bp-nc" aria-label={properties.displayName}>
+      <div className="bp-nc__top">
+        <p className="bp-nc__slug">{properties.kind}</p>
+        {onClose ? (
+          <button
+            type="button"
+            className="bp-nc__close"
+            onClick={onClose}
+            aria-label={`Close ${properties.displayName} card`}
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path
+                d="M4 4l8 8M12 4l-8 8"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        ) : null}
+      </div>
 
-      <p className="bp-sans">{properties.oneLineStory}</p>
+      <h3 className="bp-nc__title">{properties.displayName}</h3>
+      <p className="bp-nc__story">{properties.oneLineStory}</p>
+
+      <dl className="bp-nc__facts">
+        <div className="bp-nc__fact">
+          <dt>Era</dt>
+          <dd>{eraLabel(properties.eraBuckets)}</dd>
+        </div>
+        <div className="bp-nc__fact">
+          <dt>Evidence</dt>
+          <dd>
+            {properties.evidenceCount} accepted claim{properties.evidenceCount === 1 ? '' : 's'}
+          </dd>
+        </div>
+        <div className="bp-nc__fact">
+          <dt>Confidence</dt>
+          <dd>
+            <span aria-hidden="true">{glyph}</span>{' '}
+            {properties.confidenceTier === 'unrated' ? 'Unrated' : `${properties.confidenceTier} confidence`}
+          </dd>
+        </div>
+        {properties.status ? (
+          <div className="bp-nc__fact">
+            <dt>Status</dt>
+            <dd>{properties.status}</dd>
+          </div>
+        ) : null}
+      </dl>
 
       {properties.topicTags.length > 0 ? (
-        <p className="bp-explore-narrative-card__tags" aria-label="Topics">
+        <p className="bp-nc__tags" aria-label="Topics">
           {properties.topicTags.slice(0, 2).map((tag) => (
             <Link
               key={tag}
@@ -77,33 +108,11 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         </p>
       ) : null}
 
-      <dl className="bp-explore-narrative-card__facts">
-        <div>
-          <dt>Evidence</dt>
-          <dd>
-            {properties.evidenceCount} accepted claim{properties.evidenceCount === 1 ? '' : 's'}
-          </dd>
-        </div>
-        <div>
-          <dt>Confidence</dt>
-          <dd>
-            <span aria-hidden="true">{glyph}</span>{' '}
-            {properties.confidenceTier === 'unrated' ? 'Unrated' : `${properties.confidenceTier} confidence`}
-          </dd>
-        </div>
-        {properties.status ? (
-          <div>
-            <dt>Status</dt>
-            <dd>{properties.status}</dd>
-          </div>
-        ) : null}
-      </dl>
+      <p className="bp-nc__precision">{radiusAffordanceLabel(feature)}</p>
 
-      <p className="bp-sans bp-explore-narrative-card__precision">{radiusAffordanceLabel(feature)}</p>
-
-      <a className="bp-cta bp-cta--ink" href={properties.href}>
+      <a className="bp-cta bp-cta--copper bp-nc__action" href={properties.href}>
         Open full record
       </a>
-    </Card>
+    </article>
   );
 }

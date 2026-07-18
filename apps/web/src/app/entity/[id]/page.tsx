@@ -64,7 +64,16 @@ export default async function EntityPage({ params }: EntityPageProps) {
 
   const framing = deriveHistoricalFraming(entity);
   const framingLabel = framing === 'present_day' ? 'Present-day record' : 'Historical record';
-  const whyThisAppears = buildWhyThisAppearsForEntity(entity);
+  // Fail-closed, not fail-crashed: the domain layer throws when a record lacks
+  // a substantiated notability basis (BB-090). That withholds the explanation —
+  // it must never take the whole record page down with it.
+  const whyThisAppears = (() => {
+    try {
+      return buildWhyThisAppearsForEntity(entity);
+    } catch {
+      return undefined;
+    }
+  })();
   const evidenceClaims = toEvidenceClaimInputs(entity.claims);
   const relatedFacts = buildCompactFactViewsForEntity(entity.id, seedFactsForEntity(entity.id));
   const geoAnchor = geoAnchorFor(entity.id);
@@ -89,6 +98,42 @@ export default async function EntityPage({ params }: EntityPageProps) {
         <EntityTopicTags entity={entity} />
       </header>
 
+      {/* Summary before story (v5.1 cognitive-accessibility law): the whole
+          record as labeled facts, before any prose asks for sustained reading. */}
+      <section className="bp-at-a-glance" aria-label="At a glance">
+        <p className="bp-at-a-glance__title">At a glance</p>
+        <dl className="bp-at-a-glance__grid">
+          <div className="bp-at-a-glance__row">
+            <dt>Kind</dt>
+            <dd>{entity.kind}</dd>
+          </div>
+          <div className="bp-at-a-glance__row">
+            <dt>Where</dt>
+            <dd>{entity.jurisdictionLabel}</dd>
+          </div>
+          <div className="bp-at-a-glance__row">
+            <dt>Record type</dt>
+            <dd>{framingLabel}</dd>
+          </div>
+          <div className="bp-at-a-glance__row">
+            <dt>Evidence</dt>
+            <dd>
+              {entity.claims.length} accepted claim{entity.claims.length === 1 ? '' : 's'}
+            </dd>
+          </div>
+          <div className="bp-at-a-glance__row">
+            <dt>Coverage</dt>
+            <dd>{entity.researchCoverage}</dd>
+          </div>
+          <div className="bp-at-a-glance__row">
+            <dt>Location shown</dt>
+            <dd>
+              {entity.locationLabel} ({entity.locationPrecision} precision)
+            </dd>
+          </div>
+        </dl>
+      </section>
+
       <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
         {resolved.source !== 'live' ? <SeedDataNotice compact /> : null}
         <HowToReadThisRecord />
@@ -98,19 +143,23 @@ export default async function EntityPage({ params }: EntityPageProps) {
         ) : null}
 
         <div className="bp-entity-layout">
-          <div className="bp-stack">
-            <section aria-labelledby="relevance-heading">
-              <p className="bp-section__kicker">Relevance</p>
+          <div className="bp-stack bp-entity-sections">
+            <section className="bp-record-section" aria-labelledby="relevance-heading">
+              <p className="bp-section__kicker"><span className="bp-kicker-index" aria-hidden="true" />Relevance</p>
               <h2 className="bp-section__title" id="relevance-heading">
                 Why this appears
               </h2>
               <div style={{ marginTop: 'var(--bp-space-4)' }}>
-                <WhyThisAppears result={whyThisAppears} instanceId={`entity-${entity.id}-why`} />
+                {whyThisAppears ? (
+                  <WhyThisAppears result={whyThisAppears} instanceId={`entity-${entity.id}-why`} />
+                ) : (
+                  <RecordGapNotice kind="relevance" />
+                )}
               </div>
             </section>
 
-            <section aria-labelledby="context-heading">
-              <p className="bp-section__kicker">Context</p>
+            <section className="bp-record-section" aria-labelledby="context-heading">
+              <p className="bp-section__kicker"><span className="bp-kicker-index" aria-hidden="true" />Context</p>
               <h2 className="bp-section__title" id="context-heading">
                 Historical context
               </h2>
@@ -122,8 +171,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
             </section>
 
             {entity.extendedNarrative ? (
-              <section aria-labelledby="further-heading">
-                <p className="bp-section__kicker">Reading</p>
+              <section className="bp-record-section" aria-labelledby="further-heading">
+                <p className="bp-section__kicker"><span className="bp-kicker-index" aria-hidden="true" />Reading</p>
                 <h2 className="bp-section__title" id="further-heading">
                   Further reading
                 </h2>
@@ -131,8 +180,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
               </section>
             ) : null}
 
-            <section aria-labelledby="status-heading">
-              <p className="bp-section__kicker">Status</p>
+            <section className="bp-record-section" aria-labelledby="status-heading">
+              <p className="bp-section__kicker"><span className="bp-kicker-index" aria-hidden="true" />Status</p>
               <h2 className="bp-section__title" id="status-heading">
                 {entity.kind === 'event' ? 'When this happened' : 'Status and history'}
               </h2>
@@ -141,8 +190,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
               </div>
             </section>
 
-            <section aria-labelledby="claims-heading">
-              <p className="bp-section__kicker">Claims</p>
+            <section className="bp-record-section" aria-labelledby="claims-heading">
+              <p className="bp-section__kicker"><span className="bp-kicker-index" aria-hidden="true" />Claims</p>
               <h2 className="bp-section__title" id="claims-heading">
                 Accepted claims
               </h2>
@@ -160,8 +209,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
             </section>
 
             {relatedFacts.length > 0 ? (
-              <section aria-labelledby="facts-heading">
-                <p className="bp-section__kicker">Facts</p>
+              <section className="bp-record-section" aria-labelledby="facts-heading">
+                <p className="bp-section__kicker"><span className="bp-kicker-index" aria-hidden="true" />Facts</p>
                 <h2 className="bp-section__title" id="facts-heading">
                   Related fact records
                 </h2>
@@ -173,8 +222,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
               </section>
             ) : null}
 
-            <section aria-labelledby="timeline-heading">
-              <p className="bp-section__kicker">Chronology</p>
+            <section className="bp-record-section" aria-labelledby="timeline-heading">
+              <p className="bp-section__kicker"><span className="bp-kicker-index" aria-hidden="true" />Chronology</p>
               <h2 className="bp-section__title" id="timeline-heading">
                 Timeline
               </h2>
@@ -191,8 +240,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
               </p>
             </section>
 
-            <section aria-labelledby="related-heading">
-              <p className="bp-section__kicker">More</p>
+            <section className="bp-record-section" aria-labelledby="related-heading">
+              <p className="bp-section__kicker"><span className="bp-kicker-index" aria-hidden="true" />More</p>
               <h2 className="bp-section__title" id="related-heading">
                 Related records
               </h2>
@@ -202,8 +251,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
             </section>
 
             {(entity.continueLearning?.length ?? 0) > 0 ? (
-              <section aria-labelledby="continue-heading">
-                <p className="bp-section__kicker">Continue</p>
+              <section className="bp-record-section" aria-labelledby="continue-heading">
+                <p className="bp-section__kicker"><span className="bp-kicker-index" aria-hidden="true" />Continue</p>
                 <h2 className="bp-section__title" id="continue-heading">
                   Also connected
                 </h2>

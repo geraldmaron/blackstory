@@ -46,6 +46,38 @@ Where anything below contradicts an earlier section of this document, **this sec
 - **Mega footer.** The footer closes with the kit lockup at landmark scale plus the columns —
   the page signs off with the brand, not a fine-print row.
 
+### Cognitive-accessibility law (owner directive 2026-07-18: design for neurodivergent readers)
+
+Binding on every record surface (narrative card, result rows, entity page) and every future
+"modeling" page. These are testable rules, not vibes:
+
+1. **Summary before story.** A record page opens with an "At a glance" block
+   (`.bp-at-a-glance`): the whole record as labeled facts (kind, where, era, evidence,
+   coverage, location precision) before any prose asks for sustained reading. A reader who
+   never scrolls still leaves oriented.
+2. **One record anatomy, everywhere.** Map card, list row, search row, and entity page present
+   the same order: kind slug → name → one-line story → labeled facts → tags → precision →
+   single action. Predictability is the accommodation — no surface invents its own order.
+3. **Labels are literal.** Every fact carries a visible label (Era, Evidence, Confidence,
+   Status) in a `dt/dd` pair. Never bare values glued together ("place1770s – 1850s" was the
+   defect class), never meaning carried by position or color alone.
+4. **Lists declare their order.** Any ranked or sorted listing says how it's ordered in its
+   count line ("106 records · oldest first") and the order is deterministic
+   (`sortFeaturesForList`: chronological, undated last, ties alphabetical).
+5. **Chunk, then rule.** Long pages break into hairline-ruled sections with an automatic index
+   numeral (`.bp-entity-sections` + `.bp-kicker-index`) — a visible "where am I" at every
+   scroll position. Prose blocks stay short; walls of text are a defect.
+6. **One action per chunk.** Each card/section carries at most one primary action; Close is a
+   quiet icon key, never a pill competing with the real action.
+7. **Controls apply themselves.** Facets are labeled pill selects that apply on change —
+   no "Apply" memory burden, no hidden state between choosing and seeing. (No-JS fallbacks
+   live in `<noscript>` GET forms where the surface supports no-JS at all.)
+8. **Motion is opt-out and legible.** Anything that animates on its own has a visible pause
+   key (hero timeline); reduced-motion collapses everything to cuts. Nothing meaningful is
+   hover-only.
+9. **Caps are slugs, not sentences.** All-caps is confined to short mono/sans slugs; body
+   meaning never sets in caps (harder to read for many readers).
+
 Status: canonical UX/UI pattern reference. Supersedes design-direction-v4 §§2.5, 6, 7 (layout,
 surface inventory, pattern law) and every layout decision that shipped under BB-097. Carries
 forward unchanged and still binding from v4: §2 experience principles 0–4, §2b the human bar,

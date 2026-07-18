@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { ExploreMapFeature } from './build-explore-map-source';
-import { applyExploreFilters, buildExploreFacetOptions, DEFAULT_EXPLORE_FILTERS } from './filters';
+import { applyExploreFilters, buildExploreFacetOptions, DEFAULT_EXPLORE_FILTERS, sortFeaturesForList } from './filters';
 
 function feature(overrides: Partial<ExploreMapFeature['properties']>): ExploreMapFeature {
   return {
@@ -76,4 +76,19 @@ test('facet options lead with an "All ___" option and count real occurrences', (
     facets.era.map((option) => option.value),
     ['all', '1950s', '1960s'],
   );
+});
+
+test('sortFeaturesForList orders chronologically by earliest era, undated last, ties alphabetical', () => {
+  const features = [
+    feature({ entityId: 'undated', displayName: 'Undated Hall', eraBuckets: [] }),
+    feature({ entityId: 'newer', displayName: 'Newer School', eraBuckets: ['1960s', '1970s'] }),
+    feature({ entityId: 'older-b', displayName: 'Bethel Church', eraBuckets: ['1840s'] }),
+    feature({ entityId: 'older-a', displayName: 'Avery Institute', eraBuckets: ['1840s', '1900s'] }),
+  ];
+  assert.deepEqual(
+    sortFeaturesForList(features).map((f) => f.properties.entityId),
+    ['older-a', 'older-b', 'newer', 'undated'],
+  );
+  // Input order untouched (pure).
+  assert.equal(features[0]!.properties.entityId, 'undated');
 });
