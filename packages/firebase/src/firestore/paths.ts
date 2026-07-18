@@ -38,6 +38,12 @@ export const FIRESTORE_ROOT = {
   acsCountyProfiles: 'acsCountyProfiles',
   /** ACS 5-year tract estimates (~85k/vintage): county-bounded reads only, never full scans. */
   acsTractProfiles: 'acsTractProfiles',
+  /** FBI UCR agency directory: ORI → county crosswalk, shared by every UCR dataset. */
+  ucrAgencies: 'ucrAgencies',
+  /** FBI hate crime incidents aggregated by county + year (joins on fips5). */
+  hateCrimeCountyYears: 'hateCrimeCountyYears',
+  /** UCR reporting participation by state + year — the coverage denominator. */
+  ucrStateParticipation: 'ucrStateParticipation',
 } as const;
 
 export type FirestoreRootCollection = (typeof FIRESTORE_ROOT)[keyof typeof FIRESTORE_ROOT];

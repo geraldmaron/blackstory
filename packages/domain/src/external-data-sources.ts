@@ -113,6 +113,70 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     notes: 'HOLC residential security grades A–D per neighborhood polygon, 1935–1940 surveys.',
   },
   {
+    id: 'fbi-ucr-hate-crime',
+    displayName: 'FBI UCR Hate Crime Master File (1991–present)',
+    custodian: 'FBI Criminal Justice Information Services (CJIS) Division / UCR Program',
+    homepageUrl: 'https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads',
+    // The CDE serves bulk files through short-lived signed URLs; this is the stable KEY.
+    // Resolve a fresh download URL with:
+    //   GET https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=<this path>
+    dataUrl: 'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/hate-crime/hate_crime.zip',
+    license: {
+      name: 'U.S. government work — public domain (17 U.S.C. §105)',
+      verdict: 'public-domain',
+      notes: 'Cite the FBI UCR Program and the data year; the CDE download is the canonical artifact.',
+    },
+    vintage: 'hate_crime.csv, data years 1991–2024 (265,834 incidents; released 2025-07-09)',
+    geographies: ['county', 'state', 'facility'],
+    cadence: 'annual',
+    checksumSha256: '6d24e053b340e74e62d0fcf8b237ac470f5ccafc908ba661581f99c2daa9d189',
+    registryState: 'disabled',
+    notes:
+      'Incident-level bias-motivated crime reports. Carries agency ORI + state but NO county — ' +
+      'joined to county FIPS via the ucrAgencies crosswalk (FBI agency API + point-in-county). ' +
+      'REPORTING IS VOLUNTARY: absence is a fact about reporting, not safety — always read ' +
+      'beside reportingAgencyCount and fbi-ucr-participation (see ucr-schema.ts module doc).',
+  },
+  {
+    id: 'fbi-ucr-agency-directory',
+    displayName: 'FBI CDE agency directory (ORI → county, coordinates, NIBRS status)',
+    custodian: 'FBI Criminal Justice Information Services (CJIS) Division / UCR Program',
+    homepageUrl: 'https://cde.ucr.cjis.gov/',
+    dataUrl: 'https://cde.ucr.cjis.gov/LATEST/agency/byStateAbbr/{STATE_ABBR}',
+    license: {
+      name: 'U.S. government work — public domain (17 U.S.C. §105)',
+      verdict: 'public-domain',
+    },
+    vintage: 'live API, retrieved 2026-07-18 (19,415 agencies across 53 states/territories)',
+    geographies: ['county', 'facility'],
+    cadence: 'irregular',
+    registryState: 'disabled',
+    notes:
+      'The reusable ORI join key for EVERY UCR dataset (hate crime, LEOKA, cargo theft, ' +
+      'human trafficking — all in the same CDE downloads manifest). Fetched per state; ' +
+      'county assignment resolved by FBI county name where unambiguous, else point-in-county ' +
+      'on the agency coordinates (98.6% of agencies resolve).',
+  },
+  {
+    id: 'fbi-ucr-participation',
+    displayName: 'FBI UCR Program participation (1960–2024)',
+    custodian: 'FBI Criminal Justice Information Services (CJIS) Division / UCR Program',
+    homepageUrl: 'https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads',
+    dataUrl: 'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/ucr/ucr_participation_1960_2024.csv',
+    license: {
+      name: 'U.S. government work — public domain (17 U.S.C. §105)',
+      verdict: 'public-domain',
+    },
+    vintage: 'ucr_participation_1960_2024.csv (state-year coverage)',
+    geographies: ['state'],
+    cadence: 'annual',
+    checksumSha256: 'a0a1a5ea2c31f2b530672c85a4ad1787b4a2abf196b3681b1b23c366002cfab0',
+    registryState: 'disabled',
+    notes:
+      'The coverage denominator that makes every other UCR count interpretable — required ' +
+      'reading beside hate crime totals so a silent state is never mistaken for a safe one.',
+  },
+  {
     id: 'hmda-loan-level',
     displayName: 'HMDA mortgage records (loan-level)',
     custodian: 'Consumer Financial Protection Bureau (CFPB)',

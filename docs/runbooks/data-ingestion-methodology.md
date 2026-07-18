@@ -38,6 +38,14 @@ Black Book. This runbook is the pattern; the census/ACS/Opportunity-Atlas/HOLC i
    sentinels, empty cells, below-reliability estimates) become an omitted field plus an
    entry in `suppressed` — never a stored sentinel value, never a fabricated zero
    (no-false-absence, BB-051).
+5b. **Ingest the coverage denominator with the data.** When a source is voluntarily reported
+   or unevenly collected, the participation/coverage series is not optional context — it is
+   part of the dataset, and a count without it is misleading. UCR hate crime is the worked
+   example: Philadelphia County (630k Black residents) shows 4 reporting agencies and 185
+   anti-Black incidents 2020–2024 while Monmouth County NJ (41k Black residents) shows 33
+   agencies and 442 — a reporting-coverage artifact, not a finding about either place.
+   Store the per-record reporting count AND the source's own participation table, and keep
+   the collection client-closed until a surface renders them together.
 6. **Provenance quartet on every doc.** `{source, sourceUrl, retrievedAt, contentHash}` per
    `public-numeric-policy.ts` category 3; `sourceUrl` is always keyless. Bulk-derived docs
    also carry `datasetChecksum` and `license`.
@@ -107,6 +115,7 @@ Human-or-agent researched entities (the `fixtures/national-catalog/*.json` →
 | Per-state fan-out with retry + batched writes | `packages/firebase/src/demographics/acs-load-cli.ts` |
 | Bulk CSV stream-ingest with reliability screening | `packages/firebase/scripts/ingest-opportunity-atlas.ts` |
 | Bulk GeoJSON with geometry-in-Storage reference | `packages/firebase/scripts/ingest-holc-areas.ts` |
+| Signed-URL bulk source + deterministic geo crosswalk + coverage denominator | `packages/firebase/scripts/ingest-hate-crime.ts` |
 | Idempotent doc loader (compare-then-set) | `packages/firebase/src/demographics/load-cli.ts` |
 | THE batch upsert + writer contract (use this, never re-implement) | `packages/firebase/src/external/batch-upsert.ts` |
 | THE acquisition capture chain (evidenceSources→…→sourceCaptures) | `packages/firebase/src/external/capture.ts` |

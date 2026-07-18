@@ -381,6 +381,31 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // FBI UCR agency directory (ORI -> county crosswalk): public-domain reference data, no
+    // PII. Writes via packages/firebase/scripts/ingest-hate-crime.ts.
+    match /ucrAgencies/{ori} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // FBI hate crime county-year aggregates: public-domain published statistics, BUT client
+    // read stays CLOSED until a surface exists that renders them beside their coverage
+    // caveat. UCR hate crime reporting is voluntary — a county with no document means NO
+    // AGENCY REPORTED, never "no hate crime here" (BB-051 no-false-absence; see
+    // packages/firebase/src/external/ucr-schema.ts). Publishing these counts bare would
+    // read silence as safety, so the gate is the surface, not the data.
+    match /hateCrimeCountyYears/{countyYearId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    // UCR participation (the coverage denominator): public read — it exists precisely to
+    // qualify the counts above and is meaningless as a standalone signal.
+    match /ucrStateParticipation/{stateYearId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
