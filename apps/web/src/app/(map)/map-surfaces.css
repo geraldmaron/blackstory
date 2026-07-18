@@ -45,6 +45,17 @@
   cursor: pointer;
 }
 
+/* Below-hero page content on a map surface. The canvas plate above is FIXED behind the whole
+   viewport, and positioned elements (even z-index: 0) paint over static flow content — so a
+   plain `<main>` under this route group would be swallowed by the ink plate the moment the
+   reader scrolls past the hero. Re-establish paint order and bring the theme canvas along as
+   an opaque backdrop. */
+.bb-map-surface main {
+  position: relative;
+  z-index: 1;
+  background: var(--bb-canvas);
+}
+
 /* —— Hero dissolve (ADR-017 "Transition contract") — token-driven, opacity/translate only, no
    layout thrash. Reduced motion still applies this class (React state is unconditional) but the
    duration collapses to an instant cut via the media query below. ——  */

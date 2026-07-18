@@ -30,7 +30,7 @@ function DefinitionList({
     <dl className="bb-sans">
       {entries.map((entry) => (
         <div key={entry.term} style={{ marginBottom: 'var(--bb-space-4)' }}>
-          <dt style={{ fontWeight: 600 }}>{entry.term}</dt>
+          <dt className="bb-dt">{entry.term}</dt>
           <dd style={{ margin: 'var(--bb-space-1) 0 0 0' }}>{entry.definition}</dd>
         </div>
       ))}
@@ -68,9 +68,7 @@ export function MethodologySections() {
           talking past each other. Inclusion is never a popularity contest — every entity needs at
           least one documented notability basis.
         </p>
-        <h3 className="bb-section__title" style={{ fontSize: '1.125rem' }}>
-          Notability basis (per kind)
-        </h3>
+        <h3 className="bb-section__title bb-subheading">Notability basis (per kind)</h3>
         <DefinitionList
           entries={NOTABILITY_CRITERIA.map((criterion) => ({
             term: humanizeToken(criterion),
@@ -78,7 +76,7 @@ export function MethodologySections() {
           }))}
         />
         <p className="bb-sans">{CULTURAL_FIGURE_NOTABILITY_CALIBRATION_NOTE}</p>
-        <h3 className="bb-section__title" style={{ fontSize: '1.125rem', marginTop: 'var(--bb-space-6)' }}>
+        <h3 className="bb-section__title bb-subheading" style={{ marginTop: 'var(--bb-space-6)' }}>
           Fact record status lifecycle
         </h3>
         <DefinitionList
@@ -87,7 +85,7 @@ export function MethodologySections() {
             definition,
           }))}
         />
-        <h3 className="bb-section__title" style={{ fontSize: '1.125rem', marginTop: 'var(--bb-space-6)' }}>
+        <h3 className="bb-section__title bb-subheading" style={{ marginTop: 'var(--bb-space-6)' }}>
           Entity status vocabularies
         </h3>
         <DefinitionList

@@ -65,7 +65,7 @@ export default async function MythReviewPage({ params }: MythPageProps) {
             style={{
               margin: 0,
               paddingLeft: 'var(--bb-space-4)',
-              borderLeft: '2px solid var(--bb-border)',
+              borderLeft: 'var(--bb-border-width-strong) solid var(--bb-border)',
             }}
           >
             {review.claimReviewed}

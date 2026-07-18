@@ -86,17 +86,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           ]}
         />
 
-        <p
-          className="bb-sans"
-          id="search-results-heading"
-          style={{
-            margin: 0,
-            fontSize: '0.6875rem',
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-          }}
-        >
+        <p className="bb-sans bb-count-label" id="search-results-heading">
           {view.totalMatched} sample result{view.totalMatched === 1 ? '' : 's'}
         </p>
 

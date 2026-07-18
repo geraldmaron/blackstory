@@ -87,13 +87,13 @@ export default async function FactRevisionPage({ params }: FactRevisionPageProps
             This revision
           </h2>
           <dl className="bb-sans" style={{ marginTop: 'var(--bb-space-4)' }}>
-            <dt style={{ fontWeight: 600 }}>Change type</dt>
+            <dt className="bb-dt">Change type</dt>
             <dd style={{ margin: '0 0 var(--bb-space-2) 0' }}>{humanizeToken(revision.changeType)}</dd>
-            <dt style={{ fontWeight: 600 }}>Editor</dt>
+            <dt className="bb-dt">Editor</dt>
             <dd style={{ margin: '0 0 var(--bb-space-2) 0' }}>
               {revision.agent.displayName ?? revision.agent.id}
             </dd>
-            <dt style={{ fontWeight: 600 }}>Timestamp</dt>
+            <dt className="bb-dt">Timestamp</dt>
             <dd style={{ margin: 0 }}>{formatIsoDate(revision.timestamp)}</dd>
           </dl>
         </section>

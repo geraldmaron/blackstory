@@ -26,21 +26,10 @@ export default function DesignSystemPage() {
   return (
     <main className="bb-container" id="main">
       <header className="bb-gallery-section" style={{ paddingTop: 'var(--bb-space-10)' }}>
-        <p
-          className="bb-sans"
-          style={{
-            margin: 0,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            fontSize: '0.75rem',
-            color: 'var(--bb-ink-subtle)',
-          }}
-        >
+        <p className="bb-page__eyebrow" style={{ color: 'var(--bb-ink-subtle)' }}>
           Black Book · BB-007
         </p>
-        <h1 style={{ margin: '0.5rem 0 0', fontSize: 'clamp(2rem, 1.6rem + 2vw, 2.75rem)' }}>
-          Design system
-        </h1>
+        <h1 className="bb-page__title">Design system</h1>
         <p>
           Editorial black-and-white foundation with reserved status color, visible focus, and
           reduced-motion support. This route is the component fixture gallery (Storybook

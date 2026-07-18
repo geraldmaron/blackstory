@@ -1002,6 +1002,26 @@
   height: 1.25rem;
 }
 
+/* —— Shared text utilities — exist to replace repeated inline styles on
+   result/count labels, in-page subheadings, and definition terms. Kept after
+   the component rules so they win equal-specificity conflicts (e.g.
+   `.bb-section__title.bb-subheading`). ——  */
+.bb-count-label {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.bb-subheading {
+  font-size: 1.125rem;
+}
+
+.bb-dt {
+  font-weight: 600;
+}
+
 @keyframes bb-rise {
   from {
     opacity: 0;

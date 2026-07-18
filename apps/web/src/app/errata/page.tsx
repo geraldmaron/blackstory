@@ -65,7 +65,7 @@ export default function ErrataPage() {
                 style={{
                   marginBottom: 'var(--bb-space-6)',
                   paddingBottom: 'var(--bb-space-4)',
-                  borderBottom: '1px solid var(--bb-border)',
+                  borderBottom: 'var(--bb-border-width) solid var(--bb-border)',
                 }}
               >
                 <p style={{ margin: 0, color: 'var(--bb-ink-muted)' }}>
@@ -73,7 +73,7 @@ export default function ErrataPage() {
                   {' · '}
                   <span className="bb-mono">{ERRATA_CHANGE_TYPE_LABELS[entry.changeType]}</span>
                 </p>
-                <h3 style={{ margin: 'var(--bb-space-2) 0', fontSize: '1.125rem' }}>{entry.headline}</h3>
+                <h3 className="bb-subheading" style={{ margin: 'var(--bb-space-2) 0' }}>{entry.headline}</h3>
                 <p style={{ margin: 0 }}>{entry.summary}</p>
                 {entry.affectedUrl ? (
                   <p style={{ margin: 'var(--bb-space-2) 0 0 0' }}>

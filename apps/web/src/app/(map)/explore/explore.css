@@ -123,7 +123,7 @@
   min-height: min(70svh, 36rem);
   height: 100%;
   border: var(--bb-border-width) solid var(--bb-border);
-  background: #0a0a0a;
+  background: var(--bb-fixed-ink);
 }
 
 @media (min-width: 56rem) {

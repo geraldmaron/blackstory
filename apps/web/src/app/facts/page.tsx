@@ -73,17 +73,7 @@ export default async function FactsLibraryPage({ searchParams }: FactsPageProps)
           ]}
         />
 
-        <p
-          className="bb-sans"
-          id="fact-results-heading"
-          style={{
-            margin: 0,
-            fontSize: '0.6875rem',
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-          }}
-        >
+        <p className="bb-sans bb-count-label" id="fact-results-heading">
           {view.totalMatched} published fact{view.totalMatched === 1 ? '' : 's'}
         </p>
 

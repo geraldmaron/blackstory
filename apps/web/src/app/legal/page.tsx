@@ -63,17 +63,7 @@ export default async function LegalBrowsePage({ searchParams }: LegalPageProps) 
           ]}
         />
 
-        <p
-          className="bb-sans"
-          id="legal-results-heading"
-          style={{
-            margin: 0,
-            fontSize: '0.6875rem',
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-          }}
-        >
+        <p className="bb-sans bb-count-label" id="legal-results-heading">
           {view.totalMatched} legal entr{view.totalMatched === 1 ? 'y' : 'ies'}
         </p>
 
