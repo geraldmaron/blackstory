@@ -4,6 +4,10 @@
  */
 import type { FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase/firestore';
 import type { z } from 'zod';
+import {
+  assertLearningIndexProjection,
+  sanitizePrimaryImageForRelease,
+} from '@black-book/domain';
 import { assertPublicProjectionSafe } from '@black-book/security';
 import {
   auditEventSchema,
@@ -69,6 +73,41 @@ function createConverter<T>(schema: z.ZodType<T>): FirestoreDataConverter<T> {
   };
 }
 
+/**
+ * Normalize a projection for public write: drop uncleared primaryImage, enforce
+ * learning-index summary gate, then fail-closed structural redaction.
+ */
+export function preparePublicEntityProjectionForWrite(
+  modelObject: PublicEntityProjectionDoc,
+): PublicEntityProjectionDoc {
+  const parsed = publicEntityProjectionSchema.parse(modelObject);
+  const primaryImage = sanitizePrimaryImageForRelease(parsed.primaryImage);
+
+  const prepared = {
+    ...parsed,
+    ...(primaryImage !== undefined ? { primaryImage } : {}),
+  } as PublicEntityProjectionDoc;
+
+  if (primaryImage === undefined && 'primaryImage' in prepared) {
+    delete (prepared as { primaryImage?: unknown }).primaryImage;
+  }
+
+  assertLearningIndexProjection({
+    summary: prepared.summary,
+    topicTags: prepared.topicTags,
+    ...(prepared.historicalContext !== undefined
+      ? { historicalContext: prepared.historicalContext }
+      : {}),
+    ...(prepared.extendedNarrative !== undefined
+      ? { extendedNarrative: prepared.extendedNarrative }
+      : {}),
+    ...(primaryImage !== undefined ? { primaryImage } : {}),
+    ...(prepared.related !== undefined ? { related: prepared.related } : {}),
+  });
+  assertPublicProjectionSafe(prepared);
+  return prepared;
+}
+
 export function parseWithSchema<T>(schema: z.ZodType<T>, data: unknown): T {
   return schema.parse(data);
 }
@@ -93,9 +132,7 @@ export const publicationReleaseConverter = createConverter(publicationReleaseSch
 export const publicActiveReleaseConverter = createConverter(publicActiveReleaseSchema);
 export const publicEntityProjectionConverter: FirestoreDataConverter<PublicEntityProjectionDoc> = {
   toFirestore(modelObject: PublicEntityProjectionDoc) {
-    const parsed = publicEntityProjectionSchema.parse(modelObject);
-    assertPublicProjectionSafe(parsed);
-    return parsed as Record<string, unknown>;
+    return preparePublicEntityProjectionForWrite(modelObject) as Record<string, unknown>;
   },
   fromFirestore(snapshot: QueryDocumentSnapshot): PublicEntityProjectionDoc {
     return publicEntityProjectionSchema.parse(snapshot.data());

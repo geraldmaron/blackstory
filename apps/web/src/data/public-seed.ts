@@ -287,12 +287,11 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
       'replacing Accepted claims. Educators can use it as a bridge from the short summary into ' +
       'primary-source investigation. Sample seed data — not a live public release.',
     primaryImage: {
-      url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Flag_of_the_United_States.svg/320px-Flag_of_the_United_States.svg.png',
-      alt: 'Schematic stand-in image representing a historic school campus record',
-      credit: 'Public-domain schematic fixture for emulator and seed demos only',
+      url: 'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_seed_school_001/primary.png',
+      alt: 'Schematic mark representing Seed Freedmen School campus record',
+      credit: 'Black Book brand system public-domain-style fixture for seed demos',
       rightsStatus: 'public_domain',
-      width: 320,
-      height: 168,
+      objectPath: 'public/entities/ent_seed_school_001/primary.png',
     },
     recordMaturity: 'minimum_record',
     researchCoverage: 'partial',

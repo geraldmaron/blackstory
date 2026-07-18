@@ -40,6 +40,37 @@ Reuse domain provenance gates (`requiresResolvedRights('media')`,
 `PUBLISHABLE_RIGHTS_STATUSES`). Release builders must drop `primaryImage` when
 the rights gate fails rather than publishing unclear media.
 
+## Firebase / public-media (photos)
+
+Entity photos are **not** Firebase Storage default-bucket objects. Cleared images are
+promoted into the GCP `black-book-efaaf-public-media` bucket and referenced from the
+Firestore public entity projection:
+
+| Concern | Convention |
+|---------|------------|
+| Object path | `public/entities/{entityId}/primary.png` (helper: `entityPrimaryImageObjectPath`) |
+| Projection fields | `primaryImage.url`, `alt`, `credit`, `rightsStatus`, optional `objectPath` / dimensions |
+| Write gate | `preparePublicEntityProjectionForWrite` / converter drops incomplete images; requires learning-index `summary` |
+| Bootstrap | `packages/firebase/scripts/bootstrap-public-seed.ts` merges learning-index seed projections |
+| Promote file | `packages/firebase/scripts/promote-entity-primary-image.ts` uploads a local file then patches the projection |
+
+```bash
+cd packages/firebase
+BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 \
+  node --conditions development --import tsx scripts/bootstrap-public-seed.ts
+
+BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 \
+  node --conditions development --import tsx scripts/promote-entity-primary-image.ts \
+    --entity-id=ent_seed_school_001 \
+    --file=../../brand-system/assets/png/black-book-mark-light-transparent.png \
+    --alt="Schematic mark for Seed Freedmen School" \
+    --credit="Black Book brand system seed fixture" \
+    --rights=public_domain
+```
+
+Direct `storage.googleapis.com` URLs only work when the object is publicly readable or
+fronted by CDN. Until CDN is applied, `makePublic` is best-effort after upload.
+
 ## Source map
 
 | What | Where |
@@ -48,6 +79,8 @@ the rights gate fails rather than publishing unclear media.
 | Brand story / voice | `docs/ui/story.md` |
 | Domain helpers | `packages/domain/src/learning-index/` |
 | Projection schema | `packages/firebase/src/firestore/types.ts` (`publicEntityProjectionSchema`) |
+| Entity media paths | `packages/firebase/src/firestore/entity-media.ts` |
 | Serialize choke point | `packages/security/src/serialize.ts` |
 | Entity page | `apps/web/src/app/entity/[id]/page.tsx` |
 | Immutable releases | `docs/adr/ADR-004-public-projection-immutable-snapshots.md` |
+| Public-media bucket matrix | `infra/gcp/storage-buckets.matrix.md` |

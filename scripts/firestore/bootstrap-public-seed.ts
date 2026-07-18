@@ -16,6 +16,7 @@
  */
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { preparePublicEntityProjectionForWrite } from '../../packages/firebase/src/index.ts';
 import {
   firestoreSeedDocuments,
   seedActiveRelease,
@@ -79,11 +80,11 @@ ensured.set('publicMeta/activeRelease', {
 });
 ensured.set('publicReleases/rel_seed_001/entities/ent_seed_place_001', {
   path: 'publicReleases/rel_seed_001/entities/ent_seed_place_001',
-  data: seedPublicEntity,
+  data: preparePublicEntityProjectionForWrite(seedPublicEntity),
 });
 ensured.set('publicReleases/rel_seed_001/entities/ent_seed_school_001', {
   path: 'publicReleases/rel_seed_001/entities/ent_seed_school_001',
-  data: seedPublicSchoolEntity,
+  data: preparePublicEntityProjectionForWrite(seedPublicSchoolEntity),
 });
 
 const toWrite = [...ensured.values()].sort((a, b) => a.path.localeCompare(b.path));
