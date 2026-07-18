@@ -38,15 +38,15 @@ export function DataStatStrip({ items, sources, labelledBy }: DataStatStripProps
   });
 
   return (
-    <div className="bp-data-stat-strip">
-      <ul className="bp-data-strip" {...(labelledBy ? { 'aria-labelledby': labelledBy } : {})}>
+    <div className="ds-data-stat-strip">
+      <ul className="ds-data-strip" {...(labelledBy ? { 'aria-labelledby': labelledBy } : {})}>
         {items.map((item, index) => {
           const extras = partitioned.itemExtras[index] ?? [];
           return (
-            <li key={item.id ?? `${item.label}-${index}`} className="bp-data-strip__item">
-              <span className="bp-data-strip__value">{item.value}</span>
-              <span className="bp-data-strip__label">{item.label}</span>
-              {item.note ? <p className="bp-data-strip__note bp-sans">{item.note}</p> : null}
+            <li key={item.id ?? `${item.label}-${index}`} className="ds-data-strip__item">
+              <span className="ds-data-strip__value">{item.value}</span>
+              <span className="ds-data-strip__label">{item.label}</span>
+              {item.note ? <p className="ds-data-strip__note ds-sans">{item.note}</p> : null}
               {extras.length > 0 ? <SourceFootnote sources={extras} density="compact" /> : null}
             </li>
           );

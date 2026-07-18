@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AtomicStore, AtomicTransaction } from '@blap/firebase';
+import type { AtomicStore, AtomicTransaction } from '@repo/firebase';
 import { runCli } from './cli.ts';
 
 class MemoryAtomicStore implements AtomicStore {
@@ -166,7 +166,7 @@ test('an unknown command prints usage and exits non-zero', async () => {
   assert.match(out.errors[0] ?? '', /Usage/);
 });
 
-test('propose-edge without --commit prepares a real quarantine proposal but writes nothing (BB-092)', async () => {
+test('propose-edge without --commit prepares a real quarantine proposal but writes nothing ', async () => {
   const out = capture();
   const store = new MemoryAtomicStore();
   const code = await runCli(
@@ -191,7 +191,7 @@ test('propose-edge without --commit prepares a real quarantine proposal but writ
   assert.equal(store.writes.length, 0);
 });
 
-test('propose-edge rejects a caused/enabled edge with no --causal-scope, at the CLI layer, before quarantine (BB-092 acceptance criterion 9)', async () => {
+test('propose-edge rejects a caused/enabled edge with no --causal-scope, at the CLI layer, before quarantine (acceptance criterion 9)', async () => {
   const out = capture();
   const code = await runCli(
     [

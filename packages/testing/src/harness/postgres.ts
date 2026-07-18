@@ -20,7 +20,7 @@ export type PostgresHarness = {
 
 function defaultConnectionString(): string {
   return (
-    process.env.BLAP_TEST_DATABASE_URL ??
+    process.env.APP_TEST_DATABASE_URL ??
     process.env.DATABASE_URL ??
     'postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook'
   );

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://blackbook.local/schemas/extraction/extraction-record.v1.schema.json",
   "title": "ExtractionRecord",
-  "description": "Auditable atomic-claim extraction decision with evidence spans and explicit uncertainty (BB-042).",
+  "description": "Auditable atomic-claim extraction decision with evidence spans and explicit uncertainty.",
   "type": "object",
   "additionalProperties": false,
   "required": [

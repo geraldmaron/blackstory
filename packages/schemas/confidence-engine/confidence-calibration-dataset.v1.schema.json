@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://blackbook.local/schemas/confidence-engine/confidence-calibration-dataset.v1.schema.json",
   "title": "ConfidenceCalibrationDataset",
-  "description": "Versioned private calibration export for deterministic claim confidence (BB-043).",
+  "description": "Versioned private calibration export for deterministic claim confidence.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "exportedAt", "rows"],

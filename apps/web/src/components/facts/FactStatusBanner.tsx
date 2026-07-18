@@ -5,8 +5,8 @@
  * never conflated in copy or layout.
  */
 import React from 'react';
-import { Notice } from '@blap/ui';
-import type { FactRecord } from '@blap/domain/facts';
+import { Notice } from '@repo/ui';
+import type { FactRecord } from '@repo/domain/facts';
 import { humanizeToken, statusBannerTitle } from './format';
 
 export type FactStatusBannerProps = {
@@ -23,10 +23,10 @@ export function FactStatusBanner({ fact }: FactStatusBannerProps) {
     <Notice tone={tone} title={title}>
       <p style={{ margin: 0 }}>
         This record remains available at its permalink so a cited version can always be verified.
-        Workflow status: <span className="bp-mono">{humanizeToken(fact.status)}</span>.
+        Workflow status: <span className="ds-mono">{humanizeToken(fact.status)}</span>.
       </p>
       {fact.confidenceNote ? (
-        <p style={{ margin: 'var(--bp-space-2) 0 0 0' }}>{fact.confidenceNote}</p>
+        <p style={{ margin: 'var(--ds-space-2) 0 0 0' }}>{fact.confidenceNote}</p>
       ) : null}
     </Notice>
   );

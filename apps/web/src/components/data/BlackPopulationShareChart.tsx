@@ -3,7 +3,7 @@
  * copper stroke, hairline grid, server-rendered SVG with table alternative.
  */
 import React from 'react';
-import type { NationalPopulationByDecade } from '@blap/firebase';
+import type { NationalPopulationByDecade } from '@repo/firebase';
 import { DataChartFrame } from './DataChartFrame';
 import {
   CHART_HEIGHT,
@@ -52,7 +52,7 @@ export function BlackPopulationShareChart({ rows }: BlackPopulationShareChartPro
       sources={sources}
       ariaLabel="Line chart of Black population share by census decade"
       textAlternative={
-        <table className="bp-data-chart__table">
+        <table className="ds-data-chart__table">
           <caption>Black population share by census decade</caption>
           <thead>
             <tr>
@@ -72,7 +72,7 @@ export function BlackPopulationShareChart({ rows }: BlackPopulationShareChartPro
       }
     >
       <svg
-        className="bp-data-chart__svg"
+        className="ds-data-chart__svg"
         viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
         role="img"
         aria-hidden="true"
@@ -82,13 +82,13 @@ export function BlackPopulationShareChart({ rows }: BlackPopulationShareChartPro
           return (
             <g key={tick}>
               <line
-                className="bp-data-chart__grid-line"
+                className="ds-data-chart__grid-line"
                 x1={CHART_MARGIN.left}
                 x2={CHART_WIDTH - CHART_MARGIN.right}
                 y1={y}
                 y2={y}
               />
-              <text className="bp-data-chart__axis-label" x={CHART_MARGIN.left - 8} y={y + 4} textAnchor="end">
+              <text className="ds-data-chart__axis-label" x={CHART_MARGIN.left - 8} y={y + 4} textAnchor="end">
                 {tick.toFixed(1)}%
               </text>
             </g>
@@ -96,7 +96,7 @@ export function BlackPopulationShareChart({ rows }: BlackPopulationShareChartPro
         })}
         <polyline
           fill="none"
-          stroke="var(--bp-accent-graphic)"
+          stroke="var(--ds-accent-graphic)"
           strokeWidth={2}
           points={points}
         />
@@ -106,10 +106,10 @@ export function BlackPopulationShareChart({ rows }: BlackPopulationShareChartPro
               cx={xScale(index)}
               cy={yScale(shareValue(row))}
               r={4}
-              fill="var(--bp-accent-graphic)"
+              fill="var(--ds-accent-graphic)"
             />
             <text
-              className="bp-data-chart__axis-label"
+              className="ds-data-chart__axis-label"
               x={xScale(index)}
               y={CHART_HEIGHT - CHART_MARGIN.bottom + 20}
               textAnchor="middle"
@@ -119,7 +119,7 @@ export function BlackPopulationShareChart({ rows }: BlackPopulationShareChartPro
           </g>
         ))}
         <text
-          className="bp-data-chart__axis-label"
+          className="ds-data-chart__axis-label"
           x={12}
           y={CHART_MARGIN.top + plotHeight() / 2}
           textAnchor="middle"
@@ -128,9 +128,9 @@ export function BlackPopulationShareChart({ rows }: BlackPopulationShareChartPro
           Share of population
         </text>
       </svg>
-      <ul className="bp-data-chart__legend" aria-hidden="true">
-        <li className="bp-data-chart__legend-item">
-          <span className="bp-data-chart__legend-swatch" style={{ background: 'var(--bp-accent-graphic)' }} />
+      <ul className="ds-data-chart__legend" aria-hidden="true">
+        <li className="ds-data-chart__legend-item">
+          <span className="ds-data-chart__legend-swatch" style={{ background: 'var(--ds-accent-graphic)' }} />
           Black population share (line)
         </li>
       </ul>

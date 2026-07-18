@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@blap/firebase';
+import type { AppCheckVerifier } from '@repo/firebase';
 import { createExploreAppCheckGuard } from './app-check-guard';
 import { createExploreRateLimitGuard } from './rate-limit-guard';
 import { handleExploreRefineRequest, type ExploreRouteDependencies } from './handler';
@@ -58,7 +58,7 @@ test('filters by era through the real guardrail + explore filter pipeline', asyn
   assert.deepEqual(body.featureIds, ['ent_dc_landmark_listing_1975']);
 });
 
-test('rejects SQL injection through BB-026 guardrails (sql_not_allowed)', async () => {
+test('rejects SQL injection through guardrails (sql_not_allowed)', async () => {
   const deps = await buildDeps();
   const response = await handleExploreRefineRequest(exploreRequest('?sql=DROP+TABLE'), deps);
   assert.equal(response.status, 400);

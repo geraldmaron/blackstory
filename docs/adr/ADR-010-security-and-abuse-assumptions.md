@@ -12,7 +12,7 @@
 |--------|------------------|--------|
 | Threat model / abuse corpus | Written (`docs/security/`, BB-004) | Expand tests under BB-036 |
 | App Check, Armor, IAP, rate limits | **Not configured** | BB-023–027, BB-033–035 |
-| Security packages | `@blap/security` stub | Shared enforcement helpers |
+| Security packages | `@repo/security` stub | Shared enforcement helpers |
 
 These assumptions are **design constraints** for all subsequent beads. They are not evidence that controls already exist in production.
 

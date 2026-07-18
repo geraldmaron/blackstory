@@ -3,4 +3,4 @@ connectorId: 'submissions'
 generate:
   adminNodeSdk:
     outputDir: '../../../../../../packages/data-access/generated/submissions'
-    package: '@blap/sql-connect-submissions'
+    package: '@repo/sql-connect-submissions'

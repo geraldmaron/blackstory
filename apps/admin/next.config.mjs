@@ -7,12 +7,12 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: [
-    '@blap/domain',
-    '@blap/schemas',
-    '@blap/ui',
-    '@blap/operator-cli',
-    '@blap/security',
-    '@blap/firebase',
+    '@repo/domain',
+    '@repo/schemas',
+    '@repo/ui',
+    '@repo/operator-cli',
+    '@repo/security',
+    '@repo/firebase',
   ],
   webpack: (config) => {
     config.resolve.extensionAlias = {

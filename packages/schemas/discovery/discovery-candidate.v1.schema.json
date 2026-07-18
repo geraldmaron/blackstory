@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://blackbook.local/schemas/discovery/discovery-candidate.v1.schema.json",
   "title": "DiscoveryCandidateRecord",
-  "description": "Private research candidate produced by the discovery pipeline (BB-039). Never a public entity.",
+  "description": "Private research candidate produced by the discovery pipeline. Never a public entity.",
   "type": "object",
   "additionalProperties": false,
   "required": [

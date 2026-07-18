@@ -4,7 +4,7 @@
  * abuse-report form for harassing or coordinated correction activity.
  */
 import { useId, useState, type FormEvent } from 'react';
-import { Button, Notice } from '@blap/ui';
+import { Button, Notice } from '@repo/ui';
 import { ABUSE_REPORT_NOTICE, CORRECTION_PRIVACY_NOTICE } from './copy';
 import { getCorrectionAppCheckHeaders } from './app-check-client';
 
@@ -77,8 +77,8 @@ export function AbuseReportForm({ receiptCode }: { readonly receiptCode?: string
   }
 
   return (
-    <form className="bp-stack" onSubmit={handleSubmit} noValidate>
-      <p className="bp-sans">{ABUSE_REPORT_NOTICE}</p>
+    <form className="ds-stack" onSubmit={handleSubmit} noValidate>
+      <p className="ds-sans">{ABUSE_REPORT_NOTICE}</p>
 
       {state.status === 'error' ? (
         <Notice tone="error" title="Report failed">
@@ -93,12 +93,12 @@ export function AbuseReportForm({ receiptCode }: { readonly receiptCode?: string
         </Notice>
       ) : null}
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={receiptId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={receiptId}>
           Related receipt code (optional)
         </label>
         <input
-          className="bp-filters__control"
+          className="ds-filters__control"
           id={receiptId}
           name="receiptCode"
           type="text"
@@ -106,27 +106,27 @@ export function AbuseReportForm({ receiptCode }: { readonly receiptCode?: string
         />
       </div>
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={statementId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={statementId}>
           What happened? <span aria-hidden="true">*</span>
         </label>
-        <textarea className="bp-filters__control" id={statementId} name="statement" rows={4} required />
+        <textarea className="ds-filters__control" id={statementId} name="statement" rows={4} required />
       </div>
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={sourceUrlId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={sourceUrlId}>
           Supporting link (optional)
         </label>
-        <input className="bp-filters__control" id={sourceUrlId} name="sourceUrl" type="url" />
+        <input className="ds-filters__control" id={sourceUrlId} name="sourceUrl" type="url" />
       </div>
 
       <Notice tone="warning" title={CORRECTION_PRIVACY_NOTICE.title}>
         {CORRECTION_PRIVACY_NOTICE.body}
       </Notice>
 
-      <div className="bp-row" style={{ alignItems: 'flex-start' }}>
+      <div className="ds-row" style={{ alignItems: 'flex-start' }}>
         <input id={privacyId} name="privacyConsent" type="checkbox" required />
-        <label htmlFor={privacyId} className="bp-sans" style={{ marginLeft: 'var(--bp-space-2)' }}>
+        <label htmlFor={privacyId} className="ds-sans" style={{ marginLeft: 'var(--ds-space-2)' }}>
           I confirm the privacy notice. <span aria-hidden="true">*</span>
         </label>
       </div>

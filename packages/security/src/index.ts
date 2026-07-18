@@ -1,13 +1,13 @@
 
 /**
- * @blap/security central redaction and public serialization layer.
+ * @repo/security central redaction and public serialization layer.
  *
  * This package is the single choke point that reduces location precision and scrubs
  * protected values (living residential addresses, exact coordinates) before anything
  * reaches a public surface: APIs, search indexes, projections, logs, telemetry, and
- * exports. All policy is sourced from the product constitution (@blap/schemas).
+ * exports. All policy is sourced from the product constitution (@repo/schemas).
  */
-export const SECURITY_PACKAGE = '@blap/security' as const;
+export const SECURITY_PACKAGE = '@repo/security' as const;
 
 export {
   sensitivityClasses,

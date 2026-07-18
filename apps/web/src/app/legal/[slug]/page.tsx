@@ -2,7 +2,7 @@
  * Legal landscape detail page at `/legal/{slug}` with plain-language explainer sections.
  */
 import { notFound } from 'next/navigation';
-import { Card } from '@blap/ui';
+import { Card } from '@repo/ui';
 import {
   LegalDisclaimer,
   LegalExplainerSections,
@@ -43,18 +43,18 @@ export default async function LegalDetailPage({ params }: LegalDetailPageProps) 
   const statusBadge = <LegalStatusBadge status={snapshot.lawStatus} />;
 
   return (
-    <main className="bp-container bp-page" id="main">
-      <header className="bp-entity-mast">
-        <p className="bp-page__eyebrow">
-          {humanizeLegalKind(snapshot.kind)} · <span className="bp-mono">{snapshot.jurisdictionId}</span>
+    <main className="ds-container ds-page" id="main">
+      <header className="ds-entity-mast">
+        <p className="ds-page__eyebrow">
+          {humanizeLegalKind(snapshot.kind)} · <span className="ds-mono">{snapshot.jurisdictionId}</span>
         </p>
-        <h1 className="bp-page__title">{snapshot.title}</h1>
-        <p className="bp-page__lede">
-          <span className="bp-mono">{snapshot.citation.canonicalCitation}</span> · {statusBadge}
+        <h1 className="ds-page__title">{snapshot.title}</h1>
+        <p className="ds-page__lede">
+          <span className="ds-mono">{snapshot.citation.canonicalCitation}</span> · {statusBadge}
         </p>
       </header>
 
-      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
+      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
         <LegalDisclaimer />
 
         {factHref ? (
@@ -84,12 +84,12 @@ export default async function LegalDetailPage({ params }: LegalDetailPageProps) 
         )}
 
         <section aria-labelledby="archive-heading">
-          <p className="bp-section__kicker">Provenance</p>
-          <h2 className="bp-section__title" id="archive-heading">
+          <p className="ds-section__kicker">Provenance</p>
+          <h2 className="ds-section__title" id="archive-heading">
             Archived capture
           </h2>
           <Card>
-            <dl className="bp-dl">
+            <dl className="ds-dl">
               <div>
                 <dt>Retrieved</dt>
                 <dd>{snapshot.citation.archive.retrievedAt.split('T')[0]}</dd>

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://blackbook.local/schemas/query-packs/query-pack-fixture.v1.schema.json",
   "title": "QueryPackFixture",
-  "description": "Query pack with expected match and exclusion expectations for gold tests (BB-038).",
+  "description": "Query pack with expected match and exclusion expectations for gold tests.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "pack", "expectations"],

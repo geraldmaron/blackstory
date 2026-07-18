@@ -1,5 +1,5 @@
 /**
- * Data Pack v1 manifest contract (black-book-ud5q).
+ * Data Pack v1 manifest contract (the related workstream).
  *
  * Goal: no third-party's independently-hosted dataset ever becomes a direct, unvetted public
  * dependency of Black Book. A "data pack" is the unit a publisher ships: a signed manifest

@@ -1,8 +1,8 @@
 /**
  * Public read/search/location API entrypoint (Cloud Run target).
- * Read-only posture enforced via @blap/config surface capabilities.
+ * Read-only posture enforced via @repo/config surface capabilities.
  */
-import { buildSurfaceHealth, parseNodeEnv } from '@blap/config';
+import { buildSurfaceHealth, parseNodeEnv } from '@repo/config';
 import { SURFACE_ID } from './posture.js';
 
 export { createPublicApiAppCheckGuard } from './app-check.js';

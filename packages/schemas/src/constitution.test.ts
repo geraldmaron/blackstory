@@ -115,7 +115,7 @@ test('fixtures cover included, excluded, disputed, sparse, sensitive, living-per
   );
 });
 
-test('ugcLivingPersonRules extends the constitution without bumping policyVersion (BB-077)', () => {
+test('ugcLivingPersonRules extends the constitution without bumping policyVersion ()', () => {
   resetProductConstitutionCache();
   const policy = loadProductConstitution();
   assert.equal(policy.policyVersion, '1.0.0');

@@ -64,7 +64,7 @@ test('evaluateVectorSearchGuardrails requires a non-empty q even when filters ar
   }
 });
 
-test('evaluateVectorSearchGuardrails validates kind/state through the shared BB-026 filter allowlist', () => {
+test('evaluateVectorSearchGuardrails validates kind/state through the shared filter allowlist', () => {
   const decision = evaluateVectorSearchGuardrails({
     method: 'GET',
     path: '/v1/search/nearest',

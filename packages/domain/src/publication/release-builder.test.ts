@@ -1,6 +1,6 @@
 /**
  * Unit tests for the single deterministic per-entity release/projection builder
- * (black-book-1fg9). See ./release-builder.ts's module doc comment for the contract.
+ * (the related workstream). See ./release-builder.ts's module doc comment for the contract.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

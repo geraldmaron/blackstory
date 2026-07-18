@@ -50,14 +50,14 @@ test('with onSelect, rows are buttons that keep the reader on the map surface', 
   const html = renderToStaticMarkup(
     createElement(SynchronizedResultList, { features, onSelect: () => undefined }),
   );
-  assert.match(html, /bp-result-list__link--button/);
+  assert.match(html, /ds-result-list__link--button/);
   assert.doesNotMatch(html, /href="/);
 });
 
 test('uses a uniform labeled meta layout with short confidence values', () => {
   const features = buildFeatures();
   const html = renderToStaticMarkup(createElement(SynchronizedResultList, { features }));
-  assert.match(html, /bp-result-list__meta--labeled/);
+  assert.match(html, /ds-result-list__meta--labeled/);
   assert.match(html, /><dt>Kind<\/dt>/);
   assert.match(html, /><dt>Era<\/dt>/);
   assert.match(html, /><dt>Confidence<\/dt>/);

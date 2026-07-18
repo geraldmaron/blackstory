@@ -1,7 +1,7 @@
 /**
  * Atomicity, context, procedural-language, and extraction-record validation.
  */
-import { loadProductConstitution } from '@blap/schemas';
+import { loadProductConstitution } from '@repo/schemas';
 import {
   assertContradictionsPreserved,
   assertProceduralStatusRecognized,

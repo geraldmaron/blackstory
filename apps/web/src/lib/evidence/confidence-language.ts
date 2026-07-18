@@ -3,7 +3,7 @@
  * interface.
  *
  * Confidence is always labeled as a deterministic evidence score derived from the
- * component-weighted engine (`@blap/domain`'s `calculateClaimConfidence`), never framed as
+ * component-weighted engine (`@repo/domain`'s `calculateClaimConfidence`), never framed as
  * a probability that a claim is true unless the caller passes an explicit `calibrated: true`
  * flag proving the score has been statistically calibrated against an observed outcome
  * distribution. This codebase ships no such calibration today, so every real call site uses the
@@ -15,7 +15,7 @@
  * "how substantively is this entity connected to the corpus theme", or "how much research has
  * been done on this record so far" — four different questions with four different answers.
  */
-import type { ConfidenceLevel } from '@blap/ui';
+import type { ConfidenceLevel } from '@repo/ui';
 
 export type ConfidenceCalibration = {
   readonly calibrated: boolean;
@@ -77,7 +77,7 @@ export const EVIDENCE_DIMENSION_COPY: Readonly<Record<EvidenceDimensionKey, Evid
     description:
       'How strong the supporting evidence is for this specific claim: source authority, ' +
       'directness, independent corroborating lineages, and extraction quality, weighted and ' +
-      'combined per the BB-017 constitution policy. This is a score, not a probability that the ' +
+      'combined per the product constitution policy. This is a score, not a probability that the ' +
       'claim is true.',
   },
   relevance: {

@@ -1,7 +1,7 @@
 /**
  * geocode pipeline: orchestrates address normalization, the (injected) Census Geocoder
  * fetch, jurisdiction-id resolution, exact-coordinate reduction, product-scope evaluation, the
- * geocode cache, and the manual-place-search fallback into two entry points 
+ * geocode cache, and the manual-place-search fallback into two entry points
  * `geocodeAddress` (forward: address/ZIP text -> jurisdiction ids) and `reverseGeocodeCoordinates`
  * (browser location -> jurisdiction ids). Neither entry point performs network I/O itself; both
  * take a fetcher port backed, in production, by `../adapters/census-geo/fetch-geocode.ts`.

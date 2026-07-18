@@ -1,7 +1,7 @@
 /**
- * One-off data-shape migration (black-book-s4hp): splits each national-catalog fixture entry's
+ * One-off data-shape migration (the related workstream): splits each national-catalog fixture entry's
  * legacy `topicTags` array into the controlled-taxonomy fields `topicIds` / `mentionedEntityIds`
- * / `keywords` (see `@blap/domain`'s `splitTopicTags`, packages/domain/src/taxonomy/
+ * / `keywords` (see `@repo/domain`'s `splitTopicTags`, packages/domain/src/taxonomy/
  * split-topic-tags.ts, for the routing rules). `campaignIds` has no legacy source and is left
  * untouched by this script.
  *
@@ -21,7 +21,7 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { splitTopicTags } from '@blap/domain';
+import { splitTopicTags } from '@repo/domain';
 
 const catalogDir = join(dirname(fileURLToPath(import.meta.url)), '../fixtures/national-catalog');
 

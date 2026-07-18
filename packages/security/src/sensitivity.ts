@@ -2,12 +2,12 @@
 /**
  * Sensitivity vocabulary and precision-tier model for Black Book.
  *
- * The product constitution (@blap/schemas) is the authoritative policy source
+ * The product constitution (@repo/schemas) is the authoritative policy source
  * for sensitivity classes, precision-reduction reasons, residential precision levels,
  * and residential public-precision caps. This module surfaces that policy as typed
  * read-only vocabularies used by the central redaction serialization layer.
  */
-import { loadProductConstitution } from '@blap/schemas';
+import { loadProductConstitution } from '@repo/schemas';
 
 
 /**

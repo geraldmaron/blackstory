@@ -7,14 +7,14 @@
  * `SubmissionKind`/`SubmissionInput`), tagged distinctly so a moderation queue can
  * special-case it, plus a documented SLA.
  *
- * `@blap/domain` cannot import `@blap/security` (security depends on domain, so
+ * `@repo/domain` cannot import `@repo/security` (security depends on domain, so
  * the reverse would be a circular workspace dependency). The shape below is intentionally
  * structurally compatible with `SubmissionInput`
  * (`kind`/`title`/`statement`/`sourceUrls`/`targetRecordId`/`submitterContact`) so a future
  * integration can map one onto the other without redesigning either side. Do not build the
  * public page here; it does not exist yet.
  */
-import { evaluateLivingStatus, loadProductConstitution, type ProductConstitution } from '@blap/schemas';
+import { evaluateLivingStatus, loadProductConstitution, type ProductConstitution } from '@repo/schemas';
 
 export const TAKEDOWN_REASONS = [
   'privacy_deletion_request',

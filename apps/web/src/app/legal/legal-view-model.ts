@@ -1,7 +1,7 @@
 /**
  * Pure view-model for the `/legal` browse and detail pages. No Next.js runtime dependency.
  */
-import { slugifyFactStatement } from '@blap/domain';
+import { slugifyFactStatement } from '@repo/domain';
 import type { LegalBrowseItem } from '../../components/legal';
 import { isLawStatus } from '../../components/legal/format';
 import {

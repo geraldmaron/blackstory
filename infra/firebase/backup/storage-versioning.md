@@ -27,7 +27,7 @@ gs://black-book-efaaf-public-media/public/releases/{releaseId}/search-index.json
 - **Aggregate catalog** (`entities.json` + `search-index.json`): preferred public read path for
   map/list/search/history/sitemap — one CDN fetch replaces an unbounded Firestore collection scan.
   Emitted by `packages/firebase/scripts/publish-national-catalog.ts` (local fixtures always;
-  GCS when `BLAP_UPLOAD_RELEASE_ARTIFACTS=1`).
+  GCS when `APP_UPLOAD_RELEASE_ARTIFACTS=1`).
 
 Rules:
 

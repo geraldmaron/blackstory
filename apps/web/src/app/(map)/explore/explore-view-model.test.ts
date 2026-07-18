@@ -13,7 +13,7 @@ test('includes every geo-anchored active-release entity by default', () => {
   assert.equal(view.totalMatched, listPublicEntities().length);
 });
 
-test('era filter uses BB-090 decade bucket labels from entity eraBuckets', () => {
+test('era filter uses decade bucket labels from entity eraBuckets', () => {
   const view = buildExploreViewModel({});
   const eraValues = view.facetOptions.era.map((option) => option.value);
   assert.ok(eraValues.includes('1840s'));

@@ -6,23 +6,23 @@ Owner verdict on the first v5 pass: "it all looks the same … nothing to rememb
 professional-grade, modern UX." This revision replaces the v5 chrome primitives wholesale.
 Where anything below contradicts an earlier section of this document, **this section wins**:
 
-- **The island.** Navigation is ONE floating ink pill (`.bp-shell-header__inner`), fixed near
+- **The island.** Navigation is ONE floating ink pill (`.ds-shell-header__inner`), fixed near
   the top edge, detached from the page, identical on every surface and in both themes. There
   is no full-width header bar and no `--onmap` variant anymore — the island is a brand-fixed
   ink object like the map plate and footer. Active nav = paper pill; the single copper pill in
   the island is NEAR YOU (the product's one standing orientation action). Mobile: symbol +
   MENU in the island; the drawer is a bottom sheet rendered OUTSIDE the pill (its
   backdrop-filter creates a containing block for fixed descendants) with a tap-away scrim.
-- **Pill action language.** `.bp-cta` and `.bp-button` share one pill recipe
-  (`--bp-radius-full`). Radius 8/16/28 still governs boxes/sheets; actions are pills, full stop.
+- **Pill action language.** `.ds-cta` and `.ds-button` share one pill recipe
+  (`--ds-radius-full`). Radius 8/16/28 still governs boxes/sheets; actions are pills, full stop.
 - **The copper tick.** Every eyebrow/kicker leads with a 1.75rem copper rule — the recurring
-  orientation mark of the system (`.bp-page__eyebrow::before`).
+  orientation mark of the system (`.ds-page__eyebrow::before`).
 - **Display register with a serif italic accent.** Masts scale to `clamp(2.75rem → 5rem)`
   (hero to 6.25rem); one warm word per headline may sit in Source Serif italic copper
-  (`.bp-page__title em`). Copy pattern: "History happened *here*.", "Search the *archive*.",
+  (`.ds-page__title em`). Copy pattern: "History happened *here*.", "Search the *archive*.",
   "Decade by *decade*."
 - **The timeline instrument.** The hero's decades-in-motion is a full-width scrubbable rail of
-  decade ticks (`.bp-hero-timeline`): passed decades burn copper, the live decade reads at
+  decade ticks (`.ds-hero-timeline`): passed decades burn copper, the live decade reads at
   display scale in mono, every tick is a 44px jump target, play/pause is a circular key.
   `/history`'s decade stepper restates the same language as document chrome (baseline rail,
   copper underline burn) — never a wrapping pile of chip buttons.
@@ -37,12 +37,12 @@ Where anything below contradicts an earlier section of this document, **this sec
   on the stage wrapper: ink-glass panels over the plate in BOTH reader themes. Reader
   light/dark preference styles document pages only.
 - **Ledger index.** Ranked listings (search results) are numbered rows: mono index numeral,
-  display title, serif summary, slug meta (`.bp-index`). Rows, never cards. Facet controls are
-  pill selects (`.bp-pill-select`) inline with the content — no fieldset "filter card" with an
+  display title, serif summary, slug meta (`.ds-index`). Rows, never cards. Facet controls are
+  pill selects (`.ds-pill-select`) inline with the content — no fieldset "filter card" with an
   Apply button on primary surfaces (`/search` keeps one submit; `/history` facets apply on
   change with a no-JS GET fallback).
 - **Search mast.** The query IS the headline: display-scale input over a heavy rule that turns
-  copper on focus (`.bp-search-mast`).
+  copper on focus (`.ds-search-mast`).
 - **Mega footer.** The footer closes with the kit lockup at landmark scale plus the columns —
   the page signs off with the brand, not a fine-print row.
 
@@ -52,7 +52,7 @@ Binding on every record surface (narrative card, result rows, entity page) and e
 "modeling" page. These are testable rules, not vibes:
 
 1. **Summary before story.** A record page opens with an "At a glance" block
-   (`.bp-at-a-glance`): the whole record as labeled facts (kind, where, era, evidence,
+   (`.ds-at-a-glance`): the whole record as labeled facts (kind, where, era, evidence,
    coverage, location precision) before any prose asks for sustained reading. A reader who
    never scrolls still leaves oriented.
 2. **One record anatomy, everywhere.** Map card, list row, search row, and entity page present
@@ -65,7 +65,7 @@ Binding on every record surface (narrative card, result rows, entity page) and e
    count line ("106 records · oldest first") and the order is deterministic
    (`sortFeaturesForList`: chronological, undated last, ties alphabetical).
 5. **Chunk, then rule.** Long pages break into hairline-ruled sections with an automatic index
-   numeral (`.bp-entity-sections` + `.bp-kicker-index`) — a visible "where am I" at every
+   numeral (`.ds-entity-sections` + `.ds-kicker-index`) — a visible "where am I" at every
    scroll position. Prose blocks stay short; walls of text are a defect.
 6. **One action per chunk.** Each card/section carries at most one primary action; Close is a
    quiet icon key, never a pill competing with the real action.
@@ -92,7 +92,7 @@ node/edge views already depend on — one derivation path, two consumers.
 
 The client-safe half of that module (`decade-presence.ts` itself) is deliberately import-free —
 `apps/web`'s `decade-flow.ts` is transitively loaded by a `'use client'` component (`HeroStage.tsx`),
-and the top-level `@blap/domain` barrel pulls in server-only modules a browser bundle can't
+and the top-level `@repo/domain` barrel pulls in server-only modules a browser bundle can't
 resolve. The raw-active-span convenience wrapper (`buildDecadePresenceAggregates`) lives in a
 sibling `decade-presence-from-spans.ts` file instead, for server-side callers only.
 
@@ -161,33 +161,33 @@ Black and paper lead. Copper points. Sand fills. Rust stays in the artwork.
 
 | Brand color | Hex | Token | Allowed use — and nothing else |
 |---|---|---|---|
-| Black Ink | `#0A0A0A` | `--bp-ink` (light) / `--bp-canvas` (dark) / `--bp-fixed-ink` | Primary text on light; dark canvas; fixed surfaces (map plate, footer, bands) |
-| Archive Paper | `#F4EFE5` | `--bp-canvas` (light) / `--bp-ink` (dark) / `--bp-fixed-paper` | Light canvas; text on ink |
-| Surface | `#FBF8F2` | `--bp-surface(-raised)` | Raised light surfaces (cards, sheets, inputs) |
-| Copper Pin | `#B86B2A` | `--bp-accent-graphic` | **Graphic** accent only: the primary CTA plate, selected pins, active-state fills. Never body-size text on light |
-| Copper text | `#8E4F2A` light / `#D07A32` dark | `--bp-accent` | Copper as *text or underline*: kickers, active nav, links-as-orientation. The pair flips with theme so AA always holds |
-| Page Sand | `#D8A178` | `--bp-accent-muted` | Decorative fill: map density tiers, sand-shade entity encodings, page-band motifs. Never foreground text |
+| Black Ink | `#0A0A0A` | `--ds-ink` (light) / `--ds-canvas` (dark) / `--ds-fixed-ink` | Primary text on light; dark canvas; fixed surfaces (map plate, footer, bands) |
+| Archive Paper | `#F4EFE5` | `--ds-canvas` (light) / `--ds-ink` (dark) / `--ds-fixed-paper` | Light canvas; text on ink |
+| Surface | `#FBF8F2` | `--ds-surface(-raised)` | Raised light surfaces (cards, sheets, inputs) |
+| Copper Pin | `#B86B2A` | `--ds-accent-graphic` | **Graphic** accent only: the primary CTA plate, selected pins, active-state fills. Never body-size text on light |
+| Copper text | `#8E4F2A` light / `#D07A32` dark | `--ds-accent` | Copper as *text or underline*: kickers, active nav, links-as-orientation. The pair flips with theme so AA always holds |
+| Page Sand | `#D8A178` | `--ds-accent-muted` | Decorative fill: map density tiers, sand-shade entity encodings, page-band motifs. Never foreground text |
 | Page Rust | `#D84E2B` | *(no UI token — deliberate)* | Brand artwork only (the mark's page bands). Never a UI signal: it reads as red, which collides with error semantics and the dignity rule against violence-coded color |
-| Soft Stone / Warm Gray | `#CFC7B8` / `#6E6961` | `--bp-ink-muted`, `--bp-ink-subtle`, `--bp-fixed-stone`, `--bp-rule`/`--bp-border` | Secondary text, hairlines, muted chrome |
+| Soft Stone / Warm Gray | `#CFC7B8` / `#6E6961` | `--ds-ink-muted`, `--ds-ink-subtle`, `--ds-fixed-stone`, `--ds-rule`/`--ds-border` | Secondary text, hairlines, muted chrome |
 
 - **Copper discipline is a review gate** (unchanged from the guide): copper occupies roughly
   10–15% of any composition, reserved for the moment of orientation — one primary action,
   the active nav item, selected/focused map state, kicker slugs. Copper as wash, border
   decoration, or default link color is a defect.
-- **The accent trio is a hierarchy:** `--bp-accent` (text-safe copper) for type and
-  underlines; `--bp-accent-graphic` (raw Copper Pin) for fills that carry ink-colored text;
-  `--bp-accent-muted` (Page Sand) for area fills that carry no text. Picking the wrong tier
+- **The accent trio is a hierarchy:** `--ds-accent` (text-safe copper) for type and
+  underlines; `--ds-accent-graphic` (raw Copper Pin) for fills that carry ink-colored text;
+  `--ds-accent-muted` (Page Sand) for area fills that carry no text. Picking the wrong tier
   is the most common contrast bug — raw copper never carries body text on light.
 - **Status families stay semantic, never brand:** warning/dispute/error and the
-  confidence high/medium/low sets (`--bp-warning-*`, `--bp-dispute-*`, `--bp-error-*`,
-  `--bp-confidence-*`) are the only non-palette hues on any surface, always paired with a
+  confidence high/medium/low sets (`--ds-warning-*`, `--ds-dispute-*`, `--ds-error-*`,
+  `--ds-confidence-*`) are the only non-palette hues on any surface, always paired with a
   text label or glyph — color is never the only signal. They are contrast-tested per theme
   in `packages/ui/src/tokens/contrast.test.ts`.
 - **Map color language** (carried from v4/BB-099): ink plate always; entity kinds encode in
   copper/sand shades + non-color glyphs; density is presence-tiered copper RGBA (12/28/50%),
   never incident-heat; state hairlines in fixed-rule; selected state label flips to
   copper-dark. No new map colors without a bead.
-- **Data-viz** uses `--bp-viz-1..4` + `--bp-viz-grid` (ink, copper, stone, sand per theme) —
+- **Data-viz** uses `--ds-viz-1..4` + `--ds-viz-grid` (ink, copper, stone, sand per theme) —
   charts never introduce hues outside the palette + status families.
 
 ## 5. Chrome specs
@@ -203,7 +203,7 @@ Menu button; nav is a bottom sheet with 44px rows and safe-area padding.
 meta line. Padding `space-10`, not `space-12`+.
 
 **Page mast** — every document page: mono copper kicker, Sora title, serif lede (max 65ch).
-Below it, content sections separated by hairlines (`bp-section`), each with optional
+Below it, content sections separated by hairlines (`ds-section`), each with optional
 mono kicker + Sora section title.
 
 **Actions** — one vocabulary, three weights, all `≥44px` target, radius-sm, Inter 600 caps
@@ -211,7 +211,7 @@ mono kicker + Sora section title.
 - `copper` — THE primary action of the view (max one per composition);
 - `solid` — ink-on-paper (inverts per theme, fixed-paper inside ink bands);
 - `quiet` — hairline border, transparent fill.
-`.bp-cta` (links) and `.bp-button` (form buttons) share this exact recipe — same classes
+`.ds-cta` (links) and `.ds-button` (form buttons) share this exact recipe — same classes
 modifier names, one definition site each, zero visual divergence.
 
 ## 6. Surface layouts (the rip, surface by surface)
@@ -261,7 +261,7 @@ compact), result list as top-rule entries with mono meta lines. Pagination quiet
 explore.
 
 **Longform (`/methodology`, `/about`, `/myths/[slug]`, `/legal/[slug]`)** — single serif
-column (`--bp-content-max`), numbered Sora subheads, mono citations. No cards.
+column (`--ds-content-max`), numbered Sora subheads, mono citations. No cards.
 
 **Forms (`/submit`, `/corrections`)** — single column, native controls at 44px, labels in
 Inter 600 0.8125rem sentence case (not mono caps), serif intro, one copper submit per form.
@@ -272,17 +272,17 @@ scold) and always offer the three paths: map, search, browse.
 
 ## 7. Pattern law (reuse, never re-invent)
 
-Primitives live in `@blap/ui` + `shell.css`; a new surface composes these. A new pattern
+Primitives live in `@repo/ui` + `shell.css`; a new surface composes these. A new pattern
 requires updating every prior use of the pattern it replaces — no parallel vocabularies.
 
-- `bp-cta` / `bp-button` — action vocabulary (§5). Modifiers: `--copper`, `--solid`, `--quiet`
+- `ds-cta` / `ds-button` — action vocabulary (§5). Modifiers: `--copper`, `--solid`, `--quiet`
   (aliases kept this cycle: `--ink`, `--ghost`, `--primary`, `--secondary` map onto the three).
-- `bp-page` + `bp-page__eyebrow/title/lede` — document mast.
-- `bp-section` + `__kicker/__title/__lede` — hairline-ruled section.
-- `bp-story-link` — top-rule story entry (rails, related lists, results share its anatomy).
-- `bp-data-strip` — mono numbers row.
-- `bp-band` — fixed-ink full-bleed band (one per page max).
-- `bp-card` — boxed object (photo, form region, aside module only).
+- `ds-page` + `ds-page__eyebrow/title/lede` — document mast.
+- `ds-section` + `__kicker/__title/__lede` — hairline-ruled section.
+- `ds-story-link` — top-rule story entry (rails, related lists, results share its anatomy).
+- `ds-data-strip` — mono numbers row.
+- `ds-band` — fixed-ink full-bleed band (one per page max).
+- `ds-card` — boxed object (photo, form region, aside module only).
 - `Notice` — the only honest-state surface; never toasts.
 - Tokens only; no raw hex, no shadows, no gradients; hairlines carry separation.
 
@@ -305,8 +305,8 @@ whose tap target is under 44px; color-only signals; raw `<a>` internal nav.
 ## 9. What explicitly survives from v4
 
 Persistent map canvas + camera grammar (ADR-017), dignity rules (BB-051), theming contract
-(`--bp-fixed-*` surfaces), motion tokens (160/280ms, one easing), URL-carried state, the
-`bp-` token set, and the brand palette/type/radii. The rip is layout, chrome, and pattern
+(`--ds-fixed-*` surfaces), motion tokens (160/280ms, one easing), URL-carried state, the
+`ds-` token set, and the brand palette/type/radii. The rip is layout, chrome, and pattern
 vocabulary — not the architecture and not the brand foundation.
 
 ## 10. Logo (2026-07-18 kit supersession)

@@ -7,7 +7,7 @@ import {
   buildFactRevisionPath,
   currentFactRevision,
   type FactRecord,
-} from '@blap/domain/facts';
+} from '@repo/domain/facts';
 import { formatIsoDate, humanizeToken } from '../facts/format';
 
 export type RevisionUpdateChromeProps = {
@@ -25,7 +25,7 @@ export function RevisionUpdateChrome({ fact, errataHref = '/errata' }: RevisionU
   const isCorrection = revision?.changeType === 'correction' || fact.status === 'corrected';
 
   return (
-    <p className="bp-sans" role="status" style={{ margin: 0, color: 'var(--bp-ink-muted)' }}>
+    <p className="ds-sans" role="status" style={{ margin: 0, color: 'var(--ds-ink-muted)' }}>
       Updated {updatedLabel}
       {latestPath ? (
         <>
@@ -49,7 +49,7 @@ export function RevisionUpdateChrome({ fact, errataHref = '/errata' }: RevisionU
       {revision ? (
         <>
           {' '}
-          · <span className="bp-mono">{humanizeToken(revision.changeType)}</span>
+          · <span className="ds-mono">{humanizeToken(revision.changeType)}</span>
         </>
       ) : null}
     </p>

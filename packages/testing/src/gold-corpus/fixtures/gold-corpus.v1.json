@@ -3461,7 +3461,7 @@
         "confidenceOutcome": false,
         "entityResolution": "match",
         "expectedEntityId": "entity-gc-121",
-        "rationale": "Two-person synthetic adjudication for source_lineage; BB-089 Sybil scenario 1 \u2014 three lineages presenting as independent blogs share one RDAP registrant hash, so the BB-043 shared-infrastructure signal collapses them to a single lineage and the claim never reaches the publish threshold."
+        "rationale": "Two-person synthetic adjudication for source_lineage;  Sybil scenario 1 \u2014 three lineages presenting as independent blogs share one RDAP registrant hash, so the  shared-infrastructure signal collapses them to a single lineage and the claim never reaches the publish threshold."
       },
       "context": {
         "recordCompleteness": "partial",
@@ -3492,7 +3492,7 @@
         "confidenceOutcome": false,
         "entityResolution": "match",
         "expectedEntityId": "entity-gc-122",
-        "rationale": "Two-person synthetic adjudication for source_lineage; BB-089 Sybil scenario 2 \u2014 the same pattern as scenario 1 but the shared control signal is a common hosting ASN and an overlapping nameserver set rather than a registrant hash; the BB-043 shared-infrastructure signal still collapses the cluster to a single lineage."
+        "rationale": "Two-person synthetic adjudication for source_lineage;  Sybil scenario 2 \u2014 the same pattern as scenario 1 but the shared control signal is a common hosting ASN and an overlapping nameserver set rather than a registrant hash; the  shared-infrastructure signal still collapses the cluster to a single lineage."
       },
       "context": {
         "recordCompleteness": "partial",
@@ -3522,7 +3522,7 @@
         "citationEntailed": false,
         "confidenceOutcome": false,
         "entityResolution": "review_required",
-        "rationale": "Two-person synthetic adjudication for source_lineage; BB-089 Sybil scenario 3 \u2014 lineages register their domains within the same month and publish within hours of one another with no proof of shared infrastructure, so BB-043 records only an advisory independence discount; the claim still fails to publish because none of the corroborating sources is top-tier."
+        "rationale": "Two-person synthetic adjudication for source_lineage;  Sybil scenario 3 \u2014 lineages register their domains within the same month and publish within hours of one another with no proof of shared infrastructure, so  records only an advisory independence discount; the claim still fails to publish because none of the corroborating sources is top-tier."
       },
       "context": {
         "recordCompleteness": "partial",
@@ -3551,7 +3551,7 @@
         "citationEntailed": false,
         "confidenceOutcome": false,
         "entityResolution": "review_required",
-        "rationale": "Two-person synthetic adjudication for source_lineage; BB-089 Sybil scenario 4 \u2014 every corroborating domain was first observed as a source in the weeks before publication, an advisory recency signal BB-043 surfaces for reviewer attention; combined with the missing top-tier source the claim does not reach published confidence."
+        "rationale": "Two-person synthetic adjudication for source_lineage;  Sybil scenario 4 \u2014 every corroborating domain was first observed as a source in the weeks before publication, an advisory recency signal  surfaces for reviewer attention; combined with the missing top-tier source the claim does not reach published confidence."
       },
       "context": {
         "recordCompleteness": "sparse",
@@ -3581,7 +3581,7 @@
         "confidenceOutcome": true,
         "entityResolution": "match",
         "expectedEntityId": "entity-gc-125",
-        "rationale": "Two-person synthetic adjudication for source_lineage; BB-089 Sybil scenario 5 \u2014 alongside several low-trust blog mentions with no shared registrant, ASN, or nameserver ties, one primary-archival record satisfies the BB-043 top-tier-source gate, so genuine independent corroboration still publishes."
+        "rationale": "Two-person synthetic adjudication for source_lineage;  Sybil scenario 5 \u2014 alongside several low-trust blog mentions with no shared registrant, ASN, or nameserver ties, one primary-archival record satisfies the  top-tier-source gate, so genuine independent corroboration still publishes."
       },
       "context": {
         "recordCompleteness": "substantial",

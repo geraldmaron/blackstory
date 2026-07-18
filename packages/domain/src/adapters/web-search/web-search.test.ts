@@ -101,7 +101,7 @@ test('provider decision is recorded and explicitly does NOT claim storage terms 
 // registry gate (first of two independent gates)
 // ---------------------------------------------------------------------------------------------
 
-test('Brave search adapter starts disabled by default in the BB-037 registry', () => {
+test('Brave search adapter starts disabled by default in the  registry', () => {
   const store = createInMemorySourceRegistry();
   const contract = createBraveSearchAdapterContract();
   registerSource(store, {
@@ -377,7 +377,7 @@ test('evaluateWebSearchQueryBudget denies once the per-campaign query cap is rea
   assert.equal(evaluatorCalls, 0);
 });
 
-test('evaluateWebSearchQueryBudget delegates the monthly spend ceiling to the injected BB-033 evaluator', () => {
+test('evaluateWebSearchQueryBudget delegates the monthly spend ceiling to the injected  evaluator', () => {
   const denied = evaluateWebSearchQueryBudget({
     policy: {
       maxQueriesPerCampaign: 1000,
@@ -456,7 +456,7 @@ test('fetchBraveWebSearchBudgeted proceeds and reports the budget decision when 
 // Pipeline integration: Wayback capture gate -> ingestApiCandidate
 // ---------------------------------------------------------------------------------------------
 
-test('ingestWebSearchCandidatesThroughPipeline routes candidates through the Wayback capture gate before BB-039 ingestion', async () => {
+test('ingestWebSearchCandidatesThroughPipeline routes candidates through the Wayback capture gate before  ingestion', async () => {
   const entry = braveRegistryEntry();
   const pack = loadPack();
   const queryProvenance = stampExternalQueryProvenance({
@@ -547,8 +547,8 @@ test('ingestWebSearchCandidatesThroughPipeline fails closed when the Wayback cap
 // Real wiring: proves the budget-guard port can be backed by the real evaluateDailyBudget
 // ---------------------------------------------------------------------------------------------
 
-test('a real BB-033-backed DailyBudgetEvaluator (thin wrapper over the real evaluateDailyBudget) composes correctly', async () => {
-  const { evaluateDailyBudget: realEvaluateDailyBudget } = await import('@blap/security');
+test('a real -backed DailyBudgetEvaluator (thin wrapper over the real evaluateDailyBudget) composes correctly', async () => {
+  const { evaluateDailyBudget: realEvaluateDailyBudget } = await import('@repo/security');
 
   const realBackedEvaluator: DailyBudgetEvaluator = (input, budgets) => {
     const result = (realEvaluateDailyBudget as unknown as (

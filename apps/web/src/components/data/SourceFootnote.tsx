@@ -6,7 +6,7 @@
  * Dedupes by URL (falling back to label). Pluralizes "Source" / "Sources".
  */
 import React from 'react';
-import { cx } from '@blap/ui';
+import { cx } from '@repo/ui';
 
 void React;
 
@@ -103,19 +103,19 @@ export function SourceFootnote({
   return (
     <aside
       className={cx(
-        'bp-citation',
-        density === 'compact' ? 'bp-citation--compact' : 'bp-citation--group',
+        'ds-citation',
+        density === 'compact' ? 'ds-citation--compact' : 'ds-citation--group',
         className,
       )}
       aria-label={label}
     >
-      <span className="bp-citation__label">{label}</span>
+      <span className="ds-citation__label">{label}</span>
       {unique.length === 1 ? (
         <a href={unique[0]!.url} target="_blank" rel="noreferrer noopener">
           {unique[0]!.label}
         </a>
       ) : (
-        <ul className="bp-citation__list">
+        <ul className="ds-citation__list">
           {unique.map((source) => (
             <li key={sourceKey(source)}>
               <a href={source.url} target="_blank" rel="noreferrer noopener">

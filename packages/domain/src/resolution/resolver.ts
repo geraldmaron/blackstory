@@ -28,7 +28,7 @@ const REVIEW_THRESHOLD = 0.55;
 const AMBIGUITY_MARGIN = 0.12;
 
 /**
- * black-book-8bck (identifier-dominant resolution): an exact match on a TRUSTED-namespace
+ * the related workstream (identifier-dominant resolution): an exact match on a TRUSTED-namespace
  * identifier (Wikidata QID, LoC, VIAF, NPS, NRHP, NCES, etc. — see `../naming.js`) must clearly
  * outrank name similarity, whose maximum contribution is 0.55 (see `nameFactor` below). 0.65
  * dominates that ceiling on its own. An exact match on an UNTRUSTED/internal namespace keeps the

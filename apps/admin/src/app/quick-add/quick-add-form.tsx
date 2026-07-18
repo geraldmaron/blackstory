@@ -14,12 +14,12 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
 
   if (state.status === 'error') {
     return (
-      <div className="bb-notice bb-notice--error" role="alert">
-        <span className="bb-notice__cue" aria-hidden="true">
+      <div className="ds-notice ds-notice--error" role="alert">
+        <span className="ds-notice__cue" aria-hidden="true">
           Error
         </span>
         <div>
-          <p className="bb-notice__title">{state.error}</p>
+          <p className="ds-notice__title">{state.error}</p>
         </div>
       </div>
     );
@@ -28,13 +28,13 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
   const { outcome } = state;
   if (!outcome.fetch.ok) {
     return (
-      <div className="bb-notice bb-notice--error" role="alert">
-        <span className="bb-notice__cue" aria-hidden="true">
+      <div className="ds-notice ds-notice--error" role="alert">
+        <span className="ds-notice__cue" aria-hidden="true">
           Error
         </span>
         <div>
-          <p className="bb-notice__title">BB-030 safe fetch refused this URL.</p>
-          <div className="bb-notice__body">
+          <p className="ds-notice__title">Safe-fetch refused this URL.</p>
+          <div className="ds-notice__body">
             <p>
               Reason: <code>{outcome.fetch.reason}</code>. Nothing was proposed — no quarantine
               record or draft research case was created.
@@ -48,8 +48,8 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
   return (
     <div className="quick-add-result">
       {outcome.citation ? (
-        <aside className="bb-citation" aria-label="Pre-filled citation">
-          <span className="bb-citation__label">Pre-filled citation</span>
+        <aside className="ds-citation" aria-label="Pre-filled citation">
+          <span className="ds-citation__label">Pre-filled citation</span>
           <a href={outcome.citation.sourceUrl} rel="noopener noreferrer">
             {outcome.citation.suggestedTitle}
           </a>
@@ -62,16 +62,16 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
       ) : null}
 
       {outcome.capturePlan ? (
-        <div className="bb-notice bb-notice--warning" role="status">
-          <span className="bb-notice__cue" aria-hidden="true">
+        <div className="ds-notice ds-notice--warning" role="status">
+          <span className="ds-notice__cue" aria-hidden="true">
             Warning
           </span>
           <div>
-            <p className="bb-notice__title">
+            <p className="ds-notice__title">
               Archival capture point: {outcome.capturePlan.snapshotMode} snapshot, Wayback
               integration {outcome.capturePlan.waybackIntegration}
             </p>
-            <div className="bb-notice__body">
+            <div className="ds-notice__body">
               <p>{outcome.capturePlan.notes}</p>
             </div>
           </div>
@@ -85,7 +85,7 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
             <dl>
               <div>
                 <dt>Quarantine submission</dt>
-                <dd className="bb-citation__label">{outcome.intake.submission.id}</dd>
+                <dd className="ds-citation__label">{outcome.intake.submission.id}</dd>
               </div>
               <div>
                 <dt>Moderation state</dt>
@@ -94,7 +94,7 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
               {outcome.intake.researchCase ? (
                 <div>
                   <dt>Draft research case</dt>
-                  <dd className="bb-citation__label">
+                  <dd className="ds-citation__label">
                     {outcome.intake.researchCase.id} ({outcome.intake.researchCase.state})
                   </dd>
                 </div>
@@ -107,7 +107,7 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
               </div>
             </dl>
             <button
-              className="bb-button bb-button--secondary"
+              className="ds-button ds-button--secondary"
               disabled
               title="Live commit wiring intentionally follows this console's existing pattern — not connected in this shell"
               type="button"
@@ -122,13 +122,13 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
             </p>
           </div>
         ) : (
-          <div className="bb-notice bb-notice--dispute" role="status">
-            <span className="bb-notice__cue" aria-hidden="true">
+          <div className="ds-notice ds-notice--dispute" role="status">
+            <span className="ds-notice__cue" aria-hidden="true">
               Disputed
             </span>
             <div>
-              <p className="bb-notice__title">BB-029 validation rejected this proposal.</p>
-              <div className="bb-notice__body">
+              <p className="ds-notice__title">Intake validation rejected this proposal.</p>
+              <div className="ds-notice__body">
                 <ul>
                   {outcome.intake.rejection.issues.map((issue) => (
                     <li key={`${issue.field}-${issue.reason}`}>
@@ -177,7 +177,7 @@ export function QuickAddForm() {
             replace this field once IAP/Firebase session verification is wired into this route.
           </p>
         </div>
-        <button className="bb-button bb-button--primary" disabled={isPending} type="submit">
+        <button className="ds-button ds-button--primary" disabled={isPending} type="submit">
           {isPending ? 'Fetching…' : 'Fetch and prepare draft'}
         </button>
       </form>

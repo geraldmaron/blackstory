@@ -168,7 +168,7 @@ export function registerHistoricSafetySource(
     rights: input.rights,
     permittedClaimClasses: input.permittedClaimClasses,
     refreshSchedule: input.refreshCadence,
-    notes: `BB-082 historic-safety source "${input.sourceId}"; custodian: ${input.custodian}.`,
+    notes: ` historic-safety source "${input.sourceId}"; custodian: ${input.custodian}.`,
   };
 
   const contract: SourceAdapterContract = {
@@ -273,7 +273,7 @@ export function buildHistoricSafetySourceRegistrationInputs(input: {
         'citation \u2014 never restate it as a boolean claim.',
       licenseNotes:
         'Individual town-level designations with a documented confidence label; not a bulk-' +
-        'geometry corpus \u2014 excluded from the ../corpus-vetting.ts BB-094 lane by design ' +
+        'geometry corpus \u2014 excluded from the ../corpus-vetting.ts  lane by design ' +
         '(`EXCLUDED_CORPUS_LANES`), registered here instead.',
       refreshCadence: 'quarterly',
       classification: 'reputable_secondary',

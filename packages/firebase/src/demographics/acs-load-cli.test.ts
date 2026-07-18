@@ -6,7 +6,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { ACS5_2024_VINTAGE } from '@blap/domain';
+import { ACS5_2024_VINTAGE } from '@repo/domain';
 import {
   runAcsCountyLoad,
   runAcsTractLoad,

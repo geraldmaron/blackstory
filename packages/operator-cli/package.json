@@ -1,5 +1,5 @@
 {
-  "name": "@blap/operator-cli",
+  "name": "@repo/operator-cli",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -23,13 +23,13 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "@blap/domain": "workspace:*",
-    "@blap/firebase": "workspace:*",
-    "@blap/security": "workspace:*",
+    "@repo/domain": "workspace:*",
+    "@repo/firebase": "workspace:*",
+    "@repo/security": "workspace:*",
     "firebase-admin": "^13.4.0"
   },
   "devDependencies": {
-    "@blap/typescript-config": "workspace:^",
+    "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

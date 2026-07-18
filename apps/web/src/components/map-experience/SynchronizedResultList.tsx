@@ -10,7 +10,7 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import { cx } from '@blap/ui';
+import { cx } from '@repo/ui';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import { ConfidenceMark } from './ConfidenceMark';
 import { KindBadge } from './KindBadge';
@@ -41,16 +41,16 @@ export function SynchronizedResultList({
   onSelect,
 }: SynchronizedResultListProps) {
   return (
-    <ul className={cx('bp-result-list', 'bp-explore-result-list', className)} aria-labelledby={labelledBy}>
+    <ul className={cx('ds-result-list', 'ds-explore-result-list', className)} aria-labelledby={labelledBy}>
       {features.map((feature) => {
         const { properties } = feature;
         const isSelected = properties.entityId === selectedId;
         const body = (
           <>
-            <h3 className="bp-result-list__title">{properties.displayName}</h3>
-            <p className="bp-result-list__summary">{properties.oneLineStory}</p>
-            <dl className="bp-result-list__meta bp-result-list__meta--labeled">
-              <div className="bp-result-meta">
+            <h3 className="ds-result-list__title">{properties.displayName}</h3>
+            <p className="ds-result-list__summary">{properties.oneLineStory}</p>
+            <dl className="ds-result-list__meta ds-result-list__meta--labeled">
+              <div className="ds-result-meta">
                 <dt>Kind</dt>
                 <dd>
                   <KindBadge
@@ -60,25 +60,25 @@ export function SynchronizedResultList({
                   />
                 </dd>
               </div>
-              <div className="bp-result-meta">
+              <div className="ds-result-meta">
                 <dt>Era</dt>
-                <dd className="bp-mono">{eraLabel(properties.eraBuckets)}</dd>
+                <dd className="ds-mono">{eraLabel(properties.eraBuckets)}</dd>
               </div>
-              <div className="bp-result-meta">
+              <div className="ds-result-meta">
                 <dt>Confidence</dt>
                 <dd>
-                  <ConfidenceMark tier={properties.confidenceTier} labeled className="bp-sans" />
+                  <ConfidenceMark tier={properties.confidenceTier} labeled className="ds-sans" />
                 </dd>
               </div>
-              <div className="bp-result-meta">
+              <div className="ds-result-meta">
                 <dt>Evidence</dt>
-                <dd className="bp-sans">
+                <dd className="ds-sans">
                   {properties.evidenceCount} claim{properties.evidenceCount === 1 ? '' : 's'}
                 </dd>
               </div>
-              <div className="bp-result-meta">
+              <div className="ds-result-meta">
                 <dt>Where</dt>
-                <dd className="bp-mono">{properties.statePostalCode ?? '—'}</dd>
+                <dd className="ds-mono">{properties.statePostalCode ?? '—'}</dd>
               </div>
             </dl>
           </>
@@ -87,12 +87,12 @@ export function SynchronizedResultList({
         return (
           <li
             key={properties.entityId}
-            className={cx('bp-result-list__item', isSelected && 'bp-result-list__item--selected')}
+            className={cx('ds-result-list__item', isSelected && 'ds-result-list__item--selected')}
           >
             {onSelect ? (
               <button
                 type="button"
-                className="bp-result-list__link bp-result-list__link--button"
+                className="ds-result-list__link ds-result-list__link--button"
                 aria-current={isSelected ? 'true' : undefined}
                 data-entity-id={properties.entityId}
                 onClick={() => onSelect(properties.entityId)}
@@ -101,7 +101,7 @@ export function SynchronizedResultList({
               </button>
             ) : (
               <Link
-                className="bp-result-list__link"
+                className="ds-result-list__link"
                 href={properties.href}
                 aria-current={isSelected ? 'true' : undefined}
                 data-entity-id={properties.entityId}

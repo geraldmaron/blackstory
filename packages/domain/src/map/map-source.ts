@@ -3,15 +3,15 @@
  *
  * This module builds the public map GeoJSON + state/county presence aggregates
  * from active public projections. It is a pure, dependency-injected module: it
- * has ZERO runtime dependency on `@blap/security` (that package already
- * depends on `@blap/domain`, so the reverse edge would be a circular
+ * has ZERO runtime dependency on `@repo/security` (that package already
+ * depends on `@repo/domain`, so the reverse edge would be a circular
  * workspace dependency) and it never reads a raw coordinate for output.
  *
  * The hard invariant: every location
  * that reaches a feature or aggregate MUST come from the return value of the
  * injected `redactLocation` port, never from the raw `location` field on the
  * input. `redactLocation` is structurally typed to match
- * `redactLocationForPublic` from `@blap/security` callers wire the
+ * `redactLocationForPublic` from `@repo/security` callers wire the
  * real function in; see `fixtures.ts` and `map-source.redaction.test.ts` for
  * the wiring and the regression test that proves the invariant against the
  * real security package.
@@ -20,7 +20,7 @@
  * workers/publication/MAP_SOURCE_INTEGRATION.md. On release activation, the release
  * pipeline should call `buildMapSource` with every active public projection that
  * carries a location, using `redactLocationForPublic` (or `toPublicEntityProjection`'s
- * location step) from `@blap/security` as the `redactLocation` port, then
+ * location step) from `@repo/security` as the `redactLocation` port, then
  * persist the result alongside the release manifest so rollback restores the prior
  * map version the same way it restores the prior search-index version.
  */
@@ -40,7 +40,7 @@ export type MapSourceRawLocation = {
   readonly neededForPublic?: boolean;
   /**
    * Optional county hint resolved upstream from the entity's jurisdiction
-   * records (see `@blap/domain` geography `Jurisdiction`). This module
+   * records (see `@repo/domain` geography `Jurisdiction`). This module
    * never derives a county from coordinates real county attribution needs
    * polygon boundary data this repo does not vendor (see ADR-013). Without a
    * hint, the entity's point still contributes to the state aggregate; it is
@@ -57,7 +57,7 @@ export type MapSourceEntityInput = {
   readonly location?: MapSourceRawLocation;
 };
 
-/** Structurally matches `PublicLocation` from `@blap/security`. */
+/** Structurally matches `PublicLocation` from `@repo/security`. */
 export type MapRedactedLocation = {
   readonly precision: string;
   readonly lat?: number;
@@ -68,7 +68,7 @@ export type MapRedactedLocation = {
   readonly reductionReason?: string;
 };
 
-/** Structurally matches `redactLocationForPublic` from `@blap/security`. */
+/** Structurally matches `redactLocationForPublic` from `@repo/security`. */
 export type MapRedactLocationFn = (input: {
   readonly precision: string;
   readonly lat?: number;
@@ -143,13 +143,13 @@ export type BuildMapSourceInput = {
   readonly releaseId: string;
   readonly generatedAt: string;
   readonly entities: readonly MapSourceEntityInput[];
-  /** Port: wire this to `redactLocationForPublic` from `@blap/security`. */
+  /** Port: wire this to `redactLocationForPublic` from `@repo/security`. */
   readonly redactLocation: MapRedactLocationFn;
 };
 
 /**
  * Build the public map GeoJSON FeatureCollection and state/county presence
- * aggregates for every geo-anchored entity ("everything-active" population 
+ * aggregates for every geo-anchored entity ("everything-active" population
  * ). Every coordinate in the output is the
  * return value of `redactLocation`; raw `location.lat`/`location.lng` values
  * are only ever passed as arguments into that function, never read back out.

@@ -19,7 +19,7 @@
  */
 
 import React from 'react';
-import { EmptyState } from '@blap/ui';
+import { EmptyState } from '@repo/ui';
 import { buildEvidenceCards, mostRecentLastCheckedAt, totalSourceLineageCount } from '../../lib/evidence';
 import type {
   EvidenceClaimInput,
@@ -65,7 +65,7 @@ export function EntityEvidencePanel({
   const resolvedLastCheckedAt = lastCheckedAt ?? mostRecentLastCheckedAt(cards);
 
   return (
-    <div className="bp-stack" aria-labelledby={labelledBy}>
+    <div className="ds-stack" aria-labelledby={labelledBy}>
       <EvidenceMeasurementLegend />
 
       <EvidenceResearchCoverageSummary
@@ -78,7 +78,7 @@ export function EntityEvidencePanel({
       {cards.length === 0 ? (
         <EmptyState title={EVIDENCE_GAP_COPY.claims.title}>{EVIDENCE_GAP_COPY.claims.body}</EmptyState>
       ) : (
-        <div className="bp-stack">
+        <div className="ds-stack">
           {cards.map((card) => (
             <EvidenceCard key={card.id} card={card} />
           ))}

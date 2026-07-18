@@ -1,7 +1,7 @@
 /**
  * Per-source update-cadence metadata for the historic-safety engine, shaped to be directly
  * compatible with `JobCadence` (`packages/config/src/scheduled-jobs/types.ts`) without
- * this package depending on `@blap/config` (the dependency direction runs the other way:
+ * this package depending on `@repo/config` (the dependency direction runs the other way:
  * config depends on domain, not vice versa \u2014 see that package's own `package.json`). Any
  * job body (stub or real) can spread one of these cadence records directly into a
  * `ScheduledJobDefinition.cadence` field.
@@ -10,7 +10,7 @@
  * entries with cadences matching this module's `fbiHateCrime` (annual) and
  * `tougalooMappingInequality` (quarterly) entries \u2014 this module is the domain-owned source of
  * truth those roster entries' cadence numbers were drawn from; it does not re-declare or import
- * the roster itself (this package cannot depend on `@blap/config`).
+ * the roster itself (this package cannot depend on `@repo/config`).
  */
 
 /** Structurally identical to `JobCadence` shape (duplicated, not imported, to keep this
@@ -39,7 +39,7 @@ export type HistoricSafetySourceCadenceId = (typeof HISTORIC_SAFETY_SOURCE_CADEN
 /**
  * Published per-source cadences (design note: "FBI data annually on release;
  * Tougaloo/Mapping Inequality checked for dataset revisions; our own corpus layers recompute on
- * release activation"). `own-corpus-layers` uses the same event-driven sentinel convention 
+ * release activation"). `own-corpus-layers` uses the same event-driven sentinel convention
  * defines for release-coupled work (`EVENT_DRIVEN_CADENCE_SENTINEL`, duplicated here as a literal
  * string for the same dependency-direction reason as the type above) with an hourly safety-net
  * poll, mirroring `release-coupled-rebuild`'s own roster entry.

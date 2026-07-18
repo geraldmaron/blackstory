@@ -2,7 +2,7 @@
  * Rights status and publication gates for evidence media and substantial excerpts.
  * Constitution publicationRestrictions.requireRightsStatus drives the gate.
  */
-import { loadProductConstitution } from '@blap/schemas';
+import { loadProductConstitution } from '@repo/schemas';
 
 export const RIGHTS_STATUSES = [
   'unknown',

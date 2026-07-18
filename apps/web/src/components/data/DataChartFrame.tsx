@@ -34,12 +34,12 @@ export function DataChartFrame({
       : []);
 
   return (
-    <figure className="bp-data-chart" {...(ariaLabel ? { 'aria-label': ariaLabel } : {})}>
-      <figcaption className="bp-data-chart__title">{title}</figcaption>
-      <div className="bp-data-chart__viz">{children}</div>
-      <p className="bp-data-chart__caption bp-sans">{caption}</p>
-      <div className="bp-visually-hidden">{textAlternative}</div>
-      <SourceFootnote sources={resolvedSources} density="group" className="bp-data-chart__source" />
+    <figure className="ds-data-chart" {...(ariaLabel ? { 'aria-label': ariaLabel } : {})}>
+      <figcaption className="ds-data-chart__title">{title}</figcaption>
+      <div className="ds-data-chart__viz">{children}</div>
+      <p className="ds-data-chart__caption ds-sans">{caption}</p>
+      <div className="ds-visually-hidden">{textAlternative}</div>
+      <SourceFootnote sources={resolvedSources} density="group" className="ds-data-chart__source" />
     </figure>
   );
 }

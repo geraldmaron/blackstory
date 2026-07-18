@@ -11,7 +11,7 @@ import {
   type SubmissionCampaignAssessment,
   type SubmissionInput,
   type SubmissionModerationState,
-} from '@blap/security';
+} from '@repo/security';
 import { guardIntakeOperation, guardPublishAttempt } from './posture.js';
 
 export type SubmissionSecurityContext = {

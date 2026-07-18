@@ -19,7 +19,7 @@ on:
         required: false
         type: string
       staging_identity_label:
-        description: Isolated identity label beginning bb-security-dast-
+        description: Isolated identity label beginning ds-security-dast-
         required: false
         type: string
 
@@ -293,7 +293,7 @@ jobs:
           node -e '
             const url = new URL(process.env.STAGING_BASE_URL);
             if (url.protocol !== "https:" || !/(^|[.-])staging([.-]|$)/i.test(url.hostname)) process.exit(1);
-            if (!process.env.STAGING_IDENTITY_LABEL.startsWith("bb-security-dast-")) process.exit(1);
+            if (!process.env.STAGING_IDENTITY_LABEL.startsWith("ds-security-dast-")) process.exit(1);
             if (!process.env.ZAP_AUTH_HEADER_VALUE || process.env.ZAP_AUTH_HEADER_VALUE === "Bearer ") process.exit(1);
           '
       - name: Run authorized ZAP baseline against staging only

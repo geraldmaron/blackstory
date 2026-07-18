@@ -6,7 +6,7 @@
  * unlike the cosmetic slug below). The slug is deliberately the ONLY part of a fact's
  * permalink that may ever change: `/facts/{id}/{slug}` a slug change must 301 (see
  * `apps/web/src/app/facts/[id]/[slug]/page.tsx`) rather than mint a new id. Per-revision
- * permalinks (`/facts/{id}/rev/{n}`) follow the Wikipedia "oldid" pattern named in 
+ * permalinks (`/facts/{id}/rev/{n}`) follow the Wikipedia "oldid" pattern named in
  * design note: the single most important defense against a hostile out-of-context screenshot,
  * because the cited revision never changes even when the current record is later corrected.
  */

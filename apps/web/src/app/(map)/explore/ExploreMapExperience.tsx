@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Client orchestrator for `/explore` (BB-098). Wires the shared `MapStage` (via `useMapStage()`
+ * Client orchestrator for `/explore` (). Wires the shared `MapStage` (via `useMapStage()`
  * instead of mounting its own canvas), the synchronized accessible list, density toggle,
  * relationship lines, decade settings, filter form, and shareable URL state. Pin or list
  * selection opens a centered (desktop) / bottom-sheet (mobile) narrative spotlight — not a
@@ -16,8 +16,8 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Notice } from '@blap/ui';
-import { US_CONUS_BOUNDS, findUsStateByPostalCode } from '@blap/domain/map/geography';
+import { Notice } from '@repo/ui';
+import { US_CONUS_BOUNDS, findUsStateByPostalCode } from '@repo/domain/map/geography';
 import { HistoryEdgePanel } from '../../../components/history/HistoryEdgePanel';
 import { DensityLayerToggle } from '../../../components/map-experience/DensityLayerToggle';
 import { MapExperienceLegend } from '../../../components/map-experience/MapExperienceLegend';
@@ -45,7 +45,7 @@ export type ExploreMapExperienceProps = {
   readonly initial: ExploreViewModel;
 };
 
-const TRANSITION_FLAG = 'bp-map-transition';
+const TRANSITION_FLAG = 'ds-map-transition';
 
 /** Keeps the selected pin clear of the centered (desktop) / bottom (mobile) spotlight. */
 const SELECTION_CAMERA_PADDING = { top: 72, bottom: 280, left: 48, right: 48 } as const;
@@ -402,7 +402,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
     const frame = window.requestAnimationFrame(() => {
       if (entityOpen) {
-        spotlightRef.current?.querySelector<HTMLElement>('.bp-nc')?.focus();
+        spotlightRef.current?.querySelector<HTMLElement>('.ds-nc')?.focus();
       } else {
         spotlightRef.current?.querySelector<HTMLElement>('article, [tabindex]')?.focus();
       }
@@ -488,25 +488,25 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   return (
     /* Instruments follow the site theme (light/dark) — map plate syncs via MapStage. */
-    <div className="bp-explore-stage">
+    <div className="ds-explore-stage">
       {!stage.mapAvailable && degradedCopy ? (
-        <div className="bp-explore-stage__notice">
+        <div className="ds-explore-stage__notice">
           <Notice tone="warning" title="Map unavailable">
             {degradedCopy}
           </Notice>
         </div>
       ) : null}
 
-      <div className="bp-explore-stage__filters" ref={filterRegionRef} tabIndex={-1} aria-label="Map filters">
-        <p className="bp-explore-stage__panel-title" id="explore-facets-heading">
+      <div className="ds-explore-stage__filters" ref={filterRegionRef} tabIndex={-1} aria-label="Map filters">
+        <p className="ds-explore-stage__panel-title" id="explore-facets-heading">
           Filters
         </p>
-        <div className="bp-explore__facets" role="group" aria-labelledby="explore-facets-heading">
+        <div className="ds-explore__facets" role="group" aria-labelledby="explore-facets-heading">
           {FACET_ROWS.map(({ key, label }) => (
-            <label className="bp-pill-select bp-explore__facet" key={key} htmlFor={`explore-${key}`}>
-              <span className="bp-pill-select__label">{label}</span>
+            <label className="ds-pill-select ds-explore__facet" key={key} htmlFor={`explore-${key}`}>
+              <span className="ds-pill-select__label">{label}</span>
               <select
-                className="bp-pill-select__control"
+                className="ds-pill-select__control"
                 id={`explore-${key}`}
                 value={view.viewState.filters[key]}
                 onChange={(event) => handleFilterChange(key, event.currentTarget.value)}
@@ -521,35 +521,35 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           ))}
         </div>
 
-        <div className="bp-explore-stage__toolbar">
+        <div className="ds-explore-stage__toolbar">
           <DensityLayerToggle enabled={view.viewState.density} onToggle={handleDensityToggle} />
-          <details className="bp-explore-stage__disclosure" open={view.viewState.lines}>
-            <summary className="bp-explore-stage__disclosure-summary">Map settings</summary>
-            <div className="bp-explore__settings-body">
-              <fieldset className="bp-explore__settings-fieldset">
-                <legend className="bp-sans">Relationship lines</legend>
+          <details className="ds-explore-stage__disclosure" open={view.viewState.lines}>
+            <summary className="ds-explore-stage__disclosure-summary">Map settings</summary>
+            <div className="ds-explore__settings-body">
+              <fieldset className="ds-explore__settings-fieldset">
+                <legend className="ds-sans">Relationship lines</legend>
                 <button
                   type="button"
-                  className="bp-button"
+                  className="ds-button"
                   aria-pressed={view.viewState.lines}
                   onClick={handleLinesToggle}
                 >
                   Lines: {view.viewState.lines ? 'on' : 'off'}
                 </button>
-                <p className="bp-sans bp-explore__settings-note">
+                <p className="ds-sans ds-explore__settings-note">
                   Evidence-backed History connections only. Campus-shared endpoints show a short
                   display stub.
                 </p>
               </fieldset>
 
               {view.viewState.lines ? (
-                <fieldset className="bp-explore__settings-fieldset">
-                  <legend className="bp-sans">Decade</legend>
-                  <div className="bp-explore__decade-row" role="tablist" aria-label="Line decade">
+                <fieldset className="ds-explore__settings-fieldset">
+                  <legend className="ds-sans">Decade</legend>
+                  <div className="ds-explore__decade-row" role="tablist" aria-label="Line decade">
                     <button
                       type="button"
                       role="tab"
-                      className="bp-button"
+                      className="ds-button"
                       aria-selected={!view.viewState.decade}
                       onClick={() => handleDecadeSelect(undefined)}
                     >
@@ -560,7 +560,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
                         key={decade}
                         type="button"
                         role="tab"
-                        className="bp-button"
+                        className="ds-button"
                         aria-selected={view.viewState.decade === decade}
                         onClick={() => handleDecadeSelect(decade)}
                       >
@@ -571,13 +571,13 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
                 </fieldset>
               ) : null}
 
-              <p className="bp-sans">
+              <p className="ds-sans">
                 <a href="/history">Open the full history graph</a> for the decade narrative panel.
               </p>
             </div>
           </details>
           {view.viewState.state ? (
-            <button type="button" className="bp-button" onClick={handleClearState}>
+            <button type="button" className="ds-button" onClick={handleClearState}>
               Clear state
             </button>
           ) : null}
@@ -587,12 +587,12 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       <div
         className={
           selectedFeature || view.selectedEdge
-            ? 'bp-explore-stage__results bp-explore-stage__results--dimmed'
-            : 'bp-explore-stage__results'
+            ? 'ds-explore-stage__results ds-explore-stage__results--dimmed'
+            : 'ds-explore-stage__results'
         }
       >
         {/* The count labels the list it sits above — oldest records first. */}
-        <p className="bp-sans bp-explore__results-count" id="explore-results-heading">
+        <p className="ds-sans ds-explore__results-count" id="explore-results-heading">
           {filteredFeatures.length} documented record{filteredFeatures.length === 1 ? '' : 's'}
           {selectedStateName ? ` in ${selectedStateName}` : ' in view'}
           {view.viewState.lines
@@ -606,15 +606,15 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       </div>
 
       {view.selectedEdge ? (
-        <div className="bp-explore-stage__spotlight" ref={spotlightRef}>
+        <div className="ds-explore-stage__spotlight" ref={spotlightRef}>
           <button
             type="button"
-            className="bp-explore-stage__spotlight-scrim"
+            className="ds-explore-stage__spotlight-scrim"
             aria-label="Dismiss connection panel"
             onClick={handleCloseEdge}
           />
           <div
-            className="bp-explore-stage__spotlight-panel"
+            className="ds-explore-stage__spotlight-panel"
             role="dialog"
             aria-modal="true"
             aria-label="Selected connection"
@@ -625,25 +625,25 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       ) : null}
 
       {selectedFeature && !view.selectedEdge ? (
-        <div className="bp-explore-stage__spotlight" ref={spotlightRef}>
+        <div className="ds-explore-stage__spotlight" ref={spotlightRef}>
           <button
             type="button"
-            className="bp-explore-stage__spotlight-scrim"
+            className="ds-explore-stage__spotlight-scrim"
             aria-label="Dismiss selected record"
             onClick={handleCloseCard}
           />
           <div
-            className="bp-explore-stage__spotlight-panel"
+            className="ds-explore-stage__spotlight-panel"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="bp-nc-title"
+            aria-labelledby="ds-nc-title"
           >
             <NarrativeCard feature={selectedFeature} onClose={handleCloseCard} />
           </div>
         </div>
       ) : null}
 
-      <div className="bp-explore-stage__legend">
+      <div className="ds-explore-stage__legend">
         <MapExperienceLegend defaultCollapsed />
       </div>
     </div>

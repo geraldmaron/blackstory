@@ -1,7 +1,7 @@
 /**
  * Search index construction with defense-in-depth notability-gate enforcement.
  *
- * requires that every published search result carries at least one `notabilityBasis` 
+ * requires that every published search result carries at least one `notabilityBasis`
  * "the inclusion gate holds AT THE SEARCH BOUNDARY." The publication-side call site that should
  * enforce this (`packages/domain/src/publication/`) does not yet call the gate (see the wiring note
  * in `../relevance/notability-gate.ts`). So this builder independently enforces it as

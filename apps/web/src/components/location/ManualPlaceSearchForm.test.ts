@@ -11,7 +11,7 @@ import { ManualPlaceSearchForm } from './ManualPlaceSearchForm';
 
 const { createElement } = React;
 
-// Workaround for a pre-existing gap in `@blap/ui`'s FilterBar.tsx/Button.tsx see
+// Workaround for a pre-existing gap in `@repo/ui`'s FilterBar.tsx/Button.tsx see
 // `./LocationConsentButton.test.ts`'s identical note.
 (globalThis as Record<string, unknown>).React = React;
 

@@ -1,5 +1,5 @@
 /**
- * Derived graph-view release-artifact build, following the 
+ * Derived graph-view release-artifact build, following the
  * immutable-release pattern (`../publication/index.ts`): `publicReleases/{releaseId}/graph/...`
  * docs, deterministic content hashing via the same `canonicalJson`/`sha256Json` — the entity
  * projection/snapshot manifest uses, and the same `publicReleases/{releaseId}/...` path shape as

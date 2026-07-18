@@ -59,21 +59,21 @@ export function FilterBar({
 
   return (
     <form
-      className={cx('bp-filters', className)}
+      className={cx('ds-filters', className)}
       method={method}
       action={action}
       onSubmit={handleSubmit}
-    >      <fieldset className="bp-filters__fieldset">
-        <legend className="bp-filters__legend">{legend}</legend>
-        <div className="bp-filters__fields">
+    >      <fieldset className="ds-filters__fieldset">
+        <legend className="ds-filters__legend">{legend}</legend>
+        <div className="ds-filters__fields">
           {fields.map((field) => (
-            <div key={field.id} className="bp-filters__field">
-              <label className="bp-filters__label" htmlFor={field.id}>
+            <div key={field.id} className="ds-filters__field">
+              <label className="ds-filters__label" htmlFor={field.id}>
                 {field.label}
               </label>
               {field.type === 'select' ? (
                 <select
-                  className="bp-filters__control"
+                  className="ds-filters__control"
                   id={field.id}
                   name={field.name}
                   defaultValue={field.defaultValue}
@@ -86,7 +86,7 @@ export function FilterBar({
                 </select>
               ) : (
                 <input
-                  className="bp-filters__control"
+                  className="ds-filters__control"
                   id={field.id}
                   name={field.name}
                   type={field.type ?? 'search'}
@@ -98,9 +98,9 @@ export function FilterBar({
           ))}
         </div>
       </fieldset>
-      <div className="bp-filters__actions">
+      <div className="ds-filters__actions">
         {actions ?? (
-          <button type="submit" className="bp-button bp-button--primary">
+          <button type="submit" className="ds-button ds-button--primary">
             Apply filters
           </button>
         )}

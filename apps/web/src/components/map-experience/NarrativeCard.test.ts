@@ -23,17 +23,17 @@ test('renders name, era, one-line story, evidence count, confidence, and a link 
   assert.match(html, /Fifteenth Street Presbyterian Church/);
   assert.match(html, /1840s/);
   assert.match(html, /accepted claim/);
-  assert.match(html, /bp-kind-badge/);
+  assert.match(html, /ds-kind-badge/);
   assert.match(html, />Place</);
   assert.doesNotMatch(html, />place</);
-  assert.match(html, /bp-confidence-mark/);
+  assert.match(html, /ds-confidence-mark/);
   assert.match(html, /data-labeled="true"/);
   assert.match(html, />High<|>Medium<|>Low<|>Unrated</);
   assert.doesNotMatch(html, /high confidence/i);
   assert.match(html, new RegExp(`href="${feature.properties.href}"`));
   assert.match(html, /Selected record/);
   assert.match(html, /><dt>Where<\/dt>/);
-  assert.match(html, /bp-nc__title-link/);
+  assert.match(html, /ds-nc__title-link/);
   assert.match(html, /Open full record/);
 });
 

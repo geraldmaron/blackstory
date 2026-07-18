@@ -2,7 +2,7 @@
  * Site-wide disclaimer from the registry one framework, no ad-hoc copy.
  */
 import React from 'react';
-import { getDisclaimer } from '@blap/domain/disclaimers';
+import { getDisclaimer } from '@repo/domain/disclaimers';
 import { DisclaimerBanner } from '../DisclaimerBanner';
 
 export function TrustSiteDisclaimer() {

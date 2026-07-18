@@ -2,7 +2,7 @@
  * Maps internal moderation states to public-safe status surfaces. Never
  * exposes spam scores, campaign detection, duplicate lists, or other moderation-sensitive data.
  */
-import type { SubmissionModerationState } from '@blap/security';
+import type { SubmissionModerationState } from '@repo/security';
 
 export type PublicCorrectionPhase = 'received' | 'under_review' | 'closed';
 

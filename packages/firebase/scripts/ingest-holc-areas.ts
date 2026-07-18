@@ -3,15 +3,15 @@
  * Firestore `holcAreas` (geometry stays in the Storage file; docs carry a geometryRef).
  *
  * RIGHTS GATE: DSL's vector dataset is CC BY-NC-SA 4.0 (see the corrected
- * `mapping-inequality-holc` entry in @blap/domain launch-corpora.ts). `holcAreas` stays
+ * `mapping-inequality-holc` entry in @repo/domain launch-corpora.ts). `holcAreas` stays
  * client-CLOSED in firestore.rules; any public surface use needs a rights review first.
  *
  * Requires:
- *   BLAP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1 to validate without writing)
+ *   APP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1 to validate without writing)
  *   Application Default Credentials with Storage + Firestore write on black-book-efaaf
  *
  * Usage (from repo root):
- *   BLAP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
+ *   APP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
  *     packages/firebase/scripts/ingest-holc-areas.ts --file=/path/to/mappinginequality.json
  */
 import { createHash } from 'node:crypto';
@@ -19,13 +19,13 @@ import { existsSync, readFileSync } from 'node:fs';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
-import { getExternalDataSource, sha256Json } from '@blap/domain';
+import { getExternalDataSource, sha256Json } from '@repo/domain';
 import { idempotentBatchUpsert, loadExistingHashes } from '../src/external/batch-upsert.ts';
 import { recordDatasetAcquisition } from '../src/external/capture.ts';
 import { holcAreaSchema, type HolcAreaDoc } from '../src/external/schema.ts';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
-const ALLOW = process.env.BLAP_FIREBASE_ALLOW_PRODUCTION === '1';
+const ALLOW = process.env.APP_FIREBASE_ALLOW_PRODUCTION === '1';
 const DRY_RUN = process.env.DRY_RUN === '1';
 /** Private archive bucket (uniform access, public-access prevention enforced; created
  * 2026-07-18) — never the public-media bucket. */
@@ -62,7 +62,7 @@ function arg(name: string): string | undefined {
 
 async function main(): Promise<void> {
   if (!ALLOW && !DRY_RUN) {
-    console.error('Refusing to write: set BLAP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1)');
+    console.error('Refusing to write: set APP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1)');
     process.exit(2);
   }
   const filePath = arg('file');

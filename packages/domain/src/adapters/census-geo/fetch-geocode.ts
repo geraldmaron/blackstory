@@ -2,7 +2,7 @@
  * Fetches Census Geocoder results through the shared safe HTTP port never a
  * bare `fetch`, same posture as `../web-search/fetch-search.ts` and every other -style
  * adapter in this directory tree. No API key: the Census Geocoder is free and unauthenticated
- * (see ./types.ts's module doc); this adapter's own call volume is bounded by the 
+ * (see ./types.ts's module doc); this adapter's own call volume is bounded by the
  * `geocoding` endpoint-class quota at the route layer (outside this package), not a vendor key.
  */
 import {

@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { getDisclaimer } from '@blap/domain/disclaimers';
+import { getDisclaimer } from '@repo/domain/disclaimers';
 import { listSeedFacts } from '../../data/facts-seed';
 import {
   CommonMisreadings,

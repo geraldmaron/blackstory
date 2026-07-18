@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { LAW_STATUSES, lawStatusLabel, lawStatusTone } from './status.js';
 
-test('LAW_STATUSES matches BB-090 vocabulary', () => {
+test('LAW_STATUSES matches vocabulary', () => {
   assert.deepEqual(LAW_STATUSES, ['in_force', 'amended', 'repealed', 'struck_down', 'enjoined']);
 });
 

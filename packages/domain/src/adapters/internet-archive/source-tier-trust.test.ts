@@ -79,7 +79,7 @@ test('a weak-signal RSS/community_oral candidate does not independently reach in
   const candidate = communityCandidate();
   const assessment = evaluateCandidateRelevance({ candidate, assessedAt: FIXED_NOW });
   assert.notEqual(assessment.decision, 'include');
-  // The hard downgrade is a no-op here because the existing gate pipeline already blocked it 
+  // The hard downgrade is a no-op here because the existing gate pipeline already blocked it
   // proving the two layers agree rather than fighting each other.
   assert.equal(enforceLowAuthorityTierCannotIncludeIndependently(candidate, assessment.decision), assessment.decision);
 });

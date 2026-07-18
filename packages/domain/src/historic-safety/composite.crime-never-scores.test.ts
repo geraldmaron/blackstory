@@ -1,5 +1,5 @@
 /**
- * Critical invariant tests: general crime statistics and advisory data must NEVER enter the 
+ * Critical invariant tests: general crime statistics and advisory data must NEVER enter the
  * composite exercises all four independent defense lines documented in ./composite.ts.
  */
 import assert from 'node:assert/strict';
@@ -107,7 +107,7 @@ test('defense 3: a GeneralCrimeContextRecord is labeled context only and never f
   );
 });
 
-test('defense 3: advisory fields in a composite-shaped object are rejected (BB-095 extension)', () => {
+test('defense 3: advisory fields in a composite-shaped object are rejected ( extension)', () => {
   const advisory: PlaceAdvisoryRecord = {
     id: 'adv_1',
     placeEntityId: asEntityId('ent_seed_place_001'),

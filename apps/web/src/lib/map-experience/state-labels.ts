@@ -1,5 +1,5 @@
 /**
- * State abbreviation label markers for the `/explore` national map (BB-099).
+ * State abbreviation label markers for the `/explore` national map ().
  *
  * Rendered as HTML markers, not a MapLibre `symbol` layer: this style has no `glyphs` URL
  * configured (no self-hosted font/sprite server yet see ADR-013 "known gaps", the same reason
@@ -15,8 +15,8 @@
 // Subpath import (not the package barrel): the barrel re-exports ./publication, which pulls in
 // `node:crypto` at module scope. This module is imported by MapStage.tsx ('use client'), so
 // barrel-importing here would drag a Node-only module into the browser bundle.
-import { US_STATES, type UsStateInfo } from '@blap/domain/map/geography';
-import { brandPalette, darkTheme } from '@blap/ui';
+import { US_STATES, type UsStateInfo } from '@repo/domain/map/geography';
+import { brandPalette, darkTheme } from '@repo/ui';
 
 export type StateLabelPoint = {
   readonly postalCode: string;
@@ -99,8 +99,8 @@ export function buildStateLabelMarkers(selectedPostalCode?: string): readonly St
   }));
 }
 
-export const STATE_LABEL_CLASS_NAME = 'bp-state-label';
-export const STATE_LABEL_SELECTED_CLASS_NAME = 'bp-state-label--selected';
+export const STATE_LABEL_CLASS_NAME = 'ds-state-label';
+export const STATE_LABEL_SELECTED_CLASS_NAME = 'ds-state-label--selected';
 
 /**
  * Builds a label's DOM element: IBM Plex Mono caps, Stone-on-dark, copper when selected, never
@@ -132,7 +132,7 @@ export function buildStateLabelElement(descriptor: StateLabelMarkerDescriptor): 
   el.style.pointerEvents = 'none';
   el.style.userSelect = 'none';
   el.style.whiteSpace = 'nowrap';
-  el.style.fontFamily = 'var(--bp-font-mono)';
+  el.style.fontFamily = 'var(--ds-font-mono)';
   el.style.textTransform = 'uppercase';
   el.style.letterSpacing = '0.08em';
   el.style.fontSize = '0.6875rem';

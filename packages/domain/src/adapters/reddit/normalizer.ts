@@ -1,6 +1,6 @@
 /**
  * Normalize parsed Reddit posts into AdapterCandidateRecord output. Mirrors
- * ./rss/normalizer.ts /../dpla/normalizer.ts exactly: cap the triage snippet to the 
+ * ./rss/normalizer.ts /../dpla/normalizer.ts exactly: cap the triage snippet to the
  * evidence-pointer snippet limits, stamp provenance, and fail closed on any doctrine
  * violation via ./guards.ts rather than silently dropping a field.
  */

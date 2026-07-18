@@ -1,5 +1,5 @@
 /**
- * US county polygon asset for the national map (black-book-uda: county hairlines as boundary
+ * US county polygon asset for the national map (the related workstream: county hairlines as boundary
  * context beneath the entity markers).
  *
  * Source: U.S. Census Bureau 2010 cartographic boundary counties at 1:20,000,000 (public

@@ -141,7 +141,7 @@ test('ambiguous duplicate matches enter review and never select silently', () =>
   assert.deepEqual(queueItem.proposedEntityIds.slice(0, 2), ['person-alex-a', 'person-alex-b']);
 });
 
-test('converts BB-039 discovery candidates with stable source references', () => {
+test('converts  discovery candidates with stable source references', () => {
   const discoveryCandidate: DiscoveryCandidateRecord = {
     schemaVersion: 'discovery-candidate.v1',
     id: 'discovery-1',
@@ -216,7 +216,7 @@ test('historically invalid locations and impossible lifespans reduce confidence'
   );
 });
 
-test('an exact trusted-namespace identifier match outranks a merely-similar name (black-book-8bck)', () => {
+test('an exact trusted-namespace identifier match outranks a merely-similar name (the related workstream)', () => {
   const nameLookalike = entity('person-name-lookalike', 'person', 'John Smith', {
     person: { livingStatus: 'unknown' },
   });

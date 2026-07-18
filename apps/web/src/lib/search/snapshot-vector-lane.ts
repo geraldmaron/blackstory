@@ -5,8 +5,8 @@
  * fusion can run locally without Firestore `findNearest`. Production wiring swaps this for a
  * server-side vector store call.
  */
-import { findSimilarCandidates, type EmbeddingVector } from '@blap/domain';
-import type { PublicSearchIndexDoc, SearchFilter } from '@blap/domain';
+import { findSimilarCandidates, type EmbeddingVector } from '@repo/domain';
+import type { PublicSearchIndexDoc, SearchFilter } from '@repo/domain';
 
 export type VectorLaneInput = {
   readonly normalizedQuery: string;

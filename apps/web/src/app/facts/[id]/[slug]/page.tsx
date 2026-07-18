@@ -5,7 +5,7 @@
  * resolvable with a banner never 404. Emits Article JSON-LD (never ClaimReview).
  */
 import { notFound, permanentRedirect } from 'next/navigation';
-import { Card } from '@blap/ui';
+import { Card } from '@repo/ui';
 import { SeedDataNotice } from '../../../../components/SeedDataNotice';
 import {
   FactCitationList,
@@ -21,7 +21,7 @@ import {
   HowToReadThisRecord,
   RevisionUpdateChrome,
 } from '../../../../components/trust';
-import { buildFactJsonPath, buildFactRevisionPath, slugifyFactStatement } from '@blap/domain';
+import { buildFactJsonPath, buildFactRevisionPath, slugifyFactStatement } from '@repo/domain';
 import { listPublicFactStaticParams, resolvePublicFact } from '../../resolve-public-fact';
 
 type FactPageProps = {
@@ -64,29 +64,29 @@ export default async function FactDetailPage({ params }: FactPageProps) {
   const currentRevision = fact.revisions[fact.revisions.length - 1];
 
   return (
-    <main className="bp-container bp-page" id="main">
+    <main className="ds-container ds-page" id="main">
       <FactJsonLdScript fact={fact} />
 
-      <header className="bp-entity-mast">
-        <p className="bp-page__eyebrow">
-          Fact · {humanizeToken(fact.claimType)} · <span className="bp-mono">{fact.id}</span>
+      <header className="ds-entity-mast">
+        <p className="ds-page__eyebrow">
+          Fact · {humanizeToken(fact.claimType)} · <span className="ds-mono">{fact.id}</span>
         </p>
-        <h1 className="bp-page__title">{fact.shortStatement}</h1>
-        <p className="bp-page__lede">{fact.statement}</p>
+        <h1 className="ds-page__title">{fact.shortStatement}</h1>
+        <p className="ds-page__lede">{fact.statement}</p>
       </header>
 
-      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
+      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
         <SeedDataNotice compact />
         <FactStatusBanner fact={fact} />
         <RevisionUpdateChrome fact={fact} />
         <HowToReadThisRecord />
 
         <section aria-labelledby="subjects-heading">
-          <p className="bp-section__kicker">Graph</p>
-          <h2 className="bp-section__title" id="subjects-heading">
+          <p className="ds-section__kicker">Graph</p>
+          <h2 className="ds-section__title" id="subjects-heading">
             Subjects
           </h2>
-          <div style={{ marginTop: 'var(--bp-space-4)' }}>
+          <div style={{ marginTop: 'var(--ds-space-4)' }}>
             <FactSubjectList subjects={fact.subjects} labelledBy="subjects-heading" />
           </div>
         </section>
@@ -94,22 +94,22 @@ export default async function FactDetailPage({ params }: FactPageProps) {
         <FactConfidencePanel fact={fact} />
 
         <section aria-labelledby="citations-heading">
-          <p className="bp-section__kicker">Sources</p>
-          <h2 className="bp-section__title" id="citations-heading">
+          <p className="ds-section__kicker">Sources</p>
+          <h2 className="ds-section__title" id="citations-heading">
             Citations
           </h2>
-          <div style={{ marginTop: 'var(--bp-space-4)' }}>
+          <div style={{ marginTop: 'var(--ds-space-4)' }}>
             <FactCitationList citations={fact.citations} labelledBy="citations-heading" />
           </div>
         </section>
 
         {fact.counterClaims.length > 0 ? (
           <section aria-labelledby="counterclaims-heading">
-            <p className="bp-section__kicker">Pre-bunking</p>
-            <h2 className="bp-section__title" id="counterclaims-heading">
+            <p className="ds-section__kicker">Pre-bunking</p>
+            <h2 className="ds-section__title" id="counterclaims-heading">
               Common misreadings
             </h2>
-            <div style={{ marginTop: 'var(--bp-space-4)' }}>
+            <div style={{ marginTop: 'var(--ds-space-4)' }}>
               <CommonMisreadings
                 counterClaims={fact.counterClaims}
                 labelledBy="counterclaims-heading"
@@ -119,11 +119,11 @@ export default async function FactDetailPage({ params }: FactPageProps) {
         ) : null}
 
         <section aria-labelledby="revision-heading">
-          <p className="bp-section__kicker">History</p>
-          <h2 className="bp-section__title" id="revision-heading">
+          <p className="ds-section__kicker">History</p>
+          <h2 className="ds-section__title" id="revision-heading">
             Revision history
           </h2>
-          <div style={{ marginTop: 'var(--bp-space-4)' }}>
+          <div style={{ marginTop: 'var(--ds-space-4)' }}>
             <FactRevisionPanel
               fact={fact}
               {...(currentRevision?.revisionNumber !== undefined
@@ -135,12 +135,12 @@ export default async function FactDetailPage({ params }: FactPageProps) {
         </section>
 
         <Card title="Machine-readable export" as="section">
-          <p className="bp-sans" style={{ margin: 0 }}>
+          <p className="ds-sans" style={{ margin: 0 }}>
             <a href={buildFactJsonPath(fact.id)}>Download this fact as JSON</a> (CSL-JSON citations + extension
-            block). JSON-LD uses schema.org <span className="bp-mono">Article</span>, never ClaimReview.
+            block). JSON-LD uses schema.org <span className="ds-mono">Article</span>, never ClaimReview.
           </p>
           {currentRevision ? (
-            <p className="bp-sans" style={{ margin: 'var(--bp-space-2) 0 0 0' }}>
+            <p className="ds-sans" style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
               Current revision permalink:{' '}
               <a href={buildFactRevisionPath(fact.id, currentRevision.revisionNumber)}>
                 /facts/{fact.id}/rev/{currentRevision.revisionNumber}

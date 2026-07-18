@@ -1,7 +1,7 @@
 
 /**
  * Firebase client and Admin helpers shared across Black Book surfaces.
- * Production project:. Local defaults: demo-blap emulators.
+ * Production project:. Local defaults: demo-repo emulators.
  */
 export {
   ADMIN_APP_ID,
@@ -338,8 +338,8 @@ export type {
   ReleaseSearchIndexArtifact,
 } from './firestore/index.js';
 
-// Census/ACS/FBI-UCR national-rollup readers for the public /data page (black-book-vxz,
-// black-book-8qp). Admin-SDK aggregate reads only — never a per-record dump. holcAreas is
+// Census/ACS/FBI-UCR national-rollup readers for the public /data page (the related workstream,
+// the related workstream). Admin-SDK aggregate reads only — never a per-record dump. holcAreas is
 // deliberately absent here; its CC BY-NC-SA rights gate excludes it from every public reader.
 export {
   getNationalPopulationByDecade,

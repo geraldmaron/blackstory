@@ -1,7 +1,7 @@
 /**
  * Server-side Firestore readers for public release projections.
  * Lives under `lib/` (not `app/`) so Admin SDK stays off the public render path.
- * Accesses Firestore only through `@blap/firebase` helpers (no direct firebase-admin import).
+ * Accesses Firestore only through `@repo/firebase` helpers (no direct firebase-admin import).
  * Docs are validated with Zod schemas rather than Admin converters to avoid
  * firebase-admin / web Firestore type skew on QueryDocumentSnapshot.
  */
@@ -16,7 +16,7 @@ import {
   type PublicActiveReleaseDoc,
   type PublicEntityProjectionDoc,
   type PublicSearchIndexDoc as FirestorePublicSearchIndexDoc,
-} from '@blap/firebase';
+} from '@repo/firebase';
 import { shouldUseLivePublicProjections } from './live-policy';
 
 export { shouldUseLivePublicProjections };

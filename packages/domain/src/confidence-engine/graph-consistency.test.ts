@@ -1,5 +1,5 @@
 /**
- * Tests for `computeGraphConsistencySignal` (BB black-book-hx8j): a diagnostic, additive signal
+ * Tests for `computeGraphConsistencySignal` (BB the related workstream): a diagnostic, additive signal
  * that is never folded into `sourceAuthority`/`lineageIndependence` (`../claims/confidence.ts`),
  * and never allows a relationship to corroborate itself.
  */

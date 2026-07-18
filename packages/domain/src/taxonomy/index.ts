@@ -1,5 +1,5 @@
 /**
- * Controlled-taxonomy barrel (black-book-s4hp). See ./topics.ts's header for the full design
+ * Controlled-taxonomy barrel (the related workstream). See ./topics.ts's header for the full design
  * rationale.
  */
 export * from './topics.js';

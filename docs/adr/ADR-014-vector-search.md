@@ -13,7 +13,7 @@
 | Semantic search | Not implemented | Own embedding pipeline (`gemini-embedding-001`) + Firestore native KNN (`findNearest`), server-only |
 | Embedding storage | Not implemented | Sibling `entityEmbeddings` Firestore collection, one document per canonical entity |
 | Vector query surface | Not implemented | `GET /v1/search/nearest` in `apps/api-public` only — never a client/web SDK path |
-| Research-side reuse | Not implemented | Pure candidate-recall and near-duplicate functions in `@blap/domain`, wiring into `workers/research/` documented but not live |
+| Research-side reuse | Not implemented | Pure candidate-recall and near-duplicate functions in `@repo/domain`, wiring into `workers/research/` documented but not live |
 | Vertex AI Vector Search | Not used, not planned | Explicit non-goal at this scale (see Rejected alternatives) |
 
 ## Context
@@ -62,7 +62,7 @@ path in this repo already uses.
    denied while the existing `search` kill switch (BB-035) is engaged or `public-static-mode` is
    active. Client/web SDKs cannot call `findNearest` at all, so there is no parallel surface to
    accidentally expose.
-5. **Research-side reuse is pure functions, not a live pipeline integration.** `@blap/domain`'s
+5. **Research-side reuse is pure functions, not a live pipeline integration.** `@repo/domain`'s
    `similarity/` module provides `findSimilarCandidates` (candidate recall: "find sources similar
    to this accepted one") and `findNearDuplicatesOf`/`clusterNearDuplicates` (semantic
    near-duplicate flagging) over pre-computed embeddings. Both are read-only comparisons — neither
@@ -103,7 +103,7 @@ capability the client/web SDKs never had in the first place.
   Until that worker exists, the backfill CLI is the only way new/changed entities get embedded.
 - The **research-pipeline integration point is documented, not live-wired**: `workers/research/`
   (currently a minimal Python scaffold with no discovery logic yet) should call the TypeScript
-  `@blap/domain` similarity functions — or a Python port of the same pure math — at
+  `@repo/domain` similarity functions — or a Python port of the same pure math — at
   candidate-ingestion time, after the existing exact content-hash dedup (BB-039). Neither
   function may merge or auto-publish, matching the existing discovery-cannot-publish guard.
 - `infra/firebase/firestore.rules` was not touched by this bead (out of file-ownership scope). The

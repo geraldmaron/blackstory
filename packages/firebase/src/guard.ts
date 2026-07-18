@@ -45,7 +45,7 @@ export function assertFirebaseProjectAllowed(
   environment: EnvironmentLike,
 ): FirebaseRuntimeMode {
   const mode = resolveFirebaseRuntimeMode(environment);
-  const nodeEnv = environment.NODE_ENV ?? environment.BLAP_ENV ?? 'development';
+  const nodeEnv = environment.NODE_ENV ?? environment.APP_ENV ?? 'development';
   const breakGlass = environment[PRODUCTION_BREAK_GLASS_ENV] === '1';
 
   if (mode === 'emulator') {

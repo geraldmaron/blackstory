@@ -184,7 +184,7 @@ export function validateStagingDastConfiguration(
     issues.push('staging_https_target_required');
   }
   if (configuration.environment !== 'staging') issues.push('production_dast_forbidden');
-  if (!configuration.identityLabel.startsWith('bb-security-dast-')) {
+  if (!configuration.identityLabel.startsWith('ds-security-dast-')) {
     issues.push('isolated_test_identity_required');
   }
   return issues;

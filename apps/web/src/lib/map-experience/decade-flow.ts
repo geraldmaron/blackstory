@@ -7,7 +7,7 @@
  * `eraBuckets` span, not just its arrival); that decade's relationship lines
  * trace movement between places.
  *
- * Per-decade state density is delegated to `@blap/domain`'s
+ * Per-decade state density is delegated to `@repo/domain`'s
  * `aggregateDecadePresence` (packages/domain/src/map/decade-presence.ts) —
  * the modeling-library primitive for "which decades is this entity
  * recognized as active in," shared with the history graph's per-decade
@@ -18,21 +18,21 @@
  * HONESTY RULE: every frame is driven by what the release actually documents
  * (era buckets, state aggregates, history edges) and is labeled as documented
  * records. It is NOT a population layer — Black population share by decade
- * (census bead black-book-vxz) rides this same density channel when its
+ * (census bead the related workstream) rides this same density channel when its
  * ingestion lands, and replaces nothing here until the data is real.
  *
  * Dignity rules carry: intensity is presence-tiered copper (documented /
  * emerging / concentrated via `buildStateDensityLevels`), never incident heat.
  */
 // Both the value and the type come from the client-safe `./map/decade-presence` subpath, never
-// the top-level `@blap/domain` barrel: this module is imported by HeroStage.tsx ('use client'),
+// the top-level `@repo/domain` barrel: this module is imported by HeroStage.tsx ('use client'),
 // and the barrel transitively pulls in server-only modules (Node builtins in
 // publication/index.ts, relevance/fixtures.ts) that webpack cannot bundle for the browser. That
 // subpath's own module is import-free by design (see its doc comment) so nothing it pulls in can
-// reintroduce the problem — `StateAggregateCount` is a structural duplicate of `@blap/domain`'s
+// reintroduce the problem — `StateAggregateCount` is a structural duplicate of `@repo/domain`'s
 // `MapStateAggregate` (same four fields), freely interchangeable via TypeScript's structural
 // typing with `density.ts`'s `buildStateDensityLevels`, which expects the latter.
-import { aggregateDecadePresence, type StateAggregateCount } from '@blap/domain/map/decade-presence';
+import { aggregateDecadePresence, type StateAggregateCount } from '@repo/domain/map/decade-presence';
 import type { ExploreMapFeature, ExploreMapFeatureCollection } from './build-explore-map-source';
 import type { HistoryEdgeLineCollection } from './build-history-edge-lines';
 import { buildStateDensityLevels, type StateDensityLevel } from './density';
@@ -113,7 +113,7 @@ function densityOfAllFeatures(features: readonly ExploreMapFeature[]): readonly 
 
 /** Per-decade ACTIVE-presence density, keyed by decade label, over every state-resolved
  * feature's own `eraBuckets` span — delegates the active/cumulative aggregation to
- * `@blap/domain`'s `aggregateDecadePresence` rather than reimplementing it here. */
+ * `@repo/domain`'s `aggregateDecadePresence` rather than reimplementing it here. */
 function buildActiveDensityByDecade(
   features: readonly ExploreMapFeature[],
 ): ReadonlyMap<string, readonly StateDensityLevel[]> {
@@ -140,7 +140,7 @@ function collectionOf(features: readonly ExploreMapFeature[]): ExploreMapFeature
  * archive and rewinds toward earlier records, closed by a full-archive frame
  * that also carries the undated records and the all-time relationship lines.
  * Pins accumulate by arrival (earliest documented decade ≤ frame decade);
- * density reflects ACTIVE presence that decade, via `@blap/domain`'s
+ * density reflects ACTIVE presence that decade, via `@repo/domain`'s
  * decade-presence model.
  */
 export function buildDecadeFlowFrames(

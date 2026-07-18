@@ -1,5 +1,5 @@
 /**
- * Tests for the living-status derivation guess (black-book-mpfb).
+ * Tests for the living-status derivation guess (the related workstream).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,6 +1,6 @@
 # Sundown towns research — wave 1 methodology note
 
-Bead: `black-book-7ly` (research component of `black-book-5mf`). Produced 2026-07-18.
+Bead: `the related workstream` (research component of `the related workstream`). Produced 2026-07-18.
 
 ## What this is
 

@@ -21,7 +21,7 @@ test('roster job ids are unique', () => {
   assert.equal(new Set(ids).size, ids.length);
 });
 
-test('exactly eight real job bodies are registered (four from BB-084 plus BB-081 recalibration-report, BB-083 citation-link-health-sweep, BB-074 reddit-deletion-sync, and BB-087 legal-change-monitoring)', () => {
+test('exactly eight real job bodies are registered (four from workstream plus workstream recalibration-report, workstream citation-link-health-sweep, workstream reddit-deletion-sync, and workstream legal-change-monitoring)', () => {
   const store = createDefaultScheduledJobRegistry();
   const real = listScheduledJobs(store, { rosterStatus: 'real' }).map((job) => job.id).sort();
   assert.deepEqual(real, [
@@ -45,7 +45,7 @@ test('every stub declares which bead owns the real implementation', () => {
 
 test('every job runs in the internal environment', () => {
   for (const job of DEFAULT_SCHEDULED_JOBS) {
-    assert.equal(job.environment, 'blackbook-internal');
+    assert.equal(job.environment, 'repo-internal');
   }
 });
 
@@ -71,7 +71,7 @@ test('every job with a public-facing effect declares its own kill switch, distin
   assert.equal(new Set(nonSharedSwitchIds).size, nonSharedSwitchIds.length);
 });
 
-test('discovery-campaign jobs share the research-campaigns kill switch (exact BB-035 semantic fit)', () => {
+test('discovery-campaign jobs share the research-campaigns kill switch (exact workstream semantic fit)', () => {
   const discoveryJobs = DEFAULT_SCHEDULED_JOBS.filter((job) => job.id.startsWith('discovery-campaign-'));
   assert.ok(discoveryJobs.length >= 4);
   for (const job of discoveryJobs) {

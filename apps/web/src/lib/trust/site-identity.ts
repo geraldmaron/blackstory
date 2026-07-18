@@ -1,10 +1,31 @@
 /**
- * Site identity constants for trust JSON-LD and feed builders.
+ * Site identity constants for trust JSON-LD, feeds, and public brand asset paths.
+ *
+ * Product display name is BlackStory. Package/CSS/env prefixes are brand-agnostic
+ * (@repo / ds / APP) and live in @repo/config/identity — do not put product names there.
  */
 
-export const TRUST_SITE_NAME = 'BlackStory';
+import {
+  PRODUCT_NAME,
+  BRAND_ASSETS,
+  GCP_PROJECT_ID_PROD,
+  brandLockup,
+  brandSymbol,
+  brandOpenGraph,
+} from '@repo/config/identity';
 
-/** Root-relative paths for trust surfaces absolute URLs are composed at render time when needed.  */
+export const TRUST_SITE_NAME = PRODUCT_NAME;
+
+export {
+  PRODUCT_NAME,
+  BRAND_ASSETS,
+  GCP_PROJECT_ID_PROD,
+  brandLockup,
+  brandSymbol,
+  brandOpenGraph,
+};
+
+/** Root-relative paths for trust surfaces; absolute URLs are composed at render time when needed. */
 export const TRUST_PATHS = {
   methodology: '/methodology',
   errata: '/errata',

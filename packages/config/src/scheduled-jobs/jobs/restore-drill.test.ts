@@ -17,7 +17,7 @@ test('a successful drill print completes the job as success and returns the prin
   const fakeExecFile: ExecFileFn = async (command, args) => {
     assert.equal(command, 'bash');
     assert.ok(args[0]?.endsWith('staging-restore.stub.sh'));
-    return { stdout: '# BB-020 staging import stub\ngcloud firestore import ...', stderr: '', exitCode: 0 };
+    return { stdout: '#  staging import stub\ngcloud firestore import ...', stderr: '', exitCode: 0 };
   };
   const result = await runRestoreDrillJob({
     jobRunId: 'run-1',

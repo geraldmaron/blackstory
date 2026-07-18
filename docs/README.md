@@ -24,7 +24,7 @@ Operating docs for the Blap monorepo: architecture, decisions, runbooks, and bea
 | [`../infra/firebase/FIRESTORE_MODEL.md`](../infra/firebase/FIRESTORE_MODEL.md) | Firestore collection map + rules (BB-013 / ADR-011) |
 | [`../SECURITY.md`](../SECURITY.md) | Security policy + private vulnerability reporting |
 | [`../README.md`](../README.md) | Bootstrap and developer commands |
-| [`bb-001/baseline-report.md`](./bb-001/baseline-report.md) | BB-001 reconnaissance baseline |
+| [`ds-001/baseline-report.md`](./ds-001/baseline-report.md) | BB-001 reconnaissance baseline |
 | Product constitution | `packages/schemas/constitution/` (BB-003; shared TS + Python) |
 | Env isolation matrices | `infra/gcp/`, `infra/firebase/` (single production project; apps registered in BB-011; lower-layer GCP controls not provisioned) |
 
@@ -41,7 +41,7 @@ Operating docs for the Blap monorepo: architecture, decisions, runbooks, and bea
 | `admin/` | BB-056 administration and research console |
 | `source-spec/` | Versioned source PDF (BB-080) |
 | `../infra/github/` | BB-009 rulesets + BB-010 OIDC/WIF scripts, environments, release-metadata (not applied remotely yet) |
-| `bb-001/` | Bead BB-001 reports (owned by baseline work; do not clobber) |
+| `ds-001/` | Bead BB-001 reports (owned by baseline work; do not clobber) |
 | `runbooks/` | Operational procedures (stubs as needed) |
 | `../.cx/` | Resumable agent context, workflow state, decisions/research/reviews |
 | `../packages/schemas/constitution/` | Versioned product policy JSON + fixtures (BB-003) |

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://blackbook.local/schemas/research-case/backfill-job.v1.schema.json",
   "title": "Research Case Backfill Job",
-  "description": "A scheduled BB-044 job for evidence fields missing from a research case.",
+  "description": "A scheduled  job for evidence fields missing from a research case.",
   "type": "object",
   "additionalProperties": false,
   "required": [

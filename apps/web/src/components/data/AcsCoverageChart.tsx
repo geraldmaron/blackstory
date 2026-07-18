@@ -3,7 +3,7 @@
  * labeled series (color is never the only signal).
  */
 import React from 'react';
-import type { AcsCoverageSummary } from '@blap/firebase';
+import type { AcsCoverageSummary } from '@repo/firebase';
 import { DataChartFrame } from './DataChartFrame';
 import {
   CHART_HEIGHT,
@@ -22,8 +22,8 @@ export type AcsCoverageChartProps = {
 
 export function AcsCoverageChart({ coverage }: AcsCoverageChartProps) {
   const series = [
-    { key: 'counties', label: 'Counties covered', value: coverage.countyCount, fill: 'var(--bp-accent-graphic)' },
-    { key: 'tracts', label: 'Census tracts covered', value: coverage.tractCount, fill: 'var(--bp-accent-muted)' },
+    { key: 'counties', label: 'Counties covered', value: coverage.countyCount, fill: 'var(--ds-accent-graphic)' },
+    { key: 'tracts', label: 'Census tracts covered', value: coverage.tractCount, fill: 'var(--ds-accent-muted)' },
   ] as const;
 
   const maxValue = niceMax(Math.max(coverage.countyCount, coverage.tractCount));
@@ -41,7 +41,7 @@ export function AcsCoverageChart({ coverage }: AcsCoverageChartProps) {
       sourceUrl={coverage.sourceUrl}
       ariaLabel="Bar chart of ACS county and tract coverage"
       textAlternative={
-        <table className="bp-data-chart__table">
+        <table className="ds-data-chart__table">
           <caption>{`ACS ${coverage.vintage} coverage`}</caption>
           <thead>
             <tr>
@@ -61,7 +61,7 @@ export function AcsCoverageChart({ coverage }: AcsCoverageChartProps) {
       }
     >
       <svg
-        className="bp-data-chart__svg"
+        className="ds-data-chart__svg"
         viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
         role="img"
         aria-hidden="true"
@@ -71,13 +71,13 @@ export function AcsCoverageChart({ coverage }: AcsCoverageChartProps) {
           return (
             <g key={tick}>
               <line
-                className="bp-data-chart__grid-line"
+                className="ds-data-chart__grid-line"
                 x1={CHART_MARGIN.left}
                 x2={CHART_WIDTH - CHART_MARGIN.right}
                 y1={y}
                 y2={y}
               />
-              <text className="bp-data-chart__axis-label" x={CHART_MARGIN.left - 8} y={y + 4} textAnchor="end">
+              <text className="ds-data-chart__axis-label" x={CHART_MARGIN.left - 8} y={y + 4} textAnchor="end">
                 {formatChartCount(Math.round(tick))}
               </text>
             </g>
@@ -91,11 +91,11 @@ export function AcsCoverageChart({ coverage }: AcsCoverageChartProps) {
           return (
             <g key={item.key}>
               <rect x={barX} y={barTop} width={barWidth} height={barBottom - barTop} fill={item.fill} />
-              <text className="bp-data-chart__axis-label" x={centerX} y={barTop - 8} textAnchor="middle">
+              <text className="ds-data-chart__axis-label" x={centerX} y={barTop - 8} textAnchor="middle">
                 {formatChartCount(item.value)}
               </text>
               <text
-                className="bp-data-chart__axis-label"
+                className="ds-data-chart__axis-label"
                 x={centerX}
                 y={CHART_HEIGHT - CHART_MARGIN.bottom + 20}
                 textAnchor="middle"
@@ -106,7 +106,7 @@ export function AcsCoverageChart({ coverage }: AcsCoverageChartProps) {
           );
         })}
         <text
-          className="bp-data-chart__axis-label"
+          className="ds-data-chart__axis-label"
           x={12}
           y={CHART_MARGIN.top + plotHeight() / 2}
           textAnchor="middle"
@@ -115,10 +115,10 @@ export function AcsCoverageChart({ coverage }: AcsCoverageChartProps) {
           Units covered
         </text>
       </svg>
-      <ul className="bp-data-chart__legend" aria-hidden="true">
+      <ul className="ds-data-chart__legend" aria-hidden="true">
         {series.map((item) => (
-          <li key={item.key} className="bp-data-chart__legend-item">
-            <span className="bp-data-chart__legend-swatch" style={{ background: item.fill }} />
+          <li key={item.key} className="ds-data-chart__legend-item">
+            <span className="ds-data-chart__legend-swatch" style={{ background: item.fill }} />
             {item.label}
           </li>
         ))}

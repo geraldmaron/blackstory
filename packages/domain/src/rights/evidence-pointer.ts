@@ -94,7 +94,7 @@ export function assertNoFullPageFields(value: Readonly<Record<string, unknown>>)
     if (PROHIBITED_FULL_PAGE_KEYS.has(key.toLowerCase())) {
       throw new Error(
         `Evidence pointer cannot include a full-page field "${key}"; the evidence-pointer ` +
-          'doctrine never self-hosts full page copies (BB-077)',
+          'doctrine never self-hosts full page copies ()',
       );
     }
   }

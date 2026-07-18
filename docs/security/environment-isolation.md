@@ -24,7 +24,7 @@
 | Workload isolation | One live project, no split yet | Three-project split with one-way promotion IAM asymmetry (ADR-012) |
 
 Every cloud resource in `black-book-efaaf` is production today. `development` means local
-`demo-blap` emulators and disposable local services — this does not change under ADR-012.
+`demo-repo` emulators and disposable local services — this does not change under ADR-012.
 `staging` and `production-research` are **currently** configuration namespaces inside
 `black-book-efaaf`, per the historical section below; ADR-012 replaces that with real project
 boundaries (`blackbook-staging`, `blackbook-internal`) once BB-079 applies it.
@@ -54,7 +54,7 @@ Source of truth:
 | `blackbook-staging` | Pre-production mirror, synthetic data only, `minInstances: 0` | `(default)`, same shape as prod | mirrors prod bucket names, staging-prefixed | `github-deploy-staging` (optional) |
 | `blackbook-internal` | Research pipeline + admin | Named DBs `raw-ingest`, `curated` (per-DB IAM conditions) | `private-evidence` | `research`, `promotion`, `security`, `admin`, `submissions-puller`, `github-deploy-internal` (optional) |
 
-Local development stays on `demo-blap` emulators — unaffected by any of the above.
+Local development stays on `demo-repo` emulators — unaffected by any of the above.
 
 ### Admin console correction: Cloud Run + IAP, direct attachment
 
@@ -118,7 +118,7 @@ Test encoding: `infra/gcp/terraform/multi-project/tests/isolation-invariants.tes
 
 ### AC-ISO-1 — Development credentials cannot access production
 
-- Local development/tests use `demo-blap` emulators (Firestore/Auth/Storage) — unchanged.
+- Local development/tests use `demo-repo` emulators (Firestore/Auth/Storage) — unchanged.
 - **[Target topology]** `blackbook-staging` gives cloud-based pre-production testing a real project
   boundary from `blackbook-prod` for the first time; this criterion is no longer N/A once BB-079
   applies the split (it was N/A under D-013 because there was only one cloud project).
@@ -206,7 +206,7 @@ boundary; the mechanisms above remain in force as defense-in-depth even after th
 This criterion was **N/A as a cloud project-separation claim** under D-013: there was only one cloud
 project and it was production. The safe replacement was operational:
 
-- local development/tests use `demo-blap` emulators (Firestore/Auth/Storage);
+- local development/tests use `demo-repo` emulators (Firestore/Auth/Storage);
 - preflight checks reject production identifiers/endpoints;
 - any access to `black-book-efaaf` is explicitly production access;
 - `github-deploy` is WIF-only, protected-context only, and has no exported key.
@@ -336,7 +336,7 @@ blackbook-research-prod
 ```
 
 ADR-012 rejects reviving `blackbook-dev` as a cloud project (see ADR-012's Rejected Alternatives —
-`demo-blap` emulators already give zero-cost local development) and instead adopts three
+`demo-repo` emulators already give zero-cost local development) and instead adopts three
 projects: `blackbook-prod` (= retained `black-book-efaaf`), `blackbook-staging`, `blackbook-internal`
 (renamed from `blackbook-research-prod` to also host admin, per ADR-012).
 

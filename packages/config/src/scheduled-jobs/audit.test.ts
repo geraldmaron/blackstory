@@ -3,7 +3,7 @@
  * Every automated write a job makes carries the job-run id as (or alongside)
  * the correlation id, and is traceable back to the exact run that made it. This test
  * imports the REAL commitWithAudit (packages/firebase/src/firestore/audit-outbox.ts, devDep-only
- * import @blap/config does not depend on @blap/firebase at runtime, see audit.ts's
+ * import @repo/config does not depend on @repo/firebase at runtime, see audit.ts's
  * module doc) and proves objects built by buildJobRunAuditEvent/buildJobRunOutboxMessage are
  * accepted by it unmodified, i.e. this module follows commitWithAudit's exact calling
  * convention rather than a parallel one that merely looks similar.
@@ -14,7 +14,7 @@ import {
   commitWithAudit,
   type AtomicStore,
   type AtomicTransaction,
-} from '@blap/firebase';
+} from '@repo/firebase';
 import { buildJobRunAuditEvent, buildJobRunOutboxMessage } from './audit.ts';
 
 type StagedOperation =

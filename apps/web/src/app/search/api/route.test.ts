@@ -11,7 +11,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@blap/firebase';
+import type { AppCheckVerifier } from '@repo/firebase';
 import { getSnapshotSearchIndex } from '../../../lib/search/snapshot-search-index';
 import { createSearchAppCheckGuard } from './app-check-guard';
 import { createSearchRateLimitGuard } from './rate-limit-guard';

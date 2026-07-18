@@ -1,10 +1,10 @@
 /**
- * Address-text normalization. Purely textual 
+ * Address-text normalization. Purely textual
  * collapses whitespace, trims stray punctuation, and upper-cases a small set of common street
  * abbreviations so visually-equivalent inputs ("123 Main St." vs "123 main street") produce the
  * same Census Geocoder query and the same geocode-cache key. This is intentionally a different,
- * address-shaped normalizer from `@blap/security`'s `normalizeSearchText` (free-
- * text search normalizer) `@blap/domain` cannot depend on `@blap/security` at
+ * address-shaped normalizer from `@repo/security`'s `normalizeSearchText` (free-
+ * text search normalizer) `@repo/domain` cannot depend on `@repo/security` at
  * runtime (see `./jurisdiction-ids.ts`'s module doc for the same circular-dependency rule), and
  * address normalization has different goals (preserve number/street-suffix structure for the
  * geocoder) than search-query normalization (fold for fuzzy matching).

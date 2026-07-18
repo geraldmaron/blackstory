@@ -134,7 +134,7 @@ export type AcsCoverageSummary = {
 };
 
 /** County + tract coverage counts for the latest ACS 5-year vintage — a coverage summary,
- * not a per-county browser (that's the Explore map's job once black-book-vxz's choropleth
+ * not a per-county browser (that's the Explore map's job once the related workstream's choropleth
  * layer lands). */
 export async function getAcsCoverageSummary(
   firestore: Firestore = getServerFirestore(),

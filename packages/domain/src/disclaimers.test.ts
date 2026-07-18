@@ -13,7 +13,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import { evaluateProceduralLanguage, loadProductConstitution } from '@blap/schemas';
+import { evaluateProceduralLanguage, loadProductConstitution } from '@repo/schemas';
 import { SENSITIVITY_CLASSES } from './entity-status.js';
 import {
   assertNoIdentityAttributeFraming,
@@ -33,7 +33,7 @@ const POLICY = loadProductConstitution();
 // Registry completeness and shape
 // ---------------------------------------------------------------------------
 
-test('disclaimer classes match the BB-095 AC3 spec exactly', () => {
+test('disclaimer classes match the  AC3 spec exactly', () => {
   assert.deepEqual(DISCLAIMER_CLASSES, [
     'site_wide',
     'visiting_historic_sites',

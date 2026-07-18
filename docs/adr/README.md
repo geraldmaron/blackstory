@@ -11,7 +11,7 @@ Formal decisions for Blap platform topology, data, deployment, and security boun
 - **Scaffold today** means the monorepo directories, packages, or local Docker compose already exist.
 - **Aspirational / target** means the decision is binding for upcoming beads. Firebase apps, Cloud
   Run, App Hosting backends, and production GitHub Actions are **not** fully provisioned or
-  verified yet (see `docs/bb-001/baseline-report.md` and D-013). **Cloud SQL is deferred** (ADR-011).
+  verified yet (see `docs/ds-001/baseline-report.md` and D-013). **Cloud SQL is deferred** (ADR-011).
 - Do not infer working app or database deployments from the existing Firebase project/Hosting site.
 
 ## Index
@@ -56,5 +56,5 @@ No ADR proposes additional microservices beyond this set. Shared libraries live 
 
 - [`../architecture.md`](../architecture.md) — architecture overview
 - [`../../plan.md`](../../plan.md) — bead tracker
-- [`../bb-001/baseline-report.md`](../bb-001/baseline-report.md) — verified scaffold baseline
+- [`../ds-001/baseline-report.md`](../ds-001/baseline-report.md) — verified scaffold baseline
 - [`.cx/decisions/`](../../.cx/decisions/) — short session summaries of these ADRs

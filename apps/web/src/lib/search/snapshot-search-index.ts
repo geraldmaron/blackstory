@@ -1,6 +1,6 @@
 /**
  * Adapts the hand-authored seed catalog (`../../data/public-seed.ts`) into
- * `@blap/domain`'s search-index shape, so the real search pipeline
+ * `@repo/domain`'s search-index shape, so the real search pipeline
  * (`runPublicSearch`) has something to query today. This is the same "snapshot" posture as
  * `resolvePublicEntity`: a `liveFetch`-shaped seam exists so a later live Firestore
  * `publicSearchIndex` reader can plug in without changing the search route/page
@@ -8,7 +8,7 @@
  *
  * `notabilityBasis` synthesis: the bundled seed catalog only carries hand-authored
  * `notabilityLabels` (display strings), not the structured `NotabilityBasisRecord` a release
- * built by `@blap/domain`'s `buildReleaseEntityArtifacts` carries (black-book-1fg9). When a
+ * built by `@repo/domain`'s `buildReleaseEntityArtifacts` carries (the related workstream). When a
  * seed entity DOES carry a real `notabilityBasis` (`PublicEntityView.notabilityBasis`), this
  * adapter uses it as-is — no synthesis, real `evidenceIds`. Otherwise the notability gate must
  * still run at the search boundary regardless of data source, so this adapter reverse-maps each
@@ -28,7 +28,7 @@ import {
   type NotabilityCriterion,
   type PublicSearchIndexDoc,
   type SearchableEntityRecord,
-} from '@blap/domain';
+} from '@repo/domain';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 
 const RUBRIC_ENTRIES = Object.entries(NOTABILITY_RUBRIC) as readonly [NotabilityCriterion, string][];
@@ -48,7 +48,7 @@ function synthesizeNotabilityBasis(
   }));
 }
 
-/** Real notabilityBasis when the entity carries one (black-book-1fg9 release builder output);
+/** Real notabilityBasis when the entity carries one (the related workstream release builder output);
  * otherwise the label-synthesis fallback above for pre-builder seed fixtures. */
 function notabilityBasisFor(entity: PublicEntityView): readonly NotabilityBasisRecord[] {
   if (entity.notabilityBasis && entity.notabilityBasis.length > 0) {

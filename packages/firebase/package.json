@@ -1,5 +1,5 @@
 {
-  "name": "@blap/firebase",
+  "name": "@repo/firebase",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -20,15 +20,15 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "@blap/domain": "workspace:*",
-    "@blap/security": "workspace:*",
+    "@repo/domain": "workspace:*",
+    "@repo/security": "workspace:*",
     "@google/genai": "^2.12.0",
     "firebase": "^11.10.0",
     "firebase-admin": "^13.4.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@blap/typescript-config": "workspace:^",
+    "@repo/typescript-config": "workspace:^",
     "@firebase/rules-unit-testing": "^4.0.1",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",

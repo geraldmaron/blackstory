@@ -51,83 +51,83 @@ export function HomeStorySections({
 }: HomeStorySectionsProps) {
   return (
     <>
-      <div className="bp-container bp-page">
-        <section className="bp-section bp-section--flush" aria-labelledby="state-start-heading">
-          <p className="bp-section__kicker">Near you</p>
-          <h2 className="bp-section__title" id="state-start-heading">
+      <div className="ds-container ds-page">
+        <section className="ds-section ds-section--flush" aria-labelledby="state-start-heading">
+          <p className="ds-section__kicker">Near you</p>
+          <h2 className="ds-section__title" id="state-start-heading">
             Start with your state.
           </h2>
-          <p className="bp-section__lede">
+          <p className="ds-section__lede">
             Every state holds documented Black history — some of it a block from somewhere you
             know. Choose yours and see what happened there.
           </p>
           <StateStart topStates={topStates} />
         </section>
 
-        <section className="bp-section" aria-labelledby="featured-heading">
-          <p className="bp-section__kicker">From the archive</p>
-          <h2 className="bp-section__title" id="featured-heading">
+        <section className="ds-section" aria-labelledby="featured-heading">
+          <p className="ds-section__kicker">From the archive</p>
+          <h2 className="ds-section__title" id="featured-heading">
             See what happened here.
           </h2>
-          <p className="bp-section__lede">
+          <p className="ds-section__lede">
             Select a pin on the map above, or step into a full record here.
           </p>
           {showSeedNotice ? (
-            <p className="bp-story-rail__notice bp-mono">
+            <p className="ds-story-rail__notice ds-mono">
               Early release — a small, hand-verified collection, not yet the full archive.
             </p>
           ) : null}
-          <ul className="bp-story-rail">
+          <ul className="ds-story-rail">
             {featured.map((entity) => (
               <li key={entity.id}>
-                <Link className="bp-story-link" href={`/entity/${entity.id}`}>
-                  <span className="bp-story-link__meta">
+                <Link className="ds-story-link" href={`/entity/${entity.id}`}>
+                  <span className="ds-story-link__meta">
                     <KindBadge kind={entity.kind} density="compact" />
                     <span aria-hidden="true">/</span>
                     <span>{entity.jurisdictionLabel}</span>
                   </span>
-                  <h3 className="bp-story-link__title">{entity.displayName}</h3>
-                  <p className="bp-story-link__summary">{entity.summary}</p>
+                  <h3 className="ds-story-link__title">{entity.displayName}</h3>
+                  <p className="ds-story-link__summary">{entity.summary}</p>
                 </Link>
               </li>
             ))}
           </ul>
         </section>
 
-        <section className="bp-section" aria-label="The archive in numbers">
-          <p className="bp-section__kicker">In numbers</p>
-          <ul className="bp-data-strip">
-            <li className="bp-data-strip__item">
-              <span className="bp-data-strip__value">{recordCount}</span>
-              <span className="bp-data-strip__label">Records pinned</span>
+        <section className="ds-section" aria-label="The archive in numbers">
+          <p className="ds-section__kicker">In numbers</p>
+          <ul className="ds-data-strip">
+            <li className="ds-data-strip__item">
+              <span className="ds-data-strip__value">{recordCount}</span>
+              <span className="ds-data-strip__label">Records pinned</span>
             </li>
-            <li className="bp-data-strip__item">
-              <span className="bp-data-strip__value">{stateCount}</span>
-              <span className="bp-data-strip__label">States on the map</span>
+            <li className="ds-data-strip__item">
+              <span className="ds-data-strip__value">{stateCount}</span>
+              <span className="ds-data-strip__label">States on the map</span>
             </li>
             {eraSpan ? (
-              <li className="bp-data-strip__item">
-                <span className="bp-data-strip__value">{eraSpan}</span>
-                <span className="bp-data-strip__label">Eras spanned</span>
+              <li className="ds-data-strip__item">
+                <span className="ds-data-strip__value">{eraSpan}</span>
+                <span className="ds-data-strip__label">Eras spanned</span>
               </li>
             ) : null}
           </ul>
         </section>
       </div>
 
-      <section className="bp-band" aria-labelledby="how-heading">
-        <div className="bp-container">
-          <p className="bp-section__kicker">How this works</p>
-          <h2 className="bp-section__title" id="how-heading">
+      <section className="ds-band" aria-labelledby="how-heading">
+        <div className="ds-container">
+          <p className="ds-section__kicker">How this works</p>
+          <h2 className="ds-section__title" id="how-heading">
             Evidence before assertion.
           </h2>
-          <ol className="bp-qualify-list">
+          <ol className="ds-qualify-list">
             {HOW_ITEMS.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ol>
-          <p className="bp-band__cta">
-            <Link className="bp-cta bp-cta--solid" href="/methodology">
+          <p className="ds-band__cta">
+            <Link className="ds-cta ds-cta--solid" href="/methodology">
               Read the methodology
             </Link>
           </p>

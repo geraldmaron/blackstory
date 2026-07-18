@@ -17,13 +17,13 @@ import {
   evaluatePromotionGate,
   type PromotionClaim,
   type PromotionEvidence,
-} from '@blap/domain';
+} from '@repo/domain';
 import {
   AdminAuthorizationError,
   assertResearchCaseActionAuthorized,
   executeAuthorizedResearchCaseAction,
   type VerifiedAdminToken,
-} from '@blap/firebase';
+} from '@repo/firebase';
 import * as operatorCli from './index.ts';
 import { prepareLeadIntake } from './intake.ts';
 

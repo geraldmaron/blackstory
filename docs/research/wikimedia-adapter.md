@@ -2,7 +2,7 @@
 
 Contract-layer adapter for English Wikipedia and Wikidata discovery. Produces BB-037 `AdapterCandidateRecord` output with metadata and identifiers only — Wikipedia prose is not copied by default.
 
-## Domain API (`@blap/domain` → `adapters/wikimedia/`)
+## Domain API (`@repo/domain` → `adapters/wikimedia/`)
 
 Parent agent merges `packages/domain/src/adapters/wikimedia/index.ts` into the adapters barrel.
 

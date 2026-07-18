@@ -1,5 +1,5 @@
 /**
- * Unit tests for the Data Pack v1 import pipeline (black-book-ud5q): a full valid-pack round trip
+ * Unit tests for the Data Pack v1 import pipeline (the related workstream): a full valid-pack round trip
  * that passes every stage, and a pack with one bad resource that gets quarantined while the rest
  * of the batch is unaffected. See ./import-pipeline.ts's header for the staged-flow contract.
  */

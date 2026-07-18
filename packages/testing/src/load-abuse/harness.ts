@@ -32,7 +32,7 @@ import {
   type RiskSignal,
   type SearchQueryInput,
   type SubmissionInput,
-} from '@blap/security';
+} from '@repo/security';
 import { getCostEstimateForScenario } from './cost-model.js';
 import type {
   ControlDenial,

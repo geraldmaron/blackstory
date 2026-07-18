@@ -2,7 +2,7 @@
 
 Contract-layer API for registering source adapters, approving policies, and gating research runs. Persistence is in-memory in this bead; Firestore wiring follows in a later bead.
 
-## Domain API (`@blap/domain` → `adapters/`)
+## Domain API (`@repo/domain` → `adapters/`)
 
 Parent agent merges `packages/domain/src/adapters/index.ts` into the package barrel.
 

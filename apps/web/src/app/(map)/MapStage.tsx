@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * The persistent map canvas (BB-098, ADR-017 "Persistent map canvas — one MapLibre instance
+ * The persistent map canvas (ADR-017 "Persistent map canvas — one MapLibre instance
  * across hero and explore"). `MapStageProvider` mounts in the `(map)` route group's
  * `layout.tsx`, which React Router semantics never remount across `/` <-> `/explore`
  * navigations only the sibling `page.tsx`/`explore/page.tsx` trees swap. That means this
@@ -43,7 +43,7 @@ import type {
 } from 'maplibre-gl';
 import type * as MapLibreNamespace from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { brandPalette, darkTheme } from '@blap/ui';
+import { brandPalette, darkTheme } from '@repo/ui';
 import {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
@@ -197,7 +197,7 @@ function syncCircularMarkers(
 
     const el = document.createElement('button');
     el.type = 'button';
-    el.className = 'bp-map-entity-marker';
+    el.className = 'ds-map-entity-marker';
     el.setAttribute('aria-label', label);
     el.title = label;
     // The map canvas is `aria-hidden` (see `MapStageProvider`'s render) — the synchronized
@@ -305,7 +305,7 @@ function fetchCountyLines(): Promise<unknown> {
  * GeoJSON worker for nothing. */
 const countyLinesLoaded = new WeakSet<MapLibreMap>();
 
-/** Lazily fills the county-lines source (black-book-uda). Deliberately zoom-triggered by the
+/** Lazily fills the county-lines source (the related workstream). Deliberately zoom-triggered by the
  * caller, not eager: the ~2.3 MB asset is invisible below the layer's `minzoom`, so the
  * national resting frame never pays for it. */
 async function loadCountyLines(map: MapLibreMap): Promise<void> {
@@ -382,7 +382,7 @@ function setSelectedStateFilter(map: MapLibreMap, postalCode: string | undefined
 // ---------------------------------------------------------------------------------------------
 
 /** Source-data + mode flags a surface (home hero, explore) hands the stage. The stage rebuilds
- * its MapLibre style from this every call (via `buildExploreMapStyle`, BB-099's style builder —
+ * its MapLibre style from this every call (via `buildExploreMapStyle`, 's style builder —
  * consumed here, never modified) and reapplies geography layers + resyncs entity markers. Always
  * the FULL current shape, not a delta — mirrors how `ExploreMapCanvas` used to receive these as
  * plain re-render props. */
@@ -787,7 +787,7 @@ export function MapStageProvider({
 
         mapRef.current = map;
         if (process.env.NODE_ENV !== 'production') {
-          // Dev-only escape hatch for in-browser inspection and BB-101 perf traces.
+          // Dev-only escape hatch for in-browser inspection and perf traces.
           (window as unknown as Record<string, unknown>).__bpMapStage = map;
         }
         map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
@@ -992,7 +992,7 @@ export function MapStageProvider({
 
   return (
     <MapStageContext.Provider value={handle}>
-      {/* The sole persistent canvas element (ADR-017). `.bp-map-stage` is a fixed full-viewport
+      {/* The sole persistent canvas element (ADR-017). `.ds-map-stage` is a fixed full-viewport
           plate behind page chrome (map-surfaces.css); `maplibregl.Map`'s `container` must be a
           separate inner div, never the plate itself — MapLibre stamps its own `maplibregl-map`
           class onto whatever container it's given, and maplibre-gl.css hard-codes
@@ -1001,8 +1001,8 @@ export function MapStageProvider({
           canvas back in normal document flow. `aria-hidden` on the plate: the synchronized
           result list is this map's accessible-parity surface (see `syncCircularMarkers`'s doc
           comment on marker `tabIndex`), so the canvas itself carries no separate a11y tree. */}
-      <div className="bp-map-stage" aria-hidden="true">
-        <div ref={containerRef} className="bp-map-stage__canvas" />
+      <div className="ds-map-stage" aria-hidden="true">
+        <div ref={containerRef} className="ds-map-stage__canvas" />
       </div>
       {children}
     </MapStageContext.Provider>

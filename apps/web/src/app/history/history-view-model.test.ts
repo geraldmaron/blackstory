@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { statusAsOf } from '@blap/domain';
+import { statusAsOf } from '@repo/domain';
 import { resetHistoryGraphReleaseArtifactForTests } from '../../data/history-graph-seed';
 import { getPublicEntity, listPublicEntities } from '../../data/public-seed';
 import { buildHistoryViewModel } from './history-view-model';
@@ -22,7 +22,7 @@ test('all-time view includes every published seed entity from the graph artifact
   assert.ok(view.contentHash.length > 0);
 });
 
-test('decade view derives node membership from BB-092 decade artifacts', () => {
+test('decade view derives node membership from decade artifacts', () => {
   const seventies = buildHistoryViewModel({ decade: '1970s' });
   assert.equal(seventies.viewState.mode, 'decade');
   assert.equal(seventies.activeDecade, '1970s');

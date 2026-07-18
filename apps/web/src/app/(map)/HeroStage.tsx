@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Homepage hero chrome (BB-098): cinema over the live plate. The persistent
+ * Homepage hero chrome (): cinema over the live plate. The persistent
  * `MapStage` canvas renders behind this (mounted once, at the `(map)` layout);
  * `HeroStage` renders the floating typography and the TIMELINE INSTRUMENT —
  * a full-width rail of decade ticks that plays the archive decade by decade
@@ -17,8 +17,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Notice } from '@blap/ui';
-import { US_CONUS_BOUNDS } from '@blap/domain/map/geography';
+import { Notice } from '@repo/ui';
+import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { CAMERA_POINT_ZOOM, prefersReducedMotion } from '../../lib/map-experience/camera-presets';
 import type {
   ExploreMapFeatureCollection,
@@ -46,7 +46,7 @@ export type HeroStageProps = {
 };
 
 const RESTING_HREF = buildExploreHref({ filters: DEFAULT_EXPLORE_FILTERS, density: false, lines: false });
-const TRANSITION_FLAG = 'bp-map-transition';
+const TRANSITION_FLAG = 'ds-map-transition';
 
 function coordinatesOf(
   collection: ExploreMapFeatureCollection,
@@ -204,7 +204,7 @@ export function HeroStage({
 
   return (
     <section
-      className={dissolving ? 'bp-hero-stage bp-hero-stage--dissolving' : 'bp-hero-stage'}
+      className={dissolving ? 'ds-hero-stage ds-hero-stage--dissolving' : 'ds-hero-stage'}
       aria-labelledby="hero-headline"
     >
       {!stage.mapAvailable ? (
@@ -213,31 +213,31 @@ export function HeroStage({
           records as a list.
         </Notice>
       ) : null}
-      <p className="bp-hero-stage__kicker">Documented Black history</p>
-      <h1 className="bp-hero-stage__headline" id="hero-headline">
+      <p className="ds-hero-stage__kicker">Documented Black history</p>
+      <h1 className="ds-hero-stage__headline" id="hero-headline">
         History happened <em>here</em>.
       </h1>
-      <p className="bp-hero-stage__support">
+      <p className="ds-hero-stage__support">
         Every pin is a documented record — people, places, schools, and events, each carrying its
         evidence. Start with the places you know.
       </p>
-      <div className="bp-hero-stage__actions">
-        <Link className="bp-cta bp-cta--copper" href="/locate">
+      <div className="ds-hero-stage__actions">
+        <Link className="ds-cta ds-cta--copper" href="/locate">
           Find what happened near you
         </Link>
-        <a className="bp-cta bp-cta--ghost" href={RESTING_HREF} onClick={handleCtaClick}>
+        <a className="ds-cta ds-cta--ghost" href={RESTING_HREF} onClick={handleCtaClick}>
           Explore the map
         </a>
       </div>
 
       {decadeFrames.length > 1 ? (
-        <div className="bp-hero-timeline" role="group" aria-label="Decades in motion, newest to oldest">
-          <div className="bp-hero-timeline__head">
-            <div className="bp-hero-timeline__readout" aria-live="polite">
-              <p className="bp-hero-timeline__decade">
+        <div className="ds-hero-timeline" role="group" aria-label="Decades in motion, newest to oldest">
+          <div className="ds-hero-timeline__head">
+            <div className="ds-hero-timeline__readout" aria-live="polite">
+              <p className="ds-hero-timeline__decade">
                 {currentFrame?.decade ?? FINAL_FRAME_LABEL}
               </p>
-              <p className="bp-hero-timeline__note">
+              <p className="ds-hero-timeline__note">
                 {currentFrame?.isComplete
                   ? `${currentFrame?.cumulativeCount ?? featureCount} records · ${stateCount} states${liveData ? '' : ' · sample data'}`
                   : `${currentFrame?.cumulativeCount ?? 0} records documented through this decade`}
@@ -245,7 +245,7 @@ export function HeroStage({
             </div>
             <button
               type="button"
-              className="bp-hero-timeline__toggle"
+              className="ds-hero-timeline__toggle"
               aria-pressed={playing}
               aria-label={playing ? 'Pause the decade-by-decade animation' : 'Play the decade-by-decade animation'}
               onClick={() => {
@@ -260,7 +260,7 @@ export function HeroStage({
               {playing ? <PauseIcon /> : <PlayIcon />}
             </button>
           </div>
-          <div className="bp-hero-timeline__rail">
+          <div className="ds-hero-timeline__rail">
             {decadeFrames.map((frame, index) => {
               const state =
                 index === frameIndex ? 'is-current' : index < frameIndex ? 'is-passed' : '';
@@ -268,7 +268,7 @@ export function HeroStage({
                 <button
                   key={frame.decade}
                   type="button"
-                  className={state ? `bp-hero-timeline__tick ${state}` : 'bp-hero-timeline__tick'}
+                  className={state ? `ds-hero-timeline__tick ${state}` : 'ds-hero-timeline__tick'}
                   aria-label={
                     frame.isComplete
                       ? 'Show the complete archive'
@@ -280,14 +280,14 @@ export function HeroStage({
                     setFrameIndex(index);
                   }}
                 >
-                  <span className="bp-hero-timeline__tick-label">{frame.decade}</span>
+                  <span className="ds-hero-timeline__tick-label">{frame.decade}</span>
                 </button>
               );
             })}
           </div>
         </div>
       ) : (
-        <p className="bp-hero-stage__count">
+        <p className="ds-hero-stage__count">
           {featureCount} record{featureCount === 1 ? '' : 's'} · {stateCount} state
           {stateCount === 1 ? '' : 's'}
           {liveData ? '' : ' · sample data'}

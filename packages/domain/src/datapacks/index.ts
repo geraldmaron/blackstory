@@ -1,5 +1,5 @@
 /**
- * Data Pack v1 contract barrel (black-book-ud5q). See `./manifest.ts`'s header for the full
+ * Data Pack v1 contract barrel (the related workstream). See `./manifest.ts`'s header for the full
  * design rationale — this is the contract + local validation pipeline for third-party datasets,
  * not the ops/ingestion infrastructure.
  */

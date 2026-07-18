@@ -6,14 +6,14 @@
 - **Depends on:** ADR-002, ADR-005
 
 > **Phase note (2026-07-16):** SQL Connect templates under `infra/database/sql-connect/` are
-> **parked**. TypeScript apps use Firestore Admin SDK / `@blap/firebase` for the production
+> **parked**. TypeScript apps use Firestore Admin SDK / `@repo/firebase` for the production
 > data path. Revisit only if Cloud SQL is reconsidered under ADR-011 triggers.
 
 ## Scaffold vs target
 
 | Aspect | Today (verified) | Former target (parked) |
 |--------|------------------|------------------------|
-| `@blap/data-access` | Postgres helpers parked; Firestore module is primary | Live Admin SDK wrappers after generate |
+| `@repo/data-access` | Postgres helpers parked; Firestore module is primary | Live Admin SDK wrappers after generate |
 | Firebase SQL Connect / connectors | Templates under `infra/database/sql-connect/` (parked) | Linked Cloud SQL + `dataconnect:sdk:generate` |
 | Direct Postgres from Python workers | Not wired; not required this phase | Least-privilege DSN per worker role |
 
@@ -30,7 +30,7 @@ TypeScript services need typed, reviewable database operations with explicit aut
 5. **Internal / publication** role: write projections and release metadata; **cannot** modify raw evidence.
 6. **Research** role (Python, usually direct Postgres): write research/evidence staging only; **cannot** modify public projections or publish.
 7. **Public web / browsers** never use SQL Connect or any database credential.
-8. Generated server-side TypeScript SDK lives behind `@blap/data-access` (or successor); apps do not embed ad-hoc SQL strings for user-shaped queries.
+8. Generated server-side TypeScript SDK lives behind `@repo/data-access` (or successor); apps do not embed ad-hoc SQL strings for user-shaped queries.
 
 ## Rejected alternatives
 

@@ -26,4 +26,4 @@ Assumptions: [`../adr/ADR-010-security-and-abuse-assumptions.md`](../adr/ADR-010
 Isolation matrices / IaC stubs: [`../../infra/gcp/`](../../infra/gcp/), [`../../infra/firebase/`](../../infra/firebase/).  
 GitHub governance (BB-009, local): [`../../infra/github/README.md`](../../infra/github/README.md), [`../../SECURITY.md`](../../SECURITY.md).
 
-Automated completeness: `pnpm --filter @blap/testing test`.
+Automated completeness: `pnpm --filter @repo/testing test`.

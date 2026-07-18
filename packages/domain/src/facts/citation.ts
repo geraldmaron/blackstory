@@ -5,7 +5,7 @@
  * `../citations/citation.ts`'s `Citation` (the link-rot-management record keyed by
  * `claimId`): that type models one atomic claim's citation for link-health monitoring;
  * this type models one CSL-JSON bibliographic reference plus the Black Book fields a fact
- * citation must carry per spec. Both ultimately anchor to the same 
+ * citation must carry per spec. Both ultimately anchor to the same
  * `SourceCapture`/`archivedUrl` discipline, but this module does not import or re-export the
  * other's `Citation` a future adapter (mirroring `buildCitationFromEvidence`) can bridge them
  * if a caller needs both.
@@ -100,7 +100,7 @@ export function assertFactCitationStructurallyComplete(citation: FactCitation): 
   if (isWebFactCitation(citation)) {
     if (!isNonEmpty(citation.archivedUrl) || !isNonEmpty(citation.archivedAt) || !isIsoDate(citation.archivedAt)) {
       throw new Error(
-        'Web fact citations require an archivedUrl and a valid ISO archivedAt (BB-016 capture pointer)',
+        'Web fact citations require an archivedUrl and a valid ISO archivedAt ( capture pointer)',
       );
     }
     if (!isNonEmpty(citation.accessedAt) || !isIsoDate(citation.accessedAt)) {

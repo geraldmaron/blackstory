@@ -9,7 +9,7 @@ import {
   type LegalCatalogEntry,
   type LegalPlainLanguageExplainer,
   type LegalSnapshot,
-} from '@blap/domain';
+} from '@repo/domain';
 
 export const LEGAL_SEED_RELEASE_ID = 'legal-seed-2026-07-17';
 
@@ -65,7 +65,7 @@ function lawFact(
     counterClaims: [],
     relatedFacts: [],
     // No CanonicalClaim backs these seed facts yet (they predate `derivedFromClaimIds` /
-    // black-book-pj6w and there is no unambiguous claim id to backfill against) — left empty
+    // the related workstream and there is no unambiguous claim id to backfill against) — left empty
     // rather than guessed. See packages/domain/src/facts/derivation.ts's module doc: an empty
     // array is a no-op for the derivation-consistency check, not a failure.
     derivedFromClaimIds: [],

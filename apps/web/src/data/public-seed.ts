@@ -16,7 +16,7 @@ import {
   type EntityStatusValue,
   type NotabilityBasisRecord,
   type StatusHistoryEntry,
-} from '@blap/domain';
+} from '@repo/domain';
 import {
   buildGraphTimeline,
   currentStatusFor,
@@ -44,12 +44,12 @@ export type PublicClaimView = {
 export type PublicTimelineEvent = GraphTimelineEntry;
 
 /**
- * Typed related-entity entry, mirroring `@blap/domain`'s `PublicRelatedEntry`
+ * Typed related-entity entry, mirroring `@repo/domain`'s `PublicRelatedEntry`
  * (packages/domain/src/graph/adjacency.ts) and
  * `packages/firebase/src/firestore/types.ts`'s `publicEntityProjectionSchema.related` — the same
  * shape derived from a release's graph adjacency doc. Hardcoded here rather than imported since
  * this file is a standalone web-app seed catalog predating projections (see the module
- * doc above), matching this file's existing convention of not importing @blap/domain types.
+ * doc above), matching this file's existing convention of not importing @repo/domain types.
  */
 export type PublicRelatedEntry = {
   readonly id: string;
@@ -109,7 +109,7 @@ export type PublicEntityView = {
   readonly displayName: string;
   readonly summary: string;
   /** @deprecated Free-text era label predating structured era model. Prefer
-   * `eraBuckets`, derived from @blap/domain's `deriveEraBuckets`. Kept for existing
+   * `eraBuckets`, derived from @repo/domain's `deriveEraBuckets`. Kept for existing
    * filter/display call sites until they migrate. */
   readonly era: string;
   /**
@@ -117,7 +117,7 @@ export type PublicEntityView = {
    * notability/relevance scores are banned from public payloads).
    */
   /** Derived current lifecycle status label (e.g. "active", "in_force"), when the entity kind
-   * carries one. Never hand-edited — derived via @blap/domain's `currentEntityStatus`. */
+   * carries one. Never hand-edited — derived via @repo/domain's `currentEntityStatus`. */
   readonly status?: string;
   /** Time-scoped status-lifecycle designations for place/school/institution kinds omitted
    * for `event` (see `eventWindow`). `status` above is always `currentStatus(statusHistory)`,
@@ -125,14 +125,14 @@ export type PublicEntityView = {
   readonly statusHistory?: readonly StatusHistoryEntry<EntityStatusValue>[];
   /** `event`-kind entities carry this instead of `statusHistory`/`status`.  */
   readonly eventWindow?: PublicEventWindow;
-  /** Decade labels the entity's dated span overlaps, derived via @blap/domain's
+  /** Decade labels the entity's dated span overlaps, derived via @repo/domain's
    * `deriveEraBuckets` replaces the free-text `era` string above. */
   readonly eraBuckets?: readonly string[];
   /** Human-readable notability rubric labels (never the raw criterion id alone, never a score),
-   * one per notabilityBasis record sourced from @blap/domain's `NOTABILITY_RUBRIC`. */
+   * one per notabilityBasis record sourced from @repo/domain's `NOTABILITY_RUBRIC`. */
   readonly notabilityLabels?: readonly string[];
-  /** Structured, auditable inclusion basis backing `notabilityLabels` above (black-book-1fg9).
-   * Live release projections carry this directly (see `@blap/domain`'s
+  /** Structured, auditable inclusion basis backing `notabilityLabels` above (the related workstream).
+   * Live release projections carry this directly (see `@repo/domain`'s
    * `buildReleaseEntityArtifacts`); this bundled seed catalog predates the release builder and
    * does not populate it, so read-path adapters (`snapshot-search-index.ts`,
    * `entity/[id]/adapters.ts`) still synthesize a basis from `notabilityLabels` when this is
@@ -145,11 +145,11 @@ export type PublicEntityView = {
    * `SensitivityContextBanner` consumes. `sensitivityClass` above stays a plain string for
    * the pre-existing search-index adapter; this is the richer projection the entity page renders. */
   readonly sensitivity?: EntitySensitivity;
-  /** @deprecated Superseded by `topicIds` (black-book-s4hp). Kept for backward compatibility;
-   * the map/list facet builder falls back to this, filtered through `@blap/domain`'s
+  /** @deprecated Superseded by `topicIds` (the related workstream). Kept for backward compatibility;
+   * the map/list facet builder falls back to this, filtered through `@repo/domain`'s
    * `TOPIC_REGISTRY`, when `topicIds` is absent. */
   readonly topicTags: readonly string[];
-  /** Controlled historical-theme ids (black-book-s4hp) — the ONLY field the explore-map theme
+  /** Controlled historical-theme ids (the related workstream) — the ONLY field the explore-map theme
    * facet should be built from. Optional: this bundled seed predates the split, so entries
    * below don't populate it yet and the facet builder falls back to `topicTags`. */
   readonly topicIds?: readonly string[];

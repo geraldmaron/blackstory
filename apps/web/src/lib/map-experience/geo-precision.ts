@@ -1,6 +1,6 @@
 /**
  * Bridges the public-precision vocabulary (`PublicEntityView.locationPrecision`, defined by
- * `@blap/security`'s redaction policy) to the `GeoPrecisionTier` display-radius
+ * `@repo/security`'s redaction policy) to the `GeoPrecisionTier` display-radius
  * scale, and resolves the radius-affordance circle for a rendered map point.
  *
  * These are deliberately different vocabularies (see
@@ -14,8 +14,8 @@ import {
   FIXED_TIER_RADIUS_METERS,
   type GeoPrecisionTier,
   type JurisdictionBBox,
-} from '@blap/domain/geography/display-radius';
-import { US_STATES } from '@blap/domain/map/geography';
+} from '@repo/domain/geography/display-radius';
+import { US_STATES } from '@repo/domain/map/geography';
 
 /** Finest-known public precision -> the GeoPrecisionTier its radius circle should render at.  */
 const PUBLIC_PRECISION_TO_GEO_TIER: Readonly<Record<string, GeoPrecisionTier>> = {
@@ -30,14 +30,14 @@ const PUBLIC_PRECISION_TO_GEO_TIER: Readonly<Record<string, GeoPrecisionTier>> =
 
 /** Falls back to `locality` (a mid-scale radius, never a sharpened point) for any public
  * precision this table has not classified fail-soft on the RENDER-RADIUS side only; the
- * publish-time redaction decision itself is `@blap/security`'s, untouched here. */
+ * publish-time redaction decision itself is `@repo/security`'s, untouched here. */
 export function geoPrecisionTierForPublicPrecision(publicPrecision: string): GeoPrecisionTier {
   return PUBLIC_PRECISION_TO_GEO_TIER[publicPrecision] ?? 'locality';
 }
 
 /**
  * District of Columbia has no separate city/locality boundary layer in this repo's reference data
- * (`@blap/domain`'s `US_STATES` bbox IS the city extent for D.C. it is a consolidated
+ * (`@repo/domain`'s `US_STATES` bbox IS the city extent for D.C. it is a consolidated
  * city-state, the one case where "state bbox" and "locality bbox" are the same real boundary).
  * This is the ONLY locality bbox this module resolves without a real jurisdiction polygon;
  * every other state/locality combination fails closed (see `resolveDisplayRadiusMeters` below)

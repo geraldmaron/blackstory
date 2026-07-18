@@ -1,14 +1,14 @@
 
 /**
  * Concrete tuning recommendations derived from load/abuse simulations.
- * Values reference current policy defaults in @blap/security adjust after staging soak.
+ * Values reference current policy defaults in @repo/security adjust after staging soak.
  */
 import {
   DEFAULT_DAILY_BUDGETS,
   DEFAULT_ENDPOINT_QUOTA_MATRIX,
   DEFAULT_QUERY_GUARDRAIL_LIMITS,
   resolveEndpointPolicy,
-} from '@blap/security';
+} from '@repo/security';
 import type { TuningRecommendation } from './types.js';
 
 const searchAnon = resolveEndpointPolicy(DEFAULT_ENDPOINT_QUOTA_MATRIX, 'search', 'anonymous');
@@ -133,7 +133,7 @@ export function loadAbuseTuningRecommendations(): readonly TuningRecommendation[
       scenarioId: 'oversized_payloads',
       controlLayer: 'submission_validation',
       currentValue: 'maxBytes 16384',
-      recommendedValue: 'keep; ensure Content-Length check at edge matches BB-028 limits',
+      recommendedValue: 'keep; ensure Content-Length check at edge matches  limits',
       rationale:
         'Oversized payloads denied before quarantine write — zero storage cost per abusive request.',
       priority: 'P0',

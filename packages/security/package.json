@@ -1,5 +1,5 @@
 {
-  "name": "@blap/security",
+  "name": "@repo/security",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -20,12 +20,12 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "@blap/domain": "workspace:*",
-    "@blap/schemas": "workspace:*"
+    "@repo/domain": "workspace:*",
+    "@repo/schemas": "workspace:*"
   },
   "devDependencies": {
-    "@blap/observability": "workspace:*",
-    "@blap/typescript-config": "workspace:^",
+    "@repo/observability": "workspace:*",
+    "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

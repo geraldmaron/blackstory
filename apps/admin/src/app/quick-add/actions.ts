@@ -3,7 +3,7 @@
 /**
  * Server action for the quick-add surface. This is a thin caller: it reads form
  * fields, builds an `OperatorIntakeContext`, and calls the real
- * `runResearchIntake`/`createNodeSafeFetchDependencies` from `@blap/operator-cli` the
+ * `runResearchIntake`/`createNodeSafeFetchDependencies` from `@repo/operator-cli` the
  * exact same package function the `research-intake` CLI command and
  * `.claude/skills/black-book/research-intake` call. No fetch, quarantine, or research-case
  * logic is reimplemented here.
@@ -21,7 +21,7 @@
  * operator CLI's `--commit` flag, a distinct, explicit, auditable action.
  */
 import { randomUUID } from 'node:crypto';
-import { createNodeSafeFetchDependencies, runResearchIntake } from '@blap/operator-cli';
+import { createNodeSafeFetchDependencies, runResearchIntake } from '@repo/operator-cli';
 import type { QuickAddFormState } from './form-state';
 
 function readOperatorIdentity(formData: FormData): { operatorId: string; sessionId: string } {

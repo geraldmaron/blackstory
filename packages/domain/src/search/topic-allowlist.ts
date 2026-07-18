@@ -1,14 +1,14 @@
 /**
  * Controlled allowlist of permitted theme tags for facet surfacing and filter options.
- * Interim guard pending full controlled-taxonomy system (black-book-s4hp).
+ * Interim guard pending full controlled-taxonomy system (the related workstream).
  * Tags in this set are surfaced as clickable themes in map/search facets.
  *
  * Person-name abbreviations (e.g. "mlk" for Martin Luther King Jr.) are excluded
  * here for the same reason full names are: they're a person reference, not a
  * theme. Org acronyms (naacp, sclc, sncc, cofo, mfdp) are kept for now — splitting
- * mentionedEntityIds (people/orgs/events) out of topicIds entirely is black-book-s4hp's
+ * mentionedEntityIds (people/orgs/events) out of topicIds entirely is the related workstream's
  * job, and resolving name variants/abbreviations against a canonical entity is
- * black-book-8bck's (entityNames/entityIdentifiers).
+ * the related workstream's (entityNames/entityIdentifiers).
  */
 
 export const TOPIC_TAG_ALLOWLIST = new Set([

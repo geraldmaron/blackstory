@@ -5,7 +5,7 @@
  * `/corrections/appeal/api` and never exposes moderation-sensitive details.
  */
 import { useId, useState, type FormEvent } from 'react';
-import { Button, Notice } from '@blap/ui';
+import { Button, Notice } from '@repo/ui';
 import { APPEAL_ELIGIBILITY_NOTICE, CORRECTION_PRIVACY_NOTICE } from './copy';
 import { getCorrectionAppCheckHeaders } from './app-check-client';
 
@@ -103,8 +103,8 @@ export function AppealForm({ receiptCode }: { readonly receiptCode?: string | un
   }
 
   return (
-    <form className="bp-stack" onSubmit={handleSubmit} noValidate>
-      <p className="bp-sans">{APPEAL_ELIGIBILITY_NOTICE}</p>
+    <form className="ds-stack" onSubmit={handleSubmit} noValidate>
+      <p className="ds-sans">{APPEAL_ELIGIBILITY_NOTICE}</p>
 
       {state.status === 'error' ? (
         <Notice tone="error" title="Appeal failed">
@@ -119,12 +119,12 @@ export function AppealForm({ receiptCode }: { readonly receiptCode?: string | un
         </Notice>
       ) : null}
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={receiptId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={receiptId}>
           Receipt code <span aria-hidden="true">*</span>
         </label>
         <input
-          className="bp-filters__control"
+          className="ds-filters__control"
           id={receiptId}
           name="receiptCode"
           type="text"
@@ -135,12 +135,12 @@ export function AppealForm({ receiptCode }: { readonly receiptCode?: string | un
         />
       </div>
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={statementId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={statementId}>
           Why are you appealing? <span aria-hidden="true">*</span>
         </label>
         <textarea
-          className="bp-filters__control"
+          className="ds-filters__control"
           id={statementId}
           name="statement"
           rows={4}
@@ -148,38 +148,38 @@ export function AppealForm({ receiptCode }: { readonly receiptCode?: string | un
           minLength={20}
         />
         {fieldIssue('statement') ? (
-          <p className="bp-sans" role="alert">
+          <p className="ds-sans" role="alert">
             {fieldIssue('statement')!.message}
           </p>
         ) : null}
       </div>
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={sourceUrlId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={sourceUrlId}>
           Supporting HTTPS link <span aria-hidden="true">*</span>
         </label>
-        <input className="bp-filters__control" id={sourceUrlId} name="sourceUrl" type="url" required />
+        <input className="ds-filters__control" id={sourceUrlId} name="sourceUrl" type="url" required />
         {fieldIssue('sourceUrl') ? (
-          <p className="bp-sans" role="alert">
+          <p className="ds-sans" role="alert">
             {fieldIssue('sourceUrl')!.message}
           </p>
         ) : null}
       </div>
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={contactId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={contactId}>
           Contact (optional)
         </label>
-        <input className="bp-filters__control" id={contactId} name="contact" type="text" />
+        <input className="ds-filters__control" id={contactId} name="contact" type="text" />
       </div>
 
       <Notice tone="warning" title={CORRECTION_PRIVACY_NOTICE.title}>
         {CORRECTION_PRIVACY_NOTICE.body}
       </Notice>
 
-      <div className="bp-row" style={{ alignItems: 'flex-start' }}>
+      <div className="ds-row" style={{ alignItems: 'flex-start' }}>
         <input id={privacyId} name="privacyConsent" type="checkbox" required />
-        <label htmlFor={privacyId} className="bp-sans" style={{ marginLeft: 'var(--bp-space-2)' }}>
+        <label htmlFor={privacyId} className="ds-sans" style={{ marginLeft: 'var(--ds-space-2)' }}>
           I confirm the privacy notice. <span aria-hidden="true">*</span>
         </label>
       </div>

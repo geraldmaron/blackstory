@@ -1,5 +1,5 @@
 /**
- * Tests for coarse entity classification (black-book-9mox).
+ * Tests for coarse entity classification (the related workstream).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -1,5 +1,5 @@
 /**
- * Cinematic camera grammar for the persistent map stage (BB-098, ADR-017
+ * Cinematic camera grammar for the persistent map stage (ADR-017
  * "Persistent map canvas — one MapLibre instance across hero and explore").
  *
  * Named presets — never raw `flyTo`/`easeTo` defaults — describe each tier of the map's
@@ -11,7 +11,7 @@
  * it stays unit-testable in plain Node — the same split this repo already uses for
  * `marker-size.ts` / `kind-encoding.ts` / `state-labels.ts`.
  *
- * Design source: design-direction-v3.md "Camera grammar (BB-098)" — duration ~2000-2600ms
+ * Design source: design-direction-v3.md "Camera grammar ()" — duration ~2000-2600ms
  * national -> state, ~1600ms state -> locality, ~1200ms -> point; curve ~1.32-1.42; authored
  * slow-out easing (motion that reads as descent into place, never a jump cut); `jumpTo` under
  * reduced motion, full functional parity.
@@ -71,7 +71,7 @@ function cubicBezier(x1: number, y1: number, x2: number, y2: number): CameraEasi
   };
 }
 
-/** Shared slow-out register for every preset: mirrors `@blap/ui`'s `--bp-easing`
+/** Shared slow-out register for every preset: mirrors `@repo/ui`'s `--ds-easing`
  * (`cubic-bezier(0.16, 1, 0.3, 1)`, `packages/ui/src/tokens/foundation.ts`'s `motion.easingStandard`)
  * so the map's camera register and the rest of the brand's motion register are the same curve —
  * fast departure, long unhurried settle. Motion that reads as descent into place, never a jump
@@ -120,7 +120,7 @@ export function cameraPresetFor(name: CameraPresetName, reducedMotion: boolean):
 
 /** Zoom level `MapStage` lands a `point` flight at when arriving on a single entity — a
  * campus/neighborhood-scale framing close enough to read the pin's radius-affordance halo, never
- * a street-level zoom (BB-051 never implies rooftop precision, and this module has no opinion on
+ * a street-level zoom (never implies rooftop precision, and this module has no opinion on
  * any specific coordinate — only on how close the camera gets). */
 export const CAMERA_POINT_ZOOM = 13;
 

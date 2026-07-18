@@ -11,7 +11,7 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import { Notice } from '@blap/ui';
+import { Notice } from '@repo/ui';
 import type { LocateClientResult } from '../../lib/geocode/locate-client';
 
 // See LocationPrivacyNotice.tsx's identical note: keeps this file safe under a classic JSX
@@ -38,14 +38,14 @@ export function LocationResolutionPanel({ result }: LocationResolutionPanelProps
     );
     return (
       <Notice tone="warning" title="Location resolved">
-        <p className="bp-sans">
+        <p className="ds-sans">
           {parts.length > 0 ? parts.join(', ') : 'A U.S. jurisdiction was resolved for this input.'}
         </p>
-        <p className="bp-mono" style={{ fontSize: '0.8125rem' }}>
+        <p className="ds-mono" style={{ fontSize: '0.8125rem' }}>
           Jurisdiction: {jurisdictionIds.countyId ?? jurisdictionIds.stateId ?? jurisdictionIds.countryId}
         </p>
-        <p className="bp-sans">
-          <Link className="bp-cta bp-cta--ink" href="/search">
+        <p className="ds-sans">
+          <Link className="ds-cta ds-cta--ink" href="/search">
             Search records
           </Link>
         </p>
@@ -56,9 +56,9 @@ export function LocationResolutionPanel({ result }: LocationResolutionPanelProps
   if (result.kind === 'fallback') {
     return (
       <Notice tone="dispute" title="No address match">
-        <p className="bp-sans">{result.fallback.message}</p>
-        <p className="bp-sans">
-          <Link className="bp-cta bp-cta--ink" href={result.fallback.searchHref}>
+        <p className="ds-sans">{result.fallback.message}</p>
+        <p className="ds-sans">
+          <Link className="ds-cta ds-cta--ink" href={result.fallback.searchHref}>
             Go to search
           </Link>
         </p>
@@ -77,7 +77,7 @@ export function LocationResolutionPanel({ result }: LocationResolutionPanelProps
 
   return (
     <Notice tone="error" title="Lookup unavailable">
-      <p className="bp-sans">{message}</p>
+      <p className="ds-sans">{message}</p>
     </Notice>
   );
 }

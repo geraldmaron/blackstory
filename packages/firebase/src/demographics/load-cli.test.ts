@@ -7,7 +7,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { CENSUS_DECENNIAL_VINTAGES } from '@blap/domain';
+import { CENSUS_DECENNIAL_VINTAGES } from '@repo/domain';
 import {
   buildCensusCountyDecadeDoc,
   runDemographicsLoad,

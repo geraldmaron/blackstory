@@ -1,5 +1,5 @@
 /**
- * Census decennial demographics adapter surface. Reachable as `@blap/domain` via the
+ * Census decennial demographics adapter surface. Reachable as `@repo/domain` via the
  * existing wildcard chain (`../index.ts` → `../../index.ts`), same as `../census-geo/`.
  */
 export {

@@ -1,6 +1,6 @@
 /**
  * SSR markup smoke tests for the "why this appears" component. Exercises the REAL
- * `buildPublicWhyThisAppears` composer from `@blap/domain` rather than a hand-shaped fixture
+ * `buildPublicWhyThisAppears` composer from `@repo/domain` rather than a hand-shaped fixture
  * object, so these tests fail if the domain composer's output shape ever drifts from what this
  * component renders.
  */
@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { buildPublicWhyThisAppears, type RelevanceEvidence } from '@blap/domain';
+import { buildPublicWhyThisAppears, type RelevanceEvidence } from '@repo/domain';
 import { WhyThisAppears } from './WhyThisAppears';
 
 const ACCEPTED_EVIDENCE: readonly RelevanceEvidence[] = [

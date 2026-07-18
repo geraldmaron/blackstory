@@ -17,8 +17,8 @@ import {
   type PublicSearchIndexDoc,
   type SearchFilter,
   type SearchResultView,
-} from '@blap/domain';
-import { normalizeSearchText } from '@blap/security';
+} from '@repo/domain';
+import { normalizeSearchText } from '@repo/security';
 
 export const FACT_LIBRARY_PAGE_SIZE = 20;
 

@@ -34,11 +34,11 @@ export function Confidence({ level, label, className }: ConfidenceProps) {
   const text = label ?? DEFAULT_LABELS[level];
   return (
     <span
-      className={cx('bp-confidence', `bp-confidence--${level}`, className)}
+      className={cx('ds-confidence', `ds-confidence--${level}`, className)}
       data-tier={level}
       role="status"
     >
-      <span className="bp-confidence__mark" aria-hidden="true">
+      <span className="ds-confidence__mark" aria-hidden="true">
         {MARKS[level]}
       </span>
       <span>{text}</span>

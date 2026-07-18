@@ -2,7 +2,7 @@
  * Public location precision helpers aligned with constitution publicPrecisionRules.
  * Display-radius / geoPrecision tier vocabulary lives in `./display-radius.js` (client-safe).
  */
-import { evaluatePublicPrecision, loadProductConstitution } from '@blap/schemas';
+import { evaluatePublicPrecision, loadProductConstitution } from '@repo/schemas';
 import type { LivingStatus } from '../living.js';
 export {
   GEO_PRECISION_TIERS,
@@ -126,7 +126,7 @@ export function resolveEntityLocationPrecision(
   if (isCoarserGeoPrecisionTier(input.documentedTier, redactedTier)) {
     throw new Error(
       `resolveEntityLocationPrecision: redactedTier "${redactedTier}" must not be finer than ` +
-        `documentedTier "${input.documentedTier}" (BB-091 fail-closed)`,
+        `documentedTier "${input.documentedTier}" (fail-closed)`,
     );
   }
   return { tier: redactedTier, basis: 'redacted-by-rule' };

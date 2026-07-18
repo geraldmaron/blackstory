@@ -1,11 +1,11 @@
 /**
- * Per-subject verification STATE (black-book-isqd): `lastVerifiedAt`, `nextReviewAt`,
+ * Per-subject verification STATE (the related workstream): `lastVerifiedAt`, `nextReviewAt`,
  * `verificationStatus`, `verificationPolicyId`, `lastVerificationRunId`.
  *
  * Design choice — a SEPARATE type keyed by `(subjectType, subjectId)`, rather than adding these
  * 4 fields directly onto `CanonicalClaim` (`../claims/claim.ts`, which already carries
- * `lastVerifiedAt`/`lastVerifiedVersionId` per black-book-vxmy) or `EntityRelationship`
- * (`../relationship.ts`, already carries `lastVerifiedAt` per black-book-hx8j):
+ * `lastVerifiedAt`/`lastVerifiedVersionId` per the related workstream) or `EntityRelationship`
+ * (`../relationship.ts`, already carries `lastVerifiedAt` per the related workstream):
  *
  *  1. Entities need the same state shape, but `../entity.ts` is explicitly off-limits this pass
  *     (large file, recently touched by other work). A single `VerificationState` type usable

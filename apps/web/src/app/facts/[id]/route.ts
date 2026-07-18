@@ -3,7 +3,7 @@
  * `/facts/{id}.json`.
  */
 import { NextResponse } from 'next/server';
-import { buildFactPath, slugifyFactStatement } from '@blap/domain';
+import { buildFactPath, slugifyFactStatement } from '@repo/domain';
 import { buildFactJsonExport } from '../fact-json';
 import { parseFactIdParam, resolvePublicFact } from '../resolve-public-fact';
 

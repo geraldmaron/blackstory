@@ -85,6 +85,6 @@ export function buildFactArticleJsonLd(
  */
 export function assertNeverClaimReview(jsonLd: Record<string, unknown>): void {
   if (jsonLd['@type'] === 'ClaimReview') {
-    throw new Error('Canonical FactRecord JSON-LD must never be @type "ClaimReview" (BB-086 AC6)');
+    throw new Error('Canonical FactRecord JSON-LD must never be @type "ClaimReview" ( AC6)');
   }
 }

@@ -8,7 +8,7 @@
  * through this component internally). `packages/domain/src/disclaimers.test.ts` runs a repo-wide
  * check that no ad-hoc disclaimer strings exist in apps/web source outside this path.
  *
- * Callers resolve copy via `getDisclaimer(disclaimerClass)` from `@blap/domain` and
+ * Callers resolve copy via `getDisclaimer(disclaimerClass)` from `@repo/domain` and
  * spread the result into this component's props
  * (`<DisclaimerBanner {...getDisclaimer('site_wide')} />`). This component takes plain,
  * already-resolved strings so it has no compile-time dependency on the registry export.
@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import { Notice } from '@blap/ui';
+import { Notice } from '@repo/ui';
 
 export type DisclaimerCopy = {
   readonly title: string;
@@ -33,7 +33,7 @@ export function DisclaimerBanner({ title, body, reviewDate }: DisclaimerBannerPr
   return (
     <Notice tone="warning" title={title}>
       <p style={{ margin: 0 }}>{body}</p>
-      <p className="bp-mono" style={{ margin: 0, marginTop: 'var(--bp-space-2)' }}>
+      <p className="ds-mono" style={{ margin: 0, marginTop: 'var(--ds-space-2)' }}>
         Reviewed {reviewDate}.
       </p>
     </Notice>

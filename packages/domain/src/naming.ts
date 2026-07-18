@@ -1,5 +1,5 @@
 /**
- * Temporal naming + external-identifier contracts (black-book-8bck).
+ * Temporal naming + external-identifier contracts (the related workstream).
  *
  * Names today are scattered by kind: `CanonicalEntity.displayName`/`aliases`, `PlaceFields
  * .historicalNames` (`./geography/location.ts`), `SchoolFields.names` (`./school.ts`). This

@@ -8,10 +8,10 @@ importers:
 
   .:
     devDependencies:
-      '@blap/eslint-config':
+      '@repo/eslint-config':
         specifier: workspace:^
         version: link:packages/eslint-config
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:packages/typescript-config
       firebase-tools:
@@ -29,16 +29,16 @@ importers:
 
   apps/admin:
     dependencies:
-      '@blap/config':
+      '@repo/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@blap/domain':
+      '@repo/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@blap/operator-cli':
+      '@repo/operator-cli':
         specifier: workspace:*
         version: link:../../packages/operator-cli
-      '@blap/ui':
+      '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       next:
@@ -51,10 +51,10 @@ importers:
         specifier: ^19.2.7
         version: 19.2.7(react@19.2.7)
     devDependencies:
-      '@blap/eslint-config':
+      '@repo/eslint-config':
         specifier: workspace:^
         version: link:../../packages/eslint-config
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config
       '@types/node':
@@ -75,14 +75,14 @@ importers:
 
   apps/api-internal:
     dependencies:
-      '@blap/config':
+      '@repo/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@blap/domain':
+      '@repo/domain':
         specifier: workspace:*
         version: link:../../packages/domain
     devDependencies:
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config
       '@types/node':
@@ -97,20 +97,20 @@ importers:
 
   apps/api-public:
     dependencies:
-      '@blap/config':
+      '@repo/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@blap/domain':
+      '@repo/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@blap/firebase':
+      '@repo/firebase':
         specifier: workspace:*
         version: link:../../packages/firebase
-      '@blap/security':
+      '@repo/security':
         specifier: workspace:*
         version: link:../../packages/security
     devDependencies:
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config
       '@types/node':
@@ -125,20 +125,20 @@ importers:
 
   apps/api-submissions:
     dependencies:
-      '@blap/config':
+      '@repo/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@blap/domain':
+      '@repo/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@blap/firebase':
+      '@repo/firebase':
         specifier: workspace:*
         version: link:../../packages/firebase
-      '@blap/security':
+      '@repo/security':
         specifier: workspace:*
         version: link:../../packages/security
     devDependencies:
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config
       '@types/node':
@@ -153,16 +153,19 @@ importers:
 
   apps/web:
     dependencies:
-      '@blap/domain':
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@repo/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@blap/firebase':
+      '@repo/firebase':
         specifier: workspace:*
         version: link:../../packages/firebase
-      '@blap/security':
+      '@repo/security':
         specifier: workspace:*
         version: link:../../packages/security
-      '@blap/ui':
+      '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       firebase:
@@ -181,10 +184,10 @@ importers:
         specifier: ^19.2.7
         version: 19.2.7(react@19.2.7)
     devDependencies:
-      '@blap/eslint-config':
+      '@repo/eslint-config':
         specifier: workspace:^
         version: link:../../packages/eslint-config
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config
       '@types/node':
@@ -205,26 +208,26 @@ importers:
 
   packages/config:
     dependencies:
-      '@blap/domain':
+      '@repo/domain':
         specifier: workspace:*
         version: link:../domain
-      '@blap/observability':
+      '@repo/observability':
         specifier: workspace:*
         version: link:../observability
-      '@blap/security':
+      '@repo/security':
         specifier: workspace:*
         version: link:../security
-      '@blap/testing':
+      '@repo/testing':
         specifier: workspace:*
         version: link:../testing
       zod:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
-      '@blap/firebase':
+      '@repo/firebase':
         specifier: workspace:*
         version: link:../firebase
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -239,7 +242,7 @@ importers:
 
   packages/data-access:
     devDependencies:
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -254,17 +257,17 @@ importers:
 
   packages/domain:
     dependencies:
-      '@blap/schemas':
+      '@repo/schemas':
         specifier: workspace:*
         version: link:../schemas
     devDependencies:
-      '@blap/security':
+      '@repo/security':
         specifier: workspace:*
         version: link:../security
-      '@blap/testing':
+      '@repo/testing':
         specifier: workspace:*
         version: link:../testing
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -297,15 +300,15 @@ importers:
 
   packages/firebase:
     dependencies:
-      '@blap/domain':
-        specifier: workspace:*
-        version: link:../domain
-      '@blap/security':
-        specifier: workspace:*
-        version: link:../security
       '@google/genai':
         specifier: ^2.12.0
         version: 2.12.0(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))
+      '@repo/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@repo/security':
+        specifier: workspace:*
+        version: link:../security
       firebase:
         specifier: ^11.10.0
         version: 11.10.0
@@ -316,12 +319,12 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
-      '@blap/typescript-config':
-        specifier: workspace:^
-        version: link:../typescript-config
       '@firebase/rules-unit-testing':
         specifier: ^4.0.1
         version: 4.0.1(firebase@11.10.0)
+      '@repo/typescript-config':
+        specifier: workspace:^
+        version: link:../typescript-config
       '@types/node':
         specifier: ^22.20.1
         version: 22.20.1
@@ -334,14 +337,14 @@ importers:
 
   packages/observability:
     dependencies:
-      '@blap/domain':
+      '@repo/domain':
         specifier: workspace:*
         version: link:../domain
-      '@blap/security':
+      '@repo/security':
         specifier: workspace:*
         version: link:../security
     devDependencies:
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -356,20 +359,20 @@ importers:
 
   packages/operator-cli:
     dependencies:
-      '@blap/domain':
+      '@repo/domain':
         specifier: workspace:*
         version: link:../domain
-      '@blap/firebase':
+      '@repo/firebase':
         specifier: workspace:*
         version: link:../firebase
-      '@blap/security':
+      '@repo/security':
         specifier: workspace:*
         version: link:../security
       firebase-admin:
         specifier: ^13.4.0
         version: 13.10.0
     devDependencies:
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -388,7 +391,7 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -403,17 +406,17 @@ importers:
 
   packages/security:
     dependencies:
-      '@blap/domain':
+      '@repo/domain':
         specifier: workspace:*
         version: link:../domain
-      '@blap/schemas':
+      '@repo/schemas':
         specifier: workspace:*
         version: link:../schemas
     devDependencies:
-      '@blap/observability':
+      '@repo/observability':
         specifier: workspace:*
         version: link:../observability
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -428,13 +431,13 @@ importers:
 
   packages/testing:
     devDependencies:
-      '@blap/domain':
+      '@repo/domain':
         specifier: workspace:*
         version: link:../domain
-      '@blap/security':
+      '@repo/security':
         specifier: workspace:*
         version: link:../security
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       '@types/node':
@@ -451,7 +454,7 @@ importers:
 
   packages/ui:
     devDependencies:
-      '@blap/typescript-config':
+      '@repo/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':

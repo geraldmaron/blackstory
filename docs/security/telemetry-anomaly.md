@@ -2,7 +2,7 @@
 
 Design-only contracts for security dashboards, metrics, anomaly rules, and alert policies.
 Producers (App Check guards, rate limiters, audit writers, query guardrails) keep their existing
-implementations and emit signals through `@blap/observability` adapters.
+implementations and emit signals through `@repo/observability` adapters.
 
 **Depends on:** [BB-018 audit/outbox](../../packages/domain/src/audit/index.ts),
 [BB-023 Cloud Armor](../../infra/gcp/armor/metrics-alerts-checklist.md),
@@ -21,14 +21,14 @@ implementations and emit signals through `@blap/observability` adapters.
 | `security-adapters.ts` | Normalizes producer signals without rewriting producers |
 | `security-telemetry.ts` | Recorder that redacts, emits metrics, and evaluates alerts |
 
-Import from `@blap/observability`:
+Import from `@repo/observability`:
 
 ```typescript
 import {
   createSecurityTelemetryRecorder,
   adaptAppCheckTelemetry,
   adaptAuditEvent,
-} from '@blap/observability';
+} from '@repo/observability';
 ```
 
 ## Event coverage (PDF deliverables)
@@ -61,7 +61,7 @@ Security telemetry **never** emits:
 
 - Raw Firebase App Check tokens or `Authorization` headers
 - Session cookies, JWTs, API keys, or credentials
-- Residential street addresses or high-precision coordinates (via `@blap/security`)
+- Residential street addresses or high-precision coordinates (via `@repo/security`)
 
 Opaque identifiers (actor IDs, object paths) are fingerprinted before they become metric labels.
 
@@ -69,7 +69,7 @@ Opaque identifiers (actor IDs, object paths) are fingerprinted before they becom
 
 | Producer | Adapter | Notes |
 |----------|---------|-------|
-| `@blap/firebase` App Check guard | `adaptAppCheckTelemetry` | Mirrors `AppCheckTelemetryEvent` shape |
+| `@repo/firebase` App Check guard | `adaptAppCheckTelemetry` | Mirrors `AppCheckTelemetryEvent` shape |
 | BB-018 audit events | `adaptAuditEvent` | Maps `authentication.failed`, `administrative.role_changed`, publication/retraction actions |
 | BB-025 rate limit denials | `adaptRateLimitDenial` | Classifies search/geocoder/submission/auth abuse |
 | BB-026 slow query events | `adaptSlowQuery` | Uses query hash — never raw query text |
@@ -125,7 +125,7 @@ These events generate **pager + `#security-alerts`** notification when triggered
 Run package tests before production traffic exists:
 
 ```bash
-pnpm --filter @blap/observability test
+pnpm --filter @repo/observability test
 ```
 
 Tests prove:
@@ -156,6 +156,6 @@ Cross-reference BB-023 Armor metrics: [`../../infra/gcp/armor/metrics-alerts-che
 | Acceptance criterion | Implementation |
 |---------------------|----------------|
 | Alerts include severity, runbook, release, service, correlation identifiers | `buildAlertPayload`, infra JSON stubs |
-| Logs exclude secrets and protected addresses | `redactSecurityEvent`, `@blap/security` redactor |
+| Logs exclude secrets and protected addresses | `redactSecurityEvent`, `@repo/security` redactor |
 | Metrics useful before launch via synthetic tests | `evaluateAnomalyRules` + `security.test.ts` |
 | High-severity publication and administrator events → immediate notification | `IMMEDIATE_NOTIFICATION_KINDS`, `SEC-ADMIN-01`, `SEC-PUB-01`, `SEC-RET-01` |

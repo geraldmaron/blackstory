@@ -1,5 +1,5 @@
 /**
- * Tests for the unified naming/identifier contracts + uniqueness invariant (black-book-8bck).
+ * Tests for the unified naming/identifier contracts + uniqueness invariant (the related workstream).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

@@ -4,7 +4,7 @@
  * parse/serialize so the server-rendered page and the client orchestrator read and write the
  * exact same shape.
  */
-import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@blap/domain/map/geography';
+import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS, type ExploreFilterState } from './filters';
 
 export type ExploreViewport = {
@@ -111,12 +111,12 @@ export function buildExploreHref(state: ExploreViewState): string {
 
 /**
  * The `state`-tier camera target for a US postal code: the state's bounding-box midpoint (see
- * `@blap/domain`'s `US_STATES`, the same coarse bbox posture used everywhere else this
+ * `@repo/domain`'s `US_STATES`, the same coarse bbox posture used everywhere else this
  * codebase attributes a point to a state — ADR-013 "known gaps") at a zoom close enough to read
  * individual pins. Alaska/Hawaii pull back to a wider zoom so their bbox — which spans far more
  * longitude than the Lower 48 states — doesn't clip at the map's `minZoom`.
  *
- * Shared by the homepage hero (BB-098: flies here before/while pushing to `/explore?state=…`)
+ * Shared by the homepage hero (: flies here before/while pushing to `/explore?state=…`)
  * and `/explore` itself (state-shape clicks, deep links), so both surfaces fly to the exact same
  * frame for the same state — one source of truth, not two independently-tuned camera targets.
  */

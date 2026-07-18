@@ -113,8 +113,8 @@ These are reviewed human steps; this repository does not apply live GCP or Fireb
 Unit tests use injected DNS and transport fixtures only; they never contact live systems.
 
 ```bash
-pnpm --filter @blap/security test
-pnpm --filter @blap/security typecheck
+pnpm --filter @repo/security test
+pnpm --filter @repo/security typecheck
 node --conditions development --import tsx --test \
   packages/security/src/url-safety/url-safety.test.ts
 cd workers/security

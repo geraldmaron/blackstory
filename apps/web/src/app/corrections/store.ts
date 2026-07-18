@@ -4,7 +4,7 @@
  * contract for App Hosting routes and tests. Deliberately exposes lookup-by-receipt only no
  * list or enumerate API exists for submitters.
  */
-import type { QuarantinedSubmissionRecord } from '@blap/security';
+import type { QuarantinedSubmissionRecord } from '@repo/security';
 import { createReceiptCode, digestReceiptCode } from './receipt-code';
 import type { CorrectionCategory, CorrectionTargetType } from './categories';
 import type { PublicClosureReason } from './public-status';

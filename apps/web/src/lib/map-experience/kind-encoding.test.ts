@@ -6,7 +6,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { contrastRatio } from '@blap/ui';
+import { contrastRatio } from '@repo/ui';
 import { DIGNITY_PALETTE } from './dignity-style';
 import {
   DEFAULT_KIND_ENCODING,

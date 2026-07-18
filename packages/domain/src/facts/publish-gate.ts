@@ -17,7 +17,7 @@
  * may publish (with its dispute disclosed via `confidenceNote`/`counterClaims`) exactly as
  * readily as an `established`-confidence one — confidence is a caveat, not a publish blocker.
  *
- * Derivation consistency (black-book-pj6w): when a fact declares `derivedFromClaimIds`, this
+ * Derivation consistency (the related workstream): when a fact declares `derivedFromClaimIds`, this
  * gate ALSO cross-checks its citations/confidence against the named canonical claims via
  * `./derivation.ts`'s `evaluateFactDerivationConsistency` — see that module's doc comment for the
  * exact comparison rule. This is opt-in and additive, never a new hard requirement: a fact with
@@ -66,7 +66,7 @@ export function evaluateFactPublishGate(
     return {
       ok: false,
       reason: 'no_citations',
-      message: `FactRecord cannot reach status "${fact.status}" with zero citations. "Unsourced" is not a publishable state (BB-086).`,
+      message: `FactRecord cannot reach status "${fact.status}" with zero citations. "Unsourced" is not a publishable state ().`,
     };
   }
   if (!hasCompleteFactCitations(fact)) {
@@ -147,7 +147,7 @@ export function assertFactProjectionPublishGate(
     const ids = result.failures.map((f) => f.factId);
     throw new Error(
       `Projection build blocked: ${ids.length} fact(s) fail the publish gate (${ids.join(', ')}). ` +
-        '"Unsourced" is not a publishable state (BB-086).',
+        '"Unsourced" is not a publishable state ().',
     );
   }
 }

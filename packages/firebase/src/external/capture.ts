@@ -5,7 +5,7 @@
  * `retrievalEvents` → `sourceCaptures`, schemas in ../firestore/types.ts).
  *
  * Correction 2026-07-18: the first tier-1 ingest scripts recorded dataset-level provenance
- * ad hoc (`datasetChecksum` field + .sha256 sidecar only). Bead black-book-vxz's contract is
+ * ad hoc (`datasetChecksum` field + .sha256 sidecar only). Bead the related workstream's contract is
  * explicit — "ingestion provenance = RetrievalEvent/SourceCapture (contentHash) + source
  * registry" — so every dataset acquisition now ALSO writes the harness documents through
  * this helper. The sidecar and per-doc `datasetChecksum` stay (belt-and-braces at the
@@ -18,7 +18,7 @@ import type { Firestore } from 'firebase-admin/firestore';
 import {
   rightsPolicyForVerdict,
   type ExternalDataSource,
-} from '@blap/domain';
+} from '@repo/domain';
 import { FIRESTORE_ROOT } from '../firestore/paths.js';
 import { setPreservingCreatedAt } from './batch-upsert.js';
 import {

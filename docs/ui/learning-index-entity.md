@@ -56,10 +56,10 @@ Firestore public entity projection:
 
 ```bash
 cd packages/firebase
-BLAP_FIREBASE_ALLOW_PRODUCTION=1 \
+APP_FIREBASE_ALLOW_PRODUCTION=1 \
   node --conditions development --import tsx scripts/bootstrap-public-seed.ts
 
-BLAP_FIREBASE_ALLOW_PRODUCTION=1 \
+APP_FIREBASE_ALLOW_PRODUCTION=1 \
   node --conditions development --import tsx scripts/promote-entity-primary-image.ts \
     --entity-id=ent_seed_school_001 \
     --file=../../brand/symbols/dark/blap-book-pin-symbol-dark-transparent.png \

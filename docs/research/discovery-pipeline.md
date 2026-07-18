@@ -2,7 +2,7 @@
 
 Contract-layer API for ingesting adapter candidates, extracting signals, deduplicating, and running bounded discovery campaigns. Discovery produces **private research candidates only** — never public entities.
 
-## Domain API (`@blap/domain` → `discovery/`)
+## Domain API (`@repo/domain` → `discovery/`)
 
 Parent agent merges `packages/domain/src/discovery/index.ts` into the package barrel:
 

@@ -1,5 +1,5 @@
 /**
- * Typed admin hook to convert an accepted correction quarantine record into a 
+ * Typed admin hook to convert an accepted correction quarantine record into a
  * draft research case. Operators invoke this from the admin console or CLI after reviewing the
  * quarantined submission it never writes canonical records or changes public confidence.
  *
@@ -10,7 +10,7 @@
  * 3. Persist returned `researchCase` via the existing research-case create gate.
  */
 import { randomUUID } from 'node:crypto';
-import { createResearchCase, type ResearchCaseRecord } from '@blap/domain';
+import { createResearchCase, type ResearchCaseRecord } from '@repo/domain';
 import type { CorrectionSubmissionStore } from './store';
 
 export type CorrectionResearchCaseActor = {

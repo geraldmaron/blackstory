@@ -1,6 +1,6 @@
 # Administration and research console
 
-The private console shell lives at `/console` in `@blap/admin`. It is a Cloud Run + IAP
+The private console shell lives at `/console` in `@repo/admin`. It is a Cloud Run + IAP
 target, separate from the public web application. BB-056 provides route shells, deterministic
 fixtures, guard contracts, and accessible interaction patterns; it does not connect mutation
 handlers or apply cloud configuration.

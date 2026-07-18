@@ -5,7 +5,7 @@
  * list navigation to the full record.
  */
 import React from 'react';
-import { cx } from '@blap/ui';
+import { cx } from '@repo/ui';
 import type { HistoryNodeView } from '../../lib/history/build-history-graph';
 
 void React;
@@ -24,24 +24,24 @@ export function HistoryResultList({
   className,
 }: HistoryResultListProps) {
   return (
-    <ul className={cx('bp-result-list', 'bp-history-result-list', className)} aria-labelledby={labelledBy}>
+    <ul className={cx('ds-result-list', 'ds-history-result-list', className)} aria-labelledby={labelledBy}>
       {nodes.map((node) => {
         const isSelected = node.entityId === selectedId;
 
         return (
-          <li key={node.entityId} className="bp-result-list__item">
+          <li key={node.entityId} className="ds-result-list__item">
             <a
-              className="bp-result-list__link"
+              className="ds-result-list__link"
               href={node.href}
               aria-current={isSelected ? 'true' : undefined}
               data-entity-id={node.entityId}
             >
-              <h3 className="bp-result-list__title">{node.displayName}</h3>
-              <p className="bp-result-list__summary">{node.summary}</p>
-              <div className="bp-result-list__meta">
-                <span className="bp-mono">{node.kind}</span>
-                <span className="bp-sans">{node.statusLabel}</span>
-                <span className="bp-sans">
+              <h3 className="ds-result-list__title">{node.displayName}</h3>
+              <p className="ds-result-list__summary">{node.summary}</p>
+              <div className="ds-result-list__meta">
+                <span className="ds-mono">{node.kind}</span>
+                <span className="ds-sans">{node.statusLabel}</span>
+                <span className="ds-sans">
                   {node.evidenceCount} claim{node.evidenceCount === 1 ? '' : 's'}
                 </span>
               </div>
@@ -50,12 +50,12 @@ export function HistoryResultList({
                 invalid HTML and hydration-breaks. Plain inline links, not
                 CTA pills: these are references, not actions. */}
             {node.factLinks.length > 0 ? (
-              <p className="bp-sans bp-history-result-list__facts">
+              <p className="ds-sans ds-history-result-list__facts">
                 Related fact{node.factLinks.length === 1 ? '' : 's'}:{' '}
                 {node.factLinks.map((fact, index) => (
                   <React.Fragment key={fact.href}>
                     {index > 0 ? ', ' : null}
-                    <a className="bp-history-result-list__fact-link" href={fact.href}>
+                    <a className="ds-history-result-list__fact-link" href={fact.href}>
                       {fact.label}
                     </a>
                   </React.Fragment>

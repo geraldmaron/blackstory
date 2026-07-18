@@ -16,7 +16,7 @@
 | **Pass criteria** | Observable success condition |
 
 Run the living checklist: [`tests/checklist.md`](./tests/checklist.md).  
-Corpus completeness is enforced by `@blap/testing` (`pnpm --filter @blap/testing test`).
+Corpus completeness is enforced by `@repo/testing` (`pnpm --filter @repo/testing test`).
 
 ---
 

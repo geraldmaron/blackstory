@@ -22,7 +22,7 @@ export const WEB_SEARCH_PROVIDER_DECISION = {
       'neither is buildable-on, leaving Brave vs Exa as the only live candidates.',
     'Cost: Brave is roughly $5/1k queries vs Exa\'s ~$7/1k. Discovery workloads are inherently ' +
       'exploratory and high-volume (many queries per campaign, most of which will not pan out), ' +
-      'so the ~30% unit-cost gap compounds under BB-033\'s per-campaign query budgets and monthly ' +
+      'so the ~30% unit-cost gap compounds under \'s per-campaign query budgets and monthly ' +
       'spend caps — a cheaper per-query cost buys more discovery surface for the same cap.',
     'Storage-rights mechanism clarity: Brave sells an explicit, purchasable "storage rights" tier ' +
       'as a contractual add-on to the base API — a concrete, checkable artifact ops can point to ' +
@@ -33,7 +33,7 @@ export const WEB_SEARCH_PROVIDER_DECISION = {
       'either way.',
     'Coverage fit: this bead exists to find the obscure personal blog or church-history page no ' +
       'curated feed list already knows about. General keyword web search (Brave) plausibly covers ' +
-      'that need directly from the BB-038 query-pack terms; Exa\'s semantic/"similar meaning" ' +
+      'that need directly from the  query-pack terms; Exa\'s semantic/"similar meaning" ' +
       'retrieval mode is a genuine strength for some discovery shapes but is not obviously better ' +
       'suited to name/place lookups built from a structured query pack than a well-formed keyword ' +
       'query, so it does not offset the cost and storage-mechanism gaps above.',
@@ -41,7 +41,7 @@ export const WEB_SEARCH_PROVIDER_DECISION = {
   storageTermsConfirmedInWriting: false,
   note:
     'Code-default decision only — no storage-rights confirmation has been obtained, and nothing ' +
-    'in this codebase may claim otherwise. The adapter ships registered "disabled" in the BB-037 ' +
+    'in this codebase may claim otherwise. The adapter ships registered "disabled" in the  ' +
     'registry (../gates.ts) AND with WebSearchProviderConfig.storageTermsConfirmed defaulting to ' +
     'false (../normalizer.ts assertStorageTermsConfirmed) — both gates require a human to flip ' +
     'them independently after real written confirmation from Brave.',

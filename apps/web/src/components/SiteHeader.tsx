@@ -10,7 +10,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ThemeToggle } from '@blap/ui';
+import { ThemeToggle } from '@repo/ui';
 import { isNavActive, OVERFLOW_NAV, PRIMARY_NAV } from '../lib/nav';
 
 const DESKTOP_NAV_MQ = '(min-width: 48rem)';
@@ -27,7 +27,7 @@ function PrimaryLinks({ pathname }: { readonly pathname: string }) {
                 moving between surfaces feels like moving through one experience. */}
             <Link
               href={item.href}
-              className={active ? 'bp-shell-nav__link is-active' : 'bp-shell-nav__link'}
+              className={active ? 'ds-shell-nav__link is-active' : 'ds-shell-nav__link'}
               aria-current={active ? 'page' : undefined}
             >
               {item.label}
@@ -48,7 +48,7 @@ function OverflowLinks({ pathname }: { readonly pathname: string }) {
           <li key={item.href}>
             <Link
               href={item.href}
-              className={active ? 'bp-shell-nav__link is-active' : 'bp-shell-nav__link'}
+              className={active ? 'ds-shell-nav__link is-active' : 'ds-shell-nav__link'}
               aria-current={active ? 'page' : undefined}
             >
               {item.label}
@@ -65,24 +65,24 @@ function DesktopNav({ pathname, hidden }: { readonly pathname: string; readonly 
 
   return (
     <nav
-      className="bp-shell-nav bp-shell-nav--desktop"
+      className="ds-shell-nav ds-shell-nav--desktop"
       aria-label="Primary"
       {...(hidden ? { 'aria-hidden': true } : {})}
     >
-      <ul className="bp-shell-nav__list">
+      <ul className="ds-shell-nav__list">
         <PrimaryLinks pathname={pathname} />
         <li>
-          <details className="bp-shell-more">
+          <details className="ds-shell-more">
             <summary
               className={
                 overflowActive
-                  ? 'bp-shell-nav__link bp-shell-more__summary is-active'
-                  : 'bp-shell-nav__link bp-shell-more__summary'
+                  ? 'ds-shell-nav__link ds-shell-more__summary is-active'
+                  : 'ds-shell-nav__link ds-shell-more__summary'
               }
             >
               More
             </summary>
-            <ul className="bp-shell-more__panel">
+            <ul className="ds-shell-more__panel">
               <OverflowLinks pathname={pathname} />
             </ul>
           </details>
@@ -104,15 +104,15 @@ function DrawerNav({
   return (
     <nav
       id={id}
-      className="bp-shell-nav bp-shell-nav--drawer"
+      className="ds-shell-nav ds-shell-nav--drawer"
       aria-label="Primary"
       {...(hidden ? { 'aria-hidden': true } : {})}
     >
-      <ul className="bp-shell-nav__list">
+      <ul className="ds-shell-nav__list">
         <PrimaryLinks pathname={pathname} />
       </ul>
-      <p className="bp-shell-nav__more-label">More</p>
-      <ul className="bp-shell-nav__list">
+      <p className="ds-shell-nav__more-label">More</p>
+      <ul className="ds-shell-nav__list">
         <OverflowLinks pathname={pathname} />
       </ul>
     </nav>
@@ -144,20 +144,20 @@ export function SiteHeader() {
   }, [pathname]);
 
   return (
-    <header ref={headerRef} className="bp-shell-header">
-      <div className="bp-shell-header__inner">
+    <header ref={headerRef} className="ds-shell-header">
+      <div className="ds-shell-header__inner">
         {/* Kit artwork only, dark variants only — the island is always ink.
             Lockup on wide viewports, standalone symbol on narrow ones. */}
-        <Link className="bp-shell-wordmark" href="/" aria-label="BlackStory — home">
+        <Link className="ds-shell-wordmark" href="/" aria-label="BlackStory — home">
           <img
-            className="bp-shell-wordmark__img bp-shell-wordmark__img--lockup"
-            src="/brand/blackstory-lockup-dark.png"
+            className="ds-shell-wordmark__img ds-shell-wordmark__img--lockup"
+            src="/brand/lockup-dark.png"
             alt=""
             aria-hidden="true"
           />
           <img
-            className="bp-shell-wordmark__img bp-shell-wordmark__img--symbol"
-            src="/brand/blackstory-symbol-dark.png"
+            className="ds-shell-wordmark__img ds-shell-wordmark__img--symbol"
+            src="/brand/symbol-dark.png"
             alt=""
             aria-hidden="true"
           />
@@ -171,7 +171,7 @@ export function SiteHeader() {
             bottom sheet to the pill instead of the viewport. */}
         <button
           type="button"
-          className="bp-shell-menu bp-shell-menu__summary"
+          className="ds-shell-menu ds-shell-menu__summary"
           aria-expanded={menuOpen}
           aria-controls="shell-nav-drawer"
           onClick={() => setMenuOpen((open) => !open)}
@@ -179,8 +179,8 @@ export function SiteHeader() {
           Menu
         </button>
 
-        <div className="bp-shell-header__tools">
-          <Link className="bp-shell-header__cta" href="/locate">
+        <div className="ds-shell-header__tools">
+          <Link className="ds-shell-header__cta" href="/locate">
             Near you
           </Link>
           <ThemeToggle />
@@ -190,7 +190,7 @@ export function SiteHeader() {
       {menuOpen && !isDesktop ? (
         <>
           <div
-            className="bp-shell-drawer-scrim"
+            className="ds-shell-drawer-scrim"
             aria-hidden="true"
             onClick={() => setMenuOpen(false)}
           />

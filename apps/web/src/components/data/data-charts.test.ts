@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import type { HateCrimeYearSummary, NationalPopulationByDecade } from '@blap/firebase';
+import type { HateCrimeYearSummary, NationalPopulationByDecade } from '@repo/firebase';
 import { HateCrimeCompositionChart } from './HateCrimeCompositionChart';
 import { PopulationByDecadeChart } from './PopulationByDecadeChart';
 

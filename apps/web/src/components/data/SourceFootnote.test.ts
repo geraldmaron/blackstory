@@ -56,7 +56,7 @@ test('SourceFootnote pluralizes and lists multiple sources', () => {
     createElement(SourceFootnote, { sources: [FBI, CENSUS], density: 'group' }),
   );
   assert.match(html, />Sources</);
-  assert.match(html, /bp-citation__list/);
+  assert.match(html, /ds-citation__list/);
   assert.match(html, /fbi-ucr-hate-crime/);
   assert.match(html, /census/);
 });
@@ -72,10 +72,10 @@ test('DataStatStrip renders one group Source for matching sources, not one per i
       ],
     }),
   );
-  const sourceLabels = html.match(/bp-citation__label/g) ?? [];
+  const sourceLabels = html.match(/ds-citation__label/g) ?? [];
   assert.equal(sourceLabels.length, 1);
-  assert.match(html, /bp-citation--group/);
-  assert.doesNotMatch(html, /bp-citation--compact/);
+  assert.match(html, /ds-citation--group/);
+  assert.doesNotMatch(html, /ds-citation--compact/);
   assert.match(html, /11,508/);
   assert.match(html, /3,128/);
 });
@@ -90,7 +90,7 @@ test('DataStatStrip keeps compact unique extras under the owning figure', () => 
       ],
     }),
   );
-  assert.match(html, /bp-citation--group/);
-  assert.match(html, /bp-citation--compact/);
+  assert.match(html, /ds-citation--group/);
+  assert.match(html, /ds-citation--compact/);
   assert.match(html, /census/);
 });

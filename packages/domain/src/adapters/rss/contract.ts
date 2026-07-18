@@ -9,7 +9,7 @@ import { RSS_ADAPTER_ID, RSS_PARSER_VERSION, RSS_STABLE_ID_SCHEME } from './type
 
 export const RSS_ATTRIBUTION_NOTICE =
   'Content derived from RSS/Atom syndication feeds retains the publisher as the attributed ' +
-  'source; only title, link, and a short syndicated summary are stored (BB-077 evidence-pointer doctrine).';
+  'source; only title, link, and a short syndicated summary are stored ( evidence-pointer doctrine).';
 
 export function createRssAdapterContract(overrides: Partial<SourceAdapterContract> = {}): SourceAdapterContract {
   return {
@@ -27,7 +27,7 @@ export function createRssAdapterContract(overrides: Partial<SourceAdapterContrac
       },
       permittedClaimClasses: ['biographical_fact', 'geographic_fact', 'organizational_fact'],
       refreshSchedule: '0 */6 * * *',
-      notes: 'Publisher-syndicated feeds; curated registry only (BB-073).',
+      notes: 'Publisher-syndicated feeds; curated registry only ().',
     },
     rights: {
       defaultStatus: 'licensed',

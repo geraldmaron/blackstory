@@ -12,7 +12,7 @@ void React;
 import type { ThemeName } from '../tokens/colors.js';
 import { cx } from '../utils/cx.js';
 
-const STORAGE_KEY = 'bp-theme';
+const STORAGE_KEY = 'ds-theme';
 
 function readPreferredTheme(): ThemeName {
   if (typeof window === 'undefined') {
@@ -50,7 +50,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   return (
     <button
       type="button"
-      className={cx('bp-theme-toggle', className)}
+      className={cx('ds-theme-toggle', className)}
       onClick={toggle}
       aria-pressed={theme === 'dark'}
       aria-label={`Switch to ${next} theme`}

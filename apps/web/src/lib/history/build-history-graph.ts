@@ -2,7 +2,7 @@
  * Builds display-ready history graph nodes and edges from release artifacts.
  * Consumes pre-derived `DecadeGraphView` `AllTimeGraphView` docs no request-time traversal.
  */
-import type { EntityRelationship, GraphReleaseArtifact } from '@blap/domain';
+import type { EntityRelationship, GraphReleaseArtifact } from '@repo/domain';
 import { seedFactsForEntity } from '../../data/facts-seed';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 import { resolveAllTimeStatusLabel, resolveDecadeStatusLabel } from './decade-status';

@@ -1,6 +1,6 @@
 
 /**
- * Proves the source-drift-run-health job body is REAL it calls @blap/domain's
+ * Proves the source-drift-run-health job body is REAL it calls @repo/domain's
  * evaluateRunHealth/shouldQuarantineRun/shouldDeadLetterRun (the same functions the
  * source-adapter pipeline itself uses) rather than reimplementing drift evaluation.
  */
@@ -43,7 +43,7 @@ test('record-count drift quarantines the run', () => {
   assert.ok(result.issues.includes('record_count_drift'));
 });
 
-test('a third consecutive quarantine triggers dead-lettering (BB-037 threshold)', () => {
+test('a third consecutive quarantine triggers dead-lettering ( threshold)', () => {
   const result = runSourceDriftRunHealthJob({
     jobRunId: 'run-3',
     startedAt: '2026-07-17T04:00:00.000Z',

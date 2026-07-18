@@ -50,7 +50,7 @@ production or use production data.
 
 - [x] ZAP baseline is manually dispatchable only against an HTTPS host containing
   `staging`, through the protected `staging-security` environment.
-- [x] DAST requires identity prefix `bb-security-dast-` and a protected token.
+- [x] DAST requires identity prefix `ds-security-dast-` and a protected token.
 - [x] Production DAST is forbidden.
 - [x] Release evidence validation requires the deployed commit to equal the tested
   commit and the deployed digest to equal the scanned, signed digest.

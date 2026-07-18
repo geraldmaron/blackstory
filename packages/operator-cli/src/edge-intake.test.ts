@@ -76,7 +76,7 @@ test('a causal historical-causation type missing TemporalContext.validFrom is re
   );
 });
 
-test('BB-092 acceptance criterion 9: a caused/enabled edge with NO causalReview is rejected (silence defaults to rejection, not permissiveness)', () => {
+test('acceptance criterion 9: a caused/enabled edge with NO causalReview is rejected (silence defaults to rejection, not permissiveness)', () => {
   const outcome = () =>
     prepareEdgeIntake(
       baseInput({ type: 'enabled', temporal: { validFrom: '1964' } }),
@@ -85,7 +85,7 @@ test('BB-092 acceptance criterion 9: a caused/enabled edge with NO causalReview 
   assert.throws(outcome, /reserved for consensus, citable systemic historical causation/);
 });
 
-test('BB-092 acceptance criterion 9: a contested/single-incident caused/enabled claim is rejected and points to cites', () => {
+test('acceptance criterion 9: a contested/single-incident caused/enabled claim is rejected and points to cites', () => {
   assert.throws(
     () =>
       prepareEdgeIntake(
@@ -100,7 +100,7 @@ test('BB-092 acceptance criterion 9: a contested/single-incident caused/enabled 
   );
 });
 
-test('BB-092 acceptance criterion 9: a settled systemic-causation claim with a documented basis is accepted and proceeds to quarantine', () => {
+test('acceptance criterion 9: a settled systemic-causation claim with a documented basis is accepted and proceeds to quarantine', () => {
   const outcome = prepareEdgeIntake(
     baseInput({
       fromEntityId: 'ent-policy-exclusionary-lending',

@@ -82,7 +82,7 @@ test('CYCLE-SAFE / BOUNDED-DEPTH: a build over cyclic containment fixtures still
   assert.ok(artifact.adjacencyByEntityId.get('gg-place-cycle-a')!.entries.length >= 1);
 });
 
-test('acceptance criterion 4 path shape: publicReleases/{releaseId}/graph/... mirrors the BB-019 entity-projection path convention', () => {
+test('acceptance criterion 4 path shape: publicReleases/{releaseId}/graph/... mirrors the  entity-projection path convention', () => {
   assert.equal(
     publicGraphAdjacencyPath('release-1', 'ent-a'),
     'publicReleases/release-1/graph/adjacency/ent-a',

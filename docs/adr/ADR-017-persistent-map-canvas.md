@@ -78,7 +78,7 @@ with a preset; raw defaults are banned by review checklist.
 ### Transition contract
 
 On hero engagement (state or point click): the camera flies with the matching preset
-while hero chrome dissolves (token-driven, `--bb-duration-base` class, opacity/translate
+while hero chrome dissolves (token-driven, `--ds-duration-base` class, opacity/translate
 only — no layout thrash), nav condenses, and `router.push('/explore?…')` runs the same
 moment. The push re-renders pages only; the flight continues uninterrupted across the
 navigation because the stage never unmounts. The reverse transition (explore → home)

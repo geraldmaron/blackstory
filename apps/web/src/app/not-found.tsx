@@ -2,7 +2,7 @@
  * Global not-found page for unknown public routes and missing seed entities.
  */
 
-import { EmptyState } from '@blap/ui';
+import { EmptyState } from '@repo/ui';
 import { StatusPage } from '../components/StatusPage';
 
 export default function NotFound() {
@@ -12,11 +12,11 @@ export default function NotFound() {
       title="Page not found"
       lede="That route is not part of the public shell, or the sample entity id is unknown."
     >
-      <div className="bp-page--status__body">
+      <div className="ds-page--status__body">
         <EmptyState
           title="Nothing to show here"
           action={
-            <a className="bp-button bp-button--primary" href="/search">
+            <a className="ds-button ds-button--primary" href="/search">
               Browse sample records
             </a>
           }

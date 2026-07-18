@@ -1,5 +1,5 @@
 /**
- * Public errata log seed data reverse-chronological editorial changes wired to 
+ * Public errata log seed data reverse-chronological editorial changes wired to
  * fact revisions and corrections policy. Production replaces this with a live projection.
  */
 import { listSeedFacts } from '../../data/facts-seed';

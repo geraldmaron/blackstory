@@ -1,5 +1,5 @@
 /**
- * Pure due-record logic (black-book-isqd): decides whether a subject is due for
+ * Pure due-record logic (the related workstream): decides whether a subject is due for
  * re-verification, and derives its `VerificationStatus`. No I/O — a real scheduled job supplies
  * the subject list via a `VerificationStateProvider` and reads `now` from its own clock.
  */

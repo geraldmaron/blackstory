@@ -4,29 +4,29 @@
  * stay consistent without loading the explore bundle.
  */
 
-.bp-entity-mast__meta {
+.ds-entity-mast__meta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--bp-space-2) var(--bp-space-3);
+  gap: var(--ds-space-2) var(--ds-space-3);
 }
 
-.bp-entity-mast__meta-sep {
-  color: var(--bp-ink-subtle);
+.ds-entity-mast__meta-sep {
+  color: var(--ds-ink-subtle);
   user-select: none;
 }
 
-.bp-entity-mast__meta-item {
+.ds-entity-mast__meta-item {
   color: inherit;
 }
 
-.bp-story-link__meta-row {
+.ds-story-link__meta-row {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--bp-space-2);
+  gap: var(--ds-space-2);
 }
 
-.bp-at-a-glance .bp-confidence-mark {
+.ds-at-a-glance .ds-confidence-mark {
   font-size: 0.9375rem;
 }

@@ -14,7 +14,7 @@
 |--------|------------------------------|---------------------|
 | Entity lifecycle status | Only `EntityMergeState.status` exists (active/merged_away/superseded) — no notion of "is this place still standing" | Kind-specific `statusHistory[]` on `CanonicalEntity`, time-scoped, current status always derived |
 | Inclusion rubric | Emergent from relevance+confidence gates only, invisible to readers ("why is X in and Y out" has no auditable answer) | `notabilityBasis[]` — structured, evidence-backed records; >=1 required to publish |
-| Era/decade model | `era` is a free string in the web seed (`apps/web/src/data/public-seed.ts`); decades are computed only inside `packages/firebase/src/embeddings/text.ts`'s local `deriveEraBucket` | `datePrecision` + `deriveEraBuckets` defined once in `@blap/domain`, consumed everywhere |
+| Era/decade model | `era` is a free string in the web seed (`apps/web/src/data/public-seed.ts`); decades are computed only inside `packages/firebase/src/embeddings/text.ts`'s local `deriveEraBucket` | `datePrecision` + `deriveEraBuckets` defined once in `@repo/domain`, consumed everywhere |
 | Entity kinds | 11 (person, place, school, organization, institution, event, law, case, publication, artifact, other) | 12 — adds `movement` (Civil Rights Movement, Great Migration, Black Power, Black Arts Movement, etc.) |
 | Sensitivity | No schema at all | Schema-only `sensitivity[]` classification; presentation is BB-095 |
 
@@ -198,7 +198,7 @@ authoritative, so there is exactly one place a decade-boundary bug can live.
 |-------------|---------------|
 | A separate `NotabilityScore` (numeric) | Banned by standing product policy (numeric scores are gameable and invite exactly the "why 0.63 not 0.65" question a criterion-based record avoids) and directly contradicts the existing relevance-score ban this bead extends. See `relevance/notability-gate.test.ts`'s hard-rule test asserting no numeric leaf ever appears in a public entity payload. |
 | A single global `EntityStatus` enum across all kinds | Forces every kind through the same vocabulary. A person would need an "inactive" it doesn't have; an event would need a status its when-span already expresses; a movement would gain a meaningless "inactive" the owner explicitly rejected ("a movement doesn't pause, it concludes"). Kind-specific vocabularies (Decision 1) avoid all three failure modes at the type level. |
-| A new package for the ontology (instead of extending `entity.ts`) | The substrate (`CanonicalEntity`, kind field bags, `EntityKind`) already lives in `@blap/domain`; a parallel package would either duplicate `EntityKind`/`CanonicalEntity` or force every consumer to depend on two packages for one entity model. Extending `entity.ts` in place (plus small, purpose-named sibling modules `entity-status.ts`, `era.ts`, `movement.ts` — matching the existing `school.ts`/`specialized.ts` split, not one giant file) keeps one entity model, one import. |
+| A new package for the ontology (instead of extending `entity.ts`) | The substrate (`CanonicalEntity`, kind field bags, `EntityKind`) already lives in `@repo/domain`; a parallel package would either duplicate `EntityKind`/`CanonicalEntity` or force every consumer to depend on two packages for one entity model. Extending `entity.ts` in place (plus small, purpose-named sibling modules `entity-status.ts`, `era.ts`, `movement.ts` — matching the existing `school.ts`/`specialized.ts` split, not one giant file) keeps one entity model, one import. |
 | Folding `SchoolFields.statusHistory` into the new generic entity-level `statusHistory` | Covered above under "School naming-collision resolution" — the existing values are milestones, not lifecycle-status values, and coercing them would lose or corrupt information. |
 | Changing `deriveEraBucket`'s (singular) return signature in `packages/firebase/src/embeddings/text.ts` to return every overlapping decade | Would change the shape of the Firestore vector pre-filter field it feeds (`EntityVectorFilters.eraBucket: string`, a scalar equality pre-filter per ADR-014's composite indexes) to an array, which is ADR-014's design surface, not this bead's. `deriveEraBucket` instead delegates its arithmetic to the new shared `deriveEraBuckets` while keeping its existing single-value contract; a caller that wants every overlapping decade can call `deriveEraBuckets` directly. |
 | Movement modeled as a long-duration `event` instead of its own kind | An event is a discrete happening; a movement is a sustained, multi-actor, multi-decade phenomenon that individual events/organizations resolve into via `part_of`. Conflating the two would blur exactly the distinction the decade/all-time graph view (BB-092) exists to show. |
@@ -234,7 +234,7 @@ authoritative, so there is exactly one place a decade-boundary bug can live.
   existing filter/display call sites until they migrate — not this bead's scope to chase down
   every consumer.
 - `packages/firebase/src/embeddings/text.ts`'s `deriveEraBucket` now delegates to
-  `@blap/domain`'s `deriveEraBuckets`; its `resolveEntityYearSpan`'s school case reads
+  `@repo/domain`'s `deriveEraBuckets`; its `resolveEntityYearSpan`'s school case reads
   `entity.school?.milestones` (was `.statusHistory`).
 - Two files outside this bead's primary ownership list needed a single-key mechanical rename to
   stay green after the school-field rename: `packages/domain/src/resolution.test.ts` and
@@ -242,7 +242,7 @@ authoritative, so there is exactly one place a decade-boundary bug can live.
   unchanged).
 - BB-087 (law badges), BB-086 (FactRecord spec), BB-092 (history graph substrate), and BB-095
   (sensitivity presentation) now have a single, already-tested vocabulary source to import
-  (`@blap/domain`'s `LAW_STATUSES`, `DatePrecision`/`deriveEraBuckets`,
+  (`@repo/domain`'s `LAW_STATUSES`, `DatePrecision`/`deriveEraBuckets`,
   `EntityStatusValue`/`StatusHistoryEntry`, `SensitivityClass`/`EntitySensitivity` respectively)
   instead of needing to invent their own.
 

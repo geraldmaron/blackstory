@@ -1,5 +1,5 @@
 /**
- * "Safe combination" validators for statistics (black-book-cqto), per the architecture
+ * "Safe combination" validators for statistics (the related workstream), per the architecture
  * review: summing or otherwise combining two `StatisticalObservation`s is only valid when
  * they share a series/universe, come from compatible source data, cover disjoint
  * geographies, and share a boundary version (the tractVintage-style constraint from bd

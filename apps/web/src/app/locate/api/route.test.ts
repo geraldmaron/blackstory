@@ -11,8 +11,8 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@blap/firebase';
-import type { CensusGeocodeMatch } from '@blap/domain';
+import type { AppCheckVerifier } from '@repo/firebase';
+import type { CensusGeocodeMatch } from '@repo/domain';
 import { createLocateCache } from '../../../lib/geocode/pipeline';
 import { createLocateAppCheckGuard } from './app-check-guard';
 import { createLocateRateLimitGuard } from './rate-limit-guard';
@@ -98,7 +98,7 @@ type LocateFailureBody = {
   readonly fallback: { readonly available: true; readonly reason: string; readonly searchHref: string };
 };
 
-test('resolves a real address to BB-091 jurisdiction ids with exact coordinates dropped (AC3, AC6)', async () => {
+test('resolves a real address to jurisdiction ids with exact coordinates dropped (AC3, AC6)', async () => {
   const deps = await buildDeps({ fetchAddressGeocode: fakeAddressFetcher([DC_MATCH]) });
   const response = await handleLocateRequest(
     locateRequest('?address=4600+Silver+Hill+Rd%2C+Washington%2C+DC+20233'),

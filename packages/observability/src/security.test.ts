@@ -31,7 +31,7 @@ const context = {
   releaseId: 'rel_2026_07_17',
 };
 
-test('security event vocabulary covers all BB-034 deliverable domains', () => {
+test('security event vocabulary covers all  deliverable domains', () => {
   const required = [
     'armor.deny',
     'armor.throttle',
@@ -179,14 +179,14 @@ test('buildMetricSample produces samples usable in synthetic anomaly tests', () 
     value: 1,
     occurredAt: '2026-07-17T00:00:00.000Z',
     service: 'api-public',
-    dimensions: { policy: 'black-book-api-public-armor' },
+    dimensions: { policy: 'the related workstream-public-armor' },
   });
   assert.deepEqual(samples, [
     {
       metric: 'armor_throttles_total',
       value: 1,
       occurredAt: '2026-07-17T00:00:00.000Z',
-      labels: { service: 'api-public', policy: 'black-book-api-public-armor' },
+      labels: { service: 'api-public', policy: 'the related workstream-public-armor' },
     },
   ]);
 });
@@ -197,7 +197,7 @@ test('evaluateAnomalyRules triggers on synthetic metric bursts', () => {
     metric: 'armor_throttles_total',
     value: 1,
     occurredAt: new Date(nowMs - index * 1_000).toISOString(),
-    labels: { service: 'api-public', policy: 'black-book-api-public-armor' },
+    labels: { service: 'api-public', policy: 'the related workstream-public-armor' },
   }));
 
   const evaluations = evaluateAnomalyRules({ samples, nowMs });
@@ -277,9 +277,9 @@ test('armor and cost adapters produce expected telemetry kinds', () => {
   const armor = adaptArmorSignal(
     {
       action: 'deny',
-      policy: 'black-book-api-public-armor',
+      policy: 'the related workstream-public-armor',
       rulePriority: 1000,
-      backendService: 'black-book-api-public-backend',
+      backendService: 'the related workstream-public-backend',
     },
     context,
   );

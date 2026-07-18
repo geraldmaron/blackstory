@@ -12,7 +12,7 @@
  * excluded from the map (not silently placed at a guessed point) — mirrors
  * `buildMapSource` "skippedNoLocation" accounting.
  */
-import { encodeGeohash } from '@blap/domain/geography/geohash';
+import { encodeGeohash } from '@repo/domain/geography/geohash';
 
 export type EntityGeoAnchor = {
   readonly lat: number;

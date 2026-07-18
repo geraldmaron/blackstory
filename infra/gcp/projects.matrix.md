@@ -15,7 +15,7 @@ SAs, buckets, and IAM in this design are not live until BB-011 inventory/provisi
 
 | Scope | Project | Live | Meaning | Isolation strength |
 |-------|---------|------|---------|--------------------|
-| Local development | `demo-black-book` emulator ID | yes, local only | Synthetic fixtures; no cloud access | Process/local data isolation |
+| Local development | `demo-repo` emulator ID | yes, local only | Synthetic fixtures; no cloud access | Process/local data isolation |
 | Staging | `black-book-efaaf` | no | Optional `black-book-web-staging` backend and prefixed config | Naming/config only |
 | Production | `black-book-efaaf` | project/site only | Public serving and all production workloads | Per-SA, bucket, DB role, network |
 | Production research | `black-book-efaaf` | no | Research-prefixed jobs/config and private-evidence | Per-SA, bucket, DB role, quota/kill switch |

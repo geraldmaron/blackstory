@@ -1,5 +1,5 @@
 /**
- * Tests for own time-scoped, evidence-backed place-condition layer records (,,
+ * Tests for own time-scoped, evidence-backed place-condition layer records (,
  * ) \u2014 distinct from statusHistory, distinct vocabularies for sundown-town vs.
  * redlining grade, area-only geometry, and the precision-fidelity rule.
  */

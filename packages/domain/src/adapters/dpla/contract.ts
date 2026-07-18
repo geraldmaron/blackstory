@@ -31,7 +31,7 @@ export function createDplaV2AdapterContract(overrides: Partial<SourceAdapterCont
       refreshSchedule: '0 6 * * 2',
       notes:
         'Free api.dp.la/v2 key; aggregation program transitions to Cleveland Public Library ' +
-        'starting July 2026 — client.ts parses responses defensively to tolerate the churn (BB-073).',
+        'starting July 2026 — client.ts parses responses defensively to tolerate the churn ().',
     },
     rights: {
       defaultStatus: 'licensed',

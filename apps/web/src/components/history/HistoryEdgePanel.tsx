@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import { Card } from '@blap/ui';
+import { Card } from '@repo/ui';
 import type { HistoryEdgeView } from '../../lib/history/build-history-graph';
 
 void React;
@@ -17,11 +17,11 @@ export type HistoryEdgePanelProps = {
 
 export function HistoryEdgePanel({ edge, onClose }: HistoryEdgePanelProps) {
   return (
-    <Card title="Documented connection" meta={<span className="bp-mono">{edge.type.replaceAll('_', ' ')}</span>}>
+    <Card title="Documented connection" meta={<span className="ds-mono">{edge.type.replaceAll('_', ' ')}</span>}>
       {onClose ? (
         <button
           type="button"
-          className="bp-button bp-button--secondary bp-history-edge-panel__close"
+          className="ds-button ds-button--secondary ds-history-edge-panel__close"
           onClick={onClose}
           aria-label="Close connection details"
         >
@@ -29,38 +29,38 @@ export function HistoryEdgePanel({ edge, onClose }: HistoryEdgePanelProps) {
         </button>
       ) : null}
 
-      <p className="bp-sans">{edge.sentence}</p>
+      <p className="ds-sans">{edge.sentence}</p>
 
       {edge.timespan?.validFrom ? (
-        <p className="bp-sans bp-history-edge-panel__timespan">
+        <p className="ds-sans ds-history-edge-panel__timespan">
           Documented from {edge.timespan.validFrom}
           {edge.timespan.validTo ? ` through ${edge.timespan.validTo}` : ', ongoing'}.
         </p>
       ) : null}
 
       <section aria-label="Supporting citations">
-        <h3 className="bp-section__kicker">Citations ({edge.evidenceCount})</h3>
-        <ol className="bp-qualify-list">
+        <h3 className="ds-section__kicker">Citations ({edge.evidenceCount})</h3>
+        <ol className="ds-qualify-list">
           {edge.citations.map((citation) => (
             <li key={citation.id}>
               {citation.href ? (
-                <a href={citation.href} className="bp-cta bp-cta--ghost">
+                <a href={citation.href} className="ds-cta ds-cta--ghost">
                   {citation.label}
                 </a>
               ) : (
-                <span className="bp-sans">{citation.label}</span>
+                <span className="ds-sans">{citation.label}</span>
               )}
             </li>
           ))}
         </ol>
       </section>
 
-      <div className="bp-history-edge-panel__endpoints">
-        <Link className="bp-cta bp-cta--ghost" href={`/entity/${edge.fromEntityId}`}>
+      <div className="ds-history-edge-panel__endpoints">
+        <Link className="ds-cta ds-cta--ghost" href={`/entity/${edge.fromEntityId}`}>
           {edge.fromDisplayName}
         </Link>
         <span aria-hidden="true">↔</span>
-        <Link className="bp-cta bp-cta--ghost" href={`/entity/${edge.toEntityId}`}>
+        <Link className="ds-cta ds-cta--ghost" href={`/entity/${edge.toEntityId}`}>
           {edge.toDisplayName}
         </Link>
       </div>

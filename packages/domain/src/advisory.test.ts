@@ -60,7 +60,7 @@ function baseRecord(overrides: Partial<PlaceAdvisoryRecord> = {}): PlaceAdvisory
 // Vocabulary and validation
 // ---------------------------------------------------------------------------
 
-test('advisory class vocabulary matches the BB-095 spec exactly', () => {
+test('advisory class vocabulary matches the  spec exactly', () => {
   assert.deepEqual(ADVISORY_CLASSES, [
     'private_property',
     'access_restricted',
@@ -229,7 +229,7 @@ test('RELEVANCE_DIMENSIONS and CONFIDENCE_COMPONENT_WEIGHTS keys never overlap w
   }
 });
 
-test('compile-time no-overlap invariants hold (the real gate is `pnpm --filter @blap/domain typecheck`)', () => {
+test('compile-time no-overlap invariants hold (the real gate is `pnpm --filter @repo/domain typecheck`)', () => {
   // These booleans are typed `NoKeyOverlap<...>` in advisory.ts, not plain `boolean` if a
   // future field name collision is ever introduced, advisory.ts itself fails to typecheck before
   // this runtime assertion is even reached.

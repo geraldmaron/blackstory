@@ -22,7 +22,7 @@ export type ServerFirebaseApp = {
   readonly env: ParsedFirebaseServerEnv;
 };
 
-const SERVER_APP_NAME = 'black-book-server';
+const SERVER_APP_NAME = 'the related workstream';
 
 function buildCredential(environment: EnvironmentLike, credentials?: string) {
   if (!credentials) {

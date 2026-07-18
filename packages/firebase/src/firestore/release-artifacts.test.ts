@@ -28,7 +28,7 @@ test('buildReleaseCatalogArtifacts sets paths, counts, and stable hashes', () =>
 });
 
 test('writeReleaseCatalogArtifactsToDir mirrors GCS object keys on disk', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'bb-release-artifacts-'));
+  const dir = mkdtempSync(join(tmpdir(), 'ds-release-artifacts-'));
   try {
     const built = buildReleaseCatalogArtifacts({
       releaseId: 'rel_disk_001',

@@ -1,9 +1,9 @@
 /**
- * Publish invariants for `EntityRelationship` (BB black-book-hx8j).
+ * Publish invariants for `EntityRelationship` (BB the related workstream).
  *
  * These validators encode the review's publish requirements as small, composable, testable
  * functions. None of them are wired into a publish pipeline yet that wiring belongs to the
- * release-builder bead (black-book-1fg9). Each function here takes the narrowest input it needs
+ * release-builder bead (the related workstream). Each function here takes the narrowest input it needs
  * (via `Pick`) so callers can validate against partial data without constructing a full
  * `EntityRelationship`.
  */

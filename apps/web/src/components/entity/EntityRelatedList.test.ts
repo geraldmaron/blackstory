@@ -17,7 +17,7 @@ function requireEntity(id: string) {
   return entity;
 }
 
-test('renders a linked entry for each BB-092 graph-adjacency related record, with its relationship type', () => {
+test('renders a linked entry for each graph-adjacency related record, with its relationship type', () => {
   const school = requireEntity('ent_dunbar_school_001');
   assert.ok((school.related?.length ?? 0) >= 2, 'the school fixture has 2 real graph edges');
   const html = renderToStaticMarkup(createElement(EntityRelatedList, { entity: school, labelledBy: 'related-heading' }));

@@ -8,7 +8,7 @@
  * retrieval-embedding.ts). What this test *does* verify: the eval pipeline runs end to end
  * against the real corpus fixture, produces a well-formed, reproducible result, and clears a
  * low sanity floor. A real recall@k number requires swapping in a live provider (e.g.
- * `@blap/firebase`'s `createGeminiEmbeddingProvider` with a `GEMINI_API_KEY`) see
+ * `@repo/firebase`'s `createGeminiEmbeddingProvider` with a `GEMINI_API_KEY`) see
  * docs/adr/ADR-014-vector-search.md.
  */
 import assert from 'node:assert/strict';
@@ -79,5 +79,5 @@ test('runRetrievalEval against the mock provider produces real, recorded recall@
   );
 
   // Recorded for operator review; see console output for the exact numbers.
-  console.log(`BB-071 gold-corpus retrieval eval (mock provider): ${JSON.stringify(result)}`);
+  console.log(` gold-corpus retrieval eval (mock provider): ${JSON.stringify(result)}`);
 });

@@ -7,7 +7,7 @@ import {
   evaluateProceduralLanguage,
   loadProductConstitution,
   type ProductConstitution,
-} from '@blap/schemas';
+} from '@repo/schemas';
 import {
   calculateClaimConfidence,
   CONFIDENCE_COMPONENT_WEIGHTS,
@@ -293,7 +293,7 @@ export function isPurelyCrowdsourcedEvidence(supportingSources: readonly Evidenc
 /**
  * Hard override applied on top of a confidence result: crowdsourced-only supporting evidence is
  * capped below every claim-class publish threshold until at least one non-crowdsourced (or
- * additional independent) lineage corroborates it. The underlying `score` is left untouched 
+ * additional independent) lineage corroborates it. The underlying `score` is left untouched
  * the candidate can still surface as a research lead only `passesPublishThreshold` is forced
  * closed.
  */
@@ -424,7 +424,7 @@ function round4(value: number): number {
 }
 
 /**
- * Graph-consistency diagnostic (BB black-book-hx8j additive, not wired into
+ * Graph-consistency diagnostic (BB the related workstream additive, not wired into
  * `recalculateConfidence` above, following the same pattern as
  * `computeReviewerAgreementSignal`/`citationRotRateAuthoritySignal`).
  *

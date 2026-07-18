@@ -1,5 +1,5 @@
 /**
- * Tests for the RSS/Atom community discovery adapter. Fixture-driven; no live network 
+ * Tests for the RSS/Atom community discovery adapter. Fixture-driven; no live network
  * every HTTP call goes through a mock SafeHttpClient injected by the test, never a real fetch.
  */
 import assert from 'node:assert/strict';
@@ -77,7 +77,7 @@ test('RSS adapter starts disabled by default and requires an approved policy to 
   assert.equal(approved.registryState, 'approved');
 });
 
-test('RSS adapter has a registered BB-077 obligations entry (fail-closed lookup succeeds)', () => {
+test('RSS adapter has a registered  obligations entry (fail-closed lookup succeeds)', () => {
   const obligationsStore = createInMemoryObligationsRegistry(defaultSourceObligationsSeed(FIXED_NOW));
   const obligations = getSourceObligationsOrThrow(obligationsStore, RSS_ADAPTER_ID);
   assert.equal(obligations.sourceClass, 'rss');
@@ -138,7 +138,7 @@ test('normalizes feed items into provenance-stamped, syndication-only candidates
   assert.equal('fullText' in candidates[0]!.payload, false);
 });
 
-test('feed registry add/remove is versioned and produces a BB-018 audit event', () => {
+test('feed registry add/remove is versioned and produces a  audit event', () => {
   const store = createInMemoryFeedRegistry();
   const auditLog = createInMemoryAuditLog();
   const actor = { id: 'admin@blackbook.local', type: 'user' as const };

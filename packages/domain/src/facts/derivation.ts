@@ -1,5 +1,5 @@
 /**
- * Fact <-> canonical-claim derivation consistency (black-book-pj6w).
+ * Fact <-> canonical-claim derivation consistency (the related workstream).
  *
  * `FactRecord` (`./record.ts`) carries its own independent `citations`/`confidence` rather than
  * pointing at a `CanonicalClaim` (`../claims/claim.ts`) for those values. `derivedFromClaimIds`

@@ -19,7 +19,7 @@ test('formatFactId produces a zero-padded BB-F-###### id', () => {
 test('isFactId accepts the canonical format and rejects malformed ids', () => {
   assert.equal(isFactId('BB-F-000042'), true);
   assert.equal(isFactId('BB-F-42'), false);
-  assert.equal(isFactId('bb-f-000042'), false);
+  assert.equal(isFactId('ds-f-000042'), false);
   assert.equal(isFactId('BB-F-'), false);
 });
 

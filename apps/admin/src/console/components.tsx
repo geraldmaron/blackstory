@@ -9,7 +9,7 @@ import type { ConsoleAction, ConsoleSurface, PublicationDiff } from './model';
 export function ConsoleShell({ children }: { readonly children: ReactNode }) {
   return (
     <>
-      <a className="bb-visually-hidden" href="#console-content">
+      <a className="ds-visually-hidden" href="#console-content">
         Skip to console content
       </a>
       <header className="console-header">
@@ -171,7 +171,7 @@ export function ConsoleSurfacePage({ surface }: { readonly surface: ConsoleSurfa
         </div>
         <div className="console-table-wrap">
           <table>
-            <caption className="bb-visually-hidden">{surface.label} fixture records</caption>
+            <caption className="ds-visually-hidden">{surface.label} fixture records</caption>
             <thead>
               <tr>
                 <th scope="col">Record</th>

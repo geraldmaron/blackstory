@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createQuarantinedSubmission } from '@blap/security';
+import { createQuarantinedSubmission } from '@repo/security';
 import { prepareCorrectionResearchCaseConversion } from './convert-to-research-case';
 import { buildStoredCorrection, createCorrectionSubmissionStore } from './store';
 

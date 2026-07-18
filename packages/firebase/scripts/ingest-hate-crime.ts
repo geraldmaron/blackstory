@@ -1,9 +1,9 @@
 /**
- * Ingest the FBI UCR hate crime bulk file (black-book-8qp) — raw artifacts to Storage, and
+ * Ingest the FBI UCR hate crime bulk file (the related workstream) — raw artifacts to Storage, and
  * three Firestore collections: `ucrAgencies` (ORI → county crosswalk), `hateCrimeCountyYears`
  * (the cross-reference aggregate, joins on fips5), `ucrStateParticipation` (coverage).
  *
- * County resolution (no LLM, fully deterministic — per black-book-7j0's directive):
+ * County resolution (no LLM, fully deterministic — per the related workstream's directive):
  *   1. FBI's own `counties` field when it names exactly one county → match to census county
  *      names for the FIPS.
  *   2. Otherwise (multi-county agencies like NYPD/Columbus/Portland, or "NOT SPECIFIED"),
@@ -16,11 +16,11 @@
  *   GET https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=<awsFile>
  *
  * Requires:
- *   BLAP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1 to validate without writing)
+ *   APP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1 to validate without writing)
  *   Application Default Credentials with Storage + Firestore write on black-book-efaaf
  *
  * Usage (from repo root):
- *   BLAP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
+ *   APP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
  *     packages/firebase/scripts/ingest-hate-crime.ts \
  *     --hate-crime-csv=/path/hate_crime.csv \
  *     --agencies-json=/path/all-agencies.json \
@@ -34,7 +34,7 @@ import { createInterface } from 'node:readline';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
-import { getExternalDataSource, sha256Json } from '@blap/domain';
+import { getExternalDataSource, sha256Json } from '@repo/domain';
 import { idempotentBatchUpsert, loadExistingHashes } from '../src/external/batch-upsert.ts';
 import { recordDatasetAcquisition } from '../src/external/capture.ts';
 import { FIRESTORE_ROOT } from '../src/firestore/paths.ts';
@@ -49,7 +49,7 @@ import {
 } from '../src/external/ucr-schema.ts';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
-const ALLOW = process.env.BLAP_FIREBASE_ALLOW_PRODUCTION === '1';
+const ALLOW = process.env.APP_FIREBASE_ALLOW_PRODUCTION === '1';
 const DRY_RUN = process.env.DRY_RUN === '1';
 const BUCKET = `${PROJECT_ID}-raw-sources`;
 
@@ -161,7 +161,7 @@ function splitCsvLine(line: string): string[] {
 
 async function main(): Promise<void> {
   if (!ALLOW && !DRY_RUN) {
-    console.error('Refusing to write: set BLAP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1)');
+    console.error('Refusing to write: set APP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1)');
     process.exit(2);
   }
   const hateCrimeCsv = arg('hate-crime-csv');

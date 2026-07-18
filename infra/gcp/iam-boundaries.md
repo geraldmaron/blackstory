@@ -31,7 +31,7 @@ enforcing PAP on every private bucket.
 
 ## Environment reality
 
-There is no dev-to-prod project boundary. Local development uses `demo-black-book` emulators and
+There is no dev-to-prod project boundary. Local development uses `demo-repo` emulators and
 local PostGIS. Any principal able to call `black-book-efaaf` has production access. An optional
 staging backend in the same project is configuration separation only.
 

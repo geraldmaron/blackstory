@@ -2,7 +2,7 @@
 /**
  * Structured logging, operational errors, and security telemetry shared across services.
  */
-export const OBSERVABILITY_PACKAGE = '@blap/observability' as const;
+export const OBSERVABILITY_PACKAGE = '@repo/observability' as const;
 
 export {
   SECURITY_TELEMETRY_VERSION,
@@ -113,7 +113,7 @@ export interface Logger {
 
 /**
  * Redacts a structured log record before it is written. Wire the central redactor
- * from @blap/security here so protected values (residential addresses, exact
+ * from @repo/security here so protected values (residential addresses, exact
  * coordinates) never reach log output or error telemetry.
  */
 export type LogRedactor = (record: LogContext) => LogContext;

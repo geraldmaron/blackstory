@@ -2,7 +2,7 @@
  * Public correction status page. Shows coarse phases only never spam scores, campaign
  * flags, duplicate lists, or other moderation-sensitive metadata.
  */
-import { EmptyState, Notice } from '@blap/ui';
+import { EmptyState, Notice } from '@repo/ui';
 import { PUBLIC_STATUS_LABELS } from './copy';
 import type { PublicCorrectionStatus } from './public-status';
 import { AppealForm } from './AppealForm';
@@ -14,9 +14,9 @@ export function CorrectionStatusPanel({
   readonly status: PublicCorrectionStatus;
 }) {
   return (
-    <div className="bp-stack">
+    <div className="ds-stack">
       <Notice tone="warning" title="Status">
-        <dl className="bp-sans">
+        <dl className="ds-sans">
           <div>
             <dt>Receipt</dt>
             <dd>
@@ -40,7 +40,7 @@ export function CorrectionStatusPanel({
             </dd>
           </div>
         </dl>
-        <p style={{ marginTop: 'var(--bp-space-3)' }}>
+        <p style={{ marginTop: 'var(--ds-space-3)' }}>
           Volume of corrections never changes public confidence or publication. Coordinated activity
           is reviewed separately and is not shown here.
         </p>
@@ -48,7 +48,7 @@ export function CorrectionStatusPanel({
 
       {status.appealAvailable ? (
         <section aria-labelledby="appeal-heading">
-          <h2 id="appeal-heading" className="bp-page__title" style={{ fontSize: 'var(--bp-text-lg)' }}>
+          <h2 id="appeal-heading" className="ds-page__title" style={{ fontSize: 'var(--ds-text-lg)' }}>
             Appeal
           </h2>
           <AppealForm receiptCode={status.receiptCode} />
@@ -61,7 +61,7 @@ export function CorrectionStatusPanel({
       )}
 
       <section aria-labelledby="abuse-heading">
-        <h2 id="abuse-heading" className="bp-page__title" style={{ fontSize: 'var(--bp-text-lg)' }}>
+        <h2 id="abuse-heading" className="ds-page__title" style={{ fontSize: 'var(--ds-text-lg)' }}>
           Report abuse
         </h2>
         <AbuseReportForm receiptCode={status.receiptCode} />

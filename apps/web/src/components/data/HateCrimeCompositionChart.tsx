@@ -3,7 +3,7 @@
  * vs all other reported bias categories. Framed as reporting composition, not danger heat.
  */
 import React from 'react';
-import type { HateCrimeYearSummary } from '@blap/firebase';
+import type { HateCrimeYearSummary } from '@repo/firebase';
 import { DataChartFrame } from './DataChartFrame';
 import { formatChartCount } from './chart-utils';
 
@@ -48,7 +48,7 @@ export function HateCrimeCompositionChart({ summary }: HateCrimeCompositionChart
       sourceUrl={summary.sourceUrl}
       ariaLabel={`Hate crime reporting composition for ${summary.year}`}
       textAlternative={
-        <table className="bp-data-chart__table">
+        <table className="ds-data-chart__table">
           <caption>{`Hate crime reporting composition, ${summary.year}`}</caption>
           <thead>
             <tr>
@@ -78,31 +78,31 @@ export function HateCrimeCompositionChart({ summary }: HateCrimeCompositionChart
         </table>
       }
     >
-      <svg className="bp-data-chart__svg" viewBox="0 0 640 96" role="img" aria-hidden="true">
-        <rect x={0} y={24} width={640} height={32} fill="var(--bp-surface-raised)" stroke="var(--bp-rule)" strokeWidth={1} />
-        <rect x={0} y={24} width={(antiBlackWidth / 100) * 640} height={32} fill="var(--bp-accent-graphic)" />
+      <svg className="ds-data-chart__svg" viewBox="0 0 640 96" role="img" aria-hidden="true">
+        <rect x={0} y={24} width={640} height={32} fill="var(--ds-surface-raised)" stroke="var(--ds-rule)" strokeWidth={1} />
+        <rect x={0} y={24} width={(antiBlackWidth / 100) * 640} height={32} fill="var(--ds-accent-graphic)" />
         <rect
           x={(antiBlackWidth / 100) * 640}
           y={24}
           width={(otherWidth / 100) * 640}
           height={32}
-          fill="var(--bp-accent-muted)"
+          fill="var(--ds-accent-muted)"
         />
-        <text className="bp-data-chart__axis-label" x={8} y={16}>
+        <text className="ds-data-chart__axis-label" x={8} y={16}>
           Reported incidents ({formatChartCount(total)} total)
         </text>
       </svg>
-      <ul className="bp-data-chart__legend">
-        <li className="bp-data-chart__legend-item">
-          <span className="bp-data-chart__legend-swatch" style={{ background: 'var(--bp-accent-graphic)' }} />
+      <ul className="ds-data-chart__legend">
+        <li className="ds-data-chart__legend-item">
+          <span className="ds-data-chart__legend-swatch" style={{ background: 'var(--ds-accent-graphic)' }} />
           Anti-Black or African American bias — {formatChartCount(summary.antiBlackIncidents)} ({pct(summary.antiBlackIncidents, total)})
         </li>
-        <li className="bp-data-chart__legend-item">
-          <span className="bp-data-chart__legend-swatch" style={{ background: 'var(--bp-accent-muted)' }} />
+        <li className="ds-data-chart__legend-item">
+          <span className="ds-data-chart__legend-swatch" style={{ background: 'var(--ds-accent-muted)' }} />
           Other reported bias categories — {formatChartCount(otherIncidents)} ({pct(otherIncidents, total)})
         </li>
         {summary.nationalParticipatingAgenciesPct !== undefined ? (
-          <li className="bp-data-chart__legend-item">
+          <li className="ds-data-chart__legend-item">
             Agencies participating nationally — {summary.nationalParticipatingAgenciesPct}%
           </li>
         ) : null}

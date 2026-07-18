@@ -91,7 +91,7 @@ export function assertLayerMethodologyNoteValid(note: LayerMethodologyNote): voi
 
 /**
  * The shape every layer's computed output shares: a bounded [0,1] signal value (never a raw
- * "safety score" label), its own citations, its own methodology note, and its own "as of" date 
+ * "safety score" label), its own citations, its own methodology note, and its own "as of" date
  * "history does not expire," so `asOf` records when the layer was last recomputed, not a decay
  * clock. `layerId` and `signalVersion` make every layer output independently auditable.
  */

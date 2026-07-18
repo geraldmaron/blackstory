@@ -4,11 +4,11 @@
  * (`createAppCheckGuard`), same verifier (`createFirebaseAppCheckVerifier`), same replay
  * protection posture so this public entry point enforces App Check identically to every
  * other public mutation surface instead of inventing a second policy. Never import this file
- * from a Client Component: it pulls in `@blap/firebase`'s Admin SDK surface.
+ * from a Client Component: it pulls in `@repo/firebase`'s Admin SDK surface.
  *
- * The `@blap/firebase` import below is a dynamic `import`, not a static one, on
+ * The `@repo/firebase` import below is a dynamic `import`, not a static one, on
  * purpose: `apps/web`'s package.json (like `apps/admin`'s) is CommonJS-rooted, while
- * `@blap/firebase` is an ESM package whose module graph includes a top-level `await`
+ * `@repo/firebase` is an ESM package whose module graph includes a top-level `await`
  * (`embeddings/backfill-cli.ts`). A static import forces the whole graph through a
  * CJS-compatible transform, which cannot represent that top-level `await` and fails to even
  * load. A dynamic `import` loads it through real ESM semantics instead, which is exactly
@@ -21,7 +21,7 @@ import type {
   AppCheckTelemetry,
   AppCheckVerifier,
   EnvironmentLike,
-} from '@blap/firebase';
+} from '@repo/firebase';
 
 export type SubmitLeadAppCheckOptions = {
   readonly environment?: EnvironmentLike;
@@ -48,7 +48,7 @@ export async function createSubmitLeadAppCheckGuard(
     createFirebaseAppCheckVerifier,
     createServerFirebaseApp,
     parseAppCheckMode,
-  } = await import('@blap/firebase');
+  } = await import('@repo/firebase');
 
   const environment = options.environment ?? process.env;
   const mode = options.mode ?? parseAppCheckMode(environment.APP_CHECK_MODE);

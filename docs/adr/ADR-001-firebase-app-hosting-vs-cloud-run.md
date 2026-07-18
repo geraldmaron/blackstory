@@ -39,7 +39,7 @@ Blap needs a public Next.js site that can degrade to released snapshots, plus AP
 - Distinct deploy pipelines and service accounts for web vs APIs vs admin.
 - Public web can remain readable in degraded mode from release snapshots even when APIs throttle (BB-022).
 - Operators must manage both App Hosting and Cloud Run; complexity is intentional for isolation.
-- Local development continues via `pnpm --filter @blap/web|admin|api-*` without requiring Firebase until BB-011.
+- Local development continues via `pnpm --filter @repo/web|admin|api-*` without requiring Firebase until BB-011.
 
 ## Migration triggers
 

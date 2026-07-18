@@ -1,6 +1,6 @@
 /**
  * Loose, generic JSON-shaped record types for the seven Data Pack v1 resource kinds
- * (black-book-ud5q). These deliberately do NOT match `CanonicalEntity`/`CanonicalClaim` — that
+ * (the related workstream). These deliberately do NOT match `CanonicalEntity`/`CanonicalClaim` — that
  * reconciliation is the import pipeline's job (`./import-pipeline.ts`), not the manifest/record
  * contract's. Every record carries its own `externalId`: the pack's own identifier for the
  * thing, scoped to the pack's `datasetId` namespace and NEVER auto-promoted to a canonical

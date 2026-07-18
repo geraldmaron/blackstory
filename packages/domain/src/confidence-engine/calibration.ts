@@ -2,7 +2,7 @@
  * Calibration dataset export for later model calibration and evaluation.
  * Exports only deterministic, versioned confidence records with optional observed outcomes.
  */
-import type { ClaimClass } from '@blap/schemas';
+import type { ClaimClass } from '@repo/schemas';
 import type { AuditedConfidenceResult } from './engine.js';
 
 export const CONFIDENCE_CALIBRATION_DATASET_VERSION =

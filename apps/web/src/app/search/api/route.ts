@@ -19,7 +19,7 @@ export const runtime = 'nodejs';
 // Module-level singletons: one in-memory rate-limit store per server instance, matching the submit
 // route's posture. A shared store for a multi-instance deployment is an infra concern, not a change
 // to the algorithm. The App Check guard is created lazily (its factory dynamically imports
-// `@blap/firebase`; see `./app-check-guard.ts`) and cached so only one is built per instance.
+// `@repo/firebase`; see `./app-check-guard.ts`) and cached so only one is built per instance.
 const defaultRateLimitGuard = createSearchRateLimitGuard();
 
 let defaultAppCheckGuardPromise: Promise<SearchAppCheckGuard> | undefined;

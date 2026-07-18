@@ -16,7 +16,7 @@
  * snapshot, satisfying `assertFactCitationStructurallyComplete` (packages/domain/src/facts/citation.ts)
  * honestly instead of omitting the archive pointer.
  *
- * `derivedFromClaimIds`/`derivedFromRelationshipIds` (black-book-pj6w): left empty for every
+ * `derivedFromClaimIds`/`derivedFromRelationshipIds` (the related workstream): left empty for every
  * seed fact below. These facts were authored directly from the research brief, not derived from
  * a `CanonicalClaim` in `canonicalClaims/`, so there is no real claim id to backfill  guessing
  * one would be worse than leaving the link absent. An empty array is a documented no-op for
@@ -26,7 +26,7 @@ import {
   asFactId,
   buildFactSearchIndexDocs,
   type FactRecord,
-} from '@blap/domain';
+} from '@repo/domain';
 
 export const FACTS_SEED_RELEASE_ID = 'seed-release-2026-07-17';
 

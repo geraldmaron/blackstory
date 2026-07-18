@@ -11,7 +11,7 @@ import {
   assertNarrativeMayCiteClaim,
   canSourceAdapterCreateCandidates,
   narrativeMayCiteClaim,
-} from '@blap/domain';
+} from '@repo/domain';
 import {
   canPublish,
   canonicalClaimSchema,
@@ -95,7 +95,7 @@ test('relationship and merge seeds parse with evidence and audit lineage', () =>
   assert.ok(merge.auditEventIds.includes('audit_seed_merge_001'));
 });
 
-test('seed fixture includes BB-014 domain paths', () => {
+test('seed fixture includes  domain paths', () => {
   const paths = firestoreSeedDocuments.map((doc) => doc.path);
   assert.ok(paths.some((path) => path.includes('/locations/')));
   assert.ok(paths.some((path) => path.startsWith('entityRelationships/')));
@@ -104,7 +104,7 @@ test('seed fixture includes BB-014 domain paths', () => {
   assert.ok(paths.some((path) => path.startsWith('canonicalEntities/ent_seed_person')));
 });
 
-test('BB-016 provenance seeds parse and evidence resolves to source item', () => {
+test(' provenance seeds parse and evidence resolves to source item', () => {
   const source = parseWithSchema(evidenceSourceSchema, seedEvidenceSource);
   assert.equal(source.policy.snapshotMode, 'selective');
   assert.equal(source.adapterEnabled, true);
@@ -125,7 +125,7 @@ test('disabled source adapter seed cannot create candidates', () => {
   assert.equal(canSourceAdapterCreateCandidates(disabled), false);
 });
 
-test('seed fixture includes BB-016 provenance paths', () => {
+test('seed fixture includes  provenance paths', () => {
   const paths = firestoreSeedDocuments.map((doc) => doc.path);
   assert.ok(paths.some((path) => path.startsWith('sourceOrganizations/')));
   assert.ok(paths.some((path) => path.startsWith('sourceItems/')));
@@ -155,7 +155,7 @@ test('canonical claim seed parses with confidence components and policyVersion',
   assert.equal(narrativeMayCiteClaim(highImpact), false);
 });
 
-test('seed fixture includes BB-017 claim paths', () => {
+test('seed fixture includes claim paths', () => {
   const paths = firestoreSeedDocuments.map((doc) => doc.path);
   assert.ok(paths.some((path) => path.startsWith('canonicalClaims/')));
   assert.ok(paths.some((path) => path.startsWith('claimEvidenceLinks/')));

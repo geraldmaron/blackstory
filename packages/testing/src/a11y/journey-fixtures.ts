@@ -63,7 +63,7 @@ const EXPLORE_FIXTURE = `
     </form>
     <section aria-labelledby="explore-results-heading">
       <h2 id="explore-results-heading">Documented records</h2>
-      <ul class="bb-result-list" aria-labelledby="explore-results-heading">
+      <ul class="ds-result-list" aria-labelledby="explore-results-heading">
         <li>
           <a href="/entity/ent_seed_place_001" aria-current="true">
             <span aria-hidden="true">●</span> Harlem Cultural Corridor
@@ -138,7 +138,7 @@ const CORRECTIONS_FIXTURE = `
 
 /** Root shell degraded banner paired with stable main content. */
 const DEGRADED_SHELL_FIXTURE = `
-  <a class="bb-skip-link" href="#main">Skip to main content</a>
+  <a class="ds-skip-link" href="#main">Skip to main content</a>
   <div role="status">
     <p>Showing snapshot data</p>
     <p>Live reads are temporarily disabled. Pages are serving the last published release snapshot.</p>
@@ -150,14 +150,14 @@ const DEGRADED_SHELL_FIXTURE = `
 `;
 
 export const CORE_JOURNEY_FIXTURES: readonly CoreJourneyFixture[] = Object.freeze([
-  { id: 'search', label: 'Search results (BB-049)', html: SEARCH_FIXTURE },
-  { id: 'explore', label: 'Explore map + list peer (BB-051)', html: EXPLORE_FIXTURE },
-  { id: 'entity', label: 'Entity detail (BB-052)', html: ENTITY_FIXTURE },
-  { id: 'locate', label: 'Locate jurisdiction (BB-050)', html: LOCATE_FIXTURE },
-  { id: 'corrections', label: 'Corrections intake (BB-055)', html: CORRECTIONS_FIXTURE },
+  { id: 'search', label: 'Search results ()', html: SEARCH_FIXTURE },
+  { id: 'explore', label: 'Explore map + list peer ()', html: EXPLORE_FIXTURE },
+  { id: 'entity', label: 'Entity detail ()', html: ENTITY_FIXTURE },
+  { id: 'locate', label: 'Locate jurisdiction ()', html: LOCATE_FIXTURE },
+  { id: 'corrections', label: 'Corrections intake ()', html: CORRECTIONS_FIXTURE },
   {
     id: 'degraded-shell',
-    label: 'Degraded snapshot shell (BB-022)',
+    label: 'Degraded snapshot shell ()',
     html: DEGRADED_SHELL_FIXTURE,
   },
 ]);

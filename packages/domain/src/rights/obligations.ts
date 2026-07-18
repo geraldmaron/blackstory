@@ -108,7 +108,7 @@ export function getSourceObligationsOrThrow(
   if (!entry) {
     throw new Error(
       `Source adapter "${adapterId}" has no registered obligations entry; adapters cannot run ` +
-        'without one (BB-077 fail-closed, mirrors the BB-037 registry pattern)',
+        'without one ( fail-closed, mirrors the  registry pattern)',
     );
   }
   return entry;
@@ -143,7 +143,7 @@ export function defaultSourceObligationsSeed(seedAt: string): readonly SourceObl
       attributionRequired: true,
       livenessRecheckRequired: true,
       livenessRecheckIntervalDays: 7,
-      notes: 'Gated channel (BB-074).',
+      notes: 'Gated channel ().',
       createdAt: seedAt,
       updatedAt: seedAt,
     },

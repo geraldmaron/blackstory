@@ -5,10 +5,10 @@
  * filter/facet computation.
  */
 import type { ExploreMapFeature } from './build-explore-map-source';
-import { isValidTopicId } from '@blap/domain/taxonomy/topics';
+import { isValidTopicId } from '@repo/domain/taxonomy/topics';
 
 /**
- * Resolves the effective controlled-taxonomy topic ids for a feature (black-book-s4hp): prefers
+ * Resolves the effective controlled-taxonomy topic ids for a feature (the related workstream): prefers
  * the new `topicIds` field, falling back to the legacy `topicTags` field for features built
  * before the split. Either way every value is validated against `TOPIC_REGISTRY` — the theme
  * facet is NEVER built from raw, uncontrolled tag counting.

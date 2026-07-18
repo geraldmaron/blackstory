@@ -6,17 +6,17 @@
  */
 
 import React from 'react';
-import { Card } from '@blap/ui';
+import { Card } from '@repo/ui';
 import { EVIDENCE_DIMENSION_COPY } from '../../lib/evidence';
 
 export function EvidenceMeasurementLegend() {
   return (
     <Card title="How to read this record's measurements" as="section">
-      <dl className="bp-sans" style={{ margin: 0 }}>
+      <dl className="ds-sans" style={{ margin: 0 }}>
         {Object.values(EVIDENCE_DIMENSION_COPY).map((entry) => (
           <React.Fragment key={entry.label}>
             <dt style={{ fontWeight: 600 }}>{entry.label}</dt>
-            <dd style={{ margin: '0 0 var(--bp-space-3) 0' }}>{entry.description}</dd>
+            <dd style={{ margin: '0 0 var(--ds-space-3) 0' }}>{entry.description}</dd>
           </React.Fragment>
         ))}
       </dl>

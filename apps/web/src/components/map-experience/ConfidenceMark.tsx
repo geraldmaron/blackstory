@@ -8,7 +8,7 @@
  * Without a field title, the full phrase ("high confidence") stays for context.
  */
 import React from 'react';
-import { cx } from '@blap/ui';
+import { cx } from '@repo/ui';
 import { CONFIDENCE_TIER_GLYPH } from '../../lib/map-experience/dignity-style';
 
 void React;
@@ -54,12 +54,12 @@ export function ConfidenceMark({ tier, className, labeled = false }: ConfidenceM
   const text = confidenceLabel(tier, labeled);
   return (
     <span
-      className={cx('bp-confidence-mark', `bp-confidence-mark--${tierKey}`, className)}
+      className={cx('ds-confidence-mark', `ds-confidence-mark--${tierKey}`, className)}
       data-tier={tierKey}
       data-labeled={labeled ? 'true' : 'false'}
     >
       <span aria-hidden="true">{glyph}</span>{' '}
-      <span className="bp-confidence-mark__text">{text}</span>
+      <span className="ds-confidence-mark__text">{text}</span>
     </span>
   );
 }

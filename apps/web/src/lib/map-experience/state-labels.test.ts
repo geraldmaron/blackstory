@@ -1,5 +1,5 @@
 /**
- * Confirms the BB-099 state-label data layer: all 51 states + D.C. get a label point, the
+ * Confirms the state-label data layer: all 51 states + D.C. get a label point, the
  * documented AK/HI/FL/MI overrides are actually applied (not silently ignored), the zoom-fade
  * curve matches design-direction-v3.md's band (visible <= 5.6, gone >= 6.2), and selection
  * toggles exactly one descriptor without moving any label.
@@ -9,7 +9,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { US_STATES } from '@blap/domain/map/geography';
+import { US_STATES } from '@repo/domain/map/geography';
 import {
   STATE_LABEL_FADE_END_ZOOM,
   STATE_LABEL_FADE_START_ZOOM,

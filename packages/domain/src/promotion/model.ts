@@ -1,7 +1,7 @@
 /**
  * Domain contracts for the controlled claim-promotion pipeline.
  */
-import type { ClaimClass } from '@blap/schemas';
+import type { ClaimClass } from '@repo/schemas';
 
 export const PROMOTION_STAGES = [
   'submission_discovery',

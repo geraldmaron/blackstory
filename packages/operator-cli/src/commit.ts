@@ -13,7 +13,7 @@ import {
   type AtomicStore,
   type AuditEventDoc,
   type CommitWithAuditResult,
-} from '@blap/firebase';
+} from '@repo/firebase';
 import type { OperatorIntakeAccepted } from './intake.js';
 
 /** Commits one accepted operator intake outcome. Rejected outcomes have nothing to commit. */
@@ -23,8 +23,8 @@ export async function commitOperatorIntake(
 ): Promise<CommitWithAuditResult> {
   return commitWithAudit(store, {
     mutations: outcome.mutations,
-    // `@blap/domain`'s `AuditEventAction`/category union has drifted ahead of
-    // `@blap/firebase`'s zod-inferred `AuditEventDoc` (it now includes a `deletion`
+    // `@repo/domain`'s `AuditEventAction`/category union has drifted ahead of
+    // `@repo/firebase`'s zod-inferred `AuditEventDoc` (it now includes a `deletion`
     // category the Firestore schema doesn't yet declare). This package only ever produces
     // `research.created` `source.registered` events (see `AUDIT_ACTION_BY_PROPOSAL` in
     // `intake.ts`), both valid under either union, so this narrowing cast is safe today

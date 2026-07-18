@@ -216,7 +216,7 @@ describe('CI policy, suppression, DAST, and release gates', () => {
     assert.deepEqual(
       validateStagingDastConfiguration({
         baseUrl: 'https://api.staging.blackbook.example',
-        identityLabel: 'bb-security-dast-pr-42',
+        identityLabel: 'ds-security-dast-pr-42',
         environment: 'staging',
       }),
       [],

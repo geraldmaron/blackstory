@@ -5,13 +5,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Dialog } from '@blap/ui';
+import { Button, Dialog } from '@repo/ui';
 
 export function DialogFixture() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bp-stack">
+    <div className="ds-stack">
       <Button type="button" onClick={() => setOpen(true)}>
         Open sample dialog
       </Button>
@@ -26,7 +26,7 @@ export function DialogFixture() {
         }
       >
         <p>
-          Dialogs use the native <code className="bp-mono">&lt;dialog&gt;</code> element for focus
+          Dialogs use the native <code className="ds-mono">&lt;dialog&gt;</code> element for focus
           management, Escape to dismiss, and a labelled title.
         </p>
       </Dialog>

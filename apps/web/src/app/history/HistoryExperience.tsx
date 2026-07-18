@@ -8,7 +8,7 @@
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Notice } from '@blap/ui';
+import { Notice } from '@repo/ui';
 import {
   DecadeStepper,
   HistoryEdgePanel,
@@ -167,7 +167,7 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
   };
 
   return (
-    <div className="bp-history">
+    <div className="ds-history">
       {degradedReason ? (
         <Notice tone="warning" title="Snapshot mode">
           {HISTORY_DEGRADED_MODE_COPY[degradedReason]}
@@ -176,15 +176,15 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
 
       <DecadeStepper decades={view.availableDecades} viewState={view.viewState} />
 
-      <div className="bp-history__toolbar">
-        <p className="bp-sans" id="history-results-heading">
+      <div className="ds-history__toolbar">
+        <p className="ds-sans" id="history-results-heading">
           {view.totalMatched} record{view.totalMatched === 1 ? '' : 's'} in view
           {view.viewState.mode === 'decade' && view.activeDecade ? ` · ${view.activeDecade}` : ' · all time'}
         </p>
-        <label className="bp-pill-select" htmlFor="history-kind">
-          <span className="bp-pill-select__label">Kind</span>
+        <label className="ds-pill-select" htmlFor="history-kind">
+          <span className="ds-pill-select__label">Kind</span>
           <select
-            className="bp-pill-select__control"
+            className="ds-pill-select__control"
             id="history-kind"
             value={view.viewState.filters.kind}
             onChange={(event) => handleKindChange(event.currentTarget.value)}
@@ -196,20 +196,20 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
             ))}
           </select>
         </label>
-        <p className="bp-history__release-meta" aria-label="Release metadata">
+        <p className="ds-history__release-meta" aria-label="Release metadata">
           Release {view.releaseId}
         </p>
       </div>
 
-      <div className="bp-history__layout">
-        <div className="bp-history-graph-panel">
-          <h2 className="bp-section__kicker" id="history-graph-heading">
+      <div className="ds-history__layout">
+        <div className="ds-history-graph-panel">
+          <h2 className="ds-section__kicker" id="history-graph-heading">
             History graph
           </h2>
           <HistoryGraphPanel {...graphProps} />
         </div>
 
-        <div className="bp-history__list-panel">
+        <div className="ds-history__list-panel">
           {selectedNode ? (
             <HistoryNarrativeCard
               node={selectedNode}
@@ -222,9 +222,9 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
         </div>
       </div>
 
-      <p className="bp-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
+      <p className="ds-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
       {view.viewState.mode === 'decade' ? (
-        <p className="bp-history__framing">{HISTORY_DECADE_FRAMING}</p>
+        <p className="ds-history__framing">{HISTORY_DECADE_FRAMING}</p>
       ) : null}
 
       {/* Progressive enhancement hook — reserved for live refine; snapshot remains authoritative. */}

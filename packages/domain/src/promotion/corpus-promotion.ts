@@ -11,10 +11,10 @@
  * - `notabilityBasis` auto-derived from corpus class corpus membership itself is the
  * notability criterion, recorded per record via the vetting record's `notabilityCriterion`;
  * - a mandatory per-batch human spot-check sample (deterministic selection reusing
- * `selectCanaryRecordIndices` from `../adapters/gates.js`, the same sampling primitive 
+ * `selectCanaryRecordIndices` from `../adapters/gates.js`, the same sampling primitive
  * canary rollout already uses no second sampling algorithm invented);
  * - any failing check, or a record flagged ambiguous by the importer, demotes that record to
- * the `standard_consensus` lane. Nothing in this module ever marks a record published 
+ * the `standard_consensus` lane. Nothing in this module ever marks a record published
  * `standard_consensus` records are ordinary quarantine submissions bound for the existing
  * consensus-review lane; `corpus_fast_track` records are still ordinary quarantine
  * submissions (identical pipeline, see `packages/operator-cli/src/bulk-import.ts`),
@@ -186,7 +186,7 @@ export function evaluateCorpusBulkPromotion(
 }
 
 // ---------------------------------------------------------------------------
-// Per-batch report 
+// Per-batch report
 // ---------------------------------------------------------------------------
 
 export type CorpusBulkImportRowOutcome = 'accepted' | 'rejected' | 'skipped_duplicate';

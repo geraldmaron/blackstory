@@ -31,16 +31,16 @@ export type SearchableEntityRecord = {
   readonly aliases: readonly string[];
   readonly summary?: string;
   /**
-   * @deprecated Superseded by `topicIds` below (black-book-s4hp's controlled-taxonomy split).
+   * @deprecated Superseded by `topicIds` below (the related workstream's controlled-taxonomy split).
    * Kept for backward compatibility: `computeFacetCounts` (./facets.ts) still falls back to
    * this, filtered through the new `TOPIC_REGISTRY`, when `topicIds` is absent so records built
    * before the split keep faceting correctly.
    */
   readonly topicTags: readonly string[];
   /**
-   * Controlled historical-theme ids (black-book-s4hp) — the ONLY source `computeFacetCounts`
+   * Controlled historical-theme ids (the related workstream) — the ONLY source `computeFacetCounts`
    * should treat as authoritative for the `theme` facet. Every id is expected to resolve
-   * against `@blap/domain`'s `TOPIC_REGISTRY` (packages/domain/src/taxonomy/topics.ts); readers
+   * against `@repo/domain`'s `TOPIC_REGISTRY` (packages/domain/src/taxonomy/topics.ts); readers
    * should still validate with `isValidTopicId` rather than trusting this blindly. Optional so
    * every existing `SearchableEntityRecord` literal keeps compiling during the transition.
    */

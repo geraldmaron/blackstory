@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { recalculateConfidence } from '@blap/domain';
+import { recalculateConfidence } from '@repo/domain';
 import {
   ALL_ADVERSARIAL_INTEGRITY_SCENARIO_IDS,
   DOCUMENTED_CONTROL_GAPS,
@@ -16,7 +16,7 @@ import {
   runAllAdversarialIntegrityScenarios,
 } from './index.js';
 
-describe('BB-060 adversarial integrity scenarios', () => {
+describe(' adversarial integrity scenarios', () => {
   it('covers all eleven required scenario ids', () => {
     assert.equal(ALL_ADVERSARIAL_INTEGRITY_SCENARIO_IDS.length, 11);
     const runs = runAllAdversarialIntegrityScenarios();
@@ -81,7 +81,7 @@ describe('BB-060 adversarial integrity scenarios', () => {
   });
 });
 
-describe('BB-060 positive controls', () => {
+describe(' positive controls', () => {
   it('still allows strong entity-match confidence when identification is sound', () => {
     const strongMatch = recalculateConfidence({
       claimClass: 'standard',

@@ -1,4 +1,4 @@
 /**
- * Package identity constant for @blap/data-access.
+ * Package identity constant for @repo/data-access.
  */
-export const DATA_ACCESS_PACKAGE = '@blap/data-access' as const;
+export const DATA_ACCESS_PACKAGE = '@repo/data-access' as const;

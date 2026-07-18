@@ -20,9 +20,9 @@ export type EmptyStateProps = {
 
 export function EmptyState({ title, children, action, className }: EmptyStateProps) {
   return (
-    <div className={cx('bp-empty', className)} role="status">
-      <h2 className="bp-empty__title">{title}</h2>
-      <div className="bp-empty__body">{children}</div>
+    <div className={cx('ds-empty', className)} role="status">
+      <h2 className="ds-empty__title">{title}</h2>
+      <div className="ds-empty__body">{children}</div>
       {action}
     </div>
   );

@@ -5,7 +5,7 @@ Repo-side red-team scenarios for data-integrity attacks. **No live attacks** aga
 ## Run
 
 ```bash
-pnpm --filter @blap/testing test:security
+pnpm --filter @repo/testing test:security
 # or:
 node --import tsx scripts/run-testing-layer.mjs security
 ```
@@ -40,4 +40,4 @@ Module: `packages/testing/src/adversarial-integrity/`
 - Export barrel: `packages/testing/src/adversarial-integrity/index.ts`
 - Package root barrel: `export * from './adversarial-integrity/index.js'` in `packages/testing/src/index.ts`
 - Security test layer: `scripts/run-testing-layer.mjs` includes `adversarial-integrity/**/*.test.ts`
-- Dependencies: `@blap/security` and `@blap/domain` devDependencies on `@blap/testing`
+- Dependencies: `@repo/security` and `@repo/domain` devDependencies on `@repo/testing`

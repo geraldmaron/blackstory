@@ -1,11 +1,11 @@
 /**
  * Map color tokens for kind encoding, semantic tones (massacre / plantation /
  * epicenter), confidence, and light/dark plate variants. Product direction
- * (black-book-67d) expands beyond the copper-only archive register: confidence
+ * (the related workstream) expands beyond the copper-only archive register: confidence
  * runs green→orange, and certain historical tones use red/gold/black while
  * every marker still carries a non-color glyph (WCAG 1.4.1).
  */
-import { brandPalette } from '@blap/ui';
+import { brandPalette } from '@repo/ui';
 
 export const EXPLORE_CLUSTER_CONFIG = {
   /** Pixel radius for grouping nearby points — tighter than default so metro clouds collapse. */

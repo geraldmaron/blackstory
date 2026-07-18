@@ -3,12 +3,12 @@
 /**
  * Client-only App Check token acquisition for the public "submit a lead" form.
  *
- * This intentionally does NOT import `@blap/firebase`: that package's single entry
+ * This intentionally does NOT import `@repo/firebase`: that package's single entry
  * point (`src/index.ts`) statically imports Admin SDK modules (`firebase-admin/app`,
  * `firebase-admin/app-check`) alongside the browser-safe pieces, so bundling it into a Client
  * Component would pull `firebase-admin` (Node-only) into the browser build. The
  * security-critical verification stays server-only in `./app-check-guard.ts`, reusing
- * `@blap/firebase` exactly. This file only calls the vendor `firebase` client SDK
+ * `@repo/firebase` exactly. This file only calls the vendor `firebase` client SDK
  * directly to obtain a token there is no Blap–owned business logic here to duplicate.
  *
  * Gracefully degrades: if App Check isn't configured for this environment (e.g. local dev

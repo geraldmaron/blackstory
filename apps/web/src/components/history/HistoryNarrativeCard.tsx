@@ -1,10 +1,10 @@
 /**
- * Narrative off-ramp card for a selected history graph node. Mirrors 
+ * Narrative off-ramp card for a selected history graph node. Mirrors
  * `NarrativeCard` name, kind, status-as-of-decade, evidence count, and links to the entity page
  * and any published facts.
  */
 import React from 'react';
-import { Card } from '@blap/ui';
+import { Card } from '@repo/ui';
 import type { HistoryNodeView } from '../../lib/history/build-history-graph';
 
 void React;
@@ -28,16 +28,16 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
       title={node.displayName}
       meta={
         <>
-          <span className="bp-mono">{node.kind}</span>
-          <span className="bp-sans">{statusMeta}</span>
+          <span className="ds-mono">{node.kind}</span>
+          <span className="ds-sans">{statusMeta}</span>
         </>
       }
-      className="bp-history-narrative-card"
+      className="ds-history-narrative-card"
     >
       {onClose ? (
         <button
           type="button"
-          className="bp-button bp-button--secondary bp-history-narrative-card__close"
+          className="ds-button ds-button--secondary ds-history-narrative-card__close"
           onClick={onClose}
           aria-label={`Close ${node.displayName} card`}
         >
@@ -45,9 +45,9 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
         </button>
       ) : null}
 
-      <p className="bp-sans">{node.summary}</p>
+      <p className="ds-sans">{node.summary}</p>
 
-      <dl className="bp-history-narrative-card__facts">
+      <dl className="ds-history-narrative-card__facts">
         <div>
           <dt>Status in view</dt>
           <dd>{node.statusLabel}</dd>
@@ -61,12 +61,12 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
       </dl>
 
       {node.factLinks.length > 0 ? (
-        <div className="bp-history-narrative-card__facts-links">
-          <p className="bp-sans">Published facts referencing this record:</p>
+        <div className="ds-history-narrative-card__facts-links">
+          <p className="ds-sans">Published facts referencing this record:</p>
           <ul>
             {node.factLinks.map((fact) => (
               <li key={fact.href}>
-                <a className="bp-cta bp-cta--ghost" href={fact.href}>
+                <a className="ds-cta ds-cta--ghost" href={fact.href}>
                   {fact.label}
                 </a>
               </li>
@@ -75,7 +75,7 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
         </div>
       ) : null}
 
-      <a className="bp-cta bp-cta--ink" href={node.href}>
+      <a className="ds-cta ds-cta--ink" href={node.href}>
         Open full record
       </a>
     </Card>

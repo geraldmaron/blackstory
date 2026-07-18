@@ -1,8 +1,8 @@
 /**
  * Parent-owned adapters that map entity views into evidence inputs and
  * public "why this appears" payloads. Keeps the entity page free of field-renaming clutter.
- * When an entity carries a real `notabilityBasis` (black-book-1fg9's release builder,
- * `@blap/domain`'s `buildReleaseEntityArtifacts`) this uses it as-is — real `evidenceIds`
+ * When an entity carries a real `notabilityBasis` (the related workstream's release builder,
+ * `@repo/domain`'s `buildReleaseEntityArtifacts`) this uses it as-is — real `evidenceIds`
  * pointing at real claims. Bundled seed fixtures predate the release builder and carry only
  * `notabilityLabels`, so this falls back to the same label → criterion synthesis as the snapshot
  * search index for those. The synthesized fallback's `evidenceIds` is empty: that means "no
@@ -17,7 +17,7 @@ import {
   type NotabilityCriterion,
   type PublicWhyThisAppears,
   type RelevanceEvidence,
-} from '@blap/domain';
+} from '@repo/domain';
 import type { EvidenceClaimInput } from '../../../lib/evidence';
 import type { PublicClaimView, PublicEntityView } from '../../../data/public-seed';
 
@@ -41,7 +41,7 @@ function synthesizeNotabilityBasis(
   }));
 }
 
-/** Real notabilityBasis when the entity carries one (black-book-1fg9 release builder output);
+/** Real notabilityBasis when the entity carries one (the related workstream release builder output);
  * otherwise the label-synthesis fallback above for pre-builder seed fixtures. */
 function notabilityBasisFor(entity: PublicEntityView): readonly NotabilityBasisRecord[] {
   if (entity.notabilityBasis && entity.notabilityBasis.length > 0) {

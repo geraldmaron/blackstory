@@ -15,7 +15,7 @@ import {
   type PublicSearchIndexDoc,
   type SearchExecutionInput,
   type SearchExecutionResult,
-} from '@blap/domain';
+} from '@repo/domain';
 import { getSnapshotSearchIndex } from './snapshot-search-index';
 import { createSnapshotVectorLane } from './snapshot-vector-lane';
 
@@ -49,7 +49,7 @@ export async function runWebHybridSearch(
   });
 
   if (!useHybrid) {
-    const { runPublicSearch } = await import('@blap/domain');
+    const { runPublicSearch } = await import('@repo/domain');
     return { result: runPublicSearch(input, index) };
   }
 

@@ -1,5 +1,5 @@
 /**
- * Single deterministic per-entity release/projection builder (black-book-1fg9).
+ * Single deterministic per-entity release/projection builder (the related workstream).
  *
  * `./index.ts` already owns release-level infrastructure (manifest hashing, signing, lifecycle
  * transitions). This module owns the CONTENT of one entity's release artifacts — the piece that
@@ -8,7 +8,7 @@
  * `publicReleases/{releaseId}/entities/{id}` + `publicSearchIndex/{id}` docs, and it works from a
  * `CatalogEntry` fixture shape (see that script's header) rather than the richer
  * `CanonicalEntityDoc`/`CanonicalClaimDoc` model — so `ReleaseSourceEntity` below intentionally
- * mirrors `CatalogEntry`'s shape, generalized so it carries no dependency on `@blap/firebase`'s
+ * mirrors `CatalogEntry`'s shape, generalized so it carries no dependency on `@repo/firebase`'s
  * Zod schemas (this package must not depend on that package). When a canonical-graph release
  * builder replaces the fixture-driven one, adapt a `CanonicalEntityDoc` into this same
  * `ReleaseSourceEntity` shape rather than writing a second builder.
@@ -26,7 +26,7 @@
  * Fail-closed reference resolution (`resolveReleaseEntityReferences`): refuses to build artifacts
  * for an entry whose declared topics/jurisdiction/location/evidence do not resolve to something
  * real. `mentionedEntityIds` is deliberately NOT checked here: per `publicEntityProjectionSchema`'s
- * own doc comment these may still be raw legacy-tag placeholder strings pending black-book-8bck's
+ * own doc comment these may still be raw legacy-tag placeholder strings pending the related workstream's
  * real entity-resolution work, so treating them as fail-closed today would reject legitimate,
  * already-reviewed records for a gap this bead does not own.
  */
@@ -193,7 +193,7 @@ function claimToFactCitationStandIn(claim: ReleaseSourceClaim): FactCitation {
   // Minimal structural stand-in sufficient to express "a citation exists" for the no_citations
   // floor check. The fuller completeness sub-check (archived-capture pointer, retrieval date) is
   // a genuine pipeline-wide data gap (see publish-national-catalog.ts's wiring-note history,
-  // black-book-pwfi) — not fabricated here, deliberately not enforced yet.
+  // the related workstream) — not fabricated here, deliberately not enforced yet.
   return {
     csl: {
       id: claim.citationSource,
@@ -348,7 +348,7 @@ export function resolveReleaseEntityReferences(
 }
 
 /**
- * The single deterministic release/projection builder (black-book-1fg9). Given one source entry,
+ * The single deterministic release/projection builder (the related workstream). Given one source entry,
  * produces BOTH the entity-projection fields and the search-index fields from the same claims,
  * notabilityBasis, and researchCoverage never two independently-recomputed copies. Fails closed
  * (returns `{ok: false}`, never throws for an expected data-shape gap) when:

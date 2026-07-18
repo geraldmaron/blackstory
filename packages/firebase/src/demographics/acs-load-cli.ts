@@ -30,7 +30,7 @@ import {
   type AcsProfileRow,
   type AcsVintage,
   type FetchLike,
-} from '@blap/domain';
+} from '@repo/domain';
 import { createServerFirebaseApp } from '../server.js';
 import { FIRESTORE_ROOT } from '../firestore/paths.js';
 import {

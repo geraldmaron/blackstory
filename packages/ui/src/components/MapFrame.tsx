@@ -28,9 +28,9 @@ export type MapFrameProps = {
 
 export function MapFrame({ title, caption, pins = [], className }: MapFrameProps) {
   return (
-    <figure className={cx('bp-map', className)}>
+    <figure className={cx('ds-map', className)}>
       <div
-        className="bp-map__frame"
+        className="ds-map__frame"
         role="img"
         aria-label={
           pins.length
@@ -43,13 +43,13 @@ export function MapFrame({ title, caption, pins = [], className }: MapFrameProps
         {pins.map((pin) => (
           <span
             key={pin.id}
-            className="bp-map__pin"
+            className="ds-map__pin"
             style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
             title={pin.label}
           />
         ))}
       </div>
-      {caption ? <figcaption className="bp-map__caption">{caption}</figcaption> : null}
+      {caption ? <figcaption className="ds-map__caption">{caption}</figcaption> : null}
     </figure>
   );
 }

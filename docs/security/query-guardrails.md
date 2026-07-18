@@ -71,10 +71,10 @@ for rate-limit guards without modifying the BB-025 evaluator.
 ## Validation
 
 ```bash
-pnpm --filter @blap/security test
-pnpm --filter @blap/api-public test
-pnpm --filter @blap/security typecheck
-pnpm --filter @blap/api-public typecheck
+pnpm --filter @repo/security test
+pnpm --filter @repo/api-public test
+pnpm --filter @repo/security typecheck
+pnpm --filter @repo/api-public typecheck
 ```
 
 ## Remaining live work

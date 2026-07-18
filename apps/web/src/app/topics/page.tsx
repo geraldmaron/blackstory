@@ -32,22 +32,22 @@ const TOPICS = [
 
 export default function TopicsPage() {
   return (
-    <main className="bp-container bp-page" id="main">
-      <p className="bp-page__eyebrow">Browse</p>
-      <h1 className="bp-page__title">Topics</h1>
-      <p className="bp-page__lede">
+    <main className="ds-container ds-page" id="main">
+      <p className="ds-page__eyebrow">Browse</p>
+      <h1 className="ds-page__title">Topics</h1>
+      <p className="ds-page__lede">
         Thematic paths into the archive — pick a thread and follow it across states and decades.
       </p>
 
-      <section className="bp-section bp-section--flush" aria-label="Topic list">
+      <section className="ds-section ds-section--flush" aria-label="Topic list">
         <SeedDataNotice compact />
-        <ul className="bp-story-rail">
+        <ul className="ds-story-rail">
           {TOPICS.map((topic) => (
             <li key={topic.id}>
-              <Link className="bp-story-link" href={`/search?topic=${topic.id}`}>
-                <span className="bp-story-link__meta">Topic</span>
-                <h2 className="bp-story-link__title">{topic.title}</h2>
-                <p className="bp-story-link__summary">{topic.body}</p>
+              <Link className="ds-story-link" href={`/search?topic=${topic.id}`}>
+                <span className="ds-story-link__meta">Topic</span>
+                <h2 className="ds-story-link__title">{topic.title}</h2>
+                <p className="ds-story-link__summary">{topic.body}</p>
               </Link>
             </li>
           ))}

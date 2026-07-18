@@ -1,12 +1,12 @@
 /**
- * Testable core of the `/explore/api` refine endpoint. Applies 
+ * Testable core of the `/explore/api` refine endpoint. Applies
  * `evaluateSearchQueryGuardrails` to the kind/era dimensions (the two filter fields that overlap
  * the allowlist), validates theme/confidence locally, then filters the bundled explore map
  * snapshot. The page itself is SSR-first this route is the progressive-enhancement seam that
  * proves App Check + guardrails on dynamic explore queries without requiring a full navigation.
  */
 import { NextResponse } from 'next/server';
-import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@blap/security';
+import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@repo/security';
 import {
   applyExploreFilters,
   buildExploreFacetOptions,

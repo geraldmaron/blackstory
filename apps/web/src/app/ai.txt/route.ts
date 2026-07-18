@@ -10,7 +10,7 @@ import { AI_TRAINING_USER_AGENTS } from '../robots';
 
 function buildAiTxt(): string {
   const lines = [
-    '# ai.txt — BlackStory AI-crawler policy (BB-089)',
+    '# ai.txt — BlackStory AI-crawler policy ',
     '# This is a courtesy signal only; see /robots.txt for the standard-convention equivalent.',
     '# Content here is human-researched historical documentation, not a corpus offered for',
     '# unrestricted AI-training ingestion. Contact the security contact in',

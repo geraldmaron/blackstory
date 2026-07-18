@@ -1,7 +1,7 @@
 /**
  * trauma-content notice derivation. Decides WHEN a trauma-content
  * notice is warranted on a "why this appears" surface, driven by the entity's classified story
- * dimensions (./why-public-dimensions.js). This module owns none of the disclaimer prose itself 
+ * dimensions (./why-public-dimensions.js). This module owns none of the disclaimer prose itself
  * it composes the existing `sensitive_content` registry entry (../disclaimers.js), the
  * single authored source of that copy across the whole app.
  */

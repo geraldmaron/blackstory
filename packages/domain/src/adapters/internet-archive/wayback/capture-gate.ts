@@ -94,7 +94,7 @@ export function assertReviewEligible(input: {
 }): asserts input is { readonly capturePointer: EvidencePointer } {
   if (!input.capturePointer) {
     throw new Error(
-      'Candidate is not review-eligible: missing the mandatory Wayback capture pointer (BB-073 acceptance criterion 2)',
+      'Candidate is not review-eligible: missing the mandatory Wayback capture pointer ( acceptance criterion 2)',
     );
   }
   assertEvidencePointerValid(input.capturePointer);

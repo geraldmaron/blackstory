@@ -7,7 +7,7 @@
 >
 > This directory preserves BB-012 local PostGIS role scaffolding and SQL Connect templates
 > for a possible later revisit (see ADR-011 migration triggers). Prefer
-> `infra/firebase/` + `@blap/firebase` for active work.
+> `infra/firebase/` + `@repo/firebase` for active work.
 
 Historical BB-012 notes below remain accurate as a description of the parked artifacts.
 
@@ -22,7 +22,7 @@ Local PostGIS, role/grant foundation, pool budgets, Cloud SQL design, and Fireba
 
 | Path | Status |
 |------|--------|
-| Firestore model / rules | **Active** — `infra/firebase/`, `@blap/firebase` |
+| Firestore model / rules | **Active** — `infra/firebase/`, `@repo/firebase` |
 | Local PostGIS compose / init | Optional / deferred experiments |
 | SQL Connect templates | Parked; do not block beads or CI |
 | Cloud SQL instance | **Do not create** (cost gate + ADR-011) |
@@ -93,6 +93,6 @@ Connectors live under `sql-connect/dataconnect/connectors/*`. Every operation us
 
 ## Package
 
-`@blap/data-access` — Firestore access guards (primary) + parked Postgres/SQL Connect
+`@repo/data-access` — Firestore access guards (primary) + parked Postgres/SQL Connect
 helpers. Public web cannot depend on it (`pnpm validate:boundaries`). See
 `packages/data-access/DEFERRED.md`.

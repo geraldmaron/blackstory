@@ -1,5 +1,5 @@
 /**
- * Data Pack v1 validation functions (black-book-ud5q): checksum verification, signature
+ * Data Pack v1 validation functions (the related workstream): checksum verification, signature
  * verification, budget enforcement, and license/rights eligibility. Each check is a pure,
  * non-throwing function returning a pass/fail + reason so the import pipeline
  * (`./import-pipeline.ts`) can collect every failure instead of stopping at the first one —

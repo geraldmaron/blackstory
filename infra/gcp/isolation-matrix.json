@@ -66,10 +66,10 @@
       "key": "development",
       "projectId": "black-book-efaaf",
       "tier": "nonprod",
-      "purpose": "Local development through demo-black-book emulators and synthetic fixtures; no deployed development cloud environment.",
+      "purpose": "Local development through demo-repo emulators and synthetic fixtures; no deployed development cloud environment.",
       "servesPublic": false,
       "researchColocated": true,
-      "configurationScope": "local emulator namespace demo-black-book",
+      "configurationScope": "local emulator namespace demo-repo",
       "live": true,
       "humanAccess": "developers use local emulators; any access to black-book-efaaf is production access",
       "notes": "AC-ISO-1 project separation is not currently available. Tests and local development must fail closed against black-book-efaaf."
@@ -497,7 +497,7 @@
       "criterion": "Development credentials cannot access production (not currently enforceable as a cloud project boundary)",
       "enforcedBy": [
         "N/A as an environment-to-project invariant: black-book-efaaf is the only cloud project and is production.",
-        "Local development and automated tests use demo-black-book emulators or disposable local services and fail closed when production identifiers are present.",
+        "Local development and automated tests use demo-repo emulators or disposable local services and fail closed when production identifiers are present.",
         "Any human or CI access to black-book-efaaf is production access; github-deploy is WIF-only and requires protected production context.",
         "A separate cloud development project must be created before cloud-based development credentials or destructive integration tests are allowed.",
         "[ADR-012 target, not yet applied] blackbook-staging gives cloud-based pre-production testing a real project boundary from blackbook-prod, satisfying the prior N/A trigger. github-deploy stays project-scoped to blackbook-prod with no binding in blackbook-staging or blackbook-internal."

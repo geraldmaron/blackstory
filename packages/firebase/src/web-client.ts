@@ -13,7 +13,7 @@ export type WebFirebaseClient = {
   readonly env: ParsedFirebaseClientEnv;
 };
 
-const WEB_APP_NAME = 'black-book-web';
+const WEB_APP_NAME = 'the related workstream';
 
 
 /**

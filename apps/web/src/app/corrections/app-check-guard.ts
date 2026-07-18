@@ -9,7 +9,7 @@ import type {
   AppCheckTelemetry,
   AppCheckVerifier,
   EnvironmentLike,
-} from '@blap/firebase';
+} from '@repo/firebase';
 
 export type CorrectionAppCheckOptions = {
   readonly environment?: EnvironmentLike;
@@ -36,7 +36,7 @@ export async function createCorrectionAppCheckGuard(
     createFirebaseAppCheckVerifier,
     createServerFirebaseApp,
     parseAppCheckMode,
-  } = await import('@blap/firebase');
+  } = await import('@repo/firebase');
 
   const environment = options.environment ?? process.env;
   const mode = options.mode ?? parseAppCheckMode(environment.APP_CHECK_MODE);

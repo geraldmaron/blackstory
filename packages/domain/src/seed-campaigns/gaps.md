@@ -1,6 +1,6 @@
-# National seed campaign gaps (BB-058)
+# National seed campaign gaps ()
 
-This document records intentional geographic and thematic gaps in the BB-058 quality-first
+This document records intentional geographic and thematic gaps in the  quality-first
 national seed. **Quality determines count** — gaps are documented rather than filled with weak
 or unverified records.
 
@@ -18,7 +18,7 @@ or unverified records.
 
 | Gap | Reason |
 | --- | --- |
-| **Rosenwald bulk corpus** | Fisk Rosenwald Fund Card File remains `deferred-unverified` in BB-094 launch corpora; Rosenwald campaign uses only NRHP/NPS individually verified listings. |
+| **Rosenwald bulk corpus** | Fisk Rosenwald Fund Card File remains `deferred-unverified` in  launch corpora; Rosenwald campaign uses only NRHP/NPS individually verified listings. |
 | **Full HBCU inventory** | NCES lists ~100 HBCUs; seed ships 5-sample plus overlapping Freedmen's/Movement entries — not a bulk import. |
 | **Freedmen's Bureau school inventory** | Thousands of Bureau schools existed; only institutions with federal NPS/ED founding documentation ship. |
 | **Desegregation litigation exhaustiveness** | Sample covers Brown companions and post-Brown crises, not every district court order or state case. |

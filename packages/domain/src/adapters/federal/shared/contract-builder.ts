@@ -34,7 +34,7 @@ export function buildFederalAdapterDefinition(input: BuildFederalContractInput):
     rights: input.rights,
     permittedClaimClasses: input.permittedClaimClasses,
     refreshSchedule: input.refreshSchedule,
-    notes: `Federal ${input.family} adapter; fixture-only ingestion (BB-046).`,
+    notes: `Federal ${input.family} adapter; fixture-only ingestion ().`,
   };
 
   const contract: SourceAdapterContract = {

@@ -3,7 +3,7 @@
  * intake tied to entity/claim/source/location targets, with privacy notice and receipt codes.
  */
 import { Suspense } from 'react';
-import { EmptyState, Notice } from '@blap/ui';
+import { EmptyState, Notice } from '@repo/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { CorrectionForm } from './CorrectionForm';
 import { CORRECTION_FORM_INTRO, CORRECTION_PRIVACY_NOTICE } from './copy';
@@ -15,21 +15,21 @@ export const metadata = {
 
 export default function CorrectionsPage() {
   return (
-    <main className="bp-container bp-page" id="main">
-      <p className="bp-page__eyebrow">Trust</p>
-      <h1 className="bp-page__title">Corrections</h1>
-      <p className="bp-page__lede">{CORRECTION_FORM_INTRO}</p>
+    <main className="ds-container ds-page" id="main">
+      <p className="ds-page__eyebrow">Trust</p>
+      <h1 className="ds-page__title">Corrections</h1>
+      <p className="ds-page__lede">{CORRECTION_FORM_INTRO}</p>
 
-      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
+      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
         <SeedDataNotice compact />
 
         <Notice tone="warning" title="This is not a public post">
-          Corrections enter a restricted quarantine queue (BB-029) for human review. Nothing you
-          submit changes the public record until it passes independent review and promotion controls
-          (BB-032). {CORRECTION_PRIVACY_NOTICE.body}
+          Corrections enter a restricted quarantine queue for human review. Nothing you
+          submit changes the public record until it passes independent review and promotion
+          controls. {CORRECTION_PRIVACY_NOTICE.body}
         </Notice>
 
-        <Suspense fallback={<p className="bp-sans">Loading correction form…</p>}>
+        <Suspense fallback={<p className="ds-sans">Loading correction form…</p>}>
           <CorrectionForm />
         </Suspense>
 

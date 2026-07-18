@@ -85,7 +85,7 @@ export function assertSeedRecordEvidenceGate(record: SeedRecord): void {
   }
   const anyComplete = record.citations.some((citation) => isCitationStructurallyComplete(citation));
   if (!anyComplete) {
-    throw new Error(`Seed record ${record.id}: no structurally complete citation (BB-083 fail-closed).`);
+    throw new Error(`Seed record ${record.id}: no structurally complete citation ( fail-closed).`);
   }
 }
 
@@ -211,7 +211,7 @@ export function assertNationalSeedNotBulkImport(records: readonly SeedRecord[]):
   if (records.length > NATIONAL_SEED_MAX_RECORDS) {
     throw new Error(
       `National seed has ${records.length} records, exceeding the quality-first cap of ` +
-        `${NATIONAL_SEED_MAX_RECORDS} — this is not a bulk U.S. school import (BB-058 AC4).`,
+        `${NATIONAL_SEED_MAX_RECORDS} — this is not a bulk U.S. school import ( AC4).`,
     );
   }
 }

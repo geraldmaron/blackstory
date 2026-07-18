@@ -8,7 +8,7 @@ import {
   buildFactArticleJsonLd,
   type FactCitation,
   type FactRecord,
-} from '@blap/domain';
+} from '@repo/domain';
 import { canonicalFactJsonUrl, canonicalFactPageUrl } from './resolve-public-fact';
 
 export type FactJsonExport = {

@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import {
   LEARNING_CONTINUE_LEARNING_CAP,
   LEARNING_RELATED_DISPLAY_CAP,
-} from '@blap/domain';
+} from '@repo/domain';
 import { collectOneHopNeighborIds, collectTwoHopNeighborIds } from './neighbor-ids';
 
 test('collectOneHopNeighborIds prefers typed related and respects display cap', () => {

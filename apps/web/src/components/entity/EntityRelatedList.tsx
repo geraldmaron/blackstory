@@ -24,16 +24,16 @@ export type EntityRelatedListProps = {
 function NeighborLink({ neighbor }: { readonly neighbor: RelatedNeighborView }) {
   return (
     <li key={`${neighbor.id}_${neighbor.relationType}_${neighbor.direction}`}>
-      <Link className="bp-story-link" href={`/entity/${neighbor.id}`}>
-        <span className="bp-story-link__meta">
-          <span className="bp-story-link__meta-row">
+      <Link className="ds-story-link" href={`/entity/${neighbor.id}`}>
+        <span className="ds-story-link__meta">
+          <span className="ds-story-link__meta-row">
             <KindBadge kind={neighbor.kind} density="compact" />
             <span aria-hidden="true">·</span>
             <span>{humanizeToken(neighbor.relationType)}</span>
           </span>
         </span>
-        <h3 className="bp-story-link__title">{neighbor.displayName}</h3>
-        <p className="bp-story-link__summary">
+        <h3 className="ds-story-link__title">{neighbor.displayName}</h3>
+        <p className="ds-story-link__summary">
           {neighbor.summary.trim().length > 0
             ? neighbor.summary
             : `${humanizeToken(neighbor.relationType)} connection to this record.`}
@@ -58,13 +58,13 @@ export function EntityRelatedList({
       return <RecordGapNotice kind="related" />;
     }
     return (
-      <ul className="bp-story-rail" aria-labelledby={labelledBy}>
+      <ul className="ds-story-rail" aria-labelledby={labelledBy}>
         {related.map((entry) => (
           <li key={`${entry.id}_${entry.type}`}>
-            <Link className="bp-story-link" href={`/entity/${entry.id}`}>
-              <span className="bp-story-link__meta">{humanizeToken(entry.type)}</span>
-              <h3 className="bp-story-link__title">{entry.id}</h3>
-              <p className="bp-story-link__summary">
+            <Link className="ds-story-link" href={`/entity/${entry.id}`}>
+              <span className="ds-story-link__meta">{humanizeToken(entry.type)}</span>
+              <h3 className="ds-story-link__title">{entry.id}</h3>
+              <p className="ds-story-link__summary">
                 Open this related record to continue learning.
               </p>
             </Link>
@@ -79,7 +79,7 @@ export function EntityRelatedList({
   }
 
   return (
-    <ul className="bp-story-rail" aria-labelledby={labelledBy}>
+    <ul className="ds-story-rail" aria-labelledby={labelledBy}>
       {stubs.map((neighbor) => (
         <NeighborLink key={`${neighbor.id}_${neighbor.relationType}`} neighbor={neighbor} />
       ))}

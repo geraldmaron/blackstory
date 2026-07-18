@@ -32,7 +32,7 @@ export const FIRESTORE_ROOT = {
   killSwitches: 'killSwitches',
   /** Jurisdiction reference data: states + counties wholesale, cities on-demand. */
   jurisdictions: 'jurisdictions',
-  /** Published census statistics: one doc per county per decennial vintage (black-book-vxz). */
+  /** Published census statistics: one doc per county per decennial vintage (the related workstream). */
   censusCountyDecades: 'censusCountyDecades',
   /** ACS 5-year county estimates: one doc per county per vintage. */
   acsCountyProfiles: 'acsCountyProfiles',

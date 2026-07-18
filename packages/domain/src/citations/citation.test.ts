@@ -68,7 +68,7 @@ test('an offline designation with an empty description is rejected', () => {
   assert.equal(isCitationStructurallyComplete(citation), false);
 });
 
-test('buildCitationFromEvidence adapts a BB-016 evidence chain into a citation', () => {
+test('buildCitationFromEvidence adapts a  evidence chain into a citation', () => {
   const citation = buildCitationFromEvidence({
     id: 'cit-2',
     claimId: 'claim-2',

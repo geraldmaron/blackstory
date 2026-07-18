@@ -1,8 +1,8 @@
 /**
- * Wires web-search candidates into the standard discovery pipeline via the SAME 
+ * Wires web-search candidates into the standard discovery pipeline via the SAME
  * Wayback capture gate every other community adapter uses -- no
  * parallel ingestion path. `requireCaptureForAllCandidates` submits every candidate's
- * `canonicalUrl` through the injected `SafeHttpClient` (which production wiring backs with 
+ * `canonicalUrl` through the injected `SafeHttpClient` (which production wiring backs with
  * safety,../internet-archive/shared/http-port.ts), so a discovered URL only becomes
  * review-eligible after both evaluation and a real Wayback capture succeed. Accepted
  * candidates then flow through `ingestApiCandidate` -- the same API-ingestion entry

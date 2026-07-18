@@ -3,14 +3,14 @@
  * community lead must pass BOTH consensus review AND the standard research-case
  * promotion pipeline before anything from this lane could ever become visible on a
  * public read path. This test walks the real chain quarantine
- * (`@blap/security`) → consensus review → discovery-candidate research case and stops
+ * (`@repo/security`) → consensus review → discovery-candidate research case and stops
  * there deliberately: it never imports `../promotion`, never builds a `PromotionClaim`, and
  * proves with the *existing*, unmodified gate (`markResearchCasePublished`) that the
  * research case this lane produces cannot be published from where consensus review leaves it.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createQuarantinedSubmission, type SubmissionIntakeContext } from '@blap/security';
+import { createQuarantinedSubmission, type SubmissionIntakeContext } from '@repo/security';
 import { prepareResearchCasePromotion, markResearchCasePublished } from '../research-case/index.js';
 import { advanceToDiscoveryCandidate } from './advance.js';
 import { routeConsensusReview, type ReviewerClassification } from './index.js';

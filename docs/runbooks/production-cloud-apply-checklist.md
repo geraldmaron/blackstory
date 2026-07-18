@@ -461,7 +461,7 @@ gcloud compute networks vpc-access connectors create black-book-connector \
 ```bash
 gcloud redis instances describe black-book-ratelimits --project=black-book-efaaf --region=us-central1 \
   --format='value(state,host,port)'   # expect state=READY
-pnpm --filter @blap/security test   # policy math unaffected by store swap
+pnpm --filter @repo/security test   # policy math unaffected by store swap
 # Load test: confirm rate-limit denials are now consistent across concurrent Cloud Run instances
 # (see infra/gcp/armor/load-test-plan.md for the adjacent BB-059 load-test harness)
 ```
@@ -660,7 +660,7 @@ node infra/gcp/observability/security-alerts/security-alerts.test.mjs   # local 
 gcloud monitoring policies list --project=black-book-efaaf --filter='displayName:SEC-'
 ```
 
-Run synthetic metric injection from `@blap/observability`'s test suite in staging to confirm
+Run synthetic metric injection from `@repo/observability`'s test suite in staging to confirm
 an actual alert fires and reaches the configured channel; spot-check that no App Check token
 appears in any log-based metric (redaction check, per the BB-034 sign-off list).
 

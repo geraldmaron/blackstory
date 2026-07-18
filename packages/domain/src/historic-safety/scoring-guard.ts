@@ -113,7 +113,7 @@ export function assertGeneralCrimeStatsAbsentFromScoringInput(value: unknown): v
   assertNoBannedScoringKeys(
     value,
     GENERAL_CRIME_STATS_SCORING_BANNED_KEYS,
-    'general crime statistics must never enter any scoring input or composite (BB-082 critical ' +
+    'general crime statistics must never enter any scoring input or composite ( critical ' +
       'invariant \u2014 reported crime measures policing patterns, not safety for Black people).',
   );
 }

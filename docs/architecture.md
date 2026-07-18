@@ -26,18 +26,18 @@ Do not add deployable microservices beyond this set. See [ADR-005](./adr/ADR-005
 ## Platform intent (not yet configured)
 
 - **Data:** **Cloud Firestore** system of record (ADR-011 / D-014); blobs in Firebase Storage / GCS. Local PostGIS + SQL Connect under `infra/database/` are **parked / not production**.
-- **App data access:** Firestore Admin SDK + security rules; `@blap/domain` entity/geography/provenance/claims models; `@blap/firebase` converters; `@blap/data-access` Firestore guards. SQL Connect deferred with Cloud SQL.
+- **App data access:** Firestore Admin SDK + security rules; `@repo/domain` entity/geography/provenance/claims models; `@repo/firebase` converters; `@repo/data-access` Firestore guards. SQL Connect deferred with Cloud SQL.
 - **Public web vs APIs:** App Hosting for `apps/web`; Cloud Run for APIs + admin — [ADR-001](./adr/ADR-001-firebase-app-hosting-vs-cloud-run.md)
 - **Auth / abuse:** Firebase Auth + App Check (reCAPTCHA Enterprise) — intent; assumptions in [ADR-010](./adr/ADR-010-security-and-abuse-assumptions.md)
 - **Ingress:** Cloud Armor / ALB / CDN — intent only
 - **Jobs:** Cloud Tasks + Cloud Run Jobs — [ADR-007](./adr/ADR-007-background-workflow-model.md)
 - **CI/CD:** GitHub Actions + OIDC/WIF — [ADR-006](./adr/ADR-006-github-actions-deployment.md); PR CI live in-repo; deploy OIDC stub `.github/workflows/deploy-production.yml`; WIF Terraform under [`../infra/gcp/wif/`](../infra/gcp/wif/) (not applied)
-- **Search / geo:** Geohash fields + bounded Firestore queries via `api-public`; U.S. Census Geocoder later — [ADR-008](./adr/ADR-008-search-and-geocoding.md) (amended by ADR-011). Domain helpers in `@blap/domain`.
+- **Search / geo:** Geohash fields + bounded Firestore queries via `api-public`; U.S. Census Geocoder later — [ADR-008](./adr/ADR-008-search-and-geocoding.md) (amended by ADR-011). Domain helpers in `@repo/domain`.
 - **Research isolation:** Dedicated credentials/SA/bucket policy inside the one project; research cannot publish; project split deferred — [ADR-009](./adr/ADR-009-research-isolation.md)
 - **Environment isolation (BB-005/D-013):** Existing `black-book-efaaf` is the single production project; per-surface SAs, four buckets, and Firestore rules + SA boundaries provide workload isolation. Development is emulator-only; staging is configuration, not a security boundary. Resources beyond the known project/Hosting site are **not yet verified as provisioned** — [`security/environment-isolation.md`](./security/environment-isolation.md), [`../infra/gcp/`](../infra/gcp/).
 - **Observability:** OpenTelemetry + Sentry — packages stubbed, not wired
 
-Do not claim Firebase production data plane or App Hosting works until the corresponding beads land and are verified. Do **not** provision Cloud SQL. See [`bb-001/baseline-report.md`](./bb-001/baseline-report.md).
+Do not claim Firebase production data plane or App Hosting works until the corresponding beads land and are verified. Do **not** provision Cloud SQL. See [`ds-001/baseline-report.md`](./ds-001/baseline-report.md).
 
 ## Boundaries
 
@@ -60,7 +60,7 @@ Single source of truth: `packages/schemas/constitution/policy.v1.json`, validate
 
 | Consumer | Package | Role |
 |----------|---------|------|
-| TypeScript apps/packages | `@blap/schemas` | Zod-validated loaders + evaluators (`policyVersion` on every result) |
+| TypeScript apps/packages | `@repo/schemas` | Zod-validated loaders + evaluators (`policyVersion` on every result) |
 | Python workers | `black-book-constitution` | `jsonschema`-validated loaders + evaluators against the same JSON |
 
 Do not hard-code relevance/confidence thresholds, precision rules, or living-person rules in apps. Policy changes are version bumps in the shared JSON, never a public write API.
@@ -73,7 +73,7 @@ Hostile-environment design is documented under [`docs/security/`](./security/):
 |-----|------|
 | [`security/threat-model.md`](./security/threat-model.md) | 19 P0 threats with preventive / detective / containment / recovery |
 | [`security/abuse-cases.md`](./security/abuse-cases.md) | AC-01–19 mapped to implementation beads |
-| [`security/threat-corpus.json`](./security/threat-corpus.json) | Machine-readable corpus (validated by `@blap/testing`) |
+| [`security/threat-corpus.json`](./security/threat-corpus.json) | Machine-readable corpus (validated by `@repo/testing`) |
 | [`security/tests/checklist.md`](./security/tests/checklist.md) | Manual/CI checklist scaffold (full gates in BB-036) |
 
 Assumptions remain binding in [ADR-010](./adr/ADR-010-security-and-abuse-assumptions.md). Controls are mostly unimplemented until Tranche 3.

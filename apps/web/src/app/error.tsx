@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Notice } from '@blap/ui';
+import { Notice } from '@repo/ui';
 import { StatusPage } from '../components/StatusPage';
 import { sanitizeClientErrorDisplay } from '../lib/runtime-hardening/error-surface';
 
@@ -28,15 +28,15 @@ export default function Error({
       title="Something went wrong"
       lede="The public shell hit an unexpected error. You can retry or return home."
     >
-      <div className="bp-stack bp-page--status__body">
+      <div className="ds-stack ds-page--status__body">
         <Notice tone="error" title={display.title}>
           {display.detail}
         </Notice>
-        <div className="bp-row">
-          <button type="button" className="bp-button bp-button--primary" onClick={reset}>
+        <div className="ds-row">
+          <button type="button" className="ds-button ds-button--primary" onClick={reset}>
             Try again
           </button>
-          <a className="bp-button bp-button--secondary" href="/">
+          <a className="ds-button ds-button--secondary" href="/">
             Back to home
           </a>
         </div>

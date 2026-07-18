@@ -14,7 +14,7 @@ experience, not page refreshes" + "map is first class" + street-level/address-se
   gradients on the mark; clear space = pin width; minimum sizes 120/48/32 px per kit p.3.
 - **Palette**: Black Ink `#0A0A0A`, Archive Paper `#F4EFE5`, Copper Pin `#B86B2A`, Page Sand
   `#D8A178`, Page Rust `#D84E2B`; neutrals Soft Stone `#CFC7B8`, Warm Gray `#6E6961`. All
-  usage through tokens (`--bp-*`), never raw hex in app code.
+  usage through tokens (`--ds-*`), never raw hex in app code.
 - **Copper discipline**: copper is orientation — primary actions, active nav, selected/open
   states, kickers — at roughly 10–15% presence. It is never a wash, never body text on raw
   copper without the accessible-pairs table.
@@ -36,7 +36,7 @@ experience, not page refreshes" + "map is first class" + street-level/address-se
    reloads: internal navigation is exclusively `next/link` (raw `<a>` only for external
    hrefs), the shell (header/footer) persists, the map canvas persists across `/` ↔
    `/explore` (ADR-017), and page content arrives with the token-driven
-   `bp-surface-arrive` rise. Anything that visibly remounts the shell is a defect.
+   `ds-surface-arrive` rise. Anything that visibly remounts the shell is a defect.
 2. **The story is the spine.** Every surface answers "what happened here?" before it answers
    anything else. Home: hero map → "See what happened here" rail → standards → transparency
    hand-off. Entity: name/place/era → narrative → evidence → related. History: movement
@@ -80,12 +80,12 @@ escalated to the owner — never silently shipped.
 - Every route renders correctly in both `[data-theme="light"]` (Archive Paper canvas) and
   `[data-theme="dark"]` (Black Ink canvas). Theme is user-controlled (ThemeToggle), no
   hydration flash, `prefers-color-scheme` respected as the default.
-- **Theme-invariant surfaces** (deliberate exceptions, `--bp-fixed-*` tokens): the map canvas
+- **Theme-invariant surfaces** (deliberate exceptions, `--ds-fixed-*` tokens): the map canvas
   plate (always ink — an archival map insert doesn't recolor with the page), the site footer
   (always ink), the on-map header treatment. Everything else derives from theme tokens.
 - AA contrast holds in BOTH themes on every text/control pairing; the BB-101 gate verifies
   both-theme screenshots per surface. Copper on ink uses the light-copper dark variant
-  (`--bp-accent` flips value by theme); body text never sits on raw copper.
+  (`--ds-accent` flips value by theme); body text never sits on raw copper.
 
 ## 4. Responsive + mobile-ready contract
 
@@ -165,12 +165,12 @@ block the visiting job.
 
 ## 7. Pattern law (reuse, never re-invent)
 
-- Primitives live in `@blap/ui` (`bp-` prefix): Button, Card, Notice, FilterBar, Citation,
+- Primitives live in `@repo/ui` (`ds-` prefix): Button, Card, Notice, FilterBar, Citation,
   confidence chips, timeline, result list, story link, section/kicker/band, CTA variants,
   count-label/subheading/dt utilities. A new surface composes these; a new pattern requires
   a bead with a "no existing pattern serves this" justification.
 - Tokens only — no raw hex, no raw px durations, no ad-hoc font stacks. Copper via
-  `--bp-accent(-graphic)`, fixed surfaces via `--bp-fixed-*`.
+  `--ds-accent(-graphic)`, fixed surfaces via `--ds-fixed-*`.
 - Anti-patterns (defects on sight): box shadows; color-only signals; raw `<a>` for internal
   nav; per-page map instances; layout-thrashing transitions; unclamped panel prose;
   numeric scores in public payloads (see `public-numeric-policy.ts` for the exhaustive
@@ -179,7 +179,7 @@ block the visiting job.
 
 ## 8. Motion grammar
 
-Two durations (`--bp-duration-fast` 160ms, `--bp-duration-base` 280ms), one easing, opacity/
-transform only. Route arrival = `bp-surface-arrive`; hero dissolve + camera flight per
+Two durations (`--ds-duration-fast` 160ms, `--ds-duration-base` 280ms), one easing, opacity/
+transform only. Route arrival = `ds-surface-arrive`; hero dissolve + camera flight per
 ADR-017; hover states fade borders/backgrounds. `prefers-reduced-motion` collapses
 everything to instant cuts — including map camera flights (jumpTo).

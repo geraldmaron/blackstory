@@ -1,10 +1,11 @@
-# Blap
+# BlackStory
 
 Place-connected Black history research platform. TypeScript + Python monorepo.
 
-Execution tracking: [`plan.md`](./plan.md) (BB-001–BB-066).  
-Operating docs: [`docs/README.md`](./docs/README.md), [`docs/architecture.md`](./docs/architecture.md).  
-Architecture decisions: [`docs/adr/`](./docs/adr/README.md) (BB-002).
+**Product name:** BlackStory. **Code scope:** `@repo/*` (brand-agnostic — do not rename packages for a product rebrand). Design tokens: `ds-*`. Env break-glass: `APP_*`.
+
+Operating docs: [`docs/README.md`](./docs/README.md), [`docs/architecture.md`](./docs/architecture.md), brand contract: [`docs/ui/brand.md`](./docs/ui/brand.md).  
+Architecture decisions: [`docs/adr/`](./docs/adr/README.md).
 
 ## Repository map
 
@@ -82,7 +83,7 @@ Bootstrap uses frozen pnpm and uv lockfiles. Local tests default to `NODE_ENV=de
 `LOG_LEVEL=info`; no production environment variables or cloud credentials are required.
 Copy [`.env.example`](./.env.example) for local emulator-oriented Firebase placeholders.
 
-Internal `@blap/*` packages expose a `development` export condition that
+Internal `@repo/*` packages expose a `development` export condition that
 points at TypeScript source, so `pnpm test`/`pnpm test:js` run against source with
 no prior build. `pnpm build` compiles each package to `dist/`, and `pnpm typecheck`
 resolves cross-package types from those built declarations (hence build-first).
@@ -90,11 +91,11 @@ resolves cross-package types from those built declarations (hence build-first).
 The five deployables remain independently buildable:
 
 ```bash
-pnpm --filter @blap/web build
-pnpm --filter @blap/admin build
-pnpm --filter @blap/api-public build
-pnpm --filter @blap/api-submissions build
-pnpm --filter @blap/api-internal build
+pnpm --filter @repo/web build
+pnpm --filter @repo/admin build
+pnpm --filter @repo/api-public build
+pnpm --filter @repo/api-submissions build
+pnpm --filter @repo/api-internal build
 ```
 
 Shared TypeScript and ESLint policy lives in `packages/typescript-config` and
@@ -104,10 +105,10 @@ shared-package imports of deployable apps, and workspace dependency cycles.
 PostGIS runs from the pinned image in `infra/database/docker-compose.yml` on
 `postgresql://blackbook:blackbook@localhost:5432/blackbook`. These credentials are local-only.
 Foundation SQL (extensions, `bb_*` schemas, roles/grants/timeouts): `pnpm db:init` /
-`pnpm db:verify`. Server-only helpers: `@blap/data-access`. SQL Connect templates:
+`pnpm db:verify`. Server-only helpers: `@repo/data-access`. SQL Connect templates:
 `infra/database/sql-connect/` (`pnpm db:sql-connect:compile`). Cloud SQL is designed but
 **not** provisioned — see `infra/database/cloud-sql/PRODUCTION.md`.
-Firebase config (BB-011): `infra/firebase/` + `@blap/firebase`. App Hosting templates:
+Firebase config (BB-011): `infra/firebase/` + `@repo/firebase`. App Hosting templates:
 `apps/web/apphosting*.yaml`. Root `.firebaserc` maps to production `black-book-efaaf`. Isolation
 design (per-surface SAs / buckets / DB roles): `infra/gcp/` and
 `docs/security/environment-isolation.md`.
@@ -125,12 +126,12 @@ the submissions surface still cannot write canonical/public data. Public web (un
 Hosting plus registered **Blap Web** / **Blap Admin** apps. Still blocked/deferred:
 Blaze/App Hosting backends, Firestore database enablement, GCP class buckets/SAs/IAM, Auth
 provider choice, App Check provider registration/console enforcement, GitHub remote rulesets + live WIF apply, Cloud
-SQL create — see `docs/bb-001/`, `docs/adr/`, `docs/security/`, `docs/testing/`, `docs/ui/`,
+SQL create — see `docs/ds-001/`, `docs/adr/`, `docs/security/`, `docs/testing/`, `docs/ui/`,
 `infra/firebase/`, `infra/gcp/` (incl. `wif/`), `infra/github/`, `infra/database/`.
 
 ```bash
-pnpm --filter @blap/web exec next dev --port 3048
-# or: pnpm --filter @blap/web dev
+pnpm --filter @repo/web exec next dev --port 3048
+# or: pnpm --filter @repo/web dev
 # http://localhost:3048/
 # http://localhost:3048/design-system
 ```
@@ -141,7 +142,7 @@ Versioned policy values live in one place and are loaded by TypeScript and Pytho
 
 - Values: `packages/schemas/constitution/policy.v1.json`
 - JSON Schema: `packages/schemas/constitution/product-constitution.schema.json`
-- TS: `import { loadProductConstitution, evaluateLivingStatus } from '@blap/schemas'`
+- TS: `import { loadProductConstitution, evaluateLivingStatus } from '@repo/schemas'`
 - Python: `from black_book_constitution import load_product_constitution, evaluate_living_status`
 
 Policy is read-only in both packages (no public mutation API). Changes ship as a new `policyVersion`, not via HTTP.
@@ -154,7 +155,7 @@ Policy is read-only in both packages (no public mutation API). Changes ship as a
 - Submission quarantine: [`docs/security/submission-quarantine.md`](./docs/security/submission-quarantine.md)
 - Environment isolation (single-project production; BB-005/D-013): [`docs/security/environment-isolation.md`](./docs/security/environment-isolation.md)
 - Isolation matrices / Terraform stubs: [`infra/gcp/`](./infra/gcp/)
-- Corpus tests: `pnpm --filter @blap/testing test`
+- Corpus tests: `pnpm --filter @repo/testing test`
 
 ## Testing (BB-008), governance (BB-009), OIDC (BB-010)
 
@@ -162,7 +163,7 @@ Policy is read-only in both packages (no public mutation API). Changes ship as a
 - CI workflow: [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)
 - OIDC deploy stub: [`.github/workflows/deploy-production.yml`](./.github/workflows/deploy-production.yml) (`workflow_dispatch` only)
 - WIF design: [`infra/gcp/wif/`](./infra/gcp/wif/) — dry-run: `./infra/github/scripts/apply-wif.sh --dry-run`
-- Builders / guards / harnesses: `@blap/testing`
+- Builders / guards / harnesses: `@repo/testing`
 - Quarantine registry: `packages/testing/quarantine.json` (owner + deadline required)
 - Governance: [`infra/github/README.md`](./infra/github/README.md), [`SECURITY.md`](./SECURITY.md), `pnpm validate:governance`
 - Remote ruleset apply (after GitHub remote + admin auth): `./infra/github/scripts/apply-governance.sh --dry-run`
@@ -170,7 +171,7 @@ Policy is read-only in both packages (no public mutation API). Changes ship as a
 ## Design system (BB-007)
 
 - Guide: [`docs/ui/README.md`](./docs/ui/README.md)
-- Package: `@blap/ui`
+- Package: `@repo/ui`
 - Fixture gallery: `/design-system` on the public web app
 
 ## Invariants (summary)

@@ -1,5 +1,5 @@
 /**
- * Confirms the BB-099 marker-size formula: the documented base/log/modifier/clamp math, the
+ * Confirms the marker-size formula: the documented base/log/modifier/clamp math, the
  * halo offset, and that the exported MapLibre expressions are literally built from the same
  * stop/modifier data `markerRadius()` computes (one source of truth, not a hand-kept copy).
  */

@@ -12,7 +12,7 @@ import {
   publicReleaseSearchIndexPath,
   type ReleaseEntitiesListArtifact,
   type ReleaseSearchIndexArtifact,
-} from '@blap/firebase';
+} from '@repo/firebase';
 
 const LOCAL_ARTIFACTS_ROOT = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -25,7 +25,7 @@ export type ArtifactFetchImpl = (
 ) => Promise<Response>;
 
 function artifactBaseUrl(env: NodeJS.ProcessEnv = process.env): string | undefined {
-  const configured = env.BLAP_PUBLIC_RELEASE_ARTIFACT_BASE_URL?.trim();
+  const configured = env.APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL?.trim();
   if (configured && configured.length > 0) return configured.replace(/\/+$/, '');
   return undefined;
 }

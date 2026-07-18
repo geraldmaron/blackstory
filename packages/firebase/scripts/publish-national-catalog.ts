@@ -1,29 +1,29 @@
 /**
- * Publish the national seed catalog (black-book-uda follow-on: 100+ researched entities) into
+ * Publish the national seed catalog (the related workstream follow-on: 100+ researched entities) into
  * the ACTIVE public release's projections + search index, and emit ADR-004 catalog artifacts
  * (`entities.json` + `search-index.json`) for CDN/App Hosting reads.
  *
  * Reads every JSON file in `packages/firebase/fixtures/national-catalog/`, converts each
  * research entry into `publicEntityProjectionSchema`/`publicSearchIndexSchema`-conformant docs
- * via `@blap/domain`'s single release builder (`buildReleaseEntityArtifacts`,
- * packages/domain/src/publication/release-builder.ts — black-book-1fg9), hard-fails if ANY
+ * via `@repo/domain`'s single release builder (`buildReleaseEntityArtifacts`,
+ * packages/domain/src/publication/release-builder.ts — the related workstream), hard-fails if ANY
  * entry does not validate or does not resolve, then batch-writes:
  *   publicReleases/<activeRelease>/entities/<id>   (projection, merge)
  *   publicSearchIndex/<id>                          (search doc, merge)
  *
  * Also writes local catalog artifacts under
  * `packages/firebase/fixtures/release-artifacts/` (and optionally uploads to the public-media
- * bucket when `BLAP_UPLOAD_RELEASE_ARTIFACTS=1`).
+ * bucket when `APP_UPLOAD_RELEASE_ARTIFACTS=1`).
  *
  * Idempotent: re-running overwrites the same doc ids with the same content. Does NOT touch
  * `publicMeta/activeRelease` — the release pointer stays whatever bootstrap/promotion set.
  *
  * Requires:
- *   BLAP_FIREBASE_ALLOW_PRODUCTION=1
+ *   APP_FIREBASE_ALLOW_PRODUCTION=1
  *   Application Default Credentials with Firestore write access
  *
  * Usage:
- *   BLAP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
+ *   APP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
  *     packages/firebase/scripts/publish-national-catalog.ts
  *   DRY_RUN=1 ... — validate + print without writing.
  */
@@ -33,7 +33,7 @@ import { fileURLToPath } from 'node:url';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
-import { buildReleaseEntityArtifacts, type ReleaseSourceEntity } from '@blap/domain';
+import { buildReleaseEntityArtifacts, type ReleaseSourceEntity } from '@repo/domain';
 import {
   publicEntityProjectionSchema,
   publicSearchIndexSchema,
@@ -46,14 +46,14 @@ import {
 } from '../src/firestore/release-artifacts.ts';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
-const ALLOW = process.env.BLAP_FIREBASE_ALLOW_PRODUCTION === '1';
+const ALLOW = process.env.APP_FIREBASE_ALLOW_PRODUCTION === '1';
 const DRY_RUN = process.env.DRY_RUN === '1';
-const UPLOAD_ARTIFACTS = process.env.BLAP_UPLOAD_RELEASE_ARTIFACTS === '1';
+const UPLOAD_ARTIFACTS = process.env.APP_UPLOAD_RELEASE_ARTIFACTS === '1';
 /** Geohash character precision for public anchors — matches the bootstrap fixtures' choice. */
 const GEOHASH_PRECISION = 5;
 
 if (!ALLOW && !DRY_RUN) {
-  console.error('Refusing to write: set BLAP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1)');
+  console.error('Refusing to write: set APP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1)');
   process.exit(2);
 }
 
@@ -61,13 +61,13 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const catalogDir = join(scriptDir, '../fixtures/national-catalog');
 const artifactsRoot = join(scriptDir, '../fixtures/release-artifacts');
 
-/** `ReleaseSourceEntity` (from `@blap/domain`'s release builder) mirrors this fixture format
+/** `ReleaseSourceEntity` (from `@repo/domain`'s release builder) mirrors this fixture format
  * 1:1 — see that type's doc comment. National-catalog JSON files parse directly into it. */
 
 /**
- * === Publication gate wiring + single release builder (black-book-pwfi, black-book-1fg9) ===
+ * === Publication gate wiring + single release builder (the related workstream, the related workstream) ===
  *
- * black-book-pwfi first wired `@blap/domain`'s two fail-closed publish gates
+ * the related workstream first wired `@repo/domain`'s two fail-closed publish gates
  * (`facts/publish-gate.ts`'s no_citations floor, `relevance/notability-gate.ts`'s
  * notability-basis requirement) into this script, working around `CatalogEntry`'s thin shape
  * with an inline placeholder `notabilityBasis` proxy and per-claim `FactCitation` stand-ins (see
@@ -76,8 +76,8 @@ const artifactsRoot = join(scriptDir, '../fixtures/release-artifacts');
  * all 515 fixture entries carry `archivedUrl`/`archivedAt`/`accessedAt`, a genuine pipeline-wide
  * data gap, not a defect in specific entries).
  *
- * black-book-1fg9 extracted all of that gate wiring, notability-basis construction,
- * research-coverage computation, and projection/search-doc field assembly into `@blap/domain`'s
+ * the related workstream extracted all of that gate wiring, notability-basis construction,
+ * research-coverage computation, and projection/search-doc field assembly into `@repo/domain`'s
  * `buildReleaseEntityArtifacts` (packages/domain/src/publication/release-builder.ts) so this
  * fixture-driven publish path and any future canonical-graph-driven release build share exactly
  * one implementation — the bead's "search, map, facts, and entity pages all read the same
@@ -91,7 +91,7 @@ const artifactsRoot = join(scriptDir, '../fixtures/release-artifacts');
  * NOT in this pass (explicit deferral, not a silent drop): the "two independent lineages /
  * primary+corroborating source" gate for high-impact predicates (first/only/oldest, deaths,
  * violence, allegations) and the archived-capture citation-completeness sub-check both still need
- * a richer claim/evidence model than this fixture format carries. TODO(black-book-1fg9 follow-on).
+ * a richer claim/evidence model than this fixture format carries. TODO(the related workstream follow-on).
  */
 function loadCatalog(): ReleaseSourceEntity[] {
   const files = readdirSync(catalogDir).filter((name) => name.endsWith('.json'));
@@ -138,9 +138,9 @@ async function main(): Promise<void> {
 
   // Validate EVERYTHING before writing anything; name each failing entry so a bad catalog
   // line reads as "which record, which field", not a bare Zod trace. `buildReleaseEntityArtifacts`
-  // (the single release builder, @blap/domain) runs the fact/notability gates and fail-closed
+  // (the single release builder, @repo/domain) runs the fact/notability gates and fail-closed
   // reference resolution; this script only re-validates the result against the Firestore-facing
-  // Zod schemas (schema ownership stays in @blap/firebase, builder logic stays in @blap/domain).
+  // Zod schemas (schema ownership stays in @repo/firebase, builder logic stays in @repo/domain).
   const failures: string[] = [];
   const writes = entries.flatMap((entry) => {
     try {
@@ -234,7 +234,7 @@ async function main(): Promise<void> {
       `Uploaded artifacts to gs://${DEFAULT_PUBLIC_MEDIA_BUCKET}/public/releases/${releaseId}/`,
     );
   } else {
-    console.log('Skipped GCS upload (set BLAP_UPLOAD_RELEASE_ARTIFACTS=1 to upload).');
+    console.log('Skipped GCS upload (set APP_UPLOAD_RELEASE_ARTIFACTS=1 to upload).');
   }
 
   // Prefer write-count verification over a post-publish full collection scan (read-cost).

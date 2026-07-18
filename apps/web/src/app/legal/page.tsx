@@ -1,7 +1,7 @@
 /**
  * Public legal landscape browse surface at `/legal`.
  */
-import { EmptyState, FilterBar } from '@blap/ui';
+import { EmptyState, FilterBar } from '@repo/ui';
 import { LegalBrowseList, LegalDisclaimer, LEGAL_BROWSE_LEDE } from '../../components/legal';
 import { buildLegalBrowseViewModel, type RawLegalBrowseParams } from './legal-view-model';
 import './legal.css';
@@ -20,14 +20,14 @@ export default async function LegalBrowsePage({ searchParams }: LegalPageProps) 
   const view = buildLegalBrowseViewModel(params);
 
   return (
-    <main className="bp-container bp-page" id="main">
-      <header className="bp-entity-mast">
-        <p className="bp-page__eyebrow">Reference</p>
-        <h1 className="bp-page__title">Legal landscape</h1>
-        <p className="bp-page__lede">{LEGAL_BROWSE_LEDE}</p>
+    <main className="ds-container ds-page" id="main">
+      <header className="ds-entity-mast">
+        <p className="ds-page__eyebrow">Reference</p>
+        <h1 className="ds-page__title">Legal landscape</h1>
+        <p className="ds-page__lede">{LEGAL_BROWSE_LEDE}</p>
       </header>
 
-      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
+      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
         <LegalDisclaimer />
 
         <FilterBar
@@ -62,7 +62,7 @@ export default async function LegalBrowsePage({ searchParams }: LegalPageProps) 
           ]}
         />
 
-        <p className="bp-sans bp-count-label" id="legal-results-heading">
+        <p className="ds-sans ds-count-label" id="legal-results-heading">
           {view.totalMatched} legal entr{view.totalMatched === 1 ? 'y' : 'ies'}
         </p>
 
@@ -70,7 +70,7 @@ export default async function LegalBrowsePage({ searchParams }: LegalPageProps) 
           <EmptyState
             title="No legal entries matched"
             action={
-              <a className="bp-cta bp-cta--ink" href="/legal">
+              <a className="ds-cta ds-cta--ink" href="/legal">
                 Clear filters
               </a>
             }

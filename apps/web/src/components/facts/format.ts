@@ -5,7 +5,7 @@ import {
   FACT_CONFIDENCE_DEFINITIONS,
   type FactConfidenceGrade,
   type FactStatus,
-} from '@blap/domain/facts';
+} from '@repo/domain/facts';
 
 export function humanizeToken(value: string): string {
   return value

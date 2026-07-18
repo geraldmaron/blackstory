@@ -80,7 +80,7 @@ test('re-running resolveEntityContainmentPaths against identical input is determ
   assert.deepEqual(first, second);
 });
 
-test('extendJurisdictionChain walks the BB-091 jurisdiction parentId hierarchy, cycle-safe and deduplicated', async () => {
+test('extendJurisdictionChain walks the jurisdiction parentId hierarchy, cycle-safe and deduplicated', async () => {
   const lookup = createInMemoryJurisdictionParentLookup([
     { id: 'us-city-x', parentId: 'us-county-x' },
     { id: 'us-county-x', parentId: 'us-06' },

@@ -72,7 +72,7 @@ export type CanonicalEntity = {
   readonly id: string;
   readonly kind: EntityKind;
   /**
-   * Coarse entity classification (black-book-9mox, `./entity-class.ts`). NEW, additive, and
+   * Coarse entity classification (the related workstream, `./entity-class.ts`). NEW, additive, and
    * optional — `kind` remains the canonical field every existing consumer reads; these two are
    * derived via `deriveEntityClassification` and not wired into any publish/search/filter
    * pipeline in this pass.
@@ -86,7 +86,7 @@ export type CanonicalEntity = {
   /** Required for person; optional elsewhere. Default unknown ⇒ treat as living. */
   readonly livingStatus?: LivingStatus;
   /**
-   * Computed/output-only signal from `deriveLivingStatus` (`./living.ts`), black-book-mpfb.
+   * Computed/output-only signal from `deriveLivingStatus` (`./living.ts`), the related workstream.
    * NEVER hand-set independently — it exists so callers can store a derivation result without
    * a second independently-settable source of truth. Not wired into `currentEntityStatus` or any
    * publish pipeline in this pass (that overlaps live-release work owned elsewhere); see
@@ -140,7 +140,7 @@ export function currentEntityStatus(entity: CanonicalEntity): string | undefined
 }
 
 /**
- * Computes `livingStatusDerived` (black-book-mpfb) for a person entity from the closest existing
+ * Computes `livingStatusDerived` (the related workstream) for a person entity from the closest existing
  * signal in this model — `PersonFields.birthYear`/`deathYear` — via `deriveLivingStatus`
  * (`./living.ts`). Returns `undefined` for non-person kinds (living status is only meaningful for
  * persons). This is a pure computation, not wired into `currentEntityStatus` or any publish

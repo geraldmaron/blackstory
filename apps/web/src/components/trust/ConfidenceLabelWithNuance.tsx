@@ -3,8 +3,8 @@
  * links to methodology definitions for the evidence-grade vocabulary.
  */
 import React from 'react';
-import { Confidence } from '@blap/ui';
-import { FACT_CONFIDENCE_DEFINITIONS, type FactConfidenceGrade } from '@blap/domain/facts';
+import { Confidence } from '@repo/ui';
+import { FACT_CONFIDENCE_DEFINITIONS, type FactConfidenceGrade } from '@repo/domain/facts';
 import { humanizeToken, mapConfidenceToUiLevel } from '../facts/format';
 
 export type ConfidenceLabelWithNuanceProps = {
@@ -24,13 +24,13 @@ export function ConfidenceLabelWithNuance({
   return (
     <div>
       <Confidence level={level} label={label} />
-      <p className="bp-sans" style={{ margin: 'var(--bp-space-2) 0 0 0', color: 'var(--bp-ink-muted)' }}>
+      <p className="ds-sans" style={{ margin: 'var(--ds-space-2) 0 0 0', color: 'var(--ds-ink-muted)' }}>
         {FACT_CONFIDENCE_DEFINITIONS[confidence]}
         {' '}
         <a href={methodologyHref}>See grade definitions</a>.
       </p>
       {confidenceNote ? (
-        <p className="bp-sans" style={{ margin: 'var(--bp-space-2) 0 0 0' }}>
+        <p className="ds-sans" style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
           <strong>Nuance:</strong> {confidenceNote}
         </p>
       ) : null}

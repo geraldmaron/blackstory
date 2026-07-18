@@ -1,7 +1,7 @@
 /**
- * Data-driven marker radius for the `/explore` map (BB-099).
+ * Data-driven marker radius for the `/explore` map ().
  *
- * Formula (design-direction-v3.md "Map visual language (BB-099)", binding contract):
+ * Formula (design-direction-v3.md "Map visual language ()", binding contract):
  *
  *   radius = clamp(MIN, MAX, (BASE + log2(1 + evidenceCount) * EVIDENCE_COEFFICIENT) * modifier)
  *   modifier = 1.0 high | 0.9 medium | 0.8 low | 0.8 unrated
@@ -71,7 +71,7 @@ export function markerHaloRadius(evidenceCount: number, confidenceTier: Confiden
 }
 
 /**
- * County-proportionate zoom scaling (black-book-uda). With county hairlines on the canvas from
+ * County-proportionate zoom scaling (the related workstream). With county hairlines on the canvas from
  * `COUNTY_LINES_MIN_ZOOM` up (see `us-county-lines.ts`), a fixed-px radius reads wrong at both
  * ends: at the national frame a max-evidence marker blots out several counties at once, and at
  * locality zoom the same pixels under-read against the county polygon around them. The

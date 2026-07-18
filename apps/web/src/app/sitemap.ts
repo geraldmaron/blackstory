@@ -8,7 +8,7 @@ import { buildPublicSitemapEntries } from '../lib/seo/sitemap-builders';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { data: entities } = await listPublicEntityViews();
-  // Live projections don't carry revision timestamps yet (black-book-1fg9); an
+  // Live projections don't carry revision timestamps yet (the related workstream); an
   // empty string means "unknown", not "just generated" — treat it as absent so
   // the sitemap builder's own release-stamp fallback applies instead of emitting
   // an empty lastModified value.

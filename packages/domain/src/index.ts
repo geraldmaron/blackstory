@@ -3,7 +3,7 @@
  * claims confidence, append-only audit contracts, immutable
  * publication releases, and source adapter registry contracts.
  * Living-status and public precision rules come from
- * @blap/schemas (constitution). Firestore converters live in @blap/firebase;
+ * @repo/schemas (constitution). Firestore converters live in @repo/firebase;
  * Cloud SQL PostGIS are deferred (ADR-011).
  */
 export { asEntityId, asRelationshipId, asMergeId, asLocationId } from './ids.js';
@@ -96,7 +96,7 @@ export type { LivingStatus, LivingStatusDerivationSignal } from './living.js';
 export { ENTITY_KINDS, isEntityKind } from './entity-kinds.js';
 export type { EntityKind } from './entity-kinds.js';
 
-// Coarse entity classification (black-book-9mox) additive to `kind`, not wired into any
+// Coarse entity classification (the related workstream) additive to `kind`, not wired into any
 // publish/search/filter pipeline in this pass.
 export {
   ENTITY_CLASSES,
@@ -107,7 +107,7 @@ export {
 } from './entity-class.js';
 export type { EntityClass, EntityClassification } from './entity-class.js';
 
-// Unified temporal naming + external-identifier contracts (black-book-8bck), plus the
+// Unified temporal naming + external-identifier contracts (the related workstream), plus the
 // namespace/value uniqueness invariant. See ./naming.ts's module doc for scope rationale.
 export {
   ENTITY_NAME_TYPES,
@@ -232,8 +232,8 @@ export type {
   RelationshipResolutionState,
 } from './relationship.js';
 
-// publish invariants for EntityRelationship (BB black-book-hx8j) not yet wired into a publish
-// pipeline (release-builder bead black-book-1fg9 owns that wiring).
+// publish invariants for EntityRelationship (BB the related workstream) not yet wired into a publish
+// pipeline (release-builder bead the related workstream owns that wiring).
 export {
   assertRelationshipEndpointsResolvedForPublish,
   excludeSelfFromCorroboration,
@@ -248,7 +248,7 @@ export type {
 } from './relationship-publish.js';
 
 // history graph substrate containment-chain materialization, derived per-entity
-// adjacency per-decade all-time release views, succession-chain non-leakage, and 
+// adjacency per-decade all-time release views, succession-chain non-leakage, and
 // FactRecord subjects mirroring. Mirrors ./graph/index.js's own barrel EXCEPT
 // GRAPH_GOLD_FIXTURES, which stays internal-only (same convention as ./map/fixtures.js below).
 export {
@@ -598,7 +598,7 @@ export * from './relevance-feedback/index.js';
 // notability-gate-enforcing search-index builder. Mirrors ./graph/index.js's own barrel.
 export * from './search/index.js';
 
-// Controlled historical-theme taxonomy (black-book-s4hp): the registry, and the migration
+// Controlled historical-theme taxonomy (the related workstream): the registry, and the migration
 // helper that splits legacy `topicTags` into topicIds/mentionedEntityIds/keywords.
 export * from './taxonomy/index.js';
 

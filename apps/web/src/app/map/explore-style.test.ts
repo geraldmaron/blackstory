@@ -205,7 +205,7 @@ test('the point layer colors kinds and semantic tones from DIGNITY_PALETTE via m
   }
 });
 
-test('BB-099: the point layer\'s fill/stroke signature (the non-color glyph channel) is not identical across every kind', () => {
+test('the point layer\'s fill/stroke signature (the non-color glyph channel) is not identical across every kind', () => {
   const style = buildStyleFixture(true);
   const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
   const opacityOutputs = matchExpressionOutputs(pointLayer.paint?.['circle-opacity']);
@@ -217,7 +217,7 @@ test('BB-099: the point layer\'s fill/stroke signature (the non-color glyph chan
   assert.ok(new Set(strokeWidthOutputs).size > 1, 'circle-stroke-width must differ across kinds (thin vs. thick rim)');
 });
 
-test('BB-099: the institution "ring" glyph is mostly hollow with a thick Stone-sourced stroke', () => {
+test('the institution "ring" glyph is mostly hollow with a thick Stone-sourced stroke', () => {
   const style = buildStyleFixture(true);
   const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
   const opacityExpr = pointLayer.paint?.['circle-opacity'] as unknown[];
@@ -229,7 +229,7 @@ test('BB-099: the institution "ring" glyph is mostly hollow with a thick Stone-s
   assert.equal(strokeColorExpr[strokeInstitutionIndex + 1], DIGNITY_PALETTE.kindInstitutionStroke);
 });
 
-test('BB-099: the event kind gets a second, unfilled glyph-ring layer filtered to kind === "event"', () => {
+test('the event kind gets a second, unfilled glyph-ring layer filtered to kind === "event"', () => {
   const style = buildStyleFixture(true);
   const eventGlyphLayer = layerById(style, EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID);
   assert.equal(eventGlyphLayer.paint?.['circle-opacity'], 0, 'the event glyph ring must be unfilled (stroke only)');
@@ -240,7 +240,7 @@ test('BB-099: the event kind gets a second, unfilled glyph-ring layer filtered t
   assert.deepEqual(layerSpec.filter, ['all', ['!', ['has', 'point_count']], ['==', ['get', 'kind'], 'event']]);
 });
 
-test('BB-099: point and halo radii are literally markerRadiusExpression()/markerHaloRadiusExpression() (one source of truth with marker-size.ts)', () => {
+test('point and halo radii are literally markerRadiusExpression()/markerHaloRadiusExpression() (one source of truth with marker-size.ts)', () => {
   const style = buildStyleFixture(true);
   const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
   const haloLayer = layerById(style, EXPLORE_UNCLUSTERED_HALO_LAYER_ID);

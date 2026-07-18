@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { loadProductConstitution } from '@blap/schemas';
+import { loadProductConstitution } from '@repo/schemas';
 import {
   assertCanonicalClaimValid,
   assertCanonicalClaimMatchesCurrentVersion,

@@ -13,7 +13,7 @@ export type AdminFirebaseClient = {
   readonly env: ParsedFirebaseClientEnv;
 };
 
-const ADMIN_APP_NAME = 'black-book-admin';
+const ADMIN_APP_NAME = 'the related workstream';
 
 
 /**

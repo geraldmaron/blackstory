@@ -1,5 +1,5 @@
 /**
- * Unit tests for Data Pack v1 validation functions (black-book-ud5q): checksum mismatch,
+ * Unit tests for Data Pack v1 validation functions (the related workstream): checksum mismatch,
  * budget rejection, and license rejection. Signature verification round-trip lives in
  * ./manifest.test.ts alongside the sign/verify functions it exercises.
  */

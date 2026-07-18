@@ -13,7 +13,7 @@
  * Unlike MapFrame (schematic x/y percentage pins, kept for its existing
  * consumers), this component renders real geographic entities at their
  * public (redacted) precision, produced by `buildMapSource` in
- * `@blap/domain`.
+ * `@repo/domain`.
  */
 
 import React, { type  ReactNode  } from 'react';
@@ -60,9 +60,9 @@ export function MapExplorer({
   const heightStyle = typeof height === 'number' ? `${height}px` : height;
 
   return (
-    <figure className={cx('bp-map-explorer', className)}>
+    <figure className={cx('ds-map-explorer', className)}>
       <div
-        className="bp-map-explorer__canvas"
+        className="ds-map-explorer__canvas"
         style={{ height: heightStyle }}
         // The interactive canvas is a progressive-enhancement layer; the
         // legend beside it is the real accessible content (same data), so
@@ -71,17 +71,17 @@ export function MapExplorer({
       >
         {children}
       </div>
-      <div className="bp-map-explorer__legend">
-        <h3 className="bp-map-explorer__legend-title">{title}</h3>
-        {caption ? <p className="bp-map-explorer__caption">{caption}</p> : null}
-        <p className="bp-map-explorer__summary">
+      <div className="ds-map-explorer__legend">
+        <h3 className="ds-map-explorer__legend-title">{title}</h3>
+        {caption ? <p className="ds-map-explorer__caption">{caption}</p> : null}
+        <p className="ds-map-explorer__summary">
           {features.length} location{features.length === 1 ? '' : 's'} shown at public precision.
         </p>
-        <ul className="bp-map-explorer__feature-list">
+        <ul className="ds-map-explorer__feature-list">
           {features.map((feature) => (
             <li key={feature.id}>
-              <span className="bp-map-explorer__feature-name">{feature.displayName}</span>{' '}
-              <span className="bp-map-explorer__feature-meta">
+              <span className="ds-map-explorer__feature-name">{feature.displayName}</span>{' '}
+              <span className="ds-map-explorer__feature-meta">
                 ({feature.kind} · {feature.precision}
                 {feature.statePostalCode ? ` · ${feature.statePostalCode}` : ''})
               </span>
@@ -90,8 +90,8 @@ export function MapExplorer({
         </ul>
         {stateAggregates.length > 0 ? (
           <>
-            <h4 className="bp-map-explorer__legend-subtitle">State presence</h4>
-            <ul className="bp-map-explorer__state-list">
+            <h4 className="ds-map-explorer__legend-subtitle">State presence</h4>
+            <ul className="ds-map-explorer__state-list">
               {stateAggregates.map((state) => (
                 <li key={state.statePostalCode}>
                   {state.stateName}: {state.count}

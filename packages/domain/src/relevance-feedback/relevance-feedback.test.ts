@@ -311,7 +311,7 @@ test('analyzeDimensionDisagreement ranks dimensions by divergence between agreem
   assert.ok(summary[0]!.divergence >= summary[1]!.divergence);
 });
 
-test('analyzeQueryPackEffectiveness reuses BB-038 computeEffectivenessMetrics and ranks noisiest packs first', () => {
+test('analyzeQueryPackEffectiveness reuses  computeEffectivenessMetrics and ranks noisiest packs first', () => {
   const pack = buildQueryPack({
     id: 'pack-1',
     displayName: 'Test pack',
@@ -341,7 +341,7 @@ test('analyzeQueryPackEffectiveness reuses BB-038 computeEffectivenessMetrics an
   assert.equal(results[0]?.totalQueries, 100);
 });
 
-test('analyzeGraylistYield reports unavailable when no input is supplied (BB-073 gap) and computes yield when it is', () => {
+test('analyzeGraylistYield reports unavailable when no input is supplied ( gap) and computes yield when it is', () => {
   const unavailable = analyzeGraylistYield();
   assert.equal(unavailable.available, false);
 

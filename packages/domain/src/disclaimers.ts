@@ -138,7 +138,7 @@ export function assertDisclaimerRegistryComplete(): void {
 }
 
 // ---------------------------------------------------------------------------
-// Sensitivity presentation labels 
+// Sensitivity presentation labels
 // ---------------------------------------------------------------------------
 
 /**
@@ -193,7 +193,7 @@ export function assertNoIdentityAttributeFraming(text: string): void {
     if (normalized.includes(term)) {
       throw new Error(
         `Sensitivity presentation copy must never reference identity attributes (found "${term}") ` +
-          '— sensitivity flags are conduct-based only (BB-090 non-goal); this presentation layer ' +
+          '— sensitivity flags are conduct-based only (non-goal); this presentation layer ' +
           'must not undermine that.',
       );
     }

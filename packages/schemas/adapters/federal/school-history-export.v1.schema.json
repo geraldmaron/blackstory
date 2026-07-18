@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://blackbook.local/schemas/adapters/federal/school-history-export.v1.schema.json",
   "title": "SchoolHistoryExportRecord",
-  "description": "Fixture-only approved structured school-history export shape (BB-046).",
+  "description": "Fixture-only approved structured school-history export shape.",
   "type": "object",
   "additionalProperties": true,
   "required": ["stableIdentifier", "title", "curriculumTier"],

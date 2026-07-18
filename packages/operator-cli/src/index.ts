@@ -1,6 +1,6 @@
 
 /**
- * Public surface of @blap/operator-cli.
+ * Public surface of @repo/operator-cli.
  *
  * Every operation here PROPOSES data into the existing quarantine research-case
  * pipeline. Nothing exported from this package can approve, promote, or publish anything

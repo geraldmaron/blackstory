@@ -5,13 +5,13 @@
  * service connection, no mutation handlers.
  */
 import Link from 'next/link';
-import { computeRotRateBySourceClass, buildTrySearchingForSuggestion } from '@blap/domain';
-import { Citation } from '@blap/ui';
+import { computeRotRateBySourceClass, buildTrySearchingForSuggestion } from '@repo/domain';
+import { Citation } from '@repo/ui';
 import { CITATION_HEALTH_FIXTURES } from './fixtures';
 import './citation-health.css';
 
 export const metadata = {
-  title: 'Citation health — Black Book Admin',
+  title: 'Citation health — BlackStory Admin',
   description: 'Rot rate by source class and the reader-facing degraded-citation treatment.',
 };
 
@@ -25,8 +25,8 @@ export default function CitationHealthPage() {
   const driftedCitation = CITATION_HEALTH_FIXTURES.find((citation) => citation.linkStatus === 'drifted');
 
   return (
-    <main className="bb-container bb-prose citation-health-page">
-      <p className="citation-health-kicker">Operator dashboard tile · BB-083</p>
+    <main className="ds-container ds-prose citation-health-page">
+      <p className="citation-health-kicker">Operator dashboard tile · citation link health</p>
       <h1>Citation health</h1>
       <p>
         Rot rate per source class, from the weekly <code>citation-link-health-sweep</code>{' '}
@@ -42,7 +42,7 @@ export default function CitationHealthPage() {
         </div>
         <div className="citation-health-table-wrap">
           <table>
-            <caption className="bb-visually-hidden">Citation rot rate by source classification</caption>
+            <caption className="ds-visually-hidden">Citation rot rate by source classification</caption>
             <thead>
               <tr>
                 <th scope="col">Source class</th>
@@ -70,7 +70,7 @@ export default function CitationHealthPage() {
         <p className="citation-health-note">
           Rot rate also feeds an additive confidence-engine authority signal —{' '}
           <code>citationRotRateAuthoritySignal</code> in
-          packages/domain/src/confidence-engine/engine.ts — as a durability signal for BB-043,
+          packages/domain/src/confidence-engine/engine.ts — as a durability signal for confidence durability,
           without changing the existing weighted confidence computation.
         </p>
       </section>

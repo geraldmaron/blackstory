@@ -16,7 +16,7 @@ import {
   evaluateLivingStatus,
   loadProductConstitution,
   type ProductConstitution,
-} from '@blap/schemas';
+} from '@repo/schemas';
 
 export type PersonalDetailContribution = {
   readonly field: string;
@@ -52,7 +52,7 @@ export function assertNoCrossSourceProfileAggregation(
     if (sources.size > 1) {
       throw new Error(
         `Cross-source aggregation is prohibited for living-person personal-detail field ` +
-          `"${field}": sources [${[...sources].sort().join(', ')}] (BB-077 ugcLivingPersonRules)`,
+          `"${field}": sources [${[...sources].sort().join(', ')}] ( ugcLivingPersonRules)`,
       );
     }
   }
@@ -67,7 +67,7 @@ export type UgcLivingPersonClaimInput = {
 /**
  * Elevated verification threshold: a UGC-derived claim about a living (or unknown-status,
  * treated-as-living) person must clear the constitution's existing high-impact publish
- * threshold (claimConfidenceThresholds.highImpactPublish, currently 0.9 
+ * threshold (claimConfidenceThresholds.highImpactPublish, currently 0.9
  * packages/schemas/constitution/policy.v1.json) before it may advance.
  *
  * Decision: reuse the existing 0.9 high-impact tier rather than add a parallel threshold.
@@ -91,7 +91,7 @@ export function assertUgcLivingPersonClaimMayAdvance(
   if (!evaluation.passesPublishThreshold) {
     throw new Error(
       `UGC-derived claim about a living person requires confidence >= ${evaluation.threshold} ` +
-        `(${elevatedClaimClass} tier); got ${input.confidenceScore} (BB-077 ugcLivingPersonRules)`,
+        `(${elevatedClaimClass} tier); got ${input.confidenceScore} ( ugcLivingPersonRules)`,
     );
   }
 }
@@ -108,7 +108,7 @@ export type DeanonymizationAttempt = {
  *
  * Mirrors the fail-closed assertion pattern used by `assertPublicProjectionSafe`
  * (packages/security/src/serialize.ts). This module cannot import packages/security that
- * package depends on @blap/domain, so the reverse import would be circular so the
+ * package depends on @repo/domain, so the reverse import would be circular so the
  * pattern is reproduced here rather than shared.
  */
 export function assertNoDeanonymization(
@@ -121,7 +121,7 @@ export function assertNoDeanonymization(
   if (attempt.targetsPseudonymousOrAnonymousSubject) {
     throw new Error(
       `Deanonymization is prohibited: refusing to "${attempt.proposedAction}" against a ` +
-        'pseudonymous/anonymous UGC subject (BB-077 ugcLivingPersonRules)',
+        'pseudonymous/anonymous UGC subject ( ugcLivingPersonRules)',
     );
   }
 }

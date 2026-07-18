@@ -59,7 +59,7 @@ Do **not** purge. Cloud Tasks retains existing tasks and accepts new tasks while
 ## Validation
 
 ```bash
-pnpm --filter @blap/config test
-pnpm --filter @blap/config typecheck
+pnpm --filter @repo/config test
+pnpm --filter @repo/config typecheck
 node --conditions development --import tsx --test packages/config/src/kill-switches.test.ts
 ```

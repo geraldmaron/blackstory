@@ -22,7 +22,7 @@ import {
   type EntityStatusValue,
   type PublicRelatedEntry,
   type StatusHistoryEntry,
-} from '@blap/domain';
+} from '@repo/domain';
 
 // ---------------------------------------------------------------------------
 // Raw typed edges the only hand-authored graph input. `related` entries on

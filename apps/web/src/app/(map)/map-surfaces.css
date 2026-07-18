@@ -1,18 +1,18 @@
 /**
  * The persistent map canvas plate and the floating chrome contract both surfaces (`/`, `/explore`)
- * render over it (BB-098, ADR-017 "Route-group layout owns the canvas"). `.bp-map-stage`
- * (`MapStage.tsx`'s sole canvas mount) is a fixed, full-viewport plate; `.bp-hero-stage` (base
- * panel styling lives in shell.css) and `.bp-explore-stage` each establish their own stacking
+ * render over it (ADR-017 "Route-group layout owns the canvas"). `.ds-map-stage`
+ * (`MapStage.tsx`'s sole canvas mount) is a fixed, full-viewport plate; `.ds-hero-stage` (base
+ * panel styling lives in shell.css) and `.ds-explore-stage` each establish their own stacking
  * context above it so paint order never depends on DOM order vs. the canvas. The MapLibre style
  * plate follows light/dark via `colorScheme`; floating chrome uses theme-relative surface tokens
  * so instruments stay readable in either mode while the canvas stays perceptible beneath.
  */
 
-.bp-map-surface {
+.ds-map-surface {
   position: relative;
 }
 
-.bp-map-stage {
+.ds-map-stage {
   position: fixed;
   inset: 0;
   z-index: 0;
@@ -21,14 +21,14 @@
   background: #080606;
 }
 
-[data-theme='light'] .bp-map-stage {
+[data-theme='light'] .ds-map-stage {
   background: #e8e0d2;
 }
 
 /* MapLibre's own container (MapStage.tsx's `containerRef`) — never the plate above. MapLibre
    stamps `maplibregl-map` (position: relative, from maplibre-gl.css) onto whatever element it's
    given, so that class name must land here, one level in, not on the fixed plate. */
-.bp-map-stage__canvas {
+.ds-map-stage__canvas {
   width: 100%;
   height: 100%;
 }
@@ -36,46 +36,46 @@
 /* The stock zoom control re-dressed in the island language — ink glass, not
    white plastic. Hidden on touch-scale viewports: pinch zoom carries it, and
    top-right is island/instrument territory there. */
-.bp-map-stage .maplibregl-ctrl-top-right {
-  top: calc(var(--bp-island-offset) + var(--bp-island-height) + var(--bp-space-3));
+.ds-map-stage .maplibregl-ctrl-top-right {
+  top: calc(var(--ds-island-offset) + var(--ds-island-height) + var(--ds-space-3));
 }
 
-.bp-map-stage .maplibregl-ctrl-group {
-  border-radius: var(--bp-radius-full);
-  background: color-mix(in srgb, var(--bp-surface) 88%, transparent);
-  border: var(--bp-border-width) solid var(--bp-border);
+.ds-map-stage .maplibregl-ctrl-group {
+  border-radius: var(--ds-radius-full);
+  background: color-mix(in srgb, var(--ds-surface) 88%, transparent);
+  border: var(--ds-border-width) solid var(--ds-border);
   box-shadow: none;
   overflow: hidden;
 }
 
-.bp-map-stage .maplibregl-ctrl-group button {
+.ds-map-stage .maplibregl-ctrl-group button {
   background: transparent;
   border: 0;
 }
 
-.bp-map-stage .maplibregl-ctrl-group button + button {
-  border-top: var(--bp-border-width) solid var(--bp-border);
+.ds-map-stage .maplibregl-ctrl-group button + button {
+  border-top: var(--ds-border-width) solid var(--ds-border);
 }
 
 /* Recolor the +/− glyphs — paper on dark, ink on light. */
-.bp-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+.ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
-.bp-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+.ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
-[data-theme='light'] .bp-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+[data-theme='light'] .ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
-[data-theme='light'] .bp-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+[data-theme='light'] .ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 @media (max-width: 47.9375rem) {
-  .bp-map-stage .maplibregl-ctrl-top-right {
+  .ds-map-stage .maplibregl-ctrl-top-right {
     display: none;
   }
 }
@@ -85,7 +85,7 @@
    exists only so the marker is clickable/hoverable; it is pulled out of the tab order
    (MapStage.tsx sets tabIndex=-1) because the synchronized result list is this map's accessible
    parity surface. */
-.bp-map-entity-marker {
+.ds-map-entity-marker {
   width: 1.125rem;
   height: 1.125rem;
   padding: 0;
@@ -100,27 +100,27 @@
    plain `<main>` under this route group would be swallowed by the ink plate the moment the
    reader scrolls past the hero. Re-establish paint order and bring the theme canvas along as
    an opaque backdrop. */
-.bp-map-surface main {
+.ds-map-surface main {
   position: relative;
   z-index: 1;
-  background: var(--bp-canvas);
+  background: var(--ds-canvas);
 }
 
 /* —— Hero dissolve (ADR-017 "Transition contract") — token-driven, opacity/translate only, no
    layout thrash. Reduced motion still applies this class (React state is unconditional) but the
    duration collapses to an instant cut via the media query below. ——  */
-.bp-hero-stage--dissolving {
+.ds-hero-stage--dissolving {
   transition:
-    opacity var(--bp-duration-base) var(--bp-easing),
-    transform var(--bp-duration-base) var(--bp-easing);
+    opacity var(--ds-duration-base) var(--ds-easing),
+    transform var(--ds-duration-base) var(--ds-easing);
   opacity: 0;
   transform: translateY(-0.75rem);
   pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bp-hero-stage--dissolving {
-    /* Instant cut — no --bp-duration-instant token exists; base.css's global
+  .ds-hero-stage--dissolving {
+    /* Instant cut — no --ds-duration-instant token exists; base.css's global
        reduced-motion override also clamps this, kept explicit for clarity. */
     transition-duration: 0.01ms;
     transform: none;
@@ -130,19 +130,19 @@
 /* —— Explore stage: floating chrome over the shared canvas ——
  * The map fills the viewport behind this; every panel below is independently fixed-positioned
  * (a grid would force a layout the map doesn't need) so the canvas stays interactive everywhere
- * a panel isn't. Mobile-sheet consolidation of these panels is bead black-book-w72's scope, not
+ * a panel isn't. Mobile-sheet consolidation of these panels is bead the related workstream's scope, not
  * this one's — the stacked/simplified mobile rules here are a functional floor, not the final
  * polish pass. */
-.bp-explore-stage {
+.ds-explore-stage {
   position: relative;
   z-index: 1;
-  color: var(--bp-ink);
+  color: var(--ds-ink);
 }
 
-.bp-explore-stage__notice,
-.bp-explore-stage__seed-notice {
+.ds-explore-stage__notice,
+.ds-explore-stage__seed-notice {
   position: fixed;
-  top: calc(var(--bp-island-clearance) + var(--bp-space-2));
+  top: calc(var(--ds-island-clearance) + var(--ds-space-2));
   left: 50%;
   z-index: 3;
   width: min(92vw, 34rem);
@@ -150,131 +150,131 @@
 }
 
 /* Instruments follow the reader theme — glassy surface over the map plate. */
-.bp-explore-stage__filters {
+.ds-explore-stage__filters {
   position: fixed;
-  top: calc(var(--bp-island-clearance) + var(--bp-space-2));
-  left: var(--bp-space-4);
+  top: calc(var(--ds-island-clearance) + var(--ds-space-2));
+  left: var(--ds-space-4);
   z-index: 2;
   display: grid;
-  gap: var(--bp-space-2);
+  gap: var(--ds-space-2);
   width: min(88vw, 19rem);
-  max-height: calc(100svh - var(--bp-island-clearance) - var(--bp-space-8));
-  padding: var(--bp-space-3);
+  max-height: calc(100svh - var(--ds-island-clearance) - var(--ds-space-8));
+  padding: var(--ds-space-3);
   overflow-y: auto;
-  border: var(--bp-border-width) solid var(--bp-border);
+  border: var(--ds-border-width) solid var(--ds-border);
   /* Instruments read radius-md — radius-lg is reserved for sheets/dialogs. */
-  border-radius: var(--bp-radius-md);
-  background: color-mix(in srgb, var(--bp-surface) 88%, transparent);
+  border-radius: var(--ds-radius-md);
+  background: color-mix(in srgb, var(--ds-surface) 88%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 
 /* Copper marks the open instrument — an orientation moment (selected filter group), not a
    decorative wash; the closed registers stay muted ink. */
-.bp-explore-stage__filters details[open] > .bp-explore-stage__disclosure-summary,
-.bp-explore-stage__results details[open] > .bp-explore-stage__disclosure-summary {
-  color: var(--bp-accent);
+.ds-explore-stage__filters details[open] > .ds-explore-stage__disclosure-summary,
+.ds-explore-stage__results details[open] > .ds-explore-stage__disclosure-summary {
+  color: var(--ds-accent);
 }
 
-.bp-explore-stage__filters:focus-visible {
-  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
-  outline-offset: var(--bp-focus-offset);
+.ds-explore-stage__filters:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
 }
 
 /* Interactive control labels are sans caps (v5 typography law — mono is a
    data register; controls are chrome). */
-.bp-explore-stage__disclosure-summary {
+.ds-explore-stage__disclosure-summary {
   display: flex;
   align-items: center;
   min-height: 2.75rem;
   cursor: pointer;
-  font-family: var(--bp-font-sans);
+  font-family: var(--ds-font-sans);
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--bp-ink-muted);
+  color: var(--ds-ink-muted);
 }
 
-.bp-explore-stage__disclosure-summary:focus-visible {
-  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
-  outline-offset: var(--bp-focus-offset);
+.ds-explore-stage__disclosure-summary:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
 }
 
-.bp-explore-stage__toolbar {
+.ds-explore-stage__toolbar {
   display: grid;
-  gap: var(--bp-space-3);
-  padding-top: var(--bp-space-3);
-  border-top: var(--bp-border-width) solid var(--bp-border);
+  gap: var(--ds-space-3);
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-border);
 }
 
-.bp-explore-stage__results {
+.ds-explore-stage__results {
   position: fixed;
-  top: calc(var(--bp-island-clearance) + var(--bp-space-2));
-  right: var(--bp-space-4);
+  top: calc(var(--ds-island-clearance) + var(--ds-space-2));
+  right: var(--ds-space-4);
   z-index: 2;
   display: grid;
-  gap: var(--bp-space-3);
+  gap: var(--ds-space-3);
   width: min(88vw, 21rem);
-  max-height: calc(100svh - var(--bp-island-clearance) - var(--bp-space-8));
-  padding: var(--bp-space-4);
+  max-height: calc(100svh - var(--ds-island-clearance) - var(--ds-space-8));
+  padding: var(--ds-space-4);
   overflow-y: auto;
-  border: var(--bp-border-width) solid var(--bp-border);
-  border-radius: var(--bp-radius-md);
-  background: color-mix(in srgb, var(--bp-surface) 88%, transparent);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: color-mix(in srgb, var(--ds-surface) 88%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
-  transition: opacity var(--bp-duration-fast) var(--bp-easing);
+  transition: opacity var(--ds-duration-fast) var(--ds-easing);
 }
 
 /* When a record is open, quiet the list rail so the spotlight owns attention. */
-.bp-explore-stage__results--dimmed {
+.ds-explore-stage__results--dimmed {
   opacity: 0.42;
   pointer-events: none;
 }
 
 /* Centered (desktop) / bottom-sheet (mobile) narrative — copper marks the orientation moment. */
-.bp-explore-stage__spotlight {
+.ds-explore-stage__spotlight {
   position: fixed;
   inset: 0;
   z-index: 4;
   display: grid;
   place-items: center;
-  padding: var(--bp-space-4);
+  padding: var(--ds-space-4);
   pointer-events: none;
 }
 
-.bp-explore-stage__spotlight-scrim {
+.ds-explore-stage__spotlight-scrim {
   position: absolute;
   inset: 0;
   margin: 0;
   padding: 0;
   border: 0;
-  background: color-mix(in srgb, var(--bp-fixed-ink) 42%, transparent);
+  background: color-mix(in srgb, var(--ds-fixed-ink) 42%, transparent);
   cursor: pointer;
   pointer-events: auto;
 }
 
-.bp-explore-stage__spotlight-panel {
+.ds-explore-stage__spotlight-panel {
   position: relative;
   z-index: 1;
   width: min(92vw, 28rem);
   max-height: min(78svh, 40rem);
-  padding: var(--bp-space-5);
+  padding: var(--ds-space-5);
   overflow-y: auto;
-  border: var(--bp-border-width) solid var(--bp-border);
-  border-left: 3px solid var(--bp-accent);
-  border-radius: var(--bp-radius-lg);
-  background: var(--bp-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-left: 3px solid var(--ds-accent);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-surface);
   pointer-events: auto;
 }
 
-.bp-explore-stage__spotlight-panel:focus-within {
-  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
-  outline-offset: var(--bp-focus-offset);
+.ds-explore-stage__spotlight-panel:focus-within {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
 }
 
-.bp-explore-stage__results .bp-result-list__link--button {
+.ds-explore-stage__results .ds-result-list__link--button {
   display: grid;
   gap: inherit;
   width: 100%;
@@ -286,29 +286,29 @@
   cursor: pointer;
 }
 
-.bp-explore-stage__results .bp-result-list__item--selected .bp-result-list__link {
-  color: var(--bp-ink);
+.ds-explore-stage__results .ds-result-list__item--selected .ds-result-list__link {
+  color: var(--ds-ink);
 }
 
-.bp-explore-stage__results .bp-result-list__item--selected .bp-result-list__title {
-  color: var(--bp-accent);
+.ds-explore-stage__results .ds-result-list__item--selected .ds-result-list__title {
+  color: var(--ds-accent);
 }
 
 /* Result rows tighten INSIDE the floating panel only — the standalone /search page keeps the
    roomier document rhythm. Two-line summary clamp: with a hundred-record release, unclamped
    summaries turn the panel into a wall; the full text lives one click away on the record. */
-.bp-explore-stage__results .bp-result-list__link {
-  gap: var(--bp-space-2);
-  padding: var(--bp-space-4) 0;
+.ds-explore-stage__results .ds-result-list__link {
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-4) 0;
 }
 
-.bp-explore-stage__results .bp-result-list__title {
+.ds-explore-stage__results .ds-result-list__title {
   font-size: 0.9375rem;
   font-weight: 500;
   line-height: 1.35;
 }
 
-.bp-explore-stage__results .bp-result-list__summary {
+.ds-explore-stage__results .ds-result-list__summary {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -317,34 +317,34 @@
   line-height: 1.5;
 }
 
-.bp-explore-stage__results .bp-result-list__meta {
-  margin-top: var(--bp-space-3);
+.ds-explore-stage__results .ds-result-list__meta {
+  margin-top: var(--ds-space-3);
 }
 
-.bp-result-list__meta--labeled {
+.ds-result-list__meta--labeled {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--bp-space-2) var(--bp-space-3);
+  gap: var(--ds-space-2) var(--ds-space-3);
   margin: 0;
 }
 
-.bp-result-meta {
+.ds-result-meta {
   display: grid;
   gap: 0.15rem;
   min-width: 0;
 }
 
-.bp-result-meta dt {
+.ds-result-meta dt {
   margin: 0;
-  font-family: var(--bp-font-mono);
+  font-family: var(--ds-font-mono);
   font-size: 0.625rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--bp-ink-subtle);
+  color: var(--ds-ink-subtle);
 }
 
-.bp-result-meta dd {
+.ds-result-meta dd {
   margin: 0;
   min-width: 0;
   font-size: 0.75rem;
@@ -353,70 +353,70 @@
 }
 
 @media (min-width: 22rem) {
-  .bp-result-list__meta--labeled {
+  .ds-result-list__meta--labeled {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-.bp-explore-stage__legend {
+.ds-explore-stage__legend {
   position: fixed;
-  bottom: var(--bp-space-4);
-  left: var(--bp-space-4);
+  bottom: var(--ds-space-4);
+  left: var(--ds-space-4);
   z-index: 2;
   width: min(88vw, 20rem);
   max-height: min(50vh, 28rem);
-  padding: var(--bp-space-2) var(--bp-space-3);
+  padding: var(--ds-space-2) var(--ds-space-3);
   overflow-y: auto;
-  border: var(--bp-border-width) solid var(--bp-border);
-  border-radius: var(--bp-radius-md);
-  background: color-mix(in srgb, var(--bp-surface) 88%, transparent);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: color-mix(in srgb, var(--ds-surface) 88%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 
 @media (max-width: 64rem) {
-  .bp-explore-stage__filters,
-  .bp-explore-stage__results {
+  .ds-explore-stage__filters,
+  .ds-explore-stage__results {
     max-height: 40vh;
   }
 
-  .bp-explore-stage__results {
+  .ds-explore-stage__results {
     top: auto;
-    bottom: var(--bp-space-4);
-    right: var(--bp-space-4);
+    bottom: var(--ds-space-4);
+    right: var(--ds-space-4);
   }
 
-  .bp-explore-stage__results--dimmed {
+  .ds-explore-stage__results--dimmed {
     opacity: 0;
   }
 
-  .bp-explore-stage__spotlight {
+  .ds-explore-stage__spotlight {
     place-items: end center;
     padding: 0;
   }
 
-  .bp-explore-stage__spotlight-panel {
+  .ds-explore-stage__spotlight-panel {
     width: 100%;
     max-width: none;
     max-height: min(72svh, 36rem);
-    border-radius: var(--bp-radius-lg) var(--bp-radius-lg) 0 0;
-    border-left-width: var(--bp-border-width);
-    border-top: 3px solid var(--bp-accent);
+    border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
+    border-left-width: var(--ds-border-width);
+    border-top: 3px solid var(--ds-accent);
   }
 
-  .bp-explore-stage__legend {
+  .ds-explore-stage__legend {
     display: none;
   }
 }
 
 @media (max-width: 39.9375rem) {
-  .bp-explore-stage__filters {
-    left: var(--bp-space-3);
-    width: calc(100vw - var(--bp-space-3) * 2);
+  .ds-explore-stage__filters {
+    left: var(--ds-space-3);
+    width: calc(100vw - var(--ds-space-3) * 2);
   }
 
-  .bp-explore-stage__results {
-    right: var(--bp-space-3);
-    width: calc(100vw - var(--bp-space-3) * 2);
+  .ds-explore-stage__results {
+    right: var(--ds-space-3);
+    width: calc(100vw - var(--ds-space-3) * 2);
   }
 }

@@ -1,5 +1,5 @@
 /**
- * Verification policy model (black-book-isqd): governs how often a published claim/relationship
+ * Verification policy model (the related workstream): governs how often a published claim/relationship
  * (identified by entityClass + predicate) must be independently re-checked, and what source(s)
  * count as authoritative for that check. Firestore schema mirror lives at
  * `packages/firebase/src/firestore/types.ts` (`verificationPolicySchema`,

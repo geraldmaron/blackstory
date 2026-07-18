@@ -21,7 +21,7 @@ Fixture-only adapters for five federal and public-history source families:
 ## Validation
 
 ```bash
-pnpm --filter @blap/domain test
+pnpm --filter @repo/domain test
 cd workers/research && uv run pytest src/black_book_research/adapters/federal -q
 ```
 

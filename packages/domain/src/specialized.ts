@@ -5,7 +5,7 @@ import type { LivingStatus } from './living.js';
 
 export type PersonFields = {
   /**
-   * @deprecated black-book-mpfb: redundant with `CanonicalEntity.livingStatus` (the top-level
+   * @deprecated the related workstream: redundant with `CanonicalEntity.livingStatus` (the top-level
    * field), which is the one actually wired into `currentEntityStatus`, map rendering
    * (`map/map-source.ts`), and the living-person redaction/serialization compliance lane
    * (`packages/security/src/redaction.ts`, `serialize.ts`) — a repo-wide call-site audit found

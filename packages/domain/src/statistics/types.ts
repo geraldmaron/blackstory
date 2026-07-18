@@ -1,5 +1,5 @@
 /**
- * Statistical data storage model (black-book-cqto).
+ * Statistical data storage model (the related workstream).
  *
  * An external architecture review found that Census/ACS/FBI-hate-crime/Opportunity-Atlas-style
  * statistics were not modeled as a distinct concept from ordinary entity claims — folding them

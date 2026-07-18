@@ -6,7 +6,7 @@ import { mkdirSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import { buildReleaseCatalogArtifacts, writeReleaseCatalogArtifactsToDir } from '@blap/firebase';
+import { buildReleaseCatalogArtifacts, writeReleaseCatalogArtifactsToDir } from '@repo/firebase';
 import { mapFirestoreSearchIndexDoc } from './map-search-index.js';
 import {
   fetchReleaseEntitiesListArtifact,

@@ -1,4 +1,4 @@
-// blackbook-prod is referenced, never created or recreated (ADR-012: retained black-book-efaaf).
+// BlackStory prod (black-book-efaaf) is referenced, never created or recreated (ADR-012).
 // A data source needs no create permission and does not appear in `terraform plan` as a change;
 // it only resolves during `terraform plan`/`apply` (not `validate`, which needs no live credentials).
 data "google_project" "prod" {
@@ -21,21 +21,21 @@ data "google_project" "internal" {
   project_id = var.internal_project_id
 }
 
-// blackbook-staging and blackbook-internal are new projects. Gated behind create_new_projects
+// repo-staging and repo-internal are new projects. Gated behind create_new_projects
 // (default false) so a bare plan/apply cannot provision live projects. org_id is optional to
 // match the documented "no GCP org yet" situation (see README.md and ../../wif/terraform).
 resource "google_project" "staging" {
   count = var.create_new_projects ? 1 : 0
 
   project_id      = var.staging_project_id
-  name            = "blackbook-staging"
+  name            = "BlackStory Staging"
   org_id          = var.org_id != "" ? var.org_id : null
   billing_account = var.billing_account != "" ? var.billing_account : null
 
   labels = {
-    "adr"          = "adr-012"
-    "bb078-target" = "true"
-    "tier"         = "nonprod"
+    "adr"     = "adr-012"
+    "product" = "blackstory"
+    "tier"    = "nonprod"
   }
 }
 
@@ -43,13 +43,13 @@ resource "google_project" "internal" {
   count = var.create_new_projects ? 1 : 0
 
   project_id      = var.internal_project_id
-  name            = "blackbook-internal"
+  name            = "BlackStory Internal"
   org_id          = var.org_id != "" ? var.org_id : null
   billing_account = var.billing_account != "" ? var.billing_account : null
 
   labels = {
-    "adr"          = "adr-012"
-    "bb078-target" = "true"
-    "tier"         = "internal"
+    "adr"     = "adr-012"
+    "product" = "blackstory"
+    "tier"    = "internal"
   }
 }

@@ -12,7 +12,7 @@ import {
   type AppCheckTelemetry,
   type AppCheckVerifier,
   type EnvironmentLike,
-} from '@blap/firebase';
+} from '@repo/firebase';
 
 export type SubmissionsApiAppCheckOptions = {
   readonly environment?: EnvironmentLike;

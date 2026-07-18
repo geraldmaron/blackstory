@@ -1,6 +1,6 @@
 /**
  * Server-only rate-limit guard for the public "submit a lead" route. Reuses the
- * exact shared evaluator from `@blap/security` `createRateLimitEvaluator`,
+ * exact shared evaluator from `@repo/security` `createRateLimitEvaluator`,
  * `buildRateLimitKey`, `aggregateDistributedRisk`, `formatRateLimitResponse`,
  * `releaseConcurrency` — the same primitives `apps/api-submissions/src/rate-limits.ts` uses for
  * every other public submissions-style mutation. This is deliberately not a new rate-limit
@@ -19,7 +19,7 @@ import {
   type RateLimitStore,
   type RateLimitSubject,
   type RiskSignal,
-} from '@blap/security';
+} from '@repo/security';
 
 const ENDPOINT_CLASS: EndpointClass = 'corrections';
 

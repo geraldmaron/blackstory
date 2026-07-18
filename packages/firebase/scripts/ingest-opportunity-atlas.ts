@@ -2,7 +2,7 @@
  * Ingest the Opportunity Atlas tract outcomes (tract_outcomes_early.csv) —
  * raw artifact to Storage, curated starter subset to Firestore `opportunityAtlasTracts`.
  *
- * Source registry entry: @blap/domain external-data-sources.ts `opportunity-atlas-tract-outcomes`
+ * Source registry entry: @repo/domain external-data-sources.ts `opportunity-atlas-tract-outcomes`
  * (attribution required). 2010 tract geography (`tractVintage: '2010'`).
  *
  * Reliability screening: an outcome cell is retained only when its matching `*_n` count is
@@ -10,11 +10,11 @@
  * are skipped entirely (counted in the summary) — publishing pure noise helps no one.
  *
  * Requires:
- *   BLAP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1 to validate without writing)
+ *   APP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1 to validate without writing)
  *   Application Default Credentials with Storage + Firestore write on black-book-efaaf
  *
  * Usage (from repo root):
- *   BLAP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
+ *   APP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
  *     packages/firebase/scripts/ingest-opportunity-atlas.ts \
  *     --file=/path/to/tract_outcomes_early.csv [--skip-storage-upload]
  */
@@ -24,13 +24,13 @@ import { createInterface } from 'node:readline';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
-import { getExternalDataSource, sha256Json } from '@blap/domain';
+import { getExternalDataSource, sha256Json } from '@repo/domain';
 import { idempotentBatchUpsert, loadExistingHashes } from '../src/external/batch-upsert.ts';
 import { recordDatasetAcquisition } from '../src/external/capture.ts';
 import { opportunityAtlasTractSchema, type OpportunityAtlasTractDoc } from '../src/external/schema.ts';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
-const ALLOW = process.env.BLAP_FIREBASE_ALLOW_PRODUCTION === '1';
+const ALLOW = process.env.APP_FIREBASE_ALLOW_PRODUCTION === '1';
 const DRY_RUN = process.env.DRY_RUN === '1';
 /** Private archive bucket (uniform access, public-access prevention enforced; created
  * 2026-07-18) — never the public-media bucket. */
@@ -85,7 +85,7 @@ async function sha256File(path: string): Promise<string> {
 
 async function main(): Promise<void> {
   if (!ALLOW && !DRY_RUN) {
-    console.error('Refusing to write: set BLAP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1)');
+    console.error('Refusing to write: set APP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1)');
     process.exit(2);
   }
   const filePath = arg('file');

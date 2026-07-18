@@ -1,5 +1,5 @@
 /**
- * Coarse entity classification (black-book-9mox).
+ * Coarse entity classification (the related workstream).
  *
  * `CanonicalEntity.kind` (`./entity-kinds.ts`) mixes broad classes and narrow subtypes: `school`,
  * `organization`, and `institution` overlap ambiguously (a historically Black church could

@@ -116,7 +116,7 @@ test('computeComposite never accepts a layer signal whose layerId mismatches its
   );
 });
 
-test('recalculateComposite stamps BB-043 audit metadata with fingerprints and recalculation reasons', () => {
+test('recalculateComposite stamps  audit metadata with fingerprints and recalculation reasons', () => {
   const layers: CompositeLayerInputs = {
     documentedEvents: layerSignal('documented_events', 0.8),
   };

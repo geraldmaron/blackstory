@@ -81,7 +81,7 @@ function commonCrawlRegistryEntry(): SourceRegistryEntry {
 // registry gate
 // ---------------------------------------------------------------------------------------------
 
-test('Common Crawl adapter starts disabled by default in the BB-037 registry', () => {
+test('Common Crawl adapter starts disabled by default in the  registry', () => {
   const store = createInMemorySourceRegistry();
   const contract = createCommonCrawlAdapterContract();
   registerSource(store, {
@@ -335,7 +335,7 @@ test('fetchCommonCrawlCdx rejects a response whose content type is outside the a
 // Pipeline integration: Wayback capture gate -> ingestApiCandidate
 // ---------------------------------------------------------------------------------------------
 
-test('ingestCommonCrawlCandidatesThroughPipeline routes candidates through the Wayback capture gate before BB-039 ingestion', async () => {
+test('ingestCommonCrawlCandidatesThroughPipeline routes candidates through the Wayback capture gate before  ingestion', async () => {
   const entry = commonCrawlRegistryEntry();
   const pack = loadPack();
   const batch = parseCdxResponse(loadFixtureText('cdx-response.ndjson'));

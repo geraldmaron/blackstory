@@ -1,6 +1,6 @@
 /**
  * Deterministic reviewer-log accumulation, tallying, and agreement-threshold routing for
- * consensus review. Every function here is pure: no clocks, no randomness, no I/O 
+ * consensus review. Every function here is pure: no clocks, no randomness, no I/O
  * callers supply `now` and persist the returned values themselves.
  */
 import {

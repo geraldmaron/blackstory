@@ -35,7 +35,7 @@ const BASE: Pick<EntityRelationship, 'id' | 'fromEntityId' | 'toEntityId' | 'evi
 // vocabulary extension + documented direction/temporal semantics.
 // ---------------------------------------------------------------------------
 
-test('RELATIONSHIP_TYPES carries the full BB-092 vocabulary extension', () => {
+test('RELATIONSHIP_TYPES carries the full vocabulary extension', () => {
   for (const type of [
     'caused',
     'enabled',
@@ -71,7 +71,7 @@ test('authored is documented as distinct from founded (creation attribution vs o
   assert.match(RELATIONSHIP_TYPE_SEMANTICS.founded.direction, /Reserved for/);
 });
 
-test('assertRelationshipHasEvidence still holds for every BB-092 edge type, new and pre-existing', () => {
+test('assertRelationshipHasEvidence still holds for every edge type, new and pre-existing', () => {
   for (const type of RELATIONSHIP_TYPES) {
     assert.throws(() => assertRelationshipHasEvidence({ evidenceIds: [] }));
     assert.doesNotThrow(() => assertRelationshipHasEvidence({ evidenceIds: ['ev-1'] }));
@@ -205,7 +205,7 @@ test('guardrail REJECTS a systemic_consensus claim missing a documented consensu
   assert.equal(blank.allowed, false);
 });
 
-test('guardrail is a no-op (always allowed) for every non-caused/enabled type, including the other five BB-092 additions', () => {
+test('guardrail is a no-op (always allowed) for every non-caused/enabled type, including the other five additions', () => {
   const nonCausalTypes = RELATIONSHIP_TYPES.filter((t) => !isCausalAssertionRelationshipType(t));
   for (const type of nonCausalTypes) {
     assert.deepEqual(

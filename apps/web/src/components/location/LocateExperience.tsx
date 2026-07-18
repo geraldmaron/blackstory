@@ -6,7 +6,7 @@
  * (always-available manual fallback) to `../../lib/geocode/locate-client.ts`'s `/locate/api`
  * fetch wrapper, and renders the outcome through `LocationResolutionPanel`. Kept out of
  * `app/locate/page.tsx` because that file is a Server Component (Next's route-file conventions
- * aside, this feature genuinely needs client state for the fetch/loading/result lifecycle) 
+ * aside, this feature genuinely needs client state for the fetch/loading/result lifecycle)
  * `page.tsx` renders this component as its one client island.
  *
  * Every outcome resolved, manual-place-search fallback, rate limited, or errored is recorded
@@ -85,13 +85,13 @@ export function LocateExperience() {
   const loading = state.status === 'loading';
 
   return (
-    <div className="bp-stack" style={{ gap: 'var(--bp-space-4)' }}>
+    <div className="ds-stack" style={{ gap: 'var(--ds-space-4)' }}>
       <LocationConsentButton onResolved={handleCoordinates} onDenied={handleDenied} disabled={loading} />
 
       <ManualPlaceSearchForm onSubmit={handleAddress} disabled={loading} />
 
       <div id={statusRegionId} aria-live="polite" role="status">
-        {loading ? <p className="bp-sans">Looking up jurisdiction…</p> : null}
+        {loading ? <p className="ds-sans">Looking up jurisdiction…</p> : null}
         {state.status === 'done' ? <LocationResolutionPanel result={state.result} /> : null}
       </div>
     </div>

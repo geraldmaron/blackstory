@@ -4,4 +4,4 @@ connectorId: 'public-read'
 generate:
   adminNodeSdk:
     outputDir: '../../../../../../packages/data-access/generated/public-read'
-    package: '@blap/sql-connect-public-read'
+    package: '@repo/sql-connect-public-read'

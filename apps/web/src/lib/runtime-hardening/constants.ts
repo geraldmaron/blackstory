@@ -122,8 +122,8 @@ export const APP_HOSTING_RUN_LIMITS = {
 const IMPORT_OR_REQUIRE = String.raw`(?:from\s+|import\s*\(\s*|require\s*\(\s*)['"][^'"]*`;
 
 export const FORBIDDEN_PUBLIC_RENDER_IMPORTS = [
-  new RegExp(`${IMPORT_OR_REQUIRE}@blap/data-access`),
-  new RegExp(`${IMPORT_OR_REQUIRE}@blap/firebase/admin`),
+  new RegExp(`${IMPORT_OR_REQUIRE}@repo/data-access`),
+  new RegExp(`${IMPORT_OR_REQUIRE}@repo/firebase/admin`),
   new RegExp(`${IMPORT_OR_REQUIRE}firebase-admin`),
   new RegExp(`${IMPORT_OR_REQUIRE}[^'"]*/postgres`),
   new RegExp(`${IMPORT_OR_REQUIRE}pg['"]`),

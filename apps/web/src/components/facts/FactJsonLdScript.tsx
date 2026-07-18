@@ -7,7 +7,7 @@ import {
   assertNeverClaimReview,
   buildFactArticleJsonLd,
   type FactRecord,
-} from '@blap/domain/facts';
+} from '@repo/domain/facts';
 
 export type FactJsonLdScriptProps = {
   readonly fact: FactRecord;

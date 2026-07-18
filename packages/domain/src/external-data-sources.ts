@@ -268,7 +268,7 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     cadence: 'static',
     registryState: 'disabled',
     notes:
-      'Handled by the exclusion-infrastructure lane (BB-082) with dignity rules; registry entry ' +
+      'Handled by the exclusion-infrastructure lane () with dignity rules; registry entry ' +
       'here records acquisition metadata only.',
   },
   {

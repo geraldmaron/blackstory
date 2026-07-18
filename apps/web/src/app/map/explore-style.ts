@@ -4,11 +4,11 @@
  * style), so this module has zero runtime WebGL dependency and is safe to unit test in plain Node.
  *
  * Every color comes from `../../lib/map-experience/dignity-style.ts` (which reuses
- * `@blap/ui`'s brand palette). This file introduces no new hues, so the dignity rule
+ * `@repo/ui`'s brand palette). This file introduces no new hues, so the dignity rule
  * (no red violence markers, no crime-heat) holds at the render layer, not only in tokens.
  */
 import type { ExpressionSpecification, StyleSpecification } from 'maplibre-gl';
-import { brandPalette } from '@blap/ui';
+import { brandPalette } from '@repo/ui';
 import {
   DENSITY_TIER_FILL,
   DIGNITY_PALETTE,
@@ -75,7 +75,7 @@ export {
 
 /**
  * Approximate meters-per-pixel at a given zoom under spherical Web Mercator, ignoring latitude
- * distortion (the same order of approximation this repo already uses for state bounding boxes 
+ * distortion (the same order of approximation this repo already uses for state bounding boxes
  * see `packages/domain/src/map/us-geography.ts`'s module doc "good enough for national-zoom …
  * never survey-grade"). Expressed as a MapLibre style expression so the radius-affordance circle
  * scales correctly as the user zooms, per-feature, from each point's own `radiusMeters` property.
@@ -91,7 +91,7 @@ function _radiusMetersToPixelsExpression(): ExpressionSpecification {
 }
 
 /**
- * BB-099 kind -> shade + glyph paint. Every entity kind gets a `DIGNITY_PALETTE` shade (via
+ * kind -> shade + glyph paint. Every entity kind gets a `DIGNITY_PALETTE` shade (via
  * `kind-encoding.ts`, so color is one source of truth) AND a non-color fill/stroke signature
  * (WCAG 1.4.1 color is never the only signal), keyed by glyph identity rather than kind so two
  * kinds that ever shared a glyph would automatically share a signature too:
@@ -115,7 +115,7 @@ type KindGlyphPaintSignature = {
 
 const GLYPH_PAINT_SIGNATURE: Readonly<Record<string, KindGlyphPaintSignature>> = {
   // Solid-fill kinds sit at 0.82, not 1: with county hairlines beneath the marker stack
-  // (black-book-uda), a fully opaque disc erases the boundary context it sits on — slight
+  // (the related workstream), a fully opaque disc erases the boundary context it sits on — slight
   // transparency keeps the geography legible through the marker without weakening the
   // kind-shade read. `ring` stays far lower; mostly-hollow IS its glyph signature.
   circle: { opacity: 0.82, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
@@ -341,7 +341,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
-        // County hairlines (black-book-uda): the fainter tier of the same boundary system as
+        // County hairlines (the related workstream): the fainter tier of the same boundary system as
         // the state bounds line below it in this array — same Archive Paper ink, thinner and
         // more transparent, fading in from `minzoom` so the national frame stays clean. Sits
         // BELOW state bounds (so state borders keep reading stronger) and far below the entity
@@ -450,7 +450,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
         paint: {
-          // BB-099: data-driven radius (marker-size.ts's formula + the fixed halo offset), one
+          // data-driven radius (marker-size.ts's formula + the fixed halo offset), one
           // source of truth with the point layer below. Halo color stays neutral/decorative
           // (not kind-carrying) kind is fully carried by the point layer's shade + glyph
           // signature and, for `event`, the extra glyph layer below.
@@ -465,7 +465,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
         paint: {
-          // BB-099: size from marker-size.ts (evidenceCount + confidenceTier, clamped [6, 16]);
+          // size from marker-size.ts (evidenceCount + confidenceTier, clamped [6, 16]);
           // color + fill/stroke signature from kind-encoding.ts via DIGNITY_PALETTE (color marks
           // kind only; the fill/stroke signature is the non-color channel WCAG 1.4.1 requires).
           'circle-radius': markerRadiusExpression(),
@@ -476,7 +476,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
-        // BB-099: the `event` kind's "diamond" glyph a second, unfilled ring offset around the
+        // the `event` kind's "diamond" glyph a second, unfilled ring offset around the
         // point marker (see the `GLYPH_PAINT_SIGNATURE` doc comment above for why this
         // approximates rather than draws literal diamond geometry). Filtered to `event` only;
         // every other kind's glyph is fully carried by the point layer above.

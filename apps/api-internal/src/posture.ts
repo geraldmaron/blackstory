@@ -6,7 +6,7 @@ import {
   assertOperationAllowed,
   type AuthMode,
   type OperationId,
-} from '@blap/config';
+} from '@repo/config';
 
 export const SURFACE_ID = 'api-internal' as const;
 

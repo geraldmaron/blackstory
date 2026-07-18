@@ -1,9 +1,9 @@
 /**
- * Controlled historical-theme taxonomy (black-book-s4hp).
+ * Controlled historical-theme taxonomy (the related workstream).
  *
  * This registry is the ONLY vocabulary that may ever be surfaced as a facet/filter option.
  * It replaces the interim `TOPIC_TAG_ALLOWLIST` (packages/domain/src/search/topic-allowlist.ts,
- * black-book-8n8) as the source of truth for what counts as a legitimate "theme". The allowlist
+ * the related workstream) as the source of truth for what counts as a legitimate "theme". The allowlist
  * remains in place for backward compatibility (see that file's updated header) but new code
  * should read from here.
  *
@@ -249,7 +249,7 @@ export function getTopicLabel(id: string): string | undefined {
  * Legacy `topicTags` values that look like an organization acronym rather than a theme.
  * Used by the migration in `split-topic-tags.ts` to route these into `mentionedEntityIds`
  * as raw string placeholder ids. Real resolution against canonical entity ids is
- * black-book-8bck's job — this only prevents them from being mis-filed as topics.
+ * the related workstream's job — this only prevents them from being mis-filed as topics.
  */
 export const ORGANIZATION_SHAPED_LEGACY_TAGS: ReadonlySet<string> = new Set([
   'cofo',
@@ -264,7 +264,7 @@ export const ORGANIZATION_SHAPED_LEGACY_TAGS: ReadonlySet<string> = new Set([
  * Legacy `topicTags` values that name one specific event, campaign, group, or law rather than a
  * recurring theme. Used by the migration in `split-topic-tags.ts` to route these into
  * `mentionedEntityIds` as raw string placeholder ids (same caveat as above: no real
- * entity-resolution here, that's black-book-8bck).
+ * entity-resolution here, that's the related workstream).
  */
 export const EVENT_OR_LAW_SHAPED_LEGACY_TAGS: ReadonlySet<string> = new Set([
   'birmingham-campaign',

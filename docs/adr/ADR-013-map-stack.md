@@ -11,7 +11,7 @@
 | Aspect | Today (this bead) | Target (BB-051 and beyond) |
 |--------|--------------------|------------------------------|
 | Map library | MapLibre GL JS wired into a demo route (`apps/web/src/app/map`) | Same library, full national map experience (BB-051) |
-| Map source build | Pure, tested `buildMapSource` in `@blap/domain`, run once against fixtures by a script | Called by the release-activation pipeline on every publish (see "Release-coupled build" below) |
+| Map source build | Pure, tested `buildMapSource` in `@repo/domain`, run once against fixtures by a script | Called by the release-activation pipeline on every publish (see "Release-coupled build" below) |
 | Basemap | Demo-stage: MapLibre background + line/circle layers only, no tile source, zero network requests | Self-hosted Protomaps PMTiles dark/desaturated style served from Firebase Hosting/CDN |
 | Data volume | 9 fixture entities, flat GeoJSON | Everything-active population; flat GeoJSON until volume demands vector tiles |
 | County boundaries | Not vendored; county aggregate only populates from upstream jurisdiction hints | Real polygon-based county attribution if/when justified |
@@ -71,9 +71,9 @@ The demo route's style (`apps/web/src/app/map/dark-archive-style.ts`) is a MapLi
 - state-level presence/density aggregates (count bucketed by approximate state, keyed by FIPS + postal code + name);
 - county-level aggregates, populated only where an upstream jurisdiction hint is supplied (see "Known gaps" — this repo does not vendor county polygon boundary data).
 
-**Hard invariant:** `buildMapSource` never reads a raw coordinate for output. It is dependency-injected with a `redactLocation` port function structurally identical to `redactLocationForPublic` from `@blap/security`; every coordinate that reaches a feature or aggregate is the *return value* of that function, never the raw input. This is enforced by construction (the function body only ever reads `.lat`/`.lng` off the redaction result) and proven by a regression test (`map-source.redaction.test.ts`) that wires the **real** `redactLocationForPublic` — not a stub — against a fixture with a precise living-person residential coordinate, and asserts the exact raw value never appears anywhere in the serialized output.
+**Hard invariant:** `buildMapSource` never reads a raw coordinate for output. It is dependency-injected with a `redactLocation` port function structurally identical to `redactLocationForPublic` from `@repo/security`; every coordinate that reaches a feature or aggregate is the *return value* of that function, never the raw input. This is enforced by construction (the function body only ever reads `.lat`/`.lng` off the redaction result) and proven by a regression test (`map-source.redaction.test.ts`) that wires the **real** `redactLocationForPublic` — not a stub — against a fixture with a precise living-person residential coordinate, and asserts the exact raw value never appears anywhere in the serialized output.
 
-`buildMapSource` lives in `@blap/domain`, not `@blap/security`, deliberately: `@blap/security` already depends on `@blap/domain` at runtime, so the reverse edge would be a circular workspace dependency. The dependency-injection ("port") pattern avoids that entirely — `map-source.ts` has zero runtime import of `@blap/security`. (`@blap/security` is a **devDependency** of `@blap/domain`, used only by the regression test and the demo-data generator script — this follows existing precedent in this repo: `@blap/security` and `@blap/observability` already have the same kind of devDependency-only cycle.)
+`buildMapSource` lives in `@repo/domain`, not `@repo/security`, deliberately: `@repo/security` already depends on `@repo/domain` at runtime, so the reverse edge would be a circular workspace dependency. The dependency-injection ("port") pattern avoids that entirely — `map-source.ts` has zero runtime import of `@repo/security`. (`@repo/security` is a **devDependency** of `@repo/domain`, used only by the regression test and the demo-data generator script — this follows existing precedent in this repo: `@repo/security` and `@repo/observability` already have the same kind of devDependency-only cycle.)
 
 ### 5. Release-coupled build (not wired live this pass)
 
@@ -142,11 +142,11 @@ ADR-008's architecture doctrine is bounded/static-first: prefer in-product bound
 | Ship a real PMTiles basemap in this bead | Real geodata-authoring work (tile generation, styling, refresh pipeline) is out of scope for a data-platform bead; the demo route proves the rendering pipeline without it. |
 | Build a dynamic bounding-box query endpoint now | Violates ADR-008's bounded/static-first doctrine before the static artifacts are measured insufficient; would also need BB-026 guardrails + App Check wiring this pass doesn't otherwise require. |
 | Wire the release-worker call live this pass | No release-activation pipeline exists yet in any language to call into; guessing at that interface risks drift from the real implementation. Documented as an exact integration point instead (see above). |
-| Put `buildMapSource` in `@blap/security` | Would need to call domain types directly for entity/location shapes, but `@blap/security` is explicitly a redaction/serialization choke point, not a data-platform module; also outside this bead's file ownership (`packages/security` is read-only for this bead). |
+| Put `buildMapSource` in `@repo/security` | Would need to call domain types directly for entity/location shapes, but `@repo/security` is explicitly a redaction/serialization choke point, not a data-platform module; also outside this bead's file ownership (`packages/security` is read-only for this bead). |
 
 ## Consequences
 
-- `packages/domain` gains a `map/` module with a devDependency on `@blap/security` (test/demo-generator only, never in shipped runtime code) — this mirrors the existing `@blap/security`↔`@blap/observability` devDependency cycle already present in this workspace.
+- `packages/domain` gains a `map/` module with a devDependency on `@repo/security` (test/demo-generator only, never in shipped runtime code) — this mirrors the existing `@repo/security`↔`@repo/observability` devDependency cycle already present in this workspace.
 - `apps/web` gains its first WebGL/canvas-rendering dependency (`maplibre-gl`); it is isolated to a single client component (`MapLibreCanvas.tsx`) so it never touches server-rendered/SSR-tested code paths.
 - The next real engineering investment for the map surface is the release-activation wiring (see "Release-coupled build") and, separately, authoring the target PMTiles basemap — both are natural inputs to BB-051, not further data-platform work.
 

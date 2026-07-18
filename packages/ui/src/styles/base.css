@@ -5,7 +5,7 @@
 
 /*
  * Theme-invariant ink-surface constants (brand pack v3). tokens.css's
- * --bp-ink/--bp-canvas/etc. pairs intentionally flip with [data-theme] so
+ * --ds-ink/--ds-canvas/etc. pairs intentionally flip with [data-theme] so
  * ordinary page chrome matches the reader's light/dark preference. A few
  * surfaces are brand-fixed regardless of that preference instead — the map
  * (ADR-013: "a fixed editorial choice, not a light/dark theme variant"), the
@@ -17,12 +17,12 @@
  * is introduced, only a theme-stable name for values that already exist.
  */
 :root {
-  --bp-fixed-ink: #0a0a0a;
-  --bp-fixed-charcoal: #161616;
-  --bp-fixed-paper: #f4efe5;
-  --bp-fixed-stone: #bdb5a9;
-  --bp-fixed-rule: #34302c;
-  --bp-fixed-accent: #d07a32;
+  --ds-fixed-ink: #0a0a0a;
+  --ds-fixed-charcoal: #161616;
+  --ds-fixed-paper: #f4efe5;
+  --ds-fixed-stone: #bdb5a9;
+  --ds-fixed-rule: #34302c;
+  --ds-fixed-accent: #d07a32;
 }
 
 *,
@@ -39,9 +39,9 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--bp-canvas);
-  color: var(--bp-ink);
-  font-family: var(--bp-font-editorial);
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-editorial);
   font-size: 1rem;
   line-height: 1.65;
 }
@@ -57,11 +57,11 @@ svg {
 }
 
 :focus-visible {
-  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
-  outline-offset: var(--bp-focus-offset);
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
 }
 
-.bp-visually-hidden {
+.ds-visually-hidden {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -73,44 +73,44 @@ svg {
   border: 0;
 }
 
-.bp-visually-hidden:focus,
-.bp-visually-hidden:focus-visible {
+.ds-visually-hidden:focus,
+.ds-visually-hidden:focus-visible {
   position: fixed;
-  top: var(--bp-space-2);
-  left: var(--bp-space-2);
+  top: var(--ds-space-2);
+  left: var(--ds-space-2);
   z-index: 1000;
   width: auto;
   height: auto;
   margin: 0;
-  padding: var(--bp-space-2) var(--bp-space-3);
+  padding: var(--ds-space-2) var(--ds-space-3);
   overflow: visible;
   clip: auto;
   white-space: normal;
-  background: var(--bp-inverse);
-  color: var(--bp-inverse-ink);
-  border-radius: var(--bp-radius-sm);
+  background: var(--ds-inverse);
+  color: var(--ds-inverse-ink);
+  border-radius: var(--ds-radius-sm);
   text-decoration: none;
-  font-family: var(--bp-font-sans);
+  font-family: var(--ds-font-sans);
   font-weight: 600;
 }
 
-.bp-mono {
-  font-family: var(--bp-font-mono);
+.ds-mono {
+  font-family: var(--ds-font-mono);
   font-size: 0.8125rem;
   letter-spacing: 0;
 }
 
-.bp-sans {
-  font-family: var(--bp-font-sans);
+.ds-sans {
+  font-family: var(--ds-font-sans);
 }
 
-.bp-container {
-  width: min(100% - (var(--bp-gutter) * 2), var(--bp-grid-max));
+.ds-container {
+  width: min(100% - (var(--ds-gutter) * 2), var(--ds-grid-max));
   margin-inline: auto;
 }
 
-.bp-prose {
-  max-width: var(--bp-content-max);
+.ds-prose {
+  max-width: var(--ds-content-max);
 }
 
 @media (prefers-reduced-motion: reduce) {

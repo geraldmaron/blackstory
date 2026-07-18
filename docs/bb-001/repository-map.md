@@ -35,7 +35,7 @@ black-book/
 │   ├── architecture.md
 │   ├── README.md
 │   ├── runbooks/            .gitkeep
-│   └── bb-001/              this bead
+│   └── ds-001/              this bead
 ├── scripts/bootstrap.sh
 ├── package.json             pnpm workspace root scripts
 ├── pnpm-workspace.yaml      apps/* + packages/*

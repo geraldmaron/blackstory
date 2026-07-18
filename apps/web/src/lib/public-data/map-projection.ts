@@ -3,12 +3,12 @@
  * Renders live projection data as-is without enrichment from bundled seed records.
  */
 
-import { type NotabilityCriterion } from '@blap/domain';
+import { type NotabilityCriterion } from '@repo/domain';
 import { type PublicEntityView } from '../../data/public-seed';
 
 /**
  * Narrow projection shape used by the web mapper. Declared locally so apps/web
- * does not depend on potentially stale `@blap/firebase` dist `.d.ts` files
+ * does not depend on potentially stale `@repo/firebase` dist `.d.ts` files
  * during typecheck (package exports prefer `types` → `dist`).
  */
 export type PublicProjectionInput = {
@@ -44,7 +44,7 @@ export type PublicProjectionInput = {
   readonly status?: string;
   readonly eraBuckets?: readonly string[];
   readonly notabilityLabels?: readonly string[];
-  /** Structured, auditable inclusion basis (black-book-1fg9's release builder). Present on
+  /** Structured, auditable inclusion basis (the related workstream's release builder). Present on
    * releases built by `buildReleaseEntityArtifacts`; absent on pre-existing bootstrap-window
    * stubs, which carry only the derived `notabilityLabels` above. */
   readonly notabilityBasis?: readonly {
@@ -52,10 +52,10 @@ export type PublicProjectionInput = {
     readonly note: string;
     readonly evidenceIds: readonly string[];
   }[];
-  /** Research-depth signal computed once at release-build time (black-book-1fg9). Absent on
+  /** Research-depth signal computed once at release-build time (the related workstream). Absent on
    * pre-existing bootstrap-window stubs. */
   readonly researchCoverage?: 'minimal' | 'partial' | 'substantial';
-  /** Real release-build-time timestamps (black-book-1fg9). Absent on pre-existing
+  /** Real release-build-time timestamps (the related workstream). Absent on pre-existing
    * bootstrap-window stubs, which predate the release builder that populates these. */
   readonly generatedAt?: string;
   readonly recordUpdatedAt?: string;
@@ -200,7 +200,7 @@ export function mapProjectionToPublicEntityView(
     ...(primaryImage !== undefined ? { primaryImage } : {}),
     ...(geoAnchor !== undefined ? { geoAnchor } : {}),
     recordMaturity: claims.length > 0 ? 'partial_enrichment' : 'projection_stub',
-    // Prefer the release builder's own computed researchCoverage (black-book-1fg9,
+    // Prefer the release builder's own computed researchCoverage (the related workstream,
     // packages/domain/src/publication/release-builder.ts's computeReleaseResearchCoverage) —
     // it is derived from the real claim count + citation completeness at release-BUILD time.
     // The claims.length heuristic below is only a fallback for bootstrap-window stubs that
@@ -212,7 +212,7 @@ export function mapProjectionToPublicEntityView(
     revision: {
       releaseId: projection.releaseId,
       // Prefer the release builder's real "this release build ran at this instant" timestamps
-      // (black-book-1fg9) when present. Bootstrap-window stubs that predate the release builder
+      // (the related workstream) when present. Bootstrap-window stubs that predate the release builder
       // carry neither field; '' is an honest "unknown", never a fabricated "now".
       generatedAt: projection.generatedAt ?? '',
       recordUpdatedAt: projection.recordUpdatedAt ?? '',

@@ -16,7 +16,7 @@
 import { useState, type SyntheticEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { US_STATES } from '@blap/domain/map/geography';
+import { US_STATES } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
 import { buildExploreHref } from '../../lib/map-experience/url-state';
 
@@ -52,14 +52,14 @@ export function StateStart({ topStates }: StateStartProps) {
   }
 
   return (
-    <div className="bp-state-start">
-      <form className="bp-state-start__form" onSubmit={handleSubmit}>
-        <label className="bp-visually-hidden" htmlFor="state-start-select">
+    <div className="ds-state-start">
+      <form className="ds-state-start__form" onSubmit={handleSubmit}>
+        <label className="ds-visually-hidden" htmlFor="state-start-select">
           Your state
         </label>
         <select
           id="state-start-select"
-          className="bp-state-start__select"
+          className="ds-state-start__select"
           value={selected}
           onChange={(event) => setSelected(event.target.value)}
         >
@@ -70,25 +70,25 @@ export function StateStart({ topStates }: StateStartProps) {
             </option>
           ))}
         </select>
-        <button className="bp-button bp-button--secondary" type="submit" disabled={!selected}>
+        <button className="ds-button ds-button--secondary" type="submit" disabled={!selected}>
           See its records
         </button>
       </form>
 
       {topStates.length > 0 ? (
-        <ul className="bp-state-start__chips" aria-label="States with the most records">
+        <ul className="ds-state-start__chips" aria-label="States with the most records">
           {topStates.map((state) => (
             <li key={state.postalCode}>
-              <Link className="bp-state-chip" href={exploreHrefForState(state.postalCode)}>
+              <Link className="ds-state-chip" href={exploreHrefForState(state.postalCode)}>
                 {state.name}
-                <span className="bp-state-chip__count">{state.count}</span>
+                <span className="ds-state-chip__count">{state.count}</span>
               </Link>
             </li>
           ))}
         </ul>
       ) : null}
 
-      <p className="bp-state-start__locate">
+      <p className="ds-state-start__locate">
         Standing somewhere with a story? <Link href="/locate">Use your location</Link> — read only
         with your permission, never stored.
       </p>

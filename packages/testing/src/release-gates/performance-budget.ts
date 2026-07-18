@@ -51,7 +51,7 @@ export type PerformanceBudgetEvaluation = {
 
 /** Default public-surface budgets tighten as real bundles stabilize post-. */
 export const DEFAULT_PERFORMANCE_BUDGET = Object.freeze({
-  version: 'bb-057-v1',
+  version: 'ds-057-v1',
   journeys: Object.freeze(['search', 'explore', 'entity', 'locate', 'corrections']),
   thresholds: Object.freeze([
     { metric: 'largest_contentful_paint_ms', max: 2500, unit: 'ms' },

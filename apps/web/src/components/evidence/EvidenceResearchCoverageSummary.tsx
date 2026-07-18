@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { Card, Notice } from '@blap/ui';
+import { Card, Notice } from '@repo/ui';
 import {
   formatIsoDate,
   humanizeToken,
@@ -31,13 +31,13 @@ export function EvidenceResearchCoverageSummary({
   const lastChecked = lastCheckedAt ?? researchCoverage.lastCheckedAt;
 
   return (
-    <Card title="Research coverage" meta={<span className="bp-mono">{humanizeToken(researchCoverage.level)}</span>} as="section">
-      <dl className="bp-sans" style={{ margin: 0 }}>
+    <Card title="Research coverage" meta={<span className="ds-mono">{humanizeToken(researchCoverage.level)}</span>} as="section">
+      <dl className="ds-sans" style={{ margin: 0 }}>
         {sourceLineage ? (
           <>
             <dt style={{ fontWeight: 600 }}>Source lineage</dt>
-            <dd style={{ margin: '0 0 var(--bp-space-3) 0' }}>
-              <span className="bp-mono">{sourceLineage.independentLineageCount}</span> independent{' '}
+            <dd style={{ margin: '0 0 var(--ds-space-3) 0' }}>
+              <span className="ds-mono">{sourceLineage.independentLineageCount}</span> independent{' '}
               {sourceLineage.independentLineageCount === 1 ? 'source' : 'sources'} across this record&rsquo;s
               evidenced claims.
             </dd>
@@ -46,7 +46,7 @@ export function EvidenceResearchCoverageSummary({
         {researchCoverage.notes ? (
           <>
             <dt style={{ fontWeight: 600 }}>Coverage notes</dt>
-            <dd style={{ margin: '0 0 var(--bp-space-3) 0' }}>{researchCoverage.notes}</dd>
+            <dd style={{ margin: '0 0 var(--ds-space-3) 0' }}>{researchCoverage.notes}</dd>
           </>
         ) : null}
         {lastChecked ? (
@@ -58,7 +58,7 @@ export function EvidenceResearchCoverageSummary({
       </dl>
 
       {retractionNotices.length > 0 ? (
-        <div className="bp-stack" style={{ marginTop: 'var(--bp-space-4)' }}>
+        <div className="ds-stack" style={{ marginTop: 'var(--ds-space-4)' }}>
           {retractionNotices.map((notice) => (
             <Notice
               key={notice.retractedAt}
@@ -67,8 +67,8 @@ export function EvidenceResearchCoverageSummary({
             >
               <p style={{ margin: 0 }}>{notice.reason}</p>
               {notice.supersededByClaimId ? (
-                <p style={{ margin: 'var(--bp-space-2) 0 0 0' }}>
-                  Superseded by <span className="bp-mono">{notice.supersededByClaimId}</span>.
+                <p style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
+                  Superseded by <span className="ds-mono">{notice.supersededByClaimId}</span>.
                 </p>
               ) : null}
             </Notice>

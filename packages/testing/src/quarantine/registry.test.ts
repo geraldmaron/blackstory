@@ -25,7 +25,7 @@ test('expired quarantine entries fail closed', () => {
       entries: [
         {
           id: 'flaky.example',
-          owner: '@blap/platform',
+          owner: '@repo/platform',
           deadline: '2026-01-01',
           reason: 'intermittent timing',
         },

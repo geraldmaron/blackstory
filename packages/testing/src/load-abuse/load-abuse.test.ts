@@ -1,7 +1,7 @@
 
 /**
  * acceptance tests: load, abuse, and cost simulations against security guardrails.
- * No live network attacks fixtures import @blap/security evaluators directly.
+ * No live network attacks fixtures import @repo/security evaluators directly.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -15,7 +15,7 @@ import {
   tuningRecommendationsByPriority,
 } from './index.js';
 
-describe('BB-059 load and abuse scenarios', () => {
+describe(' load and abuse scenarios', () => {
   it('covers all twelve required scenario ids', () => {
     assert.equal(ALL_LOAD_ABUSE_SCENARIO_IDS.length, 12);
     const runs = runAllLoadAbuseScenarios();
@@ -51,7 +51,7 @@ describe('BB-059 load and abuse scenarios', () => {
   });
 });
 
-describe('BB-059 layered control independence', () => {
+describe(' layered control independence', () => {
   it('does not rely on a single control layer across abusive scenarios', () => {
     const multiLayer = runAllLoadAbuseScenarios().filter(
       ({ proof }) => proof.independentLayers >= 2,
@@ -78,7 +78,7 @@ describe('BB-059 layered control independence', () => {
   });
 });
 
-describe('BB-059 cost and tuning outputs', () => {
+describe(' cost and tuning outputs', () => {
   it('documents cost per abusive request for every scenario', () => {
     const costs = estimateScenarioCosts();
     assert.equal(costs.length, 12);

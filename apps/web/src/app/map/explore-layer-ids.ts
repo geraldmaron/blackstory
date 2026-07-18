@@ -13,14 +13,14 @@ export const EXPLORE_CLUSTER_LAYER_ID = 'explore-clusters';
 export const EXPLORE_CLUSTER_COUNT_LAYER_ID = 'explore-cluster-count';
 export const EXPLORE_UNCLUSTERED_HALO_LAYER_ID = 'explore-point-halo';
 export const EXPLORE_UNCLUSTERED_POINT_LAYER_ID = 'explore-point';
-/** BB-099: the `event` kind's "diamond" glyph approximation — a second thin, unfilled ring
+/** the `event` kind's "diamond" glyph approximation — a second thin, unfilled ring
  * offset around the point marker (see kind-encoding.ts's module doc for why this is an
  * approximation rather than literal diamond geometry). */
 export const EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID = 'explore-point-event-glyph';
 /** Copper orientation ring for the currently selected entity (not a heat signal). */
 export const EXPLORE_SELECTED_POINT_LAYER_ID = 'explore-point-selected';
 export const EXPLORE_STATE_DENSITY_LAYER_ID = 'explore-state-density-fill';
-/** black-book-uda: county hairlines — the fainter tier of the boundary system beneath the
+/** the related workstream: county hairlines — the fainter tier of the boundary system beneath the
  * state bounds line, zoom-gated so the national frame stays clean. */
 export const EXPLORE_COUNTY_LINES_LAYER_ID = 'explore-county-lines-line';
 export const EXPLORE_JURISDICTION_AREA_LAYER_ID = 'explore-jurisdiction-area-fill';

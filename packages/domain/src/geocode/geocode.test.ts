@@ -41,8 +41,8 @@ const TERRITORY_MATCH: CensusGeocodeMatch = {
 };
 
 test('normalizeAddressInput collapses whitespace and expands street-suffix abbreviations', () => {
-  const normalized = normalizeAddressInput('  4600   Silver Hill  Rd. , Washington  DC   ');
-  assert.equal(normalized.queryText, '4600 Silver Hill road , Washington DC');
+  const normalized = normalizeAddressInput('  4600   Silver Hill  Rd., Washington  DC   ');
+  assert.equal(normalized.queryText, '4600 Silver Hill road, Washington DC');
   assert.equal(normalized.cacheKey, `addr:${normalized.queryText.toUpperCase()}`);
 });
 

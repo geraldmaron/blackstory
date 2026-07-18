@@ -1,15 +1,15 @@
 
 /**
- * Idempotent load/refresh CLI for the `censusCountyDecades` collection (black-book-vxz).
+ * Idempotent load/refresh CLI for the `censusCountyDecades` collection (the related workstream).
  *
  * Fetches total + Black population per county for each decennial vintage in
- * `CENSUS_DECENNIAL_VINTAGES` (2000 SF1, 2010 SF1, 2020 PL) via @blap/domain's
+ * `CENSUS_DECENNIAL_VINTAGES` (2000 SF1, 2010 SF1, 2020 PL) via @repo/domain's
  * `fetchCountyPopulations`, and upserts one doc per county per decade. Structurally mirrors
  * `../jurisdictions/load-cli.ts`: every dependency (writer, fetch) is injected so
  * `runDemographicsLoad` is fully unit-testable, and only the `if (import.meta.url ...)` block
  * touches real infrastructure.
  *
- * Lane note: bead black-book-vxz suggested an operator-cli subcommand, but operator-cli's
+ * Lane note: bead the related workstream suggested an operator-cli subcommand, but operator-cli's
  * promotion boundary (`commitOperatorIntake` only — see promotion-boundary.test.ts) forbids
  * direct Firestore bulk writes, so this follows the jurisdictions-loader lane instead: unit
  * tests against a fake writer; a human operator runs the live apply.
@@ -34,7 +34,7 @@ import {
   type CensusDecennialVintage,
   type CountyDecadePopulation,
   type FetchLike,
-} from '@blap/domain';
+} from '@repo/domain';
 import { createServerFirebaseApp } from '../server.js';
 import { FIRESTORE_ROOT } from '../firestore/paths.js';
 import {

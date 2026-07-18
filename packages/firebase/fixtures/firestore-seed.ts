@@ -1,5 +1,5 @@
 /**
- * Emulator local seed fixtures for Firestore (demo-black-book only).
+ * Emulator local seed fixtures for Firestore (demo-repo only).
  * : schools/people/places with historical vs current locations and merge lineage.
  * : source organizations, items, captures, evidence rights, lineage, kill switches.
  * : atomic claims, evidence links, confidence scores, preserved contradictions.
@@ -12,7 +12,7 @@ import {
   measureConnectionStrength,
   measureRelevance,
   preserveContradictoryValues,
-} from '@blap/domain';
+} from '@repo/domain';
 import type {
   CanonicalClaimDoc,
   CanonicalEntityDoc,
@@ -42,7 +42,7 @@ export type SeedDocument = {
 
 const FIXED_NOW = '2026-07-16T18:00:00.000Z';
 
-// `buildGeoPointFields` (from `@blap/domain`) returns a `readonly string[]`
+// `buildGeoPointFields` (from `@repo/domain`) returns a `readonly string[]`
 // `geohashPrefixes`; the Firestore doc schema infers a mutable `string[]` for the same field.
 // Copying it here reconciles the two packages' array mutability without changing any value.
 function mutableGeoPoint(lat: number, lng: number, precision: number) {
@@ -271,7 +271,7 @@ export const seedSchoolCurrentLocation: EntityLocationDoc = {
 // Deliberately a generic, clearly-synthetic fixture person (never a real named historical
 // figure) the duplicate-spelling merge mechanism below needs a birth year and an "alleged"
 // high-impact claim to exercise its mechanics, and attaching either to a real person's name would
-// misrepresent them see the module doc above and BB-098's scope note on this narrow carve-out.
+// misrepresent them see the module doc above and 's scope note on this narrow carve-out.
 export const seedPersonEntity: CanonicalEntityDoc = {
   id: 'ent_seed_person_001',
   kind: 'person',
@@ -454,7 +454,7 @@ export const seedSourceCapture: SourceCaptureDoc = {
   retrievedAt: FIXED_NOW,
   retrievalEventId: 'retr_seed_001',
   snapshotMode: 'selective',
-  snapshotStorageObject: 'gs://demo-black-book-evidence/captures/cap_seed_001.pdf',
+  snapshotStorageObject: 'gs://demo-repo-evidence/captures/cap_seed_001.pdf',
   createdAt: FIXED_NOW,
 };
 
@@ -463,7 +463,7 @@ export const seedEvidenceRecord: EvidenceRecordDoc = {
   sourceItemId: 'sitm_seed_nara_001',
   sourceId: 'src_seed_nara_catalog',
   captureId: 'cap_seed_001',
-  storageObject: 'gs://demo-black-book-evidence/captures/cap_seed_001.pdf',
+  storageObject: 'gs://demo-repo-evidence/captures/cap_seed_001.pdf',
   locator: { page: '12', pages: '12-13', label: 'campus description' },
   excerpt: 'The school stood near the river landing.',
   excerptKind: 'short',

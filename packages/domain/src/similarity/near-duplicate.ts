@@ -5,7 +5,7 @@
  * Content-hash dedup catches byte-identical re-syndication. It cannot catch two write-ups of
  * the same underlying fact that differ in wording. This module flags *semantically* close
  * candidates so weak-signal items surface for human corroboration instead of silently
- * duplicating research effort it never merges or discards anything itself. Per 
+ * duplicating research effort it never merges or discards anything itself. Per
  * (../discovery/guard.ts), discovery must never publish or merge on its own authority; that
  * stays true here by construction every function below is a pure read-only comparison.
  */

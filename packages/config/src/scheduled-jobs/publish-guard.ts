@@ -13,7 +13,7 @@
  * derived artifact) that are not among FORBIDDEN_DISCOVERY_OPERATIONS in the first place they
  * are not a bypass of it.
  */
-import { assertDiscoveryCannotPublish, type DiscoveryOperationAttempt } from '@blap/domain';
+import { assertDiscoveryCannotPublish, type DiscoveryOperationAttempt } from '@repo/domain';
 import type { ScheduledJobDefinition } from './types.js';
 
 export function assertScheduledJobOperationAllowed(input: {

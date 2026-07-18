@@ -32,7 +32,7 @@ export interface ThreatRecord {
 
 export interface ThreatCorpus {
   version: string;
-  bead: 'BB-004';
+  bead: '';
   threats: ThreatRecord[];
 }
 
@@ -106,10 +106,10 @@ export interface CorpusValidationIssue {
 export function validateThreatCorpus(corpus: ThreatCorpus): CorpusValidationIssue[] {
   const issues: CorpusValidationIssue[] = [];
 
-  if (corpus.bead !== 'BB-004') {
+  if (corpus.bead !== '') {
     issues.push({
       code: 'bead',
-      message: `expected bead BB-004, got ${String(corpus.bead)}`,
+      message: `expected bead, got ${String(corpus.bead)}`,
     });
   }
 

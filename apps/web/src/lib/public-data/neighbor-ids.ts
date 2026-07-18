@@ -6,7 +6,7 @@
 import {
   LEARNING_CONTINUE_LEARNING_CAP,
   LEARNING_RELATED_DISPLAY_CAP,
-} from '@blap/domain';
+} from '@repo/domain';
 
 export type RelatedEdgeLike = {
   readonly id: string;

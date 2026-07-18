@@ -20,7 +20,7 @@ import type { ScheduledJobDefinition } from './types.ts';
 function validJob(overrides: Partial<ScheduledJobDefinition> = {}): ScheduledJobDefinition {
   return {
     id: 'sample-job',
-    owner: 'BB-084',
+    owner: 'scheduled-jobs',
     description: 'A sample job for registry tests.',
     cadence: { cronExpression: '0 4 * * *', nominalIntervalMs: 86_400_000, humanReadable: 'daily' },
     budget: { unit: 'items', maxPerRun: 10 },
@@ -28,7 +28,7 @@ function validJob(overrides: Partial<ScheduledJobDefinition> = {}): ScheduledJob
     idempotencyKeyScheme: 'job:{jobId}:{dayStart}',
     killSwitchId: 'research-campaigns',
     targetWorker: { package: 'research', function: 'sample.run' },
-    environment: 'blackbook-internal',
+    environment: 'repo-internal',
     publicEffect: 'none',
     rosterStatus: 'real',
     consecutiveMissedRunThreshold: 2,
@@ -113,7 +113,7 @@ test('a stub job must declare its implementation-owner bead', () => {
   const store = createInMemoryScheduledJobRegistry();
   assert.throws(() => registerScheduledJob(store, validJob({ rosterStatus: 'stub' })));
   assert.doesNotThrow(() =>
-    registerScheduledJob(store, validJob({ rosterStatus: 'stub', implementationOwnerBead: 'BB-999' })),
+    registerScheduledJob(store, validJob({ rosterStatus: 'stub', implementationOwnerBead: 'workstream' })),
   );
 });
 
@@ -124,19 +124,19 @@ test('rejects a non-positive consecutiveMissedRunThreshold', () => {
 
 test('listScheduledJobs filters by owner, rosterStatus, and target worker package', () => {
   const store = createInMemoryScheduledJobRegistry();
-  registerScheduledJob(store, validJob({ id: 'job-a', owner: 'BB-001', rosterStatus: 'real' }));
+  registerScheduledJob(store, validJob({ id: 'job-a', owner: 'sample-workstream', rosterStatus: 'real' }));
   registerScheduledJob(
     store,
     validJob({
       id: 'job-b',
-      owner: 'BB-002',
+      owner: 'workstream',
       rosterStatus: 'stub',
-      implementationOwnerBead: 'BB-002',
+      implementationOwnerBead: 'workstream',
       targetWorker: { package: 'security', function: 'run' },
     }),
   );
   assert.deepEqual(
-    listScheduledJobs(store, { owner: 'BB-001' }).map((j) => j.id),
+    listScheduledJobs(store, { owner: 'sample-workstream' }).map((j) => j.id),
     ['job-a'],
   );
   assert.deepEqual(

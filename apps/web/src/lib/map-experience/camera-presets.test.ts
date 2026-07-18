@@ -1,6 +1,6 @@
 /**
  * Confirms the camera grammar's shape, authored duration/curve ranges (design-direction-v3.md
- * "Camera grammar (BB-098)"), the slow-out easing curve's monotonic descent-into-place shape,
+ * "Camera grammar ()"), the slow-out easing curve's monotonic descent-into-place shape,
  * and that the reduced-motion table maps every preset to an instant jump (duration 0).
  */
 import assert from 'node:assert/strict';

@@ -1,6 +1,6 @@
 /**
  * Verifies the public entity projection converter routes writes through the central
- * redaction assertion (@blap/security) and learning-index gates so no prohibited
+ * redaction assertion (@repo/security) and learning-index gates so no prohibited
  * precision, residential address, short summary, or uncleared primaryImage can persist.
  */
 import assert from 'node:assert/strict';

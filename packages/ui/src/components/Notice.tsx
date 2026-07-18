@@ -30,18 +30,18 @@ const CUES: Record<NoticeTone, string> = {
 export function Notice({ tone, title, children, className }: NoticeProps) {
   return (
     <div
-      className={cx('bp-notice', `bp-notice--${tone}`, className)}
+      className={cx('ds-notice', `ds-notice--${tone}`, className)}
       role={tone === 'error' ? 'alert' : 'status'}
     >
-      <span className="bp-notice__cue" aria-hidden="true">
+      <span className="ds-notice__cue" aria-hidden="true">
         {CUES[tone]}
       </span>
       <div>
-        <p className="bp-notice__title">
-          <span className="bp-visually-hidden">{CUES[tone]}: </span>
+        <p className="ds-notice__title">
+          <span className="ds-visually-hidden">{CUES[tone]}: </span>
           {title}
         </p>
-        <div className="bp-notice__body">{children}</div>
+        <div className="ds-notice__body">{children}</div>
       </div>
     </div>
   );

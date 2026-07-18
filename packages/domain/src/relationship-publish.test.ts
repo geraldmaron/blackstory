@@ -1,8 +1,8 @@
 /**
- * Tests for the EntityRelationship publish invariants (BB black-book-hx8j): evidence presence,
+ * Tests for the EntityRelationship publish invariants (BB the related workstream): evidence presence,
  * endpoint resolution, type-specific temporal requirements, the edge-cannot-corroborate-itself
  * guard, and syndicated-evidence dedupe. Not wired into a publish pipeline yet (release-builder
- * bead black-book-1fg9 owns that); these tests exercise the validators directly.
+ * bead the related workstream owns that); these tests exercise the validators directly.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

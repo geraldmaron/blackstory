@@ -16,7 +16,7 @@ import { ConfidenceMark } from './ConfidenceMark';
 import { KindBadge } from './KindBadge';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source (same note as
-// `@blap/ui`'s own components, e.g. MapExplorer.tsx).
+// `@repo/ui`'s own components, e.g. MapExplorer.tsx).
 void React;
 
 export type NarrativeCardProps = {
@@ -51,16 +51,16 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
 
   return (
     <article
-      className="bp-nc"
-      aria-labelledby="bp-nc-title"
-      aria-describedby="bp-nc-story"
+      className="ds-nc"
+      aria-labelledby="ds-nc-title"
+      aria-describedby="ds-nc-story"
       tabIndex={-1}
       data-entity-id={properties.entityId}
     >
-      <p className="bp-nc__kicker">Selected record</p>
-      <div className="bp-nc__top">
+      <p className="ds-nc__kicker">Selected record</p>
+      <div className="ds-nc__top">
         <div
-          className="bp-nc__kind-rule"
+          className="ds-nc__kind-rule"
           style={{ borderColor: kindEncoding.shade }}
         >
           <KindBadge
@@ -71,7 +71,7 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         {onClose ? (
           <button
             type="button"
-            className="bp-nc__close"
+            className="ds-nc__close"
             onClick={onClose}
             aria-label={`Close ${properties.displayName} card`}
           >
@@ -87,48 +87,48 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         ) : null}
       </div>
 
-      <h3 className="bp-nc__title" id="bp-nc-title">
-        <Link className="bp-nc__title-link" href={properties.href}>
+      <h3 className="ds-nc__title" id="ds-nc-title">
+        <Link className="ds-nc__title-link" href={properties.href}>
           {properties.displayName}
         </Link>
       </h3>
-      <p className="bp-nc__story" id="bp-nc-story">
+      <p className="ds-nc__story" id="ds-nc-story">
         {properties.oneLineStory}
       </p>
 
-      <dl className="bp-nc__facts">
-        <div className="bp-nc__fact">
+      <dl className="ds-nc__facts">
+        <div className="ds-nc__fact">
           <dt>Where</dt>
-          <dd className="bp-mono">{placeLabel(feature)}</dd>
+          <dd className="ds-mono">{placeLabel(feature)}</dd>
         </div>
-        <div className="bp-nc__fact">
+        <div className="ds-nc__fact">
           <dt>Era</dt>
           <dd>{eraLabel(properties.eraBuckets)}</dd>
         </div>
-        <div className="bp-nc__fact">
+        <div className="ds-nc__fact">
           <dt>Evidence</dt>
           <dd>
             {properties.evidenceCount} accepted claim{properties.evidenceCount === 1 ? '' : 's'}
           </dd>
         </div>
-        <div className="bp-nc__fact">
+        <div className="ds-nc__fact">
           <dt>Confidence</dt>
           <dd>
             <ConfidenceMark tier={properties.confidenceTier} labeled />
           </dd>
         </div>
-        <div className="bp-nc__fact">
+        <div className="ds-nc__fact">
           <dt>Status</dt>
           <dd>{properties.status ?? '—'}</dd>
         </div>
       </dl>
 
       {properties.topicTags.length > 0 ? (
-        <p className="bp-nc__tags" aria-label="Topics">
+        <p className="ds-nc__tags" aria-label="Topics">
           {properties.topicTags.slice(0, 2).map((tag) => (
             <Link
               key={tag}
-              className="bp-entity-tag"
+              className="ds-entity-tag"
               href={`/search?topic=${encodeURIComponent(tag)}`}
             >
               {tag}
@@ -137,9 +137,9 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         </p>
       ) : null}
 
-      <p className="bp-nc__precision">{radiusAffordanceLabel(feature)}</p>
+      <p className="ds-nc__precision">{radiusAffordanceLabel(feature)}</p>
 
-      <Link className="bp-cta bp-cta--copper bp-nc__action" href={properties.href}>
+      <Link className="ds-cta ds-cta--copper ds-nc__action" href={properties.href}>
         Open full record
       </Link>
     </article>

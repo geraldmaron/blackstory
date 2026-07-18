@@ -177,7 +177,7 @@ function manifestToJson(manifest: ReleaseManifest): JsonValue {
 
 /**
  * Builds an unsigned manifest from already-public projection and snapshot payloads.
- * Callers must serialize through @blap/security before supplying artifacts.
+ * Callers must serialize through @repo/security before supplying artifacts.
  */
 export function buildReleaseManifest(input: {
   readonly releaseId: string;

@@ -7,7 +7,7 @@ import {
   rejectPublicationOperation,
   type AuthMode,
   type OperationId,
-} from '@blap/config';
+} from '@repo/config';
 
 export const SURFACE_ID = 'api-public' as const;
 

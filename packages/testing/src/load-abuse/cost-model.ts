@@ -11,7 +11,7 @@ import {
   resolveEndpointPolicy,
   type CanonicalSearchQuery,
   type SearchFilterField,
-} from '@blap/security';
+} from '@repo/security';
 import type { CostEstimate, LoadAbuseScenarioId } from './types.js';
 
 /** Rough micro-USD per cost unit for documentation (not authoritative billing). */

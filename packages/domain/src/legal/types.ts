@@ -1,6 +1,6 @@
 /**
  * Core legal landscape vocabulary: license tags, archive evidence, citation fields, and topic
- * tags for the curated snapshot corpus. Reuses `LawStatus` and 
+ * tags for the curated snapshot corpus. Reuses `LawStatus` and
  * `FactRecord` (`claimType: 'law'`) — this module never defines a parallel law store.
  */
 import type { LawStatus } from '../entity-status.js';

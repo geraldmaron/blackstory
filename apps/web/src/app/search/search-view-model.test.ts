@@ -9,7 +9,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { PublicSearchIndexDoc } from '@blap/domain';
+import type { PublicSearchIndexDoc } from '@repo/domain';
 import { getSnapshotSearchIndex } from '../../lib/search/snapshot-search-index';
 import {
   buildFacetOptions,

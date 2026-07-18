@@ -13,7 +13,7 @@ export type ProductionGuardFinding = {
 };
 
 const PRODUCTION_PROJECT_PATTERN =
-  /(^|[-_])(prod|production|live)([-_]|$)|black-book-prod|blackbook-prod|^black-book-efaaf$/i;
+  /(^|[-_])(prod|production|live)([-_]|$)|the related workstream|blackbook-prod|^black-book-efaaf$/i;
 
 const CLOUD_SQL_HOST_PATTERN =
   /\.sql\.goog$|cloudsql|\/cloudsql\/|googleapis\.com|neon\.tech|supabase\.co|aws\.com|azure\.com/i;
@@ -28,7 +28,7 @@ const DEMO_PROJECT_PATTERN = /^(demo-|test-|local-|dev-)/i;
  * Explicit override for rare break-glass scenarios. Prefer never setting this.
  * Even with the override, Cloud SQL Firebase production project IDs still fail.
  */
-export const PRODUCTION_OVERRIDE_ENV = 'BLAP_ALLOW_PRODUCTION_TESTS';
+export const PRODUCTION_OVERRIDE_ENV = 'APP_ALLOW_PRODUCTION_TESTS';
 
 export function isLocalDatabaseUrl(url: string): boolean {
   try {
@@ -57,11 +57,11 @@ export function collectProductionGuardFindings(
 ): ProductionGuardFinding[] {
   const findings: ProductionGuardFinding[] = [];
 
-  const nodeEnv = environment.NODE_ENV ?? environment.BLAP_ENV;
+  const nodeEnv = environment.NODE_ENV ?? environment.APP_ENV;
   if (nodeEnv === 'production') {
     findings.push({
       key: 'NODE_ENV',
-      reason: 'Tests refuse NODE_ENV/BLAP_ENV=production',
+      reason: 'Tests refuse NODE_ENV/APP_ENV=production',
       value: nodeEnv,
     });
   }

@@ -1,7 +1,7 @@
 
 /**
  * Firestore document schemas for tier-1 external datasets (see
- * @blap/domain's `external-data-sources.ts` for the acquisition registry):
+ * @repo/domain's `external-data-sources.ts` for the acquisition registry):
  *
  * - `opportunityAtlasTracts` — curated starter subset of the Opportunity Atlas tract
  *   outcomes (Opportunity Insights; attribution required). 2010 tract geography.

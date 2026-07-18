@@ -1,5 +1,5 @@
 /**
- * Public search page: wired to the real `@blap/domain` search pipeline
+ * Public search page: wired to the real `@repo/domain` search pipeline
  * (`runPublicSearch`) over the snapshot search index.
  *
  * Surface language (v5 "atlas instrument"): the query IS the headline — a
@@ -12,7 +12,7 @@
  * result/facet shaping.
  */
 
-import { EmptyState, ResultList } from '@blap/ui';
+import { EmptyState, ResultList } from '@repo/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { KindBadge } from '../../components/map-experience';
 import { getPublicSearchIndex } from '../../lib/public-data/source';
@@ -37,10 +37,10 @@ type FacetSelectProps = {
 
 function FacetSelect({ id, name, label, defaultValue, options }: FacetSelectProps) {
   return (
-    <label className="bp-pill-select" htmlFor={id}>
-      <span className="bp-pill-select__label">{label}</span>
+    <label className="ds-pill-select" htmlFor={id}>
+      <span className="ds-pill-select__label">{label}</span>
       <select
-        className="bp-pill-select__control"
+        className="ds-pill-select__control"
         id={id}
         name={name}
         defaultValue={defaultValue}
@@ -61,20 +61,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const view = buildSearchViewModel(params, index.data);
 
   return (
-    <main className="bp-container bp-page" id="main">
+    <main className="ds-container ds-page" id="main">
       <header>
-        <p className="bp-page__eyebrow">Index</p>
-        <h1 className="bp-page__title">
+        <p className="ds-page__eyebrow">Index</p>
+        <h1 className="ds-page__title">
           Search the <em>archive</em>.
         </h1>
       </header>
 
       {/* GET form — every query is a shareable URL; facet selects apply on
           the same submit as the keyword. */}
-      <form className="bp-search-mast" method="get" action="/search" role="search">
-        <div className="bp-search-mast__field">
+      <form className="ds-search-mast" method="get" action="/search" role="search">
+        <div className="ds-search-mast__field">
           <input
-            className="bp-search-mast__input"
+            className="ds-search-mast__input"
             type="search"
             id="q"
             name="q"
@@ -82,11 +82,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             defaultValue={view.q}
             aria-label="Search the archive"
           />
-          <button className="bp-cta bp-cta--copper" type="submit">
+          <button className="ds-cta ds-cta--copper" type="submit">
             Search
           </button>
         </div>
-        <div className="bp-search-mast__refine">
+        <div className="ds-search-mast__refine">
           <FacetSelect
             id="kind"
             name="kind"
@@ -108,16 +108,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             defaultValue={view.era}
             options={view.eraOptions}
           />
-          <a className="bp-cta-link" href="/search">
+          <a className="ds-cta-link" href="/search">
             Clear
           </a>
         </div>
       </form>
 
-      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-8)' }}>
+      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-8)' }}>
         {index.source !== 'live' ? <SeedDataNotice compact /> : null}
 
-        <p className="bp-sans bp-count-label" id="search-results-heading">
+        <p className="ds-sans ds-count-label" id="search-results-heading">
           {view.totalMatched} {index.source === 'live' ? '' : 'sample '}result
           {view.totalMatched === 1 ? '' : 's'}
         </p>
@@ -126,7 +126,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <EmptyState
             title="Nothing matched — yet"
             action={
-              <a className="bp-cta bp-cta--ink" href="/search">
+              <a className="ds-cta ds-cta--ink" href="/search">
                 Clear filters
               </a>
             }
@@ -137,7 +137,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         ) : (
           <>
             <ResultList
-              className="bp-index"
+              className="ds-index"
               labelledBy="search-results-heading"
               items={view.results.map((result) => ({
                 id: result.id,
@@ -149,7 +149,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     <KindBadge kind={result.kind} density="compact" />
                     {result.status ? (
                       <span
-                        className={`bp-status-mark bp-status-mark--${result.status}`}
+                        className={`ds-status-mark ds-status-mark--${result.status}`}
                         data-status={result.status}
                       >
                         {result.status}
@@ -162,10 +162,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             />
 
             {view.previousOffset !== undefined || view.nextOffset !== undefined ? (
-              <nav className="bp-row" aria-label="Search results pages">
+              <nav className="ds-row" aria-label="Search results pages">
                 {view.previousOffset !== undefined ? (
                   <a
-                    className="bp-cta bp-cta--quiet"
+                    className="ds-cta ds-cta--quiet"
                     href={buildSearchPageHref(view, view.previousOffset)}
                   >
                     Previous page
@@ -173,7 +173,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 ) : null}
                 {view.nextOffset !== undefined ? (
                   <a
-                    className="bp-cta bp-cta--quiet"
+                    className="ds-cta ds-cta--quiet"
                     href={buildSearchPageHref(view, view.nextOffset)}
                   >
                     Next page

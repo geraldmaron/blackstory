@@ -179,7 +179,7 @@ node infra/github/release-pipeline/release-pipeline.test.mjs
 ```bash
 gh workflow run security.yml \
   -f staging_base_url="https://staging.example.blackbook.app" \
-  -f staging_identity_label="bb-security-dast-release-001"
+  -f staging_identity_label="ds-security-dast-release-001"
 ```
 
 ---

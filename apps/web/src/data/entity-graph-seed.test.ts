@@ -43,7 +43,7 @@ test('currentStatusFor / statusHistoryFor derive status from the open-ended hist
   assert.equal(statusHistoryFor('ent_dc_landmark_listing_1975'), undefined);
 });
 
-test('sensitivityFor exposes the schema-only BB-090 flag, citing a real claim on the entity', () => {
+test('sensitivityFor exposes the schema-only flag, citing a real claim on the entity', () => {
   const sensitivity = sensitivityFor('ent_dunbar_school_001');
   assert.ok(sensitivity);
   assert.equal(sensitivity.class, 'contested_legacy');

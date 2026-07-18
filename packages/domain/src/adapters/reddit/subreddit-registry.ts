@@ -1,6 +1,6 @@
 /**
  * Versioned curated subreddit registry with add/remove audit ( mirrors../rss/
- * feed-registry.ts's pattern exactly). Reuses the 
+ * feed-registry.ts's pattern exactly). Reuses the
  * append-only audit contract (../../audit/index.ts) rather than inventing a parallel shape:
  * every mutation returns a `DomainAuditEvent` using the existing
  * `administrative.configuration_changed` action.

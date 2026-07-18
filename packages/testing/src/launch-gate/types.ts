@@ -61,7 +61,7 @@ export interface BetaLaunchEvaluationInput {
 
 export interface BetaLaunchEvaluationReport {
   readonly schemaVersion: typeof BETA_LAUNCH_DECISION_SCHEMA_VERSION;
-  readonly bead: 'BB-063';
+  readonly bead: '';
   readonly evaluator: string;
   readonly evaluatedAt: string;
   readonly decision: LaunchDecision;

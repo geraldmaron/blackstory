@@ -1,6 +1,6 @@
 # Design system
 
-Shared package: `@blap/ui` (`packages/ui`). The binding brand source is the
+Shared package: `@repo/ui` (`packages/ui`). The binding brand source is the
 root `brand/` directory; where this doc and the kit disagree, the kit wins.
 
 See also [`brand.md`](./brand.md) for the full usage
@@ -35,11 +35,11 @@ entity contract (summary, tags, related hops, enrichable prose, photo).
 ## Usage
 
 ```tsx
-import '@blap/ui/styles.css';
-import { Card, Confidence, Notice } from '@blap/ui';
+import '@repo/ui/styles.css';
+import { Card, Confidence, Notice } from '@repo/ui';
 ```
 
-In Next apps, add `@blap/ui` to `transpilePackages` and prefer `next/font` variables mapped to `--bb-font-display`, `--bb-font-editorial`, `--bb-font-sans`, and `--bb-font-mono`.
+In Next apps, add `@repo/ui` to `transpilePackages` and prefer `next/font` variables mapped to `--ds-font-display`, `--ds-font-editorial`, `--ds-font-sans`, and `--ds-font-mono`.
 
 ## Accessibility
 
@@ -53,9 +53,9 @@ In Next apps, add `@blap/ui` to `transpilePackages` and prefer `next/font` varia
 ## Commands
 
 ```bash
-pnpm --filter @blap/ui test
-pnpm --filter @blap/web exec next dev --port 3048
-# or: pnpm --filter @blap/web dev
+pnpm --filter @repo/ui test
+pnpm --filter @repo/web exec next dev --port 3048
+# or: pnpm --filter @repo/web dev
 # → http://localhost:3048/
 # → http://localhost:3048/design-system
 ```
@@ -82,7 +82,7 @@ Sample entity ids: `ent_seed_place_001`, `ent_seed_school_001`. Data is labeled 
 - Geocoding / nearby discovery (BB-050)
 - Full entity depth + evidence UI (BB-052 / BB-053)
 - Dedicated Storybook/Chromatic if visual regression CI is required later
-- Admin now consumes `@blap/ui` (transpiled + `.js`->`.ts` webpack
+- Admin now consumes `@repo/ui` (transpiled + `.js`->`.ts` webpack
   resolution, matching web's config) and renders the brand mark on its
   home page; admin doesn't yet load the display/sans font families via
   `next/font` (falls back to the CSS `font-family` string literals) — low

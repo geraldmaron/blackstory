@@ -34,7 +34,7 @@ export function createBraveSearchAdapterContract(overrides: Partial<SourceAdapte
       notes:
         'Brave Search API storage-rights tier required before persistence -- see ' +
         '../web-search/provider-decision.ts and normalizer.ts assertStorageTermsConfirmed. ' +
-        'Adapter starts disabled by default (BB-037) independent of the storage-terms gate.',
+        'Adapter starts disabled by default () independent of the storage-terms gate.',
     },
     rights: {
       defaultStatus: 'unknown',

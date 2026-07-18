@@ -6,7 +6,7 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { sha256Json, type JsonValue, type Sha256Hash } from '@blap/domain';
+import { sha256Json, type JsonValue, type Sha256Hash } from '@repo/domain';
 import { DEFAULT_PUBLIC_MEDIA_BUCKET } from './entity-media.js';
 
 export { DEFAULT_PUBLIC_MEDIA_BUCKET };
@@ -116,7 +116,7 @@ export function writeReleaseCatalogArtifactsToDir(
 
 /**
  * Upload catalog artifacts to the public-media bucket. Optional — publish scripts call this
- * when `BLAP_UPLOAD_RELEASE_ARTIFACTS=1` and ADC can write Storage.
+ * when `APP_UPLOAD_RELEASE_ARTIFACTS=1` and ADC can write Storage.
  */
 export async function uploadReleaseCatalogArtifacts(input: {
   readonly artifacts: BuiltReleaseCatalogArtifacts;

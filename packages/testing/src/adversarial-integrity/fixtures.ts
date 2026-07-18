@@ -2,9 +2,9 @@
 /**
  * Deterministic fixtures shared by adversarial integrity scenario runners.
  */
-import type { ClaimEvidenceLink } from '@blap/domain';
-import type { PromotionClaim, PromotionEvidence } from '@blap/domain';
-import type { SubmissionIntakeContext } from '@blap/security';
+import type { ClaimEvidenceLink } from '@repo/domain';
+import type { PromotionClaim, PromotionEvidence } from '@repo/domain';
+import type { SubmissionIntakeContext } from '@repo/security';
 
 export const BASE_NOW_MS = Date.parse('2026-07-17T04:00:00.000Z');
 export const BASE_NOW_ISO = '2026-07-17T04:00:00.000Z';

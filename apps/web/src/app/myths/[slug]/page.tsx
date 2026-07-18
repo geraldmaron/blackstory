@@ -36,7 +36,7 @@ export default async function MythReviewPage({ params }: MythPageProps) {
   const pagePath = `/myths/${slug}`;
 
   return (
-    <main className="bp-container bp-page" id="main">
+    <main className="ds-container ds-page" id="main">
       <TrustSiteJsonLdScript />
       <PublishingPrinciplesJsonLdScript pagePath={pagePath} pageTitle={review.title} />
       <MythClaimReviewScript
@@ -49,28 +49,28 @@ export default async function MythReviewPage({ params }: MythPageProps) {
         ratingExplanation={review.ratingExplanation}
         authorName={review.authorName}
       />
-      <p className="bp-page__eyebrow">Claim review</p>
-      <h1 className="bp-page__title">{review.title}</h1>
-      <p className="bp-sans" style={{ color: 'var(--bp-ink-muted)' }}>
+      <p className="ds-page__eyebrow">Claim review</p>
+      <h1 className="ds-page__title">{review.title}</h1>
+      <p className="ds-sans" style={{ color: 'var(--ds-ink-muted)' }}>
         Technique: {review.technique} · Rating: {review.ratingExplanation}
       </p>
 
-      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-8)' }}>
-        <section className="bp-section" aria-labelledby="claim-reviewed" style={{ paddingTop: 0 }}>
-          <h2 className="bp-section__title" id="claim-reviewed">
+      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-8)' }}>
+        <section className="ds-section" aria-labelledby="claim-reviewed" style={{ paddingTop: 0 }}>
+          <h2 className="ds-section__title" id="claim-reviewed">
             Circulating claim
           </h2>
           <blockquote
-            className="bp-sans"
+            className="ds-sans"
             style={{
               margin: 0,
-              paddingLeft: 'var(--bp-space-4)',
-              borderLeft: 'var(--bp-border-width-strong) solid var(--bp-border)',
+              paddingLeft: 'var(--ds-space-4)',
+              borderLeft: 'var(--ds-border-width-strong) solid var(--ds-border)',
             }}
           >
             {review.claimReviewed}
           </blockquote>
-          <p className="bp-sans" style={{ marginTop: 'var(--bp-space-3)', color: 'var(--bp-ink-muted)' }}>
+          <p className="ds-sans" style={{ marginTop: 'var(--ds-space-3)', color: 'var(--ds-ink-muted)' }}>
             Attributed origin: {review.claimOrigin.name}
             {review.claimOrigin.url ? (
               <>
@@ -84,19 +84,19 @@ export default async function MythReviewPage({ params }: MythPageProps) {
           </p>
         </section>
 
-        <section className="bp-section" aria-labelledby="review-body">
-          <h2 className="bp-section__title" id="review-body">
+        <section className="ds-section" aria-labelledby="review-body">
+          <h2 className="ds-section__title" id="review-body">
             What the record shows
           </h2>
-          <p className="bp-section__lede">{review.reviewBody}</p>
+          <p className="ds-section__lede">{review.reviewBody}</p>
           {review.relatedFactUrl ? (
-            <p className="bp-sans">
+            <p className="ds-sans">
               <a href={review.relatedFactUrl}>Read the canonical fact record</a>
             </p>
           ) : null}
         </section>
 
-        <section className="bp-section" aria-labelledby="how-to-verify">
+        <section className="ds-section" aria-labelledby="how-to-verify">
           <HowToReadThisRecord />
         </section>
       </div>

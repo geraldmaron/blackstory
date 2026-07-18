@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { loadProductConstitution, type ProductConstitution } from '@blap/schemas';
+import { loadProductConstitution, type ProductConstitution } from '@repo/schemas';
 import type { ClaimEvidenceLink } from './claims/evidence-link.js';
 import {
   exportConfidenceCalibrationDataset,

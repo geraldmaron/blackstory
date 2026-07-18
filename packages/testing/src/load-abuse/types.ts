@@ -1,7 +1,7 @@
 
 /**
  * Shared types for load, abuse, and cost simulation harnesses.
- * Scenarios exercise @blap/security guardrails locally no live endpoint attacks.
+ * Scenarios exercise @repo/security guardrails locally no live endpoint attacks.
  */
 
 /** Abuse scenario identifiers aligned with acceptance criteria. */

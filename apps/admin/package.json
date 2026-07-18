@@ -1,5 +1,5 @@
 {
-  "name": "@blap/admin",
+  "name": "@repo/admin",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -11,17 +11,17 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "@blap/config": "workspace:*",
-    "@blap/domain": "workspace:*",
-    "@blap/operator-cli": "workspace:*",
-    "@blap/ui": "workspace:*",
+    "@repo/config": "workspace:*",
+    "@repo/domain": "workspace:*",
+    "@repo/operator-cli": "workspace:*",
+    "@repo/ui": "workspace:*",
     "next": "^16.2.10",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
-    "@blap/eslint-config": "workspace:^",
-    "@blap/typescript-config": "workspace:^",
+    "@repo/eslint-config": "workspace:^",
+    "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.16.5",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",

@@ -307,15 +307,15 @@ export function buildLaunchCorpusVettingInputs(input: {
       organizationId: 'org_richmond_dsl',
       citationRequirements:
         'Cite Mapping Inequality (Univ. of Richmond DSL) and the underlying NARA record id; grade, ' +
-        'boundary geometry, and retrieval date are recorded per record (BB-094 acceptance ' +
+        'boundary geometry, and retrieval date are recorded per record ( acceptance ' +
         'criterion 7).',
       boundaryNotes:
-        'Feeds the BB-082 exclusion-infrastructure layer as corroborating historical evidence — ' +
-        'registered ONCE here (BB-094 acceptance criterion 5) and referenced by BB-082, never ' +
-        're-ingested by BB-082 as a second copy. Actual polygon ingestion into map tile assets ' +
-        'integrates with BB-070\'s map data platform (packages/domain/src/map/) — building that ' +
-        'tile-compilation step is explicit, documented follow-up, not part of BB-094\'s scope: ' +
-        'BB-070\'s `buildMapSource` (packages/domain/src/map/map-source.ts) already accepts ' +
+        'Feeds the  exclusion-infrastructure layer as corroborating historical evidence — ' +
+        'registered ONCE here ( acceptance criterion 5) and referenced by, never ' +
+        're-ingested by  as a second copy. Actual polygon ingestion into map tile assets ' +
+        'integrates with \'s map data platform (packages/domain/src/map/) — building that ' +
+        'tile-compilation step is explicit, documented follow-up, not part of \'s scope: ' +
+        '\'s `buildMapSource` (packages/domain/src/map/map-source.ts) already accepts ' +
         '`GeoGeometry` (`Point | Polygon | BBox`, packages/domain/src/geography/location.ts) — ' +
         'the follow-up is calling it with this corpus\'s vetted Polygon records the same way ' +
         'the "INTEGRATION POINT" comments in map-source.ts and completeness-gate.ts document for ' +
@@ -359,7 +359,7 @@ export const LAUNCH_CORPUS_SLUGS: readonly string[] = [
 
 /** Slugs deliberately excluded from this module's corpus list. */
 export const BOUNDARY_EXCLUDED_CORPUS_SLUGS: readonly { readonly slug: string; readonly ownerBead: string }[] = [
-  { slug: 'statutes', ownerBead: 'BB-087' },
-  { slug: 'cases', ownerBead: 'BB-087' },
-  { slug: 'tougaloo-sundown-data', ownerBead: 'BB-082' },
+  { slug: 'statutes', ownerBead: '' },
+  { slug: 'cases', ownerBead: '' },
+  { slug: 'tougaloo-sundown-data', ownerBead: '' },
 ];

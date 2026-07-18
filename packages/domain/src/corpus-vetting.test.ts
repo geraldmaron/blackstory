@@ -48,7 +48,7 @@ function baseInput(overrides: Partial<RegisterCorpusVettingInput> = {}): Registe
   };
 }
 
-test('registerCorpusVetting registers a BB-037 registry entry and an approved corpus for a cleared license verdict', () => {
+test('registerCorpusVetting registers a  registry entry and an approved corpus for a cleared license verdict', () => {
   const registryStore = createInMemorySourceRegistry();
   const vettingStore = createInMemoryCorpusVettingStore();
   const record = registerCorpusVetting(registryStore, vettingStore, baseInput());
@@ -155,12 +155,12 @@ test('bulk batches fail closed when the vetting record points at a missing regis
   );
 });
 
-test('assertCorpusNotInExcludedLane rejects statutes/cases (BB-087) and Tougaloo sundown data (BB-082)', () => {
-  assert.throws(() => assertCorpusNotInExcludedLane('statutes'), /BB-087/u);
-  assert.throws(() => assertCorpusNotInExcludedLane('cases'), /BB-087/u);
-  assert.throws(() => assertCorpusNotInExcludedLane('legal-corpus'), /BB-087/u);
-  assert.throws(() => assertCorpusNotInExcludedLane('tougaloo-sundown-data'), /BB-082/u);
-  assert.throws(() => assertCorpusNotInExcludedLane('tougaloo'), /BB-082/u);
+test('assertCorpusNotInExcludedLane rejects statutes/cases () and Tougaloo sundown data ()', () => {
+  assert.throws(() => assertCorpusNotInExcludedLane('statutes'), //u);
+  assert.throws(() => assertCorpusNotInExcludedLane('cases'), //u);
+  assert.throws(() => assertCorpusNotInExcludedLane('legal-corpus'), //u);
+  assert.throws(() => assertCorpusNotInExcludedLane('tougaloo-sundown-data'), //u);
+  assert.throws(() => assertCorpusNotInExcludedLane('tougaloo'), //u);
   assert.doesNotThrow(() => assertCorpusNotInExcludedLane('nrhp'));
 });
 
@@ -169,7 +169,7 @@ test('registerCorpusVetting refuses to register an excluded-lane corpus', () => 
   const vettingStore = createInMemoryCorpusVettingStore();
   assert.throws(
     () => registerCorpusVetting(registryStore, vettingStore, baseInput({ corpus: 'statutes' })),
-    /BB-087/u,
+    //u,
   );
 });
 

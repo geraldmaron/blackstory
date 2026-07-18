@@ -6,7 +6,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { DEFAULT_ALERT_POLICIES } from '@blap/observability';
+import { DEFAULT_ALERT_POLICIES } from '@repo/observability';
 import { buildBudgetExceededAlert, buildJobRunAlerts, buildMissedRunAlert } from './alerting.ts';
 import { evaluateJobBudget, evaluateMissedRuns } from './health.ts';
 import { completeJobRun, startJobRun } from './run-record.ts';
@@ -14,7 +14,7 @@ import type { ScheduledJobDefinition } from './types.ts';
 
 const JOB: ScheduledJobDefinition = {
   id: 'daily-job',
-  owner: 'BB-084',
+  owner: 'scheduled-jobs',
   description: 'test job',
   cadence: { cronExpression: '0 4 * * *', nominalIntervalMs: 86_400_000, humanReadable: 'daily' },
   budget: { unit: 'items', maxPerRun: 100 },
@@ -22,13 +22,13 @@ const JOB: ScheduledJobDefinition = {
   idempotencyKeyScheme: 'job:{jobId}:{dayStart}',
   killSwitchId: 'research-campaigns',
   targetWorker: { package: 'research', function: 'sample.run' },
-  environment: 'blackbook-internal',
+  environment: 'repo-internal',
   publicEffect: 'none',
   rosterStatus: 'real',
   consecutiveMissedRunThreshold: 3,
 };
 
-test('N consecutive missed runs (silence, no failure record needed) raises a BB-034 alert', () => {
+test('N consecutive missed runs (silence, no failure record needed) raises a workstream alert', () => {
   const evaluation = evaluateMissedRuns({
     job: JOB,
     runs: [],
@@ -72,7 +72,7 @@ test('a job that does not miss runs raises no missed-run alert', () => {
   );
 });
 
-test('a job that exceeds its budget raises a BB-034 alert', () => {
+test('a job that exceeds its budget raises a workstream alert', () => {
   const run = completeJobRun(startJobRun({ jobId: JOB.id, jobRunId: 'r-over', startedAt: '2026-07-17T04:00:00.000Z' }), {
     completedAt: '2026-07-17T04:05:00.000Z',
     itemsProcessed: 250,

@@ -1,5 +1,5 @@
 /**
- * Verification/refresh domain surface (black-book-isqd): policies, cadences, per-subject
+ * Verification/refresh domain surface (the related workstream): policies, cadences, per-subject
  * verification state, due-record selection, and the never-overwrite `CandidateUpdate` model.
  */
 export {

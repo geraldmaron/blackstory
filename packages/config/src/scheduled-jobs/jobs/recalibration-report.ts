@@ -1,19 +1,19 @@
 
 /**
  * REAL roster entry: relevance/confidence recalibration report. Wraps
- * @blap/domain's relevance-feedback module buildRecalibrationReport (per-dimension
+ * @repo/domain's relevance-feedback module buildRecalibrationReport (per-dimension
  * disagreement, query-pack effectiveness, graylist yield, source-tier precision) and
  * evaluateRelevanceDriftAlarm the same way gold-corpus-regression.ts wraps
- * @blap/testing's evaluateCorpus: this wrapper does not reimplement any analysis, it only
+ * @repo/testing's evaluateCorpus: this wrapper does not reimplement any analysis, it only
  * adapts the domain module's pure functions into the generic JobRunRecord shape so the report can
  * be scheduled through this registry.
  *
  * Report-only, always: this job produces a RecalibrationReport + a drift-alarm evaluation (and,
  * only if the disagreement rate is sustained above threshold, a alert). It never proposes,
  * gates, or approves a weight change proposeWeightChange requireGoldCorpusGatePassed
- * approveWeightChange (@blap/domain) are a separate, human-triggered path with their own
+ * approveWeightChange (@repo/domain) are a separate, human-triggered path with their own
  * distinct-approver and gold-corpus-gate requirements (see relevance-feedback.test.ts in
- * @blap/domain), deliberately not invoked anywhere in this file. No publish, no live
+ * @repo/domain), deliberately not invoked anywhere in this file. No publish, no live
  * weight mutation.
  *
  * Drift alerts reuse SEC-SRC-01 policy via the exact call shape
@@ -30,8 +30,8 @@ import {
   type RelevanceDriftAlarmEvaluation,
   type RelevanceDriftAlarmThresholds,
   type RelevanceDriftWindow,
-} from '@blap/domain';
-import { DEFAULT_ALERT_POLICIES, buildAlertPayload, type SecurityAlertPayload } from '@blap/observability';
+} from '@repo/domain';
+import { DEFAULT_ALERT_POLICIES, buildAlertPayload, type SecurityAlertPayload } from '@repo/observability';
 import { completeJobRun, startJobRun, type JobRunRecord } from '../run-record.js';
 
 export const RECALIBRATION_REPORT_JOB_ID = 'relevance-confidence-recalibration-report';
@@ -50,7 +50,7 @@ function requirePolicy(id: string) {
   const policy = DEFAULT_ALERT_POLICIES.find((candidate) => candidate.id === id);
   if (!policy) {
     throw new Error(
-      `BB-034 alert policy "${id}" is missing; recalibration-report drift alarm depends on it existing`,
+      ` alert policy "${id}" is missing; recalibration-report drift alarm depends on it existing`,
     );
   }
   return policy;

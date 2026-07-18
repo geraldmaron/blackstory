@@ -1,5 +1,5 @@
 {
-  "name": "@blap/config",
+  "name": "@repo/config",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,6 +8,11 @@
       "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./identity": {
+      "development": "./src/identity.ts",
+      "types": "./dist/identity.d.ts",
+      "import": "./dist/identity.js"
     },
     "./launch-gate": {
       "development": "./src/launch-gate/index.ts",
@@ -26,14 +31,14 @@
   },
   "dependencies": {
     "zod": "^3.25.76",
-    "@blap/domain": "workspace:*",
-    "@blap/observability": "workspace:*",
-    "@blap/security": "workspace:*",
-    "@blap/testing": "workspace:*"
+    "@repo/domain": "workspace:*",
+    "@repo/observability": "workspace:*",
+    "@repo/security": "workspace:*",
+    "@repo/testing": "workspace:*"
   },
   "devDependencies": {
-    "@blap/firebase": "workspace:*",
-    "@blap/typescript-config": "workspace:^",
+    "@repo/firebase": "workspace:*",
+    "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

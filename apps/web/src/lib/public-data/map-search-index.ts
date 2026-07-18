@@ -1,9 +1,9 @@
 /**
- * Maps Firestore / artifact search-index docs into `@blap/domain`'s `PublicSearchIndexDoc`
+ * Maps Firestore / artifact search-index docs into `@repo/domain`'s `PublicSearchIndexDoc`
  * so `runPublicSearch` can consume the written index without rebuilding from entity scans.
  */
-import type { NotabilityBasisRecord, PublicSearchIndexDoc } from '@blap/domain';
-import type { PublicSearchIndexDoc as FirestoreSearchIndexDoc } from '@blap/firebase';
+import type { NotabilityBasisRecord, PublicSearchIndexDoc } from '@repo/domain';
+import type { PublicSearchIndexDoc as FirestoreSearchIndexDoc } from '@repo/firebase';
 
 export function mapFirestoreSearchIndexDoc(
   doc: FirestoreSearchIndexDoc,

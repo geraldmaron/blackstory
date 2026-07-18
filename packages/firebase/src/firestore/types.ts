@@ -2,7 +2,7 @@
 /**
  * Firestore document schemas for Black Book (ADR-011 018).
  * Entity/geography, provenance, claims/confidence.
- * Shapes align with @blap/domain; Cloud SQL PostGIS are not the production path.
+ * Shapes align with @repo/domain; Cloud SQL PostGIS are not the production path.
  */
 import { z } from 'zod';
 import {
@@ -13,7 +13,7 @@ import {
   DATA_PACK_IMPORT_STAGES,
   DATA_PACK_RESOURCE_KINDS,
   EXTERNAL_SOURCE_LICENSE_VERDICTS,
-} from '@blap/domain';
+} from '@repo/domain';
 
 export const authClaimFlagsSchema = z.object({
   admin: z.boolean().optional(),
@@ -45,7 +45,7 @@ export const entityKindSchema = z.enum([
 export type EntityKindDoc = z.infer<typeof entityKindSchema>;
 
 /**
- * Coarse entity classification (black-book-9mox, mirrors packages/domain/src/entity-class.ts).
+ * Coarse entity classification (the related workstream, mirrors packages/domain/src/entity-class.ts).
  * NEW, additive, optional/defaulted so existing entity docs (which carry only `kind`) keep
  * parsing unchanged. Hardcoded here rather than imported, matching this file's existing
  * convention (see `entityKindSchema` above).
@@ -205,7 +205,7 @@ export const schoolFieldsSchema = z.object({
 // Entity ontology: shared date-precision model, entity-lifecycle status history,
 // notability-basis inclusion rubric, and the schema-only sensitivity classification. Mirrors
 // packages/domain/src/era.ts and packages/domain/src/entity-status.ts. Vocabularies are
-// hardcoded here (not imported from @blap/domain) to match this file's existing convention
+// hardcoded here (not imported from @repo/domain) to match this file's existing convention
 // (e.g. entityKindSchema above hardcodes ENTITY_KINDS rather than importing it).
 // ---------------------------------------------------------------------------
 
@@ -302,7 +302,7 @@ export type PolicyVersionDoc = z.infer<typeof policyVersionSchema>;
 export const canonicalEntitySchema = z.object({
   id: z.string().min(1),
   kind: entityKindSchema,
-  /** black-book-9mox: additive coarse classification, derived from `kind` — see
+  /** the related workstream: additive coarse classification, derived from `kind` — see
    * packages/domain/src/entity-class.ts. Optional so existing docs keep parsing. */
   entityClass: entityClassSchema.optional(),
   /** Controlled finer-grained subtype label(s) within `entityClass` (e.g. `['church']`). */
@@ -311,7 +311,7 @@ export const canonicalEntitySchema = z.object({
   aliases: z.array(entityAliasSchema).optional(),
   identifiers: z.array(entityIdentifierSchema).optional(),
   livingStatus: z.enum(['living', 'deceased', 'unknown']).default('unknown'),
-  /** black-book-mpfb: computed/output-only derivation result — see
+  /** the related workstream: computed/output-only derivation result — see
    * packages/domain/src/living.ts's `deriveLivingStatus`. Not independently authoritative; never
    * required at write time. */
   livingStatusDerived: z.enum(['living', 'deceased', 'unknown']).optional(),
@@ -320,13 +320,13 @@ export const canonicalEntitySchema = z.object({
    * scope-guardrail comment on statusHistoryEntrySchema above. */
   statusHistory: z.array(statusHistoryEntrySchema).optional(),
   /** >=1 record required to publish enforced by
-   * @blap/domain's assertPublishableEntityHasNotabilityBasis, not by this schema alone. */
+   * @repo/domain's assertPublishableEntityHasNotabilityBasis, not by this schema alone. */
   notabilityBasis: z.array(notabilityBasisRecordSchema).optional(),
   /** Schema-only; presentation lives in the UI layer. */
   sensitivity: z.array(entitySensitivitySchema).optional(),
   person: z
     .object({
-      /** @deprecated black-book-mpfb: redundant with the entity-level `livingStatus` above,
+      /** @deprecated the related workstream: redundant with the entity-level `livingStatus` above,
        * which is canonical (see packages/domain/src/specialized.ts's PersonFields doc for the
        * call-site audit). Made optional was required so un-migrated writers aren't forced to
        * keep setting a field that no longer has authoritative meaning. */
@@ -407,7 +407,7 @@ export type CanonicalEntityDoc = z.infer<typeof canonicalEntitySchema>;
 /**
  * Historical-causation edges (caused/enabled/influenced/participated_in/overturned/
  * commemorates) plus `authored` (creation attribution, distinct from `founded`). Direction and
- * temporal semantics for every type are documented in `@blap/domain`'s
+ * temporal semantics for every type are documented in `@repo/domain`'s
  * `RELATIONSHIP_TYPE_SEMANTICS` (packages/domain/src/relationship.ts) hardcoded here, not
  * imported, to match this file's existing convention (see the entityKindSchema comment above).
  */
@@ -437,7 +437,7 @@ export const relationshipTypeSchema = z.enum([
 export type RelationshipTypeDoc = z.infer<typeof relationshipTypeSchema>;
 
 /** Role qualifier valid ONLY on `type: 'attended'`; see
- * `@blap/domain`'s `assertRelationshipRoleValidForType`. */
+ * `@repo/domain`'s `assertRelationshipRoleValidForType`. */
 export const relationshipRoleSchema = z.enum(['organizer', 'speaker', 'participant']);
 
 export type RelationshipRoleDoc = z.infer<typeof relationshipRoleSchema>;
@@ -445,17 +445,17 @@ export type RelationshipRoleDoc = z.infer<typeof relationshipRoleSchema>;
 const unitInterval = z.number().min(0).max(1);
 
 /** Same shape as `claimVersionSchema`/`canonicalClaimSchema`'s workflow/publication enums (see
- * below), reused by name for cross-domain consistency see `@blap/domain`'s
+ * below), reused by name for cross-domain consistency see `@repo/domain`'s
  * `RELATIONSHIP_WORKFLOW_STATUSES`/`RELATIONSHIP_PUBLICATION_STATUSES`. Relationships add an
  * explicit `candidate` state claims don't have, for the candidate -> review -> published
- * pipeline (BB black-book-hx8j). */
+ * pipeline (BB the related workstream). */
 export const relationshipWorkflowStatusSchema = z.enum(['candidate', 'in_review', 'accepted', 'rejected']);
 export type RelationshipWorkflowStatusDoc = z.infer<typeof relationshipWorkflowStatusSchema>;
 
 export const relationshipPublicationStatusSchema = z.enum(['unpublished', 'published', 'retracted']);
 export type RelationshipPublicationStatusDoc = z.infer<typeof relationshipPublicationStatusSchema>;
 
-/** See `@blap/domain`'s `RelationshipResolutionState` doc comment: distinct from
+/** See `@repo/domain`'s `RelationshipResolutionState` doc comment: distinct from
  * `ResolutionOutcome` (a single candidate-to-entity match decision) this describes the joint
  * resolution state of both of an edge's endpoints. */
 export const relationshipResolutionStateSchema = z.enum(['unresolved', 'partially_resolved', 'resolved']);
@@ -513,7 +513,7 @@ export const entityRelationshipSchema = z.object({
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   // ---------------------------------------------------------------------------------------
-  // lifecycle/workflow fields (BB black-book-hx8j). All optional: pre-existing relationship
+  // lifecycle/workflow fields (BB the related workstream). All optional: pre-existing relationship
   // docs predate this pipeline and remain valid without a backfill migration.
   // ---------------------------------------------------------------------------------------
   workflowStatus: relationshipWorkflowStatusSchema.optional(),
@@ -641,7 +641,7 @@ export const canonicalClaimSchema = z.object({
 export type CanonicalClaimDoc = z.infer<typeof canonicalClaimSchema>;
 
 /**
- * Verification policy (black-book-isqd, mirrors packages/domain/src/verification/policy.ts):
+ * Verification policy (the related workstream, mirrors packages/domain/src/verification/policy.ts):
  * governs how often published claims matching `appliesToEntityClasses`/`appliesToPredicates`
  * must be independently re-checked. Doc shape for `verificationPolicies/{policyId}`. Enum values
  * hardcoded rather than imported, matching this file's existing convention (see
@@ -672,7 +672,7 @@ export const verificationPolicySchema = z.object({
 export type VerificationPolicyDoc = z.infer<typeof verificationPolicySchema>;
 
 /**
- * Per-subject verification state (black-book-isqd, mirrors
+ * Per-subject verification state (the related workstream, mirrors
  * packages/domain/src/verification/state.ts): kept separate from `canonicalClaimSchema` /
  * `entityRelationshipSchema` / canonical entity docs rather than merged into them (see the
  * domain module's doc comment for the reasoning) — doc shape for a `verificationStates`
@@ -698,7 +698,7 @@ export const verificationStateSchema = z.object({
 export type VerificationStateDoc = z.infer<typeof verificationStateSchema>;
 
 /**
- * `CandidateUpdate` (black-book-isqd, mirrors
+ * `CandidateUpdate` (the related workstream, mirrors
  * packages/domain/src/verification/candidate-update.ts): a refresh never overwrites public
  * truth directly — it produces one of these, which enters the normal review pipeline.
  */
@@ -1092,18 +1092,18 @@ export const publicEntityProjectionSchema = z.object({
    * packages/domain/src/relevance/notability-gate.test.ts for the enforcing test).
    */
   /** Derived current status label (e.g. "active", "in_force", "living") never a scalar the
-   * reader hand-edits; always derived via @blap/domain's `currentEntityStatus`. */
+   * reader hand-edits; always derived via @repo/domain's `currentEntityStatus`. */
   status: z.string().min(1).optional(),
   /** Decade labels the entity's dated span overlaps (e.g. ["1950s", "1960s"]) derived via
-   * @blap/domain's `deriveEraBuckets`, replacing the free-text `era` string. */
+   * @repo/domain's `deriveEraBuckets`, replacing the free-text `era` string. */
   eraBuckets: z.array(z.string().min(1)).optional(),
   /** Human-readable notability rubric labels (never the raw criterion enum alone, never a
-   * score) one per notabilityBasis record, sourced from @blap/domain's
+   * score) one per notabilityBasis record, sourced from @repo/domain's
    * `NOTABILITY_RUBRIC`. */
   notabilityLabels: z.array(z.string().min(1)).optional(),
   /**
    * Structured, auditable inclusion basis this entity's `notabilityLabels` above are derived
-   * from (black-book-1fg9). Reuses `notabilityBasisRecordSchema` non-numeric by the same
+   * from (the related workstream). Reuses `notabilityBasisRecordSchema` non-numeric by the same
    * standing policy, `evidenceIds` point at this projection's own `claims[].id` values. Optional
    * for the same reason `claims` is: bootstrap-window stubs predate the release builder that
    * populates this field.
@@ -1111,13 +1111,13 @@ export const publicEntityProjectionSchema = z.object({
   notabilityBasis: z.array(notabilityBasisRecordSchema).optional(),
   /**
    * Research-depth signal computed ONCE at release-build time from the entity's real claim
-   * count and citation completeness (black-book-1fg9) — never a UI-side guess computed at
-   * render time. See `@blap/domain`'s `computeReleaseResearchCoverage`. Optional for the same
+   * count and citation completeness (the related workstream) — never a UI-side guess computed at
+   * render time. See `@repo/domain`'s `computeReleaseResearchCoverage`. Optional for the same
    * bootstrap-window-stub reason as `claims`/`notabilityBasis`.
    */
   researchCoverage: z.enum(['minimal', 'partial', 'substantial']).optional(),
   /**
-   * Revision/verification metadata (black-book-1fg9): real "this release build ran at this
+   * Revision/verification metadata (the related workstream): real "this release build ran at this
    * instant" timestamps, set once by the release builder — never fabricated at page-render time
    * (see `apps/web/src/lib/public-data/map-projection.ts`'s prior placeholder-timestamp TODO,
    * which this field resolves). Optional for the same bootstrap-window-stub reason as above.
@@ -1128,27 +1128,27 @@ export const publicEntityProjectionSchema = z.object({
   sensitivityClass: sensitivityClassSchema.optional(),
 
   /**
-   * @deprecated Superseded by the controlled-taxonomy split below (black-book-s4hp). Kept
+   * @deprecated Superseded by the controlled-taxonomy split below (the related workstream). Kept
    * optional, alongside the new fields, for backward compatibility during the transition —
    * new writers should populate `topicIds`/`mentionedEntityIds`/`keywords` instead. Readers
    * that still facet on this raw field must filter through
-   * `@blap/domain`'s `isPermittedTopicTag` (interim allowlist); never count/facet on it
+   * `@repo/domain`'s `isPermittedTopicTag` (interim allowlist); never count/facet on it
    * unfiltered.
    */
   topicTags: z.array(z.string().min(1)).default([]),
   /**
-   * Controlled historical-theme ids (black-book-s4hp) — the ONLY field that may ever be
+   * Controlled historical-theme ids (the related workstream) — the ONLY field that may ever be
    * surfaced as a facet/filter option. Every id must resolve against
-   * `@blap/domain`'s `TOPIC_REGISTRY` (packages/domain/src/taxonomy/topics.ts); readers should
+   * `@repo/domain`'s `TOPIC_REGISTRY` (packages/domain/src/taxonomy/topics.ts); readers should
    * validate with `isValidTopicId` rather than trusting this array blindly. Net-new field.
    */
   topicIds: z.array(z.string().min(1)).default([]),
   /**
    * Resolvable ids of people/places/organizations/laws/events this record mentions. Never a
-   * facet — this is for future cross-linking/entity-resolution (black-book-8bck), not
-   * discovery browsing. During the black-book-s4hp migration these may be raw legacy-tag
+   * facet — this is for future cross-linking/entity-resolution (the related workstream), not
+   * discovery browsing. During the the related workstream migration these may be raw legacy-tag
    * strings acting as placeholder ids (e.g. `"naacp"`, `"selma"`) rather than real canonical
-   * entity ids; resolving those against the entity graph is black-book-8bck's job. Net-new
+   * entity ids; resolving those against the entity graph is the related workstream's job. Net-new
    * field.
    */
   mentionedEntityIds: z.array(z.string().min(1)).default([]),
@@ -1178,7 +1178,7 @@ export const publicEntityProjectionSchema = z.object({
 
   /**
    * Typed related entries derived from the release's graph
-   * adjacency doc (`@blap/domain`'s `toPublicRelatedEntries`
+   * adjacency doc (`@repo/domain`'s `toPublicRelatedEntries`
    * `publicRelatedEntriesByEntityId`, packages/domain/src/graph/adjacency.ts + build.ts)
    * sufficient for "related people, places…" and "timelines" sections. Never carries a
    * numeric field beyond what's already elsewhere on this schema (evidence counts are an
@@ -1206,7 +1206,7 @@ export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSch
 
 
 /**
- * persisted search index document the server-read shape @blap/domain's
+ * persisted search index document the server-read shape @repo/domain's
  * `buildPublicSearchIndexDocs` produces (`packages/domain/src/search/`). Follows the exact
  * conventions of `publicEntityProjectionSchema` above: reuses `entityKindSchema`
  * `sensitivityClassSchema`, and every field is non-numeric BY STANDING POLICY except the two
@@ -1214,7 +1214,7 @@ export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSch
  *
  * `relatedCount` (connection-strength proxy) and `claimCount` are the ONLY numeric fields, and are
  * SERVER-INTERNAL ranking inputs only: search runs server-side and projects results into the
- * client-facing `SearchResultView` (defined in @blap/domain), which carries neither count
+ * client-facing `SearchResultView` (defined in @repo/domain), which carries neither count
  * nor any score mirroring rule that adjacency `evidenceCount` is an ordering key, never
  * a public payload field. `notabilityBasis` is retained as the auditable inclusion basis backing
  * the AC5 gate; it carries only string leaves (criterion, note, evidenceIds the same category as
@@ -1231,11 +1231,11 @@ export const publicSearchIndexSchema = z.object({
   /** Lowercased alias strings, flattened from EntityAlias by the release builder. */
   aliases: z.array(z.string().min(1)).default([]),
   summary: z.string().optional(),
-  /** @deprecated Superseded by `topicIds`/`mentionedEntityIds`/`keywords` below (black-book-s4hp).
+  /** @deprecated Superseded by `topicIds`/`mentionedEntityIds`/`keywords` below (the related workstream).
    * Kept optional for backward compatibility; do not facet/count on this unfiltered. */
   topicTags: z.array(z.string().min(1)).default([]),
-  /** Controlled historical-theme ids (black-book-s4hp) — the ONLY field the search-index
-   * `theme` facet may be built from. Must resolve against `@blap/domain`'s `TOPIC_REGISTRY`.
+  /** Controlled historical-theme ids (the related workstream) — the ONLY field the search-index
+   * `theme` facet may be built from. Must resolve against `@repo/domain`'s `TOPIC_REGISTRY`.
    * Net-new field. */
   topicIds: z.array(z.string().min(1)).default([]),
   /** Resolvable ids of people/places/organizations/laws/events mentioned; never a facet.
@@ -1392,8 +1392,8 @@ export const killSwitchSchema = z.object({
 export type KillSwitchDoc = z.infer<typeof killSwitchSchema>;
 
 // ---------------------------------------------------------------------------
-// Data Pack v1 collections (black-book-ud5q) — skeletal stubs backing
-// @blap/domain's `datapacks/` contract (manifest + validation + import pipeline). These record
+// Data Pack v1 collections (the related workstream) — skeletal stubs backing
+// @repo/domain's `datapacks/` contract (manifest + validation + import pipeline). These record
 // the same fail-closed posture as that module: a dataset row starts disabled, an import batch
 // starts pending, and nothing here auto-promotes an external id into a canonical entity id.
 // ---------------------------------------------------------------------------
@@ -1434,7 +1434,7 @@ export const externalDatasetVersionSchema = z.object({
 export type ExternalDatasetVersionDoc = z.infer<typeof externalDatasetVersionSchema>;
 
 /** Which subscriber (feature/team) consumes a dataset, and the import budget it is bound by
- * (`DataPackImportBudget` shape from `@blap/domain`'s `datapacks/validate.ts`). */
+ * (`DataPackImportBudget` shape from `@repo/domain`'s `datapacks/validate.ts`). */
 export const datasetSubscriptionSchema = z.object({
   id: z.string().min(1).max(256),
   datasetId: z.string().min(1).max(256),

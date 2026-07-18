@@ -48,7 +48,7 @@ export function assertNoDangerShadingStyleTerm(styleToken: string): void {
     if (normalized.includes(term)) {
       throw new MapOverlayDignityViolationError(
         `Map overlay style token "${styleToken}" contains prohibited term "${term}" \u2014 overlays ` +
-          'render muted only, never danger/alert shading (BB-051 dignity rules).',
+          'render muted only, never danger/alert shading (dignity rules).',
       );
     }
   }

@@ -1,9 +1,9 @@
 /**
  * acceptance: real adversarial-submission fixtures from the shared threat corpus
- * (`@blap/testing`'s security-gate fixtures, the harmless deterministic attack
+ * (`@repo/testing`'s security-gate fixtures, the harmless deterministic attack
  * payloads used across this repo's API and policy contract tests) run through the exact
  * quarantine entry point this lane's public submission path calls
- * (`createQuarantinedSubmission` from `@blap/security`) and are confirmed to never reach
+ * (`createQuarantinedSubmission` from `@repo/security`) and are confirmed to never reach
  * canonical storage or a discovery candidate. These are not synthetic fixtures written for
  * this test they are the corpus already used to gate T-01/T-02 (resource exhaustion),
  * T-04 (mass assignment BOLA), and T-07 (data poisoning) in `docs/security/threat-corpus.json`.
@@ -15,12 +15,12 @@ import {
   RESOURCE_CONSUMPTION_FIXTURES,
   SSRF_URL_FIXTURES,
   XSS_TEXT_FIXTURES,
-} from '@blap/testing';
+} from '@repo/testing';
 import {
   createQuarantinedSubmission,
   createSubmissionCampaignDetector,
   type SubmissionIntakeContext,
-} from '@blap/security';
+} from '@repo/security';
 
 const NOW_MS = Date.parse('2026-07-17T04:00:00.000Z');
 

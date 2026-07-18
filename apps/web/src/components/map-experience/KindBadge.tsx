@@ -5,7 +5,7 @@
  * Explore map markers.
  */
 import React from 'react';
-import { cx } from '@blap/ui';
+import { cx } from '@repo/ui';
 import {
   displayEncodingFor,
   type MapEntityGlyph,
@@ -14,10 +14,10 @@ import {
 void React;
 
 const GLYPH_CLASS: Readonly<Record<MapEntityGlyph, string>> = {
-  circle: 'bp-legend-glyph--circle',
-  square: 'bp-legend-glyph--square',
-  diamond: 'bp-legend-glyph--diamond',
-  ring: 'bp-legend-glyph--ring',
+  circle: 'ds-legend-glyph--circle',
+  square: 'ds-legend-glyph--square',
+  diamond: 'ds-legend-glyph--diamond',
+  ring: 'ds-legend-glyph--ring',
 };
 
 export type KindBadgeProps = {
@@ -38,16 +38,16 @@ export function KindBadge({ kind, mapTone, className, density = 'default' }: Kin
 
   return (
     <span
-      className={cx('bp-kind-badge', density === 'compact' && 'bp-kind-badge--compact', className)}
+      className={cx('ds-kind-badge', density === 'compact' && 'ds-kind-badge--compact', className)}
       data-kind={kind}
       {...(mapTone ? { 'data-map-tone': mapTone } : {})}
     >
       <span
-        className={cx('bp-legend-glyph', GLYPH_CLASS[encoding.glyph])}
+        className={cx('ds-legend-glyph', GLYPH_CLASS[encoding.glyph])}
         style={glyphStyle}
         aria-hidden="true"
       />
-      <span className="bp-kind-badge__label">{encoding.label}</span>
+      <span className="ds-kind-badge__label">{encoding.label}</span>
     </span>
   );
 }

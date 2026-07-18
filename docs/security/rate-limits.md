@@ -15,8 +15,8 @@ device/session risk, and endpoint class — without exposing exact thresholds to
 | Layer | Scope | Implementation |
 |-------|-------|----------------|
 | Cloud Armor | Per-IP edge throttles, WAF, emergency deny | [`infra/gcp/armor/`](../../infra/gcp/armor/) (BB-023) |
-| App Check | Client attestation for expensive/mutation paths | `@blap/firebase` guards (BB-024) |
-| Subject quotas | anonymous < authenticated < admin < service | `@blap/security` policy matrix |
+| App Check | Client attestation for expensive/mutation paths | `@repo/firebase` guards (BB-024) |
+| Subject quotas | anonymous < authenticated < admin < service | `@repo/security` policy matrix |
 | Endpoint buckets | search, geocode, nearby, entity, source, … | Token bucket + rolling/daily windows |
 | Risk aggregation | Cross-IP device/session/account signals | `RiskSignal` + `aggregateDistributedRisk` |
 | Concurrency | In-flight cap per key | `maxConcurrency` per policy row |
@@ -64,9 +64,9 @@ Production should swap the store interface for Redis/Memorystore (BB-033) withou
 ## Validation
 
 ```bash
-pnpm --filter @blap/security test
-pnpm --filter @blap/api-public test
-pnpm --filter @blap/api-submissions test
+pnpm --filter @repo/security test
+pnpm --filter @repo/api-public test
+pnpm --filter @repo/api-submissions test
 ```
 
 ## Acceptance mapping

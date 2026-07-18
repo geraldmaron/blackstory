@@ -1,7 +1,7 @@
 /**
  * Builds the `/explore` map + list dataset from the active release (seed catalog until live
  * projections are wired — same posture as `../../data/public-seed.ts`). Reuses the
- * redaction-injected `buildMapSource` plus era and precision helpers from `@blap/domain`.
+ * redaction-injected `buildMapSource` plus era and precision helpers from `@repo/domain`.
  * This module adds no redaction of its own; it only enriches already-redacted map features with
  * fields the map/list UI needs (name, era, one-line story, evidence count, confidence, and
  * precision-radius affordances).
@@ -11,15 +11,15 @@
  * exist, map each record’s resolved jurisdiction bbox into `AreaRecordInput`. Area records must
  * render as polygon geometry, never as a point.
  */
-import { redactLocationForPublic } from '@blap/security';
+import { redactLocationForPublic } from '@repo/security';
 import {
   buildMapSource,
   type MapCountyAggregate,
   type MapPointFeature,
   type MapSourceEntityInput,
   type MapStateAggregate,
-} from '@blap/domain/map/map-source';
-import type { GeoPrecisionTier } from '@blap/domain/geography/display-radius';
+} from '@repo/domain/map/map-source';
+import type { GeoPrecisionTier } from '@repo/domain/geography/display-radius';
 import type { PublicClaimView, PublicEntityView } from '../../data/public-seed';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
@@ -52,10 +52,10 @@ export type ExploreMapFeatureProperties = {
    * page's "Accepted claims" section) a transparency affordance, not a hidden ranking input. */
   readonly evidenceCount: number;
   readonly confidenceTier: ConfidenceTier;
-  /** @deprecated Superseded by `topicIds` (black-book-s4hp); kept for the facet builder's
+  /** @deprecated Superseded by `topicIds` (the related workstream); kept for the facet builder's
    * fallback path. */
   readonly topicTags: readonly string[];
-  /** Controlled historical-theme ids (black-book-s4hp) — the ONLY field
+  /** Controlled historical-theme ids (the related workstream) — the ONLY field
    * `buildExploreFacetOptions` should treat as authoritative for the theme facet. */
   readonly topicIds?: readonly string[];
   /** Semantic tone override from topics (massacre / plantation / epicenter). */

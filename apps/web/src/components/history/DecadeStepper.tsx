@@ -3,7 +3,7 @@
  * and per-decade graph slices derived from published decade artifacts.
  */
 import React from 'react';
-import { cx } from '@blap/ui';
+import { cx } from '@repo/ui';
 import { buildHistoryHref, type HistoryViewState } from '../../lib/history/url-state';
 
 void React;
@@ -27,12 +27,12 @@ export function DecadeStepper({ decades, viewState, className }: DecadeStepperPr
   const activeDecade = viewState.mode === 'decade' ? viewState.decade : undefined;
 
   return (
-    <nav className={cx('bp-history-stepper', className)} aria-label="Browse by decade">
-      <ul className="bp-history-stepper__list" role="tablist">
+    <nav className={cx('ds-history-stepper', className)} aria-label="Browse by decade">
+      <ul className="ds-history-stepper__list" role="tablist">
         <li role="presentation">
           <a
             role="tab"
-            className={cx('bp-history-stepper__tab', viewState.mode === 'all-time' && 'bp-history-stepper__tab--active')}
+            className={cx('ds-history-stepper__tab', viewState.mode === 'all-time' && 'ds-history-stepper__tab--active')}
             href={stepHref(viewState)}
             aria-selected={viewState.mode === 'all-time'}
           >
@@ -44,8 +44,8 @@ export function DecadeStepper({ decades, viewState, className }: DecadeStepperPr
             <a
               role="tab"
               className={cx(
-                'bp-history-stepper__tab',
-                activeDecade === decade && 'bp-history-stepper__tab--active',
+                'ds-history-stepper__tab',
+                activeDecade === decade && 'ds-history-stepper__tab--active',
               )}
               href={stepHref(viewState, decade)}
               aria-selected={activeDecade === decade}

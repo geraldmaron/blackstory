@@ -11,33 +11,33 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Sora, Inter, Source_Serif_4, IBM_Plex_Mono } from 'next/font/google';
-import '@blap/ui/styles.css';
+import '@repo/ui/styles.css';
 import { SiteShell } from '../components/SiteShell';
 import './shell.css';
 
 const displayFace = Sora({
   subsets: ['latin'],
-  variable: '--bp-font-display',
+  variable: '--ds-font-display',
   display: 'swap',
 });
 
 const sans = Inter({
   subsets: ['latin'],
   axes: ['opsz'],
-  variable: '--bp-font-sans',
+  variable: '--ds-font-sans',
   display: 'swap',
 });
 
 const editorial = Source_Serif_4({
   subsets: ['latin'],
-  variable: '--bp-font-editorial',
+  variable: '--ds-font-editorial',
   display: 'swap',
 });
 
 const mono = IBM_Plex_Mono({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--bp-font-mono',
+  variable: '--ds-font-mono',
   display: 'swap',
 });
 
@@ -91,7 +91,7 @@ export const metadata: Metadata = {
       'Place-connected Black history research with published claims, provenance, and confidence.',
     images: [
       {
-        url: '/brand/blackstory-open-graph-dark-1200x630.png',
+        url: '/brand/open-graph-dark-1200x630.png',
         width: 1200,
         height: 630,
         alt: 'BlackStory — History, pinned to place.',
@@ -103,7 +103,7 @@ export const metadata: Metadata = {
     title: 'BlackStory',
     description:
       'Place-connected Black history research with published claims, provenance, and confidence.',
-    images: ['/brand/blackstory-open-graph-dark-1200x630.png'],
+    images: ['/brand/open-graph-dark-1200x630.png'],
   },
 };
 
@@ -115,7 +115,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${displayFace.variable} ${sans.variable} ${editorial.variable} ${mono.variable}`}
     >
       <body>
-        <a className="bp-skip-link" href="#main">
+        <a className="ds-skip-link" href="#main">
           Skip to main content
         </a>
         <SiteShell>{children}</SiteShell>

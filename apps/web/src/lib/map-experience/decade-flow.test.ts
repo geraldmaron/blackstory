@@ -2,7 +2,7 @@
  * Decades-in-motion frame builder: cumulative PIN reveal by earliest documented
  * decade (newest → oldest play/display order), honest handling of undated
  * records (final frame only), per-decade edge slices, and presence-tier
- * DENSITY over entities ACTIVE that decade (delegated to `@blap/domain`'s
+ * DENSITY over entities ACTIVE that decade (delegated to `@repo/domain`'s
  * `aggregateDecadePresence` — an entity whose `eraBuckets` span has already
  * ended does not inflate a later decade's density, even though its pin remains
  * on the map). The closing/complete frame's density stays era-agnostic

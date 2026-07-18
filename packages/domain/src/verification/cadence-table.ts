@@ -1,5 +1,5 @@
 /**
- * Seed default verification cadences (black-book-isqd), one entry per scenario named in the
+ * Seed default verification cadences (the related workstream), one entry per scenario named in the
  * bead's own spec. These are STARTING DEFAULTS a real `VerificationPolicy` (see `./policy.ts`)
  * would be seeded from — this table itself is not a `VerificationPolicy` (it has no id,
  * appliesToEntityClasses/appliesToPredicates, or authoritativeSourceIds; a seeding script would
@@ -65,7 +65,7 @@ export const DEFAULT_VERIFICATION_CADENCES: Readonly<
   },
   demographic_estimate: {
     volatilityClass: 'low',
-    // TODO(black-book-isqd): should inherit the authoritative source's own
+    // TODO(the related workstream): should inherit the authoritative source's own
     // SourceAdapterContract.refreshSchedule instead of this fixed floor; not wired in this pass.
     defaultReviewInterval: { unit: 'year', count: 1 },
     rationale:

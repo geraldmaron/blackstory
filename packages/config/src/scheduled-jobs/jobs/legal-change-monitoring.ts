@@ -1,6 +1,6 @@
 
 /**
- * REAL roster entry: legal change monitoring. Wraps `@blap/domain`'s legal
+ * REAL roster entry: legal change monitoring. Wraps `@repo/domain`'s legal
  * monitoring module and fixture-only adapter clients automation proposes review_queue events,
  * humans dispose. No live network in tests; live adapter wiring requires api.data.gov and
  * LegiScan keys documented as human follow-up.

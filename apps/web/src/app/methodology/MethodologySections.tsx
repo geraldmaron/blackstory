@@ -4,12 +4,12 @@
  * and IFCN alignment text.
  */
 import React from 'react';
-import { FACT_CONFIDENCE_DEFINITIONS } from '@blap/domain/facts';
+import { FACT_CONFIDENCE_DEFINITIONS } from '@repo/domain/facts';
 import {
   CULTURAL_FIGURE_NOTABILITY_CALIBRATION_NOTE,
   NOTABILITY_CRITERIA,
   NOTABILITY_RUBRIC,
-} from '@blap/domain';
+} from '@repo/domain';
 import {
   ENTITY_STATUS_VOCABULARY,
   FACT_STATUS_LIFECYCLE_DEFINITIONS,
@@ -27,11 +27,11 @@ function DefinitionList({
   readonly entries: readonly { readonly term: string; readonly definition: string }[];
 }) {
   return (
-    <dl className="bp-sans">
+    <dl className="ds-sans">
       {entries.map((entry) => (
-        <div key={entry.term} style={{ marginBottom: 'var(--bp-space-4)' }}>
-          <dt className="bp-dt">{entry.term}</dt>
-          <dd style={{ margin: 'var(--bp-space-1) 0 0 0' }}>{entry.definition}</dd>
+        <div key={entry.term} style={{ marginBottom: 'var(--ds-space-4)' }}>
+          <dt className="ds-dt">{entry.term}</dt>
+          <dd style={{ margin: 'var(--ds-space-1) 0 0 0' }}>{entry.definition}</dd>
         </div>
       ))}
     </dl>
@@ -40,14 +40,14 @@ function DefinitionList({
 
 export function MethodologySections() {
   return (
-    <div className="bp-stack" style={{ marginTop: 'var(--bp-space-8)' }}>
+    <div className="ds-stack" style={{ marginTop: 'var(--ds-space-8)' }}>
       <TrustSiteDisclaimer />
 
-      <section className="bp-section" aria-labelledby="mission-method" style={{ paddingTop: 0 }} id="mission">
-        <h2 className="bp-section__title" id="mission-method">
+      <section className="ds-section" aria-labelledby="mission-method" style={{ paddingTop: 0 }} id="mission">
+        <h2 className="ds-section__title" id="mission-method">
           Mission &amp; scope
         </h2>
-        <p className="bp-section__lede">
+        <p className="ds-section__lede">
           Blap publishes released historical projections — place-connected Black history with
           provenance, confidence grades, and living-person protections. We document what primary and
           secondary sources support, state what they do not, and preserve disagreements instead of
@@ -55,28 +55,28 @@ export function MethodologySections() {
         </p>
       </section>
 
-      <section className="bp-section" aria-labelledby="how-to-read-method">
+      <section className="ds-section" aria-labelledby="how-to-read-method">
         <HowToReadThisRecord methodologyHref="#definitions" />
       </section>
 
-      <section className="bp-section" aria-labelledby="definitions-method" id="definitions">
-        <h2 className="bp-section__title" id="definitions-method">
+      <section className="ds-section" aria-labelledby="definitions-method" id="definitions">
+        <h2 className="ds-section__title" id="definitions-method">
           Definitions &amp; inclusion criteria
         </h2>
-        <p className="bp-section__lede">
+        <p className="ds-section__lede">
           Precision in definitions is what lets a reader compare this archive to others without
           talking past each other. Inclusion is never a popularity contest — every entity needs at
           least one documented notability basis.
         </p>
-        <h3 className="bp-section__title bp-subheading">Notability basis (per kind)</h3>
+        <h3 className="ds-section__title ds-subheading">Notability basis (per kind)</h3>
         <DefinitionList
           entries={NOTABILITY_CRITERIA.map((criterion) => ({
             term: humanizeToken(criterion),
             definition: NOTABILITY_RUBRIC[criterion],
           }))}
         />
-        <p className="bp-sans">{CULTURAL_FIGURE_NOTABILITY_CALIBRATION_NOTE}</p>
-        <h3 className="bp-section__title bp-subheading" style={{ marginTop: 'var(--bp-space-6)' }}>
+        <p className="ds-sans">{CULTURAL_FIGURE_NOTABILITY_CALIBRATION_NOTE}</p>
+        <h3 className="ds-section__title ds-subheading" style={{ marginTop: 'var(--ds-space-6)' }}>
           Fact record status lifecycle
         </h3>
         <DefinitionList
@@ -85,7 +85,7 @@ export function MethodologySections() {
             definition,
           }))}
         />
-        <h3 className="bp-section__title bp-subheading" style={{ marginTop: 'var(--bp-space-6)' }}>
+        <h3 className="ds-section__title ds-subheading" style={{ marginTop: 'var(--ds-space-6)' }}>
           Entity status vocabularies
         </h3>
         <DefinitionList
@@ -106,8 +106,8 @@ export function MethodologySections() {
         />
       </section>
 
-      <section className="bp-section" aria-labelledby="source-hierarchy-method" id="sources">
-        <h2 className="bp-section__title" id="source-hierarchy-method">
+      <section className="ds-section" aria-labelledby="source-hierarchy-method" id="sources">
+        <h2 className="ds-section__title" id="source-hierarchy-method">
           Source hierarchy
         </h2>
         <DefinitionList
@@ -118,17 +118,17 @@ export function MethodologySections() {
         />
       </section>
 
-      <section className="bp-section" aria-labelledby="verification-method" id="verification">
-        <h2 className="bp-section__title" id="verification-method">
+      <section className="ds-section" aria-labelledby="verification-method" id="verification">
+        <h2 className="ds-section__title" id="verification-method">
           Verification &amp; triangulation
         </h2>
-        <p className="bp-section__lede">
+        <p className="ds-section__lede">
           Every published fact passes an independent citation-completeness gate: structured CSL-JSON
           references, supporting excerpts, retrieval dates, and archived captures for web sources.
           Triangulation means at least two independent lineages before a fact reaches corroborated
           grade; syndicated copies do not inflate scores.
         </p>
-        <ol className="bp-sans" style={{ paddingLeft: 'var(--bp-space-5)' }}>
+        <ol className="ds-sans" style={{ paddingLeft: 'var(--ds-space-5)' }}>
           <li>Identify primary sources closest to the event or record creation.</li>
           <li>Cross-check against independent secondary scholarship where primaries are sparse.</li>
           <li>Document contradictions in confidence notes and counter-claims rather than hiding them.</li>
@@ -136,8 +136,8 @@ export function MethodologySections() {
         </ol>
       </section>
 
-      <section className="bp-section" aria-labelledby="confidence-method" id="confidence">
-        <h2 className="bp-section__title" id="confidence-method">
+      <section className="ds-section" aria-labelledby="confidence-method" id="confidence">
+        <h2 className="ds-section__title" id="confidence-method">
           Confidence grades
         </h2>
         <DefinitionList
@@ -148,28 +148,28 @@ export function MethodologySections() {
         />
       </section>
 
-      <section className="bp-section" aria-labelledby="limitations-method" id="limitations">
-        <h2 className="bp-section__title" id="limitations-method">
+      <section className="ds-section" aria-labelledby="limitations-method" id="limitations">
+        <h2 className="ds-section__title" id="limitations-method">
           Known limitations &amp; gaps
         </h2>
-        <p className="bp-section__lede">
+        <p className="ds-section__lede">
           An archive of thousands of sourced facts will contain errors. What matters is what happens
           next: every correction is logged publicly, timestamped, and preserved in the record&apos;s
           history — nothing is silently edited. Many historical events were deliberately never
           documented; we state those gaps plainly rather than inventing certainty.
         </p>
-        <ul className="bp-sans" style={{ paddingLeft: 'var(--bp-space-5)' }}>
+        <ul className="ds-sans" style={{ paddingLeft: 'var(--ds-space-5)' }}>
           <li>Public maps show country through campus/institution precision — never street addresses or exact residence coordinates.</li>
           <li>Single-source facts are published only with an explicit confidence note explaining why.</li>
           <li>Seed and draft records in this build are labeled as such and excluded from search.</li>
         </ul>
       </section>
 
-      <section className="bp-section" aria-labelledby="cadence-method" id="cadence">
-        <h2 className="bp-section__title" id="cadence-method">
+      <section className="ds-section" aria-labelledby="cadence-method" id="cadence">
+        <h2 className="ds-section__title" id="cadence-method">
           Update cadence
         </h2>
-        <p className="bp-section__lede">
+        <p className="ds-section__lede">
           Corrections ship as soon as verified — fully, quickly, and without defensiveness. Routine
           content reviews run quarterly; present-day advisories carry their own review dates on each
           record. Major methodology changes receive an editor&apos;s note in the{' '}
@@ -177,11 +177,11 @@ export function MethodologySections() {
         </p>
       </section>
 
-      <section className="bp-section" aria-labelledby="report-error-method" id="report-error">
-        <h2 className="bp-section__title" id="report-error-method">
+      <section className="ds-section" aria-labelledby="report-error-method" id="report-error">
+        <h2 className="ds-section__title" id="report-error-method">
           How to report an error
         </h2>
-        <p className="bp-section__lede">
+        <p className="ds-section__lede">
           Use the <a href="/corrections">corrections lane</a> to challenge a published record, suggest
           missing evidence, or report a precision issue. Submissions enter a restricted review queue;
           nothing changes publicly until it passes independent verification. You receive a receipt code
@@ -189,41 +189,41 @@ export function MethodologySections() {
         </p>
       </section>
 
-      <section className="bp-section" aria-labelledby="funding-method" id="funding">
-        <h2 className="bp-section__title" id="funding-method">
+      <section className="ds-section" aria-labelledby="funding-method" id="funding">
+        <h2 className="ds-section__title" id="funding-method">
           Funding &amp; independence
         </h2>
-        <p className="bp-section__lede" id="independence">
+        <p className="ds-section__lede" id="independence">
           Blap is an independent editorial project. Funding sources, when applicable, are listed
           here and updated when they change. No funder receives advance editorial review or veto over
           published records. Research promotion and admin tooling remain on private surfaces.
         </p>
-        <p className="bp-sans" style={{ color: 'var(--bp-ink-muted)' }}>
+        <p className="ds-sans" style={{ color: 'var(--ds-ink-muted)' }}>
           This public shell is pre-beta; a live funding disclosure will appear here before general
-          release (see launch gate BB-063).
+          release (see the launch gate).
         </p>
       </section>
 
-      <section className="bp-section" aria-labelledby="masthead-method" id="masthead">
-        <h2 className="bp-section__title" id="masthead-method">
+      <section className="ds-section" aria-labelledby="masthead-method" id="masthead">
+        <h2 className="ds-section__title" id="masthead-method">
           Masthead
         </h2>
-        <p className="bp-section__lede">
+        <p className="ds-section__lede">
           Editorial accountability is named, not anonymous. Roles below will link to public bios as the
           team publishes them.
         </p>
-        <ul className="bp-sans" style={{ paddingLeft: 'var(--bp-space-5)' }}>
+        <ul className="ds-sans" style={{ paddingLeft: 'var(--ds-space-5)' }}>
           <li>Editorial lead — methodology, corrections policy, and publish gate</li>
           <li>Research lead — source verification and citation completeness</li>
           <li>Platform lead — projection integrity and security posture</li>
         </ul>
       </section>
 
-      <section className="bp-section" aria-labelledby="transparency-method" id="transparency">
-        <h2 className="bp-section__title" id="transparency-method">
+      <section className="ds-section" aria-labelledby="transparency-method" id="transparency">
+        <h2 className="ds-section__title" id="transparency-method">
           Transparency indicators
         </h2>
-        <p className="bp-section__lede">
+        <p className="ds-section__lede">
           We adopt the eight transparency practices and their schema.org vocabulary (CC-BY-SA) without
           using any trademarked program name or badge. Each indicator maps to a published policy URL
           on this site.
@@ -236,11 +236,11 @@ export function MethodologySections() {
         />
       </section>
 
-      <section className="bp-section" aria-labelledby="ifcn-method" id="ifcn">
-        <h2 className="bp-section__title" id="ifcn-method">
+      <section className="ds-section" aria-labelledby="ifcn-method" id="ifcn">
+        <h2 className="ds-section__title" id="ifcn-method">
           Aligned with IFCN fact-checking commitments
         </h2>
-        <p className="bp-section__lede">
+        <p className="ds-section__lede">
           The five International Fact-Checking Network commitments below are reproduced verbatim as
           editorial alignment. Blap is not a paid IFCN signatory; the badge requires signatory
           status. The commitment language is public and guides our corrections and verification posture.

@@ -20,7 +20,7 @@
 import { z } from 'zod';
 import { publishedStatisticProvenanceFields } from '../firestore/statistic-provenance.js';
 
-/** Decade labels this collection carries — matches `CENSUS_DECENNIAL_VINTAGES` in @blap/domain. */
+/** Decade labels this collection carries — matches `CENSUS_DECENNIAL_VINTAGES` in @repo/domain. */
 export const censusCountyDecadeDecadeSchema = z.enum(['2000', '2010', '2020']);
 
 export type CensusCountyDecadeDecade = z.infer<typeof censusCountyDecadeDecadeSchema>;
@@ -54,7 +54,7 @@ export function parseCensusCountyDecadeDoc(data: unknown): CensusCountyDecadeDoc
 
 /**
  * ACS 5-year estimate fields (the starter comparison set — `ACS5_STARTER_VARIABLES` in
- * @blap/domain). Every field optional: a suppressed cell is OMITTED here and its field name
+ * @repo/domain). Every field optional: a suppressed cell is OMITTED here and its field name
  * recorded in `suppressed` — a negative ACS sentinel value must never be persisted.
  */
 export const acsEstimatesSchema = z

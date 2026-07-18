@@ -10,19 +10,19 @@
  * directly unit-testable see `./search-view-model.test.ts`.
  *
  * Pagination note (deliberate scope boundary): the page's own "next/previous page" links use a
- * plain, page-local `offset` query param NOT `@blap/security`'s opaque `cursor`
+ * plain, page-local `offset` query param NOT `@repo/security`'s opaque `cursor`
  * token. That signed cursor is bound to a specific `queryHash` and is meant to be minted by the
  * HTTP search route (`apps/web/src/app/search/api/route.ts`) for
  * external/programmatic callers, not hand-constructed here. A plain offset is the simplest correct
  * mechanism for this server-rendered page's own forward/back links.
  */
-import { runPublicSearch } from '@blap/domain';
+import { runPublicSearch } from '@repo/domain';
 import type {
   PublicSearchIndexDoc,
   SearchFilter,
   SearchResultView,
-} from '@blap/domain';
-import { normalizeSearchText } from '@blap/security';
+} from '@repo/domain';
+import { normalizeSearchText } from '@repo/security';
 
 /** Matches `DEFAULT_QUERY_GUARDRAIL_LIMITS.defaultPageSize`. Kept as a local constant
  * since this page intentionally does not import the guardrails module. */
@@ -109,7 +109,7 @@ function buildFilters(kind: string, status: string, era: string): readonly Searc
 
 /**
  * Pure query-building + result/facet-shaping core of the search page. Parses raw string params,
- * normalizes the text query (`@blap/security`'s `normalizeSearchText`), runs the real
+ * normalizes the text query (`@repo/security`'s `normalizeSearchText`), runs the real
  * `runPublicSearch` pipeline, and shapes its output (results + dynamic facet options + pagination
  * offsets) into everything the page's JSX needs.
  */

@@ -7,7 +7,7 @@
  *
  * report finding → `proposeWeightChange` (pure, data only)
  * → gold-corpus gate result supplied by caller (real evaluation happens in
- * `@blap/testing`; this module never imports or reimplements it — see
+ * `@repo/testing`; this module never imports or reimplements it — see
  * `requireGoldCorpusGatePassed`'s structural `GoldCorpusGateInput` type, which
  * `packages/config/src/scheduled-jobs/jobs/recalibration-report.ts` fills in from a real
  * `CorpusEvaluationRecord`)
@@ -150,8 +150,8 @@ export function proposeWeightChange(input: {
 
 /** Structural (not imported) shape of CorpusEvaluationRecord
  * (packages/testing/src/gold-corpus/types.ts). Kept structural, rather than importing
- * @blap/testing into @blap/domain, to avoid adding a new cross-package dependency
- * to a foundational package the real evaluation always happens in @blap/testing
+ * @repo/testing into @repo/domain, to avoid adding a new cross-package dependency
+ * to a foundational package the real evaluation always happens in @repo/testing
  * (evaluateCorpus assertCorpusEvaluationPassed), and a real CorpusEvaluationRecord already
  * satisfies this shape, so callers (e.g. packages/config/src/scheduled-jobs/jobs/
  * recalibration-report.ts, which already depends on both packages) pass it straight through. */
@@ -193,7 +193,7 @@ export type WeightChangeApproval = {
  * - approvedBy is empty or equal to the proposal's proposedBy (same identity proposing and
  * approving is exactly the conflict this function exists to prevent);
  * - the gold-corpus gate did not pass.
- * Only on success does it return a WeightChangeApproval carrying the now-activatable policy 
+ * Only on success does it return a WeightChangeApproval carrying the now-activatable policy
  * still just a data record. Nothing here writes it anywhere.
  */
 export function approveWeightChange(input: {

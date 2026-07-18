@@ -1,6 +1,6 @@
 
 /**
- * Firestore schemas for FBI UCR data (black-book-8qp) — hate crime bulk records plus the
+ * Firestore schemas for FBI UCR data (the related workstream) — hate crime bulk records plus the
  * two reference layers that make them interpretable and joinable.
  *
  * Three collections:
@@ -13,7 +13,7 @@
  *                         tract collections.
  *  - `ucrStateParticipation` — reporting coverage by state + year.
  *
- * ─── NO-FALSE-ABSENCE (BB-051), the load-bearing caveat ───────────────────────────────
+ * ─── NO-FALSE-ABSENCE (), the load-bearing caveat ───────────────────────────────
  * UCR hate crime reporting is VOLUNTARY. A county-year with no document, or a document with
  * a low `reportingAgencyCount`, means NO AGENCY REPORTED — never "no hate crime happened
  * here". Thousands of agencies submit zero reports annually; some large jurisdictions have

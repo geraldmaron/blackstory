@@ -29,10 +29,10 @@ export function DataStatCitation({
   ];
 
   return (
-    <li className="bp-data-strip__item">
-      <span className="bp-data-strip__value">{value}</span>
-      <span className="bp-data-strip__label">{label}</span>
-      {note ? <p className="bp-data-strip__note bp-sans">{note}</p> : null}
+    <li className="ds-data-strip__item">
+      <span className="ds-data-strip__value">{value}</span>
+      <span className="ds-data-strip__label">{label}</span>
+      {note ? <p className="ds-data-strip__note ds-sans">{note}</p> : null}
       <SourceFootnote sources={sources} density="compact" />
     </li>
   );

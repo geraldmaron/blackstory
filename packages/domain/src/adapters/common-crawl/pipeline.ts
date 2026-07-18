@@ -1,5 +1,5 @@
 /**
- * Wires Common Crawl candidates into the standard discovery pipeline via the SAME 
+ * Wires Common Crawl candidates into the standard discovery pipeline via the SAME
  * Wayback capture gate every other community adapter uses -- no
  * parallel ingestion path. Mirrors../web-search/pipeline.ts exactly.
  */

@@ -1,6 +1,6 @@
 /**
  * Client-safe geoPrecision display-radius vocabulary and helpers.
- * Kept free of `@blap/schemas` / Node builtins so map UI modules can import it
+ * Kept free of `@repo/schemas` / Node builtins so map UI modules can import it
  * without pulling `node:fs` into the browser bundle.
  */
 
@@ -71,7 +71,7 @@ export function displayRadiusMeters(input: DisplayRadiusInput): number {
   }
   if (!input.jurisdictionBBox) {
     throw new Error(
-      `displayRadiusMeters: tier "${input.tier}" requires a jurisdiction bbox (BB-091 fail-closed)`,
+      `displayRadiusMeters: tier "${input.tier}" requires a jurisdiction bbox (fail-closed)`,
     );
   }
   return boundingRadiusMeters(input.jurisdictionBBox);

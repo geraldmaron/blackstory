@@ -1,8 +1,8 @@
 /**
- * Living-status helpers backed by the product constitution (@blap/schemas).
+ * Living-status helpers backed by the product constitution (@repo/schemas).
  * Unknown living status is treated as living at the model level.
  */
-import { evaluateLivingStatus, loadProductConstitution } from '@blap/schemas';
+import { evaluateLivingStatus, loadProductConstitution } from '@repo/schemas';
 
 /** Living-status vocabulary from the active product constitution. */
 export function livingStatuses(): readonly string[] {
@@ -19,7 +19,7 @@ export function treatAsLiving(status: LivingStatus): boolean {
 /** Default living status when writers omit one unknown, therefore treated as living. */
 export const DEFAULT_LIVING_STATUS: LivingStatus = 'unknown';
 
-/** Signals used to derive a living-status guess (black-book-mpfb). Nothing beyond birth/death
+/** Signals used to derive a living-status guess (the related workstream). Nothing beyond birth/death
  * years exists as a structured signal in this model today; this is intentionally minimal. */
 export type LivingStatusDerivationSignal = {
   readonly birthYear?: number | null;

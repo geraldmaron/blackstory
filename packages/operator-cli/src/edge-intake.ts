@@ -3,14 +3,14 @@
  * Edge intake: propose a new `EntityRelationship` through the existing operator
  * CLI/research-case pipeline (no parallel writer). Every proposal lands in the SAME quarantine
  * pipeline `./intake.ts`'s `prepareOperatorIntake` already uses (`createQuarantinedSubmission`,
- * `@blap/security`) and opens a draft research case exactly like `prepareLeadIntake` does.
+ * `@repo/security`) and opens a draft research case exactly like `prepareLeadIntake` does.
  * This file adds ZERO new Firestore write paths; it only shapes an `OperatorSubmission`
  * describing the proposed edge and calls the existing exported `prepareOperatorIntake`. Nothing
  * here writes an `entityRelationships` document directly — that stays the reviewer-gated
  * promotion path's job (see `./intake.ts`'s module doc).
  *
  * `caused`/`enabled` edges are hard-gated at THIS layer via `assertCausalEdgeGuardrail`
- * (`@blap/domain`). A `contested_or_single_incident` scope, or an omitted `causalReview`
+ * (`@repo/domain`). A `contested_or_single_incident` scope, or an omitted `causalReview`
  * altogether, is REJECTED here before the proposal ever reaches quarantine, with an explicit
  * instruction to submit via `cites` instead. Silence (no `causalReview` supplied) defaults to
  * rejection, never to permissiveness.
@@ -24,7 +24,7 @@ import {
   type RelationshipRole,
   type RelationshipType,
   type TemporalContext,
-} from '@blap/domain';
+} from '@repo/domain';
 import {
   prepareOperatorIntake,
   type OperatorIntakeContext,

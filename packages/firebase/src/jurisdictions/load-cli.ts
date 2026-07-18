@@ -2,7 +2,7 @@
 /**
  * Idempotent load/refresh CLI for the `jurisdictions` collection.
  *
- * Loads 51 state docs (from `@blap/domain`'s `US_STATES` see `./us-states-source.ts`)
+ * Loads 51 state docs (from `@repo/domain`'s `US_STATES` see `./us-states-source.ts`)
  * plus ~3,143 county docs (from a Census Gazetteer county file see `./tiger-gazetteer.ts`).
  * Structurally mirrors `packages/firebase/src/embeddings/backfill-cli.ts`: every dependency
  * (writer) is injected so `runJurisdictionLoad` is fully unit-testable without Firestore, and

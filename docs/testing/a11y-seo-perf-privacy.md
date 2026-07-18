@@ -1,14 +1,14 @@
 # Accessibility, SEO, performance, and privacy gates (BB-057)
 
-Repo acceptance gates for core public journeys. No live deploy required — automated checks run in CI via `@blap/testing` and `apps/web` unit tests.
+Repo acceptance gates for core public journeys. No live deploy required — automated checks run in CI via `@repo/testing` and `apps/web` unit tests.
 
 ## Layers
 
 | Gate | Command | What it checks |
 |------|---------|----------------|
-| A11y fixtures | `pnpm --filter @blap/testing test:a11y` | Landmark, heading order, alt text, core journey HTML fixtures |
-| Release gates | `pnpm --filter @blap/testing test:release-gates` | Performance budgets + degraded-mode copy contracts |
-| SEO builders | `pnpm --filter @blap/web test` (seo tests) | Protected fields stripped from metadata previews |
+| A11y fixtures | `pnpm --filter @repo/testing test:a11y` | Landmark, heading order, alt text, core journey HTML fixtures |
+| Release gates | `pnpm --filter @repo/testing test:release-gates` | Performance budgets + degraded-mode copy contracts |
+| SEO builders | `pnpm --filter @repo/web test` (seo tests) | Protected fields stripped from metadata previews |
 | Sitemap | `apps/web/src/app/sitemap.ts` | Static routes + active release entity URLs |
 
 Parent wiring: merge `release-gates` into `scripts/run-testing-layer.mjs` (add `release-gates` matcher or extend `a11y`) and append seo test paths to `apps/web/package.json` `test` script.
@@ -32,7 +32,7 @@ Documented peers (`packages/testing/src/a11y/map-search-peers.test.ts`):
 
 | Journey | Peer | Contract |
 |---------|------|----------|
-| Search | `ResultList` (`@blap/ui`) | Server-rendered list with `labelledBy` |
+| Search | `ResultList` (`@repo/ui`) | Server-rendered list with `labelledBy` |
 | Explore | `SynchronizedResultList` | Full list peer — not a map fallback; `aria-current` for selection |
 | Explore | `explore/page.tsx` noscript `FilterBar` | Native GET filters without JavaScript |
 | Locate | `ManualPlaceSearchForm` + `/search` link | Manual entry without geolocation |
@@ -53,7 +53,7 @@ Protected patterns block street addresses, phone numbers, emails, raw confidence
 
 Config: `packages/testing/src/release-gates/performance-budget.ts`
 
-Default thresholds (bb-057-v1):
+Default thresholds (ds-057-v1):
 
 | Metric | Max |
 |--------|-----|
@@ -92,7 +92,7 @@ Contract tests: `packages/testing/src/release-gates/public-degraded-contracts.te
 - [ ] Screen reader spot-check: explore list announces selection (`aria-current`)
 - [ ] View page source / social debugger: no protected fields in `<meta>` or OG tags
 - [ ] Set `PUBLIC_READ_API_DISABLED=1` locally — pages render snapshot copy
-- [ ] Run `pnpm --filter @blap/testing test:a11y` and `test:release-gates`
+- [ ] Run `pnpm --filter @repo/testing test:a11y` and `test:release-gates`
 
 ## WCAG target
 

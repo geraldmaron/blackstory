@@ -7,7 +7,7 @@
  */
 import { useId, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Button, Notice } from '@blap/ui';
+import { Button, Notice } from '@repo/ui';
 import {
   CORRECTION_CATEGORIES,
   CORRECTION_CATEGORY_LABELS,
@@ -115,8 +115,8 @@ export function CorrectionForm() {
           Thank you — save your receipt code <code>{state.receiptCode}</code>. It is the only way to
           check status; we cannot look it up without it.
         </p>
-        <p style={{ marginTop: 'var(--bp-space-3)' }}>
-          <a className="bp-button bp-button--secondary" href={state.statusHref}>
+        <p style={{ marginTop: 'var(--ds-space-3)' }}>
+          <a className="ds-button ds-button--secondary" href={state.statusHref}>
             View status
           </a>
         </p>
@@ -125,8 +125,8 @@ export function CorrectionForm() {
   }
 
   return (
-    <form className="bp-stack" onSubmit={handleSubmit} noValidate aria-describedby="correction-form-intro">
-      <p id="correction-form-intro" className="bp-sans">
+    <form className="ds-stack" onSubmit={handleSubmit} noValidate aria-describedby="correction-form-intro">
+      <p id="correction-form-intro" className="ds-sans">
         {CORRECTION_FORM_INTRO}
       </p>
 
@@ -145,13 +145,13 @@ export function CorrectionForm() {
         </Notice>
       ) : null}
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={targetTypeId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={targetTypeId}>
           What are you correcting? <span aria-hidden="true">*</span>
-          <span className="bp-visually-hidden">required</span>
+          <span className="ds-visually-hidden">required</span>
         </label>
         <select
-          className="bp-filters__control"
+          className="ds-filters__control"
           id={targetTypeId}
           name="targetType"
           defaultValue={
@@ -169,13 +169,13 @@ export function CorrectionForm() {
         </select>
       </div>
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={targetRecordId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={targetRecordId}>
           Record identifier <span aria-hidden="true">*</span>
-          <span className="bp-visually-hidden">required</span>
+          <span className="ds-visually-hidden">required</span>
         </label>
         <input
-          className="bp-filters__control"
+          className="ds-filters__control"
           id={targetRecordId}
           name="targetRecordId"
           type="text"
@@ -185,19 +185,19 @@ export function CorrectionForm() {
           aria-describedby={fieldIssue('targetRecordId') ? `${targetRecordId}-issue` : undefined}
         />
         {fieldIssue('targetRecordId') ? (
-          <p id={`${targetRecordId}-issue`} className="bp-sans" role="alert">
+          <p id={`${targetRecordId}-issue`} className="ds-sans" role="alert">
             {fieldIssue('targetRecordId')!.message}
           </p>
         ) : null}
       </div>
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={categoryId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={categoryId}>
           Category <span aria-hidden="true">*</span>
-          <span className="bp-visually-hidden">required</span>
+          <span className="ds-visually-hidden">required</span>
         </label>
         <select
-          className="bp-filters__control"
+          className="ds-filters__control"
           id={categoryId}
           name="category"
           required
@@ -214,19 +214,19 @@ export function CorrectionForm() {
           ))}
         </select>
         {fieldIssue('category') ? (
-          <p id={`${categoryId}-issue`} className="bp-sans" role="alert">
+          <p id={`${categoryId}-issue`} className="ds-sans" role="alert">
             {fieldIssue('category')!.message}
           </p>
         ) : null}
       </div>
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={statementId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={statementId}>
           Describe the correction <span aria-hidden="true">*</span>
-          <span className="bp-visually-hidden">required</span>
+          <span className="ds-visually-hidden">required</span>
         </label>
         <textarea
-          className="bp-filters__control"
+          className="ds-filters__control"
           id={statementId}
           name="statement"
           rows={5}
@@ -236,19 +236,19 @@ export function CorrectionForm() {
           aria-describedby={fieldIssue('statement') ? `${statementId}-issue` : undefined}
         />
         {fieldIssue('statement') ? (
-          <p id={`${statementId}-issue`} className="bp-sans" role="alert">
+          <p id={`${statementId}-issue`} className="ds-sans" role="alert">
             {fieldIssue('statement')!.message}
           </p>
         ) : null}
       </div>
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={sourceUrlId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={sourceUrlId}>
           Supporting source URL <span aria-hidden="true">*</span>
-          <span className="bp-visually-hidden">required</span>
+          <span className="ds-visually-hidden">required</span>
         </label>
         <input
-          className="bp-filters__control"
+          className="ds-filters__control"
           id={sourceUrlId}
           name="sourceUrl"
           type="url"
@@ -257,24 +257,24 @@ export function CorrectionForm() {
           aria-describedby={fieldIssue('sourceUrl') ? `${sourceUrlId}-issue` : undefined}
         />
         {fieldIssue('sourceUrl') ? (
-          <p id={`${sourceUrlId}-issue`} className="bp-sans" role="alert">
+          <p id={`${sourceUrlId}-issue`} className="ds-sans" role="alert">
             {fieldIssue('sourceUrl')!.message}
           </p>
         ) : null}
       </div>
 
-      <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
-        <label className="bp-filters__label" htmlFor={contactId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={contactId}>
           Contact (optional — moderators only, never shown publicly)
         </label>
-        <input className="bp-filters__control" id={contactId} name="contact" type="text" />
+        <input className="ds-filters__control" id={contactId} name="contact" type="text" />
       </div>
 
       <Notice tone="warning" title={CORRECTION_PRIVACY_NOTICE.title}>
         {CORRECTION_PRIVACY_NOTICE.body}
       </Notice>
 
-      <div className="bp-row" style={{ alignItems: 'flex-start' }}>
+      <div className="ds-row" style={{ alignItems: 'flex-start' }}>
         <input
           id={privacyId}
           name="privacyConsent"
@@ -282,14 +282,14 @@ export function CorrectionForm() {
           required
           aria-describedby={fieldIssue('privacyConsent') ? `${privacyId}-issue` : undefined}
         />
-        <label htmlFor={privacyId} className="bp-sans" style={{ marginLeft: 'var(--bp-space-2)' }}>
+        <label htmlFor={privacyId} className="ds-sans" style={{ marginLeft: 'var(--ds-space-2)' }}>
           I have read the privacy notice and understand this submission enters a restricted review
           queue. <span aria-hidden="true">*</span>
-          <span className="bp-visually-hidden">required</span>
+          <span className="ds-visually-hidden">required</span>
         </label>
       </div>
       {fieldIssue('privacyConsent') ? (
-        <p id={`${privacyId}-issue`} className="bp-sans" role="alert">
+        <p id={`${privacyId}-issue`} className="ds-sans" role="alert">
           {fieldIssue('privacyConsent')!.message}
         </p>
       ) : null}

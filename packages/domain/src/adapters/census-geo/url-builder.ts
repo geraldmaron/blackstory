@@ -1,5 +1,5 @@
 /**
- * URL construction for the U.S. Census Bureau Geocoder API. Two operations only 
+ * URL construction for the U.S. Census Bureau Geocoder API. Two operations only
  * the two this needs: forward geocode-with-geographies (`onelineaddress`, address or ZIP
  * text -> match + FIPS geographies) and reverse geocode-with-geographies (`coordinates`,
  * lat/lng -> FIPS geographies). Both request `returntype=geographies` and pin

@@ -7,7 +7,7 @@
  * status codes and route-specific error bodies itself.
  *
  * App Check headers are passed in by the caller (`components/location/LocateExperience.tsx`,
- * sourced from `../../app/locate/app-check-client.ts`) rather than fetched by this module 
+ * sourced from `../../app/locate/app-check-client.ts`) rather than fetched by this module
  * keeping this file free of any `app/` import mirrors how `apps/web/src/app/submit/SubmitLeadForm.tsx`
  * calls its own co-located `app-check-client.ts` directly rather than through a shared `lib/`
  * layer, and keeps this module usable from any future caller with a different App Check source.

@@ -9,7 +9,7 @@ import {
   isLayerAsOfOverdueForCadence,
 } from './update-cadence.js';
 
-test('HISTORIC_SAFETY_SOURCE_CADENCES entries carry BB-084-compatible JobCadence fields', () => {
+test('HISTORIC_SAFETY_SOURCE_CADENCES entries carry -compatible JobCadence fields', () => {
   for (const cadenceId of HISTORIC_SAFETY_SOURCE_CADENCE_IDS) {
     const cadence = HISTORIC_SAFETY_SOURCE_CADENCES[cadenceId];
     assert.ok(cadence.cronExpression.trim().length > 0);

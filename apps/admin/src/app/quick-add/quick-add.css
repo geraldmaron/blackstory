@@ -5,14 +5,14 @@
 
 .quick-add-page {
   display: grid;
-  gap: var(--bb-space-6);
-  padding-block: clamp(var(--bb-space-6), 4vw, var(--bb-space-10));
+  gap: var(--ds-space-6);
+  padding-block: clamp(var(--ds-space-6), 4vw, var(--ds-space-10));
 }
 
 .quick-add-kicker {
   margin: 0;
-  color: var(--bb-ink-subtle);
-  font-family: var(--bb-font-mono);
+  color: var(--ds-ink-subtle);
+  font-family: var(--ds-font-mono);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -21,19 +21,19 @@
 
 .quick-add-form {
   display: grid;
-  gap: var(--bb-space-4);
+  gap: var(--ds-space-4);
   max-width: 40rem;
 }
 
 .quick-add-row {
   display: grid;
-  gap: var(--bb-space-4);
+  gap: var(--ds-space-4);
 }
 
 .quick-add-field {
   display: grid;
-  gap: var(--bb-space-1);
-  font-family: var(--bb-font-sans);
+  gap: var(--ds-space-1);
+  font-family: var(--ds-font-sans);
 }
 
 .quick-add-field label {
@@ -42,42 +42,42 @@
 
 .quick-add-field input,
 .quick-add-field textarea {
-  padding: var(--bb-space-2);
-  color: var(--bb-ink);
-  background: var(--bb-surface);
-  border: var(--bb-border-width) solid var(--bb-border-strong);
+  padding: var(--ds-space-2);
+  color: var(--ds-ink);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
   font: inherit;
 }
 
 .quick-add-note {
   margin: 0;
-  color: var(--bb-ink-subtle);
+  color: var(--ds-ink-subtle);
   font-size: 0.8rem;
 }
 
 .quick-add-result {
   display: grid;
-  gap: var(--bb-space-4);
+  gap: var(--ds-space-4);
   max-width: 40rem;
 }
 
 .quick-add-excerpt {
-  color: var(--bb-ink-muted);
-  font-family: var(--bb-font-sans);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
 }
 
 .quick-add-meta {
-  color: var(--bb-ink-subtle);
-  font-family: var(--bb-font-mono);
+  color: var(--ds-ink-subtle);
+  font-family: var(--ds-font-mono);
   font-size: 0.75rem;
 }
 
 .quick-add-draft {
-  padding: var(--bb-space-5);
+  padding: var(--ds-space-5);
   display: grid;
-  gap: var(--bb-space-3);
-  background: var(--bb-surface-raised);
-  border: var(--bb-border-width) solid var(--bb-border);
+  gap: var(--ds-space-3);
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-border);
 }
 
 .quick-add-draft h2 {
@@ -87,24 +87,24 @@
 
 .quick-add-draft dl {
   display: grid;
-  gap: var(--bb-space-2);
+  gap: var(--ds-space-2);
   margin: 0;
 }
 
 .quick-add-draft dt {
-  color: var(--bb-ink-subtle);
-  font-family: var(--bb-font-sans);
+  color: var(--ds-ink-subtle);
+  font-family: var(--ds-font-sans);
   font-size: 0.75rem;
 }
 
 .quick-add-draft dd {
   margin: 0;
-  font-family: var(--bb-font-mono);
+  font-family: var(--ds-font-mono);
   font-size: 0.9rem;
 }
 
 .quick-add-footer {
-  font-family: var(--bb-font-sans);
+  font-family: var(--ds-font-sans);
 }
 
 @media (min-width: 40rem) {

@@ -8,16 +8,16 @@
 
 import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
-import type { PublicSearchIndexDoc } from '@blap/domain';
+import type { PublicSearchIndexDoc } from '@repo/domain';
 import type {
   PublicEntityProjectionDoc,
   PublicSearchIndexDoc as FirestoreSearchIndexDoc,
-} from '@blap/firebase';
+} from '@repo/firebase';
 import {
   buildRelatedNeighborStubs,
   composeContinueLearningStubs,
   type NeighborLookup,
-} from '@blap/domain';
+} from '@repo/domain';
 import {
   getPublicEntity,
   listPublicEntities,

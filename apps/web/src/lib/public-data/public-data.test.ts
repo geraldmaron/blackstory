@@ -68,7 +68,7 @@ test('mapProjectionToPublicEntityView renders claims carried by the projection i
 test('mapProjectionToPublicEntityView does not backfill from the bundled seed catalog even when the id matches', () => {
   // `ent_15th_st_church_001` is a real bundled seed id with its own summary/claims. A live
   // projection sharing that id must render only its own (thinner) data — never silently pull
-  // in the seed's summary/topicTags/claims (black-book-dnli fixed this seed-enrichment bug).
+  // in the seed's summary/topicTags/claims (the related workstream fixed this seed-enrichment bug).
   const view = mapProjectionToPublicEntityView({
     id: 'ent_15th_st_church_001',
     releaseId: 'rel_live_001',
@@ -98,7 +98,7 @@ test('live-only projections get a default notability label for search-pool parit
   assert.match(view.notabilityLabels![0]!, /documented site/i);
 });
 
-test('mapProjectionToPublicEntityView uses the release builder real notabilityBasis/researchCoverage/revision metadata when present (black-book-1fg9)', () => {
+test('mapProjectionToPublicEntityView uses the release builder real notabilityBasis/researchCoverage/revision metadata when present (the related workstream)', () => {
   const view = mapProjectionToPublicEntityView({
     id: 'ent_national_example_002',
     releaseId: 'rel_live_002',

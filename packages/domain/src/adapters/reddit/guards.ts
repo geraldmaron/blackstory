@@ -1,5 +1,5 @@
 /**
- * Fail-closed compliance guards for the Reddit adapter. These are runtime assertions 
+ * Fail-closed compliance guards for the Reddit adapter. These are runtime assertions
  * not just comments that the adapter's exported surface and normalized payloads never grow a
  * republication path, an ML-training path, or an identity-resolving field. reddit.test.ts calls
  * every one of these against the adapter's real module exports and real normalized output, so a
@@ -42,7 +42,7 @@ export function assertNoForbiddenExportSurface(moduleExports: Readonly<Record<st
       if (pattern.test(name)) {
         throw new Error(
           `Reddit adapter export "${name}" matches forbidden pattern ${pattern.source}: no ` +
-            'republication, ML-training, or deanonymization path may exist on this adapter (BB-074)',
+            'republication, ML-training, or deanonymization path may exist on this adapter ()',
         );
       }
     }
@@ -91,7 +91,7 @@ export function assertNoIdentityFields(value: Readonly<Record<string, unknown>>)
     if (PROHIBITED_IDENTITY_KEYS.has(key.toLowerCase())) {
       throw new Error(
         `Reddit payload cannot include identity-resolving field "${key}": authors are stored as ` +
-          'a handle only, never resolved further (BB-074/BB-077)',
+          'a handle only, never resolved further (/)',
       );
     }
   }
@@ -102,7 +102,7 @@ export function assertNoFullContentFields(value: Readonly<Record<string, unknown
     if (PROHIBITED_FULL_CONTENT_KEYS.has(key.toLowerCase())) {
       throw new Error(
         `Reddit payload cannot include full-content field "${key}": only a capped triage snippet ` +
-          'is ever stored, never a full post body or comment tree (BB-074/BB-077)',
+          'is ever stored, never a full post body or comment tree (/)',
       );
     }
   }

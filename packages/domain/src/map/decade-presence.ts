@@ -9,7 +9,7 @@
  * Deliberately import-free: this file is the ONE piece of the decade-presence
  * model a 'use client' component may import as a real value (`decade-flow.ts`
  * is imported by `HeroStage.tsx`), via the client-safe subpath
- * `@blap/domain/map/decade-presence` — never the top-level `@blap/domain`
+ * `@repo/domain/map/decade-presence` — never the top-level `@repo/domain`
  * barrel, which transitively pulls in server-only modules a browser bundle
  * cannot resolve. A relative import here (even a type-only one to `map-source.js`
  * or `../graph/decades.js`) would defeat that isolation the moment this module
@@ -32,7 +32,7 @@
  *
  * HONESTY RULE (carried from decade-flow.ts): these are documented-record
  * counts, never a population/demographic layer. Modeled Black population by
- * decade (census bead black-book-vxz) rides this same per-decade/per-state
+ * decade (census bead the related workstream) rides this same per-decade/per-state
  * channel later, additively — this module's shape does not need to change
  * when that ingestion lands.
  */

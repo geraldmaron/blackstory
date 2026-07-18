@@ -7,19 +7,19 @@ import { QuickAddForm } from './quick-add-form';
 import './quick-add.css';
 
 export const metadata = {
-  title: 'Quick add — Black Book Admin',
+  title: 'Quick add — BlackStory Admin',
   description: 'Paste a URL and open a draft research case through the operator proposal lane.',
 };
 
 export default function QuickAddPage() {
   return (
-    <main className="bb-container bb-prose quick-add-page">
+    <main className="ds-container ds-prose quick-add-page">
       <p className="quick-add-kicker">Operator proposal lane</p>
       <h1>Quick add</h1>
       <p>
-        Paste a source URL. It fetches through the BB-030 safe-fetch policy (DNS-pinned, SSRF-
+        Paste a source URL. It fetches through the safe-fetch policy (DNS-pinned, SSRF-
         safe, sandboxed), pre-fills citation metadata, notes the archival capture point, and
-        prepares a draft research case in the same BB-029/BB-044 quarantine pipeline every other
+        prepares a draft research case in the same quarantine pipeline every other
         proposer uses. Nothing is published from here — proposing and publishing stay distinct,
         separately authorized actions.
       </p>

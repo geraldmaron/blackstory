@@ -17,20 +17,20 @@
  *
  * Callers resolve `classLabel` via `SENSITIVITY_CLASS_PRESENTATION_LABELS[sensitivity.class]`
  * and disclaimer copy via `getDisclaimer('sensitive_content')` /
- * `getDisclaimer('non_endorsement')` from `@blap/domain`, then render this component on
+ * `getDisclaimer('non_endorsement')` from `@repo/domain`, then render this component on
  * the entity page, map card, and search result surfaces.
  */
 
 import React from 'react';
-import type { EntityKind } from '@blap/domain/entity-kinds';
-import type { EntitySensitivity } from '@blap/domain/entity-status';
+import type { EntityKind } from '@repo/domain/entity-kinds';
+import type { EntitySensitivity } from '@repo/domain/entity-status';
 import { DisclaimerBanner, type DisclaimerCopy } from './DisclaimerBanner';
-import { Notice } from '@blap/ui';
+import { Notice } from '@repo/ui';
 
 export type SensitivityContextBannerProps = {
   readonly sensitivity: EntitySensitivity;
   /** Procedural, conduct-based label for `sensitivity.class` see
-   * `SENSITIVITY_CLASS_PRESENTATION_LABELS` in `@blap/domain`'s disclaimers module. */
+   * `SENSITIVITY_CLASS_PRESENTATION_LABELS` in `@repo/domain`'s disclaimers module. */
   readonly classLabel: string;
   /** `getDisclaimer('sensitive_content')` from the registry.  */
   readonly sensitiveContentDisclaimer: DisclaimerCopy;
@@ -49,10 +49,10 @@ export function SensitivityContextBanner({
   const showNonEndorsement = entityKind === 'person' && Boolean(nonEndorsementDisclaimer);
 
   return (
-    <div className="bp-stack" role="group" aria-label={`Sensitivity context: ${classLabel}`}>
+    <div className="ds-stack" role="group" aria-label={`Sensitivity context: ${classLabel}`}>
       <Notice tone="warning" title={classLabel}>
         <p style={{ margin: 0 }}>{sensitivity.note}</p>
-        <p style={{ margin: 0, marginTop: 'var(--bp-space-2)' }}>{sensitiveContentDisclaimer.body}</p>
+        <p style={{ margin: 0, marginTop: 'var(--ds-space-2)' }}>{sensitiveContentDisclaimer.body}</p>
       </Notice>
       {showNonEndorsement && nonEndorsementDisclaimer ? (
         <DisclaimerBanner {...nonEndorsementDisclaimer} />

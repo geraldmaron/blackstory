@@ -71,7 +71,7 @@ test('a single-typo query (distance <= 2, length >= 4) still matches via the fuz
   assert.equal(ranked[0]?.matchedOn, 'displayName');
 });
 
-test('a 2-char query is NOT fuzzy-matched (stays clear of BB-026 minQueryLength)', () => {
+test('a 2-char query is NOT fuzzy-matched (stays clear of minQueryLength)', () => {
   const rec = record({ id: 'az', displayName: 'Az' }); // levenshtein('zz','az') === 1
   const ranked = rankRecords('zz', [rec]);
   assert.equal(ranked.length, 0);

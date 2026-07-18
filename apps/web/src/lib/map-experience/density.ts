@@ -4,7 +4,7 @@
  * counts; never a crime/incident heatmap (see `dignity-style.ts` for the color-only half of the
  * dignity rule this layer must hold to).
  */
-import type { MapStateAggregate } from '@blap/domain/map/map-source';
+import type { MapStateAggregate } from '@repo/domain/map/map-source';
 
 export type DensityTier = 'documented' | 'emerging' | 'concentrated';
 

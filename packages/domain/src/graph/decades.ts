@@ -4,7 +4,7 @@
  *
  * An entity with an open-ended or ongoing active period (an org, institution, movement, or law)
  * must appear in EVERY decade it was active derived from `statusHistory`/start-end
- * fields not merely the decade it was founded. This module never re-derives 
+ * fields not merely the decade it was founded. This module never re-derives
  * status/statusHistory logic itself (that stays owned by `../entity-status.ts`, imported
  * read-only here); callers resolve an entity's own status-history windows (or event
  * startAt/endAt, or a single founding-year point) into `EraSpan` inputs before calling in the

@@ -1,7 +1,7 @@
 /**
  * Enforces map color rules: density stays non-red (presence, not crime-heat);
  * kind shades stay non-red except the allowlisted massacre tone (product
- * direction black-book-67d). Every kind still carries a glyph so color is never
+ * direction the related workstream). Every kind still carries a glyph so color is never
  * the only signal (WCAG 1.4.1).
  */
 import assert from 'node:assert/strict';

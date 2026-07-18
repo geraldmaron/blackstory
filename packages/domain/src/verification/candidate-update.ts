@@ -1,5 +1,5 @@
 /**
- * `CandidateUpdate` (black-book-isqd): the critical invariant from the bead is that a refresh
+ * `CandidateUpdate` (the related workstream): the critical invariant from the bead is that a refresh
  * must NEVER directly overwrite public truth — it produces a candidate that enters the normal
  * review pipeline instead. This module models that candidate and the pure function that
  * produces one from a verification run's observation.

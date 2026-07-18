@@ -1,5 +1,5 @@
 /**
- * Unit tests for the Data Pack v1 manifest contract (black-book-ud5q): shape validation, deterministic
+ * Unit tests for the Data Pack v1 manifest contract (the related workstream): shape validation, deterministic
  * signing, and signature verification (valid + tampered). See ./manifest.ts's header for the
  * design rationale.
  */

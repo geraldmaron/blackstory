@@ -4,7 +4,7 @@
  * edges; every node links to its entity page.
  */
 import React from 'react';
-import { cx, EmptyState } from '@blap/ui';
+import { cx, EmptyState } from '@repo/ui';
 import type { HistoryEdgeView, HistoryNodeView } from '../../lib/history/build-history-graph';
 import { HISTORY_GAP_COPY } from '../../lib/history/copy';
 
@@ -61,26 +61,26 @@ export function HistoryGraphPanel({
 
   return (
     <section
-      className={cx('bp-history-graph', className)}
+      className={cx('ds-history-graph', className)}
       aria-labelledby={labelledBy}
       aria-live="polite"
     >
       {[...groups.entries()].map(([kind, kindNodes]) => (
-        <div key={kind} className="bp-history-graph__group">
-          <h3 className="bp-history-graph__group-title">{kind.charAt(0).toUpperCase() + kind.slice(1)}</h3>
-          <ul className="bp-history-graph__nodes">
+        <div key={kind} className="ds-history-graph__group">
+          <h3 className="ds-history-graph__group-title">{kind.charAt(0).toUpperCase() + kind.slice(1)}</h3>
+          <ul className="ds-history-graph__nodes">
             {kindNodes.map((node) => {
               const isSelected = node.entityId === selectedId;
               const nodeEdges = edgesForNode(node.entityId, edges);
 
               return (
-                <li key={node.entityId} className="bp-history-graph__node">
-                  <div className="bp-history-graph__node-header">
+                <li key={node.entityId} className="ds-history-graph__node">
+                  <div className="ds-history-graph__node-header">
                     <button
                       type="button"
                       className={cx(
-                        'bp-history-graph__node-button',
-                        isSelected && 'bp-history-graph__node-button--selected',
+                        'ds-history-graph__node-button',
+                        isSelected && 'ds-history-graph__node-button--selected',
                       )}
                       aria-pressed={isSelected}
                       aria-expanded={isSelected}
@@ -88,16 +88,16 @@ export function HistoryGraphPanel({
                         ? { onClick: () => onSelectNode(node.entityId) }
                         : {})}
                     >
-                      <span className="bp-history-graph__node-name">{node.displayName}</span>
-                      <span className="bp-mono bp-history-graph__node-status">{node.statusLabel}</span>
+                      <span className="ds-history-graph__node-name">{node.displayName}</span>
+                      <span className="ds-mono ds-history-graph__node-status">{node.statusLabel}</span>
                     </button>
-                    <a className="bp-cta bp-cta--quiet bp-history-graph__node-link" href={node.href}>
+                    <a className="ds-cta ds-cta--quiet ds-history-graph__node-link" href={node.href}>
                       Open record
                     </a>
                   </div>
 
                   {isSelected && nodeEdges.length > 0 ? (
-                    <details open className="bp-history-graph__connections">
+                    <details open className="ds-history-graph__connections">
                       <summary>Connections ({nodeEdges.length})</summary>
                       <ul>
                         {nodeEdges.map((edge) => (
@@ -105,8 +105,8 @@ export function HistoryGraphPanel({
                             <button
                               type="button"
                               className={cx(
-                                'bp-history-graph__edge-button',
-                                selectedEdgeId === edge.edgeId && 'bp-history-graph__edge-button--selected',
+                                'ds-history-graph__edge-button',
+                                selectedEdgeId === edge.edgeId && 'ds-history-graph__edge-button--selected',
                               )}
                               aria-pressed={selectedEdgeId === edge.edgeId}
                               {...(onSelectEdge
@@ -114,7 +114,7 @@ export function HistoryGraphPanel({
                                 : {})}
                             >
                               {edge.sentence}
-                              <span className="bp-mono">
+                              <span className="ds-mono">
                                 {edge.evidenceCount} citation{edge.evidenceCount === 1 ? '' : 's'}
                               </span>
                             </button>

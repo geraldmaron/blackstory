@@ -45,7 +45,7 @@ function canonicalize(value: unknown): unknown {
 }
 
 /**
- * Deterministic fingerprint over the relevance-assessment inputs that produced a decision 
+ * Deterministic fingerprint over the relevance-assessment inputs that produced a decision
  * same canonicalize -> JSON -> sha256 pattern confidenceInputFingerprints established
  * (packages/domain/src/confidence-engine/engine.ts), scoped to relevance-assessment inputs
  * rather than claim-confidence inputs (see types.ts module docstring for why).
@@ -145,7 +145,7 @@ export function extractRelevanceDecisionLog(
   return entries;
 }
 
-/** Build the versioned calibration-dataset export around an already-extracted decision log 
+/** Build the versioned calibration-dataset export around an already-extracted decision log
  * mirrors the shape of confidence-engine/calibration.js's exportConfidenceCalibrationDataset
  * (stable sort, explicit schemaVersion + exportedAt) without depending on it. */
 export function buildRelevanceCalibrationDataset(input: {

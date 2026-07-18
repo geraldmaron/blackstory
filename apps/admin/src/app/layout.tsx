@@ -2,10 +2,10 @@
  * Root layout for the private Black Book administration console.
  */
 import type { ReactNode } from 'react';
-import '@blap/ui/styles.css';
+import '@repo/ui/styles.css';
 
 export const metadata = {
-  title: 'Black Book Admin',
+  title: 'BlackStory Admin',
   description: 'Administration and research console',
 };
 
