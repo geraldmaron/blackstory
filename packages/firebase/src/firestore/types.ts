@@ -812,6 +812,21 @@ export const publicActiveReleaseSchema = z.object({
 
 export type PublicActiveReleaseDoc = z.infer<typeof publicActiveReleaseSchema>;
 
+/** Accepted public claim carried inline on an entity projection (national-catalog era).
+ * Non-numeric by the same standing policy as the parent schema: the projection stores the
+ * display register (`confidenceLevel`), never a raw confidence score. */
+export const publicClaimProjectionSchema = z.object({
+  id: z.string().min(1),
+  predicate: z.string().min(1),
+  object: z.string().min(1),
+  confidenceLevel: z.enum(['high', 'medium', 'low']),
+  citationSource: z.string().min(1),
+  citationHref: z.string().url().optional(),
+  citationLabel: z.string().min(1),
+});
+
+export type PublicClaimProjectionDoc = z.infer<typeof publicClaimProjectionSchema>;
+
 export const publicEntityProjectionSchema = z.object({
   id: z.string().min(1),
   releaseId: z.string().min(1),
@@ -822,6 +837,15 @@ export const publicEntityProjectionSchema = z.object({
   summary: z.string().min(120).max(400),
   location: geoPointFieldsSchema.optional(),
   claimIds: z.array(z.string()).default([]),
+  /** Accepted claims with citations, inline (see `publicClaimProjectionSchema`). Optional:
+   * bootstrap-window stubs carry only `claimIds`; national-catalog projections carry both. */
+  claims: z.array(publicClaimProjectionSchema).optional(),
+  /** "City, State" jurisdiction label for cards/facets; optional on bootstrap-window stubs
+   * (the web mapper falls back to bundled-seed enrichment there). */
+  jurisdictionLabel: z.string().min(1).optional(),
+  /** Public location description at the record's allowed precision — never a street address
+   * finer than the constitution's public precision for the record. */
+  locationLabel: z.string().min(1).optional(),
 
   /**
    * Public projection additions — every one non-numeric by standing policy (numeric

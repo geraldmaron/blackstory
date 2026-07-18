@@ -226,7 +226,9 @@ export function buildExploreMapSource(
   let skippedNoAnchor = 0;
 
   for (const entity of entities) {
-    const anchor = resolveAnchor(entity.id);
+    // Live projections carry their own public-precision anchor; the repo-side table is the
+    // fallback for bundled seed fixtures only (see entity-geo.ts's retirement note).
+    const anchor = entity.geoAnchor ?? resolveAnchor(entity.id);
     if (!anchor) {
       skippedNoAnchor += 1;
       continue;

@@ -143,7 +143,17 @@ test('the interpolated expression curve tracks markerRadius() reasonably closely
   }
 });
 
-test('markerHaloRadiusExpression() is the marker radius expression plus the fixed offset', () => {
-  const expression = markerHaloRadiusExpression();
-  assert.deepEqual(expression, ['+', markerRadiusExpression(), MARKER_HALO_OFFSET]);
+test('markerHaloRadiusExpression() offsets each zoom stop of the radius expression by the fixed halo offset', () => {
+  // Both expressions are TOP-LEVEL zoom interpolates (the style spec rejects ['zoom'] nested
+  // inside arithmetic), so the halo relationship holds per stop output: radius stop `['*',
+  // data, scale]` pairs with halo stop `['+', ['*', data, scale], MARKER_HALO_OFFSET]`.
+  const radius = markerRadiusExpression() as unknown[];
+  const halo = markerHaloRadiusExpression() as unknown[];
+  assert.deepEqual(radius.slice(0, 3), ['interpolate', ['linear'], ['zoom']]);
+  assert.deepEqual(halo.slice(0, 3), ['interpolate', ['linear'], ['zoom']]);
+  assert.equal(halo.length, radius.length);
+  for (let i = 3; i < radius.length; i += 2) {
+    assert.equal(halo[i], radius[i], `zoom stop ${i} differs`);
+    assert.deepEqual(halo[i + 1], ['+', radius[i + 1], MARKER_HALO_OFFSET], `output at stop ${i}`);
+  }
 });

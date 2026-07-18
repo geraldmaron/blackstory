@@ -45,11 +45,19 @@ import type * as MapLibreNamespace from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { brandPalette, darkTheme } from '@black-book/ui';
 import {
+  EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_COUNTY_LINES_LAYER_ID,
+  EXPLORE_COUNTY_LINES_SOURCE_ID,
+  EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
+  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
+  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+  EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../map/explore-layer-ids';
 import { buildExploreMapStyle } from '../map/explore-style';
 import type {
@@ -71,6 +79,10 @@ import {
   STATE_LABEL_SELECTED_CLASS_NAME,
 } from '../../lib/map-experience/state-labels';
 import { US_STATES_GEOJSON_PATH } from '../../lib/map-experience/us-state-polygons';
+import {
+  COUNTY_LINES_PREFETCH_ZOOM,
+  US_COUNTIES_GEOJSON_PATH,
+} from '../../lib/map-experience/us-county-lines';
 import type { ExploreViewport } from '../../lib/map-experience/url-state';
 
 type MaplibreModule = typeof MapLibreNamespace;
@@ -97,12 +109,33 @@ const ARCHIVE_BASE_STYLE: StyleSpecification = {
 const GEOGRAPHY_LAYER_IDS = new Set([
   'background',
   'explore-state-density-fill',
+  EXPLORE_COUNTY_LINES_LAYER_ID,
   'explore-state-bounds-line',
   'explore-state-selected-fill',
   'explore-state-selected-line',
   'explore-jurisdiction-area-fill',
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
+]);
+
+/** The entity-marker stack from `buildExploreMapStyle`, in its stacking order: halo beneath
+ * point beneath the event glyph ring, clusters above singles. Added once (add-if-missing, like
+ * geography layers) and never removed on a data patch — their paint is entirely data-driven
+ * (kind tables + marker-size expressions), so a patch only ever needs the source `setData`. */
+const ENTITY_LAYER_IDS = new Set([
+  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+  EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
+  EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_CLUSTER_COUNT_LAYER_ID,
+]);
+
+/** Sources whose real geometry arrives from a lazy client fetch (`loadStatePolygonsWithDensity`,
+ * `loadCountyLines`) — their inline style data is an empty placeholder, so a data patch must
+ * never `setData` it back over the loaded polygons. */
+const LAZY_GEOGRAPHY_SOURCE_IDS = new Set<string>([
+  EXPLORE_STATE_DENSITY_SOURCE_ID,
+  EXPLORE_COUNTY_LINES_SOURCE_ID,
 ]);
 
 /** Normalizes `maplibre-gl`'s `LngLatLike` union (a `LngLat` instance, a `{lng,lat}` or
@@ -223,19 +256,53 @@ async function loadStatePolygonsWithDensity(
   source.setData(joined as any);
 }
 
+let countyLinesPromise: Promise<unknown> | undefined;
+
+function fetchCountyLines(): Promise<unknown> {
+  if (!countyLinesPromise) {
+    countyLinesPromise = fetch(US_COUNTIES_GEOJSON_PATH).then(async (response) => {
+      if (!response.ok) {
+        countyLinesPromise = undefined;
+        throw new Error(`Failed to load ${US_COUNTIES_GEOJSON_PATH}: ${response.status}`);
+      }
+      return (await response.json()) as unknown;
+    });
+  }
+  return countyLinesPromise;
+}
+
+/** Maps whose county source already holds the real geometry — `zoomend` keeps firing past the
+ * prefetch threshold, and re-`setData`ing 3k polygons on every camera settle would churn the
+ * GeoJSON worker for nothing. */
+const countyLinesLoaded = new WeakSet<MapLibreMap>();
+
+/** Lazily fills the county-lines source (black-book-uda). Deliberately zoom-triggered by the
+ * caller, not eager: the ~2.3 MB asset is invisible below the layer's `minzoom`, so the
+ * national resting frame never pays for it. */
+async function loadCountyLines(map: MapLibreMap): Promise<void> {
+  if (countyLinesLoaded.has(map)) return;
+  const source = map.getSource(EXPLORE_COUNTY_LINES_SOURCE_ID) as GeoJSONSource | undefined;
+  if (!source) return;
+  const collection = await fetchCountyLines();
+  if (countyLinesLoaded.has(map)) return;
+  countyLinesLoaded.add(map);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+  source.setData(collection as any);
+}
+
 function applyGeographyStyle(map: MapLibreMap, style: StyleSpecification): void {
   for (const [id, source] of Object.entries(style.sources ?? {})) {
-    if (id === 'explore-entities') continue;
     const existing = map.getSource(id) as GeoJSONSource | undefined;
     if (existing) {
       // Update in place — NEVER removeSource/addSource on a data patch. Re-adding a source id
       // while the worker is still tearing the old one down corrupts the internal GeoJSON tile
       // pyramid (only the tile in flight at teardown ever renders again), and patches land in
       // quick succession on mount (hero reset + explore sync, doubled by dev StrictMode).
-      // The density source is skipped here: its inline style data is an empty placeholder, and
-      // `loadStatePolygonsWithDensity` overwrites it with the real joined polygons right after
-      // every apply — setData'ing the placeholder first would just blank-flash the states.
-      if (id === EXPLORE_STATE_DENSITY_SOURCE_ID) continue;
+      // Lazy geography sources (states+density, county lines) are skipped: their inline style
+      // data is an empty placeholder that their own loaders overwrite — setData'ing the
+      // placeholder first would just blank-flash the loaded polygons. The entities source DOES
+      // setData here: that is how a surface's filter changes reach the GL circle layers.
+      if (LAZY_GEOGRAPHY_SOURCE_IDS.has(id)) continue;
       const data = (source as { data?: unknown }).data;
       if (typeof existing.setData === 'function' && data && typeof data === 'object') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
@@ -245,9 +312,22 @@ function applyGeographyStyle(map: MapLibreMap, style: StyleSpecification): void 
     }
     map.addSource(id, source as SourceSpecification);
   }
+  // Geography layers slot in BENEATH the entity-marker stack whenever it already exists (they
+  // are removed and re-added on every apply for mode-dependent paint; the entity layers are
+  // not, so without an anchor each re-add would climb above the markers and bury them under
+  // state fills). Entity layers append once, in the style array's own stacking order.
+  const entityAnchor = map.getLayer(EXPLORE_UNCLUSTERED_HALO_LAYER_ID)
+    ? EXPLORE_UNCLUSTERED_HALO_LAYER_ID
+    : undefined;
   for (const layer of style.layers ?? []) {
-    if (!GEOGRAPHY_LAYER_IDS.has(layer.id) || layer.id === 'background') continue;
-    if (!map.getLayer(layer.id)) {
+    if (layer.id === 'background') continue;
+    if (GEOGRAPHY_LAYER_IDS.has(layer.id)) {
+      if (!map.getLayer(layer.id)) {
+        map.addLayer(layer as LayerSpecification, entityAnchor);
+      }
+      continue;
+    }
+    if (ENTITY_LAYER_IDS.has(layer.id) && !map.getLayer(layer.id)) {
       map.addLayer(layer as LayerSpecification);
     }
   }
@@ -463,6 +543,7 @@ export function MapStageProvider({
       // of the same id causes.
       for (const id of [
         EXPLORE_STATE_DENSITY_LAYER_ID,
+        EXPLORE_COUNTY_LINES_LAYER_ID,
         'explore-state-bounds-line',
         SELECTED_FILL_ID,
         SELECTED_LINE_ID,
@@ -481,6 +562,13 @@ export function MapStageProvider({
       void loadStatePolygonsWithDensity(map, configRef.current.densityLevels).catch((error) => {
         console.error('[MapStage] state polygon load failed', error);
       });
+      // County hairlines only cost their 2.3 MB once the camera is actually near their minzoom
+      // (deep links can land there directly, so the zoomend prefetch alone isn't enough).
+      if (map.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM) {
+        void loadCountyLines(map).catch((error) => {
+          console.error('[MapStage] county lines load failed', error);
+        });
+      }
       syncEntityMarkers();
     } catch (error) {
       console.error('[MapStage] style/data apply failed', error);
@@ -661,7 +749,24 @@ export function MapStageProvider({
       lastViewportRef.current = readViewport(activeMap);
       notify(listenersRef.current, 'viewport', lastViewportRef.current);
 
+      /** True when an entity marker or cluster is rendered under the click point. GL circle
+       * layers have no DOM to stopPropagation from (unlike the overlay marker buttons), so the
+       * layer-scoped state/edge click handlers must yield to them explicitly — otherwise one
+       * cluster click would both expand the cluster and select the state beneath it. */
+      function entityHitAt(point: { x: number; y: number }): boolean {
+        const layers = [
+          EXPLORE_CLUSTER_LAYER_ID,
+          EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+          EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+        ].filter((id) => activeMap.getLayer(id));
+        return (
+          layers.length > 0 &&
+          activeMap.queryRenderedFeatures([point.x, point.y], { layers }).length > 0
+        );
+      }
+
       function handleStateClick(event: MapLayerMouseEvent) {
+        if (entityHitAt(event.point)) return;
         const postal = event.features?.[0]?.properties?.postalCode;
         if (typeof postal === 'string' && postal.length > 0) {
           notify(listenersRef.current, 'stateSelect', postal);
@@ -669,6 +774,7 @@ export function MapStageProvider({
       }
 
       function handleEdgeClick(event: MapLayerMouseEvent) {
+        if (entityHitAt(event.point)) return;
         const edgeId = event.features?.[0]?.properties?.edgeId;
         if (typeof edgeId === 'string' && edgeId.length > 0) {
           notify(listenersRef.current, 'edgeSelect', edgeId);
@@ -680,6 +786,9 @@ export function MapStageProvider({
           EXPLORE_STATE_DENSITY_LAYER_ID,
           EXPLORE_HISTORY_EDGES_LAYER_ID,
           EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
+          EXPLORE_CLUSTER_LAYER_ID,
+          EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+          EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
         ].filter((id) => activeMap.getLayer(id));
         const hits = hitLayers.length ? activeMap.queryRenderedFeatures(event.point, { layers: hitLayers }) : [];
         if (hits.length > 0) return;
@@ -716,6 +825,43 @@ export function MapStageProvider({
         updateStateLabelOpacity(activeMap.getZoom());
       });
       activeMap.on('zoom', () => updateStateLabelOpacity(activeMap.getZoom()));
+      activeMap.on('zoomend', () => {
+        if (activeMap.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM) {
+          void loadCountyLines(activeMap).catch((error) => {
+            console.error('[MapStage] county lines load failed', error);
+          });
+        }
+      });
+
+      // Cluster expansion (dignity-style.ts's EXPLORE_CLUSTER_CONFIG contract: "every cluster
+      // decomposes to named entities within two interactions") — clicking a cluster circle
+      // eases down to the zoom where that cluster splits. Registered up-front even though the
+      // layer is added post-load: MapLibre's layer-scoped events resolve the layer at event
+      // time, so a not-yet-added layer is simply never hit.
+      activeMap.on('click', EXPLORE_CLUSTER_LAYER_ID, (event: MapLayerMouseEvent) => {
+        const feature = event.features?.[0];
+        const clusterId = feature?.properties?.cluster_id;
+        const source = activeMap.getSource(EXPLORE_ENTITIES_SOURCE_ID) as GeoJSONSource | undefined;
+        if (typeof clusterId !== 'number' || !source || feature?.geometry.type !== 'Point') return;
+        const [lng, lat] = feature.geometry.coordinates;
+        void source
+          .getClusterExpansionZoom(clusterId)
+          .then((zoom) => {
+            if (typeof lng === 'number' && typeof lat === 'number') {
+              activeMap.easeTo({ center: [lng, lat], zoom, essential: true });
+            }
+          })
+          .catch(() => {
+            // Cluster may have dissolved between click and lookup (data patch mid-flight);
+            // nothing to expand.
+          });
+      });
+      activeMap.on('mouseenter', EXPLORE_CLUSTER_LAYER_ID, () => {
+        activeMap.getCanvas().style.cursor = 'pointer';
+      });
+      activeMap.on('mouseleave', EXPLORE_CLUSTER_LAYER_ID, () => {
+        activeMap.getCanvas().style.cursor = '';
+      });
 
       resizeObserver = new ResizeObserver(() => {
         activeMap.resize();

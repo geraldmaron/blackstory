@@ -23,8 +23,24 @@ export type PublicProjectionInput = {
     readonly lng: number;
     readonly geohash: string;
     readonly precision?: string;
+    readonly matchMethod?: string;
   };
   readonly claimIds: readonly string[];
+  /** State/city jurisdiction label carried by release projections (national-catalog era);
+   * absent on bootstrap-window stubs, where the seed enrichment supplies it instead. */
+  readonly jurisdictionLabel?: string;
+  readonly locationLabel?: string;
+  /** Accepted public claims with citations. Non-numeric by standing policy: the projection
+   * carries `confidenceLevel` (the display register), never a raw confidence score. */
+  readonly claims?: readonly {
+    readonly id: string;
+    readonly predicate: string;
+    readonly object: string;
+    readonly confidenceLevel: 'high' | 'medium' | 'low';
+    readonly citationSource: string;
+    readonly citationHref?: string;
+    readonly citationLabel: string;
+  }[];
   readonly status?: string;
   readonly eraBuckets?: readonly string[];
   readonly notabilityLabels?: readonly string[];
@@ -62,6 +78,40 @@ function locationPrecisionFromProjection(
   return 'city';
 }
 
+/** View claims render a nominal score alongside the level chip; the projection carries only the
+ * level (non-numeric public-payload policy), so the score here is the level's register midpoint —
+ * a display value, never a stored ranking. */
+const NOMINAL_CONFIDENCE_SCORE: Record<'high' | 'medium' | 'low', number> = {
+  high: 0.85,
+  medium: 0.6,
+  low: 0.4,
+};
+
+function mapClaims(claims: PublicProjectionInput['claims']): PublicEntityView['claims'] {
+  return (claims ?? []).map((claim) => ({
+    id: claim.id,
+    predicate: claim.predicate,
+    object: claim.object,
+    confidenceScore: NOMINAL_CONFIDENCE_SCORE[claim.confidenceLevel],
+    confidenceLevel: claim.confidenceLevel,
+    citationSource: claim.citationSource,
+    ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
+    citationLabel: claim.citationLabel,
+  }));
+}
+
+function mapGeoAnchor(
+  location: PublicProjectionInput['location'],
+): PublicEntityView['geoAnchor'] {
+  if (!location) return undefined;
+  return {
+    lat: location.lat,
+    lng: location.lng,
+    geohash: location.geohash,
+    matchMethod: location.matchMethod ?? 'release_projection',
+  };
+}
+
 function mapPrimaryImage(
   image: PublicProjectionInput['primaryImage'],
 ): PublicEntityView['primaryImage'] {
@@ -95,6 +145,8 @@ export function mapProjectionToPublicEntityView(
       ? projection.topicTags
       : (seed?.topicTags ?? []);
   const primaryImage = mapPrimaryImage(projection.primaryImage) ?? seed?.primaryImage;
+  const geoAnchor = mapGeoAnchor(projection.location);
+  const claims = mapClaims(projection.claims);
 
   if (seed) {
     return {
@@ -102,6 +154,14 @@ export function mapProjectionToPublicEntityView(
       displayName: projection.displayName,
       summary,
       topicTags,
+      ...(geoAnchor !== undefined ? { geoAnchor } : {}),
+      ...(claims.length > 0 ? { claims } : {}),
+      ...(projection.jurisdictionLabel !== undefined
+        ? { jurisdictionLabel: projection.jurisdictionLabel }
+        : {}),
+      ...(projection.locationLabel !== undefined
+        ? { locationLabel: projection.locationLabel }
+        : {}),
       revision: {
         releaseId: projection.releaseId,
         generatedAt: seed.revision.generatedAt,
@@ -163,11 +223,13 @@ export function mapProjectionToPublicEntityView(
       ? { sensitivityClass: projection.sensitivityClass }
       : {}),
     topicTags,
-    jurisdictionLabel: 'Unknown',
+    jurisdictionLabel: projection.jurisdictionLabel ?? 'Unknown',
     locationPrecision: locationPrecisionFromProjection(projection.location?.precision),
-    locationLabel: projection.displayName,
+    locationLabel: projection.locationLabel ?? projection.displayName,
     relevanceExplanation:
-      'This record is served from the live public release projection. Supporting claims and evidence panels may still be sparse until the full publication pipeline lands.',
+      claims.length > 0
+        ? 'Included as a documented site in the active public release; each accepted claim below cites its source.'
+        : 'This record is served from the live public release projection. Supporting claims and evidence panels may still be sparse until the full publication pipeline lands.',
     historicalContext:
       projection.historicalContext ??
       'Live projection scaffolding — historical framing expands as curated release content is published.',
@@ -175,10 +237,11 @@ export function mapProjectionToPublicEntityView(
       ? { extendedNarrative: projection.extendedNarrative }
       : {}),
     ...(primaryImage !== undefined ? { primaryImage } : {}),
-    recordMaturity: 'projection_stub',
-    researchCoverage: 'minimal',
+    ...(geoAnchor !== undefined ? { geoAnchor } : {}),
+    recordMaturity: claims.length > 0 ? 'partial_enrichment' : 'projection_stub',
+    researchCoverage: claims.length >= 2 ? 'partial' : 'minimal',
     mapPin,
-    claims: [],
+    claims,
     timeline: [],
     revision: {
       releaseId: projection.releaseId,

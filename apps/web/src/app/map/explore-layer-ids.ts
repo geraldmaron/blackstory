@@ -5,6 +5,7 @@
 
 export const EXPLORE_ENTITIES_SOURCE_ID = 'explore-entities';
 export const EXPLORE_STATE_DENSITY_SOURCE_ID = 'explore-state-density';
+export const EXPLORE_COUNTY_LINES_SOURCE_ID = 'explore-county-lines';
 export const EXPLORE_JURISDICTION_AREAS_SOURCE_ID = 'explore-jurisdiction-areas';
 export const EXPLORE_HISTORY_EDGES_SOURCE_ID = 'explore-history-edges';
 
@@ -17,6 +18,9 @@ export const EXPLORE_UNCLUSTERED_POINT_LAYER_ID = 'explore-point';
  * approximation rather than literal diamond geometry). */
 export const EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID = 'explore-point-event-glyph';
 export const EXPLORE_STATE_DENSITY_LAYER_ID = 'explore-state-density-fill';
+/** black-book-uda: county hairlines — the fainter tier of the boundary system beneath the
+ * state bounds line, zoom-gated so the national frame stays clean. */
+export const EXPLORE_COUNTY_LINES_LAYER_ID = 'explore-county-lines-line';
 export const EXPLORE_JURISDICTION_AREA_LAYER_ID = 'explore-jurisdiction-area-fill';
 export const EXPLORE_HISTORY_EDGES_LAYER_ID = 'explore-history-edges-line';
 export const EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID = 'explore-history-edges-selected';

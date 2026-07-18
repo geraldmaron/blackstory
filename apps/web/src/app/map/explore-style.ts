@@ -18,6 +18,7 @@ import { KIND_ENCODING_ENTRIES, DEFAULT_KIND_ENCODING } from '../../lib/map-expe
 import {
   markerHaloRadiusExpression,
   markerRadiusExpression,
+  markerRadiusPlusExpression,
 } from '../../lib/map-experience/marker-size';
 import type {
   ExploreMapFeatureCollection,
@@ -26,6 +27,8 @@ import type {
 import {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_COUNTY_LINES_LAYER_ID,
+  EXPLORE_COUNTY_LINES_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
@@ -38,10 +41,13 @@ import {
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
+import { COUNTY_LINES_MIN_ZOOM } from '../../lib/map-experience/us-county-lines';
 
 export {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_COUNTY_LINES_LAYER_ID,
+  EXPLORE_COUNTY_LINES_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
@@ -96,9 +102,13 @@ type KindGlyphPaintSignature = {
 };
 
 const GLYPH_PAINT_SIGNATURE: Readonly<Record<string, KindGlyphPaintSignature>> = {
-  circle: { opacity: 1, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
-  square: { opacity: 1, strokeWidth: 4, strokeColor: DIGNITY_PALETTE.selected },
-  diamond: { opacity: 1, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
+  // Solid-fill kinds sit at 0.82, not 1: with county hairlines beneath the marker stack
+  // (black-book-uda), a fully opaque disc erases the boundary context it sits on — slight
+  // transparency keeps the geography legible through the marker without weakening the
+  // kind-shade read. `ring` stays far lower; mostly-hollow IS its glyph signature.
+  circle: { opacity: 0.82, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
+  square: { opacity: 0.82, strokeWidth: 4, strokeColor: DIGNITY_PALETTE.selected },
+  diamond: { opacity: 0.82, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
   ring: { opacity: 0.3, strokeWidth: 3, strokeColor: DIGNITY_PALETTE.kindInstitutionStroke },
 };
 
@@ -175,6 +185,13 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         // Do not point `data` at the URL — MapLibre’s async URL load would overwrite setData.
         data: { type: 'FeatureCollection', features: [] },
       },
+      [EXPLORE_COUNTY_LINES_SOURCE_ID]: {
+        type: 'geojson',
+        // Empty placeholder, same contract as the state source above: the stage lazily fetches
+        // `/geo/us-counties-20m.geojson` (~2.3 MB) only when the camera first approaches
+        // `COUNTY_LINES_MIN_ZOOM` and setDatas it in — never a URL `data` value.
+        data: { type: 'FeatureCollection', features: [] },
+      },
       [EXPLORE_JURISDICTION_AREAS_SOURCE_ID]: {
         type: 'geojson',
         data: {
@@ -223,6 +240,41 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               ]
             : DIGNITY_PALETTE.densityDisabledFill,
           'fill-opacity': 1,
+        },
+      },
+      {
+        // County hairlines (black-book-uda): the fainter tier of the same boundary system as
+        // the state bounds line below it in this array — same Archive Paper ink, thinner and
+        // more transparent, fading in from `minzoom` so the national frame stays clean. Sits
+        // BELOW state bounds (so state borders keep reading stronger) and far below the entity
+        // marker stack, whose zoom-scaled radius (marker-size.ts's `markerZoomScaleExpression`)
+        // keeps a circle proportionate to the county polygon behind it at every zoom.
+        id: EXPLORE_COUNTY_LINES_LAYER_ID,
+        type: 'line',
+        source: EXPLORE_COUNTY_LINES_SOURCE_ID,
+        minzoom: COUNTY_LINES_MIN_ZOOM,
+        paint: {
+          'line-color': DIGNITY_PALETTE.selected,
+          'line-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            COUNTY_LINES_MIN_ZOOM,
+            0.4,
+            9,
+            1,
+          ] as unknown as ExpressionSpecification,
+          'line-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            COUNTY_LINES_MIN_ZOOM,
+            0,
+            COUNTY_LINES_MIN_ZOOM + 1,
+            0.28,
+            9,
+            0.45,
+          ] as unknown as ExpressionSpecification,
         },
       },
       {
@@ -333,7 +385,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'kind'], 'event']],
         paint: {
-          'circle-radius': ['+', markerRadiusExpression(), 4],
+          // Offset ring via marker-size.ts's top-level zoom interpolate — `['+', radiusExpr, 4]`
+          // would nest the zoom expression and be rejected by the style spec (see
+          // `markerRadiusPlusExpression`'s doc comment).
+          'circle-radius': markerRadiusPlusExpression(4),
           'circle-color': DIGNITY_PALETTE.kindEvent,
           'circle-opacity': 0,
           'circle-stroke-width': 1.5,
@@ -349,6 +404,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           'circle-radius': ['step', ['get', 'point_count'], 18, 10, 24, 50, 30],
           'circle-color': DIGNITY_PALETTE.point,
+          // Same slight transparency as the unclustered glyph signatures — aggregate discs
+          // shouldn't blot out the boundary lines beneath them either.
+          'circle-opacity': 0.82,
           'circle-stroke-width': 3,
           'circle-stroke-color': DIGNITY_PALETTE.selected,
         },

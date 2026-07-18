@@ -153,6 +153,15 @@ export type PublicEntityView = {
   readonly primaryImage?: PublicEntityPrimaryImageView;
   readonly recordMaturity: string;
   readonly researchCoverage: 'minimal' | 'partial' | 'substantial';
+  /** Public-precision coordinate anchor carried by live release projections. When present the
+   * map source builder uses it directly; `entity-geo.ts`'s repo-side table remains only as the
+   * seed-era fallback for bundled fixtures (that module's own documented retirement path). */
+  readonly geoAnchor?: {
+    readonly lat: number;
+    readonly lng: number;
+    readonly geohash: string;
+    readonly matchMethod: string;
+  };
   readonly mapPin: { readonly x: number; readonly y: number };
   readonly claims: readonly PublicClaimView[];
   readonly timeline: readonly PublicTimelineEvent[];

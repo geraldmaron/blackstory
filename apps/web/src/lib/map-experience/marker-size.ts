@@ -71,6 +71,60 @@ export function markerHaloRadius(evidenceCount: number, confidenceTier: Confiden
 }
 
 /**
+ * County-proportionate zoom scaling (black-book-uda). With county hairlines on the canvas from
+ * `COUNTY_LINES_MIN_ZOOM` up (see `us-county-lines.ts`), a fixed-px radius reads wrong at both
+ * ends: at the national frame a max-evidence marker blots out several counties at once, and at
+ * locality zoom the same pixels under-read against the county polygon around them. The
+ * data-driven radius (evidence × confidence, clamped) is therefore multiplied by this
+ * zoom-keyed factor so a circle keeps a stable visual relationship to the geography behind it.
+ * Stops are calibrated against the 20m county asset: at z3.8 (CONUS resting frame) the median
+ * county is ~4 px wide → shrink toward aggregate reading; z5.5 is the state frame where the
+ * authored px scale was originally tuned → identity; by z9 (locality) a county spans hundreds
+ * of px → the marker can afford presence. The neutral midpoint means the pure
+ * `markerRadius()` contract above is unchanged — zoom scaling composes on top of it.
+ */
+export const MARKER_ZOOM_SCALE_STOPS: ReadonlyArray<readonly [zoom: number, scale: number]> = [
+  [3, 0.7],
+  [5.5, 1],
+  [9, 1.35],
+];
+
+/** Pure piecewise-linear counterpart of `markerZoomScaleExpression()` — same stops, flat
+ * extrapolation beyond either end, exactly like MapLibre's `interpolate`. */
+export function markerZoomScale(zoom: number): number {
+  const stops = MARKER_ZOOM_SCALE_STOPS;
+  const first = stops[0]!;
+  const last = stops[stops.length - 1]!;
+  if (zoom <= first[0]) return first[1];
+  if (zoom >= last[0]) return last[1];
+  for (let i = 1; i < stops.length; i += 1) {
+    const [z1, s1] = stops[i]!;
+    const [z0, s0] = stops[i - 1]!;
+    if (zoom <= z1) {
+      return s0 + ((zoom - z0) / (z1 - z0)) * (s1 - s0);
+    }
+  }
+  return last[1];
+}
+
+/** MapLibre `interpolate` expression built from `MARKER_ZOOM_SCALE_STOPS` — the expression IS
+ * the stop table, same non-drift construction as `markerRadiusEvidenceExpression()`. */
+export function markerZoomScaleExpression(): ExpressionSpecification {
+  const stops = MARKER_ZOOM_SCALE_STOPS.flatMap(([zoom, scale]) => [zoom, scale]);
+  return ['interpolate', ['linear'], ['zoom'], ...stops] as ExpressionSpecification;
+}
+
+/** Full zoom-aware radius: `markerRadius()` × `markerZoomScale()` — the pure counterpart of
+ * what `markerRadiusExpression()` renders. */
+export function markerRadiusAtZoom(
+  evidenceCount: number,
+  confidenceTier: ConfidenceTierLike,
+  zoom: number,
+): number {
+  return markerRadius(evidenceCount, confidenceTier) * markerZoomScale(zoom);
+}
+
+/**
  * Representative evidence-count sample points (doublings, plus 0), each paired with the
  * pre-modifier `evidenceBaseRadius()` value at that count. `markerRadiusEvidenceExpression()`
  * below builds a MapLibre `interpolate` expression directly from this array flattened this
@@ -107,10 +161,9 @@ export function confidenceSizeModifierExpression(): ExpressionSpecification {
   ] as ExpressionSpecification;
 }
 
-/** Full `markerRadius()` formula as a MapLibre expression: evidence interpolation × confidence
- * modifier, clamped to [`MARKER_RADIUS_MIN`, `MARKER_RADIUS_MAX`] reproducing exactly what the
- * pure `markerRadius()` function computes, for use as a `circle-radius` paint value. */
-export function markerRadiusExpression(): ExpressionSpecification {
+/** The zoom-independent data term: evidence interpolation × confidence modifier, clamped to
+ * [`MARKER_RADIUS_MIN`, `MARKER_RADIUS_MAX`] — exactly what the pure `markerRadius()` computes. */
+function markerDataRadiusExpression(): ExpressionSpecification {
   return [
     'max',
     MARKER_RADIUS_MIN,
@@ -122,8 +175,35 @@ export function markerRadiusExpression(): ExpressionSpecification {
   ] as ExpressionSpecification;
 }
 
+/** Builds a top-level zoom `interpolate` whose output at each `MARKER_ZOOM_SCALE_STOPS` stop is
+ * `build(dataRadius, scale)`. The style spec only permits `['zoom']` as the input of a
+ * TOP-LEVEL `interpolate`/`step` in a paint value — `['*', dataExpr, zoomInterpolate]` is
+ * rejected at `addLayer` — so the zoom scaling must be the outermost expression, with the
+ * data-driven term repeated inside each stop's output. */
+function zoomScaledRadiusExpression(
+  build: (dataRadius: ExpressionSpecification, scale: number) => unknown,
+): ExpressionSpecification {
+  const stops = MARKER_ZOOM_SCALE_STOPS.flatMap(([zoom, scale]) => [
+    zoom,
+    build(markerDataRadiusExpression(), scale),
+  ]);
+  return ['interpolate', ['linear'], ['zoom'], ...stops] as ExpressionSpecification;
+}
+
+/** Full `markerRadiusAtZoom()` formula as a MapLibre expression: the clamped data radius scaled
+ * by the county-proportionate zoom factor, for use as a `circle-radius` paint value. */
+export function markerRadiusExpression(): ExpressionSpecification {
+  return zoomScaledRadiusExpression((dataRadius, scale) => ['*', dataRadius, scale]);
+}
+
+/** `markerRadiusExpression()` plus a fixed pixel offset (halo ring, event glyph ring), built as
+ * its own top-level zoom interpolate for the same spec restriction documented above. */
+export function markerRadiusPlusExpression(offset: number): ExpressionSpecification {
+  return zoomScaledRadiusExpression((dataRadius, scale) => ['+', ['*', dataRadius, scale], offset]);
+}
+
 /** `markerRadiusExpression()` plus the fixed halo offset, for use as the halo layer's
  * `circle-radius` paint value. */
 export function markerHaloRadiusExpression(): ExpressionSpecification {
-  return ['+', markerRadiusExpression(), MARKER_HALO_OFFSET] as ExpressionSpecification;
+  return markerRadiusPlusExpression(MARKER_HALO_OFFSET);
 }
