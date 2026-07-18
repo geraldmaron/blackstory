@@ -5,8 +5,11 @@
  * (`/facts/{id}/rev/{n}`) — the Wikipedia-oldid hostile-quoting defense named in the.
  */
 import React from 'react';
-import type { FactRecord, FactRevision } from '@blap/domain';
-import { buildFactRevisionPath } from '@blap/domain';
+import {
+  buildFactRevisionPath,
+  type FactRecord,
+  type FactRevision,
+} from '@blap/domain/facts';
 import { formatIsoDate, humanizeToken } from './format';
 
 export type FactRevisionPanelProps = {

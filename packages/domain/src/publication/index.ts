@@ -4,6 +4,8 @@
  */
 import { createHash, sign as signBytes, verify as verifyBytes, type KeyLike } from 'node:crypto';
 
+export * from './release-builder.js';
+
 export const RELEASE_STATUSES = [
   'draft',
   'preview',

@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import { Card, Citation } from '@blap/ui';
-import type { CompactFactView } from '@blap/domain';
+import type { CompactFactView } from '@blap/domain/facts';
 import { humanizeToken } from './format';
 
 export type CompactFactReferenceProps = {

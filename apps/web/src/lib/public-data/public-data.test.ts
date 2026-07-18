@@ -97,3 +97,53 @@ test('live-only projections get a default notability label for search-pool parit
   assert.ok(view.notabilityLabels && view.notabilityLabels.length >= 1);
   assert.match(view.notabilityLabels![0]!, /documented site/i);
 });
+
+test('mapProjectionToPublicEntityView uses the release builder real notabilityBasis/researchCoverage/revision metadata when present (black-book-1fg9)', () => {
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_national_example_002',
+    releaseId: 'rel_live_002',
+    kind: 'place',
+    displayName: 'Example Built Site',
+    nameLower: 'example built site',
+    summary: 'A projection produced by the release builder.',
+    claimIds: ['claim_ex_01'],
+    claims: [
+      {
+        id: 'claim_ex_01',
+        predicate: 'founded_year',
+        object: '1900',
+        confidenceLevel: 'high',
+        citationSource: 'Example Source',
+        citationLabel: 'Example Citation',
+      },
+    ],
+    notabilityBasis: [
+      { criterion: 'documented_site', note: 'A documented site.', evidenceIds: ['claim_ex_01'] },
+    ],
+    researchCoverage: 'substantial',
+    generatedAt: '2026-07-18T00:00:00.000Z',
+    recordUpdatedAt: '2026-07-18T00:00:00.000Z',
+  });
+  assert.deepEqual(view.notabilityBasis, [
+    { criterion: 'documented_site', note: 'A documented site.', evidenceIds: ['claim_ex_01'] },
+  ]);
+  assert.equal(view.researchCoverage, 'substantial');
+  assert.equal(view.revision.generatedAt, '2026-07-18T00:00:00.000Z');
+  assert.equal(view.revision.recordUpdatedAt, '2026-07-18T00:00:00.000Z');
+});
+
+test('mapProjectionToPublicEntityView falls back to computed researchCoverage and empty revision timestamps when the projection predates the release builder', () => {
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_bootstrap_example_001',
+    releaseId: 'rel_seed_001',
+    kind: 'place',
+    displayName: 'Bootstrap Stub',
+    nameLower: 'bootstrap stub',
+    summary: 'A bootstrap-window stub predating the release builder.',
+    claimIds: [],
+  });
+  assert.equal(view.notabilityBasis, undefined);
+  assert.equal(view.researchCoverage, 'minimal');
+  assert.equal(view.revision.generatedAt, '');
+  assert.equal(view.revision.recordUpdatedAt, '');
+});

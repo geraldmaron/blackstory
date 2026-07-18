@@ -6,7 +6,7 @@
  * relationships at publish time see `packages/domain/src/facts/subjects.ts`).
  */
 import React from 'react';
-import type { FactRecord } from '@blap/domain';
+import type { FactRecord } from '@blap/domain/facts';
 import { humanizeToken } from './format';
 
 export type FactSubjectListProps = {

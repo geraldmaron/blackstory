@@ -18,6 +18,7 @@ import {
   resolveEntityCandidate,
   resolutionCandidateFromDiscovery,
   reverseResolutionDecision,
+  scoreEntityMatch,
   type ResolutionCandidate,
   type ResolutionDecision,
   type ResolutionProfile,
@@ -213,6 +214,57 @@ test('historically invalid locations and impossible lifespans reduce confidence'
     result.rankedMatches[0]!.factors.find((factor) => factor.factor === 'temporal')!.rationale,
     /outside person lifespan/,
   );
+});
+
+test('an exact trusted-namespace identifier match outranks a merely-similar name (black-book-8bck)', () => {
+  const nameLookalike = entity('person-name-lookalike', 'person', 'John Smith', {
+    person: { livingStatus: 'unknown' },
+  });
+  const identifierMatch = entity('person-identifier-match', 'person', 'Someone Else Entirely', {
+    person: { livingStatus: 'unknown' },
+    identifiers: [{ system: 'wikidata', value: 'Q999' }],
+  });
+  const candidate: ResolutionCandidate = {
+    id: 'candidate-jon-smith',
+    name: 'Jon Smith',
+    kind: 'person',
+    identifiers: { wikidata: 'Q999' },
+    sourceReferenceIds: ['archive:9001'],
+  };
+  const result = resolveEntityCandidate(candidate, [
+    { entity: nameLookalike },
+    { entity: identifierMatch },
+  ]);
+  assert.equal(result.outcome, 'proposed_match');
+  assert.equal(result.selectedEntityId, 'person-identifier-match');
+
+  const identifierRanked = result.rankedMatches.find(
+    (match) => match.entityId === 'person-identifier-match',
+  )!;
+  const nameRanked = result.rankedMatches.find((match) => match.entityId === 'person-name-lookalike')!;
+  const identifierFactorScore = identifierRanked.factors.find((f) => f.factor === 'identifier')!.score;
+  const nameFactorScore = nameRanked.factors.find((f) => f.factor === 'name')!.score;
+  assert.ok(
+    identifierFactorScore > nameFactorScore,
+    `expected trusted identifier score (${identifierFactorScore}) to exceed the near-match name score (${nameFactorScore})`,
+  );
+  assert.ok(identifierRanked.confidence > nameRanked.confidence);
+});
+
+test('an untrusted-namespace identifier match keeps its prior, smaller weight', () => {
+  const candidate: ResolutionCandidate = {
+    id: 'candidate-freedom-league-archives',
+    name: 'Freedom League, Incorporated',
+    kind: 'organization',
+    identifiers: { archives: 'FL-77' },
+    sourceReferenceIds: ['archive:3003'],
+  };
+  const orgProfile = entity('org-archives-1', 'organization', 'Freedom League', {
+    identifiers: [{ system: 'archives', value: 'FL-77' }],
+  });
+  const match = scoreEntityMatch(candidate, { entity: orgProfile });
+  const identifierFactorResult = match.factors.find((f) => f.factor === 'identifier')!;
+  assert.equal(identifierFactorResult.score, 0.1);
 });
 
 test('resolution decisions are auditable and reversible', () => {

@@ -10,9 +10,9 @@ import React from 'react';
 import {
   getDisclaimer,
   SENSITIVITY_CLASS_PRESENTATION_LABELS,
-  type EntityKind,
-  type EntitySensitivity,
-} from '@blap/domain';
+} from '@blap/domain/disclaimers';
+import type { EntityKind } from '@blap/domain/entity-kinds';
+import type { EntitySensitivity } from '@blap/domain/entity-status';
 import { SensitivityContextBanner } from '../SensitivityContextBanner';
 
 export type EntitySensitivityBannerProps = {

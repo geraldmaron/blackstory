@@ -8,7 +8,7 @@
  */
 import React from 'react';
 import { Card, Citation } from '@blap/ui';
-import type { FactCitation } from '@blap/domain';
+import type { FactCitation } from '@blap/domain/facts';
 import { formatIsoDate, humanizeToken } from './format';
 
 export type FactCitationListProps = {

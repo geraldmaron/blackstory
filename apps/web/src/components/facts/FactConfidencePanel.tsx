@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import { Confidence } from '@blap/ui';
-import type { FactRecord } from '@blap/domain';
+import type { FactRecord } from '@blap/domain/facts';
 import { confidenceDefinition, humanizeToken, mapConfidenceToUiLevel } from './format';
 
 export type FactConfidencePanelProps = {

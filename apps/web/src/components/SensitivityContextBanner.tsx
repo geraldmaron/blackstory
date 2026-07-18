@@ -22,7 +22,8 @@
  */
 
 import React from 'react';
-import type { EntityKind, EntitySensitivity } from '@blap/domain';
+import type { EntityKind } from '@blap/domain/entity-kinds';
+import type { EntitySensitivity } from '@blap/domain/entity-status';
 import { DisclaimerBanner, type DisclaimerCopy } from './DisclaimerBanner';
 import { Notice } from '@blap/ui';
 

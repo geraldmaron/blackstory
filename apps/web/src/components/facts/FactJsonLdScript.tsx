@@ -3,7 +3,11 @@
  * helper already enforces that invariant before this component serializes the payload.
  */
 import React from 'react';
-import { assertNeverClaimReview, buildFactArticleJsonLd, type FactRecord } from '@blap/domain';
+import {
+  assertNeverClaimReview,
+  buildFactArticleJsonLd,
+  type FactRecord,
+} from '@blap/domain/facts';
 
 export type FactJsonLdScriptProps = {
   readonly fact: FactRecord;

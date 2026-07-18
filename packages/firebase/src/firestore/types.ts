@@ -41,6 +41,24 @@ export const entityKindSchema = z.enum([
 
 export type EntityKindDoc = z.infer<typeof entityKindSchema>;
 
+/**
+ * Coarse entity classification (black-book-9mox, mirrors packages/domain/src/entity-class.ts).
+ * NEW, additive, optional/defaulted so existing entity docs (which carry only `kind`) keep
+ * parsing unchanged. Hardcoded here rather than imported, matching this file's existing
+ * convention (see `entityKindSchema` above).
+ */
+export const entityClassSchema = z.enum([
+  'person',
+  'place',
+  'organization',
+  'event',
+  'legal',
+  'work',
+  'movement',
+]);
+
+export type EntityClassDoc = z.infer<typeof entityClassSchema>;
+
 export const geoPointFieldsSchema = z.object({
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
@@ -281,10 +299,19 @@ export type PolicyVersionDoc = z.infer<typeof policyVersionSchema>;
 export const canonicalEntitySchema = z.object({
   id: z.string().min(1),
   kind: entityKindSchema,
+  /** black-book-9mox: additive coarse classification, derived from `kind` — see
+   * packages/domain/src/entity-class.ts. Optional so existing docs keep parsing. */
+  entityClass: entityClassSchema.optional(),
+  /** Controlled finer-grained subtype label(s) within `entityClass` (e.g. `['church']`). */
+  entityTypes: z.array(z.string().min(1)).optional(),
   displayName: z.string().min(1),
   aliases: z.array(entityAliasSchema).optional(),
   identifiers: z.array(entityIdentifierSchema).optional(),
   livingStatus: z.enum(['living', 'deceased', 'unknown']).default('unknown'),
+  /** black-book-mpfb: computed/output-only derivation result — see
+   * packages/domain/src/living.ts's `deriveLivingStatus`. Not independently authoritative; never
+   * required at write time. */
+  livingStatusDerived: z.enum(['living', 'deceased', 'unknown']).optional(),
   mergeState: entityMergeStateSchema.optional(),
   /** Entity-lifecycle status only omitted for `event`/`person` kinds by convention. See the
    * scope-guardrail comment on statusHistoryEntrySchema above. */
@@ -296,7 +323,11 @@ export const canonicalEntitySchema = z.object({
   sensitivity: z.array(entitySensitivitySchema).optional(),
   person: z
     .object({
-      livingStatus: z.enum(['living', 'deceased', 'unknown']),
+      /** @deprecated black-book-mpfb: redundant with the entity-level `livingStatus` above,
+       * which is canonical (see packages/domain/src/specialized.ts's PersonFields doc for the
+       * call-site audit). Made optional was required so un-migrated writers aren't forced to
+       * keep setting a field that no longer has authoritative meaning. */
+      livingStatus: z.enum(['living', 'deceased', 'unknown']).optional(),
       birthYear: z.number().int().nullable().optional(),
       deathYear: z.number().int().nullable().optional(),
       biographySummary: z.string().optional(),
@@ -987,6 +1018,29 @@ export const publicEntityProjectionSchema = z.object({
    * score) one per notabilityBasis record, sourced from @blap/domain's
    * `NOTABILITY_RUBRIC`. */
   notabilityLabels: z.array(z.string().min(1)).optional(),
+  /**
+   * Structured, auditable inclusion basis this entity's `notabilityLabels` above are derived
+   * from (black-book-1fg9). Reuses `notabilityBasisRecordSchema` non-numeric by the same
+   * standing policy, `evidenceIds` point at this projection's own `claims[].id` values. Optional
+   * for the same reason `claims` is: bootstrap-window stubs predate the release builder that
+   * populates this field.
+   */
+  notabilityBasis: z.array(notabilityBasisRecordSchema).optional(),
+  /**
+   * Research-depth signal computed ONCE at release-build time from the entity's real claim
+   * count and citation completeness (black-book-1fg9) — never a UI-side guess computed at
+   * render time. See `@blap/domain`'s `computeReleaseResearchCoverage`. Optional for the same
+   * bootstrap-window-stub reason as `claims`/`notabilityBasis`.
+   */
+  researchCoverage: z.enum(['minimal', 'partial', 'substantial']).optional(),
+  /**
+   * Revision/verification metadata (black-book-1fg9): real "this release build ran at this
+   * instant" timestamps, set once by the release builder — never fabricated at page-render time
+   * (see `apps/web/src/lib/public-data/map-projection.ts`'s prior placeholder-timestamp TODO,
+   * which this field resolves). Optional for the same bootstrap-window-stub reason as above.
+   */
+  generatedAt: z.string().datetime().optional(),
+  recordUpdatedAt: z.string().datetime().optional(),
   /** Sensitivity classification label when present; presentation lives in the UI layer. */
   sensitivityClass: sensitivityClassSchema.optional(),
 

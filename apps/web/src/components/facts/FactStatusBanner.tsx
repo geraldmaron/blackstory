@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import { Notice } from '@blap/ui';
-import type { FactRecord } from '@blap/domain';
+import type { FactRecord } from '@blap/domain/facts';
 import { humanizeToken, statusBannerTitle } from './format';
 
 export type FactStatusBannerProps = {

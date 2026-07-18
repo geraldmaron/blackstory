@@ -14,6 +14,7 @@ import {
   type DatePrecision,
   type EntitySensitivity,
   type EntityStatusValue,
+  type NotabilityBasisRecord,
   type StatusHistoryEntry,
 } from '@blap/domain';
 import {
@@ -130,6 +131,13 @@ export type PublicEntityView = {
   /** Human-readable notability rubric labels (never the raw criterion id alone, never a score),
    * one per notabilityBasis record sourced from @blap/domain's `NOTABILITY_RUBRIC`. */
   readonly notabilityLabels?: readonly string[];
+  /** Structured, auditable inclusion basis backing `notabilityLabels` above (black-book-1fg9).
+   * Live release projections carry this directly (see `@blap/domain`'s
+   * `buildReleaseEntityArtifacts`); this bundled seed catalog predates the release builder and
+   * does not populate it, so read-path adapters (`snapshot-search-index.ts`,
+   * `entity/[id]/adapters.ts`) still synthesize a basis from `notabilityLabels` when this is
+   * absent. */
+  readonly notabilityBasis?: readonly NotabilityBasisRecord[];
   /** Sensitivity classification label, when the entity carries one. Presentation is via
    * `SensitivityContextBanner`. */
   readonly sensitivityClass?: string;

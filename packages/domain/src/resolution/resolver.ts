@@ -5,6 +5,7 @@ import type { DiscoveryCandidateRecord } from '../discovery/types.js';
 import type { CanonicalEntity, EntityAlias } from '../entity.js';
 import { isEntityKind } from '../entity-kinds.js';
 import type { EntityLocation, Jurisdiction } from '../geography/location.js';
+import { isTrustedIdentifierNamespace } from '../naming.js';
 import {
   nameSimilarity,
   normalizeAlias,
@@ -25,6 +26,17 @@ import type {
 const PROPOSE_THRESHOLD = 0.86;
 const REVIEW_THRESHOLD = 0.55;
 const AMBIGUITY_MARGIN = 0.12;
+
+/**
+ * black-book-8bck (identifier-dominant resolution): an exact match on a TRUSTED-namespace
+ * identifier (Wikidata QID, LoC, VIAF, NPS, NRHP, NCES, etc. — see `../naming.js`) must clearly
+ * outrank name similarity, whose maximum contribution is 0.55 (see `nameFactor` below). 0.65
+ * dominates that ceiling on its own. An exact match on an UNTRUSTED/internal namespace keeps the
+ * prior, smaller weight (0.1) — unchanged from before this bead, since an internal accession
+ * number is not unambiguous evidence the way an external authority-control id is.
+ */
+const EXACT_TRUSTED_IDENTIFIER_SCORE = 0.65;
+const EXACT_UNTRUSTED_IDENTIFIER_SCORE = 0.1;
 
 function yearFromDate(value: string | undefined | null): number | undefined {
   if (!value) return undefined;
@@ -96,14 +108,20 @@ function identifierFactor(candidate: ResolutionCandidate, entity: CanonicalEntit
         normalizeAlias(identifier.value) === normalizeAlias(value),
     ),
   );
+  if (!match) {
+    return {
+      factor: 'identifier',
+      score: 0,
+      rationale: candidateIdentifiers.length ? 'no identifier match' : 'no candidate identifier supplied',
+    };
+  }
+  const trusted = isTrustedIdentifierNamespace(match[0]);
   return {
     factor: 'identifier',
-    score: match ? 0.1 : 0,
-    rationale: match
-      ? `exact identifier match for ${match[0]}`
-      : candidateIdentifiers.length
-        ? 'no identifier match'
-        : 'no candidate identifier supplied',
+    score: trusted ? EXACT_TRUSTED_IDENTIFIER_SCORE : EXACT_UNTRUSTED_IDENTIFIER_SCORE,
+    rationale: trusted
+      ? `exact identifier match on trusted namespace ${match[0]} outranks name similarity`
+      : `exact identifier match for ${match[0]}`,
   };
 }
 

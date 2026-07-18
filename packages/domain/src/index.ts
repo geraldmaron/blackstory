@@ -90,13 +90,42 @@ export type {
   EvidenceLineage,
 } from './provenance/index.js';
 
-export { livingStatuses, treatAsLiving, DEFAULT_LIVING_STATUS } from './living.js';
-export type { LivingStatus } from './living.js';
+export { livingStatuses, treatAsLiving, DEFAULT_LIVING_STATUS, deriveLivingStatus } from './living.js';
+export type { LivingStatus, LivingStatusDerivationSignal } from './living.js';
 
 export { ENTITY_KINDS, isEntityKind } from './entity-kinds.js';
 export type { EntityKind } from './entity-kinds.js';
 
-export { currentEntityStatus } from './entity.js';
+// Coarse entity classification (black-book-9mox) additive to `kind`, not wired into any
+// publish/search/filter pipeline in this pass.
+export {
+  ENTITY_CLASSES,
+  isEntityClass,
+  ENTITY_TYPES_BY_CLASS,
+  isControlledEntityType,
+  deriveEntityClassification,
+} from './entity-class.js';
+export type { EntityClass, EntityClassification } from './entity-class.js';
+
+// Unified temporal naming + external-identifier contracts (black-book-8bck), plus the
+// namespace/value uniqueness invariant. See ./naming.ts's module doc for scope rationale.
+export {
+  ENTITY_NAME_TYPES,
+  migrateEntityNames,
+  TRUSTED_IDENTIFIER_NAMESPACES,
+  isTrustedIdentifierNamespace,
+  migrateEntityIdentifiers,
+  findIdentifierUniquenessViolations,
+  assertIdentifierUniqueness,
+} from './naming.js';
+export type {
+  EntityNameType,
+  EntityName,
+  EntityIdentifierRecord,
+  IdentifierUniquenessViolation,
+} from './naming.js';
+
+export { currentEntityStatus, deriveEntityLivingStatus } from './entity.js';
 export type { EntityAlias, EntityIdentifier, EntityMergeState, CanonicalEntity } from './entity.js';
 
 export type {

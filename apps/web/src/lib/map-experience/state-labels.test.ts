@@ -9,7 +9,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { US_STATES } from '@blap/domain';
+import { US_STATES } from '@blap/domain/map/geography';
 import {
   STATE_LABEL_FADE_END_ZOOM,
   STATE_LABEL_FADE_START_ZOOM,
