@@ -18,6 +18,7 @@
  * schema, loader, and tests for this collection stay self-contained.
  */
 import { z } from 'zod';
+import { publishedStatisticProvenanceFields } from '../firestore/statistic-provenance.js';
 
 /** Decade labels this collection carries — matches `CENSUS_DECENNIAL_VINTAGES` in @blap/domain. */
 export const censusCountyDecadeDecadeSchema = z.enum(['2000', '2010', '2020']);
@@ -37,15 +38,7 @@ export const censusCountyDecadeSchema = z.object({
   totalPopulation: z.number().int().nonnegative(),
   /** "Black or African American alone" count for the vintage's race table. */
   blackPopulation: z.number().int().nonnegative(),
-  /** Provenance quartet — required, per public-numeric-policy category 3. */
-  source: z.string().min(1),
-  /** Keyless public data URL (buildProvenanceSourceUrl) — never contains an API key. */
-  sourceUrl: z.string().url(),
-  retrievedAt: z.string().datetime(),
-  /** sha256 hex digest of the canonical stable-field JSON. */
-  contentHash: z.string().regex(/^[a-f0-9]{64}$/),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  ...publishedStatisticProvenanceFields,
 });
 
 export type CensusCountyDecadeDoc = z.infer<typeof censusCountyDecadeSchema>;
@@ -84,18 +77,6 @@ export const acsEstimatesSchema = z
 
 export type AcsEstimatesDoc = z.infer<typeof acsEstimatesSchema>;
 
-const acsProvenanceFields = {
-  /** Provenance quartet — required, per public-numeric-policy category 3. */
-  source: z.string().min(1),
-  /** Keyless public data URL — never contains an API key. */
-  sourceUrl: z.string().url(),
-  retrievedAt: z.string().datetime(),
-  /** sha256 hex digest of the canonical stable-field JSON. */
-  contentHash: z.string().regex(/^[a-f0-9]{64}$/),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-} as const;
-
 /** One county's ACS 5-year starter estimates for one vintage. Doc id `{fips5}_{vintage}`. */
 export const acsCountyProfileSchema = z.object({
   id: z.string().regex(/^\d{5}_\d{4}$/),
@@ -109,7 +90,7 @@ export const acsCountyProfileSchema = z.object({
   estimates: acsEstimatesSchema,
   /** Field names whose cells were suppressed/uncomputable upstream. */
   suppressed: z.array(z.string()),
-  ...acsProvenanceFields,
+  ...publishedStatisticProvenanceFields,
 });
 
 export type AcsCountyProfileDoc = z.infer<typeof acsCountyProfileSchema>;
@@ -137,7 +118,7 @@ export const acsTractProfileSchema = z.object({
   vintage: z.string().regex(/^\d{4}$/),
   estimates: acsEstimatesSchema,
   suppressed: z.array(z.string()),
-  ...acsProvenanceFields,
+  ...publishedStatisticProvenanceFields,
 });
 
 export type AcsTractProfileDoc = z.infer<typeof acsTractProfileSchema>;

@@ -18,19 +18,7 @@
  * dropped cells are listed in `suppressed` (same convention as ACS docs).
  */
 import { z } from 'zod';
-
-const provenanceFields = {
-  source: z.string().min(1),
-  sourceUrl: z.string().url(),
-  retrievedAt: z.string().datetime(),
-  /** sha256 hex digest of this doc's canonical stable-field JSON. */
-  contentHash: z.string().regex(/^[a-f0-9]{64}$/),
-  /** sha256 hex digest of the whole acquired artifact this doc was parsed from. */
-  datasetChecksum: z.string().regex(/^[a-f0-9]{64}$/),
-  license: z.string().min(1),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-} as const;
+import { datasetArtifactProvenanceFields } from '../firestore/statistic-provenance.js';
 
 /** Outcome estimates retained from the tract_outcomes_early release. All optional — a cell
  * below the reliability threshold is omitted and recorded in `suppressed`. */
@@ -71,7 +59,7 @@ export const opportunityAtlasTractSchema = z.object({
   outcomes: opportunityAtlasOutcomesSchema,
   /** Outcome field names dropped by the reliability threshold or absent upstream. */
   suppressed: z.array(z.string()),
-  ...provenanceFields,
+  ...datasetArtifactProvenanceFields,
 });
 
 export type OpportunityAtlasTractDoc = z.infer<typeof opportunityAtlasTractSchema>;
@@ -101,7 +89,7 @@ export const holcAreaSchema = z.object({
     storagePath: z.string().min(1),
     featureIndex: z.number().int().nonnegative(),
   }),
-  ...provenanceFields,
+  ...datasetArtifactProvenanceFields,
 });
 
 export type HolcAreaDoc = z.infer<typeof holcAreaSchema>;

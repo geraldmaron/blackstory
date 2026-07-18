@@ -467,8 +467,8 @@
     "jurisdictionLabel": "Baton Rouge, Louisiana",
     "locationPrecision": "campus",
     "locationLabel": "Southern University campus, Scotlandville, on Scott's Bluff",
-    "lat": 30.5247,
-    "lng": -91.19,
+    "lat": 30.525,
+    "lng": -91.1917,
     "claims": [
       {
         "predicate": "founded_year",

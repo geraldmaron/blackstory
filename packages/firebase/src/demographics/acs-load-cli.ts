@@ -302,47 +302,15 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     },
   };
 
-  const BATCH_LIMIT = 400;
+  const { idempotentBatchUpsert, loadExistingHashes } = await import('../external/batch-upsert.js');
   const tractWriter: AcsTractStateWriter = {
     async applyState(stateFips, docs) {
       // One projection query per state resolves every existing doc's contentHash cheaply.
-      const existingSnapshot = await tractCollection
-        .where('stateFips', '==', stateFips)
-        .select('contentHash', 'createdAt')
-        .get();
-      const existing = new Map(
-        existingSnapshot.docs.map((d) => [
-          d.id,
-          d.data() as { contentHash?: string; createdAt?: string },
-        ]),
-      );
-
-      let created = 0;
-      let updated = 0;
-      let unchanged = 0;
-      let batch = firestore.batch();
-      let batched = 0;
-      const commitBatch = async () => {
-        if (batched > 0) await batch.commit();
-        batch = firestore.batch();
-        batched = 0;
-      };
-
-      for (const doc of docs) {
-        const prior = existing.get(doc.id);
-        if (prior?.contentHash === doc.contentHash) {
-          unchanged += 1;
-          continue;
-        }
-        const toWrite = prior?.createdAt ? { ...doc, createdAt: prior.createdAt } : doc;
-        batch.set(tractCollection.doc(doc.id), toWrite);
-        batched += 1;
-        if (prior) updated += 1;
-        else created += 1;
-        if (batched >= BATCH_LIMIT) await commitBatch();
-      }
-      await commitBatch();
-      return { created, updated, unchanged };
+      const existing = await loadExistingHashes(tractCollection, {
+        field: 'stateFips',
+        value: stateFips,
+      });
+      return idempotentBatchUpsert(firestore, tractCollection, docs, existing);
     },
   };
 

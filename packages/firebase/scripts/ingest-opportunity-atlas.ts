@@ -24,7 +24,9 @@ import { createInterface } from 'node:readline';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
-import { sha256Json } from '@blap/domain';
+import { getExternalDataSource, sha256Json } from '@blap/domain';
+import { idempotentBatchUpsert, loadExistingHashes } from '../src/external/batch-upsert.ts';
+import { recordDatasetAcquisition } from '../src/external/capture.ts';
 import { opportunityAtlasTractSchema, type OpportunityAtlasTractDoc } from '../src/external/schema.ts';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
@@ -198,36 +200,24 @@ async function main(): Promise<void> {
   const collection = firestore.collection('opportunityAtlasTracts');
 
   console.log('Reading existing contentHashes…');
-  const existingSnapshot = await collection.select('contentHash', 'createdAt').get();
-  const existing = new Map(
-    existingSnapshot.docs.map((d) => [d.id, d.data() as { contentHash?: string; createdAt?: string }]),
-  );
+  const existing = await loadExistingHashes(collection);
+  const summary = await idempotentBatchUpsert(firestore, collection, docs, existing);
 
-  const BATCH_LIMIT = 400;
-  let created = 0;
-  let updated = 0;
-  let unchanged = 0;
-  let batch = firestore.batch();
-  let ops = 0;
-  const flush = async () => {
-    if (ops > 0) await batch.commit();
-    batch = firestore.batch();
-    ops = 0;
-  };
-  for (const doc of docs) {
-    const prior = existing.get(doc.id);
-    if (prior?.contentHash === doc.contentHash) {
-      unchanged += 1;
-      continue;
-    }
-    batch.set(collection.doc(doc.id), prior?.createdAt ? { ...doc, createdAt: prior.createdAt } : doc);
-    ops += 1;
-    if (prior) updated += 1;
-    else created += 1;
-    if (ops >= BATCH_LIMIT) await flush();
-  }
-  await flush();
-  console.log(JSON.stringify({ created, updated, unchanged, skippedNoOutcome, badRows }, null, 2));
+  // Provenance chain (evidenceSources → sourceItems → retrievalEvents → sourceCaptures) —
+  // the harness record of this acquisition, alongside the per-doc datasetChecksum.
+  const registryEntry = getExternalDataSource('opportunity-atlas-tract-outcomes');
+  if (!registryEntry) throw new Error('external-data-sources registry entry missing');
+  const acquisition = await recordDatasetAcquisition({
+    firestore,
+    registryEntry,
+    contentHashHex: datasetChecksum,
+    retrievedAt: nowIso,
+    snapshotStorageObject: `gs://${BUCKET}/${STORAGE_PATH}`,
+    parserVersion: 'ingest-opportunity-atlas-v1',
+    httpStatus: 200,
+  });
+
+  console.log(JSON.stringify({ ...summary, skippedNoOutcome, badRows, acquisition }, null, 2));
 }
 
 await main();
