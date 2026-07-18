@@ -20,7 +20,7 @@ import {
 import { DialogFixture } from './DialogFixture';
 
 export const metadata = {
-  title: 'Design system — Blap',
+  title: 'Design system — BlackStory',
   description: 'Component and token fixtures for visual and keyboard review (design-direction-v5)',
 };
 

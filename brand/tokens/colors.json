@@ -1,9 +1,8 @@
 {
-  "blackInk": "#0A0A0A",
-  "archivePaper": "#F4EFE5",
-  "copperPin": "#B86B2A",
-  "pageSand": "#D8A178",
-  "pageRust": "#D84E2B",
-  "softStone": "#CFC7B8",
-  "warmGray": "#6E6961"
+  "ebonyInk": "#111111",
+  "archivePaper": "#F7F3EE",
+  "sand": "#E7D9C3",
+  "bronze": "#B87333",
+  "mahogany": "#7A2E22",
+  "copperPin": "#D47A42"
 }

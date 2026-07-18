@@ -1,9 +1,12 @@
 :root {
-  --blap-black-ink: #0A0A0A;
-  --blap-archive-paper: #F4EFE5;
-  --blap-copper-pin: #B86B2A;
-  --blap-page-sand: #D8A178;
-  --blap-page-rust: #D84E2B;
-  --blap-soft-stone: #CFC7B8;
-  --blap-warm-gray: #6E6961;
+  --blackstory-ebonyInk: #111111;
+  --blackstory-archivePaper: #F7F3EE;
+  --blackstory-sand: #E7D9C3;
+  --blackstory-bronze: #B87333;
+  --blackstory-mahogany: #7A2E22;
+  --blackstory-copperPin: #D47A42;
+  --blackstory-font-display: "Sora", sans-serif;
+  --blackstory-font-ui: "Inter", sans-serif;
+  --blackstory-font-editorial: "Source Serif 4", serif;
+  --blackstory-font-mono: "IBM Plex Mono", monospace;
 }

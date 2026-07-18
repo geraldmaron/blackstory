@@ -102,7 +102,7 @@ const EMPTY_EDGE_COLLECTION: HistoryEdgeLineCollection = { type: 'FeatureCollect
 
 const ARCHIVE_BASE_STYLE: StyleSpecification = {
   version: 8,
-  name: 'Blap — Archive (US)',
+  name: 'BlackStory — Archive (US)',
   sources: {},
   layers: [
     {

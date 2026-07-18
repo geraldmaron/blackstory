@@ -22,7 +22,7 @@ function expiresAt(now: Date): string {
 
 function buildSecurityTxt(now: Date): string {
   const lines = [
-    '# security.txt (RFC 9116) — Blap',
+    '# security.txt (RFC 9116) — BlackStory',
     '# TEMPLATE: every value below is a placeholder. Fill in the real role mailbox and domain',
     '# per docs/runbooks/pre-launch-operator-protection.md before this file is meaningful.',
     `Contact: mailto:${PLACEHOLDER_SECURITY_CONTACT}`,

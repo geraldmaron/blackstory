@@ -203,7 +203,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
   const plate = plateForScheme(input.colorScheme ?? 'dark');
   return {
     version: 8,
-    name: 'Blap — Explore',
+    name: 'BlackStory — Explore',
     glyphs: OPENFREEMAP_GLYPHS_URL,
     sources: {
       [OPENFREEMAP_SOURCE_ID]: {

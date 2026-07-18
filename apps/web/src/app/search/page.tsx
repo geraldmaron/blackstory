@@ -20,7 +20,7 @@ import { buildSearchPageHref, buildSearchViewModel, type RawSearchParams } from 
 
 export const metadata = {
   title: 'Search',
-  description: 'Search sample Blap records by keyword, kind, status, and era.',
+  description: 'Search sample BlackStory records by keyword, kind, status, and era.',
 };
 
 type SearchPageProps = {

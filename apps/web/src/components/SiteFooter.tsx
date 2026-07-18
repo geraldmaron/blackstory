@@ -33,7 +33,7 @@ export function SiteFooter() {
         <div className="bp-shell-footer__wordmark-slot">
           <img
             className="bp-shell-footer__wordmark"
-            src="/brand/blap-lockup-dark.png"
+            src="/brand/blackstory-lockup-dark.png"
             alt=""
             aria-hidden="true"
           />

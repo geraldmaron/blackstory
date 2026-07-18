@@ -2,7 +2,7 @@
  * Site identity constants for trust JSON-LD and feed builders.
  */
 
-export const TRUST_SITE_NAME = 'Blap';
+export const TRUST_SITE_NAME = 'BlackStory';
 
 /** Root-relative paths for trust surfaces absolute URLs are composed at render time when needed.  */
 export const TRUST_PATHS = {

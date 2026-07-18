@@ -10,7 +10,7 @@ import { CORRECTION_FORM_INTRO, CORRECTION_PRIVACY_NOTICE } from './copy';
 
 export const metadata = {
   title: 'Corrections',
-  description: 'Challenge or correct a published Blap record through moderated review.',
+  description: 'Challenge or correct a published BlackStory record through moderated review.',
 };
 
 export default function CorrectionsPage() {

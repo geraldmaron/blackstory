@@ -148,16 +148,16 @@ export function SiteHeader() {
       <div className="bp-shell-header__inner">
         {/* Kit artwork only, dark variants only — the island is always ink.
             Lockup on wide viewports, standalone symbol on narrow ones. */}
-        <Link className="bp-shell-wordmark" href="/" aria-label="blap — home">
+        <Link className="bp-shell-wordmark" href="/" aria-label="BlackStory — home">
           <img
             className="bp-shell-wordmark__img bp-shell-wordmark__img--lockup"
-            src="/brand/blap-lockup-dark.png"
+            src="/brand/blackstory-lockup-dark.png"
             alt=""
             aria-hidden="true"
           />
           <img
             className="bp-shell-wordmark__img bp-shell-wordmark__img--symbol"
-            src="/brand/blap-symbol-dark.png"
+            src="/brand/blackstory-symbol-dark.png"
             alt=""
             aria-hidden="true"
           />

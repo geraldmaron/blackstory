@@ -1,12 +1,12 @@
 /**
- * Root layout for the public Blap web application.
+ * Root layout for the public BlackStory web application.
  * Loads display + editorial + sans + mono fonts, design-system stylesheet, and app shell.
  *
- * Type system per the blap brand kit (brand/tokens/fonts.json, binding): Sora SemiBold for
- * headlines/titles/key statements, Inter for UI and body, Source Serif 4 for editorial
- * longform, IBM Plex Mono for data/citations. Sora replaced the earlier Inter-Display
- * display register when the kit landed (2026-07-18) — the wordmark art is unaffected
- * (the lockup ships as provided, never retyped).
+ * Type system per the BlackStory brand kit (brand/tokens/typography.json, binding): Sora
+ * SemiBold for headlines/titles/key statements, Inter for UI and body, Source Serif 4 for
+ * editorial longform, IBM Plex Mono for data/citations. Sora replaced the earlier
+ * Inter-Display display register when the kit landed (2026-07-18) — the wordmark art is
+ * unaffected (the lockup ships as provided, never retyped).
  */
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
@@ -44,8 +44,8 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3048'),
   title: {
-    default: 'Blap',
-    template: '%s — Blap',
+    default: 'BlackStory',
+    template: '%s — BlackStory',
   },
   description:
     'Place-connected Black history research with published claims, provenance, and confidence.',
@@ -85,25 +85,25 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    siteName: 'Blap',
-    title: 'Blap',
+    siteName: 'BlackStory',
+    title: 'BlackStory',
     description:
       'Place-connected Black history research with published claims, provenance, and confidence.',
     images: [
       {
-        url: '/brand/blap-open-graph-dark-1200x630.png',
+        url: '/brand/blackstory-open-graph-dark-1200x630.png',
         width: 1200,
         height: 630,
-        alt: 'Blap — History, pinned to place.',
+        alt: 'BlackStory — History, pinned to place.',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Blap',
+    title: 'BlackStory',
     description:
       'Place-connected Black history research with published claims, provenance, and confidence.',
-    images: ['/brand/blap-open-graph-dark-1200x630.png'],
+    images: ['/brand/blackstory-open-graph-dark-1200x630.png'],
   },
 };
 
