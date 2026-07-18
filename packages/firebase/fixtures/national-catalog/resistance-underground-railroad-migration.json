@@ -821,8 +821,8 @@
     "jurisdictionLabel": "North Bethesda, Maryland",
     "locationPrecision": "institution",
     "locationLabel": "Josiah Henson Museum and Park, 11410 Old Georgetown Road, North Bethesda",
-    "lat": 39.0344,
-    "lng": -77.1128,
+    "lat": 39.04282,
+    "lng": -77.12172,
     "claims": [
       {
         "predicate": "enslaved_at",
@@ -865,8 +865,8 @@
     "jurisdictionLabel": "Ferrisburgh, Vermont",
     "locationPrecision": "institution",
     "locationLabel": "Rokeby Museum, 4334 US Route 7, Ferrisburgh",
-    "lat": 44.2159,
-    "lng": -73.2571,
+    "lat": 44.22287,
+    "lng": -73.23895,
     "claims": [
       {
         "predicate": "sheltered_freedom_seekers",
@@ -911,8 +911,8 @@
     "jurisdictionLabel": "Detroit, Michigan",
     "locationPrecision": "institution",
     "locationLabel": "Second Baptist Church, 441 Monroe Street, Detroit",
-    "lat": 42.3313,
-    "lng": -83.0458,
+    "lat": 42.33467,
+    "lng": -83.04327,
     "claims": [
       {
         "predicate": "founded_by",
@@ -1000,8 +1000,8 @@
     "jurisdictionLabel": "Alexandria, Virginia",
     "locationPrecision": "institution",
     "locationLabel": "Freedom House Museum, 1315 Duke Street, Alexandria",
-    "lat": 38.806,
-    "lng": -77.0548,
+    "lat": 38.80367,
+    "lng": -77.05423,
     "claims": [
       {
         "predicate": "operated_as",
@@ -1134,8 +1134,8 @@
     "jurisdictionLabel": "Wilmington, Delaware",
     "locationPrecision": "institution",
     "locationLabel": "227 Shipley Street, Wilmington",
-    "lat": 39.7392,
-    "lng": -75.5502,
+    "lat": 39.73933,
+    "lng": -75.55285,
     "claims": [
       {
         "predicate": "assisted",
@@ -1315,8 +1315,8 @@
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "36 Lispenard Street, Manhattan",
-    "lat": 40.7181,
-    "lng": -74.0036,
+    "lat": 40.71967,
+    "lng": -74.00329,
     "claims": [
       {
         "predicate": "co_founded",
@@ -1450,8 +1450,8 @@
     "jurisdictionLabel": "Rochester, New York",
     "locationPrecision": "institution",
     "locationLabel": "Talman Building, 25 East Main Street, Rochester",
-    "lat": 43.1554,
-    "lng": -77.6088,
+    "lat": 43.15583,
+    "lng": -77.61175,
     "claims": [
       {
         "predicate": "founded",
@@ -1591,8 +1591,8 @@
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "Chicago Defender Building, 2400 South Michigan Avenue, Chicago",
-    "lat": 41.8534,
-    "lng": -87.6224,
+    "lat": 41.84923,
+    "lng": -87.62379,
     "claims": [
       {
         "predicate": "founded",
@@ -2547,8 +2547,8 @@
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "Liberty Hall, 120 West 138th Street, Harlem",
-    "lat": 40.8153,
-    "lng": -73.9418,
+    "lat": 40.81624,
+    "lng": -73.94011,
     "claims": [
       {
         "predicate": "founded",

@@ -7,9 +7,10 @@
  * function from `intake.ts`, `bulk-import.ts`, or `discovery-run.ts`.
  *
  * SAFE BY DEFAULT: every command only *prepares* an outcome and prints it as JSON. Passing
- * `--commit` is required to write anything, and `--commit` only ever calls
- * `commitOperatorIntake` (real `commitWithAudit`). There is no `--publish`,
- * `--approve`, or `--promote` flag anywhere in this CLI see `promotion-boundary.test.ts`.
+ * `--commit` is required to write anything. Intake commands call `commitOperatorIntake`;
+ * `locate --commit` calls `commitLocate` (both use real `commitWithAudit`). There is no
+ * `--publish`, `--approve`, or `--promote` flag anywhere in this CLI see
+ * `promotion-boundary.test.ts`.
  */
 import { readFileSync } from 'node:fs';
 import type { RelationshipRole, RelationshipType } from '@repo/domain';
@@ -34,6 +35,8 @@ import {
   type OperatorIntakeContext,
   type OperatorIntakeOutcome,
 } from './intake.js';
+import { censusSafeHttpClient } from './census-http.js';
+import { commitLocate, prepareLocate } from './locate.js';
 import { runResearchIntake } from './research-intake.js';
 
 export type CliDependencies = {
@@ -358,9 +361,62 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         stdout(JSON.stringify(summary, null, 2));
         return 0;
       }
+      case 'locate': {
+        const storedLat = optionalFlag(flags, '--stored-lat');
+        const storedLng = optionalFlag(flags, '--stored-lng');
+        const jurisdictionLabel = optionalFlag(flags, '--jurisdiction');
+        const locationPrecision = optionalFlag(flags, '--precision');
+        const locationId = optionalFlag(flags, '--location-id');
+        const role = optionalFlag(flags, '--role') as
+          | 'historical'
+          | 'current'
+          | 'approximate'
+          | undefined;
+        const outcome = await prepareLocate(
+          {
+            entityId: requireFlag(flags, '--entity-id'),
+            address: requireFlag(flags, '--address'),
+            ...(jurisdictionLabel ? { jurisdictionLabel } : {}),
+            ...(locationPrecision ? { locationPrecision } : {}),
+            ...(locationId ? { locationId } : {}),
+            ...(role ? { role } : {}),
+            ...(storedLat && storedLng
+              ? { stored: { lat: Number(storedLat), lng: Number(storedLng) } }
+              : {}),
+          },
+          { client: censusSafeHttpClient },
+        );
+        if (!outcome.ok) {
+          stdout(JSON.stringify(outcome, null, 2));
+          return 1;
+        }
+        let committed: unknown;
+        if (flags.booleans.has('--commit')) {
+          const store = deps.store ?? (await (deps.createLiveStore ?? createDefaultLiveStore)());
+          committed = await commitLocate(store, {
+            outcome,
+            identity: readOperatorIdentity(flags),
+          });
+        }
+        stdout(
+          JSON.stringify(
+            {
+              ok: true,
+              queryText: outcome.queryText,
+              cacheKey: outcome.cacheKey,
+              decision: outcome.decision,
+              location: outcome.location,
+              committed: committed ?? false,
+            },
+            null,
+            2,
+          ),
+        );
+        return 0;
+      }
       default: {
         stderr(
-          'Usage: operator-cli <submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run> [flags]',
+          'Usage: operator-cli <submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|locate> [flags]',
         );
         return command ? 1 : 0;
       }

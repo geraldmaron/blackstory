@@ -100,6 +100,13 @@ Human-or-agent researched entities (the `fixtures/national-catalog/*.json` →
   (NPS/NRHP, institutions themselves, state encyclopedias, university archives).
 - Coordinates must pass state-bbox containment QA
   (`scripts/qa-catalog-fixtures.ts`) before publish; `manual_research` match method.
+- After fixture edits, run the Census location audit (deterministic, cached, no LLM):
+  `node --conditions development --import tsx packages/firebase/scripts/audit-entity-locations.ts`.
+  Street-address pins beyond the precision drift threshold can be auto-corrected with
+  `--apply-street-corrections`. Named places that Census cannot resolve stay `review`.
+  Operator one-off: `operator-cli locate --entity-id … --address …` (see
+  `.claude/skills/black-book/locate/SKILL.md`). Publish prefers
+  `canonicalEntities/{id}/locations/*` over catalog lat/lng when present.
 - Dignity framing per BB-051: presence and institution-building, never deficit;
   `sensitivityClass` only where violence is the documented subject.
 - Claims carry `confidenceLevel` honestly (`high` only when the cited source states it

@@ -134,6 +134,16 @@ pnpm --filter @repo/web exec next dev --port 3048
 # or: pnpm --filter @repo/web dev
 # http://localhost:3048/
 # http://localhost:3048/design-system
+
+# Location accuracy (Census geocode, cached, no LLM) — see docs/runbooks/data-ingestion-methodology.md
+node --conditions development --import tsx packages/firebase/scripts/qa-catalog-fixtures.ts
+node --conditions development --import tsx packages/firebase/scripts/audit-entity-locations.ts
+# Optional: snap high-confidence street pins only
+# node --conditions development --import tsx packages/firebase/scripts/audit-entity-locations.ts --apply-street-corrections
+node --conditions development --import tsx packages/operator-cli/src/bin.ts locate \
+  --entity-id ent_example_001 --address "123 Main St, City, State" \
+  --jurisdiction "City, State" --precision institution \
+  --operator-id "$USER" --session-id "locate-$(date +%s)" --identity-source cli
 ```
 
 ## Product constitution (policy)

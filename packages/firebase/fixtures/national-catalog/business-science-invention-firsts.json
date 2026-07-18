@@ -347,8 +347,8 @@
     "jurisdictionLabel": "Dallas, Texas",
     "locationPrecision": "institution",
     "locationLabel": "American Airlines Center, 2500 Victory Avenue, Dallas, Texas",
-    "lat": 32.7905,
-    "lng": -96.8103,
+    "lat": 32.78564,
+    "lng": -96.80994,
     "claims": [
       {
         "predicate": "became",
@@ -623,8 +623,8 @@
     "jurisdictionLabel": "Alsip, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "Bessie Coleman's grave, Lincoln Cemetery, 12300 South Kedzie Avenue, Alsip, Illinois",
-    "lat": 41.6722,
-    "lng": -87.705,
+    "lat": 41.66747,
+    "lng": -87.70002,
     "claims": [
       {
         "predicate": "earned",

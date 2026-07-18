@@ -73,8 +73,8 @@
     "jurisdictionLabel": "Canastota, New York",
     "locationPrecision": "institution",
     "locationLabel": "International Boxing Hall of Fame, 1 Hall of Fame Drive, Canastota, NY",
-    "lat": 43.0808,
-    "lng": -75.7536,
+    "lat": 43.0888,
+    "lng": -75.75083,
     "claims": [
       {
         "predicate": "became_first_black_world_heavyweight_champion",
@@ -214,8 +214,8 @@
     "jurisdictionLabel": "Queens, New York",
     "locationPrecision": "institution",
     "locationLabel": "West Side Tennis Club (Forest Hills Stadium), 1 Tennis Place, Forest Hills, Queens, NY",
-    "lat": 40.7196,
-    "lng": -73.8487,
+    "lat": 40.7199,
+    "lng": -73.84669,
     "claims": [
       {
         "predicate": "broke_color_line_at",
@@ -358,8 +358,8 @@
     "jurisdictionLabel": "Pinehurst, North Carolina",
     "locationPrecision": "institution",
     "locationLabel": "World Golf Hall of Fame, 3 Carolina Vista Drive, Pinehurst, NC",
-    "lat": 35.1954,
-    "lng": -79.4695,
+    "lat": 35.19247,
+    "lng": -79.4711,
     "claims": [
       {
         "predicate": "first_black_pga_tour_member_year",
@@ -504,8 +504,8 @@
     "jurisdictionLabel": "Canton, Ohio",
     "locationPrecision": "institution",
     "locationLabel": "Pro Football Hall of Fame, 2121 George Halas Drive NW, Canton, OH",
-    "lat": 40.8211,
-    "lng": -81.3978,
+    "lat": 40.82273,
+    "lng": -81.3976,
     "claims": [
       {
         "predicate": "became_first_black_nfl_head_coach_year",
@@ -891,8 +891,8 @@
     "jurisdictionLabel": "Colorado Springs, Colorado",
     "locationPrecision": "institution",
     "locationLabel": "U.S. Olympic & Paralympic Museum, 200 S Sierra Madre Street, Colorado Springs, CO",
-    "lat": 38.8295,
-    "lng": -104.8296,
+    "lat": 38.83118,
+    "lng": -104.82912,
     "claims": [
       {
         "predicate": "olympic_gold_medals",
@@ -940,8 +940,8 @@
     "jurisdictionLabel": "Colorado Springs, Colorado",
     "locationPrecision": "institution",
     "locationLabel": "U.S. Olympic & Paralympic Museum, 200 S Sierra Madre Street, Colorado Springs, CO",
-    "lat": 38.8295,
-    "lng": -104.8296,
+    "lat": 38.83118,
+    "lng": -104.82912,
     "claims": [
       {
         "predicate": "olympic_gold_medals_year",
@@ -1364,8 +1364,8 @@
     "jurisdictionLabel": "Los Angeles, California",
     "locationPrecision": "institution",
     "locationLabel": "Dolby Theatre (formerly Kodak Theatre), 6801 Hollywood Boulevard, Hollywood, Los Angeles, CA",
-    "lat": 34.1028,
-    "lng": -118.3403,
+    "lat": 34.1016,
+    "lng": -118.33876,
     "claims": [
       {
         "predicate": "first_black_woman_best_actress_date",
@@ -1838,8 +1838,8 @@
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "Metropolitan Opera House, 30 Lincoln Center Plaza, Manhattan, NY",
-    "lat": 40.7728,
-    "lng": -73.9842,
+    "lat": 40.77121,
+    "lng": -73.98189,
     "claims": [
       {
         "predicate": "opened_venue_starring_role_date",
@@ -2502,8 +2502,8 @@
     "jurisdictionLabel": "Canton, Ohio",
     "locationPrecision": "institution",
     "locationLabel": "Pro Football Hall of Fame, 2121 George Halas Drive NW, Canton, OH",
-    "lat": 40.8211,
-    "lng": -81.3978,
+    "lat": 40.82273,
+    "lng": -81.3976,
     "claims": [
       {
         "predicate": "became_first_black_coach_win_super_bowl_date",
@@ -2550,8 +2550,8 @@
     "jurisdictionLabel": "Colorado Springs, Colorado",
     "locationPrecision": "institution",
     "locationLabel": "U.S. Olympic & Paralympic Museum, 200 S Sierra Madre Street, Colorado Springs, CO",
-    "lat": 38.8295,
-    "lng": -104.8296,
+    "lat": 38.83118,
+    "lng": -104.82912,
     "claims": [
       {
         "predicate": "became_first_black_woman_olympic_gold_year",
@@ -2598,8 +2598,8 @@
     "jurisdictionLabel": "Colorado Springs, Colorado",
     "locationPrecision": "institution",
     "locationLabel": "U.S. Olympic & Paralympic Museum, 200 S Sierra Madre Street, Colorado Springs, CO",
-    "lat": 38.8295,
-    "lng": -104.8296,
+    "lat": 38.83118,
+    "lng": -104.82912,
     "claims": [
       {
         "predicate": "became_first_back_to_back_100m_champion_year",
@@ -2969,8 +2969,8 @@
     "jurisdictionLabel": "Los Angeles, California",
     "locationPrecision": "institution",
     "locationLabel": "Dolby Theatre, 6801 Hollywood Boulevard, Hollywood, Los Angeles, CA",
-    "lat": 34.1028,
-    "lng": -118.3403,
+    "lat": 34.1016,
+    "lng": -118.33876,
     "claims": [
       {
         "predicate": "became_first_black_screenplay_oscar_winner_date",
@@ -3015,8 +3015,8 @@
     "jurisdictionLabel": "Los Angeles, California",
     "locationPrecision": "institution",
     "locationLabel": "Dolby Theatre (formerly Kodak Theatre), 6801 Hollywood Boulevard, Hollywood, Los Angeles, CA",
-    "lat": 34.1028,
-    "lng": -118.3403,
+    "lat": 34.1016,
+    "lng": -118.33876,
     "claims": [
       {
         "predicate": "became_second_black_best_actor_date",

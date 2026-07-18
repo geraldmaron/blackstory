@@ -261,6 +261,27 @@ test('buildReleaseEntityArtifacts is deterministic across repeated calls', () =>
   assert.deepEqual(first, second);
 });
 
+test('buildReleaseEntityArtifacts prefers locationOverride over catalog lat/lng', () => {
+  const entry = baseEntry({ lat: 33.749, lng: -84.388 });
+  const result = buildReleaseEntityArtifacts(entry, {
+    ...CONTEXT,
+    locationOverride: {
+      lat: 33.7554,
+      lng: -84.376,
+      precision: 'neighborhood',
+      matchMethod: 'geocode_census',
+      locationLabel: 'Sweet Auburn, Atlanta',
+    },
+  });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.location.lat, 33.7554);
+  assert.equal(result.projection.location.lng, -84.376);
+  assert.equal(result.projection.location.precision, 'neighborhood');
+  assert.equal(result.projection.location.matchMethod, 'geocode_census');
+  assert.equal(result.projection.locationLabel, 'Sweet Auburn, Atlanta');
+});
+
 test('buildReleaseEntityArtifacts prefers context.relatedEntries over entry.related bootstrap', () => {
   const entry = baseEntry({
     related: [{ id: 'ent_bootstrap_001', type: 'related_to', direction: 'outgoing' }],

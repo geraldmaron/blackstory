@@ -250,6 +250,60 @@ async function main(): Promise<void> {
     `Graph artifact: ${graphArtifact.adjacencyByEntityId.size} adjacency docs, ${graphArtifact.decadeViews.length} decade views, hash ${graphArtifact.contentHash.digest.slice(0, 12)}…`,
   );
 
+  // Prefer canonical EntityLocation docs (Census-validated) over catalog lat/lng.
+  const locationOverrides = new Map<
+    string,
+    {
+      lat: number;
+      lng: number;
+      precision?: string;
+      matchMethod?: string;
+      locationLabel?: string;
+    }
+  >();
+  let locationOverrideCount = 0;
+  for (const entry of entries) {
+    const locs = await db.collection(`canonicalEntities/${entry.id}/locations`).limit(5).get();
+    if (locs.empty) continue;
+    // Prefer current, then historical, then any doc with a point.
+    const ranked = [...locs.docs].sort((a, b) => {
+      const roleRank = (role: unknown) =>
+        role === 'current' ? 0 : role === 'historical' ? 1 : 2;
+      return roleRank(a.data().role) - roleRank(b.data().role);
+    });
+    for (const doc of ranked) {
+      const data = doc.data();
+      const point = data.point as { lat?: number; lng?: number } | undefined;
+      const geometry = data.geometry as { type?: string; coordinates?: [number, number] } | undefined;
+      const lat =
+        typeof point?.lat === 'number'
+          ? point.lat
+          : geometry?.type === 'Point' && typeof geometry.coordinates?.[1] === 'number'
+            ? geometry.coordinates[1]
+            : undefined;
+      const lng =
+        typeof point?.lng === 'number'
+          ? point.lng
+          : geometry?.type === 'Point' && typeof geometry.coordinates?.[0] === 'number'
+            ? geometry.coordinates[0]
+            : undefined;
+      if (typeof lat !== 'number' || typeof lng !== 'number') continue;
+      const match = data.match as { method?: string } | undefined;
+      locationOverrides.set(entry.id, {
+        lat,
+        lng,
+        ...(typeof data.precision === 'string' ? { precision: data.precision } : {}),
+        ...(typeof match?.method === 'string' ? { matchMethod: match.method } : {}),
+        ...(typeof data.label === 'string' ? { locationLabel: data.label } : {}),
+      });
+      locationOverrideCount += 1;
+      break;
+    }
+  }
+  console.log(
+    `EntityLocation overrides: ${locationOverrideCount} of ${entries.length} (catalog lat/lng is manual_research fallback)`,
+  );
+
   // Validate EVERYTHING before writing anything; name each failing entry so a bad catalog
   // line reads as "which record, which field", not a bare Zod trace. `buildReleaseEntityArtifacts`
   // (the single release builder, @repo/domain) runs the fact/notability gates and fail-closed
@@ -259,11 +313,13 @@ async function main(): Promise<void> {
   const writes = entries.flatMap((entry) => {
     try {
       const relatedEntries = relatedByEntity.get(entry.id);
+      const locationOverride = locationOverrides.get(entry.id);
       const built = buildReleaseEntityArtifacts(entry, {
         releaseId,
         generatedAt,
         geohashPrecision: GEOHASH_PRECISION,
         ...(relatedEntries?.length ? { relatedEntries } : {}),
+        ...(locationOverride ? { locationOverride } : {}),
       });
       if (!built.ok) {
         throw new Error(`${built.reason}: ${built.message}`);

@@ -17,6 +17,7 @@ out/
 *.tsbuildinfo
 coverage/
 .turbo/
+.cache/
 
 # Env / secrets
 .env

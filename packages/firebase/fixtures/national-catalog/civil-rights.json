@@ -752,8 +752,8 @@
     "jurisdictionLabel": "Midway, Georgia",
     "locationPrecision": "institution",
     "locationLabel": "Dorchester Academy Boys' Dormitory, 8787 East Oglethorpe Highway, Midway",
-    "lat": 31.8006,
-    "lng": -81.4656,
+    "lat": 31.80144,
+    "lng": -81.4642,
     "claims": [
       {
         "predicate": "headquarters_of",

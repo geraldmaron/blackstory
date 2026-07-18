@@ -63,8 +63,8 @@
     "jurisdictionLabel": "Raleigh, North Carolina",
     "locationPrecision": "institution",
     "locationLabel": "Shaw University, 118 E South Street, Raleigh",
-    "lat": 35.7705,
-    "lng": -78.6375,
+    "lat": 35.77207,
+    "lng": -78.6382,
     "claims": [
       {
         "predicate": "founded_on",
@@ -1474,8 +1474,8 @@
     "jurisdictionLabel": "Raleigh, North Carolina",
     "locationPrecision": "institution",
     "locationLabel": "Shaw University, 118 E South Street, Raleigh",
-    "lat": 35.7705,
-    "lng": -78.6375,
+    "lat": 35.77207,
+    "lng": -78.6382,
     "claims": [
       {
         "predicate": "directed",
@@ -1865,8 +1865,8 @@
     "jurisdictionLabel": "Little Rock, Arkansas",
     "locationPrecision": "institution",
     "locationLabel": "Daisy Bates House, 1207 West 28th Street, Little Rock",
-    "lat": 34.7217,
-    "lng": -92.2836,
+    "lat": 34.72176,
+    "lng": -92.28812,
     "claims": [
       {
         "predicate": "mentored",

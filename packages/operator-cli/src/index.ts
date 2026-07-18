@@ -80,4 +80,17 @@ export {
   type RunBoundedDiscoveryCampaignInput,
 } from './discovery-run.js';
 
+export {
+  prepareLocate,
+  commitLocate,
+  type LocateInput,
+  type LocateOutcome,
+  type LocateSuccess,
+  type LocateFailure,
+  type LocateDependencies,
+  type CommitLocateInput,
+} from './locate.js';
+
+export { censusSafeHttpClient } from './census-http.js';
+
 export { runCli, type CliDependencies } from './cli.js';

@@ -472,6 +472,31 @@ export type {
 } from './geography/location.js';
 
 export {
+  LOCATION_EVIDENCE_CLASSES,
+  LOCATION_DRIFT_THRESHOLDS_METERS,
+  LOCATION_AUDIT_ACTIONS,
+  classifyLocationEvidence,
+  driftThresholdMeters,
+  suggestedPrecisionForEvidence,
+  decideLocationCorrection,
+  buildLocationGeocodeQuery,
+  extractStreetFingerprint,
+  streetAddressesCompatible,
+} from './geography/location-audit.js';
+export type {
+  LocationEvidenceClass,
+  LocationDriftTier,
+  LocationAuditAction,
+  LocationGeocodeHit,
+  DecideLocationCorrectionInput,
+  LocationCorrectionDecision,
+  ClassifyLocationEvidenceInput,
+} from './geography/location-audit.js';
+
+export { buildEntityLocationFromResolution } from './geography/entity-location-from-geocode.js';
+export type { BuildEntityLocationFromResolutionInput } from './geography/entity-location-from-geocode.js';
+
+export {
   asClaimId,
   asClaimVersionId,
   asClaimEvidenceLinkId,

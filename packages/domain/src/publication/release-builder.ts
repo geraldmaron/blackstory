@@ -109,6 +109,17 @@ export type ReleaseBuildContext = {
    * these win over bootstrap `entry.related` shortcuts.
    */
   readonly relatedEntries?: readonly PublicRelatedEntry[];
+  /**
+   * Preferred coordinates from a canonical EntityLocation (Census-validated). When present,
+   * these win over catalog fixture lat/lng (`manual_research` fallback).
+   */
+  readonly locationOverride?: {
+    readonly lat: number;
+    readonly lng: number;
+    readonly precision?: string;
+    readonly matchMethod?: string;
+    readonly locationLabel?: string;
+  };
 };
 
 export type ReleaseEntityProjectionFields = {
@@ -443,7 +454,12 @@ export function buildReleaseEntityArtifacts(
 
   const researchCoverage = computeReleaseResearchCoverage(claims);
   const geohashPrecision = context.geohashPrecision ?? 5;
-  const geo: GeoPointFields = buildGeoPointFields(entry.lat, entry.lng, geohashPrecision);
+  const lat = context.locationOverride?.lat ?? entry.lat;
+  const lng = context.locationOverride?.lng ?? entry.lng;
+  const locationPrecision = context.locationOverride?.precision ?? entry.locationPrecision;
+  const locationLabel = context.locationOverride?.locationLabel ?? entry.locationLabel;
+  const matchMethod = context.locationOverride?.matchMethod ?? 'manual_research';
+  const geo: GeoPointFields = buildGeoPointFields(lat, lng, geohashPrecision);
   const notabilityLabels = [...new Set(notabilityBasis.map((basis) => NOTABILITY_RUBRIC[basis.criterion]))];
   const related = resolveRelatedEntries(entry, context);
 
@@ -459,13 +475,13 @@ export function buildReleaseEntityArtifacts(
       lng: geo.lng,
       geohash: geo.geohash,
       geohashPrefixes: geo.geohashPrefixes,
-      precision: entry.locationPrecision,
-      matchMethod: 'manual_research',
+      precision: locationPrecision,
+      matchMethod,
     },
     claimIds: claims.map((claim) => claim.id),
     claims,
     jurisdictionLabel: entry.jurisdictionLabel,
-    locationLabel: entry.locationLabel,
+    locationLabel,
     ...(entry.status !== undefined ? { status: entry.status } : {}),
     ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
     ...(entry.sensitivityClass !== undefined ? { sensitivityClass: entry.sensitivityClass } : {}),

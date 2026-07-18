@@ -476,8 +476,8 @@
     "jurisdictionLabel": "Montgomery, Alabama",
     "locationPrecision": "institution",
     "locationLabel": "454 Dexter Avenue, one block from the Alabama State Capitol",
-    "lat": 32.3766,
-    "lng": -86.3018,
+    "lat": 32.37756,
+    "lng": -86.30307,
     "claims": [
       {
         "predicate": "founded_year",
