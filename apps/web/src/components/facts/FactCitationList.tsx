@@ -68,8 +68,12 @@ export function FactCitationList({ citations, labelledBy }: FactCitationListProp
                 {...(href ? { href } : {})}
               />
               <dl className="bp-sans" style={{ margin: 'var(--bp-space-3) 0 0 0' }}>
-                <dt style={{ fontWeight: 600 }}>Retrieved</dt>
-                <dd style={{ margin: '0 0 var(--bp-space-2) 0' }}>{formatIsoDate(citation.accessedAt)}</dd>
+                {citation.accessedAt ? (
+                  <>
+                    <dt style={{ fontWeight: 600 }}>Retrieved</dt>
+                    <dd style={{ margin: '0 0 var(--bp-space-2) 0' }}>{formatIsoDate(citation.accessedAt)}</dd>
+                  </>
+                ) : null}
                 {citation.archivedAt ? (
                   <>
                     <dt style={{ fontWeight: 600 }}>Archived capture</dt>

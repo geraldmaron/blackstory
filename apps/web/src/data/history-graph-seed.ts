@@ -17,13 +17,20 @@ import { listPublicEntities, type PublicEntityView } from './public-seed';
 export const HISTORY_GRAPH_RELEASE_ID = 'seed-snapshot';
 export const HISTORY_GRAPH_GENERATED_AT = '2026-07-17T00:00:00.000Z';
 
-function activeSpansFor(entity: PublicEntityView): readonly DecadeBucketEntityInput['activeSpans'] {
+function activeSpansFor(entity: PublicEntityView): DecadeBucketEntityInput['activeSpans'] {
   if (entity.statusHistory && entity.statusHistory.length > 0) {
-    return entity.statusHistory.map((record) => ({
-      ...(record.validFrom !== undefined ? { validFrom: record.validFrom } : {}),
-      ...(record.validTo !== undefined ? { validTo: record.validTo } : {}),
-      datePrecision: record.datePrecision,
-    }));
+    // Records without a validFrom cannot be placed in a decade bucket — skip them.
+    return entity.statusHistory.flatMap((record) =>
+      record.validFrom !== undefined
+        ? [
+            {
+              validFrom: record.validFrom,
+              ...(record.validTo !== undefined ? { validTo: record.validTo } : {}),
+              datePrecision: record.datePrecision,
+            },
+          ]
+        : [],
+    );
   }
   if (entity.eventWindow?.startAt) {
     return [

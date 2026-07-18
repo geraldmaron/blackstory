@@ -35,7 +35,7 @@ export type LegalDetailViewModel =
   | {
       readonly kind: 'ok';
       readonly snapshot: (typeof SEED_LEGAL_SNAPSHOTS)[number];
-      readonly explainer?: ReturnType<typeof getLegalCatalogEntry> extends infer T ? NonNullable<T>['explainer'] : never;
+      readonly explainer?: NonNullable<ReturnType<typeof getLegalCatalogEntry>>['explainer'];
       readonly factHref?: string;
     };
 

@@ -186,7 +186,7 @@ export function buildHistoryNodes(
     .filter((entity): entity is PublicEntityView => entity !== undefined)
     .map((entity) => buildNodeView(entity, slice.mode, slice.activeDecade));
 
-  return applyHistoryKindFilter(nodes, filters).sort((a, b) =>
+  return [...applyHistoryKindFilter(nodes, filters)].sort((a, b) =>
     a.displayName.localeCompare(b.displayName),
   );
 }
