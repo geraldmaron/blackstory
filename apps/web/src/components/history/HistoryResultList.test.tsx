@@ -18,6 +18,7 @@ const sampleNode = {
   statusLabel: 'Historic',
   statusKind: 'status' as const,
   evidenceCount: 2,
+  connectionCount: 1,
   href: '/entity/ent_dunbar_school_001',
   factLinks: [{ href: '/facts/dunbar-founding-1870', label: 'Sample fact' }],
   topicTags: ['education'],
@@ -27,7 +28,7 @@ test('DecadeStepper renders tablist with all-time and decade tabs', () => {
   const html = renderToStaticMarkup(
     <DecadeStepper
       decades={['1860s', '1950s']}
-      viewState={{ mode: 'decade', decade: '1950s', filters: { kind: 'all' } }}
+      viewState={{ mode: 'decade', decade: '1950s', filters: { kind: 'all', q: '', sort: 'name' } }}
     />,
   );
   assert.match(html, /role="tablist"/);

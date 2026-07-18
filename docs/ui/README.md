@@ -4,14 +4,13 @@ Shared package: `@repo/ui` (`packages/ui`). The binding brand source is the
 root `brand/` directory; where this doc and the kit disagree, the kit wins.
 
 See also [`brand.md`](./brand.md) for the full usage
-contract: signature, palette, typography, and usage rules; [`story.md`](./story.md)
-(BB-069) for brand voice, narrative arc, and microcopy standards; and
+contract: signature, palette, typography, and usage rules; [`story.md`](./story.md) for brand voice, narrative arc, and microcopy standards; and
 [`learning-index-entity.md`](./learning-index-entity.md) for the learning-index
 entity contract (summary, tags, related hops, enrichable prose, photo).
 
 ## What shipped
 
-- **Palette (v3, BB-096):** Archive Paper `#F4EFE5` canvas + Surface
+- **Palette (v3, ):** Archive Paper `#F4EFE5` canvas + Surface
   `#FBF8F2` / Black Ink primary; Copper Pin accent with copper text pairs
   `#8E4F2A` (light) / `#D07A32` (dark); light and dark themes via
   `data-theme` (dark is first-class, not an afterthought); radii 8/16/28px
@@ -20,7 +19,7 @@ entity contract (summary, tags, related hops, enrichable prose, photo).
 - **Status colors:** warning, confidence, dispute, error only, re-derived
   to harmonize with the accent palette (with text/mono cues — never
   color-alone)
-- **Typography (v3, BB-096):** Inter Display (display/headlines, served
+- **Typography (v3, ):** Inter Display (display/headlines, served
   via the Inter v4 variable font's `opsz` axis) + Inter (UI/body) + Source
   Serif 4 (editorial/longform) + IBM Plex Mono (data/citations) — all
   free/open-source, no licensing budget gate
@@ -28,7 +27,7 @@ entity contract (summary, tags, related hops, enrichable prose, photo).
   pigment-anchored data-viz
 - **Components:** Card, Citation, Confidence, Timeline, MapFrame, ResultList, FilterBar, Dialog, Notice, EmptyState, Button, ThemeToggle
 - **Fixtures:** public route `/design-system` (Storybook equivalent)
-- **Public shell (BB-048 + map-led home):** news shell — paper/ink primary,
+- **Public shell ( + map-led home):** news shell — paper/ink primary,
   map-led homepage hero, story rails, sticky masthead
 
 
@@ -60,33 +59,33 @@ pnpm --filter @repo/web exec next dev --port 3048
 # → http://localhost:3048/design-system
 ```
 
-## Public routes (BB-048)
+## Public routes
 
 | Route | Purpose |
 |-------|---------|
 | `/` | Home / product framing + featured seed records |
 | `/search` | Seed-backed browse with FilterBar + ResultList |
-| `/explore` | Location discovery scaffold (BB-050 later) |
-| `/topics` | Thematic entry points |
+| `/explore` | Location discovery scaffold ( later) |
+| `/stories` | History articles from the archive |
 | `/methodology` | Inclusion, confidence, precision |
 | `/about` | Product framing |
-| `/corrections` | Correction intake scaffold (BB-055 later) |
+| `/corrections` | Correction intake scaffold ( later) |
 | `/entity/[id]` | Entity detail scaffold (seed ids) |
-| `/design-system` | BB-007 component fixtures |
+| `/design-system` |  component fixtures |
 
-Sample entity ids: `ent_seed_place_001`, `ent_seed_school_001`. Data is labeled as seed/sample — not live projections (BB-019).
+Sample entity ids: `ent_seed_place_001`, `ent_seed_school_001`. Data is labeled as seed/sample — not live projections.
 
 ## Remaining UI gaps (later beads)
 
-- Live public projections (BB-019) and search API (BB-049)
-- Geocoding / nearby discovery (BB-050)
-- Full entity depth + evidence UI (BB-052 / BB-053)
+- Live public projections and search API
+- Geocoding / nearby discovery
+- Full entity depth + evidence UI ( / )
 - Dedicated Storybook/Chromatic if visual regression CI is required later
 - Admin now consumes `@repo/ui` (transpiled + `.js`->`.ts` webpack
   resolution, matching web's config) and renders the brand mark on its
   home page; admin doesn't yet load the display/sans font families via
   `next/font` (falls back to the CSS `font-family` string literals) — low
   priority since the console isn't public-facing
-- Map-led homepage arc (`docs/ui/story.md`) is blocked on BB-070 (map data
-  platform) and BB-051 (national map experience) — the current hero is an
+- Map-led homepage arc (`docs/ui/story.md`) is blocked on  (map data
+  platform) and  (national map experience) — the current hero is an
   intentional text-led interim, not the target design

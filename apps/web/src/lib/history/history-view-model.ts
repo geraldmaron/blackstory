@@ -13,10 +13,15 @@ import {
   buildHistoryGraphContext,
   buildHistoryNodes,
   resolveHistoryGraphSlice,
+  withHistoryConnectionCounts,
   type HistoryEdgeView,
   type HistoryNodeView,
 } from './build-history-graph';
-import type { HistoryFacetOption } from './filters';
+import {
+  applyHistoryQueryFilter,
+  sortHistoryNodes,
+  type HistoryFacetOption,
+} from './filters';
 import { parseHistorySearchParams, type HistoryViewState, type RawHistorySearchParams } from './url-state';
 
 export type HistoryViewModel = {
@@ -43,15 +48,27 @@ export function buildHistoryViewModel(
   const context = buildHistoryGraphContext(artifact, entities);
   const slice = resolveHistoryGraphSlice(artifact, viewState.mode, viewState.decade);
 
-  const nodes = buildHistoryNodes(slice, viewState.filters, context.entitiesById);
-  const visibleNodeIds = new Set(nodes.map((node) => node.entityId));
+  const kindFiltered = buildHistoryNodes(slice, viewState.filters, context.entitiesById);
+  const visibleNodeIds = new Set(kindFiltered.map((node) => node.entityId));
   const edges = buildHistoryEdges(slice, SEED_ENTITY_RELATIONSHIPS, context.entitiesById, visibleNodeIds);
+  const withCounts = withHistoryConnectionCounts(kindFiltered, edges);
+  const queried = applyHistoryQueryFilter(withCounts, viewState.filters.q);
+  const nodes = sortHistoryNodes(queried, viewState.filters.sort);
+
+  // When q hides a node, drop edges that no longer have both endpoints visible.
+  const matchedIds = new Set(nodes.map((node) => node.entityId));
+  const visibleEdges =
+    viewState.filters.q.trim().length > 0
+      ? edges.filter(
+          (edge) => matchedIds.has(edge.fromEntityId) && matchedIds.has(edge.toEntityId),
+        )
+      : edges;
 
   const selectedNode = viewState.selected
     ? nodes.find((node) => node.entityId === viewState.selected)
     : undefined;
   const selectedEdge = viewState.edge
-    ? edges.find((edge) => edge.edgeId === viewState.edge)
+    ? visibleEdges.find((edge) => edge.edgeId === viewState.edge)
     : undefined;
 
   return {
@@ -60,7 +77,7 @@ export function buildHistoryViewModel(
     ...(slice.activeDecade ? { activeDecade: slice.activeDecade } : {}),
     sparseDecade: slice.sparseDecade,
     nodes,
-    edges,
+    edges: visibleEdges,
     facetOptions: context.facetOptions,
     totalMatched: nodes.length,
     releaseId: context.releaseId,

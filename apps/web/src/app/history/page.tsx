@@ -66,6 +66,13 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
               legend="Filter history graph records"
               fields={[
                 {
+                  id: 'history-q-njs',
+                  name: 'q',
+                  label: 'Search',
+                  type: 'search',
+                  defaultValue: view.viewState.filters.q,
+                },
+                {
                   id: 'history-kind-njs',
                   name: 'kind',
                   label: 'Kind',
@@ -73,6 +80,29 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
                   defaultValue: view.viewState.filters.kind,
                   options: view.facetOptions.kind,
                 },
+                {
+                  id: 'history-sort-njs',
+                  name: 'sort',
+                  label: 'Sort',
+                  type: 'select',
+                  defaultValue: view.viewState.filters.sort,
+                  options: [
+                    { value: 'name', label: 'Name A–Z' },
+                    { value: 'kind', label: 'Kind' },
+                    { value: 'connections', label: 'Connections' },
+                  ],
+                },
+                ...(view.viewState.mode === 'decade' && view.activeDecade
+                  ? [
+                      {
+                        id: 'history-decade-njs',
+                        name: 'decade',
+                        label: 'Decade',
+                        type: 'text' as const,
+                        defaultValue: view.activeDecade,
+                      },
+                    ]
+                  : []),
               ]}
             />
             <p className="ds-sans" id="history-results-heading-njs">

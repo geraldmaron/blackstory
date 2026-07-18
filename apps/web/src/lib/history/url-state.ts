@@ -1,15 +1,19 @@
 /**
- * Shareable URL state for `/history`: decade (or all-time), kind filter, selected node,
+ * Shareable URL state for `/history`: decade (or all-time), kind/q/sort filters, selected node,
  * and optional selected edge. Pure parse/serialize so the SSR page and client orchestrator read and
- * write the same shape copied URLs reproduce the same browse view.
+ * write the same shape — copied URLs reproduce the same browse view.
  */
-import { DEFAULT_HISTORY_FILTERS, type HistoryFilterState } from './filters';
+import {
+  DEFAULT_HISTORY_FILTERS,
+  parseHistorySort,
+  type HistoryFilterState,
+} from './filters';
 
 export type HistoryViewMode = 'all-time' | 'decade';
 
 export type HistoryViewState = {
   readonly mode: HistoryViewMode;
-  /** Decade label (e.g. "1950s") when `mode === 'decade'`.  */
+  /** Decade label (e.g. "1950s") when `mode === 'decade'`. */
   readonly decade?: string;
   readonly filters: HistoryFilterState;
   readonly selected?: string;
@@ -40,13 +44,15 @@ export function parseDecadeParam(raw: string | undefined): string | undefined {
 export function parseHistorySearchParams(raw: RawHistorySearchParams): HistoryViewState {
   const decade = parseDecadeParam(firstValue(raw.decade));
   const kind = cleanSelectParam(firstValue(raw.kind)) as HistoryFilterState['kind'];
+  const q = (firstValue(raw.q) ?? '').trim();
+  const sort = parseHistorySort(firstValue(raw.sort));
   const selectedRaw = firstValue(raw.selected)?.trim();
   const edgeRaw = firstValue(raw.edge)?.trim();
 
   return {
     mode: decade ? 'decade' : 'all-time',
     ...(decade ? { decade } : {}),
-    filters: { kind },
+    filters: { kind, q, sort },
     ...(selectedRaw ? { selected: selectedRaw } : {}),
     ...(edgeRaw ? { edge: edgeRaw } : {}),
   };
@@ -59,6 +65,12 @@ export function buildHistorySearchParams(state: HistoryViewState): string {
   }
   if (state.filters.kind !== DEFAULT_HISTORY_FILTERS.kind) {
     params.set('kind', state.filters.kind);
+  }
+  if (state.filters.q?.trim()) {
+    params.set('q', state.filters.q.trim());
+  }
+  if (state.filters.sort && state.filters.sort !== DEFAULT_HISTORY_FILTERS.sort) {
+    params.set('sort', state.filters.sort);
   }
   if (state.selected) params.set('selected', state.selected);
   if (state.edge) params.set('edge', state.edge);

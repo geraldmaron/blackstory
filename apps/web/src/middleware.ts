@@ -28,6 +28,8 @@ export const config = {
     '/about',
     '/methodology',
     '/topics',
+    '/stories',
+    '/stories/:path*',
     '/corrections',
     '/submit',
     '/submit/api',

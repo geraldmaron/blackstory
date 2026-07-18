@@ -3,8 +3,11 @@
  * page — click/activate always navigates. Selection highlighting still mirrors
  * the graph when a node is open; graph visualization can select without blocking
  * list navigation to the full record.
+ *
+ * Uses Next.js `Link` for soft client transitions (no full document reload).
  */
 import React from 'react';
+import Link from 'next/link';
 import { cx } from '@repo/ui';
 import type { HistoryNodeView } from '../../lib/history/build-history-graph';
 
@@ -29,8 +32,11 @@ export function HistoryResultList({
         const isSelected = node.entityId === selectedId;
 
         return (
-          <li key={node.entityId} className="ds-result-list__item">
-            <a
+          <li
+            key={node.entityId}
+            className={cx('ds-result-list__item', isSelected && 'ds-history-result-list__item--selected')}
+          >
+            <Link
               className="ds-result-list__link"
               href={node.href}
               aria-current={isSelected ? 'true' : undefined}
@@ -45,7 +51,7 @@ export function HistoryResultList({
                   {node.evidenceCount} claim{node.evidenceCount === 1 ? '' : 's'}
                 </span>
               </div>
-            </a>
+            </Link>
             {/* Sibling of the entity link, never inside it — nested <a> is
                 invalid HTML and hydration-breaks. Plain inline links, not
                 CTA pills: these are references, not actions. */}
@@ -55,9 +61,9 @@ export function HistoryResultList({
                 {node.factLinks.map((fact, index) => (
                   <React.Fragment key={fact.href}>
                     {index > 0 ? ', ' : null}
-                    <a className="ds-history-result-list__fact-link" href={fact.href}>
+                    <Link className="ds-history-result-list__fact-link" href={fact.href}>
                       {fact.label}
-                    </a>
+                    </Link>
                   </React.Fragment>
                 ))}
               </p>

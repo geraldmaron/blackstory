@@ -152,10 +152,10 @@ block the visiting job.
 | `/search` | Direct retrieval | Document rhythm, filter bar, result list (roomier than explore panel); gains address/place search | single column |
 | `/entity/[id]` | One record, fully evidenced — and visitable | Name/kind/place/era → summary → claims+citations → timeline → related → visit block (map hand-off, directions, visitable status: standing/rebuilt/demolished/marker-only) | sections stack; visit block stays above the fold on mobile |
 | `/history` | Movement through time | Decade graph views, edge panels, era scrubber | edge panel becomes sheet |
-| `/topics` | Thematic entry | Topic tiles → filtered explore/search links | 2-col → 1-col |
-| `/facts`, `/facts/[slug]`, `/facts/[id]/rev/[n]` | Fact registry + revisions | Mono-register tables, revision diffs, citation lists | tables scroll in-container |
+| `/stories`, `/stories/[slug]` | History articles | Longform narratives → entity + quick-fact off-ramps | 2-col → 1-col |
+| `/facts`, `/facts/[slug]`, `/facts/[id]/rev/[n]` | Quick facts / Did you know | Short citable pins, revision diffs, citation lists | tables scroll in-container |
 | `/methodology` | Trust: how records qualify | Longform serif, numbered sections, confidence-language explainer | — |
-| `/myths`, `/myths/[slug]` | Corrections culture | Claim-vs-evidence layout, dispute framing | — |
+| `/myths`, `/myths/[slug]` | Myths & misconceptions | Claim-vs-evidence library, dispute framing | — |
 | `/errata`, `/corrections` | Visible fallibility | Dated entries, hairline separation | — |
 | `/submit` | Community intake | Guided form on shell rhythm, moderation framing, App Check | full-width fields |
 | `/about` | Who/why | Longform serif + voice lines | — |

@@ -1,5 +1,5 @@
 /**
- * Navigation data for the public Blap application shell.
+ * Navigation data for the public BlackStory application shell.
  *
  * IA per the v3 shell contract: five routes stay in the always-visible
  * primary nav; the rest live under the "More" disclosure (desktop nav +
@@ -17,14 +17,14 @@ export const PRIMARY_NAV: readonly NavItem[] = [
   { href: '/explore', label: 'Explore' },
   { href: '/search', label: 'Search' },
   { href: '/history', label: 'History' },
-  { href: '/topics', label: 'Topics' },
+  { href: '/stories', label: 'Stories' },
   { href: '/about', label: 'About' },
 ] as const;
 
 /** Overflow routes: desktop "More" disclosure + appended to the mobile drawer. */
 export const OVERFLOW_NAV: readonly NavItem[] = [
   { href: '/data', label: 'Data' },
-  { href: '/facts', label: 'Facts' },
+  { href: '/facts', label: 'Quick facts' },
   { href: '/legal', label: 'Legal' },
   { href: '/methodology', label: 'Methodology' },
   { href: '/myths', label: 'Myths' },
@@ -46,7 +46,7 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
       { href: '/explore', label: 'Explore' },
       { href: '/search', label: 'Search' },
       { href: '/history', label: 'History' },
-      { href: '/topics', label: 'Topics' },
+      { href: '/stories', label: 'Stories' },
       { href: '/data', label: 'Data' },
     ],
   },
@@ -64,7 +64,7 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
     items: [
       { href: '/submit', label: 'Submit' },
       { href: '/about', label: 'About' },
-      { href: '/facts', label: 'Facts' },
+      { href: '/facts', label: 'Quick facts' },
       { href: '/myths', label: 'Myths' },
     ],
   },

@@ -70,12 +70,71 @@
   border-bottom-color: var(--ds-accent-graphic);
 }
 
+.ds-history__stepper-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--ds-canvas);
+  padding-bottom: var(--ds-space-2);
+}
+
 .ds-history__toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--ds-space-3);
-  align-items: center;
-  justify-content: space-between;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  align-items: flex-end;
+}
+
+.ds-history__search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  align-items: flex-end;
+  flex: 1 1 16rem;
+}
+
+.ds-history__search-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ds-history__search-input {
+  flex: 1 1 12rem;
+  min-height: 2.5rem;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+}
+
+.ds-history__search-input:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+.ds-history__count {
+  margin: 0;
+  flex: 1 1 100%;
+  font-size: 0.875rem;
+  color: var(--ds-ink-muted);
+}
+
+@media (min-width: 40rem) {
+  .ds-history__count {
+    flex: 1 1 auto;
+    margin-left: auto;
+    text-align: right;
+  }
 }
 
 .ds-history__layout {
@@ -88,6 +147,26 @@
     grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 1fr);
     align-items: start;
   }
+
+  .ds-history__list-panel {
+    position: sticky;
+    top: 3.5rem;
+    max-height: calc(100vh - 5rem);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 55.99rem) {
+  .ds-history__list-panel {
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+    padding-top: var(--ds-space-4);
+  }
+}
+
+.ds-history-result-list__item--selected > .ds-result-list__link {
+  border-left: 3px solid var(--ds-accent-graphic);
+  padding-left: var(--ds-space-3);
+  margin-left: calc(-1 * var(--ds-space-3));
 }
 
 .ds-history-graph {

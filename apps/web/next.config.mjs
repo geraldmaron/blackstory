@@ -51,6 +51,20 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/topics',
+        destination: '/stories',
+        permanent: true,
+      },
+      {
+        source: '/topics/:path*',
+        destination: '/stories',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

@@ -4,6 +4,7 @@
  * and any published facts.
  */
 import React from 'react';
+import Link from 'next/link';
 import { Card } from '@repo/ui';
 import type { HistoryNodeView } from '../../lib/history/build-history-graph';
 
@@ -66,18 +67,18 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
           <ul>
             {node.factLinks.map((fact) => (
               <li key={fact.href}>
-                <a className="ds-cta ds-cta--ghost" href={fact.href}>
+                <Link className="ds-cta ds-cta--ghost" href={fact.href}>
                   {fact.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
         </div>
       ) : null}
 
-      <a className="ds-cta ds-cta--ink" href={node.href}>
+      <Link className="ds-cta ds-cta--ink" href={node.href}>
         Open full record
-      </a>
+      </Link>
     </Card>
   );
 }

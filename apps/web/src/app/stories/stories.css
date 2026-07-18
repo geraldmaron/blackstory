@@ -1,0 +1,25 @@
+/**
+ * Presentation for longform `/stories/[slug]` articles. Editorial serif body on the
+ * archive-paper canvas; mono for dates and fact ids.
+ */
+.ds-story-article {
+  display: grid;
+  gap: var(--ds-space-6);
+}
+
+.ds-story-article__body {
+  display: grid;
+  gap: var(--ds-space-5);
+}
+
+.ds-story-article__p {
+  margin: 0;
+  font-family: var(--ds-font-editorial);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--ds-ink);
+}
+
+.ds-story-article__body .ds-section__title {
+  margin-top: var(--ds-space-2);
+}

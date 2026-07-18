@@ -80,6 +80,25 @@ test('parses shareable URL decade, filter, and selection state', () => {
   assert.ok(view.selectedNode);
 });
 
+test('query filter matches display name or summary', () => {
+  const view = buildHistoryViewModel({ q: 'dunbar' });
+  assert.ok(view.totalMatched >= 1);
+  assert.ok(view.nodes.every((node) => {
+    const haystack = `${node.displayName} ${node.summary}`.toLowerCase();
+    return haystack.includes('dunbar');
+  }));
+});
+
+test('sort by connections orders higher-degree nodes first', () => {
+  const view = buildHistoryViewModel({ sort: 'connections' });
+  assert.ok(view.nodes.length >= 2);
+  for (let i = 1; i < view.nodes.length; i += 1) {
+    const prev = view.nodes[i - 1]!;
+    const curr = view.nodes[i]!;
+    assert.ok(prev.connectionCount >= curr.connectionCount);
+  }
+});
+
 test('nodes link to entity pages and surface fact links when present', () => {
   const view = buildHistoryViewModel({ decade: '1970s' });
   for (const node of view.nodes) {

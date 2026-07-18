@@ -22,6 +22,8 @@ export type HistoryNodeView = {
   readonly statusLabel: string;
   readonly statusKind: 'status' | 'event-window' | 'undated';
   readonly evidenceCount: number;
+  /** Evidence-backed edges touching this node in the current graph slice. */
+  readonly connectionCount: number;
   readonly href: string;
   readonly factLinks: readonly HistoryFactLink[];
   readonly topicTags: readonly string[];
@@ -132,6 +134,7 @@ function buildNodeView(
     statusLabel: status.label,
     statusKind: status.kind,
     evidenceCount: entity.claims.length,
+    connectionCount: 0,
     href: entityHref(entity.id),
     factLinks: buildFactLinks(entity.id),
     topicTags: entity.topicTags,
@@ -186,9 +189,24 @@ export function buildHistoryNodes(
     .filter((entity): entity is PublicEntityView => entity !== undefined)
     .map((entity) => buildNodeView(entity, slice.mode, slice.activeDecade));
 
-  return [...applyHistoryKindFilter(nodes, filters)].sort((a, b) =>
-    a.displayName.localeCompare(b.displayName),
-  );
+  // Kind only here; query + sort apply after connection counts are attached in the view-model.
+  return [...applyHistoryKindFilter(nodes, filters)];
+}
+
+/** Attach per-node connection counts from the visible edge set. */
+export function withHistoryConnectionCounts(
+  nodes: readonly HistoryNodeView[],
+  edges: readonly HistoryEdgeView[],
+): readonly HistoryNodeView[] {
+  const counts = new Map<string, number>();
+  for (const edge of edges) {
+    counts.set(edge.fromEntityId, (counts.get(edge.fromEntityId) ?? 0) + 1);
+    counts.set(edge.toEntityId, (counts.get(edge.toEntityId) ?? 0) + 1);
+  }
+  return nodes.map((node) => ({
+    ...node,
+    connectionCount: counts.get(node.entityId) ?? 0,
+  }));
 }
 
 export function buildHistoryEdges(

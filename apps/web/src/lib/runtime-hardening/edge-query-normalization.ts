@@ -12,9 +12,11 @@ export const QUERY_NORMALIZATION_MATCHER = [
   '/entity/:path*',
   '/explore',
   '/history',
+  '/facts',
   '/about',
   '/methodology',
   '/topics',
+  '/stories',
   '/corrections',
 ];
 

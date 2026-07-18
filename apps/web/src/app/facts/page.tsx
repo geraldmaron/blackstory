@@ -14,8 +14,9 @@ import {
 } from './facts-view-model';
 
 export const metadata = {
-  title: 'Fact library',
-  description: 'Search published canonical fact records with citations and revision history.',
+  title: 'Quick facts',
+  description:
+    'Did you know — short, citable pins from the BlackStory archive with citations and revision history.',
 };
 
 type FactsPageProps = {
@@ -31,11 +32,11 @@ export default async function FactsLibraryPage({ searchParams }: FactsPageProps)
   return (
     <main className="ds-container ds-page" id="main">
       <header className="ds-entity-mast">
-        <p className="ds-page__eyebrow">Reference</p>
-        <h1 className="ds-page__title">Fact library</h1>
+        <p className="ds-page__eyebrow">Did you know</p>
+        <h1 className="ds-page__title">Quick facts</h1>
         <p className="ds-page__lede">
-          Canonical, versioned, citable facts — each with structured citations, independent workflow
-          status and evidence grade, and a stable permalink every surface links to.
+          Short, citable pins — not essays. Each fact carries structured citations, an evidence
+          grade, and a stable permalink every surface can link to.
         </p>
       </header>
 
@@ -45,7 +46,7 @@ export default async function FactsLibraryPage({ searchParams }: FactsPageProps)
         <FilterBar
           method="get"
           action="/facts"
-          legend="Search published facts"
+          legend="Search quick facts"
           fields={[
             {
               id: 'q',

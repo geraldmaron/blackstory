@@ -4,6 +4,7 @@
  * edges; every node links to its entity page.
  */
 import React from 'react';
+import Link from 'next/link';
 import { cx, EmptyState } from '@repo/ui';
 import type { HistoryEdgeView, HistoryNodeView } from '../../lib/history/build-history-graph';
 import { HISTORY_GAP_COPY } from '../../lib/history/copy';
@@ -91,9 +92,9 @@ export function HistoryGraphPanel({
                       <span className="ds-history-graph__node-name">{node.displayName}</span>
                       <span className="ds-mono ds-history-graph__node-status">{node.statusLabel}</span>
                     </button>
-                    <a className="ds-cta ds-cta--quiet ds-history-graph__node-link" href={node.href}>
+                    <Link className="ds-cta ds-cta--quiet ds-history-graph__node-link" href={node.href}>
                       Open record
-                    </a>
+                    </Link>
                   </div>
 
                   {isSelected && nodeEdges.length > 0 ? (

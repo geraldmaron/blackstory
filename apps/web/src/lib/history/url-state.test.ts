@@ -23,6 +23,14 @@ test('parses decade mode and rebuilds shareable href', () => {
   );
 });
 
+test('parses q and sort into shareable href', () => {
+  const state = parseHistorySearchParams({ q: 'dunbar', sort: 'connections', kind: 'school' });
+  assert.equal(state.filters.q, 'dunbar');
+  assert.equal(state.filters.sort, 'connections');
+  assert.equal(state.filters.kind, 'school');
+  assert.equal(buildHistoryHref(state), '/history?kind=school&q=dunbar&sort=connections');
+});
+
 test('rejects malformed decade labels', () => {
   const state = parseHistorySearchParams({ decade: 'nineteen-fifties' });
   assert.equal(state.mode, 'all-time');

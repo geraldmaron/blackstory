@@ -81,23 +81,75 @@ test('normalizeQueryString keeps allowlisted /explore map params', () => {
     zoom: '6',
     selected: 'ent_dunbar_school_001',
     density: '1',
+    state: 'DC',
+    group: '1',
+    lines: '1',
+    decade: '1970s',
+    edge: 'rel_landmark_occurred_at_school',
     utm_source: 'x',
     junk: '1',
   });
   assert.equal(
     qs,
-    'density=1&era=1970s&kind=school&lat=38.9&lng=-77.0&selected=ent_dunbar_school_001&zoom=6',
+    'era=1970s&kind=school&lat=38.9000&lng=-77.0000&zoom=6.00&selected=ent_dunbar_school_001&state=DC&density=1&group=1&lines=1&decade=1970s&edge=rel_landmark_occurred_at_school',
   );
+});
+
+test('normalizeQueryString preserves /explore?state= revisit links (homepage chips)', () => {
+  assert.equal(normalizeQueryString('/explore', { state: 'dc' }), 'state=DC');
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/explore?state=DC')),
+    false,
+  );
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/explore?state=DC&utm_source=x')),
+    true,
+  );
+});
+
+test('normalizeQueryString canonicalizes explore density/true and viewport precision', () => {
+  const qs = normalizeQueryString('/explore', {
+    density: 'true',
+    lat: '38.90721234',
+    lng: '-77.03691234',
+    zoom: '11.555',
+  });
+  assert.equal(qs, 'lat=38.9072&lng=-77.0369&zoom=11.55&density=1');
 });
 
 test('normalizeQueryString keeps allowlisted /history browse params', () => {
   const qs = normalizeQueryString('/history', {
     decade: '1970s',
     kind: 'event',
+    q: 'dunbar',
+    sort: 'connections',
     selected: 'ent_dc_landmark_listing_1975',
     edge: 'edge_1',
     fbclid: 'abc',
     junk: '1',
   });
-  assert.equal(qs, 'decade=1970s&edge=edge_1&kind=event&selected=ent_dc_landmark_listing_1975');
+  assert.equal(
+    qs,
+    'decade=1970s&kind=event&q=dunbar&sort=connections&selected=ent_dc_landmark_listing_1975&edge=edge_1',
+  );
+});
+
+test('normalizeQueryString keeps allowlisted /facts library params', () => {
+  const qs = normalizeQueryString('/facts', {
+    q: ' school ',
+    claimType: 'founding',
+    confidence: 'high',
+    offset: '20',
+    utm_source: 'newsletter',
+    junk: '1',
+  });
+  assert.equal(qs, 'claimType=founding&confidence=high&offset=20&q=school');
+});
+
+test('buildNormalizedUrl issues canonical /explore URLs for revisit', () => {
+  const normalized = buildNormalizedUrl(
+    new URL('https://example.com/explore?utm_source=x&state=va&group=true&lines=1'),
+  );
+  assert.equal(normalized.pathname, '/explore');
+  assert.equal(normalized.search, '?state=VA&group=1&lines=1');
 });

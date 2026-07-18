@@ -1,10 +1,14 @@
 /**
  * Query-string normalization for public routes.
  * Random tracking params must not alter cache keys or force regeneration.
+ * Shareable map/history/facts links are canonicalized so revisit/bookmark URLs stay stable.
  */
 
+import { buildExploreSearchParams, parseExploreSearchParams } from '../map-experience/url-state';
+import { buildHistorySearchParams, parseHistorySearchParams } from '../history/url-state';
 import {
   EXPLORE_PAGE_PARAM_ALLOWLIST,
+  FACTS_PAGE_PARAM_ALLOWLIST,
   HISTORY_PAGE_PARAM_ALLOWLIST,
   SEARCH_PAGE_PARAM_ALLOWLIST,
   TRACKING_QUERY_KEYS,
@@ -36,6 +40,9 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   if (path === '/history') {
     return HISTORY_PAGE_PARAM_ALLOWLIST;
   }
+  if (path === '/facts') {
+    return FACTS_PAGE_PARAM_ALLOWLIST;
+  }
   return [];
 }
 
@@ -50,27 +57,46 @@ function readParamBag(input: URLSearchParams | QueryParamBag): QueryParamBag {
   return input;
 }
 
+function allowlistedBag(pathname: string, bag: QueryParamBag): QueryParamBag {
+  const allowed = new Set(getAllowedQueryParamsForPath(pathname));
+  const out: QueryParamBag = {};
+  for (const key of allowed) {
+    if (isTrackingKey(key)) continue;
+    const raw = firstString(bag[key]);
+    if (raw === undefined) continue;
+    const trimmed = raw.trim();
+    if (!trimmed) continue;
+    out[key] = trimmed;
+  }
+  return out;
+}
+
 /**
- * Returns a stable, sorted query string containing only allowed, non-tracking params.
+ * Returns a stable query string containing only allowed, non-tracking params.
+ * `/explore` and `/history` go through their parse→build helpers so revisit URLs match
+ * what the client writes (`density=1`, uppercase state, rounded viewport).
  * Empty string means no query component should appear in cache keys or redirects.
  */
 export function normalizeQueryString(
   pathname: string,
   input: URLSearchParams | QueryParamBag,
 ): string {
-  const allowed = new Set(getAllowedQueryParamsForPath(pathname));
-  const bag = readParamBag(input);
-  const normalized = new URLSearchParams();
+  const path = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
+  const bag = allowlistedBag(path, readParamBag(input));
 
-  for (const key of [...allowed].sort()) {
-    if (isTrackingKey(key)) continue;
-    const raw = firstString(bag[key]);
-    if (raw === undefined) continue;
-    const trimmed = raw.trim();
-    if (!trimmed) continue;
-    normalized.set(key, trimmed);
+  if (path === '/explore') {
+    return buildExploreSearchParams(parseExploreSearchParams(bag));
+  }
+  if (path === '/history') {
+    return buildHistorySearchParams(parseHistorySearchParams(bag));
   }
 
+  const normalized = new URLSearchParams();
+  for (const key of Object.keys(bag).sort()) {
+    const value = firstString(bag[key]);
+    if (value === undefined) continue;
+    normalized.set(key, value);
+  }
   return normalized.toString();
 }
 
