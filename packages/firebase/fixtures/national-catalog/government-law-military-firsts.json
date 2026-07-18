@@ -150,7 +150,7 @@
       "governors"
     ],
     "jurisdictionLabel": "New Orleans, Louisiana",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Pinchback family plot, Metairie Cemetery, New Orleans, Louisiana",
     "lat": 29.9813,
     "lng": -90.11742,
@@ -383,8 +383,8 @@
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "campus",
     "locationLabel": "Howard University, Washington, D.C., where Ray earned her law degree in 1872",
-    "lat": 38.922684,
-    "lng": -77.019438,
+    "lat": 38.92268,
+    "lng": -77.01944,
     "claims": [
       {
         "predicate": "first_to",
@@ -518,7 +518,7 @@
       "medicine"
     ],
     "jurisdictionLabel": "Arlington, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 1, Arlington, Virginia",
     "lat": 38.8829,
     "lng": -77.0654,
@@ -565,7 +565,7 @@
       "civil-war"
     ],
     "jurisdictionLabel": "Cedarville, Ohio",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Massies Creek Cemetery, Cedarville, Ohio, near Delany's Wilberforce home",
     "lat": 39.738116,
     "lng": -83.841316,
@@ -793,8 +793,8 @@
     "jurisdictionLabel": "Los Angeles, California",
     "locationPrecision": "institution",
     "locationLabel": "Los Angeles City Hall, 200 North Spring Street, Los Angeles, California",
-    "lat": 34.053713,
-    "lng": -118.242815,
+    "lat": 34.05162,
+    "lng": -118.24559,
     "claims": [
       {
         "predicate": "elected_on",
@@ -879,8 +879,8 @@
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "New York City Hall, City Hall Park, Manhattan, New York",
-    "lat": 40.712772,
-    "lng": -74.006058,
+    "lat": 40.71277,
+    "lng": -74.00606,
     "claims": [
       {
         "predicate": "sworn_in_on",
@@ -1188,8 +1188,8 @@
     "jurisdictionLabel": "Los Angeles, California",
     "locationPrecision": "institution",
     "locationLabel": "Los Angeles City Hall, 200 North Spring Street, Los Angeles, California",
-    "lat": 34.053713,
-    "lng": -118.242815,
+    "lat": 34.05162,
+    "lng": -118.24559,
     "claims": [
       {
         "predicate": "elected_on",
@@ -1232,8 +1232,8 @@
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
-    "lat": 38.889805,
-    "lng": -77.009056,
+    "lat": 38.88981,
+    "lng": -77.00906,
     "claims": [
       {
         "predicate": "elected_on",
@@ -1276,8 +1276,8 @@
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
-    "lat": 38.889805,
-    "lng": -77.009056,
+    "lat": 38.88981,
+    "lng": -77.00906,
     "claims": [
       {
         "predicate": "elected_on",
@@ -1320,8 +1320,8 @@
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
-    "lat": 38.889805,
-    "lng": -77.009056,
+    "lat": 38.88981,
+    "lng": -77.00906,
     "claims": [
       {
         "predicate": "elected_on",
@@ -1364,8 +1364,8 @@
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
-    "lat": 38.889805,
-    "lng": -77.009056,
+    "lat": 38.88981,
+    "lng": -77.00906,
     "claims": [
       {
         "predicate": "elected_on",
@@ -1407,8 +1407,8 @@
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
-    "lat": 38.889805,
-    "lng": -77.009056,
+    "lat": 38.88981,
+    "lng": -77.00906,
     "claims": [
       {
         "predicate": "elected_on",
@@ -1494,8 +1494,8 @@
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
-    "lat": 38.889805,
-    "lng": -77.009056,
+    "lat": 38.88981,
+    "lng": -77.00906,
     "claims": [
       {
         "predicate": "elected_on",
@@ -1625,8 +1625,8 @@
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
-    "lat": 38.889805,
-    "lng": -77.009056,
+    "lat": 38.88981,
+    "lng": -77.00906,
     "claims": [
       {
         "predicate": "elected_on",
@@ -1670,8 +1670,8 @@
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
-    "lat": 38.889805,
-    "lng": -77.009056,
+    "lat": 38.88981,
+    "lng": -77.00906,
     "claims": [
       {
         "predicate": "first_to",
@@ -1713,8 +1713,8 @@
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
-    "lat": 38.889805,
-    "lng": -77.009056,
+    "lat": 38.88981,
+    "lng": -77.00906,
     "claims": [
       {
         "predicate": "first_to",
@@ -2552,8 +2552,8 @@
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
-    "lat": 38.889805,
-    "lng": -77.009056,
+    "lat": 38.88981,
+    "lng": -77.00906,
     "claims": [
       {
         "predicate": "sworn_in_on",
@@ -2595,8 +2595,8 @@
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
-    "lat": 38.889805,
-    "lng": -77.009056,
+    "lat": 38.88981,
+    "lng": -77.00906,
     "claims": [
       {
         "predicate": "sworn_in_on",
@@ -2815,7 +2815,7 @@
       "army"
     ],
     "jurisdictionLabel": "West Point, New York",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "United States Military Academy, West Point, New York",
     "lat": 41.3908,
     "lng": -73.966,
@@ -2860,7 +2860,7 @@
       "army"
     ],
     "jurisdictionLabel": "Arlington, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 2, Arlington, Virginia",
     "lat": 38.8829,
     "lng": -77.0654,
@@ -2907,7 +2907,7 @@
       "air-force"
     ],
     "jurisdictionLabel": "Arlington, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 2, Arlington, Virginia",
     "lat": 38.8829,
     "lng": -77.0654,
@@ -3044,7 +3044,7 @@
       "army"
     ],
     "jurisdictionLabel": "Arlington, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 59, Arlington, Virginia",
     "lat": 38.8829,
     "lng": -77.0654,
@@ -3089,7 +3089,7 @@
       "air-force"
     ],
     "jurisdictionLabel": "Arlington, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Arlington, Virginia",
     "lat": 38.8829,
     "lng": -77.0654,
@@ -3181,7 +3181,7 @@
       "army"
     ],
     "jurisdictionLabel": "Arlington, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Arlington, Virginia",
     "lat": 38.8829,
     "lng": -77.0654,
@@ -3226,7 +3226,7 @@
       "air-force"
     ],
     "jurisdictionLabel": "Arlington, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 2, Arlington, Virginia",
     "lat": 38.8829,
     "lng": -77.0654,
@@ -3272,7 +3272,7 @@
       "navy"
     ],
     "jurisdictionLabel": "Arlington, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 66, Arlington, Virginia",
     "lat": 38.8829,
     "lng": -77.0654,
@@ -3318,7 +3318,7 @@
       "marine-corps"
     ],
     "jurisdictionLabel": "Arlington, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Arlington, Virginia",
     "lat": 38.8829,
     "lng": -77.0654,
@@ -3364,7 +3364,7 @@
       "medicine"
     ],
     "jurisdictionLabel": "Arlington, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 60, Arlington, Virginia",
     "lat": 38.8829,
     "lng": -77.0654,
@@ -3411,7 +3411,7 @@
       "army"
     ],
     "jurisdictionLabel": "Prince George County, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Fort Gregg-Adams (formerly Fort Lee), Prince George County, Virginia",
     "lat": 37.233,
     "lng": -77.34222,

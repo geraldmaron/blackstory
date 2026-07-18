@@ -1173,7 +1173,7 @@
       "equal-protection"
     ],
     "jurisdictionLabel": "Topeka, Kansas",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Monroe Elementary School (now Brown v. Board of Education National Historical Park), Topeka, Kansas",
     "lat": 39.0392,
     "lng": -95.6702,
@@ -1361,7 +1361,7 @@
       "segregation"
     ],
     "jurisdictionLabel": "Austin, Texas",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "University of Texas School of Law, Austin, Texas",
     "lat": 30.2849,
     "lng": -97.7341,
@@ -1686,7 +1686,7 @@
       "affirmative-action"
     ],
     "jurisdictionLabel": "Davis, California",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "University of California, Davis School of Medicine, Davis, California",
     "lat": 38.5449,
     "lng": -121.7405,
@@ -2243,7 +2243,7 @@
       "segregation"
     ],
     "jurisdictionLabel": "Berea, Kentucky",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Berea College, Berea, Kentucky",
     "lat": 37.5693,
     "lng": -84.2963,
@@ -2337,10 +2337,10 @@
       "segregation"
     ],
     "jurisdictionLabel": "Norman, Oklahoma",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "University of Oklahoma, Norman, Oklahoma",
-    "lat": 35.2226,
-    "lng": -97.4395,
+    "lat": 35.20861,
+    "lng": -97.44583,
     "claims": [
       {
         "predicate": "decided_on",
@@ -2384,10 +2384,10 @@
       "segregation"
     ],
     "jurisdictionLabel": "Norman, Oklahoma",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "University of Oklahoma, Norman, Oklahoma",
-    "lat": 35.2226,
-    "lng": -97.4395,
+    "lat": 35.20861,
+    "lng": -97.44583,
     "claims": [
       {
         "predicate": "decided_on",

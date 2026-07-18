@@ -480,6 +480,9 @@ export {
   suggestedPrecisionForEvidence,
   decideLocationCorrection,
   buildLocationGeocodeQuery,
+  placeTitleCandidateFromLabel,
+  placeTitleCandidatesFromLabel,
+  isJurisdictionOnlyPlaceTitle,
   extractStreetFingerprint,
   streetAddressesCompatible,
 } from './geography/location-audit.js';
@@ -495,6 +498,9 @@ export type {
 
 export { buildEntityLocationFromResolution } from './geography/entity-location-from-geocode.js';
 export type { BuildEntityLocationFromResolutionInput } from './geography/entity-location-from-geocode.js';
+
+export { coordinateFromWikidataEntity } from './geography/wikidata-place-coords.js';
+export type { WikidataPlaceCoordinate } from './geography/wikidata-place-coords.js';
 
 export {
   asClaimId,

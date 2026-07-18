@@ -6,6 +6,7 @@
  * EntityLocation writes, and publish all share one accept/correct/downgrade policy.
  */
 import { haversineMeters, type GeoPoint } from './geohash.js';
+import { buildCensusGeocodeQuery } from '../geocode/address-normalize.js';
 
 /** How much site evidence the locationLabel actually carries (not the claimed precision). */
 export const LOCATION_EVIDENCE_CLASSES = ['street_address', 'named_place', 'area_only'] as const;
@@ -406,14 +407,125 @@ export function decideLocationCorrection(input: DecideLocationCorrectionInput): 
   };
 }
 
-/** Build the one-line Census/Nominatim query from catalog fields. */
+/** Build the one-line geocode query from catalog fields (street-preferring, Census-oriented). */
 export function buildLocationGeocodeQuery(locationLabel: string, jurisdictionLabel: string): string {
-  const label = locationLabel.trim();
-  const jurisdiction = jurisdictionLabel.trim();
-  if (!jurisdiction) return label;
-  const cityHint = jurisdiction.split(',')[0]?.trim() ?? '';
-  if (cityHint && label.toLowerCase().includes(cityHint.toLowerCase())) {
-    return label;
-  }
-  return `${label}, ${jurisdiction}`;
+  return buildCensusGeocodeQuery(locationLabel, jurisdictionLabel);
 }
+
+/**
+ * Best-effort English Wikipedia title from a catalog locationLabel.
+ * "Howard University, Washington, D.C." → "Howard University"
+ */
+export function placeTitleCandidateFromLabel(locationLabel: string): string {
+  return placeTitleCandidatesFromLabel(locationLabel)[0] ?? locationLabel.trim();
+}
+
+/**
+ * Ordered Wikidata/enwiki title guesses for a catalog locationLabel.
+ * Tries the head segment first, then parent sites (university, space center, cemetery, …).
+ * Never emits bare US state / DC jurisdiction tails (those resolve to state centroids).
+ */
+export function placeTitleCandidatesFromLabel(locationLabel: string): readonly string[] {
+  const cleaned = locationLabel
+    .replace(/\s*\([^)]*\)\s*/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const beforeStreet = cleaned.split(/\b\d{1,5}\s+[A-Za-z0-9]/)[0]?.trim();
+  const head = (beforeStreet && beforeStreet.length >= 3 ? beforeStreet : cleaned).replace(/,\s*$/, '');
+  const segments = head
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length >= 3);
+
+  const out: string[] = [];
+  const push = (value: string | undefined) => {
+    const v = value?.trim();
+    if (!v || v.length < 3) return;
+    if (isJurisdictionOnlyPlaceTitle(v)) return;
+    if (out.some((x) => x.toLowerCase() === v.toLowerCase())) return;
+    out.push(v);
+  };
+
+  // Head only — do not emit every comma segment (cities/states pollute Wikidata matches).
+  push(segments[0] ?? head);
+
+  const parentHint =
+    /\b(university|college|hospital|cemetery|museum|library|space center|research center|air force base|naval|fort|park|church|cathedral|institute|academy|refuge|plantation|battlefield)\b/i;
+  for (const seg of segments.slice(1)) {
+    if (parentHint.test(seg)) push(seg);
+  }
+
+  if (out.length === 0 && !isJurisdictionOnlyPlaceTitle(head)) push(head);
+  return out;
+}
+
+const US_STATE_PLACE_TITLES = new Set(
+  [
+    'alabama',
+    'alaska',
+    'arizona',
+    'arkansas',
+    'california',
+    'colorado',
+    'connecticut',
+    'delaware',
+    'florida',
+    'georgia',
+    'hawaii',
+    'idaho',
+    'illinois',
+    'indiana',
+    'iowa',
+    'kansas',
+    'kentucky',
+    'louisiana',
+    'maine',
+    'maryland',
+    'massachusetts',
+    'michigan',
+    'minnesota',
+    'mississippi',
+    'missouri',
+    'montana',
+    'nebraska',
+    'nevada',
+    'new hampshire',
+    'new jersey',
+    'new mexico',
+    'new york',
+    'north carolina',
+    'north dakota',
+    'ohio',
+    'oklahoma',
+    'oregon',
+    'pennsylvania',
+    'rhode island',
+    'south carolina',
+    'south dakota',
+    'tennessee',
+    'texas',
+    'utah',
+    'vermont',
+    'virginia',
+    'washington',
+    'west virginia',
+    'wisconsin',
+    'wyoming',
+    'district of columbia',
+    'd.c.',
+    'dc',
+    'washington d.c.',
+    'washington dc',
+  ].map((s) => s.toLowerCase()),
+);
+
+/** True when a title is only a US state / DC (unsafe as a Wikidata pin source). */
+export function isJurisdictionOnlyPlaceTitle(title: string): boolean {
+  const normalized = title
+    .trim()
+    .toLowerCase()
+    .replace(/\.$/, '')
+    .replace(/\s+/g, ' ');
+  return US_STATE_PLACE_TITLES.has(normalized);
+}
+

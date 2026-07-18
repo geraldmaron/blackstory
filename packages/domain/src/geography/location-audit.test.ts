@@ -162,13 +162,13 @@ test('decideLocationCorrection reviews street drift beyond 2km safety cap', () =
   assert.match(decision.reason, /2km safety cap/i);
 });
 
-test('buildLocationGeocodeQuery avoids duplicating city when already in label', () => {
+test('buildLocationGeocodeQuery extracts street segment for Census-friendly queries', () => {
   assert.equal(
     buildLocationGeocodeQuery(
       'A.G. Gaston Motel, 1510 5th Avenue North, Birmingham',
       'Birmingham, Alabama',
     ),
-    'A.G. Gaston Motel, 1510 5th Avenue North, Birmingham',
+    '1510 5th Avenue North, Birmingham',
   );
   assert.equal(
     buildLocationGeocodeQuery('Howard University', 'Washington, District of Columbia'),

@@ -103,10 +103,14 @@ Human-or-agent researched entities (the `fixtures/national-catalog/*.json` →
 - After fixture edits, run the Census location audit (deterministic, cached, no LLM):
   `node --conditions development --import tsx packages/firebase/scripts/audit-entity-locations.ts`.
   Street-address pins beyond the precision drift threshold can be auto-corrected with
-  `--apply-street-corrections`. Named places that Census cannot resolve stay `review`.
-  Operator one-off: `operator-cli locate --entity-id … --address …` (see
-  `.claude/skills/black-book/locate/SKILL.md`). Publish prefers
-  `canonicalEntities/{id}/locations/*` over catalog lat/lng when present.
+  `--apply-street-corrections`. Named places: run
+  `enrich-entity-locations.ts --apply` (Wikidata P625 → git-durable
+  `national-catalog-location-overrides.json`; raw JSON under `.cache/wikidata-entities/`).
+  Live APIs are enrichment-only — publish/map read overrides + EntityLocation, never live
+  geocoders. Never snap to US state/city centroids; parent-site snaps are capped at 15km,
+  otherwise retain the pin and honesty-downgrade precision. Operator one-off:
+  `operator-cli locate --entity-id … --address …` (see
+  `.claude/skills/black-book/locate/SKILL.md`).
 - Dignity framing per BB-051: presence and institution-building, never deficit;
   `sensitivityClass` only where violence is the documented subject.
 - Claims carry `confidenceLevel` honestly (`high` only when the cited source states it

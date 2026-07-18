@@ -667,7 +667,7 @@
       "firsts"
     ],
     "jurisdictionLabel": "Columbus, Georgia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Eugene Bullard historical marker, Talbotton Road near Midland Avenue, Columbus, Georgia",
     "lat": 32.4852,
     "lng": -84.9781,
@@ -714,7 +714,7 @@
       "education"
     ],
     "jurisdictionLabel": "Bridgeview, Illinois",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Former Harlem Airport / Coffey School of Aeronautics site, near 87th Street and Harlem Avenue (now Southfield Shopping Center), Bridgeview, Illinois",
     "lat": 41.731,
     "lng": -87.7983,
@@ -762,10 +762,10 @@
       "science"
     ],
     "jurisdictionLabel": "Cape Canaveral, Florida",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Launch Complex 39A, Kennedy Space Center, Florida",
-    "lat": 28.6083,
-    "lng": -80.6041,
+    "lat": 28.52472,
+    "lng": -80.64861,
     "claims": [
       {
         "predicate": "became",
@@ -810,10 +810,10 @@
       "women"
     ],
     "jurisdictionLabel": "Cape Canaveral, Florida",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Launch Complex 39B, Kennedy Space Center, Florida",
-    "lat": 28.6272,
-    "lng": -80.6208,
+    "lat": 28.52472,
+    "lng": -80.64861,
     "claims": [
       {
         "predicate": "became",
@@ -1001,10 +1001,10 @@
       "military"
     ],
     "jurisdictionLabel": "Edwards Air Force Base, California",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Edwards Air Force Base, California",
-    "lat": 34.8899,
-    "lng": -117.833,
+    "lat": 34.92389,
+    "lng": -117.89126,
     "claims": [
       {
         "predicate": "became",
@@ -1047,10 +1047,10 @@
       "firsts"
     ],
     "jurisdictionLabel": "Cape Canaveral, Florida",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Launch Complex 39A, Kennedy Space Center, Florida",
-    "lat": 28.6083,
-    "lng": -80.6041,
+    "lat": 28.52472,
+    "lng": -80.64861,
     "claims": [
       {
         "predicate": "piloted",
@@ -1093,10 +1093,10 @@
       "medicine"
     ],
     "jurisdictionLabel": "Cape Canaveral, Florida",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Launch Complex 39B, Kennedy Space Center, Florida",
-    "lat": 28.6272,
-    "lng": -80.6208,
+    "lat": 28.52472,
+    "lng": -80.64861,
     "claims": [
       {
         "predicate": "became",
@@ -1429,7 +1429,7 @@
       "firsts"
     ],
     "jurisdictionLabel": "Washington, District of Columbia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Howard University College of Medicine / Howard University Hospital, Georgia Avenue NW, Washington, D.C.",
     "lat": 38.9178,
     "lng": -77.0201,
@@ -1620,8 +1620,8 @@
     "jurisdictionLabel": "Berkeley, California",
     "locationPrecision": "campus",
     "locationLabel": "University of California, Berkeley, California",
-    "lat": 37.8755,
-    "lng": -122.2391,
+    "lat": 37.80222,
+    "lng": -122.27139,
     "claims": [
       {
         "predicate": "became",
@@ -1856,7 +1856,7 @@
       "women"
     ],
     "jurisdictionLabel": "Boston, Massachusetts",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Fairview Cemetery, Hyde Park, Boston, Massachusetts",
     "lat": 42.2473,
     "lng": -71.1416,
@@ -1904,7 +1904,7 @@
       "firsts"
     ],
     "jurisdictionLabel": "New York, New York",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Site of Smith's medical office and pharmacy, West Broadway near Chambers Street, Manhattan, New York",
     "lat": 40.7153,
     "lng": -74.0089,
@@ -2654,7 +2654,7 @@
       "women"
     ],
     "jurisdictionLabel": "Greenbelt, Maryland",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "NASA Goddard Space Flight Center, Greenbelt, Maryland",
     "lat": 38.9998,
     "lng": -76.8459,
@@ -2749,7 +2749,7 @@
       "women"
     ],
     "jurisdictionLabel": "Murray Hill, New Jersey",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Bell Labs, Murray Hill, New Jersey",
     "lat": 40.6954,
     "lng": -74.401,
@@ -3026,7 +3026,7 @@
       "space"
     ],
     "jurisdictionLabel": "Washington, District of Columbia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "U.S. Naval Research Laboratory, Washington, D.C.",
     "lat": 38.8245,
     "lng": -77.0242,
@@ -3073,7 +3073,7 @@
       "space"
     ],
     "jurisdictionLabel": "Greenbelt, Maryland",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "NASA Goddard Space Flight Center, Greenbelt, Maryland",
     "lat": 38.9998,
     "lng": -76.8459,
@@ -3216,7 +3216,7 @@
       "education"
     ],
     "jurisdictionLabel": "St. Louis, Missouri",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Sumner High School, St. Louis, Missouri",
     "lat": 38.6595,
     "lng": -90.2389,

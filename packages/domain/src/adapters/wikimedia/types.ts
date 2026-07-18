@@ -110,11 +110,16 @@ export type WikidataClaimValue = {
   readonly longitude?: number;
 };
 
+/**
+ * Wikidata claim snak value. Commons media (P18) uses a bare filename string;
+ * most other properties use a structured object.
+ */
 export type WikidataClaim = {
+  readonly rank?: 'preferred' | 'normal' | 'deprecated';
   readonly mainsnak: {
     readonly property: string;
     readonly datavalue?: {
-      readonly value: WikidataClaimValue;
+      readonly value: WikidataClaimValue | string;
     };
   };
 };

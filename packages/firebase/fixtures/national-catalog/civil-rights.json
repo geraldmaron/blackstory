@@ -132,8 +132,8 @@
     "jurisdictionLabel": "Selma, Alabama",
     "locationPrecision": "institution",
     "locationLabel": "Edmund Pettus Bridge, U.S. Route 80 at Broad Street, Selma",
-    "lat": 32.4053,
-    "lng": -87.0186,
+    "lat": 32.40765,
+    "lng": -87.01974,
     "claims": [
       {
         "predicate": "site_of",
@@ -655,7 +655,7 @@
       "naacp"
     ],
     "jurisdictionLabel": "Wichita, Kansas",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Former Dockum Drug Store site, Douglas Avenue and Broadway, Wichita",
     "lat": 37.6858,
     "lng": -97.3356,

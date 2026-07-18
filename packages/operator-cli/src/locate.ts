@@ -6,7 +6,7 @@
 import {
   US_STATES,
   buildEntityLocationFromResolution,
-  buildLocationGeocodeQuery,
+  buildCensusGeocodeQuery,
   classifyLocationEvidence,
   decideLocationCorrection,
   fetchCensusAddressGeocode,
@@ -84,8 +84,8 @@ export async function prepareLocate(
   const precision = input.locationPrecision ?? 'institution';
   const jurisdictionLabel = input.jurisdictionLabel ?? '';
   const query = jurisdictionLabel
-    ? buildLocationGeocodeQuery(input.address, jurisdictionLabel)
-    : input.address;
+    ? buildCensusGeocodeQuery(input.address, jurisdictionLabel)
+    : buildCensusGeocodeQuery(input.address, '');
   const normalized = normalizeAddressInput(query);
   if (!normalized.queryText) {
     return { ok: false, reason: 'empty_address' };

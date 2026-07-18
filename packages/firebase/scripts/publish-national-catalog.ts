@@ -32,7 +32,7 @@
  *     packages/firebase/scripts/publish-national-catalog.ts
  *   DRY_RUN=1 ... — validate + print without writing.
  */
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
@@ -251,6 +251,7 @@ async function main(): Promise<void> {
   );
 
   // Prefer canonical EntityLocation docs (Census-validated) over catalog lat/lng.
+  // Then prefer git-durable national-catalog-location-overrides.json (survives API outages).
   const locationOverrides = new Map<
     string,
     {
@@ -261,6 +262,31 @@ async function main(): Promise<void> {
       locationLabel?: string;
     }
   >();
+
+  const overridesPath = join(catalogDir, '../national-catalog-location-overrides.json');
+  if (existsSync(overridesPath)) {
+    const file = JSON.parse(readFileSync(overridesPath, 'utf8')) as {
+      overrides?: Record<
+        string,
+        {
+          lat: number;
+          lng: number;
+          precision?: string;
+          matchMethod?: string;
+        }
+      >;
+    };
+    for (const [entityId, override] of Object.entries(file.overrides ?? {})) {
+      locationOverrides.set(entityId, {
+        lat: override.lat,
+        lng: override.lng,
+        ...(override.precision ? { precision: override.precision } : {}),
+        ...(override.matchMethod ? { matchMethod: override.matchMethod } : {}),
+      });
+    }
+    console.log(`Loaded ${locationOverrides.size} git-durable location overrides from fixture`);
+  }
+
   let locationOverrideCount = 0;
   for (const entry of entries) {
     const locs = await db.collection(`canonicalEntities/${entry.id}/locations`).limit(5).get();
@@ -289,6 +315,7 @@ async function main(): Promise<void> {
             : undefined;
       if (typeof lat !== 'number' || typeof lng !== 'number') continue;
       const match = data.match as { method?: string } | undefined;
+      // Firestore EntityLocation wins over git overrides when present.
       locationOverrides.set(entry.id, {
         lat,
         lng,
@@ -301,7 +328,8 @@ async function main(): Promise<void> {
     }
   }
   console.log(
-    `EntityLocation overrides: ${locationOverrideCount} of ${entries.length} (catalog lat/lng is manual_research fallback)`,
+    `EntityLocation Firestore overrides applied: ${locationOverrideCount}; ` +
+      `total location overrides for publish: ${locationOverrides.size}`,
   );
 
   // Validate EVERYTHING before writing anything; name each failing entry so a bad catalog

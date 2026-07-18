@@ -28,9 +28,15 @@ node --conditions development --import tsx packages/firebase/scripts/audit-entit
 # High-confidence street corrections only:
 node --conditions development --import tsx packages/firebase/scripts/audit-entity-locations.ts \
   --apply-street-corrections
+# Named places via Wikidata P625 (writes git-durable overrides + archives raw JSON):
+node --conditions development --import tsx packages/firebase/scripts/enrich-entity-locations.ts --apply
 ```
 
-Report: `.cache/location-audit-report.json`. Cache: `.cache/geocode-census.json` (never re-geocode the same query).
+Durability: accepted pins live in `national-catalog-location-overrides.json` (git) and/or
+Firestore EntityLocation. Raw Wikidata entities are archived under `.cache/wikidata-entities/`.
+Publish/map never call live geocoders. Enrichment never snaps to US state/city centroids;
+parent-site Wikidata snaps are capped at 15km, otherwise pins are retained with an honesty
+precision downgrade.
 
 ## Precision policy (no LLM)
 

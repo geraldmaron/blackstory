@@ -21,6 +21,9 @@ export {
   normalizeAddressInput,
   coordinateCacheKey,
   zipCacheKey,
+  normalizeFractionalHouseNumbers,
+  extractStreetAddressCandidate,
+  buildCensusGeocodeQuery,
   type NormalizedAddressInput,
 } from './address-normalize.js';
 

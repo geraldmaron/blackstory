@@ -2056,7 +2056,7 @@
       "organizing"
     ],
     "jurisdictionLabel": "Montgomery, Alabama",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "First Baptist Church, North Ripley Street, Montgomery",
     "lat": 32.3819,
     "lng": -86.2986,
@@ -2923,7 +2923,7 @@
       "politics"
     ],
     "jurisdictionLabel": "Atlantic City, New Jersey",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Atlantic City Convention Hall (Boardwalk Hall), Atlantic City",
     "lat": 39.3634,
     "lng": -74.4391,

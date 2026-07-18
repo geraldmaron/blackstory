@@ -13,7 +13,7 @@ export function SeedDataNotice({ compact = false }: SeedDataNoticeProps) {
     <Notice tone="warning" title="Sample seed data">
       {compact
         ? 'This view reads local fixtures, not live public projections (live projections pending).'
-        : 'Blap is showing emulator/seed fixtures for UI demonstration. These records are not a production release and must not be treated as verified live research output.'}
+        : 'BlackStory is showing emulator/seed fixtures for UI demonstration. These records are not a production release and must not be treated as verified live research output.'}
     </Notice>
   );
 }

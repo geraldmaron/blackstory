@@ -138,6 +138,8 @@ pnpm --filter @repo/web exec next dev --port 3048
 # Location accuracy (Census geocode, cached, no LLM) — see docs/runbooks/data-ingestion-methodology.md
 node --conditions development --import tsx packages/firebase/scripts/qa-catalog-fixtures.ts
 node --conditions development --import tsx packages/firebase/scripts/audit-entity-locations.ts
+# Named-place enrichment (Wikidata P625) → git-durable overrides
+node --conditions development --import tsx packages/firebase/scripts/enrich-entity-locations.ts --apply
 # Optional: snap high-confidence street pins only
 # node --conditions development --import tsx packages/firebase/scripts/audit-entity-locations.ts --apply-street-corrections
 node --conditions development --import tsx packages/operator-cli/src/bin.ts locate \

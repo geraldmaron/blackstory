@@ -350,7 +350,7 @@ export const seedPublicSchoolEntity: PublicEntityProjectionDoc = {
   primaryImage: {
     url: 'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_dunbar_school_001/primary.png',
     alt: 'Schematic mark representing the Paul Laurence Dunbar High School campus record',
-    credit: 'Black Book brand system public-domain-style fixture pending a rights-cleared photo',
+    credit: 'BlackStory brand system public-domain-style fixture pending a rights-cleared photo',
     rightsStatus: 'public_domain',
     objectPath: 'public/entities/ent_dunbar_school_001/primary.png',
   },

@@ -77,3 +77,48 @@ export function coordinateCacheKey(lat: number, lng: number): string {
 export function zipCacheKey(zip: string): string {
   return `zip:${zip.trim()}`;
 }
+
+/**
+ * Make fractional / unicode house numbers Census-friendly before geocoding.
+ * Handles vulgar fractions (½) and NFKC forms that use U+2044 fraction slash.
+ */
+export function normalizeFractionalHouseNumbers(raw: string): string {
+  return normalizeAddressText(raw)
+    .replace(/\u00BD/g, ' 1/2') // ½
+    .replace(/\u00BC/g, ' 1/4') // ¼
+    .replace(/\u00BE/g, ' 3/4') // ¾
+    .replace(/(\d)\s*1\u2044?2\b/g, '$1 1/2') // 1½ or NFKC 1101⁄2
+    .replace(/(\d)1\u20442\b/g, '$1 1/2')
+    .replace(/(\d)\s*1\/2\b/g, '$1 1/2')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Prefer a street-number segment from a prose locationLabel for Census.
+ * "Site Name, 123 Main Street, City" → "123 Main Street, City" when possible.
+ */
+export function extractStreetAddressCandidate(locationLabel: string): string | undefined {
+  const normalized = normalizeFractionalHouseNumbers(locationLabel);
+  const match = normalized.match(/\b\d{1,5}(?:\s+1\/[234])?\s+[A-Za-z0-9].*/);
+  if (!match?.[0]) return undefined;
+  // Drop leading "near " / parentheticals that confuse Census.
+  return match[0]
+    .replace(/^\s*(near|at|along)\s+/i, '')
+    .replace(/\s*\([^)]*\)\s*/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Build the Census query: street candidate when present, else full label + jurisdiction. */
+export function buildCensusGeocodeQuery(locationLabel: string, jurisdictionLabel: string): string {
+  const street = extractStreetAddressCandidate(locationLabel);
+  const base = street ?? normalizeFractionalHouseNumbers(locationLabel);
+  const jurisdiction = jurisdictionLabel.trim();
+  if (!jurisdiction) return base;
+  const cityHint = jurisdiction.split(',')[0]?.trim() ?? '';
+  if (cityHint && base.toLowerCase().includes(cityHint.toLowerCase())) {
+    return base;
+  }
+  return `${base}, ${jurisdiction}`;
+}

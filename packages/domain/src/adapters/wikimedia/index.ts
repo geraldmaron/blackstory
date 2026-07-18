@@ -62,6 +62,47 @@ export {
 export { chunkBulkRecords, parseWikimediaBulkBatch } from './bulk.js';
 
 export {
+  COMMONS_MEDIA_OUTCOMES,
+  COMMONS_MEDIA_PROPOSE_VERSION,
+  buildAltText,
+  buildCreditLine,
+  chunkForWikimediaBatch,
+  commonsFilePageUrl,
+  enwikiTitleFromDisplayName,
+  evaluateCommonsMediaPropose,
+  extractP18Candidates,
+  isExactLabelMatch,
+  mapCommonsLicenseToRights,
+  normalizeLabel,
+  selectSingleP18,
+  summarizeCommonsMediaProposes,
+  wikipediaEnUrl,
+  wikidataUrl,
+  type CommonsImageMetadata,
+  type CommonsMediaDryRunCounts,
+  type CommonsMediaOutcome,
+  type CommonsMediaPropose,
+  type CommonsP18Candidate,
+  type EntityMediaEnrichmentInput,
+  type EntityResourceLinkPropose,
+} from './commons-media.js';
+
+export {
+  WIKIMEDIA_USER_AGENT,
+  createCommonsMediaClient,
+  type CommonsMediaClient,
+  type EnwikiTitleResolveResult,
+  type FetchCommonsMediaClientOptions,
+  type WikimediaHttpFetch,
+} from './commons-media-client.js';
+
+export {
+  runCommonsMediaEnrichment,
+  type RunCommonsMediaEnrichmentInput,
+  type RunCommonsMediaEnrichmentResult,
+} from './commons-media-enrichment.js';
+
+export {
   WIKIMEDIA_ADAPTER_ID,
   WIKIMEDIA_INGEST_MODES,
   WIKIMEDIA_PARSER_VERSION,

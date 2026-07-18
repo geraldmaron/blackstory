@@ -23,10 +23,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   US_STATES,
-  buildLocationGeocodeQuery,
   decideLocationCorrection,
   fetchCensusAddressGeocode,
   normalizeAddressInput,
+  buildCensusGeocodeQuery,
   type LocationCorrectionDecision,
   type SafeHttpClient,
 } from '@repo/domain';
@@ -198,7 +198,7 @@ async function main(): Promise<void> {
   const cacheSizeBefore = Object.keys(cache.entries).length;
 
   for (const entry of entries) {
-    const query = buildLocationGeocodeQuery(entry.locationLabel, entry.jurisdictionLabel);
+    const query = buildCensusGeocodeQuery(entry.locationLabel, entry.jurisdictionLabel);
     const sizeBefore = Object.keys(cache.entries).length;
     const match = await geocodeCached(query, cache);
     if (Object.keys(cache.entries).length === sizeBefore) cacheHits += 1;

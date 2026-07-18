@@ -62,7 +62,7 @@
       "community"
     ],
     "jurisdictionLabel": "Auburn, New York",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Harriet Tubman Home for the Aged, South Street, Auburn",
     "lat": 42.9115,
     "lng": -76.5637,
@@ -155,7 +155,7 @@
       "settlement"
     ],
     "jurisdictionLabel": "St. Augustine, Florida",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Fort Mose Historic State Park, St. Augustine",
     "lat": 29.9278,
     "lng": -81.3254,
@@ -200,7 +200,7 @@
       "emancipation"
     ],
     "jurisdictionLabel": "Hampton, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Hampton University campus, Hampton",
     "lat": 37.0237,
     "lng": -76.3307,
@@ -304,7 +304,7 @@
       "emancipation"
     ],
     "jurisdictionLabel": "Hampton, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Fort Monroe National Monument, Old Point Comfort, Hampton",
     "lat": 37.004,
     "lng": -76.3074,
@@ -513,7 +513,7 @@
       "firsts"
     ],
     "jurisdictionLabel": "Tuskegee, Alabama",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Moton Field, Tuskegee",
     "lat": 32.4554,
     "lng": -85.6798,
@@ -610,7 +610,7 @@
       "firsts"
     ],
     "jurisdictionLabel": "Fort Leavenworth, Kansas",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Buffalo Soldier Commemorative Area, Fort Leavenworth",
     "lat": 39.3463,
     "lng": -94.9247,
@@ -655,7 +655,7 @@
       "firsts"
     ],
     "jurisdictionLabel": "Chicago, Illinois",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Pullman Historic District, Chicago",
     "lat": 41.6943,
     "lng": -87.6087,
@@ -700,7 +700,7 @@
       "military"
     ],
     "jurisdictionLabel": "Galveston, Texas",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Reedy Chapel-AME Church, Broadway, Galveston",
     "lat": 29.3007,
     "lng": -94.7891,

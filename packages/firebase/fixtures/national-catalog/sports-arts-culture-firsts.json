@@ -165,7 +165,7 @@
       "firsts"
     ],
     "jurisdictionLabel": "Clarksville, Tennessee",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Wilma Rudolph Statue, Wilma Rudolph Event Center, Liberty Park, Clarksville, TN",
     "lat": 36.505,
     "lng": -87.3695,
@@ -985,7 +985,7 @@
       "bobsled"
     ],
     "jurisdictionLabel": "Park City, Utah",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Utah Olympic Park, Park City, UT",
     "lat": 40.7047,
     "lng": -111.5583,
@@ -1503,8 +1503,8 @@
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "Site of the former 54th Street Theatre, 152 West 54th Street, Manhattan (now New York Hilton Midtown)",
-    "lat": 40.7625,
-    "lng": -73.9794,
+    "lat": 40.76332,
+    "lng": -73.98093,
     "claims": [
       {
         "predicate": "first_black_woman_tony_best_actress_year",
@@ -2356,7 +2356,7 @@
       "firsts"
     ],
     "jurisdictionLabel": "Fort Pierce, Florida",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Zora Neale Hurston gravesite, Garden of Heavenly Rest, Fort Pierce, FL",
     "lat": 27.467,
     "lng": -80.3417,

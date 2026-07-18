@@ -12,7 +12,7 @@
       "rebellion"
     ],
     "jurisdictionLabel": "Rantowles, South Carolina",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Stono Rebellion historical marker, Savannah Highway (US 17), Rantowles",
     "lat": 32.7852,
     "lng": -80.1472,
@@ -100,7 +100,7 @@
       "rebellion"
     ],
     "jurisdictionLabel": "New York, New York",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Site of the colonial New York City Hall (now Federal Hall National Memorial), Wall and Nassau Streets",
     "lat": 40.7069,
     "lng": -74.0101,
@@ -145,7 +145,7 @@
       "organizing"
     ],
     "jurisdictionLabel": "Richmond, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Gabriel's Execution historical marker, East Broad Street between 15th and 16th Streets",
     "lat": 37.5375,
     "lng": -77.4295,
@@ -370,7 +370,7 @@
       "rebellion"
     ],
     "jurisdictionLabel": "Boykins, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Nat Turner's Insurrection historical marker, Route 35, Boykins",
     "lat": 36.5758,
     "lng": -77.1995,
@@ -414,7 +414,7 @@
       "rebellion"
     ],
     "jurisdictionLabel": "Courtland, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Southampton County Courthouse, Main Street, Courtland",
     "lat": 36.7158,
     "lng": -77.0661,
@@ -501,10 +501,10 @@
       "community"
     ],
     "jurisdictionLabel": "Sumatra, Florida",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Prospect Bluff Historic Sites, Apalachicola National Forest, near Sumatra",
-    "lat": 29.9134,
-    "lng": -84.9995,
+    "lat": 29.93333,
+    "lng": -85.01667,
     "claims": [
       {
         "predicate": "settled_by",
@@ -548,10 +548,10 @@
       "community"
     ],
     "jurisdictionLabel": "Suffolk, Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Washington Ditch entrance, Great Dismal Swamp National Wildlife Refuge, Suffolk",
-    "lat": 36.562,
-    "lng": -76.4028,
+    "lat": 36.5833,
+    "lng": -76.45,
     "claims": [
       {
         "predicate": "inhabited_by",
@@ -593,7 +593,7 @@
       "freedom"
     ],
     "jurisdictionLabel": "New Haven, Connecticut",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Amistad Memorial, site of the former New Haven Jail, New Haven",
     "lat": 41.3083,
     "lng": -72.9279,
@@ -679,7 +679,7 @@
       "abolition"
     ],
     "jurisdictionLabel": "Harpers Ferry, West Virginia",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "John Brown's Fort, Harpers Ferry National Historical Park",
     "lat": 39.3187,
     "lng": -77.7409,
@@ -725,7 +725,7 @@
       "freedom"
     ],
     "jurisdictionLabel": "Fountain City, Indiana",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Levi and Catharine Coffin State Historic Site, Fountain City",
     "lat": 39.9151,
     "lng": -84.8994,
@@ -955,8 +955,8 @@
     "jurisdictionLabel": "Niagara Falls, New York",
     "locationPrecision": "institution",
     "locationLabel": "Niagara Falls Underground Railroad Heritage Center, 825 Depot Avenue West, Niagara Falls",
-    "lat": 43.0955,
-    "lng": -79.0672,
+    "lat": 43.1104,
+    "lng": -79.05397,
     "claims": [
       {
         "predicate": "enabled_crossings",
@@ -1042,7 +1042,7 @@
       "underground-railroad"
     ],
     "jurisdictionLabel": "Christiana, Pennsylvania",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Christiana Riot Monument, Green Street and Slokom Avenue, Christiana",
     "lat": 39.9554,
     "lng": -75.9943,
@@ -1360,7 +1360,7 @@
       "freedom"
     ],
     "jurisdictionLabel": "Edenton, North Carolina",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Harriet Jacobs historical marker, North Broad Street and Gale Street, Edenton",
     "lat": 36.0562,
     "lng": -76.6094,
@@ -1492,7 +1492,7 @@
       "underground-railroad"
     ],
     "jurisdictionLabel": "Boston, Massachusetts",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Boston Courthouse site, Court Square, Boston",
     "lat": 42.3595,
     "lng": -71.0567,
@@ -2236,7 +2236,7 @@
       "great-migration"
     ],
     "jurisdictionLabel": "Chicago, Illinois",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Eugene Williams Memorial, 29th Street Beach, Chicago",
     "lat": 41.8425,
     "lng": -87.6089,
@@ -2322,7 +2322,7 @@
       "great-migration"
     ],
     "jurisdictionLabel": "Rosewood, Florida",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Rosewood historical marker, State Road 24, Rosewood",
     "lat": 29.2368,
     "lng": -82.9258,
@@ -2500,7 +2500,7 @@
       "underground-railroad"
     ],
     "jurisdictionLabel": "Yemassee, South Carolina",
-    "locationPrecision": "institution",
+    "locationPrecision": "campus",
     "locationLabel": "Harriet Tubman Memorial Bridge, Combahee River, near Yemassee",
     "lat": 32.758,
     "lng": -80.528,
