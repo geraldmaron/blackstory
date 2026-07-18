@@ -545,6 +545,7 @@ export * from './adapters/index.js';
 export * from './external-data-sources.js';
 export * from './public-numeric-policy.js';
 export * from './publication/index.js';
+export * from './datapacks/index.js';
 
 // Map data platform. Demo/test fixtures in ./map/fixtures.js are
 // intentionally NOT re-exported here — they are internal to this package
@@ -612,6 +613,7 @@ export * from './geocode/index.js';
 
 // historic safety place-context engine (layered signals; crime stats never score).
 export * from './historic-safety/index.js';
+export * from './verification/index.js';
 
 // Editorial trust vocabulary + ClaimReview path exclusivity.
 export * from './trust/index.js';

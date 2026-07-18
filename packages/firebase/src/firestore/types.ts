@@ -10,6 +10,9 @@ import {
   AUDIT_EVENT_ACTIONS,
   OUTBOX_STATUSES,
   auditCategoryFor,
+  DATA_PACK_IMPORT_STAGES,
+  DATA_PACK_RESOURCE_KINDS,
+  EXTERNAL_SOURCE_LICENSE_VERDICTS,
 } from '@blap/domain';
 
 export const authClaimFlagsSchema = z.object({
@@ -636,6 +639,86 @@ export const canonicalClaimSchema = z.object({
 });
 
 export type CanonicalClaimDoc = z.infer<typeof canonicalClaimSchema>;
+
+/**
+ * Verification policy (black-book-isqd, mirrors packages/domain/src/verification/policy.ts):
+ * governs how often published claims matching `appliesToEntityClasses`/`appliesToPredicates`
+ * must be independently re-checked. Doc shape for `verificationPolicies/{policyId}`. Enum values
+ * hardcoded rather than imported, matching this file's existing convention (see
+ * `entityClassSchema` above).
+ */
+export const volatilityClassSchema = z.enum(['high', 'medium', 'low', 'static']);
+export type VolatilityClassDoc = z.infer<typeof volatilityClassSchema>;
+
+export const reviewIntervalSchema = z.object({
+  unit: z.enum(['day', 'week', 'month', 'year']),
+  count: z.number().int().positive(),
+});
+export type ReviewIntervalDoc = z.infer<typeof reviewIntervalSchema>;
+
+export const verificationPolicySchema = z.object({
+  id: z.string().min(1),
+  appliesToEntityClasses: z.array(entityClassSchema).min(1),
+  appliesToPredicates: z.array(z.string().min(1)).min(1),
+  volatilityClass: volatilityClassSchema,
+  defaultReviewInterval: reviewIntervalSchema,
+  authoritativeSourceIds: z.array(z.string().min(1)).default([]),
+  contradictionSearchRequired: z.boolean(),
+  notes: z.string().optional(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export type VerificationPolicyDoc = z.infer<typeof verificationPolicySchema>;
+
+/**
+ * Per-subject verification state (black-book-isqd, mirrors
+ * packages/domain/src/verification/state.ts): kept separate from `canonicalClaimSchema` /
+ * `entityRelationshipSchema` / canonical entity docs rather than merged into them (see the
+ * domain module's doc comment for the reasoning) — doc shape for a `verificationStates`
+ * collection keyed by `{subjectType}_{subjectId}` or similar caller-chosen id scheme.
+ */
+export const verificationStatusSchema = z.enum(['current', 'due', 'overdue', 'unverified']);
+export type VerificationStatusDoc = z.infer<typeof verificationStatusSchema>;
+
+export const verificationSubjectTypeSchema = z.enum(['claim', 'relationship', 'entity']);
+export type VerificationSubjectTypeDoc = z.infer<typeof verificationSubjectTypeSchema>;
+
+export const verificationStateSchema = z.object({
+  subjectType: verificationSubjectTypeSchema,
+  subjectId: z.string().min(1),
+  verificationPolicyId: z.string().min(1).optional(),
+  verificationStatus: verificationStatusSchema,
+  lastVerifiedAt: z.string().datetime().optional(),
+  nextReviewAt: z.string().datetime().optional(),
+  lastVerificationRunId: z.string().min(1).optional(),
+  updatedAt: z.string().datetime(),
+});
+
+export type VerificationStateDoc = z.infer<typeof verificationStateSchema>;
+
+/**
+ * `CandidateUpdate` (black-book-isqd, mirrors
+ * packages/domain/src/verification/candidate-update.ts): a refresh never overwrites public
+ * truth directly — it produces one of these, which enters the normal review pipeline.
+ */
+export const candidateUpdateStatusSchema = z.enum(['pending_review', 'accepted', 'rejected']);
+export type CandidateUpdateStatusDoc = z.infer<typeof candidateUpdateStatusSchema>;
+
+export const candidateUpdateSchema = z.object({
+  id: z.string().min(1),
+  subjectType: verificationSubjectTypeSchema,
+  subjectId: z.string().min(1),
+  predicate: z.string().min(1).optional(),
+  previousValue: z.string().optional(),
+  proposedValue: z.string().optional(),
+  verificationRunId: z.string().min(1),
+  status: candidateUpdateStatusSchema,
+  createdAt: z.string().datetime(),
+  notes: z.string().optional(),
+});
+
+export type CandidateUpdateDoc = z.infer<typeof candidateUpdateSchema>;
 
 /** Claim-to-evidence relationship (supporting contradicting contextual). */
 export const claimEvidenceLinkSchema = z.object({
@@ -1307,3 +1390,108 @@ export const killSwitchSchema = z.object({
 });
 
 export type KillSwitchDoc = z.infer<typeof killSwitchSchema>;
+
+// ---------------------------------------------------------------------------
+// Data Pack v1 collections (black-book-ud5q) — skeletal stubs backing
+// @blap/domain's `datapacks/` contract (manifest + validation + import pipeline). These record
+// the same fail-closed posture as that module: a dataset row starts disabled, an import batch
+// starts pending, and nothing here auto-promotes an external id into a canonical entity id.
+// ---------------------------------------------------------------------------
+
+/** One registered third-party dataset, independent of any specific version. */
+export const externalDatasetSchema = z.object({
+  id: z.string().min(1).max(256),
+  displayName: z.string().min(1).max(512),
+  publisherName: z.string().min(1).max(512),
+  licenseVerdict: z.enum(EXTERNAL_SOURCE_LICENSE_VERDICTS),
+  licenseName: z.string().min(1).max(512),
+  homepageUrl: z.string().url().optional(),
+  registryState: z.enum(['disabled', 'enabled', 'quarantined']).default('disabled'),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export type ExternalDatasetDoc = z.infer<typeof externalDatasetSchema>;
+
+/** One signed manifest version of an `externalDatasets` row — mirrors
+ * `DataPackManifest`/`SignedDataPackManifest` field-for-field at the metadata level (the full
+ * manifest JSON, including its resource list, lives in the pack's own storage; this doc is the
+ * queryable index over it). */
+export const externalDatasetVersionSchema = z.object({
+  id: z.string().min(1).max(256),
+  datasetId: z.string().min(1).max(256),
+  datasetVersion: z.string().min(1).max(256),
+  schemaVersion: z.number().int().positive(),
+  manifestHash: z.string().regex(/^[a-f0-9]{64}$/),
+  publicKeyId: z.string().min(1).max(256),
+  issuedAt: z.string().datetime(),
+  modifiedAt: z.string().datetime(),
+  resourceCount: z.number().int().nonnegative(),
+  totalByteSize: z.number().int().nonnegative(),
+  createdAt: z.string().datetime(),
+});
+
+export type ExternalDatasetVersionDoc = z.infer<typeof externalDatasetVersionSchema>;
+
+/** Which subscriber (feature/team) consumes a dataset, and the import budget it is bound by
+ * (`DataPackImportBudget` shape from `@blap/domain`'s `datapacks/validate.ts`). */
+export const datasetSubscriptionSchema = z.object({
+  id: z.string().min(1).max(256),
+  datasetId: z.string().min(1).max(256),
+  subscriberId: z.string().min(1).max(256),
+  active: z.boolean(),
+  budget: z.object({
+    maxResources: z.number().int().positive(),
+    maxTotalBytes: z.number().int().positive(),
+    maxRecordsPerResource: z.number().int().positive().optional(),
+  }),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export type DatasetSubscriptionDoc = z.infer<typeof datasetSubscriptionSchema>;
+
+/** One run of the import pipeline (`runDataPackImportPipeline`) against one dataset version. */
+export const importBatchSchema = z.object({
+  id: z.string().min(1).max(256),
+  datasetId: z.string().min(1).max(256),
+  datasetVersion: z.string().min(1).max(256),
+  status: z.enum(['pending', 'validating', 'quarantined', 'accepted', 'rejected']),
+  startedAt: z.string().datetime(),
+  completedAt: z.string().datetime().optional(),
+  resourceCount: z.number().int().nonnegative(),
+  acceptedResourceCount: z.number().int().nonnegative(),
+  quarantinedResourceCount: z.number().int().nonnegative(),
+});
+
+export type ImportBatchDoc = z.infer<typeof importBatchSchema>;
+
+/** One `DataPackImportFinding` persisted per stage/resource/record failure — the durable form of
+ * the in-memory findings `runDataPackImportPipeline` collects. */
+export const importValidationFindingSchema = z.object({
+  id: z.string().min(1).max(512),
+  importBatchId: z.string().min(1).max(256),
+  stage: z.enum(DATA_PACK_IMPORT_STAGES),
+  resourceName: z.string().min(1).max(256).optional(),
+  recordExternalId: z.string().min(1).max(512).optional(),
+  message: z.string().min(1).max(2_000),
+  createdAt: z.string().datetime(),
+});
+
+export type ImportValidationFindingDoc = z.infer<typeof importValidationFindingSchema>;
+
+/** One quarantined record, keyed by its `NamespacedExternalId` — never a bare canonical entity
+ * id (see `datapacks/import-pipeline.ts`'s module doc comment on namespacing). */
+export const importQuarantineSchema = z.object({
+  id: z.string().min(1).max(512),
+  importBatchId: z.string().min(1).max(256),
+  resourceName: z.string().min(1).max(256),
+  resourceKind: z.enum(DATA_PACK_RESOURCE_KINDS),
+  namespace: z.string().min(1).max(256),
+  externalId: z.string().min(1).max(512),
+  reason: z.string().min(1).max(2_000),
+  quarantinedAt: z.string().datetime(),
+  resolvedAt: z.string().datetime().optional(),
+});
+
+export type ImportQuarantineDoc = z.infer<typeof importQuarantineSchema>;
