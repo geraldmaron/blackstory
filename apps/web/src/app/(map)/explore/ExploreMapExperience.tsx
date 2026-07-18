@@ -47,6 +47,24 @@ export type ExploreMapExperienceProps = {
 
 const TRANSITION_FLAG = 'ds-map-transition';
 
+/** Agent B (BB-098): read once on the client — hero sets this before `router.push`. */
+function readHeroTransitionFlag(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.sessionStorage.getItem(TRANSITION_FLAG) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function clearHeroTransitionFlag(): void {
+  try {
+    window.sessionStorage.removeItem(TRANSITION_FLAG);
+  } catch {
+    // sessionStorage unavailable — flight and chrome still work; focus handoff is best-effort.
+  }
+}
+
 /** Keeps a selected pin clear of the results rail when returning from a record page. */
 const SELECTION_CAMERA_PADDING = { top: 72, bottom: 120, left: 48, right: 320 } as const;
 
@@ -139,6 +157,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const viewportTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const filterRegionRef = useRef<HTMLDivElement | null>(null);
   const spotlightRef = useRef<HTMLDivElement | null>(null);
+  // Agent B: latch hero→explore on first client render before any effect clears sessionStorage.
+  const [fromHeroTransition] = useState(readHeroTransitionFlag);
+  const [entering, setEntering] = useState(false);
   // Mirror of the latest committed view state for the debounced viewport handler below. React
   // may replay setState updater functions during render, so an updater must stay pure — the
   // handler needs the current view state OUTSIDE an updater to build the next URL.
@@ -151,6 +172,16 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   useEffect(() => {
     viewStateRef.current = view.viewState;
   }, [view.viewState]);
+
+  // Agent B: hero landing — panel enter animation (reconcile skip is in the mount effect below).
+  useEffect(() => {
+    if (!fromHeroTransition) return;
+    clearHeroTransitionFlag();
+    setEntering(true);
+    const duration = prefersReducedMotion() ? 0 : 280;
+    const timer = window.setTimeout(() => setEntering(false), duration);
+    return () => window.clearTimeout(timer);
+  }, [fromHeroTransition]);
 
   const pushViewState = useCallback(
     (next: ExploreViewState) => {
@@ -280,16 +311,10 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   );
 
   // Deep link entry: reconcile the camera against the URL exactly once on mount (`easeTo`, never
-  // a cinematic arc — arriving at a URL is a restore, not a descent). Skip when the hero set
-  // TRANSITION_FLAG — its in-flight camera descent must not be interrupted.
+  // a cinematic arc — arriving at a URL is a restore, not a descent). Skip when latched from hero
+  // — its in-flight camera descent must not be interrupted (Agent B / ADR-017).
   useEffect(() => {
-    try {
-      if (window.sessionStorage.getItem(TRANSITION_FLAG)) {
-        return;
-      }
-    } catch {
-      // sessionStorage unavailable — fall through to URL reconcile.
-    }
+    if (fromHeroTransition) return;
     reconcileCamera(initial.viewState, 'ease');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -306,21 +331,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [reconcileCamera]);
 
-  // Chrome dissolve -> entry: if the hero flagged an in-progress transition, this mount IS its
-  // landing — focus filters unless a pin was the engagement target (spotlight owns that focus).
+  // Agent B: after a hero dissolve landing, focus filters unless a pin was the engagement target.
   useEffect(() => {
-    try {
-      if (window.sessionStorage.getItem(TRANSITION_FLAG)) {
-        window.sessionStorage.removeItem(TRANSITION_FLAG);
-        if (!initial.viewState.selected) {
-          filterRegionRef.current?.focus();
-        }
-      }
-    } catch {
-      // sessionStorage unavailable (private browsing) — the transition still completes, just
-      // without a deterministic post-landing focus target.
-    }
-  }, [initial.viewState.selected]);
+    if (!fromHeroTransition || initial.viewState.selected) return;
+    filterRegionRef.current?.focus();
+  }, [fromHeroTransition, initial.viewState.selected]);
 
   const handleSelect = useCallback(
     (entityId: string) => {
@@ -496,7 +511,14 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   return (
     /* Instruments follow the site theme (light/dark) — map plate syncs via MapStage. */
-    <div className="ds-explore-stage">
+    <div
+      className={
+        entering
+          ? 'ds-explore-stage ds-explore-stage--entering'
+          : 'ds-explore-stage'
+      }
+      data-map-journey={entering ? 'entering' : 'explore'}
+    >
       {!stage.mapAvailable && degradedCopy ? (
         <div className="ds-explore-stage__notice">
           <Notice tone="warning" title="Map unavailable">

@@ -8,19 +8,19 @@
  * (decade-flow.ts), scrubbable by tap, pausable, honest about what it shows
  * (documented records, never modeled population).
  *
- * Engagement contract (ADR-017 "Transition contract"): a state click, a
- * background click, or the copper CTA funnel through `engage()` — fly the
- * matching camera preset AND `router.push('/explore?…')` in the same tick; the
- * flight continues uninterrupted across the navigation because the stage never
- * unmounts. A point click opens the entity record page (`/entity/[id]`) — same
- * page-first story as Explore.
+ * Engagement contract (ADR-017 "Transition contract"): state, background, entity
+ * pin, and the copper CTA all fly the matching camera preset first, then funnel
+ * through `engage()` — `router.push('/explore?…')` in the same tick; the flight
+ * continues uninterrupted across the navigation because the stage never unmounts.
+ * Entity pins land on `/explore?selected=…` so the reader stays inside the map
+ * journey; the record page remains one click away from explore's list.
  */
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Notice } from '@repo/ui';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
-import { prefersReducedMotion } from '../../lib/map-experience/camera-presets';
+import { CAMERA_POINT_ZOOM, prefersReducedMotion } from '../../lib/map-experience/camera-presets';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
@@ -53,11 +53,6 @@ const RESTING_HREF = buildExploreHref({
   lines: false,
 });
 const TRANSITION_FLAG = 'ds-map-transition';
-
-function entityHrefOf(collection: ExploreMapFeatureCollection, entityId: string): string {
-  const feature = collection.features.find((item) => item.properties.entityId === entityId);
-  return feature?.properties.href ?? `/entity/${encodeURIComponent(entityId)}`;
-}
 
 function markTransition(): void {
   try {
@@ -170,9 +165,25 @@ export function HeroStage({
   useEffect(() => {
     const unsubscribe = [
       stage.subscribe('select', (entityId: string) => {
-        // Page-first: open the record. Leaving the (map) layout unmounts the canvas, so we
-        // do not fly-then-dissolve into explore for pins — state/background still do.
-        router.push(entityHrefOf(featureCollection, entityId));
+        const feature = featureCollection.features.find((item) => item.properties.entityId === entityId);
+        if (feature?.geometry.type === 'Point') {
+          const [lng, lat] = feature.geometry.coordinates;
+          stage.flyPreset('point', { center: [lng, lat], zoom: CAMERA_POINT_ZOOM });
+          engage(
+            buildExploreHref({
+              filters: DEFAULT_EXPLORE_FILTERS,
+              density: false,
+              group: false,
+              lines: false,
+              selected: entityId,
+              viewport: { lat, lng, zoom: CAMERA_POINT_ZOOM },
+            }),
+          );
+          return;
+        }
+        const href =
+          feature?.properties.href ?? `/entity/${encodeURIComponent(entityId)}`;
+        router.push(href);
       }),
       stage.subscribe('stateSelect', (postalCode: string) => {
         const viewport = viewportForState(postalCode);
@@ -190,6 +201,10 @@ export function HeroStage({
         );
       }),
       stage.subscribe('activate', (viewport: ExploreViewport) => {
+        stage.flyPreset(
+          'locality',
+          { center: [viewport.lng, viewport.lat], zoom: viewport.zoom },
+        );
         engage(
           buildExploreHref({
             filters: DEFAULT_EXPLORE_FILTERS,
@@ -208,6 +223,7 @@ export function HeroStage({
 
   function handleCtaClick(event: React.MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
+    stage.flyPreset('national', { bounds: US_CONUS_BOUNDS });
     engage(RESTING_HREF);
   }
 

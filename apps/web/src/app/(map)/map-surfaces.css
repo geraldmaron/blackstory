@@ -126,6 +126,44 @@
   }
 }
 
+/* —— Explore enter (Agent B / ADR-017): panels fade in after hero dissolve — opacity/translate
+   only, compositor-friendly; reduced motion is an instant cut. —— */
+@keyframes ds-explore-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ds-explore-stage--entering .ds-explore-stage__filters,
+.ds-explore-stage--entering .ds-explore-stage__results,
+.ds-explore-stage--entering .ds-explore-stage__legend {
+  animation: ds-explore-panel-enter var(--ds-duration-base) var(--ds-easing) both;
+}
+
+.ds-explore-stage--entering .ds-explore-stage__results {
+  animation-delay: 60ms;
+}
+
+.ds-explore-stage--entering .ds-explore-stage__legend {
+  animation-delay: 100ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-explore-stage--entering .ds-explore-stage__filters,
+  .ds-explore-stage--entering .ds-explore-stage__results,
+  .ds-explore-stage--entering .ds-explore-stage__legend {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* —— Explore stage: floating chrome over the shared canvas ——
  * The map fills the viewport behind this; every panel below is independently fixed-positioned
  * (a grid would force a layout the map doesn't need) so the canvas stays interactive everywhere
