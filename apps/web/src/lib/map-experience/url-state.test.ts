@@ -19,14 +19,14 @@ test('an empty query string parses to the "all" default filter state with no vie
 
 test('round-trips a full view state through build -> parse', () => {
   const state = {
-    filters: { era: '1950s', kind: 'school', theme: 'education', confidence: 'high' },
+    filters: { era: '1970s', kind: 'school', theme: 'education', confidence: 'high' },
     viewport: { lat: 38.9072, lng: -77.0369, zoom: 11.5 },
-    selected: 'ent_seed_school_001',
+    selected: 'ent_dunbar_school_001',
     state: 'DC',
     density: true,
     lines: true,
-    decade: '1950s',
-    edge: 'rel_seed_event_occurred_at_school',
+    decade: '1970s',
+    edge: 'rel_landmark_occurred_at_school',
   };
 
   const href = buildExploreHref(state);
@@ -44,8 +44,8 @@ test('round-trips a full view state through build -> parse', () => {
   assert.equal(parsed.state, 'DC');
   assert.equal(parsed.density, true);
   assert.equal(parsed.lines, true);
-  assert.equal(parsed.decade, '1950s');
-  assert.equal(parsed.edge, 'rel_seed_event_occurred_at_school');
+  assert.equal(parsed.decade, '1970s');
+  assert.equal(parsed.edge, 'rel_landmark_occurred_at_school');
 });
 
 test('default filter values are omitted from the query string (minimal shareable URL)', () => {

@@ -23,20 +23,20 @@ test('all-time view includes every published seed entity from the graph artifact
 });
 
 test('decade view derives node membership from BB-092 decade artifacts', () => {
-  const fifties = buildHistoryViewModel({ decade: '1950s' });
-  assert.equal(fifties.viewState.mode, 'decade');
-  assert.equal(fifties.activeDecade, '1950s');
-  assert.ok(fifties.nodes.some((node) => node.entityId === 'ent_seed_event_001'));
-  assert.ok(fifties.nodes.some((node) => node.entityId === 'ent_seed_school_001'));
+  const seventies = buildHistoryViewModel({ decade: '1970s' });
+  assert.equal(seventies.viewState.mode, 'decade');
+  assert.equal(seventies.activeDecade, '1970s');
+  assert.ok(seventies.nodes.some((node) => node.entityId === 'ent_dc_landmark_listing_1975'));
+  assert.ok(seventies.nodes.some((node) => node.entityId === 'ent_dunbar_school_001'));
 });
 
 test('decade view uses status-as-of that decade, not present-day status', () => {
-  const forties = buildHistoryViewModel({ decade: '1940s' });
-  const school = forties.nodes.find((node) => node.entityId === 'ent_seed_school_001');
+  const eighties = buildHistoryViewModel({ decade: '1880s' });
+  const school = eighties.nodes.find((node) => node.entityId === 'ent_dunbar_school_001');
   assert.ok(school);
-  const entity = getPublicEntity('ent_seed_school_001');
+  const entity = getPublicEntity('ent_dunbar_school_001');
   assert.ok(entity?.statusHistory);
-  assert.equal(statusAsOf(entity.statusHistory, '1945'), 'historic');
+  assert.equal(statusAsOf(entity.statusHistory, '1885'), 'historic');
   assert.equal(school!.statusLabel, 'Historic');
   assert.notEqual(school!.statusLabel, entity!.status);
 });
@@ -68,24 +68,24 @@ test('edges expose evidence-backed citations and omit evidence-free connections'
 
 test('parses shareable URL decade, filter, and selection state', () => {
   const view = buildHistoryViewModel({
-    decade: '1860s',
+    decade: '1870s',
     kind: 'school',
-    selected: 'ent_seed_school_001',
-    edge: 'rel_seed_school_located_at_place',
+    selected: 'ent_dunbar_school_001',
+    edge: 'rel_dunbar_school_located_at_church',
   });
-  assert.equal(view.viewState.decade, '1860s');
+  assert.equal(view.viewState.decade, '1870s');
   assert.equal(view.viewState.filters.kind, 'school');
-  assert.equal(view.viewState.selected, 'ent_seed_school_001');
-  assert.equal(view.viewState.edge, 'rel_seed_school_located_at_place');
+  assert.equal(view.viewState.selected, 'ent_dunbar_school_001');
+  assert.equal(view.viewState.edge, 'rel_dunbar_school_located_at_church');
   assert.ok(view.selectedNode);
 });
 
 test('nodes link to entity pages and surface fact links when present', () => {
-  const view = buildHistoryViewModel({ decade: '1950s' });
+  const view = buildHistoryViewModel({ decade: '1970s' });
   for (const node of view.nodes) {
     assert.match(node.href, /^\/entity\//);
   }
-  const place = view.nodes.find((node) => node.entityId === 'ent_seed_place_001');
+  const place = view.nodes.find((node) => node.entityId === 'ent_15th_st_church_001');
   assert.ok(place);
   assert.ok(place!.factLinks.length > 0);
   assert.match(place!.factLinks[0]!.href, /^\/facts\//);

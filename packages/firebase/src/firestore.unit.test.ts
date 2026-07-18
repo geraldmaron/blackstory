@@ -62,9 +62,9 @@ test('publication and admin claims can publish', () => {
 
 test('public entity projection seed parses with geohash', () => {
   const parsed = parseWithSchema(publicEntityProjectionSchema, seedPublicEntity);
-  assert.equal(parsed.id, 'ent_seed_place_001');
+  assert.equal(parsed.id, 'ent_15th_st_church_001');
   assert.ok(parsed.location?.geohash);
-  assert.equal(parsed.location?.precision, 'city');
+  assert.equal(parsed.location?.precision, 'neighborhood');
   assert.equal(parsed.location?.matchMethod, 'manual_research');
 });
 
@@ -100,7 +100,7 @@ test('seed fixture includes BB-014 domain paths', () => {
   assert.ok(paths.some((path) => path.includes('/locations/')));
   assert.ok(paths.some((path) => path.startsWith('entityRelationships/')));
   assert.ok(paths.some((path) => path.startsWith('entityMerges/')));
-  assert.ok(paths.some((path) => path.startsWith('canonicalEntities/ent_seed_school')));
+  assert.ok(paths.some((path) => path.startsWith('canonicalEntities/ent_dunbar_school')));
   assert.ok(paths.some((path) => path.startsWith('canonicalEntities/ent_seed_person')));
 });
 
@@ -142,7 +142,7 @@ test('canonical claim seed parses with confidence components and policyVersion',
   assert.ok(claim.confidence);
   assert.equal(claim.confidence.policyVersion, '1.0.0');
   assert.equal(claim.confidence.independentLineageCount, 1);
-  assert.ok(claim.preservedValues.some((v) => v.kind === 'contradicting' && v.value === '1868'));
+  assert.ok(claim.preservedValues.some((v) => v.kind === 'contradicting' && v.value === '1840'));
   assert.doesNotThrow(() => assertNarrativeMayCiteClaim(claim));
 
   const support = parseWithSchema(claimEvidenceLinkSchema, seedClaimEvidenceSupporting);

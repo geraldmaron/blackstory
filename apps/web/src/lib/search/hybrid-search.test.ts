@@ -23,7 +23,7 @@ test('snapshot vector index covers every search doc', () => {
 test('runWebHybridSearch uses structured-only without hybrid flag', async () => {
   resetSnapshotSearchIndexCache();
   const response = await runWebHybridSearch({
-    normalizedQuery: 'freedmen',
+    normalizedQuery: 'dunbar',
     filters: [],
     sort: 'relevance',
     offset: 0,
@@ -37,7 +37,7 @@ test('runWebHybridSearch activates hybrid mode with hybrid=1', async () => {
   resetSnapshotSearchIndexCache();
   const response = await runWebHybridSearch(
     {
-      normalizedQuery: 'freedmen',
+      normalizedQuery: 'dunbar',
       filters: [],
       sort: 'relevance',
       offset: 0,

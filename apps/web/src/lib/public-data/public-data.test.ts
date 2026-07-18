@@ -41,15 +41,15 @@ test('shouldUseLivePublicProjections enables production project reads', () => {
 
 test('mapProjectionToPublicEntityView enriches known seed ids', () => {
   const view = mapProjectionToPublicEntityView({
-    id: 'ent_seed_place_001',
+    id: 'ent_15th_st_church_001',
     releaseId: 'rel_seed_001',
     kind: 'place',
-    displayName: 'Seed Historical Place',
-    nameLower: 'seed historical place',
+    displayName: 'Fifteenth Street Presbyterian Church',
+    nameLower: 'fifteenth street presbyterian church',
     summary: 'Fixture projection for emulator reads.',
     claimIds: ['claim_seed_001'],
   });
-  assert.equal(view.id, 'ent_seed_place_001');
+  assert.equal(view.id, 'ent_15th_st_church_001');
   assert.ok(view.claims.length > 0);
   assert.equal(view.revision.releaseId, 'rel_seed_001');
 });

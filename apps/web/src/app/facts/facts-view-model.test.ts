@@ -19,6 +19,8 @@ test('buildFactLibraryViewModel returns only published/corrected facts from the 
   const view = buildFactLibraryViewModel({}, docs, seedConfidenceById());
   assert.ok(view.totalMatched >= 1);
   assert.ok(view.results.every((result) => result.id.startsWith('BB-F-')));
+  // BB-F-000007 is a draft not yet part of the published record, so it never reaches the index.
+  assert.ok(!view.results.some((result) => result.id === 'BB-F-000007'));
 });
 
 test('buildFactLibraryViewModel filters by claim type', () => {
@@ -26,21 +28,28 @@ test('buildFactLibraryViewModel filters by claim type', () => {
   const confidenceById = seedConfidenceById();
   const all = buildFactLibraryViewModel({}, docs, confidenceById);
   const events = buildFactLibraryViewModel({ claimType: 'event' }, docs, confidenceById);
-  assert.ok(events.totalMatched <= all.totalMatched);
-  assert.ok(events.results.every((result) => result.id === 'BB-F-000001'));
+  assert.ok(events.totalMatched < all.totalMatched);
+  assert.equal(events.totalMatched, 3);
+  assert.ok(
+    events.results.every((result) => ['BB-F-000001', 'BB-F-000005', 'BB-F-000006'].includes(result.id)),
+  );
 });
 
 test('buildFactLibraryViewModel filters by exact confidence grade', () => {
   const { docs } = getSeedFactSearchIndex();
   const confidenceById = seedConfidenceById();
   const established = buildFactLibraryViewModel({ confidence: 'established' }, docs, confidenceById);
-  assert.ok(established.results.every((result) => result.id === 'BB-F-000001'));
+  assert.equal(established.totalMatched, 2);
+  assert.ok(established.results.every((result) => ['BB-F-000001', 'BB-F-000003'].includes(result.id)));
   const corroborated = buildFactLibraryViewModel({ confidence: 'corroborated' }, docs, confidenceById);
-  assert.ok(corroborated.results.every((result) => result.id === 'BB-F-000002'));
+  assert.equal(corroborated.totalMatched, 3);
+  assert.ok(
+    corroborated.results.every((result) => ['BB-F-000002', 'BB-F-000005', 'BB-F-000006'].includes(result.id)),
+  );
 });
 
 test('resolvePublicFact returns not_public for draft facts and ok for published facts', () => {
-  assert.equal(resolvePublicFact('BB-F-000005').kind, 'not_public');
+  assert.equal(resolvePublicFact('BB-F-000007').kind, 'not_public');
   assert.equal(resolvePublicFact('BB-F-000001').kind, 'ok');
   assert.equal(resolvePublicFact('not-an-id').kind, 'not_found');
 });
@@ -49,7 +58,7 @@ test('resolvePublicFact redirects stale cosmetic slugs', () => {
   const resolved = resolvePublicFact('BB-F-000001', 'stale-slug');
   assert.equal(resolved.kind, 'redirect');
   if (resolved.kind === 'redirect') {
-    assert.match(resolved.destination, /\/facts\/BB-F-000001\/rosa-parks-arrested-dec-1-1955$/);
+    assert.match(resolved.destination, /\/facts\/BB-F-000001\/dunbar-founded-1870-in-church-basement$/);
   }
 });
 

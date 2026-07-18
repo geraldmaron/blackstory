@@ -76,7 +76,10 @@ test('degraded mode reads bundled release snapshots', () => {
   const prior = process.env.PUBLIC_READ_API_DISABLED;
   process.env.PUBLIC_READ_API_DISABLED = '1';
   assert.equal(isPublicReadApiDisabled(), true);
-  assert.equal(readEntityFromReleaseSnapshot('ent_seed_place_001')?.displayName, 'Seed Historical Place');
+  assert.equal(
+    readEntityFromReleaseSnapshot('ent_15th_st_church_001')?.displayName,
+    'Fifteenth Street Presbyterian Church',
+  );
   process.env.PUBLIC_READ_API_DISABLED = prior;
 });
 

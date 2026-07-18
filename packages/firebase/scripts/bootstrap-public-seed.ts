@@ -77,12 +77,12 @@ ensured.set('publicMeta/activeRelease', {
   path: 'publicMeta/activeRelease',
   data: seedActiveRelease,
 });
-ensured.set('publicReleases/rel_seed_001/entities/ent_seed_place_001', {
-  path: 'publicReleases/rel_seed_001/entities/ent_seed_place_001',
+ensured.set('publicReleases/rel_seed_001/entities/ent_15th_st_church_001', {
+  path: 'publicReleases/rel_seed_001/entities/ent_15th_st_church_001',
   data: preparePublicEntityProjectionForWrite(seedPublicEntity),
 });
-ensured.set('publicReleases/rel_seed_001/entities/ent_seed_school_001', {
-  path: 'publicReleases/rel_seed_001/entities/ent_seed_school_001',
+ensured.set('publicReleases/rel_seed_001/entities/ent_dunbar_school_001', {
+  path: 'publicReleases/rel_seed_001/entities/ent_dunbar_school_001',
   data: preparePublicEntityProjectionForWrite(seedPublicSchoolEntity),
 });
 

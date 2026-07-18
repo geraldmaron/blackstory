@@ -52,7 +52,7 @@ function request(query = ''): Request {
 }
 
 test('returns filtered node ids for a valid decade refine query', async () => {
-  const response = await handleHistoryRefineRequest(request('?decade=1950s&kind=event'), createDeps());
+  const response = await handleHistoryRefineRequest(request('?decade=1970s&kind=event'), createDeps());
   assert.equal(response.status, 200);
   const body = (await response.json()) as {
     nodeIds: string[];
@@ -60,7 +60,7 @@ test('returns filtered node ids for a valid decade refine query', async () => {
     sparseDecade: boolean;
   };
   assert.equal(body.totalMatched, 1);
-  assert.deepEqual(body.nodeIds, ['ent_seed_event_001']);
+  assert.deepEqual(body.nodeIds, ['ent_dc_landmark_listing_1975']);
   assert.equal(body.sparseDecade, false);
 });
 

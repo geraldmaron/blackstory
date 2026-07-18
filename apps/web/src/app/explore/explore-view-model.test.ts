@@ -16,16 +16,16 @@ test('includes every geo-anchored active-release entity by default', () => {
 test('era filter uses BB-090 decade bucket labels from entity eraBuckets', () => {
   const view = buildExploreViewModel({});
   const eraValues = view.facetOptions.era.map((option) => option.value);
-  assert.ok(eraValues.includes('1860s'));
-  assert.ok(eraValues.includes('1950s'));
+  assert.ok(eraValues.includes('1840s'));
+  assert.ok(eraValues.includes('1970s'));
 });
 
 test('filtering by era reduces results without hiding unmatched entities silently', () => {
   const all = buildExploreViewModel({});
-  const fifties = buildExploreViewModel({ era: '1950s' });
-  assert.ok(fifties.totalMatched < all.totalMatched);
-  for (const feature of fifties.filteredFeatures) {
-    assert.ok(feature.properties.eraBuckets.includes('1950s'));
+  const seventies = buildExploreViewModel({ era: '1970s' });
+  assert.ok(seventies.totalMatched < all.totalMatched);
+  for (const feature of seventies.filteredFeatures) {
+    assert.ok(feature.properties.eraBuckets.includes('1970s'));
   }
 });
 
@@ -35,12 +35,12 @@ test('parses shareable URL viewport and density state', () => {
     lng: '-77.0369',
     zoom: '11.5',
     density: '1',
-    selected: 'ent_seed_place_001',
+    selected: 'ent_15th_st_church_001',
   });
   assert.ok(view.viewState.viewport);
   assert.equal(view.viewState.viewport!.lat, 38.9072);
   assert.equal(view.viewState.density, true);
-  assert.equal(view.viewState.selected, 'ent_seed_place_001');
+  assert.equal(view.viewState.selected, 'ent_15th_st_church_001');
   assert.equal(view.viewState.lines, false);
 });
 

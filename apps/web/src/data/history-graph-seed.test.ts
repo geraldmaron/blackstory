@@ -24,7 +24,10 @@ test('builds a deterministic graph release artifact from public seed fixtures', 
 
 test('still-active entities appear in decades after their founding decade', () => {
   const artifact = getHistoryGraphReleaseArtifact();
-  const seventies = artifact.decadeViews.find((view) => view.decade === '1970s');
-  assert.ok(seventies);
-  assert.ok(seventies!.nodeIds.includes('ent_seed_institution_001'));
+  // The Dunbar Alumni Federation was founded in 2002 (the "2000s" decade); it must still appear
+  // in a LATER decade too, proving the open-ended statusHistory record propagates forward rather
+  // than being truncated at its founding decade.
+  const twentyTwenties = artifact.decadeViews.find((view) => view.decade === '2020s');
+  assert.ok(twentyTwenties);
+  assert.ok(twentyTwenties!.nodeIds.includes('ent_dunbar_alumni_federation_001'));
 });

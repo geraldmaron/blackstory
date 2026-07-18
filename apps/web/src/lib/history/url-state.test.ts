@@ -12,12 +12,15 @@ test('defaults to all-time mode with no query params', () => {
 });
 
 test('parses decade mode and rebuilds shareable href', () => {
-  const state = parseHistorySearchParams({ decade: '1950s', kind: 'event', selected: 'ent_seed_event_001' });
+  const state = parseHistorySearchParams({ decade: '1970s', kind: 'event', selected: 'ent_dc_landmark_listing_1975' });
   assert.equal(state.mode, 'decade');
-  assert.equal(state.decade, '1950s');
+  assert.equal(state.decade, '1970s');
   assert.equal(state.filters.kind, 'event');
-  assert.equal(state.selected, 'ent_seed_event_001');
-  assert.equal(buildHistoryHref(state), '/history?decade=1950s&kind=event&selected=ent_seed_event_001');
+  assert.equal(state.selected, 'ent_dc_landmark_listing_1975');
+  assert.equal(
+    buildHistoryHref(state),
+    '/history?decade=1970s&kind=event&selected=ent_dc_landmark_listing_1975',
+  );
 });
 
 test('rejects malformed decade labels', () => {

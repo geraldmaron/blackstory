@@ -43,5 +43,5 @@ test('myth reviews are the only ClaimReview emitters', () => {
     );
     assert.equal(jsonLd['@type'], 'ClaimReview');
   }
-  assert.ok(getMythReview('rosa-parks-was-just-tired'));
+  assert.ok(getMythReview('dunbar-always-called-dunbar'));
 });

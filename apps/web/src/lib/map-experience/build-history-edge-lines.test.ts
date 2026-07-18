@@ -22,13 +22,13 @@ function edge(partial: Partial<HistoryEdgeView> & Pick<HistoryEdgeView, 'edgeId'
 test('builds LineStrings for edges whose endpoints both have geo anchors', () => {
   const collection = buildHistoryEdgeLineCollection([
     edge({
-      edgeId: 'rel_seed_school_located_at_place',
-      fromEntityId: 'ent_seed_school_001',
-      toEntityId: 'ent_seed_place_001',
+      edgeId: 'rel_dunbar_school_located_at_church',
+      fromEntityId: 'ent_dunbar_school_001',
+      toEntityId: 'ent_15th_st_church_001',
     }),
   ]);
   assert.equal(collection.features.length, 1);
-  assert.equal(collection.features[0]?.properties.edgeId, 'rel_seed_school_located_at_place');
+  assert.equal(collection.features[0]?.properties.edgeId, 'rel_dunbar_school_located_at_church');
   assert.equal(collection.features[0]?.geometry.coordinates.length, 2);
   assert.equal(collection.features[0]?.properties.coincident, false);
 });
@@ -36,11 +36,11 @@ test('builds LineStrings for edges whose endpoints both have geo anchors', () =>
 test('nudges coincident campus endpoints so the segment is non-zero length', () => {
   const collection = buildHistoryEdgeLineCollection([
     edge({
-      edgeId: 'rel_seed_event_occurred_at_school',
+      edgeId: 'rel_landmark_occurred_at_school',
       type: 'occurred_at',
-      fromEntityId: 'ent_seed_event_001',
-      toEntityId: 'ent_seed_school_001',
-      sentence: 'Event occurred at School.',
+      fromEntityId: 'ent_dc_landmark_listing_1975',
+      toEntityId: 'ent_dunbar_school_001',
+      sentence: 'Landmark listing occurred at School.',
     }),
   ]);
   assert.equal(collection.features.length, 1);
@@ -54,7 +54,7 @@ test('skips edges when either endpoint lacks a geo anchor', () => {
     edge({
       edgeId: 'rel_missing',
       fromEntityId: 'ent_unknown_from',
-      toEntityId: 'ent_seed_place_001',
+      toEntityId: 'ent_15th_st_church_001',
     }),
   ]);
   assert.equal(collection.features.length, 0);

@@ -29,14 +29,14 @@ test('normalizeQueryString keeps only allowlisted /search params', () => {
 
 test('normalizeQueryString strips all params on entity routes', () => {
   assert.equal(
-    normalizeQueryString('/entity/ent_seed_place_001', { utm_campaign: 'x', ref: 'y' }),
+    normalizeQueryString('/entity/ent_15th_st_church_001', { utm_campaign: 'x', ref: 'y' }),
     '',
   );
 });
 
 test('random query params do not change entity cache keys', () => {
-  const key = buildPublicPageCacheKey('/entity/ent_seed_place_001', { utm_source: 'x' });
-  assert.equal(key, '/entity/ent_seed_place_001');
+  const key = buildPublicPageCacheKey('/entity/ent_15th_st_church_001', { utm_source: 'x' });
+  assert.equal(key, '/entity/ent_15th_st_church_001');
 });
 
 test('search cache keys ignore tracking params', () => {
@@ -47,7 +47,7 @@ test('search cache keys ignore tracking params', () => {
 });
 
 test('buildEntityCacheKey is stable', () => {
-  assert.equal(buildEntityCacheKey('ent_seed_school_001'), '/entity/ent_seed_school_001');
+  assert.equal(buildEntityCacheKey('ent_dunbar_school_001'), '/entity/ent_dunbar_school_001');
 });
 
 test('needsQueryNormalizationRedirect detects tracking params', () => {
@@ -74,30 +74,30 @@ test('normalizeSearchParamsRecord returns trimmed filter bag', () => {
 
 test('normalizeQueryString keeps allowlisted /explore map params', () => {
   const qs = normalizeQueryString('/explore', {
-    era: '1950s',
+    era: '1970s',
     kind: 'school',
     lat: '38.9',
     lng: '-77.0',
     zoom: '6',
-    selected: 'ent_seed_school_001',
+    selected: 'ent_dunbar_school_001',
     density: '1',
     utm_source: 'x',
     junk: '1',
   });
   assert.equal(
     qs,
-    'density=1&era=1950s&kind=school&lat=38.9&lng=-77.0&selected=ent_seed_school_001&zoom=6',
+    'density=1&era=1970s&kind=school&lat=38.9&lng=-77.0&selected=ent_dunbar_school_001&zoom=6',
   );
 });
 
 test('normalizeQueryString keeps allowlisted /history browse params', () => {
   const qs = normalizeQueryString('/history', {
-    decade: '1950s',
+    decade: '1970s',
     kind: 'event',
-    selected: 'ent_seed_event_001',
+    selected: 'ent_dc_landmark_listing_1975',
     edge: 'edge_1',
     fbclid: 'abc',
     junk: '1',
   });
-  assert.equal(qs, 'decade=1950s&edge=edge_1&kind=event&selected=ent_seed_event_001');
+  assert.equal(qs, 'decade=1970s&edge=edge_1&kind=event&selected=ent_dc_landmark_listing_1975');
 });

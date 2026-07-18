@@ -11,16 +11,16 @@ import { HistoryResultList } from './HistoryResultList';
 void React;
 
 const sampleNode = {
-  entityId: 'ent_seed_place_001',
-  displayName: 'Seed Historical Place',
-  kind: 'place',
-  summary: 'Fixture place summary.',
+  entityId: 'ent_dunbar_school_001',
+  displayName: 'Paul Laurence Dunbar High School',
+  kind: 'school',
+  summary: 'Fixture school summary.',
   statusLabel: 'Historic',
   statusKind: 'status' as const,
   evidenceCount: 2,
-  href: '/entity/ent_seed_place_001',
-  factLinks: [{ href: '/facts/BB-F-000001/rosa-parks-arrested-december-1-1955', label: 'Sample fact' }],
-  topicTags: ['community'],
+  href: '/entity/ent_dunbar_school_001',
+  factLinks: [{ href: '/facts/BB-F-000001/dunbar-founded-1870-in-church-basement', label: 'Sample fact' }],
+  topicTags: ['education'],
 };
 
 test('DecadeStepper renders tablist with all-time and decade tabs', () => {
@@ -38,9 +38,9 @@ test('DecadeStepper renders tablist with all-time and decade tabs', () => {
 
 test('HistoryResultList renders entity links and fact off-ramps', () => {
   const html = renderToStaticMarkup(
-    <HistoryResultList nodes={[sampleNode]} labelledBy="history-results" selectedId="ent_seed_place_001" />,
+    <HistoryResultList nodes={[sampleNode]} labelledBy="history-results" selectedId="ent_dunbar_school_001" />,
   );
-  assert.match(html, /href="\/entity\/ent_seed_place_001"/);
+  assert.match(html, /href="\/entity\/ent_dunbar_school_001"/);
   assert.match(html, /aria-current="true"/);
-  assert.match(html, /href="\/facts\/BB-F-000001\/rosa-parks-arrested-december-1-1955"/);
+  assert.match(html, /href="\/facts\/BB-F-000001\/dunbar-founded-1870-in-church-basement"/);
 });
