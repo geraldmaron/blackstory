@@ -86,8 +86,8 @@
    (MapStage.tsx sets tabIndex=-1) because the synchronized result list is this map's accessible
    parity surface. */
 .bp-map-entity-marker {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.125rem;
+  height: 1.125rem;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -224,6 +224,74 @@
   background: color-mix(in srgb, var(--bp-surface) 88%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
+  transition: opacity var(--bp-duration-fast) var(--bp-easing);
+}
+
+/* When a record is open, quiet the list rail so the spotlight owns attention. */
+.bp-explore-stage__results--dimmed {
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+/* Centered (desktop) / bottom-sheet (mobile) narrative — copper marks the orientation moment. */
+.bp-explore-stage__spotlight {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  padding: var(--bp-space-4);
+  pointer-events: none;
+}
+
+.bp-explore-stage__spotlight-scrim {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: color-mix(in srgb, var(--bp-fixed-ink) 42%, transparent);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.bp-explore-stage__spotlight-panel {
+  position: relative;
+  z-index: 1;
+  width: min(92vw, 28rem);
+  max-height: min(78svh, 40rem);
+  padding: var(--bp-space-5);
+  overflow-y: auto;
+  border: var(--bp-border-width) solid var(--bp-border);
+  border-left: 3px solid var(--bp-accent);
+  border-radius: var(--bp-radius-lg);
+  background: var(--bp-surface);
+  pointer-events: auto;
+}
+
+.bp-explore-stage__spotlight-panel:focus-within {
+  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
+  outline-offset: var(--bp-focus-offset);
+}
+
+.bp-explore-stage__results .bp-result-list__link--button {
+  display: grid;
+  gap: inherit;
+  width: 100%;
+  text-align: inherit;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.bp-explore-stage__results .bp-result-list__item--selected .bp-result-list__link {
+  color: var(--bp-ink);
+}
+
+.bp-explore-stage__results .bp-result-list__item--selected .bp-result-list__title {
+  color: var(--bp-accent);
 }
 
 /* Result rows tighten INSIDE the floating panel only — the standalone /search page keeps the
@@ -316,6 +384,24 @@
     top: auto;
     bottom: var(--bp-space-4);
     right: var(--bp-space-4);
+  }
+
+  .bp-explore-stage__results--dimmed {
+    opacity: 0;
+  }
+
+  .bp-explore-stage__spotlight {
+    place-items: end center;
+    padding: 0;
+  }
+
+  .bp-explore-stage__spotlight-panel {
+    width: 100%;
+    max-width: none;
+    max-height: min(72svh, 36rem);
+    border-radius: var(--bp-radius-lg) var(--bp-radius-lg) 0 0;
+    border-left-width: var(--bp-border-width);
+    border-top: 3px solid var(--bp-accent);
   }
 
   .bp-explore-stage__legend {

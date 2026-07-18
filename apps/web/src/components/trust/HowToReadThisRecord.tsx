@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { Notice } from '@blap/ui';
-import { PREBUNK_TECHNIQUE_FRAMES } from '../../lib/trust/domain-trust.js';
+import { PREBUNK_TECHNIQUE_FRAMES } from '../../lib/trust/domain-trust';
 
 export type HowToReadThisRecordProps = {
   readonly methodologyHref?: string;

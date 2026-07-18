@@ -9,7 +9,7 @@
  * single answer.
  */
 import type { ContradictionSet } from '@blap/domain';
-import type { EvidenceAlternateValue, EvidenceDisputeInput, EvidenceDisputeView } from './types.js';
+import type { EvidenceAlternateValue, EvidenceDisputeInput, EvidenceDisputeView } from './types';
 
 export function buildDisputeView(input: EvidenceDisputeInput): EvidenceDisputeView {
   const alternates = input.alternates ?? [];

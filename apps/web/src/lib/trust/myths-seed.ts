@@ -2,7 +2,7 @@
  * Circulating third-party claim reviews for the /myths surface the ONLY pages that
  * emit schema.org ClaimReview markup. Each review addresses one externally attributed claim.
  */
-import type { MythClaimReviewInput } from './domain-trust.js';
+import type { MythClaimReviewInput } from './domain-trust';
 
 export type MythReview = MythClaimReviewInput & {
   readonly slug: string;

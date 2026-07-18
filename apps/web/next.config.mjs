@@ -1,22 +1,21 @@
 /**
  * Next.js config for the public web surface.
  * Static entity routes prefer CDN caching; middleware strips unknown query params.
+ * Next 16 defaults to Turbopack; this app keeps Webpack for NodeNext `.js`→`.ts`
+ * remapping under transpilePackages until Turbopack supports extensionAlias.
  */
 
 import { securityHeadersForNextConfig } from './src/lib/web-security/next-config-headers.mjs';
 
 const globalSecurityHeaders = securityHeadersForNextConfig();
 
-/**  {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   // Allow local verification via 127.0.0.1 as well as localhost.
   allowedDevOrigins: ['127.0.0.1', 'localhost'],
-  // App Hosting CI run lint + typecheck as separate gates; keep `next build` focused on
+  // App Hosting CI run typecheck as a separate gate; keep `next build` focused on
   // emit so monorepo package-dist skew cannot block image publish.
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -68,6 +67,24 @@ const nextConfig = {
       },
       {
         source: '/search',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=60, stale-while-revalidate=300',
+          },
+        ],
+      },
+      {
+        source: '/history',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=300, stale-while-revalidate=3600',
+          },
+        ],
+      },
+      {
+        source: '/explore',
         headers: [
           {
             key: 'Cache-Control',

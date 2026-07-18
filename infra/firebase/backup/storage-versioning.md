@@ -15,11 +15,19 @@ ADR-011.
 
 ## Public release snapshots
 
-Path layout (BB-019):
+Path layout (BB-019 / ADR-004):
 
 ```text
 gs://black-book-efaaf-public-media/public/releases/{releaseId}/entities/{entityId}.json
+gs://black-book-efaaf-public-media/public/releases/{releaseId}/entities.json
+gs://black-book-efaaf-public-media/public/releases/{releaseId}/search-index.json
 ```
+
+- Per-entity JSON: optional fine-grained snapshots.
+- **Aggregate catalog** (`entities.json` + `search-index.json`): preferred public read path for
+  map/list/search/history/sitemap — one CDN fetch replaces an unbounded Firestore collection scan.
+  Emitted by `packages/firebase/scripts/publish-national-catalog.ts` (local fixtures always;
+  GCS when `BLAP_UPLOAD_RELEASE_ARTIFACTS=1`).
 
 Rules:
 

@@ -1,9 +1,11 @@
 /**
  * Decades-in-motion frames for the home hero (design-direction-v5 §6.1): the
- * archive fills in decade by decade — pins accumulate as their earliest
- * documented decade arrives, state fills reflect ACTIVE documented presence
- * that decade (an entity's own `eraBuckets` span, not just its arrival), and
- * that decade's relationship lines trace movement between places.
+ * archive rewinds newest → oldest — starting near the present end of the
+ * documented record and walking toward earlier decades — then lands on the
+ * full archive. Pins accumulate by earliest documented decade (≤ frame decade);
+ * state fills reflect ACTIVE documented presence that decade (an entity's own
+ * `eraBuckets` span, not just its arrival); that decade's relationship lines
+ * trace movement between places.
  *
  * Per-decade state density is delegated to `@blap/domain`'s
  * `aggregateDecadePresence` (packages/domain/src/map/decade-presence.ts) —
@@ -134,10 +136,12 @@ function collectionOf(features: readonly ExploreMapFeature[]): ExploreMapFeature
 
 /**
  * One frame per decade that changes something (a record arrives or an edge is
- * active), in chronological order, closed by a full-archive frame that also
- * carries the undated records and the all-time relationship lines. Pins
- * accumulate by arrival (earliest documented decade); density reflects
- * ACTIVE presence that decade, via `@blap/domain`'s decade-presence model.
+ * active), newest → oldest so the hero starts at the present end of the
+ * archive and rewinds toward earlier records, closed by a full-archive frame
+ * that also carries the undated records and the all-time relationship lines.
+ * Pins accumulate by arrival (earliest documented decade ≤ frame decade);
+ * density reflects ACTIVE presence that decade, via `@blap/domain`'s
+ * decade-presence model.
  */
 export function buildDecadeFlowFrames(
   collection: ExploreMapFeatureCollection,
@@ -157,7 +161,8 @@ export function buildDecadeFlowFrames(
   const activeDensityByDecade = buildActiveDensityByDecade(collection.features);
 
   const frames: DecadeFlowFrame[] = [];
-  for (const start of [...decadeStarts].sort((a, b) => a - b)) {
+  // Newest first so autoplay and the rail both read new → old.
+  for (const start of [...decadeStarts].sort((a, b) => b - a)) {
     const label = `${start}s`;
     const cumulative = collection.features.filter((feature) => {
       const earliest = earliestDecadeOf(feature);

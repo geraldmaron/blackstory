@@ -2,7 +2,7 @@
  * Law status badge using `LawStatus` vocabulary.
  */
 import React from 'react';
-import { type LawStatus } from '@blap/domain';
+import { type LawStatus } from '@blap/domain/entity-status';
 import { lawStatusTone, legalStatusDisplay } from './format';
 
 export type LegalStatusBadgeProps = {

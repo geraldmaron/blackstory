@@ -125,7 +125,7 @@ async function seedPublicProjection(env: RulesTestEnvironment): Promise<void> {
   });
 }
 
-test('unauthenticated clients can read public projections but not write', async (t) => {
+test('unauthenticated clients can read publicMeta but not public projections or search index', async (t) => {
   if (!testEnv) {
     t.skip(skipReason ?? 'emulators unavailable');
     return;
@@ -135,7 +135,8 @@ test('unauthenticated clients can read public projections but not write', async 
   const context = testEnv.unauthenticatedContext();
   const db = context.firestore();
   await assertSucceeds(db.doc('publicMeta/activeRelease').get());
-  await assertSucceeds(db.doc('publicReleases/rel_rules_001/entities/ent_1').get());
+  await assertFails(db.doc('publicReleases/rel_rules_001/entities/ent_1').get());
+  await assertFails(db.doc('publicSearchIndex/ent_1').get());
   await assertFails(db.doc('publicMeta/activeRelease').set({ releaseId: 'hacked' }));
 });
 

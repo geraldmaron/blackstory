@@ -8,10 +8,20 @@
 import { brandPalette } from '@blap/ui';
 
 export const EXPLORE_CLUSTER_CONFIG = {
-  clusterRadius: 60,
-  clusterMaxZoom: 11,
+  /** Pixel radius for grouping nearby points — tighter than default so metro clouds collapse. */
+  clusterRadius: 52,
+  /** Keep aggregates through state/locality; individuals emerge past this zoom. */
+  clusterMaxZoom: 12,
   clusterMinPoints: 2,
 } as const;
+
+/** Cluster disc radii by point_count, then scaled by zoom in explore-style (national shrink). */
+export const CLUSTER_RADIUS_BY_COUNT: ReadonlyArray<readonly [minCount: number, radius: number]> = [
+  [0, 10],
+  [10, 14],
+  [50, 18],
+  [200, 22],
+];
 
 /** OpenFreeMap vector tiles + fonts — free street basemap under the archive layers. */
 export const OPENFREEMAP_TILE_SOURCE_URL = 'https://tiles.openfreemap.org/planet';

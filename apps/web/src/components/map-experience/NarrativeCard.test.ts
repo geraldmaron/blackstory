@@ -31,6 +31,8 @@ test('renders name, era, one-line story, evidence count, confidence, and a link 
   assert.match(html, />High<|>Medium<|>Low<|>Unrated</);
   assert.doesNotMatch(html, /high confidence/i);
   assert.match(html, new RegExp(`href="${feature.properties.href}"`));
+  assert.match(html, /Selected record/);
+  assert.match(html, /><dt>Where<\/dt>/);
   assert.match(html, /bp-nc__title-link/);
   assert.match(html, /Open full record/);
 });

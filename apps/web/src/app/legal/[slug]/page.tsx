@@ -3,7 +3,6 @@
  */
 import { notFound } from 'next/navigation';
 import { Card } from '@blap/ui';
-import { SeedDataNotice } from '../../../components/SeedDataNotice';
 import {
   LegalDisclaimer,
   LegalExplainerSections,
@@ -11,6 +10,7 @@ import {
   humanizeLegalKind,
 } from '../../../components/legal';
 import { buildLegalDetailViewModel, listLegalStaticParams } from '../legal-view-model';
+import '../legal.css';
 
 type LegalDetailPageProps = {
   readonly params: Promise<{ readonly slug: string }>;
@@ -56,7 +56,6 @@ export default async function LegalDetailPage({ params }: LegalDetailPageProps) 
 
       <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
         <LegalDisclaimer />
-        <SeedDataNotice compact />
 
         {factHref ? (
           <Card>

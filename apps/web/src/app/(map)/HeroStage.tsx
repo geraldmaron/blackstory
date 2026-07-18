@@ -38,7 +38,7 @@ export type HeroStageProps = {
   readonly featureCount: number;
   /** Distinct states/districts with at least one pinned record. */
   readonly stateCount: number;
-  /** Decades-in-motion frames (chronological, closed by the full-archive frame). */
+  /** Decades-in-motion frames (newest → oldest, closed by the full-archive frame). */
   readonly decadeFrames: readonly DecadeFlowFrame[];
   /** True when the page is reading live public projections; the count line's "sample data"
    * qualifier only renders on the snapshot/seed fallback. */
@@ -96,7 +96,7 @@ export function HeroStage({
   const stage = useMapStage();
   const [dissolving, setDissolving] = useState(false);
 
-  // Decades in motion (v5 §6.1): the archive fills in decade by decade.
+  // Decades in motion: rewind newest → oldest, then land on the complete archive.
   // Reduced motion starts paused on the complete archive; play remains a
   // deliberate, user-initiated choice there.
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -129,7 +129,7 @@ export function HeroStage({
   // frame (ADR-017: "the reverse transition eases back to the national preset as
   // hero chrome returns"); the decade-flow effect below owns the data patches.
   useEffect(() => {
-    stage.applyViewState({ selectedState: undefined, selectedEdge: undefined });
+    stage.applyViewState({ selectedState: undefined, selectedEdge: undefined, selectedEntity: undefined });
     stage.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
   }, [stage]);
 
@@ -171,7 +171,11 @@ export function HeroStage({
       stage.subscribe('select', (entityId: string) => {
         const coordinates = coordinatesOf(featureCollection, entityId);
         if (coordinates) {
-          stage.flyPreset('point', { center: coordinates, zoom: CAMERA_POINT_ZOOM });
+          stage.flyPreset(
+            'point',
+            { center: coordinates, zoom: CAMERA_POINT_ZOOM },
+            { padding: { top: 72, bottom: 280, left: 48, right: 48 } },
+          );
         }
         engage(buildExploreHref({ filters: DEFAULT_EXPLORE_FILTERS, density: false, lines: false, selected: entityId }));
       }),
@@ -227,7 +231,7 @@ export function HeroStage({
       </div>
 
       {decadeFrames.length > 1 ? (
-        <div className="bp-hero-timeline" role="group" aria-label="Decades in motion">
+        <div className="bp-hero-timeline" role="group" aria-label="Decades in motion, newest to oldest">
           <div className="bp-hero-timeline__head">
             <div className="bp-hero-timeline__readout" aria-live="polite">
               <p className="bp-hero-timeline__decade">
@@ -236,7 +240,7 @@ export function HeroStage({
               <p className="bp-hero-timeline__note">
                 {currentFrame?.isComplete
                   ? `${currentFrame?.cumulativeCount ?? featureCount} records · ${stateCount} states${liveData ? '' : ' · sample data'}`
-                  : `${currentFrame?.cumulativeCount ?? 0} records documented by this decade`}
+                  : `${currentFrame?.cumulativeCount ?? 0} records documented through this decade`}
               </p>
             </div>
             <button

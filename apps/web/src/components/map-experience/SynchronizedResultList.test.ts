@@ -45,6 +45,15 @@ test('entity cards are plain navigable links (never intercept click with prevent
   }
 });
 
+test('with onSelect, rows are buttons that keep the reader on the map surface', () => {
+  const features = buildFeatures();
+  const html = renderToStaticMarkup(
+    createElement(SynchronizedResultList, { features, onSelect: () => undefined }),
+  );
+  assert.match(html, /bp-result-list__link--button/);
+  assert.doesNotMatch(html, /href="/);
+});
+
 test('uses a uniform labeled meta layout with short confidence values', () => {
   const features = buildFeatures();
   const html = renderToStaticMarkup(createElement(SynchronizedResultList, { features }));

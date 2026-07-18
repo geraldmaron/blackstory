@@ -2,9 +2,9 @@
  * Public legal landscape browse surface at `/legal`.
  */
 import { EmptyState, FilterBar } from '@blap/ui';
-import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { LegalBrowseList, LegalDisclaimer, LEGAL_BROWSE_LEDE } from '../../components/legal';
 import { buildLegalBrowseViewModel, type RawLegalBrowseParams } from './legal-view-model';
+import './legal.css';
 
 export const metadata = {
   title: 'Legal landscape',
@@ -29,7 +29,6 @@ export default async function LegalBrowsePage({ searchParams }: LegalPageProps) 
 
       <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
         <LegalDisclaimer />
-        <SeedDataNotice compact />
 
         <FilterBar
           method="get"

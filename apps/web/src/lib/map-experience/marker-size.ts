@@ -22,12 +22,12 @@ import type { ExpressionSpecification } from 'maplibre-gl';
 
 export type ConfidenceTierLike = 'high' | 'medium' | 'low' | 'unrated' | (string & {});
 
-export const MARKER_RADIUS_MIN = 6;
-export const MARKER_RADIUS_MAX = 16;
-export const MARKER_RADIUS_BASE = 6;
-export const MARKER_RADIUS_EVIDENCE_COEFFICIENT = 2.2;
+export const MARKER_RADIUS_MIN = 4;
+export const MARKER_RADIUS_MAX = 11;
+export const MARKER_RADIUS_BASE = 4;
+export const MARKER_RADIUS_EVIDENCE_COEFFICIENT = 1.6;
 /** Halo renders `MARKER_HALO_OFFSET`px larger than its point marker (design-direction-v3.md). */
-export const MARKER_HALO_OFFSET = 6;
+export const MARKER_HALO_OFFSET = 3;
 
 export const CONFIDENCE_SIZE_MODIFIER: Readonly<Record<'high' | 'medium' | 'low' | 'unrated', number>> = {
   high: 1.0,
@@ -84,9 +84,10 @@ export function markerHaloRadius(evidenceCount: number, confidenceTier: Confiden
  * `markerRadius()` contract above is unchanged — zoom scaling composes on top of it.
  */
 export const MARKER_ZOOM_SCALE_STOPS: ReadonlyArray<readonly [zoom: number, scale: number]> = [
-  [3, 0.7],
-  [5.5, 1],
-  [9, 1.35],
+  [3, 0.4],
+  [5.5, 0.85],
+  [9, 1.15],
+  [12, 1.25],
 ];
 
 /** Pure piecewise-linear counterpart of `markerZoomScaleExpression()` — same stops, flat

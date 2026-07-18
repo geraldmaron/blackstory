@@ -2,7 +2,7 @@
  * Browse list row for the `/legal` index page.
  */
 import React from 'react';
-import type { LawStatus } from '@blap/domain';
+import type { LawStatus } from '@blap/domain/entity-status';
 import { LegalStatusBadge } from './LegalStatusBadge';
 import { humanizeLegalKind, humanizeLegalTopic } from './format';
 
@@ -25,10 +25,10 @@ export type LegalBrowseListProps = {
 
 export function LegalBrowseList({ items, labelledBy }: LegalBrowseListProps) {
   return (
-    <ul className="bp-result-list" aria-labelledby={labelledBy}>
+    <ul className="bp-result-list bp-legal-browse-list" aria-labelledby={labelledBy}>
       {items.map((item) => (
-        <li key={item.id} className="bp-result-list__item">
-          <article>
+        <li key={item.id} className="bp-result-list__item bp-legal-browse-list__item">
+          <article className="bp-legal-browse-list__record">
             <h3 className="bp-result-list__title" style={{ margin: 0 }}>
               <a href={`/legal/${item.slug}`}>{item.title}</a>
             </h3>

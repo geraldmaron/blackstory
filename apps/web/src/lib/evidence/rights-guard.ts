@@ -14,7 +14,7 @@ import type {
   EvidenceCitationView,
   EvidenceExcerptInput,
   EvidenceExcerptView,
-} from './types.js';
+} from './types';
 
 function excerptContentKind(excerptKind: EvidenceExcerptInput['excerptKind']): PublicationContentKind {
   if (excerptKind === 'substantial') return 'substantial_excerpt';

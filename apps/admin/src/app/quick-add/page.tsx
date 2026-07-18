@@ -3,7 +3,7 @@
  * through the same operator-cli package functions as `submit-lead`/`research-intake`.
  */
 import Link from 'next/link';
-import { QuickAddForm } from './quick-add-form.js';
+import { QuickAddForm } from './quick-add-form';
 import './quick-add.css';
 
 export const metadata = {

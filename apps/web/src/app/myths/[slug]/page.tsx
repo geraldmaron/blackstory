@@ -7,8 +7,8 @@ import {
   MythClaimReviewScript,
   PublishingPrinciplesJsonLdScript,
   TrustSiteJsonLdScript,
-} from '../../../components/trust/index.js';
-import { getMythReview } from '../../../lib/trust/myths-seed.js';
+} from '../../../components/trust/index';
+import { getMythReview } from '../../../lib/trust/myths-seed';
 
 type MythPageProps = {
   readonly params: Promise<{ readonly slug: string }>;

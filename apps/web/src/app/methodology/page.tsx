@@ -4,9 +4,9 @@
 import {
   PublishingPrinciplesJsonLdScript,
   TrustSiteJsonLdScript,
-} from '../../components/trust/index.js';
-import { TRUST_PATHS } from '../../lib/trust/site-identity.js';
-import { MethodologySections } from './MethodologySections.js';
+} from '../../components/trust/index';
+import { TRUST_PATHS } from '../../lib/trust/site-identity';
+import { MethodologySections } from './MethodologySections';
 
 export const metadata = {
   title: 'Methodology',

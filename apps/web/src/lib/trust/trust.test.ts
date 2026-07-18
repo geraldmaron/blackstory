@@ -3,10 +3,10 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { buildErrataJsonFeed, buildErrataRssFeed } from './errata-feed.js';
-import { listErrataEntries } from './errata-seed.js';
-import { getMythReview, listMythReviews } from './myths-seed.js';
-import { assertClaimReviewPathExclusive, buildMythClaimReviewJsonLd } from './domain-trust.js';
+import { buildErrataJsonFeed, buildErrataRssFeed } from './errata-feed';
+import { listErrataEntries } from './errata-seed';
+import { getMythReview, listMythReviews } from './myths-seed';
+import { assertClaimReviewPathExclusive, buildMythClaimReviewJsonLd } from './domain-trust';
 
 test('errata seed is reverse-chronological and includes fact corrections', () => {
   const entries = listErrataEntries();

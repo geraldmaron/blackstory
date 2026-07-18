@@ -1,4 +1,9 @@
-/**  {import('next').NextConfig} */
+/**
+ * Next.js config for the operator admin console.
+ * Keeps Webpack for NodeNext `.js`→`.ts` remapping under transpilePackages.
+ */
+
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: [
@@ -10,7 +15,6 @@ const nextConfig = {
     '@blap/firebase',
   ],
   webpack: (config) => {
-    // NodeNext packages emit `.js` specifiers that map to `.ts`/`.tsx` sources.
     config.resolve.extensionAlias = {
       ...config.resolve.extensionAlias,
       '.js': ['.ts', '.tsx', '.js', '.jsx'],

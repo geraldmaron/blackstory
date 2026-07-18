@@ -17,6 +17,8 @@ export const EXPLORE_UNCLUSTERED_POINT_LAYER_ID = 'explore-point';
  * offset around the point marker (see kind-encoding.ts's module doc for why this is an
  * approximation rather than literal diamond geometry). */
 export const EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID = 'explore-point-event-glyph';
+/** Copper orientation ring for the currently selected entity (not a heat signal). */
+export const EXPLORE_SELECTED_POINT_LAYER_ID = 'explore-point-selected';
 export const EXPLORE_STATE_DENSITY_LAYER_ID = 'explore-state-density-fill';
 /** black-book-uda: county hairlines — the fainter tier of the boundary system beneath the
  * state bounds line, zoom-gated so the national frame stays clean. */

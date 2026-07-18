@@ -1,7 +1,7 @@
 /**
  * Defines the administration console surfaces, fixture rows, and guarded action contracts.
  */
-import type { AdminPermission, PrivilegedAdminAction } from '../auth/index.js';
+import type { AdminPermission, PrivilegedAdminAction } from '../auth/index';
 
 export const CONSOLE_SURFACE_IDS = [
   'candidate-queue',

@@ -170,6 +170,12 @@ export {
   DEFAULT_PUBLIC_MEDIA_BUCKET,
   entityPrimaryImageObjectPath,
   entityPrimaryImageObjectRef,
+  buildReleaseCatalogArtifacts,
+  publicMediaObjectUrl,
+  publicReleaseEntitiesListPath,
+  publicReleaseSearchIndexPath,
+  writeReleaseCatalogArtifactsToDir,
+  uploadReleaseCatalogArtifacts,
   submissionInboxConverter,
   auditEventConverter,
   outboxMessageConverter,
@@ -327,6 +333,9 @@ export type {
   PromoteClaimResult,
   ResearchCaseServerAction,
   ServerResearchCaseState,
+  BuiltReleaseCatalogArtifacts,
+  ReleaseEntitiesListArtifact,
+  ReleaseSearchIndexArtifact,
 } from './firestore/index.js';
 
 // Census/ACS/FBI-UCR national-rollup readers for the public /data page (black-book-vxz,

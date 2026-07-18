@@ -6,15 +6,15 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { getDisclaimer } from '@blap/domain';
-import { listSeedFacts } from '../../data/facts-seed.js';
+import { getDisclaimer } from '@blap/domain/disclaimers';
+import { listSeedFacts } from '../../data/facts-seed';
 import {
   CommonMisreadings,
   ConfidenceLabelWithNuance,
   HowToReadThisRecord,
   RevisionUpdateChrome,
   TrustSiteDisclaimer,
-} from './index.js';
+} from './index';
 
 test('HowToReadThisRecord names techniques and links to methodology', () => {
   const html = renderToStaticMarkup(createElement(HowToReadThisRecord));

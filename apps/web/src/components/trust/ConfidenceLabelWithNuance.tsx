@@ -4,9 +4,8 @@
  */
 import React from 'react';
 import { Confidence } from '@blap/ui';
-import type { FactConfidenceGrade } from '@blap/domain';
-import { FACT_CONFIDENCE_DEFINITIONS } from '@blap/domain';
-import { humanizeToken, mapConfidenceToUiLevel } from '../facts/format.js';
+import { FACT_CONFIDENCE_DEFINITIONS, type FactConfidenceGrade } from '@blap/domain/facts';
+import { humanizeToken, mapConfidenceToUiLevel } from '../facts/format';
 
 export type ConfidenceLabelWithNuanceProps = {
   readonly confidence: FactConfidenceGrade;

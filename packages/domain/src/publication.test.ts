@@ -12,7 +12,9 @@ import {
   createPublicEntitySnapshot,
   createPublicationRelease,
   publicEntitySnapshotPath,
+  publicReleaseEntitiesListPath,
   publicReleaseMetadata,
+  publicReleaseSearchIndexPath,
   sha256Json,
   signReleaseManifest,
   verifySignedReleaseManifest,
@@ -84,6 +86,17 @@ test('manifest deterministically hashes projection and snapshot payloads', () =>
   assert.notEqual(
     signed.manifest.entries[0]?.projectionHash.digest,
     signed.manifest.entries[0]?.snapshotHash.digest,
+  );
+});
+
+test('aggregate release catalog paths are under public/releases/{id}/', () => {
+  assert.equal(
+    publicReleaseEntitiesListPath('release-001'),
+    'public/releases/release-001/entities.json',
+  );
+  assert.equal(
+    publicReleaseSearchIndexPath('release-001'),
+    'public/releases/release-001/search-index.json',
   );
 });
 

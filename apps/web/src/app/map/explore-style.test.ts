@@ -7,13 +7,14 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listPublicEntities } from '../../data/public-seed';
-import { buildExploreMapSource, DIGNITY_PALETTE } from '../../lib/map-experience';
+import { buildExploreMapSource, DIGNITY_PALETTE, EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience';
 import { KIND_ENCODING_ENTRIES } from '../../lib/map-experience/kind-encoding';
 import { markerHaloRadiusExpression, markerRadiusExpression } from '../../lib/map-experience/marker-size';
 import {
   buildExploreMapStyle,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
+  EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
@@ -54,9 +55,25 @@ function buildStyleFixture(densityLayerEnabled: boolean) {
 
 test('the entities source is configured to cluster with the shared explore cluster config', () => {
   const style = buildStyleFixture(true);
-  const entitiesSource = style.sources['explore-entities'] as { cluster?: boolean; clusterRadius?: number };
+  const entitiesSource = style.sources['explore-entities'] as {
+    cluster?: boolean;
+    clusterRadius?: number;
+    clusterMaxZoom?: number;
+  };
   assert.equal(entitiesSource.cluster, true);
-  assert.equal(entitiesSource.clusterRadius, 60);
+  assert.equal(entitiesSource.clusterRadius, EXPLORE_CLUSTER_CONFIG.clusterRadius);
+  assert.equal(entitiesSource.clusterMaxZoom, EXPLORE_CLUSTER_CONFIG.clusterMaxZoom);
+});
+
+test('selected-entity ring layer exists and starts with an empty filter', () => {
+  const style = buildStyleFixture(true);
+  const selected = style.layers.find((layer) => layer.id === EXPLORE_SELECTED_POINT_LAYER_ID) as {
+    filter?: unknown;
+    paint?: Record<string, unknown>;
+  };
+  assert.ok(selected, 'expected selected point ring layer');
+  assert.deepEqual(selected.filter, ['==', ['get', 'entityId'], '']);
+  assert.equal(selected.paint?.['circle-color'], 'rgba(0,0,0,0)');
 });
 
 test('state density source starts empty so client join can setData without URL race', () => {
@@ -231,8 +248,16 @@ test('BB-099: point and halo radii are literally markerRadiusExpression()/marker
   assert.deepEqual(haloLayer.paint?.['circle-radius'], markerHaloRadiusExpression());
 });
 
-test('clusters keep their existing count-step sizing (untouched by the per-kind size formula)', () => {
+test('clusters use zoom-scaled count-step radii from CLUSTER_RADIUS_BY_COUNT', () => {
   const style = buildStyleFixture(true);
   const clusterLayer = layerById(style, EXPLORE_CLUSTER_LAYER_ID);
-  assert.deepEqual(clusterLayer.paint?.['circle-radius'], ['step', ['get', 'point_count'], 18, 10, 24, 50, 30]);
+  const radius = clusterLayer.paint?.['circle-radius'] as unknown[];
+  assert.equal(radius[0], 'interpolate');
+  assert.deepEqual(radius[2], ['zoom']);
+  assert.equal(radius[3], 3);
+  assert.equal(radius[5], 5.5);
+  assert.equal(radius[7], 9);
+  const nationalStep = (radius[4] as unknown[])[1] as unknown[];
+  assert.equal(nationalStep[0], 'step');
+  assert.deepEqual(nationalStep.slice(2), [10, 10, 14, 50, 18, 200, 22]);
 });

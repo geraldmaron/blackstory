@@ -5,10 +5,10 @@
 import {
   PublishingPrinciplesJsonLdScript,
   TrustSiteJsonLdScript,
-} from '../../components/trust/index.js';
-import { ERRATA_CHANGE_TYPE_LABELS } from '../../lib/trust/domain-trust.js';
-import { listErrataEntries } from '../../lib/trust/errata-seed.js';
-import { TRUST_PATHS } from '../../lib/trust/site-identity.js';
+} from '../../components/trust/index';
+import { ERRATA_CHANGE_TYPE_LABELS } from '../../lib/trust/domain-trust';
+import { listErrataEntries } from '../../lib/trust/errata-seed';
+import { TRUST_PATHS } from '../../lib/trust/site-identity';
 
 export const metadata = {
   title: 'Errata & corrections policy',

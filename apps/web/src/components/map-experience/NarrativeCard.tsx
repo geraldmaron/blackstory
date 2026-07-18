@@ -2,8 +2,8 @@
  * Narrative off-ramp card for a single selected map point. Anatomy follows the
  * cognitive-accessibility law (design-direction-v5 §v5.1): one consistent record
  * order everywhere — kind badge → name → one-line story → labeled facts → tags →
- * precision note → single action. Every fact carries a literal label (Era,
- * Evidence, Confidence, Status); nothing is inferred from position or glued
+ * precision note → single action. Every fact carries a literal label (Where,
+ * Era, Evidence, Confidence, Status); nothing is inferred from position or glued
  * together. Close is a small icon key in the top corner, not a competing action.
  * Purely presentational and SSR-render-safe — the map canvas and the
  * synchronized list both open the same card for the same feature.
@@ -40,12 +40,24 @@ function radiusAffordanceLabel(feature: ExploreMapFeature): string {
   return `Shown at ${geoPrecisionTier} precision — the marker represents a ±${distance} area, not an exact address.`;
 }
 
+function placeLabel(feature: ExploreMapFeature): string {
+  const { statePostalCode } = feature.properties;
+  return statePostalCode && statePostalCode.length > 0 ? statePostalCode : '—';
+}
+
 export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
   const { properties } = feature;
   const kindEncoding = displayEncodingFor(properties.kind, properties.mapTone);
 
   return (
-    <article className="bp-nc" aria-label={properties.displayName}>
+    <article
+      className="bp-nc"
+      aria-labelledby="bp-nc-title"
+      aria-describedby="bp-nc-story"
+      tabIndex={-1}
+      data-entity-id={properties.entityId}
+    >
+      <p className="bp-nc__kicker">Selected record</p>
       <div className="bp-nc__top">
         <div
           className="bp-nc__kind-rule"
@@ -75,14 +87,20 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         ) : null}
       </div>
 
-      <h3 className="bp-nc__title">
+      <h3 className="bp-nc__title" id="bp-nc-title">
         <Link className="bp-nc__title-link" href={properties.href}>
           {properties.displayName}
         </Link>
       </h3>
-      <p className="bp-nc__story">{properties.oneLineStory}</p>
+      <p className="bp-nc__story" id="bp-nc-story">
+        {properties.oneLineStory}
+      </p>
 
       <dl className="bp-nc__facts">
+        <div className="bp-nc__fact">
+          <dt>Where</dt>
+          <dd className="bp-mono">{placeLabel(feature)}</dd>
+        </div>
         <div className="bp-nc__fact">
           <dt>Era</dt>
           <dd>{eraLabel(properties.eraBuckets)}</dd>

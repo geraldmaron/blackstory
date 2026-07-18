@@ -7,10 +7,10 @@
  * rendering layer over this module, matching this codebase's existing
  * `entity-view-model.ts` convention of separating decision logic from JSX.
  */
-import { formatEvidenceScoreLabel } from './confidence-language.js';
-import { buildDisputeView } from './contradiction-view.js';
-import { resolveCitationForDisplay, resolveExcerptForDisplay } from './rights-guard.js';
-import type { EvidenceClaimInput, EvidenceClaimView } from './types.js';
+import { formatEvidenceScoreLabel } from './confidence-language';
+import { buildDisputeView } from './contradiction-view';
+import { resolveCitationForDisplay, resolveExcerptForDisplay } from './rights-guard';
+import type { EvidenceClaimInput, EvidenceClaimView } from './types';
 
 export function buildEvidenceCard(input: EvidenceClaimInput): EvidenceClaimView {
   const confidenceLabel = formatEvidenceScoreLabel(input.confidenceScore, input.confidenceLevel);

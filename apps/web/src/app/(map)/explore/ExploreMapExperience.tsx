@@ -2,8 +2,10 @@
 
 /**
  * Client orchestrator for `/explore` (BB-098). Wires the shared `MapStage` (via `useMapStage()`
- * instead of mounting its own canvas), the synchronized accessible list, narrative card, density
- * toggle, relationship lines, decade settings, filter form, and shareable URL state. The
+ * instead of mounting its own canvas), the synchronized accessible list, density toggle,
+ * relationship lines, decade settings, filter form, and shareable URL state. Pin or list
+ * selection opens a centered (desktop) / bottom-sheet (mobile) narrative spotlight — not a
+ * buried card in the results rail — with focus handoff and Escape to dismiss. The
  * server-rendered snapshot catalog is the source of truth; `/explore/api` refine is optional
  * progressive enhancement when App Check is configured.
  *
@@ -44,6 +46,9 @@ export type ExploreMapExperienceProps = {
 };
 
 const TRANSITION_FLAG = 'bp-map-transition';
+
+/** Keeps the selected pin clear of the centered (desktop) / bottom (mobile) spotlight. */
+const SELECTION_CAMERA_PADDING = { top: 72, bottom: 280, left: 48, right: 48 } as const;
 
 function mergeViewState(
   base: ExploreViewState,
@@ -132,6 +137,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const [view, setView] = useState(initial);
   const viewportTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const filterRegionRef = useRef<HTMLDivElement | null>(null);
+  const spotlightRef = useRef<HTMLDivElement | null>(null);
   // Mirror of the latest committed view state for the debounced viewport handler below. React
   // may replay setState updater functions during render, so an updater must stay pure — the
   // handler needs the current view state OUTSIDE an updater to build the next URL.
@@ -157,12 +163,14 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     [view.allFeatures, view.viewState.filters, view.viewState.state],
   );
 
+  // Resolve from the full catalog so a deep-linked `?selected=` still opens even when the
+  // current facet set would hide that row from the list.
   const selectedFeature = useMemo(
     () =>
       view.viewState.selected
-        ? filteredFeatures.find((feature) => feature.properties.entityId === view.viewState.selected)
+        ? view.allFeatures.find((feature) => feature.properties.entityId === view.viewState.selected)
         : undefined,
-    [filteredFeatures, view.viewState.selected],
+    [view.allFeatures, view.viewState.selected],
   );
 
   const commitViewState = useCallback(
@@ -227,8 +235,12 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   ]);
 
   useEffect(() => {
-    stage.applyViewState({ selectedState: view.viewState.state, selectedEdge: view.viewState.edge });
-  }, [stage, view.viewState.state, view.viewState.edge]);
+    stage.applyViewState({
+      selectedState: view.viewState.state,
+      selectedEdge: view.viewState.edge,
+      selectedEntity: view.viewState.selected,
+    });
+  }, [stage, view.viewState.state, view.viewState.edge, view.viewState.selected]);
 
   const reconcileCamera = useCallback(
     (viewState: ExploreViewState, mode: 'fly' | 'ease') => {
@@ -236,7 +248,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         const feature = view.allFeatures.find((item) => item.properties.entityId === viewState.selected);
         if (feature && feature.geometry.type === 'Point') {
           const [lng, lat] = feature.geometry.coordinates;
-          stage.flyPreset('point', { center: [lng, lat], zoom: CAMERA_POINT_ZOOM }, { mode });
+          stage.flyPreset(
+            'point',
+            { center: [lng, lat], zoom: CAMERA_POINT_ZOOM },
+            { mode, padding: SELECTION_CAMERA_PADDING },
+          );
           return;
         }
       }
@@ -280,26 +296,31 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   }, [reconcileCamera]);
 
   // Chrome dissolve -> entry: if the hero flagged an in-progress transition, this mount IS its
-  // landing — move focus to the filter region rather than stranding it on a now-unmounted hero
-  // control (WCAG 2.4.3 focus order).
+  // landing — focus filters unless a pin was the engagement target (spotlight owns that focus).
   useEffect(() => {
     try {
       if (window.sessionStorage.getItem(TRANSITION_FLAG)) {
         window.sessionStorage.removeItem(TRANSITION_FLAG);
-        filterRegionRef.current?.focus();
+        if (!initial.viewState.selected) {
+          filterRegionRef.current?.focus();
+        }
       }
     } catch {
       // sessionStorage unavailable (private browsing) — the transition still completes, just
       // without a deterministic post-landing focus target.
     }
-  }, []);
+  }, [initial.viewState.selected]);
 
   const handleSelect = useCallback(
     (entityId: string) => {
       const feature = view.allFeatures.find((item) => item.properties.entityId === entityId);
       if (feature && feature.geometry.type === 'Point') {
         const [lng, lat] = feature.geometry.coordinates;
-        stage.flyPreset('point', { center: [lng, lat], zoom: CAMERA_POINT_ZOOM });
+        stage.flyPreset(
+          'point',
+          { center: [lng, lat], zoom: CAMERA_POINT_ZOOM },
+          { padding: SELECTION_CAMERA_PADDING },
+        );
       }
       commitViewState(mergeViewState(view.viewState, { selected: entityId, clearEdge: true }));
     },
@@ -371,6 +392,36 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const handleCloseEdge = useCallback(() => {
     commitViewState(mergeViewState(view.viewState, { clearEdge: true }));
   }, [commitViewState, view.viewState]);
+
+  // Spotlight: move focus into the narrative so the record is announced; Escape dismisses
+  // entity or edge spotlight.
+  useEffect(() => {
+    const entityOpen = Boolean(selectedFeature) && !view.selectedEdge;
+    const edgeOpen = Boolean(view.selectedEdge);
+    if (!entityOpen && !edgeOpen) return undefined;
+
+    const frame = window.requestAnimationFrame(() => {
+      if (entityOpen) {
+        spotlightRef.current?.querySelector<HTMLElement>('.bp-nc')?.focus();
+      } else {
+        spotlightRef.current?.querySelector<HTMLElement>('article, [tabindex]')?.focus();
+      }
+    });
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      if (edgeOpen) {
+        handleCloseEdge();
+      } else {
+        handleCloseCard();
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [selectedFeature, view.selectedEdge, handleCloseCard, handleCloseEdge]);
 
   const handleViewportChange = useCallback(
     (viewport: ExploreViewport) => {
@@ -533,7 +584,13 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         </div>
       </div>
 
-      <div className="bp-explore-stage__results">
+      <div
+        className={
+          selectedFeature || view.selectedEdge
+            ? 'bp-explore-stage__results bp-explore-stage__results--dimmed'
+            : 'bp-explore-stage__results'
+        }
+      >
         {/* The count labels the list it sits above — oldest records first. */}
         <p className="bp-sans bp-explore__results-count" id="explore-results-heading">
           {filteredFeatures.length} documented record{filteredFeatures.length === 1 ? '' : 's'}
@@ -545,18 +602,46 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
             : ''}
           {' · oldest first'}
         </p>
-        {view.selectedEdge ? (
-          <div className="bp-explore__narrative">
+        <SynchronizedResultList {...listProps} onSelect={handleSelect} />
+      </div>
+
+      {view.selectedEdge ? (
+        <div className="bp-explore-stage__spotlight" ref={spotlightRef}>
+          <button
+            type="button"
+            className="bp-explore-stage__spotlight-scrim"
+            aria-label="Dismiss connection panel"
+            onClick={handleCloseEdge}
+          />
+          <div
+            className="bp-explore-stage__spotlight-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Selected connection"
+          >
             <HistoryEdgePanel edge={view.selectedEdge} onClose={handleCloseEdge} />
           </div>
-        ) : null}
-        {selectedFeature ? (
-          <div className="bp-explore__narrative">
+        </div>
+      ) : null}
+
+      {selectedFeature && !view.selectedEdge ? (
+        <div className="bp-explore-stage__spotlight" ref={spotlightRef}>
+          <button
+            type="button"
+            className="bp-explore-stage__spotlight-scrim"
+            aria-label="Dismiss selected record"
+            onClick={handleCloseCard}
+          />
+          <div
+            className="bp-explore-stage__spotlight-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="bp-nc-title"
+          >
             <NarrativeCard feature={selectedFeature} onClose={handleCloseCard} />
           </div>
-        ) : null}
-        <SynchronizedResultList {...listProps} />
-      </div>
+        </div>
+      ) : null}
 
       <div className="bp-explore-stage__legend">
         <MapExperienceLegend defaultCollapsed />

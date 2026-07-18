@@ -6,7 +6,7 @@
  * Reuses the single AI_TRAINING_USER_AGENTS list from../robots.ts so the two files can never
  * drift out of sync.
  */
-import { AI_TRAINING_USER_AGENTS } from '../robots.js';
+import { AI_TRAINING_USER_AGENTS } from '../robots';
 
 function buildAiTxt(): string {
   const lines = [

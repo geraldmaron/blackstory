@@ -1,6 +1,7 @@
 /**
  * Publish the national seed catalog (black-book-uda follow-on: 100+ researched entities) into
- * the ACTIVE public release's projections + search index.
+ * the ACTIVE public release's projections + search index, and emit ADR-004 catalog artifacts
+ * (`entities.json` + `search-index.json`) for CDN/App Hosting reads.
  *
  * Reads every JSON file in `packages/firebase/fixtures/national-catalog/`, converts each
  * research entry into `publicEntityProjectionSchema`/`publicSearchIndexSchema`-conformant docs
@@ -9,6 +10,10 @@
  * entry does not validate or does not resolve, then batch-writes:
  *   publicReleases/<activeRelease>/entities/<id>   (projection, merge)
  *   publicSearchIndex/<id>                          (search doc, merge)
+ *
+ * Also writes local catalog artifacts under
+ * `packages/firebase/fixtures/release-artifacts/` (and optionally uploads to the public-media
+ * bucket when `BLAP_UPLOAD_RELEASE_ARTIFACTS=1`).
  *
  * Idempotent: re-running overwrites the same doc ids with the same content. Does NOT touch
  * `publicMeta/activeRelease` — the release pointer stays whatever bootstrap/promotion set.
@@ -27,15 +32,23 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
 import { buildReleaseEntityArtifacts, type ReleaseSourceEntity } from '@blap/domain';
 import {
   publicEntityProjectionSchema,
   publicSearchIndexSchema,
 } from '../src/firestore/types.ts';
+import {
+  DEFAULT_PUBLIC_MEDIA_BUCKET,
+  buildReleaseCatalogArtifacts,
+  uploadReleaseCatalogArtifacts,
+  writeReleaseCatalogArtifactsToDir,
+} from '../src/firestore/release-artifacts.ts';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
 const ALLOW = process.env.BLAP_FIREBASE_ALLOW_PRODUCTION === '1';
 const DRY_RUN = process.env.DRY_RUN === '1';
+const UPLOAD_ARTIFACTS = process.env.BLAP_UPLOAD_RELEASE_ARTIFACTS === '1';
 /** Geohash character precision for public anchors — matches the bootstrap fixtures' choice. */
 const GEOHASH_PRECISION = 5;
 
@@ -44,7 +57,9 @@ if (!ALLOW && !DRY_RUN) {
   process.exit(2);
 }
 
-const catalogDir = join(dirname(fileURLToPath(import.meta.url)), '../fixtures/national-catalog');
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const catalogDir = join(scriptDir, '../fixtures/national-catalog');
+const artifactsRoot = join(scriptDir, '../fixtures/release-artifacts');
 
 /** `ReleaseSourceEntity` (from `@blap/domain`'s release builder) mirrors this fixture format
  * 1:1 — see that type's doc comment. National-catalog JSON files parse directly into it. */
@@ -129,7 +144,11 @@ async function main(): Promise<void> {
   const failures: string[] = [];
   const writes = entries.flatMap((entry) => {
     try {
-      const built = buildReleaseEntityArtifacts(entry, { releaseId, generatedAt, geohashPrecision: GEOHASH_PRECISION });
+      const built = buildReleaseEntityArtifacts(entry, {
+        releaseId,
+        generatedAt,
+        geohashPrecision: GEOHASH_PRECISION,
+      });
       if (!built.ok) {
         throw new Error(`${built.reason}: ${built.message}`);
       }
@@ -151,6 +170,19 @@ async function main(): Promise<void> {
     throw new Error(`${failures.length} catalog entries failed validation; nothing written.`);
   }
   console.log(`Validated ${writes.length} projections + ${writes.length} search docs`);
+
+  const catalogArtifacts = buildReleaseCatalogArtifacts({
+    releaseId,
+    generatedAt,
+    projections: writes.map((item) => item.projection),
+    searchDocs: writes.map((item) => item.search),
+  });
+  console.log(
+    `Catalog artifacts: ${catalogArtifacts.entitiesListPath} (${catalogArtifacts.entitiesListHash.digest.slice(0, 12)}…)`,
+  );
+  console.log(
+    `Search artifacts: ${catalogArtifacts.searchIndexPath} (${catalogArtifacts.searchIndexHash.digest.slice(0, 12)}…)`,
+  );
 
   if (DRY_RUN) {
     for (const { projection } of writes.slice(0, 5)) {
@@ -181,8 +213,34 @@ async function main(): Promise<void> {
   }
   await flush();
 
-  const after = await db.collection(`publicReleases/${releaseId}/entities`).get();
-  console.log(`Publish complete. Release now holds ${after.size} entity projections.`);
+  const written = writeReleaseCatalogArtifactsToDir(catalogArtifacts, artifactsRoot);
+  console.log(`Wrote local artifacts:\n  ${written.entitiesListFile}\n  ${written.searchIndexFile}`);
+
+  if (UPLOAD_ARTIFACTS) {
+    const bucket = getStorage().bucket(DEFAULT_PUBLIC_MEDIA_BUCKET);
+    await uploadReleaseCatalogArtifacts({
+      artifacts: catalogArtifacts,
+      save: async (objectPath, body, contentType) => {
+        await bucket.file(objectPath).save(body, {
+          contentType,
+          resumable: false,
+          metadata: {
+            cacheControl: 'public, max-age=300, stale-while-revalidate=86400',
+          },
+        });
+      },
+    });
+    console.log(
+      `Uploaded artifacts to gs://${DEFAULT_PUBLIC_MEDIA_BUCKET}/public/releases/${releaseId}/`,
+    );
+  } else {
+    console.log('Skipped GCS upload (set BLAP_UPLOAD_RELEASE_ARTIFACTS=1 to upload).');
+  }
+
+  // Prefer write-count verification over a post-publish full collection scan (read-cost).
+  console.log(
+    `Publish complete. Wrote ${writes.length} entity projections + ${writes.length} search docs for ${releaseId}.`,
+  );
 }
 
 main().catch((error: unknown) => {

@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { Card } from '@blap/ui';
-import type { LegalPlainLanguageExplainer } from '../../../../../packages/domain/src/legal/index.js';
+import type { LegalPlainLanguageExplainer } from '@blap/domain';
 import { LEGAL_SECTION_LABELS } from './copy';
 import { formatReviewDate } from './format';
 

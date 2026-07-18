@@ -3,8 +3,8 @@
  * without trademark or badge usage.
  */
 import React from 'react';
-import { buildNewsMediaOrganizationJsonLd } from '../../lib/trust/domain-trust.js';
-import { buildNewsMediaOrganizationInput } from '../../lib/trust/site-identity.js';
+import { buildNewsMediaOrganizationJsonLd } from '../../lib/trust/domain-trust';
+import { buildNewsMediaOrganizationInput } from '../../lib/trust/site-identity';
 
 export type TrustSiteJsonLdScriptProps = {
   readonly baseUrl?: string;

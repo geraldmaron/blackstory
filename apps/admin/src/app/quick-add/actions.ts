@@ -22,7 +22,7 @@
  */
 import { randomUUID } from 'node:crypto';
 import { createNodeSafeFetchDependencies, runResearchIntake } from '@blap/operator-cli';
-import type { QuickAddFormState } from './form-state.js';
+import type { QuickAddFormState } from './form-state';
 
 function readOperatorIdentity(formData: FormData): { operatorId: string; sessionId: string } {
   const operatorId = String(formData.get('operatorId') ?? '').trim();

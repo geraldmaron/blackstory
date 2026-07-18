@@ -5,9 +5,9 @@
 import {
   PublishingPrinciplesJsonLdScript,
   TrustSiteJsonLdScript,
-} from '../../components/trust/index.js';
-import { listMythReviews } from '../../lib/trust/myths-seed.js';
-import { TRUST_PATHS } from '../../lib/trust/site-identity.js';
+} from '../../components/trust/index';
+import { listMythReviews } from '../../lib/trust/myths-seed';
+import { TRUST_PATHS } from '../../lib/trust/site-identity';
 
 export const metadata = {
   title: 'Myths & misconceptions',

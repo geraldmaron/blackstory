@@ -1,0 +1,25 @@
+/**
+ * Legal landscape browse styles: hairline-ruled records with enough vertical
+ * padding that consecutive entries read as distinct without becoming cards.
+ */
+
+.bp-legal-browse-list {
+  border-top: var(--bp-border-width) solid var(--bp-rule);
+}
+
+.bp-legal-browse-list__item {
+  border-bottom: var(--bp-border-width) solid var(--bp-rule);
+  padding: 0;
+}
+
+.bp-legal-browse-list__record {
+  display: grid;
+  gap: 0;
+  padding: var(--bp-space-5) 0;
+}
+
+.bp-legal-browse-list__item + .bp-legal-browse-list__item .bp-legal-browse-list__record {
+  /* Extra air above the hairline so title/meta of the next record do not crowd
+     the previous citation row. */
+  padding-top: var(--bp-space-6);
+}

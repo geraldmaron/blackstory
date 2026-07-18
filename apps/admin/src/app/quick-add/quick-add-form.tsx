@@ -6,8 +6,8 @@
  * All the real work happens server-side in `./actions.ts`; this component only renders state.
  */
 import { useActionState } from 'react';
-import { submitQuickAdd } from './actions.js';
-import { QUICK_ADD_INITIAL_STATE, type QuickAddFormState } from './form-state.js';
+import { submitQuickAdd } from './actions';
+import { QUICK_ADD_INITIAL_STATE, type QuickAddFormState } from './form-state';
 
 function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
   if (state.status === 'idle') return null;

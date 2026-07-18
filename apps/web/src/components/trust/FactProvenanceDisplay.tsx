@@ -3,10 +3,10 @@
  * prose, and full citation list with archived copies. Composes existing fact citation rendering.
  */
 import React from 'react';
-import type { FactRecord } from '@blap/domain';
-import { FactCitationList } from '../facts/FactCitationList.js';
-import { ConfidenceLabelWithNuance } from './ConfidenceLabelWithNuance.js';
-import { humanizeToken, statusBannerTitle } from '../facts/format.js';
+import type { FactRecord } from '@blap/domain/facts';
+import { FactCitationList } from '../facts/FactCitationList';
+import { ConfidenceLabelWithNuance } from './ConfidenceLabelWithNuance';
+import { humanizeToken, statusBannerTitle } from '../facts/format';
 
 export type FactProvenanceDisplayProps = {
   readonly fact: Pick<

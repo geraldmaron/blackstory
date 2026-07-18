@@ -3,9 +3,12 @@
  * linking to per-revision permalinks and the errata log when corrections exist.
  */
 import React from 'react';
-import type { FactRecord } from '@blap/domain';
-import { buildFactRevisionPath, currentFactRevision } from '@blap/domain';
-import { formatIsoDate, humanizeToken } from '../facts/format.js';
+import {
+  buildFactRevisionPath,
+  currentFactRevision,
+  type FactRecord,
+} from '@blap/domain/facts';
+import { formatIsoDate, humanizeToken } from '../facts/format';
 
 export type RevisionUpdateChromeProps = {
   readonly fact: Pick<FactRecord, 'id' | 'updatedAt' | 'revisions' | 'status'>;

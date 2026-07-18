@@ -1,12 +1,13 @@
 /**
  * Decades-in-motion frame builder: cumulative PIN reveal by earliest documented
- * decade, honest handling of undated records (final frame only), per-decade
- * edge slices, and presence-tier DENSITY over entities ACTIVE that decade
- * (delegated to `@blap/domain`'s `aggregateDecadePresence` — an entity whose
- * `eraBuckets` span has already ended does not inflate a later decade's
- * density, even though its pin remains on the map). The closing/complete
- * frame's density stays era-agnostic cumulative (everyone with a resolved
- * state, dated or not) — "the map today" is not itself a decade.
+ * decade (newest → oldest play/display order), honest handling of undated
+ * records (final frame only), per-decade edge slices, and presence-tier
+ * DENSITY over entities ACTIVE that decade (delegated to `@blap/domain`'s
+ * `aggregateDecadePresence` — an entity whose `eraBuckets` span has already
+ * ended does not inflate a later decade's density, even though its pin remains
+ * on the map). The closing/complete frame's density stays era-agnostic
+ * cumulative (everyone with a resolved state, dated or not) — "the map today"
+ * is not itself a decade.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -76,7 +77,7 @@ const EDGE_LINE: HistoryEdgeLineCollection = {
   ],
 };
 
-test('frames are chronological and cumulative: later decades include earlier records', () => {
+test('frames are newest-to-oldest and cumulative: later (older) decades show fewer arrivals', () => {
   const frames = buildDecadeFlowFrames(
     collectionOf([
       feature('a', ['1870s'], DC),
@@ -87,9 +88,9 @@ test('frames are chronological and cumulative: later decades include earlier rec
   );
 
   const labels = frames.map((frame) => frame.decade);
-  assert.deepEqual(labels, ['1870s', '1900s', FINAL_FRAME_LABEL]);
-  assert.equal(frames[0]!.cumulativeCount, 2); // a + c arrive with their earliest decade
-  assert.equal(frames[1]!.cumulativeCount, 3);
+  assert.deepEqual(labels, ['1900s', '1870s', FINAL_FRAME_LABEL]);
+  assert.equal(frames[0]!.cumulativeCount, 3); // through 1900s: a + b + c
+  assert.equal(frames[1]!.cumulativeCount, 2); // through 1870s: a + c
 });
 
 test('undated records appear only in the closing full-archive frame', () => {
@@ -117,8 +118,8 @@ test('per-decade edge slices attach to their decade; the final frame carries all
     EDGE_LINE,
   );
 
-  assert.equal(frames[0]!.edgeCollection.features.length, 0);
-  assert.equal(frames[1]!.edgeCollection.features.length, 1);
+  assert.equal(frames[0]!.edgeCollection.features.length, 1);
+  assert.equal(frames[1]!.edgeCollection.features.length, 0);
   assert.equal(frames.at(-1)!.edgeCollection.features.length, 1);
 });
 
@@ -129,9 +130,9 @@ test('an edge-only decade still produces a frame so movement is never skipped', 
 
   assert.deepEqual(
     frames.map((frame) => frame.decade),
-    ['1870s', '1910s', FINAL_FRAME_LABEL],
+    ['1910s', '1870s', FINAL_FRAME_LABEL],
   );
-  assert.equal(frames[1]!.cumulativeCount, 1);
+  assert.equal(frames[0]!.cumulativeCount, 1);
 });
 
 test('per-decade density levels cover exactly the states of entities ACTIVE that decade', () => {
@@ -140,18 +141,19 @@ test('per-decade density levels cover exactly the states of entities ACTIVE that
     {},
   );
 
+  // Newest-first: 1900s then 1870s.
   assert.deepEqual(
     frames[0]!.densityLevels.map((level) => level.statePostalCode),
-    ['DC'],
-  );
-  // 'a' (DC) is active only in the 1870s — it must NOT inflate the 1900s density,
-  // even though its pin has already arrived by then (frames[1].cumulativeCount === 2).
-  assert.deepEqual(
-    frames[1]!.densityLevels.map((level) => level.statePostalCode),
     ['GA'],
   );
-  assert.equal(frames[1]!.cumulativeCount, 2);
-  for (const level of frames[1]!.densityLevels) {
+  // 'a' (DC) is active only in the 1870s — it must NOT inflate the 1900s density,
+  // even though its pin has already arrived by then when viewing chronologically.
+  assert.deepEqual(
+    frames[1]!.densityLevels.map((level) => level.statePostalCode),
+    ['DC'],
+  );
+  assert.equal(frames[0]!.cumulativeCount, 2);
+  for (const level of frames[0]!.densityLevels) {
     assert.ok(['documented', 'emerging', 'concentrated'].includes(level.tier));
   }
 });

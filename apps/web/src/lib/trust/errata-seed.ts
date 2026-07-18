@@ -2,11 +2,11 @@
  * Public errata log seed data reverse-chronological editorial changes wired to 
  * fact revisions and corrections policy. Production replaces this with a live projection.
  */
-import { listSeedFacts } from '../../data/facts-seed.js';
+import { listSeedFacts } from '../../data/facts-seed';
 import {
   errataTypeFromFactRevisionChangeType,
   type ErrataChangeType,
-} from './domain-trust.js';
+} from './domain-trust';
 
 function buildFactPath(id: string, slug: string): string {
   return `/facts/${id}/${slug}`;

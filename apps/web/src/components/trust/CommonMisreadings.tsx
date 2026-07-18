@@ -3,7 +3,7 @@
  * techniques in refutation copy, never people or groups.
  */
 import React from 'react';
-import type { FactCounterClaim } from '@blap/domain';
+import type { FactCounterClaim } from '@blap/domain/facts';
 
 export type CommonMisreadingsProps = {
   readonly counterClaims: readonly FactCounterClaim[];

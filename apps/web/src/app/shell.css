@@ -842,7 +842,7 @@
   letter-spacing: 0.04em;
 }
 
-/* —— The timeline instrument — decades in motion, playable, scrubbable.
+/* —— The timeline instrument — decades in motion, newest → oldest.
    A full-width rail of decade ticks along the hero's lower edge: passed
    decades burn copper, the live decade reads large, and every tick is a
    44px target that jumps the archive to that decade. ——  */

@@ -4,9 +4,9 @@
  * and IFCN alignment text.
  */
 import React from 'react';
+import { FACT_CONFIDENCE_DEFINITIONS } from '@blap/domain/facts';
 import {
   CULTURAL_FIGURE_NOTABILITY_CALIBRATION_NOTE,
-  FACT_CONFIDENCE_DEFINITIONS,
   NOTABILITY_CRITERIA,
   NOTABILITY_RUBRIC,
 } from '@blap/domain';
@@ -16,10 +16,10 @@ import {
   IFCN_COMMITMENTS,
   SOURCE_HIERARCHY_LEVELS,
   TRUST_PROJECT_INDICATORS,
-} from '../../lib/trust/domain-trust.js';
-import { humanizeToken } from '../../components/facts/format.js';
-import { HowToReadThisRecord } from '../../components/trust/HowToReadThisRecord.js';
-import { TrustSiteDisclaimer } from '../../components/trust/TrustSiteDisclaimer.js';
+} from '../../lib/trust/domain-trust';
+import { humanizeToken } from '../../components/facts/format';
+import { HowToReadThisRecord } from '../../components/trust/HowToReadThisRecord';
+import { TrustSiteDisclaimer } from '../../components/trust/TrustSiteDisclaimer';
 
 function DefinitionList({
   entries,

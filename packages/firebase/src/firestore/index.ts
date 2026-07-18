@@ -157,6 +157,19 @@ export {
 } from './entity-media.js';
 
 export {
+  RELEASE_CATALOG_ARTIFACT_SCHEMA_VERSION,
+  buildReleaseCatalogArtifacts,
+  publicMediaObjectUrl,
+  publicReleaseEntitiesListPath,
+  publicReleaseSearchIndexPath,
+  writeReleaseCatalogArtifactsToDir,
+  uploadReleaseCatalogArtifacts,
+  type BuiltReleaseCatalogArtifacts,
+  type ReleaseEntitiesListArtifact,
+  type ReleaseSearchIndexArtifact,
+} from './release-artifacts.js';
+
+export {
   createAdminAtomicStore,
   commitWithAudit,
   consumeOutboxMessage,

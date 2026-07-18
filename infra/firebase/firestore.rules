@@ -301,13 +301,14 @@ service cloud.firestore {
     }
 
     match /publicReleases/{releaseId}/entities/{entityId} {
-      allow read: if true;
-      allow write: if false;
+      // Public list/detail for the web app uses Admin SDK (bypasses rules) or CDN
+      // release artifacts (ADR-004). Anonymous client SDK scrapes are denied.
+      allow read, write: if false;
     }
 
     match /publicSearchIndex/{docId} {
-      allow read: if true;
-      allow write: if false;
+      // Search serves from release search-index.json artifacts or Admin SDK reads.
+      allow read, write: if false;
     }
 
     match /submissionInbox/{submissionId} {

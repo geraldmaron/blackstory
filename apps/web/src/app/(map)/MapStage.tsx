@@ -53,6 +53,7 @@ import {
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
+  EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
@@ -61,6 +62,7 @@ import {
 } from '../map/explore-layer-ids';
 import { buildExploreMapStyle } from '../map/explore-style';
 import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
+import { EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience/dignity-style';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
@@ -177,6 +179,12 @@ function syncCircularMarkers(
 ): void {
   clearMarkers(markers);
 
+  // Below clusterMaxZoom, MapLibre aggregates points — HTML hit-targets for every feature
+  // sit above clusters and steal clicks. Only mount DOM targets once individuals are visible.
+  if (map.getZoom() <= EXPLORE_CLUSTER_CONFIG.clusterMaxZoom) {
+    return;
+  }
+
   for (const feature of features) {
     if (feature.geometry.type !== 'Point') continue;
     const [lng, lat] = feature.geometry.coordinates;
@@ -206,6 +214,16 @@ function syncCircularMarkers(
     const marker = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([lng, lat]).addTo(map);
     markers.push(marker);
   }
+}
+
+function setSelectedEntityFilter(map: MapLibreMap, entityId: string | undefined): void {
+  if (!map.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) return;
+  const filter =
+    entityId && entityId.length > 0
+      ? (['==', ['get', 'entityId'], entityId] as unknown as [string, ...unknown[]])
+      : (['==', ['get', 'entityId'], ''] as unknown as [string, ...unknown[]]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- FilterSpecification ambient typing unavailable
+  map.setFilter(EXPLORE_SELECTED_POINT_LAYER_ID, filter as any);
 }
 
 function setHistoryEdgeData(map: MapLibreMap, collection: HistoryEdgeLineCollection): void {
@@ -383,6 +401,8 @@ export type MapStageDataPatch = {
 export type MapStageViewPatch = {
   readonly selectedState: string | undefined;
   readonly selectedEdge: string | undefined;
+  /** Copper orientation ring on the map for the open narrative record. */
+  readonly selectedEntity?: string | undefined;
 };
 
 export type CameraFlyTarget =
@@ -395,6 +415,10 @@ export type MapStageFlyOptions = {
    * against a URL viewport (deep link, back/forward), where a swooping arc would read as an
    * unrequested flight rather than a restored view. */
   readonly mode?: 'fly' | 'ease';
+  /** Override uniform preset padding — e.g. clear the right results rail for a selected point. */
+  readonly padding?:
+    | number
+    | { readonly top: number; readonly bottom: number; readonly left: number; readonly right: number };
 };
 
 type MapStageEvents = {
@@ -460,6 +484,7 @@ type StageConfig = {
   historyEdgeCollection: HistoryEdgeLineCollection;
   selectedState: string | undefined;
   selectedEdge: string | undefined;
+  selectedEntity: string | undefined;
 };
 
 function makeListenerStore(): { [K in MapStageEventName]: Set<(...args: MapStageEvents[K]) => void> } {
@@ -505,6 +530,7 @@ export function MapStageProvider({
     historyEdgeCollection: EMPTY_EDGE_COLLECTION,
     selectedState: undefined,
     selectedEdge: undefined,
+    selectedEntity: undefined,
   });
 
   const markMapUnavailable = useCallback(() => {
@@ -570,6 +596,7 @@ export function MapStageProvider({
       setHistoryEdgeData(map, configRef.current.historyEdgeCollection);
       setHistoryEdgesVisibility(map, configRef.current.historyEdgesEnabled);
       setSelectedEdgeFilter(map, configRef.current.selectedEdge);
+      setSelectedEntityFilter(map, configRef.current.selectedEntity);
       void loadStatePolygonsWithDensity(map, configRef.current.densityLevels).catch((error) => {
         console.error('[MapStage] state polygon load failed', error);
       });
@@ -635,12 +662,18 @@ export function MapStageProvider({
 
   const applyViewState = useCallback(
     (patch: MapStageViewPatch) => {
-      configRef.current = { ...configRef.current, selectedState: patch.selectedState, selectedEdge: patch.selectedEdge };
+      configRef.current = {
+        ...configRef.current,
+        selectedState: patch.selectedState,
+        selectedEdge: patch.selectedEdge,
+        selectedEntity: patch.selectedEntity,
+      };
       updateStateLabelSelection(patch.selectedState);
       const map = mapRef.current;
       if (!map || !map.isStyleLoaded()) return;
       setSelectedStateFilter(map, patch.selectedState);
       setSelectedEdgeFilter(map, patch.selectedEdge);
+      setSelectedEntityFilter(map, patch.selectedEntity);
     },
     [updateStateLabelSelection],
   );
@@ -677,7 +710,11 @@ export function MapStageProvider({
       }
     }
 
-    const padding = { top: preset.padding, bottom: preset.padding, left: preset.padding, right: preset.padding };
+    const paddingOption = options?.padding ?? preset.padding;
+    const padding =
+      typeof paddingOption === 'number'
+        ? { top: paddingOption, bottom: paddingOption, left: paddingOption, right: paddingOption }
+        : paddingOption;
 
     if (reduced || preset.duration <= 0) {
       map.jumpTo({ center, zoom, padding });
@@ -863,6 +900,7 @@ export function MapStageProvider({
       });
       activeMap.on('zoom', () => updateStateLabelOpacity(activeMap.getZoom()));
       activeMap.on('zoomend', () => {
+        syncEntityMarkers();
         if (activeMap.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM) {
           void loadCountyLines(activeMap).catch((error) => {
             console.error('[MapStage] county lines load failed', error);
@@ -897,6 +935,25 @@ export function MapStageProvider({
         activeMap.getCanvas().style.cursor = 'pointer';
       });
       activeMap.on('mouseleave', EXPLORE_CLUSTER_LAYER_ID, () => {
+        activeMap.getCanvas().style.cursor = '';
+      });
+
+      // Individual pins (GL circle) — works at every zoom once unclustered; complements the
+      // zoom-gated HTML hit-targets so selection does not depend on DOM overlays alone.
+      const selectFromUnclustered = (event: MapLayerMouseEvent) => {
+        const feature = event.features?.[0];
+        const entityId = feature?.properties?.entityId;
+        if (typeof entityId === 'string' && entityId.length > 0) {
+          event.originalEvent?.stopPropagation();
+          notify(listenersRef.current, 'select', entityId);
+        }
+      };
+      activeMap.on('click', EXPLORE_UNCLUSTERED_POINT_LAYER_ID, selectFromUnclustered);
+      activeMap.on('click', EXPLORE_UNCLUSTERED_HALO_LAYER_ID, selectFromUnclustered);
+      activeMap.on('mouseenter', EXPLORE_UNCLUSTERED_POINT_LAYER_ID, () => {
+        activeMap.getCanvas().style.cursor = 'pointer';
+      });
+      activeMap.on('mouseleave', EXPLORE_UNCLUSTERED_POINT_LAYER_ID, () => {
         activeMap.getCanvas().style.cursor = '';
       });
 

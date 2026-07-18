@@ -1,15 +1,22 @@
 /**
- * Public data source selector: live Firestore projections with seed snapshot fallback.
+ * Public data source selector: live release artifacts + Firestore with seed snapshot fallback.
  * Hydrates 1-hop related neighbor stubs and composes capped 2-hop continue-learning.
+ * Entity pages fetch only related neighbor docs (bounded). List/map/search prefer ADR-004
+ * catalog artifacts, then cross-request `unstable_cache`d Firestore reads — never rebuild
+ * search from a full entity scan when the written search index (artifact or collection) exists.
  */
 
+import { unstable_cache } from 'next/cache';
+import { cache } from 'react';
 import type { PublicSearchIndexDoc } from '@blap/domain';
+import type {
+  PublicEntityProjectionDoc,
+  PublicSearchIndexDoc as FirestoreSearchIndexDoc,
+} from '@blap/firebase';
 import {
-  buildPublicSearchIndexDocs,
   buildRelatedNeighborStubs,
   composeContinueLearningStubs,
   type NeighborLookup,
-  type SearchableEntityRecord,
 } from '@blap/domain';
 import {
   getPublicEntity,
@@ -27,51 +34,25 @@ import { getSnapshotSearchIndex } from '../search/snapshot-search-index';
 import {
   fetchActiveRelease,
   fetchPublicEntityProjection,
+  fetchPublicEntityProjectionsByIds,
   listPublicEntityProjections,
+  listPublicSearchIndexDocs,
+  parseEntityProjection,
+  parseSearchIndexDoc,
   shouldUseLivePublicProjections,
 } from './firestore-readers';
 import { mapProjectionToPublicEntityView, type PublicProjectionInput } from './map-projection';
+import { mapFirestoreSearchIndexDoc } from './map-search-index';
+import { collectOneHopNeighborIds, collectTwoHopNeighborIds } from './neighbor-ids';
+import {
+  fetchReleaseEntitiesListArtifact,
+  fetchReleaseSearchIndexArtifact,
+} from './release-artifacts';
 
 export type { PublicReadSource };
 
-function toSearchableRecord(entity: PublicEntityView): SearchableEntityRecord {
-  // Live national-catalog projections may ship without curated notabilityBasis.
-  // They are already in the public release, so synthesize a single documented-site
-  // basis from labels / relevance copy so search stays in parity with the map pool
-  // (buildPublicSearchIndexDocs would otherwise skip them at the notability gate).
-  const labels =
-    entity.notabilityLabels && entity.notabilityLabels.length > 0
-      ? entity.notabilityLabels
-      : [
-          entity.relevanceExplanation?.trim() ||
-            'A documented site in the active public release.',
-        ];
-  const notabilityBasis = labels.map((note) => ({
-    criterion: 'documented_site' as const,
-    note,
-    evidenceIds: [] as string[],
-  }));
-
-  return {
-    id: entity.id,
-    kind: entity.kind,
-    displayName: entity.displayName,
-    nameLower: entity.displayName.toLowerCase(),
-    aliases: [],
-    ...(entity.summary !== undefined ? { summary: entity.summary } : {}),
-    topicTags: entity.topicTags,
-    jurisdictionState: entity.jurisdictionLabel,
-    ...(entity.status !== undefined ? { status: entity.status } : {}),
-    eraBuckets: entity.eraBuckets ?? [],
-    notabilityBasis,
-    notabilityLabels: labels,
-    ...(entity.sensitivityClass !== undefined ? { sensitivityClass: entity.sensitivityClass } : {}),
-    recordMaturity: entity.recordMaturity,
-    researchCoverage: entity.researchCoverage,
-    relatedCount: entity.related?.length ?? entity.relatedIds.length,
-    claimCount: entity.claims.length,
-  };
-}
+/** Cross-request cache window for release catalog / search index (seconds). */
+const RELEASE_CATALOG_REVALIDATE_SECONDS = 300;
 
 function toNeighborLookup(entity: PublicEntityView): NeighborLookup {
   return {
@@ -114,7 +95,6 @@ export function hydrateEntityLearningLinks(
   catalog: readonly PublicEntityView[],
 ): PublicEntityView {
   const neighborsById = new Map(catalog.map((item) => [item.id, toNeighborLookup(item)]));
-  // Ensure the entity itself is in the map even if catalog is partial.
   neighborsById.set(entity.id, toNeighborLookup(entity));
 
   const relatedNeighbors = asRelatedNeighborViews(
@@ -131,18 +111,100 @@ export function hydrateEntityLearningLinks(
   };
 }
 
-async function loadLiveEntities(): Promise<readonly PublicEntityView[] | undefined> {
-  if (!shouldUseLivePublicProjections()) return undefined;
-  const active = await fetchActiveRelease();
-  if (!active) return undefined;
-  const projections = await listPublicEntityProjections(active.releaseId);
-  if (projections.length === 0) return undefined;
+function mapProjectionsToHydratedViews(
+  projections: readonly PublicEntityProjectionDoc[],
+): readonly PublicEntityView[] {
   const mapped = projections.map((projection) =>
     mapProjectionToPublicEntityView(projection as PublicProjectionInput),
   );
   return mapped.map((entity) => hydrateEntityLearningLinks(entity, mapped));
 }
 
+function projectionsFromArtifactEntities(
+  entities: readonly unknown[],
+): PublicEntityProjectionDoc[] {
+  const out: PublicEntityProjectionDoc[] = [];
+  for (const entity of entities) {
+    const parsed = parseEntityProjection(entity);
+    if (parsed) out.push(parsed);
+  }
+  return out;
+}
+
+function searchDocsFromArtifact(
+  docs: readonly unknown[],
+): PublicSearchIndexDoc[] {
+  const out: PublicSearchIndexDoc[] = [];
+  for (const doc of docs) {
+    const parsed = parseSearchIndexDoc(doc);
+    if (parsed) out.push(mapFirestoreSearchIndexDoc(parsed));
+  }
+  return out;
+}
+
+async function loadLiveEntitiesForRelease(
+  releaseId: string,
+): Promise<readonly PublicEntityView[] | undefined> {
+  const artifact = await fetchReleaseEntitiesListArtifact(releaseId);
+  if (artifact && artifact.entities.length > 0) {
+    const projections = projectionsFromArtifactEntities(artifact.entities);
+    if (projections.length > 0) return mapProjectionsToHydratedViews(projections);
+  }
+
+  const projections = await listPublicEntityProjections(releaseId);
+  if (projections.length === 0) return undefined;
+  return mapProjectionsToHydratedViews(projections);
+}
+
+async function loadLiveSearchIndexForRelease(
+  releaseId: string,
+): Promise<readonly PublicSearchIndexDoc[] | undefined> {
+  const artifact = await fetchReleaseSearchIndexArtifact(releaseId);
+  if (artifact && artifact.docs.length > 0) {
+    const mapped = searchDocsFromArtifact(artifact.docs);
+    if (mapped.length > 0) return mapped;
+  }
+
+  const firestoreDocs = await listPublicSearchIndexDocs(releaseId);
+  if (firestoreDocs.length > 0) {
+    return firestoreDocs.map((doc: FirestoreSearchIndexDoc) => mapFirestoreSearchIndexDoc(doc));
+  }
+  return undefined;
+}
+
+function cachedLiveEntities(
+  releaseId: string,
+  activatedAt: string,
+): Promise<readonly PublicEntityView[] | undefined> {
+  return unstable_cache(
+    async () => loadLiveEntitiesForRelease(releaseId),
+    ['public-release-entities', releaseId, activatedAt],
+    { revalidate: RELEASE_CATALOG_REVALIDATE_SECONDS },
+  )();
+}
+
+function cachedLiveSearchIndex(
+  releaseId: string,
+  activatedAt: string,
+): Promise<readonly PublicSearchIndexDoc[] | undefined> {
+  return unstable_cache(
+    async () => loadLiveSearchIndexForRelease(releaseId),
+    ['public-release-search-index', releaseId, activatedAt],
+    { revalidate: RELEASE_CATALOG_REVALIDATE_SECONDS },
+  )();
+}
+
+async function loadLiveEntities(): Promise<readonly PublicEntityView[] | undefined> {
+  if (!shouldUseLivePublicProjections()) return undefined;
+  const active = await fetchActiveRelease();
+  if (!active) return undefined;
+  return cachedLiveEntities(active.releaseId, active.activatedAt);
+}
+
+/**
+ * Live single-entity path: point-get the entity + bounded related/2-hop neighbors.
+ * Must not full-scan `publicReleases/{id}/entities` (that was ~N reads per entity page).
+ */
 async function loadLiveEntity(entityId: string): Promise<PublicEntityView | undefined> {
   if (!shouldUseLivePublicProjections()) return undefined;
   const active = await fetchActiveRelease();
@@ -151,28 +213,41 @@ async function loadLiveEntity(entityId: string): Promise<PublicEntityView | unde
   if (!projection) return undefined;
   const entity = mapProjectionToPublicEntityView(projection as PublicProjectionInput);
 
-  // Load sibling projections for neighbor hydration when possible.
-  let catalog: readonly PublicEntityView[] = [entity];
   try {
-    const all = await listPublicEntityProjections(active.releaseId);
-    catalog = all.map((item) => mapProjectionToPublicEntityView(item as PublicProjectionInput));
+    const oneHopIds = collectOneHopNeighborIds(entity);
+    const oneHopProjections = await fetchPublicEntityProjectionsByIds(
+      active.releaseId,
+      oneHopIds,
+    );
+    const oneHopViews = oneHopProjections.map((item) =>
+      mapProjectionToPublicEntityView(item as PublicProjectionInput),
+    );
+    const twoHopIds = collectTwoHopNeighborIds(entityId, oneHopIds, oneHopViews);
+    const twoHopProjections = await fetchPublicEntityProjectionsByIds(
+      active.releaseId,
+      twoHopIds,
+    );
+    const twoHopViews = twoHopProjections.map((item) =>
+      mapProjectionToPublicEntityView(item as PublicProjectionInput),
+    );
+    const catalog = [entity, ...oneHopViews, ...twoHopViews];
+    return hydrateEntityLearningLinks(entity, catalog);
   } catch {
-    // Fall back to seed neighbors for stubs.
-    catalog = [...listPublicEntities(), entity];
+    return hydrateEntityLearningLinks(entity, [...listPublicEntities(), entity]);
   }
-
-  return hydrateEntityLearningLinks(entity, catalog);
 }
 
 /** Resolve one entity: live projection first, then bundled seed snapshot.  */
-export async function resolvePublicEntityView(
-  entityId: string,
-): Promise<PublicReadResult<PublicEntityView>> {
-  return resolvePublicEntity(entityId, () => loadLiveEntity(entityId));
-}
+export const resolvePublicEntityView = cache(
+  async function resolvePublicEntityView(
+    entityId: string,
+  ): Promise<PublicReadResult<PublicEntityView>> {
+    return resolvePublicEntity(entityId, () => loadLiveEntity(entityId));
+  },
+);
 
-/** List entities from live release, falling back to seed.  */
-export async function listPublicEntityViews(): Promise<{
+/** List entities from live release artifacts/cache, falling back to seed.  */
+export const listPublicEntityViews = cache(async function listPublicEntityViews(): Promise<{
   readonly data: readonly PublicEntityView[];
   readonly source: PublicReadSource;
 }> {
@@ -190,13 +265,13 @@ export async function listPublicEntityViews(): Promise<{
   }
 
   return { data: listPublicEntities(), source: 'snapshot' };
-}
+});
 
 /**
- * Search index: prefer an index rebuilt from live entities when available;
- * otherwise the bundled snapshot index (bootstrap search docs are stubs today).
+ * Search index: prefer release search-index artifact, then Firestore `publicSearchIndex`,
+ * then bundled seed. Never rebuilds from a full entity projection scan when live index exists.
  */
-export async function getPublicSearchIndex(): Promise<{
+export const getPublicSearchIndex = cache(async function getPublicSearchIndex(): Promise<{
   readonly data: readonly PublicSearchIndexDoc[];
   readonly source: PublicReadSource;
 }> {
@@ -205,12 +280,13 @@ export async function getPublicSearchIndex(): Promise<{
   }
 
   try {
-    const live = await loadLiveEntities();
-    if (live !== undefined && live.length > 0) {
-      const releaseId = live[0]?.revision.releaseId ?? 'live';
-      const { docs } = buildPublicSearchIndexDocs(releaseId, live.map(toSearchableRecord));
-      if (docs.length > 0) {
-        return { data: docs, source: 'live' };
+    if (shouldUseLivePublicProjections()) {
+      const active = await fetchActiveRelease();
+      if (active) {
+        const live = await cachedLiveSearchIndex(active.releaseId, active.activatedAt);
+        if (live !== undefined && live.length > 0) {
+          return { data: live, source: 'live' };
+        }
       }
     }
   } catch {
@@ -218,7 +294,7 @@ export async function getPublicSearchIndex(): Promise<{
   }
 
   return { data: getSnapshotSearchIndex(), source: 'snapshot' };
-}
+});
 
 /** Sync helpers for call sites that still need seed during static generation.  */
 export function getSeedPublicEntity(entityId: string): PublicEntityView | undefined {

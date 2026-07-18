@@ -1,7 +1,7 @@
 /**
  * Presentation-only string helpers for legal landscape components.
  */
-import { LAW_STATUSES, type LawStatus } from '@blap/domain';
+import { LAW_STATUSES, type LawStatus } from '@blap/domain/entity-status';
 import { LEGAL_KIND_LABELS, LEGAL_TOPIC_LABELS } from './copy';
 
 const LAW_STATUS_LABELS: Readonly<Record<LawStatus, string>> = {

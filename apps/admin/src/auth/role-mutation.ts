@@ -6,7 +6,7 @@ import type {
   AdminRequestHeaders,
   AuthorizedAdminRequest,
   PrivilegedAdminAction,
-} from './server-authorization.js';
+} from './server-authorization';
 
 export type StaffRole = 'admin' | 'research' | 'publication' | 'security';
 

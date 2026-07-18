@@ -7,7 +7,7 @@
 import Link from 'next/link';
 import { computeRotRateBySourceClass, buildTrySearchingForSuggestion } from '@blap/domain';
 import { Citation } from '@blap/ui';
-import { CITATION_HEALTH_FIXTURES } from './fixtures.js';
+import { CITATION_HEALTH_FIXTURES } from './fixtures';
 import './citation-health.css';
 
 export const metadata = {
