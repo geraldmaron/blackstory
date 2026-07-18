@@ -319,17 +319,34 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Back/forward: the URL changes under us via `popstate`; reconcile the camera to match. This
-  // listener is separate from `router.replace` calls this component makes itself (those never
-  // fire `popstate`), so filter/density/etc. changes never spuriously refly the camera.
+  // Back/forward: the URL changes under us via `popstate`. Restore the full shareable view
+  // (filters/selection/toggles) and reconcile the camera — without calling `router.replace`
+  // (the address bar is already correct). Own `replace` calls never fire `popstate`.
   useEffect(() => {
     function handlePopState() {
       const raw = Object.fromEntries(new URLSearchParams(window.location.search).entries());
-      reconcileCamera(parseExploreSearchParams(raw), 'ease');
+      const next = parseExploreSearchParams(raw);
+      const edgeSlice = pickExploreEdgeSlice(view.edgeLineCatalog, next);
+      const selectedEdge = next.edge ? edgeSlice.edges.find((edge) => edge.edgeId === next.edge) : undefined;
+      const filtered = applyExploreFilters(view.allFeatures, next.filters, next.state);
+      setView((current) => {
+        const { selectedEdge: _previousEdge, ...rest } = current;
+        void _previousEdge;
+        return {
+          ...rest,
+          viewState: next,
+          filteredFeatures: filtered,
+          totalMatched: filtered.length,
+          historyEdges: edgeSlice.edges,
+          edgeLineCollection: edgeSlice.lineCollection,
+          ...(selectedEdge ? { selectedEdge } : {}),
+        };
+      });
+      reconcileCamera(next, 'ease');
     }
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [reconcileCamera]);
+  }, [reconcileCamera, view.allFeatures, view.edgeLineCatalog]);
 
   // Agent B: after a hero dissolve landing, focus filters unless a pin was the engagement target.
   useEffect(() => {
