@@ -61,7 +61,7 @@ test('HateCrimeCompositionChart labels both composition series and participation
     reportingCountyYears: 800,
     nationalParticipatingAgenciesPct: 87.4,
     source: 'FBI Crime Data Explorer',
-    sourceUrl: 'https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads',
+    sourceUrl: 'https://ucr.fbi.gov/hate-crime',
   };
   const html = renderToStaticMarkup(createElement(HateCrimeCompositionChart, { summary }));
   assert.match(html, /Anti-Black or African American bias/);
@@ -78,7 +78,7 @@ test('HateCrimeCompositionChart returns nothing when incidents are zero', () => 
     antiBlackIncidents: 0,
     reportingCountyYears: 0,
     source: 'FBI Crime Data Explorer',
-    sourceUrl: 'https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads',
+    sourceUrl: 'https://ucr.fbi.gov/hate-crime',
   };
   const html = renderToStaticMarkup(createElement(HateCrimeCompositionChart, { summary }));
   assert.equal(html, '');

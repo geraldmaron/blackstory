@@ -1,6 +1,12 @@
-/** URL construction for ACS 5-year pulls — pure, unit-testable, no fetch. */
+/** URL construction for ACS 5-year pulls — pure, unit-testable, no fetch.
+ * Fetch helpers stay on api.census.gov; provenance `sourceUrl` points at the ACS
+ * program page that links to the estimates (owning-body surface for citations).
+ */
 import { CENSUS_DATA_API_BASE_URL } from './url-builder.js';
 import type { AcsVintage } from './acs-types.js';
+
+/** ACS program hub — human landing page for public citations. */
+export const ACS_PROGRAM_HOMEPAGE_URL = 'https://www.census.gov/programs-surveys/acs';
 
 function variableList(vintage: AcsVintage): string {
   return `NAME,${vintage.variables.map((v) => v.id).join(',')}`;
@@ -37,13 +43,12 @@ export function buildAcsVariablesUrl(vintage: AcsVintage): string {
   return `${CENSUS_DATA_API_BASE_URL}/${vintage.dataset}/variables.json`;
 }
 
-/** Public (keyless) county-query form, recorded as provenance `sourceUrl` — the key must
- * never be persisted into a provenance field (same rule as ./url-builder.ts). */
-export function buildAcsCountyProvenanceUrl(vintage: AcsVintage): string {
-  return buildAcsCountyUrl(vintage);
+/** Owning-body ACS landing page for provenance `sourceUrl` (never an API query URL). */
+export function buildAcsCountyProvenanceUrl(_vintage: AcsVintage): string {
+  return ACS_PROGRAM_HOMEPAGE_URL;
 }
 
-/** Public (keyless) tract-query form for one state, recorded as provenance `sourceUrl`. */
-export function buildAcsTractProvenanceUrl(vintage: AcsVintage, stateFips: string): string {
-  return buildAcsTractUrl(vintage, stateFips);
+/** Owning-body ACS landing page for tract-row provenance (same public hub as county). */
+export function buildAcsTractProvenanceUrl(_vintage: AcsVintage, _stateFips: string): string {
+  return ACS_PROGRAM_HOMEPAGE_URL;
 }

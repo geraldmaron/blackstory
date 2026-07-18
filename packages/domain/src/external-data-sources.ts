@@ -116,10 +116,11 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     id: 'fbi-ucr-hate-crime',
     displayName: 'FBI UCR Hate Crime Master File (1991–present)',
     custodian: 'FBI Criminal Justice Information Services (CJIS) Division / UCR Program',
-    homepageUrl: 'https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads',
+    homepageUrl: 'https://ucr.fbi.gov/hate-crime',
     // The CDE serves bulk files through short-lived signed URLs; this is the stable KEY.
     // Resolve a fresh download URL with:
     //   GET https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=<this path>
+    // Public UI citations use homepageUrl (FBI UCR hate-crime hub), never the signedurl API.
     dataUrl: 'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/hate-crime/hate_crime.zip',
     license: {
       name: 'U.S. government work — public domain (17 U.S.C. §105)',
@@ -161,7 +162,7 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     id: 'fbi-ucr-participation',
     displayName: 'FBI UCR Program participation (1960–2024)',
     custodian: 'FBI Criminal Justice Information Services (CJIS) Division / UCR Program',
-    homepageUrl: 'https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads',
+    homepageUrl: 'https://ucr.fbi.gov/hate-crime',
     dataUrl: 'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/ucr/ucr_participation_1960_2024.csv',
     license: {
       name: 'U.S. government work — public domain (17 U.S.C. §105)',

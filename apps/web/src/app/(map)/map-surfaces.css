@@ -211,10 +211,10 @@
   right: var(--bp-space-4);
   z-index: 2;
   display: grid;
-  gap: var(--bp-space-2);
+  gap: var(--bp-space-3);
   width: min(88vw, 21rem);
   max-height: calc(100svh - var(--bp-island-clearance) - var(--bp-space-8));
-  padding: var(--bp-space-3);
+  padding: var(--bp-space-4);
   overflow-y: auto;
   border: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
   border-radius: var(--bp-radius-md);
@@ -227,11 +227,14 @@
    roomier document rhythm. Two-line summary clamp: with a hundred-record release, unclamped
    summaries turn the panel into a wall; the full text lives one click away on the record. */
 .bp-explore-stage__results .bp-result-list__link {
-  padding: var(--bp-space-3) 0;
+  gap: var(--bp-space-2);
+  padding: var(--bp-space-4) 0;
 }
 
 .bp-explore-stage__results .bp-result-list__title {
-  font-size: 1rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.35;
 }
 
 .bp-explore-stage__results .bp-result-list__summary {
@@ -239,7 +242,12 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.bp-explore-stage__results .bp-result-list__meta {
+  margin-top: var(--bp-space-3);
 }
 
 .bp-explore-stage__legend {

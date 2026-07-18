@@ -103,7 +103,13 @@ test('loads one vintage into county-decade docs with full provenance', async () 
   assert.equal(doc.totalPopulation, 58805);
   assert.equal(doc.blackPopulation, 11496);
   assert.equal(doc.source, VINTAGE_2020.sourceId);
-  assert.ok(!doc.sourceUrl.includes('key='), 'sourceUrl must be the keyless provenance form');
+  assert.equal(
+    doc.sourceUrl,
+    'https://www.census.gov/data/datasets/2020/dec/pl-94171.html',
+    'sourceUrl must be the Census dataset landing page, not an API query',
+  );
+  assert.ok(!doc.sourceUrl.includes('api.census.gov'));
+  assert.ok(!doc.sourceUrl.includes('key='), 'sourceUrl must never embed an API key');
 });
 
 test('re-running unchanged data reports all-unchanged and writes nothing', async () => {

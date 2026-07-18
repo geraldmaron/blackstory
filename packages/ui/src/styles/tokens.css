@@ -39,15 +39,16 @@
   --bp-error-bg: #f3dcd2;
   --bp-error-border: #b83a2a;
 
-  --bp-confidence-high-fg: #215a34;
-  --bp-confidence-high-bg: #dcebdd;
-  --bp-confidence-high-border: #3e8b54;
-  --bp-confidence-medium-fg: #6b4a17;
-  --bp-confidence-medium-bg: #f3e4c6;
-  --bp-confidence-medium-border: #b87a2a;
-  --bp-confidence-low-fg: #4a453d;
-  --bp-confidence-low-bg: #e7e1d3;
-  --bp-confidence-low-border: #7a7364;
+  /* Confidence badges: copper/stone family only — never green/red traffic lights. */
+  --bp-confidence-high-fg: #8e4f2a;
+  --bp-confidence-high-bg: #f3e8dc;
+  --bp-confidence-high-border: #b86b2a;
+  --bp-confidence-medium-fg: #8e4f2a;
+  --bp-confidence-medium-bg: #f6efe4;
+  --bp-confidence-medium-border: #d8a178;
+  --bp-confidence-low-fg: #6d675f;
+  --bp-confidence-low-bg: #ebe6dc;
+  --bp-confidence-low-border: #a39c91;
 
   --bp-elevation-sm: none;
   --bp-elevation-md: none;
@@ -92,15 +93,16 @@
   --bp-error-bg: #3a1610;
   --bp-error-border: #d66b54;
 
-  --bp-confidence-high-fg: #a9d9b4;
-  --bp-confidence-high-bg: #12301c;
-  --bp-confidence-high-border: #5cad73;
-  --bp-confidence-medium-fg: #f0ce8e;
-  --bp-confidence-medium-bg: #3a2a0e;
-  --bp-confidence-medium-border: #d6a354;
-  --bp-confidence-low-fg: #d4cdbe;
-  --bp-confidence-low-bg: #2b2822;
-  --bp-confidence-low-border: #8f8672;
+  /* Confidence badges: copper/stone family only — never green/red traffic lights. */
+  --bp-confidence-high-fg: #d07a32;
+  --bp-confidence-high-bg: #2a1c12;
+  --bp-confidence-high-border: #b86b2a;
+  --bp-confidence-medium-fg: #d8a178;
+  --bp-confidence-medium-bg: #241c14;
+  --bp-confidence-medium-border: #8e4f2a;
+  --bp-confidence-low-fg: #bdb5a9;
+  --bp-confidence-low-bg: #1c1b18;
+  --bp-confidence-low-border: #6d675f;
 
   --bp-elevation-sm: none;
   --bp-elevation-md: none;

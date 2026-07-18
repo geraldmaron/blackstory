@@ -15,6 +15,10 @@
  * every value ships with `reportingAgencyCount` and the matching year's state-participation
  * rows, per the no-false-absence rule documented in `../external/ucr-schema.ts`. Callers
  * must render both together; there is no "just the number" export.
+ *
+ * Display remap: older Firestore docs may still store API/download URLs as `sourceUrl`.
+ * `publicSourceUrl` rewrites those to owning-body landing pages for the UI until re-ingest
+ * stamps the corrected provenance.
  */
 import type { Firestore } from 'firebase-admin/firestore';
 import { AggregateField } from 'firebase-admin/firestore';
@@ -22,6 +26,61 @@ import { getServerFirestore } from '../server.js';
 import { FIRESTORE_ROOT } from '../firestore/paths.js';
 import { censusCountyDecadeSchema, type CensusCountyDecadeDecade } from './schema.js';
 import { hateCrimeCountyYearSchema, ucrStateParticipationSchema } from '../external/ucr-schema.js';
+
+const CENSUS_HOMEPAGE_BY_DECADE: Readonly<Record<CensusCountyDecadeDecade, string>> = {
+  '2000': 'https://www.census.gov/data/datasets/2000/dec/summary-file-1.html',
+  '2010': 'https://www.census.gov/data/datasets/2010/dec/summary-file-1.html',
+  '2020': 'https://www.census.gov/data/datasets/2020/dec/pl-94171.html',
+};
+
+const ACS_HOMEPAGE = 'https://www.census.gov/programs-surveys/acs';
+const FBI_HATE_CRIME_HOMEPAGE = 'https://ucr.fbi.gov/hate-crime';
+const OPPORTUNITY_ATLAS_HOMEPAGE = 'https://opportunityinsights.org/data/';
+
+/**
+ * Maps persisted provenance URLs (or source ids) to owning-body pages for public citations.
+ * Machine API/download URLs must not appear as clickable sources in the UI.
+ */
+export function publicSourceUrl(input: {
+  readonly source: string;
+  readonly sourceUrl: string;
+  readonly decade?: CensusCountyDecadeDecade;
+}): string {
+  const { source, sourceUrl, decade } = input;
+  if (decade && CENSUS_HOMEPAGE_BY_DECADE[decade]) {
+    return CENSUS_HOMEPAGE_BY_DECADE[decade];
+  }
+  if (
+    source.startsWith('us-census-decennial') ||
+    (sourceUrl.includes('api.census.gov/data/20') && sourceUrl.includes('/dec/'))
+  ) {
+    if (source.includes('2000') || sourceUrl.includes('/2000/')) return CENSUS_HOMEPAGE_BY_DECADE['2000'];
+    if (source.includes('2010') || sourceUrl.includes('/2010/')) return CENSUS_HOMEPAGE_BY_DECADE['2010'];
+    if (source.includes('2020') || sourceUrl.includes('/2020/')) return CENSUS_HOMEPAGE_BY_DECADE['2020'];
+  }
+  if (source.startsWith('us-census-acs') || sourceUrl.includes('/acs/acs')) {
+    return ACS_HOMEPAGE;
+  }
+  if (
+    source.includes('fbi-ucr') ||
+    sourceUrl.includes('cde.ucr.cjis.gov') ||
+    sourceUrl.includes('ucr.fbi.gov')
+  ) {
+    return FBI_HATE_CRIME_HOMEPAGE;
+  }
+  if (
+    source.includes('opportunity') ||
+    sourceUrl.includes('opportunityinsights') ||
+    sourceUrl.includes('opportunityinsightsstatic')
+  ) {
+    return OPPORTUNITY_ATLAS_HOMEPAGE;
+  }
+  if (sourceUrl.includes('api.census.gov') || sourceUrl.includes('signedurl') || sourceUrl.includes('.amazonaws.com')) {
+    // Fail closed toward known hubs rather than exposing a raw machine endpoint.
+    if (sourceUrl.includes('census.gov')) return ACS_HOMEPAGE;
+  }
+  return sourceUrl;
+}
 
 export type NationalPopulationByDecade = {
   readonly decade: CensusCountyDecadeDecade;
@@ -60,7 +119,7 @@ export async function getNationalPopulationByDecade(
       totalPopulation: aggregateSnap.data().totalPopulation ?? 0,
       blackPopulation: aggregateSnap.data().blackPopulation ?? 0,
       source: sample.source,
-      sourceUrl: sample.sourceUrl,
+      sourceUrl: publicSourceUrl({ source: sample.source, sourceUrl: sample.sourceUrl, decade }),
     });
   }
   return results;
@@ -95,7 +154,7 @@ export async function getAcsCoverageSummary(
     countyCount: countyAgg.data().n,
     tractCount: tractAgg.data().n,
     source: doc.source,
-    sourceUrl: doc.sourceUrl,
+    sourceUrl: publicSourceUrl({ source: doc.source, sourceUrl: doc.sourceUrl }),
   };
 }
 
@@ -157,7 +216,7 @@ export async function getHateCrimeYearSummary(
     reportingCountyYears: aggregateSnap.data().countyYears,
     ...(nationalParticipatingAgenciesPct !== undefined ? { nationalParticipatingAgenciesPct } : {}),
     source: sample.source,
-    sourceUrl: sample.sourceUrl,
+    sourceUrl: publicSourceUrl({ source: sample.source, sourceUrl: sample.sourceUrl }),
   };
 }
 
@@ -182,5 +241,10 @@ export async function getOpportunityAtlasCoverageSummary(
   if (sample.empty) return undefined;
   const doc = sample.docs[0]!.data() as { source?: string; sourceUrl?: string; license?: string };
   if (!doc.source || !doc.sourceUrl || !doc.license) return undefined;
-  return { tractCount: agg.data().n, source: doc.source, sourceUrl: doc.sourceUrl, license: doc.license };
+  return {
+    tractCount: agg.data().n,
+    source: doc.source,
+    sourceUrl: publicSourceUrl({ source: doc.source, sourceUrl: doc.sourceUrl }),
+    license: doc.license,
+  };
 }

@@ -14,6 +14,7 @@
 
 import { EmptyState, ResultList } from '@blap/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
+import { KindBadge } from '../../components/map-experience';
 import { getPublicSearchIndex } from '../../lib/public-data/source';
 import { buildSearchPageHref, buildSearchViewModel, type RawSearchParams } from './search-view-model';
 
@@ -145,8 +146,15 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 summary: result.summary ?? '',
                 meta: (
                   <>
-                    <span>{result.kind}</span>
-                    {result.status ? <span>{result.status}</span> : null}
+                    <KindBadge kind={result.kind} density="compact" />
+                    {result.status ? (
+                      <span
+                        className={`bp-status-mark bp-status-mark--${result.status}`}
+                        data-status={result.status}
+                      >
+                        {result.status}
+                      </span>
+                    ) : null}
                     <span>Matched: {result.matchedText}</span>
                   </>
                 ),

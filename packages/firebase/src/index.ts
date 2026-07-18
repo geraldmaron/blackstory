@@ -318,6 +318,7 @@ export {
   getAcsCoverageSummary,
   getHateCrimeYearSummary,
   getOpportunityAtlasCoverageSummary,
+  publicSourceUrl,
 } from './demographics/national-stats.js';
 export type {
   NationalPopulationByDecade,

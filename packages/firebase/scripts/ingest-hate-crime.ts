@@ -73,9 +73,9 @@ function sha256Of(path: string): string {
   return createHash('sha256').update(readFileSync(path)).digest('hex');
 }
 
-/** Public CDE URL for provenance — the stable key endpoint, never the expiring signed URL. */
-function provenanceUrl(key: string): string {
-  return `https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=${key}`;
+/** Owning-body FBI UCR hate-crime hub for public provenance — never a CDE signedurl API. */
+function provenanceUrl(_key: string): string {
+  return 'https://ucr.fbi.gov/hate-crime';
 }
 
 // ── county polygons: point-in-county without a geo dependency ────────────────────────────
@@ -252,7 +252,7 @@ async function main(): Promise<void> {
       ...(lat !== undefined ? { lat } : {}),
       ...(lng !== undefined ? { lng } : {}),
       source: AGENCY_SOURCE,
-      sourceUrl: 'https://cde.ucr.cjis.gov/LATEST/agency/byStateAbbr/',
+      sourceUrl: 'https://ucr.fbi.gov/hate-crime',
       retrievedAt: nowIso,
       contentHash: sha256Json(stable).digest,
       datasetChecksum: hcChecksum,

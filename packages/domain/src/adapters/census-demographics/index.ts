@@ -9,6 +9,7 @@ export {
 } from './types.js';
 export {
   CENSUS_DATA_API_BASE_URL,
+  CENSUS_DECENNIAL_HOMEPAGE_BY_DECADE,
   buildCountyPopulationUrl,
   buildProvenanceSourceUrl,
   buildVariablesUrl,
@@ -31,6 +32,7 @@ export {
   type AcsVintage,
 } from './acs-types.js';
 export {
+  ACS_PROGRAM_HOMEPAGE_URL,
   buildAcsCountyProvenanceUrl,
   buildAcsCountyUrl,
   buildAcsTractProvenanceUrl,

@@ -17,7 +17,9 @@
  * Idempotency: `contentHash` covers only the stable statistic fields (not `retrievedAt`), so
  * an unchanged upstream row re-hashes identically and the writer reports `unchanged` without
  * touching the doc. Provenance: every doc satisfies `assertPublishedStatisticProvenance`
- * (public-numeric-policy category 3) and `sourceUrl` is always the keyless form.
+ * (public-numeric-policy category 3) and `sourceUrl` is always the Census Bureau
+ * dataset landing page (owning-body surface). Machine fetch URLs stay on api.census.gov
+ * and are never written into provenance.
  *
  * Run directly with tsx (CENSUS_API_KEY optional but recommended — keyless is capped):
  * CENSUS_API_KEY=... node --conditions development --import tsx \

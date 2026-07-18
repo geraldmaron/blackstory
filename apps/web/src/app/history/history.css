@@ -10,7 +10,7 @@
 
 .bp-history__intro {
   display: grid;
-  gap: var(--bp-space-2);
+  gap: var(--bp-space-3);
 }
 
 .bp-history__framing {
@@ -149,7 +149,7 @@
 
 .bp-history-graph__node-name {
   font-family: var(--bp-font-sans);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .bp-history-graph__node-status {

@@ -37,8 +37,13 @@ const DRY_RUN = process.env.DRY_RUN === '1';
 const BUCKET = `${PROJECT_ID}-raw-sources`;
 
 const SOURCE_ID = 'opportunity-insights-tract-outcomes';
-const SOURCE_URL =
+/** Machine fetch target (S3 CSV). Public citations use SOURCE_URL (owning-body page) instead.
+ * Kept as the documented acquisition endpoint for operators re-downloading the release. */
+const DATA_URL =
   'https://opportunityinsightsstatic.s3.us-east-1.amazonaws.com/assets/tract_outcomes_early.csv';
+/** Owning-body data page for provenance `sourceUrl` in Firestore + public UI. */
+const SOURCE_URL = 'https://opportunityinsights.org/data/';
+void DATA_URL;
 const LICENSE = 'Opportunity Insights data-use terms — attribution required';
 const VERSION = 'tract_outcomes_early-2018';
 const STORAGE_PATH = `raw-sources/opportunity-atlas/${VERSION}/tract_outcomes_early.csv`;
