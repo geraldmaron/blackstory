@@ -5,4 +5,4 @@
 export {
   createSearchRateLimitGuard as createExploreRateLimitGuard,
   type SearchRateLimitGuardOptions as ExploreRateLimitGuardOptions,
-} from '../../search/api/rate-limit-guard';
+} from '../../../search/api/rate-limit-guard';

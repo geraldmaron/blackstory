@@ -4,7 +4,13 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { buildExploreHref, buildExploreSearchParams, parseExploreSearchParams } from './url-state';
+import {
+  buildExploreHref,
+  buildExploreSearchParams,
+  nationalViewport,
+  parseExploreSearchParams,
+  viewportForState,
+} from './url-state';
 
 test('an empty query string parses to the "all" default filter state with no viewport/selection', () => {
   const parsed = parseExploreSearchParams({});
@@ -60,4 +66,29 @@ test('default filter values are omitted from the query string (minimal shareable
 test('viewport requires all three of lat/lng/zoom to be present and finite', () => {
   const parsed = parseExploreSearchParams({ lat: '38.9', lng: 'not-a-number', zoom: '10' });
   assert.equal(parsed.viewport, undefined);
+});
+
+test('viewportForState resolves a known postal code to its bbox midpoint', () => {
+  const dc = viewportForState('DC');
+  assert.ok(dc);
+  assert.ok(dc!.lat > 38.7 && dc!.lat < 39.1);
+  assert.ok(dc!.lng > -77.2 && dc!.lng < -76.8);
+  assert.equal(dc!.zoom, 6.2);
+});
+
+test('viewportForState pulls back to a wider zoom for Alaska and Hawaii', () => {
+  assert.equal(viewportForState('AK')?.zoom, 4.5);
+  assert.equal(viewportForState('HI')?.zoom, 4.5);
+});
+
+test('viewportForState is case-insensitive and returns undefined for an unknown code', () => {
+  assert.deepEqual(viewportForState('dc'), viewportForState('DC'));
+  assert.equal(viewportForState('ZZ'), undefined);
+});
+
+test('nationalViewport centers the continental US resting frame', () => {
+  const national = nationalViewport();
+  assert.ok(national.lat > 24 && national.lat < 50);
+  assert.ok(national.lng > -126 && national.lng < -66);
+  assert.ok(national.zoom > 0);
 });

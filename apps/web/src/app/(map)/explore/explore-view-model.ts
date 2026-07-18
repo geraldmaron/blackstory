@@ -5,15 +5,15 @@
  * `./explore-view-model.test.ts`). Precomputes History edge line catalogs so the client can
  * toggle lines/decade without importing the graph release builder.
  */
-import { SEED_ENTITY_RELATIONSHIPS } from '../../data/entity-graph-seed';
-import { getHistoryGraphReleaseArtifact } from '../../data/history-graph-seed';
-import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
+import { SEED_ENTITY_RELATIONSHIPS } from '../../../data/entity-graph-seed';
+import { getHistoryGraphReleaseArtifact } from '../../../data/history-graph-seed';
+import { listPublicEntities, type PublicEntityView } from '../../../data/public-seed';
 import {
   buildHistoryEdges,
   buildHistoryGraphContext,
   resolveHistoryGraphSlice,
   type HistoryEdgeView,
-} from '../../lib/history/build-history-graph';
+} from '../../../lib/history/build-history-graph';
 import {
   applyExploreFilters,
   buildExploreFacetOptions,
@@ -26,8 +26,8 @@ import {
   type ExploreMapSource,
   type ExploreViewState,
   type RawExploreSearchParams,
-} from '../../lib/map-experience';
-import type { PublicReadSource } from '../../lib/public-data/source';
+} from '../../../lib/map-experience';
+import type { PublicReadSource } from '../../../lib/public-data/source';
 import {
   pickExploreEdgeSlice,
   type ExploreEdgeLineCatalog,

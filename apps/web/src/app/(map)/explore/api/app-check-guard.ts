@@ -6,4 +6,4 @@
 export {
   createSearchAppCheckGuard as createExploreAppCheckGuard,
   type SearchAppCheckGuard as ExploreAppCheckGuard,
-} from '../../search/api/app-check-guard';
+} from '../../../search/api/app-check-guard';

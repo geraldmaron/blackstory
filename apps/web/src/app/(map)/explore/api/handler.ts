@@ -12,8 +12,8 @@ import {
   buildExploreFacetOptions,
   buildExploreMapSource,
   type ExploreFilterState,
-} from '../../../lib/map-experience';
-import { listPublicEntityViews } from '../../../lib/public-data/source';
+} from '../../../../lib/map-experience';
+import { listPublicEntityViews } from '../../../../lib/public-data/source';
 import type { ExploreAppCheckGuard } from './app-check-guard';
 import type { createExploreRateLimitGuard } from './rate-limit-guard';
 

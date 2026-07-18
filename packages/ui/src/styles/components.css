@@ -1,31 +1,33 @@
 
 /**
- * Component-level styles for Black Book design-system primitives.
+ * Component-level styles for Black Book design-system primitives (brand pack
+ * v3). Radius language 8/16/28, Rule hairlines carry all separation, no
+ * shadows anywhere (--bb-elevation-* tokens resolve to `none` by design —
+ * this file doesn't reference them at all rather than imply they're load
+ * bearing). Metadata registers (card meta, citations, filter labels, time
+ * stamps) use IBM Plex Mono per the v3 data register.
  */
 
 .bb-card {
   background: var(--bb-surface-raised);
   border: var(--bb-border-width) solid var(--bb-border);
   border-radius: var(--bb-radius-md);
-  box-shadow: var(--bb-elevation-sm);
   padding: var(--bb-space-5);
 }
 
 .bb-card--interactive {
-  transition:
-    border-color var(--bb-duration-fast) var(--bb-easing),
-    box-shadow var(--bb-duration-fast) var(--bb-easing);
+  transition: border-color var(--bb-duration-fast) var(--bb-easing);
 }
 
 .bb-card--interactive:hover {
   border-color: var(--bb-border-strong);
-  box-shadow: var(--bb-elevation-md);
 }
 
 .bb-card__title {
   margin: 0 0 var(--bb-space-2);
+  font-family: var(--bb-font-display);
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 650;
   line-height: 1.35;
   letter-spacing: -0.01em;
 }
@@ -33,8 +35,9 @@
 .bb-card__meta {
   margin: 0 0 var(--bb-space-3);
   color: var(--bb-ink-subtle);
-  font-family: var(--bb-font-sans);
-  font-size: 0.8125rem;
+  font-family: var(--bb-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
 }
 
 .bb-citation {
@@ -42,16 +45,18 @@
   gap: var(--bb-space-1);
   padding: var(--bb-space-3) var(--bb-space-4);
   border-left: var(--bb-border-width-strong) solid var(--bb-border-strong);
+  border-radius: 0 var(--bb-radius-sm) var(--bb-radius-sm) 0;
   background: var(--bb-surface);
   font-family: var(--bb-font-sans);
   font-size: 0.875rem;
 }
 
 .bb-citation__label {
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-family: var(--bb-font-mono);
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: var(--bb-ink-subtle);
 }
 
@@ -155,10 +160,7 @@
   min-height: 12rem;
   border: var(--bb-border-width) solid var(--bb-border);
   border-radius: var(--bb-radius-md);
-  background:
-    linear-gradient(90deg, var(--bb-viz-grid) 1px, transparent 1px) 0 0 / 1.5rem 1.5rem,
-    linear-gradient(var(--bb-viz-grid) 1px, transparent 1px) 0 0 / 1.5rem 1.5rem,
-    var(--bb-surface);
+  background: var(--bb-surface);
   overflow: hidden;
 }
 
@@ -169,7 +171,7 @@
   margin: -0.375rem 0 0 -0.375rem;
   border-radius: 50%;
   background: var(--bb-ink);
-  box-shadow: 0 0 0 3px var(--bb-surface-raised);
+  outline: 3px solid var(--bb-surface-raised);
 }
 
 .bb-map__caption {
@@ -206,8 +208,10 @@
   width: 100%;
   overflow: hidden;
   border: var(--bb-border-width) solid var(--bb-border-strong);
-  border-radius: var(--bb-radius-md);
-  background: #0a0a0a;
+  /* The map frame on interior pages reads radius-lg per the v3 radius scale. */
+  border-radius: var(--bb-radius-lg);
+  /* Fixed ink regardless of [data-theme] — see base.css's --bb-fixed-* note. */
+  background: var(--bb-fixed-ink);
 }
 
 .bb-map-explorer__legend {
@@ -288,8 +292,10 @@
 
 .bb-result-list__title {
   margin: 0;
+  font-family: var(--bb-font-display);
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 650;
+  letter-spacing: -0.01em;
 }
 
 .bb-result-list__summary {
@@ -305,8 +311,9 @@
   gap: var(--bb-space-2);
   align-items: center;
   margin-top: var(--bb-space-2);
-  font-family: var(--bb-font-sans);
-  font-size: 0.8125rem;
+  font-family: var(--bb-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
   color: var(--bb-ink-subtle);
 }
 
@@ -329,9 +336,11 @@
 .bb-filters__legend {
   padding: 0;
   margin: 0 0 var(--bb-space-3);
-  font-family: var(--bb-font-sans);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-family: var(--bb-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--bb-ink-muted);
 }
 
@@ -350,15 +359,17 @@
 }
 
 .bb-filters__label {
-  font-family: var(--bb-font-sans);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-family: var(--bb-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--bb-ink-muted);
 }
 
 .bb-filters__control {
   width: 100%;
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: var(--bb-space-2) var(--bb-space-3);
   border: var(--bb-border-width) solid var(--bb-border-strong);
   border-radius: var(--bb-radius-sm);
@@ -366,7 +377,8 @@
   color: var(--bb-ink);
   font: inherit;
   font-family: var(--bb-font-sans);
-  font-size: 0.9375rem;
+  /* >=16px avoids iOS zoom-on-focus. */
+  font-size: 1rem;
 }
 
 .bb-filters__actions {
@@ -380,7 +392,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--bb-space-2);
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: var(--bb-space-2) var(--bb-space-4);
   border: var(--bb-border-width) solid transparent;
   border-radius: var(--bb-radius-sm);
@@ -431,7 +443,6 @@
   border-radius: var(--bb-radius-lg);
   background: var(--bb-surface-raised);
   color: var(--bb-ink);
-  box-shadow: var(--bb-elevation-lg);
 }
 
 .bb-dialog__header,
@@ -467,8 +478,8 @@
 }
 
 .bb-dialog__close {
-  min-width: 2.5rem;
-  min-height: 2.5rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   padding: 0;
   border: var(--bb-border-width) solid var(--bb-border);
   border-radius: var(--bb-radius-sm);
@@ -554,7 +565,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--bb-space-2);
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: var(--bb-space-2) var(--bb-space-3);
   border: var(--bb-border-width) solid var(--bb-border-strong);
   border-radius: var(--bb-radius-sm);

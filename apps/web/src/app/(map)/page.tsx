@@ -1,32 +1,22 @@
 /**
- * Public home page interactive US map teaser that enters the Explore premier experience.
+ * Homepage (BB-098): the hero IS the shared `MapStage` canvas (mounted once by the `(map)`
+ * layout). `HeroStage` renders the floating chrome over it per design-direction-v3.md's DOM
+ * contract. Below the hero: featured records, "what qualifies," and the methodology band.
+ *
+ * Gap note (see this stream's final report): design-direction-v3.md assigns the "below the
+ * hero" story-rail/standards/methodology bands to `components/home/HomeStorySections.tsx`, owned
+ * by the shell stream. That component had not landed as of this pass, so the sections below are
+ * the pre-existing homepage content (unchanged in substance from the pre-BB-098 `page.tsx`),
+ * kept rather than deleted so the homepage still has a working, non-empty body. Swap this block
+ * for `<HomeStorySections />` once that component ships.
  */
-
-import { US_CONUS_BOUNDS } from '@black-book/domain/map/geography';
-import { FEATURED_SEED_IDS, getPublicEntity } from '../data/public-seed';
-import { listPublicEntityViews } from '../lib/public-data/source';
-import { HomeMapHero } from './HomeMapHero';
-import { buildExploreViewModel } from './explore/explore-view-model';
-import { buildExploreMapStyle } from './map/explore-style';
+import { getPublicEntity, FEATURED_SEED_IDS } from '../../data/public-seed';
+import { SeedDataNotice } from '../../components/SeedDataNotice';
+import { HeroStage } from './HeroStage';
+import { loadMapStageBase } from './shared-map-data';
 
 export default async function HomePage() {
-  const entities = await listPublicEntityViews();
-  const explore = buildExploreViewModel({}, entities.data, entities.source);
-  const featureCollection = {
-    type: 'FeatureCollection' as const,
-    features: [...explore.filteredFeatures],
-  };
-  const mapStyle = buildExploreMapStyle({
-    featureCollection,
-    jurisdictionAreaFeatures: explore.source.jurisdictionAreaFeatures,
-    densityLayerEnabled: false,
-  });
-  // Seed fixtures are D.C.-local bias east so circular pins sit clear of the left hero copy.
-  const initialViewport = {
-    lat: 38.9072,
-    lng: -76.9,
-    zoom: 5.2,
-  } as const;
+  const base = await loadMapStageBase();
 
   const featured = FEATURED_SEED_IDS.map((id) => getPublicEntity(id)).filter(
     (entity): entity is NonNullable<typeof entity> => Boolean(entity),
@@ -34,33 +24,32 @@ export default async function HomePage() {
 
   return (
     <>
-      <HomeMapHero
-        mapStyle={mapStyle}
-        featureCollection={featureCollection}
-        bounds={US_CONUS_BOUNDS}
-        densityLevels={explore.densityLevels}
-        initialViewport={initialViewport}
-        showSeedNotice={explore.dataSource !== 'live'}
-        featureCount={explore.filteredFeatures.length}
+      <HeroStage
+        featureCollection={base.featureCollection}
+        jurisdictionAreaFeatures={base.jurisdictionAreaFeatures}
+        featureCount={base.featureCollection.features.length}
+        liveData={base.dataSource === 'live'}
       />
 
       <main id="main">
         <div className="bb-container bb-page">
+          {base.dataSource !== 'live' ? <SeedDataNotice compact /> : null}
+
           <section className="bb-section bb-section--flush" aria-labelledby="featured-heading">
             <p className="bb-section__kicker">On the map</p>
             <h2 className="bb-section__title" id="featured-heading">
-              Featured sample records
+              See what happened here
             </h2>
             <p className="bb-section__lede">
-              Seed fixtures for the public shell — select a pin on the map above, or open a full
-              record here.
+              Documented records from the active release — select a pin on the map above, or open
+              a full record here.
             </p>
             <ul className="bb-story-rail">
               {featured.map((entity) => (
                 <li key={entity.id}>
                   <a className="bb-story-link" href={`/entity/${entity.id}`}>
                     <span className="bb-story-link__meta">
-                      {entity.kind} · {entity.jurisdictionLabel}
+                      {entity.kind} &middot; {entity.jurisdictionLabel}
                     </span>
                     <h3 className="bb-story-link__title">{entity.displayName}</h3>
                     <p className="bb-story-link__summary">{entity.summary}</p>
@@ -76,8 +65,8 @@ export default async function HomePage() {
               What qualifies
             </h2>
             <p className="bb-section__lede">
-              Inclusion follows the product constitution — relevance, place, accepted claims, rights,
-              and living-person redaction.
+              Inclusion follows the product constitution — relevance, place, accepted claims,
+              rights, and living-person redaction.
             </p>
             <ul className="bb-qualify-list">
               <li>Historically relevant people, places, schools, events, institutions</li>

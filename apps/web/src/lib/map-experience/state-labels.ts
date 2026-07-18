@@ -12,7 +12,10 @@
  * the integration contract in `buildStateLabelMarkers`'s doc comment below). That keeps this
  * module unit-testable in plain Node, the same split `marker-size.ts` and `kind-encoding.ts` use.
  */
-import { US_STATES, type UsStateInfo } from '@black-book/domain';
+// Subpath import (not the package barrel): the barrel re-exports ./publication, which pulls in
+// `node:crypto` at module scope. This module is imported by MapStage.tsx ('use client'), so
+// barrel-importing here would drag a Node-only module into the browser bundle.
+import { US_STATES, type UsStateInfo } from '@black-book/domain/map/geography';
 import { brandPalette, darkTheme } from '@black-book/ui';
 
 export type StateLabelPoint = {

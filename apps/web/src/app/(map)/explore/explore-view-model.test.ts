@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { listPublicEntities } from '../../data/public-seed';
+import { listPublicEntities } from '../../../data/public-seed';
 import { buildExploreViewModel } from './explore-view-model';
 
 test('includes every geo-anchored active-release entity by default', () => {

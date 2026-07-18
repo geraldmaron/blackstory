@@ -4,6 +4,7 @@
  * parse/serialize so the server-rendered page and the client orchestrator read and write the
  * exact same shape.
  */
+import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@black-book/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS, type ExploreFilterState } from './filters';
 
 export type ExploreViewport = {
@@ -106,4 +107,36 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
 export function buildExploreHref(state: ExploreViewState): string {
   const qs = buildExploreSearchParams(state);
   return qs ? `/explore?${qs}` : '/explore';
+}
+
+/**
+ * The `state`-tier camera target for a US postal code: the state's bounding-box midpoint (see
+ * `@black-book/domain`'s `US_STATES`, the same coarse bbox posture used everywhere else this
+ * codebase attributes a point to a state — ADR-013 "known gaps") at a zoom close enough to read
+ * individual pins. Alaska/Hawaii pull back to a wider zoom so their bbox — which spans far more
+ * longitude than the Lower 48 states — doesn't clip at the map's `minZoom`.
+ *
+ * Shared by the homepage hero (BB-098: flies here before/while pushing to `/explore?state=…`)
+ * and `/explore` itself (state-shape clicks, deep links), so both surfaces fly to the exact same
+ * frame for the same state — one source of truth, not two independently-tuned camera targets.
+ */
+export function viewportForState(postalCode: string): ExploreViewport | undefined {
+  const state = findUsStateByPostalCode(postalCode);
+  if (!state) return undefined;
+  const [west, south, east, north] = state.bbox;
+  return {
+    lng: (west + east) / 2,
+    lat: (south + north) / 2,
+    zoom: postalCode === 'AK' || postalCode === 'HI' ? 4.5 : 6.2,
+  };
+}
+
+/** The `national`-tier resting camera target: the continental US bounds' midpoint, at a zoom
+ * that keeps the whole frame roughly in view. `MapStage.flyPreset('national', …)` prefers
+ * resolving the `national` preset directly from `US_CONUS_BOUNDS` (via `cameraForBounds`, which
+ * accounts for the live canvas's actual aspect ratio); this fixed-zoom fallback exists for
+ * non-map-instance callers (e.g. computing an href, or a viewport before the canvas exists). */
+export function nationalViewport(): ExploreViewport {
+  const [west, south, east, north] = US_CONUS_BOUNDS;
+  return { lng: (west + east) / 2, lat: (south + north) / 2, zoom: 3.4 };
 }

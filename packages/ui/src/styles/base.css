@@ -3,6 +3,28 @@
  * Base document styles, visible focus rings, and reduced-motion safeguards for Black Book UI.
  */
 
+/*
+ * Theme-invariant ink-surface constants (brand pack v3). tokens.css's
+ * --bb-ink/--bb-canvas/etc. pairs intentionally flip with [data-theme] so
+ * ordinary page chrome matches the reader's light/dark preference. A few
+ * surfaces are brand-fixed regardless of that preference instead — the map
+ * (ADR-013: "a fixed editorial choice, not a light/dark theme variant"), the
+ * persistent map hero, the on-map header, and the footer ("Black Ink
+ * always"). These six custom properties give those surfaces something to
+ * reference that is never re-pointed by [data-theme='dark'], so consuming
+ * CSS never needs an ad-hoc hex literal. Values are copied 1:1 from the
+ * landed v3 palette (tokens.css dark theme / brand-palette.ts) — nothing new
+ * is introduced, only a theme-stable name for values that already exist.
+ */
+:root {
+  --bb-fixed-ink: #0a0a0a;
+  --bb-fixed-charcoal: #161616;
+  --bb-fixed-paper: #f4efe5;
+  --bb-fixed-stone: #bdb5a9;
+  --bb-fixed-rule: #34302c;
+  --bb-fixed-accent: #d07a32;
+}
+
 *,
 *:before,
 *:after {
