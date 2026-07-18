@@ -71,7 +71,10 @@ test('Mapping Inequality is onboarded with requiresPolygonGeometry and a localit
   assert.ok(mappingInequality, 'mapping-inequality-holc must be present');
   assert.equal(mappingInequality?.requiresPolygonGeometry, true);
   assert.equal(mappingInequality?.precisionExpectation, 'locality');
-  assert.equal(mappingInequality?.licenseVerdict, 'public-domain');
+  // DSL's downloadable vector dataset is CC BY-NC-SA — noncommercial, attribution required.
+  // Still bulk-import eligible, but never wholly public-domain (corrected 2026-07-18).
+  assert.equal(mappingInequality?.licenseVerdict, 'restricted-attribution-required');
+  assert.ok(mappingInequality?.rights.prohibitedUses.includes('commercial_reuse'));
   assert.ok(mappingInequality?.boundaryNotes?.includes('BB-070'));
 });
 

@@ -14,10 +14,11 @@
  * (public domain)
  * - `rosenwald-schools` Fisk University Rosenwald Fund Card File database DEFERRED,
  * terms not yet verified; see `licenseVerdict: 'deferred-unverified'`
- * - `mapping-inequality-holc` Univ. of Richmond DSL HOLC redlining maps, sourced from NARA
- * (public domain) first launch corpus requiring real polygon
- * geometry; see the module doc note
- * at the bottom of this file for the map-tile follow-up.
+ * - `mapping-inequality-holc` Univ. of Richmond DSL HOLC redlining maps; NARA source scans
+ * are public domain but DSL's vector dataset is
+ * CC BY-NC-SA (restricted-attribution-required); first
+ * launch corpus requiring real polygon geometry; see the
+ * module doc note at the bottom for the map-tile follow-up.
  *
  * Boundary rules: statutes/cases (legal corpus) and
  * Tougaloo sundown-town data (exclusion-infrastructure lane) are deliberately absent
@@ -47,6 +48,17 @@ const PUBLIC_DOMAIN_ARCHIVAL_RIGHTS: RightsPolicy = {
 
 /** Attribution-required derivative rights (NYPL public-domain marks, EJI link+attribute terms). */
 const ATTRIBUTION_REQUIRED_RIGHTS: RightsPolicy = {
+  defaultStatus: 'licensed',
+  publicationPermissions: ['cite', 'short_excerpt'],
+  prohibitedUses: ['full_text_republication', 'unattributed_reuse', 'commercial_reuse'],
+};
+
+/**
+ * CC BY-NC-SA–class derivative rights (Mapping Inequality's georectified/vectorized spatial
+ * dataset). Attribution required, commercial reuse prohibited — a hard gate before any
+ * revenue-bearing public surface uses DSL-derived geometry.
+ */
+const NONCOMMERCIAL_ATTRIBUTION_RIGHTS: RightsPolicy = {
   defaultStatus: 'licensed',
   publicationPermissions: ['cite', 'short_excerpt'],
   prohibitedUses: ['full_text_republication', 'unattributed_reuse', 'commercial_reuse'],
@@ -263,12 +275,16 @@ export function buildLaunchCorpusVettingInputs(input: {
       corpus: 'mapping-inequality-holc',
       corpusDisplayName: 'Mapping Inequality: HOLC Residential Security Maps',
       custodian: 'University of Richmond Digital Scholarship Lab (DSL); source records held by NARA',
-      licenseVerdict: 'public-domain',
+      licenseVerdict: 'restricted-attribution-required',
       licenseNotes:
-        'Underlying HOLC Residential Security Maps are U.S. federal government records held by ' +
-        'NARA — public domain per 17 U.S.C. §105. DSL\'s digitized/vectorized boundary+grade ' +
-        'dataset derives directly from that public-domain federal record; cite both DSL and the ' +
-        'NARA record id.',
+        'Two distinct rights layers (corrected 2026-07-18; previously misrecorded as wholly ' +
+        'public-domain). (1) The underlying HOLC Residential Security Maps are U.S. federal ' +
+        'government records held by NARA — public domain per 17 U.S.C. §105. (2) DSL\'s ' +
+        'downloadable georectified/vectorized boundary+grade DATASET — the artifact this corpus ' +
+        'actually ingests — is offered by DSL under CC BY-NC-SA 4.0: attribution required, ' +
+        'noncommercial use only, share-alike. Any revenue-bearing public surface using ' +
+        'DSL-derived geometry needs a rights review first (or re-derivation from the NARA ' +
+        'scans). Cite both DSL and the NARA record id.',
       authorityTier: 'academic_institution',
       provenanceFieldsRetained: [
         'holcCityId',
@@ -285,7 +301,7 @@ export function buildLaunchCorpusVettingInputs(input: {
       refreshCadence: 'static',
       notabilityCriterion: 'documented_site',
       classification: 'primary_archival',
-      rights: PUBLIC_DOMAIN_ARCHIVAL_RIGHTS,
+      rights: NONCOMMERCIAL_ATTRIBUTION_RIGHTS,
       permittedClaimClasses: ['geographic_fact'],
       stableIdScheme: 'dsl-mapping-inequality-area-id',
       organizationId: 'org_richmond_dsl',

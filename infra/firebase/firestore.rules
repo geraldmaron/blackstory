@@ -341,6 +341,46 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Census county-decade statistics (black-book-vxz): published federal statistics with
+    // required provenance (public-numeric-policy category 3). Public read — no PII, counts
+    // as published by the Census Bureau; feeds the county choropleth. Writes are Admin SDK
+    // only via packages/firebase/src/demographics/load-cli.ts.
+    match /censusCountyDecades/{countyDecadeId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ACS 5-year county estimates: same class as censusCountyDecades (published federal
+    // statistics with provenance). Writes via packages/firebase/src/demographics/acs-load-cli.ts.
+    match /acsCountyProfiles/{countyVintageId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ACS 5-year tract estimates: ~85k docs per vintage. Client read stays CLOSED until a
+    // server-side aggregation/viewport-bounded surface exists — a public rule here would
+    // invite full-collection scans. Admin SDK bypasses rules for the loader and server reads.
+    match /acsTractProfiles/{tractVintageId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    // Opportunity Atlas curated tract outcomes: attribution-required research data, no
+    // public surface yet — CLOSED until one exists with proper attribution treatment.
+    // Writes via packages/firebase/scripts/ingest-opportunity-atlas.ts.
+    match /opportunityAtlasTracts/{tractId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    // HOLC graded areas: DSL vector data is CC BY-NC-SA (see launch-corpora.ts) — HARD
+    // rights gate, closed until a rights review clears a specific public treatment.
+    // Writes via packages/firebase/scripts/ingest-holc-areas.ts.
+    match /holcAreas/{areaId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

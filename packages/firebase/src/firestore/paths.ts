@@ -32,6 +32,12 @@ export const FIRESTORE_ROOT = {
   killSwitches: 'killSwitches',
   /** Jurisdiction reference data: states + counties wholesale, cities on-demand. */
   jurisdictions: 'jurisdictions',
+  /** Published census statistics: one doc per county per decennial vintage (black-book-vxz). */
+  censusCountyDecades: 'censusCountyDecades',
+  /** ACS 5-year county estimates: one doc per county per vintage. */
+  acsCountyProfiles: 'acsCountyProfiles',
+  /** ACS 5-year tract estimates (~85k/vintage): county-bounded reads only, never full scans. */
+  acsTractProfiles: 'acsTractProfiles',
 } as const;
 
 export type FirestoreRootCollection = (typeof FIRESTORE_ROOT)[keyof typeof FIRESTORE_ROOT];
@@ -76,4 +82,7 @@ export const firestorePaths = {
     `${FIRESTORE_ROOT.killSwitches}/source-adapter-${adapterId}`,
   /** Jurisdiction reference data: flat `{id}` docs, e.g. `us`, `us-06`, `us-06-001`. */
   jurisdiction: (jurisdictionId: string) => `${FIRESTORE_ROOT.jurisdictions}/${jurisdictionId}`,
+  /** Census county-decade statistics: flat `{fips5}_{decade}` docs, e.g. `01001_2020`. */
+  censusCountyDecade: (fips5: string, decade: string) =>
+    `${FIRESTORE_ROOT.censusCountyDecades}/${fips5}_${decade}`,
 } as const;

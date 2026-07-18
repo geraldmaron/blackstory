@@ -45,7 +45,10 @@ export const CENSUS_DECENNIAL_VINTAGES: readonly CensusDecennialVintage[] = [
     decade: '2020',
     dataset: '2020/dec/pl',
     totalVariable: 'P1_001N',
-    blackAloneVariable: 'P1_003N',
+    // P1_004N per the dataset's own variables.json ("Population of one race: Black or African
+    // American alone"); P1_003N is "White alone" — verified live 2026-07-18, caught by
+    // assertVariableLabels' fail-closed check.
+    blackAloneVariable: 'P1_004N',
     sourceId: 'us-census-decennial-2020-pl',
   },
 ] as const;

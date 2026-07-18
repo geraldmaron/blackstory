@@ -1,6 +1,6 @@
 /**
  * Parsers for the Census data API's array-of-arrays response shape:
- *   [["NAME","P1_001N","P1_003N","state","county"], ["Autauga County, Alabama","58805","11496","01","001"], ...]
+ *   [["NAME","P1_001N","P1_004N","state","county"], ["Autauga County, Alabama","58805","11496","01","001"], ...]
  * Pure functions — fetch lives in `./fetch-county-populations.ts`.
  */
 import type { CensusDecennialVintage, CountyDecadePopulation } from './types.js';
