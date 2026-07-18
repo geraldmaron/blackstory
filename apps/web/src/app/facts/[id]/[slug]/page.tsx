@@ -22,6 +22,7 @@ import {
   RevisionUpdateChrome,
 } from '../../../../components/trust';
 import { buildFactJsonPath, buildFactRevisionPath, slugifyFactStatement } from '@repo/domain';
+import { getPublicEntity } from '../../../../data/public-seed';
 import { listPublicFactStaticParams, resolvePublicFact } from '../../resolve-public-fact';
 
 type FactPageProps = {
@@ -62,6 +63,12 @@ export default async function FactDetailPage({ params }: FactPageProps) {
 
   const fact = resolved.fact;
   const currentRevision = fact.revisions[fact.revisions.length - 1];
+  const subjectLabels = Object.fromEntries(
+    fact.subjects.flatMap((subject) => {
+      const entity = getPublicEntity(subject.entityId);
+      return entity?.displayName ? [[subject.entityId, entity.displayName] as const] : [];
+    }),
+  );
 
   return (
     <main className="ds-container ds-page" id="main">
@@ -87,7 +94,11 @@ export default async function FactDetailPage({ params }: FactPageProps) {
             Subjects
           </h2>
           <div style={{ marginTop: 'var(--ds-space-4)' }}>
-            <FactSubjectList subjects={fact.subjects} labelledBy="subjects-heading" />
+            <FactSubjectList
+              subjects={fact.subjects}
+              labelledBy="subjects-heading"
+              {...(Object.keys(subjectLabels).length > 0 ? { labelsByEntityId: subjectLabels } : {})}
+            />
           </div>
         </section>
 

@@ -16,6 +16,7 @@ import { EntitySensitivityBanner } from '../../../components/entity/EntitySensit
 import '../../../components/entity/entity-page.css';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
 import { EntityRelatedList } from '../../../components/entity/EntityRelatedList';
+import { EntityLinkDiscoveryHint } from '../../../components/entity/EntityLink';
 import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
 import { EntityPrimaryImage } from '../../../components/entity/EntityPrimaryImage';
 import { RecordGapNotice } from '../../../components/entity/RecordGapNotice';
@@ -273,6 +274,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
               <h2 className="ds-section__title" id="related-heading">
                 Related records
               </h2>
+              <EntityLinkDiscoveryHint />
               <div style={{ marginTop: 'var(--ds-space-4)' }}>
                 <EntityRelatedList entity={entity} labelledBy="related-heading" />
               </div>
@@ -288,6 +290,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
                   Nearby records one step further in the published graph — keep learning without
                   dead ends.
                 </p>
+                <EntityLinkDiscoveryHint />
                 <div style={{ marginTop: 'var(--ds-space-4)' }}>
                   <EntityRelatedList
                     entity={entity}

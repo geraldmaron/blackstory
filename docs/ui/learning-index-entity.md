@@ -33,6 +33,7 @@ retraction history for operators; that trail is not the learning-index UI.
 - No photo / no extended narrative: **omit** those sections entirely.
 - Empty related: `RecordGapNotice` plus tag and map CTAs still provide learning paths.
 - Neighbor stubs are denormalized at read time; do not embed full neighbor docs on every projection.
+- Listed entity names link quietly via `EntityLink` / `ds-entity-link` (inherit color; underline on hover/focus — not copper pills). Related rails keep `ds-story-link` row anatomy; a short discovery hint invites clicking onward.
 
 ## Rights for entity media
 
@@ -64,7 +65,7 @@ APP_FIREBASE_ALLOW_PRODUCTION=1 \
     --entity-id=ent_seed_school_001 \
     --file=../../brand/symbols/dark/blap-book-pin-symbol-dark-transparent.png \
     --alt="Schematic mark for Seed Freedmen School" \
-    --credit="Blap brand kit seed fixture" \
+    --credit="BlackStory brand kit seed fixture" \
     --rights=public_domain
 ```
 
@@ -82,5 +83,7 @@ fronted by CDN. Until CDN is applied, `makePublic` is best-effort after upload.
 | Entity media paths | `packages/firebase/src/firestore/entity-media.ts` |
 | Serialize choke point | `packages/security/src/serialize.ts` |
 | Entity page | `apps/web/src/app/entity/[id]/page.tsx` |
+| Quiet entity name links | `apps/web/src/components/entity/EntityLink.tsx` (`ds-entity-link`) |
+| Catalog → relationships | `packages/domain/src/graph/catalog-related.ts` + `publish-national-catalog.ts` |
 | Immutable releases | `docs/adr/ADR-004-public-projection-immutable-snapshots.md` |
 | Public-media bucket matrix | `infra/gcp/storage-buckets.matrix.md` |

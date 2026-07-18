@@ -37,3 +37,33 @@ test('renders the approved missing-information notice when related is empty, not
   assert.match(html, /No linked records yet/);
   assert.doesNotMatch(html, /<ul/);
 });
+
+test('related fallback without neighbor stubs humanizes ids instead of showing raw entity ids', () => {
+  const school = requireEntity('ent_dunbar_school_001');
+  const html = renderToStaticMarkup(
+    createElement(EntityRelatedList, {
+      entity: {
+        ...school,
+        relatedNeighbors: [],
+        continueLearning: [],
+      },
+      labelledBy: 'related-heading',
+    }),
+  );
+  assert.match(html, /15th St Church/);
+  assert.doesNotMatch(html, />ent_15th_st_church_001</);
+  assert.match(html, /href="\/entity\/ent_15th_st_church_001"/);
+});
+
+test('renders discovery hint when showDiscoveryHint is true', () => {
+  const school = requireEntity('ent_dunbar_school_001');
+  const html = renderToStaticMarkup(
+    createElement(EntityRelatedList, {
+      entity: school,
+      labelledBy: 'related-heading',
+      showDiscoveryHint: true,
+    }),
+  );
+  assert.match(html, /class="ds-entity-link-hint"/);
+  assert.match(html, /Record names link onward/);
+});

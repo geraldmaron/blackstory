@@ -4,8 +4,8 @@
  * graph slice builder; this panel surfaces the backing citations for the selected edge.
  */
 import React from 'react';
-import Link from 'next/link';
 import { Card } from '@repo/ui';
+import { EntityLink } from '../entity/EntityLink';
 import type { HistoryEdgeView } from '../../lib/history/build-history-graph';
 
 void React;
@@ -56,13 +56,9 @@ export function HistoryEdgePanel({ edge, onClose }: HistoryEdgePanelProps) {
       </section>
 
       <div className="ds-history-edge-panel__endpoints">
-        <Link className="ds-cta ds-cta--ghost" href={`/entity/${edge.fromEntityId}`}>
-          {edge.fromDisplayName}
-        </Link>
+        <EntityLink entityId={edge.fromEntityId}>{edge.fromDisplayName}</EntityLink>
         <span aria-hidden="true">↔</span>
-        <Link className="ds-cta ds-cta--ghost" href={`/entity/${edge.toEntityId}`}>
-          {edge.toDisplayName}
-        </Link>
+        <EntityLink entityId={edge.toEntityId}>{edge.toDisplayName}</EntityLink>
       </div>
     </Card>
   );

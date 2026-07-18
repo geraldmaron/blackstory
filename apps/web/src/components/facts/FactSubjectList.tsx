@@ -7,22 +7,28 @@
  */
 import React from 'react';
 import type { FactRecord } from '@repo/domain/facts';
+import { EntityLink, resolveEntityLabel } from '../entity/EntityLink';
 import { humanizeToken } from './format';
 
 export type FactSubjectListProps = {
   readonly subjects: FactRecord['subjects'];
   readonly labelledBy?: string;
+  readonly labelsByEntityId?: ReadonlyMap<string, string> | Record<string, string>;
 };
 
-export function FactSubjectList({ subjects, labelledBy }: FactSubjectListProps) {
+export function FactSubjectList({
+  subjects,
+  labelledBy,
+  labelsByEntityId,
+}: FactSubjectListProps) {
   return (
     <section {...(labelledBy ? { 'aria-labelledby': labelledBy } : {})}>
       <ul className="ds-stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         {subjects.map((subject) => (
           <li key={`${subject.entityId}_${subject.kind}`}>
-            <a className="ds-cta ds-cta--ink" href={`/entity/${subject.entityId}`}>
-              {subject.entityId}
-            </a>
+            <EntityLink entityId={subject.entityId}>
+              {resolveEntityLabel(subject.entityId, labelsByEntityId)}
+            </EntityLink>
             <span className="ds-sans" style={{ marginLeft: 'var(--ds-space-2)', color: 'var(--ds-ink-muted)' }}>
               {humanizeToken(subject.kind)}
               {subject.role ? ` · ${humanizeToken(subject.role)}` : ''}

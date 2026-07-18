@@ -41,6 +41,9 @@ import { evaluateFactPublishGate } from '../facts/publish-gate.js';
 import type { FactCitation } from '../facts/citation.js';
 import { isValidTopicId } from '../taxonomy/topics.js';
 import { buildGeoPointFields, type GeoPointFields } from '../geography/geohash.js';
+import type { PublicRelatedEntry } from '../graph/adjacency.js';
+import type { RelationshipType, TemporalContext } from '../relationship.js';
+import { RELATIONSHIP_TYPES } from '../relationship.js';
 
 export type ReleaseSourceClaim = {
   readonly id?: string;
@@ -50,6 +53,13 @@ export type ReleaseSourceClaim = {
   readonly citationSource: string;
   readonly citationHref?: string;
   readonly citationLabel: string;
+};
+
+export type ReleaseSourceRelatedEntry = {
+  readonly id: string;
+  readonly type: string;
+  readonly direction: 'outgoing' | 'incoming';
+  readonly timespan?: TemporalContext;
 };
 
 export type ReleaseSourceEntity = {
@@ -71,6 +81,8 @@ export type ReleaseSourceEntity = {
   readonly historicalContext?: string;
   readonly sensitivityClass?: string;
   readonly status?: string;
+  /** Bootstrap catalog related shortcuts; prefer `ReleaseBuildContext.relatedEntries` from graph. */
+  readonly related?: readonly ReleaseSourceRelatedEntry[];
 };
 
 export type ReleaseClaimProjection = {
@@ -92,6 +104,11 @@ export type ReleaseBuildContext = {
   readonly generatedAt: string;
   /** Geohash character precision; defaults to the bootstrap fixtures' choice of 5. */
   readonly geohashPrecision?: number;
+  /**
+   * Graph-derived related entries for this entity (from release adjacency). When present,
+   * these win over bootstrap `entry.related` shortcuts.
+   */
+  readonly relatedEntries?: readonly PublicRelatedEntry[];
 };
 
 export type ReleaseEntityProjectionFields = {
@@ -124,6 +141,8 @@ export type ReleaseEntityProjectionFields = {
   readonly notabilityBasis: readonly NotabilityBasisRecord[];
   readonly researchCoverage: ReleaseResearchCoverage;
   readonly historicalContext?: string;
+  /** Typed related entries from graph adjacency (or catalog bootstrap fallback). */
+  readonly related?: readonly PublicRelatedEntry[];
   /** Real release-build-time timestamps (see module doc comment). */
   readonly generatedAt: string;
   readonly recordUpdatedAt: string;
@@ -347,6 +366,33 @@ export function resolveReleaseEntityReferences(
   return { ok: true };
 }
 
+function isRelationshipType(value: string): value is RelationshipType {
+  return (RELATIONSHIP_TYPES as readonly string[]).includes(value);
+}
+
+/** Prefer graph-derived context entries; fall back to catalog bootstrap `entry.related`. */
+function resolveRelatedEntries(
+  entry: ReleaseSourceEntity,
+  context: ReleaseBuildContext,
+): readonly PublicRelatedEntry[] {
+  if (context.relatedEntries !== undefined) {
+    return context.relatedEntries;
+  }
+  const bootstrap = entry.related ?? [];
+  const validated: PublicRelatedEntry[] = [];
+  for (const item of bootstrap) {
+    if (!isRelationshipType(item.type)) continue;
+    if (item.direction !== 'outgoing' && item.direction !== 'incoming') continue;
+    validated.push({
+      id: item.id,
+      type: item.type,
+      direction: item.direction,
+      ...(item.timespan ? { timespan: item.timespan } : {}),
+    });
+  }
+  return validated;
+}
+
 /**
  * The single deterministic release/projection builder (the related workstream). Given one source entry,
  * produces BOTH the entity-projection fields and the search-index fields from the same claims,
@@ -399,6 +445,7 @@ export function buildReleaseEntityArtifacts(
   const geohashPrecision = context.geohashPrecision ?? 5;
   const geo: GeoPointFields = buildGeoPointFields(entry.lat, entry.lng, geohashPrecision);
   const notabilityLabels = [...new Set(notabilityBasis.map((basis) => NOTABILITY_RUBRIC[basis.criterion]))];
+  const related = resolveRelatedEntries(entry, context);
 
   const projection: ReleaseEntityProjectionFields = {
     id: entry.id,
@@ -430,6 +477,7 @@ export function buildReleaseEntityArtifacts(
     notabilityBasis,
     researchCoverage,
     ...(entry.historicalContext !== undefined ? { historicalContext: entry.historicalContext } : {}),
+    ...(related.length > 0 ? { related } : {}),
     generatedAt: context.generatedAt,
     recordUpdatedAt: context.generatedAt,
   };
@@ -454,7 +502,7 @@ export function buildReleaseEntityArtifacts(
     ...(entry.sensitivityClass !== undefined ? { sensitivityClass: entry.sensitivityClass } : {}),
     recordMaturity: claims.length > 0 ? 'partial_enrichment' : 'projection_stub',
     researchCoverage,
-    relatedCount: 0,
+    relatedCount: related.length,
     claimCount: claims.length,
   };
 

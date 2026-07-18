@@ -260,3 +260,43 @@ test('buildReleaseEntityArtifacts is deterministic across repeated calls', () =>
   const second = buildReleaseEntityArtifacts(entry, CONTEXT);
   assert.deepEqual(first, second);
 });
+
+test('buildReleaseEntityArtifacts prefers context.relatedEntries over entry.related bootstrap', () => {
+  const entry = baseEntry({
+    related: [{ id: 'ent_bootstrap_001', type: 'related_to', direction: 'outgoing' }],
+  });
+  const result = buildReleaseEntityArtifacts(entry, {
+    ...CONTEXT,
+    relatedEntries: [
+      { id: 'ent_graph_001', type: 'located_at', direction: 'outgoing' },
+    ],
+  });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.deepEqual(result.projection.related, [
+    { id: 'ent_graph_001', type: 'located_at', direction: 'outgoing' },
+  ]);
+  assert.equal(result.searchIndex.relatedCount, 1);
+});
+
+test('buildReleaseEntityArtifacts falls back to entry.related when context has no relatedEntries', () => {
+  const entry = baseEntry({
+    related: [{ id: 'ent_arrest_site_001', type: 'located_at', direction: 'outgoing' }],
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.deepEqual(result.projection.related, [
+    { id: 'ent_arrest_site_001', type: 'located_at', direction: 'outgoing' },
+  ]);
+  assert.equal(result.searchIndex.relatedCount, 1);
+});
+
+test('buildReleaseEntityArtifacts omits related and keeps relatedCount 0 when none provided', () => {
+  const entry = baseEntry();
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.related, undefined);
+  assert.equal(result.searchIndex.relatedCount, 0);
+});

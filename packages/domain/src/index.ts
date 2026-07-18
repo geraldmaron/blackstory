@@ -1,5 +1,5 @@
 /**
- * Shared domain primitives for Black Book entities, geography, provenance,
+ * Shared domain primitives for BlackStory entities, geography, provenance,
  * claims confidence, append-only audit contracts, immutable
  * publication releases, and source adapter registry contracts.
  * Living-status and public precision rules come from
@@ -277,6 +277,11 @@ export {
   buildGraphReleaseArtifact,
   assertGraphReleaseArtifactReproducible,
   publicRelatedEntriesByEntityId,
+  extractCatalogRelationships,
+  relatedEntriesFromRelationships,
+  RELATIONSHIP_CANDIDATE_TYPES,
+  RELATIONSHIP_CANDIDATE_REASONS,
+  proposeRelationshipCandidates,
 } from './graph/index.js';
 export type {
   ContainmentRelationshipType,
@@ -304,8 +309,17 @@ export type {
   SuccessorPublicView,
   GraphReleaseArtifactInput,
   GraphReleaseArtifact,
+  CatalogRelatedEntry,
+  CatalogEntityForRelationships,
+  ExtractCatalogRelationshipsOptions,
+  ExtractCatalogRelationshipsResult,
+  RelationshipCandidateType,
+  RelationshipCandidateReason,
+  RelationshipCandidate,
+  RelationshipCandidateEntity,
+  ExistingRelationshipRef,
+  ProposeRelationshipCandidatesInput,
 } from './graph/index.js';
-
 // sensitivity presentation, present-day advisories, disclaimer registry.
 export {
   ADVISORY_CLASSES,

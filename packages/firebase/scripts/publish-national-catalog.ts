@@ -1,7 +1,8 @@
 /**
  * Publish the national seed catalog (the related workstream follow-on: 100+ researched entities) into
- * the ACTIVE public release's projections + search index, and emit ADR-004 catalog artifacts
- * (`entities.json` + `search-index.json`) for CDN/App Hosting reads.
+ * the ACTIVE public release's projections + search index, relationship docs, and graph adjacency
+ * artifacts, and emit ADR-004 catalog artifacts (`entities.json` + `search-index.json`) for
+ * CDN/App Hosting reads.
  *
  * Reads every JSON file in `packages/firebase/fixtures/national-catalog/`, converts each
  * research entry into `publicEntityProjectionSchema`/`publicSearchIndexSchema`-conformant docs
@@ -10,6 +11,10 @@
  * entry does not validate or does not resolve, then batch-writes:
  *   publicReleases/<activeRelease>/entities/<id>   (projection, merge)
  *   publicSearchIndex/<id>                          (search doc, merge)
+ *   entityRelationships/<id>                        (canonical edge, merge)
+ *   publicReleases/<activeRelease>/graph/adjacency/<id>
+ *   publicReleases/<activeRelease>/graph/decades/<decade>
+ *   publicReleases/<activeRelease>/graph/all-time
  *
  * Also writes local catalog artifacts under
  * `packages/firebase/fixtures/release-artifacts/` (and optionally uploads to the public-media
@@ -33,7 +38,18 @@ import { fileURLToPath } from 'node:url';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
-import { buildReleaseEntityArtifacts, type ReleaseSourceEntity } from '@repo/domain';
+import {
+  buildGraphReleaseArtifact,
+  buildReleaseEntityArtifacts,
+  extractCatalogRelationships,
+  publicGraphAdjacencyPath,
+  publicGraphAllTimePath,
+  publicGraphDecadePath,
+  relatedEntriesFromRelationships,
+  type DecadeBucketEntityInput,
+  type EntityAdjacency,
+  type ReleaseSourceEntity,
+} from '@repo/domain';
 import {
   publicEntityProjectionSchema,
   publicSearchIndexSchema,
@@ -108,6 +124,80 @@ function loadCatalog(): ReleaseSourceEntity[] {
   return entries;
 }
 
+/** Maps catalog `eraBuckets` into decade-bucketing active spans (see `history-graph-seed.ts`). */
+function activeSpansForCatalogEntry(
+  entry: ReleaseSourceEntity,
+): DecadeBucketEntityInput['activeSpans'] {
+  if (entry.eraBuckets && entry.eraBuckets.length > 0) {
+    const first = entry.eraBuckets[0]!;
+    const last = entry.eraBuckets[entry.eraBuckets.length - 1]!;
+    const startYear = first.slice(0, 4);
+    const endYear = last.slice(0, 4);
+    return [
+      {
+        validFrom: startYear,
+        validTo: `${Number.parseInt(endYear, 10) + 9}`,
+        datePrecision: 'year',
+      },
+    ];
+  }
+  return [];
+}
+
+function decadeBucketInputs(entries: readonly ReleaseSourceEntity[]): DecadeBucketEntityInput[] {
+  return entries.map((entry) => ({
+    entityId: entry.id,
+    activeSpans: activeSpansForCatalogEntry(entry),
+  }));
+}
+
+/** Firestore-friendly adjacency doc — mirrors `artifactPayload` in `graph/build.ts`. */
+function adjacencyToFirestoreDoc(adjacency: EntityAdjacency): Record<string, unknown> {
+  return {
+    entityId: adjacency.entityId,
+    totalCandidates: adjacency.totalCandidates,
+    entries: adjacency.entries.map((entry) => ({
+      id: entry.id,
+      type: entry.type,
+      direction: entry.direction,
+      relationshipId: entry.relationshipId,
+      evidenceCount: entry.evidenceCount,
+      ...(entry.timespan
+        ? {
+            timespan: {
+              ...(entry.timespan.label !== undefined ? { label: entry.timespan.label } : {}),
+              ...(entry.timespan.validFrom !== undefined
+                ? { validFrom: entry.timespan.validFrom }
+                : {}),
+              ...(entry.timespan.validTo !== undefined ? { validTo: entry.timespan.validTo } : {}),
+            },
+          }
+        : {}),
+    })),
+  };
+}
+
+const SPOTLIGHT_ENTITY_IDS = [
+  'ent_rosa_parks_museum_001',
+  'ent_edmund_pettus_bridge_001',
+] as const;
+
+function logRelationshipSummary(
+  relationshipCount: number,
+  skippedCount: number,
+  relatedByEntity: ReadonlyMap<string, readonly unknown[]>,
+): void {
+  const entitiesWithRelated = [...relatedByEntity.values()].filter((entries) => entries.length > 0)
+    .length;
+  console.log(
+    `Relationships: ${relationshipCount} canonical edges (${skippedCount} skipped); ${entitiesWithRelated} entities with related > 0`,
+  );
+  for (const entityId of SPOTLIGHT_ENTITY_IDS) {
+    const relatedCount = relatedByEntity.get(entityId)?.length ?? 0;
+    console.log(`  ${entityId}: ${relatedCount} related entries`);
+  }
+}
+
 async function main(): Promise<void> {
   console.log(`Project: ${PROJECT_ID}${DRY_RUN ? ' (dry-run)' : ''}`);
   console.log(`Catalog: ${catalogDir}`);
@@ -136,6 +226,30 @@ async function main(): Promise<void> {
   // and NOT legitimate at web read-time).
   const generatedAt = new Date().toISOString();
 
+  const { relationships, skipped } = extractCatalogRelationships(entries, { generatedAt });
+  console.log(`Extracted ${relationships.length} relationships (${skipped.length} skipped)`);
+  if (skipped.length > 0) {
+    for (const reason of skipped.slice(0, 10)) console.log(`  skipped: ${reason}`);
+    if (skipped.length > 10) console.log(`  ... and ${skipped.length - 10} more skipped pairs`);
+  }
+
+  const relatedByEntity = relatedEntriesFromRelationships(
+    entries.map((entry) => entry.id),
+    relationships,
+  );
+  logRelationshipSummary(relationships.length, skipped.length, relatedByEntity);
+
+  const graphArtifact = buildGraphReleaseArtifact({
+    releaseId,
+    generatedAt,
+    entityIds: entries.map((entry) => entry.id),
+    entities: decadeBucketInputs(entries),
+    relationships,
+  });
+  console.log(
+    `Graph artifact: ${graphArtifact.adjacencyByEntityId.size} adjacency docs, ${graphArtifact.decadeViews.length} decade views, hash ${graphArtifact.contentHash.digest.slice(0, 12)}…`,
+  );
+
   // Validate EVERYTHING before writing anything; name each failing entry so a bad catalog
   // line reads as "which record, which field", not a bare Zod trace. `buildReleaseEntityArtifacts`
   // (the single release builder, @repo/domain) runs the fact/notability gates and fail-closed
@@ -144,10 +258,12 @@ async function main(): Promise<void> {
   const failures: string[] = [];
   const writes = entries.flatMap((entry) => {
     try {
+      const relatedEntries = relatedByEntity.get(entry.id);
       const built = buildReleaseEntityArtifacts(entry, {
         releaseId,
         generatedAt,
         geohashPrecision: GEOHASH_PRECISION,
+        ...(relatedEntries?.length ? { relatedEntries } : {}),
       });
       if (!built.ok) {
         throw new Error(`${built.reason}: ${built.message}`);
@@ -188,6 +304,7 @@ async function main(): Promise<void> {
     for (const { projection } of writes.slice(0, 5)) {
       console.log(`  sample: ${projection.id} — ${projection.displayName} (${projection.kind})`);
     }
+    logRelationshipSummary(relationships.length, skipped.length, relatedByEntity);
     console.log('Dry run complete; nothing written.');
     return;
   }
@@ -196,6 +313,9 @@ async function main(): Promise<void> {
   const BATCH_LIMIT = 400;
   let batch = db.batch();
   let ops = 0;
+  let relationshipWrites = 0;
+  let adjacencyWrites = 0;
+  let decadeWrites = 0;
   const flush = async () => {
     if (ops > 0) {
       await batch.commit();
@@ -203,14 +323,41 @@ async function main(): Promise<void> {
       ops = 0;
     }
   };
-  for (const { projection, search } of writes) {
-    batch.set(db.doc(`publicReleases/${releaseId}/entities/${projection.id}`), projection, {
-      merge: true,
-    });
-    batch.set(db.doc(`publicSearchIndex/${search.id}`), search, { merge: true });
-    ops += 2;
+  const queueMerge = async (path: string, data: Record<string, unknown>) => {
+    batch.set(db.doc(path), data, { merge: true });
+    ops += 1;
     if (ops >= BATCH_LIMIT) await flush();
+  };
+
+  for (const { projection, search } of writes) {
+    await queueMerge(`publicReleases/${releaseId}/entities/${projection.id}`, projection);
+    await queueMerge(`publicSearchIndex/${search.id}`, search);
   }
+
+  for (const relationship of relationships) {
+    await queueMerge(`entityRelationships/${relationship.id}`, { ...relationship });
+    relationshipWrites += 1;
+  }
+
+  for (const [entityId, adjacency] of graphArtifact.adjacencyByEntityId) {
+    await queueMerge(publicGraphAdjacencyPath(releaseId, entityId), adjacencyToFirestoreDoc(adjacency));
+    adjacencyWrites += 1;
+  }
+
+  for (const decadeView of graphArtifact.decadeViews) {
+    await queueMerge(publicGraphDecadePath(releaseId, decadeView.decade), {
+      decade: decadeView.decade,
+      nodeIds: [...decadeView.nodeIds],
+      edgeIds: [...decadeView.edgeIds],
+    });
+    decadeWrites += 1;
+  }
+
+  await queueMerge(publicGraphAllTimePath(releaseId), {
+    nodeIds: [...graphArtifact.allTimeView.nodeIds],
+    edgeIds: [...graphArtifact.allTimeView.edgeIds],
+  });
+
   await flush();
 
   const written = writeReleaseCatalogArtifactsToDir(catalogArtifacts, artifactsRoot);
@@ -239,7 +386,9 @@ async function main(): Promise<void> {
 
   // Prefer write-count verification over a post-publish full collection scan (read-cost).
   console.log(
-    `Publish complete. Wrote ${writes.length} entity projections + ${writes.length} search docs for ${releaseId}.`,
+    `Publish complete. Wrote ${writes.length} entity projections + ${writes.length} search docs, ` +
+      `${relationshipWrites} relationships, ${adjacencyWrites} adjacency docs, ${decadeWrites} decade views, ` +
+      `and 1 all-time view for ${releaseId}.`,
   );
 }
 

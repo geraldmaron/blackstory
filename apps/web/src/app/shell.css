@@ -1155,6 +1155,33 @@
   line-height: 1.55;
 }
 
+/* —— Quiet entity links — inherit color; underline on hover/focus only —— */
+.ds-entity-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-entity-link:hover,
+.ds-entity-link:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.ds-entity-link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-entity-link-hint {
+  margin: 0 0 var(--ds-space-3) 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
 /* —— Data strip — the archive in numbers, mono register, hairlines only ——  */
 .ds-data-strip {
   display: grid;
