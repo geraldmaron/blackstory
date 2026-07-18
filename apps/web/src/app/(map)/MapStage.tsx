@@ -212,9 +212,9 @@ function syncCircularMarkers(
       el.dataset.mapTone = feature.properties.mapTone;
     }
     // The map canvas is `aria-hidden` (see `MapStageProvider`'s render) — the synchronized
-    // result list is the accessible-parity surface for the same entities (NarrativeCard's doc
-    // comment), so these buttons are deliberately pulled out of the tab order rather than left
-    // focusable-but-hidden (a WAI-ARIA anti-pattern).
+    // result list is the accessible-parity surface for the same entities, so these buttons
+    // are deliberately pulled out of the tab order rather than left focusable-but-hidden
+    // (a WAI-ARIA anti-pattern).
     el.tabIndex = -1;
     el.addEventListener('click', (event) => {
       event.preventDefault();
@@ -330,18 +330,37 @@ async function loadCountyLines(map: MapLibreMap): Promise<void> {
   source.setData(collection as any);
 }
 
-function applyGeographyStyle(map: MapLibreMap, style: StyleSpecification): void {
+function applyGeographyStyle(
+  map: MapLibreMap,
+  style: StyleSpecification,
+  options?: { readonly recreateEntitiesSource?: boolean },
+): void {
+  const recreateEntities = options?.recreateEntitiesSource === true;
+
+  if (recreateEntities) {
+    // Clustering is baked into the GeoJSON source at add time — toggling it requires a
+    // deliberate remove/re-add of the entities source + its layers. Do this only on an
+    // explicit grouping flip (not on every data patch), and tear layers down first.
+    for (const layerId of ENTITY_LAYER_IDS) {
+      if (map.getLayer(layerId)) map.removeLayer(layerId);
+    }
+    if (map.getSource(EXPLORE_ENTITIES_SOURCE_ID)) {
+      map.removeSource(EXPLORE_ENTITIES_SOURCE_ID);
+    }
+  }
+
   for (const [id, source] of Object.entries(style.sources ?? {})) {
     const existing = map.getSource(id) as GeoJSONSource | undefined;
     if (existing) {
-      // Update in place — NEVER removeSource/addSource on a data patch. Re-adding a source id
-      // while the worker is still tearing the old one down corrupts the internal GeoJSON tile
-      // pyramid (only the tile in flight at teardown ever renders again), and patches land in
-      // quick succession on mount (hero reset + explore sync, doubled by dev StrictMode).
-      // Lazy geography sources (states+density, county lines) are skipped: their inline style
-      // data is an empty placeholder that their own loaders overwrite — setData'ing the
-      // placeholder first would just blank-flash the loaded polygons. The entities source DOES
-      // setData here: that is how a surface's filter changes reach the GL circle layers.
+      // Update in place — NEVER removeSource/addSource on a routine data patch. Re-adding a
+      // source id while the worker is still tearing the old one down corrupts the internal
+      // GeoJSON tile pyramid (only the tile in flight at teardown ever renders again), and
+      // patches land in quick succession on mount (hero reset + explore sync, doubled by
+      // StrictMode). Lazy geography sources (states+density, county lines) are skipped: their
+      // inline style data is an empty placeholder that their own loaders overwrite —
+      // setData'ing the placeholder first would just blank-flash the loaded polygons. The
+      // entities source DOES setData here: that is how a surface's filter changes reach the
+      // GL circle layers.
       if (LAZY_GEOGRAPHY_SOURCE_IDS.has(id)) continue;
       const data = (source as { data?: unknown }).data;
       if (typeof existing.setData === 'function' && data && typeof data === 'object') {
@@ -414,6 +433,8 @@ export type MapStageDataPatch = {
   readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
   readonly densityEnabled: boolean;
   readonly densityLevels: readonly StateDensityLevel[];
+  /** When false, recreate the entities source without MapLibre clustering. Default true. */
+  readonly clusteringEnabled?: boolean;
   readonly historyEdgesEnabled: boolean;
   readonly historyEdgeCollection: HistoryEdgeLineCollection;
 };
@@ -424,7 +445,7 @@ export type MapStageDataPatch = {
 export type MapStageViewPatch = {
   readonly selectedState: string | undefined;
   readonly selectedEdge: string | undefined;
-  /** Copper orientation ring on the map for the open narrative record. */
+  /** Copper orientation ring on the map for a focused record (e.g. return from entity page). */
   readonly selectedEntity?: string | undefined;
 };
 
@@ -503,6 +524,7 @@ type StageConfig = {
   jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
   densityEnabled: boolean;
   densityLevels: readonly StateDensityLevel[];
+  clusteringEnabled: boolean;
   historyEdgesEnabled: boolean;
   historyEdgeCollection: HistoryEdgeLineCollection;
   selectedState: string | undefined;
@@ -549,6 +571,7 @@ export function MapStageProvider({
     jurisdictionAreaFeatures: initialJurisdictionAreaFeatures,
     densityEnabled: false,
     densityLevels: [],
+    clusteringEnabled: true,
     historyEdgesEnabled: false,
     historyEdgeCollection: EMPTY_EDGE_COLLECTION,
     selectedState: undefined,
@@ -592,15 +615,14 @@ export function MapStageProvider({
     }
   }, []);
 
-  const applyStyleAndData = useCallback(() => {
+  const applyStyleAndData = useCallback((options?: { readonly recreateEntitiesSource?: boolean }) => {
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded()) return;
     try {
       // Layers are removed and re-added from the rebuilt style (cheap, main-thread-only) so
       // mode-dependent paint (density tiers, edge visibility) always matches the config.
-      // Sources are deliberately NOT removed — applyGeographyStyle setDatas them in place;
-      // see its doc comment for the worker-teardown corruption that removeSource+addSource
-      // of the same id causes.
+      // Sources are deliberately NOT removed on routine patches — applyGeographyStyle setDatas
+      // them in place; see its doc comment. Grouping toggles pass recreateEntitiesSource.
       for (const id of [
         EXPLORE_STATE_DENSITY_LAYER_ID,
         EXPLORE_COUNTY_LINES_LAYER_ID,
@@ -614,7 +636,9 @@ export function MapStageProvider({
         if (map.getLayer(id)) map.removeLayer(id);
       }
 
-      applyGeographyStyle(map, configRef.current.style);
+      applyGeographyStyle(map, configRef.current.style, {
+        ...(options?.recreateEntitiesSource ? { recreateEntitiesSource: true } : {}),
+      });
       setSelectedStateFilter(map, configRef.current.selectedState);
       setHistoryEdgeData(map, configRef.current.historyEdgeCollection);
       setHistoryEdgesVisibility(map, configRef.current.historyEdgesEnabled);
@@ -638,11 +662,14 @@ export function MapStageProvider({
 
   const patchData = useCallback(
     (patch: MapStageDataPatch) => {
+      const clusteringEnabled = patch.clusteringEnabled !== false;
+      const clusteringChanged = clusteringEnabled !== configRef.current.clusteringEnabled;
       const style = buildExploreMapStyle({
         featureCollection: patch.featureCollection,
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
         densityLayerEnabled: patch.densityEnabled,
         historyEdgesEnabled: patch.historyEdgesEnabled,
+        clusteringEnabled,
         colorScheme: readDocumentColorScheme(),
       });
       configRef.current = {
@@ -652,10 +679,11 @@ export function MapStageProvider({
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
         densityEnabled: patch.densityEnabled,
         densityLevels: patch.densityLevels,
+        clusteringEnabled,
         historyEdgesEnabled: patch.historyEdgesEnabled,
         historyEdgeCollection: patch.historyEdgeCollection,
       };
-      applyStyleAndData();
+      applyStyleAndData(clusteringChanged ? { recreateEntitiesSource: true } : undefined);
     },
     [applyStyleAndData],
   );
@@ -669,6 +697,7 @@ export function MapStageProvider({
         jurisdictionAreaFeatures: cfg.jurisdictionAreaFeatures,
         densityLayerEnabled: cfg.densityEnabled,
         historyEdgesEnabled: cfg.historyEdgesEnabled,
+        clusteringEnabled: cfg.clusteringEnabled,
         colorScheme: readDocumentColorScheme(),
       });
       configRef.current = { ...cfg, style };

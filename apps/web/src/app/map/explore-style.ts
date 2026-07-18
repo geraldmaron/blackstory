@@ -113,15 +113,24 @@ type KindGlyphPaintSignature = {
   readonly strokeColor: string;
 };
 
+/** Unclustered solid-fill disc opacity — translucent enough to read basemap/county
+ * hairlines through the marker while kind shade stays readable. HTML hit-targets
+ * (`.ds-map-entity-marker`) use the same value via CSS. */
+export const ENTITY_POINT_FILL_OPACITY = 0.52;
+/** Soft halo under every unclustered point. */
+export const ENTITY_HALO_OPACITY = 0.16;
+/** Cluster aggregate disc opacity (grouped view). */
+export const ENTITY_CLUSTER_OPACITY = 0.55;
+/** Institution "ring" glyph — mostly hollow by design. */
+export const ENTITY_RING_FILL_OPACITY = 0.2;
+
 const GLYPH_PAINT_SIGNATURE: Readonly<Record<string, KindGlyphPaintSignature>> = {
-  // Solid-fill kinds sit at 0.82, not 1: with county hairlines beneath the marker stack
-  // (the related workstream), a fully opaque disc erases the boundary context it sits on — slight
-  // transparency keeps the geography legible through the marker without weakening the
-  // kind-shade read. `ring` stays far lower; mostly-hollow IS its glyph signature.
-  circle: { opacity: 0.82, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
-  square: { opacity: 0.82, strokeWidth: 4, strokeColor: DIGNITY_PALETTE.selected },
-  diamond: { opacity: 0.82, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
-  ring: { opacity: 0.3, strokeWidth: 3, strokeColor: DIGNITY_PALETTE.kindInstitutionStroke },
+  // Solid-fill kinds sit below full opacity so geography stays legible through the disc.
+  // `ring` stays far lower; mostly-hollow IS its glyph signature.
+  circle: { opacity: ENTITY_POINT_FILL_OPACITY, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
+  square: { opacity: ENTITY_POINT_FILL_OPACITY, strokeWidth: 4, strokeColor: DIGNITY_PALETTE.selected },
+  diamond: { opacity: ENTITY_POINT_FILL_OPACITY, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
+  ring: { opacity: ENTITY_RING_FILL_OPACITY, strokeWidth: 3, strokeColor: DIGNITY_PALETTE.kindInstitutionStroke },
 };
 
 const DEFAULT_GLYPH_PAINT_SIGNATURE: KindGlyphPaintSignature = GLYPH_PAINT_SIGNATURE.circle!;
@@ -191,20 +200,28 @@ export type BuildExploreMapStyleInput = {
   readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
   readonly densityLayerEnabled: boolean;
   readonly historyEdgesEnabled?: boolean;
+  /**
+   * When true (default), nearby points aggregate while zoomed out. When false, every
+   * unclustered disc stays visible at national/regional zoom — the shareable `group`
+   * URL toggle on `/explore`.
+   */
+  readonly clusteringEnabled?: boolean;
   /** Site theme — map plate and street ink follow light/dark. */
   readonly colorScheme?: MapColorScheme;
 };
 
 /**
- * Builds the full `/explore` MapLibre style: clustered entity points with a radius-affordance
- * halo (precision-tier rendering), an optional state-level presence/density fill (
- * "presence, not just incidents"), and a jurisdiction-area polygon layer (area records
- * render as geometry, never as a point; empty today, see `build-explore-map-source.ts`).
+ * Builds the full `/explore` MapLibre style: entity points with a radius-affordance
+ * halo (precision-tier rendering), optional clustering when zoomed out, an optional
+ * state-level presence/density fill ("presence, not just incidents"), and a
+ * jurisdiction-area polygon layer (area records render as geometry, never as a point;
+ * empty today, see `build-explore-map-source.ts`).
  * Clustering config (`EXPLORE_CLUSTER_CONFIG`) is the one place that governs
- * "every cluster decomposes to named entities within two interactions."
+ * "every cluster decomposes to named entities within two interactions" when grouping is on.
  */
 export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpecification {
   const plate = plateForScheme(input.colorScheme ?? 'dark');
+  const clusteringEnabled = input.clusteringEnabled !== false;
   return {
     version: 8,
     name: 'BlackStory — Explore',
@@ -241,9 +258,13 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'geojson',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
         data: input.featureCollection as any,
-        cluster: true,
-        clusterRadius: EXPLORE_CLUSTER_CONFIG.clusterRadius,
-        clusterMaxZoom: EXPLORE_CLUSTER_CONFIG.clusterMaxZoom,
+        ...(clusteringEnabled
+          ? {
+              cluster: true,
+              clusterRadius: EXPLORE_CLUSTER_CONFIG.clusterRadius,
+              clusterMaxZoom: EXPLORE_CLUSTER_CONFIG.clusterMaxZoom,
+            }
+          : { cluster: false }),
       },
       [EXPLORE_HISTORY_EDGES_SOURCE_ID]: {
         type: 'geojson',
@@ -460,7 +481,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           // marker toward the same warm tone and hiding kind color coding.
           'circle-radius': markerHaloRadiusExpression(),
           'circle-color': kindColorExpression(),
-          'circle-opacity': 0.22,
+          'circle-opacity': ENTITY_HALO_OPACITY,
         },
       },
       {
@@ -558,7 +579,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
             ],
           ],
           'circle-color': DIGNITY_PALETTE.point,
-          'circle-opacity': 0.78,
+          'circle-opacity': ENTITY_CLUSTER_OPACITY,
           'circle-stroke-width': 2,
           'circle-stroke-color': plate.selected,
         },

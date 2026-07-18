@@ -18,6 +18,7 @@ test('an empty query string parses to the "all" default filter state with no vie
   assert.equal(parsed.viewport, undefined);
   assert.equal(parsed.selected, undefined);
   assert.equal(parsed.density, false);
+  assert.equal(parsed.group, true);
   assert.equal(parsed.lines, false);
   assert.equal(parsed.decade, undefined);
   assert.equal(parsed.edge, undefined);
@@ -30,6 +31,7 @@ test('round-trips a full view state through build -> parse', () => {
     selected: 'ent_dunbar_school_001',
     state: 'DC',
     density: true,
+    group: false,
     lines: true,
     decade: '1970s',
     edge: 'rel_landmark_occurred_at_school',
@@ -37,6 +39,7 @@ test('round-trips a full view state through build -> parse', () => {
 
   const href = buildExploreHref(state);
   assert.match(href, /^\/explore\?/);
+  assert.match(href, /group=0/);
 
   const [, qs] = href.split('?');
   const parsed = parseExploreSearchParams(Object.fromEntries(new URLSearchParams(qs)));
@@ -49,6 +52,7 @@ test('round-trips a full view state through build -> parse', () => {
   assert.equal(parsed.selected, state.selected);
   assert.equal(parsed.state, 'DC');
   assert.equal(parsed.density, true);
+  assert.equal(parsed.group, false);
   assert.equal(parsed.lines, true);
   assert.equal(parsed.decade, '1970s');
   assert.equal(parsed.edge, 'rel_landmark_occurred_at_school');
@@ -58,9 +62,17 @@ test('default filter values are omitted from the query string (minimal shareable
   const qs = buildExploreSearchParams({
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
     density: false,
+    group: true,
     lines: false,
   });
   assert.equal(qs, '');
+});
+
+test('group=0 turns nearby-point grouping off; omitted group defaults on', () => {
+  assert.equal(parseExploreSearchParams({ group: '0' }).group, false);
+  assert.equal(parseExploreSearchParams({ group: 'false' }).group, false);
+  assert.equal(parseExploreSearchParams({ group: '1' }).group, true);
+  assert.equal(parseExploreSearchParams({}).group, true);
 });
 
 test('viewport requires all three of lat/lng/zoom to be present and finite', () => {

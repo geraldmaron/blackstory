@@ -1,25 +1,26 @@
 'use client';
 
 /**
- * Homepage hero chrome (): cinema over the live plate. The persistent
+ * Homepage hero chrome: cinema over the live plate. The persistent
  * `MapStage` canvas renders behind this (mounted once, at the `(map)` layout);
  * `HeroStage` renders the floating typography and the TIMELINE INSTRUMENT —
  * a full-width rail of decade ticks that plays the archive decade by decade
  * (decade-flow.ts), scrubbable by tap, pausable, honest about what it shows
  * (documented records, never modeled population).
  *
- * Engagement contract (ADR-017 "Transition contract"): a state click, a point
- * click, a background click, or the copper CTA all funnel through `engage()` —
- * fly the matching camera preset AND `router.push('/explore?…')` in the same
- * tick; the flight continues uninterrupted across the navigation because the
- * stage never unmounts.
+ * Engagement contract (ADR-017 "Transition contract"): a state click, a
+ * background click, or the copper CTA funnel through `engage()` — fly the
+ * matching camera preset AND `router.push('/explore?…')` in the same tick; the
+ * flight continues uninterrupted across the navigation because the stage never
+ * unmounts. A point click opens the entity record page (`/entity/[id]`) — same
+ * page-first story as Explore.
  */
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Notice } from '@repo/ui';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
-import { CAMERA_POINT_ZOOM, prefersReducedMotion } from '../../lib/map-experience/camera-presets';
+import { prefersReducedMotion } from '../../lib/map-experience/camera-presets';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
@@ -45,17 +46,17 @@ export type HeroStageProps = {
   readonly liveData: boolean;
 };
 
-const RESTING_HREF = buildExploreHref({ filters: DEFAULT_EXPLORE_FILTERS, density: false, lines: false });
+const RESTING_HREF = buildExploreHref({
+  filters: DEFAULT_EXPLORE_FILTERS,
+  density: false,
+  group: true,
+  lines: false,
+});
 const TRANSITION_FLAG = 'ds-map-transition';
 
-function coordinatesOf(
-  collection: ExploreMapFeatureCollection,
-  entityId: string,
-): readonly [lng: number, lat: number] | undefined {
+function entityHrefOf(collection: ExploreMapFeatureCollection, entityId: string): string {
   const feature = collection.features.find((item) => item.properties.entityId === entityId);
-  if (!feature || feature.geometry.type !== 'Point') return undefined;
-  const [lng, lat] = feature.geometry.coordinates;
-  return typeof lng === 'number' && typeof lat === 'number' ? [lng, lat] : undefined;
+  return feature?.properties.href ?? `/entity/${encodeURIComponent(entityId)}`;
 }
 
 function markTransition(): void {
@@ -169,31 +170,41 @@ export function HeroStage({
   useEffect(() => {
     const unsubscribe = [
       stage.subscribe('select', (entityId: string) => {
-        const coordinates = coordinatesOf(featureCollection, entityId);
-        if (coordinates) {
-          stage.flyPreset(
-            'point',
-            { center: coordinates, zoom: CAMERA_POINT_ZOOM },
-            { padding: { top: 72, bottom: 280, left: 48, right: 48 } },
-          );
-        }
-        engage(buildExploreHref({ filters: DEFAULT_EXPLORE_FILTERS, density: false, lines: false, selected: entityId }));
+        // Page-first: open the record. Leaving the (map) layout unmounts the canvas, so we
+        // do not fly-then-dissolve into explore for pins — state/background still do.
+        router.push(entityHrefOf(featureCollection, entityId));
       }),
       stage.subscribe('stateSelect', (postalCode: string) => {
         const viewport = viewportForState(postalCode);
         if (viewport) {
           stage.flyPreset('state', { center: [viewport.lng, viewport.lat], zoom: viewport.zoom });
         }
-        engage(buildExploreHref({ filters: DEFAULT_EXPLORE_FILTERS, density: false, lines: false, state: postalCode }));
+        engage(
+          buildExploreHref({
+            filters: DEFAULT_EXPLORE_FILTERS,
+            density: false,
+            group: true,
+            lines: false,
+            state: postalCode,
+          }),
+        );
       }),
       stage.subscribe('activate', (viewport: ExploreViewport) => {
-        engage(buildExploreHref({ filters: DEFAULT_EXPLORE_FILTERS, density: false, lines: false, viewport }));
+        engage(
+          buildExploreHref({
+            filters: DEFAULT_EXPLORE_FILTERS,
+            density: false,
+            group: true,
+            lines: false,
+            viewport,
+          }),
+        );
       }),
     ];
     return () => {
       for (const unsub of unsubscribe) unsub();
     };
-  }, [stage, featureCollection, engage]);
+  }, [stage, featureCollection, engage, router]);
 
   function handleCtaClick(event: React.MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();

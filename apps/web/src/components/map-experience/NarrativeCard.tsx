@@ -1,12 +1,7 @@
 /**
- * Narrative off-ramp card for a single selected map point. Anatomy follows the
- * cognitive-accessibility law (design-direction-v5 §v5.1): one consistent record
- * order everywhere — kind badge → name → one-line story → labeled facts → tags →
- * precision note → single action. Every fact carries a literal label (Where,
- * Era, Evidence, Confidence, Status); nothing is inferred from position or glued
- * together. Close is a small icon key in the top corner, not a competing action.
- * Purely presentational and SSR-render-safe — the map canvas and the
- * synchronized list both open the same card for the same feature.
+ * Presentational record anatomy card (kind → name → story → facts → CTA). Kept for SSR
+ * smoke tests and any surface that still wants a compact off-ramp; Explore and the home
+ * map navigate to `/entity/[id]` instead of mounting this overlay.
  */
 import React from 'react';
 import Link from 'next/link';

@@ -1,12 +1,10 @@
 /**
- * The accessible list peer for the map. When `onSelect` is provided (explore), activating a
- * row focuses that record on the map and opens the narrative spotlight — the full entity page
- * stays one copper CTA away. Without `onSelect`, rows remain plain links (legacy/standalone).
- *
- * Selection highlighting (`selectedId` / `aria-current`) mirrors the map when a point is open.
+ * The accessible list peer for the map. Rows are links to the entity record page — the same
+ * destination as clicking a map pin. Selection highlighting (`selectedId` / `aria-current`)
+ * mirrors the map copper ring when returning from “View on map” (`?selected=`).
  *
  * Meta rows use a fixed labeled layout (Kind / Era / Confidence / Evidence / Where)
- * so cards stay uniform when optional fields are sparse.
+ * so rows stay uniform when optional fields are sparse.
  */
 import React from 'react';
 import Link from 'next/link';

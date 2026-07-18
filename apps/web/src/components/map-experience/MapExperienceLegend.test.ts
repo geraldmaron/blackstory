@@ -17,6 +17,8 @@ test('explains points, clusters, the density layer, and confidence glyphs in wor
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
   assert.match(html, /radius affordance/);
   assert.match(html, /cluster/i);
+  assert.match(html, /Group nearby/);
+  assert.match(html, /full entity page/);
   assert.match(html, /presence, not incidents/);
   assert.match(html, /High/);
   assert.match(html, /medium/);

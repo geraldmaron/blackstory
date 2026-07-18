@@ -1,7 +1,7 @@
 /**
- * Entity record page affordances: mast meta row layout. Shared kind/confidence
- * badge and legend-glyph styles live in shell.css so home and entity surfaces
- * stay consistent without loading the explore bundle.
+ * Entity record page affordances: mast meta row layout and aside blocks (page sections,
+ * not floating cards). Shared kind/confidence badge and legend-glyph styles live in
+ * shell.css so home and entity surfaces stay consistent without loading the explore bundle.
  */
 
 .ds-entity-mast__meta {
@@ -29,4 +29,24 @@
 
 .ds-at-a-glance .ds-confidence-mark {
   font-size: 0.9375rem;
+}
+
+/* Aside context blocks — flat page sections with a top rule, never Card chrome. */
+.ds-aside-block {
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-aside-block__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-aside-block__meta {
+  margin: var(--ds-space-1) 0 var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  font-size: 0.8125rem;
 }

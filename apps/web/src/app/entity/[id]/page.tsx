@@ -9,7 +9,7 @@
 
 import { notFound } from 'next/navigation';
 import { buildCompactFactViewsForEntity } from '@repo/domain';
-import { Card, MapFrame, Notice, Timeline } from '@repo/ui';
+import { MapFrame, Notice, Timeline } from '@repo/ui';
 import { SeedDataNotice } from '../../../components/SeedDataNotice';
 import { KindBadge, ConfidenceMark } from '../../../components/map-experience';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
@@ -19,6 +19,7 @@ import { EntityRelatedList } from '../../../components/entity/EntityRelatedList'
 import { EntityLinkDiscoveryHint } from '../../../components/entity/EntityLink';
 import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
 import { EntityPrimaryImage } from '../../../components/entity/EntityPrimaryImage';
+import { EntityArchiveCollage } from '../../../components/entity/EntityArchiveCollage';
 import { RecordGapNotice } from '../../../components/entity/RecordGapNotice';
 import { EntityEvidencePanel } from '../../../components/evidence';
 import { CompactFactReference } from '../../../components/facts';
@@ -85,6 +86,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const exploreHref = buildExploreHref({
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
     density: false,
+    group: true,
     lines: false,
     selected: entity.id,
     ...(geoAnchor
@@ -305,25 +307,35 @@ export default async function EntityPage({ params }: EntityPageProps) {
           <aside className="ds-entity-aside" aria-label="Record context">
             {entity.primaryImage ? (
               <EntityPrimaryImage image={entity.primaryImage} entityName={entity.displayName} />
-            ) : null}
+            ) : (
+              <EntityArchiveCollage
+                entityId={entity.id}
+                entityName={entity.displayName}
+                kind={entity.kind}
+              />
+            )}
 
             <Notice tone="warning" title={`Location precision: ${entity.locationPrecision}`}>
               Showing {entity.locationLabel}. Exact residential addresses are never rendered on
               public pages.
             </Notice>
 
-            <Card
-              title="Record maturity"
-              meta={<span className="ds-mono">{entity.recordMaturity}</span>}
-              as="section"
-            >
+            <section className="ds-aside-block" aria-labelledby="maturity-heading">
+              <h2 className="ds-aside-block__title" id="maturity-heading">
+                Record maturity
+              </h2>
+              <p className="ds-aside-block__meta ds-mono">{entity.recordMaturity}</p>
               <p className="ds-sans" style={{ margin: 0 }}>
                 Research coverage: <strong>{entity.researchCoverage}</strong>. Maturity labels
                 follow the product constitution vocabulary and will be projection-backed in a later release.
               </p>
-            </Card>
+            </section>
 
-            <Card title="Revision" meta={<span className="ds-mono">{entity.revision.releaseId}</span>} as="section">
+            <section className="ds-aside-block" aria-labelledby="revision-heading">
+              <h2 className="ds-aside-block__title" id="revision-heading">
+                Revision
+              </h2>
+              <p className="ds-aside-block__meta ds-mono">{entity.revision.releaseId}</p>
               <dl className="ds-sans" style={{ margin: 0 }}>
                 <dt style={{ fontWeight: 600 }}>Record last updated</dt>
                 <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>
@@ -332,7 +344,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
                 <dt style={{ fontWeight: 600 }}>Release generated</dt>
                 <dd style={{ margin: 0 }}>{entity.revision.generatedAt || 'Not yet tracked'}</dd>
               </dl>
-            </Card>
+            </section>
 
             <MapFrame
               title={`${entity.displayName} map context`}

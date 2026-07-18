@@ -1,8 +1,12 @@
 /**
  * Shareable URL state for `/explore`: viewport + filters + selected entity + density
- * toggle + selected state + optional relationship lines decade selected edge. Pure
- * parse/serialize so the server-rendered page and the client orchestrator read and write the
- * exact same shape.
+ * toggle + optional point grouping + selected state + optional relationship lines decade
+ * selected edge. Pure parse/serialize so the server-rendered page and the client
+ * orchestrator read and write the exact same shape.
+ *
+ * Selection note: `selected` orients the copper ring on the map (e.g. “View on map” from a
+ * record page). Opening a record from a pin or list navigates to `/entity/[id]` — the map
+ * does not host a narrative card overlay.
  */
 import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS, type ExploreFilterState } from './filters';
@@ -20,6 +24,11 @@ export type ExploreViewState = {
   /** USPS state DC postal code when a state shape is selected on the map.  */
   readonly state?: string;
   readonly density: boolean;
+  /**
+   * When true (default), nearby points aggregate while zoomed out. Serialize as `group=0`
+   * only when the reader turns grouping off.
+   */
+  readonly group: boolean;
   /** Draw evidence-backed History relationship lines between entity anchors.  */
   readonly lines: boolean;
   /** When set with lines, filter edges to this decade slice (e.g. `1950s`).  */
@@ -62,9 +71,13 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const selectedRaw = firstValue(raw.selected)?.trim();
   const stateRaw = firstValue(raw.state)?.trim().toUpperCase();
   const densityRaw = firstValue(raw.density);
+  const groupRaw = firstValue(raw.group);
   const linesRaw = firstValue(raw.lines);
   const decadeRaw = firstValue(raw.decade)?.trim();
   const edgeRaw = firstValue(raw.edge)?.trim();
+
+  // Grouping defaults on; only an explicit off flag turns it off (`group=0` / `false`).
+  const groupOff = groupRaw === '0' || groupRaw === 'false';
 
   return {
     filters,
@@ -74,6 +87,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     ...(selectedRaw ? { selected: selectedRaw } : {}),
     ...(stateRaw && stateRaw !== 'ALL' ? { state: stateRaw } : {}),
     density: densityRaw === '1' || densityRaw === 'true',
+    group: !groupOff,
     lines: linesRaw === '1' || linesRaw === 'true',
     ...(decadeRaw ? { decade: decadeRaw } : {}),
     ...(edgeRaw ? { edge: edgeRaw } : {}),
@@ -98,6 +112,7 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   if (state.selected) params.set('selected', state.selected);
   if (state.state) params.set('state', state.state);
   if (state.density) params.set('density', '1');
+  if (!state.group) params.set('group', '0');
   if (state.lines) params.set('lines', '1');
   if (state.decade) params.set('decade', state.decade);
   if (state.edge) params.set('edge', state.edge);

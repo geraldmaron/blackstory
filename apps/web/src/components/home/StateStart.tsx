@@ -35,6 +35,7 @@ function exploreHrefForState(postalCode: string): string {
   return buildExploreHref({
     filters: DEFAULT_EXPLORE_FILTERS,
     density: false,
+    group: true,
     lines: false,
     state: postalCode,
   });

@@ -82,14 +82,15 @@
 
 /* Kind-colored hit-target disc aligned with GL `explore-point` / KindBadge shade.
    `--ds-map-entity-shade` is set per feature in MapStage.syncCircularMarkers from the same
-   `displayEncodingFor` hex carried on GeoJSON `properties.shade`. */
+   `displayEncodingFor` hex carried on GeoJSON `properties.shade`. Fill opacity matches
+   ENTITY_POINT_FILL_OPACITY in explore-style.ts (52%). */
 .ds-map-entity-marker {
   width: 1.125rem;
   height: 1.125rem;
   padding: 0;
-  border: 1.5px solid color-mix(in srgb, var(--ds-map-entity-shade, #b86b2a) 85%, #f4efe5);
+  border: 1.5px solid color-mix(in srgb, var(--ds-map-entity-shade, #b86b2a) 70%, #f4efe5);
   border-radius: 50%;
-  background: color-mix(in srgb, var(--ds-map-entity-shade, #b86b2a) 82%, transparent);
+  background: color-mix(in srgb, var(--ds-map-entity-shade, #b86b2a) 52%, transparent);
   cursor: pointer;
 }
 

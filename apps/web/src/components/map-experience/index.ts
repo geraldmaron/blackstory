@@ -3,6 +3,7 @@
  */
 export { ConfidenceMark, confidenceLabel, confidenceShortLabel } from './ConfidenceMark';
 export { DensityLayerToggle } from './DensityLayerToggle';
+export { GroupingToggle } from './GroupingToggle';
 export { KindBadge } from './KindBadge';
 export { MapExperienceLegend } from './MapExperienceLegend';
 export { NarrativeCard } from './NarrativeCard';

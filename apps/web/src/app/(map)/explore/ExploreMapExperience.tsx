@@ -1,18 +1,18 @@
 'use client';
 
 /**
- * Client orchestrator for `/explore` (). Wires the shared `MapStage` (via `useMapStage()`
+ * Client orchestrator for `/explore`. Wires the shared `MapStage` (via `useMapStage()`
  * instead of mounting its own canvas), the synchronized accessible list, density toggle,
- * relationship lines, decade settings, filter form, and shareable URL state. Pin or list
- * selection opens a centered (desktop) / bottom-sheet (mobile) narrative spotlight — not a
- * buried card in the results rail — with focus handoff and Escape to dismiss. The
- * server-rendered snapshot catalog is the source of truth; `/explore/api` refine is optional
- * progressive enhancement when App Check is configured.
+ * nearby-points grouping toggle, relationship lines, decade settings, filter form, and
+ * shareable URL state. Pin or list selection navigates to the entity record page — the map
+ * keeps `?selected=` only as an orientation ring (e.g. return from “View on map”). History
+ * edge clicks still open a connection panel. The server-rendered snapshot catalog is the
+ * source of truth; `/explore/api` refine is optional progressive enhancement when App Check
+ * is configured.
  *
- * Camera: every selection that has a coherent single target flies (`stage.flyPreset`, cinematic
- * arc); clearing a selection eases back out to the next-broadest tier. Deep links and
- * back/forward reconcile the camera from the URL via `easeTo` (`reconcileCamera`, run once on
- * mount and again on every `popstate`) never a raw default flight (ADR-017).
+ * Camera: deep links and back/forward reconcile the camera from the URL via `easeTo`
+ * (`reconcileCamera`, run once on mount and again on every `popstate`) never a raw default
+ * flight (ADR-017). Selecting a pin flies briefly then leaves for the record page.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -20,8 +20,8 @@ import { Notice } from '@repo/ui';
 import { US_CONUS_BOUNDS, findUsStateByPostalCode } from '@repo/domain/map/geography';
 import { HistoryEdgePanel } from '../../../components/history/HistoryEdgePanel';
 import { DensityLayerToggle } from '../../../components/map-experience/DensityLayerToggle';
+import { GroupingToggle } from '../../../components/map-experience/GroupingToggle';
 import { MapExperienceLegend } from '../../../components/map-experience/MapExperienceLegend';
-import { NarrativeCard } from '../../../components/map-experience/NarrativeCard';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
 import { CAMERA_POINT_ZOOM } from '../../../lib/map-experience/camera-presets';
 import { DEGRADED_MODE_COPY } from '../../../lib/map-experience/snapshot-mode';
@@ -47,8 +47,8 @@ export type ExploreMapExperienceProps = {
 
 const TRANSITION_FLAG = 'ds-map-transition';
 
-/** Keeps the selected pin clear of the centered (desktop) / bottom (mobile) spotlight. */
-const SELECTION_CAMERA_PADDING = { top: 72, bottom: 280, left: 48, right: 48 } as const;
+/** Keeps a selected pin clear of the results rail when returning from a record page. */
+const SELECTION_CAMERA_PADDING = { top: 72, bottom: 120, left: 48, right: 320 } as const;
 
 function mergeViewState(
   base: ExploreViewState,
@@ -62,6 +62,7 @@ function mergeViewState(
   const next: ExploreViewState = {
     filters: patch.filters ?? base.filters,
     density: patch.density ?? base.density,
+    group: patch.group ?? base.group,
     lines: patch.lines ?? base.lines,
   };
 
@@ -163,8 +164,8 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     [view.allFeatures, view.viewState.filters, view.viewState.state],
   );
 
-  // Resolve from the full catalog so a deep-linked `?selected=` still opens even when the
-  // current facet set would hide that row from the list.
+  // Resolve from the full catalog so a deep-linked `?selected=` still orients the copper ring
+  // (and list highlight) even when the current facet set would hide that row.
   const selectedFeature = useMemo(
     () =>
       view.viewState.selected
@@ -221,6 +222,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       jurisdictionAreaFeatures: view.source.jurisdictionAreaFeatures,
       densityEnabled: view.viewState.density,
       densityLevels: view.densityLevels,
+      clusteringEnabled: view.viewState.group,
       historyEdgesEnabled: view.viewState.lines,
       historyEdgeCollection: view.edgeLineCollection,
     });
@@ -229,6 +231,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     filteredFeatures,
     view.source.jurisdictionAreaFeatures,
     view.viewState.density,
+    view.viewState.group,
     view.densityLevels,
     view.viewState.lines,
     view.edgeLineCollection,
@@ -322,9 +325,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           { padding: SELECTION_CAMERA_PADDING },
         );
       }
-      commitViewState(mergeViewState(view.viewState, { selected: entityId, clearEdge: true }));
+      // Page-first: the record lives at `/entity/[id]`, not in a map overlay card.
+      const href = feature?.properties.href ?? `/entity/${encodeURIComponent(entityId)}`;
+      router.push(href);
     },
-    [commitViewState, stage, view.allFeatures, view.viewState],
+    [router, stage, view.allFeatures],
   );
 
   const handleStateSelect = useCallback(
@@ -350,7 +355,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     commitViewState(mergeViewState(view.viewState, { clearState: true }));
   }, [commitViewState, stage, view.viewState]);
 
-  const handleCloseCard = useCallback(() => {
+  const handleClearSelected = useCallback(() => {
     if (view.viewState.state) {
       const viewport = viewportForState(view.viewState.state);
       if (viewport) {
@@ -364,6 +369,10 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   const handleDensityToggle = useCallback(() => {
     commitViewState(mergeViewState(view.viewState, { density: !view.viewState.density }));
+  }, [commitViewState, view.viewState]);
+
+  const handleGroupToggle = useCallback(() => {
+    commitViewState(mergeViewState(view.viewState, { group: !view.viewState.group }));
   }, [commitViewState, view.viewState]);
 
   const handleLinesToggle = useCallback(() => {
@@ -393,35 +402,26 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     commitViewState(mergeViewState(view.viewState, { clearEdge: true }));
   }, [commitViewState, view.viewState]);
 
-  // Spotlight: move focus into the narrative so the record is announced; Escape dismisses
-  // entity or edge spotlight.
+  // Edge spotlight: focus the connection panel; Escape dismisses. Entity selection no longer
+  // mounts a narrative card — it navigates to the record page.
   useEffect(() => {
-    const entityOpen = Boolean(selectedFeature) && !view.selectedEdge;
     const edgeOpen = Boolean(view.selectedEdge);
-    if (!entityOpen && !edgeOpen) return undefined;
+    if (!edgeOpen) return undefined;
 
     const frame = window.requestAnimationFrame(() => {
-      if (entityOpen) {
-        spotlightRef.current?.querySelector<HTMLElement>('.ds-nc')?.focus();
-      } else {
-        spotlightRef.current?.querySelector<HTMLElement>('article, [tabindex]')?.focus();
-      }
+      spotlightRef.current?.querySelector<HTMLElement>('article, [tabindex]')?.focus();
     });
     function onKeyDown(event: KeyboardEvent) {
       if (event.key !== 'Escape') return;
       event.preventDefault();
-      if (edgeOpen) {
-        handleCloseEdge();
-      } else {
-        handleCloseCard();
-      }
+      handleCloseEdge();
     }
     window.addEventListener('keydown', onKeyDown);
     return () => {
       window.cancelAnimationFrame(frame);
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [selectedFeature, view.selectedEdge, handleCloseCard, handleCloseEdge]);
+  }, [view.selectedEdge, handleCloseEdge]);
 
   const handleViewportChange = useCallback(
     (viewport: ExploreViewport) => {
@@ -523,6 +523,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
         <div className="ds-explore-stage__toolbar">
           <DensityLayerToggle enabled={view.viewState.density} onToggle={handleDensityToggle} />
+          <GroupingToggle enabled={view.viewState.group} onToggle={handleGroupToggle} />
           <details className="ds-explore-stage__disclosure" open={view.viewState.lines}>
             <summary className="ds-explore-stage__disclosure-summary">Map settings</summary>
             <div className="ds-explore__settings-body">
@@ -581,12 +582,17 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
               Clear state
             </button>
           ) : null}
+          {view.viewState.selected && selectedFeature ? (
+            <button type="button" className="ds-button" onClick={handleClearSelected}>
+              Clear map focus
+            </button>
+          ) : null}
         </div>
       </div>
 
       <div
         className={
-          selectedFeature || view.selectedEdge
+          view.selectedEdge
             ? 'ds-explore-stage__results ds-explore-stage__results--dimmed'
             : 'ds-explore-stage__results'
         }
@@ -602,7 +608,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
             : ''}
           {' · oldest first'}
         </p>
-        <SynchronizedResultList {...listProps} onSelect={handleSelect} />
+        <SynchronizedResultList {...listProps} />
       </div>
 
       {view.selectedEdge ? (
@@ -620,25 +626,6 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
             aria-label="Selected connection"
           >
             <HistoryEdgePanel edge={view.selectedEdge} onClose={handleCloseEdge} />
-          </div>
-        </div>
-      ) : null}
-
-      {selectedFeature && !view.selectedEdge ? (
-        <div className="ds-explore-stage__spotlight" ref={spotlightRef}>
-          <button
-            type="button"
-            className="ds-explore-stage__spotlight-scrim"
-            aria-label="Dismiss selected record"
-            onClick={handleCloseCard}
-          />
-          <div
-            className="ds-explore-stage__spotlight-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="ds-nc-title"
-          >
-            <NarrativeCard feature={selectedFeature} onClose={handleCloseCard} />
           </div>
         </div>
       ) : null}

@@ -138,9 +138,17 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
           <div>
             <dt>Clusters</dt>
             <dd>
-              A number inside a marker means several records are grouped at this zoom level. Zoom
-              in or activate a cluster to reveal the named records inside it &mdash; every cluster
-              opens to individual entities within two interactions.
+              When &ldquo;Group nearby&rdquo; is on, a number inside a marker means several
+              records are grouped at this zoom level. Zoom in or activate a cluster to reveal
+              the named records inside it &mdash; every cluster opens to individual entities
+              within two interactions. Turn grouping off to see every disc even when zoomed out.
+            </dd>
+          </div>
+          <div>
+            <dt>Opening a record</dt>
+            <dd>
+              Activating a pin or a list row opens the full entity page &mdash; evidence,
+              context, and chronology &mdash; not a floating preview card on the map.
             </dd>
           </div>
           <div>

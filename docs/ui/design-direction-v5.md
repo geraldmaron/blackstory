@@ -48,16 +48,19 @@ Where anything below contradicts an earlier section of this document, **this sec
 
 ### Cognitive-accessibility law (owner directive 2026-07-18: design for neurodivergent readers)
 
-Binding on every record surface (narrative card, result rows, entity page) and every future
-"modeling" page. These are testable rules, not vibes:
+Binding on every record surface (list rows, search rows, entity page; history graph may still
+use a compact off-ramp card) and every future "modeling" page. These are testable rules, not
+vibes:
 
 1. **Summary before story.** A record page opens with an "At a glance" block
    (`.ds-at-a-glance`): the whole record as labeled facts (kind, where, era, evidence,
    coverage, location precision) before any prose asks for sustained reading. A reader who
    never scrolls still leaves oriented.
-2. **One record anatomy, everywhere.** Map card, list row, search row, and entity page present
+2. **One record anatomy, everywhere.** List row, search row, and entity page present
    the same order: kind slug → name → one-line story → labeled facts → tags → precision →
-   single action. Predictability is the accommodation — no surface invents its own order.
+   single action. Map pin / list activation opens the **entity page** (not a floating map
+   card). `?selected=` on `/explore` only orients the copper ring when returning from
+   “View on map.” Predictability is the accommodation — no surface invents its own order.
 3. **Labels are literal.** Every fact carries a visible label (Era, Evidence, Confidence,
    Status) in a `dt/dd` pair. Never bare values glued together ("place1770s – 1850s" was the
    defect class), never meaning carried by position or color alone.
@@ -97,7 +100,7 @@ resolve. The raw-active-span convenience wrapper (`buildDecadePresenceAggregates
 sibling `decade-presence-from-spans.ts` file instead, for server-side callers only.
 
 Status: canonical UX/UI pattern reference. Supersedes design-direction-v4 §§2.5, 6, 7 (layout,
-surface inventory, pattern law) and every layout decision that shipped under BB-097. Carries
+surface inventory, pattern law) and every layout decision that shipped under . Carries
 forward unchanged and still binding from v4: §2 experience principles 0–4, §2b the human bar,
 §3 theming contract, §4 responsive + mobile contract, §5 map architecture (persistent canvas,
 camera grammar, dignity rules), §8 motion grammar. Owner directives folded in: 2026-07-18
@@ -183,7 +186,7 @@ Black and paper lead. Copper points. Sand fills. Rust stays in the artwork.
   `--ds-confidence-*`) are the only non-palette hues on any surface, always paired with a
   text label or glyph — color is never the only signal. They are contrast-tested per theme
   in `packages/ui/src/tokens/contrast.test.ts`.
-- **Map color language** (carried from v4/BB-099): ink plate always; entity kinds encode in
+- **Map color language** (carried from v4/): ink plate always; entity kinds encode in
   copper/sand shades + non-color glyphs; density is presence-tiered copper RGBA (12/28/50%),
   never incident-heat; state hairlines in fixed-rule; selected state label flips to
   copper-dark. No new map colors without a bead.
@@ -304,7 +307,7 @@ whose tap target is under 44px; color-only signals; raw `<a>` internal nav.
 
 ## 9. What explicitly survives from v4
 
-Persistent map canvas + camera grammar (ADR-017), dignity rules (BB-051), theming contract
+Persistent map canvas + camera grammar (ADR-017), dignity rules, theming contract
 (`--ds-fixed-*` surfaces), motion tokens (160/280ms, one easing), URL-carried state, the
 `ds-` token set, and the brand palette/type/radii. The rip is layout, chrome, and pattern
 vocabulary — not the architecture and not the brand foundation.

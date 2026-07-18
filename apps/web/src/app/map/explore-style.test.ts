@@ -12,6 +12,9 @@ import { KIND_ENCODING_ENTRIES } from '../../lib/map-experience/kind-encoding';
 import { markerHaloRadiusExpression, markerRadiusExpression } from '../../lib/map-experience/marker-size';
 import {
   buildExploreMapStyle,
+  ENTITY_CLUSTER_OPACITY,
+  ENTITY_HALO_OPACITY,
+  ENTITY_POINT_FILL_OPACITY,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
@@ -63,6 +66,33 @@ test('the entities source is configured to cluster with the shared explore clust
   assert.equal(entitiesSource.cluster, true);
   assert.equal(entitiesSource.clusterRadius, EXPLORE_CLUSTER_CONFIG.clusterRadius);
   assert.equal(entitiesSource.clusterMaxZoom, EXPLORE_CLUSTER_CONFIG.clusterMaxZoom);
+});
+
+test('clusteringEnabled: false disables GeoJSON clustering on the entities source', () => {
+  const source = buildExploreMapSource(listPublicEntities());
+  const style = buildExploreMapStyle({
+    featureCollection: source.featureCollection,
+    jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
+    densityLayerEnabled: false,
+    clusteringEnabled: false,
+  });
+  const entitiesSource = style.sources['explore-entities'] as { cluster?: boolean };
+  assert.equal(entitiesSource.cluster, false);
+});
+
+test('unclustered point fill and halo use the shared translucent opacity constants', () => {
+  const style = buildStyleFixture(true);
+  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
+  const haloLayer = layerById(style, EXPLORE_UNCLUSTERED_HALO_LAYER_ID);
+  const clusterLayer = layerById(style, EXPLORE_CLUSTER_LAYER_ID);
+  assert.equal(haloLayer.paint?.['circle-opacity'], ENTITY_HALO_OPACITY);
+  assert.equal(clusterLayer.paint?.['circle-opacity'], ENTITY_CLUSTER_OPACITY);
+  const opacityOutputs = matchExpressionOutputs(pointLayer.paint?.['circle-opacity']);
+  assert.ok(opacityOutputs.includes(ENTITY_POINT_FILL_OPACITY));
+  assert.ok(
+    opacityOutputs.every((value) => typeof value === 'number' && value <= ENTITY_POINT_FILL_OPACITY),
+    'no kind fill may be more opaque than the solid-fill constant',
+  );
 });
 
 test('selected-entity ring layer exists and starts with an empty filter', () => {
