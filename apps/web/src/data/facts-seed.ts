@@ -15,6 +15,12 @@
  * lightweight `archive.org/wayback/available` lookup against each source URL, never a fabricated
  * snapshot, satisfying `assertFactCitationStructurallyComplete` (packages/domain/src/facts/citation.ts)
  * honestly instead of omitting the archive pointer.
+ *
+ * `derivedFromClaimIds`/`derivedFromRelationshipIds` (black-book-pj6w): left empty for every
+ * seed fact below. These facts were authored directly from the research brief, not derived from
+ * a `CanonicalClaim` in `canonicalClaims/`, so there is no real claim id to backfill  guessing
+ * one would be worse than leaving the link absent. An empty array is a documented no-op for
+ * `packages/domain/src/facts/derivation.ts`'s consistency check, not a validation failure.
  */
 import {
   asFactId,
@@ -46,6 +52,8 @@ export const SEED_FACTS: readonly FactRecord[] = [
     qualifiers: [],
     counterClaims: [],
     relatedFacts: [{ factId: 'BB-F-000002', type: 'partOf' }],
+    derivedFromClaimIds: [],
+    derivedFromRelationshipIds: [],
     provenance: {
       researchedBy: 'seed-catalog',
       reviewedBy: 'seed-catalog-editorial',
@@ -136,6 +144,8 @@ export const SEED_FACTS: readonly FactRecord[] = [
     ],
     counterClaims: [],
     relatedFacts: [{ factId: 'BB-F-000001', type: 'partOf' }],
+    derivedFromClaimIds: [],
+    derivedFromRelationshipIds: [],
     provenance: { researchedBy: 'seed-catalog', method: 'secondary-source-review' },
     status: 'published',
     confidence: 'corroborated',
@@ -208,6 +218,8 @@ export const SEED_FACTS: readonly FactRecord[] = [
       },
     ],
     relatedFacts: [{ factId: 'BB-F-000002', type: 'partOf' }],
+    derivedFromClaimIds: [],
+    derivedFromRelationshipIds: [],
     provenance: {
       researchedBy: 'seed-catalog',
       reviewedBy: 'seed-catalog-editorial',
@@ -294,6 +306,8 @@ export const SEED_FACTS: readonly FactRecord[] = [
     qualifiers: [],
     counterClaims: [],
     relatedFacts: [{ factId: 'BB-F-000007', type: 'contextualizes' }],
+    derivedFromClaimIds: [],
+    derivedFromRelationshipIds: [],
     provenance: {
       researchedBy: 'seed-catalog',
       reviewedBy: 'seed-catalog-editorial',
@@ -377,6 +391,8 @@ export const SEED_FACTS: readonly FactRecord[] = [
       },
     ],
     relatedFacts: [{ factId: 'BB-F-000003', type: 'contextualizes' }],
+    derivedFromClaimIds: [],
+    derivedFromRelationshipIds: [],
     provenance: {
       researchedBy: 'seed-catalog',
       reviewedBy: 'seed-catalog-editorial',
@@ -449,6 +465,8 @@ export const SEED_FACTS: readonly FactRecord[] = [
     qualifiers: [],
     counterClaims: [],
     relatedFacts: [{ factId: 'BB-F-000004', type: 'contextualizes' }],
+    derivedFromClaimIds: [],
+    derivedFromRelationshipIds: [],
     provenance: { researchedBy: 'seed-catalog', method: 'primary-source-review' },
     status: 'published',
     confidence: 'corroborated',
@@ -512,6 +530,8 @@ export const SEED_FACTS: readonly FactRecord[] = [
     qualifiers: [],
     counterClaims: [],
     relatedFacts: [{ factId: 'BB-F-000004', type: 'contextualizes' }],
+    derivedFromClaimIds: [],
+    derivedFromRelationshipIds: [],
     provenance: { researchedBy: 'seed-catalog', method: 'secondary-source-triage' },
     status: 'draft',
     confidence: 'single-source',

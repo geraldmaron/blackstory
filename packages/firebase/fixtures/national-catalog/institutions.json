@@ -43,7 +43,14 @@
         "type": "located_at",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "museum",
+      "civil-rights",
+      "education"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_apollo_theater_001",
@@ -92,7 +99,14 @@
         "type": "located_at",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "music",
+      "theater",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_schomburg_center_001",
@@ -138,7 +152,14 @@
         "type": "located_at",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "library",
+      "research",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_nmaahc_001",
@@ -177,7 +198,14 @@
         "citationLabel": "Official Smithsonian page"
       }
     ],
-    "historicalContext": "Proposals for a national museum of Black history circulated for nearly a century — Black Civil War veterans first petitioned for a memorial building in 1915 — before the 2003 legislation signed by President George W. Bush created the museum."
+    "historicalContext": "Proposals for a national museum of Black history circulated for nearly a century — Black Civil War veterans first petitioned for a memorial building in 1915 — before the 2003 legislation signed by President George W. Bush created the museum.",
+    "topicIds": [
+      "museum",
+      "history",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_dusable_museum_001",
@@ -215,7 +243,14 @@
         "citationLabel": "Official museum site"
       }
     ],
-    "historicalContext": "Founded outside white-led museum institutions during the civil rights era, the DuSable modeled community-built Black museology; Taylor-Burroughs, a poet and printmaker of the Chicago Black Renaissance, ran it from her own living room before it moved to Washington Park in 1973."
+    "historicalContext": "Founded outside white-led museum institutions during the civil rights era, the DuSable modeled community-built Black museology; Taylor-Burroughs, a poet and printmaker of the Chicago Black Renaissance, ran it from her own living room before it moved to Washington Park in 1973.",
+    "topicIds": [
+      "museum",
+      "art",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_motown_museum_001",
@@ -255,7 +290,14 @@
         "citationLabel": "Official visitor page"
       }
     ],
-    "historicalContext": "From this converted photographer's studio, Motown became the most successful Black-owned record company of its era, producing a run of 1960s hits that carried Black artists to the center of American popular music."
+    "historicalContext": "From this converted photographer's studio, Motown became the most successful Black-owned record company of its era, producing a run of 1960s hits that carried Black artists to the center of American popular music.",
+    "topicIds": [
+      "music",
+      "museum",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_studio_museum_harlem_001",
@@ -301,7 +343,14 @@
         "type": "located_at",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "art",
+      "museum",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_charles_wright_museum_001",
@@ -340,7 +389,14 @@
         "citationLabel": "Official museum site"
       }
     ],
-    "historicalContext": "Wright founded the museum after visiting a Danish memorial to World War II resistance fighters, determined that Black history deserved the same permanent institutional care; for decades it was the largest African American history museum in the country."
+    "historicalContext": "Wright founded the museum after visiting a Danish memorial to World War II resistance fighters, determined that Black history deserved the same permanent institutional care; for decades it was the largest African American history museum in the country.",
+    "topicIds": [
+      "museum",
+      "history",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_negro_leagues_baseball_museum_001",
@@ -388,7 +444,14 @@
         "type": "commemorates",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "sports",
+      "museum",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_national_civil_rights_museum_001",
@@ -435,7 +498,14 @@
         "type": "located_at",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "civil-rights",
+      "museum",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_birmingham_civil_rights_institute_001",
@@ -487,7 +557,14 @@
         "type": "related_to",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "civil-rights",
+      "museum",
+      "education"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_aamp_philadelphia_001",
@@ -525,7 +602,14 @@
         "citationLabel": "Official museum site"
       }
     ],
-    "historicalContext": "Philadelphia held the largest free Black population of the early republic; Richard Allen's Mother Bethel AME Church and the Free African Society were founded blocks from the museum's site, a legacy its core exhibition 'Audacious Freedom' documents."
+    "historicalContext": "Philadelphia held the largest free Black population of the early republic; Richard Allen's Mother Bethel AME Church and the Free African Society were founded blocks from the museum's site, a legacy its core exhibition 'Audacious Freedom' documents.",
+    "topicIds": [
+      "museum",
+      "history",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_americas_black_holocaust_museum_001",
@@ -564,7 +648,14 @@
         "citationLabel": "NPS article"
       }
     ],
-    "historicalContext": "Cameron, sixteen when a mob killed his two companions in 1930, wrote 'A Time of Terror' and built the museum to tell the full history of racial violence in America alongside the story of survival and repair; the rebuilt museum stands on the footprint of its former home."
+    "historicalContext": "Cameron, sixteen when a mob killed his two companions in 1930, wrote 'A Time of Terror' and built the museum to tell the full history of racial violence in America alongside the story of survival and repair; the rebuilt museum stands on the footprint of its former home.",
+    "topicIds": [
+      "museum",
+      "history",
+      "memory"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_whitney_plantation_001",
@@ -604,7 +695,14 @@
         "citationLabel": "Official history page"
       }
     ],
-    "historicalContext": "The German Coast plantations along this stretch of the Mississippi were worked by thousands of enslaved people and lay at the heart of the 1811 German Coast uprising, the largest revolt of enslaved people in U.S. history; Whitney's memorials draw on Depression-era WPA interviews with formerly enslaved Louisianans."
+    "historicalContext": "The German Coast plantations along this stretch of the Mississippi were worked by thousands of enslaved people and lay at the heart of the 1811 German Coast uprising, the largest revolt of enslaved people in U.S. history; Whitney's memorials draw on Depression-era WPA interviews with formerly enslaved Louisianans.",
+    "topicIds": [
+      "museum",
+      "history",
+      "memory"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_freedom_center_001",
@@ -644,7 +742,14 @@
         "citationLabel": "Official visitor page"
       }
     ],
-    "historicalContext": "Thousands of freedom seekers crossed the Ohio River near Cincinnati before the Civil War, sheltered by Black and white abolitionist networks in the city's riverfront neighborhoods; the museum stands deliberately at that shoreline."
+    "historicalContext": "Thousands of freedom seekers crossed the Ohio River near Cincinnati before the Civil War, sheltered by Black and white abolitionist networks in the city's riverfront neighborhoods; the museum stands deliberately at that shoreline.",
+    "topicIds": [
+      "museum",
+      "history",
+      "abolition"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_iaam_charleston_001",
@@ -684,7 +789,14 @@
         "citationLabel": "Official museum site"
       }
     ],
-    "historicalContext": "Charleston was the largest port of entry for enslaved Africans in North America; Gadsden's Wharf, most active in the final legal years of the trade, is among the most significant single sites of that history, which the museum spent two decades of planning to mark."
+    "historicalContext": "Charleston was the largest port of entry for enslaved Africans in North America; Gadsden's Wharf, most active in the final legal years of the trade, is among the most significant single sites of that history, which the museum spent two decades of planning to mark.",
+    "topicIds": [
+      "museum",
+      "history",
+      "genealogy"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_reginald_lewis_museum_001",
@@ -722,6 +834,13 @@
         "citationLabel": "Official museum site"
       }
     ],
-    "historicalContext": "Maryland's Black history runs from Frederick Douglass and Harriet Tubman, both born enslaved on the Eastern Shore, to Thurgood Marshall of Baltimore; the Lewis Foundation's $5 million gift to the museum's education programs gave the institution its name."
+    "historicalContext": "Maryland's Black history runs from Frederick Douglass and Harriet Tubman, both born enslaved on the Eastern Shore, to Thurgood Marshall of Baltimore; the Lewis Foundation's $5 million gift to the museum's education programs gave the institution its name.",
+    "topicIds": [
+      "museum",
+      "history",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   }
 ]

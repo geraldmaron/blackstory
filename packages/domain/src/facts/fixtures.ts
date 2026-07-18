@@ -39,6 +39,8 @@ export function buildFixtureFact(overrides: Partial<FactRecord> = {}): FactRecor
     qualifiers: [],
     counterClaims: [],
     relatedFacts: [],
+    derivedFromClaimIds: [],
+    derivedFromRelationshipIds: [],
     provenance: { researchedBy: 'researcher-1', method: 'primary-source-review' },
     status: 'published',
     confidence: 'established',

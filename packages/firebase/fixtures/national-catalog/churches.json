@@ -38,7 +38,15 @@
         "citationLabel": "Mother Bethel AME Church (Congregation and Community)"
       }
     ],
-    "historicalContext": "Independent Black congregations like Mother Bethel doubled as schools, mutual-aid societies, and organizing halls at a time when most civic institutions excluded Black Philadelphians."
+    "historicalContext": "Independent Black congregations like Mother Bethel doubled as schools, mutual-aid societies, and organizing halls at a time when most civic institutions excluded Black Philadelphians.",
+    "topicIds": [
+      "church",
+      "community",
+      "abolition",
+      "denomination-founding"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_mother_ame_zion_001",
@@ -79,7 +87,15 @@
         "citationLabel": "Mother African Methodist Episcopal Zion Church, New York City (1796- )"
       }
     ],
-    "historicalContext": "New York's early Black churches were the city's first Black-controlled public institutions, organizing abolition campaigns, schools, and burial societies decades before emancipation in the state."
+    "historicalContext": "New York's early Black churches were the city's first Black-controlled public institutions, organizing abolition campaigns, schools, and burial societies decades before emancipation in the state.",
+    "topicIds": [
+      "church",
+      "community",
+      "underground-railroad",
+      "denomination-founding"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_first_baptist_petersburg_001",
@@ -119,7 +135,14 @@
         "citationLabel": "Nation's oldest black church thrives in Petersburg"
       }
     ],
-    "historicalContext": "Petersburg held the largest free Black population in the antebellum South, and its churches were the community's schools, credit networks, and political meeting grounds."
+    "historicalContext": "Petersburg held the largest free Black population in the antebellum South, and its churches were the community's schools, credit networks, and political meeting grounds.",
+    "topicIds": [
+      "church",
+      "community",
+      "education"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_first_african_baptist_savannah_001",
@@ -158,7 +181,14 @@
         "citationLabel": "First African Baptist Church historical marker"
       }
     ],
-    "historicalContext": "Savannah's early Black Baptist congregations organized under slavery and built institutions — schools, missionary networks, and later a church-housed credit union — that outlasted it."
+    "historicalContext": "Savannah's early Black Baptist congregations organized under slavery and built institutions — schools, missionary networks, and later a church-housed credit union — that outlasted it.",
+    "topicIds": [
+      "church",
+      "community",
+      "founding-era"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_african_meeting_house_001",
@@ -198,7 +228,15 @@
         "citationLabel": "African Meeting House — Boston African American National Historic Site"
       }
     ],
-    "historicalContext": "Known as the 'Black Faneuil Hall,' the Meeting House shows how a single congregation's building could serve an entire community as church, school, and political assembly."
+    "historicalContext": "Known as the 'Black Faneuil Hall,' the Meeting House shows how a single congregation's building could serve an entire community as church, school, and political assembly.",
+    "topicIds": [
+      "church",
+      "community",
+      "abolition",
+      "education"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_abyssinian_baptist_001",
@@ -246,7 +284,15 @@
         "type": "located_at",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "harlem"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_mother_emanuel_ame_001",
@@ -288,7 +334,15 @@
         "citationLabel": "The Church — Emanuel Nine Memorial"
       }
     ],
-    "historicalContext": "Charleston's Black congregations preserved community, learning, and organized resistance through the era of slavery and after; Emanuel's two-century record made it a civic anchor for the Lowcountry."
+    "historicalContext": "Charleston's Black congregations preserved community, learning, and organized resistance through the era of slavery and after; Emanuel's two-century record made it a civic anchor for the Lowcountry.",
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "resilience"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_sixteenth_street_baptist_001",
@@ -337,7 +391,15 @@
         "type": "related_to",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "black-architects"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_ebenezer_baptist_atlanta_001",
@@ -385,7 +447,15 @@
         "type": "located_at",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "sweet-auburn"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_dexter_avenue_king_memorial_001",
@@ -433,7 +503,16 @@
         "type": "related_to",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [
+      "montgomery-bus-boycott"
+    ],
+    "keywords": []
   },
   {
     "id": "ent_brown_chapel_ame_001",
@@ -481,7 +560,15 @@
         "type": "occurred_at",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "voting-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_quinn_chapel_ame_001",
@@ -529,7 +616,15 @@
         "type": "related_to",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "church",
+      "community",
+      "underground-railroad",
+      "abolition"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_big_bethel_ame_001",
@@ -577,7 +672,15 @@
         "type": "located_at",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "church",
+      "community",
+      "education",
+      "sweet-auburn"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_metropolitan_ame_001",
@@ -618,7 +721,15 @@
         "citationLabel": "Frederick Douglass Funeral at Metropolitan AME"
       }
     ],
-    "historicalContext": "In the capital, Black congregations stood as visible civic institutions within sight of federal power, hosting the funerals, conventions, and protests that marked national Black political life."
+    "historicalContext": "In the capital, Black congregations stood as visible civic institutions within sight of federal power, hosting the funerals, conventions, and protests that marked national Black political life.",
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "national-capital"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_st_augustine_catholic_nola_001",
@@ -666,7 +777,15 @@
         "type": "located_at",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "church",
+      "community",
+      "free-people-of-color",
+      "treme"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_vernon_ame_tulsa_001",
@@ -715,7 +834,15 @@
         "type": "located_at",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "church",
+      "community",
+      "greenwood",
+      "resilience"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_clayborn_temple_001",
@@ -763,6 +890,14 @@
         "type": "related_to",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "labor"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   }
 ]

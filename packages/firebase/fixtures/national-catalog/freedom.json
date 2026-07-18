@@ -37,7 +37,14 @@
         "citationLabel": "National Park Service: Cedar Hill — Frederick Douglass's Rustic Sanctuary"
       }
     ],
-    "historicalContext": "As an elder statesman, Douglass used Cedar Hill to host suffragists, diplomats, and civil rights leaders while serving as U.S. Marshal and Recorder of Deeds for the District. His widow, Helen Pitts Douglass, and the National Association of Colored Women's Clubs preserved the estate after his death, laying groundwork for its 1962 designation as a National Historic Site."
+    "historicalContext": "As an elder statesman, Douglass used Cedar Hill to host suffragists, diplomats, and civil rights leaders while serving as U.S. Marshal and Recorder of Deeds for the District. His widow, Helen Pitts Douglass, and the National Association of Colored Women's Clubs preserved the estate after his death, laying groundwork for its 1962 designation as a National Historic Site.",
+    "topicIds": [
+      "abolition",
+      "freedom",
+      "preservation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_tubman_auburn_001",
@@ -77,7 +84,14 @@
         "citationLabel": "National Park Service: Harriet Tubman National Historical Park"
       }
     ],
-    "historicalContext": "Auburn's abolitionist and women's-suffrage circles, anchored by the Seward family, gave Tubman a base for her later decades of activism. In 2017 the National Park Service combined the Home for the Aged, the nearby Tubman Residence in Fleming, and the Thompson AME Zion Church parsonage into Harriet Tubman National Historical Park."
+    "historicalContext": "Auburn's abolitionist and women's-suffrage circles, anchored by the Seward family, gave Tubman a base for her later decades of activism. In 2017 the National Park Service combined the Home for the Aged, the nearby Tubman Residence in Fleming, and the Thompson AME Zion Church parsonage into Harriet Tubman National Historical Park.",
+    "topicIds": [
+      "underground-railroad",
+      "freedom",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_tubman_underground_railroad_md_001",
@@ -117,7 +131,14 @@
         "citationLabel": "National Park Service: Harriet Tubman Underground Railroad National Historical Park (Maryland)"
       }
     ],
-    "historicalContext": "Managed jointly by the National Park Service and Maryland Park Service, the park's visitor center near Church Creek opened March 10, 2017, roughly 11 miles from Cambridge, and anchors the Harriet Tubman Underground Railroad Byway across the landscape Tubman knew as an enslaved young woman."
+    "historicalContext": "Managed jointly by the National Park Service and Maryland Park Service, the park's visitor center near Church Creek opened March 10, 2017, roughly 11 miles from Cambridge, and anchors the Harriet Tubman Underground Railroad Byway across the landscape Tubman knew as an enslaved young woman.",
+    "topicIds": [
+      "underground-railroad",
+      "abolition",
+      "freedom"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_fort_mose_001",
@@ -156,7 +177,14 @@
         "citationLabel": "Fort Mose Historical Society: The Battle of Bloody Mose"
       }
     ],
-    "historicalContext": "Fort Mose and Spanish St. Augustine functioned as a sanctuary for enslaved people fleeing English colonies for roughly 25 years. Designated a National Historic Landmark in 1994, the site's 1738 fort has since been reconstructed by the Florida Park Service following decades of archaeological research."
+    "historicalContext": "Fort Mose and Spanish St. Augustine functioned as a sanctuary for enslaved people fleeing English colonies for roughly 25 years. Designated a National Historic Landmark in 1994, the site's 1738 fort has since been reconstructed by the Florida Park Service following decades of archaeological research.",
+    "topicIds": [
+      "freedom",
+      "military",
+      "settlement"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_emancipation_oak_001",
@@ -206,7 +234,14 @@
         "type": "related_to",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "freedom",
+      "education",
+      "emancipation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_john_parker_house_001",
@@ -246,7 +281,14 @@
         "citationLabel": "National Park Service: John P. Parker House National Historic Landmark nomination"
       }
     ],
-    "historicalContext": "Parker's own account, later published as 'His Promised Land,' describes repeated river crossings into Kentucky to help enslaved people reach Ripley's Underground Railroad network alongside white abolitionist John Rankin. After emancipation Parker became a self-trained iron manufacturer, running the Phoenix Foundry and patenting a tobacco press and soil pulverizer."
+    "historicalContext": "Parker's own account, later published as 'His Promised Land,' describes repeated river crossings into Kentucky to help enslaved people reach Ripley's Underground Railroad network alongside white abolitionist John Rankin. After emancipation Parker became a self-trained iron manufacturer, running the Phoenix Foundry and patenting a tobacco press and soil pulverizer.",
+    "topicIds": [
+      "underground-railroad",
+      "abolition",
+      "invention"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_fort_monroe_001",
@@ -291,7 +333,14 @@
         "type": "related_to",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "freedom",
+      "military",
+      "emancipation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_niagara_movement_001",
@@ -336,7 +385,14 @@
         "type": "related_to",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "civil-rights",
+      "organizing",
+      "freedom"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_naacp_founding_001",
@@ -382,7 +438,14 @@
         "type": "related_to",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "civil-rights",
+      "organizing",
+      "freedom"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_negro_national_league_001",
@@ -427,7 +490,14 @@
         "type": "commemorates",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "sports",
+      "business",
+      "organizing"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_moton_field_001",
@@ -472,7 +542,14 @@
         "type": "related_to",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "military",
+      "aviation",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_shaw_54th_memorial_001",
@@ -511,7 +588,14 @@
         "citationLabel": "National Park Service: Robert Gould Shaw and the 54th Regiment"
       }
     ],
-    "historicalContext": "The 54th Massachusetts recruited nationally, including Frederick Douglass's sons Lewis and Charles, with public meetings held partly at Boston's African Meeting House. Over thirty years passed between the regiment's 1863 assault on Fort Wagner and the memorial's 1897 dedication, and the site remains an active gathering place for civil rights commemoration and protest."
+    "historicalContext": "The 54th Massachusetts recruited nationally, including Frederick Douglass's sons Lewis and Charles, with public meetings held partly at Boston's African Meeting House. Over thirty years passed between the regiment's 1863 assault on Fort Wagner and the memorial's 1897 dedication, and the site remains an active gathering place for civil rights commemoration and protest.",
+    "topicIds": [
+      "military",
+      "memorial",
+      "civil-war"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_buffalo_soldiers_leavenworth_001",
@@ -548,7 +632,13 @@
         "citationLabel": "U.S. Army Fort Leavenworth: Buffalo Soldier Commemorative Area"
       }
     ],
-    "historicalContext": "Comprised of freemen, formerly enslaved men, and Civil War veterans, the 9th and 10th Cavalry regiments scouted, built roads, and strung telegraph lines across the West before serving in the Spanish-American War, the Philippines, and World War II. The Commemorative Area today includes the monument, the Circle of Firsts, and the Walkway of Units, with sculpture by Eddie Dixon."
+    "historicalContext": "Comprised of freemen, formerly enslaved men, and Civil War veterans, the 9th and 10th Cavalry regiments scouted, built roads, and strung telegraph lines across the West before serving in the Spanish-American War, the Philippines, and World War II. The Commemorative Area today includes the monument, the Circle of Firsts, and the Walkway of Units, with sculpture by Eddie Dixon.",
+    "topicIds": [
+      "military",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_pullman_porters_001",
@@ -587,7 +677,14 @@
         "citationLabel": "National Park Service: Pullman Celebrates the 100th Anniversary of the Brotherhood of Sleeping Car Porters"
       }
     ],
-    "historicalContext": "The National A. Philip Randolph Pullman Porter Museum operates within the Pullman Historic District, the former company town at the center of the 1894 Pullman Strike, which President Obama designated a national monument in 2015 and Congress redesignated a National Historical Park in 2022."
+    "historicalContext": "The National A. Philip Randolph Pullman Porter Museum operates within the Pullman Historic District, the former company town at the center of the 1894 Pullman Strike, which President Obama designated a national monument in 2015 and Congress redesignated a National Historical Park in 2022.",
+    "topicIds": [
+      "labor",
+      "organizing",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_juneteenth_galveston_001",
@@ -625,7 +722,14 @@
         "citationLabel": "Galveston Historical Foundation: Juneteenth and General Order No. 3"
       }
     ],
-    "historicalContext": "General Order No. 3 arrived two and a half years after the Emancipation Proclamation, delayed by Texas's remoteness from Union lines and the need for federal troops to enforce it. Reedy Chapel-AME, first established in 1848, was already a central gathering place for Galveston's Black community when Granger's order reached it, and Juneteenth became a federal holiday in 2021."
+    "historicalContext": "General Order No. 3 arrived two and a half years after the Emancipation Proclamation, delayed by Texas's remoteness from Union lines and the need for federal troops to enforce it. Reedy Chapel-AME, first established in 1848, was already a central gathering place for Galveston's Black community when Granger's order reached it, and Juneteenth became a federal holiday in 2021.",
+    "topicIds": [
+      "emancipation",
+      "freedom",
+      "military"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_seneca_village_001",
@@ -666,6 +770,13 @@
         "citationLabel": "Central Park Conservancy: Seneca Village Site"
       }
     ],
-    "historicalContext": "Seneca Village let Black New Yorkers own property away from downtown Manhattan's overcrowding and discrimination, and property ownership was itself required for Black men to vote under New York law. A 2001 historical marker and 2011 Columbia-led archaeological excavation have helped recover the settlement's material history since its erasure."
+    "historicalContext": "Seneca Village let Black New Yorkers own property away from downtown Manhattan's overcrowding and discrimination, and property ownership was itself required for Black men to vote under New York law. A 2001 historical marker and 2011 Columbia-led archaeological excavation have helped recover the settlement's material history since its erasure.",
+    "topicIds": [
+      "community",
+      "property-ownership",
+      "freedom"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   }
 ]

@@ -628,6 +628,93 @@ export const claimEvidenceLinkSchema = z.object({
 
 export type ClaimEvidenceLinkDoc = z.infer<typeof claimEvidenceLinkSchema>;
 
+// ---------------------------------------------------------------------------
+// Statistics storage model (packages/domain/src/statistics/): StatisticalSeries metric
+// definitions, StatisticalObservation as-reported readings (status always 'observed'), and
+// DerivedMeasurement computed values (status 'derived' | 'modeled'). boundaryVersion is the
+// vintage/crosswalk key generalizing the tractVintage constraint (ACS 2020s releases use 2020
+// tracts, Opportunity Atlas uses 2010 tracts — never join without a crosswalk). Vocabularies
+// hardcoded per this file's existing convention (see note above datePrecisionSchema).
+// ---------------------------------------------------------------------------
+
+export const statisticalGeographyTypeSchema = z.enum([
+  'tract',
+  'county',
+  'block',
+  'blockgroup',
+  'address',
+  'city',
+  'school',
+  'facility',
+  'state',
+]);
+
+export const statisticalEstimateTypeSchema = z.enum([
+  'count',
+  'percentage',
+  'rate',
+  'ratio',
+  'median',
+  'mean',
+  'index',
+]);
+
+export const statisticalPeriodTypeSchema = z.enum([
+  'point-in-time',
+  '1-year-estimate',
+  '5-year-estimate',
+  'annual',
+  'decennial',
+  'custom-range',
+]);
+
+export const statisticalSeriesSchema = z.object({
+  metricId: z.string().min(1),
+  metricDefinition: z.string().min(1),
+  universe: z.string().min(1),
+  unit: z.string().min(1),
+  sourceDataset: z.string().min(1),
+  sourceTable: z.string().min(1),
+  sourceVariable: z.string().min(1),
+  geographyType: statisticalGeographyTypeSchema,
+  estimateType: statisticalEstimateTypeSchema,
+  periodType: statisticalPeriodTypeSchema,
+});
+
+export type StatisticalSeriesDoc = z.infer<typeof statisticalSeriesSchema>;
+
+export const statisticalObservationSchema = z.object({
+  seriesId: z.string().min(1),
+  jurisdictionId: z.string().min(1),
+  boundaryVersion: z.string().min(1),
+  referencePeriod: z.string().min(1),
+  datasetVintage: z.string().min(1),
+  estimate: z.number(),
+  marginOfError: z.number().optional(),
+  standardError: z.number().optional(),
+  numerator: z.number().optional(),
+  denominator: z.number().optional(),
+  sourceItemId: z.string().min(1),
+  retrievedAt: z.string().datetime(),
+  status: z.literal('observed'),
+});
+
+export type StatisticalObservationDoc = z.infer<typeof statisticalObservationSchema>;
+
+export const derivedMeasurementSchema = z.object({
+  methodId: z.string().min(1),
+  methodVersion: z.string().min(1),
+  inputObservationIds: z.array(z.string().min(1)),
+  value: z.number(),
+  uncertainty: z.number().optional(),
+  formula: z.string().min(1),
+  assumptions: z.array(z.string().min(1)).default([]),
+  generatedAt: z.string().datetime(),
+  status: z.enum(['derived', 'modeled']),
+});
+
+export type DerivedMeasurementDoc = z.infer<typeof derivedMeasurementSchema>;
+
 export const contentHashSchema = z.object({
   algorithm: z.literal('sha256'),
   digest: z.string().regex(/^[a-f0-9]{64}$/),
@@ -903,8 +990,38 @@ export const publicEntityProjectionSchema = z.object({
   /** Sensitivity classification label when present; presentation lives in the UI layer. */
   sensitivityClass: sensitivityClassSchema.optional(),
 
-  /** Topic / theme tags aligned with search facets (learning-index discovery). */
+  /**
+   * @deprecated Superseded by the controlled-taxonomy split below (black-book-s4hp). Kept
+   * optional, alongside the new fields, for backward compatibility during the transition —
+   * new writers should populate `topicIds`/`mentionedEntityIds`/`keywords` instead. Readers
+   * that still facet on this raw field must filter through
+   * `@blap/domain`'s `isPermittedTopicTag` (interim allowlist); never count/facet on it
+   * unfiltered.
+   */
   topicTags: z.array(z.string().min(1)).default([]),
+  /**
+   * Controlled historical-theme ids (black-book-s4hp) — the ONLY field that may ever be
+   * surfaced as a facet/filter option. Every id must resolve against
+   * `@blap/domain`'s `TOPIC_REGISTRY` (packages/domain/src/taxonomy/topics.ts); readers should
+   * validate with `isValidTopicId` rather than trusting this array blindly. Net-new field.
+   */
+  topicIds: z.array(z.string().min(1)).default([]),
+  /**
+   * Resolvable ids of people/places/organizations/laws/events this record mentions. Never a
+   * facet — this is for future cross-linking/entity-resolution (black-book-8bck), not
+   * discovery browsing. During the black-book-s4hp migration these may be raw legacy-tag
+   * strings acting as placeholder ids (e.g. `"naacp"`, `"selma"`) rather than real canonical
+   * entity ids; resolving those against the entity graph is black-book-8bck's job. Net-new
+   * field.
+   */
+  mentionedEntityIds: z.array(z.string().min(1)).default([]),
+  /** Free-text search-recall terms — improves query matching, never a facet. Net-new field. */
+  keywords: z.array(z.string().min(1)).default([]),
+  /**
+   * Internal ingestion/research campaign membership (e.g. which sourcing wave produced this
+   * record). Never public-facing, never a facet. Net-new field.
+   */
+  campaignIds: z.array(z.string().min(1)).default([]),
   /** Framing prose for the Historical context section (not unsourced biography). */
   historicalContext: z.string().min(1).optional(),
   /** Optional multi-paragraph further reading; omit when not curated. */
@@ -977,7 +1094,22 @@ export const publicSearchIndexSchema = z.object({
   /** Lowercased alias strings, flattened from EntityAlias by the release builder. */
   aliases: z.array(z.string().min(1)).default([]),
   summary: z.string().optional(),
+  /** @deprecated Superseded by `topicIds`/`mentionedEntityIds`/`keywords` below (black-book-s4hp).
+   * Kept optional for backward compatibility; do not facet/count on this unfiltered. */
   topicTags: z.array(z.string().min(1)).default([]),
+  /** Controlled historical-theme ids (black-book-s4hp) — the ONLY field the search-index
+   * `theme` facet may be built from. Must resolve against `@blap/domain`'s `TOPIC_REGISTRY`.
+   * Net-new field. */
+  topicIds: z.array(z.string().min(1)).default([]),
+  /** Resolvable ids of people/places/organizations/laws/events mentioned; never a facet.
+   * See the identical field on `publicEntityProjectionSchema` above for the migration-window
+   * placeholder-id caveat. Net-new field. */
+  mentionedEntityIds: z.array(z.string().min(1)).default([]),
+  /** Free-text search-recall terms; never a facet. Net-new field. */
+  keywords: z.array(z.string().min(1)).default([]),
+  /** Internal ingestion/research campaign membership; never public-facing, never a facet.
+   * Net-new field. */
+  campaignIds: z.array(z.string().min(1)).default([]),
   /** State-level jurisdiction label backs the `state` facet/filter. */
   jurisdictionState: z.string().min(1).optional(),
   /** Derived current lifecycle status label (e.g. "active", "in_force") never hand-edited. */

@@ -137,7 +137,14 @@ export type PublicEntityView = {
    * `SensitivityContextBanner` consumes. `sensitivityClass` above stays a plain string for
    * the pre-existing search-index adapter; this is the richer projection the entity page renders. */
   readonly sensitivity?: EntitySensitivity;
+  /** @deprecated Superseded by `topicIds` (black-book-s4hp). Kept for backward compatibility;
+   * the map/list facet builder falls back to this, filtered through `@blap/domain`'s
+   * `TOPIC_REGISTRY`, when `topicIds` is absent. */
   readonly topicTags: readonly string[];
+  /** Controlled historical-theme ids (black-book-s4hp) — the ONLY field the explore-map theme
+   * facet should be built from. Optional: this bundled seed predates the split, so entries
+   * below don't populate it yet and the facet builder falls back to `topicTags`. */
+  readonly topicIds?: readonly string[];
   readonly jurisdictionLabel: string;
   /** City, campus, or neighborhood — never street or residence. */
   readonly locationPrecision: 'city' | 'neighborhood' | 'campus' | 'institution';

@@ -14,12 +14,12 @@
 import { redactLocationForPublic } from '@blap/security';
 import {
   buildMapSource,
-  type GeoPrecisionTier,
   type MapCountyAggregate,
   type MapPointFeature,
   type MapSourceEntityInput,
   type MapStateAggregate,
-} from '@blap/domain';
+} from '@blap/domain/map/map-source';
+import type { GeoPrecisionTier } from '@blap/domain/geography/display-radius';
 import type { PublicClaimView, PublicEntityView } from '../../data/public-seed';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
@@ -52,7 +52,12 @@ export type ExploreMapFeatureProperties = {
    * page's "Accepted claims" section) a transparency affordance, not a hidden ranking input. */
   readonly evidenceCount: number;
   readonly confidenceTier: ConfidenceTier;
+  /** @deprecated Superseded by `topicIds` (black-book-s4hp); kept for the facet builder's
+   * fallback path. */
   readonly topicTags: readonly string[];
+  /** Controlled historical-theme ids (black-book-s4hp) — the ONLY field
+   * `buildExploreFacetOptions` should treat as authoritative for the theme facet. */
+  readonly topicIds?: readonly string[];
   /** Semantic tone override from topics (massacre / plantation / epicenter). */
   readonly mapTone?: string;
   readonly stateFips?: string;
@@ -204,6 +209,7 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
       evidenceCount: entity.claims.length,
       confidenceTier: highestConfidence(entity.claims),
       topicTags: entity.topicTags,
+      ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),
       ...(mapTone !== undefined ? { mapTone } : {}),
       ...(feature.properties.stateFips ? { stateFips: feature.properties.stateFips } : {}),
       ...(feature.properties.statePostalCode ? { statePostalCode: feature.properties.statePostalCode } : {}),

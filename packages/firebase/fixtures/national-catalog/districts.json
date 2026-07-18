@@ -45,7 +45,14 @@
         "type": "located_at",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "district",
+      "business",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_sweet_auburn_001",
@@ -97,7 +104,14 @@
         "type": "located_at",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "district",
+      "business",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_bronzeville_001",
@@ -144,7 +158,14 @@
         "type": "related_to",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "district",
+      "business",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_harlem_001",
@@ -206,7 +227,14 @@
         "type": "located_at",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "district",
+      "community",
+      "arts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_beale_street_001",
@@ -246,7 +274,14 @@
         "citationLabel": "Historical Marker Database: Beale Street Historic District"
       }
     ],
-    "historicalContext": "Beale Street concentrated Black commerce, churches, fraternal halls, and entertainment in postbellum Memphis, and its saloons and theaters incubated the urban blues that W. C. Handy first set to paper — making it the model of the Black main street as cultural engine."
+    "historicalContext": "Beale Street concentrated Black commerce, churches, fraternal halls, and entertainment in postbellum Memphis, and its saloons and theaters incubated the urban blues that W. C. Handy first set to paper — making it the model of the Black main street as cultural engine.",
+    "topicIds": [
+      "district",
+      "business",
+      "music"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_u_street_corridor_001",
@@ -293,7 +328,14 @@
         "type": "related_to",
         "direction": "outgoing"
       }
-    ]
+    ],
+    "topicIds": [
+      "district",
+      "business",
+      "music"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_hayti_durham_001",
@@ -333,7 +375,14 @@
         "citationLabel": "U.S. Civil Rights Trail: Hayti Heritage Center"
       }
     ],
-    "historicalContext": "Durham's tobacco economy and a cohort of Black entrepreneurs made Hayti and nearby Parrish Street a national exemplar of Black economic self-determination, studied and praised by both Booker T. Washington and W. E. B. Du Bois in the early 1900s."
+    "historicalContext": "Durham's tobacco economy and a cohort of Black entrepreneurs made Hayti and nearby Parrish Street a national exemplar of Black economic self-determination, studied and praised by both Booker T. Washington and W. E. B. Du Bois in the early 1900s.",
+    "topicIds": [
+      "district",
+      "business",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_jackson_ward_001",
@@ -373,7 +422,14 @@
         "citationLabel": "National Park Service: Jackson Ward Walking Tour"
       }
     ],
-    "historicalContext": "Antebellum free Black Richmonders and postwar freedpeople built Jackson Ward's dense fabric of churches and fraternal societies into a financial center, proving Black-run banking and insurance viable a generation after emancipation."
+    "historicalContext": "Antebellum free Black Richmonders and postwar freedpeople built Jackson Ward's dense fabric of churches and fraternal societies into a financial center, proving Black-run banking and insurance viable a generation after emancipation.",
+    "topicIds": [
+      "district",
+      "business",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_treme_001",
@@ -420,7 +476,14 @@
         "type": "located_at",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "district",
+      "community",
+      "music"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_farish_street_001",
@@ -460,7 +523,14 @@
         "citationLabel": "Visit Jackson: Farish Street Historic District"
       }
     ],
-    "historicalContext": "In the capital of the most rigidly segregated Southern state, Farish Street's professionals, undertakers, publishers, and musicians built a parallel main street that sustained Black civic life — and sheltered civil rights organizing — for three generations."
+    "historicalContext": "In the capital of the most rigidly segregated Southern state, Farish Street's professionals, undertakers, publishers, and musicians built a parallel main street that sustained Black civic life — and sheltered civil rights organizing — for three generations.",
+    "topicIds": [
+      "district",
+      "business",
+      "music"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_fourth_avenue_district_001",
@@ -506,7 +576,13 @@
         "type": "related_to",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "district",
+      "business"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_deep_deuce_001",
@@ -546,7 +622,14 @@
         "citationLabel": "Historical Marker Database: Roscoe Dunjee"
       }
     ],
-    "historicalContext": "Segregated Oklahoma City compressed Black commerce and nightlife into a few blocks of Second Street, whose jazz scene — Jimmy Rushing, Charlie Christian, the Blue Devils orbit — projected a small district onto the national stage."
+    "historicalContext": "Segregated Oklahoma City compressed Black commerce and nightlife into a few blocks of Second Street, whose jazz scene — Jimmy Rushing, Charlie Christian, the Blue Devils orbit — projected a small district onto the national stage.",
+    "topicIds": [
+      "district",
+      "business",
+      "music"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_eatonville_001",
@@ -585,7 +668,13 @@
         "citationLabel": "Historical Marker Database: Eatonville Gateway"
       }
     ],
-    "historicalContext": "Eatonville led the wave of self-governing all-Black towns founded after Reconstruction, proving Black municipal self-rule a generation before Oklahoma's town-building boom — and giving American literature the setting Zora Neale Hurston made famous."
+    "historicalContext": "Eatonville led the wave of self-governing all-Black towns founded after Reconstruction, proving Black municipal self-rule a generation before Oklahoma's town-building boom — and giving American literature the setting Zora Neale Hurston made famous.",
+    "topicIds": [
+      "town",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_mound_bayou_001",
@@ -625,7 +714,14 @@
         "citationLabel": "Historical Marker Database: Mound Bayou"
       }
     ],
-    "historicalContext": "Mound Bayou was the flagship of post-Reconstruction Black town-building in the Deep South — a cooperative, self-governed refuge whose farms, bank, and Taborian Hospital demonstrated Black institutional capacity inside the most repressive corner of the Jim Crow order."
+    "historicalContext": "Mound Bayou was the flagship of post-Reconstruction Black town-building in the Deep South — a cooperative, self-governed refuge whose farms, bank, and Taborian Hospital demonstrated Black institutional capacity inside the most repressive corner of the Jim Crow order.",
+    "topicIds": [
+      "town",
+      "community",
+      "business"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_nicodemus_001",
@@ -663,7 +759,13 @@
         "citationLabel": "Kansas Historical Society, Kansapedia: Nicodemus, Graham County"
       }
     ],
-    "historicalContext": "Nicodemus preceded and helped inspire the Exoduster migration of 1879-1881, when tens of thousands of Black Southerners moved to Kansas seeking land and self-government — the first great westward Black town-building movement after Reconstruction."
+    "historicalContext": "Nicodemus preceded and helped inspire the Exoduster migration of 1879-1881, when tens of thousands of Black Southerners moved to Kansas seeking land and self-government — the first great westward Black town-building movement after Reconstruction.",
+    "topicIds": [
+      "town",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_africatown_001",
@@ -703,7 +805,14 @@
         "citationLabel": "Mobile County: Africatown Heritage House"
       }
     ],
-    "historicalContext": "Africatown is the only known U.S. community founded and governed by African-born survivors of the transatlantic slave trade — a direct transplant of West African social organization onto American soil, sustained through family lines that remain in the neighborhood today."
+    "historicalContext": "Africatown is the only known U.S. community founded and governed by African-born survivors of the transatlantic slave trade — a direct transplant of West African social organization onto American soil, sustained through family lines that remain in the neighborhood today.",
+    "topicIds": [
+      "community",
+      "town",
+      "district"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_weeksville_001",
@@ -742,7 +851,13 @@
         "citationLabel": "NYC Department of Design and Construction: Weeksville Hunterfly Road Houses restoration"
       }
     ],
-    "historicalContext": "Founded a decade after New York's 1827 abolition of slavery, Weeksville let Black men meet property qualifications for voting and built independent institutions — a rare, well-documented example of antebellum Northern Black community-building on its original site."
+    "historicalContext": "Founded a decade after New York's 1827 abolition of slavery, Weeksville let Black men meet property qualifications for voting and built independent institutions — a rare, well-documented example of antebellum Northern Black community-building on its original site.",
+    "topicIds": [
+      "community",
+      "town"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_allensworth_001",
@@ -780,6 +895,12 @@
         "citationLabel": "Friends of Allensworth"
       }
     ],
-    "historicalContext": "Allensworth carried the all-Black town movement to the Far West, pairing Booker T. Washington-style self-help with California farmland — and though water shortfalls stalled its growth, the restored townsite now anchors the state's premier site of Black pioneer history."
+    "historicalContext": "Allensworth carried the all-Black town movement to the Far West, pairing Booker T. Washington-style self-help with California farmland — and though water shortfalls stalled its growth, the restored townsite now anchors the state's premier site of Black pioneer history.",
+    "topicIds": [
+      "town",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   }
 ]

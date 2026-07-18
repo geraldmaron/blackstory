@@ -12,6 +12,14 @@
  * Ontology alignment (/ see `./issues.jsonl` "Ontology
  * alignment" note): `datePrecision` and `geoPrecision` are IMPORTED from the shared domain
  * modules below, never redefined locally.
+ *
+ * Derivation lineage: `derivedFromClaimIds`/`derivedFromRelationshipIds` are the (optional,
+ * possibly-empty) link BACK from a fact to the `CanonicalClaim`(s) (`../claims/claim.ts`) and/or
+ * `EntityRelationship`(s) (`../relationship.ts`) it was written from. A `FactRecord` otherwise
+ * carries its own independent `citations`/`confidence`, so without this link a fact's sourcing
+ * can silently drift from the canonical claim that backed it. `./derivation.ts`'s
+ * `evaluateFactDerivationConsistency` is the check that uses this link to catch that drift; see
+ * that module's doc comment for the exact comparison rule (a judgment call, documented there).
  */
 import { isDatePrecision, type DatePrecision } from '../era.js';
 import { isGeoPrecisionTier, type GeoPrecisionTier } from '../geography/precision.js';
@@ -108,6 +116,17 @@ export type FactRecord = {
   readonly qualifiers: readonly FactQualifier[];
   readonly counterClaims: readonly FactCounterClaim[];
   readonly relatedFacts: readonly FactRelatedFact[];
+  /**
+   * `CanonicalClaim.id`s (`../claims/claim.ts`) this fact was derived from, if any. Empty for
+   * facts predating this field (see `./derivation.ts`'s module doc for the backfill decision) or
+   * for facts that genuinely were not written from a tracked canonical claim. Never assume a
+   * non-empty array resolves to LIVE claims without checking they still exist  see
+   * `./derivation.ts`.
+   */
+  readonly derivedFromClaimIds: readonly string[];
+  /** `EntityRelationship.id`s (`../relationship.ts`) this fact was derived from, if any. Same
+   * empty-is-valid convention as `derivedFromClaimIds`. */
+  readonly derivedFromRelationshipIds: readonly string[];
   readonly provenance: FactProvenance;
   readonly status: FactStatus;
   readonly confidence: FactConfidenceGrade;
@@ -176,6 +195,17 @@ export function assertFactRecordStructurallyValid(fact: FactRecord): void {
     confidence: fact.confidence,
     ...(fact.confidenceNote !== undefined ? { confidenceNote: fact.confidenceNote } : {}),
   });
+
+  for (const claimId of fact.derivedFromClaimIds) {
+    if (!isNonEmpty(claimId)) {
+      throw new Error('FactRecord.derivedFromClaimIds[] entries must be non-empty when present');
+    }
+  }
+  for (const relationshipId of fact.derivedFromRelationshipIds) {
+    if (!isNonEmpty(relationshipId)) {
+      throw new Error('FactRecord.derivedFromRelationshipIds[] entries must be non-empty when present');
+    }
+  }
 
   if (!isNonEmpty(fact.provenance.researchedBy)) {
     throw new Error('FactRecord.provenance.researchedBy must be non-empty');

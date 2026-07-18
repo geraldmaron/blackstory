@@ -568,6 +568,10 @@ export * from './relevance-feedback/index.js';
 // notability-gate-enforcing search-index builder. Mirrors ./graph/index.js's own barrel.
 export * from './search/index.js';
 
+// Controlled historical-theme taxonomy (black-book-s4hp): the registry, and the migration
+// helper that splits legacy `topicTags` into topicIds/mentionedEntityIds/keywords.
+export * from './taxonomy/index.js';
+
 // Quality-first national seed campaigns: curated fixtures + fail-closed gate validators.
 export * from './seed-campaigns/index.js';
 
@@ -588,3 +592,7 @@ export * from './legal/index.js';
 
 // Learning-index entity contract (summary bars, tags, related hops, optional prose/photo).
 export * from './learning-index/index.js';
+
+// Statistics storage model: StatisticalSeries/StatisticalObservation/DerivedMeasurement + the
+// safe-combination validators (disjoint-geography sums, MOE propagation, growth significance).
+export * from './statistics/index.js';

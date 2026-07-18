@@ -5,7 +5,18 @@
  * filter/facet computation.
  */
 import type { ExploreMapFeature } from './build-explore-map-source';
-import { isPermittedTopicTag } from '@blap/domain';
+import { isValidTopicId } from '@blap/domain/taxonomy/topics';
+
+/**
+ * Resolves the effective controlled-taxonomy topic ids for a feature (black-book-s4hp): prefers
+ * the new `topicIds` field, falling back to the legacy `topicTags` field for features built
+ * before the split. Either way every value is validated against `TOPIC_REGISTRY` — the theme
+ * facet is NEVER built from raw, uncontrolled tag counting.
+ */
+function effectiveTopicIds(feature: ExploreMapFeature): readonly string[] {
+  const source = feature.properties.topicIds ?? feature.properties.topicTags;
+  return source.filter(isValidTopicId);
+}
 
 export type ExploreFilterState = {
   readonly era: string;
@@ -95,7 +106,7 @@ export function buildExploreFacetOptions(features: readonly ExploreMapFeature[])
   return {
     kind: toOptions(countBy(features, (feature) => [feature.properties.kind]), 'All kinds'),
     era: toOptions(countBy(features, (feature) => feature.properties.eraBuckets), 'All eras', 'chrono'),
-    theme: toOptions(countBy(features, (feature) => feature.properties.topicTags), 'All themes', 'alpha', isPermittedTopicTag),
+    theme: toOptions(countBy(features, effectiveTopicIds), 'All themes'),
     confidence: toOptions(
       countBy(features, (feature) => [feature.properties.confidenceTier]),
       'All confidence tiers',

@@ -125,6 +125,18 @@ export type {
 } from './record.js';
 
 export {
+  maxFactConfidenceGradeForClaim,
+  evaluateFactDerivationConsistency,
+  assertFactDerivationConsistent,
+} from './derivation.js';
+export type {
+  FactDerivationBackingClaim,
+  FactDerivationCheckFailureReason,
+  FactDerivationCheckResult,
+  FactDerivationCheckInput,
+} from './derivation.js';
+
+export {
   evaluateFactPublishGate,
   assertFactMayPublish,
   evaluateFactProjectionPublishGate,
@@ -132,7 +144,12 @@ export {
   assertFactRemainsResolvable,
   isFactSearchIndexable,
 } from './publish-gate.js';
-export type { FactPublishGateFailureReason, FactPublishGateResult } from './publish-gate.js';
+export type {
+  FactPublishGateFailureReason,
+  FactPublishGateResult,
+  FactPublishGateOptions,
+  FactProjectionPublishGateOptions,
+} from './publish-gate.js';
 
 export { buildCompactFactView, buildCompactFactViewsForEntity } from './embed.js';
 export type { CompactFactSubjectView, CompactFactCitationView, CompactFactView } from './embed.js';

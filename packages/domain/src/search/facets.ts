@@ -9,7 +9,7 @@ import type {
   SearchFilter,
   SearchableEntityRecord,
 } from './types.js';
-import { isPermittedTopicTag } from './topic-allowlist.js';
+import { isValidTopicId } from '../taxonomy/topics.js';
 
 function increment(counts: Record<string, number>, key: string | undefined): void {
   if (key === undefined || key === '') return;
@@ -17,7 +17,18 @@ function increment(counts: Record<string, number>, key: string | undefined): voi
 }
 
 /**
- * Counts records across every facet dimension. Multi-valued dimensions (era buckets, topic tags)
+ * Resolves the effective controlled-taxonomy topic ids for a record (black-book-s4hp): prefers
+ * the new `topicIds` field, falling back to the legacy `topicTags` field for records built
+ * before the split. Either way, every value is validated against `TOPIC_REGISTRY` — the theme
+ * facet is NEVER built from raw, uncontrolled tag counting.
+ */
+function effectiveTopicIds(record: SearchableEntityRecord): readonly string[] {
+  const source = record.topicIds ?? record.topicTags;
+  return source.filter(isValidTopicId);
+}
+
+/**
+ * Counts records across every facet dimension. Multi-valued dimensions (era buckets, topic ids)
  * increment every value a record carries. Undefined/empty values are skipped rather than counted
  * under an empty-string key.
  */
@@ -37,9 +48,7 @@ export function computeFacetCounts(records: readonly SearchableEntityRecord[]): 
     increment(recordMaturity, record.recordMaturity);
     increment(researchCoverage, record.researchCoverage);
     for (const bucket of record.eraBuckets) increment(era, bucket);
-    for (const tag of record.topicTags) {
-      if (isPermittedTopicTag(tag)) increment(theme, tag);
-    }
+    for (const topicId of effectiveTopicIds(record)) increment(theme, topicId);
   }
 
   return { kind, status, era, theme, state, recordMaturity, researchCoverage };

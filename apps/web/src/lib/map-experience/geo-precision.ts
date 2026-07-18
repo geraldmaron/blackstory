@@ -12,10 +12,10 @@
 import {
   displayRadiusMeters,
   FIXED_TIER_RADIUS_METERS,
-  US_STATES,
   type GeoPrecisionTier,
   type JurisdictionBBox,
-} from '@blap/domain';
+} from '@blap/domain/geography/display-radius';
+import { US_STATES } from '@blap/domain/map/geography';
 
 /** Finest-known public precision -> the GeoPrecisionTier its radius circle should render at.  */
 const PUBLIC_PRECISION_TO_GEO_TIER: Readonly<Record<string, GeoPrecisionTier>> = {

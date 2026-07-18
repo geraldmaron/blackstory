@@ -37,7 +37,14 @@
         "citationLabel": "The First HBCU page"
       }
     ],
-    "historicalContext": "Cheyney's founding predates emancipation by nearly three decades, opening the era of institution-building that all later HBCUs would extend. Its early decades in Philadelphia produced generations of Black teachers for schools across the country."
+    "historicalContext": "Cheyney's founding predates emancipation by nearly three decades, opening the era of institution-building that all later HBCUs would extend. Its early decades in Philadelphia produced generations of Black teachers for schools across the country.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "teaching"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_lincoln_university_pa_001",
@@ -77,7 +84,14 @@
         "citationLabel": "University history page"
       }
     ],
-    "historicalContext": "Founded before the Civil War, Lincoln belongs to the small group of antebellum institutions that proved higher education for Black men could be built and sustained. Its alumni network shaped law, letters, and independence movements on two continents."
+    "historicalContext": "Founded before the Civil War, Lincoln belongs to the small group of antebellum institutions that proved higher education for Black men could be built and sustained. Its alumni network shaped law, letters, and independence movements on two continents.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "liberal-arts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_wilberforce_university_001",
@@ -116,7 +130,14 @@
         "citationLabel": "University of Firsts page"
       }
     ],
-    "historicalContext": "Named for abolitionist William Wilberforce, the university demonstrated Black institutional self-governance a decade before Reconstruction. Its A.M.E. stewardship set a model of church-sustained higher education that other denominations followed."
+    "historicalContext": "Named for abolitionist William Wilberforce, the university demonstrated Black institutional self-governance a decade before Reconstruction. Its A.M.E. stewardship set a model of church-sustained higher education that other denominations followed.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "religion"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_howard_university_001",
@@ -164,7 +185,15 @@
         "type": "related_to",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "education",
+      "hbcu",
+      "law",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_fisk_university_001",
@@ -204,7 +233,14 @@
         "citationLabel": "University history page"
       }
     ],
-    "historicalContext": "Fisk exemplified the liberal-arts wing of the freedmen's colleges, insisting from the start on a classical curriculum. Its campus later became a hub of the Harlem Renaissance generation, with W. E. B. Du Bois among its earliest graduates."
+    "historicalContext": "Fisk exemplified the liberal-arts wing of the freedmen's colleges, insisting from the start on a classical curriculum. Its campus later became a hub of the Harlem Renaissance generation, with W. E. B. Du Bois among its earliest graduates.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "music"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_morehouse_college_001",
@@ -245,7 +281,15 @@
         "citationLabel": "College history page"
       }
     ],
-    "historicalContext": "Morehouse grew within the Atlanta University Center, the densest concentration of Black higher education in the country. Its tradition of producing ministers, scholars, and public leaders reached worldwide visibility through alumnus Martin Luther King Jr., class of 1948."
+    "historicalContext": "Morehouse grew within the Atlanta University Center, the densest concentration of Black higher education in the country. Its tradition of producing ministers, scholars, and public leaders reached worldwide visibility through alumnus Martin Luther King Jr., class of 1948.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "religion",
+      "leadership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_morgan_state_university_001",
@@ -285,7 +329,14 @@
         "citationLabel": "University history page"
       }
     ],
-    "historicalContext": "Morgan traces the common arc of many HBCUs, from denominational seminary to teacher training to state university. Its 1939 purchase by Maryland reflected growing pressure on states to fund Black public higher education in the decades before Brown."
+    "historicalContext": "Morgan traces the common arc of many HBCUs, from denominational seminary to teacher training to state university. Its 1939 purchase by Maryland reflected growing pressure on states to fund Black public higher education in the decades before Brown.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "religion"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_hampton_university_001",
@@ -331,7 +382,14 @@
         "type": "located_at",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "education",
+      "hbcu",
+      "teaching"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_clark_atlanta_university_001",
@@ -370,7 +428,14 @@
         "citationLabel": "University history page"
       }
     ],
-    "historicalContext": "The 1988 consolidation joined two Reconstruction-era institutions that had shared the Atlanta University Center for a century. Atlanta University's sociology school, led for years by Du Bois, produced some of the earliest systematic scholarship on Black life in America."
+    "historicalContext": "The 1988 consolidation joined two Reconstruction-era institutions that had shared the Atlanta University Center for a century. Atlanta University's sociology school, led for years by Du Bois, produced some of the earliest systematic scholarship on Black life in America.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "research"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_meharry_medical_college_001",
@@ -409,7 +474,14 @@
         "citationLabel": "About Meharry page"
       }
     ],
-    "historicalContext": "For most of the twentieth century Meharry and Howard together trained the majority of Black physicians and dentists in the United States. Its graduates staffed clinics and hospitals in communities that segregated medicine otherwise left unserved."
+    "historicalContext": "For most of the twentieth century Meharry and Howard together trained the majority of Black physicians and dentists in the United States. Its graduates staffed clinics and hospitals in communities that segregated medicine otherwise left unserved.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "medicine"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_prairie_view_am_university_001",
@@ -448,7 +520,14 @@
         "citationLabel": "College history page"
       }
     ],
-    "historicalContext": "Prairie View was created during Reconstruction and later folded into the 1890 land-grant system, which required Southern states to fund Black colleges to keep receiving federal agricultural money. It anchored teacher training and agricultural extension for Black Texans for generations."
+    "historicalContext": "Prairie View was created during Reconstruction and later folded into the 1890 land-grant system, which required Southern states to fund Black colleges to keep receiving federal agricultural money. It anchored teacher training and agricultural extension for Black Texans for generations.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "land-grant"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_southern_university_001",
@@ -487,7 +566,14 @@
         "citationLabel": "University founders page"
       }
     ],
-    "historicalContext": "Southern was willed into being by Black legislators who held office during Reconstruction, then sustained through the era that stripped their power. Its Baton Rouge campus became the flagship of a five-campus system unique among HBCUs."
+    "historicalContext": "Southern was willed into being by Black legislators who held office during Reconstruction, then sustained through the era that stripped their power. Its Baton Rouge campus became the flagship of a five-campus system unique among HBCUs.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "land-grant"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_spelman_college_001",
@@ -526,7 +612,14 @@
         "citationLabel": "Sophia B. Packard biography"
       }
     ],
-    "historicalContext": "Spelman gave institutional form to the education of Black women at a moment when almost no college would admit them. Its early support from the Rockefeller family, honoring the abolitionist Spelmans, tied Northern philanthropy to Black women's higher education for decades."
+    "historicalContext": "Spelman gave institutional form to the education of Black women at a moment when almost no college would admit them. Its early support from the Rockefeller family, honoring the abolitionist Spelmans, tied Northern philanthropy to Black women's higher education for decades.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "womens-education"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_tuskegee_university_001",
@@ -574,7 +667,15 @@
         "type": "related_to",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "education",
+      "hbcu",
+      "agriculture",
+      "science"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_florida_am_university_001",
@@ -614,7 +715,14 @@
         "citationLabel": "University history page"
       }
     ],
-    "historicalContext": "FAMU grew from a normal school into one of the largest HBCUs in the country, adding law, pharmacy, and graduate schools in the 1950s. Its students helped lead the 1956 Tallahassee bus boycott, an early campaign of the Southern civil rights movement."
+    "historicalContext": "FAMU grew from a normal school into one of the largest HBCUs in the country, adding law, pharmacy, and graduate schools in the 1950s. Its students helped lead the 1956 Tallahassee bus boycott, an early campaign of the Southern civil rights movement.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "land-grant"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_nc_at_state_university_001",
@@ -661,7 +769,15 @@
         "type": "related_to",
         "direction": "incoming"
       }
-    ]
+    ],
+    "topicIds": [
+      "education",
+      "hbcu",
+      "land-grant",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_xavier_university_louisiana_001",
@@ -701,7 +817,15 @@
         "citationLabel": "The Full Story history page"
       }
     ],
-    "historicalContext": "Xavier joined the later wave of HBCU founding, built by Catholic religious philanthropy rather than Protestant missionary societies or state legislatures. Its pharmacy college, opened in 1927, and premedical programs became national pipelines into the health professions."
+    "historicalContext": "Xavier joined the later wave of HBCU founding, built by Catholic religious philanthropy rather than Protestant missionary societies or state legislatures. Its pharmacy college, opened in 1927, and premedical programs became national pipelines into the health professions.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "religion",
+      "medicine"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   },
   {
     "id": "ent_dillard_university_001",
@@ -741,6 +865,13 @@
         "citationLabel": "History and traditions page"
       }
     ],
-    "historicalContext": "Dillard consolidated the Congregationalist and Methodist strands of New Orleans's freedmen's colleges into a single modern university. The merger, backed by the Rosenwald Fund and local philanthropy, typified the interwar reorganization of Black higher education."
+    "historicalContext": "Dillard consolidated the Congregationalist and Methodist strands of New Orleans's freedmen's colleges into a single modern university. The merger, backed by the Rosenwald Fund and local philanthropy, typified the interwar reorganization of Black higher education.",
+    "topicIds": [
+      "education",
+      "hbcu",
+      "liberal-arts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
   }
 ]

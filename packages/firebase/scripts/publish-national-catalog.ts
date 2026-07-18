@@ -66,7 +66,17 @@ type CatalogEntry = {
   readonly displayName: string;
   readonly summary: string;
   readonly eraBuckets?: readonly string[];
+  /** @deprecated Superseded by `topicIds`/`mentionedEntityIds`/`keywords` below (black-book-s4hp);
+   * kept so un-migrated fixture entries still validate. */
   readonly topicTags?: readonly string[];
+  /** Controlled historical-theme ids (black-book-s4hp). Populated by
+   * `migrate-topic-taxonomy.ts` for every national-catalog fixture entry. */
+  readonly topicIds?: readonly string[];
+  /** Resolvable people/place/org/law/event ids this record mentions (may be raw legacy-tag
+   * placeholder strings pending black-book-8bck's real entity resolution). */
+  readonly mentionedEntityIds?: readonly string[];
+  /** Free-text search-recall terms. */
+  readonly keywords?: readonly string[];
   readonly jurisdictionLabel: string;
   readonly locationPrecision: string;
   readonly locationLabel: string;
@@ -257,6 +267,9 @@ function toProjectionDoc(entry: CatalogEntry, releaseId: string) {
     ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
     ...(entry.sensitivityClass !== undefined ? { sensitivityClass: entry.sensitivityClass } : {}),
     topicTags: entry.topicTags ?? [],
+    topicIds: entry.topicIds ?? [],
+    mentionedEntityIds: entry.mentionedEntityIds ?? [],
+    keywords: entry.keywords ?? [],
     notabilityLabels: ['A documented site in the active public release.'],
     ...(entry.historicalContext !== undefined ? { historicalContext: entry.historicalContext } : {}),
   };
@@ -274,6 +287,9 @@ function toSearchDoc(entry: CatalogEntry, releaseId: string, claimCount: number)
     aliases: [],
     summary: entry.summary,
     topicTags: entry.topicTags ?? [],
+    topicIds: entry.topicIds ?? [],
+    mentionedEntityIds: entry.mentionedEntityIds ?? [],
+    keywords: entry.keywords ?? [],
     jurisdictionState: entry.jurisdictionLabel,
     ...(entry.status !== undefined ? { status: entry.status } : {}),
     eraBuckets: entry.eraBuckets ?? [],
