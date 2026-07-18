@@ -78,6 +78,24 @@ Binding on every record surface (narrative card, result rows, entity page) and e
 9. **Caps are slugs, not sentences.** All-caps is confined to short mono/sans slugs; body
    meaning never sets in caps (harder to read for many readers).
 
+### Decades-in-motion is a modeling-library primitive, not a page-local hack
+
+Owner directive 2026-07-18: "consider the population movement/growth stuff as part of the
+broader modeling library... this must be a part of the modeling patterns... we should use
+existing packages etc where possible." Per-decade state presence (the hero timeline's density
+fills) is promoted into `packages/domain/src/map/decade-presence.ts` (`aggregateDecadePresence`)
+— entities' own `eraBuckets`/active-span membership drives ACTIVE presence per decade (an
+institution that closed in the 1920s stops counting toward density once it's inactive), while
+pins stay CUMULATIVE (arrival never reverses). This reuses the same active-decade-bucket
+derivation (`graph/decades.ts`'s `deriveActiveDecadeBuckets`) the history graph's own per-decade
+node/edge views already depend on — one derivation path, two consumers.
+
+The client-safe half of that module (`decade-presence.ts` itself) is deliberately import-free —
+`apps/web`'s `decade-flow.ts` is transitively loaded by a `'use client'` component (`HeroStage.tsx`),
+and the top-level `@blap/domain` barrel pulls in server-only modules a browser bundle can't
+resolve. The raw-active-span convenience wrapper (`buildDecadePresenceAggregates`) lives in a
+sibling `decade-presence-from-spans.ts` file instead, for server-side callers only.
+
 Status: canonical UX/UI pattern reference. Supersedes design-direction-v4 §§2.5, 6, 7 (layout,
 surface inventory, pattern law) and every layout decision that shipped under BB-097. Carries
 forward unchanged and still binding from v4: §2 experience principles 0–4, §2b the human bar,

@@ -2,7 +2,7 @@
  * Root layout for the public Blap web application.
  * Loads display + editorial + sans + mono fonts, design-system stylesheet, and app shell.
  *
- * Type system per the blap brand pack (brand-pack/ p.2, binding): Sora SemiBold for
+ * Type system per the blap brand kit (brand/tokens/fonts.json, binding): Sora SemiBold for
  * headlines/titles/key statements, Inter for UI and body, Source Serif 4 for editorial
  * longform, IBM Plex Mono for data/citations. Sora replaced the earlier Inter-Display
  * display register when the kit landed (2026-07-18) — the wordmark art is unaffected
@@ -50,17 +50,39 @@ export const metadata: Metadata = {
   description:
     'Place-connected Black history research with published claims, provenance, and confidence.',
   icons: {
-    /* New brand/ kit ships app-icon PNGs only; browsers downscale. Proper
-       favicon size renders from the kit are a follow-up asset task. */
+    // Properly-sized renders from the new brand/ kit — see brand.md's source
+    // map for how each was generated from the master symbol/lockup art.
     icon: [
-      { url: '/brand/blap-app-icon-light.png', type: 'image/png' },
+      { url: '/brand/favicon-light-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/brand/favicon-light-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/brand/favicon-light-48.png', sizes: '48x48', type: 'image/png' },
       {
-        url: '/brand/blap-app-icon-dark.png',
+        url: '/brand/favicon-dark-16.png',
+        sizes: '16x16',
+        type: 'image/png',
+        media: '(prefers-color-scheme: dark)',
+      },
+      {
+        url: '/brand/favicon-dark-32.png',
+        sizes: '32x32',
+        type: 'image/png',
+        media: '(prefers-color-scheme: dark)',
+      },
+      {
+        url: '/brand/favicon-dark-48.png',
+        sizes: '48x48',
         type: 'image/png',
         media: '(prefers-color-scheme: dark)',
       },
     ],
-    apple: [{ url: '/brand/blap-app-icon-light.png' }],
+    apple: [
+      { url: '/brand/apple-touch-icon-light-180.png', sizes: '180x180' },
+      {
+        url: '/brand/apple-touch-icon-dark-180.png',
+        sizes: '180x180',
+        media: '(prefers-color-scheme: dark)',
+      },
+    ],
   },
   openGraph: {
     siteName: 'Blap',

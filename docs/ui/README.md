@@ -1,10 +1,9 @@
-# Design system (BB-007 / BB-068 v2 / BB-096 v3)
+# Design system
 
-Shared package: `@blap/ui` (`packages/ui`). The binding brand source
-is `brand-system/` (3.0.0-final); where this doc and the pack disagree, the
-pack wins (BB-096).
+Shared package: `@blap/ui` (`packages/ui`). The binding brand source is the
+root `brand/` directory; where this doc and the kit disagree, the kit wins.
 
-See also [`brand.md`](./brand.md) (BB-096) for the "Pinned Page" v3 usage
+See also [`brand.md`](./brand.md) for the full usage
 contract: signature, palette, typography, and usage rules; [`story.md`](./story.md)
 (BB-069) for brand voice, narrative arc, and microcopy standards; and
 [`learning-index-entity.md`](./learning-index-entity.md) for the learning-index

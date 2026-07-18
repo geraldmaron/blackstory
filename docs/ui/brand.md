@@ -1,4 +1,4 @@
-# Brand: the Pinned Page, v3 usage contract (BB-096)
+# Brand: usage contract
 
 > **SUPERSESSION (2026-07-18, owner-supplied `brand/` kit):** the binding
 > brand source is now the root **`brand/`** directory ("BLAP full brand kit —
@@ -14,35 +14,29 @@
 > this document remain in force. Favicon/OG/social renders from the new kit
 > are an open asset task.
 
-The Blap signature: a closed book cover forms a custom "B" silhouette,
-curved page-edge bands are exposed at the spine, and a copper place pin is
-integrated into the lower-left of the cover — **history, pinned to place.**
-The symbol IS the first B in "Blap"; the visible wordmark text begins
-"lack Book". From the guide:
-
-> The mark is the first B. The official lockup is artwork. Do not recreate
-> it by typing the full name beside the symbol.
+The Blap signature: a standalone book-and-pin symbol (not a letterform)
+beside a lowercase `blap` wordmark — **history, pinned to place.** Per the
+SUPERSESSION block above, the symbol is NOT a stylized "B"; do not recreate
+that reading. The official lockup and symbol are artwork, used as provided.
 
 This document is the usage contract for the signature, palette, and type
-system. The **binding source is `brand-system/`** ("Blap Brand
-Identity System 3.0.0-final"): `brand-system/tokens/black-book-brand.css`,
-`brand-system/tokens/black-book-brand-tokens.json`, and
-`brand-system/guide/black-book-brand-guide-final.pdf`. Where this doc (or
-any older doc or code) and the pack disagree, **the pack wins**. The
-agent-facing summary lives in `AGENTS.md` §Brand Language.
+system. The **binding source is the root `brand/` directory** (masters,
+4-page guide, token files). Where this doc and the pack disagree, **the
+pack wins**. The agent-facing summary lives in `AGENTS.md` §Brand Language.
 
 ## Provenance
 
 The mark's lineage: BB-067 proposed a blocky-letterform /
 Monk-Skin-Tone-Scale concept (retired — see Supersessions). BB-068 replaced
-it with the owner-supplied Pinned Page package (2026-07-17); its reference
-PNGs are archived at `docs/ui/brand-reference/`. That v2 package was in
-turn **superseded by `brand-system/` 3.0.0-final on 2026-07-17 (BB-096)**,
-which delivers the finished artwork, tokens, and standards guide. The
-geometry is original to the owner-supplied package (not a font glyph or
-stock book/pin icon); it has not been run through a trademark clearance
-search — do that before any public launch or partner-facing use beyond this
-repo.
+it with an owner-supplied Pinned Page package (2026-07-17), later superseded
+by a v3 "Blap Brand Identity System" pack (BB-096, same day) that first
+introduced the "symbol IS the first B" reading. Both prior packages are
+gone from the repo — **the 2026-07-18 `brand/` kit is the sole current
+master**, and it explicitly retires the "symbol IS the first B" framing in
+favor of a standalone symbol beside a typed lowercase wordmark. The
+geometry is original art (not a font glyph or stock book/pin icon); it has
+not been run through a trademark clearance search — do that before any
+public launch or partner-facing use beyond this repo.
 
 ## Supersessions
 
@@ -61,12 +55,12 @@ nobody "fixes" the codebase back to a retired rule:
    upper master IS Inter Display (same glyph masters), so one loaded family
    covers both display and UI registers (see
    `apps/web/src/app/layout.tsx`).
-4. **Lockup rendering.** The code-generated lockup with a typed wordmark
-   (`BlackBookLogo` `horizontal` / `stacked` variants) is superseded by the
-   official artwork SVGs at `apps/web/public/brand/` — those files are the
-   rendered source of truth for the header, masthead, favicon, and OG
-   image. The wordmark is outlined artwork; site code never types it next
-   to the symbol.
+4. **Lockup rendering.** Any code-generated lockup with a typed wordmark is
+   superseded by the official artwork PNGs at `apps/web/public/brand/` —
+   those files are the rendered source of truth for the header, masthead,
+   favicon, and OG image. Site code never types the wordmark next to the
+   symbol; there is no `BlapLogo`/`BlackBookLogo` React component (removed
+   as dead code 2026-07-18 — it had zero consumers once the kit landed).
 5. **Copper text accent.** Copper Ink `#7A4318` as the text-safe accent is
    superseded by the pack's copper text pair: `#8E4F2A` on light
    (`--bb-copper-text`, light theme) / `#D07A32` on dark.
@@ -86,11 +80,13 @@ and the pin before every page band — that is what the compact mark does.
 
 | Asset | Use |
 |---|---|
-| Primary mark (symbol only) | Avatar, map chrome, watermark |
-| Primary lockup (symbol + outlined wordmark) | Default signature; headers |
-| Compact mark | Small UI, favicon, dense controls |
-| Monochrome (black / cream) | Constrained production (print, engraving, single-color) |
-| Application icons | App launchers and tiles |
+| Symbol (book-and-pin, no wordmark) | Avatar, map chrome, watermark, small UI |
+| Lockup (symbol + lowercase `blap` wordmark) | Default signature; headers |
+| App icon | App launchers and tiles |
+
+Each ships as a light and dark transparent PNG pair — see Asset selection
+below. There is no separate "compact mark" or monochrome family in the
+current kit; use the symbol alone at small sizes instead.
 
 ### Clear space and minimum sizes
 
@@ -103,10 +99,10 @@ and the pin before every page band — that is what the compact mark does.
 
 ### Misuse (never)
 
-- No typed second B — the symbol supplies it. Never type the full name
-  beside the symbol.
-- No stretching to a non-square (mark) or off-ratio (lockup) aspect.
-- No random recoloring — approved light / dark / monochrome variants only.
+- No typed wordmark reconstruction — the lockup is artwork, used as
+  provided. Never type the wordmark beside a standalone symbol render.
+- No stretching to a non-square (symbol) or off-ratio (lockup) aspect.
+- No random recoloring — approved light / dark variants only.
 - No effects: rotation, bevel, glow, texture, ornamental motion.
 - Never remove the pin.
 - Never crowd the clear space.
@@ -115,24 +111,23 @@ and the pin before every page band — that is what the compact mark does.
 
 | Context | Asset |
 |---|---|
-| Website header | `black-book-primary-{light,dark}.svg` |
-| App launcher | `black-book-app-icon-*-1024.png` |
-| Favicon | `favicon-*-16/32/48.png` (compact mark — not the full lockup) |
-| Social avatar | `social-avatar-*-512.png` (keep the safe area; do not crop the B) |
-| Print | `primary-monochrome-*.svg` |
-| Presentations | `primary-*-transparent.png` |
+| Website header | `blap-lockup-{light,dark}.png` |
+| App launcher / touch icon | `blap-app-icon-{light,dark}.png`, `apple-touch-icon-{light,dark}-180.png` |
+| Favicon | `favicon-{light,dark}-{16,32,48}.png` (symbol only, not the full lockup) |
+| OG / link preview | `blap-open-graph-{light,dark}-1200x630.png` |
+| Social banner | `blap-social-banner-{light,dark}-1500x500.png` |
+| Social avatar | `social-avatar-{light,dark}-512.png` (keep the safe area; do not crop the symbol) |
 
-Web-served copies live at `apps/web/public/brand/` (referenced as
-`/brand/...`); checksummed masters at `brand-system/assets/`. Prefer SVG in
-product UI; transparent PNG only where SVG can't render (see
-`brand-system/implementation/asset-usage.md`).
+All served copies are PNG (the kit ships no vector source) and live at
+`apps/web/public/brand/` (referenced as `/brand/...`); the checksummed
+masters live at the root `brand/` directory alongside the guide and token
+files.
 
 ## Palette
 
-Full v3 palette (binding values in
-`brand-system/tokens/black-book-brand.css` and
-`black-book-brand-tokens.json`; dark theme swaps are in the CSS
-`[data-theme="dark"]` block):
+Full palette (binding values in `brand/tokens/brand.css` and
+`brand/tokens/colors.json`, mirrored into `packages/ui/src/styles/tokens.css`;
+dark theme swaps are in that file's `[data-theme="dark"]` block):
 
 | Role | Hex | Name |
 |---|---|---|
@@ -183,11 +178,10 @@ asset, chart):
 | Editorial / longform | Source Serif 4 | 400–600 | `--bb-font-editorial` |
 | Data / citations / mono | IBM Plex Mono | 400–500 | `--bb-font-data` |
 
-Tokens above are the pack's names
-(`brand-system/tokens/black-book-brand.css`); the in-app equivalents in
-`packages/ui/src/styles/tokens.css` are `--bb-font-sans` (UI) and
-`--bb-font-mono` (data), with `--bb-font-display` / `--bb-font-editorial`
-shared.
+The in-app tokens live in `packages/ui/src/styles/tokens.css` as
+`--bb-font-sans` (UI) and `--bb-font-mono` (data), with
+`--bb-font-display` / `--bb-font-editorial` shared; the kit's own family
+names are recorded in `brand/tokens/fonts.json`.
 
 All open-source — no licensing cost or budget gate. Responsive scale, fluid
 between mobile and desktop: display 48–72px, H1 36–48px, H2 24–32px, body
@@ -254,35 +248,21 @@ From the guide (p.13) — run before any surface ships:
 
 | What | Where |
 |---|---|
-| Binding brand pack (masters, guide, tokens, checksums) | `brand-system/` (`assets/`, `guide/`, `tokens/`, `asset-manifest.json`, `sha256sums.txt`) |
-| Pack tokens (CSS / JSON) | `brand-system/tokens/black-book-brand.css`, `black-book-brand-tokens.json` |
+| Binding brand kit (masters, guide, tokens) | root `brand/` (`logos/`, `symbols/`, `app-icons/`, `guide/`, `source-images/`, `tokens/`) |
+| Kit tokens (CSS / JSON) | `brand/tokens/brand.css`, `brand/tokens/colors.json`, `brand/tokens/fonts.json` |
 | In-app tokens | `packages/ui/src/tokens/` (`brand-palette.ts`, `colors.ts`, `typography.ts`), `packages/ui/src/styles/tokens.css` |
 | Contrast enforcement | `packages/ui/src/tokens/contrast.test.ts` |
-| Served brand assets (header, favicon, touch icon, OG, social) | `apps/web/public/brand/` |
-| Symbol-only React component | `BlackBookMark` in `packages/ui/src/brand/BlackBookLogo.tsx` |
+| Served brand assets (header, favicon, touch icon, OG, social) | `apps/web/public/brand/` — PNG only, no runtime generation |
 | Header integration | `apps/web/src/components/SiteHeader.tsx` |
-| Asset-usage rules and examples | `brand-system/implementation/` |
-| Superseded v2 reference PNGs | `docs/ui/brand-reference/` (historical; see its `readme.md`) |
 | Agent-facing brand summary | `AGENTS.md` §Brand Language |
 
-Notes on what changed in the source map under BB-096:
-
-- The favicon and OG image are **pack assets served from
-  `apps/web/public/brand/`** — there is no runtime generation of either
-  anymore.
-- `BlackBookMark` (symbol-only) remains for decorative inline and
-  map-chrome use — it tracks surrounding theme color via explicit
-  `ink`/`paper`/`accent` props (set `paper` to the actual surface color so
-  the pin's punch-through circle reads as a cutout, and wrap in
-  `aria-hidden` when adjacent text already names the product). The
-  wordmark-rendering variants are removed — any lockup on screen is pack
-  artwork, never typed.
-- The old authored SVGs at `packages/ui/src/brand/assets/bb-logo-*.svg`
-  are deleted; use `apps/web/public/brand/` (serving) or
-  `brand-system/assets/` (masters) instead.
-- When a master in `brand-system/` changes, re-copy it to
-  `apps/web/public/brand/` and refresh `asset-manifest.json` +
-  `sha256sums.txt`.
+There is no logo React component (`BlapLogo`/`BlackBookLogo` — removed
+2026-07-18, zero consumers) and no separate "asset-usage implementation"
+doc; every rendered lockup/symbol on screen is kit artwork loaded directly
+as an `<img>`, never typed or code-generated. When a master in `brand/`
+changes, re-copy the derived render (favicon/OG/social/etc.) to
+`apps/web/public/brand/` by hand — there is no asset-manifest or checksum
+pipeline for the current kit.
 
 See also `docs/ui/README.md` for the broader design-system tokens and
 components this brand sits alongside.

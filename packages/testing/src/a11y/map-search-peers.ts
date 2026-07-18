@@ -20,7 +20,7 @@ export const MAP_SEARCH_ACCESSIBLE_PEERS = Object.freeze([
   {
     journey: 'explore',
     component: 'Explore noscript filters',
-    webPath: 'apps/web/src/app/explore/page.tsx',
+    webPath: 'apps/web/src/app/(map)/explore/page.tsx',
     contract: 'Native GET FilterBar when JavaScript is unavailable',
   },
   {

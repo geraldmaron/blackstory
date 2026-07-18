@@ -1,7 +1,12 @@
 /**
- * Decades-in-motion frame builder: cumulative reveal by earliest documented
+ * Decades-in-motion frame builder: cumulative PIN reveal by earliest documented
  * decade, honest handling of undated records (final frame only), per-decade
- * edge slices, and presence-tier density over the cumulative set.
+ * edge slices, and presence-tier DENSITY over entities ACTIVE that decade
+ * (delegated to `@blap/domain`'s `aggregateDecadePresence` — an entity whose
+ * `eraBuckets` span has already ended does not inflate a later decade's
+ * density, even though its pin remains on the map). The closing/complete
+ * frame's density stays era-agnostic cumulative (everyone with a resolved
+ * state, dated or not) — "the map today" is not itself a decade.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -129,7 +134,7 @@ test('an edge-only decade still produces a frame so movement is never skipped', 
   assert.equal(frames[1]!.cumulativeCount, 1);
 });
 
-test('density levels cover exactly the states of the cumulative set', () => {
+test('per-decade density levels cover exactly the states of entities ACTIVE that decade', () => {
   const frames = buildDecadeFlowFrames(
     collectionOf([feature('a', ['1870s'], DC), feature('b', ['1900s'], GA)]),
     {},
@@ -139,8 +144,54 @@ test('density levels cover exactly the states of the cumulative set', () => {
     frames[0]!.densityLevels.map((level) => level.statePostalCode),
     ['DC'],
   );
-  assert.equal(frames[1]!.densityLevels.length, 2);
+  // 'a' (DC) is active only in the 1870s — it must NOT inflate the 1900s density,
+  // even though its pin has already arrived by then (frames[1].cumulativeCount === 2).
+  assert.deepEqual(
+    frames[1]!.densityLevels.map((level) => level.statePostalCode),
+    ['GA'],
+  );
+  assert.equal(frames[1]!.cumulativeCount, 2);
   for (const level of frames[1]!.densityLevels) {
     assert.ok(['documented', 'emerging', 'concentrated'].includes(level.tier));
   }
+});
+
+test('ACTIVE vs CUMULATIVE genuinely diverge: an entity that is no longer active drops out of a later decade\'s density, even though its pin never leaves once arrived', () => {
+  // 'new-in-1900s' exists purely so a distinct 1900s frame gets built at all — the
+  // frame axis only steps on a NEW arrival (a feature's OWN earliest decade), never
+  // on every decade a longer-lived feature's span merely touches.
+  const frames = buildDecadeFlowFrames(
+    collectionOf([
+      feature('short-lived', ['1870s'], DC),
+      feature('spans-both', ['1870s', '1900s'], GA),
+      feature('new-in-1900s', ['1900s'], GA),
+    ]),
+    {},
+  );
+
+  const d1870s = frames.find((frame) => frame.decade === '1870s')!;
+  const d1900s = frames.find((frame) => frame.decade === '1900s')!;
+
+  assert.deepEqual(d1870s.densityLevels.map((l) => l.statePostalCode).sort(), ['DC', 'GA']);
+  // 'short-lived' (DC) is not active in the 1900s — density drops to GA only...
+  assert.deepEqual(d1900s.densityLevels.map((l) => l.statePostalCode), ['GA']);
+  // ...but its pin is still on the map (cumulative reveal never removes a pin).
+  assert.equal(d1900s.cumulativeCount, 3);
+  assert.ok(
+    d1900s.featureCollection.features.some((f) => f.properties.entityId === 'short-lived'),
+  );
+});
+
+test('the closing/complete frame density is era-agnostic cumulative — includes an undated-but-located record no decade could honestly claim', () => {
+  const frames = buildDecadeFlowFrames(
+    collectionOf([feature('dated', ['1870s'], DC), feature('undated-located', [], GA)]),
+    {},
+  );
+
+  const finalFrame = frames.at(-1)!;
+  assert.equal(finalFrame.isComplete, true);
+  assert.deepEqual(
+    finalFrame.densityLevels.map((level) => level.statePostalCode).sort(),
+    ['DC', 'GA'],
+  );
 });

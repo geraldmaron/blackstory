@@ -62,9 +62,9 @@ BLAP_FIREBASE_ALLOW_PRODUCTION=1 \
 BLAP_FIREBASE_ALLOW_PRODUCTION=1 \
   node --conditions development --import tsx scripts/promote-entity-primary-image.ts \
     --entity-id=ent_seed_school_001 \
-    --file=../../brand-system/assets/png/black-book-mark-light-transparent.png \
+    --file=../../brand/symbols/dark/blap-book-pin-symbol-dark-transparent.png \
     --alt="Schematic mark for Seed Freedmen School" \
-    --credit="Blap brand system seed fixture" \
+    --credit="Blap brand kit seed fixture" \
     --rights=public_domain
 ```
 

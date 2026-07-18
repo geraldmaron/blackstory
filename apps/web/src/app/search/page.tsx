@@ -12,7 +12,7 @@
  * result/facet shaping.
  */
 
-import { EmptyState } from '@blap/ui';
+import { EmptyState, ResultList } from '@blap/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { getPublicSearchIndex } from '../../lib/public-data/source';
 import { buildSearchPageHref, buildSearchViewModel, type RawSearchParams } from './search-view-model';
@@ -135,23 +135,23 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </EmptyState>
         ) : (
           <>
-            <ol className="bp-index" aria-labelledby="search-results-heading">
-              {view.results.map((result) => (
-                <li className="bp-index__row" key={result.id}>
-                  <a className="bp-index__link" href={`/entity/${result.id}`}>
-                    <h2 className="bp-index__title">{result.displayName}</h2>
-                    {result.summary ? (
-                      <p className="bp-index__summary">{result.summary}</p>
-                    ) : null}
-                    <p className="bp-index__meta">
-                      <span>{result.kind}</span>
-                      {result.status ? <span>{result.status}</span> : null}
-                      <span>Matched: {result.matchedText}</span>
-                    </p>
-                  </a>
-                </li>
-              ))}
-            </ol>
+            <ResultList
+              className="bp-index"
+              labelledBy="search-results-heading"
+              items={view.results.map((result) => ({
+                id: result.id,
+                href: `/entity/${result.id}`,
+                title: result.displayName,
+                summary: result.summary ?? '',
+                meta: (
+                  <>
+                    <span>{result.kind}</span>
+                    {result.status ? <span>{result.status}</span> : null}
+                    <span>Matched: {result.matchedText}</span>
+                  </>
+                ),
+              }))}
+            />
 
             {view.previousOffset !== undefined || view.nextOffset !== undefined ? (
               <nav className="bp-row" aria-label="Search results pages">

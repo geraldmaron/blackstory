@@ -30,6 +30,16 @@ export type {
   BuildMapSourceInput,
 } from './map-source.js';
 
+export { aggregateDecadePresence } from './decade-presence.js';
+export type {
+  StatePresenceEntityInput,
+  StateAggregateCount,
+  DecadeStateAggregates,
+} from './decade-presence.js';
+
+export { buildDecadePresenceAggregates } from './decade-presence-from-spans.js';
+export type { DecadePresenceEntityInput } from './decade-presence-from-spans.js';
+
 export {
   MAP_SOURCE_DEMO_FIXTURES,
   PLACE_DC_FIXTURE,

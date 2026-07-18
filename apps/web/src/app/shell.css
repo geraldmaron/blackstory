@@ -1305,35 +1305,31 @@
   background: var(--bp-surface-raised);
 }
 
-/* —— Ledger index — search results and any ranked archive listing.
-   Numbered rows, serif-display titles, slug meta. Rows, never cards. ——  */
+/* —— Ledger index — the shared `@blap/ui` ResultList reskinned for search
+   results and any ranked archive listing: numbered rows, serif-display
+   titles, slug meta. Rows, never cards. Scoped as descendant overrides on
+   ResultList's own BEM classes (`className="bp-index"` on the component)
+   rather than a parallel markup, so search keeps the one accessible list
+   component `@blap/testing`'s peer contract requires
+   (packages/testing/src/a11y/map-search-peers.test.ts). ——  */
 .bp-index {
   margin: var(--bp-space-6) 0 0;
-  padding: 0;
-  list-style: none;
   counter-reset: bp-index;
 }
 
-.bp-index__row {
+.bp-index .bp-result-list__item {
   counter-increment: bp-index;
-  border-top: var(--bp-border-width) solid var(--bp-rule);
 }
 
-.bp-index__row:last-child {
-  border-bottom: var(--bp-border-width) solid var(--bp-rule);
-}
-
-.bp-index__link {
+.bp-index .bp-result-list__link {
   position: relative;
   display: grid;
   grid-template-columns: 3rem minmax(0, 1fr);
   gap: var(--bp-space-2) var(--bp-space-4);
   padding: var(--bp-space-5) 0;
-  color: inherit;
-  text-decoration: none;
 }
 
-.bp-index__link::before {
+.bp-index .bp-result-list__link::before {
   content: counter(bp-index, decimal-leading-zero);
   grid-row: 1 / span 3;
   padding-top: 0.35rem;
@@ -1344,52 +1340,38 @@
   transition: color var(--bp-duration-fast) var(--bp-easing);
 }
 
-.bp-index__link:hover::before,
-.bp-index__link:focus-visible::before {
+.bp-index .bp-result-list__link:hover::before,
+.bp-index .bp-result-list__link:focus-visible::before {
   color: var(--bp-accent);
 }
 
-.bp-index__title {
-  margin: 0;
+.bp-index .bp-result-list__title {
   font-family: var(--bp-font-display);
   font-weight: 600;
   font-size: clamp(1.25rem, 1.1rem + 0.8vw, 1.75rem);
   letter-spacing: -0.02em;
   line-height: 1.15;
-  transition: color var(--bp-duration-fast) var(--bp-easing);
 }
 
-.bp-index__link:hover .bp-index__title,
-.bp-index__link:focus-visible .bp-index__title {
+.bp-index .bp-result-list__link:hover .bp-result-list__title,
+.bp-index .bp-result-list__link:focus-visible .bp-result-list__title {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.22em;
 }
 
-.bp-index__summary {
-  margin: 0;
+.bp-index .bp-result-list__summary {
   max-width: 48rem;
-  color: var(--bp-ink-muted);
   font-family: var(--bp-font-editorial);
   font-size: 0.9375rem;
   line-height: 1.55;
 }
 
-.bp-index__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--bp-space-3);
-  color: var(--bp-ink-subtle);
+.bp-index .bp-result-list__meta {
   font-family: var(--bp-font-mono);
   font-size: 0.6875rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-}
-
-.bp-index__link:focus-visible {
-  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
-  outline-offset: var(--bp-focus-offset);
-  border-radius: var(--bp-radius-sm);
 }
 
 /* —— At a glance — summary before story (cognitive-accessibility law).

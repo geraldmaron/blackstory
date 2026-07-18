@@ -1,8 +1,17 @@
 /**
  * Decades-in-motion frames for the home hero (design-direction-v5 §6.1): the
  * archive fills in decade by decade — pins accumulate as their earliest
- * documented decade arrives, state fills deepen with documented presence, and
+ * documented decade arrives, state fills reflect ACTIVE documented presence
+ * that decade (an entity's own `eraBuckets` span, not just its arrival), and
  * that decade's relationship lines trace movement between places.
+ *
+ * Per-decade state density is delegated to `@blap/domain`'s
+ * `aggregateDecadePresence` (packages/domain/src/map/decade-presence.ts) —
+ * the modeling-library primitive for "which decades is this entity
+ * recognized as active in," shared with the history graph's per-decade
+ * node/edge views (`../graph/decades.ts`). This module supplies the pieces
+ * that ARE web-specific: which decades get a pin-arrival frame at all, and
+ * the frame's actual GeoJSON feature collection/edge lines.
  *
  * HONESTY RULE: every frame is driven by what the release actually documents
  * (era buckets, state aggregates, history edges) and is labeled as documented
@@ -13,7 +22,15 @@
  * Dignity rules carry: intensity is presence-tiered copper (documented /
  * emerging / concentrated via `buildStateDensityLevels`), never incident heat.
  */
-import type { MapStateAggregate } from '@blap/domain';
+// Both the value and the type come from the client-safe `./map/decade-presence` subpath, never
+// the top-level `@blap/domain` barrel: this module is imported by HeroStage.tsx ('use client'),
+// and the barrel transitively pulls in server-only modules (Node builtins in
+// publication/index.ts, relevance/fixtures.ts) that webpack cannot bundle for the browser. That
+// subpath's own module is import-free by design (see its doc comment) so nothing it pulls in can
+// reintroduce the problem — `StateAggregateCount` is a structural duplicate of `@blap/domain`'s
+// `MapStateAggregate` (same four fields), freely interchangeable via TypeScript's structural
+// typing with `density.ts`'s `buildStateDensityLevels`, which expects the latter.
+import { aggregateDecadePresence, type StateAggregateCount } from '@blap/domain/map/decade-presence';
 import type { ExploreMapFeature, ExploreMapFeatureCollection } from './build-explore-map-source';
 import type { HistoryEdgeLineCollection } from './build-history-edge-lines';
 import { buildStateDensityLevels, type StateDensityLevel } from './density';
@@ -23,7 +40,8 @@ export type DecadeFlowFrame = {
   readonly decade: string;
   /** Records documented by (through) this decade. */
   readonly featureCollection: ExploreMapFeatureCollection;
-  /** Presence tiers over the cumulative records — documented, never ranked. */
+  /** Presence tiers for entities ACTIVE this decade (or, on the closing frame, the
+   * complete era-agnostic archive) — documented presence, never ranked. */
   readonly densityLevels: readonly StateDensityLevel[];
   /** Relationship lines active in this decade (movement, not accumulation). */
   readonly edgeCollection: HistoryEdgeLineCollection;
@@ -56,11 +74,25 @@ function earliestDecadeOf(feature: ExploreMapFeature): number | undefined {
   return earliest;
 }
 
-function densityOf(features: readonly ExploreMapFeature[]): readonly StateDensityLevel[] {
+function stateResolved(
+  feature: ExploreMapFeature,
+): feature is ExploreMapFeature & {
+  properties: { stateFips: string; statePostalCode: string; stateName: string };
+} {
+  const { stateFips, statePostalCode, stateName } = feature.properties;
+  return Boolean(stateFips && statePostalCode && stateName);
+}
+
+/** Era-agnostic state presence over every state-resolved feature, dated or not — the
+ * closing/complete frame's "today" density. Deliberately independent of decade-bucket
+ * membership: an undated-but-located record still belongs on the map today, even though
+ * it can never honestly claim a specific decade's ACTIVE presence (see
+ * `aggregateDecadePresence`'s doc comment on why decade-scoped presence excludes it). */
+function densityOfAllFeatures(features: readonly ExploreMapFeature[]): readonly StateDensityLevel[] {
   const byState = new Map<string, { fips: string; postal: string; name: string; count: number }>();
   for (const feature of features) {
+    if (!stateResolved(feature)) continue;
     const { stateFips, statePostalCode, stateName } = feature.properties;
-    if (!stateFips || !statePostalCode || !stateName) continue;
     const entry = byState.get(stateFips);
     if (entry) {
       entry.count += 1;
@@ -68,13 +100,32 @@ function densityOf(features: readonly ExploreMapFeature[]): readonly StateDensit
       byState.set(stateFips, { fips: stateFips, postal: statePostalCode, name: stateName, count: 1 });
     }
   }
-  const aggregates: MapStateAggregate[] = [...byState.values()].map((entry) => ({
+  const aggregates: StateAggregateCount[] = [...byState.values()].map((entry) => ({
     stateFips: entry.fips,
     statePostalCode: entry.postal,
     stateName: entry.name,
     count: entry.count,
   }));
   return buildStateDensityLevels(aggregates);
+}
+
+/** Per-decade ACTIVE-presence density, keyed by decade label, over every state-resolved
+ * feature's own `eraBuckets` span — delegates the active/cumulative aggregation to
+ * `@blap/domain`'s `aggregateDecadePresence` rather than reimplementing it here. */
+function buildActiveDensityByDecade(
+  features: readonly ExploreMapFeature[],
+): ReadonlyMap<string, readonly StateDensityLevel[]> {
+  const entities = features.filter(stateResolved).map((feature) => ({
+    entityId: feature.properties.entityId,
+    stateFips: feature.properties.stateFips,
+    statePostalCode: feature.properties.statePostalCode,
+    stateName: feature.properties.stateName,
+    decadeBuckets: feature.properties.eraBuckets,
+  }));
+  const presenceByDecade = aggregateDecadePresence(entities);
+  return new Map(
+    presenceByDecade.map((presence) => [presence.decade, buildStateDensityLevels(presence.active)]),
+  );
 }
 
 function collectionOf(features: readonly ExploreMapFeature[]): ExploreMapFeatureCollection {
@@ -84,7 +135,9 @@ function collectionOf(features: readonly ExploreMapFeature[]): ExploreMapFeature
 /**
  * One frame per decade that changes something (a record arrives or an edge is
  * active), in chronological order, closed by a full-archive frame that also
- * carries the undated records and the all-time relationship lines.
+ * carries the undated records and the all-time relationship lines. Pins
+ * accumulate by arrival (earliest documented decade); density reflects
+ * ACTIVE presence that decade, via `@blap/domain`'s decade-presence model.
  */
 export function buildDecadeFlowFrames(
   collection: ExploreMapFeatureCollection,
@@ -101,6 +154,8 @@ export function buildDecadeFlowFrames(
     if (start !== undefined) decadeStarts.add(start);
   }
 
+  const activeDensityByDecade = buildActiveDensityByDecade(collection.features);
+
   const frames: DecadeFlowFrame[] = [];
   for (const start of [...decadeStarts].sort((a, b) => a - b)) {
     const label = `${start}s`;
@@ -111,7 +166,7 @@ export function buildDecadeFlowFrames(
     frames.push({
       decade: label,
       featureCollection: collectionOf(cumulative),
-      densityLevels: densityOf(cumulative),
+      densityLevels: activeDensityByDecade.get(label) ?? [],
       edgeCollection: edgesByDecade[label] ?? EMPTY_EDGE_LINE_COLLECTION,
       cumulativeCount: cumulative.length,
       isComplete: false,
@@ -123,7 +178,7 @@ export function buildDecadeFlowFrames(
   frames.push({
     decade: FINAL_FRAME_LABEL,
     featureCollection: collection,
-    densityLevels: densityOf(collection.features),
+    densityLevels: densityOfAllFeatures(collection.features),
     edgeCollection: allTimeEdges,
     cumulativeCount: collection.features.length,
     isComplete: true,

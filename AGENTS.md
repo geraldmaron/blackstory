@@ -38,10 +38,10 @@ cp -rf source dest          # NOT: cp -r source dest
 
 ## Brand Language
 
-The binding source is `brand-system/` ("Blap Brand Identity System 3.0.0-final" — see
-`brand-system/guide/black-book-brand-guide-final.pdf`). Anything an agent ships that a user can
-see must follow it. Where older docs or code disagree (pure-white canvas, Sora display type,
-zero-radius rule, code-typed wordmark), the pack wins; BB-096 tracks the reconciliation.
+The binding source is the root `brand/` directory (masters, 4-page guide, token files — see
+`docs/ui/brand.md` for the full usage contract). Anything an agent ships that a user can see must
+follow it. Where older docs or code disagree (pure-white canvas, zero-radius rule, code-typed
+wordmark, "the symbol IS a B" framing), the kit wins.
 
 **Idea and voice.** "The book is the record. The pin is the place. The B is the name." Core line:
 *History, pinned to place.* Support line: *People. Places. Evidence. Context.* Copy is specific
@@ -75,13 +75,12 @@ technical labels (400–500). H1 36–48, H2 24–32, body 16–18. All open-sou
 **Shape.** Radii 8/16/28px (sm/md/lg). Flat matte fills only — no bevels, shadows, glows,
 gradients, 3D, or ornamental motion, anywhere, ever.
 
-**The mark.** The Pinned Page symbol IS the first B; visible wordmark text begins "lack Book".
-The lockup is outlined artwork — never reconstruct it by typing the name beside the symbol.
-Never: a typed second B, stretching, recoloring beyond approved light/dark/monochrome variants,
-removing the pin, adding effects, or crowding the clear space (≥ the visible pin width). Use the
-compact mark below 32px. Serve from `apps/web/public/brand/` (masters + checksums in
-`brand-system/`; when a master changes, re-copy and refresh `asset-manifest.json` +
-`sha256sums.txt`).
+**The mark.** A standalone book-and-pin symbol (not a letterform) beside a lowercase `blap`
+wordmark. The lockup and symbol are artwork — never reconstruct either by typing the wordmark
+next to a bare symbol render. Never: stretching, recoloring beyond approved light/dark variants,
+removing the pin, adding effects, or crowding the clear space (≥ the visible pin width). Serve
+from `apps/web/public/brand/` (masters in the root `brand/` directory; when a master changes,
+re-copy the derived render by hand — there is no manifest/checksum pipeline).
 
 **Imagery and people.** Place first; evidence visible; people with context — a person is always
 identified (PERSON / ROLE / PLACE / YEAR), never anonymous decoration. Avoid generic "Black

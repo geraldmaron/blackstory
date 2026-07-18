@@ -504,6 +504,8 @@ export {
   findUsStateForPoint,
   findUsStateByPostalCode,
   buildMapSource,
+  aggregateDecadePresence,
+  buildDecadePresenceAggregates,
 } from './map/index.js';
 export type {
   UsStateInfo,
@@ -519,6 +521,9 @@ export type {
   MapSourceMeta,
   MapSourceBuildResult,
   BuildMapSourceInput,
+  StatePresenceEntityInput,
+  DecadePresenceEntityInput,
+  DecadeStateAggregates,
 } from './map/index.js';
 export * from './query-packs/index.js';
 export * from './discovery/index.js';

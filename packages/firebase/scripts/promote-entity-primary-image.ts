@@ -10,7 +10,7 @@
  *   BLAP_FIREBASE_ALLOW_PRODUCTION=1 \
  *   node --conditions development --import tsx scripts/promote-entity-primary-image.ts \
  *     --entity-id=ent_seed_school_001 \
- *     --file=../../brand-system/assets/png/black-book-mark-light-transparent.png \
+ *     --file=../../brand/symbols/dark/blap-book-pin-symbol-dark-transparent.png \
  *     --alt="Campus exterior of Seed Freedmen School" \
  *     --credit="Public domain archival fixture" \
  *     --rights=public_domain \
