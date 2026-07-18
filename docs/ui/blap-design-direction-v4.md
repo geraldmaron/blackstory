@@ -153,7 +153,7 @@ block the visiting job.
 | `/entity/[id]` | One record, fully evidenced — and visitable | Name/kind/place/era → summary → claims+citations → timeline → related → visit block (map hand-off, directions, visitable status: standing/rebuilt/demolished/marker-only) | sections stack; visit block stays above the fold on mobile |
 | `/history` | Movement through time | Decade graph views, edge panels, era scrubber | edge panel becomes sheet |
 | `/topics` | Thematic entry | Topic tiles → filtered explore/search links | 2-col → 1-col |
-| `/facts`, `/facts/[id]/rev/[n]` | Fact registry + revisions | Mono-register tables, revision diffs, citation lists | tables scroll in-container |
+| `/facts`, `/facts/[slug]`, `/facts/[id]/rev/[n]` | Fact registry + revisions | Mono-register tables, revision diffs, citation lists | tables scroll in-container |
 | `/methodology` | Trust: how records qualify | Longform serif, numbered sections, confidence-language explainer | — |
 | `/myths`, `/myths/[slug]` | Corrections culture | Claim-vs-evidence layout, dispute framing | — |
 | `/errata`, `/corrections` | Visible fallibility | Dated entries, hairline separation | — |

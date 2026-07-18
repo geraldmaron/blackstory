@@ -2,6 +2,7 @@
  * Public fact library over published facts. Search runs through the real
  * `runPublicSearch` pipeline over the seed fact search index not a hand-rolled filter.
  */
+import Link from 'next/link';
 import { EmptyState, FilterBar, ResultList } from '@repo/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { getSeedFact, getSeedFactSearchIndex, listSeedFacts } from '../../data/facts-seed';
@@ -81,9 +82,9 @@ export default async function FactsLibraryPage({ searchParams }: FactsPageProps)
           <EmptyState
             title="No published facts matched"
             action={
-              <a className="ds-cta ds-cta--ink" href="/facts">
+              <Link className="ds-cta ds-cta--ink" href="/facts">
                 Clear filters
-              </a>
+              </Link>
             }
           >
             Try a broader keyword or reset the claim type and evidence grade filters.
@@ -92,9 +93,10 @@ export default async function FactsLibraryPage({ searchParams }: FactsPageProps)
           <>
             <ResultList
               labelledBy="fact-results-heading"
+              LinkComponent={Link}
               items={view.results.map((result) => {
                 const fact = getSeedFact(result.id);
-                const href = fact ? factPageHref(fact.id, fact.shortStatement) : `/facts/${result.id}`;
+                const href = fact ? factPageHref(fact.id, fact.slug) : `/facts/${result.id}`;
                 return {
                   id: result.id,
                   href,
@@ -115,14 +117,22 @@ export default async function FactsLibraryPage({ searchParams }: FactsPageProps)
             {view.previousOffset !== undefined || view.nextOffset !== undefined ? (
               <nav className="ds-row" aria-label="Fact library pages">
                 {view.previousOffset !== undefined ? (
-                  <a className="ds-button ds-button--secondary" href={buildFactLibraryHref(view, view.previousOffset)}>
+                  <Link
+                    className="ds-button ds-button--secondary"
+                    href={buildFactLibraryHref(view, view.previousOffset)}
+                    scroll={false}
+                  >
                     Previous page
-                  </a>
+                  </Link>
                 ) : null}
                 {view.nextOffset !== undefined ? (
-                  <a className="ds-button ds-button--secondary" href={buildFactLibraryHref(view, view.nextOffset)}>
+                  <Link
+                    className="ds-button ds-button--secondary"
+                    href={buildFactLibraryHref(view, view.nextOffset)}
+                    scroll={false}
+                  >
                     Next page
-                  </a>
+                  </Link>
                 ) : null}
               </nav>
             ) : null}

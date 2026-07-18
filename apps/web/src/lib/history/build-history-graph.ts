@@ -66,8 +66,8 @@ function entityHref(entityId: string): string {
   return `/entity/${entityId}`;
 }
 
-function factHref(factId: string, slug: string): string {
-  return `/facts/${factId}/${slug}`;
+function factHref(_factId: string, slug: string): string {
+  return `/facts/${slug}`;
 }
 
 function relationshipSentence(

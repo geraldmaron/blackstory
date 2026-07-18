@@ -11,9 +11,10 @@
  * unit-testable.
  */
 import {
+  buildFactPath,
   computeFacetCounts,
   runPublicSearch,
-  slugifyFactStatement,
+  type FactId,
   type PublicSearchIndexDoc,
   type SearchFilter,
   type SearchResultView,
@@ -160,6 +161,6 @@ export function buildFactLibraryHref(view: FactLibraryViewModel, offset: number)
   return qs ? `/facts?${qs}` : '/facts';
 }
 
-export function factPageHref(id: string, shortStatement: string): string {
-  return `/facts/${id}/${slugifyFactStatement(shortStatement)}`;
+export function factPageHref(id: FactId | string, slug: string): string {
+  return buildFactPath(id as FactId, slug);
 }

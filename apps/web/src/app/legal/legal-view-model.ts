@@ -1,7 +1,7 @@
 /**
  * Pure view-model for the `/legal` browse and detail pages. No Next.js runtime dependency.
  */
-import { slugifyFactStatement } from '@repo/domain';
+import { buildFactPath } from '@repo/domain';
 import type { LegalBrowseItem } from '../../components/legal';
 import { isLawStatus } from '../../components/legal/format';
 import {
@@ -58,7 +58,7 @@ function snapshotToBrowseItem(
     lawStatus: snapshot.lawStatus,
     topics: snapshot.topics,
     hasExplainer: catalog !== undefined,
-    ...(fact ? { factHref: `/facts/${fact.id}/${slugifyFactStatement(fact.shortStatement)}` } : {}),
+    ...(fact ? { factHref: buildFactPath(fact.id, fact.slug) } : {}),
   };
 }
 
@@ -108,7 +108,7 @@ export function buildLegalDetailViewModel(slug: string): LegalDetailViewModel {
     kind: 'ok',
     snapshot,
     ...(catalog ? { explainer: catalog.explainer } : {}),
-    ...(fact ? { factHref: `/facts/${fact.id}/${slugifyFactStatement(fact.shortStatement)}` } : {}),
+    ...(fact ? { factHref: buildFactPath(fact.id, fact.slug) } : {}),
   };
 }
 

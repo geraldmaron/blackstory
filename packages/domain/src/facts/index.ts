@@ -21,7 +21,7 @@
  * at publish time — a fact-only entity linkage is never invisible to the graph.
  *
  * Citation rendering: `./citation.ts`'s `FactCitation` stores CSL-JSON (MIT schema) plus the
- * Black Book extension block; the intended renderer is citation.js (`@citation-js/core`, MIT) at
+ * BlackStory extension block; the intended renderer is citation.js (`@citation-js/core`, MIT) at
  * the presentation layer (`apps/web`). This package does not depend on citation.js itself; it
  * only stores CSL-JSON in the shape that library expects.
  */
@@ -32,6 +32,7 @@ export {
   formatFactId,
   slugifyFactStatement,
   buildFactPath,
+  buildLegacyFactPath,
   buildFactRevisionPath,
   buildFactJsonPath,
   slugNeedsRedirect,

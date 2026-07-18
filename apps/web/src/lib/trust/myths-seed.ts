@@ -29,7 +29,7 @@ export const MYTH_REVIEWS: readonly MythReview[] = [
     },
     ratingExplanation: 'False — the school carried two earlier names before 1916',
     authorName: 'BlackStory',
-    relatedFactUrl: '/facts/BB-F-000003/renamed-paul-laurence-dunbar-1916',
+    relatedFactUrl: '/facts/dunbar-rename-1916',
   },
   {
     slug: 'todays-building-is-the-1916-building',
@@ -49,7 +49,7 @@ export const MYTH_REVIEWS: readonly MythReview[] = [
     },
     ratingExplanation: 'False — the 1916 building and its 1970s replacement were both demolished',
     authorName: 'BlackStory',
-    relatedFactUrl: '/facts/BB-F-000005/1916-and-1970s-buildings-demolished-rebuilt-2013',
+    relatedFactUrl: '/facts/dunbar-campus-rebuild-2013',
   },
 ];
 

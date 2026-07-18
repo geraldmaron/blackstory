@@ -5,6 +5,7 @@
  * answered by linking the cited revision and its edit summary. The record stays resolvable even
  * when superseded or deprecated.
  */
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Notice } from '@repo/ui';
 import { SeedDataNotice } from '../../../../../components/SeedDataNotice';
@@ -17,7 +18,7 @@ import {
   formatIsoDate,
   humanizeToken,
 } from '../../../../../components/facts';
-import { buildFactPath, slugifyFactStatement } from '@repo/domain';
+import { buildFactPath } from '@repo/domain';
 import { listPublicFactRevisionParams, resolveFactRevision } from '../../../resolve-public-fact';
 
 type FactRevisionPageProps = {
@@ -77,7 +78,9 @@ export default async function FactRevisionPage({ params }: FactRevisionPageProps
             {revision.summary}
           </p>
           <p style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
-            <a href={buildFactPath(fact.id, slugifyFactStatement(fact.shortStatement))}>Open the current fact record</a>
+            <Link href={buildFactPath(fact.id, fact.slug)}>
+              Open the current fact record
+            </Link>
           </p>
         </Notice>
 

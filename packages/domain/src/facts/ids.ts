@@ -2,13 +2,12 @@
  * Stable identity and permalink helpers for the canonical fact registry.
  *
  * Fact ids are immutable and never reused: `BB-F-######` (a zero-padded, monotonically
- * assigned 6-digit sequence never re-derived from mutable content like the statement text,
- * unlike the cosmetic slug below). The slug is deliberately the ONLY part of a fact's
- * permalink that may ever change: `/facts/{id}/{slug}` a slug change must 301 (see
- * `apps/web/src/app/facts/[id]/[slug]/page.tsx`) rather than mint a new id. Per-revision
- * permalinks (`/facts/{id}/rev/{n}`) follow the Wikipedia "oldid" pattern named in
- * design note: the single most important defense against a hostile out-of-context screenshot,
- * because the cited revision never changes even when the current record is later corrected.
+ * assigned 6-digit sequence never re-derived from mutable content like the statement text).
+ * Public human permalinks are slug-only: `/facts/{slug}`. The immutable id stays on machine
+ * surfaces (`/facts/{id}.json`, `/facts/{id}/rev/{n}`). Legacy `/facts/{id}/{slug}` paths 301
+ * to the slug URL. A slug change must 301 rather than mint a new id. Per-revision
+ * permalinks follow the Wikipedia "oldid" pattern: the cited revision never changes even when
+ * the current record is later corrected.
  */
 
 const FACT_ID_PATTERN = /^BB-F-\d{6,}$/;
@@ -53,7 +52,17 @@ export function slugifyFactStatement(shortStatement: string): string {
   return slug.length > 80 ? slug.slice(0, 80).replace(/-+$/g, '') : slug;
 }
 
-export function buildFactPath(id: FactId, slug: string): string {
+/** Public human-facing fact URL — slug only (immutable id is not shown). */
+export function buildFactPath(_id: FactId, slug: string): string {
+  const trimmed = slug.trim().replace(/^\/+|\/+$/g, '');
+  if (!trimmed) {
+    throw new Error('fact slug must be non-empty');
+  }
+  return `/facts/${trimmed}`;
+}
+
+/** Legacy two-segment path kept for redirect sources only. */
+export function buildLegacyFactPath(id: FactId, slug: string): string {
   return `/facts/${id}/${slug}`;
 }
 
@@ -70,10 +79,9 @@ export function buildFactJsonPath(id: FactId): string {
 }
 
 /**
- * True when a stored slug no longer matches the slug freshly derived from the current
- * `shortStatement` — the caller (the `/facts/{id}/{slug}` page) must respond with a redirect to
- * the current canonical path rather than serving content at a stale slug silently (:
- * "cosmetic slug 301s on change").
+ * True when a requested URL slug no longer matches the stored canonical slug — the caller must
+ * respond with a redirect to `/facts/{currentSlug}` rather than serving content at a stale slug
+ * silently ("cosmetic slug 301s on change").
  */
 export function slugNeedsRedirect(requestedSlug: string, currentShortStatement: string): boolean {
   return requestedSlug !== slugifyFactStatement(currentShortStatement);

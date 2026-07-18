@@ -24,7 +24,7 @@ test('buildLegalDetailViewModel resolves explainer and fact link for CRA 1964', 
   assert.equal(view.kind, 'ok');
   if (view.kind !== 'ok') return;
   assert.ok(view.explainer);
-  assert.ok(view.factHref?.includes('BB-F-000010'));
+  assert.equal(view.factHref, '/facts/civil-rights-act-1964-enacted');
 });
 
 test('buildLegalDetailViewModel returns not_found for unknown slug', () => {

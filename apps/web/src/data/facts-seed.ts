@@ -35,7 +35,7 @@ const ACCESSED_AT = '2026-07-17T00:00:00.000Z';
 export const SEED_FACTS: readonly FactRecord[] = [
   {
     id: asFactId('BB-F-000001'),
-    slug: 'dunbar-founded-1870-in-church-basement',
+    slug: 'dunbar-founding-1870',
     statement:
       'In 1870, William Syphax, President of the Board of Trustees for Colored Schools, founded ' +
       'the Preparatory High School for Colored Youth — the first public high school for Black ' +
@@ -127,7 +127,7 @@ export const SEED_FACTS: readonly FactRecord[] = [
   },
   {
     id: asFactId('BB-F-000002'),
-    slug: 'renamed-m-street-high-school-1891',
+    slug: 'm-street-rename-1891',
     statement:
       'In 1891, the school moved to a permanent building and was renamed M Street High School.',
     shortStatement: 'Renamed M Street High School, 1891',
@@ -198,7 +198,7 @@ export const SEED_FACTS: readonly FactRecord[] = [
   },
   {
     id: asFactId('BB-F-000003'),
-    slug: 'renamed-paul-laurence-dunbar-1916',
+    slug: 'dunbar-rename-1916',
     statement:
       'In 1916, the school moved to a new building at 1st and N Streets NW (now 1301 New Jersey ' +
       'Avenue NW), designed by architect Snowden Ashford, and was renamed Paul Laurence Dunbar ' +
@@ -291,7 +291,7 @@ export const SEED_FACTS: readonly FactRecord[] = [
   },
   {
     id: asFactId('BB-F-000004'),
-    slug: 'listed-on-d-c-historic-sites-inventory-1975',
+    slug: 'dc-historic-inventory-1975',
     statement:
       'On April 29, 1975, Paul Laurence Dunbar High School was listed on the District of Columbia ' +
       'Inventory of Historic Sites.',
@@ -369,7 +369,7 @@ export const SEED_FACTS: readonly FactRecord[] = [
   },
   {
     id: asFactId('BB-F-000005'),
-    slug: '1916-and-1970s-buildings-demolished-rebuilt-2013',
+    slug: 'dunbar-campus-rebuild-2013',
     statement:
       'The school’s 1916 building was demolished in 1977, and its 1970s replacement was itself ' +
       'demolished in 2013; the current building, opened in 2013, honors the school’s history ' +
@@ -452,7 +452,7 @@ export const SEED_FACTS: readonly FactRecord[] = [
   },
   {
     id: asFactId('BB-F-000006'),
-    slug: 'dunbar-alumni-federation-organized-2002',
+    slug: 'alumni-federation-2002',
     statement:
       'The Dunbar Alumni Federation was organized in 2002 in the District of Columbia as a ' +
       '501(c)(3) nonprofit corporation, tax-exempt since July 2003, to preserve the school’s ' +
@@ -518,7 +518,7 @@ export const SEED_FACTS: readonly FactRecord[] = [
   },
   {
     id: asFactId('BB-F-000007'),
-    slug: 'draft-nrhp-listing-date-unverified',
+    slug: 'draft-nrhp-date',
     statement:
       'Draft: at least one secondary aggregator references a separate National Register of ' +
       'Historic Places listing for the school dated 1986; this date has not yet been ' +

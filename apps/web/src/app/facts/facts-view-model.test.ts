@@ -48,9 +48,10 @@ test('buildFactLibraryViewModel filters by exact confidence grade', () => {
   );
 });
 
-test('resolvePublicFact returns not_public for draft facts and ok for published facts', () => {
+test('resolvePublicFact redirects bare ids and legacy two-segment paths to the slug URL', () => {
   assert.equal(resolvePublicFact('BB-F-000007').kind, 'not_public');
-  assert.equal(resolvePublicFact('BB-F-000001').kind, 'ok');
+  assert.equal(resolvePublicFact('BB-F-000001').kind, 'redirect');
+  assert.equal(resolvePublicFact('dunbar-founding-1870').kind, 'ok');
   assert.equal(resolvePublicFact('not-an-id').kind, 'not_found');
 });
 
@@ -58,7 +59,7 @@ test('resolvePublicFact redirects stale cosmetic slugs', () => {
   const resolved = resolvePublicFact('BB-F-000001', 'stale-slug');
   assert.equal(resolved.kind, 'redirect');
   if (resolved.kind === 'redirect') {
-    assert.match(resolved.destination, /\/facts\/BB-F-000001\/dunbar-founded-1870-in-church-basement$/);
+    assert.equal(resolved.destination, '/facts/dunbar-founding-1870');
   }
 });
 
@@ -74,7 +75,7 @@ test('resolveFactRevision resolves an existing revision and rejects unknown numb
 });
 
 test('buildFactJsonExport never emits ClaimReview JSON-LD', () => {
-  const fact = resolvePublicFact('BB-F-000001');
+  const fact = resolvePublicFact('dunbar-founding-1870');
   assert.equal(fact.kind, 'ok');
   if (fact.kind === 'ok') {
     const payload = buildFactJsonExport(fact.fact, 'https://example.org');
