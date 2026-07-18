@@ -80,18 +80,16 @@
   }
 }
 
-/* Invisible, precisely-hit-targeted overlay for the GL `circle` layer's visible marker beneath it
-   (explore-style.ts owns the paint — color/radius by kind, evidence, confidence). This button
-   exists only so the marker is clickable/hoverable; it is pulled out of the tab order
-   (MapStage.tsx sets tabIndex=-1) because the synchronized result list is this map's accessible
-   parity surface. */
+/* Kind-colored hit-target disc aligned with GL `explore-point` / KindBadge shade.
+   `--ds-map-entity-shade` is set per feature in MapStage.syncCircularMarkers from the same
+   `displayEncodingFor` hex carried on GeoJSON `properties.shade`. */
 .ds-map-entity-marker {
   width: 1.125rem;
   height: 1.125rem;
   padding: 0;
-  border: 0;
+  border: 1.5px solid color-mix(in srgb, var(--ds-map-entity-shade, #b86b2a) 85%, #f4efe5);
   border-radius: 50%;
-  background: transparent;
+  background: color-mix(in srgb, var(--ds-map-entity-shade, #b86b2a) 82%, transparent);
   cursor: pointer;
 }
 

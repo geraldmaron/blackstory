@@ -132,15 +132,15 @@ const GEOGRAPHY_LAYER_IDS = new Set([
 ]);
 
 /** The entity-marker stack from `buildExploreMapStyle`, in its stacking order: halo beneath
- * point beneath the event glyph ring, clusters above singles. Added once (add-if-missing, like
- * geography layers) and never removed on a data patch — their paint is entirely data-driven
- * (kind tables + marker-size expressions), so a patch only ever needs the source `setData`. */
+ * point beneath the event glyph ring, clusters above singles, selected ring on top. Added once
+ * then paint-refreshed on style rebuild (theme plate stroke, kind shade expressions). */
 const ENTITY_LAYER_IDS = new Set([
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_SELECTED_POINT_LAYER_ID,
 ]);
 
 /** Sources whose real geometry arrives from a lazy client fetch (`loadStatePolygonsWithDensity`,
@@ -200,6 +200,17 @@ function syncCircularMarkers(
     el.className = 'ds-map-entity-marker';
     el.setAttribute('aria-label', label);
     el.title = label;
+    // Mirror the GL circle kind shade so the hit-target disc matches KindBadge / explore-point
+    // (transparent overlays previously left only the sand halo readable as "the" circle color).
+    const shade =
+      typeof feature.properties.shade === 'string' && feature.properties.shade.length > 0
+        ? feature.properties.shade
+        : brandPalette.copperPin;
+    el.style.setProperty('--ds-map-entity-shade', shade);
+    el.dataset.kind = feature.properties.kind;
+    if (typeof feature.properties.mapTone === 'string') {
+      el.dataset.mapTone = feature.properties.mapTone;
+    }
     // The map canvas is `aria-hidden` (see `MapStageProvider`'s render) — the synchronized
     // result list is the accessible-parity surface for the same entities (NarrativeCard's doc
     // comment), so these buttons are deliberately pulled out of the tab order rather than left
@@ -356,8 +367,20 @@ function applyGeographyStyle(map: MapLibreMap, style: StyleSpecification): void 
       }
       continue;
     }
-    if (ENTITY_LAYER_IDS.has(layer.id) && !map.getLayer(layer.id)) {
-      map.addLayer(layer as LayerSpecification);
+    if (ENTITY_LAYER_IDS.has(layer.id)) {
+      if (!map.getLayer(layer.id)) {
+        map.addLayer(layer as LayerSpecification);
+      } else if (layer.type === 'circle' && 'paint' in layer && layer.paint) {
+        // Refresh kind-shade / plate-dependent paint when the style rebuilds (theme toggle,
+        // encoding updates). Source geometry still updates via setData above.
+        for (const [paintKey, paintValue] of Object.entries(layer.paint)) {
+          try {
+            map.setPaintProperty(layer.id, paintKey, paintValue);
+          } catch (error) {
+            console.error(`[MapStage] setPaintProperty ${layer.id}.${paintKey} failed`, error);
+          }
+        }
+      }
     }
   }
 }

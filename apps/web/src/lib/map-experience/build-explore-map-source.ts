@@ -23,7 +23,7 @@ import type { GeoPrecisionTier } from '@repo/domain/geography/display-radius';
 import type { PublicClaimView, PublicEntityView } from '../../data/public-seed';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
-import { mapToneFromTopics } from './kind-encoding';
+import { displayEncodingFor, mapToneFromTopics } from './kind-encoding';
 
 export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
 
@@ -60,6 +60,14 @@ export type ExploreMapFeatureProperties = {
   readonly topicIds?: readonly string[];
   /** Semantic tone override from topics (massacre / plantation / epicenter). */
   readonly mapTone?: string;
+  /**
+   * Denormalized kind/tone shade from `displayEncodingFor` — the same hex KindBadge paints.
+   * Carried on the feature so MapLibre circle layers can `['get', 'shade']` without re-deriving
+   * the encoding table at paint time (and so HTML hit-targets can match the GL fill).
+   */
+  readonly shade: string;
+  /** Denormalized glyph identity from `displayEncodingFor` (WCAG non-color channel). */
+  readonly glyph: string;
   readonly stateFips?: string;
   readonly statePostalCode?: string;
   readonly stateName?: string;
@@ -189,6 +197,7 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
     ...(feature.properties.statePostalCode ? { statePostalCode: feature.properties.statePostalCode } : {}),
   });
   const mapTone = mapToneFromTopics(entity.topicTags);
+  const encoding = displayEncodingFor(feature.properties.kind, mapTone);
 
   return {
     type: 'Feature',
@@ -211,6 +220,8 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
       topicTags: entity.topicTags,
       ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),
       ...(mapTone !== undefined ? { mapTone } : {}),
+      shade: encoding.shade,
+      glyph: encoding.glyph,
       ...(feature.properties.stateFips ? { stateFips: feature.properties.stateFips } : {}),
       ...(feature.properties.statePostalCode ? { statePostalCode: feature.properties.statePostalCode } : {}),
       ...(feature.properties.stateName ? { stateName: feature.properties.stateName } : {}),

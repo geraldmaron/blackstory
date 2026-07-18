@@ -37,11 +37,13 @@ function feature(
       evidenceCount: 1,
       confidenceTier: 'high',
       topicTags: [],
+      shade: '#C48A4A',
+      glyph: 'circle',
       ...(state
         ? { stateFips: state.fips, statePostalCode: state.postal, stateName: state.name }
         : {}),
     },
-  } as ExploreMapFeature;
+  };
 }
 
 function collectionOf(features: readonly ExploreMapFeature[]): ExploreMapFeatureCollection {

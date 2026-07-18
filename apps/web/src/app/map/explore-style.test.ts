@@ -186,11 +186,13 @@ function collectColorLeaves(expression: unknown, into: string[] = []): readonly 
   return into;
 }
 
-test('the point layer colors kinds and semantic tones from DIGNITY_PALETTE via mapTone-aware case', () => {
+test('the point layer colors kinds and semantic tones from DIGNITY_PALETTE via shade-aware case', () => {
   const style = buildStyleFixture(true);
   const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
-  const colorExpr = pointLayer.paint?.['circle-color'];
-  assert.equal((colorExpr as unknown[])[0], 'case');
+  const colorExpr = pointLayer.paint?.['circle-color'] as unknown[];
+  assert.equal(colorExpr[0], 'case');
+  assert.deepEqual(colorExpr[1], ['has', 'shade']);
+  assert.deepEqual(colorExpr[2], ['get', 'shade']);
   const colorOutputs = collectColorLeaves(colorExpr);
   const expectedShades = KIND_ENCODING_ENTRIES.map(([, entry]) => entry.shade);
   for (const shade of expectedShades) {
@@ -203,6 +205,24 @@ test('the point layer colors kinds and semantic tones from DIGNITY_PALETTE via m
   for (const output of colorOutputs) {
     assert.ok(allowed.has(output), `circle-color output "${output}" must come from DIGNITY_PALETTE`);
   }
+});
+
+test('halo and event-glyph layers use the same kind color expression as the point fill', () => {
+  const style = buildStyleFixture(true);
+  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
+  const haloLayer = layerById(style, EXPLORE_UNCLUSTERED_HALO_LAYER_ID);
+  const eventGlyphLayer = layerById(style, EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID);
+  assert.deepEqual(
+    haloLayer.paint?.['circle-color'],
+    pointLayer.paint?.['circle-color'],
+    'halo must share kind shade with the point (not a flat sand wash)',
+  );
+  assert.deepEqual(
+    eventGlyphLayer.paint?.['circle-stroke-color'],
+    pointLayer.paint?.['circle-color'],
+    'event glyph stroke must share kind shade with the point',
+  );
+  assert.notEqual(haloLayer.paint?.['circle-color'], DIGNITY_PALETTE.pointHalo);
 });
 
 test('the point layer\'s fill/stroke signature (the non-color glyph channel) is not identical across every kind', () => {
@@ -233,7 +253,11 @@ test('the event kind gets a second, unfilled glyph-ring layer filtered to kind =
   const style = buildStyleFixture(true);
   const eventGlyphLayer = layerById(style, EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID);
   assert.equal(eventGlyphLayer.paint?.['circle-opacity'], 0, 'the event glyph ring must be unfilled (stroke only)');
-  assert.equal(eventGlyphLayer.paint?.['circle-stroke-color'], DIGNITY_PALETTE.kindEvent);
+  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
+  assert.deepEqual(
+    eventGlyphLayer.paint?.['circle-stroke-color'],
+    pointLayer.paint?.['circle-color'],
+  );
   const layerSpec = style.layers.find((layer) => layer.id === EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID) as {
     filter?: unknown;
   };

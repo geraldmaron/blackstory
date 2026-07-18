@@ -25,6 +25,8 @@ function feature(overrides: Partial<ExploreMapFeature['properties']>): ExploreMa
       evidenceCount: 1,
       confidenceTier: 'medium',
       topicTags: ['education'],
+      shade: '#C48A4A',
+      glyph: 'circle',
       ...overrides,
     },
   };

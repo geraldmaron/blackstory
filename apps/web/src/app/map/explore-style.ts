@@ -147,6 +147,8 @@ function kindMatchExpression(
 }
 
 function kindColorExpression(): ExpressionSpecification {
+  // Prefer the denormalized `shade` property (same hex KindBadge uses via displayEncodingFor).
+  // Fall back to kind/mapTone match tables for any older GeoJSON that lacks `shade`.
   const semanticCases = Object.entries(MAP_SEMANTIC_TONE_ENCODING).flatMap(([tone, entry]) => [
     tone,
     entry.shade,
@@ -154,6 +156,8 @@ function kindColorExpression(): ExpressionSpecification {
   const kindCases = KIND_ENCODING_ENTRIES.flatMap(([kind, entry]) => [kind, entry.shade]);
   return [
     'case',
+    ['has', 'shade'],
+    ['get', 'shade'],
     ['has', 'mapTone'],
     ['match', ['get', 'mapTone'], ...semanticCases, DEFAULT_KIND_ENCODING.shade],
     ['match', ['get', 'kind'], ...kindCases, DEFAULT_KIND_ENCODING.shade],
@@ -451,12 +455,12 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         filter: ['!', ['has', 'point_count']],
         paint: {
           // data-driven radius (marker-size.ts's formula + the fixed halo offset), one
-          // source of truth with the point layer below. Halo color stays neutral/decorative
-          // (not kind-carrying) kind is fully carried by the point layer's shade + glyph
-          // signature and, for `event`, the extra glyph layer below.
+          // source of truth with the point layer below. Halo uses the same kind/tone shade as
+          // the point (and KindBadge) at low opacity — a neutral sand wash was washing every
+          // marker toward the same warm tone and hiding kind color coding.
           'circle-radius': markerHaloRadiusExpression(),
-          'circle-color': DIGNITY_PALETTE.pointHalo,
-          'circle-opacity': 0.32,
+          'circle-color': kindColorExpression(),
+          'circle-opacity': 0.22,
         },
       },
       {
@@ -489,10 +493,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           // would nest the zoom expression and be rejected by the style spec (see
           // `markerRadiusPlusExpression`'s doc comment).
           'circle-radius': markerRadiusPlusExpression(4),
-          'circle-color': DIGNITY_PALETTE.kindEvent,
+          'circle-color': kindColorExpression(),
           'circle-opacity': 0,
           'circle-stroke-width': 1.5,
-          'circle-stroke-color': DIGNITY_PALETTE.kindEvent,
+          'circle-stroke-color': kindColorExpression(),
           'circle-stroke-opacity': 0.9,
         },
       },
