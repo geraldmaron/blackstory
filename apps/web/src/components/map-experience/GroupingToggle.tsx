@@ -1,6 +1,6 @@
 /**
  * Accessible toggle for map point grouping (clustering when zoomed out). Matches the
- * density-layer toggle pattern: native `aria-pressed` button, shareable via `/explore?group=0`.
+ * density-layer toggle pattern: native `aria-pressed` button, shareable via `/explore?group=1`.
  */
 import React from 'react';
 import { Button } from '@repo/ui';

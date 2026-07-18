@@ -86,7 +86,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const exploreHref = buildExploreHref({
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
     density: false,
-    group: true,
+    group: false,
     lines: false,
     selected: entity.id,
     ...(geoAnchor

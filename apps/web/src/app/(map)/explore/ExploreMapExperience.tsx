@@ -23,7 +23,7 @@ import { DensityLayerToggle } from '../../../components/map-experience/DensityLa
 import { GroupingToggle } from '../../../components/map-experience/GroupingToggle';
 import { MapExperienceLegend } from '../../../components/map-experience/MapExperienceLegend';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
-import { CAMERA_POINT_ZOOM } from '../../../lib/map-experience/camera-presets';
+import { CAMERA_POINT_ZOOM, prefersReducedMotion } from '../../../lib/map-experience/camera-presets';
 import { DEGRADED_MODE_COPY } from '../../../lib/map-experience/snapshot-mode';
 import {
   buildExploreHref,
@@ -280,8 +280,16 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   );
 
   // Deep link entry: reconcile the camera against the URL exactly once on mount (`easeTo`, never
-  // a cinematic arc — arriving at a URL is a restore, not a descent).
+  // a cinematic arc — arriving at a URL is a restore, not a descent). Skip when the hero set
+  // TRANSITION_FLAG — its in-flight camera descent must not be interrupted.
   useEffect(() => {
+    try {
+      if (window.sessionStorage.getItem(TRANSITION_FLAG)) {
+        return;
+      }
+    } catch {
+      // sessionStorage unavailable — fall through to URL reconcile.
+    }
     reconcileCamera(initial.viewState, 'ease');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

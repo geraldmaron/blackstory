@@ -25,8 +25,8 @@ export type ExploreViewState = {
   readonly state?: string;
   readonly density: boolean;
   /**
-   * When true (default), nearby points aggregate while zoomed out. Serialize as `group=0`
-   * only when the reader turns grouping off.
+   * When true, nearby points aggregate while zoomed out (opt-in via `group=1`). Omitted from
+   * shareable URLs when off (the default).
    */
   readonly group: boolean;
   /** Draw evidence-backed History relationship lines between entity anchors.  */
@@ -76,8 +76,8 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const decadeRaw = firstValue(raw.decade)?.trim();
   const edgeRaw = firstValue(raw.edge)?.trim();
 
-  // Grouping defaults on; only an explicit off flag turns it off (`group=0` / `false`).
-  const groupOff = groupRaw === '0' || groupRaw === 'false';
+  // Grouping defaults off; explicit on flags opt in (`group=1` / `true`).
+  const groupOn = groupRaw === '1' || groupRaw === 'true';
 
   return {
     filters,
@@ -87,7 +87,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     ...(selectedRaw ? { selected: selectedRaw } : {}),
     ...(stateRaw && stateRaw !== 'ALL' ? { state: stateRaw } : {}),
     density: densityRaw === '1' || densityRaw === 'true',
-    group: !groupOff,
+    group: groupOn,
     lines: linesRaw === '1' || linesRaw === 'true',
     ...(decadeRaw ? { decade: decadeRaw } : {}),
     ...(edgeRaw ? { edge: edgeRaw } : {}),
@@ -112,7 +112,7 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   if (state.selected) params.set('selected', state.selected);
   if (state.state) params.set('state', state.state);
   if (state.density) params.set('density', '1');
-  if (!state.group) params.set('group', '0');
+  if (state.group) params.set('group', '1');
   if (state.lines) params.set('lines', '1');
   if (state.decade) params.set('decade', state.decade);
   if (state.edge) params.set('edge', state.edge);

@@ -49,7 +49,7 @@ export type HeroStageProps = {
 const RESTING_HREF = buildExploreHref({
   filters: DEFAULT_EXPLORE_FILTERS,
   density: false,
-  group: true,
+  group: false,
   lines: false,
 });
 const TRANSITION_FLAG = 'ds-map-transition';
@@ -183,7 +183,7 @@ export function HeroStage({
           buildExploreHref({
             filters: DEFAULT_EXPLORE_FILTERS,
             density: false,
-            group: true,
+            group: false,
             lines: false,
             state: postalCode,
           }),
@@ -194,7 +194,7 @@ export function HeroStage({
           buildExploreHref({
             filters: DEFAULT_EXPLORE_FILTERS,
             density: false,
-            group: true,
+            group: false,
             lines: false,
             viewport,
           }),

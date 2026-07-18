@@ -18,7 +18,7 @@ test('an empty query string parses to the "all" default filter state with no vie
   assert.equal(parsed.viewport, undefined);
   assert.equal(parsed.selected, undefined);
   assert.equal(parsed.density, false);
-  assert.equal(parsed.group, true);
+  assert.equal(parsed.group, false);
   assert.equal(parsed.lines, false);
   assert.equal(parsed.decade, undefined);
   assert.equal(parsed.edge, undefined);
@@ -39,7 +39,7 @@ test('round-trips a full view state through build -> parse', () => {
 
   const href = buildExploreHref(state);
   assert.match(href, /^\/explore\?/);
-  assert.match(href, /group=0/);
+  assert.doesNotMatch(href, /group=/);
 
   const [, qs] = href.split('?');
   const parsed = parseExploreSearchParams(Object.fromEntries(new URLSearchParams(qs)));
@@ -62,17 +62,26 @@ test('default filter values are omitted from the query string (minimal shareable
   const qs = buildExploreSearchParams({
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
     density: false,
-    group: true,
+    group: false,
     lines: false,
   });
   assert.equal(qs, '');
 });
 
-test('group=0 turns nearby-point grouping off; omitted group defaults on', () => {
+test('group=1 turns nearby-point grouping on; omitted group defaults off', () => {
+  assert.equal(parseExploreSearchParams({ group: '1' }).group, true);
+  assert.equal(parseExploreSearchParams({ group: 'true' }).group, true);
   assert.equal(parseExploreSearchParams({ group: '0' }).group, false);
   assert.equal(parseExploreSearchParams({ group: 'false' }).group, false);
-  assert.equal(parseExploreSearchParams({ group: '1' }).group, true);
-  assert.equal(parseExploreSearchParams({}).group, true);
+  assert.equal(parseExploreSearchParams({}).group, false);
+});
+
+test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
+  assert.match(buildExploreSearchParams({ filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' }, density: false, group: true, lines: false }), /^group=1$/);
+  assert.equal(
+    buildExploreSearchParams({ filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' }, density: false, group: false, lines: false }),
+    '',
+  );
 });
 
 test('viewport requires all three of lat/lng/zoom to be present and finite', () => {

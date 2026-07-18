@@ -433,7 +433,7 @@ export type MapStageDataPatch = {
   readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
   readonly densityEnabled: boolean;
   readonly densityLevels: readonly StateDensityLevel[];
-  /** When false, recreate the entities source without MapLibre clustering. Default true. */
+  /** When false, recreate the entities source without MapLibre clustering. Omitted patches keep the current stage value (default false). */
   readonly clusteringEnabled?: boolean;
   readonly historyEdgesEnabled: boolean;
   readonly historyEdgeCollection: HistoryEdgeLineCollection;
@@ -571,7 +571,7 @@ export function MapStageProvider({
     jurisdictionAreaFeatures: initialJurisdictionAreaFeatures,
     densityEnabled: false,
     densityLevels: [],
-    clusteringEnabled: true,
+    clusteringEnabled: false,
     historyEdgesEnabled: false,
     historyEdgeCollection: EMPTY_EDGE_COLLECTION,
     selectedState: undefined,
@@ -662,7 +662,7 @@ export function MapStageProvider({
 
   const patchData = useCallback(
     (patch: MapStageDataPatch) => {
-      const clusteringEnabled = patch.clusteringEnabled !== false;
+      const clusteringEnabled = patch.clusteringEnabled ?? configRef.current.clusteringEnabled;
       const clusteringChanged = clusteringEnabled !== configRef.current.clusteringEnabled;
       const style = buildExploreMapStyle({
         featureCollection: patch.featureCollection,

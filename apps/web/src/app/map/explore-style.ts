@@ -201,7 +201,7 @@ export type BuildExploreMapStyleInput = {
   readonly densityLayerEnabled: boolean;
   readonly historyEdgesEnabled?: boolean;
   /**
-   * When true (default), nearby points aggregate while zoomed out. When false, every
+   * When true, nearby points aggregate while zoomed out (opt-in via `/explore?group=1`). When false, every
    * unclustered disc stays visible at national/regional zoom — the shareable `group`
    * URL toggle on `/explore`.
    */
