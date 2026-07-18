@@ -75,7 +75,11 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         ) : null}
       </div>
 
-      <h3 className="bp-nc__title">{properties.displayName}</h3>
+      <h3 className="bp-nc__title">
+        <Link className="bp-nc__title-link" href={properties.href}>
+          {properties.displayName}
+        </Link>
+      </h3>
       <p className="bp-nc__story">{properties.oneLineStory}</p>
 
       <dl className="bp-nc__facts">
@@ -117,9 +121,9 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
 
       <p className="bp-nc__precision">{radiusAffordanceLabel(feature)}</p>
 
-      <a className="bp-cta bp-cta--copper bp-nc__action" href={properties.href}>
+      <Link className="bp-cta bp-cta--copper bp-nc__action" href={properties.href}>
         Open full record
-      </a>
+      </Link>
     </article>
   );
 }

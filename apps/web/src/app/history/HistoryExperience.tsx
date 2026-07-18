@@ -153,7 +153,6 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
     nodes: view.nodes,
     labelledBy: 'history-results-heading',
     ...(view.viewState.selected ? { selectedId: view.viewState.selected } : {}),
-    onSelect: handleSelectNode,
   };
 
   const graphProps = {

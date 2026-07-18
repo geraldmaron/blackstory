@@ -234,6 +234,18 @@
   line-height: 1.3;
 }
 
+.bp-nc__title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.bp-nc__title-link:hover,
+.bp-nc__title-link:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
 .bp-nc__story {
   margin: 0;
   font-family: var(--bp-font-editorial);

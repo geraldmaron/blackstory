@@ -1,14 +1,11 @@
 /**
- * The accessible list peer for the map — synchronized list is a full keyboard + screen-reader
- * peer with shared filter/viewport URL state (a peer, not an afterthought). Every item is a real
- * link to the entity page; selection state (`selectedId`) mirrors whatever point is open on the
- * map, in both directions — selecting a list item and selecting a map point produce the same
- * `onSelect` callback, so keyboard-only and screen-reader users reach every narrative off-ramp
- * the map offers without touching the canvas.
+ * The accessible list peer for the map. Every item is a real link to the entity
+ * page — click/activate always navigates. Selection highlighting (`selectedId` /
+ * `aria-current`) still mirrors the map when a point is open; map markers open
+ * the narrative off-ramp, while these cards open the full record.
  *
- * Meta rows use a fixed labeled layout (Kind / Era / Confidence / Evidence / Where) so cards
- * stay uniform when optional fields are sparse — missing Where renders an em dash, never a
- * shifting slot order.
+ * Meta rows use a fixed labeled layout (Kind / Era / Confidence / Evidence / Where)
+ * so cards stay uniform when optional fields are sparse.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -23,7 +20,6 @@ void React;
 export type SynchronizedResultListProps = {
   readonly features: readonly ExploreMapFeature[];
   readonly selectedId?: string;
-  readonly onSelect?: (entityId: string) => void;
   readonly labelledBy?: string;
   readonly className?: string;
 };
@@ -37,7 +33,6 @@ function eraLabel(eraBuckets: readonly string[]): string {
 export function SynchronizedResultList({
   features,
   selectedId,
-  onSelect,
   labelledBy,
   className,
 }: SynchronizedResultListProps) {
@@ -54,17 +49,6 @@ export function SynchronizedResultList({
               href={properties.href}
               aria-current={isSelected ? 'true' : undefined}
               data-entity-id={properties.entityId}
-              {...(onSelect
-                ? {
-                    onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
-                      // A synchronized selection (highlight on the map + open its narrative card)
-                      // is a progressive enhancement over the always-working link navigation
-                      // only intercept the click when a live map is actually mounted to react to it.
-                      event.preventDefault();
-                      onSelect(properties.entityId);
-                    },
-                  }
-                : {})}
             >
               <h3 className="bp-result-list__title">{properties.displayName}</h3>
               <p className="bp-result-list__summary">{properties.oneLineStory}</p>

@@ -433,7 +433,6 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     features: sortedListFeatures,
     labelledBy: 'explore-results-heading',
     ...(view.viewState.selected ? { selectedId: view.viewState.selected } : {}),
-    ...(stage.mapAvailable ? { onSelect: handleSelect } : {}),
   };
 
   return (

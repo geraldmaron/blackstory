@@ -30,10 +30,19 @@ test('marks the selected item with aria-current for screen-reader parity with th
   assert.match(html, /aria-current="true"/);
 });
 
-test('renders without a selection or onSelect handler (no-JS-safe plain link list)', () => {
+test('renders without a selection (no-JS-safe plain link list)', () => {
   const features = buildFeatures();
   const html = renderToStaticMarkup(createElement(SynchronizedResultList, { features }));
   assert.doesNotMatch(html, /aria-current="true"/);
+});
+
+test('entity cards are plain navigable links (never intercept click with preventDefault)', () => {
+  const features = buildFeatures();
+  const html = renderToStaticMarkup(createElement(SynchronizedResultList, { features }));
+  assert.doesNotMatch(html, /onClick/);
+  for (const feature of features) {
+    assert.match(html, new RegExp(`href="${feature.properties.href}"`));
+  }
 });
 
 test('uses a uniform labeled meta layout with short confidence values', () => {

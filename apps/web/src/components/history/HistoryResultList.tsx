@@ -1,7 +1,8 @@
 /**
- * Synchronized list peer for `/history`. Every item links to the
- * entity page; selection state mirrors the graph panel and narrative card. Keyboard and
- * screen-reader users reach every node and edge off-ramp without relying on the graph visualization.
+ * Synchronized list peer for `/history`. Every item is a real link to the entity
+ * page — click/activate always navigates. Selection highlighting still mirrors
+ * the graph when a node is open; graph visualization can select without blocking
+ * list navigation to the full record.
  */
 import React from 'react';
 import { cx } from '@blap/ui';
@@ -12,7 +13,6 @@ void React;
 export type HistoryResultListProps = {
   readonly nodes: readonly HistoryNodeView[];
   readonly selectedId?: string;
-  readonly onSelect?: (entityId: string) => void;
   readonly labelledBy?: string;
   readonly className?: string;
 };
@@ -20,7 +20,6 @@ export type HistoryResultListProps = {
 export function HistoryResultList({
   nodes,
   selectedId,
-  onSelect,
   labelledBy,
   className,
 }: HistoryResultListProps) {
@@ -36,14 +35,6 @@ export function HistoryResultList({
               href={node.href}
               aria-current={isSelected ? 'true' : undefined}
               data-entity-id={node.entityId}
-              onClick={
-                onSelect
-                  ? (event) => {
-                      event.preventDefault();
-                      onSelect(node.entityId);
-                    }
-                  : undefined
-              }
             >
               <h3 className="bp-result-list__title">{node.displayName}</h3>
               <p className="bp-result-list__summary">{node.summary}</p>
