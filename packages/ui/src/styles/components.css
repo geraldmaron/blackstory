@@ -412,13 +412,21 @@
   cursor: not-allowed;
 }
 
+/* Copper is the action register (guide p.7 "Black and paper lead. Copper points." — primary
+   actions are named orientation moments). Same recipe as shell.css's .bb-cta--copper: graphic
+   copper plate, ink text in light, near-black inverse ink in dark (raw copper never carries
+   light body text — the accessible-pairs table). */
 .bb-button--primary {
-  background: var(--bb-inverse);
+  background: var(--bb-accent-graphic);
+  color: var(--bb-ink);
+}
+
+[data-theme='dark'] .bb-button--primary {
   color: var(--bb-inverse-ink);
 }
 
 .bb-button--primary:hover:not(:disabled) {
-  filter: brightness(1.08);
+  opacity: 0.88;
 }
 
 .bb-button--secondary {
