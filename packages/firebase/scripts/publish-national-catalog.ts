@@ -123,12 +123,14 @@ function toProjectionDoc(entry: CatalogEntry, releaseId: string) {
     ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
     ...(entry.sensitivityClass !== undefined ? { sensitivityClass: entry.sensitivityClass } : {}),
     topicTags: entry.topicTags ?? [],
+    notabilityLabels: ['A documented site in the active public release.'],
     ...(entry.historicalContext !== undefined ? { historicalContext: entry.historicalContext } : {}),
   };
   return publicEntityProjectionSchema.parse(doc);
 }
 
 function toSearchDoc(entry: CatalogEntry, releaseId: string, claimCount: number) {
+  const notabilityLabel = 'A documented site in the active public release.';
   const doc = {
     id: entry.id,
     releaseId,
@@ -141,8 +143,14 @@ function toSearchDoc(entry: CatalogEntry, releaseId: string, claimCount: number)
     jurisdictionState: entry.jurisdictionLabel,
     ...(entry.status !== undefined ? { status: entry.status } : {}),
     eraBuckets: entry.eraBuckets ?? [],
-    notabilityBasis: [],
-    notabilityLabels: [],
+    notabilityBasis: [
+      {
+        criterion: 'documented_site' as const,
+        note: notabilityLabel,
+        evidenceIds: [] as string[],
+      },
+    ],
+    notabilityLabels: [notabilityLabel],
     ...(entry.sensitivityClass !== undefined ? { sensitivityClass: entry.sensitivityClass } : {}),
     recordMaturity: claimCount > 0 ? 'partial_enrichment' : 'projection_stub',
     researchCoverage: claimCount >= 2 ? ('partial' as const) : ('minimal' as const),

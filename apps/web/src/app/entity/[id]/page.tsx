@@ -24,10 +24,9 @@ import { CompactFactReference } from '../../../components/facts';
 import { HowToReadThisRecord } from '../../../components/trust';
 import { WhyThisAppears } from '../../../components/why-appears';
 import { seedFactsForEntity } from '../../../data/facts-seed';
-import { listPublicEntities } from '../../../data/public-seed';
 import { buildExploreHref, geoAnchorFor, highestConfidence, mapToneFromTopics } from '../../../lib/map-experience';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
-import { resolvePublicEntityView } from '../../../lib/public-data/source';
+import { listPublicEntityViews, resolvePublicEntityView } from '../../../lib/public-data/source';
 import { buildWhyThisAppearsForEntity, toEvidenceClaimInputs } from './adapters';
 import { deriveHistoricalFraming } from './entity-view-model';
 
@@ -36,7 +35,8 @@ type EntityPageProps = {
 };
 
 export async function generateStaticParams() {
-  return listPublicEntities().map((entity) => ({ id: entity.id }));
+  const { data: entities } = await listPublicEntityViews();
+  return entities.map((entity) => ({ id: entity.id }));
 }
 
 export async function generateMetadata({ params }: EntityPageProps) {
@@ -146,7 +146,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
           <div className="bp-at-a-glance__row">
             <dt>Confidence</dt>
             <dd>
-              <ConfidenceMark tier={confidenceTier} />
+              <ConfidenceMark tier={confidenceTier} labeled />
             </dd>
           </div>
           <div className="bp-at-a-glance__row">

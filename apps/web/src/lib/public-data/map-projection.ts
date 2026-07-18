@@ -216,9 +216,10 @@ export function mapProjectionToPublicEntityView(
     era: projection.eraBuckets?.[0] ?? 'unknown',
     ...(projection.status !== undefined ? { status: projection.status } : {}),
     ...(projection.eraBuckets !== undefined ? { eraBuckets: projection.eraBuckets } : {}),
-    ...(projection.notabilityLabels !== undefined
-      ? { notabilityLabels: projection.notabilityLabels }
-      : {}),
+    notabilityLabels:
+      projection.notabilityLabels && projection.notabilityLabels.length > 0
+        ? projection.notabilityLabels
+        : ['A documented site in the active public release.'],
     ...(projection.sensitivityClass !== undefined
       ? { sensitivityClass: projection.sensitivityClass }
       : {}),

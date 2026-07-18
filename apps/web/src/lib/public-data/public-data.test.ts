@@ -53,3 +53,19 @@ test('mapProjectionToPublicEntityView enriches known seed ids', () => {
   assert.ok(view.claims.length > 0);
   assert.equal(view.revision.releaseId, 'rel_seed_001');
 });
+
+test('live-only projections get a default notability label for search-pool parity', () => {
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_national_example_001',
+    releaseId: 'rel_live_001',
+    kind: 'place',
+    displayName: 'Example National Site',
+    nameLower: 'example national site',
+    summary: 'A live-only catalog projection without curated notability.',
+    claimIds: [],
+    jurisdictionLabel: 'Oklahoma',
+    locationLabel: 'Tulsa, Oklahoma',
+  });
+  assert.ok(view.notabilityLabels && view.notabilityLabels.length >= 1);
+  assert.match(view.notabilityLabels![0]!, /documented site/i);
+});

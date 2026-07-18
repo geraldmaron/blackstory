@@ -35,3 +35,16 @@ test('renders without a selection or onSelect handler (no-JS-safe plain link lis
   const html = renderToStaticMarkup(createElement(SynchronizedResultList, { features }));
   assert.doesNotMatch(html, /aria-current="true"/);
 });
+
+test('uses a uniform labeled meta layout with short confidence values', () => {
+  const features = buildFeatures();
+  const html = renderToStaticMarkup(createElement(SynchronizedResultList, { features }));
+  assert.match(html, /bp-result-list__meta--labeled/);
+  assert.match(html, /><dt>Kind<\/dt>/);
+  assert.match(html, /><dt>Era<\/dt>/);
+  assert.match(html, /><dt>Confidence<\/dt>/);
+  assert.match(html, /><dt>Evidence<\/dt>/);
+  assert.match(html, /><dt>Where<\/dt>/);
+  assert.match(html, /data-labeled="true"/);
+  assert.doesNotMatch(html, /high confidence/i);
+});

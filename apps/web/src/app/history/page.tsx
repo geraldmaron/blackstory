@@ -16,6 +16,7 @@ import {
   HISTORY_DECADE_FRAMING,
   HISTORY_DIGNITY_FRAMING,
 } from '../../lib/history';
+import { listPublicEntityViews } from '../../lib/public-data/source';
 import { HistoryExperience } from './HistoryExperience';
 import { buildHistoryViewModel } from './history-view-model';
 import './history.css';
@@ -34,7 +35,8 @@ type HistoryPageProps = {
 
 export default async function HistoryPage({ searchParams }: HistoryPageProps) {
   const params = await searchParams;
-  const view = buildHistoryViewModel(params);
+  const { data: entities, source } = await listPublicEntityViews();
+  const view = buildHistoryViewModel(params, entities);
 
   return (
     <main className="bp-container bp-page" id="main">
@@ -53,7 +55,7 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
       </header>
 
       <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
-        <SeedDataNotice compact />
+        {source !== 'live' ? <SeedDataNotice compact /> : null}
 
         <noscript>
           <div className="bp-history__noscript">

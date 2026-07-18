@@ -5,6 +5,10 @@
  * map, in both directions — selecting a list item and selecting a map point produce the same
  * `onSelect` callback, so keyboard-only and screen-reader users reach every narrative off-ramp
  * the map offers without touching the canvas.
+ *
+ * Meta rows use a fixed labeled layout (Kind / Era / Confidence / Evidence / Where) so cards
+ * stay uniform when optional fields are sparse — missing Where renders an em dash, never a
+ * shifting slot order.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -64,21 +68,38 @@ export function SynchronizedResultList({
             >
               <h3 className="bp-result-list__title">{properties.displayName}</h3>
               <p className="bp-result-list__summary">{properties.oneLineStory}</p>
-              <div className="bp-result-list__meta">
-                <KindBadge
-                  kind={properties.kind}
-                  density="compact"
-                  {...(properties.mapTone !== undefined ? { mapTone: properties.mapTone } : {})}
-                />
-                <span className="bp-mono">{eraLabel(properties.eraBuckets)}</span>
-                <ConfidenceMark tier={properties.confidenceTier} className="bp-sans" />
-                <span className="bp-sans">
-                  {properties.evidenceCount} claim{properties.evidenceCount === 1 ? '' : 's'}
-                </span>
-                {properties.statePostalCode ? (
-                  <span className="bp-mono">{properties.statePostalCode}</span>
-                ) : null}
-              </div>
+              <dl className="bp-result-list__meta bp-result-list__meta--labeled">
+                <div className="bp-result-meta">
+                  <dt>Kind</dt>
+                  <dd>
+                    <KindBadge
+                      kind={properties.kind}
+                      density="compact"
+                      {...(properties.mapTone !== undefined ? { mapTone: properties.mapTone } : {})}
+                    />
+                  </dd>
+                </div>
+                <div className="bp-result-meta">
+                  <dt>Era</dt>
+                  <dd className="bp-mono">{eraLabel(properties.eraBuckets)}</dd>
+                </div>
+                <div className="bp-result-meta">
+                  <dt>Confidence</dt>
+                  <dd>
+                    <ConfidenceMark tier={properties.confidenceTier} labeled className="bp-sans" />
+                  </dd>
+                </div>
+                <div className="bp-result-meta">
+                  <dt>Evidence</dt>
+                  <dd className="bp-sans">
+                    {properties.evidenceCount} claim{properties.evidenceCount === 1 ? '' : 's'}
+                  </dd>
+                </div>
+                <div className="bp-result-meta">
+                  <dt>Where</dt>
+                  <dd className="bp-mono">{properties.statePostalCode ?? '—'}</dd>
+                </div>
+              </dl>
             </Link>
           </li>
         );

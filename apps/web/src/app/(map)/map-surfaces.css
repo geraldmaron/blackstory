@@ -253,6 +253,43 @@
   margin-top: var(--bp-space-3);
 }
 
+.bp-result-list__meta--labeled {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--bp-space-2) var(--bp-space-3);
+  margin: 0;
+}
+
+.bp-result-meta {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.bp-result-meta dt {
+  margin: 0;
+  font-family: var(--bp-font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bp-ink-subtle);
+}
+
+.bp-result-meta dd {
+  margin: 0;
+  min-width: 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 22rem) {
+  .bp-result-list__meta--labeled {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .bp-explore-stage__legend {
   position: fixed;
   bottom: var(--bp-space-4);

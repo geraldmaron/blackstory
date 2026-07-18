@@ -5,8 +5,9 @@
  * lives in `./handler` (`handleSearchRequest`) and this module just wires production singletons.
  *
  * The endpoint sits behind App Check + rate limits and runs search guardrails
- * before executing the pure `runPublicSearch` pipeline over `getSnapshotSearchIndex`; see
- * `./handler` for the full request flow and the snapshot/live-reader seam.
+ * before executing the pure `runPublicSearch` pipeline over `getPublicSearchIndex`
+ * (live release entities when available, otherwise the bundled snapshot). See
+ * `./handler` for the full request flow.
  */
 import { getPublicSearchIndex } from '../../../lib/public-data/source';
 import { createSearchAppCheckGuard, type SearchAppCheckGuard } from './app-check-guard';

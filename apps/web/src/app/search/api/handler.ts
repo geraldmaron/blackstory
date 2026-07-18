@@ -8,13 +8,9 @@
  * This is the first REAL caller of `evaluateSearchQueryGuardrails`: adversarial input
  * (SQL/regex/field-selection injection, wildcard-only scans, oversize pages, forged cursors) is
  * bounded by the shared guardrail before any query runs, closing the gap where the guardrail
- * existed but had no wired caller. On allow it runs the pure `runPublicSearch` pipeline over an
- * in-memory snapshot of the seed catalog.
- *
- * Snapshot data source: the injected `searchIndex` comes from `getSnapshotSearchIndex`, matching
- * this app's `resolvePublicEntity` snapshot-first posture. A live Firestore
- * `publicSearchIndex` reader is a future seam that plugs in behind this same
- * contract; it is out of scope here.
+ * existed but had no wired caller. On allow it runs the pure `runPublicSearch` pipeline over the
+ * injected search index (live release rebuild via `getPublicSearchIndex`, or the bundled snapshot
+ * in tests and degraded mode).
  */
 import { NextResponse } from 'next/server';
 import { encodeSearchCursor, evaluateSearchQueryGuardrails, type SearchQueryInput } from '@blap/security';

@@ -92,15 +92,13 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         <div className="bp-nc__fact">
           <dt>Confidence</dt>
           <dd>
-            <ConfidenceMark tier={properties.confidenceTier} />
+            <ConfidenceMark tier={properties.confidenceTier} labeled />
           </dd>
         </div>
-        {properties.status ? (
-          <div className="bp-nc__fact">
-            <dt>Status</dt>
-            <dd>{properties.status}</dd>
-          </div>
-        ) : null}
+        <div className="bp-nc__fact">
+          <dt>Status</dt>
+          <dd>{properties.status ?? '—'}</dd>
+        </div>
       </dl>
 
       {properties.topicTags.length > 0 ? (

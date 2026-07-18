@@ -35,6 +35,23 @@ import { mapProjectionToPublicEntityView, type PublicProjectionInput } from './m
 export type { PublicReadSource };
 
 function toSearchableRecord(entity: PublicEntityView): SearchableEntityRecord {
+  // Live national-catalog projections may ship without curated notabilityBasis.
+  // They are already in the public release, so synthesize a single documented-site
+  // basis from labels / relevance copy so search stays in parity with the map pool
+  // (buildPublicSearchIndexDocs would otherwise skip them at the notability gate).
+  const labels =
+    entity.notabilityLabels && entity.notabilityLabels.length > 0
+      ? entity.notabilityLabels
+      : [
+          entity.relevanceExplanation?.trim() ||
+            'A documented site in the active public release.',
+        ];
+  const notabilityBasis = labels.map((note) => ({
+    criterion: 'documented_site' as const,
+    note,
+    evidenceIds: [] as string[],
+  }));
+
   return {
     id: entity.id,
     kind: entity.kind,
@@ -46,12 +63,8 @@ function toSearchableRecord(entity: PublicEntityView): SearchableEntityRecord {
     jurisdictionState: entity.jurisdictionLabel,
     ...(entity.status !== undefined ? { status: entity.status } : {}),
     eraBuckets: entity.eraBuckets ?? [],
-    notabilityBasis: (entity.notabilityLabels ?? []).map((note) => ({
-      criterion: 'documented_site' as const,
-      note,
-      evidenceIds: [],
-    })),
-    notabilityLabels: entity.notabilityLabels ?? [],
+    notabilityBasis,
+    notabilityLabels: labels,
     ...(entity.sensitivityClass !== undefined ? { sensitivityClass: entity.sensitivityClass } : {}),
     recordMaturity: entity.recordMaturity,
     researchCoverage: entity.researchCoverage,

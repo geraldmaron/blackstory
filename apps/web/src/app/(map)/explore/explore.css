@@ -274,8 +274,15 @@
 
 .bp-nc__fact dd {
   margin: 0;
+  min-width: 0;
   font-family: var(--bp-font-sans);
   font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.bp-nc__fact dd .bp-confidence-mark {
+  display: inline-flex;
+  max-width: 100%;
 }
 
 .bp-nc__tags {

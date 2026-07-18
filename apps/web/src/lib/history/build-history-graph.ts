@@ -234,8 +234,10 @@ export function buildHistoryEdges(
   return edges.sort((a, b) => a.sentence.localeCompare(b.sentence));
 }
 
-export function buildHistoryGraphContext(artifact: GraphReleaseArtifact) {
-  const entities = listPublicEntities();
+export function buildHistoryGraphContext(
+  artifact: GraphReleaseArtifact,
+  entities: readonly PublicEntityView[] = listPublicEntities(),
+) {
   const entitiesById = new Map(entities.map((entity) => [entity.id, entity]));
   const kinds = entities.map((entity) => entity.kind);
 
