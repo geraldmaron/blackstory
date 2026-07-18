@@ -58,6 +58,9 @@ export const firestorePaths = {
   entityLocation: (entityId: string, locationId: string) =>
     `${FIRESTORE_ROOT.canonicalEntities}/${entityId}/locations/${locationId}`,
   canonicalClaim: (claimId: string) => `${FIRESTORE_ROOT.canonicalClaims}/${claimId}`,
+  /** Versions subcollection: append-only, one immutable doc per claim revision. */
+  claimVersion: (claimId: string, versionId: string) =>
+    `${FIRESTORE_ROOT.canonicalClaims}/${claimId}/versions/${versionId}`,
   claimEvidenceLink: (linkId: string) => `${FIRESTORE_ROOT.claimEvidenceLinks}/${linkId}`,
   entityRelationship: (relationshipId: string) =>
     `${FIRESTORE_ROOT.entityRelationships}/${relationshipId}`,

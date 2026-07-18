@@ -13,8 +13,10 @@
  * against `NOTABILITY_RUBRIC`) so the real gate — not a bypass — is what lets these fixtures
  * into the index. A label with no exact rubric match falls back to `documented_site` (the
  * broadest criterion) rather than being dropped, since seed fixtures are known-good by
- * construction. `evidenceIds` is empty (the seed catalog has no evidence-record ids to cite) —
- * this is a demo-data limitation, not a claim that these fixtures are undocumented.
+ * construction. `evidenceIds` is empty (the seed catalog has no evidence-record ids to cite yet —
+ * see black-book-1fg9): that means "no structured evidence-id linkage recorded", not "zero
+ * evidence exists". Callers must not render `evidenceIds.length` as a documented-source count
+ * for these records (see `WhyThisAppears`, which hides the count when it's empty).
  */
 import {
   NOTABILITY_RUBRIC,

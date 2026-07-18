@@ -52,14 +52,19 @@ export type ClaimVersion = {
 
 /**
  * Canonical atomic claim: identity + current version pointer + measurements.
- * Prior versions remain in `versions` (or a versions subcollection in Firestore).
+ *
+ * Prior versions no longer live in an embedded array on this parent doc — each
+ * version is its own immutable document in the Firestore
+ * `canonicalClaims/{claimId}/versions/{versionId}` subcollection (append-only:
+ * creates allowed, updates/deletes denied). Load a specific version (or the
+ * current one, via `currentVersionId`) from that subcollection rather than
+ * expecting it embedded here. See `findCurrentClaimVersion`.
  */
-export type AtomicClaim = {
+export type CanonicalClaim = {
   readonly id: string;
   readonly entityId: string;
   readonly predicate: string;
   readonly currentVersionId: string;
-  readonly versions: readonly ClaimVersion[];
   readonly claimClass: ClaimClass;
   readonly workflowStatus: ClaimWorkflowStatus;
   readonly publicationStatus: ClaimPublicationStatus;
@@ -75,6 +80,10 @@ export type AtomicClaim = {
    * (never silently collapsed).
    */
   readonly preservedValues: readonly PreservedClaimValue[];
+  /** ISO timestamp of the last independent verification pass over this claim, if any. */
+  readonly lastVerifiedAt?: string;
+  /** Version id that was current as of the last verification pass, if any. */
+  readonly lastVerifiedVersionId?: string;
   readonly createdAt: string;
   readonly updatedAt: string;
 };
@@ -117,42 +126,69 @@ export function assertClaimVersionValid(version: ClaimVersion): void {
   assertProceduralStatusRecognized(version.proceduralStatus);
 }
 
-export function assertAtomicClaimValid(claim: AtomicClaim): void {
+/** Validates the parent claim doc alone (versions now live in their own subcollection). */
+export function assertCanonicalClaimValid(claim: CanonicalClaim): void {
   if (!claim.id.trim()) throw new Error('Claim id is required');
   if (!claim.entityId.trim()) throw new Error('Claim entityId is required');
   if (!claim.predicate.trim()) throw new Error('Claim predicate must be non-empty');
-  if (claim.versions.length === 0) throw new Error('Claim must have at least one version');
-  const current = claim.versions.find((v) => v.id === claim.currentVersionId);
-  if (!current) {
-    throw new Error('currentVersionId must reference a version on the claim');
+  if (!claim.currentVersionId.trim()) throw new Error('Claim currentVersionId is required');
+  if (!isClaimWorkflowStatus(claim.workflowStatus)) {
+    throw new Error(`Unknown claim workflow status: ${claim.workflowStatus}`);
   }
-  for (const version of claim.versions) {
-    assertClaimVersionValid(version);
-    if (version.claimId !== claim.id) {
-      throw new Error('Claim version claimId must match parent claim id');
-    }
+  if (!isClaimPublicationStatus(claim.publicationStatus)) {
+    throw new Error(`Unknown claim publication status: ${claim.publicationStatus}`);
   }
-  if (claim.workflowStatus !== current.workflowStatus) {
+  assertProceduralStatusRecognized(claim.proceduralStatus);
+}
+
+/**
+ * Cross-checks a parent claim doc against its current version, once both have been
+ * loaded (the version from the `versions` subcollection). Callers that already have
+ * both docs in hand (e.g. after a version write) should call this in addition to
+ * `assertCanonicalClaimValid` and `assertClaimVersionValid`.
+ */
+export function assertCanonicalClaimMatchesCurrentVersion(
+  claim: Pick<
+    CanonicalClaim,
+    'id' | 'currentVersionId' | 'workflowStatus' | 'publicationStatus' | 'proceduralStatus' | 'claimClass'
+  >,
+  currentVersion: ClaimVersion,
+): void {
+  if (currentVersion.id !== claim.currentVersionId) {
+    throw new Error('currentVersionId must reference the provided current version');
+  }
+  if (currentVersion.claimId !== claim.id) {
+    throw new Error('Claim version claimId must match parent claim id');
+  }
+  if (claim.workflowStatus !== currentVersion.workflowStatus) {
     throw new Error('Claim workflowStatus must match current version');
   }
-  if (claim.publicationStatus !== current.publicationStatus) {
+  if (claim.publicationStatus !== currentVersion.publicationStatus) {
     throw new Error('Claim publicationStatus must match current version');
   }
-  if (claim.proceduralStatus !== current.proceduralStatus) {
+  if (claim.proceduralStatus !== currentVersion.proceduralStatus) {
     throw new Error('Claim proceduralStatus must match current version');
   }
-  if (claim.claimClass !== current.claimClass) {
+  if (claim.claimClass !== currentVersion.claimClass) {
     throw new Error('Claim claimClass must match current version');
   }
 }
 
 /** True when a claim is published and accepted (eligible for public narrative citation). */
-export function isClaimPublished(claim: Pick<AtomicClaim, 'workflowStatus' | 'publicationStatus'>): boolean {
+export function isClaimPublished(claim: Pick<CanonicalClaim, 'workflowStatus' | 'publicationStatus'>): boolean {
   return claim.workflowStatus === 'accepted' && claim.publicationStatus === 'published';
 }
 
-export function currentClaimVersion(claim: AtomicClaim): ClaimVersion {
-  const version = claim.versions.find((v) => v.id === claim.currentVersionId);
+/**
+ * Finds the current version within an already-loaded list of version docs
+ * (e.g. fetched from the `versions` subcollection). Versions are no longer
+ * embedded on the parent, so callers must supply them explicitly.
+ */
+export function findCurrentClaimVersion(
+  claim: Pick<CanonicalClaim, 'currentVersionId'>,
+  versions: readonly ClaimVersion[],
+): ClaimVersion {
+  const version = versions.find((v) => v.id === claim.currentVersionId);
   if (!version) {
     throw new Error('currentVersionId must reference a version on the claim');
   }

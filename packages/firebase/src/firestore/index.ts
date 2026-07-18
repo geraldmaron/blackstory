@@ -109,6 +109,7 @@ export {
   entityRelationshipConverter,
   entityMergeConverter,
   canonicalClaimConverter,
+  claimVersionConverter,
   claimEvidenceLinkConverter,
   sourceOrganizationConverter,
   sourceDomainConverter,

@@ -230,6 +230,18 @@ service cloud.firestore {
 
     match /canonicalClaims/{claimId} {
       allow read, write: if false;
+
+      // Versions subcollection (claim-model split: parent doc + immutable version docs).
+      // No non-admin principal may write here today either — all claim writes are Admin
+      // SDK only per the file header above, and the Admin SDK bypasses these rules
+      // entirely — but the create/update/delete split (instead of one `write: if false`)
+      // hardcodes the append-only invariant structurally: update/delete stay denied even
+      // if a future change ever opens `create` to a client-authenticated write path.
+      match /versions/{versionId} {
+        allow read: if false;
+        allow create: if false;
+        allow update, delete: if false;
+      }
     }
 
     // Claim–evidence links (BB-017): Admin SDK only.

@@ -13,7 +13,7 @@ import {
 import {
   claimClassThreshold,
   isClaimPublished,
-  type AtomicClaim,
+  type CanonicalClaim,
 } from './claim.js';
 import type { ConfidenceScore } from './confidence.js';
 
@@ -68,7 +68,7 @@ export function assertHighImpactThresholdHigher(
  * Narratives (and public prose assemblers) may only cite published accepted claims.
  */
 export function assertNarrativeMayCiteClaim(
-  claim: Pick<AtomicClaim, 'id' | 'workflowStatus' | 'publicationStatus'>,
+  claim: Pick<CanonicalClaim, 'id' | 'workflowStatus' | 'publicationStatus'>,
 ): void {
   if (!isClaimPublished(claim)) {
     throw new Error(
@@ -78,7 +78,7 @@ export function assertNarrativeMayCiteClaim(
 }
 
 export function narrativeMayCiteClaim(
-  claim: Pick<AtomicClaim, 'workflowStatus' | 'publicationStatus'>,
+  claim: Pick<CanonicalClaim, 'workflowStatus' | 'publicationStatus'>,
 ): boolean {
   return isClaimPublished(claim);
 }
@@ -88,7 +88,7 @@ export function narrativeMayCiteClaim(
  * constitution requires accepted claim + evidence are satisfied by the caller.
  */
 export function assertClaimMayPublish(input: {
-  readonly claim: Pick<AtomicClaim, 'claimClass' | 'workflowStatus' | 'proceduralStatus'>;
+  readonly claim: Pick<CanonicalClaim, 'claimClass' | 'workflowStatus' | 'proceduralStatus'>;
   readonly confidence: Pick<ConfidenceScore, 'score' | 'policyVersion'>;
   readonly hasQualifyingEvidence: boolean;
   readonly narrativeSnippet?: string;

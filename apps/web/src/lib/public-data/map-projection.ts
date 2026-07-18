@@ -1,10 +1,9 @@
 /**
  * Maps Firestore public entity projections onto the web `PublicEntityView` shape.
- * Projections are thinner than seed fixtures; seed enrichment fills display gaps
- * when the same entity id exists in the bundled catalog.
+ * Renders live projection data as-is without enrichment from bundled seed records.
  */
 
-import { getPublicEntity, type PublicEntityView } from '../../data/public-seed';
+import { type PublicEntityView } from '../../data/public-seed';
 
 /**
  * Narrow projection shape used by the web mapper. Declared locally so apps/web
@@ -129,74 +128,16 @@ function mapPrimaryImage(
 
 /**
  * Convert a public projection doc into a page-ready view.
- * Prefer bundled seed fields when present so UI sections stay populated during
- * the bootstrap window when Firestore only holds projection stubs.
+ * Renders live projection data as-is without enrichment from bundled seed records.
  */
 export function mapProjectionToPublicEntityView(
   projection: PublicProjectionInput,
 ): PublicEntityView {
-  const seed = getPublicEntity(projection.id);
-  const summary =
-    projection.summary && projection.summary.trim().length > 0
-      ? projection.summary
-      : (seed?.summary ?? '');
-  const topicTags =
-    projection.topicTags && projection.topicTags.length > 0
-      ? projection.topicTags
-      : (seed?.topicTags ?? []);
-  const primaryImage = mapPrimaryImage(projection.primaryImage) ?? seed?.primaryImage;
+  const summary = projection.summary && projection.summary.trim().length > 0 ? projection.summary : '';
+  const topicTags = projection.topicTags && projection.topicTags.length > 0 ? projection.topicTags : [];
+  const primaryImage = mapPrimaryImage(projection.primaryImage);
   const geoAnchor = mapGeoAnchor(projection.location);
   const claims = mapClaims(projection.claims);
-
-  if (seed) {
-    return {
-      ...seed,
-      displayName: projection.displayName,
-      summary,
-      topicTags,
-      ...(geoAnchor !== undefined ? { geoAnchor } : {}),
-      ...(claims.length > 0 ? { claims } : {}),
-      ...(projection.jurisdictionLabel !== undefined
-        ? { jurisdictionLabel: projection.jurisdictionLabel }
-        : {}),
-      ...(projection.locationLabel !== undefined
-        ? { locationLabel: projection.locationLabel }
-        : {}),
-      revision: {
-        releaseId: projection.releaseId,
-        generatedAt: seed.revision.generatedAt,
-        recordUpdatedAt: seed.revision.recordUpdatedAt,
-      },
-      ...(projection.status !== undefined ? { status: projection.status } : {}),
-      ...(projection.eraBuckets !== undefined ? { eraBuckets: projection.eraBuckets } : {}),
-      ...(projection.notabilityLabels !== undefined
-        ? { notabilityLabels: projection.notabilityLabels }
-        : {}),
-      ...(projection.sensitivityClass !== undefined
-        ? { sensitivityClass: projection.sensitivityClass }
-        : {}),
-      ...(projection.historicalContext !== undefined
-        ? { historicalContext: projection.historicalContext }
-        : {}),
-      ...(projection.extendedNarrative !== undefined
-        ? { extendedNarrative: projection.extendedNarrative }
-        : seed.extendedNarrative !== undefined
-          ? { extendedNarrative: seed.extendedNarrative }
-          : {}),
-      ...(primaryImage !== undefined ? { primaryImage } : {}),
-      ...(projection.related !== undefined
-        ? {
-            related: projection.related.map((entry) => ({
-              id: entry.id,
-              type: entry.type,
-              direction: entry.direction,
-              ...(entry.timespan !== undefined ? { timespan: entry.timespan } : {}),
-            })),
-            relatedIds: projection.related.map((entry) => entry.id),
-          }
-        : {}),
-    };
-  }
 
   const lat = projection.location?.lat;
   const lng = projection.location?.lng;
@@ -240,14 +181,20 @@ export function mapProjectionToPublicEntityView(
     ...(primaryImage !== undefined ? { primaryImage } : {}),
     ...(geoAnchor !== undefined ? { geoAnchor } : {}),
     recordMaturity: claims.length > 0 ? 'partial_enrichment' : 'projection_stub',
+    // TODO: researchCoverage should come from the projection document itself,
+    // not computed at render time from claims.length. See black-book-1fg9 for the
+    // full release-builder rework to add this field to projection schema.
     researchCoverage: claims.length >= 2 ? 'partial' : 'minimal',
     mapPin,
     claims,
     timeline: [],
     revision: {
       releaseId: projection.releaseId,
-      generatedAt: new Date().toISOString(),
-      recordUpdatedAt: new Date().toISOString(),
+      // NOTE: projection shape does not carry generatedAt/recordUpdatedAt timestamps.
+      // When projections include revision metadata, use those values instead of
+      // fabricating "now". See black-book-1fg9.
+      generatedAt: '',
+      recordUpdatedAt: '',
     },
     relatedIds: projection.related?.map((entry) => entry.id) ?? [],
     ...(projection.related !== undefined

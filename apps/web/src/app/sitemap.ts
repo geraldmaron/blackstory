@@ -8,12 +8,18 @@ import { buildPublicSitemapEntries } from '../lib/seo/sitemap-builders';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { data: entities } = await listPublicEntityViews();
+  // Live projections don't carry revision timestamps yet (black-book-1fg9); an
+  // empty string means "unknown", not "just generated" — treat it as absent so
+  // the sitemap builder's own release-stamp fallback applies instead of emitting
+  // an empty lastModified value.
   const releaseGeneratedAt = entities[0]?.revision.generatedAt;
   return buildPublicSitemapEntries({
     entities: entities.map((entity) => ({
       id: entity.id,
-      updatedAt: entity.revision.recordUpdatedAt,
+      ...(entity.revision.recordUpdatedAt
+        ? { updatedAt: entity.revision.recordUpdatedAt }
+        : {}),
     })),
-    ...(releaseGeneratedAt !== undefined ? { releaseGeneratedAt } : {}),
+    ...(releaseGeneratedAt ? { releaseGeneratedAt } : {}),
   });
 }

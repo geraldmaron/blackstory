@@ -180,6 +180,12 @@ export {
   CAUSATION_SCOPES,
   evaluateCausalEdgeGuardrail,
   assertCausalEdgeGuardrail,
+  RELATIONSHIP_WORKFLOW_STATUSES,
+  isRelationshipWorkflowStatus,
+  RELATIONSHIP_PUBLICATION_STATUSES,
+  isRelationshipPublicationStatus,
+  RELATIONSHIP_RESOLUTION_STATES,
+  isRelationshipResolutionState,
 } from './relationship.js';
 export type {
   RelationshipType,
@@ -192,7 +198,25 @@ export type {
   CausationScope,
   CausalEdgeReview,
   CausalGuardrailResult,
+  RelationshipWorkflowStatus,
+  RelationshipPublicationStatus,
+  RelationshipResolutionState,
 } from './relationship.js';
+
+// publish invariants for EntityRelationship (BB black-book-hx8j) not yet wired into a publish
+// pipeline (release-builder bead black-book-1fg9 owns that wiring).
+export {
+  assertRelationshipEndpointsResolvedForPublish,
+  excludeSelfFromCorroboration,
+  assertRelationshipNotSoleSelfCorroboration,
+  countUniqueSyndicatedEvidenceLineages,
+  assertRelationshipPublishInvariants,
+} from './relationship-publish.js';
+export type {
+  SelfCorroborationCheck,
+  EvidenceLineageLookup,
+  RelationshipPublishInvariantInput,
+} from './relationship-publish.js';
 
 // history graph substrate containment-chain materialization, derived per-entity
 // adjacency per-decade all-time release views, succession-chain non-leakage, and 
@@ -414,9 +438,10 @@ export {
   isClaimPublicationStatus,
   assertProceduralStatusRecognized,
   assertClaimVersionValid,
-  assertAtomicClaimValid,
+  assertCanonicalClaimValid,
+  assertCanonicalClaimMatchesCurrentVersion,
   isClaimPublished,
-  currentClaimVersion,
+  findCurrentClaimVersion,
   claimClassThreshold,
   CLAIM_EVIDENCE_ROLES,
   isClaimEvidenceRole,
@@ -451,7 +476,7 @@ export type {
   ClaimPublicationStatus,
   ClaimGeographicContext,
   ClaimVersion,
-  AtomicClaim,
+  CanonicalClaim,
   PreservedClaimValue,
   ClaimEvidenceRole,
   ClaimEvidenceLink,

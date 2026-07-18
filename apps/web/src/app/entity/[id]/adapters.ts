@@ -2,6 +2,10 @@
  * Parent-owned adapters that map seed entity views into evidence inputs and
  * public "why this appears" payloads. Keeps the entity page free of field-renaming clutter
  * and reuses the same notability-label → criterion synthesis as the snapshot search index.
+ * `evidenceIds` is empty (no structured evidence-record ids exist for seed data yet — see
+ * black-book-1fg9): that means "no structured evidence-id linkage recorded", not "zero
+ * evidence exists". Callers must not render `evidenceIds.length` as a documented-source
+ * count for these records (see `WhyThisAppears`, which hides the count when it's empty).
  */
 import {
   NOTABILITY_RUBRIC,

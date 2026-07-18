@@ -39,7 +39,7 @@ test('shouldUseLivePublicProjections enables production project reads', () => {
   );
 });
 
-test('mapProjectionToPublicEntityView enriches known seed ids', () => {
+test('mapProjectionToPublicEntityView renders claims carried by the projection itself', () => {
   const view = mapProjectionToPublicEntityView({
     id: 'ent_15th_st_church_001',
     releaseId: 'rel_seed_001',
@@ -48,10 +48,38 @@ test('mapProjectionToPublicEntityView enriches known seed ids', () => {
     nameLower: 'fifteenth street presbyterian church',
     summary: 'Fixture projection for emulator reads.',
     claimIds: ['claim_seed_001'],
+    claims: [
+      {
+        id: 'claim_seed_001',
+        predicate: 'founded_in',
+        object: '1841',
+        confidenceLevel: 'high',
+        citationSource: 'nps.gov',
+        citationLabel: 'National Park Service',
+      },
+    ],
   });
   assert.equal(view.id, 'ent_15th_st_church_001');
-  assert.ok(view.claims.length > 0);
+  assert.equal(view.claims.length, 1);
+  assert.equal(view.claims[0]!.object, '1841');
   assert.equal(view.revision.releaseId, 'rel_seed_001');
+});
+
+test('mapProjectionToPublicEntityView does not backfill from the bundled seed catalog even when the id matches', () => {
+  // `ent_15th_st_church_001` is a real bundled seed id with its own summary/claims. A live
+  // projection sharing that id must render only its own (thinner) data — never silently pull
+  // in the seed's summary/topicTags/claims (black-book-dnli fixed this seed-enrichment bug).
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_15th_st_church_001',
+    releaseId: 'rel_live_001',
+    kind: 'place',
+    displayName: 'Fifteenth Street Presbyterian Church',
+    nameLower: 'fifteenth street presbyterian church',
+    summary: '',
+    claimIds: [],
+  });
+  assert.equal(view.claims.length, 0);
+  assert.deepEqual(view.topicTags, []);
 });
 
 test('live-only projections get a default notability label for search-pool parity', () => {

@@ -323,9 +323,11 @@ export default async function EntityPage({ params }: EntityPageProps) {
             <Card title="Revision" meta={<span className="bp-mono">{entity.revision.releaseId}</span>} as="section">
               <dl className="bp-sans" style={{ margin: 0 }}>
                 <dt style={{ fontWeight: 600 }}>Record last updated</dt>
-                <dd style={{ margin: '0 0 var(--bp-space-2) 0' }}>{entity.revision.recordUpdatedAt}</dd>
+                <dd style={{ margin: '0 0 var(--bp-space-2) 0' }}>
+                  {entity.revision.recordUpdatedAt || 'Not yet tracked'}
+                </dd>
                 <dt style={{ fontWeight: 600 }}>Release generated</dt>
-                <dd style={{ margin: 0 }}>{entity.revision.generatedAt}</dd>
+                <dd style={{ margin: 0 }}>{entity.revision.generatedAt || 'Not yet tracked'}</dd>
               </dl>
             </Card>
 

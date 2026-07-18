@@ -17,6 +17,7 @@ import type {
   CanonicalClaimDoc,
   CanonicalEntityDoc,
   ClaimEvidenceLinkDoc,
+  ClaimVersionDoc,
   EntityLocationDoc,
   EntityMergeDoc,
   EntityRelationshipDoc,
@@ -596,32 +597,31 @@ const seedPreservedValues = preserveContradictoryValues({
   evidenceLinks: seedClaimLinks,
 }).values;
 
+export const seedCanonicalClaimVersion: ClaimVersionDoc = {
+  id: 'cver_seed_001',
+  claimId: 'claim_seed_001',
+  versionNumber: 1,
+  entityId: 'ent_15th_st_church_001',
+  predicate: 'founded_year',
+  object: '1841',
+  temporal: { label: 'founding', validFrom: '1841-01-01' },
+  geographic: {
+    locationId: 'loc_place_historical',
+    precision: 'institution',
+  },
+  proceduralStatus: 'ruled',
+  claimClass: 'standard',
+  workflowStatus: 'accepted',
+  publicationStatus: 'published',
+  createdAt: FIXED_NOW,
+  createdBy: 'researcher_seed',
+};
+
 export const seedCanonicalClaim: CanonicalClaimDoc = {
   id: 'claim_seed_001',
   entityId: 'ent_15th_st_church_001',
   predicate: 'founded_year',
   currentVersionId: 'cver_seed_001',
-  versions: [
-    {
-      id: 'cver_seed_001',
-      claimId: 'claim_seed_001',
-      versionNumber: 1,
-      entityId: 'ent_15th_st_church_001',
-      predicate: 'founded_year',
-      object: '1841',
-      temporal: { label: 'founding', validFrom: '1841-01-01' },
-      geographic: {
-        locationId: 'loc_place_historical',
-        precision: 'institution',
-      },
-      proceduralStatus: 'ruled',
-      claimClass: 'standard',
-      workflowStatus: 'accepted',
-      publicationStatus: 'published',
-      createdAt: FIXED_NOW,
-      createdBy: 'researcher_seed',
-    },
-  ],
   claimClass: 'standard',
   workflowStatus: 'accepted',
   publicationStatus: 'published',
@@ -650,26 +650,25 @@ export const seedCanonicalClaim: CanonicalClaimDoc = {
   updatedAt: FIXED_NOW,
 };
 
+export const seedHighImpactClaimVersion: ClaimVersionDoc = {
+  id: 'cver_seed_hi_001',
+  claimId: 'claim_seed_high_impact',
+  versionNumber: 1,
+  entityId: 'ent_seed_person_001',
+  predicate: 'conviction_status',
+  object: 'alleged',
+  proceduralStatus: 'alleged',
+  claimClass: 'high_impact',
+  workflowStatus: 'accepted',
+  publicationStatus: 'unpublished',
+  createdAt: FIXED_NOW,
+};
+
 export const seedHighImpactClaim: CanonicalClaimDoc = {
   id: 'claim_seed_high_impact',
   entityId: 'ent_seed_person_001',
   predicate: 'conviction_status',
   currentVersionId: 'cver_seed_hi_001',
-  versions: [
-    {
-      id: 'cver_seed_hi_001',
-      claimId: 'claim_seed_high_impact',
-      versionNumber: 1,
-      entityId: 'ent_seed_person_001',
-      predicate: 'conviction_status',
-      object: 'alleged',
-      proceduralStatus: 'alleged',
-      claimClass: 'high_impact',
-      workflowStatus: 'accepted',
-      publicationStatus: 'unpublished',
-      createdAt: FIXED_NOW,
-    },
-  ],
   claimClass: 'high_impact',
   workflowStatus: 'accepted',
   publicationStatus: 'unpublished',
@@ -814,7 +813,15 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
   { path: 'evidenceRecords/ev_seed_wire_copy', data: seedSyndicatedEvidenceRecord },
   { path: 'evidenceLineage/elin_seed_001', data: seedEvidenceLineage },
   { path: 'canonicalClaims/claim_seed_001', data: seedCanonicalClaim },
+  {
+    path: 'canonicalClaims/claim_seed_001/versions/cver_seed_001',
+    data: seedCanonicalClaimVersion,
+  },
   { path: 'canonicalClaims/claim_seed_high_impact', data: seedHighImpactClaim },
+  {
+    path: 'canonicalClaims/claim_seed_high_impact/versions/cver_seed_hi_001',
+    data: seedHighImpactClaimVersion,
+  },
   { path: 'claimEvidenceLinks/cel_seed_support_001', data: seedClaimEvidenceSupporting },
   { path: 'claimEvidenceLinks/cel_seed_syndicated_001', data: seedClaimEvidenceSyndicated },
   { path: 'claimEvidenceLinks/cel_seed_contradict_001', data: seedClaimEvidenceContradicting },

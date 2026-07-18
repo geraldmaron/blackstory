@@ -408,66 +408,24 @@ export const relationshipRoleSchema = z.enum(['organizer', 'speaker', 'participa
 
 export type RelationshipRoleDoc = z.infer<typeof relationshipRoleSchema>;
 
-export const entityRelationshipSchema = z.object({
-  id: z.string().min(1),
-  fromEntityId: z.string().min(1),
-  toEntityId: z.string().min(1),
-  type: relationshipTypeSchema,
-  evidenceIds: z.array(z.string().min(1)).min(1),
-  temporal: z
-    .object({
-      label: z.string().optional(),
-      validFrom: z.string().optional(),
-      validTo: z.string().nullable().optional(),
-    })
-    .optional(),
-  geographic: z
-    .object({
-      locationId: z.string().optional(),
-      jurisdictionId: z.string().optional(),
-      notes: z.string().optional(),
-    })
-    .optional(),
-  /** Only meaningful when `type === 'attended'`. */
-  role: relationshipRoleSchema.optional(),
-  notes: z.string().optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-});
-
-export type EntityRelationshipDoc = z.infer<typeof entityRelationshipSchema>;
-
-export const entityMergeSchema = z.object({
-  id: z.string().min(1),
-  survivorId: z.string().min(1),
-  absorbedIds: z.array(z.string().min(1)).min(1),
-  status: z.enum(['active', 'reversed']),
-  reason: z.string().min(1),
-  evidenceIds: z.array(z.string().min(1)).default([]),
-  createdAt: z.string().datetime(),
-  createdBy: z.string().min(1),
-  reversedAt: z.string().datetime().optional(),
-  reversedBy: z.string().min(1).optional(),
-  reverseReason: z.string().optional(),
-  auditEventIds: z.array(z.string().min(1)).default([]),
-});
-
-export type EntityMergeDoc = z.infer<typeof entityMergeSchema>;
-
 const unitInterval = z.number().min(0).max(1);
 
-export const claimTemporalContextSchema = z.object({
-  label: z.string().optional(),
-  validFrom: z.string().optional(),
-  validTo: z.string().nullable().optional(),
-});
+/** Same shape as `claimVersionSchema`/`canonicalClaimSchema`'s workflow/publication enums (see
+ * below), reused by name for cross-domain consistency see `@blap/domain`'s
+ * `RELATIONSHIP_WORKFLOW_STATUSES`/`RELATIONSHIP_PUBLICATION_STATUSES`. Relationships add an
+ * explicit `candidate` state claims don't have, for the candidate -> review -> published
+ * pipeline (BB black-book-hx8j). */
+export const relationshipWorkflowStatusSchema = z.enum(['candidate', 'in_review', 'accepted', 'rejected']);
+export type RelationshipWorkflowStatusDoc = z.infer<typeof relationshipWorkflowStatusSchema>;
 
-export const claimGeographicContextSchema = z.object({
-  locationId: z.string().min(1).optional(),
-  jurisdictionId: z.string().min(1).optional(),
-  notes: z.string().optional(),
-  precision: z.string().min(1).optional(),
-});
+export const relationshipPublicationStatusSchema = z.enum(['unpublished', 'published', 'retracted']);
+export type RelationshipPublicationStatusDoc = z.infer<typeof relationshipPublicationStatusSchema>;
+
+/** See `@blap/domain`'s `RelationshipResolutionState` doc comment: distinct from
+ * `ResolutionOutcome` (a single candidate-to-entity match decision) this describes the joint
+ * resolution state of both of an edge's endpoints. */
+export const relationshipResolutionStateSchema = z.enum(['unresolved', 'partially_resolved', 'resolved']);
+export type RelationshipResolutionStateDoc = z.infer<typeof relationshipResolutionStateSchema>;
 
 export const confidenceComponentsSchema = z.object({
   sourceAuthority: unitInterval,
@@ -494,6 +452,77 @@ export const confidenceScoreSchema = z.object({
 });
 
 export type ConfidenceScoreDoc = z.infer<typeof confidenceScoreSchema>;
+
+export const entityRelationshipSchema = z.object({
+  id: z.string().min(1),
+  fromEntityId: z.string().min(1),
+  toEntityId: z.string().min(1),
+  type: relationshipTypeSchema,
+  evidenceIds: z.array(z.string().min(1)).min(1),
+  temporal: z
+    .object({
+      label: z.string().optional(),
+      validFrom: z.string().optional(),
+      validTo: z.string().nullable().optional(),
+    })
+    .optional(),
+  geographic: z
+    .object({
+      locationId: z.string().optional(),
+      jurisdictionId: z.string().optional(),
+      notes: z.string().optional(),
+    })
+    .optional(),
+  /** Only meaningful when `type === 'attended'`. */
+  role: relationshipRoleSchema.optional(),
+  notes: z.string().optional(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  // ---------------------------------------------------------------------------------------
+  // lifecycle/workflow fields (BB black-book-hx8j). All optional: pre-existing relationship
+  // docs predate this pipeline and remain valid without a backfill migration.
+  // ---------------------------------------------------------------------------------------
+  workflowStatus: relationshipWorkflowStatusSchema.optional(),
+  publicationStatus: relationshipPublicationStatusSchema.optional(),
+  /** Reuses `confidenceScoreSchema` rather than a parallel relationship-specific shape. */
+  confidence: confidenceScoreSchema.optional(),
+  independentLineageCount: z.number().int().nonnegative().optional(),
+  resolutionState: relationshipResolutionStateSchema.optional(),
+  createdFromCandidateId: z.string().min(1).optional(),
+  lastVerifiedAt: z.string().datetime().optional(),
+});
+
+export type EntityRelationshipDoc = z.infer<typeof entityRelationshipSchema>;
+
+export const entityMergeSchema = z.object({
+  id: z.string().min(1),
+  survivorId: z.string().min(1),
+  absorbedIds: z.array(z.string().min(1)).min(1),
+  status: z.enum(['active', 'reversed']),
+  reason: z.string().min(1),
+  evidenceIds: z.array(z.string().min(1)).default([]),
+  createdAt: z.string().datetime(),
+  createdBy: z.string().min(1),
+  reversedAt: z.string().datetime().optional(),
+  reversedBy: z.string().min(1).optional(),
+  reverseReason: z.string().optional(),
+  auditEventIds: z.array(z.string().min(1)).default([]),
+});
+
+export type EntityMergeDoc = z.infer<typeof entityMergeSchema>;
+
+export const claimTemporalContextSchema = z.object({
+  label: z.string().optional(),
+  validFrom: z.string().optional(),
+  validTo: z.string().nullable().optional(),
+});
+
+export const claimGeographicContextSchema = z.object({
+  locationId: z.string().min(1).optional(),
+  jurisdictionId: z.string().min(1).optional(),
+  notes: z.string().optional(),
+  precision: z.string().min(1).optional(),
+});
 
 export const preservedClaimValueSchema = z.object({
   value: z.string().min(1),
@@ -523,6 +552,7 @@ export const claimVersionSchema = z.object({
   notes: z.string().optional(),
 });
 
+/** Doc shape for `canonicalClaims/{claimId}/versions/{versionId}` (append-only subcollection). */
 export type ClaimVersionDoc = z.infer<typeof claimVersionSchema>;
 
 export const researchCoverageSchema = z.object({
@@ -544,13 +574,17 @@ export const connectionStrengthSchema = z.object({
   rationale: z.string().optional(),
 });
 
-/** Canonical atomic claim with versions, confidence, and measurements. */
+/**
+ * Canonical atomic claim parent doc: identity, current-version pointer, workflow/publication
+ * status, confidence, and measurements. Versions are no longer embedded here — each is its own
+ * immutable doc in the `canonicalClaims/{claimId}/versions/{versionId}` subcollection
+ * (see `claimVersionSchema`), which is append-only at the Firestore rules level.
+ */
 export const canonicalClaimSchema = z.object({
   id: z.string().min(1),
   entityId: z.string().min(1),
   predicate: z.string().min(1),
   currentVersionId: z.string().min(1),
-  versions: z.array(claimVersionSchema).min(1),
   claimClass: z.enum(['standard', 'high_impact']),
   workflowStatus: z.enum(['proposed', 'accepted', 'rejected', 'superseded']),
   publicationStatus: z.enum(['unpublished', 'published', 'retracted']),
@@ -562,6 +596,10 @@ export const canonicalClaimSchema = z.object({
   connectionStrength: connectionStrengthSchema.optional(),
   researchCoverage: researchCoverageSchema.optional(),
   preservedValues: z.array(preservedClaimValueSchema).default([]),
+  /** ISO timestamp of the last independent verification pass over this claim, if any. */
+  lastVerifiedAt: z.string().datetime().optional(),
+  /** Version id that was current as of the last verification pass, if any. */
+  lastVerifiedVersionId: z.string().min(1).optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });

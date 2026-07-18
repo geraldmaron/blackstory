@@ -11,6 +11,8 @@
  * (per-entity adjacency, per-decade views, all-time union, containment chains) lives in
  * `./graph/` and consumes `EntityRelationship` read-only — see `./graph/index.ts`.
  */
+import type { ConfidenceScore } from './claims/confidence.js';
+
 export const RELATIONSHIP_TYPES = [
   'located_at',
   'occurred_at',
@@ -58,6 +60,46 @@ export type GeographicRelationshipContext = {
   readonly notes?: string;
 };
 
+// ---------------------------------------------------------------------------
+// lifecycle/workflow vocabulary.
+// Naming mirrors `ClaimWorkflowStatus`/`ClaimPublicationStatus` (see `./claims/claim.ts`) for
+// cross-domain consistency, with one deliberate difference: relationships add an explicit
+// `candidate` workflow state so a not-yet-reviewed graph edge (see BB `black-book-hx8j`) can be
+// represented directly on `EntityRelationship` via `workflowStatus: 'candidate'` rather than
+// requiring a separate `CandidateRelationship` type (see note on `createdFromCandidateId` below).
+// ---------------------------------------------------------------------------
+
+export const RELATIONSHIP_WORKFLOW_STATUSES = ['candidate', 'in_review', 'accepted', 'rejected'] as const;
+export type RelationshipWorkflowStatus = (typeof RELATIONSHIP_WORKFLOW_STATUSES)[number];
+
+export function isRelationshipWorkflowStatus(value: string): value is RelationshipWorkflowStatus {
+  return (RELATIONSHIP_WORKFLOW_STATUSES as readonly string[]).includes(value);
+}
+
+/** Same vocabulary as `ClaimPublicationStatus` (see `./claims/claim.ts`) so a relationship's
+ * publication lifecycle reads identically to a claim's. */
+export const RELATIONSHIP_PUBLICATION_STATUSES = ['unpublished', 'published', 'retracted'] as const;
+export type RelationshipPublicationStatus = (typeof RELATIONSHIP_PUBLICATION_STATUSES)[number];
+
+export function isRelationshipPublicationStatus(value: string): value is RelationshipPublicationStatus {
+  return (RELATIONSHIP_PUBLICATION_STATUSES as readonly string[]).includes(value);
+}
+
+/**
+ * How well both endpoint entities (`fromEntityId`/`toEntityId`) are resolved to canonical
+ * entities rather than still-pending discovery candidates. Distinct from
+ * `./resolution/types.ts`'s `ResolutionOutcome` (`proposed_match`/`review_required`/`no_match`),
+ * which describes a single candidate-to-entity match decision `resolutionState` here
+ * describes the joint resolution state of an edge's *two* endpoints, which is a different
+ * (relationship-shaped) question no existing enum answers directly.
+ */
+export const RELATIONSHIP_RESOLUTION_STATES = ['unresolved', 'partially_resolved', 'resolved'] as const;
+export type RelationshipResolutionState = (typeof RELATIONSHIP_RESOLUTION_STATES)[number];
+
+export function isRelationshipResolutionState(value: string): value is RelationshipResolutionState {
+  return (RELATIONSHIP_RESOLUTION_STATES as readonly string[]).includes(value);
+}
+
 export type EntityRelationship = {
   readonly id: string;
   readonly fromEntityId: string;
@@ -73,6 +115,30 @@ export type EntityRelationship = {
   readonly notes?: string;
   readonly createdAt: string;
   readonly updatedAt: string;
+  // -------------------------------------------------------------------------
+  // lifecycle/workflow fields (BB black-book-hx8j). All optional so pre-existing relationships
+  // that never went through a candidate -> review -> published pipeline remain valid values
+  // without a backfill migration; `assertRelationshipPublishInvariants`
+  // (see `./relationship-publish.ts`) is where these become required for publication.
+  // -------------------------------------------------------------------------
+  /** Candidate -> in_review -> accepted|rejected pipeline state. Absent means legacy data
+   * predating this field; treat as equivalent to `'accepted'` for read paths. */
+  readonly workflowStatus?: RelationshipWorkflowStatus;
+  readonly publicationStatus?: RelationshipPublicationStatus;
+  /** Reuses the claims confidence result shape (`ConfidenceScore` from `./claims/confidence.ts`)
+   * rather than a parallel relationship-specific shape same components, same audit story. */
+  readonly confidence?: ConfidenceScore;
+  /** Count of independent supporting lineages for this relationship's own `evidenceIds`, prior
+   * to (and independent of) any full `confidence` computation see
+   * `countUniqueSyndicatedEvidenceLineages` in `./relationship-publish.ts` for the syndication
+   * dedupe this count is expected to reflect. */
+  readonly independentLineageCount?: number;
+  /** Joint resolution state of `fromEntityId`/`toEntityId`; see `RelationshipResolutionState`. */
+  readonly resolutionState?: RelationshipResolutionState;
+  /** Links a promoted/accepted relationship back to the discovery candidate that spawned it. */
+  readonly createdFromCandidateId?: string;
+  /** ISO timestamp of the last human/automated re-verification pass over this edge. */
+  readonly lastVerifiedAt?: string;
 };
 
 export function assertRelationshipHasEvidence(rel: Pick<EntityRelationship, 'evidenceIds'>): void {

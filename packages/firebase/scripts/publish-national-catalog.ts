@@ -26,7 +26,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { buildGeoPointFields } from '@blap/domain';
+import {
+  buildGeoPointFields,
+  evaluateFactPublishGate,
+  evaluateNotabilityGate,
+  type FactCitation,
+} from '@blap/domain';
 import {
   publicEntityProjectionSchema,
   publicSearchIndexSchema,
@@ -73,6 +78,135 @@ type CatalogEntry = {
   readonly status?: string;
 };
 
+/** Synthesizes a stable claim id when the catalog entry omitted one (mirrors `toProjectionDoc`'s
+ * inline id assignment; extracted so the gate wiring below and the projection builder agree on
+ * the exact same id for the exact same claim). */
+function resolveClaimId(entry: CatalogEntry, claim: CatalogClaim, index: number): string {
+  return claim.id ?? `claim_${entry.id.replace(/^ent_/, '')}_${String(index + 1).padStart(2, '0')}`;
+}
+
+/**
+ * === Publication gate wiring (black-book-pwfi) ===
+ *
+ * Two fail-closed gates already exist in `@blap/domain` but were never wired into the live
+ * entity/claim release-build path — see the "Not wired live" comments in
+ * `packages/domain/src/facts/publish-gate.ts` and `packages/domain/src/relevance/notability-gate.ts`,
+ * and ADR-007 / ADR-015. `packages/domain/src/search/index-build.ts` already calls the
+ * notability gate independently as defense-in-depth for the search index only; this wires both
+ * gates into the entity/claim PROJECTION path itself (this script), inside the same
+ * validate-before-write, fail-closed loop that already collects Zod schema failures (see
+ * `main()`'s `writes` construction below) so a gate failure blocks the whole write exactly like
+ * a schema failure does.
+ *
+ * Both gates were designed for richer models than `CatalogEntry`/`CatalogClaim` (this fixture
+ * format) actually carries yet:
+ *
+ * 1. `notability-gate.ts` expects a real `notabilityBasis: NotabilityBasisRecord[]` whose
+ *    `evidenceIds` resolve to actual evidence. `CatalogEntry` has no such field — the only
+ *    notability signal that exists today is the always-on placeholder this script already
+ *    emits (`notabilityLabels`/`notabilityBasis` in `toProjectionDoc`/`toSearchDoc`). So the
+ *    gate below is evaluated against a PROXY built from `entry.claims`
+ *    (`buildNotabilityBasisProxy`): one basis record standing in for that placeholder, whose
+ *    `evidenceIds` are the ids of claims carrying a resolvable `citationSource`. This makes the
+ *    STRONGER release invariant from the architecture review real and enforced today, not a
+ *    no-op that always passes on the hardcoded placeholder: an active release must never contain
+ *    a record where `notabilityBasis.length > 0 AND any basis entry has zero resolvable
+ *    evidence refs` — i.e. an entry with no claims, or whose claims all lack a citationSource,
+ *    is rejected.
+ *    TODO(black-book-1fg9): once `CatalogEntry` carries a real `notabilityBasis` with
+ *    `evidenceIds` pointing at actual evidence records, delete this proxy and call
+ *    `assertPublishableEntityHasNotabilityBasis` directly against the real field.
+ *
+ * 2. `publish-gate.ts`'s fact-publish gate requires every citation to carry an archived-capture
+ *    pointer (`archivedUrl`+`archivedAt`) and a retrieval date (`accessedAt`) before a fact may
+ *    reach `published` (`hasCompleteFactCitations`). `CatalogClaim` has never captured any of
+ *    those fields — confirmed empirically against the current fixtures: 0 of 1031 claims across
+ *    all 515 entries carry archival metadata (the field doesn't exist in the shape at all). That
+ *    is a genuine, pipeline-wide data gap, not a defect in specific entries: forcing the gate's
+ *    full archived-capture sub-check here today would reject the entire existing, previously
+ *    reviewed and published catalog, which is disproportionate to this pass's scope. So this
+ *    wires only the gate's OTHER, already-real branch — `evaluateFactPublishGate`'s
+ *    `no_citations` reason ("unsourced is not a publishable state"): every entry must have at
+ *    least one claim. The `incomplete_citation` branch is deliberately not enforced yet.
+ *    TODO(black-book-1fg9): once claims carry archival-capture metadata, drop the floor-only
+ *    filtering below and let `evaluateFactPublishGate`'s `incomplete_citation` branch block too
+ *    (or call `assertFactMayPublish` directly, unmodified).
+ *
+ * NOT in this pass (explicit deferral, not a silent drop): the "two independent lineages /
+ * primary+corroborating source" gate for high-impact predicates (first/only/oldest, deaths,
+ * violence, allegations) needs the fuller claim/evidence model from black-book-1fg9 and is not
+ * implemented here. TODO(black-book-1fg9).
+ */
+type NotabilityBasisProxy = {
+  readonly criterion: 'documented_site';
+  readonly note: string;
+  readonly evidenceIds: readonly string[];
+};
+
+function buildNotabilityBasisProxy(entry: CatalogEntry): readonly NotabilityBasisProxy[] {
+  const claims = entry.claims ?? [];
+  const evidenceIds = claims
+    .filter((claim) => claim.citationSource.trim().length > 0)
+    .map((claim, index) => resolveClaimId(entry, claim, index));
+  return [
+    {
+      criterion: 'documented_site',
+      note: 'A documented site in the active public release.',
+      evidenceIds,
+    },
+  ];
+}
+
+function claimToFactCitationStandIn(claim: CatalogClaim): FactCitation {
+  // Minimal structural stand-in sufficient to express "a citation exists" for the no_citations
+  // floor check — see the wiring-note above for why the full completeness sub-check (sourceClass
+  // rigor, archived-capture pointer, retrieval date) is deferred rather than fabricated here.
+  return {
+    csl: {
+      id: claim.citationSource,
+      type: 'webpage',
+      ...(claim.citationHref !== undefined ? { URL: claim.citationHref } : {}),
+    },
+    sourceClass: 'secondary',
+    role: 'supports',
+    excerpt: claim.citationLabel,
+  };
+}
+
+/** Runs both wired gates for one catalog entry. Returns the first failure reason, if any so the
+ * caller can report it the same way it reports a Zod schema failure (named per entity id). */
+function evaluateEntityPublicationGates(
+  entry: CatalogEntry,
+): { readonly ok: true } | { readonly ok: false; readonly reason: string } {
+  // --- notability-basis gate (ADR-015) + stronger evidence-backing invariant ---
+  const notabilityBasis = buildNotabilityBasisProxy(entry);
+  const notabilityGate = evaluateNotabilityGate(notabilityBasis);
+  if (!notabilityGate.passed) {
+    return { ok: false, reason: `notability_basis gate: ${notabilityGate.reason}` };
+  }
+  const basisWithoutEvidence = notabilityBasis.find((basis) => basis.evidenceIds.length === 0);
+  if (basisWithoutEvidence) {
+    return {
+      ok: false,
+      reason:
+        `notability_basis gate: basis record "${basisWithoutEvidence.criterion}" has zero ` +
+        'resolvable evidence refs (no claims with a non-empty citationSource)',
+    };
+  }
+
+  // --- fact publish-gate (ADR-007) — no_citations floor only, see wiring-note above ---
+  const claims = entry.claims ?? [];
+  const factGate = evaluateFactPublishGate({
+    status: 'published',
+    citations: claims.map(claimToFactCitationStandIn),
+  });
+  if (!factGate.ok && factGate.reason === 'no_citations') {
+    return { ok: false, reason: `fact_publish_gate: ${factGate.message}` };
+  }
+
+  return { ok: true };
+}
+
 function loadCatalog(): CatalogEntry[] {
   const files = readdirSync(catalogDir).filter((name) => name.endsWith('.json'));
   if (files.length === 0) {
@@ -90,7 +224,7 @@ function loadCatalog(): CatalogEntry[] {
 
 function toProjectionDoc(entry: CatalogEntry, releaseId: string) {
   const claims = (entry.claims ?? []).map((claim, index) => ({
-    id: claim.id ?? `claim_${entry.id.replace(/^ent_/, '')}_${String(index + 1).padStart(2, '0')}`,
+    id: resolveClaimId(entry, claim, index),
     predicate: claim.predicate,
     object: claim.object,
     confidenceLevel: claim.confidenceLevel,
@@ -187,6 +321,10 @@ async function main(): Promise<void> {
   const failures: string[] = [];
   const writes = entries.flatMap((entry) => {
     try {
+      const gateResult = evaluateEntityPublicationGates(entry);
+      if (!gateResult.ok) {
+        throw new Error(gateResult.reason);
+      }
       const projection = toProjectionDoc(entry, releaseId);
       const search = toSearchDoc(entry, releaseId, projection.claims?.length ?? 0);
       return [{ entry, projection, search }];

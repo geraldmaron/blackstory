@@ -15,9 +15,10 @@ export {
   isClaimPublicationStatus,
   assertProceduralStatusRecognized,
   assertClaimVersionValid,
-  assertAtomicClaimValid,
+  assertCanonicalClaimValid,
+  assertCanonicalClaimMatchesCurrentVersion,
   isClaimPublished,
-  currentClaimVersion,
+  findCurrentClaimVersion,
   claimClassThreshold,
 } from './claim.js';
 export type {
@@ -25,7 +26,7 @@ export type {
   ClaimPublicationStatus,
   ClaimGeographicContext,
   ClaimVersion,
-  AtomicClaim,
+  CanonicalClaim,
   PreservedClaimValue,
 } from './claim.js';
 

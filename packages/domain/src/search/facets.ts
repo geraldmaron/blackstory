@@ -9,6 +9,7 @@ import type {
   SearchFilter,
   SearchableEntityRecord,
 } from './types.js';
+import { isPermittedTopicTag } from './topic-allowlist.js';
 
 function increment(counts: Record<string, number>, key: string | undefined): void {
   if (key === undefined || key === '') return;
@@ -36,7 +37,9 @@ export function computeFacetCounts(records: readonly SearchableEntityRecord[]): 
     increment(recordMaturity, record.recordMaturity);
     increment(researchCoverage, record.researchCoverage);
     for (const bucket of record.eraBuckets) increment(era, bucket);
-    for (const tag of record.topicTags) increment(theme, tag);
+    for (const tag of record.topicTags) {
+      if (isPermittedTopicTag(tag)) increment(theme, tag);
+    }
   }
 
   return { kind, status, era, theme, state, recordMaturity, researchCoverage };

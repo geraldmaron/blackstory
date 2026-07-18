@@ -5,6 +5,7 @@
  * filter/facet computation.
  */
 import type { ExploreMapFeature } from './build-explore-map-source';
+import { isPermittedTopicTag } from '@blap/domain';
 
 export type ExploreFilterState = {
   readonly era: string;
@@ -68,8 +69,9 @@ function toOptions(
   counts: Record<string, number>,
   allLabel: string,
   sort: 'alpha' | 'chrono' = 'alpha',
+  filterFn?: (value: string) => boolean,
 ): readonly FacetOption[] {
-  const entries = Object.entries(counts);
+  const entries = Object.entries(counts).filter(([value]) => !filterFn || filterFn(value));
   entries.sort(([a], [b]) =>
     sort === 'chrono' ? a.localeCompare(b, undefined, { numeric: true }) : a.localeCompare(b),
   );
@@ -93,7 +95,7 @@ export function buildExploreFacetOptions(features: readonly ExploreMapFeature[])
   return {
     kind: toOptions(countBy(features, (feature) => [feature.properties.kind]), 'All kinds'),
     era: toOptions(countBy(features, (feature) => feature.properties.eraBuckets), 'All eras', 'chrono'),
-    theme: toOptions(countBy(features, (feature) => feature.properties.topicTags), 'All themes'),
+    theme: toOptions(countBy(features, (feature) => feature.properties.topicTags), 'All themes', 'alpha', isPermittedTopicTag),
     confidence: toOptions(
       countBy(features, (feature) => [feature.properties.confidenceTier]),
       'All confidence tiers',

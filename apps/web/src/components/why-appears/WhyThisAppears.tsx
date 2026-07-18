@@ -62,9 +62,11 @@ export function WhyThisAppears({ result, instanceId = 'why-this-appears' }: WhyT
                 <p className="bp-sans" style={{ margin: 0, fontWeight: 400 }}>
                   {item.note}
                 </p>
-                <p className="bp-mono" style={{ margin: 0 }}>
-                  {WHY_THIS_APPEARS_COPY.sourceCountSuffix(item.evidenceIds.length)}
-                </p>
+                {item.evidenceIds.length > 0 ? (
+                  <p className="bp-mono" style={{ margin: 0 }}>
+                    {WHY_THIS_APPEARS_COPY.sourceCountSuffix(item.evidenceIds.length)}
+                  </p>
+                ) : null}
               </li>
             ))}
           </ol>
