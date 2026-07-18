@@ -7,6 +7,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { PublicEntityView, RelatedNeighborView } from '../../data/public-seed';
+import { KindBadge } from '../map-experience';
 import { humanizeToken } from './format';
 import { RecordGapNotice } from './RecordGapNotice';
 
@@ -25,7 +26,11 @@ function NeighborLink({ neighbor }: { readonly neighbor: RelatedNeighborView }) 
     <li key={`${neighbor.id}_${neighbor.relationType}_${neighbor.direction}`}>
       <Link className="bp-story-link" href={`/entity/${neighbor.id}`}>
         <span className="bp-story-link__meta">
-          {neighbor.kind} · {humanizeToken(neighbor.relationType)}
+          <span className="bp-story-link__meta-row">
+            <KindBadge kind={neighbor.kind} density="compact" />
+            <span aria-hidden="true">·</span>
+            <span>{humanizeToken(neighbor.relationType)}</span>
+          </span>
         </span>
         <h3 className="bp-story-link__title">{neighbor.displayName}</h3>
         <p className="bp-story-link__summary">

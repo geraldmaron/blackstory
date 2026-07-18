@@ -10,6 +10,7 @@
  */
 
 import Link from 'next/link';
+import { KindBadge } from '../map-experience';
 import { StateStart, type StateStartEntry } from './StateStart';
 
 export type HomeStoryEntity = {
@@ -81,7 +82,9 @@ export function HomeStorySections({
               <li key={entity.id}>
                 <Link className="bp-story-link" href={`/entity/${entity.id}`}>
                   <span className="bp-story-link__meta">
-                    {entity.kind} / {entity.jurisdictionLabel}
+                    <KindBadge kind={entity.kind} density="compact" />
+                    <span aria-hidden="true">/</span>
+                    <span>{entity.jurisdictionLabel}</span>
                   </span>
                   <h3 className="bp-story-link__title">{entity.displayName}</h3>
                   <p className="bp-story-link__summary">{entity.summary}</p>

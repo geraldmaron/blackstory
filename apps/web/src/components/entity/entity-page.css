@@ -1,0 +1,32 @@
+/**
+ * Entity record page affordances: mast meta row layout. Shared kind/confidence
+ * badge and legend-glyph styles live in shell.css so home and entity surfaces
+ * stay consistent without loading the explore bundle.
+ */
+
+.bp-entity-mast__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bp-space-2) var(--bp-space-3);
+}
+
+.bp-entity-mast__meta-sep {
+  color: var(--bp-ink-subtle);
+  user-select: none;
+}
+
+.bp-entity-mast__meta-item {
+  color: inherit;
+}
+
+.bp-story-link__meta-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bp-space-2);
+}
+
+.bp-at-a-glance .bp-confidence-mark {
+  font-size: 0.9375rem;
+}

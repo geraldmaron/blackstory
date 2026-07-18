@@ -25,7 +25,12 @@ import {
   type OpportunityAtlasCoverageSummary,
 } from '@blap/firebase';
 import { Notice } from '@blap/ui';
+import { AcsCoverageChart } from '../../components/data/AcsCoverageChart';
+import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataStatCitation } from '../../components/data/DataStatCitation';
+import { HateCrimeCompositionChart } from '../../components/data/HateCrimeCompositionChart';
+import { PopulationByDecadeChart } from '../../components/data/PopulationByDecadeChart';
+import '../../components/data/data-charts.css';
 
 export const metadata = {
   title: 'Data',
@@ -77,7 +82,12 @@ export default async function DataPage() {
           dataset on this page.
         </p>
         {populationByDecade && populationByDecade.length > 0 ? (
-          <ul className="bp-data-strip">
+          <>
+            <div className="bp-data-section__viz bp-data-section__viz--pair">
+              <PopulationByDecadeChart rows={populationByDecade} />
+              <BlackPopulationShareChart rows={populationByDecade} />
+            </div>
+            <ul className="bp-data-strip">
             {populationByDecade.map((row: NationalPopulationByDecade) => (
               <DataStatCitation
                 key={row.decade}
@@ -88,7 +98,8 @@ export default async function DataPage() {
                 sourceUrl={row.sourceUrl}
               />
             ))}
-          </ul>
+            </ul>
+          </>
         ) : (
           <p className="bp-sans">Census data is not available in this environment yet.</p>
         )}
@@ -104,7 +115,11 @@ export default async function DataPage() {
           Black-householder income breakout — at county and tract level.
         </p>
         {acsCoverage ? (
-          <ul className="bp-data-strip">
+          <>
+            <div className="bp-data-section__viz">
+              <AcsCoverageChart coverage={acsCoverage as AcsCoverageSummary} />
+            </div>
+            <ul className="bp-data-strip">
             <DataStatCitation
               value={formatCount((acsCoverage as AcsCoverageSummary).countyCount)}
               label="Counties covered"
@@ -118,7 +133,8 @@ export default async function DataPage() {
               sourceLabel={acsCoverage.source}
               sourceUrl={acsCoverage.sourceUrl}
             />
-          </ul>
+            </ul>
+          </>
         ) : (
           <p className="bp-sans">ACS data is not available in this environment yet.</p>
         )}
@@ -136,7 +152,11 @@ export default async function DataPage() {
           read these counts beside the national participation rate below.
         </Notice>
         {hateCrimeYear ? (
-          <ul className="bp-data-strip">
+          <>
+            <div className="bp-data-section__viz">
+              <HateCrimeCompositionChart summary={hateCrimeYear as HateCrimeYearSummary} />
+            </div>
+            <ul className="bp-data-strip">
             <DataStatCitation
               value={formatCount((hateCrimeYear as HateCrimeYearSummary).incidents)}
               label={`Reported incidents, ${LATEST_HATE_CRIME_YEAR}`}
@@ -158,7 +178,8 @@ export default async function DataPage() {
                 sourceUrl={hateCrimeYear.sourceUrl}
               />
             ) : null}
-          </ul>
+            </ul>
+          </>
         ) : (
           <p className="bp-sans">FBI hate crime data is not available in this environment yet.</p>
         )}

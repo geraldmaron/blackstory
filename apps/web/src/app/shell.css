@@ -505,7 +505,7 @@
 /* —— Page mast — the room's nameplate. Oversized, ruled, unmistakable ——  */
 .bp-page {
   animation: bp-surface-arrive var(--bp-duration-base) var(--bp-easing) both;
-  padding-block: var(--bp-space-10) var(--bp-space-16);
+  padding-block: var(--bp-space-12) var(--bp-space-16);
 }
 
 .bp-page__eyebrow,
@@ -532,12 +532,12 @@
 }
 
 .bp-page__title {
-  margin: var(--bp-space-4) 0 0;
+  margin: var(--bp-space-5) 0 0;
   font-family: var(--bp-font-display);
   font-weight: 600;
-  font-size: clamp(2.75rem, 1.9rem + 4vw, 5rem);
+  font-size: clamp(2.25rem, 1.85rem + 2vw, 3.5rem);
   letter-spacing: -0.04em;
-  line-height: 0.98;
+  line-height: 1.07;
 }
 
 /* Serif italic accent register — one warm word inside a display headline. */
@@ -555,7 +555,7 @@
 }
 
 .bp-page__lede {
-  margin: var(--bp-space-5) 0 0;
+  margin: var(--bp-space-6) 0 0;
   max-width: 42rem;
   color: var(--bp-ink-muted);
   font-family: var(--bp-font-editorial);
@@ -570,7 +570,7 @@
 /* —— Sections — hairline-ruled rooms with an index numeral ——  */
 .bp-section {
   position: relative;
-  padding-block: var(--bp-space-12);
+  padding-block: var(--bp-space-12) var(--bp-space-16);
   border-bottom: var(--bp-border-width) solid var(--bp-rule);
 }
 
@@ -583,20 +583,20 @@
 }
 
 .bp-section__kicker {
-  margin-bottom: var(--bp-space-3);
+  margin-bottom: var(--bp-space-4);
 }
 
 .bp-section__title {
   margin: 0;
   font-family: var(--bp-font-display);
   font-weight: 600;
-  font-size: clamp(1.75rem, 1.4rem + 1.6vw, 2.625rem);
+  font-size: clamp(1.5rem, 1.35rem + 0.9vw, 2rem);
   letter-spacing: -0.03em;
   line-height: 1.05;
 }
 
 .bp-section__lede {
-  margin: var(--bp-space-4) 0 0;
+  margin: var(--bp-space-5) 0 0;
   max-width: 46rem;
   color: var(--bp-ink-muted);
   font-family: var(--bp-font-editorial);
@@ -1067,8 +1067,8 @@
 .bp-story-rail {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--bp-space-6);
-  margin: var(--bp-space-6) 0 0;
+  gap: var(--bp-space-8);
+  margin: var(--bp-space-8) 0 0;
   padding: 0;
   list-style: none;
 }
@@ -1095,6 +1095,10 @@
 }
 
 .bp-story-link__meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bp-space-2);
   color: var(--bp-ink-subtle);
   font-family: var(--bp-font-mono);
   font-size: 0.6875rem;
@@ -1145,7 +1149,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 0;
-  margin: var(--bp-space-6) 0 0;
+  margin: var(--bp-space-8) 0 0;
 }
 
 .bp-data-strip__item {
@@ -1379,7 +1383,7 @@
    who never scrolls still leaves knowing what/where/when/how-solid. A framed
    box is deliberate here — this IS a discrete object. ——  */
 .bp-at-a-glance {
-  margin-top: var(--bp-space-6);
+  margin-top: var(--bp-space-8);
   padding: var(--bp-space-5) var(--bp-space-6);
   border: var(--bp-border-width) solid var(--bp-border);
   border-radius: var(--bp-radius-md);
@@ -1445,7 +1449,7 @@
 
 .bp-entity-sections > .bp-record-section {
   counter-increment: bp-rec;
-  padding-top: var(--bp-space-6);
+  padding-top: var(--bp-space-8);
   border-top: var(--bp-border-width) solid var(--bp-rule);
 }
 
@@ -1469,7 +1473,7 @@
 .bp-entity-layout {
   display: grid;
   gap: var(--bp-space-8);
-  margin-top: var(--bp-space-6);
+  margin-top: var(--bp-space-8);
 }
 
 .bp-entity-aside {
@@ -1479,7 +1483,7 @@
 }
 
 .bp-entity-mast {
-  padding-bottom: var(--bp-space-6);
+  padding-bottom: var(--bp-space-8);
   border-bottom: var(--bp-border-width-strong) solid var(--bp-ink);
 }
 
@@ -1655,4 +1659,95 @@
     gap: var(--bp-space-12);
     align-items: start;
   }
+}
+
+/* —— Kind badge + confidence mark — map-parity indicators reused on home,
+   entity, and explore surfaces. Glyph + label so color is never the only
+   signal (WCAG 1.4.1). ——  */
+.bp-kind-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bp-space-2);
+}
+
+.bp-kind-badge__label {
+  font-family: var(--bp-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.bp-kind-badge--compact {
+  gap: var(--bp-space-1);
+}
+
+.bp-kind-badge--compact .bp-kind-badge__label {
+  font-size: inherit;
+  letter-spacing: inherit;
+}
+
+.bp-confidence-mark {
+  font-family: var(--bp-font-sans);
+}
+
+.bp-legend-glyph {
+  flex: 0 0 auto;
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border: var(--bp-border-width) solid var(--bp-border);
+}
+
+.bp-legend-glyph--circle {
+  border-radius: 50%;
+}
+
+.bp-legend-glyph--square {
+  border-radius: 2px;
+}
+
+.bp-legend-glyph--diamond {
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+.bp-legend-glyph--ring {
+  border-radius: 50%;
+  border-width: 2px;
+  background: transparent;
+}
+
+/* —— Data charts — flat matte SVG figures ——  */
+.bp-data-chart {
+  margin: var(--bp-space-6) 0 0;
+}
+
+.bp-data-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.bp-data-chart__svg line,
+.bp-data-chart__svg path.bp-data-chart__axis {
+  stroke: var(--bp-rule);
+  stroke-width: 1;
+  fill: none;
+}
+
+.bp-data-chart__svg rect.bp-data-chart__bar,
+.bp-data-chart__svg path.bp-data-chart__bar {
+  fill: var(--bp-accent-graphic);
+}
+
+.bp-data-chart__caption {
+  margin: var(--bp-space-2) 0 0;
+  color: var(--bp-ink-muted);
+  font-family: var(--bp-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.45;
 }

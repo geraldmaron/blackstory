@@ -9,8 +9,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { cx } from '@blap/ui';
-import { CONFIDENCE_TIER_GLYPH } from '../../lib/map-experience/dignity-style';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
+import { ConfidenceMark } from './ConfidenceMark';
+import { KindBadge } from './KindBadge';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;
@@ -41,7 +42,6 @@ export function SynchronizedResultList({
       {features.map((feature) => {
         const { properties } = feature;
         const isSelected = properties.entityId === selectedId;
-        const glyph = CONFIDENCE_TIER_GLYPH[properties.confidenceTier] ?? CONFIDENCE_TIER_GLYPH.unrated;
 
         return (
           <li key={properties.entityId} className="bp-result-list__item">
@@ -65,12 +65,9 @@ export function SynchronizedResultList({
               <h3 className="bp-result-list__title">{properties.displayName}</h3>
               <p className="bp-result-list__summary">{properties.oneLineStory}</p>
               <div className="bp-result-list__meta">
-                <span className="bp-mono">{properties.kind}</span>
+                <KindBadge kind={properties.kind} density="compact" />
                 <span className="bp-mono">{eraLabel(properties.eraBuckets)}</span>
-                <span className="bp-sans">
-                  <span aria-hidden="true">{glyph}</span>{' '}
-                  {properties.confidenceTier === 'unrated' ? 'Unrated' : `${properties.confidenceTier} confidence`}
-                </span>
+                <ConfidenceMark tier={properties.confidenceTier} className="bp-sans" />
                 <span className="bp-sans">
                   {properties.evidenceCount} claim{properties.evidenceCount === 1 ? '' : 's'}
                 </span>

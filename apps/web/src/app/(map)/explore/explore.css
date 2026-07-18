@@ -135,16 +135,17 @@
 .bp-explore__narrative {
   max-width: 36rem;
   padding-bottom: var(--bp-space-4);
+  margin-bottom: var(--bp-space-3);
   border-bottom: var(--bp-border-width) solid var(--bp-rule);
 }
 
 /* —— Narrative card (v5.1 record anatomy) — sits flush inside the ink-glass
    results panel: no box-in-box, hairlines and labeled facts carry the
-   structure. Same order as every other record surface: kind slug → name →
+   structure. Same order as every other record surface: kind badge → name →
    story → labeled facts → tags → precision → one action. ——  */
 .bp-nc {
   display: grid;
-  gap: var(--bp-space-3);
+  gap: var(--bp-space-4);
 }
 
 .bp-nc__top {
@@ -154,14 +155,44 @@
   gap: var(--bp-space-3);
 }
 
-.bp-nc__slug {
-  margin: 0;
-  color: var(--bp-accent);
+.bp-nc__kind-rule {
+  padding-left: var(--bp-space-3);
+  border-left: 3px solid transparent;
+}
+
+.bp-kind-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bp-space-2);
+}
+
+.bp-kind-badge__label {
   font-family: var(--bp-font-mono);
   font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: var(--bp-ink-muted);
+}
+
+.bp-kind-badge--compact {
+  gap: var(--bp-space-1);
+}
+
+.bp-kind-badge--compact .bp-kind-badge__label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+}
+
+.bp-kind-badge .bp-legend-glyph--ring {
+  background: transparent !important;
+  border-width: 2px;
+}
+
+.bp-confidence-mark {
+  display: inline;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 /* Close is a quiet instrument key, never a competing pill action. */
@@ -197,7 +228,7 @@
   margin: 0;
   font-family: var(--bp-font-display);
   font-weight: 600;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   letter-spacing: -0.02em;
   line-height: 1.15;
 }
@@ -224,7 +255,11 @@
   gap: var(--bp-space-3);
   align-items: baseline;
   padding: var(--bp-space-2) 0;
-  border-top: var(--bp-border-width) solid var(--bp-rule);
+  border-top: var(--bp-border-width) solid color-mix(in srgb, var(--bp-rule) 72%, transparent);
+}
+
+.bp-nc__fact:last-child {
+  padding-bottom: 0;
 }
 
 .bp-nc__fact dt {
@@ -390,6 +425,11 @@
   width: 0.75rem;
   height: 0.75rem;
   border: var(--bp-border-width) solid var(--bp-border);
+}
+
+.bp-explore-stage__results .bp-legend-glyph,
+.bp-explore-legend .bp-legend-glyph {
+  border-color: color-mix(in srgb, currentColor 12%, transparent);
 }
 
 .bp-legend-glyph--circle {

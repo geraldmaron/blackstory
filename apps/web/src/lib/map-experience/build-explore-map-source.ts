@@ -28,7 +28,7 @@ export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
 
 /** Highest confidence tier among an entity's accepted claims a transparency affordance about
  * how strongly evidenced the record is, never a numeric score (ranking-signal ban). */
-function highestConfidence(claims: readonly PublicClaimView[]): ConfidenceTier {
+export function highestConfidence(claims: readonly PublicClaimView[]): ConfidenceTier {
   if (claims.some((claim) => claim.confidenceLevel === 'high')) return 'high';
   if (claims.some((claim) => claim.confidenceLevel === 'medium')) return 'medium';
   if (claims.some((claim) => claim.confidenceLevel === 'low')) return 'low';

@@ -1,7 +1,7 @@
 /**
  * Narrative off-ramp card for a single selected map point. Anatomy follows the
  * cognitive-accessibility law (design-direction-v5 §v5.1): one consistent record
- * order everywhere — kind slug → name → one-line story → labeled facts → tags →
+ * order everywhere — kind badge → name → one-line story → labeled facts → tags →
  * precision note → single action. Every fact carries a literal label (Era,
  * Evidence, Confidence, Status); nothing is inferred from position or glued
  * together. Close is a small icon key in the top corner, not a competing action.
@@ -10,8 +10,10 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import { CONFIDENCE_TIER_GLYPH } from '../../lib/map-experience/dignity-style';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
+import { kindEncodingFor } from '../../lib/map-experience/kind-encoding';
+import { ConfidenceMark } from './ConfidenceMark';
+import { KindBadge } from './KindBadge';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source (same note as
 // `@blap/ui`'s own components, e.g. MapExplorer.tsx).
@@ -40,12 +42,17 @@ function radiusAffordanceLabel(feature: ExploreMapFeature): string {
 
 export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
   const { properties } = feature;
-  const glyph = CONFIDENCE_TIER_GLYPH[properties.confidenceTier] ?? CONFIDENCE_TIER_GLYPH.unrated;
+  const kindEncoding = kindEncodingFor(properties.kind);
 
   return (
     <article className="bp-nc" aria-label={properties.displayName}>
       <div className="bp-nc__top">
-        <p className="bp-nc__slug">{properties.kind}</p>
+        <div
+          className="bp-nc__kind-rule"
+          style={{ borderColor: kindEncoding.shade }}
+        >
+          <KindBadge kind={properties.kind} />
+        </div>
         {onClose ? (
           <button
             type="button"
@@ -82,8 +89,7 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         <div className="bp-nc__fact">
           <dt>Confidence</dt>
           <dd>
-            <span aria-hidden="true">{glyph}</span>{' '}
-            {properties.confidenceTier === 'unrated' ? 'Unrated' : `${properties.confidenceTier} confidence`}
+            <ConfidenceMark tier={properties.confidenceTier} />
           </dd>
         </div>
         {properties.status ? (

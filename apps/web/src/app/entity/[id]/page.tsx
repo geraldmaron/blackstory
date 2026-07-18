@@ -11,7 +11,9 @@ import { notFound } from 'next/navigation';
 import { buildCompactFactViewsForEntity } from '@blap/domain';
 import { Card, MapFrame, Notice, Timeline } from '@blap/ui';
 import { SeedDataNotice } from '../../../components/SeedDataNotice';
+import { KindBadge, ConfidenceMark } from '../../../components/map-experience';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
+import '../../../components/entity/entity-page.css';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
 import { EntityRelatedList } from '../../../components/entity/EntityRelatedList';
 import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
@@ -23,7 +25,7 @@ import { HowToReadThisRecord } from '../../../components/trust';
 import { WhyThisAppears } from '../../../components/why-appears';
 import { seedFactsForEntity } from '../../../data/facts-seed';
 import { listPublicEntities } from '../../../data/public-seed';
-import { buildExploreHref, geoAnchorFor } from '../../../lib/map-experience';
+import { buildExploreHref, geoAnchorFor, highestConfidence } from '../../../lib/map-experience';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
 import { resolvePublicEntityView } from '../../../lib/public-data/source';
 import { buildWhyThisAppearsForEntity, toEvidenceClaimInputs } from './adapters';
@@ -64,6 +66,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
 
   const framing = deriveHistoricalFraming(entity);
   const framingLabel = framing === 'present_day' ? 'Present-day record' : 'Historical record';
+  const confidenceTier = highestConfidence(entity.claims);
   // Fail-closed, not fail-crashed: the domain layer throws when a record lacks
   // a substantiated notability basis (BB-090). That withholds the explanation —
   // it must never take the whole record page down with it.
@@ -91,7 +94,17 @@ export default async function EntityPage({ params }: EntityPageProps) {
     <main className="bp-container bp-page" id="main">
       <header className="bp-entity-mast">
         <p className="bp-page__eyebrow">
-          {entity.kind} · {entity.jurisdictionLabel} · {framingLabel}
+          <span className="bp-entity-mast__meta">
+            <KindBadge kind={entity.kind} />
+            <span className="bp-entity-mast__meta-sep" aria-hidden="true">
+              ·
+            </span>
+            <span className="bp-mono bp-entity-mast__meta-item">{entity.jurisdictionLabel}</span>
+            <span className="bp-entity-mast__meta-sep" aria-hidden="true">
+              ·
+            </span>
+            <span className="bp-entity-mast__meta-item">{framingLabel}</span>
+          </span>
         </p>
         <h1 className="bp-page__title">{entity.displayName}</h1>
         <p className="bp-page__lede">{entity.summary}</p>
@@ -105,7 +118,9 @@ export default async function EntityPage({ params }: EntityPageProps) {
         <dl className="bp-at-a-glance__grid">
           <div className="bp-at-a-glance__row">
             <dt>Kind</dt>
-            <dd>{entity.kind}</dd>
+            <dd>
+              <KindBadge kind={entity.kind} />
+            </dd>
           </div>
           <div className="bp-at-a-glance__row">
             <dt>Where</dt>
@@ -119,6 +134,12 @@ export default async function EntityPage({ params }: EntityPageProps) {
             <dt>Evidence</dt>
             <dd>
               {entity.claims.length} accepted claim{entity.claims.length === 1 ? '' : 's'}
+            </dd>
+          </div>
+          <div className="bp-at-a-glance__row">
+            <dt>Confidence</dt>
+            <dd>
+              <ConfidenceMark tier={confidenceTier} />
             </dd>
           </div>
           <div className="bp-at-a-glance__row">
