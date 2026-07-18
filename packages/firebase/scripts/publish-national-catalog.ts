@@ -174,12 +174,28 @@ async function main(): Promise<void> {
   if (!releaseId) throw new Error('publicMeta/activeRelease missing or has no releaseId');
   console.log(`Active release: ${releaseId}`);
 
-  // Validate EVERYTHING before writing anything.
-  const writes = entries.map((entry) => {
-    const projection = toProjectionDoc(entry, releaseId);
-    const search = toSearchDoc(entry, releaseId, projection.claims?.length ?? 0);
-    return { entry, projection, search };
+  // Validate EVERYTHING before writing anything; name each failing entry so a bad catalog
+  // line reads as "which record, which field", not a bare Zod trace.
+  const failures: string[] = [];
+  const writes = entries.flatMap((entry) => {
+    try {
+      const projection = toProjectionDoc(entry, releaseId);
+      const search = toSearchDoc(entry, releaseId, projection.claims?.length ?? 0);
+      return [{ entry, projection, search }];
+    } catch (error) {
+      const detail =
+        error instanceof Error && 'issues' in error
+          ? JSON.stringify((error as { issues: unknown }).issues)
+          : String(error);
+      failures.push(`${entry.id}: ${detail}`);
+      return [];
+    }
   });
+  if (failures.length > 0) {
+    console.error(`INVALID ENTRIES (${failures.length}):`);
+    for (const failure of failures) console.error(`  ${failure}`);
+    throw new Error(`${failures.length} catalog entries failed validation; nothing written.`);
+  }
   console.log(`Validated ${writes.length} projections + ${writes.length} search docs`);
 
   if (DRY_RUN) {

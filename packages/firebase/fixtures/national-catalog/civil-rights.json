@@ -1,0 +1,798 @@
+[
+  {
+    "id": "ent_montgomery_bus_boycott_001",
+    "kind": "event",
+    "displayName": "Montgomery Bus Boycott",
+    "summary": "For 381 days beginning December 5, 1955, Black Montgomerians organized carpools and walked to work rather than ride segregated city buses. Sparked by Rosa Parks' December 1 arrest and coordinated by the Montgomery Improvement Association under Martin Luther King Jr., the boycott ended December 20, 1956, after Browder v. Gayle desegregated the buses.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "public-transit",
+      "direct-action",
+      "organizing"
+    ],
+    "jurisdictionLabel": "Montgomery, Alabama",
+    "locationPrecision": "city",
+    "locationLabel": "Downtown Montgomery, Alabama",
+    "lat": 32.3769,
+    "lng": -86.31,
+    "claims": [
+      {
+        "predicate": "began_on",
+        "object": "December 5, 1955, four days after Rosa Parks was arrested on December 1, 1955 for refusing to surrender her bus seat",
+        "confidenceLevel": "high",
+        "citationSource": "kinginstitute.stanford.edu",
+        "citationHref": "https://kinginstitute.stanford.edu/encyclopedia/montgomery-bus-boycott",
+        "citationLabel": "King Institute Encyclopedia: Montgomery Bus Boycott"
+      },
+      {
+        "predicate": "ended_on",
+        "object": "December 20, 1956, after the Supreme Court's Browder v. Gayle ruling took effect and Montgomery's buses were desegregated",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/montgomery-bus-boycott.htm",
+        "citationLabel": "National Park Service: The Montgomery Bus Boycott"
+      }
+    ],
+    "historicalContext": "The boycott was the first sustained mass protest of the modern civil rights movement. Organized through Black churches, the Women's Political Council, and a carpool system of some 300 vehicles, it demonstrated the economic power of a united Black community and brought Martin Luther King Jr. to national leadership.",
+    "related": [
+      {
+        "id": "ent_rosa_parks_arrest_site_001",
+        "type": "occurred_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_dexter_avenue_king_memorial_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_rosa_parks_arrest_site_001",
+    "kind": "place",
+    "displayName": "Rosa Parks Arrest Site",
+    "summary": "On December 1, 1955, Rosa Parks was arrested aboard a Cleveland Avenue bus near the Empire Theater on Montgomery Street after refusing to give up her seat. Troy University's Rosa Parks Museum, opened in 2000 at 252 Montgomery Street, and a 2015 state historical marker commemorate the site where the boycott began.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "public-transit",
+      "commemoration",
+      "rosa-parks"
+    ],
+    "jurisdictionLabel": "Montgomery, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "Rosa Parks Museum, 252 Montgomery Street (former Empire Theater site)",
+    "lat": 32.3765,
+    "lng": -86.3113,
+    "claims": [
+      {
+        "predicate": "site_of",
+        "object": "Rosa Parks' December 1, 1955 arrest for refusing to surrender her seat on a segregated Montgomery city bus",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/000/places-of-rosa-parks.htm",
+        "citationLabel": "National Park Service: Places of Rosa Parks"
+      },
+      {
+        "predicate": "commemorated_by",
+        "object": "the Rosa Parks Museum, built on the arrest site at 252 Montgomery Street and opened by Troy University on December 1, 2000",
+        "confidenceLevel": "high",
+        "citationSource": "troy.edu",
+        "citationHref": "https://www.troy.edu/student-life-resources/arts-culture/rosa-parks-museum/index.html",
+        "citationLabel": "Troy University: Rosa Parks Museum"
+      }
+    ],
+    "historicalContext": "Parks, a seamstress and longtime secretary of the Montgomery NAACP, was a trained activist, not an accidental symbol. Her arrest at this downtown stop gave Montgomery's organizers the case they needed, and the museum on the site preserves a restored bus and court records from the boycott that followed.",
+    "related": [
+      {
+        "id": "ent_rosa_parks_museum_001",
+        "type": "located_at",
+        "direction": "incoming"
+      },
+      {
+        "id": "ent_montgomery_bus_boycott_001",
+        "type": "occurred_at",
+        "direction": "incoming"
+      }
+    ]
+  },
+  {
+    "id": "ent_edmund_pettus_bridge_001",
+    "kind": "place",
+    "displayName": "Edmund Pettus Bridge",
+    "summary": "On March 7, 1965, about 600 voting-rights marchers led by John Lewis and Hosea Williams crossed this U.S. Route 80 bridge over the Alabama River and were attacked by state troopers at its foot — Bloody Sunday. The bridge anchors the Selma to Montgomery National Historic Trail and hosts an annual commemorative crossing.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "voting-rights",
+      "direct-action",
+      "commemoration"
+    ],
+    "jurisdictionLabel": "Selma, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "Edmund Pettus Bridge, U.S. Route 80 at Broad Street, Selma",
+    "lat": 32.4053,
+    "lng": -87.0186,
+    "claims": [
+      {
+        "predicate": "site_of",
+        "object": "the March 7, 1965 'Bloody Sunday' attack on voting-rights marchers, which triggered national outrage and federal intervention",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/semo/index.htm",
+        "citationLabel": "National Park Service: Selma to Montgomery National Historic Trail"
+      },
+      {
+        "predicate": "part_of",
+        "object": "the 54-mile Selma to Montgomery National Historic Trail, designated by Congress in 1996 along the 1965 march route",
+        "confidenceLevel": "high",
+        "citationSource": "crmvet.org",
+        "citationHref": "https://www.crmvet.org/tim/timhis65.htm",
+        "citationLabel": "Civil Rights Movement Archive: 1965 timeline"
+      }
+    ],
+    "historicalContext": "Named for a Confederate general and Reconstruction-era Klan figure, the 1940 bridge became the visual shorthand for the voting-rights struggle. Marchers crossed it three times in March 1965; the completed march and the images from Bloody Sunday helped push the Voting Rights Act through Congress that August.",
+    "related": [
+      {
+        "id": "ent_selma_to_montgomery_marches_001",
+        "type": "occurred_at",
+        "direction": "incoming"
+      }
+    ]
+  },
+  {
+    "id": "ent_selma_to_montgomery_marches_001",
+    "kind": "event",
+    "displayName": "Selma to Montgomery Marches",
+    "summary": "Three marches in March 1965 pressed for Black voting rights in Alabama. After Bloody Sunday on March 7 and a turnaround march on March 9, roughly 3,200 marchers left Selma on March 21 under federal protection and arrived at the Montgomery capitol on March 25, 25,000 strong. The Voting Rights Act was signed on August 6, 1965.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "voting-rights",
+      "direct-action",
+      "organizing"
+    ],
+    "jurisdictionLabel": "Selma, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "Edmund Pettus Bridge, Selma (march origin)",
+    "lat": 32.4053,
+    "lng": -87.0186,
+    "claims": [
+      {
+        "predicate": "culminated_on",
+        "object": "March 25, 1965, when marchers reached the Alabama capitol in Montgomery after a five-day, 54-mile federally protected march from Selma",
+        "confidenceLevel": "high",
+        "citationSource": "kinginstitute.stanford.edu",
+        "citationHref": "https://kinginstitute.stanford.edu/encyclopedia/selma-montgomery-march",
+        "citationLabel": "King Institute Encyclopedia: Selma to Montgomery March"
+      },
+      {
+        "predicate": "contributed_to",
+        "object": "passage of the Voting Rights Act, signed into law on August 6, 1965",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/semo/index.htm",
+        "citationLabel": "National Park Service: Selma to Montgomery National Historic Trail"
+      }
+    ],
+    "historicalContext": "The marches grew out of months of voter-registration organizing in Selma and Marion by local activists, SNCC, and SCLC, and out of grief over the police killing of Jimmie Lee Jackson. Their disciplined nonviolence under attack made the case for federal voting-rights legislation to a national audience.",
+    "related": [
+      {
+        "id": "ent_edmund_pettus_bridge_001",
+        "type": "occurred_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_brown_chapel_ame_001",
+        "type": "occurred_at",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_little_rock_central_high_001",
+    "kind": "place",
+    "displayName": "Little Rock Central High School National Historic Site",
+    "summary": "Nine Black students desegregated Little Rock Central High School on September 25, 1957, entering under escort of the 101st Airborne after Governor Orval Faubus used the National Guard to block them. The school, still in operation, was designated a National Historic Site in 1998.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "school-desegregation",
+      "education",
+      "federal-intervention"
+    ],
+    "jurisdictionLabel": "Little Rock, Arkansas",
+    "locationPrecision": "institution",
+    "locationLabel": "Little Rock Central High School, 1500 Little Rock Nine Way",
+    "lat": 34.7367,
+    "lng": -92.2978,
+    "claims": [
+      {
+        "predicate": "site_of",
+        "object": "the 1957 desegregation crisis in which the Little Rock Nine entered under federal troop escort on September 25, 1957",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/chsc/index.htm",
+        "citationLabel": "National Park Service: Little Rock Central High School NHS"
+      },
+      {
+        "predicate": "designated",
+        "object": "a National Historic Site by Congress in 1998, the only such unit centered on an operating high school",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/chsc/index.htm",
+        "citationLabel": "National Park Service: Central High history and culture"
+      }
+    ],
+    "historicalContext": "Three years after Brown v. Board of Education, the Little Rock Nine tested whether the ruling would be enforced. Daisy Bates of the Arkansas NAACP mentored the students through a year of daily harassment; Ernest Green became the school's first Black graduate in May 1958."
+  },
+  {
+    "id": "ent_greensboro_woolworth_sit_in_site_001",
+    "kind": "place",
+    "displayName": "F.W. Woolworth Sit-In Site (International Civil Rights Center & Museum)",
+    "summary": "On February 1, 1960, four North Carolina A&T freshmen sat at the whites-only lunch counter of the F.W. Woolworth store on South Elm Street and asked to be served. The sit-in grew to hundreds within days, and the counter was desegregated on July 25, 1960. The International Civil Rights Center & Museum opened in the building in 2010.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "sit-ins",
+      "student-movement",
+      "direct-action"
+    ],
+    "jurisdictionLabel": "Greensboro, North Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Former F.W. Woolworth store, 134 South Elm Street, Greensboro",
+    "lat": 36.0717,
+    "lng": -79.7904,
+    "claims": [
+      {
+        "predicate": "site_of",
+        "object": "the February 1, 1960 Greensboro sit-in begun by Ezell Blair Jr., Franklin McCain, Joseph McNeil, and David Richmond",
+        "confidenceLevel": "high",
+        "citationSource": "sitinmovement.org",
+        "citationHref": "https://www.sitinmovement.org/",
+        "citationLabel": "International Civil Rights Center & Museum"
+      },
+      {
+        "predicate": "sparked",
+        "object": "a wave of student sit-ins across dozens of Southern cities in spring 1960, leading to the founding of SNCC that April",
+        "confidenceLevel": "high",
+        "citationSource": "crmvet.org",
+        "citationHref": "https://www.crmvet.org/tim/timhis60.htm",
+        "citationLabel": "Civil Rights Movement Archive: 1960 timeline"
+      }
+    ],
+    "historicalContext": "The Greensboro Four planned their protest in dorm-room conversations at North Carolina A&T. Their disciplined daily return to the counter turned a local action into a regional student movement, and a preserved section of the original lunch counter remains in the museum on the site.",
+    "related": [
+      {
+        "id": "ent_nc_at_state_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_march_on_washington_1963_001",
+    "kind": "event",
+    "displayName": "March on Washington for Jobs and Freedom",
+    "summary": "The March on Washington for Jobs and Freedom drew an estimated 250,000 people to the Lincoln Memorial on August 28, 1963. Organized by A. Philip Randolph and Bayard Rustin with a coalition of civil rights, labor, and faith groups, it pressed for civil rights legislation and closed with Martin Luther King Jr.'s 'I Have a Dream' speech.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "mass-mobilization",
+      "labor",
+      "organizing"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "Lincoln Memorial, National Mall, Washington, D.C.",
+    "lat": 38.8893,
+    "lng": -77.0502,
+    "claims": [
+      {
+        "predicate": "held_on",
+        "object": "August 28, 1963, with an estimated 250,000 participants gathered at the Lincoln Memorial",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/march-on-washington.htm",
+        "citationLabel": "National Park Service: March on Washington for Jobs and Freedom"
+      },
+      {
+        "predicate": "organized_by",
+        "object": "A. Philip Randolph as director and Bayard Rustin as chief organizer, sponsored by the leaders of the major civil rights organizations",
+        "confidenceLevel": "high",
+        "citationSource": "kinginstitute.stanford.edu",
+        "citationHref": "https://kinginstitute.stanford.edu/encyclopedia/march-washington-jobs-and-freedom",
+        "citationLabel": "King Institute Encyclopedia: March on Washington"
+      }
+    ],
+    "historicalContext": "Rustin's team assembled the logistics for the largest demonstration the capital had seen in under two months — trains, buses, marshals, and a printed manual. The march linked economic demands to civil rights and is credited with building momentum for the Civil Rights Act of 1964."
+  },
+  {
+    "id": "ent_kelly_ingram_park_001",
+    "kind": "place",
+    "displayName": "Kelly Ingram Park",
+    "summary": "Kelly Ingram Park, across from Sixteenth Street Baptist Church, was the assembly ground of the 1963 Birmingham campaign, where young demonstrators of the May 1963 Children's Crusade were met with police dogs and fire hoses. Their discipline under attack helped move the Civil Rights Act of 1964. The park lies within Birmingham Civil Rights National Monument, designated in 2017.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "direct-action",
+      "youth-organizing",
+      "commemoration"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "Kelly Ingram Park, 16th Street North and 5th Avenue North, Birmingham",
+    "lat": 33.5163,
+    "lng": -86.8146,
+    "sensitivityClass": "violence_associated",
+    "claims": [
+      {
+        "predicate": "site_of",
+        "object": "mass demonstrations of the May 1963 Birmingham campaign, including the Children's Crusade launched from Sixteenth Street Baptist Church",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/bicr/index.htm",
+        "citationLabel": "National Park Service: Birmingham Civil Rights National Monument"
+      },
+      {
+        "predicate": "adjacent_to",
+        "object": "the Birmingham Civil Rights Institute, which interprets the campaign and maintains the park's sculpture walk of the 1963 demonstrations",
+        "confidenceLevel": "high",
+        "citationSource": "bcri.org",
+        "citationHref": "https://www.bcri.org/",
+        "citationLabel": "Birmingham Civil Rights Institute"
+      }
+    ],
+    "historicalContext": "Project C, planned by Fred Shuttlesworth's Alabama Christian Movement for Human Rights and the SCLC, filled Birmingham's jails with volunteers in spring 1963. Thousands of students marched from the church through this park; national coverage of the city's response pushed the Kennedy administration to propose civil rights legislation.",
+    "related": [
+      {
+        "id": "ent_birmingham_civil_rights_institute_001",
+        "type": "related_to",
+        "direction": "incoming"
+      },
+      {
+        "id": "ent_sixteenth_street_baptist_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_lorraine_motel_001",
+    "kind": "place",
+    "displayName": "Lorraine Motel (National Civil Rights Museum)",
+    "summary": "The Lorraine Motel on Mulberry Street, a Green Book-era lodging for Black travelers, is where Martin Luther King Jr. was assassinated on April 4, 1968, while in Memphis supporting the sanitation workers' strike. The National Civil Rights Museum opened at the site in 1991, preserving Room 306 and the motel facade.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "labor",
+      "commemoration",
+      "martin-luther-king"
+    ],
+    "jurisdictionLabel": "Memphis, Tennessee",
+    "locationPrecision": "institution",
+    "locationLabel": "Lorraine Motel, 450 Mulberry Street, Memphis",
+    "lat": 35.1344,
+    "lng": -90.0575,
+    "sensitivityClass": "violence_associated",
+    "claims": [
+      {
+        "predicate": "site_of",
+        "object": "the assassination of Martin Luther King Jr. on the motel balcony outside Room 306 on April 4, 1968",
+        "confidenceLevel": "high",
+        "citationSource": "crmvet.org",
+        "citationHref": "https://www.crmvet.org/tim/timhis68.htm",
+        "citationLabel": "Civil Rights Movement Archive: 1968 timeline"
+      },
+      {
+        "predicate": "now_houses",
+        "object": "the National Civil Rights Museum, opened in 1991, which traces the movement from slavery through the modern era",
+        "confidenceLevel": "high",
+        "citationSource": "civilrightsmuseum.org",
+        "citationHref": "https://www.civilrightsmuseum.org/",
+        "citationLabel": "National Civil Rights Museum"
+      }
+    ],
+    "historicalContext": "King came to Memphis to stand with 1,300 striking sanitation workers whose 'I AM A MAN' campaign joined labor rights to civil rights. The motel where he stayed on Southern trips was saved from demolition by a community foundation and rebuilt as a museum anchored on the preserved room where he spent his last night.",
+    "related": [
+      {
+        "id": "ent_national_civil_rights_museum_001",
+        "type": "located_at",
+        "direction": "incoming"
+      },
+      {
+        "id": "ent_mason_temple_001",
+        "type": "related_to",
+        "direction": "incoming"
+      }
+    ]
+  },
+  {
+    "id": "ent_medgar_evers_home_001",
+    "kind": "place",
+    "displayName": "Medgar and Myrlie Evers Home National Monument",
+    "summary": "The ranch house at 2332 Margaret Walker Alexander Drive was home to Mississippi NAACP field secretary Medgar Evers, who organized voter registration and boycotts statewide until his assassination in the driveway on June 12, 1963. The home was designated a National Historic Landmark in 2017 and a national monument in 2020.",
+    "eraBuckets": [
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "voting-rights",
+      "naacp",
+      "commemoration"
+    ],
+    "jurisdictionLabel": "Jackson, Mississippi",
+    "locationPrecision": "institution",
+    "locationLabel": "Medgar and Myrlie Evers Home, 2332 Margaret Walker Alexander Drive, Jackson",
+    "lat": 32.341,
+    "lng": -90.2126,
+    "sensitivityClass": "violence_associated",
+    "claims": [
+      {
+        "predicate": "home_of",
+        "object": "Medgar Evers, Mississippi's first NAACP field secretary, from 1956 until his assassination there on June 12, 1963",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/memy/index.htm",
+        "citationLabel": "National Park Service: Medgar and Myrlie Evers Home NM"
+      },
+      {
+        "predicate": "designated",
+        "object": "a National Historic Landmark in 2017 and established as a National Park Service national monument in December 2020",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/memy/learn/historyculture/index.htm",
+        "citationLabel": "National Park Service: Evers Home history and culture"
+      }
+    ],
+    "historicalContext": "Evers investigated the Emmett Till lynching, organized the Jackson boycott movement, and built NAACP chapters across Mississippi under constant threat. Myrlie Evers-Williams preserved the house and pursued the case for three decades until Byron De La Beckwith's 1994 conviction; the family donated the home to Tougaloo College in 1993."
+  },
+  {
+    "id": "ent_freedom_rides_museum_001",
+    "kind": "place",
+    "displayName": "Freedom Rides Museum (Montgomery Greyhound Station)",
+    "summary": "At Montgomery's former Greyhound station on South Court Street, Freedom Riders testing interstate bus desegregation were attacked by a mob on May 20, 1961. The riders pressed on, and by November 1961 the Interstate Commerce Commission's desegregation order took effect. The Alabama Historical Commission opened the Freedom Rides Museum in the station in 2011.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "freedom-rides",
+      "public-transit",
+      "direct-action"
+    ],
+    "jurisdictionLabel": "Montgomery, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "Former Greyhound station, 210 South Court Street, Montgomery",
+    "lat": 32.3747,
+    "lng": -86.3092,
+    "sensitivityClass": "violence_associated",
+    "claims": [
+      {
+        "predicate": "site_of",
+        "object": "the May 20, 1961 mob attack on Freedom Riders arriving from Birmingham, which prompted federal marshals to be sent to Montgomery",
+        "confidenceLevel": "high",
+        "citationSource": "encyclopediaofalabama.org",
+        "citationHref": "https://encyclopediaofalabama.org/article/freedom-rides-museum/",
+        "citationLabel": "Encyclopedia of Alabama: Freedom Rides Museum"
+      },
+      {
+        "predicate": "commemorates",
+        "object": "the 1961 Freedom Rides, whose continuation led the ICC to enforce desegregated interstate travel effective November 1, 1961",
+        "confidenceLevel": "high",
+        "citationSource": "crmvet.org",
+        "citationHref": "https://www.crmvet.org/tim/timhis61.htm",
+        "citationLabel": "Civil Rights Movement Archive: 1961 timeline"
+      }
+    ],
+    "historicalContext": "CORE and Nashville student movement riders kept the Freedom Rides going after earlier violence in Anniston and Birmingham. The night after the station attack, a mass meeting at First Baptist Church stood besieged until federalized troops arrived — a confrontation that forced the Kennedy administration into the movement's corner."
+  },
+  {
+    "id": "ent_moton_high_school_001",
+    "kind": "place",
+    "displayName": "Robert Russa Moton High School (Moton Museum)",
+    "summary": "On April 23, 1951, sixteen-year-old Barbara Johns led some 450 classmates out of overcrowded Robert Russa Moton High School to demand a school equal to Farmville's white high school. Their strike produced Davis v. County School Board, one of the five cases decided in Brown v. Board of Education. The building is now the Moton Museum.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "school-desegregation",
+      "student-movement",
+      "education"
+    ],
+    "jurisdictionLabel": "Farmville, Virginia",
+    "locationPrecision": "institution",
+    "locationLabel": "Robert Russa Moton Museum, 900 Griffin Boulevard, Farmville",
+    "lat": 37.2911,
+    "lng": -78.3978,
+    "claims": [
+      {
+        "predicate": "site_of",
+        "object": "the April 23, 1951 student strike led by Barbara Johns against unequal school facilities in Prince Edward County",
+        "confidenceLevel": "high",
+        "citationSource": "motonmuseum.org",
+        "citationHref": "https://motonmuseum.org/",
+        "citationLabel": "Robert Russa Moton Museum"
+      },
+      {
+        "predicate": "led_to",
+        "object": "Davis v. County School Board of Prince Edward County, consolidated into Brown v. Board of Education (1954)",
+        "confidenceLevel": "high",
+        "citationSource": "encyclopediavirginia.org",
+        "citationHref": "https://encyclopediavirginia.org/entries/moton-school-strike-and-prince-edward-county-school-closings/",
+        "citationLabel": "Encyclopedia Virginia: Moton School Strike"
+      }
+    ],
+    "historicalContext": "Built for 200 students but holding 450 in tar-paper annexes, Moton embodied the inequality of 'separate but equal.' After Brown, Prince Edward County closed its entire public school system from 1959 to 1964 rather than integrate. The school was designated a National Historic Landmark in 1998 and affiliated with Brown v. Board NHP in 2022."
+  },
+  {
+    "id": "ent_dockum_drug_store_sit_in_001",
+    "kind": "event",
+    "displayName": "Dockum Drug Store Sit-In",
+    "summary": "From July 19 to August 11, 1958, Wichita NAACP Youth Council members led by Ron Walters and Carol Parks sat in daily at the downtown Dockum Drug Store lunch counter at Douglas and Broadway. The chain agreed to serve all customers statewide — a successful student-led sit-in a year and a half before Greensboro.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "sit-ins",
+      "student-movement",
+      "naacp"
+    ],
+    "jurisdictionLabel": "Wichita, Kansas",
+    "locationPrecision": "institution",
+    "locationLabel": "Former Dockum Drug Store site, Douglas Avenue and Broadway, Wichita",
+    "lat": 37.6858,
+    "lng": -97.3356,
+    "claims": [
+      {
+        "predicate": "began_on",
+        "object": "July 19, 1958, organized by NAACP Youth Council president Ron Walters and treasurer Carol Parks with attorney Chester I. Lewis",
+        "confidenceLevel": "high",
+        "citationSource": "wichita.edu",
+        "citationHref": "https://www.wichita.edu/about/wsunews/news/2022/02-feb/dockum_11.php",
+        "citationLabel": "Wichita State University: Dockum lunch counter sit-in"
+      },
+      {
+        "predicate": "resulted_in",
+        "object": "the Dockum/Rexall chain agreeing in August 1958 to serve all customers regardless of race across its Kansas stores",
+        "confidenceLevel": "high",
+        "citationSource": "visitwichita.com",
+        "citationHref": "https://www.visitwichita.com/listing/dockum-sit-in-of-1958/31934/",
+        "citationLabel": "Visit Wichita: Dockum Sit-In of 1958"
+      }
+    ],
+    "historicalContext": "The Dockum sit-in is among the earliest sustained, successful student sit-ins of the movement, predating Greensboro by eighteen months. Chester I. Lewis Reflection Square Park, with a bronze lunch-counter sculpture, now marks the corner; Ron Walters went on to become a leading political scientist."
+  },
+  {
+    "id": "ent_clinton_twelve_001",
+    "kind": "event",
+    "displayName": "Clinton 12 Desegregate Clinton High School",
+    "summary": "On August 27, 1956, twelve Black students walked down Foley Hill into Clinton High School, making it the first state-supported public high school in the former Confederacy to desegregate. They kept attending through mob harassment and a 1958 bombing of the school; Bobby Cain graduated in May 1957. The Green McAdoo Cultural Center tells their story.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "school-desegregation",
+      "education",
+      "youth-organizing"
+    ],
+    "jurisdictionLabel": "Clinton, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Clinton High School and Green McAdoo Cultural Center, Clinton, Tennessee",
+    "lat": 36.1034,
+    "lng": -84.1319,
+    "claims": [
+      {
+        "predicate": "began_on",
+        "object": "August 27, 1956, when twelve Black students entered Clinton High School under a federal court desegregation order",
+        "confidenceLevel": "high",
+        "citationSource": "greenmcadooculturalcenter.org",
+        "citationHref": "https://greenmcadooculturalcenter.org/about/",
+        "citationLabel": "Green McAdoo Cultural Center: About the Clinton 12"
+      },
+      {
+        "predicate": "commemorated_by",
+        "object": "the Green McAdoo Cultural Center, opened in 2006 in the former segregated Green McAdoo Grammar School with bronze statues of the twelve students",
+        "confidenceLevel": "high",
+        "citationSource": "tnmuseum.org",
+        "citationHref": "https://tnmuseum.org/green-mcadoo-cultural-center",
+        "citationLabel": "Tennessee State Museum: Green McAdoo Cultural Center"
+      }
+    ],
+    "historicalContext": "Clinton desegregated a year before Little Rock, after the McSwain v. Anderson County ruling. When outside agitators stirred mobs, white and Black neighbors escorted students and the National Guard restored order; Bobby Cain became the first Black graduate of an integrated state-supported high school in the South."
+  },
+  {
+    "id": "ent_dorchester_academy_001",
+    "kind": "place",
+    "displayName": "Dorchester Academy",
+    "summary": "Founded by the American Missionary Association after the Civil War to educate freedpeople, Dorchester Academy's surviving 1934 boys' dormitory housed the SCLC's Citizenship Education Program from 1961 to 1970. There Septima Clark and Dorothy Cotton trained community teachers who prepared thousands of Black Southerners to register to vote.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "voting-rights",
+      "education",
+      "organizing-schools"
+    ],
+    "jurisdictionLabel": "Midway, Georgia",
+    "locationPrecision": "institution",
+    "locationLabel": "Dorchester Academy Boys' Dormitory, 8787 East Oglethorpe Highway, Midway",
+    "lat": 31.8006,
+    "lng": -81.4656,
+    "claims": [
+      {
+        "predicate": "headquarters_of",
+        "object": "the SCLC Citizenship Education Program, 1961-1970, which trained close to 2,000 teachers who in turn taught more than 10,000 others",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/georgia-dorchester-academy-boys-dormitory.htm",
+        "citationLabel": "National Park Service: Dorchester Academy Boys' Dormitory"
+      },
+      {
+        "predicate": "designated",
+        "object": "a National Historic Landmark in 2006; the dormitory is the last surviving building of the academy campus",
+        "confidenceLevel": "high",
+        "citationSource": "civilrightstrail.com",
+        "citationHref": "https://civilrightstrail.com/attraction/dorchester-academy-boys-dormitory/",
+        "citationLabel": "U.S. Civil Rights Trail: Dorchester Academy"
+      }
+    ],
+    "historicalContext": "The citizenship schools begun by Septima Clark taught literacy, constitutional rights, and the mechanics of registration, quietly building the voter base the movement's marches depended on. SCLC leadership also used Dorchester for retreats, including planning sessions ahead of the 1963 Birmingham campaign."
+  },
+  {
+    "id": "ent_highlander_folk_school_001",
+    "kind": "place",
+    "displayName": "Highlander Folk School Site",
+    "summary": "Highlander Folk School near Monteagle trained labor and civil rights organizers across lines of race from 1932 until Tennessee revoked its charter in 1961. Rosa Parks attended a two-week desegregation workshop led by Septima Clark in August 1955, four months before her Montgomery arrest; the citizenship school model begun here spread across the South.",
+    "eraBuckets": [
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "organizing-schools",
+      "labor",
+      "education"
+    ],
+    "jurisdictionLabel": "Monteagle, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Former Highlander Folk School campus, Summerfield community near Monteagle",
+    "lat": 35.2399,
+    "lng": -85.8344,
+    "claims": [
+      {
+        "predicate": "trained",
+        "object": "Rosa Parks at an August 1955 desegregation workshop led by Septima Clark, months before the Montgomery Bus Boycott",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/exhibitions/rosa-parks-in-her-own-words/about-this-exhibition/the-bus-boycott/highlander-folk-school/",
+        "citationLabel": "Library of Congress: Rosa Parks and Highlander Folk School"
+      },
+      {
+        "predicate": "closed_in",
+        "object": "1961, when Tennessee revoked its charter and confiscated the property; the school rechartered as the Highlander Research and Education Center",
+        "confidenceLevel": "high",
+        "citationSource": "kinginstitute.stanford.edu",
+        "citationHref": "https://kinginstitute.stanford.edu/highlander-folk-school",
+        "citationLabel": "King Institute Encyclopedia: Highlander Folk School"
+      }
+    ],
+    "historicalContext": "Founded by Myles Horton in 1932, Highlander was one of the few Southern places where Black and white organizers met as equals. Septima Clark's citizenship school curriculum moved from here to the SCLC, and 'We Shall Overcome' entered the movement through Highlander's music workshops."
+  },
+  {
+    "id": "ent_mason_temple_001",
+    "kind": "place",
+    "displayName": "Mason Temple, Church of God in Christ",
+    "summary": "Mason Temple, world headquarters of the Church of God in Christ and one of the largest Black-owned assembly halls in the country when completed in 1945, hosted mass meetings of the 1968 Memphis sanitation workers' strike. Martin Luther King Jr. delivered his final speech, 'I've Been to the Mountaintop,' here on April 3, 1968.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "movement-churches",
+      "labor",
+      "martin-luther-king"
+    ],
+    "jurisdictionLabel": "Memphis, Tennessee",
+    "locationPrecision": "institution",
+    "locationLabel": "Mason Temple, 930 Mason Street, Memphis",
+    "lat": 35.1214,
+    "lng": -90.0496,
+    "claims": [
+      {
+        "predicate": "site_of",
+        "object": "Martin Luther King Jr.'s 'I've Been to the Mountaintop' speech on April 3, 1968, the night before his assassination",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/tennessee-mason-temple-memphis.htm",
+        "citationLabel": "National Park Service: Mason Temple, Memphis"
+      },
+      {
+        "predicate": "built",
+        "object": "between 1940 and 1945 as the administrative and spiritual center of the Church of God in Christ",
+        "confidenceLevel": "high",
+        "citationSource": "memphisheritage.org",
+        "citationHref": "https://www.memphisheritage.org/historic-properties/mason-temple-church-god-christ/",
+        "citationLabel": "Memphis Heritage: Mason Temple, Church of God in Christ"
+      }
+    ],
+    "historicalContext": "Named for COGIC founder Bishop Charles Harrison Mason, the temple anchored Black religious life in Memphis and opened its hall to the sanitation workers' movement in 1968. King spoke there to some 3,000 people through a storm, closing with words that became his valediction.",
+    "related": [
+      {
+        "id": "ent_lorraine_motel_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_clayborn_temple_001",
+        "type": "related_to",
+        "direction": "incoming"
+      }
+    ]
+  },
+  {
+    "id": "ent_bethel_baptist_church_collegeville_001",
+    "kind": "place",
+    "displayName": "Bethel Baptist Church, Collegeville",
+    "summary": "Bethel Baptist Church in Collegeville served as headquarters of the Alabama Christian Movement for Human Rights from 1956 to 1961 under pastor Fred Shuttlesworth, sustaining Birmingham's desegregation campaign after Alabama outlawed the NAACP. Bombed three times — 1956, 1958, and 1962 — the congregation rebuilt each time. It became a National Historic Landmark in 2005.",
+    "eraBuckets": [
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "movement-churches",
+      "direct-action",
+      "organizing"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "Historic Bethel Baptist Church, 3233 29th Avenue North, Collegeville, Birmingham",
+    "lat": 33.5518,
+    "lng": -86.802,
+    "sensitivityClass": "violence_associated",
+    "claims": [
+      {
+        "predicate": "headquarters_of",
+        "object": "the Alabama Christian Movement for Human Rights, 1956-1961, led by pastor Fred Shuttlesworth",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/the-historic-bethel-baptist-church.htm",
+        "citationLabel": "National Park Service: The Historic Bethel Baptist Church"
+      },
+      {
+        "predicate": "survived",
+        "object": "bombings on December 25, 1956, June 29, 1958, and December 14, 1962, continuing weekly mass meetings throughout",
+        "confidenceLevel": "high",
+        "citationSource": "thehistoricbethel.org",
+        "citationHref": "https://thehistoricbethel.org/history/",
+        "citationLabel": "Historic Bethel Baptist Church of Collegeville: History"
+      }
+    ],
+    "historicalContext": "When Alabama banned the NAACP in 1956, Shuttlesworth founded the ACMHR at Bethel the same week, and the church became the launch point for challenges to bus segregation and school exclusion in Birmingham. Its partnership with the SCLC brought the 1963 Birmingham campaign that helped produce the Civil Rights Act of 1964."
+  }
+]

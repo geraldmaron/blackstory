@@ -1,0 +1,746 @@
+[
+  {
+    "id": "ent_cheyney_university_001",
+    "kind": "school",
+    "displayName": "Cheyney University of Pennsylvania",
+    "summary": "Established February 25, 1837, through Quaker philanthropist Richard Humphreys' bequest of $10,000 to educate people of African descent and prepare them as teachers. Begun in Philadelphia as the Institute for Colored Youth, it is the nation's oldest historically Black institution of higher learning.",
+    "eraBuckets": [
+      "1830s",
+      "1900s",
+      "1910s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "teaching"
+    ],
+    "jurisdictionLabel": "Cheyney, Pennsylvania",
+    "locationPrecision": "campus",
+    "locationLabel": "Cheyney University campus, Delaware and Chester Counties",
+    "lat": 39.932,
+    "lng": -75.529,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1837",
+        "confidenceLevel": "high",
+        "citationSource": "Cheyney University of Pennsylvania",
+        "citationHref": "https://cheyney.edu/who-we-are/the-first-hbcu/",
+        "citationLabel": "The First HBCU page"
+      },
+      {
+        "predicate": "first_in_nation",
+        "object": "Oldest historically Black institution of higher education in the United States",
+        "confidenceLevel": "high",
+        "citationSource": "Cheyney University of Pennsylvania",
+        "citationHref": "https://cheyney.edu/who-we-are/the-first-hbcu/",
+        "citationLabel": "The First HBCU page"
+      }
+    ],
+    "historicalContext": "Cheyney's founding predates emancipation by nearly three decades, opening the era of institution-building that all later HBCUs would extend. Its early decades in Philadelphia produced generations of Black teachers for schools across the country."
+  },
+  {
+    "id": "ent_lincoln_university_pa_001",
+    "kind": "school",
+    "displayName": "Lincoln University",
+    "summary": "Chartered April 29, 1854, as Ashmun Institute by John Miller Dickey and Sarah Emlen Cresson, becoming the nation's first degree-granting HBCU. Renamed for Abraham Lincoln in 1866, it educated Thurgood Marshall, Langston Hughes, and future heads of state across Africa.",
+    "eraBuckets": [
+      "1850s",
+      "1860s",
+      "1920s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "liberal-arts"
+    ],
+    "jurisdictionLabel": "Lincoln University, Pennsylvania",
+    "locationPrecision": "campus",
+    "locationLabel": "Lincoln University campus, Chester County",
+    "lat": 39.8083,
+    "lng": -75.9278,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1854",
+        "confidenceLevel": "high",
+        "citationSource": "Lincoln University",
+        "citationHref": "https://www.lincoln.edu/about/history.html",
+        "citationLabel": "University history page"
+      },
+      {
+        "predicate": "first_in_nation",
+        "object": "Nation's first degree-granting historically Black college and university",
+        "confidenceLevel": "high",
+        "citationSource": "Lincoln University",
+        "citationHref": "https://www.lincoln.edu/about/history.html",
+        "citationLabel": "University history page"
+      }
+    ],
+    "historicalContext": "Founded before the Civil War, Lincoln belongs to the small group of antebellum institutions that proved higher education for Black men could be built and sustained. Its alumni network shaped law, letters, and independence movements on two continents."
+  },
+  {
+    "id": "ent_wilberforce_university_001",
+    "kind": "school",
+    "displayName": "Wilberforce University",
+    "summary": "Founded in 1856 at Tawawa Springs near Xenia, Ohio, by the Methodist Episcopal Church and purchased in 1863 by the A.M.E. Church under Bishop Daniel A. Payne, making it the nation's first college owned and operated by African Americans. Payne became the first Black president of an American university.",
+    "eraBuckets": [
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "religion"
+    ],
+    "jurisdictionLabel": "Wilberforce, Ohio",
+    "locationPrecision": "campus",
+    "locationLabel": "Wilberforce University campus, Greene County",
+    "lat": 39.7075,
+    "lng": -83.8806,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1856",
+        "confidenceLevel": "high",
+        "citationSource": "Wilberforce University",
+        "citationHref": "https://wilberforce.edu/about-wilberforce/",
+        "citationLabel": "About Wilberforce page"
+      },
+      {
+        "predicate": "first_in_nation",
+        "object": "First college owned and operated by African Americans, under the A.M.E. Church from 1863",
+        "confidenceLevel": "high",
+        "citationSource": "Wilberforce University",
+        "citationHref": "https://wilberforce.edu/wilberforce-a-university-of-firsts/",
+        "citationLabel": "University of Firsts page"
+      }
+    ],
+    "historicalContext": "Named for abolitionist William Wilberforce, the university demonstrated Black institutional self-governance a decade before Reconstruction. Its A.M.E. stewardship set a model of church-sustained higher education that other denominations followed."
+  },
+  {
+    "id": "ent_howard_university_001",
+    "kind": "school",
+    "displayName": "Howard University",
+    "summary": "Chartered by Congress on March 2, 1867, and named for Freedmen's Bureau commissioner Gen. Oliver O. Howard. From a single frame building it grew into a comprehensive research university whose law school trained the litigators, Charles Hamilton Houston and Thurgood Marshall among them, who dismantled legal segregation.",
+    "eraBuckets": [
+      "1860s",
+      "1930s",
+      "1950s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "law",
+      "civil-rights"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "campus",
+    "locationLabel": "Main campus, Georgia Avenue NW, Shaw and Pleasant Plains",
+    "lat": 38.9222,
+    "lng": -77.0194,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1867",
+        "confidenceLevel": "high",
+        "citationSource": "Howard University",
+        "citationHref": "https://howard.edu/about/history",
+        "citationLabel": "University history page"
+      },
+      {
+        "predicate": "notable_program",
+        "object": "School of Law, established 1869, incubated the legal strategy behind Brown v. Board of Education",
+        "confidenceLevel": "high",
+        "citationSource": "Howard University School of Law",
+        "citationHref": "https://law.howard.edu/about/our-history",
+        "citationLabel": "Law school history page"
+      }
+    ],
+    "historicalContext": "Howard anchored the cluster of federally supported institutions created in the capital during Reconstruction. Through the twentieth century its faculty and graduates supplied much of the intellectual leadership of Black America, from medicine to the courtroom.",
+    "related": [
+      {
+        "id": "ent_u_street_corridor_001",
+        "type": "related_to",
+        "direction": "incoming"
+      }
+    ]
+  },
+  {
+    "id": "ent_fisk_university_001",
+    "kind": "school",
+    "displayName": "Fisk University",
+    "summary": "Convened its first classes January 9, 1866, in former Union Army barracks in Nashville under the American Missionary Association. In 1871 its Jubilee Singers toured to save the school, carrying spirituals to concert stages worldwide and funding Jubilee Hall; in 1930 Fisk became the first Black college accredited by SACS.",
+    "eraBuckets": [
+      "1860s",
+      "1870s",
+      "1930s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "music"
+    ],
+    "jurisdictionLabel": "Nashville, Tennessee",
+    "locationPrecision": "campus",
+    "locationLabel": "Fisk University campus, North Nashville",
+    "lat": 36.1688,
+    "lng": -86.8047,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1866",
+        "confidenceLevel": "high",
+        "citationSource": "Fisk University",
+        "citationHref": "https://www.fisk.edu/about/history/",
+        "citationLabel": "University history page"
+      },
+      {
+        "predicate": "first_in_nation",
+        "object": "First African American institution accredited by the Southern Association of Colleges and Schools, 1930",
+        "confidenceLevel": "high",
+        "citationSource": "Fisk University",
+        "citationHref": "https://www.fisk.edu/about/history/",
+        "citationLabel": "University history page"
+      }
+    ],
+    "historicalContext": "Fisk exemplified the liberal-arts wing of the freedmen's colleges, insisting from the start on a classical curriculum. Its campus later became a hub of the Harlem Renaissance generation, with W. E. B. Du Bois among its earliest graduates."
+  },
+  {
+    "id": "ent_morehouse_college_001",
+    "kind": "school",
+    "displayName": "Morehouse College",
+    "summary": "Founded February 14, 1867, as the Augusta Institute in the basement of Springfield Baptist Church in Augusta, Georgia, to educate Black men for ministry and teaching. Relocated to Atlanta in 1879 and renamed Morehouse in 1913, it remains the nation's only historically Black liberal arts college for men.",
+    "eraBuckets": [
+      "1860s",
+      "1910s",
+      "1940s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "religion",
+      "leadership"
+    ],
+    "jurisdictionLabel": "Atlanta, Georgia",
+    "locationPrecision": "campus",
+    "locationLabel": "Morehouse campus, Atlanta University Center, West End",
+    "lat": 33.7467,
+    "lng": -84.4153,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1867",
+        "confidenceLevel": "high",
+        "citationSource": "Morehouse College",
+        "citationHref": "https://morehouse.edu/about/our-history/",
+        "citationLabel": "College history page"
+      },
+      {
+        "predicate": "founded_by",
+        "object": "Rev. William Jefferson White, at Springfield Baptist Church, Augusta",
+        "confidenceLevel": "high",
+        "citationSource": "Morehouse College",
+        "citationHref": "https://morehouse.edu/about/our-history/",
+        "citationLabel": "College history page"
+      }
+    ],
+    "historicalContext": "Morehouse grew within the Atlanta University Center, the densest concentration of Black higher education in the country. Its tradition of producing ministers, scholars, and public leaders reached worldwide visibility through alumnus Martin Luther King Jr., class of 1948."
+  },
+  {
+    "id": "ent_morgan_state_university_001",
+    "kind": "school",
+    "displayName": "Morgan State University",
+    "summary": "Founded in 1867 as the Centenary Biblical Institute by the Baltimore Conference of the Methodist Episcopal Church to train ministers. Renamed Morgan College in 1890 for trustee Rev. Lyttleton Morgan, it remained private until Maryland purchased it in 1939 to widen public higher education for Black citizens.",
+    "eraBuckets": [
+      "1860s",
+      "1890s",
+      "1930s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "religion"
+    ],
+    "jurisdictionLabel": "Baltimore, Maryland",
+    "locationPrecision": "campus",
+    "locationLabel": "Morgan State campus, Northeast Baltimore",
+    "lat": 39.3439,
+    "lng": -76.5847,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1867",
+        "confidenceLevel": "high",
+        "citationSource": "Morgan State University",
+        "citationHref": "https://www.morgan.edu/about/our-history",
+        "citationLabel": "University history page"
+      },
+      {
+        "predicate": "founded_by",
+        "object": "Baltimore Conference of the Methodist Episcopal Church",
+        "confidenceLevel": "high",
+        "citationSource": "Morgan State University",
+        "citationHref": "https://www.morgan.edu/about/our-history",
+        "citationLabel": "University history page"
+      }
+    ],
+    "historicalContext": "Morgan traces the common arc of many HBCUs, from denominational seminary to teacher training to state university. Its 1939 purchase by Maryland reflected growing pressure on states to fund Black public higher education in the decades before Brown."
+  },
+  {
+    "id": "ent_hampton_university_001",
+    "kind": "school",
+    "displayName": "Hampton University",
+    "summary": "Founded April 1, 1868, on the Virginia Peninsula by Brig. Gen. Samuel Chapman Armstrong with American Missionary Association backing. Its normal-and-agricultural model of learning by doing trained thousands of teachers for freedpeople's schools, among them Booker T. Washington, class of 1875.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "teaching"
+    ],
+    "jurisdictionLabel": "Hampton, Virginia",
+    "locationPrecision": "campus",
+    "locationLabel": "Hampton University campus, waterfront on Hampton Roads",
+    "lat": 37.0225,
+    "lng": -76.3347,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1868",
+        "confidenceLevel": "high",
+        "citationSource": "Hampton University",
+        "citationHref": "https://home.hamptonu.edu/about/history/",
+        "citationLabel": "University history page"
+      },
+      {
+        "predicate": "founded_by",
+        "object": "Brig. Gen. Samuel Chapman Armstrong",
+        "confidenceLevel": "high",
+        "citationSource": "Hampton University",
+        "citationHref": "https://home.hamptonu.edu/about/samuel-chapman-armstrong/",
+        "citationLabel": "Armstrong biography page"
+      }
+    ],
+    "historicalContext": "Hampton stood at the center of the debate over industrial versus classical education for the freedpeople, and its campus sits near the Emancipation Oak, where the Emancipation Proclamation was read to the local Black community. Its teaching model was carried across the South by graduates who founded schools of their own.",
+    "related": [
+      {
+        "id": "ent_emancipation_oak_001",
+        "type": "located_at",
+        "direction": "incoming"
+      }
+    ]
+  },
+  {
+    "id": "ent_clark_atlanta_university_001",
+    "kind": "school",
+    "displayName": "Clark Atlanta University",
+    "summary": "Formed July 1, 1988, by consolidating Atlanta University, founded 1865 as the nation's first institution to award graduate degrees to African Americans, with Clark College, founded 1869 as the first four-year liberal arts college serving a primarily Black student body. W. E. B. Du Bois taught on the Atlanta University faculty.",
+    "eraBuckets": [
+      "1860s",
+      "1980s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "research"
+    ],
+    "jurisdictionLabel": "Atlanta, Georgia",
+    "locationPrecision": "campus",
+    "locationLabel": "Clark Atlanta campus, Atlanta University Center",
+    "lat": 33.7508,
+    "lng": -84.4103,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1988",
+        "confidenceLevel": "high",
+        "citationSource": "Clark Atlanta University",
+        "citationHref": "https://www.cau.edu/about/history",
+        "citationLabel": "University history page"
+      },
+      {
+        "predicate": "first_in_nation",
+        "object": "Parent institution Atlanta University, 1865, was the nation's first to award graduate degrees to African Americans",
+        "confidenceLevel": "high",
+        "citationSource": "Clark Atlanta University",
+        "citationHref": "https://www.cau.edu/about/history",
+        "citationLabel": "University history page"
+      }
+    ],
+    "historicalContext": "The 1988 consolidation joined two Reconstruction-era institutions that had shared the Atlanta University Center for a century. Atlanta University's sociology school, led for years by Du Bois, produced some of the earliest systematic scholarship on Black life in America."
+  },
+  {
+    "id": "ent_meharry_medical_college_001",
+    "kind": "school",
+    "displayName": "Meharry Medical College",
+    "summary": "Founded in 1876 as the Medical Department of Central Tennessee College with a $30,000 gift from Samuel Meharry and his brothers, repaying a debt of kindness to a formerly enslaved family. It was the first medical school for African Americans in the South and received its independent charter in 1915.",
+    "eraBuckets": [
+      "1870s",
+      "1910s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "medicine"
+    ],
+    "jurisdictionLabel": "Nashville, Tennessee",
+    "locationPrecision": "campus",
+    "locationLabel": "Meharry campus, North Nashville, adjacent to Fisk University",
+    "lat": 36.167,
+    "lng": -86.807,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1876",
+        "confidenceLevel": "high",
+        "citationSource": "Meharry Medical College",
+        "citationHref": "https://home.mmc.edu/about/",
+        "citationLabel": "About Meharry page"
+      },
+      {
+        "predicate": "first_in_nation",
+        "object": "First medical school for African Americans in the South",
+        "confidenceLevel": "high",
+        "citationSource": "Meharry Medical College",
+        "citationHref": "https://home.mmc.edu/about/",
+        "citationLabel": "About Meharry page"
+      }
+    ],
+    "historicalContext": "For most of the twentieth century Meharry and Howard together trained the majority of Black physicians and dentists in the United States. Its graduates staffed clinics and hospitals in communities that segregated medicine otherwise left unserved."
+  },
+  {
+    "id": "ent_prairie_view_am_university_001",
+    "kind": "school",
+    "displayName": "Prairie View A&M University",
+    "summary": "Established August 14, 1876, by the Texas Legislature as the Agricultural and Mechanical College of Texas for Colored Youths, opening at Prairie View in 1878. It was the first state-supported college for African Americans in Texas and is the state's second-oldest public institution of higher education.",
+    "eraBuckets": [
+      "1870s",
+      "1890s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "land-grant"
+    ],
+    "jurisdictionLabel": "Prairie View, Texas",
+    "locationPrecision": "campus",
+    "locationLabel": "Prairie View A&M campus, Waller County",
+    "lat": 30.0919,
+    "lng": -95.9894,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1876",
+        "confidenceLevel": "high",
+        "citationSource": "Prairie View A&M University",
+        "citationHref": "https://www.pvamu.edu/about_pvamu/college-history/",
+        "citationLabel": "College history page"
+      },
+      {
+        "predicate": "first_in_state",
+        "object": "First state-supported college in Texas for African Americans",
+        "confidenceLevel": "high",
+        "citationSource": "Prairie View A&M University",
+        "citationHref": "https://www.pvamu.edu/about_pvamu/college-history/",
+        "citationLabel": "College history page"
+      }
+    ],
+    "historicalContext": "Prairie View was created during Reconstruction and later folded into the 1890 land-grant system, which required Southern states to fund Black colleges to keep receiving federal agricultural money. It anchored teacher training and agricultural extension for Black Texans for generations."
+  },
+  {
+    "id": "ent_southern_university_001",
+    "kind": "school",
+    "displayName": "Southern University and A&M College",
+    "summary": "Chartered by Louisiana's Legislative Act 87 of 1880 through the efforts of Reconstruction-era leaders including P.B.S. Pinchback, T.T. Allain, and Henry Demas, opening in New Orleans with 12 students. Relocated in 1914 to a bluff above the Mississippi at Scotlandville, it anchors the nation's only HBCU system.",
+    "eraBuckets": [
+      "1880s",
+      "1910s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "land-grant"
+    ],
+    "jurisdictionLabel": "Baton Rouge, Louisiana",
+    "locationPrecision": "campus",
+    "locationLabel": "Southern University campus, Scotlandville, on Scott's Bluff",
+    "lat": 30.5247,
+    "lng": -91.19,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1880",
+        "confidenceLevel": "high",
+        "citationSource": "Southern University and A&M College",
+        "citationHref": "https://www.subr.edu/page/southern-university-history",
+        "citationLabel": "University history page"
+      },
+      {
+        "predicate": "founded_by",
+        "object": "P.B.S. Pinchback, T.T. Allain, T.B. Stamps, and Henry Demas",
+        "confidenceLevel": "high",
+        "citationSource": "Southern University and A&M College",
+        "citationHref": "https://www.subr.edu/page/southern-university-founders",
+        "citationLabel": "University founders page"
+      }
+    ],
+    "historicalContext": "Southern was willed into being by Black legislators who held office during Reconstruction, then sustained through the era that stripped their power. Its Baton Rouge campus became the flagship of a five-campus system unique among HBCUs."
+  },
+  {
+    "id": "ent_spelman_college_001",
+    "kind": "school",
+    "displayName": "Spelman College",
+    "summary": "Opened April 11, 1881, in the basement of Atlanta's Friendship Baptist Church by New England educators Sophia B. Packard and Harriet E. Giles as the Atlanta Baptist Female Seminary. Renamed for the Spelman family in 1884, it became the nation's foremost college for women of African descent.",
+    "eraBuckets": [
+      "1880s",
+      "1920s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "womens-education"
+    ],
+    "jurisdictionLabel": "Atlanta, Georgia",
+    "locationPrecision": "campus",
+    "locationLabel": "Spelman campus, Atlanta University Center, West End",
+    "lat": 33.746,
+    "lng": -84.411,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1881",
+        "confidenceLevel": "high",
+        "citationSource": "Spelman College",
+        "citationHref": "https://www.spelman.edu/about/history-in-brief.html",
+        "citationLabel": "History in brief page"
+      },
+      {
+        "predicate": "founded_by",
+        "object": "Sophia B. Packard and Harriet E. Giles",
+        "confidenceLevel": "high",
+        "citationSource": "Spelman College",
+        "citationHref": "https://www.spelman.edu/leadership/presidents-office/past-presidents/sophia-b-packard.html",
+        "citationLabel": "Sophia B. Packard biography"
+      }
+    ],
+    "historicalContext": "Spelman gave institutional form to the education of Black women at a moment when almost no college would admit them. Its early support from the Rockefeller family, honoring the abolitionist Spelmans, tied Northern philanthropy to Black women's higher education for decades."
+  },
+  {
+    "id": "ent_tuskegee_university_001",
+    "kind": "school",
+    "displayName": "Tuskegee University",
+    "summary": "Opened July 4, 1881, in a one-room shanty near Butler Chapel A.M.E. Zion Church with Booker T. Washington as founding principal. Students made the bricks and raised the buildings themselves; by Washington's death in 1915 the campus counted about 100 buildings, 1,500 students, and a $2 million endowment.",
+    "eraBuckets": [
+      "1880s",
+      "1890s",
+      "1940s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "agriculture",
+      "science"
+    ],
+    "jurisdictionLabel": "Tuskegee, Alabama",
+    "locationPrecision": "campus",
+    "locationLabel": "Tuskegee University campus, Macon County",
+    "lat": 32.4303,
+    "lng": -85.7078,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1881",
+        "confidenceLevel": "high",
+        "citationSource": "Tuskegee University",
+        "citationHref": "https://www.tuskegee.edu/explore/History-and-Mission.html",
+        "citationLabel": "History and mission page"
+      },
+      {
+        "predicate": "founded_by",
+        "object": "Booker T. Washington, founding principal, 1881",
+        "confidenceLevel": "high",
+        "citationSource": "National Park Service",
+        "citationHref": "https://www.nps.gov/tuin/index.htm",
+        "citationLabel": "Tuskegee Institute National Historic Site"
+      }
+    ],
+    "historicalContext": "Tuskegee became the most influential expression of self-help industrial education, and George Washington Carver's laboratory made it a center of agricultural science. The campus is a National Historic Site, and the adjacent airfield trained the Tuskegee Airmen of World War II.",
+    "related": [
+      {
+        "id": "ent_moton_field_001",
+        "type": "related_to",
+        "direction": "incoming"
+      }
+    ]
+  },
+  {
+    "id": "ent_florida_am_university_001",
+    "kind": "school",
+    "displayName": "Florida A&M University",
+    "summary": "Opened October 3, 1887, as the State Normal College for Colored Students in Tallahassee with 15 students and two instructors under founding president Thomas DeSaille Tucker. Designated Florida's land-grant institution for Black students in 1891 under the Second Morrill Act.",
+    "eraBuckets": [
+      "1880s",
+      "1890s",
+      "1950s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "land-grant"
+    ],
+    "jurisdictionLabel": "Tallahassee, Florida",
+    "locationPrecision": "campus",
+    "locationLabel": "FAMU campus, on the highest hill in Tallahassee",
+    "lat": 30.4178,
+    "lng": -84.2845,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1887",
+        "confidenceLevel": "high",
+        "citationSource": "Florida A&M University",
+        "citationHref": "https://www.famu.edu/about-famu/history/index.php",
+        "citationLabel": "University history page"
+      },
+      {
+        "predicate": "land_grant_designation",
+        "object": "Florida's land-grant institution for African Americans under the Second Morrill Act, 1891",
+        "confidenceLevel": "high",
+        "citationSource": "Florida A&M University",
+        "citationHref": "https://www.famu.edu/about-famu/history/index.php",
+        "citationLabel": "University history page"
+      }
+    ],
+    "historicalContext": "FAMU grew from a normal school into one of the largest HBCUs in the country, adding law, pharmacy, and graduate schools in the 1950s. Its students helped lead the 1956 Tallahassee bus boycott, an early campaign of the Southern civil rights movement."
+  },
+  {
+    "id": "ent_nc_at_state_university_001",
+    "kind": "school",
+    "displayName": "North Carolina A&T State University",
+    "summary": "Founded March 9, 1891, as the Agricultural and Mechanical College for the Colored Race under the Second Morrill Act, moving from Raleigh to donated land in Greensboro in 1893. On February 1, 1960, four freshmen remembered as the A&T Four began the Greensboro sit-ins at a downtown Woolworth lunch counter.",
+    "eraBuckets": [
+      "1890s",
+      "1960s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "land-grant",
+      "civil-rights"
+    ],
+    "jurisdictionLabel": "Greensboro, North Carolina",
+    "locationPrecision": "campus",
+    "locationLabel": "N.C. A&T campus, East Market Street, Greensboro",
+    "lat": 36.0754,
+    "lng": -79.7736,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1891",
+        "confidenceLevel": "high",
+        "citationSource": "North Carolina A&T State University",
+        "citationHref": "https://www.ncat.edu/about/history-and-traditions/index.php",
+        "citationLabel": "University history page"
+      },
+      {
+        "predicate": "notable_event",
+        "object": "Four A&T freshmen launched the Greensboro sit-ins on February 1, 1960",
+        "confidenceLevel": "high",
+        "citationSource": "North Carolina A&T State University",
+        "citationHref": "https://www.ncat.edu/about/history-and-traditions/index.php",
+        "citationLabel": "University history page"
+      }
+    ],
+    "historicalContext": "A&T was the nation's second land-grant college for Black students under the 1890 Morrill Act and grew into the largest HBCU in the country. The sit-in movement its students ignited spread to dozens of cities within weeks and helped found SNCC.",
+    "related": [
+      {
+        "id": "ent_greensboro_woolworth_sit_in_site_001",
+        "type": "related_to",
+        "direction": "incoming"
+      }
+    ]
+  },
+  {
+    "id": "ent_xavier_university_louisiana_001",
+    "kind": "school",
+    "displayName": "Xavier University of Louisiana",
+    "summary": "Founded in New Orleans by St. Katharine Drexel and the Sisters of the Blessed Sacrament, opening as a high school in 1915 and establishing its College of Liberal Arts and Sciences in 1925. It is the nation's only historically Black and Catholic university and a leading source of Black graduates who earn medical degrees.",
+    "eraBuckets": [
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "religion",
+      "medicine"
+    ],
+    "jurisdictionLabel": "New Orleans, Louisiana",
+    "locationPrecision": "campus",
+    "locationLabel": "Xavier campus, Gert Town, along Washington Avenue and Pine Street",
+    "lat": 29.9652,
+    "lng": -90.107,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1925",
+        "confidenceLevel": "high",
+        "citationSource": "Xavier University of Louisiana",
+        "citationHref": "https://www.xula.edu/about/the-full-story.html",
+        "citationLabel": "The Full Story history page"
+      },
+      {
+        "predicate": "first_in_nation",
+        "object": "Only historically Black and Catholic university in the United States",
+        "confidenceLevel": "high",
+        "citationSource": "Xavier University of Louisiana",
+        "citationHref": "https://www.xula.edu/about/the-full-story.html",
+        "citationLabel": "The Full Story history page"
+      }
+    ],
+    "historicalContext": "Xavier joined the later wave of HBCU founding, built by Catholic religious philanthropy rather than Protestant missionary societies or state legislatures. Its pharmacy college, opened in 1927, and premedical programs became national pipelines into the health professions."
+  },
+  {
+    "id": "ent_dillard_university_001",
+    "kind": "school",
+    "displayName": "Dillard University",
+    "summary": "Chartered June 6, 1930, by merging two Reconstruction-era institutions, Straight University, founded 1869, and New Orleans University, founded 1873, and named for education reformer James Hardy Dillard. Its oak-lined Gentilly campus of white buildings opened to students in 1935.",
+    "eraBuckets": [
+      "1860s",
+      "1870s",
+      "1930s"
+    ],
+    "topicTags": [
+      "education",
+      "hbcu",
+      "liberal-arts"
+    ],
+    "jurisdictionLabel": "New Orleans, Louisiana",
+    "locationPrecision": "campus",
+    "locationLabel": "Dillard campus, Gentilly Boulevard",
+    "lat": 29.995,
+    "lng": -90.0653,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1930",
+        "confidenceLevel": "high",
+        "citationSource": "Dillard University",
+        "citationHref": "https://www.dillard.edu/about/history-traditions/",
+        "citationLabel": "History and traditions page"
+      },
+      {
+        "predicate": "formed_by_merger",
+        "object": "Straight University, 1869, and New Orleans University, 1873",
+        "confidenceLevel": "high",
+        "citationSource": "Dillard University",
+        "citationHref": "https://www.dillard.edu/about/history-traditions/",
+        "citationLabel": "History and traditions page"
+      }
+    ],
+    "historicalContext": "Dillard consolidated the Congregationalist and Methodist strands of New Orleans's freedmen's colleges into a single modern university. The merger, backed by the Rosenwald Fund and local philanthropy, typified the interwar reorganization of Black higher education."
+  }
+]

@@ -488,6 +488,7 @@ export type {
 } from './audit/index.js';
 
 export * from './adapters/index.js';
+export * from './public-numeric-policy.js';
 export * from './publication/index.js';
 
 // Map data platform. Demo/test fixtures in ./map/fixtures.js are
