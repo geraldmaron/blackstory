@@ -121,6 +121,7 @@ export {
   publicationReleaseConverter,
   publicActiveReleaseConverter,
   publicEntityProjectionConverter,
+  preparePublicEntityProjectionForWrite,
   submissionInboxConverter,
   auditEventConverter,
   outboxMessageConverter,
@@ -128,6 +129,13 @@ export {
   outboxConsumerReceiptConverter,
   killSwitchConverter,
 } from './converters.js';
+
+export {
+  DEFAULT_PUBLIC_MEDIA_BUCKET,
+  entityPrimaryImageObjectPath,
+  entityPrimaryImageObjectRef,
+  type EntityPrimaryImageObjectRef,
+} from './entity-media.js';
 
 export {
   createAdminAtomicStore,

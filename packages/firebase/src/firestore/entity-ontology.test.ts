@@ -98,6 +98,9 @@ test('publicEntityProjectionSchema BB-090 additions never carry a numeric score'
     kind: 'law',
     displayName: 'Example Statute',
     nameLower: 'example statute',
+    summary:
+      'A documented statute in the public learning index with published provenance and ' +
+      'accepted claims suitable for civic education and research.',
     claimIds: ['claim-1'],
     status: 'in_force',
     eraBuckets: ['1960s', '1970s'],
@@ -120,6 +123,9 @@ test('publicEntityProjectionSchema rejects numeric values for every BB-090 addit
     kind: 'law' as const,
     displayName: 'Example Statute',
     nameLower: 'example statute',
+    summary:
+      'A documented statute in the public learning index with published provenance and ' +
+      'accepted claims suitable for civic education and research.',
     claimIds: ['claim-1'],
   };
 

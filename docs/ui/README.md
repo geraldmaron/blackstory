@@ -1,29 +1,35 @@
-# Design system (BB-007 / BB-068 v2)
+# Design system (BB-007 / BB-068 v2 / BB-096 v3)
 
-Shared package: `@black-book/ui` (`packages/ui`).
+Shared package: `@black-book/ui` (`packages/ui`). The binding brand source
+is `brand-system/` (3.0.0-final); where this doc and the pack disagree, the
+pack wins (BB-096).
 
-See also [`brand.md`](./brand.md) (BB-067/BB-068) for the "Pinned Page" mark:
-geometry, palette, typography, and usage rules; [`story.md`](./story.md)
+See also [`brand.md`](./brand.md) (BB-096) for the "Pinned Page" v3 usage
+contract: signature, palette, typography, and usage rules; [`story.md`](./story.md)
 (BB-069) for brand voice, narrative arc, and microcopy standards; and
 [`learning-index-entity.md`](./learning-index-entity.md) for the learning-index
 entity contract (summary, tags, related hops, enrichable prose, photo).
 
 ## What shipped
 
-- **Palette (v2):** White canvas / Black Ink primary; Copper Pin +
-  Page Sand brand accent; light and dark themes via `data-theme` (dark is
-  first-class, not an afterthought)
+- **Palette (v3, BB-096):** Archive Paper `#F4EFE5` canvas + Surface
+  `#FBF8F2` / Black Ink primary; Copper Pin accent with copper text pairs
+  `#8E4F2A` (light) / `#D07A32` (dark); light and dark themes via
+  `data-theme` (dark is first-class, not an afterthought); radii 8/16/28px
+  (sm/md/lg) — the earlier zero-radius rule is superseded, but bevels,
+  shadows, gradients, and glows stay banned
 - **Status colors:** warning, confidence, dispute, error only, re-derived
   to harmonize with the accent palette (with text/mono cues — never
   color-alone)
-- **Typography (v2):** Sora (display/headlines) + Inter (UI/body) + Source
+- **Typography (v3, BB-096):** Inter Display (display/headlines, served
+  via the Inter v4 variable font's `opsz` axis) + Inter (UI/body) + Source
   Serif 4 (editorial/longform) + IBM Plex Mono (data/citations) — all
   free/open-source, no licensing budget gate
 - **Tokens:** grid, spacing, elevation, border, icon, motion, focus,
   pigment-anchored data-viz
 - **Components:** Card, Citation, Confidence, Timeline, MapFrame, ResultList, FilterBar, Dialog, Notice, EmptyState, Button, ThemeToggle
 - **Fixtures:** public route `/design-system` (Storybook equivalent)
-- **Public shell (BB-048 + map-led home):** news shell — white/black primary,
+- **Public shell (BB-048 + map-led home):** news shell — paper/ink primary,
   map-led homepage hero, story rails, sticky masthead
 
 

@@ -1,12 +1,12 @@
 
 /**
- * Typography scale: Sora display/headlines, Inter UI/body, Source Serif 4
- * editorial/longform, IBM Plex Mono for data/citations. Source: owner-supplied
- * brand package (2026-07-17) site type system.
+ * Typography scale: Inter Display display/headlines, Inter UI/body, Source
+ * Serif 4 editorial/longform, IBM Plex Mono for data/citations. Source:
+ * brand pack v3 (brand-system/tokens) fluid type scale, guide p.8.
  */
 
 export const fontFamilies = {
-  display: '"Sora", "Segoe UI", system-ui, sans-serif',
+  display: '"Inter Display", "Inter", system-ui, sans-serif',
   editorial: '"Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif',
   sans: '"Inter", "Segoe UI", system-ui, sans-serif',
   mono: '"IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace',
@@ -14,28 +14,28 @@ export const fontFamilies = {
 
 export const typeScale = {
   display: {
-    fontSize: 'clamp(2rem, 1.6rem + 2vw, 2.75rem)',
+    fontSize: 'clamp(3rem, 2.25rem + 3.75vw, 4.5rem)',
     lineHeight: '1.1',
-    fontWeight: '600',
-    letterSpacing: '-0.01em',
+    fontWeight: '650',
+    letterSpacing: '-0.035em',
     family: 'display',
   },
   title: {
-    fontSize: 'clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem)',
+    fontSize: 'clamp(2.25rem, 1.95rem + 1.5vw, 3rem)',
     lineHeight: '1.2',
-    fontWeight: '600',
-    letterSpacing: '-0.01em',
+    fontWeight: '650',
+    letterSpacing: '-0.02em',
     family: 'display',
   },
   heading: {
-    fontSize: '1.25rem',
+    fontSize: 'clamp(1.5rem, 1.35rem + 0.9vw, 2rem)',
     lineHeight: '1.3',
-    fontWeight: '600',
-    letterSpacing: '-0.005em',
+    fontWeight: '650',
+    letterSpacing: '-0.01em',
     family: 'display',
   },
   body: {
-    fontSize: '1.0625rem',
+    fontSize: 'clamp(1rem, 0.95rem + 0.3vw, 1.125rem)',
     lineHeight: '1.6',
     fontWeight: '400',
     letterSpacing: '0',

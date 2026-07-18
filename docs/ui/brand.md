@@ -1,200 +1,274 @@
-# Brand mark: the Pinned Page (BB-067 / BB-068)
+# Brand: the Pinned Page, v3 usage contract (BB-096)
 
-The Black Book mark: a closed book cover forms an asymmetric "B," curved
-page-edge bands are exposed at the spine, and a location pin is integrated
-into the lower-left of the cover — **history, pinned to place.** Source of
-truth is code, not artwork: every in-app rendering (header, admin console,
-favicon, OG image) is generated from the same geometry in
-`packages/ui/src/brand/BlackBookLogo.tsx`, so the mark cannot drift out of
-sync with itself.
+The Black Book signature: a closed book cover forms a custom "B" silhouette,
+curved page-edge bands are exposed at the spine, and a copper place pin is
+integrated into the lower-left of the cover — **history, pinned to place.**
+The symbol IS the first B in "Black Book"; the visible wordmark text begins
+"lack Book". From the guide:
 
-This document is the mark's usage contract, superseding the earlier
-BB-067 blocky-letterform/Monk-Skin-Tone-Scale concept. If you're changing
-the mark, read this first.
+> The mark is the first B. The official lockup is artwork. Do not recreate
+> it by typing the full name beside the symbol.
+
+This document is the usage contract for the signature, palette, and type
+system. The **binding source is `brand-system/`** ("Black Book Brand
+Identity System 3.0.0-final"): `brand-system/tokens/black-book-brand.css`,
+`brand-system/tokens/black-book-brand-tokens.json`, and
+`brand-system/guide/black-book-brand-guide-final.pdf`. Where this doc (or
+any older doc or code) and the pack disagree, **the pack wins**. The
+agent-facing summary lives in `AGENTS.md` §Brand Language.
 
 ## Provenance
 
-The mark, palette, and type system come from an owner-supplied brand
-package (2026-07-17, `black-book-brand-package/`) — reference PNGs and the
-original package README are archived at `docs/ui/brand-reference/` for
-comparison. The geometry is original to that package (not a font glyph or
+The mark's lineage: BB-067 proposed a blocky-letterform /
+Monk-Skin-Tone-Scale concept (retired — see Supersessions). BB-068 replaced
+it with the owner-supplied Pinned Page package (2026-07-17); its reference
+PNGs are archived at `docs/ui/brand-reference/`. That v2 package was in
+turn **superseded by `brand-system/` 3.0.0-final on 2026-07-17 (BB-096)**,
+which delivers the finished artwork, tokens, and standards guide. The
+geometry is original to the owner-supplied package (not a font glyph or
 stock book/pin icon); it has not been run through a trademark clearance
 search — do that before any public launch or partner-facing use beyond this
 repo.
 
-## Why this mark
+## Supersessions
 
-The brief: equality, pride, soul, modern, black — never gimmicky, dated, or
-side-projecty. A pinned page is a literal, legible metaphor for the
-product's thesis (an archive of Black history anchored to place, not an
-abstract classification device), which is why it replaces the earlier
-diaspora-pigment-scale concept: that direction risked reading as a skin-tone
-classification tool even with careful framing, where this one reads
-immediately as "book + place" with no such adjacency. Three restraints keep
-it from sliding into cliché:
+BB-096 reconciles older docs and code against the v3 pack. Recorded here so
+nobody "fixes" the codebase back to a retired rule:
 
-1. **Flat matte fills only.** No bevels, no drop shadows, no glow, no
-   gradients, no 3D, in any asset, ever.
-2. **One loaded accent color** (Copper Pin) carried by the pin and, sparingly,
-   by the page-edge bands — never scattered across unrelated chrome.
-3. **The pin is integrated, not applied.** It sits inside the cover
-   silhouette, not bolted on as a separate badge.
+1. **Radii.** BB-007's flat/zero-radius language is superseded by the pack's
+   radius tokens: 8px / 16px / 28px (`--bb-radius-sm` / `-md` / `-lg`).
+   Bevels, drop shadows, gradients, glows, 3D, and ornamental motion remain
+   banned everywhere — the flat-matte rule survives; only the corner radii
+   changed.
+2. **Canvas.** White `#FFFFFF` canvas is superseded by Archive Paper
+   `#F4EFE5` (light canvas) + Surface `#FBF8F2` (raised light surface).
+3. **Display type.** Sora is superseded by Inter Display. In-app it is
+   delivered via the Inter v4 variable font's `opsz` axis — the axis's
+   upper master IS Inter Display (same glyph masters), so one loaded family
+   covers both display and UI registers (see
+   `apps/web/src/app/layout.tsx`).
+4. **Lockup rendering.** The code-generated lockup with a typed wordmark
+   (`BlackBookLogo` `horizontal` / `stacked` variants) is superseded by the
+   official artwork SVGs at `apps/web/public/brand/` — those files are the
+   rendered source of truth for the header, masthead, favicon, and OG
+   image. The wordmark is outlined artwork; site code never types it next
+   to the symbol.
+5. **Copper text accent.** Copper Ink `#7A4318` as the text-safe accent is
+   superseded by the pack's copper text pair: `#8E4F2A` on light
+   (`--bb-copper-text`, light theme) / `#D07A32` on dark.
 
-## The palette
+**Still retired:** the BB-067 Monk Skin Tone Scale pigment mapping
+(superseded 2026-07-17) stays retired. If a future feature needs to discuss
+a real person's appearance, neither that retired system nor this brand
+palette is the right tool.
 
-| Role | Hex | Name | Use |
+## The signature
+
+Anatomy: book cover, page bands, place pin, and the custom B silhouette.
+Recognition order is **B → book → place**. At small sizes, preserve the B
+and the pin before every page band — that is what the compact mark does.
+
+### Logo family
+
+| Asset | Use |
+|---|---|
+| Primary mark (symbol only) | Avatar, map chrome, watermark |
+| Primary lockup (symbol + outlined wordmark) | Default signature; headers |
+| Compact mark | Small UI, favicon, dense controls |
+| Monochrome (black / cream) | Constrained production (print, engraving, single-color) |
+| Application icons | App launchers and tiles |
+
+### Clear space and minimum sizes
+
+- **Clear space:** X = the visible width of the copper pin. Keep at least
+  1X on every side of any mark or lockup.
+- **Minimums:** primary lockup 168px digital / 36mm print; primary mark
+  32px; compact mark 20px.
+- Never squeeze the clear space to fit navigation — reduce the adjacent UI
+  or switch to the compact mark instead.
+
+### Misuse (never)
+
+- No typed second B — the symbol supplies it. Never type the full name
+  beside the symbol.
+- No stretching to a non-square (mark) or off-ratio (lockup) aspect.
+- No random recoloring — approved light / dark / monochrome variants only.
+- No effects: rotation, bevel, glow, texture, ornamental motion.
+- Never remove the pin.
+- Never crowd the clear space.
+
+### Asset selection
+
+| Context | Asset |
+|---|---|
+| Website header | `black-book-primary-{light,dark}.svg` |
+| App launcher | `black-book-app-icon-*-1024.png` |
+| Favicon | `favicon-*-16/32/48.png` (compact mark — not the full lockup) |
+| Social avatar | `social-avatar-*-512.png` (keep the safe area; do not crop the B) |
+| Print | `primary-monochrome-*.svg` |
+| Presentations | `primary-*-transparent.png` |
+
+Web-served copies live at `apps/web/public/brand/` (referenced as
+`/brand/...`); checksummed masters at `brand-system/assets/`. Prefer SVG in
+product UI; transparent PNG only where SVG can't render (see
+`brand-system/implementation/asset-usage.md`).
+
+## Palette
+
+Full v3 palette (binding values in
+`brand-system/tokens/black-book-brand.css` and
+`black-book-brand-tokens.json`; dark theme swaps are in the CSS
+`[data-theme="dark"]` block):
+
+| Role | Hex | Name |
+|---|---|---|
+| Primary ink; dark canvas | `#0A0A0A` | Black Ink |
+| Dark surface | `#161616` | Charcoal |
+| Light canvas | `#F4EFE5` | Archive Paper |
+| Raised light surface | `#FBF8F2` | Surface |
+| Graphic accent (the pin) | `#B86B2A` | Copper Pin |
+| Copper text on light | `#8E4F2A` | Copper text (light) |
+| Copper text on dark | `#D07A32` | Copper text (dark) |
+| Decorative fill; page bands | `#D8A178` | Page Sand |
+| Secondary text | `#6D675F` | Stone |
+| Hairlines | `#D7D0C4` | Rule |
+
+Accessible pairs (guide p.7):
+
+| Foreground / background | Ratio | Use |
+|---|---|---|
+| Black Ink `#0A0A0A` / Archive Paper `#F4EFE5` | 17.3:1 | Primary text |
+| `#8E4F2A` / Archive Paper `#F4EFE5` | 5.5:1 | Copper text on light |
+| `#D07A32` / Black Ink `#0A0A0A` | 6.1:1 | Copper text on dark |
+| Stone `#6D675F` / Archive Paper `#F4EFE5` | 4.9:1 | Secondary text |
+
+Raw Copper Pin `#B86B2A` never carries body-size text on a light canvas —
+use the copper text pair above. Page Sand is a fill/graphic color, not
+foreground text on light canvases.
+
+## Copper discipline (review checklist item)
+
+> Black and paper lead. Copper points.
+
+Copper is a **navigational signal, not a decorative wash or default text
+color**. Treat this as a review gate on any composition (page, screen,
+asset, chart):
+
+- Copper occupies roughly **10–15%** of the composition.
+- It is reserved for the **moment of orientation**: active locations,
+  selected filters, primary actions, evidence markers.
+- If copper appears anywhere else — backgrounds, body text, borders on
+  unrelated chrome, "warming up" a neutral layout — remove it.
+
+## Type system
+
+| Role | Family | Weights | Token |
 |---|---|---|---|
-| Ink | `#0A0A0A` | Black Ink | Primary ink; near-black, not pure `#000` |
-| Canvas | `#FFFFFF` | White | Primary light-theme canvas and surfaces |
-| Accent (graphic) | `#B86B2A` | Copper Pin | The mark's pin; large-scale/graphic UI use (icons, borders, tags) — **3:1 contrast only, not body text** |
-| Accent (text-safe) | `#7A4318` | Copper Ink | Darkened Copper Pin for links/text on the light theme's white canvas |
-| Accent (muted) | `#D8A178` | Page Sand | Page-edge bands, decorative fills; text-safe as the **dark theme's** accent (8.8:1 on Black Ink) |
+| Display / headlines | Inter Display (+ Inter fallback) | 600–700 | `--bb-font-display` |
+| UI / body (sans) | Inter | 400–600 | `--bb-font-ui` |
+| Editorial / longform | Source Serif 4 | 400–600 | `--bb-font-editorial` |
+| Data / citations / mono | IBM Plex Mono | 400–500 | `--bb-font-data` |
 
-Fixed swatches live in `packages/ui/src/tokens/brand-palette.ts`
-(`brandPalette`). Theme-reactive, contrast-safe applications (which swatch
-is safe for text vs. graphics, per theme) live in
-`packages/ui/src/tokens/colors.ts` as the `accent` / `accentGraphic` /
-`accentMuted` roles — see that file's `criticalTextPairs` /
-`criticalUiPairs` and `contrast.test.ts` for the enforced ratios. Never use
-raw Copper Pin (`#B86B2A`) as small/body text color on the light theme's
-white canvas — it only clears the 3:1 UI/large-text bar,
-not the 4.5:1 body-text bar. Page Sand (`#D8A178`) is a fill/graphic color
-on light canvases only (1.97:1) — never foreground text there.
+Tokens above are the pack's names
+(`brand-system/tokens/black-book-brand.css`); the in-app equivalents in
+`packages/ui/src/styles/tokens.css` are `--bb-font-sans` (UI) and
+`--bb-font-mono` (data), with `--bb-font-display` / `--bb-font-editorial`
+shared.
 
-## Typography
+All open-source — no licensing cost or budget gate. Responsive scale, fluid
+between mobile and desktop: display 48–72px, H1 36–48px, H2 24–32px, body
+16–18px. Tighter tracking only at display sizes. From the guide:
 
-Site type system (owner-supplied, all open-source / Google Fonts — no
-licensing cost or budget gate):
+> The logo wordmark remains outlined artwork. Site typography supports it;
+> it does not reconstruct it.
 
-| Role | Family | Token |
-|---|---|---|
-| Headlines / display | Sora (SemiBold 600) | `--bb-font-display` |
-| UI / body (sans contexts) | Inter | `--bb-font-sans` |
-| Editorial / longform body | Source Serif 4 | `--bb-font-editorial` |
-| Data / citations / mono | IBM Plex Mono | `--bb-font-mono` |
+In-app, Inter Display comes from the Inter v4 variable font's `opsz` axis
+(same glyph masters as Inter Display) loaded once in
+`apps/web/src/app/layout.tsx` — do not load a second "Inter Display"
+family.
 
-Loaded via `next/font/google` in `apps/web/src/app/layout.tsx`. Longform
-body copy stays serif (Source Serif 4); headlines, wordmark, section
-titles, and story-rail titles use the Sora display family — see
-`packages/ui/src/tokens/typography.ts` (`fontFamilies`, `typeScale`) and
-`apps/web/src/app/shell.css` (`.bb-page__title`, `.bb-section__title`,
-`.bb-story-link__title`, `.bb-shell-wordmark`, `.bb-hero__brand`).
+## Product expression
 
-## Variants
+The signature, map language, story rails, typography, and evidence metadata
+work as **one system**, not separate treatments. Reference composition
+(guide p.9): light header with the lockup; dark hero band (copper mono
+kicker, display headline, support copy, copper CTA) beside a sand-toned map
+panel with copper pins; story rail beneath with mono-caps KIND / STATE
+slugs, a bold one-line story, and hairline rules.
 
-```tsx
-import { BlackBookLogo, BlackBookMark } from '@black-book/ui';
+## Imagery
 
-<BlackBookLogo variant="horizontal" size={112} tagline="History, pinned to place." />
-<BlackBookLogo variant="stacked" size={96} />
-<BlackBookLogo variant="mark" size={40} />
-<BlackBookLogo variant="app-icon" size={96} />
-```
+Three registers, all metadata-forward:
 
-`variant`:
+- **Place first** — labeled LOCATION / DATE / SOURCE.
+- **Evidence visible** — labeled COLLECTION / RIGHTS / CITATION.
+- **People with context** — labeled PERSON / ROLE / PLACE / YEAR. A person
+  is always identified, never anonymous decoration.
 
-| Variant | Renders | Use |
-|---|---|---|
-| `horizontal` | Symbol + "BLACK BOOK" wordmark side by side | Default lockup; masthead, share cards |
-| `stacked` | Symbol above wordmark | Square/social placements |
-| `mark` | Symbol only | Small chrome, favicons, inline references |
-| `app-icon` | Symbol on a rounded-square tile | App/PWA icon |
+Avoid: generic "Black history" stock imagery; automatic sepia filters; AI
+images presented as documentary material; sensational imagery; anonymous
+portraits; maps without source and precision context.
 
-For bare-symbol placements that need to track surrounding theme color
-automatically (site header, admin masthead), use the lower-level
-`BlackBookMark` directly with explicit `ink`/`paper`/`accent` props tied to
-CSS variables — see `apps/web/src/components/SiteHeader.tsx` and
-`apps/admin/src/app/page.tsx` for the pattern (`ink="var(--bb-ink)"`,
-`paper="var(--bb-canvas)"`, `accent="var(--bb-accent-graphic)"`).
+## Voice
 
-`paper` fills the small punch-through circle at the pin's base — always set
-it to whatever color the mark is sitting on, not a fixed brand color,
-or the "hole" reads as a solid dot instead of a cutout.
+Specific over sweeping; evidence before assertion; pride without spectacle;
+invite, do not lecture.
 
-Pass `decorative` (on `BlackBookLogo`) or wrap `BlackBookMark` in an
-`aria-hidden` element when adjacent visible text already provides the
-accessible name — don't announce "Black Book" twice.
+- Core line: **History, pinned to place.**
+- Support line: **People. Places. Evidence. Context.**
+- Prefer: "See what happened here." / "Every record should show why it
+  belongs."
+- Avoid: "The untold truth they hid from you." / "Everything you need to
+  know."
 
-## Committed static assets
+See `docs/ui/story.md` (BB-069) for the full voice and narrative doc.
 
-`packages/ui/src/brand/assets/` holds authored SVG exports from the source
-brand package, for contexts outside the app where the React component isn't
-available (letterhead, print, partner press kits, social profile uploads,
-README badges):
+## Launch checklist
 
-- `bb-logo-mark.svg` — full-color symbol
-- `bb-logo-mark-compact.svg` — reduced-detail symbol for small placements
-- `bb-logo-app-icon.svg` — rounded-square app icon
-- `bb-logo-lockup-horizontal.svg` — symbol + wordmark lockup
+From the guide (p.13) — run before any surface ships:
 
-These are **authored assets, not generated output** — there is no
-`generate:brand` build step for this mark (unlike the superseded grid
-system). If the geometry changes, re-export from the design source and
-replace these files directly.
-
-### In the Next.js app
-
-The public web app does not use the static favicon/OG files — it generates
-both at request time from the same shared `BlackBookMark` component, so
-there is exactly one source of truth for the interactive contexts:
-
-- `apps/web/src/app/icon.tsx` — 64x64 PNG via `next/og` `ImageResponse`.
-  Black Ink tile with the mark in white/Copper Pin, centered.
-- `apps/web/src/app/opengraph-image.tsx` — 1200x630 PNG, same mechanism,
-  white canvas with the full mark, wordmark, and tagline.
-
-## Clearspace and minimum sizes
-
-- **Clearspace:** treat the mark's own bounding box as the minimum
-  clearspace — don't crop tighter when placing it near other elements.
-- **Minimum size, full detail:** 32px tall. Below that, switch `detail` to
-  `"compact"` (2 page-edge bands instead of 4, thicker strokes) — used
-  automatically by the header/admin/favicon integrations above 24-28px.
-- **Minimum size, compact:** 16px. This is why favicons and small header
-  marks pass `detail="compact"` rather than scaling the full mark down.
-
-## Do / never
-
-**Do:**
-
-- Use the horizontal lockup as the default hero mark; use `mark`/`app-icon`
-  for small/square chrome.
-- Keep `paper` matched to the actual surface behind the mark so the pin's
-  punch-through circle reads correctly.
-- Use Copper Pin (`#B86B2A`) for graphic/large-scale accents; use Copper Ink
-  (`#7A4318`) wherever the accent carries body text on a light canvas.
-- Credit the source brand package when reusing these assets outside this
-  repo (see `docs/ui/brand-reference/source-package-README.txt`).
-
-**Never:**
-
-- No bevels, 3D effects, drop shadows, glows, or gradients on the mark, in
-  any variant, in any context.
-- Never use raw Copper Pin as small/body text color on a light canvas — it
-  fails the 4.5:1 text bar (see palette table above).
-- Never stretch the mark to a non-square aspect ratio, or place it below its
-  minimum size for the detail level in use.
-- Never reintroduce the retired Monk Skin Tone Scale pigment mapping
-  (superseded 2026-07-17) — if a future feature needs to discuss a real
-  person's appearance, neither that retired system nor this brand palette is
-  the right tool.
+- [ ] Correct light/dark asset for the surface
+- [ ] Transparent background verified
+- [ ] Alt text names the product
+- [ ] Compact mark used below 32px
+- [ ] No typed second B
+- [ ] Clear space preserved
+- [ ] Copper not used for body text
+- [ ] Source and rights labels visible
 
 ## Source map
 
 | What | Where |
 |---|---|
-| Fixed brand palette | `packages/ui/src/tokens/brand-palette.ts` |
-| Theme-safe accent roles + contrast enforcement | `packages/ui/src/tokens/colors.ts`, `contrast.test.ts` |
-| Type system | `packages/ui/src/tokens/typography.ts` |
-| Mark + logo component | `packages/ui/src/brand/BlackBookLogo.tsx` |
-| Logo layout CSS | `packages/ui/src/styles/brand-logo.css` |
-| Authored static assets | `packages/ui/src/brand/assets/` |
-| Reference PNGs + source package README | `docs/ui/brand-reference/` |
-| Web favicon (generated) | `apps/web/src/app/icon.tsx` |
-| Web OG image (generated) | `apps/web/src/app/opengraph-image.tsx` |
+| Binding brand pack (masters, guide, tokens, checksums) | `brand-system/` (`assets/`, `guide/`, `tokens/`, `asset-manifest.json`, `sha256sums.txt`) |
+| Pack tokens (CSS / JSON) | `brand-system/tokens/black-book-brand.css`, `black-book-brand-tokens.json` |
+| In-app tokens | `packages/ui/src/tokens/` (`brand-palette.ts`, `colors.ts`, `typography.ts`), `packages/ui/src/styles/tokens.css` |
+| Contrast enforcement | `packages/ui/src/tokens/contrast.test.ts` |
+| Served brand assets (header, favicon, touch icon, OG, social) | `apps/web/public/brand/` |
+| Symbol-only React component | `BlackBookMark` in `packages/ui/src/brand/BlackBookLogo.tsx` |
 | Header integration | `apps/web/src/components/SiteHeader.tsx` |
-| Admin integration | `apps/admin/src/app/page.tsx` |
+| Asset-usage rules and examples | `brand-system/implementation/` |
+| Superseded v2 reference PNGs | `docs/ui/brand-reference/` (historical; see its `readme.md`) |
+| Agent-facing brand summary | `AGENTS.md` §Brand Language |
+
+Notes on what changed in the source map under BB-096:
+
+- The favicon and OG image are **pack assets served from
+  `apps/web/public/brand/`** — there is no runtime generation of either
+  anymore.
+- `BlackBookMark` (symbol-only) remains for decorative inline and
+  map-chrome use — it tracks surrounding theme color via explicit
+  `ink`/`paper`/`accent` props (set `paper` to the actual surface color so
+  the pin's punch-through circle reads as a cutout, and wrap in
+  `aria-hidden` when adjacent text already names the product). The
+  wordmark-rendering variants are removed — any lockup on screen is pack
+  artwork, never typed.
+- The old authored SVGs at `packages/ui/src/brand/assets/bb-logo-*.svg`
+  are deleted; use `apps/web/public/brand/` (serving) or
+  `brand-system/assets/` (masters) instead.
+- When a master in `brand-system/` changes, re-copy it to
+  `apps/web/public/brand/` and refresh `asset-manifest.json` +
+  `sha256sums.txt`.
 
 See also `docs/ui/README.md` for the broader design-system tokens and
-components this mark sits alongside, and `docs/ui/story.md` (BB-069) for
-brand voice and narrative.
+components this brand sits alongside.

@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360">
-
-<path fill="#090909" d="M54 58H110c16 0 27 6 39 19v206c-12 13-23 19-39 19H54Z"/>
-<path fill="#090909" fill-rule="evenodd" d="M150 58H222c44 0 72 24 72 60 0 26-14 46-40 57 32 10 51 34 51 66 0 38-25 61-56 61H150V58ZM180 96V154H222c18 0 29-11 29-29s-11-29-29-29H180ZM180 204V266H229c20 0 33-12 33-31s-13-31-33-31H180Z"/>
-<path d="M112 58C132 58 148 74 148 94V266c0 20-16 36-36 36" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="butt"/><path d="M120 58C140 58 156 74 156 94V266c0 20-16 36-36 36" stroke="#D4A179" stroke-width="5" fill="none" stroke-linecap="butt"/><path d="M128 58C148 58 164 74 164 94V266c0 20-16 36-36 36" stroke="#FFFFFF" stroke-width="5" fill="none" stroke-linecap="butt"/><path d="M136 58C156 58 172 74 172 94V266c0 20-16 36-36 36" stroke="#8E4F2A" stroke-width="3" fill="none" stroke-linecap="butt"/>
-<path fill="#B86B2A" fill-rule="evenodd" d="M82 245c-12 0-22 10-22 22 0 18 22 41 22 41s22-23 22-41c0-12-10-22-22-22Zm0 13a9 9 0 1 1 0 18 9 9 0 0 1 0-18Z"/>
-<circle cx="82" cy="267" r="6" fill="#FFFFFF"/>
-</svg>
