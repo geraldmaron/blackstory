@@ -309,3 +309,33 @@ export type {
   ResearchCaseServerAction,
   ServerResearchCaseState,
 } from './firestore/index.js';
+
+// Census/ACS/FBI-UCR national-rollup readers for the public /data page (black-book-vxz,
+// black-book-8qp). Admin-SDK aggregate reads only — never a per-record dump. holcAreas is
+// deliberately absent here; its CC BY-NC-SA rights gate excludes it from every public reader.
+export {
+  getNationalPopulationByDecade,
+  getAcsCoverageSummary,
+  getHateCrimeYearSummary,
+  getOpportunityAtlasCoverageSummary,
+} from './demographics/national-stats.js';
+export type {
+  NationalPopulationByDecade,
+  AcsCoverageSummary,
+  HateCrimeYearSummary,
+  OpportunityAtlasCoverageSummary,
+} from './demographics/national-stats.js';
+export {
+  censusCountyDecadeSchema,
+  censusCountyDecadeDecadeSchema,
+  censusCountyDecadeId,
+  parseCensusCountyDecadeDoc,
+  acsCountyProfileSchema,
+  acsTractProfileSchema,
+} from './demographics/schema.js';
+export type {
+  CensusCountyDecadeDoc,
+  CensusCountyDecadeDecade,
+  AcsCountyProfileDoc,
+  AcsTractProfileDoc,
+} from './demographics/schema.js';

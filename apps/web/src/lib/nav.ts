@@ -23,6 +23,7 @@ export const PRIMARY_NAV: readonly NavItem[] = [
 
 /** Overflow routes: desktop "More" disclosure + appended to the mobile drawer. */
 export const OVERFLOW_NAV: readonly NavItem[] = [
+  { href: '/data', label: 'Data' },
   { href: '/facts', label: 'Facts' },
   { href: '/legal', label: 'Legal' },
   { href: '/methodology', label: 'Methodology' },
@@ -46,6 +47,7 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
       { href: '/search', label: 'Search' },
       { href: '/history', label: 'History' },
       { href: '/topics', label: 'Topics' },
+      { href: '/data', label: 'Data' },
     ],
   },
   {
