@@ -4,8 +4,14 @@
  * so this cannot silently regress as the brand palette evolves.
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { DENSITY_TIER_FILL, DIGNITY_PALETTE } from './dignity-style';
+import { KIND_ENCODING_ENTRIES } from './kind-encoding';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function hexToRgb(hex: string): readonly [number, number, number] {
   const normalized = hex.replace('#', '');
@@ -59,21 +65,46 @@ function isRedHued(rgb: readonly [number, number, number]): boolean {
   return inRedBand && s > 0.25;
 }
 
-test('no dignity-palette color used for points/clusters/selection is red-hued', () => {
-  const colorValues = [
-    DIGNITY_PALETTE.point,
-    DIGNITY_PALETTE.pointHalo,
-    DIGNITY_PALETTE.cluster,
-    DIGNITY_PALETTE.clusterText,
-    DIGNITY_PALETTE.background,
-    DIGNITY_PALETTE.border,
-    DIGNITY_PALETTE.selected,
-  ];
-  for (const color of colorValues) {
+test('no color in DIGNITY_PALETTE — including every BB-099 kind/relocated addition — is red-hued', () => {
+  // Iterates the whole map, not a hand-kept subset, so a future palette addition (kind shade or
+  // otherwise) can never silently slip past the dignity rule.
+  for (const color of Object.values(DIGNITY_PALETTE)) {
     const rgb = color.startsWith('#') ? hexToRgb(color) : rgbaToRgb(color);
     assert.ok(rgb, `expected a parseable color for ${color}`);
     assert.equal(isRedHued(rgb!), false, `${color} must not be red-hued (dignity rule)`);
   }
+});
+
+test('BB-099: every kind shade is paired with a non-color glyph channel (WCAG 1.4.1, color never alone)', () => {
+  for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
+    assert.ok(typeof entry.glyph === 'string' && entry.glyph.length > 0, `kind "${kind}" must have a glyph`);
+  }
+  const glyphs = KIND_ENCODING_ENTRIES.map(([, entry]) => entry.glyph);
+  assert.equal(new Set(glyphs).size, glyphs.length, 'every kind glyph must be distinct from every other kind');
+});
+
+test('BB-099: no status, racial, or skin framing in the user-visible kind labels or legend prose (shades encode kind only)', () => {
+  // Scoped to user-visible copy (kind labels + the legend's rendered prose), not a blind
+  // full-source grep: this repo's own doc comments legitimately *name* "status/racial/skin"
+  // while documenting that the rule forbids them (see kind-encoding.ts's module doc), so a
+  // whole-file banned-word scan would flag its own disclaimer as a violation.
+  const bannedPattern = /\b(skin|race|racial|complexion|light[- ]skinned|dark[- ]skinned|status|caste)\b/i;
+  for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
+    assert.doesNotMatch(entry.label, bannedPattern, `kind "${kind}" label must not use status/racial/skin framing`);
+  }
+
+  const legendSource = readFileSync(
+    path.join(__dirname, '../../components/map-experience/MapExperienceLegend.tsx'),
+    'utf8',
+  );
+  // Pull out just the JSX text content lines (skip the file's own /** ... */ doc comment block
+  // and TS syntax) so this checks what a user actually reads, not the code around it.
+  const jsxTextLines = legendSource
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('*') && !line.trim().startsWith('//'));
+  const renderedProse = jsxTextLines.join('\n');
+  assert.doesNotMatch(renderedProse, bannedPattern, 'MapExperienceLegend.tsx JSX copy must not use status/racial/skin framing');
+  assert.match(renderedProse, /kind of place or record only/i, 'the legend must state plainly that color encodes kind only');
 });
 
 test('no density-tier fill (the coverage/presence layer) is red-hued — never a crime-heat gradient', () => {

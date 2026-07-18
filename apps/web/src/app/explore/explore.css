@@ -192,15 +192,117 @@
   }
 }
 
+/*
+ * BB-099 legend. `.bb-explore-legend` is the component's own root (a native `<details>`) it
+ * carries no fixed/floating position of its own; a wrapping container supplied by the map-stage
+ * surface is what pins it as a bottom-left floating panel over the canvas (see
+ * `MapExperienceLegend.tsx`'s props-contract doc comment). What lives here is purely the
+ * component's internal layout, sized to stay legible down to a 375px-wide container.
+ */
 .bb-explore-legend {
   margin-top: var(--bb-space-2);
+  max-width: 22rem;
+  font-family: var(--bb-font-sans);
+}
+
+.bb-explore-legend__summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  list-style: revert;
+}
+
+.bb-explore-legend__summary:focus-visible {
+  outline: var(--bb-focus-width) solid var(--bb-focus-ring);
+  outline-offset: var(--bb-focus-offset);
+}
+
+.bb-explore-legend__body {
+  display: grid;
+  gap: var(--bb-space-4);
+  margin-top: var(--bb-space-3);
+}
+
+.bb-explore-legend__subhead {
+  margin: 0 0 var(--bb-space-1);
+  font-family: var(--bb-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bb-ink-muted);
+}
+
+.bb-explore-legend__note {
+  margin: 0 0 var(--bb-space-2);
+  font-size: 0.8125rem;
+  color: var(--bb-ink-muted);
+}
+
+.bb-explore-legend__kind-list {
+  display: grid;
+  gap: var(--bb-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+}
+
+.bb-explore-legend__kind-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--bb-space-2);
+}
+
+.bb-explore-legend__kind-glyph-name {
+  color: var(--bb-ink-muted);
+}
+
+.bb-legend-glyph {
+  flex: 0 0 auto;
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border: var(--bb-border-width) solid var(--bb-border);
+}
+
+.bb-legend-glyph--circle {
+  border-radius: 50%;
+}
+
+.bb-legend-glyph--square {
+  border-radius: 2px;
+}
+
+.bb-legend-glyph--diamond {
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+.bb-legend-glyph--ring {
+  border-radius: 50%;
+  border-width: 2px;
+}
+
+.bb-explore-legend__size-scale {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--bb-space-2);
+  margin-bottom: var(--bb-space-2);
+}
+
+.bb-explore-legend__size-dot {
+  display: inline-block;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--bb-accent-graphic);
 }
 
 .bb-explore-legend__list {
   display: grid;
   gap: var(--bb-space-3);
-  margin: var(--bb-space-3) 0 0;
-  font-family: var(--bb-font-sans);
+  margin: 0;
+  font-size: 0.8125rem;
 }
 
 .bb-explore-legend__list dt {
@@ -210,6 +312,12 @@
 .bb-explore-legend__list dd {
   margin: var(--bb-space-1) 0 0;
   color: var(--bb-ink-muted);
+}
+
+@media (max-width: 23.4375rem) {
+  .bb-explore-legend {
+    max-width: 100%;
+  }
 }
 
 .bb-explore__locate-link {

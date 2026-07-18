@@ -14,6 +14,11 @@ import {
   DIGNITY_PALETTE,
   EXPLORE_CLUSTER_CONFIG,
 } from '../../lib/map-experience/dignity-style';
+import { KIND_ENCODING_ENTRIES, DEFAULT_KIND_ENCODING } from '../../lib/map-experience/kind-encoding';
+import {
+  markerHaloRadiusExpression,
+  markerRadiusExpression,
+} from '../../lib/map-experience/marker-size';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
@@ -29,6 +34,7 @@ import {
   EXPLORE_JURISDICTION_AREAS_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
+  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
@@ -44,6 +50,7 @@ export {
   EXPLORE_JURISDICTION_AREAS_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
+  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
@@ -63,6 +70,83 @@ function _radiusMetersToPixelsExpression(): ExpressionSpecification {
     ['*', ['coalesce', ['get', 'radiusMeters'], 0], ['^', 2, ['zoom']]],
     WEB_MERCATOR_METERS_AT_ZOOM_0,
   ] as ExpressionSpecification;
+}
+
+/**
+ * BB-099 kind -> shade + glyph paint. Every entity kind gets a `DIGNITY_PALETTE` shade (via
+ * `kind-encoding.ts`, so color is one source of truth) AND a non-color fill/stroke signature
+ * (WCAG 1.4.1 color is never the only signal), keyed by glyph identity rather than kind so two
+ * kinds that ever shared a glyph would automatically share a signature too:
+ *  - `circle` (place): solid fill, thin rim the map's original default marker treatment.
+ *  - `square` (school): solid fill, a disproportionately thick rim ("blocky").
+ *  - `diamond` (event): solid fill, thin rim, PLUS a second offset unfilled ring layer
+ *    (`EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID` below) an "orbit ring" marker.
+ *  - `ring` (institution): mostly-hollow fill, thick Stone rim a literal ring.
+ * MapLibre `circle`-type layers cannot render literal square/diamond geometry (no shape
+ * parameter exists in the style spec), and this style has no icon sprite / glyph server to draw
+ * true shapes via `symbol` layers (ADR-013 "known gaps" the exact reason
+ * `EXPLORE_CLUSTER_COUNT_LAYER_ID` below is already a documented no-op). `MapExperienceLegend`
+ * renders the literal circle/square/diamond/ring shapes via CSS, which has no such limitation;
+ * this fill/stroke vocabulary is the canvas-side echo of the same four glyph identities.
+ */
+type KindGlyphPaintSignature = {
+  readonly opacity: number;
+  readonly strokeWidth: number;
+  readonly strokeColor: string;
+};
+
+const GLYPH_PAINT_SIGNATURE: Readonly<Record<string, KindGlyphPaintSignature>> = {
+  circle: { opacity: 1, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
+  square: { opacity: 1, strokeWidth: 4, strokeColor: DIGNITY_PALETTE.selected },
+  diamond: { opacity: 1, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
+  ring: { opacity: 0.3, strokeWidth: 3, strokeColor: DIGNITY_PALETTE.kindInstitutionStroke },
+};
+
+const DEFAULT_GLYPH_PAINT_SIGNATURE: KindGlyphPaintSignature = GLYPH_PAINT_SIGNATURE.circle!;
+
+function glyphSignatureFor(glyph: string): KindGlyphPaintSignature {
+  return GLYPH_PAINT_SIGNATURE[glyph] ?? DEFAULT_GLYPH_PAINT_SIGNATURE;
+}
+
+/** Builds a `['match', ['get', 'kind'], k1, v1, k2, v2, ..., fallback]` expression from
+ * `KIND_ENCODING_ENTRIES`, so every kind-keyed paint property here is generated from the same
+ * table `kind-encoding.ts` exports rather than re-listing `place | school | event | institution`
+ * by hand at each call site. */
+function kindMatchExpression(
+  valueForEntry: (entry: (typeof KIND_ENCODING_ENTRIES)[number][1]) => string | number,
+  fallback: string | number,
+): ExpressionSpecification {
+  const cases = KIND_ENCODING_ENTRIES.flatMap(([kind, entry]) => [kind, valueForEntry(entry)]);
+  // `cases` is a variable-length spread, so this array's inferred shape is not one of
+  // `ExpressionSpecification`'s fixed-length tuple variants; go through `unknown` (same escape
+  // hatch this repo already uses for other MapLibre expression/filter casts, e.g.
+  // `ExploreMapCanvas.tsx`'s `as unknown as [string, ...unknown[]]`).
+  return ['match', ['get', 'kind'], ...cases, fallback] as unknown as ExpressionSpecification;
+}
+
+function kindColorExpression(): ExpressionSpecification {
+  return kindMatchExpression((entry) => entry.shade, DEFAULT_KIND_ENCODING.shade);
+}
+
+function kindFillOpacityExpression(): ExpressionSpecification {
+  return kindMatchExpression(
+    (entry) => glyphSignatureFor(entry.glyph).opacity,
+    DEFAULT_GLYPH_PAINT_SIGNATURE.opacity,
+  );
+}
+
+function kindStrokeWidthExpression(): ExpressionSpecification {
+  return kindMatchExpression(
+    (entry) => glyphSignatureFor(entry.glyph).strokeWidth,
+    DEFAULT_GLYPH_PAINT_SIGNATURE.strokeWidth,
+  );
+}
+
+function kindStrokeColorExpression(): ExpressionSpecification {
+  return kindMatchExpression(
+    (entry) => glyphSignatureFor(entry.glyph).strokeColor,
+    DEFAULT_GLYPH_PAINT_SIGNATURE.strokeColor,
+  );
 }
 
 export type BuildExploreMapStyleInput = {
@@ -135,9 +219,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
                 DENSITY_TIER_FILL.emerging,
                 'documented',
                 DENSITY_TIER_FILL.documented,
-                'rgba(255, 255, 255, 0.1)',
+                DIGNITY_PALETTE.densityUnknownFill,
               ]
-            : 'rgba(255, 255, 255, 0.12)',
+            : DIGNITY_PALETTE.densityDisabledFill,
           'fill-opacity': 1,
         },
       },
@@ -157,7 +241,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_STATE_DENSITY_SOURCE_ID,
         filter: ['==', ['get', 'postalCode'], ''],
         paint: {
-          'fill-color': 'rgba(184, 107, 42, 0.35)',
+          'fill-color': DIGNITY_PALETTE.selectedStateFill,
         },
       },
       {
@@ -214,9 +298,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
         paint: {
-          // Circular entity markers fixed px radii (not rectangular state fills). Precision
-          // affordance copy remains on the entity page and explore list.
-          'circle-radius': 22,
+          // BB-099: data-driven radius (marker-size.ts's formula + the fixed halo offset), one
+          // source of truth with the point layer below. Halo color stays neutral/decorative
+          // (not kind-carrying) kind is fully carried by the point layer's shade + glyph
+          // signature and, for `event`, the extra glyph layer below.
+          'circle-radius': markerHaloRadiusExpression(),
           'circle-color': DIGNITY_PALETTE.pointHalo,
           'circle-opacity': 0.32,
         },
@@ -227,10 +313,32 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
         paint: {
-          'circle-radius': 11,
-          'circle-color': DIGNITY_PALETTE.point,
-          'circle-stroke-width': 3,
-          'circle-stroke-color': DIGNITY_PALETTE.selected,
+          // BB-099: size from marker-size.ts (evidenceCount + confidenceTier, clamped [6, 16]);
+          // color + fill/stroke signature from kind-encoding.ts via DIGNITY_PALETTE (color marks
+          // kind only; the fill/stroke signature is the non-color channel WCAG 1.4.1 requires).
+          'circle-radius': markerRadiusExpression(),
+          'circle-color': kindColorExpression(),
+          'circle-opacity': kindFillOpacityExpression(),
+          'circle-stroke-width': kindStrokeWidthExpression(),
+          'circle-stroke-color': kindStrokeColorExpression(),
+        },
+      },
+      {
+        // BB-099: the `event` kind's "diamond" glyph a second, unfilled ring offset around the
+        // point marker (see the `GLYPH_PAINT_SIGNATURE` doc comment above for why this
+        // approximates rather than draws literal diamond geometry). Filtered to `event` only;
+        // every other kind's glyph is fully carried by the point layer above.
+        id: EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_ENTITIES_SOURCE_ID,
+        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'kind'], 'event']],
+        paint: {
+          'circle-radius': ['+', markerRadiusExpression(), 4],
+          'circle-color': DIGNITY_PALETTE.kindEvent,
+          'circle-opacity': 0,
+          'circle-stroke-width': 1.5,
+          'circle-stroke-color': DIGNITY_PALETTE.kindEvent,
+          'circle-stroke-opacity': 0.9,
         },
       },
       {

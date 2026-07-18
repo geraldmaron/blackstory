@@ -10,12 +10,14 @@
  * Protomaps PMTiles, dark/desaturated land+water+admin style) — this demo
  * stands in.
  *
- * Brand colors come from @black-book/ui's token source (brand-palette.ts
- * colors.ts dark theme) so the map never drifts from the rest of the app.
+ * Colors route through `DIGNITY_PALETTE` (`../../lib/map-experience/dignity-style.ts`) the
+ * same single token source `explore-style.ts` uses (BB-099 basemap-conformance pass), which
+ * itself reuses @black-book/ui's brand palette, so this demo style and the production style can
+ * never drift onto two different color surfaces.
  */
 import type { StyleSpecification } from 'maplibre-gl';
-import { brandPalette, darkTheme } from '@black-book/ui';
 import type { UsStateInfo } from '@black-book/domain';
+import { DIGNITY_PALETTE } from '../../lib/map-experience/dignity-style';
 
 /**
  * Loosely-typed GeoJSON feature collection. maplibre-gl's own types express
@@ -80,14 +82,14 @@ export function buildDarkArchiveStyle(
       {
         id: 'background',
         type: 'background',
-        paint: { 'background-color': brandPalette.blackInk },
+        paint: { 'background-color': DIGNITY_PALETTE.background },
       },
       {
         id: 'state-bounds-line',
         type: 'line',
         source: 'state-bounds',
         paint: {
-          'line-color': darkTheme.border,
+          'line-color': DIGNITY_PALETTE.border,
           'line-width': 1,
           'line-opacity': 0.7,
         },
@@ -98,7 +100,7 @@ export function buildDarkArchiveStyle(
         source: 'entities',
         paint: {
           'circle-radius': 8,
-          'circle-color': brandPalette.copperPin,
+          'circle-color': DIGNITY_PALETTE.point,
           'circle-opacity': 0.18,
         },
       },
@@ -108,9 +110,9 @@ export function buildDarkArchiveStyle(
         source: 'entities',
         paint: {
           'circle-radius': 4,
-          'circle-color': brandPalette.copperPin,
+          'circle-color': DIGNITY_PALETTE.point,
           'circle-stroke-width': 1.5,
-          'circle-stroke-color': brandPalette.archivePaper,
+          'circle-stroke-color': DIGNITY_PALETTE.selected,
         },
       },
     ],
