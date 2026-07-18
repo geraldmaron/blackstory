@@ -1,0 +1,1667 @@
+[
+  {
+    "townName": "Anna",
+    "county": "Union County",
+    "state": "Illinois",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Anna, IL",
+      "href": "https://justice.tougaloo.edu/sundowntown/anna-il/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "ProPublica Illinois, “The Legend of A-N-N-A: Revisiting an American Town Where Black People Weren’t Welcome After Dark”",
+        "href": "https://features.propublica.org/illinois-sundown-towns/legend-of-anna/"
+      },
+      {
+        "sourceLabel": "WBEZ Chicago, “A Small Town In Illinois Reckons With Its Dark Racial Past”",
+        "href": "https://www.wbez.org/reset-with-sasha-ann-simons/2019/11/11/a-small-town-in-illinois-reckons-with-its-dark-racial-past"
+      }
+    ],
+    "documentedPeriod": "1909-2010s (per reported incident in 2010)",
+    "notes": "The Tougaloo database records Anna's expulsion of its Black residents in 1909, in the tense aftermath of a lynching in nearby Cairo, and cites a contemporary Carbondale newspaper account describing threats against Black quarry workers there. Long-standing local oral tradition holds that the town's name has for decades been used as an unofficial acronym signaling racial exclusion, and the database includes a resident's 2010 account of a Black visitor being turned away from a local restaurant.",
+    "confidenceCaveat": "Much of the detail comes from oral history and reader/visitor submissions to the database rather than an official record or ordinance; ProPublica's independent reporting corroborates the broad outline and the town's reputation."
+  },
+  {
+    "townName": "Cicero",
+    "county": "Cook County",
+    "state": "Illinois",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Cicero, IL",
+      "href": "https://justice.tougaloo.edu/sundowntown/cicero-il/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "Wikipedia, “Cicero race riot of 1951”",
+        "href": "https://en.wikipedia.org/wiki/Cicero_race_riot_of_1951"
+      },
+      {
+        "sourceLabel": "Chicago History Museum, “Racially Restrictive Covenants and the 1951 Cicero Race Riot”",
+        "href": "https://www.chicagohistory.org/racially-restrictive-covenants-and-the-1951-cicero-race-riot/"
+      }
+    ],
+    "documentedPeriod": "1951 (well-documented flashpoint; reputation persisted for decades after)",
+    "notes": "In July 1951 a mob numbering in the thousands attacked an apartment building after a Black family, the Clarks, attempted to move in, ultimately requiring National Guard troops to disperse the crowd; the Tougaloo entry treats this riot as the town's defining sundown-town episode. The scale of the documented violence and the subsequent criminal proceedings (in which a grand jury declined to indict rioters but did indict the family's landlord and NAACP attorney) are independently and extensively documented outside the database.",
+    "confidenceCaveat": "None significant — this is among the best independently documented cases in the set, covered by contemporary press, later academic histories, and court records."
+  },
+  {
+    "townName": "Carterville",
+    "county": "Williamson County",
+    "state": "Illinois",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Carterville, IL",
+      "href": "https://justice.tougaloo.edu/sundowntown/carterville-il/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1899-1901 (mine-labor conflict and shootings)",
+    "notes": "The database entry, citing a period county history, describes a violent 1901 incident in which several Black men were shot in the streets of Carterville amid conflict tied to the use of Black miners as strikebreakers, part of a broader wave of anti-Black violence across southern Illinois's coal towns in this era.",
+    "confidenceCaveat": "Single citation in the database (a period local history book); no independent secondary source was checked for this pass."
+  },
+  {
+    "townName": "Effingham",
+    "county": "Effingham County",
+    "state": "Illinois",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Effingham, IL",
+      "href": "https://justice.tougaloo.edu/sundowntown/effingham-il/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated (mid-20th century, per database framing)",
+    "notes": "The database records that Effingham's bus and train stations were, for a period, effectively the only places in town where Black travelers were permitted, consistent with a town that tolerated Black people passing through but not remaining after dark.",
+    "confidenceCaveat": "Entry is brief; single-source (Tougaloo submission), no date range given for the practice beyond it being remembered as historical."
+  },
+  {
+    "townName": "Pekin",
+    "county": "Tazewell County",
+    "state": "Illinois",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Pekin, IL",
+      "href": "https://justice.tougaloo.edu/sundowntown/pekin-il/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "2000s census period noted in entry; practice described as historical",
+    "notes": "The database entry notes an unusual demographic pattern in Pekin's 2000 census (a Black population skewed heavily male, consistent with commuting labor rather than resident households) as circumstantial evidence consistent with a longstanding exclusionary norm, on top of the town's regional reputation as a sundown town.",
+    "confidenceCaveat": "The demographic argument is inferential (skewed household composition), not a direct account of an ordinance, sign, or expulsion event."
+  },
+  {
+    "townName": "Kenilworth",
+    "county": "Cook County",
+    "state": "Illinois",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Kenilworth, IL",
+      "href": "https://justice.tougaloo.edu/sundowntown/kenilworth-il/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "until 1964",
+    "notes": "The database entry states that a Chicago Defender reporter and her husband were the first Black residents to move into this affluent North Shore suburb in 1964, implying an all-white community maintained through restrictive covenants and informal exclusion up to that point rather than an active sundown practice with signage or violence.",
+    "confidenceCaveat": "Based on a single reported milestone (first Black resident in 1964) rather than a documented ordinance, sign, or expulsion; exclusion here reads as covenant-and-custom rather than after-dark enforcement."
+  },
+  {
+    "townName": "Martinsville",
+    "county": "Morgan County",
+    "state": "Indiana",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Martinsville, IN",
+      "href": "https://justice.tougaloo.edu/sundowntown/martinsville-in/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "NPR, “Indiana Town: From Racist Past to Primary Present”",
+        "href": "https://www.npr.org/2008/04/30/90074719/indiana-town-from-racist-past-to-primary-present"
+      },
+      {
+        "sourceLabel": "Wikipedia, “Murder of Carol Jenkins”",
+        "href": "https://en.wikipedia.org/wiki/Murder_of_Carol_Jenkins"
+      }
+    ],
+    "documentedPeriod": "early 20th century-2002 (Jenkins case prosecuted 2002)",
+    "notes": "Martinsville's reputation as a sundown town, discussed in the Tougaloo entry, is anchored by the 1968 murder of Carol Jenkins, a young Black woman stabbed while door-to-door selling encyclopedias; the case went unsolved for over three decades until a Klan-affiliated suspect was identified and charged in 2002. NPR's reporting frames the town's continued reckoning with this reputation into the 2000s.",
+    "confidenceCaveat": "The murder itself is a documented homicide case, not by itself proof of a formal exclusionary policy; the 'sundown town' characterization rests on the town's broader reputation and Klan history rather than a single ordinance or sign."
+  },
+  {
+    "townName": "Elwood",
+    "county": "Madison County",
+    "state": "Indiana",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Elwood, IN",
+      "href": "https://justice.tougaloo.edu/sundowntown/elwood-in/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "Wikipedia, “List of expulsions of African Americans”",
+        "href": "https://en.wikipedia.org/wiki/List_of_expulsions_of_African_Americans"
+      }
+    ],
+    "documentedPeriod": "1897-1940s (per database, sign remembered into the Klan era)",
+    "notes": "The database cites an 1897 regional newspaper report describing Black families repeatedly settling in Elwood and then leaving owing to hostility, and describes a since-removed roadside sign warning Black travelers not to remain after dark, a sign also referenced in connection with 1940 presidential candidate Wendell Willkie's home town. The town later served as a local headquarters for Klan activity.",
+    "confidenceCaveat": "The sign's exact wording and years of display rely on oral memory and secondary retellings rather than a surviving photograph in the sources reviewed here."
+  },
+  {
+    "townName": "Goshen",
+    "county": "Elkhart County",
+    "state": "Indiana",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Goshen, IN",
+      "href": "https://justice.tougaloo.edu/sundowntown/goshen-in/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "Goshen News, “Goshen City Council approves resolution acknowledging 'sundown town' past”",
+        "href": "https://www.goshennews.com/news/goshen-city-council-approves-resolution-acknowledging-sundown-town-past/article_9db44bd6-cd0f-11e4-948d-8774e13ff2b6.html"
+      }
+    ],
+    "documentedPeriod": "c. 1900-2015 (formal municipal acknowledgment in 2015)",
+    "notes": "Goshen is one of the few former sundown towns whose city council has formally acknowledged the history in an official resolution, passed unanimously in March 2015, stating that exclusion of Black residents “happened” and “was wrong.” A local resident's search of city ordinance books reportedly found no written law, suggesting the exclusion operated through informal custom and social pressure rather than codified statute.",
+    "confidenceCaveat": "The absence of a found ordinance means the practice is documented through oral history, demographic patterns, and the council's own acknowledgment rather than a legal text."
+  },
+  {
+    "townName": "Decatur",
+    "county": "Adams County",
+    "state": "Indiana",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Decatur, IN",
+      "href": "https://justice.tougaloo.edu/sundowntown/decatur-in/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1902",
+    "notes": "The database cites a July 14, 1902 New York Times headline reporting that the last Black resident had left Decatur, treating this as a contemporary national news account of the town becoming, in effect, all-white.",
+    "confidenceCaveat": "Only the headline and brief framing are available in this pass; the full period article was not independently retrieved."
+  },
+  {
+    "townName": "Greenwood",
+    "county": "Johnson County",
+    "state": "Indiana",
+    "tougalooConfidence": "possible",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Greenwood, IN",
+      "href": "https://justice.tougaloo.edu/sundowntown/greenwood-in/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, described as historical by a resident submission",
+    "notes": "A resident's submission in the database describes Greenwood, now an Indianapolis suburb, as having had a reputation for discouraging Black residents in earlier decades, without citing a specific ordinance, sign, or incident.",
+    "confidenceCaveat": "Rated only 'possible' by the database itself; this is a general reputational claim from a single submission, not a documented event."
+  },
+  {
+    "townName": "Cullman",
+    "county": "Cullman County",
+    "state": "Alabama",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Cullman, AL",
+      "href": "https://justice.tougaloo.edu/sundowntown/cullman-al/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1890s-1950s",
+    "notes": "The database describes Cullman County as having barred Black residency by custom from the 1890s into the 1950s, citing census data showing a handful of Black residents concentrated in non-household settings (institutional or live-in employment) rather than ordinary family residence, consistent with the county's long-reported reputation for after-dark exclusion.",
+    "confidenceCaveat": "Census-pattern evidence is circumstantial; a widely repeated roadside-sign story associated with Cullman County (also referenced by state political figures) was not independently verified in this pass."
+  },
+  {
+    "townName": "Arab",
+    "county": "Marshall County",
+    "state": "Alabama",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Arab, AL",
+      "href": "https://justice.tougaloo.edu/sundowntown/arab-al/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1927-2000s (resident quoted recalling town history since 1927)",
+    "notes": "The database quotes a long-time resident (living in Arab since 1927) explaining that the absence of Black residents in the town was simply the enduring, unquestioned way things had always been, rather than describing a specific triggering incident.",
+    "confidenceCaveat": "Single oral-history source; no ordinance, sign, or dated expulsion event is cited in the entry reviewed."
+  },
+  {
+    "townName": "Sand Mountain",
+    "county": null,
+    "state": "Alabama",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Sand Mountain, AL",
+      "href": "https://justice.tougaloo.edu/sundowntown/sand-mountain-al/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, described via a teacher's recollection",
+    "notes": "Sand Mountain is a plateau region spanning parts of several northeast Alabama counties (including areas around Boaz and Albertville) rather than a single incorporated town; the database entry records a former teacher's account of the broader area's regional reputation for excluding Black residents.",
+    "confidenceCaveat": "This is a multi-county region, not a single municipality, and the documentation is a single secondhand recollection rather than a town-specific record; county left null because the designation spans several counties."
+  },
+  {
+    "townName": "Harrison",
+    "county": "Boone County",
+    "state": "Arkansas",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Harrison, AR",
+      "href": "https://justice.tougaloo.edu/sundowntown/harrison-ar/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "Encyclopedia of Arkansas, “Harrison Race Riots of 1905 and 1909”",
+        "href": "https://encyclopediaofarkansas.net/entries/harrison-race-riots-of-1905-and-1909-3712/"
+      }
+    ],
+    "documentedPeriod": "1905 and 1909",
+    "notes": "Two documented riots, in 1905 and 1909, drove nearly the entire Black community out of Harrison; the 1905 mob whipped and burned out Black residents after a jailed man was seized from custody, and the 1909 riot (following a rape accusation and trial) completed the town's transformation into an all-white community that persisted for decades.",
+    "confidenceCaveat": "None significant — this is corroborated by the Encyclopedia of Arkansas's detailed academic entry citing period newspapers and census records."
+  },
+  {
+    "townName": "Mena",
+    "county": "Polk County",
+    "state": "Arkansas",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Mena, AR",
+      "href": "https://justice.tougaloo.edu/sundowntown/mena-ar/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "c. 1920-1925",
+    "notes": "The database cites a 1920s-era promotional advertisement for Mena that listed the town's absence of Black residents alongside the absence of mosquitoes and drought as a selling point, treated by the entry as direct period evidence of an explicitly exclusionary civic identity.",
+    "confidenceCaveat": "Based on a single advertisement description in the database; the original ad was not independently located for this pass."
+  },
+  {
+    "townName": "Paragould",
+    "county": "Greene County",
+    "state": "Arkansas",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Paragould, AR",
+      "href": "https://justice.tougaloo.edu/sundowntown/paragould-ar/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, recalled at a high school reunion",
+    "notes": "The database entry recounts an out-of-state visitor's surprise, at a Paragould High School reunion, at how thoroughly she had to be told about the town's historical exclusion of Black residents — an oral-history account rather than a dated incident.",
+    "confidenceCaveat": "Single secondhand oral account with no specific date or triggering event given."
+  },
+  {
+    "townName": "Rogers",
+    "county": "Benton County",
+    "state": "Arkansas",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Rogers, AR",
+      "href": "https://justice.tougaloo.edu/sundowntown/rogers-ar/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "mid-20th century, per a journalist's recollection",
+    "notes": "The database cites a recollection attributed to Arkansas Gazette (and later New York Times) reporter Roy Reed describing his upbringing in the area and awareness of the region's exclusionary norms toward Black residents.",
+    "confidenceCaveat": "Based on a journalist's personal recollection rather than a contemporaneous document; no ordinance or sign is cited."
+  },
+  {
+    "townName": "Torrance",
+    "county": "Los Angeles County",
+    "state": "California",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Torrance, CA",
+      "href": "https://justice.tougaloo.edu/sundowntown/torrance-ca/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1930-1940 (census figures cited), reputation extending later",
+    "notes": "The database entry notes that Torrance's census recorded zero Black residents in 1930 and only two in 1940, and cites additional evidence of a Black postal worker being pressured against staying overnight in the city, consistent with planned-community exclusion typical of some early Los Angeles-area suburbs.",
+    "confidenceCaveat": "Census absence is suggestive rather than conclusive on its own; the postal-worker anecdote is a single account."
+  },
+  {
+    "townName": "Brea",
+    "county": "Orange County",
+    "state": "California",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Brea, CA",
+      "href": "https://justice.tougaloo.edu/sundowntown/brea-ca/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1926",
+    "notes": "The database quotes language from a 1926 restrictive covenant recorded in Brea barring the sale or lease of the described property to non-white buyers — a directly documented legal instrument rather than an oral account.",
+    "confidenceCaveat": "A restrictive covenant is strong documentary evidence of exclusionary intent for that specific property/subdivision, though it is not by itself proof of a town-wide after-dark practice; such covenants were common and often unenforced-but-present across many mid-century American suburbs."
+  },
+  {
+    "townName": "Crescent City",
+    "county": "Del Norte County",
+    "state": "California",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Crescent City, CA",
+      "href": "https://justice.tougaloo.edu/sundowntown/crescent-city-ca/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "19th century (mining-era), directed at Chinese residents",
+    "notes": "The database entry describes 19th-century hostility toward Chinese miners and saloon-keepers' economic opposition to Chinese competition in the Crescent City area, part of the well-documented wave of anti-Chinese expulsions across California and the Pacific Northwest mining districts in this period.",
+    "confidenceCaveat": "The exclusion documented here targeted Chinese residents specifically, not Black residents; the entry does not specify an exact expulsion date."
+  },
+  {
+    "townName": "Oildale",
+    "county": "Kern County",
+    "state": "California",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Oildale, CA",
+      "href": "https://justice.tougaloo.edu/sundowntown/oildale-ca/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1930s-1960s, per longtime-resident recollection",
+    "notes": "Several long-time residents quoted in the database recall a posted sign at the edge of Oildale warning Black people against remaining after dark, consistent with the community's origin as a Dust Bowl-era migrant oil-town enclave with a documented reputation for racial exclusion.",
+    "confidenceCaveat": "The sign is described through resident memory rather than a surviving photograph in the source reviewed."
+  },
+  {
+    "townName": "Taft",
+    "county": "Kern County",
+    "state": "California",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Taft, CA",
+      "href": "https://justice.tougaloo.edu/sundowntown/taft-ca/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1941",
+    "notes": "The database cites a June 1941 Fresno Bee article reporting local objection to Black soldiers being stationed near Taft, treated as contemporary press evidence of the town's exclusionary climate during the World War II era.",
+    "confidenceCaveat": "Based on a single period newspaper article as summarized in the database; the original article was not independently retrieved for this pass."
+  },
+  {
+    "townName": "Hawthorne",
+    "county": "Los Angeles County",
+    "state": "California",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Hawthorne, CA",
+      "href": "https://justice.tougaloo.edu/sundowntown/hawthorne-ca/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1930s, per a family recollection",
+    "notes": "A family recollection recorded in the database describes a sign at the Hawthorne city limits in the 1930s warning Black people not to remain past sundown.",
+    "confidenceCaveat": "Very brief entry based on a single secondhand family account; no independent corroboration was checked in this pass."
+  },
+  {
+    "townName": "Mill Valley",
+    "county": "Marin County",
+    "state": "California",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Mill Valley, CA",
+      "href": "https://justice.tougaloo.edu/sundowntown/mill-valley-ca/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "mid-20th century, per family recollection",
+    "notes": "A resident's submission describes learning as an adult that their family had not, as they had believed, been the first Black family to move into Mill Valley, implying a town where Black residency was rare enough that individual arrivals were locally notable and remembered.",
+    "confidenceCaveat": "Based on a single family recollection with no specific date, ordinance, or incident cited."
+  },
+  {
+    "townName": "Dearborn",
+    "county": "Wayne County",
+    "state": "Michigan",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Dearborn, MI",
+      "href": "https://justice.tougaloo.edu/sundowntown/dearborn-mi/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "WDET, “The Racist, Segregationist History Behind Dearborn's Orville Hubbard Statue”",
+        "href": "https://wdet.org/2020/07/07/the-racist-segregationist-history-behind-dearborns-orville-hubbard-statue/"
+      },
+      {
+        "sourceLabel": "Wikipedia, “Orville L. Hubbard”",
+        "href": "https://en.wikipedia.org/wiki/Orville_L._Hubbard"
+      }
+    ],
+    "documentedPeriod": "1942-1978 (Hubbard's mayoralty)",
+    "notes": "Longtime mayor Orville Hubbard, in office from 1942 to 1978, publicly and repeatedly stated his intent to keep Dearborn free of Black residents, reportedly telling a national newspaper that his administration responded to reports of a Black family moving in the way other cities respond to a fire; the city allowed Black live-in domestic workers but resisted independent Black households for decades.",
+    "confidenceCaveat": "None significant for the broad pattern — Hubbard's segregationist statements are extensively documented in contemporary press and later historical accounts; specific after-dark enforcement details rely more on oral history."
+  },
+  {
+    "townName": "Grosse Pointe",
+    "county": "Wayne County",
+    "state": "Michigan",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Grosse Pointe, MI",
+      "href": "https://justice.tougaloo.edu/sundowntown/grosse-pointe-mi/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "History News Network, “Column: The Grosse Pointe Gross Point System”",
+        "href": "https://www.historynewsnetwork.org/article/column-the-grosse-pointe-gross-point-system"
+      }
+    ],
+    "documentedPeriod": "1945-1960",
+    "notes": "From 1945 to 1960, Grosse Pointe real estate brokers operated a documented points-based screening system in which prospective buyers were rated by private investigators on ethnicity, religion, and appearance; Black and Asian applicants were excluded from consideration entirely, while other groups faced steep point thresholds. The system became a statewide scandal after exposure in 1960 and was ordered dismantled by the state.",
+    "confidenceCaveat": "None significant — the point system is well documented through period investigative journalism and later academic study (published in a peer-reviewed history journal)."
+  },
+  {
+    "townName": "Owosso",
+    "county": "Shiawassee County",
+    "state": "Michigan",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Owosso, MI",
+      "href": "https://justice.tougaloo.edu/sundowntown/owosso-mi/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "October 1871",
+    "notes": "The database describes an October 1871 expulsion in which white residents of Owosso drove out the town's Black population, sparing (by the entry's account) only one Black barber who was permitted to remain to serve white customers.",
+    "confidenceCaveat": "This is an early (Reconstruction-era) incident; the database's account was not cross-checked against a period newspaper for this pass."
+  },
+  {
+    "townName": "Wyandotte",
+    "county": "Wayne County",
+    "state": "Michigan",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Wyandotte, MI",
+      "href": "https://justice.tougaloo.edu/sundowntown/wyandotte-mi/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "most of the 20th century, per database framing",
+    "notes": "The database states that Wyandotte lacked any significant Black population through most of its history, and that Black workers employed in the town during the 20th century did not reside there, commuting instead from elsewhere.",
+    "confidenceCaveat": "This is a demographic-absence argument rather than a documented ordinance, sign, or specific expulsion incident."
+  },
+  {
+    "townName": "East Lansing",
+    "county": "Ingham County",
+    "state": "Michigan",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — East Lansing, MI",
+      "href": "https://justice.tougaloo.edu/sundowntown/east-lansing-mi/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1930s",
+    "notes": "The database entry cites Malcolm X's autobiography, in which he recalled that in the 1930s Black people were not allowed to remain in East Lansing after dark, an account tied to his childhood in the Lansing area.",
+    "confidenceCaveat": "Based on a single well-known memoir passage; the memoir reflects the author's childhood recollection rather than a contemporaneous legal record."
+  },
+  {
+    "townName": "Ironwood",
+    "county": "Gogebic County",
+    "state": "Michigan",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Ironwood, MI",
+      "href": "https://justice.tougaloo.edu/sundowntown/ironwood-mi/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "into the early 1960s, per family recollection",
+    "notes": "A family recollection in the database, from someone whose father worked for a regional railroad, describes an understanding that Black railroad workers could not safely stay overnight in Ironwood as recently as the early 1960s.",
+    "confidenceCaveat": "Single secondhand family account with no corroborating record cited."
+  },
+  {
+    "townName": "Howell",
+    "county": "Livingston County",
+    "state": "Michigan",
+    "tougalooConfidence": "possible",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Howell, MI",
+      "href": "https://justice.tougaloo.edu/sundowntown/howell-mi/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "20th century, reputation described as ongoing at time of submission",
+    "notes": "The database records word-of-mouth accounts, from both Black and white residents of the surrounding area, describing Howell's reputation as unsafe for Black people to be caught in, a reputation the entry connects to the town's well-known 20th-century association with organized Klan activity in Livingston County.",
+    "confidenceCaveat": "Rated only 'possible' by the database; this is a reputational account rather than a documented ordinance or dated incident, though Howell's Klan associations are separately well known in Michigan histories."
+  },
+  {
+    "townName": "Parma",
+    "county": "Cuyahoga County",
+    "state": "Ohio",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Parma, OH",
+      "href": "https://justice.tougaloo.edu/sundowntown/parma-oh/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "20th century into the 2000s, per resident submissions",
+    "notes": "Multiple resident submissions in the database describe Parma, a Cleveland suburb, as having maintained a reputation among both Black and white area residents for being unwelcoming to Black people well into the late 20th century, including recollections of the town being paired with a neighboring suburb in local discussion of the region's most exclusionary communities.",
+    "confidenceCaveat": "Based on cumulative reputational testimony from multiple submitters rather than a single documented ordinance or incident; Parma's housing-discrimination history was separately the subject of a 1980 federal civil rights lawsuit, which was not independently reviewed for this pass."
+  },
+  {
+    "townName": "Austin",
+    "county": "Mower County",
+    "state": "Minnesota",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Austin, MN",
+      "href": "https://justice.tougaloo.edu/sundowntown/austin-mn/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1890-1930 (census figures cited)",
+    "notes": "The database cites census figures showing Mower County's small Black population falling from 36 in 1890 to 11 in 1930, and states that Austin's own Black population in this period was concentrated among a small number of individuals rather than settled families, consistent with a pattern of discouraged residency rather than active resident households.",
+    "confidenceCaveat": "This is a demographic-pattern argument; no specific ordinance, sign, or expulsion event is cited in the portion of the entry reviewed."
+  },
+  {
+    "townName": "Mize",
+    "county": "Smith County",
+    "state": "Mississippi",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Mize, MS",
+      "href": "https://justice.tougaloo.edu/sundowntown/mize-ms/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, contrasted with surrounding areas",
+    "notes": "The database entry notes that Mize sits amid areas of central Mississippi with substantial historic Black populations (citing the nearby Sullivan's Hollow area), framing Mize's near-total absence of Black residents as a notable local exception within a region where Black residency was otherwise common — an unusual pattern for the Deep South, where most exclusion took the form of segregation-in-place rather than town-wide sundown practices.",
+    "confidenceCaveat": "The entry available in this pass is brief and comparative in nature; no specific ordinance, sign, or expulsion incident is cited."
+  },
+  {
+    "townName": "Maryville",
+    "county": "Nodaway County",
+    "state": "Missouri",
+    "tougalooConfidence": "possible",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Maryville, MO",
+      "href": "https://justice.tougaloo.edu/sundowntown/maryville-mo/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1930 (lynching cited) and 1990 census pattern",
+    "notes": "The database entry references a documented spectacle lynching in Maryville and notes that as of the 1990 census, the overwhelming majority of the town's small Black population were adults over 18, a demographic pattern the entry treats as consistent with discouraged family settlement rather than typical community formation.",
+    "confidenceCaveat": "Rated only 'possible' by the database; the lynching itself is a documented historical atrocity, but its direct causal link to an ongoing sundown-town practice is treated cautiously here since the entry does not describe a specific after-dark exclusion mechanism."
+  },
+  {
+    "townName": "St. Genevieve",
+    "county": "Ste. Genevieve County",
+    "state": "Missouri",
+    "tougalooConfidence": "possible",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — St. Genevieve, MO",
+      "href": "https://justice.tougaloo.edu/sundowntown/st-genevieve-mo/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1930",
+    "notes": "The database cites an account that Missouri state troopers were called into Ste. Genevieve twice in 1930 to prevent threatened mob violence, treated as evidence of active hostility toward Black residents or visitors during that period.",
+    "confidenceCaveat": "Rated only 'possible' by the database; the underlying newspaper or archival source for the troopers' intervention was not independently retrieved in this pass."
+  },
+  {
+    "townName": "Pierce City",
+    "county": "Lawrence County",
+    "state": "Missouri",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Pierce City, MO",
+      "href": "https://justice.tougaloo.edu/sundowntown/pierce-city-mo/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "St. Louis Public Radio, “Pierce City, Missouri vigil remembers 3 Black men killed during 1901 lynchings”",
+        "href": "https://www.stlpr.org/culture-history/2023-08-22/pierce-city-missouri-vigil-remembers-3-black-men-killed-during-1901-lynchings"
+      }
+    ],
+    "documentedPeriod": "August 1901",
+    "notes": "Following the murder of a young white woman, a white mob lynched three Black men (two of whom were elderly) taken from the jail, burned Black-owned homes, and drove the town's roughly 300 Black residents out over a five-hour riot in August 1901, an event still commemorated with a public vigil as of 2023.",
+    "confidenceCaveat": "None significant — well documented through academic and journalistic retrospectives, though the database itself rates the sundown-town designation 'probable' rather than 'surely.'"
+  },
+  {
+    "townName": "Corbin",
+    "county": "Whitley County",
+    "state": "Kentucky",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Corbin, KY",
+      "href": "https://justice.tougaloo.edu/sundowntown/corbin-ky/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "NPR, “Kentucky Town Re-Examines Its Racial History”",
+        "href": "https://www.npr.org/2007/03/10/7772527/kentucky-town-re-examines-its-racial-history"
+      },
+      {
+        "sourceLabel": "Wikipedia, “Corbin, Kentucky race riot of 1919”",
+        "href": "https://en.wikipedia.org/wiki/Corbin,_Kentucky_race_riot_of_1919"
+      }
+    ],
+    "documentedPeriod": "October 1919-2008 (only about ten Black residents reported by 2008)",
+    "notes": "On October 31, 1919, a large armed white mob rounded up roughly 200 Black railroad and service workers and forced them onto freight cars out of town following a robbery attributed to two Black men; the database notes that as of 2008 only about ten Black residents lived in Corbin, one generation after Loewen's book renewed public attention to the episode.",
+    "confidenceCaveat": "None significant — the 1919 expulsion is extensively documented in academic (JSTOR-indexed) and journalistic sources; the database's own confidence label here is 'probable' rather than 'surely.'"
+  },
+  {
+    "townName": "Erwin",
+    "county": "Unicoi County",
+    "state": "Tennessee",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Erwin, TN",
+      "href": "https://justice.tougaloo.edu/sundowntown/erwin-tn/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "20th century, small historic Black population noted",
+    "notes": "The database describes a very small historic Black population in Unicoi County concentrated in a couple of specific areas, consistent with the broader Appalachian pattern of counties that were overwhelmingly white by custom rather than through a single documented expulsion.",
+    "confidenceCaveat": "The entry as reviewed is largely a demographic characterization rather than an account of a specific ordinance, sign, or incident."
+  },
+  {
+    "townName": "Ocoee",
+    "county": "Orange County",
+    "state": "Florida",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Ocoee, FL",
+      "href": "https://justice.tougaloo.edu/sundowntown/ocoee-fl/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "Wikipedia, “Ocoee massacre”",
+        "href": "https://en.wikipedia.org/wiki/Ocoee_massacre"
+      },
+      {
+        "sourceLabel": "Washington Post, “Ocoee, Fla., Election Day massacre: A Black man tried to vote, enraging a White mob”",
+        "href": "https://www.washingtonpost.com/history/2020/11/02/ocoee-florida-election-day-massacre/"
+      }
+    ],
+    "documentedPeriod": "November 2, 1920",
+    "notes": "On Election Day 1920, after a Black resident attempted to vote, a white mob killed an estimated several dozen Black residents and burned homes, churches, and businesses in Ocoee's Black neighborhoods, reducing the town's Black population to near zero for decades — the 1930 census recorded only two Black residents. Florida law now requires the massacre to be taught in schools.",
+    "confidenceCaveat": "None significant for the underlying massacre, which is extensively documented; the Tougaloo database's own label for the resulting sundown-town condition is 'probable.'"
+  },
+  {
+    "townName": "Cedar Key",
+    "county": "Levy County",
+    "state": "Florida",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Cedar Key, FL",
+      "href": "https://justice.tougaloo.edu/sundowntown/cedar-key-fl/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "Wikipedia, “Rosewood massacre”",
+        "href": "https://en.wikipedia.org/wiki/Rosewood_massacre"
+      },
+      {
+        "sourceLabel": "Smithsonian Magazine, “How History Forgot Rosewood, a Black Town Razed by a White Mob”",
+        "href": "https://www.smithsonianmag.com/history/how-history-forgot-rosewood-a-black-town-razed-by-a-white-mob-180981385/"
+      }
+    ],
+    "documentedPeriod": "1923-1967 (sign reported as still present in 1967)",
+    "notes": "Some of the mob that destroyed the nearby Black community of Rosewood in January 1923 assembled from Cedar Key and neighboring towns; the database notes that a faded sign warning Black people against remaining after dark was reportedly still visible near the Cedar Key dock as late as 1967.",
+    "confidenceCaveat": "The Rosewood massacre itself is exhaustively documented; the specific claim about Cedar Key's own after-dark sign rests on a single reported 1967 sighting."
+  },
+  {
+    "townName": "Miami Beach",
+    "county": "Miami-Dade County",
+    "state": "Florida",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Miami Beach, FL",
+      "href": "https://justice.tougaloo.edu/sundowntown/miami-beach-fl/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "mid-20th century",
+    "notes": "The database entry describes a submitted account that Black people were not permitted on the islands comprising Miami Beach after 9:00 p.m., reflecting a curfew-style exclusion aimed at the resort community's Black service workforce rather than a total residency ban.",
+    "confidenceCaveat": "Based on a single submitted account (email correspondence to the database); no ordinance or period newspaper is cited in the portion reviewed."
+  },
+  {
+    "townName": "Palm Beach",
+    "county": "Palm Beach County",
+    "state": "Florida",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Palm Beach, FL",
+      "href": "https://justice.tougaloo.edu/sundowntown/palm-beach-fl/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "mid-20th century",
+    "notes": "The database records an account from a Black man who grew up in neighboring West Palm Beach describing the need to time his fishing visits to Palm Beach carefully to avoid being present after dark, consistent with the island town's history as an exclusive resort community.",
+    "confidenceCaveat": "Based on a single personal recollection; no ordinance or press account is cited in the portion reviewed."
+  },
+  {
+    "townName": "Delray Beach",
+    "county": "Palm Beach County",
+    "state": "Florida",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Delray Beach, FL",
+      "href": "https://justice.tougaloo.edu/sundowntown/delray-beach-fl/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "mid-20th century",
+    "notes": "The database describes Delray Beach as having had a particularly pronounced reputation for hostility toward both Black and Jewish residents in the mid-20th century, framed in the entry as among the most exclusionary communities in the region during that period.",
+    "confidenceCaveat": "The specific source underlying this characterization within the entry was not independently retrieved in this pass."
+  },
+  {
+    "townName": "Myakka City",
+    "county": "Manatee County",
+    "state": "Florida",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Myakka City, FL",
+      "href": "https://justice.tougaloo.edu/sundowntown/myakka-city-fl/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1920s land-boom era",
+    "notes": "The database describes Myakka City's growth during Florida's 1920s land boom as having been explicitly built around excluding Black residents from the new community being marketed to settlers.",
+    "confidenceCaveat": "The specific supporting source within the entry was not independently retrieved in this pass."
+  },
+  {
+    "townName": "Forsyth County",
+    "county": null,
+    "state": "Georgia",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Forsyth County, GA",
+      "href": "https://justice.tougaloo.edu/sundowntown/forsyth-county-ga/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "NPR, “The 'Racial Cleansing' That Drove 1,100 Black Residents Out Of Forsyth County, Ga.”",
+        "href": "https://www.npr.org/2016/09/15/494063372/the-racial-cleansing-that-drove-1-100-black-residents-out-of-forsyth-county-ga"
+      },
+      {
+        "sourceLabel": "Wikipedia, “1912 racial conflict in Forsyth County, Georgia”",
+        "href": "https://en.wikipedia.org/wiki/1912_racial_conflict_in_Forsyth_County,_Georgia"
+      }
+    ],
+    "documentedPeriod": "September-October 1912, effects lasting through the 20th century",
+    "notes": "After a white woman was found badly beaten in September 1912 and a Black man was accused, white mobs lynched three Black men, burned Black churches and homes, and forced out essentially the entire Black population of roughly 1,100 people; the county remained overwhelmingly white for the rest of the 20th century, a legacy examined at length in NPR's later reporting.",
+    "confidenceCaveat": "None significant — this is one of the most extensively documented mass expulsions in the set, covered by contemporary press, later academic work, and a 2024 NPR/Atlanta History Center podcast series."
+  },
+  {
+    "townName": "Mitchell County",
+    "county": null,
+    "state": "North Carolina",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Mitchell County, NC",
+      "href": "https://justice.tougaloo.edu/sundowntown/mitchell-county-nc/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1900-1910 (census decline cited)",
+    "notes": "The database cites census figures showing a significant decline in Mitchell County's small Black population between 1900 and 1910, treated as evidence consistent with a period of active or coerced departure in this Appalachian county.",
+    "confidenceCaveat": "Census decline alone does not establish the specific mechanism of departure (violence, economic pressure, or voluntary migration); no ordinance or incident account is cited in the portion reviewed."
+  },
+  {
+    "townName": "Colonial Heights",
+    "county": null,
+    "state": "Virginia",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Colonial Heights, VA",
+      "href": "https://justice.tougaloo.edu/sundowntown/colonial-heights-va/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1940s-2005 (testimony given in 2005 recalling childhood in the 1940s)",
+    "notes": "A nearby resident's 2005 testimony recorded in the database describes being told, since childhood in the 1940s, that Black people were expected to be gone from Colonial Heights by nightfall, an independent city near Petersburg.",
+    "confidenceCaveat": "Based on a single testimony account; no ordinance or period press account is cited in the portion reviewed."
+  },
+  {
+    "townName": "Buchanan County",
+    "county": null,
+    "state": "Virginia",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Buchanan County, VA",
+      "href": "https://justice.tougaloo.edu/sundowntown/buchanan-county-va/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1890-1930 (census figures cited)",
+    "notes": "The database cites census data showing the county's small Black population growing only modestly, from 24 in 1890 to 133 in 1930, against a much larger total population increase, framed as consistent with discouraged Black settlement in this coal-country county rather than a specific dated expulsion.",
+    "confidenceCaveat": "This is a demographic-pattern argument; no specific ordinance, sign, or incident is cited in the portion reviewed."
+  },
+  {
+    "townName": "Norman",
+    "county": "Cleveland County",
+    "state": "Oklahoma",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Norman, OK",
+      "href": "https://justice.tougaloo.edu/sundowntown/norman-ok/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "early-to-mid 20th century",
+    "notes": "The database cites a period news account describing a group of men in Norman acting to maintain what the article's own language called the town's established reputation for hostility toward Black residents, consistent with other well-documented central Oklahoma sundown towns of the era.",
+    "confidenceCaveat": "The specific newspaper and date for the cited article were not fully captured in the excerpt reviewed for this pass."
+  },
+  {
+    "townName": "Henryetta",
+    "county": "Okmulgee County",
+    "state": "Oklahoma",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Henryetta, OK",
+      "href": "https://justice.tougaloo.edu/sundowntown/henryetta-ok/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "mid-20th century, per family recollection",
+    "notes": "A family recollection in the database describes a father, employed in an occupation that brought him into contact with white residents, who nonetheless had to observe strict limits on his presence in Henryetta after dark despite those social connections.",
+    "confidenceCaveat": "Based on a single family recollection with no specific date or ordinance cited."
+  },
+  {
+    "townName": "Levittown",
+    "county": "Bucks County",
+    "state": "Pennsylvania",
+    "tougalooConfidence": "possible",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Levittown, PA",
+      "href": "https://justice.tougaloo.edu/sundowntown/levittown-pa/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "NPR, “Levittown: A Racial Battleground In The Suburbs”",
+        "href": "https://www.npr.org/transcripts/101595089"
+      },
+      {
+        "sourceLabel": "Wikipedia, “Daisy Myers”",
+        "href": "https://en.wikipedia.org/wiki/Daisy_Myers"
+      }
+    ],
+    "documentedPeriod": "1957 (planned community's first Black residents)",
+    "notes": "William and Daisy Myers became Levittown's first Black homeowners in August 1957, and their arrival was met with a mob of hundreds to over a thousand people who gathered outside their home over several nights, threw objects, and burned a cross before state police intervened; the family remained for roughly four years. Developer William Levitt's original sales policy had excluded Black buyers by covenant.",
+    "confidenceCaveat": "The database itself rates this only 'possible,' likely because the underlying practice was a developer-imposed racial covenant on a brand-new planned community rather than a longstanding after-dark custom in an existing town; the 1957 events themselves are extremely well documented."
+  },
+  {
+    "townName": "Elizabethtown",
+    "county": "Lancaster County",
+    "state": "Pennsylvania",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Elizabethtown, PA",
+      "href": "https://justice.tougaloo.edu/sundowntown/elizabethtown-pa/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "mid-20th century, per a former resident's school-age recollection",
+    "notes": "A former resident's submission recalls attending elementary school in Elizabethtown without any Black classmates and later learning the town had a reputation, unlisted at the time in Loewen's original research, for excluding Black residents.",
+    "confidenceCaveat": "Based on a single submitted recollection; no ordinance, sign, or specific incident is cited."
+  },
+  {
+    "townName": "Camp Hill",
+    "county": "Cumberland County",
+    "state": "Pennsylvania",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Camp Hill, PA",
+      "href": "https://justice.tougaloo.edu/sundowntown/camp-hill-pa/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1980s",
+    "notes": "The database records an account from a real estate agent stating that a colleague advised her, in the 1980s, against showing homes in the Camp Hill area to Black prospective buyers, describing informal steering rather than an overt after-dark practice.",
+    "confidenceCaveat": "Based on a single professional's account of industry practice (real estate steering) rather than a documented ordinance, sign, or violent incident."
+  },
+  {
+    "townName": "Tuxedo Park",
+    "county": "Orange County",
+    "state": "New York",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Tuxedo Park, NY",
+      "href": "https://justice.tougaloo.edu/sundowntown/tuxedo-park-ny/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1990-2000 (census figures cited)",
+    "notes": "The database cites census figures for this gated, private Hudson Valley village showing extremely high median housing values alongside a Black population in 2000 numbering only a handful of individuals, several of them children, consistent with the village's history as an exclusive, historically restricted enclave.",
+    "confidenceCaveat": "This is a demographic/wealth-pattern argument rather than a documented ordinance or after-dark incident specific to Black exclusion."
+  },
+  {
+    "townName": "North Tonawanda",
+    "county": "Niagara County",
+    "state": "New York",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — North Tonawanda, NY",
+      "href": "https://justice.tougaloo.edu/sundowntown/north-tonawanda-ny/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, transmitted as local oral tradition",
+    "notes": "A former resident's email to the database describes growing up with a locally transmitted story that Black people had, at some point in the town's past, been expected to leave North Tonawanda by sundown, without specifying a date or triggering event.",
+    "confidenceCaveat": "Based on oral tradition recounted secondhand; no ordinance, sign, or dated incident is cited."
+  },
+  {
+    "townName": "Tonawanda",
+    "county": "Erie County",
+    "state": "New York",
+    "tougalooConfidence": "possible",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Tonawanda, NY",
+      "href": "https://justice.tougaloo.edu/sundowntown/tonawanda-ny/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "founded 1836; exclusion undated within that history",
+    "notes": "The database entry, discussing Tonawanda's founding in 1836 and its position spanning both Erie and Niagara counties, treats it alongside neighboring North Tonawanda as sharing a similar reputation for historic exclusion of Black residents.",
+    "confidenceCaveat": "Rated only 'possible' by the database; no specific ordinance, sign, or dated incident is cited in the portion reviewed."
+  },
+  {
+    "townName": "Bronxville",
+    "county": "Westchester County",
+    "state": "New York",
+    "tougalooConfidence": "possible",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Bronxville, NY",
+      "href": "https://justice.tougaloo.edu/sundowntown/bronxville-ny/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "20th century, per a New York City resident's account",
+    "notes": "The database records a New York City resident's account noting that nearby Sarah Lawrence College's mailing address uses the prestigious Bronxville name despite technically sitting in Yonkers, offered as commentary on Bronxville's reputation as an exclusive, historically restricted village.",
+    "confidenceCaveat": "Rated only 'possible' by the database; this is a reputational/status observation rather than a documented ordinance or incident."
+  },
+  {
+    "townName": "New Market",
+    "county": "Taylor County",
+    "state": "Iowa",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — New Market, IA",
+      "href": "https://justice.tougaloo.edu/sundowntown/new-market-ia/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated ordinance, remembered as of a database-era search",
+    "notes": "The database entry states that most residents are aware of an old local sundown ordinance by reputation, though a search of the city's own archives did not turn up a surviving written copy of it.",
+    "confidenceCaveat": "The ordinance is widely known by local reputation but was not confirmed as a surviving physical document in the search described by the entry itself."
+  },
+  {
+    "townName": "Manitowoc",
+    "county": "Manitowoc County",
+    "state": "Wisconsin",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Manitowoc, WI",
+      "href": "https://justice.tougaloo.edu/sundowntown/manitowoc-wi/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1980s-1990s, per a resident raised there",
+    "notes": "A resident's 2008 email to the database, describing growing up in Manitowoc, recalls encountering people in the wider area expressing hostility toward the idea of Black residents in the town, without describing a specific ordinance or incident.",
+    "confidenceCaveat": "Based on a single personal recollection; no ordinance, sign, or dated incident is cited."
+  },
+  {
+    "townName": "Oshkosh",
+    "county": "Winnebago County",
+    "state": "Wisconsin",
+    "tougalooConfidence": "possible",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Oshkosh, WI",
+      "href": "https://justice.tougaloo.edu/sundowntown/oshkosh-wi/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "20th century",
+    "notes": "The database describes Oshkosh as a place where Black people were not welcome to stay overnight for much of its history, with those who worked in the town commuting from elsewhere rather than residing there.",
+    "confidenceCaveat": "Rated only 'possible' by the database; the specific supporting source for this characterization was not independently retrieved in this pass."
+  },
+  {
+    "townName": "Appleton",
+    "county": "Outagamie County",
+    "state": "Wisconsin",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Appleton, WI",
+      "href": "https://justice.tougaloo.edu/sundowntown/appleton-wi/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "mid-20th century, extensively documented via multiple resident submissions",
+    "notes": "The database entry for Appleton is unusually extensive, drawing on numerous separate resident and former-resident submissions recalling that Black people, including visiting entertainers and athletes, were commonly understood to need to leave the city by nightfall through the mid-20th century.",
+    "confidenceCaveat": "While the entry is long and draws on many separate submissions, these remain oral-history accounts rather than a single surviving legal document; no specific ordinance text is quoted in the record."
+  },
+  {
+    "townName": "Medford",
+    "county": "Jackson County",
+    "state": "Oregon",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Medford, OR",
+      "href": "https://justice.tougaloo.edu/sundowntown/medford-or/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "until the 1960s, per database framing",
+    "notes": "The database states that Medford is remembered as having had a posted sign enforcing exclusion of Black residents until the 1960s, and that former residents describe the surrounding Rogue Valley area as sharing a similar reputation.",
+    "confidenceCaveat": "The sign is described through resident memory in a lengthy entry; a surviving photograph was not identified in the portion reviewed."
+  },
+  {
+    "townName": "Grants Pass",
+    "county": "Josephine County",
+    "state": "Oregon",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Grants Pass, OR",
+      "href": "https://justice.tougaloo.edu/sundowntown/grants-pass-or/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "20th century, cited via a published regional history",
+    "notes": "The database entry cites Beverly A. Brown's published regional history “In Timber Country” discussing the racial exclusivity of Grants Pass and the surrounding timber-industry communities in southern Oregon.",
+    "confidenceCaveat": "Based on a secondary published source as summarized in the database; the book itself was not independently reviewed for this pass."
+  },
+  {
+    "townName": "Price",
+    "county": "Carbon County",
+    "state": "Utah",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Price, UT",
+      "href": "https://justice.tougaloo.edu/sundowntown/price-ut/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "early-to-mid 20th century",
+    "notes": "The database entry, drawing on a published history of Utah's ethnic minorities, describes coal-mining-era Price and the surrounding Carbon County as maintaining exclusionary norms against Black residency even as the area recruited a highly diverse immigrant mining workforce from Southern and Eastern Europe.",
+    "confidenceCaveat": "Sourced to a specific published academic essay cited in the entry; the essay itself was not independently retrieved for this pass."
+  },
+  {
+    "townName": "Murray",
+    "county": "Salt Lake County",
+    "state": "Utah",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Murray, UT",
+      "href": "https://justice.tougaloo.edu/sundowntown/murray-ut/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "disputed as of a 2005 Salt Lake Tribune article cited in the entry",
+    "notes": "The database entry discusses a 2005 Salt Lake Tribune article in which a Murray city official publicly disputed a claim that the city had a sundown-town past, with James Loewen responding to that dispute; the entry treats the matter as a live, contested historical claim rather than a settled fact.",
+    "confidenceCaveat": "This is an explicitly disputed claim — a local official is on record disputing the sundown-town characterization, and the entry itself frames both sides of that 2005 disagreement rather than resolving it."
+  },
+  {
+    "townName": "Goldfield",
+    "county": "Esmeralda County",
+    "state": "Nevada",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Goldfield, NV",
+      "href": "https://justice.tougaloo.edu/sundowntown/goldfield-nv/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "early 20th-century mining boom era",
+    "notes": "The database entry describes early Goldfield as having tolerated a small number of Black residents while more actively excluding Chinese and Japanese residents from remaining, reflecting the mining boomtown's particular racial hierarchy rather than a uniform ban on all non-white groups.",
+    "confidenceCaveat": "Based on a single quoted recollection describing the town's racial hierarchy; no ordinance or contemporaneous press account is cited in the portion reviewed."
+  },
+  {
+    "townName": "Ely",
+    "county": "White Pine County",
+    "state": "Nevada",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Ely, NV",
+      "href": "https://justice.tougaloo.edu/sundowntown/ely-nv/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, per a visitor's general account of Nevada mining towns",
+    "notes": "The database entry cites a visitor's account describing a broader pattern across several Nevada mining towns, including Ely, of requiring Native American residents to leave incorporated limits by a set time, situating Ely within that regional pattern.",
+    "confidenceCaveat": "Based on a general visitor account describing a regional pattern rather than a specific documented incident unique to Ely."
+  },
+  {
+    "townName": "Minden-Gardnerville",
+    "county": "Douglas County",
+    "state": "Nevada",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Minden-Gardnerville, NV",
+      "href": "https://justice.tougaloo.edu/sundowntown/minden-gardnerville-nv/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "documented via a 2002 Reno Gazette-Journal article cited in the entry",
+    "notes": "The database entry is substantial and cites a 2002 Reno Gazette-Journal piece on the decline of Washoe and Northern Paiute languages in the area, which references the twin towns' historical practice of requiring Native Americans to leave by an evening signal (a siren still sounded daily in Minden into the 2000s and later ended amid controversy over its origins).",
+    "confidenceCaveat": "The daily siren's origin as an explicit racial curfew signal versus a routine civic bell has been publicly disputed by some town officials in later years; this entry documents the historical practice as reported in regional journalism at the time."
+  },
+  {
+    "townName": "Loveland",
+    "county": "Larimer County",
+    "state": "Colorado",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Loveland, CO",
+      "href": "https://justice.tougaloo.edu/sundowntown/loveland-co/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, per multiple oral narratives cited in the entry",
+    "notes": "The database entry states that Loveland is remembered, according to numerous oral narratives collected by the site, as having excluded people of color from remaining in town, without citing a specific ordinance or dated incident.",
+    "confidenceCaveat": "Based on cumulative oral narrative rather than a documented ordinance, sign, or specific dated incident."
+  },
+  {
+    "townName": "Fruita",
+    "county": "Mesa County",
+    "state": "Colorado",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Fruita, CO",
+      "href": "https://justice.tougaloo.edu/sundowntown/fruita-co/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1930s, per a former resident's story",
+    "notes": "The database recounts a story, told by a former Fruita resident, concerning Charley Glass, a Black cowboy who lived in the area in the 1930s, used by the entry to illustrate the town's otherwise near-total absence of Black residents during that period.",
+    "confidenceCaveat": "Based on a single recounted individual story used to illustrate a broader demographic pattern; it does not by itself describe an ordinance or violent expulsion."
+  },
+  {
+    "townName": "Miles City",
+    "county": "Custer County",
+    "state": "Montana",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Miles City, MT",
+      "href": "https://justice.tougaloo.edu/sundowntown/miles-city-mt/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "since approximately 1908, per a family recollection",
+    "notes": "A family recollection recorded in the database describes a great-grandmother, born around 1908, remembering a distinctly separated Black section of Miles City in her youth, used in the entry as evidence of a historically segregated rather than fully excluded Black population.",
+    "confidenceCaveat": "Based on a single multi-generational family recollection; the entry as reviewed describes segregation within the town more than complete after-dark exclusion, which somewhat qualifies the 'surely' label."
+  },
+  {
+    "townName": "Glendive",
+    "county": "Dawson County",
+    "state": "Montana",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Glendive, MT",
+      "href": "https://justice.tougaloo.edu/sundowntown/glendive-mt/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "February 1915",
+    "notes": "The database cites a February 9, 1915 Glendive Independent newspaper article, headlined regarding a 'color line' controversy in the town, treated as contemporaneous press evidence of an active racial boundary being enforced or debated in Glendive at that time.",
+    "confidenceCaveat": "Based on a single period newspaper article as summarized in the database; the original article's full text was not independently retrieved for this pass."
+  },
+  {
+    "townName": "Hoodoo",
+    "county": "Shoshone County",
+    "state": "Idaho",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Hoodoo, ID",
+      "href": "https://justice.tougaloo.edu/sundowntown/hoodoo-id/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "December 1891",
+    "notes": "The database records that in December 1891, the mining community of Hoodoo forcibly expelled its Chinese population, one of several documented anti-Chinese expulsions across the Idaho and eastern Washington mining panhandle in this period.",
+    "confidenceCaveat": "This exclusion targeted Chinese residents specifically; the underlying period source for the date was not independently retrieved in this pass."
+  },
+  {
+    "townName": "Bonners Ferry",
+    "county": "Boundary County",
+    "state": "Idaho",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Bonners Ferry, ID",
+      "href": "https://justice.tougaloo.edu/sundowntown/bonners-ferry-id/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "June 1892",
+    "notes": "The database records that in June 1892, Bonners Ferry expelled its Chinese population, part of the same regional wave of anti-Chinese expulsions documented across the northern Idaho mining and railroad towns of the era.",
+    "confidenceCaveat": "This exclusion targeted Chinese residents specifically; the underlying period source for the date was not independently retrieved in this pass."
+  },
+  {
+    "townName": "Clark Fork",
+    "county": "Bonner County",
+    "state": "Idaho",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Clark Fork, ID",
+      "href": "https://justice.tougaloo.edu/sundowntown/clark-fork-id/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "December 1891",
+    "notes": "The database records that white residents of Clark Fork expelled the town's 22 Chinese residents in December 1891, contemporaneous with the similar expulsion recorded at nearby Hoodoo.",
+    "confidenceCaveat": "This exclusion targeted Chinese residents specifically; the underlying period source was not independently retrieved in this pass."
+  },
+  {
+    "townName": "Humboldt County",
+    "county": null,
+    "state": "California",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Humboldt County, CA",
+      "href": "https://justice.tougaloo.edu/sundowntown/humboldt-county-ca/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1880s",
+    "notes": "The database states that every incorporated town in Humboldt County expelled its Chinese population during the 1880s, part of the broader, well-documented anti-Chinese expulsion wave along the Northern California and Pacific Northwest coast in that decade.",
+    "confidenceCaveat": "The entry as reviewed is brief and does not name specific towns or cite a specific incident within the county beyond the general statement."
+  },
+  {
+    "townName": "Follansbee",
+    "county": "Brooke County",
+    "state": "West Virginia",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Follansbee, WV",
+      "href": "https://justice.tougaloo.edu/sundowntown/follansbee-wv/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "October 1923",
+    "notes": "The database cites an October 27, 1923 Pittsburgh Courier article headlined regarding a threat against West Virginia Black families attributed to the Klan, naming Follansbee among the affected communities in the northern panhandle.",
+    "confidenceCaveat": "Based on a single period Black-press newspaper article as summarized in the entry; the full article was not independently retrieved for this pass."
+  },
+  {
+    "townName": "New Martinsville",
+    "county": "Wetzel County",
+    "state": "West Virginia",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — New Martinsville, WV",
+      "href": "https://justice.tougaloo.edu/sundowntown/new-martinsville-wv/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, per a local librarian's account",
+    "notes": "A local librarian, quoted in the database, confirmed to a researcher that the town had a documented history consistent with sundown-town status, though the specific supporting evidence she referenced is not detailed further in the entry as reviewed.",
+    "confidenceCaveat": "Based on a single secondhand account of a librarian's confirmation; no ordinance, sign, or specific incident is cited directly."
+  },
+  {
+    "townName": "Eleanor",
+    "county": "Putnam County",
+    "state": "West Virginia",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Eleanor, WV",
+      "href": "https://justice.tougaloo.edu/sundowntown/eleanor-wv/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "New Deal era (1930s) through 2009, per a cited New York Times retrospective",
+    "notes": "The database cites a December 24, 2009 New York Times story on Eleanor, a planned New Deal-era resettlement community, discussing the town's origins and its persistence as a nearly all-white community decades later.",
+    "confidenceCaveat": "The cited article's framing of the town's demographic homogeneity is treated here as consistent with, but not identical to, an explicit after-dark exclusion practice; entry is brief."
+  },
+  {
+    "townName": "Moncks Corner",
+    "county": "Berkeley County",
+    "state": "South Carolina",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Moncks Corner, SC",
+      "href": "https://justice.tougaloo.edu/sundowntown/moncks-corner-sc/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "August 1940",
+    "notes": "The database cites an August 17, 1940 Pittsburgh Courier article reporting that white men shot at a group of Black church excursion-goers near Moncks Corner, treated as contemporaneous Black-press documentation of racial violence connected to the town's exclusionary reputation.",
+    "confidenceCaveat": "Based on a single period Black-press newspaper article as summarized in the entry; the full article was not independently retrieved for this pass."
+  },
+  {
+    "townName": "Lead",
+    "county": "Lawrence County",
+    "state": "South Dakota",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Lead, SD",
+      "href": "https://justice.tougaloo.edu/sundowntown/lead-sd/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, per accounts from visiting Native American sports teams",
+    "notes": "The database describes accounts from basketball teams traveling from the Pine Ridge Oglala Sioux reservation reporting frequent harassment when visiting Lead, a former Black Hills mining town, treated as evidence of an actively hostile climate toward Native American visitors.",
+    "confidenceCaveat": "The exclusion documented here is described in relation to Native American visitors specifically; no ordinance or dated incident is cited."
+  },
+  {
+    "townName": "Green River",
+    "county": "Sweetwater County",
+    "state": "Wyoming",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Green River, WY",
+      "href": "https://justice.tougaloo.edu/sundowntown/green-river-wy/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, per resident recollection",
+    "notes": "The database records a recollection that residents openly discussed how the town's local ordinance (colloquially referenced by outsiders as a 'Green River Ordinance,' a name more widely associated with a different, commerce-related law of the same name adopted by many U.S. towns) was popularly understood locally as targeting Black residents in particular.",
+    "confidenceCaveat": "Very brief entry based on a single recollection; the historical 'Green River Ordinance' is nationally known primarily as a door-to-door solicitation law, and the entry's claim that local residents read it as racially targeted is a single-source characterization that was not independently corroborated in this pass."
+  },
+  {
+    "townName": "Laramie",
+    "county": "Albany County",
+    "state": "Wyoming",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Laramie, WY",
+      "href": "https://justice.tougaloo.edu/sundowntown/laramie-wy/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1950-1954",
+    "notes": "The database cites a submission recalling that when the University of Wyoming in Laramie began recruiting Black athletes in the early 1950s, their presence in town after dark was a significant point of local tension.",
+    "confidenceCaveat": "Very brief entry based on a single recollection tied specifically to recruited student-athletes rather than the broader Black population."
+  },
+  {
+    "townName": "Darien",
+    "county": "Fairfield County",
+    "state": "Connecticut",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Darien, CT",
+      "href": "https://justice.tougaloo.edu/sundowntown/darien-ct/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1951-1960s (submitter born 1951)",
+    "notes": "A submitter's 2008 email, describing a working-class upbringing in Darien beginning in 1951, recounts the town's overwhelming and long-remarked whiteness during their childhood and young adulthood.",
+    "confidenceCaveat": "Based on a single personal recollection; no ordinance or dated incident is cited."
+  },
+  {
+    "townName": "Ridgefield",
+    "county": "Fairfield County",
+    "state": "Connecticut",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Ridgefield, CT",
+      "href": "https://justice.tougaloo.edu/sundowntown/ridgefield-ct/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, per a cited Chicago Defender article",
+    "notes": "The database entry references a Chicago Defender article, headlined regarding a figure named Godfrey defying racist treatment, connected to documented difficulties faced by a Black resident or visitor in Ridgefield.",
+    "confidenceCaveat": "The full context and date of the referenced Chicago Defender article were not captured in the excerpt reviewed for this pass."
+  },
+  {
+    "townName": "Glastonbury",
+    "county": "Hartford County",
+    "state": "Connecticut",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Glastonbury, CT",
+      "href": "https://justice.tougaloo.edu/sundowntown/glastonbury-ct/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1960s-1970s",
+    "notes": "A submitter's 2008 email recalls growing up in Glastonbury in the 1960s and 1970s and being aware of only a single Black family in the town during that period.",
+    "confidenceCaveat": "Based on a single personal recollection describing a demographic impression rather than a documented ordinance or incident."
+  },
+  {
+    "townName": "Rehoboth Beach",
+    "county": "Sussex County",
+    "state": "Delaware",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Rehoboth Beach, DE",
+      "href": "https://justice.tougaloo.edu/sundowntown/rehoboth-beach-de/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1930s",
+    "notes": "The database entry states that in the 1930s, Black people, along with members of other minority groups, were not permitted to live in Rehoboth Beach itself, though they could work in the resort town's service economy.",
+    "confidenceCaveat": "The specific supporting source for this 1930s characterization was not independently retrieved in this pass."
+  },
+  {
+    "townName": "Belmont",
+    "county": "Middlesex County",
+    "state": "Massachusetts",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Belmont, MA",
+      "href": "https://justice.tougaloo.edu/sundowntown/belmont-ma/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "pre-1990 census pattern cited",
+    "notes": "The database entry notes that Belmont's small recorded Black population before 1990 was overwhelmingly female, a pattern the entry interprets as consistent with live-in domestic service employment rather than ordinary family residency in this Boston suburb.",
+    "confidenceCaveat": "This is a demographic-pattern inference rather than a documented ordinance or specific incident."
+  },
+  {
+    "townName": "Bordentown",
+    "county": "Burlington County",
+    "state": "New Jersey",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Bordentown, NJ",
+      "href": "https://justice.tougaloo.edu/sundowntown/bordentown-nj/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "recalled in a 2007 submission",
+    "notes": "A 2007 submission to the database recounts an incident relayed by friends of the submitter's, given after a public presentation on sundown towns, connecting personal experience to Bordentown specifically.",
+    "confidenceCaveat": "Based on a single secondhand account relayed after a public talk; the specific nature of the incident is not detailed further in the portion reviewed."
+  },
+  {
+    "townName": "Kingman",
+    "county": "Mohave County",
+    "state": "Arizona",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Kingman, AZ",
+      "href": "https://justice.tougaloo.edu/sundowntown/kingman-az/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "until the 1960s or 1970s, per local rumor cited in the entry",
+    "notes": "The database records a widely repeated local rumor that a sign at the edge of Kingman warned Black people against remaining until as late as the 1960s or 1970s, alongside longstanding low Black population figures for the town.",
+    "confidenceCaveat": "Explicitly described in the entry as a rumor rather than a confirmed sighting; no photograph or contemporaneous document is cited."
+  },
+  {
+    "townName": "Scottsdale",
+    "county": "Maricopa County",
+    "state": "Arizona",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Scottsdale, AZ",
+      "href": "https://justice.tougaloo.edu/sundowntown/scottsdale-az/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1959",
+    "notes": "The database entry references an NPR conversation discussing how Pumpsie Green and other early Black major-league players were not permitted to stay in the same Scottsdale hotels as their white Boston Red Sox teammates during spring training in 1959.",
+    "confidenceCaveat": "This is a well-known episode in baseball integration history; the specific NPR segment referenced was not independently reviewed in full for this pass."
+  },
+  {
+    "townName": "Pollock",
+    "county": "Grant Parish",
+    "state": "Louisiana",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Pollock, LA",
+      "href": "https://justice.tougaloo.edu/sundowntown/pollock-la/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, per a traveler's account of a posted sign",
+    "notes": "The database records a traveler's account of arriving at Pollock around midnight and finding a sign posted at the town's edge explicitly warning Black travelers to stay out, a rare account of an active, sighted sign rather than secondhand memory of one.",
+    "confidenceCaveat": "Based on a single traveler's account; no date is given for when the sign was observed, and no photograph is cited."
+  },
+  {
+    "townName": "Pitkin",
+    "county": "Vernon Parish",
+    "state": "Louisiana",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Pitkin, LA",
+      "href": "https://justice.tougaloo.edu/sundowntown/pitkin-la/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated",
+    "notes": "The database notes that Pitkin is too small to be separately reported in census data and is instead discussed through the demographic record of Vernon Parish, the surrounding jurisdiction, limiting how precisely the town's own history can be documented apart from the parish.",
+    "confidenceCaveat": "Because the town lacks independent census reporting, the entry's claim rests on parish-level context rather than town-specific data or incident."
+  },
+  {
+    "townName": "Malaga Island",
+    "county": "Sagadahoc County",
+    "state": "Maine",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Malaga Island, ME",
+      "href": "https://justice.tougaloo.edu/sundowntown/malaga-island-me/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1847-1912",
+    "notes": "The database describes Malaga Island as a mixed-race fishing settlement founded in 1847 by Benjamin Darling, a formerly enslaved man, and others, whose residents were forcibly evicted by the State of Maine in 1912 in an episode of eugenics-driven state action rather than a typical town-level after-dark exclusion of outsiders.",
+    "confidenceCaveat": "This case is somewhat different in kind from most entries in this set: it documents the destruction of an existing mixed-race community by state authorities rather than exclusion of Black people from an otherwise white town; it is nonetheless well known in Maine historical scholarship."
+  },
+  {
+    "townName": "Chevy Chase",
+    "county": "Montgomery County",
+    "state": "Maryland",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Chevy Chase, MD",
+      "href": "https://justice.tougaloo.edu/sundowntown/chevy-chase-md/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "2008, per resident testimony describing longstanding practice",
+    "notes": "A 2008 submission from a resident describing themselves and their spouse as a white couple who moved to Chevy Chase recounts being made aware of the community's history of racial exclusivity, treated in the entry as consistent with the area's well-documented restrictive-covenant history common to many Washington, D.C.-area suburbs of this era.",
+    "confidenceCaveat": "Chevy Chase is described in the entry as comprising four separate municipal jurisdictions generally discussed together; the specific supporting evidence for the 'surely' rating within the excerpt reviewed is a single resident account."
+  },
+  {
+    "townName": "Garrett County",
+    "county": null,
+    "state": "Maryland",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Garrett County, MD",
+      "href": "https://justice.tougaloo.edu/sundowntown/garrett-county-md/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, per a librarian's account",
+    "notes": "The database entry states that although census figures show a small Black population in Garrett County, a local librarian consulted by the researcher explained that these individuals were understood locally to be prisoners or institutionalized persons rather than resident families, which the entry treats as consistent with a broader pattern of effective exclusion.",
+    "confidenceCaveat": "Based on a single librarian's characterization of census figures rather than a documented ordinance or incident."
+  },
+  {
+    "townName": "Tilghman Island",
+    "county": "Talbot County",
+    "state": "Maryland",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Tilghman Island, MD",
+      "href": "https://justice.tougaloo.edu/sundowntown/tilghman-island-md/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated",
+    "notes": "The database entry states that Tilghman Island maintained an anti-Black curfew and, according to one Maryland resident's account, posted signage enforcing an after-dark exclusion on this Chesapeake Bay watermen's community.",
+    "confidenceCaveat": "Very brief entry based on a single resident's account; no date or photograph is cited."
+  },
+  {
+    "townName": "Greenbelt",
+    "county": "Prince George's County",
+    "state": "Maryland",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Greenbelt, MD",
+      "href": "https://justice.tougaloo.edu/sundowntown/greenbelt-md/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "planned-community origins (1930s) through a 2008 resident account",
+    "notes": "A 2008 email from a European-American couple who moved to Greenbelt, a federally planned New Deal-era community, describes learning about the town's history of racial exclusion dating to its origins, a pattern common to several federally planned 'Greenbelt towns' of that era.",
+    "confidenceCaveat": "Based on a single resident couple's account of learning the town's history secondhand; the specific original exclusionary policy documents were not independently retrieved in this pass."
+  },
+  {
+    "townName": "Highland Park",
+    "county": "Dallas County",
+    "state": "Texas",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Highland Park, TX",
+      "href": "https://justice.tougaloo.edu/sundowntown/highland-park-tx/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "20th century into the 2000s",
+    "notes": "The database describes Highland Park, an independent, incorporated enclave surrounded by Dallas, as one of the city's most exclusive and historically racially restricted suburbs, noting that a sitting U.S. president had lived there, as illustrative of its continuing exclusivity.",
+    "confidenceCaveat": "The entry emphasizes the town's exclusivity and demographic homogeneity more than a specific dated ordinance or incident."
+  },
+  {
+    "townName": "Comanche County",
+    "county": null,
+    "state": "Texas",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Comanche County, TX",
+      "href": "https://justice.tougaloo.edu/sundowntown/comanche-county-tx/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1875",
+    "notes": "The database describes an 1875 killing of a Black man named Moses Jones in Comanche County as connected to the broader establishment of numerous sundown towns across the county, an area the entry treats as having a documented multi-town pattern of exclusion rather than a single incorporated town's history.",
+    "confidenceCaveat": "The entry aggregates multiple towns within the county under one designation; the specific 1875 killing's sourcing was not independently retrieved in this pass."
+  },
+  {
+    "townName": "Vidor",
+    "county": "Orange County",
+    "state": "Texas",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Vidor, TX",
+      "href": "https://justice.tougaloo.edu/sundowntown/vidor-tx/"
+    },
+    "corroboratingCitations": [
+      {
+        "sourceLabel": "Texas Monthly, “Vidor in Black And White”",
+        "href": "https://www.texasmonthly.com/being-texan/vidor-in-black-and-white/"
+      }
+    ],
+    "documentedPeriod": "1993",
+    "notes": "Following a 1993 federal desegregation order covering public housing in dozens of Texas counties, several Black residents who moved into a Vidor public housing complex faced sustained harassment, Klan rallies, and threats, and all had left within months; the episode drew sustained national press attention to the town's sundown-town reputation.",
+    "confidenceCaveat": "None significant — the 1993 events are extensively documented in contemporary and later journalism, including Texas Monthly's detailed retrospective."
+  },
+  {
+    "townName": "Richland",
+    "county": "Benton County",
+    "state": "Washington",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Richland, WA",
+      "href": "https://justice.tougaloo.edu/sundowntown/richland-wa/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1949-1953",
+    "notes": "A resident's recollection recorded in the database, describing life in Richland from 1949 to 1953 (during the Hanford nuclear site's operation), states that the federally managed community was not integrated during that period despite its otherwise unusual, government-planned character.",
+    "confidenceCaveat": "Based on a single resident's recollection of a specific multi-year period; no ordinance or sign is cited."
+  },
+  {
+    "townName": "Plattsmouth",
+    "county": "Cass County",
+    "state": "Nebraska",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Plattsmouth, NE",
+      "href": "https://justice.tougaloo.edu/sundowntown/plattsmouth-ne/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, per a new-resident's recollection",
+    "notes": "A resident's recollection in the database describes shock at learning, soon after moving to Plattsmouth, that Black people were understood not to be permitted to live in the town.",
+    "confidenceCaveat": "Based on a single personal recollection; no ordinance, sign, or dated incident is cited."
+  },
+  {
+    "townName": "Minden",
+    "county": "Kearney County",
+    "state": "Nebraska",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Minden, NE",
+      "href": "https://justice.tougaloo.edu/sundowntown/minden-ne/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "c. 1909 (stepfather's birth) onward, per family account",
+    "notes": "A submitter's account describes a white stepfather born in Minden around 1909 who left the town while young, offered in the entry as a personal-history data point rather than a description of a specific exclusionary event.",
+    "confidenceCaveat": "Very brief entry based on a single family account with limited detail about the nature of any exclusionary practice."
+  },
+  {
+    "townName": "Portales",
+    "county": "Roosevelt County",
+    "state": "New Mexico",
+    "tougalooConfidence": "surely",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Portales, NM",
+      "href": "https://justice.tougaloo.edu/sundowntown/portales-nm/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "until at least the 1950s",
+    "notes": "The database entry states that despite hosting a state university, Portales excluded Black residents until at least the 1950s, citing a submitter's own inquiry into the town's history.",
+    "confidenceCaveat": "Based on a submitter's personal research described in the entry; the specific underlying sources for that research were not independently retrieved in this pass."
+  },
+  {
+    "townName": "Seneca",
+    "county": "Nemaha County",
+    "state": "Kansas",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Seneca, KS",
+      "href": "https://justice.tougaloo.edu/sundowntown/seneca-ks/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "undated, per a visitor's recollection",
+    "notes": "A visitor to Seneca recalled, in an account recorded by the database, being told proudly by a local host that the town had no Black residents, offered by the host as a point of civic pride rather than shame.",
+    "confidenceCaveat": "Based on a single visitor's secondhand recollection; no ordinance or dated incident is cited."
+  },
+  {
+    "townName": "Hillsboro",
+    "county": "Marion County",
+    "state": "Kansas",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Hillsboro, KS",
+      "href": "https://justice.tougaloo.edu/sundowntown/hillsboro-ks/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1920s-1950s",
+    "notes": "A detailed submission to the database, from someone raised in this Mennonite farming community, describes a local story that Black people could not stay overnight in Hillsboro until a Congolese student came to play soccer at Tabor College in the 1950s, alongside a specific recollection that Black members of a 1922 road-paving crew were not permitted to lodge in town overnight.",
+    "confidenceCaveat": "The submitter's own account explicitly notes uncertainty about whether the 'sundown town' story was ever formally documented elsewhere, and frames much of it as local legend alongside the more specific 1922 road-crew recollection; treat as oral history rather than a confirmed ordinance."
+  },
+  {
+    "townName": "Denton",
+    "county": "Doniphan County",
+    "state": "Kansas",
+    "tougalooConfidence": "probable",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Denton, KS",
+      "href": "https://justice.tougaloo.edu/sundowntown/denton-ks/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "1930s-1940s, per a family recollection",
+    "notes": "A lengthy 2007 family-history submission describes Denton, a small settlement of English immigrant descendants in northeast Kansas, as having been racially homogeneous and unwelcoming to outsiders generally during the submitter's father's childhood there in the 1930s and 1940s.",
+    "confidenceCaveat": "This is a general family-history recollection describing community insularity; it does not describe a specific ordinance, sign, or expulsion incident directed at Black residents."
+  },
+  {
+    "townName": "Keene",
+    "county": "Cheshire County",
+    "state": "New Hampshire",
+    "tougalooConfidence": "possible",
+    "primaryCitation": {
+      "sourceLabel": "Tougaloo College Historical Database of Sundown Towns — Keene, NH",
+      "href": "https://justice.tougaloo.edu/sundowntown/keene-nh/"
+    },
+    "corroboratingCitations": [],
+    "documentedPeriod": "2008, recalling growing up nearby",
+    "notes": "A 2008 message to the database from someone raised in a neighboring New Hampshire town describes the wider Keene area, near the Vermont border, as having had very few Black residents and a regional reputation for racial homogeneity carried into recent decades.",
+    "confidenceCaveat": "Rated only 'possible' by the database; based on a single personal recollection describing regional demographics rather than a documented ordinance or incident specific to Keene."
+  }
+]
