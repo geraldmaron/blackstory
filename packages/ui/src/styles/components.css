@@ -1,6 +1,6 @@
 
 /**
- * Component-level styles for Blap design-system primitives (brand pack
+ * Component-level styles for BlackStory design-system primitives (brand pack
  * v3). Radius language 8/16/28, Rule hairlines carry all separation, no
  * shadows anywhere (--ds-elevation-* tokens resolve to `none` by design —
  * this file doesn't reference them at all rather than imply they're load
@@ -475,6 +475,16 @@
 
 .ds-button--secondary:hover:not(:disabled) {
   background: var(--ds-surface-raised);
+}
+
+/* Compact instrument controls — map chrome, dense toolbars. Still ≥44px
+   touch target; radius-sm (not capsule) for explore-side panels. */
+.ds-button--compact {
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-4);
+  border-radius: var(--ds-radius-sm);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
 }
 
 .ds-dialog::backdrop {

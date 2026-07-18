@@ -1,6 +1,6 @@
 /**
  * Layout and presentation styles for map-first `/explore` experience. Uses the shared
- * Black Book token vocabulary from `@black-book/ui/styles.css` no new colors introduced here.
+ * BlackStory token vocabulary from `@black-book/ui/styles.css` no new colors introduced here.
  */
 .ds-explore-page__body {
   margin-top: var(--ds-space-4);
@@ -358,15 +358,9 @@
 
 .ds-explore__facet {
   display: grid;
-  grid-template-columns: 5.5rem minmax(0, 1fr);
+  grid-template-columns: 5rem minmax(0, 1fr);
   align-items: center;
   gap: var(--ds-space-2);
-}
-
-.ds-explore__facet .ds-pill-select__control {
-  width: 100%;
-  min-height: 2.5rem;
-  font-size: 0.8125rem;
 }
 
 .ds-explore__results-count {

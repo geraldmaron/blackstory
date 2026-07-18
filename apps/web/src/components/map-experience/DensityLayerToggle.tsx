@@ -18,6 +18,7 @@ export function DensityLayerToggle({ enabled, onToggle }: DensityLayerToggleProp
   return (
     <Button
       type="button"
+      className="ds-button--compact"
       variant={enabled ? 'primary' : 'secondary'}
       aria-pressed={enabled}
       onClick={onToggle}

@@ -608,12 +608,20 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
             </div>
           </details>
           {view.viewState.state ? (
-            <button type="button" className="ds-button" onClick={handleClearState}>
+            <button
+              type="button"
+              className="ds-button ds-button--secondary ds-button--compact"
+              onClick={handleClearState}
+            >
               Clear state
             </button>
           ) : null}
           {view.viewState.selected && selectedFeature ? (
-            <button type="button" className="ds-button" onClick={handleClearSelected}>
+            <button
+              type="button"
+              className="ds-button ds-button--secondary ds-button--compact"
+              onClick={handleClearSelected}
+            >
               Clear map focus
             </button>
           ) : null}

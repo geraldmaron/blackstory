@@ -17,6 +17,7 @@ export function GroupingToggle({ enabled, onToggle }: GroupingToggleProps) {
   return (
     <Button
       type="button"
+      className="ds-button--compact"
       variant={enabled ? 'primary' : 'secondary'}
       aria-pressed={enabled}
       onClick={onToggle}
