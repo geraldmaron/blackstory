@@ -13,6 +13,7 @@ import {
   plotHeight,
   plotWidth,
   scaleLinear,
+  sourcesFromDecadeRows,
 } from './chart-utils';
 
 export type BlackPopulationShareChartProps = {
@@ -31,7 +32,6 @@ export function BlackPopulationShareChart({ rows }: BlackPopulationShareChartPro
     return null;
   }
 
-  const first = rows[0]!;
   const shares = rows.map(shareValue);
   const minShare = Math.min(...shares);
   const maxShare = Math.max(...shares);
@@ -43,13 +43,13 @@ export function BlackPopulationShareChart({ rows }: BlackPopulationShareChartPro
   const points = rows
     .map((row, index) => `${xScale(index)},${yScale(shareValue(row))}`)
     .join(' ');
+  const sources = sourcesFromDecadeRows(rows);
 
   return (
     <DataChartFrame
       title="Black population share by decade"
       caption="National share of total population counted as Black or African American in each decennial census."
-      sourceLabel={first.source}
-      sourceUrl={first.sourceUrl}
+      sources={sources}
       ariaLabel="Line chart of Black population share by census decade"
       textAlternative={
         <table className="bp-data-chart__table">

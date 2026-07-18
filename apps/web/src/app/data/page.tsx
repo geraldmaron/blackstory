@@ -13,6 +13,9 @@
  * HOLC (Mapping Inequality) is deliberately absent from this page — its vector dataset is
  * CC BY-NC-SA and stays off every public surface until a rights review clears a specific
  * public treatment (see @blap/domain's launch-corpora.ts).
+ *
+ * Source display: identical sources across a strip hoist to one group footer; unique
+ * per-decade/per-metric sources stay compact under that figure only (see DataStatStrip).
  */
 import {
   getAcsCoverageSummary,
@@ -27,7 +30,7 @@ import {
 import { Notice } from '@blap/ui';
 import { AcsCoverageChart } from '../../components/data/AcsCoverageChart';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
-import { DataStatCitation } from '../../components/data/DataStatCitation';
+import { DataStatStrip } from '../../components/data/DataStatStrip';
 import { HateCrimeCompositionChart } from '../../components/data/HateCrimeCompositionChart';
 import { PopulationByDecadeChart } from '../../components/data/PopulationByDecadeChart';
 import '../../components/data/data-charts.css';
@@ -61,6 +64,10 @@ export default async function DataPage() {
     safe(getOpportunityAtlasCoverageSummary()),
   ]);
 
+  const hateCrime = hateCrimeYear as HateCrimeYearSummary | undefined;
+  const acs = acsCoverage as AcsCoverageSummary | undefined;
+  const opportunity = opportunityAtlasCoverage as OpportunityAtlasCoverageSummary | undefined;
+
   return (
     <main className="bp-container bp-page" id="main">
       <p className="bp-page__eyebrow">Modeling</p>
@@ -87,18 +94,16 @@ export default async function DataPage() {
               <PopulationByDecadeChart rows={populationByDecade} />
               <BlackPopulationShareChart rows={populationByDecade} />
             </div>
-            <ul className="bp-data-strip">
-            {populationByDecade.map((row: NationalPopulationByDecade) => (
-              <DataStatCitation
-                key={row.decade}
-                value={formatCount(row.blackPopulation)}
-                label={`Black population, ${row.decade} census`}
-                note={`of ${formatCount(row.totalPopulation)} total population across ${formatCount(row.countyCount)} counties`}
-                sourceLabel={row.source}
-                sourceUrl={row.sourceUrl}
-              />
-            ))}
-            </ul>
+            <DataStatStrip
+              labelledBy="population-heading"
+              items={populationByDecade.map((row: NationalPopulationByDecade) => ({
+                id: row.decade,
+                value: formatCount(row.blackPopulation),
+                label: `Black population, ${row.decade} census`,
+                note: `of ${formatCount(row.totalPopulation)} total population across ${formatCount(row.countyCount)} counties`,
+                sources: [{ label: row.source, url: row.sourceUrl }],
+              }))}
+            />
           </>
         ) : (
           <p className="bp-sans">Census data is not available in this environment yet.</p>
@@ -114,26 +119,28 @@ export default async function DataPage() {
           Median household income, tenure, and educational attainment — including a
           Black-householder income breakout — at county and tract level.
         </p>
-        {acsCoverage ? (
+        {acs ? (
           <>
             <div className="bp-data-section__viz">
-              <AcsCoverageChart coverage={acsCoverage as AcsCoverageSummary} />
+              <AcsCoverageChart coverage={acs} />
             </div>
-            <ul className="bp-data-strip">
-            <DataStatCitation
-              value={formatCount((acsCoverage as AcsCoverageSummary).countyCount)}
-              label="Counties covered"
-              sourceLabel={acsCoverage.source}
-              sourceUrl={acsCoverage.sourceUrl}
+            <DataStatStrip
+              labelledBy="acs-heading"
+              sources={[{ label: acs.source, url: acs.sourceUrl }]}
+              items={[
+                {
+                  id: 'acs-counties',
+                  value: formatCount(acs.countyCount),
+                  label: 'Counties covered',
+                },
+                {
+                  id: 'acs-tracts',
+                  value: formatCount(acs.tractCount),
+                  label: 'Census tracts covered',
+                  note: `ACS ${acs.vintage} 5-year estimates`,
+                },
+              ]}
             />
-            <DataStatCitation
-              value={formatCount((acsCoverage as AcsCoverageSummary).tractCount)}
-              label="Census tracts covered"
-              note={`ACS ${(acsCoverage as AcsCoverageSummary).vintage} 5-year estimates`}
-              sourceLabel={acsCoverage.source}
-              sourceUrl={acsCoverage.sourceUrl}
-            />
-            </ul>
           </>
         ) : (
           <p className="bp-sans">ACS data is not available in this environment yet.</p>
@@ -151,34 +158,37 @@ export default async function DataPage() {
           year &mdash; it is a fact about reporting, not a claim that nothing happened. Always
           read these counts beside the national participation rate below.
         </Notice>
-        {hateCrimeYear ? (
+        {hateCrime ? (
           <>
             <div className="bp-data-section__viz">
-              <HateCrimeCompositionChart summary={hateCrimeYear as HateCrimeYearSummary} />
+              <HateCrimeCompositionChart summary={hateCrime} />
             </div>
-            <ul className="bp-data-strip">
-            <DataStatCitation
-              value={formatCount((hateCrimeYear as HateCrimeYearSummary).incidents)}
-              label={`Reported incidents, ${LATEST_HATE_CRIME_YEAR}`}
-              sourceLabel={hateCrimeYear.source}
-              sourceUrl={hateCrimeYear.sourceUrl}
+            <DataStatStrip
+              labelledBy="hate-crime-heading"
+              sources={[{ label: hateCrime.source, url: hateCrime.sourceUrl }]}
+              items={[
+                {
+                  id: 'hc-incidents',
+                  value: formatCount(hateCrime.incidents),
+                  label: `Reported incidents, ${LATEST_HATE_CRIME_YEAR}`,
+                },
+                {
+                  id: 'hc-anti-black',
+                  value: formatCount(hateCrime.antiBlackIncidents),
+                  label: 'Anti-Black or African American bias',
+                },
+                ...(hateCrime.nationalParticipatingAgenciesPct !== undefined
+                  ? [
+                      {
+                        id: 'hc-participation',
+                        value: `${hateCrime.nationalParticipatingAgenciesPct}%`,
+                        label: 'Agencies participating nationally',
+                        note: 'the coverage denominator — read every count above beside this figure',
+                      },
+                    ]
+                  : []),
+              ]}
             />
-            <DataStatCitation
-              value={formatCount((hateCrimeYear as HateCrimeYearSummary).antiBlackIncidents)}
-              label="Anti-Black or African American bias"
-              sourceLabel={hateCrimeYear.source}
-              sourceUrl={hateCrimeYear.sourceUrl}
-            />
-            {hateCrimeYear.nationalParticipatingAgenciesPct !== undefined ? (
-              <DataStatCitation
-                value={`${hateCrimeYear.nationalParticipatingAgenciesPct}%`}
-                label="Agencies participating nationally"
-                note="the coverage denominator — read every count above beside this figure"
-                sourceLabel={hateCrimeYear.source}
-                sourceUrl={hateCrimeYear.sourceUrl}
-              />
-            ) : null}
-            </ul>
           </>
         ) : (
           <p className="bp-sans">FBI hate crime data is not available in this environment yet.</p>
@@ -196,16 +206,19 @@ export default async function DataPage() {
           ranks across differently sized tracts would itself be a fabricated statistic, so we
           don&rsquo;t publish one here).
         </p>
-        {opportunityAtlasCoverage ? (
-          <ul className="bp-data-strip">
-            <DataStatCitation
-              value={formatCount((opportunityAtlasCoverage as OpportunityAtlasCoverageSummary).tractCount)}
-              label="Tracts covered (2010 geography)"
-              note={opportunityAtlasCoverage.license}
-              sourceLabel={opportunityAtlasCoverage.source}
-              sourceUrl={opportunityAtlasCoverage.sourceUrl}
-            />
-          </ul>
+        {opportunity ? (
+          <DataStatStrip
+            labelledBy="mobility-heading"
+            sources={[{ label: opportunity.source, url: opportunity.sourceUrl }]}
+            items={[
+              {
+                id: 'oa-tracts',
+                value: formatCount(opportunity.tractCount),
+                label: 'Tracts covered (2010 geography)',
+                note: opportunity.license,
+              },
+            ]}
+          />
         ) : (
           <p className="bp-sans">Opportunity Atlas data is not available in this environment yet.</p>
         )}

@@ -1186,6 +1186,23 @@
   text-transform: uppercase;
 }
 
+.bp-data-strip__note {
+  margin: var(--bp-space-2) 0 0;
+  color: var(--bp-ink-muted);
+}
+
+.bp-data-stat-strip {
+  margin-top: var(--bp-space-8);
+}
+
+.bp-data-stat-strip > .bp-data-strip {
+  margin-top: 0;
+}
+
+.bp-data-stat-strip > .bp-citation--group {
+  margin-top: var(--bp-space-4);
+}
+
 @media (min-width: 48rem) {
   .bp-data-strip {
     grid-template-columns: repeat(3, minmax(0, 1fr));

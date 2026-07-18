@@ -15,6 +15,7 @@ import {
   plotHeight,
   plotWidth,
   scaleLinear,
+  sourcesFromDecadeRows,
 } from './chart-utils';
 
 export type PopulationByDecadeChartProps = {
@@ -26,20 +27,19 @@ export function PopulationByDecadeChart({ rows }: PopulationByDecadeChartProps) 
     return null;
   }
 
-  const first = rows[0]!;
   const maxBlack = niceMax(Math.max(...rows.map((row) => row.blackPopulation)));
   const xScale = scaleLinear(0, rows.length, CHART_MARGIN.left, CHART_MARGIN.left + plotWidth());
   const yScale = scaleLinear(0, maxBlack, CHART_MARGIN.top + plotHeight(), CHART_MARGIN.top);
   const groupWidth = plotWidth() / rows.length;
   const barWidth = groupWidth * 0.55;
   const yTicks = [0, maxBlack / 2, maxBlack];
+  const sources = sourcesFromDecadeRows(rows);
 
   return (
     <DataChartFrame
       title="Black population by census decade"
       caption="National sum of county-level decennial counts. Share of total population shown above each bar."
-      sourceLabel={first.source}
-      sourceUrl={first.sourceUrl}
+      sources={sources}
       ariaLabel="Bar chart of Black population by census decade"
       textAlternative={
         <table className="bp-data-chart__table">

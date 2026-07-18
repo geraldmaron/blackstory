@@ -1,11 +1,9 @@
 /**
- * One published statistic + its mandatory source citation (public-numeric-policy category 3:
- * a count without provenance is an assertion, not a statistic — every stat rendered from
- * `@blap/firebase`'s national-stats readers carries {source, sourceUrl} and must show both).
- * Reuses the existing `.bp-data-strip` value/label pair and `.bp-citation` styling rather
- * than inventing a third numeric-display pattern.
+ * One published statistic. Prefer `DataStatStrip` for strips so shared sources
+ * render once; this leaf stays available for single-stat call sites and tests.
  */
 import type { ReactNode } from 'react';
+import { SourceFootnote, type DataSourceRef } from './SourceFootnote';
 
 export type DataStatCitationProps = {
   readonly value: string;
@@ -13,24 +11,29 @@ export type DataStatCitationProps = {
   readonly sourceLabel: string;
   readonly sourceUrl: string;
   readonly note?: ReactNode;
+  /** Extra sources beyond the primary one — listed in the same compact footnote. */
+  readonly additionalSources?: readonly DataSourceRef[];
 };
 
-export function DataStatCitation({ value, label, sourceLabel, sourceUrl, note }: DataStatCitationProps) {
+export function DataStatCitation({
+  value,
+  label,
+  sourceLabel,
+  sourceUrl,
+  note,
+  additionalSources,
+}: DataStatCitationProps) {
+  const sources: DataSourceRef[] = [
+    { label: sourceLabel, url: sourceUrl },
+    ...(additionalSources ?? []),
+  ];
+
   return (
     <li className="bp-data-strip__item">
       <span className="bp-data-strip__value">{value}</span>
       <span className="bp-data-strip__label">{label}</span>
-      {note ? (
-        <p className="bp-sans" style={{ margin: 'var(--bp-space-2) 0 0 0', color: 'var(--bp-ink-muted)' }}>
-          {note}
-        </p>
-      ) : null}
-      <p className="bp-citation" style={{ marginTop: 'var(--bp-space-2)' }}>
-        <span className="bp-citation__label">Source</span>
-        <a href={sourceUrl} target="_blank" rel="noreferrer noopener">
-          {sourceLabel}
-        </a>
-      </p>
+      {note ? <p className="bp-data-strip__note bp-sans">{note}</p> : null}
+      <SourceFootnote sources={sources} density="compact" />
     </li>
   );
 }

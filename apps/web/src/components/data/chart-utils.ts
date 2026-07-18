@@ -46,3 +46,18 @@ export function niceMax(value: number): number {
   const step = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
   return step * magnitude;
 }
+
+/** Unique {label,url} pairs from decade rows — for multi-source chart footnotes. */
+export function sourcesFromDecadeRows(
+  rows: readonly { readonly source: string; readonly sourceUrl: string }[],
+): readonly { readonly label: string; readonly url: string }[] {
+  const seen = new Set<string>();
+  const out: { label: string; url: string }[] = [];
+  for (const row of rows) {
+    const key = row.sourceUrl.trim().toLowerCase() || row.source.trim().toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ label: row.source, url: row.sourceUrl });
+  }
+  return out;
+}
