@@ -1707,25 +1707,37 @@
   line-height: 1.4;
 }
 
-/* Glyph + word label + copper/stone weight — color is never the only signal. */
+/* Glyph + word + green→orange confidence ramp (high=green, low=orange). */
 .bp-confidence-mark--high {
-  color: var(--bp-accent);
+  color: #2f6b3c;
   font-weight: 600;
 }
 
 .bp-confidence-mark--medium {
-  color: var(--bp-accent-muted);
+  color: #8b8a2e;
   font-weight: 500;
 }
 
 .bp-confidence-mark--low {
-  color: var(--bp-ink-muted);
+  color: #d07a32;
   font-weight: 500;
 }
 
 .bp-confidence-mark--unrated {
   color: var(--bp-ink-subtle);
   font-weight: 400;
+}
+
+[data-theme='dark'] .bp-confidence-mark--high {
+  color: #5cad73;
+}
+
+[data-theme='dark'] .bp-confidence-mark--medium {
+  color: #c4c04a;
+}
+
+[data-theme='dark'] .bp-confidence-mark--low {
+  color: #d07a32;
 }
 
 /* Status chips — copper/stone weight, text always present (not color-only). */

@@ -79,26 +79,26 @@
   line-height: 1.4;
 }
 
-/* Copper/stone family only — glyph + label carry tier; no green/red traffic-light hues. */
+/* Confidence badges use tokenized green→orange ramp; glyph mark remains. */
 .bp-confidence--high {
-  color: var(--bp-accent);
+  color: var(--bp-confidence-high-fg);
   font-weight: 600;
-  background: color-mix(in srgb, var(--bp-accent-muted) 22%, var(--bp-surface));
-  border-color: color-mix(in srgb, var(--bp-accent) 32%, var(--bp-border));
+  background: var(--bp-confidence-high-bg);
+  border-color: var(--bp-confidence-high-border);
 }
 
 .bp-confidence--medium {
-  color: var(--bp-accent-muted);
+  color: var(--bp-confidence-medium-fg);
   font-weight: 500;
-  background: color-mix(in srgb, var(--bp-accent-muted) 14%, var(--bp-surface));
-  border-color: color-mix(in srgb, var(--bp-accent-muted) 36%, var(--bp-border));
+  background: var(--bp-confidence-medium-bg);
+  border-color: var(--bp-confidence-medium-border);
 }
 
 .bp-confidence--low {
-  color: var(--bp-ink-muted);
+  color: var(--bp-confidence-low-fg);
   font-weight: 500;
-  background: color-mix(in srgb, var(--bp-ink-muted) 10%, var(--bp-surface));
-  border-color: color-mix(in srgb, var(--bp-ink-muted) 28%, var(--bp-border));
+  background: var(--bp-confidence-low-bg);
+  border-color: var(--bp-confidence-low-border);
 }
 
 .bp-confidence__mark {

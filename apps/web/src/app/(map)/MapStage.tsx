@@ -60,6 +60,7 @@ import {
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../map/explore-layer-ids';
 import { buildExploreMapStyle } from '../map/explore-style';
+import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
@@ -84,6 +85,11 @@ import {
   US_COUNTIES_GEOJSON_PATH,
 } from '../../lib/map-experience/us-county-lines';
 import type { ExploreViewport } from '../../lib/map-experience/url-state';
+
+function readDocumentColorScheme(): MapColorScheme {
+  if (typeof document === 'undefined') return 'dark';
+  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+}
 
 type MaplibreModule = typeof MapLibreNamespace;
 
@@ -110,6 +116,9 @@ const ARCHIVE_BASE_STYLE: StyleSpecification = {
 
 const GEOGRAPHY_LAYER_IDS = new Set([
   'background',
+  'explore-street-casing',
+  'explore-street-fill',
+  'explore-street-label',
   'explore-state-density-fill',
   EXPLORE_COUNTY_LINES_LAYER_ID,
   'explore-state-bounds-line',
@@ -584,6 +593,7 @@ export function MapStageProvider({
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
         densityLayerEnabled: patch.densityEnabled,
         historyEdgesEnabled: patch.historyEdgesEnabled,
+        colorScheme: readDocumentColorScheme(),
       });
       configRef.current = {
         ...configRef.current,
@@ -599,6 +609,29 @@ export function MapStageProvider({
     },
     [applyStyleAndData],
   );
+
+  useEffect(() => {
+    const syncPlateToTheme = () => {
+      if (!mapRef.current) return;
+      const cfg = configRef.current;
+      const style = buildExploreMapStyle({
+        featureCollection: cfg.featureCollection,
+        jurisdictionAreaFeatures: cfg.jurisdictionAreaFeatures,
+        densityLayerEnabled: cfg.densityEnabled,
+        historyEdgesEnabled: cfg.historyEdgesEnabled,
+        colorScheme: readDocumentColorScheme(),
+      });
+      configRef.current = { ...cfg, style };
+      applyStyleAndData();
+    };
+    const observer = new MutationObserver((mutations) => {
+      if (mutations.some((mutation) => mutation.attributeName === 'data-theme')) {
+        syncPlateToTheme();
+      }
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, [applyStyleAndData]);
 
   const applyViewState = useCallback(
     (patch: MapStageViewPatch) => {
@@ -707,12 +740,10 @@ export function MapStageProvider({
           // ExploreMapCanvas's identical comment): a portrait canvas cannot show full CONUS
           // east-west if maxBounds also caps latitude.
           renderWorldCopies: false,
-          // Zoom envelope: national frame down to county scale, no further.
-          // Street-level camera depth never belongs on the public surface
-          // (dignity rules — precision tiers already redact geometry, and an
-          // empty street grid at z12 read as both invasive and broken).
+          // Street-level context is available (OpenFreeMap roads from z8); stop short of
+          // address-level invasion — precision redaction still governs marker honesty.
           minZoom: 3,
-          maxZoom: 10,
+          maxZoom: 14,
           bounds: bounds as [number, number, number, number],
           fitBoundsOptions: { padding: 32 },
         });

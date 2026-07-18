@@ -41,7 +41,7 @@ test('CSP includes strict defaults and frame-ancestors none', () => {
 test('CSP development relaxes script-src for Next.js hydration and HMR', () => {
   const csp = buildContentSecurityPolicy({ isDev: true });
   assert.match(csp, /script-src 'self' 'unsafe-inline' 'unsafe-eval'/);
-  assert.match(csp, /connect-src 'self' https:\/\/demotiles\.maplibre\.org ws: wss:/);
+  assert.match(csp, /connect-src 'self' https:\/\/demotiles\.maplibre\.org https:\/\/tiles\.openfreemap\.org ws: wss:/);
   assert.doesNotMatch(csp, /upgrade-insecure-requests/);
 });
 

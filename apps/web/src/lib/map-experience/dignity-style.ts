@@ -1,20 +1,24 @@
 /**
- * Dignity-rule style tokens for the map (no red violence markers, no trauma-forward color
- * coding, clusters never render as crime-heat). Every color below comes from
- * `@blap/ui`'s brand palette — this module never introduces a new hue. The
- * accompanying test (`dignity-style.test.ts`) programmatically asserts none of them are red-hued,
- * so this rule cannot silently regress as the palette evolves.
+ * Map color tokens for kind encoding, semantic tones (massacre / plantation /
+ * epicenter), confidence, and light/dark plate variants. Product direction
+ * (black-book-67d) expands beyond the copper-only archive register: confidence
+ * runs green→orange, and certain historical tones use red/gold/black while
+ * every marker still carries a non-color glyph (WCAG 1.4.1).
  */
-import { brandPalette, darkTheme } from '@blap/ui';
+import { brandPalette } from '@blap/ui';
 
-/** Cluster/point radii chosen so a national cluster decomposes to named entities within two
- * interactions: one zoom step un-clusters to a regional-scale cluster, a second reaches
- * individual points. */
 export const EXPLORE_CLUSTER_CONFIG = {
   clusterRadius: 60,
-  clusterMaxZoom: 9,
+  clusterMaxZoom: 11,
   clusterMinPoints: 2,
 } as const;
+
+/** OpenFreeMap vector tiles + fonts — free street basemap under the archive layers. */
+export const OPENFREEMAP_TILE_SOURCE_URL = 'https://tiles.openfreemap.org/planet';
+export const OPENFREEMAP_GLYPHS_URL = 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf';
+export const OPENFREEMAP_SOURCE_ID = 'openfreemap';
+
+export type MapColorScheme = 'light' | 'dark';
 
 export const DIGNITY_PALETTE = {
   point: brandPalette.copperPin,
@@ -25,47 +29,47 @@ export const DIGNITY_PALETTE = {
   densityMid: 'rgba(184, 107, 42, 0.28)',
   densityHigh: 'rgba(184, 107, 42, 0.5)',
   background: brandPalette.blackInk,
-  /**
-   * The plate reads as a chart, not a void: unmapped world (ocean + beyond)
-   * sits a step BELOW Black Ink so the warm landmass fills below lift off it.
-   * Derived plate token, same convention as densityLow/Mid/High.
-   */
   ocean: '#080606',
-  border: darkTheme.border,
-  /** White stroke/fill on the fixed dark map canvas for selected points.  */
+  oceanLight: '#E8E0D2',
+  border: '#34302C',
+  borderLight: brandPalette.rule,
   selected: brandPalette.archivePaper,
-  /**
-   * BB-099 relocated ad-hoc literals: these three already existed inline in
-   * `explore-style.ts` before BB-099's basemap-conformance pass values unchanged, just named
-   * and centralized here so "every color pulled from DIGNITY_PALETTE" is actually true.
-   */
+  selectedDark: brandPalette.blackInk,
   selectedStateFill: 'rgba(184, 107, 42, 0.35)',
-  /** Landmass at rest — warm Page Sand washes over ink (never neutral gray),
-   * so the country reads as parchment territory against the darker ocean. */
   densityUnknownFill: 'rgba(216, 161, 120, 0.12)',
   densityDisabledFill: 'rgba(216, 161, 120, 0.14)',
-  /**
-   * BB-099 per-entity-kind shades (see `kind-encoding.ts`, which is the module that actually
-   * assigns these to `place | school | event | institution`). Namespaced `kind*` rather than
-   * reusing `point`/`pointHalo` above so a future edit to the generic point/halo tokens can
-   * never accidentally re-color the kind legend out from under it, even though `kindPlace`
-   * happens to equal `point` today (both are Copper Pin the map's original default marker
-   * color IS what "place" renders as post-BB-099).
-   */
-  kindPlace: brandPalette.copperPin,
+  densityUnknownFillLight: 'rgba(184, 107, 42, 0.08)',
+  densityDisabledFillLight: 'rgba(109, 103, 95, 0.08)',
+
+  kindPerson: brandPalette.copperPin,
+  kindPlace: '#C48A4A',
   kindSchool: brandPalette.pageSand,
-  kindEvent: brandPalette.copperDark,
-  /**
-   * "Institution paper tint" a Surface/Archive-Paper-family swatch specified by
-   * design-direction-v3.md ("Map visual language (BB-099)") that has no equivalent yet in
-   * `brand-palette.ts`'s fixed swatch set. Defined here the same way `densityLow/Mid/High`
-   * above are this module's own derived tokens: named once, referenced everywhere, never
-   * inlined at a call site.
-   */
+  kindOrganization: brandPalette.copperTextLight,
   kindInstitution: '#EDE4D2',
-  /** Stone outline for the institution "ring" glyph (paired with `kindInstitution`'s mostly-
-   * hollow fill so the marker reads as a ring, not a hue). */
   kindInstitutionStroke: brandPalette.stone,
+  kindEvent: brandPalette.copperDark,
+  kindLaw: '#3D6B9A',
+  kindCase: '#5A7FA8',
+  kindPublication: '#6D7A5C',
+  kindArtifact: '#9A7B5A',
+  kindMovement: '#A65D3A',
+  kindOther: brandPalette.stone,
+
+  kindMassacre: '#B83A2A',
+  kindPlantation: '#0A0A0A',
+  kindEpicenter: '#C9A227',
+
+  confidenceHigh: '#2F6B3C',
+  confidenceMedium: '#8B8A2E',
+  confidenceLow: '#D07A32',
+  confidenceUnrated: brandPalette.stone,
+
+  streetCasingDark: 'rgba(244, 239, 229, 0.22)',
+  streetDark: 'rgba(244, 239, 229, 0.38)',
+  streetLabelDark: 'rgba(244, 239, 229, 0.55)',
+  streetCasingLight: 'rgba(10, 10, 10, 0.18)',
+  streetLight: 'rgba(10, 10, 10, 0.32)',
+  streetLabelLight: 'rgba(10, 10, 10, 0.55)',
 } as const;
 
 export const DENSITY_TIER_FILL: Readonly<Record<'documented' | 'emerging' | 'concentrated', string>> = {
@@ -74,13 +78,41 @@ export const DENSITY_TIER_FILL: Readonly<Record<'documented' | 'emerging' | 'con
   concentrated: DIGNITY_PALETTE.densityHigh,
 };
 
-/**
- * Non-color affordances (glyph, never hue alone) so the dignity rule holds for readers who
- * cannot perceive the copper/sand distinction WCAG 1.4.1 (Use of Color).
- */
 export const CONFIDENCE_TIER_GLYPH: Readonly<Record<string, string>> = {
   high: '●',
   medium: '◐',
   low: '○',
   unrated: '·',
 };
+
+export const CONFIDENCE_TIER_COLOR: Readonly<Record<string, string>> = {
+  high: DIGNITY_PALETTE.confidenceHigh,
+  medium: DIGNITY_PALETTE.confidenceMedium,
+  low: DIGNITY_PALETTE.confidenceLow,
+  unrated: DIGNITY_PALETTE.confidenceUnrated,
+};
+
+export function plateForScheme(scheme: MapColorScheme) {
+  if (scheme === 'light') {
+    return {
+      ocean: DIGNITY_PALETTE.oceanLight,
+      selected: DIGNITY_PALETTE.selectedDark,
+      densityUnknown: DIGNITY_PALETTE.densityUnknownFillLight,
+      densityDisabled: DIGNITY_PALETTE.densityDisabledFillLight,
+      streetCasing: DIGNITY_PALETTE.streetCasingLight,
+      street: DIGNITY_PALETTE.streetLight,
+      streetLabel: DIGNITY_PALETTE.streetLabelLight,
+      clusterText: DIGNITY_PALETTE.selectedDark,
+    } as const;
+  }
+  return {
+    ocean: DIGNITY_PALETTE.ocean,
+    selected: DIGNITY_PALETTE.selected,
+    densityUnknown: DIGNITY_PALETTE.densityUnknownFill,
+    densityDisabled: DIGNITY_PALETTE.densityDisabledFill,
+    streetCasing: DIGNITY_PALETTE.streetCasingDark,
+    street: DIGNITY_PALETTE.streetDark,
+    streetLabel: DIGNITY_PALETTE.streetLabelDark,
+    clusterText: DIGNITY_PALETTE.clusterText,
+  } as const;
+}

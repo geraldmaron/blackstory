@@ -94,7 +94,7 @@ test('the jurisdiction-area layer renders fill geometry (never a point layer) an
 
 test('every paint color used is one of the dignity-palette values (no new hue introduced at render time)', () => {
   const style = buildStyleFixture(true);
-  const allowed = new Set(Object.values(DIGNITY_PALETTE));
+  const allowed = new Set<string>(Object.values(DIGNITY_PALETTE));
   // The state-bounds line/background/text layers also draw from the dignity palette or the
   // shared brand tokens; the cluster/point/halo/event-glyph layers below are the ones the
   // dignity rule is specifically about (plain string paint values here; kind-keyed `match`
@@ -129,19 +129,62 @@ test('the state-selected fill and density fallback tints are relocated DIGNITY_P
   assert.equal(densityLayerOff.paint?.['fill-color'], DIGNITY_PALETTE.densityDisabledFill);
 });
 
-test('BB-099: the point layer colors every kind from KIND_ENCODING_ENTRIES via a match on `kind`, with a DIGNITY_PALETTE-sourced fallback', () => {
+test('OpenFreeMap street layers are present for casing, fill, and labels', () => {
+  const style = buildStyleFixture(true);
+  assert.ok(style.sources['openfreemap'], 'expected openfreemap vector source');
+  assert.ok(style.layers.some((layer) => layer.id === 'explore-street-casing'));
+  assert.ok(style.layers.some((layer) => layer.id === 'explore-street-fill'));
+  assert.ok(style.layers.some((layer) => layer.id === 'explore-street-label'));
+});
+
+test('light colorScheme flips ocean and street ink to the light plate', () => {
+  const source = buildExploreMapSource(listPublicEntities());
+  const dark = buildExploreMapStyle({
+    featureCollection: source.featureCollection,
+    jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
+    densityLayerEnabled: false,
+    colorScheme: 'dark',
+  });
+  const light = buildExploreMapStyle({
+    featureCollection: source.featureCollection,
+    jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
+    densityLayerEnabled: false,
+    colorScheme: 'light',
+  });
+  const darkBg = layerById(dark, 'background').paint?.['background-color'];
+  const lightBg = layerById(light, 'background').paint?.['background-color'];
+  assert.equal(darkBg, DIGNITY_PALETTE.ocean);
+  assert.equal(lightBg, DIGNITY_PALETTE.oceanLight);
+  assert.notEqual(darkBg, lightBg);
+});
+
+/** Collect string color outputs nested inside case/match paint expressions. */
+function collectColorLeaves(expression: unknown, into: string[] = []): readonly string[] {
+  if (typeof expression === 'string' && expression.startsWith('#')) {
+    into.push(expression);
+    return into;
+  }
+  if (!Array.isArray(expression)) return into;
+  for (const item of expression) collectColorLeaves(item, into);
+  return into;
+}
+
+test('the point layer colors kinds and semantic tones from DIGNITY_PALETTE via mapTone-aware case', () => {
   const style = buildStyleFixture(true);
   const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
-  const colorOutputs = matchExpressionOutputs(pointLayer.paint?.['circle-color']);
+  const colorExpr = pointLayer.paint?.['circle-color'];
+  assert.equal((colorExpr as unknown[])[0], 'case');
+  const colorOutputs = collectColorLeaves(colorExpr);
   const expectedShades = KIND_ENCODING_ENTRIES.map(([, entry]) => entry.shade);
-  // Every kind's shade appears among the match's outputs (the last output is the fallback).
   for (const shade of expectedShades) {
-    assert.ok(colorOutputs.includes(shade), `expected kind shade ${shade} in the point layer's circle-color match`);
+    assert.ok(colorOutputs.includes(shade), `expected kind shade ${shade} in circle-color`);
   }
-  // Every output (including the fallback) is a real DIGNITY_PALETTE token zero ad-hoc hex.
-  const allowed = new Set(Object.values(DIGNITY_PALETTE));
+  assert.ok(colorOutputs.includes(DIGNITY_PALETTE.kindMassacre));
+  assert.ok(colorOutputs.includes(DIGNITY_PALETTE.kindPlantation));
+  assert.ok(colorOutputs.includes(DIGNITY_PALETTE.kindEpicenter));
+  const allowed = new Set<string>(Object.values(DIGNITY_PALETTE));
   for (const output of colorOutputs) {
-    assert.ok(allowed.has(output as string), `circle-color match output "${output}" must come from DIGNITY_PALETTE`);
+    assert.ok(allowed.has(output), `circle-color output "${output}" must come from DIGNITY_PALETTE`);
   }
 });
 

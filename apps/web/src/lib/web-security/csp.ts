@@ -16,8 +16,8 @@ export type CspBuildOptions = {
   isDev?: boolean;
 };
 
-/** MapLibre demo vector tiles glyphs (empty dark canvas is not a readable map).  */
-const MAP_TILE_SRC = ['https://demotiles.maplibre.org'];
+/** MapLibre demo tiles (fallback) + OpenFreeMap streets/fonts for the archive basemap. */
+const MAP_TILE_SRC = ['https://demotiles.maplibre.org', 'https://tiles.openfreemap.org'];
 
 const DEFAULT_IMG_SRC = ["'self'", 'data:', 'blob:', ...MAP_TILE_SRC];
 const DEFAULT_CONNECT_SRC = ["'self'", ...MAP_TILE_SRC];

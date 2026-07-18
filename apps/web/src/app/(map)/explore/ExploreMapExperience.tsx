@@ -437,11 +437,8 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   };
 
   return (
-    /* data-theme="dark": the instruments over the ink plate are brand-fixed
-       ink glass (island language) — the reader's light/dark preference styles
-       document pages, never the map cockpit. Token re-resolution is scoped to
-       this subtree by the [data-theme] attribute selector in tokens.css. */
-    <div className="bp-explore-stage" data-theme="dark">
+    /* Instruments follow the site theme (light/dark) — map plate syncs via MapStage. */
+    <div className="bp-explore-stage">
       {!stage.mapAvailable && degradedCopy ? (
         <div className="bp-explore-stage__notice">
           <Notice tone="warning" title="Map unavailable">

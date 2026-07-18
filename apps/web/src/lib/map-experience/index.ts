@@ -13,4 +13,5 @@ export * from './join-state-polygons';
 export * from './us-state-polygons';
 export * from './build-history-edge-lines';
 export * from './dignity-style';
+export * from './kind-encoding';
 export * from './snapshot-mode';

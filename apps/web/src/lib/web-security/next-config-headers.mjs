@@ -9,7 +9,7 @@ export function securityHeadersForNextConfig() {
   const scriptSrc = isDev
     ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
     : "script-src 'self'";
-  const mapTiles = 'https://demotiles.maplibre.org';
+  const mapTiles = 'https://demotiles.maplibre.org https://tiles.openfreemap.org';
   const connectSrc = isDev
     ? `connect-src 'self' ws: wss: ${mapTiles}`
     : `connect-src 'self' ${mapTiles}`;

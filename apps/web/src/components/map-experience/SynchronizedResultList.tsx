@@ -65,7 +65,11 @@ export function SynchronizedResultList({
               <h3 className="bp-result-list__title">{properties.displayName}</h3>
               <p className="bp-result-list__summary">{properties.oneLineStory}</p>
               <div className="bp-result-list__meta">
-                <KindBadge kind={properties.kind} density="compact" />
+                <KindBadge
+                  kind={properties.kind}
+                  density="compact"
+                  {...(properties.mapTone !== undefined ? { mapTone: properties.mapTone } : {})}
+                />
                 <span className="bp-mono">{eraLabel(properties.eraBuckets)}</span>
                 <ConfidenceMark tier={properties.confidenceTier} className="bp-sans" />
                 <span className="bp-sans">

@@ -6,7 +6,10 @@
  */
 import React from 'react';
 import { cx } from '@blap/ui';
-import { kindEncodingFor, type MapEntityGlyph } from '../../lib/map-experience/kind-encoding';
+import {
+  displayEncodingFor,
+  type MapEntityGlyph,
+} from '../../lib/map-experience/kind-encoding';
 
 void React;
 
@@ -19,13 +22,15 @@ const GLYPH_CLASS: Readonly<Record<MapEntityGlyph, string>> = {
 
 export type KindBadgeProps = {
   readonly kind: string;
+  /** Semantic tone override (massacre / plantation / epicenter) when known. */
+  readonly mapTone?: string;
   readonly className?: string;
   /** Compact mono row for result lists; default is the card/eyebrow chip. */
   readonly density?: 'default' | 'compact';
 };
 
-export function KindBadge({ kind, className, density = 'default' }: KindBadgeProps) {
-  const encoding = kindEncodingFor(kind);
+export function KindBadge({ kind, mapTone, className, density = 'default' }: KindBadgeProps) {
+  const encoding = displayEncodingFor(kind, mapTone);
   const glyphStyle =
     encoding.glyph === 'ring'
       ? { borderColor: encoding.shade, backgroundColor: 'transparent' as const }
@@ -35,6 +40,7 @@ export function KindBadge({ kind, className, density = 'default' }: KindBadgePro
     <span
       className={cx('bp-kind-badge', density === 'compact' && 'bp-kind-badge--compact', className)}
       data-kind={kind}
+      {...(mapTone ? { 'data-map-tone': mapTone } : {})}
     >
       <span
         className={cx('bp-legend-glyph', GLYPH_CLASS[encoding.glyph])}

@@ -25,7 +25,7 @@ import { HowToReadThisRecord } from '../../../components/trust';
 import { WhyThisAppears } from '../../../components/why-appears';
 import { seedFactsForEntity } from '../../../data/facts-seed';
 import { listPublicEntities } from '../../../data/public-seed';
-import { buildExploreHref, geoAnchorFor, highestConfidence } from '../../../lib/map-experience';
+import { buildExploreHref, geoAnchorFor, highestConfidence, mapToneFromTopics } from '../../../lib/map-experience';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
 import { resolvePublicEntityView } from '../../../lib/public-data/source';
 import { buildWhyThisAppearsForEntity, toEvidenceClaimInputs } from './adapters';
@@ -67,6 +67,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const framing = deriveHistoricalFraming(entity);
   const framingLabel = framing === 'present_day' ? 'Present-day record' : 'Historical record';
   const confidenceTier = highestConfidence(entity.claims);
+  const mapTone = mapToneFromTopics(entity.topicTags);
   // Fail-closed, not fail-crashed: the domain layer throws when a record lacks
   // a substantiated notability basis (BB-090). That withholds the explanation —
   // it must never take the whole record page down with it.
@@ -95,7 +96,10 @@ export default async function EntityPage({ params }: EntityPageProps) {
       <header className="bp-entity-mast">
         <p className="bp-page__eyebrow">
           <span className="bp-entity-mast__meta">
-            <KindBadge kind={entity.kind} />
+            <KindBadge
+              kind={entity.kind}
+              {...(mapTone !== undefined ? { mapTone } : {})}
+            />
             <span className="bp-entity-mast__meta-sep" aria-hidden="true">
               ·
             </span>
@@ -119,7 +123,10 @@ export default async function EntityPage({ params }: EntityPageProps) {
           <div className="bp-at-a-glance__row">
             <dt>Kind</dt>
             <dd>
-              <KindBadge kind={entity.kind} />
+              <KindBadge
+                kind={entity.kind}
+                {...(mapTone !== undefined ? { mapTone } : {})}
+              />
             </dd>
           </div>
           <div className="bp-at-a-glance__row">

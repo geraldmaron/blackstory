@@ -11,7 +11,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
-import { kindEncodingFor } from '../../lib/map-experience/kind-encoding';
+import { displayEncodingFor } from '../../lib/map-experience/kind-encoding';
 import { ConfidenceMark } from './ConfidenceMark';
 import { KindBadge } from './KindBadge';
 
@@ -42,7 +42,7 @@ function radiusAffordanceLabel(feature: ExploreMapFeature): string {
 
 export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
   const { properties } = feature;
-  const kindEncoding = kindEncodingFor(properties.kind);
+  const kindEncoding = displayEncodingFor(properties.kind, properties.mapTone);
 
   return (
     <article className="bp-nc" aria-label={properties.displayName}>
@@ -51,7 +51,10 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
           className="bp-nc__kind-rule"
           style={{ borderColor: kindEncoding.shade }}
         >
-          <KindBadge kind={properties.kind} />
+          <KindBadge
+            kind={properties.kind}
+            {...(properties.mapTone !== undefined ? { mapTone: properties.mapTone } : {})}
+          />
         </div>
         {onClose ? (
           <button

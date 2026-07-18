@@ -3,11 +3,9 @@
  * render over it (BB-098, ADR-017 "Route-group layout owns the canvas"). `.bp-map-stage`
  * (`MapStage.tsx`'s sole canvas mount) is a fixed, full-viewport plate; `.bp-hero-stage` (base
  * panel styling lives in shell.css) and `.bp-explore-stage` each establish their own stacking
- * context above it so paint order never depends on DOM order vs. the canvas. Ink-fixed regardless
- * of [data-theme] for the canvas plate itself (packages/ui/src/styles/base.css's --bp-fixed-*
- * tokens) — the map is a brand-fixed surface, not a light/dark variant; floating chrome panels
- * here use the theme-relative surface tokens instead, so they read as ordinary elevated cards in
- * whichever theme the reader has picked, glassy enough that the canvas stays perceptible beneath.
+ * context above it so paint order never depends on DOM order vs. the canvas. The MapLibre style
+ * plate follows light/dark via `colorScheme`; floating chrome uses theme-relative surface tokens
+ * so instruments stay readable in either mode while the canvas stays perceptible beneath.
  */
 
 .bp-map-surface {
@@ -19,7 +17,12 @@
   inset: 0;
   z-index: 0;
   height: 100dvh;
-  background: var(--bp-fixed-ink);
+  /* Pre-style-load flash — dark ocean by default; light theme softens to paper sand. */
+  background: #080606;
+}
+
+[data-theme='light'] .bp-map-stage {
+  background: #e8e0d2;
 }
 
 /* MapLibre's own container (MapStage.tsx's `containerRef`) — never the plate above. MapLibre
@@ -39,8 +42,8 @@
 
 .bp-map-stage .maplibregl-ctrl-group {
   border-radius: var(--bp-radius-full);
-  background: color-mix(in srgb, var(--bp-fixed-ink) 84%, transparent);
-  border: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
+  background: color-mix(in srgb, var(--bp-surface) 88%, transparent);
+  border: var(--bp-border-width) solid var(--bp-border);
   box-shadow: none;
   overflow: hidden;
 }
@@ -51,17 +54,24 @@
 }
 
 .bp-map-stage .maplibregl-ctrl-group button + button {
-  border-top: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
+  border-top: var(--bp-border-width) solid var(--bp-border);
 }
 
-/* Recolor the +/− glyphs (MapLibre draws them as background-image SVGs) —
-   paper strokes on the ink pill. */
+/* Recolor the +/− glyphs — paper on dark, ink on light. */
 .bp-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 .bp-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+[data-theme='light'] .bp-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+[data-theme='light'] .bp-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 @media (max-width: 47.9375rem) {
@@ -126,10 +136,6 @@
 .bp-explore-stage {
   position: relative;
   z-index: 1;
-  /* Re-declared INSIDE the data-theme="dark" stamp: body's own `color:
-     var(--bp-ink)` resolves at body scope (reader theme) and inherits as a
-     concrete value — without this line, unstyled text in the cockpit would
-     arrive ink-on-ink in light theme. */
   color: var(--bp-ink);
 }
 
@@ -143,10 +149,7 @@
   transform: translateX(-50%);
 }
 
-/* Instruments over the plate: ink glass, island language (the stage stamps
-   data-theme="dark" so every token inside resolves to the dark set — the
-   cockpit is brand-fixed, not reader-themed). Compact by direction (owner
-   2026-07-18: the canvas is the experience; these are instruments on it). */
+/* Instruments follow the reader theme — glassy surface over the map plate. */
 .bp-explore-stage__filters {
   position: fixed;
   top: calc(var(--bp-island-clearance) + var(--bp-space-2));
@@ -158,10 +161,10 @@
   max-height: calc(100svh - var(--bp-island-clearance) - var(--bp-space-8));
   padding: var(--bp-space-3);
   overflow-y: auto;
-  border: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
+  border: var(--bp-border-width) solid var(--bp-border);
   /* Instruments read radius-md — radius-lg is reserved for sheets/dialogs. */
   border-radius: var(--bp-radius-md);
-  background: color-mix(in srgb, var(--bp-fixed-ink) 82%, transparent);
+  background: color-mix(in srgb, var(--bp-surface) 88%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
@@ -216,9 +219,9 @@
   max-height: calc(100svh - var(--bp-island-clearance) - var(--bp-space-8));
   padding: var(--bp-space-4);
   overflow-y: auto;
-  border: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
+  border: var(--bp-border-width) solid var(--bp-border);
   border-radius: var(--bp-radius-md);
-  background: color-mix(in srgb, var(--bp-fixed-ink) 82%, transparent);
+  background: color-mix(in srgb, var(--bp-surface) 88%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
@@ -256,10 +259,12 @@
   left: var(--bp-space-4);
   z-index: 2;
   width: min(88vw, 20rem);
+  max-height: min(50vh, 28rem);
   padding: var(--bp-space-2) var(--bp-space-3);
-  border: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
+  overflow-y: auto;
+  border: var(--bp-border-width) solid var(--bp-border);
   border-radius: var(--bp-radius-md);
-  background: color-mix(in srgb, var(--bp-fixed-ink) 82%, transparent);
+  background: color-mix(in srgb, var(--bp-surface) 88%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
 }

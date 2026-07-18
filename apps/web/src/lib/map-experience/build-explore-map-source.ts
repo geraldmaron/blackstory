@@ -23,6 +23,7 @@ import {
 import type { PublicClaimView, PublicEntityView } from '../../data/public-seed';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
+import { mapToneFromTopics } from './kind-encoding';
 
 export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
 
@@ -52,6 +53,8 @@ export type ExploreMapFeatureProperties = {
   readonly evidenceCount: number;
   readonly confidenceTier: ConfidenceTier;
   readonly topicTags: readonly string[];
+  /** Semantic tone override from topics (massacre / plantation / epicenter). */
+  readonly mapTone?: string;
   readonly stateFips?: string;
   readonly statePostalCode?: string;
   readonly stateName?: string;
@@ -180,6 +183,7 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
   const radius = resolveDisplayRadiusMeters(tier, {
     ...(feature.properties.statePostalCode ? { statePostalCode: feature.properties.statePostalCode } : {}),
   });
+  const mapTone = mapToneFromTopics(entity.topicTags);
 
   return {
     type: 'Feature',
@@ -200,6 +204,7 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
       evidenceCount: entity.claims.length,
       confidenceTier: highestConfidence(entity.claims),
       topicTags: entity.topicTags,
+      ...(mapTone !== undefined ? { mapTone } : {}),
       ...(feature.properties.stateFips ? { stateFips: feature.properties.stateFips } : {}),
       ...(feature.properties.statePostalCode ? { statePostalCode: feature.properties.statePostalCode } : {}),
       ...(feature.properties.stateName ? { stateName: feature.properties.stateName } : {}),

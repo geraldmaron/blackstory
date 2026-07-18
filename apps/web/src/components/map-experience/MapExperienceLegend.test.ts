@@ -8,7 +8,10 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { MapExperienceLegend, type MapExperienceLegendProps } from './MapExperienceLegend';
-import { KIND_ENCODING_ENTRIES } from '../../lib/map-experience/kind-encoding';
+import {
+  KIND_ENCODING_ENTRIES,
+  SEMANTIC_TONE_ENTRIES,
+} from '../../lib/map-experience/kind-encoding';
 
 test('explains points, clusters, the density layer, and confidence glyphs in words', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
@@ -17,18 +20,20 @@ test('explains points, clusters, the density layer, and confidence glyphs in wor
   assert.match(html, /presence, not incidents/);
   assert.match(html, /High/);
   assert.match(html, /medium/);
-  assert.match(html, /low confidence/);
+  assert.match(html, /low \(orange\)/);
+  assert.match(html, /Streets/);
 });
 
-test('states plainly that color marks kind only (the dignity rule), in words', () => {
+test('states that color marks kind and historical tones, in words', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  assert.match(html, /Color marks the kind of place or record only/);
+  assert.match(html, /Color marks the kind of place or record/);
+  assert.match(html, /Historical tones/);
 });
 
-test('lists every live kind with its label and glyph name in words, not color alone', () => {
+test('lists every kind and semantic tone with its label and glyph name in words', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  for (const [, entry] of KIND_ENCODING_ENTRIES) {
-    assert.match(html, new RegExp(entry.label));
+  for (const [, entry] of [...KIND_ENCODING_ENTRIES, ...SEMANTIC_TONE_ENTRIES]) {
+    assert.match(html, new RegExp(entry.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
     assert.match(html, new RegExp(`\\(${entry.glyph}\\)`));
   }
 });
@@ -66,5 +71,5 @@ test('defaultCollapsed renders the disclosure closed', () => {
 test('kind swatches and confidence glyphs are aria-hidden (the accessible content is the adjacent text)', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
   const glyphSwatchCount = (html.match(/class="bp-legend-glyph[^"]*"[^>]*aria-hidden="true"/g) ?? []).length;
-  assert.equal(glyphSwatchCount, KIND_ENCODING_ENTRIES.length);
+  assert.equal(glyphSwatchCount, KIND_ENCODING_ENTRIES.length + SEMANTIC_TONE_ENTRIES.length);
 });

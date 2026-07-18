@@ -13,8 +13,17 @@ import {
   DENSITY_TIER_FILL,
   DIGNITY_PALETTE,
   EXPLORE_CLUSTER_CONFIG,
+  OPENFREEMAP_GLYPHS_URL,
+  OPENFREEMAP_SOURCE_ID,
+  OPENFREEMAP_TILE_SOURCE_URL,
+  plateForScheme,
+  type MapColorScheme,
 } from '../../lib/map-experience/dignity-style';
-import { KIND_ENCODING_ENTRIES, DEFAULT_KIND_ENCODING } from '../../lib/map-experience/kind-encoding';
+import {
+  KIND_ENCODING_ENTRIES,
+  DEFAULT_KIND_ENCODING,
+  MAP_SEMANTIC_TONE_ENCODING,
+} from '../../lib/map-experience/kind-encoding';
 import {
   markerHaloRadiusExpression,
   markerRadiusExpression,
@@ -135,7 +144,17 @@ function kindMatchExpression(
 }
 
 function kindColorExpression(): ExpressionSpecification {
-  return kindMatchExpression((entry) => entry.shade, DEFAULT_KIND_ENCODING.shade);
+  const semanticCases = Object.entries(MAP_SEMANTIC_TONE_ENCODING).flatMap(([tone, entry]) => [
+    tone,
+    entry.shade,
+  ]);
+  const kindCases = KIND_ENCODING_ENTRIES.flatMap(([kind, entry]) => [kind, entry.shade]);
+  return [
+    'case',
+    ['has', 'mapTone'],
+    ['match', ['get', 'mapTone'], ...semanticCases, DEFAULT_KIND_ENCODING.shade],
+    ['match', ['get', 'kind'], ...kindCases, DEFAULT_KIND_ENCODING.shade],
+  ] as unknown as ExpressionSpecification;
 }
 
 function kindFillOpacityExpression(): ExpressionSpecification {
@@ -152,10 +171,11 @@ function kindStrokeWidthExpression(): ExpressionSpecification {
   );
 }
 
-function kindStrokeColorExpression(): ExpressionSpecification {
+function kindStrokeColorExpression(rimColor: string): ExpressionSpecification {
   return kindMatchExpression(
-    (entry) => glyphSignatureFor(entry.glyph).strokeColor,
-    DEFAULT_GLYPH_PAINT_SIGNATURE.strokeColor,
+    (entry) =>
+      entry.glyph === 'ring' ? DIGNITY_PALETTE.kindInstitutionStroke : rimColor,
+    rimColor,
   );
 }
 
@@ -164,6 +184,8 @@ export type BuildExploreMapStyleInput = {
   readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
   readonly densityLayerEnabled: boolean;
   readonly historyEdgesEnabled?: boolean;
+  /** Site theme — map plate and street ink follow light/dark. */
+  readonly colorScheme?: MapColorScheme;
 };
 
 /**
@@ -175,10 +197,18 @@ export type BuildExploreMapStyleInput = {
  * "every cluster decomposes to named entities within two interactions."
  */
 export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpecification {
+  const plate = plateForScheme(input.colorScheme ?? 'dark');
   return {
     version: 8,
     name: 'Blap — Explore',
+    glyphs: OPENFREEMAP_GLYPHS_URL,
     sources: {
+      [OPENFREEMAP_SOURCE_ID]: {
+        type: 'vector',
+        url: OPENFREEMAP_TILE_SOURCE_URL,
+        attribution:
+          '<a href="https://openfreemap.org" target="_blank" rel="noreferrer">OpenFreeMap</a> · <a href="https://www.openmaptiles.org/" target="_blank" rel="noreferrer">OpenMapTiles</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
+      },
       [EXPLORE_STATE_DENSITY_SOURCE_ID]: {
         type: 'geojson',
         // Empty until ExploreMapCanvas fetches `/geo/us-states-20m.geojson` and joins density.
@@ -217,9 +247,72 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
       {
         id: 'background',
         type: 'background',
-        // Ocean/unmapped world sits below the landmass fills — see
-        // DIGNITY_PALETTE.ocean's doc comment.
-        paint: { 'background-color': DIGNITY_PALETTE.ocean },
+        paint: { 'background-color': plate.ocean },
+      },
+      {
+        id: 'explore-street-casing',
+        type: 'line',
+        source: OPENFREEMAP_SOURCE_ID,
+        'source-layer': 'transportation',
+        minzoom: 8,
+        filter: ['all', ['!=', ['get', 'class'], 'ferry'], ['!=', ['get', 'brunnel'], 'tunnel']],
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': plate.streetCasing,
+          'line-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            8,
+            0.6,
+            12,
+            2.5,
+            14,
+            5,
+          ] as unknown as ExpressionSpecification,
+        },
+      },
+      {
+        id: 'explore-street-fill',
+        type: 'line',
+        source: OPENFREEMAP_SOURCE_ID,
+        'source-layer': 'transportation',
+        minzoom: 8,
+        filter: ['all', ['!=', ['get', 'class'], 'ferry'], ['!=', ['get', 'brunnel'], 'tunnel']],
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': plate.street,
+          'line-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            8,
+            0.35,
+            12,
+            1.4,
+            14,
+            3,
+          ] as unknown as ExpressionSpecification,
+        },
+      },
+      {
+        id: 'explore-street-label',
+        type: 'symbol',
+        source: OPENFREEMAP_SOURCE_ID,
+        'source-layer': 'transportation_name',
+        minzoom: 11,
+        layout: {
+          'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': 11,
+          'symbol-placement': 'line',
+          'text-max-angle': 30,
+        },
+        paint: {
+          'text-color': plate.streetLabel,
+          'text-halo-color': plate.ocean,
+          'text-halo-width': 1,
+        },
       },
       {
         id: EXPLORE_STATE_DENSITY_LAYER_ID,
@@ -238,9 +331,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
                 DENSITY_TIER_FILL.emerging,
                 'documented',
                 DENSITY_TIER_FILL.documented,
-                DIGNITY_PALETTE.densityUnknownFill,
+                plate.densityUnknown,
               ]
-            : DIGNITY_PALETTE.densityDisabledFill,
+            : plate.densityDisabled,
           'fill-opacity': 1,
         },
       },
@@ -256,7 +349,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_COUNTY_LINES_SOURCE_ID,
         minzoom: COUNTY_LINES_MIN_ZOOM,
         paint: {
-          'line-color': DIGNITY_PALETTE.selected,
+          'line-color': plate.selected,
           'line-width': [
             'interpolate',
             ['linear'],
@@ -376,7 +469,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'circle-color': kindColorExpression(),
           'circle-opacity': kindFillOpacityExpression(),
           'circle-stroke-width': kindStrokeWidthExpression(),
-          'circle-stroke-color': kindStrokeColorExpression(),
+          'circle-stroke-color': kindStrokeColorExpression(plate.selected),
         },
       },
       {
@@ -412,15 +505,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           // shouldn't blot out the boundary lines beneath them either.
           'circle-opacity': 0.82,
           'circle-stroke-width': 3,
-          'circle-stroke-color': DIGNITY_PALETTE.selected,
+          'circle-stroke-color': plate.selected,
         },
       },
       {
-        // Cluster count label. No `glyphs` URL is configured on this style (same honest gap as
-        // `dark-archive-style.ts`'s demo style no self-hosted font/sprite server wired up yet,
-        // see ADR-013 "known gaps"), so this renders as a silent no-op today rather than visible
-        // text; the cluster's real name-bearing content is never gated on it the accessible
-        // list and each point's own narrative card carry that information regardless.
+        // Cluster count label — glyphs now supplied via OpenFreeMap fonts.
         id: EXPLORE_CLUSTER_COUNT_LAYER_ID,
         type: 'symbol',
         source: EXPLORE_ENTITIES_SOURCE_ID,
@@ -430,7 +519,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'text-size': 12,
           'text-font': ['Noto Sans Regular'],
         },
-        paint: { 'text-color': DIGNITY_PALETTE.clusterText },
+        paint: { 'text-color': plate.clusterText },
       },
     ],
   };
