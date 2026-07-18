@@ -15,7 +15,7 @@
     "@black-book/domain": "workspace:*",
     "@black-book/operator-cli": "workspace:*",
     "@black-book/ui": "workspace:*",
-    "next": "^15.4.2",
+    "next": "^16.2.10",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
