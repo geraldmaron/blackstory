@@ -9,7 +9,7 @@ import {
   loadProductConstitution,
   type ClaimClass,
   type ProductConstitution,
-} from '@black-book/schemas';
+} from '@blap/schemas';
 import {
   claimClassThreshold,
   isClaimPublished,

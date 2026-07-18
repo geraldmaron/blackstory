@@ -34,8 +34,8 @@ function ready to be called the moment that pipeline lands.
 2. Call, once per release, in TypeScript:
 
    ```ts
-   import { buildMapSource } from '@black-book/domain';
-   import { redactLocationForPublic } from '@black-book/security';
+   import { buildMapSource } from '@blap/domain';
+   import { redactLocationForPublic } from '@blap/security';
 
    const mapSource = buildMapSource({
      releaseId,

@@ -1,7 +1,7 @@
 /**
  * Wires a `EntitySensitivity` record into the `SensitivityContextBanner` component
  * contract resolving the conduct-based class label and the sensitive-content non-endorsement
- * disclaimer copy from `@black-book/domain`'s versioned registry, exactly as that component's own
+ * disclaimer copy from `@blap/domain`'s versioned registry, exactly as that component's own
  * "real caller" integration-point doc describes. Renders unconditionally additive markup
  * alongside the entity's normal content (include-with-context, never suppression) per.
  */
@@ -12,7 +12,7 @@ import {
   SENSITIVITY_CLASS_PRESENTATION_LABELS,
   type EntityKind,
   type EntitySensitivity,
-} from '@black-book/domain';
+} from '@blap/domain';
 import { SensitivityContextBanner } from '../SensitivityContextBanner';
 
 export type EntitySensitivityBannerProps = {

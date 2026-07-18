@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-16  
 **Workspace:** `/Users/geralddagher/Developer/Projects/black-book`  
-**Source beads:** Black Book Web Application Execution Beads (PDF)  
+**Source beads:** Blap Web Application Execution Beads (PDF)  
 **Acceptance status:** **done** — mapping + gaps + bead adjustments complete; bootstrap/test/build/typecheck verified exit 0 on 2026-07-16
 
 ---
@@ -36,8 +36,8 @@
 | Area | Reuse? | Notes |
 |------|--------|-------|
 | Monorepo layout + scripts | Yes (as skeleton) | Matches target map; keep and complete under BB-006 |
-| `@black-book/config` | Minimal | `parseNodeEnv`, package-name zod schema |
-| `@black-book/domain` | Minimal | `asEntityId`, `treatAsLiving` (invariant seed) |
+| `@blap/config` | Minimal | `parseNodeEnv`, package-name zod schema |
+| `@blap/domain` | Minimal | `asEntityId`, `treatAsLiving` (invariant seed) |
 | API / worker health stubs | Smoke only | Useful for CI wiring (BB-008), not product behavior |
 | Next.js pages | Placeholder | Replace under BB-007 / BB-048 |
 | Firebase / GCP / GitHub | None | Placeholders and stubs only |
@@ -116,10 +116,10 @@ No deploy command should be claimed until those beads land and are verified.
 ### Per-app (after install)
 
 ```bash
-pnpm --filter @black-book/web dev          # :3000
-pnpm --filter @black-book/admin dev        # :3001
-pnpm --filter @black-book/api-public test
-pnpm --filter @black-book/api-public build
+pnpm --filter @blap/web dev          # :3000
+pnpm --filter @blap/admin dev        # :3001
+pnpm --filter @blap/api-public test
+pnpm --filter @blap/api-public build
 ```
 
 ---
@@ -128,7 +128,7 @@ pnpm --filter @black-book/api-public build
 
 | Integration | Status | Evidence |
 |-------------|--------|----------|
-| Firebase project | **Absent** | No `firebase.json`, `.firebaserc`, `apphosting.yaml`; `infra/firebase/README.md` states not linked; `@black-book/firebase` is a name stub only |
+| Firebase project | **Absent** | No `firebase.json`, `.firebaserc`, `apphosting.yaml`; `infra/firebase/README.md` states not linked; `@blap/firebase` is a name stub only |
 | Firebase emulators | **Absent** | No emulator config; `.gitignore` reserves `.firebase/` for future |
 | GitHub remote | **Absent** | `git remote -v` empty; no commits |
 | `.github/workflows` | **Absent** | Stub only at `infra/github/workflows/stub.yml` (dispatch noop) — must move/link under `.github/` in BB-008/009 |

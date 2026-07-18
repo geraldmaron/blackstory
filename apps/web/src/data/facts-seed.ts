@@ -20,7 +20,7 @@ import {
   asFactId,
   buildFactSearchIndexDocs,
   type FactRecord,
-} from '@black-book/domain';
+} from '@blap/domain';
 
 export const FACTS_SEED_RELEASE_ID = 'seed-release-2026-07-17';
 

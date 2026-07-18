@@ -3,14 +3,14 @@
  * Hydrates 1-hop related neighbor stubs and composes capped 2-hop continue-learning.
  */
 
-import type { PublicSearchIndexDoc } from '@black-book/domain';
+import type { PublicSearchIndexDoc } from '@blap/domain';
 import {
   buildPublicSearchIndexDocs,
   buildRelatedNeighborStubs,
   composeContinueLearningStubs,
   type NeighborLookup,
   type SearchableEntityRecord,
-} from '@black-book/domain';
+} from '@blap/domain';
 import {
   getPublicEntity,
   listPublicEntities,

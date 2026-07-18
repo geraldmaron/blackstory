@@ -5,8 +5,8 @@
  * shared domain vocabulary (`FACT_CONFIDENCE_DEFINITIONS`), not a numeric score.
  */
 import React from 'react';
-import { Confidence } from '@black-book/ui';
-import type { FactRecord } from '@black-book/domain';
+import { Confidence } from '@blap/ui';
+import type { FactRecord } from '@blap/domain';
 import { confidenceDefinition, humanizeToken, mapConfidenceToUiLevel } from './format';
 
 export type FactConfidencePanelProps = {
@@ -19,22 +19,22 @@ export function FactConfidencePanel({ fact }: FactConfidencePanelProps) {
 
   return (
     <section aria-labelledby="fact-confidence-heading">
-      <p className="bb-section__kicker">Evidence grade</p>
-      <h2 className="bb-section__title" id="fact-confidence-heading">
+      <p className="bp-section__kicker">Evidence grade</p>
+      <h2 className="bp-section__title" id="fact-confidence-heading">
         Confidence
       </h2>
-      <div style={{ marginTop: 'var(--bb-space-3)' }}>
+      <div style={{ marginTop: 'var(--bp-space-3)' }}>
         <Confidence level={level} label={label} />
-        <p className="bb-sans" style={{ margin: 'var(--bb-space-3) 0 0 0', color: 'var(--bb-ink-muted)' }}>
+        <p className="bp-sans" style={{ margin: 'var(--bp-space-3) 0 0 0', color: 'var(--bp-ink-muted)' }}>
           {confidenceDefinition(fact.confidence)}
         </p>
         {fact.confidenceNote ? (
-          <p className="bb-sans" style={{ margin: 'var(--bb-space-2) 0 0 0' }}>
+          <p className="bp-sans" style={{ margin: 'var(--bp-space-2) 0 0 0' }}>
             <strong>Nuance:</strong> {fact.confidenceNote}
           </p>
         ) : null}
-        <p className="bb-sans" style={{ margin: 'var(--bb-space-2) 0 0 0', color: 'var(--bb-ink-muted)' }}>
-          Workflow status (<span className="bb-mono">{fact.status}</span>) and evidence grade are independent
+        <p className="bp-sans" style={{ margin: 'var(--bp-space-2) 0 0 0', color: 'var(--bp-ink-muted)' }}>
+          Workflow status (<span className="bp-mono">{fact.status}</span>) and evidence grade are independent
           axes — a contested grade can still be published when the dispute is disclosed.
         </p>
       </div>

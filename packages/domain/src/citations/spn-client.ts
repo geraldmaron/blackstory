@@ -8,7 +8,7 @@
  * client lands later, merging the two (retiring whichever is thinner) is a clean follow-up.
  *
  * Like `link-health.ts`, this module performs no network I/O itself and cannot import
- * `@black-book/security` (circular dependency). `SpnFetchResult` is the same structural port
+ * `@blap/security` (circular dependency). `SpnFetchResult` is the same structural port
  * shape as `LinkCheckFetchResult`; the real POST to `https://web.archive.org/save/<url>` through
  * safe-fetch policy is wired in `packages/config/src/scheduled-jobs/jobs/citation-link-health-sweep.ts`.
  */

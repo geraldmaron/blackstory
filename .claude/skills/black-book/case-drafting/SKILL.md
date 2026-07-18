@@ -12,11 +12,11 @@ every other proposal uses.
 ## Invoke
 
 **Evaluation is read-only and pure** — call the real BB-044 functions directly from
-`@black-book/domain` against the case record you're looking at (fetched via the admin console
+`@blap/domain` against the case record you're looking at (fetched via the admin console
 or a direct Firestore read of `researchCases/{caseId}` — this package doesn't wrap that read):
 
 ```ts
-import { evaluateEvidenceChecklist, buildResearchCasePreview } from '@black-book/domain';
+import { evaluateEvidenceChecklist, buildResearchCasePreview } from '@blap/domain';
 
 const evaluation = evaluateEvidenceChecklist(caseRecord.checklist);
 // evaluation.meetsMinimumRecord, evaluation.missingMinimum, evaluation.level

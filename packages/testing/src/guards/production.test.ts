@@ -31,7 +31,7 @@ test('cloud database URLs are rejected', () => {
 });
 
 test('production project ids are detected', () => {
-  assert.equal(looksLikeProductionProjectId('demo-black-book'), false);
+  assert.equal(looksLikeProductionProjectId('demo-blap'), false);
   assert.equal(looksLikeProductionProjectId('black-book-efaaf'), true);
   assert.equal(looksLikeProductionProjectId('black-book-prod'), true);
   assert.equal(looksLikeProductionProjectId('my-production-app'), true);
@@ -57,7 +57,7 @@ test('local demo environment passes the production guard', () => {
   assert.doesNotThrow(() =>
     assertTestsCannotAccessProduction({
       NODE_ENV: 'test',
-      FIREBASE_PROJECT_ID: 'demo-black-book',
+      FIREBASE_PROJECT_ID: 'demo-blap',
       DATABASE_URL: 'postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook',
       FIRESTORE_EMULATOR_HOST: '127.0.0.1:8080',
     }),

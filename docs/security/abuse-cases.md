@@ -1,4 +1,4 @@
-# Black Book — Abuse-Case Corpus (BB-004)
+# Blap — Abuse-Case Corpus (BB-004)
 
 > Testable abuse scenarios mapped to threats, implementation beads, and automation status.  
 > Source of truth for threat controls: [`threat-corpus.json`](./threat-corpus.json) · Narrative: [`threat-model.md`](./threat-model.md).
@@ -16,7 +16,7 @@
 | **Pass criteria** | Observable success condition |
 
 Run the living checklist: [`tests/checklist.md`](./tests/checklist.md).  
-Corpus completeness is enforced by `@black-book/testing` (`pnpm --filter @black-book/testing test`).
+Corpus completeness is enforced by `@blap/testing` (`pnpm --filter @blap/testing test`).
 
 ---
 

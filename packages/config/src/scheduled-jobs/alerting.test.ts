@@ -6,7 +6,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { DEFAULT_ALERT_POLICIES } from '@black-book/observability';
+import { DEFAULT_ALERT_POLICIES } from '@blap/observability';
 import { buildBudgetExceededAlert, buildJobRunAlerts, buildMissedRunAlert } from './alerting.ts';
 import { evaluateJobBudget, evaluateMissedRuns } from './health.ts';
 import { completeJobRun, startJobRun } from './run-record.ts';

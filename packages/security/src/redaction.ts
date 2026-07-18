@@ -6,10 +6,10 @@
  * before publication and scrubs protected values (residential addresses, exact
  * coordinates) out of any serialized payload public projections, search index
  * documents, logs, error telemetry, and exports. All rules derive from the product
- * constitution (@black-book/schemas); nothing here weakens those rules.
+ * constitution (@blap/schemas); nothing here weakens those rules.
  */
-import { evaluatePublicPrecision, loadProductConstitution } from '@black-book/schemas';
-import { treatAsLiving, type LivingStatus } from '@black-book/domain';
+import { evaluatePublicPrecision, loadProductConstitution } from '@blap/schemas';
+import { treatAsLiving, type LivingStatus } from '@blap/domain';
 import {
   isResidentialPrecision,
   type PrecisionReductionReason,

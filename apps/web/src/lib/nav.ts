@@ -1,5 +1,5 @@
 /**
- * Navigation data for the public Black Book application shell.
+ * Navigation data for the public Blap application shell.
  *
  * IA per the v3 shell contract: five routes stay in the always-visible
  * primary nav; the rest live under the "More" disclosure (desktop nav +

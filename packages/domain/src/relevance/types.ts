@@ -2,7 +2,7 @@
  * Deterministic relevance assessment types.
  * Composite scores and feature values are private research metadata never public numeric output.
  */
-import type { RelevanceDecision } from '@black-book/schemas';
+import type { RelevanceDecision } from '@blap/schemas';
 import type { DiscoveryCandidateRecord } from '../discovery/types.js';
 
 export const RELEVANCE_ASSESSMENT_SCHEMA_VERSION = 'relevance-assessment.v1' as const;

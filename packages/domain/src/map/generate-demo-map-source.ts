@@ -9,12 +9,12 @@
  * projections — build the source once, write an immutable artifact, let the app read it
  * statically (ADR-008 bounded/static-first doctrine).
  *
- * Run with: pnpm --filter @black-book/domain exec tsx
+ * Run with: pnpm --filter @blap/domain exec tsx
  * src/map/generate-demo-map-source.ts
  */
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { redactLocationForPublic } from '@black-book/security';
+import { redactLocationForPublic } from '@blap/security';
 import { buildMapSource } from './map-source.js';
 import { MAP_SOURCE_DEMO_FIXTURES } from './fixtures.js';
 

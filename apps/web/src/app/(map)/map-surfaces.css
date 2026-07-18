@@ -1,31 +1,31 @@
 /**
  * The persistent map canvas plate and the floating chrome contract both surfaces (`/`, `/explore`)
- * render over it (BB-098, ADR-017 "Route-group layout owns the canvas"). `.bb-map-stage`
- * (`MapStage.tsx`'s sole canvas mount) is a fixed, full-viewport plate; `.bb-hero-stage` (base
- * panel styling lives in shell.css) and `.bb-explore-stage` each establish their own stacking
+ * render over it (BB-098, ADR-017 "Route-group layout owns the canvas"). `.bp-map-stage`
+ * (`MapStage.tsx`'s sole canvas mount) is a fixed, full-viewport plate; `.bp-hero-stage` (base
+ * panel styling lives in shell.css) and `.bp-explore-stage` each establish their own stacking
  * context above it so paint order never depends on DOM order vs. the canvas. Ink-fixed regardless
- * of [data-theme] for the canvas plate itself (packages/ui/src/styles/base.css's --bb-fixed-*
+ * of [data-theme] for the canvas plate itself (packages/ui/src/styles/base.css's --bp-fixed-*
  * tokens) — the map is a brand-fixed surface, not a light/dark variant; floating chrome panels
  * here use the theme-relative surface tokens instead, so they read as ordinary elevated cards in
  * whichever theme the reader has picked, glassy enough that the canvas stays perceptible beneath.
  */
 
-.bb-map-surface {
+.bp-map-surface {
   position: relative;
 }
 
-.bb-map-stage {
+.bp-map-stage {
   position: fixed;
   inset: 0;
   z-index: 0;
   height: 100dvh;
-  background: var(--bb-fixed-ink);
+  background: var(--bp-fixed-ink);
 }
 
 /* MapLibre's own container (MapStage.tsx's `containerRef`) — never the plate above. MapLibre
    stamps `maplibregl-map` (position: relative, from maplibre-gl.css) onto whatever element it's
    given, so that class name must land here, one level in, not on the fixed plate. */
-.bb-map-stage__canvas {
+.bp-map-stage__canvas {
   width: 100%;
   height: 100%;
 }
@@ -35,7 +35,7 @@
    exists only so the marker is clickable/hoverable; it is pulled out of the tab order
    (MapStage.tsx sets tabIndex=-1) because the synchronized result list is this map's accessible
    parity surface. */
-.bb-map-entity-marker {
+.bp-map-entity-marker {
   width: 1.75rem;
   height: 1.75rem;
   padding: 0;
@@ -50,27 +50,27 @@
    plain `<main>` under this route group would be swallowed by the ink plate the moment the
    reader scrolls past the hero. Re-establish paint order and bring the theme canvas along as
    an opaque backdrop. */
-.bb-map-surface main {
+.bp-map-surface main {
   position: relative;
   z-index: 1;
-  background: var(--bb-canvas);
+  background: var(--bp-canvas);
 }
 
 /* —— Hero dissolve (ADR-017 "Transition contract") — token-driven, opacity/translate only, no
    layout thrash. Reduced motion still applies this class (React state is unconditional) but the
    duration collapses to an instant cut via the media query below. ——  */
-.bb-hero-stage--dissolving {
+.bp-hero-stage--dissolving {
   transition:
-    opacity var(--bb-duration-base) var(--bb-easing),
-    transform var(--bb-duration-base) var(--bb-easing);
+    opacity var(--bp-duration-base) var(--bp-easing),
+    transform var(--bp-duration-base) var(--bp-easing);
   opacity: 0;
   transform: translateY(-0.75rem);
   pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bb-hero-stage--dissolving {
-    transition-duration: var(--bb-duration-instant);
+  .bp-hero-stage--dissolving {
+    transition-duration: var(--bp-duration-instant);
     transform: none;
   }
 }
@@ -81,15 +81,15 @@
  * a panel isn't. Mobile-sheet consolidation of these panels is bead black-book-w72's scope, not
  * this one's — the stacked/simplified mobile rules here are a functional floor, not the final
  * polish pass. */
-.bb-explore-stage {
+.bp-explore-stage {
   position: relative;
   z-index: 1;
 }
 
-.bb-explore-stage__notice,
-.bb-explore-stage__seed-notice {
+.bp-explore-stage__notice,
+.bp-explore-stage__seed-notice {
   position: fixed;
-  top: calc(3.5rem + var(--bb-space-3));
+  top: calc(3.5rem + var(--bp-space-3));
   left: 50%;
   z-index: 3;
   width: min(92vw, 34rem);
@@ -98,72 +98,72 @@
 
 /* Compact by direction (owner 2026-07-18: floating chrome must not read bulky — the canvas
    is the experience; these panels are instruments on top of it). */
-.bb-explore-stage__filters {
+.bp-explore-stage__filters {
   position: fixed;
-  top: calc(3.5rem + var(--bb-space-4));
-  left: var(--bb-space-4);
+  top: calc(3.5rem + var(--bp-space-4));
+  left: var(--bp-space-4);
   z-index: 2;
   display: grid;
-  gap: var(--bb-space-2);
+  gap: var(--bp-space-2);
   width: min(88vw, 19rem);
-  max-height: calc(100svh - 3.5rem - var(--bb-space-8));
-  padding: var(--bb-space-3);
+  max-height: calc(100svh - 3.5rem - var(--bp-space-8));
+  padding: var(--bp-space-3);
   overflow-y: auto;
-  border: var(--bb-border-width) solid var(--bb-border);
-  border-radius: var(--bb-radius-lg);
-  background: color-mix(in srgb, var(--bb-surface-raised) 92%, transparent);
+  border: var(--bp-border-width) solid var(--bp-border);
+  border-radius: var(--bp-radius-lg);
+  background: color-mix(in srgb, var(--bp-surface-raised) 92%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
 /* Copper marks the open instrument — an orientation moment (selected filter group), not a
    decorative wash; the closed registers stay muted ink. */
-.bb-explore-stage__filters details[open] > .bb-explore-stage__disclosure-summary,
-.bb-explore-stage__results details[open] > .bb-explore-stage__disclosure-summary {
-  color: var(--bb-accent);
+.bp-explore-stage__filters details[open] > .bp-explore-stage__disclosure-summary,
+.bp-explore-stage__results details[open] > .bp-explore-stage__disclosure-summary {
+  color: var(--bp-accent);
 }
 
-.bb-explore-stage__filters:focus-visible {
-  outline: var(--bb-focus-width) solid var(--bb-focus-ring);
-  outline-offset: var(--bb-focus-offset);
+.bp-explore-stage__filters:focus-visible {
+  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
+  outline-offset: var(--bp-focus-offset);
 }
 
-.bb-explore-stage__disclosure-summary {
+.bp-explore-stage__disclosure-summary {
   cursor: pointer;
-  font-family: var(--bb-font-mono);
+  font-family: var(--bp-font-mono);
   font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--bb-ink-muted);
+  color: var(--bp-ink-muted);
 }
 
-.bb-explore-stage__disclosure-summary:focus-visible {
-  outline: var(--bb-focus-width) solid var(--bb-focus-ring);
-  outline-offset: var(--bb-focus-offset);
+.bp-explore-stage__disclosure-summary:focus-visible {
+  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
+  outline-offset: var(--bp-focus-offset);
 }
 
-.bb-explore-stage__toolbar {
+.bp-explore-stage__toolbar {
   display: grid;
-  gap: var(--bb-space-3);
-  padding-top: var(--bb-space-3);
-  border-top: var(--bb-border-width) solid var(--bb-border);
+  gap: var(--bp-space-3);
+  padding-top: var(--bp-space-3);
+  border-top: var(--bp-border-width) solid var(--bp-border);
 }
 
-.bb-explore-stage__results {
+.bp-explore-stage__results {
   position: fixed;
-  top: calc(3.5rem + var(--bb-space-4));
-  right: var(--bb-space-4);
+  top: calc(3.5rem + var(--bp-space-4));
+  right: var(--bp-space-4);
   z-index: 2;
   display: grid;
-  gap: var(--bb-space-2);
+  gap: var(--bp-space-2);
   width: min(88vw, 21rem);
-  max-height: calc(100svh - 3.5rem - var(--bb-space-8));
-  padding: var(--bb-space-3);
+  max-height: calc(100svh - 3.5rem - var(--bp-space-8));
+  padding: var(--bp-space-3);
   overflow-y: auto;
-  border: var(--bb-border-width) solid var(--bb-border);
-  border-radius: var(--bb-radius-lg);
-  background: color-mix(in srgb, var(--bb-surface-raised) 92%, transparent);
+  border: var(--bp-border-width) solid var(--bp-border);
+  border-radius: var(--bp-radius-lg);
+  background: color-mix(in srgb, var(--bp-surface-raised) 92%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -171,15 +171,15 @@
 /* Result rows tighten INSIDE the floating panel only — the standalone /search page keeps the
    roomier document rhythm. Two-line summary clamp: with a hundred-record release, unclamped
    summaries turn the panel into a wall; the full text lives one click away on the record. */
-.bb-explore-stage__results .bb-result-list__link {
-  padding: var(--bb-space-3) 0;
+.bp-explore-stage__results .bp-result-list__link {
+  padding: var(--bp-space-3) 0;
 }
 
-.bb-explore-stage__results .bb-result-list__title {
+.bp-explore-stage__results .bp-result-list__title {
   font-size: 1rem;
 }
 
-.bb-explore-stage__results .bb-result-list__summary {
+.bp-explore-stage__results .bp-result-list__summary {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -187,45 +187,45 @@
   font-size: 0.875rem;
 }
 
-.bb-explore-stage__legend {
+.bp-explore-stage__legend {
   position: fixed;
-  bottom: var(--bb-space-4);
-  left: var(--bb-space-4);
+  bottom: var(--bp-space-4);
+  left: var(--bp-space-4);
   z-index: 2;
   width: min(88vw, 20rem);
-  padding: var(--bb-space-2) var(--bb-space-3);
-  border: var(--bb-border-width) solid var(--bb-border);
-  border-radius: var(--bb-radius-lg);
-  background: color-mix(in srgb, var(--bb-surface-raised) 92%, transparent);
+  padding: var(--bp-space-2) var(--bp-space-3);
+  border: var(--bp-border-width) solid var(--bp-border);
+  border-radius: var(--bp-radius-lg);
+  background: color-mix(in srgb, var(--bp-surface-raised) 92%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
 @media (max-width: 64rem) {
-  .bb-explore-stage__filters,
-  .bb-explore-stage__results {
+  .bp-explore-stage__filters,
+  .bp-explore-stage__results {
     max-height: 40vh;
   }
 
-  .bb-explore-stage__results {
+  .bp-explore-stage__results {
     top: auto;
-    bottom: var(--bb-space-4);
-    right: var(--bb-space-4);
+    bottom: var(--bp-space-4);
+    right: var(--bp-space-4);
   }
 
-  .bb-explore-stage__legend {
+  .bp-explore-stage__legend {
     display: none;
   }
 }
 
 @media (max-width: 39.9375rem) {
-  .bb-explore-stage__filters {
-    left: var(--bb-space-3);
-    width: calc(100vw - var(--bb-space-3) * 2);
+  .bp-explore-stage__filters {
+    left: var(--bp-space-3);
+    width: calc(100vw - var(--bp-space-3) * 2);
   }
 
-  .bb-explore-stage__results {
-    right: var(--bb-space-3);
-    width: calc(100vw - var(--bb-space-3) * 2);
+  .bp-explore-stage__results {
+    right: var(--bp-space-3);
+    width: calc(100vw - var(--bp-space-3) * 2);
   }
 }

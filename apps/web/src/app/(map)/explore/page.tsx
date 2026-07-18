@@ -6,7 +6,7 @@
  * off-ramps, legend — over the persisted canvas. Filters use native GET navigation (no-JS safe);
  * the client island adds the interactive camera, cluster drill-down, and viewport URL sync.
  */
-import { FilterBar } from '@black-book/ui';
+import { FilterBar } from '@blap/ui';
 import { SeedDataNotice } from '../../../components/SeedDataNotice';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
 import { getSharedPublicEntities } from '../shared-map-data';
@@ -32,13 +32,13 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
   return (
     <>
       {view.dataSource !== 'live' ? (
-        <div className="bb-explore-stage__seed-notice">
+        <div className="bp-explore-stage__seed-notice">
           <SeedDataNotice compact />
         </div>
       ) : null}
 
       <noscript>
-        <div className="bb-explore__noscript bb-container bb-page">
+        <div className="bp-explore__noscript bp-container bp-page">
           <FilterBar
             method="get"
             action="/explore"
@@ -78,7 +78,7 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
               },
             ]}
           />
-          <p className="bb-sans bb-explore__results-count" id="explore-results-heading-njs">
+          <p className="bp-sans bp-explore__results-count" id="explore-results-heading-njs">
             {view.totalMatched} documented record{view.totalMatched === 1 ? '' : 's'} in view
           </p>
           <SynchronizedResultList features={view.filteredFeatures} labelledBy="explore-results-heading-njs" />

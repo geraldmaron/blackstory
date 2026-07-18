@@ -18,13 +18,13 @@
 |------|---------------|--------------------------------|
 | GCP/Firebase projects | `black-book-efaaf` (project number `332234323945`) is the only live project; Hosting site `black-book-efaaf.web.app` exists | `blackbook-prod` (= `black-book-efaaf`, retained — see ADR-012), `blackbook-staging` (new), `blackbook-internal` (new) |
 | Firebase Hosting | `black-book-efaaf.web.app` exists | App content/release state is outside this design |
-| Firebase apps | **Black Book Web** `1:332234323945:web:17be349ebc9c029b3bfd78`; **Black Book Admin** `1:332234323945:web:e1b31c78e32d95943bfd78` | Admin app re-registered under `blackbook-internal` Firebase Auth config at migration time |
+| Firebase apps | **Blap Web** `1:332234323945:web:17be349ebc9c029b3bfd78`; **Blap Admin** `1:332234323945:web:e1b31c78e32d95943bfd78` | Admin app re-registered under `blackbook-internal` Firebase Auth config at migration time |
 | App Hosting | Inventory/creation blocked — project not on Blaze; App Hosting API unavailable | `black-book-web-production` in `blackbook-prod`; `black-book-web-staging` in `blackbook-staging` as its own project (not a same-project namespace) |
 | Firestore | Not enabled | `(default)` DB in `blackbook-prod`/`blackbook-staging`; named databases `raw-ingest` and `curated` in `blackbook-internal` (ADR-012) |
 | Workload isolation | One live project, no split yet | Three-project split with one-way promotion IAM asymmetry (ADR-012) |
 
 Every cloud resource in `black-book-efaaf` is production today. `development` means local
-`demo-black-book` emulators and disposable local services — this does not change under ADR-012.
+`demo-blap` emulators and disposable local services — this does not change under ADR-012.
 `staging` and `production-research` are **currently** configuration namespaces inside
 `black-book-efaaf`, per the historical section below; ADR-012 replaces that with real project
 boundaries (`blackbook-staging`, `blackbook-internal`) once BB-079 applies it.
@@ -54,7 +54,7 @@ Source of truth:
 | `blackbook-staging` | Pre-production mirror, synthetic data only, `minInstances: 0` | `(default)`, same shape as prod | mirrors prod bucket names, staging-prefixed | `github-deploy-staging` (optional) |
 | `blackbook-internal` | Research pipeline + admin | Named DBs `raw-ingest`, `curated` (per-DB IAM conditions) | `private-evidence` | `research`, `promotion`, `security`, `admin`, `submissions-puller`, `github-deploy-internal` (optional) |
 
-Local development stays on `demo-black-book` emulators — unaffected by any of the above.
+Local development stays on `demo-blap` emulators — unaffected by any of the above.
 
 ### Admin console correction: Cloud Run + IAP, direct attachment
 
@@ -118,7 +118,7 @@ Test encoding: `infra/gcp/terraform/multi-project/tests/isolation-invariants.tes
 
 ### AC-ISO-1 — Development credentials cannot access production
 
-- Local development/tests use `demo-black-book` emulators (Firestore/Auth/Storage) — unchanged.
+- Local development/tests use `demo-blap` emulators (Firestore/Auth/Storage) — unchanged.
 - **[Target topology]** `blackbook-staging` gives cloud-based pre-production testing a real project
   boundary from `blackbook-prod` for the first time; this criterion is no longer N/A once BB-079
   applies the split (it was N/A under D-013 because there was only one cloud project).
@@ -206,7 +206,7 @@ boundary; the mechanisms above remain in force as defense-in-depth even after th
 This criterion was **N/A as a cloud project-separation claim** under D-013: there was only one cloud
 project and it was production. The safe replacement was operational:
 
-- local development/tests use `demo-black-book` emulators (Firestore/Auth/Storage);
+- local development/tests use `demo-blap` emulators (Firestore/Auth/Storage);
 - preflight checks reject production identifiers/endpoints;
 - any access to `black-book-efaaf` is explicitly production access;
 - `github-deploy` is WIF-only, protected-context only, and has no exported key.
@@ -278,9 +278,9 @@ Terraform is a plan scaffold only; do not apply it blindly to the live project.
    - Decide whether to upgrade to Blaze. App Hosting backend inventory/creation is blocked until the
      project is on Blaze and `firebaseapphosting.googleapis.com` can be enabled.
 2. **Register Firebase apps**
-   - Create one Firebase Web app for `apps/web` (suggested display name `Black Book Web`).
+   - Create one Firebase Web app for `apps/web` (suggested display name `Blap Web`).
    - Create a separate Firebase Web app for `apps/admin` (suggested display name
-     `Black Book Admin`) for Firebase Auth client configuration; do not share admin authorization
+     `Blap Admin`) for Firebase Auth client configuration; do not share admin authorization
      logic with the public app.
    - Record only Firebase's non-secret public web configuration through the approved config path.
      Do not create iOS/Android apps until those clients exist.
@@ -336,7 +336,7 @@ blackbook-research-prod
 ```
 
 ADR-012 rejects reviving `blackbook-dev` as a cloud project (see ADR-012's Rejected Alternatives —
-`demo-black-book` emulators already give zero-cost local development) and instead adopts three
+`demo-blap` emulators already give zero-cost local development) and instead adopts three
 projects: `blackbook-prod` (= retained `black-book-efaaf`), `blackbook-staging`, `blackbook-internal`
 (renamed from `blackbook-research-prod` to also host admin, per ADR-012).
 

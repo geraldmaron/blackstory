@@ -43,7 +43,7 @@ import type {
 } from 'maplibre-gl';
 import type * as MapLibreNamespace from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { brandPalette, darkTheme } from '@black-book/ui';
+import { brandPalette, darkTheme } from '@blap/ui';
 import {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
@@ -94,7 +94,7 @@ const EMPTY_EDGE_COLLECTION: HistoryEdgeLineCollection = { type: 'FeatureCollect
 
 const ARCHIVE_BASE_STYLE: StyleSpecification = {
   version: 8,
-  name: 'Black Book — Archive (US)',
+  name: 'Blap — Archive (US)',
   sources: {},
   layers: [
     {
@@ -178,7 +178,7 @@ function syncCircularMarkers(
 
     const el = document.createElement('button');
     el.type = 'button';
-    el.className = 'bb-map-entity-marker';
+    el.className = 'bp-map-entity-marker';
     el.setAttribute('aria-label', label);
     el.title = label;
     // The map canvas is `aria-hidden` (see `MapStageProvider`'s render) — the synchronized
@@ -714,7 +714,7 @@ export function MapStageProvider({
         mapRef.current = map;
         if (process.env.NODE_ENV !== 'production') {
           // Dev-only escape hatch for in-browser inspection and BB-101 perf traces.
-          (window as unknown as Record<string, unknown>).__bbMapStage = map;
+          (window as unknown as Record<string, unknown>).__bpMapStage = map;
         }
         map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
         map.on('error', (event) => {
@@ -898,7 +898,7 @@ export function MapStageProvider({
 
   return (
     <MapStageContext.Provider value={handle}>
-      {/* The sole persistent canvas element (ADR-017). `.bb-map-stage` is a fixed full-viewport
+      {/* The sole persistent canvas element (ADR-017). `.bp-map-stage` is a fixed full-viewport
           plate behind page chrome (map-surfaces.css); `maplibregl.Map`'s `container` must be a
           separate inner div, never the plate itself — MapLibre stamps its own `maplibregl-map`
           class onto whatever container it's given, and maplibre-gl.css hard-codes
@@ -907,8 +907,8 @@ export function MapStageProvider({
           canvas back in normal document flow. `aria-hidden` on the plate: the synchronized
           result list is this map's accessible-parity surface (see `syncCircularMarkers`'s doc
           comment on marker `tabIndex`), so the canvas itself carries no separate a11y tree. */}
-      <div className="bb-map-stage" aria-hidden="true">
-        <div ref={containerRef} className="bb-map-stage__canvas" />
+      <div className="bp-map-stage" aria-hidden="true">
+        <div ref={containerRef} className="bp-map-stage__canvas" />
       </div>
       {children}
     </MapStageContext.Provider>

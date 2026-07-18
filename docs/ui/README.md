@@ -1,6 +1,6 @@
 # Design system (BB-007 / BB-068 v2 / BB-096 v3)
 
-Shared package: `@black-book/ui` (`packages/ui`). The binding brand source
+Shared package: `@blap/ui` (`packages/ui`). The binding brand source
 is `brand-system/` (3.0.0-final); where this doc and the pack disagree, the
 pack wins (BB-096).
 
@@ -36,11 +36,11 @@ entity contract (summary, tags, related hops, enrichable prose, photo).
 ## Usage
 
 ```tsx
-import '@black-book/ui/styles.css';
-import { Card, Confidence, Notice } from '@black-book/ui';
+import '@blap/ui/styles.css';
+import { Card, Confidence, Notice } from '@blap/ui';
 ```
 
-In Next apps, add `@black-book/ui` to `transpilePackages` and prefer `next/font` variables mapped to `--bb-font-display`, `--bb-font-editorial`, `--bb-font-sans`, and `--bb-font-mono`.
+In Next apps, add `@blap/ui` to `transpilePackages` and prefer `next/font` variables mapped to `--bb-font-display`, `--bb-font-editorial`, `--bb-font-sans`, and `--bb-font-mono`.
 
 ## Accessibility
 
@@ -54,9 +54,9 @@ In Next apps, add `@black-book/ui` to `transpilePackages` and prefer `next/font`
 ## Commands
 
 ```bash
-pnpm --filter @black-book/ui test
-pnpm --filter @black-book/web exec next dev --port 3048
-# or: pnpm --filter @black-book/web dev
+pnpm --filter @blap/ui test
+pnpm --filter @blap/web exec next dev --port 3048
+# or: pnpm --filter @blap/web dev
 # → http://localhost:3048/
 # → http://localhost:3048/design-system
 ```
@@ -83,7 +83,7 @@ Sample entity ids: `ent_seed_place_001`, `ent_seed_school_001`. Data is labeled 
 - Geocoding / nearby discovery (BB-050)
 - Full entity depth + evidence UI (BB-052 / BB-053)
 - Dedicated Storybook/Chromatic if visual regression CI is required later
-- Admin now consumes `@black-book/ui` (transpiled + `.js`->`.ts` webpack
+- Admin now consumes `@blap/ui` (transpiled + `.js`->`.ts` webpack
   resolution, matching web's config) and renders the brand mark on its
   home page; admin doesn't yet load the display/sans font families via
   `next/font` (falls back to the CSS `font-family` string literals) — low

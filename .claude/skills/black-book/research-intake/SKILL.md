@@ -34,11 +34,11 @@ independently tested functions:
 2. `buildCitationPrefill` / `planSelectiveCapture` (same file) — citation metadata from what
    the fetch returned, and a note on where Wayback capture *would* attach (not wired yet).
 3. `prepareLeadIntake` (`packages/operator-cli/src/intake.ts`) — the real BB-029 quarantine
-   intake (`createQuarantinedSubmission`, `@black-book/security`) plus a real BB-044 draft
-   research case (`createResearchCase`, `@black-book/domain`).
+   intake (`createQuarantinedSubmission`, `@blap/security`) plus a real BB-044 draft
+   research case (`createResearchCase`, `@blap/domain`).
 
 If you need the package function directly instead of shelling out (e.g. you're already running
-TypeScript in this session), call `runResearchIntake` from `@black-book/operator-cli` with the
+TypeScript in this session), call `runResearchIntake` from `@blap/operator-cli` with the
 same shape shown above — do not re-fetch the URL yourself or hand-build a quarantine record.
 
 Add `--commit` only after the owner has reviewed the printed result and asked you to actually

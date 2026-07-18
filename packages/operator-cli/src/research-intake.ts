@@ -9,7 +9,7 @@
  * Used by both the `research-intake` CLI command and the admin quick-add route, so the two
  * surfaces the brief asks for (Claude/CLI session, admin console) share one implementation.
  */
-import type { SafeFetchDependencies, SafeFetchResult } from '@black-book/security';
+import type { SafeFetchDependencies, SafeFetchResult } from '@blap/security';
 import {
   buildCitationPrefill,
   createNodeSafeFetchDependencies,

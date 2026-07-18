@@ -1,16 +1,16 @@
 # Brand: the Pinned Page, v3 usage contract (BB-096)
 
-The Black Book signature: a closed book cover forms a custom "B" silhouette,
+The Blap signature: a closed book cover forms a custom "B" silhouette,
 curved page-edge bands are exposed at the spine, and a copper place pin is
 integrated into the lower-left of the cover — **history, pinned to place.**
-The symbol IS the first B in "Black Book"; the visible wordmark text begins
+The symbol IS the first B in "Blap"; the visible wordmark text begins
 "lack Book". From the guide:
 
 > The mark is the first B. The official lockup is artwork. Do not recreate
 > it by typing the full name beside the symbol.
 
 This document is the usage contract for the signature, palette, and type
-system. The **binding source is `brand-system/`** ("Black Book Brand
+system. The **binding source is `brand-system/`** ("Blap Brand
 Identity System 3.0.0-final"): `brand-system/tokens/black-book-brand.css`,
 `brand-system/tokens/black-book-brand-tokens.json`, and
 `brand-system/guide/black-book-brand-guide-final.pdf`. Where this doc (or

@@ -1,7 +1,7 @@
 /**
  * Builds the `/explore` map + list dataset from the active release (seed catalog until live
  * projections are wired — same posture as `../../data/public-seed.ts`). Reuses the
- * redaction-injected `buildMapSource` plus era and precision helpers from `@black-book/domain`.
+ * redaction-injected `buildMapSource` plus era and precision helpers from `@blap/domain`.
  * This module adds no redaction of its own; it only enriches already-redacted map features with
  * fields the map/list UI needs (name, era, one-line story, evidence count, confidence, and
  * precision-radius affordances).
@@ -11,7 +11,7 @@
  * exist, map each record’s resolved jurisdiction bbox into `AreaRecordInput`. Area records must
  * render as polygon geometry, never as a point.
  */
-import { redactLocationForPublic } from '@black-book/security';
+import { redactLocationForPublic } from '@blap/security';
 import {
   buildMapSource,
   type GeoPrecisionTier,
@@ -19,7 +19,7 @@ import {
   type MapPointFeature,
   type MapSourceEntityInput,
   type MapStateAggregate,
-} from '@black-book/domain';
+} from '@blap/domain';
 import type { PublicClaimView, PublicEntityView } from '../../data/public-seed';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';

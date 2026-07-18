@@ -1,5 +1,5 @@
 {
-  "name": "@black-book/security",
+  "name": "@blap/security",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -20,12 +20,12 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "@black-book/domain": "workspace:*",
-    "@black-book/schemas": "workspace:*"
+    "@blap/domain": "workspace:*",
+    "@blap/schemas": "workspace:*"
   },
   "devDependencies": {
-    "@black-book/observability": "workspace:*",
-    "@black-book/typescript-config": "workspace:^",
+    "@blap/observability": "workspace:*",
+    "@blap/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

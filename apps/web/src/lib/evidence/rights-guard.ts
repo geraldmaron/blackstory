@@ -3,12 +3,12 @@
  * source links do not leak private evidence or protected information.
  *
  * Reuses rights-status publication gate (`canPublishWithRights` from
- * `@black-book/domain`) rather than re-implementing excerpt/media publication rules, and
+ * `@blap/domain`) rather than re-implementing excerpt/media publication rules, and
  * additionally withholds any citation link explicitly flagged as resolving to private or
  * protected evidence (e.g. a living-person-sensitive capture, an internal-only source) even when
  * its rights status alone would otherwise permit citation.
  */
-import { canPublishWithRights, type PublicationContentKind } from '@black-book/domain';
+import { canPublishWithRights, type PublicationContentKind } from '@blap/domain';
 import type {
   EvidenceCitationInput,
   EvidenceCitationView,

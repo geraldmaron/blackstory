@@ -12,7 +12,7 @@ void React;
 import type { ThemeName } from '../tokens/colors.js';
 import { cx } from '../utils/cx.js';
 
-const STORAGE_KEY = 'bb-theme';
+const STORAGE_KEY = 'bp-theme';
 
 function readPreferredTheme(): ThemeName {
   if (typeof window === 'undefined') {
@@ -48,7 +48,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   return (
     <button
       type="button"
-      className={cx('bb-theme-toggle', className)}
+      className={cx('bp-theme-toggle', className)}
       onClick={toggle}
       aria-pressed={theme === 'dark'}
     >

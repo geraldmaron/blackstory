@@ -1,12 +1,12 @@
 
 /**
- * Barrel export for the Black Book brand mark (the "Pinned Page" identity).
+ * Barrel export for the Blap brand mark (the "Pinned Page" identity).
  */
 
 export {
-  BlackBookLogo,
-  BlackBookMark,
-  type BlackBookLogoDetail,
-  type BlackBookLogoProps,
-  type BlackBookLogoVariant,
-} from './BlackBookLogo.js';
+  BlapLogo,
+  BlapMark,
+  type BlapLogoDetail,
+  type BlapLogoProps,
+  type BlapLogoVariant,
+} from './BlapLogo.js';

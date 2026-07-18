@@ -8,7 +8,7 @@ import { getPublicEntity, type PublicEntityView } from '../../data/public-seed';
 
 /**
  * Narrow projection shape used by the web mapper. Declared locally so apps/web
- * does not depend on potentially stale `@black-book/firebase` dist `.d.ts` files
+ * does not depend on potentially stale `@blap/firebase` dist `.d.ts` files
  * during typecheck (package exports prefer `types` → `dist`).
  */
 export type PublicProjectionInput = {

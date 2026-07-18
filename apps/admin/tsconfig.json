@@ -1,5 +1,5 @@
 {
-  "extends": "@black-book/typescript-config/nextjs.json",
+  "extends": "@blap/typescript-config/nextjs.json",
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]

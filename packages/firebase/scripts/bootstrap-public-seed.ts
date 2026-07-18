@@ -6,11 +6,11 @@
  * research collections.
  *
  * Requires:
- * BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1
+ * BLAP_FIREBASE_ALLOW_PRODUCTION=1
  * Application Default Credentials with Firestore write access
  *
  * Usage:
- * BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
+ * BLAP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
  * packages/firebase/scripts/bootstrap-public-seed.ts
  */
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
@@ -25,11 +25,11 @@ import {
 } from '../fixtures/firestore-seed.ts';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
-const ALLOW = process.env.BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION === '1';
+const ALLOW = process.env.BLAP_FIREBASE_ALLOW_PRODUCTION === '1';
 const DRY_RUN = process.env.DRY_RUN === '1';
 
 if (!ALLOW) {
-  console.error('Refusing to write: set BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1');
+  console.error('Refusing to write: set BLAP_FIREBASE_ALLOW_PRODUCTION=1');
   process.exit(2);
 }
 

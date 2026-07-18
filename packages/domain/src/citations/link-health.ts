@@ -3,11 +3,11 @@
  * classification of a re-verification fetch into alive redirected drifted dead, plus a
  * retry-before-declaring-dead state machine across scheduled sweeps.
  *
- * `@black-book/domain` cannot import `@black-book/security` (security depends on domain; the
+ * `@blap/domain` cannot import `@blap/security` (security depends on domain; the
  * reverse edge would be a circular workspace dependency) see
  * packages/domain/src/rights/takedown.ts and packages/domain/src/map/map-source.ts for the same
  * port pattern used here. `LinkCheckFetchResult` below is structurally compatible with (a
- * superset of) `SafeFetchResult` from `@black-book/security`'s url-safety fetch policy
+ * superset of) `SafeFetchResult` from `@blap/security`'s url-safety fetch policy
  * (`executeSafeFetch`). The real wiring calling `executeSafeFetch` and adapting its result
  * into this port lives in
  * packages/config/src/scheduled-jobs/jobs/citation-link-health-sweep.ts, the one layer allowed

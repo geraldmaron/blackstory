@@ -20,23 +20,23 @@ export const metadata = {
 
 export default function LocatePage() {
   return (
-    <main className="bb-container bb-page" id="main">
-      <header className="bb-entity-mast">
-        <p className="bb-page__eyebrow">Discover</p>
-        <h1 className="bb-page__title">Find your jurisdiction</h1>
-        <p className="bb-page__lede">
+    <main className="bp-container bp-page" id="main">
+      <header className="bp-entity-mast">
+        <p className="bp-page__eyebrow">Discover</p>
+        <h1 className="bp-page__title">Find your jurisdiction</h1>
+        <p className="bp-page__lede">
           Enter an address, city and state, or ZIP — or use your current location — to find the
           state, county, and city (50 states + D.C. only) it falls within.
         </p>
       </header>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)', gap: 'var(--bb-space-4)' }}>
+      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)', gap: 'var(--bp-space-4)' }}>
         <LocationPrivacyNotice />
         <LocateExperience />
         <noscript>
-          <p className="bb-sans">
+          <p className="bp-sans">
             This page needs JavaScript for location lookup. You can still{' '}
-            <a className="bb-cta bb-cta--ink" href="/search">
+            <a className="bp-cta bp-cta--ink" href="/search">
               search records directly
             </a>
             .

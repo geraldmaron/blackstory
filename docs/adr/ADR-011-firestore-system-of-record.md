@@ -26,7 +26,7 @@ Non-negotiable product invariants still apply: no anonymous canonical writes; pu
 
 1. **Cloud Firestore** is the system of record for structured entities, claims, evidence **metadata**, sources, publication releases, public projections, submissions, audit events, policy refs, and operations documents.
 2. **Firebase Storage / GCS** remains the blob store (evidence binaries, public media, quarantine, exports). Metadata in Firestore points at storage object refs; clients never gain broad storage write via rules.
-3. **Cloud SQL, PostGIS, and SQL Connect are deferred** for the current phase. Artifacts under `infra/database/` and Postgres helpers in `@black-book/data-access` remain in-repo as **parked / non-production** history, not as required CI or deploy blockers.
+3. **Cloud SQL, PostGIS, and SQL Connect are deferred** for the current phase. Artifacts under `infra/database/` and Postgres helpers in `@blap/data-access` remain in-repo as **parked / non-production** history, not as required CI or deploy blockers.
 4. **Geography / nearby discovery (initial):** store `geohash` (and optional prefixes), `lat`, `lng` on public projection location documents; `api-public` performs approved geohash-bounded queries plus server-side radius filtering. No PostGIS requirement for beta.
 5. **Text search (initial):** bounded field/prefix queries over released public projection documents; defer a dedicated search engine until measured need (same spirit as ADR-008, different first store).
 6. **Access control:** Firestore security rules enforce client boundaries; privileged writes use **Admin SDK** from Cloud Run / workers with distinct service accounts. Custom Auth claims separate admin vs research console **reads** where needed; research still cannot publish.

@@ -38,7 +38,7 @@ cp -rf source dest          # NOT: cp -r source dest
 
 ## Brand Language
 
-The binding source is `brand-system/` ("Black Book Brand Identity System 3.0.0-final" — see
+The binding source is `brand-system/` ("Blap Brand Identity System 3.0.0-final" — see
 `brand-system/guide/black-book-brand-guide-final.pdf`). Anything an agent ships that a user can
 see must follow it. Where older docs or code disagree (pure-white canvas, Sora display type,
 zero-radius rule, code-typed wordmark), the pack wins; BB-096 tracks the reconciliation.

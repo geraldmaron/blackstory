@@ -1,7 +1,7 @@
 /**
  * Embedding-vector similarity surface for research-side reuse: candidate recall and
  * near-duplicate detection. Pure math — no Firestore, no I/O. Vectors are computed by
- * `@black-book/firebase`'s embedding pipeline.
+ * `@blap/firebase`'s embedding pipeline.
  *
  * Not wired live: wiring these functions into the live discovery workflow (`workers/research/`)
  * is documented in `docs/adr/ADR-014-vector-search.md`.

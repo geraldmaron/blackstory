@@ -10,7 +10,7 @@
  * 3. Persist returned `researchCase` via the existing research-case create gate.
  */
 import { randomUUID } from 'node:crypto';
-import { createResearchCase, type ResearchCaseRecord } from '@black-book/domain';
+import { createResearchCase, type ResearchCaseRecord } from '@blap/domain';
 import type { CorrectionSubmissionStore } from './store';
 
 export type CorrectionResearchCaseActor = {

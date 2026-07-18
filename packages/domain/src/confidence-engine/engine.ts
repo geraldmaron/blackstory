@@ -7,7 +7,7 @@ import {
   evaluateProceduralLanguage,
   loadProductConstitution,
   type ProductConstitution,
-} from '@black-book/schemas';
+} from '@blap/schemas';
 import {
   calculateClaimConfidence,
   CONFIDENCE_COMPONENT_WEIGHTS,

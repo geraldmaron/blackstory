@@ -19,7 +19,7 @@
  */
 
 import React from 'react';
-import { EmptyState } from '@black-book/ui';
+import { EmptyState } from '@blap/ui';
 import { buildEvidenceCards, mostRecentLastCheckedAt, totalSourceLineageCount } from '../../lib/evidence';
 import type {
   EvidenceClaimInput,
@@ -65,7 +65,7 @@ export function EntityEvidencePanel({
   const resolvedLastCheckedAt = lastCheckedAt ?? mostRecentLastCheckedAt(cards);
 
   return (
-    <div className="bb-stack" aria-labelledby={labelledBy}>
+    <div className="bp-stack" aria-labelledby={labelledBy}>
       <EvidenceMeasurementLegend />
 
       <EvidenceResearchCoverageSummary
@@ -78,7 +78,7 @@ export function EntityEvidencePanel({
       {cards.length === 0 ? (
         <EmptyState title={EVIDENCE_GAP_COPY.claims.title}>{EVIDENCE_GAP_COPY.claims.body}</EmptyState>
       ) : (
-        <div className="bb-stack">
+        <div className="bp-stack">
           {cards.map((card) => (
             <EvidenceCard key={card.id} card={card} />
           ))}

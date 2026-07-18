@@ -8,7 +8,7 @@ import {
   loadProductConstitution,
   type ClaimClass,
   type ProductConstitution,
-} from '@black-book/schemas';
+} from '@blap/schemas';
 import type { ClaimEvidenceLink } from './evidence-link.js';
 import { assertUnitInterval } from './measurements.js';
 

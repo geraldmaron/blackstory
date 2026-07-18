@@ -5,9 +5,9 @@
  * with their input before any interactive control appears.
  */
 import React from 'react';
-import { Notice } from '@black-book/ui';
+import { Notice } from '@blap/ui';
 
-// See `@black-book/ui`'s Notice.tsx/EmptyState.tsx for why this otherwise-unused import stays:
+// See `@blap/ui`'s Notice.tsx/EmptyState.tsx for why this otherwise-unused import stays:
 // it makes this file safe to cross-transpile under a classic JSX runtime (e.g. this app's own
 // test runner), where compiled JSX needs `React` in scope.
 void React;
@@ -15,7 +15,7 @@ void React;
 export function LocationPrivacyNotice() {
   return (
     <Notice tone="warning" title="How this lookup uses your location">
-      <ul className="bb-stack" style={{ gap: 'var(--bb-space-1)', margin: 0, paddingLeft: '1.1em' }}>
+      <ul className="bp-stack" style={{ gap: 'var(--bp-space-1)', margin: 0, paddingLeft: '1.1em' }}>
         <li>
           Using your device&rsquo;s location requires you to press the button below — this page
           never requests it automatically.

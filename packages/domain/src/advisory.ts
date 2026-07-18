@@ -218,7 +218,7 @@ export function assertAdvisoryAbsentFromScoringInput(value: unknown, path = '$')
 }
 
 // ---------------------------------------------------------------------------
-// Compile-time proof enforced by `pnpm --filter @black-book/domain typecheck`, not only by the
+// Compile-time proof enforced by `pnpm --filter @blap/domain typecheck`, not only by the
 // runtime scan above. If a future edit to relevance/types.ts or claims/confidence.ts ever
 // introduces a field name colliding with PlaceAdvisoryRecord's own field names, the object literal
 // below stops satisfying its type and `tsc --noEmit` fails the build the "never enters scoring"

@@ -1,45 +1,45 @@
-.bb-logo {
-  --bb-logo-size: 112px;
-  --bb-logo-ink: #0a0a0a;
-  --bb-logo-paper: #ffffff;
-  --bb-logo-accent: #b86b2a;
+.bp-logo {
+  --bp-logo-size: 112px;
+  --bp-logo-ink: #0a0a0a;
+  --bp-logo-paper: #ffffff;
+  --bp-logo-accent: #b86b2a;
 
   display: inline-flex;
-  color: var(--bb-logo-ink);
+  color: var(--bp-logo-ink);
   line-height: 1;
   max-width: 100%;
 }
 
-.bb-logo__mark {
+.bp-logo__mark {
   display: block;
   flex: 0 0 auto;
-  width: var(--bb-logo-size);
-  height: var(--bb-logo-size);
+  width: var(--bp-logo-size);
+  height: var(--bp-logo-size);
 }
 
-.bb-logo__mark > svg {
+.bp-logo__mark > svg {
   display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
 }
 
-.bb-logo--mark {
-  width: var(--bb-logo-size);
-  height: var(--bb-logo-size);
+.bp-logo--mark {
+  width: var(--bp-logo-size);
+  height: var(--bp-logo-size);
 }
 
-.bb-logo--app-icon {
+.bp-logo--app-icon {
   align-items: center;
   aspect-ratio: 1;
   box-sizing: border-box;
   justify-content: center;
   overflow: hidden;
-  padding: calc(var(--bb-logo-size) * 0.115);
-  width: var(--bb-logo-size);
+  padding: calc(var(--bp-logo-size) * 0.115);
+  width: var(--bp-logo-size);
 }
 
-.bb-logo--app-icon .bb-logo__mark {
+.bp-logo--app-icon .bp-logo__mark {
   height: auto;
   width: 100%;
 }

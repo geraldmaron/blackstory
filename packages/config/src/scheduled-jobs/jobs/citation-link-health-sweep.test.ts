@@ -1,7 +1,7 @@
 
 /**
  * Proves the citation-link-health-sweep job body is REAL: it drives
- * @black-book/domain's citation link-health/repair-ladder logic (not a reimplementation), the
+ * @blap/domain's citation link-health/repair-ladder logic (not a reimplementation), the
  * one automatic write it makes matches the roster's declared 'link-repair-archived-copy' effect
  * exactly, and permanent-redirect retroactive-SPN repairs are proposed rather than
  * auto-applied.
@@ -11,12 +11,12 @@ import { test } from 'node:test';
 import {
   DEFAULT_SAFE_FETCH_LIMITS,
   type PinnedTransportResponse,
-} from '@black-book/security';
+} from '@blap/security';
 import {
   initialLinkHealthState,
   type Citation,
   type LinkCheckFetchResult,
-} from '@black-book/domain';
+} from '@blap/domain';
 import {
   checkCitationLinkThroughSafeFetch,
   runCitationLinkHealthSweepJob,

@@ -15,7 +15,7 @@ test('omitting linkStatus renders exactly the original citation markup (no degra
     createElement(Citation, { source: 'National Archives', href: 'https://example.com' }),
   );
   assert.match(html, /<aside/);
-  assert.doesNotMatch(html, /bb-notice/);
+  assert.doesNotMatch(html, /bp-notice/);
 });
 
 test('linkStatus dead with no archived copy renders "Link dead as of <date>"', () => {
@@ -54,7 +54,7 @@ test('linkStatus drifted flags content-changed-since-capture for research review
 
 test('linkStatus alive/redirected renders no degraded block', () => {
   const alive = renderToStaticMarkup(createElement(Citation, { source: 'Local Gazette', linkStatus: 'alive' }));
-  assert.doesNotMatch(alive, /bb-notice/);
+  assert.doesNotMatch(alive, /bp-notice/);
   const redirected = renderToStaticMarkup(createElement(Citation, { source: 'Local Gazette', linkStatus: 'redirected' }));
-  assert.doesNotMatch(redirected, /bb-notice/);
+  assert.doesNotMatch(redirected, /bp-notice/);
 });

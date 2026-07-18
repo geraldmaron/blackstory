@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { AppError, createLogger, type LogContext } from '@black-book/observability';
+import { AppError, createLogger, type LogContext } from '@blap/observability';
 import { createSensitiveDataRedactor } from './index.ts';
 
 function wiredLogger(lines: string[]) {

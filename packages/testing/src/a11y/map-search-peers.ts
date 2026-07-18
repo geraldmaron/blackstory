@@ -1,13 +1,13 @@
 
 /**
  * Documented accessible peers for search/map journeys.
- * Kept outside test files so `@black-book/testing` can re-export the contract.
+ * Kept outside test files so `@blap/testing` can re-export the contract.
  */
 
 export const MAP_SEARCH_ACCESSIBLE_PEERS = Object.freeze([
   {
     journey: 'search',
-    component: 'ResultList (@black-book/ui)',
+    component: 'ResultList (@blap/ui)',
     webPath: 'packages/ui/src/components/ResultList.tsx',
     contract: 'Server-rendered result list with labelledBy for screen-reader parity',
   },

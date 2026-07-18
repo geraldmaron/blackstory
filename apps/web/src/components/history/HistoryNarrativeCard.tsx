@@ -4,7 +4,7 @@
  * and any published facts.
  */
 import React from 'react';
-import { Card } from '@black-book/ui';
+import { Card } from '@blap/ui';
 import type { HistoryNodeView } from '../../lib/history/build-history-graph';
 
 void React;
@@ -28,16 +28,16 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
       title={node.displayName}
       meta={
         <>
-          <span className="bb-mono">{node.kind}</span>
-          <span className="bb-sans">{statusMeta}</span>
+          <span className="bp-mono">{node.kind}</span>
+          <span className="bp-sans">{statusMeta}</span>
         </>
       }
-      className="bb-history-narrative-card"
+      className="bp-history-narrative-card"
     >
       {onClose ? (
         <button
           type="button"
-          className="bb-button bb-button--secondary bb-history-narrative-card__close"
+          className="bp-button bp-button--secondary bp-history-narrative-card__close"
           onClick={onClose}
           aria-label={`Close ${node.displayName} card`}
         >
@@ -45,9 +45,9 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
         </button>
       ) : null}
 
-      <p className="bb-sans">{node.summary}</p>
+      <p className="bp-sans">{node.summary}</p>
 
-      <dl className="bb-history-narrative-card__facts">
+      <dl className="bp-history-narrative-card__facts">
         <div>
           <dt>Status in view</dt>
           <dd>{node.statusLabel}</dd>
@@ -61,12 +61,12 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
       </dl>
 
       {node.factLinks.length > 0 ? (
-        <div className="bb-history-narrative-card__facts-links">
-          <p className="bb-sans">Published facts referencing this record:</p>
+        <div className="bp-history-narrative-card__facts-links">
+          <p className="bp-sans">Published facts referencing this record:</p>
           <ul>
             {node.factLinks.map((fact) => (
               <li key={fact.href}>
-                <a className="bb-cta bb-cta--ghost" href={fact.href}>
+                <a className="bp-cta bp-cta--ghost" href={fact.href}>
                   {fact.label}
                 </a>
               </li>
@@ -75,7 +75,7 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
         </div>
       ) : null}
 
-      <a className="bb-cta bb-cta--ink" href={node.href}>
+      <a className="bp-cta bp-cta--ink" href={node.href}>
         Open full record
       </a>
     </Card>

@@ -4,7 +4,7 @@
  * Deliberately NOT inside `actions.ts`: a `'use server'` file may only export async
  * functions a plain constant or type export there silently breaks on the client bundle.
  */
-import type { ResearchIntakeOutcome } from '@black-book/operator-cli';
+import type { ResearchIntakeOutcome } from '@blap/operator-cli';
 
 export type QuickAddFormState =
   | { readonly status: 'idle' }

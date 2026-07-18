@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import { loadGoldCorpus } from '@black-book/testing';
+import { loadGoldCorpus } from '@blap/testing';
 import {
   ALL_SEED_RECORDS,
   NATIONAL_SEED_CAMPAIGN_BUNDLE,

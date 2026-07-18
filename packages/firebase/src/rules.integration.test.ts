@@ -74,7 +74,7 @@ before(async () => {
   }
 
   testEnv = await initializeTestEnvironment({
-    projectId: 'demo-black-book',
+    projectId: 'demo-blap',
     firestore: {
       rules: readFileSync(path.join(FIREBASE_DIR, 'firestore.rules'), 'utf8'),
       host: firestore.host,
@@ -310,7 +310,7 @@ test('storage deny-all rejects unauthenticated reads and writes', async (t) => {
 });
 
 test('rules harness stays on demo project id', () => {
-  assert.equal(process.env.FIREBASE_PROJECT_ID ?? 'demo-black-book', 'demo-black-book');
+  assert.equal(process.env.FIREBASE_PROJECT_ID ?? 'demo-blap', 'demo-blap');
 });
 
 test('audit rules express append-only and protected outbox intent', () => {

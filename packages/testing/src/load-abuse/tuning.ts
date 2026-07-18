@@ -1,14 +1,14 @@
 
 /**
  * Concrete tuning recommendations derived from load/abuse simulations.
- * Values reference current policy defaults in @black-book/security adjust after staging soak.
+ * Values reference current policy defaults in @blap/security adjust after staging soak.
  */
 import {
   DEFAULT_DAILY_BUDGETS,
   DEFAULT_ENDPOINT_QUOTA_MATRIX,
   DEFAULT_QUERY_GUARDRAIL_LIMITS,
   resolveEndpointPolicy,
-} from '@black-book/security';
+} from '@blap/security';
 import type { TuningRecommendation } from './types.js';
 
 const searchAnon = resolveEndpointPolicy(DEFAULT_ENDPOINT_QUOTA_MATRIX, 'search', 'anonymous');

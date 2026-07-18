@@ -4,7 +4,7 @@
  *
  * Runs labeled name/misspelling/descriptive/place queries against the domain hybrid pipeline
  * and reports precision/recall/MRR with configurable gates. Fusion weight changes require
- * re-running this eval (see FUSION_WEIGHTS_VERSION in @black-book/domain).
+ * re-running this eval (see FUSION_WEIGHTS_VERSION in @blap/domain).
  */
 
 export type FusionWeights = {

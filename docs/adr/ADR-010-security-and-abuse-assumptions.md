@@ -12,13 +12,13 @@
 |--------|------------------|--------|
 | Threat model / abuse corpus | Written (`docs/security/`, BB-004) | Expand tests under BB-036 |
 | App Check, Armor, IAP, rate limits | **Not configured** | BB-023–027, BB-033–035 |
-| Security packages | `@black-book/security` stub | Shared enforcement helpers |
+| Security packages | `@blap/security` stub | Shared enforcement helpers |
 
 These assumptions are **design constraints** for all subsequent beads. They are not evidence that controls already exist in production.
 
 ## Context
 
-Black Book will face scrapers, submission spam, search/geocode exhaustion, SSRF via submitted URLs, data poisoning aimed at promotion, and attempts to reach admin/publication paths. The public historical corpus must remain readable under attack when possible (degraded read-only mode), while optional and mutating features shut down first.
+Blap will face scrapers, submission spam, search/geocode exhaustion, SSRF via submitted URLs, data poisoning aimed at promotion, and attempts to reach admin/publication paths. The public historical corpus must remain readable under attack when possible (degraded read-only mode), while optional and mutating features shut down first.
 
 ## Decision
 

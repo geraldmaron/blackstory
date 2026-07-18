@@ -2,7 +2,7 @@
  * Browse list row for the `/legal` index page.
  */
 import React from 'react';
-import type { LawStatus } from '@black-book/domain';
+import type { LawStatus } from '@blap/domain';
 import { LegalStatusBadge } from './LegalStatusBadge';
 import { humanizeLegalKind, humanizeLegalTopic } from './format';
 
@@ -25,30 +25,30 @@ export type LegalBrowseListProps = {
 
 export function LegalBrowseList({ items, labelledBy }: LegalBrowseListProps) {
   return (
-    <ul className="bb-result-list" aria-labelledby={labelledBy}>
+    <ul className="bp-result-list" aria-labelledby={labelledBy}>
       {items.map((item) => (
-        <li key={item.id} className="bb-result-list__item">
+        <li key={item.id} className="bp-result-list__item">
           <article>
-            <h3 className="bb-result-list__title" style={{ margin: 0 }}>
+            <h3 className="bp-result-list__title" style={{ margin: 0 }}>
               <a href={`/legal/${item.slug}`}>{item.title}</a>
             </h3>
-            <p className="bb-result-list__summary" style={{ margin: 'var(--bb-space-2) 0 0 0' }}>
-              <span className="bb-mono">{item.citation}</span>
+            <p className="bp-result-list__summary" style={{ margin: 'var(--bp-space-2) 0 0 0' }}>
+              <span className="bp-mono">{item.citation}</span>
             </p>
-            <div className="bb-row" style={{ marginTop: 'var(--bb-space-2)', gap: 'var(--bb-space-2)', flexWrap: 'wrap' }}>
-              <span className="bb-sans">{humanizeLegalKind(item.kind)}</span>
+            <div className="bp-row" style={{ marginTop: 'var(--bp-space-2)', gap: 'var(--bp-space-2)', flexWrap: 'wrap' }}>
+              <span className="bp-sans">{humanizeLegalKind(item.kind)}</span>
               <LegalStatusBadge status={item.lawStatus} />
               {item.topics.map((topic) => (
-                <span key={topic} className="bb-badge">
+                <span key={topic} className="bp-badge">
                   {humanizeLegalTopic(topic)}
                 </span>
               ))}
               {item.hasExplainer ? (
-                <span className="bb-sans">Plain-language explainer available</span>
+                <span className="bp-sans">Plain-language explainer available</span>
               ) : null}
             </div>
             {item.factHref ? (
-              <p style={{ margin: 'var(--bb-space-2) 0 0 0' }}>
+              <p style={{ margin: 'var(--bp-space-2) 0 0 0' }}>
                 <a href={item.factHref}>View canonical fact record</a>
               </p>
             ) : null}

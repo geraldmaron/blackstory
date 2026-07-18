@@ -1,6 +1,6 @@
 /**
  * Server-side geocode pipeline for the `/locate` route: normalizes address/ZIP text,
- * calls the real Census Geocoder adapter (`@black-book/domain`'s `fetchCensusAddressGeocode`
+ * calls the real Census Geocoder adapter (`@blap/domain`'s `fetchCensusAddressGeocode`
  * `fetchCensusCoordinatesGeocode`, backed by `./safe-http-client.ts`), resolves 
  * jurisdiction ids, reduces exact coordinates, checks the 50-states-+-D.C. product scope, and
  * falls back to manual place search on any failure.
@@ -18,7 +18,7 @@ import {
   type GeocodePrecisionResult,
   type ManualPlaceSearchFallback,
   type ResolvedJurisdictionIds,
-} from '@black-book/domain';
+} from '@blap/domain';
 import { safeHttpClient } from './safe-http-client';
 
 export type GeocodeMatchSummary = {

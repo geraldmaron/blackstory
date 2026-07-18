@@ -50,8 +50,8 @@ entitlement failures must be recorded as blockers; do not weaken the gates.
 ## Local verification
 
 ```bash
-pnpm --filter @black-book/testing test:security
-pnpm --filter @black-book/testing exec node --import tsx --test \
+pnpm --filter @blap/testing test:security
+pnpm --filter @blap/testing exec node --import tsx --test \
   src/security-gates/security-gates.test.ts
 pnpm exec tsc --noEmit --strict --exactOptionalPropertyTypes \
   --target ES2022 --module NodeNext --moduleResolution NodeNext --skipLibCheck \

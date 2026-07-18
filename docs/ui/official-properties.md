@@ -32,7 +32,7 @@ A future route (owning bead TBD — likely folds into the `about` section or a d
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Black Book",
+  "name": "Blap",
   "url": "https://<real-domain>",
   "sameAs": [
     "https://github.com/<real-org>",

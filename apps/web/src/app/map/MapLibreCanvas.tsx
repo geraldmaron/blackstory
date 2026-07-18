@@ -2,7 +2,7 @@
  * MapLibre GL JS wiring for the `/map` demo route.
  *
  * `maplibre-gl` (and its CSS) are only ever imported here a client-only
- * leaf component never from `@black-book/ui`'s MapExplorer shell. That
+ * leaf component never from `@blap/ui`'s MapExplorer shell. That
  * keeps the shared UI package free of a WebGL dependency and safe for its
  * plain Node/tsx test runner (no bundler CSS loader available there).
  *

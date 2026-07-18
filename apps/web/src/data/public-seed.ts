@@ -15,7 +15,7 @@ import {
   type EntitySensitivity,
   type EntityStatusValue,
   type StatusHistoryEntry,
-} from '@black-book/domain';
+} from '@blap/domain';
 import {
   buildGraphTimeline,
   currentStatusFor,
@@ -43,12 +43,12 @@ export type PublicClaimView = {
 export type PublicTimelineEvent = GraphTimelineEntry;
 
 /**
- * Typed related-entity entry, mirroring `@black-book/domain`'s `PublicRelatedEntry`
+ * Typed related-entity entry, mirroring `@blap/domain`'s `PublicRelatedEntry`
  * (packages/domain/src/graph/adjacency.ts) and
  * `packages/firebase/src/firestore/types.ts`'s `publicEntityProjectionSchema.related` — the same
  * shape derived from a release's graph adjacency doc. Hardcoded here rather than imported since
  * this file is a standalone web-app seed catalog predating projections (see the module
- * doc above), matching this file's existing convention of not importing @black-book/domain types.
+ * doc above), matching this file's existing convention of not importing @blap/domain types.
  */
 export type PublicRelatedEntry = {
   readonly id: string;
@@ -108,7 +108,7 @@ export type PublicEntityView = {
   readonly displayName: string;
   readonly summary: string;
   /** @deprecated Free-text era label predating structured era model. Prefer
-   * `eraBuckets`, derived from @black-book/domain's `deriveEraBuckets`. Kept for existing
+   * `eraBuckets`, derived from @blap/domain's `deriveEraBuckets`. Kept for existing
    * filter/display call sites until they migrate. */
   readonly era: string;
   /**
@@ -116,7 +116,7 @@ export type PublicEntityView = {
    * notability/relevance scores are banned from public payloads).
    */
   /** Derived current lifecycle status label (e.g. "active", "in_force"), when the entity kind
-   * carries one. Never hand-edited — derived via @black-book/domain's `currentEntityStatus`. */
+   * carries one. Never hand-edited — derived via @blap/domain's `currentEntityStatus`. */
   readonly status?: string;
   /** Time-scoped status-lifecycle designations for place/school/institution kinds omitted
    * for `event` (see `eventWindow`). `status` above is always `currentStatus(statusHistory)`,
@@ -124,11 +124,11 @@ export type PublicEntityView = {
   readonly statusHistory?: readonly StatusHistoryEntry<EntityStatusValue>[];
   /** `event`-kind entities carry this instead of `statusHistory`/`status`.  */
   readonly eventWindow?: PublicEventWindow;
-  /** Decade labels the entity's dated span overlaps, derived via @black-book/domain's
+  /** Decade labels the entity's dated span overlaps, derived via @blap/domain's
    * `deriveEraBuckets` replaces the free-text `era` string above. */
   readonly eraBuckets?: readonly string[];
   /** Human-readable notability rubric labels (never the raw criterion id alone, never a score),
-   * one per notabilityBasis record sourced from @black-book/domain's `NOTABILITY_RUBRIC`. */
+   * one per notabilityBasis record sourced from @blap/domain's `NOTABILITY_RUBRIC`. */
   readonly notabilityLabels?: readonly string[];
   /** Sensitivity classification label, when the entity carries one. Presentation is via
    * `SensitivityContextBanner`. */
@@ -312,7 +312,7 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     primaryImage: {
       url: 'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_dunbar_school_001/primary.png',
       alt: 'Schematic mark representing the Paul Laurence Dunbar High School campus record',
-      credit: 'Black Book brand system public-domain-style fixture pending a rights-cleared photo',
+      credit: 'Blap brand system public-domain-style fixture pending a rights-cleared photo',
       rightsStatus: 'public_domain',
       objectPath: 'public/entities/ent_dunbar_school_001/primary.png',
     },

@@ -229,7 +229,7 @@ test('RELEVANCE_DIMENSIONS and CONFIDENCE_COMPONENT_WEIGHTS keys never overlap w
   }
 });
 
-test('compile-time no-overlap invariants hold (the real gate is `pnpm --filter @black-book/domain typecheck`)', () => {
+test('compile-time no-overlap invariants hold (the real gate is `pnpm --filter @blap/domain typecheck`)', () => {
   // These booleans are typed `NoKeyOverlap<...>` in advisory.ts, not plain `boolean` if a
   // future field name collision is ever introduced, advisory.ts itself fails to typecheck before
   // this runtime assertion is even reached.

@@ -17,8 +17,8 @@
  * contract; it is out of scope here.
  */
 import { NextResponse } from 'next/server';
-import { encodeSearchCursor, evaluateSearchQueryGuardrails, type SearchQueryInput } from '@black-book/security';
-import type { PublicSearchIndexDoc } from '@black-book/domain';
+import { encodeSearchCursor, evaluateSearchQueryGuardrails, type SearchQueryInput } from '@blap/security';
+import type { PublicSearchIndexDoc } from '@blap/domain';
 import {
   readHybridFlagFromParams,
   readLaneKillSwitchParams,

@@ -3,9 +3,9 @@
  * Kept free of Admin SDK imports so unit tests do not load Firestore clients.
  */
 
-/** Production Firebase project id (mirrors `@black-book/firebase` constants).  */
+/** Production Firebase project id (mirrors `@blap/firebase` constants).  */
 const PRODUCTION_PROJECT_ID = 'black-book-efaaf';
-const PRODUCTION_BREAK_GLASS_ENV = 'BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION';
+const PRODUCTION_BREAK_GLASS_ENV = 'BLAP_FIREBASE_ALLOW_PRODUCTION';
 
 type EnvironmentLike = Readonly<Record<string, string | undefined>>;
 
@@ -57,7 +57,7 @@ export function shouldUseLivePublicProjections(
     return false;
   }
 
-  const nodeEnv = env.NODE_ENV ?? env.BLACK_BOOK_ENV ?? 'development';
+  const nodeEnv = env.NODE_ENV ?? env.BLAP_ENV ?? 'development';
   if (nodeEnv !== 'production' && env[PRODUCTION_BREAK_GLASS_ENV] !== '1') {
     return false;
   }

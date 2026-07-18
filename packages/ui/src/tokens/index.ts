@@ -1,6 +1,6 @@
 
 /**
- * Barrel export for Black Book design tokens.
+ * Barrel export for Blap design tokens.
  */
 
 export * from './brand-palette.js';

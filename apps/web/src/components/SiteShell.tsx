@@ -14,11 +14,11 @@ export type SiteShellProps = {
 
 export function SiteShell({ children }: SiteShellProps) {
   return (
-    <div className="bb-shell">
+    <div className="bp-shell">
       <SiteHeader />
       <DegradedModeNotice />
       <OfflineNotice />
-      <div className="bb-shell-body">{children}</div>
+      <div className="bp-shell-body">{children}</div>
       <SiteFooter />
     </div>
   );

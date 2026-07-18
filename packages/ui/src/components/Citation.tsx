@@ -48,8 +48,8 @@ export function Citation({
   trySearchingFor,
 }: CitationProps) {
   return (
-    <aside className={cx('bb-citation', className)} aria-label={label}>
-      <span className="bb-citation__label">{label}</span>
+    <aside className={cx('bp-citation', className)} aria-label={label}>
+      <span className="bp-citation__label">{label}</span>
       {href ? (
         <a href={href} rel="noopener noreferrer">
           {source}
@@ -59,17 +59,17 @@ export function Citation({
       )}
       {children}
       {linkStatus === 'dead' ? (
-        <div className="bb-notice bb-notice--warning" role="status">
-          <span className="bb-notice__cue" aria-hidden="true">
+        <div className="bp-notice bp-notice--warning" role="status">
+          <span className="bp-notice__cue" aria-hidden="true">
             Warning
           </span>
           <div>
-            <p className="bb-notice__title">
+            <p className="bp-notice__title">
               {archivedHref
                 ? 'Original link unavailable — archived copy'
                 : `Link dead${deadAsOfDate ? ` as of ${deadAsOfDate}` : ''}`}
             </p>
-            <div className="bb-notice__body">
+            <div className="bp-notice__body">
               {archivedHref ? (
                 <p>
                   <a href={archivedHref} rel="noopener noreferrer">
@@ -84,13 +84,13 @@ export function Citation({
         </div>
       ) : null}
       {linkStatus === 'drifted' ? (
-        <div className="bb-notice bb-notice--dispute" role="status">
-          <span className="bb-notice__cue" aria-hidden="true">
+        <div className="bp-notice bp-notice--dispute" role="status">
+          <span className="bp-notice__cue" aria-hidden="true">
             Disputed
           </span>
           <div>
-            <p className="bb-notice__title">Content may have changed since capture</p>
-            <div className="bb-notice__body">
+            <p className="bp-notice__title">Content may have changed since capture</p>
+            <div className="bp-notice__body">
               <p>
                 This link is reachable, but its current content no longer matches what was
                 captured. Flagged for research review — the original capture remains the

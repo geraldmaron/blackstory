@@ -3,11 +3,11 @@
  * primitives not a stub and that an SSRF-targeted URL is rejected before any adapter fetch
  * proceeds.
  *
- * `@black-book/security` is a devDependency of this package for this test only (see
+ * `@blap/security` is a devDependency of this package for this test only (see
  * package.json); it is never imported by http-port.ts or any other shipped adapter file see
  * http-port.ts's header comment for the circular-dependency reason. This mirrors
  * `../../../map/map-source.redaction.test.ts`'s pattern exactly: the port is defined and
- * consumed with zero runtime dependency on `@black-book/security`, and only the test proves the
+ * consumed with zero runtime dependency on `@blap/security`, and only the test proves the
  * real wiring holds.
  */
 import assert from 'node:assert/strict';
@@ -17,7 +17,7 @@ import {
   resolveAndPinDestination,
   type PinnedTransport,
   type ResolveHost,
-} from '@black-book/security';
+} from '@blap/security';
 import {
   mapWithConcurrency,
   withRetry,

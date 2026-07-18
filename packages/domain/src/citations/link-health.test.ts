@@ -2,7 +2,7 @@
  * link-health classification (alive/redirected/drifted/dead) and the
  * retry-before-declaring-dead state machine. The final test in this file proves the
  * `LinkCheckFetchResult` port is actually adaptable from real `executeSafeFetch` 
- * `@black-book/security` is a devDependency of this package for exactly this kind of proof (see
+ * `@blap/security` is a devDependency of this package for exactly this kind of proof (see
  * packages/domain/src/map/map-source.redaction.test.ts for the established precedent).
  */
 import assert from 'node:assert/strict';
@@ -11,7 +11,7 @@ import {
   DEFAULT_SAFE_FETCH_LIMITS,
   executeSafeFetch,
   type PinnedTransportResponse,
-} from '@black-book/security';
+} from '@blap/security';
 import {
   advanceLinkHealthState,
   classifyLinkCheckAttempt,
@@ -143,7 +143,7 @@ test('an explicit dead classification (e.g. 404) is not subject to the retry bud
  * minimal fake DNS resolver + pinned transport (the same dependency-injection shape 
  * own tests use) and confirms the adapted result classifies as expected.
  */
-test('the link-health port adapts a real executeSafeFetch(...) result from @black-book/security', async () => {
+test('the link-health port adapts a real executeSafeFetch(...) result from @blap/security', async () => {
   const html = Buffer.from('<html><body>Hello, archive.</body></html>', 'utf8');
   const transport = async (): Promise<PinnedTransportResponse> => ({
     status: 200,

@@ -223,7 +223,7 @@ registration in Section 1 if sequencing allows, since the LLC becomes the WHOIS 
   **Verify:** the agent listing is live and searchable in the Copyright Office directory; the
   contact email actually receives mail (send a test message).
 - [ ] **Write a takedown/counter-notice runbook wired to BB-077.** When a copyright claim comes in
-  against something Black Book published (as opposed to Section 4's mirror case), the process is:
+  against something Blap published (as opposed to Section 4's mirror case), the process is:
   1. Log the claim as a `copyright_claim`-reasoned takedown request — the data model for this
      already exists (`packages/domain/src/rights/takedown.ts`, `TAKEDOWN_REASONS`,
      `TAKEDOWN_DISTINCT_TAG`), pending the public-facing intake UI (BB-055/BB-076, not built yet).
@@ -231,7 +231,7 @@ registration in Section 1 if sequencing allows, since the LLC becomes the WHOIS 
      carries a mandatory Wayback/Internet Archive capture link and a snippet capped to roughly one
      or two sentences (`packages/domain/src/rights/evidence-pointer.ts`) rather than a rehosted
      copy of the source. This link-out-plus-minimal-snippet posture is the fair-use basis for a
-     counter-notice: Black Book is not republishing the work, it is citing and linking to an
+     counter-notice: Blap is not republishing the work, it is citing and linking to an
      archival capture of it.
   3. If the claim is meritless, file a formal DMCA counter-notice citing that posture, through
      whichever host received the original takedown notice (Google/Firebase, GitHub, etc.).

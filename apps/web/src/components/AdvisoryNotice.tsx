@@ -17,15 +17,15 @@
  *
  * Callers build `statement` via `buildAdvisoryStatement(record, sourceLabel)` and
  * `safetyAdvisoryDisclaimer` via `getDisclaimer('safety_advisory')`, both from
- * `@black-book/domain`, then render this component on a place entity's page and its map card.
+ * `@blap/domain`, then render this component on a place entity's page and its map card.
  */
 
 import React from 'react';
 import { DisclaimerBanner, type DisclaimerCopy } from './DisclaimerBanner';
-import { Notice } from '@black-book/ui';
+import { Notice } from '@blap/ui';
 
 export type AdvisoryNoticeProps = {
-  /** Procedural class label, e.g. `ADVISORY_CLASS_LABELS[advisoryClass]` from `@black-book/domain`'s advisory module.  */
+  /** Procedural class label, e.g. `ADVISORY_CLASS_LABELS[advisoryClass]` from `@blap/domain`'s advisory module.  */
   readonly classLabel: string;
   /** The single dated, cited, procedural sentence `buildAdvisoryStatement(...)`'s output.  */
   readonly statement: string;
@@ -41,10 +41,10 @@ export function AdvisoryNotice({
   safetyAdvisoryDisclaimer,
 }: AdvisoryNoticeProps) {
   return (
-    <div className="bb-stack" role="group" aria-label={`Present-day advisory: ${classLabel}`}>
+    <div className="bp-stack" role="group" aria-label={`Present-day advisory: ${classLabel}`}>
       <Notice tone="warning" title={classLabel}>
         <p style={{ margin: 0 }}>{statement}</p>
-        <p className="bb-mono" style={{ margin: 0, marginTop: 'var(--bb-space-2)' }}>
+        <p className="bp-mono" style={{ margin: 0, marginTop: 'var(--bp-space-2)' }}>
           Review cadence: {reviewCadence}.
         </p>
       </Notice>

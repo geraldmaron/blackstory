@@ -5,8 +5,8 @@
  * service connection, no mutation handlers.
  */
 import Link from 'next/link';
-import { computeRotRateBySourceClass, buildTrySearchingForSuggestion } from '@black-book/domain';
-import { Citation } from '@black-book/ui';
+import { computeRotRateBySourceClass, buildTrySearchingForSuggestion } from '@blap/domain';
+import { Citation } from '@blap/ui';
 import { CITATION_HEALTH_FIXTURES } from './fixtures.js';
 import './citation-health.css';
 

@@ -169,9 +169,9 @@ async function main() {
     }
 
     // Public web must never depend on server DB helpers.
-    if (workspace.name === '@black-book/web' && dependencies.has('@black-book/data-access')) {
+    if (workspace.name === '@blap/web' && dependencies.has('@blap/data-access')) {
       errors.push(
-        '@black-book/web cannot depend on @black-book/data-access (no browser DB credentials)',
+        '@blap/web cannot depend on @blap/data-access (no browser DB credentials)',
       );
     }
 
@@ -184,22 +184,22 @@ async function main() {
           );
         }
         if (
-          workspace.name === '@black-book/web' &&
-          (importedName === '@black-book/data-access' ||
-            importedName.startsWith('@black-book/data-access/'))
+          workspace.name === '@blap/web' &&
+          (importedName === '@blap/data-access' ||
+            importedName.startsWith('@blap/data-access/'))
         ) {
           errors.push(
-            `${path.relative(ROOT, file)} cannot import @black-book/data-access in the public web app`,
+            `${path.relative(ROOT, file)} cannot import @blap/data-access in the public web app`,
           );
         }
       }
     }
 
     // Package export contract: data-access must deny browser resolution.
-    if (workspace.name === '@black-book/data-access') {
+    if (workspace.name === '@blap/data-access') {
       const browserExport = workspace.manifest.exports?.['.']?.browser;
       if (!browserExport) {
-        errors.push('@black-book/data-access must define exports["."].browser denial entry');
+        errors.push('@blap/data-access must define exports["."].browser denial entry');
       }
     }
   }

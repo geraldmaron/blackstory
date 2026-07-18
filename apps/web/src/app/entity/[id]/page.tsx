@@ -8,8 +8,8 @@
  */
 
 import { notFound } from 'next/navigation';
-import { buildCompactFactViewsForEntity } from '@black-book/domain';
-import { Card, MapFrame, Notice, Timeline } from '@black-book/ui';
+import { buildCompactFactViewsForEntity } from '@blap/domain';
+import { Card, MapFrame, Notice, Timeline } from '@blap/ui';
 import { SeedDataNotice } from '../../../components/SeedDataNotice';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
@@ -79,17 +79,17 @@ export default async function EntityPage({ params }: EntityPageProps) {
   });
 
   return (
-    <main className="bb-container bb-page" id="main">
-      <header className="bb-entity-mast">
-        <p className="bb-page__eyebrow">
+    <main className="bp-container bp-page" id="main">
+      <header className="bp-entity-mast">
+        <p className="bp-page__eyebrow">
           {entity.kind} · {entity.jurisdictionLabel} · {framingLabel}
         </p>
-        <h1 className="bb-page__title">{entity.displayName}</h1>
-        <p className="bb-page__lede">{entity.summary}</p>
+        <h1 className="bp-page__title">{entity.displayName}</h1>
+        <p className="bp-page__lede">{entity.summary}</p>
         <EntityTopicTags entity={entity} />
       </header>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
+      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
         {resolved.source !== 'live' ? <SeedDataNotice compact /> : null}
         <HowToReadThisRecord />
 
@@ -97,25 +97,25 @@ export default async function EntityPage({ params }: EntityPageProps) {
           <EntitySensitivityBanner sensitivity={entity.sensitivity} entityKind={entity.kind} />
         ) : null}
 
-        <div className="bb-entity-layout">
-          <div className="bb-stack">
+        <div className="bp-entity-layout">
+          <div className="bp-stack">
             <section aria-labelledby="relevance-heading">
-              <p className="bb-section__kicker">Relevance</p>
-              <h2 className="bb-section__title" id="relevance-heading">
+              <p className="bp-section__kicker">Relevance</p>
+              <h2 className="bp-section__title" id="relevance-heading">
                 Why this appears
               </h2>
-              <div style={{ marginTop: 'var(--bb-space-4)' }}>
+              <div style={{ marginTop: 'var(--bp-space-4)' }}>
                 <WhyThisAppears result={whyThisAppears} instanceId={`entity-${entity.id}-why`} />
               </div>
             </section>
 
             <section aria-labelledby="context-heading">
-              <p className="bb-section__kicker">Context</p>
-              <h2 className="bb-section__title" id="context-heading">
+              <p className="bp-section__kicker">Context</p>
+              <h2 className="bp-section__title" id="context-heading">
                 Historical context
               </h2>
               {entity.historicalContext.trim().length > 0 ? (
-                <p className="bb-section__lede">{entity.historicalContext}</p>
+                <p className="bp-section__lede">{entity.historicalContext}</p>
               ) : (
                 <RecordGapNotice kind="context" />
               )}
@@ -123,30 +123,30 @@ export default async function EntityPage({ params }: EntityPageProps) {
 
             {entity.extendedNarrative ? (
               <section aria-labelledby="further-heading">
-                <p className="bb-section__kicker">Reading</p>
-                <h2 className="bb-section__title" id="further-heading">
+                <p className="bp-section__kicker">Reading</p>
+                <h2 className="bp-section__title" id="further-heading">
                   Further reading
                 </h2>
-                <p className="bb-section__lede">{entity.extendedNarrative}</p>
+                <p className="bp-section__lede">{entity.extendedNarrative}</p>
               </section>
             ) : null}
 
             <section aria-labelledby="status-heading">
-              <p className="bb-section__kicker">Status</p>
-              <h2 className="bb-section__title" id="status-heading">
+              <p className="bp-section__kicker">Status</p>
+              <h2 className="bp-section__title" id="status-heading">
                 {entity.kind === 'event' ? 'When this happened' : 'Status and history'}
               </h2>
-              <div style={{ marginTop: 'var(--bb-space-4)' }}>
+              <div style={{ marginTop: 'var(--bp-space-4)' }}>
                 <EntityStatusPanel entity={entity} framing={framing} />
               </div>
             </section>
 
             <section aria-labelledby="claims-heading">
-              <p className="bb-section__kicker">Claims</p>
-              <h2 className="bb-section__title" id="claims-heading">
+              <p className="bp-section__kicker">Claims</p>
+              <h2 className="bp-section__title" id="claims-heading">
                 Accepted claims
               </h2>
-              <div style={{ marginTop: 'var(--bb-space-4)' }}>
+              <div style={{ marginTop: 'var(--bp-space-4)' }}>
                 {entity.claims.length === 0 ? (
                   <RecordGapNotice kind="claims" />
                 ) : (
@@ -161,11 +161,11 @@ export default async function EntityPage({ params }: EntityPageProps) {
 
             {relatedFacts.length > 0 ? (
               <section aria-labelledby="facts-heading">
-                <p className="bb-section__kicker">Facts</p>
-                <h2 className="bb-section__title" id="facts-heading">
+                <p className="bp-section__kicker">Facts</p>
+                <h2 className="bp-section__title" id="facts-heading">
                   Related fact records
                 </h2>
-                <div className="bb-stack" style={{ marginTop: 'var(--bb-space-4)' }}>
+                <div className="bp-stack" style={{ marginTop: 'var(--bp-space-4)' }}>
                   {relatedFacts.map((view) => (
                     <CompactFactReference key={view.id} view={view} />
                   ))}
@@ -174,44 +174,44 @@ export default async function EntityPage({ params }: EntityPageProps) {
             ) : null}
 
             <section aria-labelledby="timeline-heading">
-              <p className="bb-section__kicker">Chronology</p>
-              <h2 className="bb-section__title" id="timeline-heading">
+              <p className="bp-section__kicker">Chronology</p>
+              <h2 className="bp-section__title" id="timeline-heading">
                 Timeline
               </h2>
-              <div style={{ marginTop: 'var(--bb-space-4)' }}>
+              <div style={{ marginTop: 'var(--bp-space-4)' }}>
                 {entity.timeline.length === 0 ? (
                   <RecordGapNotice kind="timeline" />
                 ) : (
                   <Timeline labelledBy="timeline-heading" items={entity.timeline} />
                 )}
               </div>
-              <p className="bb-sans" style={{ color: 'var(--bb-ink-muted)', marginTop: 'var(--bb-space-2)' }}>
+              <p className="bp-sans" style={{ color: 'var(--bp-ink-muted)', marginTop: 'var(--bp-space-2)' }}>
                 Derived from this record&rsquo;s published BB-092 history graph and BB-090 status
                 history — never hand-authored prose.
               </p>
             </section>
 
             <section aria-labelledby="related-heading">
-              <p className="bb-section__kicker">More</p>
-              <h2 className="bb-section__title" id="related-heading">
+              <p className="bp-section__kicker">More</p>
+              <h2 className="bp-section__title" id="related-heading">
                 Related records
               </h2>
-              <div style={{ marginTop: 'var(--bb-space-4)' }}>
+              <div style={{ marginTop: 'var(--bp-space-4)' }}>
                 <EntityRelatedList entity={entity} labelledBy="related-heading" />
               </div>
             </section>
 
             {(entity.continueLearning?.length ?? 0) > 0 ? (
               <section aria-labelledby="continue-heading">
-                <p className="bb-section__kicker">Continue</p>
-                <h2 className="bb-section__title" id="continue-heading">
+                <p className="bp-section__kicker">Continue</p>
+                <h2 className="bp-section__title" id="continue-heading">
                   Also connected
                 </h2>
-                <p className="bb-section__lede">
+                <p className="bp-section__lede">
                   Nearby records one step further in the published graph — keep learning without
                   dead ends.
                 </p>
-                <div style={{ marginTop: 'var(--bb-space-4)' }}>
+                <div style={{ marginTop: 'var(--bp-space-4)' }}>
                   <EntityRelatedList
                     entity={entity}
                     labelledBy="continue-heading"
@@ -222,7 +222,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
             ) : null}
           </div>
 
-          <aside className="bb-entity-aside" aria-label="Record context">
+          <aside className="bp-entity-aside" aria-label="Record context">
             {entity.primaryImage ? (
               <EntityPrimaryImage image={entity.primaryImage} entityName={entity.displayName} />
             ) : null}
@@ -234,19 +234,19 @@ export default async function EntityPage({ params }: EntityPageProps) {
 
             <Card
               title="Record maturity"
-              meta={<span className="bb-mono">{entity.recordMaturity}</span>}
+              meta={<span className="bp-mono">{entity.recordMaturity}</span>}
               as="section"
             >
-              <p className="bb-sans" style={{ margin: 0 }}>
+              <p className="bp-sans" style={{ margin: 0 }}>
                 Research coverage: <strong>{entity.researchCoverage}</strong>. Maturity labels
                 follow the product constitution vocabulary and will be projection-backed in BB-019.
               </p>
             </Card>
 
-            <Card title="Revision" meta={<span className="bb-mono">{entity.revision.releaseId}</span>} as="section">
-              <dl className="bb-sans" style={{ margin: 0 }}>
+            <Card title="Revision" meta={<span className="bp-mono">{entity.revision.releaseId}</span>} as="section">
+              <dl className="bp-sans" style={{ margin: 0 }}>
                 <dt style={{ fontWeight: 600 }}>Record last updated</dt>
-                <dd style={{ margin: '0 0 var(--bb-space-2) 0' }}>{entity.revision.recordUpdatedAt}</dd>
+                <dd style={{ margin: '0 0 var(--bp-space-2) 0' }}>{entity.revision.recordUpdatedAt}</dd>
                 <dt style={{ fontWeight: 600 }}>Release generated</dt>
                 <dd style={{ margin: 0 }}>{entity.revision.generatedAt}</dd>
               </dl>
@@ -265,7 +265,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
               ]}
             />
             <p style={{ margin: 0 }}>
-              <a className="bb-cta bb-cta--ink" href={exploreHref}>
+              <a className="bp-cta bp-cta--ink" href={exploreHref}>
                 View on map
               </a>
             </p>

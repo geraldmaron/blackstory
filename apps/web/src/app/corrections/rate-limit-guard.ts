@@ -1,5 +1,5 @@
 /**
- * Server-only rate-limit guard for correction intake. Reuses `@black-book/security`'s
+ * Server-only rate-limit guard for correction intake. Reuses `@blap/security`'s
  * shared evaluator under the existing `corrections` endpoint class anonymous capacity 2
  * window cap 2 daily 8 so coordinated brigading cannot exhaust the lane silently.
  */
@@ -15,7 +15,7 @@ import {
   type RateLimitStore,
   type RateLimitSubject,
   type RiskSignal,
-} from '@black-book/security';
+} from '@blap/security';
 
 const ENDPOINT_CLASS: EndpointClass = 'corrections';
 

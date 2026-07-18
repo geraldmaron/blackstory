@@ -2,7 +2,7 @@
  * correction status page keyed by receipt code. Server-rendered lookup with no
  * moderation-sensitive fields and no enumeration of other submissions.
  */
-import { EmptyState, Notice } from '@black-book/ui';
+import { EmptyState, Notice } from '@blap/ui';
 import {
   buildDefaultCorrectionRouteDependencies,
   lookupPublicStatusByReceipt,
@@ -27,8 +27,8 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
 
   if (!status) {
     return (
-      <main className="bb-container bb-page" id="main">
-        <h1 className="bb-page__title">Correction status</h1>
+      <main className="bp-container bp-page" id="main">
+        <h1 className="bp-page__title">Correction status</h1>
         <Notice tone="error" title="Receipt not found">
           We could not find a correction with that receipt code. Check the code and try again — there
           is no way to browse other submissions.
@@ -36,7 +36,7 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
         <EmptyState
           title="Need to submit a correction?"
           action={
-            <a className="bb-button bb-button--secondary" href="/corrections">
+            <a className="bp-button bp-button--secondary" href="/corrections">
               Go to corrections
             </a>
           }
@@ -48,14 +48,14 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
   }
 
   return (
-    <main className="bb-container bb-page" id="main">
-      <p className="bb-page__eyebrow">Trust</p>
-      <h1 className="bb-page__title">Correction status</h1>
-      <p className="bb-page__lede">
+    <main className="bp-container bp-page" id="main">
+      <p className="bp-page__eyebrow">Trust</p>
+      <h1 className="bp-page__title">Correction status</h1>
+      <p className="bp-page__lede">
         This page shows only what you need to track your submission. Moderation details stay
         restricted.
       </p>
-      <div style={{ marginTop: 'var(--bb-space-6)' }}>
+      <div style={{ marginTop: 'var(--bp-space-6)' }}>
         <CorrectionStatusPanel status={status} />
       </div>
     </main>

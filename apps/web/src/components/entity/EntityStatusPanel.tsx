@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { Card } from '@black-book/ui';
+import { Card } from '@blap/ui';
 import type { PublicEntityView, PublicEventWindow } from '../../data/public-seed';
 import { humanizeToken } from './format';
 import { RecordGapNotice } from './RecordGapNotice';
@@ -33,12 +33,12 @@ function formatEventWindow(window: PublicEventWindow): string {
 export function EntityStatusPanel({ entity, framing }: EntityStatusPanelProps) {
   if (entity.kind === 'event') {
     return (
-      <Card title="When this happened" meta={<span className="bb-mono">{framingLabel(framing)}</span>}>
-        <p className="bb-sans" style={{ margin: 0 }}>
+      <Card title="When this happened" meta={<span className="bp-mono">{framingLabel(framing)}</span>}>
+        <p className="bp-sans" style={{ margin: 0 }}>
           {entity.eventWindow ? formatEventWindow(entity.eventWindow) : 'Undated'}
           {entity.eventWindow?.eventType ? ` \u00b7 ${humanizeToken(entity.eventWindow.eventType)}` : ''}
         </p>
-        <p className="bb-sans" style={{ margin: 0, marginTop: 'var(--bb-space-2)' }}>
+        <p className="bp-sans" style={{ margin: 0, marginTop: 'var(--bp-space-2)' }}>
           Events carry no active/historic status of their own — a when-span is authoritative
           instead (BB-090).
         </p>
@@ -53,12 +53,12 @@ export function EntityStatusPanel({ entity, framing }: EntityStatusPanelProps) {
   return (
     <Card
       title={`Status: ${humanizeToken(entity.status)}`}
-      meta={<span className="bb-mono">{framingLabel(framing)}</span>}
+      meta={<span className="bp-mono">{framingLabel(framing)}</span>}
     >
-      <ol className="bb-qualify-list" aria-label="Status history" style={{ marginTop: 'var(--bb-space-4)' }}>
+      <ol className="bp-qualify-list" aria-label="Status history" style={{ marginTop: 'var(--bp-space-4)' }}>
         {entity.statusHistory.map((record, index) => (
           <li key={`${entity.id}_status_${index}`}>
-            <span className="bb-mono">{humanizeToken(record.status)}</span>
+            <span className="bp-mono">{humanizeToken(record.status)}</span>
             {' \u2014 '}
             {record.validFrom ?? 'undated'}
             {record.validTo ? ` through ${record.validTo}` : ', ongoing'}

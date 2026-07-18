@@ -36,7 +36,7 @@ export const searchSortKeys = [
 /**
  * Allowlisted filter fields no arbitrary column selection. `status` and `era` were added for
  * AC5 ("the filter allowlist extends to status and era"), matching the 6 fields
- * `@black-book/domain`'s search layer filters on (see `packages/domain/src/search/types.ts`).
+ * `@blap/domain`'s search layer filters on (see `packages/domain/src/search/types.ts`).
  */
 export type SearchFilterField = 'kind' | 'state' | 'precision' | 'releaseId' | 'status' | 'era';
 

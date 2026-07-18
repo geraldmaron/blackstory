@@ -3,7 +3,7 @@
  * jurisdiction-id resolution, geocode cache, exact-coordinate reduction, ZIP translate-then-
  * discard, manual-place-search fallback, and the forward/reverse geocode pipeline).
  *
- * Not yet re-exported from `../index.ts` (the `@black-book/domain` package barrel). Until that
+ * Not yet re-exported from `../index.ts` (the `@blap/domain` package barrel). Until that
  * lands, `apps/web`'s `locate` route/components import via the documented mirror under
  * `apps/web/src/lib/geocode/` (same pattern as `packages/firebase/src/jurisdictions/resolver.ts`).
  */

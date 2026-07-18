@@ -1,6 +1,6 @@
 
 /**
- * Smoke tests for @black-book/config environment helpers.
+ * Smoke tests for @blap/config environment helpers.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -15,7 +15,7 @@ test('parseNodeEnv accepts production', () => {
 });
 
 test('packageNameSchema accepts scoped package names', () => {
-  assert.equal(packageNameSchema.parse('@black-book/config'), '@black-book/config');
+  assert.equal(packageNameSchema.parse('@blap/config'), '@blap/config');
 });
 
 test('local runtime environment does not require production variables', () => {

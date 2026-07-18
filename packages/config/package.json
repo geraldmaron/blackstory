@@ -1,5 +1,5 @@
 {
-  "name": "@black-book/config",
+  "name": "@blap/config",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -26,14 +26,14 @@
   },
   "dependencies": {
     "zod": "^3.25.76",
-    "@black-book/domain": "workspace:*",
-    "@black-book/observability": "workspace:*",
-    "@black-book/security": "workspace:*",
-    "@black-book/testing": "workspace:*"
+    "@blap/domain": "workspace:*",
+    "@blap/observability": "workspace:*",
+    "@blap/security": "workspace:*",
+    "@blap/testing": "workspace:*"
   },
   "devDependencies": {
-    "@black-book/firebase": "workspace:*",
-    "@black-book/typescript-config": "workspace:^",
+    "@blap/firebase": "workspace:*",
+    "@blap/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

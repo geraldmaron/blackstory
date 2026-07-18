@@ -1,6 +1,6 @@
 # Runbook: Production release pipeline (BB-062)
 
-**Scope:** End-to-end release procedure for Black Book — from merged PR through staging
+**Scope:** End-to-end release procedure for Blap — from merged PR through staging
 validation, progressive release metadata, protected production approval, explicit App Hosting
 promote, post-deploy health checks, and rollback rehearsal.
 

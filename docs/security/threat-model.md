@@ -1,4 +1,4 @@
-# Black Book — Threat Model (BB-004)
+# Blap — Threat Model (BB-004)
 
 > Expands [ADR-010](../adr/ADR-010-security-and-abuse-assumptions.md) into a full threat corpus with preventive, detective, containment, and recovery controls. Machine-readable source: [`threat-corpus.json`](./threat-corpus.json).
 
@@ -292,7 +292,7 @@ Every threat records residual risk in the corpus. Cross-cutting residuals:
 3. **Human operators remain phishable and fallible**; dual control + fast rollback bound blast radius (T-03, T-16, T-17).
 4. **Deferred features (uploads, tool-using LLMs) are high residual if enabled early** — keep disabled until BB-031 / BB-065.
 5. **Controls are mostly unimplemented today** (scaffold). Treat this document as binding design, not evidence of production readiness.
-6. **Third-party and historical sources may already expose living addresses**; Black Book must not re-amplify them (T-15).
+6. **Third-party and historical sources may already expose living addresses**; Blap must not re-amplify them (T-15).
 
 ## Maintenance
 

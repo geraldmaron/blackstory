@@ -9,12 +9,12 @@
  * this same form renders again after a fallback, with the fallback's `message` passed through
  * `helperText`.
  *
- * Built on `@black-book/ui`'s `FilterBar` (native fieldset/legend/label markup, no bespoke input)
+ * Built on `@blap/ui`'s `FilterBar` (native fieldset/legend/label markup, no bespoke input)
  * rather than a hand-rolled `<input>`, so labelling/keyboard behavior matches every other filter
  * control in this app.
  */
 import React from 'react';
-import { FilterBar, Button } from '@black-book/ui';
+import { FilterBar, Button } from '@blap/ui';
 
 // See `../LocationPrivacyNotice.tsx`'s identical note: keeps this file safe under a classic JSX
 // runtime (this app's own test runner) even though the automatic runtime doesn't need it.
@@ -34,8 +34,8 @@ export function ManualPlaceSearchForm({
   defaultValue,
 }: ManualPlaceSearchFormProps) {
   return (
-    <div className="bb-stack" style={{ gap: 'var(--bb-space-2)' }}>
-      {helperText ? <p className="bb-sans">{helperText}</p> : null}
+    <div className="bp-stack" style={{ gap: 'var(--bp-space-2)' }}>
+      {helperText ? <p className="bp-sans">{helperText}</p> : null}
       <FilterBar
         legend="Search by address, city, or ZIP"
         fields={[

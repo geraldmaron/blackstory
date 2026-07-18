@@ -8,7 +8,7 @@
  * (filtering, facets, edge catalogs) over this shared base, not a second style/feature build.
  */
 import { cache } from 'react';
-import { US_CONUS_BOUNDS } from '@black-book/domain/map/geography';
+import { US_CONUS_BOUNDS } from '@blap/domain/map/geography';
 import type { PublicEntityView } from '../../data/public-seed';
 import {
   buildExploreMapSource,

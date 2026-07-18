@@ -97,7 +97,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 3,
   },
 
-  // --- REAL: Reddit deletion-sync. Wired to @black-book/domain's
+  // --- REAL: Reddit deletion-sync. Wired to @blap/domain's
   // Reddit deletion-sync sweep (sweepRedditPointerLiveness/applyRedditPointerPurge, which wrap
   // shared planDeletionSyncPurge/applyDeletionSyncPurge) via
   // ./jobs/reddit-deletion-sync.ts. Honors the contractual 48h deletion window
@@ -143,7 +143,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 2,
   },
 
-  // --- REAL: citation link-health sweeps. Wired to @black-book/domain's
+  // --- REAL: citation link-health sweeps. Wired to @blap/domain's
   // citation link-health/repair-ladder logic via ./jobs/citation-link-health-sweep.ts. This is
   // one of the two pre-approved automatic public-facing exceptions (mechanical + reversible:
   // swap in an archived-copy URL only) confirmed still true of the job body: it auto-commits
@@ -201,7 +201,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
   },
 
   // --- REAL: relevance/confidence recalibration report. Wired to
-  // @black-book/domain's relevance-feedback module (decision-log extraction, per-dimension
+  // @blap/domain's relevance-feedback module (decision-log extraction, per-dimension
   // disagreement, query-pack effectiveness, source-tier precision, drift alarm) via
   // ./jobs/recalibration-report.ts. Report-only: proposal/approval/gold-corpus-gate for an
   // actual weight change is a separate, human-triggered path never part of this cron job.
@@ -222,7 +222,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
   },
 
   // --- REAL: source drift + adapter run-health checks. Wired to
-  // @black-book/domain's evaluateRunHealth via ./jobs/source-drift-run-health.ts.
+  // @blap/domain's evaluateRunHealth via ./jobs/source-drift-run-health.ts.
   {
     id: 'source-drift-run-health-check',
     owner: 'BB-037',
@@ -239,7 +239,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     consecutiveMissedRunThreshold: 2,
   },
 
-  // --- REAL: gold-corpus regression. Wired to @black-book/testing's
+  // --- REAL: gold-corpus regression. Wired to @blap/testing's
   // evaluateCorpus via ./jobs/gold-corpus-regression.ts.
   {
     id: 'gold-corpus-regression',
@@ -303,7 +303,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
 
   // --- Cost/budget report. Stub: real evaluator (evaluateDailyBudget) lives
   // in packages/security/src/resource-controls.ts, not packages/config outside a "cheap to
-  // wire" claim without adding @black-book/security as a new dependency here, so this stays a
+  // wire" claim without adding @blap/security as a new dependency here, so this stays a
   // documented stub rather than a rushed wiring.
   {
     id: 'cost-budget-report',

@@ -12,7 +12,7 @@ import {
   type AppCheckTelemetry,
   type AppCheckVerifier,
   type EnvironmentLike,
-} from '@black-book/firebase';
+} from '@blap/firebase';
 
 export type PublicApiAppCheckOptions = {
   readonly environment?: EnvironmentLike;

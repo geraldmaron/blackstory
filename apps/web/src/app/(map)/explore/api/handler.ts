@@ -6,7 +6,7 @@
  * proves App Check + guardrails on dynamic explore queries without requiring a full navigation.
  */
 import { NextResponse } from 'next/server';
-import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@black-book/security';
+import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@blap/security';
 import {
   applyExploreFilters,
   buildExploreFacetOptions,

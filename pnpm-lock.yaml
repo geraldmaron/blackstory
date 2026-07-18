@@ -8,10 +8,10 @@ importers:
 
   .:
     devDependencies:
-      '@black-book/eslint-config':
+      '@blap/eslint-config':
         specifier: workspace:^
         version: link:packages/eslint-config
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:packages/typescript-config
       firebase-tools:
@@ -29,16 +29,16 @@ importers:
 
   apps/admin:
     dependencies:
-      '@black-book/config':
+      '@blap/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@black-book/domain':
+      '@blap/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@black-book/operator-cli':
+      '@blap/operator-cli':
         specifier: workspace:*
         version: link:../../packages/operator-cli
-      '@black-book/ui':
+      '@blap/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       next:
@@ -51,10 +51,10 @@ importers:
         specifier: ^19.1.0
         version: 19.2.7(react@19.2.7)
     devDependencies:
-      '@black-book/eslint-config':
+      '@blap/eslint-config':
         specifier: workspace:^
         version: link:../../packages/eslint-config
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config
       '@types/node':
@@ -75,14 +75,14 @@ importers:
 
   apps/api-internal:
     dependencies:
-      '@black-book/config':
+      '@blap/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@black-book/domain':
+      '@blap/domain':
         specifier: workspace:*
         version: link:../../packages/domain
     devDependencies:
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config
       '@types/node':
@@ -97,20 +97,20 @@ importers:
 
   apps/api-public:
     dependencies:
-      '@black-book/config':
+      '@blap/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@black-book/domain':
+      '@blap/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@black-book/firebase':
+      '@blap/firebase':
         specifier: workspace:*
         version: link:../../packages/firebase
-      '@black-book/security':
+      '@blap/security':
         specifier: workspace:*
         version: link:../../packages/security
     devDependencies:
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config
       '@types/node':
@@ -125,20 +125,20 @@ importers:
 
   apps/api-submissions:
     dependencies:
-      '@black-book/config':
+      '@blap/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@black-book/domain':
+      '@blap/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@black-book/firebase':
+      '@blap/firebase':
         specifier: workspace:*
         version: link:../../packages/firebase
-      '@black-book/security':
+      '@blap/security':
         specifier: workspace:*
         version: link:../../packages/security
     devDependencies:
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config
       '@types/node':
@@ -153,16 +153,16 @@ importers:
 
   apps/web:
     dependencies:
-      '@black-book/domain':
+      '@blap/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@black-book/firebase':
+      '@blap/firebase':
         specifier: workspace:*
         version: link:../../packages/firebase
-      '@black-book/security':
+      '@blap/security':
         specifier: workspace:*
         version: link:../../packages/security
-      '@black-book/ui':
+      '@blap/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       firebase:
@@ -181,10 +181,10 @@ importers:
         specifier: ^19.1.0
         version: 19.2.7(react@19.2.7)
     devDependencies:
-      '@black-book/eslint-config':
+      '@blap/eslint-config':
         specifier: workspace:^
         version: link:../../packages/eslint-config
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config
       '@types/node':
@@ -205,26 +205,26 @@ importers:
 
   packages/config:
     dependencies:
-      '@black-book/domain':
+      '@blap/domain':
         specifier: workspace:*
         version: link:../domain
-      '@black-book/observability':
+      '@blap/observability':
         specifier: workspace:*
         version: link:../observability
-      '@black-book/security':
+      '@blap/security':
         specifier: workspace:*
         version: link:../security
-      '@black-book/testing':
+      '@blap/testing':
         specifier: workspace:*
         version: link:../testing
       zod:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
-      '@black-book/firebase':
+      '@blap/firebase':
         specifier: workspace:*
         version: link:../firebase
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -239,7 +239,7 @@ importers:
 
   packages/data-access:
     devDependencies:
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -254,17 +254,17 @@ importers:
 
   packages/domain:
     dependencies:
-      '@black-book/schemas':
+      '@blap/schemas':
         specifier: workspace:*
         version: link:../schemas
     devDependencies:
-      '@black-book/security':
+      '@blap/security':
         specifier: workspace:*
         version: link:../security
-      '@black-book/testing':
+      '@blap/testing':
         specifier: workspace:*
         version: link:../testing
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -297,10 +297,10 @@ importers:
 
   packages/firebase:
     dependencies:
-      '@black-book/domain':
+      '@blap/domain':
         specifier: workspace:*
         version: link:../domain
-      '@black-book/security':
+      '@blap/security':
         specifier: workspace:*
         version: link:../security
       '@google/genai':
@@ -316,7 +316,7 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@firebase/rules-unit-testing':
@@ -334,14 +334,14 @@ importers:
 
   packages/observability:
     dependencies:
-      '@black-book/domain':
+      '@blap/domain':
         specifier: workspace:*
         version: link:../domain
-      '@black-book/security':
+      '@blap/security':
         specifier: workspace:*
         version: link:../security
     devDependencies:
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -356,20 +356,20 @@ importers:
 
   packages/operator-cli:
     dependencies:
-      '@black-book/domain':
+      '@blap/domain':
         specifier: workspace:*
         version: link:../domain
-      '@black-book/firebase':
+      '@blap/firebase':
         specifier: workspace:*
         version: link:../firebase
-      '@black-book/security':
+      '@blap/security':
         specifier: workspace:*
         version: link:../security
       firebase-admin:
         specifier: ^13.4.0
         version: 13.10.0
     devDependencies:
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -388,7 +388,7 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -403,17 +403,17 @@ importers:
 
   packages/security:
     dependencies:
-      '@black-book/domain':
+      '@blap/domain':
         specifier: workspace:*
         version: link:../domain
-      '@black-book/schemas':
+      '@blap/schemas':
         specifier: workspace:*
         version: link:../schemas
     devDependencies:
-      '@black-book/observability':
+      '@blap/observability':
         specifier: workspace:*
         version: link:../observability
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':
@@ -428,13 +428,13 @@ importers:
 
   packages/testing:
     devDependencies:
-      '@black-book/domain':
+      '@blap/domain':
         specifier: workspace:*
         version: link:../domain
-      '@black-book/security':
+      '@blap/security':
         specifier: workspace:*
         version: link:../security
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       '@types/node':
@@ -451,7 +451,7 @@ importers:
 
   packages/ui:
     devDependencies:
-      '@black-book/typescript-config':
+      '@blap/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
       '@types/node':

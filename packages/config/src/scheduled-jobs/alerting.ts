@@ -17,7 +17,7 @@
  * meaningful despite that. A follow-up could add dedicated SEC-JOB-* policies to
  * packages/observability if dedicated job-alert policies are needed.
  */
-import { DEFAULT_ALERT_POLICIES, buildAlertPayload, type SecurityAlertPayload } from '@black-book/observability';
+import { DEFAULT_ALERT_POLICIES, buildAlertPayload, type SecurityAlertPayload } from '@blap/observability';
 import type { BudgetEvaluation, MissedRunEvaluation } from './health.js';
 import type { ScheduledJobDefinition } from './types.js';
 

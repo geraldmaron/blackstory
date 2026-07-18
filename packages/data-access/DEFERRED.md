@@ -2,7 +2,7 @@
 
 This package historically hosted Cloud SQL / SQL Connect helpers from BB-012.
 
-**Current production path:** Firestore via `@black-book/firebase` converters +
+**Current production path:** Firestore via `@blap/firebase` converters +
 `src/firestore/` in this package.
 
 Postgres modules (`config`, `pool`, `roles`, `session`, `sql-connect/*`) remain

@@ -4,7 +4,7 @@
  * `apps/web/src/app/submit/app-check-guard.ts`) so this endpoint enforces App Check through the
  * same guard factory (`createAppCheckGuard`), verifier (`createFirebaseAppCheckVerifier`), and
  * telemetry sink as every other public surface, instead of inventing a second policy. Never
- * import this file from a Client Component: it pulls in `@black-book/firebase`'s Admin SDK
+ * import this file from a Client Component: it pulls in `@blap/firebase`'s Admin SDK
  * surface.
  *
  * Same read-endpoint deviation as the search guard: `replayProtection` is `false`. This is a
@@ -13,7 +13,7 @@
  * permission prompt) single-use token consumption would reject those as replays. The token is
  * still cryptographically verified either way.
  *
- * The `@black-book/firebase` import below is a dynamic `import`, not a static one, for the same
+ * The `@blap/firebase` import below is a dynamic `import`, not a static one, for the same
  * CJS/ESM interop reason documented in `../../search/api/app-check-guard.ts`.
  */
 import type {
@@ -23,7 +23,7 @@ import type {
   AppCheckTelemetry,
   AppCheckVerifier,
   EnvironmentLike,
-} from '@black-book/firebase';
+} from '@blap/firebase';
 
 export type LocateAppCheckOptions = {
   readonly environment?: EnvironmentLike;
@@ -50,7 +50,7 @@ export async function createLocateAppCheckGuard(
     createFirebaseAppCheckVerifier,
     createServerFirebaseApp,
     parseAppCheckMode,
-  } = await import('@black-book/firebase');
+  } = await import('@blap/firebase');
 
   const environment = options.environment ?? process.env;
   const mode = options.mode ?? parseAppCheckMode(environment.APP_CHECK_MODE);

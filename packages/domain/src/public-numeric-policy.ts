@@ -20,7 +20,7 @@
  *    document structurally requires its provenance: source identifier, source URL,
  *    vintage/decade, retrieval timestamp, and content hash. A count without provenance is
  *    not a statistic, it is an assertion — schemas for statistics collections must make the
- *    provenance fields required (see `censusCountyDecadeSchema` in @black-book/firebase),
+ *    provenance fields required (see `censusCountyDecadeSchema` in @blap/firebase),
  *    and writers should call `assertPublishedStatisticProvenance` before persisting.
  *
  * Why the distinction: entity scoring is editorial judgment this project deliberately keeps

@@ -11,7 +11,7 @@
 
 | ID | Check | Status | Notes |
 |----|-------|--------|-------|
-| S-01 | Threat corpus JSON validates (19 threats, four control quadrants, residual risk) | automated | `pnpm --filter @black-book/testing test` |
+| S-01 | Threat corpus JSON validates (19 threats, four control quadrants, residual risk) | automated | `pnpm --filter @blap/testing test` |
 | S-02 | Every `T-xx` has matching `AC-xx` | automated | same package |
 | S-03 | Every P0 threat lists ≥1 implementation bead | automated | same package |
 | S-04 | Uploads disabled or gated until BB-031 | manual/scaffold | assert feature flag / route absent |

@@ -4,8 +4,8 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@black-book/firebase';
-import { createSubmissionCampaignDetector } from '@black-book/security';
+import type { AppCheckVerifier } from '@blap/firebase';
+import { createSubmissionCampaignDetector } from '@blap/security';
 import { createCorrectionAppCheckGuard } from '../app-check-guard';
 import { createCorrectionRateLimitGuard } from '../rate-limit-guard';
 import { createCorrectionSubmissionStore } from '../store';

@@ -10,7 +10,7 @@ import {
   registerCorpusVetting,
   type CorpusBulkRecordCandidate,
   type RegisterCorpusVettingInput,
-} from '@black-book/domain';
+} from '@blap/domain';
 import {
   parseLeadsFromCsv,
   parseLeadsFromMarkdown,

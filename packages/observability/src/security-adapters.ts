@@ -3,7 +3,7 @@
  * Adapters that normalize producer signals into security telemetry events.
  * Structural contracts mirror existing producers no rewrites required.
  */
-import type { DomainAuditEvent } from '@black-book/domain';
+import type { DomainAuditEvent } from '@blap/domain';
 import {
   AUDIT_ACTION_TO_SECURITY_KIND,
   createSecurityEventId,
@@ -17,7 +17,7 @@ import {
 } from './security-events.js';
 import { fingerprintDimension } from './security-redaction.js';
 
-/** Mirrors @black-book/firebase AppCheckTelemetryEvent without a runtime dependency. */
+/** Mirrors @blap/firebase AppCheckTelemetryEvent without a runtime dependency. */
 export type AppCheckTelemetryInput = {
   readonly event: 'app_check_verification';
   readonly mode: 'monitor' | 'enforce';

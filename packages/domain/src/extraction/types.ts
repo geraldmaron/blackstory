@@ -1,7 +1,7 @@
 /**
  * Contracts for deterministic claim extraction, evidence spans, and review outcomes.
  */
-import type { ClaimClass } from '@black-book/schemas';
+import type { ClaimClass } from '@blap/schemas';
 import type {
   ClaimEvidenceLink,
   ClaimGeographicContext,

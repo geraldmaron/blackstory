@@ -8,7 +8,7 @@
  * retrieval-embedding.ts). What this test *does* verify: the eval pipeline runs end to end
  * against the real corpus fixture, produces a well-formed, reproducible result, and clears a
  * low sanity floor. A real recall@k number requires swapping in a live provider (e.g.
- * `@black-book/firebase`'s `createGeminiEmbeddingProvider` with a `GEMINI_API_KEY`) see
+ * `@blap/firebase`'s `createGeminiEmbeddingProvider` with a `GEMINI_API_KEY`) see
  * docs/adr/ADR-014-vector-search.md.
  */
 import assert from 'node:assert/strict';

@@ -6,7 +6,7 @@
  * same way: a pure "did this trip?" evaluator here, with the actual alert payload built
  * one layer up (packages/config/src/scheduled-jobs/jobs/recalibration-report.ts), exactly the
  * split health.ts/alerting.ts already use. This module has no dependency on
- * @black-book/observability @black-book/domain does not (and should not) depend on it.
+ * @blap/observability @blap/domain does not (and should not) depend on it.
  */
 import type { RelevanceDecisionLogEntry } from './types.js';
 

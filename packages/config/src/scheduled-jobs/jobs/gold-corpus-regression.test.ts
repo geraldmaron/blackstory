@@ -1,6 +1,6 @@
 
 /**
- * Proves the gold-corpus-regression job body is REAL it calls @black-book/testing's
+ * Proves the gold-corpus-regression job body is REAL it calls @blap/testing's
  * evaluateCorpus (the same evaluator the gold-corpus CLI runs) rather than reimplementing
  * evaluation, and that a failing evaluation still just reports (no publish side effect).
  */
@@ -11,7 +11,7 @@ import {
   GOLD_PREDICTIONS_SCHEMA_VERSION,
   type GoldCorpus,
   type GoldPredictions,
-} from '@black-book/testing';
+} from '@blap/testing';
 import { runGoldCorpusRegressionJob } from './gold-corpus-regression.ts';
 
 const CORPUS: GoldCorpus = {

@@ -5,7 +5,7 @@
  * through the same guard factory (`createAppCheckGuard`), verifier
  * (`createFirebaseAppCheckVerifier`), and telemetry sink as every other public surface, instead
  * of inventing a second policy. Never import this file from a Client Component: it pulls in
- * `@black-book/firebase`'s Admin SDK surface.
+ * `@blap/firebase`'s Admin SDK surface.
  *
  * Deliberate deviation from the submit guard: `replayProtection` is `false` here. App Check
  * replay protection consumes a single-use token (each token is accepted at most once). That is
@@ -15,8 +15,8 @@
  * reject those as replays. Reads carry no write side effect, so single-use enforcement buys no
  * safety and breaks normal usage; the token is still cryptographically verified, just not consumed.
  *
- * The `@black-book/firebase` import below is a dynamic `import`, not a static one, on purpose:
- * `apps/web`'s package.json (like `apps/admin`'s) is CommonJS-rooted, while `@black-book/firebase`
+ * The `@blap/firebase` import below is a dynamic `import`, not a static one, on purpose:
+ * `apps/web`'s package.json (like `apps/admin`'s) is CommonJS-rooted, while `@blap/firebase`
  * is an ESM package whose module graph includes a top-level `await`
  * (`embeddings/backfill-cli.ts`). A static import forces the whole graph through a CJS-compatible
  * transform, which cannot represent that top-level `await` and fails to even load. A dynamic
@@ -30,7 +30,7 @@ import type {
   AppCheckTelemetry,
   AppCheckVerifier,
   EnvironmentLike,
-} from '@black-book/firebase';
+} from '@blap/firebase';
 
 export type SearchAppCheckOptions = {
   readonly environment?: EnvironmentLike;
@@ -57,7 +57,7 @@ export async function createSearchAppCheckGuard(
     createFirebaseAppCheckVerifier,
     createServerFirebaseApp,
     parseAppCheckMode,
-  } = await import('@black-book/firebase');
+  } = await import('@blap/firebase');
 
   const environment = options.environment ?? process.env;
   const mode = options.mode ?? parseAppCheckMode(environment.APP_CHECK_MODE);

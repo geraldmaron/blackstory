@@ -1,10 +1,10 @@
-# Black Book — Documentation
+# Blap — Documentation
 
 > Required project state. All LLMs working in this repo, including Construct, should keep this file updated.
 
 ## Purpose
 
-Operating docs for the Black Book monorepo: architecture, decisions, runbooks, and bead reports. Not a substitute for the execution tracker.
+Operating docs for the Blap monorepo: architecture, decisions, runbooks, and bead reports. Not a substitute for the execution tracker.
 
 ## Read first
 
@@ -18,7 +18,7 @@ Operating docs for the Black Book monorepo: architecture, decisions, runbooks, a
 | [`ui/README.md`](./ui/README.md) | Design system tokens, components, fixtures (BB-007) |
 | [`research/`](./research/) | Research/evidence engine docs: discovery, adapters, query packs, relevance, confidence lineage, research-case workflow, gold corpus (BB-037–044, BB-047) |
 | [`admin/research-console.md`](./admin/research-console.md) | Administration and research console (BB-056) |
-| [`source-spec/`](./source-spec/) | Versioned copy of the original *Black Book Web Application Execution Beads* PDF (BB-080) |
+| [`source-spec/`](./source-spec/) | Versioned copy of the original *Blap Web Application Execution Beads* PDF (BB-080) |
 | [`../infra/github/README.md`](../infra/github/README.md) | GitHub governance (BB-009) + OIDC/WIF operator docs (BB-010; cloud not applied) |
 | [`../infra/database/README.md`](../infra/database/README.md) | Parked PostGIS / SQL Connect (Cloud SQL deferred — ADR-011) |
 | [`../infra/firebase/FIRESTORE_MODEL.md`](../infra/firebase/FIRESTORE_MODEL.md) | Firestore collection map + rules (BB-013 / ADR-011) |

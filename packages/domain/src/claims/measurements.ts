@@ -2,8 +2,8 @@
  * Relevance, connection-strength, and research-coverage measurements.
  * These are distinct from confidence: they answer different questions and must not be conflated.
  */
-import type { RelevanceDecision } from '@black-book/schemas';
-import { evaluateRelevance, loadProductConstitution } from '@black-book/schemas';
+import type { RelevanceDecision } from '@blap/schemas';
+import { evaluateRelevance, loadProductConstitution } from '@blap/schemas';
 
 export const RESEARCH_COVERAGE_LEVELS = [
   'none',

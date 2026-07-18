@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { statusAsOf } from '@black-book/domain';
+import { statusAsOf } from '@blap/domain';
 import { resetHistoryGraphReleaseArtifactForTests } from '../../data/history-graph-seed';
 import { getPublicEntity, listPublicEntities } from '../../data/public-seed';
 import { buildHistoryViewModel } from './history-view-model';

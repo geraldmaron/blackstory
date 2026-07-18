@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-Formal decisions for Black Book platform topology, data, deployment, and security boundaries.
+Formal decisions for Blap platform topology, data, deployment, and security boundaries.
 
 **Bead:** BB-002  
 **Status:** Accepted (existing `black-book-efaaf` project/Hosting site acknowledged; other cloud resources not yet verified/provisioned)  

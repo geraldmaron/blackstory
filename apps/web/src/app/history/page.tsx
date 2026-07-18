@@ -5,7 +5,7 @@
  * native GET navigation (no-JS safe).
  */
 import React from 'react';
-import { FilterBar } from '@black-book/ui';
+import { FilterBar } from '@blap/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
 import {
   DecadeStepper,
@@ -37,24 +37,24 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
   const view = buildHistoryViewModel(params);
 
   return (
-    <main className="bb-container bb-page" id="main">
-      <header className="bb-entity-mast bb-history__intro">
-        <p className="bb-page__eyebrow">Temporal browse</p>
-        <h1 className="bb-page__title">History through time</h1>
-        <p className="bb-page__lede">
+    <main className="bp-container bp-page" id="main">
+      <header className="bp-entity-mast bp-history__intro">
+        <p className="bp-page__eyebrow">Temporal browse</p>
+        <h1 className="bp-page__title">History through time</h1>
+        <p className="bp-page__lede">
           An all-time view of the published history graph plus decade-by-decade slices — what was
           active, in force, or living in each era, derived from status history and release artifacts,
           never present-day status backfilled.
         </p>
-        <p className="bb-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
-        <p className="bb-history__framing">{HISTORY_DECADE_FRAMING}</p>
+        <p className="bp-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
+        <p className="bp-history__framing">{HISTORY_DECADE_FRAMING}</p>
       </header>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
+      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
         <SeedDataNotice compact />
 
         <noscript>
-          <div className="bb-history__noscript">
+          <div className="bp-history__noscript">
             <DecadeStepper decades={view.availableDecades} viewState={view.viewState} />
             <FilterBar
               method="get"
@@ -71,7 +71,7 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
                 },
               ]}
             />
-            <p className="bb-sans" id="history-results-heading-njs">
+            <p className="bp-sans" id="history-results-heading-njs">
               {view.totalMatched} record{view.totalMatched === 1 ? '' : 's'} in view
             </p>
             <HistoryGraphPanel

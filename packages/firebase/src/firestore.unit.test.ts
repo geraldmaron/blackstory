@@ -11,7 +11,7 @@ import {
   assertNarrativeMayCiteClaim,
   canSourceAdapterCreateCandidates,
   narrativeMayCiteClaim,
-} from '@black-book/domain';
+} from '@blap/domain';
 import {
   canPublish,
   canonicalClaimSchema,

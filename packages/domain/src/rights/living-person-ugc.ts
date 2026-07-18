@@ -16,7 +16,7 @@ import {
   evaluateLivingStatus,
   loadProductConstitution,
   type ProductConstitution,
-} from '@black-book/schemas';
+} from '@blap/schemas';
 
 export type PersonalDetailContribution = {
   readonly field: string;
@@ -108,7 +108,7 @@ export type DeanonymizationAttempt = {
  *
  * Mirrors the fail-closed assertion pattern used by `assertPublicProjectionSafe`
  * (packages/security/src/serialize.ts). This module cannot import packages/security that
- * package depends on @black-book/domain, so the reverse import would be circular so the
+ * package depends on @blap/domain, so the reverse import would be circular so the
  * pattern is reproduced here rather than shared.
  */
 export function assertNoDeanonymization(

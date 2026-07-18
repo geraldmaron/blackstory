@@ -12,7 +12,7 @@ import {
   measureConnectionStrength,
   measureRelevance,
   preserveContradictoryValues,
-} from '@black-book/domain';
+} from '@blap/domain';
 import type {
   CanonicalClaimDoc,
   CanonicalEntityDoc,
@@ -41,7 +41,7 @@ export type SeedDocument = {
 
 const FIXED_NOW = '2026-07-16T18:00:00.000Z';
 
-// `buildGeoPointFields` (from `@black-book/domain`) returns a `readonly string[]`
+// `buildGeoPointFields` (from `@blap/domain`) returns a `readonly string[]`
 // `geohashPrefixes`; the Firestore doc schema infers a mutable `string[]` for the same field.
 // Copying it here reconciles the two packages' array mutability without changing any value.
 function mutableGeoPoint(lat: number, lng: number, precision: number) {

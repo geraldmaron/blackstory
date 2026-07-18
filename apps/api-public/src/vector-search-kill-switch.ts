@@ -1,7 +1,7 @@
 /**
  * Kill-switch wiring for semantic (`find_nearest`) vector search.
  *
- * Reuses the existing `search` CORE_KILL_SWITCH_IDS entry from `@black-book/config` rather than
+ * Reuses the existing `search` CORE_KILL_SWITCH_IDS entry from `@blap/config` rather than
  * introducing a dedicated vector-search switch id. Vector search is classified as "dynamic search"
  * per that switch's description ("Stops dynamic search while immutable entity snapshots remain
  * available."). Reusing it also inherits the right cascading behavior: `search` is already in
@@ -12,7 +12,7 @@
  * needed, adding a dedicated `vector-search` core switch id is a small, additive change to
  * packages/config (documented as a gap in ADR-014).
  */
-import { evaluateKillSwitch, type KillSwitchDecision, type KillSwitchSnapshot } from '@black-book/config';
+import { evaluateKillSwitch, type KillSwitchDecision, type KillSwitchSnapshot } from '@blap/config';
 
 export const VECTOR_SEARCH_KILL_SWITCH_ID = 'search' as const;
 

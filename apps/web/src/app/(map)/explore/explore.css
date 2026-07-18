@@ -2,178 +2,178 @@
  * Layout and presentation styles for map-first `/explore` experience. Uses the shared
  * Black Book token vocabulary from `@black-book/ui/styles.css` no new colors introduced here.
  */
-.bb-explore-page__body {
-  margin-top: var(--bb-space-4);
+.bp-explore-page__body {
+  margin-top: var(--bp-space-4);
 }
 
-.bb-explore-mast {
+.bp-explore-mast {
   display: grid;
-  gap: var(--bb-space-2);
+  gap: var(--bp-space-2);
   max-width: 40rem;
 }
 
-.bb-explore-mast__title {
+.bp-explore-mast__title {
   margin: 0;
-  font-family: var(--bb-font-display);
+  font-family: var(--bp-font-display);
   font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.15;
-  color: var(--bb-ink);
+  color: var(--bp-ink);
 }
 
-.bb-explore-mast__lede {
+.bp-explore-mast__lede {
   margin: 0;
-  font-family: var(--bb-font-sans);
+  font-family: var(--bp-font-sans);
   font-size: 0.9375rem;
   line-height: 1.45;
-  color: var(--bb-ink-muted);
+  color: var(--bp-ink-muted);
 }
 
-.bb-explore {
+.bp-explore {
   display: grid;
-  gap: var(--bb-space-4);
+  gap: var(--bp-space-4);
 }
 
-.bb-explore__toolbar {
+.bp-explore__toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--bb-space-3);
+  gap: var(--bp-space-3);
   align-items: center;
   justify-content: space-between;
 }
 
-.bb-explore__settings {
-  font-family: var(--bb-font-sans);
+.bp-explore__settings {
+  font-family: var(--bp-font-sans);
   font-size: 0.875rem;
 }
 
-.bb-explore__settings summary {
+.bp-explore__settings summary {
   cursor: pointer;
   font-weight: 600;
 }
 
-.bb-explore__settings-body {
+.bp-explore__settings-body {
   max-width: 28rem;
-  margin-top: var(--bb-space-2);
-  padding: var(--bb-space-3);
-  border: var(--bb-border-width) solid var(--bb-border);
-  background: var(--bb-surface);
+  margin-top: var(--bp-space-2);
+  padding: var(--bp-space-3);
+  border: var(--bp-border-width) solid var(--bp-border);
+  background: var(--bp-surface);
 }
 
-.bb-explore__settings-body p {
-  margin: 0 0 var(--bb-space-2);
+.bp-explore__settings-body p {
+  margin: 0 0 var(--bp-space-2);
 }
 
-.bb-explore__settings-body p:last-child {
+.bp-explore__settings-body p:last-child {
   margin-bottom: 0;
 }
 
-.bb-explore__settings-fieldset {
-  margin: 0 0 var(--bb-space-3);
+.bp-explore__settings-fieldset {
+  margin: 0 0 var(--bp-space-3);
   padding: 0;
   border: 0;
 }
 
-.bb-explore__settings-fieldset legend {
+.bp-explore__settings-fieldset legend {
   padding: 0;
-  margin-bottom: var(--bb-space-2);
+  margin-bottom: var(--bp-space-2);
   font-weight: 600;
 }
 
-.bb-explore__settings-note {
-  margin-top: var(--bb-space-2) !important;
-  color: var(--bb-ink-muted);
+.bp-explore__settings-note {
+  margin-top: var(--bp-space-2) !important;
+  color: var(--bp-ink-muted);
   font-size: 0.8125rem;
 }
 
-.bb-explore__decade-row {
+.bp-explore__decade-row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--bb-space-2);
+  gap: var(--bp-space-2);
 }
 
-.bb-explore__layout {
+.bp-explore__layout {
   display: grid;
-  gap: var(--bb-space-4);
+  gap: var(--bp-space-4);
 }
 
 @media (min-width: 56rem) {
-  .bb-explore__layout {
+  .bp-explore__layout {
     grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 0.9fr);
     align-items: stretch;
     min-height: calc(100svh - 14rem);
   }
 }
 
-.bb-explore__map-panel {
+.bp-explore__map-panel {
   display: grid;
-  gap: var(--bb-space-3);
+  gap: var(--bp-space-3);
   min-height: min(70svh, 36rem);
 }
 
 @media (min-width: 56rem) {
-  .bb-explore__map-panel {
+  .bp-explore__map-panel {
     min-height: calc(100svh - 14rem);
   }
 }
 
-.bb-explore-map__canvas {
+.bp-explore-map__canvas {
   width: 100%;
   min-height: min(70svh, 36rem);
   height: 100%;
-  border: var(--bb-border-width) solid var(--bb-border);
-  background: var(--bb-fixed-ink);
+  border: var(--bp-border-width) solid var(--bp-border);
+  background: var(--bp-fixed-ink);
 }
 
 @media (min-width: 56rem) {
-  .bb-explore-map__canvas {
+  .bp-explore-map__canvas {
     min-height: calc(100svh - 14rem);
   }
 }
 
-.bb-explore__narrative {
+.bp-explore__narrative {
   max-width: 36rem;
 }
 
-.bb-explore-narrative-card {
+.bp-explore-narrative-card {
   position: relative;
 }
 
-.bb-explore-narrative-card__close {
-  margin-bottom: var(--bb-space-2);
+.bp-explore-narrative-card__close {
+  margin-bottom: var(--bp-space-2);
 }
 
-.bb-explore-narrative-card__facts {
+.bp-explore-narrative-card__facts {
   display: grid;
-  gap: var(--bb-space-2);
-  margin: var(--bb-space-3) 0;
-  font-family: var(--bb-font-sans);
+  gap: var(--bp-space-2);
+  margin: var(--bp-space-3) 0;
+  font-family: var(--bp-font-sans);
 }
 
-.bb-explore-narrative-card__facts dt {
+.bp-explore-narrative-card__facts dt {
   font-weight: 700;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
-.bb-explore-narrative-card__facts dd {
+.bp-explore-narrative-card__facts dd {
   margin: 0;
 }
 
-.bb-explore-narrative-card__precision {
-  color: var(--bb-ink-subtle);
+.bp-explore-narrative-card__precision {
+  color: var(--bp-ink-subtle);
   font-size: 0.875rem;
 }
 
-.bb-explore__list-panel {
+.bp-explore__list-panel {
   display: grid;
-  gap: var(--bb-space-3);
+  gap: var(--bp-space-3);
   align-content: start;
 }
 
-.bb-explore__results-count {
+.bp-explore__results-count {
   margin: 0;
   font-size: 0.6875rem;
   font-weight: 700;
@@ -181,151 +181,151 @@
   text-transform: uppercase;
 }
 
-.bb-explore-result-list {
+.bp-explore-result-list {
   max-height: min(60svh, 32rem);
   overflow: auto;
 }
 
 @media (min-width: 56rem) {
-  .bb-explore-result-list {
+  .bp-explore-result-list {
     max-height: calc(100svh - 22rem);
   }
 }
 
 /*
- * BB-099 legend. `.bb-explore-legend` is the component's own root (a native `<details>`) it
+ * BB-099 legend. `.bp-explore-legend` is the component's own root (a native `<details>`) it
  * carries no fixed/floating position of its own; a wrapping container supplied by the map-stage
  * surface is what pins it as a bottom-left floating panel over the canvas (see
  * `MapExperienceLegend.tsx`'s props-contract doc comment). What lives here is purely the
  * component's internal layout, sized to stay legible down to a 375px-wide container.
  */
-.bb-explore-legend {
-  margin-top: var(--bb-space-2);
+.bp-explore-legend {
+  margin-top: var(--bp-space-2);
   max-width: 22rem;
-  font-family: var(--bb-font-sans);
+  font-family: var(--bp-font-sans);
 }
 
-.bb-explore-legend__summary {
+.bp-explore-legend__summary {
   cursor: pointer;
   font-weight: 700;
   font-size: 0.8125rem;
   list-style: revert;
 }
 
-.bb-explore-legend__summary:focus-visible {
-  outline: var(--bb-focus-width) solid var(--bb-focus-ring);
-  outline-offset: var(--bb-focus-offset);
+.bp-explore-legend__summary:focus-visible {
+  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
+  outline-offset: var(--bp-focus-offset);
 }
 
-.bb-explore-legend__body {
+.bp-explore-legend__body {
   display: grid;
-  gap: var(--bb-space-4);
-  margin-top: var(--bb-space-3);
+  gap: var(--bp-space-4);
+  margin-top: var(--bp-space-3);
 }
 
-.bb-explore-legend__subhead {
-  margin: 0 0 var(--bb-space-1);
-  font-family: var(--bb-font-mono);
+.bp-explore-legend__subhead {
+  margin: 0 0 var(--bp-space-1);
+  font-family: var(--bp-font-mono);
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--bb-ink-muted);
+  color: var(--bp-ink-muted);
 }
 
-.bb-explore-legend__note {
-  margin: 0 0 var(--bb-space-2);
+.bp-explore-legend__note {
+  margin: 0 0 var(--bp-space-2);
   font-size: 0.8125rem;
-  color: var(--bb-ink-muted);
+  color: var(--bp-ink-muted);
 }
 
-.bb-explore-legend__kind-list {
+.bp-explore-legend__kind-list {
   display: grid;
-  gap: var(--bb-space-2);
+  gap: var(--bp-space-2);
   margin: 0;
   padding: 0;
   list-style: none;
   font-size: 0.8125rem;
 }
 
-.bb-explore-legend__kind-list li {
+.bp-explore-legend__kind-list li {
   display: flex;
   align-items: center;
-  gap: var(--bb-space-2);
+  gap: var(--bp-space-2);
 }
 
-.bb-explore-legend__kind-glyph-name {
-  color: var(--bb-ink-muted);
+.bp-explore-legend__kind-glyph-name {
+  color: var(--bp-ink-muted);
 }
 
-.bb-legend-glyph {
+.bp-legend-glyph {
   flex: 0 0 auto;
   display: inline-block;
   width: 0.75rem;
   height: 0.75rem;
-  border: var(--bb-border-width) solid var(--bb-border);
+  border: var(--bp-border-width) solid var(--bp-border);
 }
 
-.bb-legend-glyph--circle {
+.bp-legend-glyph--circle {
   border-radius: 50%;
 }
 
-.bb-legend-glyph--square {
+.bp-legend-glyph--square {
   border-radius: 2px;
 }
 
-.bb-legend-glyph--diamond {
+.bp-legend-glyph--diamond {
   border-radius: 2px;
   transform: rotate(45deg);
 }
 
-.bb-legend-glyph--ring {
+.bp-legend-glyph--ring {
   border-radius: 50%;
   border-width: 2px;
 }
 
-.bb-explore-legend__size-scale {
+.bp-explore-legend__size-scale {
   display: flex;
   align-items: flex-end;
-  gap: var(--bb-space-2);
-  margin-bottom: var(--bb-space-2);
+  gap: var(--bp-space-2);
+  margin-bottom: var(--bp-space-2);
 }
 
-.bb-explore-legend__size-dot {
+.bp-explore-legend__size-dot {
   display: inline-block;
   flex: 0 0 auto;
   border-radius: 50%;
-  background: var(--bb-accent-graphic);
+  background: var(--bp-accent-graphic);
 }
 
-.bb-explore-legend__list {
+.bp-explore-legend__list {
   display: grid;
-  gap: var(--bb-space-3);
+  gap: var(--bp-space-3);
   margin: 0;
   font-size: 0.8125rem;
 }
 
-.bb-explore-legend__list dt {
+.bp-explore-legend__list dt {
   font-weight: 700;
 }
 
-.bb-explore-legend__list dd {
-  margin: var(--bb-space-1) 0 0;
-  color: var(--bb-ink-muted);
+.bp-explore-legend__list dd {
+  margin: var(--bp-space-1) 0 0;
+  color: var(--bp-ink-muted);
 }
 
 @media (max-width: 23.4375rem) {
-  .bb-explore-legend {
+  .bp-explore-legend {
     max-width: 100%;
   }
 }
 
-.bb-explore__locate-link {
+.bp-explore__locate-link {
   margin: 0;
-  color: var(--bb-ink-subtle);
+  color: var(--bp-ink-subtle);
 }
 
-.bb-explore__noscript {
+.bp-explore__noscript {
   display: grid;
-  gap: var(--bb-space-4);
+  gap: var(--bp-space-4);
 }

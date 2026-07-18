@@ -4,11 +4,11 @@
  * style), so this module has zero runtime WebGL dependency and is safe to unit test in plain Node.
  *
  * Every color comes from `../../lib/map-experience/dignity-style.ts` (which reuses
- * `@black-book/ui`'s brand palette). This file introduces no new hues, so the dignity rule
+ * `@blap/ui`'s brand palette). This file introduces no new hues, so the dignity rule
  * (no red violence markers, no crime-heat) holds at the render layer, not only in tokens.
  */
 import type { ExpressionSpecification, StyleSpecification } from 'maplibre-gl';
-import { brandPalette } from '@black-book/ui';
+import { brandPalette } from '@blap/ui';
 import {
   DENSITY_TIER_FILL,
   DIGNITY_PALETTE,
@@ -177,7 +177,7 @@ export type BuildExploreMapStyleInput = {
 export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpecification {
   return {
     version: 8,
-    name: 'Black Book — Explore',
+    name: 'Blap — Explore',
     sources: {
       [EXPLORE_STATE_DENSITY_SOURCE_ID]: {
         type: 'geojson',

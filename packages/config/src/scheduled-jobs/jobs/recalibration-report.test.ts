@@ -1,13 +1,13 @@
 
 /**
- * Proves the recalibration-report job body is REAL it calls @black-book/domain's
+ * Proves the recalibration-report job body is REAL it calls @blap/domain's
  * relevance-feedback module (buildRecalibrationReport evaluateRelevanceDriftAlarm) rather than
  * reimplementing any analysis, produces report-only output (no publish, no weight mutation), and
  * raises a real SEC-SRC-01 alert only when disagreement drift is actually triggered.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { RELEVANCE_FEEDBACK_SCHEMA_VERSION, type RelevanceDecisionLogEntry } from '@black-book/domain';
+import { RELEVANCE_FEEDBACK_SCHEMA_VERSION, type RelevanceDecisionLogEntry } from '@blap/domain';
 import {
   DEFAULT_RECALIBRATION_DRIFT_THRESHOLDS,
   RECALIBRATION_REPORT_JOB_ID,

@@ -21,11 +21,11 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   transpilePackages: [
-    '@black-book/domain',
-    '@black-book/schemas',
-    '@black-book/ui',
-    '@black-book/security',
-    '@black-book/firebase',
+    '@blap/domain',
+    '@blap/schemas',
+    '@blap/ui',
+    '@blap/security',
+    '@blap/firebase',
   ],
   webpack: (config) => {
     // NodeNext packages emit `.js` specifiers that map to `.ts`/`.tsx` sources.

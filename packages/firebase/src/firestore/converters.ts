@@ -7,8 +7,8 @@ import type { z } from 'zod';
 import {
   assertLearningIndexProjection,
   sanitizePrimaryImageForRelease,
-} from '@black-book/domain';
-import { assertPublicProjectionSafe } from '@black-book/security';
+} from '@blap/domain';
+import { assertPublicProjectionSafe } from '@blap/security';
 import {
   auditEventSchema,
   canonicalClaimSchema,

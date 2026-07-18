@@ -10,7 +10,7 @@ import {
   type NotabilityCriterion,
   type PublicWhyThisAppears,
   type RelevanceEvidence,
-} from '@black-book/domain';
+} from '@blap/domain';
 import type { EvidenceClaimInput } from '../../../lib/evidence';
 import type { PublicClaimView, PublicEntityView } from '../../../data/public-seed';
 

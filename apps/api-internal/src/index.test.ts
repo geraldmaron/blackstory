@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { SurfaceCapabilityError } from '@black-book/config';
+import { SurfaceCapabilityError } from '@blap/config';
 import { health } from './index.ts';
 import { guardIncomingAuth, guardPublicationOperation, rejectEndUserToken } from './posture.ts';
 

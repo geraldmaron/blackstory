@@ -1,11 +1,11 @@
 /**
  * Dignity-rule style tokens for the map (no red violence markers, no trauma-forward color
  * coding, clusters never render as crime-heat). Every color below comes from
- * `@black-book/ui`'s brand palette — this module never introduces a new hue. The
+ * `@blap/ui`'s brand palette — this module never introduces a new hue. The
  * accompanying test (`dignity-style.test.ts`) programmatically asserts none of them are red-hued,
  * so this rule cannot silently regress as the palette evolves.
  */
-import { brandPalette, darkTheme } from '@black-book/ui';
+import { brandPalette, darkTheme } from '@blap/ui';
 
 /** Cluster/point radii chosen so a national cluster decomposes to named entities within two
  * interactions: one zoom step un-clusters to a regional-scale cluster, a second reaches

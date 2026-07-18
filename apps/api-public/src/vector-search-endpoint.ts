@@ -17,11 +17,11 @@
  * vector-specific distanceThreshold/eraBucket/k bounds)
  * 5. Embed the validated query text, then run the capped, thresholded KNN query.
  */
-import type { AppCheckDecision, AppCheckHeaders } from '@black-book/firebase';
-import type { EmbeddingProvider, VectorIndexStore, VectorQueryMatch } from '@black-book/firebase';
-import { truncateAndNormalize, EMBEDDING_DIMS } from '@black-book/firebase';
-import type { KillSwitchSnapshot } from '@black-book/config';
-import type { RateLimitSubject } from '@black-book/security';
+import type { AppCheckDecision, AppCheckHeaders } from '@blap/firebase';
+import type { EmbeddingProvider, VectorIndexStore, VectorQueryMatch } from '@blap/firebase';
+import { truncateAndNormalize, EMBEDDING_DIMS } from '@blap/firebase';
+import type { KillSwitchSnapshot } from '@blap/config';
+import type { RateLimitSubject } from '@blap/security';
 import { evaluateVectorSearchKillSwitch } from './vector-search-kill-switch.js';
 import {
   evaluateVectorSearchGuardrails,

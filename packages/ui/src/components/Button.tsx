@@ -22,7 +22,7 @@ export function Button({
   ...rest
 }: ButtonProps) {
   return (
-    <button type={type} className={cx('bb-button', `bb-button--${variant}`, className)} {...rest}>
+    <button type={type} className={cx('bp-button', `bp-button--${variant}`, className)} {...rest}>
       {children}
     </button>
   );

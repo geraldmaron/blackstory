@@ -24,7 +24,7 @@ This assumption is **general and defeasible**. It does not cover:
 ## Reddit's deletion-sync obligation is contractual, not privacy-law-conditional
 
 Reddit's deletion-sync requirement — purge derived content within 48 hours of the user deleting
-the original on Reddit — comes from **Reddit's API/developer terms**, a contract Black Book
+the original on Reddit — comes from **Reddit's API/developer terms**, a contract Blap
 enters into to access the API. It is not derived from, and does not depend on, a CPRA "publicly
 available" analysis.
 
@@ -70,7 +70,7 @@ argument) should go through counsel review, not just this document.
 ## What this document intentionally does not cover
 
 - Rights of publicity / right-to-be-forgotten regimes outside CPRA.
-- Non-US jurisdictions (GDPR, etc.) — Black Book's current UGC sources and obligations registry
+- Non-US jurisdictions (GDPR, etc.) — Blap's current UGC sources and obligations registry
   entries (Reddit, Brave, Exa, RSS, Internet Archive, DPLA) are evaluated against US law only.
 - Platform-specific terms for sources not yet in the obligations registry
   (`packages/domain/src/rights/obligations.ts`) — any new UGC source needs its own entry and,

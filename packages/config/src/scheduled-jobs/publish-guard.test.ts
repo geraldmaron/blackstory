@@ -1,13 +1,13 @@
 
 /**
  * Nothing scheduled can publish. This proves assertScheduledJobOperationAllowed
- * calls through the REAL guard (assertDiscoveryCannotPublish from @black-book/domain)
+ * calls through the REAL guard (assertDiscoveryCannotPublish from @blap/domain)
  * not a locally invented check that doesn't connect to anything and that a job cannot bypass
  * promotion gates even when it declares one of the two pre-approved public-facing exceptions.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { FORBIDDEN_DISCOVERY_OPERATIONS, assertDiscoveryCannotPublish } from '@black-book/domain';
+import { FORBIDDEN_DISCOVERY_OPERATIONS, assertDiscoveryCannotPublish } from '@blap/domain';
 import { assertScheduledJobOperationAllowed, jobDeclaresPublicEffect } from './publish-guard.ts';
 import type { ScheduledJobDefinition } from './types.ts';
 

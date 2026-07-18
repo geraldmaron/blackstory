@@ -2,7 +2,7 @@
  * Global not-found page for unknown public routes and missing seed entities.
  */
 
-import { EmptyState } from '@black-book/ui';
+import { EmptyState } from '@blap/ui';
 import { StatusPage } from '../components/StatusPage';
 
 export default function NotFound() {
@@ -12,11 +12,11 @@ export default function NotFound() {
       title="Page not found"
       lede="That route is not part of the public shell, or the sample entity id is unknown."
     >
-      <div className="bb-page--status__body">
+      <div className="bp-page--status__body">
         <EmptyState
           title="Nothing to show here"
           action={
-            <a className="bb-button bb-button--primary" href="/search">
+            <a className="bp-button bp-button--primary" href="/search">
               Browse sample records
             </a>
           }

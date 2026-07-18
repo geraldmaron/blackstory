@@ -3,7 +3,7 @@
  * Security telemetry redaction strips App Check tokens, credentials, and protected
  * addresses before events reach logs or exported metrics.
  */
-import { createSensitiveDataRedactor } from '@black-book/security';
+import { createSensitiveDataRedactor } from '@blap/security';
 import type { SecurityTelemetryEvent } from './security-events.js';
 
 /** Keys that must never appear in security telemetry output (case-insensitive). */

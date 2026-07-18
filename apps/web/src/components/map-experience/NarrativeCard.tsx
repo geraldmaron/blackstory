@@ -5,12 +5,13 @@
  * open the same card for the same feature, so the two experiences stay observably in sync.
  */
 import React from 'react';
-import { Card } from '@black-book/ui';
+import Link from 'next/link';
+import { Card } from '@blap/ui';
 import { CONFIDENCE_TIER_GLYPH } from '../../lib/map-experience/dignity-style';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source (same note as
-// `@black-book/ui`'s own components, e.g. MapExplorer.tsx).
+// `@blap/ui`'s own components, e.g. MapExplorer.tsx).
 void React;
 
 export type NarrativeCardProps = {
@@ -43,16 +44,16 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
       title={properties.displayName}
       meta={
         <>
-          <span className="bb-mono">{properties.kind}</span>
-          <span className="bb-mono">{eraLabel(properties.eraBuckets)}</span>
+          <span className="bp-mono">{properties.kind}</span>
+          <span className="bp-mono">{eraLabel(properties.eraBuckets)}</span>
         </>
       }
-      className="bb-explore-narrative-card"
+      className="bp-explore-narrative-card"
     >
       {onClose ? (
         <button
           type="button"
-          className="bb-button bb-button--secondary bb-explore-narrative-card__close"
+          className="bp-button bp-button--secondary bp-explore-narrative-card__close"
           onClick={onClose}
           aria-label={`Close ${properties.displayName} card`}
         >
@@ -60,23 +61,23 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         </button>
       ) : null}
 
-      <p className="bb-sans">{properties.oneLineStory}</p>
+      <p className="bp-sans">{properties.oneLineStory}</p>
 
       {properties.topicTags.length > 0 ? (
-        <p className="bb-explore-narrative-card__tags" aria-label="Topics">
+        <p className="bp-explore-narrative-card__tags" aria-label="Topics">
           {properties.topicTags.slice(0, 2).map((tag) => (
-            <a
+            <Link
               key={tag}
-              className="bb-entity-tag"
+              className="bp-entity-tag"
               href={`/search?topic=${encodeURIComponent(tag)}`}
             >
               {tag}
-            </a>
+            </Link>
           ))}
         </p>
       ) : null}
 
-      <dl className="bb-explore-narrative-card__facts">
+      <dl className="bp-explore-narrative-card__facts">
         <div>
           <dt>Evidence</dt>
           <dd>
@@ -98,9 +99,9 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         ) : null}
       </dl>
 
-      <p className="bb-sans bb-explore-narrative-card__precision">{radiusAffordanceLabel(feature)}</p>
+      <p className="bp-sans bp-explore-narrative-card__precision">{radiusAffordanceLabel(feature)}</p>
 
-      <a className="bb-cta bb-cta--ink" href={properties.href}>
+      <a className="bp-cta bp-cta--ink" href={properties.href}>
         Open full record
       </a>
     </Card>

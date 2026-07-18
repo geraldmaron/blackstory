@@ -1,5 +1,5 @@
 {
-  "name": "@black-book/eslint-config",
+  "name": "@blap/eslint-config",
   "version": "0.0.0",
   "private": true,
   "type": "module",

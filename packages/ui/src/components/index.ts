@@ -1,6 +1,6 @@
 
 /**
- * Public exports for Black Book accessible UI components.
+ * Public exports for Blap accessible UI components.
  */
 
 export { Button, type ButtonProps } from './Button.js';

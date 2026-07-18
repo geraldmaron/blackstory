@@ -93,7 +93,7 @@ const DEFAULT_K_VALUES = [5, 10] as const;
  * Runs the retrieval eval end to end: embeds every document and query with the injected
  * provider, ranks documents per query by cosine similarity, and reports recall@k + MRR.
  * Pass `createDeterministicMockEvalProvider` (retrieval-embedding.ts) for a CI-safe run with
- * no network access, or a real provider (e.g. `@black-book/firebase`'s
+ * no network access, or a real provider (e.g. `@blap/firebase`'s
  * `createGeminiEmbeddingProvider`, wired in by a caller outside this package) for a real number.
  */
 export async function runRetrievalEval(

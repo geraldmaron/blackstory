@@ -11,8 +11,8 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@black-book/firebase';
-import type { CensusGeocodeMatch } from '@black-book/domain';
+import type { AppCheckVerifier } from '@blap/firebase';
+import type { CensusGeocodeMatch } from '@blap/domain';
 import { createLocateCache } from '../../../lib/geocode/pipeline';
 import { createLocateAppCheckGuard } from './app-check-guard';
 import { createLocateRateLimitGuard } from './rate-limit-guard';

@@ -3,7 +3,7 @@
  * technique-based reader empowerment. Names manipulation techniques, never people or groups.
  */
 import React from 'react';
-import { Notice } from '@black-book/ui';
+import { Notice } from '@blap/ui';
 import { PREBUNK_TECHNIQUE_FRAMES } from '../../lib/trust/domain-trust.js';
 
 export type HowToReadThisRecordProps = {
@@ -21,14 +21,14 @@ export function HowToReadThisRecord({ methodologyHref = '/methodology' }: HowToR
           built so you can check it yourself.
         </p>
       </Notice>
-      <ul className="bb-sans" style={{ margin: 'var(--bb-space-4) 0 0 0', paddingLeft: 'var(--bb-space-5)' }}>
+      <ul className="bp-sans" style={{ margin: 'var(--bp-space-4) 0 0 0', paddingLeft: 'var(--bp-space-5)' }}>
         {PREBUNK_TECHNIQUE_FRAMES.map((frame) => (
-          <li key={frame.id} style={{ marginBottom: 'var(--bb-space-3)' }}>
+          <li key={frame.id} style={{ marginBottom: 'var(--bp-space-3)' }}>
             <strong>{frame.technique}.</strong> {frame.readerAction}
           </li>
         ))}
       </ul>
-      <p className="bb-sans" style={{ margin: 'var(--bb-space-4) 0 0 0' }}>
+      <p className="bp-sans" style={{ margin: 'var(--bp-space-4) 0 0 0' }}>
         <a href={methodologyHref}>Read our full methodology</a> for definitions, source hierarchy, and
         verification steps.
       </p>

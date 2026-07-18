@@ -216,7 +216,7 @@ firebase deploy --only firestore:rules,firestore:indexes --project=blackbook-sta
 #    infra/firebase/.firebaserc.example already shows the target shape (default/production/staging/internal)
 
 # 5. Re-register apps/admin's Firebase app under blackbook-internal per runbook step 15
-firebase apps:create WEB "Black Book Admin" --project=blackbook-internal
+firebase apps:create WEB "Blap Admin" --project=blackbook-internal
 ```
 
 Source config: `infra/firebase/firebase.json`, `infra/firebase/firestore.rules`,
@@ -327,7 +327,7 @@ gcloud recaptcha-enterprise keys create \
   --domains=black-book-efaaf.web.app,black-book-efaaf.firebaseapp.com,<production-domain> \
   --integration-type=SCORE
 
-# 2. Register the key with Firebase App Check for "Black Book Web"
+# 2. Register the key with Firebase App Check for "Blap Web"
 #    (Firebase console: Project Settings -> App Check -> apps/web -> Register -> reCAPTCHA
 #    Enterprise; no firebase-tools CLI subcommand for this step as of writing — console-only,
 #    matching infra/firebase/auth-and-app-check.md's documented sequence)
@@ -461,7 +461,7 @@ gcloud compute networks vpc-access connectors create black-book-connector \
 ```bash
 gcloud redis instances describe black-book-ratelimits --project=black-book-efaaf --region=us-central1 \
   --format='value(state,host,port)'   # expect state=READY
-pnpm --filter @black-book/security test   # policy math unaffected by store swap
+pnpm --filter @blap/security test   # policy math unaffected by store swap
 # Load test: confirm rate-limit denials are now consistent across concurrent Cloud Run instances
 # (see infra/gcp/armor/load-test-plan.md for the adjacent BB-059 load-test harness)
 ```
@@ -660,7 +660,7 @@ node infra/gcp/observability/security-alerts/security-alerts.test.mjs   # local 
 gcloud monitoring policies list --project=black-book-efaaf --filter='displayName:SEC-'
 ```
 
-Run synthetic metric injection from `@black-book/observability`'s test suite in staging to confirm
+Run synthetic metric injection from `@blap/observability`'s test suite in staging to confirm
 an actual alert fires and reaches the configured channel; spot-check that no App Check token
 appears in any log-based metric (redaction check, per the BB-034 sign-off list).
 

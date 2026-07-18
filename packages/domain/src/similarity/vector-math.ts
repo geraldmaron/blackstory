@@ -1,8 +1,8 @@
 /**
  * Pure embedding-vector math shared by candidate recall and near-duplicate detection.
  *
- * Deliberately duplicated (in miniature) from @black-book/firebase's embeddings/vector-math.ts
- * rather than imported: @black-book/firebase depends on @black-book/domain (not the reverse),
+ * Deliberately duplicated (in miniature) from @blap/firebase's embeddings/vector-math.ts
+ * rather than imported: @blap/firebase depends on @blap/domain (not the reverse),
  * and this package's discovery/research logic must stay Firestore-free so it can run inside
  * research workers without pulling in Admin SDK credentials. Both copies assert the same
  * invariant (finite, unit-normalized, equal length) and will be trivial to reconcile if a

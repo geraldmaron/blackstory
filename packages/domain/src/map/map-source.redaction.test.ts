@@ -1,17 +1,17 @@
 /**
  * THE critical regression test: proves buildMapSource, wired to the
- * REAL `redactLocationForPublic` from `@black-book/security` (not a stub),
+ * REAL `redactLocationForPublic` from `@blap/security` (not a stub),
  * never lets a precise living-person residential coordinate reach the
  * generated map source at full precision.
  *
- * `@black-book/security` is a devDependency of this package for this test
+ * `@blap/security` is a devDependency of this package for this test
  * only (see package.json) it is never imported by map-source.ts itself,
  * so there is no runtime circular dependency (security already depends on
  * domain at runtime; domain's shipped code has zero dependency on security).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { redactLocationForPublic } from '@black-book/security';
+import { redactLocationForPublic } from '@blap/security';
 import { buildMapSource } from './map-source.js';
 import {
   DECEASED_RESIDENCE_FIXTURE,

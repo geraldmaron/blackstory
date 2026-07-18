@@ -1,5 +1,5 @@
 /**
- * @black-book/data-access server-only data access helpers.
+ * @blap/data-access server-only data access helpers.
  *
  * Primary path (ADR-011 D-014): Firestore collection maps and publish guards.
  * Deferred path: Postgres roles, pool, SQL Connect allowlists 

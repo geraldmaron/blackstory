@@ -1,8 +1,8 @@
 /**
  * Presentation-only string helpers for fact registry components.
  */
-import type { FactConfidenceGrade, FactStatus } from '@black-book/domain';
-import { FACT_CONFIDENCE_DEFINITIONS } from '@black-book/domain';
+import type { FactConfidenceGrade, FactStatus } from '@blap/domain';
+import { FACT_CONFIDENCE_DEFINITIONS } from '@blap/domain';
 
 export function humanizeToken(value: string): string {
   return value

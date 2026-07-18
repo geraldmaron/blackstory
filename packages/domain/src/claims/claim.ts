@@ -1,8 +1,8 @@
 /**
  * Atomic claims, versions, temporal/geographic context, and procedural status.
  */
-import type { ClaimClass } from '@black-book/schemas';
-import { isRecognizedVocabulary, loadProductConstitution } from '@black-book/schemas';
+import type { ClaimClass } from '@blap/schemas';
+import { isRecognizedVocabulary, loadProductConstitution } from '@blap/schemas';
 import type { GeographicRelationshipContext, TemporalContext } from '../relationship.js';
 import type { ConfidenceScore } from './confidence.js';
 import type {

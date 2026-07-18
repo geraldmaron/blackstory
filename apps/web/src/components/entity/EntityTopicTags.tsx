@@ -2,6 +2,7 @@
  * Learning-index topic / era / notability chips linking into search and explore filters.
  */
 import React from 'react';
+import Link from 'next/link';
 import type { PublicEntityView } from '../../data/public-seed';
 
 void React;
@@ -27,19 +28,19 @@ export function EntityTopicTags({ entity }: EntityTopicTagsProps) {
   }
 
   return (
-    <div className="bb-entity-tags" role="group" aria-label="Topics and eras">
+    <div className="bp-entity-tags" role="group" aria-label="Topics and eras">
       {themes.map((tag) => (
-        <a key={`theme-${tag}`} className="bb-entity-tag" href={chipHref('theme', tag)}>
+        <Link key={`theme-${tag}`} className="bp-entity-tag" href={chipHref('theme', tag)}>
           {tag}
-        </a>
+        </Link>
       ))}
       {eras.map((era) => (
-        <a key={`era-${era}`} className="bb-entity-tag bb-entity-tag--era" href={chipHref('era', era)}>
+        <Link key={`era-${era}`} className="bp-entity-tag bp-entity-tag--era" href={chipHref('era', era)}>
           {era}
-        </a>
+        </Link>
       ))}
       {notability.slice(0, 2).map((label) => (
-        <span key={`note-${label.slice(0, 24)}`} className="bb-entity-tag bb-entity-tag--note">
+        <span key={`note-${label.slice(0, 24)}`} className="bp-entity-tag bp-entity-tag--note">
           {label.length > 72 ? `${label.slice(0, 69)}…` : label}
         </span>
       ))}

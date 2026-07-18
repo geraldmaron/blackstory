@@ -47,7 +47,7 @@ test('explains state labels and the copper selected-state convention in words', 
 
 test('is a native, keyboard-accessible disclosure (details/summary), open by default', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  assert.match(html, /<details[^>]*class="bb-explore-legend"[^>]*open/);
+  assert.match(html, /<details[^>]*class="bp-explore-legend"[^>]*open/);
   assert.match(html, /<summary/);
 });
 
@@ -59,12 +59,12 @@ test('defaultCollapsed renders the disclosure closed', () => {
   const html = renderToStaticMarkup(
     createElement<MapExperienceLegendProps>(MapExperienceLegend, { defaultCollapsed: true }),
   );
-  assert.match(html, /<details class="bb-explore-legend">/);
+  assert.match(html, /<details class="bp-explore-legend">/);
   assert.doesNotMatch(html, /<details[^>]*open/);
 });
 
 test('kind swatches and confidence glyphs are aria-hidden (the accessible content is the adjacent text)', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  const glyphSwatchCount = (html.match(/class="bb-legend-glyph[^"]*"[^>]*aria-hidden="true"/g) ?? []).length;
+  const glyphSwatchCount = (html.match(/class="bp-legend-glyph[^"]*"[^>]*aria-hidden="true"/g) ?? []).length;
   assert.equal(glyphSwatchCount, KIND_ENCODING_ENTRIES.length);
 });

@@ -16,7 +16,7 @@ export type FirebaseHarness = {
   readonly firestoreHost?: string;
 };
 
-const DEMO_PROJECT_ID = 'demo-black-book';
+const DEMO_PROJECT_ID = 'demo-blap';
 
 function javaAvailable(): boolean {
   const result = spawnSync('java', ['-version'], { encoding: 'utf8' });

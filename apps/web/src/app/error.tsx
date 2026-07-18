@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Notice } from '@black-book/ui';
+import { Notice } from '@blap/ui';
 import { StatusPage } from '../components/StatusPage';
 import { sanitizeClientErrorDisplay } from '../lib/runtime-hardening/error-surface';
 
@@ -28,15 +28,15 @@ export default function Error({
       title="Something went wrong"
       lede="The public shell hit an unexpected error. You can retry or return home."
     >
-      <div className="bb-stack bb-page--status__body">
+      <div className="bp-stack bp-page--status__body">
         <Notice tone="error" title={display.title}>
           {display.detail}
         </Notice>
-        <div className="bb-row">
-          <button type="button" className="bb-button bb-button--primary" onClick={reset}>
+        <div className="bp-row">
+          <button type="button" className="bp-button bp-button--primary" onClick={reset}>
             Try again
           </button>
-          <a className="bb-button bb-button--secondary" href="/">
+          <a className="bp-button bp-button--secondary" href="/">
             Back to home
           </a>
         </div>

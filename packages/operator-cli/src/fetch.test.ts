@@ -11,7 +11,7 @@
 import assert from 'node:assert/strict';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { test } from 'node:test';
-import type { SafeFetchResult } from '@black-book/security';
+import type { SafeFetchResult } from '@blap/security';
 import {
   buildCitationPrefill,
   nodePinnedTransport,

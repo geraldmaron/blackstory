@@ -1,6 +1,6 @@
 
 /**
- * The Black Book "Pinned Page" mark: a closed-book cover forms an
+ * The Blap "Pinned Page" mark: a closed-book cover forms an
  * asymmetric B, curved page-edge bands are exposed at the spine, and a
  * location pin is integrated into the lower-left of the cover "history,
  * pinned to place." Geometry is original (not a font glyph or stock icon);
@@ -15,18 +15,18 @@ import { brandPalette } from '../tokens/brand-palette.js';
  * wordmark variants are intentionally absent. Full lockups are served as
  * static SVGs from the brand pack — this component only renders the symbol.
  */
-export type BlackBookLogoVariant = 'mark' | 'app-icon';
+export type BlapLogoVariant = 'mark' | 'app-icon';
 
-export type BlackBookLogoDetail = 'full' | 'compact';
+export type BlapLogoDetail = 'full' | 'compact';
 
-export interface BlackBookLogoProps
+export interface BlapLogoProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'color'> {
 
   /**
    * mark: symbol only
    * app-icon: rounded-square application icon
  */
-  variant?: BlackBookLogoVariant;
+  variant?: BlapLogoVariant;
   /** Width of the symbol in CSS pixels. */
   size?: number;
   /** Primary logo color (book cover + B bowls). */
@@ -42,19 +42,19 @@ export interface BlackBookLogoProps
  */
   pageColors?: readonly string[];
   /** Reduces page detail for favicons and very small UI placements. */
-  detail?: BlackBookLogoDetail;
+  detail?: BlapLogoDetail;
   /** Accessible label for the complete logo. */
   label?: string;
   /** Rounded-corner radius (percent) used by the app-icon variant. */
   iconRadius?: number;
 }
 
-interface BlackBookMarkProps {
+interface BlapMarkProps {
   ink: string;
   paper: string;
   accent: string;
   pageColors: readonly string[];
-  detail: BlackBookLogoDetail;
+  detail: BlapLogoDetail;
 }
 
 const DEFAULT_PAGE_COLORS = [
@@ -66,19 +66,19 @@ const DEFAULT_PAGE_COLORS = [
 
 
 /**
- * Custom Black Book symbol.
+ * Custom Blap symbol.
  *
  * The left volume is the book cover. The curved vertical bands are exposed
  * page edges. The right volume forms a proprietary asymmetric B. The
  * location pin is integrated into the cover.
  */
-export function BlackBookMark({
+export function BlapMark({
   ink,
   paper,
   accent,
   pageColors,
   detail,
-}: BlackBookMarkProps): React.JSX.Element {
+}: BlapMarkProps): React.JSX.Element {
   const requestedPages =
     detail === 'compact'
       ? pageColors.slice(0, Math.min(2, pageColors.length))
@@ -170,7 +170,7 @@ export function BlackBookMark({
   );
 }
 
-export function BlackBookLogo({
+export function BlapLogo({
   variant = 'mark',
   size = 112,
   ink = brandPalette.blackInk,
@@ -178,23 +178,23 @@ export function BlackBookLogo({
   accent = brandPalette.copperPin,
   pageColors = DEFAULT_PAGE_COLORS,
   detail = 'full',
-  label = 'Black Book',
+  label = 'Blap',
   iconRadius = 26,
   className,
   style,
   ...divProps
-}: BlackBookLogoProps): React.JSX.Element {
+}: BlapLogoProps): React.JSX.Element {
   const rootStyle = {
-    '--bb-logo-size': `${size}px`,
-    '--bb-logo-ink': ink,
-    '--bb-logo-paper': paper,
-    '--bb-logo-accent': accent,
+    '--bp-logo-size': `${size}px`,
+    '--bp-logo-ink': ink,
+    '--bp-logo-paper': paper,
+    '--bp-logo-accent': accent,
     ...style,
   } as React.CSSProperties;
 
   const mark = (
-    <span className="bb-logo__mark" aria-hidden="true">
-      <BlackBookMark ink={ink} paper={paper} accent={accent} pageColors={pageColors} detail={detail} />
+    <span className="bp-logo__mark" aria-hidden="true">
+      <BlapMark ink={ink} paper={paper} accent={accent} pageColors={pageColors} detail={detail} />
     </span>
   );
 
@@ -202,7 +202,7 @@ export function BlackBookLogo({
     return (
       <div
         {...divProps}
-        className={['bb-logo', 'bb-logo--app-icon', className].filter(Boolean).join(' ')}
+        className={['bp-logo', 'bp-logo--app-icon', className].filter(Boolean).join(' ')}
         style={{ ...rootStyle, borderRadius: `${iconRadius}%`, background: paper }}
         role="img"
         aria-label={label}
@@ -215,7 +215,7 @@ export function BlackBookLogo({
   return (
     <div
       {...divProps}
-      className={['bb-logo', `bb-logo--${variant}`, className].filter(Boolean).join(' ')}
+      className={['bp-logo', `bp-logo--${variant}`, className].filter(Boolean).join(' ')}
       style={rootStyle}
       role="img"
       aria-label={label}

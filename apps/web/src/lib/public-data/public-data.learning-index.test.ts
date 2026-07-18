@@ -7,7 +7,7 @@ import {
   LEARNING_SUMMARY_MAX_CHARS,
   LEARNING_SUMMARY_MIN_CHARS,
   validateLearningSummary,
-} from '@black-book/domain';
+} from '@blap/domain';
 import { listPublicEntities } from '../../data/public-seed';
 import { hydrateEntityLearningLinks } from './source';
 

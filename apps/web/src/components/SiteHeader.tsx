@@ -5,15 +5,16 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ThemeToggle } from '@black-book/ui';
+import { ThemeToggle } from '@blap/ui';
 import { isNavActive, OVERFLOW_NAV, PRIMARY_NAV } from '../lib/nav';
 
 const DESKTOP_NAV_MQ = '(min-width: 48rem)';
 
 /**
  * Routes whose hero/canvas is the persistent map — the header sits over ink
- * there (`.bb-shell-header--onmap`) regardless of the reader's light/dark
+ * there (`.bp-shell-header--onmap`) regardless of the reader's light/dark
  * theme. The (map) route group is expected to also stamp `data-surface="map"`
  * on a document-level wrapper once BB-098 lands its own layout; shell.css
  * styles both mechanisms so this pathname check is a working default, not a
@@ -30,13 +31,16 @@ function PrimaryLinks({ pathname }: { readonly pathname: string }) {
         const active = isNavActive(pathname, item.href);
         return (
           <li key={item.href}>
-            <a
+            {/* Client-side Link, never a raw anchor: a full document load would remount the
+                persistent (map) layout and read as a page refresh — the shell contract is that
+                moving between surfaces feels like moving through one experience. */}
+            <Link
               href={item.href}
-              className={active ? 'bb-shell-nav__link is-active' : 'bb-shell-nav__link'}
+              className={active ? 'bp-shell-nav__link is-active' : 'bp-shell-nav__link'}
               aria-current={active ? 'page' : undefined}
             >
               {item.label}
-            </a>
+            </Link>
           </li>
         );
       })}
@@ -51,13 +55,13 @@ function OverflowLinks({ pathname }: { readonly pathname: string }) {
         const active = isNavActive(pathname, item.href);
         return (
           <li key={item.href}>
-            <a
+            <Link
               href={item.href}
-              className={active ? 'bb-shell-nav__link is-active' : 'bb-shell-nav__link'}
+              className={active ? 'bp-shell-nav__link is-active' : 'bp-shell-nav__link'}
               aria-current={active ? 'page' : undefined}
             >
               {item.label}
-            </a>
+            </Link>
           </li>
         );
       })}
@@ -70,24 +74,24 @@ function DesktopNav({ pathname, hidden }: { readonly pathname: string; readonly 
 
   return (
     <nav
-      className="bb-shell-nav bb-shell-nav--desktop"
+      className="bp-shell-nav bp-shell-nav--desktop"
       aria-label="Primary"
       {...(hidden ? { 'aria-hidden': true } : {})}
     >
-      <ul className="bb-shell-nav__list">
+      <ul className="bp-shell-nav__list">
         <PrimaryLinks pathname={pathname} />
         <li>
-          <details className="bb-shell-more">
+          <details className="bp-shell-more">
             <summary
               className={
                 overflowActive
-                  ? 'bb-shell-nav__link bb-shell-more__summary is-active'
-                  : 'bb-shell-nav__link bb-shell-more__summary'
+                  ? 'bp-shell-nav__link bp-shell-more__summary is-active'
+                  : 'bp-shell-nav__link bp-shell-more__summary'
               }
             >
               More
             </summary>
-            <ul className="bb-shell-more__panel">
+            <ul className="bp-shell-more__panel">
               <OverflowLinks pathname={pathname} />
             </ul>
           </details>
@@ -109,15 +113,15 @@ function DrawerNav({
   return (
     <nav
       id={id}
-      className="bb-shell-nav bb-shell-nav--drawer"
+      className="bp-shell-nav bp-shell-nav--drawer"
       aria-label="Primary"
       {...(hidden ? { 'aria-hidden': true } : {})}
     >
-      <ul className="bb-shell-nav__list">
+      <ul className="bp-shell-nav__list">
         <PrimaryLinks pathname={pathname} />
       </ul>
-      <p className="bb-shell-nav__more-label">More</p>
-      <ul className="bb-shell-nav__list">
+      <p className="bp-shell-nav__more-label">More</p>
+      <ul className="bp-shell-nav__list">
         <OverflowLinks pathname={pathname} />
       </ul>
     </nav>
@@ -154,53 +158,53 @@ export function SiteHeader() {
   return (
     <header
       ref={headerRef}
-      className={onMap ? 'bb-shell-header bb-shell-header--onmap' : 'bb-shell-header'}
+      className={onMap ? 'bp-shell-header bp-shell-header--onmap' : 'bp-shell-header'}
     >
-      <div className="bb-container bb-shell-header__inner">
+      <div className="bp-container bp-shell-header__inner">
         {/*
           Official lockup artwork only — the symbol IS the first B, so the
           product name is never typed beside the mark. Light/dark variants are
           both rendered and swapped with CSS on [data-theme] (no JS, no
           hydration flash); the link carries the stable accessible name.
         */}
-        <a className="bb-shell-wordmark" href="/" aria-label="Black Book — home">
-          <span className="bb-shell-wordmark__full">
+        <Link className="bp-shell-wordmark" href="/" aria-label="Blap — home">
+          <span className="bp-shell-wordmark__full">
             <img
-              className="bb-shell-wordmark__img bb-shell-wordmark__img--light"
-              src="/brand/black-book-primary-light.svg"
+              className="bp-shell-wordmark__img bp-shell-wordmark__img--light"
+              src="/brand/blap-primary-light.svg"
               alt=""
               aria-hidden="true"
             />
             <img
-              className="bb-shell-wordmark__img bb-shell-wordmark__img--dark"
-              src="/brand/black-book-primary-dark.svg"
-              alt=""
-              aria-hidden="true"
-            />
-          </span>
-          <span className="bb-shell-wordmark__mini">
-            <img
-              className="bb-shell-wordmark__img bb-shell-wordmark__img--light"
-              src="/brand/black-book-mark-compact-light.svg"
-              alt=""
-              aria-hidden="true"
-            />
-            <img
-              className="bb-shell-wordmark__img bb-shell-wordmark__img--dark"
-              src="/brand/black-book-mark-compact-dark.svg"
+              className="bp-shell-wordmark__img bp-shell-wordmark__img--dark"
+              src="/brand/blap-primary-dark.svg"
               alt=""
               aria-hidden="true"
             />
           </span>
-        </a>
+          <span className="bp-shell-wordmark__mini">
+            <img
+              className="bp-shell-wordmark__img bp-shell-wordmark__img--light"
+              src="/brand/blap-mark-compact-light.svg"
+              alt=""
+              aria-hidden="true"
+            />
+            <img
+              className="bp-shell-wordmark__img bp-shell-wordmark__img--dark"
+              src="/brand/blap-mark-compact-dark.svg"
+              alt=""
+              aria-hidden="true"
+            />
+          </span>
+        </Link>
 
         <details
           ref={menuRef}
-          className="bb-shell-menu"
+          className="bp-shell-menu"
           onToggle={(event) => setMenuOpen(event.currentTarget.open)}
         >
           <summary
-            className="bb-shell-menu__summary"
+            className="bp-shell-menu__summary"
             aria-expanded={menuOpen}
             aria-controls="shell-nav-drawer"
           >
@@ -211,7 +215,7 @@ export function SiteHeader() {
 
         <DesktopNav pathname={pathname} hidden={!isDesktop} />
 
-        <div className="bb-shell-header__tools">
+        <div className="bp-shell-header__tools">
           <ThemeToggle />
         </div>
       </div>

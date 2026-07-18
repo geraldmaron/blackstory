@@ -6,7 +6,7 @@
  * when superseded or deprecated.
  */
 import { notFound } from 'next/navigation';
-import { Notice } from '@black-book/ui';
+import { Notice } from '@blap/ui';
 import { SeedDataNotice } from '../../../../../components/SeedDataNotice';
 import {
   FactCitationList,
@@ -17,7 +17,7 @@ import {
   formatIsoDate,
   humanizeToken,
 } from '../../../../../components/facts';
-import { buildFactPath, slugifyFactStatement } from '@black-book/domain';
+import { buildFactPath, slugifyFactStatement } from '@blap/domain';
 import { listPublicFactRevisionParams, resolveFactRevision } from '../../../resolve-public-fact';
 
 type FactRevisionPageProps = {
@@ -56,18 +56,18 @@ export default async function FactRevisionPage({ params }: FactRevisionPageProps
   const { fact, revision } = resolved;
 
   return (
-    <main className="bb-container bb-page" id="main">
+    <main className="bp-container bp-page" id="main">
       <FactJsonLdScript fact={fact} />
 
-      <header className="bb-entity-mast">
-        <p className="bb-page__eyebrow">
-          Fact revision · <span className="bb-mono">{fact.id}</span> · rev {revision.revisionNumber}
+      <header className="bp-entity-mast">
+        <p className="bp-page__eyebrow">
+          Fact revision · <span className="bp-mono">{fact.id}</span> · rev {revision.revisionNumber}
         </p>
-        <h1 className="bb-page__title">{fact.shortStatement}</h1>
-        <p className="bb-page__lede">{fact.statement}</p>
+        <h1 className="bp-page__title">{fact.shortStatement}</h1>
+        <p className="bp-page__lede">{fact.statement}</p>
       </header>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
+      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
         <SeedDataNotice compact />
         <FactStatusBanner fact={fact} />
 
@@ -76,24 +76,24 @@ export default async function FactRevisionPage({ params }: FactRevisionPageProps
             You are viewing revision {revision.revisionNumber} from {formatIsoDate(revision.timestamp)}. Edit summary:{' '}
             {revision.summary}
           </p>
-          <p style={{ margin: 'var(--bb-space-2) 0 0 0' }}>
+          <p style={{ margin: 'var(--bp-space-2) 0 0 0' }}>
             <a href={buildFactPath(fact.id, slugifyFactStatement(fact.shortStatement))}>Open the current fact record</a>
           </p>
         </Notice>
 
         <section aria-labelledby="revision-detail-heading">
-          <p className="bb-section__kicker">Audit</p>
-          <h2 className="bb-section__title" id="revision-detail-heading">
+          <p className="bp-section__kicker">Audit</p>
+          <h2 className="bp-section__title" id="revision-detail-heading">
             This revision
           </h2>
-          <dl className="bb-sans" style={{ marginTop: 'var(--bb-space-4)' }}>
-            <dt className="bb-dt">Change type</dt>
-            <dd style={{ margin: '0 0 var(--bb-space-2) 0' }}>{humanizeToken(revision.changeType)}</dd>
-            <dt className="bb-dt">Editor</dt>
-            <dd style={{ margin: '0 0 var(--bb-space-2) 0' }}>
+          <dl className="bp-sans" style={{ marginTop: 'var(--bp-space-4)' }}>
+            <dt className="bp-dt">Change type</dt>
+            <dd style={{ margin: '0 0 var(--bp-space-2) 0' }}>{humanizeToken(revision.changeType)}</dd>
+            <dt className="bp-dt">Editor</dt>
+            <dd style={{ margin: '0 0 var(--bp-space-2) 0' }}>
               {revision.agent.displayName ?? revision.agent.id}
             </dd>
-            <dt className="bb-dt">Timestamp</dt>
+            <dt className="bp-dt">Timestamp</dt>
             <dd style={{ margin: 0 }}>{formatIsoDate(revision.timestamp)}</dd>
           </dl>
         </section>
@@ -101,21 +101,21 @@ export default async function FactRevisionPage({ params }: FactRevisionPageProps
         <FactConfidencePanel fact={fact} />
 
         <section aria-labelledby="rev-citations-heading">
-          <p className="bb-section__kicker">Sources</p>
-          <h2 className="bb-section__title" id="rev-citations-heading">
+          <p className="bp-section__kicker">Sources</p>
+          <h2 className="bp-section__title" id="rev-citations-heading">
             Citations at this revision
           </h2>
-          <div style={{ marginTop: 'var(--bb-space-4)' }}>
+          <div style={{ marginTop: 'var(--bp-space-4)' }}>
             <FactCitationList citations={fact.citations} labelledBy="rev-citations-heading" />
           </div>
         </section>
 
         <section aria-labelledby="all-revisions-heading">
-          <p className="bb-section__kicker">History</p>
-          <h2 className="bb-section__title" id="all-revisions-heading">
+          <p className="bp-section__kicker">History</p>
+          <h2 className="bp-section__title" id="all-revisions-heading">
             All revisions
           </h2>
-          <div style={{ marginTop: 'var(--bb-space-4)' }}>
+          <div style={{ marginTop: 'var(--bp-space-4)' }}>
             <FactRevisionPanel
               fact={fact}
               currentRevisionNumber={revision.revisionNumber}

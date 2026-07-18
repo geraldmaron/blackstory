@@ -4,7 +4,7 @@
  */
 import { createHash, randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
-import { createQuarantinedSubmission, createSubmissionCampaignDetector } from '@black-book/security';
+import { createQuarantinedSubmission, createSubmissionCampaignDetector } from '@blap/security';
 import { buildPublicCorrectionStatus } from '../public-status';
 import {
   validateAbuseReportSubmission,

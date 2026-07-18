@@ -4,7 +4,7 @@
  * Consumer handlers may stage Firestore writes only; external I/O belongs in a later Cloud Tasks adapter.
  */
 import type { DocumentData, Firestore } from 'firebase-admin/firestore';
-import { reconstructPublicationHistory, type PublicationHistoryEntry } from '@black-book/domain';
+import { reconstructPublicationHistory, type PublicationHistoryEntry } from '@blap/domain';
 import {
   auditEventSchema,
   idempotencyRecordSchema,

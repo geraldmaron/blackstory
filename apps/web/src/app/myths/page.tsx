@@ -19,22 +19,22 @@ export default function MythsIndexPage() {
   const reviews = listMythReviews();
 
   return (
-    <main className="bb-container bb-page" id="main">
+    <main className="bp-container bp-page" id="main">
       <TrustSiteJsonLdScript />
       <PublishingPrinciplesJsonLdScript pagePath={TRUST_PATHS.myths} pageTitle="Myths" />
-      <p className="bb-page__eyebrow">Pre-bunking</p>
-      <h1 className="bb-page__title">Myths &amp; misconceptions</h1>
-      <p className="bb-page__lede">
+      <p className="bp-page__eyebrow">Pre-bunking</p>
+      <h1 className="bp-page__title">Myths &amp; misconceptions</h1>
+      <p className="bp-page__lede">
         These pages review genuinely circulating third-party claims — educational, non-judgmental,
         and focused on techniques you can verify yourself. Canonical fact records live on{' '}
         <a href="/facts">/facts</a>; only this surface emits ClaimReview markup.
       </p>
 
-      <ul className="bb-sans" style={{ marginTop: 'var(--bb-space-8)', paddingLeft: 'var(--bb-space-5)' }}>
+      <ul className="bp-sans" style={{ marginTop: 'var(--bp-space-8)', paddingLeft: 'var(--bp-space-5)' }}>
         {reviews.map((review) => (
-          <li key={review.slug} style={{ marginBottom: 'var(--bb-space-4)' }}>
+          <li key={review.slug} style={{ marginBottom: 'var(--bp-space-4)' }}>
             <a href={review.pageUrl}>{review.title}</a>
-            <p style={{ margin: 'var(--bb-space-1) 0 0 0', color: 'var(--bb-ink-muted)' }}>
+            <p style={{ margin: 'var(--bp-space-1) 0 0 0', color: 'var(--bp-ink-muted)' }}>
               Technique: {review.technique}
             </p>
           </li>

@@ -5,7 +5,7 @@ Repo-side simulations for load, abuse, and cost scenarios. **No live attacks** a
 ## Run
 
 ```bash
-pnpm --filter @black-book/testing test:security
+pnpm --filter @blap/testing test:security
 # or full layer:
 node --import tsx scripts/run-testing-layer.mjs security
 ```
@@ -46,4 +46,4 @@ Tests assert **≥2 independent layers** fire for most scenarios and that **rate
 - Export barrel: `packages/testing/src/load-abuse/index.ts`
 - Package root barrel: add `export * from './load-abuse/index.js'` in `packages/testing/src/index.ts`
 - Security test layer: `scripts/run-testing-layer.mjs` includes `load-abuse/**/*.test.ts`
-- Dependency: `@black-book/security` devDependency on `@black-book/testing`
+- Dependency: `@blap/security` devDependency on `@blap/testing`

@@ -1,7 +1,7 @@
 # OWASP ASVS and API security checklist
 
 This checklist tailors OWASP ASVS 4.0.3 and OWASP API Security Top 10 controls to
-Black Book. Automated checks use synthetic fixtures and emulators; they never attack
+Blap. Automated checks use synthetic fixtures and emulators; they never attack
 production or use production data.
 
 ## Identity and access control

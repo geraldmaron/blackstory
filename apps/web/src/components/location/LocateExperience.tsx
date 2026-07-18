@@ -85,13 +85,13 @@ export function LocateExperience() {
   const loading = state.status === 'loading';
 
   return (
-    <div className="bb-stack" style={{ gap: 'var(--bb-space-4)' }}>
+    <div className="bp-stack" style={{ gap: 'var(--bp-space-4)' }}>
       <LocationConsentButton onResolved={handleCoordinates} onDenied={handleDenied} disabled={loading} />
 
       <ManualPlaceSearchForm onSubmit={handleAddress} disabled={loading} />
 
       <div id={statusRegionId} aria-live="polite" role="status">
-        {loading ? <p className="bb-sans">Looking up jurisdiction…</p> : null}
+        {loading ? <p className="bp-sans">Looking up jurisdiction…</p> : null}
         {state.status === 'done' ? <LocationResolutionPanel result={state.result} /> : null}
       </div>
     </div>

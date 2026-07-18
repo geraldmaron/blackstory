@@ -14,44 +14,44 @@ import {
   ResultList,
   ThemeToggle,
   Timeline,
-} from '@black-book/ui';
+} from '@blap/ui';
 import { DialogFixture } from './DialogFixture';
 
 export const metadata = {
-  title: 'Design system — Black Book',
+  title: 'Design system — Blap',
   description: 'BB-007 component and token fixtures for visual and keyboard review',
 };
 
 export default function DesignSystemPage() {
   return (
-    <main className="bb-container" id="main">
-      <header className="bb-gallery-section" style={{ paddingTop: 'var(--bb-space-10)' }}>
-        <p className="bb-page__eyebrow" style={{ color: 'var(--bb-ink-subtle)' }}>
-          Black Book · BB-007
+    <main className="bp-container" id="main">
+      <header className="bp-gallery-section" style={{ paddingTop: 'var(--bp-space-10)' }}>
+        <p className="bp-page__eyebrow" style={{ color: 'var(--bp-ink-subtle)' }}>
+          Blap · BB-007
         </p>
-        <h1 className="bb-page__title">Design system</h1>
+        <h1 className="bp-page__title">Design system</h1>
         <p>
           Editorial black-and-white foundation with reserved status color, visible focus, and
           reduced-motion support. This route is the component fixture gallery (Storybook
           equivalent).
         </p>
-        <div className="bb-row">
+        <div className="bp-row">
           <ThemeToggle />
-          <a className="bb-sans" href="/">
+          <a className="bp-sans" href="/">
             Back to home
           </a>
         </div>
       </header>
 
-      <section className="bb-gallery-section" aria-labelledby="tokens-heading">
+      <section className="bp-gallery-section" aria-labelledby="tokens-heading">
         <h2 id="tokens-heading">Tokens</h2>
         <p>Primary palette is black, white, and neutral gray. Status hues are reserved.</p>
-        <div className="bb-row" aria-label="Confidence levels">
+        <div className="bp-row" aria-label="Confidence levels">
           <Confidence level="high" />
           <Confidence level="medium" />
           <Confidence level="low" />
         </div>
-        <div className="bb-stack">
+        <div className="bp-stack">
           <Notice tone="warning" title="Source capture incomplete">
             Additional archival pages are still under review.
           </Notice>
@@ -64,17 +64,17 @@ export default function DesignSystemPage() {
         </div>
       </section>
 
-      <section className="bb-gallery-section" aria-labelledby="card-heading">
+      <section className="bp-gallery-section" aria-labelledby="card-heading">
         <h2 id="card-heading">Cards & citations</h2>
         <p>
           Cards group related research content; citations expose provenance without color-only cues.
         </p>
         <Card
           title="Rosenwald School site"
-          meta={<span className="bb-mono">entity:place</span>}
+          meta={<span className="bp-mono">entity:place</span>}
           interactive
         >
-          <p className="bb-sans" style={{ marginTop: 0 }}>
+          <p className="bp-sans" style={{ marginTop: 0 }}>
             Documented community school associated with early twentieth-century Black education
             networks.
           </p>
@@ -86,7 +86,7 @@ export default function DesignSystemPage() {
         </Card>
       </section>
 
-      <section className="bb-gallery-section" aria-labelledby="results-heading">
+      <section className="bp-gallery-section" aria-labelledby="results-heading">
         <h2 id="results-heading">Filters & results</h2>
         <p>Native labelled controls and a keyboard-reachable result list.</p>
         <FilterBar
@@ -124,7 +124,7 @@ export default function DesignSystemPage() {
               meta: (
                 <>
                   <Confidence level="high" />
-                  <span className="bb-mono">1964</span>
+                  <span className="bp-mono">1964</span>
                 </>
               ),
             },
@@ -139,7 +139,7 @@ export default function DesignSystemPage() {
         />
       </section>
 
-      <section className="bb-gallery-section" aria-labelledby="timeline-heading">
+      <section className="bp-gallery-section" aria-labelledby="timeline-heading">
         <h2 id="timeline-heading">Timeline</h2>
         <p>Chronological narrative with monospace dates.</p>
         <Timeline
@@ -167,7 +167,7 @@ export default function DesignSystemPage() {
         />
       </section>
 
-      <section className="bb-gallery-section" aria-labelledby="map-heading">
+      <section className="bp-gallery-section" aria-labelledby="map-heading">
         <h2 id="map-heading">Map frame</h2>
         <p>Geographic context with an accessible name that includes pin labels.</p>
         <MapFrame
@@ -177,13 +177,13 @@ export default function DesignSystemPage() {
         />
       </section>
 
-      <section className="bb-gallery-section" aria-labelledby="dialog-heading">
+      <section className="bp-gallery-section" aria-labelledby="dialog-heading">
         <h2 id="dialog-heading">Dialog</h2>
         <p>Focus moves into the modal; Escape and the close control dismiss it.</p>
         <DialogFixture />
       </section>
 
-      <section className="bb-gallery-section" aria-labelledby="empty-heading">
+      <section className="bp-gallery-section" aria-labelledby="empty-heading">
         <h2 id="empty-heading">Empty state</h2>
         <p>Zero-result messaging with a clear next action.</p>
         <EmptyState

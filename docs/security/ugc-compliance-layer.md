@@ -97,8 +97,8 @@ this bead rather than duplicated).
 - **Deanonymization prohibited everywhere** — `assertNoDeanonymization` fails closed on any
   action tagged as targeting a pseudonymous/anonymous UGC subject, mirroring
   `assertPublicProjectionSafe`'s fail-closed pattern (`packages/security/src/serialize.ts`).
-  The pattern is reproduced rather than imported because `@black-book/security` depends on
-  `@black-book/domain` — the reverse import would be circular.
+  The pattern is reproduced rather than imported because `@blap/security` depends on
+  `@blap/domain` — the reverse import would be circular.
 
 ## 5. Public takedown/contest routing
 
@@ -111,7 +111,7 @@ BB-029's submission intake (`packages/security/src/submissions/quarantine.ts`
 `SubmissionInput`: `targetRecordId`/`statement`/`sourceUrls`/`requestorContact`), tagged with
 `distinctTag: 'takedown'` and bridged onto BB-029's closest existing `SubmissionKind`
 (`'abuse_report'`) pending a native `'takedown'` kind, which is BB-055/BB-076's call. Domain
-cannot import `@black-book/security` for the same circular-dependency reason as above, so the
+cannot import `@blap/security` for the same circular-dependency reason as above, so the
 bridge is structural, not a direct call.
 
 SLA fields (documented, not yet operationally enforced by a scheduler):
@@ -125,10 +125,10 @@ Privacy/harassment takedowns concerning a living (or unknown-status) subject are
 ## Validation
 
 ```bash
-pnpm --filter @black-book/domain test
-pnpm --filter @black-book/domain typecheck
-pnpm --filter @black-book/schemas test
-pnpm --filter @black-book/schemas typecheck
+pnpm --filter @blap/domain test
+pnpm --filter @blap/domain typecheck
+pnpm --filter @blap/schemas test
+pnpm --filter @blap/schemas typecheck
 cd packages/constitution && uv run pytest
 ```
 

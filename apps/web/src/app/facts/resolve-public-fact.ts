@@ -14,7 +14,7 @@ import {
   slugifyFactStatement,
   type FactRecord,
   type FactRevision,
-} from '@black-book/domain';
+} from '@blap/domain';
 import { getSeedFact, listSeedFacts } from '../../data/facts-seed';
 
 export type PublicFactResolution =

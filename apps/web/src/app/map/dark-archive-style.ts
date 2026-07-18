@@ -12,11 +12,11 @@
  *
  * Colors route through `DIGNITY_PALETTE` (`../../lib/map-experience/dignity-style.ts`) the
  * same single token source `explore-style.ts` uses (BB-099 basemap-conformance pass), which
- * itself reuses @black-book/ui's brand palette, so this demo style and the production style can
+ * itself reuses @blap/ui's brand palette, so this demo style and the production style can
  * never drift onto two different color surfaces.
  */
 import type { StyleSpecification } from 'maplibre-gl';
-import type { UsStateInfo } from '@black-book/domain';
+import type { UsStateInfo } from '@blap/domain';
 import { DIGNITY_PALETTE } from '../../lib/map-experience/dignity-style';
 
 /**
@@ -71,7 +71,7 @@ export function buildDarkArchiveStyle(
 ): StyleSpecification {
   return {
     version: 8,
-    name: 'Black Book — Archive Dark (demo)',
+    name: 'Blap — Archive Dark (demo)',
     sources: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see LooseFeatureCollection comment above
       'state-bounds': { type: 'geojson', data: stateBoundsFeatureCollection(states) as any },

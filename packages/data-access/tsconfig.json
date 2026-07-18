@@ -1,5 +1,5 @@
 {
-  "extends": "@black-book/typescript-config/node.json",
+  "extends": "@blap/typescript-config/node.json",
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src"

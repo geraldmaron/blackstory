@@ -14,20 +14,20 @@ export type EntityPrimaryImageProps = {
 
 export function EntityPrimaryImage({ image, entityName }: EntityPrimaryImageProps) {
   return (
-    <figure className="bb-entity-photo">
+    <figure className="bp-entity-photo">
       {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL may be external */}
       <img
         src={image.url}
         alt={image.alt || `Photograph related to ${entityName}`}
         width={image.width}
         height={image.height}
-        className="bb-entity-photo__img"
+        className="bp-entity-photo__img"
         loading="lazy"
         decoding="async"
       />
-      <figcaption className="bb-entity-photo__credit bb-sans">
+      <figcaption className="bp-entity-photo__credit bp-sans">
         {image.credit}
-        <span className="bb-mono"> · {image.rightsStatus.replace('_', ' ')}</span>
+        <span className="bp-mono"> · {image.rightsStatus.replace('_', ' ')}</span>
       </figcaption>
     </figure>
   );

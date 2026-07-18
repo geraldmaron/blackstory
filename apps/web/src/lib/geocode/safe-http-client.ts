@@ -1,7 +1,7 @@
 /**
- * Production `SafeHttpClient` for the Census Geocoder adapter (`@black-book/domain`'s
+ * Production `SafeHttpClient` for the Census Geocoder adapter (`@blap/domain`'s
  * `../adapters/census-geo/fetch-geocode.ts`), backed by the REAL URL-safety primitives
- * from `@black-book/security` (`evaluateExternalUrl`, `resolveAndPinDestination`) — the exact
+ * from `@blap/security` (`evaluateExternalUrl`, `resolveAndPinDestination`) — the exact
  * seam `packages/domain/src/adapters/internet-archive/shared/http-port.ts` defines and
  * `http-port.test.ts`'s `buildRealSafeHttpClient` reference implementation demonstrates. This is
  * that reference implementation made real: DNS is resolved once via Node's `dns.promises`,
@@ -17,10 +17,10 @@ import { request as httpsRequest } from 'node:https';
 import {
   evaluateExternalUrl,
   resolveAndPinDestination,
-} from '@black-book/security';
+} from '@blap/security';
 
 /**
- * Structurally matches `@black-book/domain`'s `SafeHttpClient` port
+ * Structurally matches `@blap/domain`'s `SafeHttpClient` port
  * (`packages/domain/src/adapters/internet-archive/shared/http-port.ts`) exactly including the
  * `'GET' | 'POST'` method union and optional `body` even though this client only ever performs
  * GET requests for the Census Geocoder (see `handleRequest`'s runtime guard below). Matching the

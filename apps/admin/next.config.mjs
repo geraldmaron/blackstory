@@ -2,12 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: [
-    '@black-book/domain',
-    '@black-book/schemas',
-    '@black-book/ui',
-    '@black-book/operator-cli',
-    '@black-book/security',
-    '@black-book/firebase',
+    '@blap/domain',
+    '@blap/schemas',
+    '@blap/ui',
+    '@blap/operator-cli',
+    '@blap/security',
+    '@blap/firebase',
   ],
   webpack: (config) => {
     // NodeNext packages emit `.js` specifiers that map to `.ts`/`.tsx` sources.

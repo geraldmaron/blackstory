@@ -3,7 +3,7 @@
  * `createQuarantinedSubmission` accepts. Pure and synchronous 
  * no Firebase, App Check, or rate limiting so field rules are trivially testable in isolation.
  */
-import type { SubmissionInput } from '@black-book/security';
+import type { SubmissionInput } from '@blap/security';
 import {
   CORRECTION_CATEGORY_LABELS,
   CORRECTION_TARGET_LABELS,

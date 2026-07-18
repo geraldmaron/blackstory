@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 export const packageNameSchema = z
   .string()
-  .regex(/^@black-book\/[a-z0-9-]+$/, 'Expected @black-book/<name> package id');
+  .regex(/^@blap\/[a-z0-9-]+$/, 'Expected @blap/<name> package id');
 
 export const nodeEnvSchema = z.enum(['development', 'test', 'staging', 'production']);
 export const logLevelSchema = z.enum(['debug', 'info', 'warn', 'error']);
@@ -31,7 +31,7 @@ export function parseRuntimeEnvironment(
   return runtimeEnvironmentSchema.parse(environment);
 }
 
-export const PACKAGE_SCOPE = '@black-book' as const;
+export const PACKAGE_SCOPE = '@blap' as const;
 
 export * from './surfaces.js';
 export * from './kill-switches.js';

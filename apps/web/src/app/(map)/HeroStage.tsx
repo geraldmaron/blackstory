@@ -2,7 +2,7 @@
 
 /**
  * Homepage hero chrome (BB-098): DOM contract per design-direction-v3.md "Homepage (the hero IS
- * the map)" — `.bb-hero-stage` markup is law, `map-surfaces.css` owns the visual styling. The
+ * the map)" — `.bp-hero-stage` markup is law, `map-surfaces.css` owns the visual styling. The
  * live `MapStage` canvas renders behind this (mounted once, at the `(map)` layout) `HeroStage`
  * only renders the floating chrome and wires it to the shared stage through `useMapStage()`.
  *
@@ -10,12 +10,13 @@
  * background click, or the copper CTA all funnel through `engage()` — fly the matching camera
  * preset AND `router.push('/explore?…')` in the same tick; the flight continues uninterrupted
  * across the navigation because the stage never unmounts. Hero chrome dissolves via a token-driven
- * CSS class (`--bb-duration-base`, opacity/translate only) while that push resolves.
+ * CSS class (`--bp-duration-base`, opacity/translate only) while that push resolves.
  */
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Notice } from '@black-book/ui';
-import { US_CONUS_BOUNDS } from '@black-book/domain/map/geography';
+import { Notice } from '@blap/ui';
+import { US_CONUS_BOUNDS } from '@blap/domain/map/geography';
 import { CAMERA_POINT_ZOOM } from '../../lib/map-experience/camera-presets';
 import type {
   ExploreMapFeatureCollection,
@@ -35,7 +36,7 @@ export type HeroStageProps = {
 };
 
 const RESTING_HREF = buildExploreHref({ filters: DEFAULT_EXPLORE_FILTERS, density: false, lines: false });
-const TRANSITION_FLAG = 'bb-map-transition';
+const TRANSITION_FLAG = 'bp-map-transition';
 
 function coordinatesOf(
   collection: ExploreMapFeatureCollection,
@@ -119,34 +120,34 @@ export function HeroStage({ featureCollection, jurisdictionAreaFeatures, feature
 
   return (
     <section
-      className={dissolving ? 'bb-hero-stage bb-hero-stage--dissolving' : 'bb-hero-stage'}
+      className={dissolving ? 'bp-hero-stage bp-hero-stage--dissolving' : 'bp-hero-stage'}
       aria-labelledby="hero-headline"
     >
-      <div className="bb-hero-stage__scrim" aria-hidden="true" />
-      <div className="bb-hero-stage__panel">
+      <div className="bp-hero-stage__scrim" aria-hidden="true" />
+      <div className="bp-hero-stage__panel">
         {!stage.mapAvailable ? (
           <Notice tone="warning" title="Map unavailable">
             The map canvas could not start in this browser. Use Explore to browse documented
             records as a list.
           </Notice>
         ) : null}
-        <p className="bb-hero-stage__kicker">Place-connected Black history</p>
-        <h1 className="bb-hero-stage__headline" id="hero-headline">
+        <p className="bp-hero-stage__kicker">Place-connected Black history</p>
+        <h1 className="bp-hero-stage__headline" id="hero-headline">
           History, pinned to place.
         </h1>
-        <p className="bb-hero-stage__support">
+        <p className="bp-hero-stage__support">
           People. Places. Evidence. Context. Drag the map, tap a state or a pin, or open the full
           archive below.
         </p>
-        <div className="bb-hero-stage__actions">
-          <a className="bb-cta bb-cta--copper" href={RESTING_HREF} onClick={handleCtaClick}>
+        <div className="bp-hero-stage__actions">
+          <a className="bp-cta bp-cta--copper" href={RESTING_HREF} onClick={handleCtaClick}>
             Explore the map
           </a>
-          <a className="bb-cta bb-cta--ghost-dark" href="/methodology">
+          <Link className="bp-cta bp-cta--ghost-dark" href="/methodology">
             How records qualify
-          </a>
+          </Link>
         </div>
-        <p className="bb-hero-stage__count">
+        <p className="bp-hero-stage__count">
           {featureCount} record{featureCount === 1 ? '' : 's'} pinned
           {liveData ? '' : ' · sample data'}
         </p>

@@ -12,9 +12,9 @@
  * `--approve`, or `--promote` flag anywhere in this CLI see `promotion-boundary.test.ts`.
  */
 import { readFileSync } from 'node:fs';
-import type { RelationshipRole, RelationshipType } from '@black-book/domain';
-import type { AtomicStore } from '@black-book/firebase';
-import type { SafeFetchDependencies } from '@black-book/security';
+import type { RelationshipRole, RelationshipType } from '@blap/domain';
+import type { AtomicStore } from '@blap/firebase';
+import type { SafeFetchDependencies } from '@blap/security';
 import {
   parseLeadsFromText,
   prepareBulkLeadIntake,
@@ -153,7 +153,7 @@ async function finish(
 }
 
 async function createDefaultLiveStore(): Promise<AtomicStore> {
-  const { createServerFirebaseApp, createAdminAtomicStore } = await import('@black-book/firebase');
+  const { createServerFirebaseApp, createAdminAtomicStore } = await import('@blap/firebase');
   const { getFirestore } = await import('firebase-admin/firestore');
   const { app } = createServerFirebaseApp(process.env);
   return createAdminAtomicStore(getFirestore(app));

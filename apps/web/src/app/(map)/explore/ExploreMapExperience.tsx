@@ -14,8 +14,8 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FilterBar, Notice } from '@black-book/ui';
-import { US_CONUS_BOUNDS, findUsStateByPostalCode } from '@black-book/domain/map/geography';
+import { FilterBar, Notice } from '@blap/ui';
+import { US_CONUS_BOUNDS, findUsStateByPostalCode } from '@blap/domain/map/geography';
 import { HistoryEdgePanel } from '../../../components/history/HistoryEdgePanel';
 import { DensityLayerToggle } from '../../../components/map-experience/DensityLayerToggle';
 import { MapExperienceLegend } from '../../../components/map-experience/MapExperienceLegend';
@@ -39,7 +39,7 @@ export type ExploreMapExperienceProps = {
   readonly initial: ExploreViewModel;
 };
 
-const TRANSITION_FLAG = 'bb-map-transition';
+const TRANSITION_FLAG = 'bp-map-transition';
 
 function mergeViewState(
   base: ExploreViewState,
@@ -445,18 +445,18 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   };
 
   return (
-    <div className="bb-explore-stage">
+    <div className="bp-explore-stage">
       {!stage.mapAvailable && degradedCopy ? (
-        <div className="bb-explore-stage__notice">
+        <div className="bp-explore-stage__notice">
           <Notice tone="warning" title="Map unavailable">
             {degradedCopy}
           </Notice>
         </div>
       ) : null}
 
-      <div className="bb-explore-stage__filters" ref={filterRegionRef} tabIndex={-1} aria-label="Map filters">
-        <details className="bb-explore-stage__disclosure" open>
-          <summary className="bb-explore-stage__disclosure-summary">Filters</summary>
+      <div className="bp-explore-stage__filters" ref={filterRegionRef} tabIndex={-1} aria-label="Map filters">
+        <details className="bp-explore-stage__disclosure" open>
+          <summary className="bp-explore-stage__disclosure-summary">Filters</summary>
           <FilterBar
             method="get"
             action="/explore"
@@ -477,7 +477,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
                   </>
                 ) : null}
                 {view.viewState.selected ? <input type="hidden" name="selected" value={view.viewState.selected} /> : null}
-                <button type="submit" className="bb-button bb-button--primary">
+                <button type="submit" className="bp-button bp-button--primary">
                   Apply filters
                 </button>
               </>
@@ -485,35 +485,35 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           />
         </details>
 
-        <div className="bb-explore-stage__toolbar">
+        <div className="bp-explore-stage__toolbar">
           <DensityLayerToggle enabled={view.viewState.density} onToggle={handleDensityToggle} />
-          <details className="bb-explore-stage__disclosure" open={view.viewState.lines}>
-            <summary className="bb-explore-stage__disclosure-summary">Map settings</summary>
-            <div className="bb-explore__settings-body">
-              <fieldset className="bb-explore__settings-fieldset">
-                <legend className="bb-sans">Relationship lines</legend>
+          <details className="bp-explore-stage__disclosure" open={view.viewState.lines}>
+            <summary className="bp-explore-stage__disclosure-summary">Map settings</summary>
+            <div className="bp-explore__settings-body">
+              <fieldset className="bp-explore__settings-fieldset">
+                <legend className="bp-sans">Relationship lines</legend>
                 <button
                   type="button"
-                  className="bb-button"
+                  className="bp-button"
                   aria-pressed={view.viewState.lines}
                   onClick={handleLinesToggle}
                 >
                   Lines: {view.viewState.lines ? 'on' : 'off'}
                 </button>
-                <p className="bb-sans bb-explore__settings-note">
+                <p className="bp-sans bp-explore__settings-note">
                   Evidence-backed History connections only. Campus-shared endpoints show a short
                   display stub.
                 </p>
               </fieldset>
 
               {view.viewState.lines ? (
-                <fieldset className="bb-explore__settings-fieldset">
-                  <legend className="bb-sans">Decade</legend>
-                  <div className="bb-explore__decade-row" role="tablist" aria-label="Line decade">
+                <fieldset className="bp-explore__settings-fieldset">
+                  <legend className="bp-sans">Decade</legend>
+                  <div className="bp-explore__decade-row" role="tablist" aria-label="Line decade">
                     <button
                       type="button"
                       role="tab"
-                      className="bb-button"
+                      className="bp-button"
                       aria-selected={!view.viewState.decade}
                       onClick={() => handleDecadeSelect(undefined)}
                     >
@@ -524,7 +524,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
                         key={decade}
                         type="button"
                         role="tab"
-                        className="bb-button"
+                        className="bp-button"
                         aria-selected={view.viewState.decade === decade}
                         onClick={() => handleDecadeSelect(decade)}
                       >
@@ -535,12 +535,12 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
                 </fieldset>
               ) : null}
 
-              <p className="bb-sans">
+              <p className="bp-sans">
                 <a href="/history">Open the full history graph</a> for the decade narrative panel.
               </p>
             </div>
           </details>
-          <p className="bb-sans bb-explore__results-count" id="explore-results-heading">
+          <p className="bp-sans bp-explore__results-count" id="explore-results-heading">
             {filteredFeatures.length} documented record{filteredFeatures.length === 1 ? '' : 's'}
             {selectedStateName ? ` in ${selectedStateName}` : ' in view'}
             {view.viewState.lines
@@ -550,28 +550,28 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
               : ''}
           </p>
           {view.viewState.state ? (
-            <button type="button" className="bb-button" onClick={handleClearState}>
+            <button type="button" className="bp-button" onClick={handleClearState}>
               Clear state
             </button>
           ) : null}
         </div>
       </div>
 
-      <div className="bb-explore-stage__results">
+      <div className="bp-explore-stage__results">
         {view.selectedEdge ? (
-          <div className="bb-explore__narrative">
+          <div className="bp-explore__narrative">
             <HistoryEdgePanel edge={view.selectedEdge} onClose={handleCloseEdge} />
           </div>
         ) : null}
         {selectedFeature ? (
-          <div className="bb-explore__narrative">
+          <div className="bp-explore__narrative">
             <NarrativeCard feature={selectedFeature} onClose={handleCloseCard} />
           </div>
         ) : null}
         <SynchronizedResultList {...listProps} />
       </div>
 
-      <div className="bb-explore-stage__legend">
+      <div className="bp-explore-stage__legend">
         <MapExperienceLegend defaultCollapsed />
       </div>
     </div>

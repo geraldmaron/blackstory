@@ -1,8 +1,8 @@
 /**
- * Living-status helpers backed by the product constitution (@black-book/schemas).
+ * Living-status helpers backed by the product constitution (@blap/schemas).
  * Unknown living status is treated as living at the model level.
  */
-import { evaluateLivingStatus, loadProductConstitution } from '@black-book/schemas';
+import { evaluateLivingStatus, loadProductConstitution } from '@blap/schemas';
 
 /** Living-status vocabulary from the active product constitution. */
 export function livingStatuses(): readonly string[] {

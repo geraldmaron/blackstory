@@ -3,8 +3,8 @@
  * linking to per-revision permalinks and the errata log when corrections exist.
  */
 import React from 'react';
-import type { FactRecord } from '@black-book/domain';
-import { buildFactRevisionPath, currentFactRevision } from '@black-book/domain';
+import type { FactRecord } from '@blap/domain';
+import { buildFactRevisionPath, currentFactRevision } from '@blap/domain';
 import { formatIsoDate, humanizeToken } from '../facts/format.js';
 
 export type RevisionUpdateChromeProps = {
@@ -22,7 +22,7 @@ export function RevisionUpdateChrome({ fact, errataHref = '/errata' }: RevisionU
   const isCorrection = revision?.changeType === 'correction' || fact.status === 'corrected';
 
   return (
-    <p className="bb-sans" role="status" style={{ margin: 0, color: 'var(--bb-ink-muted)' }}>
+    <p className="bp-sans" role="status" style={{ margin: 0, color: 'var(--bp-ink-muted)' }}>
       Updated {updatedLabel}
       {latestPath ? (
         <>
@@ -46,7 +46,7 @@ export function RevisionUpdateChrome({ fact, errataHref = '/errata' }: RevisionU
       {revision ? (
         <>
           {' '}
-          · <span className="bb-mono">{humanizeToken(revision.changeType)}</span>
+          · <span className="bp-mono">{humanizeToken(revision.changeType)}</span>
         </>
       ) : null}
     </p>

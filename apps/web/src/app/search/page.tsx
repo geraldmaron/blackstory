@@ -1,5 +1,5 @@
 /**
- * Public search page: wired to the real `@black-book/domain` search pipeline
+ * Public search page: wired to the real `@blap/domain` search pipeline
  * (`runPublicSearch`) over the snapshot search index, replacing the earlier hand-rolled
  * `filterPublicEntities` seed-filter stand-in.
  *
@@ -11,14 +11,14 @@
  * framework's own allowlisted route conventions see `./search-view-model.ts`'s module doc.
  */
 
-import { EmptyState, FilterBar, ResultList } from '@black-book/ui';
+import { EmptyState, FilterBar, ResultList } from '@blap/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { getPublicSearchIndex } from '../../lib/public-data/source';
 import { buildSearchPageHref, buildSearchViewModel, type RawSearchParams } from './search-view-model';
 
 export const metadata = {
   title: 'Search',
-  description: 'Search sample Black Book records by keyword, kind, status, and era.',
+  description: 'Search sample Blap records by keyword, kind, status, and era.',
 };
 
 type SearchPageProps = {
@@ -31,19 +31,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const view = buildSearchViewModel(params, index.data);
 
   return (
-    <main className="bb-container bb-page" id="main">
-      <header className="bb-entity-mast">
-        <p className="bb-page__eyebrow">Index</p>
-        <h1 className="bb-page__title">Search</h1>
-        <p className="bb-page__lede">
+    <main className="bp-container bp-page" id="main">
+      <header className="bp-entity-mast">
+        <p className="bp-page__eyebrow">Index</p>
+        <h1 className="bp-page__title">Search</h1>
+        <p className="bp-page__lede">
           Search runs against the current{' '}
           {index.source === 'live' ? 'live public release' : 'sample/snapshot catalog'} through the
-          real Black Book search pipeline — matches, facet counts, and match explanations below
+          real Blap search pipeline — matches, facet counts, and match explanations below
           reflect that pipeline, not a hardcoded seed filter.
         </p>
       </header>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
+      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
         {index.source !== 'live' ? <SeedDataNotice compact /> : null}
 
         <FilterBar
@@ -86,7 +86,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           ]}
         />
 
-        <p className="bb-sans bb-count-label" id="search-results-heading">
+        <p className="bp-sans bp-count-label" id="search-results-heading">
           {view.totalMatched} sample result{view.totalMatched === 1 ? '' : 's'}
         </p>
 
@@ -94,7 +94,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <EmptyState
             title="No sample records matched"
             action={
-              <a className="bb-cta bb-cta--ink" href="/search">
+              <a className="bp-cta bp-cta--ink" href="/search">
                 Clear filters
               </a>
             }
@@ -112,20 +112,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 summary: result.summary ?? '',
                 meta: (
                   <>
-                    <span className="bb-mono">{result.kind}</span>
-                    {result.status ? <span className="bb-mono">{result.status}</span> : null}
-                    <span className="bb-sans">Matched: {result.matchedText}</span>
-                    <span className="bb-sans">{result.explanation}</span>
+                    <span className="bp-mono">{result.kind}</span>
+                    {result.status ? <span className="bp-mono">{result.status}</span> : null}
+                    <span className="bp-sans">Matched: {result.matchedText}</span>
+                    <span className="bp-sans">{result.explanation}</span>
                   </>
                 ),
               }))}
             />
 
             {view.previousOffset !== undefined || view.nextOffset !== undefined ? (
-              <nav className="bb-row" aria-label="Search results pages">
+              <nav className="bp-row" aria-label="Search results pages">
                 {view.previousOffset !== undefined ? (
                   <a
-                    className="bb-button bb-button--secondary"
+                    className="bp-button bp-button--secondary"
                     href={buildSearchPageHref(view, view.previousOffset)}
                   >
                     Previous page
@@ -133,7 +133,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 ) : null}
                 {view.nextOffset !== undefined ? (
                   <a
-                    className="bb-button bb-button--secondary"
+                    className="bp-button bp-button--secondary"
                     href={buildSearchPageHref(view, view.nextOffset)}
                   >
                     Next page

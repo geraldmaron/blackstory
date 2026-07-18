@@ -3,4 +3,4 @@ connectorId: 'publication'
 generate:
   adminNodeSdk:
     outputDir: '../../../../../../packages/data-access/generated/publication'
-    package: '@black-book/sql-connect-publication'
+    package: '@blap/sql-connect-publication'

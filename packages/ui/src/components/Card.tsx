@@ -30,11 +30,11 @@ export function Card({
 }: CardProps) {
   return (
     <Component
-      className={cx('bb-card', interactive && 'bb-card--interactive', className)}
+      className={cx('bp-card', interactive && 'bp-card--interactive', className)}
       {...rest}
     >
-      {title ? <h3 className="bb-card__title">{title}</h3> : null}
-      {meta ? <div className="bb-card__meta">{meta}</div> : null}
+      {title ? <h3 className="bp-card__title">{title}</h3> : null}
+      {meta ? <div className="bp-card__meta">{meta}</div> : null}
       {children}
     </Component>
   );

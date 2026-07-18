@@ -1,7 +1,7 @@
 /**
  * Public legal landscape browse surface at `/legal`.
  */
-import { EmptyState, FilterBar } from '@black-book/ui';
+import { EmptyState, FilterBar } from '@blap/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { LegalBrowseList, LegalDisclaimer, LEGAL_BROWSE_LEDE } from '../../components/legal';
 import { buildLegalBrowseViewModel, type RawLegalBrowseParams } from './legal-view-model';
@@ -20,14 +20,14 @@ export default async function LegalBrowsePage({ searchParams }: LegalPageProps) 
   const view = buildLegalBrowseViewModel(params);
 
   return (
-    <main className="bb-container bb-page" id="main">
-      <header className="bb-entity-mast">
-        <p className="bb-page__eyebrow">Reference</p>
-        <h1 className="bb-page__title">Legal landscape</h1>
-        <p className="bb-page__lede">{LEGAL_BROWSE_LEDE}</p>
+    <main className="bp-container bp-page" id="main">
+      <header className="bp-entity-mast">
+        <p className="bp-page__eyebrow">Reference</p>
+        <h1 className="bp-page__title">Legal landscape</h1>
+        <p className="bp-page__lede">{LEGAL_BROWSE_LEDE}</p>
       </header>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
+      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
         <LegalDisclaimer />
         <SeedDataNotice compact />
 
@@ -63,7 +63,7 @@ export default async function LegalBrowsePage({ searchParams }: LegalPageProps) 
           ]}
         />
 
-        <p className="bb-sans bb-count-label" id="legal-results-heading">
+        <p className="bp-sans bp-count-label" id="legal-results-heading">
           {view.totalMatched} legal entr{view.totalMatched === 1 ? 'y' : 'ies'}
         </p>
 
@@ -71,7 +71,7 @@ export default async function LegalBrowsePage({ searchParams }: LegalPageProps) 
           <EmptyState
             title="No legal entries matched"
             action={
-              <a className="bb-cta bb-cta--ink" href="/legal">
+              <a className="bp-cta bp-cta--ink" href="/legal">
                 Clear filters
               </a>
             }

@@ -39,7 +39,7 @@ export function Dialog({ open, title, children, onClose, footer, className }: Di
   return (
     <dialog
       ref={dialogRef}
-      className={cx('bb-dialog', className)}
+      className={cx('bp-dialog', className)}
       aria-labelledby={titleId}
       onClose={onClose}
       onCancel={(event) => {
@@ -47,21 +47,21 @@ export function Dialog({ open, title, children, onClose, footer, className }: Di
         onClose();
       }}
     >
-      <div className="bb-dialog__header">
-        <h2 className="bb-dialog__title" id={titleId}>
+      <div className="bp-dialog__header">
+        <h2 className="bp-dialog__title" id={titleId}>
           {title}
         </h2>
         <button
           type="button"
-          className="bb-dialog__close"
+          className="bp-dialog__close"
           onClick={onClose}
           aria-label="Close dialog"
         >
           ×
         </button>
       </div>
-      <div className="bb-dialog__body">{children}</div>
-      {footer ? <div className="bb-dialog__footer">{footer}</div> : null}
+      <div className="bp-dialog__body">{children}</div>
+      {footer ? <div className="bp-dialog__footer">{footer}</div> : null}
     </dialog>
   );
 }

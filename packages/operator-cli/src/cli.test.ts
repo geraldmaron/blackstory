@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AtomicStore, AtomicTransaction } from '@black-book/firebase';
+import type { AtomicStore, AtomicTransaction } from '@blap/firebase';
 import { runCli } from './cli.ts';
 
 class MemoryAtomicStore implements AtomicStore {

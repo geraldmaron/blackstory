@@ -3,7 +3,7 @@
  * Firestore `legalSnapshots` + published `FactRecord` projections. Fact ids `BB-F-000010`+
  * deliberately avoid collision with `facts-seed.ts` (`BB-F-000001`–`000005`).
  */
-import { asFactId, type FactRecord } from '@black-book/domain';
+import { asFactId, type FactRecord } from '@blap/domain';
 import type {
   LegalCatalogEntry,
   LegalPlainLanguageExplainer,

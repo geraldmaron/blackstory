@@ -18,7 +18,7 @@ test('motion tokens document prefers-reduced-motion', () => {
 test('token CSS collapses durations under reduced motion', () => {
   const css = readFileSync(path.join(stylesDir, 'tokens.css'), 'utf8');
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
-  assert.match(css, /--bb-duration-base:\s*0\.01ms/);
+  assert.match(css, /--bp-duration-base:\s*0\.01ms/);
 });
 
 test('base CSS disables transitions and animations under reduced motion', () => {
@@ -31,5 +31,5 @@ test('base CSS disables transitions and animations under reduced motion', () => 
 test('focus styles use :focus-visible with outline tokens', () => {
   const css = readFileSync(path.join(stylesDir, 'base.css'), 'utf8');
   assert.match(css, /:focus-visible/);
-  assert.match(css, /outline:\s*var\(--bb-focus-width\)/);
+  assert.match(css, /outline:\s*var\(--bp-focus-width\)/);
 });

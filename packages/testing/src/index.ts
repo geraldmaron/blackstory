@@ -3,7 +3,7 @@
  * Shared test builders, guards, harnesses, and deterministic helpers for Black Book.
  * Expanded under for multi-layer automated quality foundations.
  */
-export const TESTING_PACKAGE = '@black-book/testing' as const;
+export const TESTING_PACKAGE = '@blap/testing' as const;
 
 export { captureLines, createSequence, fixedClock, steppingClock } from './utilities.js';
 export type { CapturedLines } from './utilities.js';

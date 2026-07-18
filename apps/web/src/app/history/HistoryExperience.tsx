@@ -8,7 +8,7 @@
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FilterBar, Notice } from '@black-book/ui';
+import { FilterBar, Notice } from '@blap/ui';
 import {
   DecadeStepper,
   HistoryEdgePanel,
@@ -161,7 +161,7 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
   };
 
   return (
-    <div className="bb-history">
+    <div className="bp-history">
       {degradedReason ? (
         <Notice tone="warning" title="Snapshot mode">
           {HISTORY_DEGRADED_MODE_COPY[degradedReason]}
@@ -184,32 +184,32 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
               <input type="hidden" name="selected" value={view.viewState.selected} />
             ) : null}
             {view.viewState.edge ? <input type="hidden" name="edge" value={view.viewState.edge} /> : null}
-            <button type="submit" className="bb-button bb-button--primary">
+            <button type="submit" className="bp-button bp-button--primary">
               Apply filters
             </button>
           </>
         }
       />
 
-      <div className="bb-history__toolbar">
-        <p className="bb-sans" id="history-results-heading">
+      <div className="bp-history__toolbar">
+        <p className="bp-sans" id="history-results-heading">
           {view.totalMatched} record{view.totalMatched === 1 ? '' : 's'} in view
           {view.viewState.mode === 'decade' && view.activeDecade ? ` · ${view.activeDecade}` : ' · all time'}
         </p>
-        <p className="bb-history__release-meta" aria-label="Release metadata">
+        <p className="bp-history__release-meta" aria-label="Release metadata">
           Release {view.releaseId}
         </p>
       </div>
 
-      <div className="bb-history__layout">
-        <div className="bb-history-graph-panel">
-          <h2 className="bb-section__kicker" id="history-graph-heading">
+      <div className="bp-history__layout">
+        <div className="bp-history-graph-panel">
+          <h2 className="bp-section__kicker" id="history-graph-heading">
             History graph
           </h2>
           <HistoryGraphPanel {...graphProps} />
         </div>
 
-        <div className="bb-history__list-panel">
+        <div className="bp-history__list-panel">
           {selectedNode ? (
             <HistoryNarrativeCard
               node={selectedNode}
@@ -222,9 +222,9 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
         </div>
       </div>
 
-      <p className="bb-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
+      <p className="bp-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
       {view.viewState.mode === 'decade' ? (
-        <p className="bb-history__framing">{HISTORY_DECADE_FRAMING}</p>
+        <p className="bp-history__framing">{HISTORY_DECADE_FRAMING}</p>
       ) : null}
 
       {/* Progressive enhancement hook — reserved for live refine; snapshot remains authoritative. */}

@@ -7,28 +7,28 @@
  * see `../corrections/page.tsx` for the related correction-intake surface and
  * `docs/runbooks/moderator-wellbeing.md` for how the review queue is staffed.
  */
-import { EmptyState, Notice } from '@black-book/ui';
+import { EmptyState, Notice } from '@blap/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { SubmitLeadForm } from './SubmitLeadForm';
 
 export const metadata = {
   title: 'Submit a lead',
   description:
-    'Point Black Book toward a lead — a closed group post, a family paper, an oral account — for moderated review.',
+    'Point Blap toward a lead — a closed group post, a family paper, an oral account — for moderated review.',
 };
 
 export default function SubmitLeadPage() {
   return (
-    <main className="bb-container bb-page" id="main">
-      <p className="bb-page__eyebrow">Contribute</p>
-      <h1 className="bb-page__title">Submit a lead</h1>
-      <p className="bb-page__lede">
+    <main className="bp-container bp-page" id="main">
+      <p className="bp-page__eyebrow">Contribute</p>
+      <h1 className="bp-page__title">Submit a lead</h1>
+      <p className="bp-page__lede">
         Some of the most important sources for this history live where no compliant automated
         search can reach — closed Facebook groups, Discord servers, private forums, family
         papers, oral memory. If you know of one, tell us here.
       </p>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
+      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
         <SeedDataNotice compact />
 
         <Notice tone="warning" title="This is not a public post">

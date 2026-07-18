@@ -548,7 +548,7 @@ test('ingestWebSearchCandidatesThroughPipeline fails closed when the Wayback cap
 // ---------------------------------------------------------------------------------------------
 
 test('a real BB-033-backed DailyBudgetEvaluator (thin wrapper over the real evaluateDailyBudget) composes correctly', async () => {
-  const { evaluateDailyBudget: realEvaluateDailyBudget } = await import('@black-book/security');
+  const { evaluateDailyBudget: realEvaluateDailyBudget } = await import('@blap/security');
 
   const realBackedEvaluator: DailyBudgetEvaluator = (input, budgets) => {
     const result = (realEvaluateDailyBudget as unknown as (

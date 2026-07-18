@@ -3,11 +3,11 @@
  * Firestore projection with a rights-cleared primaryImage block.
  *
  * Requires:
- *   BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1
+ *   BLAP_FIREBASE_ALLOW_PRODUCTION=1
  *   Application Default Credentials with Storage + Firestore write on black-book-efaaf
  *
  * Usage (from packages/firebase):
- *   BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 \
+ *   BLAP_FIREBASE_ALLOW_PRODUCTION=1 \
  *   node --conditions development --import tsx scripts/promote-entity-primary-image.ts \
  *     --entity-id=ent_seed_school_001 \
  *     --file=../../brand-system/assets/png/black-book-mark-light-transparent.png \
@@ -29,7 +29,7 @@ import {
 } from '../src/index.ts';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
-const ALLOW = process.env.BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION === '1';
+const ALLOW = process.env.BLAP_FIREBASE_ALLOW_PRODUCTION === '1';
 const DRY_RUN = process.env.DRY_RUN === '1';
 
 function arg(name: string): string | undefined {
@@ -49,7 +49,7 @@ function requireArg(name: string): string {
 
 async function main(): Promise<void> {
   if (!ALLOW) {
-    console.error('Refusing to write: set BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1');
+    console.error('Refusing to write: set BLAP_FIREBASE_ALLOW_PRODUCTION=1');
     process.exit(2);
   }
 

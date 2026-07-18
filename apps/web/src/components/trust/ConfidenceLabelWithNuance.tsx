@@ -3,9 +3,9 @@
  * links to methodology definitions for the evidence-grade vocabulary.
  */
 import React from 'react';
-import { Confidence } from '@black-book/ui';
-import type { FactConfidenceGrade } from '@black-book/domain';
-import { FACT_CONFIDENCE_DEFINITIONS } from '@black-book/domain';
+import { Confidence } from '@blap/ui';
+import type { FactConfidenceGrade } from '@blap/domain';
+import { FACT_CONFIDENCE_DEFINITIONS } from '@blap/domain';
 import { humanizeToken, mapConfidenceToUiLevel } from '../facts/format.js';
 
 export type ConfidenceLabelWithNuanceProps = {
@@ -25,13 +25,13 @@ export function ConfidenceLabelWithNuance({
   return (
     <div>
       <Confidence level={level} label={label} />
-      <p className="bb-sans" style={{ margin: 'var(--bb-space-2) 0 0 0', color: 'var(--bb-ink-muted)' }}>
+      <p className="bp-sans" style={{ margin: 'var(--bp-space-2) 0 0 0', color: 'var(--bp-ink-muted)' }}>
         {FACT_CONFIDENCE_DEFINITIONS[confidence]}
         {' '}
         <a href={methodologyHref}>See grade definitions</a>.
       </p>
       {confidenceNote ? (
-        <p className="bb-sans" style={{ margin: 'var(--bb-space-2) 0 0 0' }}>
+        <p className="bp-sans" style={{ margin: 'var(--bp-space-2) 0 0 0' }}>
           <strong>Nuance:</strong> {confidenceNote}
         </p>
       ) : null}

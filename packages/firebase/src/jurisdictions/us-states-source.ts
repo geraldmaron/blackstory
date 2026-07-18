@@ -1,11 +1,11 @@
 
 /**
- * Adapts `@black-book/domain`'s existing `US_STATES` table (51 states + D.C.) into
+ * Adapts `@blap/domain`'s existing `US_STATES` table (51 states + D.C.) into
  * `jurisdictions` collection docs. State docs must be sourced from the existing us-geography
  * module (single source of truth, no duplicate table). This file is the only place state
  * jurisdiction data is derived, and it derives every field from `US_STATES`.
  */
-import { US_STATES, type UsStateInfo } from '@black-book/domain';
+import { US_STATES, type UsStateInfo } from '@blap/domain';
 import { countryJurisdictionId, stateJurisdictionId, type JurisdictionDoc } from './schema.js';
 
 export const US_STATES_SOURCE_DATASET = 'us-geography-module' as const;

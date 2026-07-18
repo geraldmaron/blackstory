@@ -4,7 +4,7 @@
  *
  * Reads every JSON file in `packages/firebase/fixtures/national-catalog/`, converts each
  * research entry into a `publicEntityProjectionSchema`-conformant doc (geohash via
- * @black-book/domain's `buildGeoPointFields`, claim ids synthesized when the research entry
+ * @blap/domain's `buildGeoPointFields`, claim ids synthesized when the research entry
  * omitted them), hard-fails if ANY entry does not validate, then batch-writes:
  *   publicReleases/<activeRelease>/entities/<id>   (projection, merge)
  *   publicSearchIndex/<id>                          (search doc, merge)
@@ -13,11 +13,11 @@
  * `publicMeta/activeRelease` — the release pointer stays whatever bootstrap/promotion set.
  *
  * Requires:
- *   BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1
+ *   BLAP_FIREBASE_ALLOW_PRODUCTION=1
  *   Application Default Credentials with Firestore write access
  *
  * Usage:
- *   BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
+ *   BLAP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
  *     packages/firebase/scripts/publish-national-catalog.ts
  *   DRY_RUN=1 ... — validate + print without writing.
  */
@@ -26,20 +26,20 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { buildGeoPointFields } from '@black-book/domain';
+import { buildGeoPointFields } from '@blap/domain';
 import {
   publicEntityProjectionSchema,
   publicSearchIndexSchema,
 } from '../src/firestore/types.ts';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
-const ALLOW = process.env.BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION === '1';
+const ALLOW = process.env.BLAP_FIREBASE_ALLOW_PRODUCTION === '1';
 const DRY_RUN = process.env.DRY_RUN === '1';
 /** Geohash character precision for public anchors — matches the bootstrap fixtures' choice. */
 const GEOHASH_PRECISION = 5;
 
 if (!ALLOW && !DRY_RUN) {
-  console.error('Refusing to write: set BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1)');
+  console.error('Refusing to write: set BLAP_FIREBASE_ALLOW_PRODUCTION=1 (or DRY_RUN=1)');
   process.exit(2);
 }
 

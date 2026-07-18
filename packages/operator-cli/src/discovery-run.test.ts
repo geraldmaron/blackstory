@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import { parseCandidateFixtureBatch, parseQueryPackFixture } from '@black-book/domain';
+import { parseCandidateFixtureBatch, parseQueryPackFixture } from '@blap/domain';
 import { runBoundedDiscoveryCampaign } from './discovery-run.ts';
 
 const DOMAIN_SRC = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'domain', 'src');

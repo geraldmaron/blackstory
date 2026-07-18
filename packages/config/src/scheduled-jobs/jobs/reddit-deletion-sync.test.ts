@@ -1,13 +1,13 @@
 
 /**
  * /: proves the Reddit deletion-sync job body is REAL it calls
- * `@black-book/domain`'s `sweepRedditPointerLiveness`/`applyRedditPointerPurge` (which in turn
+ * `@blap/domain`'s `sweepRedditPointerLiveness`/`applyRedditPointerPurge` (which in turn
  * wrap `planDeletionSyncPurge`/`applyDeletionSyncPurge`) rather than reimplementing
  * liveness classification or purge mechanics. Fixture/fake-driven throughout no live network.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { RedditLivenessChecker, RedditStoredPointer } from '@black-book/domain';
+import type { RedditLivenessChecker, RedditStoredPointer } from '@blap/domain';
 import { runRedditDeletionSyncJob } from './reddit-deletion-sync.ts';
 
 const ACTOR = { id: 'system:reddit-deletion-sync', type: 'service' as const };

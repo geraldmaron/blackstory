@@ -7,17 +7,17 @@
  * residential/address fields, and fails closed (`assertPublicProjectionSafe`) if any
  * prohibited precision or protected value would otherwise reach a public surface.
  * Learning-index fields (required summary, topic tags, optional prose/photo) are
- * gated via `@black-book/domain` assertLearningIndexProjection.
+ * gated via `@blap/domain` assertLearningIndexProjection.
  */
-import type { LivingStatus, PublicEntityPrimaryImage, PublicRelatedEntry } from '@black-book/domain';
+import type { LivingStatus, PublicEntityPrimaryImage, PublicRelatedEntry } from '@blap/domain';
 import {
   allowedPublicPrecisionLevels,
   assertLearningIndexProjection,
   hasPreferredTopicTags,
   prohibitedPublicPrecisionLevels,
   sanitizePrimaryImageForRelease,
-} from '@black-book/domain';
-import { evaluatePublicPrecision } from '@black-book/schemas';
+} from '@blap/domain';
+import { evaluatePublicPrecision } from '@blap/schemas';
 import {
   createSensitiveDataRedactor,
   redactLocationForPublic,

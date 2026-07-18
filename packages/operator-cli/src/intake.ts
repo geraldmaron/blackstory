@@ -3,8 +3,8 @@
  * Core operator-proposal intake: submit a lead, register a source, or attach evidence.
  *
  * Every operation in this file lands in the *existing* submission-quarantine pipeline
- * (`createQuarantinedSubmission` from `@black-book/security`) and, for leads, opens a real
- * draft research case (`createResearchCase` from `@black-book/domain`). Nothing here
+ * (`createQuarantinedSubmission` from `@blap/security`) and, for leads, opens a real
+ * draft research case (`createResearchCase` from `@blap/domain`). Nothing here
  * writes a canonical record, touches `evidenceSources`, mutates a research-case checklist, or
  * evaluates a promotion gate see `../docs` in the repo root (`docs/runbooks/operator-session.md`)
  * and `promotion-boundary.test.ts` for the boundary this module cannot cross.
@@ -25,15 +25,15 @@ import { randomUUID } from 'node:crypto';
 import {
   createResearchCase,
   type ResearchCaseRecord,
-} from '@black-book/domain';
+} from '@blap/domain';
 import {
   createQuarantinedSubmission,
   createSubmissionCampaignDetector,
   type QuarantinedSubmissionRecord,
   type RejectedSubmission,
   type SubmissionIntakeContext,
-} from '@black-book/security';
-import { firestorePaths, type StateMutation } from '@black-book/firebase';
+} from '@blap/security';
+import { firestorePaths, type StateMutation } from '@blap/firebase';
 import { buildOperatorAuditEvent, buildOperatorOutboxMessage } from './audit.js';
 import { operatorStamp, type OperatorIdentity, type OperatorStamp } from './identity.js';
 

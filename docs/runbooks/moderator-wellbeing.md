@@ -9,7 +9,7 @@ acceptance tests, not this document.
 
 ## Why this runbook exists
 
-Black Book documents racially charged, and sometimes violent, history. A public, unauthenticated
+Blap documents racially charged, and sometimes violent, history. A public, unauthenticated
 "submit a lead" form is — by the Queering the Map lesson named in BB-076's design brief — a
 predictable target for two very different kinds of hostile submission:
 

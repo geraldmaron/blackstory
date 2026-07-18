@@ -1,6 +1,6 @@
 /**
  * Pure-logic tests for buildMapSource using a stub redaction port (no
- * @black-book/security dependency here; see map-source.redaction.test.ts for
+ * @blap/security dependency here; see map-source.redaction.test.ts for
  * the integration regression test against the real redaction functions).
  */
 import assert from 'node:assert/strict';

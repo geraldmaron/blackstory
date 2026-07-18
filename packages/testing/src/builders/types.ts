@@ -1,7 +1,7 @@
 
 /**
  * Shared domain fixture shapes used by test data builders.
- * Aligned with @black-book/domain entity kinds; builders remain test-only.
+ * Aligned with @blap/domain entity kinds; builders remain test-only.
  */
 
 export type EntityKind =

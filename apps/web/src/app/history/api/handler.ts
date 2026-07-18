@@ -5,7 +5,7 @@
  * history queries without requiring a full navigation.
  */
 import { NextResponse } from 'next/server';
-import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@black-book/security';
+import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@blap/security';
 import { getHistoryGraphReleaseArtifact } from '../../../data/history-graph-seed';
 import {
   buildHistoryEdges,

@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@black-book/firebase';
+import type { AppCheckVerifier } from '@blap/firebase';
 import { createExploreAppCheckGuard } from './app-check-guard';
 import { createExploreRateLimitGuard } from './rate-limit-guard';
 import { handleExploreRefineRequest, type ExploreRouteDependencies } from './handler';

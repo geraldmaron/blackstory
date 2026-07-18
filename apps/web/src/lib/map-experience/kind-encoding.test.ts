@@ -7,7 +7,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { contrastRatio } from '@black-book/ui';
+import { contrastRatio } from '@blap/ui';
 import { DIGNITY_PALETTE } from './dignity-style';
 import {
   DEFAULT_KIND_ENCODING,

@@ -12,7 +12,7 @@ import {
   hashCanonicalQuery,
   resolveEndpointPolicy,
   type SubmissionInput,
-} from '@black-book/security';
+} from '@blap/security';
 import {
   buildCacheKeyFromQuery,
   cacheKeyCollapsesVariants,

@@ -6,7 +6,7 @@
  * This module never fetches a URL directly. It only supplies the dependency-injected
  * `resolveHost`/`transport` that `executeSafeFetch` (packages/security/src/url-safety/fetch.ts)
  * requires, and calls that real function the SSRF-safe DNS pinning, redirect re-validation,
- * response-size/content-type limits, and sandboxed parsing all stay in `@black-book/security`.
+ * response-size/content-type limits, and sandboxed parsing all stay in `@blap/security`.
  *
  * Wayback capture: NOT wired. Nothing in this repo calls the Internet Archive's Save Page Now
  * API yet (see `packages/domain/src/provenance/capture.ts` `SourceCapture.snapshotStorageObject`
@@ -25,8 +25,8 @@ import {
   type SafeFetchDependencies,
   type SafeFetchOptions,
   type SafeFetchResult,
-} from '@black-book/security';
-import type { SnapshotMode } from '@black-book/domain';
+} from '@blap/security';
+import type { SnapshotMode } from '@blap/domain';
 
 /** Resolves a hostname to its public/private-classified addresses via the real system resolver. */
 export const nodeResolveHost: ResolveHost = async (hostname) => {

@@ -5,7 +5,7 @@
  * (packages/config/src/scheduled-jobs/jobs/citation-link-health-sweep.ts) writes to; nothing here
  * connects to a live service.
  */
-import type { Citation } from '@black-book/domain';
+import type { Citation } from '@blap/domain';
 
 export const CITATION_HEALTH_FIXTURES: readonly Citation[] = [
   {

@@ -28,7 +28,7 @@ export const MYTH_REVIEWS: readonly MythReview[] = [
       name: 'Common assumption about the school’s naming history',
     },
     ratingExplanation: 'False — the school carried two earlier names before 1916',
-    authorName: 'Black Book',
+    authorName: 'Blap',
     relatedFactUrl: '/facts/BB-F-000003/renamed-paul-laurence-dunbar-1916',
   },
   {
@@ -48,7 +48,7 @@ export const MYTH_REVIEWS: readonly MythReview[] = [
       name: 'Common assumption about the current building’s history',
     },
     ratingExplanation: 'False — the 1916 building and its 1970s replacement were both demolished',
-    authorName: 'Black Book',
+    authorName: 'Blap',
     relatedFactUrl: '/facts/BB-F-000005/1916-and-1970s-buildings-demolished-rebuilt-2013',
   },
 ];

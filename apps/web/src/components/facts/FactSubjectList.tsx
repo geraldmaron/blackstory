@@ -6,7 +6,7 @@
  * relationships at publish time see `packages/domain/src/facts/subjects.ts`).
  */
 import React from 'react';
-import type { FactRecord } from '@black-book/domain';
+import type { FactRecord } from '@blap/domain';
 import { humanizeToken } from './format';
 
 export type FactSubjectListProps = {
@@ -17,20 +17,20 @@ export type FactSubjectListProps = {
 export function FactSubjectList({ subjects, labelledBy }: FactSubjectListProps) {
   return (
     <section {...(labelledBy ? { 'aria-labelledby': labelledBy } : {})}>
-      <ul className="bb-stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+      <ul className="bp-stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         {subjects.map((subject) => (
           <li key={`${subject.entityId}_${subject.kind}`}>
-            <a className="bb-cta bb-cta--ink" href={`/entity/${subject.entityId}`}>
+            <a className="bp-cta bp-cta--ink" href={`/entity/${subject.entityId}`}>
               {subject.entityId}
             </a>
-            <span className="bb-sans" style={{ marginLeft: 'var(--bb-space-2)', color: 'var(--bb-ink-muted)' }}>
+            <span className="bp-sans" style={{ marginLeft: 'var(--bp-space-2)', color: 'var(--bp-ink-muted)' }}>
               {humanizeToken(subject.kind)}
               {subject.role ? ` · ${humanizeToken(subject.role)}` : ''}
             </span>
           </li>
         ))}
       </ul>
-      <p className="bb-sans" style={{ margin: 'var(--bb-space-3) 0 0 0', color: 'var(--bb-ink-muted)' }}>
+      <p className="bp-sans" style={{ margin: 'var(--bp-space-3) 0 0 0', color: 'var(--bp-ink-muted)' }}>
         These subject edges feed the published history graph (BB-092) — mirrored into browse-graph
         relationships at publish time so fact-only entity linkages are not silently absent.
       </p>

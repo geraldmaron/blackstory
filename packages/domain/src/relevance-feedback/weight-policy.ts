@@ -7,7 +7,7 @@
  *
  * report finding → `proposeWeightChange` (pure, data only)
  * → gold-corpus gate result supplied by caller (real evaluation happens in
- * `@black-book/testing`; this module never imports or reimplements it — see
+ * `@blap/testing`; this module never imports or reimplements it — see
  * `requireGoldCorpusGatePassed`'s structural `GoldCorpusGateInput` type, which
  * `packages/config/src/scheduled-jobs/jobs/recalibration-report.ts` fills in from a real
  * `CorpusEvaluationRecord`)
@@ -150,8 +150,8 @@ export function proposeWeightChange(input: {
 
 /** Structural (not imported) shape of CorpusEvaluationRecord
  * (packages/testing/src/gold-corpus/types.ts). Kept structural, rather than importing
- * @black-book/testing into @black-book/domain, to avoid adding a new cross-package dependency
- * to a foundational package the real evaluation always happens in @black-book/testing
+ * @blap/testing into @blap/domain, to avoid adding a new cross-package dependency
+ * to a foundational package the real evaluation always happens in @blap/testing
  * (evaluateCorpus assertCorpusEvaluationPassed), and a real CorpusEvaluationRecord already
  * satisfies this shape, so callers (e.g. packages/config/src/scheduled-jobs/jobs/
  * recalibration-report.ts, which already depends on both packages) pass it straight through. */

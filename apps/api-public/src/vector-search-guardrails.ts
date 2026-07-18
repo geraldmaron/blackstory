@@ -26,7 +26,7 @@ import {
   DEFAULT_QUERY_GUARDRAIL_LIMITS,
   type QueryGuardrailDenialReason,
   type SearchQueryInput,
-} from '@black-book/security';
+} from '@blap/security';
 
 export const VECTOR_SEARCH_PATH = /^\/v1\/search\/nearest(?:\/|$)/i;
 

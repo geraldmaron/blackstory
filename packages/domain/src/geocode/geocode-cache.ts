@@ -4,7 +4,7 @@
  * `ManualPlaceSearchFallback` shapes, never a raw address-history record. Mirrors
  * `packages/security/src/rate-limits.ts`'s `createInMemoryRateLimitStore` shape (bounded size,
  * TTL eviction, size) so this cache reads the same way to anyone already familiar with that
- * store, without importing `@black-book/security` (circular-dependency rule, see
+ * store, without importing `@blap/security` (circular-dependency rule, see
  * `./jurisdiction-ids.ts`'s module doc).
  *
  * Privacy note: entries are keyed by a normalized address/coordinate/ZIP hash (see

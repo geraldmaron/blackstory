@@ -6,7 +6,7 @@ import {
   assertOperationAllowed,
   type AuthMode,
   type OperationId,
-} from '@black-book/config';
+} from '@blap/config';
 
 export const SURFACE_ID = 'api-internal' as const;
 

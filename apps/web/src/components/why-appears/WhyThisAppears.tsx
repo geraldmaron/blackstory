@@ -1,6 +1,6 @@
 /**
  * Public "why this appears" explanation surface. Renders the auditable payload produced by
- * `@black-book/domain`'s `buildPublicWhyThisAppears` (composing relevance explanation and
+ * `@blap/domain`'s `buildPublicWhyThisAppears` (composing relevance explanation and
  * `notabilityBasis`). This component performs no editorial composition of its own; it only
  * presents the already-validated `PublicWhyThisAppears` structure.
  *
@@ -10,14 +10,14 @@
  * perspective indicators render additively alongside the explanation, never in place of it.
  *
  * Callers resolve a `PublicWhyThisAppears` value via `buildPublicWhyThisAppears` from
- * `@black-book/domain` (typically from an entity's `relevanceExplanation` /
+ * `@blap/domain` (typically from an entity's `relevanceExplanation` /
  * `historicalContext` / claim text and `notabilityBasis`) and mount
  * `<WhyThisAppears result={...} />` on the entity detail page.
  */
 
 import React from 'react';
-import { Card, EmptyState, Notice } from '@black-book/ui';
-import type { PublicWhyThisAppears } from '@black-book/domain';
+import { Card, EmptyState, Notice } from '@blap/ui';
+import type { PublicWhyThisAppears } from '@blap/domain';
 import { WHY_THIS_APPEARS_COPY } from './copy';
 
 export type WhyThisAppearsProps = {
@@ -34,9 +34,9 @@ export function WhyThisAppears({ result, instanceId = 'why-this-appears' }: WhyT
   return (
     <Card
       title={WHY_THIS_APPEARS_COPY.heading}
-      meta={<span className="bb-mono">{WHY_THIS_APPEARS_COPY.auditableTag}</span>}
+      meta={<span className="bp-mono">{WHY_THIS_APPEARS_COPY.auditableTag}</span>}
     >
-      <p className="bb-sans" style={{ margin: 0 }}>
+      <p className="bp-sans" style={{ margin: 0 }}>
         {result.explanation}
       </p>
 
@@ -46,8 +46,8 @@ export function WhyThisAppears({ result, instanceId = 'why-this-appears' }: WhyT
         </Notice>
       ) : null}
 
-      <section aria-labelledby={basisHeadingId} style={{ marginTop: 'var(--bb-space-4)' }}>
-        <h4 id={basisHeadingId} className="bb-sans" style={{ margin: 0 }}>
+      <section aria-labelledby={basisHeadingId} style={{ marginTop: 'var(--bp-space-4)' }}>
+        <h4 id={basisHeadingId} className="bp-sans" style={{ margin: 0 }}>
           {WHY_THIS_APPEARS_COPY.basisHeading}
         </h4>
         {result.notabilityBasis.length === 0 ? (
@@ -55,14 +55,14 @@ export function WhyThisAppears({ result, instanceId = 'why-this-appears' }: WhyT
             {WHY_THIS_APPEARS_COPY.noBasisRecorded}
           </EmptyState>
         ) : (
-          <ol className="bb-qualify-list" aria-label={WHY_THIS_APPEARS_COPY.basisHeading}>
+          <ol className="bp-qualify-list" aria-label={WHY_THIS_APPEARS_COPY.basisHeading}>
             {result.notabilityBasis.map((item, index) => (
               <li key={`${item.criterion}_${index}`}>
-                <span className="bb-mono">{item.criterionLabel}</span>
-                <p className="bb-sans" style={{ margin: 0, fontWeight: 400 }}>
+                <span className="bp-mono">{item.criterionLabel}</span>
+                <p className="bp-sans" style={{ margin: 0, fontWeight: 400 }}>
                   {item.note}
                 </p>
-                <p className="bb-mono" style={{ margin: 0 }}>
+                <p className="bp-mono" style={{ margin: 0 }}>
                   {WHY_THIS_APPEARS_COPY.sourceCountSuffix(item.evidenceIds.length)}
                 </p>
               </li>
@@ -74,15 +74,15 @@ export function WhyThisAppears({ result, instanceId = 'why-this-appears' }: WhyT
       {result.missingPerspectiveIndicators.length > 0 ? (
         <section
           aria-labelledby={coverageHeadingId}
-          className="bb-stack"
-          style={{ marginTop: 'var(--bb-space-4)' }}
+          className="bp-stack"
+          style={{ marginTop: 'var(--bp-space-4)' }}
         >
-          <h4 id={coverageHeadingId} className="bb-sans" style={{ margin: 0 }}>
+          <h4 id={coverageHeadingId} className="bp-sans" style={{ margin: 0 }}>
             {WHY_THIS_APPEARS_COPY.missingPerspectiveHeading}
           </h4>
           <ul>
             {result.missingPerspectiveIndicators.map((indicator) => (
-              <li key={indicator.dimension} className="bb-sans">
+              <li key={indicator.dimension} className="bp-sans">
                 {indicator.note}
               </li>
             ))}

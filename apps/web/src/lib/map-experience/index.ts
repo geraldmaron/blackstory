@@ -1,6 +1,6 @@
 /**
  * Barrel export for the map-experience data layer. Does not re-export from
- * `@black-book/domain` or `@black-book/security`; only re-exports this package's own
+ * `@blap/domain` or `@blap/security`; only re-exports this package's own
  * additive files.
  */
 export * from './entity-geo';

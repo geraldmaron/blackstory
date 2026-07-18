@@ -1,12 +1,12 @@
 /**
  * Server-only rate-limit guard for the public search route. Reuses the
- * exact shared evaluator from `@black-book/security` `createRateLimitEvaluator`,
+ * exact shared evaluator from `@blap/security` `createRateLimitEvaluator`,
  * `buildRateLimitKey`, `aggregateDistributedRisk`, `formatRateLimitResponse`,
  * `releaseConcurrency` — the same primitives `apps/web/src/app/submit/rate-limit-guard.ts` uses.
  * This is not a new rate-limit algorithm.
  *
  * Deliberate deviation from the submit guard: this endpoint is routed under the `search` endpoint
- * class, not `corrections`. `@black-book/security`'s policy matrix (`DEFAULT_ENDPOINT_QUOTA_MATRIX`
+ * class, not `corrections`. `@blap/security`'s policy matrix (`DEFAULT_ENDPOINT_QUOTA_MATRIX`
  * in `rate-limits.ts`) gives `search` a distinct, more generous `expensive_read` tier
  * (anonymous: capacity 8 window cap 8 daily 40 concurrency 1) than the `corrections`
  * `mutation` tier (anonymous: capacity 2 window cap 2 daily 8) appropriate for an
@@ -28,7 +28,7 @@ import {
   type RateLimitStore,
   type RateLimitSubject,
   type RiskSignal,
-} from '@black-book/security';
+} from '@blap/security';
 
 const ENDPOINT_CLASS: EndpointClass = SEARCH_ENDPOINT_CLASS;
 

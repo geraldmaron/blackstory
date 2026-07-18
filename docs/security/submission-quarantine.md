@@ -71,8 +71,8 @@ semantics.
 ## Validation
 
 ```bash
-pnpm --filter @black-book/security test
-pnpm --filter @black-book/security typecheck
-pnpm --filter @black-book/api-submissions test
-pnpm --filter @black-book/api-submissions typecheck
+pnpm --filter @blap/security test
+pnpm --filter @blap/security typecheck
+pnpm --filter @blap/api-submissions test
+pnpm --filter @blap/api-submissions typecheck
 ```

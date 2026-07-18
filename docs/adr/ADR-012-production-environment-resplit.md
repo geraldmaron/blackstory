@@ -18,7 +18,7 @@
 | Submissions flow | Public intake writes quarantine/submissions in the same project research/publication already share | Public intake stays in `blackbook-prod`; `blackbook-internal` **pulls** from it. No push from internal into prod's intake path |
 | Promotion | Same-project IAM (`publication`/`api-internal` roles) | Cross-project: one identity in `blackbook-internal` is the only writer into `blackbook-prod`'s canonical/public data |
 | CI/CD identity | One WIF pool + one production deploy SA, optional same-project staging SA | One WIF pool (hosted in `blackbook-prod`), three per-project deploy SAs, CEL conditions pinning repository + ref + protected environment per project |
-| Local dev | `demo-black-book` emulators | Unchanged |
+| Local dev | `demo-blap` emulators | Unchanged |
 
 ## Context
 
@@ -130,7 +130,7 @@ Adopt a **three-project** topology, all inside the existing Firebase account:
 
 ### 4. Local development — unchanged
 
-`demo-black-book` Firestore/Auth/Storage emulators remain the only local development target. No
+`demo-blap` Firestore/Auth/Storage emulators remain the only local development target. No
 project split changes this; AC-ISO-1 restated below still resolves the same way locally.
 
 ### Why keep `black-book-efaaf` as `blackbook-prod`
@@ -259,7 +259,7 @@ now carries both the historical same-project bullets and a `[Target topology]`-p
 bullet). Test encoding: `infra/gcp/terraform/multi-project/tests/isolation-invariants.test.mjs`.
 
 - **AC-ISO-1 — Development credentials cannot access production.** Now a **real project-separation
-  claim** again (D-013 had marked this N/A). `demo-black-book` emulators remain local-only;
+  claim** again (D-013 had marked this N/A). `demo-blap` emulators remain local-only;
   `blackbook-staging` gives cloud-based pre-production testing a real project boundary from
   `blackbook-prod` for the first time, without touching production credentials, data, or quota.
 - **AC-ISO-2 — Research workers cannot publish.** `research@blackbook-internal` has no grant in
@@ -284,7 +284,7 @@ bullet). Test encoding: `infra/gcp/terraform/multi-project/tests/isolation-invar
 
 | Alternative | Why rejected |
 |-------------|---------------|
-| Four-project split (restore the original `blackbook-dev`/`staging`/`prod`/`research-prod` target verbatim) | A cloud `dev` project buys little over `demo-black-book` emulators, which already give zero-cost, zero-blast-radius local development; a fourth project is ongoing IAM/billing surface for a workflow that doesn't need cloud credentials. Re-evaluate only if cloud-based development or destructive integration testing against realistic data becomes required (unchanged trigger from D-013/ADR-009). |
+| Four-project split (restore the original `blackbook-dev`/`staging`/`prod`/`research-prod` target verbatim) | A cloud `dev` project buys little over `demo-blap` emulators, which already give zero-cost, zero-blast-radius local development; a fourth project is ongoing IAM/billing surface for a workflow that doesn't need cloud credentials. Re-evaluate only if cloud-based development or destructive integration testing against realistic data becomes required (unchanged trigger from D-013/ADR-009). |
 | Recreate `black-book-efaaf` as a fresh `blackbook-prod` project | Rejected above ("Why keep `black-book-efaaf`") — no live resource justifies the churn, and it multiplies the chance of an isolation mistake during the highest-risk phase of the change. |
 | Keep admin on the same project as research but put it behind an external HTTPS LB + IAP (the BB-027 design as written) | Works, but is strictly more infrastructure (LB, serverless NEG, backend service) than the direct Cloud-Run-attached IAP integration GCP now supports, for identical security properties. Extra infrastructure is extra attack surface and extra Terraform to keep synchronized. |
 | Two-way promotion (prod calls into internal to trigger promotion, or internal pushes on a webhook prod exposes) | Any callable path from prod into internal is a path a prod compromise could walk. A pull initiated entirely from `blackbook-internal`, reading a create-only collection prod already exposes to its own intake surface, needs no new prod-side attack surface at all. |

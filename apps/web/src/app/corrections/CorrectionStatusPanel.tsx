@@ -2,7 +2,7 @@
  * Public correction status page. Shows coarse phases only never spam scores, campaign
  * flags, duplicate lists, or other moderation-sensitive metadata.
  */
-import { EmptyState, Notice } from '@black-book/ui';
+import { EmptyState, Notice } from '@blap/ui';
 import { PUBLIC_STATUS_LABELS } from './copy';
 import type { PublicCorrectionStatus } from './public-status';
 import { AppealForm } from './AppealForm';
@@ -14,9 +14,9 @@ export function CorrectionStatusPanel({
   readonly status: PublicCorrectionStatus;
 }) {
   return (
-    <div className="bb-stack">
+    <div className="bp-stack">
       <Notice tone="warning" title="Status">
-        <dl className="bb-sans">
+        <dl className="bp-sans">
           <div>
             <dt>Receipt</dt>
             <dd>
@@ -40,7 +40,7 @@ export function CorrectionStatusPanel({
             </dd>
           </div>
         </dl>
-        <p style={{ marginTop: 'var(--bb-space-3)' }}>
+        <p style={{ marginTop: 'var(--bp-space-3)' }}>
           Volume of corrections never changes public confidence or publication. Coordinated activity
           is reviewed separately and is not shown here.
         </p>
@@ -48,7 +48,7 @@ export function CorrectionStatusPanel({
 
       {status.appealAvailable ? (
         <section aria-labelledby="appeal-heading">
-          <h2 id="appeal-heading" className="bb-page__title" style={{ fontSize: 'var(--bb-text-lg)' }}>
+          <h2 id="appeal-heading" className="bp-page__title" style={{ fontSize: 'var(--bp-text-lg)' }}>
             Appeal
           </h2>
           <AppealForm receiptCode={status.receiptCode} />
@@ -61,7 +61,7 @@ export function CorrectionStatusPanel({
       )}
 
       <section aria-labelledby="abuse-heading">
-        <h2 id="abuse-heading" className="bb-page__title" style={{ fontSize: 'var(--bb-text-lg)' }}>
+        <h2 id="abuse-heading" className="bp-page__title" style={{ fontSize: 'var(--bp-text-lg)' }}>
           Report abuse
         </h2>
         <AbuseReportForm receiptCode={status.receiptCode} />

@@ -9,7 +9,7 @@
  * `advance.ts` in this module is the only place a lead may exit quarantine, and it only
  * ever produces a research case in its earliest `candidate` state (see
  * `../research-case/index.js`) never a promoted or published claim. This module never
- * imports from `@black-book/security` or `@black-book/firebase`: it is pure, deterministic
+ * imports from `@blap/security` or `@blap/firebase`: it is pure, deterministic
  * domain logic over already-quarantined submission identifiers supplied by a caller
  * (the public intake surface in `apps/web/src/app/submit/`).
  */

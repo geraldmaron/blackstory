@@ -12,7 +12,7 @@ import {
   resolvePublicFact,
 } from './resolve-public-fact';
 import { buildFactJsonExport } from './fact-json';
-import { assertNeverClaimReview } from '@black-book/domain';
+import { assertNeverClaimReview } from '@blap/domain';
 
 test('buildFactLibraryViewModel returns only published/corrected facts from the seed index', () => {
   const { docs } = getSeedFactSearchIndex();

@@ -1,6 +1,6 @@
 
 /**
- * Proves the source-drift-run-health job body is REAL it calls @black-book/domain's
+ * Proves the source-drift-run-health job body is REAL it calls @blap/domain's
  * evaluateRunHealth/shouldQuarantineRun/shouldDeadLetterRun (the same functions the
  * source-adapter pipeline itself uses) rather than reimplementing drift evaluation.
  */

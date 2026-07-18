@@ -7,8 +7,8 @@ import {
   SurfaceCapabilityError,
   deniesCanonicalWrite,
   deniesPublication,
-} from '@black-book/config';
-import type { AppCheckTelemetryEvent } from '@black-book/firebase';
+} from '@blap/config';
+import type { AppCheckTelemetryEvent } from '@blap/firebase';
 import { createPublicApiAppCheckGuard } from './app-check.ts';
 import { health } from './index.ts';
 import { guardMutationAttempt, guardReadOperation } from './posture.ts';

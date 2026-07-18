@@ -5,12 +5,12 @@
  * is never distinguished by hue alone (WCAG 1.4.1 Use of Color). Shades never read as status,
  * racial, or skin coding: they encode ENTITY KIND ONLY, stated plainly in the legend
  * (`MapExperienceLegend.tsx`). Colors are pulled exclusively from `DIGNITY_PALETTE`
- * (`dignity-style.ts`), itself sourced from `@black-book/ui`'s brand palette zero ad-hoc hex.
+ * (`dignity-style.ts`), itself sourced from `@blap/ui`'s brand palette zero ad-hoc hex.
  *
  * The live `kind` vocabulary for the active release is `place | school | event | institution`
  * (`apps/web/src/data/public-seed.ts`'s `PublicEntityKind`, passed through verbatim by
  * `build-explore-map-source.ts`'s `enrichFeature`). The full canonical entity-kind vocabulary
- * (`@black-book/domain`'s `ENTITY_KINDS`) has eight more kinds with no seed data yet;
+ * (`@blap/domain`'s `ENTITY_KINDS`) has eight more kinds with no seed data yet;
  * `DEFAULT_KIND_ENCODING` is the render-time fallback for any of those once they reach the map,
  * so a future kind can never silently render colorless/unstyled.
  *
@@ -47,7 +47,7 @@ export const MAP_KIND_ENCODING: Readonly<Record<MapKind, KindEncodingEntry>> = {
 };
 
 /** Fallback entry for any kind outside the live vocabulary above (defensive; the canonical
- * `@black-book/domain` `ENTITY_KINDS` vocabulary is larger than what the active release seeds).
+ * `@blap/domain` `ENTITY_KINDS` vocabulary is larger than what the active release seeds).
  * Reuses the map's original pre-BB-099 default marker treatment (solid Copper Pin circle), so an
  * unrecognized kind still renders exactly as every kind did before this change never blank,
  * never a crash. */

@@ -60,11 +60,11 @@ Deploy identity: `github-deploy@black-book-efaaf.iam.gserviceaccount.com` via WI
 ## Validation
 
 ```bash
-pnpm --filter @black-book/config test
-pnpm --filter @black-book/api-public test
-pnpm --filter @black-book/api-submissions test
-pnpm --filter @black-book/api-internal test
-pnpm --filter @black-book/admin test
+pnpm --filter @blap/config test
+pnpm --filter @blap/api-public test
+pnpm --filter @blap/api-submissions test
+pnpm --filter @blap/api-internal test
+pnpm --filter @blap/admin test
 ```
 
 See also [`docs/security/service-surfaces.md`](../../../docs/security/service-surfaces.md) and

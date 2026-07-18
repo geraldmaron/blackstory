@@ -3,7 +3,7 @@
  */
 export const LEGAL_DISCLAIMER_TITLE = 'Not legal advice';
 export const LEGAL_DISCLAIMER_BODY =
-  'Black Book explains public laws and court decisions in plain language. This is general information, not legal advice. ' +
+  'Blap explains public laws and court decisions in plain language. This is general information, not legal advice. ' +
   'For advice about your specific situation, consult a licensed attorney or a qualified legal aid organization.';
 
 export const LEGAL_SECTION_LABELS = {

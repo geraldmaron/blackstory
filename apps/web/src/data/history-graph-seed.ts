@@ -10,7 +10,7 @@ import {
   buildGraphReleaseArtifact,
   type DecadeBucketEntityInput,
   type GraphReleaseArtifact,
-} from '@black-book/domain';
+} from '@blap/domain';
 import { SEED_ENTITY_RELATIONSHIPS } from './entity-graph-seed';
 import { listPublicEntities, type PublicEntityView } from './public-seed';
 

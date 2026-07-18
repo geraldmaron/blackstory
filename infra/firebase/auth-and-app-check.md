@@ -30,12 +30,12 @@ human provider choice and a successful metrics-only rollout.**
    - Recommended default for public beta: **no social providers** until a product decision.
    - Admin path: prefer Cloud IAP on Cloud Run; if Firebase Auth is used for admin UX, restrict to an allowlisted Google Workspace / Cloud Identity domain.
 5. Do **not** mint custom tokens from the public web runtime.
-6. Emulator: local Auth uses `demo-black-book` via `pnpm firebase:emulators` — never point local clients at production Auth without the production break-glass flag in `@black-book/firebase`.
+6. Emulator: local Auth uses `demo-black-book` via `pnpm firebase:emulators` — never point local clients at production Auth without the production break-glass flag in `@blap/firebase`.
 
 ### Config artifacts in repo
 
 - Client identifiers: `registered-apps.json` + App Hosting `NEXT_PUBLIC_FIREBASE_*` values.
-- Runtime validation: `@black-book/firebase` (`parseWebFirebaseEnv`, `parseAdminFirebaseEnv`, `parseServerFirebaseEnv`).
+- Runtime validation: `@blap/firebase` (`parseWebFirebaseEnv`, `parseAdminFirebaseEnv`, `parseServerFirebaseEnv`).
 - Secrets (session cookies, admin private keys, etc.): **Secret Manager names only** in `apps/web/apphosting*.yaml`. No JSON keys.
 
 ## App Check client binding and server enforcement

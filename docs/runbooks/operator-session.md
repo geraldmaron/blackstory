@@ -141,9 +141,9 @@ this runbook — follow it exactly:
 1. **File issues for remaining work** (`bd` — not TodoWrite/markdown TODOs).
 2. **Run quality gates** for anything you changed:
    ```bash
-   pnpm --filter @black-book/operator-cli test
-   pnpm --filter @black-book/operator-cli typecheck
-   pnpm --filter @black-book/admin typecheck
+   pnpm --filter @blap/operator-cli test
+   pnpm --filter @blap/operator-cli typecheck
+   pnpm --filter @blap/admin typecheck
    ```
 3. **Update issue status** — close finished `bd` work, update in-progress items.
 4. **Push to remote** (mandatory — work is not done until this succeeds):

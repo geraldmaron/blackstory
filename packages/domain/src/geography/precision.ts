@@ -1,7 +1,7 @@
 /**
  * Public location precision helpers aligned with constitution publicPrecisionRules.
  */
-import { evaluatePublicPrecision, loadProductConstitution } from '@black-book/schemas';
+import { evaluatePublicPrecision, loadProductConstitution } from '@blap/schemas';
 import type { LivingStatus } from '../living.js';
 
 export type PublicPrecisionLevel = string;

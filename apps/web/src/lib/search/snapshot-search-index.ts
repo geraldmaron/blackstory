@@ -1,6 +1,6 @@
 /**
  * Adapts the hand-authored seed catalog (`../../data/public-seed.ts`) into
- * `@black-book/domain`'s search-index shape, so the real search pipeline
+ * `@blap/domain`'s search-index shape, so the real search pipeline
  * (`runPublicSearch`) has something to query today. This is the same "snapshot" posture as
  * `resolvePublicEntity`: a `liveFetch`-shaped seam exists so a later live Firestore
  * `publicSearchIndex` reader can plug in without changing the search route/page
@@ -23,7 +23,7 @@ import {
   type NotabilityCriterion,
   type PublicSearchIndexDoc,
   type SearchableEntityRecord,
-} from '@black-book/domain';
+} from '@blap/domain';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 
 const RUBRIC_ENTRIES = Object.entries(NOTABILITY_RUBRIC) as readonly [NotabilityCriterion, string][];

@@ -3,7 +3,7 @@
 The PNGs in this directory are the reference sheet from the owner-supplied
 v2 brand package (2026-07-17), kept for historical provenance alongside its
 original `source-package-README.txt`. **They are SUPERSEDED by
-`brand-system/` "Black Book Brand Identity System 3.0.0-final" (BB-096)**
+`brand-system/` "Blap Brand Identity System 3.0.0-final" (BB-096)**
 and must not be used as a source for any new asset, measurement, or color
 value.
 

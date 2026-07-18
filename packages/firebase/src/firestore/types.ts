@@ -2,7 +2,7 @@
 /**
  * Firestore document schemas for Black Book (ADR-011 018).
  * Entity/geography, provenance, claims/confidence.
- * Shapes align with @black-book/domain; Cloud SQL PostGIS are not the production path.
+ * Shapes align with @blap/domain; Cloud SQL PostGIS are not the production path.
  */
 import { z } from 'zod';
 import {
@@ -10,7 +10,7 @@ import {
   AUDIT_EVENT_ACTIONS,
   OUTBOX_STATUSES,
   auditCategoryFor,
-} from '@black-book/domain';
+} from '@blap/domain';
 
 export const authClaimFlagsSchema = z.object({
   admin: z.boolean().optional(),
@@ -184,7 +184,7 @@ export const schoolFieldsSchema = z.object({
 // Entity ontology: shared date-precision model, entity-lifecycle status history,
 // notability-basis inclusion rubric, and the schema-only sensitivity classification. Mirrors
 // packages/domain/src/era.ts and packages/domain/src/entity-status.ts. Vocabularies are
-// hardcoded here (not imported from @black-book/domain) to match this file's existing convention
+// hardcoded here (not imported from @blap/domain) to match this file's existing convention
 // (e.g. entityKindSchema above hardcodes ENTITY_KINDS rather than importing it).
 // ---------------------------------------------------------------------------
 
@@ -290,7 +290,7 @@ export const canonicalEntitySchema = z.object({
    * scope-guardrail comment on statusHistoryEntrySchema above. */
   statusHistory: z.array(statusHistoryEntrySchema).optional(),
   /** >=1 record required to publish enforced by
-   * @black-book/domain's assertPublishableEntityHasNotabilityBasis, not by this schema alone. */
+   * @blap/domain's assertPublishableEntityHasNotabilityBasis, not by this schema alone. */
   notabilityBasis: z.array(notabilityBasisRecordSchema).optional(),
   /** Schema-only; presentation lives in the UI layer. */
   sensitivity: z.array(entitySensitivitySchema).optional(),
@@ -373,7 +373,7 @@ export type CanonicalEntityDoc = z.infer<typeof canonicalEntitySchema>;
 /**
  * Historical-causation edges (caused/enabled/influenced/participated_in/overturned/
  * commemorates) plus `authored` (creation attribution, distinct from `founded`). Direction and
- * temporal semantics for every type are documented in `@black-book/domain`'s
+ * temporal semantics for every type are documented in `@blap/domain`'s
  * `RELATIONSHIP_TYPE_SEMANTICS` (packages/domain/src/relationship.ts) hardcoded here, not
  * imported, to match this file's existing convention (see the entityKindSchema comment above).
  */
@@ -403,7 +403,7 @@ export const relationshipTypeSchema = z.enum([
 export type RelationshipTypeDoc = z.infer<typeof relationshipTypeSchema>;
 
 /** Role qualifier valid ONLY on `type: 'attended'`; see
- * `@black-book/domain`'s `assertRelationshipRoleValidForType`. */
+ * `@blap/domain`'s `assertRelationshipRoleValidForType`. */
 export const relationshipRoleSchema = z.enum(['organizer', 'speaker', 'participant']);
 
 export type RelationshipRoleDoc = z.infer<typeof relationshipRoleSchema>;
@@ -853,13 +853,13 @@ export const publicEntityProjectionSchema = z.object({
    * packages/domain/src/relevance/notability-gate.test.ts for the enforcing test).
    */
   /** Derived current status label (e.g. "active", "in_force", "living") never a scalar the
-   * reader hand-edits; always derived via @black-book/domain's `currentEntityStatus`. */
+   * reader hand-edits; always derived via @blap/domain's `currentEntityStatus`. */
   status: z.string().min(1).optional(),
   /** Decade labels the entity's dated span overlaps (e.g. ["1950s", "1960s"]) derived via
-   * @black-book/domain's `deriveEraBuckets`, replacing the free-text `era` string. */
+   * @blap/domain's `deriveEraBuckets`, replacing the free-text `era` string. */
   eraBuckets: z.array(z.string().min(1)).optional(),
   /** Human-readable notability rubric labels (never the raw criterion enum alone, never a
-   * score) one per notabilityBasis record, sourced from @black-book/domain's
+   * score) one per notabilityBasis record, sourced from @blap/domain's
    * `NOTABILITY_RUBRIC`. */
   notabilityLabels: z.array(z.string().min(1)).optional(),
   /** Sensitivity classification label when present; presentation lives in the UI layer. */
@@ -886,7 +886,7 @@ export const publicEntityProjectionSchema = z.object({
 
   /**
    * Typed related entries derived from the release's graph
-   * adjacency doc (`@black-book/domain`'s `toPublicRelatedEntries`
+   * adjacency doc (`@blap/domain`'s `toPublicRelatedEntries`
    * `publicRelatedEntriesByEntityId`, packages/domain/src/graph/adjacency.ts + build.ts)
    * sufficient for "related people, places…" and "timelines" sections. Never carries a
    * numeric field beyond what's already elsewhere on this schema (evidence counts are an
@@ -914,7 +914,7 @@ export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSch
 
 
 /**
- * persisted search index document the server-read shape @black-book/domain's
+ * persisted search index document the server-read shape @blap/domain's
  * `buildPublicSearchIndexDocs` produces (`packages/domain/src/search/`). Follows the exact
  * conventions of `publicEntityProjectionSchema` above: reuses `entityKindSchema`
  * `sensitivityClassSchema`, and every field is non-numeric BY STANDING POLICY except the two
@@ -922,7 +922,7 @@ export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSch
  *
  * `relatedCount` (connection-strength proxy) and `claimCount` are the ONLY numeric fields, and are
  * SERVER-INTERNAL ranking inputs only: search runs server-side and projects results into the
- * client-facing `SearchResultView` (defined in @black-book/domain), which carries neither count
+ * client-facing `SearchResultView` (defined in @blap/domain), which carries neither count
  * nor any score mirroring rule that adjacency `evidenceCount` is an ordering key, never
  * a public payload field. `notabilityBasis` is retained as the auditable inclusion basis backing
  * the AC5 gate; it carries only string leaves (criterion, note, evidenceIds the same category as

@@ -2,7 +2,7 @@
  * Public fact library over published facts. Search runs through the real 
  * `runPublicSearch` pipeline over the seed fact search index not a hand-rolled filter.
  */
-import { EmptyState, FilterBar, ResultList } from '@black-book/ui';
+import { EmptyState, FilterBar, ResultList } from '@blap/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { getSeedFact, getSeedFactSearchIndex, listSeedFacts } from '../../data/facts-seed';
 import {
@@ -28,17 +28,17 @@ export default async function FactsLibraryPage({ searchParams }: FactsPageProps)
   const view = buildFactLibraryViewModel(params, docs, confidenceById);
 
   return (
-    <main className="bb-container bb-page" id="main">
-      <header className="bb-entity-mast">
-        <p className="bb-page__eyebrow">Reference</p>
-        <h1 className="bb-page__title">Fact library</h1>
-        <p className="bb-page__lede">
+    <main className="bp-container bp-page" id="main">
+      <header className="bp-entity-mast">
+        <p className="bp-page__eyebrow">Reference</p>
+        <h1 className="bp-page__title">Fact library</h1>
+        <p className="bp-page__lede">
           Canonical, versioned, citable facts — each with structured citations, independent workflow
           status and evidence grade, and a stable permalink every surface links to.
         </p>
       </header>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
+      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
         <SeedDataNotice compact />
 
         <FilterBar
@@ -73,7 +73,7 @@ export default async function FactsLibraryPage({ searchParams }: FactsPageProps)
           ]}
         />
 
-        <p className="bb-sans bb-count-label" id="fact-results-heading">
+        <p className="bp-sans bp-count-label" id="fact-results-heading">
           {view.totalMatched} published fact{view.totalMatched === 1 ? '' : 's'}
         </p>
 
@@ -81,7 +81,7 @@ export default async function FactsLibraryPage({ searchParams }: FactsPageProps)
           <EmptyState
             title="No published facts matched"
             action={
-              <a className="bb-cta bb-cta--ink" href="/facts">
+              <a className="bp-cta bp-cta--ink" href="/facts">
                 Clear filters
               </a>
             }
@@ -102,10 +102,10 @@ export default async function FactsLibraryPage({ searchParams }: FactsPageProps)
                   summary: result.summary ?? '',
                   meta: (
                     <>
-                      <span className="bb-mono">{result.id}</span>
-                      {result.status ? <span className="bb-mono">{result.status}</span> : null}
-                      <span className="bb-sans">Matched: {result.matchedText}</span>
-                      <span className="bb-sans">{result.explanation}</span>
+                      <span className="bp-mono">{result.id}</span>
+                      {result.status ? <span className="bp-mono">{result.status}</span> : null}
+                      <span className="bp-sans">Matched: {result.matchedText}</span>
+                      <span className="bp-sans">{result.explanation}</span>
                     </>
                   ),
                 };
@@ -113,14 +113,14 @@ export default async function FactsLibraryPage({ searchParams }: FactsPageProps)
             />
 
             {view.previousOffset !== undefined || view.nextOffset !== undefined ? (
-              <nav className="bb-row" aria-label="Fact library pages">
+              <nav className="bp-row" aria-label="Fact library pages">
                 {view.previousOffset !== undefined ? (
-                  <a className="bb-button bb-button--secondary" href={buildFactLibraryHref(view, view.previousOffset)}>
+                  <a className="bp-button bp-button--secondary" href={buildFactLibraryHref(view, view.previousOffset)}>
                     Previous page
                   </a>
                 ) : null}
                 {view.nextOffset !== undefined ? (
-                  <a className="bb-button bb-button--secondary" href={buildFactLibraryHref(view, view.nextOffset)}>
+                  <a className="bp-button bp-button--secondary" href={buildFactLibraryHref(view, view.nextOffset)}>
                     Next page
                   </a>
                 ) : null}

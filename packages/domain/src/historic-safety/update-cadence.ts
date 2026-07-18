@@ -1,7 +1,7 @@
 /**
  * Per-source update-cadence metadata for the historic-safety engine, shaped to be directly
  * compatible with `JobCadence` (`packages/config/src/scheduled-jobs/types.ts`) without
- * this package depending on `@black-book/config` (the dependency direction runs the other way:
+ * this package depending on `@blap/config` (the dependency direction runs the other way:
  * config depends on domain, not vice versa \u2014 see that package's own `package.json`). Any
  * job body (stub or real) can spread one of these cadence records directly into a
  * `ScheduledJobDefinition.cadence` field.
@@ -10,7 +10,7 @@
  * entries with cadences matching this module's `fbiHateCrime` (annual) and
  * `tougalooMappingInequality` (quarterly) entries \u2014 this module is the domain-owned source of
  * truth those roster entries' cadence numbers were drawn from; it does not re-declare or import
- * the roster itself (this package cannot depend on `@black-book/config`).
+ * the roster itself (this package cannot depend on `@blap/config`).
  */
 
 /** Structurally identical to `JobCadence` shape (duplicated, not imported, to keep this

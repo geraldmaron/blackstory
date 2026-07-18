@@ -9,7 +9,7 @@ import {
   type QueryGuardrailDecision,
   type QueryGuardrailDecisionDenied,
   type SearchQueryInput,
-} from '@black-book/security';
+} from '@blap/security';
 
 export type PublicSearchHttpQuery = {
   readonly q?: string;

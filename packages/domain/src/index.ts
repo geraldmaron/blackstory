@@ -3,7 +3,7 @@
  * claims confidence, append-only audit contracts, immutable
  * publication releases, and source adapter registry contracts.
  * Living-status and public precision rules come from
- * @black-book/schemas (constitution). Firestore converters live in @black-book/firebase;
+ * @blap/schemas (constitution). Firestore converters live in @blap/firebase;
  * Cloud SQL PostGIS are deferred (ADR-011).
  */
 export { asEntityId, asRelationshipId, asMergeId, asLocationId } from './ids.js';

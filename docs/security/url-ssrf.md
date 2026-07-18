@@ -50,7 +50,7 @@ denylist in addition to IP classification. Domain approval never overrides desti
 Internationalized names are evaluated after the runtime parser converts them to canonical ASCII.
 
 Do not allow wildcard exceptions for organization-owned internal zones. At minimum deny metadata
-hostnames and all private/internal DNS suffixes used by Black Book, Firebase, Google APIs, and
+hostnames and all private/internal DNS suffixes used by Blap, Firebase, Google APIs, and
 service discovery.
 
 ## Worker egress boundary
@@ -113,8 +113,8 @@ These are reviewed human steps; this repository does not apply live GCP or Fireb
 Unit tests use injected DNS and transport fixtures only; they never contact live systems.
 
 ```bash
-pnpm --filter @black-book/security test
-pnpm --filter @black-book/security typecheck
+pnpm --filter @blap/security test
+pnpm --filter @blap/security typecheck
 node --conditions development --import tsx --test \
   packages/security/src/url-safety/url-safety.test.ts
 cd workers/security

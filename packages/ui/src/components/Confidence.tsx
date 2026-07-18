@@ -33,8 +33,8 @@ const DEFAULT_LABELS: Record<ConfidenceLevel, string> = {
 export function Confidence({ level, label, className }: ConfidenceProps) {
   const text = label ?? DEFAULT_LABELS[level];
   return (
-    <span className={cx('bb-confidence', `bb-confidence--${level}`, className)} role="status">
-      <span className="bb-confidence__mark" aria-hidden="true">
+    <span className={cx('bp-confidence', `bp-confidence--${level}`, className)} role="status">
+      <span className="bp-confidence__mark" aria-hidden="true">
         {MARKS[level]}
       </span>
       <span>{text}</span>

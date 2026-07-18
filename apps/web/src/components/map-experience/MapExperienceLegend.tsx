@@ -5,14 +5,14 @@
  * (WCAG 1.4.1 Use of Color: every visual distinction here also has a text/glyph explanation).
  *
  * Collapsible via a native `<details>`/`<summary>` (the same disclosure pattern
- * `explore.css`'s `.bb-explore__settings` already uses elsewhere on this page) keyboard and
+ * `explore.css`'s `.bp-explore__settings` already uses elsewhere on this page) keyboard and
  * screen-reader support come from the native element, not custom JS.
  *
  * Props contract for the mounting surface (MapStage/`ExploreMapExperience`):
  *  - `defaultCollapsed` (optional, default `false`): pass `true` to start the legend closed
  *    (e.g. on a narrow viewport). This component owns its own open/closed state after that
  *    (native `<details>` toggling); the prop only seeds the initial render.
- *  - This component renders its own root element (`<details class="bb-explore-legend">`) with
+ *  - This component renders its own root element (`<details class="bp-explore-legend">`) with
  *    no built-in fixed/floating positioning. If the map surface wants it pinned as a floating
  *    bottom-left panel over the canvas, that positioning (position/inset/z-index) belongs to
  *    the wrapping container the mounting surface owns this component only guarantees its own
@@ -27,10 +27,10 @@ import { MARKER_RADIUS_MAX, MARKER_RADIUS_MIN } from '../../lib/map-experience/m
 void React;
 
 const KIND_GLYPH_CLASS: Readonly<Record<MapEntityGlyph, string>> = {
-  circle: 'bb-legend-glyph--circle',
-  square: 'bb-legend-glyph--square',
-  diamond: 'bb-legend-glyph--diamond',
-  ring: 'bb-legend-glyph--ring',
+  circle: 'bp-legend-glyph--circle',
+  square: 'bp-legend-glyph--square',
+  diamond: 'bp-legend-glyph--diamond',
+  ring: 'bp-legend-glyph--ring',
 };
 
 const SIZE_SCALE_STEPS: readonly number[] = [
@@ -48,25 +48,25 @@ export type MapExperienceLegendProps = {
 export function MapExperienceLegend(props?: MapExperienceLegendProps) {
   const defaultCollapsed = props?.defaultCollapsed ?? false;
   return (
-    <details className="bb-explore-legend" open={!defaultCollapsed}>
-      <summary className="bb-explore-legend__summary" id="explore-legend-heading">
+    <details className="bp-explore-legend" open={!defaultCollapsed}>
+      <summary className="bp-explore-legend__summary" id="explore-legend-heading">
         Reading this map
       </summary>
-      <div className="bb-explore-legend__body">
+      <div className="bp-explore-legend__body">
         <section aria-labelledby="explore-legend-kind-heading">
-          <h3 className="bb-explore-legend__subhead" id="explore-legend-kind-heading">
+          <h3 className="bp-explore-legend__subhead" id="explore-legend-kind-heading">
             Kind
           </h3>
-          <p className="bb-explore-legend__note">
+          <p className="bp-explore-legend__note">
             Color marks the kind of place or record only &mdash; it says nothing about the people
             connected to a place. Each kind also has its own shape, so color is never the only
             signal.
           </p>
-          <ul className="bb-explore-legend__kind-list">
+          <ul className="bp-explore-legend__kind-list">
             {KIND_ENCODING_ENTRIES.map(([kind, entry]) => (
               <li key={kind}>
                 <span
-                  className={`bb-legend-glyph ${KIND_GLYPH_CLASS[entry.glyph]}`}
+                  className={`bp-legend-glyph ${KIND_GLYPH_CLASS[entry.glyph]}`}
                   style={
                     entry.glyph === 'ring'
                       ? { backgroundColor: 'transparent', borderColor: entry.shade }
@@ -74,8 +74,8 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
                   }
                   aria-hidden="true"
                 />
-                <span className="bb-explore-legend__kind-label">
-                  {entry.label} <span className="bb-explore-legend__kind-glyph-name">({entry.glyph})</span>
+                <span className="bp-explore-legend__kind-label">
+                  {entry.label} <span className="bp-explore-legend__kind-glyph-name">({entry.glyph})</span>
                 </span>
               </li>
             ))}
@@ -83,13 +83,13 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
         </section>
 
         <section aria-labelledby="explore-legend-size-heading">
-          <h3 className="bb-explore-legend__subhead" id="explore-legend-size-heading">
+          <h3 className="bp-explore-legend__subhead" id="explore-legend-size-heading">
             Size
           </h3>
-          <div className="bb-explore-legend__size-scale" aria-hidden="true">
+          <div className="bp-explore-legend__size-scale" aria-hidden="true">
             {SIZE_SCALE_STEPS.map((diameter, index) => (
               // eslint-disable-next-line react/no-array-index-key -- fixed 3-step scale, order never changes
-              <span key={index} className="bb-explore-legend__size-dot" style={{ width: diameter, height: diameter }} />
+              <span key={index} className="bp-explore-legend__size-dot" style={{ width: diameter, height: diameter }} />
             ))}
           </div>
           <p>
@@ -99,7 +99,7 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
           </p>
         </section>
 
-        <dl className="bb-explore-legend__list">
+        <dl className="bp-explore-legend__list">
           <div>
             <dt>Points</dt>
             <dd>

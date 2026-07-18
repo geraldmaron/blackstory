@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckTelemetryEvent, AppCheckVerifier } from '@black-book/firebase';
+import type { AppCheckTelemetryEvent, AppCheckVerifier } from '@blap/firebase';
 import { createSubmitLeadAppCheckGuard } from './app-check-guard';
 
 function headersFrom(record: Record<string, string>): Headers {

@@ -4,11 +4,11 @@
  *
  * Normalizes either the seed-depth `disputed`/`disputeNote` shape (mirroring
  * `apps/web/src/data/public-seed.ts`'s `PublicClaimView`) or a richer `ContradictionSet`
- * (`@black-book/domain`'s `preserveContradictoryValues` output) into one `EvidenceDisputeView` \u2014
+ * (`@blap/domain`'s `preserveContradictoryValues` output) into one `EvidenceDisputeView` \u2014
  * every credible alternate value is always retained in the view model, never collapsed down to a
  * single answer.
  */
-import type { ContradictionSet } from '@black-book/domain';
+import type { ContradictionSet } from '@blap/domain';
 import type { EvidenceAlternateValue, EvidenceDisputeInput, EvidenceDisputeView } from './types.js';
 
 export function buildDisputeView(input: EvidenceDisputeInput): EvidenceDisputeView {

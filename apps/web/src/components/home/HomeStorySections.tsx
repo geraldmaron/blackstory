@@ -9,6 +9,8 @@
  * plumbing without touching this component's contract.
  */
 
+import Link from 'next/link';
+
 export type HomeStoryEntity = {
   readonly id: string;
   readonly kind: string;
@@ -34,45 +36,45 @@ const QUALIFY_ITEMS = [
 export function HomeStorySections({ featured, showSeedNotice = false }: HomeStorySectionsProps) {
   return (
     <>
-      <div className="bb-container bb-page">
-        <section className="bb-section bb-section--flush" aria-labelledby="featured-heading">
-          <p className="bb-section__kicker">On the map</p>
-          <h2 className="bb-section__title" id="featured-heading">
+      <div className="bp-container bp-page">
+        <section className="bp-section bp-section--flush" aria-labelledby="featured-heading">
+          <p className="bp-section__kicker">On the map</p>
+          <h2 className="bp-section__title" id="featured-heading">
             See what happened here.
           </h2>
-          <p className="bb-section__lede">
+          <p className="bp-section__lede">
             Select a pin on the map above, or open a full record here.
           </p>
           {showSeedNotice ? (
-            <p className="bb-story-rail__notice bb-mono">
+            <p className="bp-story-rail__notice bp-mono">
               Early release — a small, hand-verified collection, not yet the full archive.
             </p>
           ) : null}
-          <ul className="bb-story-rail">
+          <ul className="bp-story-rail">
             {featured.map((entity) => (
               <li key={entity.id}>
-                <a className="bb-story-link" href={`/entity/${entity.id}`}>
-                  <span className="bb-story-link__meta">
+                <Link className="bp-story-link" href={`/entity/${entity.id}`}>
+                  <span className="bp-story-link__meta">
                     {entity.kind} / {entity.jurisdictionLabel}
                   </span>
-                  <h3 className="bb-story-link__title">{entity.displayName}</h3>
-                  <p className="bb-story-link__summary">{entity.summary}</p>
-                </a>
+                  <h3 className="bp-story-link__title">{entity.displayName}</h3>
+                  <p className="bp-story-link__summary">{entity.summary}</p>
+                </Link>
               </li>
             ))}
           </ul>
         </section>
 
-        <section className="bb-section" aria-labelledby="qualify-heading">
-          <p className="bb-section__kicker">Standards</p>
-          <h2 className="bb-section__title" id="qualify-heading">
+        <section className="bp-section" aria-labelledby="qualify-heading">
+          <p className="bp-section__kicker">Standards</p>
+          <h2 className="bp-section__title" id="qualify-heading">
             What qualifies
           </h2>
-          <p className="bb-section__lede">
+          <p className="bp-section__lede">
             Inclusion follows the product constitution — relevance, place, accepted claims,
             rights, and living-person redaction.
           </p>
-          <ul className="bb-qualify-list">
+          <ul className="bp-qualify-list">
             {QUALIFY_ITEMS.map((item) => (
               <li key={item}>{item}</li>
             ))}
@@ -80,20 +82,20 @@ export function HomeStorySections({ featured, showSeedNotice = false }: HomeStor
         </section>
       </div>
 
-      <section className="bb-band" aria-labelledby="method-teaser-heading">
-        <div className="bb-container">
-          <p className="bb-section__kicker">Transparency</p>
-          <h2 className="bb-section__title" id="method-teaser-heading">
+      <section className="bp-band" aria-labelledby="method-teaser-heading">
+        <div className="bp-container">
+          <p className="bp-section__kicker">Transparency</p>
+          <h2 className="bp-section__title" id="method-teaser-heading">
             Why a claim shows up — and how strong it is
           </h2>
-          <p className="bb-section__lede">
+          <p className="bp-section__lede">
             Confidence is never color-only. Disputes stay visible. Street-level residence stays
             off the public map.
           </p>
-          <p className="bb-band__cta">
-            <a className="bb-cta bb-cta--solid" href="/methodology">
+          <p className="bp-band__cta">
+            <Link className="bp-cta bp-cta--solid" href="/methodology">
               Read methodology
-            </a>
+            </Link>
           </p>
         </div>
       </section>

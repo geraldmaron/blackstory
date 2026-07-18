@@ -72,7 +72,7 @@ Operator procedure: [`infra/gcp/cost-controls/hard-stop-runbook.md`](../../infra
 ## Validation
 
 ```bash
-pnpm --filter @black-book/security test
+pnpm --filter @blap/security test
 node --test infra/gcp/cost-controls/cost-controls.test.mjs
 ```
 
