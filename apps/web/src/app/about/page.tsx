@@ -2,6 +2,8 @@
  * About page describing the Blap public product.
  */
 
+import Link from 'next/link';
+
 export const metadata = {
   title: 'About',
   description: 'What Blap is and who the public interface is for.',
@@ -11,15 +13,29 @@ export default function AboutPage() {
   return (
     <main className="bp-container bp-page" id="main">
       <p className="bp-page__eyebrow">Product</p>
-      <h1 className="bp-page__title">About Blap</h1>
+      <h1 className="bp-page__title">History, pinned to place.</h1>
       <p className="bp-page__lede">
-        Blap is a place-connected Black history research platform. The public web app serves
-        only released historical projections with provenance, confidence, and living-person
-        protections.
+        Blap is a place-connected Black history research platform. It exists to connect people
+        with documented history — especially the history close to them: their state, their city,
+        the corner they pass every day. The public site serves only released historical
+        projections, with provenance, confidence, and living-person protections.
       </p>
 
-      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-8)', maxWidth: '40rem' }}>
-        <section className="bp-section" style={{ paddingTop: 0 }} aria-labelledby="audience-heading">
+      <div className="bp-prose">
+        <section className="bp-section" aria-labelledby="mission-heading">
+          <p className="bp-section__kicker">Why</p>
+          <h2 className="bp-section__title" id="mission-heading">
+            Learn what happened where you are
+          </h2>
+          <p className="bp-section__lede">
+            Most people pass documented Black history without knowing it is there. The map puts
+            the record back on the ground: choose your state, share your location if you want
+            to, and see what happened around you — with the evidence attached.
+          </p>
+        </section>
+
+        <section className="bp-section" aria-labelledby="audience-heading">
+          <p className="bp-section__kicker">Who</p>
           <h2 className="bp-section__title" id="audience-heading">
             Who it is for
           </h2>
@@ -30,31 +46,22 @@ export default function AboutPage() {
         </section>
 
         <section className="bp-section" aria-labelledby="auth-heading">
+          <p className="bp-section__kicker">Access</p>
           <h2 className="bp-section__title" id="auth-heading">
             No account required
           </h2>
           <p className="bp-section__lede">
-            Core public pages are usable without authentication. Research, promotion, and admin
-            tools remain on private surfaces.
+            Every public page works without authentication. Research, promotion, and admin tools
+            remain on private surfaces; nothing you read here tracks who you are.
           </p>
-        </section>
-
-        <section className="bp-section" aria-labelledby="status-heading">
-          <h2 className="bp-section__title" id="status-heading">
-            Build status
-          </h2>
-          <p className="bp-section__lede">
-            This interface is an early public shell (BB-048) reading sample seed data. Live
-            projections (BB-019), search (BB-049), and geocoding (BB-050) are still in progress.
-          </p>
-          <p style={{ marginTop: 'var(--bp-space-4)' }}>
-            <a className="bp-cta-link" href="/methodology">
+          <p className="bp-band__cta">
+            <Link className="bp-cta-link" href="/methodology">
               Methodology
-            </a>
+            </Link>
             {' · '}
-            <a className="bp-cta-link" href="/corrections">
+            <Link className="bp-cta-link" href="/corrections">
               Corrections
-            </a>
+            </Link>
           </p>
         </section>
       </div>

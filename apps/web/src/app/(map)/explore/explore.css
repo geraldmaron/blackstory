@@ -151,11 +151,14 @@
   font-family: var(--bp-font-sans);
 }
 
+/* Fact labels are data slugs — mono register (v5 typography law). */
 .bp-explore-narrative-card__facts dt {
-  font-weight: 700;
-  font-size: 0.75rem;
+  font-family: var(--bp-font-mono);
+  font-weight: 500;
+  font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  color: var(--bp-ink-muted);
 }
 
 .bp-explore-narrative-card__facts dd {
@@ -175,10 +178,12 @@
 
 .bp-explore__results-count {
   margin: 0;
+  font-family: var(--bp-font-mono);
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  color: var(--bp-ink-muted);
 }
 
 .bp-explore-result-list {

@@ -25,6 +25,12 @@ export const DIGNITY_PALETTE = {
   densityMid: 'rgba(184, 107, 42, 0.28)',
   densityHigh: 'rgba(184, 107, 42, 0.5)',
   background: brandPalette.blackInk,
+  /**
+   * The plate reads as a chart, not a void: unmapped world (ocean + beyond)
+   * sits a step BELOW Black Ink so the warm landmass fills below lift off it.
+   * Derived plate token, same convention as densityLow/Mid/High.
+   */
+  ocean: '#080606',
   border: darkTheme.border,
   /** White stroke/fill on the fixed dark map canvas for selected points.  */
   selected: brandPalette.archivePaper,
@@ -34,8 +40,10 @@ export const DIGNITY_PALETTE = {
    * and centralized here so "every color pulled from DIGNITY_PALETTE" is actually true.
    */
   selectedStateFill: 'rgba(184, 107, 42, 0.35)',
-  densityUnknownFill: 'rgba(255, 255, 255, 0.1)',
-  densityDisabledFill: 'rgba(255, 255, 255, 0.12)',
+  /** Landmass at rest — warm Page Sand washes over ink (never neutral gray),
+   * so the country reads as parchment territory against the darker ocean. */
+  densityUnknownFill: 'rgba(216, 161, 120, 0.12)',
+  densityDisabledFill: 'rgba(216, 161, 120, 0.14)',
   /**
    * BB-099 per-entity-kind shades (see `kind-encoding.ts`, which is the module that actually
    * assigns these to `place | school | event | institution`). Namespaced `kind*` rather than

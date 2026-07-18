@@ -1,5 +1,19 @@
 # Brand: the Pinned Page, v3 usage contract (BB-096)
 
+> **SUPERSESSION (2026-07-18, owner-supplied `brand/` kit):** the binding
+> brand source is now the root **`brand/`** directory ("BLAP full brand kit —
+> current approved version"): a **standalone book-and-pin symbol (not a B)**
+> beside a **lowercase `blap` wordmark**, light/dark transparent lockups and
+> symbols, app icons, 4-page guide (`brand/guide/`), and token files
+> (`brand/tokens/` — palette and type families unchanged from v3). The
+> "symbol IS the first B" rule and every "no typed second B" clause below are
+> **retired**; the kit's implementation note is "the icon and wordmark should
+> always be used as provided." Served copies live at `apps/web/public/brand/`
+> (`blap-lockup-*.png`, `blap-symbol-*.png`, `blap-app-icon-*.png`).
+> Palette, copper discipline, type system, radii, and imagery/voice rules in
+> this document remain in force. Favicon/OG/social renders from the new kit
+> are an open asset task.
+
 The Blap signature: a closed book cover forms a custom "B" silhouette,
 curved page-edge bands are exposed at the spine, and a copper place pin is
 integrated into the lower-left of the cover — **history, pinned to place.**

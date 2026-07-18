@@ -30,6 +30,46 @@
   height: 100%;
 }
 
+/* The stock zoom control re-dressed in the island language — ink glass, not
+   white plastic. Hidden on touch-scale viewports: pinch zoom carries it, and
+   top-right is island/instrument territory there. */
+.bp-map-stage .maplibregl-ctrl-top-right {
+  top: calc(var(--bp-island-offset) + var(--bp-island-height) + var(--bp-space-3));
+}
+
+.bp-map-stage .maplibregl-ctrl-group {
+  border-radius: var(--bp-radius-full);
+  background: color-mix(in srgb, var(--bp-fixed-ink) 84%, transparent);
+  border: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.bp-map-stage .maplibregl-ctrl-group button {
+  background: transparent;
+  border: 0;
+}
+
+.bp-map-stage .maplibregl-ctrl-group button + button {
+  border-top: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
+}
+
+/* Recolor the +/− glyphs (MapLibre draws them as background-image SVGs) —
+   paper strokes on the ink pill. */
+.bp-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.bp-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+@media (max-width: 47.9375rem) {
+  .bp-map-stage .maplibregl-ctrl-top-right {
+    display: none;
+  }
+}
+
 /* Invisible, precisely-hit-targeted overlay for the GL `circle` layer's visible marker beneath it
    (explore-style.ts owns the paint — color/radius by kind, evidence, confidence). This button
    exists only so the marker is clickable/hoverable; it is pulled out of the tab order
@@ -70,7 +110,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .bp-hero-stage--dissolving {
-    transition-duration: var(--bp-duration-instant);
+    /* Instant cut — no --bp-duration-instant token exists; base.css's global
+       reduced-motion override also clamps this, kept explicit for clarity. */
+    transition-duration: 0.01ms;
     transform: none;
   }
 }
@@ -89,31 +131,34 @@
 .bp-explore-stage__notice,
 .bp-explore-stage__seed-notice {
   position: fixed;
-  top: calc(3.5rem + var(--bp-space-3));
+  top: calc(var(--bp-island-clearance) + var(--bp-space-2));
   left: 50%;
   z-index: 3;
   width: min(92vw, 34rem);
   transform: translateX(-50%);
 }
 
-/* Compact by direction (owner 2026-07-18: floating chrome must not read bulky — the canvas
-   is the experience; these panels are instruments on top of it). */
+/* Instruments over the plate: ink glass, island language (the stage stamps
+   data-theme="dark" so every token inside resolves to the dark set — the
+   cockpit is brand-fixed, not reader-themed). Compact by direction (owner
+   2026-07-18: the canvas is the experience; these are instruments on it). */
 .bp-explore-stage__filters {
   position: fixed;
-  top: calc(3.5rem + var(--bp-space-4));
+  top: calc(var(--bp-island-clearance) + var(--bp-space-2));
   left: var(--bp-space-4);
   z-index: 2;
   display: grid;
   gap: var(--bp-space-2);
   width: min(88vw, 19rem);
-  max-height: calc(100svh - 3.5rem - var(--bp-space-8));
+  max-height: calc(100svh - var(--bp-island-clearance) - var(--bp-space-8));
   padding: var(--bp-space-3);
   overflow-y: auto;
-  border: var(--bp-border-width) solid var(--bp-border);
-  border-radius: var(--bp-radius-lg);
-  background: color-mix(in srgb, var(--bp-surface-raised) 92%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
+  /* Instruments read radius-md — radius-lg is reserved for sheets/dialogs. */
+  border-radius: var(--bp-radius-md);
+  background: color-mix(in srgb, var(--bp-fixed-ink) 82%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 
 /* Copper marks the open instrument — an orientation moment (selected filter group), not a
@@ -128,11 +173,16 @@
   outline-offset: var(--bp-focus-offset);
 }
 
+/* Interactive control labels are sans caps (v5 typography law — mono is a
+   data register; controls are chrome). */
 .bp-explore-stage__disclosure-summary {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
   cursor: pointer;
-  font-family: var(--bp-font-mono);
+  font-family: var(--bp-font-sans);
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--bp-ink-muted);
@@ -152,20 +202,20 @@
 
 .bp-explore-stage__results {
   position: fixed;
-  top: calc(3.5rem + var(--bp-space-4));
+  top: calc(var(--bp-island-clearance) + var(--bp-space-2));
   right: var(--bp-space-4);
   z-index: 2;
   display: grid;
   gap: var(--bp-space-2);
   width: min(88vw, 21rem);
-  max-height: calc(100svh - 3.5rem - var(--bp-space-8));
+  max-height: calc(100svh - var(--bp-island-clearance) - var(--bp-space-8));
   padding: var(--bp-space-3);
   overflow-y: auto;
-  border: var(--bp-border-width) solid var(--bp-border);
-  border-radius: var(--bp-radius-lg);
-  background: color-mix(in srgb, var(--bp-surface-raised) 92%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
+  border-radius: var(--bp-radius-md);
+  background: color-mix(in srgb, var(--bp-fixed-ink) 82%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 
 /* Result rows tighten INSIDE the floating panel only — the standalone /search page keeps the
@@ -194,11 +244,11 @@
   z-index: 2;
   width: min(88vw, 20rem);
   padding: var(--bp-space-2) var(--bp-space-3);
-  border: var(--bp-border-width) solid var(--bp-border);
-  border-radius: var(--bp-radius-lg);
-  background: color-mix(in srgb, var(--bp-surface-raised) 92%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
+  border-radius: var(--bp-radius-md);
+  background: color-mix(in srgb, var(--bp-fixed-ink) 82%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 
 @media (max-width: 64rem) {

@@ -54,20 +54,23 @@ export function HistoryResultList({
                   {node.evidenceCount} claim{node.evidenceCount === 1 ? '' : 's'}
                 </span>
               </div>
-              {node.factLinks.length > 0 ? (
-                <p className="bp-sans bp-history-result-list__facts">
-                  Related fact{node.factLinks.length === 1 ? '' : 's'}:{' '}
-                  {node.factLinks.map((fact, index) => (
-                    <React.Fragment key={fact.href}>
-                      {index > 0 ? ', ' : null}
-                      <a className="bp-cta bp-cta--ghost" href={fact.href}>
-                        {fact.label}
-                      </a>
-                    </React.Fragment>
-                  ))}
-                </p>
-              ) : null}
             </a>
+            {/* Sibling of the entity link, never inside it — nested <a> is
+                invalid HTML and hydration-breaks. Plain inline links, not
+                CTA pills: these are references, not actions. */}
+            {node.factLinks.length > 0 ? (
+              <p className="bp-sans bp-history-result-list__facts">
+                Related fact{node.factLinks.length === 1 ? '' : 's'}:{' '}
+                {node.factLinks.map((fact, index) => (
+                  <React.Fragment key={fact.href}>
+                    {index > 0 ? ', ' : null}
+                    <a className="bp-history-result-list__fact-link" href={fact.href}>
+                      {fact.label}
+                    </a>
+                  </React.Fragment>
+                ))}
+              </p>
+            ) : null}
           </li>
         );
       })}

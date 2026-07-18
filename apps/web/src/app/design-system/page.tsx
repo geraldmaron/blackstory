@@ -1,7 +1,9 @@
 /**
  * Design-system fixture gallery (Storybook equivalent) for component and token states.
+ * Stays current with docs/ui/design-direction-v5.md — new shell patterns land here too.
  */
 
+import Link from 'next/link';
 import {
   Button,
   Card,
@@ -19,33 +21,103 @@ import { DialogFixture } from './DialogFixture';
 
 export const metadata = {
   title: 'Design system — Blap',
-  description: 'BB-007 component and token fixtures for visual and keyboard review',
+  description: 'Component and token fixtures for visual and keyboard review (design-direction-v5)',
 };
 
 export default function DesignSystemPage() {
   return (
     <main className="bp-container" id="main">
       <header className="bp-gallery-section" style={{ paddingTop: 'var(--bp-space-10)' }}>
-        <p className="bp-page__eyebrow" style={{ color: 'var(--bp-ink-subtle)' }}>
-          Blap · BB-007
-        </p>
+        <p className="bp-page__eyebrow">Design direction v5</p>
         <h1 className="bp-page__title">Design system</h1>
         <p>
-          Editorial black-and-white foundation with reserved status color, visible focus, and
-          reduced-motion support. This route is the component fixture gallery (Storybook
-          equivalent).
+          Archive Paper / Black Ink foundation, copper as the orientation signal, hairline
+          separation, visible focus, reduced-motion support. This route is the component fixture
+          gallery (Storybook equivalent).
         </p>
         <div className="bp-row">
           <ThemeToggle />
-          <a className="bp-sans" href="/">
+          <Link className="bp-sans" href="/">
             Back to home
-          </a>
+          </Link>
         </div>
       </header>
 
+      <section className="bp-gallery-section" aria-labelledby="actions-heading">
+        <h2 id="actions-heading">Actions</h2>
+        <p>
+          One vocabulary, three weights (v5 §5): copper is THE primary action of a view — max one
+          per composition; solid inverts with theme; quiet is a hairline.
+        </p>
+        <div className="bp-row">
+          <Link className="bp-cta bp-cta--copper" href="#actions-heading">
+            Primary action
+          </Link>
+          <Link className="bp-cta bp-cta--solid" href="#actions-heading">
+            Solid action
+          </Link>
+          <Link className="bp-cta bp-cta--quiet" href="#actions-heading">
+            Quiet action
+          </Link>
+          <Link className="bp-cta-link" href="#actions-heading">
+            Text link
+          </Link>
+        </div>
+        <div className="bp-row">
+          <Button type="button" variant="primary">
+            Form primary
+          </Button>
+          <Button type="button" variant="secondary">
+            Form secondary
+          </Button>
+        </div>
+      </section>
+
+      <section className="bp-gallery-section" aria-labelledby="shell-patterns-heading">
+        <h2 id="shell-patterns-heading">Story link, chips & data strip</h2>
+        <p>
+          Lists and rails use top-rule entries, never boxes; chips are the compact pick-one
+          affordance; the data strip is the mono numbers register.
+        </p>
+        <ul className="bp-story-rail">
+          <li>
+            <Link className="bp-story-link" href="#shell-patterns-heading">
+              <span className="bp-story-link__meta">School / Washington, D.C.</span>
+              <h3 className="bp-story-link__title">Story link entry</h3>
+              <p className="bp-story-link__summary">
+                Mono slug, Sora title, serif one-line story — the shared anatomy for rails,
+                related lists, and browse paths.
+              </p>
+            </Link>
+          </li>
+        </ul>
+        <div className="bp-row">
+          <Link className="bp-state-chip" href="#shell-patterns-heading">
+            Georgia<span className="bp-state-chip__count">17</span>
+          </Link>
+          <Link className="bp-state-chip" href="#shell-patterns-heading">
+            Alabama<span className="bp-state-chip__count">12</span>
+          </Link>
+        </div>
+        <ul className="bp-data-strip">
+          <li className="bp-data-strip__item">
+            <span className="bp-data-strip__value">104</span>
+            <span className="bp-data-strip__label">Records pinned</span>
+          </li>
+          <li className="bp-data-strip__item">
+            <span className="bp-data-strip__value">24</span>
+            <span className="bp-data-strip__label">States on the map</span>
+          </li>
+          <li className="bp-data-strip__item">
+            <span className="bp-data-strip__value">1820s–1970s</span>
+            <span className="bp-data-strip__label">Eras spanned</span>
+          </li>
+        </ul>
+      </section>
+
       <section className="bp-gallery-section" aria-labelledby="tokens-heading">
         <h2 id="tokens-heading">Tokens</h2>
-        <p>Primary palette is black, white, and neutral gray. Status hues are reserved.</p>
+        <p>Black and paper lead; copper points; sand fills. Status hues are reserved.</p>
         <div className="bp-row" aria-label="Confidence levels">
           <Confidence level="high" />
           <Confidence level="medium" />

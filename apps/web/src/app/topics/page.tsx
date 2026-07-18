@@ -1,13 +1,15 @@
 /**
- * Topics index for thematic browsing of sample records.
+ * Topics index for thematic browsing — one of the three honest paths to every
+ * record (map, search, browse). Entries share the story-link anatomy (v5
+ * pattern law) rather than boxed cards.
  */
 
-import { Card } from '@blap/ui';
+import Link from 'next/link';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
 
 export const metadata = {
   title: 'Topics',
-  description: 'Thematic entry points into Blap sample records.',
+  description: 'Thematic entry points into the Blap archive.',
 };
 
 const TOPICS = [
@@ -34,24 +36,23 @@ export default function TopicsPage() {
       <p className="bp-page__eyebrow">Browse</p>
       <h1 className="bp-page__title">Topics</h1>
       <p className="bp-page__lede">
-        Thematic paths into the catalog. Filters currently resolve against seed fixtures only.
+        Thematic paths into the archive — pick a thread and follow it across states and decades.
       </p>
 
-      <div className="bp-stack" style={{ marginTop: 'var(--bp-space-6)' }}>
+      <section className="bp-section bp-section--flush" aria-label="Topic list">
         <SeedDataNotice compact />
-        <div className="bp-feature-grid">
+        <ul className="bp-story-rail">
           {TOPICS.map((topic) => (
-            <Card key={topic.id} title={topic.title} interactive>
-              <p className="bp-sans" style={{ marginTop: 0 }}>
-                {topic.body}
-              </p>
-              <a className="bp-cta-link" href={`/search?topic=${topic.id}`}>
-                View sample records
-              </a>
-            </Card>
+            <li key={topic.id}>
+              <Link className="bp-story-link" href={`/search?topic=${topic.id}`}>
+                <span className="bp-story-link__meta">Topic</span>
+                <h2 className="bp-story-link__title">{topic.title}</h2>
+                <p className="bp-story-link__summary">{topic.body}</p>
+              </Link>
+            </li>
           ))}
-        </div>
-      </div>
+        </ul>
+      </section>
     </main>
   );
 }

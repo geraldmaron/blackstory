@@ -1,15 +1,16 @@
 /**
- * The three paper-canvas sections below the persistent map hero: a story
- * rail into featured records, the "what qualifies" standards band, and a
- * charcoal transparency band that hands off to /methodology.
+ * The paper-canvas beats below the persistent map hero (design-direction-v5
+ * §6.1 beats 2–5): Orient ("Start with your state" — the personal-relevance
+ * entry), Discover ("From the archive" story rail), the archive in numbers,
+ * and one fixed-ink "How this works" band handing off to /methodology.
  *
  * Typed loosely against the featured-entity shape `app/page.tsx` already
- * builds from the public entity source (kind, jurisdictionLabel,
- * displayName, summary, id) so either stream can adjust its own data
- * plumbing without touching this component's contract.
+ * builds from the public entity source so either stream can adjust its own
+ * data plumbing without touching this component's contract.
  */
 
 import Link from 'next/link';
+import { StateStart, type StateStartEntry } from './StateStart';
 
 export type HomeStoryEntity = {
   readonly id: string;
@@ -21,29 +22,54 @@ export type HomeStoryEntity = {
 
 export type HomeStorySectionsProps = {
   readonly featured: readonly HomeStoryEntity[];
+  /** States with pinned records, ordered by record count descending (top slice). */
+  readonly topStates: readonly StateStartEntry[];
+  /** Archive-wide figures for the numbers strip. */
+  readonly recordCount: number;
+  readonly stateCount: number;
+  /** e.g. "1820s–1970s"; omitted when the release carries no dated records. */
+  readonly eraSpan?: string | undefined;
   /** True while the public catalog is still a small early-release set. */
   readonly showSeedNotice?: boolean;
 };
 
-/** Guide p.9 "What qualifies" standards — existing copy, voice-checked. */
-const QUALIFY_ITEMS = [
-  'Historically relevant people, places, schools, events, institutions',
-  'Documented geography at an allowed public precision',
-  'Accepted claims with confidence — contradictions preserved',
-  'Released projections only; research stays private until promotion',
+/** v5 §6.5 "How this works" — three points, evidence before assertion. */
+const HOW_ITEMS = [
+  'Every record is documented: people, places, schools, and events with accepted claims, citations, and confidence you can read for yourself.',
+  'Contradictions stay visible. When sources disagree, the record says so — confidence is never a color alone, and disputes are part of the story.',
+  'Dignity is a rule, not a tone. Street-level residences stay off the public map, living people stay protected, and presence is never framed as deficit.',
 ] as const;
 
-export function HomeStorySections({ featured, showSeedNotice = false }: HomeStorySectionsProps) {
+export function HomeStorySections({
+  featured,
+  topStates,
+  recordCount,
+  stateCount,
+  eraSpan,
+  showSeedNotice = false,
+}: HomeStorySectionsProps) {
   return (
     <>
       <div className="bp-container bp-page">
-        <section className="bp-section bp-section--flush" aria-labelledby="featured-heading">
-          <p className="bp-section__kicker">On the map</p>
+        <section className="bp-section bp-section--flush" aria-labelledby="state-start-heading">
+          <p className="bp-section__kicker">Near you</p>
+          <h2 className="bp-section__title" id="state-start-heading">
+            Start with your state.
+          </h2>
+          <p className="bp-section__lede">
+            Every state holds documented Black history — some of it a block from somewhere you
+            know. Choose yours and see what happened there.
+          </p>
+          <StateStart topStates={topStates} />
+        </section>
+
+        <section className="bp-section" aria-labelledby="featured-heading">
+          <p className="bp-section__kicker">From the archive</p>
           <h2 className="bp-section__title" id="featured-heading">
             See what happened here.
           </h2>
           <p className="bp-section__lede">
-            Select a pin on the map above, or open a full record here.
+            Select a pin on the map above, or step into a full record here.
           </p>
           {showSeedNotice ? (
             <p className="bp-story-rail__notice bp-mono">
@@ -65,36 +91,41 @@ export function HomeStorySections({ featured, showSeedNotice = false }: HomeStor
           </ul>
         </section>
 
-        <section className="bp-section" aria-labelledby="qualify-heading">
-          <p className="bp-section__kicker">Standards</p>
-          <h2 className="bp-section__title" id="qualify-heading">
-            What qualifies
-          </h2>
-          <p className="bp-section__lede">
-            Inclusion follows the product constitution — relevance, place, accepted claims,
-            rights, and living-person redaction.
-          </p>
-          <ul className="bp-qualify-list">
-            {QUALIFY_ITEMS.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
+        <section className="bp-section" aria-label="The archive in numbers">
+          <p className="bp-section__kicker">In numbers</p>
+          <ul className="bp-data-strip">
+            <li className="bp-data-strip__item">
+              <span className="bp-data-strip__value">{recordCount}</span>
+              <span className="bp-data-strip__label">Records pinned</span>
+            </li>
+            <li className="bp-data-strip__item">
+              <span className="bp-data-strip__value">{stateCount}</span>
+              <span className="bp-data-strip__label">States on the map</span>
+            </li>
+            {eraSpan ? (
+              <li className="bp-data-strip__item">
+                <span className="bp-data-strip__value">{eraSpan}</span>
+                <span className="bp-data-strip__label">Eras spanned</span>
+              </li>
+            ) : null}
           </ul>
         </section>
       </div>
 
-      <section className="bp-band" aria-labelledby="method-teaser-heading">
+      <section className="bp-band" aria-labelledby="how-heading">
         <div className="bp-container">
-          <p className="bp-section__kicker">Transparency</p>
-          <h2 className="bp-section__title" id="method-teaser-heading">
-            Why a claim shows up — and how strong it is
+          <p className="bp-section__kicker">How this works</p>
+          <h2 className="bp-section__title" id="how-heading">
+            Evidence before assertion.
           </h2>
-          <p className="bp-section__lede">
-            Confidence is never color-only. Disputes stay visible. Street-level residence stays
-            off the public map.
-          </p>
+          <ol className="bp-qualify-list">
+            {HOW_ITEMS.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ol>
           <p className="bp-band__cta">
             <Link className="bp-cta bp-cta--solid" href="/methodology">
-              Read methodology
+              Read the methodology
             </Link>
           </p>
         </div>

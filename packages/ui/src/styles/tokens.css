@@ -140,6 +140,7 @@
   --bp-radius-sm: 8px;
   --bp-radius-md: 16px;
   --bp-radius-lg: 28px;
+  --bp-radius-full: 999px;
 
   --bp-border-width: 1px;
   --bp-border-width-strong: 2px;

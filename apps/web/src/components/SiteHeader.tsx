@@ -1,5 +1,8 @@
 /**
- * Public site header with the brand lockup, primary navigation, and theme toggle.
+ * Public site navigation — the floating ink island. One detached pill,
+ * fixed near the top edge, identical on every surface and in both themes
+ * (the island is a brand-fixed ink object, like the map plate and footer;
+ * see shell.css "The island"). No full-width bar, no onmap variant.
  */
 
 'use client';
@@ -11,18 +14,6 @@ import { ThemeToggle } from '@blap/ui';
 import { isNavActive, OVERFLOW_NAV, PRIMARY_NAV } from '../lib/nav';
 
 const DESKTOP_NAV_MQ = '(min-width: 48rem)';
-
-/**
- * Routes whose hero/canvas is the persistent map — the header sits over ink
- * there (`.bp-shell-header--onmap`) regardless of the reader's light/dark
- * theme. The (map) route group is expected to also stamp `data-surface="map"`
- * on a document-level wrapper once BB-098 lands its own layout; shell.css
- * styles both mechanisms so this pathname check is a working default, not a
- * competing source of truth.
- */
-function isMapSurface(pathname: string): boolean {
-  return pathname === '/' || pathname === '/explore' || pathname.startsWith('/explore/');
-}
 
 function PrimaryLinks({ pathname }: { readonly pathname: string }) {
   return (
@@ -131,7 +122,6 @@ function DrawerNav({
 export function SiteHeader() {
   const pathname = usePathname() || '/';
   const headerRef = useRef<HTMLElement>(null);
-  const menuRef = useRef<HTMLDetailsElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -153,72 +143,60 @@ export function SiteHeader() {
     setMenuOpen(false);
   }, [pathname]);
 
-  const onMap = isMapSurface(pathname);
-
   return (
-    <header
-      ref={headerRef}
-      className={onMap ? 'bp-shell-header bp-shell-header--onmap' : 'bp-shell-header'}
-    >
-      <div className="bp-container bp-shell-header__inner">
-        {/*
-          Official lockup artwork only — the symbol IS the first B, so the
-          product name is never typed beside the mark. Light/dark variants are
-          both rendered and swapped with CSS on [data-theme] (no JS, no
-          hydration flash); the link carries the stable accessible name.
-        */}
-        <Link className="bp-shell-wordmark" href="/" aria-label="Blap — home">
-          <span className="bp-shell-wordmark__full">
-            <img
-              className="bp-shell-wordmark__img bp-shell-wordmark__img--light"
-              src="/brand/blap-primary-light.svg"
-              alt=""
-              aria-hidden="true"
-            />
-            <img
-              className="bp-shell-wordmark__img bp-shell-wordmark__img--dark"
-              src="/brand/blap-primary-dark.svg"
-              alt=""
-              aria-hidden="true"
-            />
-          </span>
-          <span className="bp-shell-wordmark__mini">
-            <img
-              className="bp-shell-wordmark__img bp-shell-wordmark__img--light"
-              src="/brand/blap-mark-compact-light.svg"
-              alt=""
-              aria-hidden="true"
-            />
-            <img
-              className="bp-shell-wordmark__img bp-shell-wordmark__img--dark"
-              src="/brand/blap-mark-compact-dark.svg"
-              alt=""
-              aria-hidden="true"
-            />
-          </span>
+    <header ref={headerRef} className="bp-shell-header">
+      <div className="bp-shell-header__inner">
+        {/* Kit artwork only, dark variants only — the island is always ink.
+            Lockup on wide viewports, standalone symbol on narrow ones. */}
+        <Link className="bp-shell-wordmark" href="/" aria-label="blap — home">
+          <img
+            className="bp-shell-wordmark__img bp-shell-wordmark__img--lockup"
+            src="/brand/blap-lockup-dark.png"
+            alt=""
+            aria-hidden="true"
+          />
+          <img
+            className="bp-shell-wordmark__img bp-shell-wordmark__img--symbol"
+            src="/brand/blap-symbol-dark.png"
+            alt=""
+            aria-hidden="true"
+          />
         </Link>
-
-        <details
-          ref={menuRef}
-          className="bp-shell-menu"
-          onToggle={(event) => setMenuOpen(event.currentTarget.open)}
-        >
-          <summary
-            className="bp-shell-menu__summary"
-            aria-expanded={menuOpen}
-            aria-controls="shell-nav-drawer"
-          >
-            Menu
-          </summary>
-          <DrawerNav id="shell-nav-drawer" pathname={pathname} hidden={isDesktop || !menuOpen} />
-        </details>
 
         <DesktopNav pathname={pathname} hidden={!isDesktop} />
 
+        {/* Plain state-driven button, NOT a <details> wrapper: the drawer must
+            render OUTSIDE the island pill — the pill's backdrop-filter makes it
+            the containing block for fixed descendants, which would pin the
+            bottom sheet to the pill instead of the viewport. */}
+        <button
+          type="button"
+          className="bp-shell-menu bp-shell-menu__summary"
+          aria-expanded={menuOpen}
+          aria-controls="shell-nav-drawer"
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          Menu
+        </button>
+
         <div className="bp-shell-header__tools">
+          <Link className="bp-shell-header__cta" href="/locate">
+            Near you
+          </Link>
           <ThemeToggle />
         </div>
       </div>
+
+      {menuOpen && !isDesktop ? (
+        <>
+          <div
+            className="bp-shell-drawer-scrim"
+            aria-hidden="true"
+            onClick={() => setMenuOpen(false)}
+          />
+          <DrawerNav id="shell-nav-drawer" pathname={pathname} hidden={false} />
+        </>
+      ) : null}
     </header>
   );
 }

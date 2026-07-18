@@ -1,5 +1,6 @@
 /**
- * Public site footer — Black Ink always, independent of the reader's light/dark theme.
+ * Public site footer — Black Ink always, closed by the kit lockup at
+ * landmark scale (the page signs off with the brand, not a fine-print row).
  */
 
 import Link from 'next/link';
@@ -10,16 +11,8 @@ export function SiteFooter() {
     <footer className="bp-shell-footer">
       <div className="bp-container bp-shell-footer__inner">
         <div className="bp-shell-footer__mast">
-          <img
-            className="bp-shell-footer__mark"
-            src="/brand/blap-mark-dark.svg"
-            alt=""
-            aria-hidden="true"
-          />
-          <div>
-            <p className="bp-shell-footer__core">History, pinned to place.</p>
-            <p className="bp-shell-footer__support">People. Places. Evidence. Context.</p>
-          </div>
+          <p className="bp-shell-footer__support">People. Places. Evidence. Context.</p>
+          <p className="bp-shell-footer__core">History, pinned to place.</p>
         </div>
 
         <nav aria-label="Footer" className="bp-shell-footer__columns">
@@ -36,6 +29,15 @@ export function SiteFooter() {
             </div>
           ))}
         </nav>
+
+        <div className="bp-shell-footer__wordmark-slot">
+          <img
+            className="bp-shell-footer__wordmark"
+            src="/brand/blap-lockup-dark.png"
+            alt=""
+            aria-hidden="true"
+          />
+        </div>
 
         <p className="bp-shell-footer__meta bp-mono">
           Public shell · released projections only, with visible provenance and confidence · no

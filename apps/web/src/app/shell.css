@@ -1,12 +1,20 @@
 /**
- * Public Black Book shell — brand pack v3 ("the archive, open").
- * Archive Paper canvas, Surface cards, Rule hairlines, radius 8/16/28.
- * No shadows, gradients, bevels, or glows anywhere in this file: separation
- * is hairline rules and tone shifts (paper -> surface, paper -> ink) only.
+ * Public blap shell — design-direction-v5, "the atlas instrument" revision.
  *
- * A handful of surfaces here are brand-fixed regardless of [data-theme] —
- * the map hero, the on-map header, and the footer read Black Ink always
- * (see packages/ui/src/styles/base.css's --bp-fixed-* tokens for why).
+ * The chrome language, in one breath: ONE floating ink island for
+ * navigation (never a full-width bar, never theme-flipped), pill-shaped
+ * actions, oversized Sora masts with a serif italic accent register,
+ * hairline-ruled ledger rows instead of cards, a timeline instrument on
+ * the hero, and a mega-wordmark footer. Copper stays an orientation
+ * signal at 10–15% presence — one copper action per composition.
+ *
+ * Type registers (v5 §3): Sora display · Inter UI/chrome · Source Serif 4
+ * editorial · IBM Plex Mono strictly for data (slugs, counts, dates,
+ * decades, citations). Caps in exactly two registers: mono data slugs and
+ * sans nav/CTA labels.
+ *
+ * Fixed-ink surfaces (map plate, island, footer, bands, hero chrome)
+ * ignore [data-theme] — see base.css --bp-fixed-*.
  */
 
 .bp-shell {
@@ -17,161 +25,97 @@
 
 .bp-shell-body {
   flex: 1 0 auto;
+  /* The island header floats — document pages clear it themselves. */
+  padding-top: calc(var(--bp-island-clearance));
 }
 
-/* —— Header ——  */
+:root {
+  /* Island geometry, shared by everything that offsets around it. */
+  --bp-island-offset: 0.875rem;
+  --bp-island-height: 3.25rem;
+  --bp-island-clearance: calc(var(--bp-island-offset) + var(--bp-island-height) + 1.25rem);
+}
+
+/* Map surfaces own the full viewport — the hero/explore stage runs under
+   the island by design. */
+.bp-shell-body:has([data-surface='map']) {
+  padding-top: 0;
+}
+
+/* —— The island — one floating ink pill, every surface, every theme ——  */
 .bp-shell-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  border-bottom: var(--bp-border-width) solid var(--bp-rule);
-  background: color-mix(in srgb, var(--bp-canvas) 92%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition:
-    background-color var(--bp-duration-base) var(--bp-easing),
-    border-color var(--bp-duration-base) var(--bp-easing);
-}
-
-/*
- * On map surfaces (`/`, `/explore`) the header sits over the live ink
- * basemap and stays ink-dark regardless of the reader's light/dark theme —
- * two mechanisms are styled defensively: the `--onmap` modifier class
- * (SiteHeader.tsx sets it from the current route today) and the
- * `[data-surface='map']` attribute a document-level wrapper may carry once
- * the (map) route group's own layout lands.
- */
-.bp-shell-header--onmap,
-[data-surface='map'] .bp-shell-header {
-  border-bottom-color: var(--bp-fixed-rule);
-  background: color-mix(in srgb, var(--bp-fixed-ink) 88%, transparent);
-}
-
-.bp-shell-header--onmap :focus-visible,
-[data-surface='map'] .bp-shell-header :focus-visible {
-  outline-color: var(--bp-fixed-paper);
-}
-
-.bp-shell-header--onmap .bp-shell-wordmark__img--light,
-[data-surface='map'] .bp-shell-header .bp-shell-wordmark__img--light {
-  display: none;
-}
-
-.bp-shell-header--onmap .bp-shell-wordmark__img--dark,
-[data-surface='map'] .bp-shell-header .bp-shell-wordmark__img--dark {
-  display: block;
-}
-
-.bp-shell-header--onmap .bp-shell-nav__link,
-[data-surface='map'] .bp-shell-header .bp-shell-nav__link,
-.bp-shell-header--onmap .bp-shell-menu__summary,
-[data-surface='map'] .bp-shell-header .bp-shell-menu__summary {
-  color: var(--bp-fixed-paper);
-}
-
-.bp-shell-header--onmap .bp-shell-nav__link:hover,
-[data-surface='map'] .bp-shell-header .bp-shell-nav__link:hover {
-  border-bottom-color: var(--bp-fixed-rule);
-}
-
-.bp-shell-header--onmap .bp-shell-nav__link.is-active,
-[data-surface='map'] .bp-shell-header .bp-shell-nav__link.is-active {
-  border-bottom-color: var(--bp-fixed-accent);
-}
-
-.bp-shell-header--onmap .bp-shell-menu__summary,
-[data-surface='map'] .bp-shell-header .bp-shell-menu__summary {
-  border-color: var(--bp-fixed-rule);
-  background: transparent;
-}
-
-.bp-shell-header--onmap .bp-theme-toggle,
-[data-surface='map'] .bp-shell-header .bp-theme-toggle {
-  border-color: var(--bp-fixed-rule);
-  background: transparent;
-  color: var(--bp-fixed-paper);
+  position: fixed;
+  top: var(--bp-island-offset);
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding-inline: var(--bp-gutter);
+  pointer-events: none;
 }
 
 .bp-shell-header__inner {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
+  pointer-events: auto;
+  display: flex;
   align-items: center;
-  gap: var(--bp-space-3);
-  min-height: 3.5rem;
-  padding-block: var(--bp-space-2);
+  gap: var(--bp-space-2);
+  max-width: 100%;
+  min-height: var(--bp-island-height);
+  padding: 0.375rem 0.5rem 0.375rem 1rem;
+  border: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
+  border-radius: var(--bp-radius-full);
+  background: color-mix(in srgb, var(--bp-fixed-ink) 84%, transparent);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
 }
 
-/*
- * Official lockup artwork (BB-096) — preserved exactly. The symbol IS the
- * first B, so the product name is never typed beside the mark; light/dark
- * variants swap on [data-theme] with pure CSS (no hydration flash).
- */
+.bp-shell-header :focus-visible {
+  outline-color: var(--bp-fixed-paper);
+}
+
 .bp-shell-wordmark {
   display: inline-flex;
   align-items: center;
-  /* Clear space: padding exceeds the pin's visible width at this scale. */
-  padding: var(--bp-space-2);
+  margin-right: var(--bp-space-2);
   text-decoration: none;
   line-height: 1;
-  border-radius: var(--bp-radius-sm);
+  border-radius: var(--bp-radius-full);
+  transition: opacity var(--bp-duration-fast) var(--bp-easing);
 }
 
+.bp-shell-wordmark:hover {
+  opacity: 0.75;
+}
+
+/* Kit lockup (3:1), dark variant only — the island is always ink. */
 .bp-shell-wordmark__img {
   display: block;
-  /* Brand minimum lockup width: 168px. */
-  width: 10.5rem;
+  width: 6.25rem;
   height: auto;
 }
 
-.bp-shell-wordmark__mini {
+.bp-shell-wordmark__img--symbol {
   display: none;
+  width: 2rem;
+  height: 2rem;
 }
 
-.bp-shell-wordmark__mini .bp-shell-wordmark__img {
-  width: var(--bp-space-8);
-  height: var(--bp-space-8);
-}
-
-/* CSS-only theme swap keyed off the existing data-theme attribute. */
-.bp-shell-wordmark__img--dark {
-  display: none;
-}
-
-[data-theme='dark'] .bp-shell-wordmark__img--light {
-  display: none;
-}
-
-[data-theme='dark'] .bp-shell-wordmark__img--dark {
-  display: block;
-}
-
-/* Below the lockup's minimum width, swap to the compact mark instead of shrinking. */
-@media (max-width: 30rem) {
-  .bp-shell-wordmark__full {
+@media (max-width: 47.9375rem) {
+  .bp-shell-wordmark__img--lockup {
     display: none;
   }
 
-  .bp-shell-wordmark__mini {
+  .bp-shell-wordmark__img--symbol {
     display: block;
   }
 }
 
-.bp-shell-wordmark:hover {
-  opacity: 0.7;
-}
-
-.bp-shell-wordmark:focus-visible {
-  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
-  outline-offset: var(--bp-focus-offset);
-  border-radius: var(--bp-radius-sm);
-}
-
-/* Primary nav — IBM Plex Mono caps, active route gets the 2px copper underline. */
+/* —— Island nav — sans caps, paper at rest, paper pill when here ——  */
 .bp-shell-nav__list {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0;
+  gap: 0.125rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -180,39 +124,36 @@
 .bp-shell-nav__link {
   display: inline-flex;
   align-items: center;
-  min-height: 2.75rem;
+  min-height: 2.5rem;
   padding: 0 var(--bp-space-3);
-  color: var(--bp-ink);
-  font-family: var(--bp-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  border-radius: var(--bp-radius-full);
+  color: color-mix(in srgb, var(--bp-fixed-paper) 72%, transparent);
+  font-family: var(--bp-font-sans);
+  font-size: 0.71875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   text-decoration: none;
-  border-bottom: 2px solid transparent;
-  transition: border-color var(--bp-duration-fast) var(--bp-easing);
+  transition:
+    color var(--bp-duration-fast) var(--bp-easing),
+    background-color var(--bp-duration-fast) var(--bp-easing);
 }
 
 .bp-shell-nav__link:hover {
-  border-bottom-color: var(--bp-rule);
+  color: var(--bp-fixed-paper);
+  background: color-mix(in srgb, var(--bp-fixed-paper) 8%, transparent);
 }
 
 .bp-shell-nav__link.is-active {
-  border-bottom-color: var(--bp-accent);
-}
-
-.bp-shell-nav__link:focus-visible {
-  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
-  outline-offset: var(--bp-focus-offset);
-  border-bottom-color: var(--bp-accent);
+  color: var(--bp-fixed-ink);
+  background: var(--bp-fixed-paper);
 }
 
 .bp-shell-nav--desktop {
   display: none;
 }
 
-/* "More" disclosure — overflow routes, desktop only; native details/summary
-   is keyboard accessible for free (Enter/Space toggles, Tab moves through). */
+/* "More" disclosure — ink glass panel dropping from the island. */
 .bp-shell-more {
   position: relative;
 }
@@ -228,17 +169,19 @@
 
 .bp-shell-more__panel {
   position: absolute;
-  top: calc(100% + var(--bp-space-2));
+  top: calc(100% + var(--bp-space-3));
   right: 0;
-  z-index: 60;
+  z-index: 90;
   display: grid;
-  min-width: 12rem;
+  min-width: 13rem;
   margin: 0;
   padding: var(--bp-space-2);
   list-style: none;
-  border: var(--bp-border-width) solid var(--bp-rule);
-  border-radius: var(--bp-radius-sm);
-  background: var(--bp-surface-raised);
+  border: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
+  border-radius: var(--bp-radius-md);
+  background: color-mix(in srgb, var(--bp-fixed-ink) 92%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .bp-shell-more__panel .bp-shell-nav__link {
@@ -246,69 +189,138 @@
   justify-content: flex-start;
 }
 
-/* Mobile "Menu" trigger + drawer.  */
-.bp-shell-menu {
-  justify-self: end;
+/* —— Island utilities: locate CTA, theme toggle, menu ——  */
+.bp-shell-header__cta {
+  display: none;
 }
 
+@media (min-width: 64rem) {
+  .bp-shell-header__cta {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0 var(--bp-space-4);
+    border-radius: var(--bp-radius-full);
+    background: var(--bp-accent-graphic);
+    color: var(--bp-fixed-ink);
+    font-family: var(--bp-font-sans);
+    font-size: 0.71875rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: opacity var(--bp-duration-fast) var(--bp-easing);
+  }
+
+  .bp-shell-header__cta:hover {
+    opacity: 0.85;
+  }
+}
+
+.bp-shell-header__tools {
+  display: flex;
+  align-items: center;
+  gap: var(--bp-space-1);
+}
+
+/* The theme toggle rides the island — paper on ink, whatever the theme. */
+.bp-shell-header__tools .bp-theme-toggle {
+  border-color: transparent;
+  background: transparent;
+  color: var(--bp-fixed-paper);
+}
+
+.bp-shell-header__tools .bp-theme-toggle:hover {
+  background: color-mix(in srgb, var(--bp-fixed-paper) 8%, transparent);
+}
+
+/* —— Mobile menu trigger + bottom-sheet drawer ——  */
 .bp-shell-menu__summary {
   list-style: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.75rem;
-  padding: 0 var(--bp-space-4);
-  border: var(--bp-border-width) solid var(--bp-rule);
-  border-radius: var(--bp-radius-sm);
-  background: var(--bp-surface);
-  color: var(--bp-ink);
-  font-family: var(--bp-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  min-height: 2.5rem;
+  min-width: 2.75rem;
+  padding: 0 var(--bp-space-3);
+  border: 0;
+  border-radius: var(--bp-radius-full);
+  background: transparent;
+  color: var(--bp-fixed-paper);
+  font-family: var(--bp-font-sans);
+  font-size: 0.71875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   cursor: pointer;
+}
+
+.bp-shell-menu__summary:hover {
+  background: color-mix(in srgb, var(--bp-fixed-paper) 8%, transparent);
 }
 
 .bp-shell-menu__summary::-webkit-details-marker {
   display: none;
 }
 
-.bp-shell-menu__summary:focus-visible {
-  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
-  outline-offset: var(--bp-focus-offset);
+/* Tap-away scrim behind the bottom sheet. Rendered as a sibling of the
+   island (never inside it — see SiteHeader's containing-block note). */
+.bp-shell-drawer-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  pointer-events: auto;
+  background: color-mix(in srgb, var(--bp-fixed-ink) 55%, transparent);
 }
 
-/* Bottom sheet, not a header dropdown — paper sheet, radius-lg top corners. */
 .bp-shell-nav--drawer {
   position: fixed;
   inset: auto 0 0 0;
-  z-index: 70;
-  max-height: 82vh;
+  z-index: 100;
+  pointer-events: auto;
+  max-height: 84vh;
   overflow-y: auto;
   margin: 0;
-  padding: var(--bp-space-4);
-  padding-bottom: max(var(--bp-space-6), env(safe-area-inset-bottom));
-  border-top: var(--bp-border-width) solid var(--bp-rule);
+  padding: var(--bp-space-5) var(--bp-space-5);
+  padding-bottom: max(var(--bp-space-8), env(safe-area-inset-bottom));
+  border-top: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 14%, transparent);
   border-radius: var(--bp-radius-lg) var(--bp-radius-lg) 0 0;
-  background: var(--bp-surface-raised);
-  color: var(--bp-ink);
+  background: color-mix(in srgb, var(--bp-fixed-ink) 96%, transparent);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  color: var(--bp-fixed-paper);
+  animation: bp-sheet-rise var(--bp-duration-base) var(--bp-easing) both;
+}
+
+@keyframes bp-sheet-rise {
+  from {
+    transform: translateY(1.5rem);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
 }
 
 .bp-shell-nav--drawer .bp-shell-nav__list {
   flex-direction: column;
-  gap: var(--bp-space-1);
+  align-items: stretch;
+  gap: 0;
 }
 
 .bp-shell-nav--drawer .bp-shell-nav__link {
   width: 100%;
+  min-height: 3rem;
   justify-content: flex-start;
+  border-radius: var(--bp-radius-sm);
+  font-size: 0.8125rem;
 }
 
 .bp-shell-nav__more-label {
-  margin: var(--bp-space-4) 0 var(--bp-space-2);
+  margin: var(--bp-space-5) 0 var(--bp-space-1);
   padding: 0 var(--bp-space-3);
-  color: var(--bp-ink-subtle);
+  color: color-mix(in srgb, var(--bp-fixed-paper) 50%, transparent);
   font-family: var(--bp-font-mono);
   font-size: 0.6875rem;
   font-weight: 500;
@@ -316,14 +328,8 @@
   text-transform: uppercase;
 }
 
-.bp-shell-header__tools {
-  display: flex;
-  align-items: center;
-  justify-self: end;
-}
-
 .bp-shell-offline {
-  padding: var(--bp-space-3) 0 0;
+  padding: calc(var(--bp-island-clearance)) 0 0;
 }
 
 .bp-shell-offline > * {
@@ -331,59 +337,52 @@
   margin-inline: auto;
 }
 
-/* —— Footer — Black Ink always, independent of [data-theme] ——  */
+/* —— Footer — Black Ink always, closed by the mega wordmark ——  */
 .bp-shell-footer {
   margin-top: auto;
   background: var(--bp-fixed-ink);
   color: var(--bp-fixed-paper);
-  padding-block: var(--bp-space-12);
+  padding-block: var(--bp-space-16) var(--bp-space-8);
 }
 
 .bp-shell-footer__inner {
   display: grid;
-  gap: var(--bp-space-8);
+  gap: var(--bp-space-12);
 }
 
 .bp-shell-footer__mast {
-  display: flex;
-  align-items: center;
-  gap: var(--bp-space-4);
-}
-
-.bp-shell-footer__mark {
-  flex: 0 0 auto;
-  width: 2.5rem;
-  height: 2.5rem;
+  display: grid;
+  gap: var(--bp-space-2);
 }
 
 .bp-shell-footer__core {
   margin: 0;
   font-family: var(--bp-font-display);
-  font-weight: 650;
-  font-size: clamp(1.5rem, 1.3rem + 1vw, 2rem);
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  font-weight: 600;
+  font-size: clamp(1.75rem, 1.4rem + 1.8vw, 2.75rem);
+  letter-spacing: -0.03em;
+  line-height: 1.08;
   color: var(--bp-fixed-paper);
 }
 
 .bp-shell-footer__support {
-  margin: var(--bp-space-2) 0 0;
+  margin: 0;
   color: var(--bp-fixed-stone);
   font-family: var(--bp-font-mono);
   font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .bp-shell-footer__columns {
   display: grid;
-  gap: var(--bp-space-6);
+  gap: var(--bp-space-8);
   grid-template-columns: 1fr;
 }
 
 .bp-shell-footer__column-title {
-  margin: 0 0 var(--bp-space-3);
+  margin: 0 0 var(--bp-space-2);
   color: var(--bp-fixed-stone);
   font-family: var(--bp-font-mono);
   font-size: 0.6875rem;
@@ -394,7 +393,7 @@
 
 .bp-shell-footer__links {
   display: grid;
-  gap: var(--bp-space-2);
+  gap: 0;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -409,10 +408,11 @@
   color: var(--bp-fixed-paper);
   text-decoration: none;
   border-bottom: 1px solid transparent;
+  transition: border-color var(--bp-duration-fast) var(--bp-easing);
 }
 
 .bp-shell-footer__links a:hover {
-  border-bottom-color: var(--bp-fixed-rule);
+  border-bottom-color: var(--bp-fixed-stone);
 }
 
 .bp-shell-footer__links a:focus-visible {
@@ -420,9 +420,16 @@
   outline-offset: var(--bp-focus-offset);
 }
 
+/* The kit lockup at landmark scale — the page signs off with the brand. */
+.bp-shell-footer__wordmark {
+  width: min(70%, 26rem);
+  height: auto;
+  margin-top: var(--bp-space-4);
+}
+
 .bp-shell-footer__meta {
-  margin: var(--bp-space-4) 0 0;
-  padding-top: var(--bp-space-6);
+  margin: 0;
+  padding-top: var(--bp-space-5);
   border-top: var(--bp-border-width) solid var(--bp-fixed-rule);
   color: var(--bp-fixed-stone);
 }
@@ -430,11 +437,25 @@
 @media (min-width: 40rem) {
   .bp-shell-footer__columns {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--bp-space-8);
   }
 }
 
-/* —— Skip link, visible on keyboard focus (WCAG 2.4.1) ——  */
+@media (min-width: 64rem) {
+  .bp-shell-footer__inner {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr);
+    align-items: start;
+  }
+
+  .bp-shell-footer__wordmark-slot {
+    grid-column: 1 / -1;
+  }
+
+  .bp-shell-footer__meta {
+    grid-column: 1 / -1;
+  }
+}
+
+/* —— Skip link (WCAG 2.4.1) ——  */
 .bp-skip-link {
   position: absolute;
   width: 1px;
@@ -464,19 +485,12 @@
   color: var(--bp-inverse-ink);
   border-radius: var(--bp-radius-sm);
   text-decoration: none;
-  font-family: var(--bp-font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: var(--bp-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 
-/* —— Surface arrival ——
-   Route changes should read as moving to another room of the archive, not reloading the
-   site: page content arrives with a soft rise on mount (client-side Link navigations keep
-   the shell and the map canvas alive; this animation is the only visible seam). Token-driven
-   like every other motion here; reduced motion collapses it to an instant cut via the
-   --bp-duration-base override in tokens.css. */
+/* —— Surface arrival ——  */
 @keyframes bp-surface-arrive {
   from {
     opacity: 0;
@@ -488,260 +502,75 @@
   }
 }
 
-/* —— Page chrome ——  */
+/* —— Page mast — the room's nameplate. Oversized, ruled, unmistakable ——  */
 .bp-page {
   animation: bp-surface-arrive var(--bp-duration-base) var(--bp-easing) both;
-  padding-block: var(--bp-space-8) var(--bp-space-16);
+  padding-block: var(--bp-space-10) var(--bp-space-16);
 }
 
-.bp-page__eyebrow {
+.bp-page__eyebrow,
+.bp-section__kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--bp-space-3);
   margin: 0;
   color: var(--bp-accent);
   font-family: var(--bp-font-mono);
   font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
+/* The copper tick — the recurring orientation mark of the system. */
+.bp-page__eyebrow::before,
+.bp-section__kicker::before {
+  content: '';
+  width: 1.75rem;
+  height: 2px;
+  background: var(--bp-accent-graphic);
+}
+
 .bp-page__title {
-  margin: var(--bp-space-3) 0 0;
+  margin: var(--bp-space-4) 0 0;
   font-family: var(--bp-font-display);
-  font-weight: 650;
-  font-size: clamp(2.25rem, 1.9rem + 1.75vw, 3rem);
-  letter-spacing: -0.035em;
-  line-height: 1.05;
+  font-weight: 600;
+  font-size: clamp(2.75rem, 1.9rem + 4vw, 5rem);
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+
+/* Serif italic accent register — one warm word inside a display headline. */
+.bp-page__title em,
+.bp-hero-stage__headline em {
+  font-family: var(--bp-font-editorial);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--bp-accent);
+}
+
+.bp-hero-stage__headline em {
+  color: var(--bp-fixed-accent);
 }
 
 .bp-page__lede {
-  margin: var(--bp-space-4) 0 0;
-  max-width: 65ch;
+  margin: var(--bp-space-5) 0 0;
+  max-width: 42rem;
   color: var(--bp-ink-muted);
-  font-family: var(--bp-font-sans);
-  font-size: 1.125rem;
-  line-height: 1.5;
+  font-family: var(--bp-font-editorial);
+  font-size: clamp(1.125rem, 1.05rem + 0.4vw, 1.3125rem);
+  line-height: 1.55;
 }
 
 .bp-page--status__body {
   margin-top: var(--bp-space-6);
 }
 
-.bp-feature-grid {
-  display: grid;
-  gap: var(--bp-space-4);
-  margin-top: var(--bp-space-2);
-}
-
-/* —— Map hero (BB-098 persistent-canvas contract) ——
- * Fixed ink-dark surface regardless of [data-theme] — the map is the
- * premier surface and stays cinematic no matter the reader's site theme.
- * M stream builds the markup; this file ships the CSS the class names bind
- * to (`.bp-map-stage` — the live canvas mount — is that stream's own CSS).
- */
-.bp-hero-stage {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  height: 100svh;
-  display: grid;
-  align-items: end;
-  justify-items: start;
-  padding: 0 5vw 9vh;
-}
-
-.bp-hero-stage__scrim,
-.bp-hero-stage__panel {
-  grid-column: 1;
-  grid-row: 1;
-  width: min(100%, 38rem);
-}
-
-.bp-hero-stage__scrim {
-  align-self: stretch;
-  border-radius: var(--bp-radius-lg);
-  background: color-mix(in srgb, var(--bp-fixed-ink) 55%, transparent);
-  pointer-events: none;
-}
-
-.bp-hero-stage__panel {
-  position: relative;
-  z-index: 1;
-  border-radius: var(--bp-radius-lg);
-  background: color-mix(in srgb, var(--bp-fixed-ink) 82%, transparent);
-  padding: 2.5rem;
-  color: var(--bp-fixed-paper);
-}
-
-.bp-hero-stage__kicker {
-  margin: 0;
-  color: var(--bp-fixed-accent);
-  font-family: var(--bp-font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  animation: bp-rise var(--bp-duration-slow) var(--bp-easing) both;
-}
-
-.bp-hero-stage__headline {
-  margin: var(--bp-space-3) 0 0;
-  color: var(--bp-fixed-paper);
-  font-family: var(--bp-font-display);
-  font-weight: 650;
-  font-size: clamp(3rem, 2.5rem + 2.5vw, 4.5rem);
-  letter-spacing: -0.035em;
-  line-height: 1.02;
-  animation: bp-rise var(--bp-duration-slow) var(--bp-easing) 0.06s both;
-}
-
-.bp-hero-stage__support {
-  margin: var(--bp-space-4) 0 0;
-  max-width: 32rem;
-  color: var(--bp-fixed-stone);
-  font-family: var(--bp-font-sans);
-  font-size: 1.0625rem;
-  line-height: 1.5;
-  animation: bp-rise var(--bp-duration-slow) var(--bp-easing) 0.12s both;
-}
-
-.bp-hero-stage__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--bp-space-3);
-  margin-top: var(--bp-space-6);
-  animation: bp-rise var(--bp-duration-slow) var(--bp-easing) 0.18s both;
-}
-
-.bp-hero-stage__count {
-  margin: var(--bp-space-5) 0 0;
-  color: var(--bp-fixed-stone);
-  font-family: var(--bp-font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-}
-
-@media (max-width: 39.9375rem) {
-  .bp-hero-stage {
-    padding: 0 1rem 1.5rem;
-  }
-
-  .bp-hero-stage__actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .bp-hero-stage__actions .bp-cta {
-    width: 100%;
-  }
-}
-
-/* —— CTA vocabulary — mono caps, radius-sm, >=44px tall ——  */
-.bp-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.75rem;
-  padding: 0 var(--bp-space-5);
-  border-radius: var(--bp-radius-sm);
-  border: var(--bp-border-width) solid transparent;
-  font-family: var(--bp-font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition:
-    background-color var(--bp-duration-base) var(--bp-easing),
-    color var(--bp-duration-base) var(--bp-easing),
-    border-color var(--bp-duration-base) var(--bp-easing),
-    opacity var(--bp-duration-base) var(--bp-easing);
-}
-
-.bp-cta:focus-visible {
-  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
-  outline-offset: var(--bp-focus-offset);
-}
-
-/* Solid ink-on-paper CTA — light theme ink bg/paper text, dark theme
-   inverts (paper bg/ink text) so it never sits ink-on-ink against the
-   page's own dark canvas. `--ink` is the long-established alias every
-   long-tail page already renders with this class. */
-.bp-cta--solid,
-.bp-cta--ink {
-  background: var(--bp-ink);
-  color: var(--bp-inverse-ink);
-}
-
-.bp-cta--solid:hover,
-.bp-cta--ink:hover {
-  opacity: 0.82;
-}
-
-/* Inside an always-charcoal band the page's own [data-theme] doesn't apply —
-   force the paper-bg/ink-text reading regardless of theme. */
-.bp-band .bp-cta--solid,
-.bp-band .bp-cta--ink {
-  background: var(--bp-fixed-paper);
-  color: var(--bp-fixed-ink);
-}
-
-/* THE one primary CTA per view — copper, reserved for orientation moments. */
-.bp-cta--copper {
-  background: var(--bp-accent-graphic);
-  color: var(--bp-ink);
-}
-
-[data-theme='dark'] .bp-cta--copper {
-  color: var(--bp-inverse-ink);
-}
-
-.bp-cta--copper:hover {
-  opacity: 0.88;
-}
-
-/* For use over ink (the map hero, the on-map header, any dark band) —
-   fixed paper-on-transparent regardless of the page's own [data-theme].
-   `--ghost` is kept as an alias for the map hero's existing ghost action
-   until BB-098 migrates it onto the `.bp-hero-stage` contract. */
-.bp-cta--ghost,
-.bp-cta--ghost-dark {
-  background: transparent;
-  border-color: var(--bp-fixed-paper);
-  color: var(--bp-fixed-paper);
-}
-
-.bp-cta--ghost:hover,
-.bp-cta--ghost-dark:hover {
-  background: var(--bp-fixed-paper);
-  color: var(--bp-fixed-ink);
-}
-
-.bp-cta-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-  color: var(--bp-ink);
-  font-family: var(--bp-font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-decoration: none;
-  border-bottom: 2px solid var(--bp-ink);
-}
-
-.bp-cta-link:hover {
-  opacity: 0.7;
-}
-
-.bp-cta-link:focus-visible {
-  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
-  outline-offset: var(--bp-focus-offset);
-}
-
-/* —— Modular sections ——  */
+/* —— Sections — hairline-ruled rooms with an index numeral ——  */
 .bp-section {
-  padding-block: var(--bp-space-10);
+  position: relative;
+  padding-block: var(--bp-space-12);
   border-bottom: var(--bp-border-width) solid var(--bp-rule);
 }
 
@@ -754,40 +583,32 @@
 }
 
 .bp-section__kicker {
-  margin: 0 0 var(--bp-space-2);
-  color: var(--bp-accent);
-  font-family: var(--bp-font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  margin-bottom: var(--bp-space-3);
 }
 
 .bp-section__title {
   margin: 0;
   font-family: var(--bp-font-display);
-  font-weight: 650;
-  font-size: clamp(1.5rem, 1.3rem + 1vw, 2rem);
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  font-weight: 600;
+  font-size: clamp(1.75rem, 1.4rem + 1.6vw, 2.625rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
 }
 
 .bp-section__lede {
-  margin: var(--bp-space-3) 0 0;
-  max-width: 42rem;
+  margin: var(--bp-space-4) 0 0;
+  max-width: 46rem;
   color: var(--bp-ink-muted);
-  font-family: var(--bp-font-sans);
+  font-family: var(--bp-font-editorial);
   font-size: 1.0625rem;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-/* Always-charcoal band — fixed regardless of [data-theme], same reasoning
-   as the map hero and footer. */
+/* —— Ink band — full-bleed, no radius, one per page max ——  */
 .bp-band {
   background: var(--bp-fixed-charcoal);
   color: var(--bp-fixed-paper);
-  padding-block: var(--bp-space-12);
-  border-radius: var(--bp-radius-md);
+  padding-block: var(--bp-space-16);
 }
 
 .bp-band .bp-section__kicker {
@@ -799,19 +620,450 @@
 }
 
 .bp-band .bp-section__lede,
-.bp-band a {
+.bp-band a:not(.bp-cta) {
   color: var(--bp-fixed-stone);
 }
 
-.bp-band a:hover {
+.bp-band a:not(.bp-cta):hover {
   color: var(--bp-fixed-paper);
 }
 
 .bp-band__cta {
-  margin: var(--bp-space-6) 0 0;
+  margin: var(--bp-space-8) 0 0;
 }
 
-/* —— Story rail — no boxes, no side borders, top rule only ——  */
+/* —— Action vocabulary — ONE pill recipe, three weights.
+   `.bp-cta` (links) and `.bp-button` (form buttons, components.css) share
+   this recipe exactly. Aliases kept this cycle: --ink/--solid → solid,
+   --ghost/--ghost-dark → quiet-on-ink, --copper → copper. ——  */
+.bp-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bp-space-2);
+  min-height: 2.75rem;
+  padding: 0 var(--bp-space-6);
+  border-radius: var(--bp-radius-full);
+  border: var(--bp-border-width) solid transparent;
+  font-family: var(--bp-font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--bp-duration-fast) var(--bp-easing),
+    color var(--bp-duration-fast) var(--bp-easing),
+    border-color var(--bp-duration-fast) var(--bp-easing),
+    transform var(--bp-duration-fast) var(--bp-easing),
+    opacity var(--bp-duration-fast) var(--bp-easing);
+}
+
+.bp-cta:active {
+  transform: scale(0.98);
+}
+
+/* THE primary action of a view — copper, max one per composition. */
+.bp-cta--copper {
+  background: var(--bp-accent-graphic);
+  color: var(--bp-fixed-ink);
+}
+
+.bp-cta--copper:hover {
+  opacity: 0.87;
+}
+
+/* Solid ink-on-paper; inverts with theme so it never sits ink-on-ink. */
+.bp-cta--solid,
+.bp-cta--ink {
+  background: var(--bp-ink);
+  color: var(--bp-inverse-ink);
+}
+
+.bp-cta--solid:hover,
+.bp-cta--ink:hover {
+  opacity: 0.84;
+}
+
+.bp-band .bp-cta--solid,
+.bp-band .bp-cta--ink {
+  background: var(--bp-fixed-paper);
+  color: var(--bp-fixed-ink);
+}
+
+/* Quiet — hairline pill, transparent fill, theme-following. */
+.bp-cta--quiet {
+  border-color: var(--bp-border-strong);
+  color: var(--bp-ink);
+}
+
+.bp-cta--quiet:hover {
+  background: var(--bp-surface-raised);
+}
+
+/* Quiet over fixed-ink (hero, bands): paper hairline + paper text. */
+.bp-cta--ghost,
+.bp-cta--ghost-dark {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--bp-fixed-paper) 38%, transparent);
+  color: var(--bp-fixed-paper);
+}
+
+.bp-cta--ghost:hover,
+.bp-cta--ghost-dark:hover {
+  border-color: var(--bp-fixed-paper);
+  background: color-mix(in srgb, var(--bp-fixed-paper) 8%, transparent);
+}
+
+/* Quiet text link — underline action without the pill. */
+.bp-cta-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--bp-ink);
+  font-family: var(--bp-font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom: 2px solid var(--bp-accent);
+  transition: opacity var(--bp-duration-fast) var(--bp-easing);
+}
+
+.bp-cta-link:hover {
+  opacity: 0.7;
+}
+
+/* —— Hero — cinema over the live plate. Typography floats on the map;
+   a bottom scrim earns the contrast; the timeline instrument closes the
+   frame. The scrim is a map-plate treatment (v5 §4 note), not page UI. ——  */
+.bp-hero-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 clamp(1rem, 5vw, 4rem) clamp(1rem, 3.5vh, 2.5rem);
+  pointer-events: none;
+}
+
+.bp-hero-stage > * {
+  pointer-events: auto;
+}
+
+/* Legibility scrim: bottom third fades to ink so paper type always clears
+   WCAG on top of whatever the camera shows. pointer-events stays none. */
+.bp-hero-stage::before {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 62%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--bp-fixed-ink) 55%, transparent) 55%,
+    color-mix(in srgb, var(--bp-fixed-ink) 88%, transparent) 100%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+.bp-hero-stage__kicker {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--bp-space-3);
+  color: var(--bp-fixed-accent);
+  font-family: var(--bp-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  animation: bp-rise var(--bp-duration-slow) var(--bp-easing) both;
+}
+
+.bp-hero-stage__kicker::before {
+  content: '';
+  width: 1.75rem;
+  height: 2px;
+  background: var(--bp-accent-graphic);
+}
+
+.bp-hero-stage__headline {
+  margin: var(--bp-space-3) 0 0;
+  max-width: 12ch;
+  color: var(--bp-fixed-paper);
+  font-family: var(--bp-font-display);
+  font-weight: 600;
+  font-size: clamp(3rem, 1.9rem + 5.5vw, 6.25rem);
+  letter-spacing: -0.045em;
+  line-height: 0.96;
+  animation: bp-rise var(--bp-duration-slow) var(--bp-easing) 0.06s both;
+}
+
+.bp-hero-stage__support {
+  margin: var(--bp-space-4) 0 0;
+  max-width: 32rem;
+  color: var(--bp-fixed-stone);
+  font-family: var(--bp-font-editorial);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  animation: bp-rise var(--bp-duration-slow) var(--bp-easing) 0.12s both;
+}
+
+.bp-hero-stage__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bp-space-3);
+  margin-top: var(--bp-space-6);
+  animation: bp-rise var(--bp-duration-slow) var(--bp-easing) 0.18s both;
+}
+
+.bp-hero-stage__count {
+  margin: var(--bp-space-4) 0 0;
+  color: var(--bp-fixed-stone);
+  font-family: var(--bp-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+/* —— The timeline instrument — decades in motion, playable, scrubbable.
+   A full-width rail of decade ticks along the hero's lower edge: passed
+   decades burn copper, the live decade reads large, and every tick is a
+   44px target that jumps the archive to that decade. ——  */
+.bp-hero-timeline {
+  width: 100%;
+  margin-top: var(--bp-space-6);
+  animation: bp-rise var(--bp-duration-slow) var(--bp-easing) 0.24s both;
+}
+
+.bp-hero-timeline__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--bp-space-4);
+}
+
+.bp-hero-timeline__readout {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.bp-hero-timeline__decade {
+  margin: 0;
+  color: var(--bp-fixed-paper);
+  font-family: var(--bp-font-mono);
+  font-size: clamp(2rem, 1.5rem + 2.4vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.bp-hero-timeline__note {
+  margin: 0;
+  color: var(--bp-fixed-stone);
+  font-family: var(--bp-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+/* Play/pause — a circular instrument key. */
+.bp-hero-timeline__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 auto;
+  border: var(--bp-border-width) solid color-mix(in srgb, var(--bp-fixed-paper) 38%, transparent);
+  border-radius: var(--bp-radius-full);
+  background: color-mix(in srgb, var(--bp-fixed-ink) 55%, transparent);
+  color: var(--bp-fixed-paper);
+  cursor: pointer;
+  transition:
+    border-color var(--bp-duration-fast) var(--bp-easing),
+    background-color var(--bp-duration-fast) var(--bp-easing);
+}
+
+.bp-hero-timeline__toggle:hover {
+  border-color: var(--bp-fixed-paper);
+  background: color-mix(in srgb, var(--bp-fixed-paper) 10%, transparent);
+}
+
+.bp-hero-timeline__toggle svg {
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
+}
+
+.bp-hero-timeline__rail {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  margin-top: var(--bp-space-3);
+}
+
+/* Each decade is one tick: a hairline that grows and burns copper as the
+   archive reaches it. The whole column is the touch target. */
+.bp-hero-timeline__tick {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 2.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: stretch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.bp-hero-timeline__tick::after {
+  content: '';
+  display: block;
+  height: 3px;
+  margin-inline: 1px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--bp-fixed-paper) 22%, transparent);
+  transition:
+    background-color var(--bp-duration-fast) var(--bp-easing),
+    height var(--bp-duration-fast) var(--bp-easing);
+}
+
+.bp-hero-timeline__tick:hover::after {
+  background: color-mix(in srgb, var(--bp-fixed-paper) 55%, transparent);
+}
+
+.bp-hero-timeline__tick.is-passed::after {
+  background: color-mix(in srgb, var(--bp-accent-graphic) 72%, transparent);
+}
+
+.bp-hero-timeline__tick.is-current::after {
+  height: 10px;
+  background: var(--bp-accent-graphic);
+}
+
+.bp-hero-timeline__tick-label {
+  margin-bottom: var(--bp-space-1);
+  color: color-mix(in srgb, var(--bp-fixed-stone) 80%, transparent);
+  font-family: var(--bp-font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.04em;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.bp-hero-timeline__tick.is-current .bp-hero-timeline__tick-label {
+  color: var(--bp-fixed-accent);
+}
+
+@media (max-width: 47.9375rem) {
+  .bp-hero-stage {
+    height: 92svh;
+  }
+
+  .bp-hero-stage__actions {
+    width: 100%;
+  }
+
+  .bp-hero-stage__actions .bp-cta {
+    flex: 1 1 auto;
+  }
+
+  /* Mobile rail: labels off (the readout carries the decade), ticks stay
+     44px-tall touch targets. */
+  .bp-hero-timeline__tick-label {
+    display: none;
+  }
+}
+
+/* —— Start with your state ——  */
+.bp-state-start {
+  display: grid;
+  gap: var(--bp-space-5);
+}
+
+.bp-state-start__form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: var(--bp-space-2);
+}
+
+.bp-state-start__select {
+  flex: 1 1 14rem;
+  max-width: 22rem;
+  min-height: 2.75rem;
+  padding: var(--bp-space-2) var(--bp-space-4);
+  border: var(--bp-border-width) solid var(--bp-border-strong);
+  border-radius: var(--bp-radius-full);
+  background: var(--bp-surface-raised);
+  color: var(--bp-ink);
+  font-family: var(--bp-font-sans);
+  /* ≥16px avoids iOS zoom-on-focus. */
+  font-size: 1rem;
+}
+
+.bp-state-start__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bp-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bp-state-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bp-space-2);
+  min-height: 2.75rem;
+  padding: 0 var(--bp-space-4);
+  border: var(--bp-border-width) solid var(--bp-rule);
+  border-radius: var(--bp-radius-full);
+  color: var(--bp-ink);
+  font-family: var(--bp-font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    border-color var(--bp-duration-fast) var(--bp-easing),
+    background-color var(--bp-duration-fast) var(--bp-easing);
+}
+
+.bp-state-chip:hover {
+  border-color: var(--bp-border-strong);
+  background: var(--bp-surface-raised);
+}
+
+.bp-state-chip__count {
+  color: var(--bp-accent);
+  font-family: var(--bp-font-mono);
+  font-size: 0.75rem;
+}
+
+.bp-state-start__locate {
+  color: var(--bp-ink-muted);
+  font-family: var(--bp-font-sans);
+  font-size: 0.9375rem;
+}
+
+.bp-state-start__locate a {
+  color: var(--bp-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+/* —— Story rail — top-rule entries, never boxes ——  */
 .bp-story-rail {
   display: grid;
   grid-template-columns: 1fr;
@@ -836,7 +1088,7 @@
 .bp-story-link {
   display: grid;
   gap: var(--bp-space-2);
-  padding: var(--bp-space-5) 0 0;
+  padding: var(--bp-space-4) 0 0;
   border-top: var(--bp-border-width-strong) solid var(--bp-ink);
   color: inherit;
   text-decoration: none;
@@ -860,7 +1112,7 @@
 .bp-story-link__title {
   margin: 0;
   font-family: var(--bp-font-display);
-  font-weight: 650;
+  font-weight: 600;
   font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
   letter-spacing: -0.02em;
   line-height: 1.2;
@@ -883,38 +1135,271 @@
   margin: 0;
   max-width: 40rem;
   color: var(--bp-ink-muted);
-  font-family: var(--bp-font-sans);
-  font-size: 0.9375rem;
-  line-height: 1.5;
-}
-
-/* —— Standards band — surface cards, radius-md, serif body ——  */
-.bp-qualify-list {
-  display: grid;
-  gap: var(--bp-space-4);
-  grid-template-columns: 1fr;
-  margin: var(--bp-space-6) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.bp-qualify-list li {
-  padding: var(--bp-space-5);
-  border: var(--bp-border-width) solid var(--bp-rule);
-  border-radius: var(--bp-radius-md);
-  background: var(--bp-surface);
   font-family: var(--bp-font-editorial);
-  font-size: 1.0625rem;
-  line-height: 1.65;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+/* —— Data strip — the archive in numbers, mono register, hairlines only ——  */
+.bp-data-strip {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin: var(--bp-space-6) 0 0;
+}
+
+.bp-data-strip__item {
+  display: grid;
+  gap: var(--bp-space-1);
+  padding: var(--bp-space-4) 0;
+  border-top: var(--bp-border-width) solid var(--bp-rule);
+}
+
+.bp-data-strip__value {
+  font-family: var(--bp-font-mono);
+  font-size: clamp(2.25rem, 1.8rem + 2vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.bp-data-strip__label {
+  color: var(--bp-ink-muted);
+  font-family: var(--bp-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 @media (min-width: 48rem) {
-  .bp-qualify-list {
-    grid-template-columns: 1fr 1fr;
+  .bp-data-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--bp-space-8);
   }
 }
 
-/* —— Entity layout ——  */
+/* —— Editorial point list — numbered, serif, hairline-separated ——  */
+.bp-qualify-list {
+  display: grid;
+  gap: 0;
+  margin: var(--bp-space-5) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: bp-qualify;
+}
+
+.bp-qualify-list li {
+  position: relative;
+  counter-increment: bp-qualify;
+  padding: var(--bp-space-5) 0 var(--bp-space-5) var(--bp-space-12);
+  border-top: var(--bp-border-width) solid var(--bp-rule);
+  font-family: var(--bp-font-editorial);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+.bp-qualify-list li::before {
+  content: counter(bp-qualify, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: var(--bp-space-4);
+  color: var(--bp-accent);
+  font-family: var(--bp-font-mono);
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.bp-band .bp-qualify-list li {
+  border-top-color: var(--bp-fixed-rule);
+  color: var(--bp-fixed-paper);
+}
+
+.bp-band .bp-qualify-list li::before {
+  color: var(--bp-fixed-accent);
+}
+
+/* —— Search mast — the query IS the headline. No filter card: a display-
+   scale input over a heavy rule, refine pills beneath. ——  */
+.bp-search-mast {
+  margin-top: var(--bp-space-8);
+}
+
+.bp-search-mast__field {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--bp-space-4);
+  padding-bottom: var(--bp-space-3);
+  border-bottom: var(--bp-border-width-strong) solid var(--bp-ink);
+  transition: border-color var(--bp-duration-fast) var(--bp-easing);
+}
+
+.bp-search-mast__field:focus-within {
+  border-bottom-color: var(--bp-accent);
+}
+
+.bp-search-mast__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 3.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--bp-ink);
+  font-family: var(--bp-font-display);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 1.2rem + 1.6vw, 2.5rem);
+  letter-spacing: -0.03em;
+}
+
+.bp-search-mast__input::placeholder {
+  color: var(--bp-ink-subtle);
+}
+
+.bp-search-mast__input:focus-visible {
+  outline: none;
+}
+
+.bp-search-mast__refine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bp-space-2);
+  margin-top: var(--bp-space-4);
+}
+
+/* —— Pill select — a native select wearing the island language. Used by
+   the search refine row and the history facet row. ——  */
+.bp-pill-select {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bp-space-2);
+}
+
+.bp-pill-select__label {
+  color: var(--bp-ink-subtle);
+  font-family: var(--bp-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.bp-pill-select__control {
+  min-height: 2.75rem;
+  padding: 0 var(--bp-space-4);
+  border: var(--bp-border-width) solid var(--bp-border-strong);
+  border-radius: var(--bp-radius-full);
+  background: transparent;
+  color: var(--bp-ink);
+  font-family: var(--bp-font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color var(--bp-duration-fast) var(--bp-easing),
+    background-color var(--bp-duration-fast) var(--bp-easing);
+}
+
+.bp-pill-select__control:hover {
+  background: var(--bp-surface-raised);
+}
+
+/* —— Ledger index — search results and any ranked archive listing.
+   Numbered rows, serif-display titles, slug meta. Rows, never cards. ——  */
+.bp-index {
+  margin: var(--bp-space-6) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: bp-index;
+}
+
+.bp-index__row {
+  counter-increment: bp-index;
+  border-top: var(--bp-border-width) solid var(--bp-rule);
+}
+
+.bp-index__row:last-child {
+  border-bottom: var(--bp-border-width) solid var(--bp-rule);
+}
+
+.bp-index__link {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: var(--bp-space-2) var(--bp-space-4);
+  padding: var(--bp-space-5) 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.bp-index__link::before {
+  content: counter(bp-index, decimal-leading-zero);
+  grid-row: 1 / span 3;
+  padding-top: 0.35rem;
+  color: var(--bp-ink-subtle);
+  font-family: var(--bp-font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: color var(--bp-duration-fast) var(--bp-easing);
+}
+
+.bp-index__link:hover::before,
+.bp-index__link:focus-visible::before {
+  color: var(--bp-accent);
+}
+
+.bp-index__title {
+  margin: 0;
+  font-family: var(--bp-font-display);
+  font-weight: 600;
+  font-size: clamp(1.25rem, 1.1rem + 0.8vw, 1.75rem);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  transition: color var(--bp-duration-fast) var(--bp-easing);
+}
+
+.bp-index__link:hover .bp-index__title,
+.bp-index__link:focus-visible .bp-index__title {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+}
+
+.bp-index__summary {
+  margin: 0;
+  max-width: 48rem;
+  color: var(--bp-ink-muted);
+  font-family: var(--bp-font-editorial);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.bp-index__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bp-space-3);
+  color: var(--bp-ink-subtle);
+  font-family: var(--bp-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.bp-index__link:focus-visible {
+  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
+  outline-offset: var(--bp-focus-offset);
+  border-radius: var(--bp-radius-sm);
+}
+
+/* —— Feature grid (topics) ——  */
+.bp-feature-grid {
+  display: grid;
+  gap: var(--bp-space-4);
+  margin-top: var(--bp-space-2);
+}
+
+/* —— Entity record layout ——  */
 .bp-entity-layout {
   display: grid;
   gap: var(--bp-space-8);
@@ -943,23 +1428,24 @@
   display: inline-flex;
   align-items: center;
   min-height: 2rem;
-  padding: 0.2rem 0.65rem;
+  padding: 0.2rem 0.75rem;
   border: var(--bp-border-width) solid var(--bp-rule);
-  border-radius: var(--bp-radius-sm);
+  border-radius: var(--bp-radius-full);
   color: var(--bp-ink);
   font-family: var(--bp-font-mono);
   font-size: 0.75rem;
   line-height: 1.3;
   text-decoration: none;
   background: transparent;
+  transition:
+    background-color var(--bp-duration-fast) var(--bp-easing),
+    color var(--bp-duration-fast) var(--bp-easing);
 }
 
 .bp-entity-tag:hover,
 .bp-entity-tag:focus-visible {
   background: var(--bp-ink);
   color: var(--bp-canvas);
-  outline: var(--bp-focus-width) solid var(--bp-focus-ring);
-  outline-offset: var(--bp-focus-offset);
 }
 
 .bp-entity-tag--era {
@@ -968,9 +1454,13 @@
 
 .bp-entity-tag--note {
   max-width: 28rem;
-  border-color: var(--bp-rule);
   color: var(--bp-ink-muted);
   cursor: default;
+}
+
+.bp-entity-tag--note:hover {
+  background: transparent;
+  color: var(--bp-ink-muted);
 }
 
 .bp-entity-photo {
@@ -1020,16 +1510,15 @@
   height: 1.25rem;
 }
 
-/* —— Shared text utilities — exist to replace repeated inline styles on
-   result/count labels, in-page subheadings, and definition terms. Kept after
-   the component rules so they win equal-specificity conflicts (e.g.
-   `.bp-section__title.bp-subheading`). ——  */
+/* —— Shared text utilities ——  */
 .bp-count-label {
   margin: 0;
+  font-family: var(--bp-font-mono);
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  color: var(--bp-ink-muted);
 }
 
 .bp-subheading {
@@ -1066,28 +1555,31 @@
   .bp-hero-stage__headline,
   .bp-hero-stage__support,
   .bp-hero-stage__actions,
+  .bp-hero-timeline,
+  .bp-shell-nav--drawer,
   .bp-loading__bar {
     animation: none;
   }
 }
 
 @media (min-width: 48rem) {
-  .bp-shell-header__inner {
-    grid-template-columns: auto 1fr auto;
-  }
-
   .bp-shell-menu {
     display: none;
   }
 
   .bp-shell-nav--desktop {
     display: block;
-    justify-self: center;
   }
 
   .bp-feature-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--bp-space-5);
+  }
+}
+
+@media (max-width: 47.9375rem) {
+  .bp-shell-nav--desktop {
+    display: none;
   }
 }
 

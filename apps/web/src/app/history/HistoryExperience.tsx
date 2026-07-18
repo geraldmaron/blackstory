@@ -8,7 +8,7 @@
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FilterBar, Notice } from '@blap/ui';
+import { Notice } from '@blap/ui';
 import {
   DecadeStepper,
   HistoryEdgePanel,
@@ -63,19 +63,6 @@ function mergeViewState(
     return { ...next, edge: patch.edge };
   }
   return next;
-}
-
-function facetFields(view: HistoryViewModel) {
-  return [
-    {
-      id: 'history-kind',
-      name: 'kind',
-      label: 'Kind',
-      type: 'select' as const,
-      defaultValue: view.viewState.filters.kind,
-      options: view.facetOptions.kind,
-    },
-  ];
 }
 
 export function HistoryExperience({ initial }: HistoryExperienceProps) {
@@ -142,6 +129,26 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
     pushViewState(next);
   }, [pushViewState, view.viewState]);
 
+  // Facets apply the moment they change — no filter card, no Apply button
+  // (the page-level <noscript> block keeps a plain GET form for no-JS).
+  const handleKindChange = useCallback(
+    (kind: string) => {
+      // The select's options come from buildHistoryKindFacetOptions, so any
+      // change event value is a real HistoryKindFilter; an unexpected value
+      // degrades to 'all' rather than widening the filter type.
+      const valid = view.facetOptions.kind.some((option) => option.value === kind);
+      const next = mergeViewState(view.viewState, {
+        filters: {
+          ...view.viewState.filters,
+          kind: (valid ? kind : 'all') as HistoryViewModel['viewState']['filters']['kind'],
+        },
+      });
+      setView((current) => ({ ...current, viewState: next }));
+      pushViewState(next);
+    },
+    [pushViewState, view.viewState, view.facetOptions.kind],
+  );
+
   const listProps = {
     nodes: view.nodes,
     labelledBy: 'history-results-heading',
@@ -170,32 +177,26 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
 
       <DecadeStepper decades={view.availableDecades} viewState={view.viewState} />
 
-      <FilterBar
-        method="get"
-        action="/history"
-        legend="Filter history graph records"
-        fields={facetFields(view)}
-        actions={
-          <>
-            {view.viewState.mode === 'decade' && view.viewState.decade ? (
-              <input type="hidden" name="decade" value={view.viewState.decade} />
-            ) : null}
-            {view.viewState.selected ? (
-              <input type="hidden" name="selected" value={view.viewState.selected} />
-            ) : null}
-            {view.viewState.edge ? <input type="hidden" name="edge" value={view.viewState.edge} /> : null}
-            <button type="submit" className="bp-button bp-button--primary">
-              Apply filters
-            </button>
-          </>
-        }
-      />
-
       <div className="bp-history__toolbar">
         <p className="bp-sans" id="history-results-heading">
           {view.totalMatched} record{view.totalMatched === 1 ? '' : 's'} in view
           {view.viewState.mode === 'decade' && view.activeDecade ? ` · ${view.activeDecade}` : ' · all time'}
         </p>
+        <label className="bp-pill-select" htmlFor="history-kind">
+          <span className="bp-pill-select__label">Kind</span>
+          <select
+            className="bp-pill-select__control"
+            id="history-kind"
+            value={view.viewState.filters.kind}
+            onChange={(event) => handleKindChange(event.currentTarget.value)}
+          >
+            {view.facetOptions.kind.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
         <p className="bp-history__release-meta" aria-label="Release metadata">
           Release {view.releaseId}
         </p>

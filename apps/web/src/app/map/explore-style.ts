@@ -217,7 +217,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
       {
         id: 'background',
         type: 'background',
-        paint: { 'background-color': DIGNITY_PALETTE.background },
+        // Ocean/unmapped world sits below the landmass fills — see
+        // DIGNITY_PALETTE.ocean's doc comment.
+        paint: { 'background-color': DIGNITY_PALETTE.ocean },
       },
       {
         id: EXPLORE_STATE_DENSITY_LAYER_ID,
@@ -282,9 +284,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'line',
         source: EXPLORE_STATE_DENSITY_SOURCE_ID,
         paint: {
-          'line-color': DIGNITY_PALETTE.selected,
-          'line-width': 1.25,
-          'line-opacity': 1,
+          // Warm hairlines, not stark paper strokes — state bounds are the
+          // chart's ruling, and the entity stack must always read above them.
+          'line-color': DIGNITY_PALETTE.pointHalo,
+          'line-width': 1,
+          'line-opacity': 0.55,
         },
       },
       {

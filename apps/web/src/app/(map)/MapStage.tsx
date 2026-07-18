@@ -100,8 +100,10 @@ const ARCHIVE_BASE_STYLE: StyleSpecification = {
     {
       id: 'background',
       type: 'background',
-      // Near-black plate: the "rest of the world" stays unmapped, grayed by absence.
-      paint: { 'background-color': '#121212' },
+      // Ocean plate — one step below Black Ink so the warm landmass fills lift
+      // off it (must match DIGNITY_PALETTE.ocean; this literal exists only to
+      // keep the pre-style-load frame from flashing a different shade).
+      paint: { 'background-color': '#080606' },
     },
   ],
 };
@@ -705,8 +707,12 @@ export function MapStageProvider({
           // ExploreMapCanvas's identical comment): a portrait canvas cannot show full CONUS
           // east-west if maxBounds also caps latitude.
           renderWorldCopies: false,
-          minZoom: 2.5,
-          maxZoom: 12,
+          // Zoom envelope: national frame down to county scale, no further.
+          // Street-level camera depth never belongs on the public surface
+          // (dignity rules — precision tiers already redact geometry, and an
+          // empty street grid at z12 read as both invasive and broken).
+          minZoom: 3,
+          maxZoom: 10,
           bounds: bounds as [number, number, number, number],
           fitBoundsOptions: { padding: 32 },
         });

@@ -333,6 +333,9 @@
   min-inline-size: 0;
 }
 
+/* Form labels are Inter sentence case (v5 §6 forms) — mono caps is a DATA
+   register, not chrome. The legend keeps a slug treatment as the one
+   orientation label of the group. */
 .bp-filters__legend {
   padding: 0;
   margin: 0 0 var(--bp-space-3);
@@ -359,12 +362,10 @@
 }
 
 .bp-filters__label {
-  font-family: var(--bp-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--bp-ink-muted);
+  font-family: var(--bp-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--bp-ink);
 }
 
 .bp-filters__control {
@@ -387,24 +388,31 @@
   flex-wrap: wrap;
 }
 
+/* Action vocabulary (design-direction-v5 §5): `.bp-button` (form buttons)
+   and shell.css's `.bp-cta` (links) share ONE recipe — sans caps 0.75rem,
+   0.08em tracking, PILL radius, ≥44px target. Weights: --primary = copper
+   (THE orientation action, max one per view), --secondary = quiet hairline. */
 .bp-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--bp-space-2);
   min-height: 2.75rem;
-  padding: var(--bp-space-2) var(--bp-space-4);
+  padding: 0 var(--bp-space-6);
   border: var(--bp-border-width) solid transparent;
-  border-radius: var(--bp-radius-sm);
+  border-radius: var(--bp-radius-full);
   font-family: var(--bp-font-sans);
-  font-size: 0.9375rem;
+  font-size: 0.75rem;
   font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   line-height: 1.2;
   cursor: pointer;
   transition:
     background-color var(--bp-duration-fast) var(--bp-easing),
     color var(--bp-duration-fast) var(--bp-easing),
-    border-color var(--bp-duration-fast) var(--bp-easing);
+    border-color var(--bp-duration-fast) var(--bp-easing),
+    opacity var(--bp-duration-fast) var(--bp-easing);
 }
 
 .bp-button:disabled {
@@ -412,17 +420,11 @@
   cursor: not-allowed;
 }
 
-/* Copper is the action register (guide p.7 "Black and paper lead. Copper points." — primary
-   actions are named orientation moments). Same recipe as shell.css's .bp-cta--copper: graphic
-   copper plate, ink text in light, near-black inverse ink in dark (raw copper never carries
-   light body text — the accessible-pairs table). */
+/* Copper plate carries dark ink text in BOTH themes (accessible-pairs
+   table: #0A0A0A on #B86B2A — raw copper never carries light body text). */
 .bp-button--primary {
   background: var(--bp-accent-graphic);
-  color: var(--bp-ink);
-}
-
-[data-theme='dark'] .bp-button--primary {
-  color: var(--bp-inverse-ink);
+  color: var(--bp-fixed-ink);
 }
 
 .bp-button--primary:hover:not(:disabled) {
@@ -569,20 +571,32 @@
   font-family: var(--bp-font-sans);
 }
 
+/* Icon-only theme toggle (v5 §5 chrome): 44px square, glyph + accessible
+   name — never a labeled pill. */
 .bp-theme-toggle {
   display: inline-flex;
   align-items: center;
-  gap: var(--bp-space-2);
+  justify-content: center;
   min-height: 2.75rem;
-  padding: var(--bp-space-2) var(--bp-space-3);
-  border: var(--bp-border-width) solid var(--bp-border-strong);
+  min-width: 2.75rem;
+  padding: 0;
+  border: var(--bp-border-width) solid var(--bp-rule);
   border-radius: var(--bp-radius-sm);
-  background: var(--bp-surface-raised);
+  background: transparent;
   color: var(--bp-ink);
-  font-family: var(--bp-font-sans);
-  font-size: 0.875rem;
-  font-weight: 600;
   cursor: pointer;
+  transition:
+    border-color var(--bp-duration-fast) var(--bp-easing),
+    background-color var(--bp-duration-fast) var(--bp-easing);
+}
+
+.bp-theme-toggle:hover {
+  border-color: var(--bp-border-strong);
+}
+
+.bp-theme-toggle svg {
+  width: var(--bp-icon-md);
+  height: var(--bp-icon-md);
 }
 
 .bp-gallery-section {

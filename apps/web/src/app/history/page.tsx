@@ -38,13 +38,15 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
 
   return (
     <main className="bp-container bp-page" id="main">
-      <header className="bp-entity-mast bp-history__intro">
+      <header className="bp-history__intro">
         <p className="bp-page__eyebrow">Temporal browse</p>
-        <h1 className="bp-page__title">History through time</h1>
+        <h1 className="bp-page__title">
+          Decade by <em>decade</em>.
+        </h1>
         <p className="bp-page__lede">
-          An all-time view of the published history graph plus decade-by-decade slices — what was
-          active, in force, or living in each era, derived from status history and release artifacts,
-          never present-day status backfilled.
+          Walk the published history graph through time — what was active, in force, or living in
+          each era, derived from status history and release artifacts, never present-day status
+          backfilled.
         </p>
         <p className="bp-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
         <p className="bp-history__framing">{HISTORY_DECADE_FRAMING}</p>

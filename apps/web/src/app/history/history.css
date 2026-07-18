@@ -20,39 +20,54 @@
   margin: 0;
 }
 
+/* The decade rail — the hero's timeline instrument, restated as document
+   chrome: one continuous baseline, mono decade stops riding it, copper
+   underline burn on the active stop. Scrolls horizontally on narrow
+   viewports instead of wrapping into a button pile. */
 .bp-history-stepper__list {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--bp-space-2);
+  gap: 0;
   list-style: none;
   margin: 0;
   padding: 0;
+  overflow-x: auto;
+  border-bottom: var(--bp-border-width) solid var(--bp-rule);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.bp-history-stepper__list::-webkit-scrollbar {
+  display: none;
 }
 
 .bp-history-stepper__tab {
+  position: relative;
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
-  padding: var(--bp-space-1) var(--bp-space-3);
-  border: var(--bp-border-width) solid var(--bp-border);
-  border-radius: var(--bp-radius-pill);
-  background: var(--bp-canvas);
-  color: var(--bp-ink);
+  margin-bottom: calc(-1 * var(--bp-border-width));
+  padding: 0 var(--bp-space-3);
+  border-bottom: 3px solid transparent;
+  color: var(--bp-ink-muted);
   font-family: var(--bp-font-mono);
   font-size: 0.8125rem;
   text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color var(--bp-duration-fast) var(--bp-easing),
+    border-color var(--bp-duration-fast) var(--bp-easing);
 }
 
-.bp-history-stepper__tab:hover,
-.bp-history-stepper__tab:focus-visible {
-  border-color: var(--bp-accent);
-  outline: none;
+.bp-history-stepper__tab:hover {
+  color: var(--bp-ink);
+  border-bottom-color: var(--bp-border-strong);
 }
 
 .bp-history-stepper__tab--active {
-  background: var(--bp-accent-subtle);
-  border-color: var(--bp-accent);
-  color: var(--bp-accent-ink);
+  color: var(--bp-accent);
+  font-weight: 500;
+  border-bottom-color: var(--bp-accent-graphic);
 }
 
 .bp-history__toolbar {
@@ -120,10 +135,8 @@
   cursor: pointer;
 }
 
-.bp-history-graph__node-button:hover,
-.bp-history-graph__node-button:focus-visible {
+.bp-history-graph__node-button:hover {
   border-color: var(--bp-accent);
-  outline: none;
 }
 
 .bp-history-graph__node-button--selected {
@@ -147,7 +160,7 @@
 .bp-history-graph__connections {
   margin-top: var(--bp-space-2);
   padding: var(--bp-space-2) var(--bp-space-3);
-  border-left: var(--bp-border-width-strong) solid var(--bp-accent-subtle);
+  border-left: var(--bp-border-width-strong) solid var(--bp-accent-muted);
 }
 
 .bp-history-graph__connections ul {
@@ -196,11 +209,14 @@
   font-family: var(--bp-font-sans);
 }
 
+/* Fact labels are data slugs — mono register (v5 typography law). */
 .bp-history-narrative-card__facts dt {
-  font-weight: 700;
-  font-size: 0.75rem;
+  font-family: var(--bp-font-mono);
+  font-weight: 500;
+  font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  color: var(--bp-ink-muted);
 }
 
 .bp-history-narrative-card__facts dd {
@@ -210,6 +226,13 @@
 .bp-history-result-list__facts {
   margin-top: var(--bp-space-2);
   font-size: 0.875rem;
+}
+
+.bp-history-result-list__fact-link {
+  color: var(--bp-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
 }
 
 .bp-history-edge-panel__timespan {

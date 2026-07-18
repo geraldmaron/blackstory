@@ -73,6 +73,25 @@ function buildEdgeSlice(
   };
 }
 
+/** All-time + per-decade edge/line catalog over the history graph release —
+ * shared by the explore view model and the home hero's decades-in-motion flow. */
+export function buildEdgeLineCatalog(): {
+  readonly edgeLineCatalog: ExploreEdgeLineCatalog;
+  readonly availableDecades: readonly string[];
+} {
+  const artifact = getHistoryGraphReleaseArtifact();
+  const historyContext = buildHistoryGraphContext(artifact);
+  const allTime = buildEdgeSlice(artifact, historyContext.entitiesById, 'all-time');
+  const byDecade: Record<string, ExploreEdgeLineSlice> = {};
+  for (const decade of historyContext.availableDecades) {
+    byDecade[decade] = buildEdgeSlice(artifact, historyContext.entitiesById, 'decade', decade);
+  }
+  return {
+    edgeLineCatalog: { allTime, byDecade },
+    availableDecades: historyContext.availableDecades,
+  };
+}
+
 export function buildExploreViewModel(
   raw: RawExploreSearchParams,
   entities: readonly PublicEntityView[] = listPublicEntities(),
@@ -84,14 +103,7 @@ export function buildExploreViewModel(
   const filteredFeatures = applyExploreFilters(allFeatures, viewState.filters, viewState.state);
   const densityLevels = buildStateDensityLevels(source.stateAggregates);
 
-  const artifact = getHistoryGraphReleaseArtifact();
-  const historyContext = buildHistoryGraphContext(artifact);
-  const allTime = buildEdgeSlice(artifact, historyContext.entitiesById, 'all-time');
-  const byDecade: Record<string, ExploreEdgeLineSlice> = {};
-  for (const decade of historyContext.availableDecades) {
-    byDecade[decade] = buildEdgeSlice(artifact, historyContext.entitiesById, 'decade', decade);
-  }
-  const edgeLineCatalog = { allTime, byDecade };
+  const { edgeLineCatalog, availableDecades } = buildEdgeLineCatalog();
   const active = pickExploreEdgeSlice(edgeLineCatalog, viewState);
   const selectedEdge = viewState.edge
     ? active.edges.find((edge) => edge.edgeId === viewState.edge)
@@ -106,7 +118,7 @@ export function buildExploreViewModel(
     facetOptions: buildExploreFacetOptions(allFeatures),
     totalMatched: filteredFeatures.length,
     dataSource,
-    availableDecades: historyContext.availableDecades,
+    availableDecades,
     edgeLineCatalog,
     historyEdges: active.edges,
     edgeLineCollection: active.lineCollection,

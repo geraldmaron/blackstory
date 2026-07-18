@@ -1,0 +1,140 @@
+{
+  "summary": "Rebuilt package with actual alpha transparency on lockup and symbol PNGs. No other design elements changed.",
+  "transparent_assets": [
+    {
+      "file": "logos/light/blap-primary-lockup-light-transparent.tmp.png",
+      "size": [
+        2172,
+        724
+      ],
+      "alpha_bbox": [
+        467,
+        135,
+        1718,
+        597
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "file": "logos/dark/blap-primary-lockup-dark-transparent.tmp.png",
+      "size": [
+        2172,
+        724
+      ],
+      "alpha_bbox": [
+        330,
+        95,
+        1842,
+        650
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "file": "symbols/light/blap-book-pin-symbol-light-transparent.tmp.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "alpha_bbox": [
+        408,
+        180,
+        887,
+        1003
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "file": "symbols/dark/blap-book-pin-symbol-dark-transparent.tmp.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "alpha_bbox": [
+        444,
+        207,
+        888,
+        1012
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "alpha_checks": [
+    {
+      "file": "logos/light/blap-primary-lockup-light-transparent.png",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "bbox": [
+        467,
+        135,
+        1718,
+        597
+      ]
+    },
+    {
+      "file": "logos/dark/blap-primary-lockup-dark-transparent.png",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "bbox": [
+        330,
+        95,
+        1842,
+        650
+      ]
+    },
+    {
+      "file": "symbols/light/blap-book-pin-symbol-light-transparent.png",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "bbox": [
+        408,
+        180,
+        887,
+        1003
+      ]
+    },
+    {
+      "file": "symbols/dark/blap-book-pin-symbol-dark-transparent.png",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "bbox": [
+        444,
+        207,
+        888,
+        1012
+      ]
+    }
+  ],
+  "notes": [
+    "Light and dark lockups now have true transparent backgrounds.",
+    "Light and dark symbol-only assets now have true transparent backgrounds.",
+    "App icons and guide pages intentionally retain their backgrounds."
+  ]
+}

@@ -50,18 +50,17 @@ export const metadata: Metadata = {
   description:
     'Place-connected Black history research with published claims, provenance, and confidence.',
   icons: {
+    /* New brand/ kit ships app-icon PNGs only; browsers downscale. Proper
+       favicon size renders from the kit are a follow-up asset task. */
     icon: [
-      { url: '/brand/favicon.svg', type: 'image/svg+xml' },
-      { url: '/brand/favicon-light-32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/brand/favicon-light-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/brand/blap-app-icon-light.png', type: 'image/png' },
       {
-        url: '/brand/favicon-dark-32.png',
-        sizes: '32x32',
+        url: '/brand/blap-app-icon-dark.png',
         type: 'image/png',
         media: '(prefers-color-scheme: dark)',
       },
     ],
-    apple: [{ url: '/brand/apple-touch-icon-light-180.png', sizes: '180x180' }],
+    apple: [{ url: '/brand/blap-app-icon-light.png' }],
   },
   openGraph: {
     siteName: 'Blap',
