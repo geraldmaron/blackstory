@@ -211,6 +211,14 @@
         "citationSource": "loc.gov",
         "citationHref": "https://www.loc.gov/free-to-use/african-american-heritage/",
         "citationLabel": "Library of Congress: African American Heritage | Library of Congress Free to Use and ..."
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress documents First African Baptist Church in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://blogs.loc.gov/loc/2019/02/african-american-history-month-the-struggle-for-civil-rights-past-present-and-future/",
+        "citationLabel": "Library of Congress: African-American History Month: The Struggle for Civil Rights Past ..."
       }
     ],
     "historicalContext": "Savannah's early Black Baptist congregations organized under slavery and built institutions — schools, missionary networks, and later a church-housed credit union — that outlasted it.",

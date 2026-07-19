@@ -78,6 +78,13 @@ Add `--commit` only after the owner reviews JSON. That writes quarantine
 `editorial_packet` proposals (and may open draft research cases for keep/needs_evidence).
 There is no `--publish` / `--promote`.
 
+**Catalog dedupe (required before new fixtures):** run
+`packages/firebase/scripts/classify-corsair-keeps-against-catalog.ts` against
+enrichment keep JSON. `existing_match` → enrich that `entityId` (more claims/sources)
+or mine related entities from its story — never recreate. `non_entity` → exclude
+lists/indexes/guides. Only `new_candidate` after human validation may become fixtures
++ `publish-national-catalog.ts`.
+
 ## Prose links
 
 Summaries should use `[[ent_id|Display Name]]` so the web `LinkedProse` component renders

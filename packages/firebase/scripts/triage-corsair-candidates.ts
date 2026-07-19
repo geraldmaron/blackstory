@@ -1,6 +1,9 @@
 /**
  * Corsair candidate triage: inventory researchCases (state=candidate), bucket by URL/title
  * signal, apply admin transitions, write enrichment subject files under .cache/corsair-triage.
+ *
+ * After enrichment keeps land, run classify-corsair-keeps-against-catalog.ts so existing
+ * catalog entities are enriched (not recreated) and lists/indexes are excluded.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
