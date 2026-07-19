@@ -174,3 +174,15 @@ export {
   type DiscoveryCampaignWebSearchJobInput,
   type DiscoveryCampaignWebSearchJobResult,
 } from './jobs/discovery-campaign-web-search.js';
+
+export {
+  DISCOVERY_DISPATCHER_VERSION,
+  DISCOVERY_CAMPAIGN_JOB_IDS,
+  dispatchDiscoveryCampaign,
+  disengagedResearchCampaignsSnapshot,
+  type DiscoveryCampaignJobId,
+  type DiscoveryCampaignDispatchMode,
+  type DiscoveryCampaignDispatchStatus,
+  type DiscoveryCampaignDispatchResult,
+  type DispatchDiscoveryCampaignInput,
+} from './discovery-dispatcher.js';

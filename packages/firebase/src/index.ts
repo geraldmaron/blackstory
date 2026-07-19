@@ -1,6 +1,6 @@
 
 /**
- * Firebase client and Admin helpers shared across Black Book surfaces.
+ * Firebase client and Admin helpers shared across BlackStory surfaces.
  * Production project:. Local defaults: demo-repo emulators.
  */
 export {
@@ -145,6 +145,7 @@ export {
   idempotencyRecordSchema,
   outboxConsumerReceiptSchema,
   killSwitchSchema,
+  discoveryCampaignRunSchema,
   parseWithSchema,
   policyActiveConverter,
   policyVersionConverter,
@@ -182,6 +183,7 @@ export {
   idempotencyRecordConverter,
   outboxConsumerReceiptConverter,
   killSwitchConverter,
+  discoveryCampaignRunConverter,
   createAdminAtomicStore,
   commitWithAudit,
   consumeOutboxMessage,
@@ -201,6 +203,26 @@ export {
   executeAuthorizedResearchCaseTransition,
   executeAuthorizedResearchCaseAction,
 } from './firestore/index.js';
+export {
+  DISCOVERY_CAMPAIGN_RUN_STATUSES,
+  DISCOVERY_CAMPAIGN_RUN_MODES,
+  RESEARCH_CAMPAIGNS_KILL_SWITCH_ID,
+  buildDiscoveryCampaignRunDoc,
+  assertDiscoveryRunCannotPublish,
+  createInMemoryDiscoveryCampaignRunStore,
+  isKillSwitchEngagedFromDoc,
+  isResearchCampaignsKillSwitchEngaged,
+  fetchResearchCampaignsKillSwitch,
+  isResearchCampaignsKillSwitchEngagedIn,
+} from './discovery/index.js';
+export type {
+  DiscoveryCampaignRunStatus,
+  DiscoveryCampaignRunMode,
+  BuildDiscoveryCampaignRunInput,
+  DiscoveryCampaignRunStore,
+  KillSwitchDocSnapshot,
+  DocGetter,
+} from './discovery/index.js';
 export {
   EMBEDDING_MODEL,
   EMBEDDING_DIMS,
@@ -239,6 +261,11 @@ export {
   runBackfill,
   createFirestoreCanonicalEntitySource,
   createFirestoreExistingHashLookup,
+  createFirestorePublicSearchIndexEntitySource,
+  createNationalCatalogFixtureEntitySource,
+  mapSearchIndexRecordToEmbeddingInput,
+  mapCatalogFixtureRecordToEmbeddingInput,
+  parseStateCodeFromJurisdiction,
 } from './embeddings/index.js';
 export type {
   EmbeddingVector,
@@ -261,9 +288,12 @@ export type {
   VectorIndexStore,
   BackfillOptions,
   BackfillSummary,
+  BackfillEntitySourceName,
   CanonicalEntitySource,
   CanonicalEntitySourcePage,
   ExistingEmbeddingHashLookup,
+  SearchIndexEmbeddingRecord,
+  CatalogFixtureEmbeddingRecord,
 } from './embeddings/index.js';
 export type {
   FirestoreRootCollection,
@@ -314,6 +344,7 @@ export type {
   IdempotencyRecordDoc,
   OutboxConsumerReceiptDoc,
   KillSwitchDoc,
+  DiscoveryCampaignRunDoc,
   AtomicSnapshot,
   AtomicTransaction,
   AtomicStore,

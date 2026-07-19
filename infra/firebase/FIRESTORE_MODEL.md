@@ -37,6 +37,7 @@
 | `idempotencyKeys` | State-change replay guard (BB-018) | No | No |
 | `outboxConsumerReceipts` | Per-consumer effect deduplication (BB-018) | No | No |
 | `killSwitches` | Ops kill switches (including `source-adapter-{adapterId}`) | `admin` | No |
+| `discoveryCampaignRuns` | Private audit trail for scheduled discovery campaign dispatches (`publicEffect: none`) | No | No |
 
 ## Entity kinds (BB-014)
 

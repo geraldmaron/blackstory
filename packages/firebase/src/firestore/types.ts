@@ -1,6 +1,6 @@
 
 /**
- * Firestore document schemas for Black Book (ADR-011 018).
+ * Firestore document schemas for BlackStory (ADR-011 018).
  * Entity/geography, provenance, claims/confidence.
  * Shapes align with @repo/domain; Cloud SQL PostGIS are not the production path.
  */
@@ -1390,6 +1390,28 @@ export const killSwitchSchema = z.object({
 });
 
 export type KillSwitchDoc = z.infer<typeof killSwitchSchema>;
+
+/** Private audit trail for scheduled discovery campaign dispatches (publicEffect always none). */
+export const discoveryCampaignRunSchema = z.object({
+  id: z.string().min(1),
+  jobId: z.string().min(1),
+  jobRunId: z.string().min(1),
+  status: z.enum(['success', 'skipped_kill_switch', 'error']),
+  startedAt: z.string().datetime(),
+  completedAt: z.string().datetime(),
+  mode: z.enum(['fixture', 'live']),
+  itemsExpected: z.number().int().nonnegative(),
+  itemsProcessed: z.number().int().nonnegative(),
+  survivors: z.number().int().nonnegative().optional(),
+  accepted: z.number().int().nonnegative().optional(),
+  kind: z.string().min(1).optional(),
+  publicEffect: z.literal('none'),
+  errorMessage: z.string().optional(),
+  killSwitchId: z.literal('research-campaigns'),
+  createdAt: z.string().datetime(),
+});
+
+export type DiscoveryCampaignRunDoc = z.infer<typeof discoveryCampaignRunSchema>;
 
 // ---------------------------------------------------------------------------
 // Data Pack v1 collections (the related workstream) — skeletal stubs backing

@@ -1,6 +1,6 @@
 
 /**
- * Firestore model surface for Black Book (ADR-011 019).
+ * Firestore model surface for BlackStory (ADR-011 019).
  */
 export { FIRESTORE_ROOT, firestorePaths } from './paths.js';
 export type { FirestoreRootCollection } from './paths.js';
@@ -67,6 +67,7 @@ export {
   idempotencyRecordSchema,
   outboxConsumerReceiptSchema,
   killSwitchSchema,
+  discoveryCampaignRunSchema,
 } from './types.js';
 export type {
   AuthClaimFlags,
@@ -116,6 +117,7 @@ export type {
   IdempotencyRecordDoc,
   OutboxConsumerReceiptDoc,
   KillSwitchDoc,
+  DiscoveryCampaignRunDoc,
 } from './types.js';
 
 export {
@@ -147,6 +149,7 @@ export {
   idempotencyRecordConverter,
   outboxConsumerReceiptConverter,
   killSwitchConverter,
+  discoveryCampaignRunConverter,
 } from './converters.js';
 
 export {

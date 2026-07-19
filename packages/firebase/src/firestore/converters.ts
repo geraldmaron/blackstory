@@ -1,6 +1,6 @@
 
 /**
- * Zod-backed Firestore converters and parse helpers for Black Book documents.
+ * Zod-backed Firestore converters and parse helpers for BlackStory documents.
  */
 import type { FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase/firestore';
 import type { z } from 'zod';
@@ -22,6 +22,7 @@ import {
   evidenceRecordSchema,
   evidenceSourceSchema,
   idempotencyRecordSchema,
+  discoveryCampaignRunSchema,
   killSwitchSchema,
   outboxConsumerReceiptSchema,
   outboxMessageSchema,
@@ -48,6 +49,7 @@ import {
   type EvidenceRecordDoc,
   type EvidenceSourceDoc,
   type IdempotencyRecordDoc,
+  type DiscoveryCampaignRunDoc,
   type KillSwitchDoc,
   type OutboxConsumerReceiptDoc,
   type OutboxMessageDoc,
@@ -179,6 +181,7 @@ export const outboxMessageConverter = createConverter(outboxMessageSchema);
 export const idempotencyRecordConverter = createConverter(idempotencyRecordSchema);
 export const outboxConsumerReceiptConverter = createConverter(outboxConsumerReceiptSchema);
 export const killSwitchConverter = createConverter(killSwitchSchema);
+export const discoveryCampaignRunConverter = createConverter(discoveryCampaignRunSchema);
 
 export type {
   AuditEventDoc,
@@ -193,6 +196,7 @@ export type {
   EvidenceRecordDoc,
   EvidenceSourceDoc,
   IdempotencyRecordDoc,
+  DiscoveryCampaignRunDoc,
   KillSwitchDoc,
   OutboxConsumerReceiptDoc,
   OutboxMessageDoc,

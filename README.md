@@ -156,6 +156,28 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts comm
 # Generic RSS discovery dry-run (excludes curated ABS by default; use --include-curated to opt in)
 node --conditions development --import tsx packages/operator-cli/src/bin.ts rss-campaign-run \
   --feed-xml feed_historical_society=packages/domain/src/adapters/rss/fixtures/historical-society-feed.rss.xml
+
+# Discovery automation dispatcher (fixture; GHA workflow_dispatch also available)
+node --conditions development --import tsx packages/operator-cli/src/bin.ts discovery-dispatch \
+  --job discovery-campaign-wikimedia-federal --mode fixture
+# See docs/runbooks/discovery-campaign-automation.md
+
+# Editorial enrichment (LLM stage-only; --provider mock|openrouter|ollama; --catalog-from=firestore)
+# OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
+#   packages/operator-cli/src/bin.ts editorial-run --subjects /tmp/subjects.json \
+#   --catalog-from=firestore --provider mock \
+#   --operator-id "$USER" --session-id "sess-$(date +%s)" --identity-source cursor_session
+# Embedding backfill (needs GEMINI_API_KEY): packages/firebase/src/embeddings/backfill-cli.ts \
+#   --source=publicSearchIndex --max-items 600 --max-cost-usd 1
+
+# Story research (citation-gated /stories drafts; staging only — human approve before seed)
+# See .claude/skills/black-book/story-craft/SKILL.md
+# Review UI: apps/admin → http://localhost:3001/login then /stories/review
+# (Firebase Google auth; allowlist geraldmarondagher@gmail.com only)
+# OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
+#   packages/operator-cli/src/bin.ts story-research-run --topics /tmp/story-topics.json \
+#   --provider mock \
+#   --operator-id "$USER" --session-id "sess-$(date +%s)" --identity-source cursor_session
 ```
 
 ## Product constitution (policy)

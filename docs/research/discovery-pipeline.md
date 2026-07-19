@@ -59,6 +59,7 @@ Every campaign run:
 | Low-authority sources yield authority follow-ups | `harvestAuthorityFollowUpsForCandidate` + RSS `outboundLinkHints` |
 | Curated community feeds with extra care | `curated-feeds.ts` / `seedCuratedCommunityFeeds` (ABS seed) |
 | Catalog-relative obscurity highlighting | `scoreObscurity` (`obscurity.v1`) + `OBSCURITY_METHODOLOGY_DISCLAIMER` |
+| Automation (fixture + injected live) | `dispatchDiscoveryCampaign` + GHA `discovery-campaigns.yml` + `docs/runbooks/discovery-campaign-automation.md` |
 
 ## Catalog blocking and authority harvest
 

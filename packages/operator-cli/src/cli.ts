@@ -29,6 +29,7 @@ import {
   runCommunityObscurityOperatorCampaign,
 } from './community-obscurity-run.js';
 import { runRssOperatorCampaign } from './rss-campaign-run.js';
+import { dispatchDiscoveryCampaign } from '../../config/src/scheduled-jobs/discovery-dispatcher.js';
 import { prepareEdgeIntake, type EdgeIntakeInput } from './edge-intake.js';
 import { createNodeSafeFetchDependencies } from './fetch.js';
 import { OPERATOR_SOURCES, type OperatorIdentity, type OperatorSource } from './identity.js';
@@ -446,6 +447,32 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         stdout(JSON.stringify(full ? { summary, result } : summary, null, 2));
         return 0;
       }
+      case 'discovery-dispatch': {
+        const jobId = requireFlag(flags, '--job');
+        const modeRaw = optionalFlag(flags, '--mode') ?? 'fixture';
+        if (modeRaw !== 'fixture' && modeRaw !== 'live') {
+          throw new Error('--mode must be fixture or live');
+        }
+        const killRaw = optionalFlag(flags, '--kill-switch') ?? 'disengaged';
+        if (killRaw !== 'engaged' && killRaw !== 'disengaged') {
+          throw new Error('--kill-switch must be engaged or disengaged');
+        }
+        const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
+        const jobRunId = optionalFlag(flags, '--run-id');
+        const maxCandidatesRaw = optionalFlag(flags, '--max-candidates');
+        const result = await dispatchDiscoveryCampaign({
+          jobId,
+          mode: modeRaw,
+          killSwitchEngaged: killRaw === 'engaged',
+          nowIso,
+          ...(jobRunId !== undefined ? { jobRunId } : {}),
+          ...(maxCandidatesRaw !== undefined
+            ? { maxCandidates: Number(maxCandidatesRaw) }
+            : {}),
+        });
+        stdout(JSON.stringify(result, null, 2));
+        return result.status === 'success' ? 0 : 1;
+      }
       case 'locate': {
         const storedLat = optionalFlag(flags, '--stored-lat');
         const storedLng = optionalFlag(flags, '--stored-lng');
@@ -501,7 +528,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       }
       default: {
         stderr(
-          'Usage: operator-cli <submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|locate> [flags]',
+          'Usage: operator-cli <submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|locate> [flags]',
         );
         return command ? 1 : 0;
       }

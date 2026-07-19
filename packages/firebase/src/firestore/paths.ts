@@ -1,6 +1,6 @@
 
 /**
- * Firestore collection path constants for Black Book (ADR-011 018).
+ * Firestore collection path constants for BlackStory (ADR-011 018).
  * Paths always use even segment counts (collection/doc[/collection/doc...]).
  */
 export const FIRESTORE_ROOT = {
@@ -30,6 +30,8 @@ export const FIRESTORE_ROOT = {
   idempotencyKeys: 'idempotencyKeys',
   outboxConsumerReceipts: 'outboxConsumerReceipts',
   killSwitches: 'killSwitches',
+  /** Private run records for scheduled discovery campaign jobs. */
+  discoveryCampaignRuns: 'discoveryCampaignRuns',
   /** Jurisdiction reference data: states + counties wholesale, cities on-demand. */
   jurisdictions: 'jurisdictions',
   /** Published census statistics: one doc per county per decennial vintage (the related workstream). */
@@ -86,6 +88,8 @@ export const firestorePaths = {
   outboxConsumerReceipt: (receiptId: string) =>
     `${FIRESTORE_ROOT.outboxConsumerReceipts}/${receiptId}`,
   killSwitch: (switchId: string) => `${FIRESTORE_ROOT.killSwitches}/${switchId}`,
+  discoveryCampaignRun: (runId: string) =>
+    `${FIRESTORE_ROOT.discoveryCampaignRuns}/${runId}`,
   /** Convention: source adapter kill switches use this id pattern. */
   sourceAdapterKillSwitch: (adapterId: string) =>
     `${FIRESTORE_ROOT.killSwitches}/source-adapter-${adapterId}`,

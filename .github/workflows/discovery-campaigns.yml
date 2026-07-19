@@ -1,0 +1,81 @@
+# Discovery campaigns — manual dispatch and a safe weekly fixture schedule.
+#
+# Manual runs use workflow_dispatch to exercise any discovery roster job in fixture or live
+# mode. The weekly schedule runs community-obscurity-discovery in fixture mode only (no live
+# network required). Production live cadences remain on GCP Cloud Scheduler → Cloud Run Job;
+# see workers/research-node/README.md.
+
+name: Discovery campaigns
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: Scheduled discovery job id from the roster
+        required: true
+        type: choice
+        options:
+          - discovery-campaign-rss
+          - discovery-campaign-wikimedia-federal
+          - discovery-campaign-archive-dpla
+          - discovery-campaign-web-search
+          - community-obscurity-discovery
+      mode:
+        description: Fixture uses checked-in payloads; live may reach external sources
+        required: true
+        type: choice
+        default: fixture
+        options:
+          - fixture
+          - live
+  schedule:
+    # Safe weekly smoke: community obscurity fixture only (Sundays 10:15 UTC).
+    - cron: '15 10 * * 0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: discovery-campaigns-${{ github.workflow }}-${{ github.event_name == 'schedule' && 'community-obscurity-discovery' || inputs.job_id }}-${{ github.event_name == 'schedule' && 'fixture' || inputs.mode }}
+  cancel-in-progress: true
+
+jobs:
+  dispatch:
+    name: Dispatch discovery campaign
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DISCOVERY_JOB_ID: ${{ github.event_name == 'schedule' && 'community-obscurity-discovery' || inputs.job_id }}
+      DISCOVERY_MODE: ${{ github.event_name == 'schedule' && 'fixture' || inputs.mode }}
+      DISCOVERY_KILL_SWITCH: disengaged
+      NODE_ENV: test
+      LOG_LEVEL: info
+      FIREBASE_PROJECT_ID: demo-repo
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Dispatch discovery campaign
+        run: |
+          set -euo pipefail
+          JOB_ID="${DISCOVERY_JOB_ID}"
+          MODE="${DISCOVERY_MODE}"
+          if grep -q "discovery-dispatch" packages/operator-cli/src/cli.ts; then
+            node --conditions development --import tsx packages/operator-cli/src/bin.ts discovery-dispatch --job "$JOB_ID" --mode "$MODE"
+          else
+            node --conditions development --import tsx packages/config/src/scheduled-jobs/discovery-dispatcher-cli.ts --job "$JOB_ID" --mode "$MODE"
+          fi
