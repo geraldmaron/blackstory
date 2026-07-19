@@ -12,7 +12,7 @@
     "build": "node scripts/build.mjs",
     "start": "node --conditions development --import tsx src/local-invoke.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/mode.test.ts src/timeout.test.ts src/kill-switch-env.test.ts",
+    "test": "node --conditions development --import tsx --test src/mode.test.ts src/timeout.test.ts src/kill-switch-env.test.ts src/run-discovery.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

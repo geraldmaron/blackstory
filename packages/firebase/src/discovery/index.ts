@@ -23,3 +23,18 @@ export {
   isResearchCampaignsKillSwitchEngagedIn,
 } from './kill-switch.js';
 export type { KillSwitchDocSnapshot, DocGetter } from './kill-switch.js';
+
+export {
+  DISCOVERY_CATALOG_PROFILE_DEFAULT_MAX,
+  resolutionProfileFromCatalogLeaf,
+  resolutionProfileFromPublicSearchIndex,
+  publicSearchIndexDocFromRow,
+  loadDiscoveryCatalogProfiles,
+  createPublicSearchIndexCatalogPager,
+  createFirestorePublicSearchIndexCatalogPager,
+} from './catalog-profiles.js';
+export type {
+  DiscoveryCatalogLeaf,
+  DiscoveryCatalogPage,
+  DiscoveryCatalogPager,
+} from './catalog-profiles.js';

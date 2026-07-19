@@ -10,6 +10,7 @@ import {
   WEB_SEARCH_MAX_REQUESTS_PER_RUN,
   type WebSearchCampaignResult,
   type WebSearchProviderConfig,
+  type ResolutionProfile,
 } from '@repo/domain';
 import { completeJobRun, startJobRun, type JobRunRecord } from '../run-record.js';
 
@@ -25,6 +26,7 @@ export type DiscoveryCampaignWebSearchJobInput = {
   readonly maxQueries?: number;
   readonly maxCandidates?: number;
   readonly requireWaybackCapture?: boolean;
+  readonly catalogProfiles?: readonly ResolutionProfile[];
 };
 
 export type DiscoveryCampaignWebSearchJobResult = {
@@ -54,6 +56,7 @@ export async function runDiscoveryCampaignWebSearchJob(
     ...(input.requireWaybackCapture !== undefined
       ? { requireWaybackCapture: input.requireWaybackCapture }
       : {}),
+    ...(input.catalogProfiles !== undefined ? { catalogProfiles: input.catalogProfiles } : {}),
   });
 
   const run = completeJobRun(started, {

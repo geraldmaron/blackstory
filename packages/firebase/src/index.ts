@@ -214,6 +214,13 @@ export {
   isResearchCampaignsKillSwitchEngaged,
   fetchResearchCampaignsKillSwitch,
   isResearchCampaignsKillSwitchEngagedIn,
+  DISCOVERY_CATALOG_PROFILE_DEFAULT_MAX,
+  resolutionProfileFromCatalogLeaf,
+  resolutionProfileFromPublicSearchIndex,
+  publicSearchIndexDocFromRow,
+  loadDiscoveryCatalogProfiles,
+  createPublicSearchIndexCatalogPager,
+  createFirestorePublicSearchIndexCatalogPager,
 } from './discovery/index.js';
 export type {
   DiscoveryCampaignRunStatus,
@@ -222,6 +229,9 @@ export type {
   DiscoveryCampaignRunStore,
   KillSwitchDocSnapshot,
   DocGetter,
+  DiscoveryCatalogLeaf,
+  DiscoveryCatalogPage,
+  DiscoveryCatalogPager,
 } from './discovery/index.js';
 export {
   EMBEDDING_MODEL,

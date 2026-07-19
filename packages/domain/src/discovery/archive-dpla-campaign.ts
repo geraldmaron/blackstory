@@ -41,6 +41,7 @@ import {
 } from './campaign-runner.js';
 import { runDiscoveryCampaign, type RunDiscoveryCampaignInput } from './pipeline.js';
 import type { DiscoveryCampaignResult } from './types.js';
+import type { ResolutionProfile } from '../resolution/types.js';
 
 export const ARCHIVE_DPLA_CAMPAIGN_KIND = 'archive-dpla-discovery.v1' as const;
 
@@ -95,6 +96,8 @@ export type RunArchiveDplaCampaignInput = {
   readonly sourceRegistry?: SourceRegistryStore;
   readonly editorialHook?: CampaignEditorialHook;
   readonly operatorActor?: AuditActor;
+  /** Optional catalog profiles for soft propose/review match (never hard-exclude). */
+  readonly catalogProfiles?: readonly ResolutionProfile[];
 };
 
 function defaultArchiveDplaPack(createdAt: string): QueryPack {
@@ -285,6 +288,9 @@ export async function runArchiveDplaCampaign(
     },
     stampedAt: input.stampedAt,
     completedAt: input.completedAt,
+    ...(input.catalogProfiles !== undefined
+      ? { catalog: { profiles: input.catalogProfiles } }
+      : {}),
   };
 
   const campaign = runDiscoveryCampaign(campaignInput);

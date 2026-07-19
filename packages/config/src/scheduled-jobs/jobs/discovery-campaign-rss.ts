@@ -9,6 +9,7 @@
 import {
   runRssDiscoveryCampaign,
   type RssDiscoveryCampaignResult,
+  type ResolutionProfile,
 } from '@repo/domain';
 import { completeJobRun, startJobRun, type JobRunRecord } from '../run-record.js';
 
@@ -23,6 +24,8 @@ export type RssDiscoveryCampaignJobInput = {
   readonly maxCandidates?: number;
   /** Opt-in to include curated community feeds (ABS). Default excludes them. */
   readonly includeCuratedCommunityFeeds?: boolean;
+  /** Soft propose/review catalog match — never hard-excludes known entities. */
+  readonly catalogProfiles?: readonly ResolutionProfile[];
 };
 
 export type RssDiscoveryCampaignJobResult = {
@@ -48,6 +51,7 @@ export async function runRssDiscoveryCampaignJob(
     ...(input.includeCuratedCommunityFeeds === true
       ? { excludeCuratedCommunityFeeds: false }
       : {}),
+    ...(input.catalogProfiles !== undefined ? { catalogProfiles: input.catalogProfiles } : {}),
   });
   const run = completeJobRun(started, {
     completedAt: input.completedAt,

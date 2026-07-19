@@ -8,6 +8,7 @@
 import {
   runWikimediaFederalCampaign,
   type WikimediaFederalCampaignResult,
+  type ResolutionProfile,
 } from '@repo/domain';
 import { completeJobRun, startJobRun, type JobRunRecord } from '../run-record.js';
 
@@ -19,6 +20,7 @@ export type DiscoveryCampaignWikimediaFederalJobInput = {
   readonly startedAt: string;
   readonly completedAt: string;
   readonly maxCandidates?: number;
+  readonly catalogProfiles?: readonly ResolutionProfile[];
 };
 
 export type DiscoveryCampaignWikimediaFederalJobResult = {
@@ -40,6 +42,7 @@ export async function runDiscoveryCampaignWikimediaFederalJob(
     campaignId: `camp_${DISCOVERY_CAMPAIGN_WIKIMEDIA_FEDERAL_JOB_ID}_${input.jobRunId}`,
     runId: input.jobRunId,
     ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
+    ...(input.catalogProfiles !== undefined ? { catalogProfiles: input.catalogProfiles } : {}),
   });
   const run = completeJobRun(started, {
     completedAt: input.completedAt,

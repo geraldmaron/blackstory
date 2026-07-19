@@ -37,6 +37,7 @@ import {
   type EditorialReviewResult,
 } from './campaign-runner.js';
 import { runDiscoveryCampaign, type RunDiscoveryCampaignInput } from './pipeline.js';
+import type { ResolutionProfile } from '../resolution/types.js';
 import type { DiscoveryCampaignResult, DiscoveryCandidateRecord } from './types.js';
 import { buildQueryPack, type QueryPack } from '../query-packs/index.js';
 import type { AuditActor } from '../audit/index.js';
@@ -82,6 +83,8 @@ export type RunRssDiscoveryCampaignInput = {
   readonly operatorActor?: AuditActor;
   readonly editorialHook?: CampaignEditorialHook;
   readonly enableRelevancePartition?: boolean;
+  /** Optional catalog profiles for soft propose/review match (never hard-exclude). */
+  readonly catalogProfiles?: readonly ResolutionProfile[];
 };
 
 function defaultRssDiscoveryPack(createdAt: string): QueryPack {
@@ -285,6 +288,9 @@ export async function runRssDiscoveryCampaign(
     },
     stampedAt: input.stampedAt,
     completedAt: input.completedAt,
+    ...(input.catalogProfiles !== undefined
+      ? { catalog: { profiles: input.catalogProfiles } }
+      : {}),
   };
 
   const campaign = runDiscoveryCampaign(campaignInput);

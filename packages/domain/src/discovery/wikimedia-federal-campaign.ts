@@ -55,6 +55,7 @@ import {
 } from './campaign-runner.js';
 import { runDiscoveryCampaign, type RunDiscoveryCampaignInput } from './pipeline.js';
 import type { DiscoveryCampaignResult } from './types.js';
+import type { ResolutionProfile } from '../resolution/types.js';
 
 export const WIKIMEDIA_FEDERAL_CAMPAIGN_KIND = 'wikimedia-federal-discovery.v1' as const;
 
@@ -100,6 +101,8 @@ export type RunWikimediaFederalCampaignInput = {
   readonly federalFixturesRoot?: string;
   /** Override wikimedia bulk fixture path (tests). */
   readonly wikimediaFixturePath?: string;
+  /** Optional catalog profiles for soft propose/review match (never hard-exclude). */
+  readonly catalogProfiles?: readonly ResolutionProfile[];
 };
 
 const DOMAIN_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -363,6 +366,9 @@ export async function runWikimediaFederalCampaign(
     },
     stampedAt: input.stampedAt,
     completedAt: input.completedAt,
+    ...(input.catalogProfiles !== undefined
+      ? { catalog: { profiles: input.catalogProfiles } }
+      : {}),
   };
 
   const campaign = runDiscoveryCampaign(campaignInput);

@@ -117,6 +117,7 @@ functions created.
 |---------|--------|
 | `killSwitches/research-campaigns` | Materialized with **`enabled: false`** (schedules may run) |
 | `DISCOVERY_MODE` | Default **fixture** |
+| Soft catalog match | **Off by default.** Set `DISCOVERY_CATALOG_FROM=firestore` only for seed enrichment runs. Soft propose/review via `attachCatalogMatch` — **never** hard-exclude known entities (new evidence about known people/places stays in). Cap with `DISCOVERY_CATALOG_MAX` (default 500). |
 | Artifact Registry cleanup | **7-day** policy on `gcf-artifacts` / `us-central1` |
 | Runtime SA | **`research@black-book-efaaf.iam.gserviceaccount.com`** (datastore.viewer + logging.logWriter; deployer + GCF agent ActAs) |
 
@@ -131,6 +132,8 @@ Image build from `workers/research-node/Dockerfile`. Env:
 - `DISCOVERY_JOB_ID` (required)
 - `DISCOVERY_MODE` = `fixture` \| `live` (default fixture)
 - `DISCOVERY_KILL_SWITCH` = `engaged` \| `disengaged` (prefer Firestore in prod)
+- `DISCOVERY_CATALOG_FROM` = omit \| `firestore` (opt-in soft catalog match; schedules leave unset)
+- `DISCOVERY_CATALOG_MAX` = positive int (default 500) when catalog-from=firestore
 - Optional payload paths as above
 
 Identity: `research@` SA — no publish IAM (ADR-009).

@@ -8,6 +8,7 @@ import {
   runArchiveDplaCampaign,
   ARCHIVE_DPLA_CAMPAIGN_KIND,
   type ArchiveDplaCampaignResult,
+  type ResolutionProfile,
 } from '@repo/domain';
 import { completeJobRun, startJobRun, type JobRunRecord } from '../run-record.js';
 
@@ -22,6 +23,7 @@ export type DiscoveryCampaignArchiveDplaJobInput = {
   /** DPLA v2 search JSON (fixture or live response). */
   readonly dplaSearchJson?: unknown;
   readonly maxCandidates?: number;
+  readonly catalogProfiles?: readonly ResolutionProfile[];
 };
 
 export type DiscoveryCampaignArchiveDplaJobResult = {
@@ -45,6 +47,7 @@ export async function runDiscoveryCampaignArchiveDplaJob(
     campaignId: `camp_${DISCOVERY_CAMPAIGN_ARCHIVE_DPLA_JOB_ID}_${input.jobRunId}`,
     runId: input.jobRunId,
     ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
+    ...(input.catalogProfiles !== undefined ? { catalogProfiles: input.catalogProfiles } : {}),
   });
   assertCampaignKind(campaign);
   const run = completeJobRun(started, {

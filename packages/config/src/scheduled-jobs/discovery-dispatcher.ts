@@ -36,6 +36,7 @@ import {
   runDiscoveryCampaignWikimediaFederalJob,
 } from './jobs/discovery-campaign-wikimedia-federal.js';
 import type { JobRunRecord } from './run-record.js';
+import type { ResolutionProfile } from '@repo/domain';
 
 export const DISCOVERY_DISPATCHER_VERSION = 'discovery-dispatcher.v1' as const;
 
@@ -82,6 +83,13 @@ export type DispatchDiscoveryCampaignInput = {
   readonly nowIso?: string;
   readonly maxCandidates?: number;
   readonly environment?: Readonly<Record<string, string | undefined>>;
+  /**
+   * Soft catalog match profiles (propose/review). Never hard-excludes known entities.
+   * When omitted, campaigns skip catalogMatch attachments.
+   */
+  readonly catalogProfiles?: readonly ResolutionProfile[];
+  /** Titles for obscurity novelty scoring; defaults to a small famous-name list. */
+  readonly catalogTitles?: readonly string[];
 };
 
 const RESEARCH_CAMPAIGNS_KILL_SWITCH = 'research-campaigns' as const;
@@ -169,7 +177,10 @@ async function runFixtureOrLiveJob(
         startedAt: input.startedAt,
         completedAt: input.completedAt,
         feedXmlByFeedId: new Map([['feed_the_american_blackstory', readText(xmlPath)]]),
-        catalogTitles: defaultCatalogTitles(),
+        catalogTitles: input.catalogTitles ?? defaultCatalogTitles(),
+        ...(input.catalogProfiles !== undefined
+          ? { catalogProfiles: input.catalogProfiles }
+          : {}),
         ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
       });
       return {
@@ -197,6 +208,9 @@ async function runFixtureOrLiveJob(
         completedAt: input.completedAt,
         feedXmlByFeedId: new Map([['feed_historical_society', readText(xmlPath)]]),
         ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
+        ...(input.catalogProfiles !== undefined
+          ? { catalogProfiles: input.catalogProfiles }
+          : {}),
       });
       return {
         run: result.run,
@@ -212,6 +226,9 @@ async function runFixtureOrLiveJob(
         startedAt: input.startedAt,
         completedAt: input.completedAt,
         ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
+        ...(input.catalogProfiles !== undefined
+          ? { catalogProfiles: input.catalogProfiles }
+          : {}),
       });
       return {
         run: result.run,
@@ -243,6 +260,9 @@ async function runFixtureOrLiveJob(
         internetArchiveSearchJson: readJson(iaLive && iaLive.length > 0 ? iaLive : iaFixture),
         dplaSearchJson: readJson(dplaLive && dplaLive.length > 0 ? dplaLive : dplaFixture),
         ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
+        ...(input.catalogProfiles !== undefined
+          ? { catalogProfiles: input.catalogProfiles }
+          : {}),
       });
       return {
         run: result.run,
@@ -284,6 +304,9 @@ async function runFixtureOrLiveJob(
         },
         requireWaybackCapture: false,
         ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
+        ...(input.catalogProfiles !== undefined
+          ? { catalogProfiles: input.catalogProfiles }
+          : {}),
       });
       return {
         run: result.run,
