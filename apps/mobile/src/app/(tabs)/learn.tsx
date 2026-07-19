@@ -1,43 +1,25 @@
 /**
- * Learn tab — consolidates web's learning-oriented top-level/overflow nav (History, Stories,
- * Myths, Methodology; see `packages/config/src/shell-nav.ts`) into one mobile tab. Each row is a
- * stub pending its own bead (MOB-015 "Learn and supporting public content surfaces"); this
- * screen's job (MOB-008) is only the tab's presence in the route tree and its position in the
- * IA. Rows are non-interactive placeholders, not dead links, until MOB-015 lands real routes.
+ * Learn tab index (MOB-015 — fills in the MOB-008 stub). Lists the learning-oriented content
+ * sections (History, Topics, Myths, Methodology); each row navigates into `/learn/[section]`,
+ * which either lists that section's pages or — for a single-page section like Methodology —
+ * renders the page directly. See `src/features/learn/sections.ts` for the registry this list is
+ * generated from and `docs/mobile/mobile-app-epic.md` for why Learn/More consolidate web's
+ * learning + overflow nav into two mobile tabs.
  */
-import { ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { ListRow, Text } from '@/ui';
-
-const LEARN_SECTIONS = [
-  { title: 'History', subtitle: 'Decade-by-decade context (web: /history)' },
-  { title: 'Stories', subtitle: 'Long-form narrative features (web: /stories)' },
-  { title: 'Myths', subtitle: 'Common misconceptions, corrected (web: /myths)' },
-  { title: 'Methodology', subtitle: 'How records are researched and verified (web: /methodology)' },
-] as const;
+import { router } from 'expo-router';
+import { LEARN_SECTIONS, SectionListScreen } from '@/features/learn';
 
 export default function LearnScreen() {
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
-        <Text variant="title" isHeading>
-          Learn
-        </Text>
-        <Text variant="body" colorRole="inkMuted">
-          Native learning surfaces land in MOB-015. Placeholder rows below are not yet
-          navigable.
-        </Text>
-        {LEARN_SECTIONS.map((section, index) => (
-          <ListRow
-            key={section.title}
-            title={section.title}
-            subtitle={section.subtitle}
-            interactive={false}
-            showDivider={index < LEARN_SECTIONS.length - 1}
-          />
-        ))}
-      </ScrollView>
-    </SafeAreaView>
+    <SectionListScreen
+      title="Learn"
+      intro="History, stories, myths, and methodology — offline-readable once opened."
+      rows={LEARN_SECTIONS.map((section) => ({
+        key: section.routeId,
+        title: section.title,
+        subtitle: section.subtitle,
+        onPress: () => router.push(`/learn/${section.routeId}` as never),
+      }))}
+    />
   );
 }
