@@ -22,6 +22,8 @@ test('an empty query string parses to the "all" default filter state with no vie
   assert.equal(parsed.lines, false);
   assert.equal(parsed.decade, undefined);
   assert.equal(parsed.edge, undefined);
+  assert.equal(parsed.showFilters, true);
+  assert.equal(parsed.showResults, true);
 });
 
 test('round-trips a full view state through build -> parse', () => {
@@ -35,6 +37,8 @@ test('round-trips a full view state through build -> parse', () => {
     lines: true,
     decade: '1970s',
     edge: 'rel_landmark_occurred_at_school',
+    showFilters: true,
+    showResults: true,
   };
 
   const href = buildExploreHref(state);
@@ -64,6 +68,8 @@ test('default filter values are omitted from the query string (minimal shareable
     layerMode: 'off',
     group: false,
     lines: false,
+    showFilters: true,
+    showResults: true,
   });
   assert.equal(qs, '');
 });
@@ -75,6 +81,8 @@ test('layerMode=presence is emitted; off is omitted', () => {
       layerMode: 'presence',
       group: false,
       lines: false,
+      showFilters: true,
+      showResults: true,
     }),
     'layerMode=presence',
   );
@@ -92,6 +100,8 @@ test('population modes round-trip decade params', () => {
     popDecade: '2010' as const,
     group: false,
     lines: false,
+    showFilters: true,
+    showResults: true,
   };
   const shareQs = buildExploreSearchParams(share);
   assert.equal(shareQs, 'layerMode=blackShare&popDecade=2010');
@@ -104,6 +114,8 @@ test('population modes round-trip decade params', () => {
     popTo: '2020' as const,
     group: false,
     lines: false,
+    showFilters: true,
+    showResults: true,
   };
   const changeQs = buildExploreSearchParams(change);
   assert.equal(changeQs, 'layerMode=blackChange&popFrom=2000');
@@ -128,6 +140,8 @@ test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
       layerMode: 'off',
       group: true,
       lines: false,
+      showFilters: true,
+      showResults: true,
     }),
     /^group=1$/,
   );
@@ -137,9 +151,94 @@ test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
       layerMode: 'off',
       group: false,
       lines: false,
+      showFilters: true,
+      showResults: true,
     }),
     '',
   );
+});
+
+test('hidePanels defaults both panels to shown when param is absent', () => {
+  const parsed = parseExploreSearchParams({});
+  assert.equal(parsed.showFilters, true);
+  assert.equal(parsed.showResults, true);
+  assert.equal(
+    buildExploreSearchParams({
+      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      layerMode: 'off',
+      group: false,
+      lines: false,
+      showFilters: true,
+      showResults: true,
+    }),
+    '',
+  );
+});
+
+test('hidePanels=filters hides only the filters panel', () => {
+  const parsed = parseExploreSearchParams({ hidePanels: 'filters' });
+  assert.equal(parsed.showFilters, false);
+  assert.equal(parsed.showResults, true);
+
+  const state = {
+    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    layerMode: 'off' as const,
+    group: false,
+    lines: false,
+    showFilters: false,
+    showResults: true,
+  };
+  assert.equal(buildExploreSearchParams(state), 'hidePanels=filters');
+  assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=filters'))), state);
+});
+
+test('hidePanels=results hides only the results rail', () => {
+  const parsed = parseExploreSearchParams({ hidePanels: 'results' });
+  assert.equal(parsed.showFilters, true);
+  assert.equal(parsed.showResults, false);
+
+  const state = {
+    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    layerMode: 'off' as const,
+    group: false,
+    lines: false,
+    showFilters: true,
+    showResults: false,
+  };
+  assert.equal(buildExploreSearchParams(state), 'hidePanels=results');
+  assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=results'))), state);
+});
+
+test('hidePanels=filters,results hides both panels regardless of token order', () => {
+  for (const hidePanels of ['filters,results', 'results,filters', 'results, filters , filters']) {
+    const parsed = parseExploreSearchParams({ hidePanels });
+    assert.equal(parsed.showFilters, false, hidePanels);
+    assert.equal(parsed.showResults, false, hidePanels);
+  }
+
+  const state = {
+    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    layerMode: 'off' as const,
+    group: false,
+    lines: false,
+    showFilters: false,
+    showResults: false,
+  };
+  assert.equal(new URLSearchParams(buildExploreSearchParams(state)).get('hidePanels'), 'filters,results');
+  assert.deepEqual(
+    parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=filters,results'))),
+    state,
+  );
+  assert.deepEqual(
+    parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=results,filters'))),
+    state,
+  );
+});
+
+test('hidePanels ignores unknown tokens', () => {
+  const parsed = parseExploreSearchParams({ hidePanels: 'filters,sidebar,results' });
+  assert.equal(parsed.showFilters, false);
+  assert.equal(parsed.showResults, false);
 });
 
 test('viewport requires all three of lat/lng/zoom to be present and finite', () => {

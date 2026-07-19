@@ -51,6 +51,10 @@ import {
 } from '../../../lib/map-experience/filters';
 import { useMapStage } from '../MapStage';
 import { pickExploreEdgeSlice } from './explore-edge-catalog';
+import {
+  exploreFiltersPanelClassName,
+  exploreResultsPanelClassName,
+} from './explore-panel-chrome';
 import type { ExploreViewModel } from './explore-view-model';
 
 export type ExploreMapExperienceProps = {
@@ -94,6 +98,8 @@ function mergeViewState(
     layerMode: patch.layerMode ?? base.layerMode,
     group: patch.group ?? base.group,
     lines: patch.lines ?? base.lines,
+    showFilters: patch.showFilters ?? base.showFilters,
+    showResults: patch.showResults ?? base.showResults,
   };
 
   const withSelection = {
@@ -421,9 +427,25 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   // Agent B: after a hero dissolve landing, focus filters unless a pin was the engagement target.
   useEffect(() => {
-    if (!fromHeroTransition || initial.viewState.selected) return;
+    if (!fromHeroTransition || initial.viewState.selected || !initial.viewState.showFilters) return;
     filterRegionRef.current?.focus();
-  }, [fromHeroTransition, initial.viewState.selected]);
+  }, [fromHeroTransition, initial.viewState.selected, initial.viewState.showFilters]);
+
+  const handleHideFilters = useCallback(() => {
+    commitViewState(mergeViewState(view.viewState, { showFilters: false }));
+  }, [commitViewState, view.viewState]);
+
+  const handleShowFilters = useCallback(() => {
+    commitViewState(mergeViewState(view.viewState, { showFilters: true }));
+  }, [commitViewState, view.viewState]);
+
+  const handleHideResults = useCallback(() => {
+    commitViewState(mergeViewState(view.viewState, { showResults: false }));
+  }, [commitViewState, view.viewState]);
+
+  const handleShowResults = useCallback(() => {
+    commitViewState(mergeViewState(view.viewState, { showResults: true }));
+  }, [commitViewState, view.viewState]);
 
   const handleSelect = useCallback(
     (entityId: string) => {
@@ -619,6 +641,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   const degradedCopy = stage.mapAvailable ? null : DEGRADED_MODE_COPY.map_canvas_unavailable;
   const selectedStateName = view.viewState.state ? findUsStateByPostalCode(view.viewState.state)?.name : undefined;
+  const filtersVisible = view.viewState.showFilters;
+  const resultsVisible = view.viewState.showResults;
+  const resultsDimmed = Boolean(view.selectedEdge || selectedFeature);
 
   const listProps = {
     features: sortedListFeatures,
@@ -645,10 +670,26 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         </div>
       ) : null}
 
-      <div className="ds-explore-stage__filters" ref={filterRegionRef} tabIndex={-1} aria-label="Map filters">
-        <p className="ds-explore-stage__panel-title" id="explore-facets-heading">
-          Filters
-        </p>
+      <div
+        className={exploreFiltersPanelClassName({ visible: filtersVisible })}
+        ref={filterRegionRef}
+        tabIndex={filtersVisible ? -1 : undefined}
+        aria-label="Map filters"
+        {...(filtersVisible ? {} : { hidden: true })}
+      >
+        <div className="ds-explore-stage__panel-header">
+          <p className="ds-explore-stage__panel-title" id="explore-facets-heading">
+            Filters
+          </p>
+          <button
+            type="button"
+            className="ds-button ds-button--secondary ds-button--compact ds-explore-stage__panel-hide"
+            aria-label="Hide filters"
+            onClick={handleHideFilters}
+          >
+            Hide filters
+          </button>
+        </div>
         <div className="ds-explore__facets" role="group" aria-labelledby="explore-facets-heading">
           {FACET_ROWS.map(({ key, label }) => (
             <label className="ds-pill-select ds-explore__facet" key={key} htmlFor={`explore-${key}`}>
@@ -761,26 +802,55 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         </div>
       </div>
 
+      {!filtersVisible ? (
+        <button
+          type="button"
+          className="ds-button ds-button--secondary ds-explore-stage__panel-restore ds-explore-stage__panel-restore--filters"
+          aria-label="Show filters"
+          onClick={handleShowFilters}
+        >
+          Show filters
+        </button>
+      ) : null}
+
       <div
-        className={
-          view.selectedEdge || selectedFeature
-            ? 'ds-explore-stage__results ds-explore-stage__results--dimmed'
-            : 'ds-explore-stage__results'
-        }
+        className={exploreResultsPanelClassName({ visible: resultsVisible, dimmed: resultsDimmed })}
+        {...(resultsVisible ? {} : { hidden: true })}
       >
-        {/* The count labels the list it sits above — oldest records first. */}
-        <p className="ds-sans ds-explore__results-count" id="explore-results-heading">
-          {filteredFeatures.length} documented record{filteredFeatures.length === 1 ? '' : 's'}
-          {selectedStateName ? ` in ${selectedStateName}` : ' in view'}
-          {view.viewState.lines
-            ? ` · ${view.edgeLineCollection.features.length} connection${
-                view.edgeLineCollection.features.length === 1 ? '' : 's'
-              }`
-            : ''}
-          {' · oldest first'}
-        </p>
+        <div className="ds-explore-stage__panel-header">
+          {/* The count labels the list it sits above — oldest records first. */}
+          <p className="ds-sans ds-explore__results-count" id="explore-results-heading">
+            {filteredFeatures.length} documented record{filteredFeatures.length === 1 ? '' : 's'}
+            {selectedStateName ? ` in ${selectedStateName}` : ' in view'}
+            {view.viewState.lines
+              ? ` · ${view.edgeLineCollection.features.length} connection${
+                  view.edgeLineCollection.features.length === 1 ? '' : 's'
+                }`
+              : ''}
+            {' · oldest first'}
+          </p>
+          <button
+            type="button"
+            className="ds-button ds-button--secondary ds-button--compact ds-explore-stage__panel-hide"
+            aria-label="Hide records"
+            onClick={handleHideResults}
+          >
+            Hide records
+          </button>
+        </div>
         <SynchronizedResultList {...listProps} />
       </div>
+
+      {!resultsVisible ? (
+        <button
+          type="button"
+          className="ds-button ds-button--secondary ds-explore-stage__panel-restore ds-explore-stage__panel-restore--results"
+          aria-label="Show records"
+          onClick={handleShowResults}
+        >
+          Show records
+        </button>
+      ) : null}
 
       {spotlightOpen ? (
         <div className="ds-explore-stage__spotlight" ref={spotlightRef}>

@@ -176,8 +176,7 @@
   color: var(--ds-ink);
 }
 
-.ds-explore-stage__notice,
-.ds-explore-stage__seed-notice {
+.ds-explore-stage__notice {
   position: fixed;
   top: calc(var(--ds-island-clearance) + var(--ds-space-2));
   left: 50%;
@@ -242,6 +241,84 @@
 }
 
 .ds-explore-stage__filters:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+/* Panel chrome — title row + hide control; restore buttons when a rail is collapsed. */
+.ds-explore-stage__panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+}
+
+.ds-explore-stage__panel-header .ds-explore-stage__panel-title,
+.ds-explore-stage__panel-header .ds-explore__results-count {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ds-explore-stage__panel-hide {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  white-space: nowrap;
+}
+
+.ds-explore-stage__filters--hidden,
+.ds-explore-stage__results--hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ds-explore-stage__filters,
+  .ds-explore-stage__results {
+    transition:
+      opacity var(--ds-duration-fast) var(--ds-easing),
+      transform var(--ds-duration-fast) var(--ds-easing),
+      visibility var(--ds-duration-fast) var(--ds-easing);
+  }
+
+  .ds-explore-stage__filters--hidden {
+    opacity: 0;
+    transform: translateX(calc(-1 * var(--ds-space-4)));
+  }
+
+  .ds-explore-stage__results--hidden {
+    opacity: 0;
+    transform: translateX(var(--ds-space-4));
+  }
+}
+
+.ds-explore-stage__panel-restore {
+  position: fixed;
+  z-index: 2;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: color-mix(in srgb, var(--ds-surface) 88%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.ds-explore-stage__panel-restore--filters {
+  top: calc(var(--ds-island-clearance) + var(--ds-space-2));
+  left: var(--ds-space-4);
+}
+
+.ds-explore-stage__panel-restore--results {
+  top: calc(var(--ds-island-clearance) + var(--ds-space-2));
+  right: var(--ds-space-4);
+}
+
+.ds-explore-stage__panel-restore:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: var(--ds-focus-offset);
 }
@@ -319,10 +396,15 @@
   transition: opacity var(--ds-duration-fast) var(--ds-easing);
 }
 
-/* When a record is open, quiet the list rail so the spotlight owns attention. */
+/* When a record is open, quiet the list rail so the spotlight owns attention.
+   Keep the panel header interactive so Hide records still works. */
 .ds-explore-stage__results--dimmed {
   opacity: 0.42;
   pointer-events: none;
+}
+
+.ds-explore-stage__results--dimmed .ds-explore-stage__panel-header {
+  pointer-events: auto;
 }
 
 /* Centered (desktop) / bottom-sheet (mobile) narrative — copper marks the orientation moment. */
@@ -526,6 +608,12 @@
     opacity: 0;
   }
 
+  .ds-explore-stage__panel-restore--results {
+    top: auto;
+    bottom: var(--ds-space-4);
+    right: var(--ds-space-4);
+  }
+
   .ds-explore-stage__spotlight {
     place-items: end center;
     padding: 0;
@@ -554,5 +642,13 @@
   .ds-explore-stage__results {
     right: var(--ds-space-3);
     width: calc(100vw - var(--ds-space-3) * 2);
+  }
+
+  .ds-explore-stage__panel-restore--filters {
+    left: var(--ds-space-3);
+  }
+
+  .ds-explore-stage__panel-restore--results {
+    right: var(--ds-space-3);
   }
 }

@@ -51,6 +51,10 @@ export type ExploreViewState = {
   readonly decade?: string;
   /** Selected History edge id when a relationship line is clicked.  */
   readonly edge?: string;
+  /** When false, the filters panel is hidden (default shown). */
+  readonly showFilters: boolean;
+  /** When false, the results cards rail is hidden (default shown). */
+  readonly showResults: boolean;
 };
 
 export type RawExploreSearchParams = Readonly<Record<string, string | readonly string[] | undefined>>;
@@ -93,6 +97,33 @@ function parsePopulationDecade(raw: string | undefined, fallback: CensusPopulati
   return trimmed && isCensusPopulationDecade(trimmed) ? trimmed : fallback;
 }
 
+const HIDE_PANELS_TOKENS = ['filters', 'results'] as const;
+type HidePanelsToken = (typeof HIDE_PANELS_TOKENS)[number];
+
+function parseHidePanels(raw: RawExploreSearchParams): Pick<ExploreViewState, 'showFilters' | 'showResults'> {
+  const hidePanelsRaw = firstValue(raw.hidePanels)?.trim();
+  if (!hidePanelsRaw) {
+    return { showFilters: true, showResults: true };
+  }
+
+  let showFilters = true;
+  let showResults = true;
+  for (const token of hidePanelsRaw.split(',')) {
+    const trimmed = token.trim();
+    if (trimmed === 'filters') showFilters = false;
+    else if (trimmed === 'results') showResults = false;
+  }
+
+  return { showFilters, showResults };
+}
+
+function serializeHidePanels(state: ExploreViewState): string | undefined {
+  const tokens: HidePanelsToken[] = [];
+  if (!state.showFilters) tokens.push('filters');
+  if (!state.showResults) tokens.push('results');
+  return tokens.length > 0 ? tokens.join(',') : undefined;
+}
+
 export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreViewState {
   const filters: ExploreFilterState = {
     era: cleanSelectParam(firstValue(raw.era)),
@@ -126,6 +157,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
       : undefined;
   const popTo =
     layerMode === 'blackChange' ? parsePopulationDecade(popToRaw, DEFAULT_POPULATION_CHANGE_TO) : undefined;
+  const { showFilters, showResults } = parseHidePanels(raw);
 
   return {
     filters,
@@ -142,6 +174,8 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     lines: linesRaw === '1' || linesRaw === 'true',
     ...(decadeRaw ? { decade: decadeRaw } : {}),
     ...(edgeRaw ? { edge: edgeRaw } : {}),
+    showFilters,
+    showResults,
   };
 }
 
@@ -180,6 +214,8 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   if (state.lines) params.set('lines', '1');
   if (state.decade) params.set('decade', state.decade);
   if (state.edge) params.set('edge', state.edge);
+  const hidePanels = serializeHidePanels(state);
+  if (hidePanels) params.set('hidePanels', hidePanels);
   return params.toString();
 }
 
