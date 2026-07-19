@@ -1,8 +1,10 @@
 /**
  * Builds the full evidence-card view model for one claim: evidence-score confidence
  * language, rights-limited excerpt/citation resolution, preserved dispute presentation,
- * and source-lineage / research-coverage / last-checked / revision / retraction metadata
- * kept visibly distinct from confidence. Pure and synchronously testable — no I/O, no
+ * source-lineage / research-coverage / last-checked / revision / retraction metadata
+ * kept visibly distinct from confidence, and record-level source-lineage resolution
+ * (explicit rollup, per-claim sum, or citation-source proxy). Pure and synchronously
+ * testable — no I/O, no
  * React — so `apps/web/src/components/evidence/EntityEvidencePanel.tsx` stays a thin
  * rendering layer over this module, matching this codebase's existing
  * `entity-view-model.ts` convention of separating decision logic from JSX.
@@ -10,7 +12,7 @@
 import { formatEvidenceScoreLabel } from './confidence-language';
 import { buildDisputeView } from './contradiction-view';
 import { resolveCitationForDisplay, resolveExcerptForDisplay } from './rights-guard';
-import type { EvidenceClaimInput, EvidenceClaimView } from './types';
+import type { EvidenceClaimInput, EvidenceClaimView, EvidenceSourceLineageInput } from './types';
 
 export function buildEvidenceCard(input: EvidenceClaimInput): EvidenceClaimView {
   const confidenceLabel = formatEvidenceScoreLabel(input.confidenceScore, input.confidenceLevel);
@@ -46,6 +48,38 @@ export function buildEvidenceCards(inputs: readonly EvidenceClaimInput[]): reado
  * the caller has not supplied one explicitly (e.g. from a real projection aggregate). */
 export function totalSourceLineageCount(cards: readonly EvidenceClaimView[]): number {
   return cards.reduce((sum, card) => sum + (card.sourceLineage?.independentLineageCount ?? 0), 0);
+}
+
+/** Distinct non-empty citation `source` strings across cards (case-insensitive trim). */
+export function uniqueCitationSourceCount(cards: readonly EvidenceClaimView[]): number {
+  const sources = new Set<string>();
+  for (const card of cards) {
+    const normalized = card.citation.source.trim().toLowerCase();
+    if (normalized.length > 0) {
+      sources.add(normalized);
+    }
+  }
+  return sources.size;
+}
+
+/** Resolve record-level source lineage: explicit input wins; else per-claim sum; else citation
+ * source count as a public proxy when lineage is not yet on claims; else omit (never synthesize 0). */
+export function resolveRecordSourceLineage(
+  cards: readonly EvidenceClaimView[],
+  explicit?: EvidenceSourceLineageInput,
+): EvidenceSourceLineageInput | undefined {
+  if (explicit !== undefined) {
+    return explicit;
+  }
+  const lineageSum = totalSourceLineageCount(cards);
+  if (lineageSum > 0) {
+    return { independentLineageCount: lineageSum };
+  }
+  const citationCount = uniqueCitationSourceCount(cards);
+  if (citationCount > 0) {
+    return { independentLineageCount: citationCount };
+  }
+  return undefined;
 }
 
 /** Most recent `lastCheckedAt` across all cards and their research-coverage records, or

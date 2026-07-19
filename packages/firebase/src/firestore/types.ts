@@ -1062,6 +1062,7 @@ export const publicClaimProjectionSchema = z.object({
   citationSource: z.string().min(1),
   citationHref: z.string().url().optional(),
   citationLabel: z.string().min(1),
+  independentLineageCount: z.number().int().nonnegative().optional(),
 });
 
 export type PublicClaimProjectionDoc = z.infer<typeof publicClaimProjectionSchema>;

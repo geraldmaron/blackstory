@@ -112,6 +112,13 @@ export function toEvidenceClaimInputs(
             ...(claim.disputeNote !== undefined ? { disputeNote: claim.disputeNote } : {}),
           }
         : undefined;
+    // Only pass through scored lineage. Do not invent `1` from a citation — that would make
+    // the record rollup sum claims instead of unique sources; EntityEvidencePanel falls back to
+    // distinct citation sources when claim lineage is absent.
+    const sourceLineage =
+      claim.independentLineageCount !== undefined && claim.independentLineageCount > 0
+        ? { independentLineageCount: claim.independentLineageCount }
+        : undefined;
     return {
       id: claim.id,
       predicate: claim.predicate,
@@ -120,6 +127,7 @@ export function toEvidenceClaimInputs(
       confidenceLevel: claim.confidenceLevel,
       citation,
       ...(dispute !== undefined ? { dispute } : {}),
+      ...(sourceLineage !== undefined ? { sourceLineage } : {}),
     };
   });
 }

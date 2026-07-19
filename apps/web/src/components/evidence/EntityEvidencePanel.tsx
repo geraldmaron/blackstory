@@ -12,7 +12,7 @@
 
 import React from 'react';
 import { EmptyState } from '@repo/ui';
-import { buildEvidenceCards, mostRecentLastCheckedAt, totalSourceLineageCount } from '../../lib/evidence';
+import { buildEvidenceCards, mostRecentLastCheckedAt, resolveRecordSourceLineage } from '../../lib/evidence';
 import type {
   EvidenceClaimInput,
   EvidenceResearchCoverageInput,
@@ -33,7 +33,7 @@ export type EntityEvidencePanelProps = {
    * `{ level: entity.researchCoverage }`). Kept required since every record carries one today. */
   readonly researchCoverage: EvidenceResearchCoverageInput;
   /** Record-level independent-source-lineage rollup. Falls back to the sum of each claim's own
-   * `sourceLineage.independentLineageCount` when omitted. */
+   * `sourceLineage.independentLineageCount`, then distinct citation sources, when omitted. */
   readonly sourceLineage?: EvidenceSourceLineageInput;
   /** Record-level last-checked date. Falls back to the most recent date across claims when
    * omitted. */
@@ -51,9 +51,7 @@ export function EntityEvidencePanel({
   retractionNotices,
 }: EntityEvidencePanelProps) {
   const cards = buildEvidenceCards(claims);
-  const resolvedSourceLineage = sourceLineage ?? {
-    independentLineageCount: totalSourceLineageCount(cards),
-  };
+  const resolvedSourceLineage = resolveRecordSourceLineage(cards, sourceLineage);
   const resolvedLastCheckedAt = lastCheckedAt ?? mostRecentLastCheckedAt(cards);
 
   return (
@@ -72,7 +70,7 @@ export function EntityEvidencePanel({
 
       <EvidenceResearchCoverageSummary
         researchCoverage={researchCoverage}
-        sourceLineage={resolvedSourceLineage}
+        {...(resolvedSourceLineage ? { sourceLineage: resolvedSourceLineage } : {})}
         {...(resolvedLastCheckedAt ? { lastCheckedAt: resolvedLastCheckedAt } : {})}
         {...(retractionNotices ? { retractionNotices } : {})}
       />

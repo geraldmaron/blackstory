@@ -87,6 +87,60 @@ test('derives the record-level source-lineage rollup from claims when not suppli
   assert.match(html, /3.*independent.*sources/s);
 });
 
+const CLAIMS_WITHOUT_LINEAGE: readonly EvidenceClaimInput[] = [
+  {
+    id: 'claim_seed_001',
+    predicate: 'founded_year',
+    object: '1867',
+    confidenceScore: 0.78,
+    confidenceLevel: 'high',
+    citation: { source: 'National Archives (seed)', label: 'Primary archival', href: 'https://catalog.archives.gov/' },
+  },
+  {
+    id: 'claim_seed_005',
+    predicate: 'documented_dispute',
+    object: 'Contested 1920s land-use displacement action',
+    confidenceScore: 0.66,
+    confidenceLevel: 'medium',
+    citation: { source: 'D.C. Historical Society (seed)', label: 'Reputable secondary' },
+  },
+];
+
+test('uses distinct citation sources when claims lack sourceLineage', () => {
+  const html = renderToStaticMarkup(
+    createElement(EntityEvidencePanel, {
+      labelledBy: 'evidence-heading',
+      claims: CLAIMS_WITHOUT_LINEAGE,
+      researchCoverage: { level: 'partial' },
+    }),
+  );
+  assert.match(html, /2.*independent.*sources/s);
+  assert.doesNotMatch(html, /<span class="ds-mono">0<\/span> independent/);
+});
+
+const CLAIMS_WITHOUT_LINEAGE_OR_CITATIONS: readonly EvidenceClaimInput[] = [
+  {
+    id: 'claim_seed_001',
+    predicate: 'founded_year',
+    object: '1867',
+    confidenceScore: 0.78,
+    confidenceLevel: 'high',
+    citation: { source: '', label: 'Primary archival' },
+  },
+];
+
+test('does not render independent source lineage when no lineage or citation signal exists', () => {
+  const html = renderToStaticMarkup(
+    createElement(EntityEvidencePanel, {
+      labelledBy: 'evidence-heading',
+      claims: CLAIMS_WITHOUT_LINEAGE_OR_CITATIONS,
+      researchCoverage: { level: 'partial' },
+    }),
+  );
+  assert.doesNotMatch(html, /Source lineage/);
+  assert.doesNotMatch(html, /<span class="ds-mono">0<\/span> independent/);
+});
+
 test('renders the approved gap notice, not a bare empty list, when there are no claims', () => {
   const html = renderToStaticMarkup(
     createElement(EntityEvidencePanel, {

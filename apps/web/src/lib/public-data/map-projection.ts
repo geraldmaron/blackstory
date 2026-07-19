@@ -40,6 +40,7 @@ export type PublicProjectionInput = {
     readonly citationSource: string;
     readonly citationHref?: string;
     readonly citationLabel: string;
+    readonly independentLineageCount?: number;
   }[];
   readonly status?: string;
   readonly eraBuckets?: readonly string[];
@@ -112,6 +113,9 @@ function mapClaims(claims: PublicProjectionInput['claims']): PublicEntityView['c
     citationSource: claim.citationSource,
     ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
     citationLabel: claim.citationLabel,
+    ...(claim.independentLineageCount !== undefined
+      ? { independentLineageCount: claim.independentLineageCount }
+      : {}),
   }));
 }
 

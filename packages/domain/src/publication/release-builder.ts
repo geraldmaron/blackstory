@@ -53,6 +53,7 @@ export type ReleaseSourceClaim = {
   readonly citationSource: string;
   readonly citationHref?: string;
   readonly citationLabel: string;
+  readonly independentLineageCount?: number;
 };
 
 export type ReleaseSourceRelatedEntry = {
@@ -93,6 +94,7 @@ export type ReleaseClaimProjection = {
   readonly citationSource: string;
   readonly citationHref?: string;
   readonly citationLabel: string;
+  readonly independentLineageCount?: number;
 };
 
 export type ReleaseResearchCoverage = 'minimal' | 'partial' | 'substantial';
@@ -216,6 +218,11 @@ function buildClaimProjections(entry: ReleaseSourceEntity): readonly ReleaseClai
     citationSource: claim.citationSource,
     ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
     citationLabel: claim.citationLabel,
+    // Pass through scored lineage only. Inventing `1` per cited claim overcounts the same
+    // source across claims; the web evidence panel uses unique citation sources as proxy.
+    ...(claim.independentLineageCount !== undefined
+      ? { independentLineageCount: claim.independentLineageCount }
+      : {}),
   }));
 }
 

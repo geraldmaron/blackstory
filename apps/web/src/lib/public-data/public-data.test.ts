@@ -147,3 +147,36 @@ test('mapProjectionToPublicEntityView falls back to computed researchCoverage an
   assert.equal(view.revision.generatedAt, '');
   assert.equal(view.revision.recordUpdatedAt, '');
 });
+
+test('mapProjectionToPublicEntityView maps independentLineageCount when present on projection claims', () => {
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_lineage_example_001',
+    releaseId: 'rel_live_003',
+    kind: 'place',
+    displayName: 'Lineage Example',
+    nameLower: 'lineage example',
+    summary: 'Projection with explicit independent lineage counts on claims.',
+    claimIds: ['claim_lineage_01', 'claim_lineage_02'],
+    claims: [
+      {
+        id: 'claim_lineage_01',
+        predicate: 'founded_year',
+        object: '1900',
+        confidenceLevel: 'high',
+        citationSource: 'Example Source A',
+        citationLabel: 'Example Citation A',
+        independentLineageCount: 3,
+      },
+      {
+        id: 'claim_lineage_02',
+        predicate: 'located_in',
+        object: 'Tulsa',
+        confidenceLevel: 'medium',
+        citationSource: 'Example Source B',
+        citationLabel: 'Example Citation B',
+      },
+    ],
+  });
+  assert.equal(view.claims[0]!.independentLineageCount, 3);
+  assert.equal(view.claims[1]!.independentLineageCount, undefined);
+});
