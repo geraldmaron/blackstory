@@ -6,6 +6,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // App Hosting / Cloud Run need a self-contained server bundle for monorepo deploys.
+  output: 'standalone',
   transpilePackages: [
     '@repo/domain',
     '@repo/schemas',

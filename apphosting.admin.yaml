@@ -1,0 +1,81 @@
+# Firebase App Hosting config for the apps/admin backend (black-book-admin-production).
+#
+# Project: black-book-efaaf (332234323945)
+# Backend: black-book-admin-production, rootDirectory "." (same reason as apphosting.yaml:
+#   App Hosting's default adapter falls back to npm and fails on pnpm workspace:* deps unless
+#   rootDirectory sees pnpm-lock.yaml at the repo root).
+# Registered web app: 1:332234323945:web:e1b31c78e32d95943bfd78 (Black Book Admin)
+# Runtime identity: admin-runtime@black-book-efaaf.iam.gserviceaccount.com (separate from
+#   web-runtime@... — keeps the admin surface's identity distinct from the public web surface,
+#   matching ADR-005's surface-separation intent even without the full Cloud Run + IAP + separate
+#   GCP project ADR-012 design, which is deferred until an actual multi-operator team justifies it).
+#
+# Auth: ADMIN_AUTH_MODE=firebase (Firebase Auth email/password + custom claims). This is the
+# code's own documented solo-operator production mode (see apps/admin/src/auth/mode.ts,
+# apps/admin/.env.example) — not a stopgap hack.
+#
+# Custom build/run commands (bypasses the Next.js framework adapter's auto-detection, matching
+# the same static/public-asset copy pattern the root apphosting.yaml uses for apps/web).
+#
+# automatic App Hosting rollouts are disabled, same as web (explicit CLI/Actions promote only).
+
+scripts:
+  buildCommand: >-
+    pnpm --filter @repo/admin... --workspace-concurrency=1 build &&
+    mkdir -p apps/admin/.next/standalone/apps/admin/.next &&
+    cp -R apps/admin/.next/static apps/admin/.next/standalone/apps/admin/.next/static &&
+    cp -R apps/admin/public apps/admin/.next/standalone/apps/admin/public
+  runCommand: node apps/admin/.next/standalone/apps/admin/server.js
+
+runConfig:
+  minInstances: 0
+  maxInstances: 2
+  concurrency: 20
+  cpu: 1
+  memoryMiB: 384
+
+env:
+  - variable: NEXT_PUBLIC_APP_ENV
+    value: production
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: ADMIN_AUTH_MODE
+    value: firebase
+    availability:
+      - RUNTIME
+  - variable: NEXT_PUBLIC_SITE_URL
+    value: https://blackstory.app
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: black-book-efaaf
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: black-book-efaaf.firebaseapp.com
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: black-book-efaaf.firebasestorage.app
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: '332234323945'
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: '1:332234323945:web:e1b31c78e32d95943bfd78'
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: AIzaSyCS6qbiHo3KYAkMOhVbuORCwNa9PNbChFU
+    availability:
+      - BUILD
+      - RUNTIME

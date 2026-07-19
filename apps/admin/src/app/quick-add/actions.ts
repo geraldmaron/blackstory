@@ -78,7 +78,7 @@ export async function submitQuickAdd(
         outcome,
         sessionId,
         auditEventId: commitResult.eventId,
-        researchCaseId: outcome.intake.researchCase?.id,
+        ...(outcome.intake.researchCase?.id ? { researchCaseId: outcome.intake.researchCase.id } : {}),
       };
     }
 
