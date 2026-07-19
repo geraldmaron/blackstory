@@ -4,6 +4,10 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
+    "@expo-google-fonts/ibm-plex-mono": "^0.4.1",
+    "@expo-google-fonts/inter": "^0.4.2",
+    "@expo-google-fonts/sora": "^0.4.2",
+    "@expo-google-fonts/source-serif-4": "^0.4.1",
     "@expo/ui": "~56.0.22",
     "expo": "56.0.16",
     "expo-build-properties": "~56.0.23",
@@ -30,9 +34,16 @@
     "react-native-worklets": "0.8.3"
   },
   "devDependencies": {
+    "@testing-library/react-native": "^14.0.1",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.20.1",
     "@types/react": "~19.2.2",
     "eslint": "^9.39.5",
     "eslint-config-expo": "~56.0.4",
+    "jest": "^29.7.0",
+    "jest-expo": "~56.0.5",
+    "react-test-renderer": "19.2.3",
+    "tsx": "^4.23.1",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -42,8 +53,10 @@
     "web": "expo start --web",
     "reset-project": "node ./scripts/reset-project.js",
     "lint": "expo lint",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "echo 'test: no tests yet — apps/mobile is a bare scaffold (MOB-006, no UI/state/network libraries installed). Add real tests starting MOB-007+ as behavior lands.'",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.tooling.json --noEmit",
+    "test": "jest",
+    "tokens:generate": "node --import tsx scripts/generate-brand-tokens.ts",
+    "tokens:check": "node --import tsx scripts/generate-brand-tokens.ts --check",
     "build": "expo export",
     "prebuild": "expo prebuild",
     "eas-build:development": "npx eas-cli build --profile development",
