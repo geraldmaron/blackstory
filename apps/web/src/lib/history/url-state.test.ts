@@ -9,6 +9,9 @@ test('defaults to all-time mode with no query params', () => {
   const state = parseHistorySearchParams({});
   assert.equal(state.mode, 'all-time');
   assert.equal(state.filters.kind, 'all');
+  assert.equal(state.filters.status, 'all');
+  assert.equal(state.filters.topic, 'all');
+  assert.equal(state.filters.connections, 'all');
 });
 
 test('parses decade mode and rebuilds shareable href', () => {
@@ -31,8 +34,33 @@ test('parses q and sort into shareable href', () => {
   assert.equal(buildHistoryHref(state), '/history?kind=school&q=dunbar&sort=connections');
 });
 
+test('parses status, topic, and connections into shareable href', () => {
+  const state = parseHistorySearchParams({
+    status: 'historic',
+    topic: 'education',
+    connections: 'with',
+  });
+  assert.equal(state.filters.status, 'historic');
+  assert.equal(state.filters.topic, 'education');
+  assert.equal(state.filters.connections, 'with');
+  assert.equal(
+    buildHistoryHref(state),
+    '/history?status=historic&topic=education&connections=with',
+  );
+});
+
+test('omits default status, topic, and connections from href', () => {
+  const state = parseHistorySearchParams({ status: 'all', topic: 'all', connections: 'all' });
+  assert.equal(buildHistoryHref(state), '/history');
+});
+
 test('rejects malformed decade labels', () => {
   const state = parseHistorySearchParams({ decade: 'nineteen-fifties' });
   assert.equal(state.mode, 'all-time');
   assert.equal(state.decade, undefined);
+});
+
+test('normalizes invalid connections values to all', () => {
+  const state = parseHistorySearchParams({ connections: 'maybe' });
+  assert.equal(state.filters.connections, 'all');
 });

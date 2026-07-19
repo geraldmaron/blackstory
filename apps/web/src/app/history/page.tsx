@@ -1,20 +1,22 @@
 /**
  * Temporal history graph browse page: all-time union view plus decade stepper over
- * published graph release artifacts, synchronized accessible list peer, progressive-disclosure
- * graph rendering, and shareable URL state. SSR-first from the bundled snapshot; filters use
- * native GET navigation (no-JS safe).
+ * published graph release artifacts, relationship graph visualization, synchronized
+ * accessible list peer, and shareable URL state. SSR-first from the bundled snapshot;
+ * filters use native GET navigation (no-JS safe).
  */
 import React from 'react';
 import { FilterBar } from '@repo/ui';
 import {
   DecadeStepper,
   HistoryGraphPanel,
+  HistoryOverviewStrip,
   HistoryResultList,
 } from '../../components/history';
 import {
   HISTORY_DECADE_FRAMING,
   HISTORY_DIGNITY_FRAMING,
 } from '../../lib/history';
+import type { HistoryFacetOption } from '../../lib/history/filters';
 import { listPublicEntityViews } from '../../lib/public-data/source';
 import { HistoryExperience } from './HistoryExperience';
 import { buildHistoryViewModel } from './history-view-model';
@@ -22,10 +24,14 @@ import './history.css';
 
 void React;
 
+function formatFacetOptionLabel(option: HistoryFacetOption): string {
+  return option.count !== undefined ? `${option.label} (${option.count})` : option.label;
+}
+
 export const metadata = {
   title: 'History',
   description:
-    'Walk documented Black history through time — an all-time graph view and decade-by-decade browse over published release artifacts.',
+    'Browse documented Black history by decade — relationship graph, connection filters, and synchronized record list from published release artifacts.',
 };
 
 type HistoryPageProps = {
@@ -45,8 +51,9 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
           Decade by <em>decade</em>.
         </h1>
         <p className="ds-page__lede">
-          Walk the published history graph through time — what was active, in force, or living in
-          each era, derived from status history and release artifacts, never present-day status
+          Step through published release artifacts decade by decade — a relationship graph of
+          documented records and their connections, with filters and a synchronized list peer.
+          Status and presence reflect what was active in each era, never present-day status
           backfilled.
         </p>
         <p className="ds-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
@@ -57,10 +64,14 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
         <noscript>
           <div className="ds-history__noscript">
             <DecadeStepper decades={view.availableDecades} viewState={view.viewState} />
+            <HistoryOverviewStrip
+              overview={view.overview}
+              {...(view.activeDecade ? { activeDecade: view.activeDecade } : {})}
+            />
             <FilterBar
               method="get"
               action="/history"
-              legend="Filter history graph records"
+              legend="Filter history records"
               fields={[
                 {
                   id: 'history-q-njs',
@@ -75,7 +86,44 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
                   label: 'Kind',
                   type: 'select',
                   defaultValue: view.viewState.filters.kind,
-                  options: view.facetOptions.kind,
+                  options: view.facetOptions.kind.map((option) => ({
+                    value: option.value,
+                    label: formatFacetOptionLabel(option),
+                  })),
+                },
+                {
+                  id: 'history-status-njs',
+                  name: 'status',
+                  label: 'Status',
+                  type: 'select',
+                  defaultValue: view.viewState.filters.status,
+                  options: view.facetOptions.status.map((option) => ({
+                    value: option.value,
+                    label: formatFacetOptionLabel(option),
+                  })),
+                },
+                {
+                  id: 'history-topic-njs',
+                  name: 'topic',
+                  label: 'Topic',
+                  type: 'select',
+                  defaultValue: view.viewState.filters.topic,
+                  options: view.facetOptions.topic.map((option) => ({
+                    value: option.value,
+                    label: formatFacetOptionLabel(option),
+                  })),
+                },
+                {
+                  id: 'history-connections-njs',
+                  name: 'connections',
+                  label: 'Connections',
+                  type: 'select',
+                  defaultValue: view.viewState.filters.connections,
+                  options: [
+                    { value: 'all', label: 'All records' },
+                    { value: 'with', label: 'With connections' },
+                    { value: 'without', label: 'Without connections' },
+                  ],
                 },
                 {
                   id: 'history-sort-njs',

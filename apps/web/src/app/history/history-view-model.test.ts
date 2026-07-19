@@ -146,3 +146,78 @@ test('nodes link to entity pages and surface fact links when present', () => {
   assert.ok(place!.factLinks.length > 0);
   assert.match(place!.factLinks[0]!.href, /^\/facts\//);
 });
+
+test('topic filter reduces results to matching topic tags', () => {
+  const all = buildHistoryViewModel({});
+  const education = buildHistoryViewModel({ topic: 'education' });
+  assert.ok(education.totalMatched <= all.totalMatched);
+  for (const node of education.nodes) {
+    assert.ok(node.topicTags.includes('education'));
+  }
+});
+
+test('connections filter with keeps only nodes that have edges', () => {
+  const view = buildHistoryViewModel({ connections: 'with' });
+  assert.ok(view.totalMatched >= 1);
+  for (const node of view.nodes) {
+    assert.ok(node.connectionCount > 0);
+  }
+});
+
+test('status filter matches slug derived from status label', () => {
+  const all = buildHistoryViewModel({});
+  const historicOption = all.facetOptions.status.find((entry) => entry.value === 'historic');
+  if (!historicOption) {
+    assert.ok(all.facetOptions.status.length > 1, 'seed should expose a historic status facet');
+    return;
+  }
+  const historic = buildHistoryViewModel({ status: 'historic' });
+  assert.ok(historic.totalMatched >= 1);
+  for (const node of historic.nodes) {
+    assert.match(node.statusLabel.toLowerCase(), /historic/);
+  }
+});
+
+test('facet options include kind, status, and topic with counts', () => {
+  const view = buildHistoryViewModel({});
+  assert.ok(view.facetOptions.kind.length > 1);
+  assert.ok(view.facetOptions.kind.some((entry) => entry.value !== 'all' && (entry.count ?? 0) > 0));
+  assert.ok(view.facetOptions.status.length > 1);
+  assert.ok(view.facetOptions.topic.length > 1);
+  const topicWithCount = view.facetOptions.topic.find((entry) => entry.value !== 'all' && (entry.count ?? 0) > 0);
+  assert.ok(topicWithCount);
+});
+
+test('overview reflects filtered nodes and visible edges', () => {
+  const all = buildHistoryViewModel({});
+  assert.equal(all.overview.totalRecords, all.totalMatched);
+  assert.equal(all.overview.totalConnections, all.edges.length);
+  assert.ok(all.overview.kindCounts.length > 0);
+  assert.ok(all.overview.decadeDensity.length > 0);
+  assert.ok(all.overview.decadeDensity.every((entry) => entry.decade.endsWith('s')));
+});
+
+test('overview kind counts follow active filters', () => {
+  const places = buildHistoryViewModel({ kind: 'place' });
+  assert.ok(places.overview.kindCounts.every((entry) => entry.kind === 'place'));
+  assert.equal(
+    places.overview.kindCounts.reduce((sum, entry) => sum + entry.count, 0),
+    places.overview.totalRecords,
+  );
+});
+
+test('parses shareable URL with status, topic, and connections', () => {
+  const view = buildHistoryViewModel({
+    decade: '1870s',
+    kind: 'school',
+    status: 'historic',
+    topic: 'education',
+    connections: 'with',
+    selected: 'ent_dunbar_school_001',
+  });
+  assert.equal(view.viewState.filters.status, 'historic');
+  assert.equal(view.viewState.filters.topic, 'education');
+  assert.equal(view.viewState.filters.connections, 'with');
+  assert.equal(view.viewState.filters.kind, 'school');
+  assert.equal(view.viewState.selected, 'ent_dunbar_school_001');
+});

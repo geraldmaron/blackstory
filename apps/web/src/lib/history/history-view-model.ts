@@ -18,10 +18,19 @@ import {
   type HistoryNodeView,
 } from './build-history-graph';
 import {
+  applyHistoryConnectionsFilter,
   applyHistoryQueryFilter,
+  applyHistoryStatusFilter,
+  applyHistoryTopicFilter,
+  buildHistoryKindFacetOptionsWithCounts,
+  buildHistoryStatusFacetOptions,
+  buildHistoryTopicFacetOptions,
   sortHistoryNodes,
+  trimHistoryEdgesToNodes,
   type HistoryFacetOption,
+  type HistoryFilterState,
 } from './filters';
+import { buildHistoryOverview, type HistoryOverview } from './overview';
 import { parseHistorySearchParams, type HistoryViewState, type RawHistorySearchParams } from './url-state';
 
 export type HistoryViewModel = {
@@ -31,13 +40,29 @@ export type HistoryViewModel = {
   readonly sparseDecade: boolean;
   readonly nodes: readonly HistoryNodeView[];
   readonly edges: readonly HistoryEdgeView[];
-  readonly facetOptions: { readonly kind: readonly HistoryFacetOption[] };
+  readonly facetOptions: {
+    readonly kind: readonly HistoryFacetOption[];
+    readonly status: readonly HistoryFacetOption[];
+    readonly topic: readonly HistoryFacetOption[];
+  };
+  readonly overview: HistoryOverview;
   readonly totalMatched: number;
   readonly releaseId: string;
   readonly contentHash: string;
   readonly selectedNode?: HistoryNodeView;
   readonly selectedEdge?: HistoryEdgeView;
 };
+
+function buildSliceNodesWithCounts(
+  slice: ReturnType<typeof resolveHistoryGraphSlice>,
+  filters: HistoryFilterState,
+  entitiesById: ReadonlyMap<string, PublicEntityView>,
+): readonly HistoryNodeView[] {
+  const nodes = buildHistoryNodes(slice, filters, entitiesById);
+  const nodeIds = new Set(nodes.map((node) => node.entityId));
+  const edges = buildHistoryEdges(slice, SEED_ENTITY_RELATIONSHIPS, entitiesById, nodeIds);
+  return withHistoryConnectionCounts(nodes, edges);
+}
 
 export function buildHistoryViewModel(
   raw: RawHistorySearchParams,
@@ -48,21 +73,31 @@ export function buildHistoryViewModel(
   const context = buildHistoryGraphContext(artifact, entities);
   const slice = resolveHistoryGraphSlice(artifact, viewState.mode, viewState.decade);
 
-  const kindFiltered = buildHistoryNodes(slice, viewState.filters, context.entitiesById);
+  const kindFiltered = buildSliceNodesWithCounts(slice, viewState.filters, context.entitiesById);
   const visibleNodeIds = new Set(kindFiltered.map((node) => node.entityId));
   const edges = buildHistoryEdges(slice, SEED_ENTITY_RELATIONSHIPS, context.entitiesById, visibleNodeIds);
-  const withCounts = withHistoryConnectionCounts(kindFiltered, edges);
-  const queried = applyHistoryQueryFilter(withCounts, viewState.filters.q);
-  const nodes = sortHistoryNodes(queried, viewState.filters.sort);
 
-  // When q hides a node, drop edges that no longer have both endpoints visible.
+  const sliceForKindFacets = buildSliceNodesWithCounts(
+    slice,
+    { ...viewState.filters, kind: 'all' },
+    context.entitiesById,
+  );
+
+  const facetOptions = {
+    kind: buildHistoryKindFacetOptionsWithCounts(sliceForKindFacets),
+    status: buildHistoryStatusFacetOptions(kindFiltered),
+    topic: buildHistoryTopicFacetOptions(kindFiltered),
+  };
+
+  let filtered = kindFiltered;
+  filtered = applyHistoryStatusFilter(filtered, viewState.filters.status);
+  filtered = applyHistoryTopicFilter(filtered, viewState.filters.topic);
+  filtered = applyHistoryConnectionsFilter(filtered, viewState.filters.connections);
+  filtered = applyHistoryQueryFilter(filtered, viewState.filters.q);
+  const nodes = sortHistoryNodes(filtered, viewState.filters.sort);
+
   const matchedIds = new Set(nodes.map((node) => node.entityId));
-  const visibleEdges =
-    viewState.filters.q.trim().length > 0
-      ? edges.filter(
-          (edge) => matchedIds.has(edge.fromEntityId) && matchedIds.has(edge.toEntityId),
-        )
-      : edges;
+  const visibleEdges = trimHistoryEdgesToNodes(edges, matchedIds);
 
   const selectedNode = viewState.selected
     ? nodes.find((node) => node.entityId === viewState.selected)
@@ -71,6 +106,8 @@ export function buildHistoryViewModel(
     ? visibleEdges.find((edge) => edge.edgeId === viewState.edge)
     : undefined;
 
+  const overview = buildHistoryOverview(nodes, visibleEdges, artifact);
+
   return {
     viewState,
     availableDecades: context.availableDecades,
@@ -78,7 +115,8 @@ export function buildHistoryViewModel(
     sparseDecade: slice.sparseDecade,
     nodes,
     edges: visibleEdges,
-    facetOptions: context.facetOptions,
+    facetOptions,
+    overview,
     totalMatched: nodes.length,
     releaseId: context.releaseId,
     contentHash: context.contentHash,

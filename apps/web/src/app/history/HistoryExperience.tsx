@@ -2,22 +2,26 @@
 
 /**
  * Client orchestrator for `/history` temporal browse experience. Wires the decade
- * stepper, progressive-disclosure graph panel, synchronized accessible list, narrative/edge cards,
- * and shareable URL state. The server-rendered graph release snapshot is the source of truth;
- * `/history/api` refine is optional progressive enhancement when App Check is configured.
+ * stepper, overview strip, filter toolbar, progressive-disclosure graph panel,
+ * synchronized accessible list, narrative/edge cards, and shareable URL state. The
+ * server-rendered graph release snapshot is the source of truth; `/history/api` refine
+ * is optional progressive enhancement when App Check is configured.
  */
 import { startTransition, useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Notice } from '@repo/ui';
+import { Notice, cx } from '@repo/ui';
 import {
   DecadeStepper,
   HistoryEdgePanel,
   HistoryGraphPanel,
   HistoryNarrativeCard,
+  HistoryOverviewStrip,
   HistoryResultList,
 } from '../../components/history';
 import {
+  DEFAULT_HISTORY_FILTERS,
   HISTORY_SORT_OPTIONS,
+  type HistoryFacetOption,
   type HistorySort,
 } from '../../lib/history/filters';
 import {
@@ -34,6 +38,16 @@ import type { HistoryViewModel } from './history-view-model';
 export type HistoryExperienceProps = {
   readonly initial: HistoryViewModel;
 };
+
+const HISTORY_CONNECTIONS_OPTIONS = [
+  { value: 'all', label: 'All records' },
+  { value: 'with', label: 'With connections' },
+  { value: 'without', label: 'Without connections' },
+] as const;
+
+function formatFacetOptionLabel(option: HistoryFacetOption): string {
+  return option.count !== undefined ? `${option.label} (${option.count})` : option.label;
+}
 
 function mergeViewState(
   base: HistoryViewState,
@@ -174,6 +188,31 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
     [applyFilters, view.facetOptions.kind],
   );
 
+  const handleStatusChange = useCallback(
+    (status: string) => {
+      const valid = view.facetOptions.status.some((option) => option.value === status);
+      applyFilters({ status: valid ? status : 'all' });
+    },
+    [applyFilters, view.facetOptions.status],
+  );
+
+  const handleTopicChange = useCallback(
+    (topic: string) => {
+      const valid = view.facetOptions.topic.some((option) => option.value === topic);
+      applyFilters({ topic: valid ? topic : 'all' });
+    },
+    [applyFilters, view.facetOptions.topic],
+  );
+
+  const handleConnectionsChange = useCallback(
+    (connections: string) => {
+      const next =
+        connections === 'with' || connections === 'without' ? connections : DEFAULT_HISTORY_FILTERS.connections;
+      applyFilters({ connections: next });
+    },
+    [applyFilters],
+  );
+
   const handleSortChange = useCallback(
     (sort: string) => {
       const nextSort = (HISTORY_SORT_OPTIONS.some((option) => option.value === sort)
@@ -194,13 +233,23 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
 
   const handleClearFilters = useCallback(() => {
     setQueryDraft('');
-    applyFilters({ q: '', kind: 'all', sort: 'name' });
+    applyFilters({
+      q: DEFAULT_HISTORY_FILTERS.q,
+      kind: DEFAULT_HISTORY_FILTERS.kind,
+      sort: DEFAULT_HISTORY_FILTERS.sort,
+      status: DEFAULT_HISTORY_FILTERS.status,
+      topic: DEFAULT_HISTORY_FILTERS.topic,
+      connections: DEFAULT_HISTORY_FILTERS.connections,
+    });
   }, [applyFilters]);
 
   const hasActiveFilters =
     view.viewState.filters.q.length > 0 ||
-    view.viewState.filters.kind !== 'all' ||
-    view.viewState.filters.sort !== 'name';
+    view.viewState.filters.kind !== DEFAULT_HISTORY_FILTERS.kind ||
+    view.viewState.filters.sort !== DEFAULT_HISTORY_FILTERS.sort ||
+    view.viewState.filters.status !== DEFAULT_HISTORY_FILTERS.status ||
+    view.viewState.filters.topic !== DEFAULT_HISTORY_FILTERS.topic ||
+    view.viewState.filters.connections !== DEFAULT_HISTORY_FILTERS.connections;
 
   const listProps = {
     nodes: view.nodes,
@@ -235,6 +284,11 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
         />
       </div>
 
+      <HistoryOverviewStrip
+        overview={view.overview}
+        {...(view.activeDecade ? { activeDecade: view.activeDecade } : {})}
+      />
+
       <div className="ds-history__toolbar">
         <form className="ds-history__search" onSubmit={handleQuerySubmit} role="search">
           <label className="ds-history__search-label" htmlFor="history-q">
@@ -255,15 +309,69 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
           </button>
         </form>
 
-        <label className="ds-pill-select" htmlFor="history-kind">
-          <span className="ds-pill-select__label">Kind</span>
+        <fieldset className="ds-history-kind-chips" role="radiogroup" aria-label="Kind">
+          <legend className="ds-history-kind-chips__legend">Kind</legend>
+          {view.facetOptions.kind.map((option) => {
+            const isActive = view.viewState.filters.kind === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                className={cx(
+                  'ds-history-kind-chips__chip',
+                  isActive && 'ds-history-kind-chips__chip--active',
+                )}
+                role="radio"
+                aria-checked={isActive}
+                onClick={() => handleKindChange(option.value)}
+              >
+                {formatFacetOptionLabel(option)}
+              </button>
+            );
+          })}
+        </fieldset>
+
+        <label className="ds-pill-select" htmlFor="history-status">
+          <span className="ds-pill-select__label">Status</span>
           <select
             className="ds-pill-select__control"
-            id="history-kind"
-            value={view.viewState.filters.kind}
-            onChange={(event) => handleKindChange(event.currentTarget.value)}
+            id="history-status"
+            value={view.viewState.filters.status}
+            onChange={(event) => handleStatusChange(event.currentTarget.value)}
           >
-            {view.facetOptions.kind.map((option) => (
+            {view.facetOptions.status.map((option) => (
+              <option key={option.value} value={option.value}>
+                {formatFacetOptionLabel(option)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="ds-pill-select" htmlFor="history-topic">
+          <span className="ds-pill-select__label">Topic</span>
+          <select
+            className="ds-pill-select__control"
+            id="history-topic"
+            value={view.viewState.filters.topic}
+            onChange={(event) => handleTopicChange(event.currentTarget.value)}
+          >
+            {view.facetOptions.topic.map((option) => (
+              <option key={option.value} value={option.value}>
+                {formatFacetOptionLabel(option)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="ds-pill-select" htmlFor="history-connections">
+          <span className="ds-pill-select__label">Connections</span>
+          <select
+            className="ds-pill-select__control"
+            id="history-connections"
+            value={view.viewState.filters.connections}
+            onChange={(event) => handleConnectionsChange(event.currentTarget.value)}
+          >
+            {HISTORY_CONNECTIONS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -293,7 +401,7 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
           </button>
         ) : null}
 
-        <p className="ds-sans ds-history__count" id="history-results-heading">
+        <p className="ds-sans ds-history__count">
           {view.totalMatched} record{view.totalMatched === 1 ? '' : 's'} in view
           {view.viewState.mode === 'decade' && view.activeDecade ? ` · ${view.activeDecade}` : ' · all time'}
         </p>
@@ -306,12 +414,15 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
       <div className="ds-history__layout">
         <div className="ds-history-graph-panel">
           <h2 className="ds-section__kicker" id="history-graph-heading">
-            History graph
+            Relationship graph
           </h2>
           <HistoryGraphPanel {...graphProps} />
         </div>
 
         <div className="ds-history__list-panel">
+          <h2 className="ds-section__kicker" id="history-results-heading">
+            Records in view
+          </h2>
           {selectedNode ? (
             <HistoryNarrativeCard
               node={selectedNode}

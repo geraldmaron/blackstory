@@ -1,11 +1,15 @@
 /**
  * Layout and presentation styles for `/history` temporal browse experience. Uses
  * brand tokens via the shared `@black-book/ui/styles.css` vocabulary Archive Paper canvas,
- * Copper Pin accents, no violence heat colors.
+ * Copper Pin accents, no violence heat colors. Width is constrained with a min-width: 0
+ * cascade so the decade rail scrolls internally instead of expanding the page.
  */
 .ds-history {
   display: grid;
   gap: var(--ds-space-4);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .ds-history__intro {
@@ -24,12 +28,36 @@
    chrome: one continuous baseline, mono decade stops riding it, copper
    underline burn on the active stop. Scrolls horizontally on narrow
    viewports instead of wrapping into a button pile. */
+.ds-history-stepper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  /* Soft edge mask hints at horizontal scroll without decorative shadows. */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 0.75rem,
+    #000 calc(100% - 0.75rem),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 0.75rem,
+    #000 calc(100% - 0.75rem),
+    transparent
+  );
+}
+
 .ds-history-stepper__list {
   display: flex;
   gap: 0;
   list-style: none;
   margin: 0;
   padding: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
   -webkit-overflow-scrolling: touch;
@@ -76,6 +104,9 @@
   z-index: 2;
   background: var(--ds-canvas);
   padding-bottom: var(--ds-space-2);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .ds-history__toolbar {
@@ -83,6 +114,9 @@
   flex-wrap: wrap;
   gap: var(--ds-space-2) var(--ds-space-3);
   align-items: flex-end;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .ds-history__search {
@@ -91,6 +125,8 @@
   gap: var(--ds-space-2);
   align-items: flex-end;
   flex: 1 1 16rem;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .ds-history__search-label {
@@ -107,6 +143,9 @@
 
 .ds-history__search-input {
   flex: 1 1 12rem;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
   min-height: 2.5rem;
   padding: 0 var(--ds-space-3);
   border: var(--ds-border-width) solid var(--ds-border);
@@ -140,11 +179,20 @@
 .ds-history__layout {
   display: grid;
   gap: var(--ds-space-4);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-history-graph-panel,
+.ds-history__list-panel {
+  min-width: 0;
+  max-width: 100%;
 }
 
 @media (min-width: 56rem) {
   .ds-history__layout {
-    grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 1fr);
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
     align-items: start;
   }
 
@@ -175,6 +223,9 @@
   padding: var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-border);
   background: var(--ds-canvas);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .ds-history-graph__group-title {
@@ -193,16 +244,25 @@
   padding: 0;
 }
 
+.ds-history-graph__node {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .ds-history-graph__node-header {
   display: flex;
   flex-wrap: wrap;
   gap: var(--ds-space-2);
   align-items: center;
   justify-content: space-between;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .ds-history-graph__node-button {
   flex: 1 1 12rem;
+  min-width: 0;
+  max-width: 100%;
   display: grid;
   gap: var(--ds-space-1);
   min-height: 2.75rem;
@@ -226,9 +286,16 @@
   outline-offset: calc(-2 * var(--ds-border-width));
 }
 
+.ds-history-graph__node-link {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .ds-history-graph__node-name {
   font-family: var(--ds-font-sans);
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
 .ds-history-graph__node-status {
@@ -336,4 +403,338 @@
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
   color: var(--ds-ink-subtle);
+}
+
+/* History graph SVG visualization — appended after list/graph panel overflow work. */
+.ds-history-graph-viz {
+  display: grid;
+  gap: var(--ds-space-2);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-history-graph-viz__truncation {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--ds-ink-subtle);
+}
+
+.ds-history-graph-viz__svg {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: auto;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+}
+
+.ds-history-graph-viz__edge-line {
+  stroke: var(--ds-rule);
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+
+.ds-history-graph-viz__edge-line--selected {
+  stroke: var(--ds-accent-graphic);
+  stroke-width: 2.5;
+}
+
+.ds-history-graph-viz__edge-hit {
+  stroke: transparent;
+  stroke-width: 12;
+  fill: none;
+  cursor: pointer;
+}
+
+.ds-history-graph-viz__edge-hit:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+.ds-history-graph-viz__node-shape,
+.ds-history-graph-viz__node-core {
+  fill: var(--ds-ink);
+  stroke: var(--ds-border-strong);
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+
+.ds-history-graph-viz__node-shape--selected,
+.ds-history-graph-viz__node--selected .ds-history-graph-viz__node-core {
+  stroke: var(--ds-accent-graphic);
+  stroke-width: 2.5;
+}
+
+.ds-history-graph-viz__node--selected .ds-history-graph-viz__node-shape {
+  filter: none;
+}
+
+.ds-history-graph-viz__node-hit,
+.ds-history-graph-viz__node-focus {
+  fill: transparent;
+  stroke: none;
+}
+
+.ds-history-graph-viz__node-focus {
+  cursor: pointer;
+}
+
+.ds-history-graph-viz__node-focus:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+.ds-history-graph-viz__node-label {
+  font-family: var(--ds-font-sans);
+  font-size: 0.6875rem;
+  fill: var(--ds-ink);
+  pointer-events: none;
+}
+
+.ds-history-graph-viz__node-name {
+  font-weight: 500;
+}
+
+.ds-history-graph-viz__node-kind {
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  fill: var(--ds-ink-subtle);
+  text-transform: lowercase;
+}
+
+/* Overview strip — record/connection stats, kind bars, decade density */
+.ds-history-overview {
+  display: grid;
+  gap: var(--ds-space-4);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: var(--ds-space-3) 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-history-overview__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-4) var(--ds-space-6);
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-history-overview__stat {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin: 0;
+}
+
+.ds-history-overview__stat-label {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+}
+
+.ds-history-overview__stat-value {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: clamp(1.25rem, 1.1rem + 0.8vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.ds-history-overview__section-label {
+  margin: 0 0 var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ds-history-overview__kinds,
+.ds-history-overview__density {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-history-overview__kind-list,
+.ds-history-overview__density-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-history-overview__kind-row {
+  display: grid;
+  grid-template-columns: minmax(6rem, 8rem) minmax(0, 1fr);
+  gap: var(--ds-space-2);
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-history-overview__kind-label {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+}
+
+.ds-history-overview__kind-count {
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-history-overview__kind-bar {
+  display: block;
+  height: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  background: var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  overflow: hidden;
+}
+
+.ds-history-overview__kind-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--ds-ink);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-history-overview__density-list {
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 2px;
+  height: 3rem;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.ds-history-overview__density-bar {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--ds-space-1);
+  min-width: 0.375rem;
+  max-width: 1.25rem;
+  height: 100%;
+}
+
+.ds-history-overview__density-bar-fill {
+  display: block;
+  width: 100%;
+  min-height: 2px;
+  background: var(--ds-ink);
+  border-radius: var(--ds-radius-sm) var(--ds-radius-sm) 0 0;
+}
+
+.ds-history-overview__density-bar--empty .ds-history-overview__density-bar-fill {
+  background: var(--ds-border);
+}
+
+.ds-history-overview__density-bar--active .ds-history-overview__density-bar-fill {
+  background: var(--ds-accent-graphic);
+}
+
+.ds-history-overview__density-bar-label {
+  display: none;
+  font-family: var(--ds-font-mono);
+  font-size: 0.5625rem;
+  color: var(--ds-ink-muted);
+  white-space: nowrap;
+}
+
+@media (min-width: 48rem) {
+  .ds-history-overview__density-list {
+    height: 4.5rem;
+  }
+
+  .ds-history-overview__density-bar-label {
+    display: block;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    max-height: 2.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Kind filter chips — copper underline on active, no shadow */
+.ds-history-kind-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1) var(--ds-space-2);
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-history-kind-chips__legend {
+  flex: 0 0 100%;
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+}
+
+.ds-history-kind-chips__chip {
+  appearance: none;
+  margin: 0;
+  padding: var(--ds-space-1) var(--ds-space-2);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition:
+    color var(--ds-duration-fast) var(--ds-easing),
+    border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-history-kind-chips__chip:hover {
+  color: var(--ds-ink);
+  border-bottom-color: var(--ds-border-strong);
+}
+
+.ds-history-kind-chips__chip--active {
+  color: var(--ds-accent);
+  border-bottom-color: var(--ds-accent-graphic);
+  font-weight: 500;
+}
+
+.ds-history-kind-chips__chip:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
 }

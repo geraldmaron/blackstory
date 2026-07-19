@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { DEFAULT_HISTORY_FILTERS } from '../../lib/history/filters';
 import { DecadeStepper } from './DecadeStepper';
 import { HistoryResultList } from './HistoryResultList';
 
@@ -28,7 +29,7 @@ test('DecadeStepper renders tablist with all-time and decade tabs', () => {
   const html = renderToStaticMarkup(
     <DecadeStepper
       decades={['1860s', '1950s']}
-      viewState={{ mode: 'decade', decade: '1950s', filters: { kind: 'all', q: '', sort: 'name' } }}
+      viewState={{ mode: 'decade', decade: '1950s', filters: DEFAULT_HISTORY_FILTERS }}
     />,
   );
   assert.match(html, /role="tablist"/);

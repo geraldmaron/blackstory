@@ -270,7 +270,9 @@ view).
 **`/search`, `/facts`, `/legal`** — document rhythm: mast, filter row (native controls,
 compact), result list as top-rule entries with mono meta lines. Pagination quiet buttons.
 
-**`/history`** — mast + decade scrubber + graph panels on the same instrument language as
+**`/history`** — mast + decade scrubber + SVG relationship graph (nodes/edges) with
+  synchronized list peer, overview strip (counts, kind composition, decade density), and
+  richer facets (kind chips, status, topic, connections). Same instrument language as
 explore.
 
 **Longform (`/methodology`, `/about`, `/myths/[slug]`, `/legal/[slug]`)** — single serif

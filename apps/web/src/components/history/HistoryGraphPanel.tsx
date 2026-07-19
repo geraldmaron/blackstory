@@ -1,13 +1,14 @@
 /**
- * Progressive-disclosure graph panel for `/history`. Groups nodes by kind with equal visual
- * weight (dignity rule: no violence-heat styling). Selected nodes reveal their evidence-backed
- * edges; every node links to its entity page.
+ * Progressive-disclosure graph panel for `/history`. Renders an SVG network of nodes and edges
+ * with equal visual weight per kind (dignity rule: no violence-heat styling). Selected nodes
+ * reveal their evidence-backed connections below the graph.
  */
 import React from 'react';
 import Link from 'next/link';
 import { cx, EmptyState } from '@repo/ui';
 import type { HistoryEdgeView, HistoryNodeView } from '../../lib/history/build-history-graph';
 import { HISTORY_GAP_COPY } from '../../lib/history/copy';
+import { HistoryGraphViz } from './HistoryGraphViz';
 
 void React;
 
@@ -22,16 +23,6 @@ export type HistoryGraphPanelProps = {
   readonly labelledBy?: string;
   readonly className?: string;
 };
-
-function groupNodesByKind(nodes: readonly HistoryNodeView[]): ReadonlyMap<string, readonly HistoryNodeView[]> {
-  const groups = new Map<string, HistoryNodeView[]>();
-  for (const node of nodes) {
-    const bucket = groups.get(node.kind) ?? [];
-    bucket.push(node);
-    groups.set(node.kind, bucket);
-  }
-  return groups;
-}
 
 function edgesForNode(nodeId: string, edges: readonly HistoryEdgeView[]): readonly HistoryEdgeView[] {
   return edges.filter((edge) => edge.fromEntityId === nodeId || edge.toEntityId === nodeId);
@@ -58,7 +49,8 @@ export function HistoryGraphPanel({
     return <EmptyState title={copy.title}>{copy.body}</EmptyState>;
   }
 
-  const groups = groupNodesByKind(nodes);
+  const selectedNode = selectedId ? nodes.find((node) => node.entityId === selectedId) : undefined;
+  const selectedNodeEdges = selectedNode ? edgesForNode(selectedNode.entityId, edges) : [];
 
   return (
     <section
@@ -66,70 +58,47 @@ export function HistoryGraphPanel({
       aria-labelledby={labelledBy}
       aria-live="polite"
     >
-      {[...groups.entries()].map(([kind, kindNodes]) => (
-        <div key={kind} className="ds-history-graph__group">
-          <h3 className="ds-history-graph__group-title">{kind.charAt(0).toUpperCase() + kind.slice(1)}</h3>
-          <ul className="ds-history-graph__nodes">
-            {kindNodes.map((node) => {
-              const isSelected = node.entityId === selectedId;
-              const nodeEdges = edgesForNode(node.entityId, edges);
+      <HistoryGraphViz
+        nodes={nodes}
+        edges={edges}
+        {...(selectedId ? { selectedId } : {})}
+        {...(selectedEdgeId ? { selectedEdgeId } : {})}
+        {...(onSelectNode ? { onSelectNode } : {})}
+        {...(onSelectEdge ? { onSelectEdge } : {})}
+      />
 
-              return (
-                <li key={node.entityId} className="ds-history-graph__node">
-                  <div className="ds-history-graph__node-header">
-                    <button
-                      type="button"
-                      className={cx(
-                        'ds-history-graph__node-button',
-                        isSelected && 'ds-history-graph__node-button--selected',
-                      )}
-                      aria-pressed={isSelected}
-                      aria-expanded={isSelected}
-                      {...(onSelectNode
-                        ? { onClick: () => onSelectNode(node.entityId) }
-                        : {})}
-                    >
-                      <span className="ds-history-graph__node-name">{node.displayName}</span>
-                      <span className="ds-mono ds-history-graph__node-status">{node.statusLabel}</span>
-                    </button>
-                    <Link className="ds-cta ds-cta--quiet ds-history-graph__node-link" href={node.href}>
-                      Open record
-                    </Link>
-                  </div>
-
-                  {isSelected && nodeEdges.length > 0 ? (
-                    <details open className="ds-history-graph__connections">
-                      <summary>Connections ({nodeEdges.length})</summary>
-                      <ul>
-                        {nodeEdges.map((edge) => (
-                          <li key={edge.edgeId}>
-                            <button
-                              type="button"
-                              className={cx(
-                                'ds-history-graph__edge-button',
-                                selectedEdgeId === edge.edgeId && 'ds-history-graph__edge-button--selected',
-                              )}
-                              aria-pressed={selectedEdgeId === edge.edgeId}
-                              {...(onSelectEdge
-                                ? { onClick: () => onSelectEdge(edge.edgeId) }
-                                : {})}
-                            >
-                              {edge.sentence}
-                              <span className="ds-mono">
-                                {edge.evidenceCount} citation{edge.evidenceCount === 1 ? '' : 's'}
-                              </span>
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
-                  ) : null}
-                </li>
-              );
-            })}
+      {selectedNode && selectedNodeEdges.length > 0 ? (
+        <details open className="ds-history-graph__connections">
+          <summary>
+            Connections for {selectedNode.displayName} ({selectedNodeEdges.length})
+          </summary>
+          <p className="ds-history-graph__node-header">
+            <Link className="ds-cta ds-cta--quiet ds-history-graph__node-link" href={selectedNode.href}>
+              Open record
+            </Link>
+          </p>
+          <ul>
+            {selectedNodeEdges.map((edge) => (
+              <li key={edge.edgeId}>
+                <button
+                  type="button"
+                  className={cx(
+                    'ds-history-graph__edge-button',
+                    selectedEdgeId === edge.edgeId && 'ds-history-graph__edge-button--selected',
+                  )}
+                  aria-pressed={selectedEdgeId === edge.edgeId}
+                  {...(onSelectEdge ? { onClick: () => onSelectEdge(edge.edgeId) } : {})}
+                >
+                  {edge.sentence}
+                  <span className="ds-mono">
+                    {edge.evidenceCount} citation{edge.evidenceCount === 1 ? '' : 's'}
+                  </span>
+                </button>
+              </li>
+            ))}
           </ul>
-        </div>
-      ))}
+        </details>
+      ) : null}
 
       {edges.length === 0 ? (
         <EmptyState title={HISTORY_GAP_COPY.noConnections.title}>

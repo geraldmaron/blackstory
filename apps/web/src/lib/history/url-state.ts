@@ -1,10 +1,11 @@
 /**
- * Shareable URL state for `/history`: decade (or all-time), kind/q/sort filters, selected node,
- * and optional selected edge. Pure parse/serialize so the SSR page and client orchestrator read and
- * write the same shape — copied URLs reproduce the same browse view.
+ * Shareable URL state for `/history`: decade (or all-time), kind/q/sort/status/topic/connections
+ * filters, selected node, and optional selected edge. Pure parse/serialize so the SSR page and
+ * client orchestrator read and write the same shape — copied URLs reproduce the same browse view.
  */
 import {
   DEFAULT_HISTORY_FILTERS,
+  parseHistoryConnectionsFilter,
   parseHistorySort,
   type HistoryFilterState,
 } from './filters';
@@ -46,13 +47,16 @@ export function parseHistorySearchParams(raw: RawHistorySearchParams): HistoryVi
   const kind = cleanSelectParam(firstValue(raw.kind)) as HistoryFilterState['kind'];
   const q = (firstValue(raw.q) ?? '').trim();
   const sort = parseHistorySort(firstValue(raw.sort));
+  const status = cleanSelectParam(firstValue(raw.status));
+  const topic = cleanSelectParam(firstValue(raw.topic));
+  const connections = parseHistoryConnectionsFilter(firstValue(raw.connections));
   const selectedRaw = firstValue(raw.selected)?.trim();
   const edgeRaw = firstValue(raw.edge)?.trim();
 
   return {
     mode: decade ? 'decade' : 'all-time',
     ...(decade ? { decade } : {}),
-    filters: { kind, q, sort },
+    filters: { kind, q, sort, status, topic, connections },
     ...(selectedRaw ? { selected: selectedRaw } : {}),
     ...(edgeRaw ? { edge: edgeRaw } : {}),
   };
@@ -71,6 +75,15 @@ export function buildHistorySearchParams(state: HistoryViewState): string {
   }
   if (state.filters.sort && state.filters.sort !== DEFAULT_HISTORY_FILTERS.sort) {
     params.set('sort', state.filters.sort);
+  }
+  if (state.filters.status !== DEFAULT_HISTORY_FILTERS.status) {
+    params.set('status', state.filters.status);
+  }
+  if (state.filters.topic !== DEFAULT_HISTORY_FILTERS.topic) {
+    params.set('topic', state.filters.topic);
+  }
+  if (state.filters.connections !== DEFAULT_HISTORY_FILTERS.connections) {
+    params.set('connections', state.filters.connections);
   }
   if (state.selected) params.set('selected', state.selected);
   if (state.edge) params.set('edge', state.edge);

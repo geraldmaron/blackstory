@@ -6,5 +6,7 @@ export * from './copy';
 export * from './decade-status';
 export * from './filters';
 export * from './history-view-model';
+export * from './layout-history-graph';
+export * from './overview';
 export * from './snapshot-mode';
 export * from './url-state';

@@ -15,7 +15,7 @@ import {
   resolveHistoryGraphSlice,
 } from '../../../lib/history/build-history-graph';
 import { listPublicEntityViews } from '../../../lib/public-data/source';
-import type { HistoryFilterState } from '../../../lib/history/filters';
+import { parseHistoryConnectionsFilter, parseHistorySort, type HistoryFilterState } from '../../../lib/history/filters';
 import { parseDecadeParam } from '../../../lib/history/url-state';
 import type { HistoryAppCheckGuard } from './app-check-guard';
 import type { createHistoryRateLimitGuard } from './rate-limit-guard';
@@ -77,7 +77,14 @@ export function parseHistoryFilterState(
   if (!allowed.has(kind)) {
     return { error: 'invalid_kind_filter' };
   }
-  return { kind };
+  return {
+    kind,
+    q: (params.get('q') ?? '').trim(),
+    sort: parseHistorySort(params.get('sort') ?? undefined),
+    status: cleanSelectParam(params.get('status')),
+    topic: cleanSelectParam(params.get('topic')),
+    connections: parseHistoryConnectionsFilter(params.get('connections') ?? undefined),
+  };
 }
 
 export async function handleHistoryRefineRequest(
