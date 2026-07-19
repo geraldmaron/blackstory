@@ -25,6 +25,10 @@ import {
 import { commitOperatorIntake } from './commit.js';
 import type { DiscoveryRunBatch } from './discovery-run.js';
 import { runBoundedDiscoveryCampaign } from './discovery-run.js';
+import {
+  runCommunityObscurityOperatorCampaign,
+} from './community-obscurity-run.js';
+import { runRssOperatorCampaign } from './rss-campaign-run.js';
 import { prepareEdgeIntake, type EdgeIntakeInput } from './edge-intake.js';
 import { createNodeSafeFetchDependencies } from './fetch.js';
 import { OPERATOR_SOURCES, type OperatorIdentity, type OperatorSource } from './identity.js';
@@ -57,8 +61,8 @@ type Flags = {
   readonly booleans: Set<string>;
 };
 
-const REPEATABLE_FLAGS = new Set(['--source-url']);
-const BOOLEAN_FLAGS = new Set(['--commit', '--continue-on-quarantine']);
+const REPEATABLE_FLAGS = new Set(['--source-url', '--feed-xml']);
+const BOOLEAN_FLAGS = new Set(['--commit', '--continue-on-quarantine', '--full', '--include-curated']);
 
 function parseFlags(argv: readonly string[]): Flags {
   const values = new Map<string, string>();
@@ -361,6 +365,87 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         stdout(JSON.stringify(summary, null, 2));
         return 0;
       }
+      case 'community-obscurity-run': {
+        const pairs = flags.repeated.get('--feed-xml') ?? [];
+        if (pairs.length === 0) {
+          throw new Error(
+            'community-obscurity-run requires --feed-xml feedId=/path/to/feed.xml (repeatable)',
+          );
+        }
+        const feedXmlByFeedId = new Map<string, string>();
+        for (const pair of pairs) {
+          const eq = pair.indexOf('=');
+          if (eq <= 0) {
+            throw new Error(`--feed-xml must be feedId=/path (got ${pair})`);
+          }
+          const feedId = pair.slice(0, eq);
+          const path = pair.slice(eq + 1);
+          feedXmlByFeedId.set(feedId, readFile(path));
+        }
+        const catalogTitles = (optionalFlag(flags, '--catalog-titles') ?? '')
+          .split('|')
+          .map((title) => title.trim())
+          .filter(Boolean);
+        if (catalogTitles.length === 0) {
+          throw new Error(
+            'community-obscurity-run requires --catalog-titles "Title One|Title Two|..."',
+          );
+        }
+        const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
+        const campaignId = optionalFlag(flags, '--campaign-id');
+        const runId = optionalFlag(flags, '--run-id');
+        const maxCandidatesRaw = optionalFlag(flags, '--max-candidates');
+        const { summary, result } = runCommunityObscurityOperatorCampaign({
+          feedXmlByFeedId,
+          catalogTitles,
+          nowIso,
+          ...(campaignId !== undefined ? { campaignId } : {}),
+          ...(runId !== undefined ? { runId } : {}),
+          ...(maxCandidatesRaw !== undefined
+            ? { maxCandidates: Number(maxCandidatesRaw) }
+            : {}),
+        });
+        const full = flags.booleans.has('--full');
+        stdout(JSON.stringify(full ? { summary, result } : summary, null, 2));
+        return 0;
+      }
+      case 'rss-campaign-run': {
+        const pairs = flags.repeated.get('--feed-xml') ?? [];
+        if (pairs.length === 0) {
+          throw new Error(
+            'rss-campaign-run requires --feed-xml feedId=/path/to/feed.xml (repeatable)',
+          );
+        }
+        const feedXmlByFeedId = new Map<string, string>();
+        for (const pair of pairs) {
+          const eq = pair.indexOf('=');
+          if (eq <= 0) {
+            throw new Error(`--feed-xml must be feedId=/path (got ${pair})`);
+          }
+          const feedId = pair.slice(0, eq);
+          const path = pair.slice(eq + 1);
+          feedXmlByFeedId.set(feedId, readFile(path));
+        }
+        const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
+        const campaignId = optionalFlag(flags, '--campaign-id');
+        const runId = optionalFlag(flags, '--run-id');
+        const maxCandidatesRaw = optionalFlag(flags, '--max-candidates');
+        const { summary, result } = await runRssOperatorCampaign({
+          feedXmlByFeedId,
+          nowIso,
+          ...(campaignId !== undefined ? { campaignId } : {}),
+          ...(runId !== undefined ? { runId } : {}),
+          ...(maxCandidatesRaw !== undefined
+            ? { maxCandidates: Number(maxCandidatesRaw) }
+            : {}),
+          ...(flags.booleans.has('--include-curated')
+            ? { includeCuratedCommunityFeeds: true }
+            : {}),
+        });
+        const full = flags.booleans.has('--full');
+        stdout(JSON.stringify(full ? { summary, result } : summary, null, 2));
+        return 0;
+      }
       case 'locate': {
         const storedLat = optionalFlag(flags, '--stored-lat');
         const storedLng = optionalFlag(flags, '--stored-lng');
@@ -416,7 +501,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       }
       default: {
         stderr(
-          'Usage: operator-cli <submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|locate> [flags]',
+          'Usage: operator-cli <submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|locate> [flags]',
         );
         return command ? 1 : 0;
       }

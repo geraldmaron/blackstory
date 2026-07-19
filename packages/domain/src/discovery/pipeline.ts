@@ -14,6 +14,13 @@ import {
   recordWithinCampaignBoundaries,
   type CampaignBudgetSnapshot,
 } from './campaign.js';
+import {
+  attachCatalogMatchesToSurvivors,
+  type CatalogMatchCatalog,
+} from './catalog-match.js';
+import {
+  harvestAuthorityFollowUpsForCandidates,
+} from './authority-harvest.js';
 import { mergeDuplicateCandidates } from './deduplication.js';
 import { stampDiscoveryReproducibility } from './hashing.js';
 import { ingestBulkCandidates } from './ingestion.js';
@@ -37,6 +44,20 @@ export type RunDiscoveryCampaignInput = {
   readonly stampedAt: string;
   readonly completedAt: string;
   readonly idPrefix?: string;
+  /**
+   * Optional catalog profiles for cheap propose-match blocking after accept.
+   * When omitted, campaign behavior is unchanged (no catalogMatch attachments).
+   */
+  readonly catalog?: CatalogMatchCatalog;
+  /**
+   * When true (default false), harvest authority-host URLs from low-authority accepted
+   * survivors into `authorityFollowUps`. Pass ephemeral page/feed HTML by candidate id for
+   * richer extraction without persisting full bodies on candidates.
+   */
+  readonly authorityHarvest?: {
+    readonly enabled: boolean;
+    readonly sourceTextByCandidateId?: ReadonlyMap<string, string>;
+  };
 };
 
 function emptySnapshot(): CampaignBudgetSnapshot {
@@ -154,6 +175,22 @@ export function runDiscoveryCampaign(input: RunDiscoveryCampaignInput): Discover
 
   const { survivors, mergedCount } = mergeDuplicateCandidates(processed);
 
+  const catalogAttached = input.catalog
+    ? attachCatalogMatchesToSurvivors(survivors, input.catalog, input.completedAt)
+    : undefined;
+  const finalCandidates = catalogAttached?.candidates ?? survivors;
+
+  const authorityFollowUps =
+    input.authorityHarvest?.enabled === true
+      ? harvestAuthorityFollowUpsForCandidates({
+          candidates: finalCandidates,
+          harvestedAt: input.completedAt,
+          ...(input.authorityHarvest.sourceTextByCandidateId !== undefined
+            ? { sourceTextByCandidateId: input.authorityHarvest.sourceTextByCandidateId }
+            : {}),
+        })
+      : undefined;
+
   return {
     campaignId: input.config.campaignId,
     run: stampedRun,
@@ -163,12 +200,24 @@ export function runDiscoveryCampaign(input: RunDiscoveryCampaignInput): Discover
       version: input.pack.version,
     },
     reproducibility,
-    candidates: survivors,
-    acceptedCount: survivors.filter((c) => c.status === 'accepted' || c.status === 'merged').length,
-    quarantinedCount: survivors.filter((c) => c.status === 'quarantined').length,
-    deadLetterCount: survivors.filter((c) => c.status === 'dead_letter').length,
+    candidates: finalCandidates,
+    acceptedCount: finalCandidates.filter((c) => c.status === 'accepted' || c.status === 'merged')
+      .length,
+    quarantinedCount: finalCandidates.filter((c) => c.status === 'quarantined').length,
+    deadLetterCount: finalCandidates.filter((c) => c.status === 'dead_letter').length,
     mergedCount,
     skippedCount,
     completedAt: input.completedAt,
+    ...(catalogAttached !== undefined
+      ? {
+          catalogMatchSummary: {
+            proposedMatchCount: catalogAttached.proposedMatchCount,
+            reviewRequiredCount: catalogAttached.reviewRequiredCount,
+            noMatchCount: catalogAttached.noMatchCount,
+          },
+          reviewQueueItems: catalogAttached.reviewQueueItems,
+        }
+      : {}),
+    ...(authorityFollowUps !== undefined ? { authorityFollowUps } : {}),
   };
 }

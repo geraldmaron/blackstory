@@ -49,6 +49,7 @@ export type NormalizeFeedItemInput = {
 
 export function normalizeFeedItem(input: NormalizeFeedItemInput): RssCandidateRecord {
   const summary = capSyndicatedSummary(input.item.summary);
+  const outboundLinkHints = input.item.linkHints?.slice(0, 40);
   const payload: RssCandidatePayload = {
     schemaVersion: RSS_PAYLOAD_SCHEMA_VERSION,
     feedId: input.feed.id,
@@ -58,6 +59,9 @@ export function normalizeFeedItem(input: NormalizeFeedItemInput): RssCandidateRe
     ...(input.item.guid !== undefined ? { itemGuid: input.item.guid } : {}),
     ...(summary !== undefined ? { summary } : {}),
     ...(input.item.publishedAt !== undefined ? { publishedAt: input.item.publishedAt } : {}),
+    ...(outboundLinkHints !== undefined && outboundLinkHints.length > 0
+      ? { outboundLinkHints }
+      : {}),
   };
 
   const candidate = stampCandidateProvenance(input.registryEntry, input.runId, input.capturedAt, {

@@ -11,6 +11,7 @@ import type {
   StampedDiscoveryRun,
   TermClass,
 } from '../query-packs/types.js';
+import type { DuplicateReviewQueueItem, ResolutionOutcome } from '../resolution/types.js';
 
 export const DISCOVERY_CANDIDATE_SCHEMA_VERSION = 'discovery-candidate.v1' as const;
 
@@ -66,6 +67,30 @@ export type DiscoverySignal = {
   readonly reasons: readonly string[];
 };
 
+/** Compact catalog-match attachment from cheap blocking against existing entities. */
+export type DiscoveryCatalogMatch = {
+  readonly outcome: ResolutionOutcome;
+  readonly selectedEntityId?: string;
+  readonly topMatches: readonly {
+    readonly entityId: string;
+    readonly confidence: number;
+  }[];
+  readonly rationale: readonly string[];
+  readonly matchedAt: string;
+};
+
+/** Follow-up lead harvested from a low-authority candidate that cites an authority host. */
+export type AuthorityFollowUpLead = {
+  readonly url: string;
+  readonly host: string;
+  readonly parentCandidateId: string;
+  readonly parentStableIdentifier: string;
+  readonly parentCanonicalUrl?: string;
+  readonly sourceClassification?: string;
+  readonly reason: 'authority_host_allowlist';
+  readonly harvestedAt: string;
+};
+
 export type DiscoveryCandidateRecord = {
   readonly schemaVersion: typeof DISCOVERY_CANDIDATE_SCHEMA_VERSION;
   readonly id: string;
@@ -79,6 +104,11 @@ export type DiscoveryCandidateRecord = {
   readonly failureReason?: string;
   readonly retryCount: number;
   readonly mergedIntoId?: string;
+  /**
+   * Optional catalog blocking result from `attachCatalogMatch`. Propose/review/no_match only —
+   * never a silent merge into a public entity.
+   */
+  readonly catalogMatch?: DiscoveryCatalogMatch;
   readonly createdAt: string;
   readonly updatedAt: string;
 };
@@ -123,6 +153,16 @@ export type DiscoveryCampaignResult = {
   readonly mergedCount: number;
   readonly skippedCount: number;
   readonly completedAt: string;
+  /** Present when the campaign was run with a catalog for propose-match blocking. */
+  readonly catalogMatchSummary?: {
+    readonly proposedMatchCount: number;
+    readonly reviewRequiredCount: number;
+    readonly noMatchCount: number;
+  };
+  /** Review-queue items for ambiguous / low-confidence catalog matches. */
+  readonly reviewQueueItems?: readonly DuplicateReviewQueueItem[];
+  /** Authority URL follow-ups harvested from low-authority accepted survivors. */
+  readonly authorityFollowUps?: readonly AuthorityFollowUpLead[];
 };
 
 export type BulkIngestBatch = {

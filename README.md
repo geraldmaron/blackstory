@@ -146,6 +146,16 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts loca
   --entity-id ent_example_001 --address "123 Main St, City, State" \
   --jurisdiction "City, State" --precision institution \
   --operator-id "$USER" --session-id "locate-$(date +%s)" --identity-source cli
+
+# Community-feed obscurity dry-run (private candidates only; weekly schedule declared, GCP apply is human)
+# See docs/research/discovery-pipeline.md
+node --conditions development --import tsx packages/operator-cli/src/bin.ts community-obscurity-run \
+  --feed-xml feed_the_american_blackstory=packages/domain/src/adapters/rss/fixtures/the-american-blackstory.trimmed.rss.xml \
+  --catalog-titles "Rosa Parks|Martin Luther King Jr.|Buffalo Soldiers|Harriet Tubman"
+
+# Generic RSS discovery dry-run (excludes curated ABS by default; use --include-curated to opt in)
+node --conditions development --import tsx packages/operator-cli/src/bin.ts rss-campaign-run \
+  --feed-xml feed_historical_society=packages/domain/src/adapters/rss/fixtures/historical-society-feed.rss.xml
 ```
 
 ## Product constitution (policy)

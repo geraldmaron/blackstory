@@ -41,6 +41,11 @@ export type ParsedFeedItem = {
   readonly summary?: string;
   /** ISO 8601 when parseable from pubDate/updated/published; otherwise the raw string. */
   readonly publishedAt?: string;
+  /**
+   * HTTPS/HTTP hrefs extracted from item HTML (description/content:encoded) before stripping.
+   * URLs only — never a full article body. Used for authority follow-up harvest.
+   */
+  readonly linkHints?: readonly string[];
 };
 
 export type ParsedFeed = {
@@ -59,6 +64,8 @@ export type RssCandidatePayload = {
   readonly summary?: string;
   readonly publishedAt?: string;
   readonly classification: RssFeedClassification;
+  /** Outbound hrefs from the feed item (capped); for authority harvest, not republication. */
+  readonly outboundLinkHints?: readonly string[];
 };
 
 export type RssCandidateRecord = AdapterCandidateRecord & {

@@ -81,6 +81,20 @@ export {
 } from './discovery-run.js';
 
 export {
+  runCommunityObscurityOperatorCampaign,
+  summarizeCommunityObscurityRun,
+  type CommunityObscurityRunInput,
+  type CommunityObscurityRunSummary,
+} from './community-obscurity-run.js';
+
+export {
+  runRssOperatorCampaign,
+  summarizeRssCampaignRun,
+  type RssCampaignRunInput,
+  type RssCampaignRunSummary,
+} from './rss-campaign-run.js';
+
+export {
   prepareLocate,
   commitLocate,
   type LocateInput,

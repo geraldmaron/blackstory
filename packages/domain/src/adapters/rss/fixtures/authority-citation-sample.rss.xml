@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Authority Citation Sample Feed</title>
+    <link>https://example-history.example.org/</link>
+    <description>Sample editorial feed that cites primary archives.</description>
+    <item>
+      <title>DAY 4 — The Buffalo Soldiers</title>
+      <link>https://example-history.example.org/2025/02/04/buffalo-soldiers/</link>
+      <guid>https://example-history.example.org/2025/02/04/buffalo-soldiers/</guid>
+      <pubDate>Tue, 04 Feb 2025 12:00:00 GMT</pubDate>
+      <description><![CDATA[A short summary of Buffalo Soldiers in Yosemite.]]></description>
+      <content:encoded><![CDATA[
+        <p>Historical photos courtesy of the
+        <a href="https://www.nps.gov/yose/learn/historyculture/buffalo-soldiers.htm">National Park Service</a>
+        and
+        <a href="https://nmaahc.si.edu/explore/stories/buffalo-soldiers">NMAAHC</a>.</p>
+        <p>Also see <a href="https://instagram.com/example">Instagram</a>.</p>
+      ]]></content:encoded>
+    </item>
+  </channel>
+</rss>

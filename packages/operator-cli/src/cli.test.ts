@@ -241,3 +241,83 @@ test('propose-edge accepts a caused edge with --causal-scope systemic_consensus 
   const result = JSON.parse(out.lines[0] ?? '{}');
   assert.equal(result.accepted, true);
 });
+
+test('community-obscurity-run ranks fixture feed without writing', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { dirname, join } = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const feedPath = join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../../domain/src/adapters/rss/fixtures/the-american-blackstory.trimmed.rss.xml',
+  );
+  assert.ok(readFileSync(feedPath, 'utf8').includes('rss'));
+  const out = capture();
+  const store = new MemoryAtomicStore();
+  const code = await runCli(
+    [
+      'community-obscurity-run',
+      '--feed-xml',
+      `feed_the_american_blackstory=${feedPath}`,
+      '--catalog-titles',
+      'Rosa Parks|Martin Luther King Jr.|Buffalo Soldiers|Harriet Tubman',
+      '--campaign-id',
+      'camp_cli_obscurity_test',
+    ],
+    {
+      store,
+      stdout: out.stdout,
+      stderr: out.stderr,
+      nowMs: Date.parse('2026-07-18T16:00:00.000Z'),
+    },
+  );
+  assert.equal(code, 0, out.errors.join('\n'));
+  assert.equal(store.writes.length, 0);
+  const summary = JSON.parse(out.lines[0] ?? '{}');
+  assert.equal(summary.kind, 'community-obscurity.v1');
+  assert.ok(summary.acceptedCount >= 1);
+  assert.ok(Array.isArray(summary.rankedTop));
+  assert.ok(summary.rankedTop.length >= 1);
+  assert.equal(summary.disclaimerId, 'methodology_obscurity_heuristic_v1');
+});
+
+test('rss-campaign-run ranks historical-society fixture without writing and excludes ABS by default', async () => {
+  const { dirname, join } = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const here = dirname(fileURLToPath(import.meta.url));
+  const historicalPath = join(
+    here,
+    '../../domain/src/adapters/rss/fixtures/historical-society-feed.rss.xml',
+  );
+  const absPath = join(
+    here,
+    '../../domain/src/adapters/rss/fixtures/the-american-blackstory.trimmed.rss.xml',
+  );
+  const out = capture();
+  const store = new MemoryAtomicStore();
+  const code = await runCli(
+    [
+      'rss-campaign-run',
+      '--feed-xml',
+      `feed_historical_society=${historicalPath}`,
+      '--feed-xml',
+      `feed_the_american_blackstory=${absPath}`,
+      '--campaign-id',
+      'camp_cli_rss_test',
+      '--max-candidates',
+      '50',
+    ],
+    {
+      store,
+      stdout: out.stdout,
+      stderr: out.stderr,
+      nowMs: Date.parse('2026-07-18T16:00:00.000Z'),
+    },
+  );
+  assert.equal(code, 0, out.errors.join('\n'));
+  assert.equal(store.writes.length, 0);
+  const summary = JSON.parse(out.lines[0] ?? '{}');
+  assert.equal(summary.kind, 'rss-discovery.v1');
+  assert.ok(summary.survivors >= 1);
+  assert.ok(summary.excludedCuratedFeedIds.includes('feed_the_american_blackstory'));
+  assert.ok(!summary.feedIds.includes('feed_the_american_blackstory'));
+});

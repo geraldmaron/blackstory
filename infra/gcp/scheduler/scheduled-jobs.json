@@ -24,7 +24,7 @@
       "killSwitchId": "research-campaigns",
       "targetWorker": { "package": "research", "function": "discovery.campaign.run_wikimedia_federal_campaign" },
       "publicEffect": "none",
-      "rosterStatus": "stub",
+      "rosterStatus": "real",
       "implementationOwnerBead": "BB-073"
     },
     {
@@ -38,8 +38,21 @@
       "killSwitchId": "research-campaigns",
       "targetWorker": { "package": "research", "function": "discovery.campaign.run_rss_campaign" },
       "publicEffect": "none",
-      "rosterStatus": "stub",
+      "rosterStatus": "real",
       "implementationOwnerBead": "BB-075"
+    },
+    {
+      "id": "community-obscurity-discovery",
+      "owner": "discovery/community-obscurity",
+      "cronExpression": "0 10 * * 0",
+      "humanReadable": "weekly, Sundays 10:00 UTC",
+      "budget": { "unit": "candidates", "maxPerRun": 100 },
+      "timeoutSec": 1800,
+      "idempotencyKeyScheme": "job:{jobId}:{isoWeekStart}",
+      "killSwitchId": "research-campaigns",
+      "targetWorker": { "package": "research", "function": "discovery.campaign.run_community_obscurity_campaign" },
+      "publicEffect": "none",
+      "rosterStatus": "real"
     },
     {
       "id": "discovery-campaign-archive-dpla",
@@ -52,7 +65,7 @@
       "killSwitchId": "research-campaigns",
       "targetWorker": { "package": "research", "function": "discovery.campaign.run_archive_dpla_campaign" },
       "publicEffect": "none",
-      "rosterStatus": "stub",
+      "rosterStatus": "real",
       "implementationOwnerBead": "BB-073/BB-075"
     },
     {
@@ -66,7 +79,7 @@
       "killSwitchId": "research-campaigns",
       "targetWorker": { "package": "research", "function": "discovery.campaign.run_web_search_campaign" },
       "publicEffect": "none",
-      "rosterStatus": "stub",
+      "rosterStatus": "real",
       "implementationOwnerBead": "BB-073/BB-075"
     },
     {

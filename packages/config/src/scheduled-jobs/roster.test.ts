@@ -21,12 +21,17 @@ test('roster job ids are unique', () => {
   assert.equal(new Set(ids).size, ids.length);
 });
 
-test('exactly eight real job bodies are registered (four from workstream plus workstream recalibration-report, workstream citation-link-health-sweep, workstream reddit-deletion-sync, and workstream legal-change-monitoring)', () => {
+test('exactly thirteen real job bodies are registered (prior nine plus four discovery campaigns)', () => {
   const store = createDefaultScheduledJobRegistry();
   const real = listScheduledJobs(store, { rosterStatus: 'real' }).map((job) => job.id).sort();
   assert.deepEqual(real, [
     'backup-verification-daily',
     'citation-link-health-sweep',
+    'community-obscurity-discovery',
+    'discovery-campaign-archive-dpla',
+    'discovery-campaign-rss',
+    'discovery-campaign-web-search',
+    'discovery-campaign-wikimedia-federal',
     'gold-corpus-regression',
     'legal-change-monitoring',
     'reddit-deletion-sync',

@@ -99,6 +99,18 @@ test('parses RSS 2.0 feeds into normalized items', () => {
   assert.equal(parsed.items[0]?.publishedAt, new Date('Wed, 15 Jul 2026 14:00:00 GMT').toISOString());
 });
 
+test('parses outbound href linkHints from content:encoded without storing full body', () => {
+  const xml = loadFixtureXml('authority-citation-sample.rss.xml');
+  const parsed = parseRssOrAtomFeed(xml);
+  assert.equal(parsed.items.length, 1);
+  const hints = parsed.items[0]?.linkHints ?? [];
+  assert.ok(hints.some((url) => url.includes('nps.gov')));
+  assert.ok(hints.some((url) => url.includes('nmaahc.si.edu')));
+  assert.ok(hints.some((url) => url.includes('instagram.com')));
+  // Summary remains short — linkHints are separate from the capped summary.
+  assert.ok((parsed.items[0]?.summary?.length ?? 0) < 200);
+});
+
 test('parses Atom 1.0 feeds into normalized items', () => {
   const xml = loadFixtureXml('library-digital-collections.atom.xml');
   const parsed = parseRssOrAtomFeed(xml);
