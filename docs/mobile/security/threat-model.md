@@ -37,7 +37,7 @@ From `docs/mobile/mobile-app-epic.md` and `docs/mobile/decisions/mobile-identity
 
 ### Reusable server-side primitives referenced
 
-The mobile API surface reuses the existing `@black-book/security` enforcement helpers rather than
+The mobile API surface reuses the existing `@repo/security` enforcement helpers rather than
 inventing parallel controls. Named primitives cited below (see `packages/security/src/`):
 `DEFAULT_ENDPOINT_QUOTA_MATRIX`, `createRateLimitEvaluator` / `evaluateQuota`, `buildRateLimitKey`,
 `RiskSignal` / `RiskSignalKind` (notably `missing_app_check`), `aggregateRiskScore`,

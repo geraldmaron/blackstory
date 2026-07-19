@@ -1,9 +1,9 @@
 {
-  "name": "@black-book/public-contracts",
+  "name": "@repo/public-contracts",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Versioned public API v1 TypeScript types + zod schemas shared by apps/web (optional) and apps/mobile, per ADR-021. Zero server-only dependencies: no node:* built-ins, no firebase-admin, no @black-book/domain or @black-book/security at runtime.",
+  "description": "Versioned public API v1 TypeScript types + zod schemas shared by apps/web (optional) and apps/mobile, per ADR-021. Zero server-only dependencies: no node:* built-ins, no firebase-admin, no @repo/domain or @repo/security at runtime.",
   "exports": {
     "./version": {
       "development": "./src/version.ts",

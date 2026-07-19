@@ -3,7 +3,7 @@
  *
  * Not exported from the package (no `package.json` "exports" entry points here) — it only exists
  * to keep bound/format rules consistent across schemas without inventing a new convention per
- * file. Pure zod + string/number logic only: no `node:*`, no I/O, no `@black-book/*` imports.
+ * file. Pure zod + string/number logic only: no `node:*`, no I/O, no `@repo/*` imports.
  *
  * Bounds below exist specifically to defeat the adversarial "maliciously large DTO" case
  * (ADR-021 / MOB-003 adversarial review): every string and array field in this package has an

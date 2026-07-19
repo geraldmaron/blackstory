@@ -1,5 +1,5 @@
 /**
- * Wire-contract version constants for `@black-book/public-contracts` (ADR-021 §2).
+ * Wire-contract version constants for `@repo/public-contracts` (ADR-021 §2).
  *
  * - `API_VERSION` is the current major the server serves by default and the value this package's
  *   `v1/*` subpaths correspond to. When a breaking shape change ships, a sibling `v2/*` subpath

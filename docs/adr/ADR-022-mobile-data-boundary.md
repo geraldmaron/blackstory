@@ -16,7 +16,7 @@
 | Public contracts package | Does not exist | `packages/public-contracts` — versioned request/response types + zod schemas + pure validators, zero server-only deps (built by MOB-003) |
 | Public API shape | `apps/api-public` serves web reads; guardrails, App Check, rate limits, vector search present (`apps/api-public/src`) | Same surface gains an explicit, versioned `/v1` read contract (MOB-004); no new deployable |
 | API versioning | Unversioned; web is same-repo lockstep with the server | Explicit `/v1` URL prefix + client-version floor enforcement for independently-shipped store binaries |
-| Contract sharing across clients | `@black-book/domain` subpath exports, convention-enforced (web only) | A hard, compile-time client/server boundary usable by both `apps/web` (optionally) and `apps/mobile` |
+| Contract sharing across clients | `@repo/domain` subpath exports, convention-enforced (web only) | A hard, compile-time client/server boundary usable by both `apps/web` (optionally) and `apps/mobile` |
 
 ## Context
 
@@ -32,13 +32,13 @@ Three accepted ADRs already set the doctrine this one extends rather than contra
 - **ADR-005** (service surface separation): exactly one public read surface (`apps/api-public`); admin/internal/submissions are distinct surfaces; **shared logic lives in `packages/*`, not new deployables**; "packages cannot import apps; apps cannot reach across forbidden boundaries at runtime"; and — critically — migration trigger explicitly anticipates "Expo/mobile later consumes the same public/submissions contracts; do not invent mobile-only services now." This ADR is the concrete realization of that trigger.
 - **ADR-011** (Firestore system of record): public clients may read only under `public/**`; privileged writes use the Admin SDK from Cloud Run/workers with distinct service accounts, never client SDKs. Firebase-admin is a server-only dependency by construction.
 
-A concrete, already-felt hazard motivates the central decision. The repo already learned that the top-level `@black-book/domain` barrel "pulls in server-only modules a browser bundle can't [import]" (`docs/ui/design-direction-v5.md`), which is why web code uses `@black-book/domain`'s **subpath exports** (`@black-book/domain/map/geography`, `@black-book/domain/facts`, etc. — see `packages/domain/package.json` `exports`) rather than the package root. That subpath discipline is a **convention a developer must remember**. Next.js is forgiving: an accidental `node:crypto` or `firebase-admin` import in a server component simply runs on the server. A React Native / Hermes bundle is not forgiving — a stray node built-in or firebase-admin transitive import is a hard bundling/runtime failure with a confusing stack trace, discovered late (at native build or on-device), by whoever is unlucky. Mobile needs a **compile-time boundary**, not a convention.
+A concrete, already-felt hazard motivates the central decision. The repo already learned that the top-level `@repo/domain` barrel "pulls in server-only modules a browser bundle can't [import]" (`docs/ui/design-direction-v5.md`), which is why web code uses `@repo/domain`'s **subpath exports** (`@repo/domain/map/geography`, `@repo/domain/facts`, etc. — see `packages/domain/package.json` `exports`) rather than the package root. That subpath discipline is a **convention a developer must remember**. Next.js is forgiving: an accidental `node:crypto` or `firebase-admin` import in a server component simply runs on the server. A React Native / Hermes bundle is not forgiving — a stray node built-in or firebase-admin transitive import is a hard bundling/runtime failure with a confusing stack trace, discovered late (at native build or on-device), by whoever is unlucky. Mobile needs a **compile-time boundary**, not a convention.
 
 ## Decision
 
 ### 1. A new package `packages/public-contracts` with a hard client/server boundary
 
-Create (in MOB-003, not here) `packages/public-contracts`, published under the existing brand-agnostic `@black-book` scope (confirmed the real scope in this repo — `packages/domain` is `@black-book/domain`). This ADR fixes its **boundary rules**; MOB-003 builds it.
+Create (in MOB-003, not here) `packages/public-contracts`, published under the existing brand-agnostic `@repo` scope (confirmed the real scope in this repo — `packages/domain` is `@repo/domain`). This ADR fixes its **boundary rules**; MOB-003 builds it.
 
 **It MAY contain, and only these:**
 
@@ -50,20 +50,20 @@ Create (in MOB-003, not here) `packages/public-contracts`, published under the e
 **It MUST NOT contain (hard boundary — enforced, not requested):**
 
 - Any **server-only code**: no route handlers, no Firestore/Admin-SDK access, no request-authenticated logic.
-- Any **`firebase-admin`, `@black-book/firebase` server surface, or direct Firestore import**, transitively or otherwise.
+- Any **`firebase-admin`, `@repo/firebase` server surface, or direct Firestore import**, transitively or otherwise.
 - Any **`node:` built-in** — no `node:crypto`, `node:fs`, `node:path`, `node:buffer`, etc. — nor any dependency that pulls one in. These break a Hermes bundle.
 - Any **secret, credential, service-account reference, or environment-specific config**.
-- Any dependency on `@black-book/domain`, `@black-book/security`, `@black-book/observability`, or any package that itself carries server-only or node-only transitive deps.
+- Any dependency on `@repo/domain`, `@repo/security`, `@repo/observability`, or any package that itself carries server-only or node-only transitive deps.
 
-**It MUST be importable by both `apps/web` (optionally) and the future `apps/mobile` without pulling in anything server-only.** This is the same discipline already established for `@black-book/domain` subpath exports — extended into a dedicated package.
+**It MUST be importable by both `apps/web` (optionally) and the future `apps/mobile` without pulling in anything server-only.** This is the same discipline already established for `@repo/domain` subpath exports — extended into a dedicated package.
 
-**Why a separate package rather than reusing `@black-book/domain` directly.** `@black-book/domain` is the server-side domain core: its barrel and many of its subpaths legitimately depend on `@black-book/schemas`, `@black-book/security` (dev), and node built-ins, because that is its job. Bolting mobile-safe contracts onto it would force every existing consumer to preserve a client-safe property across a large, fast-moving surface — a convention to remember, on a package that has no reason to honor it. A dedicated `packages/public-contracts` inverts that: its **entire purpose** is to be client-safe, so the property is checkable at the package boundary. Concretely:
+**Why a separate package rather than reusing `@repo/domain` directly.** `@repo/domain` is the server-side domain core: its barrel and many of its subpaths legitimately depend on `@repo/schemas`, `@repo/security` (dev), and node built-ins, because that is its job. Bolting mobile-safe contracts onto it would force every existing consumer to preserve a client-safe property across a large, fast-moving surface — a convention to remember, on a package that has no reason to honor it. A dedicated `packages/public-contracts` inverts that: its **entire purpose** is to be client-safe, so the property is checkable at the package boundary. Concretely:
 
-- **Hard boundary, not a convention.** MOB-003 configures the package's own `tsconfig`/lint to forbid `node:*` and server imports, and its dependency list is short enough to eyeball. A CI check (proposed for MOB-003/MOB-019) bundles it under a React Native / Metro-like resolver and fails on any node built-in — a compile-time gate that `@black-book/domain`'s subpath convention can never provide.
+- **Hard boundary, not a convention.** MOB-003 configures the package's own `tsconfig`/lint to forbid `node:*` and server imports, and its dependency list is short enough to eyeball. A CI check (proposed for MOB-003/MOB-019) bundles it under a React Native / Metro-like resolver and fails on any node built-in — a compile-time gate that `@repo/domain`'s subpath convention can never provide.
 - **Mobile bundlers are stricter than Next.js.** The whole point is to fail in CI, not on a device. A separate package is the smallest unit that can carry that guarantee.
-- **Independent versioning.** Contracts version with the wire protocol (§2), on their own cadence, decoupled from `@black-book/domain`'s internal churn.
+- **Independent versioning.** Contracts version with the wire protocol (§2), on their own cadence, decoupled from `@repo/domain`'s internal churn.
 
-Following the repo's existing subpath convention, the package exposes **explicit subpath exports** (e.g. `@black-book/public-contracts/v1/entity`, `@black-book/public-contracts/v1/search`, `@black-book/public-contracts/errors`) rather than one fat barrel — so a client imports exactly the shapes it uses, and the "don't import the root barrel" lesson from `@black-book/domain` is designed out from day one.
+Following the repo's existing subpath convention, the package exposes **explicit subpath exports** (e.g. `@repo/public-contracts/v1/entity`, `@repo/public-contracts/v1/search`, `@repo/public-contracts/errors`) rather than one fat barrel — so a client imports exactly the shapes it uses, and the "don't import the root barrel" lesson from `@repo/domain` is designed out from day one.
 
 ### 2. API versioning and compatibility: URL-prefix major version + client-version floor header
 
@@ -150,7 +150,7 @@ Normative reading of the diagram:
 
 **If the contracts-package boundary is violated and has to be retrofitted after mobile already imports something server-only.** This is the expensive, asymmetric failure the whole ADR is structured to prevent:
 
-- A server-only import (a `node:` built-in, `firebase-admin`, or a `@black-book/domain` subpath that transitively pulls one in) that slips into `packages/public-contracts` may build fine under Next.js/web and only detonate at **native build or on-device runtime** for mobile — the worst place to discover it (late, per-platform, cryptic).
+- A server-only import (a `node:` built-in, `firebase-admin`, or a `@repo/domain` subpath that transitively pulls one in) that slips into `packages/public-contracts` may build fine under Next.js/web and only detonate at **native build or on-device runtime** for mobile — the worst place to discover it (late, per-platform, cryptic).
 - Retrofitting means: identify the offending transitive dep, split the contract types away from whatever server logic dragged the dep in, re-publish a clean contract version, and **update every mobile call site** — but mobile call sites that already shipped in a **store binary cannot be recalled**, so the fix rides the normal store-release + version-floor timeline (days to weeks), not a hotfix.
 - This is why §1 mandates a **compile-time gate (CI bundling check) rather than code review**: the reversal cost of a leaked server-only dep is measured in store-release cycles, so the boundary must fail closed in CI, before a byte ships. The dedicated package exists specifically so that gate has a place to live.
 
@@ -158,7 +158,7 @@ Normative reading of the diagram:
 
 | Alternative | Why rejected |
 |-------------|--------------|
-| Reuse `@black-book/domain` subpaths directly from mobile | Its barrel/subpaths carry server-only + node deps by design (`docs/ui/design-direction-v5.md`); mobile safety would be a convention to remember on a package with no reason to honor it, discovered on-device not in CI. |
+| Reuse `@repo/domain` subpaths directly from mobile | Its barrel/subpaths carry server-only + node deps by design (`docs/ui/design-direction-v5.md`); mobile safety would be a convention to remember on a package with no reason to honor it, discovered on-device not in CI. |
 | Header-negotiated response shape instead of `/v1` URL prefix | Fractures CDN cache keys (ADR-004 is snapshot/CDN-friendly), hides the contract boundary from logs and code review; URL prefix is the coarse, visible boundary, header is only the version floor. |
 | URL versioning only, no client-version floor | No way to force-update dangerously stale store binaries; a header floor + `CLIENT_VERSION_UNSUPPORTED` gives a clean forced-update path independent of the wire contract. |
 | A new mobile-only API service | Violates ADR-005 (one public read surface; migration trigger says "do not invent mobile-only services now"); mobile is just another public reader. |
@@ -167,11 +167,11 @@ Normative reading of the diagram:
 
 ## Consequences
 
-- MOB-003 builds `packages/public-contracts` under `@black-book`, with subpath exports and a CI bundling gate that fails on any node built-in or server-only transitive dep.
+- MOB-003 builds `packages/public-contracts` under `@repo`, with subpath exports and a CI bundling gate that fails on any node built-in or server-only transitive dep.
 - MOB-004 adds `/v1` read endpoints to `apps/api-public` (no new deployable), validating requests and serializing responses against the shared zod schemas, and enforcing the `X-BlackStory-Client` floor with `CLIENT_VERSION_UNSUPPORTED` / `426`.
 - `apps/api-public` responses continue to carry ADR-004 release/revision metadata; mobile gets the same immutable-snapshot / degraded-mode guarantees the web reader already has.
 - Corrections (MOB-016) are the only client write, served by `apps/api-submissions` as quarantine-only intake — no canonical write path from any client (invariants 2, 6).
-- `apps/web` may optionally adopt `@black-book/public-contracts` for its own public reads later, converging web and mobile on one wire contract, but this ADR does not require that migration.
+- `apps/web` may optionally adopt `@repo/public-contracts` for its own public reads later, converging web and mobile on one wire contract, but this ADR does not require that migration.
 
 ## Migration triggers
 
@@ -211,7 +211,7 @@ findings and dispositions). Each is a decision, not a deferral:
    wire shapes and belong on the client-safe side of the boundary. The fact that they route to
    `apps/api-submissions` rather than `apps/api-public` is a *server routing* concern, not a reason to stand up a
    second client-safe contracts package a one-maintainer operation must keep in sync. Isolate them behind their own
-   subpath (e.g. `@black-book/public-contracts/corrections`) so the surface split is legible without a second package.
+   subpath (e.g. `@repo/public-contracts/corrections`) so the surface split is legible without a second package.
    Revisit only if a second, non-mobile submissions consumer ever appears.
 4. **CI gate fidelity — resolved: a Metro-config bundle-smoke test in CI is the required per-PR gate; a real
    EAS/on-device build is a periodic backstop, not a per-PR requirement.** A Metro/Hermes-resolver bundle of

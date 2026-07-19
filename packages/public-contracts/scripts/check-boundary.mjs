@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
  * Static forbidden-import scanner + Metro-bundle-smoke-test stand-in for
- * `@black-book/public-contracts` (ADR-021 §1, MOB-003).
+ * `@repo/public-contracts` (ADR-021 §1, MOB-003).
  *
  * ADR-021 requires a compile-time CI gate — not a code-review convention — that fails on any
  * `node:*` built-in or server-only transitive dependency (`firebase-admin`,
- * `@black-book/domain`, `@black-book/security`, `@black-book/firebase`'s server surface, or a
+ * `@repo/domain`, `@repo/security`, `@repo/firebase`'s server surface, or a
  * direct Firestore import) anywhere this package's shipped surface can reach. This script is
  * that gate, run as plain Node (no TypeScript compilation needed — it works by statically
  * regex-scanning import/require/dynamic-import specifiers, which is sufficient to catch every
@@ -51,10 +51,10 @@ const NODE_BUILTIN_MODULES = new Set([
 
 const FORBIDDEN_PACKAGE_SPECIFIERS = [
   'firebase-admin',
-  '@black-book/domain',
-  '@black-book/security',
-  '@black-book/firebase',
-  // Legacy/current scope kept during the @repo -> @black-book rename (see MOB-003 evidence
+  '@repo/domain',
+  '@repo/security',
+  '@repo/firebase',
+  // Legacy/current scope kept during the @repo -> @repo rename (see MOB-003 evidence
   // report) so the gate does not go blind if a file is copy-pasted from an @repo-scoped module.
   '@repo/domain',
   '@repo/security',
