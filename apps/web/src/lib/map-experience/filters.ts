@@ -6,6 +6,7 @@
  */
 import type { ExploreMapFeature } from './build-explore-map-source';
 import { isValidTopicId } from '@repo/domain/taxonomy/topics';
+import type { ExploreMapBounds } from './url-state';
 
 /**
  * Resolves the effective controlled-taxonomy topic ids for a feature (the related workstream): prefers
@@ -50,6 +51,29 @@ export function applyExploreFilters(
     if (filters.confidence !== 'all' && feature.properties.confidenceTier !== filters.confidence) return false;
     if (stateFilter && feature.properties.statePostalCode !== stateFilter) return false;
     return true;
+  });
+}
+
+/**
+ * Keeps point features whose coordinates fall inside the live map camera bounds.
+ * Used so the synchronized records list matches what is geographically on screen —
+ * filters still apply first; this only scopes the list to the current view.
+ * Antimeridian-safe when west > east (rare for CONUS browsing).
+ */
+export function filterFeaturesInBounds(
+  features: readonly ExploreMapFeature[],
+  bounds: ExploreMapBounds,
+): readonly ExploreMapFeature[] {
+  return features.filter((feature) => {
+    if (feature.geometry.type !== 'Point') return false;
+    const [lng, lat] = feature.geometry.coordinates;
+    if (!Number.isFinite(lng) || !Number.isFinite(lat)) return false;
+    if (lat < bounds.south || lat > bounds.north) return false;
+    if (bounds.west <= bounds.east) {
+      return lng >= bounds.west && lng <= bounds.east;
+    }
+    // Crosses antimeridian: in-bounds if east of west OR west of east.
+    return lng >= bounds.west || lng <= bounds.east;
   });
 }
 

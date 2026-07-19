@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { ExploreMapFeature } from './build-explore-map-source';
-import { applyExploreFilters, buildExploreFacetOptions, DEFAULT_EXPLORE_FILTERS, sortFeaturesForList } from './filters';
+import { applyExploreFilters, buildExploreFacetOptions, DEFAULT_EXPLORE_FILTERS, filterFeaturesInBounds, sortFeaturesForList } from './filters';
 
 function feature(overrides: Partial<ExploreMapFeature['properties']>): ExploreMapFeature {
   return {
@@ -93,4 +93,60 @@ test('sortFeaturesForList orders chronologically by earliest era, undated last, 
   );
   // Input order untouched (pure).
   assert.equal(features[0]!.properties.entityId, 'undated');
+});
+
+test('filterFeaturesInBounds keeps only points inside the live camera extent', () => {
+  const features: ExploreMapFeature[] = [
+    {
+      ...feature({ entityId: 'dc' }),
+      geometry: { type: 'Point', coordinates: [-77.04, 38.9] },
+    },
+    {
+      ...feature({ entityId: 'nyc' }),
+      geometry: { type: 'Point', coordinates: [-74.0, 40.7] },
+    },
+    {
+      ...feature({ entityId: 'sf' }),
+      geometry: { type: 'Point', coordinates: [-122.4, 37.8] },
+    },
+  ];
+
+  const midAtlantic = filterFeaturesInBounds(features, {
+    west: -80,
+    south: 36,
+    east: -70,
+    north: 42,
+  });
+  assert.deepEqual(
+    midAtlantic.map((f) => f.properties.entityId),
+    ['dc', 'nyc'],
+  );
+});
+
+test('filterFeaturesInBounds handles antimeridian-crossing extents', () => {
+  const features: ExploreMapFeature[] = [
+    {
+      ...feature({ entityId: 'west' }),
+      geometry: { type: 'Point', coordinates: [170, 0] },
+    },
+    {
+      ...feature({ entityId: 'east' }),
+      geometry: { type: 'Point', coordinates: [-170, 0] },
+    },
+    {
+      ...feature({ entityId: 'other' }),
+      geometry: { type: 'Point', coordinates: [0, 0] },
+    },
+  ];
+
+  const wrapped = filterFeaturesInBounds(features, {
+    west: 160,
+    south: -10,
+    east: -160,
+    north: 10,
+  });
+  assert.deepEqual(
+    wrapped.map((f) => f.properties.entityId).sort(),
+    ['east', 'west'],
+  );
 });

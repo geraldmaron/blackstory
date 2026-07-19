@@ -12,7 +12,8 @@ import { buildEntityMastImageCandidates } from './entity-mast-image-candidates';
 import { EntityRecordMark } from './EntityRecordMark';
 import {
   entityPrimaryImageAlt,
-  primaryImageRightsLabel,
+  primaryImageCreditCaption,
+  primaryImageFocalClass,
   type RecordMarkReason,
 } from './record-mark';
 
@@ -86,9 +87,14 @@ export function EntityMastMedia({
   const src = phase.urls[phase.urlIndex]!;
   const alt = entityPrimaryImageAlt(image.alt, entityName);
   const creditId = `entity-photo-credit-${entityId.replace(/[^a-zA-Z0-9]/g, '').slice(-8) || 'x'}`;
+  const caption = primaryImageCreditCaption({
+    credit: image.credit,
+    rightsStatus: image.rightsStatus,
+  });
+  const focalClass = primaryImageFocalClass(kind);
 
   return (
-    <figure className="ds-entity-photo" aria-describedby={creditId}>
+    <figure className={`ds-entity-photo ${focalClass}`} aria-describedby={creditId}>
       {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL may be external */}
       <img
         key={src}
@@ -114,8 +120,13 @@ export function EntityMastMedia({
         }}
       />
       <figcaption id={creditId} className="ds-entity-photo__credit ds-sans">
-        {image.credit}
-        <span className="ds-mono"> · {primaryImageRightsLabel(image.rightsStatus)}</span>
+        {caption.creditText}
+        {caption.showRightsLabel ? (
+          <span className="ds-mono">
+            {caption.creditText ? ' · ' : ''}
+            {caption.rightsLabel}
+          </span>
+        ) : null}
       </figcaption>
     </figure>
   );

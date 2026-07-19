@@ -3,6 +3,7 @@
  * Shapes are book, pin, or arch only — never presented as a likeness of the entity.
  * Accessible names and captions stay honest about why a mark is shown.
  */
+import { sanitizePrimaryImageCreditForDisplay } from '@repo/domain';
 
 export const RECORD_MARK_SHAPES = ['book', 'pin', 'arch'] as const;
 
@@ -153,4 +154,29 @@ export function primaryImageRightsLabel(
       return _exhaustive;
     }
   }
+}
+
+/**
+ * Figcaption parts for a primary image: strips Commons "Unknown author" garbage
+ * and avoids duplicating the rights label already present in credit.
+ */
+export function primaryImageCreditCaption(input: {
+  readonly credit: string;
+  readonly rightsStatus: 'public_domain' | 'licensed' | 'fair_use';
+}): {
+  readonly creditText: string;
+  readonly rightsLabel: string;
+  readonly showRightsLabel: boolean;
+} {
+  return sanitizePrimaryImageCreditForDisplay(input);
+}
+
+/**
+ * Mast photo crop bias: person portraits keep the upper frame (heads);
+ * places/events stay centered.
+ */
+export function primaryImageFocalClass(
+  kind?: string,
+): 'ds-entity-photo--focal-upper' | 'ds-entity-photo--focal-center' {
+  return kind === 'person' ? 'ds-entity-photo--focal-upper' : 'ds-entity-photo--focal-center';
 }

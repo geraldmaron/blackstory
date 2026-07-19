@@ -85,7 +85,7 @@ import {
   COUNTY_LINES_PREFETCH_ZOOM,
   US_COUNTIES_GEOJSON_PATH,
 } from '../../lib/map-experience/us-county-lines';
-import type { ExploreLayerMode, ExploreViewport } from '../../lib/map-experience/url-state';
+import type { ExploreLayerMode, ExploreViewportFrame } from '../../lib/map-experience/url-state';
 import {
   PERSISTENT_PLATE_LAYER_IDS,
   syncLayerPaintFromStyle,
@@ -183,9 +183,20 @@ function lngLatTuple(value: LngLatLike): [number, number] {
   return [value.lon, value.lat];
 }
 
-function readViewport(map: MapLibreMap): ExploreViewport {
+function readViewport(map: MapLibreMap): ExploreViewportFrame {
   const center = map.getCenter();
-  return { lat: center.lat, lng: center.lng, zoom: map.getZoom() };
+  const bounds = map.getBounds();
+  return {
+    lat: center.lat,
+    lng: center.lng,
+    zoom: map.getZoom(),
+    bounds: {
+      west: bounds.getWest(),
+      south: bounds.getSouth(),
+      east: bounds.getEast(),
+      north: bounds.getNorth(),
+    },
+  };
 }
 
 function clearMarkers(markers: Marker[]): void {
@@ -514,8 +525,8 @@ type MapStageEvents = {
    * `activateOnBackgroundClick` behavior `HomeMapHero` used to opt into via a prop. Now every
    * surface gets the event; only the ones that `subscribe('activate', …)` act on it, which is an
    * equivalent opt-in. */
-  activate: [viewport: ExploreViewport];
-  viewport: [viewport: ExploreViewport];
+  activate: [viewport: ExploreViewportFrame];
+  viewport: [viewport: ExploreViewportFrame];
   error: [];
 };
 
@@ -603,7 +614,7 @@ export function MapStageProvider({
     new Map(),
   );
   const listenersRef = useRef(makeListenerStore());
-  const lastViewportRef = useRef<ExploreViewport | undefined>(undefined);
+  const lastViewportRef = useRef<ExploreViewportFrame | undefined>(undefined);
   const [mapAvailable, setMapAvailable] = useState(true);
   const mapAvailableRef = useRef(true);
 
@@ -868,7 +879,7 @@ export function MapStageProvider({
         (handler as () => void)();
       }
       if (event === 'viewport' && lastViewportRef.current) {
-        (handler as (viewport: ExploreViewport) => void)(lastViewportRef.current);
+        (handler as (viewport: ExploreViewportFrame) => void)(lastViewportRef.current);
       }
       return () => {
         set.delete(handler);

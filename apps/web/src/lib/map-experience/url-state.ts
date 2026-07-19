@@ -24,6 +24,19 @@ export type ExploreViewport = {
   readonly zoom: number;
 };
 
+/** Geographic extent of the live map camera (not written to the URL). */
+export type ExploreMapBounds = {
+  readonly west: number;
+  readonly south: number;
+  readonly east: number;
+  readonly north: number;
+};
+
+/** Center/zoom plus live bounds — emitted by MapStage on moveend. */
+export type ExploreViewportFrame = ExploreViewport & {
+  readonly bounds: ExploreMapBounds;
+};
+
 export type ExploreLayerMode = 'off' | 'presence' | 'blackShare' | 'blackChange';
 
 export type ExploreViewState = {

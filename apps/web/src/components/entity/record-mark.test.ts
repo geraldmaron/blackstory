@@ -9,6 +9,8 @@ import {
   RECORD_MARK_CAPTION_UNAVAILABLE,
   entityPrimaryImageAlt,
   kindLabelForMark,
+  primaryImageCreditCaption,
+  primaryImageFocalClass,
   primaryImageRightsLabel,
   recordMarkAlt,
   recordMarkCaption,
@@ -94,4 +96,27 @@ test('primaryImageRightsLabel expands snake_case statuses', () => {
   assert.equal(primaryImageRightsLabel('public_domain'), 'public domain');
   assert.equal(primaryImageRightsLabel('fair_use'), 'fair use');
   assert.equal(primaryImageRightsLabel('licensed'), 'licensed');
+});
+
+test('primaryImageCreditCaption drops unknown author and duplicate public domain', () => {
+  const harlem = primaryImageCreditCaption({
+    credit: 'Momos · Public domain · Wikimedia Commons',
+    rightsStatus: 'public_domain',
+  });
+  assert.equal(harlem.creditText, 'Momos · Wikimedia Commons');
+  assert.equal(harlem.showRightsLabel, true);
+  assert.equal(harlem.rightsLabel, 'public domain');
+
+  const unknown = primaryImageCreditCaption({
+    credit: 'Unknown authorUnknown author or not provided · Public domain · Wikimedia Commons',
+    rightsStatus: 'public_domain',
+  });
+  assert.equal(unknown.creditText, 'Wikimedia Commons');
+  assert.equal(unknown.showRightsLabel, true);
+});
+
+test('primaryImageFocalClass biases person portraits toward the upper frame', () => {
+  assert.equal(primaryImageFocalClass('person'), 'ds-entity-photo--focal-upper');
+  assert.equal(primaryImageFocalClass('place'), 'ds-entity-photo--focal-center');
+  assert.equal(primaryImageFocalClass(undefined), 'ds-entity-photo--focal-center');
 });

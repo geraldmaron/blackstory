@@ -4,13 +4,14 @@
  * Client orchestrator for `/explore`. Wires the shared `MapStage` (via `useMapStage()`
  * instead of mounting its own canvas), the synchronized accessible list, map data model
  * picker (record presence | Black population share | share change), nearby-points grouping
- * nearby-points grouping toggle, relationship lines, decade settings, filter form, and
- * shareable URL state. Pin or list selection opens a preview narrative card in the spotlight
- * shell; the full record is one CTA away at `/entity/[id]`. `?selected=` is shareable preview
- * state (e.g. return from “View on map”). History edge clicks still open a connection panel.
- * The server-rendered snapshot catalog is the
- * source of truth; `/explore/api` refine is optional progressive enhancement when App Check
- * is configured.
+ * toggle, relationship lines, decade settings, filter form, and shareable URL state. The
+ * records list is scoped to the live map camera bounds (plus active filters) so its count
+ * and rows match what is geographically on screen. Pin or list selection opens a preview
+ * narrative card in the spotlight shell; the full record is one CTA away at `/entity/[id]`.
+ * `?selected=` is shareable preview state (e.g. return from “View on map”). History edge
+ * clicks still open a connection panel. The server-rendered snapshot catalog is the source
+ * of truth; `/explore/api` refine is optional progressive enhancement when App Check is
+ * configured.
  *
  * Camera: deep links and back/forward reconcile the camera from the URL via `easeTo`
  * (`reconcileCamera`, run once on mount and again on every `popstate`) never a raw default
@@ -44,11 +45,14 @@ import {
   parseExploreSearchParams,
   viewportForState,
   type ExploreLayerMode,
+  type ExploreMapBounds,
   type ExploreViewState,
   type ExploreViewport,
+  type ExploreViewportFrame,
 } from '../../../lib/map-experience/url-state';
 import {
   applyExploreFilters,
+  filterFeaturesInBounds,
   sortFeaturesForList,
   type ExploreFilterState,
 } from '../../../lib/map-experience/filters';
@@ -213,6 +217,8 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const viewStateRef = useRef(initial.viewState);
   /** Live map camera — kept current via `viewport` subscription for close-camera bounce-back. */
   const liveViewportRef = useRef<ExploreViewport | undefined>(initial.viewState.viewport);
+  /** Bounds used to scope the records list to what's geographically on the map. */
+  const [listBounds, setListBounds] = useState<ExploreMapBounds | undefined>(undefined);
   /** Camera before the most recent point-selection flight (hierarchical close target). */
   const preSelectViewportRef = useRef<ExploreViewport | undefined>(initial.viewState.viewport);
 
@@ -326,8 +332,14 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   );
 
   // Deterministic reading order for the accessible list (chronological, undated
-  // last) — the GL canvas keeps source order; paint order is not reading order.
-  const sortedListFeatures = useMemo(() => sortFeaturesForList(filteredFeatures), [filteredFeatures]);
+  // last) — scoped to the live map camera so the list matches what's on screen.
+  // Until the first viewport event, fall back to the full filter set (SSR / pre-map).
+  const sortedListFeatures = useMemo(() => {
+    const scoped = listBounds
+      ? filterFeaturesInBounds(filteredFeatures, listBounds)
+      : filteredFeatures;
+    return sortFeaturesForList(scoped);
+  }, [filteredFeatures, listBounds]);
 
   // Every source-data-affecting slice of view state patches the shared canvas — never a style
   // rebuild the surface calls into (MapStage.patchData rebuilds the style internally).
@@ -620,13 +632,26 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   }, [spotlightOpen, dismissSpotlight]);
 
   const handleViewportChange = useCallback(
-    (viewport: ExploreViewport) => {
+    (frame: ExploreViewportFrame) => {
+      const viewport: ExploreViewport = {
+        lat: frame.lat,
+        lng: frame.lng,
+        zoom: frame.zoom,
+      };
       liveViewportRef.current = viewport;
-      // While a record is open the camera sits at point zoom — do not overwrite the
-      // pre-select stash with that framing, or close would always think we were "beyond county"
-      // from the selection flight itself.
+      // While a record is open the camera sits at point zoom — keep the list scoped to the
+      // pre-select framing so selecting a pin does not empty the records rail.
       if (!viewStateRef.current.selected) {
         preSelectViewportRef.current = viewport;
+        setListBounds((previous) =>
+          previous &&
+          previous.west === frame.bounds.west &&
+          previous.south === frame.bounds.south &&
+          previous.east === frame.bounds.east &&
+          previous.north === frame.bounds.north
+            ? previous
+            : frame.bounds,
+        );
       }
       // The stage replays its latched viewport to every new subscriber, and this component
       // resubscribes whenever its handlers' view state changes — so an unchanged viewport MUST
@@ -862,7 +887,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         <div className="ds-explore-stage__panel-header">
           {/* The count labels the list it sits above — oldest records first. */}
           <p className="ds-sans ds-explore__results-count" id="explore-results-heading">
-            {filteredFeatures.length} documented record{filteredFeatures.length === 1 ? '' : 's'}
+            {sortedListFeatures.length} documented record{sortedListFeatures.length === 1 ? '' : 's'}
             {selectedStateName ? ` in ${selectedStateName}` : ' in view'}
             {view.viewState.lines
               ? ` · ${view.edgeLineCollection.features.length} connection${

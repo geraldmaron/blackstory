@@ -10,7 +10,10 @@ import {
   evaluateCommonsMediaPropose,
   extractP18Candidates,
   isExactLabelMatch,
+  isUnknownCreatorCredit,
   mapCommonsLicenseToRights,
+  sanitizePrimaryImageCreditForDisplay,
+  stripHtml,
   summarizeCommonsMediaProposes,
 } from './commons-media.js';
 import type { WikidataEntity } from './types.js';
@@ -118,6 +121,53 @@ test('buildAltText and credit are deterministic from metadata', () => {
     buildCreditLine({ artist: '<a href="x">Jane Doe</a>', licenseShortName: 'CC BY 4.0' }),
     'Jane Doe · CC BY 4.0 · Wikimedia Commons',
   );
+});
+
+test('buildCreditLine drops unknown-author placeholders and bare PD license text', () => {
+  assert.equal(
+    buildCreditLine({
+      artist: '<span>Unknown author</span>Unknown author or not provided',
+      licenseShortName: 'Public domain',
+    }),
+    'Wikimedia Commons',
+  );
+  assert.equal(
+    buildCreditLine({
+      artist: 'Momos',
+      licenseShortName: 'Public domain',
+    }),
+    'Momos · Wikimedia Commons',
+  );
+  assert.equal(
+    stripHtml('<span>Unknown author</span>Unknown author or not provided'),
+    'Unknown author Unknown author or not provided',
+  );
+  assert.equal(isUnknownCreatorCredit('Unknown authorUnknown author or not provided'), true);
+  assert.equal(isUnknownCreatorCredit('Momos'), false);
+});
+
+test('sanitizePrimaryImageCreditForDisplay cleans Harlem and unknown-author credits', () => {
+  const harlem = sanitizePrimaryImageCreditForDisplay({
+    credit: 'Momos · Public domain · Wikimedia Commons',
+    rightsStatus: 'public_domain',
+  });
+  assert.equal(harlem.creditText, 'Momos · Wikimedia Commons');
+  assert.equal(harlem.rightsLabel, 'public domain');
+  assert.equal(harlem.showRightsLabel, true);
+
+  const unknown = sanitizePrimaryImageCreditForDisplay({
+    credit: 'Unknown authorUnknown author or not provided · Public domain · Wikimedia Commons',
+    rightsStatus: 'public_domain',
+  });
+  assert.equal(unknown.creditText, 'Wikimedia Commons');
+  assert.equal(unknown.showRightsLabel, true);
+
+  const licensed = sanitizePrimaryImageCreditForDisplay({
+    credit: 'Jane Doe · CC BY 4.0 · Wikimedia Commons',
+    rightsStatus: 'licensed',
+  });
+  assert.equal(licensed.creditText, 'Jane Doe · CC BY 4.0 · Wikimedia Commons');
+  assert.equal(licensed.showRightsLabel, false);
 });
 
 test('chunkForWikimediaBatch and summarize counts', () => {

@@ -1827,10 +1827,22 @@
 .ds-entity-photo__img {
   display: block;
   width: 100%;
+  aspect-ratio: 4 / 3;
   height: auto;
+  object-fit: cover;
+  object-position: center center;
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
   background: var(--ds-surface);
+}
+
+/* Prefer upper third for person portraits so heads stay in frame under cover crop. */
+.ds-entity-photo--focal-upper .ds-entity-photo__img {
+  object-position: center 18%;
+}
+
+.ds-entity-photo--focal-center .ds-entity-photo__img {
+  object-position: center center;
 }
 
 .ds-entity-photo__credit {
@@ -1847,10 +1859,19 @@
   overflow: hidden;
 }
 
+.ds-entity-mark__frame {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  background: #f4efe5;
+}
+
 .ds-entity-mark__svg {
   display: block;
-  width: 100%;
-  height: auto;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
   aspect-ratio: 240 / 280;
 }
 

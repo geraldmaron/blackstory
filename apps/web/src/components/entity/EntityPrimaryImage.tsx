@@ -6,13 +6,19 @@
  */
 import React from 'react';
 import type { PublicEntityPrimaryImageView } from '../../data/public-seed';
-import { entityPrimaryImageAlt, primaryImageRightsLabel } from './record-mark';
+import {
+  entityPrimaryImageAlt,
+  primaryImageCreditCaption,
+  primaryImageFocalClass,
+} from './record-mark';
 
 void React;
 
 export type EntityPrimaryImageProps = {
   readonly image: PublicEntityPrimaryImageView;
   readonly entityName: string;
+  /** Entity kind — biases object-position toward heads for person records. */
+  readonly kind?: string;
   /** When true (default), load eagerly for above-the-fold mast placement. */
   readonly priority?: boolean;
 };
@@ -20,12 +26,18 @@ export type EntityPrimaryImageProps = {
 export function EntityPrimaryImage({
   image,
   entityName,
+  kind,
   priority = true,
 }: EntityPrimaryImageProps) {
   const alt = entityPrimaryImageAlt(image.alt, entityName);
+  const caption = primaryImageCreditCaption({
+    credit: image.credit,
+    rightsStatus: image.rightsStatus,
+  });
+  const focalClass = primaryImageFocalClass(kind);
 
   return (
-    <figure className="ds-entity-photo">
+    <figure className={`ds-entity-photo ${focalClass}`}>
       {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL may be external */}
       <img
         src={image.url}
@@ -38,8 +50,13 @@ export function EntityPrimaryImage({
         {...(priority ? { fetchPriority: 'high' as const } : {})}
       />
       <figcaption className="ds-entity-photo__credit ds-sans">
-        {image.credit}
-        <span className="ds-mono"> · {primaryImageRightsLabel(image.rightsStatus)}</span>
+        {caption.creditText}
+        {caption.showRightsLabel ? (
+          <span className="ds-mono">
+            {caption.creditText ? ' · ' : ''}
+            {caption.rightsLabel}
+          </span>
+        ) : null}
       </figcaption>
     </figure>
   );

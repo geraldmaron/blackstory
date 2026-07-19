@@ -53,25 +53,27 @@ export function EntityRecordMark({
 
   return (
     <figure className="ds-entity-photo ds-entity-photo--mark">
-      <div
-        className="ds-entity-mark"
-        role="img"
-        aria-labelledby={nameId}
-        aria-describedby={captionId}
-      >
-        <span id={nameId} className="ds-visually-hidden">
-          {accessibleName}
-        </span>
-        <svg
-          className="ds-entity-mark__svg"
-          viewBox="0 0 240 280"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-          focusable="false"
+      <div className="ds-entity-mark">
+        <div
+          className="ds-entity-mark__frame"
+          role="img"
+          aria-labelledby={nameId}
+          aria-describedby={captionId}
         >
-          <rect width="240" height="280" fill="#F4EFE5" />
-          <RecordMarkShapeGraphic shape={shape} markId={markId} />
-        </svg>
+          <span id={nameId} className="ds-visually-hidden">
+            {accessibleName}
+          </span>
+          <svg
+            className="ds-entity-mark__svg"
+            viewBox="0 0 240 280"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <rect width="240" height="280" fill="#F4EFE5" />
+            <RecordMarkShapeGraphic shape={shape} markId={markId} />
+          </svg>
+        </div>
         {contextParts.length > 0 ? (
           <p className="ds-entity-mark__context ds-mono" aria-hidden="true">
             {contextParts.join(' · ')}

@@ -199,6 +199,54 @@ export function buildAltText(input: {
   return `Image of ${input.displayName}`;
 }
 
+/**
+ * True when Commons Artist/Credit is a placeholder, not a usable creator name.
+ * Covers {{Unknown|author}} HTML that collapses to glued "Unknown author…" after strip.
+ */
+export function isUnknownCreatorCredit(value: string | undefined): boolean {
+  if (!value) return true;
+  const spaced = value.trim().replace(/\s+/g, ' ');
+  if (!spaced) return true;
+  const lower = spaced.toLowerCase();
+  if (
+    /^(unknown(\s+author)?|author\s+unknown|anonymous|not\s+provided|n\/?a|none)(\s+or\s+not\s+provided)?$/i.test(
+      lower,
+    )
+  ) {
+    return true;
+  }
+  // Glued Commons template text: "Unknown authorUnknown author or not provided"
+  const compacted = lower.replace(/[\s·|,;:/\\-]+/g, '');
+  if (
+    /^unknownauthor(unknownauthor)?(ornotprovided)?$/.test(compacted) ||
+    /^unknownauthorornotprovided$/.test(compacted)
+  ) {
+    return true;
+  }
+  if (/unknown\s*author.*(?:unknown\s*author|or\s*not\s*provided)/i.test(lower)) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Strip tags and normalize whitespace. Inserts spaces so adjacent HTML nodes
+ * do not glue ("Unknown author</span>Unknown" → "Unknown author Unknown").
+ */
+export function stripHtml(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  const cleaned = value
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return cleaned.length > 0 ? cleaned : undefined;
+}
+
 export function buildCreditLine(input: {
   readonly artist?: string;
   readonly credit?: string;
@@ -207,12 +255,118 @@ export function buildCreditLine(input: {
   const artist = stripHtml(input.artist);
   const credit = stripHtml(input.credit);
   const parts: string[] = [];
-  if (artist) parts.push(artist);
-  else if (credit) parts.push(credit);
-  if (input.licenseShortName) parts.push(input.licenseShortName);
+  if (artist && !isUnknownCreatorCredit(artist)) {
+    parts.push(artist);
+  } else if (credit && !isUnknownCreatorCredit(credit)) {
+    parts.push(credit);
+  }
+  const license = input.licenseShortName?.trim();
+  // Keep specific license short names (CC BY…); bare PD/CC0 wording comes from rightsStatus in UI.
+  if (license && !isBareRightsLabel(license)) {
+    parts.push(license);
+  }
   parts.push('Wikimedia Commons');
   const line = parts.filter(Boolean).join(' · ');
   return line.length > 0 ? line : undefined;
+}
+
+/**
+ * Clean a stored primaryImage.credit for public display.
+ * Drops unknown-author placeholders and bare rights labels (those render from
+ * rightsStatus). Keeps specific license short names such as "CC BY 4.0".
+ */
+export function sanitizePrimaryImageCreditForDisplay(input: {
+  readonly credit: string;
+  readonly rightsStatus: PublishableRightsStatus;
+}): {
+  readonly creditText: string;
+  readonly rightsLabel: string;
+  readonly showRightsLabel: boolean;
+} {
+  const rightsLabel = rightsStatusDisplayLabel(input.rightsStatus);
+  const rawParts = input.credit
+    .split(/\s*·\s*/)
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
+
+  const kept: string[] = [];
+  const seen = new Set<string>();
+  let hasSpecificLicenseName = false;
+  for (const part of rawParts) {
+    if (isUnknownCreatorCredit(part)) continue;
+    if (isBareRightsLabel(part)) continue;
+    if (creditPartImpliesRights(part, input.rightsStatus)) {
+      hasSpecificLicenseName = true;
+    }
+    const key = part.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    kept.push(part);
+  }
+
+  return {
+    creditText: kept.join(' · '),
+    rightsLabel,
+    showRightsLabel: !hasSpecificLicenseName,
+  };
+}
+
+function rightsStatusDisplayLabel(status: PublishableRightsStatus): string {
+  switch (status) {
+    case 'public_domain':
+      return 'public domain';
+    case 'licensed':
+      return 'licensed';
+    case 'fair_use':
+      return 'fair use';
+    default: {
+      const _exhaustive: never = status;
+      return _exhaustive;
+    }
+  }
+}
+
+/** Exact rights-status wording (not a specific license short name). */
+function isBareRightsLabel(part: string): boolean {
+  const key = part.trim().toLowerCase().replace(/\s+/g, ' ');
+  return (
+    key === 'public domain' ||
+    key === 'pd' ||
+    key === 'licensed' ||
+    key === 'fair use' ||
+    key === 'cc0' ||
+    key === 'cc-zero'
+  );
+}
+
+function creditPartImpliesRights(
+  part: string,
+  rightsStatus: PublishableRightsStatus,
+): boolean {
+  const key = part.trim().toLowerCase().replace(/\s+/g, ' ');
+  switch (rightsStatus) {
+    case 'public_domain':
+      return (
+        key === 'public domain' ||
+        key === 'pd' ||
+        key === 'cc0' ||
+        key === 'cc-zero' ||
+        key.startsWith('pd-') ||
+        key.includes('public domain')
+      );
+    case 'fair_use':
+      return key === 'fair use' || key.includes('fair use');
+    case 'licensed':
+      return (
+        key === 'licensed' ||
+        /^cc[- ]by\b/.test(key) ||
+        key.includes('attribution')
+      );
+    default: {
+      const _exhaustive: never = rightsStatus;
+      return _exhaustive;
+    }
+  }
 }
 
 export function commonsFilePageUrl(fileTitle: string): string {
@@ -456,10 +610,4 @@ function claimRank(claim: WikidataClaim): CommonsP18Candidate['rank'] {
   const rank = (claim as { readonly rank?: string }).rank;
   if (rank === 'preferred' || rank === 'normal' || rank === 'deprecated') return rank;
   return 'unknown';
-}
-
-function stripHtml(value: string | undefined): string | undefined {
-  if (!value) return undefined;
-  const cleaned = value.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
-  return cleaned.length > 0 ? cleaned : undefined;
 }
