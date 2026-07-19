@@ -11,7 +11,7 @@ import {
   DEFAULT_SAFE_FETCH_LIMITS,
   executeSafeFetch,
   type PinnedTransportResponse,
-} from '@repo/security';
+} from '@repo/security/url-safety';
 import {
   advanceLinkHealthState,
   classifyLinkCheckAttempt,

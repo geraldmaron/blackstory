@@ -11,7 +11,7 @@
  * exist, map each record’s resolved jurisdiction bbox into `AreaRecordInput`. Area records must
  * render as polygon geometry, never as a point.
  */
-import { redactLocationForPublic } from '@repo/security';
+import { redactLocationForPublic } from '@repo/security/redaction';
 import {
   buildMapSource,
   type MapCountyAggregate,

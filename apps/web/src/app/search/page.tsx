@@ -12,6 +12,7 @@
  * result/facet shaping.
  */
 
+import Link from 'next/link';
 import { EmptyState, ResultList } from '@repo/ui';
 import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { KindBadge } from '../../components/map-experience';
@@ -108,9 +109,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             defaultValue={view.era}
             options={view.eraOptions}
           />
-          <a className="ds-cta-link" href="/search">
+          <Link className="ds-cta-link" href="/search">
             Clear
-          </a>
+          </Link>
         </div>
       </form>
 
@@ -126,9 +127,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <EmptyState
             title="Nothing matched — yet"
             action={
-              <a className="ds-cta ds-cta--ink" href="/search">
+              <Link className="ds-cta ds-cta--ink" href="/search">
                 Clear filters
-              </a>
+              </Link>
             }
           >
             Try a broader keyword, or set Kind / Status / Era back to “All”. The archive grows
@@ -139,6 +140,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <ResultList
               className="ds-index"
               labelledBy="search-results-heading"
+              LinkComponent={Link}
               items={view.results.map((result) => ({
                 id: result.id,
                 href: `/entity/${result.id}`,
@@ -164,20 +166,22 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             {view.previousOffset !== undefined || view.nextOffset !== undefined ? (
               <nav className="ds-row" aria-label="Search results pages">
                 {view.previousOffset !== undefined ? (
-                  <a
+                  <Link
                     className="ds-cta ds-cta--quiet"
                     href={buildSearchPageHref(view, view.previousOffset)}
+                    scroll={false}
                   >
                     Previous page
-                  </a>
+                  </Link>
                 ) : null}
                 {view.nextOffset !== undefined ? (
-                  <a
+                  <Link
                     className="ds-cta ds-cta--quiet"
                     href={buildSearchPageHref(view, view.nextOffset)}
+                    scroll={false}
                   >
                     Next page
-                  </a>
+                  </Link>
                 ) : null}
               </nav>
             ) : null}

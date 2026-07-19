@@ -1,5 +1,5 @@
 /**
- * Renders a fact's CSL-JSON citations plus Blap extension fields.
+ * Renders a fact's CSL-JSON citations plus BlackStory extension fields.
  *
  * Web citations prefer the archived capture URL as the outbound link; offline citations show the
  * excerpt and retrieval date without inventing a live URL. Full bibliography formatting via

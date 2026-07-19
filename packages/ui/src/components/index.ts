@@ -1,6 +1,6 @@
 
 /**
- * Public exports for Blap accessible UI components.
+ * Public exports for BlackStory accessible UI components.
  */
 
 export { Button, type ButtonProps } from './Button.js';
@@ -18,6 +18,13 @@ export {
   type MapExplorerStateAggregate,
 } from './MapExplorer.js';
 export { Notice, type NoticeProps, type NoticeTone } from './Notice.js';
-export { ResultList, type ResultItem, type ResultListProps } from './ResultList.js';
+export { ResultList, type ResultItem, type ResultListProps, type ResultListLinkProps } from './ResultList.js';
 export { ThemeToggle, type ThemeToggleProps } from './ThemeToggle.js';
+export {
+  ShellHeader,
+  isShellNavActive,
+  type ShellHeaderLinkProps,
+  type ShellHeaderProps,
+  type ShellNavItem,
+} from './ShellHeader.js';
 export { Timeline, type TimelineItem, type TimelineProps } from './Timeline.js';

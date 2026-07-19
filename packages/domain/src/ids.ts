@@ -1,5 +1,5 @@
 /**
- * Branded string identifiers for Black Book domain entities and related records.
+ * Branded string identifiers for BlackStory domain entities and related records.
  */
 export type EntityId = string & { readonly __brand: 'EntityId' };
 export type RelationshipId = string & { readonly __brand: 'RelationshipId' };

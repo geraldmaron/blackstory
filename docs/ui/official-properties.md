@@ -1,4 +1,4 @@
-# Pattern: official-properties page (BB-089)
+# Pattern: official-properties page
 
 **Status:** documented pattern only — no route exists yet. Do not fabricate placeholder social
 URLs to fill this pattern in early; wire real `sameAs` links only once the accounts in
@@ -32,7 +32,7 @@ A future route (owning bead TBD — likely folds into the `about` section or a d
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Blap",
+  "name": "BlackStory",
   "url": "https://<real-domain>",
   "sameAs": [
     "https://github.com/<real-org>",

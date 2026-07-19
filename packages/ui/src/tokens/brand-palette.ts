@@ -1,6 +1,6 @@
 
 /**
- * Fixed Blap brand palette (the "Pinned Page" identity, brand pack v3).
+ * Fixed BlackStory brand palette (the "Pinned Page" identity, brand pack v3).
  *
  * These colors are the brand's own, independent of light/dark theme tokens in
  * colors.ts, the same way a printed logo doesn't change color when the room

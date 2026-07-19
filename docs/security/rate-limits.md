@@ -1,8 +1,8 @@
-# Endpoint rate limits and abuse quotas (BB-025)
+# Endpoint rate limits and abuse quotas
 
 **Status:** Policy matrix + in-memory evaluator in-repo. Shared distributed store and live
-middleware wiring are follow-on work (BB-034, BB-059).  
-**Depends on:** [BB-023 ingress / Cloud Armor](./ingress-armor.md), [BB-024 App Check](../packages/firebase)  
+middleware wiring are follow-on work (, ).
+**Depends on:** [ ingress / Cloud Armor](./ingress-armor.md), [ App Check](../packages/firebase)
 **Threats:** [T-01](./threat-model.md#t-01-volumetric-and-application-layer-denial-of-service), [T-02](./threat-model.md#t-02-cost-exhaustion-via-search-and-geocoding), [T-05](./threat-model.md#t-05-coordinated-correction-brigading)
 
 ## Objective
@@ -14,8 +14,8 @@ device/session risk, and endpoint class — without exposing exact thresholds to
 
 | Layer | Scope | Implementation |
 |-------|-------|----------------|
-| Cloud Armor | Per-IP edge throttles, WAF, emergency deny | [`infra/gcp/armor/`](../../infra/gcp/armor/) (BB-023) |
-| App Check | Client attestation for expensive/mutation paths | `@repo/firebase` guards (BB-024) |
+| Cloud Armor | Per-IP edge throttles, WAF, emergency deny | [`infra/gcp/armor/`](../../infra/gcp/armor/) |
+| App Check | Client attestation for expensive/mutation paths | `@repo/firebase` guards |
 | Subject quotas | anonymous < authenticated < admin < service | `@repo/security` policy matrix |
 | Endpoint buckets | search, geocode, nearby, entity, source, … | Token bucket + rolling/daily windows |
 | Risk aggregation | Cross-IP device/session/account signals | `RiskSignal` + `aggregateDistributedRisk` |
@@ -59,7 +59,7 @@ Callers should honor `Retry-After` with exponential backoff and jitter.
 - `maxKeys` (10 000) with LRU eviction
 - Keys scoped as `subject:endpointClass:identity`
 
-Production should swap the store interface for Redis/Memorystore (BB-033) without changing policy math.
+Production should swap the store interface for Redis/Memorystore without changing policy math.
 
 ## Validation
 
@@ -83,8 +83,8 @@ pnpm --filter @repo/api-submissions test
 
 1. Wire guards into Cloud Run request middleware (after App Check).
 2. Shared Redis/Memorystore backend implementing `RateLimitStore`.
-3. Export quota metrics to BB-034 telemetry (`rate_limit_denied`, `risk_score_exceeded`).
-4. Load/abuse validation under BB-059 against staging Armor + app quotas.
+3. Export quota metrics to  telemetry (`rate_limit_denied`, `risk_score_exceeded`).
+4. Load/abuse validation under  against staging Armor + app quotas.
 5. Tune matrix from production traffic (no secrets in repo).
 
 ## Related

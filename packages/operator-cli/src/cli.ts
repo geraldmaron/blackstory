@@ -15,7 +15,7 @@
 import { readFileSync } from 'node:fs';
 import type { RelationshipRole, RelationshipType } from '@repo/domain';
 import type { AtomicStore } from '@repo/firebase';
-import type { SafeFetchDependencies } from '@repo/security';
+import type { SafeFetchDependencies } from '@repo/security/url-safety';
 import {
   parseLeadsFromText,
   prepareBulkLeadIntake,
@@ -30,6 +30,17 @@ import {
 } from './community-obscurity-run.js';
 import { runRssOperatorCampaign } from './rss-campaign-run.js';
 import { dispatchDiscoveryCampaign } from '../../config/src/scheduled-jobs/discovery-dispatcher.js';
+import {
+  loadEditorialCatalogFromFirestore,
+  mergeJsonCatalogOverFirestore,
+} from './editorial-catalog-firestore.js';
+import { runEditorialJudge, type EditorialCatalogEntity } from './editorial-run.js';
+import { prepareEditorialPacketIntake } from './editorial-intake.js';
+import { runEnrichmentJudge } from './enrichment-run.js';
+import { createLlmProvider } from './llm-provider.js';
+import { loadPendingEditorialItems } from './pending-list.js';
+import { runStoryResearch, type StoryTopicSeed } from './story-research-run.js';
+import { prepareStoryPacketIntake } from './story-intake.js';
 import { prepareEdgeIntake, type EdgeIntakeInput } from './edge-intake.js';
 import { createNodeSafeFetchDependencies } from './fetch.js';
 import { OPERATOR_SOURCES, type OperatorIdentity, type OperatorSource } from './identity.js';
@@ -62,8 +73,17 @@ type Flags = {
   readonly booleans: Set<string>;
 };
 
-const REPEATABLE_FLAGS = new Set(['--source-url', '--feed-xml']);
-const BOOLEAN_FLAGS = new Set(['--commit', '--continue-on-quarantine', '--full', '--include-curated']);
+const REPEATABLE_FLAGS = new Set(['--source-url', '--feed-xml', '--from']);
+const BOOLEAN_FLAGS = new Set(['--commit', '--continue-on-quarantine', '--full']);
+
+type EditorialSubjectFile = {
+  readonly subjectId: string;
+  readonly title: string;
+  readonly kind?: string;
+  readonly existingSummary?: string;
+  readonly existingContext?: string;
+  readonly sourceSnippets?: readonly string[];
+};
 
 function parseFlags(argv: readonly string[]): Flags {
   const values = new Map<string, string>();
@@ -473,6 +493,161 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         stdout(JSON.stringify(result, null, 2));
         return result.status === 'success' ? 0 : 1;
       }
+      case 'pending-list': {
+        const paths = flags.repeated.get('--from') ?? [];
+        const single = optionalFlag(flags, '--from');
+        const fromPaths = paths.length > 0 ? paths : single ? [single] : [];
+        if (fromPaths.length === 0) {
+          throw new Error('pending-list requires --from path/to/obscurity-or-subjects.json (repeatable)');
+        }
+        stdout(JSON.stringify(loadPendingEditorialItems(fromPaths), null, 2));
+        return 0;
+      }
+      case 'editorial-run':
+      case 'enrichment-run': {
+        const subjectsPath = requireFlag(flags, '--subjects');
+        const catalogPath = optionalFlag(flags, '--catalog');
+        const catalogFrom = optionalFlag(flags, '--catalog-from');
+        const subjectsJson = JSON.parse(readFile(subjectsPath)) as {
+          subjects?: EditorialSubjectFile[];
+        } | EditorialSubjectFile[];
+        const subjects = Array.isArray(subjectsJson)
+          ? subjectsJson
+          : (subjectsJson.subjects ?? []);
+        if (subjects.length === 0) {
+          throw new Error('--subjects must be a JSON array or { subjects: [...] }');
+        }
+        const catalogRaw = catalogPath ? JSON.parse(readFile(catalogPath)) : undefined;
+        const jsonCatalogEntries: EditorialCatalogEntity[] = Array.isArray(catalogRaw)
+          ? (catalogRaw as EditorialCatalogEntity[])
+          : Array.isArray((catalogRaw as { entities?: unknown } | undefined)?.entities)
+            ? ((catalogRaw as { entities: EditorialCatalogEntity[] }).entities)
+            : [];
+        let catalogEntries: EditorialCatalogEntity[] =
+          jsonCatalogEntries.length > 0
+            ? jsonCatalogEntries
+            : subjects.map((subject) => ({
+                id: subject.subjectId,
+                displayName: subject.title,
+              }));
+        if (catalogFrom === 'firestore') {
+          const { createServerFirebaseApp } = await import('@repo/firebase');
+          const { getFirestore } = await import('firebase-admin/firestore');
+          const { app } = createServerFirebaseApp(process.env);
+          const firestoreCatalog = await loadEditorialCatalogFromFirestore(getFirestore(app));
+          catalogEntries =
+            jsonCatalogEntries.length > 0
+              ? mergeJsonCatalogOverFirestore(firestoreCatalog, jsonCatalogEntries)
+              : firestoreCatalog.length > 0
+                ? firestoreCatalog
+                : catalogEntries;
+        } else if (catalogFrom !== undefined) {
+          throw new Error('--catalog-from must be "firestore" when set');
+        }
+        const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
+          | 'mock'
+          | 'openrouter'
+          | 'ollama';
+        const model = optionalFlag(flags, '--model');
+        const provider = createLlmProvider({
+          provider: providerName,
+          ...(model !== undefined ? { model } : {}),
+        });
+        const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
+        const identity = readOperatorIdentity(flags);
+        const runInput = {
+          subjects: subjects.map((subject) => ({
+            subjectId: subject.subjectId,
+            title: subject.title,
+            ...(subject.kind !== undefined ? { kind: subject.kind } : {}),
+            ...(subject.existingSummary !== undefined
+              ? { existingSummary: subject.existingSummary }
+              : {}),
+            ...(subject.existingContext !== undefined
+              ? { existingContext: subject.existingContext }
+              : {}),
+            ...(subject.sourceSnippets !== undefined
+              ? { sourceSnippets: subject.sourceSnippets }
+              : {}),
+          })),
+          catalog: catalogEntries.map((entry) => ({
+            id: entry.id,
+            displayName: entry.displayName,
+            ...(entry.aliases !== undefined ? { aliases: entry.aliases } : {}),
+            ...(entry.vector !== undefined ? { vector: entry.vector } : {}),
+          })),
+          identity,
+          nowIso,
+          provider,
+          ...(model !== undefined ? { model } : {}),
+        };
+        const result =
+          command === 'enrichment-run'
+            ? await runEnrichmentJudge(runInput)
+            : await runEditorialJudge(runInput);
+        if (flags.booleans.has('--commit')) {
+          const pepper = optionalFlag(flags, '--privacy-pepper') ?? requirePepperFromEnv();
+          const context = {
+            identity,
+            privacyPepper: pepper,
+            nowMs: deps.nowMs ?? Date.now(),
+          };
+          const commits = [];
+          for (const item of result.items) {
+            if (item.packet.decision === 'reject') continue;
+            commits.push(await finish(prepareEditorialPacketIntake(item.packet, context), flags, deps));
+          }
+          stdout(JSON.stringify({ result, commits }, null, 2));
+          return 0;
+        }
+        stdout(JSON.stringify(result, null, 2));
+        return 0;
+      }
+      case 'story-research-run': {
+        const topicsPath = requireFlag(flags, '--topics');
+        const topicsJson = JSON.parse(readFile(topicsPath)) as {
+          topics?: StoryTopicSeed[];
+        } | StoryTopicSeed[];
+        const topics = Array.isArray(topicsJson) ? topicsJson : (topicsJson.topics ?? []);
+        if (topics.length === 0) {
+          throw new Error('--topics must be a JSON array or { topics: [...] }');
+        }
+        const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
+          | 'mock'
+          | 'openrouter'
+          | 'ollama';
+        const model = optionalFlag(flags, '--model');
+        const provider = createLlmProvider({
+          provider: providerName,
+          ...(model !== undefined ? { model } : {}),
+        });
+        const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
+        const identity = readOperatorIdentity(flags);
+        const result = await runStoryResearch({
+          topics,
+          identity,
+          nowIso,
+          provider,
+          ...(model !== undefined ? { model } : {}),
+        });
+        if (flags.booleans.has('--commit')) {
+          const pepper = optionalFlag(flags, '--privacy-pepper') ?? requirePepperFromEnv();
+          const context = {
+            identity,
+            privacyPepper: pepper,
+            nowMs: deps.nowMs ?? Date.now(),
+          };
+          const commits = [];
+          for (const item of result.items) {
+            if (item.packet.decision === 'reject') continue;
+            commits.push(await finish(prepareStoryPacketIntake(item.packet, context), flags, deps));
+          }
+          stdout(JSON.stringify({ result, commits }, null, 2));
+          return 0;
+        }
+        stdout(JSON.stringify(result, null, 2));
+        return 0;
+      }
       case 'locate': {
         const storedLat = optionalFlag(flags, '--stored-lat');
         const storedLng = optionalFlag(flags, '--stored-lng');
@@ -528,7 +703,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       }
       default: {
         stderr(
-          'Usage: operator-cli <submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|locate> [flags]',
+          'Usage: operator-cli <submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|locate> [flags]',
         );
         return command ? 1 : 0;
       }

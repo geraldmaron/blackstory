@@ -2,8 +2,8 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-16
-- **Bead:** BB-002
-- **Deciders:** Execution beads platform choices; recorded against scaffold baseline (BB-001)
+- **Bead:**
+- **Deciders:** Execution beads platform choices; recorded against scaffold baseline
 
 ## Scaffold vs target
 
@@ -12,11 +12,11 @@
 | `apps/web` | Next.js scaffold; local `:3000` | Firebase App Hosting |
 | `apps/admin` | Next.js scaffold; local `:3001` | Cloud Run + IAP |
 | `apps/api-*` | Health stubs only | Separate Cloud Run services |
-| Firebase / App Hosting / Cloud Run | Not configured (`infra/firebase`, `infra/gcp` placeholders) | Provisioned in BB-005 / BB-011 / BB-021 |
+| Firebase / App Hosting / Cloud Run | Not configured (`infra/firebase`, `infra/gcp` placeholders) | Provisioned in  /  /  |
 
 ## Context
 
-Blap needs a public Next.js site that can degrade to released snapshots, plus APIs and a private admin console that must not share public route handlers or credentials. Firebase App Hosting is optimized for Firebase-linked Next.js delivery; Cloud Run is the control plane for least-privilege APIs, IAP-protected admin, and private internal services.
+BlackStory needs a public Next.js site that can degrade to released snapshots, plus APIs and a private admin console that must not share public route handlers or credentials. Firebase App Hosting is optimized for Firebase-linked Next.js delivery; Cloud Run is the control plane for least-privilege APIs, IAP-protected admin, and private internal services.
 
 ## Decision
 
@@ -37,13 +37,13 @@ Blap needs a public Next.js site that can degrade to released snapshots, plus AP
 ## Consequences
 
 - Distinct deploy pipelines and service accounts for web vs APIs vs admin.
-- Public web can remain readable in degraded mode from release snapshots even when APIs throttle (BB-022).
+- Public web can remain readable in degraded mode from release snapshots even when APIs throttle.
 - Operators must manage both App Hosting and Cloud Run; complexity is intentional for isolation.
-- Local development continues via `pnpm --filter @repo/web|admin|api-*` without requiring Firebase until BB-011.
+- Local development continues via `pnpm --filter @repo/web|admin|api-*` without requiring Firebase until .
 
 ## Migration triggers
 
-- Move public web off App Hosting only if App Hosting cannot meet security, cache, or region requirements after BB-022 hardening.
+- Move public web off App Hosting only if App Hosting cannot meet security, cache, or region requirements after  hardening.
 - Split or merge Cloud Run services only when a security boundary change is approved (must still map to ADR-005 surfaces).
 - Revisit if Firebase product changes deprecate App Hosting for this Next.js deployment model.
 

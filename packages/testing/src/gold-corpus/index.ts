@@ -1,6 +1,6 @@
 
 /**
- * Public module boundary for Black Book gold-corpus evaluation, comparison, and
+ * Public module boundary for BlackStory gold-corpus evaluation, comparison, and
  * automatic-publication gating.
  */
 export * from './gate.js';

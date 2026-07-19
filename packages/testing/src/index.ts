@@ -1,6 +1,6 @@
 
 /**
- * Shared test builders, guards, harnesses, and deterministic helpers for Black Book.
+ * Shared test builders, guards, harnesses, and deterministic helpers for BlackStory.
  * Expanded under for multi-layer automated quality foundations.
  */
 export const TESTING_PACKAGE = '@repo/testing' as const;

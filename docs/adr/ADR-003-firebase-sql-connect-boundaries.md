@@ -2,7 +2,7 @@
 
 - **Status:** Deferred / superseded (current phase) by [ADR-011](./ADR-011-firestore-system-of-record.md)
 - **Date:** 2026-07-16
-- **Bead:** BB-002
+- **Bead:**
 - **Depends on:** ADR-002, ADR-005
 
 > **Phase note (2026-07-16):** SQL Connect templates under `infra/database/sql-connect/` are
@@ -39,18 +39,18 @@ TypeScript services need typed, reviewable database operations with explicit aut
 | SQL Connect for all clients including browsers | Violates invariant: public clients never connect to canonical (or any) DB. |
 | Raw Postgres from every TypeScript service with no Connect | Harder to audit operation allowlists; still allowed only if Connect is unavailable for a specific trusted path, with equivalent allowlisting. |
 | One shared “app” database user | Collapses role boundaries; submissions compromise could publish. |
-| ORM unrestricted query builder exposed to request handlers | Enables user-shaped SQL, sort expressions, and column selection (forbidden by BB-026). |
+| ORM unrestricted query builder exposed to request handlers | Enables user-shaped SQL, sort expressions, and column selection (forbidden by ). |
 
 ## Consequences
 
-- Operation allowlists become part of the security review surface (BB-012, BB-036).
+- Operation allowlists become part of the security review surface (, ).
 - Python jobs keep direct Postgres with IAM/DSN rotation; dual access patterns must stay role-aligned.
 - Schema changes may require regenerating Connect SDK and redeploying APIs in lockstep.
-- Local development may use direct Postgres until Connect emulators/project wiring exist (BB-011/BB-012); production must not weaken roles for convenience.
+- Local development may use direct Postgres until Connect emulators/project wiring exist (/); production must not weaken roles for convenience.
 
 ## Migration triggers
 
-- Expand Connect to additional schemas only with new role proofs and threat-model updates (BB-004).
+- Expand Connect to additional schemas only with new role proofs and threat-model updates.
 - Replace Connect with another typed data layer only if Firebase product limits block required isolation; retain the same role matrix.
 - Allow a TypeScript service temporary direct Postgres only under documented exception and time-boxed remediation.
 

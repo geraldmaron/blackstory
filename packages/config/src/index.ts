@@ -44,7 +44,11 @@ export function parseRuntimeEnvironment(
 }
 
 export * from './surfaces.js';
+export * from './sibling-origins.js';
+export * from './shell-nav.js';
 export * from './kill-switches.js';
-export * from './scheduled-jobs/index.js';
 
-export * from './launch-gate/index.js';
+// Node-only surfaces — import via package subpaths, never the main barrel
+// (client components that import @repo/config would otherwise pull node:* into webpack):
+//   @repo/config/scheduled-jobs
+//   @repo/config/launch-gate

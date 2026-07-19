@@ -49,7 +49,7 @@ export function createIdFactory(prefix: string, startAt = 1, pad = 4): IdFactory
   };
 }
 
-/** Shared default factories for Black Book domain fixtures. */
+/** Shared default factories for BlackStory domain fixtures. */
 export const defaultIdFactories = {
   entity: () => createIdFactory('ent'),
   claim: () => createIdFactory('clm'),

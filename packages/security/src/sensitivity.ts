@@ -1,6 +1,6 @@
 
 /**
- * Sensitivity vocabulary and precision-tier model for Black Book.
+ * Sensitivity vocabulary and precision-tier model for BlackStory.
  *
  * The product constitution (@repo/schemas) is the authoritative policy source
  * for sensitivity classes, precision-reduction reasons, residential precision levels,

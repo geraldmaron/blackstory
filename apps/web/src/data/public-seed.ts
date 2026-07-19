@@ -10,13 +10,15 @@
 import {
   buildRelatedNeighborStubs,
   composeContinueLearningStubs,
+} from '@repo/domain/learning-index';
+import type { DatePrecision } from '@repo/domain/era';
+import {
   NOTABILITY_RUBRIC,
-  type DatePrecision,
   type EntitySensitivity,
   type EntityStatusValue,
   type NotabilityBasisRecord,
   type StatusHistoryEntry,
-} from '@repo/domain';
+} from '@repo/domain/entity-status';
 import {
   buildGraphTimeline,
   currentStatusFor,

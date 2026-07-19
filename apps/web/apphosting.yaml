@@ -3,7 +3,7 @@
 # Project: black-book-efaaf (332234323945)
 # Proposed backend: black-book-web-production (create after Blaze upgrade)
 # Existing Hosting site: black-book-efaaf.web.app (does not prove an App Hosting backend exists)
-# Registered web app: 1:332234323945:web:17be349ebc9c029b3bfd78 (Black Book Web)
+# Registered web app: 1:332234323945:web:17be349ebc9c029b3bfd78 (BlackStory Web)
 #
 # Isolation notes:
 #   - Set the backend runtime identity to web-runtime@black-book-efaaf.iam.gserviceaccount.com

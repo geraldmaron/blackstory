@@ -224,4 +224,5 @@ export type {
   AbusiveTrafficSimulationResult,
 } from './resource-controls.js';
 
-export * from './url-safety/index.js';
+// Node-only URL safety — import via `@repo/security/url-safety`, never the main barrel
+// (client webpack graphs that need redactLocationForPublic must use `@repo/security/redaction`).

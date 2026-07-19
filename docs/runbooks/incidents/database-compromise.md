@@ -13,6 +13,6 @@
 
 ## Recover
 
-- Roll public output back with BB-019 when sufficient; use [`../backup-restore.md`](../backup-restore.md) PITR/export recovery for canonical corruption.
+- Roll public output back with  when sufficient; use [`../backup-restore.md`](../backup-restore.md) PITR/export recovery for canonical corruption.
 - Restore into an isolated database first, verify counts/hashes and release manifests, then perform a controlled migration.
 - Rotate reachable credentials, repair rules/IAM, and canary read-only access before writes.

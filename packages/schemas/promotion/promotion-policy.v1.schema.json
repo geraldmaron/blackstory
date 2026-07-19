@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://black-book.local/schemas/promotion/promotion-policy.v1.schema.json",
-  "title": "Black Book Promotion Policy",
+  "title": "BlackStory Promotion Policy",
   "description": "Deterministic evidence and confidence requirements for claim promotion.",
   "type": "object",
   "additionalProperties": false,

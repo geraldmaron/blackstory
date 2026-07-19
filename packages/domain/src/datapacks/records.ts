@@ -4,7 +4,7 @@
  * reconciliation is the import pipeline's job (`./import-pipeline.ts`), not the manifest/record
  * contract's. Every record carries its own `externalId`: the pack's own identifier for the
  * thing, scoped to the pack's `datasetId` namespace and NEVER auto-promoted to a canonical
- * Black Book entity id (see `NamespacedExternalId` in `./import-pipeline.ts`).
+ * BlackStory entity id (see `NamespacedExternalId` in `./import-pipeline.ts`).
  */
 import type { JsonValue } from '../publication/index.js';
 

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://blackbook.local/schemas/gold-corpus/gold-evaluation.v1.schema.json",
-  "title": "Black Book Gold Evaluation",
+  "title": "BlackStory Gold Evaluation",
   "description": "Machine-readable evidence that an algorithm version passed corpus thresholds.",
   "type": "object",
   "additionalProperties": false,

@@ -1,6 +1,6 @@
 
 /**
- * Public serialization choke point for Black Book.
+ * Public serialization choke point for BlackStory.
  *
  * Every value that becomes public entity projections, search-index documents, and
  * exports must pass through this module. It reduces location precision, strips

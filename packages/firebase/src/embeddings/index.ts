@@ -72,7 +72,20 @@ export {
 export type {
   BackfillOptions,
   BackfillSummary,
+  BackfillEntitySourceName,
   CanonicalEntitySource,
   CanonicalEntitySourcePage,
   ExistingEmbeddingHashLookup,
 } from './backfill-cli.js';
+
+export {
+  createFirestorePublicSearchIndexEntitySource,
+  createNationalCatalogFixtureEntitySource,
+  mapSearchIndexRecordToEmbeddingInput,
+  mapCatalogFixtureRecordToEmbeddingInput,
+  parseStateCodeFromJurisdiction,
+} from './backfill-sources.js';
+export type {
+  SearchIndexEmbeddingRecord,
+  CatalogFixtureEmbeddingRecord,
+} from './backfill-sources.js';

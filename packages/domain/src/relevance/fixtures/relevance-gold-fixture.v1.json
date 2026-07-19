@@ -1,6 +1,6 @@
 {
   "schemaVersion": "relevance-fixture.v1",
-  "description": "Gold relevance calibration cases for deterministic include/exclude/supporting-context decisions (BB-040).",
+  "description": "Gold relevance calibration cases for deterministic include/exclude/supporting-context decisions.",
   "cases": [
     {
       "id": "included-civil-rights-activist",

@@ -10,9 +10,9 @@ import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@repo/secu
 import {
   applyExploreFilters,
   buildExploreFacetOptions,
-  buildExploreMapSource,
   type ExploreFilterState,
 } from '../../../../lib/map-experience';
+import { buildExploreMapSource } from '../../../../lib/map-experience/build-explore-map-source';
 import { listPublicEntityViews } from '../../../../lib/public-data/source';
 import type { ExploreAppCheckGuard } from './app-check-guard';
 import type { createExploreRateLimitGuard } from './rate-limit-guard';

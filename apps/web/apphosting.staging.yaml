@@ -1,6 +1,6 @@
 # Optional staging template in production project black-book-efaaf.
 # Proposed backend: black-book-web-staging (same project; not a security boundary).
-# Uses the same Black Book Web app registration; distinct Secret Manager names only.
+# Uses the same BlackStory Web app registration; distinct Secret Manager names only.
 # Backend runtime: web-runtime@black-book-efaaf.iam.gserviceaccount.com.
 # No secret values here — only Secret Manager references by name (resolved at deploy time).
 #

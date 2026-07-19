@@ -130,7 +130,11 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
               <p className="ds-notice__title">Intake validation rejected this proposal.</p>
               <div className="ds-notice__body">
                 <ul>
-                  {outcome.intake.rejection.issues.map((issue) => (
+                  {outcome.intake.rejection.issues.map((issue: {
+                    readonly field: string;
+                    readonly reason: string;
+                    readonly message: string;
+                  }) => (
                     <li key={`${issue.field}-${issue.reason}`}>
                       {issue.field}: {issue.message}
                     </li>

@@ -15,5 +15,5 @@
 ## Recover
 
 - Pin/remove the dependency, rebuild from a clean trusted environment, and compare provenance.
-- Redeploy the last known-good artifact or corrected build; use BB-019 rollback for public data releases.
+- Redeploy the last known-good artifact or corrected build; use  rollback for public data releases.
 - Run security/regression suites and canary before restoring workflows or optional features.

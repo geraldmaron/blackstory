@@ -11,11 +11,13 @@ import { fileURLToPath } from 'node:url';
 import { assertAdminPermission } from '../../../firebase/src/admin-auth.ts';
 import {
   evaluateDailyBudget,
-  evaluateExternalUrl,
   evaluateSearchQueryGuardrails,
-  resolveAndPinDestination,
   validateAndNormalizeSubmission,
 } from '../../../security/src/index.ts';
+import {
+  evaluateExternalUrl,
+  resolveAndPinDestination,
+} from '../../../security/src/url-safety/index.ts';
 import {
   authorizeApiOperation,
   escapeUntrustedHtml,

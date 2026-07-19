@@ -25,3 +25,14 @@ export type {
   PrivilegedActionAuthorizer,
   StaffRole,
 } from './role-mutation';
+export {
+  FirebaseSessionAuthorizationError,
+  createFirebaseSessionAuthorizer,
+  normalizeAdminEmail,
+} from './firebase-session-authorizer';
+export { resolveAdminAuthMode, type AdminAuthMode } from './mode';
+export {
+  authorizeAdminRequest,
+  authErrorResponse,
+  type ResolvedAdminCaller,
+} from './request-auth';

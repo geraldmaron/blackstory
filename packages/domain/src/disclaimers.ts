@@ -53,7 +53,7 @@ export const DISCLAIMER_REGISTRY: Readonly<Record<DisclaimerClass, DisclaimerRec
     class: 'site_wide',
     title: 'About this record',
     body:
-      'Black Book presents documented Black history for educational and journalistic purposes. ' +
+      'BlackStory presents documented Black history for educational and journalistic purposes. ' +
       'It is not legal advice, not travel advice, and not a real-time safety service. Accuracy ' +
       'reflects the sources cited on each record as of their retrieval date — verify ' +
       'independently before relying on any record for legal, financial, or travel decisions.',
@@ -74,7 +74,7 @@ export const DISCLAIMER_REGISTRY: Readonly<Record<DisclaimerClass, DisclaimerRec
     class: 'private_property',
     title: 'Private property',
     body:
-      'This location is documented as private property. Black Book records history; it does ' +
+      'This location is documented as private property. BlackStory records history; it does ' +
       'not grant, imply, or facilitate access. Property and trespassing laws apply regardless ' +
       "of a site's historical significance.",
     reviewDate: '2026-07-17',
@@ -94,7 +94,7 @@ export const DISCLAIMER_REGISTRY: Readonly<Record<DisclaimerClass, DisclaimerRec
     class: 'non_endorsement',
     title: 'Inclusion is not endorsement',
     body:
-      'Black Book documents historical figures for their verifiable role in the historical ' +
+      'BlackStory documents historical figures for their verifiable role in the historical ' +
       "record, including figures whose documented conduct is contested or harmful. A figure's " +
       "inclusion in this index is never an endorsement of that individual's actions, views, or " +
       'legacy — it is a record of a documented role in history, shown with evidence and context.',

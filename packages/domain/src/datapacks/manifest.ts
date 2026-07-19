@@ -2,7 +2,7 @@
  * Data Pack v1 manifest contract (the related workstream).
  *
  * Goal: no third-party's independently-hosted dataset ever becomes a direct, unvetted public
- * dependency of Black Book. A "data pack" is the unit a publisher ships: a signed manifest
+ * dependency of BlackStory. A "data pack" is the unit a publisher ships: a signed manifest
  * describing a set of checksummed JSON resources. Everything downstream (validation, import
  * pipeline) works from this contract, never from a live upstream URL directly.
  *
@@ -27,7 +27,7 @@
  * Eventual target vocabularies this deliberately does NOT implement (cited for future alignment,
  * not built from scratch here): DCAT2 for dataset/distribution metadata, JSON Schema 2020-12 for
  * per-resource shape validation, PROV-O for provenance chains. This is a small, hand-rolled
- * contract sized for the resource kinds Black Book actually ingests.
+ * contract sized for the resource kinds BlackStory actually ingests.
  */
 import { sign as signBytes, verify as verifyBytes, type KeyLike } from 'node:crypto';
 import { canonicalJson, sha256Bytes, type JsonValue, type Sha256Hash } from '../publication/index.js';

@@ -1,4 +1,4 @@
-# Beta launch gate (BB-063)
+# Beta launch gate
 
 Measurable, fail-closed **go/no-go** evaluation for public beta. Failed required gates block launch — they are not informal follow-ups.
 
@@ -46,12 +46,12 @@ Machine gates assert repo evidence (files, docs, harness outputs) without live c
 | Gate | Evidence |
 |------|----------|
 | Gold corpus precision | After predictions pass thresholds |
-| Restore rehearsal | BB-061 dry-run report + rollback script |
-| Load/abuse | BB-059 scenario inventory |
-| Adversarial integrity | BB-060 scenario inventory |
+| Restore rehearsal |  dry-run report + rollback script |
+| Load/abuse |  scenario inventory |
+| Adversarial integrity |  scenario inventory |
 | Methodology/corrections | Public trust surfaces in `apps/web` |
-| Disclaimers | BB-095 registry module |
-| Release pipeline | BB-062 runbook + provenance schema |
+| Disclaimers |  registry module |
+| Release pipeline |  runbook + provenance schema |
 | Beta disable path | Kill switches + App Hosting env + runbook |
 
 ## Disable public beta quickly

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://black-book.local/schemas/product-constitution.schema.json",
-  "title": "Black Book product constitution",
+  "title": "BlackStory product constitution",
   "description": "Versioned machine-readable product policy. Single structural source of truth for TypeScript and Python loaders.",
   "type": "object",
   "additionalProperties": false,

@@ -1,6 +1,6 @@
 /**
  * External dataset acquisition registry (owner directive 2026-07-18): every third-party
- * dataset Black Book plans to ingest for the demographics/context modeling layers, recorded
+ * dataset BlackStory plans to ingest for the demographics/context modeling layers, recorded
  * BEFORE ingestion with its direct data URL, license verdict, geography, cadence, and (once
  * downloaded) checksum — so each future ingestion session starts from a vetted entry instead
  * of a link dump.

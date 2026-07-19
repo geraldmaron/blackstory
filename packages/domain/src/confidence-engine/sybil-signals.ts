@@ -61,7 +61,7 @@ export type SourceIndependenceMetadata = {
   readonly nameservers?: readonly string[];
   /** ISO date the domain's registration became effective (WHOIS/RDAP createdDate). */
   readonly domainRegisteredAt?: string;
-  /** ISO date Black Book first observed this domain as a source, independent of registration date. */
+  /** ISO date BlackStory first observed this domain as a source, independent of registration date. */
   readonly domainFirstSeenAt?: string;
   /** ISO datetime this specific evidence item was published. */
   readonly publishedAt?: string;

@@ -5,7 +5,7 @@
 import { lookup } from 'node:dns/promises';
 import { request as httpsRequest } from 'node:https';
 import type { SafeHttpClient, SafeHttpRequest, SafeHttpResponse } from '@repo/domain';
-import { evaluateExternalUrl, resolveAndPinDestination } from '@repo/security';
+import { evaluateExternalUrl, resolveAndPinDestination } from '@repo/security/url-safety';
 
 const REQUEST_TIMEOUT_MS = 8_000;
 const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;

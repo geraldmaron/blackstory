@@ -1,0 +1,225 @@
+/**
+ * Editorial judge runner: LLM drafts keep/reject + field prose with entity-link markup,
+ * domain validates, optional vector-related suggestions. Prepare-only; never publishes.
+ */
+import {
+  buildEditorialPacket,
+  linkifyProseAgainstCatalog,
+  suggestRelatedEntitiesFromVectors,
+  validateEditorialDrafts,
+  type CatalogLinkTarget,
+  type EditorialDecision,
+  type EditorialPacket,
+  type EmbeddingVector,
+} from '@repo/domain';
+import { createLlmProvider, type LlmProvider } from './llm-provider.js';
+import type { OperatorIdentity } from './identity.js';
+
+export type EditorialSubject = {
+  readonly subjectId: string;
+  readonly title: string;
+  readonly kind?: string;
+  readonly existingSummary?: string;
+  readonly existingContext?: string;
+  readonly sourceSnippets?: readonly string[];
+};
+
+export type EditorialCatalogEntity = CatalogLinkTarget & {
+  readonly vector?: EmbeddingVector;
+};
+
+export type EditorialRunInput = {
+  readonly subjects: readonly EditorialSubject[];
+  readonly catalog: readonly EditorialCatalogEntity[];
+  readonly identity: OperatorIdentity;
+  readonly nowIso: string;
+  readonly provider?: LlmProvider;
+  readonly model?: string;
+  readonly targetVectorBySubjectId?: ReadonlyMap<string, EmbeddingVector>;
+};
+
+export type EditorialRunItem = {
+  readonly packet: EditorialPacket;
+  readonly rawModelContent?: string;
+  readonly relatedSuggestions: readonly {
+    readonly entityId: string;
+    readonly similarity: number;
+    readonly displayName?: string;
+  }[];
+};
+
+export type EditorialRunResult = {
+  readonly kind: 'editorial.run.v1';
+  readonly items: readonly EditorialRunItem[];
+  readonly keepCount: number;
+  readonly rejectCount: number;
+  readonly needsEvidenceCount: number;
+  readonly completedAt: string;
+};
+
+type ModelJson = {
+  readonly decision?: string;
+  readonly rationale?: string;
+  readonly confidence?: number;
+  readonly drafts?: {
+    readonly publicSummary?: string;
+    readonly historicalContext?: string;
+    readonly identityLabel?: string;
+    readonly relevanceNote?: string;
+    readonly relatedEntityIds?: readonly string[];
+    readonly proposedRelationshipNotes?: string;
+  };
+};
+
+const SYSTEM_PROMPT = `You are an editorial judge for BlackStory (History, pinned to place).
+Return ONLY JSON with keys: decision (keep|reject|needs_evidence), rationale, confidence (0-1),
+drafts: { publicSummary, historicalContext, identityLabel?, relevanceNote?, relatedEntityIds?, proposedRelationshipNotes? }.
+Rules:
+- publicSummary 120-400 chars, specific evidence-led prose, no sensational framing, no completeness claims.
+- When mentioning other catalog entities, use markup [[entityId|Display Name]] for known ids only.
+- Do not invent citations or claim legal procedural status.
+- reject spam/commerce/off-topic; needs_evidence when thin; keep when learnable with place context.
+- relatedEntityIds must be existing catalog ids only.`;
+
+function parseDecision(raw: string | undefined): EditorialDecision {
+  if (raw === 'reject' || raw === 'needs_evidence' || raw === 'keep') return raw;
+  return 'needs_evidence';
+}
+
+function extractJsonObject(content: string): ModelJson {
+  const trimmed = content.trim();
+  try {
+    return JSON.parse(trimmed) as ModelJson;
+  } catch {
+    const start = trimmed.indexOf('{');
+    const end = trimmed.lastIndexOf('}');
+    if (start >= 0 && end > start) {
+      return JSON.parse(trimmed.slice(start, end + 1)) as ModelJson;
+    }
+    throw new Error('Model response was not valid JSON');
+  }
+}
+
+function ensureLinkedSummary(
+  summary: string | undefined,
+  catalog: readonly CatalogLinkTarget[],
+  subjectId: string,
+): string | undefined {
+  if (!summary?.trim()) return undefined;
+  if (summary.includes('[[')) return summary;
+  return linkifyProseAgainstCatalog(summary, catalog, { skipEntityIds: [subjectId] }).text;
+}
+
+export async function runEditorialJudge(input: EditorialRunInput): Promise<EditorialRunResult> {
+  const provider = input.provider ?? createLlmProvider({ provider: 'mock' });
+  const catalogTargets: CatalogLinkTarget[] = input.catalog.map((entry) => ({
+    id: entry.id,
+    displayName: entry.displayName,
+    ...(entry.aliases !== undefined ? { aliases: entry.aliases } : {}),
+  }));
+  const vectorCorpus = input.catalog
+    .filter((entry) => entry.vector !== undefined)
+    .map((entry) => ({
+      id: entry.id,
+      vector: entry.vector!,
+      ...(entry.displayName !== undefined ? { displayName: entry.displayName } : {}),
+    }));
+
+  const items: EditorialRunItem[] = [];
+  for (const subject of input.subjects) {
+    const userPayload = {
+      subjectId: subject.subjectId,
+      title: subject.title,
+      kind: subject.kind ?? null,
+      existingSummary: subject.existingSummary ?? null,
+      existingContext: subject.existingContext ?? null,
+      sourceSnippets: subject.sourceSnippets ?? [],
+      catalogSample: catalogTargets.slice(0, 40).map((entry) => ({
+        id: entry.id,
+        displayName: entry.displayName,
+      })),
+    };
+    const completion = await provider.complete({
+      model: input.model ?? 'mock-editorial-v1',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: JSON.stringify(userPayload) },
+      ],
+    });
+    const parsed = extractJsonObject(completion.content);
+    const draftsIn = parsed.drafts ?? {};
+    const linkedSummary = ensureLinkedSummary(
+      draftsIn.publicSummary ?? subject.existingSummary,
+      catalogTargets,
+      subject.subjectId,
+    );
+    const drafts = {
+      ...(linkedSummary !== undefined ? { publicSummary: linkedSummary } : {}),
+      ...(draftsIn.historicalContext !== undefined
+        ? { historicalContext: draftsIn.historicalContext }
+        : subject.existingContext !== undefined
+          ? { historicalContext: subject.existingContext }
+          : {}),
+      ...(draftsIn.identityLabel !== undefined ? { identityLabel: draftsIn.identityLabel } : {}),
+      ...(draftsIn.relevanceNote !== undefined ? { relevanceNote: draftsIn.relevanceNote } : {}),
+      ...(draftsIn.relatedEntityIds !== undefined
+        ? { relatedEntityIds: draftsIn.relatedEntityIds }
+        : {}),
+      ...(draftsIn.proposedRelationshipNotes !== undefined
+        ? { proposedRelationshipNotes: draftsIn.proposedRelationshipNotes }
+        : {}),
+    };
+    const validation = validateEditorialDrafts(drafts);
+    const targetVector =
+      input.targetVectorBySubjectId?.get(subject.subjectId) ??
+      input.catalog.find((entry) => entry.id === subject.subjectId)?.vector;
+    const relatedSuggestions =
+      targetVector && vectorCorpus.length > 0
+        ? suggestRelatedEntitiesFromVectors({
+            targetVector,
+            corpus: vectorCorpus.filter((entry) => entry.id !== subject.subjectId),
+            limit: 8,
+            minSimilarity: 0.35,
+          })
+        : [];
+
+    const relatedIds = [
+      ...new Set([
+        ...(drafts.relatedEntityIds ?? []),
+        ...relatedSuggestions.map((item) => item.entityId),
+      ]),
+    ].filter((id) => id !== subject.subjectId);
+
+    const packet = buildEditorialPacket({
+      subjectId: subject.subjectId,
+      subjectTitle: subject.title,
+      decision: parseDecision(parsed.decision),
+      rationale: parsed.rationale?.trim() || 'No rationale returned.',
+      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.4,
+      drafts: {
+        ...drafts,
+        ...(relatedIds.length > 0 ? { relatedEntityIds: relatedIds } : {}),
+      },
+      validationIssues: validation.issues,
+      model: { provider: completion.provider, modelId: completion.modelId },
+      createdAt: input.nowIso,
+      operatorId: input.identity.operatorId,
+      sessionId: input.identity.sessionId,
+    });
+
+    items.push({
+      packet,
+      rawModelContent: completion.content,
+      relatedSuggestions,
+    });
+  }
+
+  return {
+    kind: 'editorial.run.v1',
+    items,
+    keepCount: items.filter((item) => item.packet.decision === 'keep').length,
+    rejectCount: items.filter((item) => item.packet.decision === 'reject').length,
+    needsEvidenceCount: items.filter((item) => item.packet.decision === 'needs_evidence').length,
+    completedAt: input.nowIso,
+  };
+}

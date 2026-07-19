@@ -127,6 +127,35 @@
     "failureReason": { "type": "string" },
     "retryCount": { "type": "integer", "minimum": 0 },
     "mergedIntoId": { "type": "string" },
+    "catalogMatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "topMatches", "rationale", "matchedAt"],
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": ["proposed_match", "review_required", "no_match"]
+        },
+        "selectedEntityId": { "type": "string", "minLength": 1 },
+        "topMatches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["entityId", "confidence"],
+            "properties": {
+              "entityId": { "type": "string", "minLength": 1 },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        },
+        "rationale": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "matchedAt": { "type": "string", "format": "date-time" }
+      }
+    },
     "createdAt": { "type": "string", "format": "date-time" },
     "updatedAt": { "type": "string", "format": "date-time" }
   }

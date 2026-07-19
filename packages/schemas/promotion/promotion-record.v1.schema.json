@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://black-book.local/schemas/promotion/promotion-record.v1.schema.json",
-  "title": "Black Book Promotion Record",
+  "title": "BlackStory Promotion Record",
   "description": "Explicit state record from submission or discovery through publication release.",
   "type": "object",
   "additionalProperties": false,

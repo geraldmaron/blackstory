@@ -634,6 +634,8 @@ export * from './extraction/index.js';
 export * from './confidence-engine/index.js';
 export * from './research-case/index.js';
 export * from './similarity/index.js';
+export * from './editorial/index.js';
+export * from './story-research/index.js';
 export * from './rights/index.js';
 export * from './consensus-review/index.js';
 export * from './citations/index.js';

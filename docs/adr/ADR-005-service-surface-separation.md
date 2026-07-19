@@ -2,17 +2,17 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-16
-- **Bead:** BB-002
+- **Bead:**
 - **Depends on:** ADR-001, ADR-003
-- **Implements toward:** BB-021
+- **Implements toward:**
 
 ## Scaffold vs target
 
 | Aspect | Today (verified) | Target |
 |--------|------------------|--------|
 | App directories | `apps/web`, `admin`, `api-public`, `api-submissions`, `api-internal` present | Same boundaries as deployables |
-| Runtime isolation / IAP / Armor | Not configured | BB-021–027 |
-| Distinct SA / pipelines | **Designed** in `infra/gcp/` (BB-005); not provisioned | BB-010, BB-021, BB-062 |
+| Runtime isolation / IAP / Armor | Not configured | –027 |
+| Distinct SA / pipelines | **Designed** in `infra/gcp/`; not provisioned | , ,  |
 
 ## 2026-07-16 addendum — single production project
 
@@ -60,7 +60,7 @@ Additional rules:
 |-------------|--------------|
 | Monolith API for public + submissions + internal | Single credential/process failure publishes or corrupts. |
 | Microservice per domain entity (people, schools, events, …) | Over-decomposition beyond bead boundaries; ops cost without security gain. |
-| Admin embedded in public Next.js app with route guards only | Shared runtime and accidental handler coupling; fails BB-021 acceptance. |
+| Admin embedded in public Next.js app with route guards only | Shared runtime and accidental handler coupling; fails  acceptance. |
 | Internal API publicly reachable with “secret” header | Insufficient; must be network-private + trusted identity. |
 | Combining research and publication workers | Violates research-cannot-publish invariant. |
 
@@ -69,16 +69,16 @@ Additional rules:
 - More deployables and IAM to manage; accepted cost of isolation.
 - Cross-surface calls use service identity, not browser sessions.
 - Local monorepo keeps all apps for DX while production enforces separation.
-- BB-006 must keep package import rules: packages cannot import apps; apps cannot reach across forbidden boundaries at runtime.
+-  must keep package import rules: packages cannot import apps; apps cannot reach across forbidden boundaries at runtime.
 
 ## Migration triggers
 
-- Split a surface only if a **new security domain** appears (e.g., future file-upload quarantine BB-031) — treat as explicit bead, not casual extraction.
+- Split a surface only if a **new security domain** appears (e.g., future file-upload quarantine ) — treat as explicit bead, not casual extraction.
 - Merge surfaces only with a written threat-model exception proving isolation is preserved another way.
 - Expo/mobile later consumes the same public/submissions contracts (invariant 20); do not invent mobile-only services now.
 
 ## Rollback considerations
 
 - Roll back individual Cloud Run / App Hosting revisions per surface; do not “simplify” by redeploying a combined binary.
-- If a surface is unsafe, kill-switch that surface (BB-035) while others continue (especially public snapshot reads).
+- If a surface is unsafe, kill-switch that surface while others continue (especially public snapshot reads).
 - IAM rollback: remove grants before deleting services to avoid orphaned public endpoints.

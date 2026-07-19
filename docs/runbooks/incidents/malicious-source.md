@@ -9,7 +9,7 @@
 
 1. Engage only `source-adapter-{adapterId}` first; engage research/LLM if cross-source processing is unsafe.
 2. Pause affected queues without purge and quarantine all captures from the suspected window.
-3. Engage `publication`; roll back BB-019 if source-derived content reached public output.
+3. Engage `publication`; roll back  if source-derived content reached public output.
 
 ## Recover
 

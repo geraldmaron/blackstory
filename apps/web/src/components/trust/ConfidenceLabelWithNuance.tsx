@@ -3,6 +3,7 @@
  * links to methodology definitions for the evidence-grade vocabulary.
  */
 import React from 'react';
+import Link from 'next/link';
 import { Confidence } from '@repo/ui';
 import { FACT_CONFIDENCE_DEFINITIONS, type FactConfidenceGrade } from '@repo/domain/facts';
 import { humanizeToken, mapConfidenceToUiLevel } from '../facts/format';
@@ -27,7 +28,7 @@ export function ConfidenceLabelWithNuance({
       <p className="ds-sans" style={{ margin: 'var(--ds-space-2) 0 0 0', color: 'var(--ds-ink-muted)' }}>
         {FACT_CONFIDENCE_DEFINITIONS[confidence]}
         {' '}
-        <a href={methodologyHref}>See grade definitions</a>.
+        <Link href={methodologyHref}>See grade definitions</Link>.
       </p>
       {confidenceNote ? (
         <p className="ds-sans" style={{ margin: 'var(--ds-space-2) 0 0 0' }}>

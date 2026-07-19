@@ -17,7 +17,7 @@ import {
   resolveAndPinDestination,
   type PinnedTransport,
   type ResolveHost,
-} from '@repo/security';
+} from '@repo/security/url-safety';
 import {
   mapWithConcurrency,
   withRetry,

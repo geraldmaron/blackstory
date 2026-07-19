@@ -173,8 +173,8 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts disc
 
 # Story research (citation-gated /stories drafts; staging only — human approve before seed)
 # See .claude/skills/black-book/story-craft/SKILL.md
-# Review UI: apps/admin → http://localhost:3001/login then /stories/review
-# (Firebase Google auth; allowlist geraldmarondagher@gmail.com only)
+# Review UI: apps/admin → http://localhost:3001/stories/review
+# (Firebase email/password; queue supports filter/sort/bulk; operators are Auth users)
 # OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
 #   packages/operator-cli/src/bin.ts story-research-run --topics /tmp/story-topics.json \
 #   --provider mock \

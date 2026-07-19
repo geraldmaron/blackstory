@@ -11,7 +11,7 @@ import { MethodologySections } from './MethodologySections';
 export const metadata = {
   title: 'Methodology',
   description:
-    'How Blap decides what qualifies, verifies sources, handles corrections, and publishes transparency indicators.',
+    'How BlackStory decides what qualifies, verifies sources, handles corrections, and publishes transparency indicators.',
 };
 
 export default function MethodologyPage() {

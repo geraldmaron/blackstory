@@ -83,7 +83,7 @@ export const EVIDENCE_DIMENSION_COPY: Readonly<Record<EvidenceDimensionKey, Evid
   relevance: {
     label: 'Relevance',
     description:
-      'Whether this record belongs in Blap at all \u2014 its connection to documented ' +
+      'Whether this record belongs in BlackStory at all \u2014 its connection to documented ' +
       'Black history against the constitution relevance gates. Distinct from how confident any ' +
       'single claim on the record is.',
   },

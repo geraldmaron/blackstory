@@ -1,11 +1,13 @@
 /**
- * Barrel export for the map-experience data layer. Does not re-export from
- * `@repo/domain` or `@repo/security`; only re-exports this package's own
- * additive files.
+ * Barrel export for the map-experience data layer.
+ *
+ * Intentionally omits `./build-explore-map-source` — that module imports `@repo/security`
+ * redaction (constitution/`node:fs`). Re-exporting it here pulled Node builtins into the
+ * client webpack graph whenever anything imported this barrel (e.g. entity page helpers).
+ * Import `./build-explore-map-source` directly from server-only callers.
  */
 export * from './entity-geo';
 export * from './geo-precision';
-export * from './build-explore-map-source';
 export * from './filters';
 export * from './url-state';
 export * from './density';

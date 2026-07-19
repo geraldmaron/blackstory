@@ -1,6 +1,6 @@
 # Gold corpus and calibration harness
 
-BB-047 provides a private, versioned evaluation corpus for relevance, publication safety,
+ provides a private, versioned evaluation corpus for relevance, publication safety,
 confidence calibration, citation entailment, and entity resolution. It is local-only under
 ADR-011: evaluation does not read or write Firestore and neither CLI applies cloud changes.
 

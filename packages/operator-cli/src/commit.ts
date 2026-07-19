@@ -4,7 +4,7 @@
  *
  * This is the ONLY function in this package that writes anything. It calls the existing
  * `commitWithAudit` (packages/firebase/src/firestore/audit-outbox.ts) directly the same
- * atomic audit+outbox+idempotency transaction every other Black Book writer uses instead of
+ * atomic audit+outbox+idempotency transaction every other BlackStory writer uses instead of
  * reimplementing any part of it. There is no function anywhere in this package that publishes,
  * promotes, or approves anything; see `promotion-boundary.test.ts`.
  */

@@ -34,7 +34,7 @@ test('JSON Schema artifact exists beside policy values', () => {
   const schema = JSON.parse(readFileSync(CONSTITUTION_SCHEMA_PATH, 'utf8')) as {
     title?: string;
   };
-  assert.equal(schema.title, 'Black Book product constitution');
+  assert.equal(schema.title, 'BlackStory product constitution');
 });
 
 test('every evaluation records policyVersion', () => {

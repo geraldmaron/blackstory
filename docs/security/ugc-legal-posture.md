@@ -1,7 +1,7 @@
-# CCPA/CPRA publicly-available posture and fair-use ground truth (BB-077)
+# CCPA/CPRA publicly-available posture and fair-use ground truth
 
 Written so a future counsel review starts from documented ground truth rather than nothing.
-**This is engineering documentation, not legal advice** — it records the assumptions the BB-077
+**This is engineering documentation, not legal advice** — it records the assumptions the
 compliance layer was built against so counsel can confirm, correct, or supersede them.
 
 ## CPRA's publicly-available-information exception
@@ -24,7 +24,7 @@ This assumption is **general and defeasible**. It does not cover:
 ## Reddit's deletion-sync obligation is contractual, not privacy-law-conditional
 
 Reddit's deletion-sync requirement — purge derived content within 48 hours of the user deleting
-the original on Reddit — comes from **Reddit's API/developer terms**, a contract Blap
+the original on Reddit — comes from **Reddit's API/developer terms**, a contract BlackStory
 enters into to access the API. It is not derived from, and does not depend on, a CPRA "publicly
 available" analysis.
 
@@ -70,7 +70,7 @@ argument) should go through counsel review, not just this document.
 ## What this document intentionally does not cover
 
 - Rights of publicity / right-to-be-forgotten regimes outside CPRA.
-- Non-US jurisdictions (GDPR, etc.) — Blap's current UGC sources and obligations registry
+- Non-US jurisdictions (GDPR, etc.) — BlackStory's current UGC sources and obligations registry
   entries (Reddit, Brave, Exa, RSS, Internet Archive, DPLA) are evaluated against US law only.
 - Platform-specific terms for sources not yet in the obligations registry
   (`packages/domain/src/rights/obligations.ts`) — any new UGC source needs its own entry and,
@@ -83,4 +83,4 @@ argument) should go through counsel review, not just this document.
 - `packages/domain/src/rights/deletion-sync.ts` — deletion-sync framework.
 - `packages/domain/src/rights/living-person-ugc.ts` — living-person ethics rules.
 - `packages/domain/src/rights/takedown.ts` — takedown/contest routing.
-- `docs/security/ugc-compliance-layer.md` — full BB-077 deliverable map.
+- `docs/security/ugc-compliance-layer.md` — full  deliverable map.

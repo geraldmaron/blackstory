@@ -8,7 +8,7 @@
 
 import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
-import type { PublicSearchIndexDoc } from '@repo/domain';
+import type { PublicSearchIndexDoc } from '@repo/domain/search';
 import type {
   PublicEntityProjectionDoc,
   PublicSearchIndexDoc as FirestoreSearchIndexDoc,
@@ -17,7 +17,7 @@ import {
   buildRelatedNeighborStubs,
   composeContinueLearningStubs,
   type NeighborLookup,
-} from '@repo/domain';
+} from '@repo/domain/learning-index';
 import {
   getPublicEntity,
   listPublicEntities,

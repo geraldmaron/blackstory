@@ -1,6 +1,6 @@
-# Runbook: Firestore backup and restore (BB-020)
+# Runbook: Firestore backup and restore
 
-**Scope:** Firestore (ADR-011) managed export, PITR, GCS versioning, BB-019 release verification.  
+**Scope:** Firestore (ADR-011) managed export, PITR, GCS versioning,  release verification.
 **Not in scope:** Cloud SQL PITR (deferred — see [`infra/firebase/backup/deferred-cloud-sql.md`](../../infra/firebase/backup/deferred-cloud-sql.md)).
 
 ## Prerequisites
@@ -79,11 +79,11 @@ For accidental deletes within PITR window:
 1. Identify timestamp (UTC) from audit trail.
 2. Human runs Firestore PITR restore to **new** database ID (not in-place overwrite).
 3. Run `verify-restore.mjs` against export closest to timestamp.
-4. Merge recovered docs via controlled migration job (out of BB-020 scope).
+4. Merge recovered docs via controlled migration job (out of  scope).
 
 ## Release-specific restore
 
-If a bad activation slipped past checks (should be blocked by BB-019):
+If a bad activation slipped past checks (should be blocked by ):
 
 1. Roll back `publicMeta/activeRelease` to last good `active` release (publication worker).
 2. Restore `publication` + `public` tier on-release export for that `releaseId`.

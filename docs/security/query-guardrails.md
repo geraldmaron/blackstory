@@ -1,8 +1,8 @@
-# Search and query resource guardrails (BB-026)
+# Search and query resource guardrails
 
 **Status:** Pure validation + cursor/cache helpers in-repo. Middleware wiring and live load
-tests are follow-on work (BB-049, BB-059).  
-**Depends on:** [BB-025 rate limits](./rate-limits.md), [ADR-008 search](../adr/ADR-008-search-and-geocoding.md)  
+tests are follow-on work (, ).
+**Depends on:** [ rate limits](./rate-limits.md), [ADR-008 search](../adr/ADR-008-search-and-geocoding.md)
 **Threats:** [T-02](./threat-model.md#t-02-cost-exhaustion-via-search-and-geocoding), [T-13](./threat-model.md#t-13-database-exhaustion-and-connection-starvation)
 
 ## Objective
@@ -63,10 +63,10 @@ emit `createSlowQueryLogEvent` / `createTimeoutFailure` — do not hold pool slo
 
 Cloud SQL `statement_timeout` remains **deferred** (ADR-011); document only until SQL search paths exist.
 
-## BB-025 integration
+##  integration
 
 `searchQueryEndpointMetadata` exports `endpointClass: 'search'` and `costTier: 'expensive_read'`
-for rate-limit guards without modifying the BB-025 evaluator.
+for rate-limit guards without modifying the  evaluator.
 
 ## Validation
 
@@ -80,6 +80,6 @@ pnpm --filter @repo/api-public typecheck
 ## Remaining live work
 
 1. Wire `createPublicSearchGuard` into Cloud Run middleware (after App Check + rate limits).
-2. Firestore query builder consuming `CanonicalSearchQuery` only (BB-049).
-3. Slow-query telemetry export to BB-034.
-4. Live load / fuzz under BB-059 against staging.
+2. Firestore query builder consuming `CanonicalSearchQuery` only.
+3. Slow-query telemetry export to .
+4. Live load / fuzz under  against staging.

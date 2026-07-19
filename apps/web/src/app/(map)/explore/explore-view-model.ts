@@ -17,16 +17,18 @@ import {
 import {
   applyExploreFilters,
   buildExploreFacetOptions,
-  buildExploreMapSource,
   buildHistoryEdgeLineCollection,
   buildStateDensityLevels,
   parseExploreSearchParams,
   type ExploreFacetOptions,
-  type ExploreMapFeature,
-  type ExploreMapSource,
   type ExploreViewState,
   type RawExploreSearchParams,
 } from '../../../lib/map-experience';
+import {
+  buildExploreMapSource,
+  type ExploreMapFeature,
+  type ExploreMapSource,
+} from '../../../lib/map-experience/build-explore-map-source';
 import type { PublicReadSource } from '../../../lib/public-data/source';
 import {
   pickExploreEdgeSlice,

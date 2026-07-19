@@ -16,7 +16,7 @@ export function ConsoleShell({ children }: { readonly children: ReactNode }) {
         <div>
           <p className="console-kicker">Private operations</p>
           <Link className="console-brand" href="/console">
-            Black Book / Administration
+            BlackStory Admin
           </Link>
         </div>
         <p className="console-session" aria-label="Authentication status">

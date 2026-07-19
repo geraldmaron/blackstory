@@ -1,6 +1,6 @@
 
 /**
- * Blap color tokens: Archive Paper / Black Ink primary surfaces and ink,
+ * BlackStory color tokens: Archive Paper / Black Ink primary surfaces and ink,
  * Copper Pin Page Sand brand accent, and reserved status hues.
  * Status colors are only for warning, confidence, dispute, and error never decorative chrome.
  * Palette source: brandPalette (brand-palette.ts).

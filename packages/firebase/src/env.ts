@@ -107,7 +107,7 @@ function mergeClientConfig(
 
 /**
  * Public web client env. Emulator mode supplies demo defaults; production uses
- * registered Black Book Web identifiers unless overridden.
+ * registered BlackStory Web identifiers unless overridden.
  */
 export function parseWebFirebaseEnv(
   environment: EnvironmentLike = process.env,
@@ -122,7 +122,7 @@ export function parseWebFirebaseEnv(
 
 
 /**
- * Admin console client env. Uses the separate Black Book Admin app id.
+ * Admin console client env. Uses the separate BlackStory Admin app id.
  */
 export function parseAdminFirebaseEnv(
   environment: EnvironmentLike = process.env,

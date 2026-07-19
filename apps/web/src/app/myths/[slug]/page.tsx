@@ -1,6 +1,7 @@
 /**
  * Individual myth review page the ONLY pages that emit schema.org ClaimReview markup.
  */
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
   HowToReadThisRecord,
@@ -91,7 +92,7 @@ export default async function MythReviewPage({ params }: MythPageProps) {
           <p className="ds-section__lede">{review.reviewBody}</p>
           {review.relatedFactUrl ? (
             <p className="ds-sans">
-              <a href={review.relatedFactUrl}>Read the canonical fact record</a>
+              <Link href={review.relatedFactUrl}>Read the canonical fact record</Link>
             </p>
           ) : null}
         </section>

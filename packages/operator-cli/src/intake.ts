@@ -42,6 +42,8 @@ export const OPERATOR_PROPOSAL_KINDS = [
   'source_registration',
   'evidence_attachment',
   'bulk_import_row',
+  'editorial_packet',
+  'story_packet',
 ] as const;
 
 export type OperatorProposalKind = (typeof OPERATOR_PROPOSAL_KINDS)[number];
@@ -94,6 +96,8 @@ const AUDIT_ACTION_BY_PROPOSAL: Record<OperatorProposalKind, 'research.created' 
   source_registration: 'source.registered',
   evidence_attachment: 'research.created',
   bulk_import_row: 'research.created',
+  editorial_packet: 'research.created',
+  story_packet: 'research.created',
 };
 
 export type PrepareOperatorIntakeOptions = {

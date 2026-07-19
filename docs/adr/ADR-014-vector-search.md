@@ -2,9 +2,9 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-17
-- **Bead:** BB-071
+- **Bead:**
 - **Depends on:** ADR-004, ADR-005, ADR-011, ADR-008 (amends)
-- **Implements toward:** BB-072
+- **Implements toward:**
 
 ## Scaffold vs target
 
@@ -25,7 +25,7 @@ what a user means in their own words — "the school where the sit-ins started" 
 field queries only match what was typed, not what was meant. The research pipeline has the same
 gap from the other direction: discovery candidates and accepted sources that describe the same
 underlying fact in different words currently only get caught by exact content-hash dedup
-(`packages/domain/src/discovery/deduplication.ts`, BB-039), which misses paraphrase-level
+(`packages/domain/src/discovery/deduplication.ts`, ), which misses paraphrase-level
 duplicates entirely.
 
 The owner asked directly how vector search could work "within Firebase" at all, given the
@@ -55,18 +55,18 @@ path in this repo already uses.
    is the only lever that keeps `p95` latency sane at scale. `infra/firebase/firestore.indexes.json`
    defines a bare vector index plus every practical combination of the three pre-filter fields.
 4. **`find_nearest` is served only from `apps/api-public` server code**, composed from — not
-   replacing — the existing BB-026/BB-025/BB-035 guardrails: the natural-language query text is
+   replacing — the existing // guardrails: the natural-language query text is
    validated by the *same* `evaluateSearchQueryGuardrails` function `/v1/search` uses, the
    neighbor count `k` is capped by that same function's `pageSize` limits (default 20, max 50 —
    well under the platform ceiling of 1000 neighbors), App Check runs first, and the request is
-   denied while the existing `search` kill switch (BB-035) is engaged or `public-static-mode` is
+   denied while the existing `search` kill switch is engaged or `public-static-mode` is
    active. Client/web SDKs cannot call `findNearest` at all, so there is no parallel surface to
    accidentally expose.
 5. **Research-side reuse is pure functions, not a live pipeline integration.** `@repo/domain`'s
    `similarity/` module provides `findSimilarCandidates` (candidate recall: "find sources similar
    to this accepted one") and `findNearDuplicatesOf`/`clusterNearDuplicates` (semantic
    near-duplicate flagging) over pre-computed embeddings. Both are read-only comparisons — neither
-   merges nor publishes anything, consistent with the BB-039 discovery-cannot-publish guard.
+   merges nor publishes anything, consistent with the  discovery-cannot-publish guard.
    Wiring these into the live `workers/research/` discovery workflow is a documented integration
    point (see Consequences), not done in this pass.
 
@@ -89,7 +89,7 @@ capability the client/web SDKs never had in the first place.
 | Pre-GA `firestore-vector-search` Firebase Extension | Gives up control over the embedding model, output dimensionality, and retry/backoff behavior — exactly the three things this bead needed to own (see `packages/firebase/src/embeddings/provider.ts`'s explicit retry wrapper and `gemini-provider.ts`'s explicit `outputDimensionality` request). It is also pre-GA, which this project avoids for a load-bearing write path per its general risk posture. |
 | External search engine (Typesense/Algolia) from day one | Per ADR-008 doctrine, an external search platform is deferred until Firestore-based approaches are measured insufficient, not adopted preemptively. Nothing about semantic search changes that calculus — it is a new *recall lane*, not evidence that the existing doctrine failed. |
 | Storing the vector on the existing public entity projection document | Would force re-embedding every entity on every immutable release cut, multiplying embedding cost and write volume for no benefit (an entity's semantic content rarely changes between releases). A sibling collection decouples embedding freshness from release cadence. |
-| Fusing semantic and structured results inside this bead | BB-072 (hybrid retrieval / ranking fusion, still blocked) owns combining the ADR-008 structured/prefix recall lane with this bead's semantic recall lane (e.g. via RRF). This bead delivers the raw KNN query path BB-072 will consume, not the fusion layer itself. |
+| Fusing semantic and structured results inside this bead |  (hybrid retrieval / ranking fusion, still blocked) owns combining the ADR-008 structured/prefix recall lane with this bead's semantic recall lane (e.g. via RRF). This bead delivers the raw KNN query path  will consume, not the fusion layer itself. |
 
 ## Consequences
 
@@ -104,8 +104,17 @@ capability the client/web SDKs never had in the first place.
 - The **research-pipeline integration point is documented, not live-wired**: `workers/research/`
   (currently a minimal Python scaffold with no discovery logic yet) should call the TypeScript
   `@repo/domain` similarity functions — or a Python port of the same pure math — at
-  candidate-ingestion time, after the existing exact content-hash dedup (BB-039). Neither
+  candidate-ingestion time, after the existing exact content-hash dedup. Neither
   function may merge or auto-publish, matching the existing discovery-cannot-publish guard.
+- **Editorial enrichment hook (operator-cli):** `suggestRelatedEntitiesFromVectors` in
+  `@repo/domain` editorial module is called from `editorial-run` / `enrichment-run` when catalog
+  entries include optional `vector` fields. Operators can load live vectors with
+  `--catalog-from=firestore` (joins `entityEmbeddings` + `publicSearchIndex` display names).
+  Packets stage related-id suggestions into quarantine only — never auto-publish. Public
+  summaries may carry `[[entityId|Label]]` markup rendered by web `LinkedProse`.
+- **Backfill entity sources:** default CLI source is `publicSearchIndex` (prod often has
+  searchable projections before `canonicalEntities` is filled). Also supports
+  `--source=fixtures` (national-catalog JSON) and `--source=canonicalEntities`.
 - `infra/firebase/firestore.rules` was not touched by this bead (out of file-ownership scope). The
   `entityEmbeddings` collection is currently unprotected by explicit client-deny rules; it is safe
   today only because nothing writes to it except the server-side Admin SDK (which bypasses rules
@@ -140,13 +149,13 @@ not a default upgrade path.
 
 ## Rollback considerations
 
-- Kill-switch semantic search independently via the existing `search` core switch (BB-035) — see
+- Kill-switch semantic search independently via the existing `search` core switch — see
   `apps/api-public/src/vector-search-kill-switch.ts`. This is the same switch `/v1/search`
   already uses, so `public-static-mode` correctly stops both together, and enabling/disabling
   semantic search specifically requires no new operational tooling. A dedicated `vector-search`
   switch id is a small additive follow-up to `packages/config/` if independent control is later
   needed — not required for the initial rollout.
 - Structured/prefix search (ADR-008) is unaffected by disabling semantic search; they are
-  independent recall lanes until BB-072 fuses them.
+  independent recall lanes until  fuses them.
 - Deleting or corrupting the `entityEmbeddings` collection does not affect canonical or public
   projection data — it is a derived index, fully reconstructable by re-running the backfill CLI.

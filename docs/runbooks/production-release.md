@@ -1,6 +1,6 @@
-# Runbook: Production release pipeline (BB-062)
+# Runbook: Production release pipeline
 
-**Scope:** End-to-end release procedure for Blap — from merged PR through staging
+**Scope:** End-to-end release procedure for BlackStory — from merged PR through staging
 validation, progressive release metadata, protected production approval, explicit App Hosting
 promote, post-deploy health checks, and rollback rehearsal.
 
@@ -169,7 +169,7 @@ node infra/github/release-pipeline/release-pipeline.test.mjs
 
 ---
 
-## Security scans (BB-036)
+## Security scans
 
 `security.yml` runs on PRs and `main` pushes. Before production:
 

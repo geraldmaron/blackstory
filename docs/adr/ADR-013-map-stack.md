@@ -2,15 +2,15 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-17
-- **Bead:** BB-070 (map data platform and tiles)
-- **Depends on:** ADR-004, ADR-008, ADR-010, ADR-011, BB-014, BB-015, BB-019, BB-026
-- **Blocks (data platform for):** BB-051 (results list and national map experience)
+- **Bead:**  (map data platform and tiles)
+- **Depends on:** ADR-004, ADR-008, ADR-010, ADR-011, , , ,
+- **Blocks (data platform for):**  (results list and national map experience)
 
 ## Scaffold vs target
 
-| Aspect | Today (this bead) | Target (BB-051 and beyond) |
+| Aspect | Today (this bead) | Target ( and beyond) |
 |--------|--------------------|------------------------------|
-| Map library | MapLibre GL JS wired into a demo route (`apps/web/src/app/map`) | Same library, full national map experience (BB-051) |
+| Map library | MapLibre GL JS wired into a demo route (`apps/web/src/app/map`) | Same library, full national map experience |
 | Map source build | Pure, tested `buildMapSource` in `@repo/domain`, run once against fixtures by a script | Called by the release-activation pipeline on every publish (see "Release-coupled build" below) |
 | Basemap | Demo-stage: MapLibre background + line/circle layers only, no tile source, zero network requests | Self-hosted Protomaps PMTiles dark/desaturated style served from Firebase Hosting/CDN |
 | Data volume | 9 fixture entities, flat GeoJSON | Everything-active population; flat GeoJSON until volume demands vector tiles |
@@ -18,7 +18,7 @@
 
 ## Context
 
-The owner's brief for the 2026-07-17 course-correction review was explicit: "the map is a huge element of what we are doing ... populate with everything active." No map library exists anywhere in the repo today — `packages/ui/src/components/MapFrame.tsx` positions pins by hardcoded x/y percentages, which cannot represent real geography. The domain layer already has real geo primitives (BB-014 geohash encode/prefix, `GeoGeometry`, public precision levels) and BB-015's redaction layer explicitly exists to protect maps (`redactLocationForPublic` coarsens coordinates and geohash together specifically because "protects maps" is called out in its own doc comment). This ADR picks the map library, the tile-serving strategy, and the basemap's visual register, and records the perf and degraded-mode posture for the underlying data platform.
+The owner's brief for the 2026-07-17 course-correction review was explicit: "the map is a huge element of what we are doing ... populate with everything active." No map library exists anywhere in the repo today — `packages/ui/src/components/MapFrame.tsx` positions pins by hardcoded x/y percentages, which cannot represent real geography. The domain layer already has real geo primitives ( geohash encode/prefix, `GeoGeometry`, public precision levels) and 's redaction layer explicitly exists to protect maps (`redactLocationForPublic` coarsens coordinates and geohash together specifically because "protects maps" is called out in its own doc comment). This ADR picks the map library, the tile-serving strategy, and the basemap's visual register, and records the perf and degraded-mode posture for the underlying data platform.
 
 Two adjacent ADRs already set doctrine this one must fit inside:
 
@@ -33,7 +33,7 @@ MapLibre GL JS (BSD-2-Clause) renders the map. Rationale:
 
 - **License and vendor independence.** BSD, no API key required to render, no runtime dependency on a single commercial vendor — consistent with this project's repeated preference (ADR-002→ADR-011, ADR-008) for avoiding vendor lock-in and fixed subscription cost before measured need.
 - **Self-host friendly.** Works directly against static tile archives (PMTiles) or any vector-tile source over plain HTTP — fits the "stay inside Firebase Hosting/CDN economics" pattern already established for the rest of the public surface.
-- **Fits the existing security posture.** Any future dynamic tile/query endpoint (not built in this pass — see "Out of scope" below) would sit behind the same App Check + BB-026 guardrail middleware every other `api-public` endpoint uses; MapLibre has no opinion about that and doesn't fight it.
+- **Fits the existing security posture.** Any future dynamic tile/query endpoint (not built in this pass — see "Out of scope" below) would sit behind the same App Check +  guardrail middleware every other `api-public` endpoint uses; MapLibre has no opinion about that and doesn't fight it.
 - **Real GeoJSON support.** Renders our GeoJSON `FeatureCollection` output directly as a `geojson` source — no format translation layer needed between `buildMapSource`'s output and the renderer.
 
 Mapbox GL JS was not considered: it moved to a non-OSS license after the version MapLibre forked from, which conflicts with this repo's license posture elsewhere (BSD/MIT dependencies). Leaflet was considered and rejected: it has no native vector-tile/GeoJSON-at-scale story on par with MapLibre's GPU-accelerated rendering, and would need a plugin ecosystem to reach feature parity, adding more third-party surface, not less.
@@ -51,13 +51,13 @@ PMTiles packages an entire vector tile archive as a single file that clients rea
 | Ongoing vendor dependency | None — an outage or price change at Protomaps (a tiling *format and tool*, not a hosted service we call at runtime) does not affect a rendered map, because the archive already lives in our own CDN | API key management, rate limits, and a live third-party dependency in the render path |
 | Fit with existing doctrine | Matches ADR-011/ADR-008's "stay in Firebase-native, cost-controlled, no new managed platform before measured need" | Would be the first paid third-party SaaS dependency in the public render path |
 
-**Fallback: managed MapTiler** if authoring/maintaining the self-hosted PMTiles basemap turns out to cost more engineering time than the team can absorb in the BB-051 timeframe. MapTiler ships ready-made vector tiles and styles under a MapLibre-compatible API, so switching later (or starting there and migrating to self-hosted once traffic/cost justifies the authoring investment) is a source-swap, not a rendering-library swap — this is exactly the kind of narrow, reversible vendor boundary ADR-011's "migration triggers" pattern favors over an irreversible one.
+**Fallback: managed MapTiler** if authoring/maintaining the self-hosted PMTiles basemap turns out to cost more engineering time than the team can absorb in the  timeframe. MapTiler ships ready-made vector tiles and styles under a MapLibre-compatible API, so switching later (or starting there and migrating to self-hosted once traffic/cost justifies the authoring investment) is a source-swap, not a rendering-library swap — this is exactly the kind of narrow, reversible vendor boundary ADR-011's "migration triggers" pattern favors over an irreversible one.
 
 This bead does **not** ship a production PMTiles basemap archive — that is real geodata-authoring work out of scope for a data-platform bead. The demo route (see "What this bead actually ships" below) proves the rendering pipeline without it.
 
 ### 3. Basemap style: custom dark, desaturated — the "archive of record" register, not a tourism basemap
 
-BB-051's design notes are explicit that a bright, cheerful, street-map/tourism-style basemap is the wrong register for a historical-record product; EJI's lynching-memory map and Mapping Police Violence's incident map both use a dark, desaturated register precisely because the content is historical/civic record, not a travel aid. Native Land's map additionally establishes "presence, not just pins" as a pattern this product's state/county aggregates deliberately mirror.
+'s design notes are explicit that a bright, cheerful, street-map/tourism-style basemap is the wrong register for a historical-record product; EJI's lynching-memory map and Mapping Police Violence's incident map both use a dark, desaturated register precisely because the content is historical/civic record, not a travel aid. Native Land's map additionally establishes "presence, not just pins" as a pattern this product's state/county aggregates deliberately mirror.
 
 Concretely: `background-color` is Black Ink (`#0A0A0A`, `brandPalette.blackInk`); entity points render in Copper Pin (`#B86B2A`) with an Archive Paper (`#F4EFE5`) stroke for contrast against the dark canvas; any line/boundary layer uses the dark theme's low-contrast border tone (`darkTheme.border`), never a bright saturated color. **The map canvas is a fixed dark register regardless of the surrounding site's light/dark theme toggle** — the same way a printed archival map insert in a book doesn't recolor itself to match the page around it. See `packages/ui/src/tokens/brand-palette.ts` / `colors.ts` and `docs/ui/brand.md` for the token source; the map style pulls those tokens directly rather than hardcoding parallel hex values, so it cannot drift from the rest of the brand system.
 
@@ -77,7 +77,7 @@ The demo route's style (`apps/web/src/app/map/dark-archive-style.ts`) is a MapLi
 
 ### 5. Release-coupled build (not wired live this pass)
 
-BB-019's release model (ADR-004) already versions public projections and the search index with each immutable release, with instant rollback via the active-release pointer. The map source must join that same discipline: **on release activation, rebuild the map artifacts from the release's active public projections; rollback restores the prior map version automatically, the same way it restores the prior search-index version, with no separate map-specific rollback code.**
+'s release model (ADR-004) already versions public projections and the search index with each immutable release, with instant rollback via the active-release pointer. The map source must join that same discipline: **on release activation, rebuild the map artifacts from the release's active public projections; rollback restores the prior map version automatically, the same way it restores the prior search-index version, with no separate map-specific rollback code.**
 
 This bead does not wire that call live — there is no release-activation pipeline that iterates every public projection and calls `toPublicEntityProjection` yet in *any* language (Python `workers/publication/src/black_book_publication/release.py` only has manifest/hashing helpers today; nothing calls it end-to-end over live entities). Building that pipeline is a larger, separate piece of work than this data-platform bead. Wiring it in place of leaving it undone would mean guessing at an interface that doesn't exist yet and risking real drift from whatever the actual release-activation implementation ends up looking like.
 
@@ -90,9 +90,9 @@ This bead does not wire that call live — there is no release-activation pipeli
 
 Until that lands, `packages/domain/src/map/generate-demo-map-source.ts` performs the same operation against fixture data as a one-off script, producing the static artifact the `/map` demo route reads. This is not dead code nobody would invoke — it is the exact shape of call the real integration will make, run once to prove the pipeline works end to end.
 
-### 6. What this bead actually ships (demo-level integration, not BB-051)
+### 6. What this bead actually ships (demo-level integration, not )
 
-Per the bead's own scope note, BB-051 (results list + national map experience, clustering, etc.) is a separate, larger, still-blocked bead that *consumes* this data platform. This bead ships:
+Per the bead's own scope note,  (results list + national map experience, clustering, etc.) is a separate, larger, still-blocked bead that *consumes* this data platform. This bead ships:
 
 - `packages/domain/src/map/` — `buildMapSource`, U.S. state reference table (`us-geography.ts`), fixtures, and three test files (pure-logic tests, the critical redaction regression tests, and U.S.-geography tests).
 - `packages/ui/src/components/MapExplorer.tsx` — a presentational shell (accessible feature/state legend + a `children` slot for the interactive canvas) with zero MapLibre dependency, so it stays SSR-safe and testable via `renderToStaticMarkup` the same way every other component in that package is. `MapFrame.tsx` (schematic x/y pins) is left in place rather than replaced — three existing pages depend on its exact prop shape and were out of this bead's file ownership to edit; `MapExplorer` is the real-geography component that supersedes it for new usage.
@@ -106,9 +106,9 @@ Per the bead's own scope note, BB-051 (results list + national map experience, c
 - Flat GeoJSON `FeatureCollection` (current strategy, per ADR-008's bounded/static-first doctrine): target ≤ 2 MB gzipped for the full active-release population at initial product scale (tens of thousands of points). Point properties are kept minimal (`entityId`, `kind`, `displayName`, `precision`, state fields) specifically to keep this small — no embedded claims/citations/timeline data, which stays behind the existing per-entity page fetch.
 - **Migration trigger:** if the active-release point count pushes the flat GeoJSON past that budget, move to PMTiles/vector tiles for per-point data (same self-hosted-preferred strategy as the basemap) rather than growing the flat file further — this mirrors ADR-011's "migration triggers" pattern (a measured threshold, not a guess, decides when to add complexity).
 
-**Lazy-loading strategy:** state/county aggregates load first and render immediately at national zoom (presence rendering per Native Land's pattern); the full per-point `FeatureCollection` loads once, in parallel, and populates points as the aggregate view is already usable. Beyond that, deferring per-point detail further (e.g., fetching only points inside the current viewport) is exactly the kind of dynamic query BB-051 will need — and exactly what ADR-008's bounded/static-first doctrine says to avoid building until the static artifacts are measured insufficient (see "Out of scope" below).
+**Lazy-loading strategy:** state/county aggregates load first and render immediately at national zoom (presence rendering per Native Land's pattern); the full per-point `FeatureCollection` loads once, in parallel, and populates points as the aggregate view is already usable. Beyond that, deferring per-point detail further (e.g., fetching only points inside the current viewport) is exactly the kind of dynamic query  will need — and exactly what ADR-008's bounded/static-first doctrine says to avoid building until the static artifacts are measured insufficient (see "Out of scope" below).
 
-**Measurement plan (not yet run):** the bead's acceptance criterion — "national view interactive in under 3 seconds on mid-tier mobile" — genuinely cannot be measured without a deployed environment and a real device/throttling test; fabricating a number here would be worse than stating the gap plainly. Once BB-070's artifacts are deployed (Firebase Hosting/CDN, per ADR-001), the measurement step is: a Lighthouse mobile run against the live map route with a mid-tier throttling profile (Lighthouse's default "Moto G Power"-class CPU/network throttling, or an equivalent mid-tier Android profile), recording Time to Interactive / Largest Contentful Paint for the map canvas specifically. This is a follow-up task once a deployed environment exists, not a blocker to closing this bead at repo-acceptance level (this project's established convention — see prior beads' "cloud/measurement blockers documented" pattern).
+**Measurement plan (not yet run):** the bead's acceptance criterion — "national view interactive in under 3 seconds on mid-tier mobile" — genuinely cannot be measured without a deployed environment and a real device/throttling test; fabricating a number here would be worse than stating the gap plainly. Once 's artifacts are deployed (Firebase Hosting/CDN, per ADR-001), the measurement step is: a Lighthouse mobile run against the live map route with a mid-tier throttling profile (Lighthouse's default "Moto G Power"-class CPU/network throttling, or an equivalent mid-tier Android profile), recording Time to Interactive / Largest Contentful Paint for the map canvas specifically. This is a follow-up task once a deployed environment exists, not a blocker to closing this bead at repo-acceptance level (this project's established convention — see prior beads' "cloud/measurement blockers documented" pattern).
 
 ## Degraded mode
 
@@ -122,7 +122,7 @@ The one real gap: none of this is wired live yet (see "Release-coupled build"), 
 
 ## Out of scope: dynamic map query endpoints
 
-ADR-008's architecture doctrine is bounded/static-first: prefer in-product bounded queries over a new query platform until measured need. This bead does **not** add a bounding-box or any other dynamic map query API. The static GeoJSON + aggregate artifacts serve the "everything-active" population at this bead's scale; a dynamic endpoint (e.g., "give me points in this viewport") is exactly the kind of thing BB-051 may need once real point volume makes the flat file impractical (see "Migration trigger" above). If and when that endpoint is built, it **must** sit behind the same BB-026 guardrails + App Check middleware every other `api-public` endpoint uses (`packages/security/src/query-guardrails.ts`, `packages/firebase/src/app-check*.ts`) — not a new, unguarded surface.
+ADR-008's architecture doctrine is bounded/static-first: prefer in-product bounded queries over a new query platform until measured need. This bead does **not** add a bounding-box or any other dynamic map query API. The static GeoJSON + aggregate artifacts serve the "everything-active" population at this bead's scale; a dynamic endpoint (e.g., "give me points in this viewport") is exactly the kind of thing  may need once real point volume makes the flat file impractical (see "Migration trigger" above). If and when that endpoint is built, it **must** sit behind the same  guardrails + App Check middleware every other `api-public` endpoint uses (`packages/security/src/query-guardrails.ts`, `packages/firebase/src/app-check*.ts`) — not a new, unguarded surface.
 
 ## Known gaps (honest, not fabricated)
 
@@ -140,7 +140,7 @@ ADR-008's architecture doctrine is bounded/static-first: prefer in-product bound
 | Leaflet | No native GPU-accelerated vector-tile/GeoJSON-at-scale rendering on par with MapLibre; would need a plugin stack to reach parity. |
 | Google Maps / Google Maps Platform | Proprietary, API-key-gated, per-load billing from day one; conflicts with ADR-011's cost/independence rationale for staying Firebase-native. |
 | Ship a real PMTiles basemap in this bead | Real geodata-authoring work (tile generation, styling, refresh pipeline) is out of scope for a data-platform bead; the demo route proves the rendering pipeline without it. |
-| Build a dynamic bounding-box query endpoint now | Violates ADR-008's bounded/static-first doctrine before the static artifacts are measured insufficient; would also need BB-026 guardrails + App Check wiring this pass doesn't otherwise require. |
+| Build a dynamic bounding-box query endpoint now | Violates ADR-008's bounded/static-first doctrine before the static artifacts are measured insufficient; would also need  guardrails + App Check wiring this pass doesn't otherwise require. |
 | Wire the release-worker call live this pass | No release-activation pipeline exists yet in any language to call into; guessing at that interface risks drift from the real implementation. Documented as an exact integration point instead (see above). |
 | Put `buildMapSource` in `@repo/security` | Would need to call domain types directly for entity/location shapes, but `@repo/security` is explicitly a redaction/serialization choke point, not a data-platform module; also outside this bead's file ownership (`packages/security` is read-only for this bead). |
 
@@ -148,14 +148,14 @@ ADR-008's architecture doctrine is bounded/static-first: prefer in-product bound
 
 - `packages/domain` gains a `map/` module with a devDependency on `@repo/security` (test/demo-generator only, never in shipped runtime code) — this mirrors the existing `@repo/security`↔`@repo/observability` devDependency cycle already present in this workspace.
 - `apps/web` gains its first WebGL/canvas-rendering dependency (`maplibre-gl`); it is isolated to a single client component (`MapLibreCanvas.tsx`) so it never touches server-rendered/SSR-tested code paths.
-- The next real engineering investment for the map surface is the release-activation wiring (see "Release-coupled build") and, separately, authoring the target PMTiles basemap — both are natural inputs to BB-051, not further data-platform work.
+- The next real engineering investment for the map surface is the release-activation wiring (see "Release-coupled build") and, separately, authoring the target PMTiles basemap — both are natural inputs to , not further data-platform work.
 
 ## Migration triggers
 
 - Move from flat GeoJSON to PMTiles/vector tiles for per-point data once the active-release point count pushes the flat file past the ~2 MB gzipped budget above.
-- Move from the demo-stage empty-tile style to a real self-hosted PMTiles basemap once BB-051 needs a production map experience (this bead's demo route was never meant to ship as the public map).
+- Move from the demo-stage empty-tile style to a real self-hosted PMTiles basemap once  needs a production map experience (this bead's demo route was never meant to ship as the public map).
 - Reconsider polygon-based state/county attribution only if a specific product need (not just aesthetic accuracy) depends on getting border cases right — the bounding-box approximation is sufficient for presence/coverage aggregates.
-- Add a dynamic bounding-box query endpoint only after the static artifacts are measured insufficient at real traffic/volume, and only behind BB-026 + App Check from day one.
+- Add a dynamic bounding-box query endpoint only after the static artifacts are measured insufficient at real traffic/volume, and only behind  + App Check from day one.
 
 ## Rollback considerations
 

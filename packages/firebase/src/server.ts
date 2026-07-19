@@ -72,7 +72,7 @@ export function getServerFirebaseApp(): App {
   return getApp(SERVER_APP_NAME);
 }
 
-/** Firestore instance bound to the Black Book server Admin app. */
+/** Firestore instance bound to the BlackStory server Admin app. */
 export function getServerFirestore(environment: EnvironmentLike = process.env): Firestore {
   const { app } = createServerFirebaseApp(environment);
   return getFirestore(app);

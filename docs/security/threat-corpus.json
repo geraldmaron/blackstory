@@ -1,7 +1,7 @@
 {
   "$schema": "./threat-corpus.schema.json",
   "version": "1.0.0",
-  "bead": "BB-004",
+  "bead": "",
   "updatedAt": "2026-07-16",
   "assumptionsRef": "docs/adr/ADR-010-security-and-abuse-assumptions.md",
   "threats": [
@@ -12,7 +12,7 @@
       "assets": ["public web", "api-public", "CDN/cache", "Cloud Run capacity"],
       "actors": ["botnet", "scripted scraper", "opportunistic vandal"],
       "abuseCaseIds": ["AC-01"],
-      "implementationBeads": ["BB-022", "BB-023", "BB-025", "BB-033", "BB-034", "BB-035", "BB-059"],
+      "implementationBeads": ["", "", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "Cloud Armor / ALB rate and geo/IP controls at edge",
@@ -21,18 +21,18 @@
           "Degraded read-only mode serves last good snapshots without origin fan-out"
         ],
         "detective": [
-          "Edge and app QPS/error/latency anomaly alerts (BB-034)",
+          "Edge and app QPS/error/latency anomaly alerts",
           "Per-route saturation and 429/5xx dashboards",
-          "Cost and request budget burn-rate alerts (BB-033)"
+          "Cost and request budget burn-rate alerts"
         ],
         "containment": [
-          "Feature kill switches for search, submissions, geocode, exports before wiping corpus (BB-035)",
+          "Feature kill switches for search, submissions, geocode, exports before wiping corpus",
           "Armor adaptive protection / emergency block rules",
           "Scale-to-zero or throttle non-essential workers"
         ],
         "recovery": [
           "Restore CDN/origin from last known-good release snapshot",
-          "Incident runbook rehearsal (BB-061)",
+          "Incident runbook rehearsal",
           "Post-incident rule and quota tuning"
         ]
       },
@@ -45,12 +45,12 @@
       "assets": ["search API", "geocode quota", "DB CPU", "CDN hit ratio"],
       "actors": ["scraper", "cost attacker", "researcher competitor"],
       "abuseCaseIds": ["AC-02"],
-      "implementationBeads": ["BB-023", "BB-024", "BB-025", "BB-026", "BB-033", "BB-049", "BB-059"],
+      "implementationBeads": ["", "", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "Normalize and strip cache-busting query params for public reads",
-          "Strict App Check on expensive reads after BB-024",
-          "Search query complexity caps, timeouts, result limits (BB-026)",
+          "Strict App Check on expensive reads after ",
+          "Search query complexity caps, timeouts, result limits",
           "Separate stricter quotas for search/geocode/nearby vs static reads (ADR-010)"
         ],
         "detective": [
@@ -65,7 +65,7 @@
         ],
         "recovery": [
           "Flush poisoned edge configs; restore CDN rules",
-          "Re-enable search with tightened quotas after BB-059 soak"
+          "Re-enable search with tightened quotas after  soak"
         ]
       },
       "residualRisk": "Legitimate bursty research traffic may look like abuse; quotas will false-positive and require allowlists for known partners."
@@ -77,11 +77,11 @@
       "assets": ["admin console", "Firebase Auth admin users", "IAP-protected surfaces"],
       "actors": ["credential stuffer", "phisher", "account takeover"],
       "abuseCaseIds": ["AC-03"],
-      "implementationBeads": ["BB-005", "BB-011", "BB-021", "BB-027", "BB-034", "BB-035"],
+      "implementationBeads": ["", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "Admin never exposed as public+role-claim-only (ADR-010)",
-          "Firebase Auth + IAP + application RBAC for administrators (BB-027)",
+          "Firebase Auth + IAP + application RBAC for administrators",
           "MFA required for admin; phishing-resistant factors preferred",
           "Separate admin identity pool from public end-user auth where feasible"
         ],
@@ -97,8 +97,8 @@
         ],
         "recovery": [
           "Credential rotation and forced re-auth",
-          "Audit trail review of actions during compromise window (BB-018)",
-          "Rollback unauthorized releases (BB-019, BB-035)"
+          "Audit trail review of actions during compromise window",
+          "Rollback unauthorized releases (, )"
         ]
       },
       "residualRisk": "Targeted phishing of break-glass operators remains possible; residual mitigated by dual control on publication, not by perfect human immunity."
@@ -111,18 +111,18 @@
       "actors": ["authenticated attacker", "curious user", "compromised client"],
       "abuseCaseIds": ["AC-04"],
       "implementationBeads": [
-        "BB-003",
-        "BB-013",
-        "BB-015",
-        "BB-019",
-        "BB-021",
-        "BB-027",
-        "BB-028",
-        "BB-036"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
       ],
       "controls": {
         "preventive": [
-          "Separate deployables and networks per ADR-005 / BB-021",
+          "Separate deployables and networks per ADR-005 / ",
           "Server-side authZ on every request; no client-trusted role claims for publication",
           "Object-level checks for submission/case ownership and release IDs",
           "DB role allowlists: public read-only on public schema; research ≠ publication (ADR-003)"
@@ -130,7 +130,7 @@
         "detective": [
           "403/401 anomaly spikes and IDOR probe patterns",
           "Cross-surface call attempts from public tokens to internal APIs",
-          "Security regression suite in CI (BB-036)"
+          "Security regression suite in CI"
         ],
         "containment": [
           "Revoke tokens; disable mis-scoped service accounts",
@@ -143,7 +143,7 @@
           "Re-issue least-privilege credentials"
         ]
       },
-      "residualRisk": "New endpoints can introduce IDOR until BB-036 coverage exists; residual accepted only with mandatory authZ review in PR checklist."
+      "residualRisk": "New endpoints can introduce IDOR until  coverage exists; residual accepted only with mandatory authZ review in PR checklist."
     },
     {
       "id": "T-05",
@@ -152,12 +152,12 @@
       "assets": ["submissions API", "moderation queue", "operator attention"],
       "actors": ["spammer", "coordinated brigade", "reputation launderer"],
       "abuseCaseIds": ["AC-05"],
-      "implementationBeads": ["BB-024", "BB-025", "BB-029", "BB-032", "BB-034", "BB-055"],
+      "implementationBeads": ["", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "App Check + rate limits on corrections/submissions",
           "Quarantine-first intake; never write canonical history from anonymous clients",
-          "Volume ≠ truth: duplicates do not raise confidence or publish (BB-032)",
+          "Volume ≠ truth: duplicates do not raise confidence or publish",
           "Cooldown and similarity clustering for near-identical submissions"
         ],
         "detective": [
@@ -186,27 +186,27 @@
       "actors": ["ideological adversary", "grifter", "lazy secondary mirror"],
       "abuseCaseIds": ["AC-06"],
       "implementationBeads": [
-        "BB-003",
-        "BB-016",
-        "BB-017",
-        "BB-032",
-        "BB-037",
-        "BB-043",
-        "BB-047",
-        "BB-053",
-        "BB-060"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
       ],
       "controls": {
         "preventive": [
-          "Constitution gates for inclusion, confidence, and precision (BB-003)",
-          "Provenance and rights model; secondary mirrors do not become primary (BB-016)",
-          "Lineage/confidence engine rejects circular citation inflation (BB-043)",
-          "Promotion workflow required before public visibility (BB-019/044)"
+          "Constitution gates for inclusion, confidence, and precision",
+          "Provenance and rights model; secondary mirrors do not become primary",
+          "Lineage/confidence engine rejects circular citation inflation",
+          "Promotion workflow required before public visibility (/044)"
         ],
         "detective": [
-          "Contradiction and dispute signals on entity pages (BB-053)",
-          "Gold corpus / calibration regressions (BB-047)",
-          "Adversarial integrity exercise (BB-060)"
+          "Contradiction and dispute signals on entity pages",
+          "Gold corpus / calibration regressions",
+          "Adversarial integrity exercise"
         ],
         "containment": [
           "Hold or retract disputed releases; mark claims disputed",
@@ -228,13 +228,13 @@
       "assets": ["quarantine store", "research candidates", "promotion pipeline"],
       "actors": ["poisoner", "SEO farmer", "compromised upstream source"],
       "abuseCaseIds": ["AC-07"],
-      "implementationBeads": ["BB-029", "BB-032", "BB-037", "BB-039", "BB-040", "BB-044", "BB-060"],
+      "implementationBeads": ["", "", "", "", "", "", ""],
       "controls": {
         "preventive": [
-          "Submissions quarantine with promotion controls (BB-029/032)",
+          "Submissions quarantine with promotion controls (/032)",
           "Research workers cannot publish (ADR-009)",
           "Deterministic relevance and multi-source corroboration before acceptance",
-          "Source registry trust tiers and adapter allowlists (BB-037)"
+          "Source registry trust tiers and adapter allowlists"
         ],
         "detective": [
           "Sudden confidence jumps from single lineage",
@@ -249,7 +249,7 @@
         "recovery": [
           "Purge or demote tainted claims; republish clean release",
           "Replay promotion from known-good evidence",
-          "Update gold corpus with the poison pattern (BB-047/060)"
+          "Update gold corpus with the poison pattern (/060)"
         ]
       },
       "residualRisk": "Slow, low-and-slow poisoning across many sources may evade burst detection; residual accepted with periodic adversarial review."
@@ -261,18 +261,18 @@
       "assets": ["workers/security", "research fetchers", "metadata store", "internal network"],
       "actors": ["SSRF attacker", "submission abuser", "malicious publisher"],
       "abuseCaseIds": ["AC-08"],
-      "implementationBeads": ["BB-004", "BB-029", "BB-030", "BB-033", "BB-036", "BB-065"],
+      "implementationBeads": ["", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "No synchronous fetch of submitted URLs in user requests (ADR-010)",
-          "Async fetcher with allow/deny lists, private-IP block, DNS rebinding checks (BB-030)",
+          "Async fetcher with allow/deny lists, private-IP block, DNS rebinding checks",
           "Redirect limits, scheme allowlist (https), response size/time caps",
           "Egress controls from workers; no cloud metadata access from fetcher role"
         ],
         "detective": [
           "Fetcher denials for private ranges / rebind attempts",
           "Oversized response and redirect-loop metrics",
-          "Security tests for SSRF corpus (BB-036)"
+          "Security tests for SSRF corpus"
         ],
         "containment": [
           "Disable URL fetch / adapter fetch kill switch",
@@ -285,7 +285,7 @@
           "Re-scan quarantine queue with fixed fetcher"
         ]
       },
-      "residualRisk": "Novel DNS/CDN edge cases and IPv6 dual-stack rebinding may slip until BB-030 hardening matures; treat all fetched content as hostile."
+      "residualRisk": "Novel DNS/CDN edge cases and IPv6 dual-stack rebinding may slip until  hardening matures; treat all fetched content as hostile."
     },
     {
       "id": "T-09",
@@ -294,10 +294,10 @@
       "assets": ["upload storage", "virus/content scanners", "admin viewers"],
       "actors": ["malware uploader", "polyglot file attacker"],
       "abuseCaseIds": ["AC-09"],
-      "implementationBeads": ["BB-005", "BB-029", "BB-031", "BB-033", "BB-036"],
+      "implementationBeads": ["", "", "", "", ""],
       "controls": {
         "preventive": [
-          "Uploads deferred/quarantined; not served from public CDN by default (BB-031)",
+          "Uploads deferred/quarantined; not served from public CDN by default",
           "Type sniffing, size limits, virus/malware scanning before any processing",
           "Separate upload bucket with no execute / no public ACL",
           "Admin viewers use sandboxed rendering; no server-side office macros"
@@ -318,7 +318,7 @@
           "Re-enable uploads after scanner and policy fixes"
         ]
       },
-      "residualRisk": "BB-031 is deferred (P1); until then uploads must remain disabled or narrowly scoped. Residual: zero-day malware packing past scanners."
+      "residualRisk": " is deferred (P1); until then uploads must remain disabled or narrowly scoped. Residual: zero-day malware packing past scanners."
     },
     {
       "id": "T-10",
@@ -327,18 +327,18 @@
       "assets": ["LLM research modes", "tool-using agents", "claim extraction"],
       "actors": ["document author", "compromised web page", "indirect injector"],
       "abuseCaseIds": ["AC-10"],
-      "implementationBeads": ["BB-030", "BB-042", "BB-044", "BB-064", "BB-065"],
+      "implementationBeads": ["", "", "", "", ""],
       "controls": {
         "preventive": [
           "Public rendering never invokes an LLM (invariant)",
           "LLMs cannot publish or approve their own claims",
-          "Tool/egress isolation and untrusted-content framing (BB-065)",
+          "Tool/egress isolation and untrusted-content framing",
           "Deterministic extraction paths preferred; LLM assists only in research modes"
         ],
         "detective": [
           "Tool-call anomaly and unexpected egress from research agents",
           "Human review flags on model-proposed promotions",
-          "Eval harness for injection fixtures (BB-065)"
+          "Eval harness for injection fixtures"
         ],
         "containment": [
           "Disable LLM provider / research-mode kill switch",
@@ -351,7 +351,7 @@
           "Update isolation and prompt firewall rules"
         ]
       },
-      "residualRisk": "BB-064/065 are deferred (P2); residual is high if LLMs are enabled early. Do not enable tool-using research until BB-065 controls exist."
+      "residualRisk": "/065 are deferred (P2); residual is high if LLMs are enabled early. Do not enable tool-using research until  controls exist."
     },
     {
       "id": "T-11",
@@ -360,18 +360,18 @@
       "assets": ["build artifacts", "deploy identities", "source integrity"],
       "actors": ["dependency attacker", "malicious Action", "compromised maintainer"],
       "abuseCaseIds": ["AC-11"],
-      "implementationBeads": ["BB-006", "BB-008", "BB-009", "BB-010", "BB-036", "BB-062"],
+      "implementationBeads": ["", "", "", "", "", ""],
       "controls": {
         "preventive": [
-          "Pinned Actions; allowlist publishers (BB-009)",
-          "OIDC/WIF deploy identities; no long-lived keys in CI (BB-010)",
+          "Pinned Actions; allowlist publishers",
+          "OIDC/WIF deploy identities; no long-lived keys in CI",
           "Dependabot / lockfile discipline; review high-risk deps",
           "CODEOWNERS for security, infra, policies, publication"
         ],
         "detective": [
           "Dependabot and secret-scanning alerts",
           "Unexpected workflow file changes and new third-party Actions",
-          "Artifact hash / provenance checks in release pipeline (BB-062)"
+          "Artifact hash / provenance checks in release pipeline"
         ],
         "containment": [
           "Disable compromised workflows; revoke OIDC bindings",
@@ -393,11 +393,11 @@
       "assets": ["API keys", "DB credentials", "App Check secrets", "service accounts"],
       "actors": ["accidental committer", "log scraper", "client bundle inspector"],
       "abuseCaseIds": ["AC-12"],
-      "implementationBeads": ["BB-005", "BB-009", "BB-010", "BB-011", "BB-027", "BB-034"],
+      "implementationBeads": ["", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "1Password / Secret Manager; no secrets in source or client bundles",
-          "Push protection and secret scanning (BB-009)",
+          "Push protection and secret scanning",
           "Workload identity over static keys; least privilege",
           "Logging redaction: no raw App Check tokens or protected addresses (ADR-010)"
         ],
@@ -426,11 +426,11 @@
       "assets": ["Cloud SQL", "connection pools", "public/read replicas"],
       "actors": ["abuse traffic", "buggy client", "expensive query author"],
       "abuseCaseIds": ["AC-13"],
-      "implementationBeads": ["BB-012", "BB-013", "BB-025", "BB-026", "BB-033", "BB-034"],
+      "implementationBeads": ["", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "Pool size caps per service; statement timeouts",
-          "Read-only public role; expensive search constrained (BB-026)",
+          "Read-only public role; expensive search constrained",
           "Connection reservation for admin/publication paths",
           "Query guardrails and prepared statements"
         ],
@@ -445,9 +445,9 @@
           "Disable offending endpoints via kill switch"
         ],
         "recovery": [
-          "Scale or restart pools; restore from PITR if corruption (BB-020)",
+          "Scale or restart pools; restore from PITR if corruption",
           "Fix offending queries; add regression tests",
-          "Rehearse restore (BB-061)"
+          "Rehearse restore"
         ]
       },
       "residualRisk": "Novel query shapes can still starve pools until observed; residual mitigated by timeouts and shedding, not infinite capacity."
@@ -460,18 +460,18 @@
       "actors": ["cost attacker", "misconfigured autoscaler", "runaway worker"],
       "abuseCaseIds": ["AC-14"],
       "implementationBeads": [
-        "BB-005",
-        "BB-022",
-        "BB-023",
-        "BB-025",
-        "BB-033",
-        "BB-034",
-        "BB-035",
-        "BB-059"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
       ],
       "controls": {
         "preventive": [
-          "Budgets and hard quotas per project/env (BB-005/033)",
+          "Budgets and hard quotas per project/env (/033)",
           "Bounded concurrency for every queue, worker, API, model provider",
           "Separate billing alerts for research vs public",
           "No unbounded retries; dead-letter with caps"
@@ -489,10 +489,10 @@
         "recovery": [
           "Root-cause and restore essential services first (public snapshots)",
           "Adjust budgets and concurrency",
-          "Cost soak test gates before launch (BB-059)"
+          "Cost soak test gates before launch"
         ]
       },
-      "residualRisk": "GCP budget alerts are not always hard stops; residual spend can accrue until automation enforces caps—treat BB-033 hard limits as launch-critical."
+      "residualRisk": "GCP budget alerts are not always hard stops; residual spend can accrue until automation enforces caps—treat  hard limits as launch-critical."
     },
     {
       "id": "T-15",
@@ -502,26 +502,26 @@
       "actors": ["doxxer", "stalker", "curious scraper", "insider"],
       "abuseCaseIds": ["AC-15"],
       "implementationBeads": [
-        "BB-003",
-        "BB-015",
-        "BB-019",
-        "BB-028",
-        "BB-034",
-        "BB-036",
-        "BB-050",
-        "BB-057"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
       ],
       "controls": {
         "preventive": [
-          "Constitution: unknown living status treated as living (BB-003)",
-          "Living residential addresses never ordinary person-location fields or public outputs (BB-015)",
-          "Public projection schema excludes protected fields (BB-019)",
+          "Constitution: unknown living status treated as living",
+          "Living residential addresses never ordinary person-location fields or public outputs",
+          "Public projection schema excludes protected fields",
           "Log redaction for protected addresses"
         ],
         "detective": [
-          "Tests asserting absence of living residential fields in public DTOs (BB-036)",
+          "Tests asserting absence of living residential fields in public DTOs",
           "Anomalous access to sensitive admin fields",
-          "Privacy review gate (BB-057)"
+          "Privacy review gate"
         ],
         "containment": [
           "Immediate retract/release rollback if leak detected",
@@ -534,7 +534,7 @@
           "Add fixtures and CI guards from the leak pattern"
         ]
       },
-      "residualRisk": "Historical public records and third-party sites may already contain living addresses; product residual is not re-amplifying them via Black Book APIs or UI."
+      "residualRisk": "Historical public records and third-party sites may already contain living addresses; product residual is not re-amplifying them via BlackStory APIs or UI."
     },
     {
       "id": "T-16",
@@ -544,29 +544,29 @@
       "actors": ["compromised admin", "broken authZ", "CI deployer"],
       "abuseCaseIds": ["AC-16"],
       "implementationBeads": [
-        "BB-018",
-        "BB-019",
-        "BB-021",
-        "BB-027",
-        "BB-032",
-        "BB-035",
-        "BB-044",
-        "BB-062"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
       ],
       "controls": {
         "preventive": [
-          "Immutable release snapshots; activation is explicit (BB-019)",
-          "Dual control / RBAC for publication (BB-027/044)",
+          "Immutable release snapshots; activation is explicit",
+          "Dual control / RBAC for publication (/044)",
           "Internal API private; research cannot publish",
-          "Deploy pipeline gates (BB-062)"
+          "Deploy pipeline gates"
         ],
         "detective": [
-          "Audit every promotion and release activation (BB-018)",
+          "Audit every promotion and release activation",
           "CDN content hash drift alerts vs expected release",
           "Unexpected publication events paging on-call"
         ],
         "containment": [
-          "Activate prior known-good release immediately (BB-035)",
+          "Activate prior known-good release immediately",
           "Disable publication kill switch",
           "Revoke publisher credentials"
         ],
@@ -576,7 +576,7 @@
           "Harden authZ and add regression tests"
         ]
       },
-      "residualRisk": "A fully compromised publisher identity can still activate a bad release until detected; residual time-to-detect depends on BB-034 telemetry maturity."
+      "residualRisk": "A fully compromised publisher identity can still activate a bad release until detected; residual time-to-detect depends on  telemetry maturity."
     },
     {
       "id": "T-17",
@@ -586,19 +586,19 @@
       "actors": ["well-meaning operator", "fat-finger deployer"],
       "abuseCaseIds": ["AC-17"],
       "implementationBeads": [
-        "BB-005",
-        "BB-018",
-        "BB-019",
-        "BB-027",
-        "BB-035",
-        "BB-044",
-        "BB-056",
-        "BB-061"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
       ],
       "controls": {
         "preventive": [
-          "Strict env isolation (BB-005); no shared prod resources",
-          "Confirmation UX and dry-run for publication in admin (BB-056)",
+          "Strict env isolation; no shared prod resources",
+          "Confirmation UX and dry-run for publication in admin",
           "Staging-first promotion; production requires elevated role",
           "Immutable releases make rollback a switch, not a rewrite"
         ],
@@ -614,7 +614,7 @@
         ],
         "recovery": [
           "Root-cause UX/process gap",
-          "Rehearse rollback (BB-061)",
+          "Rehearse rollback",
           "Add guardrails (checklists, dual approval) where mistakes recur"
         ]
       },
@@ -627,16 +627,16 @@
       "assets": ["adapters", "captures", "relevance ranking", "rights compliance"],
       "actors": ["upstream site change", "silent schema drift", "adversarial upstream"],
       "abuseCaseIds": ["AC-18"],
-      "implementationBeads": ["BB-016", "BB-037", "BB-038", "BB-045", "BB-046", "BB-047"],
+      "implementationBeads": ["", "", "", "", "", ""],
       "controls": {
         "preventive": [
-          "Versioned adapter contracts and query packs (BB-037/038)",
+          "Versioned adapter contracts and query packs (/038)",
           "Contract tests against fixtures; fail closed on parse errors",
-          "Rights/provenance checks before capture acceptance (BB-016)"
+          "Rights/provenance checks before capture acceptance"
         ],
         "detective": [
           "Adapter health: parse failure rate, field null spikes, volume cliffs",
-          "Gold corpus diffs when adapter versions change (BB-047)",
+          "Gold corpus diffs when adapter versions change",
           "Checksum / snapshot comparison of sample pages"
         ],
         "containment": [
@@ -659,7 +659,7 @@
       "assets": ["public corpus", "search API", "entity pages", "competitive IP"],
       "actors": ["commercial scraper", "archive bot", "hostile mirror"],
       "abuseCaseIds": ["AC-19"],
-      "implementationBeads": ["BB-023", "BB-024", "BB-025", "BB-026", "BB-034", "BB-049", "BB-059"],
+      "implementationBeads": ["", "", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "Rate limits, App Check, and bot management on search and list endpoints",
@@ -678,7 +678,7 @@
           "Block ASN/IP ranges via Armor"
         ],
         "recovery": [
-          "Tune limits after BB-059 load tests",
+          "Tune limits after  load tests",
           "Legal/ToS follow-up for persistent scrapers if required",
           "Consider watermarking or delayed fields only if product accepts"
         ]

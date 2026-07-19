@@ -34,12 +34,12 @@ export type RegisteredWebApp = {
 
 export const REGISTERED_APPS = {
   web: {
-    displayName: 'Black Book Web',
+    displayName: 'BlackStory Web',
     appId: WEB_APP_ID,
     surface: 'apps/web',
   },
   admin: {
-    displayName: 'Black Book Admin',
+    displayName: 'BlackStory Admin',
     appId: ADMIN_APP_ID,
     surface: 'apps/admin',
   },

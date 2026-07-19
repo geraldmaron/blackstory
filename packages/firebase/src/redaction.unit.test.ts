@@ -8,7 +8,7 @@ import { test } from 'node:test';
 import { publicEntityProjectionConverter } from './firestore/index.js';
 
 const LEARNING_SUMMARY =
-  'A historically documented public place in the Black Book learning index, with published ' +
+  'A historically documented public place in the BlackStory learning index, with published ' +
   'claims and provenance suitable for educators and researchers.';
 
 test('public projection converter accepts a safe, coarse projection', () => {

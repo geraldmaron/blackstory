@@ -38,9 +38,10 @@ export type FetchCommonsMediaClientOptions = {
 
 function defaultFetch(): WikimediaHttpFetch {
   return async (url, init) => {
-    const response = await fetch(url, {
-      headers: init?.headers ? { ...init.headers } : undefined,
-    });
+    const response = await fetch(
+      url,
+      init?.headers ? { headers: { ...init.headers } } : {},
+    );
     return {
       ok: response.ok,
       status: response.status,

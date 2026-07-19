@@ -15,6 +15,7 @@
  * flight (ADR-017). Selecting a pin flies briefly then leaves for the record page.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Notice } from '@repo/ui';
 import { US_CONUS_BOUNDS, findUsStateByPostalCode } from '@repo/domain/map/geography';
@@ -620,7 +621,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
               ) : null}
 
               <p className="ds-sans">
-                <a href="/history">Open the full history graph</a> for the decade narrative panel.
+                <Link href="/history">Open the full history graph</Link> for the decade narrative panel.
               </p>
             </div>
           </details>

@@ -1,9 +1,9 @@
-# Protected public API ingress and Cloud Armor (BB-023)
+# Protected public API ingress and Cloud Armor
 
 **Status:** Design + declarative stubs in-repo. Live GCP resources are **not** provisioned by
-this bead.  
-**Machine source:** [`../../infra/gcp/armor/ingress-matrix.json`](../../infra/gcp/armor/ingress-matrix.json)  
-**ADR:** [ADR-005](../adr/ADR-005-service-surface-separation.md), [ADR-010](../adr/ADR-010-security-and-abuse-assumptions.md)  
+this bead.
+**Machine source:** [`../../infra/gcp/armor/ingress-matrix.json`](../../infra/gcp/armor/ingress-matrix.json)
+**ADR:** [ADR-005](../adr/ADR-005-service-surface-separation.md), [ADR-010](../adr/ADR-010-security-and-abuse-assumptions.md)
 **Threats:** [T-01](./threat-model.md#t-01-volumetric-and-application-layer-denial-of-service), [T-19](./threat-model.md#t-19-search-scraping-and-corpus-extraction)
 
 ## Objective
@@ -44,7 +44,7 @@ flowchart TB
 | `api-public` | `api.blackbook.app` | `black-book-api-public` | Yes (read paths) | `black-book-api-public-armor` |
 | `api-submissions` | `submit.blackbook.app` | `black-book-api-submissions` | No | `black-book-api-submissions-armor` |
 
-Out of scope for BB-023: `api-internal` (private ingress), `admin` (IAP + LB), `web` (App Hosting CDN).
+Out of scope for : `api-internal` (private ingress), `admin` (IAP + LB), `web` (App Hosting CDN).
 
 ## Cloud Armor policy summary
 
@@ -83,7 +83,7 @@ This ensures:
 Negative test procedure: [`../../infra/gcp/armor/load-test-plan.md`](../../infra/gcp/armor/load-test-plan.md) § `direct-url-negative-test`.
 
 > **Note:** [`infra/gcp/surfaces/surface-matrix.json`](../../infra/gcp/surfaces/surface-matrix.json)
-> still lists legacy `ingress: "all"` for historical BB-021 stubs. **BB-023 supersedes** that
+> still lists legacy `ingress: "all"` for historical  stubs. ** supersedes** that
 > deploy target for public APIs — apply `internal-and-cloud-load-balancing` at provisioning time.
 
 ## Cloud CDN
@@ -141,7 +141,7 @@ Schema validation command in [`../../infra/gcp/armor/README.md`](../../infra/gcp
 
 ## Related
 
-- [Service surfaces](./service-surfaces.md) (BB-021)
+- [Service surfaces](./service-surfaces.md)
 - [Abuse cases](./abuse-cases.md) — AC-01, AC-02, AC-19
 - [ALB / NEG design](../../infra/gcp/armor/alb-neg-design.md)
-- Follow-on beads: BB-025 (app quotas), BB-034 (telemetry), BB-059 (live load tests)
+- Follow-on beads:  (app quotas),  (telemetry),  (live load tests)

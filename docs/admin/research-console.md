@@ -1,7 +1,7 @@
 # Administration and research console
 
 The private console shell lives at `/console` in `@repo/admin`. It is a Cloud Run + IAP
-target, separate from the public web application. BB-056 provides route shells, deterministic
+target, separate from the public web application.  provides route shells, deterministic
 fixtures, guard contracts, and accessible interaction patterns; it does not connect mutation
 handlers or apply cloud configuration.
 
@@ -51,7 +51,7 @@ Retraction and rollback use release replacement semantics:
 1. Build a replacement manifest that omits or restores the affected records.
 2. Show its added, changed, removed, and unchanged counts.
 3. Obtain a fresh-authenticated publication decision with a reason.
-4. Sign and activate the replacement release through the BB-019 release lifecycle.
+4. Sign and activate the replacement release through the  release lifecycle.
 5. Retain the prior immutable manifest, pointer history, reason, and audit event.
 
 Bulk actions require a preview, enforce the lower of the action-specific limit and the global
@@ -60,7 +60,7 @@ execution.
 
 ## Human enablement remaining
 
-No live IAP, Firebase, Cloud Run, Firestore, or Remote Config change is part of BB-056. Before
+No live IAP, Firebase, Cloud Run, Firestore, or Remote Config change is part of . Before
 enabling the console, a human platform administrator must:
 
 1. Deploy `apps/admin` to its private Cloud Run service with the dedicated admin service account.
@@ -69,7 +69,7 @@ enabling the console, a human platform administrator must:
 4. Connect Firebase Admin token verification with revoked-token checking and the existing
    custom-claims policy.
 5. Implement server-only handlers that compose the console guards with Firestore transactions,
-   audit/outbox writes, and the BB-019 release service.
+   audit/outbox writes, and the  release service.
 6. Keep Firestore client rules deny-by-default for canonical, publication, audit, and operations
    collections.
 7. Connect feature and kill-switch reads to reviewed runtime configuration; do not let browser

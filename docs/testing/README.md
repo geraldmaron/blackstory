@@ -1,6 +1,6 @@
-# Testing foundation (BB-008)
+# Testing foundation
 
-Automated quality layers for Blap. Production services are fail-closed; flaky tests are quarantined with owner + deadline (never infinite retries).
+Automated quality layers for BlackStory. Production services are fail-closed; flaky tests are quarantined with owner + deadline (never infinite retries).
 
 ## Layers and commands
 
@@ -9,8 +9,8 @@ Automated quality layers for Blap. Production services are fail-closed; flaky te
 | Preflight | `pnpm test:preflight` | Production identifier guard + quarantine registry health |
 | Unit | `pnpm test:unit` | Package/app unit tests + Python pytest |
 | Contract | `pnpm test:contract` | API health contract helpers |
-| Security | `pnpm test:security` | Threat corpus (BB-004) + production guards + BB-059 load/abuse scenarios (`docs/testing/load-abuse.md`) + BB-060 adversarial integrity (`docs/testing/adversarial-integrity.md`) |
-| Accessibility | `pnpm test:a11y` | HTML landmark/alt smoke fixtures + BB-057 journey audits (`docs/testing/a11y-seo-perf-privacy.md`) |
+| Security | `pnpm test:security` | Threat corpus + production guards +  load/abuse scenarios (`docs/testing/load-abuse.md`) +  adversarial integrity (`docs/testing/adversarial-integrity.md`) |
+| Accessibility | `pnpm test:a11y` | HTML landmark/alt smoke fixtures +  journey audits (`docs/testing/a11y-seo-perf-privacy.md`) |
 | Release gates | `pnpm --filter @repo/testing test:release-gates` | Performance budgets + public degraded-mode contracts |
 | Integration | `pnpm test:integration` | Postgres disposable schema + Firebase emulator probes |
 | Migration | `pnpm test:migration` | Forward-only `schema_migrations` harness on disposable DB |
@@ -38,7 +38,7 @@ Flaky tests belong in `packages/testing/quarantine.json` with `owner`, `deadline
 
 ### PostgreSQL (deferred / optional)
 
-- Local: `pnpm db:up`, then `pnpm db:init` / `pnpm db:verify` for parked role foundation (BB-012).
+- Local: `pnpm db:up`, then `pnpm db:init` / `pnpm db:verify` for parked role foundation.
 - Integration: `pnpm test:integration` / `pnpm test:migration` (skips if Docker/Postgres down).
 - Role isolation unit tests still run in `@repo/data-access`; runtime isolation via
   `pnpm test:db:integration` is **optional**.
@@ -75,4 +75,4 @@ Workflow: `.github/workflows/ci.yml` (`name: CI`)
 
 Permissions are `contents: read`. Third-party actions are pinned to immutable SHAs. `pull_request_target` is not used.
 
-Governance policy (BB-009): `pnpm validate:governance` checks workflow pins/permissions/events plus checked-in ruleset/CODEOWNERS/Dependabot/SECURITY artifacts. Remote ruleset application is documented in `infra/github/README.md` (blocked until a GitHub remote + admin `gh` auth exist).
+Governance policy: `pnpm validate:governance` checks workflow pins/permissions/events plus checked-in ruleset/CODEOWNERS/Dependabot/SECURITY artifacts. Remote ruleset application is documented in `infra/github/README.md` (blocked until a GitHub remote + admin `gh` auth exist).

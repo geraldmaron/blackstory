@@ -1,7 +1,7 @@
-# Security test checklist (BB-004 / BB-036)
+# Security test checklist ( / )
 
-> Manual and future-automated checks derived from [`../abuse-cases.md`](../abuse-cases.md).  
-> BB-036 automation is mapped below and in [`asvs-checklist.md`](./asvs-checklist.md).
+> Manual and future-automated checks derived from [`../abuse-cases.md`](../abuse-cases.md).
+>  automation is mapped below and in [`asvs-checklist.md`](./asvs-checklist.md).
 > Human and downstream checks remain release blockers where marked.
 
 **Last updated:** 2026-07-17
@@ -14,10 +14,10 @@
 | S-01 | Threat corpus JSON validates (19 threats, four control quadrants, residual risk) | automated | `pnpm --filter @repo/testing test` |
 | S-02 | Every `T-xx` has matching `AC-xx` | automated | same package |
 | S-03 | Every P0 threat lists ≥1 implementation bead | automated | same package |
-| S-04 | Uploads disabled or gated until BB-031 | manual/scaffold | assert feature flag / route absent |
-| S-05 | Tool-using LLM research disabled until BB-065 | manual/scaffold | assert no public LLM; no tool egress |
+| S-04 | Uploads disabled or gated until  | manual/scaffold | assert feature flag / route absent |
+| S-05 | Tool-using LLM research disabled until  | manual/scaffold | assert no public LLM; no tool egress |
 
-## AuthZ / surfaces (BB-021, BB-027, BB-028, BB-036)
+## AuthZ / surfaces (, , , )
 
 | ID | Abuse | Check | Mode |
 |----|-------|-------|------|
@@ -26,36 +26,36 @@
 | A-03a | AC-03 | End-user Firebase token rejected on admin/publication | ci (`security-gates.test.ts` → Firebase auth gate) |
 | A-16a | AC-16 | Research worker credentials cannot activate release | ci (`security-gates.test.ts`) |
 
-## Abuse / quotas (BB-023–026, BB-029, BB-032)
+## Abuse / quotas (–026, , )
 
 | ID | Abuse | Check | Mode |
 |----|-------|-------|------|
-| A-01a | AC-01 | Edge/app returns 429 under flood; snapshots still readable | manual / BB-059 |
+| A-01a | AC-01 | Edge/app returns 429 under flood; snapshots still readable | manual /  |
 | A-02a | AC-02 | Cache-busting query params do not bypass CDN for static | ci |
 | A-02b | AC-02 | Over-complex search rejected or times out | ci (`security-gates.test.ts` → query guardrails) |
 | A-05a | AC-05 | Duplicate corrections do not raise confidence | ci |
 | A-05b | AC-05 | Submission burst / oversized body hits quota | ci (`security-gates.test.ts`) |
-| A-19a | AC-19 | Sequential entity enumeration throttled | ci / BB-059 |
+| A-19a | AC-19 | Sequential entity enumeration throttled | ci /  |
 
-## URL / file / model (BB-030, BB-031, BB-065)
+## URL / file / model (, , )
 
 | ID | Abuse | Check | Mode |
 |----|-------|-------|------|
 | A-08a | AC-08 | Request path never fetches submitted URL synchronously | ci |
 | A-08b | AC-08 | Fetcher denies link-local, RFC1918, metadata, and loopback fixtures | ci (`security-gates.test.ts` → URL safety) |
 | A-08c | AC-08 | Oversized response aborted | ci |
-| A-09a | AC-09 | Malware/polyglot upload rejected or quarantined | deferred BB-031 |
-| A-10a | AC-10 | Injection fixture cannot trigger publish or secret tool | deferred BB-065 |
+| A-09a | AC-09 | Malware/polyglot upload rejected or quarantined | deferred  |
+| A-10a | AC-10 | Injection fixture cannot trigger publish or secret tool | deferred  |
 
-## Privacy (BB-003, BB-015, BB-019)
+## Privacy (, , )
 
 | ID | Abuse | Check | Mode |
 |----|-------|-------|------|
 | A-15a | AC-15 | Living-person fixture never emits residential address on public DTO | ci |
-| A-15b | AC-15 | Unknown living status ⇒ treat as living (constitution) | ci (exists via BB-003 fixtures) |
+| A-15b | AC-15 | Unknown living status ⇒ treat as living (constitution) | ci (exists via  fixtures) |
 | A-15c | AC-15 | Logs/redaction strips protected addresses | ci / manual |
 
-## Supply chain / secrets (BB-009, BB-010)
+## Supply chain / secrets (, )
 
 | ID | Abuse | Check | Mode |
 |----|-------|-------|------|
@@ -64,34 +64,34 @@
 | A-12a | AC-12 | Secret scanning + push protection enabled | Gitleaks CI + human repo setting (`infra/github/security-gates/README.md`) |
 | A-12b | AC-12 | Web client bundle scan finds no private keys | ci |
 
-## Publication integrity (BB-019, BB-035, BB-061)
+## Publication integrity (, , )
 
 | ID | Abuse | Check | Mode |
 |----|-------|-------|------|
-| A-16b | AC-16 | Activate prior release restores public content | manual / BB-061 |
-| A-17a | AC-17 | Staging credentials cannot mutate prod | ci / env isolation BB-005 |
-| A-06a | AC-06 | Circular citation does not inflate confidence | ci BB-043 |
+| A-16b | AC-16 | Activate prior release restores public content | manual /  |
+| A-17a | AC-17 | Staging credentials cannot mutate prod | ci / env isolation  |
+| A-06a | AC-06 | Circular citation does not inflate confidence | ci  |
 | A-07a | AC-07 | Quarantine item never appears on public projection without promotion | ci |
 
-## Adapter drift (BB-037, BB-038, BB-047)
+## Adapter drift (, , )
 
 | ID | Abuse | Check | Mode |
 |----|-------|-------|------|
 | A-18a | AC-18 | Fixture with removed required fields fails closed | ci |
-| A-18b | AC-18 | Adapter health alert on null-field spike | telemetry BB-034 |
+| A-18b | AC-18 | Adapter health alert on null-field spike | telemetry  |
 
 ## Sign-off
 
 | Gate | Owner bead | Required before |
 |------|------------|-----------------|
-| Checklist items Mode=`ci` green in pipeline | BB-036 | BB-062 prod pipeline |
-| Load/abuse/cost scenarios | BB-059 | BB-063 beta gate |
-| Adversarial integrity | BB-060 | BB-063 |
-| Rollback rehearsal | BB-061 | BB-063 |
+| Checklist items Mode=`ci` green in pipeline |  |  prod pipeline |
+| Load/abuse/cost scenarios |  |  beta gate |
+| Adversarial integrity |  |  |
+| Rollback rehearsal |  |  |
 
 When a check moves from scaffold → ci, update this table and link the test path (do not leave orphan checklist rows).
 
-## BB-036 production security gates
+##  production security gates
 
 | Gate | Automated evidence | Production rule |
 |------|--------------------|-----------------|

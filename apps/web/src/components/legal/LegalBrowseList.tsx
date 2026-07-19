@@ -1,7 +1,9 @@
 /**
  * Browse list row for the `/legal` index page.
+ * Uses Next.js `Link` for soft in-app transitions.
  */
 import React from 'react';
+import Link from 'next/link';
 import type { LawStatus } from '@repo/domain/entity-status';
 import { LegalStatusBadge } from './LegalStatusBadge';
 import { humanizeLegalKind, humanizeLegalTopic } from './format';
@@ -30,7 +32,7 @@ export function LegalBrowseList({ items, labelledBy }: LegalBrowseListProps) {
         <li key={item.id} className="ds-result-list__item ds-legal-browse-list__item">
           <article className="ds-legal-browse-list__record">
             <h3 className="ds-result-list__title" style={{ margin: 0 }}>
-              <a href={`/legal/${item.slug}`}>{item.title}</a>
+              <Link href={`/legal/${item.slug}`}>{item.title}</Link>
             </h3>
             <p className="ds-result-list__summary" style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
               <span className="ds-mono">{item.citation}</span>
@@ -49,7 +51,7 @@ export function LegalBrowseList({ items, labelledBy }: LegalBrowseListProps) {
             </div>
             {item.factHref ? (
               <p style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
-                <a href={item.factHref}>View canonical fact record</a>
+                <Link href={item.factHref}>View canonical fact record</Link>
               </p>
             ) : null}
           </article>

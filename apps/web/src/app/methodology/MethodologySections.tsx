@@ -9,7 +9,7 @@ import {
   CULTURAL_FIGURE_NOTABILITY_CALIBRATION_NOTE,
   NOTABILITY_CRITERIA,
   NOTABILITY_RUBRIC,
-} from '@repo/domain';
+} from '@repo/domain/entity-status';
 import {
   ENTITY_STATUS_VOCABULARY,
   FACT_STATUS_LIFECYCLE_DEFINITIONS,
@@ -48,7 +48,7 @@ export function MethodologySections() {
           Mission &amp; scope
         </h2>
         <p className="ds-section__lede">
-          Blap publishes released historical projections — place-connected Black history with
+          BlackStory publishes released historical projections — place-connected Black history with
           provenance, confidence grades, and living-person protections. We document what primary and
           secondary sources support, state what they do not, and preserve disagreements instead of
           collapsing them into a single winner.
@@ -194,7 +194,7 @@ export function MethodologySections() {
           Funding &amp; independence
         </h2>
         <p className="ds-section__lede" id="independence">
-          Blap is an independent editorial project. Funding sources, when applicable, are listed
+          BlackStory is an independent editorial project. Funding sources, when applicable, are listed
           here and updated when they change. No funder receives advance editorial review or veto over
           published records. Research promotion and admin tooling remain on private surfaces.
         </p>
@@ -242,7 +242,7 @@ export function MethodologySections() {
         </h2>
         <p className="ds-section__lede">
           The five International Fact-Checking Network commitments below are reproduced verbatim as
-          editorial alignment. Blap is not a paid IFCN signatory; the badge requires signatory
+          editorial alignment. BlackStory is not a paid IFCN signatory; the badge requires signatory
           status. The commitment language is public and guides our corrections and verification posture.
         </p>
         <DefinitionList

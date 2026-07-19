@@ -40,7 +40,7 @@ const storedExactResidence = {
 };
 
 const LEARNING_SUMMARY =
-  'A historically documented public record in the Black Book learning index, ' +
+  'A historically documented public record in the BlackStory learning index, ' +
   'with published claims and provenance suitable for educators and researchers.';
 
 test('public projection reduces a stored exact address before publication (living)', () => {

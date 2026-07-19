@@ -1,9 +1,9 @@
-# Service surface separation (BB-021)
+# Service surface separation
 
 **Status:** Design + runtime contracts implemented in-repo. Cloud ingress, IAP, and per-surface deploy
 jobs remain human provisioning steps (see [`infra/gcp/surfaces/README.md`](../../infra/gcp/surfaces/README.md)).
 
-**ADR:** [ADR-005](../adr/ADR-005-service-surface-separation.md)  
+**ADR:** [ADR-005](../adr/ADR-005-service-surface-separation.md)
 **Data store:** Firestore system of record ([ADR-011](../adr/ADR-011-firestore-system-of-record.md))
 
 ## Threat model summary
@@ -88,6 +88,6 @@ accepts a forbidden auth mode.
 
 ## Related docs
 
-- [Environment isolation](./environment-isolation.md) (BB-005)
+- [Environment isolation](./environment-isolation.md)
 - [GCP isolation matrices](../../infra/gcp/README.md)
 - [WIF deploy identity](../../infra/gcp/wif/README.md)

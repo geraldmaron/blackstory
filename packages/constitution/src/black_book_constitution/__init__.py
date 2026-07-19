@@ -1,5 +1,5 @@
 """
-Read-only Black Book product constitution loaders and evaluators for Python workers.
+Read-only BlackStory product constitution loaders and evaluators for Python workers.
 
 Loads the shared JSON policy and JSON Schema under packages/schemas/constitution/.
 No mutation or public write API is provided — policy changes ship as versioned files.

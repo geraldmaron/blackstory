@@ -1,37 +1,19 @@
 /**
  * Navigation data for the public BlackStory application shell.
- *
- * IA per the v3 shell contract: five routes stay in the always-visible
- * primary nav; the rest live under the "More" disclosure (desktop nav +
- * mobile drawer) and are re-surfaced in the footer's three link columns so
- * every route that used to live in the flat top-level nav stays reachable.
+ * Primary/overflow IA lives in @repo/config so admin can share the same navbar.
  */
 
-export type NavItem = {
-  readonly href: string;
-  readonly label: string;
-};
+import {
+  FOOTER_NAV_COLUMNS as CONFIG_FOOTER,
+  OVERFLOW_NAV,
+  PRIMARY_NAV,
+  isShellNavActive,
+  type ShellNavItem,
+} from '@repo/config';
 
-/** Always-visible top-level nav — mono caps, active route gets the copper underline. */
-export const PRIMARY_NAV: readonly NavItem[] = [
-  { href: '/explore', label: 'Explore' },
-  { href: '/search', label: 'Search' },
-  { href: '/history', label: 'History' },
-  { href: '/stories', label: 'Stories' },
-  { href: '/about', label: 'About' },
-] as const;
+export type NavItem = ShellNavItem;
 
-/** Overflow routes: desktop "More" disclosure + appended to the mobile drawer. */
-export const OVERFLOW_NAV: readonly NavItem[] = [
-  { href: '/data', label: 'Data' },
-  { href: '/facts', label: 'Quick facts' },
-  { href: '/legal', label: 'Legal' },
-  { href: '/methodology', label: 'Methodology' },
-  { href: '/myths', label: 'Myths' },
-  { href: '/corrections', label: 'Corrections' },
-  { href: '/errata', label: 'Errata' },
-  { href: '/submit', label: 'Submit' },
-] as const;
+export { PRIMARY_NAV, OVERFLOW_NAV };
 
 export type FooterNavColumn = {
   readonly title: string;
@@ -39,38 +21,9 @@ export type FooterNavColumn = {
 };
 
 /** Three mono-caps footer columns per the v3 shell contract. */
-export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
-  {
-    title: 'Explore',
-    items: [
-      { href: '/explore', label: 'Explore' },
-      { href: '/search', label: 'Search' },
-      { href: '/history', label: 'History' },
-      { href: '/stories', label: 'Stories' },
-      { href: '/data', label: 'Data' },
-    ],
-  },
-  {
-    title: 'Trust',
-    items: [
-      { href: '/methodology', label: 'Methodology' },
-      { href: '/errata', label: 'Errata' },
-      { href: '/corrections', label: 'Corrections' },
-      { href: '/legal', label: 'Legal' },
-    ],
-  },
-  {
-    title: 'Contribute',
-    items: [
-      { href: '/submit', label: 'Submit' },
-      { href: '/about', label: 'About' },
-      { href: '/facts', label: 'Quick facts' },
-      { href: '/myths', label: 'Myths' },
-    ],
-  },
-] as const;
+export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] =
+  CONFIG_FOOTER as readonly FooterNavColumn[];
 
 export function isNavActive(pathname: string, href: string): boolean {
-  if (href === '/') return pathname === '/';
-  return pathname === href || pathname.startsWith(`${href}/`);
+  return isShellNavActive(pathname, href);
 }

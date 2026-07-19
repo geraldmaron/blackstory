@@ -1,8 +1,9 @@
 
 /**
- * Aggregated Blap UI stylesheet: tokens, base, and components.
+ * Aggregated BlackStory UI stylesheet: tokens, base, and components.
  */
 
 @import './tokens.css';
 @import './base.css';
 @import './components.css';
+@import './shell-header.css';

@@ -7,7 +7,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listPublicEntities } from '../../data/public-seed';
-import { buildExploreMapSource, DIGNITY_PALETTE, EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience';
+import { buildExploreMapSource } from '../../lib/map-experience/build-explore-map-source';
+import { DIGNITY_PALETTE, EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience';
 import { KIND_ENCODING_ENTRIES } from '../../lib/map-experience/kind-encoding';
 import { markerHaloRadiusExpression, markerRadiusExpression } from '../../lib/map-experience/marker-size';
 import {

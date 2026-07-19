@@ -1,4 +1,4 @@
-# External URL safety and SSRF prevention (BB-030)
+# External URL safety and SSRF prevention
 
 Submitted URLs are inert data during submission intake. The submissions service creates a
 `url-evaluation` queue job and retains the source in quarantine; it does not resolve, connect to, or
@@ -50,7 +50,7 @@ denylist in addition to IP classification. Domain approval never overrides desti
 Internationalized names are evaluated after the runtime parser converts them to canonical ASCII.
 
 Do not allow wildcard exceptions for organization-owned internal zones. At minimum deny metadata
-hostnames and all private/internal DNS suffixes used by Blap, Firebase, Google APIs, and
+hostnames and all private/internal DNS suffixes used by BlackStory, Firebase, Google APIs, and
 service discovery.
 
 ## Worker egress boundary

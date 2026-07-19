@@ -1,4 +1,4 @@
-# Federal archive and public-history adapters (BB-046).
+# Federal archive and public-history adapters.
 
 ## Scope
 

@@ -25,7 +25,7 @@ import {
   type SafeFetchDependencies,
   type SafeFetchOptions,
   type SafeFetchResult,
-} from '@repo/security';
+} from '@repo/security/url-safety';
 import type { SnapshotMode } from '@repo/domain';
 
 /** Resolves a hostname to its public/private-classified addresses via the real system resolver. */

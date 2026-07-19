@@ -6,7 +6,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { listPublicEntities } from '../../data/public-seed';
-import { buildExploreMapSource } from '../../lib/map-experience';
+import { buildExploreMapSource } from '../../lib/map-experience/build-explore-map-source';
 import { SynchronizedResultList } from './SynchronizedResultList';
 
 function buildFeatures() {

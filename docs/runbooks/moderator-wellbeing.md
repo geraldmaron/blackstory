@@ -1,20 +1,20 @@
-# Runbook: Moderator wellbeing for community-lead review (BB-076)
+# Runbook: Moderator wellbeing for community-lead review
 
 **Scope:** the human review queue behind the public "Submit a lead" form — reviewing
 quarantined community submissions (`packages/domain/src/consensus-review/`), the moderator
 rotation, exposure limits, and escalation paths for what that content can contain.
 **Not in scope:** the technical quarantine and consensus mechanics themselves (see
-`packages/domain/src/consensus-review/` and its tests), which are covered by BB-076's
+`packages/domain/src/consensus-review/` and its tests), which are covered by 's
 acceptance tests, not this document.
 
 ## Why this runbook exists
 
-Blap documents racially charged, and sometimes violent, history. A public, unauthenticated
-"submit a lead" form is — by the Queering the Map lesson named in BB-076's design brief — a
+BlackStory documents racially charged, and sometimes violent, history. A public, unauthenticated
+"submit a lead" form is — by the Queering the Map lesson named in 's design brief — a
 predictable target for two very different kinds of hostile submission:
 
 1. **Coordinated abuse aimed at the product**: spam, SEO poisoning, brigading, attempts to get
-   false claims into the research pipeline (BB-029/032 quarantine and the consensus-review
+   false claims into the research pipeline (/032 quarantine and the consensus-review
    agreement threshold exist to blunt this — see `packages/domain/src/consensus-review/`).
 2. **Content that is genuinely disturbing to read**: racist language quoted or reenacted,
    descriptions or images of violence, harassment directed at the reviewer personally, and
@@ -32,7 +32,7 @@ The moderator queue (the human side of `expert_review` and `pending_review` rout
 present raw, unwarned content as the first thing a reviewer sees.
 
 1. **Content warnings are structural, not optional.** Every quarantined lead entering the
-   moderator queue carries a coarse pre-screen — the deterministic spam/campaign signals BB-029
+   moderator queue carries a coarse pre-screen — the deterministic spam/campaign signals
    already computes (`SpamAssessment`, `SubmissionCampaignAssessment` in
    `packages/security/src/submissions/quarantine.ts`) plus a keyword-pattern heuristic for slurs,
    graphic-violence terms, and self-harm/crisis language. A lead that trips the heuristic is
@@ -91,10 +91,10 @@ to trigger the escalation.
 
 ## What this runbook depends on
 
-- **BB-029 quarantine.** Nothing a moderator reviews is public; the entire point of quarantine is
+- ** quarantine.** Nothing a moderator reviews is public; the entire point of quarantine is
   that mistakes here have a small, contained blast radius, not a published one.
   (`packages/security/src/submissions/quarantine.ts`)
-- **BB-076 consensus review.** Reviewers work independently and see agreement/disagreement state,
+- ** consensus review.** Reviewers work independently and see agreement/disagreement state,
   not just raw content — this runbook's "context before content" guidance depends on that
   metadata existing. (`packages/domain/src/consensus-review/`)
 - **Incident response.** The Acute-lane escalation path hands off into the existing incident

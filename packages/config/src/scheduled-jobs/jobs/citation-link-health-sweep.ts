@@ -40,7 +40,7 @@ import {
   type PinnedTransportResponse,
   type ResolveHost,
   type SafeFetchDependencies,
-} from '@repo/security';
+} from '@repo/security/url-safety';
 import {
   advanceLinkHealthState,
   applyRepairLadder,

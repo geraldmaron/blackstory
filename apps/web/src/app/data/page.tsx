@@ -73,7 +73,7 @@ export default async function DataPage() {
       <p className="ds-page__eyebrow">Modeling</p>
       <h1 className="ds-page__title">Data behind the archive</h1>
       <p className="ds-page__lede">
-        The national numbers underneath Blap&rsquo;s map and records — population, economic, and
+        The national numbers underneath BlackStory&rsquo;s map and records — population, economic, and
         civil-rights context, each carrying the exact source it came from. County- and
         tract-level detail is landing on the Explore map as a choropleth layer; this page is the
         national-scale summary and the paper trail.

@@ -320,6 +320,11 @@ function payloadStrings(
   return [];
 }
 
+function stripEditorialDayPrefix(title: string): string {
+  const stripped = title.replace(/^day\s+\d+\s*[—–-]\s*/iu, '').trim();
+  return stripped || title;
+}
+
 export function resolutionCandidateFromDiscovery(
   candidate: DiscoveryCandidateRecord,
 ): ResolutionCandidate {
@@ -337,9 +342,13 @@ export function resolutionCandidateFromDiscovery(
   const address = payloadStrings(payload, 'address')[0];
   const year = typeof yearValue === 'number' ? yearValue : undefined;
   const kindValue = payloadStrings(payload, 'kind')[0];
+  const title = candidate.adapterRecord.title ?? '';
+  const name =
+    payloadStrings(payload, 'name')[0] ??
+    (title ? stripEditorialDayPrefix(title) : '');
   return {
     id: candidate.id,
-    name: payloadStrings(payload, 'name')[0] ?? candidate.adapterRecord.title ?? '',
+    name,
     ...(kindValue !== undefined && isEntityKind(kindValue) ? { kind: kindValue } : {}),
     aliases: payloadStrings(payload, 'aliases'),
     ...(address !== undefined ? { address } : {}),

@@ -74,7 +74,8 @@ export type CampaignEditorialHook = {
 export function assertCampaignCannotPublish(
   attempt?: DiscoveryOperationAttempt,
 ): void {
-  if (FORBIDDEN_DISCOVERY_OPERATIONS.length === 0) {
+  // Length is fixed in source; keep a runtime guard for misconfigured forks.
+  if ((FORBIDDEN_DISCOVERY_OPERATIONS as readonly string[]).length === 0) {
     throw new Error('Discovery publish guard is unconfigured');
   }
   if (attempt) {
@@ -201,12 +202,13 @@ export async function runOptionalEditorialHook(
 export function toEditorialLeadPreview(
   candidate: DiscoveryCandidateRecord,
 ): EditorialLeadPreview {
+  const summary = payloadSummary(candidate);
   return {
     candidateId: candidate.id,
     ...(candidate.adapterRecord.title !== undefined
       ? { title: candidate.adapterRecord.title }
       : {}),
-    ...(payloadSummary(candidate) !== undefined ? { summary: payloadSummary(candidate) } : {}),
+    ...(summary !== undefined ? { summary } : {}),
     ...(candidate.adapterRecord.canonicalUrl !== undefined
       ? { canonicalUrl: candidate.adapterRecord.canonicalUrl }
       : {}),

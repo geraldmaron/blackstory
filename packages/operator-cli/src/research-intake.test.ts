@@ -11,7 +11,7 @@ import type {
   PinnedTransportResponse,
   ResolveHost,
   SafeFetchDependencies,
-} from '@repo/security';
+} from '@repo/security/url-safety';
 import { runResearchIntake } from './research-intake.ts';
 import type { OperatorIntakeContext } from './intake.ts';
 

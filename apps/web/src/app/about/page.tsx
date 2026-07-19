@@ -1,12 +1,12 @@
 /**
- * About page describing the Blap public product.
+ * About page describing the BlackStory public product.
  */
 
 import Link from 'next/link';
 
 export const metadata = {
   title: 'About',
-  description: 'What Blap is and who the public interface is for.',
+  description: 'What BlackStory is and who the public interface is for.',
 };
 
 export default function AboutPage() {
@@ -15,7 +15,7 @@ export default function AboutPage() {
       <p className="ds-page__eyebrow">Product</p>
       <h1 className="ds-page__title">History, pinned to place.</h1>
       <p className="ds-page__lede">
-        Blap is a place-connected Black history research platform. It exists to connect people
+        BlackStory is a place-connected Black history research platform. It exists to connect people
         with documented history — especially the history close to them: their state, their city,
         the corner they pass every day. The public site serves only released historical
         projections, with provenance, confidence, and living-person protections.

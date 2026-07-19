@@ -2,9 +2,9 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-16
-- **Bead:** BB-002
+- **Bead:**
 - **Depends on:** ADR-002, ADR-005, ADR-007
-- **Implements toward:** BB-019
+- **Implements toward:**
 
 ## Scaffold vs target
 
@@ -42,7 +42,7 @@ Public readers must never see draft canonical research. Promotion must be audita
 ## Consequences
 
 - Publication pipeline complexity concentrates in `workers/publication` and `api-internal`.
-- Storage grows with immutable releases and snapshots; retention policy required (BB-020).
+- Storage grows with immutable releases and snapshots; retention policy required.
 - Public API responses include release/revision metadata.
 - Admin console must never edit active public projections directly (preview → promote).
 
@@ -50,11 +50,11 @@ Public readers must never see draft canonical research. Promotion must be audita
 
 - Change snapshot format only with a new release generation that dual-writes until cutover.
 - Add a CDN object store layout when snapshot volume exceeds App Hosting/static assumptions.
-- Revisit denormalization shape when BB-049/BB-052 query patterns demand new projection columns (still one public schema, not new services).
+- Revisit denormalization shape when / query patterns demand new projection columns (still one public schema, not new services).
 
 ## Rollback considerations
 
-- Primary rollback: activate previous release pointer + prior search-index version (BB-019 acceptance).
+- Primary rollback: activate previous release pointer + prior search-index version ( acceptance).
 - Snapshot/CDN objects for prior releases remain immutable and addressable.
 - Do not “fix” an active release in place; publish a new release or roll back to a prior one.
 - Database PITR is last resort for canonical corruption, separate from public release rollback.

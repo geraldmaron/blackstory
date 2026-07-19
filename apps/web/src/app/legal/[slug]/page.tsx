@@ -1,6 +1,7 @@
 /**
  * Legal landscape detail page at `/legal/{slug}` with plain-language explainer sections.
  */
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Card } from '@repo/ui';
 import {
@@ -61,7 +62,7 @@ export default async function LegalDetailPage({ params }: LegalDetailPageProps) 
           <Card>
             <p style={{ margin: 0 }}>
               This entry links to a canonical{' '}
-              <a href={factHref}>fact record</a> with structured citations and revision history.
+              <Link href={factHref}>fact record</Link> with structured citations and revision history.
             </p>
           </Card>
         ) : null}

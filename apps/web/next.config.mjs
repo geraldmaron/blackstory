@@ -26,12 +26,29 @@ const nextConfig = {
     '@repo/security',
     '@repo/firebase',
   ],
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     // NodeNext packages emit `.js` specifiers that map to `.ts`/`.tsx` sources.
     config.resolve.extensionAlias = {
       ...config.resolve.extensionAlias,
       '.js': ['.ts', '.tsx', '.js', '.jsx'],
     };
+    // Belt-and-suspenders: if a client graph still touches a Node builtin via a
+    // mis-imported barrel, fail closed with an empty shim instead of UnhandledSchemeError.
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        child_process: false,
+        crypto: false,
+        dns: false,
+        fs: false,
+        http: false,
+        https: false,
+        net: false,
+        path: false,
+        tls: false,
+        url: false,
+      };
+    }
     return config;
   },
   experimental: {

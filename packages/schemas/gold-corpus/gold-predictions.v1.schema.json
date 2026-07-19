@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://blackbook.local/schemas/gold-corpus/gold-predictions.v1.schema.json",
-  "title": "Black Book Gold Predictions",
+  "title": "BlackStory Gold Predictions",
   "description": "A complete algorithm prediction set for one version of the gold corpus.",
   "type": "object",
   "additionalProperties": false,

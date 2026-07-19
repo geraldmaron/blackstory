@@ -1,6 +1,6 @@
-# Deterministic relevance engine (BB-040)
+# Deterministic relevance engine
 
-Contract-layer API for scoring discovery candidates through deterministic relevance gates, producing include / exclude / supporting-context decisions with human-readable explanations. Relevance consumes BB-039 discovery candidates and BB-038 query-pack signal classification.
+Contract-layer API for scoring discovery candidates through deterministic relevance gates, producing include / exclude / supporting-context decisions with human-readable explanations. Relevance consumes  discovery candidates and  query-pack signal classification.
 
 ## Scope
 
@@ -43,6 +43,6 @@ cd workers/research && uv run pytest src/black_book_research/relevance/test_rele
 
 ## Follow-ups
 
-- Firestore persistence for relevance assessments (BB-044)
-- Gold corpus calibration harness (BB-047)
-- Public “Why this appears” storytelling layer (BB-054)
+- Firestore persistence for relevance assessments
+- Gold corpus calibration harness
+- Public “Why this appears” storytelling layer

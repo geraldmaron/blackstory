@@ -11,7 +11,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { redactLocationForPublic } from '@repo/security';
+import { redactLocationForPublic } from '@repo/security/redaction';
 import { buildMapSource } from './map-source.js';
 import {
   DECEASED_RESIDENCE_FIXTURE,

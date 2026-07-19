@@ -458,6 +458,20 @@
   color: var(--ds-fixed-stone);
 }
 
+.ds-shell-footer__operator {
+  color: var(--ds-fixed-copper-text, #d07a32);
+  text-decoration: none;
+}
+
+.ds-shell-footer__operator:hover {
+  text-decoration: underline;
+}
+
+.ds-shell-footer__operator:focus-visible {
+  outline: 2px solid var(--ds-fixed-copper-text, #d07a32);
+  outline-offset: 3px;
+}
+
 @media (min-width: 40rem) {
   .ds-shell-footer__columns {
     grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -14,7 +14,7 @@
  */
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { redactLocationForPublic } from '@repo/security';
+import { redactLocationForPublic } from '@repo/security/redaction';
 import { buildMapSource } from './map-source.js';
 import { MAP_SOURCE_DEMO_FIXTURES } from './fixtures.js';
 

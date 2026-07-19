@@ -8,6 +8,16 @@
       "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./redaction": {
+      "development": "./src/redaction.ts",
+      "types": "./dist/redaction.d.ts",
+      "import": "./dist/redaction.js"
+    },
+    "./url-safety": {
+      "development": "./src/url-safety/index.ts",
+      "types": "./dist/url-safety/index.d.ts",
+      "import": "./dist/url-safety/index.js"
     }
   },
   "files": [

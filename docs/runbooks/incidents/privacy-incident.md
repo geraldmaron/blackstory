@@ -8,7 +8,7 @@
 ## Contain
 
 1. Engage `publication`, geocoding, nearby, exports, search, and uploads.
-2. Enter static mode only if the active immutable snapshot is safe; otherwise perform immediate BB-019 rollback first.
+2. Enter static mode only if the active immutable snapshot is safe; otherwise perform immediate  rollback first.
 3. Revoke affected access independently and quarantine exposed records/artifacts.
 4. Purge affected CDN/cache/log copies where feasible without destroying required evidence.
 

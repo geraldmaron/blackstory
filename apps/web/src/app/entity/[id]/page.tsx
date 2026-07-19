@@ -8,7 +8,7 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { buildCompactFactViewsForEntity } from '@repo/domain';
+import { buildCompactFactViewsForEntity } from '@repo/domain/facts';
 import { MapFrame, Timeline } from '@repo/ui';
 import { SeedDataNotice } from '../../../components/SeedDataNotice';
 import { KindBadge, ConfidenceMark } from '../../../components/map-experience';
@@ -27,7 +27,10 @@ import { CompactFactReference } from '../../../components/facts';
 import { HowToReadThisRecord } from '../../../components/trust';
 import { WhyThisAppears } from '../../../components/why-appears';
 import { seedFactsForEntity } from '../../../data/facts-seed';
-import { buildExploreHref, geoAnchorFor, highestConfidence, mapToneFromTopics } from '../../../lib/map-experience';
+import { buildExploreHref } from '../../../lib/map-experience/url-state';
+import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
+import { highestConfidence } from '../../../lib/map-experience/build-explore-map-source';
+import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
 import { listPublicEntityViews, resolvePublicEntityView } from '../../../lib/public-data/source';
 import { buildWhyThisAppearsForEntity, toEvidenceClaimInputs } from './adapters';

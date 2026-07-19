@@ -2,9 +2,10 @@
  * Compact embed/reference card for map, entity, and evidence surfaces.
  *
  * Renders the shared `CompactFactView` shape from `@repo/domain` one canonical URL and one
- * citation set, identical to the fact's own page.
+ * citation set, identical to the fact's own page. Uses Next.js `Link` for soft navigation.
  */
 import React from 'react';
+import Link from 'next/link';
 import { Card, Citation } from '@repo/ui';
 import type { CompactFactView } from '@repo/domain/facts';
 import { humanizeToken } from './format';
@@ -33,9 +34,9 @@ export function CompactFactReference({ view }: CompactFactReferenceProps) {
         />
       ) : null}
       <p style={{ margin: 'var(--ds-space-3) 0 0 0' }}>
-        <a className="ds-cta ds-cta--ink" href={view.canonicalUrl}>
+        <Link className="ds-cta ds-cta--ink" href={view.canonicalUrl}>
           Open canonical fact record
-        </a>
+        </Link>
       </p>
     </Card>
   );

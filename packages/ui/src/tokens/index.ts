@@ -1,6 +1,6 @@
 
 /**
- * Barrel export for Blap design tokens.
+ * Barrel export for BlackStory design tokens.
  */
 
 export * from './brand-palette.js';

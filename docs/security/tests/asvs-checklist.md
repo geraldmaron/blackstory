@@ -1,7 +1,7 @@
 # OWASP ASVS and API security checklist
 
 This checklist tailors OWASP ASVS 4.0.3 and OWASP API Security Top 10 controls to
-Blap. Automated checks use synthetic fixtures and emulators; they never attack
+BlackStory. Automated checks use synthetic fixtures and emulators; they never attack
 production or use production data.
 
 ## Identity and access control
@@ -31,7 +31,7 @@ production or use production data.
 - [x] V11 / API4: exhausted source-fetch budgets hard-stop.
 - [x] API4: search complexity and submission byte limits are deterministic.
 - [x] API6: only declared business flows can activate a publication release.
-- [ ] BB-059: staging load test verifies 429 behavior, queue depth, concurrency, and
+- [ ] : staging load test verifies 429 behavior, queue depth, concurrency, and
   public snapshot availability under sustained abuse.
 
 ## Supply chain, configuration, and verification
@@ -54,7 +54,7 @@ production or use production data.
 - [x] Production DAST is forbidden.
 - [x] Release evidence validation requires the deployed commit to equal the tested
   commit and the deployed digest to equal the scanned, signed digest.
-- [ ] BB-062 integration: production workflow consumes the image/signature gate,
+- [ ]  integration: production workflow consumes the image/signature gate,
   downloads security artifacts, attaches them to the release, and records run IDs.
 
 Unchecked human or downstream items are release blockers when applicable; they are not

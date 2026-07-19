@@ -1,4 +1,4 @@
-# Accessibility, SEO, performance, and privacy gates (BB-057)
+# Accessibility, SEO, performance, and privacy gates
 
 Repo acceptance gates for core public journeys. No live deploy required — automated checks run in CI via `@repo/testing` and `apps/web` unit tests.
 
@@ -37,7 +37,7 @@ Documented peers (`packages/testing/src/a11y/map-search-peers.test.ts`):
 | Explore | `explore/page.tsx` noscript `FilterBar` | Native GET filters without JavaScript |
 | Locate | `ManualPlaceSearchForm` + `/search` link | Manual entry without geolocation |
 
-Do not edit explore/map-experience components in BB-057 — read-only ownership (BB-051).
+Do not edit explore/map-experience components in  — read-only ownership.
 
 ## Metadata and previews
 
@@ -82,7 +82,7 @@ Contract tests: `packages/testing/src/release-gates/public-degraded-contracts.te
 
 ## Privacy
 
-- Minimal analytics — geocode analytics client is consent-aware (see BB-050 locate components)
+- Minimal analytics — geocode analytics client is consent-aware (see  locate components)
 - No behavioral advertising fields in public metadata builders
 - Location coordinates never appear in SEO previews (`protected-fields.ts`)
 

@@ -9,7 +9,7 @@
  * Component would pull `firebase-admin` (Node-only) into the browser build. The
  * security-critical verification stays server-only in `./app-check-guard.ts`, reusing
  * `@repo/firebase` exactly. This file only calls the vendor `firebase` client SDK
- * directly to obtain a token there is no Blap–owned business logic here to duplicate.
+ * directly to obtain a token there is no BlackStory–owned business logic here to duplicate.
  *
  * Gracefully degrades: if App Check isn't configured for this environment (e.g. local dev
  * without a real Firebase project), it returns no header, and the server-side guard falls back

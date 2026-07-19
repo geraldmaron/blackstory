@@ -1,6 +1,6 @@
-# Brand story, voice, and site narrative (BB-069)
+# Brand story, voice, and site narrative
 
-This is the narrative platform every Blap surface draws from — home,
+This is the narrative platform every BlackStory surface draws from — home,
 map, entity pages, methodology, about, corrections. If a page's copy isn't
 traceable to this document, it's ad hoc and should be rewritten to match.
 
@@ -68,7 +68,7 @@ who trusts nothing by default and wants the tool to make trust
 - Never trauma-forward: hard history is never the *default lens* or the
   *hook*. A place's page leads with what's documented about the place —
   people, institutions, events across time — not with the worst thing
-  that happened there. See "Why this appears" (BB-054) for how the product
+  that happened there. See "Why this appears" for how the product
   explains *why* a record surfaced, which is the mechanism that keeps a
   search from feeling like it's fishing for tragedy.
 
@@ -95,7 +95,7 @@ citation/confidence components where relevant), not like a separate
 short declarative sections, no hedging, methodology sections built from
 the actual `Citation`/`Confidence`/`Notice` components rather than prose
 describing them. Keep extending both pages this way as new capabilities
-ship (e.g., link-rot handling from BB-083 gets a methodology section when
+ship (e.g., link-rot handling from  gets a methodology section when
 it lands, not just a runbook entry).
 
 ## Editorial voice guide
@@ -111,7 +111,7 @@ real, complete answer). No marketing superlatives ("groundbreaking,"
 |---|---|---|
 | Confidence levels | Always pair the color with a text label and non-color glyph (the `Confidence` component's `●●○` marks + "Medium confidence" text) — never color alone. | "●●○ Medium confidence" |
 | Disputes | State the dispute as a fact, not a warning. Preserve both values; don't imply one is more likely correct unless the confidence engine says so. | "Two accepted claims disagree on the 1910 school address." |
-| "Why this appears" (BB-054) | Name the specific match reason (place, era, entity relationship) — never a generic "related content" line. | "Appears because: documented at this address, 1948–1967." |
+| "Why this appears" | Name the specific match reason (place, era, entity relationship) — never a generic "related content" line. | "Appears because: documented at this address, 1948–1967." |
 | Empty states | State what's missing and the next action; never apologize ("Oops," "Sorry") and never blame the reader. | "No published records at this precision yet. Try a broader area." |
 | Corrections | Neutral, procedural tone; a correction is normal system function, not an admission of failure. | "Submit a correction" / "Under review" / "Resolved — record updated." |
 | Legal/procedural status | Use only the constitution's `legalStatusVocabulary` (alleged, charged, indicted, arraigned, convicted, acquitted, dismissed, settled_civil, ruled, enacted, repealed, unknown_procedural) — never a conclusory label like "guilty," "the criminal," or "proven murderer" (see `unsupportedProceduralLanguage` in `packages/schemas/constitution/policy.v1.json`, enforced by `@repo/schemas`/`@repo/constitution`). | "Charged, 1952. Case dismissed, 1953." not "Innocent." |
@@ -133,7 +133,7 @@ enter the composite — see `docs/security/threat-model.md`).
   "Confidence & disputes," "Location precision," "Provenance" — matching
   the methodology page's own section names, so the vocabulary a reader
   learns on `/methodology` transfers directly to every entity page.
-  (BB-052/BB-053 must reuse these exact section names.)
+  (/ must reuse these exact section names.)
 - No gimmick names for internal concepts that leak into public copy: the
   research pipeline's internal vocabulary (quarantine, promotion,
   graylist, research case) stays internal; public copy translates each to
@@ -154,6 +154,6 @@ enter the composite — see `docs/security/threat-model.md`).
 | Methodology page | `apps/web/src/app/methodology/page.tsx` |
 | About page | `apps/web/src/app/about/page.tsx` |
 
-Consumed by: BB-048 (shell copy), BB-052 (entity page section naming),
-BB-054 ("why this appears" storytelling), BB-055 (corrections voice),
-BB-088 (editorial trust surfaces).
+Consumed by:  (shell copy),  (entity page section naming),
+ ("why this appears" storytelling),  (corrections voice),
+ (editorial trust surfaces).

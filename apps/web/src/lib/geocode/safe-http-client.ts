@@ -17,7 +17,7 @@ import { request as httpsRequest } from 'node:https';
 import {
   evaluateExternalUrl,
   resolveAndPinDestination,
-} from '@repo/security';
+} from '@repo/security/url-safety';
 
 /**
  * Structurally matches `@repo/domain`'s `SafeHttpClient` port

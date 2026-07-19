@@ -1,6 +1,6 @@
-# Runbook: Recovery and rollback rehearsal (BB-061)
+# Runbook: Recovery and rollback rehearsal
 
-**Scope:** Quarterly dry-run proving recovery procedures under pressure without live GCP restore.  
+**Scope:** Quarterly dry-run proving recovery procedures under pressure without live GCP restore.
 **System of record:** Firestore (ADR-011). **Not in scope:** live production import, Cloud SQL restore.
 
 ## When to run
@@ -27,8 +27,8 @@ Execute in order. Record start/end UTC for each row in the findings template.
 | 4 | Pause queues (no purge) | 15 min | human-platform-admin | `bash scripts/recovery-rehearsal/stubs/pause-queues.stub.sh` |
 | 5 | Revoke compromised deploy identity | 30 min | human-platform-admin | `bash scripts/recovery-rehearsal/stubs/revoke-deploy-identity.stub.sh` |
 | 6 | Rotate secrets | 60 min | human-platform-admin | `bash scripts/recovery-rehearsal/stubs/rotate-secrets.stub.sh` |
-| 7 | Active release rollback (BB-019) | 120 min | human-platform-admin | `bash scripts/recovery-rehearsal/stubs/release-rollback.stub.sh` |
-| 8 | Database restore (staging dry-run, BB-020) | 480 min | backup-restore-sa | `bash scripts/recovery-rehearsal/stubs/database-restore.stub.sh` |
+| 7 | Active release rollback | 120 min | human-platform-admin | `bash scripts/recovery-rehearsal/stubs/release-rollback.stub.sh` |
+| 8 | Database restore (staging dry-run, ) | 480 min | backup-restore-sa | `bash scripts/recovery-rehearsal/stubs/database-restore.stub.sh` |
 | 9 | Rebuild public projections | 240 min | human-platform-admin | `bash scripts/recovery-rehearsal/stubs/rebuild-projections.stub.sh` |
 | 10 | Restore deleted public object | 240 min | backup-restore-sa | `bash scripts/recovery-rehearsal/stubs/restore-public-object.stub.sh` |
 | 11 | Record findings | 30 min | security-operator | `node scripts/recovery-rehearsal/record-findings.mjs --dry-run --validate` |
@@ -76,8 +76,8 @@ Targets align with [`infra/firebase/backup/rpo-rto.md`](../../infra/firebase/bac
 
 ## References (link only)
 
-- [`backup-restore.md`](./backup-restore.md) — Firestore export restore (BB-020)
-- [`incident-response.md`](./incident-response.md) — kill switches and containment order (BB-035)
+- [`backup-restore.md`](./backup-restore.md) — Firestore export restore
+- [`incident-response.md`](./incident-response.md) — kill switches and containment order
 - [`infra/gcp/kill-switches/`](../../infra/gcp/kill-switches/)
 - [`infra/gcp/armor/emergency-deny-runbook.md`](../../infra/gcp/armor/emergency-deny-runbook.md)
 - [`infra/firebase/backup/`](../../infra/firebase/backup/)

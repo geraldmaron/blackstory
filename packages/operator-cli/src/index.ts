@@ -95,6 +95,46 @@ export {
 } from './rss-campaign-run.js';
 
 export {
+  createLlmProvider,
+  createMockLlmProvider,
+  createOpenRouterLlmProvider,
+  createOllamaLlmProvider,
+  type LlmProvider,
+  type CreateLlmProviderOptions,
+} from './llm-provider.js';
+
+export {
+  runEditorialJudge,
+  type EditorialRunInput,
+  type EditorialRunResult,
+  type EditorialSubject,
+  type EditorialCatalogEntity,
+} from './editorial-run.js';
+
+export {
+  loadEditorialCatalogFromFirestore,
+  mergeEditorialCatalogFromDocs,
+  mergeJsonCatalogOverFirestore,
+  extractEmbeddingVector,
+} from './editorial-catalog-firestore.js';
+
+export { runEnrichmentJudge, type EnrichmentRunResult } from './enrichment-run.js';
+
+export { loadPendingEditorialItems, type PendingListResult } from './pending-list.js';
+
+export { prepareEditorialPacketIntake } from './editorial-intake.js';
+
+export {
+  runStoryResearch,
+  type StoryTopicSeed,
+  type StoryResearchRunInput,
+  type StoryResearchRunResult,
+  type StoryResearchRunItem,
+} from './story-research-run.js';
+
+export { prepareStoryPacketIntake } from './story-intake.js';
+
+export {
   prepareLocate,
   commitLocate,
   type LocateInput,

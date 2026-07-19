@@ -11,7 +11,7 @@ import { test } from 'node:test';
 import {
   DEFAULT_SAFE_FETCH_LIMITS,
   type PinnedTransportResponse,
-} from '@repo/security';
+} from '@repo/security/url-safety';
 import {
   initialLinkHealthState,
   type Citation,

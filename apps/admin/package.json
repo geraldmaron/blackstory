@@ -7,14 +7,17 @@
     "build": "next build --webpack",
     "start": "next start --port 3001",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/surface.test.ts src/auth/server-authorization.test.ts src/console.test.ts",
+    "test": "node --conditions development --import tsx --test src/surface.test.ts src/auth/server-authorization.test.ts src/auth/firebase-session.test.ts src/stories/story-review-queue.test.ts src/console.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
     "@repo/config": "workspace:*",
     "@repo/domain": "workspace:*",
+    "@repo/firebase": "workspace:*",
     "@repo/operator-cli": "workspace:*",
     "@repo/ui": "workspace:*",
+    "firebase": "^11.10.0",
+    "firebase-admin": "^13.4.0",
     "next": "^16.2.10",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"

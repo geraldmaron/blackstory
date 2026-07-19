@@ -1,6 +1,6 @@
 
 /**
- * Auth custom-claim helpers for Black Book staff roles.
+ * Auth custom-claim helpers for BlackStory staff roles.
  */
 import type { AuthClaimFlags } from './types.js';
 

@@ -1,4 +1,4 @@
-# Submission quarantine (BB-029)
+# Submission quarantine
 
 Corrections, contributions, and abuse reports enter a restricted submission quarantine. They never
 write canonical entities, public projections, search indexes, or publication releases.
@@ -10,15 +10,15 @@ fields, non-HTTPS URLs, URL credentials, and publication operations are outside 
 
 Requests pass through these controls in order:
 
-1. BB-024 App Check verification with replay consumption.
-2. BB-025 correction endpoint quota and distributed-risk evaluation.
-3. BB-029 schema, encoded-size, text-length, prohibited-character, source/link-count, and independent
+1.  App Check verification with replay consumption.
+2.  correction endpoint quota and distributed-risk evaluation.
+3.  schema, encoded-size, text-length, prohibited-character, source/link-count, and independent
    frequency validation.
 4. Deterministic spam scoring and duplicate/coordinated-campaign assessment.
 5. Append to submission quarantine with `canonicalWriteAllowed: false`.
 
 `apps/api-submissions/src/quarantine.ts` requires the App Check and quota decisions explicitly. It
-also calls the BB-021 `write:quarantine` capability guard. A denied prerequisite or validation error
+also calls the  `write:quarantine` capability guard. A denied prerequisite or validation error
 cannot append a record.
 
 ## State and data separation

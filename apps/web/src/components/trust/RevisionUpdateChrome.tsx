@@ -3,6 +3,7 @@
  * linking to per-revision permalinks and the errata log when corrections exist.
  */
 import React from 'react';
+import Link from 'next/link';
 import {
   buildFactRevisionPath,
   currentFactRevision,
@@ -31,19 +32,19 @@ export function RevisionUpdateChrome({ fact, errataHref = '/errata' }: RevisionU
         <>
           {' '}
           —{' '}
-          <a href={latestPath}>
+          <Link href={latestPath}>
             see what changed
             {isCorrection ? ' (correction logged)' : ''}
-          </a>
+          </Link>
         </>
       ) : null}
       {isCorrection ? (
         <>
           {' '}
           ·{' '}
-          <a href={errataHref}>
+          <Link href={errataHref}>
             public errata
-          </a>
+          </Link>
         </>
       ) : null}
       {revision ? (

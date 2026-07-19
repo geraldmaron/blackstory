@@ -5,6 +5,7 @@
  * (`/facts/{id}/rev/{n}`) — the Wikipedia-oldid hostile-quoting defense named in the.
  */
 import React from 'react';
+import Link from 'next/link';
 import {
   buildFactRevisionPath,
   type FactRecord,
@@ -53,7 +54,9 @@ export function FactRevisionPanel({ fact, currentRevisionNumber, labelledBy }: F
               </p>
               {!isCurrent ? (
                 <p style={{ margin: 'var(--ds-space-1) 0 0 0' }}>
-                  <a href={buildFactRevisionPath(fact.id, revision.revisionNumber)}>View revision permalink</a>
+                  <Link href={buildFactRevisionPath(fact.id, revision.revisionNumber)}>
+                    View revision permalink
+                  </Link>
                 </p>
               ) : null}
               {revision.diff.length > 0 ? (
