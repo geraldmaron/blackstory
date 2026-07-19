@@ -29,8 +29,8 @@ const tileCreditsPath = join(
   scriptDir,
   '../../../apps/web/src/components/atmosphere/tile-credits.ts',
 );
-/** Broader pool for story masts + about living mosaic (was 24). */
-const TILE_COUNT = 48;
+/** Cap high; dry-run currently supplies ~238 auto_propose (PD first, then licensed). */
+const TILE_COUNT = 500;
 
 type Propose = {
   readonly outcome: string;
@@ -84,9 +84,14 @@ async function main(): Promise<void> {
   let i = 0;
   for (const propose of selected) {
     i += 1;
-    const index = String(i).padStart(2, '0');
+    const index = String(i).padStart(3, '0');
     const dest = join(outDir, `${index}.jpg`);
     const url = `https://storage.googleapis.com/${BUCKET}/public/entities/${propose.entityId}/primary.jpg`;
+    if (existsSync(dest)) {
+      manifest.push({ index, entityId: propose.entityId, url });
+      console.log(`${index} ∃ ${propose.entityId}`);
+      continue;
+    }
     const ok = await download(url, dest);
     if (!ok) {
       // try .png

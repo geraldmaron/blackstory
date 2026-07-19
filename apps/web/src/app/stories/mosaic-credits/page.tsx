@@ -27,7 +27,7 @@ export default function MosaicCreditsPage() {
           rights-cleared archive images, served from this site — never hotlinked from Wikimedia at
           request time. The mosaic is symbolic atmosphere, not a photograph of a page subject. On
           about, tiles periodically swap from the broader pool; motion stops under reduced-motion or
-          Save-Data.
+          Save-Data. When a tile matches a published record, it opens that entity page.
         </p>
       </header>
 

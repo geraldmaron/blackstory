@@ -282,10 +282,10 @@ compact), result list as top-rule entries with mono meta lines. Pagination quiet
 **Longform (`/methodology`, `/legal/[slug]`)** — single serif
 column (`--ds-content-max`), numbered Sora subheads, mono citations. No cards.
 
-**`/about`** — longform serif column with a living archive mosaic in the desktop open gutter
-(`LivingAtmosphereMosaic` / `AboutMosaicRail`): same rights-cleared B&W collage pool as story
-masts, with opacity tile swaps from the broader pool. Narrow viewports show the mosaic as a band
-under the lede. Attribution at `/stories/mosaic-credits`.
+**`/about`** — full-bleed living mosaic mast (thesis + copper CTA over archive collage), then
+presence/evidence/dignity pillars, three numbered editorial beats, one ink publish-bar band, and
+destination rows. Tiles swap softly and open `/entity/[id]` when selected. Attribution at
+`/stories/mosaic-credits`. Not a documentation longform column.
 
 **Forms (`/submit`, `/corrections`)** — single column, native controls at 44px, labels in
 Inter 600 0.8125rem sentence case (not mono caps), serif intro, one copper submit per form.
@@ -310,8 +310,8 @@ requires updating every prior use of the pattern it replaces — no parallel voc
 - `AtmospherePlane` + `selectAtmospherePlane` — story mast media plane (`mode: mosaic` default,
   `geometric` fallback); tiles from `tile-credits.ts`. Entity pages use `EntityRecordMark`
   instead — never collage mosaics on `/entity/[id]`.
-- `LivingAtmosphereMosaic` + `AboutMosaicRail` — about-page living collage rail (opacity tile
-  swaps; static under reduced-motion / Save-Data); same tile pool as story masts.
+- `LivingAtmosphereMosaic` + `AboutMosaicMast` — about-page full-bleed living collage mast
+  (opacity tile swaps; entity click-through; static under reduced-motion / Save-Data).
 - `Notice` — the only honest-state surface; never toasts.
 - Tokens only; no raw hex, no shadows, no gradients; hairlines carry separation.
 

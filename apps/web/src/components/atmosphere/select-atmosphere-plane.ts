@@ -18,7 +18,7 @@ import {
   type AtmosphereTileCredit,
 } from './tile-credits';
 
-export type AtmosphereDensity = 12 | 16;
+export type AtmosphereDensity = 12 | 16 | 24 | 32 | 48;
 
 export type AtmospherePlaneSelectionInput = {
   readonly seedKey: string;

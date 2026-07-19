@@ -5,8 +5,12 @@
 export { AtmospherePlane } from './AtmospherePlane';
 export type { AtmospherePlaneProps } from './AtmospherePlane';
 export { LivingAtmosphereMosaic } from './LivingAtmosphereMosaic';
-export type { LivingAtmosphereMosaicProps } from './LivingAtmosphereMosaic';
-export { AboutMosaicRail } from './AboutMosaicRail';
+export type {
+  LivingAtmosphereMosaicProps,
+  MosaicEntityLink,
+} from './LivingAtmosphereMosaic';
+export { AboutMosaicMast, AboutMosaicRail } from './AboutMosaicRail';
+export type { AboutMosaicMastProps } from './AboutMosaicRail';
 export {
   GEOMETRIC_FALLBACKS,
   GEOMETRIC_FALLBACK_IDS,

@@ -1,23 +1,69 @@
 /**
- * About-page mosaic rail — fills the desktop open gutter beside longform copy
- * with a living archive collage. Decorative; credits link is the accessible
- * attribution surface.
+ * About mosaic mast — full-bleed living collage behind the product thesis.
+ * Resolves entity link targets for tiles that open published records.
  */
-'use client';
-
 import Link from 'next/link';
-import { ATMOSPHERE_ATTRIBUTION_HREF } from './tile-credits';
-import { LivingAtmosphereMosaic } from './LivingAtmosphereMosaic';
+import type { ReactNode } from 'react';
+import { listPublicEntityViews } from '../../lib/public-data/source';
+import {
+  ATMOSPHERE_ATTRIBUTION_HREF,
+  ATMOSPHERE_TILE_CREDITS,
+} from './tile-credits';
+import {
+  LivingAtmosphereMosaic,
+  type MosaicEntityLink,
+} from './LivingAtmosphereMosaic';
 import './atmosphere.css';
 
-export function AboutMosaicRail() {
+function humanizeEntityId(entityId: string): string {
+  return entityId
+    .replace(/^ent_/, '')
+    .replace(/_\d+$/, '')
+    .split('_')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+export type AboutMosaicMastProps = {
+  readonly children: ReactNode;
+};
+
+export async function AboutMosaicMast({ children }: AboutMosaicMastProps) {
+  const { data: entities } = await listPublicEntityViews();
+  const byId = new Map(entities.map((entity) => [entity.id, entity] as const));
+
+  const entityLinks: Readonly<Record<string, MosaicEntityLink>> = Object.fromEntries(
+    ATMOSPHERE_TILE_CREDITS.map((tile) => {
+      const entity = byId.get(tile.entityId);
+      const label = entity?.displayName.trim() || humanizeEntityId(tile.entityId);
+      return [
+        tile.entityId,
+        { href: `/entity/${tile.entityId}`, label } satisfies MosaicEntityLink,
+      ];
+    }),
+  );
+
   return (
-    <aside className="ds-about__mosaic-rail">
-      <LivingAtmosphereMosaic seedKey="about" density={16} columns={4} />
-      <p className="ds-about__mosaic-credit">
-        Archive mosaic · symbolic atmosphere.{' '}
-        <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
-      </p>
-    </aside>
+    <header className="ds-about-mast">
+      <LivingAtmosphereMosaic
+        seedKey="about"
+        density={48}
+        columns={8}
+        entityLinks={entityLinks}
+        className="ds-about-mast__plane"
+      />
+      <div className="ds-about-mast__scrim" aria-hidden="true" />
+      <div className="ds-container ds-about-mast__inner">
+        {children}
+        <p className="ds-about-mast__credit">
+          Archive mosaic · symbolic atmosphere · select a tile to open its record.{' '}
+          <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
+        </p>
+      </div>
+    </header>
   );
 }
+
+/** @deprecated Prefer AboutMosaicMast — kept as alias during the about redesign. */
+export const AboutMosaicRail = AboutMosaicMast;

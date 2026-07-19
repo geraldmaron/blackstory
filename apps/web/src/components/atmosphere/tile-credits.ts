@@ -14,336 +14,1638 @@ export type AtmosphereTileCredit = {
   readonly sourceUrl: string;
 };
 
-/** 47-tile pool — index order matches public/brand/collage/tiles/manifest.json. */
+/** 233-tile pool — index order matches public/brand/collage/tiles/manifest.json. */
 export const ATMOSPHERE_TILE_CREDITS: readonly AtmosphereTileCredit[] = [
   {
-    index: '01',
+    index: '001',
     entityId: 'ent_maggie_l_walker_001',
-    path: '/brand/collage/tiles/01.jpg',
+    path: '/brand/collage/tiles/001.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_maggie_l_walker_001/primary.jpg',
   },
   {
-    index: '02',
+    index: '002',
     entityId: 'ent_ursula_burns_001',
-    path: '/brand/collage/tiles/02.jpg',
+    path: '/brand/collage/tiles/002.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_ursula_burns_001/primary.jpg',
   },
   {
-    index: '03',
+    index: '003',
     entityId: 'ent_kenneth_chenault_001',
-    path: '/brand/collage/tiles/03.jpg',
+    path: '/brand/collage/tiles/003.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_kenneth_chenault_001/primary.jpg',
   },
   {
-    index: '04',
+    index: '004',
     entityId: 'ent_robert_l_johnson_001',
-    path: '/brand/collage/tiles/04.jpg',
+    path: '/brand/collage/tiles/004.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_robert_l_johnson_001/primary.jpg',
   },
   {
-    index: '05',
+    index: '005',
     entityId: 'ent_john_h_johnson_001',
-    path: '/brand/collage/tiles/05.jpg',
+    path: '/brand/collage/tiles/005.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_john_h_johnson_001/primary.jpg',
   },
   {
-    index: '06',
+    index: '006',
     entityId: 'ent_bessie_coleman_001',
-    path: '/brand/collage/tiles/06.jpg',
+    path: '/brand/collage/tiles/006.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_bessie_coleman_001/primary.jpg',
   },
   {
-    index: '07',
+    index: '007',
     entityId: 'ent_eugene_bullard_001',
-    path: '/brand/collage/tiles/07.jpg',
+    path: '/brand/collage/tiles/007.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_eugene_bullard_001/primary.jpg',
   },
   {
-    index: '08',
+    index: '008',
     entityId: 'ent_willa_brown_001',
-    path: '/brand/collage/tiles/08.jpg',
+    path: '/brand/collage/tiles/008.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_willa_brown_001/primary.jpg',
   },
   {
-    index: '09',
+    index: '009',
     entityId: 'ent_guion_bluford_001',
-    path: '/brand/collage/tiles/09.jpg',
+    path: '/brand/collage/tiles/009.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_guion_bluford_001/primary.jpg',
   },
   {
-    index: '10',
+    index: '010',
     entityId: 'ent_mae_jemison_001',
-    path: '/brand/collage/tiles/10.jpg',
+    path: '/brand/collage/tiles/010.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_mae_jemison_001/primary.jpg',
   },
   {
-    index: '11',
+    index: '011',
     entityId: 'ent_ronald_mcnair_001',
-    path: '/brand/collage/tiles/11.jpg',
+    path: '/brand/collage/tiles/011.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_ronald_mcnair_001/primary.jpg',
   },
   {
-    index: '12',
+    index: '012',
     entityId: 'ent_charles_bolden_001',
-    path: '/brand/collage/tiles/12.jpg',
+    path: '/brand/collage/tiles/012.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_charles_bolden_001/primary.jpg',
   },
   {
-    index: '13',
+    index: '013',
     entityId: 'ent_robert_h_lawrence_001',
-    path: '/brand/collage/tiles/13.jpg',
+    path: '/brand/collage/tiles/013.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_robert_h_lawrence_001/primary.jpg',
   },
   {
-    index: '14',
+    index: '014',
     entityId: 'ent_katherine_johnson_001',
-    path: '/brand/collage/tiles/14.jpg',
+    path: '/brand/collage/tiles/014.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_katherine_johnson_001/primary.jpg',
   },
   {
-    index: '15',
+    index: '015',
     entityId: 'ent_dorothy_vaughan_001',
-    path: '/brand/collage/tiles/15.jpg',
+    path: '/brand/collage/tiles/015.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_dorothy_vaughan_001/primary.jpg',
   },
   {
-    index: '16',
+    index: '016',
     entityId: 'ent_patricia_bath_001',
-    path: '/brand/collage/tiles/16.jpg',
+    path: '/brand/collage/tiles/016.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_patricia_bath_001/primary.jpg',
   },
   {
-    index: '17',
+    index: '017',
     entityId: 'ent_ernest_everett_just_001',
-    path: '/brand/collage/tiles/17.jpg',
+    path: '/brand/collage/tiles/017.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_ernest_everett_just_001/primary.jpg',
   },
   {
-    index: '18',
+    index: '018',
     entityId: 'ent_marie_maynard_daly_001',
-    path: '/brand/collage/tiles/18.jpg',
+    path: '/brand/collage/tiles/018.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_marie_maynard_daly_001/primary.jpg',
   },
   {
-    index: '19',
+    index: '019',
     entityId: 'ent_james_mccune_smith_001',
-    path: '/brand/collage/tiles/19.jpg',
+    path: '/brand/collage/tiles/019.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_james_mccune_smith_001/primary.jpg',
   },
   {
-    index: '20',
+    index: '020',
     entityId: 'ent_alexa_canady_001',
-    path: '/brand/collage/tiles/20.jpg',
+    path: '/brand/collage/tiles/020.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_alexa_canady_001/primary.jpg',
   },
   {
-    index: '21',
+    index: '021',
     entityId: 'ent_garrett_morgan_001',
-    path: '/brand/collage/tiles/21.jpg',
+    path: '/brand/collage/tiles/021.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_garrett_morgan_001/primary.jpg',
   },
   {
-    index: '22',
+    index: '022',
     entityId: 'ent_frederick_mckinley_jones_001',
-    path: '/brand/collage/tiles/22.jpg',
+    path: '/brand/collage/tiles/022.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_frederick_mckinley_jones_001/primary.jpg',
   },
   {
-    index: '23',
+    index: '023',
     entityId: 'ent_granville_woods_001',
-    path: '/brand/collage/tiles/23.jpg',
+    path: '/brand/collage/tiles/023.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_granville_woods_001/primary.jpg',
   },
   {
-    index: '24',
+    index: '024',
     entityId: 'ent_elijah_mccoy_001',
-    path: '/brand/collage/tiles/24.jpg',
+    path: '/brand/collage/tiles/024.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_elijah_mccoy_001/primary.jpg',
   },
   {
-    index: '25',
+    index: '025',
     entityId: 'ent_george_washington_carver_001',
-    path: '/brand/collage/tiles/25.jpg',
+    path: '/brand/collage/tiles/025.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_george_washington_carver_001/primary.jpg',
   },
   {
-    index: '26',
+    index: '026',
     entityId: 'ent_otis_boykin_001',
-    path: '/brand/collage/tiles/26.jpg',
+    path: '/brand/collage/tiles/026.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_otis_boykin_001/primary.jpg',
   },
   {
-    index: '27',
+    index: '027',
+    entityId: 'ent_valerie_thomas_001',
+    path: '/brand/collage/tiles/027.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_valerie_thomas_001/primary.jpg',
+  },
+  {
+    index: '028',
     entityId: 'ent_norbert_rillieux_001',
-    path: '/brand/collage/tiles/27.jpg',
+    path: '/brand/collage/tiles/028.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_norbert_rillieux_001/primary.jpg',
   },
   {
-    index: '28',
+    index: '029',
     entityId: 'ent_sarah_e_goode_001',
-    path: '/brand/collage/tiles/28.jpg',
+    path: '/brand/collage/tiles/029.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_sarah_e_goode_001/primary.jpg',
   },
   {
-    index: '29',
+    index: '030',
     entityId: 'ent_emmett_chappelle_001',
-    path: '/brand/collage/tiles/29.jpg',
+    path: '/brand/collage/tiles/030.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_emmett_chappelle_001/primary.jpg',
   },
   {
-    index: '30',
+    index: '031',
     entityId: 'ent_solomon_carter_fuller_001',
-    path: '/brand/collage/tiles/30.jpg',
+    path: '/brand/collage/tiles/031.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_solomon_carter_fuller_001/primary.jpg',
   },
   {
-    index: '31',
+    index: '032',
     entityId: 'ent_african_meeting_house_001',
-    path: '/brand/collage/tiles/31.jpg',
+    path: '/brand/collage/tiles/032.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_african_meeting_house_001/primary.jpg',
   },
   {
-    index: '32',
+    index: '033',
     entityId: 'ent_ebenezer_baptist_atlanta_001',
-    path: '/brand/collage/tiles/32.jpg',
+    path: '/brand/collage/tiles/033.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_ebenezer_baptist_atlanta_001/primary.jpg',
   },
   {
-    index: '33',
+    index: '034',
     entityId: 'ent_clayborn_temple_001',
-    path: '/brand/collage/tiles/33.jpg',
+    path: '/brand/collage/tiles/034.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_clayborn_temple_001/primary.jpg',
   },
   {
-    index: '34',
+    index: '035',
     entityId: 'ent_chicago_freedom_movement_001',
-    path: '/brand/collage/tiles/34.jpg',
+    path: '/brand/collage/tiles/035.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_chicago_freedom_movement_001/primary.jpg',
   },
   {
-    index: '35',
+    index: '036',
     entityId: 'ent_orangeburg_massacre_001',
-    path: '/brand/collage/tiles/35.jpg',
+    path: '/brand/collage/tiles/036.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_orangeburg_massacre_001/primary.jpg',
   },
   {
-    index: '36',
+    index: '037',
     entityId: 'ent_gaston_motel_001',
-    path: '/brand/collage/tiles/36.jpg',
+    path: '/brand/collage/tiles/037.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_gaston_motel_001/primary.jpg',
   },
   {
-    index: '37',
+    index: '038',
     entityId: 'ent_martin_luther_king_jr_001',
-    path: '/brand/collage/tiles/37.jpg',
+    path: '/brand/collage/tiles/038.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_martin_luther_king_jr_001/primary.jpg',
   },
   {
-    index: '38',
+    index: '039',
     entityId: 'ent_malcolm_x_001',
-    path: '/brand/collage/tiles/38.jpg',
+    path: '/brand/collage/tiles/039.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_malcolm_x_001/primary.jpg',
   },
   {
-    index: '39',
+    index: '040',
     entityId: 'ent_ella_baker_001',
-    path: '/brand/collage/tiles/39.jpg',
+    path: '/brand/collage/tiles/040.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_ella_baker_001/primary.jpg',
   },
   {
-    index: '40',
+    index: '041',
     entityId: 'ent_bayard_rustin_001',
-    path: '/brand/collage/tiles/40.jpg',
+    path: '/brand/collage/tiles/041.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_bayard_rustin_001/primary.jpg',
   },
   {
-    index: '41',
+    index: '042',
     entityId: 'ent_fannie_lou_hamer_001',
-    path: '/brand/collage/tiles/41.jpg',
+    path: '/brand/collage/tiles/042.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_fannie_lou_hamer_001/primary.jpg',
   },
   {
-    index: '42',
+    index: '043',
     entityId: 'ent_john_lewis_001',
-    path: '/brand/collage/tiles/42.jpg',
+    path: '/brand/collage/tiles/043.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_john_lewis_001/primary.jpg',
   },
   {
-    index: '43',
+    index: '044',
     entityId: 'ent_james_meredith_001',
-    path: '/brand/collage/tiles/43.jpg',
+    path: '/brand/collage/tiles/044.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_james_meredith_001/primary.jpg',
   },
   {
-    index: '44',
+    index: '045',
     entityId: 'ent_ralph_abernathy_001',
-    path: '/brand/collage/tiles/44.jpg',
+    path: '/brand/collage/tiles/045.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_ralph_abernathy_001/primary.jpg',
   },
   {
-    index: '45',
+    index: '046',
     entityId: 'ent_hosea_williams_001',
-    path: '/brand/collage/tiles/45.jpg',
+    path: '/brand/collage/tiles/046.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_hosea_williams_001/primary.jpg',
   },
   {
-    index: '46',
+    index: '047',
     entityId: 'ent_charles_sherrod_001',
-    path: '/brand/collage/tiles/46.jpg',
+    path: '/brand/collage/tiles/047.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_charles_sherrod_001/primary.jpg',
   },
   {
-    index: '47',
+    index: '048',
     entityId: 'ent_james_bevel_001',
-    path: '/brand/collage/tiles/47.jpg',
+    path: '/brand/collage/tiles/048.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_james_bevel_001/primary.jpg',
+  },
+  {
+    index: '049',
+    entityId: 'ent_cleveland_sellers_001',
+    path: '/brand/collage/tiles/049.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_cleveland_sellers_001/primary.jpg',
+  },
+  {
+    index: '050',
+    entityId: 'ent_edmund_pettus_bridge_001',
+    path: '/brand/collage/tiles/050.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_edmund_pettus_bridge_001/primary.jpg',
+  },
+  {
+    index: '051',
+    entityId: 'ent_harlem_001',
+    path: '/brand/collage/tiles/051.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_harlem_001/primary.jpg',
+  },
+  {
+    index: '052',
+    entityId: 'ent_nicodemus_001',
+    path: '/brand/collage/tiles/052.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_nicodemus_001/primary.jpg',
+  },
+  {
+    index: '053',
+    entityId: 'ent_tubman_underground_railroad_md_001',
+    path: '/brand/collage/tiles/053.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_tubman_underground_railroad_md_001/primary.jpg',
+  },
+  {
+    index: '054',
+    entityId: 'ent_john_parker_house_001',
+    path: '/brand/collage/tiles/054.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_john_parker_house_001/primary.jpg',
+  },
+  {
+    index: '055',
+    entityId: 'ent_seneca_village_001',
+    path: '/brand/collage/tiles/055.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_seneca_village_001/primary.jpg',
+  },
+  {
+    index: '056',
+    entityId: 'ent_joseph_rainey_001',
+    path: '/brand/collage/tiles/056.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_joseph_rainey_001/primary.jpg',
+  },
+  {
+    index: '057',
+    entityId: 'ent_jonathan_jasper_wright_001',
+    path: '/brand/collage/tiles/057.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_jonathan_jasper_wright_001/primary.jpg',
+  },
+  {
+    index: '058',
+    entityId: 'ent_robert_smalls_001',
+    path: '/brand/collage/tiles/058.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_robert_smalls_001/primary.jpg',
+  },
+  {
+    index: '059',
+    entityId: 'ent_john_mercer_langston_001',
+    path: '/brand/collage/tiles/059.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_john_mercer_langston_001/primary.jpg',
+  },
+  {
+    index: '060',
+    entityId: 'ent_mifflin_wistar_gibbs_001',
+    path: '/brand/collage/tiles/060.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_mifflin_wistar_gibbs_001/primary.jpg',
+  },
+  {
+    index: '061',
+    entityId: 'ent_alexander_augusta_001',
+    path: '/brand/collage/tiles/061.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_alexander_augusta_001/primary.jpg',
+  },
+  {
+    index: '062',
+    entityId: 'ent_martin_delany_001',
+    path: '/brand/collage/tiles/062.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_martin_delany_001/primary.jpg',
+  },
+  {
+    index: '063',
+    entityId: 'ent_william_harvey_carney_001',
+    path: '/brand/collage/tiles/063.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_william_harvey_carney_001/primary.jpg',
+  },
+  {
+    index: '064',
+    entityId: 'ent_coleman_young_001',
+    path: '/brand/collage/tiles/064.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_coleman_young_001/primary.jpg',
+  },
+  {
+    index: '065',
+    entityId: 'ent_david_dinkins_001',
+    path: '/brand/collage/tiles/065.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_david_dinkins_001/primary.jpg',
+  },
+  {
+    index: '066',
+    entityId: 'ent_karen_bass_001',
+    path: '/brand/collage/tiles/066.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_karen_bass_001/primary.jpg',
+  },
+  {
+    index: '067',
+    entityId: 'ent_shirley_chisholm_001',
+    path: '/brand/collage/tiles/067.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_shirley_chisholm_001/primary.jpg',
+  },
+  {
+    index: '068',
+    entityId: 'ent_barbara_jordan_001',
+    path: '/brand/collage/tiles/068.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_barbara_jordan_001/primary.jpg',
+  },
+  {
+    index: '069',
+    entityId: 'ent_andrew_young_001',
+    path: '/brand/collage/tiles/069.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_andrew_young_001/primary.jpg',
+  },
+  {
+    index: '070',
+    entityId: 'ent_douglas_wilder_001',
+    path: '/brand/collage/tiles/070.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_douglas_wilder_001/primary.jpg',
+  },
+  {
+    index: '071',
+    entityId: 'ent_carol_moseley_braun_001',
+    path: '/brand/collage/tiles/071.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_carol_moseley_braun_001/primary.jpg',
+  },
+  {
+    index: '072',
+    entityId: 'ent_deval_patrick_001',
+    path: '/brand/collage/tiles/072.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_deval_patrick_001/primary.jpg',
+  },
+  {
+    index: '073',
+    entityId: 'ent_david_paterson_001',
+    path: '/brand/collage/tiles/073.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_david_paterson_001/primary.jpg',
+  },
+  {
+    index: '074',
+    entityId: 'ent_augustus_hawkins_001',
+    path: '/brand/collage/tiles/074.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_augustus_hawkins_001/primary.jpg',
+  },
+  {
+    index: '075',
+    entityId: 'ent_adam_clayton_powell_001',
+    path: '/brand/collage/tiles/075.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_adam_clayton_powell_001/primary.jpg',
+  },
+  {
+    index: '076',
+    entityId: 'ent_mervyn_dymally_001',
+    path: '/brand/collage/tiles/076.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_mervyn_dymally_001/primary.jpg',
+  },
+  {
+    index: '077',
+    entityId: 'ent_robert_c_weaver_001',
+    path: '/brand/collage/tiles/077.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_robert_c_weaver_001/primary.jpg',
+  },
+  {
+    index: '078',
+    entityId: 'ent_patricia_roberts_harris_001',
+    path: '/brand/collage/tiles/078.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_patricia_roberts_harris_001/primary.jpg',
+  },
+  {
+    index: '079',
+    entityId: 'ent_thurgood_marshall_001',
+    path: '/brand/collage/tiles/079.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_thurgood_marshall_001/primary.jpg',
+  },
+  {
+    index: '080',
+    entityId: 'ent_constance_baker_motley_001',
+    path: '/brand/collage/tiles/080.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_constance_baker_motley_001/primary.jpg',
+  },
+  {
+    index: '081',
+    entityId: 'ent_jane_bolin_001',
+    path: '/brand/collage/tiles/081.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_jane_bolin_001/primary.jpg',
+  },
+  {
+    index: '082',
+    entityId: 'ent_ron_brown_001',
+    path: '/brand/collage/tiles/082.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_ron_brown_001/primary.jpg',
+  },
+  {
+    index: '083',
+    entityId: 'ent_mike_espy_001',
+    path: '/brand/collage/tiles/083.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_mike_espy_001/primary.jpg',
+  },
+  {
+    index: '084',
+    entityId: 'ent_alexis_herman_001',
+    path: '/brand/collage/tiles/084.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_alexis_herman_001/primary.jpg',
+  },
+  {
+    index: '085',
+    entityId: 'ent_jesse_brown_001',
+    path: '/brand/collage/tiles/085.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_jesse_brown_001/primary.jpg',
+  },
+  {
+    index: '086',
+    entityId: 'ent_franklin_raines_001',
+    path: '/brand/collage/tiles/086.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_franklin_raines_001/primary.jpg',
+  },
+  {
+    index: '087',
+    entityId: 'ent_rod_paige_001',
+    path: '/brand/collage/tiles/087.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_rod_paige_001/primary.jpg',
+  },
+  {
+    index: '088',
+    entityId: 'ent_colin_powell_001',
+    path: '/brand/collage/tiles/088.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_colin_powell_001/primary.jpg',
+  },
+  {
+    index: '089',
+    entityId: 'ent_condoleezza_rice_001',
+    path: '/brand/collage/tiles/089.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_condoleezza_rice_001/primary.jpg',
+  },
+  {
+    index: '090',
+    entityId: 'ent_eric_holder_001',
+    path: '/brand/collage/tiles/090.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_eric_holder_001/primary.jpg',
+  },
+  {
+    index: '091',
+    entityId: 'ent_barack_obama_001',
+    path: '/brand/collage/tiles/091.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_barack_obama_001/primary.jpg',
+  },
+  {
+    index: '092',
+    entityId: 'ent_kamala_harris_001',
+    path: '/brand/collage/tiles/092.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_kamala_harris_001/primary.jpg',
+  },
+  {
+    index: '093',
+    entityId: 'ent_loretta_lynch_001',
+    path: '/brand/collage/tiles/093.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_loretta_lynch_001/primary.jpg',
+  },
+  {
+    index: '094',
+    entityId: 'ent_susan_rice_001',
+    path: '/brand/collage/tiles/094.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_susan_rice_001/primary.jpg',
+  },
+  {
+    index: '095',
+    entityId: 'ent_lloyd_austin_001',
+    path: '/brand/collage/tiles/095.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_lloyd_austin_001/primary.jpg',
+  },
+  {
+    index: '096',
+    entityId: 'ent_benjamin_davis_sr_001',
+    path: '/brand/collage/tiles/096.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_benjamin_davis_sr_001/primary.jpg',
+  },
+  {
+    index: '097',
+    entityId: 'ent_benjamin_davis_jr_001',
+    path: '/brand/collage/tiles/097.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_benjamin_davis_jr_001/primary.jpg',
+  },
+  {
+    index: '098',
+    entityId: 'ent_vernon_baker_001',
+    path: '/brand/collage/tiles/098.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_vernon_baker_001/primary.jpg',
+  },
+  {
+    index: '099',
+    entityId: 'ent_michelle_howard_001',
+    path: '/brand/collage/tiles/099.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_michelle_howard_001/primary.jpg',
+  },
+  {
+    index: '100',
+    entityId: 'ent_roscoe_robinson_001',
+    path: '/brand/collage/tiles/100.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_roscoe_robinson_001/primary.jpg',
+  },
+  {
+    index: '101',
+    entityId: 'ent_samuel_gravely_001',
+    path: '/brand/collage/tiles/101.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_samuel_gravely_001/primary.jpg',
+  },
+  {
+    index: '102',
+    entityId: 'ent_hazel_johnson_brown_001',
+    path: '/brand/collage/tiles/102.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_hazel_johnson_brown_001/primary.jpg',
+  },
+  {
+    index: '103',
+    entityId: 'ent_charity_adams_earley_001',
+    path: '/brand/collage/tiles/103.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_charity_adams_earley_001/primary.jpg',
+  },
+  {
+    index: '104',
+    entityId: 'ent_nancy_leftenant_colon_001',
+    path: '/brand/collage/tiles/104.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_nancy_leftenant_colon_001/primary.jpg',
+  },
+  {
+    index: '105',
+    entityId: 'ent_lee_p_brown_001',
+    path: '/brand/collage/tiles/105.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_lee_p_brown_001/primary.jpg',
+  },
+  {
+    index: '106',
+    entityId: 'ent_meharry_medical_college_001',
+    path: '/brand/collage/tiles/106.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_meharry_medical_college_001/primary.jpg',
+  },
+  {
+    index: '107',
+    entityId: 'ent_prairie_view_am_university_001',
+    path: '/brand/collage/tiles/107.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_prairie_view_am_university_001/primary.jpg',
+  },
+  {
+    index: '108',
+    entityId: 'ent_spelman_college_001',
+    path: '/brand/collage/tiles/108.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_spelman_college_001/primary.jpg',
+  },
+  {
+    index: '109',
+    entityId: 'ent_birmingham_civil_rights_institute_001',
+    path: '/brand/collage/tiles/109.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_birmingham_civil_rights_institute_001/primary.jpg',
+  },
+  {
+    index: '110',
+    entityId: 'ent_law_civil_rights_act_1964',
+    path: '/brand/collage/tiles/110.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_law_civil_rights_act_1964/primary.jpg',
+  },
+  {
+    index: '111',
+    entityId: 'ent_law_voting_rights_act_1965',
+    path: '/brand/collage/tiles/111.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_law_voting_rights_act_1965/primary.jpg',
+  },
+  {
+    index: '112',
+    entityId: 'ent_law_missouri_compromise_1820',
+    path: '/brand/collage/tiles/112.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_law_missouri_compromise_1820/primary.jpg',
+  },
+  {
+    index: '113',
+    entityId: 'ent_law_executive_order_9981_1948',
+    path: '/brand/collage/tiles/113.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_law_executive_order_9981_1948/primary.jpg',
+  },
+  {
+    index: '114',
+    entityId: 'ent_denmark_vesey_001',
+    path: '/brand/collage/tiles/114.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_denmark_vesey_001/primary.jpg',
+  },
+  {
+    index: '115',
+    entityId: 'ent_nat_turner_rebellion_001',
+    path: '/brand/collage/tiles/115.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_nat_turner_rebellion_001/primary.jpg',
+  },
+  {
+    index: '116',
+    entityId: 'ent_levi_coffin_house_001',
+    path: '/brand/collage/tiles/116.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_levi_coffin_house_001/primary.jpg',
+  },
+  {
+    index: '117',
+    entityId: 'ent_william_still_001',
+    path: '/brand/collage/tiles/117.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_william_still_001/primary.jpg',
+  },
+  {
+    index: '118',
+    entityId: 'ent_jermain_loguen_001',
+    path: '/brand/collage/tiles/118.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_jermain_loguen_001/primary.jpg',
+  },
+  {
+    index: '119',
+    entityId: 'ent_lewis_hayden_house_001',
+    path: '/brand/collage/tiles/119.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_lewis_hayden_house_001/primary.jpg',
+  },
+  {
+    index: '120',
+    entityId: 'ent_david_ruggles_001',
+    path: '/brand/collage/tiles/120.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_david_ruggles_001/primary.jpg',
+  },
+  {
+    index: '121',
+    entityId: 'ent_harriet_jacobs_001',
+    path: '/brand/collage/tiles/121.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_harriet_jacobs_001/primary.jpg',
+  },
+  {
+    index: '122',
+    entityId: 'ent_ona_judge_001',
+    path: '/brand/collage/tiles/122.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_ona_judge_001/primary.jpg',
+  },
+  {
+    index: '123',
+    entityId: 'ent_ida_b_wells_001',
+    path: '/brand/collage/tiles/123.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_ida_b_wells_001/primary.jpg',
+  },
+  {
+    index: '124',
+    entityId: 'ent_benjamin_pap_singleton_001',
+    path: '/brand/collage/tiles/124.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_benjamin_pap_singleton_001/primary.jpg',
+  },
+  {
+    index: '125',
+    entityId: 'ent_green_book_001',
+    path: '/brand/collage/tiles/125.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_green_book_001/primary.jpg',
+  },
+  {
+    index: '126',
+    entityId: 'ent_jackie_robinson_001',
+    path: '/brand/collage/tiles/126.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_jackie_robinson_001/primary.jpg',
+  },
+  {
+    index: '127',
+    entityId: 'ent_jesse_owens_001',
+    path: '/brand/collage/tiles/127.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_jesse_owens_001/primary.jpg',
+  },
+  {
+    index: '128',
+    entityId: 'ent_althea_gibson_001',
+    path: '/brand/collage/tiles/128.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_althea_gibson_001/primary.jpg',
+  },
+  {
+    index: '129',
+    entityId: 'ent_willie_oree_001',
+    path: '/brand/collage/tiles/129.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_willie_oree_001/primary.jpg',
+  },
+  {
+    index: '130',
+    entityId: 'ent_charlie_sifford_001',
+    path: '/brand/collage/tiles/130.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_charlie_sifford_001/primary.jpg',
+  },
+  {
+    index: '131',
+    entityId: 'ent_muhammad_ali_001',
+    path: '/brand/collage/tiles/131.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_muhammad_ali_001/primary.jpg',
+  },
+  {
+    index: '132',
+    entityId: 'ent_bill_russell_001',
+    path: '/brand/collage/tiles/132.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_bill_russell_001/primary.jpg',
+  },
+  {
+    index: '133',
+    entityId: 'ent_fritz_pollard_001',
+    path: '/brand/collage/tiles/133.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_fritz_pollard_001/primary.jpg',
+  },
+  {
+    index: '134',
+    entityId: 'ent_rube_foster_001',
+    path: '/brand/collage/tiles/134.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_rube_foster_001/primary.jpg',
+  },
+  {
+    index: '135',
+    entityId: 'ent_josh_gibson_001',
+    path: '/brand/collage/tiles/135.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_josh_gibson_001/primary.jpg',
+  },
+  {
+    index: '136',
+    entityId: 'ent_florence_griffith_joyner_001',
+    path: '/brand/collage/tiles/136.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_florence_griffith_joyner_001/primary.jpg',
+  },
+  {
+    index: '137',
+    entityId: 'ent_vonetta_flowers_001',
+    path: '/brand/collage/tiles/137.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_vonetta_flowers_001/primary.jpg',
+  },
+  {
+    index: '138',
+    entityId: 'ent_marian_anderson_001',
+    path: '/brand/collage/tiles/138.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_marian_anderson_001/primary.jpg',
+  },
+  {
+    index: '139',
+    entityId: 'ent_langston_hughes_001',
+    path: '/brand/collage/tiles/139.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_langston_hughes_001/primary.jpg',
+  },
+  {
+    index: '140',
+    entityId: 'ent_billie_holiday_001',
+    path: '/brand/collage/tiles/140.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_billie_holiday_001/primary.jpg',
+  },
+  {
+    index: '141',
+    entityId: 'ent_bessie_smith_001',
+    path: '/brand/collage/tiles/141.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_bessie_smith_001/primary.jpg',
+  },
+  {
+    index: '142',
+    entityId: 'ent_dorothy_dandridge_001',
+    path: '/brand/collage/tiles/142.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_dorothy_dandridge_001/primary.jpg',
+  },
+  {
+    index: '143',
+    entityId: 'ent_hattie_mcdaniel_001',
+    path: '/brand/collage/tiles/143.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_hattie_mcdaniel_001/primary.jpg',
+  },
+  {
+    index: '144',
+    entityId: 'ent_sidney_poitier_001',
+    path: '/brand/collage/tiles/144.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_sidney_poitier_001/primary.jpg',
+  },
+  {
+    index: '145',
+    entityId: 'ent_diahann_carroll_001',
+    path: '/brand/collage/tiles/145.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_diahann_carroll_001/primary.jpg',
+  },
+  {
+    index: '146',
+    entityId: 'ent_louis_armstrong_001',
+    path: '/brand/collage/tiles/146.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_louis_armstrong_001/primary.jpg',
+  },
+  {
+    index: '147',
+    entityId: 'ent_scott_joplin_001',
+    path: '/brand/collage/tiles/147.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_scott_joplin_001/primary.jpg',
+  },
+  {
+    index: '148',
+    entityId: 'ent_alvin_ailey_001',
+    path: '/brand/collage/tiles/148.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_alvin_ailey_001/primary.jpg',
+  },
+  {
+    index: '149',
+    entityId: 'ent_katherine_dunham_001',
+    path: '/brand/collage/tiles/149.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_katherine_dunham_001/primary.jpg',
+  },
+  {
+    index: '150',
+    entityId: 'ent_gordon_parks_001',
+    path: '/brand/collage/tiles/150.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_gordon_parks_001/primary.jpg',
+  },
+  {
+    index: '151',
+    entityId: 'ent_aretha_franklin_001',
+    path: '/brand/collage/tiles/151.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_aretha_franklin_001/primary.jpg',
+  },
+  {
+    index: '152',
+    entityId: 'ent_michael_jackson_001',
+    path: '/brand/collage/tiles/152.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_michael_jackson_001/primary.jpg',
+  },
+  {
+    index: '153',
+    entityId: 'ent_miles_davis_001',
+    path: '/brand/collage/tiles/153.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_miles_davis_001/primary.jpg',
+  },
+  {
+    index: '154',
+    entityId: 'ent_john_coltrane_001',
+    path: '/brand/collage/tiles/154.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_john_coltrane_001/primary.jpg',
+  },
+  {
+    index: '155',
+    entityId: 'ent_nina_simone_001',
+    path: '/brand/collage/tiles/155.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_nina_simone_001/primary.jpg',
+  },
+  {
+    index: '156',
+    entityId: 'ent_zora_neale_hurston_001',
+    path: '/brand/collage/tiles/156.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_zora_neale_hurston_001/primary.jpg',
+  },
+  {
+    index: '157',
+    entityId: 'ent_frank_robinson_001',
+    path: '/brand/collage/tiles/157.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_frank_robinson_001/primary.jpg',
+  },
+  {
+    index: '158',
+    entityId: 'ent_wyomia_tyus_001',
+    path: '/brand/collage/tiles/158.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_wyomia_tyus_001/primary.jpg',
+  },
+  {
+    index: '159',
+    entityId: 'ent_tommie_smith_001',
+    path: '/brand/collage/tiles/159.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_tommie_smith_001/primary.jpg',
+  },
+  {
+    index: '160',
+    entityId: 'ent_gwendolyn_brooks_001',
+    path: '/brand/collage/tiles/160.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_gwendolyn_brooks_001/primary.jpg',
+  },
+  {
+    index: '161',
+    entityId: 'ent_phillis_wheatley_001',
+    path: '/brand/collage/tiles/161.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_phillis_wheatley_001/primary.jpg',
+  },
+  {
+    index: '162',
+    entityId: 'ent_cynt_marshall_001',
+    path: '/brand/collage/tiles/162.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_cynt_marshall_001/primary.jpg',
+  },
+  {
+    index: '163',
+    entityId: 'ent_earl_g_graves_sr_001',
+    path: '/brand/collage/tiles/163.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_earl_g_graves_sr_001/primary.jpg',
+  },
+  {
+    index: '164',
+    entityId: 'ent_daniel_hale_williams_001',
+    path: '/brand/collage/tiles/164.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_daniel_hale_williams_001/primary.jpg',
+  },
+  {
+    index: '165',
+    entityId: 'ent_david_blackwell_001',
+    path: '/brand/collage/tiles/165.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_david_blackwell_001/primary.jpg',
+  },
+  {
+    index: '166',
+    entityId: 'ent_shirley_ann_jackson_001',
+    path: '/brand/collage/tiles/166.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_shirley_ann_jackson_001/primary.jpg',
+  },
+  {
+    index: '167',
+    entityId: 'ent_ralph_bunche_001',
+    path: '/brand/collage/tiles/167.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_ralph_bunche_001/primary.jpg',
+  },
+  {
+    index: '168',
+    entityId: 'ent_toni_morrison_001',
+    path: '/brand/collage/tiles/168.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_toni_morrison_001/primary.jpg',
+  },
+  {
+    index: '169',
+    entityId: 'ent_rebecca_lee_crumpler_001',
+    path: '/brand/collage/tiles/169.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_rebecca_lee_crumpler_001/primary.jpg',
+  },
+  {
+    index: '170',
+    entityId: 'ent_ben_carson_001',
+    path: '/brand/collage/tiles/170.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_ben_carson_001/primary.jpg',
+  },
+  {
+    index: '171',
+    entityId: 'ent_marian_croak_001',
+    path: '/brand/collage/tiles/171.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_marian_croak_001/primary.jpg',
+  },
+  {
+    index: '172',
+    entityId: 'ent_mother_ame_zion_001',
+    path: '/brand/collage/tiles/172.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_mother_ame_zion_001/primary.jpg',
+  },
+  {
+    index: '173',
+    entityId: 'ent_abyssinian_baptist_001',
+    path: '/brand/collage/tiles/173.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_abyssinian_baptist_001/primary.jpg',
+  },
+  {
+    index: '174',
+    entityId: 'ent_big_bethel_ame_001',
+    path: '/brand/collage/tiles/174.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_big_bethel_ame_001/primary.jpg',
+  },
+  {
+    index: '175',
+    entityId: 'ent_dexter_parsonage_museum_001',
+    path: '/brand/collage/tiles/175.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_dexter_parsonage_museum_001/primary.jpg',
+  },
+  {
+    index: '176',
+    entityId: 'ent_mlk_memorial_dc_001',
+    path: '/brand/collage/tiles/176.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_mlk_memorial_dc_001/primary.jpg',
+  },
+  {
+    index: '177',
+    entityId: 'ent_audubon_ballroom_001',
+    path: '/brand/collage/tiles/177.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_audubon_ballroom_001/primary.jpg',
+  },
+  {
+    index: '178',
+    entityId: 'ent_nashville_student_movement_001',
+    path: '/brand/collage/tiles/178.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_nashville_student_movement_001/primary.jpg',
+  },
+  {
+    index: '179',
+    entityId: 'ent_fred_shuttlesworth_001',
+    path: '/brand/collage/tiles/179.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_fred_shuttlesworth_001/primary.jpg',
+  },
+  {
+    index: '180',
+    entityId: 'ent_amelia_boynton_robinson_001',
+    path: '/brand/collage/tiles/180.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_amelia_boynton_robinson_001/primary.jpg',
+  },
+  {
+    index: '181',
+    entityId: 'ent_julian_bond_001',
+    path: '/brand/collage/tiles/181.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_julian_bond_001/primary.jpg',
+  },
+  {
+    index: '182',
+    entityId: 'ent_unita_blackwell_001',
+    path: '/brand/collage/tiles/182.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_unita_blackwell_001/primary.jpg',
+  },
+  {
+    index: '183',
+    entityId: 'ent_kelly_ingram_park_001',
+    path: '/brand/collage/tiles/183.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_kelly_ingram_park_001/primary.jpg',
+  },
+  {
+    index: '184',
+    entityId: 'ent_medgar_evers_home_001',
+    path: '/brand/collage/tiles/184.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_medgar_evers_home_001/primary.jpg',
+  },
+  {
+    index: '185',
+    entityId: 'ent_dorchester_academy_001',
+    path: '/brand/collage/tiles/185.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_dorchester_academy_001/primary.jpg',
+  },
+  {
+    index: '186',
+    entityId: 'ent_sweet_auburn_001',
+    path: '/brand/collage/tiles/186.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_sweet_auburn_001/primary.jpg',
+  },
+  {
+    index: '187',
+    entityId: 'ent_beale_street_001',
+    path: '/brand/collage/tiles/187.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_beale_street_001/primary.jpg',
+  },
+  {
+    index: '188',
+    entityId: 'ent_jackson_ward_001',
+    path: '/brand/collage/tiles/188.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_jackson_ward_001/primary.jpg',
+  },
+  {
+    index: '189',
+    entityId: 'ent_treme_001',
+    path: '/brand/collage/tiles/189.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_treme_001/primary.jpg',
+  },
+  {
+    index: '190',
+    entityId: 'ent_africatown_001',
+    path: '/brand/collage/tiles/190.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_africatown_001/primary.jpg',
+  },
+  {
+    index: '191',
+    entityId: 'ent_macon_bolling_allen_001',
+    path: '/brand/collage/tiles/191.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_macon_bolling_allen_001/primary.jpg',
+  },
+  {
+    index: '192',
+    entityId: 'ent_harold_washington_001',
+    path: '/brand/collage/tiles/192.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_harold_washington_001/primary.jpg',
+  },
+  {
+    index: '193',
+    entityId: 'ent_wilson_goode_001',
+    path: '/brand/collage/tiles/193.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_wilson_goode_001/primary.jpg',
+  },
+  {
+    index: '194',
+    entityId: 'ent_sharon_pratt_001',
+    path: '/brand/collage/tiles/194.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_sharon_pratt_001/primary.jpg',
+  },
+  {
+    index: '195',
+    entityId: 'ent_howard_university_001',
+    path: '/brand/collage/tiles/195.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_howard_university_001/primary.jpg',
+  },
+  {
+    index: '196',
+    entityId: 'ent_fisk_university_001',
+    path: '/brand/collage/tiles/196.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_fisk_university_001/primary.jpg',
+  },
+  {
+    index: '197',
+    entityId: 'ent_morgan_state_university_001',
+    path: '/brand/collage/tiles/197.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_morgan_state_university_001/primary.jpg',
+  },
+  {
+    index: '198',
+    entityId: 'ent_hampton_university_001',
+    path: '/brand/collage/tiles/198.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_hampton_university_001/primary.jpg',
+  },
+  {
+    index: '199',
+    entityId: 'ent_clark_atlanta_university_001',
+    path: '/brand/collage/tiles/199.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_clark_atlanta_university_001/primary.jpg',
+  },
+  {
+    index: '200',
+    entityId: 'ent_tuskegee_university_001',
+    path: '/brand/collage/tiles/200.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_tuskegee_university_001/primary.jpg',
+  },
+  {
+    index: '201',
+    entityId: 'ent_florida_am_university_001',
+    path: '/brand/collage/tiles/201.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_florida_am_university_001/primary.jpg',
+  },
+  {
+    index: '202',
+    entityId: 'ent_xavier_university_louisiana_001',
+    path: '/brand/collage/tiles/202.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_xavier_university_louisiana_001/primary.jpg',
+  },
+  {
+    index: '203',
+    entityId: 'ent_dillard_university_001',
+    path: '/brand/collage/tiles/203.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_dillard_university_001/primary.jpg',
+  },
+  {
+    index: '204',
+    entityId: 'ent_rosa_parks_museum_001',
+    path: '/brand/collage/tiles/204.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_rosa_parks_museum_001/primary.jpg',
+  },
+  {
+    index: '205',
+    entityId: 'ent_apollo_theater_001',
+    path: '/brand/collage/tiles/205.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_apollo_theater_001/primary.jpg',
+  },
+  {
+    index: '206',
+    entityId: 'ent_schomburg_center_001',
+    path: '/brand/collage/tiles/206.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_schomburg_center_001/primary.jpg',
+  },
+  {
+    index: '207',
+    entityId: 'ent_nmaahc_001',
+    path: '/brand/collage/tiles/207.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_nmaahc_001/primary.jpg',
+  },
+  {
+    index: '208',
+    entityId: 'ent_studio_museum_harlem_001',
+    path: '/brand/collage/tiles/208.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_studio_museum_harlem_001/primary.jpg',
+  },
+  {
+    index: '209',
+    entityId: 'ent_charles_wright_museum_001',
+    path: '/brand/collage/tiles/209.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_charles_wright_museum_001/primary.jpg',
+  },
+  {
+    index: '210',
+    entityId: 'ent_negro_leagues_baseball_museum_001',
+    path: '/brand/collage/tiles/210.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_negro_leagues_baseball_museum_001/primary.jpg',
+  },
+  {
+    index: '211',
+    entityId: 'ent_aamp_philadelphia_001',
+    path: '/brand/collage/tiles/211.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_aamp_philadelphia_001/primary.jpg',
+  },
+  {
+    index: '212',
+    entityId: 'ent_americas_black_holocaust_museum_001',
+    path: '/brand/collage/tiles/212.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_americas_black_holocaust_museum_001/primary.jpg',
+  },
+  {
+    index: '213',
+    entityId: 'ent_freedom_center_001',
+    path: '/brand/collage/tiles/213.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_freedom_center_001/primary.jpg',
+  },
+  {
+    index: '214',
+    entityId: 'ent_iaam_charleston_001',
+    path: '/brand/collage/tiles/214.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_iaam_charleston_001/primary.jpg',
+  },
+  {
+    index: '215',
+    entityId: 'ent_stono_rebellion_001',
+    path: '/brand/collage/tiles/215.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_stono_rebellion_001/primary.jpg',
+  },
+  {
+    index: '216',
+    entityId: 'ent_igbo_landing_001',
+    path: '/brand/collage/tiles/216.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_igbo_landing_001/primary.jpg',
+  },
+  {
+    index: '217',
+    entityId: 'ent_satchel_paige_001',
+    path: '/brand/collage/tiles/217.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_satchel_paige_001/primary.jpg',
+  },
+  {
+    index: '218',
+    entityId: 'ent_simone_biles_001',
+    path: '/brand/collage/tiles/218.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_simone_biles_001/primary.jpg',
+  },
+  {
+    index: '219',
+    entityId: 'ent_serena_williams_001',
+    path: '/brand/collage/tiles/219.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_serena_williams_001/primary.jpg',
+  },
+  {
+    index: '220',
+    entityId: 'ent_halle_berry_001',
+    path: '/brand/collage/tiles/220.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_halle_berry_001/primary.jpg',
+  },
+  {
+    index: '221',
+    entityId: 'ent_berry_gordy_001',
+    path: '/brand/collage/tiles/221.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_berry_gordy_001/primary.jpg',
+  },
+  {
+    index: '222',
+    entityId: 'ent_deford_bailey_001',
+    path: '/brand/collage/tiles/222.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_deford_bailey_001/primary.jpg',
+  },
+  {
+    index: '223',
+    entityId: 'ent_leontyne_price_001',
+    path: '/brand/collage/tiles/223.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_leontyne_price_001/primary.jpg',
+  },
+  {
+    index: '224',
+    entityId: 'ent_tony_dungy_001',
+    path: '/brand/collage/tiles/224.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_tony_dungy_001/primary.jpg',
+  },
+  {
+    index: '225',
+    entityId: 'ent_alice_coachman_001',
+    path: '/brand/collage/tiles/225.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_alice_coachman_001/primary.jpg',
+  },
+  {
+    index: '226',
+    entityId: 'ent_gabby_douglas_001',
+    path: '/brand/collage/tiles/226.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_gabby_douglas_001/primary.jpg',
+  },
+  {
+    index: '227',
+    entityId: 'ent_john_carlos_001',
+    path: '/brand/collage/tiles/227.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_john_carlos_001/primary.jpg',
+  },
+  {
+    index: '228',
+    entityId: 'ent_rita_dove_001',
+    path: '/brand/collage/tiles/228.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_rita_dove_001/primary.jpg',
+  },
+  {
+    index: '229',
+    entityId: 'ent_alice_walker_001',
+    path: '/brand/collage/tiles/229.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_alice_walker_001/primary.jpg',
+  },
+  {
+    index: '230',
+    entityId: 'ent_jordan_peele_001',
+    path: '/brand/collage/tiles/230.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_jordan_peele_001/primary.jpg',
+  },
+  {
+    index: '231',
+    entityId: 'ent_denzel_washington_001',
+    path: '/brand/collage/tiles/231.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_denzel_washington_001/primary.jpg',
+  },
+  {
+    index: '232',
+    entityId: 'ent_whoopi_goldberg_001',
+    path: '/brand/collage/tiles/232.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_whoopi_goldberg_001/primary.jpg',
+  },
+  {
+    index: '233',
+    entityId: 'ent_stevie_wonder_001',
+    path: '/brand/collage/tiles/233.jpg',
+    sourceUrl:
+      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_stevie_wonder_001/primary.jpg',
   },
 ] as const;
 
