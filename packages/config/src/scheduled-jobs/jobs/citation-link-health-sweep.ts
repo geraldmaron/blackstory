@@ -1,20 +1,20 @@
 
 /**
- * REAL roster entry: citation link-health sweep. Wraps `@black-book/domain`'s citation
+ * REAL roster entry: citation link-health sweep. Wraps `@repo/domain`'s citation
  * link-health repair-ladder logic (packages/domain/src/citations/) — the pure classification,
  * retry-before-dead state machine, and repair ladder all live there and are unit-tested there
  * (packages/domain/src/citations/*.test.ts). This file is the thin adapter layer that:
  *
  * (a) performs the SSRF-safe re-verification fetch through
- * `@black-book/security`'s `executeSafeFetch`, since `@black-book/domain` cannot depend on
- * `@black-book/security` (security depends on domain; the reverse edge would be a circular
+ * `@repo/security`'s `executeSafeFetch`, since `@repo/domain` cannot depend on
+ * `@repo/security` (security depends on domain; the reverse edge would be a circular
  * workspace dependency; see packages/domain/src/citations/link-health.ts's module doc for
  * the same constraint). `packages/config` has no such constraint, so
  * this is the one place real network wiring happens. The Node DNS/HTTP transport
  * below intentionally mirrors `packages/operator-cli/src/fetch.ts`'s
  * `nodeResolveHost`/`nodePinnedTransport` (the only other real Node transport in
  * this repo) rather than inventing a third shape `packages/config` does not depend on
- * `@black-book/operator-cli` (that dependency direction would be backwards: a CLI package
+ * `@repo/operator-cli` (that dependency direction would be backwards: a CLI package
  * depending on it, not a scheduled-job framework), so this is a deliberate, small,
  * documented near-duplicate rather than a new cross-package edge.
  *
@@ -40,7 +40,7 @@ import {
   type PinnedTransportResponse,
   type ResolveHost,
   type SafeFetchDependencies,
-} from '@black-book/security';
+} from '@repo/security/url-safety';
 import {
   advanceLinkHealthState,
   applyRepairLadder,
@@ -51,7 +51,7 @@ import {
   type LinkCheckFetchResult,
   type LinkHealthState,
   type SpnCaptureOutcome,
-} from '@black-book/domain';
+} from '@repo/domain';
 import { assertScheduledJobOperationAllowed } from '../publish-guard.js';
 import { DEFAULT_SCHEDULED_JOBS } from '../roster.js';
 import { completeJobRun, startJobRun, type JobRunRecord } from '../run-record.js';
@@ -229,7 +229,7 @@ const NEVER_ATTEMPT_SPN: (url: string) => Promise<SpnCaptureOutcome> = async () 
 /**
  * Runs one scheduled sweep over the supplied citation checks. Pure aside from the injected
  * `fetchLink`/`attemptSpn` I/O ports the classification, retry state machine, and repair-ladder
- * ordering are entirely `@black-book/domain`'s tested logic; this function only sequences calls
+ * ordering are entirely `@repo/domain`'s tested logic; this function only sequences calls
  * to it and decides which resulting repair step is allowed to auto-commit (see module doc).
  */
 export async function runCitationLinkHealthSweepJob(

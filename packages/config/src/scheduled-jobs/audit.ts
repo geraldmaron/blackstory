@@ -2,14 +2,14 @@
 /**
  * Builds job-run audit events and outbox messages using the exact DomainAuditEvent
  * DomainOutboxMessage shapes (packages/domain/src/audit/index.ts) that
- * @black-book/firebase's commitWithAudit (packages/firebase/src/firestore/audit-outbox.ts)
+ * @repo/firebase's commitWithAudit (packages/firebase/src/firestore/audit-outbox.ts)
  * consumes unmodified.
  *
- * This module deliberately does NOT depend on @black-book/firebase at runtime pulling
+ * This module deliberately does NOT depend on @repo/firebase at runtime pulling
  * firebase-admin into the operational-config layer would be architecturally wrong for a package
  * other lightweight surfaces (web, edge) may also import. It only builds plain,
  * framework-independent objects matching commitWithAudit's exact calling convention; the worker
- * or app that actually performs the Firestore write already depends on @black-book/firebase and
+ * or app that actually performs the Firestore write already depends on @repo/firebase and
  * passes the objects built here straight through. audit.test.ts proves this concretely by
  * importing the real commitWithAudit (as a devDependency-only, test-time import) and calling it
  * with objects built by this module, unmodified.
@@ -18,8 +18,8 @@
  * message. Every automated write a scheduled job makes carries its run id as the
  * correlation id, so it is traceable back to the exact run that made it (.
  */
-import { auditCategoryFor } from '@black-book/domain';
-import type { AuditActor, AuditEventAction, DomainAuditEvent, DomainOutboxMessage } from '@black-book/domain';
+import { auditCategoryFor } from '@repo/domain';
+import type { AuditActor, AuditEventAction, DomainAuditEvent, DomainOutboxMessage } from '@repo/domain';
 
 export type BuildJobRunAuditEventInput = {
   readonly jobRunId: string;

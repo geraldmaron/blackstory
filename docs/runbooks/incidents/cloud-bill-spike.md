@@ -10,7 +10,7 @@
 1. Engage research, LLM, geocoding, nearby, uploads, exports, and source adapters first.
 2. Pause high-cost queues without purge; then disable submissions/search if burn continues.
 3. Enter static mode before disabling public serving; immutable snapshots should remain available.
-4. Apply reviewed BB-033 caps and revoke any abused provider credential independently.
+4. Apply reviewed  caps and revoke any abused provider credential independently.
 
 ## Recover
 

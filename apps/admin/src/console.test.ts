@@ -3,16 +3,16 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AuthorizedAdminRequest } from './auth/index.js';
-import { CONSOLE_SURFACES } from './console/fixtures.js';
+import type { AuthorizedAdminRequest } from './auth/index';
+import { CONSOLE_SURFACES } from './console/fixtures';
 import {
   ConsoleActionError,
   assertNoActiveProjectionWrite,
   authorizeConsoleAction,
   previewBulkAction,
   type ConsoleActionAuthorizer,
-} from './console/guards.js';
-import type { ConsoleAction } from './console/model.js';
+} from './console/guards';
+import type { ConsoleAction } from './console/model';
 
 const HEADERS = {
   authorization: 'Bearer verified-firebase-token',

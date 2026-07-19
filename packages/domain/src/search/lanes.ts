@@ -124,7 +124,7 @@ export function runStructuredLane(
 }
 
 /**
- * Runs the vector KNN lane through an injected port. Applies era pre-filter from shared 
+ * Runs the vector KNN lane through an injected port. Applies era pre-filter from shared
  * derivation before delegating to the store.
  */
 export async function runVectorLane(

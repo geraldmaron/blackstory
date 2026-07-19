@@ -1,8 +1,8 @@
-# Versioned historical query packs (BB-038)
+# Versioned historical query packs
 
 Contract-layer API for versioned discovery query packs grouped by entity type and research theme. In-memory registry in this bead; Firestore persistence follows in a later bead.
 
-## Domain API (`@black-book/domain` → `query-packs/`)
+## Domain API (`@repo/domain` → `query-packs/`)
 
 Parent agent merges `packages/domain/src/query-packs/index.ts` into the package barrel:
 
@@ -65,5 +65,5 @@ Gold fixture: `packages/domain/src/query-packs/fixtures/person-civil-rights-fixt
 ## Deferred (not this bead)
 
 - **Firestore persistence** for query packs and effectiveness metrics
-- **Discovery pipeline integration** — BB-039 wires `stampDiscoveryRun` into campaign runs
-- **Admin UI** for pack review and approval — BB-056
+- **Discovery pipeline integration** —  wires `stampDiscoveryRun` into campaign runs
+- **Admin UI** for pack review and approval —

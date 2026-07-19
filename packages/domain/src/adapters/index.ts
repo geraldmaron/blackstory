@@ -97,6 +97,7 @@ export * from './common-crawl/index.js';
 
 // Census TIGER/Gazetteer source registry entry (jurisdiction reference data).
 export * from './census-geo/index.js';
+export * from './census-demographics/index.js';
 
 // Legal landscape adapters fixtures-first.
 export * from './legal/index.js';

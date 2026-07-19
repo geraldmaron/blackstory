@@ -1,11 +1,11 @@
-# Adversarial integrity testing (BB-060)
+# Adversarial integrity testing
 
 Repo-side red-team scenarios for data-integrity attacks. **No live attacks** against production or staging endpoints.
 
 ## Run
 
 ```bash
-pnpm --filter @black-book/testing test:security
+pnpm --filter @repo/testing test:security
 # or:
 node --import tsx scripts/run-testing-layer.mjs security
 ```
@@ -16,17 +16,17 @@ Module: `packages/testing/src/adversarial-integrity/`
 
 | ID | Attack pattern | Primary controls |
 |----|----------------|------------------|
-| `false_source_submissions` | Fabricated sources / low-trust leads | BB-029 quarantine; BB-032 promotion gate |
-| `source_laundering` | Shared-registrant mirror blogs | BB-043 Sybil collapse; top-tier source gate |
-| `coordinated_citation_repetition` | Citation ring volume | BB-032 lineage collapse; promotion gate |
-| `altered_documents` | Duplicate fingerprints + contradictions | BB-032 duplicate detection; promotion gate |
-| `misidentified_people` | Weak entity-match confidence | BB-043 confidence threshold |
-| `living_address_attempts` | Living-person street addresses | BB-015 redaction; public serialization |
-| `procedural_status_inflation` | Convicted language on alleged evidence | BB-043 public-language gate |
-| `race_inference` | Identity-attribute framing | BB-095 identity framing guard; quarantine |
-| `relevance_gaming` | Skip relevance → publication | BB-044 state machine; BB-032 promotion |
-| `moderator_social_engineering` | Self-approval / mass assignment / lone reviewer | BB-032 approver conflict; BB-029 schema; BB-076 consensus |
-| `unauthorized_publication` | Direct publish / stage skip | BB-044 publication gate; BB-032 stage order; top-tier gate |
+| `false_source_submissions` | Fabricated sources / low-trust leads |  quarantine;  promotion gate |
+| `source_laundering` | Shared-registrant mirror blogs |  Sybil collapse; top-tier source gate |
+| `coordinated_citation_repetition` | Citation ring volume |  lineage collapse; promotion gate |
+| `altered_documents` | Duplicate fingerprints + contradictions |  duplicate detection; promotion gate |
+| `misidentified_people` | Weak entity-match confidence |  confidence threshold |
+| `living_address_attempts` | Living-person street addresses |  redaction; public serialization |
+| `procedural_status_inflation` | Convicted language on alleged evidence |  public-language gate |
+| `race_inference` | Identity-attribute framing |  identity framing guard; quarantine |
+| `relevance_gaming` | Skip relevance → publication |  state machine;  promotion |
+| `moderator_social_engineering` | Self-approval / mass assignment / lone reviewer |  approver conflict;  schema;  consensus |
+| `unauthorized_publication` | Direct publish / stage skip |  publication gate;  stage order; top-tier gate |
 
 ## Acceptance criteria
 
@@ -40,4 +40,4 @@ Module: `packages/testing/src/adversarial-integrity/`
 - Export barrel: `packages/testing/src/adversarial-integrity/index.ts`
 - Package root barrel: `export * from './adversarial-integrity/index.js'` in `packages/testing/src/index.ts`
 - Security test layer: `scripts/run-testing-layer.mjs` includes `adversarial-integrity/**/*.test.ts`
-- Dependencies: `@black-book/security` and `@black-book/domain` devDependencies on `@black-book/testing`
+- Dependencies: `@repo/security` and `@repo/domain` devDependencies on `@repo/testing`

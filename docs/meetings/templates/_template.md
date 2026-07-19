@@ -20,7 +20,7 @@ Attendees: {{attendees}}
 
 ### Topic 2
 
-- Key point  
+- Key point
 - Decision
 - Action item
 

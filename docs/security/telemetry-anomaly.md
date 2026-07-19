@@ -1,13 +1,13 @@
-# Security telemetry and anomaly detection (BB-034)
+# Security telemetry and anomaly detection
 
 Design-only contracts for security dashboards, metrics, anomaly rules, and alert policies.
 Producers (App Check guards, rate limiters, audit writers, query guardrails) keep their existing
-implementations and emit signals through `@black-book/observability` adapters.
+implementations and emit signals through `@repo/observability` adapters.
 
-**Depends on:** [BB-018 audit/outbox](../../packages/domain/src/audit/index.ts),
-[BB-023 Cloud Armor](../../infra/gcp/armor/metrics-alerts-checklist.md),
-[BB-024 App Check](../../infra/firebase/auth-and-app-check.md),
-[BB-025 rate limits](./rate-limits.md)
+**Depends on:** [ audit/outbox](../../packages/domain/src/audit/index.ts),
+[ Cloud Armor](../../infra/gcp/armor/metrics-alerts-checklist.md),
+[ App Check](../../infra/firebase/auth-and-app-check.md),
+[ rate limits](./rate-limits.md)
 
 ## Package surface
 
@@ -21,14 +21,14 @@ implementations and emit signals through `@black-book/observability` adapters.
 | `security-adapters.ts` | Normalizes producer signals without rewriting producers |
 | `security-telemetry.ts` | Recorder that redacts, emits metrics, and evaluates alerts |
 
-Import from `@black-book/observability`:
+Import from `@repo/observability`:
 
 ```typescript
 import {
   createSecurityTelemetryRecorder,
   adaptAppCheckTelemetry,
   adaptAuditEvent,
-} from '@black-book/observability';
+} from '@repo/observability';
 ```
 
 ## Event coverage (PDF deliverables)
@@ -61,7 +61,7 @@ Security telemetry **never** emits:
 
 - Raw Firebase App Check tokens or `Authorization` headers
 - Session cookies, JWTs, API keys, or credentials
-- Residential street addresses or high-precision coordinates (via `@black-book/security`)
+- Residential street addresses or high-precision coordinates (via `@repo/security`)
 
 Opaque identifiers (actor IDs, object paths) are fingerprinted before they become metric labels.
 
@@ -69,10 +69,10 @@ Opaque identifiers (actor IDs, object paths) are fingerprinted before they becom
 
 | Producer | Adapter | Notes |
 |----------|---------|-------|
-| `@black-book/firebase` App Check guard | `adaptAppCheckTelemetry` | Mirrors `AppCheckTelemetryEvent` shape |
-| BB-018 audit events | `adaptAuditEvent` | Maps `authentication.failed`, `administrative.role_changed`, publication/retraction actions |
-| BB-025 rate limit denials | `adaptRateLimitDenial` | Classifies search/geocoder/submission/auth abuse |
-| BB-026 slow query events | `adaptSlowQuery` | Uses query hash — never raw query text |
+| `@repo/firebase` App Check guard | `adaptAppCheckTelemetry` | Mirrors `AppCheckTelemetryEvent` shape |
+|  audit events | `adaptAuditEvent` | Maps `authentication.failed`, `administrative.role_changed`, publication/retraction actions |
+|  rate limit denials | `adaptRateLimitDenial` | Classifies search/geocoder/submission/auth abuse |
+|  slow query events | `adaptSlowQuery` | Uses query hash — never raw query text |
 | Cloud Armor LB logs | `adaptArmorSignal` | Policy + rule priority dimensions |
 | Queue / outbox monitors | `adaptQueueSignal` | Depth and retry counters |
 | Storage rules denials | `adaptStorageDenial` | Bucket + fingerprinted object path |
@@ -125,7 +125,7 @@ These events generate **pager + `#security-alerts`** notification when triggered
 Run package tests before production traffic exists:
 
 ```bash
-pnpm --filter @black-book/observability test
+pnpm --filter @repo/observability test
 ```
 
 Tests prove:
@@ -147,15 +147,15 @@ node infra/gcp/observability/security-alerts/security-alerts.test.mjs
 |----------|---------|
 | [`security-alert-policies.json`](../../infra/gcp/observability/security-alerts/security-alert-policies.json) | Alert policy catalog |
 | [`security-dashboard.json`](../../infra/gcp/observability/security-alerts/security-dashboard.json) | Dashboard panel definitions |
-| [`README.md`](../../infra/gcp/observability/security-alerts/README.md) | Apply checklist (no live apply in BB-034) |
+| [`README.md`](../../infra/gcp/observability/security-alerts/README.md) | Apply checklist (no live apply in ) |
 
-Cross-reference BB-023 Armor metrics: [`../../infra/gcp/armor/metrics-alerts-checklist.md`](../../infra/gcp/armor/metrics-alerts-checklist.md).
+Cross-reference  Armor metrics: [`../../infra/gcp/armor/metrics-alerts-checklist.md`](../../infra/gcp/armor/metrics-alerts-checklist.md).
 
 ## Acceptance mapping
 
 | Acceptance criterion | Implementation |
 |---------------------|----------------|
 | Alerts include severity, runbook, release, service, correlation identifiers | `buildAlertPayload`, infra JSON stubs |
-| Logs exclude secrets and protected addresses | `redactSecurityEvent`, `@black-book/security` redactor |
+| Logs exclude secrets and protected addresses | `redactSecurityEvent`, `@repo/security` redactor |
 | Metrics useful before launch via synthetic tests | `evaluateAnomalyRules` + `security.test.ts` |
 | High-severity publication and administrator events → immediate notification | `IMMEDIATE_NOTIFICATION_KINDS`, `SEC-ADMIN-01`, `SEC-PUB-01`, `SEC-RET-01` |

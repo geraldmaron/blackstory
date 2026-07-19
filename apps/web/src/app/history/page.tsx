@@ -1,12 +1,11 @@
 /**
- * Temporal history graph browse page: all-time union view plus decade stepper over 
+ * Temporal history graph browse page: all-time union view plus decade stepper over
  * published graph release artifacts, synchronized accessible list peer, progressive-disclosure
  * graph rendering, and shareable URL state. SSR-first from the bundled snapshot; filters use
  * native GET navigation (no-JS safe).
  */
 import React from 'react';
-import { FilterBar } from '@black-book/ui';
-import { SeedDataNotice } from '../../components/SeedDataNotice';
+import { FilterBar } from '@repo/ui';
 import {
   DecadeStepper,
   HistoryGraphPanel,
@@ -16,6 +15,7 @@ import {
   HISTORY_DECADE_FRAMING,
   HISTORY_DIGNITY_FRAMING,
 } from '../../lib/history';
+import { listPublicEntityViews } from '../../lib/public-data/source';
 import { HistoryExperience } from './HistoryExperience';
 import { buildHistoryViewModel } from './history-view-model';
 import './history.css';
@@ -34,33 +34,41 @@ type HistoryPageProps = {
 
 export default async function HistoryPage({ searchParams }: HistoryPageProps) {
   const params = await searchParams;
-  const view = buildHistoryViewModel(params);
+  const { data: entities } = await listPublicEntityViews();
+  const view = buildHistoryViewModel(params, entities);
 
   return (
-    <main className="bb-container bb-page" id="main">
-      <header className="bb-entity-mast bb-history__intro">
-        <p className="bb-page__eyebrow">Temporal browse</p>
-        <h1 className="bb-page__title">History through time</h1>
-        <p className="bb-page__lede">
-          An all-time view of the published history graph plus decade-by-decade slices — what was
-          active, in force, or living in each era, derived from status history and release artifacts,
-          never present-day status backfilled.
+    <main className="ds-container ds-page" id="main">
+      <header className="ds-history__intro">
+        <p className="ds-page__eyebrow">Temporal browse</p>
+        <h1 className="ds-page__title">
+          Decade by <em>decade</em>.
+        </h1>
+        <p className="ds-page__lede">
+          Walk the published history graph through time — what was active, in force, or living in
+          each era, derived from status history and release artifacts, never present-day status
+          backfilled.
         </p>
-        <p className="bb-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
-        <p className="bb-history__framing">{HISTORY_DECADE_FRAMING}</p>
+        <p className="ds-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
+        <p className="ds-history__framing">{HISTORY_DECADE_FRAMING}</p>
       </header>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
-        <SeedDataNotice compact />
-
+      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
         <noscript>
-          <div className="bb-history__noscript">
+          <div className="ds-history__noscript">
             <DecadeStepper decades={view.availableDecades} viewState={view.viewState} />
             <FilterBar
               method="get"
               action="/history"
               legend="Filter history graph records"
               fields={[
+                {
+                  id: 'history-q-njs',
+                  name: 'q',
+                  label: 'Search',
+                  type: 'search',
+                  defaultValue: view.viewState.filters.q,
+                },
                 {
                   id: 'history-kind-njs',
                   name: 'kind',
@@ -69,9 +77,32 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
                   defaultValue: view.viewState.filters.kind,
                   options: view.facetOptions.kind,
                 },
+                {
+                  id: 'history-sort-njs',
+                  name: 'sort',
+                  label: 'Sort',
+                  type: 'select',
+                  defaultValue: view.viewState.filters.sort,
+                  options: [
+                    { value: 'name', label: 'Name A–Z' },
+                    { value: 'kind', label: 'Kind' },
+                    { value: 'connections', label: 'Connections' },
+                  ],
+                },
+                ...(view.viewState.mode === 'decade' && view.activeDecade
+                  ? [
+                      {
+                        id: 'history-decade-njs',
+                        name: 'decade',
+                        label: 'Decade',
+                        type: 'text' as const,
+                        defaultValue: view.activeDecade,
+                      },
+                    ]
+                  : []),
               ]}
             />
-            <p className="bb-sans" id="history-results-heading-njs">
+            <p className="ds-sans" id="history-results-heading-njs">
               {view.totalMatched} record{view.totalMatched === 1 ? '' : 's'} in view
             </p>
             <HistoryGraphPanel

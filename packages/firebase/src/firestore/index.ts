@@ -1,6 +1,6 @@
 
 /**
- * Firestore model surface for Black Book (ADR-011 019).
+ * Firestore model surface for BlackStory (ADR-011 019).
  */
 export { FIRESTORE_ROOT, firestorePaths } from './paths.js';
 export type { FirestoreRootCollection } from './paths.js';
@@ -33,6 +33,14 @@ export {
   connectionStrengthSchema,
   canonicalClaimSchema,
   claimEvidenceLinkSchema,
+  volatilityClassSchema,
+  reviewIntervalSchema,
+  verificationPolicySchema,
+  verificationStatusSchema,
+  verificationSubjectTypeSchema,
+  verificationStateSchema,
+  candidateUpdateStatusSchema,
+  candidateUpdateSchema,
   contentHashSchema,
   rightsStatusSchema,
   publicationPermissionSchema,
@@ -50,6 +58,7 @@ export {
   publicationReleaseSchema,
   publicActiveReleaseSchema,
   publicEntityProjectionSchema,
+  publicSearchIndexSchema,
   submissionInboxSchema,
   auditActorSchema,
   auditSubjectSchema,
@@ -58,6 +67,7 @@ export {
   idempotencyRecordSchema,
   outboxConsumerReceiptSchema,
   killSwitchSchema,
+  discoveryCampaignRunSchema,
 } from './types.js';
 export type {
   AuthClaimFlags,
@@ -78,6 +88,14 @@ export type {
   ClaimVersionDoc,
   CanonicalClaimDoc,
   ClaimEvidenceLinkDoc,
+  VolatilityClassDoc,
+  ReviewIntervalDoc,
+  VerificationPolicyDoc,
+  VerificationStatusDoc,
+  VerificationSubjectTypeDoc,
+  VerificationStateDoc,
+  CandidateUpdateStatusDoc,
+  CandidateUpdateDoc,
   ContentHashDoc,
   RightsPolicyDoc,
   SourceOrganizationDoc,
@@ -92,12 +110,14 @@ export type {
   PublicationReleaseDoc,
   PublicActiveReleaseDoc,
   PublicEntityProjectionDoc,
+  PublicSearchIndexDoc,
   SubmissionInboxDoc,
   AuditEventDoc,
   OutboxMessageDoc,
   IdempotencyRecordDoc,
   OutboxConsumerReceiptDoc,
   KillSwitchDoc,
+  DiscoveryCampaignRunDoc,
 } from './types.js';
 
 export {
@@ -109,6 +129,7 @@ export {
   entityRelationshipConverter,
   entityMergeConverter,
   canonicalClaimConverter,
+  claimVersionConverter,
   claimEvidenceLinkConverter,
   sourceOrganizationConverter,
   sourceDomainConverter,
@@ -128,6 +149,7 @@ export {
   idempotencyRecordConverter,
   outboxConsumerReceiptConverter,
   killSwitchConverter,
+  discoveryCampaignRunConverter,
 } from './converters.js';
 
 export {
@@ -136,6 +158,19 @@ export {
   entityPrimaryImageObjectRef,
   type EntityPrimaryImageObjectRef,
 } from './entity-media.js';
+
+export {
+  RELEASE_CATALOG_ARTIFACT_SCHEMA_VERSION,
+  buildReleaseCatalogArtifacts,
+  publicMediaObjectUrl,
+  publicReleaseEntitiesListPath,
+  publicReleaseSearchIndexPath,
+  writeReleaseCatalogArtifactsToDir,
+  uploadReleaseCatalogArtifacts,
+  type BuiltReleaseCatalogArtifacts,
+  type ReleaseEntitiesListArtifact,
+  type ReleaseSearchIndexArtifact,
+} from './release-artifacts.js';
 
 export {
   createAdminAtomicStore,

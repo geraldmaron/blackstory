@@ -1,13 +1,14 @@
 /**
- * Myths and misconceptions index pre-bunking reviews of circulating third-party claims.
+ * Myths and misconceptions index — pre-bunking reviews of circulating third-party claims.
  * ClaimReview JSON-LD is emitted only on individual myth pages under /myths/[slug].
  */
+import Link from 'next/link';
 import {
   PublishingPrinciplesJsonLdScript,
   TrustSiteJsonLdScript,
-} from '../../components/trust/index.js';
-import { listMythReviews } from '../../lib/trust/myths-seed.js';
-import { TRUST_PATHS } from '../../lib/trust/site-identity.js';
+} from '../../components/trust/index';
+import { listMythReviews } from '../../lib/trust/myths-seed';
+import { TRUST_PATHS } from '../../lib/trust/site-identity';
 
 export const metadata = {
   title: 'Myths & misconceptions',
@@ -19,27 +20,30 @@ export default function MythsIndexPage() {
   const reviews = listMythReviews();
 
   return (
-    <main className="bb-container bb-page" id="main">
+    <main className="ds-container ds-page" id="main">
       <TrustSiteJsonLdScript />
-      <PublishingPrinciplesJsonLdScript pagePath={TRUST_PATHS.myths} pageTitle="Myths" />
-      <p className="bb-page__eyebrow">Pre-bunking</p>
-      <h1 className="bb-page__title">Myths &amp; misconceptions</h1>
-      <p className="bb-page__lede">
-        These pages review genuinely circulating third-party claims — educational, non-judgmental,
-        and focused on techniques you can verify yourself. Canonical fact records live on{' '}
-        <a href="/facts">/facts</a>; only this surface emits ClaimReview markup.
+      <PublishingPrinciplesJsonLdScript pagePath={TRUST_PATHS.myths} pageTitle="Myths & misconceptions" />
+      <p className="ds-page__eyebrow">Pre-bunking</p>
+      <h1 className="ds-page__title">Myths &amp; misconceptions</h1>
+      <p className="ds-page__lede">
+        A library of circulating third-party claims, reviewed technique by technique — educational,
+        non-judgmental, and checkable. Short citable pins live in{' '}
+        <Link href="/facts">Quick facts</Link>; only this surface emits ClaimReview markup.
       </p>
 
-      <ul className="bb-sans" style={{ marginTop: 'var(--bb-space-8)', paddingLeft: 'var(--bb-space-5)' }}>
-        {reviews.map((review) => (
-          <li key={review.slug} style={{ marginBottom: 'var(--bb-space-4)' }}>
-            <a href={review.pageUrl}>{review.title}</a>
-            <p style={{ margin: 'var(--bb-space-1) 0 0 0', color: 'var(--bb-ink-muted)' }}>
-              Technique: {review.technique}
-            </p>
-          </li>
-        ))}
-      </ul>
+      <section className="ds-section ds-section--flush" aria-label="Myth reviews">
+        <ul className="ds-story-rail">
+          {reviews.map((review) => (
+            <li key={review.slug}>
+              <Link className="ds-story-link" href={review.pageUrl}>
+                <span className="ds-story-link__meta">Technique · {review.technique}</span>
+                <h2 className="ds-story-link__title">{review.title}</h2>
+                <p className="ds-story-link__summary">{review.ratingExplanation}</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </main>
   );
 }

@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { currentEntityStatus, type CanonicalEntity } from './entity.js';
+import { currentEntityStatus, deriveEntityLivingStatus, type CanonicalEntity } from './entity.js';
 import { ENTITY_KINDS } from './entity-kinds.js';
 
 const NOW = '2026-07-17T00:00:00.000Z';
@@ -112,6 +112,37 @@ test('movement kind carries its own field bag and active|historic status (no ina
   assert.equal(currentEntityStatus(movement), 'historic');
   assert.equal(movement.movement?.endYear, 1968);
   assert.equal(movement.notabilityBasis?.[0]?.criterion, 'movement_significance');
+});
+
+test('deriveEntityLivingStatus is undefined for non-person kinds', () => {
+  const place: CanonicalEntity = {
+    id: 'ent-place-1',
+    kind: 'place',
+    displayName: 'Some Neighborhood',
+    createdAt: NOW,
+    updatedAt: NOW,
+  };
+  assert.equal(deriveEntityLivingStatus(place), undefined);
+});
+
+test('deriveEntityLivingStatus derives deceased from person.deathYear, unknown otherwise', () => {
+  const deceased: CanonicalEntity = {
+    id: 'ent-person-4',
+    kind: 'person',
+    displayName: 'Historical Figure',
+    person: { livingStatus: 'unknown', birthYear: 1929, deathYear: 1968 },
+    createdAt: NOW,
+    updatedAt: NOW,
+  };
+  const noSignal: CanonicalEntity = {
+    id: 'ent-person-5',
+    kind: 'person',
+    displayName: 'Undocumented Person',
+    createdAt: NOW,
+    updatedAt: NOW,
+  };
+  assert.equal(deriveEntityLivingStatus(deceased), 'deceased');
+  assert.equal(deriveEntityLivingStatus(noSignal), 'unknown');
 });
 
 test('entity-level sensitivity is schema-only and carries an auditable basis', () => {

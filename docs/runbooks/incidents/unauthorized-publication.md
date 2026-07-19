@@ -9,7 +9,7 @@
 
 1. Engage `publication` and `public-static-mode`.
 2. Revoke the suspected publisher account, internal service identity, or signing key independently.
-3. Atomically repoint the BB-019 active release and paired search index to the last verified release.
+3. Atomically repoint the  active release and paired search index to the last verified release.
 4. Purge only affected CDN keys and verify immutable snapshot hashes.
 
 ## Recover

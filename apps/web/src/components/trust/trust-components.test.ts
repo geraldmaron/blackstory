@@ -6,21 +6,28 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { getDisclaimer } from '@black-book/domain';
-import { listSeedFacts } from '../../data/facts-seed.js';
+import { getDisclaimer } from '@repo/domain/disclaimers';
+import { listSeedFacts } from '../../data/facts-seed';
 import {
   CommonMisreadings,
   ConfidenceLabelWithNuance,
   HowToReadThisRecord,
   RevisionUpdateChrome,
   TrustSiteDisclaimer,
-} from './index.js';
+} from './index';
 
 test('HowToReadThisRecord names techniques and links to methodology', () => {
   const html = renderToStaticMarkup(createElement(HowToReadThisRecord));
   assert.match(html, /out of context/i);
   assert.match(html, /Read our full methodology/);
   assert.doesNotMatch(html, /deniers|critics/i);
+});
+
+test('HowToReadThisRecord compact variant is a one-line methodology off-ramp', () => {
+  const html = renderToStaticMarkup(createElement(HowToReadThisRecord, { variant: 'compact' }));
+  assert.match(html, /How this record is built/);
+  assert.match(html, /read the methodology/);
+  assert.doesNotMatch(html, /out of context/i);
 });
 
 test('CommonMisreadings renders counterClaims from seed facts', () => {

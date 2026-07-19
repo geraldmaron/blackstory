@@ -135,7 +135,7 @@ export function evaluateBetaLaunchGate(
 
   return {
     schemaVersion: BETA_LAUNCH_DECISION_SCHEMA_VERSION,
-    bead: 'BB-063',
+    bead: '',
     evaluator: input.evaluator,
     evaluatedAt,
     decision: summarizeDecision(gates),

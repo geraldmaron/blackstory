@@ -133,7 +133,7 @@ test('Reddit adapter contract respects the 100 QPM free tier ceiling', () => {
   assert.equal(contract.rateLimits.requestsPerMinute, REDDIT_FREE_TIER_QPM_LIMIT);
 });
 
-test('Reddit adapter has a registered BB-077 obligations entry with the contractual 48h deletion-sync window', () => {
+test('Reddit adapter has a registered  obligations entry with the contractual 48h deletion-sync window', () => {
   const obligationsStore = createInMemoryObligationsRegistry(defaultSourceObligationsSeed(FIXED_NOW));
   const obligations = getSourceObligationsOrThrow(obligationsStore, REDDIT_ADAPTER_ID);
   assert.equal(obligations.sourceClass, 'reddit');
@@ -224,7 +224,7 @@ test('normalized payload never carries a full post body, comments, or an identit
 
 // --- Subreddit registry ------------------------------------------------------------------------
 
-test('subreddit registry add/remove is versioned and produces a BB-018 audit event', () => {
+test('subreddit registry add/remove is versioned and produces a  audit event', () => {
   const store = createInMemorySubredditRegistry();
   const actor = { id: 'admin@blackbook.local', type: 'user' as const };
 
@@ -398,7 +398,7 @@ test('the adapter export surface has no republication, ML-training, or deanonymi
   assert.doesNotThrow(() => assertNoForbiddenExportSurface(redditAdapter as unknown as Record<string, unknown>));
 });
 
-test('BB-077 deanonymization guard rejects a Reddit-targeted attempt (adapter does not bypass it)', () => {
+test(' deanonymization guard rejects a Reddit-targeted attempt (adapter does not bypass it)', () => {
   assert.throws(
     () =>
       assertNoDeanonymization({
@@ -475,7 +475,7 @@ test('assertPointerLiveBeforeReview passes on a fresh live check and throws on a
 
 // --- Deletion-sync (real wiring) ---------------------------------------------------------
 
-test('planRedditPointerPurge builds a real BB-077 DeletionSyncPlan covering every cascade stage', () => {
+test('planRedditPointerPurge builds a real  DeletionSyncPlan covering every cascade stage', () => {
   const pointer = storedPointer();
   const actor = { id: 'system:reddit-deletion-sync', type: 'service' as const };
   const plan = planRedditPointerPurge({

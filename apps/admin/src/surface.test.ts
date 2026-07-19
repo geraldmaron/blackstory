@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { getSurfaceDefinition } from '@black-book/config';
+import { getSurfaceDefinition } from '@repo/config';
 import { health } from './surface.ts';
 
 const SOURCE_ROOT = new URL('.', import.meta.url).pathname;

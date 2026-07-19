@@ -1,6 +1,6 @@
 # Administrator identity and authorization
 
-BB-027 implements administrator identity as two independent controls: Google Cloud IAP at the
+ implements administrator identity as two independent controls: Google Cloud IAP at the
 admin service boundary and Firebase Authentication inside the application. Neither control alone
 authorizes a request.
 
@@ -83,7 +83,7 @@ changes, suspected compromise, administrator offboarding, or MFA reset.
 
 `AdministrativeAuthAlertEvent` defines sanitized events for login success/failure, new-device
 signals, session revocation, and role changes. `emitAdministrativeAuthAlert` is an injected sink
-stub; BB-027 does not select or provision an alert transport. Device and source-IP values must be
+stub;  does not select or provision an alert transport. Device and source-IP values must be
 pseudonymous hashes. Events must never contain raw ID tokens, IAP assertions, passwords, factor
 secrets, recovery codes, or full IP addresses.
 
@@ -99,4 +99,4 @@ secrets, recovery codes, or full IP addresses.
 5. Configure the alert sink and route login failure, new-device, revocation, and role-change events
    to the security response channel.
 
-No live IAP or Firebase console changes were applied by BB-027.
+No live IAP or Firebase console changes were applied by .

@@ -11,6 +11,8 @@
  * (per-entity adjacency, per-decade views, all-time union, containment chains) lives in
  * `./graph/` and consumes `EntityRelationship` read-only — see `./graph/index.ts`.
  */
+import type { ConfidenceScore } from './claims/confidence.js';
+
 export const RELATIONSHIP_TYPES = [
   'located_at',
   'occurred_at',
@@ -58,6 +60,46 @@ export type GeographicRelationshipContext = {
   readonly notes?: string;
 };
 
+// ---------------------------------------------------------------------------
+// lifecycle/workflow vocabulary.
+// Naming mirrors `ClaimWorkflowStatus`/`ClaimPublicationStatus` (see `./claims/claim.ts`) for
+// cross-domain consistency, with one deliberate difference: relationships add an explicit
+// `candidate` workflow state so a not-yet-reviewed graph edge (see BB `the related workstream`) can be
+// represented directly on `EntityRelationship` via `workflowStatus: 'candidate'` rather than
+// requiring a separate `CandidateRelationship` type (see note on `createdFromCandidateId` below).
+// ---------------------------------------------------------------------------
+
+export const RELATIONSHIP_WORKFLOW_STATUSES = ['candidate', 'in_review', 'accepted', 'rejected'] as const;
+export type RelationshipWorkflowStatus = (typeof RELATIONSHIP_WORKFLOW_STATUSES)[number];
+
+export function isRelationshipWorkflowStatus(value: string): value is RelationshipWorkflowStatus {
+  return (RELATIONSHIP_WORKFLOW_STATUSES as readonly string[]).includes(value);
+}
+
+/** Same vocabulary as `ClaimPublicationStatus` (see `./claims/claim.ts`) so a relationship's
+ * publication lifecycle reads identically to a claim's. */
+export const RELATIONSHIP_PUBLICATION_STATUSES = ['unpublished', 'published', 'retracted'] as const;
+export type RelationshipPublicationStatus = (typeof RELATIONSHIP_PUBLICATION_STATUSES)[number];
+
+export function isRelationshipPublicationStatus(value: string): value is RelationshipPublicationStatus {
+  return (RELATIONSHIP_PUBLICATION_STATUSES as readonly string[]).includes(value);
+}
+
+/**
+ * How well both endpoint entities (`fromEntityId`/`toEntityId`) are resolved to canonical
+ * entities rather than still-pending discovery candidates. Distinct from
+ * `./resolution/types.ts`'s `ResolutionOutcome` (`proposed_match`/`review_required`/`no_match`),
+ * which describes a single candidate-to-entity match decision `resolutionState` here
+ * describes the joint resolution state of an edge's *two* endpoints, which is a different
+ * (relationship-shaped) question no existing enum answers directly.
+ */
+export const RELATIONSHIP_RESOLUTION_STATES = ['unresolved', 'partially_resolved', 'resolved'] as const;
+export type RelationshipResolutionState = (typeof RELATIONSHIP_RESOLUTION_STATES)[number];
+
+export function isRelationshipResolutionState(value: string): value is RelationshipResolutionState {
+  return (RELATIONSHIP_RESOLUTION_STATES as readonly string[]).includes(value);
+}
+
 export type EntityRelationship = {
   readonly id: string;
   readonly fromEntityId: string;
@@ -73,6 +115,30 @@ export type EntityRelationship = {
   readonly notes?: string;
   readonly createdAt: string;
   readonly updatedAt: string;
+  // -------------------------------------------------------------------------
+  // lifecycle/workflow fields (BB the related workstream). All optional so pre-existing relationships
+  // that never went through a candidate -> review -> published pipeline remain valid values
+  // without a backfill migration; `assertRelationshipPublishInvariants`
+  // (see `./relationship-publish.ts`) is where these become required for publication.
+  // -------------------------------------------------------------------------
+  /** Candidate -> in_review -> accepted|rejected pipeline state. Absent means legacy data
+   * predating this field; treat as equivalent to `'accepted'` for read paths. */
+  readonly workflowStatus?: RelationshipWorkflowStatus;
+  readonly publicationStatus?: RelationshipPublicationStatus;
+  /** Reuses the claims confidence result shape (`ConfidenceScore` from `./claims/confidence.ts`)
+   * rather than a parallel relationship-specific shape same components, same audit story. */
+  readonly confidence?: ConfidenceScore;
+  /** Count of independent supporting lineages for this relationship's own `evidenceIds`, prior
+   * to (and independent of) any full `confidence` computation see
+   * `countUniqueSyndicatedEvidenceLineages` in `./relationship-publish.ts` for the syndication
+   * dedupe this count is expected to reflect. */
+  readonly independentLineageCount?: number;
+  /** Joint resolution state of `fromEntityId`/`toEntityId`; see `RelationshipResolutionState`. */
+  readonly resolutionState?: RelationshipResolutionState;
+  /** Links a promoted/accepted relationship back to the discovery candidate that spawned it. */
+  readonly createdFromCandidateId?: string;
+  /** ISO timestamp of the last human/automated re-verification pass over this edge. */
+  readonly lastVerifiedAt?: string;
 };
 
 export function assertRelationshipHasEvidence(rel: Pick<EntityRelationship, 'evidenceIds'>): void {
@@ -110,7 +176,7 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, Rela
   attended: {
     direction:
       'fromEntity (person) ATTENDED toEntity (event). The optional `role` qualifier ' +
-      '(organizer|speaker|participant, BB-092) distinguishes organizing/speaking weight from ' +
+      '(organizer|speaker|participant, ) distinguishes organizing/speaking weight from ' +
       'rank-and-file attendance without changing the edge type.',
     temporalSemantics: 'validFrom/validTo scope multi-day attendance; a single-day event needs only validFrom.',
     requiresTemporalContext: false,
@@ -118,7 +184,7 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, Rela
   founded: {
     direction:
       'fromEntity (person/organization) FOUNDED toEntity (organization/institution). Reserved for ' +
-      'orgs/institutions — creation of a publication/artifact uses `authored` (BB-092) instead.',
+      'orgs/institutions — creation of a publication/artifact uses `authored`  instead.',
     temporalSemantics: 'validFrom is the founding date; validTo is not meaningful (founding is a point in time).',
     requiresTemporalContext: false,
   },
@@ -147,7 +213,7 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, Rela
       'fromEntity CITES toEntity — a documented connection asserted by a source without the ' +
       'stronger causal/participatory claim a more specific edge type would carry. This is the ' +
       'required landing type for contested or single-incident causal claims that do not meet the ' +
-      '`caused`/`enabled` guardrail (see `evaluateCausalEdgeGuardrail`), and for BB-086 FactRecord ' +
+      '`caused`/`enabled` guardrail (see `evaluateCausalEdgeGuardrail`), and for  FactRecord ' +
       '`subjects[]` co-mentions mirrored into the graph (see `./graph/fact-subjects.ts`).',
     temporalSemantics: 'Optional; validFrom may record when the citing source was published/observed.',
     requiresTemporalContext: false,
@@ -160,7 +226,7 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, Rela
   part_of: {
     direction:
       'fromEntity is PART_OF toEntity (a coarser containing entity — e.g. a neighborhood part_of a ' +
-      'city). Chained with `located_at`, this is the containment edge BB-092’s containment-chain ' +
+      'city). Chained with `located_at`, this is the containment edge ’s containment-chain ' +
       'materialization walks (see `./graph/containment.ts`).',
     temporalSemantics: 'validFrom/validTo bound containment when a boundary changed (annexation, redistricting).',
     requiresTemporalContext: false,
@@ -170,7 +236,7 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, Rela
       'fromEntity (the modern successor) is SUCCESSOR_OF toEntity (the superseded historical ' +
       'predecessor) — e.g. a modern municipality successor_of an annexed historical place. The ' +
       'predecessor’s own statusHistory/condition designation must never be read as the successor’s ' +
-      'current status (BB-092 acceptance criterion 11) — see `./graph/succession.ts`.',
+      'current status (acceptance criterion 11) — see `./graph/succession.ts`.',
     temporalSemantics: 'validFrom records the succession/transition date when documented.',
     requiresTemporalContext: false,
   },
@@ -179,7 +245,7 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, Rela
       'fromEntity CAUSED toEntity — fromEntity is the cause, toEntity is the effect. Reserved for ' +
       'consensus, citable SYSTEMIC historical causation (e.g. HOLC redlining causing measurable ' +
       'disinvestment), never a contested or single-incident causal claim — see ' +
-      '`evaluateCausalEdgeGuardrail` (BB-092 acceptance criterion 9).',
+      '`evaluateCausalEdgeGuardrail` (acceptance criterion 9).',
     temporalSemantics: 'validFrom (required) marks when the causal effect began manifesting.',
     requiresTemporalContext: true,
   },

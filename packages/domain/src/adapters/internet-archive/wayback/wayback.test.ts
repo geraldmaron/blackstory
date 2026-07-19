@@ -112,7 +112,7 @@ test('buildWaybackCaptureUrl matches the archive.org web/<timestamp>/<url> patte
   assert.equal(url, 'https://web.archive.org/web/20260717140512/https://example.org/article');
 });
 
-test('captureUrlToEvidencePointer produces a BB-077-valid EvidencePointer end to end', async () => {
+test('captureUrlToEvidencePointer produces a -valid EvidencePointer end to end', async () => {
   const calls: string[] = [];
   const client = async (request: SafeHttpRequest): Promise<SafeHttpResponse> => {
     if (request.url === WAYBACK_SPN_SUBMIT_URL) {

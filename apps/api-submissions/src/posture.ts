@@ -6,7 +6,7 @@ import {
   rejectPublicationOperation,
   type AuthMode,
   type OperationId,
-} from '@black-book/config';
+} from '@repo/config';
 
 export const SURFACE_ID = 'api-submissions' as const;
 

@@ -1,8 +1,8 @@
 /**
  * Sequential relevance gates applied before threshold decisions.
  */
-import type { ProductConstitution } from '@black-book/schemas';
-import { loadProductConstitution } from '@black-book/schemas';
+import type { ProductConstitution } from '@repo/schemas';
+import { loadProductConstitution } from '@repo/schemas';
 import type { DiscoveryCandidateRecord } from '../discovery/types.js';
 import type { RelevanceAssessment, RelevanceEvidence, RelevanceGateResult } from './types.js';
 

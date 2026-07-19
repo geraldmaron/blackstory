@@ -1,0 +1,10 @@
+{
+  "name": "@blackstory/research-node",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Cloud Run Job entry for discovery campaign dispatch. Run from monorepo root.",
+  "type": "module",
+  "scripts": {
+    "start": "node --conditions development --import tsx workers/research-node/src/main.ts"
+  }
+}

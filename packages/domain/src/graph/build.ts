@@ -1,5 +1,5 @@
 /**
- * Derived graph-view release-artifact build, following the 
+ * Derived graph-view release-artifact build, following the
  * immutable-release pattern (`../publication/index.ts`): `publicReleases/{releaseId}/graph/...`
  * docs, deterministic content hashing via the same `canonicalJson`/`sha256Json` — the entity
  * projection/snapshot manifest uses, and the same `publicReleases/{releaseId}/...` path shape as
@@ -49,18 +49,18 @@ function assertSafePathSegment(value: string, field: string): void {
   }
 }
 
-/** `publicReleases/{releaseId}/graph/adjacency/{entityId}` one bounded adjacency doc per entity. */
+/** `publicReleases/{releaseId}/graphAdjacency/{entityId}` — one bounded adjacency doc per entity. */
 export function publicGraphAdjacencyPath(releaseId: string, entityId: string): string {
   assertSafePathSegment(releaseId, 'releaseId');
   assertSafePathSegment(entityId, 'entityId');
-  return `publicReleases/${releaseId}/graph/adjacency/${entityId}`;
+  return `publicReleases/${releaseId}/graphAdjacency/${entityId}`;
 }
 
-/** `publicReleases/{releaseId}/graph/decades/{decade}` one node/edge-set doc per decade label. */
+/** `publicReleases/{releaseId}/graphDecades/{decade}` — one node/edge-set doc per decade label. */
 export function publicGraphDecadePath(releaseId: string, decade: string): string {
   assertSafePathSegment(releaseId, 'releaseId');
   assertSafePathSegment(decade, 'decade');
-  return `publicReleases/${releaseId}/graph/decades/${decade}`;
+  return `publicReleases/${releaseId}/graphDecades/${decade}`;
 }
 
 /** `publicReleases/{releaseId}/graph/all-time` the all-time union view doc. */
@@ -145,7 +145,10 @@ export function buildGraphReleaseArtifact(input: GraphReleaseArtifactInput): Gra
     { entities: input.entities, relationships: input.relationships },
     { stillActiveCutoff: input.generatedAt },
   );
-  const allTimeView = buildAllTimeView(decadeViews);
+  const allTimeView = buildAllTimeView(decadeViews, {
+    entityIds: input.entityIds,
+    relationships: input.relationships,
+  });
   const contentHash = sha256Json(artifactPayload(adjacencyByEntityId, decadeViews, allTimeView));
 
   return {

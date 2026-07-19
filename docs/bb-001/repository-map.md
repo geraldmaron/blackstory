@@ -1,4 +1,4 @@
-# BB-001 — Repository map (quick reference)
+#  — Repository map (quick reference)
 
 Verified tree as of 2026-07-16. Depth shows scaffold presence, not product completeness.
 
@@ -14,8 +14,8 @@ black-book/
 │   ├── config/              Zod env helpers (minimal)
 │   ├── domain/              EntityId + living-status helper
 │   ├── schemas/             Stub export
-│   ├── ui/                  Stub (BB-007)
-│   ├── firebase/            Stub (BB-011)
+│   ├── ui/                  Stub
+│   ├── firebase/            Stub
 │   ├── data-access/         Stub
 │   ├── security/            Stub
 │   ├── observability/       Stub
@@ -35,7 +35,7 @@ black-book/
 │   ├── architecture.md
 │   ├── README.md
 │   ├── runbooks/            .gitkeep
-│   └── bb-001/              this bead
+│   └── ds-001/              this bead
 ├── scripts/bootstrap.sh
 ├── package.json             pnpm workspace root scripts
 ├── pnpm-workspace.yaml      apps/* + packages/*

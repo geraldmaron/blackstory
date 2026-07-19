@@ -19,7 +19,7 @@ test('lawStatusTone maps struck_down to error tone', () => {
   assert.equal(legalStatusDisplay('in_force'), 'In force');
 });
 
-test('isLawStatus validates BB-090 vocabulary', () => {
+test('isLawStatus validates vocabulary', () => {
   assert.equal(isLawStatus('enjoined'), true);
   assert.equal(isLawStatus('invalid'), false);
 });

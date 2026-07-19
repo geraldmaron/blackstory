@@ -10,7 +10,8 @@
  * off a resolution, never its coordinate fields.
  */
 import React from 'react';
-import { Notice } from '@black-book/ui';
+import Link from 'next/link';
+import { Notice } from '@repo/ui';
 import type { LocateClientResult } from '../../lib/geocode/locate-client';
 
 // See LocationPrivacyNotice.tsx's identical note: keeps this file safe under a classic JSX
@@ -37,16 +38,16 @@ export function LocationResolutionPanel({ result }: LocationResolutionPanelProps
     );
     return (
       <Notice tone="warning" title="Location resolved">
-        <p className="bb-sans">
+        <p className="ds-sans">
           {parts.length > 0 ? parts.join(', ') : 'A U.S. jurisdiction was resolved for this input.'}
         </p>
-        <p className="bb-mono" style={{ fontSize: '0.8125rem' }}>
+        <p className="ds-mono" style={{ fontSize: '0.8125rem' }}>
           Jurisdiction: {jurisdictionIds.countyId ?? jurisdictionIds.stateId ?? jurisdictionIds.countryId}
         </p>
-        <p className="bb-sans">
-          <a className="bb-cta bb-cta--ink" href="/search">
+        <p className="ds-sans">
+          <Link className="ds-cta ds-cta--ink" href="/search">
             Search records
-          </a>
+          </Link>
         </p>
       </Notice>
     );
@@ -55,11 +56,11 @@ export function LocationResolutionPanel({ result }: LocationResolutionPanelProps
   if (result.kind === 'fallback') {
     return (
       <Notice tone="dispute" title="No address match">
-        <p className="bb-sans">{result.fallback.message}</p>
-        <p className="bb-sans">
-          <a className="bb-cta bb-cta--ink" href={result.fallback.searchHref}>
+        <p className="ds-sans">{result.fallback.message}</p>
+        <p className="ds-sans">
+          <Link className="ds-cta ds-cta--ink" href={result.fallback.searchHref}>
             Go to search
-          </a>
+          </Link>
         </p>
       </Notice>
     );
@@ -76,7 +77,7 @@ export function LocationResolutionPanel({ result }: LocationResolutionPanelProps
 
   return (
     <Notice tone="error" title="Lookup unavailable">
-      <p className="bb-sans">{message}</p>
+      <p className="ds-sans">{message}</p>
     </Notice>
   );
 }

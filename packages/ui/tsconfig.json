@@ -1,5 +1,5 @@
 {
-  "extends": "@black-book/typescript-config/react.json",
+  "extends": "@repo/typescript-config/react.json",
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src"

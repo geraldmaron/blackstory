@@ -1,0 +1,176 @@
+/**
+ * Styles for server-rendered SVG charts on the public `/data` page — flat matte fills,
+ * hairline rules, mono axis labels, copper data marks only.
+ */
+
+.ds-data-section__viz {
+  display: grid;
+  gap: var(--ds-space-8);
+  margin-top: var(--ds-space-6);
+}
+
+@media (min-width: 48rem) {
+  .ds-data-section__viz--pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ds-data-chart {
+  margin: 0;
+  padding: var(--ds-space-5) 0 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-data-chart__title {
+  margin: 0 0 var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-data-chart__viz {
+  overflow-x: auto;
+}
+
+.ds-data-chart__svg {
+  display: block;
+  width: 100%;
+  max-width: 40rem;
+  height: auto;
+}
+
+.ds-data-chart__axis-label {
+  fill: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+}
+
+.ds-data-chart__grid-line {
+  stroke: var(--ds-viz-grid);
+  stroke-width: 1;
+}
+
+.ds-data-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-4);
+  margin: var(--ds-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-data-chart__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-data-chart__legend-swatch {
+  flex: 0 0 auto;
+  width: 0.75rem;
+  height: 0.75rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-data-chart__caption {
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink-muted);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.ds-data-chart__source {
+  margin-top: var(--ds-space-2);
+}
+
+.ds-data-chart__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--ds-font-mono);
+  font-size: 0.8125rem;
+}
+
+.ds-data-chart__table th,
+.ds-data-chart__table td {
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  text-align: left;
+}
+
+.ds-data-chart__table th {
+  color: var(--ds-ink-muted);
+  font-weight: 500;
+}
+
+.ds-data-comparability-note {
+  margin-top: var(--ds-space-4);
+  color: var(--ds-ink-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  max-width: 42rem;
+}
+
+.ds-data-state-shift {
+  margin-top: var(--ds-space-8);
+  padding-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-data-opportunity-charts {
+  display: grid;
+  gap: var(--ds-space-8);
+}
+
+.ds-data-chart__axis-label--wrap {
+  font-size: 9px;
+}
+
+.ds-data-state-shift__title {
+  margin: 0 0 var(--ds-space-2);
+  font-size: 1.125rem;
+}
+
+.ds-data-state-shift__lede {
+  margin: 0 0 var(--ds-space-5);
+  max-width: 40rem;
+}
+
+.ds-data-state-shift__columns {
+  display: grid;
+  gap: var(--ds-space-6);
+}
+
+@media (min-width: 48rem) {
+  .ds-data-state-shift__columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ds-data-state-shift__kicker {
+  margin: 0 0 var(--ds-space-3);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-data-state-shift__list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-family: var(--ds-font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ds-ink);
+}
+
+.ds-data-state-shift__list li + li {
+  margin-top: var(--ds-space-2);
+}
+

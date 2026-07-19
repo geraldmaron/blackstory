@@ -75,7 +75,7 @@ test('computeFacetCounts aggregates every dimension, incrementing multi-valued f
   assert.deepEqual(facets.researchCoverage, { substantial: 1, minimal: 1 });
 });
 
-test('a status filter narrows results using the BB-090 status vocabularies', () => {
+test('a status filter narrows results using the status vocabularies', () => {
   const active = record({ id: 'place', displayName: 'Active Place', status: PLACE_LIKE_STATUSES[0] });
   const inForce = record({ id: 'law', displayName: 'In-Force Statute', kind: 'law', status: LAW_STATUSES[0] });
   const historicMovement = record({

@@ -5,13 +5,13 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckDecision } from '@black-book/firebase';
+import type { AppCheckDecision } from '@repo/firebase';
 import {
   createDeterministicMockEmbeddingProvider,
   createInMemoryVectorIndexStore,
   truncateAndNormalize,
   EMBEDDING_DIMS,
-} from '@black-book/firebase';
+} from '@repo/firebase';
 import { createFindNearestEndpoint, type FindNearestHttpRequest } from './vector-search-endpoint.ts';
 
 const ALLOWED_APP_CHECK: AppCheckDecision = {

@@ -1,10 +1,10 @@
 /**
  * Public legal landscape browse surface at `/legal`.
  */
-import { EmptyState, FilterBar } from '@black-book/ui';
-import { SeedDataNotice } from '../../components/SeedDataNotice';
+import { EmptyState, FilterBar } from '@repo/ui';
 import { LegalBrowseList, LegalDisclaimer, LEGAL_BROWSE_LEDE } from '../../components/legal';
 import { buildLegalBrowseViewModel, type RawLegalBrowseParams } from './legal-view-model';
+import './legal.css';
 
 export const metadata = {
   title: 'Legal landscape',
@@ -20,16 +20,15 @@ export default async function LegalBrowsePage({ searchParams }: LegalPageProps) 
   const view = buildLegalBrowseViewModel(params);
 
   return (
-    <main className="bb-container bb-page" id="main">
-      <header className="bb-entity-mast">
-        <p className="bb-page__eyebrow">Reference</p>
-        <h1 className="bb-page__title">Legal landscape</h1>
-        <p className="bb-page__lede">{LEGAL_BROWSE_LEDE}</p>
+    <main className="ds-container ds-page" id="main">
+      <header className="ds-entity-mast">
+        <p className="ds-page__eyebrow">Reference</p>
+        <h1 className="ds-page__title">Legal landscape</h1>
+        <p className="ds-page__lede">{LEGAL_BROWSE_LEDE}</p>
       </header>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
+      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
         <LegalDisclaimer />
-        <SeedDataNotice compact />
 
         <FilterBar
           method="get"
@@ -63,17 +62,7 @@ export default async function LegalBrowsePage({ searchParams }: LegalPageProps) 
           ]}
         />
 
-        <p
-          className="bb-sans"
-          id="legal-results-heading"
-          style={{
-            margin: 0,
-            fontSize: '0.6875rem',
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-          }}
-        >
+        <p className="ds-sans ds-count-label" id="legal-results-heading">
           {view.totalMatched} legal entr{view.totalMatched === 1 ? 'y' : 'ies'}
         </p>
 
@@ -81,7 +70,7 @@ export default async function LegalBrowsePage({ searchParams }: LegalPageProps) 
           <EmptyState
             title="No legal entries matched"
             action={
-              <a className="bb-cta bb-cta--ink" href="/legal">
+              <a className="ds-cta ds-cta--ink" href="/legal">
                 Clear filters
               </a>
             }

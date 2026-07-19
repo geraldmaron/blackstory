@@ -101,7 +101,7 @@ export async function assertJurisdictionReferencesResolve(
       .join(', ');
     throw new Error(
       `Projection build blocked: dangling jurisdiction reference(s) [${detail}]. ` +
-        'Every jurisdictionId must resolve to a jurisdictions/{id} document (BB-091 fail-closed).',
+        'Every jurisdictionId must resolve to a jurisdictions/{id} document (fail-closed).',
     );
   }
 }

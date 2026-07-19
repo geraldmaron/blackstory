@@ -11,14 +11,15 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@black-book/firebase';
+import type { AppCheckVerifier } from '@repo/firebase';
 import { getSnapshotSearchIndex } from '../../../lib/search/snapshot-search-index';
 import { createSearchAppCheckGuard } from './app-check-guard';
 import { createSearchRateLimitGuard } from './rate-limit-guard';
 import { handleSearchRequest, type SearchRouteDependencies } from './handler';
 
-const SCHOOL_ID = 'ent_seed_school_001';
-const PLACE_ID = 'ent_seed_place_001';
+const SCHOOL_ID = 'ent_dunbar_school_001';
+const PLACE_ID = 'ent_15th_st_church_001';
+const EVENT_ID = 'ent_dc_landmark_listing_1975';
 
 function acceptingVerifier(appId = 'test-app-id'): AppCheckVerifier {
   return {
@@ -60,14 +61,14 @@ type SearchBody = {
 
 test('a valid query returns 200 with real snapshot results', async () => {
   const deps = await buildDeps();
-  const response = await handleSearchRequest(searchRequest('?q=freedmen'), deps);
+  const response = await handleSearchRequest(searchRequest('?q=laurence'), deps);
   assert.equal(response.status, 200);
 
   const body = (await response.json()) as SearchBody;
   assert.ok(body.totalMatched >= 1);
   assert.ok(
     body.results.some((r) => r.id === SCHOOL_ID),
-    'expected the Seed Freedmen School fixture in the results',
+    'expected the Paul Laurence Dunbar High School fixture in the results',
   );
 });
 
@@ -93,25 +94,26 @@ test('rejects a wildcard-only query through the real route (wildcard_only)', asy
 
 test('the status filter narrows results through the real route (AC5)', async () => {
   const deps = await buildDeps();
+  const stateParam = encodeURIComponent('Washington, D.C.');
 
   const unfiltered = (await (
-    await handleSearchRequest(searchRequest('?q=education'), deps)
+    await handleSearchRequest(searchRequest(`?state=${stateParam}`), deps)
   ).json()) as SearchBody;
-  assert.equal(unfiltered.totalMatched, 2, 'both seed entities share the "education" topic');
+  assert.equal(unfiltered.totalMatched, 4, 'all four seed entities share the Washington, D.C. jurisdiction');
 
   const filtered = (await (
-    await handleSearchRequest(searchRequest('?q=education&status=active'), await buildDeps())
+    await handleSearchRequest(searchRequest(`?state=${stateParam}&status=active`), await buildDeps())
   ).json()) as SearchBody;
-  assert.equal(filtered.totalMatched, 1);
-  assert.equal(filtered.results[0]?.id, SCHOOL_ID, 'only the active school survives status=active');
+  assert.equal(filtered.totalMatched, 3, 'the statusless 1975 landmark-listing event is excluded by status=active');
+  assert.ok(!filtered.results.some((r) => r.id === EVENT_ID));
 });
 
 test('the era filter narrows results through the real route (AC5)', async () => {
   const filtered = (await (
-    await handleSearchRequest(searchRequest('?q=education&era=1900s'), await buildDeps())
+    await handleSearchRequest(searchRequest('?q=education&era=1890s'), await buildDeps())
   ).json()) as SearchBody;
   assert.equal(filtered.totalMatched, 1);
-  assert.equal(filtered.results[0]?.id, SCHOOL_ID, 'only the school overlaps the 1900s era bucket');
+  assert.equal(filtered.results[0]?.id, SCHOOL_ID, 'only the school overlaps the 1890s era bucket');
 });
 
 test('a missing App Check token is denied (401 app_check_required)', async () => {
@@ -165,10 +167,10 @@ test('cursor round-trip returns the next page, not the same page', async () => {
   const secondId = second.results[0]?.id;
 
   assert.notEqual(firstId, secondId, 'the second page must not repeat the first page');
-  // : relatedCount is now the real graph-adjacency size, not relatedIds.length the school
-  // is connected to both the place and the commemoration event, so it outranks the place
-  // (relatedCount 2 vs 1) once the equal "education" topic-tier tie is broken by connection
-  // strength.
+  // : relatedCount is the real graph-adjacency size, not relatedIds.length the school is
+  // connected to both the church (located_at) and the 1975 landmark listing (occurred_at), so it
+  // outranks the church (relatedCount 2 vs 1) once the equal "education" topic-tier tie is broken
+  // by connection strength.
   assert.equal(firstId, SCHOOL_ID);
   assert.equal(secondId, PLACE_ID);
 });

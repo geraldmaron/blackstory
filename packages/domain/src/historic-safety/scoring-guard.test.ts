@@ -58,7 +58,7 @@ test('assertGeneralCrimeStatsAbsentFromScoringInput accepts a clean composite-sh
   );
 });
 
-test('assertScoringInputFreeOfExcludedData also rejects advisory fields (BB-095 extension)', () => {
+test('assertScoringInputFreeOfExcludedData also rejects advisory fields ( extension)', () => {
   assert.throws(
     () =>
       assertScoringInputFreeOfExcludedData({

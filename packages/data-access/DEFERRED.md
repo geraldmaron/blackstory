@@ -1,8 +1,8 @@
 # Deferred: Postgres / SQL Connect / PostGIS (ADR-011 / D-014)
 
-This package historically hosted Cloud SQL / SQL Connect helpers from BB-012.
+This package historically hosted Cloud SQL / SQL Connect helpers from .
 
-**Current production path:** Firestore via `@black-book/firebase` converters +
+**Current production path:** Firestore via `@repo/firebase` converters +
 `src/firestore/` in this package.
 
 Postgres modules (`config`, `pool`, `roles`, `session`, `sql-connect/*`) remain

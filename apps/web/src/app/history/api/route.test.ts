@@ -15,10 +15,17 @@ function allowAllAppCheck() {
   return {
     allowed: true as const,
     verified: false,
-    status: 200,
-    reason: 'skipped' as const,
+    mode: 'monitor' as const,
+    trustedService: false as const,
   };
 }
+
+const noRisk = {
+  totalScore: 0,
+  byKind: {},
+  distinctDimensions: 0,
+  exceedsThreshold: false,
+};
 
 function createDeps(overrides?: {
   readonly appCheckAllowed?: boolean;
@@ -28,20 +35,48 @@ function createDeps(overrides?: {
   return {
     appCheckGuard: async () =>
       overrides?.appCheckAllowed === false
-        ? { allowed: false as const, verified: false, status: 401, reason: 'missing' as const }
+        ? {
+            allowed: false as const,
+            verified: false as const,
+            mode: 'enforce' as const,
+            status: 401 as const,
+            code: 'APP_CHECK_REQUIRED' as const,
+            reason: 'missing_token' as const,
+            trustedService: false as const,
+          }
         : allowAllAppCheck(),
     rateLimitGuard: {
       evaluate: () =>
         overrides?.rateAllowed === false
-          ? { allowed: false as const, key: 'k', retryAfterSeconds: 30 }
-          : { allowed: true as const, key: 'k' },
+          ? {
+              allowed: false as const,
+              reason: 'token_bucket_exhausted' as const,
+              retryAfterMs: 30_000,
+              safeRetryAfterSec: 30,
+              policyVersion: 'test',
+              key: 'k',
+              riskAggregation: noRisk,
+            }
+          : {
+              allowed: true as const,
+              remaining: 10,
+              resetAtMs: 0,
+              concurrencyRemaining: 1,
+              policyVersion: 'test',
+              key: 'k',
+              riskAggregation: noRisk,
+            },
       release: (key: string) => {
         keys.delete(key);
       },
       formatDeniedResponse: () => ({
-        status: 429,
+        status: 429 as const,
         headers: { 'Retry-After': '30' },
-        body: { error: 'rate_limited' },
+        body: {
+          error: 'rate_limit_exceeded' as const,
+          message: 'Rate limit exceeded.',
+          retryAfterSec: 30,
+        },
       }),
     },
   };
@@ -52,7 +87,7 @@ function request(query = ''): Request {
 }
 
 test('returns filtered node ids for a valid decade refine query', async () => {
-  const response = await handleHistoryRefineRequest(request('?decade=1950s&kind=event'), createDeps());
+  const response = await handleHistoryRefineRequest(request('?decade=1970s&kind=event'), createDeps());
   assert.equal(response.status, 200);
   const body = (await response.json()) as {
     nodeIds: string[];
@@ -60,7 +95,7 @@ test('returns filtered node ids for a valid decade refine query', async () => {
     sparseDecade: boolean;
   };
   assert.equal(body.totalMatched, 1);
-  assert.deepEqual(body.nodeIds, ['ent_seed_event_001']);
+  assert.deepEqual(body.nodeIds, ['ent_dc_landmark_listing_1975']);
   assert.equal(body.sparseDecade, false);
 });
 

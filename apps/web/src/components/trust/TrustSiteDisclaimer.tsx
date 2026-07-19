@@ -2,8 +2,8 @@
  * Site-wide disclaimer from the registry one framework, no ad-hoc copy.
  */
 import React from 'react';
-import { getDisclaimer } from '@black-book/domain';
-import { DisclaimerBanner } from '../DisclaimerBanner.js';
+import { getDisclaimer } from '@repo/domain/disclaimers';
+import { DisclaimerBanner } from '../DisclaimerBanner';
 
 export function TrustSiteDisclaimer() {
   return <DisclaimerBanner {...getDisclaimer('site_wide')} />;

@@ -1,6 +1,6 @@
 # Security Policy
 
-Black Book treats supply-chain integrity, secret handling, and private vulnerability reporting as first-class controls (BB-009 / threat T-11, T-12).
+Blap treats supply-chain integrity, secret handling, and private vulnerability reporting as first-class controls (BB-009 / threat T-11, T-12).
 
 ## Supported versions
 
@@ -13,7 +13,7 @@ This repository is pre-production. Report issues against the default branch (`ma
 Prefer one of these private channels (in order):
 
 1. **GitHub private vulnerability reporting** — once the repository is on GitHub, use **Security → Advisories → Report a vulnerability** (or the equivalent “Report a vulnerability” button on this file). Enable private reporting when applying `infra/github/security-settings.json`.
-2. **Email the maintainer** listed in `.github/CODEOWNERS` (interim: GitHub user `geraldmaron`) with a clear subject such as `Black Book security report`.
+2. **Email the maintainer** listed in `.github/CODEOWNERS` (interim: GitHub user `geraldmaron`) with a clear subject such as `Blap security report`.
 
 Include:
 

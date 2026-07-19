@@ -1,4 +1,4 @@
-# Public web surface contract (BB-021)
+# Public web surface contract ()
 
 This app is the **public UI** surface. It is deployed via Firebase App Hosting, not Cloud Run.
 
@@ -9,7 +9,7 @@ This app is the **public UI** surface. It is deployed via Firebase App Hosting, 
 | Surface id | `web` |
 | Runtime | Firebase App Hosting |
 | Config | `apphosting.yaml`, `apphosting.production.yaml`, `apphosting.staging.yaml` |
-| Proposed backend | `black-book-web-production` |
+| Proposed backend | `the related workstream-production` |
 | Runtime SA | `web-runtime@black-book-efaaf.iam.gserviceaccount.com` |
 | Network posture | Public CDN |
 

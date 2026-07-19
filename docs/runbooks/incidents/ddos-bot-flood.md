@@ -9,7 +9,7 @@
 
 1. Engage research campaigns, LLM, geocoding, nearby, uploads, exports, and affected adapters.
 2. Engage `corrections-submissions` and `search` if pressure persists.
-3. Apply reviewed BB-023 edge rules and pause affected queues without purging.
+3. Apply reviewed  edge rules and pause affected queues without purging.
 4. If origins remain unsafe, engage `public-static-mode`; keep immutable release snapshots online.
 
 ## Recover

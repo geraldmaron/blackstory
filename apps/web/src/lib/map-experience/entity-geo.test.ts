@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { isWithinUsBounds } from '@black-book/domain';
+import { isWithinUsBounds } from '@repo/domain/map/geography';
 import { listPublicEntities } from '../../data/public-seed';
 import { ENTITY_GEO_ANCHORS, geoAnchorFor } from './entity-geo';
 

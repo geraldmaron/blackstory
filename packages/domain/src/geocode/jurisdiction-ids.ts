@@ -8,8 +8,8 @@
  * `docs/adr/ADR-016-jurisdiction-reference-data.md` §2 already define and load into the real
  * `jurisdictions` Firestore collection. This module duplicates only the tiny pure
  * string-building functions (not the Firestore schema, loader, or resolver) because
- * `@black-book/domain` cannot depend on `@black-book/firebase` — that package already depends
- * on `@black-book/domain` at runtime, so the reverse edge would be a circular workspace
+ * `@repo/domain` cannot depend on `@repo/firebase` — that package already depends
+ * on `@repo/domain` at runtime, so the reverse edge would be a circular workspace
  * dependency (the same rule `../adapters/internet-archive/shared/http-port.ts` documents for
  * the domain/security edge). Any change to the id format in
  * `packages/firebase/src/jurisdictions/schema.ts` must be mirrored here.

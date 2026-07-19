@@ -1,6 +1,6 @@
 /**
  * SSR markup smoke tests for the disclaimer/sensitivity/advisory banner components.
- * Mirrors the render-to-static-markup pattern used by @black-book/ui's semantics.test.ts.
+ * Mirrors the render-to-static-markup pattern used by @repo/ui's semantics.test.ts.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';
@@ -102,7 +102,7 @@ test('SensitivityContextBanner never renders a suppression/hide affordance — i
   // The component always renders visible content for a given flag there is no prop or branch
   // that yields an empty/hidden result while a sensitivity record is passed in. Matches the
   // standalone "hidden" token (an HTML `hidden` attribute or `visibility: hidden`) but not
-  // `aria-hidden`/`bb-visually-hidden` those are legitimate, unrelated accessibility markup
+  // `aria-hidden`/`ds-visually-hidden` those are legitimate, unrelated accessibility markup
   // (a decorative icon and screen-reader-only text respectively), not content suppression.
   assert.ok(html.length > 0);
   assert.doesNotMatch(html, /(?<![\w-])hidden(?![\w-])/i);

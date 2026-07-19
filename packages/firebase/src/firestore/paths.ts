@@ -1,6 +1,6 @@
 
 /**
- * Firestore collection path constants for Black Book (ADR-011 018).
+ * Firestore collection path constants for BlackStory (ADR-011 018).
  * Paths always use even segment counts (collection/doc[/collection/doc...]).
  */
 export const FIRESTORE_ROOT = {
@@ -30,8 +30,22 @@ export const FIRESTORE_ROOT = {
   idempotencyKeys: 'idempotencyKeys',
   outboxConsumerReceipts: 'outboxConsumerReceipts',
   killSwitches: 'killSwitches',
+  /** Private run records for scheduled discovery campaign jobs. */
+  discoveryCampaignRuns: 'discoveryCampaignRuns',
   /** Jurisdiction reference data: states + counties wholesale, cities on-demand. */
   jurisdictions: 'jurisdictions',
+  /** Published census statistics: one doc per county per decennial vintage (the related workstream). */
+  censusCountyDecades: 'censusCountyDecades',
+  /** ACS 5-year county estimates: one doc per county per vintage. */
+  acsCountyProfiles: 'acsCountyProfiles',
+  /** ACS 5-year tract estimates (~85k/vintage): county-bounded reads only, never full scans. */
+  acsTractProfiles: 'acsTractProfiles',
+  /** FBI UCR agency directory: ORI → county crosswalk, shared by every UCR dataset. */
+  ucrAgencies: 'ucrAgencies',
+  /** FBI hate crime incidents aggregated by county + year (joins on fips5). */
+  hateCrimeCountyYears: 'hateCrimeCountyYears',
+  /** UCR reporting participation by state + year — the coverage denominator. */
+  ucrStateParticipation: 'ucrStateParticipation',
 } as const;
 
 export type FirestoreRootCollection = (typeof FIRESTORE_ROOT)[keyof typeof FIRESTORE_ROOT];
@@ -46,6 +60,9 @@ export const firestorePaths = {
   entityLocation: (entityId: string, locationId: string) =>
     `${FIRESTORE_ROOT.canonicalEntities}/${entityId}/locations/${locationId}`,
   canonicalClaim: (claimId: string) => `${FIRESTORE_ROOT.canonicalClaims}/${claimId}`,
+  /** Versions subcollection: append-only, one immutable doc per claim revision. */
+  claimVersion: (claimId: string, versionId: string) =>
+    `${FIRESTORE_ROOT.canonicalClaims}/${claimId}/versions/${versionId}`,
   claimEvidenceLink: (linkId: string) => `${FIRESTORE_ROOT.claimEvidenceLinks}/${linkId}`,
   entityRelationship: (relationshipId: string) =>
     `${FIRESTORE_ROOT.entityRelationships}/${relationshipId}`,
@@ -71,9 +88,14 @@ export const firestorePaths = {
   outboxConsumerReceipt: (receiptId: string) =>
     `${FIRESTORE_ROOT.outboxConsumerReceipts}/${receiptId}`,
   killSwitch: (switchId: string) => `${FIRESTORE_ROOT.killSwitches}/${switchId}`,
+  discoveryCampaignRun: (runId: string) =>
+    `${FIRESTORE_ROOT.discoveryCampaignRuns}/${runId}`,
   /** Convention: source adapter kill switches use this id pattern. */
   sourceAdapterKillSwitch: (adapterId: string) =>
     `${FIRESTORE_ROOT.killSwitches}/source-adapter-${adapterId}`,
   /** Jurisdiction reference data: flat `{id}` docs, e.g. `us`, `us-06`, `us-06-001`. */
   jurisdiction: (jurisdictionId: string) => `${FIRESTORE_ROOT.jurisdictions}/${jurisdictionId}`,
+  /** Census county-decade statistics: flat `{fips5}_{decade}` docs, e.g. `01001_2020`. */
+  censusCountyDecade: (fips5: string, decade: string) =>
+    `${FIRESTORE_ROOT.censusCountyDecades}/${fips5}_${decade}`,
 } as const;

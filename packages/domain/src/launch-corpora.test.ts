@@ -71,11 +71,14 @@ test('Mapping Inequality is onboarded with requiresPolygonGeometry and a localit
   assert.ok(mappingInequality, 'mapping-inequality-holc must be present');
   assert.equal(mappingInequality?.requiresPolygonGeometry, true);
   assert.equal(mappingInequality?.precisionExpectation, 'locality');
-  assert.equal(mappingInequality?.licenseVerdict, 'public-domain');
-  assert.ok(mappingInequality?.boundaryNotes?.includes('BB-070'));
+  // DSL's downloadable vector dataset is CC BY-NC-SA — noncommercial, attribution required.
+  // Still bulk-import eligible, but never wholly public-domain (corrected 2026-07-18).
+  assert.equal(mappingInequality?.licenseVerdict, 'restricted-attribution-required');
+  assert.ok(mappingInequality?.rights.prohibitedUses.includes('commercial_reuse'));
+  assert.ok(mappingInequality?.boundaryNotes?.includes(''));
 });
 
-test('every launch corpus notability criterion is a valid BB-090 criterion, distinct where corpus class differs', () => {
+test('every launch corpus notability criterion is a valid criterion, distinct where corpus class differs', () => {
   const inputs = buildLaunchCorpusVettingInputs({ vettedBy: 'operator-gerald', vettedAt: NOW });
   const byCorpus = new Map(inputs.map((input) => [input.corpus, input.notabilityCriterion]));
   assert.equal(byCorpus.get('nrhp'), 'landmark_or_national_register');
@@ -85,7 +88,7 @@ test('every launch corpus notability criterion is a valid BB-090 criterion, dist
   assert.equal(byCorpus.get('mapping-inequality-holc'), 'documented_site');
 });
 
-test('statutes/cases (BB-087) and Tougaloo sundown data (BB-082) are not in the launch corpus list', () => {
+test('statutes/cases () and Tougaloo sundown data () are not in the launch corpus list', () => {
   const inputs = buildLaunchCorpusVettingInputs({ vettedBy: 'operator-gerald', vettedAt: NOW });
   const slugs = new Set(inputs.map((input) => input.corpus));
   for (const excluded of BOUNDARY_EXCLUDED_CORPUS_SLUGS) {

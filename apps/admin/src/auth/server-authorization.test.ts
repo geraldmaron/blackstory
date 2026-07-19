@@ -4,12 +4,12 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mutateAdminRoles } from './role-mutation.js';
+import { mutateAdminRoles } from './role-mutation';
 import {
   ServerAdminAuthorizationError,
   createServerAdminAuthorizer,
   type AdminAuthorizationPolicy,
-} from './server-authorization.js';
+} from './server-authorization';
 
 const VALID_HEADERS = {
   authorization: 'Bearer firebase-id-token',

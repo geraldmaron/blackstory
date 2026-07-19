@@ -6,11 +6,11 @@
  * Reuses the single AI_TRAINING_USER_AGENTS list from../robots.ts so the two files can never
  * drift out of sync.
  */
-import { AI_TRAINING_USER_AGENTS } from '../robots.js';
+import { AI_TRAINING_USER_AGENTS } from '../robots';
 
 function buildAiTxt(): string {
   const lines = [
-    '# ai.txt — Black Book AI-crawler policy (BB-089)',
+    '# ai.txt — BlackStory AI-crawler policy ',
     '# This is a courtesy signal only; see /robots.txt for the standard-convention equivalent.',
     '# Content here is human-researched historical documentation, not a corpus offered for',
     '# unrestricted AI-training ingestion. Contact the security contact in',

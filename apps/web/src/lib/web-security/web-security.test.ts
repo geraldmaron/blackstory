@@ -29,19 +29,21 @@ const NEXT_CONFIG_PATH = join(__dirname, '../../../next.config.mjs');
 test('CSP includes strict defaults and frame-ancestors none', () => {
   const csp = buildContentSecurityPolicy({ isDev: false });
   assert.match(csp, /default-src 'self'/);
-  assert.match(csp, /script-src 'self'/);
-  assert.doesNotMatch(csp, /script-src 'self' 'unsafe-inline'/);
+  // Next App Router needs inline flight scripts until a nonce pipeline lands.
+  assert.match(csp, /script-src 'self' 'unsafe-inline'/);
+  assert.doesNotMatch(csp, /script-src 'self' 'unsafe-inline' 'unsafe-eval'/);
   assert.match(csp, /frame-ancestors 'none'/);
   assert.match(csp, /object-src 'none'/);
   assert.match(csp, /upgrade-insecure-requests/);
   assert.match(csp, /worker-src 'self' blob:/);
   assert.match(csp, /demotiles\.maplibre\.org/);
+  assert.match(csp, /storage\.googleapis\.com/);
 });
 
 test('CSP development relaxes script-src for Next.js hydration and HMR', () => {
   const csp = buildContentSecurityPolicy({ isDev: true });
   assert.match(csp, /script-src 'self' 'unsafe-inline' 'unsafe-eval'/);
-  assert.match(csp, /connect-src 'self' https:\/\/demotiles\.maplibre\.org ws: wss:/);
+  assert.match(csp, /connect-src 'self' https:\/\/demotiles\.maplibre\.org https:\/\/tiles\.openfreemap\.org ws: wss:/);
   assert.doesNotMatch(csp, /upgrade-insecure-requests/);
 });
 

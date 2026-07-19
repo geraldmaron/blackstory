@@ -1,4 +1,4 @@
-# External URL safety and SSRF prevention (BB-030)
+# External URL safety and SSRF prevention
 
 Submitted URLs are inert data during submission intake. The submissions service creates a
 `url-evaluation` queue job and retains the source in quarantine; it does not resolve, connect to, or
@@ -50,7 +50,7 @@ denylist in addition to IP classification. Domain approval never overrides desti
 Internationalized names are evaluated after the runtime parser converts them to canonical ASCII.
 
 Do not allow wildcard exceptions for organization-owned internal zones. At minimum deny metadata
-hostnames and all private/internal DNS suffixes used by Black Book, Firebase, Google APIs, and
+hostnames and all private/internal DNS suffixes used by BlackStory, Firebase, Google APIs, and
 service discovery.
 
 ## Worker egress boundary
@@ -113,8 +113,8 @@ These are reviewed human steps; this repository does not apply live GCP or Fireb
 Unit tests use injected DNS and transport fixtures only; they never contact live systems.
 
 ```bash
-pnpm --filter @black-book/security test
-pnpm --filter @black-book/security typecheck
+pnpm --filter @repo/security test
+pnpm --filter @repo/security typecheck
 node --conditions development --import tsx --test \
   packages/security/src/url-safety/url-safety.test.ts
 cd workers/security

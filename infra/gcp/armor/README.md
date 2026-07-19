@@ -28,7 +28,7 @@ directory is applied to GCP by default.
 ## Application quotas (BB-025)
 
 Edge Armor policies (above) provide coarse per-IP throttles. **Application-layer quotas** live in
-`@black-book/security` and are wired through `createPublicRateLimitGuard` /
+`@repo/security` and are wired through `createPublicRateLimitGuard` /
 `createSubmissionsRateLimitGuard` in the API apps. See
 [`docs/security/rate-limits.md`](../../docs/security/rate-limits.md) for the policy matrix,
 risk-signal aggregation, and remaining shared-store / middleware work.

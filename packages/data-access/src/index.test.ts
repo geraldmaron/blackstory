@@ -36,7 +36,7 @@ test('rejects public Next.js database env keys', () => {
 
 test('parseDatabaseConfig requires server role and connection target', () => {
   const config = parseDatabaseConfig({
-    BLACK_BOOK_DB_ROLE: 'role_public_read',
+    APP_DB_ROLE: 'role_public_read',
     DATABASE_URL: 'postgresql://role_public_read:local-public-read@127.0.0.1:5432/blackbook',
   });
   assert.equal(config.role, 'role_public_read');

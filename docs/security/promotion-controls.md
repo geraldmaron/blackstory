@@ -1,6 +1,6 @@
 # Data-poisoning and promotion controls
 
-BB-032 makes publication a controlled state machine:
+ makes publication a controlled state machine:
 
 `submission/discovery → research case → proposed claim → accepted claim → publication candidate → release`
 

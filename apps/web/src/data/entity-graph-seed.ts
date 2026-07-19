@@ -22,7 +22,7 @@ import {
   type EntityStatusValue,
   type PublicRelatedEntry,
   type StatusHistoryEntry,
-} from '@black-book/domain';
+} from '@repo/domain';
 import { NATIONAL_STORY_RELATIONSHIPS } from './national-story-seed/relationships';
 
 // ---------------------------------------------------------------------------
@@ -32,32 +32,32 @@ import { NATIONAL_STORY_RELATIONSHIPS } from './national-story-seed/relationship
 
 const BASE_ENTITY_RELATIONSHIPS: readonly EntityRelationship[] = [
   {
-    id: 'rel_seed_school_located_at_place',
-    fromEntityId: 'ent_seed_school_001',
-    toEntityId: 'ent_seed_place_001',
+    id: 'rel_dunbar_school_located_at_church',
+    fromEntityId: 'ent_dunbar_school_001',
+    toEntityId: 'ent_15th_st_church_001',
     type: 'located_at',
-    evidenceIds: ['evid_seed_located_001'],
-    temporal: { validFrom: '1868' },
+    evidenceIds: ['evid_dunbar_located_001'],
+    temporal: { validFrom: '1870' },
     createdAt: '2026-07-17T00:00:00.000Z',
     updatedAt: '2026-07-17T00:00:00.000Z',
   },
   {
-    id: 'rel_seed_event_occurred_at_school',
-    fromEntityId: 'ent_seed_event_001',
-    toEntityId: 'ent_seed_school_001',
+    id: 'rel_landmark_occurred_at_school',
+    fromEntityId: 'ent_dc_landmark_listing_1975',
+    toEntityId: 'ent_dunbar_school_001',
     type: 'occurred_at',
-    evidenceIds: ['evid_seed_occurred_001'],
-    temporal: { validFrom: '1954' },
+    evidenceIds: ['evid_landmark_occurred_001'],
+    temporal: { validFrom: '1975' },
     createdAt: '2026-07-17T00:00:00.000Z',
     updatedAt: '2026-07-17T00:00:00.000Z',
   },
   {
-    id: 'rel_seed_institution_commemorates_event',
-    fromEntityId: 'ent_seed_institution_001',
-    toEntityId: 'ent_seed_event_001',
+    id: 'rel_alumni_commemorates_landmark',
+    fromEntityId: 'ent_dunbar_alumni_federation_001',
+    toEntityId: 'ent_dc_landmark_listing_1975',
     type: 'commemorates',
-    evidenceIds: ['evid_seed_commemorates_001'],
-    temporal: { validFrom: '1975' },
+    evidenceIds: ['evid_alumni_commemorates_001'],
+    temporal: { validFrom: '2002' },
     createdAt: '2026-07-17T00:00:00.000Z',
     updatedAt: '2026-07-17T00:00:00.000Z',
   },
@@ -85,21 +85,26 @@ export function relatedEntriesFor(entityId: string): readonly PublicRelatedEntry
 // ---------------------------------------------------------------------------
 
 export const SEED_STATUS_HISTORY: Readonly<Record<string, readonly StatusHistoryEntry<EntityStatusValue>[]>> = {
-  ent_seed_place_001: [
-    { status: 'historic', validFrom: '1950', datePrecision: 'year', basisClaimIds: ['claim_seed_001'] },
+  ent_15th_st_church_001: [
+    { status: 'active', validFrom: '1841', datePrecision: 'year', basisClaimIds: ['claim_church_founded_1841'] },
   ],
-  ent_seed_school_001: [
+  ent_dunbar_school_001: [
     {
       status: 'historic',
-      validFrom: '1868',
-      validTo: '1954',
+      validFrom: '1870',
+      validTo: '1891',
       datePrecision: 'year',
-      basisClaimIds: ['claim_seed_002'],
+      basisClaimIds: ['claim_dunbar_founded_1870'],
     },
-    { status: 'active', validFrom: '1954', datePrecision: 'year', basisClaimIds: ['claim_seed_003'] },
+    {
+      status: 'active',
+      validFrom: '1891',
+      datePrecision: 'year',
+      basisClaimIds: ['claim_dunbar_renamed_m_street_1891'],
+    },
   ],
-  ent_seed_institution_001: [
-    { status: 'active', validFrom: '1975', datePrecision: 'year', basisClaimIds: ['claim_seed_004'] },
+  ent_dunbar_alumni_federation_001: [
+    { status: 'active', validFrom: '2002', datePrecision: 'year', basisClaimIds: ['claim_alumni_organized_2002'] },
   ],
   ent_princeville_nc_001: [
     { status: 'active', validFrom: '1885', datePrecision: 'year', basisClaimIds: ['claim_princeville_incorporated_1885'] },
@@ -161,18 +166,21 @@ export function statusHistoryFor(entityId: string): readonly StatusHistoryEntry<
 
 // ---------------------------------------------------------------------------
 // sensitivity flag (schema only presentation is `SensitivityContextBanner`).
-// One flagged fixture demonstrates the banner; the note is conduct-based (a documented dispute
-// action), never an identity attribute, and cites a real claim on the entity's own claims list.
+// One flagged fixture demonstrates the banner: a real, documented, bittersweet preservation
+// history (not a conduct/identity dispute), citing a real claim on the entity's own claims list.
 // ---------------------------------------------------------------------------
 
 export const SEED_SENSITIVITY: Readonly<Record<string, EntitySensitivity>> = {
-  ent_seed_place_001: {
+  ent_dunbar_school_001: {
     class: 'contested_legacy',
     note:
-      'Historical society records document a contested 1920s land-use dispute in which local ' +
-      'authorities took disputed displacement actions affecting the community historically ' +
-      'associated with this site.',
-    basisClaimIds: ['claim_seed_005'],
+      'The school’s original 1916 building was demolished in 1977, and its 1970s replacement was ' +
+      'itself demolished in 2013; the demolitions were emotionally significant for alumni, though ' +
+      'the buildings had seriously deteriorated by the time each was torn down. The current 2013 ' +
+      'building sits on the original footprint and honors the school’s history through graduate ' +
+      'plaques and paintings of alumni who appeared on U.S. postage stamps, rather than preserving ' +
+      'the original structure.',
+    basisClaimIds: ['claim_dunbar_demolitions_1977_2013'],
   },
 };
 

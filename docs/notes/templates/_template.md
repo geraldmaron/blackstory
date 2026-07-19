@@ -11,7 +11,7 @@ What prompted this note? What problem are we trying to understand?
 ## Observations
 
 - Fact 1
-- Fact 2  
+- Fact 2
 - Fact 3
 
 ## Questions

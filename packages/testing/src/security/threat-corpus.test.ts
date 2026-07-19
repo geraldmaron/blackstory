@@ -12,7 +12,7 @@ import {
   validateThreatCorpus,
 } from './threat-corpus.ts';
 
-describe('BB-004 threat corpus', () => {
+describe(' threat corpus', () => {
   it('loads nineteen P0 threats with full control quadrants and implementation refs', () => {
     const corpus = loadThreatCorpus();
     const issues = validateThreatCorpus(corpus);

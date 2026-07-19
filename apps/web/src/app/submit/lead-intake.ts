@@ -12,7 +12,7 @@
  * issue the same behavior `packages/operator-cli`'s lead intake has today. This file does not
  * duplicate or relax that rule; it surfaces the real rejection to the submitter instead.
  */
-import type { SubmissionInput } from '@black-book/security';
+import type { SubmissionInput } from '@repo/security';
 
 const MIN_WHY_IT_MATTERS_LENGTH = 10;
 const MAX_FIELD_LENGTH = 4_000;

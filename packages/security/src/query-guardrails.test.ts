@@ -91,7 +91,7 @@ test('allowlists sort keys and filter fields only', () => {
   );
 });
 
-test('allowlists the BB-049 status and era filter fields', () => {
+test('allowlists the  status and era filter fields', () => {
   // AC5: the filter allowlist extends to status and era. Both must now be accepted (allowed:true)
   // and appear on the canonical filter set previously they were rejected as
   // filter_field_not_allowed.
@@ -218,7 +218,7 @@ test('slow query log event shape includes failClosed', () => {
   assert.equal(event.endpointClass, 'search');
 });
 
-test('searchQueryEndpointMetadata integrates with BB-025 endpoint classes', () => {
+test('searchQueryEndpointMetadata integrates with  endpoint classes', () => {
   const decision = evaluateSearchQueryGuardrails({ q: 'test' });
   assert.equal(decision.allowed, true);
   if (decision.allowed) {

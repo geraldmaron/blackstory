@@ -20,7 +20,7 @@ export type UsStateInfo = {
 };
 
 /**
- * Approximate bounding boxes for the 50 states + D.C. Deliberately coarse 
+ * Approximate bounding boxes for the 50 states + D.C. Deliberately coarse
  * only used for presence bucketing over already-coarsened public coordinates,
  * never for anything that needs administrative-boundary precision.
  */

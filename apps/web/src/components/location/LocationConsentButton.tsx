@@ -13,7 +13,7 @@
  * so screen reader users get the same feedback sighted users see in the label change.
  */
 import React, { useState } from 'react';
-import { Button } from '@black-book/ui';
+import { Button } from '@repo/ui';
 import {
   requestBrowserLocation,
   type BrowserCoordinates,
@@ -59,7 +59,7 @@ export function LocationConsentButton({ onResolved, onDenied, disabled = false }
   }
 
   return (
-    <div className="bb-stack" style={{ gap: 'var(--bb-space-2)' }}>
+    <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
       <Button
         type="button"
         onClick={handleClick}
@@ -68,11 +68,11 @@ export function LocationConsentButton({ onResolved, onDenied, disabled = false }
       >
         {status === 'requesting' ? 'Requesting location…' : 'Use my current location'}
       </Button>
-      <p id="locate-consent-status" role="status" aria-live="polite" className="bb-visually-hidden">
+      <p id="locate-consent-status" role="status" aria-live="polite" className="ds-visually-hidden">
         {status === 'requesting' ? 'Requesting your location from the browser.' : ''}
         {status === 'denied' ? denialMessage : ''}
       </p>
-      {status === 'denied' && denialMessage ? <p className="bb-sans">{denialMessage}</p> : null}
+      {status === 'denied' && denialMessage ? <p className="ds-sans">{denialMessage}</p> : null}
     </div>
   );
 }

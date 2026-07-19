@@ -1,11 +1,21 @@
 /**
- * Enforces the dignity rule programmatically: no color token used for the map's points,
- * clusters, or density layer may be red-hued (no red violence markers, no crime-heat),
- * so this cannot silently regress as the brand palette evolves.
+ * Enforces map color rules: density stays non-red (presence, not crime-heat);
+ * kind shades stay non-red except the allowlisted massacre tone (product
+ * direction the related workstream). Every kind still carries a glyph so color is never
+ * the only signal (WCAG 1.4.1).
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { DENSITY_TIER_FILL, DIGNITY_PALETTE } from './dignity-style';
+import { KIND_ENCODING_ENTRIES, MAP_SEMANTIC_TONE_ENCODING } from './kind-encoding';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/** Intentionally red (massacre) semantic tone — product allowlist. */
+const RED_ALLOWLIST = new Set<string>([DIGNITY_PALETTE.kindMassacre]);
 
 function hexToRgb(hex: string): readonly [number, number, number] {
   const normalized = hex.replace('#', '');
@@ -50,8 +60,7 @@ function saturation([r, g, b]: readonly [number, number, number]): number {
   return delta / (1 - Math.abs(2 * lightness - 1));
 }
 
-/** "Red-hued" per the dignity rule: a saturated color whose hue sits in the red band. Warm
- * copper/brown/orange tones (hue ~15-45) are explicitly allowed the brand's own palette. */
+/** "Red-hued": saturated color in the red band. Warm copper/brown/orange (hue ~15-45) allowed. */
 function isRedHued(rgb: readonly [number, number, number]): boolean {
   const h = hue(rgb);
   const s = saturation(rgb);
@@ -59,24 +68,59 @@ function isRedHued(rgb: readonly [number, number, number]): boolean {
   return inRedBand && s > 0.25;
 }
 
-test('no dignity-palette color used for points/clusters/selection is red-hued', () => {
-  const colorValues = [
-    DIGNITY_PALETTE.point,
-    DIGNITY_PALETTE.pointHalo,
-    DIGNITY_PALETTE.cluster,
-    DIGNITY_PALETTE.clusterText,
-    DIGNITY_PALETTE.background,
-    DIGNITY_PALETTE.border,
-    DIGNITY_PALETTE.selected,
-  ];
-  for (const color of colorValues) {
+test('no color in DIGNITY_PALETTE is red-hued except the allowlisted massacre tone', () => {
+  for (const color of Object.values(DIGNITY_PALETTE)) {
+    if (RED_ALLOWLIST.has(color)) continue;
     const rgb = color.startsWith('#') ? hexToRgb(color) : rgbaToRgb(color);
     assert.ok(rgb, `expected a parseable color for ${color}`);
     assert.equal(isRedHued(rgb!), false, `${color} must not be red-hued (dignity rule)`);
   }
+  assert.equal(isRedHued(hexToRgb(DIGNITY_PALETTE.kindMassacre)), true, 'massacre tone must be red');
 });
 
-test('no density-tier fill (the coverage/presence layer) is red-hued — never a crime-heat gradient', () => {
+test('every kind shade is paired with a non-color glyph channel (WCAG 1.4.1)', () => {
+  for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
+    assert.ok(typeof entry.glyph === 'string' && entry.glyph.length > 0, `kind "${kind}" must have a glyph`);
+  }
+  const signatures = KIND_ENCODING_ENTRIES.map(([, entry]) => `${entry.shade}::${entry.glyph}`);
+  assert.equal(
+    new Set(signatures).size,
+    signatures.length,
+    'no two kinds may share both shade and glyph',
+  );
+});
+
+test('semantic tones keep distinct shades for massacre, plantation, and epicenter', () => {
+  const tones = Object.entries(MAP_SEMANTIC_TONE_ENCODING);
+  assert.equal(tones.length, 3);
+  assert.equal(MAP_SEMANTIC_TONE_ENCODING.massacre.shade, DIGNITY_PALETTE.kindMassacre);
+  assert.equal(MAP_SEMANTIC_TONE_ENCODING.plantation.shade, DIGNITY_PALETTE.kindPlantation);
+  assert.equal(MAP_SEMANTIC_TONE_ENCODING.epicenter.shade, DIGNITY_PALETTE.kindEpicenter);
+});
+
+test('no status or skin framing in kind labels or legend prose', () => {
+  const bannedPattern = /\b(skin|racial|complexion|light[- ]skinned|dark[- ]skinned|caste)\b/i;
+  for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
+    assert.doesNotMatch(entry.label, bannedPattern, `kind "${kind}" label must not use status/skin framing`);
+  }
+
+  const legendSource = readFileSync(
+    path.join(__dirname, '../../components/map-experience/MapExperienceLegend.tsx'),
+    'utf8',
+  );
+  const jsxTextLines = legendSource
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('*') && !line.trim().startsWith('//'));
+  const renderedProse = jsxTextLines.join('\n');
+  assert.doesNotMatch(renderedProse, bannedPattern, 'MapExperienceLegend.tsx JSX copy must not use status/skin framing');
+  assert.match(
+    renderedProse,
+    /kind of place or record/i,
+    'the legend must state that color encodes kind (and historical tones)',
+  );
+});
+
+test('no density-tier fill is red-hued — never a crime-heat gradient', () => {
   for (const [tier, value] of Object.entries(DENSITY_TIER_FILL)) {
     const rgb = rgbaToRgb(value);
     assert.ok(rgb, `expected a parseable rgba() for density tier ${tier}`);
@@ -84,7 +128,7 @@ test('no density-tier fill (the coverage/presence layer) is red-hued — never a
   }
 });
 
-test('density tiers share the same hue family (a single warm palette scaling by opacity, not by hue-shifting toward red as density increases)', () => {
+test('density tiers share the same hue family (opacity scale, not hue-shift toward red)', () => {
   const hues = Object.values(DENSITY_TIER_FILL)
     .map((value) => rgbaToRgb(value))
     .filter((rgb): rgb is readonly [number, number, number] => rgb !== undefined)

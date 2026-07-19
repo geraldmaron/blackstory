@@ -25,7 +25,7 @@ Runtime evaluators live in [`packages/security/src/resource-controls.ts`](../../
 
 ```bash
 node --test infra/gcp/cost-controls/cost-controls.test.mjs
-pnpm --filter @black-book/security test
+pnpm --filter @repo/security test
 ```
 
 Human doc: [`docs/security/cost-resource-controls.md`](../../../docs/security/cost-resource-controls.md).

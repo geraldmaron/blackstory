@@ -48,7 +48,7 @@ test('buildHistoricSafetySourceRegistrationInputs records mandatory EJI and Toug
   assert.equal(tougaloo!.feedsLayerId, 'sundown_town');
 });
 
-test('registerHistoricSafetySources registers both sources through the BB-037 registry without re-registering launch corpora', () => {
+test('registerHistoricSafetySources registers both sources through the  registry without re-registering launch corpora', () => {
   const registryStore = createInMemorySourceRegistry();
   const sourceRegistryStore = createInMemoryHistoricSafetySourceRegistryStore();
   const registrations = registerHistoricSafetySources(registryStore, sourceRegistryStore, {

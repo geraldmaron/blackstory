@@ -2,9 +2,9 @@
 
 - **Status:** Accepted (amended by [ADR-011](./ADR-011-firestore-system-of-record.md))
 - **Date:** 2026-07-16
-- **Bead:** BB-002
+- **Bead:**
 - **Depends on:** ADR-004, ADR-005, ADR-011
-- **Implements toward:** BB-026, BB-049, BB-050
+- **Implements toward:** , ,
 
 ## Scaffold vs target
 
@@ -12,22 +12,22 @@
 |--------|------------------|------------------------|
 | Search API | Not implemented (`api-public` health stub) | Bounded queries over **released Firestore public projections** (prefix/field filters; optional later search engine) |
 | Geography | Not implemented | **Geohash** (+ lat/lng) on projection docs; server radius filter in `api-public` |
-| Geocoder | Not implemented | U.S. Census Geocoder adapter + cache (BB-050) |
+| Geocoder | Not implemented | U.S. Census Geocoder adapter + cache |
 | PostGIS / Postgres FTS | Parked under `infra/database/` | Deferred unless ADR-011 migration triggers fire |
 | Separate search SaaS | None | Explicitly deferred until Firestore + geohash proven insufficient |
 
 ## Context
 
-Users discover history by place, name, and proximity. Search and geocoding are expensive abuse magnets. Living residential addresses must never be stored or returned as ordinary person-location fields. Product scope for address discovery is U.S.-oriented (50 states + D.C. per BB-050). Ranking should favor relevance and connection strength, not fame alone.
+Users discover history by place, name, and proximity. Search and geocoding are expensive abuse magnets. Living residential addresses must never be stored or returned as ordinary person-location fields. Product scope for address discovery is U.S.-oriented (50 states + D.C. per ). Ranking should favor relevance and connection strength, not fame alone.
 
 ## Decision
 
 1. **Search** is served only by **`apps/api-public`** against **released public projections** (and release-scoped search index metadata), never canonical draft data.
 2. **Initial store:** Firestore public projection documents with searchable fields and **geohash** geography — not PostGIS (ADR-011). Prefer in-product bounded queries before a separate search platform.
-3. Enforce **approved query shapes only**: min/max length, normalized Unicode, max filters/radius/date range/page size/depth, **cursor pagination**, query timeouts/budgets, no user-defined sort expressions/field selection (BB-026).
-4. **Geocoding** uses a **U.S. Census Geocoder** adapter with **normalization**, **geocode cache**, rate limits, and **manual place search fallback** on failure (BB-050).
+3. Enforce **approved query shapes only**: min/max length, normalized Unicode, max filters/radius/date range/page size/depth, **cursor pagination**, query timeouts/budgets, no user-defined sort expressions/field selection.
+4. **Geocoding** uses a **U.S. Census Geocoder** adapter with **normalization**, **geocode cache**, rate limits, and **manual place search fallback** on failure.
 5. Browser location requires **explicit user action**; no persistent precise-location history; coarse analytics only; reduce exact coordinates when no longer needed.
-6. Layered abuse controls (Armor, App Check, quotas) apply more strictly to search/geocode/nearby than to static entity reads (BB-025).
+6. Layered abuse controls (Armor, App Check, quotas) apply more strictly to search/geocode/nearby than to static entity reads.
 7. Search-index version is tied to each **immutable release** (ADR-004).
 
 ## Rejected alternatives
@@ -43,10 +43,10 @@ Users discover history by place, name, and proximity. Search and geocoding are e
 
 ## Consequences
 
-- Public schema and projection design must include searchable/geospatial fields up front (BB-014, BB-019).
+- Public schema and projection design must include searchable/geospatial fields up front (, ).
 - Census Geocoder outages degrade to manual place search, not empty hard-fail of the whole site.
-- Load and abuse tests must specifically target search/geocode (BB-059).
-- Map-centric UX (BB-051) remains deferred and must reuse the same API guardrails.
+- Load and abuse tests must specifically target search/geocode.
+- Map-centric UX remains deferred and must reuse the same API guardrails.
 
 ## Migration triggers
 
@@ -57,6 +57,6 @@ Users discover history by place, name, and proximity. Search and geocoding are e
 
 ## Rollback considerations
 
-- Kill-switch search and/or geocoding independently (BB-035) while entity pages continue from snapshots.
+- Kill-switch search and/or geocoding independently while entity pages continue from snapshots.
 - Pin public API to prior release’s search-index version when a bad index ships.
 - Flush geocode cache entries that violate privacy rules without rolling back releases.

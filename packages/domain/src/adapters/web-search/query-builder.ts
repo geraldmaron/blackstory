@@ -37,7 +37,7 @@ export function assertQueryTextHasNoResearchOnlyOffensiveTerms(queryText: string
     if (lower.includes(offensive)) {
       throw new Error(
         `Constructed web-search query text contains a researchOnlyOffensive term from pack "${pack.id}"; ` +
-          'these terms must never be sent to an external API (BB-075 acceptance criterion 3)',
+          'these terms must never be sent to an external API ( acceptance criterion 3)',
       );
     }
   }

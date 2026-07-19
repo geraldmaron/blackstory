@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://blackbook.local/schemas/relevance/relevance-assessment.v1.schema.json",
   "title": "RelevanceAssessment",
-  "description": "Private deterministic relevance assessment for discovery candidates (BB-040). Composite scores are never public.",
+  "description": "Private deterministic relevance assessment for discovery candidates. Composite scores are never public.",
   "type": "object",
   "additionalProperties": false,
   "required": [

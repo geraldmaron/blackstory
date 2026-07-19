@@ -78,7 +78,7 @@ export function assertNoExcludedLayerInComposite(inputs: CompositeLayerInputs): 
       throw new Error(
         `Composite slot "${slot}" expects a "${layerId}" LayerSignal but received layerId ` +
           `"${signal.layerId}" \u2014 layer 5 (modern-context) and any other non-matching layer ` +
-          'can never enter the composite (BB-082 critical invariant).',
+          'can never enter the composite ( critical invariant).',
       );
     }
   }

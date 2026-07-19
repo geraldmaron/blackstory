@@ -5,7 +5,7 @@
  * "Vet once, import bulk": rather than re-litigating licensing, custodianship,
  * and authority for every record a settled corpus (National Register, HABS/HAER,...)
  * contributes, the corpus itself is vetted ONCE and the verdict recorded here
- * (`CorpusVettingRecord`). Bulk batches then run exclusively through the existing 
+ * (`CorpusVettingRecord`). Bulk batches then run exclusively through the existing
  * CLI/quarantine pipeline (`packages/operator-cli/src/bulk-import.ts`), gated by
  * `assertCorpusVettedForBulkImport` below an unvetted corpus, a corpus whose license verdict
  * was never cleared for bulk import, or a corpus whose registry entry is
@@ -22,7 +22,7 @@
  * approved, so `assertAdapterMayRun` fails closed on them automatically no separate check
  * could accidentally diverge from the registry's own state.
  *
- * These are dedicated, -owned registry entries distinct from any live discovery adapter 
+ * These are dedicated, -owned registry entries distinct from any live discovery adapter
  * e.g. the federal adapter `nps-national-register-v1` also touches NPS data, but for a
  * different, continuously-polled discovery workload with its own volume/canary expectations.
  * corpus registry entries never mutate or depend on another team's adapter state.
@@ -101,7 +101,7 @@ export function isRefreshCadence(value: string): value is RefreshCadence {
 }
 
 // ---------------------------------------------------------------------------
-// Boundary rules 
+// Boundary rules
 // ---------------------------------------------------------------------------
 
 /**
@@ -117,14 +117,14 @@ export const EXCLUDED_CORPUS_LANES: readonly {
 }[] = [
   {
     corpusSlugPattern: /^(statutes?|cases?|legal[-_]?corpus)$/iu,
-    ownerBead: 'BB-087',
-    reason: 'Statutes and cases are BB-087\'s legal corpus lane, never the BB-094 bulk-intake lane.',
+    ownerBead: '',
+    reason: 'Statutes and cases are \'s legal corpus lane, never the  bulk-intake lane.',
   },
   {
     corpusSlugPattern: /^tougaloo([-_]sundown([-_]data)?)?$/iu,
-    ownerBead: 'BB-082',
+    ownerBead: '',
     reason:
-      'Tougaloo sundown-town data is BB-082\'s exclusion-infrastructure lane, never the BB-094 bulk-intake lane.',
+      'Tougaloo sundown-town data is \'s exclusion-infrastructure lane, never the  bulk-intake lane.',
   },
 ];
 
@@ -133,7 +133,7 @@ export function assertCorpusNotInExcludedLane(corpus: string): void {
   const match = EXCLUDED_CORPUS_LANES.find((exclusion) => exclusion.corpusSlugPattern.test(corpus));
   if (match) {
     throw new Error(
-      `Corpus "${corpus}" belongs to ${match.ownerBead}'s lane, not BB-094's bulk-intake lane: ${match.reason}`,
+      `Corpus "${corpus}" belongs to ${match.ownerBead}'s lane, not 's bulk-intake lane: ${match.reason}`,
     );
   }
 }
@@ -160,7 +160,7 @@ export type CorpusVettingRecord = {
   readonly provenanceFieldsRetained: readonly string[];
   /** Best-documented geoPrecision tier this corpus's records are expected at. */
   readonly precisionExpectation: GeoPrecisionTier;
-  /** True only for corpora whose records carry real polygon geometry (e.g. Mapping Inequality 
+  /** True only for corpora whose records carry real polygon geometry (e.g. Mapping Inequality
    * ), never point+radius. */
   readonly requiresPolygonGeometry: boolean;
   readonly refreshCadence: RefreshCadence;
@@ -233,7 +233,7 @@ export function createInMemoryCorpusVettingStore(
 }
 
 // ---------------------------------------------------------------------------
-// Registration 
+// Registration
 // ---------------------------------------------------------------------------
 
 export function corpusSourceRegistryEntryId(corpus: string): string {
@@ -291,7 +291,7 @@ export function registerCorpusVetting(
     rights: input.rights,
     permittedClaimClasses: input.permittedClaimClasses,
     refreshSchedule: input.refreshCadence,
-    notes: `BB-094 vetted bulk-import corpus "${input.corpus}"; custodian: ${input.custodian}.`,
+    notes: ` vetted bulk-import corpus "${input.corpus}"; custodian: ${input.custodian}.`,
   };
 
   const contract: SourceAdapterContract = {
@@ -435,7 +435,7 @@ export function assertWithinCorpusBulkImportBudget(input: {
   if (input.batchRecordCount > input.budget.maxRecordsPerBatch) {
     throw new Error(
       `Bulk import batch of ${input.batchRecordCount} records exceeds the per-batch budget cap ` +
-        `of ${input.budget.maxRecordsPerBatch} (BB-094 fail-closed).`,
+        `of ${input.budget.maxRecordsPerBatch} ( fail-closed).`,
     );
   }
   if (
@@ -445,13 +445,13 @@ export function assertWithinCorpusBulkImportBudget(input: {
     throw new Error(
       `Bulk import batch would push corpus imports to ` +
         `${(input.priorRecordsInWindow ?? 0) + input.batchRecordCount}, exceeding the refresh-window ` +
-        `budget cap of ${input.budget.maxRecordsPerRefreshWindow} (BB-094 fail-closed).`,
+        `budget cap of ${input.budget.maxRecordsPerRefreshWindow} ( fail-closed).`,
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// The fail-closed gate 
+// The fail-closed gate
 // ---------------------------------------------------------------------------
 
 export type CorpusVettingGateResult = {
@@ -473,20 +473,20 @@ export function assertCorpusVettedForBulkImport(
   const vetting = vettingStore.get(corpus);
   if (!vetting) {
     throw new Error(
-      `Bulk import blocked: corpus "${corpus}" has no vetting record (BB-094 fail-closed).`,
+      `Bulk import blocked: corpus "${corpus}" has no vetting record ( fail-closed).`,
     );
   }
   if (!isBulkImportEligibleLicenseVerdict(vetting.licenseVerdict)) {
     throw new Error(
       `Bulk import blocked: corpus "${corpus}" license verdict "${vetting.licenseVerdict}" is not ` +
-        'cleared for bulk import (BB-094 fail-closed).',
+        'cleared for bulk import ( fail-closed).',
     );
   }
   const registryEntry = registryStore.get(vetting.sourceRegistryEntryId);
   if (!registryEntry) {
     throw new Error(
       `Bulk import blocked: corpus "${corpus}" vetting record points at missing registry entry ` +
-        `"${vetting.sourceRegistryEntryId}" (BB-094 fail-closed).`,
+        `"${vetting.sourceRegistryEntryId}" ( fail-closed).`,
     );
   }
   assertAdapterMayRun(registryEntry, killSwitch);

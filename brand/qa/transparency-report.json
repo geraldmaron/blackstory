@@ -1,0 +1,222 @@
+{
+  "logos/dark/BlackStory-primary-lockup-dark-transparent.png": {
+    "size": [
+      1672,
+      941
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "bbox": [
+      238,
+      286,
+      1489,
+      638
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "logos/light/BlackStory-primary-lockup-light-transparent.png": {
+    "size": [
+      1672,
+      941
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "bbox": [
+      238,
+      286,
+      1489,
+      638
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "symbols/dark/BlackStory-symbol-dark-transparent-1024.png": {
+    "size": [
+      1024,
+      1024
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "bbox": [
+      334,
+      172,
+      700,
+      759
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "symbols/dark/BlackStory-symbol-dark-transparent-2048.png": {
+    "size": [
+      2048,
+      2048
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "bbox": [
+      671,
+      346,
+      1400,
+      1518
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "symbols/dark/BlackStory-symbol-dark-transparent-512.png": {
+    "size": [
+      512,
+      512
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "bbox": [
+      166,
+      85,
+      351,
+      381
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "symbols/dark/BlackStory-symbol-dark-transparent.png": {
+    "size": [
+      1254,
+      1254
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "bbox": [
+      372,
+      135,
+      899,
+      985
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "symbols/light/BlackStory-symbol-light-transparent-1024.png": {
+    "size": [
+      1024,
+      1024
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "bbox": [
+      334,
+      172,
+      700,
+      759
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "symbols/light/BlackStory-symbol-light-transparent-2048.png": {
+    "size": [
+      2048,
+      2048
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "bbox": [
+      671,
+      346,
+      1400,
+      1518
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "symbols/light/BlackStory-symbol-light-transparent-512.png": {
+    "size": [
+      512,
+      512
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "bbox": [
+      166,
+      85,
+      351,
+      381
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "symbols/light/BlackStory-symbol-light-transparent.png": {
+    "size": [
+      1254,
+      1254
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "bbox": [
+      372,
+      135,
+      899,
+      985
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

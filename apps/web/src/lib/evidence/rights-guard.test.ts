@@ -81,9 +81,9 @@ test('a citation flagged as protected uses a caller-supplied reason when provide
     label: 'Protected source',
     href: 'https://internal.example.org/sensitive',
     protectedFromPublicLink: true,
-    protectedReason: 'Withheld under BB-015 living-person protections.',
+    protectedReason: 'Withheld under living-person protections.',
   });
-  assert.equal(view.withheldReason, 'Withheld under BB-015 living-person protections.');
+  assert.equal(view.withheldReason, 'Withheld under living-person protections.');
 });
 
 test('an unprotected citation with a public href renders the link normally', () => {

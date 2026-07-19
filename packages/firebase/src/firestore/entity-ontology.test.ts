@@ -91,7 +91,7 @@ function assertNoNumericLeaf(value: unknown, path = '$'): void {
   }
 }
 
-test('publicEntityProjectionSchema BB-090 additions never carry a numeric score', () => {
+test('publicEntityProjectionSchema additions never carry a numeric score', () => {
   const parsed = publicEntityProjectionSchema.parse({
     id: 'ent-law-1',
     releaseId: 'rel-1',
@@ -116,7 +116,7 @@ test('publicEntityProjectionSchema BB-090 additions never carry a numeric score'
   });
 });
 
-test('publicEntityProjectionSchema rejects numeric values for every BB-090 addition by construction', () => {
+test('publicEntityProjectionSchema rejects numeric values for every addition by construction', () => {
   const base = {
     id: 'ent-law-1',
     releaseId: 'rel-1',
@@ -165,7 +165,7 @@ const VALID_SEARCH_DOC = {
   claimCount: 2,
 };
 
-test('publicSearchIndexSchema (BB-049) round-trips a valid search index doc', () => {
+test('publicSearchIndexSchema () round-trips a valid search index doc', () => {
   const parsed = publicSearchIndexSchema.parse(VALID_SEARCH_DOC);
   assert.equal(parsed.id, 'ent-law-1');
   assert.equal(parsed.releaseId, 'rel-1');

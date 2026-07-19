@@ -88,7 +88,7 @@ When BB-035 lands, prefer feature kill switches over taking public corpus offlin
 
 ```bash
 node --test infra/gcp/cost-controls/cost-controls.test.mjs
-pnpm --filter @black-book/security test
+pnpm --filter @repo/security test
 ```
 
 ## Explicit non-actions

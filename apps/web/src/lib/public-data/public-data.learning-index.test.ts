@@ -7,7 +7,7 @@ import {
   LEARNING_SUMMARY_MAX_CHARS,
   LEARNING_SUMMARY_MIN_CHARS,
   validateLearningSummary,
-} from '@black-book/domain';
+} from '@repo/domain';
 import { listPublicEntities } from '../../data/public-seed';
 import { hydrateEntityLearningLinks } from './source';
 
@@ -27,10 +27,10 @@ test('every seed entity summary meets the learning-index length bar', () => {
 
 test('seed entities hydrate related neighbors and continue-learning where graph allows', () => {
   const entities = listPublicEntities();
-  const place = entities.find((e) => e.id === 'ent_seed_place_001');
+  const place = entities.find((e) => e.id === 'ent_15th_st_church_001');
   assert.ok(place);
   assert.ok((place.relatedNeighbors?.length ?? 0) >= 1);
-  // place → school → event/institution yields 2-hop continue learning
+  // church → school → landmark listing/institution yields 2-hop continue learning
   assert.ok((place.continueLearning?.length ?? 0) >= 1);
 
   const { relatedNeighbors: _rn, continueLearning: _cl, ...withoutLinks } = place;
@@ -39,7 +39,7 @@ test('seed entities hydrate related neighbors and continue-learning where graph 
 });
 
 test('school seed carries optional photo and extended narrative', () => {
-  const school = listPublicEntities().find((e) => e.id === 'ent_seed_school_001');
+  const school = listPublicEntities().find((e) => e.id === 'ent_dunbar_school_001');
   assert.ok(school?.primaryImage?.url);
   assert.ok(school?.extendedNarrative);
   assert.equal(school?.primaryImage?.rightsStatus, 'public_domain');

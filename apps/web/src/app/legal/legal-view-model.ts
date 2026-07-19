@@ -1,7 +1,7 @@
 /**
  * Pure view-model for the `/legal` browse and detail pages. No Next.js runtime dependency.
  */
-import { slugifyFactStatement } from '@black-book/domain';
+import { buildFactPath } from '@repo/domain';
 import type { LegalBrowseItem } from '../../components/legal';
 import { isLawStatus } from '../../components/legal/format';
 import {
@@ -35,7 +35,7 @@ export type LegalDetailViewModel =
   | {
       readonly kind: 'ok';
       readonly snapshot: (typeof SEED_LEGAL_SNAPSHOTS)[number];
-      readonly explainer?: ReturnType<typeof getLegalCatalogEntry> extends infer T ? NonNullable<T>['explainer'] : never;
+      readonly explainer?: NonNullable<ReturnType<typeof getLegalCatalogEntry>>['explainer'];
       readonly factHref?: string;
     };
 
@@ -58,7 +58,7 @@ function snapshotToBrowseItem(
     lawStatus: snapshot.lawStatus,
     topics: snapshot.topics,
     hasExplainer: catalog !== undefined,
-    ...(fact ? { factHref: `/facts/${fact.id}/${slugifyFactStatement(fact.shortStatement)}` } : {}),
+    ...(fact ? { factHref: buildFactPath(fact.id, fact.slug) } : {}),
   };
 }
 
@@ -108,7 +108,7 @@ export function buildLegalDetailViewModel(slug: string): LegalDetailViewModel {
     kind: 'ok',
     snapshot,
     ...(catalog ? { explainer: catalog.explainer } : {}),
-    ...(fact ? { factHref: `/facts/${fact.id}/${slugifyFactStatement(fact.shortStatement)}` } : {}),
+    ...(fact ? { factHref: buildFactPath(fact.id, fact.slug) } : {}),
   };
 }
 

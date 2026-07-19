@@ -6,10 +6,13 @@
 /** @returns {{ key: string, value: string }}  */
 export function securityHeadersForNextConfig() {
   const isDev = process.env.NODE_ENV !== 'production';
+  // Keep in sync with csp.ts — production needs 'unsafe-inline' for Next RSC flight
+  // scripts until a nonce pipeline lands.
   const scriptSrc = isDev
     ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-    : "script-src 'self'";
-  const mapTiles = 'https://demotiles.maplibre.org';
+    : "script-src 'self' 'unsafe-inline'";
+  const mapTiles = 'https://demotiles.maplibre.org https://tiles.openfreemap.org';
+  const publicMedia = 'https://storage.googleapis.com';
   const connectSrc = isDev
     ? `connect-src 'self' ws: wss: ${mapTiles}`
     : `connect-src 'self' ${mapTiles}`;
@@ -21,7 +24,7 @@ export function securityHeadersForNextConfig() {
     "object-src 'none'",
     scriptSrc,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${mapTiles}`,
+    `img-src 'self' data: blob: ${mapTiles} ${publicMedia}`,
     `font-src 'self' ${mapTiles}`,
     connectSrc,
     "manifest-src 'self'",

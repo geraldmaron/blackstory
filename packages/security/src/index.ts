@@ -1,13 +1,13 @@
 
 /**
- * @black-book/security central redaction and public serialization layer.
+ * @repo/security central redaction and public serialization layer.
  *
  * This package is the single choke point that reduces location precision and scrubs
  * protected values (living residential addresses, exact coordinates) before anything
  * reaches a public surface: APIs, search indexes, projections, logs, telemetry, and
- * exports. All policy is sourced from the product constitution (@black-book/schemas).
+ * exports. All policy is sourced from the product constitution (@repo/schemas).
  */
-export const SECURITY_PACKAGE = '@black-book/security' as const;
+export const SECURITY_PACKAGE = '@repo/security' as const;
 
 export {
   sensitivityClasses,
@@ -224,4 +224,5 @@ export type {
   AbusiveTrafficSimulationResult,
 } from './resource-controls.js';
 
-export * from './url-safety/index.js';
+// Node-only URL safety — import via `@repo/security/url-safety`, never the main barrel
+// (client webpack graphs that need redactLocationForPublic must use `@repo/security/redaction`).

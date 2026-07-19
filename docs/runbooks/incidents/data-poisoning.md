@@ -9,7 +9,7 @@
 
 1. Engage `corrections-submissions`, affected source-adapter switches, `research-campaigns`, and `publication`.
 2. Pause relevant queues without purge and quarantine the suspected lineage.
-3. If poison reached public output, roll back to the last verified BB-019 release.
+3. If poison reached public output, roll back to the last verified  release.
 
 ## Recover
 

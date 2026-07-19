@@ -1,6 +1,6 @@
 
 /**
- * CSS custom properties for Black Book themes, focus, motion, and layout tokens.
+ * CSS custom properties for BlackStory themes, focus, motion, and layout tokens.
  * Import via `@black-book/ui/styles.css` in consuming apps.
  * Palette: Archive Paper Black Ink primaries with Copper Pin Page Sand accents.
  * Mirrors packages/ui/src/tokens/colors.ts keep the two in sync.
@@ -10,160 +10,164 @@
 [data-theme='light'] {
   color-scheme: light;
 
-  --bb-canvas: #f4efe5;
-  --bb-surface: #fbf8f2;
-  --bb-surface-raised: #fbf8f2;
-  --bb-ink: #0a0a0a;
-  --bb-ink-muted: #6d675f;
-  --bb-ink-subtle: #6d675f;
-  --bb-border: #d7d0c4;
-  --bb-rule: #d7d0c4;
-  --bb-border-strong: #0a0a0a;
-  --bb-focus-ring: #0a0a0a;
-  --bb-focus-ring-offset: #f4efe5;
-  --bb-inverse: #0a0a0a;
-  --bb-inverse-ink: #f4efe5;
-  --bb-overlay: rgba(10, 10, 10, 0.55);
+  --ds-canvas: #f4efe5;
+  --ds-surface: #fbf8f2;
+  --ds-surface-raised: #fbf8f2;
+  --ds-ink: #0a0a0a;
+  --ds-ink-muted: #6d675f;
+  --ds-ink-subtle: #6d675f;
+  --ds-border: #d7d0c4;
+  --ds-rule: #d7d0c4;
+  --ds-border-strong: #0a0a0a;
+  --ds-focus-ring: #0a0a0a;
+  --ds-focus-ring-offset: #f4efe5;
+  --ds-inverse: #0a0a0a;
+  --ds-inverse-ink: #f4efe5;
+  --ds-overlay: rgba(10, 10, 10, 0.55);
 
-  --bb-accent: #8e4f2a;
-  --bb-accent-graphic: #b86b2a;
-  --bb-accent-muted: #d8a178;
+  --ds-accent: #8e4f2a;
+  --ds-accent-graphic: #b86b2a;
+  --ds-accent-muted: #d8a178;
 
-  --bb-warning-fg: #6b4a17;
-  --bb-warning-bg: #f3e4c6;
-  --bb-warning-border: #b87a2a;
-  --bb-dispute-fg: #7a1f3d;
-  --bb-dispute-bg: #f1dce3;
-  --bb-dispute-border: #b8395f;
-  --bb-error-fg: #7a1f1f;
-  --bb-error-bg: #f3dcd2;
-  --bb-error-border: #b83a2a;
+  --ds-warning-fg: #6b4a17;
+  --ds-warning-bg: #f3e4c6;
+  --ds-warning-border: #b87a2a;
+  --ds-dispute-fg: #7a1f3d;
+  --ds-dispute-bg: #f1dce3;
+  --ds-dispute-border: #b8395f;
+  --ds-error-fg: #7a1f1f;
+  --ds-error-bg: #f3dcd2;
+  --ds-error-border: #b83a2a;
 
-  --bb-confidence-high-fg: #215a34;
-  --bb-confidence-high-bg: #dcebdd;
-  --bb-confidence-high-border: #3e8b54;
-  --bb-confidence-medium-fg: #6b4a17;
-  --bb-confidence-medium-bg: #f3e4c6;
-  --bb-confidence-medium-border: #b87a2a;
-  --bb-confidence-low-fg: #4a453d;
-  --bb-confidence-low-bg: #e7e1d3;
-  --bb-confidence-low-border: #7a7364;
+  /* Confidence: high → green, medium → olive, low → orange (glyph still required). */
+  --ds-confidence-high-fg: #2f6b3c;
+  --ds-confidence-high-bg: #dcebdd;
+  --ds-confidence-high-border: #3e8b54;
+  --ds-confidence-medium-fg: #6b6a17;
+  --ds-confidence-medium-bg: #ebebc6;
+  --ds-confidence-medium-border: #8b8a2e;
+  --ds-confidence-low-fg: #8e4f2a;
+  --ds-confidence-low-bg: #f3e4c6;
+  --ds-confidence-low-border: #d07a32;
 
-  --bb-elevation-sm: none;
-  --bb-elevation-md: none;
-  --bb-elevation-lg: none;
+  --ds-elevation-sm: none;
+  --ds-elevation-md: none;
+  --ds-elevation-lg: none;
 
-  --bb-viz-1: #0a0a0a;
-  --bb-viz-2: #b86b2a;
-  --bb-viz-3: #6d675f;
-  --bb-viz-4: #d8a178;
-  --bb-viz-grid: #d7d0c4;
+  --ds-viz-1: #0a0a0a;
+  --ds-viz-2: #b86b2a;
+  --ds-viz-3: #6d675f;
+  --ds-viz-4: #d8a178;
+  --ds-viz-grid: #d7d0c4;
 }
 
 [data-theme='dark'] {
   color-scheme: dark;
 
-  --bb-canvas: #0a0a0a;
-  --bb-surface: #161616;
-  --bb-surface-raised: #1c1b18;
-  --bb-ink: #f4efe5;
-  --bb-ink-muted: #bdb5a9;
-  --bb-ink-subtle: #bdb5a9;
-  --bb-border: #34302c;
-  --bb-rule: #34302c;
-  --bb-border-strong: #f4efe5;
-  --bb-focus-ring: #f4efe5;
-  --bb-focus-ring-offset: #0a0a0a;
-  --bb-inverse: #f4efe5;
-  --bb-inverse-ink: #0a0a0a;
-  --bb-overlay: rgba(0, 0, 0, 0.72);
+  --ds-canvas: #0a0a0a;
+  --ds-surface: #161616;
+  --ds-surface-raised: #1c1b18;
+  --ds-ink: #f4efe5;
+  --ds-ink-muted: #bdb5a9;
+  --ds-ink-subtle: #bdb5a9;
+  --ds-border: #34302c;
+  --ds-rule: #34302c;
+  --ds-border-strong: #f4efe5;
+  --ds-focus-ring: #f4efe5;
+  --ds-focus-ring-offset: #0a0a0a;
+  --ds-inverse: #f4efe5;
+  --ds-inverse-ink: #0a0a0a;
+  --ds-overlay: rgba(0, 0, 0, 0.72);
 
-  --bb-accent: #d07a32;
-  --bb-accent-graphic: #d07a32;
-  --bb-accent-muted: #d8a178;
+  --ds-accent: #d07a32;
+  --ds-accent-graphic: #d07a32;
+  --ds-accent-muted: #d8a178;
 
-  --bb-warning-fg: #f0ce8e;
-  --bb-warning-bg: #3a2a0e;
-  --bb-warning-border: #d6a354;
-  --bb-dispute-fg: #f0b9c9;
-  --bb-dispute-bg: #3a1420;
-  --bb-dispute-border: #d66e8b;
-  --bb-error-fg: #f0b3a6;
-  --bb-error-bg: #3a1610;
-  --bb-error-border: #d66b54;
+  --ds-warning-fg: #f0ce8e;
+  --ds-warning-bg: #3a2a0e;
+  --ds-warning-border: #d6a354;
+  --ds-dispute-fg: #f0b9c9;
+  --ds-dispute-bg: #3a1420;
+  --ds-dispute-border: #d66e8b;
+  --ds-error-fg: #f0b3a6;
+  --ds-error-bg: #3a1610;
+  --ds-error-border: #d66b54;
 
-  --bb-confidence-high-fg: #a9d9b4;
-  --bb-confidence-high-bg: #12301c;
-  --bb-confidence-high-border: #5cad73;
-  --bb-confidence-medium-fg: #f0ce8e;
-  --bb-confidence-medium-bg: #3a2a0e;
-  --bb-confidence-medium-border: #d6a354;
-  --bb-confidence-low-fg: #d4cdbe;
-  --bb-confidence-low-bg: #2b2822;
-  --bb-confidence-low-border: #8f8672;
+  /* Confidence: high → green, medium → olive, low → orange (glyph still required). */
+  --ds-confidence-high-fg: #a9d9b4;
+  --ds-confidence-high-bg: #12301c;
+  --ds-confidence-high-border: #5cad73;
+  --ds-confidence-medium-fg: #d4d48e;
+  --ds-confidence-medium-bg: #2a2a0e;
+  --ds-confidence-medium-border: #c4c04a;
+  --ds-confidence-low-fg: #d07a32;
+  --ds-confidence-low-bg: #3a2a0e;
+  --ds-confidence-low-border: #b86b2a;
 
-  --bb-elevation-sm: none;
-  --bb-elevation-md: none;
-  --bb-elevation-lg: none;
+  --ds-elevation-sm: none;
+  --ds-elevation-md: none;
+  --ds-elevation-lg: none;
 
-  --bb-viz-1: #f4efe5;
-  --bb-viz-2: #d07a32;
-  --bb-viz-3: #bdb5a9;
-  --bb-viz-4: #d8a178;
-  --bb-viz-grid: #34302c;
+  --ds-viz-1: #f4efe5;
+  --ds-viz-2: #d07a32;
+  --ds-viz-3: #bdb5a9;
+  --ds-viz-4: #d8a178;
+  --ds-viz-grid: #34302c;
 }
 
 :root {
   /*
-   * Display register rides the loaded Inter variable family (next/font injects
-   * --bb-font-sans with the opsz axis; its upper optical master is Inter
-   * Display). Weight 650 and -0.035em tracking live in the type-scale tokens.
+   * Display register is Sora per the blap brand pack (p.2 typography system —
+   * headlines, titles, key statements). next/font injects the loaded family via
+   * this same custom property on <body>; this :root chain is the no-JS/out-of-app
+   * fallback. Weight and tracking live in the type-scale tokens.
    */
-  --bb-font-display: var(--bb-font-sans, 'Inter Display', 'Inter', system-ui, sans-serif);
-  --bb-font-editorial:
+  --ds-font-display: 'Sora', var(--ds-font-sans, 'Inter', system-ui, sans-serif);
+  --ds-font-editorial:
     'Source Serif 4', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
-  --bb-font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  --bb-font-mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+  --ds-font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --ds-font-mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
 
-  --bb-space-1: 0.25rem;
-  --bb-space-2: 0.5rem;
-  --bb-space-3: 0.75rem;
-  --bb-space-4: 1rem;
-  --bb-space-5: 1.25rem;
-  --bb-space-6: 1.5rem;
-  --bb-space-8: 2rem;
-  --bb-space-10: 2.5rem;
-  --bb-space-12: 3rem;
-  --bb-space-16: 4rem;
+  --ds-space-1: 0.25rem;
+  --ds-space-2: 0.5rem;
+  --ds-space-3: 0.75rem;
+  --ds-space-4: 1rem;
+  --ds-space-5: 1.25rem;
+  --ds-space-6: 1.5rem;
+  --ds-space-8: 2rem;
+  --ds-space-10: 2.5rem;
+  --ds-space-12: 3rem;
+  --ds-space-16: 4rem;
 
-  --bb-radius-sm: 8px;
-  --bb-radius-md: 16px;
-  --bb-radius-lg: 28px;
+  --ds-radius-sm: 8px;
+  --ds-radius-md: 16px;
+  --ds-radius-lg: 28px;
+  --ds-radius-full: 999px;
 
-  --bb-border-width: 1px;
-  --bb-border-width-strong: 2px;
+  --ds-border-width: 1px;
+  --ds-border-width-strong: 2px;
 
-  --bb-focus-width: 3px;
-  --bb-focus-offset: 2px;
+  --ds-focus-width: 3px;
+  --ds-focus-offset: 2px;
 
-  --bb-icon-sm: 1rem;
-  --bb-icon-md: 1.25rem;
-  --bb-icon-lg: 1.5rem;
+  --ds-icon-sm: 1rem;
+  --ds-icon-md: 1.25rem;
+  --ds-icon-lg: 1.5rem;
 
-  --bb-duration-fast: 160ms;
-  --bb-duration-base: 280ms;
-  --bb-duration-slow: 480ms;
-  --bb-easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --ds-duration-fast: 160ms;
+  --ds-duration-base: 280ms;
+  --ds-duration-slow: 480ms;
+  --ds-easing: cubic-bezier(0.16, 1, 0.3, 1);
 
-  --bb-grid-max: 72rem;
-  --bb-content-max: 38rem;
-  --bb-gutter: var(--bb-space-4);
+  --ds-grid-max: 72rem;
+  --ds-content-max: 38rem;
+  --ds-gutter: var(--ds-space-4);
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --bb-duration-fast: 0.01ms;
-    --bb-duration-base: 0.01ms;
-    --bb-duration-slow: 0.01ms;
+    --ds-duration-fast: 0.01ms;
+    --ds-duration-base: 0.01ms;
+    --ds-duration-slow: 0.01ms;
   }
 }

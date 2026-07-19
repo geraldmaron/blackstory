@@ -1,5 +1,5 @@
 /**
- * Tests proving the Census TIGER/Gazetteer source is registered through the 
+ * Tests proving the Census TIGER/Gazetteer source is registered through the
  * registry with a public-domain license verdict.
  */
 import assert from 'node:assert/strict';
@@ -13,7 +13,7 @@ import {
   createCensusGeoEvidenceSource,
 } from './contract.js';
 
-test('createCensusGeoAdapterContract produces a structurally valid BB-037 contract', () => {
+test('createCensusGeoAdapterContract produces a structurally valid  contract', () => {
   const contract = createCensusGeoAdapterContract();
   assert.doesNotThrow(() => assertSourceAdapterContractValid(contract));
   assert.equal(contract.adapterId, CENSUS_GEO_ADAPTER_ID);
@@ -28,7 +28,7 @@ test('Census TIGER/Gazetteer carries a public_domain rights verdict — no paid 
   assert.deepEqual(contract.rights.prohibitedUses, []);
 });
 
-test('the Census source registers cleanly through the BB-037 in-memory registry', () => {
+test('the Census source registers cleanly through the  in-memory registry', () => {
   const store = createInMemorySourceRegistry();
   const contract = createCensusGeoAdapterContract();
   const evidenceSource = {

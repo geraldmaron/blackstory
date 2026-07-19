@@ -16,7 +16,7 @@ import { REDDIT_ADAPTER_ID, REDDIT_DEFAULT_CLASSIFICATION, REDDIT_FREE_TIER_QPM_
 export const REDDIT_ATTRIBUTION_NOTICE =
   'Reddit threads are discovery leads that point researchers at verifiable primary sources — ' +
   'never evidence of record, never republished. Only title, permalink, and a short triage ' +
-  'snippet are stored (BB-077 evidence-pointer doctrine); the author handle is never resolved ' +
+  'snippet are stored ( evidence-pointer doctrine); the author handle is never resolved ' +
   'to a real identity.';
 
 /**
@@ -43,7 +43,7 @@ export function createRedditAdapterContract(overrides: Partial<SourceAdapterCont
       permittedClaimClasses: ['biographical_fact', 'geographic_fact', 'organizational_fact'],
       refreshSchedule: '*/15 * * * *',
       notes:
-        'Gated channel (BB-074): fixtures-first canary until Reddit Responsible Builder approval ' +
+        'Gated channel (): fixtures-first canary until Reddit Responsible Builder approval ' +
         'is recorded on the bead. Curated subreddit registry only — no broad crawl.',
     },
     rights: {

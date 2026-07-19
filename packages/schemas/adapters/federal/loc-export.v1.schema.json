@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://blackbook.local/schemas/adapters/federal/loc-export.v1.schema.json",
   "title": "LibraryOfCongressExportRecord",
-  "description": "Fixture-only LOC export shape for federal adapter ingestion (BB-046).",
+  "description": "Fixture-only LOC export shape for federal adapter ingestion.",
   "type": "object",
   "additionalProperties": true,
   "required": ["stableIdentifier", "title"],

@@ -1,0 +1,76 @@
+/**
+ * Presentation for longform `/stories/[slug]` articles. Editorial serif body on the
+ * archive-paper canvas; mono for dates and fact ids. Atmosphere mast styles live in
+ * `components/atmosphere/atmosphere.css`.
+ */
+.ds-story-article {
+  display: grid;
+  gap: var(--ds-space-6);
+  padding-block: var(--ds-space-8) var(--ds-space-12);
+}
+
+.ds-story-article__body {
+  display: grid;
+  gap: var(--ds-space-5);
+  max-width: var(--ds-content-max);
+}
+
+.ds-story-article__p {
+  margin: 0;
+  font-family: var(--ds-font-editorial);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--ds-ink);
+}
+
+.ds-story-article__body .ds-section__title {
+  margin-top: var(--ds-space-2);
+}
+
+.ds-story-article__body > section {
+  padding-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-story-article__body > section:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.ds-story-article__footer {
+  margin-top: var(--ds-space-8);
+}
+
+/* Mosaic credits list */
+.ds-story-mosaic-credits {
+  list-style: none;
+  margin: var(--ds-space-6) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+.ds-story-mosaic-credits__item {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: var(--ds-space-4);
+  padding-block: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-story-mosaic-credits__index {
+  color: var(--ds-ink-muted);
+  font-size: 0.75rem;
+}
+
+.ds-story-mosaic-credits__entity {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+}
+
+.ds-story-mosaic-credits__path {
+  margin: var(--ds-space-1) 0 0;
+  font-size: 0.6875rem;
+  color: var(--ds-ink-muted);
+}

@@ -78,7 +78,7 @@ export function assertScheduledJobDefinitionValid(definition: ScheduledJobDefini
   }
   if (definition.rosterStatus === 'stub' && !definition.implementationOwnerBead) {
     throw new Error(
-      `Scheduled job "${definition.id}" is a stub and must declare implementationOwnerBead`,
+      `Scheduled job "${definition.id}" is a stub and must declare implementationOwnerBead (workstream label, not a tracker id)`,
     );
   }
   if (!(definition.consecutiveMissedRunThreshold >= 1)) {

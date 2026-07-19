@@ -14,7 +14,7 @@ import {
   type AuditSubject,
   type DomainAuditEvent,
   type DomainOutboxMessage,
-} from '@black-book/domain';
+} from '@repo/domain';
 import { buildOperatorActor, type OperatorIdentity } from './identity.js';
 
 export type BuildOperatorAuditEventInput = {

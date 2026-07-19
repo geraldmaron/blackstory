@@ -2,7 +2,9 @@
  * Learning-index topic / era / notability chips linking into search and explore filters.
  */
 import React from 'react';
+import Link from 'next/link';
 import type { PublicEntityView } from '../../data/public-seed';
+import { exploreHrefForEra } from '../../lib/map-experience/metadata-hrefs';
 
 void React;
 
@@ -14,7 +16,7 @@ function chipHref(kind: 'theme' | 'era', value: string): string {
   if (kind === 'theme') {
     return `/search?topic=${encodeURIComponent(value)}`;
   }
-  return `/explore?era=${encodeURIComponent(value)}`;
+  return exploreHrefForEra(value);
 }
 
 export function EntityTopicTags({ entity }: EntityTopicTagsProps) {
@@ -27,19 +29,19 @@ export function EntityTopicTags({ entity }: EntityTopicTagsProps) {
   }
 
   return (
-    <div className="bb-entity-tags" role="group" aria-label="Topics and eras">
+    <div className="ds-entity-tags" role="group" aria-label="Topics and eras">
       {themes.map((tag) => (
-        <a key={`theme-${tag}`} className="bb-entity-tag" href={chipHref('theme', tag)}>
+        <Link key={`theme-${tag}`} className="ds-entity-tag" href={chipHref('theme', tag)}>
           {tag}
-        </a>
+        </Link>
       ))}
       {eras.map((era) => (
-        <a key={`era-${era}`} className="bb-entity-tag bb-entity-tag--era" href={chipHref('era', era)}>
+        <Link key={`era-${era}`} className="ds-entity-tag ds-entity-tag--era" href={chipHref('era', era)}>
           {era}
-        </a>
+        </Link>
       ))}
       {notability.slice(0, 2).map((label) => (
-        <span key={`note-${label.slice(0, 24)}`} className="bb-entity-tag bb-entity-tag--note">
+        <span key={`note-${label.slice(0, 24)}`} className="ds-entity-tag ds-entity-tag--note">
           {label.length > 72 ? `${label.slice(0, 69)}…` : label}
         </span>
       ))}

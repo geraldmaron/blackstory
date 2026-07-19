@@ -4,7 +4,7 @@
  * black_book_research/adapters/run_health.py, mirrored in packages/domain/src/adapters/
  * run-health.ts): started/completed/failed, duration, item counts, error summary. This module
  * does not reimplement adapter-specific health evaluation (record-count/schema drift) that
- * stays in @black-book/domain's evaluateRunHealth, reused as-is by jobs/source-drift-run-
+ * stays in @repo/domain's evaluateRunHealth, reused as-is by jobs/source-drift-run-
  * health.ts. This module is the broader, job-agnostic run-record shape every scheduled job
  * (not just source adapters) produces one of per dispatch.
  */

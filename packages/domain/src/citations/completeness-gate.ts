@@ -64,7 +64,7 @@ export function assertClaimCitationComplete(
   if (!result.ok) {
     throw new Error(
       `Claim ${claim.id} cannot publish: ${result.failures.map((f) => f.reason).join(', ')}. ` +
-        '"Unsourced" is not a publishable state (BB-083).',
+        '"Unsourced" is not a publishable state ().',
     );
   }
 }
@@ -101,7 +101,7 @@ export function assertProjectionCitationCompletenessGate(
     const claimIds = [...new Set(result.failures.map((f) => f.claimId))];
     throw new Error(
       `Projection build blocked: ${claimIds.length} claim(s) lack a complete citation ` +
-        `(${claimIds.join(', ')}). "Unsourced" is not a publishable state (BB-083).`,
+        `(${claimIds.join(', ')}). "Unsourced" is not a publishable state ().`,
     );
   }
 }

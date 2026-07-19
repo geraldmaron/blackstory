@@ -1,6 +1,6 @@
 /**
  * Normalize Internet Archive search/metadata docs into AdapterCandidateRecord output
- * 
+ *
  */
 import { MAX_EVIDENCE_SNIPPET_CHARACTERS, MAX_EVIDENCE_SNIPPET_WORDS } from '../../rights/evidence-pointer.js';
 import { stampCandidateProvenance } from '../candidates.js';

@@ -2,18 +2,18 @@
  * Safe outbound HTTP port shared by the community discovery adapters
  * (RSS/Atom, Internet Archive, DPLA v2, Wayback SPN).
  *
- * `@black-book/domain` cannot import `@black-book/security` in shipped (non-test) code 
- * `@black-book/security` already depends on `@black-book/domain` at runtime, so the reverse
+ * `@repo/domain` cannot import `@repo/security` in shipped (non-test) code
+ * `@repo/security` already depends on `@repo/domain` at runtime, so the reverse
  * edge would be a circular workspace dependency (the same rule documented in
- * `../../../rights/takedown.ts` and `../../../map/map-source.ts`). `@black-book/security` is
+ * `../../../rights/takedown.ts` and `../../../map/map-source.ts`). `@repo/security` is
  * listed only as a devDependency of this package for tests.
  *
  * So this module defines a dependency-injected **port** instead of calling directly.
  * Every adapter in rss/, internet-archive/, and dpla/ takes a `SafeHttpClient` as an argument
  * and never performs a bare `fetch`. Production wiring (outside this package, in the
- * apps/workers layer that already depends on both `@black-book/domain` and
- * `@black-book/security`) MUST implement `SafeHttpClient` by:
- * 1. Calling `evaluateExternalUrl` from `@black-book/security`'s url-safety module 
+ * apps/workers layer that already depends on both `@repo/domain` and
+ * `@repo/security`) MUST implement `SafeHttpClient` by:
+ * 1. Calling `evaluateExternalUrl` from `@repo/security`'s url-safety module
  * to reject disallowed schemes/ports/userinfo/domains before any I/O.
  * 2. Calling `resolveAndPinDestination` to resolve DNS once, reject private/loopback/
  * link-local/metadata answers, and pin the connection to a specific public IP.
@@ -23,10 +23,10 @@
  * A URL that fails safety evaluation must reject/throw never silently fall back to an
  * unpinned or unchecked request.
  *
- * See `http-port.test.ts` in this directory for a test that wires the REAL `@black-book/security`
+ * See `http-port.test.ts` in this directory for a test that wires the REAL `@repo/security`
  * primitives end-to-end (imported only there, as a devDependency) and proves an SSRF-targeted
  * URL is rejected before any adapter fetch would proceed the same pattern
- * `map-source.redaction.test.ts` uses to regression-test `@black-book/security` wiring without
+ * `map-source.redaction.test.ts` uses to regression-test `@repo/security` wiring without
  * creating a shipped runtime dependency.
  */
 

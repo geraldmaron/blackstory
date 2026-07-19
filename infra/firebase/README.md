@@ -22,7 +22,7 @@ Registered web apps (BB-011):
 | Black Book Admin | `1:332234323945:web:e1b31c78e32d95943bfd78` | `apps/admin` |
 
 Full SDK identifiers: [`registered-apps.json`](./registered-apps.json). Typed accessors:
-`@black-book/firebase`.
+`@repo/firebase`.
 
 The alias is a deployment convenience, not authorization to deploy. Use native `firebase login`,
 confirm the active account/project, inventory existing resources, and obtain human confirmation
@@ -42,13 +42,13 @@ Model + rules: [`FIRESTORE_MODEL.md`](./FIRESTORE_MODEL.md), [`firestore.rules`]
 [`firestore.indexes.json`](./firestore.indexes.json).
 
 BB-018 adds append-only `auditEvents`, transactional `outboxMessages`, idempotency records, and
-per-consumer receipts. `@black-book/firebase` exposes `commitWithAudit`,
+per-consumer receipts. `@repo/firebase` exposes `commitWithAudit`,
 `consumeOutboxMessage`, and `loadEntityPublicationHistory`. Firestore effects and consumer receipts
 are atomic; future external consumers must use the event id as their downstream idempotency key.
 
 ## Local emulators
 
-Isolated from production via explicit `demo-black-book`:
+Isolated from production via explicit `demo-repo`:
 
 ```bash
 pnpm firebase:emulators
@@ -59,9 +59,9 @@ pnpm firebase:emulators
 
 ```bash
 # with emulators running
-pnpm --filter @black-book/firebase test
+pnpm --filter @repo/firebase test
 # or CI-style
-CI_REQUIRE_FIREBASE=1 pnpm --filter @black-book/firebase test
+CI_REQUIRE_FIREBASE=1 pnpm --filter @repo/firebase test
 ```
 
 ## Rules and buckets

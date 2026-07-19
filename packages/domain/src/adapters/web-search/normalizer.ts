@@ -27,7 +27,7 @@ export function assertStorageTermsConfirmed(config: WebSearchProviderConfig): vo
     throw new Error(
       `Cannot persist a ${config.provider} web-search result: storageTermsConfirmed is false. ` +
         'Written storage-rights confirmation from the vendor is required before any result may ' +
-        'be persisted (BB-075 acceptance criterion 1); this flag is never set automatically.',
+        'be persisted ( acceptance criterion 1); this flag is never set automatically.',
     );
   }
 }

@@ -5,9 +5,9 @@
  * answered by linking the cited revision and its edit summary. The record stays resolvable even
  * when superseded or deprecated.
  */
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Notice } from '@black-book/ui';
-import { SeedDataNotice } from '../../../../../components/SeedDataNotice';
+import { Notice } from '@repo/ui';
 import {
   FactCitationList,
   FactConfidencePanel,
@@ -17,7 +17,7 @@ import {
   formatIsoDate,
   humanizeToken,
 } from '../../../../../components/facts';
-import { buildFactPath, slugifyFactStatement } from '@black-book/domain';
+import { buildFactPath } from '@repo/domain';
 import { listPublicFactRevisionParams, resolveFactRevision } from '../../../resolve-public-fact';
 
 type FactRevisionPageProps = {
@@ -56,19 +56,18 @@ export default async function FactRevisionPage({ params }: FactRevisionPageProps
   const { fact, revision } = resolved;
 
   return (
-    <main className="bb-container bb-page" id="main">
+    <main className="ds-container ds-page" id="main">
       <FactJsonLdScript fact={fact} />
 
-      <header className="bb-entity-mast">
-        <p className="bb-page__eyebrow">
-          Fact revision · <span className="bb-mono">{fact.id}</span> · rev {revision.revisionNumber}
+      <header className="ds-entity-mast">
+        <p className="ds-page__eyebrow">
+          Fact revision · <span className="ds-mono">{fact.id}</span> · rev {revision.revisionNumber}
         </p>
-        <h1 className="bb-page__title">{fact.shortStatement}</h1>
-        <p className="bb-page__lede">{fact.statement}</p>
+        <h1 className="ds-page__title">{fact.shortStatement}</h1>
+        <p className="ds-page__lede">{fact.statement}</p>
       </header>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
-        <SeedDataNotice compact />
+      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
         <FactStatusBanner fact={fact} />
 
         <Notice tone="warning" title="Pinned revision view">
@@ -76,24 +75,26 @@ export default async function FactRevisionPage({ params }: FactRevisionPageProps
             You are viewing revision {revision.revisionNumber} from {formatIsoDate(revision.timestamp)}. Edit summary:{' '}
             {revision.summary}
           </p>
-          <p style={{ margin: 'var(--bb-space-2) 0 0 0' }}>
-            <a href={buildFactPath(fact.id, slugifyFactStatement(fact.shortStatement))}>Open the current fact record</a>
+          <p style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
+            <Link href={buildFactPath(fact.id, fact.slug)}>
+              Open the current fact record
+            </Link>
           </p>
         </Notice>
 
         <section aria-labelledby="revision-detail-heading">
-          <p className="bb-section__kicker">Audit</p>
-          <h2 className="bb-section__title" id="revision-detail-heading">
+          <p className="ds-section__kicker">Audit</p>
+          <h2 className="ds-section__title" id="revision-detail-heading">
             This revision
           </h2>
-          <dl className="bb-sans" style={{ marginTop: 'var(--bb-space-4)' }}>
-            <dt style={{ fontWeight: 600 }}>Change type</dt>
-            <dd style={{ margin: '0 0 var(--bb-space-2) 0' }}>{humanizeToken(revision.changeType)}</dd>
-            <dt style={{ fontWeight: 600 }}>Editor</dt>
-            <dd style={{ margin: '0 0 var(--bb-space-2) 0' }}>
+          <dl className="ds-sans" style={{ marginTop: 'var(--ds-space-4)' }}>
+            <dt className="ds-dt">Change type</dt>
+            <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>{humanizeToken(revision.changeType)}</dd>
+            <dt className="ds-dt">Editor</dt>
+            <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>
               {revision.agent.displayName ?? revision.agent.id}
             </dd>
-            <dt style={{ fontWeight: 600 }}>Timestamp</dt>
+            <dt className="ds-dt">Timestamp</dt>
             <dd style={{ margin: 0 }}>{formatIsoDate(revision.timestamp)}</dd>
           </dl>
         </section>
@@ -101,21 +102,21 @@ export default async function FactRevisionPage({ params }: FactRevisionPageProps
         <FactConfidencePanel fact={fact} />
 
         <section aria-labelledby="rev-citations-heading">
-          <p className="bb-section__kicker">Sources</p>
-          <h2 className="bb-section__title" id="rev-citations-heading">
+          <p className="ds-section__kicker">Sources</p>
+          <h2 className="ds-section__title" id="rev-citations-heading">
             Citations at this revision
           </h2>
-          <div style={{ marginTop: 'var(--bb-space-4)' }}>
+          <div style={{ marginTop: 'var(--ds-space-4)' }}>
             <FactCitationList citations={fact.citations} labelledBy="rev-citations-heading" />
           </div>
         </section>
 
         <section aria-labelledby="all-revisions-heading">
-          <p className="bb-section__kicker">History</p>
-          <h2 className="bb-section__title" id="all-revisions-heading">
+          <p className="ds-section__kicker">History</p>
+          <h2 className="ds-section__title" id="all-revisions-heading">
             All revisions
           </h2>
-          <div style={{ marginTop: 'var(--bb-space-4)' }}>
+          <div style={{ marginTop: 'var(--ds-space-4)' }}>
             <FactRevisionPanel
               fact={fact}
               currentRevisionNumber={revision.revisionNumber}

@@ -120,7 +120,7 @@ export const CAUSATION_VOCAB_RELATIONSHIPS: readonly EntityRelationship[] = [
     type: 'caused',
     temporal: { validFrom: '1935', validTo: '1968' },
     notes:
-      'Fixture for the settled-systemic-causation case (BB-092 acceptance criterion 9) — a ' +
+      'Fixture for the settled-systemic-causation case (acceptance criterion 9) — a ' +
       'documented lending policy causing measurable disinvestment, the shape of the bead\'s own ' +
       'HOLC-redlining example without naming the real historical policy.',
   }),

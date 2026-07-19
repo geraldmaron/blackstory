@@ -1,6 +1,6 @@
 /**
  * Content-negotiated JSON export for a canonical fact: CSL-JSON citations plus the
- * Black Book extension block, wrapped with stable permalink metadata. Canonical facts are exported
+ * Blap extension block, wrapped with stable permalink metadata. Canonical facts are exported
  * as data records only never as ClaimReview (see `assertNeverClaimReview` in the JSON-LD helper).
  */
 import {
@@ -8,7 +8,7 @@ import {
   buildFactArticleJsonLd,
   type FactCitation,
   type FactRecord,
-} from '@black-book/domain';
+} from '@repo/domain';
 import { canonicalFactJsonUrl, canonicalFactPageUrl } from './resolve-public-fact';
 
 export type FactJsonExport = {

@@ -41,6 +41,6 @@ owns building it.
 
 ```bash
 node --test infra/gcp/scheduler/scheduled-jobs.test.mjs
-pnpm --filter @black-book/config test
-pnpm --filter @black-book/config typecheck
+pnpm --filter @repo/config test
+pnpm --filter @repo/config typecheck
 ```

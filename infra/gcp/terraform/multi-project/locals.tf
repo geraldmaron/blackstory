@@ -3,8 +3,8 @@
 // productionResplitTarget / crossProjectGrants; keep the three in sync.
 
 locals {
-  // blackbook-staging mirrors blackbook-prod's runtime surface shape exactly (ADR-012:
-  // "mirror of prod shape"). Same set as the updated ../../wif/terraform runtime_sa_ids.
+  // repo-staging mirrors BlackStory prod (black-book-efaaf) runtime surface shape exactly
+  // (ADR-012: "mirror of prod shape"). Same set as the updated ../../wif/terraform runtime_sa_ids.
   staging_service_accounts = {
     "web-runtime"     = "Public web (App Hosting) runtime - staging mirror"
     "api-public"      = "Public read/search/location API - staging mirror"
@@ -14,19 +14,19 @@ locals {
     "backup"          = "Backup / PITR / export runner - staging mirror"
   }
 
-  // blackbook-internal hosts the research pipeline, admin console, and the cross-project
+  // repo-internal hosts the research pipeline, admin console, and the cross-project
   // promotion/pull identities. "admin" (5 chars) is invalid as a GCP account ID; use
   // "admin-app" (see infra/gcp/wif/deploy-roles.md).
   internal_service_accounts = {
     "admin-app"          = "Admin / research console runtime identity (Cloud Run + IAP, direct attach - no load balancer)"
     "research"           = "Research worker; writes the raw-ingest named database only"
     "publication"        = "Curation worker; reads raw-ingest, writes curated"
-    "security"           = "Quarantine / validation / integrity worker; cross-project into blackbook-prod quarantine + public-media"
-    "promotion"          = "Cross-project promotion identity; reads curated, is the ONLY writer of blackbook-prod public/** projections"
-    "submissions-puller" = "Cross-project puller; read-only on blackbook-prod's create-only submissions collection"
+    "security"           = "Quarantine / validation / integrity worker; cross-project into BlackStory prod quarantine + public-media"
+    "promotion"          = "Cross-project promotion identity; reads curated, is the ONLY writer of BlackStory prod public/** projections"
+    "submissions-puller" = "Cross-project puller; read-only on BlackStory prod's create-only submissions collection"
   }
 
-  // Named Firestore databases inside blackbook-internal (GA feature). Per-database IAM
+  // Named Firestore databases inside repo-internal (GA feature). Per-database IAM
   // conditions in iam-cross-project.tf enforce that research writes raw-ingest only and
   // promotion reads curated only.
   internal_named_databases = {
@@ -34,9 +34,9 @@ locals {
     "curated"    = "Reviewed/normalized data staged for promotion; distinct IAM from raw-ingest."
   }
 
-  // Buckets inside blackbook-internal. private-evidence relocates here from the original
-  // BB-005 single-project stub (../buckets.tf) because both of its writers - research and
-  // security - move to blackbook-internal under ADR-012; colocating the bucket with its only
+  // Buckets inside repo-internal. private-evidence relocates here from the original
+  // single-project stub (../buckets.tf) because both of its writers - research and
+  // security - move to repo-internal under ADR-012; colocating the bucket with its only
   // writers is the more defensible default now that it need not be same-project with
   // publication/admin/api-internal (which read it, but under ADR-012 only admin-app and
   // publication remain reachable without a new cross-project grant - see buckets.tf).

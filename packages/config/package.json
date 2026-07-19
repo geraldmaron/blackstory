@@ -1,5 +1,5 @@
 {
-  "name": "@black-book/config",
+  "name": "@repo/config",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,10 +9,20 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./identity": {
+      "development": "./src/identity.ts",
+      "types": "./dist/identity.d.ts",
+      "import": "./dist/identity.js"
+    },
     "./launch-gate": {
       "development": "./src/launch-gate/index.ts",
       "types": "./dist/launch-gate/index.d.ts",
       "import": "./dist/launch-gate/index.js"
+    },
+    "./scheduled-jobs": {
+      "development": "./src/scheduled-jobs/index.ts",
+      "types": "./dist/scheduled-jobs/index.d.ts",
+      "import": "./dist/scheduled-jobs/index.js"
     }
   },
   "files": [
@@ -21,19 +31,19 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/index.test.ts src/surfaces.test.ts src/kill-switches.test.ts src/launch-gate/beta-kill-switch.test.ts src/scheduled-jobs/registry.test.ts src/scheduled-jobs/roster.test.ts src/scheduled-jobs/run-record.test.ts src/scheduled-jobs/health.test.ts src/scheduled-jobs/alerting.test.ts src/scheduled-jobs/publish-guard.test.ts src/scheduled-jobs/audit.test.ts src/scheduled-jobs/jobs/source-drift-run-health.test.ts src/scheduled-jobs/jobs/gold-corpus-regression.test.ts src/scheduled-jobs/jobs/backup-verification.test.ts src/scheduled-jobs/jobs/restore-drill.test.ts src/scheduled-jobs/jobs/recalibration-report.test.ts src/scheduled-jobs/jobs/citation-link-health-sweep.test.ts src/scheduled-jobs/jobs/reddit-deletion-sync.test.ts src/scheduled-jobs/jobs/legal-change-monitoring.test.ts",
+    "test": "node --conditions development --import tsx --test src/index.test.ts src/surfaces.test.ts src/sibling-origins.test.ts src/shell-nav.test.ts src/kill-switches.test.ts src/launch-gate/beta-kill-switch.test.ts src/scheduled-jobs/registry.test.ts src/scheduled-jobs/roster.test.ts src/scheduled-jobs/run-record.test.ts src/scheduled-jobs/health.test.ts src/scheduled-jobs/alerting.test.ts src/scheduled-jobs/publish-guard.test.ts src/scheduled-jobs/audit.test.ts src/scheduled-jobs/jobs/source-drift-run-health.test.ts src/scheduled-jobs/jobs/gold-corpus-regression.test.ts src/scheduled-jobs/jobs/backup-verification.test.ts src/scheduled-jobs/jobs/restore-drill.test.ts src/scheduled-jobs/jobs/recalibration-report.test.ts src/scheduled-jobs/jobs/citation-link-health-sweep.test.ts src/scheduled-jobs/jobs/reddit-deletion-sync.test.ts src/scheduled-jobs/jobs/legal-change-monitoring.test.ts src/scheduled-jobs/jobs/community-obscurity-discovery.test.ts src/scheduled-jobs/jobs/discovery-campaign-rss.test.ts src/scheduled-jobs/jobs/discovery-campaign-wikimedia-federal.test.ts src/scheduled-jobs/jobs/discovery-campaign-archive-dpla.test.ts src/scheduled-jobs/jobs/discovery-campaign-web-search.test.ts src/scheduled-jobs/discovery-dispatcher.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
     "zod": "^3.25.76",
-    "@black-book/domain": "workspace:*",
-    "@black-book/observability": "workspace:*",
-    "@black-book/security": "workspace:*",
-    "@black-book/testing": "workspace:*"
+    "@repo/domain": "workspace:*",
+    "@repo/observability": "workspace:*",
+    "@repo/security": "workspace:*",
+    "@repo/testing": "workspace:*"
   },
   "devDependencies": {
-    "@black-book/firebase": "workspace:*",
-    "@black-book/typescript-config": "workspace:^",
+    "@repo/firebase": "workspace:*",
+    "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

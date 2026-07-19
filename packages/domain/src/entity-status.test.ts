@@ -19,7 +19,7 @@ import {
   type StatusHistoryEntry,
 } from './entity-status.js';
 
-test('kind-specific status vocabularies match the BB-090 spec exactly', () => {
+test('kind-specific status vocabularies match the spec exactly', () => {
   assert.deepEqual(PLACE_LIKE_STATUSES, ['active', 'historic', 'inactive']);
   assert.deepEqual(LAW_STATUSES, ['in_force', 'amended', 'repealed', 'struck_down', 'enjoined']);
   // Movements conclude, they don't pause no "inactive".
@@ -89,7 +89,7 @@ test('cultural-figure calibration ships as icons-and-firsts-only', () => {
   assert.equal(CULTURAL_FIGURE_NOTABILITY_CALIBRATION, 'icons_and_firsts_only');
 });
 
-test('sensitivity classes match the BB-090 spec exactly', () => {
+test('sensitivity classes match the spec exactly', () => {
   assert.deepEqual(SENSITIVITY_CLASSES, [
     'contested_legacy',
     'perpetrator_associated',

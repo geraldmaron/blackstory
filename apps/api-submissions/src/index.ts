@@ -2,7 +2,7 @@
  * Corrections and contribution intake API entrypoint (Cloud Run target).
  * Quarantine-write-only posture enforced via surface capabilities.
  */
-import { buildSurfaceHealth, parseNodeEnv } from '@black-book/config';
+import { buildSurfaceHealth, parseNodeEnv } from '@repo/config';
 import { SURFACE_ID } from './posture.js';
 
 export { createSubmissionsApiAppCheckGuard } from './app-check.js';

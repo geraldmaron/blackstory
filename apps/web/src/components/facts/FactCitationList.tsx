@@ -1,5 +1,5 @@
 /**
- * Renders a fact's CSL-JSON citations plus Black Book extension fields.
+ * Renders a fact's CSL-JSON citations plus BlackStory extension fields.
  *
  * Web citations prefer the archived capture URL as the outbound link; offline citations show the
  * excerpt and retrieval date without inventing a live URL. Full bibliography formatting via
@@ -7,8 +7,8 @@
  * directly until `@citation-js/core` is wired in `apps/web/package.json`.
  */
 import React from 'react';
-import { Card, Citation } from '@black-book/ui';
-import type { FactCitation } from '@black-book/domain';
+import { Card, Citation } from '@repo/ui';
+import type { FactCitation } from '@repo/domain/facts';
 import { formatIsoDate, humanizeToken } from './format';
 
 export type FactCitationListProps = {
@@ -27,7 +27,7 @@ function citationHref(citation: FactCitation): string | undefined {
 export function FactCitationList({ citations, labelledBy }: FactCitationListProps) {
   if (citations.length === 0) {
     return (
-      <p className="bb-sans" style={{ color: 'var(--bb-ink-muted)' }}>
+      <p className="ds-sans" style={{ color: 'var(--ds-ink-muted)' }}>
         No citations are attached to this fact record.
       </p>
     );
@@ -35,7 +35,7 @@ export function FactCitationList({ citations, labelledBy }: FactCitationListProp
 
   return (
     <ol
-      className="bb-stack"
+      className="ds-stack"
       style={{ listStyle: 'none', margin: 0, padding: 0 }}
       {...(labelledBy ? { 'aria-labelledby': labelledBy } : {})}
     >
@@ -46,18 +46,18 @@ export function FactCitationList({ citations, labelledBy }: FactCitationListProp
             <Card
               title={citationTitle(citation)}
               meta={
-                <span className="bb-mono">
+                <span className="ds-mono">
                   {humanizeToken(citation.sourceClass)} · {humanizeToken(citation.role)}
                 </span>
               }
               as="article"
             >
               <blockquote
-                className="bb-sans"
+                className="ds-sans"
                 style={{
-                  margin: '0 0 var(--bb-space-3) 0',
-                  paddingLeft: 'var(--bb-space-4)',
-                  borderLeft: '2px solid var(--bb-border)',
+                  margin: '0 0 var(--ds-space-3) 0',
+                  paddingLeft: 'var(--ds-space-4)',
+                  borderLeft: '2px solid var(--ds-border)',
                 }}
               >
                 {citation.excerpt}
@@ -67,19 +67,23 @@ export function FactCitationList({ citations, labelledBy }: FactCitationListProp
                 label={`${humanizeToken(citation.sourceClass)} source`}
                 {...(href ? { href } : {})}
               />
-              <dl className="bb-sans" style={{ margin: 'var(--bb-space-3) 0 0 0' }}>
-                <dt style={{ fontWeight: 600 }}>Retrieved</dt>
-                <dd style={{ margin: '0 0 var(--bb-space-2) 0' }}>{formatIsoDate(citation.accessedAt)}</dd>
+              <dl className="ds-sans" style={{ margin: 'var(--ds-space-3) 0 0 0' }}>
+                {citation.accessedAt ? (
+                  <>
+                    <dt style={{ fontWeight: 600 }}>Retrieved</dt>
+                    <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>{formatIsoDate(citation.accessedAt)}</dd>
+                  </>
+                ) : null}
                 {citation.archivedAt ? (
                   <>
                     <dt style={{ fontWeight: 600 }}>Archived capture</dt>
-                    <dd style={{ margin: '0 0 var(--bb-space-2) 0' }}>{formatIsoDate(citation.archivedAt)}</dd>
+                    <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>{formatIsoDate(citation.archivedAt)}</dd>
                   </>
                 ) : null}
                 {citation.pageLocator ? (
                   <>
                     <dt style={{ fontWeight: 600 }}>Locator</dt>
-                    <dd style={{ margin: '0 0 var(--bb-space-2) 0' }}>{citation.pageLocator}</dd>
+                    <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>{citation.pageLocator}</dd>
                   </>
                 ) : null}
                 {citation.sourceNote ? (

@@ -68,7 +68,7 @@ test('submitting a lead lands a real quarantine record and opens a real draft re
   assert.deepEqual(payload?.operator, outcome.operator);
 });
 
-test('a lead without a source URL is rejected by the real BB-029 validation, not by this package', () => {
+test('a lead without a source URL is rejected by the real Intake validation, not by this package', () => {
   const outcome = prepareLeadIntake(
     { description: 'A lead with no citation at all, which should fail validation cleanly.' },
     context(),

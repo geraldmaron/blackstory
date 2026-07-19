@@ -6,32 +6,38 @@
  * relationships at publish time see `packages/domain/src/facts/subjects.ts`).
  */
 import React from 'react';
-import type { FactRecord } from '@black-book/domain';
+import type { FactRecord } from '@repo/domain/facts';
+import { EntityLink, resolveEntityLabel } from '../entity/EntityLink';
 import { humanizeToken } from './format';
 
 export type FactSubjectListProps = {
   readonly subjects: FactRecord['subjects'];
   readonly labelledBy?: string;
+  readonly labelsByEntityId?: ReadonlyMap<string, string> | Record<string, string>;
 };
 
-export function FactSubjectList({ subjects, labelledBy }: FactSubjectListProps) {
+export function FactSubjectList({
+  subjects,
+  labelledBy,
+  labelsByEntityId,
+}: FactSubjectListProps) {
   return (
     <section {...(labelledBy ? { 'aria-labelledby': labelledBy } : {})}>
-      <ul className="bb-stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+      <ul className="ds-stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         {subjects.map((subject) => (
           <li key={`${subject.entityId}_${subject.kind}`}>
-            <a className="bb-cta bb-cta--ink" href={`/entity/${subject.entityId}`}>
-              {subject.entityId}
-            </a>
-            <span className="bb-sans" style={{ marginLeft: 'var(--bb-space-2)', color: 'var(--bb-ink-muted)' }}>
+            <EntityLink entityId={subject.entityId}>
+              {resolveEntityLabel(subject.entityId, labelsByEntityId)}
+            </EntityLink>
+            <span className="ds-sans" style={{ marginLeft: 'var(--ds-space-2)', color: 'var(--ds-ink-muted)' }}>
               {humanizeToken(subject.kind)}
               {subject.role ? ` · ${humanizeToken(subject.role)}` : ''}
             </span>
           </li>
         ))}
       </ul>
-      <p className="bb-sans" style={{ margin: 'var(--bb-space-3) 0 0 0', color: 'var(--bb-ink-muted)' }}>
-        These subject edges feed the published history graph (BB-092) — mirrored into browse-graph
+      <p className="ds-sans" style={{ margin: 'var(--ds-space-3) 0 0 0', color: 'var(--ds-ink-muted)' }}>
+        These subject edges feed the published history graph  — mirrored into browse-graph
         relationships at publish time so fact-only entity linkages are not silently absent.
       </p>
     </section>

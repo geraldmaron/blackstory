@@ -1,6 +1,6 @@
 
 /**
- * Thin wrapper over the real discovery campaign gate (`@black-book/domain`).
+ * Thin wrapper over the real discovery campaign gate (`@repo/domain`).
  *
  * This does NOT fetch adapter candidates from any real source adapter fetching lives in
  * `packages/domain/src/adapters/**` and its worker callers, which are out of scope.
@@ -15,9 +15,9 @@ import {
   type AdapterCandidateRecord,
   type DiscoveryCampaignConfig,
   type DiscoveryCampaignResult,
-} from '@black-book/domain';
-import type { QueryPack } from '@black-book/domain';
-import type { DiscoveryRunContext } from '@black-book/domain';
+} from '@repo/domain';
+import type { QueryPack } from '@repo/domain';
+import type { DiscoveryRunContext } from '@repo/domain';
 
 export type DiscoveryRunBatch = {
   readonly pack: QueryPack;

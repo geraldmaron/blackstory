@@ -1,14 +1,14 @@
 /**
  * Maps Firestore public entity projections onto the web `PublicEntityView` shape.
- * Projections are thinner than seed fixtures; seed enrichment fills display gaps
- * when the same entity id exists in the bundled catalog.
+ * Renders live projection data as-is without enrichment from bundled seed records.
  */
 
-import { getPublicEntity, type PublicEntityView } from '../../data/public-seed';
+import { type NotabilityCriterion } from '@repo/domain';
+import { type PublicEntityView } from '../../data/public-seed';
 
 /**
  * Narrow projection shape used by the web mapper. Declared locally so apps/web
- * does not depend on potentially stale `@black-book/firebase` dist `.d.ts` files
+ * does not depend on potentially stale `@repo/firebase` dist `.d.ts` files
  * during typecheck (package exports prefer `types` → `dist`).
  */
 export type PublicProjectionInput = {
@@ -23,11 +23,43 @@ export type PublicProjectionInput = {
     readonly lng: number;
     readonly geohash: string;
     readonly precision?: string;
+    readonly matchMethod?: string;
   };
   readonly claimIds: readonly string[];
+  /** State/city jurisdiction label carried by release projections (national-catalog era);
+   * absent on bootstrap-window stubs, where the seed enrichment supplies it instead. */
+  readonly jurisdictionLabel?: string;
+  readonly locationLabel?: string;
+  /** Accepted public claims with citations. Non-numeric by standing policy: the projection
+   * carries `confidenceLevel` (the display register), never a raw confidence score. */
+  readonly claims?: readonly {
+    readonly id: string;
+    readonly predicate: string;
+    readonly object: string;
+    readonly confidenceLevel: 'high' | 'medium' | 'low';
+    readonly citationSource: string;
+    readonly citationHref?: string;
+    readonly citationLabel: string;
+    readonly independentLineageCount?: number;
+  }[];
   readonly status?: string;
   readonly eraBuckets?: readonly string[];
   readonly notabilityLabels?: readonly string[];
+  /** Structured, auditable inclusion basis (the related workstream's release builder). Present on
+   * releases built by `buildReleaseEntityArtifacts`; absent on pre-existing bootstrap-window
+   * stubs, which carry only the derived `notabilityLabels` above. */
+  readonly notabilityBasis?: readonly {
+    readonly criterion: NotabilityCriterion;
+    readonly note: string;
+    readonly evidenceIds: readonly string[];
+  }[];
+  /** Research-depth signal computed once at release-build time (the related workstream). Absent on
+   * pre-existing bootstrap-window stubs. */
+  readonly researchCoverage?: 'minimal' | 'partial' | 'substantial';
+  /** Real release-build-time timestamps (the related workstream). Absent on pre-existing
+   * bootstrap-window stubs, which predate the release builder that populates these. */
+  readonly generatedAt?: string;
+  readonly recordUpdatedAt?: string;
   readonly sensitivityClass?: string;
   readonly topicTags?: readonly string[];
   readonly historicalContext?: string;
@@ -62,6 +94,43 @@ function locationPrecisionFromProjection(
   return 'city';
 }
 
+/** View claims render a nominal score alongside the level chip; the projection carries only the
+ * level (non-numeric public-payload policy), so the score here is the level's register midpoint —
+ * a display value, never a stored ranking. */
+const NOMINAL_CONFIDENCE_SCORE: Record<'high' | 'medium' | 'low', number> = {
+  high: 0.85,
+  medium: 0.6,
+  low: 0.4,
+};
+
+function mapClaims(claims: PublicProjectionInput['claims']): PublicEntityView['claims'] {
+  return (claims ?? []).map((claim) => ({
+    id: claim.id,
+    predicate: claim.predicate,
+    object: claim.object,
+    confidenceScore: NOMINAL_CONFIDENCE_SCORE[claim.confidenceLevel],
+    confidenceLevel: claim.confidenceLevel,
+    citationSource: claim.citationSource,
+    ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
+    citationLabel: claim.citationLabel,
+    ...(claim.independentLineageCount !== undefined
+      ? { independentLineageCount: claim.independentLineageCount }
+      : {}),
+  }));
+}
+
+function mapGeoAnchor(
+  location: PublicProjectionInput['location'],
+): PublicEntityView['geoAnchor'] {
+  if (!location) return undefined;
+  return {
+    lat: location.lat,
+    lng: location.lng,
+    geohash: location.geohash,
+    matchMethod: location.matchMethod ?? 'release_projection',
+  };
+}
+
 function mapPrimaryImage(
   image: PublicProjectionInput['primaryImage'],
 ): PublicEntityView['primaryImage'] {
@@ -79,64 +148,16 @@ function mapPrimaryImage(
 
 /**
  * Convert a public projection doc into a page-ready view.
- * Prefer bundled seed fields when present so UI sections stay populated during
- * the bootstrap window when Firestore only holds projection stubs.
+ * Renders live projection data as-is without enrichment from bundled seed records.
  */
 export function mapProjectionToPublicEntityView(
   projection: PublicProjectionInput,
 ): PublicEntityView {
-  const seed = getPublicEntity(projection.id);
-  const summary =
-    projection.summary && projection.summary.trim().length > 0
-      ? projection.summary
-      : (seed?.summary ?? '');
-  const topicTags =
-    projection.topicTags && projection.topicTags.length > 0
-      ? projection.topicTags
-      : (seed?.topicTags ?? []);
-  const primaryImage = mapPrimaryImage(projection.primaryImage) ?? seed?.primaryImage;
-
-  if (seed) {
-    return {
-      ...seed,
-      displayName: projection.displayName,
-      summary,
-      topicTags,
-      revision: {
-        releaseId: projection.releaseId,
-        generatedAt: seed.revision.generatedAt,
-        recordUpdatedAt: seed.revision.recordUpdatedAt,
-      },
-      ...(projection.status !== undefined ? { status: projection.status } : {}),
-      ...(projection.eraBuckets !== undefined ? { eraBuckets: projection.eraBuckets } : {}),
-      ...(projection.notabilityLabels !== undefined
-        ? { notabilityLabels: projection.notabilityLabels }
-        : {}),
-      ...(projection.sensitivityClass !== undefined
-        ? { sensitivityClass: projection.sensitivityClass }
-        : {}),
-      ...(projection.historicalContext !== undefined
-        ? { historicalContext: projection.historicalContext }
-        : {}),
-      ...(projection.extendedNarrative !== undefined
-        ? { extendedNarrative: projection.extendedNarrative }
-        : seed.extendedNarrative !== undefined
-          ? { extendedNarrative: seed.extendedNarrative }
-          : {}),
-      ...(primaryImage !== undefined ? { primaryImage } : {}),
-      ...(projection.related !== undefined
-        ? {
-            related: projection.related.map((entry) => ({
-              id: entry.id,
-              type: entry.type,
-              direction: entry.direction,
-              ...(entry.timespan !== undefined ? { timespan: entry.timespan } : {}),
-            })),
-            relatedIds: projection.related.map((entry) => entry.id),
-          }
-        : {}),
-    };
-  }
+  const summary = projection.summary && projection.summary.trim().length > 0 ? projection.summary : '';
+  const topicTags = projection.topicTags && projection.topicTags.length > 0 ? projection.topicTags : [];
+  const primaryImage = mapPrimaryImage(projection.primaryImage);
+  const geoAnchor = mapGeoAnchor(projection.location);
+  const claims = mapClaims(projection.claims);
 
   const lat = projection.location?.lat;
   const lng = projection.location?.lng;
@@ -156,18 +177,24 @@ export function mapProjectionToPublicEntityView(
     era: projection.eraBuckets?.[0] ?? 'unknown',
     ...(projection.status !== undefined ? { status: projection.status } : {}),
     ...(projection.eraBuckets !== undefined ? { eraBuckets: projection.eraBuckets } : {}),
-    ...(projection.notabilityLabels !== undefined
-      ? { notabilityLabels: projection.notabilityLabels }
+    notabilityLabels:
+      projection.notabilityLabels && projection.notabilityLabels.length > 0
+        ? projection.notabilityLabels
+        : ['A documented site in the active public release.'],
+    ...(projection.notabilityBasis !== undefined
+      ? { notabilityBasis: projection.notabilityBasis }
       : {}),
     ...(projection.sensitivityClass !== undefined
       ? { sensitivityClass: projection.sensitivityClass }
       : {}),
     topicTags,
-    jurisdictionLabel: 'Unknown',
+    jurisdictionLabel: projection.jurisdictionLabel ?? 'Unknown',
     locationPrecision: locationPrecisionFromProjection(projection.location?.precision),
-    locationLabel: projection.displayName,
+    locationLabel: projection.locationLabel ?? projection.displayName,
     relevanceExplanation:
-      'This record is served from the live public release projection. Supporting claims and evidence panels may still be sparse until the full publication pipeline lands.',
+      claims.length > 0
+        ? 'Included as a documented site in the active public release; each accepted claim below cites its source.'
+        : 'This record is served from the live public release projection. Supporting claims and evidence panels may still be sparse until the full publication pipeline lands.',
     historicalContext:
       projection.historicalContext ??
       'Live projection scaffolding — historical framing expands as curated release content is published.',
@@ -175,15 +202,24 @@ export function mapProjectionToPublicEntityView(
       ? { extendedNarrative: projection.extendedNarrative }
       : {}),
     ...(primaryImage !== undefined ? { primaryImage } : {}),
-    recordMaturity: 'projection_stub',
-    researchCoverage: 'minimal',
+    ...(geoAnchor !== undefined ? { geoAnchor } : {}),
+    recordMaturity: claims.length > 0 ? 'partial_enrichment' : 'projection_stub',
+    // Prefer the release builder's own computed researchCoverage (the related workstream,
+    // packages/domain/src/publication/release-builder.ts's computeReleaseResearchCoverage) —
+    // it is derived from the real claim count + citation completeness at release-BUILD time.
+    // The claims.length heuristic below is only a fallback for bootstrap-window stubs that
+    // predate the release builder and never carried this field.
+    researchCoverage: projection.researchCoverage ?? (claims.length >= 2 ? 'partial' : 'minimal'),
     mapPin,
-    claims: [],
+    claims,
     timeline: [],
     revision: {
       releaseId: projection.releaseId,
-      generatedAt: new Date().toISOString(),
-      recordUpdatedAt: new Date().toISOString(),
+      // Prefer the release builder's real "this release build ran at this instant" timestamps
+      // (the related workstream) when present. Bootstrap-window stubs that predate the release builder
+      // carry neither field; '' is an honest "unknown", never a fabricated "now".
+      generatedAt: projection.generatedAt ?? '',
+      recordUpdatedAt: projection.recordUpdatedAt ?? '',
     },
     relatedIds: projection.related?.map((entry) => entry.id) ?? [],
     ...(projection.related !== undefined

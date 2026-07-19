@@ -24,15 +24,15 @@ export type TimelineProps = {
 
 export function Timeline({ items, className, labelledBy }: TimelineProps) {
   return (
-    <ol className={cx('bb-timeline', className)} aria-labelledby={labelledBy}>
+    <ol className={cx('ds-timeline', className)} aria-labelledby={labelledBy}>
       {items.map((item) => (
-        <li key={item.id} className="bb-timeline__item">
-          <span className="bb-timeline__marker" aria-hidden="true" />
-          <time className="bb-timeline__time" dateTime={item.time}>
+        <li key={item.id} className="ds-timeline__item">
+          <span className="ds-timeline__marker" aria-hidden="true" />
+          <time className="ds-timeline__time" dateTime={item.time}>
             {item.time}
           </time>
-          <h3 className="bb-timeline__title">{item.title}</h3>
-          {item.body ? <div className="bb-timeline__body">{item.body}</div> : null}
+          <h3 className="ds-timeline__title">{item.title}</h3>
+          {item.body ? <div className="ds-timeline__body">{item.body}</div> : null}
         </li>
       ))}
     </ol>

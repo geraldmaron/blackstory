@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Trimmed offline fixture shaped like theamericanblackstory.com/feed/.
+  Not a live mirror. content:encoded keeps only citation hrefs for authority-harvest tests.
+-->
+<rss version="2.0"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>THE AMERICAN BLACKSTORY</title>
+    <link>https://theamericanblackstory.com/</link>
+    <description>Trimmed fixture for curated community-feed and obscurity tests.</description>
+    <atom:link href="https://theamericanblackstory.com/feed/" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>BLACK BAGS, Vol. 4 — Fanm Djanm</title>
+      <link>https://theamericanblackstory.com/2026/03/01/v42026/</link>
+      <guid>http://theamericanblackstory.com/?p=4883</guid>
+      <pubDate>Sun, 01 Mar 2026 23:57:54 +0000</pubDate>
+      <description><![CDATA[Brand storytelling spotlighting a Black-owned shop — low place-history signal for obscurity tests.]]></description>
+      <content:encoded><![CDATA[
+        <p>Fixture excerpt with cited sources:</p>
+        <p><a href="https://instagram.com/theamericanblackstory">Instagram</a></p>
+      ]]></content:encoded>
+    </item>
+
+    <item>
+      <title>DAY 5 — Stormé DeLarverie</title>
+      <link>https://theamericanblackstory.com/2025/02/05/d52025/</link>
+      <guid>http://theamericanblackstory.com/?p=4701</guid>
+      <pubDate>Wed, 05 Feb 2025 12:00:00 +0000</pubDate>
+      <description><![CDATA[Stonewall veteran Stormé DeLarverie — a named historical figure with place context.]]></description>
+      <content:encoded><![CDATA[
+        <p>Fixture excerpt with cited sources:</p>
+        <p><a href="https://www.nps.gov/articles/000/stonewall-national-monument.htm">National Park Service</a></p>
+        <p><a href="https://nmaahc.si.edu/explore/stories">NMAAHC</a></p>
+      ]]></content:encoded>
+    </item>
+
+    <item>
+      <title>DAY 4 — The Buffalo Soldiers</title>
+      <link>https://theamericanblackstory.com/2025/02/04/d42025/</link>
+      <guid>http://theamericanblackstory.com/?p=4684</guid>
+      <pubDate>Tue, 04 Feb 2025 12:00:00 +0000</pubDate>
+      <description><![CDATA[Buffalo Soldiers in Yosemite and Hawaiʻi — well-attested subject that should score less obscure against a catalog that already knows them.]]></description>
+      <content:encoded><![CDATA[
+        <p>Fixture excerpt with cited sources:</p>
+        <p><a href="https://www.nps.gov/yose/learn/historyculture/buffalo-soldiers.htm">National Park Service — Yosemite</a></p>
+        <p><a href="https://nmaahc.si.edu/explore/stories/buffalo-soldiers">NMAAHC</a></p>
+        <p><a href="https://www.nps.gov/havo/learn/historyculture/buffalo-soldiers.htm">NPS — Hawaiʻi Volcanoes</a></p>
+      ]]></content:encoded>
+    </item>
+
+    <item>
+      <title>DAY 11 — The Rosewood School Bell, Piedmont County</title>
+      <link>https://theamericanblackstory.com/fixture/rosewood-school-bell/</link>
+      <guid>http://theamericanblackstory.com/?p=fixture-obscure</guid>
+      <pubDate>Tue, 11 Feb 2025 12:00:00 +0000</pubDate>
+      <description><![CDATA[A local school bell dedication in Piedmont County with few national identifiers — synthetic obscure local lead for scoring tests.]]></description>
+      <content:encoded><![CDATA[
+        <p>Fixture excerpt with cited sources:</p>
+        <p><a href="https://www.loc.gov/item/fixture-rosewood-bell/">Library of Congress (fixture)</a></p>
+      ]]></content:encoded>
+    </item>
+  </channel>
+</rss>

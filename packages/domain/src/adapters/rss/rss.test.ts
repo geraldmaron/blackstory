@@ -1,5 +1,5 @@
 /**
- * Tests for the RSS/Atom community discovery adapter. Fixture-driven; no live network 
+ * Tests for the RSS/Atom community discovery adapter. Fixture-driven; no live network
  * every HTTP call goes through a mock SafeHttpClient injected by the test, never a real fetch.
  */
 import assert from 'node:assert/strict';
@@ -77,7 +77,7 @@ test('RSS adapter starts disabled by default and requires an approved policy to 
   assert.equal(approved.registryState, 'approved');
 });
 
-test('RSS adapter has a registered BB-077 obligations entry (fail-closed lookup succeeds)', () => {
+test('RSS adapter has a registered  obligations entry (fail-closed lookup succeeds)', () => {
   const obligationsStore = createInMemoryObligationsRegistry(defaultSourceObligationsSeed(FIXED_NOW));
   const obligations = getSourceObligationsOrThrow(obligationsStore, RSS_ADAPTER_ID);
   assert.equal(obligations.sourceClass, 'rss');
@@ -97,6 +97,18 @@ test('parses RSS 2.0 feeds into normalized items', () => {
   assert.equal(parsed.items[0]?.link, 'https://www.piedmonthistoricalsociety.example.org/news/freedmens-bureau-correspondence');
   assert.ok(parsed.items[0]?.summary?.includes('214 letters'));
   assert.equal(parsed.items[0]?.publishedAt, new Date('Wed, 15 Jul 2026 14:00:00 GMT').toISOString());
+});
+
+test('parses outbound href linkHints from content:encoded without storing full body', () => {
+  const xml = loadFixtureXml('authority-citation-sample.rss.xml');
+  const parsed = parseRssOrAtomFeed(xml);
+  assert.equal(parsed.items.length, 1);
+  const hints = parsed.items[0]?.linkHints ?? [];
+  assert.ok(hints.some((url) => url.includes('nps.gov')));
+  assert.ok(hints.some((url) => url.includes('nmaahc.si.edu')));
+  assert.ok(hints.some((url) => url.includes('instagram.com')));
+  // Summary remains short — linkHints are separate from the capped summary.
+  assert.ok((parsed.items[0]?.summary?.length ?? 0) < 200);
 });
 
 test('parses Atom 1.0 feeds into normalized items', () => {
@@ -138,7 +150,7 @@ test('normalizes feed items into provenance-stamped, syndication-only candidates
   assert.equal('fullText' in candidates[0]!.payload, false);
 });
 
-test('feed registry add/remove is versioned and produces a BB-018 audit event', () => {
+test('feed registry add/remove is versioned and produces a  audit event', () => {
   const store = createInMemoryFeedRegistry();
   const auditLog = createInMemoryAuditLog();
   const actor = { id: 'admin@blackbook.local', type: 'user' as const };

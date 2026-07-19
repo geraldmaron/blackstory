@@ -1,8 +1,8 @@
 
 /**
- * Firestore document schemas for Black Book (ADR-011 018).
+ * Firestore document schemas for BlackStory (ADR-011 018).
  * Entity/geography, provenance, claims/confidence.
- * Shapes align with @black-book/domain; Cloud SQL PostGIS are not the production path.
+ * Shapes align with @repo/domain; Cloud SQL PostGIS are not the production path.
  */
 import { z } from 'zod';
 import {
@@ -10,7 +10,10 @@ import {
   AUDIT_EVENT_ACTIONS,
   OUTBOX_STATUSES,
   auditCategoryFor,
-} from '@black-book/domain';
+  DATA_PACK_IMPORT_STAGES,
+  DATA_PACK_RESOURCE_KINDS,
+  EXTERNAL_SOURCE_LICENSE_VERDICTS,
+} from '@repo/domain';
 
 export const authClaimFlagsSchema = z.object({
   admin: z.boolean().optional(),
@@ -40,6 +43,24 @@ export const entityKindSchema = z.enum([
 ]);
 
 export type EntityKindDoc = z.infer<typeof entityKindSchema>;
+
+/**
+ * Coarse entity classification (the related workstream, mirrors packages/domain/src/entity-class.ts).
+ * NEW, additive, optional/defaulted so existing entity docs (which carry only `kind`) keep
+ * parsing unchanged. Hardcoded here rather than imported, matching this file's existing
+ * convention (see `entityKindSchema` above).
+ */
+export const entityClassSchema = z.enum([
+  'person',
+  'place',
+  'organization',
+  'event',
+  'legal',
+  'work',
+  'movement',
+]);
+
+export type EntityClassDoc = z.infer<typeof entityClassSchema>;
 
 export const geoPointFieldsSchema = z.object({
   lat: z.number().min(-90).max(90),
@@ -184,7 +205,7 @@ export const schoolFieldsSchema = z.object({
 // Entity ontology: shared date-precision model, entity-lifecycle status history,
 // notability-basis inclusion rubric, and the schema-only sensitivity classification. Mirrors
 // packages/domain/src/era.ts and packages/domain/src/entity-status.ts. Vocabularies are
-// hardcoded here (not imported from @black-book/domain) to match this file's existing convention
+// hardcoded here (not imported from @repo/domain) to match this file's existing convention
 // (e.g. entityKindSchema above hardcodes ENTITY_KINDS rather than importing it).
 // ---------------------------------------------------------------------------
 
@@ -281,22 +302,35 @@ export type PolicyVersionDoc = z.infer<typeof policyVersionSchema>;
 export const canonicalEntitySchema = z.object({
   id: z.string().min(1),
   kind: entityKindSchema,
+  /** the related workstream: additive coarse classification, derived from `kind` — see
+   * packages/domain/src/entity-class.ts. Optional so existing docs keep parsing. */
+  entityClass: entityClassSchema.optional(),
+  /** Controlled finer-grained subtype label(s) within `entityClass` (e.g. `['church']`). */
+  entityTypes: z.array(z.string().min(1)).optional(),
   displayName: z.string().min(1),
   aliases: z.array(entityAliasSchema).optional(),
   identifiers: z.array(entityIdentifierSchema).optional(),
   livingStatus: z.enum(['living', 'deceased', 'unknown']).default('unknown'),
+  /** the related workstream: computed/output-only derivation result — see
+   * packages/domain/src/living.ts's `deriveLivingStatus`. Not independently authoritative; never
+   * required at write time. */
+  livingStatusDerived: z.enum(['living', 'deceased', 'unknown']).optional(),
   mergeState: entityMergeStateSchema.optional(),
   /** Entity-lifecycle status only omitted for `event`/`person` kinds by convention. See the
    * scope-guardrail comment on statusHistoryEntrySchema above. */
   statusHistory: z.array(statusHistoryEntrySchema).optional(),
   /** >=1 record required to publish enforced by
-   * @black-book/domain's assertPublishableEntityHasNotabilityBasis, not by this schema alone. */
+   * @repo/domain's assertPublishableEntityHasNotabilityBasis, not by this schema alone. */
   notabilityBasis: z.array(notabilityBasisRecordSchema).optional(),
   /** Schema-only; presentation lives in the UI layer. */
   sensitivity: z.array(entitySensitivitySchema).optional(),
   person: z
     .object({
-      livingStatus: z.enum(['living', 'deceased', 'unknown']),
+      /** @deprecated the related workstream: redundant with the entity-level `livingStatus` above,
+       * which is canonical (see packages/domain/src/specialized.ts's PersonFields doc for the
+       * call-site audit). Made optional was required so un-migrated writers aren't forced to
+       * keep setting a field that no longer has authoritative meaning. */
+      livingStatus: z.enum(['living', 'deceased', 'unknown']).optional(),
       birthYear: z.number().int().nullable().optional(),
       deathYear: z.number().int().nullable().optional(),
       biographySummary: z.string().optional(),
@@ -373,7 +407,7 @@ export type CanonicalEntityDoc = z.infer<typeof canonicalEntitySchema>;
 /**
  * Historical-causation edges (caused/enabled/influenced/participated_in/overturned/
  * commemorates) plus `authored` (creation attribution, distinct from `founded`). Direction and
- * temporal semantics for every type are documented in `@black-book/domain`'s
+ * temporal semantics for every type are documented in `@repo/domain`'s
  * `RELATIONSHIP_TYPE_SEMANTICS` (packages/domain/src/relationship.ts) hardcoded here, not
  * imported, to match this file's existing convention (see the entityKindSchema comment above).
  */
@@ -403,71 +437,29 @@ export const relationshipTypeSchema = z.enum([
 export type RelationshipTypeDoc = z.infer<typeof relationshipTypeSchema>;
 
 /** Role qualifier valid ONLY on `type: 'attended'`; see
- * `@black-book/domain`'s `assertRelationshipRoleValidForType`. */
+ * `@repo/domain`'s `assertRelationshipRoleValidForType`. */
 export const relationshipRoleSchema = z.enum(['organizer', 'speaker', 'participant']);
 
 export type RelationshipRoleDoc = z.infer<typeof relationshipRoleSchema>;
 
-export const entityRelationshipSchema = z.object({
-  id: z.string().min(1),
-  fromEntityId: z.string().min(1),
-  toEntityId: z.string().min(1),
-  type: relationshipTypeSchema,
-  evidenceIds: z.array(z.string().min(1)).min(1),
-  temporal: z
-    .object({
-      label: z.string().optional(),
-      validFrom: z.string().optional(),
-      validTo: z.string().nullable().optional(),
-    })
-    .optional(),
-  geographic: z
-    .object({
-      locationId: z.string().optional(),
-      jurisdictionId: z.string().optional(),
-      notes: z.string().optional(),
-    })
-    .optional(),
-  /** Only meaningful when `type === 'attended'`. */
-  role: relationshipRoleSchema.optional(),
-  notes: z.string().optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-});
-
-export type EntityRelationshipDoc = z.infer<typeof entityRelationshipSchema>;
-
-export const entityMergeSchema = z.object({
-  id: z.string().min(1),
-  survivorId: z.string().min(1),
-  absorbedIds: z.array(z.string().min(1)).min(1),
-  status: z.enum(['active', 'reversed']),
-  reason: z.string().min(1),
-  evidenceIds: z.array(z.string().min(1)).default([]),
-  createdAt: z.string().datetime(),
-  createdBy: z.string().min(1),
-  reversedAt: z.string().datetime().optional(),
-  reversedBy: z.string().min(1).optional(),
-  reverseReason: z.string().optional(),
-  auditEventIds: z.array(z.string().min(1)).default([]),
-});
-
-export type EntityMergeDoc = z.infer<typeof entityMergeSchema>;
-
 const unitInterval = z.number().min(0).max(1);
 
-export const claimTemporalContextSchema = z.object({
-  label: z.string().optional(),
-  validFrom: z.string().optional(),
-  validTo: z.string().nullable().optional(),
-});
+/** Same shape as `claimVersionSchema`/`canonicalClaimSchema`'s workflow/publication enums (see
+ * below), reused by name for cross-domain consistency see `@repo/domain`'s
+ * `RELATIONSHIP_WORKFLOW_STATUSES`/`RELATIONSHIP_PUBLICATION_STATUSES`. Relationships add an
+ * explicit `candidate` state claims don't have, for the candidate -> review -> published
+ * pipeline (BB the related workstream). */
+export const relationshipWorkflowStatusSchema = z.enum(['candidate', 'in_review', 'accepted', 'rejected']);
+export type RelationshipWorkflowStatusDoc = z.infer<typeof relationshipWorkflowStatusSchema>;
 
-export const claimGeographicContextSchema = z.object({
-  locationId: z.string().min(1).optional(),
-  jurisdictionId: z.string().min(1).optional(),
-  notes: z.string().optional(),
-  precision: z.string().min(1).optional(),
-});
+export const relationshipPublicationStatusSchema = z.enum(['unpublished', 'published', 'retracted']);
+export type RelationshipPublicationStatusDoc = z.infer<typeof relationshipPublicationStatusSchema>;
+
+/** See `@repo/domain`'s `RelationshipResolutionState` doc comment: distinct from
+ * `ResolutionOutcome` (a single candidate-to-entity match decision) this describes the joint
+ * resolution state of both of an edge's endpoints. */
+export const relationshipResolutionStateSchema = z.enum(['unresolved', 'partially_resolved', 'resolved']);
+export type RelationshipResolutionStateDoc = z.infer<typeof relationshipResolutionStateSchema>;
 
 export const confidenceComponentsSchema = z.object({
   sourceAuthority: unitInterval,
@@ -494,6 +486,77 @@ export const confidenceScoreSchema = z.object({
 });
 
 export type ConfidenceScoreDoc = z.infer<typeof confidenceScoreSchema>;
+
+export const entityRelationshipSchema = z.object({
+  id: z.string().min(1),
+  fromEntityId: z.string().min(1),
+  toEntityId: z.string().min(1),
+  type: relationshipTypeSchema,
+  evidenceIds: z.array(z.string().min(1)).min(1),
+  temporal: z
+    .object({
+      label: z.string().optional(),
+      validFrom: z.string().optional(),
+      validTo: z.string().nullable().optional(),
+    })
+    .optional(),
+  geographic: z
+    .object({
+      locationId: z.string().optional(),
+      jurisdictionId: z.string().optional(),
+      notes: z.string().optional(),
+    })
+    .optional(),
+  /** Only meaningful when `type === 'attended'`. */
+  role: relationshipRoleSchema.optional(),
+  notes: z.string().optional(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  // ---------------------------------------------------------------------------------------
+  // lifecycle/workflow fields (BB the related workstream). All optional: pre-existing relationship
+  // docs predate this pipeline and remain valid without a backfill migration.
+  // ---------------------------------------------------------------------------------------
+  workflowStatus: relationshipWorkflowStatusSchema.optional(),
+  publicationStatus: relationshipPublicationStatusSchema.optional(),
+  /** Reuses `confidenceScoreSchema` rather than a parallel relationship-specific shape. */
+  confidence: confidenceScoreSchema.optional(),
+  independentLineageCount: z.number().int().nonnegative().optional(),
+  resolutionState: relationshipResolutionStateSchema.optional(),
+  createdFromCandidateId: z.string().min(1).optional(),
+  lastVerifiedAt: z.string().datetime().optional(),
+});
+
+export type EntityRelationshipDoc = z.infer<typeof entityRelationshipSchema>;
+
+export const entityMergeSchema = z.object({
+  id: z.string().min(1),
+  survivorId: z.string().min(1),
+  absorbedIds: z.array(z.string().min(1)).min(1),
+  status: z.enum(['active', 'reversed']),
+  reason: z.string().min(1),
+  evidenceIds: z.array(z.string().min(1)).default([]),
+  createdAt: z.string().datetime(),
+  createdBy: z.string().min(1),
+  reversedAt: z.string().datetime().optional(),
+  reversedBy: z.string().min(1).optional(),
+  reverseReason: z.string().optional(),
+  auditEventIds: z.array(z.string().min(1)).default([]),
+});
+
+export type EntityMergeDoc = z.infer<typeof entityMergeSchema>;
+
+export const claimTemporalContextSchema = z.object({
+  label: z.string().optional(),
+  validFrom: z.string().optional(),
+  validTo: z.string().nullable().optional(),
+});
+
+export const claimGeographicContextSchema = z.object({
+  locationId: z.string().min(1).optional(),
+  jurisdictionId: z.string().min(1).optional(),
+  notes: z.string().optional(),
+  precision: z.string().min(1).optional(),
+});
 
 export const preservedClaimValueSchema = z.object({
   value: z.string().min(1),
@@ -523,6 +586,7 @@ export const claimVersionSchema = z.object({
   notes: z.string().optional(),
 });
 
+/** Doc shape for `canonicalClaims/{claimId}/versions/{versionId}` (append-only subcollection). */
 export type ClaimVersionDoc = z.infer<typeof claimVersionSchema>;
 
 export const researchCoverageSchema = z.object({
@@ -544,13 +608,17 @@ export const connectionStrengthSchema = z.object({
   rationale: z.string().optional(),
 });
 
-/** Canonical atomic claim with versions, confidence, and measurements. */
+/**
+ * Canonical atomic claim parent doc: identity, current-version pointer, workflow/publication
+ * status, confidence, and measurements. Versions are no longer embedded here — each is its own
+ * immutable doc in the `canonicalClaims/{claimId}/versions/{versionId}` subcollection
+ * (see `claimVersionSchema`), which is append-only at the Firestore rules level.
+ */
 export const canonicalClaimSchema = z.object({
   id: z.string().min(1),
   entityId: z.string().min(1),
   predicate: z.string().min(1),
   currentVersionId: z.string().min(1),
-  versions: z.array(claimVersionSchema).min(1),
   claimClass: z.enum(['standard', 'high_impact']),
   workflowStatus: z.enum(['proposed', 'accepted', 'rejected', 'superseded']),
   publicationStatus: z.enum(['unpublished', 'published', 'retracted']),
@@ -562,11 +630,95 @@ export const canonicalClaimSchema = z.object({
   connectionStrength: connectionStrengthSchema.optional(),
   researchCoverage: researchCoverageSchema.optional(),
   preservedValues: z.array(preservedClaimValueSchema).default([]),
+  /** ISO timestamp of the last independent verification pass over this claim, if any. */
+  lastVerifiedAt: z.string().datetime().optional(),
+  /** Version id that was current as of the last verification pass, if any. */
+  lastVerifiedVersionId: z.string().min(1).optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
 
 export type CanonicalClaimDoc = z.infer<typeof canonicalClaimSchema>;
+
+/**
+ * Verification policy (the related workstream, mirrors packages/domain/src/verification/policy.ts):
+ * governs how often published claims matching `appliesToEntityClasses`/`appliesToPredicates`
+ * must be independently re-checked. Doc shape for `verificationPolicies/{policyId}`. Enum values
+ * hardcoded rather than imported, matching this file's existing convention (see
+ * `entityClassSchema` above).
+ */
+export const volatilityClassSchema = z.enum(['high', 'medium', 'low', 'static']);
+export type VolatilityClassDoc = z.infer<typeof volatilityClassSchema>;
+
+export const reviewIntervalSchema = z.object({
+  unit: z.enum(['day', 'week', 'month', 'year']),
+  count: z.number().int().positive(),
+});
+export type ReviewIntervalDoc = z.infer<typeof reviewIntervalSchema>;
+
+export const verificationPolicySchema = z.object({
+  id: z.string().min(1),
+  appliesToEntityClasses: z.array(entityClassSchema).min(1),
+  appliesToPredicates: z.array(z.string().min(1)).min(1),
+  volatilityClass: volatilityClassSchema,
+  defaultReviewInterval: reviewIntervalSchema,
+  authoritativeSourceIds: z.array(z.string().min(1)).default([]),
+  contradictionSearchRequired: z.boolean(),
+  notes: z.string().optional(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export type VerificationPolicyDoc = z.infer<typeof verificationPolicySchema>;
+
+/**
+ * Per-subject verification state (the related workstream, mirrors
+ * packages/domain/src/verification/state.ts): kept separate from `canonicalClaimSchema` /
+ * `entityRelationshipSchema` / canonical entity docs rather than merged into them (see the
+ * domain module's doc comment for the reasoning) — doc shape for a `verificationStates`
+ * collection keyed by `{subjectType}_{subjectId}` or similar caller-chosen id scheme.
+ */
+export const verificationStatusSchema = z.enum(['current', 'due', 'overdue', 'unverified']);
+export type VerificationStatusDoc = z.infer<typeof verificationStatusSchema>;
+
+export const verificationSubjectTypeSchema = z.enum(['claim', 'relationship', 'entity']);
+export type VerificationSubjectTypeDoc = z.infer<typeof verificationSubjectTypeSchema>;
+
+export const verificationStateSchema = z.object({
+  subjectType: verificationSubjectTypeSchema,
+  subjectId: z.string().min(1),
+  verificationPolicyId: z.string().min(1).optional(),
+  verificationStatus: verificationStatusSchema,
+  lastVerifiedAt: z.string().datetime().optional(),
+  nextReviewAt: z.string().datetime().optional(),
+  lastVerificationRunId: z.string().min(1).optional(),
+  updatedAt: z.string().datetime(),
+});
+
+export type VerificationStateDoc = z.infer<typeof verificationStateSchema>;
+
+/**
+ * `CandidateUpdate` (the related workstream, mirrors
+ * packages/domain/src/verification/candidate-update.ts): a refresh never overwrites public
+ * truth directly — it produces one of these, which enters the normal review pipeline.
+ */
+export const candidateUpdateStatusSchema = z.enum(['pending_review', 'accepted', 'rejected']);
+export type CandidateUpdateStatusDoc = z.infer<typeof candidateUpdateStatusSchema>;
+
+export const candidateUpdateSchema = z.object({
+  id: z.string().min(1),
+  subjectType: verificationSubjectTypeSchema,
+  subjectId: z.string().min(1),
+  predicate: z.string().min(1).optional(),
+  previousValue: z.string().optional(),
+  proposedValue: z.string().optional(),
+  verificationRunId: z.string().min(1),
+  status: candidateUpdateStatusSchema,
+  createdAt: z.string().datetime(),
+  notes: z.string().optional(),
+});
+
+export type CandidateUpdateDoc = z.infer<typeof candidateUpdateSchema>;
 
 /** Claim-to-evidence relationship (supporting contradicting contextual). */
 export const claimEvidenceLinkSchema = z.object({
@@ -589,6 +741,93 @@ export const claimEvidenceLinkSchema = z.object({
 });
 
 export type ClaimEvidenceLinkDoc = z.infer<typeof claimEvidenceLinkSchema>;
+
+// ---------------------------------------------------------------------------
+// Statistics storage model (packages/domain/src/statistics/): StatisticalSeries metric
+// definitions, StatisticalObservation as-reported readings (status always 'observed'), and
+// DerivedMeasurement computed values (status 'derived' | 'modeled'). boundaryVersion is the
+// vintage/crosswalk key generalizing the tractVintage constraint (ACS 2020s releases use 2020
+// tracts, Opportunity Atlas uses 2010 tracts — never join without a crosswalk). Vocabularies
+// hardcoded per this file's existing convention (see note above datePrecisionSchema).
+// ---------------------------------------------------------------------------
+
+export const statisticalGeographyTypeSchema = z.enum([
+  'tract',
+  'county',
+  'block',
+  'blockgroup',
+  'address',
+  'city',
+  'school',
+  'facility',
+  'state',
+]);
+
+export const statisticalEstimateTypeSchema = z.enum([
+  'count',
+  'percentage',
+  'rate',
+  'ratio',
+  'median',
+  'mean',
+  'index',
+]);
+
+export const statisticalPeriodTypeSchema = z.enum([
+  'point-in-time',
+  '1-year-estimate',
+  '5-year-estimate',
+  'annual',
+  'decennial',
+  'custom-range',
+]);
+
+export const statisticalSeriesSchema = z.object({
+  metricId: z.string().min(1),
+  metricDefinition: z.string().min(1),
+  universe: z.string().min(1),
+  unit: z.string().min(1),
+  sourceDataset: z.string().min(1),
+  sourceTable: z.string().min(1),
+  sourceVariable: z.string().min(1),
+  geographyType: statisticalGeographyTypeSchema,
+  estimateType: statisticalEstimateTypeSchema,
+  periodType: statisticalPeriodTypeSchema,
+});
+
+export type StatisticalSeriesDoc = z.infer<typeof statisticalSeriesSchema>;
+
+export const statisticalObservationSchema = z.object({
+  seriesId: z.string().min(1),
+  jurisdictionId: z.string().min(1),
+  boundaryVersion: z.string().min(1),
+  referencePeriod: z.string().min(1),
+  datasetVintage: z.string().min(1),
+  estimate: z.number(),
+  marginOfError: z.number().optional(),
+  standardError: z.number().optional(),
+  numerator: z.number().optional(),
+  denominator: z.number().optional(),
+  sourceItemId: z.string().min(1),
+  retrievedAt: z.string().datetime(),
+  status: z.literal('observed'),
+});
+
+export type StatisticalObservationDoc = z.infer<typeof statisticalObservationSchema>;
+
+export const derivedMeasurementSchema = z.object({
+  methodId: z.string().min(1),
+  methodVersion: z.string().min(1),
+  inputObservationIds: z.array(z.string().min(1)),
+  value: z.number(),
+  uncertainty: z.number().optional(),
+  formula: z.string().min(1),
+  assumptions: z.array(z.string().min(1)).default([]),
+  generatedAt: z.string().datetime(),
+  status: z.enum(['derived', 'modeled']),
+});
+
+export type DerivedMeasurementDoc = z.infer<typeof derivedMeasurementSchema>;
 
 export const contentHashSchema = z.object({
   algorithm: z.literal('sha256'),
@@ -812,6 +1051,22 @@ export const publicActiveReleaseSchema = z.object({
 
 export type PublicActiveReleaseDoc = z.infer<typeof publicActiveReleaseSchema>;
 
+/** Accepted public claim carried inline on an entity projection (national-catalog era).
+ * Non-numeric by the same standing policy as the parent schema: the projection stores the
+ * display register (`confidenceLevel`), never a raw confidence score. */
+export const publicClaimProjectionSchema = z.object({
+  id: z.string().min(1),
+  predicate: z.string().min(1),
+  object: z.string().min(1),
+  confidenceLevel: z.enum(['high', 'medium', 'low']),
+  citationSource: z.string().min(1),
+  citationHref: z.string().url().optional(),
+  citationLabel: z.string().min(1),
+  independentLineageCount: z.number().int().nonnegative().optional(),
+});
+
+export type PublicClaimProjectionDoc = z.infer<typeof publicClaimProjectionSchema>;
+
 export const publicEntityProjectionSchema = z.object({
   id: z.string().min(1),
   releaseId: z.string().min(1),
@@ -822,6 +1077,15 @@ export const publicEntityProjectionSchema = z.object({
   summary: z.string().min(120).max(400),
   location: geoPointFieldsSchema.optional(),
   claimIds: z.array(z.string()).default([]),
+  /** Accepted claims with citations, inline (see `publicClaimProjectionSchema`). Optional:
+   * bootstrap-window stubs carry only `claimIds`; national-catalog projections carry both. */
+  claims: z.array(publicClaimProjectionSchema).optional(),
+  /** "City, State" jurisdiction label for cards/facets; optional on bootstrap-window stubs
+   * (the web mapper falls back to bundled-seed enrichment there). */
+  jurisdictionLabel: z.string().min(1).optional(),
+  /** Public location description at the record's allowed precision — never a street address
+   * finer than the constitution's public precision for the record. */
+  locationLabel: z.string().min(1).optional(),
 
   /**
    * Public projection additions — every one non-numeric by standing policy (numeric
@@ -829,20 +1093,73 @@ export const publicEntityProjectionSchema = z.object({
    * packages/domain/src/relevance/notability-gate.test.ts for the enforcing test).
    */
   /** Derived current status label (e.g. "active", "in_force", "living") never a scalar the
-   * reader hand-edits; always derived via @black-book/domain's `currentEntityStatus`. */
+   * reader hand-edits; always derived via @repo/domain's `currentEntityStatus`. */
   status: z.string().min(1).optional(),
   /** Decade labels the entity's dated span overlaps (e.g. ["1950s", "1960s"]) derived via
-   * @black-book/domain's `deriveEraBuckets`, replacing the free-text `era` string. */
+   * @repo/domain's `deriveEraBuckets`, replacing the free-text `era` string. */
   eraBuckets: z.array(z.string().min(1)).optional(),
   /** Human-readable notability rubric labels (never the raw criterion enum alone, never a
-   * score) one per notabilityBasis record, sourced from @black-book/domain's
+   * score) one per notabilityBasis record, sourced from @repo/domain's
    * `NOTABILITY_RUBRIC`. */
   notabilityLabels: z.array(z.string().min(1)).optional(),
+  /**
+   * Structured, auditable inclusion basis this entity's `notabilityLabels` above are derived
+   * from (the related workstream). Reuses `notabilityBasisRecordSchema` non-numeric by the same
+   * standing policy, `evidenceIds` point at this projection's own `claims[].id` values. Optional
+   * for the same reason `claims` is: bootstrap-window stubs predate the release builder that
+   * populates this field.
+   */
+  notabilityBasis: z.array(notabilityBasisRecordSchema).optional(),
+  /**
+   * Research-depth signal computed ONCE at release-build time from the entity's real claim
+   * count and citation completeness (the related workstream) — never a UI-side guess computed at
+   * render time. See `@repo/domain`'s `computeReleaseResearchCoverage`. Optional for the same
+   * bootstrap-window-stub reason as `claims`/`notabilityBasis`.
+   */
+  researchCoverage: z.enum(['minimal', 'partial', 'substantial']).optional(),
+  /**
+   * Revision/verification metadata (the related workstream): real "this release build ran at this
+   * instant" timestamps, set once by the release builder — never fabricated at page-render time
+   * (see `apps/web/src/lib/public-data/map-projection.ts`'s prior placeholder-timestamp TODO,
+   * which this field resolves). Optional for the same bootstrap-window-stub reason as above.
+   */
+  generatedAt: z.string().datetime().optional(),
+  recordUpdatedAt: z.string().datetime().optional(),
   /** Sensitivity classification label when present; presentation lives in the UI layer. */
   sensitivityClass: sensitivityClassSchema.optional(),
 
-  /** Topic / theme tags aligned with search facets (learning-index discovery). */
+  /**
+   * @deprecated Superseded by the controlled-taxonomy split below (the related workstream). Kept
+   * optional, alongside the new fields, for backward compatibility during the transition —
+   * new writers should populate `topicIds`/`mentionedEntityIds`/`keywords` instead. Readers
+   * that still facet on this raw field must filter through
+   * `@repo/domain`'s `isPermittedTopicTag` (interim allowlist); never count/facet on it
+   * unfiltered.
+   */
   topicTags: z.array(z.string().min(1)).default([]),
+  /**
+   * Controlled historical-theme ids (the related workstream) — the ONLY field that may ever be
+   * surfaced as a facet/filter option. Every id must resolve against
+   * `@repo/domain`'s `TOPIC_REGISTRY` (packages/domain/src/taxonomy/topics.ts); readers should
+   * validate with `isValidTopicId` rather than trusting this array blindly. Net-new field.
+   */
+  topicIds: z.array(z.string().min(1)).default([]),
+  /**
+   * Resolvable ids of people/places/organizations/laws/events this record mentions. Never a
+   * facet — this is for future cross-linking/entity-resolution (the related workstream), not
+   * discovery browsing. During the the related workstream migration these may be raw legacy-tag
+   * strings acting as placeholder ids (e.g. `"naacp"`, `"selma"`) rather than real canonical
+   * entity ids; resolving those against the entity graph is the related workstream's job. Net-new
+   * field.
+   */
+  mentionedEntityIds: z.array(z.string().min(1)).default([]),
+  /** Free-text search-recall terms — improves query matching, never a facet. Net-new field. */
+  keywords: z.array(z.string().min(1)).default([]),
+  /**
+   * Internal ingestion/research campaign membership (e.g. which sourcing wave produced this
+   * record). Never public-facing, never a facet. Net-new field.
+   */
+  campaignIds: z.array(z.string().min(1)).default([]),
   /** Framing prose for the Historical context section (not unsourced biography). */
   historicalContext: z.string().min(1).optional(),
   /** Optional multi-paragraph further reading; omit when not curated. */
@@ -862,7 +1179,7 @@ export const publicEntityProjectionSchema = z.object({
 
   /**
    * Typed related entries derived from the release's graph
-   * adjacency doc (`@black-book/domain`'s `toPublicRelatedEntries`
+   * adjacency doc (`@repo/domain`'s `toPublicRelatedEntries`
    * `publicRelatedEntriesByEntityId`, packages/domain/src/graph/adjacency.ts + build.ts)
    * sufficient for "related people, places…" and "timelines" sections. Never carries a
    * numeric field beyond what's already elsewhere on this schema (evidence counts are an
@@ -890,7 +1207,7 @@ export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSch
 
 
 /**
- * persisted search index document the server-read shape @black-book/domain's
+ * persisted search index document the server-read shape @repo/domain's
  * `buildPublicSearchIndexDocs` produces (`packages/domain/src/search/`). Follows the exact
  * conventions of `publicEntityProjectionSchema` above: reuses `entityKindSchema`
  * `sensitivityClassSchema`, and every field is non-numeric BY STANDING POLICY except the two
@@ -898,7 +1215,7 @@ export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSch
  *
  * `relatedCount` (connection-strength proxy) and `claimCount` are the ONLY numeric fields, and are
  * SERVER-INTERNAL ranking inputs only: search runs server-side and projects results into the
- * client-facing `SearchResultView` (defined in @black-book/domain), which carries neither count
+ * client-facing `SearchResultView` (defined in @repo/domain), which carries neither count
  * nor any score mirroring rule that adjacency `evidenceCount` is an ordering key, never
  * a public payload field. `notabilityBasis` is retained as the auditable inclusion basis backing
  * the AC5 gate; it carries only string leaves (criterion, note, evidenceIds the same category as
@@ -915,7 +1232,22 @@ export const publicSearchIndexSchema = z.object({
   /** Lowercased alias strings, flattened from EntityAlias by the release builder. */
   aliases: z.array(z.string().min(1)).default([]),
   summary: z.string().optional(),
+  /** @deprecated Superseded by `topicIds`/`mentionedEntityIds`/`keywords` below (the related workstream).
+   * Kept optional for backward compatibility; do not facet/count on this unfiltered. */
   topicTags: z.array(z.string().min(1)).default([]),
+  /** Controlled historical-theme ids (the related workstream) — the ONLY field the search-index
+   * `theme` facet may be built from. Must resolve against `@repo/domain`'s `TOPIC_REGISTRY`.
+   * Net-new field. */
+  topicIds: z.array(z.string().min(1)).default([]),
+  /** Resolvable ids of people/places/organizations/laws/events mentioned; never a facet.
+   * See the identical field on `publicEntityProjectionSchema` above for the migration-window
+   * placeholder-id caveat. Net-new field. */
+  mentionedEntityIds: z.array(z.string().min(1)).default([]),
+  /** Free-text search-recall terms; never a facet. Net-new field. */
+  keywords: z.array(z.string().min(1)).default([]),
+  /** Internal ingestion/research campaign membership; never public-facing, never a facet.
+   * Net-new field. */
+  campaignIds: z.array(z.string().min(1)).default([]),
   /** State-level jurisdiction label backs the `state` facet/filter. */
   jurisdictionState: z.string().min(1).optional(),
   /** Derived current lifecycle status label (e.g. "active", "in_force") never hand-edited. */
@@ -1059,3 +1391,130 @@ export const killSwitchSchema = z.object({
 });
 
 export type KillSwitchDoc = z.infer<typeof killSwitchSchema>;
+
+/** Private audit trail for scheduled discovery campaign dispatches (publicEffect always none). */
+export const discoveryCampaignRunSchema = z.object({
+  id: z.string().min(1),
+  jobId: z.string().min(1),
+  jobRunId: z.string().min(1),
+  status: z.enum(['success', 'skipped_kill_switch', 'error']),
+  startedAt: z.string().datetime(),
+  completedAt: z.string().datetime(),
+  mode: z.enum(['fixture', 'live']),
+  itemsExpected: z.number().int().nonnegative(),
+  itemsProcessed: z.number().int().nonnegative(),
+  survivors: z.number().int().nonnegative().optional(),
+  accepted: z.number().int().nonnegative().optional(),
+  kind: z.string().min(1).optional(),
+  publicEffect: z.literal('none'),
+  errorMessage: z.string().optional(),
+  killSwitchId: z.literal('research-campaigns'),
+  createdAt: z.string().datetime(),
+});
+
+export type DiscoveryCampaignRunDoc = z.infer<typeof discoveryCampaignRunSchema>;
+
+// ---------------------------------------------------------------------------
+// Data Pack v1 collections (the related workstream) — skeletal stubs backing
+// @repo/domain's `datapacks/` contract (manifest + validation + import pipeline). These record
+// the same fail-closed posture as that module: a dataset row starts disabled, an import batch
+// starts pending, and nothing here auto-promotes an external id into a canonical entity id.
+// ---------------------------------------------------------------------------
+
+/** One registered third-party dataset, independent of any specific version. */
+export const externalDatasetSchema = z.object({
+  id: z.string().min(1).max(256),
+  displayName: z.string().min(1).max(512),
+  publisherName: z.string().min(1).max(512),
+  licenseVerdict: z.enum(EXTERNAL_SOURCE_LICENSE_VERDICTS),
+  licenseName: z.string().min(1).max(512),
+  homepageUrl: z.string().url().optional(),
+  registryState: z.enum(['disabled', 'enabled', 'quarantined']).default('disabled'),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export type ExternalDatasetDoc = z.infer<typeof externalDatasetSchema>;
+
+/** One signed manifest version of an `externalDatasets` row — mirrors
+ * `DataPackManifest`/`SignedDataPackManifest` field-for-field at the metadata level (the full
+ * manifest JSON, including its resource list, lives in the pack's own storage; this doc is the
+ * queryable index over it). */
+export const externalDatasetVersionSchema = z.object({
+  id: z.string().min(1).max(256),
+  datasetId: z.string().min(1).max(256),
+  datasetVersion: z.string().min(1).max(256),
+  schemaVersion: z.number().int().positive(),
+  manifestHash: z.string().regex(/^[a-f0-9]{64}$/),
+  publicKeyId: z.string().min(1).max(256),
+  issuedAt: z.string().datetime(),
+  modifiedAt: z.string().datetime(),
+  resourceCount: z.number().int().nonnegative(),
+  totalByteSize: z.number().int().nonnegative(),
+  createdAt: z.string().datetime(),
+});
+
+export type ExternalDatasetVersionDoc = z.infer<typeof externalDatasetVersionSchema>;
+
+/** Which subscriber (feature/team) consumes a dataset, and the import budget it is bound by
+ * (`DataPackImportBudget` shape from `@repo/domain`'s `datapacks/validate.ts`). */
+export const datasetSubscriptionSchema = z.object({
+  id: z.string().min(1).max(256),
+  datasetId: z.string().min(1).max(256),
+  subscriberId: z.string().min(1).max(256),
+  active: z.boolean(),
+  budget: z.object({
+    maxResources: z.number().int().positive(),
+    maxTotalBytes: z.number().int().positive(),
+    maxRecordsPerResource: z.number().int().positive().optional(),
+  }),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export type DatasetSubscriptionDoc = z.infer<typeof datasetSubscriptionSchema>;
+
+/** One run of the import pipeline (`runDataPackImportPipeline`) against one dataset version. */
+export const importBatchSchema = z.object({
+  id: z.string().min(1).max(256),
+  datasetId: z.string().min(1).max(256),
+  datasetVersion: z.string().min(1).max(256),
+  status: z.enum(['pending', 'validating', 'quarantined', 'accepted', 'rejected']),
+  startedAt: z.string().datetime(),
+  completedAt: z.string().datetime().optional(),
+  resourceCount: z.number().int().nonnegative(),
+  acceptedResourceCount: z.number().int().nonnegative(),
+  quarantinedResourceCount: z.number().int().nonnegative(),
+});
+
+export type ImportBatchDoc = z.infer<typeof importBatchSchema>;
+
+/** One `DataPackImportFinding` persisted per stage/resource/record failure — the durable form of
+ * the in-memory findings `runDataPackImportPipeline` collects. */
+export const importValidationFindingSchema = z.object({
+  id: z.string().min(1).max(512),
+  importBatchId: z.string().min(1).max(256),
+  stage: z.enum(DATA_PACK_IMPORT_STAGES),
+  resourceName: z.string().min(1).max(256).optional(),
+  recordExternalId: z.string().min(1).max(512).optional(),
+  message: z.string().min(1).max(2_000),
+  createdAt: z.string().datetime(),
+});
+
+export type ImportValidationFindingDoc = z.infer<typeof importValidationFindingSchema>;
+
+/** One quarantined record, keyed by its `NamespacedExternalId` — never a bare canonical entity
+ * id (see `datapacks/import-pipeline.ts`'s module doc comment on namespacing). */
+export const importQuarantineSchema = z.object({
+  id: z.string().min(1).max(512),
+  importBatchId: z.string().min(1).max(256),
+  resourceName: z.string().min(1).max(256),
+  resourceKind: z.enum(DATA_PACK_RESOURCE_KINDS),
+  namespace: z.string().min(1).max(256),
+  externalId: z.string().min(1).max(512),
+  reason: z.string().min(1).max(2_000),
+  quarantinedAt: z.string().datetime(),
+  resolvedAt: z.string().datetime().optional(),
+});
+
+export type ImportQuarantineDoc = z.infer<typeof importQuarantineSchema>;

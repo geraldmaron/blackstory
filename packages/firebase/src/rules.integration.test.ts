@@ -74,7 +74,7 @@ before(async () => {
   }
 
   testEnv = await initializeTestEnvironment({
-    projectId: 'demo-black-book',
+    projectId: 'demo-repo',
     firestore: {
       rules: readFileSync(path.join(FIREBASE_DIR, 'firestore.rules'), 'utf8'),
       host: firestore.host,
@@ -125,7 +125,7 @@ async function seedPublicProjection(env: RulesTestEnvironment): Promise<void> {
   });
 }
 
-test('unauthenticated clients can read public projections but not write', async (t) => {
+test('unauthenticated clients can read publicMeta but not public projections or search index', async (t) => {
   if (!testEnv) {
     t.skip(skipReason ?? 'emulators unavailable');
     return;
@@ -135,7 +135,8 @@ test('unauthenticated clients can read public projections but not write', async 
   const context = testEnv.unauthenticatedContext();
   const db = context.firestore();
   await assertSucceeds(db.doc('publicMeta/activeRelease').get());
-  await assertSucceeds(db.doc('publicReleases/rel_rules_001/entities/ent_1').get());
+  await assertFails(db.doc('publicReleases/rel_rules_001/entities/ent_1').get());
+  await assertFails(db.doc('publicSearchIndex/ent_1').get());
   await assertFails(db.doc('publicMeta/activeRelease').set({ releaseId: 'hacked' }));
 });
 
@@ -310,7 +311,7 @@ test('storage deny-all rejects unauthenticated reads and writes', async (t) => {
 });
 
 test('rules harness stays on demo project id', () => {
-  assert.equal(process.env.FIREBASE_PROJECT_ID ?? 'demo-black-book', 'demo-black-book');
+  assert.equal(process.env.FIREBASE_PROJECT_ID ?? 'demo-repo', 'demo-repo');
 });
 
 test('audit rules express append-only and protected outbox intent', () => {

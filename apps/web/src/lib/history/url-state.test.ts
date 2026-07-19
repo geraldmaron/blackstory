@@ -12,12 +12,23 @@ test('defaults to all-time mode with no query params', () => {
 });
 
 test('parses decade mode and rebuilds shareable href', () => {
-  const state = parseHistorySearchParams({ decade: '1950s', kind: 'event', selected: 'ent_seed_event_001' });
+  const state = parseHistorySearchParams({ decade: '1970s', kind: 'event', selected: 'ent_dc_landmark_listing_1975' });
   assert.equal(state.mode, 'decade');
-  assert.equal(state.decade, '1950s');
+  assert.equal(state.decade, '1970s');
   assert.equal(state.filters.kind, 'event');
-  assert.equal(state.selected, 'ent_seed_event_001');
-  assert.equal(buildHistoryHref(state), '/history?decade=1950s&kind=event&selected=ent_seed_event_001');
+  assert.equal(state.selected, 'ent_dc_landmark_listing_1975');
+  assert.equal(
+    buildHistoryHref(state),
+    '/history?decade=1970s&kind=event&selected=ent_dc_landmark_listing_1975',
+  );
+});
+
+test('parses q and sort into shareable href', () => {
+  const state = parseHistorySearchParams({ q: 'dunbar', sort: 'connections', kind: 'school' });
+  assert.equal(state.filters.q, 'dunbar');
+  assert.equal(state.filters.sort, 'connections');
+  assert.equal(state.filters.kind, 'school');
+  assert.equal(buildHistoryHref(state), '/history?kind=school&q=dunbar&sort=connections');
 });
 
 test('rejects malformed decade labels', () => {

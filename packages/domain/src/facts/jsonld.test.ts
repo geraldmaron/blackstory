@@ -12,7 +12,7 @@ test('buildFactArticleJsonLd always emits @type Article, never ClaimReview', () 
 test('buildFactArticleJsonLd absolutizes the canonical URL when a baseUrl is given', () => {
   const fact = buildFixtureFact();
   const jsonLd = buildFactArticleJsonLd(fact, { baseUrl: 'https://blackbook.example.org' });
-  assert.equal(jsonLd['@id'], `https://blackbook.example.org/facts/${fact.id}/${fact.slug}`);
+  assert.equal(jsonLd['@id'], `https://blackbook.example.org/facts/${fact.slug}`);
 });
 
 test('buildFactArticleJsonLd carries the current revision number as version', () => {

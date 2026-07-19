@@ -1,7 +1,7 @@
 /**
  * Builds the `/explore` map + list dataset from the active release (seed catalog until live
  * projections are wired — same posture as `../../data/public-seed.ts`). Reuses the
- * redaction-injected `buildMapSource` plus era and precision helpers from `@black-book/domain`.
+ * redaction-injected `buildMapSource` plus era and precision helpers from `@repo/domain`.
  * This module adds no redaction of its own; it only enriches already-redacted map features with
  * fields the map/list UI needs (name, era, one-line story, evidence count, confidence, and
  * precision-radius affordances).
@@ -11,24 +11,25 @@
  * exist, map each record’s resolved jurisdiction bbox into `AreaRecordInput`. Area records must
  * render as polygon geometry, never as a point.
  */
-import { redactLocationForPublic } from '@black-book/security';
+import { redactLocationForPublic } from '@repo/security/redaction';
 import {
   buildMapSource,
-  type GeoPrecisionTier,
   type MapCountyAggregate,
   type MapPointFeature,
   type MapSourceEntityInput,
   type MapStateAggregate,
-} from '@black-book/domain';
+} from '@repo/domain/map/map-source';
+import type { GeoPrecisionTier } from '@repo/domain/geography/display-radius';
 import type { PublicClaimView, PublicEntityView } from '../../data/public-seed';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
+import { displayEncodingFor, mapToneFromTopics } from './kind-encoding';
 
 export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
 
 /** Highest confidence tier among an entity's accepted claims a transparency affordance about
  * how strongly evidenced the record is, never a numeric score (ranking-signal ban). */
-function highestConfidence(claims: readonly PublicClaimView[]): ConfidenceTier {
+export function highestConfidence(claims: readonly PublicClaimView[]): ConfidenceTier {
   if (claims.some((claim) => claim.confidenceLevel === 'high')) return 'high';
   if (claims.some((claim) => claim.confidenceLevel === 'medium')) return 'medium';
   if (claims.some((claim) => claim.confidenceLevel === 'low')) return 'low';
@@ -51,7 +52,22 @@ export type ExploreMapFeatureProperties = {
    * page's "Accepted claims" section) a transparency affordance, not a hidden ranking input. */
   readonly evidenceCount: number;
   readonly confidenceTier: ConfidenceTier;
+  /** @deprecated Superseded by `topicIds` (the related workstream); kept for the facet builder's
+   * fallback path. */
   readonly topicTags: readonly string[];
+  /** Controlled historical-theme ids (the related workstream) — the ONLY field
+   * `buildExploreFacetOptions` should treat as authoritative for the theme facet. */
+  readonly topicIds?: readonly string[];
+  /** Semantic tone override from topics (massacre / plantation / epicenter). */
+  readonly mapTone?: string;
+  /**
+   * Denormalized kind/tone shade from `displayEncodingFor` — the same hex KindBadge paints.
+   * Carried on the feature so MapLibre circle layers can `['get', 'shade']` without re-deriving
+   * the encoding table at paint time (and so HTML hit-targets can match the GL fill).
+   */
+  readonly shade: string;
+  /** Denormalized glyph identity from `displayEncodingFor` (WCAG non-color channel). */
+  readonly glyph: string;
   readonly stateFips?: string;
   readonly statePostalCode?: string;
   readonly stateName?: string;
@@ -180,6 +196,8 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
   const radius = resolveDisplayRadiusMeters(tier, {
     ...(feature.properties.statePostalCode ? { statePostalCode: feature.properties.statePostalCode } : {}),
   });
+  const mapTone = mapToneFromTopics(entity.topicTags);
+  const encoding = displayEncodingFor(feature.properties.kind, mapTone);
 
   return {
     type: 'Feature',
@@ -200,6 +218,10 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
       evidenceCount: entity.claims.length,
       confidenceTier: highestConfidence(entity.claims),
       topicTags: entity.topicTags,
+      ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),
+      ...(mapTone !== undefined ? { mapTone } : {}),
+      shade: encoding.shade,
+      glyph: encoding.glyph,
       ...(feature.properties.stateFips ? { stateFips: feature.properties.stateFips } : {}),
       ...(feature.properties.statePostalCode ? { statePostalCode: feature.properties.statePostalCode } : {}),
       ...(feature.properties.stateName ? { stateName: feature.properties.stateName } : {}),
@@ -226,7 +248,9 @@ export function buildExploreMapSource(
   let skippedNoAnchor = 0;
 
   for (const entity of entities) {
-    const anchor = resolveAnchor(entity.id);
+    // Live projections carry their own public-precision anchor; the repo-side table is the
+    // fallback for bundled seed fixtures only (see entity-geo.ts's retirement note).
+    const anchor = entity.geoAnchor ?? resolveAnchor(entity.id);
     if (!anchor) {
       skippedNoAnchor += 1;
       continue;

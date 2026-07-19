@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" fill="none">
+  <!-- Horizontal ledger lines  archive atmosphere fallback -->
+  <rect width="192" height="192" fill="#161616"/>
+  <g stroke="#F4EFE5" stroke-width="1" opacity="0.35">
+    <path d="M16 20h160M16 44h160M16 68h160M16 92h160M16 116h160M16 140h160M16 164h160"/>
+  </g>
+  <g stroke="#B86B2A" stroke-width="2" opacity="0.4">
+    <path d="M16 20h28M16 92h28"/>
+  </g>
+</svg>

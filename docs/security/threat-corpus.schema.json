@@ -1,17 +1,17 @@
 /**
- * JSON Schema for docs/security/threat-corpus.json (BB-004).
+ * JSON Schema for docs/security/threat-corpus.json.
  * Validates that each threat has P0 priority, four control quadrants, and bead mappings.
  */
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://black-book.local/schemas/threat-corpus.json",
-  "title": "Black Book threat corpus",
+  "title": "BlackStory threat corpus",
   "type": "object",
   "required": ["version", "bead", "threats"],
   "additionalProperties": true,
   "properties": {
     "version": { "type": "string" },
-    "bead": { "const": "BB-004" },
+    "bead": { "const": "" },
     "updatedAt": { "type": "string" },
     "assumptionsRef": { "type": "string" },
     "threats": {

@@ -1,7 +1,8 @@
 /**
  * Content-Security-Policy builder for the public web surface.
- * Strict defaults in production; Next.js MapLibre need limited relaxations in development
- * (inline/eval scripts for hydration + HMR, blob workers for MapLibre GL).
+ * Production allows inline scripts for Next.js App Router flight/hydration until a
+ * nonce pipeline lands; development also allows eval for HMR. MapLibre needs blob
+ * workers and OpenFreeMap / demotiles connect+font+img hosts.
  */
 
 export type CspBuildOptions = {
@@ -16,10 +17,13 @@ export type CspBuildOptions = {
   isDev?: boolean;
 };
 
-/** MapLibre demo vector tiles glyphs (empty dark canvas is not a readable map).  */
-const MAP_TILE_SRC = ['https://demotiles.maplibre.org'];
+/** MapLibre demo tiles (fallback) + OpenFreeMap streets/fonts for the archive basemap. */
+const MAP_TILE_SRC = ['https://demotiles.maplibre.org', 'https://tiles.openfreemap.org'];
 
-const DEFAULT_IMG_SRC = ["'self'", 'data:', 'blob:', ...MAP_TILE_SRC];
+/** Public entity/media objects (promoted Commons portraits, collage sources). */
+const PUBLIC_MEDIA_IMG_SRC = ['https://storage.googleapis.com'];
+
+const DEFAULT_IMG_SRC = ["'self'", 'data:', 'blob:', ...MAP_TILE_SRC, ...PUBLIC_MEDIA_IMG_SRC];
 const DEFAULT_CONNECT_SRC = ["'self'", ...MAP_TILE_SRC];
 const DEFAULT_FONT_SRC = ["'self'", ...MAP_TILE_SRC];
 
@@ -34,9 +38,12 @@ export function buildContentSecurityPolicy(options: CspBuildOptions = {}): strin
   } = options;
 
   const styleSrc = allowInlineStyles ? ["'self'", "'unsafe-inline'"] : ["'self'"];
-  // Next.js App Router hydrates via inline bootstrap scripts; webpack HMR needs eval in
-  // development. Production stays strict ('self' only) until a nonce pipeline lands.
-  const scriptSrc = isDev ? ["'self'", "'unsafe-inline'", "'unsafe-eval'"] : ["'self'"];
+  // Next.js App Router ships RSC flight data in inline <script> tags without nonces.
+  // Production must allow 'unsafe-inline' until a per-request nonce pipeline lands
+  // (see tracker follow-up for nonce + strict-dynamic). Dev still needs 'unsafe-eval' for HMR.
+  const scriptSrc = isDev
+    ? ["'self'", "'unsafe-inline'", "'unsafe-eval'"]
+    : ["'self'", "'unsafe-inline'"];
   const workerSrc = ["'self'", 'blob:'];
   const resolvedConnectSrc = isDev
     ? [...connectSrc, 'ws:', 'wss:']

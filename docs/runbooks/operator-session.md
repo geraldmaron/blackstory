@@ -1,9 +1,9 @@
-# Runbook: Operator session (BB-085)
+# Runbook: Operator session
 
 **Scope:** starting a periodic operator session (Claude Code or the admin console), submitting
 leads/sources/evidence through `packages/operator-cli`, running a bounded discovery campaign,
 drafting a case toward review-ready, and closing the session correctly.
-**Not in scope:** promotion/publication (BB-019/032 — a distinct, fresh-auth reviewer action),
+**Not in scope:** promotion/publication (/032 — a distinct, fresh-auth reviewer action),
 adapter/source fetching (`packages/domain/src/adapters/**`), and live IAP/Firebase
 authentication for the admin console's quick-add route (documented gap below).
 
@@ -11,10 +11,10 @@ authentication for the admin console's quick-add route (documented gap below).
 
 **Proposer is never approver.** Everything in this runbook — the CLI, the four
 `.claude/skills/black-book/` skills, and the admin console's `/quick-add` route — lands data in
-the *existing* BB-029 submission quarantine and BB-044 research-case pipeline. None of it can
+the *existing*  submission quarantine and  research-case pipeline. None of it can
 publish, promote, or approve anything: `evaluatePromotionGate`
 (`packages/domain/src/promotion/controls.ts`) refuses when the approver id equals the proposer
-id, and BB-044's `promote`/`retract` actions require a *fresh* (≤10 minute), separately
+id, and 's `promote`/`retract` actions require a *fresh* (≤10 minute), separately
 authenticated `publication`-role token (`assertRecentReauth`,
 `packages/firebase/src/admin-auth.ts`) — something a long-running operator session never holds.
 `packages/operator-cli/src/promotion-boundary.test.ts` proves this mechanically; read it if you
@@ -61,7 +61,7 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts regi
 ```
 
 This *proposes* the source into the same quarantine queue a lead uses — it does not write to
-the `evidenceSources` registry (BB-016). A reviewer actions it through the existing
+the `evidenceSources` registry. A reviewer actions it through the existing
 source-registry workflow.
 
 ### Attach evidence to a research case
@@ -100,13 +100,57 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts disc
 ```
 
 Requires an already-assembled batch file (`{pack, records, runContext}`) — this command runs
-the real BB-039 gate over it and reports yield; it does not fetch from any adapter itself. See
+the real  gate over it and reports yield; it does not fetch from any adapter itself. See
 `.claude/skills/black-book/discovery-run/SKILL.md`.
+
+### Run community-feed obscurity discovery (dry-run)
+
+Weekly schedule is declared as `community-obscurity-discovery` (Sundays 10:00 UTC); GCP
+Scheduler apply is still a human step. For an on-demand dry-run, pass a local feed XML file
+(no network fetch in this command):
+
+```bash
+node --conditions development --import tsx packages/operator-cli/src/bin.ts community-obscurity-run \
+  --feed-xml feed_the_american_blackstory=packages/domain/src/adapters/rss/fixtures/the-american-blackstory.trimmed.rss.xml \
+  --catalog-titles "Rosa Parks|Martin Luther King Jr.|Buffalo Soldiers|Harriet Tubman"
+```
+
+Private candidates + obscurity ranking only — never publishes. See
+`docs/research/discovery-pipeline.md`.
+
+### Run editorial / enrichment (LLM stage-only)
+
+```bash
+# List pending from an obscurity summary JSON
+node --conditions development --import tsx packages/operator-cli/src/bin.ts pending-list \
+  --from /tmp/obscurity.json
+
+# Draft keep/reject + linked prose (mock default; use --provider openrouter|ollama)
+# --catalog-from=firestore loads entityEmbeddings vectors for related suggestions
+OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
+  packages/operator-cli/src/bin.ts editorial-run \
+  --subjects /tmp/subjects.json \
+  --catalog-from=firestore \
+  --provider mock \
+  --operator-id "$USER" --session-id "sess-$(date +%s)" --identity-source cursor_session
+```
+
+One-time (or incremental) embedding backfill into `entityEmbeddings`:
+
+```bash
+GEMINI_API_KEY=... APP_FIREBASE_ALLOW_PRODUCTION=1 FIREBASE_PROJECT_ID=black-book-efaaf \
+  node --conditions development --import tsx \
+  packages/firebase/src/embeddings/backfill-cli.ts \
+  --source=publicSearchIndex --max-items 600 --max-cost-usd 1
+```
+
+Add `--commit` only after review — stages quarantine `editorial_packet` proposals, never
+publishes. Skill: `.claude/skills/black-book/editorial-enrichment/SKILL.md`.
 
 ### Commit a prepared proposal
 
 Every command above defaults to a dry run (prints the prepared result, writes nothing). Add
-`--commit` once you've reviewed the output and want it written through BB-018's real
+`--commit` once you've reviewed the output and want it written through 's real
 `commitWithAudit`:
 
 ```bash
@@ -116,13 +160,13 @@ GOOGLE_APPLICATION_CREDENTIALS=... node --conditions development --import tsx \
 
 `--commit` needs Firestore Admin SDK credentials for the target project (or emulator env vars —
 see `apps/admin/.env.example`). There is no `--publish`, `--approve`, or `--promote` flag on
-this CLI, anywhere — publication is a separate action through BB-019/032's own gated tooling
+this CLI, anywhere — publication is a separate action through /032's own gated tooling
 with a distinct, fresh-authenticated approver identity.
 
 ### Admin console quick-add
 
 Navigate to `/quick-add` in `apps/admin`. Paste a URL, optionally add notes/location/era and
-your operator id, and submit. The route fetches through BB-030 safety, pre-fills a citation,
+your operator id, and submit. The route fetches through  safety, pre-fills a citation,
 notes the (currently unwired) Wayback capture point, and prepares a draft research case through
 the same `runResearchIntake` the CLI's `research-intake` command uses. The "Commit to
 quarantine pipeline" button is intentionally disabled, matching `/console`'s existing pattern —
@@ -131,7 +175,7 @@ commit the exact prepared proposal via the CLI's `--commit` flag instead.
 **Known, documented gap:** `/quick-add` does not yet read a verified IAP/Firebase administrator
 identity (no route in `apps/admin` wires `createServerAdminAuthorizer` into a request handler
 yet). Until that lands, the operator identifies themselves via a plain "Operator id" form
-field. Swap that for a verified identity once BB-027's live wiring reaches this route.
+field. Swap that for a verified identity once 's live wiring reaches this route.
 
 ## End-of-session checklist
 
@@ -141,9 +185,9 @@ this runbook — follow it exactly:
 1. **File issues for remaining work** (`bd` — not TodoWrite/markdown TODOs).
 2. **Run quality gates** for anything you changed:
    ```bash
-   pnpm --filter @black-book/operator-cli test
-   pnpm --filter @black-book/operator-cli typecheck
-   pnpm --filter @black-book/admin typecheck
+   pnpm --filter @repo/operator-cli test
+   pnpm --filter @repo/operator-cli typecheck
+   pnpm --filter @repo/admin typecheck
    ```
 3. **Update issue status** — close finished `bd` work, update in-progress items.
 4. **Push to remote** (mandatory — work is not done until this succeeds):

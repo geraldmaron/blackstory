@@ -1,7 +1,7 @@
 
 /**
  * Shared types for adversarial integrity exercise harnesses.
- * Scenarios compose @black-book/security and @black-book/domain gates locally no live attacks.
+ * Scenarios compose @repo/security and @repo/domain gates locally no live attacks.
  */
 
 /** Red-team scenario identifiers aligned with acceptance criteria. */

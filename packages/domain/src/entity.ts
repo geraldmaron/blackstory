@@ -9,6 +9,8 @@
  * full ontology decision record.
  */
 import type { EntityKind } from './entity-kinds.js';
+import type { EntityClass } from './entity-class.js';
+import { deriveLivingStatus } from './living.js';
 import type { LivingStatus } from './living.js';
 import type { PlaceFields } from './geography/location.js';
 import type { SchoolFields } from './school.js';
@@ -69,11 +71,28 @@ export type EntityMergeState = {
 export type CanonicalEntity = {
   readonly id: string;
   readonly kind: EntityKind;
+  /**
+   * Coarse entity classification (the related workstream, `./entity-class.ts`). NEW, additive, and
+   * optional — `kind` remains the canonical field every existing consumer reads; these two are
+   * derived via `deriveEntityClassification` and not wired into any publish/search/filter
+   * pipeline in this pass.
+   */
+  readonly entityClass?: EntityClass;
+  /** Controlled finer-grained subtype label(s) within `entityClass` (e.g. `['church']`). */
+  readonly entityTypes?: readonly string[];
   readonly displayName: string;
   readonly aliases?: readonly EntityAlias[];
   readonly identifiers?: readonly EntityIdentifier[];
   /** Required for person; optional elsewhere. Default unknown ⇒ treat as living. */
   readonly livingStatus?: LivingStatus;
+  /**
+   * Computed/output-only signal from `deriveLivingStatus` (`./living.ts`), the related workstream.
+   * NEVER hand-set independently — it exists so callers can store a derivation result without
+   * a second independently-settable source of truth. Not wired into `currentEntityStatus` or any
+   * publish pipeline in this pass (that overlaps live-release work owned elsewhere); see
+   * `deriveEntityLivingStatus` below for how to compute it from this entity's person signals.
+   */
+  readonly livingStatusDerived?: LivingStatus;
   readonly mergeState?: EntityMergeState;
   /**
    * Time-scoped entity-lifecycle status designations. Omitted for `event` and `person`
@@ -118,4 +137,20 @@ export function currentEntityStatus(entity: CanonicalEntity): string | undefined
     return undefined;
   }
   return currentStatus(entity.statusHistory);
+}
+
+/**
+ * Computes `livingStatusDerived` (the related workstream) for a person entity from the closest existing
+ * signal in this model — `PersonFields.birthYear`/`deathYear` — via `deriveLivingStatus`
+ * (`./living.ts`). Returns `undefined` for non-person kinds (living status is only meaningful for
+ * persons). This is a pure computation, not wired into `currentEntityStatus` or any publish
+ * pipeline in this pass — callers decide when/whether to store the result on
+ * `livingStatusDerived`.
+ */
+export function deriveEntityLivingStatus(entity: CanonicalEntity): LivingStatus | undefined {
+  if (entity.kind !== 'person') return undefined;
+  return deriveLivingStatus({
+    ...(entity.person?.birthYear !== undefined ? { birthYear: entity.person.birthYear } : {}),
+    ...(entity.person?.deathYear !== undefined ? { deathYear: entity.person.deathYear } : {}),
+  });
 }

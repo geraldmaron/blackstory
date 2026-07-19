@@ -17,13 +17,13 @@ import {
   evaluatePromotionGate,
   type PromotionClaim,
   type PromotionEvidence,
-} from '@black-book/domain';
+} from '@repo/domain';
 import {
   AdminAuthorizationError,
   assertResearchCaseActionAuthorized,
   executeAuthorizedResearchCaseAction,
   type VerifiedAdminToken,
-} from '@black-book/firebase';
+} from '@repo/firebase';
 import * as operatorCli from './index.ts';
 import { prepareLeadIntake } from './intake.ts';
 

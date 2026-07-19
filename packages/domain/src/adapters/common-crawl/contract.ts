@@ -31,7 +31,7 @@ export function createCommonCrawlAdapterContract(overrides: Partial<SourceAdapte
       refreshSchedule: '0 4 1 * *',
       notes:
         'Free AWS Open Data / Hugging Face access under Common Crawl research/fair-use terms -- ' +
-        'no storage-rights gate needed (BB-075). Adapter still starts disabled by default (BB-037).',
+        'no storage-rights gate needed (). Adapter still starts disabled by default ().',
     },
     rights: {
       defaultStatus: 'unknown',

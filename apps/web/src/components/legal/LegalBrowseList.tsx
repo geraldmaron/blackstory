@@ -1,8 +1,10 @@
 /**
  * Browse list row for the `/legal` index page.
+ * Uses Next.js `Link` for soft in-app transitions.
  */
 import React from 'react';
-import type { LawStatus } from '@black-book/domain';
+import Link from 'next/link';
+import type { LawStatus } from '@repo/domain/entity-status';
 import { LegalStatusBadge } from './LegalStatusBadge';
 import { humanizeLegalKind, humanizeLegalTopic } from './format';
 
@@ -25,31 +27,31 @@ export type LegalBrowseListProps = {
 
 export function LegalBrowseList({ items, labelledBy }: LegalBrowseListProps) {
   return (
-    <ul className="bb-result-list" aria-labelledby={labelledBy}>
+    <ul className="ds-result-list ds-legal-browse-list" aria-labelledby={labelledBy}>
       {items.map((item) => (
-        <li key={item.id} className="bb-result-list__item">
-          <article>
-            <h3 className="bb-result-list__title" style={{ margin: 0 }}>
-              <a href={`/legal/${item.slug}`}>{item.title}</a>
+        <li key={item.id} className="ds-result-list__item ds-legal-browse-list__item">
+          <article className="ds-legal-browse-list__record">
+            <h3 className="ds-result-list__title" style={{ margin: 0 }}>
+              <Link href={`/legal/${item.slug}`}>{item.title}</Link>
             </h3>
-            <p className="bb-result-list__summary" style={{ margin: 'var(--bb-space-2) 0 0 0' }}>
-              <span className="bb-mono">{item.citation}</span>
+            <p className="ds-result-list__summary" style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
+              <span className="ds-mono">{item.citation}</span>
             </p>
-            <div className="bb-row" style={{ marginTop: 'var(--bb-space-2)', gap: 'var(--bb-space-2)', flexWrap: 'wrap' }}>
-              <span className="bb-sans">{humanizeLegalKind(item.kind)}</span>
+            <div className="ds-row" style={{ marginTop: 'var(--ds-space-2)', gap: 'var(--ds-space-2)', flexWrap: 'wrap' }}>
+              <span className="ds-sans">{humanizeLegalKind(item.kind)}</span>
               <LegalStatusBadge status={item.lawStatus} />
               {item.topics.map((topic) => (
-                <span key={topic} className="bb-badge">
+                <span key={topic} className="ds-badge">
                   {humanizeLegalTopic(topic)}
                 </span>
               ))}
               {item.hasExplainer ? (
-                <span className="bb-sans">Plain-language explainer available</span>
+                <span className="ds-sans">Plain-language explainer available</span>
               ) : null}
             </div>
             {item.factHref ? (
-              <p style={{ margin: 'var(--bb-space-2) 0 0 0' }}>
-                <a href={item.factHref}>View canonical fact record</a>
+              <p style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
+                <Link href={item.factHref}>View canonical fact record</Link>
               </p>
             ) : null}
           </article>

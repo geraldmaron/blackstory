@@ -5,15 +5,16 @@
  * history queries without requiring a full navigation.
  */
 import { NextResponse } from 'next/server';
-import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@black-book/security';
+import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@repo/security';
 import { getHistoryGraphReleaseArtifact } from '../../../data/history-graph-seed';
+import { SEED_ENTITY_RELATIONSHIPS } from '../../../data/entity-graph-seed';
 import {
   buildHistoryEdges,
   buildHistoryGraphContext,
   buildHistoryNodes,
   resolveHistoryGraphSlice,
 } from '../../../lib/history/build-history-graph';
-import { SEED_ENTITY_RELATIONSHIPS } from '../../../data/entity-graph-seed';
+import { listPublicEntityViews } from '../../../lib/public-data/source';
 import type { HistoryFilterState } from '../../../lib/history/filters';
 import { parseDecadeParam } from '../../../lib/history/url-state';
 import type { HistoryAppCheckGuard } from './app-check-guard';
@@ -122,8 +123,9 @@ export async function handleHistoryRefineRequest(
     }
 
     const decade = parseDecadeParam(url.searchParams.get('decade') ?? undefined);
-    const artifact = getHistoryGraphReleaseArtifact();
-    const context = buildHistoryGraphContext(artifact);
+    const { data: entities } = await listPublicEntityViews();
+    const artifact = getHistoryGraphReleaseArtifact(entities);
+    const context = buildHistoryGraphContext(artifact, entities);
     const slice = resolveHistoryGraphSlice(artifact, decade ? 'decade' : 'all-time', decade);
     const nodes = buildHistoryNodes(slice, filterState, context.entitiesById);
     const visibleNodeIds = new Set(nodes.map((node) => node.entityId));

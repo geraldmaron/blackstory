@@ -1,16 +1,16 @@
-# Environment and workload isolation (BB-005, re-split by BB-078)
+# Environment and workload isolation (, re-split by )
 
 > **Design target: three-project topology**, per [ADR-012](../adr/ADR-012-production-environment-resplit.md)
-> (BB-078), superseding the single-project design D-013 recorded here on 2026-07-16.
+>, superseding the single-project design D-013 recorded here on 2026-07-16.
 > **Live reality is unchanged by this document alone** — the actual migration (creating
-> `blackbook-staging`/`blackbook-internal`, moving workloads, applying IAM) is BB-079, not yet
-> executed. Until BB-079 applies it, the "Historical: single-project design" section below still
+> `blackbook-staging`/`blackbook-internal`, moving workloads, applying IAM) is , not yet
+> executed. Until  applies it, the "Historical: single-project design" section below still
 > describes what is live. This document itself only changes what the *target* is; see the "Verified
 > live vs. designed" table for exactly what is true today.
 
 **Date:** 2026-07-17 (re-split); originally 2026-07-16
-**Depends on:** ADR-005, ADR-006, ADR-009, ADR-011, ADR-012, BB-004
-**Implements toward:** BB-010–012, BB-021–027, BB-079, BB-089
+**Depends on:** ADR-005, ADR-006, ADR-009, ADR-011, ADR-012,
+**Implements toward:** –012, –027, ,
 
 ## Verified live vs. designed
 
@@ -18,16 +18,16 @@
 |------|---------------|--------------------------------|
 | GCP/Firebase projects | `black-book-efaaf` (project number `332234323945`) is the only live project; Hosting site `black-book-efaaf.web.app` exists | `blackbook-prod` (= `black-book-efaaf`, retained — see ADR-012), `blackbook-staging` (new), `blackbook-internal` (new) |
 | Firebase Hosting | `black-book-efaaf.web.app` exists | App content/release state is outside this design |
-| Firebase apps | **Black Book Web** `1:332234323945:web:17be349ebc9c029b3bfd78`; **Black Book Admin** `1:332234323945:web:e1b31c78e32d95943bfd78` | Admin app re-registered under `blackbook-internal` Firebase Auth config at migration time |
+| Firebase apps | **BlackStory Web** `1:332234323945:web:17be349ebc9c029b3bfd78`; **BlackStory Admin** `1:332234323945:web:e1b31c78e32d95943bfd78` | Admin app re-registered under `blackbook-internal` Firebase Auth config at migration time |
 | App Hosting | Inventory/creation blocked — project not on Blaze; App Hosting API unavailable | `black-book-web-production` in `blackbook-prod`; `black-book-web-staging` in `blackbook-staging` as its own project (not a same-project namespace) |
 | Firestore | Not enabled | `(default)` DB in `blackbook-prod`/`blackbook-staging`; named databases `raw-ingest` and `curated` in `blackbook-internal` (ADR-012) |
 | Workload isolation | One live project, no split yet | Three-project split with one-way promotion IAM asymmetry (ADR-012) |
 
 Every cloud resource in `black-book-efaaf` is production today. `development` means local
-`demo-black-book` emulators and disposable local services — this does not change under ADR-012.
+`demo-repo` emulators and disposable local services — this does not change under ADR-012.
 `staging` and `production-research` are **currently** configuration namespaces inside
 `black-book-efaaf`, per the historical section below; ADR-012 replaces that with real project
-boundaries (`blackbook-staging`, `blackbook-internal`) once BB-079 applies it.
+boundaries (`blackbook-staging`, `blackbook-internal`) once  applies it.
 
 Source of truth:
 
@@ -54,7 +54,7 @@ Source of truth:
 | `blackbook-staging` | Pre-production mirror, synthetic data only, `minInstances: 0` | `(default)`, same shape as prod | mirrors prod bucket names, staging-prefixed | `github-deploy-staging` (optional) |
 | `blackbook-internal` | Research pipeline + admin | Named DBs `raw-ingest`, `curated` (per-DB IAM conditions) | `private-evidence` | `research`, `promotion`, `security`, `admin`, `submissions-puller`, `github-deploy-internal` (optional) |
 
-Local development stays on `demo-black-book` emulators — unaffected by any of the above.
+Local development stays on `demo-repo` emulators — unaffected by any of the above.
 
 ### Admin console correction: Cloud Run + IAP, direct attachment
 
@@ -64,7 +64,7 @@ or serverless NEG is required; that pattern was only necessary before Google Clo
 support for Cloud Run. `docs/security/service-surfaces.md` and `infra/gcp/isolation-matrix.json`
 already say "Cloud Run + IAP" for admin (not App Hosting — App Hosting backends cannot sit behind IAP
 at all, so this was never actually an App Hosting assumption in this repo's docs). The one design that
-*does* still assume the older load-balancer mechanism is `infra/gcp/iap/README.md` (BB-027); that
+*does* still assume the older load-balancer mechanism is `infra/gcp/iap/README.md`; that
 directory is outside this bead's file ownership and needs a follow-up rewrite (tracked in ADR-012's
 Consequences).
 
@@ -112,15 +112,15 @@ enforce this boundary; see `infra/gcp/terraform/multi-project/firestore.tf`.
 ## AC-ISO-1..5 — cross-project invariants (current)
 
 Restated for the ADR-012 target topology. Each still names the historical same-project mechanism
-(still true, and still the fallback until BB-079 applies the split) plus the new cross-project
+(still true, and still the fallback until  applies the split) plus the new cross-project
 mechanism. Machine encoding: `infra/gcp/isolation-matrix.json` → `acceptanceCriteria[].enforcedBy`.
 Test encoding: `infra/gcp/terraform/multi-project/tests/isolation-invariants.test.mjs`.
 
 ### AC-ISO-1 — Development credentials cannot access production
 
-- Local development/tests use `demo-black-book` emulators (Firestore/Auth/Storage) — unchanged.
+- Local development/tests use `demo-repo` emulators (Firestore/Auth/Storage) — unchanged.
 - **[Target topology]** `blackbook-staging` gives cloud-based pre-production testing a real project
-  boundary from `blackbook-prod` for the first time; this criterion is no longer N/A once BB-079
+  boundary from `blackbook-prod` for the first time; this criterion is no longer N/A once
   applies the split (it was N/A under D-013 because there was only one cloud project).
 - `github-deploy` (prod) is WIF-only, protected-context only, project-scoped to `blackbook-prod`; it
   has no exported key and no binding in `blackbook-staging`/`blackbook-internal`.
@@ -162,15 +162,15 @@ Test encoding: `infra/gcp/terraform/multi-project/tests/isolation-invariants.tes
 
 Human-executable runbook:
 [`../runbooks/production-environment-resplit-migration.md`](../runbooks/production-environment-resplit-migration.md).
-Not executed by this document or by BB-078 — tracked as BB-079.
+Not executed by this document or by  — tracked as .
 
 ---
 
-## Historical: BB-005 single-project design (superseded 2026-07-17 by ADR-012)
+## Historical:  single-project design (superseded 2026-07-17 by ADR-012)
 
 > Kept for the decision trail, per this repo's convention of not deleting recorded decisions. This
 > section describes the D-013 single-project design and remains an accurate description of **live**
-> state until BB-079 executes the migration above.
+> state until  executes the migration above.
 
 ### Same-project security boundaries (as designed under D-013)
 
@@ -185,7 +185,7 @@ every lower layer:
    `black-book-efaaf-private-evidence`, `black-book-efaaf-exports`, and
    `black-book-efaaf-quarantine`. All use UBLA; every bucket except the deliberate public-media
    delivery path enforces Public Access Prevention.
-4. **Firestore rules + Auth claims (BB-013 / ADR-011):** public clients read only `public/**`;
+4. **Firestore rules + Auth claims ( / ADR-011):** public clients read only `public/**`;
    canonical/evidence/publication/audit writes are Admin SDK only; submissions stay quarantined;
    research claims cannot publish. Parked Postgres roles under `infra/database/` are not the
    production control plane.
@@ -199,14 +199,14 @@ project-level grant can defeat bucket separation. IAM review must reject broad g
 negative permissions in the matrix. **This is exactly the weakness ADR-012 closes with a real project
 boundary; the mechanisms above remain in force as defense-in-depth even after the split.**
 
-### BB-005 acceptance invariants (original text, D-013-era)
+###  acceptance invariants (original text, D-013-era)
 
 #### AC-ISO-1 — Development credentials cannot access production
 
 This criterion was **N/A as a cloud project-separation claim** under D-013: there was only one cloud
 project and it was production. The safe replacement was operational:
 
-- local development/tests use `demo-black-book` emulators (Firestore/Auth/Storage);
+- local development/tests use `demo-repo` emulators (Firestore/Auth/Storage);
 - preflight checks reject production identifiers/endpoints;
 - any access to `black-book-efaaf` is explicitly production access;
 - `github-deploy` is WIF-only, protected-context only, and has no exported key.
@@ -242,9 +242,9 @@ now satisfied by ADR-012's `blackbook-staging`.
 - It has no canonical write, evidence read, publication/promotion, deploy, or impersonation grant.
 - Promotion requires the separate internal/publication identity and auditable workflow.
 
-### BB-011 checklist for `black-book-efaaf`
+###  checklist for `black-book-efaaf`
 
-Status after BB-011 execution (2026-07-16): apps registered and repo config/rules/package delivered;
+Status after  execution (2026-07-16): apps registered and repo config/rules/package delivered;
 cloud backends and GCP IAM/buckets remain blocked on Blaze / `gcloud auth` / human choices. **This
 checklist still governs `blackbook-prod` (the retained `black-book-efaaf` project) under ADR-012; it
 does not need to be redone for that project, only extended to `blackbook-staging`/`blackbook-internal`
@@ -254,15 +254,15 @@ in the migration runbook.**
 2. **Register Firebase apps** — **Done** (Web + Admin); see `infra/firebase/registered-apps.json`.
 3. **Create App Hosting backends** — **Blocked** pending Blaze + `firebaseapphosting.googleapis.com`.
 4. **Create service accounts** — Designed only; needs `gcloud auth login` + human apply.
-5. **Create buckets and IAM** — Designed only; not provisioned in BB-011.
+5. **Create buckets and IAM** — Designed only; not provisioned in .
 6. **Firebase rules and Auth** — Firestore rules enforce public-projection reads + submission
-   quarantine (BB-013); Storage remains deny-all for clients. Live Firestore API/database may still
+   quarantine; Storage remains deny-all for clients. Live Firestore API/database may still
    need enablement; Auth providers not enabled (awaiting human choice).
-7. **App Check** — Scaffold/docs only; enforcement is BB-024.
-8. **Secrets and deployment** — App Hosting YAML uses Secret Manager names only; WIF design is BB-010 (`infra/gcp/wif/`, declarative; not applied until remote + numeric IDs).
-9. **Database boundary handoff** — **Firestore is the system of record (ADR-011 / D-014).** BB-012
+7. **App Check** — Scaffold/docs only; enforcement is .
+8. **Secrets and deployment** — App Hosting YAML uses Secret Manager names only; WIF design is  (`infra/gcp/wif/`, declarative; not applied until remote + numeric IDs).
+9. **Database boundary handoff** — **Firestore is the system of record (ADR-011 / D-014).**
    PostGIS/SQL Connect artifacts are parked under `infra/database/`; do not provision Cloud SQL.
-   Domain depth continues in BB-014+.
+   Domain depth continues in +.
 
 All remaining cloud actions still require human review after `firebase login` / `gcloud auth login`.
 Terraform is a plan scaffold only; do not apply it blindly to the live project.
@@ -278,9 +278,9 @@ Terraform is a plan scaffold only; do not apply it blindly to the live project.
    - Decide whether to upgrade to Blaze. App Hosting backend inventory/creation is blocked until the
      project is on Blaze and `firebaseapphosting.googleapis.com` can be enabled.
 2. **Register Firebase apps**
-   - Create one Firebase Web app for `apps/web` (suggested display name `Black Book Web`).
+   - Create one Firebase Web app for `apps/web` (suggested display name `BlackStory Web`).
    - Create a separate Firebase Web app for `apps/admin` (suggested display name
-     `Black Book Admin`) for Firebase Auth client configuration; do not share admin authorization
+     `BlackStory Admin`) for Firebase Auth client configuration; do not share admin authorization
      logic with the public app.
    - Record only Firebase's non-secret public web configuration through the approved config path.
      Do not create iOS/Android apps until those clients exist.
@@ -310,23 +310,23 @@ Terraform is a plan scaffold only; do not apply it blindly to the live project.
 7. **App Check**
    - Register the public Web app with reCAPTCHA Enterprise.
    - Start in metrics/monitoring mode, validate legitimate traffic and token propagation, then
-     enforce per supported product/API in BB-024.
+     enforce per supported product/API in .
    - Admin authorization and server-to-server IAM are not replaced by App Check.
 8. **Secrets and deployment**
    - Create named Secret Manager secrets only when a consumer exists (for example
      `web-production-sentry-dsn`); grant access per secret to the consuming SA.
-   - Complete WIF apply in BB-010 (`infra/github/scripts/apply-wif.sh`) and protected production approval before enabling `github-deploy` for real rollouts.
+   - Complete WIF apply in  (`infra/github/scripts/apply-wif.sh`) and protected production approval before enabling `github-deploy` for real rollouts.
    - Do not create JSON keys or place secret values in Firebase config, App Hosting yaml, CI, or repo.
 9. **Database boundary handoff**
-   - BB-012/013 creates the distinct Postgres roles and private Cloud SQL connectivity.
+   - /013 creates the distinct Postgres roles and private Cloud SQL connectivity.
    - Verify research cannot write public projections, submissions cannot write canonical data, and
      publication cannot alter raw evidence before any production data flow is enabled.
 
 </details>
 
-### Deferred four-project migration plan (original BB-005 target, now superseded by ADR-012's three-project design)
+### Deferred four-project migration plan (original  target, now superseded by ADR-012's three-project design)
 
-The original BB-005 target topology named these four projects:
+The original  target topology named these four projects:
 
 ```text
 blackbook-dev
@@ -336,7 +336,7 @@ blackbook-research-prod
 ```
 
 ADR-012 rejects reviving `blackbook-dev` as a cloud project (see ADR-012's Rejected Alternatives —
-`demo-black-book` emulators already give zero-cost local development) and instead adopts three
+`demo-repo` emulators already give zero-cost local development) and instead adopts three
 projects: `blackbook-prod` (= retained `black-book-efaaf`), `blackbook-staging`, `blackbook-internal`
 (renamed from `blackbook-research-prod` to also host admin, per ADR-012).
 

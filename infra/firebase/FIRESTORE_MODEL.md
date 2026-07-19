@@ -29,27 +29,28 @@
 | `evidenceLineage` | Syndication / republication relationships (BB-016) | No | No |
 | `publicationReleases` | Release manifests / drafts | `publication`/`admin` | No |
 | `publicMeta` | Active release pointer | Yes | No |
-| `publicReleases/{id}/entities/{id}` | Released projections | Yes | No |
-| `publicSearchIndex` | Search/geo index docs (geohash) | Yes | No |
+| `publicReleases/{id}/entities/{id}` | Released projections (web: Admin SDK or CDN `entities.json`) | No (client SDK denied) | No |
+| `publicSearchIndex` | Search index docs (web: Admin SDK or CDN `search-index.json`) | No (client SDK denied) | No |
 | `submissionInbox` | Quarantine inbox | Own docs or security/admin | Create quarantined only |
 | `auditEvents` | Append-only audit (BB-018) | Admin/security read; trusted staff append | Create only |
 | `outboxMessages` | Transactional event delivery with retry/DLQ (BB-018) | No | No |
 | `idempotencyKeys` | State-change replay guard (BB-018) | No | No |
 | `outboxConsumerReceipts` | Per-consumer effect deduplication (BB-018) | No | No |
 | `killSwitches` | Ops kill switches (including `source-adapter-{adapterId}`) | `admin` | No |
+| `discoveryCampaignRuns` | Private audit trail for scheduled discovery campaign dispatches (`publicEffect: none`) | No | No |
 
 ## Entity kinds (BB-014)
 
 `person` · `place` · `school` · `organization` · `institution` · `event` · `law` · `case` · `publication` · `artifact` · `other`
 
-Typed domain models live in `@black-book/domain`. Firestore Zod converters live in `@black-book/firebase`.
+Typed domain models live in `@repo/domain`. Firestore Zod converters live in `@repo/firebase`.
 
 ## Claims, contradictions, and confidence (BB-017)
 
 - **Atomic claims** store predicate/object, claim class (`standard` | `high_impact`), workflow + publication status, procedural status, and temporal/geographic context.
 - **Versions** are retained on the claim (`versions[]` + `currentVersionId`).
 - **`claimEvidenceLinks`** bind evidence with role `supporting` | `contradicting` | `contextual`, plus quality inputs and `lineageRootId` (from BB-016).
-- **Confidence** is calculated by deterministic code in `@black-book/domain` (`calculateClaimConfidence`). Scores retain component values and constitution `policyVersion`.
+- **Confidence** is calculated by deterministic code in `@repo/domain` (`calculateClaimConfidence`). Scores retain component values and constitution `policyVersion`.
 - **Syndication:** when constitution `blockSyndicatedCopiesAsIndependent` is true, evidence sharing a `lineageRootId` counts as one independent lineage.
 - **Contradictions:** credible alternate values are preserved in `preservedValues` (never silently collapsed).
 - **Publication:** high-impact claims use the higher constitution threshold; narratives cannot cite unpublished claims (`assertNarrativeMayCiteClaim`).
@@ -70,7 +71,7 @@ Typed domain models live in `@black-book/domain`. Firestore Zod converters live 
 
 - **Source organizations / domains** register who hosts material and which hostnames belong to them.
 - **`evidenceSources`** are adapters with constitution `sourceClassifications`, selective snapshot policy (`none` | `selective` — never automatic full crawl), default rights / publication permissions / prohibited uses, and `adapterEnabled`.
-- **Kill switches:** `adapterEnabled: false` OR engaged `killSwitches/source-adapter-{adapterId}` blocks new candidates via `canSourceAdapterCreateCandidates` / `assertSourceAdapterCanCreateCandidates` in `@black-book/domain`. Clients cannot write these collections.
+- **Kill switches:** `adapterEnabled: false` OR engaged `killSwitches/source-adapter-{adapterId}` blocks new candidates via `canSourceAdapterCreateCandidates` / `assertSourceAdapterCanCreateCandidates` in `@repo/domain`. Clients cannot write these collections.
 - **Source items** carry stable identifiers within the source scheme; every **evidence record** requires `sourceItemId`.
 - **Captures** store `contentHash` (`sha256` hex), `parserVersion`, optional selective `snapshotStorageObject`, and `dedupOfCaptureId` when hash-deduplicated.
 - **Evidence** stores locator (page/pages/offsets), excerpt + `excerptKind`, `observedAt`, `rightsStatus`, permissions, prohibited uses, and optional syndication pointers (`lineageRootId`, `syndicatedFromEvidenceId`).
@@ -81,7 +82,7 @@ Typed domain models live in `@black-book/domain`. Firestore Zod converters live 
 
 - Store Firestore-friendly geometries: `Point`, `Polygon`, or `BBox` on location docs.
 - Public projection and search-index documents may include `lat`, `lng`, `geohash`, optional `geohashPrefixes`, plus `precision` and `matchMethod`.
-- `@black-book/domain` provides `encodeGeohash` / `buildGeoPointFields` / `haversineMeters`.
+- `@repo/domain` provides `encodeGeohash` / `buildGeoPointFields` / `haversineMeters`.
 - `api-public` performs approved geohash-bounded queries plus server-side radius filtering (ADR-008 / ADR-011).
 - **ZIP** is `modern_input` / `modern_lookup` only — never a permanent historical boundary.
 - Historical and current `locations` subdocs may coexist on the same entity.
@@ -93,15 +94,15 @@ Typed domain models live in `@black-book/domain`. Firestore Zod converters live 
 
 ## Living status and sensitive-location enforcement (BB-015)
 
-Unknown living status defaults to `unknown` and is treated as living at the model layer (`@black-book/domain` / constitution).
+Unknown living status defaults to `unknown` and is treated as living at the model layer (`@repo/domain` / constitution).
 
-`@black-book/security` is the **single choke point for public serialization**. Location facts carry three precision tiers — evidence (exact), internal (staff), and public (always reduced). Constitution `sensitivityRules` define sensitivity classes, precision-reduction reasons, residential precision levels, and public caps.
+`@repo/security` is the **single choke point for public serialization**. Location facts carry three precision tiers — evidence (exact), internal (staff), and public (always reduced). Constitution `sensitivityRules` define sensitivity classes, precision-reduction reasons, residential precision levels, and public caps.
 
 - `reducePublicPrecision` / `redactLocationForPublic` reduce precision and coarsen coordinates + geohash before publication; living/unknown residential is capped at `city`, deceased occupied private residences at `neighborhood`.
 - `toPublicEntityProjection` / `toPublicSearchDocument` / `redactForPublicExport` build public payloads; `assertPublicProjectionSafe` fails closed on prohibited precision, address fields, or exact coordinates.
-- The `publicReleases/{id}/entities` converter (`@black-book/firebase`) runs `assertPublicProjectionSafe` on every `toFirestore`, and search-index docs carry only a coarse geohash — never address fields.
-- `@black-book/observability` loggers accept the security redactor so residential addresses and exact coordinates are scrubbed from logs and error telemetry.
-- BB-019 public projection/search writers **must** go through `@black-book/security` serializers.
+- The `publicReleases/{id}/entities` converter (`@repo/firebase`) runs `assertPublicProjectionSafe` on every `toFirestore`, and search-index docs carry only a coarse geohash — never address fields.
+- `@repo/observability` loggers accept the security redactor so residential addresses and exact coordinates are scrubbed from logs and error telemetry.
+- BB-019 public projection/search writers **must** go through `@repo/security` serializers.
 
 ## Auth claims
 
@@ -113,18 +114,18 @@ Custom claims (minted by privileged backend; BB-027): `admin` / `research` / `pu
 |----------|----------|
 | Security rules | `infra/firebase/firestore.rules` |
 | Indexes | `infra/firebase/firestore.indexes.json` |
-| Domain types / geohash / merge / provenance / claims / audit history | `@black-book/domain` |
-| Paths / types / converters / transaction + consumer helpers | `@black-book/firebase` → `src/firestore/` |
+| Domain types / geohash / merge / provenance / claims / audit history | `@repo/domain` |
+| Paths / types / converters / transaction + consumer helpers | `@repo/firebase` → `src/firestore/` |
 | Seed fixtures | `packages/firebase/fixtures/firestore-seed.ts` |
-| Server publish guards | `@black-book/data-access` → `src/firestore/` |
-| Redaction + public serialization (BB-015) | `@black-book/security` → `src/{sensitivity,redaction,serialize}.ts` |
+| Server publish guards | `@repo/data-access` → `src/firestore/` |
+| Redaction + public serialization (BB-015) | `@repo/security` → `src/{sensitivity,redaction,serialize}.ts` |
 
 ## Emulator tests
 
 ```bash
 pnpm firebase:emulators
 # other terminal
-CI_REQUIRE_FIREBASE=1 pnpm --filter @black-book/firebase test
+CI_REQUIRE_FIREBASE=1 pnpm --filter @repo/firebase test
 ```
 
 ## Public projection and immutable releases (BB-019)
@@ -157,7 +158,7 @@ public/releases/{releaseId}/entities/{entityId}.json
 ```
 
 Each entity JSON object has `schemaVersion`, an `entity` projection produced through
-`@black-book/security`, and metadata containing `releaseId`, canonical entity
+`@repo/security`, and metadata containing `releaseId`, canonical entity
 `revision`, `searchIndexVersion`, and `manifestHash`. Object ids are validated as single,
 non-traversing path segments.
 

@@ -5,7 +5,10 @@
  */
 
 import React from 'react';
+import Link from 'next/link';
 import type { PublicEntityView, RelatedNeighborView } from '../../data/public-seed';
+import { KindBadge } from '../map-experience';
+import { EntityLinkDiscoveryHint, humanizeEntityId } from './EntityLink';
 import { humanizeToken } from './format';
 import { RecordGapNotice } from './RecordGapNotice';
 
@@ -17,22 +20,38 @@ export type EntityRelatedListProps = {
   readonly labelledBy: string;
   /** When true, render continueLearning stubs instead of relatedNeighbors. */
   readonly continueLearning?: boolean;
+  /** When true, show a muted note that record names link onward. */
+  readonly showDiscoveryHint?: boolean;
 };
+
+function neighborLabelMap(entity: PublicEntityView): ReadonlyMap<string, string> {
+  const map = new Map<string, string>();
+  for (const neighbor of [...(entity.relatedNeighbors ?? []), ...(entity.continueLearning ?? [])]) {
+    if (neighbor.displayName.trim().length > 0) {
+      map.set(neighbor.id, neighbor.displayName);
+    }
+  }
+  return map;
+}
 
 function NeighborLink({ neighbor }: { readonly neighbor: RelatedNeighborView }) {
   return (
     <li key={`${neighbor.id}_${neighbor.relationType}_${neighbor.direction}`}>
-      <a className="bb-story-link" href={`/entity/${neighbor.id}`}>
-        <span className="bb-story-link__meta">
-          {neighbor.kind} · {humanizeToken(neighbor.relationType)}
+      <Link className="ds-story-link" href={`/entity/${neighbor.id}`}>
+        <span className="ds-story-link__meta">
+          <span className="ds-story-link__meta-row">
+            <KindBadge kind={neighbor.kind} density="compact" />
+            <span aria-hidden="true">·</span>
+            <span>{humanizeToken(neighbor.relationType)}</span>
+          </span>
         </span>
-        <h3 className="bb-story-link__title">{neighbor.displayName}</h3>
-        <p className="bb-story-link__summary">
+        <h3 className="ds-story-link__title">{neighbor.displayName}</h3>
+        <p className="ds-story-link__summary">
           {neighbor.summary.trim().length > 0
             ? neighbor.summary
             : `${humanizeToken(neighbor.relationType)} connection to this record.`}
         </p>
-      </a>
+      </Link>
     </li>
   );
 }
@@ -41,6 +60,7 @@ export function EntityRelatedList({
   entity,
   labelledBy,
   continueLearning = false,
+  showDiscoveryHint = false,
 }: EntityRelatedListProps) {
   const stubs = continueLearning
     ? (entity.continueLearning ?? [])
@@ -51,20 +71,27 @@ export function EntityRelatedList({
     if (related.length === 0) {
       return <RecordGapNotice kind="related" />;
     }
+    const labels = neighborLabelMap(entity);
     return (
-      <ul className="bb-story-rail" aria-labelledby={labelledBy}>
-        {related.map((entry) => (
-          <li key={`${entry.id}_${entry.type}`}>
-            <a className="bb-story-link" href={`/entity/${entry.id}`}>
-              <span className="bb-story-link__meta">{humanizeToken(entry.type)}</span>
-              <h3 className="bb-story-link__title">{entry.id}</h3>
-              <p className="bb-story-link__summary">
-                Open this related record to continue learning.
-              </p>
-            </a>
-          </li>
-        ))}
-      </ul>
+      <>
+        {showDiscoveryHint ? <EntityLinkDiscoveryHint /> : null}
+        <ul className="ds-story-rail" aria-labelledby={labelledBy}>
+          {related.map((entry) => {
+            const displayName = labels.get(entry.id) ?? humanizeEntityId(entry.id);
+            return (
+              <li key={`${entry.id}_${entry.type}`}>
+                <Link className="ds-story-link" href={`/entity/${entry.id}`}>
+                  <span className="ds-story-link__meta">{humanizeToken(entry.type)}</span>
+                  <h3 className="ds-story-link__title">{displayName}</h3>
+                  <p className="ds-story-link__summary">
+                    Open this related record to continue learning.
+                  </p>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </>
     );
   }
 
@@ -73,10 +100,13 @@ export function EntityRelatedList({
   }
 
   return (
-    <ul className="bb-story-rail" aria-labelledby={labelledBy}>
-      {stubs.map((neighbor) => (
-        <NeighborLink key={`${neighbor.id}_${neighbor.relationType}`} neighbor={neighbor} />
-      ))}
-    </ul>
+    <>
+      {showDiscoveryHint ? <EntityLinkDiscoveryHint /> : null}
+      <ul className="ds-story-rail" aria-labelledby={labelledBy}>
+        {stubs.map((neighbor) => (
+          <NeighborLink key={`${neighbor.id}_${neighbor.relationType}`} neighbor={neighbor} />
+        ))}
+      </ul>
+    </>
   );
 }

@@ -1,6 +1,6 @@
 
 /**
- * Public surface of @black-book/operator-cli.
+ * Public surface of @repo/operator-cli.
  *
  * Every operation here PROPOSES data into the existing quarantine research-case
  * pipeline. Nothing exported from this package can approve, promote, or publish anything
@@ -56,6 +56,14 @@ export {
 export { commitOperatorIntake } from './commit.js';
 
 export {
+  prepareDiscoverySurvivorIntake,
+  DISCOVERY_SURVIVOR_INTAKE_VERSION,
+  type DiscoverySurvivorIntakeItem,
+  type DiscoverySurvivorIntakeResult,
+  type PrepareDiscoverySurvivorIntakeInput,
+} from './discovery-survivor-intake.js';
+
+export {
   buildCitationPrefill,
   createNodeSafeFetchDependencies,
   nodePinnedTransport,
@@ -79,5 +87,76 @@ export {
   type DiscoveryYieldSummary,
   type RunBoundedDiscoveryCampaignInput,
 } from './discovery-run.js';
+
+export {
+  runCommunityObscurityOperatorCampaign,
+  summarizeCommunityObscurityRun,
+  type CommunityObscurityRunInput,
+  type CommunityObscurityRunSummary,
+} from './community-obscurity-run.js';
+
+export {
+  runRssOperatorCampaign,
+  summarizeRssCampaignRun,
+  type RssCampaignRunInput,
+  type RssCampaignRunSummary,
+} from './rss-campaign-run.js';
+
+export {
+  createLlmProvider,
+  createMockLlmProvider,
+  createOpenRouterLlmProvider,
+  createOllamaLlmProvider,
+  createHybridLlmProvider,
+  extractMessageContent,
+  type LlmProvider,
+  type CreateLlmProviderOptions,
+} from './llm-provider.js';
+
+export { mapPool } from './map-pool.js';
+
+export {
+  runEditorialJudge,
+  type EditorialRunInput,
+  type EditorialRunResult,
+  type EditorialSubject,
+  type EditorialCatalogEntity,
+} from './editorial-run.js';
+
+export {
+  loadEditorialCatalogFromFirestore,
+  mergeEditorialCatalogFromDocs,
+  mergeJsonCatalogOverFirestore,
+  extractEmbeddingVector,
+} from './editorial-catalog-firestore.js';
+
+export { runEnrichmentJudge, type EnrichmentRunResult } from './enrichment-run.js';
+
+export { loadPendingEditorialItems, type PendingListResult } from './pending-list.js';
+
+export { prepareEditorialPacketIntake } from './editorial-intake.js';
+
+export {
+  runStoryResearch,
+  type StoryTopicSeed,
+  type StoryResearchRunInput,
+  type StoryResearchRunResult,
+  type StoryResearchRunItem,
+} from './story-research-run.js';
+
+export { prepareStoryPacketIntake } from './story-intake.js';
+
+export {
+  prepareLocate,
+  commitLocate,
+  type LocateInput,
+  type LocateOutcome,
+  type LocateSuccess,
+  type LocateFailure,
+  type LocateDependencies,
+  type CommitLocateInput,
+} from './locate.js';
+
+export { censusSafeHttpClient } from './census-http.js';
 
 export { runCli, type CliDependencies } from './cli.js';

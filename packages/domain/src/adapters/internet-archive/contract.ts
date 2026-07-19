@@ -29,7 +29,7 @@ export function createInternetArchiveAdapterContract(
       },
       permittedClaimClasses: ['biographical_fact', 'geographic_fact', 'organizational_fact'],
       refreshSchedule: '0 5 * * *',
-      notes: 'Open API, no approval gate at IA; adapter still starts disabled (BB-073).',
+      notes: 'Open API, no approval gate at IA; adapter still starts disabled ().',
     },
     rights: {
       defaultStatus: 'unknown',

@@ -1,0 +1,38 @@
+# BlackStory overnight hybrid discovery + enrichment (user unit).
+# Install on Corsair: ~/.config/systemd/user/
+[Unit]
+Description=BlackStory overnight hybrid discovery+enrichment (OpenRouter free + Ollama)
+Documentation=file:///home/gerald/Developer/Projects/blackstory/scripts/run-overnight-hybrid-enrichment.sh
+After=network-online.target
+Wants=network-online.target
+StartLimitBurst=3
+StartLimitIntervalSec=1h
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/Developer/Projects/blackstory
+Environment=HOME=%h
+Environment=EDITORIAL_LLM_PROVIDER=hybrid
+Environment=OPENROUTER_MODEL=openrouter/free
+Environment=OLLAMA_MODEL=qwen3:8b
+Environment=OLLAMA_BASE_URL=http://127.0.0.1:11434/v1
+Environment=TARGET_CANDIDATES=1000
+Environment=DISCOVERY_LIMIT=25
+Environment=DISCOVERY_CONCURRENCY=2
+Environment=ENRICH_CONCURRENCY=4
+Environment=COMMIT_ENRICHMENT=0
+Environment=SEARXNG_QUERIES_PER_NIGHT=8
+Environment=DISCOVERY_MAX_SURVIVORS=25
+Environment=WIKIMEDIA_ROUND_PAUSE_SEC=15
+Environment=ENRICHMENT_OPERATOR_ID=overnight-hybrid-corsair
+# OpenRouter key + optional pepper — never commit this file.
+EnvironmentFile=-%h/.config/blackstory/enrichment.env
+EnvironmentFile=-%h/.config/blackstory/discovery.env
+ExecStart=%h/Developer/Projects/blackstory/scripts/run-overnight-hybrid-enrichment.sh
+Nice=10
+TimeoutStartSec=12h
+Restart=on-failure
+RestartSec=120
+
+[Install]
+WantedBy=default.target

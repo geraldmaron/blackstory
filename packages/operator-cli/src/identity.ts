@@ -11,9 +11,9 @@
  * never accepted anywhere a `VerifiedAdminToken` (packages/firebase/src/admin-auth.ts) or a
  * fresh-reauth approver identity is required see promotion-boundary.test.ts.
  */
-import type { AuditActor } from '@black-book/domain';
+import type { AuditActor } from '@repo/domain';
 
-export const OPERATOR_SOURCES = ['claude_session', 'cli', 'admin_console'] as const;
+export const OPERATOR_SOURCES = ['claude_session', 'cursor_session', 'cli', 'admin_console'] as const;
 
 /** Where the operator proposal originated. Never a `system`/automated-worker actor type. */
 export type OperatorSource = (typeof OPERATOR_SOURCES)[number];

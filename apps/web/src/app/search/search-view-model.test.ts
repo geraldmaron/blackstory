@@ -9,7 +9,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { PublicSearchIndexDoc } from '@black-book/domain';
+import type { PublicSearchIndexDoc } from '@repo/domain';
 import { getSnapshotSearchIndex } from '../../lib/search/snapshot-search-index';
 import {
   buildFacetOptions,
@@ -41,19 +41,22 @@ function fixtureDoc(
   };
 }
 
-test('q=freedmen returns the Seed Freedmen School fixture, matched on its name', () => {
-  const view = buildSearchViewModel({ q: 'freedmen' }, getSnapshotSearchIndex());
-  assert.equal(view.results.length, 1);
-  assert.equal(view.results[0]?.id, 'ent_seed_school_001');
+test('q=laurence ranks the Paul Laurence Dunbar High School fixture first, matched on its name', () => {
+  // Other seed entities' summaries also mention "Paul Laurence Dunbar High School" by its full
+  // name (they are directly connected to it), so more than one record can match "laurence" — a
+  // stronger displayName match still outranks a summary-only mention.
+  const view = buildSearchViewModel({ q: 'laurence' }, getSnapshotSearchIndex());
+  assert.ok(view.results.length >= 1);
+  assert.equal(view.results[0]?.id, 'ent_dunbar_school_001');
   assert.equal(view.results[0]?.matchedOn, 'displayName');
-  assert.match(view.results[0]?.matchedText ?? '', /Freedmen/);
+  assert.match(view.results[0]?.matchedText ?? '', /Laurence/);
 });
 
-test('status=historic narrows results to the historic seed fixture only', () => {
-  const view = buildSearchViewModel({ status: 'historic' }, getSnapshotSearchIndex());
-  assert.equal(view.results.length, 1);
-  assert.equal(view.results[0]?.id, 'ent_seed_place_001');
-  assert.ok(view.results.every((result) => result.status === 'historic'));
+test('status=active narrows results to the three status-bearing fixtures, excluding the statusless event', () => {
+  const view = buildSearchViewModel({ status: 'active' }, getSnapshotSearchIndex());
+  assert.equal(view.results.length, 3);
+  assert.ok(view.results.every((result) => result.status === 'active'));
+  assert.ok(!view.results.some((result) => result.id === 'ent_dc_landmark_listing_1975'));
 });
 
 test('a query with no matches renders the empty-state branch (results.length === 0)', () => {
@@ -125,10 +128,10 @@ test('parseOffset clamps negative, non-numeric, and missing values to 0', () => 
 
 test('buildSearchPageHref preserves current filters and only overrides offset', () => {
   const view: SearchViewModel = {
-    q: 'freedmen school',
+    q: 'dunbar school',
     kind: 'school',
     status: 'all',
-    era: '1900s',
+    era: '1890s',
     offset: 20,
     results: [],
     totalMatched: 0,
@@ -140,10 +143,10 @@ test('buildSearchPageHref preserves current filters and only overrides offset', 
   const href = buildSearchPageHref(view, 40);
   const url = new URL(href, 'https://example.test');
   assert.equal(url.pathname, '/search');
-  assert.equal(url.searchParams.get('q'), 'freedmen school');
+  assert.equal(url.searchParams.get('q'), 'dunbar school');
   assert.equal(url.searchParams.get('kind'), 'school');
   assert.equal(url.searchParams.get('status'), null);
-  assert.equal(url.searchParams.get('era'), '1900s');
+  assert.equal(url.searchParams.get('era'), '1890s');
   assert.equal(url.searchParams.get('offset'), '40');
 });
 

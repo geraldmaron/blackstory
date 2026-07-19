@@ -23,25 +23,40 @@ test('the index is memoized across calls', () => {
   assert.equal(first, second);
 });
 
-test('synthesized notabilityBasis falls back to documented_site for hand-authored seed prose that paraphrases (not quotes) the rubric', () => {
-  // The seed catalog's labels are paraphrases of NOTABILITY_RUBRIC text, not verbatim quotes, so
-  // the exact-string reverse-lookup in the adapter is expected to miss and fall back this test
-  // documents that behavior rather than asserting a criterion the seed data can't actually prove.
+test('notabilityBasis resolves the real rubric criterion since seed labels now quote NOTABILITY_RUBRIC verbatim', () => {
+  // Unlike the old fictional fixture (which paraphrased NOTABILITY_RUBRIC and always fell back to
+  // documented_site), the real Dunbar cluster's notabilityLabels are verbatim NOTABILITY_RUBRIC
+  // strings (see public-seed.ts), so the adapter's exact-string reverse-lookup now genuinely
+  // resolves each entity's real criterion.
   resetSnapshotSearchIndexCache();
   const index = getSnapshotSearchIndex();
+  const byId = new Map(index.map((doc) => [doc.id, doc]));
+  assert.equal(byId.get('ent_15th_st_church_001')?.notabilityBasis[0]?.criterion, 'community_anchor');
+  assert.equal(byId.get('ent_dunbar_school_001')?.notabilityBasis[0]?.criterion, 'first_to_do_x');
+  assert.equal(
+    byId.get('ent_dc_landmark_listing_1975')?.notabilityBasis[0]?.criterion,
+    'landmark_or_national_register',
+  );
+  assert.equal(
+    byId.get('ent_dunbar_alumni_federation_001')?.notabilityBasis[0]?.criterion,
+    'community_anchor',
+  );
   for (const doc of index) {
-    assert.equal(doc.notabilityBasis[0]?.criterion, 'documented_site');
-    assert.equal(doc.notabilityBasis[0]?.evidenceIds.length, 0);
+    assert.ok(
+      (doc.notabilityBasis[0]?.evidenceIds.length ?? 0) > 0,
+      `${doc.id} must attach cited claim ids to inclusion evidence`,
+    );
+    assert.match(doc.notabilityBasis[0]!.note, /Cited from /);
   }
 });
 
 test('relatedCount and claimCount are populated from the seed fixture, never left at a stale default', () => {
   resetSnapshotSearchIndexCache();
   const index = getSnapshotSearchIndex();
-  const place = index.find((doc) => doc.id === 'ent_seed_place_001');
+  const place = index.find((doc) => doc.id === 'ent_15th_st_church_001');
   assert.ok(place);
   assert.equal(place.relatedCount, 1);
-  // : the place now carries a second accepted claim (the contested land-use dispute) that
-  // backs its sensitivity flag's basisClaimIds.
+  // The church carries 2 accepted claims: its 1841 founding, and hosting the school's 1870
+  // founding in its basement.
   assert.equal(place.claimCount, 2);
 });

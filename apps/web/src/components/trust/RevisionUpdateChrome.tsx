@@ -3,9 +3,13 @@
  * linking to per-revision permalinks and the errata log when corrections exist.
  */
 import React from 'react';
-import type { FactRecord } from '@black-book/domain';
-import { buildFactRevisionPath, currentFactRevision } from '@black-book/domain';
-import { formatIsoDate, humanizeToken } from '../facts/format.js';
+import Link from 'next/link';
+import {
+  buildFactRevisionPath,
+  currentFactRevision,
+  type FactRecord,
+} from '@repo/domain/facts';
+import { formatIsoDate, humanizeToken } from '../facts/format';
 
 export type RevisionUpdateChromeProps = {
   readonly fact: Pick<FactRecord, 'id' | 'updatedAt' | 'revisions' | 'status'>;
@@ -22,31 +26,31 @@ export function RevisionUpdateChrome({ fact, errataHref = '/errata' }: RevisionU
   const isCorrection = revision?.changeType === 'correction' || fact.status === 'corrected';
 
   return (
-    <p className="bb-sans" role="status" style={{ margin: 0, color: 'var(--bb-ink-muted)' }}>
+    <p className="ds-sans" role="status" style={{ margin: 0, color: 'var(--ds-ink-muted)' }}>
       Updated {updatedLabel}
       {latestPath ? (
         <>
           {' '}
           —{' '}
-          <a href={latestPath}>
+          <Link href={latestPath}>
             see what changed
             {isCorrection ? ' (correction logged)' : ''}
-          </a>
+          </Link>
         </>
       ) : null}
       {isCorrection ? (
         <>
           {' '}
           ·{' '}
-          <a href={errataHref}>
+          <Link href={errataHref}>
             public errata
-          </a>
+          </Link>
         </>
       ) : null}
       {revision ? (
         <>
           {' '}
-          · <span className="bb-mono">{humanizeToken(revision.changeType)}</span>
+          · <span className="ds-mono">{humanizeToken(revision.changeType)}</span>
         </>
       ) : null}
     </p>

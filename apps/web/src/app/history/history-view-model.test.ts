@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { statusAsOf } from '@black-book/domain';
+import { statusAsOf } from '@repo/domain';
 import { resetHistoryGraphReleaseArtifactForTests } from '../../data/history-graph-seed';
 import { getPublicEntity, listPublicEntities } from '../../data/public-seed';
 import { buildHistoryViewModel } from './history-view-model';
@@ -15,28 +15,65 @@ test.beforeEach(() => {
 });
 
 test('all-time view includes every published seed entity from the graph artifact', () => {
-  const view = buildHistoryViewModel({});
-  assert.equal(view.totalMatched, listPublicEntities().length);
+  const entities = listPublicEntities();
+  const view = buildHistoryViewModel({}, entities);
+  assert.equal(view.totalMatched, entities.length);
   assert.equal(view.viewState.mode, 'all-time');
   assert.ok(view.nodes.length > 0);
   assert.ok(view.contentHash.length > 0);
 });
 
-test('decade view derives node membership from BB-092 decade artifacts', () => {
-  const fifties = buildHistoryViewModel({ decade: '1950s' });
-  assert.equal(fifties.viewState.mode, 'decade');
-  assert.equal(fifties.activeDecade, '1950s');
-  assert.ok(fifties.nodes.some((node) => node.entityId === 'ent_seed_event_001'));
-  assert.ok(fifties.nodes.some((node) => node.entityId === 'ent_seed_school_001'));
+test('all-time view includes an injected undated entity with undated status label', () => {
+  const undated = {
+    id: 'ent_undated_fixture_001',
+    kind: 'place' as const,
+    displayName: 'Undated Place Fixture',
+    summary: 'No temporal spans.',
+    era: 'undated',
+    notabilityLabels: [] as const,
+    topicTags: ['fixture'] as const,
+    jurisdictionLabel: 'Washington, D.C.',
+    locationPrecision: 'city' as const,
+    locationLabel: 'Washington, D.C.',
+    relevanceExplanation: 'Fixture.',
+    historicalContext: 'Fixture.',
+    recordMaturity: 'minimum_record' as const,
+    researchCoverage: 'partial' as const,
+    mapPin: { x: 50, y: 50 },
+    claims: [] as const,
+    revision: {
+      releaseId: 'seed-snapshot',
+      generatedAt: '2026-07-17T00:00:00.000Z',
+      recordUpdatedAt: '2026-07-01T00:00:00.000Z',
+    },
+    relatedIds: [] as const,
+    related: [] as const,
+    timeline: [] as const,
+  };
+  const catalog = [...listPublicEntities(), undated];
+  const view = buildHistoryViewModel({}, catalog);
+  assert.equal(view.totalMatched, catalog.length);
+  const node = view.nodes.find((entry) => entry.entityId === undated.id);
+  assert.ok(node);
+  assert.equal(node!.statusKind, 'undated');
+  assert.equal(node!.statusLabel, 'Status not yet published for this record');
+});
+
+test('decade view derives node membership from decade artifacts', () => {
+  const seventies = buildHistoryViewModel({ decade: '1970s' });
+  assert.equal(seventies.viewState.mode, 'decade');
+  assert.equal(seventies.activeDecade, '1970s');
+  assert.ok(seventies.nodes.some((node) => node.entityId === 'ent_dc_landmark_listing_1975'));
+  assert.ok(seventies.nodes.some((node) => node.entityId === 'ent_dunbar_school_001'));
 });
 
 test('decade view uses status-as-of that decade, not present-day status', () => {
-  const forties = buildHistoryViewModel({ decade: '1940s' });
-  const school = forties.nodes.find((node) => node.entityId === 'ent_seed_school_001');
+  const eighties = buildHistoryViewModel({ decade: '1880s' });
+  const school = eighties.nodes.find((node) => node.entityId === 'ent_dunbar_school_001');
   assert.ok(school);
-  const entity = getPublicEntity('ent_seed_school_001');
+  const entity = getPublicEntity('ent_dunbar_school_001');
   assert.ok(entity?.statusHistory);
-  assert.equal(statusAsOf(entity.statusHistory, '1945'), 'historic');
+  assert.equal(statusAsOf(entity.statusHistory, '1885'), 'historic');
   assert.equal(school!.statusLabel, 'Historic');
   assert.notEqual(school!.statusLabel, entity!.status);
 });
@@ -68,24 +105,43 @@ test('edges expose evidence-backed citations and omit evidence-free connections'
 
 test('parses shareable URL decade, filter, and selection state', () => {
   const view = buildHistoryViewModel({
-    decade: '1860s',
+    decade: '1870s',
     kind: 'school',
-    selected: 'ent_seed_school_001',
-    edge: 'rel_seed_school_located_at_place',
+    selected: 'ent_dunbar_school_001',
+    edge: 'rel_dunbar_school_located_at_church',
   });
-  assert.equal(view.viewState.decade, '1860s');
+  assert.equal(view.viewState.decade, '1870s');
   assert.equal(view.viewState.filters.kind, 'school');
-  assert.equal(view.viewState.selected, 'ent_seed_school_001');
-  assert.equal(view.viewState.edge, 'rel_seed_school_located_at_place');
+  assert.equal(view.viewState.selected, 'ent_dunbar_school_001');
+  assert.equal(view.viewState.edge, 'rel_dunbar_school_located_at_church');
   assert.ok(view.selectedNode);
 });
 
+test('query filter matches display name or summary', () => {
+  const view = buildHistoryViewModel({ q: 'dunbar' });
+  assert.ok(view.totalMatched >= 1);
+  assert.ok(view.nodes.every((node) => {
+    const haystack = `${node.displayName} ${node.summary}`.toLowerCase();
+    return haystack.includes('dunbar');
+  }));
+});
+
+test('sort by connections orders higher-degree nodes first', () => {
+  const view = buildHistoryViewModel({ sort: 'connections' });
+  assert.ok(view.nodes.length >= 2);
+  for (let i = 1; i < view.nodes.length; i += 1) {
+    const prev = view.nodes[i - 1]!;
+    const curr = view.nodes[i]!;
+    assert.ok(prev.connectionCount >= curr.connectionCount);
+  }
+});
+
 test('nodes link to entity pages and surface fact links when present', () => {
-  const view = buildHistoryViewModel({ decade: '1950s' });
+  const view = buildHistoryViewModel({ decade: '1970s' });
   for (const node of view.nodes) {
     assert.match(node.href, /^\/entity\//);
   }
-  const place = view.nodes.find((node) => node.entityId === 'ent_seed_place_001');
+  const place = view.nodes.find((node) => node.entityId === 'ent_15th_st_church_001');
   assert.ok(place);
   assert.ok(place!.factLinks.length > 0);
   assert.match(place!.factLinks[0]!.href, /^\/facts\//);

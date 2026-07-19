@@ -1,6 +1,6 @@
 # Platform takedown (false abuse reports)
 
-**BB-089.** The attack this runbook defends against is non-technical: a coordinated actor files
+**.** The attack this runbook defends against is non-technical: a coordinated actor files
 mass false abuse reports (copyright, "harassment," "hate speech," phishing/malware) against
 Google (Firebase Hosting/App Hosting, the GCP project, the Google Workspace/Cloud account) or the
 domain registrar, aiming to trigger an *automated* suspension without ever touching our code or
@@ -17,7 +17,7 @@ data are intact but a third party is trying to get someone else to take it offli
   (registrar), or repository (GitHub) — because the response and the human contact differ per
   layer. Confirm this is a false report, not a real policy violation, before proceeding (see
   "Evidence pack" below either way — you need it to prove either outcome).
-- Registrar and host are already different vendors by design (BB-089 operator-protection runbook,
+- Registrar and host are already different vendors by design ( operator-protection runbook,
   "Registrar choice"): one false report to Google cannot also take the domain's DNS down, and vice
   versa. If that separation is not yet in place, treat closing it as the first follow-up action
   after this incident, not a blocker to responding now.
@@ -41,11 +41,11 @@ Assemble this *before* you need to file an appeal — most of it should already 
 byproduct of how the product is built, not something invented under pressure:
 
 1. **Provenance and evidence chain.** Every published claim carries evidence links with a source
-   classification and, per BB-077, a Wayback/Internet Archive capture pointer
+   classification and, per , a Wayback/Internet Archive capture pointer
    (`packages/domain/src/rights/evidence-pointer.ts`) rather than a rehosted copy — this is the
    single strongest artifact against a bogus copyright/scraping claim, since it shows the content
    is cited and linked out, not laundered.
-2. **Audit trail export.** BB-018's append-only audit events reconstruct exactly who
+2. **Audit trail export.** 's append-only audit events reconstruct exactly who
    published/corrected/retracted what and when (`packages/domain/src/audit/index.ts`,
    `packages/firebase/src/firestore/audit-outbox.ts` `loadEntityPublicationHistory`). Export the
    relevant entity's history to show a documented editorial process, not an anonymous dump.
@@ -54,7 +54,7 @@ byproduct of how the product is built, not something invented under pressure:
    (`packages/schemas/constitution/policy.v1.json`) demonstrate this is a moderated, policy-bound
    product with living-person protections (T-15) and a promotion gate (T-06/T-07), not an
    unmoderated dumping ground.
-4. **Pre-incident content hash.** The BB-089 uptime/defacement canary
+4. **Pre-incident content hash.** The  uptime/defacement canary
    (`.github/workflows/canary-uptime.yml`) records a sha256 of a canary page on a schedule; its
    last known-good hash (and, ideally, a full response snapshot taken at the same time) proves
    what the page actually said before any suspension, which rebuts a "the site currently shows
@@ -92,7 +92,7 @@ The primary defense is availability under pressure, not fighting the false-repor
   serving and the canary hash, and confirm no unrelated changes were introduced while switches
   were engaged.
 - If data was actually affected at any point (not expected in a pure false-report scenario, but
-  verify), use [`backup-restore.md`](../backup-restore.md) (Firestore PITR/managed export, BB-020)
+  verify), use [`backup-restore.md`](../backup-restore.md) (Firestore PITR/managed export, )
   as the data backstop before assuming a clean bill of health.
 - File a post-incident note per `incident-response.md`'s "Learn" step, including which layer was
   targeted, which contact channel actually resolved it, and how long resolution took — feed timing
@@ -100,31 +100,31 @@ The primary defense is availability under pressure, not fighting the false-repor
 
 ## Optional hardening (not required to ship; apply only when triggered)
 
-Per the BB-089 design note, do **not** set these up pre-emptively while nothing is live — apply
+Per the  design note, do **not** set these up pre-emptively while nothing is live — apply
 them only on an actual takedown/DDoS event, or immediately before a high-profile
 launch/press moment:
 
 - **Cloudflare free in front of the site**: separate blast radius for DNS from Google, free edge
-  WAF/Bot Fight Mode, one rate-limit rule, and origin-IP hiding. Re-evaluate against the BB-023
+  WAF/Bot Fight Mode, one rate-limit rule, and origin-IP hiding. Re-evaluate against the
   self-managed load balancer + Cloud Armor path at that point — Cloud Armor Standard has no free
   tier and needs a paid load-balancer floor, which is not worth it for a solo budget with nothing
   live yet.
 - **Warm off-Google backup**: a periodic export to non-Google storage, so a Google-side event
-  cannot simultaneously threaten both serving and the only copy of the data. BB-020's PITR/export
+  cannot simultaneously threaten both serving and the only copy of the data. 's PITR/export
   already protects against data loss; this is specifically about *vendor* diversity for the
   backup, not about backup existing at all.
 
 ## References
 
 - [`pre-launch-operator-protection.md`](../pre-launch-operator-protection.md) — registrar/host
-  separation, paid support tier signup, and the rest of the BB-089 checklist
+  separation, paid support tier signup, and the rest of the  checklist
 - [`incident-response.md`](../incident-response.md) — operating model and kill-switch containment
   order this runbook reuses
-- [`backup-restore.md`](../backup-restore.md) — BB-020 PITR/backup data backstop
-- `packages/config/src/kill-switches.ts` — BB-033/035 kill switches and degraded snapshot mode
+- [`backup-restore.md`](../backup-restore.md) —  PITR/backup data backstop
+- `packages/config/src/kill-switches.ts` — /035 kill switches and degraded snapshot mode
   (`evaluatePublicRuntimeMode`, `containmentOrder`)
-- `packages/domain/src/rights/evidence-pointer.ts` — BB-077 Wayback-pointer/minimal-snippet
+- `packages/domain/src/rights/evidence-pointer.ts` —  Wayback-pointer/minimal-snippet
   posture used as fair-use evidence
 - `packages/domain/src/audit/index.ts`,
-  `packages/firebase/src/firestore/audit-outbox.ts` — BB-018 audit trail export
-- `.github/workflows/canary-uptime.yml` — BB-089 uptime/defacement canary
+  `packages/firebase/src/firestore/audit-outbox.ts` —  audit trail export
+- `.github/workflows/canary-uptime.yml` —  uptime/defacement canary

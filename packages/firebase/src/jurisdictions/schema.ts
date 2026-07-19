@@ -7,7 +7,7 @@
  * `validTo`) as real storage, extended with the fields the collection actually needs to be
  * useful (FIPS code, bbox, centroid, source dataset provenance). This mirrors the existing
  * convention in packages/firebase/src/firestore/types.ts of a Firestore doc schema that
- * "aligns with @black-book/domain" without being a 1:1 re-export of the domain type (see e.g.
+ * "aligns with @repo/domain" without being a 1:1 re-export of the domain type (see e.g.
  * `entityKindSchema` there, a local zod enum mirroring domain's `EntityKind`).
  *
  * `jurisdictionKindSchema` mirrors `packages/domain/src/geography/location.ts`'s

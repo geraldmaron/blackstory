@@ -208,8 +208,8 @@ export function assertAdvisoryAbsentFromScoringInput(value: unknown, path = '$')
       if ((ADVISORY_SCORING_BANNED_KEYS as readonly string[]).includes(key)) {
         throw new AdvisoryValidationError(
           `Advisory field "${key}" found in scoring/composite input at ${path}.${key} — advisory ` +
-            'data must never enter any scoring input or composite (BB-095 AC1, extending the ' +
-            'BB-082 crime-stats discipline).',
+            'data must never enter any scoring input or composite ( AC1, extending the ' +
+            ' crime-stats discipline).',
         );
       }
       assertAdvisoryAbsentFromScoringInput(entry, `${path}.${key}`);
@@ -218,7 +218,7 @@ export function assertAdvisoryAbsentFromScoringInput(value: unknown, path = '$')
 }
 
 // ---------------------------------------------------------------------------
-// Compile-time proof enforced by `pnpm --filter @black-book/domain typecheck`, not only by the
+// Compile-time proof enforced by `pnpm --filter @repo/domain typecheck`, not only by the
 // runtime scan above. If a future edit to relevance/types.ts or claims/confidence.ts ever
 // introduces a field name colliding with PlaceAdvisoryRecord's own field names, the object literal
 // below stops satisfying its type and `tsc --noEmit` fails the build the "never enters scoring"

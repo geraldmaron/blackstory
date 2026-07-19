@@ -2,7 +2,7 @@
  * Circulating third-party claim reviews for the /myths surface the ONLY pages that
  * emit schema.org ClaimReview markup. Each review addresses one externally attributed claim.
  */
-import type { MythClaimReviewInput } from './domain-trust.js';
+import type { MythClaimReviewInput } from './domain-trust';
 
 export type MythReview = MythClaimReviewInput & {
   readonly slug: string;
@@ -13,40 +13,43 @@ export type MythReview = MythClaimReviewInput & {
 
 export const MYTH_REVIEWS: readonly MythReview[] = [
   {
-    slug: 'rosa-parks-was-just-tired',
-    title: '“Rosa Parks was just tired that day”',
-    technique: 'Quoting a source out of context',
-    pageUrl: '/myths/rosa-parks-was-just-tired',
+    slug: 'dunbar-always-called-dunbar',
+    title: '“Dunbar has always been called Dunbar High School”',
+    technique: 'Collapsing a multi-name institutional history into its best-known name',
+    pageUrl: '/myths/dunbar-always-called-dunbar',
     datePublished: '2026-07-17',
     claimReviewed:
-      'Rosa Parks refused to give up her bus seat because she was physically tired, not as a deliberate act of protest.',
+      'The school now known as Paul Laurence Dunbar High School has always been called Dunbar High School.',
     reviewBody:
-      'Contemporaneous arrest records and Parks\u2019s own documented activism show a deliberate act tied to organized nonviolent resistance training, not spontaneous fatigue.',
+      'The school operated under two earlier names before the 1916 renaming: Preparatory High ' +
+      'School for Colored Youth (1870–1891) and M Street High School (1891–1916). It became Paul ' +
+      'Laurence Dunbar High School only in 1916, when it moved to a new building named for the poet.',
     claimOrigin: {
-      name: 'Circulating social post',
-      url: 'https://example.com/social/rosa-parks-tired',
+      name: 'Common assumption about the school’s naming history',
     },
-    ratingExplanation: 'Misleading — omits documented prior activism',
-    authorName: 'Black Book',
-    relatedFactUrl: '/facts/BB-F-000001/rosa-parks-arrested-december-1-1955',
+    ratingExplanation: 'False — the school carried two earlier names before 1916',
+    authorName: 'BlackStory',
+    relatedFactUrl: '/facts/dunbar-rename-1916',
   },
   {
-    slug: 'founding-attendance-was-3000',
-    title: '“The institution had 3,000 founding members”',
-    technique: 'Treating a single uncited retrospective as authoritative',
-    pageUrl: '/myths/founding-attendance-was-3000',
+    slug: 'todays-building-is-the-1916-building',
+    title: '“The Dunbar building alumni visit today is the historic 1916 building”',
+    technique: 'Assuming a landmark institution’s current building is its original structure',
+    pageUrl: '/myths/todays-building-is-the-1916-building',
     datePublished: '2026-07-17',
     claimReviewed:
-      'A local institution welcomed 3,000 members at its founding, based on a 1980s newspaper retrospective.',
+      'The Paul Laurence Dunbar High School building students and alumni visit today is the original 1916 building.',
     reviewBody:
-      'The retrospective cites no primary source. The institution\u2019s own 1975 membership rolls document approximately 1,200 members — the figure this archive publishes with the contradicting source disclosed.',
+      'The 1916 building was demolished in 1977; its 1970s replacement was itself demolished in ' +
+      '2013. The current building, opened in 2013, sits on the same footprint and honors the ' +
+      'school’s history through graduate plaques and paintings of alumni who appeared on U.S. ' +
+      'postage stamps, but it is a new structure, not the historic 1916 building.',
     claimOrigin: {
-      name: '1980s newspaper retrospective',
-      url: 'https://example-news.example/retrospective-1980s',
+      name: 'Common assumption about the current building’s history',
     },
-    ratingExplanation: 'False — contradicted by primary membership rolls',
-    authorName: 'Black Book',
-    relatedFactUrl: '/facts/BB-F-000003/institution-attendance-figure-corrected',
+    ratingExplanation: 'False — the 1916 building and its 1970s replacement were both demolished',
+    authorName: 'BlackStory',
+    relatedFactUrl: '/facts/dunbar-campus-rebuild-2013',
   },
 ];
 

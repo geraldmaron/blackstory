@@ -3,7 +3,11 @@
  * helper already enforces that invariant before this component serializes the payload.
  */
 import React from 'react';
-import { assertNeverClaimReview, buildFactArticleJsonLd, type FactRecord } from '@black-book/domain';
+import {
+  assertNeverClaimReview,
+  buildFactArticleJsonLd,
+  type FactRecord,
+} from '@repo/domain/facts';
 
 export type FactJsonLdScriptProps = {
   readonly fact: FactRecord;

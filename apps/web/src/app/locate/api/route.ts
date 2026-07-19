@@ -7,7 +7,7 @@
  *
  * The endpoint sits behind App Check + `geocoding` rate limits and geocodes an address/ZIP
  * (`?address=`) or reverse-geocodes browser coordinates (`?lat=&lng=`) via the real U.S. Census
- * Geocoder adapter (`@black-book/domain`'s `fetchCensusAddressGeocode` and
+ * Geocoder adapter (`@repo/domain`'s `fetchCensusAddressGeocode` and
  * `fetchCensusCoordinatesGeocode`, backed by `../../../lib/geocode/safe-http-client.ts`); see
  * `./handler` for the full request flow.
  */
@@ -22,7 +22,7 @@ export const runtime = 'nodejs';
 // instance, matching the search route's posture (`../../search/api/route.ts`'s module doc). A
 // shared store for a multi-instance deployment is an infra concern, not a change to the
 // algorithm. The App Check guard is created lazily (its factory dynamically imports
-// `@black-book/firebase`) and cached so only one is built per instance.
+// `@repo/firebase`) and cached so only one is built per instance.
 const defaultRateLimitGuard = createLocateRateLimitGuard();
 const defaultCache = createLocateCache();
 

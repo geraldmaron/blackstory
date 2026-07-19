@@ -6,7 +6,7 @@ export {
   IAP_ASSERTION_HEADER,
   ServerAdminAuthorizationError,
   createServerAdminAuthorizer,
-} from './server-authorization.js';
+} from './server-authorization';
 export type {
   AdminAuthorizationPolicy,
   AdminPermission,
@@ -18,10 +18,21 @@ export type {
   ServerAdminAuthorizationOptions,
   VerifiedFirebaseAdminIdentity,
   VerifiedIapPrincipal,
-} from './server-authorization.js';
-export { mutateAdminRoles } from './role-mutation.js';
+} from './server-authorization';
+export { mutateAdminRoles } from './role-mutation';
 export type {
   AdminRoleMutationService,
   PrivilegedActionAuthorizer,
   StaffRole,
-} from './role-mutation.js';
+} from './role-mutation';
+export {
+  FirebaseSessionAuthorizationError,
+  createFirebaseSessionAuthorizer,
+  normalizeAdminEmail,
+} from './firebase-session-authorizer';
+export { resolveAdminAuthMode, type AdminAuthMode } from './mode';
+export {
+  authorizeAdminRequest,
+  authErrorResponse,
+  type ResolvedAdminCaller,
+} from './request-auth';

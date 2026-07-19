@@ -4,16 +4,15 @@
  * source-lineage / research-coverage / last-checked / revision / retraction metadata
  * kept visibly distinct from confidence, and record-level source-lineage resolution
  * (explicit rollup, per-claim sum, or citation-source proxy). Pure and synchronously
- * testable — no I/O, no React — so `EntityEvidencePanel` stays a thin rendering layer.
+ * testable — no I/O, no
+ * React — so `apps/web/src/components/evidence/EntityEvidencePanel.tsx` stays a thin
+ * rendering layer over this module, matching this codebase's existing
+ * `entity-view-model.ts` convention of separating decision logic from JSX.
  */
-import { formatEvidenceScoreLabel } from './confidence-language.js';
-import { buildDisputeView } from './contradiction-view.js';
-import { resolveCitationForDisplay, resolveExcerptForDisplay } from './rights-guard.js';
-import type {
-  EvidenceClaimInput,
-  EvidenceClaimView,
-  EvidenceSourceLineageInput,
-} from './types.js';
+import { formatEvidenceScoreLabel } from './confidence-language';
+import { buildDisputeView } from './contradiction-view';
+import { resolveCitationForDisplay, resolveExcerptForDisplay } from './rights-guard';
+import type { EvidenceClaimInput, EvidenceClaimView, EvidenceSourceLineageInput } from './types';
 
 export function buildEvidenceCard(input: EvidenceClaimInput): EvidenceClaimView {
   const confidenceLabel = formatEvidenceScoreLabel(input.confidenceScore, input.confidenceLevel);

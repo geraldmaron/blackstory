@@ -63,7 +63,7 @@ export function createCensusGeoAdapterContract(
       notes:
         'Bulk static reference file (Census Gazetteer county file + the existing US_STATES ' +
         'table), loaded by packages/firebase/src/jurisdictions/load-cli.ts. Not a live-scraping ' +
-        'adapter; adapterEnabled/registryState still gate whether a run may write (BB-037).',
+        'adapter; adapterEnabled/registryState still gate whether a run may write ().',
     },
     rights: CENSUS_GEO_RIGHTS,
     permittedClaimClasses: [...CENSUS_GEO_PERMITTED_CLAIM_CLASSES],

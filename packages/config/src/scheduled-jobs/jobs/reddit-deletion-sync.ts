@@ -1,6 +1,6 @@
 
 /**
- * REAL roster entry: Reddit deletion-sync. Wraps `@black-book/domain`'s
+ * REAL roster entry: Reddit deletion-sync. Wraps `@repo/domain`'s
  * Reddit deletion-sync module (packages/domain/src/adapters/reddit/deletion-sync.ts), which in
  * turn wraps shared purge framework (`planDeletionSyncPurge`/`applyDeletionSyncPurge`,
  * packages/domain/src/rights/deletion-sync.ts) — this file does not reimplement purge, audit, or
@@ -34,7 +34,7 @@ import {
   type RedditPointerCascadePaths,
   type RedditPurgeableStore,
   type RedditStoredPointer,
-} from '@black-book/domain';
+} from '@repo/domain';
 import { completeJobRun, startJobRun, type JobRunRecord } from '../run-record.js';
 
 export const REDDIT_DELETION_SYNC_JOB_ID = 'reddit-deletion-sync';

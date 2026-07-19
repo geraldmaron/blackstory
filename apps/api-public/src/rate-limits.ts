@@ -14,7 +14,7 @@ import {
   type RateLimitStore,
   type RateLimitSubject,
   type RiskSignal,
-} from '@black-book/security';
+} from '@repo/security';
 
 export type PublicRateLimitRequest = {
   readonly method: string;

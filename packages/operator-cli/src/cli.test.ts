@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AtomicStore, AtomicTransaction } from '@black-book/firebase';
+import type { AtomicStore, AtomicTransaction } from '@repo/firebase';
 import { runCli } from './cli.ts';
 
 class MemoryAtomicStore implements AtomicStore {
@@ -166,7 +166,7 @@ test('an unknown command prints usage and exits non-zero', async () => {
   assert.match(out.errors[0] ?? '', /Usage/);
 });
 
-test('propose-edge without --commit prepares a real quarantine proposal but writes nothing (BB-092)', async () => {
+test('propose-edge without --commit prepares a real quarantine proposal but writes nothing ', async () => {
   const out = capture();
   const store = new MemoryAtomicStore();
   const code = await runCli(
@@ -191,7 +191,7 @@ test('propose-edge without --commit prepares a real quarantine proposal but writ
   assert.equal(store.writes.length, 0);
 });
 
-test('propose-edge rejects a caused/enabled edge with no --causal-scope, at the CLI layer, before quarantine (BB-092 acceptance criterion 9)', async () => {
+test('propose-edge rejects a caused/enabled edge with no --causal-scope, at the CLI layer, before quarantine (acceptance criterion 9)', async () => {
   const out = capture();
   const code = await runCli(
     [
@@ -240,4 +240,172 @@ test('propose-edge accepts a caused edge with --causal-scope systemic_consensus 
   assert.equal(code, 0);
   const result = JSON.parse(out.lines[0] ?? '{}');
   assert.equal(result.accepted, true);
+});
+
+test('community-obscurity-run ranks fixture feed without writing', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { dirname, join } = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const feedPath = join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../../domain/src/adapters/rss/fixtures/the-american-blackstory.trimmed.rss.xml',
+  );
+  assert.ok(readFileSync(feedPath, 'utf8').includes('rss'));
+  const out = capture();
+  const store = new MemoryAtomicStore();
+  const code = await runCli(
+    [
+      'community-obscurity-run',
+      '--feed-xml',
+      `feed_the_american_blackstory=${feedPath}`,
+      '--catalog-titles',
+      'Rosa Parks|Martin Luther King Jr.|Buffalo Soldiers|Harriet Tubman',
+      '--campaign-id',
+      'camp_cli_obscurity_test',
+    ],
+    {
+      store,
+      stdout: out.stdout,
+      stderr: out.stderr,
+      nowMs: Date.parse('2026-07-18T16:00:00.000Z'),
+    },
+  );
+  assert.equal(code, 0, out.errors.join('\n'));
+  assert.equal(store.writes.length, 0);
+  const summary = JSON.parse(out.lines[0] ?? '{}');
+  assert.equal(summary.kind, 'community-obscurity.v1');
+  assert.ok(summary.acceptedCount >= 1);
+  assert.ok(Array.isArray(summary.rankedTop));
+  assert.ok(summary.rankedTop.length >= 1);
+  assert.equal(summary.disclaimerId, 'methodology_obscurity_heuristic_v1');
+});
+
+test('rss-campaign-run ranks historical-society fixture without writing and excludes ABS by default', async () => {
+  const { dirname, join } = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const here = dirname(fileURLToPath(import.meta.url));
+  const historicalPath = join(
+    here,
+    '../../domain/src/adapters/rss/fixtures/historical-society-feed.rss.xml',
+  );
+  const absPath = join(
+    here,
+    '../../domain/src/adapters/rss/fixtures/the-american-blackstory.trimmed.rss.xml',
+  );
+  const out = capture();
+  const store = new MemoryAtomicStore();
+  const code = await runCli(
+    [
+      'rss-campaign-run',
+      '--feed-xml',
+      `feed_historical_society=${historicalPath}`,
+      '--feed-xml',
+      `feed_the_american_blackstory=${absPath}`,
+      '--campaign-id',
+      'camp_cli_rss_test',
+      '--max-candidates',
+      '50',
+    ],
+    {
+      store,
+      stdout: out.stdout,
+      stderr: out.stderr,
+      nowMs: Date.parse('2026-07-18T16:00:00.000Z'),
+    },
+  );
+  assert.equal(code, 0, out.errors.join('\n'));
+  assert.equal(store.writes.length, 0);
+  const summary = JSON.parse(out.lines[0] ?? '{}');
+  assert.equal(summary.kind, 'rss-discovery.v1');
+  assert.ok(summary.survivors >= 1);
+  assert.ok(summary.excludedCuratedFeedIds.includes('feed_the_american_blackstory'));
+  assert.ok(!summary.feedIds.includes('feed_the_american_blackstory'));
+});
+
+test('discovery-dispatch --queue-survivors prepares admin draft cases without writing', async () => {
+  const out = capture();
+  const store = new MemoryAtomicStore();
+  const code = await runCli(
+    [
+      'discovery-dispatch',
+      '--job',
+      'discovery-campaign-web-search',
+      '--mode',
+      'fixture',
+      '--kill-switch',
+      'disengaged',
+      '--queue-survivors',
+      '--max-survivors',
+      '5',
+      '--operator-id',
+      'operator-1',
+      '--session-id',
+      'session-1',
+      '--privacy-pepper',
+      'test-only-pepper',
+    ],
+    {
+      store,
+      stdout: out.stdout,
+      stderr: out.stderr,
+      nowMs: Date.parse('2026-07-19T08:30:00.000Z'),
+    },
+  );
+  assert.equal(code, 0, out.errors.join('\n'));
+  assert.equal(store.writes.length, 0);
+  const payload = JSON.parse(out.lines[0] ?? '{}');
+  assert.equal(payload.status, 'success');
+  assert.ok(payload.survivorQueue);
+  assert.equal(payload.survivorQueue.committed, false);
+  assert.ok(payload.survivorQueue.prepared >= 1);
+  assert.equal(payload.campaign, undefined);
+});
+
+test('enrichment-run --output writes full JSON sync and prints compact stdout summary', async () => {
+  const { mkdtempSync, readFileSync, writeFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const dir = mkdtempSync(join(tmpdir(), 'enrich-output-'));
+  const subjectsPath = join(dir, 'subjects.json');
+  const outputPath = join(dir, 'run.json');
+  writeFileSync(
+    subjectsPath,
+    JSON.stringify({
+      subjects: [{ subjectId: 'ent_test_001', title: 'Test Subject', existingSummary: 'A note.' }],
+    }),
+  );
+  const written: { path: string; contents: string }[] = [];
+  const out = capture();
+  const code = await runCli(
+    [
+      'enrichment-run',
+      '--subjects',
+      subjectsPath,
+      '--provider',
+      'mock',
+      '--output',
+      outputPath,
+      '--omit-raw-model',
+      ...BASE_FLAGS,
+    ],
+    {
+      stdout: out.stdout,
+      stderr: out.stderr,
+      nowMs: Date.parse('2026-07-19T12:00:00.000Z'),
+      writeFile: (path, contents) => {
+        written.push({ path, contents });
+        writeFileSync(path, contents);
+      },
+    },
+  );
+  assert.equal(code, 0, out.errors.join('\n'));
+  assert.equal(written.length, 1);
+  assert.equal(written[0]?.path, outputPath);
+  const filePayload = JSON.parse(readFileSync(outputPath, 'utf8'));
+  assert.equal(filePayload.kind, 'enrichment.run.v1');
+  assert.equal(filePayload.items.length, 1);
+  assert.equal(filePayload.items[0]?.rawModelContent, undefined);
+  const summary = JSON.parse(out.lines[0] ?? '{}');
+  assert.equal(summary.itemCount, 1);
+  assert.ok(summary.kind === 'enrichment.run.v1' || summary.itemCount === 1);
 });

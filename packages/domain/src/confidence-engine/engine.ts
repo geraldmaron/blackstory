@@ -7,7 +7,7 @@ import {
   evaluateProceduralLanguage,
   loadProductConstitution,
   type ProductConstitution,
-} from '@black-book/schemas';
+} from '@repo/schemas';
 import {
   calculateClaimConfidence,
   CONFIDENCE_COMPONENT_WEIGHTS,
@@ -293,7 +293,7 @@ export function isPurelyCrowdsourcedEvidence(supportingSources: readonly Evidenc
 /**
  * Hard override applied on top of a confidence result: crowdsourced-only supporting evidence is
  * capped below every claim-class publish threshold until at least one non-crowdsourced (or
- * additional independent) lineage corroborates it. The underlying `score` is left untouched 
+ * additional independent) lineage corroborates it. The underlying `score` is left untouched
  * the candidate can still surface as a research lead only `passesPublishThreshold` is forced
  * closed.
  */
@@ -421,4 +421,76 @@ export function withReviewerAgreementCorroboration(
 
 function round4(value: number): number {
   return Math.round(value * 10_000) / 10_000;
+}
+
+/**
+ * Graph-consistency diagnostic (BB the related workstream additive, not wired into
+ * `recalculateConfidence` above, following the same pattern as
+ * `computeReviewerAgreementSignal`/`citationRotRateAuthoritySignal`).
+ *
+ * Graph corroboration relationships in the graph agreeing or conflicting with a given edge
+ * is a real signal, but it must never be folded into `sourceAuthority` or `lineageIndependence`
+ * (`../claims/confidence.ts`): those two components are deliberately evidence-sourced only, so
+ * that a bad source's own derived cluster of relationships can never launder itself into a
+ * higher score by corroborating itself through the graph. This diagnostic is the ONLY place
+ * graph corroboration is allowed to surface today; a future integration may additionally let it
+ * inform `entityMatchQuality`, but that composition is not implemented here — this function only
+ * computes and returns the diagnostic.
+ */
+export const GRAPH_CONSISTENCY_SIGNAL_VERSION = 'graph-consistency-signal.v1' as const;
+
+export type GraphConsistencyRelationshipObservation = {
+  readonly relationshipId: string;
+  /** True when this other relationship independently corroborates the edge under evaluation
+   * (same or compatible assertion between the same resolved entity pair); false when it
+   * conflicts with it. */
+  readonly agrees: boolean;
+};
+
+export type GraphConsistencySignalInput = {
+  /** The relationship being diagnosed. Any observation carrying this same id is excluded before
+   * scoring an edge is never allowed to corroborate itself (see
+   * `assertRelationshipNotSoleSelfCorroboration` in `../relationship-publish.js`). */
+  readonly relationshipId: string;
+  readonly observations: readonly GraphConsistencyRelationshipObservation[];
+};
+
+export type GraphConsistencySignal = {
+  readonly signalVersion: typeof GRAPH_CONSISTENCY_SIGNAL_VERSION;
+  readonly kind: 'graph_consistency';
+  readonly relationshipId: string;
+  readonly agreeingCount: number;
+  readonly conflictingCount: number;
+  /** [0, 1] diagnostic only; never applied to `score`/`passesPublishThreshold` here. */
+  readonly graphConsistency: number;
+  readonly fingerprint: string;
+};
+
+/** Pure, deterministic, and self-corroboration-safe: any observation whose `relationshipId`
+ * matches the edge under evaluation is dropped before the ratio is computed. */
+export function computeGraphConsistencySignal(
+  input: GraphConsistencySignalInput,
+): GraphConsistencySignal {
+  const others = input.observations.filter(
+    (observation) => observation.relationshipId !== input.relationshipId,
+  );
+  const agreeingCount = others.filter((observation) => observation.agrees).length;
+  const conflictingCount = others.length - agreeingCount;
+  const total = agreeingCount + conflictingCount;
+  const graphConsistency = total === 0 ? 0 : round4(agreeingCount / total);
+
+  return {
+    signalVersion: GRAPH_CONSISTENCY_SIGNAL_VERSION,
+    kind: 'graph_consistency',
+    relationshipId: input.relationshipId,
+    agreeingCount,
+    conflictingCount,
+    graphConsistency,
+    fingerprint: fingerprint({
+      signalVersion: GRAPH_CONSISTENCY_SIGNAL_VERSION,
+      relationshipId: input.relationshipId,
+      agreeingCount,
+      conflictingCount,
+    }),
+  };
 }

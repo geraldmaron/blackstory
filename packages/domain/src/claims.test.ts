@@ -3,9 +3,10 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { loadProductConstitution } from '@black-book/schemas';
+import { loadProductConstitution } from '@repo/schemas';
 import {
-  assertAtomicClaimValid,
+  assertCanonicalClaimValid,
+  assertCanonicalClaimMatchesCurrentVersion,
   assertClaimEvidenceLinkValid,
   assertClaimMayPublish,
   assertContradictionsPreserved,
@@ -19,8 +20,9 @@ import {
   narrativeMayCiteClaim,
   preserveContradictoryValues,
   uniqueLineageAggregates,
-  type AtomicClaim,
+  type CanonicalClaim,
   type ClaimEvidenceLink,
+  type ClaimVersion,
 } from './index.ts';
 
 const FIXED_NOW = '2026-07-16T23:00:00.000Z';
@@ -226,7 +228,7 @@ test('contradictory credible values are preserved', () => {
 });
 
 test('narrative cannot cite an unpublished claim', () => {
-  const unpublished: Pick<AtomicClaim, 'id' | 'workflowStatus' | 'publicationStatus'> = {
+  const unpublished: Pick<CanonicalClaim, 'id' | 'workflowStatus' | 'publicationStatus'> = {
     id: 'claim_draft',
     workflowStatus: 'accepted',
     publicationStatus: 'unpublished',
@@ -234,14 +236,14 @@ test('narrative cannot cite an unpublished claim', () => {
   assert.equal(narrativeMayCiteClaim(unpublished), false);
   assert.throws(() => assertNarrativeMayCiteClaim(unpublished), /cannot cite unpublished claim/);
 
-  const proposed: Pick<AtomicClaim, 'id' | 'workflowStatus' | 'publicationStatus'> = {
+  const proposed: Pick<CanonicalClaim, 'id' | 'workflowStatus' | 'publicationStatus'> = {
     id: 'claim_proposed',
     workflowStatus: 'proposed',
     publicationStatus: 'unpublished',
   };
   assert.throws(() => assertNarrativeMayCiteClaim(proposed), /cannot cite unpublished claim/);
 
-  const published: Pick<AtomicClaim, 'id' | 'workflowStatus' | 'publicationStatus'> = {
+  const published: Pick<CanonicalClaim, 'id' | 'workflowStatus' | 'publicationStatus'> = {
     id: 'claim_pub',
     workflowStatus: 'accepted',
     publicationStatus: 'published',
@@ -251,28 +253,27 @@ test('narrative cannot cite an unpublished claim', () => {
 });
 
 test('atomic claim versions and publication gate', () => {
-  const claim: AtomicClaim = {
+  const currentVersion: ClaimVersion = {
+    id: 'cver_gold_001',
+    claimId: 'claim_gold_001',
+    versionNumber: 1,
+    entityId: 'ent_seed_place_001',
+    predicate: 'founded_year',
+    object: '1867',
+    proceduralStatus: 'ruled',
+    claimClass: 'standard',
+    workflowStatus: 'accepted',
+    publicationStatus: 'unpublished',
+    temporal: { label: 'founding', validFrom: '1867-01-01' },
+    geographic: { locationId: 'loc_place_historical', precision: 'institution' },
+    createdAt: FIXED_NOW,
+  };
+
+  const claim: CanonicalClaim = {
     id: 'claim_gold_001',
     entityId: 'ent_seed_place_001',
     predicate: 'founded_year',
     currentVersionId: 'cver_gold_001',
-    versions: [
-      {
-        id: 'cver_gold_001',
-        claimId: 'claim_gold_001',
-        versionNumber: 1,
-        entityId: 'ent_seed_place_001',
-        predicate: 'founded_year',
-        object: '1867',
-        proceduralStatus: 'ruled',
-        claimClass: 'standard',
-        workflowStatus: 'accepted',
-        publicationStatus: 'unpublished',
-        temporal: { label: 'founding', validFrom: '1867-01-01' },
-        geographic: { locationId: 'loc_place_historical', precision: 'institution' },
-        createdAt: FIXED_NOW,
-      },
-    ],
     claimClass: 'standard',
     workflowStatus: 'accepted',
     publicationStatus: 'unpublished',
@@ -294,7 +295,8 @@ test('atomic claim versions and publication gate', () => {
     updatedAt: FIXED_NOW,
   };
 
-  assert.doesNotThrow(() => assertAtomicClaimValid(claim));
+  assert.doesNotThrow(() => assertCanonicalClaimValid(claim));
+  assert.doesNotThrow(() => assertCanonicalClaimMatchesCurrentVersion(claim, currentVersion));
   assert.equal(claim.relevance?.policyVersion, POLICY.policyVersion);
 
   const strongLinks = [

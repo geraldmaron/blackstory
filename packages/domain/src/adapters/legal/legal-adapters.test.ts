@@ -16,7 +16,7 @@ import {
 } from './index.js';
 import { assertLegalSnapshotValid } from '../../legal/types.js';
 
-test('legal adapter contracts pass BB-037 validation', () => {
+test('legal adapter contracts pass  validation', () => {
   assert.doesNotThrow(() => assertSourceAdapterContractValid(createCongressGovAdapterContract()));
   assert.doesNotThrow(() => assertSourceAdapterContractValid(createEcfrAdapterContract()));
   assert.doesNotThrow(() => assertSourceAdapterContractValid(createCourtListenerAdapterContract()));

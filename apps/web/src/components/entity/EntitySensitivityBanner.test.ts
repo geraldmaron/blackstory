@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { getDisclaimer, SENSITIVITY_CLASS_PRESENTATION_LABELS } from '@black-book/domain';
+import { getDisclaimer, SENSITIVITY_CLASS_PRESENTATION_LABELS } from '@repo/domain/disclaimers';
 import { EntitySensitivityBanner } from './EntitySensitivityBanner';
 
 test('renders the registry class label and sensitive-content disclaimer body for a place-kind entity', () => {

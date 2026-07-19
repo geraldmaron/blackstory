@@ -139,3 +139,50 @@ export {
   type LegalChangeMonitoringJobInput,
   type LegalChangeMonitoringJobResult,
 } from './jobs/legal-change-monitoring.js';
+
+export {
+  COMMUNITY_OBSCURITY_DISCOVERY_JOB_ID,
+  runCommunityObscurityDiscoveryJob,
+  type CommunityObscurityDiscoveryJobInput,
+  type CommunityObscurityDiscoveryJobResult,
+} from './jobs/community-obscurity-discovery.js';
+
+export {
+  RSS_DISCOVERY_CAMPAIGN_JOB_ID,
+  runRssDiscoveryCampaignJob,
+  type RssDiscoveryCampaignJobInput,
+  type RssDiscoveryCampaignJobResult,
+} from './jobs/discovery-campaign-rss.js';
+
+export {
+  DISCOVERY_CAMPAIGN_WIKIMEDIA_FEDERAL_JOB_ID,
+  runDiscoveryCampaignWikimediaFederalJob,
+  type DiscoveryCampaignWikimediaFederalJobInput,
+  type DiscoveryCampaignWikimediaFederalJobResult,
+} from './jobs/discovery-campaign-wikimedia-federal.js';
+
+export {
+  DISCOVERY_CAMPAIGN_ARCHIVE_DPLA_JOB_ID,
+  runDiscoveryCampaignArchiveDplaJob,
+  type DiscoveryCampaignArchiveDplaJobInput,
+  type DiscoveryCampaignArchiveDplaJobResult,
+} from './jobs/discovery-campaign-archive-dpla.js';
+
+export {
+  DISCOVERY_CAMPAIGN_WEB_SEARCH_JOB_ID,
+  runDiscoveryCampaignWebSearchJob,
+  type DiscoveryCampaignWebSearchJobInput,
+  type DiscoveryCampaignWebSearchJobResult,
+} from './jobs/discovery-campaign-web-search.js';
+
+export {
+  DISCOVERY_DISPATCHER_VERSION,
+  DISCOVERY_CAMPAIGN_JOB_IDS,
+  dispatchDiscoveryCampaign,
+  disengagedResearchCampaignsSnapshot,
+  type DiscoveryCampaignJobId,
+  type DiscoveryCampaignDispatchMode,
+  type DiscoveryCampaignDispatchStatus,
+  type DiscoveryCampaignDispatchResult,
+  type DispatchDiscoveryCampaignInput,
+} from './discovery-dispatcher.js';

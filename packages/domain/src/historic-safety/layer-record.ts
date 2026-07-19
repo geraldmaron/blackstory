@@ -61,7 +61,7 @@ export const PLACE_CONDITION_DESIGNATION_KINDS = [
 export type PlaceConditionDesignationKind = (typeof PLACE_CONDITION_DESIGNATION_KINDS)[number];
 
 // ---------------------------------------------------------------------------
-// Area-condition geometry binding 
+// Area-condition geometry binding
 // ---------------------------------------------------------------------------
 
 /** An area-only geometry a sundown town or redlining grade covers a place over a time range,
@@ -79,7 +79,7 @@ export function assertAreaConditionGeometryValid(geometry: AreaConditionGeometry
   if (geometry.shape.type !== 'Polygon' && geometry.shape.type !== 'BBox') {
     throw new Error(
       'AreaConditionGeometry.shape must be a Polygon or BBox — an area condition (sundown town, ' +
-        'redlining grade) renders as an area over a time range, never a point marker (BB-082/BB-091 AC9).',
+        'redlining grade) renders as an area over a time range, never a point marker (/AC9).',
     );
   }
 }
@@ -97,7 +97,7 @@ export function assertAreaConditionRenderPrecisionValid(input: {
     throw new Error(
       `Area-condition render precision "${input.renderPrecisionTier}" is finer than the ` +
         `documented precision "${input.documentedPrecisionTier}" — rendering must never infer a ` +
-        'finer geographic precision than the source documentation supports (BB-082/BB-091 AC11).',
+        'finer geographic precision than the source documentation supports (/AC11).',
     );
   }
 }

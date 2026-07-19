@@ -14,7 +14,7 @@ const VERIFY = path.join(ROOT, 'infra/database/scripts/verify-isolation.sh');
 const REQUIRE = process.env.CI_REQUIRE_POSTGRES === '1';
 
 const connectionString =
-  process.env.BLACK_BOOK_TEST_DATABASE_URL ??
+  process.env.APP_TEST_DATABASE_URL ??
   process.env.DATABASE_URL ??
   'postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook';
 

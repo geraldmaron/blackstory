@@ -58,7 +58,9 @@ export function extractLocations(entity?: WikidataEntity, language = 'en'): read
   for (const claim of coordinateClaims) {
     const value = claim.mainsnak.datavalue?.value;
     if (
-      value?.latitude !== undefined &&
+      value &&
+      typeof value === 'object' &&
+      value.latitude !== undefined &&
       value.longitude !== undefined &&
       !locations.some((entry) => entry.coordinate !== undefined)
     ) {
@@ -86,7 +88,9 @@ export function extractRelationships(entity?: WikidataEntity): readonly Wikimedi
       continue;
     }
     for (const claim of claims) {
-      const targetId = claim.mainsnak.datavalue?.value.id;
+      const claimValue = claim.mainsnak.datavalue?.value;
+      const targetId =
+        claimValue && typeof claimValue === 'object' ? claimValue.id : undefined;
       if (targetId?.startsWith('Q')) {
         relationships.push({
           property,
@@ -128,6 +132,9 @@ function externalIdentifierFromClaim(claim: WikidataClaim): string | undefined {
   if (!value) {
     return undefined;
   }
+  if (typeof value === 'string') {
+    return value.trim() || undefined;
+  }
   if (value.id) {
     return value.id;
   }
@@ -142,7 +149,7 @@ function locationHintFromClaim(
   _language: string,
 ): WikimediaLocationHint | undefined {
   const value = claim.mainsnak.datavalue?.value;
-  if (!value) {
+  if (!value || typeof value === 'string') {
     return undefined;
   }
   if (value.id?.startsWith('Q')) {

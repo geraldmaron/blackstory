@@ -14,6 +14,8 @@ export {
   type DiscoveryCandidateIdentity,
   type GeographicHint,
   type DiscoverySignal,
+  type DiscoveryCatalogMatch,
+  type AuthorityFollowUpLead,
   type DiscoveryCandidateRecord,
   type DiscoveryCampaignBudget,
   type DiscoveryCampaignBoundaries,
@@ -94,6 +96,97 @@ export {
 
 export { runDiscoveryCampaign, type RunDiscoveryCampaignInput } from './pipeline.js';
 
+export {
+  attachCatalogMatch,
+  attachCatalogMatchesToSurvivors,
+  type CatalogMatchCatalog,
+  type AttachCatalogMatchResult,
+  type AttachCatalogMatchesResult,
+} from './catalog-match.js';
+
+export {
+  AUTHORITY_HOST_SUFFIXES,
+  isAuthorityHost,
+  normalizeAuthorityUrl,
+  harvestAuthorityFollowUpsForCandidate,
+  harvestAuthorityFollowUpsForCandidates,
+  type AuthorityHostSuffix,
+  type HarvestAuthorityFollowUpsInput,
+  type HarvestAuthorityFollowUpsBatchInput,
+} from './authority-harvest.js';
+
+export {
+  COMMUNITY_OBSCURITY_CAMPAIGN_KIND,
+  runCommunityObscurityCampaign,
+  type CommunityObscurityRankedLead,
+  type CommunityObscurityCampaignResult,
+  type RunCommunityObscurityCampaignInput,
+} from './community-obscurity-campaign.js';
+
+export {
+  RSS_DISCOVERY_CAMPAIGN_KIND,
+  runRssDiscoveryCampaign,
+  type RssDiscoveryRankedLead,
+  type RssDiscoveryCampaignResult,
+  type RunRssDiscoveryCampaignInput,
+} from './rss-campaign.js';
+
+export {
+  WIKIMEDIA_FEDERAL_CAMPAIGN_KIND,
+  WIKIMEDIA_SUB_BUDGET_RESERVE,
+  PARTICIPATING_ADAPTER_IDS,
+  computeAdapterSubBudgets,
+  runWikimediaFederalCampaign,
+  type WikimediaFederalPerAdapterYield,
+  type WikimediaFederalCampaignResult,
+  type RunWikimediaFederalCampaignInput,
+} from './wikimedia-federal-campaign.js';
+
+export {
+  ARCHIVE_DPLA_CAMPAIGN_KIND,
+  ARCHIVE_DPLA_ADAPTER_IDS,
+  ARCHIVE_DPLA_SUB_BUDGET_POLICY,
+  applyArchiveDplaSubBudgets,
+  runArchiveDplaCampaign,
+  type ArchiveDplaSubBudgetSnapshot,
+  type ArchiveDplaCampaignResult,
+  type RunArchiveDplaCampaignInput,
+} from './archive-dpla-campaign.js';
+
+export {
+  WEB_SEARCH_CAMPAIGN_KIND,
+  WEB_SEARCH_MAX_REQUESTS_PER_RUN,
+  assertWebSearchCampaignStorageTerms,
+  runWebSearchCampaign,
+  type WebSearchWaybackGate,
+  type WebSearchCampaignRequestBudget,
+  type WebSearchCampaignResult,
+  type RunWebSearchCampaignInput,
+} from './web-search-campaign.js';
+
+export {
+  OBSCURITY_METHODOLOGY_VERSION,
+  OBSCURITY_METHODOLOGY_DISCLAIMER,
+  OBSCURITY_WEIGHTS,
+  HIGH_VISIBILITY_NAME_PHRASES,
+  catalogNoveltyRaw,
+  identifierSparsenessRaw,
+  nameRarityRaw,
+  geographicSpecificityRaw,
+  lowAuthorityBoostRaw,
+  highVisibilityPenaltyRaw,
+  historyDayBoostRaw,
+  brandCommercePenaltyRaw,
+  obscurityBand,
+  scoreObscurity,
+  rankByObscurity,
+  type ObscurityFactorId,
+  type ObscurityFactorBreakdown,
+  type ObscurityAssessment,
+  type ObscurityReferenceCorpus,
+  type ScoreObscurityInput,
+} from './obscurity.js';
+
 // graylist recall lane below-threshold candidates parked with disposition, never
 // silently dropped, queryable for later corroboration.
 export {
@@ -115,3 +208,22 @@ export {
   promoteGraylistEntry,
   archiveGraylistEntry,
 } from './graylist.js';
+
+// Shared post-pipeline helpers for fixture-first discovery campaign runners.
+export {
+  CAMPAIGN_RUNNER_HELPERS_VERSION,
+  assertCampaignCannotPublish,
+  assertSurvivorSnippetsCapped,
+  listCampaignSurvivors,
+  partitionSurvivorsByRelevance,
+  summarizeCampaignYield,
+  runOptionalEditorialHook,
+  toEditorialLeadPreview,
+  type CampaignYieldSummary,
+  type EditorialLeadPreview,
+  type EditorialReviewDecision,
+  type EditorialReviewResult,
+  type CampaignEditorialHook,
+  type PartitionByRelevanceInput,
+  type PartitionByRelevanceResult,
+} from './campaign-runner.js';

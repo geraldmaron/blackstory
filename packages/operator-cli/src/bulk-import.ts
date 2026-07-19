@@ -25,7 +25,7 @@ import {
   type SourceKillSwitchState,
   type SourceRegistryStore,
   type SpotCheckVerdict,
-} from '@black-book/domain';
+} from '@repo/domain';
 import { buildOperatorAuditEvent, buildOperatorOutboxMessage } from './audit.js';
 import {
   buildLeadSubmission,
@@ -272,7 +272,7 @@ export function prepareBulkLeadIntake(
 // Vetted-corpus bulk-import batch runner — the exclusive execution surface for
 // corpus-vetted bulk intake. Every hard gate from the standard pipeline
 // survives (citation completeness, precision, notability; see
-// `@black-book/domain`'s `evaluateCorpusBulkPromotion`); this function's own job is: (1) the
+// `@repo/domain`'s `evaluateCorpusBulkPromotion`); this function's own job is: (1) the
 // fail-closed corpus-vetting + kill-switch gate, (2) the per-batch budget cap, (3) idempotent
 // duplicate detection, (4) routing every non-duplicate row through the SAME `prepareOperatorIntake`
 // quarantine path `prepareBulkLeadIntake` above uses a corpus_fast_track record is still an
@@ -409,7 +409,7 @@ export function prepareCorpusBulkImportBatch(
 
     const rowContext: OperatorIntakeContext = {
       ...input.context,
-      reason: `BB-094 corpus bulk import: ${input.corpusId}/${input.batchId}/${candidate.sourceRecordId}`,
+      reason: ` corpus bulk import: ${input.corpusId}/${input.batchId}/${candidate.sourceRecordId}`,
     };
     const intakeOutcome = prepareOperatorIntake('bulk_import_row', submission, rowContext, {
       openDraftCase: false,
@@ -444,7 +444,7 @@ export function prepareCorpusBulkImportBatch(
       path: `corpusBulkImportBatches/${input.corpusId}/${input.batchId}`,
     },
     identity: input.context.identity,
-    reason: `BB-094 corpus-vetted bulk import batch: ${report.counts.accepted}/${report.counts.total} accepted.`,
+    reason: ` corpus-vetted bulk import batch: ${report.counts.accepted}/${report.counts.total} accepted.`,
     now: generatedAt,
     idempotencyKey,
     data: { report: report as unknown as Readonly<Record<string, unknown>> },

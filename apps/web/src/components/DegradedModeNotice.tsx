@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Notice } from '@black-book/ui';
+import { Notice } from '@repo/ui';
 import { isPublicReadApiDisabled } from '../lib/runtime-hardening/degraded-mode';
 
 export function DegradedModeNotice() {
@@ -14,7 +14,7 @@ export function DegradedModeNotice() {
   }
 
   return (
-    <div className="bb-shell-offline" role="status">
+    <div className="ds-shell-offline" role="status">
       <Notice tone="warning" title="Showing snapshot data">
         Live reads are temporarily disabled by the operator. Pages are serving the last published
         release snapshot.

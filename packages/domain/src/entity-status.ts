@@ -2,7 +2,7 @@
  * Kind-specific entity status vocabularies, time-scoped status history, the notability-basis
  * inclusion rubric, and the entity-level sensitivity schema.
  *
- * SCOPE GUARDRAIL: `StatusHistoryEntry` `statusHistory` is ENTITY-LIFECYCLE status only 
+ * SCOPE GUARDRAIL: `StatusHistoryEntry` `statusHistory` is ENTITY-LIFECYCLE status only
  * place/school/organization/institution active|historic|inactive, law
  * in_force|amended|repealed|struck_down|enjoined, movement active|historic. It never stores
  * area/condition designations (sundown-town, redlining grade, exclusion infrastructure) those
@@ -68,7 +68,7 @@ function latestByValidFrom<S extends string>(
 }
 
 /**
- * The current status is ALWAYS derived from the open-ended record (validTo omitted or null) 
+ * The current status is ALWAYS derived from the open-ended record (validTo omitted or null)
  * never hand-edited as an independent scalar field. If more than one open-ended record exists
  * (an upstream data-entry error), the one with the latest validFrom wins.
  */
@@ -99,7 +99,7 @@ export function statusAsOf<S extends string>(
 }
 
 // ---------------------------------------------------------------------------
-// Person status derives from livingStatus never a second field 
+// Person status derives from livingStatus never a second field
 // ---------------------------------------------------------------------------
 
 export type PersonDerivedStatus = 'living' | 'deceased';
@@ -137,7 +137,7 @@ export type NotabilityBasisRecord = {
 };
 
 /**
- * >=1 basis record is required to publish. This is a structural gate, not a score 
+ * >=1 basis record is required to publish. This is a structural gate, not a score
  * numeric NotabilityScore fields are banned by standing policy from this record and from every
  * public payload derived from it (see packages/domain/src/relevance/notability-gate.ts, which
  * wires this check into the relevance-gate vocabulary as an 8th, additive gate).

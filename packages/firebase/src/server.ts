@@ -22,7 +22,33 @@ export type ServerFirebaseApp = {
   readonly env: ParsedFirebaseServerEnv;
 };
 
-const SERVER_APP_NAME = 'black-book-server';
+const SERVER_APP_NAME = 'the related workstream';
+
+/**
+ * Local ADC user credentials call Identity Toolkit (token revoke checks) against a
+ * quota project. Without one, verifyIdToken fails with a 403 that admin maps to
+ * generic Unauthorized. Prefer an explicit GOOGLE_CLOUD_QUOTA_PROJECT; otherwise
+ * inherit the Firebase project id for production Admin SDK sessions.
+ */
+export function ensureGoogleCloudQuotaProject(
+  projectId: string,
+  environment: EnvironmentLike = process.env,
+): string | undefined {
+  const existing =
+    environment.GOOGLE_CLOUD_QUOTA_PROJECT?.trim() ||
+    process.env.GOOGLE_CLOUD_QUOTA_PROJECT?.trim();
+  if (existing) {
+    if (!process.env.GOOGLE_CLOUD_QUOTA_PROJECT) {
+      process.env.GOOGLE_CLOUD_QUOTA_PROJECT = existing;
+    }
+    return existing;
+  }
+  if (!projectId.trim()) {
+    return undefined;
+  }
+  process.env.GOOGLE_CLOUD_QUOTA_PROJECT = projectId;
+  return projectId;
+}
 
 function buildCredential(environment: EnvironmentLike, credentials?: string) {
   if (!credentials) {
@@ -49,6 +75,8 @@ export function createServerFirebaseApp(
 
   if (env.mode === 'emulator') {
     applyAdminEmulatorEnvironment(environment);
+  } else {
+    ensureGoogleCloudQuotaProject(env.projectId, environment);
   }
 
   const existing = getApps().find((candidate) => candidate.name === SERVER_APP_NAME);
@@ -72,7 +100,7 @@ export function getServerFirebaseApp(): App {
   return getApp(SERVER_APP_NAME);
 }
 
-/** Firestore instance bound to the Black Book server Admin app. */
+/** Firestore instance bound to the BlackStory server Admin app. */
 export function getServerFirestore(environment: EnvironmentLike = process.env): Firestore {
   const { app } = createServerFirebaseApp(environment);
   return getFirestore(app);

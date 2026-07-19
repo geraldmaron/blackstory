@@ -14,7 +14,7 @@ This document is the editorial and engineering contract for that surface.
 | `eraBuckets` / `notabilityLabels` | When present | Secondary chips (ADR-015) | Never numeric scores. |
 | `historicalContext` | Strongly preferred | Framing in Black-history place | Not new unsourced facts about this record (those live in `claims`). |
 | `extendedNarrative` | Optional | Multi-paragraph further reading | Omit UI section when absent. Never replaces Accepted claims. |
-| `primaryImage` | Optional | Hero/aside photo | Requires publishable rights (`public_domain` \| `licensed` \| `fair_use`) and `display_media`. Alt + credit required (WCAG). Omit entirely when missing — no stock placeholders. |
+| `primaryImage` | Optional | Hero/aside photo | Requires publishable rights (`public_domain` \| `licensed` \| `fair_use`) and `display_media`. Alt + credit required (WCAG). When missing, UI shows a kind-derived record mark (book/pin/arch), not a stock portrait or mosaic. |
 | `related` (1-hop) | Strongly preferred | Typed graph edges on the projection | Stored on release; adjacency is single-hop by design. |
 | Continue learning (2-hop) | Read-time only | “Also connected” | Server-composed from neighbors’ related IDs; capped; never stored on the projection. |
 | `claims` / facts | Sourced detail | Atomic cited statements | Claims are the evidence layer; summary is the index lede. |
@@ -30,9 +30,19 @@ retraction history for operators; that trail is not the learning-index UI.
 ## UI sparsity (honesty over fake richness)
 
 - Sparse entity: summary + tags + why-appears + gap notices is OK.
-- No photo / no extended narrative: **omit** those sections entirely.
+- First viewport is an **editorial mast**: rights-cleared photo or kind-derived record mark as a
+  media plane beside (desktop) / above (mobile) the name and serif summary — not a dossier
+  header with media buried in an aside.
+- No rights-cleared photo: show the **record mark** (book / pin / arch by entity kind) — symbolic
+  only, never a stock portrait or mosaic. Caption states that a rights-cleared portrait is still
+  awaited.
+- No extended narrative: **omit** that section entirely.
 - Empty related: `RecordGapNotice` plus tag and map CTAs still provide learning paths.
 - Neighbor stubs are denormalized at read time; do not embed full neighbor docs on every projection.
+- Listed entity names link quietly via `EntityLink` / `ds-entity-link` (inherit color; underline on hover/focus — not copper pills). Related rails keep `ds-story-link` row anatomy; a short discovery hint invites clicking onward.
+- At-a-glance keeps only non-mast facts (evidence count, confidence, coverage, location precision).
+- Trust pedagogy on the entity page is a one-line methodology off-ramp — not a full technique banner.
+- Connected records are one section (1-hop, then optional 2-hop “Also connected”).
 
 ## Rights for entity media
 
@@ -56,15 +66,15 @@ Firestore public entity projection:
 
 ```bash
 cd packages/firebase
-BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 \
+APP_FIREBASE_ALLOW_PRODUCTION=1 \
   node --conditions development --import tsx scripts/bootstrap-public-seed.ts
 
-BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 \
+APP_FIREBASE_ALLOW_PRODUCTION=1 \
   node --conditions development --import tsx scripts/promote-entity-primary-image.ts \
     --entity-id=ent_seed_school_001 \
-    --file=../../brand-system/assets/png/black-book-mark-light-transparent.png \
+    --file=../../brand/symbols/dark/blap-book-pin-symbol-dark-transparent.png \
     --alt="Schematic mark for Seed Freedmen School" \
-    --credit="Black Book brand system seed fixture" \
+    --credit="BlackStory brand kit seed fixture" \
     --rights=public_domain
 ```
 
@@ -82,5 +92,7 @@ fronted by CDN. Until CDN is applied, `makePublic` is best-effort after upload.
 | Entity media paths | `packages/firebase/src/firestore/entity-media.ts` |
 | Serialize choke point | `packages/security/src/serialize.ts` |
 | Entity page | `apps/web/src/app/entity/[id]/page.tsx` |
+| Quiet entity name links | `apps/web/src/components/entity/EntityLink.tsx` (`ds-entity-link`) |
+| Catalog → relationships | `packages/domain/src/graph/catalog-related.ts` + `publish-national-catalog.ts` |
 | Immutable releases | `docs/adr/ADR-004-public-projection-immutable-snapshots.md` |
 | Public-media bucket matrix | `infra/gcp/storage-buckets.matrix.md` |

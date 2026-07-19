@@ -2,22 +2,22 @@
 // alerts per project"). Gated behind billing_account != "" so a bare plan/apply cannot create
 // budgets against an unset billing account. Secret Manager itself needs no Terraform here - it
 // is per-project by construction once the projects are split; named secrets are created only
-// when a consumer exists, per the existing BB-011 convention (see docs/security/environment-isolation.md).
+// when a consumer exists, per the existing convention (see docs/security/environment-isolation.md).
 //
-// billing kill-switch asymmetry (ADR-012, load-bearing): blackbook-prod gets threshold alerts
+// billing kill-switch asymmetry (ADR-012, load-bearing): BlackStory prod gets threshold alerts
 // ONLY - there is no automated action wired to its budget, and no Terraform resource in this
 // file (or anywhere in this module) attaches a Pub/Sub-triggered shutdown to prod's budget.
-// blackbook-internal (and optionally blackbook-staging) MAY wire an automated hard-stop; that
-// automation itself (Cloud Function / Pub/Sub consumer that disables Cloud Run services) is out
-// of scope for this bead - see docs/runbooks/production-environment-resplit-migration.md and
-// infra/gcp/cost-controls/ (BB-033, not touched by BB-078) for the existing kill-switch pattern
-// this should eventually plug into for blackbook-internal only.
+// repo-internal (and optionally repo-staging) MAY wire an automated hard-stop; that automation
+// itself (Cloud Function / Pub/Sub consumer that disables Cloud Run services) is out of scope
+// for this module - see docs/runbooks/production-environment-resplit-migration.md and
+// infra/gcp/cost-controls/ for the existing kill-switch pattern this should eventually plug
+// into for repo-internal only.
 
 resource "google_billing_budget" "prod" {
   count = var.billing_account != "" ? 1 : 0
 
   billing_account = var.billing_account
-  display_name    = "blackbook-prod monthly budget (notify-only - no kill switch, ADR-012)"
+  display_name    = "BlackStory monthly budget (notify-only - no kill switch, ADR-012)"
 
   budget_filter {
     projects = ["projects/${data.google_project.prod.number}"]
@@ -42,7 +42,7 @@ resource "google_billing_budget" "staging" {
   count = var.billing_account != "" ? 1 : 0
 
   billing_account = var.billing_account
-  display_name    = "blackbook-staging monthly budget"
+  display_name    = "BlackStory Staging monthly budget"
 
   budget_filter {
     projects = ["projects/${data.google_project.staging[0].number}"]
@@ -63,7 +63,7 @@ resource "google_billing_budget" "internal" {
   count = var.billing_account != "" ? 1 : 0
 
   billing_account = var.billing_account
-  display_name    = "blackbook-internal monthly budget (kill-switch eligible, ADR-012)"
+  display_name    = "BlackStory Internal monthly budget (kill-switch eligible, ADR-012)"
 
   budget_filter {
     projects = ["projects/${data.google_project.internal[0].number}"]

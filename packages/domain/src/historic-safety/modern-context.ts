@@ -146,7 +146,7 @@ export function assertGeneralCrimeContextValid(record: GeneralCrimeContextRecord
   if (record.policingPatternCaveat !== GENERAL_CRIME_CONTEXT_BIAS_CAVEAT) {
     throw new Error(
       'GeneralCrimeContextRecord.policingPatternCaveat must equal GENERAL_CRIME_CONTEXT_BIAS_CAVEAT ' +
-        'verbatim \u2014 the caveat is mandatory and not caller-configurable (BB-082 critical invariant).',
+        'verbatim \u2014 the caveat is mandatory and not caller-configurable ( critical invariant).',
     );
   }
   // Defense-in-depth: even this labeled-context-only record must never carry a composite/scoring

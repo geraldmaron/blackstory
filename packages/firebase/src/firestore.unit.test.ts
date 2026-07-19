@@ -11,7 +11,7 @@ import {
   assertNarrativeMayCiteClaim,
   canSourceAdapterCreateCandidates,
   narrativeMayCiteClaim,
-} from '@black-book/domain';
+} from '@repo/domain';
 import {
   canPublish,
   canonicalClaimSchema,
@@ -62,9 +62,9 @@ test('publication and admin claims can publish', () => {
 
 test('public entity projection seed parses with geohash', () => {
   const parsed = parseWithSchema(publicEntityProjectionSchema, seedPublicEntity);
-  assert.equal(parsed.id, 'ent_seed_place_001');
+  assert.equal(parsed.id, 'ent_15th_st_church_001');
   assert.ok(parsed.location?.geohash);
-  assert.equal(parsed.location?.precision, 'city');
+  assert.equal(parsed.location?.precision, 'neighborhood');
   assert.equal(parsed.location?.matchMethod, 'manual_research');
 });
 
@@ -95,16 +95,16 @@ test('relationship and merge seeds parse with evidence and audit lineage', () =>
   assert.ok(merge.auditEventIds.includes('audit_seed_merge_001'));
 });
 
-test('seed fixture includes BB-014 domain paths', () => {
+test('seed fixture includes  domain paths', () => {
   const paths = firestoreSeedDocuments.map((doc) => doc.path);
   assert.ok(paths.some((path) => path.includes('/locations/')));
   assert.ok(paths.some((path) => path.startsWith('entityRelationships/')));
   assert.ok(paths.some((path) => path.startsWith('entityMerges/')));
-  assert.ok(paths.some((path) => path.startsWith('canonicalEntities/ent_seed_school')));
+  assert.ok(paths.some((path) => path.startsWith('canonicalEntities/ent_dunbar_school')));
   assert.ok(paths.some((path) => path.startsWith('canonicalEntities/ent_seed_person')));
 });
 
-test('BB-016 provenance seeds parse and evidence resolves to source item', () => {
+test(' provenance seeds parse and evidence resolves to source item', () => {
   const source = parseWithSchema(evidenceSourceSchema, seedEvidenceSource);
   assert.equal(source.policy.snapshotMode, 'selective');
   assert.equal(source.adapterEnabled, true);
@@ -125,7 +125,7 @@ test('disabled source adapter seed cannot create candidates', () => {
   assert.equal(canSourceAdapterCreateCandidates(disabled), false);
 });
 
-test('seed fixture includes BB-016 provenance paths', () => {
+test('seed fixture includes  provenance paths', () => {
   const paths = firestoreSeedDocuments.map((doc) => doc.path);
   assert.ok(paths.some((path) => path.startsWith('sourceOrganizations/')));
   assert.ok(paths.some((path) => path.startsWith('sourceItems/')));
@@ -142,7 +142,7 @@ test('canonical claim seed parses with confidence components and policyVersion',
   assert.ok(claim.confidence);
   assert.equal(claim.confidence.policyVersion, '1.0.0');
   assert.equal(claim.confidence.independentLineageCount, 1);
-  assert.ok(claim.preservedValues.some((v) => v.kind === 'contradicting' && v.value === '1868'));
+  assert.ok(claim.preservedValues.some((v) => v.kind === 'contradicting' && v.value === '1840'));
   assert.doesNotThrow(() => assertNarrativeMayCiteClaim(claim));
 
   const support = parseWithSchema(claimEvidenceLinkSchema, seedClaimEvidenceSupporting);
@@ -155,7 +155,7 @@ test('canonical claim seed parses with confidence components and policyVersion',
   assert.equal(narrativeMayCiteClaim(highImpact), false);
 });
 
-test('seed fixture includes BB-017 claim paths', () => {
+test('seed fixture includes claim paths', () => {
   const paths = firestoreSeedDocuments.map((doc) => doc.path);
   assert.ok(paths.some((path) => path.startsWith('canonicalClaims/')));
   assert.ok(paths.some((path) => path.startsWith('claimEvidenceLinks/')));

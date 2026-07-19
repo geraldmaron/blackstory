@@ -54,7 +54,7 @@ export function assertFilterPatternHasNoResearchOnlyOffensiveTerms(filterPattern
     if (text && lower.includes(text)) {
       throw new Error(
         `Constructed Common Crawl CDX filter pattern contains a researchOnlyOffensive term from ` +
-          `pack "${pack.id}"; these terms must never be sent to an external API (BB-075 acceptance criterion 3)`,
+          `pack "${pack.id}"; these terms must never be sent to an external API ( acceptance criterion 3)`,
       );
     }
   }

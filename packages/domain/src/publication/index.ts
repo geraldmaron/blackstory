@@ -4,6 +4,8 @@
  */
 import { createHash, sign as signBytes, verify as verifyBytes, type KeyLike } from 'node:crypto';
 
+export * from './release-builder.js';
+
 export const RELEASE_STATUSES = [
   'draft',
   'preview',
@@ -151,6 +153,11 @@ export function publicEntitySnapshotPath(releaseId: string, entityId: string): s
   return `public/releases/${releaseId}/entities/${entityId}.json`;
 }
 
+export {
+  publicReleaseEntitiesListPath,
+  publicReleaseSearchIndexPath,
+} from './release-paths.js';
+
 function manifestToJson(manifest: ReleaseManifest): JsonValue {
   return {
     schemaVersion: manifest.schemaVersion,
@@ -170,7 +177,7 @@ function manifestToJson(manifest: ReleaseManifest): JsonValue {
 
 /**
  * Builds an unsigned manifest from already-public projection and snapshot payloads.
- * Callers must serialize through @black-book/security before supplying artifacts.
+ * Callers must serialize through @repo/security before supplying artifacts.
  */
 export function buildReleaseManifest(input: {
   readonly releaseId: string;

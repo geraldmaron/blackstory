@@ -1,7 +1,7 @@
 /**
  * Runtime guard that fails closed when database helpers execute in a browser-like global.
  */
-export function assertServerOnly(context = '@black-book/data-access'): void {
+export function assertServerOnly(context = '@repo/data-access'): void {
   const globalObject = globalThis as typeof globalThis & {
     window?: unknown;
     document?: unknown;

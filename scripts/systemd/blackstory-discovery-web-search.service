@@ -1,0 +1,26 @@
+# BlackStory scheduled SearXNG discovery → admin researchCases (user unit).
+# Install on Corsair: ~/.config/systemd/user/
+[Unit]
+Description=BlackStory SearXNG discovery (queue survivors for admin)
+Documentation=file:///home/gerald/Developer/Projects/blackstory/scripts/run-scheduled-searxng-discovery.sh
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/Developer/Projects/blackstory
+Environment=HOME=%h
+Environment=SEARXNG_BASE_URL=http://127.0.0.1:8888
+Environment=DISCOVERY_MODE=live
+Environment=DISCOVERY_KILL_SWITCH=disengaged
+Environment=DISCOVERY_STORAGE_TERMS_CONFIRMED=true
+Environment=COMMIT_SURVIVORS=1
+Environment=DISCOVERY_OPERATOR_ID=scheduled-discovery-corsair
+# Optional: DISCOVERY_QUERIES_PER_RUN=3 (default) — rotates corsair-web-search-queries.json
+# Load Firebase / privacy pepper from a root-owned or user env file (never commit secrets).
+EnvironmentFile=-%h/.config/blackstory/discovery.env
+ExecStart=%h/Developer/Projects/blackstory/scripts/run-scheduled-searxng-discovery.sh
+Nice=10
+
+[Install]
+WantedBy=default.target

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "bead": "BB-063",
-  "evaluator": "parent-wiring@local",
-  "evaluatedAt": "2026-07-17T21:06:14.036Z",
+  "gateId": "beta-launch-gate",
+  "evaluator": "cli-test",
+  "evaluatedAt": "2026-07-18T21:46:01.504Z",
   "decision": "NO_GO",
   "requiredFailed": 7,
   "requiredPassed": 8,
@@ -49,7 +49,7 @@
         {
           "type": "command",
           "ref": "node --import tsx scripts/run-testing-layer.mjs security",
-          "description": "Includes living-address adversarial scenarios (BB-060)."
+          "description": "Includes living-address adversarial scenarios (adversarial integrity)."
         },
         {
           "type": "file",
@@ -110,7 +110,7 @@
     },
     {
       "id": "restore-rehearsal-complete",
-      "title": "Restore rehearsal complete (BB-061)",
+      "title": "Restore rehearsal complete (restore drill)",
       "kind": "machine",
       "required": true,
       "status": "pass",
@@ -146,7 +146,7 @@
     },
     {
       "id": "load-abuse-verified",
-      "title": "Load and abuse limits verified (BB-059)",
+      "title": "Load and abuse limits verified (load and abuse)",
       "kind": "machine",
       "required": true,
       "status": "pass",
@@ -168,7 +168,7 @@
     },
     {
       "id": "adversarial-integrity-verified",
-      "title": "Adversarial integrity exercise (BB-060)",
+      "title": "Adversarial integrity exercise (adversarial integrity)",
       "kind": "machine",
       "required": true,
       "status": "pass",
@@ -186,7 +186,7 @@
     },
     {
       "id": "methodology-corrections-available",
-      "title": "Public methodology and correction process (BB-088)",
+      "title": "Public methodology and correction process (launch readiness)",
       "kind": "machine",
       "required": true,
       "status": "pass",
@@ -226,7 +226,7 @@
     },
     {
       "id": "disclaimer-framework-live",
-      "title": "Disclaimer framework live on public surfaces (BB-095)",
+      "title": "Disclaimer framework live on public surfaces (advisory/disclaimer classes)",
       "kind": "machine",
       "required": true,
       "status": "pass",
@@ -244,7 +244,7 @@
     },
     {
       "id": "release-pipeline-ready",
-      "title": "Production release pipeline ready (BB-062)",
+      "title": "Production release pipeline ready (App Hosting rollouts)",
       "kind": "machine",
       "required": true,
       "status": "pass",

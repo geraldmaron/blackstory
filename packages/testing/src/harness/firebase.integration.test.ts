@@ -13,7 +13,7 @@ test(
   'firebase emulator harness reports demo project when reachable',
   firebaseHarnessGate(harness),
   () => {
-    assert.equal(harness.projectId, 'demo-black-book');
+    assert.equal(harness.projectId, 'demo-repo');
     assert.ok(harness.authHost || harness.firestoreHost);
   },
 );

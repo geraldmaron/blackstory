@@ -6,7 +6,7 @@ import {
   getSurfaceDefinition,
   parseNodeEnv,
   type AuthMode,
-} from '@black-book/config';
+} from '@repo/config';
 
 export const SURFACE_ID = 'admin' as const;
 

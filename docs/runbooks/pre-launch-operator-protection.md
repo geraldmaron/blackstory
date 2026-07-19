@@ -1,8 +1,8 @@
-# Runbook: Pre-launch operator protection (BB-089)
+# Runbook: Pre-launch operator protection
 
 **Scope:** Human-executed OPSEC, account-hardening, legal, and impersonation-defense steps that
-must happen before the repository/site goes public and before BB-063 (beta launch) proceeds.
-**Not executed by BB-089 or by this document.** No domain was registered, no account was created,
+must happen before the repository/site goes public and before  (beta launch) proceeds.
+**Not executed by  or by this document.** No domain was registered, no account was created,
 no 2FA setting was changed, no payment was made, and no DMCA agent was registered by the session
 that wrote this runbook — every action below is a checklist item for the human operator to
 execute in one sitting, the same convention this project already uses for cloud/account actions
@@ -12,20 +12,20 @@ for the pattern). This is that same pattern applied to non-cloud, real-world ope
 **Why this exists:** a solo-run, deliberately controversial historical archive will face
 coordinated *non-technical* attack before it faces a technical one — operator de-anonymization,
 platform takedown via false abuse reports, root-account takeover, and brand impersonation. The
-existing [threat model](../security/threat-model.md) (BB-004) is strong on technical integrity;
+existing [threat model](../security/threat-model.md) is strong on technical integrity;
 this runbook closes the operator/platform/impersonation/legal delta the 2026-07-17 adversarial
-review found, without duplicating BB-004. The public-facing half of "protection" (rigor, trust
-signaling, pre-bunking) is BB-088 — this document is internal only and none of it becomes
+review found, without duplicating . The public-facing half of "protection" (rigor, trust
+signaling, pre-bunking) is  — this document is internal only and none of it becomes
 defensive public copy.
 
-**Blocks:** BB-063 (beta launch). Several items below are one-way doors (domain registration, git
+**Blocks:**  (beta launch). Several items below are one-way doors (domain registration, git
 history going public, LLC-as-WHOIS-registrant) that are cheap now and painful or impossible to
 retrofit after launch — that is why this is pre-launch, not "eventually."
 
-**Launch-gate note:** independent of the items below, BB-089's design also calls for community
+**Launch-gate note:** independent of the items below, 's design also calls for community
 submissions to launch **gated**, with the graylist/review queue never obligated to be drained on
-day one — a solo operator cannot staff BB-076's consensus-of-N review or a flooded queue at
-launch. That is a BB-063 launch-gate condition and a BB-076 acceptance note, not something this
+day one — a solo operator cannot staff 's consensus-of-N review or a flooded queue at
+launch. That is a  launch-gate condition and a  acceptance note, not something this
 runbook's checklist executes; flagged here so it is not lost.
 
 ## How to use this checklist
@@ -92,7 +92,7 @@ anything else.
 
 ## 2. Root-account hardening (free; blocks the worst case)
 
-Extends BB-027 (which is app-layer admin MFA — Firebase Auth + IAP + RBAC for the admin console —
+Extends  (which is app-layer admin MFA — Firebase Auth + IAP + RBAC for the admin console —
 not root/console-account security; see `docs/security/admin-identity.md`). This section is about
 the human accounts that hold the keys to GitHub and Google Cloud/Firebase themselves.
 
@@ -127,7 +127,7 @@ the human accounts that hold the keys to GitHub and Google Cloud/Firebase themse
   **Verify:** confirm which Google account is the Cloud Billing Account owner/administrator versus
   which account(s) hold day-to-day IAM roles used for deploys; record the answer here once decided.
 
-Add this section's completion status to the BB-079 human-apply checklist tracking production
+Add this section's completion status to the  human-apply checklist tracking production
 cloud setup, since both share the "one sitting, human-only" execution model.
 
 ## 3. Platform-takedown resilience
@@ -146,14 +146,14 @@ the process/contract pieces around it, not a replacement for it.
   priority case can actually be filed.
 - [ ] **Read [`platform-takedown.md`](./incidents/platform-takedown.md)** — the incident runbook
   this bead ships, covering contacts, the evidence pack, and containment steps referencing the
-  real BB-033/035 kill switches (`packages/config/src/kill-switches.ts`,
-  `evaluatePublicRuntimeMode`, `containmentOrder`) and BB-020's PITR/backup
+  real /035 kill switches (`packages/config/src/kill-switches.ts`,
+  `evaluatePublicRuntimeMode`, `containmentOrder`) and 's PITR/backup
   (`docs/runbooks/backup-restore.md`) as the data backstop. Nothing to execute here beyond reading
   it and filling in the contacts table once the registrar/support case exist.
 - [ ] **(Optional, triggered only)** Cloudflare free in front of the site and a warm off-Google
   backup — see "Optional hardening" in `platform-takedown.md`. Do not set these up while nothing
   is live; apply only after an actual takedown/DDoS event or immediately before a high-profile
-  launch/press moment, per the BB-089 design note.
+  launch/press moment, per the  design note.
 
 ## 4. Brand-impersonation early-warning
 
@@ -214,7 +214,7 @@ registration in Section 1 if sequencing allows, since the LLC becomes the WHOIS 
   2. Designate the role security/legal contact (Section 1's role mailbox, not a personal one) as
      the agent contact.
   3. Pay the $6 fee; note the 3-year renewal date somewhere durable (fold into the recurring
-     maintenance this bead already documents as belonging to BB-084 — CT monitors, uptime canary,
+     maintenance this bead already documents as belonging to  — CT monitors, uptime canary,
      link-health, DMARC reports, and now this renewal date).
   4. This registration is a prerequisite for DMCA §512(c) safe-harbor protection for user-generated
      content (correction submissions, future community contributions) — without a registered
@@ -222,16 +222,16 @@ registration in Section 1 if sequencing allows, since the LLC becomes the WHOIS 
      content was actually handled.
   **Verify:** the agent listing is live and searchable in the Copyright Office directory; the
   contact email actually receives mail (send a test message).
-- [ ] **Write a takedown/counter-notice runbook wired to BB-077.** When a copyright claim comes in
-  against something Black Book published (as opposed to Section 4's mirror case), the process is:
+- [ ] **Write a takedown/counter-notice runbook wired to .** When a copyright claim comes in
+  against something BlackStory published (as opposed to Section 4's mirror case), the process is:
   1. Log the claim as a `copyright_claim`-reasoned takedown request — the data model for this
      already exists (`packages/domain/src/rights/takedown.ts`, `TAKEDOWN_REASONS`,
-     `TAKEDOWN_DISTINCT_TAG`), pending the public-facing intake UI (BB-055/BB-076, not built yet).
-  2. Evaluate whether the claim has merit against BB-077's actual posture: every evidence pointer
+     `TAKEDOWN_DISTINCT_TAG`), pending the public-facing intake UI (/, not built yet).
+  2. Evaluate whether the claim has merit against 's actual posture: every evidence pointer
      carries a mandatory Wayback/Internet Archive capture link and a snippet capped to roughly one
      or two sentences (`packages/domain/src/rights/evidence-pointer.ts`) rather than a rehosted
      copy of the source. This link-out-plus-minimal-snippet posture is the fair-use basis for a
-     counter-notice: Black Book is not republishing the work, it is citing and linking to an
+     counter-notice: BlackStory is not republishing the work, it is citing and linking to an
      archival capture of it.
   3. If the claim is meritless, file a formal DMCA counter-notice citing that posture, through
      whichever host received the original takedown notice (Google/Firebase, GitHub, etc.).
@@ -240,11 +240,11 @@ registration in Section 1 if sequencing allows, since the LLC becomes the WHOIS 
      (`retraction.retracted` / `retraction.reversed` audit actions,
      `packages/domain/src/audit/index.ts`) rather than contesting it.
   **Verify:** this section has been read and understood by whoever will handle a real claim; no
-  code action required beyond what BB-077 already built.
+  code action required beyond what  already built.
 
 ## 6. Perimeter hygiene
 
-Free, set-and-forget, or folds into BB-084's scheduler. Most of this section is already built —
+Free, set-and-forget, or folds into 's scheduler. Most of this section is already built —
 this is a checklist of what exists plus the remaining DNS record changes only the domain owner can
 make.
 
@@ -256,15 +256,15 @@ make.
   cannot drift apart. Both are courtesy signals honored only by crawlers that choose to; they are
   not access control (see `docs/security/threat-model.md` T-19 for the real controls: rate limits,
   App Check, cache-busting normalization). Review `AI_TRAINING_USER_AGENTS` periodically as new
-  agents appear — fold that review into BB-084's scheduled maintenance.
+  agents appear — fold that review into 's scheduled maintenance.
   **Verify:** `GET /robots.txt` and `GET /ai.txt` on the deployed site both return the expected
   disallow lists (confirmed locally via `next build && next start` during this bead's
   implementation).
-- [ ] **Map-tile/static-asset scraping caps** (BB-070 tiles are not App-Check-eligible) — **not**
+- [ ] **Map-tile/static-asset scraping caps** ( tiles are not App-Check-eligible) — **not**
   built by this bead; this is a documented forward reference, not a checklist item with a human
   action. The intended mechanism is long-TTL immutable caching plus Referer/Origin checks at the
-  tile-serving layer, tracked against BB-070's own scope. File or locate the BB-070 follow-up bead
-  before BB-063 launch if tile scraping becomes a measured problem.
+  tile-serving layer, tracked against 's own scope. File or locate the  follow-up bead
+  before  launch if tile scraping becomes a measured problem.
 - [ ] **Uptime/defacement canary — already built as code, not yet live.**
   `.github/workflows/canary-uptime.yml` fetches a canary URL, hashes the response, and fails the
   run (GitHub notifies watchers on scheduled-workflow failures by default) on a non-200 status or
@@ -300,7 +300,7 @@ make.
   **Verify:** `dig TXT <domain>` / `dig TXT _dmarc.<domain>` show the published records;
   a DMARC report ("rua") arrives within a few days and shows `pass` for legitimate mail and the
   intended `reject` disposition for anything that fails alignment.
-- [ ] **Pseudonymous reviewer model — already true, verified, not built.** BB-018's audit trail
+- [ ] **Pseudonymous reviewer model — already true, verified, not built.** 's audit trail
   (`packages/domain/src/audit/index.ts`) records reviewer identity as an `AuditActor` with only
   `id`, `type` (`user` / `service` / `system`), and an optional `displayName` — there is no email,
   real-name, or contact field on the audit event or on `PublicationHistoryEntry`. No code currently
@@ -308,7 +308,7 @@ make.
   public-facing page (confirmed by search: no `apps/web` usage of publication history exists yet).
   As long as (a) `AuditActor.id`/`displayName` are populated with a pseudonym or opaque id rather
   than a reviewer's real name when reviewer accounts are created, and (b) any future public history
-  UI (BB-055/BB-076 territory) continues to omit or pseudonymize `actor`, this invariant holds
+  UI (/ territory) continues to omit or pseudonymize `actor`, this invariant holds
   without new code. Flag this as an explicit acceptance check on whichever bead first builds a
   public-facing history/audit view.
 
@@ -323,18 +323,18 @@ make.
 | 5. Legal | LLC formed with EIN and registered agent, anti-SLAPP statute identified, DMCA agent registered and live in the Copyright Office directory |
 | 6. Perimeter hygiene | `robots.txt`/`ai.txt` verified live, canary schedule uncommented against a real URL, DMARC at `p=reject` with clean aggregate reports, pseudonymous-reviewer invariant re-checked against any new public history UI |
 
-All items above must be checked before BB-063 (beta launch) proceeds.
+All items above must be checked before  (beta launch) proceeds.
 
 ## References
 
 - [`incidents/platform-takedown.md`](./incidents/platform-takedown.md)
 - [`production-environment-resplit-migration.md`](./production-environment-resplit-migration.md) — the runbook-format precedent this document follows
-- [`backup-restore.md`](./backup-restore.md) — BB-020 data backstop
+- [`backup-restore.md`](./backup-restore.md) —  data backstop
 - [`incident-response.md`](./incident-response.md) — kill switches and containment order
-- [`../security/threat-model.md`](../security/threat-model.md), [`../security/abuse-cases.md`](../security/abuse-cases.md) — BB-004 technical threat model this bead does not duplicate
+- [`../security/threat-model.md`](../security/threat-model.md), [`../security/abuse-cases.md`](../security/abuse-cases.md) —  technical threat model this bead does not duplicate
 - [`../ui/official-properties.md`](../ui/official-properties.md) — verified-accounts page pattern
 - `apps/web/src/app/robots.ts`, `apps/web/src/app/ai.txt/route.ts`, `apps/web/src/app/.well-known/security.txt/route.ts`
 - `.github/workflows/canary-uptime.yml`
-- `packages/config/src/kill-switches.ts` — BB-033/035
-- `packages/domain/src/rights/evidence-pointer.ts`, `packages/domain/src/rights/takedown.ts` — BB-077
-- `packages/domain/src/audit/index.ts` — BB-018
+- `packages/config/src/kill-switches.ts` — /035
+- `packages/domain/src/rights/evidence-pointer.ts`, `packages/domain/src/rights/takedown.ts` —
+- `packages/domain/src/audit/index.ts` —

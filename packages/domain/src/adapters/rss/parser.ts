@@ -85,6 +85,21 @@ function extractBlocks(xml: string, tag: string): readonly string[] {
   return blocks;
 }
 
+function extractHrefUrls(block: string): readonly string[] {
+  const found: string[] = [];
+  const re = /\bhref\s*=\s*["']([^"']+)["']/gi;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(block)) !== null) {
+    const href = match[1]?.trim();
+    if (href && /^https?:\/\//i.test(href)) {
+      found.push(href);
+    }
+  }
+  return found;
+}
+
+const MAX_LINK_HINTS = 40;
+
 function parseRssItem(block: string): ParsedFeedItem {
   const title = cleanText(extractElementText(block, 'title'));
   const link = cleanText(extractElementText(block, 'link'));
@@ -93,12 +108,16 @@ function parseRssItem(block: string): ParsedFeedItem {
     extractElementText(block, 'description') ?? extractElementText(block, 'summary'),
   );
   const publishedAt = toIsoDate(cleanText(extractElementText(block, 'pubDate')));
+  // Pull hrefs from description + content:encoded before tag stripping so authority citations
+  // survive even when the stored summary is capped (evidence-pointer doctrine).
+  const linkHints = [...new Set(extractHrefUrls(block))].slice(0, MAX_LINK_HINTS);
   return {
     ...(title !== undefined ? { title } : {}),
     ...(link !== undefined ? { link } : {}),
     ...(guid !== undefined ? { guid } : {}),
     ...(summary !== undefined ? { summary } : {}),
     ...(publishedAt !== undefined ? { publishedAt } : {}),
+    ...(linkHints.length > 0 ? { linkHints } : {}),
   };
 }
 
@@ -112,12 +131,14 @@ function parseAtomEntry(block: string): ParsedFeedItem {
   const publishedAt = toIsoDate(
     cleanText(extractElementText(block, 'updated') ?? extractElementText(block, 'published')),
   );
+  const linkHints = [...new Set(extractHrefUrls(block))].slice(0, MAX_LINK_HINTS);
   return {
     ...(title !== undefined ? { title } : {}),
     ...(linkHref !== undefined ? { link: linkHref } : {}),
     ...(id !== undefined ? { guid: id } : {}),
     ...(summary !== undefined ? { summary } : {}),
     ...(publishedAt !== undefined ? { publishedAt } : {}),
+    ...(linkHints.length > 0 ? { linkHints } : {}),
   };
 }
 

@@ -35,14 +35,14 @@ test('every service has conservative bounded maxInstances', () => {
   }
 });
 
-test('web scaling mirrors BB-022 App Hosting production caps', () => {
+test('web scaling mirrors  App Hosting production caps', () => {
   const web = DEFAULT_SERVICE_SCALING_LIMITS.web;
   assert.equal(web.maxInstances, BB022_APP_HOSTING_LIMITS.production.maxInstances);
   assert.equal(web.concurrency, BB022_APP_HOSTING_LIMITS.production.concurrency);
   assert.equal(web.bb022Ref, 'apps/web/apphosting.production.yaml');
 });
 
-test('references BB-025 rate limit policy version without rewriting quotas', () => {
+test('references  rate limit policy version without rewriting quotas', () => {
   assert.equal(typeof BB025_POLICY_REF, 'string');
   assert.match(BB025_POLICY_REF, /^\d+\.\d+\.\d+$/);
 });

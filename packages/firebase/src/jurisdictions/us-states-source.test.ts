@@ -1,11 +1,11 @@
 
 /**
  * Tests proving state jurisdiction docs are sourced solely from the existing
- * `@black-book/domain` `US_STATES` table.
+ * `@repo/domain` `US_STATES` table.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { US_STATES } from '@black-book/domain';
+import { US_STATES } from '@repo/domain';
 import { jurisdictionSchema } from './schema.js';
 import { buildCountryJurisdictionDoc, buildStateJurisdictionDocs, stateInfoByFips } from './us-states-source.js';
 

@@ -5,7 +5,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Notice } from '@black-book/ui';
+import { Notice } from '@repo/ui';
 
 export function OfflineNotice() {
   const [offline, setOffline] = useState(false);
@@ -28,7 +28,7 @@ export function OfflineNotice() {
   }
 
   return (
-    <div className="bb-shell-offline" role="status">
+    <div className="ds-shell-offline" role="status">
       <Notice tone="warning" title="You appear to be offline">
         Browse pages already loaded on this device. Search and entity links may fail until
         connectivity returns.

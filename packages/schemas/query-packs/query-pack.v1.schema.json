@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://blackbook.local/schemas/query-packs/query-pack.v1.schema.json",
   "title": "QueryPack",
-  "description": "Versioned historical query pack with term classes and content-hash identity (BB-038).",
+  "description": "Versioned historical query pack with term classes and content-hash identity.",
   "type": "object",
   "additionalProperties": false,
   "required": [

@@ -1,5 +1,5 @@
 /**
- * Shared flat ESLint configuration for Black Book TypeScript and JavaScript.
+ * Shared flat ESLint configuration for BlackStory TypeScript and JavaScript.
  */
 import eslint from '@eslint/js';
 import nextPlugin from '@next/eslint-plugin-next';
@@ -13,6 +13,7 @@ export default tseslint.config(
       '**/build/**',
       '**/coverage/**',
       '**/dist/**',
+      '**/.deploy/**',
       '**/next-env.d.ts',
       '**/node_modules/**',
       'packages/data-access/generated/**',

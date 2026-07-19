@@ -1,9 +1,9 @@
 /**
- * Shared domain primitives for Black Book entities, geography, provenance,
+ * Shared domain primitives for BlackStory entities, geography, provenance,
  * claims confidence, append-only audit contracts, immutable
  * publication releases, and source adapter registry contracts.
  * Living-status and public precision rules come from
- * @black-book/schemas (constitution). Firestore converters live in @black-book/firebase;
+ * @repo/schemas (constitution). Firestore converters live in @repo/firebase;
  * Cloud SQL PostGIS are deferred (ADR-011).
  */
 export { asEntityId, asRelationshipId, asMergeId, asLocationId } from './ids.js';
@@ -90,13 +90,42 @@ export type {
   EvidenceLineage,
 } from './provenance/index.js';
 
-export { livingStatuses, treatAsLiving, DEFAULT_LIVING_STATUS } from './living.js';
-export type { LivingStatus } from './living.js';
+export { livingStatuses, treatAsLiving, DEFAULT_LIVING_STATUS, deriveLivingStatus } from './living.js';
+export type { LivingStatus, LivingStatusDerivationSignal } from './living.js';
 
 export { ENTITY_KINDS, isEntityKind } from './entity-kinds.js';
 export type { EntityKind } from './entity-kinds.js';
 
-export { currentEntityStatus } from './entity.js';
+// Coarse entity classification (the related workstream) additive to `kind`, not wired into any
+// publish/search/filter pipeline in this pass.
+export {
+  ENTITY_CLASSES,
+  isEntityClass,
+  ENTITY_TYPES_BY_CLASS,
+  isControlledEntityType,
+  deriveEntityClassification,
+} from './entity-class.js';
+export type { EntityClass, EntityClassification } from './entity-class.js';
+
+// Unified temporal naming + external-identifier contracts (the related workstream), plus the
+// namespace/value uniqueness invariant. See ./naming.ts's module doc for scope rationale.
+export {
+  ENTITY_NAME_TYPES,
+  migrateEntityNames,
+  TRUSTED_IDENTIFIER_NAMESPACES,
+  isTrustedIdentifierNamespace,
+  migrateEntityIdentifiers,
+  findIdentifierUniquenessViolations,
+  assertIdentifierUniqueness,
+} from './naming.js';
+export type {
+  EntityNameType,
+  EntityName,
+  EntityIdentifierRecord,
+  IdentifierUniquenessViolation,
+} from './naming.js';
+
+export { currentEntityStatus, deriveEntityLivingStatus } from './entity.js';
 export type { EntityAlias, EntityIdentifier, EntityMergeState, CanonicalEntity } from './entity.js';
 
 export type {
@@ -180,6 +209,12 @@ export {
   CAUSATION_SCOPES,
   evaluateCausalEdgeGuardrail,
   assertCausalEdgeGuardrail,
+  RELATIONSHIP_WORKFLOW_STATUSES,
+  isRelationshipWorkflowStatus,
+  RELATIONSHIP_PUBLICATION_STATUSES,
+  isRelationshipPublicationStatus,
+  RELATIONSHIP_RESOLUTION_STATES,
+  isRelationshipResolutionState,
 } from './relationship.js';
 export type {
   RelationshipType,
@@ -192,10 +227,28 @@ export type {
   CausationScope,
   CausalEdgeReview,
   CausalGuardrailResult,
+  RelationshipWorkflowStatus,
+  RelationshipPublicationStatus,
+  RelationshipResolutionState,
 } from './relationship.js';
 
+// publish invariants for EntityRelationship (BB the related workstream) not yet wired into a publish
+// pipeline (release-builder bead the related workstream owns that wiring).
+export {
+  assertRelationshipEndpointsResolvedForPublish,
+  excludeSelfFromCorroboration,
+  assertRelationshipNotSoleSelfCorroboration,
+  countUniqueSyndicatedEvidenceLineages,
+  assertRelationshipPublishInvariants,
+} from './relationship-publish.js';
+export type {
+  SelfCorroborationCheck,
+  EvidenceLineageLookup,
+  RelationshipPublishInvariantInput,
+} from './relationship-publish.js';
+
 // history graph substrate containment-chain materialization, derived per-entity
-// adjacency per-decade all-time release views, succession-chain non-leakage, and 
+// adjacency per-decade all-time release views, succession-chain non-leakage, and
 // FactRecord subjects mirroring. Mirrors ./graph/index.js's own barrel EXCEPT
 // GRAPH_GOLD_FIXTURES, which stays internal-only (same convention as ./map/fixtures.js below).
 export {
@@ -224,6 +277,11 @@ export {
   buildGraphReleaseArtifact,
   assertGraphReleaseArtifactReproducible,
   publicRelatedEntriesByEntityId,
+  extractCatalogRelationships,
+  relatedEntriesFromRelationships,
+  RELATIONSHIP_CANDIDATE_TYPES,
+  RELATIONSHIP_CANDIDATE_REASONS,
+  proposeRelationshipCandidates,
 } from './graph/index.js';
 export type {
   ContainmentRelationshipType,
@@ -251,8 +309,17 @@ export type {
   SuccessorPublicView,
   GraphReleaseArtifactInput,
   GraphReleaseArtifact,
+  CatalogRelatedEntry,
+  CatalogEntityForRelationships,
+  ExtractCatalogRelationshipsOptions,
+  ExtractCatalogRelationshipsResult,
+  RelationshipCandidateType,
+  RelationshipCandidateReason,
+  RelationshipCandidate,
+  RelationshipCandidateEntity,
+  ExistingRelationshipRef,
+  ProposeRelationshipCandidatesInput,
 } from './graph/index.js';
-
 // sensitivity presentation, present-day advisories, disclaimer registry.
 export {
   ADVISORY_CLASSES,
@@ -405,6 +472,37 @@ export type {
 } from './geography/location.js';
 
 export {
+  LOCATION_EVIDENCE_CLASSES,
+  LOCATION_DRIFT_THRESHOLDS_METERS,
+  LOCATION_AUDIT_ACTIONS,
+  classifyLocationEvidence,
+  driftThresholdMeters,
+  suggestedPrecisionForEvidence,
+  decideLocationCorrection,
+  buildLocationGeocodeQuery,
+  placeTitleCandidateFromLabel,
+  placeTitleCandidatesFromLabel,
+  isJurisdictionOnlyPlaceTitle,
+  extractStreetFingerprint,
+  streetAddressesCompatible,
+} from './geography/location-audit.js';
+export type {
+  LocationEvidenceClass,
+  LocationDriftTier,
+  LocationAuditAction,
+  LocationGeocodeHit,
+  DecideLocationCorrectionInput,
+  LocationCorrectionDecision,
+  ClassifyLocationEvidenceInput,
+} from './geography/location-audit.js';
+
+export { buildEntityLocationFromResolution } from './geography/entity-location-from-geocode.js';
+export type { BuildEntityLocationFromResolutionInput } from './geography/entity-location-from-geocode.js';
+
+export { coordinateFromWikidataEntity } from './geography/wikidata-place-coords.js';
+export type { WikidataPlaceCoordinate } from './geography/wikidata-place-coords.js';
+
+export {
   asClaimId,
   asClaimVersionId,
   asClaimEvidenceLinkId,
@@ -414,9 +512,10 @@ export {
   isClaimPublicationStatus,
   assertProceduralStatusRecognized,
   assertClaimVersionValid,
-  assertAtomicClaimValid,
+  assertCanonicalClaimValid,
+  assertCanonicalClaimMatchesCurrentVersion,
   isClaimPublished,
-  currentClaimVersion,
+  findCurrentClaimVersion,
   claimClassThreshold,
   CLAIM_EVIDENCE_ROLES,
   isClaimEvidenceRole,
@@ -451,7 +550,7 @@ export type {
   ClaimPublicationStatus,
   ClaimGeographicContext,
   ClaimVersion,
-  AtomicClaim,
+  CanonicalClaim,
   PreservedClaimValue,
   ClaimEvidenceRole,
   ClaimEvidenceLink,
@@ -488,7 +587,10 @@ export type {
 } from './audit/index.js';
 
 export * from './adapters/index.js';
+export * from './external-data-sources.js';
+export * from './public-numeric-policy.js';
 export * from './publication/index.js';
+export * from './datapacks/index.js';
 
 // Map data platform. Demo/test fixtures in ./map/fixtures.js are
 // intentionally NOT re-exported here — they are internal to this package
@@ -502,6 +604,8 @@ export {
   findUsStateForPoint,
   findUsStateByPostalCode,
   buildMapSource,
+  aggregateDecadePresence,
+  buildDecadePresenceAggregates,
 } from './map/index.js';
 export type {
   UsStateInfo,
@@ -517,6 +621,9 @@ export type {
   MapSourceMeta,
   MapSourceBuildResult,
   BuildMapSourceInput,
+  StatePresenceEntityInput,
+  DecadePresenceEntityInput,
+  DecadeStateAggregates,
 } from './map/index.js';
 export * from './query-packs/index.js';
 export * from './discovery/index.js';
@@ -527,6 +634,8 @@ export * from './extraction/index.js';
 export * from './confidence-engine/index.js';
 export * from './research-case/index.js';
 export * from './similarity/index.js';
+export * from './editorial/index.js';
+export * from './story-research/index.js';
 export * from './rights/index.js';
 export * from './consensus-review/index.js';
 export * from './citations/index.js';
@@ -535,6 +644,10 @@ export * from './relevance-feedback/index.js';
 // Public search domain layer: deterministic ranking, facets, explanations, and the
 // notability-gate-enforcing search-index builder. Mirrors ./graph/index.js's own barrel.
 export * from './search/index.js';
+
+// Controlled historical-theme taxonomy (the related workstream): the registry, and the migration
+// helper that splits legacy `topicTags` into topicIds/mentionedEntityIds/keywords.
+export * from './taxonomy/index.js';
 
 // Quality-first national seed campaigns: curated fixtures + fail-closed gate validators.
 export * from './seed-campaigns/index.js';
@@ -547,6 +660,7 @@ export * from './geocode/index.js';
 
 // historic safety place-context engine (layered signals; crime stats never score).
 export * from './historic-safety/index.js';
+export * from './verification/index.js';
 
 // Editorial trust vocabulary + ClaimReview path exclusivity.
 export * from './trust/index.js';
@@ -556,3 +670,8 @@ export * from './legal/index.js';
 
 // Learning-index entity contract (summary bars, tags, related hops, optional prose/photo).
 export * from './learning-index/index.js';
+
+// Statistics storage model: StatisticalSeries/StatisticalObservation/DerivedMeasurement + the
+// safe-combination validators (disjoint-geography sums, MOE propagation, growth significance).
+export * from './statistics/index.js';
+export * from './demographics/index.js';

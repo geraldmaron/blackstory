@@ -75,7 +75,7 @@ export function assertSubstantiveConnectionExplained(input: {
   }
   if (!hasRequiredNotabilityBasis(input.notabilityBasis)) {
     throw new Error(
-      'Public "why this appears" explanation requires at least one BB-090 notabilityBasis record ' +
+      'Public "why this appears" explanation requires at least one notabilityBasis record ' +
         'to substantiate the entity\u2019s connection — an explanation alone is not sufficient.',
     );
   }

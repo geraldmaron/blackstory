@@ -6,7 +6,7 @@ import { buildCompactFactView, buildCompactFactViewsForEntity } from './embed.js
 test('buildCompactFactView carries the canonical URL and citation set every embed shares', () => {
   const fact = buildFixtureFact();
   const view = buildCompactFactView(fact);
-  assert.equal(view.canonicalUrl, `/facts/${fact.id}/${fact.slug}`);
+  assert.equal(view.canonicalUrl, `/facts/${fact.slug}`);
   assert.equal(view.citationCount, 1);
   assert.ok(view.primaryCitation);
   assert.equal(view.primaryCitation?.href, fact.citations[0]!.archivedUrl);

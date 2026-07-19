@@ -1,7 +1,29 @@
 
 /**
- * Base document styles, visible focus rings, and reduced-motion safeguards for Black Book UI.
+ * Base document styles, visible focus rings, and reduced-motion safeguards for BlackStory UI.
  */
+
+/*
+ * Theme-invariant ink-surface constants (brand pack v3). tokens.css's
+ * --ds-ink/--ds-canvas/etc. pairs intentionally flip with [data-theme] so
+ * ordinary page chrome matches the reader's light/dark preference. A few
+ * surfaces are brand-fixed regardless of that preference instead — the map
+ * (ADR-013: "a fixed editorial choice, not a light/dark theme variant"), the
+ * persistent map hero, the on-map header, and the footer ("Black Ink
+ * always"). These six custom properties give those surfaces something to
+ * reference that is never re-pointed by [data-theme='dark'], so consuming
+ * CSS never needs an ad-hoc hex literal. Values are copied 1:1 from the
+ * landed v3 palette (tokens.css dark theme / brand-palette.ts) — nothing new
+ * is introduced, only a theme-stable name for values that already exist.
+ */
+:root {
+  --ds-fixed-ink: #0a0a0a;
+  --ds-fixed-charcoal: #161616;
+  --ds-fixed-paper: #f4efe5;
+  --ds-fixed-stone: #bdb5a9;
+  --ds-fixed-rule: #34302c;
+  --ds-fixed-accent: #d07a32;
+}
 
 *,
 *:before,
@@ -17,11 +39,11 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--bb-canvas);
-  color: var(--bb-ink);
-  font-family: var(--bb-font-editorial);
-  font-size: 1.0625rem;
-  line-height: 1.6;
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-editorial);
+  font-size: 1rem;
+  line-height: 1.65;
 }
 
 img,
@@ -35,11 +57,11 @@ svg {
 }
 
 :focus-visible {
-  outline: var(--bb-focus-width) solid var(--bb-focus-ring);
-  outline-offset: var(--bb-focus-offset);
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
 }
 
-.bb-visually-hidden {
+.ds-visually-hidden {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -51,44 +73,44 @@ svg {
   border: 0;
 }
 
-.bb-visually-hidden:focus,
-.bb-visually-hidden:focus-visible {
+.ds-visually-hidden:focus,
+.ds-visually-hidden:focus-visible {
   position: fixed;
-  top: var(--bb-space-2);
-  left: var(--bb-space-2);
+  top: var(--ds-space-2);
+  left: var(--ds-space-2);
   z-index: 1000;
   width: auto;
   height: auto;
   margin: 0;
-  padding: var(--bb-space-2) var(--bb-space-3);
+  padding: var(--ds-space-2) var(--ds-space-3);
   overflow: visible;
   clip: auto;
   white-space: normal;
-  background: var(--bb-inverse);
-  color: var(--bb-inverse-ink);
-  border-radius: var(--bb-radius-sm);
+  background: var(--ds-inverse);
+  color: var(--ds-inverse-ink);
+  border-radius: var(--ds-radius-sm);
   text-decoration: none;
-  font-family: var(--bb-font-sans);
+  font-family: var(--ds-font-sans);
   font-weight: 600;
 }
 
-.bb-mono {
-  font-family: var(--bb-font-mono);
+.ds-mono {
+  font-family: var(--ds-font-mono);
   font-size: 0.8125rem;
   letter-spacing: 0;
 }
 
-.bb-sans {
-  font-family: var(--bb-font-sans);
+.ds-sans {
+  font-family: var(--ds-font-sans);
 }
 
-.bb-container {
-  width: min(100% - (var(--bb-gutter) * 2), var(--bb-grid-max));
+.ds-container {
+  width: min(100% - (var(--ds-gutter) * 2), var(--ds-grid-max));
   margin-inline: auto;
 }
 
-.bb-prose {
-  max-width: var(--bb-content-max);
+.ds-prose {
+  max-width: var(--ds-content-max);
 }
 
 @media (prefers-reduced-motion: reduce) {

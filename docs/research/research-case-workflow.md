@@ -1,6 +1,6 @@
 # Research-case and publication workflow
 
-BB-044 turns discovery candidates into reviewable research cases while preserving an
+ turns discovery candidates into reviewable research cases while preserving an
 append-only decision history. Under ADR-011, canonical case records, assignments, backfill
 jobs, and release references belong in Firestore. Public clients read only active release
 projections; they never write workflow state.
@@ -20,7 +20,7 @@ The workflow uses these stored states:
 9. `merged`
 10. `retracted`
 
-Cases enter relevance review from `candidate`. A passing BB-040 relevance assessment is
+Cases enter relevance review from `candidate`. A passing  relevance assessment is
 required for `relevance_confirmed`. The evidence checklist then determines whether the
 record is minimum, partially enriched, or substantially enriched. Cases can be routed to
 insufficient evidence, excluded with a structured reason, or merged into another case.
@@ -46,8 +46,8 @@ enrichment fields. Completing some produces `partial_enrichment`; completing all
 `substantial_enrichment`. Missing enrichment can be scheduled as backfill without blocking
 a minimum record.
 
-Promotion composes with the BB-032 `research_case` promotion stage. Preview composes with
-the BB-032 deterministic claim diff and reports added, changed, removed, and unchanged
+Promotion composes with the  `research_case` promotion stage. Preview composes with
+the  deterministic claim diff and reports added, changed, removed, and unchanged
 claims before publication.
 
 ## Review operations
@@ -72,9 +72,9 @@ history. Reconsideration requires one or more new evidence identifiers and appen
 
 ## Retraction and release history
 
-Retraction never deletes or rewrites a published release. The BB-044 helper composes with
-BB-019 to build a new release manifest that omits the retracted entity. The old release ID,
-replacement release ID, reason, actor, and timestamp remain on the case. The normal BB-019
+Retraction never deletes or rewrites a published release. The  helper composes with
+ to build a new release manifest that omits the retracted entity. The old release ID,
+replacement release ID, reason, actor, and timestamp remain on the case. The normal
 sign, preview, and activation lifecycle must publish the replacement release before public
 traffic changes.
 
@@ -109,5 +109,5 @@ The domain local barrel is `packages/domain/src/research-case/index.ts`. Package
 integration should export `./research-case/index.js`. Firebase integration should export
 `./firestore/research-case.js` from its Firestore and package barrels.
 
-No Firebase or GCP resource is applied by BB-044. Collection rules, indexes, handlers, and
+No Firebase or GCP resource is applied by . Collection rules, indexes, handlers, and
 deployment remain reviewed human/deployment work when the persistence adapter is connected.

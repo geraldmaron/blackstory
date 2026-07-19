@@ -1,8 +1,8 @@
 /**
  * Public read/search/location API entrypoint (Cloud Run target).
- * Read-only posture enforced via @black-book/config surface capabilities.
+ * Read-only posture enforced via @repo/config surface capabilities.
  */
-import { buildSurfaceHealth, parseNodeEnv } from '@black-book/config';
+import { buildSurfaceHealth, parseNodeEnv } from '@repo/config';
 import { SURFACE_ID } from './posture.js';
 
 export { createPublicApiAppCheckGuard } from './app-check.js';

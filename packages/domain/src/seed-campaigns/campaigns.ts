@@ -10,7 +10,7 @@ export const SEED_CAMPAIGN_METADATA: readonly SeedCampaignMeta[] = [
     displayName: 'Rosenwald schools',
     description:
       'NRHP- or NPS-documented Rosenwald Fund school buildings. Fisk Rosenwald database bulk ' +
-      'import remains deferred (BB-094); only individually verified public listings ship here.',
+      'import remains deferred (); only individually verified public listings ship here.',
     qualityTargetCount: 6,
     preferredNotabilityCriteria: ['landmark_or_national_register', 'only_or_oldest', 'documented_site'],
   },

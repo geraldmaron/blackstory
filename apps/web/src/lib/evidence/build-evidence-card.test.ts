@@ -124,9 +124,10 @@ test('totalSourceLineageCount sums independent lineage counts across cards', () 
 
 test('uniqueCitationSourceCount counts distinct non-empty citation sources case-insensitively', () => {
   const cards = buildEvidenceCards([
-    { ...BASE_CLAIM, id: 'a', citation: { source: 'National Archives', label: 'A' } },
-    { ...BASE_CLAIM, id: 'b', citation: { source: ' national archives ', label: 'B' } },
-    { ...BASE_CLAIM, id: 'c', citation: { source: 'Library of Congress', label: 'C' } },
+    { ...BASE_CLAIM, id: 'a', citation: { ...BASE_CLAIM.citation, source: 'National Archives (seed)' } },
+    { ...BASE_CLAIM, id: 'b', citation: { ...BASE_CLAIM.citation, source: '  national archives (seed)  ' } },
+    { ...BASE_CLAIM, id: 'c', citation: { ...BASE_CLAIM.citation, source: 'D.C. Historical Society (seed)' } },
+    { ...BASE_CLAIM, id: 'd', citation: { ...BASE_CLAIM.citation, source: '' } },
   ]);
   assert.equal(uniqueCitationSourceCount(cards), 2);
 });
@@ -141,21 +142,24 @@ test('resolveRecordSourceLineage prefers the sum of per-claim lineage counts', (
 
 test('resolveRecordSourceLineage falls back to distinct citation sources when lineage is absent', () => {
   const cards = buildEvidenceCards([
-    { ...BASE_CLAIM, id: 'a', citation: { source: 'Source A', label: 'A' } },
-    { ...BASE_CLAIM, id: 'b', citation: { source: 'Source B', label: 'B' } },
+    { ...BASE_CLAIM, id: 'a', citation: { ...BASE_CLAIM.citation, source: 'National Archives (seed)' } },
+    { ...BASE_CLAIM, id: 'b', citation: { ...BASE_CLAIM.citation, source: 'D.C. Historical Society (seed)' } },
   ]);
   assert.deepEqual(resolveRecordSourceLineage(cards), { independentLineageCount: 2 });
 });
 
 test('resolveRecordSourceLineage returns undefined when there is no lineage or citation source signal', () => {
   const cards = buildEvidenceCards([
-    { ...BASE_CLAIM, id: 'a', citation: { source: '   ', label: 'Empty' } },
+    { ...BASE_CLAIM, id: 'a', citation: { ...BASE_CLAIM.citation, source: '' } },
+    { ...BASE_CLAIM, id: 'b', citation: { ...BASE_CLAIM.citation, source: '   ' } },
   ]);
   assert.equal(resolveRecordSourceLineage(cards), undefined);
 });
 
 test('resolveRecordSourceLineage preserves an explicit zero count from the caller', () => {
-  const cards = buildEvidenceCards([BASE_CLAIM]);
+  const cards = buildEvidenceCards([
+    { ...BASE_CLAIM, id: 'a', citation: { ...BASE_CLAIM.citation, source: 'National Archives (seed)' } },
+  ]);
   assert.deepEqual(resolveRecordSourceLineage(cards, { independentLineageCount: 0 }), {
     independentLineageCount: 0,
   });

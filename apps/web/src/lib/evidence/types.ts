@@ -14,8 +14,8 @@
  * `PublicationPermission`, `ProhibitedUse`, `ContradictionSet`-compatible alternate-value kinds)
  * rather than re-declaring a parallel vocabulary.
  */
-import type { ConfidenceLevel } from '@black-book/ui';
-import type { ExcerptKind, ProhibitedUse, PublicationPermission, RightsStatus } from '@black-book/domain';
+import type { ConfidenceLevel } from '@repo/ui';
+import type { ExcerptKind, ProhibitedUse, PublicationPermission, RightsStatus } from '@repo/domain';
 
 export const EVIDENCE_RESEARCH_COVERAGE_LEVELS = [
   'none',

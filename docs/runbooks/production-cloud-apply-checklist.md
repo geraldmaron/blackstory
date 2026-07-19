@@ -1,11 +1,11 @@
-# Runbook: Production cloud apply checklist (BB-079)
+# Runbook: Production cloud apply checklist
 
 **Scope:** The single consolidated list of every "human cloud step remaining" note scattered
 across the close comments and READMEs of roughly a dozen closed beads
-(BB-005/009/010/011/020/021/023/024/025/027/034/035, plus BB-061's drill), reorganized against the
+(/009/010/011/020/021/023/024/025/027/034/035, plus 's drill), reorganized against the
 [ADR-012](../adr/ADR-012-production-environment-resplit.md) three-project topology
 (`blackbook-prod` = retained `black-book-efaaf`, `blackbook-staging`, `blackbook-internal`) that
-BB-078 designed but did not apply.
+ designed but did not apply.
 
 **Not executed by this document or by the session that wrote it.** No `gcloud`, `firebase
 deploy`, `firebase appcheck:*`, `terraform apply`, `gh repo create`, `gh api --method PUT/POST`,
@@ -14,7 +14,7 @@ command in this checklist is written for a human operator (or a future session e
 authorized to touch live infrastructure) to run themselves, in order, with the review gates each
 source bead already specified.
 
-**Acceptance model (per BB-079):** binary per roster line — applied + verified + evidenced, or
+**Acceptance model (per ):** binary per roster line — applied + verified + evidenced, or
 explicitly deferred with reason. Every line item below is currently:
 
 > **Status: DEFERRED — requires live cloud/account action outside this session's authority.**
@@ -46,7 +46,7 @@ and copy that line into `bd show black-book-bb079`'s notes/comments (the parent 
 
 ## 1. GitHub remote, rulesets, CODEOWNERS, allowed-actions
 
-**Traces to:** BB-009 (close note: *"Local artifacts + Governance CI; remote rulesets **not**
+**Traces to:**  (close note: *"Local artifacts + Governance CI; remote rulesets **not**
 applied (no remote; `gh` auth invalid)"*).
 
 **Why:** All governance (`main-protection` ruleset, Actions allowlist, secret scanning /
@@ -101,8 +101,8 @@ depending on plan/visibility — script warns rather than fails).
 **Cross-reference (do not duplicate here):** root-account hardening for this same GitHub
 org/account — hardware security keys/passkeys, removing SMS 2FA, org-wide 2FA-required, offline
 recovery codes, separating the billing-owner identity from the day-to-day deploy identity — is
-BB-089's scope ("Root-account hardening... added to the BB-079 human-apply checklist" per
-BB-089's own Deliver text). Apply it in the same sitting as step 1 above, once BB-089's operator
+'s scope ("Root-account hardening... added to the  human-apply checklist" per
+'s own Deliver text). Apply it in the same sitting as step 1 above, once 's operator
 runbook lands; that runbook is authoritative for the exact steps, not this document.
 
 **Status: DEFERRED — requires live cloud/account action outside this session's authority.**
@@ -111,8 +111,8 @@ runbook lands; that runbook is authoritative for the exact steps, not this docum
 
 ## 2. WIF / OIDC (GitHub Actions deploy identities)
 
-**Traces to:** BB-010 (close note: *"Declarative WIF + OIDC workflow stub; cloud not applied (no
-remote; IDs TBD)"*), extended by BB-078/ADR-012 for per-project deploy service accounts.
+**Traces to:**  (close note: *"Declarative WIF + OIDC workflow stub; cloud not applied (no
+remote; IDs TBD)"*), extended by /ADR-012 for per-project deploy service accounts.
 
 **Why:** The WIF pool/provider and the `github-deploy` (blackbook-prod), `github-deploy-staging`
 (blackbook-staging, optional), and `github-deploy-internal` (blackbook-internal, optional) service
@@ -176,13 +176,13 @@ one ever appears). A test deploy workflow run from a fork or non-`main` ref must
 
 ## 3. Firebase projects, Firestore, rules/indexes
 
-**Traces to:** BB-011 (close note: *"Apps registered; App Hosting/Blaze + Firestore DB + GCP
-buckets/IAM still blocked/deferred"*), BB-013 (rules/indexes), BB-078/ADR-012 (three-project
+**Traces to:**  (close note: *"Apps registered; App Hosting/Blaze + Firestore DB + GCP
+buckets/IAM still blocked/deferred"*),  (rules/indexes), /ADR-012 (three-project
 topology + named databases).
 
 **Why:** `black-book-efaaf` has registered web/admin apps but no Blaze billing, no Firestore
 database, and no deployed rules/indexes (`infra/firebase/auth-and-app-check.md`'s "Blockers
-observed during BB-011" table). BB-078 additionally requires two **new** projects
+observed during " table).  additionally requires two **new** projects
 (`blackbook-staging`, `blackbook-internal`) with `blackbook-internal` hosting named Firestore
 databases `raw-ingest`/`curated`.
 
@@ -192,11 +192,11 @@ steps 1–3 — do not duplicate that sequence here.** That runbook uses
 `infra/gcp/terraform/multi-project/` gated by `create_new_projects`,
 `provision_internal_databases`.
 
-**Everything BB-078's runbook does *not* cover (Blaze, default-DB creation, rules/indexes deploy)
+**Everything 's runbook does *not* cover (Blaze, default-DB creation, rules/indexes deploy)
 — commands:**
 
 ```bash
-# 1. Blaze upgrade (link billing) — not in the BB-078 runbook; needed before App Hosting APIs,
+# 1. Blaze upgrade (link billing) — not in the  runbook; needed before App Hosting APIs,
 #    reCAPTCHA Enterprise (section 5), or any paid API can enable
 gcloud billing projects link black-book-efaaf   --billing-account=<ACCOUNT_ID>
 gcloud billing projects link blackbook-staging  --billing-account=<ACCOUNT_ID>
@@ -216,7 +216,7 @@ firebase deploy --only firestore:rules,firestore:indexes --project=blackbook-sta
 #    infra/firebase/.firebaserc.example already shows the target shape (default/production/staging/internal)
 
 # 5. Re-register apps/admin's Firebase app under blackbook-internal per runbook step 15
-firebase apps:create WEB "Black Book Admin" --project=blackbook-internal
+firebase apps:create WEB "BlackStory Admin" --project=blackbook-internal
 ```
 
 Source config: `infra/firebase/firebase.json`, `infra/firebase/firestore.rules`,
@@ -241,11 +241,11 @@ node --test infra/gcp/terraform/multi-project/tests/isolation-invariants.test.mj
 
 ## 4. Buckets and service accounts (11 named SAs, 4 buckets, PAP/UBLA, per-secret IAM)
 
-**Traces to:** BB-005 (`infra/gcp/service-accounts.matrix.md`, `infra/gcp/storage-buckets.matrix.md`,
-`infra/gcp/terraform/`), split across projects by BB-078/ADR-012.
+**Traces to:**  (`infra/gcp/service-accounts.matrix.md`, `infra/gcp/storage-buckets.matrix.md`,
+`infra/gcp/terraform/`), split across projects by /ADR-012.
 
-**Why:** BB-005 designed 11 least-privilege service accounts and 4 UBLA/PAP buckets in a single
-project; none is provisioned. BB-078 then redesigned the *topology* (not the roles) so that
+**Why:**  designed 11 least-privilege service accounts and 4 UBLA/PAP buckets in a single
+project; none is provisioned.  then redesigned the *topology* (not the roles) so that
 `research`, `publication`, `security`, and `admin`(→`admin-app`) move to `blackbook-internal`,
 joined there by two new cross-project identities (`promotion`, `submissions-puller`), while
 `web-runtime`, `api-public`, `api-submissions`, `api-internal`, `migrations`, `backup` stay in
@@ -308,7 +308,7 @@ gcloud projects get-iam-policy blackbook-internal --format=json | grep -i 'black
 
 ## 5. App Check (reCAPTCHA Enterprise, monitor then enforce)
 
-**Traces to:** BB-024 (close note: *"Human gaps remain: create/register the reCAPTCHA Enterprise
+**Traces to:**  (close note: *"Human gaps remain: create/register the reCAPTCHA Enterprise
 provider and enable Firebase-console enforcement only after monitor metrics are healthy"*).
 
 **Why:** Server-side App Check verification (`APP_CHECK_MODE=monitor|enforce`), replay rejection,
@@ -327,7 +327,7 @@ gcloud recaptcha-enterprise keys create \
   --domains=black-book-efaaf.web.app,black-book-efaaf.firebaseapp.com,<production-domain> \
   --integration-type=SCORE
 
-# 2. Register the key with Firebase App Check for "Black Book Web"
+# 2. Register the key with Firebase App Check for "BlackStory Web"
 #    (Firebase console: Project Settings -> App Check -> apps/web -> Register -> reCAPTCHA
 #    Enterprise; no firebase-tools CLI subcommand for this step as of writing — console-only,
 #    matching infra/firebase/auth-and-app-check.md's documented sequence)
@@ -361,9 +361,9 @@ mode; monitor-mode telemetry shows no raw token or verifier error in logs (redac
 
 ## 6. Cloud Armor and protected public API ingress
 
-**Traces to:** BB-023 (close note ordered human-apply list, quoted below).
+**Traces to:**  (close note ordered human-apply list, quoted below).
 
-**Why:** BB-023 delivered the full design (policies, ALB/NEG/CDN docs, geo controls, emergency
+**Why:**  delivered the full design (policies, ALB/NEG/CDN docs, geo controls, emergency
 deny runbook, load-test plan, metrics checklist) with 6/6 tests passing, but explicitly "no live
 apply." The close comment's own ordered list is the source for this section.
 
@@ -409,7 +409,7 @@ Expected per `infra/gcp/armor/README.md`'s acceptance table: AC-ARMOR-1 (LB-only
 AC-ARMOR-2 (direct `run.app` fails), AC-ARMOR-3 (429 on sustained flood + metrics), AC-ARMOR-4
 (priority-10 emergency deny flips without redeploy — see `emergency-deny-runbook.md`).
 
-**Note:** `infra/gcp/surfaces/surface-matrix.json` still shows `ingress=all` from BB-021; BB-023's
+**Note:** `infra/gcp/surfaces/surface-matrix.json` still shows `ingress=all` from ; 's
 close comment flags that this section supersedes it at apply time — update that matrix's status
 alongside step 6 (out of this checklist's file ownership; note for whoever executes this).
 
@@ -419,8 +419,8 @@ alongside step 6 (out of this checklist's file ownership; note for whoever execu
 
 ## 7. Rate-limit backing store (Memorystore/Redis)
 
-**Traces to:** BB-025 (close note: *"Remaining live work: Cloud Run middleware wiring, shared
-Redis/Memorystore RateLimitStore, BB-034 telemetry export, BB-059 load tests, production matrix
+**Traces to:**  (close note: *"Remaining live work: Cloud Run middleware wiring, shared
+Redis/Memorystore RateLimitStore,  telemetry export,  load tests, production matrix
 tuning"*).
 
 **Why:** The policy matrix, token-bucket evaluator, and per-endpoint guards
@@ -434,7 +434,7 @@ doc anywhere in `infra/` for the Memorystore instance itself — `grep -ril "mem
 across `infra/`, `docs/`, and `packages/security` returns only the one sentence in
 `docs/security/rate-limits.md`. The commands below are inferred from standard Memorystore
 provisioning, not sourced from a repo artifact — verify sizing/tier/network choices with whoever
-owns the BB-025/BB-033 cost model before running.
+owns the / cost model before running.
 
 **Commands (inferred, not sourced from a repo stub):**
 
@@ -461,9 +461,9 @@ gcloud compute networks vpc-access connectors create black-book-connector \
 ```bash
 gcloud redis instances describe black-book-ratelimits --project=black-book-efaaf --region=us-central1 \
   --format='value(state,host,port)'   # expect state=READY
-pnpm --filter @black-book/security test   # policy math unaffected by store swap
+pnpm --filter @repo/security test   # policy math unaffected by store swap
 # Load test: confirm rate-limit denials are now consistent across concurrent Cloud Run instances
-# (see infra/gcp/armor/load-test-plan.md for the adjacent BB-059 load-test harness)
+# (see infra/gcp/armor/load-test-plan.md for the adjacent  load-test harness)
 ```
 
 **Status: DEFERRED — requires live cloud/account action outside this session's authority.**
@@ -472,10 +472,10 @@ pnpm --filter @black-book/security test   # policy math unaffected by store swap
 
 ## 8. Backups (Firestore PITR + scheduled exports + retention) and quarterly restore drill
 
-**Traces to:** BB-020 (close note: *"Human cloud steps remaining: enable Firestore+PITR,
+**Traces to:**  (close note: *"Human cloud steps remaining: enable Firestore+PITR,
 provision firestore-backups bucket (terraform stub), bind backup@ IAM, deploy Scheduler jobs, live
-quarterly drill"*), BB-061 (close note: *"Repo acceptance met... Live PITR/bucket/scheduler and
-quarterly drill remain human cloud follow-up, same pattern as BB-021"*).
+quarterly drill"*),  (close note: *"Repo acceptance met... Live PITR/bucket/scheduler and
+quarterly drill remain human cloud follow-up, same pattern as "*).
 
 **Why:** Export schedule design, retention matrix, RPO/RTO targets, deny-delete IAM design, and
 dry-run verification scripts (9/9 passing) all exist. Nothing has been enabled in Firestore or GCP.
@@ -511,7 +511,7 @@ drill procedure — reference, don't duplicate), `docs/runbooks/recovery-rollbac
 **GAP (flag):** `infra/gcp/terraform/multi-project/firestore.tf` hardcodes
 `point_in_time_recovery_enablement = "POINT_IN_TIME_RECOVERY_DISABLED"` on the named
 `raw-ingest`/`curated` databases in `blackbook-internal`, with no gate variable to turn it on.
-If PITR is wanted for those two databases (BB-020's RPO/RTO targets don't explicitly exclude
+If PITR is wanted for those two databases ('s RPO/RTO targets don't explicitly exclude
 them), that Terraform file needs a follow-up edit — outside this document's file ownership.
 
 **Verify:**
@@ -525,7 +525,7 @@ node scripts/backup-restore/verify-iam-matrix.mjs   # confirms deny-delete IAM m
 # Manual: attempt gcloud storage rm with web-runtime@ credentials against the backup bucket -> expect 403
 ```
 
-Then run the recovery rehearsal itself (BB-061):
+Then run the recovery rehearsal itself:
 
 ```bash
 node scripts/recovery-rehearsal/run-rehearsal.mjs --dry-run       # timing baseline before the live drill
@@ -542,10 +542,10 @@ Schedule the **live** quarterly drill as a standing calendar item using
 
 ## 9. Admin: Cloud Run + IAP, admin Google group, MFA policy verification
 
-**Traces to:** BB-027 (close note: *"Human steps: provision LB/IAP and restricted accessor group,
+**Traces to:**  (close note: *"Human steps: provision LB/IAP and restricted accessor group,
 configure exact IAP JWT audience, enable Firebase MFA and enroll admins, bootstrap first admin
 claim via audited Admin SDK path, configure alert sink. No live GCP apply."*), corrected by
-BB-078/ADR-012 (direct-attach Cloud Run IAP, not the external-LB pattern BB-027 originally
+/ADR-012 (direct-attach Cloud Run IAP, not the external-LB pattern  originally
 assumed).
 
 **Why:** Layered IAP-JWT + Firebase-MFA server authorization is fully implemented and tested
@@ -553,10 +553,10 @@ assumed).
 exist behind IAP yet, no administrator access group is provisioned, and Firebase MFA hasn't been
 enabled or enrolled.
 
-**Use the BB-078 migration runbook's steps 11–12 as authoritative** (direct-attach IAP on Cloud
+**Use the  migration runbook's steps 11–12 as authoritative** (direct-attach IAP on Cloud
 Run, no load balancer) — do not follow `infra/gcp/iap/README.md`'s "Human provisioning steps"
 literally; that document still describes the superseded external-HTTPS-LB + serverless-NEG
-pattern and was explicitly flagged by BB-078 as needing a rewrite before this step is executed for
+pattern and was explicitly flagged by  as needing a rewrite before this step is executed for
 real (see "Gaps found during consolidation" below).
 
 **Commands:**
@@ -614,7 +614,7 @@ curl -I https://black-book-admin-<hash>.run.app/   # expect IAP redirect/401, ne
 
 ## 10. Telemetry: alert policies, dashboards, verify security events flow
 
-**Traces to:** BB-034 (close note: *"Design-only GCP stubs; no live apply"*).
+**Traces to:**  (close note: *"Design-only GCP stubs; no live apply"*).
 
 **Why:** The alert-policy catalog, dashboard panel definitions, and their JSON Schemas are
 complete and locally tested, but nothing has been imported into Cloud Monitoring, so no security
@@ -660,9 +660,9 @@ node infra/gcp/observability/security-alerts/security-alerts.test.mjs   # local 
 gcloud monitoring policies list --project=black-book-efaaf --filter='displayName:SEC-'
 ```
 
-Run synthetic metric injection from `@black-book/observability`'s test suite in staging to confirm
+Run synthetic metric injection from `@repo/observability`'s test suite in staging to confirm
 an actual alert fires and reaches the configured channel; spot-check that no App Check token
-appears in any log-based metric (redaction check, per the BB-034 sign-off list).
+appears in any log-based metric (redaction check, per the  sign-off list).
 
 **Status: DEFERRED — requires live cloud/account action outside this session's authority.**
 
@@ -690,7 +690,7 @@ no live cloud apply). Gaps **5–7** remain open before those sections are appli
    multi-project switches. Enable in tfvars after cost/RPO review.
 
 5. **`infra/gcp/iap/README.md` describes a superseded IAP pattern (affects section 9).** Already
-   flagged by BB-078 itself as a "Known follow-up, not fixed by this runbook" — the document still
+   flagged by  itself as a "Known follow-up, not fixed by this runbook" — the document still
    assumes an external-HTTPS-load-balancer + serverless-NEG IAP integration. ADR-012 uses IAP
    attached directly to the Cloud Run service (no load balancer). Section 9 above routes around
    this by following the migration runbook's steps 11–12 instead, but the IAP directory itself
@@ -703,7 +703,7 @@ no live cloud apply). Gaps **5–7** remain open before those sections are appli
    Section 7's commands are inferred, not sourced, and should be treated as a starting point for
    review rather than a vetted plan.
 
-7. **`workers/submissions-puller` is granted but unimplemented.** BB-078's own close notes already
+7. **`workers/submissions-puller` is granted but unimplemented.** 's own close notes already
    flagged this (not a new finding here, repeated for completeness): the cross-project IAM grant
    for `submissions-puller` (section 4) exists, but the Firestore-pull logic it's meant to run has
    no implementation anywhere in `workers/`. Applying the IAM grant in section 4 is safe (it's a
@@ -715,7 +715,7 @@ no live cloud apply). Gaps **5–7** remain open before those sections are appli
 
 Each section above ends with a `Status:` line reading `DEFERRED — requires live cloud/account
 action outside this session's authority.` That is the correct, expected state of every roster item
-at the close of this bead — BB-079's acceptance criterion is binary per line item ("applied +
+at the close of this bead — 's acceptance criterion is binary per line item ("applied +
 verified + evidenced, OR explicitly deferred with reason"), and every line item here is the latter.
 When `bd update black-book-bb079` records this, each of the ten status lines above can be copied
 verbatim as that item's evidence-trail entry; the reason is identical for all ten
@@ -724,7 +724,7 @@ safety boundary.
 
 ## References
 
-- [`production-environment-resplit-migration.md`](./production-environment-resplit-migration.md) — BB-078's 19-step topology migration (sections 3, 4, 9 reference its steps rather than duplicating them)
+- [`production-environment-resplit-migration.md`](./production-environment-resplit-migration.md) — 's 19-step topology migration (sections 3, 4, 9 reference its steps rather than duplicating them)
 - [ADR-012](../adr/ADR-012-production-environment-resplit.md) — the topology every section here targets
 - [`docs/security/environment-isolation.md`](../security/environment-isolation.md) — "Verified live vs. designed" table, current as of this checklist
 - [`infra/gcp/isolation-matrix.json`](../../infra/gcp/isolation-matrix.json) — machine source of truth for the cross-project grant list referenced in gap #2

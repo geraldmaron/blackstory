@@ -18,6 +18,6 @@ export type GeneratedAdminSdkModule = {
 
 export function loadGeneratedAdminSdk(connectorId: string): never {
   throw new Error(
-    `Import generated Admin SDK from @black-book/data-access/generated/${connectorId} (or relative generated path). Requested connector=${connectorId}. Cloud link: ${SQL_CONNECT_SDK_STATUS.cloudLinked}. Compile: ${SQL_CONNECT_SDK_STATUS.compileCommand}`,
+    `Import generated Admin SDK from @repo/data-access/generated/${connectorId} (or relative generated path). Requested connector=${connectorId}. Cloud link: ${SQL_CONNECT_SDK_STATUS.cloudLinked}. Compile: ${SQL_CONNECT_SDK_STATUS.compileCommand}`,
   );
 }

@@ -40,7 +40,7 @@ test('buildFactSearchIndexDocs partitions good and bad facts without aborting th
   assert.equal(skipped[0]!.id, bad.id);
 });
 
-test('the produced doc is structurally compatible with the real BB-049 ranking pipeline', () => {
+test('the produced doc is structurally compatible with the real  ranking pipeline', () => {
   const { docs } = buildFactSearchIndexDocs('release-1', [buildFixtureFact()]);
   const ranked = rankRecords('rosa parks', docs);
   assert.equal(ranked.length, 1);

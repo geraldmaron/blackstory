@@ -1,6 +1,6 @@
 # Confidence and source lineage
 
-BB-043 extends the BB-017 claim-confidence formula with an auditable orchestration layer. It does not replace the claim helper or alter its weights.
+ extends the  claim-confidence formula with an auditable orchestration layer. It does not replace the claim helper or alter its weights.
 
 ## Deterministic score
 
@@ -33,4 +33,4 @@ Persist the complete result beside the claim version. A source reclassification,
 
 `packages/schemas/confidence-engine/confidence-calibration-dataset.v1.schema.json`
 
-The dataset is private calibration material for BB-047 and is not a public projection.
+The dataset is private calibration material for  and is not a public projection.

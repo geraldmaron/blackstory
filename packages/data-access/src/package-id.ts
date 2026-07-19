@@ -1,4 +1,4 @@
 /**
- * Package identity constant for @black-book/data-access.
+ * Package identity constant for @repo/data-access.
  */
-export const DATA_ACCESS_PACKAGE = '@black-book/data-access' as const;
+export const DATA_ACCESS_PACKAGE = '@repo/data-access' as const;

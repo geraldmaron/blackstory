@@ -17,7 +17,7 @@
  * ./provenance/hashes.js) applied to the relevance-assessment inputs a decision was made from.
  * See decision-log.ts's `computeRelevanceInputFingerprint`.
  */
-import type { RelevanceDecision } from '@black-book/schemas';
+import type { RelevanceDecision } from '@repo/schemas';
 import type { RelevanceAssessment, RelevanceDimension } from '../relevance/index.js';
 import type {
   ResearchCaseReasonCode,

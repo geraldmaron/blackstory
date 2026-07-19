@@ -1,7 +1,9 @@
 /**
  * Design-system fixture gallery (Storybook equivalent) for component and token states.
+ * Stays current with docs/ui/design-direction-v5.md — new shell patterns land here too.
  */
 
+import Link from 'next/link';
 import {
   Button,
   Card,
@@ -14,55 +16,114 @@ import {
   ResultList,
   ThemeToggle,
   Timeline,
-} from '@black-book/ui';
+} from '@repo/ui';
 import { DialogFixture } from './DialogFixture';
 
 export const metadata = {
-  title: 'Design system — Black Book',
-  description: 'BB-007 component and token fixtures for visual and keyboard review',
+  title: 'Design system — BlackStory',
+  description: 'Component and token fixtures for visual and keyboard review (design-direction-v5)',
 };
 
 export default function DesignSystemPage() {
   return (
-    <main className="bb-container" id="main">
-      <header className="bb-gallery-section" style={{ paddingTop: 'var(--bb-space-10)' }}>
-        <p
-          className="bb-sans"
-          style={{
-            margin: 0,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            fontSize: '0.75rem',
-            color: 'var(--bb-ink-subtle)',
-          }}
-        >
-          Black Book · BB-007
-        </p>
-        <h1 style={{ margin: '0.5rem 0 0', fontSize: 'clamp(2rem, 1.6rem + 2vw, 2.75rem)' }}>
-          Design system
-        </h1>
+    <main className="ds-container" id="main">
+      <header className="ds-gallery-section" style={{ paddingTop: 'var(--ds-space-10)' }}>
+        <p className="ds-page__eyebrow">Design direction v5</p>
+        <h1 className="ds-page__title">Design system</h1>
         <p>
-          Editorial black-and-white foundation with reserved status color, visible focus, and
-          reduced-motion support. This route is the component fixture gallery (Storybook
-          equivalent).
+          Archive Paper / Black Ink foundation, copper as the orientation signal, hairline
+          separation, visible focus, reduced-motion support. This route is the component fixture
+          gallery (Storybook equivalent).
         </p>
-        <div className="bb-row">
+        <div className="ds-row">
           <ThemeToggle />
-          <a className="bb-sans" href="/">
+          <Link className="ds-sans" href="/">
             Back to home
-          </a>
+          </Link>
         </div>
       </header>
 
-      <section className="bb-gallery-section" aria-labelledby="tokens-heading">
+      <section className="ds-gallery-section" aria-labelledby="actions-heading">
+        <h2 id="actions-heading">Actions</h2>
+        <p>
+          One vocabulary, three weights (v5 §5): copper is THE primary action of a view — max one
+          per composition; solid inverts with theme; quiet is a hairline.
+        </p>
+        <div className="ds-row">
+          <Link className="ds-cta ds-cta--copper" href="#actions-heading">
+            Primary action
+          </Link>
+          <Link className="ds-cta ds-cta--solid" href="#actions-heading">
+            Solid action
+          </Link>
+          <Link className="ds-cta ds-cta--quiet" href="#actions-heading">
+            Quiet action
+          </Link>
+          <Link className="ds-cta-link" href="#actions-heading">
+            Text link
+          </Link>
+        </div>
+        <div className="ds-row">
+          <Button type="button" variant="primary">
+            Form primary
+          </Button>
+          <Button type="button" variant="secondary">
+            Form secondary
+          </Button>
+        </div>
+      </section>
+
+      <section className="ds-gallery-section" aria-labelledby="shell-patterns-heading">
+        <h2 id="shell-patterns-heading">Story link, chips & data strip</h2>
+        <p>
+          Lists and rails use top-rule entries, never boxes; chips are the compact pick-one
+          affordance; the data strip is the mono numbers register.
+        </p>
+        <ul className="ds-story-rail">
+          <li>
+            <Link className="ds-story-link" href="#shell-patterns-heading">
+              <span className="ds-story-link__meta">School / Washington, D.C.</span>
+              <h3 className="ds-story-link__title">Story link entry</h3>
+              <p className="ds-story-link__summary">
+                Mono slug, Sora title, serif one-line story — the shared anatomy for rails,
+                related lists, and browse paths.
+              </p>
+            </Link>
+          </li>
+        </ul>
+        <div className="ds-row">
+          <Link className="ds-state-chip" href="#shell-patterns-heading">
+            Georgia<span className="ds-state-chip__count">17</span>
+          </Link>
+          <Link className="ds-state-chip" href="#shell-patterns-heading">
+            Alabama<span className="ds-state-chip__count">12</span>
+          </Link>
+        </div>
+        <ul className="ds-data-strip">
+          <li className="ds-data-strip__item">
+            <span className="ds-data-strip__value">104</span>
+            <span className="ds-data-strip__label">Records pinned</span>
+          </li>
+          <li className="ds-data-strip__item">
+            <span className="ds-data-strip__value">24</span>
+            <span className="ds-data-strip__label">States on the map</span>
+          </li>
+          <li className="ds-data-strip__item">
+            <span className="ds-data-strip__value">1820s–1970s</span>
+            <span className="ds-data-strip__label">Eras spanned</span>
+          </li>
+        </ul>
+      </section>
+
+      <section className="ds-gallery-section" aria-labelledby="tokens-heading">
         <h2 id="tokens-heading">Tokens</h2>
-        <p>Primary palette is black, white, and neutral gray. Status hues are reserved.</p>
-        <div className="bb-row" aria-label="Confidence levels">
+        <p>Black and paper lead; copper points; sand fills. Status hues are reserved.</p>
+        <div className="ds-row" aria-label="Confidence levels">
           <Confidence level="high" />
           <Confidence level="medium" />
           <Confidence level="low" />
         </div>
-        <div className="bb-stack">
+        <div className="ds-stack">
           <Notice tone="warning" title="Source capture incomplete">
             Additional archival pages are still under review.
           </Notice>
@@ -75,17 +136,17 @@ export default function DesignSystemPage() {
         </div>
       </section>
 
-      <section className="bb-gallery-section" aria-labelledby="card-heading">
+      <section className="ds-gallery-section" aria-labelledby="card-heading">
         <h2 id="card-heading">Cards & citations</h2>
         <p>
           Cards group related research content; citations expose provenance without color-only cues.
         </p>
         <Card
           title="Rosenwald School site"
-          meta={<span className="bb-mono">entity:place</span>}
+          meta={<span className="ds-mono">entity:place</span>}
           interactive
         >
-          <p className="bb-sans" style={{ marginTop: 0 }}>
+          <p className="ds-sans" style={{ marginTop: 0 }}>
             Documented community school associated with early twentieth-century Black education
             networks.
           </p>
@@ -97,7 +158,7 @@ export default function DesignSystemPage() {
         </Card>
       </section>
 
-      <section className="bb-gallery-section" aria-labelledby="results-heading">
+      <section className="ds-gallery-section" aria-labelledby="results-heading">
         <h2 id="results-heading">Filters & results</h2>
         <p>Native labelled controls and a keyboard-reachable result list.</p>
         <FilterBar
@@ -135,7 +196,7 @@ export default function DesignSystemPage() {
               meta: (
                 <>
                   <Confidence level="high" />
-                  <span className="bb-mono">1964</span>
+                  <span className="ds-mono">1964</span>
                 </>
               ),
             },
@@ -150,7 +211,7 @@ export default function DesignSystemPage() {
         />
       </section>
 
-      <section className="bb-gallery-section" aria-labelledby="timeline-heading">
+      <section className="ds-gallery-section" aria-labelledby="timeline-heading">
         <h2 id="timeline-heading">Timeline</h2>
         <p>Chronological narrative with monospace dates.</p>
         <Timeline
@@ -178,7 +239,7 @@ export default function DesignSystemPage() {
         />
       </section>
 
-      <section className="bb-gallery-section" aria-labelledby="map-heading">
+      <section className="ds-gallery-section" aria-labelledby="map-heading">
         <h2 id="map-heading">Map frame</h2>
         <p>Geographic context with an accessible name that includes pin labels.</p>
         <MapFrame
@@ -188,13 +249,13 @@ export default function DesignSystemPage() {
         />
       </section>
 
-      <section className="bb-gallery-section" aria-labelledby="dialog-heading">
+      <section className="ds-gallery-section" aria-labelledby="dialog-heading">
         <h2 id="dialog-heading">Dialog</h2>
         <p>Focus moves into the modal; Escape and the close control dismiss it.</p>
         <DialogFixture />
       </section>
 
-      <section className="bb-gallery-section" aria-labelledby="empty-heading">
+      <section className="ds-gallery-section" aria-labelledby="empty-heading">
         <h2 id="empty-heading">Empty state</h2>
         <p>Zero-result messaging with a clear next action.</p>
         <EmptyState

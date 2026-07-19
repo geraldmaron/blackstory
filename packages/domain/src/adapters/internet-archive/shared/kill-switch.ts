@@ -1,6 +1,6 @@
 /**
  * Kill-switch identifiers for the community discovery adapters (RSS, Internet Archive,
- * DPLA v2). Mirrors `../../federal/shared/kill-switch.ts` exactly same 
+ * DPLA v2). Mirrors `../../federal/shared/kill-switch.ts` exactly same
  * logical `adapter:<adapterId>` prefix so ops tooling that already understands the federal
  * adapters' kill switches needs no special case for the community adapters.
  */

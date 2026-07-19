@@ -68,8 +68,8 @@ export function validateBetaLaunchDecisionArtifact(value: unknown): BetaLaunchEv
   if (record.schemaVersion !== BETA_LAUNCH_DECISION_SCHEMA_VERSION) {
     throw new Error('artifact.schemaVersion must be 1.');
   }
-  if (record.bead !== 'BB-063') {
-    throw new Error('artifact.bead must be BB-063.');
+  if (record.bead !== '') {
+    throw new Error('artifact.bead must be .');
   }
   assertString(record.evaluator, 'artifact.evaluator');
   assertString(record.evaluatedAt, 'artifact.evaluatedAt');

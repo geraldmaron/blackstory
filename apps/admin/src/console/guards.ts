@@ -5,8 +5,8 @@
 import type {
   createServerAdminAuthorizer,
   AdminRequestHeaders,
-} from '../auth/server-authorization.js';
-import type { ConsoleAction, PublicationDiff } from './model.js';
+} from '../auth/server-authorization';
+import type { ConsoleAction, PublicationDiff } from './model';
 
 export const MAX_BULK_ACTION_ITEMS = 50;
 
@@ -81,7 +81,7 @@ export async function authorizeConsoleAction(
   if (privilegedAction && !reason) {
     throw new ConsoleActionError(
       'REASON_REQUIRED',
-      'High-impact actions require a durable operator reason',
+      'High-impact actions require a decision reason',
     );
   }
 

@@ -66,12 +66,12 @@ export function parseDatabaseConfig(
   assertServerOnly('parseDatabaseConfig');
   assertNoBrowserDatabaseCredentials(environment);
 
-  const roleRaw = environment.BLACK_BOOK_DB_ROLE ?? environment.DATABASE_ROLE;
+  const roleRaw = environment.APP_DB_ROLE ?? environment.DATABASE_ROLE;
   if (!roleRaw || !isDatabaseRole(roleRaw)) {
-    throw new Error(`BLACK_BOOK_DB_ROLE must be one of: ${DATABASE_ROLES.join(', ')}`);
+    throw new Error(`APP_DB_ROLE must be one of: ${DATABASE_ROLES.join(', ')}`);
   }
 
-  const connectionString = environment.DATABASE_URL ?? environment.BLACK_BOOK_DATABASE_URL;
+  const connectionString = environment.DATABASE_URL ?? environment.APP_DATABASE_URL;
   const host = environment.PGHOST ?? environment.DATABASE_HOST;
   const cloudSqlConnectionName = environment.CLOUD_SQL_CONNECTION_NAME;
   if (!connectionString && !host && !cloudSqlConnectionName) {

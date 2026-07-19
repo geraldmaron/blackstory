@@ -2,7 +2,7 @@
  * Point-in-time status resolution for decade views. Uses `statusAsOf` against
  * published `statusHistory` never present-day `entity.status` when rendering a decade slice.
  */
-import { statusAsOf, type EntityStatusValue, type StatusHistoryEntry } from '@black-book/domain/entity-status';
+import { statusAsOf, type EntityStatusValue, type StatusHistoryEntry } from '@repo/domain/entity-status';
 import type { PublicEntityView } from '../../data/public-seed';
 
 /** Mid-decade representative year for status-as-of queries ("1950s" → "1955").  */

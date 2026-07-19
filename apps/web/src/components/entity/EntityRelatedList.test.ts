@@ -17,17 +17,17 @@ function requireEntity(id: string) {
   return entity;
 }
 
-test('renders a linked entry for each BB-092 graph-adjacency related record, with its relationship type', () => {
-  const school = requireEntity('ent_seed_school_001');
+test('renders a linked entry for each graph-adjacency related record, with its relationship type', () => {
+  const school = requireEntity('ent_dunbar_school_001');
   assert.ok((school.related?.length ?? 0) >= 2, 'the school fixture has 2 real graph edges');
   const html = renderToStaticMarkup(createElement(EntityRelatedList, { entity: school, labelledBy: 'related-heading' }));
-  assert.match(html, /Seed Historical Place/);
-  assert.match(html, /Seed Emancipation Day Commemoration/);
-  assert.match(html, /href="\/entity\/ent_seed_place_001"/);
+  assert.match(html, /Fifteenth Street Presbyterian Church/);
+  assert.match(html, /D\.C\. Inventory of Historic Sites Listing/);
+  assert.match(html, /href="\/entity\/ent_15th_st_church_001"/);
 });
 
 test('renders the approved missing-information notice when related is empty, not a bare empty list', () => {
-  const school = requireEntity('ent_seed_school_001');
+  const school = requireEntity('ent_dunbar_school_001');
   const html = renderToStaticMarkup(
     createElement(EntityRelatedList, {
       entity: { ...school, related: [], relatedNeighbors: [], continueLearning: [] },
@@ -36,4 +36,34 @@ test('renders the approved missing-information notice when related is empty, not
   );
   assert.match(html, /No linked records yet/);
   assert.doesNotMatch(html, /<ul/);
+});
+
+test('related fallback without neighbor stubs humanizes ids instead of showing raw entity ids', () => {
+  const school = requireEntity('ent_dunbar_school_001');
+  const html = renderToStaticMarkup(
+    createElement(EntityRelatedList, {
+      entity: {
+        ...school,
+        relatedNeighbors: [],
+        continueLearning: [],
+      },
+      labelledBy: 'related-heading',
+    }),
+  );
+  assert.match(html, /15th St Church/);
+  assert.doesNotMatch(html, />ent_15th_st_church_001</);
+  assert.match(html, /href="\/entity\/ent_15th_st_church_001"/);
+});
+
+test('renders discovery hint when showDiscoveryHint is true', () => {
+  const school = requireEntity('ent_dunbar_school_001');
+  const html = renderToStaticMarkup(
+    createElement(EntityRelatedList, {
+      entity: school,
+      labelledBy: 'related-heading',
+      showDiscoveryHint: true,
+    }),
+  );
+  assert.match(html, /class="ds-entity-link-hint"/);
+  assert.match(html, /Record names link onward/);
 });

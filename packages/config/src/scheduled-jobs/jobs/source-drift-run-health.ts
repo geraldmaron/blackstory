@@ -1,7 +1,7 @@
 
 /**
  * REAL roster entry: source drift + adapter run-health checks. Wraps
- * @black-book/domain's evaluateRunHealth/shouldQuarantineRun/shouldDeadLetterRun the exact
+ * @repo/domain's evaluateRunHealth/shouldQuarantineRun/shouldDeadLetterRun the exact
  * same functions the source-adapter pipeline itself uses (packages/domain/src/adapters/
  * run-health.ts), which in turn mirror the research worker's Python run_health module
  * (workers/research/src/black_book_research/adapters/run_health.py). This wrapper does not
@@ -13,7 +13,7 @@ import {
   shouldDeadLetterRun,
   shouldQuarantineRun,
   type EvaluateRunHealthInput,
-} from '@black-book/domain';
+} from '@repo/domain';
 import { completeJobRun, startJobRun, type JobRunRecord } from '../run-record.js';
 
 export const SOURCE_DRIFT_RUN_HEALTH_JOB_ID = 'source-drift-run-health-check';

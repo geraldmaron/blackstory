@@ -52,6 +52,7 @@ export type {
   DecadeGraphView,
   BuildDecadeViewsInput,
   AllTimeGraphView,
+  BuildAllTimeViewOptions,
 } from './decades.js';
 
 export {
@@ -70,6 +71,31 @@ export {
   publicRelatedEntriesByEntityId,
 } from './build.js';
 export type { GraphReleaseArtifactInput, GraphReleaseArtifact } from './build.js';
+
+export {
+  extractCatalogRelationships,
+  relatedEntriesFromRelationships,
+} from './catalog-related.js';
+export type {
+  CatalogRelatedEntry,
+  CatalogEntityForRelationships,
+  ExtractCatalogRelationshipsOptions,
+  ExtractCatalogRelationshipsResult,
+} from './catalog-related.js';
+
+export {
+  RELATIONSHIP_CANDIDATE_TYPES,
+  RELATIONSHIP_CANDIDATE_REASONS,
+  proposeRelationshipCandidates,
+} from './relationship-candidates.js';
+export type {
+  RelationshipCandidateType,
+  RelationshipCandidateReason,
+  RelationshipCandidate,
+  RelationshipCandidateEntity,
+  ExistingRelationshipRef,
+  ProposeRelationshipCandidatesInput,
+} from './relationship-candidates.js';
 
 // Gold-corpus-style regression fixtures internal-facing like
 // /map/fixtures.js's re-export here (see ../map/index.ts): NOT re-exported from the top-level

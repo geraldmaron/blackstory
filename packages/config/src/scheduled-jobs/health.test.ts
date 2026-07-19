@@ -13,7 +13,7 @@ import type { ScheduledJobDefinition } from './types.ts';
 
 const JOB: ScheduledJobDefinition = {
   id: 'daily-job',
-  owner: 'BB-084',
+  owner: 'scheduled-jobs',
   description: 'test job',
   cadence: { cronExpression: '0 4 * * *', nominalIntervalMs: 86_400_000, humanReadable: 'daily' },
   budget: { unit: 'items', maxPerRun: 100 },
@@ -21,7 +21,7 @@ const JOB: ScheduledJobDefinition = {
   idempotencyKeyScheme: 'job:{jobId}:{dayStart}',
   killSwitchId: 'research-campaigns',
   targetWorker: { package: 'research', function: 'sample.run' },
-  environment: 'blackbook-internal',
+  environment: 'repo-internal',
   publicEffect: 'none',
   rosterStatus: 'real',
   consecutiveMissedRunThreshold: 3,

@@ -3,10 +3,10 @@
  * links to methodology definitions for the evidence-grade vocabulary.
  */
 import React from 'react';
-import { Confidence } from '@black-book/ui';
-import type { FactConfidenceGrade } from '@black-book/domain';
-import { FACT_CONFIDENCE_DEFINITIONS } from '@black-book/domain';
-import { humanizeToken, mapConfidenceToUiLevel } from '../facts/format.js';
+import Link from 'next/link';
+import { Confidence } from '@repo/ui';
+import { FACT_CONFIDENCE_DEFINITIONS, type FactConfidenceGrade } from '@repo/domain/facts';
+import { humanizeToken, mapConfidenceToUiLevel } from '../facts/format';
 
 export type ConfidenceLabelWithNuanceProps = {
   readonly confidence: FactConfidenceGrade;
@@ -25,13 +25,13 @@ export function ConfidenceLabelWithNuance({
   return (
     <div>
       <Confidence level={level} label={label} />
-      <p className="bb-sans" style={{ margin: 'var(--bb-space-2) 0 0 0', color: 'var(--bb-ink-muted)' }}>
+      <p className="ds-sans" style={{ margin: 'var(--ds-space-2) 0 0 0', color: 'var(--ds-ink-muted)' }}>
         {FACT_CONFIDENCE_DEFINITIONS[confidence]}
         {' '}
-        <a href={methodologyHref}>See grade definitions</a>.
+        <Link href={methodologyHref}>See grade definitions</Link>.
       </p>
       {confidenceNote ? (
-        <p className="bb-sans" style={{ margin: 'var(--bb-space-2) 0 0 0' }}>
+        <p className="ds-sans" style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
           <strong>Nuance:</strong> {confidenceNote}
         </p>
       ) : null}

@@ -1,5 +1,5 @@
 /**
- * Emulator local seed fixtures for Firestore (demo-black-book only).
+ * Emulator local seed fixtures for Firestore (demo-repo only).
  * : schools/people/places with historical vs current locations and merge lineage.
  * : source organizations, items, captures, evidence rights, lineage, kill switches.
  * : atomic claims, evidence links, confidence scores, preserved contradictions.
@@ -12,11 +12,12 @@ import {
   measureConnectionStrength,
   measureRelevance,
   preserveContradictoryValues,
-} from '@black-book/domain';
+} from '@repo/domain';
 import type {
   CanonicalClaimDoc,
   CanonicalEntityDoc,
   ClaimEvidenceLinkDoc,
+  ClaimVersionDoc,
   EntityLocationDoc,
   EntityMergeDoc,
   EntityRelationshipDoc,
@@ -41,22 +42,36 @@ export type SeedDocument = {
 
 const FIXED_NOW = '2026-07-16T18:00:00.000Z';
 
+// `buildGeoPointFields` (from `@repo/domain`) returns a `readonly string[]`
+// `geohashPrefixes`; the Firestore doc schema infers a mutable `string[]` for the same field.
+// Copying it here reconciles the two packages' array mutability without changing any value.
+function mutableGeoPoint(lat: number, lng: number, precision: number) {
+  const fields = buildGeoPointFields(lat, lng, precision);
+  return { ...fields, geohashPrefixes: [...fields.geohashPrefixes] };
+}
+
+// Fifteenth Street Presbyterian Church's current site (1701 15th Street NW; congregation moved
+// here in 1918, present building completed 1979) — a manual-research neighborhood estimate, per
+// the research brief, not a rooftop geocode.
 const placeCurrentPoint = {
-  ...buildGeoPointFields(38.9072, -77.0369, 5),
-  precision: 'city' as const,
+  ...mutableGeoPoint(38.9126, -77.0366, 5),
+  precision: 'neighborhood' as const,
   matchMethod: 'manual_research' as const,
 };
 
+// The school's 1870-1891 location: the same church basement as `placeCurrentPoint` above.
 const schoolHistoricalPoint = {
-  ...buildGeoPointFields(38.9, -77.0, 5),
-  precision: 'campus' as const,
+  ...mutableGeoPoint(38.9126, -77.0366, 5),
+  precision: 'neighborhood' as const,
   matchMethod: 'manual_research' as const,
 };
 
+// The school's campus since 1891 (New Jersey Avenue NW; the present 2013 building sits on the
+// same footprint occupied since 1916) — a manual-research campus-level estimate.
 const schoolCurrentPoint = {
-  ...buildGeoPointFields(38.91, -77.02, 5),
+  ...mutableGeoPoint(38.9098, -77.0143, 5),
   precision: 'campus' as const,
-  matchMethod: 'geocode_other' as const,
+  matchMethod: 'manual_research' as const,
 };
 
 export const seedPolicyActive: PolicyActiveDoc = {
@@ -72,20 +87,21 @@ export const seedActiveRelease: PublicActiveReleaseDoc = {
 };
 
 export const seedPublicEntity: PublicEntityProjectionDoc = {
-  id: 'ent_seed_place_001',
+  id: 'ent_15th_st_church_001',
   releaseId: 'rel_seed_001',
   kind: 'place',
-  displayName: 'Seed Historical Place',
-  nameLower: 'seed historical place',
+  displayName: 'Fifteenth Street Presbyterian Church',
+  nameLower: 'fifteenth street presbyterian church',
   summary:
-    'A historically documented Black community place in the District of Columbia area, ' +
-    'tied to education and mutual-aid networks with published archival claims for learners.',
+    'Founded in 1841, Fifteenth Street Presbyterian Church hosted the 1870 founding of the ' +
+    'nation’s first public high school for Black students in its basement.',
   location: placeCurrentPoint,
   claimIds: ['claim_seed_001'],
-  topicTags: ['community', 'education', 'reconstruction'],
+  topicTags: ['church', 'education', 'community'],
   historicalContext:
-    'Reconstruction-era Black communities in the District of Columbia organized schools and mutual aid networks.',
-  eraBuckets: ['1860s', '1870s'],
+    'Washington’s historically Black Presbyterian congregations built and sustained educational ' +
+    'and civic institutions well beyond their own sanctuaries.',
+  eraBuckets: ['1840s', '1870s'],
 };
 
 export const seedSubmission: SubmissionInboxDoc = {
@@ -97,14 +113,16 @@ export const seedSubmission: SubmissionInboxDoc = {
 };
 
 export const seedPlaceEntity: CanonicalEntityDoc = {
-  id: 'ent_seed_place_001',
+  id: 'ent_15th_st_church_001',
   kind: 'place',
-  displayName: 'Seed Historical Place',
-  aliases: [{ value: 'Old Place Name', kind: 'former_name', validFrom: '1900', validTo: '1940' }],
+  displayName: 'Fifteenth Street Presbyterian Church',
+  aliases: [],
   identifiers: [{ system: 'seed', value: 'place-001' }],
   livingStatus: 'unknown',
   place: {
-    historicalNames: ['Old Place Name'],
+    // No former name is documented in sources consulted; the congregation's name has stayed
+    // consistent since its 1841 founding (only the site itself changed, in 1918).
+    historicalNames: [],
     jurisdictionIds: ['jur_dc'],
     primaryLocationId: 'loc_place_current',
   },
@@ -115,84 +133,91 @@ export const seedPlaceEntity: CanonicalEntityDoc = {
 
 export const seedPlaceHistoricalLocation: EntityLocationDoc = {
   id: 'loc_place_historical',
-  entityId: 'ent_seed_place_001',
+  entityId: 'ent_15th_st_church_001',
   role: 'historical',
   geometry: {
+    // Coarse Washington, D.C. citywide extent, deliberately NOT a specific claimed address the
+    // congregation's exact pre-1918 location is not documented in sources consulted this session
+    // (only that it "moved to this site in 1918" per the research brief) see `match.notes`.
     type: 'BBox',
-    bbox: [-77.05, 38.88, -77.0, 38.92],
+    bbox: [-77.1198, 38.7916, -76.9094, 38.9958],
   },
-  precision: 'neighborhood',
+  precision: 'city',
   match: {
     method: 'manual_research',
-    precision: 'neighborhood',
+    precision: 'city',
     recordedAt: FIXED_NOW,
-    notes: 'Approximate 1920s neighborhood extent; not a ZIP boundary',
+    notes:
+      'Pre-1918 location undocumented in sources consulted this session; this is a coarse D.C. ' +
+      'citywide extent, not a specific claimed address.',
   },
-  validFrom: '1920',
-  validTo: '1950',
+  validFrom: '1841',
+  validTo: '1918',
   jurisdictionIds: ['jur_dc'],
-  label: 'Historical neighborhood extent',
+  label: 'Pre-1918 location (undocumented, citywide extent only)',
   evidenceIds: ['ev_seed_place_hist'],
 };
 
 export const seedPlaceCurrentLocation: EntityLocationDoc = {
   id: 'loc_place_current',
-  entityId: 'ent_seed_place_001',
+  entityId: 'ent_15th_st_church_001',
   role: 'current',
   geometry: {
     type: 'Point',
     coordinates: [placeCurrentPoint.lng, placeCurrentPoint.lat],
   },
   point: placeCurrentPoint,
-  precision: 'city',
+  precision: 'neighborhood',
   match: {
     method: 'manual_research',
-    precision: 'city',
+    precision: 'neighborhood',
     recordedAt: FIXED_NOW,
   },
-  validFrom: '1950',
+  validFrom: '1918',
   validTo: null,
-  modernZip: { zip: '20001', role: 'modern_input', countryCode: 'US' },
-  label: 'Current map pin (ZIP is modern input only)',
+  modernZip: { zip: '20009', role: 'modern_input', countryCode: 'US' },
+  label: 'Current site (1701 15th Street NW; present building completed 1979)',
   evidenceIds: ['ev_seed_place_cur'],
 };
 
 export const seedSchoolEntity: CanonicalEntityDoc = {
-  id: 'ent_seed_school_001',
+  id: 'ent_dunbar_school_001',
   kind: 'school',
-  displayName: 'Seed Freedmen School',
+  displayName: 'Paul Laurence Dunbar High School',
   aliases: [
-    { value: 'Colored School No. 1', kind: 'former_name', validFrom: '1868', validTo: '1910' },
+    { value: 'Preparatory High School for Colored Youth', kind: 'former_name', validFrom: '1870', validTo: '1891' },
+    { value: 'M Street High School', kind: 'former_name', validFrom: '1891', validTo: '1916' },
   ],
   livingStatus: 'unknown',
   school: {
     names: [
-      { name: 'Colored School No. 1', validFrom: '1868', validTo: '1910', primary: false },
-      { name: 'Seed Freedmen School', validFrom: '1910', validTo: null, primary: true },
+      { name: 'Preparatory High School for Colored Youth', validFrom: '1870', validTo: '1891', primary: false },
+      { name: 'M Street High School', validFrom: '1891', validTo: '1916', primary: false },
+      { name: 'Paul Laurence Dunbar High School', validFrom: '1916', validTo: null, primary: true },
     ],
     campuses: [
       {
         id: 'campus_hist',
-        name: 'Original campus',
+        name: 'Fifteenth Street Presbyterian Church basement',
         locationId: 'loc_school_historical',
         status: 'closed',
-        validFrom: '1868',
-        validTo: '1954',
+        validFrom: '1870',
+        validTo: '1891',
       },
       {
         id: 'campus_cur',
-        name: 'Current campus',
+        name: 'New Jersey Avenue NW campus',
         locationId: 'loc_school_current',
         status: 'active',
-        validFrom: '1954',
+        validFrom: '1891',
         validTo: null,
       },
     ],
     // : renamed from `statusHistory` to `milestones` to resolve a naming collision with
     // the new entity-level CanonicalEntityDoc.statusHistory (see packages/domain/src/school.ts).
     milestones: [
-      { status: 'opened', at: '1868', evidenceIds: ['ev_seed_school_open'] },
-      { status: 'relocated', at: '1954', evidenceIds: ['ev_seed_school_move'] },
+      { status: 'opened', at: '1870', evidenceIds: ['ev_seed_school_open'] },
+      { status: 'relocated', at: '1891', evidenceIds: ['ev_seed_school_move'] },
     ],
   },
   mergeState: { status: 'active', mergeIds: [] },
@@ -202,28 +227,28 @@ export const seedSchoolEntity: CanonicalEntityDoc = {
 
 export const seedSchoolHistoricalLocation: EntityLocationDoc = {
   id: 'loc_school_historical',
-  entityId: 'ent_seed_school_001',
+  entityId: 'ent_dunbar_school_001',
   role: 'historical',
   geometry: {
     type: 'Point',
     coordinates: [schoolHistoricalPoint.lng, schoolHistoricalPoint.lat],
   },
   point: schoolHistoricalPoint,
-  precision: 'campus',
+  precision: 'neighborhood',
   match: {
     method: 'manual_research',
-    precision: 'campus',
+    precision: 'neighborhood',
     recordedAt: FIXED_NOW,
   },
-  validFrom: '1868',
-  validTo: '1954',
-  label: 'Original campus (historical)',
+  validFrom: '1870',
+  validTo: '1891',
+  label: 'Original location — Fifteenth Street Presbyterian Church basement (historical)',
   evidenceIds: ['ev_seed_school_open'],
 };
 
 export const seedSchoolCurrentLocation: EntityLocationDoc = {
   id: 'loc_school_current',
-  entityId: 'ent_seed_school_001',
+  entityId: 'ent_dunbar_school_001',
   role: 'current',
   geometry: {
     type: 'Point',
@@ -232,21 +257,25 @@ export const seedSchoolCurrentLocation: EntityLocationDoc = {
   point: schoolCurrentPoint,
   precision: 'campus',
   match: {
-    method: 'geocode_other',
+    method: 'manual_research',
     precision: 'campus',
     recordedAt: FIXED_NOW,
   },
-  validFrom: '1954',
+  validFrom: '1891',
   validTo: null,
-  modernZip: { zip: '20002', role: 'modern_lookup' },
-  label: 'Current campus',
+  modernZip: { zip: '20001', role: 'modern_lookup' },
+  label: 'Current campus (New Jersey Avenue NW; present 2013 building on the same footprint since 1916)',
   evidenceIds: ['ev_seed_school_move'],
 };
 
+// Deliberately a generic, clearly-synthetic fixture person (never a real named historical
+// figure) the duplicate-spelling merge mechanism below needs a birth year and an "alleged"
+// high-impact claim to exercise its mechanics, and attaching either to a real person's name would
+// misrepresent them see the module doc above and 's scope note on this narrow carve-out.
 export const seedPersonEntity: CanonicalEntityDoc = {
   id: 'ent_seed_person_001',
   kind: 'person',
-  displayName: 'Seed Historical Person',
+  displayName: 'Fixture Test Person',
   livingStatus: 'unknown',
   person: {
     livingStatus: 'unknown',
@@ -262,7 +291,7 @@ export const seedPersonEntity: CanonicalEntityDoc = {
 export const seedAbsorbedPersonEntity: CanonicalEntityDoc = {
   id: 'ent_seed_person_dup',
   kind: 'person',
-  displayName: 'Seed Historical Person (duplicate spelling)',
+  displayName: 'Fixture Test Person (duplicate spelling)',
   livingStatus: 'unknown',
   person: { livingStatus: 'unknown', birthYear: 1890 },
   mergeState: {
@@ -277,7 +306,7 @@ export const seedAbsorbedPersonEntity: CanonicalEntityDoc = {
 export const seedPersonSchoolRelationship: EntityRelationshipDoc = {
   id: 'rel_seed_attended_001',
   fromEntityId: 'ent_seed_person_001',
-  toEntityId: 'ent_seed_school_001',
+  toEntityId: 'ent_dunbar_school_001',
   type: 'attended',
   evidenceIds: ['ev_seed_rel_attended'],
   temporal: { validFrom: '1905', validTo: '1910', label: 'student years' },
@@ -299,29 +328,26 @@ export const seedEntityMerge: EntityMergeDoc = {
 };
 
 export const seedPublicSchoolEntity: PublicEntityProjectionDoc = {
-  id: 'ent_seed_school_001',
+  id: 'ent_dunbar_school_001',
   releaseId: 'rel_seed_001',
   kind: 'school',
-  displayName: 'Seed Freedmen School',
-  nameLower: 'seed freedmen school',
+  displayName: 'Paul Laurence Dunbar High School',
+  nameLower: 'paul laurence dunbar high school',
   summary:
-    'Freedmen school with documented historical and current campus locations at campus ' +
-    'precision only — a multi-era educational anchor for Black public schooling in D.C.',
+    'Founded in 1870 as the Preparatory High School for Colored Youth, the nation’s first public ' +
+    'high school for Black students, later renamed M Street High School (1891) and Paul Laurence ' +
+    'Dunbar High School (1916).',
   location: schoolCurrentPoint,
   claimIds: [],
-  topicTags: ['education', 'freedmen', 'schools'],
+  topicTags: ['education', 'schools', 'preservation'],
   historicalContext:
-    'Freedmen schools were among the first formal Black educational institutions in post-Emancipation D.C.',
+    'The Preparatory High School for Colored Youth opened during Reconstruction, when Black ' +
+    'communities in the District of Columbia built public schooling largely without support from ' +
+    'the segregated municipal government.',
   extendedNarrative:
-    'This seed further-reading block shows how longer curated prose can deepen a record without replacing Accepted claims.',
-  primaryImage: {
-    url: 'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_seed_school_001/primary.png',
-    alt: 'Schematic mark representing Seed Freedmen School campus record',
-    credit: 'Black Book brand system public-domain-style fixture for seed demos',
-    rightsStatus: 'public_domain',
-    objectPath: 'public/entities/ent_seed_school_001/primary.png',
-  },
-  eraBuckets: ['1860s', '1870s', '1900s', '1910s'],
+    'By the 1950s the school sent roughly 80% of its graduates on to college. Faculty and alumni ' +
+    'include Anna Julia Cooper, Carter G. Woodson, Charles R. Drew, and Charles Hamilton Houston.',
+  eraBuckets: ['1870s', '1890s', '1910s'],
 };
 
 const seedCaptureHash = hashUtf8('seed-nara-catalog-item-body-v1');
@@ -421,7 +447,7 @@ export const seedSourceCapture: SourceCaptureDoc = {
   retrievedAt: FIXED_NOW,
   retrievalEventId: 'retr_seed_001',
   snapshotMode: 'selective',
-  snapshotStorageObject: 'gs://demo-black-book-evidence/captures/cap_seed_001.pdf',
+  snapshotStorageObject: 'gs://demo-repo-evidence/captures/cap_seed_001.pdf',
   createdAt: FIXED_NOW,
 };
 
@@ -430,7 +456,7 @@ export const seedEvidenceRecord: EvidenceRecordDoc = {
   sourceItemId: 'sitm_seed_nara_001',
   sourceId: 'src_seed_nara_catalog',
   captureId: 'cap_seed_001',
-  storageObject: 'gs://demo-black-book-evidence/captures/cap_seed_001.pdf',
+  storageObject: 'gs://demo-repo-evidence/captures/cap_seed_001.pdf',
   locator: { page: '12', pages: '12-13', label: 'campus description' },
   excerpt: 'The school stood near the river landing.',
   excerptKind: 'short',
@@ -485,7 +511,7 @@ export const seedClaimEvidenceSupporting: ClaimEvidenceLinkDoc = {
   geographicPrecision: 0.85,
   entityMatchQuality: 0.9,
   extractionQuality: 0.9,
-  assertedValue: '1867',
+  assertedValue: '1841',
   createdAt: FIXED_NOW,
 };
 
@@ -503,11 +529,16 @@ export const seedClaimEvidenceSyndicated: ClaimEvidenceLinkDoc = {
   geographicPrecision: 0.5,
   entityMatchQuality: 0.7,
   extractionQuality: 0.6,
-  assertedValue: '1867',
+  assertedValue: '1841',
   notes: 'Syndicated wire copy — same lineageRootId as archival root',
   createdAt: FIXED_NOW,
 };
 
+// This one evidence link's assertedValue is deliberately synthetic (see the module doc's
+// "contradicting evidence" note): the church's real founding year (1841) is single-sourced with
+// no credible alternate in the research brief, so this narrow mechanical data point demonstrates
+// what a contradicting-evidence link LOOKS like schema-wise without fabricating a real dispute
+// over the church's actual founding year.
 export const seedClaimEvidenceContradicting: ClaimEvidenceLinkDoc = {
   id: 'cel_seed_contradict_001',
   claimId: 'claim_seed_001',
@@ -522,8 +553,11 @@ export const seedClaimEvidenceContradicting: ClaimEvidenceLinkDoc = {
   geographicPrecision: 0.8,
   entityMatchQuality: 0.85,
   extractionQuality: 0.8,
-  assertedValue: '1868',
-  notes: 'Credible alternate founding year preserved',
+  assertedValue: '1840',
+  notes:
+    'Illustrative-only alternate value for confidence-scoring/contradiction-preservation ' +
+    'mechanics demonstration; not a real documented dispute over Fifteenth Street Presbyterian ' +
+    'Church’s actual founding year (1841, per HMdb.org and Howard University archives).',
   createdAt: FIXED_NOW,
 };
 
@@ -546,47 +580,46 @@ const seedClaimConfidence = {
   independentLineageCount: seedClaimConfidenceResult.independentLineageCount,
   supportingEvidenceCount: seedClaimConfidenceResult.supportingEvidenceCount,
   contradictingEvidenceCount: seedClaimConfidenceResult.contradictingEvidenceCount,
-  contributingEvidenceIds: seedClaimConfidenceResult.contributingEvidenceIds,
+  contributingEvidenceIds: [...seedClaimConfidenceResult.contributingEvidenceIds],
   calculatedAt: seedClaimConfidenceResult.calculatedAt,
 };
 
 const seedPreservedValues = preserveContradictoryValues({
   claimId: 'claim_seed_001',
-  primaryValue: '1867',
+  primaryValue: '1841',
   evidenceLinks: seedClaimLinks,
 }).values;
 
+export const seedCanonicalClaimVersion: ClaimVersionDoc = {
+  id: 'cver_seed_001',
+  claimId: 'claim_seed_001',
+  versionNumber: 1,
+  entityId: 'ent_15th_st_church_001',
+  predicate: 'founded_year',
+  object: '1841',
+  temporal: { label: 'founding', validFrom: '1841-01-01' },
+  geographic: {
+    locationId: 'loc_place_historical',
+    precision: 'institution',
+  },
+  proceduralStatus: 'ruled',
+  claimClass: 'standard',
+  workflowStatus: 'accepted',
+  publicationStatus: 'published',
+  createdAt: FIXED_NOW,
+  createdBy: 'researcher_seed',
+};
+
 export const seedCanonicalClaim: CanonicalClaimDoc = {
   id: 'claim_seed_001',
-  entityId: 'ent_seed_place_001',
+  entityId: 'ent_15th_st_church_001',
   predicate: 'founded_year',
   currentVersionId: 'cver_seed_001',
-  versions: [
-    {
-      id: 'cver_seed_001',
-      claimId: 'claim_seed_001',
-      versionNumber: 1,
-      entityId: 'ent_seed_place_001',
-      predicate: 'founded_year',
-      object: '1867',
-      temporal: { label: 'founding', validFrom: '1867-01-01' },
-      geographic: {
-        locationId: 'loc_place_historical',
-        precision: 'institution',
-      },
-      proceduralStatus: 'ruled',
-      claimClass: 'standard',
-      workflowStatus: 'accepted',
-      publicationStatus: 'published',
-      createdAt: FIXED_NOW,
-      createdBy: 'researcher_seed',
-    },
-  ],
   claimClass: 'standard',
   workflowStatus: 'accepted',
   publicationStatus: 'published',
   proceduralStatus: 'ruled',
-  temporal: { label: 'founding', validFrom: '1867-01-01' },
+  temporal: { label: 'founding', validFrom: '1841-01-01' },
   geographic: {
     locationId: 'loc_place_historical',
     precision: 'institution',
@@ -602,9 +635,26 @@ export const seedCanonicalClaim: CanonicalClaimDoc = {
     score: 0.55,
     lastCheckedAt: FIXED_NOW,
   },
-  preservedValues: [...seedPreservedValues],
+  preservedValues: seedPreservedValues.map((value) => ({
+    ...value,
+    evidenceLinkIds: [...value.evidenceLinkIds],
+  })),
   createdAt: FIXED_NOW,
   updatedAt: FIXED_NOW,
+};
+
+export const seedHighImpactClaimVersion: ClaimVersionDoc = {
+  id: 'cver_seed_hi_001',
+  claimId: 'claim_seed_high_impact',
+  versionNumber: 1,
+  entityId: 'ent_seed_person_001',
+  predicate: 'conviction_status',
+  object: 'alleged',
+  proceduralStatus: 'alleged',
+  claimClass: 'high_impact',
+  workflowStatus: 'accepted',
+  publicationStatus: 'unpublished',
+  createdAt: FIXED_NOW,
 };
 
 export const seedHighImpactClaim: CanonicalClaimDoc = {
@@ -612,21 +662,6 @@ export const seedHighImpactClaim: CanonicalClaimDoc = {
   entityId: 'ent_seed_person_001',
   predicate: 'conviction_status',
   currentVersionId: 'cver_seed_hi_001',
-  versions: [
-    {
-      id: 'cver_seed_hi_001',
-      claimId: 'claim_seed_high_impact',
-      versionNumber: 1,
-      entityId: 'ent_seed_person_001',
-      predicate: 'conviction_status',
-      object: 'alleged',
-      proceduralStatus: 'alleged',
-      claimClass: 'high_impact',
-      workflowStatus: 'accepted',
-      publicationStatus: 'unpublished',
-      createdAt: FIXED_NOW,
-    },
-  ],
   claimClass: 'high_impact',
   workflowStatus: 'accepted',
   publicationStatus: 'unpublished',
@@ -661,7 +696,7 @@ export const seedHighImpactClaim: CanonicalClaimDoc = {
       independentLineageCount: result.independentLineageCount,
       supportingEvidenceCount: result.supportingEvidenceCount,
       contradictingEvidenceCount: result.contradictingEvidenceCount,
-      contributingEvidenceIds: result.contributingEvidenceIds,
+      contributingEvidenceIds: [...result.contributingEvidenceIds],
       calculatedAt: result.calculatedAt,
     };
   })(),
@@ -691,17 +726,17 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
   },
   { path: 'publicMeta/activeRelease', data: seedActiveRelease },
   {
-    path: 'publicReleases/rel_seed_001/entities/ent_seed_place_001',
+    path: 'publicReleases/rel_seed_001/entities/ent_15th_st_church_001',
     data: seedPublicEntity,
   },
   {
-    path: 'publicReleases/rel_seed_001/entities/ent_seed_school_001',
+    path: 'publicReleases/rel_seed_001/entities/ent_dunbar_school_001',
     data: seedPublicSchoolEntity,
   },
   {
-    path: 'publicSearchIndex/ent_seed_place_001',
+    path: 'publicSearchIndex/ent_15th_st_church_001',
     data: {
-      id: 'ent_seed_place_001',
+      id: 'ent_15th_st_church_001',
       releaseId: 'rel_seed_001',
       displayName: seedPublicEntity.displayName,
       nameLower: seedPublicEntity.nameLower,
@@ -717,9 +752,9 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
     },
   },
   {
-    path: 'publicSearchIndex/ent_seed_school_001',
+    path: 'publicSearchIndex/ent_dunbar_school_001',
     data: {
-      id: 'ent_seed_school_001',
+      id: 'ent_dunbar_school_001',
       releaseId: 'rel_seed_001',
       displayName: seedPublicSchoolEntity.displayName,
       nameLower: seedPublicSchoolEntity.nameLower,
@@ -738,22 +773,22 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
     path: 'submissionInbox/sub_seed_001',
     data: seedSubmission,
   },
-  { path: 'canonicalEntities/ent_seed_place_001', data: seedPlaceEntity },
+  { path: 'canonicalEntities/ent_15th_st_church_001', data: seedPlaceEntity },
   {
-    path: 'canonicalEntities/ent_seed_place_001/locations/loc_place_historical',
+    path: 'canonicalEntities/ent_15th_st_church_001/locations/loc_place_historical',
     data: seedPlaceHistoricalLocation,
   },
   {
-    path: 'canonicalEntities/ent_seed_place_001/locations/loc_place_current',
+    path: 'canonicalEntities/ent_15th_st_church_001/locations/loc_place_current',
     data: seedPlaceCurrentLocation,
   },
-  { path: 'canonicalEntities/ent_seed_school_001', data: seedSchoolEntity },
+  { path: 'canonicalEntities/ent_dunbar_school_001', data: seedSchoolEntity },
   {
-    path: 'canonicalEntities/ent_seed_school_001/locations/loc_school_historical',
+    path: 'canonicalEntities/ent_dunbar_school_001/locations/loc_school_historical',
     data: seedSchoolHistoricalLocation,
   },
   {
-    path: 'canonicalEntities/ent_seed_school_001/locations/loc_school_current',
+    path: 'canonicalEntities/ent_dunbar_school_001/locations/loc_school_current',
     data: seedSchoolCurrentLocation,
   },
   { path: 'canonicalEntities/ent_seed_person_001', data: seedPersonEntity },
@@ -771,7 +806,15 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
   { path: 'evidenceRecords/ev_seed_wire_copy', data: seedSyndicatedEvidenceRecord },
   { path: 'evidenceLineage/elin_seed_001', data: seedEvidenceLineage },
   { path: 'canonicalClaims/claim_seed_001', data: seedCanonicalClaim },
+  {
+    path: 'canonicalClaims/claim_seed_001/versions/cver_seed_001',
+    data: seedCanonicalClaimVersion,
+  },
   { path: 'canonicalClaims/claim_seed_high_impact', data: seedHighImpactClaim },
+  {
+    path: 'canonicalClaims/claim_seed_high_impact/versions/cver_seed_hi_001',
+    data: seedHighImpactClaimVersion,
+  },
   { path: 'claimEvidenceLinks/cel_seed_support_001', data: seedClaimEvidenceSupporting },
   { path: 'claimEvidenceLinks/cel_seed_syndicated_001', data: seedClaimEvidenceSyndicated },
   { path: 'claimEvidenceLinks/cel_seed_contradict_001', data: seedClaimEvidenceContradicting },

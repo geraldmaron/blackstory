@@ -1,29 +1,59 @@
 /**
- * Public search page: wired to the real `@black-book/domain` search pipeline
- * (`runPublicSearch`) over the snapshot search index, replacing the earlier hand-rolled
- * `filterPublicEntities` seed-filter stand-in.
+ * Public search page: wired to the real `@repo/domain` search pipeline
+ * (`runPublicSearch`) over the snapshot search index.
  *
- * This Server Component stays intentionally thin `buildSearchViewModel` in the co-located
- * `./search-view-model.ts` (plain, synchronously testable, no Next.js runtime dependency) does all
- * query-parsing, filter-building, and result/facet shaping. It lives in a separate module rather
- * than this file because Next's generated typed-route check
- * (`.next/types/app/search/page.ts`) rejects any named export from `page.tsx` other than the
- * framework's own allowlisted route conventions see `./search-view-model.ts`'s module doc.
+ * Surface language (v5 "atlas instrument"): the query IS the headline — a
+ * display-scale input over a heavy rule, pill facet selects beneath, and a
+ * numbered ledger index for results. No filter card, no boxed rows.
+ *
+ * This Server Component stays intentionally thin — `buildSearchViewModel` in
+ * the co-located `./search-view-model.ts` (plain, synchronously testable, no
+ * Next.js runtime dependency) does all query-parsing, filter-building, and
+ * result/facet shaping.
  */
 
-import { EmptyState, FilterBar, ResultList } from '@black-book/ui';
-import { SeedDataNotice } from '../../components/SeedDataNotice';
+import Link from 'next/link';
+import { EmptyState, ResultList } from '@repo/ui';
+import { KindBadge } from '../../components/map-experience';
 import { getPublicSearchIndex } from '../../lib/public-data/source';
 import { buildSearchPageHref, buildSearchViewModel, type RawSearchParams } from './search-view-model';
 
 export const metadata = {
   title: 'Search',
-  description: 'Search sample Black Book records by keyword, kind, status, and era.',
+  description: 'Search BlackStory records by keyword, kind, status, and era.',
 };
 
 type SearchPageProps = {
   readonly searchParams: Promise<RawSearchParams>;
 };
+
+type FacetSelectProps = {
+  readonly id: string;
+  readonly name: string;
+  readonly label: string;
+  readonly defaultValue: string;
+  readonly options: readonly { readonly value: string; readonly label: string }[];
+};
+
+function FacetSelect({ id, name, label, defaultValue, options }: FacetSelectProps) {
+  return (
+    <label className="ds-pill-select" htmlFor={id}>
+      <span className="ds-pill-select__label">{label}</span>
+      <select
+        className="ds-pill-select__control"
+        id={id}
+        name={name}
+        defaultValue={defaultValue}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
@@ -31,90 +61,83 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const view = buildSearchViewModel(params, index.data);
 
   return (
-    <main className="bb-container bb-page" id="main">
-      <header className="bb-entity-mast">
-        <p className="bb-page__eyebrow">Index</p>
-        <h1 className="bb-page__title">Search</h1>
-        <p className="bb-page__lede">
-          Search runs against the current{' '}
-          {index.source === 'live' ? 'live public release' : 'sample/snapshot catalog'} through the
-          real Black Book search pipeline — matches, facet counts, and match explanations below
-          reflect that pipeline, not a hardcoded seed filter.
-        </p>
+    <main className="ds-container ds-page" id="main">
+      <header>
+        <p className="ds-page__eyebrow">Index</p>
+        <h1 className="ds-page__title">
+          Search the <em>archive</em>.
+        </h1>
       </header>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
-        {index.source !== 'live' ? <SeedDataNotice compact /> : null}
+      {/* GET form — every query is a shareable URL; facet selects apply on
+          the same submit as the keyword. */}
+      <form className="ds-search-mast" method="get" action="/search" role="search">
+        <div className="ds-search-mast__field">
+          <input
+            className="ds-search-mast__input"
+            type="search"
+            id="q"
+            name="q"
+            placeholder="A school, a church, a city…"
+            defaultValue={view.q}
+            aria-label="Search the archive"
+          />
+          <button className="ds-cta ds-cta--copper" type="submit">
+            Search
+          </button>
+        </div>
+        <div className="ds-search-mast__refine">
+          <FacetSelect
+            id="kind"
+            name="kind"
+            label="Kind"
+            defaultValue={view.kind}
+            options={view.kindOptions}
+          />
+          <FacetSelect
+            id="status"
+            name="status"
+            label="Status"
+            defaultValue={view.status}
+            options={view.statusOptions}
+          />
+          <FacetSelect
+            id="era"
+            name="era"
+            label="Era"
+            defaultValue={view.era}
+            options={view.eraOptions}
+          />
+          <Link className="ds-cta-link" href="/search">
+            Clear
+          </Link>
+        </div>
+      </form>
 
-        <FilterBar
-          method="get"
-          action="/search"
-          legend="Filter sample records"
-          fields={[
-            {
-              id: 'q',
-              name: 'q',
-              label: 'Search',
-              type: 'search',
-              placeholder: 'School, place, neighborhood…',
-              defaultValue: view.q,
-            },
-            {
-              id: 'kind',
-              name: 'kind',
-              label: 'Kind',
-              type: 'select',
-              defaultValue: view.kind,
-              options: view.kindOptions,
-            },
-            {
-              id: 'status',
-              name: 'status',
-              label: 'Status',
-              type: 'select',
-              defaultValue: view.status,
-              options: view.statusOptions,
-            },
-            {
-              id: 'era',
-              name: 'era',
-              label: 'Era',
-              type: 'select',
-              defaultValue: view.era,
-              options: view.eraOptions,
-            },
-          ]}
-        />
-
-        <p
-          className="bb-sans"
-          id="search-results-heading"
-          style={{
-            margin: 0,
-            fontSize: '0.6875rem',
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-          }}
-        >
-          {view.totalMatched} sample result{view.totalMatched === 1 ? '' : 's'}
+      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-8)' }}>
+        <p className="ds-sans ds-count-label" id="search-results-heading">
+          {view.totalMatched} result
+          {view.totalMatched === 1 ? '' : 's'}
         </p>
 
         {view.results.length === 0 ? (
           <EmptyState
-            title="No sample records matched"
+            title="Nothing matched — yet"
             action={
-              <a className="bb-cta bb-cta--ink" href="/search">
+              <Link className="ds-cta ds-cta--ink" href="/search">
                 Clear filters
-              </a>
+              </Link>
             }
           >
-            Try a broader keyword or set Kind / Status / Era back to “All”.
+            Try a broader keyword, or set Kind / Status / Era back to “All”. The archive grows
+            with every release.
           </EmptyState>
         ) : (
           <>
             <ResultList
+              className="ds-index"
               labelledBy="search-results-heading"
+              LinkComponent={Link}
               items={view.results.map((result) => ({
                 id: result.id,
                 href: `/entity/${result.id}`,
@@ -122,32 +145,40 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 summary: result.summary ?? '',
                 meta: (
                   <>
-                    <span className="bb-mono">{result.kind}</span>
-                    {result.status ? <span className="bb-mono">{result.status}</span> : null}
-                    <span className="bb-sans">Matched: {result.matchedText}</span>
-                    <span className="bb-sans">{result.explanation}</span>
+                    <KindBadge kind={result.kind} density="compact" />
+                    {result.status ? (
+                      <span
+                        className={`ds-status-mark ds-status-mark--${result.status}`}
+                        data-status={result.status}
+                      >
+                        {result.status}
+                      </span>
+                    ) : null}
+                    <span>Matched: {result.matchedText}</span>
                   </>
                 ),
               }))}
             />
 
             {view.previousOffset !== undefined || view.nextOffset !== undefined ? (
-              <nav className="bb-row" aria-label="Search results pages">
+              <nav className="ds-row" aria-label="Search results pages">
                 {view.previousOffset !== undefined ? (
-                  <a
-                    className="bb-button bb-button--secondary"
+                  <Link
+                    className="ds-cta ds-cta--quiet"
                     href={buildSearchPageHref(view, view.previousOffset)}
+                    scroll={false}
                   >
                     Previous page
-                  </a>
+                  </Link>
                 ) : null}
                 {view.nextOffset !== undefined ? (
-                  <a
-                    className="bb-button bb-button--secondary"
+                  <Link
+                    className="ds-cta ds-cta--quiet"
                     href={buildSearchPageHref(view, view.nextOffset)}
+                    scroll={false}
                   >
                     Next page
-                  </a>
+                  </Link>
                 ) : null}
               </nav>
             ) : null}

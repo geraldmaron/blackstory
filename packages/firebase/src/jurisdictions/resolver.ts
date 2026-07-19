@@ -3,7 +3,7 @@
  * Firestore-backed jurisdiction lookups for the `jurisdictions` collection.
  *
  * `createFirestoreJurisdictionResolver`'s return value is structurally compatible with
- * `@black-book/domain`'s `JurisdictionResolver` interface
+ * `@repo/domain`'s `JurisdictionResolver` interface
  * (`packages/domain/src/geography/jurisdiction-refs.ts` `{ exists(id): Promise<boolean> }`)
  * by shape. Once `jurisdiction-refs.ts` is exported from the domain barrel, this resolver
  * can be passed directly to `assertJurisdictionReferencesResolve` — the shape already matches.

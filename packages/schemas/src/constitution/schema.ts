@@ -1,5 +1,5 @@
 /**
- * Zod schemas for the Black Book product constitution.
+ * Zod schemas for the BlackStory product constitution.
  * Mirrors packages/schemas/constitution/product-constitution.schema.json and
  * validates the shared policy.v1.json value document.
  */

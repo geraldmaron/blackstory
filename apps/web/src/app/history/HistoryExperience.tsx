@@ -6,9 +6,9 @@
  * and shareable URL state. The server-rendered graph release snapshot is the source of truth;
  * `/history/api` refine is optional progressive enhancement when App Check is configured.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { startTransition, useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { FilterBar, Notice } from '@black-book/ui';
+import { Notice } from '@repo/ui';
 import {
   DecadeStepper,
   HistoryEdgePanel,
@@ -16,6 +16,10 @@ import {
   HistoryNarrativeCard,
   HistoryResultList,
 } from '../../components/history';
+import {
+  HISTORY_SORT_OPTIONS,
+  type HistorySort,
+} from '../../lib/history/filters';
 import {
   buildHistoryHref,
   type HistoryViewState,
@@ -65,35 +69,39 @@ function mergeViewState(
   return next;
 }
 
-function facetFields(view: HistoryViewModel) {
-  return [
-    {
-      id: 'history-kind',
-      name: 'kind',
-      label: 'Kind',
-      type: 'select' as const,
-      defaultValue: view.viewState.filters.kind,
-      options: view.facetOptions.kind,
-    },
-  ];
-}
-
 export function HistoryExperience({ initial }: HistoryExperienceProps) {
   const router = useRouter();
   const [view, setView] = useState(initial);
+  const [queryDraft, setQueryDraft] = useState(initial.viewState.filters.q);
   const [degradedReason, setDegradedReason] = useState<keyof typeof HISTORY_DEGRADED_MODE_COPY | null>(
     null,
   );
 
   useEffect(() => {
     setView(initial);
+    setQueryDraft(initial.viewState.filters.q);
   }, [initial]);
 
   const pushViewState = useCallback(
     (next: HistoryViewState) => {
-      router.replace(buildHistoryHref(next), { scroll: false });
+      startTransition(() => {
+        router.replace(buildHistoryHref(next), { scroll: false });
+      });
     },
     [router],
+  );
+
+  const applyFilters = useCallback(
+    (patch: Partial<HistoryViewState['filters']>) => {
+      const next = mergeViewState(view.viewState, {
+        filters: { ...view.viewState.filters, ...patch },
+        clearSelected: true,
+        clearEdge: true,
+      });
+      setView((current) => ({ ...current, viewState: next }));
+      pushViewState(next);
+    },
+    [pushViewState, view.viewState],
   );
 
   const selectedNode = useMemo(
@@ -142,11 +150,62 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
     pushViewState(next);
   }, [pushViewState, view.viewState]);
 
+  const handleDecadeSelect = useCallback(
+    (decade: string | undefined) => {
+      const next = mergeViewState(view.viewState, {
+        mode: decade ? 'decade' : 'all-time',
+        decade: decade ?? '',
+        clearSelected: true,
+        clearEdge: true,
+      });
+      setView((current) => ({ ...current, viewState: next }));
+      pushViewState(next);
+    },
+    [pushViewState, view.viewState],
+  );
+
+  const handleKindChange = useCallback(
+    (kind: string) => {
+      const valid = view.facetOptions.kind.some((option) => option.value === kind);
+      applyFilters({
+        kind: (valid ? kind : 'all') as HistoryViewModel['viewState']['filters']['kind'],
+      });
+    },
+    [applyFilters, view.facetOptions.kind],
+  );
+
+  const handleSortChange = useCallback(
+    (sort: string) => {
+      const nextSort = (HISTORY_SORT_OPTIONS.some((option) => option.value === sort)
+        ? sort
+        : 'name') as HistorySort;
+      applyFilters({ sort: nextSort });
+    },
+    [applyFilters],
+  );
+
+  const handleQuerySubmit = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      applyFilters({ q: queryDraft.trim() });
+    },
+    [applyFilters, queryDraft],
+  );
+
+  const handleClearFilters = useCallback(() => {
+    setQueryDraft('');
+    applyFilters({ q: '', kind: 'all', sort: 'name' });
+  }, [applyFilters]);
+
+  const hasActiveFilters =
+    view.viewState.filters.q.length > 0 ||
+    view.viewState.filters.kind !== 'all' ||
+    view.viewState.filters.sort !== 'name';
+
   const listProps = {
     nodes: view.nodes,
     labelledBy: 'history-results-heading',
     ...(view.viewState.selected ? { selectedId: view.viewState.selected } : {}),
-    onSelect: handleSelectNode,
   };
 
   const graphProps = {
@@ -161,55 +220,98 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
   };
 
   return (
-    <div className="bb-history">
+    <div className="ds-history">
       {degradedReason ? (
         <Notice tone="warning" title="Snapshot mode">
           {HISTORY_DEGRADED_MODE_COPY[degradedReason]}
         </Notice>
       ) : null}
 
-      <DecadeStepper decades={view.availableDecades} viewState={view.viewState} />
+      <div className="ds-history__stepper-sticky">
+        <DecadeStepper
+          decades={view.availableDecades}
+          viewState={view.viewState}
+          onSelect={handleDecadeSelect}
+        />
+      </div>
 
-      <FilterBar
-        method="get"
-        action="/history"
-        legend="Filter history graph records"
-        fields={facetFields(view)}
-        actions={
-          <>
-            {view.viewState.mode === 'decade' && view.viewState.decade ? (
-              <input type="hidden" name="decade" value={view.viewState.decade} />
-            ) : null}
-            {view.viewState.selected ? (
-              <input type="hidden" name="selected" value={view.viewState.selected} />
-            ) : null}
-            {view.viewState.edge ? <input type="hidden" name="edge" value={view.viewState.edge} /> : null}
-            <button type="submit" className="bb-button bb-button--primary">
-              Apply filters
-            </button>
-          </>
-        }
-      />
+      <div className="ds-history__toolbar">
+        <form className="ds-history__search" onSubmit={handleQuerySubmit} role="search">
+          <label className="ds-history__search-label" htmlFor="history-q">
+            Search records
+          </label>
+          <input
+            className="ds-history__search-input"
+            id="history-q"
+            name="q"
+            type="search"
+            value={queryDraft}
+            onChange={(event) => setQueryDraft(event.currentTarget.value)}
+            placeholder="Search by name or summary"
+            autoComplete="off"
+          />
+          <button className="ds-button ds-button--secondary" type="submit">
+            Search
+          </button>
+        </form>
 
-      <div className="bb-history__toolbar">
-        <p className="bb-sans" id="history-results-heading">
+        <label className="ds-pill-select" htmlFor="history-kind">
+          <span className="ds-pill-select__label">Kind</span>
+          <select
+            className="ds-pill-select__control"
+            id="history-kind"
+            value={view.viewState.filters.kind}
+            onChange={(event) => handleKindChange(event.currentTarget.value)}
+          >
+            {view.facetOptions.kind.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="ds-pill-select" htmlFor="history-sort">
+          <span className="ds-pill-select__label">Sort</span>
+          <select
+            className="ds-pill-select__control"
+            id="history-sort"
+            value={view.viewState.filters.sort}
+            onChange={(event) => handleSortChange(event.currentTarget.value)}
+          >
+            {HISTORY_SORT_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        {hasActiveFilters ? (
+          <button className="ds-button ds-button--secondary" type="button" onClick={handleClearFilters}>
+            Clear
+          </button>
+        ) : null}
+
+        <p className="ds-sans ds-history__count" id="history-results-heading">
           {view.totalMatched} record{view.totalMatched === 1 ? '' : 's'} in view
           {view.viewState.mode === 'decade' && view.activeDecade ? ` · ${view.activeDecade}` : ' · all time'}
         </p>
-        <p className="bb-history__release-meta" aria-label="Release metadata">
+
+        <p className="ds-history__release-meta" aria-label="Release metadata">
           Release {view.releaseId}
         </p>
       </div>
 
-      <div className="bb-history__layout">
-        <div className="bb-history-graph-panel">
-          <h2 className="bb-section__kicker" id="history-graph-heading">
+      <div className="ds-history__layout">
+        <div className="ds-history-graph-panel">
+          <h2 className="ds-section__kicker" id="history-graph-heading">
             History graph
           </h2>
           <HistoryGraphPanel {...graphProps} />
         </div>
 
-        <div className="bb-history__list-panel">
+        <div className="ds-history__list-panel">
           {selectedNode ? (
             <HistoryNarrativeCard
               node={selectedNode}
@@ -222,12 +324,11 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
         </div>
       </div>
 
-      <p className="bb-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
+      <p className="ds-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
       {view.viewState.mode === 'decade' ? (
-        <p className="bb-history__framing">{HISTORY_DECADE_FRAMING}</p>
+        <p className="ds-history__framing">{HISTORY_DECADE_FRAMING}</p>
       ) : null}
 
-      {/* Progressive enhancement hook — reserved for live refine; snapshot remains authoritative. */}
       <span hidden data-history-degraded-hook="" onFocus={() => setDegradedReason(null)} />
     </div>
   );

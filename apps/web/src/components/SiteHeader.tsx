@@ -1,140 +1,53 @@
 /**
- * Public site header with the brand lockup, primary navigation, and theme toggle.
+ * Public site navigation — thin wrapper around the shared ShellHeader island.
+ * Uses Next.js Link for same-origin traversal so the persistent map shell stays mounted.
  */
-
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ThemeToggle } from '@black-book/ui';
-import { isNavActive, PRIMARY_NAV } from '../lib/nav';
+import {
+  OVERFLOW_NAV,
+  PRIMARY_NAV,
+  absolutizeShellNav,
+} from '@repo/config';
+import { ShellHeader, type ShellHeaderLinkProps } from '@repo/ui';
+import { webAdminHref } from '../lib/sibling-origins';
 
-const DESKTOP_NAV_MQ = '(min-width: 48rem)';
-
-function NavLinks({
-  id,
-  className,
-  hidden,
-}: {
-  readonly id?: string;
-  readonly className: string;
-  readonly hidden?: boolean;
-}) {
-  const pathname = usePathname() || '/';
-
+function NextShellLink({ href, className, children, ...rest }: ShellHeaderLinkProps) {
+  const external = /^https?:\/\//i.test(href);
+  if (external) {
+    return (
+      <a href={href} className={className} {...rest}>
+        {children}
+      </a>
+    );
+  }
   return (
-    <nav
-      id={id}
-      className={className}
-      aria-label="Primary"
-      {...(hidden ? { 'aria-hidden': true } : {})}
-    >
-      <ul className="bb-shell-nav__list">
-        {PRIMARY_NAV.map((item) => {
-          const active = isNavActive(pathname, item.href);
-          return (
-            <li key={item.href}>
-              <a
-                href={item.href}
-                className={active ? 'bb-shell-nav__link is-active' : 'bb-shell-nav__link'}
-                aria-current={active ? 'page' : undefined}
-              >
-                {item.label}
-              </a>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+    <Link href={href} className={className} {...rest}>
+      {children}
+    </Link>
   );
 }
 
 export function SiteHeader() {
-  const pathname = usePathname();
-  const menuRef = useRef<HTMLDetailsElement>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia(DESKTOP_NAV_MQ);
-    function sync() {
-      setIsDesktop(media.matches);
-    }
-    sync();
-    media.addEventListener('change', sync);
-    return () => media.removeEventListener('change', sync);
-  }, []);
-
-  useEffect(() => {
-    menuRef.current?.removeAttribute('open');
-    setMenuOpen(false);
-  }, [pathname]);
+  const pathname = usePathname() || '/';
+  const adminLogin = webAdminHref('/login');
+  const overflow = [
+    ...OVERFLOW_NAV,
+    ...(adminLogin ? [{ href: adminLogin, label: 'Admin login' } as const] : []),
+  ];
 
   return (
-    <header className="bb-shell-header">
-      <div className="bb-container bb-shell-header__inner">
-        {/*
-          Official lockup artwork only — the symbol IS the first B, so the
-          product name is never typed beside the mark. Light/dark variants are
-          both rendered and swapped with CSS on [data-theme] (no JS, no
-          hydration flash); the link carries the stable accessible name.
-        */}
-        <a className="bb-shell-wordmark" href="/" aria-label="Black Book — home">
-          <span className="bb-shell-wordmark__full">
-            <img
-              className="bb-shell-wordmark__img bb-shell-wordmark__img--light"
-              src="/brand/black-book-primary-light.svg"
-              alt=""
-              aria-hidden="true"
-            />
-            <img
-              className="bb-shell-wordmark__img bb-shell-wordmark__img--dark"
-              src="/brand/black-book-primary-dark.svg"
-              alt=""
-              aria-hidden="true"
-            />
-          </span>
-          <span className="bb-shell-wordmark__mini">
-            <img
-              className="bb-shell-wordmark__img bb-shell-wordmark__img--light"
-              src="/brand/black-book-mark-compact-light.svg"
-              alt=""
-              aria-hidden="true"
-            />
-            <img
-              className="bb-shell-wordmark__img bb-shell-wordmark__img--dark"
-              src="/brand/black-book-mark-compact-dark.svg"
-              alt=""
-              aria-hidden="true"
-            />
-          </span>
-        </a>
-
-        <details
-          ref={menuRef}
-          className="bb-shell-menu"
-          onToggle={(event) => setMenuOpen(event.currentTarget.open)}
-        >
-          <summary
-            className="bb-shell-menu__summary"
-            aria-expanded={menuOpen}
-            aria-controls="shell-nav-drawer"
-          >
-            Menu
-          </summary>
-          <NavLinks
-            id="shell-nav-drawer"
-            className="bb-shell-nav bb-shell-nav--drawer"
-            hidden={isDesktop || !menuOpen}
-          />
-        </details>
-
-        <NavLinks className="bb-shell-nav bb-shell-nav--desktop" hidden={!isDesktop} />
-
-        <div className="bb-shell-header__tools">
-          <ThemeToggle />
-        </div>
-      </div>
-    </header>
+    <ShellHeader
+      pathname={pathname}
+      homeHref="/"
+      primaryNav={PRIMARY_NAV}
+      overflowNav={absolutizeShellNav(overflow, null)}
+      brandLockupSrc="/brand/lockup-dark.png"
+      brandSymbolSrc="/brand/symbol-dark.png"
+      cta={{ href: '/locate', label: 'Near you' }}
+      renderLink={NextShellLink}
+    />
   );
 }

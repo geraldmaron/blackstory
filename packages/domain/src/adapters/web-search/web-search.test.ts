@@ -23,12 +23,16 @@ import {
   buildBraveWebSearchUrl,
   buildWebSearchQueryTexts,
   createBraveSearchAdapterContract,
+  createSearxngSearchAdapterContract,
   evaluateWebSearchQueryBudget,
   fetchBraveWebSearch,
   fetchBraveWebSearchBudgeted,
   ingestWebSearchCandidatesThroughPipeline,
   normalizeWebSearchResult,
   parseBraveSearchResponse,
+  parseSearxngSearchResponse,
+  buildSearxngSearchUrl,
+  SEARXNG_SEARCH_ADAPTER_ID,
   stampExternalQueryProvenance,
   WEB_SEARCH_DEFAULT_CLASSIFICATION,
   WEB_SEARCH_PROVIDER_DECISION,
@@ -91,8 +95,8 @@ function braveRegistryEntry(): SourceRegistryEntry {
 // Provider decision
 // ---------------------------------------------------------------------------------------------
 
-test('provider decision is recorded and explicitly does NOT claim storage terms are confirmed', () => {
-  assert.equal(WEB_SEARCH_PROVIDER_DECISION.chosenProvider, 'brave');
+test('provider decision prefers SearXNG and does NOT claim storage terms are confirmed', () => {
+  assert.equal(WEB_SEARCH_PROVIDER_DECISION.chosenProvider, 'searxng');
   assert.equal(WEB_SEARCH_PROVIDER_DECISION.storageTermsConfirmedInWriting, false);
   assert.ok(WEB_SEARCH_PROVIDER_DECISION.reasoning.length >= 3);
 });
@@ -101,7 +105,7 @@ test('provider decision is recorded and explicitly does NOT claim storage terms 
 // registry gate (first of two independent gates)
 // ---------------------------------------------------------------------------------------------
 
-test('Brave search adapter starts disabled by default in the BB-037 registry', () => {
+test('Brave search adapter starts disabled by default in the  registry', () => {
   const store = createInMemorySourceRegistry();
   const contract = createBraveSearchAdapterContract();
   registerSource(store, {
@@ -146,6 +150,33 @@ test('parseBraveSearchResponse tolerates missing title/description and rejects r
   assert.equal(batch.rejected.length, 1);
   assert.equal(batch.rejected[0]?.reason, 'missing_url');
   assert.throws(() => parseBraveSearchResponse('not an object'), /must be an object/);
+});
+
+test('buildSearxngSearchUrl targets operator base URL with format=json', () => {
+  const url = buildSearxngSearchUrl({
+    baseUrl: 'http://100.119.72.84:8888',
+    query: 'freedom rider Montgomery Alabama',
+  });
+  const parsed = new URL(url);
+  assert.equal(parsed.origin, 'http://100.119.72.84:8888');
+  assert.equal(parsed.pathname, '/search');
+  assert.equal(parsed.searchParams.get('format'), 'json');
+  assert.equal(parsed.searchParams.get('q'), 'freedom rider Montgomery Alabama');
+  assert.throws(() => buildSearxngSearchUrl({ baseUrl: 'http://x', query: '  ' }), /query text is required/);
+});
+
+test('parseSearxngSearchResponse maps content→description and rejects missing urls', () => {
+  const batch = parseSearxngSearchResponse(loadFixture('searxng-search-response.json'));
+  assert.equal(batch.results.length, 3);
+  assert.equal(batch.results[0]?.description?.includes('Freedom Rides'), true);
+  assert.equal(batch.results[2]?.title, undefined);
+  assert.equal(batch.rejected.length, 1);
+  assert.equal(batch.rejected[0]?.reason, 'missing_url');
+});
+
+test('SearXNG adapter contract uses searxng_search id', () => {
+  const contract = createSearxngSearchAdapterContract();
+  assert.equal(contract.adapterId, SEARXNG_SEARCH_ADAPTER_ID);
 });
 
 // ---------------------------------------------------------------------------------------------
@@ -377,7 +408,7 @@ test('evaluateWebSearchQueryBudget denies once the per-campaign query cap is rea
   assert.equal(evaluatorCalls, 0);
 });
 
-test('evaluateWebSearchQueryBudget delegates the monthly spend ceiling to the injected BB-033 evaluator', () => {
+test('evaluateWebSearchQueryBudget delegates the monthly spend ceiling to the injected  evaluator', () => {
   const denied = evaluateWebSearchQueryBudget({
     policy: {
       maxQueriesPerCampaign: 1000,
@@ -456,7 +487,7 @@ test('fetchBraveWebSearchBudgeted proceeds and reports the budget decision when 
 // Pipeline integration: Wayback capture gate -> ingestApiCandidate
 // ---------------------------------------------------------------------------------------------
 
-test('ingestWebSearchCandidatesThroughPipeline routes candidates through the Wayback capture gate before BB-039 ingestion', async () => {
+test('ingestWebSearchCandidatesThroughPipeline routes candidates through the Wayback capture gate before  ingestion', async () => {
   const entry = braveRegistryEntry();
   const pack = loadPack();
   const queryProvenance = stampExternalQueryProvenance({
@@ -547,8 +578,8 @@ test('ingestWebSearchCandidatesThroughPipeline fails closed when the Wayback cap
 // Real wiring: proves the budget-guard port can be backed by the real evaluateDailyBudget
 // ---------------------------------------------------------------------------------------------
 
-test('a real BB-033-backed DailyBudgetEvaluator (thin wrapper over the real evaluateDailyBudget) composes correctly', async () => {
-  const { evaluateDailyBudget: realEvaluateDailyBudget } = await import('@black-book/security');
+test('a real -backed DailyBudgetEvaluator (thin wrapper over the real evaluateDailyBudget) composes correctly', async () => {
+  const { evaluateDailyBudget: realEvaluateDailyBudget } = await import('@repo/security');
 
   const realBackedEvaluator: DailyBudgetEvaluator = (input, budgets) => {
     const result = (realEvaluateDailyBudget as unknown as (

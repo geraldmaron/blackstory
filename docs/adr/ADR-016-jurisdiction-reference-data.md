@@ -2,28 +2,28 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-17
-- **Bead:** BB-091 (jurisdiction registry and geographic reference substrate)
-- **Depends on:** ADR-004, ADR-008, ADR-011, ADR-013, BB-014, BB-037, BB-070
-- **Blocks (real jurisdiction refs for):** BB-050, BB-051, BB-082, BB-087, BB-092, BB-094
+- **Bead:**  (jurisdiction registry and geographic reference substrate)
+- **Depends on:** ADR-004, ADR-008, ADR-011, ADR-013, , ,
+- **Blocks (real jurisdiction refs for):** , , , , ,
 
 ## Problem
 
-`Jurisdiction` has existed as a domain type since BB-014
+`Jurisdiction` has existed as a domain type since
 (`packages/domain/src/geography/location.ts` — `country | state | county | city | district |
 school_district | other`, with `validFrom`/`validTo` for historical validity) but backs no
 storage. `LawFields.jurisdictionId` and `EntityLocation.jurisdictionIds` /
 `PlaceFields.jurisdictionIds` are plain strings today — references with nowhere to resolve.
 Concretely: a law entity cannot state which state or county it applies to in a way that
-resolves to anything; the map cannot aggregate by county; BB-082's area-conditions engine has
-no jurisdiction to bind a condition to; BB-092's containment-chain graph has no county node to
+resolves to anything; the map cannot aggregate by county; 's area-conditions engine has
+no jurisdiction to bind a condition to; 's containment-chain graph has no county node to
 attach a "part of" edge to. The owner's brief was explicit that jurisdiction is a first-order
 organizing axis ("anchor most things around state ... a law: federal, state, county") and
 asked directly whether the product stores all ZIPs, all states, all counties, all cities — a
 scoping question this ADR answers with a rule, not a case-by-case judgment call each future
 bead has to re-derive.
 
-The cost of not deciding: every future bead that touches geography (BB-082 area conditions,
-BB-087 law effect-areas, BB-092 containment chains, BB-094 bulk intake) would either invent its
+The cost of not deciding: every future bead that touches geography ( area conditions,
+ law effect-areas,  containment chains,  bulk intake) would either invent its
 own ad hoc jurisdiction representation or block on this one, and "how close to the known
 location as possible" (the owner's other brief line) has no deterministic answer without a
 radius policy tied to something governed, not a hand-typed number per record.
@@ -41,7 +41,7 @@ Three adjacent decisions already bound this one:
 - **ADR-013** (map stack): `packages/domain/src/map/map-source.ts` already aggregates by state
   using `US_STATES`' approximate bboxes, and its "Known gaps" section already flags that county
   aggregation has no backing polygon data — "real polygon-based county attribution if/when
-  justified" was deferred to a later pass. BB-070 (the map data platform bead this ADR depends
+  justified" was deferred to a later pass.  (the map data platform bead this ADR depends
   on) shipped the PMTiles tile-build pipeline that is the correct home for that polygon data
   when it lands; it is closed and out of this bead's scope to extend.
 
@@ -53,7 +53,7 @@ flowchart LR
   B --> E[Cities: on-demand only]
   B --> F[ZIPs: never stored]
   G[Census TIGER/Gazetteer<br/>public domain] --> C
-  H[BB-070 PMTiles pipeline] -.county polygons, not this ADR.-> C
+  H[ PMTiles pipeline] -.county polygons, not this ADR.-> C
 ```
 
 ## Decision
@@ -93,7 +93,7 @@ same document ids, so a re-run is a compare-and-skip, never a duplicate insert.
 
 State rows are derived from the *already-committed* `packages/domain/src/map/us-geography.ts`
 `US_STATES` table — not re-fetched or re-typed from anywhere else. This was a hard requirement,
-not a convenience: a second state table would immediately drift from the first one BB-070
+not a convenience: a second state table would immediately drift from the first one
 already ships and every future geography feature depends on. County rows are parsed from the
 U.S. Census Bureau's national county Gazetteer file (tab-delimited; FIPS/GEOID, name, land/
 water area, internal-point centroid) — see `packages/firebase/src/jurisdictions/
@@ -109,13 +109,13 @@ block for the real CLI entry point. County bboxes computed from the Gazetteer fi
 `bboxSource: 'census-gazetteer-area-approximated'`) — the Gazetteer file does not carry a
 bounding box, only a centroid and area. A survey-grade bbox (`bboxSource:
 'census-cartographic-boundary'`) can be backfilled later from the Census cartographic boundary
-shapefiles BB-070's tile pipeline already processes for county polygons — see "County polygon
+shapefiles 's tile pipeline already processes for county polygons — see "County polygon
 geometry" below for why that integration is a documented follow-up, not built in this pass.
 
 ### 4. Precision-radius policy: one geoPrecision tier vocabulary, deterministic radius mapping
 
 `packages/domain/src/geography/precision.ts` adds the canonical `exact-site | block | locality
-| county | state` tier vocabulary (`GeoPrecisionTier`) — the single definition BB-086's
+| county | state` tier vocabulary (`GeoPrecisionTier`) — the single definition 's
 fact-registry spec (`FactRecord.geoPrecision`) imports rather than redefines. This is a
 *different* scale from `packages/security/src/redaction.ts`'s `PRECISION_RANK` (country|
 state|county|city|neighborhood|...|exact_coordinates), which governs public-output redaction;
@@ -135,7 +135,7 @@ rather than guessing (fail closed).
 per location so "why is this coarse" is always answerable, and — this is the load-bearing
 policy point — **`redacted-by-rule` is reserved for the exception path only**.
 `resolveEntityLocationPrecision` never coarsens on its own initiative; it only reflects a
-redaction decision the caller has already made (a BB-015 rule firing). Bulk-loaded records with
+redaction decision the caller has already made (a  rule firing). Bulk-loaded records with
 a documented or geocoded coordinate keep that tier and basis untouched by default. See
 `packages/domain/src/geography/precision.test.ts` for the test proving this: a mixed batch
 where only the record with `redactionRequired: true` coarsens, and every other record's tier
@@ -152,7 +152,7 @@ aggregate reporting): given every `jurisdictionId`/`jurisdictionIds` a claim/ent
 carries and a resolver backed by the real `jurisdictions` collection, it throws if any
 reference does not resolve to a real document. This follows the exact "INTEGRATION POINT,
 documented not live-wired" convention `packages/domain/src/citations/completeness-gate.ts`
-already established for BB-083's citation-completeness gate: the actual claim-to-projection
+already established for 's citation-completeness gate: the actual claim-to-projection
 assembly step lives outside this bead's file ownership (and, per ADR-007, largely outside this
 TypeScript package for the primary publish path), so this ADR specifies the exact call site and
 contract rather than reaching into files this bead does not own to wire it live.
@@ -179,11 +179,11 @@ line follows from a different property of the underlying data:
   boundary. Storing them as jurisdiction reference data would imply a permanence and
   authoritativeness they do not have — precisely the failure mode `location.ts`'s existing
   `assertZipNotHistoricalBoundary` guard was written to prevent. This ADR's scope decision is
-  the storage-layer expression of that same principle already established by BB-014.
+  the storage-layer expression of that same principle already established by .
 
 Bbox+centroid in Firestore, polygons in tiles is not a duplication-avoidance nicety; it is the
 direct consequence of ADR-011 (no PostGIS/geometry column in the primary store) plus ADR-013
-(BB-070's PMTiles pipeline already owns the polygon-shaped asset). A Firestore-stored polygon
+('s PMTiles pipeline already owns the polygon-shaped asset). A Firestore-stored polygon
 would need independent refresh discipline from the tile source and would bloat every jurisdiction
 document for a shape most reads (map center, rough radius, "is this near that") never need at
 full fidelity.
@@ -231,7 +231,7 @@ scales coarsen in the same direction, even though they are not merged into one e
 bbox-only per ADR-013's "Known gaps") gains a governed bbox/centroid source to aggregate
 against; any future entity/geocode flow that needs a city jurisdiction has a defined creation
 path (Census place FIPS, on-demand) instead of an open question. Every `FactRecord.geoPrecision`
-value BB-086 emits is guaranteed to mean the same thing everywhere it appears, because there is
+value  emits is guaranteed to mean the same thing everywhere it appears, because there is
 exactly one place the vocabulary is defined.
 
 **Harder:** any caller that wants a fine-grained historical county boundary (a county as it was
@@ -243,7 +243,7 @@ accordingly — this is the same "deliberately coarse, never survey-grade" postu
 `us-geography.ts` already documents for state bboxes, now extended to counties.
 
 **Locked in:** the `exact-site | block | locality | county | state` geoPrecision vocabulary is
-now the one every future bead (BB-086 and beyond) must import, not redefine — changing it later
+now the one every future bead ( and beyond) must import, not redefine — changing it later
 is a cross-cutting migration, not a local edit.
 
 ## Reversibility
@@ -255,7 +255,7 @@ redesign. If ZIP-adjacent lookup is ever needed for a genuinely modern-only purp
 current mailing-address validation), `location.ts`'s existing `modern_input`/`modern_lookup`
 roles already cover that without touching this ADR's "never stored as reference data" line.
 
-One-way-ish on the geoPrecision vocabulary: once BB-086 and other consumers import
+One-way-ish on the geoPrecision vocabulary: once  and other consumers import
 `GeoPrecisionTier`, renaming or restructuring the five tiers becomes a coordinated migration
 across every consumer, not a local change — this is the trade this ADR deliberately makes by
 centralizing the definition instead of leaving each bead to invent its own.
@@ -266,7 +266,7 @@ centralizing the definition instead of leaving each bead to invent its own.
   — public domain (17 U.S.C. § 105, U.S. Government Work; no fee, no license restriction).
 - U.S. Census Bureau Cartographic Boundary Files (1:500k):
   <https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html>
-  — the future source for `bboxSource: 'census-cartographic-boundary'` and for BB-070's PMTiles
+  — the future source for `bboxSource: 'census-cartographic-boundary'` and for 's PMTiles
   county polygons.
 - Newberry Library, Atlas of Historical County Boundaries — noted future source for on-demand
   `validFrom`/`validTo` historical county records; not ingested by this bead.

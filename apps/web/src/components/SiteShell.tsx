@@ -14,11 +14,12 @@ export type SiteShellProps = {
 
 export function SiteShell({ children }: SiteShellProps) {
   return (
-    <div className="bb-shell">
+    <div className="ds-shell">
+      {/* Skip link (WCAG 2.4.1) renders once in app/layout.tsx, ahead of this shell. */}
       <SiteHeader />
       <DegradedModeNotice />
       <OfflineNotice />
-      <div className="bb-shell-body">{children}</div>
+      <div className="ds-shell-body">{children}</div>
       <SiteFooter />
     </div>
   );

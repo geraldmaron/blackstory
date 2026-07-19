@@ -1,9 +1,9 @@
 # Architecture Decision Records
 
-Formal decisions for Black Book platform topology, data, deployment, and security boundaries.
+Formal decisions for BlackStory platform topology, data, deployment, and security boundaries.
 
-**Bead:** BB-002  
-**Status:** Accepted (existing `black-book-efaaf` project/Hosting site acknowledged; other cloud resources not yet verified/provisioned)  
+**Bead:**
+**Status:** Accepted (existing `black-book-efaaf` project/Hosting site acknowledged; other cloud resources not yet verified/provisioned)
 **Date:** 2026-07-16
 
 ## How to read these
@@ -11,7 +11,7 @@ Formal decisions for Black Book platform topology, data, deployment, and securit
 - **Scaffold today** means the monorepo directories, packages, or local Docker compose already exist.
 - **Aspirational / target** means the decision is binding for upcoming beads. Firebase apps, Cloud
   Run, App Hosting backends, and production GitHub Actions are **not** fully provisioned or
-  verified yet (see `docs/bb-001/baseline-report.md` and D-013). **Cloud SQL is deferred** (ADR-011).
+  verified yet (see `docs/ds-001/baseline-report.md` and D-013). **Cloud SQL is deferred** (ADR-011).
 - Do not infer working app or database deployments from the existing Firebase project/Hosting site.
 
 ## Index
@@ -24,16 +24,19 @@ Formal decisions for Black Book platform topology, data, deployment, and securit
 | [ADR-004](./ADR-004-public-projection-immutable-snapshots.md) | Public projection and immutable publication snapshot model | Accepted |
 | [ADR-005](./ADR-005-service-surface-separation.md) | Public, submissions, internal, and admin service separation | Accepted |
 | [ADR-006](./ADR-006-github-actions-deployment.md) | GitHub Actions deployment model | Accepted |
-| [ADR-007](./ADR-007-background-workflow-model.md) | Background workflow model | Accepted |
+| [ADR-007](./ADR-007-background-workflow-model.md) | Background workflow model | Accepted (amended by ADR-018 for discovery schedules) |
 | [ADR-008](./ADR-008-search-and-geocoding.md) | Search and geocoding | Accepted (amended by ADR-011) |
 | [ADR-009](./ADR-009-research-isolation.md) | Research isolation | Accepted |
 | [ADR-010](./ADR-010-security-and-abuse-assumptions.md) | Security and abuse assumptions | Accepted |
 | [ADR-011](./ADR-011-firestore-system-of-record.md) | Firestore as system of record (Cloud SQL deferred) | Accepted |
-| [ADR-012](./ADR-012-production-environment-resplit.md) | Production environment re-split (multi-project isolation) | Accepted (supersedes D-013; not yet applied — see BB-079) |
-| [ADR-013](./ADR-013-map-stack.md) | Map stack: MapLibre GL JS, PMTiles/MapTiler tile strategy, dark archive basemap | Accepted (demo-level integration; release-activation wiring pending — see BB-051) |
-| [ADR-014](./ADR-014-vector-search.md) | Vector search: embedding pipeline and Firestore native KNN | Accepted (on-write/research-pipeline wiring pending — see BB-072) |
-| [ADR-015](./ADR-015-entity-ontology-status-notability-era.md) | Entity ontology: status lifecycle, notability basis, era model | Accepted (publication-gate wiring pending — see BB-090) |
-| [ADR-016](./ADR-016-jurisdiction-reference-data.md) | Jurisdiction reference data: scope, storage shape, and precision-radius policy | Accepted (dangling-reference gate documented, not live-wired — see BB-091) |
+| [ADR-012](./ADR-012-production-environment-resplit.md) | Production environment re-split (multi-project isolation) | Accepted (supersedes D-013; not yet applied — see ) |
+| [ADR-013](./ADR-013-map-stack.md) | Map stack: MapLibre GL JS, PMTiles/MapTiler tile strategy, dark archive basemap | Accepted (demo-level integration; release-activation wiring pending — see ) |
+| [ADR-014](./ADR-014-vector-search.md) | Vector search: embedding pipeline and Firestore native KNN | Accepted (on-write/research-pipeline wiring pending — see ) |
+| [ADR-015](./ADR-015-entity-ontology-status-notability-era.md) | Entity ontology: status lifecycle, notability basis, era model | Accepted (publication-gate wiring pending — see ) |
+| [ADR-016](./ADR-016-jurisdiction-reference-data.md) | Jurisdiction reference data: scope, storage shape, and precision-radius policy | Accepted (dangling-reference gate documented, not live-wired — see ) |
+| [ADR-017](./ADR-017-persistent-map-canvas.md) | Persistent map canvas | Accepted |
+| [ADR-018](./ADR-018-firebase-scheduled-functions-discovery.md) | Firebase scheduled Functions for discovery automation | Accepted (partially supersedes ADR-007 Jobs-only for capped discovery) |
+| [ADR-019](./ADR-019-acquisition-crawler-runtime.md) | Acquisition crawler runtime: TS adapters + Python Scrapy/Trafilatura | Accepted |
 
 ## Security boundary set (do not expand)
 
@@ -46,7 +49,7 @@ Deployable surfaces are limited to the bead-defined security boundaries:
 | Submissions / corrections API | Cloud Run | `apps/api-submissions` |
 | Internal publication / promotion API | Private Cloud Run | `apps/api-internal` |
 | Admin / research console | Cloud Run + IAP | `apps/admin` |
-| Research workers | Cloud Run Jobs / Tasks | `workers/research` |
+| Research workers | Cloud Run Jobs / Tasks **or** Firebase Functions v2 (research SA; ADR-018) | `workers/research`, `functions/` (discovery schedules) |
 | Publication workers | Cloud Run Jobs / Tasks | `workers/publication` |
 | Security workers | Cloud Run Jobs / Tasks | `workers/security` |
 
@@ -56,5 +59,5 @@ No ADR proposes additional microservices beyond this set. Shared libraries live 
 
 - [`../architecture.md`](../architecture.md) — architecture overview
 - [`../../plan.md`](../../plan.md) — bead tracker
-- [`../bb-001/baseline-report.md`](../bb-001/baseline-report.md) — verified scaffold baseline
+- [`../ds-001/baseline-report.md`](../ds-001/baseline-report.md) — verified scaffold baseline
 - [`.cx/decisions/`](../../.cx/decisions/) — short session summaries of these ADRs

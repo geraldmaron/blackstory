@@ -58,7 +58,7 @@ function reasonForErrorCode(code: number): GeolocationDenialReason {
 
 /**
  * Requests the browser's current position exactly once. `geolocation` is `undefined` on
- * browsers/contexts where the API doesn't exist (or where a Permissions-Policy has disabled it) 
+ * browsers/contexts where the API doesn't exist (or where a Permissions-Policy has disabled it)
  * that resolves to `{ ok: false, reason: 'unsupported' }` rather than throwing, so the caller can
  * always fall through to `ManualPlaceSearchForm`.
  */

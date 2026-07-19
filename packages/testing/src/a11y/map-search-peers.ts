@@ -1,13 +1,13 @@
 
 /**
  * Documented accessible peers for search/map journeys.
- * Kept outside test files so `@black-book/testing` can re-export the contract.
+ * Kept outside test files so `@repo/testing` can re-export the contract.
  */
 
 export const MAP_SEARCH_ACCESSIBLE_PEERS = Object.freeze([
   {
     journey: 'search',
-    component: 'ResultList (@black-book/ui)',
+    component: 'ResultList (@repo/ui)',
     webPath: 'packages/ui/src/components/ResultList.tsx',
     contract: 'Server-rendered result list with labelledBy for screen-reader parity',
   },
@@ -20,7 +20,7 @@ export const MAP_SEARCH_ACCESSIBLE_PEERS = Object.freeze([
   {
     journey: 'explore',
     component: 'Explore noscript filters',
-    webPath: 'apps/web/src/app/explore/page.tsx',
+    webPath: 'apps/web/src/app/(map)/explore/page.tsx',
     contract: 'Native GET FilterBar when JavaScript is unavailable',
   },
   {

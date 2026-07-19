@@ -1,15 +1,26 @@
 /**
- * The accessible list peer for the map — synchronized list is a full keyboard + screen-reader
- * peer with shared filter/viewport URL state (a peer, not an afterthought). Every item is a real
- * link to the entity page; selection state (`selectedId`) mirrors whatever point is open on the
- * map, in both directions — selecting a list item and selecting a map point produce the same
- * `onSelect` callback, so keyboard-only and screen-reader users reach every narrative off-ramp
- * the map offers without touching the canvas.
+ * The accessible list peer for the map. Rows are links to the entity record page — the same
+ * destination as clicking a map pin. Selection highlighting (`selectedId` / `aria-current`)
+ * mirrors the map copper ring when returning from “View on map” (`?selected=`).
+ *
+ * Meta rows use a fixed labeled layout (Kind / Era / Confidence / Evidence / Where)
+ * so rows stay uniform when optional fields are sparse. Metadata values link to explore,
+ * search, or entity anchors independently of the row’s primary select/open control.
  */
 import React from 'react';
-import { cx } from '@black-book/ui';
-import { CONFIDENCE_TIER_GLYPH } from '../../lib/map-experience/dignity-style';
+import Link from 'next/link';
+import { cx } from '@repo/ui';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
+import { displayEncodingFor } from '../../lib/map-experience/kind-encoding';
+import {
+  entityEvidenceHref,
+  eraFactLink,
+  exploreHrefForKind,
+  exploreHrefForState,
+  searchHrefForStatus,
+} from '../../lib/map-experience/metadata-hrefs';
+import { ConfidenceMark } from './ConfidenceMark';
+import { KindBadge } from './KindBadge';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;
@@ -17,67 +28,153 @@ void React;
 export type SynchronizedResultListProps = {
   readonly features: readonly ExploreMapFeature[];
   readonly selectedId?: string;
-  readonly onSelect?: (entityId: string) => void;
   readonly labelledBy?: string;
   readonly className?: string;
+  /** When set, list rows select the map record instead of navigating away. */
+  readonly onSelect?: (entityId: string) => void;
 };
 
-function eraLabel(eraBuckets: readonly string[]): string {
-  if (eraBuckets.length === 0) return 'Undated';
-  if (eraBuckets.length === 1) return eraBuckets[0]!;
-  return `${eraBuckets[0]} \u2013 ${eraBuckets[eraBuckets.length - 1]}`;
+type ResultRowMetaProps = {
+  readonly feature: ExploreMapFeature;
+};
+
+function ResultRowMeta({ feature }: ResultRowMetaProps) {
+  const { properties } = feature;
+  const kindEncoding = displayEncodingFor(properties.kind, properties.mapTone);
+  const era = eraFactLink(properties.eraBuckets);
+  const statePostalCode = properties.statePostalCode?.trim().toUpperCase();
+  const statusHref =
+    properties.status !== undefined ? searchHrefForStatus(properties.status) : undefined;
+  const evidenceLabel = `${properties.evidenceCount} accepted claim${properties.evidenceCount === 1 ? '' : 's'}`;
+
+  return (
+    <dl className="ds-result-list__meta ds-result-list__meta--labeled">
+      <div className="ds-result-meta">
+        <dt>Kind</dt>
+        <dd>
+          <Link
+            className="ds-result-meta__link ds-result-meta__link--kind"
+            href={exploreHrefForKind(properties.kind)}
+            aria-label={`Browse ${kindEncoding.label} records`}
+          >
+            <KindBadge
+              kind={properties.kind}
+              density="compact"
+              {...(properties.mapTone !== undefined ? { mapTone: properties.mapTone } : {})}
+            />
+          </Link>
+        </dd>
+      </div>
+      <div className="ds-result-meta">
+        <dt>Era</dt>
+        <dd className="ds-mono">
+          {era.href ? (
+            <Link
+              className="ds-result-meta__link"
+              href={era.href}
+              aria-label={`Browse records from the ${era.label}`}
+            >
+              {era.label}
+            </Link>
+          ) : (
+            era.label
+          )}
+        </dd>
+      </div>
+      <div className="ds-result-meta">
+        <dt>Confidence</dt>
+        <dd>
+          <ConfidenceMark tier={properties.confidenceTier} labeled className="ds-sans" />
+        </dd>
+      </div>
+      <div className="ds-result-meta">
+        <dt>Evidence</dt>
+        <dd className="ds-sans">
+          <Link
+            className="ds-result-meta__link"
+            href={entityEvidenceHref(properties.href)}
+            aria-label={`View ${evidenceLabel} on full record`}
+          >
+            {evidenceLabel}
+          </Link>
+        </dd>
+      </div>
+      <div className="ds-result-meta">
+        <dt>Where</dt>
+        <dd className="ds-mono">
+          {statePostalCode ? (
+            <Link
+              className="ds-result-meta__link"
+              href={exploreHrefForState(statePostalCode)}
+              aria-label={`View records in ${statePostalCode}`}
+            >
+              {statePostalCode}
+            </Link>
+          ) : (
+            '—'
+          )}
+        </dd>
+      </div>
+      {properties.status !== undefined ? (
+        <div className="ds-result-meta">
+          <dt>Status</dt>
+          <dd className="ds-sans">
+            {statusHref ? (
+              <Link
+                className="ds-result-meta__link"
+                href={statusHref}
+                aria-label={`Search records with status ${properties.status}`}
+              >
+                {properties.status}
+              </Link>
+            ) : (
+              properties.status
+            )}
+          </dd>
+        </div>
+      ) : null}
+    </dl>
+  );
 }
 
 export function SynchronizedResultList({
   features,
   selectedId,
-  onSelect,
   labelledBy,
   className,
+  onSelect,
 }: SynchronizedResultListProps) {
   return (
-    <ul className={cx('bb-result-list', 'bb-explore-result-list', className)} aria-labelledby={labelledBy}>
+    <ul className={cx('ds-result-list', 'ds-explore-result-list', className)} aria-labelledby={labelledBy}>
       {features.map((feature) => {
         const { properties } = feature;
         const isSelected = properties.entityId === selectedId;
-        const glyph = CONFIDENCE_TIER_GLYPH[properties.confidenceTier] ?? CONFIDENCE_TIER_GLYPH.unrated;
+        const primaryControlProps = {
+          className: cx(
+            'ds-result-list__link',
+            onSelect ? 'ds-result-list__link--button' : undefined,
+          ),
+          'aria-current': isSelected ? ('true' as const) : undefined,
+          'data-entity-id': properties.entityId,
+        };
 
         return (
-          <li key={properties.entityId} className="bb-result-list__item">
-            <a
-              className="bb-result-list__link"
-              href={properties.href}
-              aria-current={isSelected ? 'true' : undefined}
-              data-entity-id={properties.entityId}
-              onClick={
-                onSelect
-                  ? (event) => {
-                      // A synchronized selection (highlight on the map + open its narrative card)
-                      // is a progressive enhancement over the always-working link navigation 
-                      // only intercept the click when a live map is actually mounted to react to it.
-                      event.preventDefault();
-                      onSelect(properties.entityId);
-                    }
-                  : undefined
-              }
-            >
-              <h3 className="bb-result-list__title">{properties.displayName}</h3>
-              <p className="bb-result-list__summary">{properties.oneLineStory}</p>
-              <div className="bb-result-list__meta">
-                <span className="bb-mono">{properties.kind}</span>
-                <span className="bb-mono">{eraLabel(properties.eraBuckets)}</span>
-                <span className="bb-sans">
-                  <span aria-hidden="true">{glyph}</span>{' '}
-                  {properties.confidenceTier === 'unrated' ? 'Unrated' : `${properties.confidenceTier} confidence`}
-                </span>
-                <span className="bb-sans">
-                  {properties.evidenceCount} claim{properties.evidenceCount === 1 ? '' : 's'}
-                </span>
-                {properties.statePostalCode ? (
-                  <span className="bb-mono">{properties.statePostalCode}</span>
-                ) : null}
-              </div>
-            </a>
+          <li
+            key={properties.entityId}
+            className={cx('ds-result-list__item', isSelected && 'ds-result-list__item--selected')}
+          >
+            {onSelect ? (
+              <button type="button" {...primaryControlProps} onClick={() => onSelect(properties.entityId)}>
+                <h3 className="ds-result-list__title">{properties.displayName}</h3>
+                <p className="ds-result-list__summary">{properties.oneLineStory}</p>
+              </button>
+            ) : (
+              <Link {...primaryControlProps} href={properties.href}>
+                <h3 className="ds-result-list__title">{properties.displayName}</h3>
+                <p className="ds-result-list__summary">{properties.oneLineStory}</p>
+              </Link>
+            )}
+            <ResultRowMeta feature={feature} />
           </li>
         );
       })}

@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WORKSPACE_ROOTS = ['apps', 'packages'];
+/** Root-level Firebase Functions package (ADR-018 discovery schedules). */
+const ROOT_DEPLOYABLES = ['functions'];
 const SOURCE_EXTENSIONS = ['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx'];
 const IGNORED_DIRECTORIES = new Set(['.next', 'coverage', 'dist', 'node_modules']);
 const IMPORT_PATTERN =
@@ -40,6 +42,23 @@ async function discoverWorkspaces() {
         if (error?.code !== 'ENOENT') {
           throw error;
         }
+      }
+    }
+  }
+
+  for (const deployable of ROOT_DEPLOYABLES) {
+    const directory = path.join(ROOT, deployable);
+    try {
+      const manifest = await readJson(path.join(directory, 'package.json'));
+      workspaces.push({
+        directory,
+        kind: 'app',
+        manifest,
+        name: manifest.name,
+      });
+    } catch (error) {
+      if (error?.code !== 'ENOENT') {
+        throw error;
       }
     }
   }
@@ -169,9 +188,9 @@ async function main() {
     }
 
     // Public web must never depend on server DB helpers.
-    if (workspace.name === '@black-book/web' && dependencies.has('@black-book/data-access')) {
+    if (workspace.name === '@repo/web' && dependencies.has('@repo/data-access')) {
       errors.push(
-        '@black-book/web cannot depend on @black-book/data-access (no browser DB credentials)',
+        '@repo/web cannot depend on @repo/data-access (no browser DB credentials)',
       );
     }
 
@@ -184,22 +203,22 @@ async function main() {
           );
         }
         if (
-          workspace.name === '@black-book/web' &&
-          (importedName === '@black-book/data-access' ||
-            importedName.startsWith('@black-book/data-access/'))
+          workspace.name === '@repo/web' &&
+          (importedName === '@repo/data-access' ||
+            importedName.startsWith('@repo/data-access/'))
         ) {
           errors.push(
-            `${path.relative(ROOT, file)} cannot import @black-book/data-access in the public web app`,
+            `${path.relative(ROOT, file)} cannot import @repo/data-access in the public web app`,
           );
         }
       }
     }
 
     // Package export contract: data-access must deny browser resolution.
-    if (workspace.name === '@black-book/data-access') {
+    if (workspace.name === '@repo/data-access') {
       const browserExport = workspace.manifest.exports?.['.']?.browser;
       if (!browserExport) {
-        errors.push('@black-book/data-access must define exports["."].browser denial entry');
+        errors.push('@repo/data-access must define exports["."].browser denial entry');
       }
     }
   }

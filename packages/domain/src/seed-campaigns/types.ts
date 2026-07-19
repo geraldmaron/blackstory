@@ -1,6 +1,6 @@
 /**
  * Versioned contracts for national seed campaigns: quality-first, fixture-only
- * seed records grouped by thematic campaign. These are structured fixtures and validators 
+ * seed records grouped by thematic campaign. These are structured fixtures and validators
  * never live Firestore apply payloads.
  */
 import type { GeoPrecisionTier } from '../geography/precision.js';

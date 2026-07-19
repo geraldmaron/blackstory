@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { SurfaceCapabilityError } from '@black-book/config';
+import { SurfaceCapabilityError } from '@repo/config';
 import {
   createInMemorySubmissionQuarantineRepository,
   createSubmissionQuarantineService,

@@ -8,7 +8,7 @@
 ## Contain
 
 1. Engage `publication` and `public-static-mode`.
-2. If release content changed, execute BB-019 rollback; if host code changed, use the last known-good deployment artifact.
+2. If release content changed, execute  rollback; if host code changed, use the last known-good deployment artifact.
 3. Revoke only the compromised deployer, publisher, DNS, or CDN credential.
 4. Preserve artifacts, manifests, headers, and audit logs before cache changes.
 

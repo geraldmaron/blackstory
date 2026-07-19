@@ -1,13 +1,13 @@
 /**
- * Proves the `SafeHttpClient` port (./http-port.ts) is realizable against the REAL 
+ * Proves the `SafeHttpClient` port (./http-port.ts) is realizable against the REAL
  * primitives not a stub and that an SSRF-targeted URL is rejected before any adapter fetch
  * proceeds.
  *
- * `@black-book/security` is a devDependency of this package for this test only (see
+ * `@repo/security` is a devDependency of this package for this test only (see
  * package.json); it is never imported by http-port.ts or any other shipped adapter file see
  * http-port.ts's header comment for the circular-dependency reason. This mirrors
  * `../../../map/map-source.redaction.test.ts`'s pattern exactly: the port is defined and
- * consumed with zero runtime dependency on `@black-book/security`, and only the test proves the
+ * consumed with zero runtime dependency on `@repo/security`, and only the test proves the
  * real wiring holds.
  */
 import assert from 'node:assert/strict';
@@ -17,7 +17,7 @@ import {
   resolveAndPinDestination,
   type PinnedTransport,
   type ResolveHost,
-} from '@black-book/security';
+} from '@repo/security/url-safety';
 import {
   mapWithConcurrency,
   withRetry,
@@ -42,11 +42,11 @@ function buildRealSafeHttpClient(deps: { readonly resolveHost: ResolveHost; read
   return async (request): Promise<SafeHttpResponse> => {
     const parsed = evaluateExternalUrl(request.url);
     if (!parsed.allowed) {
-      throw new Error(`URL rejected by BB-030 policy: ${parsed.reason}`);
+      throw new Error(`URL rejected by safe-fetch policy: ${parsed.reason}`);
     }
     const destination = await resolveAndPinDestination(parsed.value, deps.resolveHost);
     if (!destination.allowed) {
-      throw new Error(`URL rejected by BB-030 DNS pinning: ${destination.reason}`);
+      throw new Error(`URL rejected by safe-fetch DNS pinning: ${destination.reason}`);
     }
     const response = await deps.transport({
       url: destination.value.normalizedUrl,
@@ -69,7 +69,7 @@ function buildRealSafeHttpClient(deps: { readonly resolveHost: ResolveHost; read
   };
 }
 
-test('a real BB-030-backed SafeHttpClient serves an allowed public URL', async () => {
+test('a real -backed SafeHttpClient serves an allowed public URL', async () => {
   const client = buildRealSafeHttpClient({
     resolveHost: async () => [{ address: '93.184.216.34', family: 4 }],
     transport: async () => ({
@@ -85,7 +85,7 @@ test('a real BB-030-backed SafeHttpClient serves an allowed public URL', async (
   assert.equal(response.bodyText, '{"identifier":"example"}');
 });
 
-test('SSRF-targeted URLs (private/loopback/metadata) are rejected by the real BB-030 policy before any transport call', async () => {
+test('SSRF-targeted URLs (private/loopback/metadata) are rejected by the real  policy before any transport call', async () => {
   let transportCalled = false;
   const client = buildRealSafeHttpClient({
     resolveHost: async () => [{ address: '93.184.216.34', family: 4 }],
@@ -106,7 +106,7 @@ test('SSRF-targeted URLs (private/loopback/metadata) are rejected by the real BB
     'https://metadata.google.internal/',
     'file:///etc/passwd',
   ]) {
-    await assert.rejects(() => client({ url: target, method: 'GET' }), /URL rejected by BB-030/);
+    await assert.rejects(() => client({ url: target, method: 'GET' }), /URL rejected by /);
   }
   assert.equal(transportCalled, false);
 });

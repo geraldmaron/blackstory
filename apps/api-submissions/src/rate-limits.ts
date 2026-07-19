@@ -13,7 +13,7 @@ import {
   type RateLimitStore,
   type RateLimitSubject,
   type RiskSignal,
-} from '@black-book/security';
+} from '@repo/security';
 
 export type SubmissionsRateLimitRequest = {
   readonly method: string;

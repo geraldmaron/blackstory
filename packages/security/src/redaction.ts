@@ -1,15 +1,15 @@
 
 /**
- * Central redaction primitives for Black Book.
+ * Central redaction primitives for BlackStory.
  *
  * This module is the single policy-driven engine that reduces location precision
  * before publication and scrubs protected values (residential addresses, exact
  * coordinates) out of any serialized payload public projections, search index
  * documents, logs, error telemetry, and exports. All rules derive from the product
- * constitution (@black-book/schemas); nothing here weakens those rules.
+ * constitution (@repo/schemas); nothing here weakens those rules.
  */
-import { evaluatePublicPrecision, loadProductConstitution } from '@black-book/schemas';
-import { treatAsLiving, type LivingStatus } from '@black-book/domain';
+import { evaluatePublicPrecision, loadProductConstitution } from '@repo/schemas';
+import { treatAsLiving, type LivingStatus } from '@repo/domain/living';
 import {
   isResidentialPrecision,
   type PrecisionReductionReason,

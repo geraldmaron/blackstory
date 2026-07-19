@@ -1,11 +1,13 @@
 /**
- * Narrative off-ramp card for a selected history graph node. Mirrors 
+ * Narrative off-ramp card for a selected history graph node. Mirrors
  * `NarrativeCard` name, kind, status-as-of-decade, evidence count, and links to the entity page
  * and any published facts.
  */
 import React from 'react';
-import { Card } from '@black-book/ui';
+import Link from 'next/link';
+import { Card } from '@repo/ui';
 import type { HistoryNodeView } from '../../lib/history/build-history-graph';
+import { entityEvidenceHref, exploreHrefForKind } from '../../lib/map-experience/metadata-hrefs';
 
 void React;
 
@@ -28,16 +30,18 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
       title={node.displayName}
       meta={
         <>
-          <span className="bb-mono">{node.kind}</span>
-          <span className="bb-sans">{statusMeta}</span>
+          <Link className="ds-mono ds-history-narrative-card__kind-link" href={exploreHrefForKind(node.kind)}>
+            {node.kind}
+          </Link>
+          <span className="ds-sans">{statusMeta}</span>
         </>
       }
-      className="bb-history-narrative-card"
+      className="ds-history-narrative-card"
     >
       {onClose ? (
         <button
           type="button"
-          className="bb-button bb-button--secondary bb-history-narrative-card__close"
+          className="ds-button ds-button--secondary ds-history-narrative-card__close"
           onClick={onClose}
           aria-label={`Close ${node.displayName} card`}
         >
@@ -45,9 +49,9 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
         </button>
       ) : null}
 
-      <p className="bb-sans">{node.summary}</p>
+      <p className="ds-sans">{node.summary}</p>
 
-      <dl className="bb-history-narrative-card__facts">
+      <dl className="ds-history-narrative-card__facts">
         <div>
           <dt>Status in view</dt>
           <dd>{node.statusLabel}</dd>
@@ -55,29 +59,31 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
         <div>
           <dt>Evidence</dt>
           <dd>
-            {node.evidenceCount} accepted claim{node.evidenceCount === 1 ? '' : 's'}
+            <Link className="ds-history-narrative-card__fact-link" href={entityEvidenceHref(node.href)}>
+              {node.evidenceCount} accepted claim{node.evidenceCount === 1 ? '' : 's'}
+            </Link>
           </dd>
         </div>
       </dl>
 
       {node.factLinks.length > 0 ? (
-        <div className="bb-history-narrative-card__facts-links">
-          <p className="bb-sans">Published facts referencing this record:</p>
+        <div className="ds-history-narrative-card__facts-links">
+          <p className="ds-sans">Published facts referencing this record:</p>
           <ul>
             {node.factLinks.map((fact) => (
               <li key={fact.href}>
-                <a className="bb-cta bb-cta--ghost" href={fact.href}>
+                <Link className="ds-cta ds-cta--ghost" href={fact.href}>
                   {fact.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
         </div>
       ) : null}
 
-      <a className="bb-cta bb-cta--ink" href={node.href}>
+      <Link className="ds-cta ds-cta--ink" href={node.href}>
         Open full record
-      </a>
+      </Link>
     </Card>
   );
 }

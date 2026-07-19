@@ -68,11 +68,16 @@ describe('BB-084 scheduled-jobs Cloud Scheduler mirror', () => {
     ]);
   });
 
-  it('exactly four jobs are marked real, matching the wired job bodies under packages/config/src/scheduled-jobs/jobs/', () => {
+  it('exactly nine jobs are marked real (prior five plus four unstubbed discovery campaigns)', () => {
     const config = readJson('scheduled-jobs.json');
     const real = config.jobs.filter((job) => job.rosterStatus === 'real').map((job) => job.id).sort();
     assert.deepEqual(real, [
       'backup-verification-daily',
+      'community-obscurity-discovery',
+      'discovery-campaign-archive-dpla',
+      'discovery-campaign-rss',
+      'discovery-campaign-web-search',
+      'discovery-campaign-wikimedia-federal',
       'gold-corpus-regression',
       'restore-drill-quarterly',
       'source-drift-run-health-check',

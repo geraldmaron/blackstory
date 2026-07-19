@@ -36,7 +36,7 @@ After the repository exists and an administrator has authenticated with `gh`:
    image/signature and staging DAST checks before production rollout enables those
    paths.
 5. Create the protected `staging-security` environment. Add an isolated account named
-   with prefix `bb-security-dast-`, store only its short-lived token as
+   with prefix `ds-security-dast-`, store only its short-lived token as
    `STAGING_DAST_TOKEN`, restrict it to synthetic staging data, and deny production IAM.
 6. Configure artifact retention to at least 90 days. The release workflow must download
    the security artifacts, attach them to the release, and write tested commit, image
@@ -50,8 +50,8 @@ entitlement failures must be recorded as blockers; do not weaken the gates.
 ## Local verification
 
 ```bash
-pnpm --filter @black-book/testing test:security
-pnpm --filter @black-book/testing exec node --import tsx --test \
+pnpm --filter @repo/testing test:security
+pnpm --filter @repo/testing exec node --import tsx --test \
   src/security-gates/security-gates.test.ts
 pnpm exec tsc --noEmit --strict --exactOptionalPropertyTypes \
   --target ES2022 --module NodeNext --moduleResolution NodeNext --skipLibCheck \

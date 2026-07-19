@@ -5,9 +5,9 @@
  *
  * IS re-exported through the package barrels: `../index.ts` (the adapters package barrel)
  * already does `export * from './census-geo/index.js';` (added for), and
- * `../../index.ts` (the `@black-book/domain` package barrel) already does
+ * `../../index.ts` (the `@repo/domain` package barrel) already does
  * `export * from './adapters/index.js';` so every symbol exported from THIS file is already
- * reachable as `@black-book/domain` today with no further barrel edit required. This is
+ * reachable as `@repo/domain` today with no further barrel edit required. This is
  * different from the brand-new `../../geocode/` module (see its index.ts doc comment), which
  * has no existing wildcard chain and does need a parent-session merge.
  */

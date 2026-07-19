@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://blackbook.local/schemas/adapters/candidate-record.v1.schema.json",
   "title": "AdapterCandidateRecord",
-  "description": "Normalized adapter output record with mandatory source and parser provenance (BB-037).",
+  "description": "Normalized adapter output record with mandatory source and parser provenance.",
   "type": "object",
   "additionalProperties": false,
   "required": ["stableIdentifier", "provenance"],

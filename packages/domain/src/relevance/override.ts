@@ -1,7 +1,7 @@
 /**
  * Manual relevance override with required human reason.
  */
-import type { RelevanceDecision } from '@black-book/schemas';
+import type { RelevanceDecision } from '@repo/schemas';
 import type { RelevanceOverride } from './types.js';
 
 const MIN_OVERRIDE_REASON_LENGTH = 12;

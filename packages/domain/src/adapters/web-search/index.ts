@@ -1,11 +1,11 @@
 /**
- * Web-search discovery adapter public surface. Primary provider: Brave Search API —
- * see `./provider-decision.ts` for the full reasoning. Storage-rights gated — see
- * `./normalizer.ts`'s `assertStorageTermsConfirmed` and `./types.ts`'s
- * `WebSearchProviderConfig` doc comment for the fail-closed persistence boundary.
+ * Web-search discovery adapter public surface. Preferred provider: SearXNG
+ * (self-hosted OSS) — see `./provider-decision.ts`. Brave remains supported.
+ * Storage-rights gated — see `./normalizer.ts` assertStorageTermsConfirmed.
  */
 export {
   WEB_SEARCH_PROVIDERS,
+  SEARXNG_SEARCH_ADAPTER_ID,
   BRAVE_SEARCH_ADAPTER_ID,
   EXA_SEARCH_ADAPTER_ID,
   WEB_SEARCH_PARSER_VERSION,
@@ -34,6 +34,14 @@ export {
 } from './brave-client.js';
 
 export {
+  SEARXNG_DEFAULT_PATH,
+  normalizeSearxngBaseUrl,
+  buildSearxngSearchUrl,
+  parseSearxngSearchResponse,
+  type BuildSearxngSearchUrlInput,
+} from './searxng-client.js';
+
+export {
   buildWebSearchQueryTexts,
   assertQueryTextHasNoResearchOnlyOffensiveTerms,
   type WebSearchGeographicSeed,
@@ -60,14 +68,19 @@ export {
   type NormalizeWebSearchResultInput,
 } from './normalizer.js';
 
-export { createBraveSearchAdapterContract } from './contract.js';
+export {
+  createBraveSearchAdapterContract,
+  createSearxngSearchAdapterContract,
+} from './contract.js';
 
 export {
   fetchBraveWebSearch,
   fetchBraveWebSearchBudgeted,
+  fetchSearxngWebSearch,
   type FetchBraveWebSearchInput,
   type FetchBraveWebSearchBudgetedInput,
   type FetchBraveWebSearchBudgetedResult,
+  type FetchSearxngWebSearchInput,
 } from './fetch-search.js';
 
 export {

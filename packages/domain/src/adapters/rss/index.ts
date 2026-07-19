@@ -45,3 +45,13 @@ export {
 } from './normalizer.js';
 
 export { fetchAndNormalizeFeed, fetchAndNormalizeFeeds, type FetchFeedInput } from './fetch-feed.js';
+
+export {
+  CURATED_COMMUNITY_FEED_SEED_VERSION,
+  CURATED_COMMUNITY_FEED_SEEDS,
+  getCuratedCommunityFeedSeed,
+  assertCommunityFeedCarePolicy,
+  seedCuratedCommunityFeeds,
+  type CommunityFeedCarePolicy,
+  type CuratedCommunityFeedSeed,
+} from './curated-feeds.js';

@@ -146,6 +146,20 @@ test('buildAllTimeView unions every decade view into one deduplicated, sorted no
   assert.deepEqual(allTime.nodeIds, [...new Set(allTime.nodeIds)]); // deduplicated
 });
 
+test('buildAllTimeView includes entityIds that never appear in any decade bucket', () => {
+  const decadeViews = buildDecadeViews(
+    {
+      entities: [GRAPH_GOLD_FIXTURES.decadeBucketing.stillActiveOrg],
+      relationships: [],
+    },
+    { stillActiveCutoff: '1980' },
+  );
+  const allTime = buildAllTimeView(decadeViews, {
+    entityIds: ['gg-org-league', 'gg-undated-no-spans'],
+  });
+  assert.deepEqual(allTime.nodeIds, ['gg-org-league', 'gg-undated-no-spans']);
+});
+
 // Sanity: confirms this test exercises the real currentStatus derivation (never
 // reimplemented locally) so the "still active" premise above is grounded in the real function.
 test('sanity: currentStatus derives "active" from the same open-ended record used above', () => {

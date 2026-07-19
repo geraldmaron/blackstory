@@ -1,8 +1,8 @@
 /**
  * Include exclude supporting-context decision logic.
  */
-import type { ProductConstitution, RelevanceDecision } from '@black-book/schemas';
-import { evaluateRelevance, loadProductConstitution } from '@black-book/schemas';
+import type { ProductConstitution, RelevanceDecision } from '@repo/schemas';
+import { evaluateRelevance, loadProductConstitution } from '@repo/schemas';
 import type { DiscoveryCandidateRecord } from '../discovery/types.js';
 import { firstFailedGate, gateFailed } from './gates.js';
 import type { RelevanceGateResult } from './types.js';

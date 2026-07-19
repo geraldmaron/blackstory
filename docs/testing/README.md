@@ -1,6 +1,6 @@
-# Testing foundation (BB-008)
+# Testing foundation
 
-Automated quality layers for Black Book. Production services are fail-closed; flaky tests are quarantined with owner + deadline (never infinite retries).
+Automated quality layers for BlackStory. Production services are fail-closed; flaky tests are quarantined with owner + deadline (never infinite retries).
 
 ## Layers and commands
 
@@ -9,18 +9,18 @@ Automated quality layers for Black Book. Production services are fail-closed; fl
 | Preflight | `pnpm test:preflight` | Production identifier guard + quarantine registry health |
 | Unit | `pnpm test:unit` | Package/app unit tests + Python pytest |
 | Contract | `pnpm test:contract` | API health contract helpers |
-| Security | `pnpm test:security` | Threat corpus (BB-004) + production guards + BB-059 load/abuse scenarios (`docs/testing/load-abuse.md`) + BB-060 adversarial integrity (`docs/testing/adversarial-integrity.md`) |
-| Accessibility | `pnpm test:a11y` | HTML landmark/alt smoke fixtures + BB-057 journey audits (`docs/testing/a11y-seo-perf-privacy.md`) |
-| Release gates | `pnpm --filter @black-book/testing test:release-gates` | Performance budgets + public degraded-mode contracts |
+| Security | `pnpm test:security` | Threat corpus + production guards +  load/abuse scenarios (`docs/testing/load-abuse.md`) +  adversarial integrity (`docs/testing/adversarial-integrity.md`) |
+| Accessibility | `pnpm test:a11y` | HTML landmark/alt smoke fixtures +  journey audits (`docs/testing/a11y-seo-perf-privacy.md`) |
+| Release gates | `pnpm --filter @repo/testing test:release-gates` | Performance budgets + public degraded-mode contracts |
 | Integration | `pnpm test:integration` | Postgres disposable schema + Firebase emulator probes |
 | Migration | `pnpm test:migration` | Forward-only `schema_migrations` harness on disposable DB |
 | E2E | `pnpm test:e2e` | Harness; live fetch only when `E2E_BASE_URL` is local |
-| Coverage | `pnpm test:coverage` | Node test coverage thresholds for `@black-book/testing` |
+| Coverage | `pnpm test:coverage` | Node test coverage thresholds for `@repo/testing` |
 | Full | `pnpm test` | Preflight + all package/app tests + pytest |
 
 ## Determinism and builders
 
-Import from `@black-book/testing`:
+Import from `@repo/testing`:
 
 - Clocks: `fixedClock`, `steppingClock`
 - IDs: `createIdFactory`, `defaultIdFactories`
@@ -38,9 +38,9 @@ Flaky tests belong in `packages/testing/quarantine.json` with `owner`, `deadline
 
 ### PostgreSQL (deferred / optional)
 
-- Local: `pnpm db:up`, then `pnpm db:init` / `pnpm db:verify` for parked role foundation (BB-012).
+- Local: `pnpm db:up`, then `pnpm db:init` / `pnpm db:verify` for parked role foundation.
 - Integration: `pnpm test:integration` / `pnpm test:migration` (skips if Docker/Postgres down).
-- Role isolation unit tests still run in `@black-book/data-access`; runtime isolation via
+- Role isolation unit tests still run in `@repo/data-access`; runtime isolation via
   `pnpm test:db:integration` is **optional**.
 - CI job **Integration Postgres** is **skipped by default** (set repo variable
   `ENABLE_POSTGRES_CI=true` to enable). Not a required status check (ADR-011).
@@ -48,7 +48,7 @@ Flaky tests belong in `packages/testing/quarantine.json` with `owner`, `deadline
 ### Firebase emulators (primary data path)
 
 - Local: Java runtime (Homebrew `openjdk@21` is the default `JAVA_HOME` in `pnpm firebase:emulators`) + `pnpm firebase:emulators`, then `pnpm test:integration` (skips if emulators/Java unavailable).
-- Firestore security rules + converters: `pnpm firebase:test:rules` (or `@black-book/firebase` tests); skips locally unless emulators are up; set `CI_REQUIRE_FIREBASE=1` to fail closed.
+- Firestore security rules + converters: `pnpm firebase:test:rules` (or `@repo/firebase` tests); skips locally unless emulators are up; set `CI_REQUIRE_FIREBASE=1` to fail closed.
 - CI job **Integration Firebase** installs Temurin 21, starts demo emulators, runs harness + **Firestore rules tests**, sets `CI_REQUIRE_FIREBASE=1`. Missing emulators fails the job.
 
 ### E2E
@@ -75,4 +75,4 @@ Workflow: `.github/workflows/ci.yml` (`name: CI`)
 
 Permissions are `contents: read`. Third-party actions are pinned to immutable SHAs. `pull_request_target` is not used.
 
-Governance policy (BB-009): `pnpm validate:governance` checks workflow pins/permissions/events plus checked-in ruleset/CODEOWNERS/Dependabot/SECURITY artifacts. Remote ruleset application is documented in `infra/github/README.md` (blocked until a GitHub remote + admin `gh` auth exist).
+Governance policy: `pnpm validate:governance` checks workflow pins/permissions/events plus checked-in ruleset/CODEOWNERS/Dependabot/SECURITY artifacts. Remote ruleset application is documented in `infra/github/README.md` (blocked until a GitHub remote + admin `gh` auth exist).

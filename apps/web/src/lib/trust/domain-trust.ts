@@ -1,5 +1,6 @@
 /**
- * Re-exports the domain trust local barrel for apps/web until parent merges
- * `export * from './trust/index.js'` into `packages/domain/src/index.ts`.
+ * Re-exports the domain trust surface for apps/web.
+ * Uses the client-safe `@repo/domain/trust` subpath — never the package barrel
+ * (barrel pulls `publication/` → `node:crypto` into browser clients).
  */
-export * from '../../../../../packages/domain/src/trust/index.js';
+export * from '@repo/domain/trust';

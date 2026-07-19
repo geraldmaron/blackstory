@@ -1,0 +1,4 @@
+.deploy/
+lib/
+node_modules/
+*.tsbuildinfo

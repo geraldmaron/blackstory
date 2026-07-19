@@ -1,5 +1,5 @@
 {
-  "name": "@black-book/api-public",
+  "name": "@repo/api-public",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,13 +11,13 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "@black-book/config": "workspace:*",
-    "@black-book/domain": "workspace:*",
-    "@black-book/firebase": "workspace:*",
-    "@black-book/security": "workspace:*"
+    "@repo/config": "workspace:*",
+    "@repo/domain": "workspace:*",
+    "@repo/firebase": "workspace:*",
+    "@repo/security": "workspace:*"
   },
   "devDependencies": {
-    "@black-book/typescript-config": "workspace:^",
+    "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

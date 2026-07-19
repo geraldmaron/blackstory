@@ -1,12 +1,24 @@
-
 /**
- * Shared environment validation and package identity helpers for the Black Book monorepo.
+ * Shared environment validation and package identity helpers for the monorepo.
  */
 import { z } from 'zod';
 
+export {
+  PRODUCT_NAME,
+  PACKAGE_SCOPE,
+  DESIGN_TOKEN_PREFIX,
+  APP_ENV_PREFIX,
+  GCP_PROJECT_ID_PROD,
+  BRAND_ASSETS,
+  brandLockup,
+  brandSymbol,
+  brandOpenGraph,
+} from './identity.js';
+export type { BrandTheme } from './identity.js';
+
 export const packageNameSchema = z
   .string()
-  .regex(/^@black-book\/[a-z0-9-]+$/, 'Expected @black-book/<name> package id');
+  .regex(/^@repo\/[a-z0-9-]+$/, 'Expected @repo/<name> package id');
 
 export const nodeEnvSchema = z.enum(['development', 'test', 'staging', 'production']);
 export const logLevelSchema = z.enum(['debug', 'info', 'warn', 'error']);
@@ -31,10 +43,12 @@ export function parseRuntimeEnvironment(
   return runtimeEnvironmentSchema.parse(environment);
 }
 
-export const PACKAGE_SCOPE = '@black-book' as const;
-
 export * from './surfaces.js';
+export * from './sibling-origins.js';
+export * from './shell-nav.js';
 export * from './kill-switches.js';
-export * from './scheduled-jobs/index.js';
 
-export * from './launch-gate/index.js';
+// Node-only surfaces — import via package subpaths, never the main barrel
+// (client components that import @repo/config would otherwise pull node:* into webpack):
+//   @repo/config/scheduled-jobs
+//   @repo/config/launch-gate

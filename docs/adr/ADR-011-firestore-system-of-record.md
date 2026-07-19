@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-16
-- **Bead:** BB-013 (rescoped); overrides BB-012 production path
+- **Bead:**  (rescoped); overrides  production path
 - **Depends on:** ADR-004, ADR-005, ADR-009, ADR-010, D-013, D-014
 - **Supersedes (current phase):** ADR-002 and ADR-003 production intent
 - **Amends:** ADR-008 search/geo initial implementation path
@@ -11,14 +11,14 @@
 
 | Aspect | Today (verified) | Target (current phase) |
 |--------|------------------|------------------------|
-| System of record | Firestore rules + typed paths/converters (BB-013 rescoped) | Cloud Firestore collections for structured product data |
+| System of record | Firestore rules + typed paths/converters ( rescoped) | Cloud Firestore collections for structured product data |
 | Blobs | Storage deny-all rules; GCS class buckets designed | Firebase Storage / GCS (unchanged) |
 | Cloud SQL / PostGIS | Local compose + SQL Connect templates **parked** | **Not provisioned**; not production path |
-| Search / geo | Not implemented | Geohash fields + bounded `api-public` queries; Census Geocoder later (BB-050) |
+| Search / geo | Not implemented | Geohash fields + bounded `api-public` queries; Census Geocoder later |
 
 ## Context
 
-Execution beads originally mandated Cloud SQL PostgreSQL + PostGIS + Firebase SQL Connect. The product owner rejected that path for **cost and efficiency** while retaining Firebase Auth, App Check, Storage, and a single production project (`black-book-efaaf`). BB-012 delivered local PostGIS roles and SQL Connect templates; BB-013 Postgres migrations were interrupted and must not continue as the blocking path.
+Execution beads originally mandated Cloud SQL PostgreSQL + PostGIS + Firebase SQL Connect. The product owner rejected that path for **cost and efficiency** while retaining Firebase Auth, App Check, Storage, and a single production project (`black-book-efaaf`).  delivered local PostGIS roles and SQL Connect templates;  Postgres migrations were interrupted and must not continue as the blocking path.
 
 Non-negotiable product invariants still apply: no anonymous canonical writes; public reads of released projections/snapshots only; submissions require promotion; research cannot publish; living-person and evidence provenance rules remain binding.
 
@@ -26,7 +26,7 @@ Non-negotiable product invariants still apply: no anonymous canonical writes; pu
 
 1. **Cloud Firestore** is the system of record for structured entities, claims, evidence **metadata**, sources, publication releases, public projections, submissions, audit events, policy refs, and operations documents.
 2. **Firebase Storage / GCS** remains the blob store (evidence binaries, public media, quarantine, exports). Metadata in Firestore points at storage object refs; clients never gain broad storage write via rules.
-3. **Cloud SQL, PostGIS, and SQL Connect are deferred** for the current phase. Artifacts under `infra/database/` and Postgres helpers in `@black-book/data-access` remain in-repo as **parked / non-production** history, not as required CI or deploy blockers.
+3. **Cloud SQL, PostGIS, and SQL Connect are deferred** for the current phase. Artifacts under `infra/database/` and Postgres helpers in `@repo/data-access` remain in-repo as **parked / non-production** history, not as required CI or deploy blockers.
 4. **Geography / nearby discovery (initial):** store `geohash` (and optional prefixes), `lat`, `lng` on public projection location documents; `api-public` performs approved geohash-bounded queries plus server-side radius filtering. No PostGIS requirement for beta.
 5. **Text search (initial):** bounded field/prefix queries over released public projection documents; defer a dedicated search engine until measured need (same spirit as ADR-008, different first store).
 6. **Access control:** Firestore security rules enforce client boundaries; privileged writes use **Admin SDK** from Cloud Run / workers with distinct service accounts. Custom Auth claims separate admin vs research console **reads** where needed; research still cannot publish.
@@ -39,13 +39,13 @@ Non-negotiable product invariants still apply: no anonymous canonical writes; pu
 | Provision Cloud SQL anyway “for parity with beads” | Fixed cost without validated need; owner override |
 | Dual-write Firestore + Postgres from day one | Doubles complexity and cost; violates efficiency goal |
 | Client SDK writes to canonical with rule filters | High leak/abuse risk; violates “no public canonical write” |
-| Mass-delete BB-012 Postgres artifacts | Loses recoverable history; prefer park + banners |
+| Mass-delete  Postgres artifacts | Loses recoverable history; prefer park + banners |
 
 ## Consequences
 
-- BB-013 becomes **Firestore schema foundation** (collections, rules, converters, seeds, emulator tests), not SQL migrations.
-- BB-014+ domain models target Firestore document shapes; living-person rules remain constitution-driven.
-- BB-020 backup/PITR shifts toward Firestore export / Storage versioning design (not Cloud SQL PITR) unless Postgres is reconsidered.
+-  becomes **Firestore schema foundation** (collections, rules, converters, seeds, emulator tests), not SQL migrations.
+- + domain models target Firestore document shapes; living-person rules remain constitution-driven.
+-  backup/PITR shifts toward Firestore export / Storage versioning design (not Cloud SQL PITR) unless Postgres is reconsidered.
 - CI primary data path is **Firestore emulator rules tests**; Postgres integration jobs are optional/skipped.
 - Local PostGIS remains available for experiments but is not required for `pnpm test` / validate.
 

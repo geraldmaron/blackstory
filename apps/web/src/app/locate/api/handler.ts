@@ -20,7 +20,7 @@ import {
   translateZipToPlace,
   type LocateCache,
 } from '../../../lib/geocode/pipeline';
-import type { fetchCensusAddressGeocode, fetchCensusCoordinatesGeocode } from '@black-book/domain';
+import type { fetchCensusAddressGeocode, fetchCensusCoordinatesGeocode } from '@repo/domain';
 import type { LocateAppCheckGuard } from './app-check-guard';
 import type { createLocateRateLimitGuard } from './rate-limit-guard';
 

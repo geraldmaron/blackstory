@@ -1,16 +1,20 @@
-/**  {import('next').NextConfig} */
+/**
+ * Next.js config for the operator admin console.
+ * Keeps Webpack for NodeNext `.js`→`.ts` remapping under transpilePackages.
+ */
+
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: [
-    '@black-book/domain',
-    '@black-book/schemas',
-    '@black-book/ui',
-    '@black-book/operator-cli',
-    '@black-book/security',
-    '@black-book/firebase',
+    '@repo/domain',
+    '@repo/schemas',
+    '@repo/ui',
+    '@repo/operator-cli',
+    '@repo/security',
+    '@repo/firebase',
   ],
   webpack: (config) => {
-    // NodeNext packages emit `.js` specifiers that map to `.ts`/`.tsx` sources.
     config.resolve.extensionAlias = {
       ...config.resolve.extensionAlias,
       '.js': ['.ts', '.tsx', '.js', '.jsx'],

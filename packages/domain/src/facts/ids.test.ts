@@ -5,6 +5,7 @@ import {
   buildFactJsonPath,
   buildFactPath,
   buildFactRevisionPath,
+  buildLegacyFactPath,
   formatFactId,
   isFactId,
   slugNeedsRedirect,
@@ -19,7 +20,7 @@ test('formatFactId produces a zero-padded BB-F-###### id', () => {
 test('isFactId accepts the canonical format and rejects malformed ids', () => {
   assert.equal(isFactId('BB-F-000042'), true);
   assert.equal(isFactId('BB-F-42'), false);
-  assert.equal(isFactId('bb-f-000042'), false);
+  assert.equal(isFactId('ds-f-000042'), false);
   assert.equal(isFactId('BB-F-'), false);
 });
 
@@ -53,7 +54,8 @@ test('slugifyFactStatement throws on input with no sluggable characters', () => 
 
 test('buildFactPath / buildFactRevisionPath / buildFactJsonPath produce canonical permalinks', () => {
   const id = asFactId('BB-F-000042');
-  assert.equal(buildFactPath(id, 'rosa-parks-refused'), '/facts/BB-F-000042/rosa-parks-refused');
+  assert.equal(buildFactPath(id, 'rosa-parks-refused'), '/facts/rosa-parks-refused');
+  assert.equal(buildLegacyFactPath(id, 'rosa-parks-refused'), '/facts/BB-F-000042/rosa-parks-refused');
   assert.equal(buildFactRevisionPath(id, 3), '/facts/BB-F-000042/rev/3');
   assert.equal(buildFactJsonPath(id), '/facts/BB-F-000042.json');
 });

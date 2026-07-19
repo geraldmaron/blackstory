@@ -2,7 +2,7 @@
  * Internal publication, promotion, and control API (not internet-facing).
  * Service-identity-only auth posture.
  */
-import { buildSurfaceHealth, parseNodeEnv } from '@black-book/config';
+import { buildSurfaceHealth, parseNodeEnv } from '@repo/config';
 import { SURFACE_ID } from './posture.js';
 
 export {

@@ -1,5 +1,5 @@
 /**
- * Public correction status lookup by receipt code. Returns coarse public phases only 
+ * Public correction status lookup by receipt code. Returns coarse public phases only
  * never moderation-sensitive campaign, spam, or duplicate metadata.
  */
 import {

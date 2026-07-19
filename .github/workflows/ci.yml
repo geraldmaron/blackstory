@@ -21,7 +21,7 @@ concurrency:
 env:
   NODE_ENV: test
   LOG_LEVEL: info
-  FIREBASE_PROJECT_ID: demo-black-book
+  FIREBASE_PROJECT_ID: demo-repo
   BLACK_BOOK_TEST_DATABASE_URL: postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook
 
 jobs:
@@ -230,7 +230,7 @@ jobs:
     timeout-minutes: 25
     env:
       CI_REQUIRE_FIREBASE: '1'
-      FIREBASE_PROJECT_ID: demo-black-book
+      FIREBASE_PROJECT_ID: demo-repo
       FIRESTORE_EMULATOR_HOST: 127.0.0.1:8080
       FIREBASE_AUTH_EMULATOR_HOST: 127.0.0.1:9099
       FIREBASE_STORAGE_EMULATOR_HOST: 127.0.0.1:9199

@@ -3,7 +3,7 @@
  * claims with a distinct external origin per Google eligibility rules.
  */
 import React from 'react';
-import { buildMythClaimReviewJsonLd, type MythClaimReviewInput } from '../../lib/trust/domain-trust.js';
+import { buildMythClaimReviewJsonLd, type MythClaimReviewInput } from '../../lib/trust/domain-trust';
 
 export type MythClaimReviewScriptProps = MythClaimReviewInput & {
   readonly pagePath: string;

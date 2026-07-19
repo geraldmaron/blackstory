@@ -1,5 +1,5 @@
 """
-Tests for Python product constitution loaders and evaluators (BB-003).
+Tests for Python product constitution loaders and evaluators.
 """
 
 from __future__ import annotations
@@ -81,7 +81,7 @@ def test_fixtures_cover_required_kinds() -> None:
 
 
 def test_ugc_living_person_rules_extends_constitution_without_version_bump() -> None:
-    """BB-077: additive extension, mirrors how BB-015 added sensitivityRules at 1.0.0."""
+    """additive extension, mirrors how  added sensitivityRules at 1.0.0."""
     reset_product_constitution_cache()
     policy = load_product_constitution()
     assert policy["policyVersion"] == "1.0.0"

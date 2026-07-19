@@ -59,7 +59,7 @@ function dplaRegistryEntry(): SourceRegistryEntry {
   };
 }
 
-test('DPLA v2 adapter starts disabled by default in the BB-037 registry', () => {
+test('DPLA v2 adapter starts disabled by default in the  registry', () => {
   const store = createInMemorySourceRegistry();
   const contract = createDplaV2AdapterContract();
   registerSource(store, {
@@ -88,7 +88,7 @@ test('DPLA v2 adapter id is distinct from the fixture-only federal DPLA adapter 
   assert.notEqual(DPLA_V2_ADAPTER_ID, federal.DPLA_ADAPTER_ID);
 });
 
-test('DPLA v2 adapter has a registered BB-077 obligations entry', () => {
+test('DPLA v2 adapter has a registered  obligations entry', () => {
   const obligationsStore = createInMemoryObligationsRegistry(defaultSourceObligationsSeed(FIXED_NOW));
   const obligations = getSourceObligationsOrThrow(obligationsStore, DPLA_V2_ADAPTER_ID);
   assert.equal(obligations.sourceClass, 'dpla');

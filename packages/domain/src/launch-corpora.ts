@@ -14,10 +14,11 @@
  * (public domain)
  * - `rosenwald-schools` Fisk University Rosenwald Fund Card File database DEFERRED,
  * terms not yet verified; see `licenseVerdict: 'deferred-unverified'`
- * - `mapping-inequality-holc` Univ. of Richmond DSL HOLC redlining maps, sourced from NARA
- * (public domain) first launch corpus requiring real polygon
- * geometry; see the module doc note
- * at the bottom of this file for the map-tile follow-up.
+ * - `mapping-inequality-holc` Univ. of Richmond DSL HOLC redlining maps; NARA source scans
+ * are public domain but DSL's vector dataset is
+ * CC BY-NC-SA (restricted-attribution-required); first
+ * launch corpus requiring real polygon geometry; see the
+ * module doc note at the bottom for the map-tile follow-up.
  *
  * Boundary rules: statutes/cases (legal corpus) and
  * Tougaloo sundown-town data (exclusion-infrastructure lane) are deliberately absent
@@ -47,6 +48,17 @@ const PUBLIC_DOMAIN_ARCHIVAL_RIGHTS: RightsPolicy = {
 
 /** Attribution-required derivative rights (NYPL public-domain marks, EJI link+attribute terms). */
 const ATTRIBUTION_REQUIRED_RIGHTS: RightsPolicy = {
+  defaultStatus: 'licensed',
+  publicationPermissions: ['cite', 'short_excerpt'],
+  prohibitedUses: ['full_text_republication', 'unattributed_reuse', 'commercial_reuse'],
+};
+
+/**
+ * CC BY-NC-SA–class derivative rights (Mapping Inequality's georectified/vectorized spatial
+ * dataset). Attribution required, commercial reuse prohibited — a hard gate before any
+ * revenue-bearing public surface uses DSL-derived geometry.
+ */
+const NONCOMMERCIAL_ATTRIBUTION_RIGHTS: RightsPolicy = {
   defaultStatus: 'licensed',
   publicationPermissions: ['cite', 'short_excerpt'],
   prohibitedUses: ['full_text_republication', 'unattributed_reuse', 'commercial_reuse'],
@@ -263,12 +275,16 @@ export function buildLaunchCorpusVettingInputs(input: {
       corpus: 'mapping-inequality-holc',
       corpusDisplayName: 'Mapping Inequality: HOLC Residential Security Maps',
       custodian: 'University of Richmond Digital Scholarship Lab (DSL); source records held by NARA',
-      licenseVerdict: 'public-domain',
+      licenseVerdict: 'restricted-attribution-required',
       licenseNotes:
-        'Underlying HOLC Residential Security Maps are U.S. federal government records held by ' +
-        'NARA — public domain per 17 U.S.C. §105. DSL\'s digitized/vectorized boundary+grade ' +
-        'dataset derives directly from that public-domain federal record; cite both DSL and the ' +
-        'NARA record id.',
+        'Two distinct rights layers (corrected 2026-07-18; previously misrecorded as wholly ' +
+        'public-domain). (1) The underlying HOLC Residential Security Maps are U.S. federal ' +
+        'government records held by NARA — public domain per 17 U.S.C. §105. (2) DSL\'s ' +
+        'downloadable georectified/vectorized boundary+grade DATASET — the artifact this corpus ' +
+        'actually ingests — is offered by DSL under CC BY-NC-SA 4.0: attribution required, ' +
+        'noncommercial use only, share-alike. Any revenue-bearing public surface using ' +
+        'DSL-derived geometry needs a rights review first (or re-derivation from the NARA ' +
+        'scans). Cite both DSL and the NARA record id.',
       authorityTier: 'academic_institution',
       provenanceFieldsRetained: [
         'holcCityId',
@@ -285,21 +301,21 @@ export function buildLaunchCorpusVettingInputs(input: {
       refreshCadence: 'static',
       notabilityCriterion: 'documented_site',
       classification: 'primary_archival',
-      rights: PUBLIC_DOMAIN_ARCHIVAL_RIGHTS,
+      rights: NONCOMMERCIAL_ATTRIBUTION_RIGHTS,
       permittedClaimClasses: ['geographic_fact'],
       stableIdScheme: 'dsl-mapping-inequality-area-id',
       organizationId: 'org_richmond_dsl',
       citationRequirements:
         'Cite Mapping Inequality (Univ. of Richmond DSL) and the underlying NARA record id; grade, ' +
-        'boundary geometry, and retrieval date are recorded per record (BB-094 acceptance ' +
+        'boundary geometry, and retrieval date are recorded per record ( acceptance ' +
         'criterion 7).',
       boundaryNotes:
-        'Feeds the BB-082 exclusion-infrastructure layer as corroborating historical evidence — ' +
-        'registered ONCE here (BB-094 acceptance criterion 5) and referenced by BB-082, never ' +
-        're-ingested by BB-082 as a second copy. Actual polygon ingestion into map tile assets ' +
-        'integrates with BB-070\'s map data platform (packages/domain/src/map/) — building that ' +
-        'tile-compilation step is explicit, documented follow-up, not part of BB-094\'s scope: ' +
-        'BB-070\'s `buildMapSource` (packages/domain/src/map/map-source.ts) already accepts ' +
+        'Feeds the  exclusion-infrastructure layer as corroborating historical evidence — ' +
+        'registered ONCE here ( acceptance criterion 5) and referenced by, never ' +
+        're-ingested by  as a second copy. Actual polygon ingestion into map tile assets ' +
+        'integrates with \'s map data platform (packages/domain/src/map/) — building that ' +
+        'tile-compilation step is explicit, documented follow-up, not part of \'s scope: ' +
+        '\'s `buildMapSource` (packages/domain/src/map/map-source.ts) already accepts ' +
         '`GeoGeometry` (`Point | Polygon | BBox`, packages/domain/src/geography/location.ts) — ' +
         'the follow-up is calling it with this corpus\'s vetted Polygon records the same way ' +
         'the "INTEGRATION POINT" comments in map-source.ts and completeness-gate.ts document for ' +
@@ -343,7 +359,7 @@ export const LAUNCH_CORPUS_SLUGS: readonly string[] = [
 
 /** Slugs deliberately excluded from this module's corpus list. */
 export const BOUNDARY_EXCLUDED_CORPUS_SLUGS: readonly { readonly slug: string; readonly ownerBead: string }[] = [
-  { slug: 'statutes', ownerBead: 'BB-087' },
-  { slug: 'cases', ownerBead: 'BB-087' },
-  { slug: 'tougaloo-sundown-data', ownerBead: 'BB-082' },
+  { slug: 'statutes', ownerBead: '' },
+  { slug: 'cases', ownerBead: '' },
+  { slug: 'tougaloo-sundown-data', ownerBead: '' },
 ];

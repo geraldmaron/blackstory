@@ -17,7 +17,7 @@ import {
   routeConsensusReview,
   transitionResearchCase,
   type SourceIndependenceMetadata,
-} from '@black-book/domain';
+} from '@repo/domain';
 import {
   MASS_ASSIGNMENT_FIXTURE,
 } from '../security-gates/fixtures.js';
@@ -27,7 +27,7 @@ import {
   createSubmissionCampaignDetector,
   redactLocationForPublic,
   type SubmissionInput,
-} from '@black-book/security';
+} from '@repo/security';
 import {
   BASE_NOW_ISO,
   claimEvidenceLink,

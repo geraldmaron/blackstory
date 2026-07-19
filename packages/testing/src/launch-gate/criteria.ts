@@ -45,7 +45,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
       {
         type: 'command',
         ref: 'node --import tsx scripts/run-testing-layer.mjs security',
-        description: 'Includes living-address adversarial scenarios (BB-060).',
+        description: 'Includes living-address adversarial scenarios ().',
       },
       {
         type: 'file',
@@ -104,7 +104,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
   },
   {
     id: 'restore-rehearsal-complete',
-    title: 'Restore rehearsal complete (BB-061)',
+    title: 'Restore rehearsal complete ()',
     kind: 'machine',
     required: true,
     description: 'Recovery rehearsal runner and last dry-run report fixtures are present and valid.',
@@ -138,7 +138,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
   },
   {
     id: 'load-abuse-verified',
-    title: 'Load and abuse limits verified (BB-059)',
+    title: 'Load and abuse limits verified ()',
     kind: 'machine',
     required: true,
     description: 'Load/abuse harness module and operator doc exist; scenario inventory is complete.',
@@ -159,7 +159,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
   },
   {
     id: 'adversarial-integrity-verified',
-    title: 'Adversarial integrity exercise (BB-060)',
+    title: 'Adversarial integrity exercise ()',
     kind: 'machine',
     required: true,
     description: 'Adversarial integrity harness ships all required scenario ids.',
@@ -176,7 +176,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
   },
   {
     id: 'methodology-corrections-available',
-    title: 'Public methodology and correction process (BB-088)',
+    title: 'Public methodology and correction process ()',
     kind: 'machine',
     required: true,
     description: 'Methodology, corrections, errata, and myths public surfaces exist in repo.',
@@ -214,7 +214,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
   },
   {
     id: 'disclaimer-framework-live',
-    title: 'Disclaimer framework live on public surfaces (BB-095)',
+    title: 'Disclaimer framework live on public surfaces ()',
     kind: 'machine',
     required: true,
     description: 'Versioned disclaimer registry module exists and ships tests.',
@@ -231,7 +231,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
   },
   {
     id: 'release-pipeline-ready',
-    title: 'Production release pipeline ready (BB-062)',
+    title: 'Production release pipeline ready ()',
     kind: 'machine',
     required: true,
     description: 'Release runbook, rollback dry-run script, and provenance schema are present.',

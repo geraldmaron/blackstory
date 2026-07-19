@@ -1,0 +1,846 @@
+[
+  {
+    "id": "ent_rosa_parks_museum_001",
+    "kind": "institution",
+    "displayName": "Rosa Parks Museum",
+    "summary": "Opened by Troy University on December 1, 2000 — forty-five years to the day after Rosa Parks's arrest — on the downtown Montgomery block where that arrest took place, at the former Empire Theater site. Its permanent exhibit reconstructs December 1, 1955 and the 381-day bus boycott that followed, including a restored city bus of the era.",
+    "eraBuckets": [
+      "1950s",
+      "2000s"
+    ],
+    "topicTags": [
+      "museum",
+      "civil-rights",
+      "education"
+    ],
+    "jurisdictionLabel": "Montgomery, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "252 Montgomery Street, Montgomery, AL",
+    "lat": 32.3767,
+    "lng": -86.3111,
+    "claims": [
+      {
+        "predicate": "opened_year",
+        "object": "2000",
+        "confidenceLevel": "high",
+        "citationSource": "Troy University — Rosa Parks Museum",
+        "citationHref": "https://www.troy.edu/student-life-resources/arts-culture/rosa-parks-museum/index.html",
+        "citationLabel": "Official museum site"
+      },
+      {
+        "predicate": "built_at_site_of",
+        "object": "Rosa Parks's December 1, 1955 arrest (former Empire Theater block)",
+        "confidenceLevel": "high",
+        "citationSource": "Troy University — Rosa Parks Museum, visitor information",
+        "citationHref": "https://www.troy.edu/student-life-resources/arts-culture/rosa-parks-museum/visit.html",
+        "citationLabel": "Official visitor page"
+      }
+    ],
+    "historicalContext": "Parks's arrest on a Montgomery city bus triggered the 1955-56 Montgomery Bus Boycott, the mass protest that brought Martin Luther King Jr. to national prominence and led to Browder v. Gayle, which struck down bus segregation.",
+    "related": [
+      {
+        "id": "ent_rosa_parks_arrest_site_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ],
+    "topicIds": [
+      "museum",
+      "civil-rights",
+      "education"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_apollo_theater_001",
+    "kind": "institution",
+    "displayName": "Apollo Theater",
+    "summary": "A 1914 burlesque house at 253 West 125th Street that reopened to Black performers and audiences in 1934, the year its Amateur Night began — a 17-year-old Ella Fitzgerald won that November. For the next four decades the Apollo was the proving ground of Black popular music, from swing and bebop to R&B and soul.",
+    "eraBuckets": [
+      "1910s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "music",
+      "theater",
+      "culture"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "253 West 125th Street, Harlem, Manhattan",
+    "lat": 40.8096,
+    "lng": -73.95,
+    "claims": [
+      {
+        "predicate": "opened_to_black_audiences_year",
+        "object": "1934",
+        "confidenceLevel": "high",
+        "citationSource": "Apollo Theater — official history",
+        "citationHref": "https://www.apollotheater.org/about/history/",
+        "citationLabel": "Official theater history"
+      },
+      {
+        "predicate": "launched_program",
+        "object": "Amateur Night at the Apollo, 1934",
+        "confidenceLevel": "high",
+        "citationSource": "Apollo Theater — about",
+        "citationHref": "https://www.apollotheater.org/about/",
+        "citationLabel": "Official theater site"
+      }
+    ],
+    "historicalContext": "The Apollo anchored 125th Street as the main stage of Black entertainment during and after the Harlem Renaissance; it was designated a New York City landmark and listed on the National Register of Historic Places in 1983.",
+    "related": [
+      {
+        "id": "ent_harlem_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ],
+    "topicIds": [
+      "music",
+      "theater",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_schomburg_center_001",
+    "kind": "institution",
+    "displayName": "Schomburg Center for Research in Black Culture",
+    "summary": "Founded in 1925 as the Division of Negro Literature, History and Prints at the New York Public Library's 135th Street Branch. In 1926 the library acquired bibliophile Arturo Alfonso Schomburg's roughly 5,000-item personal collection, the seed of what is now one of the world's leading research archives of the global Black experience.",
+    "eraBuckets": [
+      "1920s",
+      "1970s"
+    ],
+    "topicTags": [
+      "library",
+      "research",
+      "culture"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "515 Malcolm X Boulevard, Harlem, Manhattan",
+    "lat": 40.8144,
+    "lng": -73.9411,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1925",
+        "confidenceLevel": "high",
+        "citationSource": "New York Public Library — Schomburg Center",
+        "citationHref": "https://www.nypl.org/locations/schomburg",
+        "citationLabel": "Official NYPL location page"
+      },
+      {
+        "predicate": "acquired_founding_collection",
+        "object": "Arturo Schomburg's personal collection of about 5,000 items, 1926",
+        "confidenceLevel": "high",
+        "citationSource": "New York Public Library — Schomburg Center",
+        "citationHref": "https://www.nypl.org/locations/schomburg",
+        "citationLabel": "Official NYPL location page"
+      }
+    ],
+    "historicalContext": "Schomburg, a Puerto Rican-born Black scholar, assembled his collection to refute claims that people of African descent had no history; the center that bears his name became a cornerstone of the Harlem Renaissance's intellectual life and was renamed for him in 1972.",
+    "related": [
+      {
+        "id": "ent_harlem_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ],
+    "topicIds": [
+      "library",
+      "research",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_nmaahc_001",
+    "kind": "institution",
+    "displayName": "National Museum of African American History and Culture",
+    "summary": "Established by Act of Congress in 2003 and opened on the National Mall on September 24, 2016 as the Smithsonian's nineteenth museum. Its collection of more than 40,000 objects ranges from Harriet Tubman's hymnal to a segregated Southern Railway passenger car, presented in a bronze-latticed building by David Adjaye.",
+    "eraBuckets": [
+      "2000s",
+      "2010s"
+    ],
+    "topicTags": [
+      "museum",
+      "history",
+      "culture"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "1400 Constitution Avenue NW, National Mall",
+    "lat": 38.8911,
+    "lng": -77.0328,
+    "claims": [
+      {
+        "predicate": "established_by_congress_year",
+        "object": "2003",
+        "confidenceLevel": "high",
+        "citationSource": "Smithsonian — NMAAHC, about the museum",
+        "citationHref": "https://nmaahc.si.edu/about",
+        "citationLabel": "Official Smithsonian page"
+      },
+      {
+        "predicate": "opened_year",
+        "object": "2016",
+        "confidenceLevel": "high",
+        "citationSource": "Smithsonian — NMAAHC, about the museum",
+        "citationHref": "https://nmaahc.si.edu/about",
+        "citationLabel": "Official Smithsonian page"
+      }
+    ],
+    "historicalContext": "Proposals for a national museum of Black history circulated for nearly a century — Black Civil War veterans first petitioned for a memorial building in 1915 — before the 2003 legislation signed by President George W. Bush created the museum.",
+    "topicIds": [
+      "museum",
+      "history",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_dusable_museum_001",
+    "kind": "institution",
+    "displayName": "DuSable Black History Museum and Education Center",
+    "summary": "Chartered on February 16, 1961 by artist and educator Margaret Taylor-Burroughs, her husband Charles, and four co-founders, opening in the Burroughs home on Chicago's South Side. One of the oldest independent museums of Black history in the United States, it was renamed in 1968 for Jean Baptiste Point DuSable, Chicago's Black founder.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "museum",
+      "art",
+      "history"
+    ],
+    "jurisdictionLabel": "Chicago, Illinois",
+    "locationPrecision": "institution",
+    "locationLabel": "740 East 56th Place, Washington Park, Chicago",
+    "lat": 41.7919,
+    "lng": -87.6072,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1961",
+        "confidenceLevel": "high",
+        "citationSource": "DuSable Black History Museum — about",
+        "citationHref": "https://www.dusablemuseum.org/about-us/",
+        "citationLabel": "Official museum site"
+      },
+      {
+        "predicate": "named_for",
+        "object": "Jean Baptiste Point DuSable, first non-Indigenous permanent settler of Chicago",
+        "confidenceLevel": "high",
+        "citationSource": "DuSable Black History Museum — about",
+        "citationHref": "https://www.dusablemuseum.org/about-us/",
+        "citationLabel": "Official museum site"
+      }
+    ],
+    "historicalContext": "Founded outside white-led museum institutions during the civil rights era, the DuSable modeled community-built Black museology; Taylor-Burroughs, a poet and printmaker of the Chicago Black Renaissance, ran it from her own living room before it moved to Washington Park in 1973.",
+    "topicIds": [
+      "museum",
+      "art",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_motown_museum_001",
+    "kind": "institution",
+    "displayName": "Motown Museum (Hitsville U.S.A.)",
+    "summary": "Founded in 1985 by Esther Gordy Edwards in the house at 2648 West Grand Boulevard where her brother Berry Gordy ran Motown Records from 1959. The museum preserves Studio A — kept nearly as it was when the Supremes, Temptations, Miracles, and Stevie Wonder recorded there — along with Gordy's upstairs apartment.",
+    "eraBuckets": [
+      "1950s",
+      "1960s",
+      "1980s"
+    ],
+    "topicTags": [
+      "music",
+      "museum",
+      "culture"
+    ],
+    "jurisdictionLabel": "Detroit, Michigan",
+    "locationPrecision": "institution",
+    "locationLabel": "2648 West Grand Boulevard, Detroit",
+    "lat": 42.3642,
+    "lng": -83.0883,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1985",
+        "confidenceLevel": "high",
+        "citationSource": "Motown Museum — about",
+        "citationHref": "https://www.motownmuseum.org/about/",
+        "citationLabel": "Official museum site"
+      },
+      {
+        "predicate": "preserves_site",
+        "object": "Studio A and the original Hitsville U.S.A. headquarters of Motown Records (est. 1959)",
+        "confidenceLevel": "high",
+        "citationSource": "Motown Museum — visit",
+        "citationHref": "https://www.motownmuseum.org/visit/",
+        "citationLabel": "Official visitor page"
+      }
+    ],
+    "historicalContext": "From this converted photographer's studio, Motown became the most successful Black-owned record company of its era, producing a run of 1960s hits that carried Black artists to the center of American popular music.",
+    "topicIds": [
+      "music",
+      "museum",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_studio_museum_harlem_001",
+    "kind": "institution",
+    "displayName": "Studio Museum in Harlem",
+    "summary": "Founded in 1968 as a museum for artists of African descent built around working studio space, it has run an artist-in-residence program from its first years; alumni include Kehinde Wiley and Njideka Akunyili Crosby. In November 2025 it reopened in a purpose-built seven-story home on West 125th Street designed by David Adjaye.",
+    "eraBuckets": [
+      "1960s",
+      "2020s"
+    ],
+    "topicTags": [
+      "art",
+      "museum",
+      "culture"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "144 West 125th Street, Harlem, Manhattan",
+    "lat": 40.8085,
+    "lng": -73.9475,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1968",
+        "confidenceLevel": "high",
+        "citationSource": "Studio Museum in Harlem — about",
+        "citationHref": "https://studiomuseum.org/about",
+        "citationLabel": "Official museum site"
+      },
+      {
+        "predicate": "runs_program",
+        "object": "Artist-in-Residence studio residency for emerging artists of African descent",
+        "confidenceLevel": "high",
+        "citationSource": "Studio Museum in Harlem — about",
+        "citationHref": "https://studiomuseum.org/about",
+        "citationLabel": "Official museum site"
+      }
+    ],
+    "historicalContext": "Founded amid the Black Arts Movement, when major New York museums showed almost no work by Black artists, the Studio Museum put artists' working practice — not just finished objects — at the center of its mission.",
+    "related": [
+      {
+        "id": "ent_harlem_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ],
+    "topicIds": [
+      "art",
+      "museum",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_charles_wright_museum_001",
+    "kind": "institution",
+    "displayName": "Charles H. Wright Museum of African American History",
+    "summary": "Founded in 1965 by Dr. Charles H. Wright, a Detroit obstetrician, as the International Afro-American Museum. Its 125,000-square-foot building on East Warren Avenue, opened in 1997, holds more than 35,000 artifacts and the long-running core exhibition 'And Still We Rise: Our Journey Through African American History and Culture.'",
+    "eraBuckets": [
+      "1960s",
+      "1990s"
+    ],
+    "topicTags": [
+      "museum",
+      "history",
+      "culture"
+    ],
+    "jurisdictionLabel": "Detroit, Michigan",
+    "locationPrecision": "institution",
+    "locationLabel": "315 East Warren Avenue, Midtown Detroit",
+    "lat": 42.359,
+    "lng": -83.061,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1965",
+        "confidenceLevel": "high",
+        "citationSource": "The Wright Museum — about",
+        "citationHref": "https://www.thewright.org/about",
+        "citationLabel": "Official museum site"
+      },
+      {
+        "predicate": "collection_size",
+        "object": "More than 35,000 artifacts and archival materials",
+        "confidenceLevel": "medium",
+        "citationSource": "The Wright Museum — about",
+        "citationHref": "https://www.thewright.org/about",
+        "citationLabel": "Official museum site"
+      }
+    ],
+    "historicalContext": "Wright founded the museum after visiting a Danish memorial to World War II resistance fighters, determined that Black history deserved the same permanent institutional care; for decades it was the largest African American history museum in the country.",
+    "topicIds": [
+      "museum",
+      "history",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_negro_leagues_baseball_museum_001",
+    "kind": "institution",
+    "displayName": "Negro Leagues Baseball Museum",
+    "summary": "Founded in 1990 in Kansas City's 18th & Vine district — blocks from where the Negro National League was organized in 1920 — by a group including Kansas City Monarchs first baseman Buck O'Neil, who chaired its board. Its Field of Legends gallery fields life-size bronzes of league greats on a scaled diamond.",
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s",
+      "1990s"
+    ],
+    "topicTags": [
+      "sports",
+      "museum",
+      "history"
+    ],
+    "jurisdictionLabel": "Kansas City, Missouri",
+    "locationPrecision": "institution",
+    "locationLabel": "1616 East 18th Street, 18th & Vine District",
+    "lat": 39.0914,
+    "lng": -94.5625,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1990",
+        "confidenceLevel": "high",
+        "citationSource": "Negro Leagues Baseball Museum — about",
+        "citationHref": "https://nlbm.com/about/",
+        "citationLabel": "Official museum site"
+      },
+      {
+        "predicate": "located_in_district",
+        "object": "Historic 18th & Vine district, center of Black Kansas City in the early 20th century",
+        "confidenceLevel": "high",
+        "citationSource": "Negro Leagues Baseball Museum",
+        "citationHref": "https://nlbm.com/",
+        "citationLabel": "Official museum site"
+      }
+    ],
+    "historicalContext": "The Negro Leagues, organized in 1920 at Kansas City's Paseo YMCA under Rube Foster, sustained professional Black baseball through four decades of segregation and produced players — Satchel Paige, Josh Gibson, Jackie Robinson — now recognized among the game's greatest.",
+    "related": [
+      {
+        "id": "ent_negro_national_league_001",
+        "type": "commemorates",
+        "direction": "outgoing"
+      }
+    ],
+    "topicIds": [
+      "sports",
+      "museum",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_national_civil_rights_museum_001",
+    "kind": "institution",
+    "displayName": "National Civil Rights Museum",
+    "summary": "Opened September 28, 1991 at the Lorraine Motel in Memphis, where Dr. Martin Luther King Jr. was assassinated on April 4, 1968 while supporting the city's striking sanitation workers. Room 306 is preserved, and the exhibits trace the movement from slavery and Jim Crow through the Montgomery boycott, the sit-ins, and Memphis 1968.",
+    "eraBuckets": [
+      "1950s",
+      "1960s",
+      "1990s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "museum",
+      "history"
+    ],
+    "jurisdictionLabel": "Memphis, Tennessee",
+    "locationPrecision": "institution",
+    "locationLabel": "450 Mulberry Street, Memphis (Lorraine Motel)",
+    "lat": 35.1345,
+    "lng": -90.0576,
+    "claims": [
+      {
+        "predicate": "opened_year",
+        "object": "1991",
+        "confidenceLevel": "high",
+        "citationSource": "National Civil Rights Museum — about",
+        "citationHref": "https://www.civilrightsmuseum.org/about",
+        "citationLabel": "Official museum site"
+      },
+      {
+        "predicate": "preserves_site",
+        "object": "Lorraine Motel, site of the April 4, 1968 assassination of Dr. Martin Luther King Jr.",
+        "confidenceLevel": "high",
+        "citationSource": "National Civil Rights Museum — about",
+        "citationHref": "https://www.civilrightsmuseum.org/about",
+        "citationLabel": "Official museum site"
+      }
+    ],
+    "historicalContext": "The Lorraine was one of the few Memphis motels serving Black travelers under segregation and a regular stop for touring musicians and movement leaders; King came to Memphis in 1968 to stand with sanitation workers striking under the banner 'I Am a Man.'",
+    "related": [
+      {
+        "id": "ent_lorraine_motel_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ],
+    "topicIds": [
+      "civil-rights",
+      "museum",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_birmingham_civil_rights_institute_001",
+    "kind": "institution",
+    "displayName": "Birmingham Civil Rights Institute",
+    "summary": "Opened in November 1992 in Birmingham's Civil Rights District, facing Kelly Ingram Park and a block from 16th Street Baptist Church, where four girls were killed in the 1963 Klan bombing. A Smithsonian Affiliate, it holds oral histories and archives of the 1963 Birmingham campaign, from the Children's Crusade to the fire hoses.",
+    "eraBuckets": [
+      "1950s",
+      "1960s",
+      "1990s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "museum",
+      "education"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "520 16th Street North, Civil Rights District",
+    "lat": 33.516,
+    "lng": -86.815,
+    "claims": [
+      {
+        "predicate": "opened_year",
+        "object": "1992",
+        "confidenceLevel": "high",
+        "citationSource": "Birmingham Civil Rights Institute — about",
+        "citationHref": "https://www.bcri.org/about/",
+        "citationLabel": "Official institute site"
+      },
+      {
+        "predicate": "located_adjacent_to",
+        "object": "Kelly Ingram Park and 16th Street Baptist Church",
+        "confidenceLevel": "high",
+        "citationSource": "Birmingham Civil Rights Institute",
+        "citationHref": "https://www.bcri.org/",
+        "citationLabel": "Official institute site"
+      }
+    ],
+    "historicalContext": "Birmingham's 1963 demonstrations — met with police dogs and fire hoses in Kelly Ingram Park — and the September bombing of 16th Street Baptist Church helped move national opinion toward the Civil Rights Act of 1964.",
+    "related": [
+      {
+        "id": "ent_kelly_ingram_park_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_fourth_avenue_district_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ],
+    "topicIds": [
+      "civil-rights",
+      "museum",
+      "education"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_aamp_philadelphia_001",
+    "kind": "institution",
+    "displayName": "African American Museum in Philadelphia",
+    "summary": "Founded in 1976 during the Bicentennial, the AAMP was the first museum funded and built by a major U.S. municipality to preserve and interpret African American heritage. Its galleries at 701 Arch Street stand in the historic district where Philadelphia's free Black community organized churches, lodges, and abolition societies.",
+    "eraBuckets": [
+      "1970s"
+    ],
+    "topicTags": [
+      "museum",
+      "history",
+      "culture"
+    ],
+    "jurisdictionLabel": "Philadelphia, Pennsylvania",
+    "locationPrecision": "institution",
+    "locationLabel": "701 Arch Street, Historic District, Philadelphia",
+    "lat": 39.9528,
+    "lng": -75.1516,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1976",
+        "confidenceLevel": "high",
+        "citationSource": "African American Museum in Philadelphia — about",
+        "citationHref": "https://www.aampmuseum.org/about-us",
+        "citationLabel": "Official museum site"
+      },
+      {
+        "predicate": "first_of_kind",
+        "object": "First museum funded and built by a major U.S. city to preserve African American heritage",
+        "confidenceLevel": "high",
+        "citationSource": "African American Museum in Philadelphia — about",
+        "citationHref": "https://www.aampmuseum.org/about-us",
+        "citationLabel": "Official museum site"
+      }
+    ],
+    "historicalContext": "Philadelphia held the largest free Black population of the early republic; Richard Allen's Mother Bethel AME Church and the Free African Society were founded blocks from the museum's site, a legacy its core exhibition 'Audacious Freedom' documents.",
+    "topicIds": [
+      "museum",
+      "history",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_americas_black_holocaust_museum_001",
+    "kind": "institution",
+    "displayName": "America's Black Holocaust Museum",
+    "summary": "Founded in Milwaukee in 1988 by Dr. James Cameron, who survived a 1930 lynching in Marion, Indiana, and devoted his life to documenting that history. Closed in 2008 after his death, it continued as a virtual museum from 2012 and reopened in February 2022 in Bronzeville, pairing an unsparing record of racial terror with galleries on resistance, repair, and Black achievement.",
+    "eraBuckets": [
+      "1980s",
+      "2020s"
+    ],
+    "topicTags": [
+      "museum",
+      "history",
+      "memory"
+    ],
+    "jurisdictionLabel": "Milwaukee, Wisconsin",
+    "locationPrecision": "institution",
+    "locationLabel": "401 West North Avenue, Bronzeville, Milwaukee",
+    "lat": 43.0602,
+    "lng": -87.9158,
+    "claims": [
+      {
+        "predicate": "founded_year",
+        "object": "1988",
+        "confidenceLevel": "high",
+        "citationSource": "America's Black Holocaust Museum — history and impact",
+        "citationHref": "https://www.abhmuseum.org/about/black-holocaust-museum-history-impact/",
+        "citationLabel": "Official museum history"
+      },
+      {
+        "predicate": "reopened_year",
+        "object": "2022",
+        "confidenceLevel": "high",
+        "citationSource": "National Park Service — America's Black Holocaust Museum",
+        "citationHref": "https://www.nps.gov/articles/000/america-s-black-holocaust-museum-milwaukee-wisconsin.htm",
+        "citationLabel": "NPS article"
+      }
+    ],
+    "historicalContext": "Cameron, sixteen when a mob killed his two companions in 1930, wrote 'A Time of Terror' and built the museum to tell the full history of racial violence in America alongside the story of survival and repair; the rebuilt museum stands on the footprint of its former home.",
+    "topicIds": [
+      "museum",
+      "history",
+      "memory"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_whitney_plantation_001",
+    "kind": "institution",
+    "displayName": "Whitney Plantation",
+    "summary": "A 1752 indigo and sugar estate on Louisiana's River Road, opened as a museum in December 2014 by New Orleans attorney John Cummings after some fifteen years of research. It was the first plantation museum in Louisiana centered on the lives of the enslaved, with memorials naming the more than 100,000 people enslaved in the state.",
+    "eraBuckets": [
+      "1750s",
+      "1790s",
+      "2010s"
+    ],
+    "topicTags": [
+      "museum",
+      "history",
+      "memory"
+    ],
+    "jurisdictionLabel": "Wallace, Louisiana",
+    "locationPrecision": "institution",
+    "locationLabel": "5099 Highway 18 (River Road), Wallace, St. John the Baptist Parish",
+    "lat": 30.0392,
+    "lng": -90.6506,
+    "claims": [
+      {
+        "predicate": "opened_as_museum_year",
+        "object": "2014",
+        "confidenceLevel": "high",
+        "citationSource": "Whitney Plantation",
+        "citationHref": "https://whitneyplantation.org/",
+        "citationLabel": "Official museum site"
+      },
+      {
+        "predicate": "dedicated_focus",
+        "object": "Museum of slavery centered on the lives of the enslaved people of the estate and of Louisiana",
+        "confidenceLevel": "high",
+        "citationSource": "Whitney Plantation — history",
+        "citationHref": "https://whitneyplantation.org/history/",
+        "citationLabel": "Official history page"
+      }
+    ],
+    "historicalContext": "The German Coast plantations along this stretch of the Mississippi were worked by thousands of enslaved people and lay at the heart of the 1811 German Coast uprising, the largest revolt of enslaved people in U.S. history; Whitney's memorials draw on Depression-era WPA interviews with formerly enslaved Louisianans.",
+    "topicIds": [
+      "museum",
+      "history",
+      "memory"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_freedom_center_001",
+    "kind": "institution",
+    "displayName": "National Underground Railroad Freedom Center",
+    "summary": "Opened August 3, 2004 on Cincinnati's Ohio River bank — the water that divided slave states from free soil. Its centerpiece is a two-story 1830s log slave pen moved from a Kentucky farm, and its exhibits connect Underground Railroad history, from local conductors like Levi Coffin's network, to modern struggles against unfreedom.",
+    "eraBuckets": [
+      "1830s",
+      "1850s",
+      "2000s"
+    ],
+    "topicTags": [
+      "museum",
+      "history",
+      "abolition"
+    ],
+    "jurisdictionLabel": "Cincinnati, Ohio",
+    "locationPrecision": "institution",
+    "locationLabel": "50 East Freedom Way, The Banks, Cincinnati",
+    "lat": 39.0979,
+    "lng": -84.5115,
+    "claims": [
+      {
+        "predicate": "opened_year",
+        "object": "2004",
+        "confidenceLevel": "high",
+        "citationSource": "National Underground Railroad Freedom Center",
+        "citationHref": "https://freedomcenter.org/",
+        "citationLabel": "Official museum site"
+      },
+      {
+        "predicate": "located_on",
+        "object": "North bank of the Ohio River, a historic crossing point from slavery to free soil",
+        "confidenceLevel": "high",
+        "citationSource": "National Underground Railroad Freedom Center — visit",
+        "citationHref": "https://freedomcenter.org/visit/",
+        "citationLabel": "Official visitor page"
+      }
+    ],
+    "historicalContext": "Thousands of freedom seekers crossed the Ohio River near Cincinnati before the Civil War, sheltered by Black and white abolitionist networks in the city's riverfront neighborhoods; the museum stands deliberately at that shoreline.",
+    "topicIds": [
+      "museum",
+      "history",
+      "abolition"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_iaam_charleston_001",
+    "kind": "institution",
+    "displayName": "International African American Museum",
+    "summary": "Opened June 27, 2023 on Gadsden's Wharf in Charleston, where an estimated 100,000 enslaved Africans were disembarked between 1783 and 1808. The building is raised on pillars above the wharf ground, and its Center for Family History supports African American genealogy back through the records of slavery.",
+    "eraBuckets": [
+      "1780s",
+      "1800s",
+      "2020s"
+    ],
+    "topicTags": [
+      "museum",
+      "history",
+      "genealogy"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "14 Wharfside Street, Gadsden's Wharf, Charleston",
+    "lat": 32.7886,
+    "lng": -79.9261,
+    "claims": [
+      {
+        "predicate": "opened_year",
+        "object": "2023",
+        "confidenceLevel": "high",
+        "citationSource": "International African American Museum — about",
+        "citationHref": "https://iaamuseum.org/about/",
+        "citationLabel": "Official museum site"
+      },
+      {
+        "predicate": "built_at_site_of",
+        "object": "Gadsden's Wharf, a principal disembarkation point of the transatlantic slave trade",
+        "confidenceLevel": "high",
+        "citationSource": "International African American Museum — about",
+        "citationHref": "https://iaamuseum.org/about/",
+        "citationLabel": "Official museum site"
+      }
+    ],
+    "historicalContext": "Charleston was the largest port of entry for enslaved Africans in North America; Gadsden's Wharf, most active in the final legal years of the trade, is among the most significant single sites of that history, which the museum spent two decades of planning to mark.",
+    "topicIds": [
+      "museum",
+      "history",
+      "genealogy"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_reginald_lewis_museum_001",
+    "kind": "institution",
+    "displayName": "Reginald F. Lewis Museum of Maryland African American History and Culture",
+    "summary": "Opened in June 2005 near Baltimore's Inner Harbor and named for Reginald F. Lewis, the Baltimore-born financier who became the first African American to build a billion-dollar company, TLC Beatrice International. A Smithsonian Affiliate, it is Maryland's largest museum of African American history, holding the state's stories from slavery through the present.",
+    "eraBuckets": [
+      "2000s"
+    ],
+    "topicTags": [
+      "museum",
+      "history",
+      "culture"
+    ],
+    "jurisdictionLabel": "Baltimore, Maryland",
+    "locationPrecision": "institution",
+    "locationLabel": "830 East Pratt Street, Baltimore",
+    "lat": 39.2875,
+    "lng": -76.6039,
+    "claims": [
+      {
+        "predicate": "opened_year",
+        "object": "2005",
+        "confidenceLevel": "high",
+        "citationSource": "Reginald F. Lewis Museum — about",
+        "citationHref": "https://www.lewismuseum.org/about/",
+        "citationLabel": "Official museum site"
+      },
+      {
+        "predicate": "named_for",
+        "object": "Reginald F. Lewis, first African American to build a billion-dollar company",
+        "confidenceLevel": "high",
+        "citationSource": "Reginald F. Lewis Museum — about",
+        "citationHref": "https://www.lewismuseum.org/about/",
+        "citationLabel": "Official museum site"
+      }
+    ],
+    "historicalContext": "Maryland's Black history runs from Frederick Douglass and Harriet Tubman, both born enslaved on the Eastern Shore, to Thurgood Marshall of Baltimore; the Lewis Foundation's $5 million gift to the museum's education programs gave the institution its name.",
+    "topicIds": [
+      "museum",
+      "history",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  }
+]

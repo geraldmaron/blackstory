@@ -8,7 +8,7 @@
  * pipeline.
  */
 import { useId, useState, type FormEvent } from 'react';
-import { Button, Notice } from '@black-book/ui';
+import { Button, Notice } from '@repo/ui';
 import { getSubmitLeadAppCheckHeaders } from './app-check-client';
 
 type SubmitState =
@@ -103,7 +103,7 @@ export function SubmitLeadForm() {
     state.status === 'error' ? state.fieldIssues?.find((issue) => issue.field === field) : undefined;
 
   return (
-    <form className="bb-stack" onSubmit={handleSubmit} noValidate>
+    <form className="ds-stack" onSubmit={handleSubmit} noValidate>
       {state.status === 'error' && !state.fieldIssues ? (
         <Notice tone="error" title="Submission failed">
           {state.message}
@@ -119,12 +119,12 @@ export function SubmitLeadForm() {
         </Notice>
       ) : null}
 
-      <div className="bb-stack" style={{ gap: 'var(--bb-space-2)' }}>
-        <label className="bb-filters__label" htmlFor={urlId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={urlId}>
           Link (article, archived post, group page, or anywhere this lives online)
         </label>
         <input
-          className="bb-filters__control"
+          className="ds-filters__control"
           id={urlId}
           name="url"
           type="url"
@@ -132,18 +132,18 @@ export function SubmitLeadForm() {
           aria-describedby={fieldIssue('url') ? `${urlId}-issue` : undefined}
         />
         {fieldIssue('url') ? (
-          <p id={`${urlId}-issue`} className="bb-sans" role="alert">
+          <p id={`${urlId}-issue`} className="ds-sans" role="alert">
             {fieldIssue('url')!.message}
           </p>
         ) : null}
       </div>
 
-      <div className="bb-stack" style={{ gap: 'var(--bb-space-2)' }}>
-        <label className="bb-filters__label" htmlFor={descriptionId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={descriptionId}>
           Description (if there is no single link — e.g. something you know firsthand)
         </label>
         <textarea
-          className="bb-filters__control"
+          className="ds-filters__control"
           id={descriptionId}
           name="description"
           rows={4}
@@ -151,13 +151,13 @@ export function SubmitLeadForm() {
         />
       </div>
 
-      <div className="bb-stack" style={{ gap: 'var(--bb-space-2)' }}>
-        <label className="bb-filters__label" htmlFor={whyId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={whyId}>
           Why it matters <span aria-hidden="true">*</span>
-          <span className="bb-visually-hidden">required</span>
+          <span className="ds-visually-hidden">required</span>
         </label>
         <textarea
-          className="bb-filters__control"
+          className="ds-filters__control"
           id={whyId}
           name="whyItMatters"
           rows={3}
@@ -167,37 +167,37 @@ export function SubmitLeadForm() {
           aria-describedby={fieldIssue('whyItMatters') ? `${whyId}-issue` : undefined}
         />
         {fieldIssue('whyItMatters') ? (
-          <p id={`${whyId}-issue`} className="bb-sans" role="alert">
+          <p id={`${whyId}-issue`} className="ds-sans" role="alert">
             {fieldIssue('whyItMatters')!.message}
           </p>
         ) : null}
       </div>
 
-      <div className="bb-row">
-        <div className="bb-stack" style={{ gap: 'var(--bb-space-2)', flex: '1 1 12rem' }}>
-          <label className="bb-filters__label" htmlFor={locationId}>
+      <div className="ds-row">
+        <div className="ds-stack" style={{ gap: 'var(--ds-space-2)', flex: '1 1 12rem' }}>
+          <label className="ds-filters__label" htmlFor={locationId}>
             Location (optional)
           </label>
-          <input className="bb-filters__control" id={locationId} name="location" type="text" />
+          <input className="ds-filters__control" id={locationId} name="location" type="text" />
         </div>
-        <div className="bb-stack" style={{ gap: 'var(--bb-space-2)', flex: '1 1 12rem' }}>
-          <label className="bb-filters__label" htmlFor={eraId}>
+        <div className="ds-stack" style={{ gap: 'var(--ds-space-2)', flex: '1 1 12rem' }}>
+          <label className="ds-filters__label" htmlFor={eraId}>
             Era (optional)
           </label>
-          <input className="bb-filters__control" id={eraId} name="era" type="text" />
+          <input className="ds-filters__control" id={eraId} name="era" type="text" />
         </div>
       </div>
 
-      <div className="bb-stack" style={{ gap: 'var(--bb-space-2)' }}>
-        <label className="bb-filters__label" htmlFor={contactId}>
+      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+        <label className="ds-filters__label" htmlFor={contactId}>
           Contact (optional — only reachable by moderators, never shown publicly)
         </label>
-        <input className="bb-filters__control" id={contactId} name="contact" type="text" />
+        <input className="ds-filters__control" id={contactId} name="contact" type="text" />
       </div>
 
-      <div className="bb-row" style={{ alignItems: 'flex-start' }}>
+      <div className="ds-row" style={{ alignItems: 'flex-start' }}>
         <input id={attestationId} name="attestation" type="checkbox" />
-        <label htmlFor={attestationId} className="bb-sans" style={{ marginLeft: 'var(--bb-space-2)' }}>
+        <label htmlFor={attestationId} className="ds-sans" style={{ marginLeft: 'var(--ds-space-2)' }}>
           I believe this information is accurate to the best of my knowledge (optional
           attestation — leads are reviewed either way).
         </label>

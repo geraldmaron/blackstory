@@ -1,7 +1,7 @@
-# Cost and resource exhaustion controls (BB-033)
+# Cost and resource exhaustion controls
 
-**Status:** Policy matrix + evaluators in-repo; GCP billing budgets and live queue/job provisioning are follow-on work (BB-034, BB-059).  
-**Depends on:** [BB-022 App Hosting hardening](../apps/web/apphosting.yaml), [BB-023 ingress / Cloud Armor](./ingress-armor.md), [BB-025 rate limits](./rate-limits.md)  
+**Status:** Policy matrix + evaluators in-repo; GCP billing budgets and live queue/job provisioning are follow-on work (, ).
+**Depends on:** [ App Hosting hardening](../apps/web/apphosting.yaml), [ ingress / Cloud Armor](./ingress-armor.md), [ rate limits](./rate-limits.md)
 **Threats:** [T-01](./threat-model.md#t-01-volumetric-and-application-layer-denial-of-service), [T-13](./threat-model.md#t-13-database-exhaustion-and-connection-starvation), [T-14](./threat-model.md#t-14-cloud-bill-exhaustion)
 
 ## Objective
@@ -12,7 +12,7 @@ Ensure a traffic spike, retry storm, or budget burn cannot scale every service w
 
 | Layer | Scope | Implementation |
 |-------|-------|----------------|
-| App Hosting / Cloud Run scaling | Per-service maxInstances, concurrency | BB-022 `apphosting*.yaml` + `DEFAULT_SERVICE_SCALING_LIMITS` |
+| App Hosting / Cloud Run scaling | Per-service maxInstances, concurrency |  `apphosting*.yaml` + `DEFAULT_SERVICE_SCALING_LIMITS` |
 | Cloud Tasks | Rate, concurrency, depth, retries | `DEFAULT_CLOUD_TASKS_POLICIES` |
 | Cloud Run Jobs | CPU, memory, duration, retries | `DEFAULT_CLOUD_RUN_JOB_POLICIES` |
 | Database | Connections, statement/lock timeouts | `DEFAULT_DATABASE_LIMITS` |
@@ -29,7 +29,7 @@ Ensure a traffic spike, retry storm, or budget burn cannot scale every service w
 | `essential_ops` | submissions, internal, publication jobs | Second |
 | `optional_research` | research campaigns, URL fetch | **First** |
 
-`autoDisablePublicCorpus` is hard-coded `false`. Full read-only mode requires an explicit operator choice (BB-035).
+`autoDisablePublicCorpus` is hard-coded `false`. Full read-only mode requires an explicit operator choice.
 
 ## Package layout
 
@@ -41,8 +41,8 @@ Ensure a traffic spike, retry storm, or budget burn cannot scale every service w
 
 ## References to other beads (not rewritten)
 
-- **BB-022:** Web `maxInstances=6`, `concurrency=40` — validated via `BB022_APP_HOSTING_LIMITS` mirror
-- **BB-025:** Endpoint quotas — referenced via `BB025_POLICY_REF`; rate-limit math unchanged
+- **:** Web `maxInstances=6`, `concurrency=40` — validated via `BB022_APP_HOSTING_LIMITS` mirror
+- **:** Endpoint quotas — referenced via `BB025_POLICY_REF`; rate-limit math unchanged
 
 ## Retry policy
 
@@ -62,7 +62,7 @@ delay = min(initialBackoffMs × multiplier^(attempt-1), maxBackoffMs)
 | `throttle_optional` | Reduce optional workload dispatch rate |
 | `pause_research` | Pause research queues and jobs |
 | `disable_geocoder` | Reject new geocode requests |
-| `disable_model` | Block LLM calls (future BB-064) |
+| `disable_model` | Block LLM calls (future ) |
 | `disable_source_fetch` | Pause URL/source fetch workers |
 
 ## Manual hard-stop
@@ -72,7 +72,7 @@ Operator procedure: [`infra/gcp/cost-controls/hard-stop-runbook.md`](../../infra
 ## Validation
 
 ```bash
-pnpm --filter @black-book/security test
+pnpm --filter @repo/security test
 node --test infra/gcp/cost-controls/cost-controls.test.mjs
 ```
 
@@ -88,6 +88,6 @@ node --test infra/gcp/cost-controls/cost-controls.test.mjs
 
 ## Follow-on
 
-- BB-034: Cost anomaly dashboards and alerts
-- BB-035: Kill switches wired to automated responses
-- BB-059: Load/abuse/cost integration tests against staging
+- : Cost anomaly dashboards and alerts
+- : Kill switches wired to automated responses
+- : Load/abuse/cost integration tests against staging

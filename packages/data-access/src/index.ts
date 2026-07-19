@@ -1,8 +1,8 @@
 /**
- * @black-book/data-access server-only data access helpers.
+ * @repo/data-access server-only data access helpers.
  *
  * Primary path (ADR-011 D-014): Firestore collection maps and publish guards.
- * Deferred path: Postgres roles, pool, SQL Connect allowlists 
+ * Deferred path: Postgres roles, pool, SQL Connect allowlists
  * see DEFERRED.md and infra/database/README.md. Do not provision Cloud SQL.
  */
 export { DATA_ACCESS_PACKAGE } from './package-id.js';

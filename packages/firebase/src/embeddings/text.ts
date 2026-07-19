@@ -3,12 +3,12 @@
  * Builds the text an entity is embedded from, and the pre-filter fields (kind/state/eraBucket)
  * stored alongside its vector. Pure string/number logic no I/O.
  *
- * Decade-bucketing math delegates to @black-book/domain's shared `deriveEraBuckets` (
+ * Decade-bucketing math delegates to @repo/domain's shared `deriveEraBuckets` (
  * packages/domain/src/era.ts) rather than duplicating it locally `deriveEraBucket` below is a
  * thin single-bucket adapter over that shared function, kept for this module's existing
  * single-value `eraBucket` pre-filter field (see ADR-014's composite vector indexes).
  */
-import { deriveEraBuckets } from '@black-book/domain';
+import { deriveEraBuckets } from '@repo/domain';
 import type { CanonicalEntityDoc, EntityKindDoc } from '../firestore/types.js';
 
 /** Caller-resolved location context the pipeline does not itself geocode/resolve state. */
@@ -104,7 +104,7 @@ export function resolveEntityYearSpan(entity: EntityEmbeddingSource): EntityYear
  * Buckets a year span into a single decade label ("1950s"), preferring the start year.
  * Undefined when no temporal anchor exists at all the pre-filter simply omits eraBucket for
  * those entities. This is a thin, single-bucket adapter over the shared
- * `deriveEraBuckets` (@black-book/domain) — the anchor resolves to exactly one decade
+ * `deriveEraBuckets` (@repo/domain) — the anchor resolves to exactly one decade
  * because it is passed as a single-point span (no end), matching this function's pre-existing
  * anchor-only behavior. Multi-decade spans (e.g. a person's full birth–death range) are exposed
  * via the plural `deriveEraBuckets` directly for callers that want every overlapping decade,

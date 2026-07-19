@@ -1,7 +1,7 @@
 /**
- * Production `SafeHttpClient` for the Census Geocoder adapter (`@black-book/domain`'s
+ * Production `SafeHttpClient` for the Census Geocoder adapter (`@repo/domain`'s
  * `../adapters/census-geo/fetch-geocode.ts`), backed by the REAL URL-safety primitives
- * from `@black-book/security` (`evaluateExternalUrl`, `resolveAndPinDestination`) — the exact
+ * from `@repo/security` (`evaluateExternalUrl`, `resolveAndPinDestination`) — the exact
  * seam `packages/domain/src/adapters/internet-archive/shared/http-port.ts` defines and
  * `http-port.test.ts`'s `buildRealSafeHttpClient` reference implementation demonstrates. This is
  * that reference implementation made real: DNS is resolved once via Node's `dns.promises`,
@@ -17,10 +17,10 @@ import { request as httpsRequest } from 'node:https';
 import {
   evaluateExternalUrl,
   resolveAndPinDestination,
-} from '@black-book/security';
+} from '@repo/security/url-safety';
 
 /**
- * Structurally matches `@black-book/domain`'s `SafeHttpClient` port
+ * Structurally matches `@repo/domain`'s `SafeHttpClient` port
  * (`packages/domain/src/adapters/internet-archive/shared/http-port.ts`) exactly including the
  * `'GET' | 'POST'` method union and optional `body` even though this client only ever performs
  * GET requests for the Census Geocoder (see `handleRequest`'s runtime guard below). Matching the
@@ -110,11 +110,11 @@ export async function safeHttpClient(request: SafeHttpRequest): Promise<SafeHttp
   }
   const parsed = evaluateExternalUrl(request.url, { allowedDomains: ['geocoding.geo.census.gov'] });
   if (!parsed.allowed) {
-    throw new Error(`URL rejected by BB-030 policy: ${parsed.reason}`);
+    throw new Error(`URL rejected by safe-fetch policy: ${parsed.reason}`);
   }
   const destination = await resolveAndPinDestination(parsed.value, resolveHost);
   if (!destination.allowed) {
-    throw new Error(`URL rejected by BB-030 DNS pinning: ${destination.reason}`);
+    throw new Error(`URL rejected by safe-fetch DNS pinning: ${destination.reason}`);
   }
   return performPinnedRequest({
     normalizedUrl: destination.value.normalizedUrl,

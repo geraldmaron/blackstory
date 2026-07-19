@@ -5,6 +5,18 @@
  * filter/facet computation.
  */
 import type { ExploreMapFeature } from './build-explore-map-source';
+import { isValidTopicId } from '@repo/domain/taxonomy/topics';
+
+/**
+ * Resolves the effective controlled-taxonomy topic ids for a feature (the related workstream): prefers
+ * the new `topicIds` field, falling back to the legacy `topicTags` field for features built
+ * before the split. Either way every value is validated against `TOPIC_REGISTRY` — the theme
+ * facet is NEVER built from raw, uncontrolled tag counting.
+ */
+function effectiveTopicIds(feature: ExploreMapFeature): readonly string[] {
+  const source = feature.properties.topicIds ?? feature.properties.topicTags;
+  return source.filter(isValidTopicId);
+}
 
 export type ExploreFilterState = {
   readonly era: string;
@@ -68,8 +80,9 @@ function toOptions(
   counts: Record<string, number>,
   allLabel: string,
   sort: 'alpha' | 'chrono' = 'alpha',
+  filterFn?: (value: string) => boolean,
 ): readonly FacetOption[] {
-  const entries = Object.entries(counts);
+  const entries = Object.entries(counts).filter(([value]) => !filterFn || filterFn(value));
   entries.sort(([a], [b]) =>
     sort === 'chrono' ? a.localeCompare(b, undefined, { numeric: true }) : a.localeCompare(b),
   );
@@ -93,10 +106,36 @@ export function buildExploreFacetOptions(features: readonly ExploreMapFeature[])
   return {
     kind: toOptions(countBy(features, (feature) => [feature.properties.kind]), 'All kinds'),
     era: toOptions(countBy(features, (feature) => feature.properties.eraBuckets), 'All eras', 'chrono'),
-    theme: toOptions(countBy(features, (feature) => feature.properties.topicTags), 'All themes'),
+    theme: toOptions(countBy(features, effectiveTopicIds), 'All themes'),
     confidence: toOptions(
       countBy(features, (feature) => [feature.properties.confidenceTier]),
       'All confidence tiers',
     ),
   };
+}
+
+/** Earliest era-bucket start year for chronological ordering; undated records sort last. */
+function earliestEraYear(feature: ExploreMapFeature): number {
+  let earliest = Number.POSITIVE_INFINITY;
+  for (const bucket of feature.properties.eraBuckets) {
+    const year = Number.parseInt(bucket, 10);
+    if (Number.isFinite(year) && year < earliest) earliest = year;
+  }
+  return earliest;
+}
+
+/**
+ * Deterministic reading order for the synchronized list (cognitive-accessibility law:
+ * a list's order must be inferable at a glance, never arbitrary source order):
+ * chronological by earliest documented era, undated records last, ties alphabetical.
+ */
+export function sortFeaturesForList(
+  features: readonly ExploreMapFeature[],
+): readonly ExploreMapFeature[] {
+  return [...features].sort((a, b) => {
+    const eraA = earliestEraYear(a);
+    const eraB = earliestEraYear(b);
+    if (eraA !== eraB) return eraA - eraB;
+    return a.properties.displayName.localeCompare(b.properties.displayName);
+  });
 }

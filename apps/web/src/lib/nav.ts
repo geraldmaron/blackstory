@@ -1,43 +1,29 @@
 /**
- * Primary navigation items for the public Black Book application shell.
+ * Navigation data for the public BlackStory application shell.
+ * Primary/overflow IA lives in @repo/config so admin can share the same navbar.
  */
 
-export type NavItem = {
-  readonly href: string;
-  readonly label: string;
+import {
+  FOOTER_NAV_COLUMNS as CONFIG_FOOTER,
+  OVERFLOW_NAV,
+  PRIMARY_NAV,
+  isShellNavActive,
+  type ShellNavItem,
+} from '@repo/config';
+
+export type NavItem = ShellNavItem;
+
+export { PRIMARY_NAV, OVERFLOW_NAV };
+
+export type FooterNavColumn = {
+  readonly title: string;
+  readonly items: readonly NavItem[];
 };
 
-export const PRIMARY_NAV: readonly NavItem[] = [
-  { href: '/', label: 'Home' },
-  { href: '/explore', label: 'Explore' },
-  { href: '/search', label: 'Search' },
-  { href: '/history', label: 'History' },
-  { href: '/facts', label: 'Facts' },
-  { href: '/legal', label: 'Legal' },
-  { href: '/topics', label: 'Topics' },
-  { href: '/methodology', label: 'Methodology' },
-  { href: '/myths', label: 'Myths' },
-  { href: '/about', label: 'About' },
-  { href: '/corrections', label: 'Corrections' },
-] as const;
-
-/** Compact footer links editorial close + dev fixtures.  */
-export const FOOTER_NAV: readonly NavItem[] = [
-  { href: '/explore', label: 'Explore' },
-  { href: '/search', label: 'Search' },
-  { href: '/history', label: 'History' },
-  { href: '/facts', label: 'Facts' },
-  { href: '/legal', label: 'Legal' },
-  { href: '/topics', label: 'Topics' },
-  { href: '/methodology', label: 'Methodology' },
-  { href: '/errata', label: 'Errata' },
-  { href: '/myths', label: 'Myths' },
-  { href: '/about', label: 'About' },
-  { href: '/corrections', label: 'Corrections' },
-  { href: '/design-system', label: 'Design system' },
-] as const;
+/** Three mono-caps footer columns per the v3 shell contract. */
+export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] =
+  CONFIG_FOOTER as readonly FooterNavColumn[];
 
 export function isNavActive(pathname: string, href: string): boolean {
-  if (href === '/') return pathname === '/';
-  return pathname === href || pathname.startsWith(`${href}/`);
+  return isShellNavActive(pathname, href);
 }

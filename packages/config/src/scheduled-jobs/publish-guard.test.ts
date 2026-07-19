@@ -1,19 +1,19 @@
 
 /**
  * Nothing scheduled can publish. This proves assertScheduledJobOperationAllowed
- * calls through the REAL guard (assertDiscoveryCannotPublish from @black-book/domain)
+ * calls through the REAL guard (assertDiscoveryCannotPublish from @repo/domain)
  * not a locally invented check that doesn't connect to anything and that a job cannot bypass
  * promotion gates even when it declares one of the two pre-approved public-facing exceptions.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { FORBIDDEN_DISCOVERY_OPERATIONS, assertDiscoveryCannotPublish } from '@black-book/domain';
+import { FORBIDDEN_DISCOVERY_OPERATIONS, assertDiscoveryCannotPublish } from '@repo/domain';
 import { assertScheduledJobOperationAllowed, jobDeclaresPublicEffect } from './publish-guard.ts';
 import type { ScheduledJobDefinition } from './types.ts';
 
 const NONE_EFFECT_JOB: ScheduledJobDefinition = {
   id: 'discovery-campaign-wikimedia-federal',
-  owner: 'BB-073',
+  owner: 'discovery/wikimedia-federal',
   description: 'test',
   cadence: { cronExpression: '0 6 * * 1', nominalIntervalMs: 604_800_000, humanReadable: 'weekly' },
   budget: { unit: 'candidates', maxPerRun: 500 },
@@ -21,10 +21,10 @@ const NONE_EFFECT_JOB: ScheduledJobDefinition = {
   idempotencyKeyScheme: 'job:{jobId}:{isoWeekStart}',
   killSwitchId: 'research-campaigns',
   targetWorker: { package: 'research', function: 'discovery.campaign.run' },
-  environment: 'blackbook-internal',
+  environment: 'repo-internal',
   publicEffect: 'none',
   rosterStatus: 'stub',
-  implementationOwnerBead: 'BB-073',
+  implementationOwnerBead: 'discovery/wikimedia-federal',
   consecutiveMissedRunThreshold: 2,
 };
 

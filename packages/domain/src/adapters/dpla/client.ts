@@ -1,6 +1,6 @@
 /**
  * Defensive DPLA v2 response parsing. See types.ts's module header for why this is
- * deliberately tolerant of field renames/relocations rather than assuming a rigid shape 
+ * deliberately tolerant of field renames/relocations rather than assuming a rigid shape
  * DPLA's aggregation program transitions to Cleveland Public Library starting July 2026.
  */
 import type { DplaNormalizedDoc, DplaParsedBatch, DplaRejectedDoc } from './types.js';

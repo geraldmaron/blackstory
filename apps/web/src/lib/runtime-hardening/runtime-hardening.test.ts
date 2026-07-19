@@ -64,7 +64,7 @@ test('collectPublicRenderPathFindings flags forbidden imports', () => {
   // requires a literal "import"/"export" keyword) so this fixture
   // exercises the real detector without the repo-wide boundary scanner
   // mistaking it for an actual cross-boundary import.
-  const forbiddenModuleSpecifier = ['@black-book', 'data-access/firestore'].join('/');
+  const forbiddenModuleSpecifier = ['@blap', 'data-access/firestore'].join('/');
   const findings = collectPublicRenderPathFindings(
     'fake.tsx',
     `// re-exported from '${forbiddenModuleSpecifier}' upstream`,
@@ -76,7 +76,10 @@ test('degraded mode reads bundled release snapshots', () => {
   const prior = process.env.PUBLIC_READ_API_DISABLED;
   process.env.PUBLIC_READ_API_DISABLED = '1';
   assert.equal(isPublicReadApiDisabled(), true);
-  assert.equal(readEntityFromReleaseSnapshot('ent_seed_place_001')?.displayName, 'Seed Historical Place');
+  assert.equal(
+    readEntityFromReleaseSnapshot('ent_15th_st_church_001')?.displayName,
+    'Fifteenth Street Presbyterian Church',
+  );
   process.env.PUBLIC_READ_API_DISABLED = prior;
 });
 

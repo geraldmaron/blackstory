@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { EmptyState } from '@black-book/ui';
+import { EmptyState } from '@repo/ui';
 import { RECORD_GAP_COPY, type RecordGapKind } from './copy';
 
 export type RecordGapNoticeProps = {

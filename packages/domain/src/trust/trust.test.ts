@@ -13,7 +13,7 @@ import {
 
 test('buildNewsMediaOrganizationJsonLd emits required Trust Project schema properties', () => {
   const jsonLd = buildNewsMediaOrganizationJsonLd({
-    name: 'Black Book',
+    name: 'BlackStory',
     url: 'https://example.org',
     correctionsPolicyUrl: 'https://example.org/errata',
     verificationFactCheckingPolicyUrl: 'https://example.org/methodology#verification',
@@ -29,7 +29,7 @@ test('buildNewsMediaOrganizationJsonLd emits required Trust Project schema prope
 
 test('assertClaimReviewPathExclusive allows only /myths/<slug> paths', () => {
   assert.doesNotThrow(() => assertClaimReviewPathExclusive('/myths/rosa-parks-was-tired'));
-  assert.throws(() => assertClaimReviewPathExclusive('/facts/BB-F-000001/slug'));
+  assert.throws(() => assertClaimReviewPathExclusive('/facts/dunbar-founding-1870'));
   assert.throws(() => assertClaimReviewPathExclusive('/myths/'));
 });
 
@@ -42,7 +42,7 @@ test('buildMythClaimReviewJsonLd emits ClaimReview for an allowed myths path', (
       reviewBody: 'The primary record shows otherwise.',
       claimOrigin: { name: 'Example social post', url: 'https://example.com/post' },
       ratingExplanation: 'False',
-      authorName: 'Black Book',
+      authorName: 'BlackStory',
     },
     '/myths/sample',
   );

@@ -3,8 +3,8 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { SurfaceCapabilityError, deniesPublication } from '@black-book/config';
-import type { AppCheckTelemetryEvent } from '@black-book/firebase';
+import { SurfaceCapabilityError, deniesPublication } from '@repo/config';
+import type { AppCheckTelemetryEvent } from '@repo/firebase';
 import { createSubmissionsApiAppCheckGuard } from './app-check.ts';
 import { health } from './index.ts';
 import { guardIntakeOperation, guardPublishAttempt } from './posture.ts';

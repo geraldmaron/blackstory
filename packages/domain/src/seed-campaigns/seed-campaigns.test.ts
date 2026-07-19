@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import { loadGoldCorpus } from '@black-book/testing';
+import { loadGoldCorpus } from '@repo/testing';
 import {
   ALL_SEED_RECORDS,
   NATIONAL_SEED_CAMPAIGN_BUNDLE,
@@ -64,13 +64,13 @@ test('assertAllSeedRecordsPassGates is fail-closed on a record missing citations
   );
 });
 
-test('national seed is not a bulk U.S. school import (BB-058 AC4)', () => {
+test('national seed is not a bulk U.S. school import ( AC4)', () => {
   assertNationalSeedNotBulkImport(ALL_SEED_RECORDS);
   assert.ok(ALL_SEED_RECORDS.length < 100, 'sample must stay orders of magnitude below school inventory');
   assert.ok(ALL_SEED_RECORDS.length <= NATIONAL_SEED_MAX_RECORDS);
 });
 
-test('sparse but verified records are allowed (BB-058 AC3)', () => {
+test('sparse but verified records are allowed ( AC3)', () => {
   const sparse = ALL_SEED_RECORDS.filter((record) => record.completeness === 'sparse');
   assert.ok(sparse.length >= 2, 'campaign should include at least two sparse verified records');
   for (const record of sparse) {
@@ -106,7 +106,7 @@ test('geographic diversity spans multiple Census regions with documented gaps', 
   assert.match(gapsDoc, /Rosenwald bulk corpus/iu);
 });
 
-test('BB-047 gold corpus included_school adjudications align with seed publication posture', () => {
+test(' gold corpus included_school adjudications align with seed publication posture', () => {
   const gold = loadGoldCorpus(GOLD_CORPUS_PATH);
   const includedSchools = gold.examples.filter(
     (example) =>
@@ -128,7 +128,7 @@ test('BB-047 gold corpus included_school adjudications align with seed publicati
   }
 });
 
-test('records with sourceCorpus use BB-094 cleared launch corpora only', () => {
+test('records with sourceCorpus use  cleared launch corpora only', () => {
   const withCorpus = ALL_SEED_RECORDS.filter((record) => record.sourceCorpus !== undefined);
   assert.ok(withCorpus.length > 0);
   for (const record of withCorpus) {
@@ -140,7 +140,7 @@ test('records with sourceCorpus use BB-094 cleared launch corpora only', () => {
     const corpusGate = evaluateSeedRecordGates(record, GATE_INPUT).find(
       (entry) => entry.gate === 'corpus_promotion',
     );
-    assert.equal(corpusGate?.passed, true, `${record.id} must pass BB-094 corpus promotion gate`);
+    assert.equal(corpusGate?.passed, true, `${record.id} must pass  corpus promotion gate`);
   }
 });
 

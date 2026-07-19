@@ -17,6 +17,7 @@ out/
 *.tsbuildinfo
 coverage/
 .turbo/
+.cache/
 
 # Env / secrets
 .env
@@ -58,11 +59,11 @@ infra/database/sql-connect/dataconnect/.dataconnect/
 packages/data-access/generated/*/
 !packages/data-access/generated/README.md
 
-# Construct — generated adapters, launcher, and runtime state.
-# Machine-specific, recreated by `construct sync`; never source (ADR-0027).
+# .claude/ — machine-local Claude Code config (hooks, launch config, synced
+# skill libraries). Never source, except the carve-out below.
 .claude/*
 # Exception: Black Book product skills (BB-085) are committed source — thin
-# callers over tested @black-book/* packages, not Construct-generated state.
+# callers over tested @repo/* packages.
 # (A gitignored parent dir can't be re-included by a child negation, so this
 # un-ignores .claude/ contents one level at a time down to the carve-out.)
 !.claude/skills/
@@ -78,7 +79,8 @@ packages/data-access/generated/*/
 config.env
 embed.yaml
 plan.md
-inbox/
+# Operator/local drop folders at repo root only — do not ignore apps/admin/src/app/inbox
+/inbox/
 
 # Beads / Dolt files (added by bd init)
 .dolt/

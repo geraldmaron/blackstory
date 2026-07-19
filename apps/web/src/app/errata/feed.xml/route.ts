@@ -1,9 +1,9 @@
 /**
  * RSS export for the public errata log.
  */
-import { buildErrataRssFeed } from '../../../lib/trust/errata-feed.js';
-import { listErrataEntries } from '../../../lib/trust/errata-seed.js';
-import { TRUST_PATHS, resolveTrustUrl } from '../../../lib/trust/site-identity.js';
+import { buildErrataRssFeed } from '../../../lib/trust/errata-feed';
+import { listErrataEntries } from '../../../lib/trust/errata-seed';
+import { TRUST_PATHS, resolveTrustUrl } from '../../../lib/trust/site-identity';
 
 export async function GET(request: Request) {
   const origin = new URL(request.url).origin;

@@ -2,9 +2,9 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-17
-- **Bead:** BB-098 (premier map: cinematic zoom and seamless page-to-map transition)
-- **Depends on:** ADR-013 (map stack), BB-051 (dignity/redaction rules), BB-096 (tokens v3), BB-097 (site redesign v3)
-- **Blocks:** BB-101 (redesign quality gate)
+- **Bead:**  (premier map: cinematic zoom and seamless page-to-map transition)
+- **Depends on:** ADR-013 (map stack),  (dignity/redaction rules),  (tokens v3),  (site redesign v3)
+- **Blocks:**  (redesign quality gate)
 
 ## Context
 
@@ -28,7 +28,7 @@ Constraints this decision must respect:
   island; nothing about this change may move page content out of the server render.
 - **Deep links and history.** `/explore` viewport + selection live in the URL and must
   keep working (shareable links, back/forward).
-- **BB-051 dignity rules** hold at every zoom, unchanged by architecture.
+- ** dignity rules** hold at every zoom, unchanged by architecture.
 
 ## Decision
 
@@ -64,7 +64,7 @@ source/layer/marker management becomes per-surface wiring.
 
 Camera movement is a brand register, so flights are named presets defined as motion
 tokens in `apps/web/src/lib/map-experience/camera-presets.ts` (unit-tested, auditable by
-BB-101):
+):
 
 - `national` — the resting CONUS frame.
 - `state` — flight to a state's bbox (`us-geography` bounds), long arc, slow-out easing.
@@ -78,7 +78,7 @@ with a preset; raw defaults are banned by review checklist.
 ### Transition contract
 
 On hero engagement (state or point click): the camera flies with the matching preset
-while hero chrome dissolves (token-driven, `--bb-duration-base` class, opacity/translate
+while hero chrome dissolves (token-driven, `--ds-duration-base` class, opacity/translate
 only — no layout thrash), nav condenses, and `router.push('/explore?…')` runs the same
 moment. The push re-renders pages only; the flight continues uninterrupted across the
 navigation because the stage never unmounts. The reverse transition (explore → home)
@@ -121,6 +121,6 @@ polish on top of option (a).
   page-level fetch collapses into view-model construction over the shared data.
 - Homepage LCP stays on server-rendered hero text; the canvas hydrates beneath it as
   today. Map failure keeps the existing graceful fallback (notice + nav links).
-- Performance acceptance (BB-098): transition holds 60fps-class smoothness on mid-tier
+- Performance acceptance: transition holds 60fps-class smoothness on mid-tier
   hardware, measured with DevTools traces on the final build and recorded in the bead —
   not asserted.

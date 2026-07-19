@@ -3,8 +3,8 @@
  * canonical methodology page as its principles document.
  */
 import React from 'react';
-import { buildPublishingPrinciplesJsonLd } from '../../lib/trust/domain-trust.js';
-import { TRUST_PATHS, TRUST_SITE_NAME, resolveTrustUrl } from '../../lib/trust/site-identity.js';
+import { buildPublishingPrinciplesJsonLd } from '../../lib/trust/domain-trust';
+import { TRUST_PATHS, TRUST_SITE_NAME, resolveTrustUrl } from '../../lib/trust/site-identity';
 
 export type PublishingPrinciplesJsonLdScriptProps = {
   readonly pagePath: string;

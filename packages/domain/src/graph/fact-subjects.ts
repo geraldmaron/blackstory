@@ -82,7 +82,7 @@ export function mirrorFactSubjectsIntoRelationships(
         type: 'cites',
         evidenceIds,
         ...(fact.temporal ? { temporal: fact.temporal } : {}),
-        notes: `Mirrored from BB-086 FactRecord ${fact.factId} subjects[] (BB-092 acceptance criterion 8).`,
+        notes: `Mirrored from  FactRecord ${fact.factId} subjects[] (acceptance criterion 8).`,
         sourceFactId: fact.factId,
       });
     }

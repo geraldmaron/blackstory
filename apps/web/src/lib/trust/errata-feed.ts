@@ -1,9 +1,9 @@
 /**
  * RSS and JSON feed builders for the public errata log.
  */
-import { ERRATA_CHANGE_TYPE_LABELS } from './domain-trust.js';
-import { TRUST_SITE_NAME } from './site-identity.js';
-import type { ErrataEntry } from './errata-seed.js';
+import { ERRATA_CHANGE_TYPE_LABELS } from './domain-trust';
+import { TRUST_SITE_NAME } from './site-identity';
+import type { ErrataEntry } from './errata-seed';
 
 function escapeXml(value: string): string {
   return value

@@ -1,9 +1,9 @@
-# Runbook: Production environment re-split migration (BB-078 → BB-079)
+# Runbook: Production environment re-split migration ( → )
 
 **Scope:** Human-executed migration from the single production project `black-book-efaaf` to the
 [ADR-012](../adr/ADR-012-production-environment-resplit.md) three-project topology
 (`blackbook-prod` = retained `black-book-efaaf`, `blackbook-staging`, `blackbook-internal`).
-**Not executed by BB-078 or by this document.** Tracked as BB-079 (Production cloud apply). No
+**Not executed by  or by this document.** Tracked as  (Production cloud apply). No
 `gcloud`, `firebase deploy`, or `terraform apply` command in this runbook has been run by any
 agent session.
 
@@ -13,7 +13,7 @@ migration steps and points at where those follow-on beads pick up.
 
 ## When to run
 
-- Once, as BB-079, after this runbook and the underlying Terraform have been reviewed by whoever
+- Once, as , after this runbook and the underlying Terraform have been reviewed by whoever
   holds billing/org authority on the Google Cloud account.
 - Before any Blaze upgrade, App Hosting backend creation, or production data/traffic exists —
   this is the cheapest point in the project's life for this migration (ADR-012 Context).
@@ -24,7 +24,7 @@ migration steps and points at where those follow-on beads pick up.
   billing (human break-glass identity, not `github-deploy`).
 - A real billing account ID. An org ID if a GCP organization exists (optional — see
   "No GCP org yet" below).
-- GitHub remote exists with numeric `repository_id`/`repository_owner_id` recorded (BB-010
+- GitHub remote exists with numeric `repository_id`/`repository_owner_id` recorded (
   prerequisite, `infra/gcp/wif/trust-conditions.md`).
 - `terraform >= 1.6.0` and the `hashicorp/google` provider (already used by
   `infra/gcp/terraform/multi-project/`).
@@ -60,9 +60,9 @@ not flip every gate variable to `true` in one apply.
 | 10 | Extend WIF: enable `github-deploy-staging` (now targeting `blackbook-staging`) and `github-deploy-internal` | `infra/gcp/wif/terraform/` | `terraform apply -var-file=envs/prod.tfvars -var enable_staging_deploy_identity=true -var enable_internal_deploy_identity=true -var staging_project_id=blackbook-staging -var internal_project_id=blackbook-internal` |
 | 11 | Move `apps/admin` deploy target: Cloud Run service in `blackbook-internal`, IAP attached **directly to the Cloud Run service** (no load balancer) | `gcloud` (human) | `gcloud run services update black-book-admin --project=blackbook-internal --region=<region> --iap` (exact flag/console step depends on current `gcloud`/console IAP-for-Cloud-Run UI at execution time — verify against current GCP docs, not this runbook, before running) |
 | 12 | Grant `roles/iap.httpsResourceAccessor` only to the administrator access group on the `blackbook-internal` admin service | `gcloud` (human) | See `infra/gcp/iap/README.md` for the accessor-group pattern (mechanism section needs a follow-up rewrite for direct-attach IAP — see "Known follow-up" below) |
-| 13 | Move `workers/research`, `workers/publication`, `workers/security` deploy targets to `blackbook-internal` | CI workflows (out of scope for BB-078; follow-up bead) | Update `.github/workflows/*` to deploy against `blackbook-internal` using `github-deploy-internal` |
-| 14 | Update the **root** `.firebaserc` to add `staging`/`internal` aliases (root `.firebaserc` is outside BB-078's file ownership — `infra/firebase/.firebaserc.example` already shows the target shape) | repo (human) | Mirror `infra/firebase/.firebaserc.example` into `.firebaserc` |
-| 15 | Re-register `apps/admin`'s Firebase app under `blackbook-internal`; update admin's runtime Firebase config (outside BB-078's file ownership — `apps/admin` source) | repo (human, follow-up bead) | Firebase console / `firebase apps:create` against `blackbook-internal` |
+| 13 | Move `workers/research`, `workers/publication`, `workers/security` deploy targets to `blackbook-internal` | CI workflows (out of scope for ; follow-up bead) | Update `.github/workflows/*` to deploy against `blackbook-internal` using `github-deploy-internal` |
+| 14 | Update the **root** `.firebaserc` to add `staging`/`internal` aliases (root `.firebaserc` is outside 's file ownership — `infra/firebase/.firebaserc.example` already shows the target shape) | repo (human) | Mirror `infra/firebase/.firebaserc.example` into `.firebaserc` |
+| 15 | Re-register `apps/admin`'s Firebase app under `blackbook-internal`; update admin's runtime Firebase config (outside 's file ownership — `apps/admin` source) | repo (human, follow-up bead) | Firebase console / `firebase apps:create` against `blackbook-internal` |
 | 16 | Set real per-project budgets | `infra/gcp/terraform/multi-project/` | `terraform apply ... -var billing_account=<ACCOUNT_ID> -var billing_budget_amount_units='{prod=..., staging=..., internal=...}'` — confirm `blackbook-prod`'s budget has no automated action wired (notify-only; see `budgets.tf` header) |
 | 17 | Confirm `black-book-efaaf` (`blackbook-prod`) still has zero IAM binding for any `blackbook-internal` identity, and zero resource left over from the old same-project research/admin design | `gcloud` (human) | Cross-check against `infra/gcp/service-accounts.matrix.md`'s historical list; there should be nothing to decommission since nothing was ever applied |
 | 18 | Run the full AC-ISO-1..5 verification (below) and record a findings note (pattern: `infra/gcp/recovery-rehearsal/findings-template.md`) | repo + `gcloud` | See "Verification" section |
@@ -70,7 +70,7 @@ not flip every gate variable to `true` in one apply.
 
 ## Known follow-up (flagged, not fixed by this runbook)
 
-`infra/gcp/iap/README.md` and `infra/gcp/iap/admin-iap-policy.json` (BB-027) still describe the
+`infra/gcp/iap/README.md` and `infra/gcp/iap/admin-iap-policy.json` still describe the
 external-HTTPS-load-balancer + serverless NEG IAP pattern. Step 11–12 above use the newer direct
 Cloud-Run-attached IAP integration per ADR-012. That directory needs its own rewrite pass before
 step 11 is executed for real — file a follow-up bead rather than provisioning against a stale
@@ -99,7 +99,7 @@ Firebase MFA) is unaffected either way.
   production data or traffic depends on the new projects yet. Revert by disabling the gate
   variables (`terraform apply` with gates back to `false` does not un-create already-applied
   resources; use `terraform destroy -target=...` for the specific resources, reviewed).
-- **After production serving actually moves (BB-079 completion):** expensive. Reversing means
+- **After production serving actually moves ( completion):** expensive. Reversing means
   either a live data migration back into one project or accepting permanent three-project
   overhead — this matches ADR-012's Reversibility section. Do not attempt without a dedicated
   incident-level review; use `docs/runbooks/incident-response.md` and

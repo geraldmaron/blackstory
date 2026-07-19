@@ -29,7 +29,7 @@ const STATIC_PUBLIC_ROUTES: readonly { readonly path: string; readonly changeFre
     { path: '/facts', changeFrequency: 'daily', priority: 0.8 },
     { path: '/legal', changeFrequency: 'weekly', priority: 0.7 },
     { path: '/history', changeFrequency: 'weekly', priority: 0.8 },
-    { path: '/topics', changeFrequency: 'weekly', priority: 0.6 },
+    { path: '/stories', changeFrequency: 'weekly', priority: 0.6 },
   ]);
 
 function resolveSiteUrl(siteUrl: string | undefined): string {

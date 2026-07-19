@@ -9,7 +9,7 @@ import { auditHtmlSmoke } from './html-smoke.ts';
 test('auditHtmlSmoke accepts a minimal accessible fixture', () => {
   const html = `
     <main>
-      <h1>Black Book</h1>
+      <h1>BlackStory</h1>
       <img src="/hero.jpg" alt="Historic place photograph" />
     </main>
   `;

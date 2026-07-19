@@ -11,11 +11,13 @@ import { fileURLToPath } from 'node:url';
 import { assertAdminPermission } from '../../../firebase/src/admin-auth.ts';
 import {
   evaluateDailyBudget,
-  evaluateExternalUrl,
   evaluateSearchQueryGuardrails,
-  resolveAndPinDestination,
   validateAndNormalizeSubmission,
 } from '../../../security/src/index.ts';
+import {
+  evaluateExternalUrl,
+  resolveAndPinDestination,
+} from '../../../security/src/url-safety/index.ts';
 import {
   authorizeApiOperation,
   escapeUntrustedHtml,
@@ -216,7 +218,7 @@ describe('CI policy, suppression, DAST, and release gates', () => {
     assert.deepEqual(
       validateStagingDastConfiguration({
         baseUrl: 'https://api.staging.blackbook.example',
-        identityLabel: 'bb-security-dast-pr-42',
+        identityLabel: 'ds-security-dast-pr-42',
         environment: 'staging',
       }),
       [],

@@ -1,10 +1,14 @@
 {
-  "extends": "@black-book/typescript-config/node.json",
+  "extends": "@repo/typescript-config/node.json",
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.test.ts", "dist"]
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/map/generate-demo-map-source.ts",
+    "dist"
+  ]
 }

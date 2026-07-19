@@ -31,16 +31,16 @@ test('cloud database URLs are rejected', () => {
 });
 
 test('production project ids are detected', () => {
-  assert.equal(looksLikeProductionProjectId('demo-black-book'), false);
+  assert.equal(looksLikeProductionProjectId('demo-repo'), false);
   assert.equal(looksLikeProductionProjectId('black-book-efaaf'), true);
-  assert.equal(looksLikeProductionProjectId('black-book-prod'), true);
+  assert.equal(looksLikeProductionProjectId('the related workstream'), true);
   assert.equal(looksLikeProductionProjectId('my-production-app'), true);
 });
 
 test('assertTestsCannotAccessProduction fails closed on production signals', () => {
   const findings = collectProductionGuardFindings({
     NODE_ENV: 'test',
-    FIREBASE_PROJECT_ID: 'black-book-prod',
+    FIREBASE_PROJECT_ID: 'the related workstream',
     DATABASE_URL: 'postgresql://user:pass@db.example.supabase.co:5432/postgres',
   });
   assert.ok(findings.length >= 2);
@@ -57,7 +57,7 @@ test('local demo environment passes the production guard', () => {
   assert.doesNotThrow(() =>
     assertTestsCannotAccessProduction({
       NODE_ENV: 'test',
-      FIREBASE_PROJECT_ID: 'demo-black-book',
+      FIREBASE_PROJECT_ID: 'demo-repo',
       DATABASE_URL: 'postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook',
       FIRESTORE_EMULATOR_HOST: '127.0.0.1:8080',
     }),

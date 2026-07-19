@@ -1,0 +1,223 @@
+/**
+ * Entity record page affordances: editorial mast (media + identity), status/aside blocks,
+ * evidence claim typography, evidence legend, and trust off-ramp. Shared kind/confidence
+ * badge styles live in shell.css so home and entity surfaces stay consistent without
+ * loading the explore bundle.
+ */
+
+.ds-entity-mast {
+  display: grid;
+  gap: var(--ds-space-6);
+  padding-bottom: var(--ds-space-8);
+  border-bottom: var(--ds-border-width-strong) solid var(--ds-ink);
+}
+
+.ds-entity-mast__media {
+  min-width: 0;
+}
+
+.ds-entity-mast__media .ds-entity-photo__img,
+.ds-entity-mast__media .ds-entity-mark__svg {
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-entity-mast__identity {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.ds-entity-mast__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-entity-mast__meta-sep {
+  color: var(--ds-ink-subtle);
+  user-select: none;
+}
+
+.ds-entity-mast__meta-item {
+  color: inherit;
+}
+
+@media (min-width: 64rem) {
+  .ds-entity-mast {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: var(--ds-space-10);
+    align-items: end;
+  }
+}
+
+.ds-entity-body {
+  display: grid;
+  gap: var(--ds-space-5);
+  margin-top: var(--ds-space-6);
+}
+
+.ds-entity-trust-offramp {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-size: 0.9375rem;
+}
+
+.ds-record-section__body {
+  margin-top: var(--ds-space-4);
+}
+
+.ds-record-section__nested {
+  margin-top: var(--ds-space-6);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-entity-footnote {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+  font-size: 0.875rem;
+}
+
+.ds-entity-aside__cta {
+  margin: 0;
+}
+
+.ds-entity-aside__precision {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-size: 0.875rem;
+}
+
+.ds-entity-status__current {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  margin: 0 0 var(--ds-space-4);
+}
+
+.ds-entity-status__current .ds-mono {
+  color: var(--ds-ink-muted);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-entity-status__note {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+}
+
+.ds-why-appears__explanation {
+  margin: 0;
+}
+
+.ds-why-appears__tag {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+  font-size: 0.75rem;
+}
+
+.ds-why-appears__block {
+  margin-top: var(--ds-space-4);
+}
+
+.ds-why-appears__block .ds-subheading {
+  margin: 0 0 var(--ds-space-3);
+}
+
+.ds-evidence-legend {
+  margin: 0;
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-evidence-legend__summary {
+  cursor: pointer;
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-evidence-legend__summary:focus-visible {
+  outline: 2px solid var(--ds-accent-graphic);
+  outline-offset: 2px;
+}
+
+.ds-evidence-legend__body {
+  margin: var(--ds-space-3) 0 0;
+}
+
+.ds-evidence-legend__body dt {
+  font-weight: 600;
+}
+
+.ds-evidence-legend__body dd {
+  margin: 0 0 var(--ds-space-3);
+}
+
+.ds-story-link__meta-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-at-a-glance .ds-confidence-mark {
+  font-size: 0.9375rem;
+}
+
+.ds-at-a-glance__link {
+  color: var(--ds-copper-text);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.ds-at-a-glance__link:hover,
+.ds-at-a-glance__link:focus-visible {
+  color: var(--ds-ink);
+}
+
+/* Aside context blocks — flat page sections with a top rule, never Card chrome. */
+.ds-aside-block {
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-aside-block__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-aside-block__meta {
+  margin: var(--ds-space-1) 0 var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  font-size: 0.8125rem;
+}
+
+/* Accepted claims: stop using Card-title size/weight for claim copy. Predicate is a quiet
+ * label; claim prose is normal body weight and reading size. */
+.ds-entity-evidence .ds-card__title {
+  font-family: var(--ds-font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-evidence-claim__body {
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-editorial);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--ds-ink);
+}

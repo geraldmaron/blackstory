@@ -1,7 +1,7 @@
 {
   "schemaVersion": "hybrid-retrieval-queries.v1",
   "querySetVersion": "hybrid-retrieval.v1",
-  "description": "Labeled hybrid retrieval queries for BB-072 eval: name lookups, misspellings, descriptive queries, and place-anchored queries.",
+  "description": "Labeled hybrid retrieval queries for  eval: name lookups, misspellings, descriptive queries, and place-anchored queries.",
   "queries": [
     {
       "id": "hq_name_exact",

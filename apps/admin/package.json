@@ -1,27 +1,30 @@
 {
-  "name": "@black-book/admin",
+  "name": "@repo/admin",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3001",
-    "build": "next build",
+    "dev": "next dev --webpack --port 3001",
+    "build": "next build --webpack",
     "start": "next start --port 3001",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/surface.test.ts src/auth/server-authorization.test.ts src/console.test.ts",
+    "test": "node --conditions development --import tsx --test src/surface.test.ts src/auth/server-authorization.test.ts src/auth/firebase-session.test.ts src/auth/request-auth.test.ts src/stories/story-review-queue.test.ts src/ops/ops-summary.test.ts src/console/research-case-queue.test.ts src/cases/case-queue.test.ts src/console.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "@black-book/config": "workspace:*",
-    "@black-book/domain": "workspace:*",
-    "@black-book/operator-cli": "workspace:*",
-    "@black-book/ui": "workspace:*",
-    "next": "^15.4.2",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "@repo/config": "workspace:*",
+    "@repo/domain": "workspace:*",
+    "@repo/firebase": "workspace:*",
+    "@repo/operator-cli": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "firebase": "^11.10.0",
+    "firebase-admin": "^13.4.0",
+    "next": "^16.2.10",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
-    "@black-book/eslint-config": "workspace:^",
-    "@black-book/typescript-config": "workspace:^",
+    "@repo/eslint-config": "workspace:^",
+    "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.16.5",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",

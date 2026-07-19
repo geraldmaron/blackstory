@@ -1,7 +1,7 @@
 /**
  * Constitution-aligned source classifications for provenance.
  */
-import { loadProductConstitution } from '@black-book/schemas';
+import { loadProductConstitution } from '@repo/schemas';
 
 export function sourceClassifications(): readonly string[] {
   return loadProductConstitution().sourceClassifications;

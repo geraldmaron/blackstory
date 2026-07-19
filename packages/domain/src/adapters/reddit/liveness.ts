@@ -85,7 +85,7 @@ export async function assertPointerLiveBeforeReview(
   if (!result.live) {
     throw new Error(
       `Reddit pointer ${pointer.id} is no longer live (${result.reason}); refusing to attach it ` +
-        'to human review or a research case without a fresh, passing liveness check (BB-074)',
+        'to human review or a research case without a fresh, passing liveness check ()',
     );
   }
   return result;

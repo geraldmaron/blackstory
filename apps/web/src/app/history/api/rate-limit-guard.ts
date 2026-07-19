@@ -1,5 +1,5 @@
 /**
- * Server-only rate-limit guard for the `/history/api` refine route. Reuses 
+ * Server-only rate-limit guard for the `/history/api` refine route. Reuses
  * search rate-limit primitives same posture as `/explore/api`.
  */
 export {

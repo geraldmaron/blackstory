@@ -10,7 +10,7 @@ import {
   registerCorpusVetting,
   type CorpusBulkRecordCandidate,
   type RegisterCorpusVettingInput,
-} from '@black-book/domain';
+} from '@repo/domain';
 import {
   parseLeadsFromCsv,
   parseLeadsFromMarkdown,
@@ -37,7 +37,7 @@ function context(): OperatorIntakeContext {
 const CSV = [
   'title,description,url,location,era',
   '"Douglass Ave office","A photo shows the mutual-aid office plaque, dated 1962.",https://archive.example.org/a,Douglass Avenue,1960s',
-  ',"A second lead with no title field, but a valid description of sufficient length.",https://archive.example.org/b,,',
+  ',"A second lead with no title field, but a valid description of sufficient length.",https://archive.example.org/b,',
 ].join('\n');
 
 test('parses a CSV bulk-import batch into LeadInput rows', () => {
@@ -93,7 +93,7 @@ test('bulk-import runs every parsed row through the same real intake path, one a
 test('a bad row in a batch is rejected individually without blocking the rest of the batch', () => {
   const leads = [
     { description: 'Valid lead with a citation.', url: 'https://archive.example.org/ok' },
-    { description: 'No citation at all here, should fail BB-029 validation cleanly.' },
+    { description: 'No citation at all here, should fail Intake validation cleanly.' },
   ];
   const summary = prepareBulkLeadIntake(leads, context());
   assert.equal(summary.total, 2);
@@ -339,7 +339,7 @@ test('prepareCorpusBulkImportBatch: a citation missing a required field demotes 
   assert.equal(only?.row.outcome, 'accepted');
 });
 
-test('prepareCorpusBulkImportBatch: zero citations means zero source URLs, so real intake rejects it on its own (independent, real BB-029 validation)', () => {
+test('prepareCorpusBulkImportBatch: zero citations means zero source URLs, so real intake rejects it on its own (independent, real Intake validation)', () => {
   const { registryStore, vettingStore } = vettedFixture();
   const result = prepareCorpusBulkImportBatch({
     corpusId: 'nrhp',

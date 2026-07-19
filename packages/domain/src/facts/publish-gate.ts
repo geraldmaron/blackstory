@@ -16,14 +16,30 @@
  * never reads or derives `confidence` as a publish precondition. A `contested`-confidence fact
  * may publish (with its dispute disclosed via `confidenceNote`/`counterClaims`) exactly as
  * readily as an `established`-confidence one — confidence is a caveat, not a publish blocker.
+ *
+ * Derivation consistency (the related workstream): when a fact declares `derivedFromClaimIds`, this
+ * gate ALSO cross-checks its citations/confidence against the named canonical claims via
+ * `./derivation.ts`'s `evaluateFactDerivationConsistency` — see that module's doc comment for the
+ * exact comparison rule. This is opt-in and additive, never a new hard requirement: a fact with
+ * an empty `derivedFromClaimIds` (all pre-existing fact data today) is unaffected, and a caller
+ * that does not supply `backingClaims` for a fact that HAS declared derivation ids fails the gate
+ * closed rather than silently skipping the check (see `derivation.ts` for why).
  */
 import { isSearchIndexableFactStatus, isPubliclyResolvableFactStatus, type FactStatus } from './status.js';
 import { hasCompleteFactCitations, type FactRecord } from './record.js';
+import { evaluateFactDerivationConsistency, type FactDerivationBackingClaim } from './derivation.js';
 
 export type FactPublishGateFailureReason =
   | 'no_citations'
   | 'incomplete_citation'
-  | 'not_a_publishable_status';
+  | 'not_a_publishable_status'
+  | 'derivation_inconsistent';
+
+/** Per-call options for the derivation-consistency sub-check; omit entirely (or leave
+ * `backingClaims` unset) for a fact whose `derivedFromClaimIds` is empty. */
+export type FactPublishGateOptions = {
+  readonly backingClaims?: readonly FactDerivationBackingClaim[];
+};
 
 export type FactPublishGateResult =
   | { readonly ok: true }
@@ -39,7 +55,9 @@ export type FactPublishGateResult =
 const STATUSES_REQUIRING_CITATION_COMPLETENESS: readonly FactStatus[] = ['published', 'corrected'];
 
 export function evaluateFactPublishGate(
-  fact: Pick<FactRecord, 'citations' | 'status'>,
+  fact: Pick<FactRecord, 'citations' | 'status'> &
+    Partial<Pick<FactRecord, 'id' | 'derivedFromClaimIds' | 'confidence'>>,
+  options: FactPublishGateOptions = {},
 ): FactPublishGateResult {
   if (!STATUSES_REQUIRING_CITATION_COMPLETENESS.includes(fact.status)) {
     return { ok: true };
@@ -48,7 +66,7 @@ export function evaluateFactPublishGate(
     return {
       ok: false,
       reason: 'no_citations',
-      message: `FactRecord cannot reach status "${fact.status}" with zero citations. "Unsourced" is not a publishable state (BB-086).`,
+      message: `FactRecord cannot reach status "${fact.status}" with zero citations. "Unsourced" is not a publishable state ().`,
     };
   }
   if (!hasCompleteFactCitations(fact)) {
@@ -60,15 +78,43 @@ export function evaluateFactPublishGate(
         'archived-capture pointer (archivedUrl+archivedAt) or a retrieval date (accessedAt).',
     };
   }
+
+  const derivedFromClaimIds = fact.derivedFromClaimIds ?? [];
+  if (derivedFromClaimIds.length > 0 && fact.confidence !== undefined) {
+    const derivation = evaluateFactDerivationConsistency({
+      fact: {
+        ...(fact.id !== undefined ? { id: fact.id } : {}),
+        citations: fact.citations,
+        confidence: fact.confidence,
+        derivedFromClaimIds,
+      },
+      backingClaims: options.backingClaims ?? [],
+    });
+    if (!derivation.ok) {
+      return { ok: false, reason: 'derivation_inconsistent', message: derivation.message };
+    }
+  }
+
   return { ok: true };
 }
 
-export function assertFactMayPublish(fact: Pick<FactRecord, 'id' | 'citations' | 'status'>): void {
-  const result = evaluateFactPublishGate(fact);
+export function assertFactMayPublish(
+  fact: Pick<FactRecord, 'id' | 'citations' | 'status'> &
+    Partial<Pick<FactRecord, 'derivedFromClaimIds' | 'confidence'>>,
+  options: FactPublishGateOptions = {},
+): void {
+  const result = evaluateFactPublishGate(fact, options);
   if (!result.ok) {
     throw new Error(`Fact ${fact.id} blocked from publishing: ${result.message}`);
   }
 }
+
+/** Per-projection-run options: `backingClaimsByFactId` supplies the canonical claims backing
+ * each fact's `derivedFromClaimIds`, keyed by `FactRecord.id`, for the derivation-consistency
+ * sub-check (see `./derivation.ts`). Facts with an empty `derivedFromClaimIds` need no entry. */
+export type FactProjectionPublishGateOptions = {
+  readonly backingClaimsByFactId?: ReadonlyMap<string, readonly FactDerivationBackingClaim[]>;
+};
 
 /**
  * Aggregates the publish gate across every fact slated for a projection build mirrors
@@ -76,11 +122,14 @@ export function assertFactMayPublish(fact: Pick<FactRecord, 'id' | 'citations' |
  * failing fact in one pass rather than stopping at the first.
  */
 export function evaluateFactProjectionPublishGate(
-  facts: readonly Pick<FactRecord, 'id' | 'citations' | 'status'>[],
+  facts: readonly (Pick<FactRecord, 'id' | 'citations' | 'status'> &
+    Partial<Pick<FactRecord, 'derivedFromClaimIds' | 'confidence'>>)[],
+  options: FactProjectionPublishGateOptions = {},
 ): { readonly ok: true } | { readonly ok: false; readonly failures: readonly { readonly factId: string; readonly reason: FactPublishGateFailureReason }[] } {
   const failures: { readonly factId: string; readonly reason: FactPublishGateFailureReason }[] = [];
   for (const fact of facts) {
-    const result = evaluateFactPublishGate(fact);
+    const backingClaims = options.backingClaimsByFactId?.get(fact.id);
+    const result = evaluateFactPublishGate(fact, backingClaims !== undefined ? { backingClaims } : {});
     if (!result.ok) {
       failures.push({ factId: fact.id, reason: result.reason });
     }
@@ -89,14 +138,16 @@ export function evaluateFactProjectionPublishGate(
 }
 
 export function assertFactProjectionPublishGate(
-  facts: readonly Pick<FactRecord, 'id' | 'citations' | 'status'>[],
+  facts: readonly (Pick<FactRecord, 'id' | 'citations' | 'status'> &
+    Partial<Pick<FactRecord, 'derivedFromClaimIds' | 'confidence'>>)[],
+  options: FactProjectionPublishGateOptions = {},
 ): void {
-  const result = evaluateFactProjectionPublishGate(facts);
+  const result = evaluateFactProjectionPublishGate(facts, options);
   if (!result.ok) {
     const ids = result.failures.map((f) => f.factId);
     throw new Error(
       `Projection build blocked: ${ids.length} fact(s) fail the publish gate (${ids.join(', ')}). ` +
-        '"Unsourced" is not a publishable state (BB-086).',
+        '"Unsourced" is not a publishable state ().',
     );
   }
 }

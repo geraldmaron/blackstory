@@ -9,10 +9,10 @@
  * `deletionSync.maxHours: 48`) `REDDIT_DELETION_SYNC_MAX_HOURS` below is asserted equal to
  * that registered value in reddit.test.ts so the two never silently drift apart.
  *
- * This is the SCHEDULED, batch sweep half of liveness re-checking. The other, mandatory half 
+ * This is the SCHEDULED, batch sweep half of liveness re-checking. The other, mandatory half
  * a synchronous re-check immediately before human review case attachment lives in
  * ./liveness.ts `assertPointerLiveBeforeReview` and is NOT a special case of this sweep; both
- * must exist and both are tested (see reddit.test.ts and 
+ * must exist and both are tested (see reddit.test.ts and
  * packages/config/src/scheduled-jobs/jobs/reddit-deletion-sync.ts, which calls this module's
  * `sweepRedditPointerLiveness` on a 6-hour cadence).
  */
@@ -70,7 +70,7 @@ export type PlanRedditPointerPurgeInput = {
   readonly actor: AuditActor;
 };
 
-/** Builds a purge plan for one dead Reddit pointer via the REAL `planDeletionSyncPurge` 
+/** Builds a purge plan for one dead Reddit pointer via the REAL `planDeletionSyncPurge`
  * never a Reddit-specific reimplementation of purge/audit/outbox mechanics. */
 export function planRedditPointerPurge(input: PlanRedditPointerPurgeInput): DeletionSyncPlan {
   return planDeletionSyncPurge({
@@ -105,7 +105,7 @@ export type SweepRedditPointerLivenessInput = {
 
 /**
  * Scheduled sweep: re-checks liveness for every supplied stored pointer and builds a real purge
- * plan for any pointer no longer live. Pure aside from the injected `checkLiveness` I/O port 
+ * plan for any pointer no longer live. Pure aside from the injected `checkLiveness` I/O port
  * callers execute the returned `purgePlan.mutations` against their own store via
  * `applyRedditPointerPurge` below (re-exported straight from, not reimplemented).
  */

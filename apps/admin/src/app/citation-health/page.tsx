@@ -5,13 +5,13 @@
  * service connection, no mutation handlers.
  */
 import Link from 'next/link';
-import { computeRotRateBySourceClass, buildTrySearchingForSuggestion } from '@black-book/domain';
-import { Citation } from '@black-book/ui';
-import { CITATION_HEALTH_FIXTURES } from './fixtures.js';
+import { computeRotRateBySourceClass, buildTrySearchingForSuggestion } from '@repo/domain';
+import { Citation } from '@repo/ui';
+import { CITATION_HEALTH_FIXTURES } from './fixtures';
 import './citation-health.css';
 
 export const metadata = {
-  title: 'Citation health — Black Book Admin',
+  title: 'Citation health — BlackStory Admin',
   description: 'Rot rate by source class and the reader-facing degraded-citation treatment.',
 };
 
@@ -25,14 +25,13 @@ export default function CitationHealthPage() {
   const driftedCitation = CITATION_HEALTH_FIXTURES.find((citation) => citation.linkStatus === 'drifted');
 
   return (
-    <main className="bb-container bb-prose citation-health-page">
-      <p className="citation-health-kicker">Operator dashboard tile · BB-083</p>
-      <h1>Citation health</h1>
-      <p>
-        Rot rate per source class, from the weekly <code>citation-link-health-sweep</code>{' '}
-        scheduled job (packages/config/src/scheduled-jobs/jobs/citation-link-health-sweep.ts).
-        This shell renders fixture data and exposes no live mutation handlers — the real sweep
-        writes its findings to the citation store, which a future integration would read here.
+    <main className="ds-container ds-prose ds-page citation-health-page" id="main">
+      <p className="ds-page__eyebrow">Evidence quality</p>
+      <h1 className="ds-page__title">Citation health</h1>
+      <p className="ds-page__lede">
+        Rot rate by source class from the scheduled citation link-health sweep, plus a preview of
+        the reader-facing degraded-citation treatment. This desk reads fixture telemetry only — it
+        does not repair links, mutate citations, or publish catalog changes.
       </p>
 
       <section aria-labelledby="rot-rate-heading">
@@ -42,7 +41,7 @@ export default function CitationHealthPage() {
         </div>
         <div className="citation-health-table-wrap">
           <table>
-            <caption className="bb-visually-hidden">Citation rot rate by source classification</caption>
+            <caption className="ds-visually-hidden">Citation rot rate by source classification</caption>
             <thead>
               <tr>
                 <th scope="col">Source class</th>
@@ -70,7 +69,7 @@ export default function CitationHealthPage() {
         <p className="citation-health-note">
           Rot rate also feeds an additive confidence-engine authority signal —{' '}
           <code>citationRotRateAuthoritySignal</code> in
-          packages/domain/src/confidence-engine/engine.ts — as a durability signal for BB-043,
+          packages/domain/src/confidence-engine/engine.ts — as a durability signal for confidence durability,
           without changing the existing weighted confidence computation.
         </p>
       </section>
@@ -100,7 +99,7 @@ export default function CitationHealthPage() {
       </section>
 
       <p className="citation-health-footer">
-        <Link href="/console">Back to the administration console</Link>
+        <Link href="/">Back to operations</Link>
       </p>
     </main>
   );

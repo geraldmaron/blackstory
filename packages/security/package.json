@@ -1,5 +1,5 @@
 {
-  "name": "@black-book/security",
+  "name": "@repo/security",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,6 +8,16 @@
       "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./redaction": {
+      "development": "./src/redaction.ts",
+      "types": "./dist/redaction.d.ts",
+      "import": "./dist/redaction.js"
+    },
+    "./url-safety": {
+      "development": "./src/url-safety/index.ts",
+      "types": "./dist/url-safety/index.d.ts",
+      "import": "./dist/url-safety/index.js"
     }
   },
   "files": [
@@ -20,12 +30,12 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "@black-book/domain": "workspace:*",
-    "@black-book/schemas": "workspace:*"
+    "@repo/domain": "workspace:*",
+    "@repo/schemas": "workspace:*"
   },
   "devDependencies": {
-    "@black-book/observability": "workspace:*",
-    "@black-book/typescript-config": "workspace:^",
+    "@repo/observability": "workspace:*",
+    "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

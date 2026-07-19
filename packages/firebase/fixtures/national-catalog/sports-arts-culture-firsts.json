@@ -1,0 +1,3139 @@
+[
+  {
+    "id": "ent_jackie_robinson_001",
+    "kind": "person",
+    "displayName": "Jackie Robinson",
+    "summary": "Jackie Robinson broke Major League Baseball's color line on April 15, 1947, debuting for the Brooklyn Dodgers at Ebbets Field. In 1962 he became the first Black player elected to the National Baseball Hall of Fame, chosen in his first year of eligibility with 77.5 percent of the vote.",
+    "eraBuckets": [
+      "1940s",
+      "1960s"
+    ],
+    "topicTags": [
+      "sports",
+      "baseball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Brooklyn, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "Jackie Robinson Playground, former Ebbets Field home-plate site, 10 McKeever Place, Brooklyn",
+    "lat": 40.666,
+    "lng": -73.9588,
+    "claims": [
+      {
+        "predicate": "broke_mlb_color_line_year",
+        "object": "April 15, 1947, debuting for the Brooklyn Dodgers and breaking modern Major League Baseball's color line",
+        "confidenceLevel": "high",
+        "citationSource": "baseballhall.org",
+        "citationHref": "https://baseballhall.org/discover-more/stories/baseball-history/remembering-jackie",
+        "citationLabel": "National Baseball Hall of Fame — Remembering Jackie"
+      },
+      {
+        "predicate": "site_preserved_as",
+        "object": "Ebbets Field was demolished in 1960; its footprint is preserved today as Jackie Robinson Playground in Crown Heights, Brooklyn",
+        "confidenceLevel": "high",
+        "citationSource": "nycgovparks.org",
+        "citationHref": "https://www.nycgovparks.org/parks/jackie-robinson-playground/history",
+        "citationLabel": "NYC Parks — Jackie Robinson Playground history"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "1962, first Black player elected to the National Baseball Hall of Fame, in his first year on the ballot",
+        "confidenceLevel": "high",
+        "citationSource": "baseballhall.org",
+        "citationHref": "https://baseballhall.org/hall-of-famers/robinson-jackie",
+        "citationLabel": "National Baseball Hall of Fame — Jackie Robinson"
+      }
+    ],
+    "historicalContext": "Ebbets Field, demolished in 1960, is anchored here rather than Cooperstown because it is the site of Robinson's specific documented first; a sidewalk marker at the housing complex now on the site marks the former home-plate location.",
+    "topicIds": [
+      "sports",
+      "baseball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_jack_johnson_001",
+    "kind": "person",
+    "displayName": "Jack Johnson",
+    "summary": "On December 26, 1908, Jack Johnson defeated Tommy Burns to become the first Black world heavyweight boxing champion, a title he held until 1915. His victory and 1910 defense against James Jeffries, the 'Fight of the Century,' made him the most famous Black man in America and provoked violent backlash nationwide.",
+    "eraBuckets": [
+      "1900s",
+      "1910s"
+    ],
+    "topicTags": [
+      "sports",
+      "boxing",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Canastota, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "International Boxing Hall of Fame, 1 Hall of Fame Drive, Canastota, NY",
+    "lat": 43.0888,
+    "lng": -75.75083,
+    "claims": [
+      {
+        "predicate": "became_first_black_world_heavyweight_champion",
+        "object": "December 26, 1908, defeating Tommy Burns to win the title",
+        "confidenceLevel": "high",
+        "citationSource": "americanhistory.si.edu",
+        "citationHref": "https://americanhistory.si.edu/explore/stories/jack-johnson-first-african-american-world-heavyweight-boxing-champion",
+        "citationLabel": "Smithsonian National Museum of American History — Jack Johnson"
+      },
+      {
+        "predicate": "hall_of_fame_inducted",
+        "object": "International Boxing Hall of Fame, inaugural class, named April 1990",
+        "confidenceLevel": "high",
+        "citationSource": "upi.com",
+        "citationHref": "https://www.upi.com/Archives/1990/04/07/Boxing-Hall-of-Fame-names-first-inductees/6244639460800/",
+        "citationLabel": "UPI Archives — Boxing Hall of Fame names first inductees"
+      }
+    ],
+    "historicalContext": "Johnson's 1908 title fight took place in Sydney, Australia, so no U.S. ring site survives; his location here is anchored to the International Boxing Hall of Fame in Canastota, NY, where his boxing legacy is permanently enshrined.",
+    "topicIds": [
+      "sports",
+      "boxing",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_jesse_owens_001",
+    "kind": "person",
+    "displayName": "Jesse Owens",
+    "summary": "Competing for Ohio State University, Jesse Owens tied one world record and set three others in roughly 45 minutes at the May 25, 1935 Big Ten Championships. At the 1936 Berlin Olympics he won four gold medals (100m, 200m, long jump, 4x100m relay), undercutting Nazi claims of Aryan racial supremacy on their own soil.",
+    "eraBuckets": [
+      "1930s"
+    ],
+    "topicTags": [
+      "sports",
+      "track-and-field",
+      "olympics",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Columbus, Ohio",
+    "locationPrecision": "institution",
+    "locationLabel": "Jesse Owens Memorial Stadium, Ohio State University, Columbus, OH",
+    "lat": 40.0124,
+    "lng": -83.0276,
+    "claims": [
+      {
+        "predicate": "set_world_records_at",
+        "object": "Big Ten Championships, May 25, 1935 — tied one world record and set three others in about 45 minutes while competing for Ohio State",
+        "confidenceLevel": "high",
+        "citationSource": "ohiostatebuckeyes.com",
+        "citationHref": "https://ohiostatebuckeyes.com/news/2005/5/25/on-this-date-jesse-owens-sets-three-world-records-within-70-minutes-at-1935-big-ten-championships",
+        "citationLabel": "Ohio State Athletics — Jesse Owens sets world records, 1935"
+      },
+      {
+        "predicate": "olympic_gold_medals",
+        "object": "Four gold medals at the 1936 Berlin Olympics: 100m, 200m, long jump, and 4x100m relay",
+        "confidenceLevel": "high",
+        "citationSource": "olympics.com",
+        "citationHref": "https://www.olympics.com/en/athletes/jesse-owens",
+        "citationLabel": "Olympics.com — Jesse Owens biography and medals"
+      }
+    ],
+    "historicalContext": "Owens's 1935 records were set at Ferry Field in Ann Arbor, Michigan, but Ohio State — his alma mater, which barred him from campus housing and away-game hotels at the time — later renamed its track and field stadium in his honor, making it the most concrete surviving U.S. site tied to his collegiate career.",
+    "topicIds": [
+      "sports",
+      "track-and-field",
+      "olympics",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_wilma_rudolph_001",
+    "kind": "person",
+    "displayName": "Wilma Rudolph",
+    "summary": "At the 1960 Rome Olympics, Wilma Rudolph became the first American woman to win three gold medals in track and field at a single Olympiad (100m, 200m, 4x100m relay), each in world-record time. She returned home to Clarksville, Tennessee and insisted her welcome-home parade and banquet be racially integrated, a first for the city.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "sports",
+      "track-and-field",
+      "olympics",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Clarksville, Tennessee",
+    "locationPrecision": "campus",
+    "locationLabel": "Wilma Rudolph Statue, Wilma Rudolph Event Center, Liberty Park, Clarksville, TN",
+    "lat": 36.505,
+    "lng": -87.3695,
+    "claims": [
+      {
+        "predicate": "olympic_gold_medals",
+        "object": "Three gold medals at the 1960 Rome Olympics (100m, 200m, 4x100m relay), each in world-record time",
+        "confidenceLevel": "high",
+        "citationSource": "customshousemuseum.org",
+        "citationHref": "https://customshousemuseum.org/news/shattering-barriers-60-years-later-wilma-rudolphs-olympic-gold-medal-runs-still-inspire/",
+        "citationLabel": "Customs House Museum & Cultural Center — Wilma Rudolph's Olympic runs"
+      },
+      {
+        "predicate": "required_integrated_homecoming",
+        "object": "Rudolph refused to attend her Clarksville homecoming parade and banquet unless it was racially integrated, becoming the city's first such event",
+        "confidenceLevel": "high",
+        "citationSource": "clarksvillenow.com",
+        "citationHref": "https://clarksvillenow.com/local/wilma-rudolph-remembered-as-hometown-hero/",
+        "citationLabel": "ClarksvilleNow.com — Wilma Rudolph remembered as hometown hero"
+      }
+    ],
+    "historicalContext": "A life-sized bronze statue of Rudolph crossing the finish line stands at Liberty Park's event center, which bears her name, in her hometown of Clarksville.",
+    "topicIds": [
+      "sports",
+      "track-and-field",
+      "olympics",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_althea_gibson_001",
+    "kind": "person",
+    "displayName": "Althea Gibson",
+    "summary": "Althea Gibson broke tennis's color line on August 28, 1950, becoming the first Black player to compete in the U.S. National Championships at the West Side Tennis Club in Forest Hills. In 1957 she became the first Black champion in Wimbledon's 80-year history, then won both Wimbledon and the U.S. Nationals again in 1958.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "sports",
+      "tennis",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Queens, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "West Side Tennis Club (Forest Hills Stadium), 1 Tennis Place, Forest Hills, Queens, NY",
+    "lat": 40.7199,
+    "lng": -73.84669,
+    "claims": [
+      {
+        "predicate": "broke_color_line_at",
+        "object": "August 28, 1950, becoming the first Black player to compete at the U.S. National Championships at the West Side Tennis Club",
+        "confidenceLevel": "high",
+        "citationSource": "smithsonianmag.com",
+        "citationHref": "https://www.smithsonianmag.com/history/sports-legend-althea-gibson-served-up-tennis-history-when-she-broke-through-in-1950-180982669/",
+        "citationLabel": "Smithsonian Magazine — Althea Gibson broke through in 1950"
+      },
+      {
+        "predicate": "first_black_wimbledon_champion_year",
+        "object": "1957, first Black singles champion in Wimbledon's 80-year history; she repeated as champion in 1958",
+        "confidenceLevel": "high",
+        "citationSource": "tennisfame.com",
+        "citationHref": "https://www.tennisfame.com/hall-of-famers/inductees/althea-gibson",
+        "citationLabel": "International Tennis Hall of Fame — Althea Gibson"
+      }
+    ],
+    "historicalContext": "Forest Hills, then home of the U.S. National Championships, is where Gibson first broke tennis's color line in 1950 before her Grand Slam titles later in the decade.",
+    "topicIds": [
+      "sports",
+      "tennis",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_arthur_ashe_001",
+    "kind": "person",
+    "displayName": "Arthur Ashe",
+    "summary": "In 1968, Arthur Ashe became the first Black man to win the U.S. Open, defeating Tom Okker in a five-set final while still an amateur Army lieutenant. He remains the only Black man ever to win the U.S. Open, Wimbledon, and the Australian Open singles titles. The U.S. Open's main stadium in Flushing Meadows was renamed for him in 1997.",
+    "eraBuckets": [
+      "1960s",
+      "1990s"
+    ],
+    "topicTags": [
+      "sports",
+      "tennis",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Queens, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "Arthur Ashe Stadium, USTA Billie Jean King National Tennis Center, Flushing Meadows, Queens, NY",
+    "lat": 40.75,
+    "lng": -73.8475,
+    "claims": [
+      {
+        "predicate": "first_black_man_win_us_open_year",
+        "object": "1968, defeating Tom Okker in the final to become the first Black man to win the U.S. Open",
+        "confidenceLevel": "high",
+        "citationSource": "npg.si.edu",
+        "citationHref": "https://npg.si.edu/blog/1968-us-open-arthur-ashe",
+        "citationLabel": "Smithsonian National Portrait Gallery — 1968 U.S. Open: Arthur Ashe"
+      },
+      {
+        "predicate": "stadium_named_for",
+        "object": "Arthur Ashe Stadium, the main show court at the USTA Billie Jean King National Tennis Center, opened in 1997",
+        "confidenceLevel": "high",
+        "citationSource": "tennisfame.com",
+        "citationHref": "https://www.tennisfame.com/hall-of-famers/inductees/arthur-ashe",
+        "citationLabel": "International Tennis Hall of Fame — Arthur Ashe"
+      }
+    ],
+    "historicalContext": "Flushing Meadows is anchored here both as the site of Ashe's 1968 breakthrough win and as the site of the 23,200-seat stadium later named in his honor.",
+    "topicIds": [
+      "sports",
+      "tennis",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_willie_oree_001",
+    "kind": "person",
+    "displayName": "Willie O'Ree",
+    "summary": "Willie O'Ree became the first Black player in NHL history on January 18, 1958, skating for the Boston Bruins despite having lost most of the vision in his right eye. Sixty-four years later to the day, the Bruins retired his No. 22 at TD Garden; O'Ree was inducted into the Hockey Hall of Fame in 2018 and received the Congressional Gold Medal in 2022.",
+    "eraBuckets": [
+      "1950s",
+      "2020s"
+    ],
+    "topicTags": [
+      "sports",
+      "hockey",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Boston, Massachusetts",
+    "locationPrecision": "institution",
+    "locationLabel": "TD Garden, 100 Legends Way, Boston, MA",
+    "lat": 42.3664,
+    "lng": -71.0622,
+    "claims": [
+      {
+        "predicate": "became_first_black_nhl_player_date",
+        "object": "January 18, 1958, debuting for the Boston Bruins",
+        "confidenceLevel": "high",
+        "citationSource": "nhl.com",
+        "citationHref": "https://www.nhl.com/news/willie-o-ree-first-black-player-in-hockey-hall-of-fame-299287068",
+        "citationLabel": "NHL.com — O'Ree, first Black NHL player, inducted into Hockey Hall of Fame"
+      },
+      {
+        "predicate": "jersey_retired_at",
+        "object": "No. 22 retired by the Boston Bruins at TD Garden on January 18, 2022, the 64th anniversary of his NHL debut",
+        "confidenceLevel": "high",
+        "citationSource": "nhl.com",
+        "citationHref": "https://www.nhl.com/bruins/news/ceremony-to-retire-willie-o-ree-s-no-22-on-january-18-to-begin-at-7-p--329902022",
+        "citationLabel": "NHL.com / Boston Bruins — Ceremony to retire Willie O'Ree's No. 22"
+      }
+    ],
+    "historicalContext": "O'Ree's actual 1958 debut took place at the Montreal Forum in Canada; TD Garden, the modern home of the Bruins, is anchored here as the site of his 2022 jersey retirement, the clearest U.S. site tied to his legacy with the franchise.",
+    "topicIds": [
+      "sports",
+      "hockey",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_charlie_sifford_001",
+    "kind": "person",
+    "displayName": "Charlie Sifford",
+    "summary": "Charlie Sifford became the first Black golfer to hold a PGA Tour card in 1961 after years of fighting the PGA of America's whites-only clause, and went on to win the 1967 Greater Hartford Open and 1969 Los Angeles Open. In 2004 he became the first Black golfer inducted into the World Golf Hall of Fame; he received the Presidential Medal of Freedom in 2014.",
+    "eraBuckets": [
+      "1960s",
+      "2000s"
+    ],
+    "topicTags": [
+      "sports",
+      "golf",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Pinehurst, North Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "World Golf Hall of Fame, 3 Carolina Vista Drive, Pinehurst, NC",
+    "lat": 35.19247,
+    "lng": -79.4711,
+    "claims": [
+      {
+        "predicate": "first_black_pga_tour_member_year",
+        "object": "1961, becoming the first Black golfer to hold a PGA Tour card",
+        "confidenceLevel": "high",
+        "citationSource": "pgatour.com",
+        "citationHref": "https://www.pgatour.com/article/news/latest/2024/02/20/remembering-legendary-charlie-sifford",
+        "citationLabel": "PGA Tour — Remembering legendary Charlie Sifford"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "2004, first Black golfer inducted into the World Golf Hall of Fame, via the Lifetime Achievement category",
+        "confidenceLevel": "high",
+        "citationSource": "worldgolfhalloffame.org",
+        "citationHref": "https://worldgolfhalloffame.org/members/charlie-sifford.html",
+        "citationLabel": "World Golf Hall of Fame — Charlie Sifford"
+      }
+    ],
+    "historicalContext": "The World Golf Hall of Fame relocated from St. Augustine, Florida to a new Pinehurst, NC campus in 2024; Sifford's induction is honored at its current home.",
+    "topicIds": [
+      "sports",
+      "golf",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_muhammad_ali_001",
+    "kind": "person",
+    "displayName": "Muhammad Ali",
+    "summary": "Muhammad Ali won Olympic light-heavyweight gold as Cassius Clay at the 1960 Rome Games, then became the first fighter to win the world heavyweight title three separate times. His 1967 refusal of the Vietnam draft on religious grounds cost him his title and boxing license for over three years. In 2005 he received the Presidential Medal of Freedom.",
+    "eraBuckets": [
+      "1960s",
+      "1970s",
+      "2000s"
+    ],
+    "topicTags": [
+      "sports",
+      "boxing",
+      "firsts",
+      "civil-rights"
+    ],
+    "jurisdictionLabel": "Louisville, Kentucky",
+    "locationPrecision": "institution",
+    "locationLabel": "Muhammad Ali Center, 144 N 6th Street, Louisville, KY",
+    "lat": 38.2582,
+    "lng": -85.7601,
+    "claims": [
+      {
+        "predicate": "three_time_heavyweight_champion",
+        "object": "First boxer in history to win the world heavyweight title three separate times (1964, 1974, 1978)",
+        "confidenceLevel": "high",
+        "citationSource": "alicenter.org",
+        "citationHref": "https://alicenter.org/muhammad-ali/biography/",
+        "citationLabel": "Muhammad Ali Center — Muhammad Ali biography"
+      },
+      {
+        "predicate": "received_honor",
+        "object": "Presidential Medal of Freedom, awarded by President George W. Bush in 2005",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/this-day-in-history/november-9/muhammad-ali-receives-presidential-medal-of-freedom",
+        "citationLabel": "History.com — Muhammad Ali receives Presidential Medal of Freedom"
+      }
+    ],
+    "historicalContext": "Ali was born and raised in Louisville's West End; the Muhammad Ali Center, a museum and cultural center built in his honor, opened downtown in 2005 and anchors his legacy in his hometown.",
+    "topicIds": [
+      "sports",
+      "boxing",
+      "firsts",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_bill_russell_001",
+    "kind": "person",
+    "displayName": "Bill Russell",
+    "summary": "On April 17, 1966, Bill Russell was named player-coach of the Boston Celtics, becoming the first Black head coach in the history of a major U.S. professional sports league. He won two more championships as player-coach (1968, 1969), on top of the eight he won as a player. He was inducted into the Naismith Basketball Hall of Fame as a player in 1975 and as a coach in 2021.",
+    "eraBuckets": [
+      "1960s",
+      "1970s",
+      "2020s"
+    ],
+    "topicTags": [
+      "sports",
+      "basketball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Springfield, Massachusetts",
+    "locationPrecision": "institution",
+    "locationLabel": "Naismith Memorial Basketball Hall of Fame, 1000 Hall of Fame Avenue, Springfield, MA",
+    "lat": 42.0938,
+    "lng": -72.5847,
+    "claims": [
+      {
+        "predicate": "became_first_black_head_coach_major_league_year",
+        "object": "April 17, 1966, named player-coach of the Boston Celtics, the first Black head coach in a major U.S. professional sports league",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/this-day-in-history/april-17/bill-russell-first-black-nba-coach-celtics",
+        "citationLabel": "History.com — Bill Russell becomes the NBA's first Black coach"
+      },
+      {
+        "predicate": "hall_of_fame_inducted",
+        "object": "Naismith Memorial Basketball Hall of Fame, as a player in 1975 and as a coach in 2021",
+        "confidenceLevel": "high",
+        "citationSource": "hoophall.com",
+        "citationHref": "https://www.hoophall.com/hall-of-famers/bill-russell-1",
+        "citationLabel": "Naismith Memorial Basketball Hall of Fame — Bill Russell"
+      }
+    ],
+    "historicalContext": "Russell's coaching and playing careers were both spent with the Boston Celtics; the Hall of Fame in Springfield, MA is the most concrete surviving site tied to both of his enshrinements.",
+    "topicIds": [
+      "sports",
+      "basketball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_fritz_pollard_001",
+    "kind": "person",
+    "displayName": "Fritz Pollard",
+    "summary": "Fritz Pollard was named co-head coach of the Akron Pros in 1921, becoming the first Black head coach in NFL history while continuing to play; Akron had gone 8-0-3 to win the league's first championship in 1920 with Pollard starring at halfback. He was posthumously elected to the Pro Football Hall of Fame in 2005, nearly 19 years after his death.",
+    "eraBuckets": [
+      "1920s",
+      "2000s"
+    ],
+    "topicTags": [
+      "sports",
+      "football",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Canton, Ohio",
+    "locationPrecision": "institution",
+    "locationLabel": "Pro Football Hall of Fame, 2121 George Halas Drive NW, Canton, OH",
+    "lat": 40.82273,
+    "lng": -81.3976,
+    "claims": [
+      {
+        "predicate": "became_first_black_nfl_head_coach_year",
+        "object": "1921, named co-head coach of the Akron Pros while still an active player",
+        "confidenceLevel": "high",
+        "citationSource": "profootballhof.com",
+        "citationHref": "https://www.profootballhof.com/news/pioneer",
+        "citationLabel": "Pro Football Hall of Fame — Pioneer: Fritz Pollard"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "2005, elected to the Pro Football Hall of Fame, posthumously",
+        "confidenceLevel": "high",
+        "citationSource": "profootballhof.com",
+        "citationHref": "https://www.profootballhof.com/players/fritz-pollard",
+        "citationLabel": "Pro Football Hall of Fame — Fritz Pollard"
+      }
+    ],
+    "historicalContext": "Pollard played for and co-coached the Akron Pros in Ohio, the same state where the NFL (as the American Professional Football Association) was founded in 1920 and where the Hall of Fame now stands.",
+    "topicIds": [
+      "sports",
+      "football",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_doug_williams_001",
+    "kind": "person",
+    "displayName": "Doug Williams",
+    "summary": "Doug Williams starred at quarterback for Grambling State under coach Eddie Robinson from 1974-1977, then in 1988 became the first Black quarterback to start and win a Super Bowl, throwing a Super-Bowl-record four touchdown passes in a single quarter to earn MVP honors in Super Bowl XXII. He later returned to coach Grambling State from 1998-2003.",
+    "eraBuckets": [
+      "1970s",
+      "1980s"
+    ],
+    "topicTags": [
+      "sports",
+      "football",
+      "firsts",
+      "hbcu"
+    ],
+    "jurisdictionLabel": "Grambling, Louisiana",
+    "locationPrecision": "campus",
+    "locationLabel": "Grambling State University, Grambling, LA",
+    "lat": 32.5252,
+    "lng": -92.7153,
+    "claims": [
+      {
+        "predicate": "first_black_qb_start_win_super_bowl_year",
+        "object": "1988, Super Bowl XXII, leading Washington to a 42-10 win over Denver and earning Super Bowl MVP",
+        "confidenceLevel": "high",
+        "citationSource": "commanders.com",
+        "citationHref": "https://www.commanders.com/news/history-of-firsts-doug-williams-first-african-american-qb-super-bowl",
+        "citationLabel": "Washington Commanders — History of Firsts: Doug Williams"
+      },
+      {
+        "predicate": "field_named_for",
+        "object": "Grambling State named the field at Eddie G. Robinson Memorial Stadium in honor of Williams and James 'Shack' Harris in 2023",
+        "confidenceLevel": "high",
+        "citationSource": "gsutigers.com",
+        "citationHref": "https://gsutigers.com/news/2023/9/26/general-grambling-state-to-name-field-at-eddie-g-robinson-memorial-stadium-in-honor-of-james-shack-harris-and-doug-williams-on-homecoming",
+        "citationLabel": "Grambling State University Athletics — field named for Harris and Williams"
+      }
+    ],
+    "historicalContext": "Williams's Super Bowl XXII venue in San Diego was demolished in 2020; Grambling State, where he became a star under Eddie Robinson and later returned as head coach, is the best-documented surviving site tied to his career.",
+    "topicIds": [
+      "sports",
+      "football",
+      "firsts",
+      "hbcu"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_rube_foster_001",
+    "kind": "person",
+    "displayName": "Rube Foster",
+    "summary": "On February 13, 1920, Andrew 'Rube' Foster convened seven other Negro baseball team owners at the Paseo YMCA in Kansas City and founded the Negro National League, the first successful Black professional baseball circuit, serving as its first president. A star pitcher himself, Foster was elected to the National Baseball Hall of Fame in 1981.",
+    "eraBuckets": [
+      "1920s",
+      "1980s"
+    ],
+    "topicTags": [
+      "sports",
+      "baseball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Kansas City, Missouri",
+    "locationPrecision": "institution",
+    "locationLabel": "Buck O'Neil Education and Research Center (former Paseo YMCA), 1824 Paseo, Kansas City, MO",
+    "lat": 39.0903,
+    "lng": -94.5647,
+    "claims": [
+      {
+        "predicate": "founded_organization_date",
+        "object": "February 13, 1920, founded the Negro National League at the Paseo YMCA in Kansas City and served as its first president",
+        "confidenceLevel": "high",
+        "citationSource": "baseballhall.org",
+        "citationHref": "https://baseballhall.org/discover-more/stories/inside-pitch/negro-national-league-is-founded",
+        "citationLabel": "National Baseball Hall of Fame — The Negro National League is Founded"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "1981, elected to the National Baseball Hall of Fame",
+        "confidenceLevel": "medium",
+        "citationSource": "sabr.org",
+        "citationHref": "https://sabr.org/bioproj/person/andrew-rube-foster/",
+        "citationLabel": "Society for American Baseball Research — Rube Foster biography"
+      }
+    ],
+    "historicalContext": "The Paseo YMCA, where Foster held the founding meeting, has been restored by the Negro Leagues Baseball Museum as the Buck O'Neil Education and Research Center, distinct from the museum's main building.",
+    "topicIds": [
+      "sports",
+      "baseball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_satchel_paige_001",
+    "kind": "person",
+    "displayName": "Satchel Paige",
+    "summary": "A legendary Negro Leagues pitcher who barnstormed for decades before Major League Baseball integrated, Leroy 'Satchel' Paige became, on August 9, 1971, the first player elected to the National Baseball Hall of Fame primarily for his Negro Leagues career. He also pitched in the majors for the Cleveland Indians and St. Louis Browns in his 40s and 50s.",
+    "eraBuckets": [
+      "1930s",
+      "1940s",
+      "1970s"
+    ],
+    "topicTags": [
+      "sports",
+      "baseball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Cooperstown, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "National Baseball Hall of Fame and Museum, 25 Main Street, Cooperstown, NY",
+    "lat": 42.6999,
+    "lng": -74.9233,
+    "claims": [
+      {
+        "predicate": "hall_of_fame_induction_date",
+        "object": "August 9, 1971, the first player elected to the Hall of Fame based on his Negro Leagues career",
+        "confidenceLevel": "high",
+        "citationSource": "baseballhall.org",
+        "citationHref": "https://baseballhall.org/discover/in-1971-satchel-paige-came-to-cooperstown",
+        "citationLabel": "National Baseball Hall of Fame — In 1971, Satchel Paige came to Cooperstown"
+      },
+      {
+        "predicate": "oldest_mlb_pitcher_record",
+        "object": "Pitched in the majors for the Kansas City Athletics in 1965 at age 59, the oldest player to appear in an MLB game",
+        "confidenceLevel": "high",
+        "citationSource": "baseballhall.org",
+        "citationHref": "https://baseballhall.org/discover-more/stories/baseball-history/satchel-paige-pitches-last-major-league-game-at-age-59",
+        "citationLabel": "National Baseball Hall of Fame — Satchel Paige pitches last major league game at age 59"
+      }
+    ],
+    "historicalContext": "Paige's induction is anchored to Cooperstown because it is itself the documented first being honored — the earliest instance of a player enshrined chiefly for Negro Leagues play.",
+    "topicIds": [
+      "sports",
+      "baseball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_josh_gibson_001",
+    "kind": "person",
+    "displayName": "Josh Gibson",
+    "summary": "Known as the 'Black Babe Ruth,' catcher Josh Gibson starred for the Homestead Grays and Pittsburgh Crawfords in the Negro Leagues, hitting for extraordinary power over a career cut short by his death in 1947 at age 35. On February 8, 1972, he and Buck Leonard became the second and third Negro Leagues players elected to the National Baseball Hall of Fame.",
+    "eraBuckets": [
+      "1930s",
+      "1940s",
+      "1970s"
+    ],
+    "topicTags": [
+      "sports",
+      "baseball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Cooperstown, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "National Baseball Hall of Fame and Museum, 25 Main Street, Cooperstown, NY",
+    "lat": 42.6999,
+    "lng": -74.9233,
+    "claims": [
+      {
+        "predicate": "hall_of_fame_induction_date",
+        "object": "February 8, 1972, elected to the National Baseball Hall of Fame alongside Buck Leonard",
+        "confidenceLevel": "high",
+        "citationSource": "baseballhall.org",
+        "citationHref": "https://baseballhall.org/discover-more/stories/inside-pitch/buck-leonard-josh-gibson-elected-to-hof",
+        "citationLabel": "National Baseball Hall of Fame — Buck Leonard and Josh Gibson are elected"
+      },
+      {
+        "predicate": "mlb_recognized_statistics_2024",
+        "object": "In 2024, MLB formally incorporated Negro Leagues statistics into its official record book, making Gibson MLB's all-time career batting average and slugging percentage leader",
+        "confidenceLevel": "medium",
+        "citationSource": "mlb.com",
+        "citationHref": "https://www.mlb.com/history/negro-leagues/players/josh-gibson",
+        "citationLabel": "MLB.com — Josh Gibson, Negro Leagues history"
+      }
+    ],
+    "historicalContext": "Gibson's induction, like Paige's, is anchored to Cooperstown; the Homestead Grays and Pittsburgh Crawfords ballparks he played in no longer survive in a form suitable for citation.",
+    "topicIds": [
+      "sports",
+      "baseball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_chuck_cooper_001",
+    "kind": "person",
+    "displayName": "Chuck Cooper",
+    "summary": "On April 25, 1950, Chuck Cooper became the first Black player drafted by an NBA team when the Boston Celtics selected him in the second round. He played six NBA seasons and was inducted into the Naismith Memorial Basketball Hall of Fame in 2019, chosen by the Early African-American Pioneers Committee.",
+    "eraBuckets": [
+      "1950s",
+      "2010s"
+    ],
+    "topicTags": [
+      "sports",
+      "basketball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Springfield, Massachusetts",
+    "locationPrecision": "institution",
+    "locationLabel": "Naismith Memorial Basketball Hall of Fame, 1000 Hall of Fame Avenue, Springfield, MA",
+    "lat": 42.0938,
+    "lng": -72.5847,
+    "claims": [
+      {
+        "predicate": "became_first_black_player_drafted_date",
+        "object": "April 25, 1950, drafted by the Boston Celtics in the second round, the first Black player drafted by an NBA team",
+        "confidenceLevel": "high",
+        "citationSource": "nba.com",
+        "citationHref": "https://www.nba.com/news/how-chuck-cooper-nat-clifton-earl-lloyd-changed-nba-racial-integration",
+        "citationLabel": "NBA.com — How Chuck Cooper, Nat Clifton, Earl Lloyd changed NBA racial integration"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "2019, inducted into the Naismith Memorial Basketball Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "hoophall.com",
+        "citationHref": "https://www.hoophall.com/hall-of-famers/charles-chuck-cooper",
+        "citationLabel": "Naismith Memorial Basketball Hall of Fame — Charles 'Chuck' Cooper"
+      }
+    ],
+    "historicalContext": "Cooper, Earl Lloyd, and Nat Clifton together integrated the NBA within months of each other in 1950; all three are now enshrined at the Hall of Fame in Springfield, MA.",
+    "topicIds": [
+      "sports",
+      "basketball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_earl_lloyd_001",
+    "kind": "person",
+    "displayName": "Earl Lloyd",
+    "summary": "On October 31, 1950, Earl Lloyd became the first Black player to appear in an NBA game, taking the court for the Washington Capitols days before fellow pioneers Chuck Cooper and Nat Clifton played their first games. Lloyd went on to win an NBA championship with the 1955 Syracuse Nationals and was inducted into the Naismith Memorial Basketball Hall of Fame in 2003.",
+    "eraBuckets": [
+      "1950s",
+      "2000s"
+    ],
+    "topicTags": [
+      "sports",
+      "basketball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Springfield, Massachusetts",
+    "locationPrecision": "institution",
+    "locationLabel": "Naismith Memorial Basketball Hall of Fame, 1000 Hall of Fame Avenue, Springfield, MA",
+    "lat": 42.0938,
+    "lng": -72.5847,
+    "claims": [
+      {
+        "predicate": "became_first_black_nba_player_date",
+        "object": "October 31, 1950, becoming the first Black player to play in an NBA game, for the Washington Capitols",
+        "confidenceLevel": "high",
+        "citationSource": "britannica.com",
+        "citationHref": "https://www.britannica.com/biography/Earl-Lloyd",
+        "citationLabel": "Britannica — Earl Lloyd"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "2003, inducted into the Naismith Memorial Basketball Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "nba.com",
+        "citationHref": "https://www.nba.com/news/history-top-moments-earl-lloyd-chuck-cooper-nat-clifton-new-path-nba",
+        "citationLabel": "NBA.com — Earl Lloyd, Chuck Cooper, Nat Clifton blaze new path in NBA"
+      }
+    ],
+    "historicalContext": "The Washington Capitols franchise no longer exists; Lloyd's Hall of Fame enshrinement in Springfield, MA is the most concrete surviving site tied to his legacy.",
+    "topicIds": [
+      "sports",
+      "basketball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_simone_biles_001",
+    "kind": "person",
+    "displayName": "Simone Biles",
+    "summary": "Simone Biles is the most decorated gymnast in history, with 11 Olympic medals (7 gold) across the 2016, 2020, and 2024 Games and 30 World Championship medals. She trains at World Champions Centre in Spring, Texas, the gymnastics academy her family built and owns.",
+    "eraBuckets": [
+      "2010s",
+      "2020s"
+    ],
+    "topicTags": [
+      "sports",
+      "gymnastics",
+      "olympics",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Spring, Texas",
+    "locationPrecision": "city",
+    "locationLabel": "Spring, Texas (World Champions Centre, the Biles family's gymnastics academy)",
+    "lat": 30.0542,
+    "lng": -95.3869,
+    "claims": [
+      {
+        "predicate": "olympic_medal_record",
+        "object": "11 Olympic medals (7 gold, 2 silver, 2 bronze) across the 2016 Rio, 2020 Tokyo, and 2024 Paris Games, the most of any gymnast in history",
+        "confidenceLevel": "high",
+        "citationSource": "olympics.com",
+        "citationHref": "https://www.olympics.com/en/news/simone-biles-all-titles-records-and-medals-complete-list-paris-2024",
+        "citationLabel": "Olympics.com — Simone Biles: all titles, records, and medals"
+      },
+      {
+        "predicate": "trains_at",
+        "object": "World Champions Centre, Spring, Texas, the gymnastics academy owned by the Biles family",
+        "confidenceLevel": "high",
+        "citationSource": "texasmonthly.com",
+        "citationHref": "https://www.texasmonthly.com/arts-entertainment/world-champions-centre-simone-biles-gym/",
+        "citationLabel": "Texas Monthly — How Simone Biles turned World Champions Centre into America's best gym"
+      }
+    ],
+    "historicalContext": "Coordinates represent the city of Spring, Texas, where World Champions Centre is located; a precise street-level coordinate for the gym building could not be independently verified.",
+    "topicIds": [
+      "sports",
+      "gymnastics",
+      "olympics",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_serena_williams_001",
+    "kind": "person",
+    "displayName": "Serena Williams",
+    "summary": "Serena Williams won an Olympic singles gold medal at the 2012 London Games plus three doubles golds with sister Venus (2000, 2008, 2012), completing a career Golden Slam. In July 2025 she was inducted into the U.S. Olympic & Paralympic Hall of Fame.",
+    "eraBuckets": [
+      "2000s",
+      "2010s",
+      "2020s"
+    ],
+    "topicTags": [
+      "sports",
+      "tennis",
+      "olympics",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Colorado Springs, Colorado",
+    "locationPrecision": "institution",
+    "locationLabel": "U.S. Olympic & Paralympic Museum, 200 S Sierra Madre Street, Colorado Springs, CO",
+    "lat": 38.83118,
+    "lng": -104.82912,
+    "claims": [
+      {
+        "predicate": "olympic_gold_medals",
+        "object": "Singles gold at the 2012 London Olympics and doubles golds with Venus Williams in 2000, 2008, and 2012",
+        "confidenceLevel": "high",
+        "citationSource": "usopm.org",
+        "citationHref": "https://usopm.org/serena-williams/",
+        "citationLabel": "U.S. Olympic & Paralympic Museum — Serena Williams"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "2025, inducted into the U.S. Olympic & Paralympic Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "usta.com",
+        "citationHref": "https://www.usta.com/en/home/pro/pro-media---news/serena-williams-us-olympic-paralympic-hall-of-fame.html",
+        "citationLabel": "USTA — Serena Williams named to U.S. Olympic & Paralympic Hall of Fame"
+      }
+    ],
+    "historicalContext": "The U.S. Olympic & Paralympic Museum in Colorado Springs houses the Hall of Fame into which Williams was inducted.",
+    "topicIds": [
+      "sports",
+      "tennis",
+      "olympics",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_florence_griffith_joyner_001",
+    "kind": "person",
+    "displayName": "Florence Griffith Joyner",
+    "summary": "Florence Griffith Joyner, known as 'Flo-Jo,' won three gold medals in track and field at the 1988 Seoul Olympics (100m, 200m, 4x100m relay) and still holds the world records in the 100m and 200m set that year. She was inducted into the U.S. Olympic Hall of Fame in 2004 and the U.S. Track & Field Hall of Fame in 1995.",
+    "eraBuckets": [
+      "1980s",
+      "1990s",
+      "2000s"
+    ],
+    "topicTags": [
+      "sports",
+      "track-and-field",
+      "olympics",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Colorado Springs, Colorado",
+    "locationPrecision": "institution",
+    "locationLabel": "U.S. Olympic & Paralympic Museum, 200 S Sierra Madre Street, Colorado Springs, CO",
+    "lat": 38.83118,
+    "lng": -104.82912,
+    "claims": [
+      {
+        "predicate": "olympic_gold_medals_year",
+        "object": "Three gold medals at the 1988 Seoul Olympics (100m, 200m, 4x100m relay); her 100m and 200m world records still stand",
+        "confidenceLevel": "high",
+        "citationSource": "usopm.org",
+        "citationHref": "https://usopm.org/florence-griffith-joyner/",
+        "citationLabel": "U.S. Olympic & Paralympic Museum — Florence Griffith Joyner"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "2004, elected to the first U.S. Olympic Hall of Fame class inducted since 1992",
+        "confidenceLevel": "high",
+        "citationSource": "uclabruins.com",
+        "citationHref": "https://uclabruins.com/sports/2004/5/17/207890142",
+        "citationLabel": "UCLA Athletics — Bruin Greats Jackie Joyner-Kersee, FloJo elected to USOC Hall of Fame"
+      }
+    ],
+    "historicalContext": "The U.S. Olympic & Paralympic Museum in Colorado Springs houses the Hall of Fame into which Griffith Joyner was inducted.",
+    "topicIds": [
+      "sports",
+      "track-and-field",
+      "olympics",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_vonetta_flowers_001",
+    "kind": "person",
+    "displayName": "Vonetta Flowers",
+    "summary": "On February 19, 2002, Vonetta Flowers and pilot Jill Bakken won the first-ever Olympic women's bobsled event at the Salt Lake City Games, making Flowers the first Black athlete from any country to win a Winter Olympics gold medal. A former University of Alabama at Birmingham sprinter and long jumper, she switched to bobsled after narrowly missing the Summer Olympics team.",
+    "eraBuckets": [
+      "2000s"
+    ],
+    "topicTags": [
+      "sports",
+      "olympics",
+      "firsts",
+      "bobsled"
+    ],
+    "jurisdictionLabel": "Park City, Utah",
+    "locationPrecision": "campus",
+    "locationLabel": "Utah Olympic Park, Park City, UT",
+    "lat": 40.7047,
+    "lng": -111.5583,
+    "claims": [
+      {
+        "predicate": "became_first_black_winter_olympics_gold_medalist_date",
+        "object": "February 19, 2002, winning gold in the inaugural women's Olympic bobsled event with Jill Bakken",
+        "confidenceLevel": "high",
+        "citationSource": "usopm.org",
+        "citationHref": "https://usopm.org/bobsledder-vonetta-flowers-became-the-first-black-woman-to-win-winter-olympic-gold/",
+        "citationLabel": "U.S. Olympic & Paralympic Museum — Vonetta Flowers"
+      },
+      {
+        "predicate": "competed_at_venue",
+        "object": "The 2002 Winter Olympics bobsled events were held at the Utah Olympic Park track near Park City",
+        "confidenceLevel": "high",
+        "citationSource": "nbcsports.com",
+        "citationHref": "https://www.nbcsports.com/olympics/news/vonetta-flowers-captures-monumental-gold-at-the-2002-olympic-winter-games",
+        "citationLabel": "NBC Sports — Vonetta Flowers captures monumental gold at the 2002 Olympic Winter Games"
+      }
+    ],
+    "historicalContext": "The Utah Olympic Park track hosted bobsled, luge, and skeleton events during the 2002 Salt Lake City Winter Olympics and remains an active training center today.",
+    "topicIds": [
+      "sports",
+      "olympics",
+      "firsts",
+      "bobsled"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_debi_thomas_001",
+    "kind": "person",
+    "displayName": "Debi Thomas",
+    "summary": "Debi Thomas won bronze in figure skating at the 1988 Calgary Winter Olympics, becoming the first Black athlete to win any medal at a Winter Olympics. A two-time U.S. national champion and 1986 world champion, she was inducted into the U.S. Figure Skating Hall of Fame in 2000 and later became an orthopedic surgeon.",
+    "eraBuckets": [
+      "1980s",
+      "2000s"
+    ],
+    "topicTags": [
+      "sports",
+      "olympics",
+      "firsts",
+      "figure-skating"
+    ],
+    "jurisdictionLabel": "Colorado Springs, Colorado",
+    "locationPrecision": "city",
+    "locationLabel": "Colorado Springs, Colorado (World Figure Skating Museum and Hall of Fame)",
+    "lat": 38.8339,
+    "lng": -104.8214,
+    "claims": [
+      {
+        "predicate": "became_first_black_winter_olympics_medalist_year",
+        "object": "1988, winning bronze in figure skating at the Calgary Winter Olympics",
+        "confidenceLevel": "high",
+        "citationSource": "andscape.com",
+        "citationHref": "https://andscape.com/whhw/debi-thomas-the-first-black-athlete-to-win-a-medal-in-the-winter-olympics/",
+        "citationLabel": "Andscape — Debi Thomas, the first Black athlete to win a medal in the Winter Olympics"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "2000, inducted into the U.S. Figure Skating Hall of Fame",
+        "confidenceLevel": "medium",
+        "citationSource": "usfigureskating.org",
+        "citationHref": "https://usfigureskating.org/sports/2025/9/18/hall-of-fame.aspx",
+        "citationLabel": "U.S. Figure Skating — Hall of Fame"
+      }
+    ],
+    "historicalContext": "Coordinates represent the city of Colorado Springs, home to the World Figure Skating Museum and Hall of Fame where Thomas is honored; a precise street-level coordinate could not be independently verified.",
+    "topicIds": [
+      "sports",
+      "olympics",
+      "firsts",
+      "figure-skating"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_marian_anderson_001",
+    "kind": "person",
+    "displayName": "Marian Anderson",
+    "summary": "After the Daughters of the American Revolution barred her from Constitution Hall because she was Black, contralto Marian Anderson performed an open-air concert at the Lincoln Memorial on Easter Sunday, April 9, 1939, before 75,000 people and a national radio audience. In 1955 she became the first Black artist to sing a leading role at the Metropolitan Opera.",
+    "eraBuckets": [
+      "1930s",
+      "1950s"
+    ],
+    "topicTags": [
+      "music",
+      "firsts",
+      "civil-rights",
+      "arts"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "Lincoln Memorial, National Mall, Washington, DC",
+    "lat": 38.8893,
+    "lng": -77.0502,
+    "claims": [
+      {
+        "predicate": "performed_concert_date",
+        "object": "April 9, 1939, Easter Sunday, performing at the Lincoln Memorial after being barred from Constitution Hall",
+        "confidenceLevel": "high",
+        "citationSource": "music.si.edu",
+        "citationHref": "https://music.si.edu/story/marian-anderson-and-concert-lincoln-memorial",
+        "citationLabel": "Smithsonian Music — Marian Anderson and the Concert at the Lincoln Memorial"
+      },
+      {
+        "predicate": "first_black_lead_at_met_opera_date",
+        "object": "January 7, 1955, debuting as Ulrica in Verdi's Un Ballo in Maschera, the first Black artist to sing a leading role at the Metropolitan Opera",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/this-day-in-history/january-7/marian-anderson-first-african-american-performance-met-opera",
+        "citationLabel": "History.com — Marian Anderson becomes first African American to perform at the Met Opera"
+      }
+    ],
+    "historicalContext": "The Metropolitan Opera House Anderson debuted in, at 1411 Broadway, was demolished in 1967; the Lincoln Memorial, an NPS-maintained site with a permanent marker commemorating her 1939 concert, is the best-preserved site tied to her legacy and is anchored here as her single most consequential public performance.",
+    "topicIds": [
+      "music",
+      "firsts",
+      "civil-rights",
+      "arts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_langston_hughes_001",
+    "kind": "person",
+    "displayName": "Langston Hughes",
+    "summary": "A leading poet of the Harlem Renaissance, Langston Hughes lived and worked on the top floor of a brownstone rowhouse at 20 East 127th Street in Harlem from 1947 until his death in 1967, writing works including 'Montage of a Dream Deferred' there. The house was designated a National Historic Landmark and opened to the public as a museum in 2023.",
+    "eraBuckets": [
+      "1920s",
+      "1940s",
+      "1960s"
+    ],
+    "topicTags": [
+      "literature",
+      "arts",
+      "harlem-renaissance",
+      "firsts"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "Langston Hughes House, 20 East 127th Street, Harlem, Manhattan",
+    "lat": 40.8072,
+    "lng": -73.9408,
+    "claims": [
+      {
+        "predicate": "resided_at_years",
+        "object": "1947 to 1967, living and writing on the top floor of the rowhouse at 20 East 127th Street",
+        "confidenceLevel": "high",
+        "citationSource": "savingplaces.org",
+        "citationHref": "https://savingplaces.org/stories/restoring-langston-hughes-house-harlem",
+        "citationLabel": "National Trust for Historic Preservation — Restoring Langston Hughes' House in Harlem"
+      },
+      {
+        "predicate": "site_designation",
+        "object": "Designated a New York City Landmark in 1981 and listed on the National Register of Historic Places in 1982",
+        "confidenceLevel": "high",
+        "citationSource": "theartnewspaper.com",
+        "citationHref": "https://www.theartnewspaper.com/2023/08/21/langston-hughes-house-museum-harlem-renaissance",
+        "citationLabel": "The Art Newspaper — Langston Hughes House museum opens in Harlem"
+      }
+    ],
+    "historicalContext": "The block of East 127th Street outside the house was co-named 'Langston Hughes Place' in his honor.",
+    "topicIds": [
+      "literature",
+      "arts",
+      "harlem-renaissance",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_duke_ellington_001",
+    "kind": "person",
+    "displayName": "Duke Ellington",
+    "summary": "Duke Ellington's orchestra became the house band at Harlem's Cotton Club on December 4, 1927, a residency that ran into the early 1930s and, broadcast live on radio, made Ellington a national star while he composed some of his most enduring works. He went on to receive the Presidential Medal of Freedom in 1969 and a special posthumous Pulitzer Prize citation in 1999.",
+    "eraBuckets": [
+      "1920s",
+      "1930s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "harlem-renaissance",
+      "firsts"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "Site of the original Cotton Club, 644 Lenox Avenue at 142nd Street, Harlem, Manhattan",
+    "lat": 40.819,
+    "lng": -73.937,
+    "claims": [
+      {
+        "predicate": "became_house_band_date",
+        "object": "December 4, 1927, opening as the house orchestra at the Cotton Club at 142nd Street and Lenox Avenue",
+        "confidenceLevel": "high",
+        "citationSource": "ebsco.com",
+        "citationHref": "https://www.ebsco.com/research-starters/music/ellington-begins-performing-cotton-club",
+        "citationLabel": "EBSCO Research Starters — Ellington Begins Performing at the Cotton Club"
+      },
+      {
+        "predicate": "received_honor",
+        "object": "Presidential Medal of Freedom, awarded by President Richard Nixon in 1969",
+        "confidenceLevel": "medium",
+        "citationSource": "britannica.com",
+        "citationHref": "https://www.britannica.com/biography/Duke-Ellington",
+        "citationLabel": "Britannica — Duke Ellington"
+      }
+    ],
+    "historicalContext": "The original Cotton Club building at 142nd and Lenox no longer operates as a nightclub, but the site anchors Ellington's rise to national fame via the club's live radio broadcasts.",
+    "topicIds": [
+      "music",
+      "arts",
+      "harlem-renaissance",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_billie_holiday_001",
+    "kind": "person",
+    "displayName": "Billie Holiday",
+    "summary": "In 1939, Billie Holiday debuted 'Strange Fruit,' a searing anti-lynching song, at Cafe Society in Greenwich Village — New York's first racially integrated nightclub. Under owner Barney Josephson's staging, service stopped, the room went dark but for a single spotlight on her face, and she offered no encore, cementing the song's status as an early anthem of the civil rights movement.",
+    "eraBuckets": [
+      "1930s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "civil-rights",
+      "firsts"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "Site of Cafe Society, 1 Sheridan Square, Greenwich Village, Manhattan",
+    "lat": 40.7328,
+    "lng": -74.0019,
+    "claims": [
+      {
+        "predicate": "debuted_song_at",
+        "object": "'Strange Fruit,' premiered at Cafe Society in early 1939",
+        "confidenceLevel": "high",
+        "citationSource": "villagepreservation.org",
+        "citationHref": "https://www.villagepreservation.org/2015/12/30/cafe-society-the-wrong-place-for-the-right-people/",
+        "citationLabel": "Village Preservation — Cafe Society, The Wrong Place for the Right People"
+      },
+      {
+        "predicate": "venue_significance",
+        "object": "Cafe Society, opened in 1938 by Barney Josephson, was New York's first racially integrated nightclub",
+        "confidenceLevel": "high",
+        "citationSource": "boweryboyshistory.com",
+        "citationHref": "https://www.boweryboyshistory.com/2021/03/friday-night-fever-cafe-society.html",
+        "citationLabel": "The Bowery Boys: New York City History — The story of Cafe Society"
+      }
+    ],
+    "historicalContext": "Cafe Society's building at 1 Sheridan Square has since been redeveloped; the address is anchored here as the documented site of Holiday's first performances of 'Strange Fruit.'",
+    "topicIds": [
+      "music",
+      "arts",
+      "civil-rights",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_bessie_smith_001",
+    "kind": "person",
+    "displayName": "Bessie Smith",
+    "summary": "Known as the 'Empress of the Blues,' Bessie Smith was the highest-paid Black performer of the 1920s, recording classics like 'Downhearted Blues' and influencing generations of singers from Billie Holiday to Janis Joplin. She was born and began performing in Chattanooga, Tennessee, which now houses the Bessie Smith Cultural Center in her honor.",
+    "eraBuckets": [
+      "1920s",
+      "1930s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Chattanooga, Tennessee",
+    "locationPrecision": "institution",
+    "locationLabel": "Bessie Smith Cultural Center, 200 East Martin Luther King Boulevard, Chattanooga, TN",
+    "lat": 35.0446,
+    "lng": -85.3064,
+    "claims": [
+      {
+        "predicate": "recognized_as",
+        "object": "The highest-paid Black performer of the 1920s, known as the 'Empress of the Blues'",
+        "confidenceLevel": "medium",
+        "citationSource": "bessiesmithcc.org",
+        "citationHref": "https://www.bessiesmithcc.org/",
+        "citationLabel": "Bessie Smith Cultural Center — official site"
+      },
+      {
+        "predicate": "born_in",
+        "object": "Chattanooga, Tennessee, where the Bessie Smith Cultural Center now stands in her honor",
+        "confidenceLevel": "high",
+        "citationSource": "visitchattanooga.com",
+        "citationHref": "https://www.visitchattanooga.com/listing/bessie-smith-cultural-center/1553/",
+        "citationLabel": "Visit Chattanooga — Bessie Smith Cultural Center"
+      }
+    ],
+    "historicalContext": "The Cultural Center, part museum and part performance hall, anchors Smith's legacy in her hometown.",
+    "topicIds": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_dorothy_dandridge_001",
+    "kind": "person",
+    "displayName": "Dorothy Dandridge",
+    "summary": "For her lead role in 'Carmen Jones' (1954), Dorothy Dandridge became the first Black performer nominated for the Best Actress Academy Award, at the ceremony held March 30, 1955 at the RKO Pantages Theatre in Hollywood. She was also the first Black woman to present an Academy Award, for Best Film Editing, at that same ceremony.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "film",
+      "firsts",
+      "arts"
+    ],
+    "jurisdictionLabel": "Los Angeles, California",
+    "locationPrecision": "institution",
+    "locationLabel": "Hollywood Pantages Theatre, 6233 Hollywood Boulevard, Hollywood, Los Angeles, CA",
+    "lat": 34.102,
+    "lng": -118.326,
+    "claims": [
+      {
+        "predicate": "first_black_best_actress_nominee_date",
+        "object": "March 30, 1955, nominated for Best Actress for 'Carmen Jones' at the 27th Academy Awards",
+        "confidenceLevel": "high",
+        "citationSource": "americacomesalive.com",
+        "citationHref": "https://americacomesalive.com/dorothy-dandridge-first-african-american-nominated-for-a-best-actress-oscar/",
+        "citationLabel": "America Comes Alive — Dorothy Dandridge, First Black Nominated for Best Actress Oscar"
+      },
+      {
+        "predicate": "ceremony_venue",
+        "object": "The 27th Academy Awards were held at the RKO Pantages Theatre in Hollywood",
+        "confidenceLevel": "high",
+        "citationSource": "oscars.org",
+        "citationHref": "https://www.oscars.org/oscars/ceremonies/1955",
+        "citationLabel": "Academy of Motion Picture Arts and Sciences — The 27th Academy Awards"
+      }
+    ],
+    "historicalContext": "The Pantages Theatre, still standing on Hollywood Boulevard, hosted the Academy Awards ceremonies from 1949 to 1959, including Dandridge's historic 1955 nomination.",
+    "topicIds": [
+      "film",
+      "firsts",
+      "arts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_halle_berry_001",
+    "kind": "person",
+    "displayName": "Halle Berry",
+    "summary": "On March 24, 2002, Halle Berry became the first, and to date only, Black woman to win the Academy Award for Best Actress, for her role in 'Monster's Ball,' at the Kodak Theatre (now the Dolby Theatre) in its first year hosting the ceremony. The same night, Denzel Washington won Best Actor, marking the first time Black performers won both lead acting awards.",
+    "eraBuckets": [
+      "2000s"
+    ],
+    "topicTags": [
+      "film",
+      "firsts",
+      "arts"
+    ],
+    "jurisdictionLabel": "Los Angeles, California",
+    "locationPrecision": "institution",
+    "locationLabel": "Dolby Theatre (formerly Kodak Theatre), 6801 Hollywood Boulevard, Hollywood, Los Angeles, CA",
+    "lat": 34.1016,
+    "lng": -118.33876,
+    "claims": [
+      {
+        "predicate": "first_black_woman_best_actress_date",
+        "object": "March 24, 2002, winning Best Actress for 'Monster's Ball,' the first Black woman to win the award",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/this-day-in-history/march-24/halle-berry-first-black-woman-to-win-best-actress-oscar",
+        "citationLabel": "History.com — Halle Berry becomes first Black woman to win Best Actress Oscar"
+      },
+      {
+        "predicate": "still_only_black_woman_winner",
+        "object": "As of the ceremony's most recent ceremonies, Berry remains the only Black woman to have won the Best Actress Oscar",
+        "confidenceLevel": "high",
+        "citationSource": "cnn.com",
+        "citationHref": "https://www.cnn.com/2025/02/25/entertainment/oscars-halle-berry-best-actress",
+        "citationLabel": "CNN — Halle Berry says she's 'tired' of being the only Black woman to win Best Actress"
+      }
+    ],
+    "historicalContext": "The 2002 ceremony was the first Academy Awards held at the Kodak Theatre (renamed the Dolby Theatre in 2012), which has hosted the ceremony most years since.",
+    "topicIds": [
+      "film",
+      "firsts",
+      "arts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_hattie_mcdaniel_001",
+    "kind": "person",
+    "displayName": "Hattie McDaniel",
+    "summary": "Hattie McDaniel became the first Black person to win an Academy Award on February 29, 1940, taking Best Supporting Actress for playing Mammy in 'Gone with the Wind,' despite being seated apart from her white castmates at the segregated ceremony. Her will left the Oscar to Howard University; it went missing decades later, and the Academy presented a replacement in 2023.",
+    "eraBuckets": [
+      "1930s",
+      "1940s",
+      "2020s"
+    ],
+    "topicTags": [
+      "film",
+      "firsts",
+      "arts"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "campus",
+    "locationLabel": "Howard University, Washington, DC",
+    "lat": 38.9222,
+    "lng": -77.0194,
+    "claims": [
+      {
+        "predicate": "became_first_black_oscar_winner_date",
+        "object": "February 29, 1940, winning Best Supporting Actress at the 12th Academy Awards for 'Gone with the Wind'",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/this-day-in-history/february-29/mcdaniel-wins-oscar",
+        "citationLabel": "History.com — Hattie McDaniel becomes first African American actress to win Oscar"
+      },
+      {
+        "predicate": "bequeathed_oscar_to",
+        "object": "Howard University, per her 1951 will; the Academy presented the university a replacement Oscar in a ceremony on October 1, 2023 after the original went missing",
+        "confidenceLevel": "high",
+        "citationSource": "magazine.howard.edu",
+        "citationHref": "https://magazine.howard.edu/stories/hattie-mcdaniels-academy-award-comes-home",
+        "citationLabel": "Howard Magazine — Hattie McDaniel's Academy Award Comes Home"
+      }
+    ],
+    "historicalContext": "The Ambassador Hotel, where McDaniel accepted her Oscar despite the venue's whites-only policy, was demolished in 2005; Howard University, to which she bequeathed the award, is anchored here instead as the site most concretely tied to her legacy today.",
+    "topicIds": [
+      "film",
+      "firsts",
+      "arts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_sidney_poitier_001",
+    "kind": "person",
+    "displayName": "Sidney Poitier",
+    "summary": "On April 13, 1964, Sidney Poitier became the first Black actor to win the Academy Award for Best Actor, for 'Lilies of the Field,' at a ceremony held at the Santa Monica Civic Auditorium. He went on to receive an Honorary Academy Award in 2002 and the Presidential Medal of Freedom in 2009.",
+    "eraBuckets": [
+      "1960s",
+      "2000s"
+    ],
+    "topicTags": [
+      "film",
+      "firsts",
+      "arts"
+    ],
+    "jurisdictionLabel": "Santa Monica, California",
+    "locationPrecision": "institution",
+    "locationLabel": "Santa Monica Civic Auditorium, 1855 Main Street, Santa Monica, CA",
+    "lat": 34.0089,
+    "lng": -118.4892,
+    "claims": [
+      {
+        "predicate": "first_black_best_actor_date",
+        "object": "April 13, 1964, winning Best Actor for 'Lilies of the Field' at the 36th Academy Awards, held at the Santa Monica Civic Auditorium",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/this-day-in-history/april-13/sidney-poitier-wins-best-actor-oscar-for-lilies-of-the-field",
+        "citationLabel": "History.com — Sidney Poitier becomes first African American to win Best Actor Oscar"
+      },
+      {
+        "predicate": "received_honor_year",
+        "object": "Presidential Medal of Freedom, awarded in 2009",
+        "confidenceLevel": "medium",
+        "citationSource": "britannica.com",
+        "citationHref": "https://www.britannica.com/biography/Sidney-Poitier",
+        "citationLabel": "Britannica — Sidney Poitier"
+      }
+    ],
+    "historicalContext": "The Santa Monica Civic Auditorium hosted the Academy Awards from 1961 to 1968, including Poitier's historic 1964 win.",
+    "topicIds": [
+      "film",
+      "firsts",
+      "arts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_diahann_carroll_001",
+    "kind": "person",
+    "displayName": "Diahann Carroll",
+    "summary": "Diahann Carroll became the first Black woman to win the Tony Award for Best Actress in a Musical in 1962, for 'No Strings' at the 54th Street Theatre. In 1968 she starred in 'Julia,' the first American television series to star a Black woman in a role other than a servant.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "theater",
+      "television",
+      "firsts",
+      "arts"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "Site of the former 54th Street Theatre, 152 West 54th Street, Manhattan (now New York Hilton Midtown)",
+    "lat": 40.76332,
+    "lng": -73.98093,
+    "claims": [
+      {
+        "predicate": "first_black_woman_tony_best_actress_year",
+        "object": "1962, winning the Tony Award for Best Actress in a Musical for 'No Strings,' which opened at the 54th Street Theatre on March 15, 1962",
+        "confidenceLevel": "high",
+        "citationSource": "playbill.com",
+        "citationHref": "https://playbill.com/article/look-back-at-diahann-carroll-and-richard-kiley-in-no-strings-on-broadway",
+        "citationLabel": "Playbill — Look Back at Diahann Carroll and Richard Kiley in No Strings on Broadway"
+      },
+      {
+        "predicate": "starred_in_series",
+        "object": "'Julia' (1968-1971), the first American television series to star a Black woman in a role other than a servant",
+        "confidenceLevel": "high",
+        "citationSource": "britannica.com",
+        "citationHref": "https://www.britannica.com/biography/Diahann-Carroll",
+        "citationLabel": "Britannica — Diahann Carroll"
+      }
+    ],
+    "historicalContext": "The 54th Street Theatre was demolished in 1970 for the New York Hilton Midtown, which now occupies the site.",
+    "topicIds": [
+      "theater",
+      "television",
+      "firsts",
+      "arts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_louis_armstrong_001",
+    "kind": "person",
+    "displayName": "Louis Armstrong",
+    "summary": "Louis Armstrong, the trumpeter and singer who did more than any other musician to define jazz as a soloist's art, lived in his modest Corona, Queens home with his wife Lucille from 1943 until his death in 1971. The house is preserved today as the Louis Armstrong House Museum.",
+    "eraBuckets": [
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Queens, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "Louis Armstrong House Museum, 34-56 107th Street, Corona, Queens, NY",
+    "lat": 40.7546,
+    "lng": -73.8615,
+    "claims": [
+      {
+        "predicate": "resided_at_years",
+        "object": "1943 until his death in 1971, living in the house with his wife Lucille Wilson",
+        "confidenceLevel": "high",
+        "citationSource": "louisarmstronghouse.org",
+        "citationHref": "https://www.louisarmstronghouse.org/",
+        "citationLabel": "Louis Armstrong House Museum — official site"
+      },
+      {
+        "predicate": "site_designation",
+        "object": "Designated a National Historic Landmark and preserved as a museum operated by Queens College, CUNY",
+        "confidenceLevel": "medium",
+        "citationSource": "nylandmarks.org",
+        "citationHref": "https://nylandmarks.org/explore-ny/louis-armstrong-house-museum/",
+        "citationLabel": "New York Landmarks Conservancy — Louis Armstrong House Museum"
+      }
+    ],
+    "historicalContext": "The house remains largely as Armstrong and Wilson decorated it, offering a rare intact domestic record of a major 20th-century Black artist.",
+    "topicIds": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_berry_gordy_001",
+    "kind": "person",
+    "displayName": "Berry Gordy",
+    "summary": "Berry Gordy founded Motown Records in 1959 with an $800 family loan, building Hitsville U.S.A. at 2648 West Grand Boulevard in Detroit into the most successful Black-owned record label in American history. Over the 1960s, Motown's roster and in-house Artist Development program shaped acts including the Supremes, the Temptations, and Stevie Wonder into crossover stars.",
+    "eraBuckets": [
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "business",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Detroit, Michigan",
+    "locationPrecision": "institution",
+    "locationLabel": "Hitsville U.S.A. (Motown Museum), 2648 West Grand Boulevard, Detroit, MI",
+    "lat": 42.3642,
+    "lng": -83.0883,
+    "claims": [
+      {
+        "predicate": "founded_company_year",
+        "object": "1959, founding Tamla/Motown Records with an $800 loan from his family's savings club",
+        "confidenceLevel": "high",
+        "citationSource": "motownmuseum.org",
+        "citationHref": "https://www.motownmuseum.org/legacy/berry-gordy/",
+        "citationLabel": "Motown Museum — Berry Gordy"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "1988, inducted into the Rock and Roll Hall of Fame",
+        "confidenceLevel": "medium",
+        "citationSource": "britannica.com",
+        "citationHref": "https://www.britannica.com/biography/Berry-Gordy",
+        "citationLabel": "Britannica — Berry Gordy"
+      }
+    ],
+    "historicalContext": "Gordy converted the ground floor of the West Grand Boulevard house into Motown's first studio and offices, dubbing it 'Hitsville U.S.A.'; the building is preserved today as the Motown Museum.",
+    "topicIds": [
+      "music",
+      "arts",
+      "business",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_chuck_berry_001",
+    "kind": "person",
+    "displayName": "Chuck Berry",
+    "summary": "Chuck Berry's guitar-driven songs like 'Johnny B. Goode' and 'Maybellene' helped define rock and roll's sound and stage presence. On January 23, 1986, he was inducted into the Rock and Roll Hall of Fame's first-ever class, alongside Elvis Presley and James Brown, cited for laying the groundwork for 'not only a rock and roll sound but a rock and roll stance.'",
+    "eraBuckets": [
+      "1950s",
+      "1980s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Cleveland, Ohio",
+    "locationPrecision": "institution",
+    "locationLabel": "Rock and Roll Hall of Fame, 1100 Rock and Roll Boulevard, Cleveland, OH",
+    "lat": 41.5086,
+    "lng": -81.6956,
+    "claims": [
+      {
+        "predicate": "hall_of_fame_induction_date",
+        "object": "January 23, 1986, inducted into the first class of the Rock and Roll Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "rockhall.com",
+        "citationHref": "https://rockhall.com/inductees/chuck-berry/",
+        "citationLabel": "Rock and Roll Hall of Fame — Chuck Berry"
+      },
+      {
+        "predicate": "first_induction_ceremony",
+        "object": "The January 23, 1986 ceremony was the Rock and Roll Hall of Fame's first-ever induction event",
+        "confidenceLevel": "high",
+        "citationSource": "bobfmutah.com",
+        "citationHref": "https://bobfmutah.com/news/january-23-1986-rock-halls-first-induction/",
+        "citationLabel": "100.7 Bob FM — January 23, 1986: Rock Hall's First Induction"
+      }
+    ],
+    "historicalContext": "Berry was among the small inaugural class that established the Rock and Roll Hall of Fame; the museum building in Cleveland, designed by I.M. Pei, opened in 1995.",
+    "topicIds": [
+      "music",
+      "arts",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_charley_pride_001",
+    "kind": "person",
+    "displayName": "Charley Pride",
+    "summary": "A former Negro American League pitcher turned country singer, Charley Pride became country music's first Black superstar in the 1960s, scoring 29 No. 1 Billboard country singles between 1969 and 1983. On October 4, 2000, he became the first Black artist inducted into the Country Music Hall of Fame.",
+    "eraBuckets": [
+      "1960s",
+      "1970s",
+      "2000s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Nashville, Tennessee",
+    "locationPrecision": "institution",
+    "locationLabel": "Country Music Hall of Fame and Museum, 222 Rep. John Lewis Way South, Nashville, TN",
+    "lat": 36.1583,
+    "lng": -86.7761,
+    "claims": [
+      {
+        "predicate": "hall_of_fame_induction_date",
+        "object": "October 4, 2000, the first Black artist inducted into the Country Music Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "countrymusichalloffame.org",
+        "citationHref": "https://www.countrymusichalloffame.org/hall-of-fame/charley-pride",
+        "citationLabel": "Country Music Hall of Fame and Museum — Charley Pride"
+      },
+      {
+        "predicate": "chart_record",
+        "object": "29 No. 1 Billboard country singles between 1969 and 1983",
+        "confidenceLevel": "high",
+        "citationSource": "npr.org",
+        "citationHref": "https://www.npr.org/2020/12/12/945895767/charley-pride-country-musics-first-major-black-star-dies-at-86",
+        "citationLabel": "NPR — Charley Pride, Country Music's First Major Black Star, Dies At 86"
+      }
+    ],
+    "historicalContext": "Pride's induction ceremony took place at the Country Music Association Awards, held at the Grand Ole Opry House; the Hall of Fame's own museum building in downtown Nashville is anchored here as the permanent site of his enshrinement.",
+    "topicIds": [
+      "music",
+      "arts",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_deford_bailey_001",
+    "kind": "person",
+    "displayName": "DeFord Bailey",
+    "summary": "A virtuoso harmonica player, DeFord Bailey became the Grand Ole Opry's first Black star and one of its most popular early performers, debuting his signature 'Pan American Blues' on December 10, 1927 — the broadcast during which the program was first called 'The Grand Ole Opry.' He was inducted into the Country Music Hall of Fame on November 15, 2005.",
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "2000s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Nashville, Tennessee",
+    "locationPrecision": "institution",
+    "locationLabel": "Country Music Hall of Fame and Museum, 222 Rep. John Lewis Way South, Nashville, TN",
+    "lat": 36.1583,
+    "lng": -86.7761,
+    "claims": [
+      {
+        "predicate": "debuted_signature_song_date",
+        "object": "December 10, 1927, performing 'Pan American Blues' on the WSM broadcast during which announcer George D. Hay first used the name 'The Grand Ole Opry'",
+        "confidenceLevel": "high",
+        "citationSource": "aaregistry.org",
+        "citationHref": "https://aaregistry.org/story/deford-bailey-first-black-star-of-the-grand-ole-opry/",
+        "citationLabel": "African American Registry — DeFord Bailey, first Black star of the Grand Ole Opry"
+      },
+      {
+        "predicate": "hall_of_fame_induction_date",
+        "object": "November 15, 2005, inducted into the Country Music Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "countrymusichalloffame.org",
+        "citationHref": "https://www.countrymusichalloffame.org/hall-of-fame/deford-bailey",
+        "citationLabel": "Country Music Hall of Fame and Museum — DeFord Bailey"
+      }
+    ],
+    "historicalContext": "Bailey performed on the Opry from 1927 to 1941 before being dropped amid a licensing dispute; his Hall of Fame induction six decades later formally recognized his foundational role.",
+    "topicIds": [
+      "music",
+      "arts",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_scott_joplin_001",
+    "kind": "person",
+    "displayName": "Scott Joplin",
+    "summary": "Known as the 'King of Ragtime,' Scott Joplin composed 'Maple Leaf Rag' (1899) and dozens of other pieces that carried ragtime to national popularity. He lived in this St. Louis rowhouse from 1901 to 1903; in 1983 it became the first Missouri state historic site dedicated to African American heritage.",
+    "eraBuckets": [
+      "1890s",
+      "1900s",
+      "1980s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "St. Louis, Missouri",
+    "locationPrecision": "institution",
+    "locationLabel": "Scott Joplin House State Historic Site, 2658 Delmar Boulevard, St. Louis, MO",
+    "lat": 38.6371,
+    "lng": -90.2149,
+    "claims": [
+      {
+        "predicate": "resided_at_years",
+        "object": "1901 to 1903, while composing some of his best-known rags",
+        "confidenceLevel": "high",
+        "citationSource": "mostateparks.com",
+        "citationHref": "https://mostateparks.com/historic-site/scott-joplin-house-state-historic-site",
+        "citationLabel": "Missouri State Parks — Scott Joplin House State Historic Site"
+      },
+      {
+        "predicate": "site_designation_year",
+        "object": "1976, designated a National Historic Landmark; in 1983 it became Missouri's first state historic site dedicated to African American heritage",
+        "confidenceLevel": "high",
+        "citationSource": "stlouis-mo.gov",
+        "citationHref": "https://www.stlouis-mo.gov/government/departments/planning/cultural-resources/Scott-Joplin-Residence-National-Historic-Landmark.cfm",
+        "citationLabel": "City of St. Louis — Scott Joplin Residence National Historic Landmark"
+      }
+    ],
+    "historicalContext": "The rowhouse is one of the few surviving buildings directly tied to Joplin's life and composing career.",
+    "topicIds": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_leontyne_price_001",
+    "kind": "person",
+    "displayName": "Leontyne Price",
+    "summary": "Leontyne Price became the first Black singer to build a sustained career as a leading Metropolitan Opera star beginning in 1961, and on September 16, 1966 she starred as Cleopatra in the world premiere of Samuel Barber's 'Antony and Cleopatra,' commissioned to open the new Metropolitan Opera House at Lincoln Center. She won 19 Grammy Awards over her career, more than any other classical vocalist.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "opera",
+      "firsts"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "Metropolitan Opera House, 30 Lincoln Center Plaza, Manhattan, NY",
+    "lat": 40.77121,
+    "lng": -73.98189,
+    "claims": [
+      {
+        "predicate": "opened_venue_starring_role_date",
+        "object": "September 16, 1966, starring as Cleopatra in the world premiere of Samuel Barber's 'Antony and Cleopatra,' commissioned for the opening of the new Metropolitan Opera House at Lincoln Center",
+        "confidenceLevel": "high",
+        "citationSource": "metopera.org",
+        "citationHref": "https://www.metopera.org/discover/archives/notes-from-the-archives/leontyne-price-a-legendary-met-career/",
+        "citationLabel": "Metropolitan Opera — Leontyne Price: A Legendary Met Career"
+      },
+      {
+        "predicate": "recognized_as",
+        "object": "The first African American soprano to receive international acclaim, and the first Black singer to build a long, sustained relationship with the Metropolitan Opera",
+        "confidenceLevel": "high",
+        "citationSource": "pbs.org",
+        "citationHref": "https://www.pbs.org/wnet/gperf/great-performances-opera-house-leontyne-price-opening-metropolitan-opera/8540/",
+        "citationLabel": "PBS Great Performances — Leontyne Price on Opening the Metropolitan Opera"
+      }
+    ],
+    "historicalContext": "Price's 1966 opening-night role, choreographed by fellow honoree Alvin Ailey, marked a high point of her long Met career and the debut of its current Lincoln Center home.",
+    "topicIds": [
+      "music",
+      "arts",
+      "opera",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_alvin_ailey_001",
+    "kind": "person",
+    "displayName": "Alvin Ailey",
+    "summary": "Alvin Ailey founded the Alvin Ailey American Dance Theater in 1958 to showcase Black artists and the concert-dance tradition, and in 1960 choreographed 'Revelations,' now one of the most widely performed modern dance works in the world. He received the Presidential Medal of Freedom posthumously in 2014.",
+    "eraBuckets": [
+      "1950s",
+      "1960s",
+      "2010s"
+    ],
+    "topicTags": [
+      "dance",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "The Joan Weill Center for Dance, 405 West 55th Street, Manhattan, NY",
+    "lat": 40.7669,
+    "lng": -73.987,
+    "claims": [
+      {
+        "predicate": "founded_company_year",
+        "object": "1958, founding the Alvin Ailey American Dance Theater, now the largest modern dance company in the United States",
+        "confidenceLevel": "high",
+        "citationSource": "ailey.org",
+        "citationHref": "https://ailey.org/people/alvin-ailey",
+        "citationLabel": "Alvin Ailey American Dance Theater — Alvin Ailey biography"
+      },
+      {
+        "predicate": "received_honor_year",
+        "object": "Presidential Medal of Freedom, awarded posthumously in 2014",
+        "confidenceLevel": "high",
+        "citationSource": "ailey.org",
+        "citationHref": "https://pressroom.alvinailey.org/alvin-ailey-american-dance-theater/directors/alvin-ailey",
+        "citationLabel": "Ailey Pressroom — Alvin Ailey, Founder"
+      }
+    ],
+    "historicalContext": "The company Ailey founded is now headquartered at the Joan Weill Center for Dance in Manhattan, the largest building dedicated to dance in New York City.",
+    "topicIds": [
+      "dance",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_katherine_dunham_001",
+    "kind": "person",
+    "displayName": "Katherine Dunham",
+    "summary": "An anthropologist and choreographer, Katherine Dunham developed the first major African American concert dance technique, fusing Caribbean and African movement with ballet after fieldwork in Haiti and Jamaica. Called the 'matriarch and queen mother of Black dance,' she received a Kennedy Center Honor in 1983.",
+    "eraBuckets": [
+      "1930s",
+      "1940s",
+      "1980s"
+    ],
+    "topicTags": [
+      "dance",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "East St. Louis, Illinois",
+    "locationPrecision": "institution",
+    "locationLabel": "Katherine Dunham Museum, 1005 Pennsylvania Avenue, East St. Louis, IL",
+    "lat": 38.6288,
+    "lng": -90.1446,
+    "claims": [
+      {
+        "predicate": "developed_technique",
+        "object": "The Dunham Technique, the first formal African American concert dance technique, combining Caribbean and African ritual movement with ballet",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/collections/katherine-dunham/articles-and-essays/katherine-dunham-a-life-in-dance/",
+        "citationLabel": "Library of Congress — Katherine Dunham: A Life in Dance"
+      },
+      {
+        "predicate": "received_honor_year",
+        "object": "Kennedy Center Honor, 1983, for lifetime achievement in the arts",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://loc.gov/loc/lcib/06078/dunham.html",
+        "citationLabel": "Library of Congress Information Bulletin — Dancer and Choreographer Katherine Dunham Dies"
+      }
+    ],
+    "historicalContext": "Dunham settled in East St. Louis in the 1960s, founding a training center there; the Katherine Dunham Museum preserves her personal collection of African and Caribbean art.",
+    "topicIds": [
+      "dance",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_gordon_parks_001",
+    "kind": "person",
+    "displayName": "Gordon Parks",
+    "summary": "A self-taught photographer, composer, writer, and filmmaker, Gordon Parks became the first Black director of a major Hollywood studio film with 'The Learning Tree' (1969), which he also wrote, produced, and scored for Warner Bros.-Seven Arts, filming it in his hometown of Fort Scott, Kansas. The film was among the first 25 selected for the Library of Congress's National Film Registry in 1989.",
+    "eraBuckets": [
+      "1960s",
+      "1980s"
+    ],
+    "topicTags": [
+      "film",
+      "photography",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Fort Scott, Kansas",
+    "locationPrecision": "campus",
+    "locationLabel": "Gordon Parks Museum, Fort Scott Community College, Fort Scott, KS",
+    "lat": 37.8164,
+    "lng": -94.7155,
+    "claims": [
+      {
+        "predicate": "became_first_black_studio_director_year",
+        "object": "1969, directing, writing, producing, and scoring 'The Learning Tree' for Warner Bros.-Seven Arts, the first major Hollywood studio film directed by a Black filmmaker",
+        "confidenceLevel": "high",
+        "citationSource": "kansasreflector.com",
+        "citationHref": "https://kansasreflector.com/2021/02/16/its-time-to-re-watch-kansas-native-gordon-parks-groundbreaking-1969-movie-the-learning-tree/",
+        "citationLabel": "Kansas Reflector — Gordon Parks' groundbreaking 1969 movie 'The Learning Tree'"
+      },
+      {
+        "predicate": "film_registry_year",
+        "object": "1989, 'The Learning Tree' named to the first group of 25 films on the Library of Congress National Film Registry",
+        "confidenceLevel": "high",
+        "citationSource": "gordonparkscenter.org",
+        "citationHref": "https://www.gordonparkscenter.org/gordon-parks",
+        "citationLabel": "The Gordon Parks Museum — Gordon Parks"
+      }
+    ],
+    "historicalContext": "Parks filmed 'The Learning Tree' on location in Fort Scott, his hometown, which now houses the Gordon Parks Museum on the Fort Scott Community College campus.",
+    "topicIds": [
+      "film",
+      "photography",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_august_wilson_001",
+    "kind": "person",
+    "displayName": "August Wilson",
+    "summary": "Playwright August Wilson wrote the ten-play 'Pittsburgh Cycle' (also called the American Century Cycle), chronicling Black American life across every decade of the 20th century mostly through the lens of Pittsburgh's Hill District. He won the Pulitzer Prize for Drama twice, for 'Fences' (1987) and 'The Piano Lesson' (1990).",
+    "eraBuckets": [
+      "1980s",
+      "1990s"
+    ],
+    "topicTags": [
+      "theater",
+      "literature",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Pittsburgh, Pennsylvania",
+    "locationPrecision": "institution",
+    "locationLabel": "August Wilson House, 1727 Bedford Avenue, Pittsburgh, PA",
+    "lat": 40.4451,
+    "lng": -79.986,
+    "claims": [
+      {
+        "predicate": "pulitzer_prizes",
+        "object": "Pulitzer Prize for Drama for 'Fences' (1987) and 'The Piano Lesson' (1990)",
+        "confidenceLevel": "high",
+        "citationSource": "britannica.com",
+        "citationHref": "https://www.britannica.com/biography/August-Wilson",
+        "citationLabel": "Britannica — August Wilson"
+      },
+      {
+        "predicate": "childhood_home_designated",
+        "object": "Wilson's childhood home at 1727 Bedford Avenue was listed on the National Register of Historic Places on April 30, 2013 and opened as an arts center in 2022",
+        "confidenceLevel": "high",
+        "citationSource": "mellon.org",
+        "citationHref": "https://www.mellon.org/grant-story/making-art-and-history-useful-august-wilson-house",
+        "citationLabel": "Mellon Foundation — Making Art and History 'Useful': August Wilson House"
+      }
+    ],
+    "historicalContext": "Wilson's Pittsburgh Cycle draws heavily on his childhood in the Hill District; this house, where he lived for his first twelve years, is now preserved as an arts center in his honor.",
+    "topicIds": [
+      "theater",
+      "literature",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_maya_angelou_001",
+    "kind": "person",
+    "displayName": "Maya Angelou",
+    "summary": "Poet and memoirist Maya Angelou, author of 'I Know Why the Caged Bird Sings,' became Wake Forest University's first Reynolds Professor of American Studies in 1982, a post she held until her death in 2014. On January 20, 1993, she became the first woman and first Black poet to read an inaugural poem at a U.S. presidential inauguration, later winning a Grammy for the recording.",
+    "eraBuckets": [
+      "1980s",
+      "1990s"
+    ],
+    "topicTags": [
+      "literature",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Winston-Salem, North Carolina",
+    "locationPrecision": "campus",
+    "locationLabel": "Wake Forest University, Winston-Salem, NC",
+    "lat": 36.1345,
+    "lng": -80.2775,
+    "claims": [
+      {
+        "predicate": "held_professorship_years",
+        "object": "1982 until her death in 2014, as Wake Forest University's first Reynolds Professor of American Studies",
+        "confidenceLevel": "high",
+        "citationSource": "wfu.edu",
+        "citationHref": "https://mayaangelou.wfu.edu/story/",
+        "citationLabel": "Wake Forest University — Maya Angelou: Teacher"
+      },
+      {
+        "predicate": "first_black_woman_inaugural_poet_date",
+        "object": "January 20, 1993, reading 'On the Pulse of Morning' at President Clinton's first inauguration, the first woman and first Black poet to do so",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://blogs.loc.gov/catbird/2021/02/on-the-pulse-of-morning-remembering-maya-angelou/",
+        "citationLabel": "Library of Congress — On the Pulse of Morning: Remembering Maya Angelou"
+      }
+    ],
+    "historicalContext": "Angelou lived in Winston-Salem for over three decades while teaching at Wake Forest and is buried there; the university now houses her personal archive.",
+    "topicIds": [
+      "literature",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_aretha_franklin_001",
+    "kind": "person",
+    "displayName": "Aretha Franklin",
+    "summary": "The 'Queen of Soul,' Aretha Franklin recorded landmark hits including 'Respect' and 'Chain of Fools' and won 18 competitive Grammy Awards over her career. On January 3, 1987, she became the first woman inducted into the Rock and Roll Hall of Fame.",
+    "eraBuckets": [
+      "1960s",
+      "1980s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Cleveland, Ohio",
+    "locationPrecision": "institution",
+    "locationLabel": "Rock and Roll Hall of Fame, 1100 Rock and Roll Boulevard, Cleveland, OH",
+    "lat": 41.5086,
+    "lng": -81.6956,
+    "claims": [
+      {
+        "predicate": "became_first_woman_inducted_date",
+        "object": "January 3, 1987, the first woman inducted into the Rock and Roll Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/this-day-in-history/january-3/rock-and-roll-hall-of-fame-inducts-first-woman",
+        "citationLabel": "History.com — Rock and Roll Hall of Fame inducts first woman"
+      },
+      {
+        "predicate": "hall_of_fame_profile",
+        "object": "Inducted alongside Marvin Gaye, Bo Diddley, Carl Perkins, Muddy Waters, and B.B. King in the Hall's second induction class",
+        "confidenceLevel": "high",
+        "citationSource": "rockhall.com",
+        "citationHref": "https://rockhall.com/inductees/aretha-franklin/",
+        "citationLabel": "Rock and Roll Hall of Fame — Aretha Franklin"
+      }
+    ],
+    "historicalContext": "Franklin did not attend the 1987 ceremony, reportedly due to a fear of flying; Clive Davis accepted the honor on her behalf.",
+    "topicIds": [
+      "music",
+      "arts",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_michael_jackson_001",
+    "kind": "person",
+    "displayName": "Michael Jackson",
+    "summary": "Michael Jackson began his recording career as the youngest member of the Jackson 5, who signed with Motown after auditioning at Hitsville U.S.A. in 1968. As a solo artist his 1983 'Billie Jean' video became one of the first by a Black artist to receive heavy rotation on MTV, after CBS Records threatened to pull its catalog over the network's initial refusal to air it.",
+    "eraBuckets": [
+      "1960s",
+      "1980s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Detroit, Michigan",
+    "locationPrecision": "institution",
+    "locationLabel": "Hitsville U.S.A. (Motown Museum), 2648 West Grand Boulevard, Detroit, MI",
+    "lat": 42.3642,
+    "lng": -83.0883,
+    "claims": [
+      {
+        "predicate": "signed_to_label_year",
+        "object": "1968, the Jackson 5 auditioned for and signed with Motown Records, recording early material at Hitsville U.S.A.",
+        "confidenceLevel": "high",
+        "citationSource": "motownmuseum.org",
+        "citationHref": "https://www.motownmuseum.org/artist/the-jackson-5/",
+        "citationLabel": "Motown Museum — The Jackson 5"
+      },
+      {
+        "predicate": "broke_mtv_color_barrier_year",
+        "object": "1983, the 'Billie Jean' video became one of the first by a Black artist to receive heavy rotation on MTV",
+        "confidenceLevel": "high",
+        "citationSource": "forbes.com",
+        "citationHref": "https://www.forbes.com/sites/imeekpo/2024/09/11/from-billie-jean-to-the-vanguard-award-michael-jacksons-impact-on-mtv-and-black-artist-recognition/",
+        "citationLabel": "Forbes — From 'Billie Jean' to the Vanguard Award: Michael Jackson's Impact on MTV"
+      }
+    ],
+    "historicalContext": "Motown's Hitsville U.S.A. studio, where the Jackson 5 recorded after their 1968 signing, anchors the start of Jackson's recording career.",
+    "topicIds": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_miles_davis_001",
+    "kind": "person",
+    "displayName": "Miles Davis",
+    "summary": "Trumpeter and bandleader Miles Davis led some of the most influential small groups in jazz history, from the modal experiments of 'Kind of Blue' (1959) to fusion on 'Bitches Brew' (1970). He grew up in East St. Louis, Illinois, in the house at 1701 Kansas Avenue, now preserved as the House of Miles museum and community center.",
+    "eraBuckets": [
+      "1950s",
+      "1960s",
+      "1970s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "East St. Louis, Illinois",
+    "locationPrecision": "institution",
+    "locationLabel": "House of Miles, 1701 Kansas Avenue, East St. Louis, IL",
+    "lat": 38.6137,
+    "lng": -90.1454,
+    "claims": [
+      {
+        "predicate": "childhood_home",
+        "object": "Davis lived in the house at 1701 Kansas Avenue from 1939 to 1944, where he started his first band in the basement",
+        "confidenceLevel": "high",
+        "citationSource": "houseofmilesestl.com",
+        "citationHref": "https://houseofmilesestl.com/miles-davis-childhood-home-will-be-a-museum-and-educational-center/",
+        "citationLabel": "House of Miles East St. Louis — Miles Davis' childhood home"
+      },
+      {
+        "predicate": "hall_of_fame_inducted",
+        "object": "Inducted into the Rock and Roll Hall of Fame in 2006 in the Performer category",
+        "confidenceLevel": "high",
+        "citationSource": "rockhall.com",
+        "citationHref": "https://rockhall.com/inductees/miles-davis/",
+        "citationLabel": "Rock and Roll Hall of Fame — Miles Davis"
+      }
+    ],
+    "historicalContext": "The House of Miles preserves the original walls, ceilings, and floors of Davis's boyhood home and operates today as a museum and community arts center.",
+    "topicIds": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_john_coltrane_001",
+    "kind": "person",
+    "displayName": "John Coltrane",
+    "summary": "Saxophonist John Coltrane reshaped modern jazz with albums like 'Giant Steps' (1960) and 'A Love Supreme' (1965), recorded in part at his Dix Hills, New York home. In 2007, he received a posthumous special citation from the Pulitzer Prize board recognizing his 'masterful improvisation, supreme musicianship and iconic centrality to the history of jazz.'",
+    "eraBuckets": [
+      "1960s",
+      "2000s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Dix Hills, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "John and Alice Coltrane Home, 247 Candlewood Path, Dix Hills, NY",
+    "lat": 40.7998,
+    "lng": -73.3243,
+    "claims": [
+      {
+        "predicate": "resided_at_years",
+        "object": "1964 until his death in 1967, composing 'A Love Supreme' at this home",
+        "confidenceLevel": "high",
+        "citationSource": "savingplaces.org",
+        "citationHref": "https://savingplaces.org/places/john-and-alice-coltrane-home",
+        "citationLabel": "National Trust for Historic Preservation — John and Alice Coltrane Home"
+      },
+      {
+        "predicate": "site_designation_year",
+        "object": "2007, listed on the New York State and National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "huntingtonny.gov",
+        "citationHref": "https://huntingtonny.gov/content/13747/99530/16519/default.aspx",
+        "citationLabel": "Town of Huntington — Coltrane Home"
+      }
+    ],
+    "historicalContext": "Coltrane composed and rehearsed 'A Love Supreme' at this Long Island home; the National Trust for Historic Preservation named it a National Treasure in 2018.",
+    "topicIds": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_nina_simone_001",
+    "kind": "person",
+    "displayName": "Nina Simone",
+    "summary": "Born Eunice Kathleen Waymon, Nina Simone blended classical training with jazz, blues, and gospel into a body of work including 'Mississippi Goddam' and 'Feeling Good' that made her a voice of the civil rights movement. She was inducted into the Rock and Roll Hall of Fame in 2018, the same year a group of four Black artists purchased and began restoring her childhood home in Tryon, North Carolina.",
+    "eraBuckets": [
+      "1960s",
+      "2010s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "civil-rights",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Tryon, North Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Nina Simone Childhood Home, 30 East Livingston Street, Tryon, NC",
+    "lat": 35.214,
+    "lng": -82.2321,
+    "claims": [
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "2018, inducted into the Rock and Roll Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "andscape.com",
+        "citationHref": "https://andscape.com/features/thanks-to-these-four-artists-nina-simones-childhood-home-is-now-a-national-treasure/",
+        "citationLabel": "Andscape — Nina Simone's childhood home is now a National Treasure"
+      },
+      {
+        "predicate": "childhood_home_preserved",
+        "object": "In 2016, four Black artists purchased her deteriorating childhood home for $95,000 to preserve it as a historic site",
+        "confidenceLevel": "high",
+        "citationSource": "savingplaces.org",
+        "citationHref": "https://savingplaces.org/places/ninasimone",
+        "citationLabel": "National Trust for Historic Preservation — Nina Simone Childhood Home"
+      }
+    ],
+    "historicalContext": "The 660-square-foot house where Simone was born and raised with seven siblings is being preserved as a National Treasure through the African American Cultural Heritage Action Fund.",
+    "topicIds": [
+      "music",
+      "arts",
+      "civil-rights",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_zora_neale_hurston_001",
+    "kind": "person",
+    "displayName": "Zora Neale Hurston",
+    "summary": "Novelist and anthropologist Zora Neale Hurston, author of 'Their Eyes Were Watching God' (1937), spent her final years in Fort Pierce, Florida, where she died in 1960 and was buried in an unmarked grave. In 1973, novelist Alice Walker located the grave and placed a headstone reading 'Genius of the South,' helping spark a national revival of Hurston's literary reputation.",
+    "eraBuckets": [
+      "1930s",
+      "1950s",
+      "1970s"
+    ],
+    "topicTags": [
+      "literature",
+      "arts",
+      "harlem-renaissance",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Fort Pierce, Florida",
+    "locationPrecision": "campus",
+    "locationLabel": "Zora Neale Hurston gravesite, Garden of Heavenly Rest, Fort Pierce, FL",
+    "lat": 27.467,
+    "lng": -80.3417,
+    "claims": [
+      {
+        "predicate": "grave_marked_by",
+        "object": "In 1973, Alice Walker located Hurston's unmarked grave and placed a headstone reading 'Genius of the South,' recounted in Walker's 1975 essay 'Looking for Zora'",
+        "confidenceLevel": "high",
+        "citationSource": "hmdb.org",
+        "citationHref": "https://www.hmdb.org/m.asp?m=256804",
+        "citationLabel": "Historical Marker Database — Zora Neale Hurston Gravesite"
+      },
+      {
+        "predicate": "commemorated_by_trail",
+        "object": "The Zora Neale Hurston Dust Tracks Heritage Trail, established in Fort Pierce in 2004, marks eight sites from her final years",
+        "confidenceLevel": "high",
+        "citationSource": "cityoffortpierce.com",
+        "citationHref": "https://www.cityoffortpierce.com/400/Trail-Marker-4",
+        "citationLabel": "City of Fort Pierce — Zora Neale Hurston Dust Tracks Heritage Trail"
+      }
+    ],
+    "historicalContext": "Hurston's Eatonville hometown already anchors a separate place-kind entry in this catalog; her Fort Pierce gravesite is used here as the site most concretely tied to her personal legacy and rediscovery.",
+    "topicIds": [
+      "literature",
+      "arts",
+      "harlem-renaissance",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_hank_aaron_001",
+    "kind": "person",
+    "displayName": "Hank Aaron",
+    "summary": "On April 8, 1974, Hank Aaron hit his 715th career home run off Al Downing at Atlanta-Fulton County Stadium, breaking Babe Ruth's 39-year-old home run record while enduring hundreds of racist death threats during his pursuit of the mark. Aaron retired in 1976 with 755 home runs and was elected to the National Baseball Hall of Fame in 1982 with 97.8 percent of the vote.",
+    "eraBuckets": [
+      "1970s",
+      "1980s"
+    ],
+    "topicTags": [
+      "sports",
+      "baseball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Atlanta, Georgia",
+    "locationPrecision": "institution",
+    "locationLabel": "Hank Aaron statue, Monument Garden, Truist Park, Atlanta, GA",
+    "lat": 33.89,
+    "lng": -84.468,
+    "claims": [
+      {
+        "predicate": "broke_home_run_record_date",
+        "object": "April 8, 1974, hitting his 715th career home run to surpass Babe Ruth's record of 714",
+        "confidenceLevel": "high",
+        "citationSource": "baseballhall.org",
+        "citationHref": "https://baseballhall.org/discover-more/stories/inside-pitch/henry-aaron-hits-home-run-number-715",
+        "citationLabel": "National Baseball Hall of Fame — Henry Aaron hits home run No. 715"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "1982, elected to the National Baseball Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "britannica.com",
+        "citationHref": "https://www.britannica.com/biography/Hank-Aaron",
+        "citationLabel": "Britannica — Hank Aaron"
+      }
+    ],
+    "historicalContext": "Atlanta-Fulton County Stadium, where Aaron broke the record, was demolished in 1997; the Atlanta Braves' current ballpark, Truist Park, commemorates the achievement with a statue and a Monument Garden displaying artifacts from the record-breaking game.",
+    "topicIds": [
+      "sports",
+      "baseball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_frank_robinson_001",
+    "kind": "person",
+    "displayName": "Frank Robinson",
+    "summary": "A Hall of Fame outfielder and the only player to win the MVP award in both the American and National Leagues, Frank Robinson became Major League Baseball's first Black manager on October 2, 1974, when the Cleveland Indians named him player-manager. He hit a home run in his managerial debut on April 8, 1975, in front of more than 56,000 fans at Cleveland Stadium.",
+    "eraBuckets": [
+      "1970s",
+      "1980s"
+    ],
+    "topicTags": [
+      "sports",
+      "baseball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Cooperstown, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "National Baseball Hall of Fame and Museum, 25 Main Street, Cooperstown, NY",
+    "lat": 42.6999,
+    "lng": -74.9233,
+    "claims": [
+      {
+        "predicate": "became_first_black_mlb_manager_date",
+        "object": "October 2, 1974, named player-manager of the Cleveland Indians, becoming MLB's first Black manager",
+        "confidenceLevel": "high",
+        "citationSource": "baseballhall.org",
+        "citationHref": "https://baseballhall.org/discover/frank-robinson-made-history-as-manager",
+        "citationLabel": "National Baseball Hall of Fame — Frank Robinson made history as manager"
+      },
+      {
+        "predicate": "managerial_debut_date",
+        "object": "April 8, 1975, hit a home run in his first game as player-manager, a 5-3 win over the New York Yankees",
+        "confidenceLevel": "high",
+        "citationSource": "sabr.org",
+        "citationHref": "https://sabr.org/gamesproj/game/april-8-1975-frank-robinson-debuts-as-first-black-manager-in-major-leagues/",
+        "citationLabel": "Society for American Baseball Research — Frank Robinson debuts as first Black manager"
+      }
+    ],
+    "historicalContext": "Cleveland Municipal Stadium, site of Robinson's managerial debut, was demolished in 1996; his Hall of Fame plaque in Cooperstown (inducted as a player in 1982) anchors his legacy today.",
+    "topicIds": [
+      "sports",
+      "baseball",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_tony_dungy_001",
+    "kind": "person",
+    "displayName": "Tony Dungy",
+    "summary": "On February 4, 2007, Tony Dungy led the Indianapolis Colts to a 29-17 win over the Chicago Bears in Super Bowl XLI, becoming the first Black head coach to win a Super Bowl in the same game that pitted him against fellow Black head coach Lovie Smith, the first time two Black head coaches met in the championship. Dungy was inducted into the Pro Football Hall of Fame in 2016.",
+    "eraBuckets": [
+      "2000s",
+      "2010s"
+    ],
+    "topicTags": [
+      "sports",
+      "football",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "jurisdictionLabel": "Canton, Ohio",
+    "locationPrecision": "institution",
+    "locationLabel": "Pro Football Hall of Fame, 2121 George Halas Drive NW, Canton, OH",
+    "lat": 40.82273,
+    "lng": -81.3976,
+    "claims": [
+      {
+        "predicate": "became_first_black_coach_win_super_bowl_date",
+        "object": "February 4, 2007, Super Bowl XLI, defeating the Chicago Bears 29-17",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/this-day-in-history/february-4/tony-dungy-first-black-coach-to-win-super-bowl",
+        "citationLabel": "History.com — Tony Dungy becomes first Black head coach to win a Super Bowl"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "2016, inducted into the Pro Football Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "profootballhof.com",
+        "citationHref": "https://www.profootballhof.com/players/tony-dungy",
+        "citationLabel": "Pro Football Hall of Fame — Tony Dungy"
+      }
+    ],
+    "historicalContext": "Super Bowl XLI was also the first Super Bowl matching two Black head coaches, Dungy and his former assistant and close friend Lovie Smith of the Bears.",
+    "topicIds": [
+      "sports",
+      "football",
+      "firsts",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_alice_coachman_001",
+    "kind": "person",
+    "displayName": "Alice Coachman",
+    "summary": "At the 1948 London Olympics, Alice Coachman became the first Black woman from any country to win an Olympic gold medal, clearing 5 feet 6 1/8 inches in the high jump on her first attempt for a new Olympic record — the only gold won by any American woman at those Games. She was inducted into the U.S. Olympic Hall of Fame in 2004.",
+    "eraBuckets": [
+      "1940s",
+      "2000s"
+    ],
+    "topicTags": [
+      "sports",
+      "olympics",
+      "track-and-field",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Colorado Springs, Colorado",
+    "locationPrecision": "institution",
+    "locationLabel": "U.S. Olympic & Paralympic Museum, 200 S Sierra Madre Street, Colorado Springs, CO",
+    "lat": 38.83118,
+    "lng": -104.82912,
+    "claims": [
+      {
+        "predicate": "became_first_black_woman_olympic_gold_year",
+        "object": "1948, winning the high jump at the London Olympics, the first Black woman from any country to win Olympic gold",
+        "confidenceLevel": "high",
+        "citationSource": "womenshistory.org",
+        "citationHref": "https://www.womenshistory.org/education-resources/biographies/alice-coachman",
+        "citationLabel": "National Women's History Museum — Alice Coachman"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "2004, inducted into the U.S. Olympic Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "usopm.org",
+        "citationHref": "https://usopm.org/alice-coachman/",
+        "citationLabel": "U.S. Olympic & Paralympic Museum — Alice Coachman"
+      }
+    ],
+    "historicalContext": "Coachman's gold medal was awarded at Wembley Stadium in London; the U.S. Olympic & Paralympic Museum in Colorado Springs, which houses the Hall of Fame she was inducted into, anchors her legacy on U.S. soil.",
+    "topicIds": [
+      "sports",
+      "olympics",
+      "track-and-field",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_wyomia_tyus_001",
+    "kind": "person",
+    "displayName": "Wyomia Tyus",
+    "summary": "Wyomia Tyus won the Olympic 100m in 1964 and again in 1968, setting a world record of 11.08 seconds in her Mexico City title defense to become the first person, male or female, to win back-to-back Olympic 100m titles. She was inducted into the U.S. Olympic Hall of Fame in 1985.",
+    "eraBuckets": [
+      "1960s",
+      "1980s"
+    ],
+    "topicTags": [
+      "sports",
+      "olympics",
+      "track-and-field",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Colorado Springs, Colorado",
+    "locationPrecision": "institution",
+    "locationLabel": "U.S. Olympic & Paralympic Museum, 200 S Sierra Madre Street, Colorado Springs, CO",
+    "lat": 38.83118,
+    "lng": -104.82912,
+    "claims": [
+      {
+        "predicate": "became_first_back_to_back_100m_champion_year",
+        "object": "1968, defending her 1964 Olympic 100m title in Mexico City with a world-record 11.08 seconds, the first person of either sex to win back-to-back Olympic 100m titles",
+        "confidenceLevel": "high",
+        "citationSource": "worldathletics.org",
+        "citationHref": "https://worldathletics.org/news/feature/wyomia-tyus-olympic-1964-1968-100m-champion-u1",
+        "citationLabel": "World Athletics — Wyomia Tyus, first back-to-back Olympic 100m champion"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "1985, inducted into the U.S. Olympic Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "teamusa.com",
+        "citationHref": "https://www.teamusa.com/hall-of-fame/hall-of-fame-members/wyomia-tyus",
+        "citationLabel": "Team USA — Wyomia Tyus, U.S. Olympic Hall of Fame"
+      }
+    ],
+    "historicalContext": "Carl Lewis matched Tyus's feat of consecutive Olympic 100m titles in 1984, sixteen years after her second win; her achievement went largely unrecognized for decades.",
+    "topicIds": [
+      "sports",
+      "olympics",
+      "track-and-field",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_gabby_douglas_001",
+    "kind": "person",
+    "displayName": "Gabby Douglas",
+    "summary": "At the 2012 London Olympics, 16-year-old Gabby Douglas became the first Black woman to win the Olympic all-around title in gymnastics, edging Russia's Viktoria Komova, while also helping Team USA win team gold — making her the first American gymnast to win both titles at the same Games.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "sports",
+      "gymnastics",
+      "olympics",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "National Museum of American History, Smithsonian Institution, Washington, DC",
+    "lat": 38.8913,
+    "lng": -77.0301,
+    "claims": [
+      {
+        "predicate": "became_first_black_woman_allaround_gold_year",
+        "object": "2012, winning the Olympic individual all-around gymnastics title in London, the first Black woman to do so",
+        "confidenceLevel": "high",
+        "citationSource": "nbcsports.com",
+        "citationHref": "https://www.nbcsports.com/olympics/news/gabby-douglas-gymnastics-comeback-olympics",
+        "citationLabel": "NBC Sports — When Gabby Douglas made gymnastics history at the 2012 Olympics"
+      },
+      {
+        "predicate": "collection_held_by",
+        "object": "The Smithsonian's National Museum of American History holds an exhibition on Douglas's career and 2012 Olympic leotard",
+        "confidenceLevel": "high",
+        "citationSource": "americanhistory.si.edu",
+        "citationHref": "https://americanhistory.si.edu/explore/exhibitions/gabrielle-douglas-american-gymnast",
+        "citationLabel": "Smithsonian National Museum of American History — Gabrielle Douglas, American Gymnast"
+      }
+    ],
+    "historicalContext": "Douglas trained in Iowa under coach Liang Chow after moving from her native Virginia Beach; the Smithsonian's American History Museum in Washington, DC holds artifacts from her historic 2012 performance.",
+    "topicIds": [
+      "sports",
+      "gymnastics",
+      "olympics",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_tommie_smith_001",
+    "kind": "person",
+    "displayName": "Tommie Smith",
+    "summary": "Tommie Smith won gold in the 200m at the 1968 Mexico City Olympics in a world-record 19.83 seconds, then, with bronze medalist John Carlos, raised a black-gloved fist during the medal ceremony to protest racial injustice — one of the most enduring images in sports history. A San Jose State alumnus, Smith was inducted with Carlos into the U.S. Olympic and Paralympic Hall of Fame in 2019.",
+    "eraBuckets": [
+      "1960s",
+      "2010s"
+    ],
+    "topicTags": [
+      "sports",
+      "olympics",
+      "civil-rights",
+      "firsts"
+    ],
+    "jurisdictionLabel": "San Jose, California",
+    "locationPrecision": "campus",
+    "locationLabel": "Victory Salute statue, San Jose State University, San Jose, CA",
+    "lat": 37.3353,
+    "lng": -121.8813,
+    "claims": [
+      {
+        "predicate": "won_gold_and_protested_date",
+        "object": "October 16, 1968, winning the 200m gold medal in a world record 19.83 seconds and raising a fist during the medal ceremony",
+        "confidenceLevel": "high",
+        "citationSource": "sjsu.edu",
+        "citationHref": "https://www.sjsu.edu/ha-public-art-tour/public-art/black-power.php",
+        "citationLabel": "San José State University — Victory Salute public art"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "2019, inducted into the U.S. Olympic and Paralympic Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "sjsu.edu",
+        "citationHref": "https://blogs.sjsu.edu/newsroom/2019/alumni-tommie-smith-and-john-carlos-to-be-inducted-into-u-s-olympic-and-paralympic-hall-of-fame/",
+        "citationLabel": "SJSU NewsCenter — Tommie Smith and John Carlos inducted into U.S. Olympic and Paralympic Hall of Fame"
+      }
+    ],
+    "historicalContext": "Smith and Carlos were both San Jose State track athletes; the university erected the 22-foot 'Victory Salute' statue on campus in 2005 to honor their protest, since neither man was included on a medal stand at the time by the school.",
+    "topicIds": [
+      "sports",
+      "olympics",
+      "civil-rights",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_john_carlos_001",
+    "kind": "person",
+    "displayName": "John Carlos",
+    "summary": "John Carlos won bronze in the 200m at the 1968 Mexico City Olympics, then joined gold medalist Tommie Smith in raising a black-gloved fist during the medal ceremony to protest racial injustice, an act that led to their suspension from the U.S. team. A San Jose State alumnus, Carlos was inducted into the U.S. Olympic and Paralympic Hall of Fame alongside Smith in 2019.",
+    "eraBuckets": [
+      "1960s",
+      "2010s"
+    ],
+    "topicTags": [
+      "sports",
+      "olympics",
+      "civil-rights",
+      "firsts"
+    ],
+    "jurisdictionLabel": "San Jose, California",
+    "locationPrecision": "campus",
+    "locationLabel": "Victory Salute statue, San Jose State University, San Jose, CA",
+    "lat": 37.3353,
+    "lng": -121.8813,
+    "claims": [
+      {
+        "predicate": "won_bronze_and_protested_date",
+        "object": "October 16, 1968, winning bronze in the 200m and joining Tommie Smith's raised-fist protest during the medal ceremony",
+        "confidenceLevel": "high",
+        "citationSource": "sjsu.edu",
+        "citationHref": "https://www.sjsu.edu/ha-public-art-tour/public-art/black-power.php",
+        "citationLabel": "San José State University — Victory Salute public art"
+      },
+      {
+        "predicate": "hall_of_fame_induction_year",
+        "object": "2019, inducted into the U.S. Olympic and Paralympic Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "sjsu.edu",
+        "citationHref": "https://blogs.sjsu.edu/newsroom/2019/alumni-tommie-smith-and-john-carlos-to-be-inducted-into-u-s-olympic-and-paralympic-hall-of-fame/",
+        "citationLabel": "SJSU NewsCenter — Tommie Smith and John Carlos inducted into U.S. Olympic and Paralympic Hall of Fame"
+      }
+    ],
+    "historicalContext": "Carlos and Smith were suspended from the Olympic team and sent home following the protest; decades later both are honored as civil rights pioneers, including with this campus statue and their 2019 Hall of Fame induction.",
+    "topicIds": [
+      "sports",
+      "olympics",
+      "civil-rights",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_gwendolyn_brooks_001",
+    "kind": "person",
+    "displayName": "Gwendolyn Brooks",
+    "summary": "Gwendolyn Brooks became the first Black person to win a Pulitzer Prize on May 1, 1950, awarded for Poetry for 'Annie Allen,' a collection centered on a young Black girl coming of age in Chicago's Bronzeville neighborhood. She lived and wrote many of her best-known works, including 'The Bean Eaters' and 'In the Mecca,' at her South Side Chicago home from 1953 to 1994.",
+    "eraBuckets": [
+      "1940s",
+      "1950s"
+    ],
+    "topicTags": [
+      "literature",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Chicago, Illinois",
+    "locationPrecision": "institution",
+    "locationLabel": "Gwendolyn Brooks House, 7428 South Evans Avenue, Chicago, IL",
+    "lat": 41.7595,
+    "lng": -87.6069,
+    "claims": [
+      {
+        "predicate": "became_first_black_pulitzer_winner_date",
+        "object": "May 1, 1950, winning the Pulitzer Prize for Poetry for 'Annie Allen,' the first Black person to win a Pulitzer Prize",
+        "confidenceLevel": "high",
+        "citationSource": "pulitzer.org",
+        "citationHref": "https://www.pulitzer.org/article/frost-williams-no-gwendolyn-brooks",
+        "citationLabel": "The Pulitzer Prizes — Frost? Williams? No, Gwendolyn Brooks"
+      },
+      {
+        "predicate": "site_designation_year",
+        "object": "2010, her home at 7428 South Evans Avenue, where she lived from 1953 to 1994 and wrote many major works, was designated a Chicago Landmark",
+        "confidenceLevel": "high",
+        "citationSource": "southsideweekly.com",
+        "citationHref": "https://southsideweekly.com/home-histories-gwendolyn-brooks-house/",
+        "citationLabel": "South Side Weekly — Home Histories: The Gwendolyn Brooks House"
+      }
+    ],
+    "historicalContext": "Brooks was later named Poet Laureate of Illinois in 1968, a post she held until her death in 2000; her landmarked home stands in the Greater Grand Crossing neighborhood near the Bronzeville setting of much of her work.",
+    "topicIds": [
+      "literature",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_rita_dove_001",
+    "kind": "person",
+    "displayName": "Rita Dove",
+    "summary": "Rita Dove won the Pulitzer Prize for Poetry in 1987 for 'Thomas and Beulah,' becoming the second Black person to win the award for poetry after Gwendolyn Brooks. In 1993, at age 40, she was appointed the first Black U.S. Poet Laureate Consultant in Poetry to the Library of Congress, and the youngest person to hold the post.",
+    "eraBuckets": [
+      "1980s",
+      "1990s"
+    ],
+    "topicTags": [
+      "literature",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "Library of Congress, Thomas Jefferson Building, Washington, DC",
+    "lat": 38.8887,
+    "lng": -77.0047,
+    "claims": [
+      {
+        "predicate": "became_first_black_poet_laureate_year",
+        "object": "1993, appointed the first Black U.S. Poet Laureate Consultant in Poetry, serving until 1995",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://loc.gov/loc/lcib/93/9315/dove.html",
+        "citationLabel": "Library of Congress Information Bulletin — Rita Dove"
+      },
+      {
+        "predicate": "pulitzer_prize_year",
+        "object": "1987, won the Pulitzer Prize for Poetry for 'Thomas and Beulah'",
+        "confidenceLevel": "high",
+        "citationSource": "britannica.com",
+        "citationHref": "https://www.britannica.com/biography/Rita-Dove",
+        "citationLabel": "Britannica — Rita Dove"
+      }
+    ],
+    "historicalContext": "The Library of Congress, which appoints and hosts the U.S. Poet Laureate, anchors Dove's tenure in the post at its Thomas Jefferson Building on Capitol Hill.",
+    "topicIds": [
+      "literature",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_alice_walker_001",
+    "kind": "person",
+    "displayName": "Alice Walker",
+    "summary": "Alice Walker won the Pulitzer Prize for Fiction on April 18, 1983, for 'The Color Purple,' becoming the first Black woman to win a Pulitzer for fiction; she also won the National Book Award for the same novel. Walker, the youngest of eight children of Georgia sharecroppers, grew up in Eatonton, the rural setting that shaped the world of her best-known book.",
+    "eraBuckets": [
+      "1980s"
+    ],
+    "topicTags": [
+      "literature",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Eatonton, Georgia",
+    "locationPrecision": "city",
+    "locationLabel": "Eatonton, Georgia (Alice Walker Driving Tour)",
+    "lat": 33.3264,
+    "lng": -83.3878,
+    "claims": [
+      {
+        "predicate": "became_first_black_woman_pulitzer_fiction_date",
+        "object": "April 18, 1983, won the Pulitzer Prize for Fiction for 'The Color Purple,' the first Black woman to win the fiction prize",
+        "confidenceLevel": "high",
+        "citationSource": "pulitzer.org",
+        "citationHref": "https://www.pulitzer.org/winners/alice-walker",
+        "citationLabel": "The Pulitzer Prizes — Alice Walker"
+      },
+      {
+        "predicate": "birthplace_and_upbringing",
+        "object": "Born in and raised in Eatonton, Georgia, the youngest of eight children of sharecroppers; the town maintains a self-guided Alice Walker Driving Tour of sites from her childhood",
+        "confidenceLevel": "high",
+        "citationSource": "visiteatonton.com",
+        "citationHref": "https://visiteatonton.com/alice-walker-driving-tour/",
+        "citationLabel": "Visit Eatonton — Alice Walker Driving Tour"
+      }
+    ],
+    "historicalContext": "The driving tour includes Walker's birthplace, childhood home, and the church where she was baptized, all in and around Eatonton.",
+    "topicIds": [
+      "literature",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_phillis_wheatley_001",
+    "kind": "person",
+    "displayName": "Phillis Wheatley",
+    "summary": "Enslaved as a child and brought to Boston around 1761, Phillis Wheatley became the first African American, and the first enslaved person in the American colonies, to publish a book of poetry: 'Poems on Various Subjects, Religious and Moral,' printed in London in September 1773 after Boston publishers declined it. She was freed shortly after the book's publication.",
+    "eraBuckets": [
+      "1770s"
+    ],
+    "topicTags": [
+      "literature",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Boston, Massachusetts",
+    "locationPrecision": "institution",
+    "locationLabel": "Old South Meeting House, 310 Washington Street, Boston, MA",
+    "lat": 42.3569,
+    "lng": -71.0586,
+    "claims": [
+      {
+        "predicate": "became_first_published_black_author_date",
+        "object": "September 1, 1773, publication in London of 'Poems on Various Subjects, Religious and Moral,' the first book of poetry published by an African American",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/people/phillis-wheatley.htm",
+        "citationLabel": "National Park Service — Phillis Wheatley"
+      },
+      {
+        "predicate": "worship_site_commemorated_at",
+        "object": "A statue and first-edition copy of her book are displayed at the Old South Meeting House, where she was a worshiping member",
+        "confidenceLevel": "medium",
+        "citationSource": "npg.si.edu",
+        "citationHref": "https://npg.si.edu/blog/phillis-wheatley-her-life-poetry-and-legacy",
+        "citationLabel": "Smithsonian National Portrait Gallery — Phillis Wheatley: Her Life, Poetry, and Legacy"
+      }
+    ],
+    "historicalContext": "Wheatley's owners, the Wheatley family of Boston, worshiped at the Old South Meeting House, and Wheatley herself became a member there; the building, a key Revolutionary-era meeting site, now commemorates her legacy.",
+    "topicIds": [
+      "literature",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_jordan_peele_001",
+    "kind": "person",
+    "displayName": "Jordan Peele",
+    "summary": "Jordan Peele won the Academy Award for Best Original Screenplay at the 90th Academy Awards on March 4, 2018, for 'Get Out,' becoming the first Black writer to win the award. The horror film, Peele's directorial debut, also earned him nominations for Best Director and Best Picture.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "film",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Los Angeles, California",
+    "locationPrecision": "institution",
+    "locationLabel": "Dolby Theatre, 6801 Hollywood Boulevard, Hollywood, Los Angeles, CA",
+    "lat": 34.1016,
+    "lng": -118.33876,
+    "claims": [
+      {
+        "predicate": "became_first_black_screenplay_oscar_winner_date",
+        "object": "March 4, 2018, winning Best Original Screenplay for 'Get Out' at the 90th Academy Awards, held at the Dolby Theatre",
+        "confidenceLevel": "high",
+        "citationSource": "cbsnews.com",
+        "citationHref": "https://www.cbsnews.com/news/oscars-2018-jordan-peele-makes-history-first-black-writer-win-get-out-best-original-screenplay/",
+        "citationLabel": "CBS News — Oscars 2018: Jordan Peele makes history as first Black writer to win Best Original Screenplay"
+      },
+      {
+        "predicate": "additional_nominations",
+        "object": "'Get Out' also earned Peele Academy Award nominations for Best Director and Best Picture the same night",
+        "confidenceLevel": "high",
+        "citationSource": "variety.com",
+        "citationHref": "https://variety.com/2018/film/news/get-out-wins-oscar-best-original-screenplay-jordan-peele-1202714071/",
+        "citationLabel": "Variety — 'Get Out' Wins Oscar for Best Original Screenplay"
+      }
+    ],
+    "historicalContext": "The 90th Academy Awards were held at the Dolby Theatre (formerly the Kodak Theatre), the same venue where Halle Berry made history in 2002.",
+    "topicIds": [
+      "film",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_denzel_washington_001",
+    "kind": "person",
+    "displayName": "Denzel Washington",
+    "summary": "Denzel Washington won the Academy Award for Best Actor on March 24, 2002, for 'Training Day,' becoming the second Black man to win the category after Sidney Poitier's win 38 years earlier. Washington won his first Oscar, for Best Supporting Actor, in 1990 for 'Glory,' and the same 2002 ceremony saw Halle Berry become the first Black woman to win Best Actress.",
+    "eraBuckets": [
+      "1980s",
+      "2000s"
+    ],
+    "topicTags": [
+      "film",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Los Angeles, California",
+    "locationPrecision": "institution",
+    "locationLabel": "Dolby Theatre (formerly Kodak Theatre), 6801 Hollywood Boulevard, Hollywood, Los Angeles, CA",
+    "lat": 34.1016,
+    "lng": -118.33876,
+    "claims": [
+      {
+        "predicate": "became_second_black_best_actor_date",
+        "object": "March 24, 2002, winning Best Actor for 'Training Day,' 38 years after Sidney Poitier's 1964 win",
+        "confidenceLevel": "high",
+        "citationSource": "oscars.org",
+        "citationHref": "https://www.oscars.org/collection-highlights/denzel-washington",
+        "citationLabel": "Academy of Motion Picture Arts and Sciences — Denzel Washington"
+      },
+      {
+        "predicate": "first_oscar_year",
+        "object": "1990, won Best Supporting Actor for 'Glory'",
+        "confidenceLevel": "high",
+        "citationSource": "oscars.org",
+        "citationHref": "https://www.oscars.org/collection-highlights/denzel-washington",
+        "citationLabel": "Academy of Motion Picture Arts and Sciences — Denzel Washington"
+      }
+    ],
+    "historicalContext": "The 2002 ceremony, held at the Kodak Theatre in its first year hosting the Oscars, marked the first time Black performers won both lead acting categories in the same year.",
+    "topicIds": [
+      "film",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_whoopi_goldberg_001",
+    "kind": "person",
+    "displayName": "Whoopi Goldberg",
+    "summary": "Whoopi Goldberg won the Academy Award for Best Supporting Actress on March 25, 1991, for 'Ghost,' becoming the first Black performer to win an Oscar since Hattie McDaniel 51 years earlier and the first Black person nominated in both lead and supporting acting categories. By 2002 she completed an EGOT, becoming the first Black woman to win all four major American entertainment awards.",
+    "eraBuckets": [
+      "1980s",
+      "1990s",
+      "2000s"
+    ],
+    "topicTags": [
+      "film",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Los Angeles, California",
+    "locationPrecision": "institution",
+    "locationLabel": "Dorothy Chandler Pavilion, 135 North Grand Avenue, Los Angeles, CA",
+    "lat": 34.0564,
+    "lng": -118.2486,
+    "claims": [
+      {
+        "predicate": "won_oscar_date",
+        "object": "March 25, 1991, winning Best Supporting Actress for 'Ghost' at the 63rd Academy Awards, held at the Dorothy Chandler Pavilion",
+        "confidenceLevel": "high",
+        "citationSource": "variety.com",
+        "citationHref": "https://variety.com/2021/film/news/whoopi-goldberg-egot-ghost-oscar-1234955841/",
+        "citationLabel": "Variety — Whoopi Goldberg on 'Ghost' and the 30th anniversary of her Oscar triumph"
+      },
+      {
+        "predicate": "completed_egot_year",
+        "object": "2002, completed an EGOT (Emmy, Grammy, Oscar, Tony), the first Black woman to do so",
+        "confidenceLevel": "high",
+        "citationSource": "britannica.com",
+        "citationHref": "https://www.britannica.com/biography/Whoopi-Goldberg",
+        "citationLabel": "Britannica — Whoopi Goldberg"
+      }
+    ],
+    "historicalContext": "The Dorothy Chandler Pavilion hosted the Academy Awards from 1969 to 2001, including Goldberg's historic 1991 win.",
+    "topicIds": [
+      "film",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_stevie_wonder_001",
+    "kind": "person",
+    "displayName": "Stevie Wonder",
+    "summary": "Signed to Motown as a child prodigy billed as 'Little Stevie Wonder,' he topped the Billboard Hot 100 on August 10, 1963 with 'Fingertips – Pt. 2' at age 13, becoming the youngest solo artist ever to have a number-one single, a feat also making its live album the youngest artist to top the pop albums chart. He went on to win 25 Grammy Awards, among the most of any solo artist.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "jurisdictionLabel": "Detroit, Michigan",
+    "locationPrecision": "institution",
+    "locationLabel": "Hitsville U.S.A. (Motown Museum), 2648 West Grand Boulevard, Detroit, MI",
+    "lat": 42.3642,
+    "lng": -83.0883,
+    "claims": [
+      {
+        "predicate": "became_youngest_number_one_solo_artist_date",
+        "object": "August 10, 1963, 'Fingertips – Pt. 2' topped the Billboard Hot 100, making 13-year-old Stevie Wonder the youngest solo artist to reach number one",
+        "confidenceLevel": "high",
+        "citationSource": "billboard.com",
+        "citationHref": "https://www.billboard.com/pro/stevie-wonder-fingertips-this-week-in-billboard-chart-history-1963/",
+        "citationLabel": "Billboard — This Week in Billboard Chart History: Stevie Wonder Made History on the Hot 100"
+      },
+      {
+        "predicate": "signed_to_label_as_child",
+        "object": "Signed to Motown Records as a child prodigy, recording and developing his early career at the label's Hitsville U.S.A. studio in Detroit",
+        "confidenceLevel": "medium",
+        "citationSource": "motownmuseum.org",
+        "citationHref": "https://www.motownmuseum.org/legacy/berry-gordy/",
+        "citationLabel": "Motown Museum — Berry Gordy"
+      }
+    ],
+    "historicalContext": "Wonder's discovery and early recordings took place at Hitsville U.S.A., the Motown studio and offices preserved today as a museum.",
+    "topicIds": [
+      "music",
+      "arts",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  }
+]

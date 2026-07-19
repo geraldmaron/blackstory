@@ -1,10 +1,10 @@
-# Black Book — Architecture
+# BlackStory — Architecture
 
-> Required project state. All LLMs working in this repo, including Construct, should keep this file updated.
+> Required project state. All LLMs working in this repo should keep this file updated.
 
 ## System overview
 
-Black Book is a place-connected Black history research platform. Public surfaces serve only released historical projections. Research, evidence, and promotion stay behind private APIs, workers, and admin tools.
+BlackStory is a place-connected Black history research platform. Public surfaces serve only released historical projections. Research, evidence, and promotion stay behind private APIs, workers, and admin tools.
 
 ## Target surfaces
 
@@ -14,9 +14,10 @@ apps/admin               Private Next.js admin/research (Cloud Run + IAP — tar
 apps/api-public          Public read/search/location API (Cloud Run — target)
 apps/api-submissions     Corrections / contribution intake (Cloud Run — target)
 apps/api-internal        Publication / promotion / internal control (private Cloud Run — target)
-workers/research         Python source discovery & ingestion
+workers/research         Python + Node research compute (Jobs / Tasks)
 workers/publication      Projection, snapshot, indexing, release
 workers/security         Quarantine, content validation, integrity
+functions/               Firebase Functions v2 (capped discovery schedules — ADR-018)
 packages/*               Shared TypeScript libraries
 infra/*                  Firebase, GCP, GitHub, database scaffolding
 ```
@@ -26,18 +27,18 @@ Do not add deployable microservices beyond this set. See [ADR-005](./adr/ADR-005
 ## Platform intent (not yet configured)
 
 - **Data:** **Cloud Firestore** system of record (ADR-011 / D-014); blobs in Firebase Storage / GCS. Local PostGIS + SQL Connect under `infra/database/` are **parked / not production**.
-- **App data access:** Firestore Admin SDK + security rules; `@black-book/domain` entity/geography/provenance/claims models; `@black-book/firebase` converters; `@black-book/data-access` Firestore guards. SQL Connect deferred with Cloud SQL.
+- **App data access:** Firestore Admin SDK + security rules; `@repo/domain` entity/geography/provenance/claims models; `@repo/firebase` converters; `@repo/data-access` Firestore guards. SQL Connect deferred with Cloud SQL.
 - **Public web vs APIs:** App Hosting for `apps/web`; Cloud Run for APIs + admin — [ADR-001](./adr/ADR-001-firebase-app-hosting-vs-cloud-run.md)
 - **Auth / abuse:** Firebase Auth + App Check (reCAPTCHA Enterprise) — intent; assumptions in [ADR-010](./adr/ADR-010-security-and-abuse-assumptions.md)
 - **Ingress:** Cloud Armor / ALB / CDN — intent only
-- **Jobs:** Cloud Tasks + Cloud Run Jobs — [ADR-007](./adr/ADR-007-background-workflow-model.md)
+- **Jobs:** Cloud Tasks + Cloud Run Jobs for long/heavy batch — [ADR-007](./adr/ADR-007-background-workflow-model.md); capped discovery schedules prefer Firebase Functions v2 `onSchedule` — [ADR-018](./adr/ADR-018-firebase-scheduled-functions-discovery.md)
 - **CI/CD:** GitHub Actions + OIDC/WIF — [ADR-006](./adr/ADR-006-github-actions-deployment.md); PR CI live in-repo; deploy OIDC stub `.github/workflows/deploy-production.yml`; WIF Terraform under [`../infra/gcp/wif/`](../infra/gcp/wif/) (not applied)
-- **Search / geo:** Geohash fields + bounded Firestore queries via `api-public`; U.S. Census Geocoder later — [ADR-008](./adr/ADR-008-search-and-geocoding.md) (amended by ADR-011). Domain helpers in `@black-book/domain`.
+- **Search / geo:** Geohash fields + bounded Firestore queries via `api-public`; U.S. Census Geocoder later — [ADR-008](./adr/ADR-008-search-and-geocoding.md) (amended by ADR-011). Domain helpers in `@repo/domain`.
 - **Research isolation:** Dedicated credentials/SA/bucket policy inside the one project; research cannot publish; project split deferred — [ADR-009](./adr/ADR-009-research-isolation.md)
-- **Environment isolation (BB-005/D-013):** Existing `black-book-efaaf` is the single production project; per-surface SAs, four buckets, and Firestore rules + SA boundaries provide workload isolation. Development is emulator-only; staging is configuration, not a security boundary. Resources beyond the known project/Hosting site are **not yet verified as provisioned** — [`security/environment-isolation.md`](./security/environment-isolation.md), [`../infra/gcp/`](../infra/gcp/).
+- **Environment isolation (/D-013):** Existing `black-book-efaaf` is the single production project; per-surface SAs, four buckets, and Firestore rules + SA boundaries provide workload isolation. Development is emulator-only; staging is configuration, not a security boundary. Resources beyond the known project/Hosting site are **not yet verified as provisioned** — [`security/environment-isolation.md`](./security/environment-isolation.md), [`../infra/gcp/`](../infra/gcp/).
 - **Observability:** OpenTelemetry + Sentry — packages stubbed, not wired
 
-Do not claim Firebase production data plane or App Hosting works until the corresponding beads land and are verified. Do **not** provision Cloud SQL. See [`bb-001/baseline-report.md`](./bb-001/baseline-report.md).
+Do not claim Firebase production data plane or App Hosting works until the corresponding beads land and are verified. Do **not** provision Cloud SQL. See [`ds-001/baseline-report.md`](./ds-001/baseline-report.md).
 
 ## Boundaries
 
@@ -54,18 +55,18 @@ Do not claim Firebase production data plane or App Hosting works until the corre
 
 Full non-negotiable list: [`../plan.md`](../plan.md).
 
-## Product constitution (BB-003)
+## Product constitution
 
 Single source of truth: `packages/schemas/constitution/policy.v1.json`, validated by `product-constitution.schema.json`.
 
 | Consumer | Package | Role |
 |----------|---------|------|
-| TypeScript apps/packages | `@black-book/schemas` | Zod-validated loaders + evaluators (`policyVersion` on every result) |
+| TypeScript apps/packages | `@repo/schemas` | Zod-validated loaders + evaluators (`policyVersion` on every result) |
 | Python workers | `black-book-constitution` | `jsonschema`-validated loaders + evaluators against the same JSON |
 
 Do not hard-code relevance/confidence thresholds, precision rules, or living-person rules in apps. Policy changes are version bumps in the shared JSON, never a public write API.
 
-## Security threat model (BB-004)
+## Security threat model
 
 Hostile-environment design is documented under [`docs/security/`](./security/):
 
@@ -73,12 +74,12 @@ Hostile-environment design is documented under [`docs/security/`](./security/):
 |-----|------|
 | [`security/threat-model.md`](./security/threat-model.md) | 19 P0 threats with preventive / detective / containment / recovery |
 | [`security/abuse-cases.md`](./security/abuse-cases.md) | AC-01–19 mapped to implementation beads |
-| [`security/threat-corpus.json`](./security/threat-corpus.json) | Machine-readable corpus (validated by `@black-book/testing`) |
-| [`security/tests/checklist.md`](./security/tests/checklist.md) | Manual/CI checklist scaffold (full gates in BB-036) |
+| [`security/threat-corpus.json`](./security/threat-corpus.json) | Machine-readable corpus (validated by `@repo/testing`) |
+| [`security/tests/checklist.md`](./security/tests/checklist.md) | Manual/CI checklist scaffold (full gates in ) |
 
 Assumptions remain binding in [ADR-010](./adr/ADR-010-security-and-abuse-assumptions.md). Controls are mostly unimplemented until Tranche 3.
 
-## Environment isolation (BB-005)
+## Environment isolation
 
 Single-project design (not applied): [`security/environment-isolation.md`](./security/environment-isolation.md). Matrices and Terraform stubs: [`../infra/gcp/`](../infra/gcp/). The root `.firebaserc` points to production `black-book-efaaf`; App Hosting stubs remain unprovisioned.
 
@@ -92,7 +93,7 @@ Single-project design (not applied): [`security/environment-isolation.md`](./sec
 
 ## Key decisions
 
-Formal ADRs (BB-002): [`docs/adr/`](./adr/README.md). Session summaries: [`.cx/decisions/`](../.cx/decisions/).
+Formal ADRs: [`docs/adr/`](./adr/README.md). Session summaries: [`.cx/decisions/`](../.cx/decisions/).
 
 | ADR | Topic |
 |-----|-------|
@@ -110,4 +111,4 @@ Formal ADRs (BB-002): [`docs/adr/`](./adr/README.md). Session summaries: [`.cx/d
 
 ## Execution
 
-Bead order and status: [`../plan.md`](../plan.md). Active focus: course-correction expansion (BB-067–089) — design language (BB-067/068/069), map platform (BB-070), vector search (BB-071), and hostile-environment/hygiene beads landing alongside the original Tranche 5/6 public-product backlog (BB-048–063). Tranches 1–4 are complete except deferred/parked items (BB-012, BB-031).
+Bead order and status: [`../plan.md`](../plan.md). Active focus: course-correction expansion (–089) — design language (/068/069), map platform, vector search, and hostile-environment/hygiene beads landing alongside the original Tranche 5/6 public-product backlog (–063). Tranches 1–4 are complete except deferred/parked items (, ).

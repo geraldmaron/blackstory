@@ -2,8 +2,8 @@
  * Budget guard for web-search adapters, wired into cost-control evaluator rather than a
  * new one (deliverable 4: per-campaign query budgets, monthly spend caps, alerts).
  *
- * `@black-book/domain` cannot depend on `@black-book/security` at runtime -- `@black-book/security`
- * already depends on `@black-book/domain` (see ../internet-archive/shared/http-port.ts's doc
+ * `@repo/domain` cannot depend on `@repo/security` at runtime -- `@repo/security`
+ * already depends on `@repo/domain` (see ../internet-archive/shared/http-port.ts's doc
  * comment for the full circular-dependency reasoning; the same rule applies here). So this module
  * defines a `DailyBudgetEvaluator` port whose call shape mirrors real
  * `evaluateDailyBudget` (packages/security/src/resource-controls.ts) closely enough that a thin,
@@ -15,8 +15,8 @@
  * devDependency only for that one test, mirroring
  * ./internet-archive/shared/http-port.test.ts's `buildRealSafeHttpClient` pattern.
  * Production wiring (outside this package, in the apps/workers layer that already depends on both
- * `@black-book/domain` and `@black-book/security`) is expected to back this port with
- * `evaluateDailyBudget` from `@black-book/security` — the same way.
+ * `@repo/domain` and `@repo/security`) is expected to back this port with
+ * `evaluateDailyBudget` from `@repo/security` — the same way.
  *
  * The per-campaign query cap below is genuinely new bookkeeping this asks for (has no
  * per-campaign query concept) it is deliberately simple local arithmetic, not a re-implementation

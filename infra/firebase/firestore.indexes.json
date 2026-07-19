@@ -1,6 +1,24 @@
 {
   "indexes": [
     {
+      "collectionGroup": "censusCountyDecades",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "decade", "order": "ASCENDING" },
+        { "fieldPath": "blackPopulation", "order": "ASCENDING" },
+        { "fieldPath": "totalPopulation", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "hateCrimeCountyYears",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "year", "order": "ASCENDING" },
+        { "fieldPath": "antiBlackIncidents", "order": "ASCENDING" },
+        { "fieldPath": "incidents", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "entities",
       "queryScope": "COLLECTION",
       "fields": [
@@ -145,6 +163,14 @@
       "fields": [
         { "fieldPath": "kind", "order": "ASCENDING" },
         { "fieldPath": "parentId", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "researchCases",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "state", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
       ]
     }
   ],

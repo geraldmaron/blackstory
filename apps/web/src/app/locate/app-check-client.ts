@@ -7,7 +7,7 @@
  * local dev without a real Firebase project still works, and the server-side guard falls back to
  * its default `monitor` mode instead of hard-failing the request).
  *
- * Does NOT import `@black-book/firebase` for the same reason the submit client doesn't: that
+ * Does NOT import `@repo/firebase` for the same reason the submit client doesn't: that
  * package's entry point statically imports Admin SDK (Node-only) modules, which must never reach
  * a Client Component's browser bundle.
  */

@@ -61,7 +61,7 @@ function iaRegistryEntry(): SourceRegistryEntry {
   };
 }
 
-test('Internet Archive adapter starts disabled by default in the BB-037 registry', () => {
+test('Internet Archive adapter starts disabled by default in the  registry', () => {
   const store = createInMemorySourceRegistry();
   const contract = createInternetArchiveAdapterContract();
   registerSource(store, {
@@ -85,7 +85,7 @@ test('Internet Archive adapter starts disabled by default in the BB-037 registry
   assert.equal(approved.registryState, 'approved');
 });
 
-test('Internet Archive adapter has a registered BB-077 obligations entry', () => {
+test('Internet Archive adapter has a registered  obligations entry', () => {
   const obligationsStore = createInMemoryObligationsRegistry(defaultSourceObligationsSeed(FIXED_NOW));
   const obligations = getSourceObligationsOrThrow(obligationsStore, INTERNET_ARCHIVE_ADAPTER_ID);
   assert.equal(obligations.sourceClass, 'internet_archive');

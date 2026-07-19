@@ -34,7 +34,7 @@ test('JSON Schema artifact exists beside policy values', () => {
   const schema = JSON.parse(readFileSync(CONSTITUTION_SCHEMA_PATH, 'utf8')) as {
     title?: string;
   };
-  assert.equal(schema.title, 'Black Book product constitution');
+  assert.equal(schema.title, 'BlackStory product constitution');
 });
 
 test('every evaluation records policyVersion', () => {
@@ -115,7 +115,7 @@ test('fixtures cover included, excluded, disputed, sparse, sensitive, living-per
   );
 });
 
-test('ugcLivingPersonRules extends the constitution without bumping policyVersion (BB-077)', () => {
+test('ugcLivingPersonRules extends the constitution without bumping policyVersion ()', () => {
   resetProductConstitutionCache();
   const policy = loadProductConstitution();
   assert.equal(policy.policyVersion, '1.0.0');

@@ -1,5 +1,5 @@
 {
-  "name": "@black-book/data-access",
+  "name": "@repo/data-access",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -24,7 +24,7 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "devDependencies": {
-    "@black-book/typescript-config": "workspace:^",
+    "@repo/typescript-config": "workspace:^",
     "@types/node": "^26.1.1",
     "tsx": "^4.23.1",
     "typescript": "^5.8.3"

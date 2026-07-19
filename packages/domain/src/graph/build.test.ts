@@ -82,12 +82,12 @@ test('CYCLE-SAFE / BOUNDED-DEPTH: a build over cyclic containment fixtures still
   assert.ok(artifact.adjacencyByEntityId.get('gg-place-cycle-a')!.entries.length >= 1);
 });
 
-test('acceptance criterion 4 path shape: publicReleases/{releaseId}/graph/... mirrors the BB-019 entity-projection path convention', () => {
+test('acceptance criterion 4 path shape: publicReleases/{releaseId}/graph/... mirrors the  entity-projection path convention', () => {
   assert.equal(
     publicGraphAdjacencyPath('release-1', 'ent-a'),
-    'publicReleases/release-1/graph/adjacency/ent-a',
+    'publicReleases/release-1/graphAdjacency/ent-a',
   );
-  assert.equal(publicGraphDecadePath('release-1', '1960s'), 'publicReleases/release-1/graph/decades/1960s');
+  assert.equal(publicGraphDecadePath('release-1', '1960s'), 'publicReleases/release-1/graphDecades/1960s');
   assert.equal(publicGraphAllTimePath('release-1'), 'publicReleases/release-1/graph/all-time');
 });
 
@@ -105,4 +105,21 @@ test('publicRelatedEntriesByEntityId produces the {id, type, direction, timespan
     assert.ok('id' in entry && 'type' in entry && 'direction' in entry);
     assert.ok(!('evidenceCount' in entry), 'evidenceCount must not leak into the public shape');
   }
+});
+
+test('all-time view includes every entityId even when the entity has no decade-span inputs', () => {
+  const input: GraphReleaseArtifactInput = {
+    releaseId: 'release-undated',
+    generatedAt: '2026',
+    entityIds: ['dated-entity', 'undated-entity'],
+    entities: [
+      {
+        entityId: 'dated-entity',
+        activeSpans: [{ validFrom: '1950', validTo: '1960', datePrecision: 'year' }],
+      },
+    ],
+    relationships: [],
+  };
+  const artifact = buildGraphReleaseArtifact(input);
+  assert.deepEqual(artifact.allTimeView.nodeIds, ['dated-entity', 'undated-entity']);
 });

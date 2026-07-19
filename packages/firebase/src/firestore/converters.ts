@@ -1,19 +1,20 @@
 
 /**
- * Zod-backed Firestore converters and parse helpers for Black Book documents.
+ * Zod-backed Firestore converters and parse helpers for BlackStory documents.
  */
 import type { FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase/firestore';
 import type { z } from 'zod';
 import {
   assertLearningIndexProjection,
   sanitizePrimaryImageForRelease,
-} from '@black-book/domain';
-import { assertPublicProjectionSafe } from '@black-book/security';
+} from '@repo/domain';
+import { assertPublicProjectionSafe } from '@repo/security';
 import {
   auditEventSchema,
   canonicalClaimSchema,
   canonicalEntitySchema,
   claimEvidenceLinkSchema,
+  claimVersionSchema,
   entityLocationSchema,
   entityMergeSchema,
   entityRelationshipSchema,
@@ -21,6 +22,7 @@ import {
   evidenceRecordSchema,
   evidenceSourceSchema,
   idempotencyRecordSchema,
+  discoveryCampaignRunSchema,
   killSwitchSchema,
   outboxConsumerReceiptSchema,
   outboxMessageSchema,
@@ -39,6 +41,7 @@ import {
   type CanonicalClaimDoc,
   type CanonicalEntityDoc,
   type ClaimEvidenceLinkDoc,
+  type ClaimVersionDoc,
   type EntityLocationDoc,
   type EntityMergeDoc,
   type EntityRelationshipDoc,
@@ -46,6 +49,7 @@ import {
   type EvidenceRecordDoc,
   type EvidenceSourceDoc,
   type IdempotencyRecordDoc,
+  type DiscoveryCampaignRunDoc,
   type KillSwitchDoc,
   type OutboxConsumerReceiptDoc,
   type OutboxMessageDoc,
@@ -81,7 +85,21 @@ export function preparePublicEntityProjectionForWrite(
   modelObject: PublicEntityProjectionDoc,
 ): PublicEntityProjectionDoc {
   const parsed = publicEntityProjectionSchema.parse(modelObject);
-  const primaryImage = sanitizePrimaryImageForRelease(parsed.primaryImage);
+  const parsedPrimaryImage =
+    parsed.primaryImage !== undefined
+      ? {
+          url: parsed.primaryImage.url,
+          alt: parsed.primaryImage.alt,
+          credit: parsed.primaryImage.credit,
+          rightsStatus: parsed.primaryImage.rightsStatus,
+          ...(parsed.primaryImage.width !== undefined ? { width: parsed.primaryImage.width } : {}),
+          ...(parsed.primaryImage.height !== undefined ? { height: parsed.primaryImage.height } : {}),
+          ...(parsed.primaryImage.objectPath !== undefined
+            ? { objectPath: parsed.primaryImage.objectPath }
+            : {}),
+        }
+      : undefined;
+  const primaryImage = sanitizePrimaryImageForRelease(parsedPrimaryImage);
 
   const prepared = {
     ...parsed,
@@ -91,6 +109,23 @@ export function preparePublicEntityProjectionForWrite(
   if (primaryImage === undefined && 'primaryImage' in prepared) {
     delete (prepared as { primaryImage?: unknown }).primaryImage;
   }
+
+  const normalizedRelated = prepared.related?.map((entry) => ({
+    id: entry.id,
+    type: entry.type,
+    direction: entry.direction,
+    ...(entry.timespan !== undefined
+      ? {
+          timespan: {
+            ...(entry.timespan.label !== undefined ? { label: entry.timespan.label } : {}),
+            ...(entry.timespan.validFrom !== undefined
+              ? { validFrom: entry.timespan.validFrom }
+              : {}),
+            ...(entry.timespan.validTo !== undefined ? { validTo: entry.timespan.validTo } : {}),
+          },
+        }
+      : {}),
+  }));
 
   assertLearningIndexProjection({
     summary: prepared.summary,
@@ -102,7 +137,7 @@ export function preparePublicEntityProjectionForWrite(
       ? { extendedNarrative: prepared.extendedNarrative }
       : {}),
     ...(primaryImage !== undefined ? { primaryImage } : {}),
-    ...(prepared.related !== undefined ? { related: prepared.related } : {}),
+    ...(normalizedRelated !== undefined ? { related: normalizedRelated } : {}),
   });
   assertPublicProjectionSafe(prepared);
   return prepared;
@@ -119,6 +154,8 @@ export const entityLocationConverter = createConverter(entityLocationSchema);
 export const entityRelationshipConverter = createConverter(entityRelationshipSchema);
 export const entityMergeConverter = createConverter(entityMergeSchema);
 export const canonicalClaimConverter = createConverter(canonicalClaimSchema);
+/** Converter for `canonicalClaims/{claimId}/versions/{versionId}` (append-only subcollection). */
+export const claimVersionConverter = createConverter(claimVersionSchema);
 export const claimEvidenceLinkConverter = createConverter(claimEvidenceLinkSchema);
 export const sourceOrganizationConverter = createConverter(sourceOrganizationSchema);
 export const sourceDomainConverter = createConverter(sourceDomainSchema);
@@ -144,12 +181,14 @@ export const outboxMessageConverter = createConverter(outboxMessageSchema);
 export const idempotencyRecordConverter = createConverter(idempotencyRecordSchema);
 export const outboxConsumerReceiptConverter = createConverter(outboxConsumerReceiptSchema);
 export const killSwitchConverter = createConverter(killSwitchSchema);
+export const discoveryCampaignRunConverter = createConverter(discoveryCampaignRunSchema);
 
 export type {
   AuditEventDoc,
   CanonicalClaimDoc,
   CanonicalEntityDoc,
   ClaimEvidenceLinkDoc,
+  ClaimVersionDoc,
   EntityLocationDoc,
   EntityMergeDoc,
   EntityRelationshipDoc,
@@ -157,6 +196,7 @@ export type {
   EvidenceRecordDoc,
   EvidenceSourceDoc,
   IdempotencyRecordDoc,
+  DiscoveryCampaignRunDoc,
   KillSwitchDoc,
   OutboxConsumerReceiptDoc,
   OutboxMessageDoc,

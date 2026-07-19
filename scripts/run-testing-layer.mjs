@@ -1,6 +1,6 @@
 
 /**
- * Runs Node.js test files for @black-book/testing by layer.
+ * Runs Node.js test files for @repo/testing by layer.
  * Usage: node scripts/run-testing-layer.mjs <layer>
  * Layers: unit | contract | security | a11y | release-gates | integration | migration | e2e | all | coverage
  */

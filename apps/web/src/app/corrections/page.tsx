@@ -3,33 +3,30 @@
  * intake tied to entity/claim/source/location targets, with privacy notice and receipt codes.
  */
 import { Suspense } from 'react';
-import { EmptyState, Notice } from '@black-book/ui';
-import { SeedDataNotice } from '../../components/SeedDataNotice';
+import { EmptyState, Notice } from '@repo/ui';
 import { CorrectionForm } from './CorrectionForm';
 import { CORRECTION_FORM_INTRO, CORRECTION_PRIVACY_NOTICE } from './copy';
 
 export const metadata = {
   title: 'Corrections',
-  description: 'Challenge or correct a published Black Book record through moderated review.',
+  description: 'Challenge or correct a published BlackStory record through moderated review.',
 };
 
 export default function CorrectionsPage() {
   return (
-    <main className="bb-container bb-page" id="main">
-      <p className="bb-page__eyebrow">Trust</p>
-      <h1 className="bb-page__title">Corrections</h1>
-      <p className="bb-page__lede">{CORRECTION_FORM_INTRO}</p>
+    <main className="ds-container ds-page" id="main">
+      <p className="ds-page__eyebrow">Trust</p>
+      <h1 className="ds-page__title">Corrections</h1>
+      <p className="ds-page__lede">{CORRECTION_FORM_INTRO}</p>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-6)' }}>
-        <SeedDataNotice compact />
-
+      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
         <Notice tone="warning" title="This is not a public post">
-          Corrections enter a restricted quarantine queue (BB-029) for human review. Nothing you
-          submit changes the public record until it passes independent review and promotion controls
-          (BB-032). {CORRECTION_PRIVACY_NOTICE.body}
+          Corrections enter a restricted quarantine queue for human review. Nothing you
+          submit changes the public record until it passes independent review and promotion
+          controls. {CORRECTION_PRIVACY_NOTICE.body}
         </Notice>
 
-        <Suspense fallback={<p className="bb-sans">Loading correction form…</p>}>
+        <Suspense fallback={<p className="ds-sans">Loading correction form…</p>}>
           <CorrectionForm />
         </Suspense>
 

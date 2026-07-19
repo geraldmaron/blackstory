@@ -1,7 +1,7 @@
 
 /**
- * Firebase client and Admin helpers shared across Black Book surfaces.
- * Production project:. Local defaults: demo-black-book emulators.
+ * Firebase client and Admin helpers shared across BlackStory surfaces.
+ * Production project:. Local defaults: demo-repo emulators.
  */
 export {
   ADMIN_APP_ID,
@@ -82,7 +82,12 @@ export { createAdminFirebaseClient } from './admin-client.js';
 export type { AdminFirebaseClient } from './admin-client.js';
 export * from './admin-auth.js';
 
-export { createServerFirebaseApp, getServerFirebaseApp, getServerFirestore } from './server.js';
+export {
+  createServerFirebaseApp,
+  ensureGoogleCloudQuotaProject,
+  getServerFirebaseApp,
+  getServerFirestore,
+} from './server.js';
 export type { ServerFirebaseApp } from './server.js';
 
 export {
@@ -111,6 +116,14 @@ export {
   connectionStrengthSchema,
   canonicalClaimSchema,
   claimEvidenceLinkSchema,
+  volatilityClassSchema,
+  reviewIntervalSchema,
+  verificationPolicySchema,
+  verificationStatusSchema,
+  verificationSubjectTypeSchema,
+  verificationStateSchema,
+  candidateUpdateStatusSchema,
+  candidateUpdateSchema,
   contentHashSchema,
   rightsStatusSchema,
   publicationPermissionSchema,
@@ -128,6 +141,7 @@ export {
   publicationReleaseSchema,
   publicActiveReleaseSchema,
   publicEntityProjectionSchema,
+  publicSearchIndexSchema,
   submissionInboxSchema,
   auditActorSchema,
   auditSubjectSchema,
@@ -136,6 +150,7 @@ export {
   idempotencyRecordSchema,
   outboxConsumerReceiptSchema,
   killSwitchSchema,
+  discoveryCampaignRunSchema,
   parseWithSchema,
   policyActiveConverter,
   policyVersionConverter,
@@ -144,6 +159,7 @@ export {
   entityRelationshipConverter,
   entityMergeConverter,
   canonicalClaimConverter,
+  claimVersionConverter,
   claimEvidenceLinkConverter,
   sourceOrganizationConverter,
   sourceDomainConverter,
@@ -160,12 +176,19 @@ export {
   DEFAULT_PUBLIC_MEDIA_BUCKET,
   entityPrimaryImageObjectPath,
   entityPrimaryImageObjectRef,
+  buildReleaseCatalogArtifacts,
+  publicMediaObjectUrl,
+  publicReleaseEntitiesListPath,
+  publicReleaseSearchIndexPath,
+  writeReleaseCatalogArtifactsToDir,
+  uploadReleaseCatalogArtifacts,
   submissionInboxConverter,
   auditEventConverter,
   outboxMessageConverter,
   idempotencyRecordConverter,
   outboxConsumerReceiptConverter,
   killSwitchConverter,
+  discoveryCampaignRunConverter,
   createAdminAtomicStore,
   commitWithAudit,
   consumeOutboxMessage,
@@ -185,6 +208,36 @@ export {
   executeAuthorizedResearchCaseTransition,
   executeAuthorizedResearchCaseAction,
 } from './firestore/index.js';
+export {
+  DISCOVERY_CAMPAIGN_RUN_STATUSES,
+  DISCOVERY_CAMPAIGN_RUN_MODES,
+  RESEARCH_CAMPAIGNS_KILL_SWITCH_ID,
+  buildDiscoveryCampaignRunDoc,
+  assertDiscoveryRunCannotPublish,
+  createInMemoryDiscoveryCampaignRunStore,
+  isKillSwitchEngagedFromDoc,
+  isResearchCampaignsKillSwitchEngaged,
+  fetchResearchCampaignsKillSwitch,
+  isResearchCampaignsKillSwitchEngagedIn,
+  DISCOVERY_CATALOG_PROFILE_DEFAULT_MAX,
+  resolutionProfileFromCatalogLeaf,
+  resolutionProfileFromPublicSearchIndex,
+  publicSearchIndexDocFromRow,
+  loadDiscoveryCatalogProfiles,
+  createPublicSearchIndexCatalogPager,
+  createFirestorePublicSearchIndexCatalogPager,
+} from './discovery/index.js';
+export type {
+  DiscoveryCampaignRunStatus,
+  DiscoveryCampaignRunMode,
+  BuildDiscoveryCampaignRunInput,
+  DiscoveryCampaignRunStore,
+  KillSwitchDocSnapshot,
+  DocGetter,
+  DiscoveryCatalogLeaf,
+  DiscoveryCatalogPage,
+  DiscoveryCatalogPager,
+} from './discovery/index.js';
 export {
   EMBEDDING_MODEL,
   EMBEDDING_DIMS,
@@ -223,6 +276,11 @@ export {
   runBackfill,
   createFirestoreCanonicalEntitySource,
   createFirestoreExistingHashLookup,
+  createFirestorePublicSearchIndexEntitySource,
+  createNationalCatalogFixtureEntitySource,
+  mapSearchIndexRecordToEmbeddingInput,
+  mapCatalogFixtureRecordToEmbeddingInput,
+  parseStateCodeFromJurisdiction,
 } from './embeddings/index.js';
 export type {
   EmbeddingVector,
@@ -245,9 +303,12 @@ export type {
   VectorIndexStore,
   BackfillOptions,
   BackfillSummary,
+  BackfillEntitySourceName,
   CanonicalEntitySource,
   CanonicalEntitySourcePage,
   ExistingEmbeddingHashLookup,
+  SearchIndexEmbeddingRecord,
+  CatalogFixtureEmbeddingRecord,
 } from './embeddings/index.js';
 export type {
   FirestoreRootCollection,
@@ -266,6 +327,14 @@ export type {
   ClaimVersionDoc,
   CanonicalClaimDoc,
   ClaimEvidenceLinkDoc,
+  VolatilityClassDoc,
+  ReviewIntervalDoc,
+  VerificationPolicyDoc,
+  VerificationStatusDoc,
+  VerificationSubjectTypeDoc,
+  VerificationStateDoc,
+  CandidateUpdateStatusDoc,
+  CandidateUpdateDoc,
   PolicyActiveDoc,
   PolicyVersionDoc,
   CanonicalEntityDoc,
@@ -283,12 +352,14 @@ export type {
   PublicationReleaseDoc,
   PublicActiveReleaseDoc,
   PublicEntityProjectionDoc,
+  PublicSearchIndexDoc,
   SubmissionInboxDoc,
   AuditEventDoc,
   OutboxMessageDoc,
   IdempotencyRecordDoc,
   OutboxConsumerReceiptDoc,
   KillSwitchDoc,
+  DiscoveryCampaignRunDoc,
   AtomicSnapshot,
   AtomicTransaction,
   AtomicStore,
@@ -308,4 +379,60 @@ export type {
   PromoteClaimResult,
   ResearchCaseServerAction,
   ServerResearchCaseState,
+  BuiltReleaseCatalogArtifacts,
+  ReleaseEntitiesListArtifact,
+  ReleaseSearchIndexArtifact,
 } from './firestore/index.js';
+
+// Census/ACS/FBI-UCR national-rollup readers for the public /data page (the related workstream,
+// the related workstream). Admin-SDK aggregate reads only — never a per-record dump. holcAreas is
+// deliberately absent here; its CC BY-NC-SA rights gate excludes it from every public reader.
+export {
+  getNationalPopulationByDecade,
+  getNationalPopulationChanges,
+  getStatePopulationByDecade,
+  getStatePopulationChanges,
+  getAcsCoverageSummary,
+  getHateCrimeYearSummary,
+  getHateCrimeYearSummaries,
+  hateCrimeAntiBlackShare,
+  getOpportunityAtlasCoverageSummary,
+  aggregateOpportunityAtlasCoverage,
+  buildStateFipsNameMap,
+  resolveStateFipsName,
+  publicSourceUrl,
+  POPULATION_DECADE_COMPARABILITY_NOTE,
+  US_TERRITORY_FIPS_NAMES,
+  OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS,
+  KFR_BLACK_P25_HISTOGRAM_BINS,
+  aggregateCountiesByState,
+  computePopulationDecadeChange,
+  computeStatePopulationChange,
+  computeNationalPopulationChangesFromDecades,
+  computeStatePopulationChangesFromDecades,
+} from './demographics/national-stats.js';
+export type {
+  NationalPopulationByDecade,
+  PopulationDecadeChange,
+  StatePopulationByDecade,
+  StatePopulationChange,
+  AcsCoverageSummary,
+  HateCrimeYearSummary,
+  OpportunityAtlasCoverageSummary,
+  OpportunityAtlasOutcomeFieldCoverage,
+  OpportunityAtlasHistogramBin,
+} from './demographics/national-stats.js';
+export {
+  censusCountyDecadeSchema,
+  censusCountyDecadeDecadeSchema,
+  censusCountyDecadeId,
+  parseCensusCountyDecadeDoc,
+  acsCountyProfileSchema,
+  acsTractProfileSchema,
+} from './demographics/schema.js';
+export type {
+  CensusCountyDecadeDoc,
+  CensusCountyDecadeDecade,
+  AcsCountyProfileDoc,
+  AcsTractProfileDoc,
+} from './demographics/schema.js';

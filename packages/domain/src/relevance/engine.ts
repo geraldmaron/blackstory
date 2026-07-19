@@ -1,8 +1,8 @@
 /**
  * Deterministic relevance engine orchestration.
  */
-import { evaluateRelevance, loadProductConstitution } from '@black-book/schemas';
-import type { ProductConstitution } from '@black-book/schemas';
+import { evaluateRelevance, loadProductConstitution } from '@repo/schemas';
+import type { ProductConstitution } from '@repo/schemas';
 import { deriveProvisionalDecision } from './decisions.js';
 import { composeCompositeScore, extractRelevanceFeatures } from './dimensions.js';
 import {

@@ -1,14 +1,15 @@
 /**
  * Individual myth review page the ONLY pages that emit schema.org ClaimReview markup.
  */
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
   HowToReadThisRecord,
   MythClaimReviewScript,
   PublishingPrinciplesJsonLdScript,
   TrustSiteJsonLdScript,
-} from '../../../components/trust/index.js';
-import { getMythReview } from '../../../lib/trust/myths-seed.js';
+} from '../../../components/trust/index';
+import { getMythReview } from '../../../lib/trust/myths-seed';
 
 type MythPageProps = {
   readonly params: Promise<{ readonly slug: string }>;
@@ -36,7 +37,7 @@ export default async function MythReviewPage({ params }: MythPageProps) {
   const pagePath = `/myths/${slug}`;
 
   return (
-    <main className="bb-container bb-page" id="main">
+    <main className="ds-container ds-page" id="main">
       <TrustSiteJsonLdScript />
       <PublishingPrinciplesJsonLdScript pagePath={pagePath} pageTitle={review.title} />
       <MythClaimReviewScript
@@ -49,28 +50,28 @@ export default async function MythReviewPage({ params }: MythPageProps) {
         ratingExplanation={review.ratingExplanation}
         authorName={review.authorName}
       />
-      <p className="bb-page__eyebrow">Claim review</p>
-      <h1 className="bb-page__title">{review.title}</h1>
-      <p className="bb-sans" style={{ color: 'var(--bb-ink-muted)' }}>
+      <p className="ds-page__eyebrow">Claim review</p>
+      <h1 className="ds-page__title">{review.title}</h1>
+      <p className="ds-sans" style={{ color: 'var(--ds-ink-muted)' }}>
         Technique: {review.technique} · Rating: {review.ratingExplanation}
       </p>
 
-      <div className="bb-stack" style={{ marginTop: 'var(--bb-space-8)' }}>
-        <section className="bb-section" aria-labelledby="claim-reviewed" style={{ paddingTop: 0 }}>
-          <h2 className="bb-section__title" id="claim-reviewed">
+      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-8)' }}>
+        <section className="ds-section" aria-labelledby="claim-reviewed" style={{ paddingTop: 0 }}>
+          <h2 className="ds-section__title" id="claim-reviewed">
             Circulating claim
           </h2>
           <blockquote
-            className="bb-sans"
+            className="ds-sans"
             style={{
               margin: 0,
-              paddingLeft: 'var(--bb-space-4)',
-              borderLeft: '2px solid var(--bb-border)',
+              paddingLeft: 'var(--ds-space-4)',
+              borderLeft: 'var(--ds-border-width-strong) solid var(--ds-border)',
             }}
           >
             {review.claimReviewed}
           </blockquote>
-          <p className="bb-sans" style={{ marginTop: 'var(--bb-space-3)', color: 'var(--bb-ink-muted)' }}>
+          <p className="ds-sans" style={{ marginTop: 'var(--ds-space-3)', color: 'var(--ds-ink-muted)' }}>
             Attributed origin: {review.claimOrigin.name}
             {review.claimOrigin.url ? (
               <>
@@ -84,19 +85,19 @@ export default async function MythReviewPage({ params }: MythPageProps) {
           </p>
         </section>
 
-        <section className="bb-section" aria-labelledby="review-body">
-          <h2 className="bb-section__title" id="review-body">
+        <section className="ds-section" aria-labelledby="review-body">
+          <h2 className="ds-section__title" id="review-body">
             What the record shows
           </h2>
-          <p className="bb-section__lede">{review.reviewBody}</p>
+          <p className="ds-section__lede">{review.reviewBody}</p>
           {review.relatedFactUrl ? (
-            <p className="bb-sans">
-              <a href={review.relatedFactUrl}>Read the canonical fact record</a>
+            <p className="ds-sans">
+              <Link href={review.relatedFactUrl}>Read the canonical fact record</Link>
             </p>
           ) : null}
         </section>
 
-        <section className="bb-section" aria-labelledby="how-to-verify">
+        <section className="ds-section" aria-labelledby="how-to-verify">
           <HowToReadThisRecord />
         </section>
       </div>

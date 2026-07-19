@@ -33,7 +33,7 @@ test('explicit alternate values are preserved even when the disputed flag is abs
   assert.equal(view.alternates[0]?.value, '1868');
 });
 
-test('a full BB-017 ContradictionSet preserves every non-primary value, never collapsing to one answer', () => {
+test('a full ContradictionSet preserves every non-primary value, never collapsing to one answer', () => {
   const view = buildDisputeViewFromContradictionSet({
     claimId: 'claim_seed_001',
     primaryValue: '1867',

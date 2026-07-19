@@ -5,13 +5,13 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { AppError, createLogger, type LogContext } from '@black-book/observability';
+import { AppError, createLogger, type LogContext } from '@repo/observability';
 import { createSensitiveDataRedactor } from './index.ts';
 
 function wiredLogger(lines: string[]) {
   const redactor = createSensitiveDataRedactor();
   return createLogger({
-    service: 'bb-015-test',
+    service: 'ds-015-test',
     clock: () => new Date('2026-01-01T00:00:00.000Z'),
     sink: (line) => lines.push(line),
     redact: (record: LogContext) => redactor(record) as LogContext,

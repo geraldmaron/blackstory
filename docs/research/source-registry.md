@@ -1,8 +1,8 @@
-# Source registry and adapter contract (BB-037)
+# Source registry and adapter contract
 
 Contract-layer API for registering source adapters, approving policies, and gating research runs. Persistence is in-memory in this bead; Firestore wiring follows in a later bead.
 
-## Domain API (`@black-book/domain` → `adapters/`)
+## Domain API (`@repo/domain` → `adapters/`)
 
 Parent agent merges `packages/domain/src/adapters/index.ts` into the package barrel.
 
@@ -38,10 +38,10 @@ Domain validation enforces the same shape via `ADAPTER_CANDIDATE_SCHEMA_VERSION`
 
 ## Deferred (not this bead)
 
-- **Admin registry UI** — BB-056 Administration and research console
+- **Admin registry UI** —  Administration and research console
 - **Live Firestore persistence** — `SourceRegistryStore` interface only; implement against `evidenceSources`
 - **HTTP admin API** — register/approve endpoints on admin service
-- **Telemetry alerts** — parser drift metrics recorded here; alerting in BB-034
+- **Telemetry alerts** — parser drift metrics recorded here; alerting in
 
 ## Acceptance mapping
 

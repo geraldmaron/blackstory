@@ -6,7 +6,13 @@
  * state of the record, never as an absence of history.
  */
 
-export type RecordGapKind = 'claims' | 'related' | 'timeline' | 'statusHistory' | 'context';
+export type RecordGapKind =
+  | 'claims'
+  | 'related'
+  | 'timeline'
+  | 'statusHistory'
+  | 'context'
+  | 'relevance';
 
 export type RecordGapCopy = {
   readonly title: string;
@@ -41,5 +47,12 @@ export const RECORD_GAP_COPY: Readonly<Record<RecordGapKind, RecordGapCopy>> = {
     body:
       'Framing prose for this record has not been published yet. Accepted claims below remain ' +
       'the sourced factual layer when available.',
+  },
+  relevance: {
+    title: 'Relevance basis pending',
+    body:
+      'A substantiated notability basis has not been published for this record yet, so the ' +
+      '"why this appears" explanation is withheld rather than asserted (the fail-closed rule). ' +
+      'The documented claims and connections below still carry the record.',
   },
 };

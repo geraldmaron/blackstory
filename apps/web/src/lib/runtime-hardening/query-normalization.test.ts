@@ -29,14 +29,14 @@ test('normalizeQueryString keeps only allowlisted /search params', () => {
 
 test('normalizeQueryString strips all params on entity routes', () => {
   assert.equal(
-    normalizeQueryString('/entity/ent_seed_place_001', { utm_campaign: 'x', ref: 'y' }),
+    normalizeQueryString('/entity/ent_15th_st_church_001', { utm_campaign: 'x', ref: 'y' }),
     '',
   );
 });
 
 test('random query params do not change entity cache keys', () => {
-  const key = buildPublicPageCacheKey('/entity/ent_seed_place_001', { utm_source: 'x' });
-  assert.equal(key, '/entity/ent_seed_place_001');
+  const key = buildPublicPageCacheKey('/entity/ent_15th_st_church_001', { utm_source: 'x' });
+  assert.equal(key, '/entity/ent_15th_st_church_001');
 });
 
 test('search cache keys ignore tracking params', () => {
@@ -47,7 +47,7 @@ test('search cache keys ignore tracking params', () => {
 });
 
 test('buildEntityCacheKey is stable', () => {
-  assert.equal(buildEntityCacheKey('ent_seed_school_001'), '/entity/ent_seed_school_001');
+  assert.equal(buildEntityCacheKey('ent_dunbar_school_001'), '/entity/ent_dunbar_school_001');
 });
 
 test('needsQueryNormalizationRedirect detects tracking params', () => {
@@ -74,30 +74,82 @@ test('normalizeSearchParamsRecord returns trimmed filter bag', () => {
 
 test('normalizeQueryString keeps allowlisted /explore map params', () => {
   const qs = normalizeQueryString('/explore', {
-    era: '1950s',
+    era: '1970s',
     kind: 'school',
     lat: '38.9',
     lng: '-77.0',
     zoom: '6',
-    selected: 'ent_seed_school_001',
-    density: '1',
+    selected: 'ent_dunbar_school_001',
+    layerMode: 'presence',
+    state: 'DC',
+    group: '1',
+    lines: '1',
+    decade: '1970s',
+    edge: 'rel_landmark_occurred_at_school',
     utm_source: 'x',
     junk: '1',
   });
   assert.equal(
     qs,
-    'density=1&era=1950s&kind=school&lat=38.9&lng=-77.0&selected=ent_seed_school_001&zoom=6',
+    'era=1970s&kind=school&lat=38.9000&lng=-77.0000&zoom=6.00&selected=ent_dunbar_school_001&state=DC&layerMode=presence&group=1&lines=1&decade=1970s&edge=rel_landmark_occurred_at_school',
   );
+});
+
+test('normalizeQueryString preserves /explore?state= revisit links (homepage chips)', () => {
+  assert.equal(normalizeQueryString('/explore', { state: 'dc' }), 'state=DC');
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/explore?state=DC')),
+    false,
+  );
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/explore?state=DC&utm_source=x')),
+    true,
+  );
+});
+
+test('normalizeQueryString canonicalizes explore layerMode and viewport precision', () => {
+  const qs = normalizeQueryString('/explore', {
+    density: 'true',
+    lat: '38.90721234',
+    lng: '-77.03691234',
+    zoom: '11.555',
+  });
+  assert.equal(qs, 'lat=38.9072&lng=-77.0369&zoom=11.55&layerMode=presence');
 });
 
 test('normalizeQueryString keeps allowlisted /history browse params', () => {
   const qs = normalizeQueryString('/history', {
-    decade: '1950s',
+    decade: '1970s',
     kind: 'event',
-    selected: 'ent_seed_event_001',
+    q: 'dunbar',
+    sort: 'connections',
+    selected: 'ent_dc_landmark_listing_1975',
     edge: 'edge_1',
     fbclid: 'abc',
     junk: '1',
   });
-  assert.equal(qs, 'decade=1950s&edge=edge_1&kind=event&selected=ent_seed_event_001');
+  assert.equal(
+    qs,
+    'decade=1970s&kind=event&q=dunbar&sort=connections&selected=ent_dc_landmark_listing_1975&edge=edge_1',
+  );
+});
+
+test('normalizeQueryString keeps allowlisted /facts library params', () => {
+  const qs = normalizeQueryString('/facts', {
+    q: ' school ',
+    claimType: 'founding',
+    confidence: 'high',
+    offset: '20',
+    utm_source: 'newsletter',
+    junk: '1',
+  });
+  assert.equal(qs, 'claimType=founding&confidence=high&offset=20&q=school');
+});
+
+test('buildNormalizedUrl issues canonical /explore URLs for revisit', () => {
+  const normalized = buildNormalizedUrl(
+    new URL('https://example.com/explore?utm_source=x&state=va&group=true&lines=1'),
+  );
+  assert.equal(normalized.pathname, '/explore');
+  assert.equal(normalized.search, '?state=VA&group=1&lines=1');
 });

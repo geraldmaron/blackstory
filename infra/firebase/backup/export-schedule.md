@@ -73,7 +73,7 @@ PITR does **not** replace signed release manifest verification or Storage object
 
 ## Staging restore (no production secrets)
 
-Quarterly drills restore into an isolated staging Firestore database (or `demo-black-book` emulator
+Quarterly drills restore into an isolated staging Firestore database (or `demo-repo` emulator
 fixtures for CI) using:
 
 1. Export URI from weekly full (not production API keys).

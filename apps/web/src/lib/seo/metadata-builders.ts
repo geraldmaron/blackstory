@@ -57,10 +57,10 @@ export function buildStaticPageMetadata(source: StaticPageMetadataSource): Metad
  */
 export function buildEntityPageMetadata(source: EntityMetadataSource): Metadata {
   const safe = stripProtectedFields(source);
-  const title = sanitizePreviewText(safe.displayName, 'Black Book record');
+  const title = sanitizePreviewText(safe.displayName, 'BlackStory record');
   const description = sanitizePreviewText(
     safe.summary,
-    `Published ${safe.kind ?? 'record'} in the Black Book public catalog.`,
+    `Published ${safe.kind ?? 'record'} in the BlackStory public catalog.`,
   );
   const preview = buildPublicMetadataPreview({
     title,
@@ -77,7 +77,7 @@ export function buildEntityPageMetadata(source: EntityMetadataSource): Metadata 
  * Pure preview shape for tests and non-Next consumers.
  */
 export function buildPublicMetadataPreview(input: MetadataPreviewInput): PublicMetadataPreview {
-  const title = sanitizePreviewText(input.title, 'Black Book');
+  const title = sanitizePreviewText(input.title, 'BlackStory');
   const description = sanitizePreviewText(
     input.description,
     'Place-connected Black history research with published claims, provenance, and confidence.',

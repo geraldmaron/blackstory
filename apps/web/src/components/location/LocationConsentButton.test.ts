@@ -14,10 +14,10 @@ import { LocationConsentButton } from './LocationConsentButton';
 
 const { createElement } = React;
 
-// Workaround for a pre-existing gap in `@black-book/ui`'s Button.tsx/FilterBar.tsx (unlike
+// Workaround for a pre-existing gap in `@repo/ui`'s Button.tsx/FilterBar.tsx (unlike
 // Notice.tsx/EmptyState.tsx in the same package, they don't import React for cross-transpile
 // safety under a classic JSX runtime — see this app's `test` script, which resolves
-// `@black-book/ui` through its `development` package-export condition straight to `.tsx` source).
+// `@repo/ui` through its `development` package-export condition straight to `.tsx` source).
 // Binding the global here is test-only.
 (globalThis as Record<string, unknown>).React = React;
 
