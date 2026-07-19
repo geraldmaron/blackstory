@@ -58,6 +58,12 @@ GEMINI_API_KEY=… APP_FIREBASE_ALLOW_PRODUCTION=1 FIREBASE_PROJECT_ID=black-boo
 
 Providers: `mock` (default), `openrouter`, `ollama`, `hybrid`. Pass `--model openrouter/free`
 and optional `--ollama-model qwen3:8b` / `--concurrency N` when not using mock.
+When `--model` is omitted, openrouter/hybrid default to `openrouter/free` and ollama to
+`qwen3:8b` (so live providers no longer accidentally request `mock-editorial-v1`).
+
+With `--output path.json`, each finished subject also appends one NDJSON line to
+`path.json.progress.ndjson` and prints the same line on stderr (`enrichment.progress.v1`)
+so long runs show keep/reject/errors without waiting for the final summary.
 
 Enrichment is the same judge with result kind `enrichment.run.v1`:
 

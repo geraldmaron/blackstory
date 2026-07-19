@@ -399,8 +399,9 @@ test('enrichment-run --output writes full JSON sync and prints compact stdout su
     },
   );
   assert.equal(code, 0, out.errors.join('\n'));
-  assert.equal(written.length, 1);
-  assert.equal(written[0]?.path, outputPath);
+  assert.equal(written.length, 2);
+  assert.equal(written[0]?.path, `${outputPath}.progress.ndjson`);
+  assert.equal(written[1]?.path, outputPath);
   const filePayload = JSON.parse(readFileSync(outputPath, 'utf8'));
   assert.equal(filePayload.kind, 'enrichment.run.v1');
   assert.equal(filePayload.items.length, 1);
@@ -408,4 +409,9 @@ test('enrichment-run --output writes full JSON sync and prints compact stdout su
   const summary = JSON.parse(out.lines[0] ?? '{}');
   assert.equal(summary.itemCount, 1);
   assert.ok(summary.kind === 'enrichment.run.v1' || summary.itemCount === 1);
+  assert.ok(
+    out.errors.some((line) => line.includes('"kind":"enrichment.progress.v1"')),
+    `expected progress on stderr, got: ${out.errors.join('\n')}`,
+  );
+  assert.match(readFileSync(`${outputPath}.progress.ndjson`, 'utf8'), /enrichment\.progress\.v1/);
 });

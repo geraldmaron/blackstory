@@ -119,6 +119,7 @@ export {
   runEditorialJudge,
   type EditorialRunInput,
   type EditorialRunResult,
+  type EditorialProgressEvent,
   type EditorialSubject,
   type EditorialCatalogEntity,
 } from './editorial-run.js';

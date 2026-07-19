@@ -12,7 +12,7 @@
  * `--publish`, `--approve`, or `--promote` flag anywhere in this CLI see
  * `promotion-boundary.test.ts`.
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
 import type { RelationshipRole, RelationshipType } from '@repo/domain';
 import type { AtomicStore } from '@repo/firebase';
 import type { SafeFetchDependencies } from '@repo/security/url-safety';
@@ -32,12 +32,16 @@ import {
   runCommunityObscurityOperatorCampaign,
 } from './community-obscurity-run.js';
 import { runRssOperatorCampaign } from './rss-campaign-run.js';
-import { dispatchDiscoveryCampaign } from '../../config/src/scheduled-jobs/discovery-dispatcher.js';
+import { dispatchDiscoveryCampaign } from '@repo/config/scheduled-jobs';
 import {
   loadEditorialCatalogFromFirestore,
   mergeJsonCatalogOverFirestore,
 } from './editorial-catalog-firestore.js';
-import { runEditorialJudge, type EditorialCatalogEntity } from './editorial-run.js';
+import {
+  runEditorialJudge,
+  type EditorialCatalogEntity,
+  type EditorialProgressEvent,
+} from './editorial-run.js';
 import { prepareEditorialPacketIntake } from './editorial-intake.js';
 import { runEnrichmentJudge } from './enrichment-run.js';
 import { createLlmProvider } from './llm-provider.js';
@@ -66,6 +70,8 @@ export type CliDependencies = {
   readonly readFile?: (path: string) => string;
   /** Sync file writer used by `--output` (defaults to `writeFileSync`). */
   readonly writeFile?: (path: string, contents: string) => void;
+  /** Sync append used for streaming progress NDJSON (defaults to `appendFileSync`). */
+  readonly appendFile?: (path: string, contents: string) => void;
   /** Lazily builds a real Firestore-backed store when `--commit` is set and no `store` is injected. */
   readonly createLiveStore?: () => Promise<AtomicStore>;
   /** Overrides the real DNS/HTTP dependencies `research-intake` passes to `runQuickAddFetch`. */
@@ -130,6 +136,47 @@ function requireFlag(flags: Flags, name: string): string {
 
 function optionalFlag(flags: Flags, name: string): string | undefined {
   return flags.values.get(name);
+}
+
+/** Default completion model when `--model` is omitted for a live LLM provider. */
+function defaultModelForProvider(
+  providerName: 'mock' | 'openrouter' | 'ollama' | 'hybrid',
+  ollamaModel: string | undefined,
+): string {
+  switch (providerName) {
+    case 'openrouter':
+    case 'hybrid':
+      return process.env.OPENROUTER_MODEL ?? 'openrouter/free';
+    case 'ollama':
+      return ollamaModel ?? process.env.OLLAMA_MODEL ?? 'qwen3:8b';
+    case 'mock':
+    default:
+      return 'mock-editorial-v1';
+  }
+}
+
+function emitEditorialProgress(options: {
+  readonly event: EditorialProgressEvent;
+  readonly stderr: (line: string) => void;
+  readonly appendFile: (path: string, contents: string) => void;
+  readonly progressPath?: string;
+}): void {
+  const line = JSON.stringify({
+    kind: 'enrichment.progress.v1',
+    completed: options.event.completed,
+    total: options.event.total,
+    index: options.event.index,
+    subjectId: options.event.subjectId,
+    title: options.event.title,
+    decision: options.event.decision,
+    ...(options.event.error !== undefined ? { error: options.event.error.slice(0, 240) } : {}),
+    ...(options.event.servedBy !== undefined ? { servedBy: options.event.servedBy } : {}),
+    ...(options.event.modelId !== undefined ? { modelId: options.event.modelId } : {}),
+  });
+  options.stderr(line);
+  if (options.progressPath) {
+    options.appendFile(options.progressPath, `${line}\n`);
+  }
 }
 
 /**
@@ -291,6 +338,8 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
   const readFile = deps.readFile ?? ((path: string) => readFileSync(path, 'utf8'));
   const writeFile =
     deps.writeFile ?? ((path: string, contents: string) => writeFileSync(path, contents, 'utf8'));
+  const appendFile =
+    deps.appendFile ?? ((path: string, contents: string) => appendFileSync(path, contents, 'utf8'));
   const [command, ...rest] = argv;
 
   try {
@@ -710,8 +759,9 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         if (!['mock', 'openrouter', 'ollama', 'hybrid'].includes(providerName)) {
           throw new Error('--provider must be mock|openrouter|ollama|hybrid');
         }
-        const model = optionalFlag(flags, '--model');
         const ollamaModel = optionalFlag(flags, '--ollama-model');
+        const model =
+          optionalFlag(flags, '--model') ?? defaultModelForProvider(providerName, ollamaModel);
         const concurrencyRaw = optionalFlag(flags, '--concurrency');
         const concurrency = concurrencyRaw !== undefined ? Number(concurrencyRaw) : 1;
         if (!Number.isFinite(concurrency) || concurrency < 1) {
@@ -719,11 +769,16 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         }
         const provider = createLlmProvider({
           provider: providerName,
-          ...(model !== undefined ? { model } : {}),
+          model,
           ...(ollamaModel !== undefined ? { ollamaModel } : {}),
         });
         const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
         const identity = readOperatorIdentity(flags);
+        const outputPath = optionalFlag(flags, '--output');
+        const progressPath = outputPath ? `${outputPath}.progress.ndjson` : undefined;
+        if (progressPath) {
+          writeFile(progressPath, '');
+        }
         const runInput = {
           subjects: subjects.map((subject) => ({
             subjectId: subject.subjectId,
@@ -749,7 +804,15 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           nowIso,
           provider,
           concurrency,
-          ...(model !== undefined ? { model } : {}),
+          model,
+          onProgress: (event: EditorialProgressEvent) => {
+            emitEditorialProgress({
+              event,
+              stderr,
+              appendFile,
+              ...(progressPath !== undefined ? { progressPath } : {}),
+            });
+          },
         };
         const result =
           command === 'enrichment-run'

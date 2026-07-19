@@ -33,7 +33,25 @@ test('mapPool with concurrency 1 is sequential', async () => {
   assert.deepEqual(order, [1, 2, 3]);
 });
 
-test('mapPool returns empty for empty input', async () => {
-  const results = await mapPool([], async () => 1, { concurrency: 4 });
-  assert.deepEqual(results, []);
+test('mapPool onItemComplete fires after each item', async () => {
+  const seen: Array<{ result: number; index: number; total: number }> = [];
+  await mapPool(
+    [1, 2, 3],
+    async (n) => n * 10,
+    {
+      concurrency: 2,
+      onItemComplete: (result, index, total) => {
+        seen.push({ result, index, total });
+      },
+    },
+  );
+  assert.equal(seen.length, 3);
+  assert.deepEqual(
+    [...seen].sort((a, b) => a.index - b.index),
+    [
+      { result: 10, index: 0, total: 3 },
+      { result: 20, index: 1, total: 3 },
+      { result: 30, index: 2, total: 3 },
+    ],
+  );
 });

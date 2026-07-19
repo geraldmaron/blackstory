@@ -31,6 +31,18 @@ export type EditorialCatalogEntity = CatalogLinkTarget & {
   readonly vector?: EmbeddingVector;
 };
 
+export type EditorialProgressEvent = {
+  readonly index: number;
+  readonly total: number;
+  readonly completed: number;
+  readonly subjectId: string;
+  readonly title: string;
+  readonly decision: EditorialDecision;
+  readonly error?: string;
+  readonly servedBy?: string;
+  readonly modelId?: string;
+};
+
 export type EditorialRunInput = {
   readonly subjects: readonly EditorialSubject[];
   readonly catalog: readonly EditorialCatalogEntity[];
@@ -41,6 +53,8 @@ export type EditorialRunInput = {
   /** Bounded parallel subject workers (default 1 = sequential). */
   readonly concurrency?: number;
   readonly targetVectorBySubjectId?: ReadonlyMap<string, EmbeddingVector>;
+  /** Fired after each subject finishes so long batches can stream progress. */
+  readonly onProgress?: (event: EditorialProgressEvent) => void;
 };
 
 export type EditorialRunItem = {
@@ -269,6 +283,7 @@ export async function runEditorialJudge(input: EditorialRunInput): Promise<Edito
       ...(entry.displayName !== undefined ? { displayName: entry.displayName } : {}),
     }));
 
+  let completed = 0;
   const items = await mapPool(
     input.subjects,
     (subject) =>
@@ -285,7 +300,25 @@ export async function runEditorialJudge(input: EditorialRunInput): Promise<Edito
           ? { targetVectorBySubjectId: input.targetVectorBySubjectId }
           : {}),
       }),
-    { concurrency },
+    {
+      concurrency,
+      onItemComplete: (item, index, total) => {
+        completed += 1;
+        input.onProgress?.({
+          index,
+          total,
+          completed,
+          subjectId: item.packet.subjectId,
+          title: item.packet.subjectTitle,
+          decision: item.packet.decision,
+          ...(item.error !== undefined ? { error: item.error } : {}),
+          ...(item.servedBy !== undefined ? { servedBy: item.servedBy } : {}),
+          ...(item.packet.model.modelId !== undefined
+            ? { modelId: item.packet.model.modelId }
+            : {}),
+        });
+      },
+    },
   );
 
   return {
