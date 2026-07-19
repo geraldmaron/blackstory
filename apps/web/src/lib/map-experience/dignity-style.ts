@@ -80,7 +80,7 @@ export const DIGNITY_PALETTE = {
   streetDark: 'rgba(244, 239, 229, 0.38)',
   streetLabelDark: 'rgba(244, 239, 229, 0.55)',
   streetCasingLight: 'rgba(10, 10, 10, 0.18)',
-  streetLight: 'rgba(10, 10, 10, 0.32)',
+  streetLight: 'rgba(10, 10, 10, 0.22)',
   streetLabelLight: 'rgba(10, 10, 10, 0.55)',
 } as const;
 

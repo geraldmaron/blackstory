@@ -81,6 +81,119 @@ export {
 } from './explore-layer-ids';
 
 /**
+ * OpenMapTiles `transportation.class` width ladder — motorway heaviest down through residential
+ * (`minor`) to service/path/track fallback. Used inside zoom-interpolated street casing/fill so
+ * the grid orients without a uniform bold diagram stroke.
+ */
+type RoadClassWidths = {
+  readonly motorway: number;
+  readonly trunk: number;
+  readonly primary: number;
+  readonly secondary: number;
+  readonly tertiary: number;
+  readonly minor: number;
+  readonly fallback: number;
+};
+
+function roadClassWidthMatch(widths: RoadClassWidths): ExpressionSpecification {
+  return [
+    'match',
+    ['get', 'class'],
+    'motorway',
+    widths.motorway,
+    'trunk',
+    widths.trunk,
+    'primary',
+    widths.primary,
+    'secondary',
+    widths.secondary,
+    'tertiary',
+    widths.tertiary,
+    'minor',
+    widths.minor,
+    widths.fallback,
+  ] as unknown as ExpressionSpecification;
+}
+
+/** Street casing: muted hierarchy; z12≈1.8 / z14≈3.5 at trunk, thinner elsewhere. */
+function streetCasingWidthExpression(): ExpressionSpecification {
+  return [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    8,
+    roadClassWidthMatch({
+      motorway: 0.48,
+      trunk: 0.42,
+      primary: 0.36,
+      secondary: 0.26,
+      tertiary: 0.19,
+      minor: 0.14,
+      fallback: 0.1,
+    }),
+    12,
+    roadClassWidthMatch({
+      motorway: 2.06,
+      trunk: 1.8,
+      primary: 1.54,
+      secondary: 1.13,
+      tertiary: 0.82,
+      minor: 0.62,
+      fallback: 0.41,
+    }),
+    14,
+    roadClassWidthMatch({
+      motorway: 4,
+      trunk: 3.5,
+      primary: 3,
+      secondary: 2.2,
+      tertiary: 1.6,
+      minor: 1.2,
+      fallback: 0.8,
+    }),
+  ] as unknown as ExpressionSpecification;
+}
+
+/** Street fill: always thinner than casing at the same class; z12≈1.0 / z14≈2.0 at trunk. */
+function streetFillWidthExpression(): ExpressionSpecification {
+  return [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    8,
+    roadClassWidthMatch({
+      motorway: 0.28,
+      trunk: 0.23,
+      primary: 0.2,
+      secondary: 0.15,
+      tertiary: 0.11,
+      minor: 0.08,
+      fallback: 0.05,
+    }),
+    12,
+    roadClassWidthMatch({
+      motorway: 1.2,
+      trunk: 1.0,
+      primary: 0.85,
+      secondary: 0.63,
+      tertiary: 0.45,
+      minor: 0.35,
+      fallback: 0.23,
+    }),
+    14,
+    roadClassWidthMatch({
+      motorway: 2.4,
+      trunk: 2.0,
+      primary: 1.7,
+      secondary: 1.25,
+      tertiary: 0.9,
+      minor: 0.7,
+      fallback: 0.45,
+    }),
+  ] as unknown as ExpressionSpecification;
+}
+
+/**
  * Approximate meters-per-pixel at a given zoom under spherical Web Mercator, ignoring latitude
  * distortion (the same order of approximation this repo already uses for state bounding boxes
  * see `packages/domain/src/map/us-geography.ts`'s module doc "good enough for national-zoom …
@@ -326,17 +439,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': plate.streetCasing,
-          'line-width': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            8,
-            0.6,
-            12,
-            2.5,
-            14,
-            5,
-          ] as unknown as ExpressionSpecification,
+          'line-width': streetCasingWidthExpression(),
         },
       },
       {
@@ -349,17 +452,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': plate.street,
-          'line-width': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            8,
-            0.35,
-            12,
-            1.4,
-            14,
-            3,
-          ] as unknown as ExpressionSpecification,
+          'line-width': streetFillWidthExpression(),
         },
       },
       {

@@ -188,6 +188,70 @@ test('OpenFreeMap street layers are present for casing, fill, and labels', () =>
   assert.ok(style.layers.some((layer) => layer.id === 'explore-street-label'));
 });
 
+/** Pull the class→width match expression nested at a zoom stop inside a street line-width interpolate. */
+function streetWidthMatchAtZoom(lineWidth: unknown, zoom: number): unknown[] {
+  const expr = lineWidth as unknown[];
+  assert.equal(expr[0], 'interpolate');
+  assert.deepEqual(expr[2], ['zoom']);
+  const zoomIndex = expr.indexOf(zoom);
+  assert.ok(zoomIndex > 0, `expected zoom stop ${zoom} in street line-width`);
+  const match = expr[zoomIndex + 1] as unknown[];
+  assert.equal(match[0], 'match');
+  assert.deepEqual(match[1], ['get', 'class']);
+  return match;
+}
+
+function widthForClass(matchExpr: unknown[], roadClass: string): number {
+  const index = matchExpr.indexOf(roadClass);
+  assert.ok(index > 0, `expected class "${roadClass}" in road-class match`);
+  return matchExpr[index + 1] as number;
+}
+
+test('street casing and fill use muted zoom stops with motorway→minor class hierarchy', () => {
+  const style = buildStyleFixture('presence');
+  const casing = layerById(style, 'explore-street-casing');
+  const fill = layerById(style, 'explore-street-fill');
+  const casingZ14 = streetWidthMatchAtZoom(casing.paint?.['line-width'], 14);
+  const fillZ14 = streetWidthMatchAtZoom(fill.paint?.['line-width'], 14);
+  const casingZ12 = streetWidthMatchAtZoom(casing.paint?.['line-width'], 12);
+  const fillZ12 = streetWidthMatchAtZoom(fill.paint?.['line-width'], 12);
+
+  assert.equal(widthForClass(casingZ14, 'motorway'), 4);
+  assert.equal(widthForClass(casingZ14, 'trunk'), 3.5);
+  assert.equal(widthForClass(casingZ14, 'primary'), 3);
+  assert.equal(widthForClass(casingZ14, 'secondary'), 2.2);
+  assert.equal(widthForClass(casingZ14, 'tertiary'), 1.6);
+  assert.equal(widthForClass(casingZ14, 'minor'), 1.2);
+  assert.equal(casingZ14[casingZ14.length - 1], 0.8);
+
+  assert.equal(widthForClass(casingZ12, 'trunk'), 1.8);
+  assert.equal(widthForClass(fillZ12, 'trunk'), 1.0);
+  assert.equal(widthForClass(fillZ14, 'trunk'), 2.0);
+
+  // Fill stays thinner than casing at every named class (and the fallback).
+  for (const roadClass of ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'minor'] as const) {
+    assert.ok(
+      widthForClass(fillZ14, roadClass) < widthForClass(casingZ14, roadClass),
+      `${roadClass} fill must be thinner than casing at z14`,
+    );
+    assert.ok(
+      widthForClass(fillZ12, roadClass) < widthForClass(casingZ12, roadClass),
+      `${roadClass} fill must be thinner than casing at z12`,
+    );
+  }
+  assert.ok((fillZ14[fillZ14.length - 1] as number) < (casingZ14[casingZ14.length - 1] as number));
+
+  // Hierarchy: motorway > trunk > primary > secondary > tertiary > minor > fallback
+  const casingOrder = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'minor'] as const;
+  for (let i = 0; i < casingOrder.length - 1; i++) {
+    assert.ok(
+      widthForClass(casingZ14, casingOrder[i]!) > widthForClass(casingZ14, casingOrder[i + 1]!),
+      `casing z14 ${casingOrder[i]} must exceed ${casingOrder[i + 1]}`,
+    );
+  }
+  assert.ok(widthForClass(casingZ14, 'minor') > (casingZ14[casingZ14.length - 1] as number));
+});
+
 test('light colorScheme uses a white plate with brown state bounds and stone county lines', () => {
   const source = buildExploreMapSource(listPublicEntities());
   const dark = buildExploreMapStyle({
