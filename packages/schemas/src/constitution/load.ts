@@ -13,11 +13,23 @@ import {
   type ProductConstitution,
 } from './schema.js';
 
-const PACKAGE_ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
-export const CONSTITUTION_DIR = join(PACKAGE_ROOT, 'constitution');
-export const POLICY_V1_PATH = join(CONSTITUTION_DIR, 'policy.v1.json');
-export const CONSTITUTION_SCHEMA_PATH = join(CONSTITUTION_DIR, 'product-constitution.schema.json');
-export const FIXTURES_DIR = join(CONSTITUTION_DIR, 'fixtures');
+/** Prefer DISCOVERY_REPO_ROOT (Cloud Functions upload root) when the bundle inlines this module. */
+function resolveSchemasPackageRoot(): string {
+  const deployRoot = process.env.DISCOVERY_REPO_ROOT?.trim();
+  if (deployRoot !== undefined && deployRoot.length > 0) {
+    return join(deployRoot, 'packages', 'schemas');
+  }
+  return join(dirname(fileURLToPath(import.meta.url)), '../..');
+}
+
+function constitutionDir(): string {
+  return join(resolveSchemasPackageRoot(), 'constitution');
+}
+
+export const CONSTITUTION_DIR = constitutionDir();
+export const POLICY_V1_PATH = join(constitutionDir(), 'policy.v1.json');
+export const CONSTITUTION_SCHEMA_PATH = join(constitutionDir(), 'product-constitution.schema.json');
+export const FIXTURES_DIR = join(constitutionDir(), 'fixtures');
 
 const FIXTURE_FILES = {
   included: 'included.json',
@@ -41,7 +53,8 @@ export function loadProductConstitution(): ProductConstitution {
   if (cachedPolicy) {
     return cachedPolicy;
   }
-  const parsed = productConstitutionSchema.parse(readJsonFile(POLICY_V1_PATH));
+  const policyPath = join(constitutionDir(), 'policy.v1.json');
+  const parsed = productConstitutionSchema.parse(readJsonFile(policyPath));
   cachedPolicy = Object.freeze(structuredClone(parsed)) as ProductConstitution;
   return cachedPolicy;
 }
@@ -54,7 +67,7 @@ export function getPolicyVersion(policy: ProductConstitution = loadProductConsti
 /** Load a named constitution fixture used by evaluation tests.  */
 export function loadConstitutionFixture(kind: FixtureKind): ConstitutionFixture {
   const fileName = FIXTURE_FILES[kind];
-  return constitutionFixtureSchema.parse(readJsonFile(join(FIXTURES_DIR, fileName)));
+  return constitutionFixtureSchema.parse(readJsonFile(join(constitutionDir(), 'fixtures', fileName)));
 }
 
 /** Load all constitution fixtures (included, excluded, disputed, sparse, sensitive, living-person).  */

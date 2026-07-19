@@ -5,6 +5,7 @@
  * set DISCOVERY_MODE=live and inject feed/JSON env paths only after operator confirmation.
  * App Hosting must never host these functions.
  */
+import './env-bootstrap.js';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { runScheduledDiscovery } from './run-discovery.js';

@@ -87,6 +87,12 @@ export type DispatchDiscoveryCampaignInput = {
 const RESEARCH_CAMPAIGNS_KILL_SWITCH = 'research-campaigns' as const;
 
 function repoRootFromHere(): string {
+  // Cloud Functions / bundled deploy: set DISCOVERY_REPO_ROOT to the upload root that
+  // contains packages/domain/.../fixtures (see functions/scripts/build.mjs).
+  const fromEnv = process.env.DISCOVERY_REPO_ROOT?.trim();
+  if (fromEnv !== undefined && fromEnv.length > 0) {
+    return fromEnv;
+  }
   return join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 }
 
