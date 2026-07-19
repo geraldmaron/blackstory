@@ -235,14 +235,16 @@ modifier names, one definition site each, zero visual divergence.
    black-book-vxz) rides this same density channel only when its ingestion lands; no
    population claim renders before the data is real. Reduced motion starts paused on the
    complete archive; play stays available as a deliberate choice.
-2. *Start with your state (Orient):* first paper section. Native state `<select>` (51 entries,
-   zero-permission) + submit → `/explore?state=XX`; beside it the top states by record count
-   as one-tap chips; a quiet link to `/locate` for "use my location." One compact row on
-   desktop, stacked on mobile.
-3. *From the archive (Discover):* story rail — top-rule entries, mono KIND / STATE slug, Sora
+2. *About (Thesis):* first paper section. Product line ("History, pinned to place"), three
+   hairline pillars (presence / evidence / dignity), CTAs to Explore + `/about` + methodology.
+   Quiet state `<select>` + coverage chips + `/locate` remain as a secondary place path under
+   the thesis — not the lead headline.
+3. *From the data:* archive mono strip (records / states / era) plus national census
+   visualizations reused from `/data` (population by decade + share line + decade Δ strip)
+   with citations and a hand-off to the full modeling page. Hate-crime charts stay on `/data`
+   only (dignity).
+4. *From the archive (Discover):* story rail — top-rule entries, mono KIND / STATE slug, Sora
    record name, serif one-line story. 3-up desktop, stacked mobile.
-4. *The archive in numbers:* mono data strip — records pinned, states covered, era span —
-   hairline-separated, no boxes.
 5. *How this works (Trust):* single ink band (fixed charcoal, full-bleed, no radius): three
    numbered points (what qualifies, how confidence works, what stays off the map) in serif +
    one solid CTA to `/methodology`. Replaces v4's two separate standards/transparency sections.

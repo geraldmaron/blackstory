@@ -3,7 +3,7 @@
  * Shapes are book, pin, or arch only — never presented as a likeness of the entity.
  * Accessible names and captions stay honest about why a mark is shown.
  */
-import { sanitizePrimaryImageCreditForDisplay } from '@repo/domain';
+import { sanitizePrimaryImageCreditForDisplay } from '@repo/domain/adapters/wikimedia/commons-media';
 
 export const RECORD_MARK_SHAPES = ['book', 'pin', 'arch'] as const;
 

@@ -97,5 +97,8 @@ test('uses a uniform labeled meta layout with short confidence values', () => {
   assert.match(html, /><dt>Evidence<\/dt>/);
   assert.match(html, /><dt>Where<\/dt>/);
   assert.match(html, /data-labeled="true"/);
-  assert.doesNotMatch(html, /high confidence/i);
+  // Visible text stays short ("High"); aria-label carries the full phrase for screen readers
+  // (see ConfidenceMark.tsx's own doc comment) — check the visible span specifically, not the
+  // whole markup, since the aria-label legitimately says "High confidence".
+  assert.doesNotMatch(html, /ds-confidence-mark__text">[^<]*confidence/i);
 });

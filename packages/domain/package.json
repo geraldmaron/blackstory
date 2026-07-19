@@ -9,6 +9,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./adapters/wikimedia/commons-media": {
+      "development": "./src/adapters/wikimedia/commons-media.ts",
+      "types": "./dist/adapters/wikimedia/commons-media.d.ts",
+      "import": "./dist/adapters/wikimedia/commons-media.js"
+    },
     "./map/geography": {
       "development": "./src/map/us-geography.ts",
       "types": "./dist/map/us-geography.d.ts",

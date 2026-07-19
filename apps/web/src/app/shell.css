@@ -1230,7 +1230,114 @@
   }
 }
 
-/* —— Start with your state ——  */
+/* —— Home About —— product thesis + quiet place orientation —— */
+.ds-home-about__pillars {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ds-space-8);
+  margin: var(--ds-space-8) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 48rem) {
+  .ds-home-about__pillars {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--ds-space-8);
+  }
+}
+
+.ds-home-about__pillar {
+  display: grid;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-5) 0 0;
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
+}
+
+.ds-home-about__pillar-kicker {
+  margin: 0;
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-home-about__pillar-title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ds-ink);
+}
+
+.ds-home-about__pillar-body {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-serif);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.ds-home-about__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-3);
+  margin: var(--ds-space-8) 0 0;
+}
+
+.ds-home-about__orient {
+  display: grid;
+  gap: var(--ds-space-4);
+  margin: var(--ds-space-10) 0 0;
+  padding: var(--ds-space-6) 0 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-home-about__orient-lede {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+/* —— Home data pulse —— archive strip + /data charts —— */
+.ds-home-data-pulse__viz {
+  display: grid;
+  gap: var(--ds-space-8);
+  margin-top: var(--ds-space-6);
+}
+
+.ds-home-data-pulse__subhead {
+  margin: 0 0 var(--ds-space-4);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-home-data-pulse__changes {
+  margin-top: var(--ds-space-2);
+}
+
+.ds-home-data-pulse__fallback {
+  margin: var(--ds-space-6) 0 0;
+  color: var(--ds-ink-muted);
+}
+
+.ds-home-data-pulse__cta {
+  margin: var(--ds-space-8) 0 0;
+}
+
+.ds-home-data-pulse .ds-data-strip {
+  margin-top: var(--ds-space-6);
+}
+
+/* —— State start (quiet orientation under About) —— */
 .ds-state-start {
   display: grid;
   gap: var(--ds-space-5);

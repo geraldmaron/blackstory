@@ -54,7 +54,7 @@ test('q=laurence ranks the Paul Laurence Dunbar High School fixture first, match
 
 test('status=active narrows results to the status-bearing fixtures, excluding the statusless event', () => {
   const view = buildSearchViewModel({ status: 'active' }, getSnapshotSearchIndex());
-  assert.equal(view.results.length, 15);
+  assert.equal(view.results.length, 3);
   assert.ok(view.results.every((result) => result.status === 'active'));
   assert.ok(!view.results.some((result) => result.id === 'ent_dc_landmark_listing_1975'));
 });

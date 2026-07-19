@@ -1,9 +1,13 @@
 /**
  * Homepage: the hero IS the shared `MapStage` canvas (mounted once by the `(map)` layout).
  * `HeroStage` renders the floating chrome over it; `HomeStorySections` owns the beats below
- * (design-direction-v5 §6.1): start-with-your-state, the story rail, the numbers strip, and
- * the "how this works" band.
+ * (design-direction-v5 §6.1): About, From the data (archive + `/data` census viz), the story
+ * rail, and the "how this works" band.
  */
+import {
+  getNationalPopulationByDecade,
+  getNationalPopulationChanges,
+} from '@repo/firebase';
 import { HomeStorySections } from '../../components/home/HomeStorySections';
 import type { StateStartEntry } from '../../components/home/StateStart';
 import { FEATURED_SEED_IDS } from '../../data/public-seed';
@@ -13,6 +17,14 @@ import { buildDecadeFlowFrames } from '../../lib/map-experience/decade-flow';
 import { buildEdgeLineCatalog } from './explore/explore-view-model';
 import { HeroStage } from './HeroStage';
 import { loadMapStageBase } from './shared-map-data';
+
+async function safe<T>(promise: Promise<T | undefined>): Promise<T | undefined> {
+  try {
+    return await promise;
+  } catch {
+    return undefined;
+  }
+}
 
 /** How many one-tap state chips the Orient beat shows. */
 const TOP_STATE_LIMIT = 5;
@@ -52,7 +64,11 @@ function eraSpanOf(collection: ExploreMapFeatureCollection): string | undefined 
 }
 
 export default async function HomePage() {
-  const base = await loadMapStageBase();
+  const [base, populationByDecade, populationChanges] = await Promise.all([
+    loadMapStageBase(),
+    safe(getNationalPopulationByDecade()),
+    safe(getNationalPopulationChanges()),
+  ]);
 
   // Feature the curated ids when the active release carries them; otherwise lead with whatever
   // the release does hold, so the rail never goes empty just because curation lagged a release.
@@ -63,6 +79,7 @@ export default async function HomePage() {
 
   const states = tallyStates(base.featureCollection);
   const recordCount = base.featureCollection.features.length;
+  const eraSpan = eraSpanOf(base.featureCollection);
 
   // Decades in motion (v5 §6.1): per-decade edge lines from the history graph
   // release + cumulative record reveal over the shared feature collection.
@@ -93,7 +110,9 @@ export default async function HomePage() {
           topStates={states.slice(0, TOP_STATE_LIMIT)}
           recordCount={recordCount}
           stateCount={states.length}
-          eraSpan={eraSpanOf(base.featureCollection)}
+          {...(eraSpan !== undefined ? { eraSpan } : {})}
+          {...(populationByDecade !== undefined ? { populationByDecade } : {})}
+          {...(populationChanges !== undefined ? { populationChanges } : {})}
         />
       </main>
     </>

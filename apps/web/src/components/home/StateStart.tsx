@@ -1,12 +1,9 @@
 'use client';
 
 /**
- * "Start with your state" (design-direction-v5 §6.2) — the zero-permission
- * orientation control: a native state select covering all 51 states/D.C.
- * (readers can pick a state with no records yet — /explore frames that
- * honestly and suggests other paths), one-tap chips for the states with the
- * deepest coverage, and a quiet hand-off to /locate for readers who choose
- * to share their location.
+ * Zero-permission place orientation: a native state select covering all 51
+ * states/D.C., one-tap chips for deepest coverage, and a quiet /locate hand-off.
+ * Lives under the homepage About beat (no longer the lead Orient headline).
  *
  * Navigation is router.push (continuous-experience contract): the persistent
  * map canvas survives the transition and flies to the state's camera preset

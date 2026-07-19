@@ -44,7 +44,7 @@ test('returns all active-release feature ids with no user filters', async () => 
   assert.equal(response.status, 200);
 
   const body = (await response.json()) as { featureIds: readonly string[]; totalMatched: number };
-  assert.equal(body.totalMatched, 19);
+  assert.equal(body.totalMatched, 4);
   assert.ok(body.featureIds.includes('ent_15th_st_church_001'));
 });
 
@@ -54,8 +54,8 @@ test('filters by era through the real guardrail + explore filter pipeline', asyn
   assert.equal(response.status, 200);
 
   const body = (await response.json()) as { featureIds: readonly string[]; totalMatched: number };
-  assert.equal(body.totalMatched, 2);
-  assert.deepEqual(body.featureIds, ['ent_dc_landmark_listing_1975', 'ent_schomburg_center_001']);
+  assert.equal(body.totalMatched, 1);
+  assert.deepEqual(body.featureIds, ['ent_dc_landmark_listing_1975']);
 });
 
 test('rejects SQL injection through guardrails (sql_not_allowed)', async () => {

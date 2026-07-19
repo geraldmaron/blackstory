@@ -1,17 +1,24 @@
 /**
  * The paper-canvas beats below the persistent map hero (design-direction-v5
- * §6.1 beats 2–5): Orient ("Start with your state" — the personal-relevance
- * entry), Discover ("From the archive" story rail), the archive in numbers,
- * and one fixed-ink "How this works" band handing off to /methodology.
+ * §6.1): About (product thesis + quiet place orientation), From the data
+ * (archive counts + `/data` census visualizations), Discover (story rail), and
+ * one fixed-ink "How this works" band handing off to /methodology.
  *
- * Typed loosely against the featured-entity shape `app/page.tsx` already
+ * Typed loosely against the featured-entity shape `app/(map)/page.tsx` already
  * builds from the public entity source so either stream can adjust its own
  * data plumbing without touching this component's contract.
  */
 
 import Link from 'next/link';
+import type {
+  NationalPopulationByDecade,
+  PopulationDecadeChange,
+} from '@repo/firebase';
 import { KindBadge } from '../map-experience/KindBadge';
-import { StateStart, type StateStartEntry } from './StateStart';
+import { HomeAbout } from './HomeAbout';
+import { HomeDataPulse } from './HomeDataPulse';
+import type { StateStartEntry } from './StateStart';
+import '../data/data-charts.css';
 
 export type HomeStoryEntity = {
   readonly id: string;
@@ -25,11 +32,13 @@ export type HomeStorySectionsProps = {
   readonly featured: readonly HomeStoryEntity[];
   /** States with pinned records, ordered by record count descending (top slice). */
   readonly topStates: readonly StateStartEntry[];
-  /** Archive-wide figures for the numbers strip. */
+  /** Archive-wide figures for the data pulse. */
   readonly recordCount: number;
   readonly stateCount: number;
   /** e.g. "1820s–1970s"; omitted when the release carries no dated records. */
   readonly eraSpan?: string | undefined;
+  readonly populationByDecade?: readonly NationalPopulationByDecade[] | undefined;
+  readonly populationChanges?: readonly PopulationDecadeChange[] | undefined;
 };
 
 /** v5 §6.5 "How this works" — three points, evidence before assertion. */
@@ -45,21 +54,21 @@ export function HomeStorySections({
   recordCount,
   stateCount,
   eraSpan,
+  populationByDecade,
+  populationChanges,
 }: HomeStorySectionsProps) {
   return (
     <>
       <div className="ds-container ds-page">
-        <section className="ds-section ds-section--flush" aria-labelledby="state-start-heading">
-          <p className="ds-section__kicker">Near you</p>
-          <h2 className="ds-section__title" id="state-start-heading">
-            Start with your state.
-          </h2>
-          <p className="ds-section__lede">
-            Every state holds documented Black history — some of it a block from somewhere you
-            know. Choose yours and see what happened there.
-          </p>
-          <StateStart topStates={topStates} />
-        </section>
+        <HomeAbout topStates={topStates} />
+
+        <HomeDataPulse
+          recordCount={recordCount}
+          stateCount={stateCount}
+          eraSpan={eraSpan}
+          populationByDecade={populationByDecade}
+          populationChanges={populationChanges}
+        />
 
         <section className="ds-section" aria-labelledby="featured-heading">
           <p className="ds-section__kicker">From the archive</p>
@@ -83,26 +92,6 @@ export function HomeStorySections({
                 </Link>
               </li>
             ))}
-          </ul>
-        </section>
-
-        <section className="ds-section" aria-label="The archive in numbers">
-          <p className="ds-section__kicker">In numbers</p>
-          <ul className="ds-data-strip">
-            <li className="ds-data-strip__item">
-              <span className="ds-data-strip__value">{recordCount}</span>
-              <span className="ds-data-strip__label">Records pinned</span>
-            </li>
-            <li className="ds-data-strip__item">
-              <span className="ds-data-strip__value">{stateCount}</span>
-              <span className="ds-data-strip__label">States on the map</span>
-            </li>
-            {eraSpan ? (
-              <li className="ds-data-strip__item">
-                <span className="ds-data-strip__value">{eraSpan}</span>
-                <span className="ds-data-strip__label">Eras spanned</span>
-              </li>
-            ) : null}
           </ul>
         </section>
       </div>
