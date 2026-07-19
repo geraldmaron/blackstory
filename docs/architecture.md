@@ -1,6 +1,6 @@
 # BlackStory — Architecture
 
-> Required project state. All LLMs working in this repo, including Construct, should keep this file updated.
+> Required project state. All LLMs working in this repo should keep this file updated.
 
 ## System overview
 
