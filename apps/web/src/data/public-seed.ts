@@ -326,13 +326,6 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
       'Richard T. Greener (the first Black graduate of Harvard), Carter G. Woodson, Mary Church ' +
       'Terrell, and Robert Heberton Terrell. Graduates include physician Charles R. Drew, ' +
       'civil-rights lawyer Charles Hamilton Houston, and General Benjamin O. Davis Jr.',
-    primaryImage: {
-      url: 'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_dunbar_school_001/primary.png',
-      alt: 'Schematic mark representing the Paul Laurence Dunbar High School campus record',
-      credit: 'BlackStory brand system public-domain-style fixture pending a rights-cleared photo',
-      rightsStatus: 'public_domain',
-      objectPath: 'public/entities/ent_dunbar_school_001/primary.png',
-    },
     recordMaturity: 'partial_enrichment',
     researchCoverage: 'substantial',
     mapPin: { x: 55, y: 50 },

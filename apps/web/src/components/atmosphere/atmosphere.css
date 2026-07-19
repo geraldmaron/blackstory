@@ -1,0 +1,119 @@
+/**
+ * Atmosphere plane presentation — full-bleed charcoal mast plate with a flat
+ * geometric SVG pattern. Decorative layer is aria-hidden in the component.
+ */
+
+.ds-atmosphere {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--ds-fixed-charcoal);
+}
+
+.ds-atmosphere__geometric {
+  position: absolute;
+  inset: 0;
+  background-color: var(--ds-fixed-charcoal);
+  background-repeat: repeat;
+  background-size: 12rem 12rem;
+  opacity: 0.22;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-atmosphere__geometric {
+    opacity: 0.28;
+  }
+}
+
+/* —— Story atmosphere mast band —— */
+.ds-story-mast {
+  position: relative;
+  isolation: isolate;
+  margin: 0;
+  padding-block: var(--ds-space-16) var(--ds-space-12);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  background: var(--ds-fixed-charcoal);
+  color: var(--ds-fixed-paper);
+}
+
+.ds-story-mast__plane {
+  z-index: 0;
+}
+
+.ds-story-mast__inner {
+  position: relative;
+  z-index: 1;
+}
+
+.ds-story-mast .ds-page__eyebrow {
+  color: var(--ds-fixed-accent);
+}
+
+.ds-story-mast .ds-page__eyebrow::before {
+  background: var(--ds-fixed-accent);
+}
+
+.ds-story-mast .ds-page__title {
+  color: var(--ds-fixed-paper);
+  margin-top: var(--ds-space-4);
+}
+
+.ds-story-mast .ds-page__title em {
+  color: var(--ds-fixed-accent);
+}
+
+.ds-story-mast .ds-page__lede {
+  color: color-mix(in srgb, var(--ds-fixed-paper) 88%, transparent);
+  max-width: var(--ds-content-max);
+}
+
+.ds-story-mast__meta {
+  margin: var(--ds-space-3) 0 0;
+  color: var(--ds-fixed-stone);
+}
+
+.ds-story-mast__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-4);
+  margin-top: var(--ds-space-8);
+}
+
+.ds-story-mast__credit {
+  margin: var(--ds-space-4) 0 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--ds-fixed-stone);
+}
+
+.ds-story-mast__credit a {
+  color: var(--ds-fixed-stone);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-story-mast__credit a:hover,
+.ds-story-mast__credit a:focus-visible {
+  color: var(--ds-fixed-paper);
+}
+
+.ds-story-article__body {
+  max-width: var(--ds-content-max);
+}
+
+.ds-story-article__body > section {
+  padding-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-story-article__body > section:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.ds-story-article__footer {
+  margin-top: var(--ds-space-8);
+}

@@ -20,14 +20,14 @@ import { EntityLinkDiscoveryHint } from '../../../components/entity/EntityLink';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
 import { EntityPrimaryImage } from '../../../components/entity/EntityPrimaryImage';
-import { EntityArchiveCollage } from '../../../components/entity/EntityArchiveCollage';
+import { EntityRecordMark } from '../../../components/entity/EntityRecordMark';
 import { RecordGapNotice } from '../../../components/entity/RecordGapNotice';
 import { EntityEvidencePanel } from '../../../components/evidence';
 import { CompactFactReference } from '../../../components/facts';
 import { HowToReadThisRecord } from '../../../components/trust';
 import { WhyThisAppears } from '../../../components/why-appears';
 import { seedFactsForEntity } from '../../../data/facts-seed';
-import { buildExploreHref } from '../../../lib/map-experience/url-state';
+import { buildExploreHref, defaultExploreOverlayState } from '../../../lib/map-experience/url-state';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import { highestConfidence } from '../../../lib/map-experience/build-explore-map-source';
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
@@ -106,9 +106,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const continueLearning = entity.continueLearning ?? [];
   const exploreHref = buildExploreHref({
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-    density: false,
-    group: false,
-    lines: false,
+    ...defaultExploreOverlayState(),
     selected: entity.id,
     ...(geoAnchor
       ? { viewport: { lat: geoAnchor.lat, lng: geoAnchor.lng, zoom: 11 } }
@@ -122,10 +120,11 @@ export default async function EntityPage({ params }: EntityPageProps) {
           {entity.primaryImage ? (
             <EntityPrimaryImage image={entity.primaryImage} entityName={entity.displayName} priority />
           ) : (
-            <EntityArchiveCollage
+            <EntityRecordMark
               entityId={entity.id}
               entityName={entity.displayName}
               kind={entity.kind}
+              jurisdictionLabel={entity.jurisdictionLabel}
             />
           )}
         </div>

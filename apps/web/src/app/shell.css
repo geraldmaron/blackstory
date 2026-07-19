@@ -1644,18 +1644,27 @@
   font-size: 0.75rem;
 }
 
-.ds-entity-photo--collage .ds-entity-collage {
+.ds-entity-photo--mark .ds-entity-mark {
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
   background: var(--ds-surface);
   overflow: hidden;
 }
 
-.ds-entity-collage__svg {
+.ds-entity-mark__svg {
   display: block;
   width: 100%;
   height: auto;
   aspect-ratio: 240 / 280;
+}
+
+.ds-entity-mark__context {
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  color: var(--ds-ink-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
 }
 
 .ds-explore-narrative-card__tags {

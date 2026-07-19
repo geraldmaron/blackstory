@@ -1,16 +1,24 @@
 /**
  * Longform story article page at `/stories/{slug}`.
  *
- * Renders seed narrative sections in editorial serif, with related entity and quick-fact
- * off-ramps. Emits schema.org Article JSON-LD only — never ClaimReview.
+ * Geometric atmosphere mast, editorial serif body, related entity/fact off-ramps,
+ * and a single copper map CTA when a related entity has a geo anchor. Emits
+ * schema.org Article JSON-LD only — never ClaimReview.
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
+import { AtmospherePlane, selectAtmospherePlane } from '../../../components/atmosphere';
+import { renderStoryTitle } from '../../../components/atmosphere/story-title';
 import { SeedDataNotice } from '../../../components/SeedDataNotice';
 import { getPublicEntity } from '../../../data/public-seed';
 import { getSeedFact } from '../../../data/facts-seed';
 import { getSeedStory, listSeedStories, type StoryRecord } from '../../../data/stories-seed';
+import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
+import {
+  buildExploreHref,
+  defaultExploreOverlayState,
+} from '../../../lib/map-experience/url-state';
 import { factPageHref } from '../../facts/facts-view-model';
 import './../stories.css';
 
@@ -47,6 +55,24 @@ function buildStoryArticleJsonLd(story: StoryRecord) {
   return jsonLd;
 }
 
+function mapCtaForStory(relatedEntityIds: readonly string[]): {
+  readonly href: string;
+  readonly label: string;
+} | null {
+  for (const entityId of relatedEntityIds) {
+    const geoAnchor = geoAnchorFor(entityId);
+    if (!geoAnchor) continue;
+    const href = buildExploreHref({
+      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      ...defaultExploreOverlayState(),
+      selected: entityId,
+      viewport: { lat: geoAnchor.lat, lng: geoAnchor.lng, zoom: 11 },
+    });
+    return { href, label: 'View on map' };
+  }
+  return null;
+}
+
 export default async function StoryDetailPage({ params }: StoryPageProps) {
   const { slug } = await params;
   const story = getSeedStory(slug);
@@ -59,27 +85,41 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
     .map((id) => getSeedFact(id))
     .filter((fact): fact is NonNullable<typeof fact> => fact !== undefined);
 
+  const atmosphere = selectAtmospherePlane({ seedKey: story.slug });
+  const mapCta = mapCtaForStory(story.relatedEntityIds);
   const jsonLd = buildStoryArticleJsonLd(story);
 
   return (
-    <main className="ds-container ds-page" id="main">
+    <main className="ds-page" id="main">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <article className="ds-story-article">
-        <header className="ds-entity-mast">
+      <header className="ds-story-mast">
+        <AtmospherePlane selection={atmosphere} className="ds-story-mast__plane" />
+        <div className="ds-container ds-story-mast__inner">
           <p className="ds-page__eyebrow">
             Story · <span className="ds-mono">{story.eraLabel}</span> · {story.placeLabel}
           </p>
-          <h1 className="ds-page__title">{story.title}</h1>
+          <h1 className="ds-page__title">{renderStoryTitle(story.slug, story.title)}</h1>
           <p className="ds-page__lede">{story.dek}</p>
-          <p className="ds-mono" style={{ marginTop: 'var(--ds-space-3)', color: 'var(--ds-ink-subtle)' }}>
-            Published {story.publishedAt}
+          <p className="ds-mono ds-story-mast__meta">Published {story.publishedAt}</p>
+          {mapCta ? (
+            <p className="ds-story-mast__actions">
+              <Link className="ds-cta ds-cta--copper" href={mapCta.href}>
+                {mapCta.label}
+              </Link>
+            </p>
+          ) : null}
+          <p className="ds-story-mast__credit">
+            Geometric atmosphere · {atmosphere.geometric.label} — not a photograph of this
+            story.
           </p>
-        </header>
+        </div>
+      </header>
 
+      <article className="ds-container ds-story-article">
         <SeedDataNotice compact />
 
         <div className="ds-story-article__body ds-prose">
@@ -137,7 +177,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
           </section>
         ) : null}
 
-        <p className="ds-sans" style={{ marginTop: 'var(--ds-space-8)' }}>
+        <p className="ds-sans ds-story-article__footer">
           <Link href="/stories">All stories</Link>
         </p>
       </article>

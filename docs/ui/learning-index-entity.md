@@ -14,7 +14,7 @@ This document is the editorial and engineering contract for that surface.
 | `eraBuckets` / `notabilityLabels` | When present | Secondary chips (ADR-015) | Never numeric scores. |
 | `historicalContext` | Strongly preferred | Framing in Black-history place | Not new unsourced facts about this record (those live in `claims`). |
 | `extendedNarrative` | Optional | Multi-paragraph further reading | Omit UI section when absent. Never replaces Accepted claims. |
-| `primaryImage` | Optional | Hero/aside photo | Requires publishable rights (`public_domain` \| `licensed` \| `fair_use`) and `display_media`. Alt + credit required (WCAG). When missing, UI shows a symbolic B&W archive collage (not a stock portrait). |
+| `primaryImage` | Optional | Hero/aside photo | Requires publishable rights (`public_domain` \| `licensed` \| `fair_use`) and `display_media`. Alt + credit required (WCAG). When missing, UI shows a kind-derived record mark (book/pin/arch), not a stock portrait or mosaic. |
 | `related` (1-hop) | Strongly preferred | Typed graph edges on the projection | Stored on release; adjacency is single-hop by design. |
 | Continue learning (2-hop) | Read-time only | “Also connected” | Server-composed from neighbors’ related IDs; capped; never stored on the projection. |
 | `claims` / facts | Sourced detail | Atomic cited statements | Claims are the evidence layer; summary is the index lede. |
@@ -30,12 +30,12 @@ retraction history for operators; that trail is not the learning-index UI.
 ## UI sparsity (honesty over fake richness)
 
 - Sparse entity: summary + tags + why-appears + gap notices is OK.
-- First viewport is an **editorial mast**: rights-cleared photo or archive collage as a
+- First viewport is an **editorial mast**: rights-cleared photo or kind-derived record mark as a
   media plane beside (desktop) / above (mobile) the name and serif summary — not a dossier
   header with media buried in an aside.
-- No rights-cleared photo: show the **archive collage** silhouette (afro / fist / book / pin / arch)
-  filled with a B&W mosaic of rights-cleared archive tiles — symbolic only, never a fake portrait.
-  Caption states that a rights-cleared portrait is still awaited.
+- No rights-cleared photo: show the **record mark** (book / pin / arch by entity kind) — symbolic
+  only, never a stock portrait or mosaic. Caption states that a rights-cleared portrait is still
+  awaited.
 - No extended narrative: **omit** that section entirely.
 - Empty related: `RecordGapNotice` plus tag and map CTAs still provide learning paths.
 - Neighbor stubs are denormalized at read time; do not embed full neighbor docs on every projection.

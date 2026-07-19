@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" fill="none">
+  <!-- Flat rectangular tessellation  archive atmosphere fallback -->
+  <rect width="192" height="192" fill="#161616"/>
+  <g stroke="#D7D0C4" stroke-width="1" opacity="0.45" fill="none">
+    <rect x="8" y="8" width="56" height="40"/>
+    <rect x="72" y="8" width="40" height="40"/>
+    <rect x="120" y="8" width="64" height="40"/>
+    <rect x="8" y="56" width="40" height="56"/>
+    <rect x="56" y="56" width="72" height="56"/>
+    <rect x="136" y="56" width="48" height="56"/>
+    <rect x="8" y="120" width="72" height="64"/>
+    <rect x="88" y="120" width="48" height="64"/>
+    <rect x="144" y="120" width="40" height="64"/>
+  </g>
+</svg>

@@ -347,13 +347,6 @@ export const seedPublicSchoolEntity: PublicEntityProjectionDoc = {
   extendedNarrative:
     'By the 1950s the school sent roughly 80% of its graduates on to college. Faculty and alumni ' +
     'include Anna Julia Cooper, Carter G. Woodson, Charles R. Drew, and Charles Hamilton Houston.',
-  primaryImage: {
-    url: 'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_dunbar_school_001/primary.png',
-    alt: 'Schematic mark representing the Paul Laurence Dunbar High School campus record',
-    credit: 'BlackStory brand system public-domain-style fixture pending a rights-cleared photo',
-    rightsStatus: 'public_domain',
-    objectPath: 'public/entities/ent_dunbar_school_001/primary.png',
-  },
   eraBuckets: ['1870s', '1890s', '1910s'],
 };
 

@@ -1,6 +1,6 @@
 /**
  * Optional rights-cleared primary image for learning-index entity pages.
- * When absent, the entity page renders EntityArchiveCollage instead.
+ * When absent, the entity page renders EntityRecordMark instead.
  * Mast mounts use eager loading; aside/deferred mounts may pass priority={false}.
  */
 import React from 'react';

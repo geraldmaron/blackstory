@@ -16,7 +16,7 @@
 }
 
 .ds-entity-mast__media .ds-entity-photo__img,
-.ds-entity-mast__media .ds-entity-collage__svg {
+.ds-entity-mast__media .ds-entity-mark__svg {
   border-radius: var(--ds-radius-md);
 }
 
