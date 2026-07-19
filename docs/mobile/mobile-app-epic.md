@@ -75,7 +75,7 @@ a child bead explicitly changes scope through measured evidence (governed by MOB
 
 `repo-b4fcbc25` (Mobile app foundation: portable tokens, API contract, MapLibre Native
 spike) predates this program; its deliverables are absorbed by MOB-002/003/007/011 and it
-is linked to the epic as related work.
+was closed as a duplicate of this epic on 2026-07-19.
 
 ## Sequencing
 
