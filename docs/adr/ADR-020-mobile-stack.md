@@ -1,426 +1,339 @@
-# ADR-020: Mobile stack — Expo, MapLibre Native, RN Firebase App Check, and the offline SQLite cache
+# ADR-020: Mobile stack — Expo React Native, MapLibre Native, App Check attestation, and SQLite offline cache
 
-- **Date**: 2026-07-19
-- **Status**: Proposed
-- **Deciders**: mobile-program-review (agent draft); owner sign-off pending an independent red-team pass
-- **Supersedes**: none
-- **Bead**: MOB-002 (architecture, threat model, contract boundary ADRs)
-- **Depends on**: ADR-004, ADR-005, ADR-008, ADR-010, ADR-011, ADR-013
-- **Blocks**: MOB-003, MOB-006, MOB-010, MOB-011
+- **Status:** Proposed — independent red-team complete, awaiting owner acceptance
+- **Date:** 2026-07-19
+- **Deciders:** mobile-program-review (agent); pending owner sign-off and an independent adversarial red-team pass before acceptance
+- **Bead:** MOB-002 (`black-book-mobile-002`)
+- **Supersedes:** none
+- **Depends on:** ADR-004, ADR-005, ADR-008, ADR-010, ADR-011, ADR-013
+- **Blocks:** MOB-003, MOB-006, MOB-010, MOB-011
 
-## Problem
+## Scaffold vs target
 
-BlackStory today is a public web reader (`apps/web`) rendering released, immutable
-public projections (ADR-004) through a bounded read surface (`apps/api-public`, ADR-005),
-with a self-hosted MapLibre GL JS map backed by static Protomaps PMTiles (ADR-013). The
-program now commits to shipping a production-quality native iOS and Android reader that
-matches that web experience — truth, evidence, map, dignity, brand, and correction
-posture — without duplicating canonical data or weakening the security boundary
-(mobile epic, program invariants 1–7).
+| Aspect | Today (this bead) | Target (MOB-006 and beyond) |
+|--------|--------------------|------------------------------|
+| App code | No `apps/mobile` exists; no `eas.json`, no Expo account | `apps/mobile` Expo project scaffolded (MOB-006), EAS Build/Update wired (MOB-019) |
+| Framework | Decision only | Expo managed workflow + Continuous Native Generation (CNG), Expo Router |
+| Map | Web uses MapLibre GL JS (ADR-013) | MapLibre Native (`@maplibre/maplibre-react-native`) against the same self-hosted PMTiles (MOB-011) |
+| Firebase client | Web apps use the JS SDK behind App Check reCAPTCHA | React Native Firebase App Check only (App Attest / Play Integrity), no client Firestore |
+| Local storage | None | `expo-sqlite` offline cache; schema designed in MOB-009 |
+| Read boundary | `apps/api-public` serves web | Same `apps/api-public` serves mobile (program invariant 2) |
 
-A native app forces a set of foundational technology choices that are expensive to
-reverse once a store binary, a signed release, and a bundle identifier exist in the
-world (`app.blackbook.mobile`, per MOB-001). The forcing tension is that these choices
-are mutually constraining — the framework dictates which map, storage, and Firebase
-modules are even installable; the Firebase-access choice determines the security
-boundary; the native-directory policy determines how builds are reproduced — and every
-one of them is a one-maintainer operational commitment. Deciding them ad hoc at scaffold
-time (MOB-006), one `npm install` at a time, is how a solo project accretes an
-unmaintainable native toolchain it cannot upgrade. This ADR fixes the stack, states the
-reversal cost of each choice honestly, and records the load-bearing native-build
-requirements that a scaffold must carry from day one.
+This ADR **decides and justifies** the stack; it ships no code. Every downstream bead it blocks
+(MOB-003 contracts, MOB-006 scaffold, MOB-010 security, MOB-011 map data) inherits these choices.
 
 ## Context
 
-Forces beyond the core problem that bound the decision space:
+The mobile program (`docs/mobile/mobile-app-epic.md`) commits to a native iOS and Android reader that
+matches the public web app's truth, evidence, map, dignity, and correction posture **without duplicating
+canonical data or weakening security**. Two program invariants bound every choice here: the mobile client
+reads only through `apps/api-public` (invariant 2), and only environment-neutral contracts and pure behavior
+are shared across web and mobile (invariant 3). MOB-001 (`docs/mobile/decisions/mobile-identity.md`) already
+fixed the identity surface: product name BlackStory, domain `blackbook.app`, proposed bundle id
+`app.blackbook.mobile`, United States only, and **no accounts, push, or social features at launch**.
 
-- **The read boundary is fixed and non-negotiable** (ADR-005, ADR-011, epic invariant 2).
-  Canonical and research data stay behind `apps/api-public`; clients read only released
-  `public/**` projections and snapshots. The mobile app is a *reader*, not a second
-  system of record. This eliminates any option whose main appeal is "direct database
-  access from the client."
-- **Clients are untrusted for authorization** (ADR-010 trust assumptions 3, 8). Browser
-  and mobile clients get *attestation* (App Check), never authorization. A compromised
-  client must not gain a canonical write path (epic invariant 6). App Check on mobile is
-  App Attest (iOS) / Play Integrity (Android), not reCAPTCHA — a native-module concern.
-- **Only environment-neutral contracts and pure behavior cross the web/mobile line**
-  (epic invariant 3): no app-to-app imports, no server-only transitive dependencies. The
-  shared surface is a versioned contracts package (`@black-book/public-contracts`,
-  MOB-003), which strongly rewards a stack that speaks the same TypeScript as the web app.
-- **The map decision is already half-made.** ADR-013 chose MapLibre GL JS for the web on
-  a license/vendor-independence/self-host rationale, with a dark, desaturated
-  "archive of record" basemap served as static PMTiles from the same Firebase Hosting/CDN
-  as every other public snapshot. Mobile must inherit that rationale and that tile
-  strategy, not open a new vendor relationship.
-- **Cost and independence doctrine runs through every prior ADR** (ADR-002→ADR-011,
-  ADR-013): free-tier-first, no fixed subscription or vendor API key in the render path
-  before measured need, stay inside economics the project already pays for.
-- **One maintainer.** The project's operating principle is "runs itself within reason" —
-  budget-capped, kill-switch, free-tier-first. Any stack that demands two native
-  toolchains, two languages, or a full-time build engineer is disqualified on operational
-  grounds regardless of technical merit.
-- **Launch scope is deliberately small** (epic non-goals): U.S.-only, no accounts, no
-  push, no social, no full offline basemap at launch. The stack is sized for that scope,
-  with measured upgrades governed by MOB-022 — not pre-built for hypothetical futures.
+Three properties of this specific project dominate the framework decision more than raw benchmark numbers:
 
-```mermaid
-flowchart LR
-  subgraph client[Mobile client - untrusted]
-    E[Expo managed + CNG dev builds]
-    R[Expo Router]
-    M[MapLibre Native]
-    S[expo-sqlite offline cache]
-    AC["RN Firebase App Check only"]
-  end
-  subgraph shared[Shared, environment-neutral]
-    C["@black-book/public-contracts"]
-  end
-  subgraph server[Server - authoritative]
-    P[apps/api-public]
-    T[Static PMTiles + JSON snapshots on CDN]
-  end
-  E --> R --> M
-  E --> S
-  E --> AC
-  C --> E
-  C --> P
-  AC -. attestation .-> P
-  M --> T
-  S -. caches .-> P
-  P --> DB[(Firestore public projections - ADR-011)]
-  Bare[Bare RN CLI] -.rejected.-> E
-  Flutter[Flutter / Dart] -.rejected.-> E
-  Native[Native Swift + Kotlin] -.rejected.-> E
-```
+- **One-maintainer operational reality.** The project's `operating-principle-runs-itself-within-reason`
+  posture (budget-capped, kill-switch, free-tier-first — see MOB-001 spend-ceiling gate) means the mobile
+  stack must be maintainable by the same person who runs the web app and workers, not a mobile-specialist team.
+- **A TypeScript monorepo with a hard contract boundary.** The public read surface is already TypeScript
+  (`apps/api-public`), and MOB-003 will produce a versioned `packages/public-contracts` package. A JS/TS
+  client can consume those contract types directly; any non-JS client would need a parallel, hand-maintained
+  copy of the same types, which is exactly the drift program invariant 3 exists to prevent.
+- **An accepted map doctrine to parallel, not reinvent.** ADR-013 already chose MapLibre GL JS for the web
+  for its BSD license, absence of a vendor API key, and self-hosted Protomaps PMTiles served from Firebase
+  Hosting/CDN, rendered in a fixed dark, desaturated "archive of record" register. The mobile map must land
+  in the same place for the same reasons, differing only where the runtime genuinely differs.
+
+Adjacent accepted ADRs this decision must fit inside, not contradict:
+
+- **ADR-005** (service separation): mobile "later consumes the same public/submissions contracts (invariant 20);
+  do not invent mobile-only services now." No new backend surface is created for mobile.
+- **ADR-010** (security assumptions): browser — and by extension mobile — clients are untrusted for
+  authorization; App Check is mandatory; "mobile-specific security models" are explicitly a v1 non-goal for the
+  server architecture, which means the mobile client adapts to the existing server posture rather than the
+  server bending to the client. Logs must never contain raw App Check tokens.
+- **ADR-011** (Firestore system of record): public clients may read only under `public/**`; privileged writes
+  are Admin-SDK-only from Cloud Run/workers. A mobile client therefore has no legitimate direct-Firestore role.
+- **ADR-004** (immutable snapshots): the public surface is release-versioned, static-first JSON — an ideal shape
+  for an offline cache to mirror.
 
 ## Decision
 
-The BlackStory mobile app is an **Expo React Native application (managed workflow with
-Continuous Native Generation and custom development builds)** using **Expo Router**,
-**MapLibre Native** for the map, **React Native Firebase for App Check only**, and
-**`expo-sqlite`** for the offline cache. It lives at `apps/mobile` in the existing pnpm
-monorepo. The specifics:
+### 1. Framework — Expo (managed workflow + CNG) with Expo Router
 
-### 1. Framework: Expo (managed workflow, CNG / custom dev builds) + Expo Router
+The mobile app is an **Expo application using the managed workflow with Continuous Native Generation (CNG) and
+custom development builds** (`expo-dev-client`), navigated by **Expo Router** (file-based routing). It is **not**
+bare React Native CLI, not Flutter, and not per-platform native Swift/Kotlin.
 
-The app uses **Expo's managed workflow with Continuous Native Generation (CNG)** and
-**custom development builds** (`expo-dev-client`) — explicitly *not* bare React Native
-CLI, Flutter, or native Swift/Kotlin. Navigation is **Expo Router** (file-based routing).
+Decision drivers:
 
-Rationale (the load-bearing drivers):
+- **Single JS/TS codebase sharing types with the web contracts.** The client imports the same
+  `packages/public-contracts` types the API produces (MOB-003), so a contract change is a compile error on both
+  surfaces at once. This is the cheapest possible enforcement of program invariant 3.
+- **EAS build/update infrastructure fits a one-maintainer operation.** Expo Application Services provides
+  cloud-hosted native builds (no local Xcode/Android farm to maintain), managed signing credentials (a fallback
+  if Apple/Google credentials are ever lost — flagged in MOB-001's adversarial review), and over-the-air
+  JS updates with staged rollout and rollback that mirror ADR-004's "atomic activation, proven rollback"
+  discipline (program invariant 4). A one-person operation cannot economically run a self-hosted native CI farm.
+- **Dev velocity.** File-based routing (Expo Router), config plugins, `expo install` version resolution, and
+  Expo's curated module set collapse most of the native-integration work that bare RN leaves as manual glue.
+- **CNG, not bare, preserves reversibility.** Managed CNG keeps native folders generated from
+  `app.config.ts` + config plugins (see §6). The escape hatch — dropping to committed native code — remains
+  available per-module via config plugins without abandoning Expo, so choosing Expo does not forfeit native
+  extensibility.
 
-- **One TypeScript codebase that shares types with the web contracts.** The single
-  largest maintenance win for a one-maintainer project is that the mobile app consumes
-  `@black-book/public-contracts` (MOB-003) as the *same* TypeScript types the web app and
-  `apps/api-public` compile against. A contract change surfaces as a mobile type error at
-  build time, not a runtime divergence discovered in production. Flutter (Dart) and native
-  (Swift/Kotlin) forfeit this entirely; they would re-hand-transcribe the contract into a
-  second and third type system.
-- **EAS build and update infrastructure.** Expo Application Services gives cloud native
-  builds (no locally maintained Xcode/Gradle CI farm), managed signing credentials as a
-  fallback against lost Apple/Google keys (a risk MOB-001's adversarial review flags), and
-  over-the-air JS updates for immutable, atomically-activated, provably-rollback-able
-  releases (epic invariant 4) that mirror the web's release-pointer discipline (ADR-004).
-  A one-maintainer project cannot afford to hand-build the equivalent.
-- **Dev velocity for the launch scope.** The launch feature set (a bounded reader: map,
-  list, search, entity/evidence pages, correction submission) is squarely inside what
-  managed Expo does well. CNG means `ios/` and `android/` are generated from
-  `app.json`/config plugins rather than hand-maintained (see decision 6).
-- **Expo Router keeps navigation declarative and deep-link-native.** File-based routes map
-  cleanly to the universal-link scheme MOB-001 reserves (`blackbook.app/e/{entityId}`,
-  `blackstory://`), so a single link resolves on web and native (MOB-008) without a
-  bespoke linking configuration.
-- **Custom dev builds, not Expo Go.** MapLibre Native and React Native Firebase are custom
-  native modules absent from Expo Go, so the app requires a custom development build
-  (`expo-dev-client`) from day one. This is still the *managed* workflow — CNG regenerates
-  native projects — not a bare eject.
+Reversal cost is stated per alternative in "Rejected alternatives" and consolidated in "Reversal cost."
 
-### 2. Map: MapLibre Native (`@maplibre/maplibre-react-native`)
+### 2. Map — MapLibre Native (`@maplibre/maplibre-react-native`)
 
-The map renderer is **MapLibre Native** via `@maplibre/maplibre-react-native`, the direct
-mobile parallel to ADR-013's MapLibre GL JS. The tile strategy, basemap register, and
-security posture carry over unchanged: **self-hosted Protomaps PMTiles served as static
-assets from the same Firebase Hosting/CDN** as the web (ADR-013 §2), the **fixed dark,
-desaturated "archive of record" basemap** (ADR-013 §3, Black Ink `#0A0A0A` background,
-Copper Pin `#B86B2A` points, Archive Paper `#F4EFE5` stroke, pulled from brand tokens,
-never a bright tourism basemap), and the same GeoJSON `FeatureCollection` +
-state/county-aggregate artifacts the release pipeline produces (ADR-013 §4–5). BSD
-license, no vendor API key, no live third-party dependency in the render path — the exact
-ADR-013 rationale.
+The mobile map surface renders with **MapLibre Native via `@maplibre/maplibre-react-native`** (the MapLibre
+organization's community React Native binding). This is the deliberate mobile parallel to ADR-013's MapLibre GL
+JS choice for web: same BSD-family license, no vendor API key in the render path, and the **same self-hosted
+Protomaps PMTiles archive served from Firebase Hosting/CDN** (authored under MOB-011), styled in the **same fixed
+dark, desaturated "archive of record" register** — Black Ink canvas, Copper Pin points, never a bright tourism
+basemap, and independent of any in-app light/dark toggle exactly as ADR-013 mandates for web.
 
-What differs on mobile, and must be handled by MOB-011/MOB-012:
+What genuinely differs on mobile, and is therefore in scope for MOB-011/MOB-012 rather than assumed identical:
 
-- **Native GPU rendering**, not WebGL. MapLibre Native renders through the platform GPU
-  (Metal on iOS, OpenGL/Vulkan on Android) rather than a browser WebGL context. No browser
-  vendor prefixes, no `maplibre-gl` CSS import, no SSR-safety concern — but style-spec
-  parity must be verified per-platform rather than assumed from the web.
-- **Offline tile caching is a native, on-device concern.** PMTiles range-request reads work
-  over HTTP the same as web, but a mobile client can and will cache tiles on device. Per
-  epic non-goals, **no full offline basemap ships at launch**; the cache posture is
-  bounded, viewport-scoped tile caching only, with an explicit size ceiling (MOB-011 to
-  set the budget). A full offline basemap is a measured MOB-022 upgrade, not a launch
-  default — the same "static-first, measure before adding" discipline as ADR-008/ADR-013.
-- **Attribution and failure strategy are per-platform** (MOB-011): the required PMTiles /
-  Protomaps / OpenStreetMap attribution must render natively, and a tile-fetch failure must
-  degrade to the same snapshot-backed presence view the web uses (ADR-013 degraded mode),
-  never a blank or errored map.
+- **Native GPU rendering.** MapLibre Native renders through the platform's native graphics stack (Metal on iOS,
+  OpenGL ES / Vulkan on Android) rather than a browser WebGL canvas. There are **no browser vendor prefixes,
+  no `maplibre-gl` CSS import, and no SSR/hydration concern** — the map is a native view, not a DOM element.
+- **Offline tile caching.** Unlike a browser, a native app can persist tiles across launches. MapLibre Native
+  exposes an offline region/ambient-cache API. Program non-goals forbid a **full offline basemap** at launch,
+  so MOB-011 must scope caching to a **bounded ambient cache** (recently viewed tiles, size-capped) — not a
+  pre-downloaded national pack — unless MOB-022 later changes scope on measured evidence. The PMTiles
+  range-request strategy from ADR-013 still applies: the client reads byte ranges over HTTPS, not whole archives.
+- **Style-token sourcing.** The dark-archive style must pull the same brand tokens (MOB-007, from `brand/`) the
+  web style pulls, so the two map surfaces cannot drift.
 
-### 3. Firebase access: React Native Firebase for App Check only
+### 3. Firebase access — React Native Firebase App Check only (native attestation)
 
-The app installs **`@react-native-firebase/app` + `@react-native-firebase/app-check`** and
-**nothing else** from the Firebase family. App Check uses **App Attest on iOS** and
-**Play Integrity on Android**. The app does **not** install
-`@react-native-firebase/firestore`, `/auth`, `/storage`, or any other data-plane Firebase
-module.
+The client links **only** the App Check surface of React Native Firebase (`@react-native-firebase/app` +
+`@react-native-firebase/app-check`). It does **not** link `@react-native-firebase/firestore`,
+`@react-native-firebase/auth`, or any other data module. Canonical data reaches the app **only** through
+`apps/api-public` (program invariant 2; ADR-011 §7). App Check is **attestation, not authorization** (program
+invariant 6; ADR-010 trust assumption 3): a compromised client that forges attestation must still gain no
+canonical write path, because there is no client write path to gain.
 
-This is a direct enforcement of the read boundary (ADR-005, ADR-011 §7, epic invariant 2)
-and the trust model (ADR-010 assumptions 2–4, epic invariant 6): canonical data stays
-behind `apps/api-public`; the client reads only released public projections *through that
-API*, and App Check is *attestation attached to those API calls*, not authorization and
-not a direct database SDK. There is deliberately no Firestore or Auth SDK on the device to
-misuse, leak rules through, or expand into a canonical write path. This mirrors the web,
-where App Check guards `api-public` reads and the browser holds no canonical-write SDK.
+Why native attestation rather than the web SDK's reCAPTCHA-based provider:
 
-### 4. Local storage: `expo-sqlite`
+- The web apps use App Check's reCAPTCHA Enterprise provider because a browser is the only attestation primitive
+  available there. A native app has **hardware- and OS-backed attestation** the browser cannot offer:
+  **App Attest** (Apple DeviceCheck App Attest) on iOS and the **Play Integrity API** on Android. These attest
+  that a genuine, unmodified build of *this* app is running on a genuine device, which is a materially stronger
+  signal than a reCAPTCHA challenge and requires no user-facing challenge friction.
+- Running the reCAPTCHA provider inside a native WebView would be strictly worse: weaker signal, more third-party
+  surface, and a UX regression, for no benefit.
+- App Attest requires iOS 14+ and Play Integrity requires current Play services — both comfortably satisfied by
+  the OS floor in §7. Attested requests hit the **same App Check + query-guardrail middleware** every
+  `api-public` endpoint already enforces (ADR-013 §1; ADR-008 decision 6), so the server contract is unchanged;
+  only the provider on the client differs. Per ADR-010, **raw App Check tokens must never be logged** on either
+  surface (also program invariant 7).
 
-The offline cache is **`expo-sqlite`** — a real relational store for cached public
-entities, evidence metadata, map aggregates, and correction-receipt status — not
-AsyncStorage, MMKV, WatermelonDB, or Realm.
+**Monitor → enforce rollout (bead requirement; owned by MOB-010).** App Check is rolled out in stages, never
+flipped straight to hard enforcement. (1) **Monitor mode first:** register the App Attest / Play Integrity
+providers and ship attestation from the client, but the server keeps App Check as a pure *observed signal*
+(`missing_app_check` risk input) — no request is denied for a failed/absent token — while MOB-018 dashboards
+watch the legitimate-client verified-attestation rate across the real device/OS fleet. (2) **Promote to enforce
+only on evidence:** move an endpoint class to enforcement (deny/tighten on threshold) only once monitor metrics
+show the false-negative rate on genuine clients is negligible, so enforcement cannot lock out honest users on a
+provider quirk. (3) **Even under enforcement, reads fail open** to rate-limited `anonymous` access on an App Check
+*outage* (threat model T2; ADR-010 degraded-read doctrine) — enforcement raises abuse cost, it is never a hard
+availability gate on public content. This staged posture is the mobile analogue of ADR-010's "tighten (never
+silently loosen) App Check enforcement when moving staging → prod."
 
-| Option | Bundle / footprint | Expo supported-modules maturity | Query capability | Verdict |
+### 4. Local storage — `expo-sqlite`
+
+The offline cache engine is **`expo-sqlite`** (SQLite). MOB-009 designs the actual schema and migrations; this
+ADR only fixes the engine. The public surface is release-versioned, static-shaped JSON (ADR-004), and the
+offline cache must hold **entity, evidence, timeline, and map artifacts** keyed for lookup and light querying —
+a relational store fits that far better than a key-value blob.
+
+| Engine | Storage / query model | Expo native-module maturity | Bundle / footprint | Fit for entity/evidence cache |
 |---|---|---|---|---|
-| **`expo-sqlite`** | Small; SQLite ships with the OS, module is a thin binding | **First-party Expo module**, on the supported-modules list, CNG config-plugin support, actively maintained by Expo | Full SQL: joins, indexes, `WHERE`/`ORDER BY`, migrations — fits caching related entity/evidence graphs and querying by place/kind offline | **Chosen** |
-| AsyncStorage | Small | Community, widely used | Key–value only; no query, no relations. Cannot express "evidence for entity X" or offline filters without hand-rolling an index in JS | Rejected — insufficient query model |
-| MMKV | Small, very fast | Community native module; works with dev builds but not a first-party Expo module | Key–value only; same query gap as AsyncStorage, just faster | Rejected — wrong data model for a relational cache |
-| WatermelonDB | Larger; adds an ORM + reactive layer | Community; heavier native integration, more upgrade surface | Strong reactive relational queries — but sits *on top of* SQLite and adds a maintenance/upgrade burden disproportionate to a bounded read cache | Rejected — over-built for launch scope |
-| Realm | Large native footprint | Community (MongoDB-owned); heavier native module, its own object model and licensing/roadmap risk | Strong object queries — but a whole second data engine, second schema language, and a vendor roadmap dependency the project doesn't need | Rejected — vendor + footprint cost without matching need |
+| **`expo-sqlite`** | Full SQLite; SQL queries, indexes, transactions, async API | First-party Expo module, in the supported-modules list, CNG-native | Modest; SQLite ships with the OS, binding is thin | **Chosen** — relational queries + migrations for versioned cached entities/evidence |
+| AsyncStorage | Unstructured key-value only | Community, Expo-supported | Small | Poor — no query/index; re-implementing SQL by hand |
+| MMKV (`react-native-mmkv`) | Very fast key-value | Community; needs a dev build (not Expo Go) | Small | Poor for relational cache; excellent as a small fast prefs/KV store, complementary not competing |
+| WatermelonDB | ORM **on top of SQLite**; reactive | Community; extra native/config-plugin setup | Larger (ORM + adapter) | Capable but heavier abstraction over the same SQLite we can use directly |
+| Realm (Atlas Device SDK) | Object DB, live objects | Community | Largest | **Rejected** — MongoDB deprecated Atlas Device Sync/Realm (sunset announced 2024); adopting a vendor-deprecated engine is a liability |
 
-`expo-sqlite` is the only option that is simultaneously (a) a first-party Expo module on
-the supported list — lowest native-upgrade risk under CNG — and (b) a real query engine
-able to serve offline entity/evidence lookups and migrations (MOB-009) without a JS-side
-index. Schema versioning and migrations are owned by MOB-009.
+`expo-sqlite` wins on the axis that matters: it gives real relational query capability and migration support with
+the least native-module and bundle cost, as a first-party module inside Expo's tested matrix. MMKV may still be
+adopted **alongside** SQLite for tiny hot key-value needs (e.g. last-viewed state restoration, MOB-008); that is
+not a competing choice, and MOB-009 may make it. The relational cache engine is SQLite.
 
 ### 5. Version pinning policy
 
-Verified root pins (root `package.json`, this worktree): `"packageManager":
-"pnpm@9.12.3"`, `"engines": { "node": ">=22" }`. No root `.npmrc` exists today. The mobile
-app must pin its Expo/RN toolchain **without changing these root pins or breaking
-`pnpm install` for the web apps.**
+- **Root inheritance, no divergence.** The monorepo root pins `node >=22` (`engines`) and `pnpm@9.12.3`
+  (`packageManager`). `apps/mobile` **inherits both** and must not declare a conflicting `engines` range or
+  require a different pnpm — the single `pnpm install` at the root must keep resolving for `apps/web`,
+  `apps/admin`, and every worker unchanged. MOB-006 verifies this at scaffold time.
+- **Expo SDK is the version anchor.** `apps/mobile` pins an **exact** Expo SDK version (not a `^` range). The
+  React Native version is **whatever that Expo SDK bundles** — never bumped independently. All Expo/RN-adjacent
+  native modules are added with **`expo install`** (which consults Expo's bundled-native-modules manifest) rather
+  than raw `pnpm add`, so every native dependency stays inside the SDK's tested matrix.
+- **pnpm hoisting policy (red-team-resolved; validated at MOB-006).** React Native's Metro bundler and native
+  autolinking historically assume a hoisted `node_modules`; pnpm's default isolated/symlinked layout can break
+  them. **Resolved decision: do NOT flip the whole workspace to `node-linker=hoisted`** — that is the single most
+  dangerous option because `node-linker` is a workspace-root setting and switching it changes the installed layout
+  (and therefore the resolution/`peerDependencies` surface) for `apps/web`, `apps/admin`, `apps/api-*`, and every
+  worker at once. Instead, scope hoisting to the RN/Expo/Metro toolchain via **targeted `public-hoist-pattern` /
+  `hoist-pattern` entries** (hoisting only those packages into the virtual-store root) and, only if MOB-006 proves
+  that insufficient, isolate `apps/mobile` with its own nested `.npmrc`/sub-lockfile rather than changing the root
+  linker. MOB-006 is **blocking-gated** on a CI proof that, after `apps/mobile` is added, `pnpm install
+  --frozen-lockfile` at the root still resolves and `apps/web` + `apps/admin` + `apps/api-*` + workers build
+  byte-for-byte unchanged; a regression there fails the scaffold. This is the most likely place the mobile stack
+  could break the web `pnpm install`, so it is gated, not merely noted.
+- **Upgrade cadence.** Track Expo SDK on an **N-1 stability window**: do not adopt a new SDK the day it releases;
+  wait for the early patch releases (`.1`/`.2`) and the ecosystem's key libraries (MapLibre RN, RN Firebase) to
+  publish compatible versions. Upgrades happen on a branch via Expo's upgrade path, proven by a full EAS build +
+  device test matrix (MOB-019) before merge. Security patches are the exception and may jump the cadence.
 
-Policy:
+### 6. Native-directory policy — `ios/` and `android/` are gitignored (CNG)
 
-- **Node and pnpm stay root-pinned and shared.** The mobile app does not fork the package
-  manager or Node engine. It builds under the same `pnpm@9.12.3` / Node `>=22` the web apps
-  use. Any bump to those is a monorepo-wide decision, not a mobile-local one.
-- **Expo SDK and React Native are pinned in `apps/mobile/package.json` only.** Expo's SDK
-  pins an exact, mutually-tested set of `expo`, `react`, `react-native`, and Expo module
-  versions; `expo install` (not bare `npm add`) resolves compatible versions against the
-  installed SDK. These pins live in the mobile package and are **not hoisted** in a way that
-  forces a `react`/`react-native` version onto the web apps.
-- **Metro + pnpm interaction is a known scaffold requirement.** Metro historically does not
-  traverse pnpm's isolated (symlinked) `node_modules` cleanly. MOB-006 must configure the
-  workspace so Metro resolves the mobile app's dependencies — via an `.npmrc`
-  `node-linker`/`public-hoist-pattern` scoped so it does not disturb the web apps' install,
-  and/or Metro `watchFolders`/`resolver` config. This is a scaffold acceptance criterion,
-  not an afterthought (see Open questions).
-- **Upgrade cadence: track Expo SDK N-1.** Adopt an Expo SDK one major behind the newest
-  release (the N-1 stability window) rather than day-zero on `.0`. Bump on a deliberate
-  cadence with a full `expo-doctor` + EAS build + device smoke pass, never silently. This is
-  the same "measured, not reflexive" posture ADR-011/ADR-013 apply to platform changes.
+`apps/mobile/ios/` and `apps/mobile/android/` are **not committed to git**. They are treated as build output,
+generated by `expo prebuild` from the committed source of truth: `app.config.ts` (or `app.json`) plus config
+plugins. EAS Build runs prebuild as part of its standard pipeline, so the committed configuration — not a
+checked-in native tree — is authoritative.
 
-### 6. Native-directory policy: `ios/` and `android/` are gitignored and CNG-generated
+Rationale: with CNG, committed native folders drift from the config the moment any config plugin or SDK upgrade
+regenerates them, producing merge conflicts and a two-sources-of-truth hazard for exactly the native code a
+one-maintainer operation is least equipped to hand-reconcile. Keeping native folders generated means an SDK
+upgrade or plugin change is a config edit, not a native-tree merge. The escape hatch remains: a native change a
+config plugin cannot express is first attempted **as** a config plugin; only as a genuine last resort would the
+project commit the native folders (a near-one-way door — see "Reversal cost").
 
-`apps/mobile/ios/` and `apps/mobile/android/` are **gitignored** and **regenerated by CNG /
-`expo prebuild`** from `app.json` and config plugins. They are **not committed**.
+### 7. Supported OS floor — iOS 16+, Android 8 (API 26)+ (proposed; re-verify at MOB-006)
 
-Justification: with EAS Build, the native projects are a *build output*, not source. The
-sources of truth are `app.json`, config plugins, and the pinned Expo SDK; `expo prebuild`
-deterministically regenerates `ios/`/`android/` from them, and EAS Build does exactly that
-in the cloud. Committing generated native directories invites the precise failure mode this
-ADR guards against — hand-edits to generated files that silently drift from the config and
-cannot be reproduced. Anything a raw native edit would express (the Podfile linkage in
-requirement R1 below, entitlements, permission strings) is instead expressed as a config
-plugin or an EAS build-profile setting, so it survives regeneration. Committing the native
-dirs would also fight the gitignore and bloat the repo with derivable files.
+Adopt the MOB-001 proposal: **iOS 16+ and Android 8.0 (API level 26)+**.
 
-### 7. Supported OS floor: iOS 16+, Android 8 (API 26)+
+Verification against the current Expo SDK as of this writing: the current stable line is **Expo SDK 54**
+(released ~September 2025, bundling React Native 0.81). Its actual platform minimums are **lower** than this
+proposal — approximately **iOS 15.1** and **Android API 24 (Android 7.0)**. The proposed iOS 16 / API 26 floor
+therefore sits **above** the platform minimum, which is a deliberate, allowed choice: it (a) comfortably clears
+App Attest (iOS 14+) and Play Integrity requirements from §3, (b) shrinks the OS test matrix and polyfill burden
+for a one-maintainer operation, and (c) covers the overwhelming majority of the U.S. install base this
+U.S.-only product targets. **Red-team-resolved: hold the floor at iOS 16 / Android API 26 — do not relax toward
+the Expo platform minimum.** The only circumstance that would justify lowering it is MOB-006-time device-share
+evidence showing a *material* population of otherwise-reachable U.S. users excluded at iOS 16 / API 26; absent
+that measured evidence, the higher floor stands because its costs (a slightly smaller addressable base) are
+outweighed by the shrunken test/polyfill matrix a solo maintainer must carry. Relaxation is thus evidence-gated,
+not default.
 
-The proposed floor is **iOS 16+ and Android 8 / API 26+** (MOB-001). This avoids
-maintaining polyfills for OS versions with negligible, declining share while staying at or
-above what a current Expo SDK requires.
-
-**This floor is provisional and MUST be re-verified against the actual current Expo SDK's
-minimum requirements at MOB-006 scaffold time.** Expo/React Native raise their minimum iOS
-and Android API floors roughly every ~3 months with each SDK release; the chosen floor can
-only ever be `max(product-desired floor, SDK-required floor)`. MOB-006 records the exact
-SDK version and its exact minimums, and this section is updated to match. Do not treat
-iOS 16 / API 26 as settled — treat it as the *intended* floor pending that check.
-
-## Evidence — proof-of-concept spike (real, already run)
-
-A real proof-of-concept spike was executed in a disposable Expo app against the current
-Expo SDK before this ADR was drafted (not repeated here; recorded as decision evidence):
-
-- **Clean install, zero peer-dependency conflicts.** `npx expo install
-  @maplibre/maplibre-react-native @react-native-firebase/app
-  @react-native-firebase/app-check expo-sqlite expo-dev-client` installed the entire target
-  stack cleanly against the current Expo SDK with **no peer-dependency conflicts** — i.e.
-  Expo's SDK pin set (decision 5) and these native modules co-resolve.
-- **`expo-doctor` passed 20/20 checks** on the resulting project — no config, plugin, or
-  dependency-alignment warnings.
-- **iOS native build succeeded** — `pod install` and the Xcode build completed — **but only
-  with `USE_FRAMEWORKS=static`** in the Expo-generated Podfile
-  (`use_frameworks! :linkage => :static`). React Native Firebase's Swift pods (AppCheckCore,
-  FirebaseCoreInternal) require modular headers that plain static-library linking does not
-  provide; static frameworks resolve it. This is the single most important operational
-  finding of the spike, and it is recorded as a load-bearing requirement below rather than a
-  footnote.
-
-The spike de-risks the central integration question (do MapLibre Native + RN Firebase App
-Check + expo-sqlite coexist under managed Expo?) with a positive, reproducible answer,
-conditioned on the pod-linkage requirement.
-
-## Load-bearing native-build requirements (numbered)
-
-These are concrete, non-optional configuration commitments the mobile app must carry from
-scaffold (MOB-006) onward. They exist because this ADR's chosen stack does not build
-without them; leaving any as tribal knowledge is exactly the "native config drift" risk the
-program's adversarial-review posture calls out.
-
-- **R1 — `USE_FRAMEWORKS=static` is mandatory on iOS.** The iOS build **must** set static
-  frameworks (`use_frameworks! :linkage => :static`) because React Native Firebase's Swift
-  pods (AppCheckCore, FirebaseCoreInternal) need modular headers unavailable under plain
-  static-library linking. Because `ios/` is generated and not committed (decision 6), this
-  **must be expressed as an Expo config plugin / `app.json` setting** (so `expo prebuild`
-  emits the correct Podfile) **and** carried in the **EAS Build profile**, so both local
-  regeneration and cloud builds apply it identically. It must not live as a manual edit to a
-  generated Podfile.
-- **R2 — Custom dev client is required, not Expo Go.** MapLibre Native and RN Firebase are
-  not in Expo Go; `expo-dev-client` custom development builds are the only supported dev
-  path. CI/onboarding assume a dev build, not Expo Go.
-- **R3 — App Check must be data-plane-only in configuration.** Only
-  `@react-native-firebase/app` + `/app-check` are installed; adding any Firestore/Auth/
-  Storage RN Firebase module is a boundary violation (ADR-005, ADR-011) and must fail
-  review, not just linting.
-- **R4 — `expo-doctor` must pass in CI.** The 20/20 spike result is the floor; MOB-019's CI
-  runs `expo-doctor` as a gate so dependency/config drift is caught before it reaches a
-  build.
-- **R5 — Metro/pnpm resolution config is a scaffold deliverable.** The `.npmrc`/Metro
-  configuration from decision 5 must be committed and proven with a passing EAS build at
-  MOB-006, scoped so it does not alter the web apps' `pnpm install`.
+**This must be re-verified at MOB-006 scaffold time.** Expo's floor moves up roughly every ~3 months with each
+SDK; a later SDK could raise the platform minimum to meet or exceed iOS 16 / API 26, at which point "proposed
+floor" and "platform floor" converge and the choice is made for us. Whichever SDK MOB-006 actually pins governs.
 
 ## Rejected alternatives
 
-### Framework
-
-| Alternative | Concretely | Why rejected | Reversal cost if we'd chosen it |
-|---|---|---|---|
-| **Bare React Native CLI** | RN without Expo's managed workflow; hand-maintained `ios/`/`android/`, self-run signing and OTA | Forfeits EAS build/update, managed credentials, CNG, and config plugins; a one-maintainer project would hand-maintain two native toolchains and a CI farm. The spike stack installs cleanly under managed Expo — bare buys native control the launch scope does not need | Moderate — Expo↔bare is a documented, mostly-mechanical migration, but you lose the managed-services safety net |
-| **Flutter (Dart)** | Separate Dart UI toolkit and rendering engine | Second language, second type system; **cannot share `@black-book/public-contracts` types** — the contract would be re-transcribed by hand, reintroducing exactly the web/mobile divergence invariant 3 prevents. MapLibre and Firebase App Check integrations exist but are separate ecosystems from the web's | High — a full rewrite; nothing but design intent transfers |
-| **Native Swift + Kotlin** | Two fully separate native apps | Two codebases, two languages, two toolchains for one maintainer; maximal contract-duplication surface; slowest path to a bounded reader | Highest — two independent rewrites |
-
-### Map
-
 | Alternative | Why rejected |
 |---|---|
-| Mapbox Maps SDK (native) | Non-OSS since the MapLibre fork point and API-key/usage-billed — conflicts with ADR-013's explicit license/vendor-independence rationale and the project's cost doctrine |
-| Google Maps SDK | Proprietary, API-key-gated, per-load billing from day one; conflicts with ADR-011/ADR-013 cost/independence posture and forfeits the shared PMTiles basemap |
-| A different renderer than the web | Would fork the basemap style, tile pipeline, and attribution from ADR-013 for no benefit; MapLibre Native *is* the mobile MapLibre, keeping one style spec and one tile archive |
-
-### Firebase access
-
-| Alternative | Why rejected |
-|---|---|
-| RN Firebase Firestore/Auth direct on device | Violates the read boundary (ADR-005, ADR-011 §7, invariant 2) and the trust model (ADR-010); puts a canonical-capable SDK and rules surface on an untrusted client. The app reads only released projections through `apps/api-public` |
-| `expo-firebase-*` / Firebase JS SDK for App Check | The JS SDK's web App Check (reCAPTCHA) is not the correct mobile attestation; App Attest / Play Integrity require the native RN Firebase App Check module |
-| No App Check at all | Contradicts ADR-010 assumption 3 and invariant 6; expensive public reads must be attestable |
-
-### Local storage
-
-See the comparison table in decision 4 — AsyncStorage and MMKV lack a query model for a
-relational entity/evidence cache; WatermelonDB and Realm add native/upgrade/vendor burden
-disproportionate to a bounded launch-scope read cache; `expo-sqlite` is the only
-first-party-Expo, real-query option.
-
-### Native-directory policy
-
-| Alternative | Why rejected |
-|---|---|
-| Commit `ios/`/`android/` | Generated build output committed as source invites hand-edits that drift from `app.json`/plugins and cannot be reproduced by EAS — the exact drift R1–R5 exist to prevent |
+| **Bare React Native CLI** (no Expo) | Forfeits EAS Build/Update, managed credentials, config plugins, and `expo install` version resolution — all of which do heavy lifting for a one-maintainer operation — while gaining nothing Expo's CNG + config-plugin escape hatch does not already provide. Native extensibility is available inside Expo. |
+| **Flutter** | Dart codebase cannot import the TypeScript `packages/public-contracts` types; every contract would need a hand-maintained parallel copy, directly inviting the drift program invariant 3 forbids. Also a second language/toolchain for a solo maintainer already fluent in the repo's TS. |
+| **Native Swift + Kotlin (two codebases)** | Two separate native codebases, two contract re-implementations, and two skill sets — the highest possible maintenance load, the opposite of `operating-principle-runs-itself-within-reason`. Justified only for platform-specific performance the reader product does not need. |
+| **Mapbox GL Native / Mapbox mobile SDK** | Non-OSS license and API-key/per-load billing since the MapLibre fork point — rejected for the same reasons ADR-013 rejected Mapbox GL JS on web. Breaks license and vendor-independence posture. |
+| **Google Maps SDK (mobile)** | Proprietary, API-key-gated, per-load billing from day one; cannot render our self-hosted PMTiles in the dark-archive register; conflicts with ADR-011/ADR-013 cost and independence rationale. |
+| **`@react-native-firebase/firestore` for direct reads** | Violates program invariant 2 and ADR-011 §7 (public clients read only `public/**`; canonical data stays behind `api-public`). Would also bypass the `api-public` guardrail/App Check middleware and couple the client to Firestore document shapes instead of versioned contracts. |
+| **App Check via reCAPTCHA provider in a WebView** | Strictly weaker than native App Attest / Play Integrity, adds WebView surface, and regresses UX — no benefit on a platform where hardware-backed attestation exists. |
+| **AsyncStorage / MMKV as the primary cache** | Key-value only; re-implementing indexed relational lookup over entities/evidence by hand. MMKV is retained as an optional complementary KV store, not the cache engine. |
+| **WatermelonDB** | Heavier ORM abstraction over the same SQLite `expo-sqlite` exposes directly, with extra native/config setup, for query needs SQLite already meets. |
+| **Realm / Atlas Device SDK** | Vendor-deprecated (MongoDB announced sunset of Atlas Device Sync/Realm in 2024). Adopting a deprecated engine is an avoidable future migration. |
+| **Committing `ios/`/`android/` to git** | Two sources of truth against CNG; native-tree merge conflicts on every plugin/SDK change — the worst failure mode for a solo maintainer. EAS Build regenerates them anyway. |
+| **Lowering the OS floor to Expo's minimum (iOS 15.1 / API 24)** | Enlarges the test/polyfill matrix for negligible additional U.S. install-base coverage; not justified absent device-share evidence at MOB-006. |
 
 ## Consequences
 
-- **Easier:** one TypeScript codebase and shared contracts with the web; cloud native
-  builds and OTA releases via EAS; a first-party, low-drift module set (`expo-sqlite`,
-  Expo Router) that upgrades with the SDK; a map that reuses the web's tile archive, style,
-  and attribution wholesale.
-- **Harder / newly locked in:** the app now depends on the Expo SDK release train and its
-  N-1 cadence (decision 5); it requires a custom dev client (R2) and the `USE_FRAMEWORKS=
-  static` iOS linkage (R1) from day one; Metro/pnpm resolution becomes a standing monorepo
-  concern (R5). Any future need for a data-plane Firebase capability on device is a boundary
-  change requiring a new ADR, not a package add (R3).
-- **Second-order:** EAS becomes a third root-account custody + spend surface alongside
-  Apple/Google (MOB-001 open gates); the OS floor (decision 7) is now a moving target tied
-  to SDK upgrades and must be re-verified each bump, not set once.
+- `apps/mobile` becomes the repo's first non-Next.js application and its first native build target; MOB-006 must
+  prove it does not break the root `pnpm install` (see §5 hoisting caveat).
+- The mobile client gains its first WebGL-equivalent surface (MapLibre Native), isolated to the map screen, with
+  no SSR concern — simpler than the web's SSR-safety dance around `maplibre-gl`.
+- A new external operational dependency appears: **EAS** (billing, credentials, MFA custody) — already flagged as
+  MOB-001 human gates #3 and #7. This is the first paid third-party in the mobile build path; it is a build-time
+  dependency, not a runtime one in the render path (unlike a managed map vendor would be).
+- Contract discipline tightens: because the client shares `packages/public-contracts` types, MOB-003 must keep
+  those contracts strictly environment-neutral (no Node/DOM/server-only transitive deps) or it breaks the mobile
+  build — enforcing invariant 3 by construction.
+- The offline cache (SQLite) becomes a **second copy** of released public data on-device; MOB-009 must treat it as
+  cache (invalidated by release version per ADR-004), never a source of truth, and MOB-010/018 must ensure no
+  protected data (precise location, sensitive classifications) is cached or logged (program invariant 7).
 
-## Reversibility — reversal cost per decision
+## Reversal cost
 
-- **Framework (Expo managed).** Two-way door, but the width narrows over time. Expo →
-  bare RN is a documented, largely mechanical migration (`expo prebuild` already produces
-  the native projects), so leaving *managed* is cheap; leaving *React Native entirely* for
-  Flutter or native is a full rewrite with no code reuse. Choosing Expo keeps the cheap exit
-  (to bare RN) available while foreclosing only the expensive ones we would never want.
-- **Map (MapLibre Native).** Two-way door and deliberately narrow. Because the renderer
-  reads the same static PMTiles and GeoJSON artifacts the web produces (ADR-013), swapping
-  renderers later is a component swap, not a data-pipeline change — the tile archive, style
-  tokens, and attribution are unaffected. Reversal cost is a single map component.
-- **Firebase access (App Check only).** Two-way door with low cost, and reversing *toward*
-  more device Firebase is intentionally gated. Adding App Check elsewhere or swapping
-  providers touches one thin attestation layer. Expanding to a data-plane Firebase SDK is
-  *meant* to be expensive — it requires a new ADR because it moves the security boundary
-  (R3), so the "cost" here is procedural by design, not accidental.
-- **Local storage (`expo-sqlite`).** Two-way door, cost proportional to cache complexity.
-  The cache is a rebuildable, non-canonical mirror of released projections (it can be
-  dropped and repopulated from `api-public`), so switching stores mainly means rewriting the
-  data-access layer in MOB-009 and shipping a migration — no canonical data is at risk.
-- **Version pinning policy.** Fully reversible, low cost. Pins are per-package config;
-  changing the SDK cadence or Metro/pnpm resolution is an edit plus a build-verify, with no
-  external artifact locked in.
-- **Native-directory policy.** Fully reversible, near-zero cost. Deleting the gitignore
-  entries and committing a `prebuild` output (or vice-versa) is a one-time repo change; it
-  affects reproducibility ergonomics, not any shipped binary or user.
-- **Supported OS floor.** Reversible *upward* cheaply, *downward* with product cost. Raising
-  the floor is a config bump. Lowering it below the current SDK's minimum is impossible
-  without also downgrading the SDK; lowering it within SDK limits means re-adding polyfills
-  and re-testing older-OS devices — a testing cost, not a rewrite. Because floors only move
-  up with SDK upgrades, the practical reversal is "re-verify and raise at each bump"
-  (decision 7).
+Required by MOB-002 acceptance — one paragraph per decision on what changing it later costs.
 
-## Open questions for the red-team pass
+- **Framework (Expo → bare RN or off-RN).** Expo → **bare RN** is a *moderate, mostly one-way* door: `expo prebuild`
+  then maintaining the native folders by hand keeps the JS/TS app but permanently loses EAS/CNG ergonomics and is
+  painful to undo. Expo/RN → **Flutter or native** is a *full rewrite* — a new language and UI layer, re-doing the
+  map, App Check, cache, and navigation from scratch. The framework choice is the least reversible decision here,
+  which is why single-codebase-with-shared-contracts is weighted so heavily.
+- **Map (MapLibre Native → another engine).** *Moderate.* Because the map is isolated to the Explore/detail screens
+  and the tile source is our own PMTiles, swapping the rendering binding is a contained component rewrite, not an
+  app-wide change — the same isolation ADR-013 relied on for web. Switching to a proprietary vendor (Mapbox/Google)
+  would additionally re-introduce API keys and per-load billing this ADR deliberately avoids, so the cost is as much
+  posture as code.
+- **Firebase access (App Check provider or adding data modules).** *Low for the provider, high to breach the boundary.*
+  Changing attestation providers is a config/module swap. But adding a client data module (Firestore/Auth) is not a
+  reversal, it is a **boundary violation** (invariant 2) — the cost is re-architecting away from the `api-public`
+  contract, and it should never be done casually; it would require a new ADR superseding this one and ADR-011 §7.
+- **Local storage (SQLite → another DB).** *Moderate, bounded.* The cache holds derived, release-versioned data, so
+  the fallback is always "clear cache and re-fetch from `api-public`" — no user data is stranded. Migration cost is a
+  new schema + one-time re-hydrate on upgrade (MOB-009 owns migrations), not data loss. This bounded reversal is a
+  reason to prefer plain SQLite over a heavier ORM whose abstractions would have to be unwound too.
+- **Version pinning policy.** *Low.* Cadence and pinning are process, changeable per upgrade cycle. The one sharp edge
+  is the pnpm hoisting configuration: once web + mobile both depend on a particular `node-linker`/hoist setup, changing
+  it re-tests both surfaces' installs — cheap if caught at MOB-006, expensive if discovered post-launch.
+- **Native-directory policy (gitignored → committed).** *Near one-way.* Committing native folders after living on CNG
+  means every future SDK upgrade becomes a manual native-tree reconciliation; going back to gitignored/CNG afterward
+  requires re-deriving all hand-edits as config plugins. Prefer the config-plugin escape hatch; treat committing native
+  as a last resort with a written justification.
+- **OS floor (raising or lowering).** *Asymmetric.* **Raising** the floor later (dropping old-OS users) is trivial
+  config but a user-facing regression that may need release notes. **Lowering** it later (supporting older OSes) can
+  reintroduce polyfills, widen the test matrix, and surface App Attest/Play Integrity edge cases — more expensive than
+  it looks. Setting the floor slightly high now (§7) makes the cheap direction the likely one.
 
-1. **Exact Expo SDK number and its OS minimums are unpinned** in this draft (decision 5,
-   decision 7). The spike ran against "the current Expo SDK"; MOB-006 must record the exact
-   version and confirm iOS 16 / API 26 is `>=` that SDK's floor, updating decision 7 if not.
-2. **Metro + pnpm resolution (R5)** is stated as a requirement but not yet proven in this
-   repo (no `apps/mobile`, no root `.npmrc` today). It must be demonstrated by a green EAS
-   build at MOB-006 before this ADR is accepted as reproducible, not just plausible.
-3. **`USE_FRAMEWORKS=static` (R1) side effects** — static frameworks can affect build times
-   and, occasionally, other pods' linkage. The red-team should confirm no launch dependency
-   conflicts with static linkage on a full (not disposable) build.
-4. **Offline tile-cache ceiling** (decision 2) is asserted as "bounded" but the actual size
-   budget and eviction policy are deferred to MOB-011 — the red-team should confirm that
-   deferral is acceptable and does not smuggle in a full offline basemap against epic
-   non-goals.
+## Migration triggers
+
+- Reconsider the map engine only if MapLibre Native fails a measured performance/quality bar on the §7 device floor
+  that the isolated component cannot fix — mirroring ADR-013's "measured threshold, not a guess" pattern.
+- Add an offline **basemap pack** (beyond a bounded ambient cache) only through MOB-022 on measured evidence, since a
+  full offline basemap is an explicit launch non-goal.
+- Revisit `expo-sqlite` only if the cache's measured query needs outgrow SQLite (unlikely for a read cache), never on
+  preference.
+- Re-verify the OS floor and the Expo SDK/RN pin at every SDK upgrade (MOB-006 sets the first values).
+
+## Rollback considerations
+
+- **Releases roll back via EAS**, mirroring ADR-004's active-pointer discipline: EAS Update rolls back JS/asset changes
+  with staged rollout, and prior immutable native build artifacts remain submittable — no bespoke rollback code
+  (program invariant 4; proven under MOB-021).
+- **The offline cache is disposable.** Any bad cache state recovers by clearing it and re-fetching from `api-public`
+  against the active release; the cache is never authoritative (ADR-004).
+- **App Check is fail-safe toward reads.** Per ADR-010, an App Check misconfiguration must degrade toward
+  release-snapshot reads, not a hard lockout; the mobile client inherits that posture through the shared `api-public`
+  middleware and must not invent a stricter client-side gate that strands users.
+
+## Red-team review resolutions
+
+Dispositions of the two questions flagged in this ADR for the independent second-model red-team (MOB-002 requires
+recorded reviewer findings and dispositions):
+
+- **pnpm `node-linker=hoisted` risk to the root `pnpm install`.** *Resolved (§5):* do not change the workspace
+  root linker; scope hoisting to the RN toolchain via `public-hoist-pattern`, and block MOB-006 on CI proof that
+  the root install and all existing app/worker builds are unchanged after `apps/mobile` is added. The dangerous
+  option (root `node-linker=hoisted`) is rejected.
+- **Whether to relax the iOS 16 / Android API 26 floor toward the Expo minimum.** *Resolved (§7):* hold at iOS 16 /
+  API 26. Relaxation is evidence-gated on MOB-006 device-share data showing materially excluded U.S. users, not a
+  default.
 
 ## References
 
-- ADR-004 — public projection and immutable publication snapshots (release/rollback model)
-- ADR-005 — public/submissions/internal/admin service-surface separation
-- ADR-008 — search and geocoding (bounded, static-first, U.S.-only doctrine)
-- ADR-010 — security and abuse assumptions (client-untrusted, App Check attestation)
-- ADR-011 — Firestore as system of record (cost/independence doctrine, read boundary)
-- ADR-013 — map stack (MapLibre GL JS, PMTiles tile strategy, dark archive basemap)
-- `docs/mobile/mobile-app-epic.md` — program invariants and non-goals (MOB-EPIC)
-- `docs/mobile/decisions/mobile-identity.md` — product identity, bundle IDs, OS floor (MOB-001)
-- Proof-of-concept spike (this ADR, "Evidence") — real run: clean `expo install`,
-  `expo-doctor` 20/20, iOS build under `USE_FRAMEWORKS=static`
+- `docs/mobile/mobile-app-epic.md` — program invariants, non-goals, bead index (MOB-002 → MOB-003/006/010/011).
+- `docs/mobile/decisions/mobile-identity.md` (MOB-001) — product identity, bundle ids, OS floor proposal, human gates.
+- ADR-013 — MapLibre GL JS, PMTiles tile strategy, dark-archive basemap register (the web parallel this ADR mirrors).
+- ADR-011 — Firestore system of record; public clients read only `public/**` (§3 boundary).
+- ADR-010 — security and abuse assumptions; App Check is attestation not authorization; token-logging prohibition.
+- ADR-008 — bounded, static-first public queries; U.S.-only scope; guardrail middleware the mobile client reuses.
+- ADR-005 — service separation; "mobile later consumes the same contracts; do not invent mobile-only services."
+- ADR-004 — immutable release snapshots and atomic activation/rollback the offline cache and EAS releases mirror.

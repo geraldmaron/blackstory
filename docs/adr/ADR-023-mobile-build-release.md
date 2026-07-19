@@ -1,138 +1,190 @@
-# ADR-023: Mobile build, release, and OTA update policy — EAS Build/Submit/Update, runtime versions, and forced-update enforcement
+# ADR-023: Mobile build, distribution, OTA update, and release-rollback model
 
-- **Status:** Proposed
+- **Status:** Proposed — independent red-team complete, awaiting owner acceptance
 - **Date:** 2026-07-19
 - **Bead:** MOB-002 (architecture, threat model, contract boundary ADRs)
 - **Depends on:** ADR-004, ADR-006, ADR-021
 - **Blocks:** MOB-005, MOB-019, MOB-020, MOB-021
 
-> ADR-021 (mobile data boundary) is being drafted in parallel and may not yet exist in this worktree. It defines the public API's N/N-1 compatibility window and the min-supported-app-version signal this ADR ties into. Where this ADR says "the min-version signal," it means that ADR-021 mechanism; if ADR-021's final number differs, only the cross-reference changes, not the decisions here.
-
 ## Scaffold vs target
 
-| Aspect | Today (verified) | Target (MOB-005/019/020/021) |
-|--------|------------------|------------------------------|
-| Expo/EAS project | **Does not exist** — no `apps/mobile`, no `eas.json`, no Expo account (MOB-001 audit) | EAS project linked, three build profiles, three update channels |
-| Build pipeline | **Absent** | EAS Build → EAS Submit, triggered from GitHub Actions (MOB-019) |
-| OTA channel | **Absent** | EAS Update channels bound 1:1 to build profiles, gated by runtime version |
-| Store records | **Absent** — Apple/Play accounts are open human gates (MOB-001) | TestFlight/Play internal + production listings (MOB-020) |
-| Rollback evidence | **None** | Executed OTA rollback drill + expedited-review contingency recorded (MOB-021) |
+| Aspect | Today (verified) | Target |
+|--------|------------------|--------|
+| Expo/EAS project | Does not exist — no `apps/mobile`, no `eas.json`, no Expo account reference anywhere in the repo (see `docs/mobile/decisions/mobile-identity.md` audit) | EAS project linked to the Expo/EAS org gated in MOB-001; `eas.json` with three build profiles |
+| Binary build pipeline | Absent | EAS Build produces iOS/Android binaries; EAS Submit uploads to stores; EAS Update ships JS-only OTA patches |
+| CI wiring | Web CI/CD via GitHub Actions + OIDC/WIF (ADR-006), mobile untouched | GitHub Actions invokes EAS via a scoped EAS token; store credentials in EAS managed credentials + GitHub Actions secrets |
+| Version scheme | Web deploys the tested commit SHA (ADR-006) | Semantic app version (manual) + monotonic build number (CI-derived); recorded in release provenance |
+| Rollback | Web: activate prior release pointer (ADR-004) | OTA: republish/roll back an EAS Update channel; binary: prior store build + staged-rollout halt; drilled in MOB-021 |
 
 ## Context
 
-Program invariant 4 requires "immutable release artifacts with atomic activation and proven rollback." The web surface already realizes this discipline: ADR-004 versions every public projection into an immutable release with a signed manifest and flips a single active-release pointer to activate or roll back atomically; ADR-006 orchestrates deployment through GitHub Actions with short-lived OIDC credentials and no long-lived keys in the repo; ADR-013 couples map artifacts to that same release-activation pipeline so they roll back for free with the pointer. The mobile app must inherit the *spirit* of these — immutable artifacts, atomic activation, a demonstrated pointer-flip rollback, secrets out of the repo — without pretending a store binary behaves like a CDN object.
+The mobile program's invariant 4 is "immutable release artifacts with atomic activation and proven rollback." The web platform already satisfies that shape: ADR-004 versions every publication as an immutable release with a signed manifest and instant rollback via an active-release pointer, and ADR-006 makes GitHub Actions the sole CI/CD authority that deploys only the tested commit SHA, with automatic rollouts disabled, environment-gated approvals, and OIDC/WIF short-lived credentials instead of standing keys. A native mobile app cannot literally reuse either mechanism — a compiled binary sitting in App Store Connect / Play Console is not a Firebase Hosting release pointer, and store review latency means "atomic activation" and "instant rollback" mean something different once a build is in users' hands. This ADR ports the *spirit* of ADR-004/ADR-006 (immutable artifacts, one audited commit, no standing keys, proven not asserted rollback) onto the native distribution reality that EAS, Apple, and Google impose.
 
-The mobile constraint that has no web analogue: two release channels with fundamentally different latencies. A native binary is gated by App Store / Play review (hours to days, not always in our control), while JavaScript and asset changes can ship over-the-air in minutes. This ADR decides which changes are allowed to use which channel, how versions are numbered so the two channels stay coherent, and what the app does when the server tells it it is too old to talk to the API safely.
+The identity record (`docs/mobile/decisions/mobile-identity.md`) already fixes the three environment tiers (dev / preview / production), the bundle/application IDs per tier, U.S.-only launch territories, and the account-custody human gates. It also records the binding budget constraint: EAS Build/Submit is usage-based and the owner must set a spend ceiling consistent with the project's `operating-principle-runs-itself-within-reason` posture (free-tier-first, budget-capped, kill-switch, with a recorded upgrade trigger). This ADR decides the pipeline, the OTA policy, the versioning scheme, the minimum-supported-app enforcement, the CI secrets handling, the rollback-drill requirement, and the cost of reversing off EAS.
 
-MOB-001 already fixed the three environment tiers (dev / preview / production) and their bundle identifiers; this ADR maps a build profile and an update channel onto each. Per program invariant 2 the app never touches canonical Firestore — it reads only `apps/api-public` — so "release" here means the *client artifact* lifecycle, distinct from and downstream of ADR-004's data-release lifecycle.
+Two adjacent mobile ADRs bound this one:
+
+- **ADR-004** (immutable public releases): mobile *content and map artifacts* still ride the server-side release pointer; a mobile build never bakes in a canonical snapshot, so a content rollback is a server release rollback, not an app resubmission. This ADR governs only the *client binary and its JS bundle*, not the data it reads.
+- **ADR-021** (mobile data boundary, drafted in parallel): sets the public API's N / N-1 version compatibility window and the minimum-supported-app signal. This ADR decides what the *client* does when the server says the app is below minimum (see Decision §4); ADR-021 owns the server contract that emits that signal.
 
 ## Decision
 
-### 1. Build and distribution pipeline: EAS Build + EAS Submit + EAS Update
+### 1. Build and distribution pipeline: EAS Build + EAS Submit + EAS Update, three profiles
 
-Expo Application Services is the mobile build/distribution/OTA plane, orchestrated from GitHub Actions (MOB-019) so it sits inside the same CI authority ADR-006 already mandates for the web surface. Three build profiles in `eas.json`, one per MOB-001 environment tier, each bound 1:1 to an EAS Update channel of the same name:
+**EAS Build** produces the iOS and Android binaries; **EAS Submit** uploads them to App Store Connect / Play Console; **EAS Update** ships JS-only over-the-air patches to already-installed binaries. All three are configured through a single committed `eas.json` with exactly three build profiles, one per identity-doc environment tier:
 
-| Profile | Distribution | Trigger | Channel | Bundle ID (MOB-001) |
-|---------|-------------|---------|---------|---------------------|
-| `development` | Dev client, internal devices/simulators only | Manual / on demand | `development` | `app.blackbook.mobile.dev` |
-| `preview` | Internal testing — TestFlight internal group + Play internal track | **Every merge to `main`** | `preview` | `app.blackbook.mobile.preview` |
-| `production` | Store-bound (App Store + Play production) | **Only an explicit tagged, audited release commit** — never an untagged main push | `production` | `app.blackbook.mobile` |
+| Profile | Distribution | Bundle/app ID (from identity doc) | Firebase target | Trigger |
+|---|---|---|---|---|
+| `development` | Dev client, internal only (simulator / registered devices) | `app.blackbook.mobile.dev` | Firebase **emulator suite** — never production | On demand, from a developer machine or a manually dispatched CI job. Never store-bound. |
+| `preview` | Internal testing — TestFlight internal group / Play **internal** track / EAS internal-distribution URL | `app.blackbook.mobile.preview` | Distinct App Check attestation (preview) | **Every merge to `main`** via GitHub Actions, once MOB-006 lands. Fast feedback lane; never a public store listing. |
+| `production` | Store-bound (App Store / Play production track) | `app.blackbook.mobile` | Production `black-book-efaaf` via `apps/api-public` boundary only | **Only** on an explicit annotated release tag pushed to an audited commit — never on a bare `main` merge. |
 
-The `production` trigger mirrors this repo's launch-gate discipline: ADR-006 deploys "only the tested commit (immutable SHA)" behind a protected-environment approval, and the epic's closure discipline requires the epic to close on "a signed-off launch evidence index linking … production commit, store build … release ID." A production build/submit therefore runs only from a signed release tag on an audited commit that passed the MOB-021 launch gate — the mobile analogue of ADR-006's "one audited commit" protected-production rule. `production` profile builds and `production` channel promotions require the same GitHub protected-environment approval ADR-006 uses for web production.
+The production trigger deliberately mirrors ADR-006's "deploy only the tested commit (immutable SHA)" and the epic's "one audited commit" launch-gate discipline: a public binary is minted from a tagged commit that a human gated, not from whatever last landed on `main`. `preview` is the mobile analogue of ADR-006's optional staging/preview lane — high-frequency, internal, never a security boundary and never public. `development` creates no permanent or public store resource, consistent with program invariant 5.
 
-EAS Submit (not manual Xcode/Transporter or Play Console uploads) performs store upload, so submission is auditable CI, consistent with ADR-006 rejecting "Firebase Console / gcloud manual prod deploys" as unauditable.
+The EAS **update channel** is bound to the build profile (`preview` binaries subscribe to the `preview` channel, `production` binaries to the `production` channel), so an OTA push can never cross an environment boundary — a preview-channel update can never reach a store build, exactly as the emulator-vs-production Firebase split prevents a dev build from touching production data.
 
-### 2. OTA update policy (EAS Update) and the runtime-version boundary
+### 2. OTA update policy (EAS Update) and OTA rollback
 
-Every native binary embeds a **runtime version**. EAS Update only ever delivers an update to a binary whose runtime version matches the update's — this is the enforced, mechanical boundary between "can ship OTA" and "requires a new binary." We set `runtimeVersion` policy so it changes exactly when the native layer changes (Expo's `appVersion`-linked or fingerprint policy; MOB-006 pins the concrete policy at scaffold and records it here as an amendment).
+EAS Update replaces only the **JavaScript bundle and bundled JS-readable assets** of an already-installed binary. It therefore *may* ship, without any store review:
 
-**MAY ship over-the-air** (same runtime version, published to the tier's channel):
+- Bug fixes in JS/TS application logic.
+- Content, copy, and layout changes that are pure JS (strings, styles, component trees).
+- Configuration changes that live in the JS bundle (feature flags, endpoint routing within the already-permitted host set).
 
-- Bug fixes in JavaScript/TypeScript logic that touch no native module.
-- Content and copy changes, styling, layout, non-native feature flags.
-- Any pure-JS behavior change that does not alter the native binary's capabilities.
+It **must not**, and technically cannot correctly, ship anything that changes the native binary. The following **require a full binary rebuild + EAS Submit + store review**:
 
-**REQUIRES a full binary resubmission** (runtime-version bump → new EAS Build → EAS Submit → store review):
+- Any native module added or removed (any change to the set of linked native dependencies).
+- Any `Info.plist` / `AndroidManifest.xml` change, **especially any permission or capability change** (a new permission shipped via OTA would be a privacy and review-integrity violation, not merely a technical mismatch — see program invariant 7).
+- Any **Expo SDK upgrade** (the SDK's native runtime must match the bundle's expected runtime; a mismatched OTA bundle can hard-crash on launch).
+- Any change to the app version, entitlements, associated-domain configuration, or signing.
 
-- Adding or removing any native module / config plugin.
-- Any `Info.plist` / `AndroidManifest.xml` change, especially a permission or entitlement change.
-- Expo SDK upgrade, React Native upgrade, or any change to native build config.
+This boundary is enforced structurally by EAS's **runtime version** field: a JS bundle only ever installs onto a binary whose runtime version matches, so an incompatible OTA is *rejected by the client*, not shipped and crashed. The runtime version is bumped exactly when the native layer changes — which is precisely the set of changes that require a resubmission — so the "OTA vs rebuild" decision is encoded in the artifact, not left to a reviewer's judgment.
 
-An OTA update whose JS assumes native capabilities absent from the installed binary is a crash-on-launch class bug; the runtime-version match is what structurally prevents it, so **we never hand-wave a native change into an OTA update** — a runtime-version bump is mandatory for anything in the second list.
+**OTA rollback (concrete mechanism, satisfying invariant 4's "proven rollback" for the OTA case):** every published update on a channel is immutable and addressable by update ID (same immutable-artifact discipline as ADR-004 release manifests). A bad `production`-channel update is rolled back by **republishing the previous known-good update to the same channel** (`eas update --channel production` pointing at the prior update, i.e. an EAS Update "rollback"/republish). Clients on their next update check pull the restored bundle; the bad update is never deleted (immutable audit trail) but is no longer the channel head. Because the JS bundle and the binary are decoupled, this rollback needs **no store review and no resubmission** — it is the mobile equivalent of ADR-004's active-release-pointer flip, and it is the fast path for any regression that shipped via OTA. Rollback latency is bounded by the client's update-check interval, not by store review.
 
-**OTA rollback = republish the previous immutable update to the channel.** Each EAS Update is content-addressed and immutable. A channel points at whichever update is "active" for a runtime version; rolling back means pointing the channel back at the prior good update (an EAS "roll back to embedded" / republish-previous operation). This is the direct mobile analogue of ADR-004's active-release pointer flip — no artifact is mutated, no rebuild occurs, activation is atomic, and the prior artifact stays immutable and addressable exactly as ADR-004 requires. Because a channel pointer flip is cheap and near-instant, OTA is also the fastest mitigation for a bad JS change — faster than any store path.
-
-This rollback must be **demonstrated, not asserted**: MOB-021 must execute and record an actual OTA rollback drill (publish a marked bad update to `preview`, observe a device pick it up, flip the channel back, observe the device return to the prior update) as runtime evidence, consistent with the epic's rule that "documentation alone cannot substitute." See §6.
+**OTA cannot rescue a bad *binary*.** If a regression is in native code (already shipped to the store), OTA is powerless; that case falls to §6's binary contingency (halt staged rollout, promote prior build, expedited review).
 
 ### 3. App version and build number scheme
 
-- **Semantic app version** (`X.Y.Z`, the store-facing marketing version): **manually bumped** on a deliberate release, owned by the release commit, single source of truth in `app.config.ts` / `app.json`. It signals human-meaningful change and is what the min-supported-version check in §4 compares against.
-- **Build/version number** (iOS `CFBundleVersion`, Android `versionCode`): **monotonically increasing, machine-derived, never hand-edited.** Primary source is EAS auto-increment; the CI-derived fallback is git commit count (`git rev-list --count HEAD`), which is monotonic and reproducible without EAS state. Stores reject a re-used or non-increasing build number, so this must be automatic to avoid failed submissions.
+Two independent numbers, matching store requirements:
 
-The two are orthogonal: many monotonic build numbers can share one semantic version (e.g. successive `preview` builds), and OTA updates ship under an unchanged semantic version and build number but a new immutable update ID. The min-version gate in §4 keys on the **semantic app version**, not the build number.
+- **App version** (user-visible semantic version, e.g. `1.2.0` → iOS `CFBundleShortVersionString`, Android `versionName`): **manually bumped** in `app.config`/`eas.json` on a meaningful release, following semver intent (patch = fixes, minor = features, major = breaking UX/compat). It is a deliberate human act tied to the tagged production commit, not a CI side effect.
+- **Build number** (monotonic, store-required uniqueness, iOS `CFBundleVersion` / Android `versionCode`): **derived by CI** and strictly increasing. Preferred source: EAS's own auto-increment (`autoIncrement` per profile) so the platform guarantees monotonicity across builds of the same app version; the fallback derivation if EAS auto-increment is not used is the **git commit count** (`git rev-list --count`), which is monotonic and reproducible from the repo. A CI run number is acceptable only if it is guaranteed never to reset; commit count is preferred because it survives CI-provider changes. The build number is recorded in release provenance alongside the commit SHA, the app version, the EAS build ID, and the runtime version — the mobile analogue of ADR-006's release-metadata provenance record.
 
-### 4. Minimum-supported-app enforcement (ties into ADR-021's N/N-1 signal)
+The pair `(appVersion, buildNumber)` uniquely identifies an immutable binary; `(channel, updateId)` uniquely identifies an immutable OTA bundle. Together they are the mobile "immutable release artifact" set invariant 4 demands.
 
-ADR-021 defines the public API's N/N-1 compatibility window and a **min-supported-app-version signal** the API returns to clients. This ADR decides the client behavior:
+### 4. Minimum-supported-app enforcement (tie-in to ADR-021)
 
-1. On launch and on a cadence, the app reads the min-supported-app-version signal from `apps/api-public` (ADR-021's mechanism).
-2. If the app's **semantic version (§3) is below** the advertised minimum, the app shows a **blocking, non-dismissible forced-update screen** with a deep link to its store listing (App Store / Play), and does not proceed to normal content. This protects the API's N-1 contract: clients too old to be supported are stopped at the door rather than making unsupported calls.
-3. **Fail-open default for a missing or malformed signal.** If the signal itself is **unavailable, times out, is malformed, or is otherwise unreadable** (server outage, network timeout, bad/absent header, parse error), the app **fails OPEN** — it continues to operate normally as if it were supported. Rationale: a broken version-check must never become an accidental self-inflicted denial-of-service that bricks every install at once. A version *gate* is a safety mechanism, not an authorization boundary; the real authorization boundary is the API itself (App Check + guardrails, invariant 6), which stays authoritative regardless. Only a **valid, successfully parsed** signal that *explicitly* places the app below minimum triggers the blocking screen. Fail-closed is rejected precisely because it converts any signal outage into a fleet-wide outage.
+ADR-021 fixes the public API's N / N-1 compatibility window and defines a **minimum-supported-app** signal the server returns (e.g. a minimum acceptable `(appVersion, buildNumber)` and/or minimum contract version in a response header or bootstrap payload). This ADR decides the **client behavior** when the server reports that the running app is below that minimum:
 
-This requirement (3) is stated explicitly and numbered so it cannot be left as an implementation-time coin flip.
+- The app presents a **blocking forced-update screen** that prevents all further use of the product (no bypass, no "later"), because a below-minimum client is, by ADR-021's definition, outside the supported contract window and may misrender or mishandle server responses.
+- The screen carries a **store deep link** (App Store / Play Store product page for `app.blackbook.mobile`) so the user can update in one tap.
+- The check runs at launch and on the first successful (bootstrap) response, so a client that goes stale mid-session is caught on its next server round-trip. (There are no user accounts at launch — MOB-001 non-goal — so "bootstrap response" here means the first successful unauthenticated read, not an authenticated session.)
+- The forced-update state is driven **only** by the server signal, never by a client-baked constant, so raising the floor is a server-side act (ADR-021's surface) that needs no app resubmission — consistent with keeping the server authoritative (program invariant 6).
+
+**Fail-open when the min-version signal itself is unavailable or malformed (red-team-resolved).** The blocking
+forced-update screen fires **only** on an *affirmative, well-formed* below-minimum signal — never on the *absence*
+or corruption of one. Concretely:
+
+- If the bootstrap payload / header that advertises the minimum-supported version is **missing, empty, unparseable,
+  or malformed**, the client treats it as *"no floor asserted"* and proceeds normally. It must **not** self-brick
+  on a signal it cannot read.
+- This is the same fail-open-toward-reads posture the rest of the stack takes (threat model T2; ADR-010 "fail to
+  degraded snapshot reads"; ADR-020 "App Check is fail-safe toward reads"). Fail-*closed* here would convert any
+  transient server hiccup, CDN blip, or a single malformed deploy into an instant, total outage across every
+  installed device — the worst possible failure for a one-maintainer operation, and a self-inflicted denial of
+  service an attacker could aim for. The bounded downside of fail-open — a genuinely-too-old client keeps talking
+  for a little longer — is already contained: below-minimum clients gain no capability (invariant 6, server
+  re-validates every parameter), and the server retains a **hard backstop** independent of this soft signal.
+- **Backstop / reconciliation with ADR-021.** ADR-021's `CLIENT_VERSION_UNSUPPORTED` / `426 Upgrade Required` is
+  that hard backstop: it is the server *affirmatively rejecting* a request from a known-too-old client, and the
+  client **does** honor it (it is a well-formed below-minimum signal, delivered per-request). The bootstrap
+  min-version field decided here is the *proactive* self-fence that lets a client warn/block itself before it hits
+  a 426; its *absence* fails open to that 426 backstop. So the two mechanisms are complementary, not redundant:
+  affirmative rejection (426) and affirmative bootstrap floor both block; only a missing/garbled bootstrap floor
+  fails open. A malformed floor value is logged as a privacy-safe anomaly (MOB-018) so a broken deploy is noticed,
+  but it never blocks a user.
+
+This makes OTA and forced-update complementary: a recoverable regression is fixed via §2 OTA rollback in minutes; an unrecoverable-old client is fenced off by the server raising the minimum and the client blocking itself until updated.
 
 ### 5. Secrets in CI
 
-Consistent with this repo's "secrets in Secret Manager / GitHub Actions secrets, never in the repo" doctrine (ADR-006; the WIF/OIDC pattern in `infra/gcp/wif/`):
+The pipeline needs three credential families, and **none of them may ever live in the repository**, consistent with ADR-006's OIDC/WIF doctrine and the repo-wide "secrets in Secret Manager / GitHub Actions secrets, never in the repo" posture (see `infra/gcp/wif/`):
 
-- **Signing and store credentials live in EAS managed credentials**, not in the repo and not in GitHub secrets. EAS holds the iOS distribution certificate / provisioning profiles / push key and the Android keystore, and the Apple App Store Connect API key and Google Play service-account JSON used by EAS Submit. This also realizes MOB-001's noted fallback: EAS managed credentials survive local machine loss.
-- **The only required GitHub Actions secret is a single, scoped, revocable EAS access token** (`EXPO_TOKEN`) stored as a GitHub Actions secret, used by CI to invoke EAS Build/Submit/Update. It is scoped to the minimum needed, rotatable, and revocable without touching signing material.
-- **Nothing signing-related is committed to the repo** — no keystore, no `.p8`, no service-account JSON, no provisioning profile. `eas.json` contains only non-secret build configuration.
+| Credential | Purpose | Storage (decided) |
+|---|---|---|
+| **Apple App Store Connect API key** (`.p8` + key ID + issuer ID) | EAS Submit → App Store Connect; TestFlight | **EAS managed credentials service** (preferred — EAS holds signing + submission secrets), with the key never checked out to the CI runner. |
+| **Google Play service-account JSON** | EAS Submit → Play Console (internal/production tracks) | **EAS managed credentials** preferred; if a raw JSON must reach CI, it lives only as a **GitHub Actions secret**, injected at job time, never written to the repo or logged. |
+| **iOS/Android signing material** (distribution cert, provisioning profile, Android keystore) | EAS Build code-signing | **EAS managed credentials** (EAS generates and custodies signing keys) — the recommended path; the Android keystore custody is recorded per the identity doc's root-account-custody + phishing-resistant-MFA requirement. |
+| **EAS access token** | GitHub Actions authenticating to EAS (build/submit/update) | **GitHub Actions secret**, a **scoped, revocable EAS token** (not a personal login), rotated on the same cadence as other CI secrets. |
 
-Web deploys use OIDC/WIF for keyless GCP auth (ADR-006); EAS does not offer GitHub OIDC federation today, so a single scoped, revocable token is the closest equivalent that keeps standing secrets to exactly one narrowly-scoped, rotatable credential. If EAS adds OIDC federation, migrating `EXPO_TOKEN` to it is a pure win and should be taken (see Migration triggers).
+Preference order matches ADR-006's "no standing long-lived keys in GitHub secrets where a managed short-lived path exists": push signing/submission secrets into **EAS's managed credentials** (analogous to WIF holding the trust relationship) and keep only the *scoped EAS token* in GitHub Actions secrets as the one bootstrap credential — the minimal surface, revocable, never in the repo. No Apple/Google secret value is invented or stored by this ADR; MOB-019 provisions them into the stores above once the MOB-001 account-custody human gates clear.
 
-### 6. Rollback drill requirement (runtime evidence, per MOB-021)
+### 6. Rollback drill is a launch-gate requirement (MOB-021 evidence)
 
-Rollback is not proven by prose. MOB-021 must execute and record, as runtime evidence in the launch evidence index:
+Invariant 4 says "proven rollback," and the epic's closure discipline says every child closes on runtime evidence, not documentation. Therefore **MOB-021 (the adversarial launch gate) must execute and record an actual rollback drill as runtime evidence — it may not merely assert that rollback works.** The drill must demonstrate, at minimum:
 
-- **(a) An OTA rollback drill** — the channel-pointer-flip procedure of §2, demonstrated end-to-end on a real device against the `preview` channel: push a marked-bad update, confirm a device receives it, flip the channel to the prior immutable update, confirm the device returns to the prior update. Record update IDs, timestamps, and device evidence.
-- **(b) A store-side expedited-review contingency plan** — because a native-layer bug can only be fixed by a new binary through store review (§2), and review latency is not fully in our control, MOB-021 must document and (where possible) rehearse the expedited/emergency review request path (Apple expedited App Review request; Google Play's escalation/review process), including who requests it, the justification template, and the interim OTA mitigation (disable the broken feature via an OTA feature-flag flip while the binary is in review). This is the mobile answer to "some failures can't be pointer-flipped away."
+1. **OTA rollback (mandatory):** publish a deliberately-bad `production`-channel OTA update to a controlled build, observe the regression on a real device, execute the §2 republish-previous-update rollback, and record that the device recovered on its next update check — with the update IDs, timestamps, and recovery latency captured in the launch evidence index.
+2. **Store-side binary contingency (mandatory if feasible at drill time):** rehearse the halt of a Play/App Store **staged rollout**, promotion of the prior known-good store build, and the **Apple/Google "expedited review" request** path for a critical fix — or, if a live store rehearsal is not feasible before launch, record the exact runbook and the reason the live rehearsal could not run, flagged as a residual launch risk rather than silently skipped.
 
-Neither (a) nor (b) may be closed by assertion; both require recorded execution/rehearsal.
+This mirrors the web platform's expectation that rollback is rehearsed, not theoretical (ADR-006 "avoid destructive down-migrations in prod without rehearsal"; `infra/gcp/recovery-rehearsal/`). No production go/no-go is granted until the OTA drill evidence exists.
+
+### 7. Reversal cost: moving off EAS
+
+EAS is a **narrow, reversible vendor boundary**, chosen the same way ADR-013 chose a self-host-friendly map stack: it earns adoption on free-tier-first economics with a recorded upgrade trigger, and the exit is a pipeline swap, not an app rewrite.
+
+- **What is portable:** the app is standard Expo/React Native. The binaries can be built by **`expo prebuild` → Fastlane → self-hosted CI runners** (or GitHub-hosted macOS runners for iOS), and OTA can move to a self-hosted `expo-updates` server or be dropped in favor of store-only releases. None of this touches product code, the identity/bundle IDs, or the store records — it swaps *how* the binary and bundle are produced and shipped.
+- **What the migration costs:** standing up and maintaining macOS build infrastructure (or paid macOS CI minutes), re-implementing signing/submission in Fastlane, custodying the signing keys that EAS otherwise manages, and running a self-hosted updates server if OTA is retained. This is real, recurring ops work — precisely the toil EAS's managed path buys out — which is why EAS is chosen first.
+- **EAS free-tier limits (as understood at 2026-07; reverify at MOB-019 because vendor pricing moves independently of this ADR):** the free plan grants a small monthly quota of cloud builds with limited concurrency and slower queue priority, and EAS Update is metered by monthly active users / bandwidth on the free tier. Exact current numbers must be confirmed at implementation time, not trusted from this ADR.
+- **Recorded upgrade/exit trigger** (per `operating-principle-runs-itself-within-reason`): move off the EAS free tier — first to a paid EAS tier, then, only if paid EAS cost or limits still bind, to the self-hosted Fastlane path — **when** sustained monthly build volume exceeds the free build quota during normal release cadence, **or** EAS Update MAU/bandwidth exceeds the free metering at launch scale, **or** the owner-set monthly spend ceiling (MOB-001 human gate #7) would be breached by EAS charges. Whichever trips first is the trigger; the owner records the decision the same way ADR-011/ADR-013 record measured migration thresholds rather than guessing.
 
 ## Rejected alternatives
 
 | Alternative | Why rejected |
-|-------------|--------------|
-| Self-hosted Fastlane + self-hosted runners now | Standing signing infrastructure, keystore custody, and runner maintenance we do not need at pre-launch scale; EAS managed credentials remove the highest-risk secret custody. Reconsidered only on a measured trigger (below). |
-| Manual Xcode/Transporter and Play Console uploads | Unauditable, skips CI gates — same reason ADR-006 rejects manual console prod deploys. |
-| Ship native changes via OTA | Structurally unsafe (crash-on-launch); the runtime-version boundary exists precisely to forbid it. |
-| Production build on every `main` merge | Untested/unaudited commits reach public store users — the mobile form of ADR-006's rejected "automatic App Hosting on every main push." Production is tag-gated. |
-| Long-lived signing keys committed or in GitHub secrets | Violates repo secret doctrine; EAS managed credentials + one scoped token instead. |
-| Fail-closed on a missing min-version signal | Converts any signal outage into a fleet-wide self-DoS; fail-open is the safety-preserving default (§4.3). |
-| Auto-incrementing the *semantic* version in CI | Semantic version must carry human meaning and drive the min-version gate; only the build number is machine-monotonic. |
-
-## Migration triggers (reversal cost: moving off EAS)
-
-EAS is a managed dependency; this records the concrete condition for leaving it, consistent with the project's free-tier-first-with-a-recorded-upgrade-trigger principle.
-
-- **EAS free-tier limits (as understood, 2026-07; re-verify at MOB-006 scaffold, since EAS pricing moves):** the free plan provides a small monthly quota of cloud builds (order of ~30 builds/month) on shared/queued infrastructure with lower priority and longer queue times, plus EAS Update with a bounded monthly active-user / bandwidth allotment. Paid tiers raise build concurrency/priority and Update MAU/bandwidth. **These numbers are not authoritative — MOB-019 must confirm current limits against Expo's live pricing before relying on them**, and the owner's monthly spend ceiling (MOB-001 human gate #7) governs whether we sit on free or a paid tier.
-- **Concrete trigger to migrate off EAS to self-hosted (Fastlane + self-hosted GitHub runners):** if **either** (a) sustained build volume or Update MAU/bandwidth pushes EAS cost above the owner-set monthly ceiling with no cheaper EAS tier that fits, **or** (b) EAS queue latency repeatedly blocks the release cadence (e.g. can't get an expedited-fix binary built in time), **or** (c) an EAS pricing/policy change materially breaks the model — then migrate.
-- **Reversal cost when triggered:** moderate but bounded, and deliberately de-risked. EAS Build wraps standard native tooling, so a Fastlane pipeline reproduces `fastlane gym`/`supply`/`pilot` equivalents of Build+Submit. The genuine costs are: (i) **taking custody of signing material** — export the iOS certificate/profiles and Android keystore out of EAS into our own secret store (Secret Manager, mirroring ADR-006/`infra/gcp/wif/` doctrine), the single highest-risk step; (ii) **standing up and hardening self-hosted macOS runners** for iOS builds (a real maintenance and supply-chain surface ADR-006's pinned-Actions discipline would extend to); and (iii) **replacing EAS Update** — the hardest piece, since OTA has no drop-in OSS equivalent with the same runtime-version guarantees, so leaving EAS likely means either self-hosting `expo-updates` against our own CDN or dropping OTA and living with store-review latency for every fix. That asymmetry is exactly why we stay on EAS until a measured trigger fires rather than pre-building a self-hosted plane.
-
-## Rollback considerations
-
-- **JS/content regression:** flip the EAS Update channel pointer to the prior immutable update (§2) — fastest path, atomic, no rebuild. This is the default first response.
-- **Native/binary regression:** OTA-flip a feature flag off to neutralize the broken path immediately, then ship a corrected binary through EAS Build/Submit, requesting expedited store review per the §6(b) contingency. Store rollback to a prior binary is limited (Apple does not truly "roll back" a live version; Play supports halting a staged rollout), so the OTA feature-flag mitigation is the real-time control while the fixed binary is in review.
-- **Bad forced-update gate:** because the min-version check fails open (§4.3), a mistaken or unreachable min-version signal cannot brick the fleet; correct the signal server-side (ADR-021 surface) and clients recover on next check.
-- **Staged rollout:** production store releases use phased/staged rollout (Play staged rollout; App Store phased release) so a regression is caught on a fraction of installs before full exposure — the store-native form of ADR-006's "progressive release + automatic rollback."
+|---|---|
+| **Fastlane + self-hosted CI runners from day one** | Front-loads macOS build-infra and signing-custody toil that EAS buys out, before any measured need to leave the free/paid tier — violates the free-tier-first, recorded-upgrade-trigger posture. It is the *exit* path (§7), not the entry path. |
+| **OTA-ship anything, including native/permission changes** | Technically impossible for native code and a privacy/review-integrity violation for permission changes (invariant 7). The runtime-version guard exists precisely to prevent it. |
+| **One build profile with runtime environment switches** | Would let a dev/preview build point at production Firebase and let an OTA cross environment boundaries — exactly the "accidental production use from dev builds" risk the identity doc mitigates structurally. Three profiles bound to three bundle IDs and three channels keep the boundary physical. |
+| **Auto-submit to the production store track on every `main` merge** | The direct analogue of ADR-006's rejected "automatic App Hosting rollout on every push": untested/unaudited commits reach public users. Production requires a tagged, audited commit. |
+| **Soft "please update" banner instead of a blocking forced-update screen** | A below-minimum client is outside ADR-021's supported contract window and may mishandle responses; a dismissible banner lets a broken client keep talking to the server. Blocking is the safe default; the server controls when the floor rises. |
+| **Long-lived personal EAS/Apple/Google credentials in GitHub secrets** | Same objection ADR-006 raises to standing GCP keys: leak blast-radius and no revocation story. Use EAS managed credentials plus a single scoped, revocable EAS token. |
+| **Assert rollback works in this doc and move on** | Violates the epic's runtime-evidence closure discipline and invariant 4's "proven." MOB-021 must drill it (§6). |
+| **Store-only releases, no OTA at all** | Loses the minutes-fast rollback path for JS regressions and forces every copy/bug fix through multi-day store review — a worse rollback posture than invariant 4 wants, for no security gain (OTA is environment- and runtime-version-fenced). |
 
 ## Consequences
 
-- Mobile inherits invariant 4's immutable-artifact/atomic-activation/proven-rollback posture via two coherent mechanisms: EAS Update's content-addressed channel pointer (JS/content) and store binaries gated by runtime version (native), both demonstrated by MOB-021.
-- Exactly one standing CI secret (`EXPO_TOKEN`); all signing custody sits in EAS managed credentials, keeping the repo and GitHub secrets free of signing material.
-- A hard dependency on EAS is accepted deliberately, bounded by a recorded, measured migration trigger and a de-risked (if non-trivial) exit.
-- MOB-005 (release-coupled bootstrap/content artifacts) can now assume this client-release lifecycle; MOB-019 wires the CI; MOB-020 creates store records; MOB-021 supplies the rollback-drill and expedited-review runtime evidence that closes the loop.
-- Open cross-reference risk: this ADR is coupled to ADR-021's not-yet-final min-version signal shape — if ADR-021 lands with a different signal contract, §4 must be reconciled with it (numbered fail-open requirement 4.3 is expected to hold regardless).
+- `apps/mobile` gains an `eas.json` with three profiles and a channel-per-profile binding; MOB-006 scaffolds it, MOB-019 wires the GitHub Actions jobs (`preview` on merge, `production` on tag).
+- Release provenance grows a mobile record: `(appVersion, buildNumber, commitSHA, easBuildId, runtimeVersion)` per binary and `(channel, updateId)` per OTA — the mobile parallel to `infra/github/release-metadata/`.
+- The client must implement a launch/bootstrap minimum-version check and a blocking forced-update screen (MOB-008/MOB-009 surface, driven by ADR-021's server signal).
+- MOB-021's launch evidence index must include the OTA rollback drill artifacts before production go/no-go.
+- A hard dependency on the MOB-001 human gates (Apple/Google/EAS accounts, MFA custody, spend ceiling) — no production build is signed until those clear; nothing here unblocks earlier engineering (MOB-003/006/007 proceed on dev/preview identifiers).
 
-_Package scope note: the mobile identity doc refers to the workspace scope as `@repo` in one place; the verified scope in this repo is `@repo` (e.g. `@repo/config`, `@repo/domain` in `packages/*/package.json`). No `@black-book` scope exists. Recorded here so downstream mobile package naming (MOB-003/006) uses the real scope._
+## Migration triggers
+
+- Move off the EAS free tier (then off EAS entirely to Fastlane/self-hosted) per §7's recorded trigger — measured build volume / OTA metering / spend-ceiling breach, not a guess.
+- Revisit the OTA-vs-rebuild boundary only if Expo changes what `expo-updates` can safely deliver; the permission/native/SDK exclusions are non-negotiable regardless.
+- Reconsider the forced-update blocking behavior only if ADR-021 changes the N / N-1 window such that below-minimum clients become provably safe to keep serving (they are not today).
+- Change the build-number source only with a scheme that preserves strict monotonicity across the change (dual-track until the new source is proven ≥ the old high-water mark).
+
+## Rollback considerations
+
+- **JS/OTA regression:** republish the previous immutable update to the affected channel (§2); recovery bounded by client update-check interval, no store review. This is the fast path and the drilled path (§6).
+- **Native/binary regression:** halt the store staged rollout, promote the prior known-good store build, and request expedited review for a fix build (§6 contingency); OTA cannot help here.
+- **Below-minimum clients:** the server raises the minimum-supported version (ADR-021); affected clients self-fence via the forced-update screen (§4) until they update — a coarse but reliable last-resort "rollback" of a whole compatibility generation.
+- **Content/data regression:** not a mobile-build concern — the app reads server-side immutable releases, so content rollback is an ADR-004 active-release-pointer flip, requiring no app action at all.
+- Never "hotfix" a shipped binary in place; publish a new build or roll back an OTA channel, mirroring ADR-004's "do not fix an active release in place."
+
+## Red-team resolution
+
+Disposition of the question flagged for the independent second-model red-team (MOB-002 requires recorded reviewer
+findings and dispositions):
+
+- **Fail-open vs. fail-closed when the minimum-supported-app signal itself is unavailable or malformed —
+  *resolved: fail open* (§4).** The blocking forced-update screen fires only on an affirmative, well-formed
+  below-minimum signal (bootstrap floor) or an affirmative server rejection (ADR-021 `426` /
+  `CLIENT_VERSION_UNSUPPORTED`). A missing, empty, or malformed floor signal is treated as "no floor asserted," the
+  client proceeds, and the malformed value is logged as a privacy-safe anomaly for MOB-018 rather than blocking any
+  user. Fail-closed was rejected because it turns a transient signal outage or one bad deploy into a total,
+  self-inflicted outage across every install — the opposite of the fail-open-toward-reads posture the whole stack
+  holds (ADR-010, ADR-020, threat model T2) — while the fail-open downside is fully contained by server-side
+  re-validation and the `426` backstop.
