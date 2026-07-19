@@ -7,13 +7,14 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "start": "node dist/index.js",
-    "test": "node --conditions development --import tsx --test src/index.test.ts src/rate-limits.test.ts src/search-guardrails.test.ts src/vector-search-guardrails.test.ts src/vector-search-kill-switch.test.ts src/vector-search-endpoint.test.ts",
+    "test": "node --conditions development --import tsx --test src/index.test.ts src/rate-limits.test.ts src/search-guardrails.test.ts src/vector-search-guardrails.test.ts src/vector-search-kill-switch.test.ts src/vector-search-endpoint.test.ts src/http/handlers.test.ts src/http/redaction.test.ts src/http/server.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
     "@repo/config": "workspace:*",
     "@repo/domain": "workspace:*",
     "@repo/firebase": "workspace:*",
+    "@repo/public-contracts": "workspace:*",
     "@repo/security": "workspace:*"
   },
   "devDependencies": {

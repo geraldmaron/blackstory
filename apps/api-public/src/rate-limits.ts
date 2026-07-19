@@ -46,6 +46,9 @@ const PUBLIC_PATH_PATTERNS: ReadonlyArray<{ pattern: RegExp; endpointClass: Endp
   { pattern: /^\/v1\/locations\/nearby(?:\/|$)/i, endpointClass: 'nearbyDiscovery' },
   { pattern: /^\/v1\/entities\/[^/]+\/sources(?:\/|$)/i, endpointClass: 'sourceInspection' },
   { pattern: /^\/v1\/entities(?:\/|$)/i, endpointClass: 'entityRetrieval' },
+  // Singular `/v1/entity/:id` — the MOB-004 single-entity read route (ADR-021). Maps to the same
+  // `entityRetrieval` quota as the plural collection form above.
+  { pattern: /^\/v1\/entity\/[^/]+(?:\/|$)/i, endpointClass: 'entityRetrieval' },
   { pattern: /^\/v1\/auth\/password-reset(?:\/|$)/i, endpointClass: 'passwordReset' },
   { pattern: /^\/v1\/auth(?:\/|$)/i, endpointClass: 'authentication' },
 ];
