@@ -107,9 +107,13 @@ export {
   createMockLlmProvider,
   createOpenRouterLlmProvider,
   createOllamaLlmProvider,
+  createHybridLlmProvider,
+  extractMessageContent,
   type LlmProvider,
   type CreateLlmProviderOptions,
 } from './llm-provider.js';
+
+export { mapPool } from './map-pool.js';
 
 export {
   runEditorialJudge,

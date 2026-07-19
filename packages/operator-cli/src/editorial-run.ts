@@ -1,6 +1,8 @@
 /**
  * Editorial judge runner: LLM drafts keep/reject + field prose with entity-link markup,
  * domain validates, optional vector-related suggestions. Prepare-only; never publishes.
+ * Subjects are processed concurrently via a bounded worker pool; per-item failures become
+ * needs_evidence packets so overnight batches do not abort on a single bad completion.
  */
 import {
   buildEditorialPacket,
@@ -14,6 +16,7 @@ import {
 } from '@repo/domain';
 import { createLlmProvider, type LlmProvider } from './llm-provider.js';
 import type { OperatorIdentity } from './identity.js';
+import { mapPool } from './map-pool.js';
 
 export type EditorialSubject = {
   readonly subjectId: string;
@@ -35,6 +38,8 @@ export type EditorialRunInput = {
   readonly nowIso: string;
   readonly provider?: LlmProvider;
   readonly model?: string;
+  /** Bounded parallel subject workers (default 1 = sequential). */
+  readonly concurrency?: number;
   readonly targetVectorBySubjectId?: ReadonlyMap<string, EmbeddingVector>;
 };
 
@@ -46,6 +51,9 @@ export type EditorialRunItem = {
     readonly similarity: number;
     readonly displayName?: string;
   }[];
+  /** Hybrid lane that answered, when applicable. */
+  readonly servedBy?: string;
+  readonly error?: string;
 };
 
 export type EditorialRunResult = {
@@ -54,7 +62,9 @@ export type EditorialRunResult = {
   readonly keepCount: number;
   readonly rejectCount: number;
   readonly needsEvidenceCount: number;
+  readonly errorCount: number;
   readonly completedAt: string;
+  readonly concurrency: number;
 };
 
 type ModelJson = {
@@ -110,23 +120,23 @@ function ensureLinkedSummary(
   return linkifyProseAgainstCatalog(summary, catalog, { skipEntityIds: [subjectId] }).text;
 }
 
-export async function runEditorialJudge(input: EditorialRunInput): Promise<EditorialRunResult> {
-  const provider = input.provider ?? createLlmProvider({ provider: 'mock' });
-  const catalogTargets: CatalogLinkTarget[] = input.catalog.map((entry) => ({
-    id: entry.id,
-    displayName: entry.displayName,
-    ...(entry.aliases !== undefined ? { aliases: entry.aliases } : {}),
-  }));
-  const vectorCorpus = input.catalog
-    .filter((entry) => entry.vector !== undefined)
-    .map((entry) => ({
-      id: entry.id,
-      vector: entry.vector!,
-      ...(entry.displayName !== undefined ? { displayName: entry.displayName } : {}),
-    }));
-
-  const items: EditorialRunItem[] = [];
-  for (const subject of input.subjects) {
+async function judgeOneSubject(input: {
+  readonly subject: EditorialSubject;
+  readonly provider: LlmProvider;
+  readonly model: string;
+  readonly catalogTargets: readonly CatalogLinkTarget[];
+  readonly vectorCorpus: readonly {
+    readonly id: string;
+    readonly vector: EmbeddingVector;
+    readonly displayName?: string;
+  }[];
+  readonly catalog: readonly EditorialCatalogEntity[];
+  readonly identity: OperatorIdentity;
+  readonly nowIso: string;
+  readonly targetVectorBySubjectId?: ReadonlyMap<string, EmbeddingVector>;
+}): Promise<EditorialRunItem> {
+  const { subject, provider, catalogTargets, vectorCorpus } = input;
+  try {
     const userPayload = {
       subjectId: subject.subjectId,
       title: subject.title,
@@ -140,7 +150,7 @@ export async function runEditorialJudge(input: EditorialRunInput): Promise<Edito
       })),
     };
     const completion = await provider.complete({
-      model: input.model ?? 'mock-editorial-v1',
+      model: input.model,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: JSON.stringify(userPayload) },
@@ -201,18 +211,82 @@ export async function runEditorialJudge(input: EditorialRunInput): Promise<Edito
         ...(relatedIds.length > 0 ? { relatedEntityIds: relatedIds } : {}),
       },
       validationIssues: validation.issues,
-      model: { provider: completion.provider, modelId: completion.modelId },
+      model: {
+        provider: completion.servedBy ?? completion.provider,
+        modelId: completion.modelId,
+      },
       createdAt: input.nowIso,
       operatorId: input.identity.operatorId,
       sessionId: input.identity.sessionId,
     });
 
-    items.push({
+    return {
       packet,
       rawModelContent: completion.content,
       relatedSuggestions,
+      ...(completion.servedBy !== undefined ? { servedBy: completion.servedBy } : {}),
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const packet = buildEditorialPacket({
+      subjectId: subject.subjectId,
+      subjectTitle: subject.title,
+      decision: 'needs_evidence',
+      rationale: `LLM completion failed: ${message.slice(0, 300)}`,
+      confidence: 0,
+      drafts: {
+        ...(subject.existingSummary !== undefined
+          ? { publicSummary: subject.existingSummary }
+          : {}),
+      },
+      validationIssues: [`completion_error: ${message.slice(0, 200)}`],
+      model: { provider: provider.id, modelId: input.model },
+      createdAt: input.nowIso,
+      operatorId: input.identity.operatorId,
+      sessionId: input.identity.sessionId,
     });
+    return {
+      packet,
+      relatedSuggestions: [],
+      error: message,
+    };
   }
+}
+
+export async function runEditorialJudge(input: EditorialRunInput): Promise<EditorialRunResult> {
+  const provider = input.provider ?? createLlmProvider({ provider: 'mock' });
+  const concurrency = Math.max(1, Math.floor(input.concurrency ?? 1));
+  const catalogTargets: CatalogLinkTarget[] = input.catalog.map((entry) => ({
+    id: entry.id,
+    displayName: entry.displayName,
+    ...(entry.aliases !== undefined ? { aliases: entry.aliases } : {}),
+  }));
+  const vectorCorpus = input.catalog
+    .filter((entry) => entry.vector !== undefined)
+    .map((entry) => ({
+      id: entry.id,
+      vector: entry.vector!,
+      ...(entry.displayName !== undefined ? { displayName: entry.displayName } : {}),
+    }));
+
+  const items = await mapPool(
+    input.subjects,
+    (subject) =>
+      judgeOneSubject({
+        subject,
+        provider,
+        model: input.model ?? 'mock-editorial-v1',
+        catalogTargets,
+        vectorCorpus,
+        catalog: input.catalog,
+        identity: input.identity,
+        nowIso: input.nowIso,
+        ...(input.targetVectorBySubjectId !== undefined
+          ? { targetVectorBySubjectId: input.targetVectorBySubjectId }
+          : {}),
+      }),
+    { concurrency },
+  );
 
   return {
     kind: 'editorial.run.v1',
@@ -220,6 +294,8 @@ export async function runEditorialJudge(input: EditorialRunInput): Promise<Edito
     keepCount: items.filter((item) => item.packet.decision === 'keep').length,
     rejectCount: items.filter((item) => item.packet.decision === 'reject').length,
     needsEvidenceCount: items.filter((item) => item.packet.decision === 'needs_evidence').length,
+    errorCount: items.filter((item) => item.error !== undefined).length,
     completedAt: input.nowIso,
+    concurrency,
   };
 }

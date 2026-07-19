@@ -76,8 +76,47 @@ DISCOVERY_STORAGE_TERMS_CONFIRMED=true \
 ./scripts/run-scheduled-searxng-discovery.sh
 ```
 
-Survivors become private Firestore `researchCases` (`state: candidate`) for admin
-`/console/candidate-queue` and `/console/research-cases`. Never auto-publishes.
+Survivors become private Firestore draft research cases. Never auto-publishes.
+
+### Where `--queue-survivors --commit` writes
+
+| | |
+|---|---|
+| Firebase project | **`black-book-efaaf`** (only live project today; ADR-012 staging/internal not provisioned) |
+| Primary collection | `researchCases/{uuid}` with `state: candidate` |
+| Companion | `submissionInbox/{uuid}` (quarantined lead) + `auditEvents` / `outboxMessages` via `commitWithAudit` |
+| Corsair env | `~/.config/blackstory/discovery.env` → `FIREBASE_PROJECT_ID` / `GOOGLE_CLOUD_PROJECT` / `APP_FIREBASE_ALLOW_PRODUCTION=1` + ADC path |
+| Publish | **No** — private triage only (`COMMIT_SURVIVORS=1` does not enable public publish) |
+
+There is no separate DEV Firebase project for discovery commits. Local admin review against live
+data must target **`black-book-efaaf`** (same project Corsair writes). Emulator/`demo-repo` will
+not show overnight survivors.
+
+### Open admin review (Mac)
+
+Use branch **`redesign/brand-map-beads`** (or any checkout that still has live
+`apps/admin/src/cases/` + console live-backing). On `main`, `/console/candidate-queue` is
+fixture-only and will **not** show Firestore survivors.
+
+```bash
+cd ~/Developer/Projects/blackstory
+git switch redesign/brand-map-beads   # required for live researchCases UI
+# apps/admin/.env.local: NEXT_PUBLIC_FIREBASE_PROJECT_ID=black-book-efaaf
+#   APP_FIREBASE_ALLOW_PRODUCTION=1, no FIREBASE_EMULATOR_MODE / FIRESTORE_EMULATOR_HOST
+pnpm --filter @repo/admin dev         # http://localhost:3001
+```
+
+Then open (after Firebase Auth login):
+
+| Surface | URL |
+|---|---|
+| Candidate queue (live `candidate` + `relevance_review`) | http://localhost:3001/console/candidate-queue |
+| Research cases console | http://localhost:3001/console/research-cases |
+| Case triage inbox | http://localhost:3001/inbox |
+| Case queue | http://localhost:3001/cases |
+
+Firebase Console (read-only check): [Firestore `researchCases`](https://console.firebase.google.com/project/black-book-efaaf/firestore/databases/-default-/data/~2FresearchCases)
+— filter `state == candidate`.
 
 **Query roster:** `packages/config/src/scheduled-jobs/data/corsair-web-search-queries.json`.
 SERP discovery only — not HTML body scrape. Full crawl of `blackwomenleadproject.org`
@@ -86,7 +125,9 @@ remains gated on source-policy audit (`repo-tt2u.13`).
 **Overnight hybrid** (`scripts/run-overnight-hybrid-enrichment.sh`) runs SearXNG roster
 first (`SEARXNG_QUERIES_PER_NIGHT`, default 8, hard-capped at 12), then multi-round Wikimedia
 `discover-candidates`, then hybrid LLM enrichment with **`COMMIT_ENRICHMENT=0`** by default
-(quarantine commit requires `ALLOW_ENRICHMENT_COMMIT=1`).
+(quarantine commit requires `ALLOW_ENRICHMENT_COMMIT=1`). Full ops runbook:
+[`overnight-hybrid-enrichment.md`](./overnight-hybrid-enrichment.md). Dev Guides:
+`~/Developer/Guides/CLI-Reference.md`, `Workflows.md`, `Secrets-1Password.md`.
 
 ### Overnight / SearXNG safeties
 

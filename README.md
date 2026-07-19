@@ -163,11 +163,13 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts disc
 # Scheduled Functions (ADR-018): pnpm --filter @repo/functions-discovery start
 # See docs/runbooks/discovery-campaign-automation.md and functions/README.md
 
-# Editorial enrichment (LLM stage-only; --provider mock|openrouter|ollama; --catalog-from=firestore)
+# Editorial enrichment (LLM stage-only; --provider mock|openrouter|ollama|hybrid)
+# Parallel: --concurrency N. Hybrid = OpenRouter free → Corsair/local Ollama failover.
 # OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
-#   packages/operator-cli/src/bin.ts editorial-run --subjects /tmp/subjects.json \
-#   --catalog-from=firestore --provider mock \
+#   packages/operator-cli/src/bin.ts enrichment-run --subjects /tmp/subjects.json \
+#   --provider hybrid --model openrouter/free --ollama-model qwen3:8b --concurrency 4 \
 #   --operator-id "$USER" --session-id "sess-$(date +%s)" --identity-source cursor_session
+# Overnight on Corsair (systemd): docs/runbooks/overnight-hybrid-enrichment.md
 # Embedding backfill (needs GEMINI_API_KEY): packages/firebase/src/embeddings/backfill-cli.ts \
 #   --source=publicSearchIndex --max-items 600 --max-cost-usd 1
 

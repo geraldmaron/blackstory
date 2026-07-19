@@ -2,7 +2,8 @@
  * Pluggable LLM completion port for editorial/enrichment runs.
  *
  * Providers: `mock` (deterministic, no network), `openrouter` (OPENROUTER_API_KEY),
- * `ollama` (local OpenAI-compatible). Never used on the public render path.
+ * `ollama` (local OpenAI-compatible or native /api/chat), `hybrid` (OpenRouter primary
+ * with Ollama failover). Never used on the public render path.
  */
 export type LlmMessage = {
   readonly role: 'system' | 'user' | 'assistant';
@@ -20,6 +21,9 @@ export type LlmCompletionResult = {
   readonly content: string;
   readonly provider: string;
   readonly modelId: string;
+  /** When hybrid failover occurred, names the provider that actually answered. */
+  readonly servedBy?: string;
+  readonly attempts?: number;
 };
 
 export type LlmProvider = {
@@ -28,15 +32,19 @@ export type LlmProvider = {
 };
 
 export type CreateLlmProviderOptions = {
-  readonly provider?: 'mock' | 'openrouter' | 'ollama';
+  readonly provider?: 'mock' | 'openrouter' | 'ollama' | 'hybrid';
   readonly model?: string;
   readonly apiKey?: string;
   readonly baseUrl?: string;
+  /** Ollama model used by hybrid failover (and default for provider=ollama). */
+  readonly ollamaModel?: string;
   readonly fetchImpl?: typeof fetch;
+  /** Max attempts per provider before failing (or failing over for hybrid). */
+  readonly maxAttempts?: number;
 };
 
 const DEFAULT_OPENROUTER_MODEL = 'openrouter/free';
-const DEFAULT_OLLAMA_MODEL = 'llama3.2';
+const DEFAULT_OLLAMA_MODEL = 'qwen3:8b';
 const DEFAULT_MOCK_MODEL = 'mock-editorial-v1';
 
 export function createMockLlmProvider(modelId = DEFAULT_MOCK_MODEL): LlmProvider {
@@ -72,12 +80,42 @@ export function createMockLlmProvider(modelId = DEFAULT_MOCK_MODEL): LlmProvider
   };
 }
 
+type ChatMessagePayload = {
+  readonly role?: string;
+  readonly content?: string | null;
+  readonly reasoning?: string | null;
+  readonly thinking?: string | null;
+};
+
+/** Prefer message.content; fall back to reasoning/thinking (qwen3 OpenAI-compat quirk). */
+export function extractMessageContent(message: ChatMessagePayload | undefined): string {
+  const content = message?.content?.trim();
+  if (content) return content;
+  const reasoning = message?.reasoning?.trim() || message?.thinking?.trim();
+  if (!reasoning) return '';
+  const jsonStart = reasoning.indexOf('{');
+  const jsonEnd = reasoning.lastIndexOf('}');
+  if (jsonStart >= 0 && jsonEnd > jsonStart) {
+    return reasoning.slice(jsonStart, jsonEnd + 1);
+  }
+  return reasoning;
+}
+
+function isRetryableStatus(status: number): boolean {
+  return status === 408 || status === 429 || status >= 500;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function completeOpenAiCompatible(
   providerId: string,
   baseUrl: string,
   apiKey: string | undefined,
   request: LlmCompletionRequest,
   fetchImpl: typeof fetch,
+  extraBody: Record<string, unknown> = {},
 ): Promise<LlmCompletionResult> {
   const headers: Record<string, string> = {
     'content-type': 'application/json',
@@ -98,26 +136,119 @@ async function completeOpenAiCompatible(
       max_tokens: request.maxTokens ?? 900,
       messages: request.messages,
       response_format: { type: 'json_object' },
+      ...extraBody,
     }),
   });
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`${providerId} completion failed (${response.status}): ${body.slice(0, 400)}`);
+    const err = new Error(
+      `${providerId} completion failed (${response.status}): ${body.slice(0, 400)}`,
+    ) as Error & { status?: number; retryable?: boolean };
+    err.status = response.status;
+    err.retryable = isRetryableStatus(response.status);
+    throw err;
   }
   const json = (await response.json()) as {
-    choices?: Array<{ message?: { content?: string } }>;
+    choices?: Array<{ message?: ChatMessagePayload }>;
+    model?: string;
   };
-  const content = json.choices?.[0]?.message?.content;
-  if (!content?.trim()) {
-    throw new Error(`${providerId} returned empty completion content`);
+  const content = extractMessageContent(json.choices?.[0]?.message);
+  if (!content) {
+    const err = new Error(`${providerId} returned empty completion content`) as Error & {
+      retryable?: boolean;
+    };
+    err.retryable = true;
+    throw err;
   }
-  return { content, provider: providerId, modelId: request.model };
+  return {
+    content,
+    provider: providerId,
+    modelId: typeof json.model === 'string' && json.model ? json.model : request.model,
+  };
+}
+
+/**
+ * Ollama native /api/chat — honors `think: false` so qwen3 writes to `message.content`
+ * instead of burning tokens on reasoning under the OpenAI-compat shim.
+ */
+async function completeOllamaNative(
+  baseUrl: string,
+  request: LlmCompletionRequest,
+  fetchImpl: typeof fetch,
+): Promise<LlmCompletionResult> {
+  const root = baseUrl.replace(/\/$/, '').replace(/\/v1$/, '');
+  const response = await fetchImpl(`${root}/api/chat`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      model: request.model,
+      stream: false,
+      think: false,
+      options: {
+        temperature: request.temperature ?? 0.2,
+        num_predict: request.maxTokens ?? 900,
+      },
+      messages: request.messages,
+      format: 'json',
+    }),
+  });
+  if (!response.ok) {
+    const body = await response.text();
+    const err = new Error(
+      `ollama completion failed (${response.status}): ${body.slice(0, 400)}`,
+    ) as Error & { status?: number; retryable?: boolean };
+    err.status = response.status;
+    err.retryable = isRetryableStatus(response.status);
+    throw err;
+  }
+  const json = (await response.json()) as {
+    message?: ChatMessagePayload;
+    model?: string;
+  };
+  const content = extractMessageContent(json.message);
+  if (!content) {
+    const err = new Error('ollama returned empty completion content') as Error & {
+      retryable?: boolean;
+    };
+    err.retryable = true;
+    throw err;
+  }
+  return {
+    content,
+    provider: 'ollama',
+    modelId: typeof json.model === 'string' && json.model ? json.model : request.model,
+  };
+}
+
+async function withRetries(
+  label: string,
+  maxAttempts: number,
+  run: () => Promise<LlmCompletionResult>,
+): Promise<LlmCompletionResult> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const result = await run();
+      return { ...result, attempts: attempt };
+    } catch (error) {
+      lastError = error;
+      const retryable =
+        error instanceof Error &&
+        'retryable' in error &&
+        (error as { retryable?: boolean }).retryable === true;
+      if (!retryable || attempt >= maxAttempts) break;
+      await sleep(Math.min(8_000, 400 * 2 ** (attempt - 1)));
+    }
+  }
+  const message = lastError instanceof Error ? lastError.message : String(lastError);
+  throw new Error(`${label} failed after ${maxAttempts} attempt(s): ${message}`);
 }
 
 export function createOpenRouterLlmProvider(options: {
   readonly apiKey?: string;
   readonly model?: string;
   readonly fetchImpl?: typeof fetch;
+  readonly maxAttempts?: number;
 }): LlmProvider {
   const apiKey = options.apiKey ?? process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
@@ -125,15 +256,18 @@ export function createOpenRouterLlmProvider(options: {
   }
   const fetchImpl = options.fetchImpl ?? fetch;
   const defaultModel = options.model ?? process.env.OPENROUTER_MODEL ?? DEFAULT_OPENROUTER_MODEL;
+  const maxAttempts = options.maxAttempts ?? 3;
   return {
     id: 'openrouter',
     complete(request) {
-      return completeOpenAiCompatible(
-        'openrouter',
-        'https://openrouter.ai/api/v1',
-        apiKey,
-        { ...request, model: request.model || defaultModel },
-        fetchImpl,
+      return withRetries('openrouter', maxAttempts, () =>
+        completeOpenAiCompatible(
+          'openrouter',
+          'https://openrouter.ai/api/v1',
+          apiKey,
+          { ...request, model: request.model || defaultModel },
+          fetchImpl,
+        ),
       );
     },
   };
@@ -143,38 +277,135 @@ export function createOllamaLlmProvider(options: {
   readonly baseUrl?: string;
   readonly model?: string;
   readonly fetchImpl?: typeof fetch;
+  readonly maxAttempts?: number;
 }): LlmProvider {
   const baseUrl = options.baseUrl ?? process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434/v1';
   const fetchImpl = options.fetchImpl ?? fetch;
   const defaultModel = options.model ?? process.env.OLLAMA_MODEL ?? DEFAULT_OLLAMA_MODEL;
+  const maxAttempts = options.maxAttempts ?? 2;
   return {
     id: 'ollama',
     complete(request) {
-      return completeOpenAiCompatible(
-        'ollama',
-        baseUrl,
-        undefined,
-        { ...request, model: request.model || defaultModel },
-        fetchImpl,
+      return withRetries('ollama', maxAttempts, () =>
+        completeOllamaNative(baseUrl, { ...request, model: request.model || defaultModel }, fetchImpl),
       );
     },
   };
 }
 
+function looksLikeJsonObject(content: string): boolean {
+  const trimmed = content.trim();
+  if (!trimmed.startsWith('{')) return false;
+  try {
+    JSON.parse(trimmed);
+    return true;
+  } catch {
+    const start = trimmed.indexOf('{');
+    const end = trimmed.lastIndexOf('}');
+    if (start < 0 || end <= start) return false;
+    try {
+      JSON.parse(trimmed.slice(start, end + 1));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
+/**
+ * OpenRouter free router first; on retryable failure or non-JSON body, Ollama on Corsair/local.
+ * Records `servedBy` so overnight reports show which lane answered.
+ */
+export function createHybridLlmProvider(options: {
+  readonly apiKey?: string;
+  readonly model?: string;
+  readonly ollamaModel?: string;
+  readonly baseUrl?: string;
+  readonly fetchImpl?: typeof fetch;
+  readonly maxAttempts?: number;
+}): LlmProvider {
+  const openrouter = createOpenRouterLlmProvider({
+    ...(options.apiKey !== undefined ? { apiKey: options.apiKey } : {}),
+    ...(options.model !== undefined ? { model: options.model } : {}),
+    ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),
+    maxAttempts: options.maxAttempts ?? 2,
+  });
+  const ollama = createOllamaLlmProvider({
+    ...(options.baseUrl !== undefined ? { baseUrl: options.baseUrl } : {}),
+    model: options.ollamaModel ?? process.env.OLLAMA_MODEL ?? DEFAULT_OLLAMA_MODEL,
+    ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),
+    maxAttempts: options.maxAttempts ?? 2,
+  });
+  return {
+    id: 'hybrid',
+    async complete(request) {
+      try {
+        const primary = await openrouter.complete({
+          ...request,
+          model: request.model || DEFAULT_OPENROUTER_MODEL,
+        });
+        if (!looksLikeJsonObject(primary.content)) {
+          throw Object.assign(new Error('openrouter returned non-JSON content'), {
+            retryable: true,
+          });
+        }
+        return { ...primary, provider: 'hybrid', servedBy: 'openrouter' };
+      } catch (primaryError) {
+        try {
+          const fallback = await ollama.complete({
+            ...request,
+            model: options.ollamaModel ?? process.env.OLLAMA_MODEL ?? DEFAULT_OLLAMA_MODEL,
+          });
+          if (!looksLikeJsonObject(fallback.content)) {
+            throw new Error('ollama returned non-JSON content');
+          }
+          return { ...fallback, provider: 'hybrid', servedBy: 'ollama' };
+        } catch (fallbackError) {
+          const primaryMsg =
+            primaryError instanceof Error ? primaryError.message : String(primaryError);
+          const fallbackMsg =
+            fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
+          throw new Error(
+            `hybrid failed (openrouter: ${primaryMsg.slice(0, 200)}; ollama: ${fallbackMsg.slice(0, 200)})`,
+          );
+        }
+      }
+    },
+  };
+}
+
 export function createLlmProvider(options: CreateLlmProviderOptions = {}): LlmProvider {
-  const provider = options.provider ?? (process.env.EDITORIAL_LLM_PROVIDER as CreateLlmProviderOptions['provider']) ?? 'mock';
+  const provider =
+    options.provider ??
+    (process.env.EDITORIAL_LLM_PROVIDER as CreateLlmProviderOptions['provider']) ??
+    'mock';
   switch (provider) {
     case 'openrouter':
       return createOpenRouterLlmProvider({
         ...(options.apiKey !== undefined ? { apiKey: options.apiKey } : {}),
         ...(options.model !== undefined ? { model: options.model } : {}),
         ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),
+        ...(options.maxAttempts !== undefined ? { maxAttempts: options.maxAttempts } : {}),
       });
     case 'ollama':
       return createOllamaLlmProvider({
         ...(options.baseUrl !== undefined ? { baseUrl: options.baseUrl } : {}),
-        ...(options.model !== undefined ? { model: options.model } : {}),
+        ...(options.ollamaModel !== undefined
+          ? { model: options.ollamaModel }
+          : options.model !== undefined
+            ? { model: options.model }
+            : {}),
         ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),
+        ...(options.maxAttempts !== undefined ? { maxAttempts: options.maxAttempts } : {}),
+      });
+    case 'hybrid':
+      return createHybridLlmProvider({
+        ...(options.apiKey !== undefined ? { apiKey: options.apiKey } : {}),
+        ...(options.model !== undefined ? { model: options.model } : {}),
+        ...(options.ollamaModel !== undefined ? { ollamaModel: options.ollamaModel } : {}),
+        ...(options.baseUrl !== undefined ? { baseUrl: options.baseUrl } : {}),
+        ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),
+        ...(options.maxAttempts !== undefined ? { maxAttempts: options.maxAttempts } : {}),
       });
     case 'mock':
     default:

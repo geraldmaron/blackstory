@@ -109,15 +109,19 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts comm
 
 ## Editorial enrichment (LLM stage-only)
 
-After discovery/obscurity yields pending leads, run the editorial judge (mock / OpenRouter /
-Ollama). It weeds keep|reject|needs_evidence, drafts `publicSummary` with optional
-`[[entityId|Label]]` prose links, suggests related ids (vectors when provided), validates
-learning-summary + public-language gates, and stages quarantine packets — **never publishes**.
+After discovery/obscurity yields pending leads, run the editorial judge (`mock` /
+`openrouter` / `ollama` / `hybrid`). It weeds keep|reject|needs_evidence, drafts
+`publicSummary` with optional `[[entityId|Label]]` prose links, suggests related ids
+(vectors when provided), validates learning-summary + public-language gates, and stages
+quarantine packets — **never publishes**. Use `--concurrency N` for parallel subjects;
+`hybrid` fails over OpenRouter free → Ollama. Overnight Corsair job:
+[`docs/runbooks/overnight-hybrid-enrichment.md`](../runbooks/overnight-hybrid-enrichment.md).
 
 ```bash
 node --conditions development --import tsx packages/operator-cli/src/bin.ts pending-list --from /tmp/obscurity.json
-node --conditions development --import tsx packages/operator-cli/src/bin.ts editorial-run \
-  --subjects /tmp/subjects.json --provider mock \
+node --conditions development --import tsx packages/operator-cli/src/bin.ts enrichment-run \
+  --subjects /tmp/subjects.json --provider hybrid \
+  --model openrouter/free --ollama-model qwen3:8b --concurrency 4 \
   --catalog-from=firestore \
   --operator-id "$USER" --session-id "sess-$(date +%s)" --identity-source cursor_session
 ```

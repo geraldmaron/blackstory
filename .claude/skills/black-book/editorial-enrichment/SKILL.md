@@ -14,10 +14,15 @@ release activation are out of scope for this skill.
 # OpenRouter (1Password via run-with-dev-secrets)
 run-with-dev-secrets -- env | rg OPENROUTER
 
-# Or local Ollama (no key)
+# Or local / Corsair Ollama (no key)
 export EDITORIAL_LLM_PROVIDER=ollama
-export OLLAMA_MODEL=llama3.2
+export OLLAMA_MODEL=qwen3:8b
+export OLLAMA_BASE_URL=http://100.119.72.84:11434/v1   # Corsair via Tailscale
 ```
+
+Overnight Corsair job (SearXNG + Wikimedia + hybrid enrichment):
+`docs/runbooks/overnight-hybrid-enrichment.md`. Dev Guides:
+`~/Developer/Guides/Workflows.md`, `CLI-Reference.md`, `Secrets-1Password.md`.
 
 ## Pending list
 
@@ -51,13 +56,14 @@ GEMINI_API_KEY=… APP_FIREBASE_ALLOW_PRODUCTION=1 FIREBASE_PROJECT_ID=black-boo
   --source=publicSearchIndex --max-items 600 --max-cost-usd 1
 ```
 
-Providers: `mock` (default), `openrouter`, `ollama`. Pass `--model openrouter/free` (or a local
-model id) when not using mock.
+Providers: `mock` (default), `openrouter`, `ollama`, `hybrid`. Pass `--model openrouter/free`
+and optional `--ollama-model qwen3:8b` / `--concurrency N` when not using mock.
 
 Enrichment is the same judge with result kind `enrichment.run.v1`:
 
 ```bash
-… enrichment-run --subjects … --provider openrouter --model openrouter/free …
+… enrichment-run --subjects … --provider hybrid \
+  --model openrouter/free --ollama-model qwen3:8b --concurrency 4 …
 ```
 
 ## Commit (stage only)

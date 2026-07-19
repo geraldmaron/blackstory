@@ -620,11 +620,22 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
           | 'mock'
           | 'openrouter'
-          | 'ollama';
+          | 'ollama'
+          | 'hybrid';
+        if (!['mock', 'openrouter', 'ollama', 'hybrid'].includes(providerName)) {
+          throw new Error('--provider must be mock|openrouter|ollama|hybrid');
+        }
         const model = optionalFlag(flags, '--model');
+        const ollamaModel = optionalFlag(flags, '--ollama-model');
+        const concurrencyRaw = optionalFlag(flags, '--concurrency');
+        const concurrency = concurrencyRaw !== undefined ? Number(concurrencyRaw) : 1;
+        if (!Number.isFinite(concurrency) || concurrency < 1) {
+          throw new Error('--concurrency must be a positive number');
+        }
         const provider = createLlmProvider({
           provider: providerName,
           ...(model !== undefined ? { model } : {}),
+          ...(ollamaModel !== undefined ? { ollamaModel } : {}),
         });
         const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
         const identity = readOperatorIdentity(flags);
@@ -652,6 +663,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           identity,
           nowIso,
           provider,
+          concurrency,
           ...(model !== undefined ? { model } : {}),
         };
         const result =
@@ -688,11 +700,17 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
           | 'mock'
           | 'openrouter'
-          | 'ollama';
+          | 'ollama'
+          | 'hybrid';
+        if (!['mock', 'openrouter', 'ollama', 'hybrid'].includes(providerName)) {
+          throw new Error('--provider must be mock|openrouter|ollama|hybrid');
+        }
         const model = optionalFlag(flags, '--model');
+        const ollamaModel = optionalFlag(flags, '--ollama-model');
         const provider = createLlmProvider({
           provider: providerName,
           ...(model !== undefined ? { model } : {}),
+          ...(ollamaModel !== undefined ? { ollamaModel } : {}),
         });
         const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
         const identity = readOperatorIdentity(flags);
