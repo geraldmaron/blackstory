@@ -43,6 +43,32 @@ export type NhgisDecadeRaceTable = {
  */
 export const NHGIS_DECADE_RACE_TABLES: readonly NhgisDecadeRaceTable[] = [
   {
+    // "Non-White: Free/Slave" ≈ Black in 1790 (the census counted essentially no other non-white
+    // persons), matching twps0056's Black = free + slave for this decade.
+    decade: '1790',
+    dataset: '1790_cPop',
+    dataTable: 'NT6',
+    nhgisCode: 'AAQ',
+    hasFreeEnslavedSplit: true,
+    variables: { AAQ003: 'white', AAQ001: 'blackFree', AAQ002: 'blackEnslaved' },
+  },
+  {
+    // Race/Slave Status BY SEX — each category sums its male + female variables.
+    decade: '1830',
+    dataset: '1830_cPop',
+    dataTable: 'NT12',
+    nhgisCode: 'ABO',
+    hasFreeEnslavedSplit: true,
+    variables: {
+      ABO001: 'white',
+      ABO002: 'white',
+      ABO005: 'blackFree', // Nonwhite Free (M+F)
+      ABO006: 'blackFree',
+      ABO003: 'blackEnslaved', // Nonwhite Slave (M+F)
+      ABO004: 'blackEnslaved',
+    },
+  },
+  {
     decade: '1860',
     dataset: '1860_cPAX',
     dataTable: 'NT6',
@@ -53,6 +79,24 @@ export const NHGIS_DECADE_RACE_TABLES: readonly NhgisDecadeRaceTable[] = [
       AH3002: 'blackFree', // "Free colored"
       AH3003: 'blackEnslaved', // "Slave"
     },
+  },
+  {
+    // Post-emancipation: no free/slave split. Black = Negro (M+F); "Other Colored" is excluded.
+    decade: '1900',
+    dataset: '1900_cPHAM',
+    dataTable: 'NT7',
+    nhgisCode: 'AZ3',
+    hasFreeEnslavedSplit: false,
+    variables: { AZ3003: 'black', AZ3004: 'black' },
+  },
+  {
+    // Race/Nativity: Black = Negro; White = native + foreign-born; "Other" excluded.
+    decade: '1940',
+    dataset: '1940_cPHAE',
+    dataTable: 'NT6',
+    nhgisCode: 'BYA',
+    hasFreeEnslavedSplit: false,
+    variables: { BYA001: 'white', BYA002: 'white', BYA003: 'black' },
   },
 ];
 

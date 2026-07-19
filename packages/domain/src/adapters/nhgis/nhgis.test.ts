@@ -5,6 +5,7 @@ import {
   assertNhgisApiKeyConfigured,
   buildNhgisExtractDefinition,
   getNhgisExtractStatus,
+  isNhgisAggregateArea,
   nhgisCountyRaceFromCsv,
   parseNhgisCountyRaceCsv,
   submitNhgisExtract,
@@ -32,6 +33,34 @@ test('parses real 1860 county race/slave rows, skipping the description header r
 
   const baldwin = rows[1]!;
   assert.equal(baldwin.black, 140 + 3714);
+});
+
+test('sums multiple variables per category (1830 is split by sex)', () => {
+  // 1830 NT12 maps White=ABO001+ABO002, Slave=ABO003+ABO004, Free=ABO005+ABO006.
+  const csv = [
+    'GISJOIN,YEAR,STATE,STATEA,COUNTY,COUNTYA,AREANAME,STATEICP,COUNTYICP,ABO001,ABO002,ABO003,ABO004,ABO005,ABO006',
+    'code,year,st,sta,co,coa,area,sti,coi,White M,White F,Slave M,Slave F,Free M,Free F',
+    '"G01","1830","X","001","Y","0010","Y","1","1",100,110,5,6,7,8',
+  ].join('\n');
+  const [row] = parseNhgisCountyRaceCsv(csv, '1830');
+  assert.equal(row!.white, 210, 'white = male + female');
+  assert.equal(row!.blackEnslaved, 11, 'slave = male + female');
+  assert.equal(row!.blackFree, 15, 'free = male + female');
+  assert.equal(row!.black, 26, 'black = free + enslaved');
+});
+
+test('excludes special/aggregate reporting areas (COUNTYA >= 9900) so they never double-count', () => {
+  assert.equal(isNhgisAggregateArea('9997'), true);
+  assert.equal(isNhgisAggregateArea('0010'), false);
+  const csv = [
+    'GISJOIN,YEAR,STATE,STATEA,COUNTY,COUNTYA,AREANAME,STATEICP,COUNTYICP,AH3001,AH3002,AH3003,AH3004,AH3005,AH3006',
+    'code,year,st,sta,co,coa,area,sti,coi,White,Free colored,Slave,Indian,Half breed,Asiatic',
+    '"G01","1860","X","001","Real County","0010","x","1","1",100,10,20,0,,',
+    '"G99","1860","X","001","X [multi-county reporting area]","9997","x","1","1",9999,9999,9999,0,,',
+  ].join('\n');
+  const rows = parseNhgisCountyRaceCsv(csv, '1860');
+  assert.equal(rows.length, 1, 'the 9997 aggregate row is dropped');
+  assert.equal(rows[0]!.black, 30);
 });
 
 test('nhgisCountyRaceFromCsv wraps the parse in a result envelope', () => {

@@ -68,6 +68,19 @@ function splitCsvLine(line: string): string[] {
   return out;
 }
 
+/**
+ * NHGIS reserves COUNTYA codes 9900–9999 for special/aggregate areas — notably "multi-county
+ * reporting areas" that SUPERSET their constituent counties (e.g. 1790 Virginia). Those rows
+ * coexist with the individual county rows, so summing them double-counts; they are excluded.
+ * (Confirmed: excluding them fixes 1790 from +42% to −0.5% and changes no other decade.)
+ */
+const NHGIS_SPECIAL_COUNTY_CODE_MIN = 9900;
+
+export function isNhgisAggregateArea(countyCode: string): boolean {
+  const n = Number(countyCode);
+  return Number.isInteger(n) && n >= NHGIS_SPECIAL_COUNTY_CODE_MIN;
+}
+
 function parseCount(value: string | undefined): number | null {
   const v = (value ?? '').trim();
   if (v === '' || v === '.') return null;
@@ -112,12 +125,18 @@ export function parseNhgisCountyRaceCsv(csvText: string, decade: string): NhgisC
   }
 
   const at = (cells: string[], code: string): string => cells[index.get(code)!] ?? '';
-  const varByCategory = (category: string): string | undefined =>
-    Object.keys(table.variables).find((code) => table.variables[code] === category);
-  const whiteCode = varByCategory('white');
-  const freeCode = varByCategory('blackFree');
-  const enslavedCode = varByCategory('blackEnslaved');
-  const blackCode = varByCategory('black');
+  const codesFor = (category: string): string[] =>
+    Object.keys(table.variables).filter((code) => table.variables[code] === category);
+  // A category can map to MULTIPLE variables (e.g. male + female, native + foreign-born) that
+  // are summed. A category with no mapped variable in this table stays null.
+  const sumCategory = (cells: string[], codes: string[]): number | null => {
+    if (codes.length === 0) return null;
+    return codes.reduce((total, code) => total + (parseCount(at(cells, code)) ?? 0), 0);
+  };
+  const whiteCodes = codesFor('white');
+  const freeCodes = codesFor('blackFree');
+  const enslavedCodes = codesFor('blackEnslaved');
+  const blackCodes = codesFor('black');
 
   const rows: NhgisCountyRaceRow[] = [];
   // Skip line 0 (codes) via header parse above; skip line 1 (descriptions) as the first data pass.
@@ -127,14 +146,14 @@ export function parseNhgisCountyRaceCsv(csvText: string, decade: string): NhgisC
     if (year !== decade) {
       throw new Error(`NHGIS parse: row YEAR "${year}" does not match requested decade ${decade}`);
     }
-    const white = whiteCode ? parseCount(at(cells, whiteCode)) : null;
-    const blackFree = freeCode ? parseCount(at(cells, freeCode)) : null;
-    const blackEnslaved = enslavedCode ? parseCount(at(cells, enslavedCode)) : null;
+    // Drop special/aggregate reporting areas so they don't double-count with their counties.
+    if (isNhgisAggregateArea(at(cells, 'COUNTYA').trim())) continue;
+    const white = sumCategory(cells, whiteCodes);
+    const blackFree = sumCategory(cells, freeCodes);
+    const blackEnslaved = sumCategory(cells, enslavedCodes);
     const black = table.hasFreeEnslavedSplit
       ? (blackFree ?? 0) + (blackEnslaved ?? 0)
-      : blackCode
-        ? (parseCount(at(cells, blackCode)) ?? 0)
-        : 0;
+      : (sumCategory(cells, blackCodes) ?? 0);
 
     rows.push({
       gisJoin: at(cells, 'GISJOIN').trim(),
