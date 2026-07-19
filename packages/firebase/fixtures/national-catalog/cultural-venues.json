@@ -47,7 +47,14 @@
       "culture"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_u_street_corridor_001",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_gem_theater_kansas_city_001",

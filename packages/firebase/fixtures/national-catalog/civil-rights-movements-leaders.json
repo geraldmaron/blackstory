@@ -140,7 +140,14 @@
     "mentionedEntityIds": [
       "sclc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_black_panther_party_founding_001",
@@ -646,7 +653,14 @@
     "mentionedEntityIds": [
       "sncc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_st_augustine_movement_001",
@@ -694,7 +708,14 @@
     "mentionedEntityIds": [
       "sclc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_cambridge_movement_001",
@@ -741,7 +762,14 @@
       "desegregation"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_danville_movement_001",
@@ -1027,7 +1055,14 @@
     "mentionedEntityIds": [
       "sncc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_black_power_movement",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_freedom_summer_mount_zion_001",
@@ -1405,7 +1440,34 @@
     "mentionedEntityIds": [
       "sclc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_montgomery_bus_boycott_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_montgomery_improvement_association_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_mlk_birth_home_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_morehouse_college_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_malcolm_x_001",
@@ -1452,7 +1514,19 @@
       "nation-of-islam"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_malcolm_x_omaha_birthsite_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_malcolm_x_boston_house_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_ella_baker_001",
@@ -1554,7 +1628,19 @@
     "mentionedEntityIds": [
       "march-on-washington"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_march_on_washington_1963_001",
+        "type": "attended",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_fannie_lou_hamer_001",
@@ -1602,7 +1688,14 @@
       "mfdp",
       "sncc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_unita_blackwell_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_diane_nash_001",
@@ -1748,7 +1841,24 @@
     "mentionedEntityIds": [
       "sncc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_lowndes_county_freedom_org_001",
+        "type": "founded",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_black_power_movement",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_cofo_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_fred_shuttlesworth_001",
@@ -1846,7 +1956,19 @@
       "citizenship-schools"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_highlander_folk_school_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_dorothy_cotton_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_daisy_bates_001",
@@ -1894,7 +2016,14 @@
       "naacp",
       "little-rock-nine"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_cooper_v_aaron_1958",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_james_meredith_001",
@@ -1989,7 +2118,14 @@
       "women-leaders"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_cambridge_movement_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_james_lawson_001",
@@ -2038,7 +2174,14 @@
     "mentionedEntityIds": [
       "sclc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_nashville_student_movement_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_ralph_abernathy_001",
@@ -2087,7 +2230,29 @@
       "sclc",
       "montgomery-bus-boycott"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_montgomery_improvement_association_001",
+        "type": "founded",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_fred_shuttlesworth_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_founding_001",
+        "type": "attended",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_ct_vivian_001",
@@ -2136,7 +2301,14 @@
       "sclc",
       "selma"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_st_augustine_movement_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_hosea_williams_001",
@@ -2185,7 +2357,14 @@
       "sclc",
       "selma"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_st_augustine_movement_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_amelia_boynton_robinson_001",
@@ -2283,7 +2462,14 @@
     "mentionedEntityIds": [
       "sncc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_albany_movement_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_james_bevel_001",
@@ -2331,7 +2517,14 @@
     "mentionedEntityIds": [
       "sclc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_chicago_freedom_movement_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_robert_moses_001",
@@ -2526,7 +2719,19 @@
     "mentionedEntityIds": [
       "mfdp"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_fannie_lou_hamer_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_robert_moses_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_vernon_dahmer_001",
@@ -2668,7 +2873,14 @@
       "sclc",
       "birmingham-campaign"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_ella_baker_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_journey_of_reconciliation_001",
@@ -2810,7 +3022,14 @@
       "philanthropy"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_freedom_vote_1963_001",

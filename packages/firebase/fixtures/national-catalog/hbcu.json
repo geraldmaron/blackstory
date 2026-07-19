@@ -1402,7 +1402,13 @@
       }
     ],
     "historicalContext": "Central State shares the Wilberforce hilltop with Wilberforce University but followed a distinct path as a state-funded normal and industrial school. A 1974 tornado devastated the campus; rebuilding preserved its role as a Midwestern land-grant HBCU training educators, scientists, and musicians.",
-    "related": [],
+    "related": [
+      {
+        "id": "ent_wilberforce_university_001",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ],
     "topicIds": [
       "education",
       "hbcu",

@@ -297,7 +297,14 @@
       "culture"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_berry_gordy_001",
+        "type": "commemorates",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_studio_museum_harlem_001",
@@ -841,6 +848,13 @@
       "culture"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_reginald_f_lewis_001",
+        "type": "commemorates",
+        "direction": "outgoing"
+      }
+    ]
   }
 ]

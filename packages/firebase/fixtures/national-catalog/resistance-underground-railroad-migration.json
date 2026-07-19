@@ -938,7 +938,14 @@
       "organizing"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_great_migration_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_niagara_falls_crossing_001",
@@ -1160,7 +1167,14 @@
       "freedom"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_william_still_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_john_rankin_house_001",
@@ -1667,7 +1681,14 @@
       "publication"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_chicago_defender_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_national_urban_league_001",
@@ -2180,7 +2201,14 @@
       "journalism"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_chicago_defender_001",
+        "type": "authored",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_east_st_louis_massacre_001",
@@ -2438,7 +2466,14 @@
       "freedom"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_nicodemus_001",
+        "type": "occurred_at",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_benjamin_pap_singleton_001",
@@ -2484,7 +2519,14 @@
       "freedom"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_kansas_exodus_1879_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_combahee_river_raid_001",
@@ -2662,7 +2704,14 @@
       "great-migration"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_march_on_washington_1963_001",
+        "type": "influenced",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_norfolk_journal_guide_001",

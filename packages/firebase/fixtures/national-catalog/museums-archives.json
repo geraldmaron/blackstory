@@ -452,7 +452,19 @@
       "history"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_edmund_pettus_bridge_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_selma_to_montgomery_marches_001",
+        "type": "commemorates",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_amistad_research_center_001",
@@ -725,7 +737,14 @@
       "culture"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_louis_armstrong_001",
+        "type": "commemorates",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_great_blacks_in_wax_museum_001",

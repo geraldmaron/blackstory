@@ -535,7 +535,14 @@
       "migration"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_kansas_exodus_1879_001",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_bill_pickett_memorial_001",

@@ -321,7 +321,14 @@
       "black-power"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_black_power_movement",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_mississippi_freedom_labor_union_001",

@@ -91,7 +91,14 @@
       "community"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_tubman_underground_railroad_md_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_tubman_underground_railroad_md_001",
@@ -288,7 +295,14 @@
       "invention"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_john_rankin_house_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_fort_monroe_001",
@@ -684,7 +698,14 @@
       "firsts"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_brotherhood_sleeping_car_porters_001",
+        "type": "commemorates",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_juneteenth_galveston_001",
@@ -729,7 +750,19 @@
       "military"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_emancipation_proclamation_1863",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_13th_amendment_1865",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_seneca_village_001",

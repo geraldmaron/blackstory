@@ -1391,7 +1391,14 @@
       "segregation"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_mclaurin_v_oklahoma_state_regents_1950",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_missouri_ex_rel_gaines_v_canada_1938",
@@ -1761,7 +1768,14 @@
       "school-desegregation"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_brown_v_board_of_education_1954",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_heart_of_atlanta_motel_v_us_1964",
@@ -1808,7 +1822,19 @@
       "commerce-clause"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_katzenbach_v_mcclung_1964",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_civil_rights_act_1964",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_south_carolina_v_katzenbach_1966",
@@ -1853,7 +1879,14 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_voting_rights_act_1965",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_cooper_v_aaron_1958",
@@ -1898,7 +1931,14 @@
       "school-desegregation"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_brown_v_board_of_education_1954",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_shelby_county_v_holder_2013",
@@ -2367,7 +2407,14 @@
       "segregation"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_plessy_v_ferguson_1896",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_mclaurin_v_oklahoma_state_regents_1950",
@@ -2414,7 +2461,14 @@
       "segregation"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_plessy_v_ferguson_1896",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_boynton_v_virginia_1960",
@@ -2555,7 +2609,14 @@
       "civil-rights"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_naacp_v_alabama_1958",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_gomillion_v_lightfoot_1960",
@@ -2741,7 +2802,14 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_smith_v_allwright_1944",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_jones_v_alfred_h_mayer_1968",
@@ -2789,7 +2857,14 @@
     "mentionedEntityIds": [
       "civil-rights-act-1866"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_shelley_v_kraemer_1948",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_swann_v_charlotte_mecklenburg_1971",
@@ -2883,7 +2958,14 @@
       "busing"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_swann_v_charlotte_mecklenburg_1971",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_washington_v_davis_1976",
@@ -2930,7 +3012,14 @@
       "equal-protection"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_griggs_v_duke_power_1971",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_katzenbach_v_mcclung_1964",

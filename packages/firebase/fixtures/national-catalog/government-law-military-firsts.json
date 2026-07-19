@@ -1739,7 +1739,14 @@
       "house-of-representatives"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_abyssinian_baptist_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_mervyn_dymally_001",
@@ -1917,7 +1924,14 @@
       "judiciary"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_constance_baker_motley_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_constance_baker_motley_001",
@@ -3530,7 +3544,14 @@
       "reconstruction"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_cedar_hill_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_edward_dudley_001",

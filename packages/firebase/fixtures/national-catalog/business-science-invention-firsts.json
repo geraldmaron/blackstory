@@ -506,7 +506,14 @@
       "civil-rights"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_gaston_motel_001",
+        "type": "founded",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_john_h_johnson_001",
@@ -1362,7 +1369,14 @@
       "women"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_katherine_johnson_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_mary_jackson_001",
@@ -1427,7 +1441,19 @@
       "women"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_katherine_johnson_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_dorothy_vaughan_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_percy_julian_001",
@@ -1538,7 +1564,14 @@
       "firsts"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_howard_university_001",
+        "type": "employed_by",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_patricia_bath_001",
@@ -2392,7 +2425,14 @@
       "firsts"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_cleveland_call_and_post_001",
+        "type": "authored",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_frederick_mckinley_jones_001",
@@ -2743,7 +2783,14 @@
       "firsts"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_tuskegee_university_001",
+        "type": "employed_by",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_otis_boykin_001",
