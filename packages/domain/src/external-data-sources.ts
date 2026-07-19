@@ -463,6 +463,37 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
       'category comparability notes (do not invent harmonized totals).',
   },
   {
+    id: 'slavevoyages-transatlantic',
+    displayName: 'SlaveVoyages — Trans-Atlantic Slave Trade Database',
+    custodian: 'SlaveVoyages Consortium (Rice University et al.)',
+    homepageUrl: 'https://www.slavevoyages.org/voyage/about/',
+    dataUrl: 'https://www.slavevoyages.org/voyage/downloads',
+    license: {
+      name: 'CC BY-NC 3.0 US (imputed values); observed/documented values in the public domain',
+      verdict: 'noncommercial',
+      notes:
+        'Attribution required; commercial use of imputed (asterisked) values prohibited without ' +
+        'written permission from the SlaveVoyages Consortium. Public display is GATED on a rights ' +
+        'review that includes an owner determination of whether BlackStory is "commercial" — same ' +
+        'closed lane as mapping-inequality-holc / seda-education-archive. Do not ingest or surface ' +
+        'until that review clears (repo-lcl9.4).',
+    },
+    vintage: 'Trans-Atlantic Slave Trade Database v2024-11 (~36,000 voyages, 1514–1866)',
+    // A forced-migration FLOW by Atlantic macro-region (embark/disembark), NOT a U.S. resident
+    // geography; 'nation' is the closest vocab token for the mainland-North-America disembarkation
+    // slice. This is never resident population.
+    geographies: ['nation'],
+    cadence: 'irregular',
+    notes:
+      'Forced-arrival FLOW series ONLY — captives embarked (obs. TSLAVESD / imp. SLAXIMP) and ' +
+      'disembarked (obs. SLAARRIV / imp. SLAMIMP) by year and Atlantic region, 1514–1866; mainland ' +
+      'North America is filterable (<4% of voyages). MUST stay a separate flow series with its own ' +
+      'vocabulary and visualization — never converted into or shown as resident Black population ' +
+      'without a peer-reviewed demographic model. Preserve the observed-vs-imputed distinction. ' +
+      'Deferred acquisition/modeling tracked on repo-lcl9.4.',
+    registryState: 'disabled',
+  },
+  {
     id: 'fcc-broadband-map',
     displayName: 'FCC National Broadband Map (BDC)',
     custodian: 'Federal Communications Commission',
