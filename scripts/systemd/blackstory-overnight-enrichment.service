@@ -21,6 +21,9 @@ Environment=DISCOVERY_LIMIT=25
 Environment=DISCOVERY_CONCURRENCY=2
 Environment=ENRICH_CONCURRENCY=4
 Environment=COMMIT_ENRICHMENT=0
+Environment=SEARXNG_QUERIES_PER_NIGHT=8
+Environment=DISCOVERY_MAX_SURVIVORS=25
+Environment=WIKIMEDIA_ROUND_PAUSE_SEC=15
 Environment=ENRICHMENT_OPERATOR_ID=overnight-hybrid-corsair
 # OpenRouter key + optional pepper — never commit this file.
 EnvironmentFile=-%h/.config/blackstory/enrichment.env

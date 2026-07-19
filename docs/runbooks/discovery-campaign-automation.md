@@ -84,8 +84,31 @@ SERP discovery only — not HTML body scrape. Full crawl of `blackwomenleadproje
 remains gated on source-policy audit (`repo-tt2u.13`).
 
 **Overnight hybrid** (`scripts/run-overnight-hybrid-enrichment.sh`) runs SearXNG roster
-first (`SEARXNG_QUERIES_PER_NIGHT`, default 8), then multi-round Wikimedia
-`discover-candidates`, then hybrid LLM enrichment.
+first (`SEARXNG_QUERIES_PER_NIGHT`, default 8, hard-capped at 12), then multi-round Wikimedia
+`discover-candidates`, then hybrid LLM enrichment with **`COMMIT_ENRICHMENT=0`** by default
+(quarantine commit requires `ALLOW_ENRICHMENT_COMMIT=1`).
+
+### Overnight / SearXNG safeties
+
+| Guard | Behavior |
+|-------|----------|
+| `COMMIT_ENRICHMENT=0` | Enrichment prepare-only unless `ALLOW_ENRICHMENT_COMMIT=1` |
+| `COMMIT_SURVIVORS=1` | Queues private `researchCases` only — never publishes |
+| Domain `assertCampaignCannotPublish` | Discovery path cannot create public entities |
+| Hard caps | SearXNG ≤12 queries/run, ≤50 survivors; Wikimedia concurrency/rounds capped |
+| Forbidden flags | `ENABLE_HTML_CRAWL`, `ENABLE_PLAYWRIGHT`, `ALLOW_GATED_SOURCE_SCRAPE`, `ALLOW_PUBLIC_PUBLISH` → refuse |
+| `DISCOVERY_STORAGE_TERMS_CONFIRMED=true` | Required for live SearXNG |
+| `DISCOVERY_KILL_SWITCH=engaged` | Dispatcher skips campaigns |
+| Query pause | `DISCOVERY_QUERY_PAUSE_SEC` (default 4) between SearXNG queries |
+| BWLP | SERP `site:` leads only; full HTML crawl gated on `repo-tt2u.13` |
+
+**Stop a running overnight job:**
+
+```bash
+ssh gerald@100.119.72.84 'systemctl --user stop blackstory-overnight-enrichment.service'
+# Follow logs (redact peppers if grepping):
+ssh gerald@100.119.72.84 'journalctl --user -u blackstory-overnight-enrichment.service -f'
+```
 
 **Preferred live schedule:** Corsair systemd user timer
 `scripts/systemd/blackstory-discovery-web-search.timer` (08:30 UTC) →

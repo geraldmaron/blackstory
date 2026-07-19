@@ -6,7 +6,14 @@
 #   SERP leads only; full HTML crawl of gated sources stays policy-blocked.
 # Phase 2 — Multi-round Wikimedia discover-candidates (merge by id) until TARGET.
 # Phase 3 — multithreaded enrichment-run with provider=hybrid (OpenRouter → Ollama).
-# Prepare-only by default; set COMMIT_ENRICHMENT=1 to stage quarantine packets.
+# Prepare-only by default; set COMMIT_ENRICHMENT=1 only with ALLOW_ENRICHMENT_COMMIT=1.
+#
+# Safeties (fail-closed where noted):
+#   - Never publishes / never enables HTML crawl or Playwright
+#   - Hard caps on SearXNG queries, survivors, Wikimedia rounds/concurrency
+#   - COMMIT_ENRICHMENT defaults 0; quarantine commit requires break-glass
+#   - Honors DISCOVERY_KILL_SWITCH when SearXNG phase runs
+#   - Stop: systemctl --user stop blackstory-overnight-enrichment.service
 #
 # Hosts:
 #   - Corsair (preferred): Ollama + SearXNG local; OpenRouter key in enrichment.env
@@ -15,6 +22,48 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+
+# --- Guardrails (apply before any live work) ---
+# Absolute caps — env may lower these, never raise past the hard max.
+HARD_MAX_SEARXNG_QUERIES=12
+HARD_MAX_SURVIVORS=50
+HARD_MAX_DISCOVERY_ROUNDS=6
+HARD_MAX_DISCOVERY_CONCURRENCY=3
+HARD_MAX_ENRICH_CONCURRENCY=6
+HARD_MAX_DISCOVERY_LIMIT=60
+
+refuse_forbidden_crawl() {
+  local flag
+  for flag in ENABLE_HTML_CRAWL ENABLE_PLAYWRIGHT ENABLE_SCRAPY_CRAWL \
+    BLACKSTORY_HTML_CRAWL ALLOW_GATED_SOURCE_SCRAPE; do
+    local val="${!flag:-}"
+    if [[ "${val}" == "1" || "${val}" == "true" || "${val}" == "yes" ]]; then
+      echo "Refusing overnight run: ${flag}=${val} enables gated HTML crawl (policy blocked)." >&2
+      exit 40
+    fi
+  done
+  if [[ "${ALLOW_PUBLIC_PUBLISH:-0}" == "1" || "${ALLOW_PUBLIC_PUBLISH:-}" == "true" ]]; then
+    echo "Refusing overnight run: ALLOW_PUBLIC_PUBLISH is set — discovery/enrichment never publishes." >&2
+    exit 41
+  fi
+}
+
+cap_int() {
+  # cap_int NAME VALUE HARD_MAX → echoes min(VALUE, HARD_MAX), at least 1 if VALUE>0
+  local name="$1" value="$2" hard="$3"
+  if ! [[ "${value}" =~ ^[0-9]+$ ]]; then
+    echo "Invalid ${name}=${value} (must be integer)" >&2
+    exit 42
+  fi
+  if (( value > hard )); then
+    echo "Capping ${name}=${value} → ${hard}" >&2
+    echo "${hard}"
+  else
+    echo "${value}"
+  fi
+}
+
+refuse_forbidden_crawl
 
 # User systemd units often lack interactive PATH — prefer nvm Node 22 when present.
 if [[ -z "${NVM_DIR:-}" && -s "${HOME}/.nvm/nvm.sh" ]]; then
@@ -49,18 +98,31 @@ export EDITORIAL_LLM_PROVIDER="${EDITORIAL_LLM_PROVIDER:-hybrid}"
 export OPENROUTER_MODEL="${OPENROUTER_MODEL:-openrouter/free}"
 export OLLAMA_MODEL="${OLLAMA_MODEL:-qwen3:8b}"
 
-TARGET_CANDIDATES="${TARGET_CANDIDATES:-1000}"
-DISCOVERY_LIMIT="${DISCOVERY_LIMIT:-40}"
-DISCOVERY_CONCURRENCY="${DISCOVERY_CONCURRENCY:-2}"
-DISCOVERY_ROUNDS="${DISCOVERY_ROUNDS:-3}"
-ENRICH_CONCURRENCY="${ENRICH_CONCURRENCY:-4}"
+# Discovery kill switch + storage terms for SearXNG child script.
+export DISCOVERY_KILL_SWITCH="${DISCOVERY_KILL_SWITCH:-disengaged}"
+export DISCOVERY_STORAGE_TERMS_CONFIRMED="${DISCOVERY_STORAGE_TERMS_CONFIRMED:-true}"
+
+TARGET_CANDIDATES="$(cap_int TARGET_CANDIDATES "${TARGET_CANDIDATES:-1000}" 2000)"
+DISCOVERY_LIMIT="$(cap_int DISCOVERY_LIMIT "${DISCOVERY_LIMIT:-40}" "${HARD_MAX_DISCOVERY_LIMIT}")"
+DISCOVERY_CONCURRENCY="$(cap_int DISCOVERY_CONCURRENCY "${DISCOVERY_CONCURRENCY:-2}" "${HARD_MAX_DISCOVERY_CONCURRENCY}")"
+DISCOVERY_ROUNDS="$(cap_int DISCOVERY_ROUNDS "${DISCOVERY_ROUNDS:-3}" "${HARD_MAX_DISCOVERY_ROUNDS}")"
+ENRICH_CONCURRENCY="$(cap_int ENRICH_CONCURRENCY "${ENRICH_CONCURRENCY:-4}" "${HARD_MAX_ENRICH_CONCURRENCY}")"
 ENRICH_MAX_SUBJECTS="${ENRICH_MAX_SUBJECTS:-${TARGET_CANDIDATES}}"
 SKIP_DISCOVERY="${SKIP_DISCOVERY:-0}"
 SKIP_SEARXNG="${SKIP_SEARXNG:-0}"
-SEARXNG_QUERIES_PER_NIGHT="${SEARXNG_QUERIES_PER_NIGHT:-8}"
-COMMIT_ENRICHMENT="${COMMIT_ENRICHMENT:-0}"
+SEARXNG_QUERIES_PER_NIGHT="$(cap_int SEARXNG_QUERIES_PER_NIGHT "${SEARXNG_QUERIES_PER_NIGHT:-8}" "${HARD_MAX_SEARXNG_QUERIES}")"
 COMMIT_SURVIVORS="${COMMIT_SURVIVORS:-1}"
 DRY_RUN="${DRY_RUN:-0}"
+WIKIMEDIA_ROUND_PAUSE_SEC="$(cap_int WIKIMEDIA_ROUND_PAUSE_SEC "${WIKIMEDIA_ROUND_PAUSE_SEC:-15}" 120)"
+
+# Enrichment commit is prepare-only unless break-glass is set.
+COMMIT_ENRICHMENT="${COMMIT_ENRICHMENT:-0}"
+if [[ "${COMMIT_ENRICHMENT}" == "1" || "${COMMIT_ENRICHMENT}" == "true" ]]; then
+  if [[ "${ALLOW_ENRICHMENT_COMMIT:-0}" != "1" && "${ALLOW_ENRICHMENT_COMMIT:-}" != "true" ]]; then
+    echo "Refusing COMMIT_ENRICHMENT=1 without ALLOW_ENRICHMENT_COMMIT=1 (quarantine break-glass)." >&2
+    exit 43
+  fi
+fi
 
 OPERATOR_ID="${ENRICHMENT_OPERATOR_ID:-overnight-hybrid-corsair}"
 SESSION_ID="${ENRICHMENT_SESSION_ID:-sess_$(date -u +%Y%m%dT%H%M%SZ)}"
@@ -74,7 +136,8 @@ LOG_FILE="${LOG_DIR}/run-${STAMP}.json"
 SUBJECTS_FILE="${LOG_DIR}/subjects-${STAMP}.json"
 SUMMARY_FILE="${LOG_DIR}/summary-${STAMP}.json"
 
-echo "overnight hybrid start target=${TARGET_CANDIDATES} ollama=${OLLAMA_BASE_URL} provider=${EDITORIAL_LLM_PROVIDER} concurrency=${ENRICH_CONCURRENCY}" >&2
+echo "overnight hybrid start target=${TARGET_CANDIDATES} ollama=${OLLAMA_BASE_URL} provider=${EDITORIAL_LLM_PROVIDER} concurrency=${ENRICH_CONCURRENCY} commit_enrichment=${COMMIT_ENRICHMENT} kill_switch=${DISCOVERY_KILL_SWITCH}" >&2
+echo "safeties: searxng_queries<=${SEARXNG_QUERIES_PER_NIGHT} discovery_rounds<=${DISCOVERY_ROUNDS} no_html_crawl no_publish" >&2
 
 if [[ -z "${OPENROUTER_API_KEY:-}" && "${EDITORIAL_LLM_PROVIDER}" != "ollama" && "${EDITORIAL_LLM_PROVIDER}" != "mock" ]]; then
   echo "OPENROUTER_API_KEY missing — set via enrichment.env or run-with-dev-secrets" >&2
@@ -89,6 +152,7 @@ if [[ "${SKIP_SEARXNG}" != "1" && "${SKIP_SEARXNG}" != "true" ]]; then
     SEARXNG_SUMMARY='{"skipped":"dry_run"}'
   else
     DISCOVERY_QUERIES_PER_RUN="${SEARXNG_QUERIES_PER_NIGHT}" \
+    DISCOVERY_MAX_SURVIVORS="${DISCOVERY_MAX_SURVIVORS:-25}" \
     COMMIT_SURVIVORS="${COMMIT_SURVIVORS}" \
     DISCOVERY_OPERATOR_ID="${OPERATOR_ID}" \
     DISCOVERY_SESSION_ID="${SESSION_ID}-searxng" \
@@ -147,8 +211,8 @@ text = sys.stdin.read()
 objs = list(re.finditer(r"\{[^{}]*\"newCandidates\"[^{}]*\}", text))
 print(objs[-1].group(0) if objs else "{}")
 ' 2>/dev/null || echo '{}')"
-    # Brief pause between rounds to ease Wikimedia rate limits.
-    sleep 5
+    # Pause between rounds to ease Wikimedia rate limits (429 observed under load).
+    sleep "${WIKIMEDIA_ROUND_PAUSE_SEC}"
   done
 fi
 
@@ -179,7 +243,7 @@ json.dump({"subjects": clean, "source": src, "count": len(clean)}, open(dest, "w
 print(f"Wrote {len(clean)} subjects → {dest}", file=sys.stderr)
 PY
 
-echo "Phase 3: enrichment-run provider=${EDITORIAL_LLM_PROVIDER} concurrency=${ENRICH_CONCURRENCY}" >&2
+echo "Phase 3: enrichment-run provider=${EDITORIAL_LLM_PROVIDER} concurrency=${ENRICH_CONCURRENCY} commit=${COMMIT_ENRICHMENT}" >&2
 
 ARGS=(
   enrichment-run
@@ -250,3 +314,4 @@ PY
 
 echo "Wrote ${LOG_FILE}" >&2
 echo "Wrote ${SUMMARY_FILE}" >&2
+echo "Stop this unit anytime: systemctl --user stop blackstory-overnight-enrichment.service" >&2

@@ -12,10 +12,48 @@
 #
 # SERP snippets only. Full HTML crawl of gated sources (e.g. BWLP) stays off until
 # source-policy approval.
+#
+# Safeties:
+#   - Hard caps on queries/survivors; refuse HTML-crawl / Playwright / publish flags
+#   - Requires DISCOVERY_STORAGE_TERMS_CONFIRMED=true for live mode
+#   - Honors DISCOVERY_KILL_SWITCH (engaged → dispatcher skips)
+#   - Pause between queries (DISCOVERY_QUERY_PAUSE_SEC, default 4)
+#   - Stop overnight parent: systemctl --user stop blackstory-overnight-enrichment.service
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+
+HARD_MAX_QUERIES_PER_RUN=12
+HARD_MAX_SURVIVORS=50
+
+refuse_forbidden_crawl() {
+  local flag
+  for flag in ENABLE_HTML_CRAWL ENABLE_PLAYWRIGHT ENABLE_SCRAPY_CRAWL \
+    BLACKSTORY_HTML_CRAWL ALLOW_GATED_SOURCE_SCRAPE ALLOW_PUBLIC_PUBLISH; do
+    local val="${!flag:-}"
+    if [[ "${val}" == "1" || "${val}" == "true" || "${val}" == "yes" ]]; then
+      echo "Refusing SearXNG discovery: ${flag}=${val} is forbidden on this path." >&2
+      exit 40
+    fi
+  done
+}
+
+cap_int() {
+  local name="$1" value="$2" hard="$3"
+  if ! [[ "${value}" =~ ^[0-9]+$ ]]; then
+    echo "Invalid ${name}=${value}" >&2
+    exit 42
+  fi
+  if (( value > hard )); then
+    echo "Capping ${name}=${value} → ${hard}" >&2
+    echo "${hard}"
+  else
+    echo "${value}"
+  fi
+}
+
+refuse_forbidden_crawl
 
 # User systemd units often lack interactive PATH — prefer nvm Node 22 when present.
 if [[ -z "${NVM_DIR:-}" && -s "${HOME}/.nvm/nvm.sh" ]]; then
@@ -37,17 +75,27 @@ fi
 export DISCOVERY_KILL_SWITCH="${DISCOVERY_KILL_SWITCH:-disengaged}"
 export DISCOVERY_MODE="${DISCOVERY_MODE:-live}"
 export DISCOVERY_JOB_ID="${DISCOVERY_JOB_ID:-discovery-campaign-web-search}"
-export DISCOVERY_STORAGE_TERMS_CONFIRMED="${DISCOVERY_STORAGE_TERMS_CONFIRMED:-true}"
+
+# Fail-closed for live: storage terms must be explicitly confirmed.
+if [[ "${DISCOVERY_MODE}" == "live" ]]; then
+  if [[ "${DISCOVERY_STORAGE_TERMS_CONFIRMED:-}" != "true" ]]; then
+    echo "Refusing live SearXNG: set DISCOVERY_STORAGE_TERMS_CONFIRMED=true after engine-policy review." >&2
+    exit 44
+  fi
+else
+  export DISCOVERY_STORAGE_TERMS_CONFIRMED="${DISCOVERY_STORAGE_TERMS_CONFIRMED:-true}"
+fi
 
 QUERY_FILE="${DISCOVERY_SEARXNG_QUERY_FILE:-${ROOT}/packages/config/src/scheduled-jobs/data/corsair-web-search-queries.json}"
-QUERIES_PER_RUN="${DISCOVERY_QUERIES_PER_RUN:-3}"
-QUERY_PAUSE_SEC="${DISCOVERY_QUERY_PAUSE_SEC:-4}"
+QUERIES_PER_RUN="$(cap_int DISCOVERY_QUERIES_PER_RUN "${DISCOVERY_QUERIES_PER_RUN:-3}" "${HARD_MAX_QUERIES_PER_RUN}")"
+QUERY_PAUSE_SEC="$(cap_int DISCOVERY_QUERY_PAUSE_SEC "${DISCOVERY_QUERY_PAUSE_SEC:-4}" 60)"
+export QUERIES_PER_RUN
 
 # Survivor → admin researchCases (private). Set COMMIT_SURVIVORS=0 to prepare-only.
 COMMIT_SURVIVORS="${COMMIT_SURVIVORS:-1}"
 OPERATOR_ID="${DISCOVERY_OPERATOR_ID:-scheduled-discovery}"
 SESSION_BASE="${DISCOVERY_SESSION_ID:-sess_$(date -u +%Y%m%dT%H%M%SZ)}"
-MAX_SURVIVORS="${DISCOVERY_MAX_SURVIVORS:-25}"
+MAX_SURVIVORS="$(cap_int DISCOVERY_MAX_SURVIVORS "${DISCOVERY_MAX_SURVIVORS:-25}" "${HARD_MAX_SURVIVORS}")"
 PRIVACY_PEPPER="${OPERATOR_CLI_PRIVACY_PEPPER:-${DISCOVERY_PRIVACY_PEPPER:-}}"
 
 LOG_DIR="${ROOT}/.cache/discovery-scheduled"

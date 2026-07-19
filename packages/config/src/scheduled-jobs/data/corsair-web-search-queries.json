@@ -2,6 +2,16 @@
   "schemaVersion": "corsair-web-search-queries.v1",
   "updatedAt": "2026-07-19",
   "purpose": "Rotating SearXNG SERP queries for Corsair discovery. These are search-result leads only — not HTML body scrapes. Full crawl of blackwomenleadproject.org remains gated on source-policy audit (repo-tt2u.13).",
+  "safeties": {
+    "serpOnly": true,
+    "htmlCrawlForbiddenUntil": "repo-tt2u.13",
+    "gatedHostsNoBodyScrape": ["blackwomenleadproject.org"],
+    "livingPersonSensitive": true,
+    "livingPersonNote": "Black Women Lead includes present-day leaders; treat SERP hits as leads, never harvest private contact data.",
+    "maxQueriesPerRunHardCap": 12,
+    "maxSurvivorsHardCap": 50,
+    "neverPublish": true
+  },
   "preferredHosts": [
     "blackwomenleadproject.org",
     "loc.gov",
