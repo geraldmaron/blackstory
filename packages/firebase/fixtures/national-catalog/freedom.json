@@ -398,6 +398,11 @@
         "id": "ent_naacp_founding_001",
         "type": "related_to",
         "direction": "incoming"
+      },
+      {
+        "id": "ent_naacp_founding_001",
+        "type": "influenced",
+        "direction": "outgoing"
       }
     ],
     "topicIds": [
@@ -609,7 +614,14 @@
       "civil-war"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_william_harvey_carney_001",
+        "type": "commemorates",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_buffalo_soldiers_leavenworth_001",

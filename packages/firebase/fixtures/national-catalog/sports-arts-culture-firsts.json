@@ -53,7 +53,14 @@
       "hall-of-fame"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_frank_robinson_001",
+        "type": "influenced",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_jack_johnson_001",
@@ -628,7 +635,14 @@
       "hall-of-fame"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_negro_national_league_001",
+        "type": "attended",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_satchel_paige_001",
@@ -2735,7 +2749,19 @@
       "firsts"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_john_carlos_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_wyomia_tyus_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_john_carlos_001",

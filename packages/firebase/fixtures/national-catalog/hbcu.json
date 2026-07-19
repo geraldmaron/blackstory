@@ -768,6 +768,11 @@
         "id": "ent_greensboro_woolworth_sit_in_site_001",
         "type": "related_to",
         "direction": "incoming"
+      },
+      {
+        "id": "ent_greensboro_woolworth_sit_in_site_001",
+        "type": "related_to",
+        "direction": "outgoing"
       }
     ],
     "topicIds": [

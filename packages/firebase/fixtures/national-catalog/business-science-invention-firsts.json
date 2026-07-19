@@ -126,7 +126,14 @@
       "entrepreneurship"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_jackson_ward_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_reginald_f_lewis_001",

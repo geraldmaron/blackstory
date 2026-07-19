@@ -1203,7 +1203,14 @@
       "equal-protection"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_plessy_v_ferguson_1896",
+        "type": "overturned",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_bolling_v_sharpe_1954",
@@ -1297,7 +1304,14 @@
       "equal-protection"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_virginia_racial_integrity_act_1924",
+        "type": "overturned",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_shelley_v_kraemer_1948",
@@ -1344,7 +1358,14 @@
       "restrictive-covenants"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_corrigan_v_buckley_1926",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_sweatt_v_painter_1950",
@@ -1629,7 +1650,14 @@
       "right-to-counsel"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_norris_v_alabama_1935",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_batson_v_kentucky_1986",
@@ -1937,6 +1965,11 @@
         "id": "ent_case_brown_v_board_of_education_1954",
         "type": "cites",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_little_rock_central_high_001",
+        "type": "cites",
+        "direction": "outgoing"
       }
     ]
   },
@@ -1983,7 +2016,14 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_south_carolina_v_katzenbach_1966",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_griggs_v_duke_power_1971",
@@ -2125,7 +2165,14 @@
       "reconstruction"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_civil_rights_act_1875",
+        "type": "overturned",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_us_v_cruikshank_1876",
@@ -2172,7 +2219,14 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_slaughterhouse_cases_1873",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_us_v_reese_1876",
@@ -3113,7 +3167,14 @@
       "affirmative-action"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_regents_uc_v_bakke_1978",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_movement_civil_rights_movement",

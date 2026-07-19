@@ -355,7 +355,14 @@
       "freedom"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_denmark_vesey_conspiracy_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_nat_turner_rebellion_001",
@@ -399,7 +406,14 @@
       "rebellion"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_nat_turner_trial_site_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_nat_turner_trial_site_001",
@@ -1171,6 +1185,11 @@
     "related": [
       {
         "id": "ent_william_still_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_tubman_underground_railroad_md_001",
         "type": "related_to",
         "direction": "outgoing"
       }
@@ -2153,7 +2172,14 @@
       "journalism"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_naacp_founding_001",
+        "type": "attended",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_robert_abbott_001",

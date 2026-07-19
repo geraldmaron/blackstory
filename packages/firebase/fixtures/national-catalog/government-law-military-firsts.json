@@ -322,7 +322,14 @@
       "house-of-representatives"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_howard_university_001",
+        "type": "employed_by",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_macon_bolling_allen_001",
@@ -410,7 +417,14 @@
       "education"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_howard_university_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_mifflin_wistar_gibbs_001",
@@ -1433,7 +1447,14 @@
       "house-of-representatives"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_douglas_wilder_001",
@@ -1876,7 +1897,14 @@
       "cabinet"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_robert_c_weaver_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_thurgood_marshall_001",
