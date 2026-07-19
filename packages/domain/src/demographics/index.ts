@@ -12,3 +12,17 @@ export {
   type DecadeComparabilityBand,
   type DecadeRaceCategoryBand,
 } from './comparability.js';
+
+export {
+  POPULATION_DECADES,
+  POPULATION_DECADE_METAS,
+  HISTORICAL_NATIONAL_DECADES,
+  MODERN_COUNTY_DECADES,
+  FREE_ENSLAVED_SPLIT_DECADES,
+  isPopulationDecade,
+  getPopulationDecadeMeta,
+  changeCrossesDefinitionBoundary,
+  type PopulationDecade,
+  type PopulationDecadeMeta,
+  type NationalPopulationSource,
+} from './population-decades.js';

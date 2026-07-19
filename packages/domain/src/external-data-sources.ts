@@ -41,6 +41,7 @@ export const EXTERNAL_SOURCE_GEOGRAPHIES = [
   'school',
   'facility',
   'state',
+  'nation',
 ] as const;
 
 export type ExternalSourceGeography = (typeof EXTERNAL_SOURCE_GEOGRAPHIES)[number];
@@ -121,11 +122,13 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     // Resolve a fresh download URL with:
     //   GET https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=<this path>
     // Public UI citations use homepageUrl (FBI UCR hate-crime hub), never the signedurl API.
-    dataUrl: 'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/hate-crime/hate_crime.zip',
+    dataUrl:
+      'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/hate-crime/hate_crime.zip',
     license: {
       name: 'U.S. government work — public domain (17 U.S.C. §105)',
       verdict: 'public-domain',
-      notes: 'Cite the FBI UCR Program and the data year; the CDE download is the canonical artifact.',
+      notes:
+        'Cite the FBI UCR Program and the data year; the CDE download is the canonical artifact.',
     },
     vintage: 'hate_crime.csv, data years 1991–2024 (265,834 incidents; released 2025-07-09)',
     geographies: ['county', 'state', 'facility'],
@@ -163,7 +166,8 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     displayName: 'FBI UCR Program participation (1960–2024)',
     custodian: 'FBI Criminal Justice Information Services (CJIS) Division / UCR Program',
     homepageUrl: 'https://ucr.fbi.gov/hate-crime',
-    dataUrl: 'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/ucr/ucr_participation_1960_2024.csv',
+    dataUrl:
+      'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/ucr/ucr_participation_1960_2024.csv',
     license: {
       name: 'U.S. government work — public domain (17 U.S.C. §105)',
       verdict: 'public-domain',
@@ -305,8 +309,7 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     displayName: 'USDA Food Access Research Atlas',
     custodian: 'USDA Economic Research Service',
     homepageUrl: 'https://www.ers.usda.gov/data-products/food-access-research-atlas/',
-    dataUrl:
-      'https://www.ers.usda.gov/data-products/food-access-research-atlas/download-the-data/',
+    dataUrl: 'https://www.ers.usda.gov/data-products/food-access-research-atlas/download-the-data/',
     license: { name: 'U.S. government work — public domain', verdict: 'public-domain' },
     vintage: '2019 atlas (2010 tract geography)',
     geographies: ['tract'],
@@ -359,7 +362,8 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     displayName: 'EPA Superfund National Priorities List site boundaries',
     custodian: 'U.S. Environmental Protection Agency',
     homepageUrl: 'https://www.epa.gov/superfund',
-    dataUrl: 'https://catalog.data.gov/dataset/superfund-national-priorities-list-npl-site-boundaries',
+    dataUrl:
+      'https://catalog.data.gov/dataset/superfund-national-priorities-list-npl-site-boundaries',
     license: { name: 'U.S. government work — public domain', verdict: 'public-domain' },
     vintage: 'current NPL boundary release',
     geographies: ['facility'],
@@ -409,6 +413,34 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     notes: 'Black-owned nonemployer business counts and receipts.',
   },
   {
+    id: 'us-census-historical-race-1790-1990',
+    displayName: 'Historical Census Statistics on Population Totals by Race, 1790–1990 (twps0056)',
+    custodian: 'U.S. Census Bureau, Population Division',
+    homepageUrl: 'https://www.census.gov/library/working-papers/2002/demo/POP-twps0056.html',
+    // Machine artifact: Table 1 (United States national totals by race, 1790–1990) as .xlsx.
+    dataUrl: 'https://www2.census.gov/library/working-papers/2002/demo/pop-twps0056/table01.xlsx',
+    license: {
+      name: 'U.S. government work — public domain (17 U.S.C. §105)',
+      verdict: 'public-domain',
+      notes:
+        'Gibson & Jung, Population Division Working Paper No. 56 (Sept 2002). Free for all uses. ' +
+        'Public citations must point at the working-paper landing page (homepageUrl), never the ' +
+        'raw table01.xlsx machine URL.',
+    },
+    vintage:
+      'Working Paper 56, Table 1 — national race totals 1790–1990 (Internet release 2002-09-13)',
+    geographies: ['nation'],
+    cadence: 'static',
+    notes:
+      'National Total/White/Black population by decade 1790–1990, with the Black column split ' +
+      'into Free/Slave for 1790–1860. Public-domain historical enumerations — the 1790–1990 ' +
+      'lane of the national timeline (2000–2020 comes from censusCountyDecades sums). Race labels ' +
+      'are twps0056-harmonized ("Black"); comparability bands in demographics/comparability.ts ' +
+      'record the period terminology ("Negro"/"colored") and the pre-2000 vs "Black alone" ' +
+      'measurement-regime boundary. Region/division/state tables (2–65) are deferred (repo-lcl9.2).',
+    registryState: 'disabled',
+  },
+  {
     id: 'nhgis-county-race',
     displayName: 'IPUMS NHGIS county race / Black population time series',
     custodian: 'IPUMS NHGIS (University of Minnesota)',
@@ -417,7 +449,8 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     license: {
       name: 'Free for registered IPUMS users — IPUMS terms of use (attribution required)',
       verdict: 'attribution-required',
-      notes: 'Registration and NHGIS_API_KEY required; no automated ingest until human gate clears.',
+      notes:
+        'Registration and NHGIS_API_KEY required; no automated ingest until human gate clears.',
     },
     vintage: 'Historical decennial county race tables 1790–2020 (NHGIS time series + crosswalks)',
     geographies: ['county', 'state'],
