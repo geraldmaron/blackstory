@@ -118,7 +118,7 @@ functions created.
 | `killSwitches/research-campaigns` | Materialized with **`enabled: false`** (schedules may run) |
 | `DISCOVERY_MODE` | Default **fixture** |
 | Artifact Registry cleanup | **7-day** policy on `gcf-artifacts` / `us-central1` |
-| Runtime SA | Still App Engine default until `research@black-book-efaaf.iam.gserviceaccount.com` exists and is bound via `DISCOVERY_RESEARCH_SA` + redeploy (`gcloud auth login` required for SA create) |
+| Runtime SA | **`research@black-book-efaaf.iam.gserviceaccount.com`** (datastore.viewer + logging.logWriter; deployer + GCF agent ActAs) |
 
 Pause schedules anytime: set `killSwitches/research-campaigns.enabled` to `true`.
 

@@ -11,13 +11,17 @@ import { runScheduledDiscovery } from './run-discovery.js';
 import { DISCOVERY_SCHEDULES, scheduledTimeoutSeconds } from './schedules.js';
 
 const region = process.env.DISCOVERY_FUNCTIONS_REGION?.trim() || 'us-central1';
-const researchSa = process.env.DISCOVERY_RESEARCH_SA?.trim();
+const projectId =
+  process.env.GCLOUD_PROJECT?.trim() ||
+  process.env.GCP_PROJECT?.trim() ||
+  process.env.GOOGLE_CLOUD_PROJECT?.trim() ||
+  'black-book-efaaf';
+const researchSa =
+  process.env.DISCOVERY_RESEARCH_SA?.trim() || `research@${projectId}.iam.gserviceaccount.com`;
 
 setGlobalOptions({
   region,
-  ...(researchSa !== undefined && researchSa.length > 0
-    ? { serviceAccount: researchSa }
-    : {}),
+  serviceAccount: researchSa,
 });
 
 function createScheduledDiscovery(jobId: string, schedule: string, rosterTimeoutSec: number) {
