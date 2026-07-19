@@ -373,6 +373,15 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Historical county race from NHGIS (1790–1960, ~45k docs). Client read stays CLOSED — the
+    // public map reads a bounded static artifact, never this collection (a public rule would
+    // invite full scans). Admin SDK bypasses rules for the loader and the artifact builder.
+    // Writes via packages/firebase/src/demographics/nhgis-load-cli.ts.
+    match /censusCountyHistoricalDecades/{countyDecadeId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
     // ACS 5-year county estimates: same class as censusCountyDecades (published federal
     // statistics with provenance). Writes via packages/firebase/src/demographics/acs-load-cli.ts.
     match /acsCountyProfiles/{countyVintageId} {

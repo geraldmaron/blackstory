@@ -38,6 +38,9 @@ export const FIRESTORE_ROOT = {
   /** Published national census statistics: one doc per decade 1790–1990 (twps0056 historical
    * lane). Small (~21 docs); the modern 2000–2020 national number comes from county sums. */
   censusNationalDecades: 'censusNationalDecades',
+  /** Historical county race from NHGIS: one doc per NHGIS county (gisJoin) per decade 1790–1960
+   * (~45k docs). Client read CLOSED — served via a bounded static artifact, never scanned. */
+  censusCountyHistoricalDecades: 'censusCountyHistoricalDecades',
   /** ACS 5-year county estimates: one doc per county per vintage. */
   acsCountyProfiles: 'acsCountyProfiles',
   /** ACS 5-year tract estimates (~85k/vintage): county-bounded reads only, never full scans. */

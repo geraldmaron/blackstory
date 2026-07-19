@@ -137,6 +137,93 @@ export function parseCensusNationalDecadeDoc(data: unknown): CensusNationalDecad
 }
 
 /**
+ * Historical county race doc from NHGIS (one per county per decade, 1790–1960). Counties are
+ * keyed by NHGIS `gisJoin` on that decade's HISTORICAL boundaries (`boundaryVersion` =
+ * `nhgis-<decade>`) — NOT a modern 5-digit FIPS, so cross-vintage or modern joins require an
+ * NHGIS crosswalk (deferred). `blackFree`/`blackEnslaved` are present only for the 1790–1860
+ * free/slave decades and reconstitute `black`. Client read stays CLOSED (see firestore.rules):
+ * ~45k docs; the public map reads a bounded static artifact, never this collection.
+ */
+export const censusCountyHistoricalDecadeSchema = z
+  .object({
+    /** Deterministic id: `${gisJoin}_${decade}`, e.g. `G0100010_1860`. */
+    id: z.string().regex(/^G\d+_\d{4}$/),
+    gisJoin: z.string().regex(/^G\d+$/),
+    decade: z.string().regex(/^\d{4}$/),
+    /** Geography vintage key, `nhgis-<decade>`. */
+    boundaryVersion: z.string().min(1),
+    stateName: z.string().min(1),
+    countyName: z.string().min(1),
+    /** NHGIS historical state/county codes (not necessarily modern FIPS). */
+    stateCode: z.string().min(1),
+    countyCode: z.string().min(1),
+    black: z.number().int().nonnegative(),
+    blackFree: z.number().int().nonnegative().optional(),
+    blackEnslaved: z.number().int().nonnegative().optional(),
+    white: z.number().int().nonnegative().optional(),
+    ...datasetArtifactProvenanceFields,
+  })
+  .superRefine((doc, ctx) => {
+    const year = Number(doc.decade);
+    if (!(year >= 1790 && year <= 1960 && year % 10 === 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `decade ${doc.decade} out of 1790–1960`,
+        path: ['decade'],
+      });
+    }
+    if (doc.id !== `${doc.gisJoin}_${doc.decade}`) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'id must equal `${gisJoin}_${decade}`',
+        path: ['id'],
+      });
+    }
+    if (doc.boundaryVersion !== `nhgis-${doc.decade}`) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'boundaryVersion must equal `nhgis-${decade}`',
+        path: ['boundaryVersion'],
+      });
+    }
+    const hasFree = doc.blackFree !== undefined;
+    const hasEnslaved = doc.blackEnslaved !== undefined;
+    if (hasFree !== hasEnslaved) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'blackFree and blackEnslaved must both be present or both absent',
+        path: ['blackFree'],
+      });
+    }
+    if (hasFree && year > 1860) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `decade ${doc.decade} must not carry a free/enslaved split`,
+        path: ['blackFree'],
+      });
+    }
+    if (hasFree && hasEnslaved && doc.blackFree! + doc.blackEnslaved! !== doc.black) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `blackFree + blackEnslaved must equal black (${doc.black})`,
+        path: ['black'],
+      });
+    }
+  });
+
+export type CensusCountyHistoricalDecadeDoc = z.infer<typeof censusCountyHistoricalDecadeSchema>;
+
+export function censusCountyHistoricalDecadeId(gisJoin: string, decade: string): string {
+  return `${gisJoin}_${decade}`;
+}
+
+export function parseCensusCountyHistoricalDecadeDoc(
+  data: unknown,
+): CensusCountyHistoricalDecadeDoc {
+  return censusCountyHistoricalDecadeSchema.parse(data);
+}
+
+/**
  * ACS 5-year estimate fields (the starter comparison set — `ACS5_STARTER_VARIABLES` in
  * @repo/domain). Every field optional: a suppressed cell is OMITTED here and its field name
  * recorded in `suppressed` — a negative ACS sentinel value must never be persisted.
