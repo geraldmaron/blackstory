@@ -361,6 +361,11 @@
         "id": "ent_denmark_vesey_conspiracy_001",
         "type": "participated_in",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_mother_emanuel_ame_001",
+        "type": "founded",
+        "direction": "outgoing"
       }
     ]
   },
@@ -1604,7 +1609,14 @@
       "organizing"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_black_bottom_paradise_valley_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_chicago_defender_001",
@@ -2687,7 +2699,14 @@
       "organizing"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_harlem_001",
+        "type": "depicts",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_march_on_washington_movement_1941_001",

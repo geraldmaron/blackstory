@@ -276,7 +276,14 @@
       "education"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_boston_african_american_nhs_001",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_abyssinian_baptist_001",

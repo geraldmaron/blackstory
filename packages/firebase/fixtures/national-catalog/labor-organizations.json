@@ -45,7 +45,14 @@
       "railroad"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_negro_american_labor_council_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_coalition_black_trade_unionists_001",

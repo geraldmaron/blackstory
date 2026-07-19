@@ -240,6 +240,11 @@
         "id": "ent_fort_monroe_001",
         "type": "related_to",
         "direction": "incoming"
+      },
+      {
+        "id": "ent_virginia_union_university_001",
+        "type": "located_at",
+        "direction": "outgoing"
       }
     ],
     "topicIds": [

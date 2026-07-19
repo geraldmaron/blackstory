@@ -450,6 +450,11 @@
         "id": "ent_negro_national_league_001",
         "type": "commemorates",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_josh_gibson_001",
+        "type": "commemorates",
+        "direction": "outgoing"
       }
     ],
     "topicIds": [
@@ -562,6 +567,11 @@
       {
         "id": "ent_fourth_avenue_district_001",
         "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_bethel_baptist_church_collegeville_001",
+        "type": "cites",
         "direction": "outgoing"
       }
     ],

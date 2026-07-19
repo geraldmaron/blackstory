@@ -132,6 +132,11 @@
         "id": "ent_jackson_ward_001",
         "type": "located_at",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_evergreen_cemetery_richmond_001",
+        "type": "located_at",
+        "direction": "outgoing"
       }
     ]
   },
@@ -2226,7 +2231,14 @@
       "arts"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_howard_university_001",
+        "type": "employed_by",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_euphemia_lofton_haynes_001",
@@ -2328,7 +2340,14 @@
       "space"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_marjorie_lee_browne_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_marjorie_lee_browne_001",

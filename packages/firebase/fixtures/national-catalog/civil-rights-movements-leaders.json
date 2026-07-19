@@ -44,7 +44,24 @@
       "nonviolence"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_nashville_student_movement_001",
+        "type": "influenced",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_journey_of_reconciliation_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_founding_001",
+        "type": "influenced",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_sncc_founding_001",
@@ -92,7 +109,14 @@
     "mentionedEntityIds": [
       "sncc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_shaw_university_001",
+        "type": "occurred_at",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_sclc_founding_001",
@@ -338,7 +362,14 @@
       "national-mall"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_march_on_washington_1963_001",
+        "type": "commemorates",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_malcolm_x_omaha_birthsite_001",
@@ -519,7 +550,14 @@
       "commemoration"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_bronzeville_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_malcolm_x_lansing_home_001",
@@ -1615,7 +1653,14 @@
       "sncc",
       "sclc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sncc_founding_001",
+        "type": "attended",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_bayard_rustin_001",
@@ -1730,6 +1775,11 @@
       {
         "id": "ent_unita_blackwell_001",
         "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_mfdp_dnc_challenge_001",
+        "type": "participated_in",
         "direction": "outgoing"
       }
     ]
@@ -1969,7 +2019,14 @@
       "sclc",
       "birmingham-campaign"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_bethel_baptist_church_collegeville_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_septima_clark_001",
@@ -2339,6 +2396,11 @@
         "id": "ent_sclc_founding_001",
         "type": "attended",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_poor_peoples_campaign_001",
+        "type": "participated_in",
+        "direction": "outgoing"
       }
     ]
   },
@@ -2528,6 +2590,11 @@
         "id": "ent_selma_to_montgomery_marches_001",
         "type": "attended",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "participated_in",
+        "direction": "outgoing"
       }
     ]
   },
@@ -2687,7 +2754,14 @@
       "sncc",
       "freedom-summer"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_freedom_vote_1963_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_julian_bond_001",
@@ -3095,7 +3169,14 @@
       "coalition"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_freedom_vote_1963_001",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_voter_education_project_001",

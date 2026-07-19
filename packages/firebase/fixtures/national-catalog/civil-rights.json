@@ -47,6 +47,11 @@
         "id": "ent_dexter_avenue_king_memorial_001",
         "type": "related_to",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_montgomery_improvement_association_001",
+        "type": "cites",
+        "direction": "outgoing"
       }
     ],
     "topicIds": [

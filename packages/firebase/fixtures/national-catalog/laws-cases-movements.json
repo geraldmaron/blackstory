@@ -642,7 +642,14 @@
       "sectionalism"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_missouri_compromise_1820",
+        "type": "overturned",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_law_reconstruction_act_1867",
@@ -1156,7 +1163,19 @@
       "jim-crow"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_14th_amendment_1868",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_louisiana_separate_car_act_1890",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_brown_v_board_of_education_1954",
@@ -1208,6 +1227,11 @@
       {
         "id": "ent_case_plessy_v_ferguson_1896",
         "type": "overturned",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_14th_amendment_1868",
+        "type": "cites",
         "direction": "outgoing"
       }
     ]
@@ -1309,6 +1333,11 @@
       {
         "id": "ent_law_virginia_racial_integrity_act_1924",
         "type": "overturned",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_14th_amendment_1868",
+        "type": "cites",
         "direction": "outgoing"
       }
     ]
@@ -1603,7 +1632,14 @@
       "segregation"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_14th_amendment_1868",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_powell_v_alabama_1932",
@@ -1913,6 +1949,11 @@
         "id": "ent_law_voting_rights_act_1965",
         "type": "cites",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_15th_amendment_1870",
+        "type": "cites",
+        "direction": "outgoing"
       }
     ]
   },
@@ -2070,7 +2111,14 @@
       "disparate-impact"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_civil_rights_act_1964",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_runyon_v_mccrary_1976",
@@ -2118,7 +2166,14 @@
     "mentionedEntityIds": [
       "civil-rights-act-1866"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_civil_rights_act_1866",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_civil_rights_cases_1883",
@@ -2273,7 +2328,14 @@
       "reconstruction"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_15th_amendment_1870",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_slaughterhouse_cases_1873",
@@ -2320,7 +2382,14 @@
       "constitutional-law"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_14th_amendment_1868",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_berea_college_v_kentucky_1908",
@@ -2414,7 +2483,14 @@
       "restrictive-covenants"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_14th_amendment_1868",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_sipuel_v_board_of_regents_1948",
@@ -2717,7 +2793,14 @@
       "gerrymandering"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_15th_amendment_1870",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_bailey_v_alabama_1911",
@@ -2764,7 +2847,14 @@
       "labor"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_13th_amendment_1865",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_norris_v_alabama_1935",
@@ -2811,7 +2901,14 @@
       "jury-selection"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_powell_v_alabama_1932",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_terry_v_adams_1953",
@@ -2915,6 +3012,11 @@
     "related": [
       {
         "id": "ent_case_shelley_v_kraemer_1948",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_civil_rights_act_1866",
         "type": "cites",
         "direction": "outgoing"
       }
@@ -3120,7 +3222,14 @@
       "commerce-clause"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_civil_rights_act_1964",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_sffa_v_harvard_2023",

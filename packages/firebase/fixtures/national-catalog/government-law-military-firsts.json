@@ -2931,7 +2931,14 @@
       "army"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_benjamin_davis_jr_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_benjamin_davis_jr_001",

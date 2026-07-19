@@ -249,7 +249,14 @@
       "jazz"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_fourth_avenue_district_001",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_dreamland_ballroom_omaha_001",

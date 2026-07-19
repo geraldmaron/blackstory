@@ -271,7 +271,19 @@
       "education"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_boston_african_american_nhs_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_african_meeting_house_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_black_archives_mid_america_001",
@@ -316,7 +328,14 @@
       "culture"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_negro_leagues_baseball_museum_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_aamlo_oakland_001",
@@ -555,7 +574,14 @@
       "history"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_hampton_university_001",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_african_american_museum_cleveland_001",
