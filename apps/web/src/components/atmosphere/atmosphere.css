@@ -140,3 +140,130 @@
 .ds-story-article__footer {
   margin-top: var(--ds-space-8);
 }
+
+/* —— Living mosaic (about rail) —— */
+.ds-atmosphere--living {
+  position: absolute;
+  inset: 0;
+}
+
+.ds-atmosphere__mosaic--living {
+  grid-template-columns: repeat(var(--ds-atmosphere-columns, 4), 1fr);
+  opacity: 0.36;
+}
+
+.ds-atmosphere__cell {
+  position: relative;
+  min-height: 4.5rem;
+  overflow: hidden;
+}
+
+.ds-atmosphere__tile-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 700ms ease;
+}
+
+.ds-atmosphere__tile-layer--over {
+  opacity: 1;
+  z-index: 1;
+}
+
+.ds-atmosphere__tile-layer--under {
+  opacity: 0;
+  z-index: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Keep a static collage on the about rail; only suppress live crossfade. */
+  .ds-atmosphere--living .ds-atmosphere__mosaic {
+    display: grid;
+  }
+
+  .ds-atmosphere--living .ds-atmosphere__tile-layer {
+    transition: none;
+  }
+}
+
+/* —— About page: prose + mosaic gutter —— */
+.ds-about {
+  display: grid;
+  gap: var(--ds-space-10);
+}
+
+.ds-about__mast,
+.ds-about__copy {
+  min-width: 0;
+}
+
+.ds-about__mosaic-rail {
+  position: relative;
+  isolation: isolate;
+  min-height: 14rem;
+  background: var(--ds-fixed-charcoal);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  overflow: hidden;
+}
+
+.ds-about__mosaic-credit {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--ds-fixed-stone);
+  background: var(--ds-fixed-charcoal);
+}
+
+.ds-about__mosaic-credit a {
+  color: var(--ds-fixed-stone);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-about__mosaic-credit a:hover,
+.ds-about__mosaic-credit a:focus-visible {
+  color: var(--ds-fixed-paper);
+}
+
+.ds-about__mosaic-rail .ds-atmosphere--living {
+  /* Leave room for the credit line at the bottom of the rail. */
+  bottom: 2.25rem;
+}
+
+@media (min-width: 64rem) {
+  .ds-about {
+    grid-template-columns: minmax(0, var(--ds-content-max)) minmax(17rem, 1fr);
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    column-gap: var(--ds-space-10);
+  }
+
+  .ds-about__mast {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .ds-about__copy {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .ds-about__mosaic-rail {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    position: sticky;
+    top: var(--ds-space-12);
+    min-height: min(70vh, 38rem);
+    height: min(70vh, 38rem);
+    align-self: start;
+  }
+}

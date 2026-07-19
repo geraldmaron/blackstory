@@ -1,8 +1,8 @@
 /**
  * Archive mosaic credits — lists the rights-cleared collage tiles used as
- * decorative atmosphere on story pages. Tiles are local copies of Commons
- * promotions; this page satisfies attribution for licensed sources used
- * symbolically (never as portraits of the story subject).
+ * decorative atmosphere on story masts and the about-page living mosaic.
+ * Tiles are local copies of Commons promotions; this page satisfies attribution
+ * for licensed sources used symbolically (never as portraits of a subject).
  */
 import Link from 'next/link';
 import { ATMOSPHERE_TILE_CREDITS } from '../../../components/atmosphere';
@@ -11,7 +11,7 @@ import '../stories.css';
 export const metadata = {
   title: 'Archive mosaic credits',
   description:
-    'Source credits for the rights-cleared archive mosaic tiles used as symbolic atmosphere on BlackStory story pages.',
+    'Source credits for the rights-cleared archive mosaic tiles used as symbolic atmosphere on BlackStory story and about pages.',
 };
 
 export default function MosaicCreditsPage() {
@@ -23,10 +23,11 @@ export default function MosaicCreditsPage() {
           Archive mosaic <em>credits</em>
         </h1>
         <p className="ds-page__lede">
-          Story masts may show a soft black-and-white mosaic behind the headline. Those tiles
-          are rights-cleared archive images, served from this site — never hotlinked from
-          Wikimedia at request time. The mosaic is symbolic atmosphere, not a photograph of
-          the story subject.
+          Story masts and the about page may show a soft black-and-white mosaic. Those tiles are
+          rights-cleared archive images, served from this site — never hotlinked from Wikimedia at
+          request time. The mosaic is symbolic atmosphere, not a photograph of a page subject. On
+          about, tiles periodically swap from the broader pool; motion stops under reduced-motion or
+          Save-Data.
         </p>
       </header>
 
@@ -56,6 +57,8 @@ export default function MosaicCreditsPage() {
 
       <p className="ds-sans ds-story-article__footer">
         <Link href="/stories">All stories</Link>
+        {' · '}
+        <Link href="/about">About</Link>
       </p>
     </main>
   );

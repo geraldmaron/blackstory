@@ -1,10 +1,11 @@
 /**
  * About page: what BlackStory is, why it exists, who it serves, and how the
  * public archive is meant to be used — place-connected Black history with
- * evidence attached.
+ * evidence attached. Desktop open gutter hosts a living archive mosaic.
  */
 
 import Link from 'next/link';
+import { AboutMosaicRail } from '../../components/atmosphere/AboutMosaicRail';
 
 export const metadata = {
   title: 'About',
@@ -14,16 +15,20 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="ds-container ds-page" id="main">
-      <p className="ds-page__eyebrow">Product</p>
-      <h1 className="ds-page__title">History, pinned to place.</h1>
-      <p className="ds-page__lede">
-        BlackStory is a place-connected Black history research platform. It exists so documented
-        history stays findable — especially the history close to you: your state, your city, the
-        corner you pass every day. People. Places. Evidence. Context.
-      </p>
+    <main className="ds-container ds-page ds-about" id="main">
+      <header className="ds-about__mast">
+        <p className="ds-page__eyebrow">Product</p>
+        <h1 className="ds-page__title">History, pinned to place.</h1>
+        <p className="ds-page__lede">
+          BlackStory is a place-connected Black history research platform. It exists so documented
+          history stays findable — especially the history close to you: your state, your city, the
+          corner you pass every day. People. Places. Evidence. Context.
+        </p>
+      </header>
 
-      <div className="ds-prose">
+      <AboutMosaicRail />
+
+      <div className="ds-about__copy ds-prose">
         <section className="ds-section" aria-labelledby="why-heading">
           <p className="ds-section__kicker">Why</p>
           <h2 className="ds-section__title" id="why-heading">

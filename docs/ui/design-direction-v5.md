@@ -279,8 +279,13 @@ compact), result list as top-rule entries with mono meta lines. Pagination quiet
   shades, decade density), and richer facets (kind chips, status, topic, connections).
   Same instrument language as explore.
 
-**Longform (`/methodology`, `/about`, `/legal/[slug]`)** — single serif
+**Longform (`/methodology`, `/legal/[slug]`)** — single serif
 column (`--ds-content-max`), numbered Sora subheads, mono citations. No cards.
+
+**`/about`** — longform serif column with a living archive mosaic in the desktop open gutter
+(`LivingAtmosphereMosaic` / `AboutMosaicRail`): same rights-cleared B&W collage pool as story
+masts, with opacity tile swaps from the broader pool. Narrow viewports show the mosaic as a band
+under the lede. Attribution at `/stories/mosaic-credits`.
 
 **Forms (`/submit`, `/corrections`)** — single column, native controls at 44px, labels in
 Inter 600 0.8125rem sentence case (not mono caps), serif intro, one copper submit per form.
@@ -305,6 +310,8 @@ requires updating every prior use of the pattern it replaces — no parallel voc
 - `AtmospherePlane` + `selectAtmospherePlane` — story mast media plane (`mode: mosaic` default,
   `geometric` fallback); tiles from `tile-credits.ts`. Entity pages use `EntityRecordMark`
   instead — never collage mosaics on `/entity/[id]`.
+- `LivingAtmosphereMosaic` + `AboutMosaicRail` — about-page living collage rail (opacity tile
+  swaps; static under reduced-motion / Save-Data); same tile pool as story masts.
 - `Notice` — the only honest-state surface; never toasts.
 - Tokens only; no raw hex, no shadows, no gradients; hairlines carry separation.
 
