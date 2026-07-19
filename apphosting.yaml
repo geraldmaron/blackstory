@@ -25,6 +25,10 @@ env:
     value: apps/web
     availability:
       - BUILD
+  - variable: APPHOSTING_BUILD_TARGET
+    value: apps/web
+    availability:
+      - BUILD
   - variable: NEXT_PUBLIC_APP_ENV
     value: production
     availability:
@@ -33,6 +37,11 @@ env:
   - variable: PUBLIC_READ_API_DISABLED
     value: '0'
     availability:
+      - RUNTIME
+  - variable: NEXT_PUBLIC_ADMIN_ORIGIN
+    value: https://black-book-admin-production--black-book-efaaf.us-central1.hosted.app
+    availability:
+      - BUILD
       - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
     value: black-book-efaaf
