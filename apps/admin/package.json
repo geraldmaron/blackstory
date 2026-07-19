@@ -17,7 +17,7 @@
     "@repo/operator-cli": "workspace:*",
     "@repo/ui": "workspace:*",
     "firebase": "^11.10.0",
-    "firebase-admin": "^13.4.0",
+    "firebase-admin": "^14.2.0",
     "next": "^16.2.10",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
