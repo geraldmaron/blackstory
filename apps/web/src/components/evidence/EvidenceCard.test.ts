@@ -132,10 +132,27 @@ test('renders a visible excerpt as a blockquote when rights permit it', () => {
   assert.match(html, /A public-domain sentence quoted for context\./);
 });
 
-test('does not surface raw claim ids in the Card meta (public surface)', () => {
+test('does not surface raw claim ids on the public card surface', () => {
   const html = renderToStaticMarkup(createElement(EvidenceCard, { card: buildEvidenceCard(BASE_CLAIM) }));
   assert.doesNotMatch(html, />claim_seed_001</);
   assert.match(html, /Primary archival/);
+});
+
+test('keeps claim prose in body text, not the Card title (quiet typography)', () => {
+  const longObject =
+    'During spring and summer 1800, Gabriel organized enslaved people across Henrico County to march on Richmond.';
+  const html = renderToStaticMarkup(
+    createElement(EvidenceCard, {
+      card: buildEvidenceCard({
+        ...BASE_CLAIM,
+        predicate: 'organized',
+        object: longObject,
+      }),
+    }),
+  );
+  assert.match(html, /<h3 class="ds-card__title">Organized<\/h3>/);
+  assert.doesNotMatch(html, /ds-card__title">Organized: During/);
+  assert.match(html, /class="ds-evidence-claim__body">During spring and summer 1800/);
 });
 
 test('renders revision history and a retraction notice when present', () => {

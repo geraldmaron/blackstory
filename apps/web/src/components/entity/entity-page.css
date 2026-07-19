@@ -1,7 +1,8 @@
 /**
  * Entity record page affordances: editorial mast (media + identity), status/aside blocks,
- * evidence legend, and trust off-ramp. Shared kind/confidence badge styles live in shell.css
- * so home and entity surfaces stay consistent without loading the explore bundle.
+ * evidence claim typography, evidence legend, and trust off-ramp. Shared kind/confidence
+ * badge styles live in shell.css so home and entity surfaces stay consistent without
+ * loading the explore bundle.
  */
 
 .ds-entity-mast {
@@ -198,4 +199,25 @@
   margin: var(--ds-space-1) 0 var(--ds-space-3);
   color: var(--ds-ink-muted);
   font-size: 0.8125rem;
+}
+
+/* Accepted claims: stop using Card-title size/weight for claim copy. Predicate is a quiet
+ * label; claim prose is normal body weight and reading size. */
+.ds-entity-evidence .ds-card__title {
+  font-family: var(--ds-font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-evidence-claim__body {
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-editorial);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--ds-ink);
 }

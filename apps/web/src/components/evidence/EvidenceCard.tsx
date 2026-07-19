@@ -23,14 +23,12 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
   const citationId = `${card.id}-evidence-citation`;
   const hasCoverageMeta = Boolean(card.sourceLineage || card.researchCoverage || card.lastCheckedAt);
   const lastChecked = card.lastCheckedAt ?? card.researchCoverage?.lastCheckedAt;
+  const predicateLabel = humanizeToken(card.predicate);
 
   return (
-    <Card
-      id={card.id}
-      title={`${humanizeToken(card.predicate)}: ${card.object}`}
-      meta={<span className="ds-mono">{card.citation.label}</span>}
-      aria-describedby={citationId}
-    >
+    <Card id={card.id} title={predicateLabel} aria-describedby={citationId}>
+      <p className="ds-evidence-claim__body">{card.object}</p>
+
       <div className="ds-row" style={{ marginBottom: 'var(--ds-space-3)', flexWrap: 'wrap' }}>
         <Confidence level={card.confidenceLevel} label={card.confidenceLabel} />
       </div>
