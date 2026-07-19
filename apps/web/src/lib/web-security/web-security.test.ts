@@ -37,6 +37,7 @@ test('CSP includes strict defaults and frame-ancestors none', () => {
   assert.match(csp, /upgrade-insecure-requests/);
   assert.match(csp, /worker-src 'self' blob:/);
   assert.match(csp, /demotiles\.maplibre\.org/);
+  assert.match(csp, /storage\.googleapis\.com/);
 });
 
 test('CSP development relaxes script-src for Next.js hydration and HMR', () => {

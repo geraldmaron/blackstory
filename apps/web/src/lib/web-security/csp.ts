@@ -20,7 +20,10 @@ export type CspBuildOptions = {
 /** MapLibre demo tiles (fallback) + OpenFreeMap streets/fonts for the archive basemap. */
 const MAP_TILE_SRC = ['https://demotiles.maplibre.org', 'https://tiles.openfreemap.org'];
 
-const DEFAULT_IMG_SRC = ["'self'", 'data:', 'blob:', ...MAP_TILE_SRC];
+/** Public entity/media objects (promoted Commons portraits, collage sources). */
+const PUBLIC_MEDIA_IMG_SRC = ['https://storage.googleapis.com'];
+
+const DEFAULT_IMG_SRC = ["'self'", 'data:', 'blob:', ...MAP_TILE_SRC, ...PUBLIC_MEDIA_IMG_SRC];
 const DEFAULT_CONNECT_SRC = ["'self'", ...MAP_TILE_SRC];
 const DEFAULT_FONT_SRC = ["'self'", ...MAP_TILE_SRC];
 

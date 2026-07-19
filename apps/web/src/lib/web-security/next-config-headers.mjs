@@ -12,6 +12,7 @@ export function securityHeadersForNextConfig() {
     ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
     : "script-src 'self' 'unsafe-inline'";
   const mapTiles = 'https://demotiles.maplibre.org https://tiles.openfreemap.org';
+  const publicMedia = 'https://storage.googleapis.com';
   const connectSrc = isDev
     ? `connect-src 'self' ws: wss: ${mapTiles}`
     : `connect-src 'self' ${mapTiles}`;
@@ -23,7 +24,7 @@ export function securityHeadersForNextConfig() {
     "object-src 'none'",
     scriptSrc,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${mapTiles}`,
+    `img-src 'self' data: blob: ${mapTiles} ${publicMedia}`,
     `font-src 'self' ${mapTiles}`,
     connectSrc,
     "manifest-src 'self'",
