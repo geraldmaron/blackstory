@@ -12,8 +12,8 @@
  *   publicReleases/<activeRelease>/entities/<id>   (projection, merge)
  *   publicSearchIndex/<id>                          (search doc, merge)
  *   entityRelationships/<id>                        (canonical edge, merge)
- *   publicReleases/<activeRelease>/graph/adjacency/<id>
- *   publicReleases/<activeRelease>/graph/decades/<decade>
+ *   publicReleases/<activeRelease>/graphAdjacency/<id>
+ *   publicReleases/<activeRelease>/graphDecades/<decade>
  *   publicReleases/<activeRelease>/graph/all-time
  *
  * Also writes local catalog artifacts under

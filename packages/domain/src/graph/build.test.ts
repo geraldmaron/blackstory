@@ -85,9 +85,9 @@ test('CYCLE-SAFE / BOUNDED-DEPTH: a build over cyclic containment fixtures still
 test('acceptance criterion 4 path shape: publicReleases/{releaseId}/graph/... mirrors the  entity-projection path convention', () => {
   assert.equal(
     publicGraphAdjacencyPath('release-1', 'ent-a'),
-    'publicReleases/release-1/graph/adjacency/ent-a',
+    'publicReleases/release-1/graphAdjacency/ent-a',
   );
-  assert.equal(publicGraphDecadePath('release-1', '1960s'), 'publicReleases/release-1/graph/decades/1960s');
+  assert.equal(publicGraphDecadePath('release-1', '1960s'), 'publicReleases/release-1/graphDecades/1960s');
   assert.equal(publicGraphAllTimePath('release-1'), 'publicReleases/release-1/graph/all-time');
 });
 

@@ -49,18 +49,18 @@ function assertSafePathSegment(value: string, field: string): void {
   }
 }
 
-/** `publicReleases/{releaseId}/graph/adjacency/{entityId}` one bounded adjacency doc per entity. */
+/** `publicReleases/{releaseId}/graphAdjacency/{entityId}` — one bounded adjacency doc per entity. */
 export function publicGraphAdjacencyPath(releaseId: string, entityId: string): string {
   assertSafePathSegment(releaseId, 'releaseId');
   assertSafePathSegment(entityId, 'entityId');
-  return `publicReleases/${releaseId}/graph/adjacency/${entityId}`;
+  return `publicReleases/${releaseId}/graphAdjacency/${entityId}`;
 }
 
-/** `publicReleases/{releaseId}/graph/decades/{decade}` one node/edge-set doc per decade label. */
+/** `publicReleases/{releaseId}/graphDecades/{decade}` — one node/edge-set doc per decade label. */
 export function publicGraphDecadePath(releaseId: string, decade: string): string {
   assertSafePathSegment(releaseId, 'releaseId');
   assertSafePathSegment(decade, 'decade');
-  return `publicReleases/${releaseId}/graph/decades/${decade}`;
+  return `publicReleases/${releaseId}/graphDecades/${decade}`;
 }
 
 /** `publicReleases/{releaseId}/graph/all-time` the all-time union view doc. */
