@@ -6,52 +6,90 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import type { HateCrimeYearSummary, NationalPopulationByDecade, OpportunityAtlasCoverageSummary } from '@repo/firebase';
+import type {
+  HateCrimeYearSummary,
+  NationalPopulationTimelineRow,
+  OpportunityAtlasCoverageSummary,
+} from '@repo/firebase';
 import { HateCrimeCompositionChart } from './HateCrimeCompositionChart';
 import { HateCrimeYearSeriesChart } from './HateCrimeYearSeriesChart';
 import { OpportunityAtlasCoverageChart } from './OpportunityAtlasCoverageChart';
 import { PopulationByDecadeChart } from './PopulationByDecadeChart';
 import { StatePopulationShiftChart } from './StatePopulationShiftChart';
 
-const SAMPLE_POPULATION: readonly NationalPopulationByDecade[] = [
-  {
+function timelineRow(
+  partial: Partial<NationalPopulationTimelineRow> &
+    Pick<NationalPopulationTimelineRow, 'decade' | 'year' | 'totalPopulation' | 'blackPopulation'>,
+): NationalPopulationTimelineRow {
+  return {
+    freeBlackPopulation: null,
+    enslavedBlackPopulation: null,
+    blackShareOfTotalPct: (partial.blackPopulation / partial.totalPopulation) * 100,
+    raceCategoryLabel: 'Black',
+    nationalSource: 'twps0056',
+    sourceId: 'us-census-historical-race-1790-1990',
+    sourceUrl: 'https://www.census.gov/library/working-papers/2002/demo/POP-twps0056.html',
+    opensDefinitionBoundary: partial.decade === '2000',
+    southernUndercountCaveat: partial.decade === '1870',
+    hasFreeEnslavedSplit: partial.freeBlackPopulation != null,
+    ...partial,
+  };
+}
+
+const SAMPLE_TIMELINE: readonly NationalPopulationTimelineRow[] = [
+  timelineRow({
+    decade: '1790',
+    year: 1790,
+    totalPopulation: 3929214,
+    blackPopulation: 757208,
+    freeBlackPopulation: 59527,
+    enslavedBlackPopulation: 697681,
+    raceCategoryLabel: 'Enslaved persons and free colored persons',
+  }),
+  timelineRow({
     decade: '2000',
-    countyCount: 3141,
+    year: 2000,
     totalPopulation: 281421906,
     blackPopulation: 34658190,
-    source: 'U.S. Census Bureau, Summary File 1',
-    sourceUrl: 'https://www.census.gov/data/datasets/2000/dec/summary-file-1.html',
-  },
-  {
+    raceCategoryLabel: 'Black or African American alone',
+  }),
+  timelineRow({
     decade: '2010',
-    countyCount: 3143,
+    year: 2010,
     totalPopulation: 308745538,
     blackPopulation: 38929259,
-    source: 'U.S. Census Bureau, Summary File 1',
-    sourceUrl: 'https://www.census.gov/data/datasets/2010/dec/summary-file-1.html',
-  },
-  {
+  }),
+  timelineRow({
     decade: '2020',
-    countyCount: 3143,
+    year: 2020,
     totalPopulation: 331449281,
     blackPopulation: 41104607,
-    source: 'U.S. Census Bureau, Decennial Census P.L. 94-171',
-    sourceUrl: 'https://www.census.gov/data/datasets/2020/dec/pl-94171.html',
-  },
+  }),
 ];
 
-test('PopulationByDecadeChart renders decade labels and share annotations', () => {
-  const html = renderToStaticMarkup(createElement(PopulationByDecadeChart, { rows: SAMPLE_POPULATION }));
-  assert.match(html, /2000/);
-  assert.match(html, /2010/);
+const SAMPLE_SOURCES = [
+  {
+    label: 'U.S. Census Bureau, Working Paper 56',
+    url: 'https://www.census.gov/library/working-papers/2002/demo/POP-twps0056.html',
+  },
+] as const;
+
+test('PopulationByDecadeChart renders the 1790–2020 span, the 2000 boundary, and a source', () => {
+  const html = renderToStaticMarkup(
+    createElement(PopulationByDecadeChart, { rows: SAMPLE_TIMELINE, sources: SAMPLE_SOURCES }),
+  );
+  assert.match(html, /1790/);
   assert.match(html, /2020/);
   assert.match(html, /Black population by census decade/);
-  assert.match(html, /12\.3%/);
+  assert.match(html, /Black alone/); // 2000 methodology-boundary marker
+  assert.match(html, /59,527/); // free count in the accessible table
   assert.match(html, /U\.S\. Census Bureau/);
 });
 
 test('PopulationByDecadeChart returns nothing when rows are empty', () => {
-  const html = renderToStaticMarkup(createElement(PopulationByDecadeChart, { rows: [] }));
+  const html = renderToStaticMarkup(
+    createElement(PopulationByDecadeChart, { rows: [], sources: [] }),
+  );
   assert.equal(html, '');
   assert.doesNotMatch(html, />0</);
 });
@@ -141,12 +179,26 @@ test('OpportunityAtlasCoverageChart renders outcome coverage and histogram bins'
   const coverage: OpportunityAtlasCoverageSummary = {
     tractCount: 3,
     outcomeFieldCoverage: [
-      { field: 'kfrBlackP25', label: 'Household income rank (Black children, parents p25)', tractCount: 3 },
-      { field: 'kfrWhiteP25', label: 'Household income rank (white children, parents p25)', tractCount: 1 },
+      {
+        field: 'kfrBlackP25',
+        label: 'Household income rank (Black children, parents p25)',
+        tractCount: 3,
+      },
+      {
+        field: 'kfrWhiteP25',
+        label: 'Household income rank (white children, parents p25)',
+        tractCount: 1,
+      },
     ],
     kfrBlackP25Histogram: [
       { id: '0-20', label: '0–20th', minInclusive: 0, maxExclusive: 0.2, tractCount: 1 },
-      { id: '80-100', label: '80–100th', minInclusive: 0.8, maxExclusive: 1.0000001, tractCount: 2 },
+      {
+        id: '80-100',
+        label: '80–100th',
+        minInclusive: 0.8,
+        maxExclusive: 1.0000001,
+        tractCount: 2,
+      },
     ],
     source: 'Opportunity Insights',
     sourceUrl: 'https://opportunityinsights.org/data/',

@@ -15,23 +15,23 @@ import {
   getAcsCoverageSummary,
   getHateCrimeYearSummaries,
   getHateCrimeYearSummary,
-  getNationalPopulationByDecade,
-  getNationalPopulationChanges,
+  getNationalPopulationTimelineSnapshot,
   getOpportunityAtlasCoverageSummary,
   getStatePopulationChanges,
   type AcsCoverageSummary,
   type HateCrimeYearSummary,
+  type NationalPopulationTimelineSnapshot,
   type OpportunityAtlasCoverageSummary,
-  type PopulationDecadeChange,
   type StatePopulationChange,
 } from '@repo/firebase';
 import { Notice } from '@repo/ui';
 import { AcsCoverageChart } from '../../components/data/AcsCoverageChart';
+import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataStatStrip } from '../../components/data/DataStatStrip';
 import { HateCrimeCompositionChart } from '../../components/data/HateCrimeCompositionChart';
 import { HateCrimeYearSeriesChart } from '../../components/data/HateCrimeYearSeriesChart';
 import { OpportunityAtlasCoverageChart } from '../../components/data/OpportunityAtlasCoverageChart';
-import { nationalChangeStripItems } from '../../components/data/population-change';
+import { timelineChangeStripItems } from '../../components/data/population-change';
 import { PopulationByDecadeChart } from '../../components/data/PopulationByDecadeChart';
 import { StatePopulationShift } from '../../components/data/StatePopulationShift';
 import '../../components/data/data-charts.css';
@@ -64,16 +64,14 @@ const STATE_NAME_BY_FIPS = buildStateFipsNameMap(US_STATES);
 
 export default async function DataPage() {
   const [
-    populationByDecade,
-    populationChanges,
+    timelineSnapshot,
     stateChanges2010to2020,
     acsCoverage,
     hateCrimeYear,
     hateCrimeSeries,
     opportunityAtlasCoverage,
   ] = await Promise.all([
-    safe(getNationalPopulationByDecade()),
-    safe(getNationalPopulationChanges()),
+    safe(getNationalPopulationTimelineSnapshot()),
     safe(getStatePopulationChanges('2010', '2020')),
     safe(getAcsCoverageSummary()),
     safe(getHateCrimeYearSummary(LATEST_HATE_CRIME_YEAR)),
@@ -85,10 +83,26 @@ export default async function DataPage() {
   const hateCrimeByYear = (hateCrimeSeries ?? []) as readonly HateCrimeYearSummary[];
   const acs = acsCoverage as AcsCoverageSummary | undefined;
   const opportunity = opportunityAtlasCoverage as OpportunityAtlasCoverageSummary | undefined;
-  const changes = (populationChanges ?? []) as readonly PopulationDecadeChange[];
+  const timeline = (timelineSnapshot ?? undefined) as
+    NationalPopulationTimelineSnapshot | undefined;
+  const timelineRows = timeline?.rows ?? [];
   const stateChanges = (stateChanges2010to2020 ?? []) as readonly StatePopulationChange[];
-  const changeStripItems = nationalChangeStripItems(changes);
-  const comparabilityNote = changes[0]?.comparabilityNote;
+  const chartSources = (timeline?.sources ?? []).map((source) => ({
+    label: source.label,
+    url: source.sourceUrl,
+  }));
+  const lastRow = timelineRows.at(-1);
+  const primarySource = lastRow
+    ? (() => {
+        const match = timeline?.sources.find((source) => source.sourceId === lastRow.sourceId);
+        return match
+          ? { label: match.label, url: match.sourceUrl }
+          : { label: lastRow.sourceId, url: lastRow.sourceUrl };
+      })()
+    : { label: 'U.S. Census Bureau', url: 'https://www.census.gov' };
+  const changeStripItems = timeline
+    ? timelineChangeStripItems(timeline.changes, primarySource, 3)
+    : [];
 
   return (
     <main className="ds-container ds-page" id="main">
@@ -96,9 +110,9 @@ export default async function DataPage() {
       <h1 className="ds-page__title">Data behind the archive</h1>
       <p className="ds-page__lede">
         The national numbers underneath BlackStory&rsquo;s map and records — population shift,
-        economic, and civil-rights context, each carrying the exact source it came from.
-        County choropleths and alternate map models live on Explore; this page is the
-        national-scale summary and the paper trail.
+        economic, and civil-rights context, each carrying the exact source it came from. County
+        choropleths and alternate map models live on Explore; this page is the national-scale
+        summary and the paper trail.
       </p>
 
       <section className="ds-section" aria-labelledby="population-heading">
@@ -107,23 +121,31 @@ export default async function DataPage() {
           Black population by decade
         </h2>
         <p className="ds-section__lede">
-          Decennial Black alone counts for every U.S. county (2000–2020), joined by 5-digit FIPS.
-          The chart shows levels; the figures below show decade-over-decade change.
+          National Black population every decade from 1790 to 2020 — free and enslaved counts from
+          the 1790–1860 censuses, the single Black total afterward, and modern county-summed counts
+          for 2000–2020. Historical figures come from Census Working Paper 56; the numbers below
+          show recent decade-over-decade change.
         </p>
-        {populationByDecade && populationByDecade.length > 0 ? (
+        {timelineRows.length > 0 ? (
           <>
-            <div className="ds-data-section__viz">
-              <PopulationByDecadeChart rows={populationByDecade} />
+            <div className="ds-data-section__viz ds-data-section__viz--pair">
+              <PopulationByDecadeChart rows={timelineRows} sources={chartSources} />
+              <BlackPopulationShareChart rows={timelineRows} sources={chartSources} />
             </div>
             {changeStripItems.length > 0 ? (
               <>
                 <h3 className="ds-sans" id="population-change-heading">
-                  Decade-over-decade change
+                  Recent decade-over-decade change
                 </h3>
                 <DataStatStrip labelledBy="population-change-heading" items={changeStripItems} />
-                {comparabilityNote ? (
-                  <p className="ds-sans ds-data-comparability-note">{comparabilityNote}</p>
-                ) : null}
+                <p className="ds-sans ds-data-comparability-note">
+                  Race categories change across two centuries: the 1790–1860 censuses split Black
+                  population into free and enslaved counts; “Negro”/“colored” terminology gave way
+                  to “Black”; and 2000 introduced the “Black or African American alone”
+                  multiple-race methodology. Counts before and after 2000 are not perfectly
+                  comparable, and 1870’s Southern count is a documented undercount — the charts mark
+                  these boundaries rather than smoothing over them.
+                </p>
               </>
             ) : null}
             {stateChanges.length > 0 ? (
@@ -185,10 +207,10 @@ export default async function DataPage() {
           Hate crime reporting
         </h2>
         <Notice tone="warning" title="Reporting is voluntary">
-          Participation in the UCR hate crime program is voluntary for law enforcement agencies.
-          A county with no reported incidents means no participating agency reported one that
-          year &mdash; it is a fact about reporting, not a claim that nothing happened. Always
-          read these counts beside the national participation rate below.
+          Participation in the UCR hate crime program is voluntary for law enforcement agencies. A
+          county with no reported incidents means no participating agency reported one that year
+          &mdash; it is a fact about reporting, not a claim that nothing happened. Always read these
+          counts beside the national participation rate below.
         </Notice>
         {hateCrime ? (
           <>
@@ -239,9 +261,9 @@ export default async function DataPage() {
         </h2>
         <p className="ds-section__lede">
           Household income rank in adulthood by race and parental income percentile, from the
-          Opportunity Atlas &mdash; tract-level, not a national average (averaging percentile
-          ranks across differently sized tracts would itself be a fabricated statistic, so we
-          don&rsquo;t publish one here).
+          Opportunity Atlas &mdash; tract-level, not a national average (averaging percentile ranks
+          across differently sized tracts would itself be a fabricated statistic, so we don&rsquo;t
+          publish one here).
         </p>
         {opportunity ? (
           <>
@@ -262,7 +284,9 @@ export default async function DataPage() {
             />
           </>
         ) : (
-          <p className="ds-sans">Opportunity Atlas data is not available in this environment yet.</p>
+          <p className="ds-sans">
+            Opportunity Atlas data is not available in this environment yet.
+          </p>
         )}
       </section>
     </main>

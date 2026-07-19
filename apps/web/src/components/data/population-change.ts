@@ -74,6 +74,52 @@ export function nationalChangeStripItems(changes: readonly PopulationChangeLike[
   });
 }
 
+/** Adjacent-decade change from the national-timeline snapshot (domain `NationalPopulationChange`). */
+export type TimelineChangeLike = {
+  readonly fromDecade: string;
+  readonly toDecade: string;
+  readonly growth: { readonly absoluteChange: number; readonly percentChange: number | null };
+  readonly sharePointChange: number | null;
+  readonly crossesDefinitionBoundary: boolean;
+};
+
+/**
+ * Strip items for the most recent `limit` adjacent-decade changes from the merged 1790–2020
+ * timeline. A change that crosses the 2000 measurement-regime boundary is labelled as not
+ * directly comparable rather than presented as a clean delta.
+ */
+export function timelineChangeStripItems(
+  changes: readonly TimelineChangeLike[],
+  source: { readonly label: string; readonly url: string },
+  limit = 3,
+): Array<{
+  readonly id: string;
+  readonly value: string;
+  readonly label: string;
+  readonly note: string;
+  readonly sources: readonly [{ readonly label: string; readonly url: string }];
+}> {
+  return changes.slice(-limit).map((change) => {
+    const pct = formatPercentChange(change.growth.percentChange);
+    const noteParts = [
+      ...(change.sharePointChange !== null
+        ? [`Share of total population ${formatSignedPp(change.sharePointChange)}`]
+        : []),
+      ...(pct ? [`Black population ${pct}`] : []),
+      ...(change.crossesDefinitionBoundary
+        ? ['methodology change (2000 “Black alone”) — not directly comparable']
+        : []),
+    ];
+    return {
+      id: `${change.fromDecade}-${change.toDecade}`,
+      value: formatSignedCount(change.growth.absoluteChange),
+      label: `Black population change, ${change.fromDecade}→${change.toDecade}`,
+      note: noteParts.join(' · '),
+      sources: [source],
+    };
+  });
+}
+
 /** Top movers by absolute Black population change (gains first, then losses). */
 export function rankStateMovers(
   changes: readonly StateChangeLike[],
