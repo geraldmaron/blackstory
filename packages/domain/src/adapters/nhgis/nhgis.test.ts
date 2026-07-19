@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import {
   assertNhgisApiKeyConfigured,
   buildNhgisExtractDefinition,
+  NHGIS_DECADE_RACE_TABLES,
   getNhgisExtractStatus,
   isNhgisAggregateArea,
   nhgisCountyRaceFromCsv,
@@ -68,6 +69,22 @@ test('nhgisCountyRaceFromCsv wraps the parse in a result envelope', () => {
   assert.equal(result.request.decade, '1860');
   assert.equal(result.rows.length, 5);
   assert.deepEqual(result.rejected, []);
+});
+
+test('registry covers every decade 1790–1960 with the right split regime', () => {
+  const decades = NHGIS_DECADE_RACE_TABLES.map((t) => t.decade);
+  const expected = Array.from({ length: 18 }, (_u, i) => String(1790 + i * 10));
+  assert.deepEqual([...decades].sort(), expected.sort(), 'no gaps 1790–1960');
+  for (const t of NHGIS_DECADE_RACE_TABLES) {
+    const isFreeSlaveEra = Number(t.decade) <= 1860;
+    assert.equal(t.hasFreeEnslavedSplit, isFreeSlaveEra, `${t.decade} split regime`);
+    // Every table must map at least one Black-bearing variable.
+    const cats = new Set(Object.values(t.variables));
+    assert.ok(
+      cats.has('black') || (cats.has('blackFree') && cats.has('blackEnslaved')),
+      `${t.decade} maps Black`,
+    );
+  }
 });
 
 test('fails closed on an unregistered decade', () => {

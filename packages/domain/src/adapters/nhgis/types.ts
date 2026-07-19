@@ -42,9 +42,10 @@ export type NhgisDecadeRaceTable = {
  * as each is verified the same way, rather than encoded unverified.
  */
 export const NHGIS_DECADE_RACE_TABLES: readonly NhgisDecadeRaceTable[] = [
+  // ── Free/slave era (1790–1860): Black = free + enslaved. "Non-White"/"Colored" ≈ Black; the
+  //    census counted essentially no other non-white persons in these decades. Several tables
+  //    split by sex, so a category sums its male + female variables.
   {
-    // "Non-White: Free/Slave" ≈ Black in 1790 (the census counted essentially no other non-white
-    // persons), matching twps0056's Black = free + slave for this decade.
     decade: '1790',
     dataset: '1790_cPop',
     dataTable: 'NT6',
@@ -53,50 +54,178 @@ export const NHGIS_DECADE_RACE_TABLES: readonly NhgisDecadeRaceTable[] = [
     variables: { AAQ003: 'white', AAQ001: 'blackFree', AAQ002: 'blackEnslaved' },
   },
   {
-    // Race/Slave Status BY SEX — each category sums its male + female variables.
+    decade: '1800',
+    dataset: '1800_cPop',
+    dataTable: 'NT6',
+    nhgisCode: 'AAY',
+    hasFreeEnslavedSplit: true,
+    variables: { AAY001: 'blackFree', AAY002: 'blackEnslaved' },
+  },
+  {
+    decade: '1810',
+    dataset: '1810_cPop',
+    dataTable: 'NT6',
+    nhgisCode: 'AA7',
+    hasFreeEnslavedSplit: true,
+    variables: { AA7001: 'blackFree', AA7002: 'blackEnslaved' },
+  },
+  {
+    decade: '1820',
+    dataset: '1820_cPop',
+    dataTable: 'NT10', // Race/Slave Status by Sex
+    nhgisCode: 'ABB',
+    hasFreeEnslavedSplit: true,
+    variables: {
+      ABB001: 'white',
+      ABB002: 'white',
+      ABB005: 'blackFree',
+      ABB006: 'blackFree',
+      ABB003: 'blackEnslaved',
+      ABB004: 'blackEnslaved',
+    },
+  },
+  {
     decade: '1830',
     dataset: '1830_cPop',
-    dataTable: 'NT12',
+    dataTable: 'NT12', // Race/Slave Status by Sex
     nhgisCode: 'ABO',
     hasFreeEnslavedSplit: true,
     variables: {
       ABO001: 'white',
       ABO002: 'white',
-      ABO005: 'blackFree', // Nonwhite Free (M+F)
+      ABO005: 'blackFree',
       ABO006: 'blackFree',
-      ABO003: 'blackEnslaved', // Nonwhite Slave (M+F)
+      ABO003: 'blackEnslaved',
       ABO004: 'blackEnslaved',
     },
   },
   {
+    decade: '1840',
+    dataset: '1840_cPopX',
+    dataTable: 'NT25', // Race/Slave Status
+    nhgisCode: 'ACS',
+    hasFreeEnslavedSplit: true,
+    variables: { ACS001: 'white', ACS002: 'blackFree', ACS003: 'blackEnslaved' },
+  },
+  {
+    decade: '1850',
+    dataset: '1850_cPAX',
+    dataTable: 'NT6', // Race/Slave Status
+    nhgisCode: 'AE6',
+    hasFreeEnslavedSplit: true,
+    variables: { AE6001: 'white', AE6002: 'blackFree', AE6003: 'blackEnslaved' },
+  },
+  {
     decade: '1860',
     dataset: '1860_cPAX',
-    dataTable: 'NT6',
+    dataTable: 'NT6', // Race and Slave Status
     nhgisCode: 'AH3',
     hasFreeEnslavedSplit: true,
+    variables: { AH3001: 'white', AH3002: 'blackFree', AH3003: 'blackEnslaved' },
+  },
+  // ── Post-emancipation (1870+): no free/slave split. Black = "Colored" (1870/1880) or "Negro".
+  //    Chinese/Indian/other races have their own columns and are excluded from Black.
+  {
+    decade: '1870',
+    dataset: '1870_cPAX',
+    dataTable: 'NT4', // Race
+    nhgisCode: 'AK3',
+    hasFreeEnslavedSplit: false,
+    variables: { AK3001: 'white', AK3002: 'black' }, // Colored
+  },
+  {
+    decade: '1880',
+    dataset: '1880_cPAX',
+    dataTable: 'NT4', // Race
+    nhgisCode: 'APP',
+    hasFreeEnslavedSplit: false,
+    variables: { APP001: 'white', APP002: 'black' }, // Colored
+  },
+  {
+    // NT4 lists Negro for 1890, 1880 AND 1870 — take ONLY the 1890 column (AVF001).
+    decade: '1890',
+    dataset: '1890_cPHAM',
+    dataTable: 'NT4', // Non-White Population by Race by Year
+    nhgisCode: 'AVF',
+    hasFreeEnslavedSplit: false,
+    variables: { AVF001: 'black' }, // Negro >> 1890
+  },
+  {
+    decade: '1900',
+    dataset: '1900_cPHAM',
+    dataTable: 'NT7', // Non-White Population by Race by Sex
+    nhgisCode: 'AZ3',
+    hasFreeEnslavedSplit: false,
+    variables: { AZ3003: 'black', AZ3004: 'black' }, // Negro M+F ("Other Colored" excluded)
+  },
+  {
+    decade: '1910',
+    dataset: '1910_cPHA',
+    dataTable: 'NT11', // Race by Sex
+    nhgisCode: 'A30',
+    hasFreeEnslavedSplit: false,
+    variables: { A30001: 'white', A30002: 'white', A30003: 'black', A30004: 'black' },
+  },
+  {
+    decade: '1920',
+    dataset: '1920_cPHAM',
+    dataTable: 'NT5', // Race/Nativity by Sex
+    nhgisCode: 'A8L',
+    hasFreeEnslavedSplit: false,
     variables: {
-      AH3001: 'white',
-      AH3002: 'blackFree', // "Free colored"
-      AH3003: 'blackEnslaved', // "Slave"
+      A8L001: 'white',
+      A8L002: 'white',
+      A8L003: 'white',
+      A8L004: 'white',
+      A8L005: 'black',
+      A8L006: 'black',
     },
   },
   {
-    // Post-emancipation: no free/slave split. Black = Negro (M+F); "Other Colored" is excluded.
-    decade: '1900',
-    dataset: '1900_cPHAM',
-    dataTable: 'NT7',
-    nhgisCode: 'AZ3',
+    decade: '1930',
+    dataset: '1930_cPAE',
+    dataTable: 'NT5', // Race/Nativity by Sex
+    nhgisCode: 'BEP',
     hasFreeEnslavedSplit: false,
-    variables: { AZ3003: 'black', AZ3004: 'black' },
+    variables: {
+      BEP001: 'white',
+      BEP002: 'white',
+      BEP003: 'white',
+      BEP004: 'white',
+      BEP005: 'black',
+      BEP006: 'black',
+    },
   },
   {
-    // Race/Nativity: Black = Negro; White = native + foreign-born; "Other" excluded.
     decade: '1940',
     dataset: '1940_cPHAE',
-    dataTable: 'NT6',
+    dataTable: 'NT6', // Race/Nativity
     nhgisCode: 'BYA',
     hasFreeEnslavedSplit: false,
     variables: { BYA001: 'white', BYA002: 'white', BYA003: 'black' },
+  },
+  {
+    decade: '1950',
+    dataset: '1950_cPHA',
+    dataTable: 'NT6', // Sex by Race/Nativity
+    nhgisCode: 'B3P',
+    hasFreeEnslavedSplit: false,
+    variables: {
+      B3P001: 'white',
+      B3P002: 'white',
+      B3P005: 'white',
+      B3P006: 'white',
+      B3P003: 'black',
+      B3P007: 'black',
+    },
+  },
+  {
+    decade: '1960',
+    dataset: '1960_cPop',
+    dataTable: 'NT13', // Sex by Race
+    nhgisCode: 'B5S',
+    hasFreeEnslavedSplit: false,
+    variables: { B5S001: 'white', B5S008: 'white', B5S002: 'black', B5S009: 'black' },
   },
 ];
 
