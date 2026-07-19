@@ -1,0 +1,7 @@
+GISJOIN,YEAR,STATE,STATEA,COUNTY,COUNTYA,AREANAME,STATEICP,COUNTYICP,AH3001,AH3002,AH3003,AH3004,AH3005,AH3006
+GIS Join Match Code,Data File Year,State Name,State Code,County Name,County Code,Area name,ICPSR State Code,ICPSR County Code,White,Free colored,Slave,Indian,Half breed,Asiatic
+"G0100010","1860","Alabama","010","Autauga","0010","Autauga","41","10",7105,14,9607,13,,
+"G0100030","1860","Alabama","010","Baldwin","0030","Baldwin","41","30",3585,140,3714,91,,
+"G0100050","1860","Alabama","010","Barbour","0050","Barbour","41","50",14629,33,16150,0,,
+"G0100070","1860","Alabama","010","Bibb","0070","Bibb","41","70",8027,25,3842,0,,
+"G0100090","1860","Alabama","010","Blount","0090","Blount","41","90",10193,6,666,0,,
