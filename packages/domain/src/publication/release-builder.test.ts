@@ -227,6 +227,29 @@ test('buildReleaseEntityArtifacts fails closed with no_citations when an entry h
   assert.equal(result.reason, 'no_citations');
 });
 
+test('buildReleaseEntityArtifacts fails closed when an admin flagged the entity for retraction', () => {
+  const entry = baseEntry();
+  const result = buildReleaseEntityArtifacts(entry, {
+    ...CONTEXT,
+    catalogDecision: { action: 'flag_for_retraction', reason: 'Owner-confirmed factual error' },
+  });
+  assert.equal(result.ok, false);
+  if (result.ok) return;
+  assert.equal(result.reason, 'catalog_decision_retracted');
+  assert.match(result.message, /Owner-confirmed factual error/);
+});
+
+test('buildReleaseEntityArtifacts ignores a needs_review or clear_flag catalog decision', () => {
+  const entry = baseEntry();
+  for (const action of ['needs_review', 'clear_flag'] as const) {
+    const result = buildReleaseEntityArtifacts(entry, {
+      ...CONTEXT,
+      catalogDecision: { action, reason: 'just a note' },
+    });
+    assert.equal(result.ok, true, `expected ${action} to still build`);
+  }
+});
+
 test('buildReleaseEntityArtifacts fails closed when every claim lacks a citationSource', () => {
   const entry = baseEntry({
     claims: [

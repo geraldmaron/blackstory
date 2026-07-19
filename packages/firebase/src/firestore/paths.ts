@@ -46,6 +46,10 @@ export const FIRESTORE_ROOT = {
   hateCrimeCountyYears: 'hateCrimeCountyYears',
   /** UCR reporting participation by state + year — the coverage denominator. */
   ucrStateParticipation: 'ucrStateParticipation',
+  /** Admin-recorded bulk decisions on published catalog entities (flag/needs-review/clear).
+   * Never mutates the entity or a release directly — the release builder reads these and the
+   * existing signed-manifest privileged-apply flow is what actually changes what's live. */
+  catalogDecisions: 'catalogDecisions',
 } as const;
 
 export type FirestoreRootCollection = (typeof FIRESTORE_ROOT)[keyof typeof FIRESTORE_ROOT];
@@ -98,4 +102,6 @@ export const firestorePaths = {
   /** Census county-decade statistics: flat `{fips5}_{decade}` docs, e.g. `01001_2020`. */
   censusCountyDecade: (fips5: string, decade: string) =>
     `${FIRESTORE_ROOT.censusCountyDecades}/${fips5}_${decade}`,
+  /** One doc per entity id — the latest bulk decision wins (set, not append). */
+  catalogDecision: (entityId: string) => `${FIRESTORE_ROOT.catalogDecisions}/${entityId}`,
 } as const;

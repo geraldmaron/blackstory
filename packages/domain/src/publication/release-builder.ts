@@ -131,6 +131,15 @@ export type ReleaseBuildContext = {
     readonly matchMethod?: string;
     readonly locationLabel?: string;
   };
+  /**
+   * Latest admin bulk catalog decision for this entity (apps/admin's catalog-decisions-store),
+   * when the caller looked one up. A `flag_for_retraction` decision fails this entity closed —
+   * the same fail-closed shape as the other gates below, not a silent skip.
+   */
+  readonly catalogDecision?: {
+    readonly action: 'flag_for_retraction' | 'needs_review' | 'clear_flag';
+    readonly reason: string;
+  };
 };
 
 export type ReleaseEntityProjectionFields = {
@@ -197,7 +206,8 @@ export type ReleaseSearchIndexFields = {
 export type ReleaseBuildFailureReason =
   | 'no_citations'
   | 'notability_basis_gate'
-  | 'reference_resolution';
+  | 'reference_resolution'
+  | 'catalog_decision_retracted';
 
 export type ReleaseBuildResult =
   | {
@@ -464,6 +474,14 @@ export function buildReleaseEntityArtifacts(
   entry: ReleaseSourceEntity,
   context: ReleaseBuildContext,
 ): ReleaseBuildResult {
+  if (context.catalogDecision?.action === 'flag_for_retraction') {
+    return {
+      ok: false,
+      reason: 'catalog_decision_retracted',
+      message: `Admin flagged this entity for retraction: ${context.catalogDecision.reason}`,
+    };
+  }
+
   const claims = buildClaimProjections(entry);
 
   const factGate = evaluateFactPublishGate({
