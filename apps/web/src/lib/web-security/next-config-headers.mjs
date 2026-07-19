@@ -6,9 +6,11 @@
 /** @returns {{ key: string, value: string }}  */
 export function securityHeadersForNextConfig() {
   const isDev = process.env.NODE_ENV !== 'production';
+  // Keep in sync with csp.ts — production needs 'unsafe-inline' for Next RSC flight
+  // scripts until a nonce pipeline lands.
   const scriptSrc = isDev
     ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-    : "script-src 'self'";
+    : "script-src 'self' 'unsafe-inline'";
   const mapTiles = 'https://demotiles.maplibre.org https://tiles.openfreemap.org';
   const connectSrc = isDev
     ? `connect-src 'self' ws: wss: ${mapTiles}`
