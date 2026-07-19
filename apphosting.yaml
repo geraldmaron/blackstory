@@ -5,6 +5,8 @@
 # directory `.`, the buildpack sees pnpm-lock.yaml and uses pnpm.
 #
 # GOOGLE_BUILDABLE points the Next.js adapter at apps/web.
+# apphosting:build copies `.next/static` + `public` into the standalone tree
+# (required for CSS/JS when using scripts.runCommand).
 # automatic App Hosting rollouts stay disabled (explicit CLI/Actions promote only).
 
 scripts:

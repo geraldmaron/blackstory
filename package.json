@@ -10,7 +10,7 @@
   "scripts": {
     "bootstrap": "./scripts/bootstrap.sh",
     "build": "pnpm -r --filter './packages/**' --filter './apps/**' --filter @repo/functions-discovery run build",
-    "apphosting:build": "pnpm --filter @repo/web... --workspace-concurrency=1 build",
+    "apphosting:build": "pnpm --filter @repo/web... --workspace-concurrency=1 build && mkdir -p apps/web/.next/standalone/apps/web/.next && cp -R apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static && cp -R apps/web/public apps/web/.next/standalone/apps/web/public",
     "start": "node apps/web/.next/standalone/apps/web/server.js",
     "test": "pnpm test:preflight && pnpm -r --filter './packages/**' --filter './apps/**' --filter @repo/functions-discovery run --if-present test && uv run pytest",
     "test:preflight": "node --import tsx scripts/test-preflight.mjs",
