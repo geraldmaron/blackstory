@@ -143,7 +143,7 @@ export function sortStoryReviewQueue<T extends StoryReviewQueueItem>(
 ): readonly T[] {
   const direction = query.sortDirection === 'asc' ? 1 : -1;
   const sorted = [...items].sort((left, right) => {
-    let cmp = 0;
+    let cmp: number;
     switch (query.sortKey) {
       case 'title':
         cmp = compareStrings(left.title, right.title);

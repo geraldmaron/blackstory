@@ -52,7 +52,7 @@ import { createEcfrFixtureClient } from './ecfr/client.js';
 import { createCourtListenerFixtureClient } from './courtlistener/client.js';
 import { createLegiScanFixtureClient } from './legiscan/client.js';
 
-export function parseAllLegalFixtures(): readonly import('./types.js').LegalAdapterParseResult[] {
+export function parseAllLegalFixtures(): readonly LegalAdapterParseResult[] {
   return [
     createCongressGovFixtureClient().parseFixtures(),
     createEcfrFixtureClient().parseFixtures(),

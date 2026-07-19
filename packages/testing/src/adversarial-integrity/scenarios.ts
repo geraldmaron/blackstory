@@ -24,7 +24,6 @@ import {
 import {
   assertPublicProjectionSafe,
   createQuarantinedSubmission,
-  createSubmissionCampaignDetector,
   redactLocationForPublic,
   type SubmissionInput,
 } from '@repo/security';

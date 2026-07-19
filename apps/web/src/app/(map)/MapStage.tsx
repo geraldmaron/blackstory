@@ -1192,7 +1192,6 @@ export function MapStageProvider({
     // `(map)` layout that renders `MapStageProvider` never remounts across `/` <-> `/explore`
     // navigations (ADR-017) — that persistence IS the point, so this must not re-run on prop
     // changes the way a per-page canvas component's effects used to.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handle = useMemo<MapStageHandle>(

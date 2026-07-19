@@ -19,7 +19,6 @@ import { formatStateChangeLine, type StateChangeLike } from './population-change
 
 void React;
 
-const CHART_HEIGHT = 360;
 const ROW_HEIGHT = 28;
 const CENTER_GUTTER = 8;
 

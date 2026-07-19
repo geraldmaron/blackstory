@@ -5,7 +5,6 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   createHybridLlmProvider,
-  createMockLlmProvider,
   createOllamaLlmProvider,
   extractMessageContent,
 } from './llm-provider.ts';

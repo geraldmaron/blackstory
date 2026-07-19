@@ -352,7 +352,6 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
             </h3>
             <div className="ds-explore-legend__size-scale" aria-hidden="true">
               {SIZE_SCALE_STEPS.map((diameter, index) => (
-                // eslint-disable-next-line react/no-array-index-key -- fixed 3-step scale, order never changes
                 <span key={index} className="ds-explore-legend__size-dot" style={{ width: diameter, height: diameter }} />
               ))}
             </div>

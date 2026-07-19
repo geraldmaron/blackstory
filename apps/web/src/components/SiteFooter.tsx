@@ -32,6 +32,7 @@ export function SiteFooter() {
         </nav>
 
         <div className="ds-shell-footer__wordmark-slot">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             className="ds-shell-footer__wordmark"
             src="/brand/lockup-dark.png"

@@ -414,7 +414,6 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   useEffect(() => {
     if (fromHeroTransition) return;
     reconcileCamera(initial.viewState, 'ease');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Back/forward: the URL changes under us via `popstate`. Restore the full shareable view

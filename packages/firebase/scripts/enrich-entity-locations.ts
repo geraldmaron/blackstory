@@ -345,7 +345,7 @@ async function main(): Promise<void> {
       }
 
       if (matched) {
-        const { qid, coord, title, isParentSite } = matched;
+        const { coord, title, isParentSite } = matched;
         const drift = Math.round(haversineMeters({ lat: entry.lat, lng: entry.lng }, coord));
         const precision =
           entry.locationPrecision === 'institution'

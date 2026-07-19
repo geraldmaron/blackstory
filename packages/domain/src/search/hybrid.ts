@@ -9,7 +9,6 @@ import { buildWhyThisResult, assertHybridExplanationHasNoNumericScore } from './
 import {
   DEFAULT_LANE_KILL_SWITCHES,
   DEFAULT_LANE_LIMITS,
-  deriveVectorEraPreFilter,
   eraBucketOverlapsRecord,
   runParallelLanes,
   type LaneKillSwitches,
@@ -22,7 +21,6 @@ import type {
   PublicSearchIndexDoc,
   SearchExecutionInput,
   SearchExecutionResult,
-  SearchFilter,
   SearchResultView,
 } from './types.js';
 
@@ -261,7 +259,7 @@ export async function runHybridSearch(
       laneOutput.vector.status === 'failed' ||
       laneOutput.vector.status === 'disabled');
 
-  let fusedIds: readonly string[] = [];
+  let fusedIds: readonly string[];
   let fusionWeightsVersion: string | undefined;
 
   if (mode === 'hybrid') {

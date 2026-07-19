@@ -357,7 +357,7 @@ export function createHybridLlmProvider(options: {
             model: options.ollamaModel ?? process.env.OLLAMA_MODEL ?? DEFAULT_OLLAMA_MODEL,
           });
           if (!looksLikeJsonObject(fallback.content)) {
-            throw new Error('ollama returned non-JSON content');
+            throw new Error('ollama returned non-JSON content', { cause: primaryError });
           }
           return { ...fallback, provider: 'hybrid', servedBy: 'ollama' };
         } catch (fallbackError) {
@@ -367,6 +367,7 @@ export function createHybridLlmProvider(options: {
             fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
           throw new Error(
             `hybrid failed (openrouter: ${primaryMsg.slice(0, 200)}; ollama: ${fallbackMsg.slice(0, 200)})`,
+            { cause: fallbackError },
           );
         }
       }

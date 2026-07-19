@@ -12,7 +12,6 @@ import {
   GENERAL_CRIME_CONTEXT_BIAS_CAVEAT,
   GENERAL_CRIME_STATS_SCORING_BANNED_KEYS,
   HISTORIC_SAFETY_SCORING_TYPE_INVARIANTS,
-  ScoringExclusionError,
 } from './scoring-guard.js';
 
 test('GENERAL_CRIME_STATS_SCORING_BANNED_KEYS is a conservative superset of crime-context field names', () => {

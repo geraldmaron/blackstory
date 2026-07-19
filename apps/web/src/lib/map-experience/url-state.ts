@@ -112,8 +112,7 @@ function parsePopulationDecade(raw: string | undefined, fallback: CensusPopulati
   return trimmed && isCensusPopulationDecade(trimmed) ? trimmed : fallback;
 }
 
-const HIDE_PANELS_TOKENS = ['filters', 'results', 'key'] as const;
-type HidePanelsToken = (typeof HIDE_PANELS_TOKENS)[number];
+type HidePanelsToken = 'filters' | 'results' | 'key';
 
 function parseHidePanels(
   raw: RawExploreSearchParams,

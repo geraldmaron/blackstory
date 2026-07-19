@@ -39,8 +39,6 @@ export async function runCommonsMediaEnrichment(
   const { entities, client, onProgress } = input;
   const batchSize = client.batchSize;
   let titleResolveBatches = 0;
-  let entityClaimsBatches = 0;
-  let commonsImageinfoBatches = 0;
 
   // Phase 0: entities that already have images
   const already: CommonsMediaPropose[] = [];
@@ -124,7 +122,7 @@ export async function runCommonsMediaEnrichment(
     ...new Set(resolved.map((r) => r.wikidataId).filter((q): q is string => Boolean(q))),
   ];
   onProgress?.(`Fetching claims for ${qids.length} unique QIDs`);
-  entityClaimsBatches = qids.length === 0 ? 0 : Math.ceil(qids.length / batchSize);
+  const entityClaimsBatches = qids.length === 0 ? 0 : Math.ceil(qids.length / batchSize);
   const entitiesById = qids.length > 0 ? await client.fetchEntitiesById(qids) : new Map();
 
   // Phase 3: collect single-P18 file titles, batch Commons imageinfo
@@ -142,7 +140,7 @@ export async function runCommonsMediaEnrichment(
 
   const uniqueFiles = [...new Set(fileTitles)];
   onProgress?.(`Fetching Commons metadata for ${uniqueFiles.length} files`);
-  commonsImageinfoBatches =
+  const commonsImageinfoBatches =
     uniqueFiles.length === 0 ? 0 : Math.ceil(uniqueFiles.length / batchSize);
   const imageMeta =
     uniqueFiles.length > 0 ? await client.fetchCommonsImageMetadata(uniqueFiles) : new Map();

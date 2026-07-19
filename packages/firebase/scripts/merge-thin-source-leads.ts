@@ -69,7 +69,7 @@ function normalizeUrl(url: string): string {
     const u = new URL(url);
     u.hash = '';
     u.search = '';
-    let path = u.pathname.replace(/\/+$/, '');
+    const path = u.pathname.replace(/\/+$/, '');
     return `${u.hostname.toLowerCase()}${path}`.toLowerCase();
   } catch {
     return url.toLowerCase();
