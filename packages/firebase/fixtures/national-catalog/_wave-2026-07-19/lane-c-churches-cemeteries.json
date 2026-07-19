@@ -614,8 +614,8 @@
     "jurisdictionLabel": "Woolwich Township, New Jersey",
     "locationPrecision": "institution",
     "locationLabel": "172 Garwin Road, Small Gloucester, Woolwich Township",
-    "lat": 39.7378,
-    "lng": -75.3356,
+    "lat": 39.765,
+    "lng": -75.29722,
     "claims": [
       {
         "predicate": "underground_railroad_role",
