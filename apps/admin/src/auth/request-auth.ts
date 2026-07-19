@@ -72,6 +72,22 @@ export async function authorizeAdminRequest(
   );
 }
 
+function describeAuthFailure(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  if (
+    /quota project/i.test(message) ||
+    /identitytoolkit\.googleapis\.com/i.test(message) ||
+    /764086051850/.test(message)
+  ) {
+    return (
+      'Firebase token verification needs a Google Cloud quota project for local ADC. ' +
+      'Set GOOGLE_CLOUD_QUOTA_PROJECT=black-book-efaaf in apps/admin/.env.local ' +
+      '(or: gcloud auth application-default set-quota-project black-book-efaaf), then restart admin.'
+    );
+  }
+  return 'Unauthorized';
+}
+
 export function authErrorResponse(error: unknown): Response {
   if (error instanceof FirebaseSessionAuthorizationError) {
     return Response.json({ error: error.message, code: error.code }, { status: 403 });
@@ -84,5 +100,5 @@ export function authErrorResponse(error: unknown): Response {
     return Response.json({ error: error.message, code: error.code }, { status });
   }
   console.error('admin auth failure', error);
-  return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  return Response.json({ error: describeAuthFailure(error) }, { status: 401 });
 }

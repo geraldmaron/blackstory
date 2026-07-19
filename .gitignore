@@ -79,7 +79,8 @@ packages/data-access/generated/*/
 config.env
 embed.yaml
 plan.md
-inbox/
+# Operator/local drop folders at repo root only — do not ignore apps/admin/src/app/inbox
+/inbox/
 
 # Beads / Dolt files (added by bd init)
 .dolt/

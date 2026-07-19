@@ -1,5 +1,5 @@
 /**
- * Admin shell footer — signed-in console destinations plus public-site handoff links.
+ * Admin shell footer — ops-first signed-in destinations, then public-site handoffs.
  * Sign in is canonical in the shell More menu, not the footer.
  */
 import Link from 'next/link';
@@ -26,13 +26,25 @@ export function AdminPageFooter({ signedIn = false }: AdminPageFooterProps) {
             {signedIn ? (
               <>
                 <li>
-                  <Link href="/stories/review">Story review</Link>
+                  <Link href="/">Home</Link>
+                </li>
+                <li>
+                  <Link href="/inbox">Inbox</Link>
+                </li>
+                <li>
+                  <Link href="/cases">Cases</Link>
+                </li>
+                <li>
+                  <Link href="/catalog">Catalog</Link>
+                </li>
+                <li>
+                  <Link href="/stories/review">Stories</Link>
+                </li>
+                <li>
+                  <Link href="/releases">Releases</Link>
                 </li>
                 <li>
                   <Link href="/quick-add">Quick add</Link>
-                </li>
-                <li>
-                  <Link href="/">Admin home</Link>
                 </li>
               </>
             ) : null}

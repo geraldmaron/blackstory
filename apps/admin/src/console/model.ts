@@ -49,6 +49,8 @@ export type ConsoleFixtureRow = {
   readonly detail: string;
 };
 
+export type ConsoleDataSource = 'live' | 'fixture' | 'unavailable';
+
 export type ConsoleSurface = {
   readonly id: ConsoleSurfaceId;
   readonly label: string;

@@ -1,10 +1,9 @@
 'use client';
 
 /**
- * Quick-add form: paste a URL, fetch it through safety, review the pre-filled
- * citation and capture-plan note, and see the draft research case `runResearchIntake` prepared.
- * All the real work happens server-side in `./actions.ts`; this component only renders state.
+ * Quick-add form: paste a URL, fetch through safety, prepare a draft case, optionally commit.
  */
+import Link from 'next/link';
 import { useActionState } from 'react';
 import { submitQuickAdd } from './actions';
 import { QUICK_ADD_INITIAL_STATE, type QuickAddFormState } from './form-state';
@@ -25,6 +24,36 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
     );
   }
 
+  if (state.status === 'committed') {
+    const caseId = state.researchCaseId;
+    return (
+      <div className="ds-notice" role="status">
+        <span className="ds-notice__cue" aria-hidden="true">
+          Committed
+        </span>
+        <div>
+          <p className="ds-notice__title">Proposal written to quarantine.</p>
+          <div className="ds-notice__body">
+            <p>
+              Audit event <code>{state.auditEventId}</code>. Nothing was published.
+            </p>
+            {caseId ? (
+              <p>
+                Open the draft case in{' '}
+                <Link href={`/cases/${caseId}`}>Cases</Link> or continue from{' '}
+                <Link href="/inbox">Inbox</Link>.
+              </p>
+            ) : (
+              <p>
+                Continue triage in <Link href="/inbox">Inbox</Link>.
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const { outcome } = state;
   if (!outcome.fetch.ok) {
     return (
@@ -36,8 +65,7 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
           <p className="ds-notice__title">Safe-fetch refused this URL.</p>
           <div className="ds-notice__body">
             <p>
-              Reason: <code>{outcome.fetch.reason}</code>. Nothing was proposed — no quarantine
-              record or draft research case was created.
+              Reason: <code>{outcome.fetch.reason}</code>. Nothing was proposed.
             </p>
           </div>
         </div>
@@ -54,28 +82,7 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
             {outcome.citation.suggestedTitle}
           </a>
           <p className="quick-add-excerpt">{outcome.citation.excerpt}</p>
-          <p className="quick-add-meta">
-            Fetched {outcome.citation.fetchedAt} · sha256 {outcome.citation.contentHash.slice(0, 12)}
-            … · {outcome.citation.contentType}
-          </p>
         </aside>
-      ) : null}
-
-      {outcome.capturePlan ? (
-        <div className="ds-notice ds-notice--warning" role="status">
-          <span className="ds-notice__cue" aria-hidden="true">
-            Warning
-          </span>
-          <div>
-            <p className="ds-notice__title">
-              Archival capture point: {outcome.capturePlan.snapshotMode} snapshot, Wayback
-              integration {outcome.capturePlan.waybackIntegration}
-            </p>
-            <div className="ds-notice__body">
-              <p>{outcome.capturePlan.notes}</p>
-            </div>
-          </div>
-        </div>
       ) : null}
 
       {outcome.intake ? (
@@ -87,10 +94,6 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
                 <dt>Quarantine submission</dt>
                 <dd className="ds-citation__label">{outcome.intake.submission.id}</dd>
               </div>
-              <div>
-                <dt>Moderation state</dt>
-                <dd>{outcome.intake.submission.moderationState}</dd>
-              </div>
               {outcome.intake.researchCase ? (
                 <div>
                   <dt>Draft research case</dt>
@@ -99,48 +102,20 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
                   </dd>
                 </div>
               ) : null}
-              <div>
-                <dt>Proposed by</dt>
-                <dd>
-                  {outcome.intake.operator.operatorId} · session {state.sessionId}
-                </dd>
-              </div>
             </dl>
-            <button
-              className="ds-button ds-button--secondary"
-              disabled
-              title="Live commit wiring intentionally follows this console's existing pattern — not connected in this shell"
-              type="button"
-            >
-              Commit to quarantine pipeline
-            </button>
             <p className="quick-add-note">
-              Nothing has been written yet. Commit this exact prepared proposal with{' '}
-              <code>operator-cli submit-lead --commit</code> (or the equivalent package call)
-              once reviewed — publishing still requires a separate, fresh-authenticated
-              promotion action after that.
+              Nothing was written yet. Check &quot;Commit to quarantine&quot; and submit again to
+              persist, or use the prepare-only path for review first. Publishing remains a separate
+              release action.
             </p>
           </div>
         ) : (
           <div className="ds-notice ds-notice--dispute" role="status">
             <span className="ds-notice__cue" aria-hidden="true">
-              Disputed
+              Rejected
             </span>
             <div>
               <p className="ds-notice__title">Intake validation rejected this proposal.</p>
-              <div className="ds-notice__body">
-                <ul>
-                  {outcome.intake.rejection.issues.map((issue: {
-                    readonly field: string;
-                    readonly reason: string;
-                    readonly message: string;
-                  }) => (
-                    <li key={`${issue.field}-${issue.reason}`}>
-                      {issue.field}: {issue.message}
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </div>
           </div>
         )
@@ -160,7 +135,7 @@ export function QuickAddForm() {
           <input id="qa-url" name="url" type="url" placeholder="https://…" required />
         </div>
         <div className="quick-add-field">
-          <label htmlFor="qa-description">Notes (optional — the fetched excerpt fills this in otherwise)</label>
+          <label htmlFor="qa-description">Notes (optional)</label>
           <textarea id="qa-description" name="description" rows={3} />
         </div>
         <div className="quick-add-row">
@@ -176,13 +151,15 @@ export function QuickAddForm() {
         <div className="quick-add-field">
           <label htmlFor="qa-operator">Operator id</label>
           <input id="qa-operator" name="operatorId" type="text" required autoComplete="off" />
-          <p id="qa-operator-help" className="quick-add-note">
-            Stamped onto the proposal and its audit event. A verified admin identity will
-            replace this field once IAP/Firebase session verification is wired into this route.
-          </p>
+        </div>
+        <div className="quick-add-field">
+          <label htmlFor="qa-commit">
+            <input id="qa-commit" name="commit" type="checkbox" value="1" /> Commit to quarantine
+            pipeline (writes submission + draft research case; does not publish)
+          </label>
         </div>
         <button className="ds-button ds-button--primary" disabled={isPending} type="submit">
-          {isPending ? 'Fetching…' : 'Fetch and prepare draft'}
+          {isPending ? 'Working…' : 'Fetch and prepare draft'}
         </button>
       </form>
       <ResultPanel state={state} />
