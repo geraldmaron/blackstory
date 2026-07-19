@@ -1,21 +1,5 @@
 {
   "$schema": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase-config.json",
-  "functions": [
-    {
-      "source": "../../functions/.deploy",
-      "codebase": "discovery",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local"
-      ],
-      "predeploy": [
-        "pnpm --filter @repo/functions-discovery build"
-      ]
-    }
-  ],
   "firestore": [
     {
       "database": "(default)",

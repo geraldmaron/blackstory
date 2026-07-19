@@ -28,7 +28,7 @@ DISCOVERY_JOB_ID=discovery-campaign-rss \
 pnpm --filter @repo/functions-discovery build
 FIREBASE_CLI_DISABLE_UPDATE_CHECK=true firebase deploy \
   --only functions:discovery \
-  --config infra/firebase/firebase.json \
+  --config firebase.discovery.json \
   --project <project-id>
 ```
 

@@ -100,13 +100,20 @@ pnpm --filter @repo/functions-discovery build
 # Human apply (research SA; kill switch doc materialised):
 FIREBASE_CLI_DISABLE_UPDATE_CHECK=true firebase deploy \
   --only functions:discovery \
-  --config infra/firebase/firebase.json \
+  --config firebase.discovery.json \
   --project <project-id>
 ```
 
 Local fixture invoke: `DISCOVERY_JOB_ID=discovery-campaign-rss pnpm --filter @repo/functions-discovery start`
 
 Until Functions are deployed in GCP: use GHA `workflow_dispatch` + operator `discovery-dispatch`.
+
+### Deployed (2026-07-18)
+
+Project `black-book-efaaf`, codebase `discovery`, region `us-central1` — all five scheduled
+functions created. Schedules stay **no-op** while `killSwitches/research-campaigns` is missing
+(fail-closed / engaged) or `enabled: true`. Default runtime mode is **fixture**. Identity is the
+App Engine default SA until `DISCOVERY_RESEARCH_SA` is bound (ADR-009 follow-up).
 
 ## Cloud Run Job (human apply) — long campaigns
 

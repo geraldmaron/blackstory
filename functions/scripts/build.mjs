@@ -53,4 +53,11 @@ writeFileSync(
   )}\n`,
 );
 
+const { execFileSync } = await import('node:child_process');
+execFileSync('npm', ['install', '--omit=dev', '--no-fund', '--no-audit'], {
+  cwd: deployDir,
+  stdio: 'inherit',
+  env: { ...process.env, npm_config_update_notifier: 'false' },
+});
+
 process.stdout.write(`Built Firebase upload root at ${deployDir}\n`);
