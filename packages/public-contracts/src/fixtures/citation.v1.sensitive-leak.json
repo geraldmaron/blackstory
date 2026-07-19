@@ -1,0 +1,8 @@
+{
+  "source": "Internal capture, restricted",
+  "label": "Restricted internal source",
+  "withheldReason": "Protects a living person named in the underlying record.",
+  "protectedFromPublicLink": true,
+  "protectedReason": "Internal-only capture flagged by legal review; never expose reasoning text.",
+  "internalDocumentId": "doc_internal_9911"
+}

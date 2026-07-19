@@ -1,0 +1,24 @@
+{
+  "type": "Feature",
+  "id": "ent_leak_test_001",
+  "geometry": { "type": "Point", "coordinates": [-77.0169, 38.9172] },
+  "properties": {
+    "entityId": "ent_leak_test_001",
+    "href": "/entity/ent_leak_test_001",
+    "kind": "place",
+    "displayName": "Sensitive-leak map fixture",
+    "oneLineStory": "Fixture only.",
+    "precision": "city",
+    "geoPrecisionTier": "city",
+    "eraBuckets": ["1900s"],
+    "notabilityLabels": ["Test label"],
+    "evidenceCount": 3,
+    "confidenceTier": "medium",
+    "topicTags": ["test"],
+    "shade": "#ABCDEF",
+    "glyph": "circle",
+    "relatedCount": 42,
+    "claimCount": 17,
+    "rawResidentialAddress": "123 Confidential St"
+  }
+}

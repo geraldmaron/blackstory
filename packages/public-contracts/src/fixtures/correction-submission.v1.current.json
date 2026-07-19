@@ -1,0 +1,9 @@
+{
+  "targetType": "entity",
+  "targetRecordId": "ent_dunbar_school_001",
+  "category": "factual_error",
+  "statement": "The founding year listed does not match the cited 1870 board minutes; please re-check the source.",
+  "sourceUrl": "https://example.gov/dc-board-1870",
+  "privacyConsent": true,
+  "contact": "reader@example.com"
+}
