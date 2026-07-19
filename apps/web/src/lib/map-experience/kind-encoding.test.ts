@@ -1,7 +1,7 @@
 /**
  * Confirms the kind + semantic-tone encoding table: shades trace to DIGNITY_PALETTE,
  * shade+glyph pairs are unique (color never sole signal), contrast holds against the
- * ink basemap except intentionally black plantation (rim carries contrast), and
+ * ink basemap except plantation charcoal (rim carries contrast on the dark plate), and
  * topic-derived tones resolve correctly.
  */
 import assert from 'node:assert/strict';
@@ -40,7 +40,7 @@ test('the encoding table covers the full domain kind vocabulary', () => {
   assert.deepEqual(Object.keys(MAP_KIND_ENCODING).sort(), [...DOMAIN_KINDS].sort());
 });
 
-test('every kind shade passes 3:1 non-text contrast against the ink basemap (except plantation black)', () => {
+test('every kind shade passes 3:1 non-text contrast against the ink basemap (except plantation charcoal)', () => {
   for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
     if (kind === 'other' && entry.shade === DIGNITY_PALETTE.kindOther) {
       // stone on ink is intentional secondary; still check
@@ -55,7 +55,7 @@ test('every kind shade passes 3:1 non-text contrast against the ink basemap (exc
   assert.equal(
     MAP_SEMANTIC_TONE_ENCODING.plantation.shade,
     DIGNITY_PALETTE.kindPlantation,
-    'plantation tone stays black; rim (not fill) carries contrast on the dark plate',
+    'plantation tone stays charcoal; rim (not fill) carries contrast on the dark plate',
   );
 });
 

@@ -14,7 +14,9 @@
  *
  * Camera: deep links and back/forward reconcile the camera from the URL via `easeTo`
  * (`reconcileCamera`, run once on mount and again on every `popstate`) never a raw default
- * flight (ADR-017). Selecting a pin flies briefly then opens the preview card.
+ * flight (ADR-017). Selecting a pin flies briefly then opens the preview card. Closing the
+ * card eases one geographic tier up (county → state → country) from the pre-select camera,
+ * never a jump cut to full CONUS when the reader was already in a tighter frame.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -29,6 +31,7 @@ import { MapExperienceLegend } from '../../../components/map-experience/MapExper
 import { NarrativeCard } from '../../../components/map-experience/NarrativeCard';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
 import { CAMERA_POINT_ZOOM, prefersReducedMotion } from '../../../lib/map-experience/camera-presets';
+import { resolveCloseCameraTarget } from '../../../lib/map-experience/close-camera';
 import { DEGRADED_MODE_COPY } from '../../../lib/map-experience/snapshot-mode';
 import {
   buildCountyChoroplethLevels,
@@ -206,6 +209,10 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   // may replay setState updater functions during render, so an updater must stay pure — the
   // handler needs the current view state OUTSIDE an updater to build the next URL.
   const viewStateRef = useRef(initial.viewState);
+  /** Live map camera — kept current via `viewport` subscription for close-camera bounce-back. */
+  const liveViewportRef = useRef<ExploreViewport | undefined>(initial.viewState.viewport);
+  /** Camera before the most recent point-selection flight (hierarchical close target). */
+  const preSelectViewportRef = useRef<ExploreViewport | undefined>(initial.viewState.viewport);
 
   useEffect(() => {
     setView(initial);
@@ -449,6 +456,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   const handleSelect = useCallback(
     (entityId: string) => {
+      // Stash the camera *before* the point flight so close can bounce one tier up
+      // (county → state → country) instead of always dumping to CONUS / state filter.
+      preSelectViewportRef.current = liveViewportRef.current ?? viewStateRef.current.viewport;
       const feature = view.allFeatures.find((item) => item.properties.entityId === entityId);
       if (feature && feature.geometry.type === 'Point') {
         const [lng, lat] = feature.geometry.coordinates;
@@ -489,16 +499,30 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   }, [commitViewState, stage, view.viewState]);
 
   const handleClearSelected = useCallback(() => {
-    if (view.viewState.state) {
-      const viewport = viewportForState(view.viewState.state);
-      if (viewport) {
-        stage.flyPreset('state', { center: [viewport.lng, viewport.lat], zoom: viewport.zoom }, { mode: 'ease' });
-      }
+    const selectedId = view.viewState.selected;
+    const feature = selectedId
+      ? view.allFeatures.find((item) => item.properties.entityId === selectedId)
+      : undefined;
+    const entityCenter =
+      feature && feature.geometry.type === 'Point'
+        ? ([feature.geometry.coordinates[0], feature.geometry.coordinates[1]] as const)
+        : undefined;
+    const target = resolveCloseCameraTarget({
+      ...(preSelectViewportRef.current ? { preSelectViewport: preSelectViewportRef.current } : {}),
+      ...(entityCenter ? { entityCenter } : {}),
+      ...(view.viewState.state ? { stateFilter: view.viewState.state } : {}),
+    });
+    if (target.preset === 'national') {
+      stage.flyPreset('national', { bounds: target.bounds }, { mode: 'ease' });
     } else {
-      stage.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
+      stage.flyPreset(
+        target.preset,
+        { center: target.center, zoom: target.zoom },
+        { mode: 'ease' },
+      );
     }
     commitViewState(mergeViewState(view.viewState, { clearSelected: true }));
-  }, [commitViewState, stage, view.viewState]);
+  }, [commitViewState, stage, view.allFeatures, view.viewState]);
 
   const handleLayerModeChange = useCallback(
     (layerMode: ExploreLayerMode) => {
@@ -587,6 +611,13 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   const handleViewportChange = useCallback(
     (viewport: ExploreViewport) => {
+      liveViewportRef.current = viewport;
+      // While a record is open the camera sits at point zoom — do not overwrite the
+      // pre-select stash with that framing, or close would always think we were "beyond county"
+      // from the selection flight itself.
+      if (!viewStateRef.current.selected) {
+        preSelectViewportRef.current = viewport;
+      }
       // The stage replays its latched viewport to every new subscriber, and this component
       // resubscribes whenever its handlers' view state changes — so an unchanged viewport MUST
       // be a no-op here. Without this guard the replay itself triggers `router.replace`, whose

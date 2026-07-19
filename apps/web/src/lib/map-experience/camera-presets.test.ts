@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   CAMERA_EASING_SLOW_OUT,
+  CAMERA_COUNTY_ZOOM,
   CAMERA_POINT_ZOOM,
   CAMERA_PRESETS,
   REDUCED_MOTION_CAMERA_PRESETS,
@@ -91,4 +92,8 @@ test('cameraPresetFor selects the reduced-motion table only when asked', () => {
 
 test('the point preset lands at a coherent, positive zoom level', () => {
   assert.ok(CAMERA_POINT_ZOOM > 0 && CAMERA_POINT_ZOOM < 22);
+});
+
+test('county zoom sits between state resting frame and point framing', () => {
+  assert.ok(CAMERA_COUNTY_ZOOM > 6.2 && CAMERA_COUNTY_ZOOM < CAMERA_POINT_ZOOM);
 });

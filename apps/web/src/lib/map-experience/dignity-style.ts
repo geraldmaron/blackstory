@@ -66,7 +66,9 @@ export const DIGNITY_PALETTE = {
   kindOther: brandPalette.stone,
 
   kindMassacre: '#B83A2A',
-  kindPlantation: '#0A0A0A',
+  /** Charcoal — reads as the darkest tone on the ink basemap (rim still carries contrast)
+   * without presenting as a broken black square in the light legend panel. */
+  kindPlantation: '#2C2824',
   kindEpicenter: '#C9A227',
 
   confidenceHigh: '#2F6B3C',

@@ -185,7 +185,9 @@
   transform: translateX(-50%);
 }
 
-/* Instruments follow the reader theme — glassy surface over the map plate. */
+/* Instruments follow the reader theme — glassy surface over the map plate.
+   Keep enough translucency for continuity, but not so thin that state labels /
+   dark markers bleed through the legend and read as stray black UI chrome. */
 .ds-explore-stage__filters {
   position: fixed;
   top: calc(var(--ds-island-clearance) + var(--ds-space-2));
@@ -200,7 +202,7 @@
   border: var(--ds-border-width) solid var(--ds-border);
   /* Instruments read radius-md — radius-lg is reserved for sheets/dialogs. */
   border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, var(--ds-surface) 88%, transparent);
+  background: color-mix(in srgb, var(--ds-surface) 96%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
@@ -390,7 +392,7 @@
   overflow-y: auto;
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, var(--ds-surface) 88%, transparent);
+  background: color-mix(in srgb, var(--ds-surface) 96%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
   transition: opacity var(--ds-duration-fast) var(--ds-easing);
@@ -432,9 +434,10 @@
 .ds-explore-stage__spotlight-panel {
   position: relative;
   z-index: 1;
-  width: min(92vw, 28rem);
+  width: min(92vw, 32rem);
   max-height: min(78svh, 40rem);
-  padding: var(--ds-space-5);
+  /* Roomier than the instrument panels — card content needs clear margin from the copper rule. */
+  padding: var(--ds-space-8);
   overflow-y: auto;
   border: var(--ds-border-width) solid var(--ds-border);
   border-left: 3px solid var(--ds-accent);

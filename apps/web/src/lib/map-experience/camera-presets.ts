@@ -124,6 +124,11 @@ export function cameraPresetFor(name: CameraPresetName, reducedMotion: boolean):
  * any specific coordinate — only on how close the camera gets). */
 export const CAMERA_POINT_ZOOM = 13;
 
+/** County / locality resting zoom when a selected-record card closes from beyond-county
+ * framing — wide enough to read county hairlines and nearby pins, tighter than `viewportForState`
+ * (~6.2). Calibrated against marker-size's z9 locality stop (a county spans hundreds of px). */
+export const CAMERA_COUNTY_ZOOM = 9;
+
 /** True when the browser's `prefers-reduced-motion: reduce` media query is active. `false` in
  * any non-DOM environment (SSR, plain-Node tests) never a client-only crash. */
 export function prefersReducedMotion(): boolean {
