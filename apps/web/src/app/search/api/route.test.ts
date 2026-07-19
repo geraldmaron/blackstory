@@ -18,7 +18,6 @@ import { createSearchRateLimitGuard } from './rate-limit-guard';
 import { handleSearchRequest, type SearchRouteDependencies } from './handler';
 
 const SCHOOL_ID = 'ent_dunbar_school_001';
-const PLACE_ID = 'ent_15th_st_church_001';
 const EVENT_ID = 'ent_dc_landmark_listing_1975';
 
 function acceptingVerifier(appId = 'test-app-id'): AppCheckVerifier {
@@ -99,12 +98,16 @@ test('the status filter narrows results through the real route (AC5)', async () 
   const unfiltered = (await (
     await handleSearchRequest(searchRequest(`?state=${stateParam}`), deps)
   ).json()) as SearchBody;
-  assert.equal(unfiltered.totalMatched, 4, 'all four seed entities share the Washington, D.C. jurisdiction');
+  assert.equal(
+    unfiltered.totalMatched,
+    6,
+    'the four Dunbar-lineage entities plus Howard University and NMAAHC share the Washington, D.C. jurisdiction',
+  );
 
   const filtered = (await (
     await handleSearchRequest(searchRequest(`?state=${stateParam}&status=active`), await buildDeps())
   ).json()) as SearchBody;
-  assert.equal(filtered.totalMatched, 3, 'the statusless 1975 landmark-listing event is excluded by status=active');
+  assert.equal(filtered.totalMatched, 5, 'the statusless 1975 landmark-listing event is excluded by status=active');
   assert.ok(!filtered.results.some((r) => r.id === EVENT_ID));
 });
 
@@ -145,7 +148,8 @@ test('repeated calls exhaust the rate limit and are denied (429)', async () => {
 });
 
 test('cursor round-trip returns the next page, not the same page', async () => {
-  // The snapshot index has exactly 2 records that match "education"; pageSize=1 forces pagination.
+  // The snapshot index has 8 records that match "education" (the Dunbar-lineage fixtures plus
+  // several national-catalog HBCU/education entities); pageSize=1 forces pagination.
   const deps = await buildDeps();
 
   const first = (await (
@@ -163,14 +167,12 @@ test('cursor round-trip returns the next page, not the same page', async () => {
     )
   ).json()) as SearchBody;
   assert.equal(second.results.length, 1);
-  assert.equal(second.hasMore, false);
+  assert.equal(second.hasMore, true);
   const secondId = second.results[0]?.id;
 
   assert.notEqual(firstId, secondId, 'the second page must not repeat the first page');
-  // : relatedCount is the real graph-adjacency size, not relatedIds.length the school is
-  // connected to both the church (located_at) and the 1975 landmark listing (occurred_at), so it
-  // outranks the church (relatedCount 2 vs 1) once the equal "education" topic-tier tie is broken
-  // by connection strength.
+  // : the school ranks first for "education" among the Dunbar-lineage and national-catalog
+  // fixtures; Emancipation Oak (Hampton's companion entity) ranks second.
   assert.equal(firstId, SCHOOL_ID);
-  assert.equal(secondId, PLACE_ID);
+  assert.equal(secondId, 'ent_emancipation_oak_001');
 });

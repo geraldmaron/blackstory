@@ -1,7 +1,7 @@
 /**
  * Typed graph edges for national-story seed entities — merged into entity-graph-seed.ts.
  */
-import type { EntityRelationship } from '@black-book/domain';
+import type { EntityRelationship } from '@repo/domain';
 
 export const NATIONAL_STORY_RELATIONSHIPS: readonly EntityRelationship[] = [
   {
