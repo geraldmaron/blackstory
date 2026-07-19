@@ -111,9 +111,16 @@ Until Functions are deployed in GCP: use GHA `workflow_dispatch` + operator `dis
 ### Deployed (2026-07-18)
 
 Project `black-book-efaaf`, codebase `discovery`, region `us-central1` — all five scheduled
-functions created. Schedules stay **no-op** while `killSwitches/research-campaigns` is missing
-(fail-closed / engaged) or `enabled: true`. Default runtime mode is **fixture**. Identity is the
-App Engine default SA until `DISCOVERY_RESEARCH_SA` is bound (ADR-009 follow-up).
+functions created.
+
+| Control | State |
+|---------|--------|
+| `killSwitches/research-campaigns` | Materialized with **`enabled: false`** (schedules may run) |
+| `DISCOVERY_MODE` | Default **fixture** |
+| Artifact Registry cleanup | **7-day** policy on `gcf-artifacts` / `us-central1` |
+| Runtime SA | Still App Engine default until `research@black-book-efaaf.iam.gserviceaccount.com` exists and is bound via `DISCOVERY_RESEARCH_SA` + redeploy (`gcloud auth login` required for SA create) |
+
+Pause schedules anytime: set `killSwitches/research-campaigns.enabled` to `true`.
 
 ## Cloud Run Job (human apply) — long campaigns
 
