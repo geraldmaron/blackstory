@@ -18,7 +18,7 @@
   "dependencies": {
     "@repo/config": "workspace:*",
     "@repo/firebase": "workspace:*",
-    "firebase-admin": "^13.4.0",
+    "firebase-admin": "^14.2.0",
     "firebase-functions": "^6.4.0"
   },
   "devDependencies": {
