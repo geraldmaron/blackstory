@@ -1,7 +1,8 @@
 /**
  * SSR markup smoke test confirming the legend explains every visual distinction in words
  * (WCAG 1.4.1 Use of Color), not color/glyph alone: kind shades + glyphs, the size scale,
- * clusters, the density layer, state labels, and confidence glyphs.
+ * clusters, the density layer, state labels, and confidence glyphs. Historical tones are
+ * shade-only (no glyph claim) so the key matches `displayEncodingFor`.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';
@@ -32,12 +33,25 @@ test('states that color marks kind and historical tones, in words', () => {
   assert.match(html, /Historical tones/);
 });
 
-test('lists every kind and semantic tone with its label and glyph name in words', () => {
+test('lists every kind with its label, glyph name, and map-disc echo', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  for (const [, entry] of [...KIND_ENCODING_ENTRIES, ...SEMANTIC_TONE_ENTRIES]) {
+  for (const [, entry] of KIND_ENCODING_ENTRIES) {
     assert.match(html, new RegExp(entry.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-    assert.match(html, new RegExp(`\\(${entry.glyph}\\)`));
+    assert.match(html, new RegExp(`\\(${entry.glyph} →`));
   }
+  assert.match(html, /thick-rim disc/);
+  assert.match(html, /orbit-ring disc/);
+  assert.match(html, /hollow disc/);
+});
+
+test('lists every semantic tone as shade-only (never claims a tone-owned glyph)', () => {
+  const html = renderToStaticMarkup(createElement(MapExperienceLegend));
+  for (const [, entry] of SEMANTIC_TONE_ENTRIES) {
+    assert.match(html, new RegExp(entry.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+  assert.match(html, /shade only/);
+  assert.doesNotMatch(html, /Plantation\s*\(square\)/);
+  assert.doesNotMatch(html, /Massacre \/ atrocity\s*\(diamond\)/);
 });
 
 test('explains the size scale as evidence depth, with confidence called out as separate', () => {
@@ -70,28 +84,50 @@ test('defaultCollapsed renders the disclosure closed', () => {
   assert.doesNotMatch(html, /<details[^>]*open/);
 });
 
-test('shows a visible color key for state and county boundary colors', () => {
+test('shows a visible color key for boundaries, kinds, and historical tones', () => {
   const html = renderToStaticMarkup(
-    createElement(MapExperienceLegend, { colorScheme: 'light' }),
+    createElement<MapExperienceLegendProps>(MapExperienceLegend, { colorScheme: 'light' }),
   );
   assert.match(html, /Color key/);
   assert.match(html, /State outline/);
   assert.match(html, /County line/);
   assert.match(html, /Selected state/);
+  assert.match(html, /Record kinds/);
+  assert.match(html, /Historical tones \(shade only/);
   assert.match(html, /ds-map-color-key/);
+  assert.doesNotMatch(html, /Hide key/);
+});
+
+test('onHide renders an accessible Hide key control beside the Color key heading', () => {
+  const html = renderToStaticMarkup(
+    createElement<MapExperienceLegendProps>(MapExperienceLegend, {
+      colorScheme: 'light',
+      onHide: () => undefined,
+    }),
+  );
+  assert.match(html, /aria-label="Hide key"/);
+  assert.match(html, />Hide key</);
+  assert.match(html, /ds-explore-stage__panel-hide/);
 });
 
 test('color key includes share tiers when blackShare layer is active', () => {
   const html = renderToStaticMarkup(
-    createElement(MapExperienceLegend, { layerMode: 'blackShare', colorScheme: 'light' }),
+    createElement<MapExperienceLegendProps>(MapExperienceLegend, {
+      layerMode: 'blackShare',
+      colorScheme: 'light',
+    }),
   );
   assert.match(html, /Black population share by county/);
   assert.match(html, /Under 2%/);
   assert.match(html, /50%\+/);
 });
 
-test('kind swatches and confidence glyphs are aria-hidden (the accessible content is the adjacent text)', () => {
+test('kind and tone swatches are aria-hidden (the accessible content is the adjacent text)', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  const glyphSwatchCount = (html.match(/class="ds-legend-glyph[^"]*"[^>]*aria-hidden="true"/g) ?? []).length;
-  assert.equal(glyphSwatchCount, KIND_ENCODING_ENTRIES.length + SEMANTIC_TONE_ENTRIES.length);
+  const glyphSwatchCount = (html.match(/class="ds-legend-glyph[^"]*"[^>]*aria-hidden="true"/g) ?? [])
+    .length;
+  // Color key + Reading this map each list kinds and tones (2× each vocabulary).
+  const expected =
+    KIND_ENCODING_ENTRIES.length * 2 + SEMANTIC_TONE_ENTRIES.length * 2;
+  assert.equal(glyphSwatchCount, expected);
 });

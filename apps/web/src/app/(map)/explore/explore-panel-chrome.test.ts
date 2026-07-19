@@ -3,7 +3,11 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { exploreFiltersPanelClassName, exploreResultsPanelClassName } from './explore-panel-chrome';
+import {
+  exploreFiltersPanelClassName,
+  exploreLegendPanelClassName,
+  exploreResultsPanelClassName,
+} from './explore-panel-chrome';
 
 test('filters panel class reflects visible vs hidden state', () => {
   assert.equal(exploreFiltersPanelClassName({ visible: true }), 'ds-explore-stage__filters');
@@ -25,5 +29,13 @@ test('results panel class combines hidden and dimmed modifiers independently', (
   assert.equal(
     exploreResultsPanelClassName({ visible: true, dimmed: true }),
     'ds-explore-stage__results ds-explore-stage__results--dimmed',
+  );
+});
+
+test('legend panel class reflects visible vs hidden state', () => {
+  assert.equal(exploreLegendPanelClassName({ visible: true }), 'ds-explore-stage__legend');
+  assert.equal(
+    exploreLegendPanelClassName({ visible: false }),
+    'ds-explore-stage__legend ds-explore-stage__legend--hidden',
   );
 });

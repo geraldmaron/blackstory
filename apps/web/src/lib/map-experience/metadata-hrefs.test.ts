@@ -31,6 +31,7 @@ test('exploreHrefForState normalizes postal code and includes state + viewport f
   assert.deepEqual(parsed.filters, { era: 'all', kind: 'all', theme: 'all', confidence: 'all' });
   assert.equal(parsed.showFilters, true);
   assert.equal(parsed.showResults, true);
+  assert.equal(parsed.showKey, true);
 });
 
 test('exploreHrefForState returns bare /explore for empty or unknown postal codes', () => {

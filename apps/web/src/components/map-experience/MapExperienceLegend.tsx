@@ -2,12 +2,15 @@
 
 /**
  * Accessible legend for the map: explains kind shades + glyphs, semantic tones
- * (massacre / plantation / epicenter), size, density, precision, and confidence
- * (green→orange ramp with glyphs). Color is never the only signal (WCAG 1.4.1).
+ * (massacre / plantation / epicenter as shade-only overlays), size, density,
+ * precision, and confidence (green→orange ramp with glyphs). Color is never the
+ * only signal (WCAG 1.4.1). The Color Key lists the encoding vocabulary the map
+ * can paint; tones do not claim a shape of their own (kind glyph is preserved).
  *
  * A compact color key stays visible above the disclosure. The longer “Reading this
  * map” guide uses a native `<details>`/`<summary>` for keyboard and screen-reader
- * support without custom JS.
+ * support without custom JS. Explore may pass `onHide` so the Color key row mirrors
+ * the filters/records “Hide …” chrome; visibility itself is owned by URL state.
  */
 import React, { useEffect, useState } from 'react';
 import {
@@ -37,6 +40,14 @@ const KIND_GLYPH_CLASS: Readonly<Record<MapEntityGlyph, string>> = {
   square: 'ds-legend-glyph--square',
   diamond: 'ds-legend-glyph--diamond',
   ring: 'ds-legend-glyph--ring',
+};
+
+/** Map-canvas echo of each glyph identity (MapLibre circle layers cannot draw true squares). */
+const KIND_GLYPH_MAP_ECHO: Readonly<Record<MapEntityGlyph, string>> = {
+  circle: 'disc',
+  square: 'thick-rim disc',
+  diamond: 'orbit-ring disc',
+  ring: 'hollow disc',
 };
 
 const SIZE_SCALE_STEPS: readonly number[] = [
@@ -74,6 +85,8 @@ export type MapExperienceLegendProps = {
   readonly layerMode?: ExploreLayerMode;
   /** Optional override for tests; live UI reads `document.documentElement.dataset.theme`. */
   readonly colorScheme?: MapColorScheme;
+  /** When set, renders a “Hide key” control beside the Color key heading (Explore chrome). */
+  readonly onHide?: () => void;
 };
 
 function LegendSwatch(props: {
@@ -89,6 +102,17 @@ function LegendSwatch(props: {
           ? { backgroundColor: 'transparent', borderColor: shade }
           : { backgroundColor: shade }
       }
+      aria-hidden="true"
+    />
+  );
+}
+
+/** Tone swatches are shade-only discs — tones never override kind shape on the map. */
+function ToneSwatch(props: { readonly shade: string }) {
+  return (
+    <span
+      className="ds-legend-glyph ds-legend-glyph--circle"
+      style={{ backgroundColor: props.shade }}
       aria-hidden="true"
     />
   );
@@ -112,15 +136,28 @@ function readDocumentColorScheme(): MapColorScheme {
 function MapColorKey(props: {
   readonly layerMode: ExploreLayerMode;
   readonly colorScheme: MapColorScheme;
+  readonly onHide?: () => void;
 }) {
-  const { layerMode, colorScheme } = props;
+  const { layerMode, colorScheme, onHide } = props;
   const plate = plateForScheme(colorScheme);
 
   return (
     <div className="ds-map-color-key" aria-labelledby="map-color-key-heading">
-      <h3 className="ds-explore-legend__subhead" id="map-color-key-heading">
-        Color key
-      </h3>
+      <div className="ds-explore-stage__panel-header">
+        <h3 className="ds-explore-legend__subhead" id="map-color-key-heading">
+          Color key
+        </h3>
+        {onHide ? (
+          <button
+            type="button"
+            className="ds-button ds-button--secondary ds-button--compact ds-explore-stage__panel-hide"
+            aria-label="Hide key"
+            onClick={onHide}
+          >
+            Hide key
+          </button>
+        ) : null}
+      </div>
       <ul className="ds-explore-legend__kind-list">
         <li>
           <LineSwatch color={plate.stateBounds} />
@@ -134,6 +171,29 @@ function MapColorKey(props: {
           <LineSwatch color={DIGNITY_PALETTE.point} />
           <span>Selected state</span>
         </li>
+      </ul>
+      <p className="ds-explore-legend__note">Record kinds</p>
+      <ul className="ds-explore-legend__kind-list">
+        {KIND_ENCODING_ENTRIES.map(([kind, entry]) => (
+          <li key={kind}>
+            <LegendSwatch glyph={entry.glyph} shade={entry.shade} />
+            <span>
+              {entry.label}{' '}
+              <span className="ds-explore-legend__kind-glyph-name">
+                ({entry.glyph} → {KIND_GLYPH_MAP_ECHO[entry.glyph]})
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="ds-explore-legend__note">Historical tones (shade only — shape stays with kind)</p>
+      <ul className="ds-explore-legend__kind-list">
+        {SEMANTIC_TONE_ENTRIES.map(([tone, entry]) => (
+          <li key={tone}>
+            <ToneSwatch shade={entry.shade} />
+            <span>{entry.label}</span>
+          </li>
+        ))}
       </ul>
       {layerMode === 'presence' ? (
         <>
@@ -188,7 +248,9 @@ function MapColorKey(props: {
         </>
       ) : null}
       <p className="ds-explore-legend__note">
-        Each map color pairs with a label or glyph — color is never the only signal.
+        Each map color pairs with a label or glyph — color is never the only signal. Markers on
+        the canvas are discs; square / diamond / ring names are rim and fill signatures, not
+        literal MapLibre shapes.
       </p>
     </div>
   );
@@ -197,6 +259,7 @@ function MapColorKey(props: {
 export function MapExperienceLegend(props?: MapExperienceLegendProps) {
   const defaultCollapsed = props?.defaultCollapsed ?? false;
   const layerMode = props?.layerMode ?? 'off';
+  const onHide = props?.onHide;
   const [colorScheme, setColorScheme] = useState<MapColorScheme>(
     () => props?.colorScheme ?? readDocumentColorScheme(),
   );
@@ -222,7 +285,11 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
 
   return (
     <div className="ds-explore-legend-stack">
-      <MapColorKey layerMode={layerMode} colorScheme={colorScheme} />
+      <MapColorKey
+        layerMode={layerMode}
+        colorScheme={colorScheme}
+        {...(onHide ? { onHide } : {})}
+      />
       <details className="ds-explore-legend" open={!defaultCollapsed}>
         <summary className="ds-explore-legend__summary" id="explore-legend-heading">
           Reading this map
@@ -234,8 +301,11 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
             </h3>
             <p className="ds-explore-legend__note">
               Color marks the kind of place or record, and a few historical tones noted below
-              &mdash; it says nothing about the people connected to a place. Each entry also has
-              its own shape, so color is never the only signal.
+              &mdash; it says nothing about the people connected to a place. Each kind also has
+              a named shape identity (circle, square, diamond, or ring). On the map those
+              identities paint as discs with matching rim or fill: thick rim for square kinds
+              (school, law, publication), an orbit ring for diamond kinds (event, case,
+              movement), and a hollow disc for ring kinds (organization, institution).
             </p>
             <ul className="ds-explore-legend__kind-list">
               {KIND_ENCODING_ENTRIES.map(([kind, entry]) => (
@@ -243,7 +313,9 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
                   <LegendSwatch glyph={entry.glyph} shade={entry.shade} />
                   <span className="ds-explore-legend__kind-label">
                     {entry.label}{' '}
-                    <span className="ds-explore-legend__kind-glyph-name">({entry.glyph})</span>
+                    <span className="ds-explore-legend__kind-glyph-name">
+                      ({entry.glyph} → {KIND_GLYPH_MAP_ECHO[entry.glyph]})
+                    </span>
                   </span>
                 </li>
               ))}
@@ -257,15 +329,17 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
             <p className="ds-explore-legend__note">
               When topic tags identify a massacre, plantation, or Black epicenter (for example
               Tulsa&rsquo;s Greenwood / Black Wall Street), the marker shade follows that tone
-              while keeping the record&rsquo;s kind shape.
+              while keeping the record&rsquo;s kind shape. Tones are vocabulary the map can
+              paint; a tone may be rare or absent in the current catalog until matching topics
+              are present.
             </p>
             <ul className="ds-explore-legend__kind-list">
               {SEMANTIC_TONE_ENTRIES.map(([tone, entry]) => (
                 <li key={tone}>
-                  <LegendSwatch glyph={entry.glyph} shade={entry.shade} />
+                  <ToneSwatch shade={entry.shade} />
                   <span className="ds-explore-legend__kind-label">
                     {entry.label}{' '}
-                    <span className="ds-explore-legend__kind-glyph-name">({entry.glyph})</span>
+                    <span className="ds-explore-legend__kind-glyph-name">(shade only)</span>
                   </span>
                 </li>
               ))}

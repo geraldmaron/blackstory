@@ -114,6 +114,22 @@ test('displayEncodingFor prefers semantic tone shade while keeping kind glyph', 
   assert.equal(encoded.shade, DIGNITY_PALETTE.kindMassacre);
   assert.equal(encoded.glyph, MAP_KIND_ENCODING.place.glyph);
   assert.equal(encoded.label, MAP_SEMANTIC_TONE_ENCODING.massacre.label);
+
+  const plantation = displayEncodingFor('place', 'plantation');
+  assert.equal(plantation.shade, DIGNITY_PALETTE.kindPlantation);
+  assert.equal(plantation.glyph, 'circle', 'plantation tone must not invent a square glyph');
+  assert.equal(plantation.label, MAP_SEMANTIC_TONE_ENCODING.plantation.label);
+
+  const schoolPlantation = displayEncodingFor('school', 'plantation');
+  assert.equal(schoolPlantation.glyph, 'square', 'school keeps its square identity under plantation tone');
+});
+
+test('semantic tones are shade-only (no glyph channel of their own)', () => {
+  for (const [, entry] of Object.entries(MAP_SEMANTIC_TONE_ENCODING)) {
+    assert.equal('glyph' in entry, false, 'tone encoding must not claim a glyph');
+    assert.ok(typeof entry.shade === 'string' && entry.shade.length > 0);
+    assert.ok(typeof entry.label === 'string' && entry.label.length > 0);
+  }
 });
 
 test('kind shades are not red-hued (massacre is a semantic tone, not a kind)', () => {

@@ -55,6 +55,8 @@ export type ExploreViewState = {
   readonly showFilters: boolean;
   /** When false, the results cards rail is hidden (default shown). */
   readonly showResults: boolean;
+  /** When false, the color key / “Reading this map” legend is hidden (default shown). */
+  readonly showKey: boolean;
 };
 
 export type RawExploreSearchParams = Readonly<Record<string, string | readonly string[] | undefined>>;
@@ -97,30 +99,35 @@ function parsePopulationDecade(raw: string | undefined, fallback: CensusPopulati
   return trimmed && isCensusPopulationDecade(trimmed) ? trimmed : fallback;
 }
 
-const HIDE_PANELS_TOKENS = ['filters', 'results'] as const;
+const HIDE_PANELS_TOKENS = ['filters', 'results', 'key'] as const;
 type HidePanelsToken = (typeof HIDE_PANELS_TOKENS)[number];
 
-function parseHidePanels(raw: RawExploreSearchParams): Pick<ExploreViewState, 'showFilters' | 'showResults'> {
+function parseHidePanels(
+  raw: RawExploreSearchParams,
+): Pick<ExploreViewState, 'showFilters' | 'showResults' | 'showKey'> {
   const hidePanelsRaw = firstValue(raw.hidePanels)?.trim();
   if (!hidePanelsRaw) {
-    return { showFilters: true, showResults: true };
+    return { showFilters: true, showResults: true, showKey: true };
   }
 
   let showFilters = true;
   let showResults = true;
+  let showKey = true;
   for (const token of hidePanelsRaw.split(',')) {
     const trimmed = token.trim();
     if (trimmed === 'filters') showFilters = false;
     else if (trimmed === 'results') showResults = false;
+    else if (trimmed === 'key') showKey = false;
   }
 
-  return { showFilters, showResults };
+  return { showFilters, showResults, showKey };
 }
 
 function serializeHidePanels(state: ExploreViewState): string | undefined {
   const tokens: HidePanelsToken[] = [];
   if (!state.showFilters) tokens.push('filters');
   if (!state.showResults) tokens.push('results');
+  if (!state.showKey) tokens.push('key');
   return tokens.length > 0 ? tokens.join(',') : undefined;
 }
 
@@ -157,7 +164,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
       : undefined;
   const popTo =
     layerMode === 'blackChange' ? parsePopulationDecade(popToRaw, DEFAULT_POPULATION_CHANGE_TO) : undefined;
-  const { showFilters, showResults } = parseHidePanels(raw);
+  const { showFilters, showResults, showKey } = parseHidePanels(raw);
 
   return {
     filters,
@@ -176,6 +183,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     ...(edgeRaw ? { edge: edgeRaw } : {}),
     showFilters,
     showResults,
+    showKey,
   };
 }
 
@@ -227,9 +235,16 @@ export function buildExploreHref(state: ExploreViewState): string {
 /** Default overlay + toggle state for callers building explore links without a full view model. */
 export function defaultExploreOverlayState(): Pick<
   ExploreViewState,
-  'layerMode' | 'group' | 'lines' | 'showFilters' | 'showResults'
+  'layerMode' | 'group' | 'lines' | 'showFilters' | 'showResults' | 'showKey'
 > {
-  return { layerMode: 'off', group: false, lines: false, showFilters: true, showResults: true };
+  return {
+    layerMode: 'off',
+    group: false,
+    lines: false,
+    showFilters: true,
+    showResults: true,
+    showKey: true,
+  };
 }
 
 /**

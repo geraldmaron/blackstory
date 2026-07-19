@@ -56,6 +56,7 @@ import { useMapStage } from '../MapStage';
 import { pickExploreEdgeSlice } from './explore-edge-catalog';
 import {
   exploreFiltersPanelClassName,
+  exploreLegendPanelClassName,
   exploreResultsPanelClassName,
 } from './explore-panel-chrome';
 import type { ExploreViewModel } from './explore-view-model';
@@ -103,6 +104,7 @@ function mergeViewState(
     lines: patch.lines ?? base.lines,
     showFilters: patch.showFilters ?? base.showFilters,
     showResults: patch.showResults ?? base.showResults,
+    showKey: patch.showKey ?? base.showKey,
   };
 
   const withSelection = {
@@ -454,6 +456,14 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     commitViewState(mergeViewState(view.viewState, { showResults: true }));
   }, [commitViewState, view.viewState]);
 
+  const handleHideKey = useCallback(() => {
+    commitViewState(mergeViewState(view.viewState, { showKey: false }));
+  }, [commitViewState, view.viewState]);
+
+  const handleShowKey = useCallback(() => {
+    commitViewState(mergeViewState(view.viewState, { showKey: true }));
+  }, [commitViewState, view.viewState]);
+
   const handleSelect = useCallback(
     (entityId: string) => {
       // Stash the camera *before* the point flight so close can bounce one tier up
@@ -674,6 +684,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const selectedStateName = view.viewState.state ? findUsStateByPostalCode(view.viewState.state)?.name : undefined;
   const filtersVisible = view.viewState.showFilters;
   const resultsVisible = view.viewState.showResults;
+  const keyVisible = view.viewState.showKey;
   const resultsDimmed = Boolean(view.selectedEdge || selectedFeature);
 
   const listProps = {
@@ -906,9 +917,26 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         </div>
       ) : null}
 
-      <div className="ds-explore-stage__legend">
-        <MapExperienceLegend layerMode={view.viewState.layerMode} />
+      <div
+        className={exploreLegendPanelClassName({ visible: keyVisible })}
+        {...(keyVisible ? {} : { hidden: true })}
+      >
+        <MapExperienceLegend
+          layerMode={view.viewState.layerMode}
+          onHide={handleHideKey}
+        />
       </div>
+
+      {!keyVisible ? (
+        <button
+          type="button"
+          className="ds-button ds-button--secondary ds-explore-stage__panel-restore ds-explore-stage__panel-restore--key"
+          aria-label="Show key"
+          onClick={handleShowKey}
+        >
+          Show key
+        </button>
+      ) : null}
     </div>
   );
 }
