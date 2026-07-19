@@ -4,15 +4,20 @@
  * Atmosphere mast (rights-cleared mosaic or geometric fallback), editorial serif
  * body, related entity/fact off-ramps, and a single copper map CTA when a related
  * entity has a geo anchor. Emits schema.org Article JSON-LD only — never ClaimReview.
+ *
+ * Related entities resolve from live Firestore projections first (national catalog);
+ * the bundled Dunbar seed is only a snapshot fallback. Facts remain seed-backed until
+ * a public facts projection lands.
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
 import { AtmospherePlane, selectAtmospherePlane } from '../../../components/atmosphere';
 import { renderStoryTitle } from '../../../components/atmosphere/story-title';
-import { getPublicEntity } from '../../../data/public-seed';
+import type { PublicEntityView } from '../../../data/public-seed';
 import { getSeedFact } from '../../../data/facts-seed';
 import { getSeedStory, listSeedStories, type StoryRecord } from '../../../data/stories-seed';
+import { resolvePublicEntityView } from '../../../lib/public-data/source';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import {
   buildExploreHref,
@@ -54,17 +59,21 @@ function buildStoryArticleJsonLd(story: StoryRecord) {
   return jsonLd;
 }
 
-function mapCtaForStory(relatedEntityIds: readonly string[]): {
+function resolveMapAnchor(entity: PublicEntityView) {
+  return entity.geoAnchor ?? geoAnchorFor(entity.id);
+}
+
+function mapCtaForRelatedEntities(entities: readonly PublicEntityView[]): {
   readonly href: string;
   readonly label: string;
 } | null {
-  for (const entityId of relatedEntityIds) {
-    const geoAnchor = geoAnchorFor(entityId);
+  for (const entity of entities) {
+    const geoAnchor = resolveMapAnchor(entity);
     if (!geoAnchor) continue;
     const href = buildExploreHref({
       filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
       ...defaultExploreOverlayState(),
-      selected: entityId,
+      selected: entity.id,
       viewport: { lat: geoAnchor.lat, lng: geoAnchor.lng, zoom: 11 },
     });
     return { href, label: 'View on map' };
@@ -77,9 +86,12 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   const story = getSeedStory(slug);
   if (!story) notFound();
 
-  const relatedEntities = story.relatedEntityIds
-    .map((id) => getPublicEntity(id))
-    .filter((entity): entity is NonNullable<typeof entity> => entity !== undefined);
+  const relatedEntityResults = await Promise.all(
+    story.relatedEntityIds.map((id) => resolvePublicEntityView(id)),
+  );
+  const relatedEntities = relatedEntityResults
+    .map((result) => result.data)
+    .filter((entity): entity is PublicEntityView => entity !== undefined);
   const relatedFacts = story.relatedFactIds
     .map((id) => getSeedFact(id))
     .filter((fact): fact is NonNullable<typeof fact> => fact !== undefined);
@@ -88,7 +100,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
     seedKey: story.slug,
     relatedEntityIds: story.relatedEntityIds,
   });
-  const mapCta = mapCtaForStory(story.relatedEntityIds);
+  const mapCta = mapCtaForRelatedEntities(relatedEntities);
   const jsonLd = buildStoryArticleJsonLd(story);
 
   return (

@@ -1,10 +1,11 @@
 /**
  * Public-facing seed catalog for the web UI.
- * Mirrors safe fields from packages/firebase/fixtures/firestore-seed.ts for
- * demonstrable pages until public projections and search land. This is a real, fully-cited
- * historical dataset (the Fifteenth Street Presbyterian Church / Paul Laurence Dunbar High
- * School cluster) standing in for a live release pipeline until public projections land.
- * The facts and citations below are real, not placeholders.
+ * Mirrors safe fields from packages/firebase/fixtures/firestore-seed.ts for the
+ * Fifteenth Street Presbyterian / Dunbar High School cluster — an offline snapshot
+ * fallback and unit-test fixture. National-catalog entities (646+) live in Firestore
+ * `publicReleases` / `publicSearchIndex` and are republished from
+ * `packages/firebase/fixtures/national-catalog/` via `publish-national-catalog.ts`.
+ * Prefer `PUBLIC_DATA_SOURCE=firestore` in production; this seed is not the national catalog.
  * Never includes residential addresses or unpublished high-impact claims.
  */
 import {
@@ -27,7 +28,6 @@ import {
   statusHistoryFor,
   type GraphTimelineEntry,
 } from './entity-graph-seed';
-import { NATIONAL_STORY_ENTITY_DRAFTS } from './national-story-seed/entities';
 
 export type PublicEntityKind = 'place' | 'school' | 'event' | 'institution';
 
@@ -483,7 +483,6 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     relatedIds: ['ent_dc_landmark_listing_1975'],
     related: relatedEntriesFor('ent_dunbar_alumni_federation_001'),
   },
-  ...NATIONAL_STORY_ENTITY_DRAFTS,
 ];
 
 const DISPLAY_NAME_LOOKUP: ReadonlyMap<string, { readonly displayName: string }> = new Map(

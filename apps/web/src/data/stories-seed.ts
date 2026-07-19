@@ -2,11 +2,9 @@
  * Seed catalog of longform history Stories for `/stories`.
  *
  * Stands in for a published editorial projection the same way `facts-seed.ts` stands in for the
- * fact registry. Each story is a narrative article pinned to place and evidence — related entity
- * and fact ids must resolve against the public seed catalogs so off-ramps stay honest.
- *
- * National-story lane records (`./national-story-seed/stories`) plus place-first narrative
- * off-ramps to published entities/facts extend the original Dunbar-lineage stories below.
+ * fact registry. Related entity ids for national-story records resolve from live Firestore
+ * projections (national catalog); the Dunbar-cluster offline seed covers only those two
+ * local stories' entity off-ramps. Facts remain seed-backed until a facts projection lands.
  */
 import { NATIONAL_STORY_RECORDS } from './national-story-seed/stories';
 

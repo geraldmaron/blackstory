@@ -1,6 +1,6 @@
 /**
- * Shared helpers for national-story seed modules: map pins, revision metadata,
- * confidence scoring, and confirmed Wayback citation fields.
+ * Shared helpers for national-story fact drafts: revision metadata, confidence
+ * scoring, and confirmed Wayback citation fields.
  */
 
 export const ACCESSED_AT = '2026-07-19T00:00:00.000Z';

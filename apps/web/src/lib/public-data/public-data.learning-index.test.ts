@@ -38,9 +38,10 @@ test('seed entities hydrate related neighbors and continue-learning where graph 
   assert.ok((rehydrated.relatedNeighbors?.length ?? 0) >= 1);
 });
 
-test('school seed carries optional photo and extended narrative', () => {
+test('school seed carries extended narrative; primary image comes from live projections', () => {
   const school = listPublicEntities().find((e) => e.id === 'ent_dunbar_school_001');
-  assert.ok(school?.primaryImage?.url);
   assert.ok(school?.extendedNarrative);
-  assert.equal(school?.primaryImage?.rightsStatus, 'public_domain');
+  // Offline seed stays text-only for media; `primaryImage` is served from Firestore
+  // public entity projections (see map-projection / promote-entity-primary-image).
+  assert.equal(school?.primaryImage, undefined);
 });

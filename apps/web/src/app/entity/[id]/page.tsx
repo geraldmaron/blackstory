@@ -44,11 +44,10 @@ type EntityPageProps = {
   readonly params: Promise<{ id: string }>;
 };
 
-function statePostalForEntity(entityId: string): string | undefined {
-  const anchor = geoAnchorFor(entityId);
-  if (!anchor) {
-    return undefined;
-  }
+function statePostalFromAnchor(
+  anchor: { readonly lat: number; readonly lng: number } | undefined,
+): string | undefined {
+  if (!anchor) return undefined;
   return findUsStateForPoint(anchor.lat, anchor.lng)?.postalCode;
 }
 
@@ -113,8 +112,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
   })();
   const evidenceClaims = toEvidenceClaimInputs(entity.claims);
   const relatedFacts = buildCompactFactViewsForEntity(entity.id, seedFactsForEntity(entity.id));
-  const geoAnchor = geoAnchorFor(entity.id);
-  const statePostal = statePostalForEntity(entity.id);
+  const geoAnchor = entity.geoAnchor ?? geoAnchorFor(entity.id);
+  const statePostal = statePostalFromAnchor(geoAnchor);
   const entityLinkCatalog = entityLinkCatalogFromNeighbors(entity);
   const continueLearning = entity.continueLearning ?? [];
   const exploreHref = buildExploreHref({
