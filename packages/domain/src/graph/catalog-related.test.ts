@@ -178,3 +178,87 @@ test('relatedEntriesFromRelationships returns public related entries for museum 
     },
   ]);
 });
+
+// ---------------------------------------------------------------------------
+// WS6 — `mentionedEntityIds` wire-forward (see ./mention-resolver.ts).
+// ---------------------------------------------------------------------------
+
+const sampleClaim = {
+  predicate: 'p',
+  object: 'o',
+  confidenceLevel: 'high' as const,
+  citationSource: 'src',
+  citationLabel: 'lbl',
+};
+
+test('extractCatalogRelationships emits a related_to edge for a resolved mention', () => {
+  const entities: CatalogEntityForRelationships[] = [
+    { id: 'ent_a', displayName: 'Alpha Org', claims: [sampleClaim] },
+    {
+      id: 'ent_b',
+      displayName: 'Beta Group',
+      claims: [sampleClaim],
+      mentionedEntityIds: ['ent_a'],
+    },
+  ];
+
+  const { relationships, skipped } = extractCatalogRelationships(entities, { generatedAt });
+
+  assert.equal(skipped.length, 0);
+  assert.equal(relationships.length, 1);
+  assert.equal(relationships[0]?.fromEntityId, 'ent_b');
+  assert.equal(relationships[0]?.toEntityId, 'ent_a');
+  assert.equal(relationships[0]?.type, 'related_to');
+  assert.equal(relationships[0]?.workflowStatus, 'accepted');
+});
+
+test('extractCatalogRelationships silently skips an unresolved mention (never guesses)', () => {
+  const entities: CatalogEntityForRelationships[] = [
+    { id: 'ent_a', displayName: 'Alpha Org', claims: [sampleClaim] },
+    {
+      id: 'ent_b',
+      displayName: 'Beta Group',
+      claims: [sampleClaim],
+      mentionedEntityIds: ['totally-unrecognized-slug'],
+    },
+  ];
+
+  const { relationships, skipped } = extractCatalogRelationships(entities, { generatedAt });
+
+  assert.equal(relationships.length, 0);
+  assert.equal(skipped.length, 0);
+});
+
+test('extractCatalogRelationships does not duplicate an explicit related[] edge with a resolved mention of the same pair', () => {
+  const entities: CatalogEntityForRelationships[] = [
+    {
+      id: 'ent_a',
+      displayName: 'Alpha Org',
+      claims: [sampleClaim],
+      related: [{ id: 'ent_b', type: 'founded', direction: 'outgoing' }],
+      mentionedEntityIds: ['ent_b'],
+    },
+    { id: 'ent_b', displayName: 'Beta Group', claims: [sampleClaim] },
+  ];
+
+  const { relationships, skipped } = extractCatalogRelationships(entities, { generatedAt });
+
+  assert.equal(skipped.length, 0);
+  assert.equal(relationships.length, 1);
+  assert.equal(relationships[0]?.type, 'founded');
+  assert.equal(relationships[0]?.fromEntityId, 'ent_a');
+  assert.equal(relationships[0]?.toEntityId, 'ent_b');
+});
+
+test('extractCatalogRelationships mentions are still subject to the evidence requirement', () => {
+  const entities: CatalogEntityForRelationships[] = [
+    { id: 'ent_a', displayName: 'Alpha Org' },
+    { id: 'ent_b', displayName: 'Beta Group', mentionedEntityIds: ['ent_a'] },
+  ];
+
+  const { relationships, skipped } = extractCatalogRelationships(entities, { generatedAt });
+
+  assert.equal(relationships.length, 0);
+  assert.equal(skipped.length, 1);
+  assert.match(skipped[0] ?? '', /no resolvable claim evidence/);
+});
