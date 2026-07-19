@@ -23,6 +23,8 @@ those aggregated declarations must match; MOB-020 confirms the final aggregated
 |---|---|---|---|
 | `@react-native-firebase/app` | Firebase core (App Check host) | Device/app attestation metadata sent to Firebase App Check *only* — no user identifiers, no Analytics module linked | No |
 | `@react-native-firebase/app-check` | App Attest / DeviceCheck (iOS), Play Integrity (Android) attestation | Hardware-backed attestation assertion + App Check JWT. Attests that a genuine build runs on a genuine device. **No personal data, no advertising ID, no location.** Raw tokens never logged (invariant 7). | No |
+| `@react-native-firebase/crashlytics` (MOB-018) | Crash reporting — stack traces on fatal/handled errors | Error name/message/stack, device model/OS, app version/build/runtime-version/release-id (`src/observability/report-context.ts`). **Every value passes through `src/security/log-redaction.ts` first** (`src/observability/crash-reporter.ts`'s `reportError`/`addBreadcrumb` — the only call sites permitted to reach this SDK): no query text, correction content, precise location, citation URLs, or sensitive classifications ever reaches it. Diagnostic-only — not a user-behavior/analytics product. | No |
+| `@react-native-firebase/perf` (MOB-018) | Performance Monitoring — named trace timing (e.g. entity-load latency) | Trace name/duration + the same redacted build-metadata attributes as Crashlytics above, sampled at 10% by default (`src/observability/config.ts`; see `src/observability/README.md` "Sampling & retention"). Diagnostic-only. | No |
 | `expo` / `expo-modules-core` | Expo runtime | None user-identifying | No |
 | `expo-constants` | Read build/config values | None | No |
 | `expo-device` | Read device model/OS for compatibility/UX | Coarse device model + OS version (on-device; not transmitted by this app except as request metadata) — **does not request any runtime permission** | No |
@@ -36,13 +38,22 @@ those aggregated declarations must match; MOB-020 confirms the final aggregated
 - **No ad SDK.** No AdMob, no ad network, no advertising identifier (IDFA/GAID)
   is requested or read. There is no App Tracking Transparency prompt because
   nothing tracks.
-- **No analytics SDK** beyond the privacy-safe observability MOB-018 will add
-  (which, per its bead, must itself carry no query text / correction content /
-  precise location / citation URLs / sensitive classifications — routed through
-  `src/security/log-redaction.ts`).
-- **No third-party tracking / attribution / crash-reporter with PII.** Firebase
-  Analytics, Crashlytics, and all Firestore/Auth data modules are deliberately
-  **not linked** (ADR-020 §3: App Check surface only).
+- **No general analytics SDK.** MOB-018 adds Firebase Crashlytics + Performance
+  Monitoring (rows above) for crash/perf **diagnostics only** — neither is a
+  user-behavior analytics product, and every value they receive is redacted
+  through `src/security/log-redaction.ts` first (no query text / correction
+  content / precise location / citation URLs / sensitive classifications).
+  `src/observability/no-raw-sdk-imports.test.ts` statically asserts no ad SDK,
+  Firebase Analytics, or third-party analytics/attribution SDK (Segment,
+  Amplitude, Mixpanel, App Tracking Transparency) is present anywhere in
+  `apps/mobile/src`.
+- **No third-party tracking / attribution SDK, and no crash reporter that
+  receives un-redacted data.** Firebase Analytics and all Firestore/Auth data
+  modules remain deliberately **not linked** (ADR-020 §3: App Check surface,
+  plus the MOB-018 Crashlytics/Performance diagnostics surface — nothing
+  else). Crashlytics/Performance are linked, but only ever reachable through
+  the redacting wrapper in `src/observability/crash-reporter.ts` — the raw
+  SDK is never exposed to the rest of the app.
 - **No accounts, no push, no social, no background location** at launch
   (non-goals) — so there are no credentials, contacts, notification tokens, or
   location streams to collect.

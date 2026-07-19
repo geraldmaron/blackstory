@@ -13,6 +13,8 @@
     "@react-native-community/netinfo": "~12.0.1",
     "@react-native-firebase/app": "^25.1.0",
     "@react-native-firebase/app-check": "^25.1.0",
+    "@react-native-firebase/crashlytics": "^25.1.0",
+    "@react-native-firebase/perf": "^25.1.0",
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-query-persist-client": "^5.101.2",
     "expo": "56.0.16",
@@ -67,6 +69,7 @@
     "tokens:check": "node --import tsx scripts/generate-brand-tokens.ts --check",
     "build": "expo export",
     "prebuild": "expo prebuild",
+    "bundle-size": "node --import tsx scripts/report-bundle-size.ts",
     "eas-build:development": "npx eas-cli build --profile development",
     "eas-build:preview": "npx eas-cli build --profile preview",
     "eas-build:production": "npx eas-cli build --profile production"

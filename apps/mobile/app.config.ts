@@ -64,6 +64,32 @@ const firebaseConfigPresent = Boolean(
   GOOGLE_SERVICES_INFO_PLIST && GOOGLE_SERVICES_JSON,
 );
 
+// --- Observability (crash/perf reporting) config (MOB-018) -----------------
+//
+// Firebase Crashlytics + Performance Monitoring reuse the SAME
+// `firebaseConfigPresent` gate as App Check above (both need the same
+// GoogleService-Info.plist / google-services.json — MOB-010's human gate,
+// not a new one). Until that gate clears, `expo prebuild` runs cleanly with
+// no crash/perf plugin added and the client degrades gracefully (see
+// src/observability/native-bridge.ts — same guarded-require pattern as
+// src/security/app-check.ts). Do NOT fabricate a placeholder credential file
+// to "turn this on".
+//
+// Kill switch + sampling (MOB-018 items 6/7): `observabilityEnabled`
+// defaults to true and is override-able per build without a code change;
+// `performanceSampleRate` bounds perf-trace volume (see
+// src/observability/README.md "Sampling & retention" for the rationale).
+// Crashlytics/Performance are free-tier / not billed per-event in Firebase's
+// pricing model (unlike Firestore reads or a paid map API), so unlike
+// `infra/gcp/cost-controls/cost-controls-matrix.json`'s metered-service
+// budgets, there is no spend ceiling to enforce here — this is a
+// volume/noise control plus a blunt off-switch, consistent with that same
+// budget-capped/kill-switch operating posture.
+const OBSERVABILITY_ENABLED = process.env.OBSERVABILITY_ENABLED === 'false' ? false : true;
+const PERFORMANCE_SAMPLE_RATE = process.env.PERFORMANCE_SAMPLE_RATE
+  ? Number(process.env.PERFORMANCE_SAMPLE_RATE)
+  : 0.1;
+
 // App Check enforcement STAGE (MOB-010; ADR-020 §3 monitor→enforce rollout).
 // Deliberately defaults to `monitor` — never hardcode `enforce`. Promotion is
 // an explicit operational cutover (see src/security/README.md), overridable
@@ -208,6 +234,16 @@ const config: ExpoConfig = {
       ? [
           '@react-native-firebase/app',
           '@react-native-firebase/app-check',
+          // MOB-018: Crashlytics + Performance Monitoring config plugins.
+          // Same gate as App Check above (`firebaseConfigPresent`) — both
+          // plugins need the same registered Firebase app + config file and
+          // would otherwise throw at prebuild. Not a new human gate; reuses
+          // MOB-010's. The native modules are autolinked from package.json
+          // regardless; these plugins wire the dSYM/mapping-file upload
+          // build phases (iOS Crashlytics) and Gradle plugin (Android) that
+          // need a registered Firebase app to be meaningful.
+          '@react-native-firebase/crashlytics',
+          '@react-native-firebase/perf',
         ]
       : []),
   ],
@@ -221,6 +257,11 @@ const config: ExpoConfig = {
     // (client-advisory only; server stays authoritative). Defaults to
     // `monitor` — see the cutover runbook in src/security/README.md.
     appCheckEnforcementMode: APP_CHECK_ENFORCEMENT_MODE,
+    // MOB-018: observability kill switch + perf-trace sample rate, read at
+    // runtime by src/observability/bootstrap.ts's `resolveObservabilityConfig`.
+    // Defaults to enabled/10% — see src/observability/README.md.
+    observabilityEnabled: OBSERVABILITY_ENABLED,
+    performanceSampleRate: PERFORMANCE_SAMPLE_RATE,
     // No `eas.projectId` yet — no EAS organization/project is provisioned
     // (mobile-identity.md human gate #3). Added by `eas init` once that
     // gate clears; do not hand-write a fake project id here.
