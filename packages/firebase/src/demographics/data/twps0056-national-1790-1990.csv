@@ -1,0 +1,41 @@
+# Normalized national race totals, 1790-1990 — the parse target for the censusNationalDecades loader.
+#
+# SOURCE (public domain, 17 U.S.C. §105):
+#   U.S. Census Bureau, Population Division Working Paper No. 56 (twps0056),
+#   "Historical Census Statistics on Population Totals by Race, 1790 to 1990 ...",
+#   Gibson & Jung (2002), Table 1 — United States: Race and Hispanic Origin.
+#   Landing page (human citation): https://www.census.gov/library/working-papers/2002/demo/POP-twps0056.html
+#   Machine artifact:              https://www2.census.gov/library/working-papers/2002/demo/pop-twps0056/table01.xlsx
+#
+# DERIVATION: values are the NUMBER block of Table 1, transcribed column-for-column.
+#   Ambiguous rows resolved to the canonical 50-state / full-count figure:
+#     1890 -> footnote 5 row (includes Indian Territory & reservations): 62,947,714 / 7,488,676
+#     1960 -> includes Alaska & Hawaii: 179,323,175 / 18,871,831
+#     1970 -> 100-percent count row (not the 15%/5% sample rows)
+#   Free/Slave columns are populated only for 1790-1860 (blank afterward: emancipation ended
+#   the legal category). For every split decade, free + slave == black exactly.
+#   Regenerate/verify from the official .xlsx with scripts/derive-twps0056-national.py.
+#
+# Columns: decade,totalPopulation,blackPopulation,blackFree,blackSlave
+decade,totalPopulation,blackPopulation,blackFree,blackSlave
+1790,3929214,757208,59527,697681
+1800,5308483,1002037,108435,893602
+1810,7239881,1377808,186446,1191362
+1820,9638453,1771656,233634,1538022
+1830,12860702,2328642,319599,2009043
+1840,17063353,2873648,386293,2487355
+1850,23191876,3638808,434495,3204313
+1860,31443321,4441830,488070,3953760
+1870,38558371,4880009,,
+1880,50155783,6580793,,
+1890,62947714,7488676,,
+1900,75994575,8833994,,
+1910,91972266,9827763,,
+1920,105710620,10463131,,
+1930,122775046,11891143,,
+1940,131669275,12865518,,
+1950,150697361,15042286,,
+1960,179323175,18871831,,
+1970,203211926,22580289,,
+1980,226545805,26495025,,
+1990,248709873,29986060,,

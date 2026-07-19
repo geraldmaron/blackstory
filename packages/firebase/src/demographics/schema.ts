@@ -1,4 +1,3 @@
-
 /**
  * Firestore document schema for the `censusCountyDecades` collection — one doc per county per
  * decennial vintage: total + Black ("Black or African American alone") population counts.
@@ -18,7 +17,11 @@
  * schema, loader, and tests for this collection stay self-contained.
  */
 import { z } from 'zod';
-import { publishedStatisticProvenanceFields } from '../firestore/statistic-provenance.js';
+import { FREE_ENSLAVED_SPLIT_DECADES, HISTORICAL_NATIONAL_DECADES } from '@repo/domain';
+import {
+  datasetArtifactProvenanceFields,
+  publishedStatisticProvenanceFields,
+} from '../firestore/statistic-provenance.js';
 
 /** Decade labels this collection carries — matches `CENSUS_DECENNIAL_VINTAGES` in @repo/domain. */
 export const censusCountyDecadeDecadeSchema = z.enum(['2000', '2010', '2020']);
@@ -50,6 +53,87 @@ export function censusCountyDecadeId(fips5: string, decade: CensusCountyDecadeDe
 
 export function parseCensusCountyDecadeDoc(data: unknown): CensusCountyDecadeDoc {
   return censusCountyDecadeSchema.parse(data);
+}
+
+/**
+ * National decennial population doc — one per decade 1790–1990 from twps0056 Table 1 (the
+ * historical lane; the modern 2000–2020 national number comes from `censusCountyDecades` sums,
+ * so this collection deliberately stops at 1990). `freeBlackPopulation` /
+ * `enslavedBlackPopulation` are present only for the 1790–1860 decades that carried the
+ * free/enslaved split — both or neither, and (within twps0056's independent per-column
+ * rounding) they reconstitute the Black total.
+ *
+ * Decade grammar is imported from the @repo/domain registry (HISTORICAL_NATIONAL_DECADES) so a
+ * new historical decade is a one-line registry edit, never a copy edited here.
+ */
+export const censusNationalDecadeDecadeSchema = z.enum(
+  HISTORICAL_NATIONAL_DECADES as unknown as [string, ...string[]],
+);
+
+export type CensusNationalDecadeDecade = z.infer<typeof censusNationalDecadeDecadeSchema>;
+
+const FREE_ENSLAVED_TOLERANCE = 5;
+
+export const censusNationalDecadeSchema = z
+  .object({
+    /** Deterministic id equal to the decade label, e.g. `1790`. */
+    id: z.string().regex(/^\d{4}$/),
+    decade: censusNationalDecadeDecadeSchema,
+    totalPopulation: z.number().int().nonnegative(),
+    /** twps0056-harmonized "Black" total for the decade. */
+    blackPopulation: z.number().int().nonnegative(),
+    /** Free Black population — 1790–1860 only. */
+    freeBlackPopulation: z.number().int().nonnegative().optional(),
+    /** Enslaved Black population — 1790–1860 only. */
+    enslavedBlackPopulation: z.number().int().nonnegative().optional(),
+    // Parsed from a single bulk CSV artifact → carries the artifact digest + license, not just
+    // the per-row quartet (data-ingestion-methodology.md step 6, bulk-derived lane).
+    ...datasetArtifactProvenanceFields,
+  })
+  .superRefine((doc, ctx) => {
+    if (doc.id !== doc.decade) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'id must equal decade', path: ['id'] });
+    }
+    const hasFree = doc.freeBlackPopulation !== undefined;
+    const hasEnslaved = doc.enslavedBlackPopulation !== undefined;
+    if (hasFree !== hasEnslaved) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'freeBlackPopulation and enslavedBlackPopulation must both be present or both absent',
+        path: ['freeBlackPopulation'],
+      });
+    }
+    const splitDecade = (FREE_ENSLAVED_SPLIT_DECADES as readonly string[]).includes(doc.decade);
+    if (hasFree && !splitDecade) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `decade ${doc.decade} must not carry a free/enslaved split`,
+        path: ['freeBlackPopulation'],
+      });
+    }
+    if (hasFree && hasEnslaved) {
+      const discrepancy =
+        doc.freeBlackPopulation! + doc.enslavedBlackPopulation! - doc.blackPopulation;
+      if (Math.abs(discrepancy) > FREE_ENSLAVED_TOLERANCE) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `free + enslaved (${doc.freeBlackPopulation! + doc.enslavedBlackPopulation!}) must equal Black total (${doc.blackPopulation}) within ±${FREE_ENSLAVED_TOLERANCE}`,
+          path: ['blackPopulation'],
+        });
+      }
+    }
+  });
+
+export type CensusNationalDecadeDoc = z.infer<typeof censusNationalDecadeSchema>;
+
+/** Deterministic doc id: the decade label itself. */
+export function censusNationalDecadeId(decade: CensusNationalDecadeDecade): string {
+  return decade;
+}
+
+export function parseCensusNationalDecadeDoc(data: unknown): CensusNationalDecadeDoc {
+  return censusNationalDecadeSchema.parse(data);
 }
 
 /**
