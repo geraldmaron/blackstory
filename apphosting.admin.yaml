@@ -79,3 +79,15 @@ env:
     availability:
       - BUILD
       - RUNTIME
+  # apps/admin doesn't use App Check or Sentry — override the base apphosting.yaml's
+  # secret-backed values (which this backend's service account has no access to) so the
+  # build doesn't try to resolve web's secrets.
+  - variable: NEXT_PUBLIC_FIREBASE_APP_CHECK_SITE_KEY
+    value: ''
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: SENTRY_DSN
+    value: ''
+    availability:
+      - RUNTIME
