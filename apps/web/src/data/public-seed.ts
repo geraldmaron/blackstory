@@ -255,7 +255,7 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     locationLabel: 'Dupont/Sixteenth Street Historic District area (neighborhood-level pin)',
     relevanceExplanation:
       'Included as a documented community anchor with a multi-decade role hosting Black educational ' +
-      'history in the District of Columbia, above the constitution relevance threshold.',
+      'history in the District of Columbia, based on cited archival and marker sources.',
     historicalContext:
       'Washington’s historically Black Presbyterian congregations built and sustained educational ' +
       'and civic institutions well beyond their own sanctuaries. Fifteenth Street’s 1870 basement ' +

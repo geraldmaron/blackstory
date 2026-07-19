@@ -270,6 +270,33 @@ export function isNotabilityCriterion(value: string): value is NotabilityCriteri
 }
 
 /**
+ * Human-readable inclusion note for one claim-predicate group. Must be specific to this
+ * record's claim text and named external sources — never a dump of `NOTABILITY_RUBRIC`
+ * methodology prose (that text is criterion definition for methodology pages, not a per-record
+ * reason). BlackStory assembles/cites; it does not originate the historical fact.
+ */
+export function buildNotabilityBasisNote(
+  predicate: string,
+  predicateClaims: readonly ReleaseClaimProjection[],
+): string {
+  const [sample] = predicateClaims;
+  const claimText = sample
+    ? `${predicate.replaceAll('_', ' ')}: ${sample.object}`
+    : predicate.replaceAll('_', ' ');
+  const sources = [
+    ...new Set(
+      predicateClaims
+        .map((claim) => claim.citationSource.trim())
+        .filter((source) => source.length > 0),
+    ),
+  ];
+  if (sources.length === 0) {
+    return `${claimText}. Linked source citation is incomplete.`;
+  }
+  return `${claimText}. Cited from ${sources.join('; ')}.`;
+}
+
+/**
  * Builds a REAL, evidence-backed `notabilityBasis` from an entry's own claims: one basis record
  * per distinct claim predicate, `evidenceIds` set to the ids of that predicate's claims that
  * carry a non-empty `citationSource`. This replaces the single hardcoded placeholder basis record
@@ -299,7 +326,7 @@ export function buildReleaseNotabilityBasis(
     const criterion = sample ? inferNotabilityCriterionFromClaim(predicate, sample.object) : 'documented_site';
     records.push({
       criterion,
-      note: NOTABILITY_RUBRIC[criterion],
+      note: buildNotabilityBasisNote(predicate, predicateClaims),
       evidenceIds,
     });
   }

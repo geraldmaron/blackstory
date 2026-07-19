@@ -6,20 +6,12 @@
  * `publicSearchIndex` reader can plug in without changing the search route/page
  * contract — see `getSnapshotSearchIndex` below.
  *
- * `notabilityBasis` synthesis: the bundled seed catalog only carries hand-authored
- * `notabilityLabels` (display strings), not the structured `NotabilityBasisRecord` a release
- * built by `@repo/domain`'s `buildReleaseEntityArtifacts` carries (the related workstream). When a
- * seed entity DOES carry a real `notabilityBasis` (`PublicEntityView.notabilityBasis`), this
- * adapter uses it as-is — no synthesis, real `evidenceIds`. Otherwise the notability gate must
- * still run at the search boundary regardless of data source, so this adapter reverse-maps each
- * label back to its rubric criterion (exact string match against `NOTABILITY_RUBRIC`) so the
- * real gate — not a bypass — is what lets these fixtures into the index. A label with no exact
- * rubric match falls back to `documented_site` (the broadest criterion) rather than being
- * dropped, since seed fixtures are known-good by construction. The synthesized `evidenceIds` is
- * empty (the bundled seed catalog has no evidence-record ids to cite): that means "no structured
- * evidence-id linkage recorded", not "zero evidence exists". Callers must not render
- * `evidenceIds.length` as a documented-source count for these records (see `WhyThisAppears`,
- * which hides the count when it's empty).
+ * `notabilityBasis` synthesis: the bundled seed catalog often carries hand-authored
+ * `notabilityLabels` (display strings), not always a structured `NotabilityBasisRecord` from
+ * `buildReleaseEntityArtifacts`. When a seed entity DOES carry a real `notabilityBasis`, this
+ * adapter uses it (filling empty `evidenceIds` from cited claims). Otherwise it reverse-maps each
+ * label to its rubric criterion and attaches the entity's cited claim ids so search and public
+ * surfaces share citation-backed inclusion evidence — never empty-evidence theater.
  */
 import {
   NOTABILITY_RUBRIC,
@@ -38,23 +30,53 @@ function criterionForLabel(label: string): NotabilityCriterion {
   return match ? match[0] : 'documented_site';
 }
 
-function synthesizeNotabilityBasis(
-  labels: readonly string[] | undefined,
-): readonly NotabilityBasisRecord[] {
-  return (labels ?? []).map((note) => ({
-    criterion: criterionForLabel(note),
+function citedClaimIds(entity: PublicEntityView): readonly string[] {
+  return entity.claims
+    .filter((claim) => claim.citationSource.trim().length > 0)
+    .map((claim) => claim.id);
+}
+
+function noteFromCitedClaims(entity: PublicEntityView): string {
+  const cited = entity.claims.filter((claim) => claim.citationSource.trim().length > 0);
+  if (cited.length === 0) {
+    return 'Inclusion is pending linked source citations.';
+  }
+  const [first] = cited;
+  const sources = [...new Set(cited.map((claim) => claim.citationSource.trim()))];
+  return `${first!.predicate.replaceAll('_', ' ')}: ${first!.object}. Cited from ${sources.join('; ')}.`;
+}
+
+function synthesizeNotabilityBasis(entity: PublicEntityView): readonly NotabilityBasisRecord[] {
+  const evidenceIds = citedClaimIds(entity);
+  const note = noteFromCitedClaims(entity);
+  const labels = entity.notabilityLabels ?? [];
+  if (labels.length === 0) {
+    return evidenceIds.length === 0
+      ? []
+      : [{ criterion: 'documented_site', note, evidenceIds }];
+  }
+  return labels.map((label) => ({
+    criterion: criterionForLabel(label),
     note,
-    evidenceIds: [],
+    evidenceIds,
   }));
 }
 
-/** Real notabilityBasis when the entity carries one (the related workstream release builder output);
- * otherwise the label-synthesis fallback above for pre-builder seed fixtures. */
+/** Real notabilityBasis when present; otherwise citation-backed label synthesis. */
 function notabilityBasisFor(entity: PublicEntityView): readonly NotabilityBasisRecord[] {
   if (entity.notabilityBasis && entity.notabilityBasis.length > 0) {
-    return entity.notabilityBasis;
+    const citedIds = citedClaimIds(entity);
+    const fallbackNote = noteFromCitedClaims(entity);
+    return entity.notabilityBasis.map((record) => ({
+      criterion: record.criterion,
+      note:
+        record.note.trim() === NOTABILITY_RUBRIC[record.criterion].trim()
+          ? fallbackNote
+          : record.note,
+      evidenceIds: record.evidenceIds.length > 0 ? record.evidenceIds : citedIds,
+    }));
   }
-  return synthesizeNotabilityBasis(entity.notabilityLabels);
+  return synthesizeNotabilityBasis(entity);
 }
 
 function toSearchableRecord(entity: PublicEntityView): SearchableEntityRecord {

@@ -106,9 +106,13 @@ test('buildReleaseNotabilityBasis groups claims by predicate with real evidenceI
   const foundedBasis = basis.find((b) => b.evidenceIds.length === 2);
   assert.ok(foundedBasis, 'expected a basis record covering both founded_year claims');
   assert.equal(foundedBasis!.criterion, 'documented_site');
+  assert.match(foundedBasis!.note, /founded year: 1900/i);
+  assert.match(foundedBasis!.note, /Cited from Source A; Source B/);
+  assert.doesNotMatch(foundedBasis!.note, /documented site of a historically significant/i);
   const landmarkBasis = basis.find((b) => b.criterion === 'landmark_or_national_register');
   assert.ok(landmarkBasis, 'expected a landmark_or_national_register basis record');
   assert.equal(landmarkBasis!.evidenceIds.length, 1);
+  assert.match(landmarkBasis!.note, /Cited from Source C/);
 });
 
 test('buildReleaseNotabilityBasis never fabricates evidence for an uncited claim', () => {

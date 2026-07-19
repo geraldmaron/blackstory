@@ -42,7 +42,11 @@ test('notabilityBasis resolves the real rubric criterion since seed labels now q
     'community_anchor',
   );
   for (const doc of index) {
-    assert.equal(doc.notabilityBasis[0]?.evidenceIds.length, 0);
+    assert.ok(
+      (doc.notabilityBasis[0]?.evidenceIds.length ?? 0) > 0,
+      `${doc.id} must attach cited claim ids to inclusion evidence`,
+    );
+    assert.match(doc.notabilityBasis[0]!.note, /Cited from /);
   }
 });
 

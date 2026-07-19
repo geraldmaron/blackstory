@@ -33,7 +33,11 @@ import { highestConfidence } from '../../../lib/map-experience/build-explore-map
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
 import { listPublicEntityViews, resolvePublicEntityView } from '../../../lib/public-data/source';
-import { buildWhyThisAppearsForEntity, toEvidenceClaimInputs } from './adapters';
+import {
+  buildWhyThisAppearsForEntity,
+  toEvidenceClaimInputs,
+  whyAppearsEvidenceById,
+} from './adapters';
 import { deriveHistoricalFraming } from './entity-view-model';
 
 type EntityPageProps = {
@@ -221,7 +225,11 @@ export default async function EntityPage({ params }: EntityPageProps) {
               </h2>
               <div className="ds-record-section__body">
                 {whyThisAppears ? (
-                  <WhyThisAppears result={whyThisAppears} instanceId={`entity-${entity.id}-why`} />
+                  <WhyThisAppears
+                    result={whyThisAppears}
+                    instanceId={`entity-${entity.id}-why`}
+                    evidenceById={whyAppearsEvidenceById(entity)}
+                  />
                 ) : (
                   <RecordGapNotice kind="relevance" />
                 )}
