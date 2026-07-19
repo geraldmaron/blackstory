@@ -36,6 +36,14 @@
         "citationSource": "Encyclopedia of Greater Philadelphia",
         "citationHref": "https://philadelphiaencyclopedia.org/essays/mother-bethel-ame-church-congregation-and-community-2/",
         "citationLabel": "Mother Bethel AME Church (Congregation and Community)"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "National Park Service documents Mother Bethel AME Church in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/000/inde-goal-bethelame-walnut-st-birch-1799.htm",
+        "citationLabel": "National Park Service: Goal, in Walnut Street Philadelphia by W. Birch & Son, 1799 (U.S. ..."
       }
     ],
     "historicalContext": "Independent Black congregations like Mother Bethel doubled as schools, mutual-aid societies, and organizing halls at a time when most civic institutions excluded Black Philadelphians.",
@@ -179,6 +187,30 @@
         "citationSource": "Georgia Historical Society",
         "citationHref": "https://www.georgiahistory.com/ghmi_marker_updated/first-african-baptist-church/",
         "citationLabel": "First African Baptist Church historical marker"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "National Park Service documents First African Baptist Church in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/first-african-baptist-church-beaufort.htm",
+        "citationLabel": "National Park Service: First African Baptist Church Beaufort (U.S. National Park Service)"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress documents First African Baptist Church in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://hdl.loc.gov/loc.mss/eadmss.ms021005.3",
+        "citationLabel": "Library of Congress: DuPree African American Pentecostal Collection | Library of Congress"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress documents First African Baptist Church in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/free-to-use/african-american-heritage/",
+        "citationLabel": "Library of Congress: African American Heritage | Library of Congress Free to Use and ..."
       }
     ],
     "historicalContext": "Savannah's early Black Baptist congregations organized under slavery and built institutions — schools, missionary networks, and later a church-housed credit union — that outlasted it.",

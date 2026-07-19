@@ -2031,39 +2031,56 @@
 
 .ds-confidence-mark {
   display: inline-flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.25em;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.3em;
   max-width: 100%;
-  font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
-  line-height: 1.4;
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.ds-confidence-mark__icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: 0 0 auto;
 }
 
 .ds-confidence-mark__text {
   overflow-wrap: anywhere;
   word-break: break-word;
+  letter-spacing: 0.02em;
 }
 
-/* Glyph + word + green→orange confidence ramp (high=green, low=orange). */
+/* When a field title is already present, hide the redundant word — icon + aria-label carry meaning. */
+.ds-confidence-mark[data-labeled='true'] .ds-confidence-mark__text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Icon + word + green→orange confidence ramp (high=green, low=orange). */
 .ds-confidence-mark--high {
   color: #2f6b3c;
-  font-weight: 600;
 }
 
 .ds-confidence-mark--medium {
   color: #8b8a2e;
-  font-weight: 500;
 }
 
 .ds-confidence-mark--low {
   color: #d07a32;
-  font-weight: 500;
 }
 
 .ds-confidence-mark--unrated {
   color: var(--ds-ink-subtle);
-  font-weight: 400;
 }
 
 [data-theme='dark'] .ds-confidence-mark--high {
@@ -2078,27 +2095,52 @@
   color: #d07a32;
 }
 
-/* Status chips — copper/stone weight, text always present (not color-only). */
+/* Status chips — icon + mono label (not color-only). */
 .ds-status-mark {
   display: inline-flex;
   align-items: center;
+  gap: 0.3em;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: none;
 }
 
-.ds-status-mark--active {
+.ds-status-mark__icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: 0 0 auto;
+}
+
+.ds-status-mark[data-labeled='true'] .ds-status-mark__text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ds-status-mark--active,
+.ds-status-mark--living,
+.ds-status-mark--in_force {
   color: var(--ds-accent);
-  font-weight: 600;
 }
 
+.ds-status-mark--historic,
 .ds-status-mark--inactive,
+.ds-status-mark--deceased,
 .ds-status-mark--archived,
-.ds-status-mark--draft {
+.ds-status-mark--draft,
+.ds-status-mark--repealed,
+.ds-status-mark--struck_down,
+.ds-status-mark--enjoined,
+.ds-status-mark--amended {
   color: var(--ds-ink-muted);
-  font-weight: 500;
 }
 
 .ds-legend-glyph {

@@ -167,7 +167,12 @@
 }
 
 .ds-at-a-glance .ds-confidence-mark {
-  font-size: 0.9375rem;
+  font-size: 0.75rem;
+}
+
+.ds-at-a-glance .ds-confidence-mark__icon {
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
 .ds-at-a-glance__link {

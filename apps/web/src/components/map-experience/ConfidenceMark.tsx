@@ -1,28 +1,31 @@
 /**
- * Confidence mark: map-aligned glyph + word label. Record-level confidence is
- * encoded as shape (● ◐ ○ ·), never hue alone — matches NarrativeCard and the
+ * Confidence mark: Font Awesome icon + accessible label. Record-level confidence
+ * is encoded as icon shape (never hue alone) — matches NarrativeCard and the
  * Explore legend so entity pages do not invent a second confidence language.
  *
  * When a nearby "Confidence" field title is present, pass `labeled` so the
- * value is just High / Medium / Low / Unrated (the field name is not repeated).
- * Without a field title, the full phrase ("high confidence") stays for context.
+ * visible word stays compact (or hidden via CSS) while aria-label keeps the
+ * full phrase for screen readers.
  */
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { cx } from '@repo/ui';
-import { CONFIDENCE_TIER_GLYPH } from '../../lib/map-experience/dignity-style';
+import {
+  confidenceIconFor,
+  type ConfidenceTierKey,
+} from '../../lib/map-experience/confidence-icons';
 
 void React;
 
+export type { ConfidenceTierKey };
 export type ConfidenceTierLabel = 'high' | 'medium' | 'low' | 'unrated' | string;
-
-export type ConfidenceTierKey = 'high' | 'medium' | 'low' | 'unrated';
 
 export type ConfidenceMarkProps = {
   readonly tier: ConfidenceTierLabel;
   readonly className?: string;
   /**
    * True when a Confidence field title / `dt` is already visible beside this mark.
-   * Shortens the visible word to High / Medium / Low / Unrated.
+   * Shortens the visible word; screen readers still get the full phrase via aria-label.
    */
   readonly labeled?: boolean;
 };
@@ -50,15 +53,18 @@ export function confidenceLabel(tier: ConfidenceTierLabel, labeled = false): str
 
 export function ConfidenceMark({ tier, className, labeled = false }: ConfidenceMarkProps) {
   const tierKey = confidenceTierKey(tier);
-  const glyph = CONFIDENCE_TIER_GLYPH[tierKey];
+  const icon = confidenceIconFor(tierKey);
   const text = confidenceLabel(tier, labeled);
+  const aria = labeled ? `${confidenceShortLabel(tier)} confidence` : text;
   return (
     <span
       className={cx('ds-confidence-mark', `ds-confidence-mark--${tierKey}`, className)}
       data-tier={tierKey}
       data-labeled={labeled ? 'true' : 'false'}
+      role="img"
+      aria-label={aria}
     >
-      <span aria-hidden="true">{glyph}</span>{' '}
+      <FontAwesomeIcon icon={icon} className="ds-confidence-mark__icon" aria-hidden="true" />
       <span className="ds-confidence-mark__text">{text}</span>
     </span>
   );

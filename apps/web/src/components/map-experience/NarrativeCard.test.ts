@@ -28,8 +28,9 @@ test('renders name, era, one-line story, evidence count, confidence, and a link 
   assert.doesNotMatch(html, />place</);
   assert.match(html, /ds-confidence-mark/);
   assert.match(html, /data-labeled="true"/);
-  assert.match(html, />High<|>Medium<|>Low<|>Unrated</);
-  assert.doesNotMatch(html, /high confidence/i);
+  assert.match(html, /ds-confidence-mark__icon/);
+  assert.match(html, /aria-label="[^"]*confidence"/i);
+  assert.match(html, /ds-status-mark/);
   assert.match(html, new RegExp(`href="${feature.properties.href}"`));
   assert.match(html, /Selected record/);
   assert.match(html, /><dt>Where<\/dt>/);

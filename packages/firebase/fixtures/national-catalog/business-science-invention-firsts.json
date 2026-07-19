@@ -35,6 +35,30 @@
         "citationSource": "nps.gov",
         "citationHref": "https://npgallery.nps.gov/NRHP/GetAsset/NHLS/76001289_text",
         "citationLabel": "National Park Service: Villa Lewaro National Historic Landmark nomination"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting Madam C.J. Walker, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://guides.loc.gov/this-month-in-business-history/december/madam-cj-walker-born",
+        "citationLabel": "Library of Congress: Madam C. J. Walker Born - This Month in Business History"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting Madam C.J. Walker, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://blogs.loc.gov/headlinesandheroes/2020/05/madam-c-j-walker/",
+        "citationLabel": "Library of Congress: Madam C.J. Walker | Headlines & Heroes - Library of Congress Blogs"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting Madam C.J. Walker, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://blogs.loc.gov/teachers/2024/04/inventions-and-innovations-entrepreneur-madam-c-j-walker/",
+        "citationLabel": "Library of Congress: Inventions and Innovations: Entrepreneur Madam C.J. Walker"
       }
     ],
     "historicalContext": "Villa Lewaro is anchored here rather than at a birthplace because Walker built it deliberately as a monument to Black enterprise, hosting W.E.B. Du Bois, James Weldon Johnson, and other Harlem Renaissance figures; it remains the most concretely documented site tied to her achievement.",
@@ -84,6 +108,14 @@
         "citationSource": "nps.gov",
         "citationHref": "https://www.nps.gov/mawa/planyourvisit/basicinfo.htm",
         "citationLabel": "National Park Service: Maggie L. Walker National Historic Site basic information"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting Maggie L. Walker, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://guides.loc.gov/this-month-in-business-history/november/maggie-l-walker-first-black-woman-to-charter-a-bank",
+        "citationLabel": "Library of Congress: Maggie L. Walker, First Black Woman to Charter a Bank - This Month ..."
       }
     ],
     "historicalContext": "The bank Walker founded survives today as Consolidated Bank and Trust, the oldest continuously operated African American-run bank in the United States. Her Jackson Ward home, preserved by the National Park Service, is the best-documented site tied to her life and work.",
@@ -272,6 +304,14 @@
         "citationSource": "cnbc.com",
         "citationHref": "https://www.cnbc.com/2018/02/26/what-to-know-about-robert-johnson-americas-first-black-billionaire.html",
         "citationLabel": "CNBC: 5 things to know about Robert Johnson, America's first Black billionaire"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "National Park Service holds archival materials documenting Robert L. Johnson, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://npgallery.nps.gov/NRHP/GetAsset/NRHP/64500614_text",
+        "citationLabel": "National Park Service: National Register of Historic Places Multiple Property ... - NPGallery"
       }
     ],
     "historicalContext": "BET's Northeast Washington headquarters, where the network was run through its NYSE listing and eventual sale, is the site most directly tied to Johnson's business milestones; the company relocated its headquarters functions to New York after the Viacom sale.",
@@ -551,6 +591,14 @@
         "citationSource": "shsmo.org",
         "citationHref": "https://historicmissourians.shsmo.org/annie-turnbo-malone/",
         "citationLabel": "State Historical Society of Missouri: Annie Turnbo Malone, Historic Missourians"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "National Park Service holds archival materials documenting Annie Malone, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/people/maud-malone.htm",
+        "citationLabel": "National Park Service: Maud Malone (U.S. National Park Service)"
       }
     ],
     "historicalContext": "The Poro College building was sold and later razed in 1965 for a public housing development; the St. Ferdinand Avenue address remains the documented site of the campus that anchored The Ville as a hub of Black St. Louis business and civic life.",
@@ -1353,6 +1401,22 @@
         "citationSource": "nasa.gov",
         "citationHref": "https://www.nasa.gov/people/mary-w-jackson-biography/",
         "citationLabel": "NASA: Mary W. Jackson Biography"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting Mary Jackson, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/item/mm83061408/",
+        "citationLabel": "Library of Congress: Robert H. Jackson papers, 1816-1983 | Library of Congress"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting Mary Jackson, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://hdl.loc.gov/loc.mss/eadmss.ms003002.3",
+        "citationLabel": "Library of Congress: Robert Houghwout Jackson Papers"
       }
     ],
     "historicalContext": "Jackson spent most of her nearly two-decade engineering career at Langley Research Center in Hampton, Virginia, but is anchored here at NASA's Washington headquarters because the agency renamed that building for her in 2021, the most concretely NASA-designated site bearing her name today.",
@@ -1449,6 +1513,22 @@
         "citationSource": "nmaahc.si.edu",
         "citationHref": "https://nmaahc.si.edu/explore/stories/color-blood",
         "citationLabel": "National Museum of African American History and Culture: The Color of Blood"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "National Park Service holds archival materials documenting Charles Drew, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/charles-drew-house.htm",
+        "citationLabel": "National Park Service: Charles Drew House (U.S. National Park Service)"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting Charles Drew, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://blogs.loc.gov/headlinesandheroes/2021/02/dr-charles-r-drew-blood-bank-pioneer/",
+        "citationLabel": "Library of Congress: Dr. Charles R. Drew: Blood Bank Pioneer | Headlines & Heroes"
       }
     ],
     "historicalContext": "Freedmen's Hospital, where Drew served as chief of surgery, was the teaching hospital affiliated with Howard's medical school and has since been succeeded by Howard University Hospital on the same Georgia Avenue campus.",
@@ -1780,6 +1860,22 @@
         "citationSource": "nps.gov",
         "citationHref": "https://www.nps.gov/people/rbunche.htm",
         "citationLabel": "National Park Service: Ralph Bunche"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting Ralph Bunche, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://blogs.loc.gov/law/2017/12/dr-ralph-bunche-nobel-peace-prize-laureate-and-peace-negotiator/",
+        "citationLabel": "Library of Congress: Dr. Ralph Bunche, Nobel Peace Prize Laureate and Peace Negotiator"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting Ralph Bunche, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/loc/lcib/0104/bunche_odyssey.html",
+        "citationLabel": "Library of Congress: The Legacy of Ralph Bunche (April 2001) - The Library of Congress"
       }
     ],
     "historicalContext": "New York City dedicated this small park directly across First Avenue from UN Headquarters in Bunche's honor in 1979, the same stretch of Turtle Bay where he carried out much of his UN diplomatic career; it was designated the city's first 'peace park' in 1985.",
@@ -1828,6 +1924,22 @@
         "citationSource": "britannica.com",
         "citationHref": "https://www.britannica.com/biography/Toni-Morrison",
         "citationLabel": "Britannica: Toni Morrison"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting Toni Morrison, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://blogs.loc.gov/loc/2019/08/remembering-toni-morrison/",
+        "citationLabel": "Library of Congress: Remembering Toni Morrison | Timeless - Library of Congress Blogs"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting Toni Morrison, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://guides.loc.gov/fiction-prize-toni-morrison/external-resources",
+        "citationLabel": "Library of Congress: External Resources - Toni Morrison, Library of Congress Creative ..."
       }
     ],
     "historicalContext": "Morrison's Nobel followed her 1988 Pulitzer Prize for Beloved; she is anchored at Princeton, where she spent 17 years on the faculty, rather than Howard, her undergraduate alma mater, which is already documented elsewhere in this catalog.",
@@ -2264,6 +2376,14 @@
         "citationSource": "invent.org",
         "citationHref": "https://www.invent.org/inductees/garrett-morgan",
         "citationLabel": "National Inventors Hall of Fame: Garrett Morgan"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "National Park Service holds archival materials documenting Garrett Morgan, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/brvb/learn/news/garrettmorgan.htm",
+        "citationLabel": "National Park Service: Garrett Morgan: An Uncommon Inventor - National Park Service"
       }
     ],
     "historicalContext": "Morgan moved to Cleveland in 1895 and became one of Ohio's most prolific Black inventors and entrepreneurs; the tunnel disaster site lies roughly 120 feet below Lake Erie and is not a documented visitable location, so this entry is anchored at city precision in the Cleveland community where Morgan lived and worked.",
@@ -2355,6 +2475,14 @@
         "citationSource": "invent.org",
         "citationHref": "https://www.invent.org/inductees/lewis-latimer",
         "citationLabel": "National Inventors Hall of Fame: Lewis Latimer"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "National Park Service holds archival materials documenting Lewis Latimer, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/000/latimer.htm",
+        "citationLabel": "National Park Service: George and Rebecca Latimer's Flight to Freedom"
       }
     ],
     "historicalContext": "Latimer's Flushing home, where he lived from 1902 until his death in 1928, was relocated a short distance to a park site and preserved as a landmarked museum documenting his career as a draftsman and inventor for the U.S. Electric Lighting Company and Edison's companies.",
@@ -2581,6 +2709,30 @@
         "citationSource": "shsmo.org",
         "citationHref": "https://historicmissourians.shsmo.org/george-washington-carver/",
         "citationLabel": "State Historical Society of Missouri: George Washington Carver, Historic Missourians"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting George Washington Carver, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://blogs.loc.gov/law/2023/02/peanuts-potatoes-patents-and-plants-the-life-and-times-of-george-washington-carver/",
+        "citationLabel": "Library of Congress: Peanuts, Potatoes, Patents, and Plants – The Life and Times of ..."
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting George Washington Carver, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://blogs.loc.gov/picturethis/2013/02/george-washington-carver-more-than-a-name/",
+        "citationLabel": "Library of Congress: George Washington Carver: More Than A Name | Picture This"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress holds archival materials documenting George Washington Carver, corroborating biographical and career records cited in this catalog entry",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://guides.loc.gov/School-Gardens/carver-and-nature-study",
+        "citationLabel": "Library of Congress: George Washington Carver and Nature Study - School Garden ..."
       }
     ],
     "historicalContext": "Carver is anchored at his birthplace monument in Diamond, Missouri, rather than Tuskegee, since Tuskegee University's campus already appears elsewhere in this catalog; Carver is buried on the Tuskegee campus near Booker T. Washington.",

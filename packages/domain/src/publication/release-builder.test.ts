@@ -325,3 +325,19 @@ test('buildReleaseEntityArtifacts omits related and keeps relatedCount 0 when no
   assert.equal(result.projection.related, undefined);
   assert.equal(result.searchIndex.relatedCount, 0);
 });
+
+test('buildReleaseEntityArtifacts derives status when entry has no status field', () => {
+  const entry = baseEntry({
+    summary:
+      'Howard University remains a working research university in Washington, D.C., with an active campus.',
+    eraBuckets: ['1860s'],
+  });
+  assert.equal(entry.status, undefined);
+  assert.equal(entry.statusHistory, undefined);
+
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.status, 'active');
+  assert.equal(result.searchIndex.status, 'active');
+});

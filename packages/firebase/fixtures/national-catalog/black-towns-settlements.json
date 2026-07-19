@@ -301,6 +301,22 @@
         "citationSource": "npgallery.nps.gov",
         "citationHref": "https://npgallery.nps.gov/GetAsset/2f30d66f-7a30-4f33-85d7-0b485e2a4555",
         "citationLabel": "NPS National Register: Freedmen's Village Multiple Property Documentation"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress documents James City in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/item/gvhs01.vhs00367/",
+        "citationLabel": "Library of Congress: Map Map of New Kent, Charles City, James City and York counties."
+      },
+      {
+        "predicate": "documented_by",
+        "object": "National Park Service documents James City in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/carters.htm",
+        "citationLabel": "National Park Service: James City County: Carter's Grove - National Park Service"
       }
     ],
     "historicalContext": "James City was one of North Carolina's three major postwar resettlement colonies alongside Princeville and Roanoke Island's Freedmen's Colony. Its struggle to convert tenancy into fee-simple ownership foreshadowed how legal title — not settlement alone — determined whether freedom colonies could endure.",
@@ -407,6 +423,14 @@
         "citationSource": "okhistory.org",
         "citationHref": "https://www.okhistory.org/about/markers.php?action=search&county=Wagoner",
         "citationLabel": "Oklahoma Historical Society: Tullahassee historical marker"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress documents Tullahassee in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/exhibits/african/afam004.html",
+        "citationLabel": "Library of Congress: Personal Stories and ACS New Directions - The African-American ..."
       }
     ],
     "historicalContext": "Tullahassee illustrates how Indian Territory Freedmen converted mission-school infrastructure into municipal life. Railroad access and townsite-company promotion brought Southern settlers, while the college extended the community's educational reach beyond the Rosenwald-era public schools common in other All-Black towns.",
@@ -460,6 +484,14 @@
         "citationSource": "thc.texas.gov",
         "citationHref": "https://atlas.thc.texas.gov/NR/pdfs/98001417/98001417.pdf",
         "citationLabel": "Texas Historical Commission: Sweet Home school NRHP nomination"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress documents Sweet Home in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/collections/songs-of-america/articles-and-essays/musical-styles/ethnic/african-american-song/",
+        "citationLabel": "Library of Congress: African American Song | Ethnic | Musical Styles | Articles and Essays"
       }
     ],
     "historicalContext": "Sweet Home represents the Central Texas freedom-colony pattern: landowning families clustered around church and school while remaining unincorporated. Rosenwald funding elevated a community institution whose survival today depends on descendant stewardship rather than municipal budgets.",
@@ -513,6 +545,14 @@
         "citationSource": "npgallery.nps.gov",
         "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/79001160",
         "citationLabel": "National Register of Historic Places: Idlewild Historic District"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress documents Idlewild in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/item/2002709316",
+        "citationLabel": "Library of Congress: [Patrice Lumumba, seated in car, waving as he leaves Idlewild ..."
       }
     ],
     "historicalContext": "Idlewild was not a farming colony but a deliberate leisure settlement — proof that Black placemaking included resort architecture, entertainment economies, and second-home ownership. Preservation efforts today treat Idlewild as cultural infrastructure whose cottages and clubs document how families claimed rest and recreation on their own terms.",
@@ -725,6 +765,22 @@
         "citationSource": "okhistory.org",
         "citationHref": "https://www.okhistory.org/about/markers.php?action=search&county=Wagoner",
         "citationLabel": "Oklahoma Historical Society: Red Bird historical marker"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress documents Red Bird in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/free-to-use/birds/",
+        "citationLabel": "Library of Congress: Birds | Library of Congress Free to Use and Reuse"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "National Park Service documents Red Bird in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/people/zitkala-sa.htm",
+        "citationLabel": "National Park Service: Zitkala-Ša (Red Bird / Gertrude Simmons Bonnin) (U.S. National ..."
       }
     ],
     "historicalContext": "Red Bird combined booster-era town building with durable civic architecture and voting-rights litigation. Its NRHP-listed school and city hall record how All-Black towns invested in public buildings even as agricultural economies contracted.",
@@ -778,6 +834,30 @@
         "citationSource": "okhistory.org",
         "citationHref": "https://www.okhistory.org/publications/enc/entry?entry=TA001",
         "citationLabel": "Encyclopedia of Oklahoma History and Culture: Taft"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress documents Taft in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/collections/william-howard-taft-papers/about-this-collection/",
+        "citationLabel": "Library of Congress: About this Collection | William H. Taft Papers - Library of Congress"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress documents Taft in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://guides.loc.gov/william-howard-taft/digital-collections",
+        "citationLabel": "Library of Congress: Digital Collections - William Howard Taft: A Resource Guide"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "Library of Congress documents Taft in federal historic-place and archival records, providing independent authority corroboration for this settlement's documented history",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://guides.loc.gov/william-howard-taft",
+        "citationLabel": "Library of Congress: Introduction - William Howard Taft: A Resource Guide"
       }
     ],
     "historicalContext": "Taft's dual story — railroad-era commercial ambition and later service as a state institutional host community — shows how Oklahoma's All-Black towns adapted when agriculture alone could not sustain population. Foley-Davis's 1973 mayoral election linked Taft to a wider history of Black women in municipal leadership.",

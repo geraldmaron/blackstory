@@ -20,6 +20,7 @@ import {
   searchHrefForStatus,
 } from '../../lib/map-experience/metadata-hrefs';
 import { ConfidenceMark } from './ConfidenceMark';
+import { StatusMark } from './StatusMark';
 import { KindBadge } from './KindBadge';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
@@ -118,17 +119,17 @@ function ResultRowMeta({ feature }: ResultRowMetaProps) {
       {properties.status !== undefined ? (
         <div className="ds-result-meta">
           <dt>Status</dt>
-          <dd className="ds-sans">
+          <dd>
             {statusHref ? (
               <Link
                 className="ds-result-meta__link"
                 href={statusHref}
                 aria-label={`Search records with status ${properties.status}`}
               >
-                {properties.status}
+                <StatusMark status={properties.status} labeled />
               </Link>
             ) : (
-              properties.status
+              <StatusMark status={properties.status} labeled />
             )}
           </dd>
         </div>

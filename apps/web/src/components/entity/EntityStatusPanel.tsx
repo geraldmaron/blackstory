@@ -8,6 +8,7 @@
 
 import React from 'react';
 import type { PublicEntityView, PublicEventWindow } from '../../data/public-seed';
+import { StatusMark } from '../map-experience';
 import { humanizeToken } from './format';
 import { RecordGapNotice } from './RecordGapNotice';
 
@@ -48,7 +49,7 @@ export function EntityStatusPanel({ entity, framing: _framing }: EntityStatusPan
     <div className="ds-entity-status">
       <p className="ds-entity-status__current">
         <span className="ds-mono">Current status</span>
-        <strong className="ds-sans">{humanizeToken(entity.status)}</strong>
+        <StatusMark status={entity.status} labeled />
       </p>
       <ol className="ds-qualify-list" aria-label="Status history">
         {entity.statusHistory.map((record, index) => (

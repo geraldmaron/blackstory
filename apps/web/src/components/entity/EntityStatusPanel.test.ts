@@ -21,6 +21,9 @@ test('renders the current status and full time-scoped statusHistory for a place-
   const school = requireEntity('ent_dunbar_school_001');
   const html = renderToStaticMarkup(createElement(EntityStatusPanel, { entity: school, framing: 'present_day' }));
   assert.match(html, /Current status/);
+  assert.match(html, /ds-status-mark/);
+  assert.match(html, /ds-status-mark__icon/);
+  assert.match(html, /aria-label="Status: active"/);
   assert.match(html, /Active/);
   assert.match(html, /Historic/);
   assert.match(html, /1870/);

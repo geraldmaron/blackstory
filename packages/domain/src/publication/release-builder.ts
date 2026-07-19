@@ -36,6 +36,7 @@ import {
   type NotabilityBasisRecord,
   type NotabilityCriterion,
 } from '../entity-status.js';
+import { deriveCatalogEntityStatus } from '../derive-catalog-status.js';
 import { evaluateNotabilityGate } from '../relevance/notability-gate.js';
 import { evaluateFactPublishGate } from '../facts/publish-gate.js';
 import type { FactCitation } from '../facts/citation.js';
@@ -82,6 +83,14 @@ export type ReleaseSourceEntity = {
   readonly historicalContext?: string;
   readonly sensitivityClass?: string;
   readonly status?: string;
+  readonly statusHistory?: readonly {
+    readonly status: string;
+    readonly validFrom?: string;
+    readonly validTo?: string | null;
+    readonly datePrecision: string;
+    readonly basisClaimIds: readonly string[];
+  }[];
+  readonly livingStatus?: 'living' | 'deceased' | 'unknown';
   /** Bootstrap catalog related shortcuts; prefer `ReleaseBuildContext.relatedEntries` from graph. */
   readonly related?: readonly ReleaseSourceRelatedEntry[];
 };
@@ -496,6 +505,19 @@ export function buildReleaseEntityArtifacts(
   const geo: GeoPointFields = buildGeoPointFields(lat, lng, geohashPrecision);
   const notabilityLabels = [...new Set(notabilityBasis.map((basis) => NOTABILITY_RUBRIC[basis.criterion]))];
   const related = resolveRelatedEntries(entry, context);
+  const derivedStatus = deriveCatalogEntityStatus({
+    id: entry.id,
+    kind: entry.kind,
+    displayName: entry.displayName,
+    summary: entry.summary,
+    ...(entry.historicalContext !== undefined ? { historicalContext: entry.historicalContext } : {}),
+    ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
+    ...(entry.claims !== undefined ? { claims: entry.claims } : {}),
+    ...(entry.statusHistory !== undefined ? { statusHistory: entry.statusHistory as never } : {}),
+    ...(entry.status !== undefined ? { status: entry.status } : {}),
+    ...(entry.livingStatus !== undefined ? { livingStatus: entry.livingStatus } : {}),
+  });
+  const publicStatus = derivedStatus.status ?? entry.status;
 
   const projection: ReleaseEntityProjectionFields = {
     id: entry.id,
@@ -516,7 +538,7 @@ export function buildReleaseEntityArtifacts(
     claims,
     jurisdictionLabel: entry.jurisdictionLabel,
     locationLabel,
-    ...(entry.status !== undefined ? { status: entry.status } : {}),
+    ...(publicStatus !== undefined ? { status: publicStatus } : {}),
     ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
     ...(entry.sensitivityClass !== undefined ? { sensitivityClass: entry.sensitivityClass } : {}),
     topicTags: entry.topicTags ?? [],
@@ -545,7 +567,7 @@ export function buildReleaseEntityArtifacts(
     mentionedEntityIds: entry.mentionedEntityIds ?? [],
     keywords: entry.keywords ?? [],
     jurisdictionState: entry.jurisdictionLabel,
-    ...(entry.status !== undefined ? { status: entry.status } : {}),
+    ...(publicStatus !== undefined ? { status: publicStatus } : {}),
     eraBuckets: entry.eraBuckets ?? [],
     notabilityBasis,
     notabilityLabels,

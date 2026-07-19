@@ -16,6 +16,7 @@ import {
 } from '../../lib/map-experience/metadata-hrefs';
 import { ConfidenceMark } from './ConfidenceMark';
 import { KindBadge } from './KindBadge';
+import { StatusMark } from './StatusMark';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source (same note as
 // `@repo/ui`'s own components, e.g. MapExplorer.tsx).
@@ -152,16 +153,20 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         <div className="ds-nc__fact">
           <dt>Status</dt>
           <dd>
-            {statusHref && properties.status ? (
-              <Link
-                className="ds-nc__fact-link"
-                href={statusHref}
-                aria-label={`Search records with status ${properties.status}`}
-              >
-                {properties.status}
-              </Link>
+            {properties.status ? (
+              statusHref ? (
+                <Link
+                  className="ds-nc__fact-link"
+                  href={statusHref}
+                  aria-label={`Search records with status ${properties.status}`}
+                >
+                  <StatusMark status={properties.status} labeled />
+                </Link>
+              ) : (
+                <StatusMark status={properties.status} labeled />
+              )
             ) : (
-              (properties.status ?? '—')
+              '—'
             )}
           </dd>
         </div>

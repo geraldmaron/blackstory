@@ -181,6 +181,11 @@ export type {
   StatuslessEntityKind,
   StatusHistoryEntry,
 } from './entity-status.js';
+export {
+  deriveCatalogEntityStatus,
+  type CatalogStatusSource,
+  type DerivedCatalogStatus,
+} from './derive-catalog-status.js';
 
 export type { MovementFields } from './movement.js';
 

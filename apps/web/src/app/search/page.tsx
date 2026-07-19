@@ -14,7 +14,7 @@
 
 import Link from 'next/link';
 import { EmptyState, ResultList } from '@repo/ui';
-import { KindBadge } from '../../components/map-experience';
+import { KindBadge, StatusMark } from '../../components/map-experience';
 import { getPublicSearchIndex } from '../../lib/public-data/source';
 import { buildSearchPageHref, buildSearchViewModel, type RawSearchParams } from './search-view-model';
 
@@ -146,14 +146,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 meta: (
                   <>
                     <KindBadge kind={result.kind} density="compact" />
-                    {result.status ? (
-                      <span
-                        className={`ds-status-mark ds-status-mark--${result.status}`}
-                        data-status={result.status}
-                      >
-                        {result.status}
-                      </span>
-                    ) : null}
+                    {result.status ? <StatusMark status={result.status} labeled /> : null}
                     <span>Matched: {result.matchedText}</span>
                   </>
                 ),
