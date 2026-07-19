@@ -72,6 +72,42 @@ test('derives the record-level source-lineage rollup from claims when not suppli
   assert.match(html, /3.*independent.*sources/s);
 });
 
+test('uses distinct citation sources when claims lack sourceLineage', () => {
+  const citationOnlyClaims: readonly EvidenceClaimInput[] = CLAIMS.map((claim) => {
+    const { sourceLineage: _omit, ...rest } = claim;
+    return rest;
+  });
+  const html = renderToStaticMarkup(
+    createElement(EntityEvidencePanel, {
+      labelledBy: 'evidence-heading',
+      claims: citationOnlyClaims,
+      researchCoverage: { level: 'partial' },
+    }),
+  );
+  assert.match(html, /<span class="bb-mono">2<\/span> independent sources/s);
+  assert.doesNotMatch(html, /<span class="bb-mono">0<\/span> independent/);
+});
+
+test('does not render independent source lineage when no lineage or citation signal exists', () => {
+  const html = renderToStaticMarkup(
+    createElement(EntityEvidencePanel, {
+      labelledBy: 'evidence-heading',
+      claims: [
+        {
+          id: 'claim_empty_cite',
+          predicate: 'note',
+          object: 'Placeholder',
+          confidenceScore: 0.4,
+          confidenceLevel: 'low',
+          citation: { source: '   ', label: 'Pending' },
+        },
+      ],
+      researchCoverage: { level: 'minimal' },
+    }),
+  );
+  assert.doesNotMatch(html, /independent.*sources/s);
+});
+
 test('renders the approved gap notice, not a bare empty list, when there are no claims', () => {
   const html = renderToStaticMarkup(
     createElement(EntityEvidencePanel, {

@@ -9,7 +9,9 @@ import {
   buildEvidenceCard,
   buildEvidenceCards,
   mostRecentLastCheckedAt,
+  resolveRecordSourceLineage,
   totalSourceLineageCount,
+  uniqueCitationSourceCount,
 } from './build-evidence-card';
 import type { EvidenceClaimInput } from './types';
 
@@ -118,6 +120,45 @@ test('totalSourceLineageCount sums independent lineage counts across cards', () 
     { ...BASE_CLAIM, id: 'c' },
   ]);
   assert.equal(totalSourceLineageCount(cards), 3);
+});
+
+test('uniqueCitationSourceCount counts distinct non-empty citation sources case-insensitively', () => {
+  const cards = buildEvidenceCards([
+    { ...BASE_CLAIM, id: 'a', citation: { source: 'National Archives', label: 'A' } },
+    { ...BASE_CLAIM, id: 'b', citation: { source: ' national archives ', label: 'B' } },
+    { ...BASE_CLAIM, id: 'c', citation: { source: 'Library of Congress', label: 'C' } },
+  ]);
+  assert.equal(uniqueCitationSourceCount(cards), 2);
+});
+
+test('resolveRecordSourceLineage prefers the sum of per-claim lineage counts', () => {
+  const cards = buildEvidenceCards([
+    { ...BASE_CLAIM, id: 'a', sourceLineage: { independentLineageCount: 2 } },
+    { ...BASE_CLAIM, id: 'b', sourceLineage: { independentLineageCount: 1 } },
+  ]);
+  assert.deepEqual(resolveRecordSourceLineage(cards), { independentLineageCount: 3 });
+});
+
+test('resolveRecordSourceLineage falls back to distinct citation sources when lineage is absent', () => {
+  const cards = buildEvidenceCards([
+    { ...BASE_CLAIM, id: 'a', citation: { source: 'Source A', label: 'A' } },
+    { ...BASE_CLAIM, id: 'b', citation: { source: 'Source B', label: 'B' } },
+  ]);
+  assert.deepEqual(resolveRecordSourceLineage(cards), { independentLineageCount: 2 });
+});
+
+test('resolveRecordSourceLineage returns undefined when there is no lineage or citation source signal', () => {
+  const cards = buildEvidenceCards([
+    { ...BASE_CLAIM, id: 'a', citation: { source: '   ', label: 'Empty' } },
+  ]);
+  assert.equal(resolveRecordSourceLineage(cards), undefined);
+});
+
+test('resolveRecordSourceLineage preserves an explicit zero count from the caller', () => {
+  const cards = buildEvidenceCards([BASE_CLAIM]);
+  assert.deepEqual(resolveRecordSourceLineage(cards, { independentLineageCount: 0 }), {
+    independentLineageCount: 0,
+  });
 });
 
 test('mostRecentLastCheckedAt picks the latest date across claim and coverage fields', () => {
