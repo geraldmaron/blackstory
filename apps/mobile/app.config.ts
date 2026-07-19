@@ -46,6 +46,31 @@ const APP_NAMES: Record<AppVariant, string> = {
 const bundleIdentifier = BUNDLE_IDS[APP_VARIANT];
 const appName = APP_NAMES[APP_VARIANT];
 
+// --- App Check / Firebase native config (MOB-010) ----------------------------
+//
+// No real Firebase iOS/Android app is registered yet and NO
+// GoogleService-Info.plist / google-services.json is committed (a human
+// gate — see mobile-identity.md gates #1/#3 and README "Firebase config —
+// intentionally not committed"). The `@react-native-firebase/app` config
+// plugin THROWS at `expo prebuild` if it is enabled without a real config
+// file present, so the plugins are wired into a SLOT that activates only once
+// the file paths are supplied via env (set per-EAS-profile once the gate
+// clears). Until then, `expo prebuild` runs cleanly with App Check absent and
+// the client degrades gracefully (see src/security/app-check.ts). Do NOT
+// fabricate a placeholder credential file to "turn this on".
+const GOOGLE_SERVICES_INFO_PLIST = process.env.GOOGLE_SERVICES_INFO_PLIST;
+const GOOGLE_SERVICES_JSON = process.env.GOOGLE_SERVICES_JSON;
+const firebaseConfigPresent = Boolean(
+  GOOGLE_SERVICES_INFO_PLIST && GOOGLE_SERVICES_JSON,
+);
+
+// App Check enforcement STAGE (MOB-010; ADR-020 §3 monitor→enforce rollout).
+// Deliberately defaults to `monitor` — never hardcode `enforce`. Promotion is
+// an explicit operational cutover (see src/security/README.md), overridable
+// per-build via APP_CHECK_ENFORCEMENT_MODE but never to `enforce` by default.
+const APP_CHECK_ENFORCEMENT_MODE =
+  process.env.APP_CHECK_ENFORCEMENT_MODE === 'enforce' ? 'enforce' : 'monitor';
+
 const config: ExpoConfig = {
   name: appName,
   // EAS project slug placeholder — no Expo/EAS organization has been
@@ -77,11 +102,17 @@ const config: ExpoConfig = {
     deploymentTarget: '16.4',
     bundleIdentifier,
     icon: './assets/expo.icon',
-    // TODO(MOB-010): once real Firebase iOS apps exist for each bundle id
-    // (a human gate — see mobile-identity.md gates #1/#3), wire
-    // GoogleService-Info.plist via a config plugin (e.g.
-    // `@react-native-firebase/app`'s plugin) keyed by APP_VARIANT. No
-    // Firebase config file is committed by this bead; do not fabricate one.
+    // MOB-010: the `@react-native-firebase/app` config plugin (added to
+    // `plugins` below, gated on `firebaseConfigPresent`) copies this file
+    // into the native project. Keyed by APP_VARIANT via the env var, which
+    // EAS sets per-profile to the correct dev/preview/prod plist once the
+    // Firebase apps are registered (mobile-identity.md gates #1/#3). No
+    // Firebase config file is committed by this bead; do not fabricate one —
+    // when the env var is unset (today) the plugin is not added and prebuild
+    // runs cleanly with App Check absent.
+    ...(GOOGLE_SERVICES_INFO_PLIST
+      ? { googleServicesFile: GOOGLE_SERVICES_INFO_PLIST }
+      : {}),
     //
     // Universal Links (MOB-008, mobile-identity.md's URL-scheme section, threat-model T4
     // "Universal-link domain binding"): declares this app as the handler for
@@ -105,8 +136,11 @@ const config: ExpoConfig = {
       monochromeImage: './assets/images/android-icon-monochrome.png',
     },
     predictiveBackGestureEnabled: false,
-    // TODO(MOB-010): wire google-services.json via a config plugin per
-    // APP_VARIANT once real Firebase Android apps exist. Not committed here.
+    // MOB-010: `@react-native-firebase/app` plugin (gated on
+    // `firebaseConfigPresent` below) copies this google-services.json into the
+    // Android project, keyed by APP_VARIANT via the env var. Not committed
+    // here; the plugin is skipped entirely when the env var is unset (today).
+    ...(GOOGLE_SERVICES_JSON ? { googleServicesFile: GOOGLE_SERVICES_JSON } : {}),
     //
     // Android App Links (MOB-008), the Android analogue of iOS associatedDomains above:
     // autoVerify asks Android to verify this app against the real assetlinks.json served
@@ -149,8 +183,33 @@ const config: ExpoConfig = {
         android: {
           minSdkVersion: 26,
         },
+        ios: {
+          // MOB-010 / ADR-020 §"USE_FRAMEWORKS=static": React Native Firebase
+          // (App Check) REQUIRES static frameworks linkage, and the ADR-020
+          // spike proved `pod install` succeeds with `USE_FRAMEWORKS=static`.
+          // Carrying it forward here (the CNG source of truth) makes every
+          // `expo prebuild` emit `ios.useFrameworks=static` into
+          // Podfile.properties.json so the App Check pods link correctly when
+          // the Firebase config gate clears.
+          useFrameworks: 'static',
+        },
       },
     ],
+    // MOB-010: App Check attestation plugins (ADR-020 §3 — App Attest /
+    // DeviceCheck on iOS, Play Integrity on Android; NOT the web reCAPTCHA
+    // provider). Wired into a SLOT that activates only when real Firebase
+    // config files are supplied via env (`firebaseConfigPresent`). The
+    // `@react-native-firebase/app` plugin throws at prebuild without a real
+    // config file, so it is intentionally absent until the human gate clears.
+    // The App Check native module itself is autolinked from package.json
+    // regardless; these plugins only wire the AppDelegate init + config-file
+    // copy that need a registered Firebase app to be meaningful.
+    ...(firebaseConfigPresent
+      ? [
+          '@react-native-firebase/app',
+          '@react-native-firebase/app-check',
+        ]
+      : []),
   ],
   experiments: {
     typedRoutes: true,
@@ -158,6 +217,10 @@ const config: ExpoConfig = {
   },
   extra: {
     appVariant: APP_VARIANT,
+    // App Check enforcement stage read at runtime by src/security/bootstrap.ts
+    // (client-advisory only; server stays authoritative). Defaults to
+    // `monitor` — see the cutover runbook in src/security/README.md.
+    appCheckEnforcementMode: APP_CHECK_ENFORCEMENT_MODE,
     // No `eas.projectId` yet — no EAS organization/project is provisioned
     // (mobile-identity.md human gate #3). Added by `eas init` once that
     // gate clears; do not hand-write a fake project id here.
