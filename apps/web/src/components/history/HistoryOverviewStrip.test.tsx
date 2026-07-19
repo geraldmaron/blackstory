@@ -31,6 +31,7 @@ test('HistoryOverviewStrip renders stats and kind bars with aria labels', () => 
   assert.match(html, />8</);
   assert.match(html, /Kind composition/);
   assert.match(html, /Place: 7 records/);
+  assert.match(html, /ds-legend-glyph--circle/);
   assert.match(html, /Decade density/);
   assert.match(html, /1950s: 10 records/);
   assert.match(html, /ds-history-overview__density-bar--active/);

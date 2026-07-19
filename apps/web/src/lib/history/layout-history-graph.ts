@@ -1,45 +1,73 @@
 /**
- * Deterministic kind-clustered layout for the `/history` graph SVG. Caps node count,
- * filters edges to the laid-out set, and uses a seeded PRNG so identical inputs always
- * produce identical coordinates.
+ * Adaptive layout for the `/history` relationship graph. Chooses a readable mode by
+ * data volume — kind aggregation at catalog scale, ego-neighborhood when a record is
+ * selected, and a sparse record graph only when the filtered set is small — so the
+ * viz never dumps a labeled hairball. Positions are deterministic for identical inputs.
  */
+import {
+  displayEncodingFor,
+  kindEncodingFor,
+  mapToneFromTopics,
+  type MapEntityGlyph,
+} from '../map-experience/kind-encoding';
 import type { HistoryEdgeView, HistoryNodeView } from './build-history-graph';
+
+/** Max records before the viz collapses to kind hubs (explore-scale density). */
+export const HISTORY_RECORD_GRAPH_MAX = 24;
+
+/** Cap on ego-neighborhood satellites around a selected record. */
+export const HISTORY_NEIGHBORHOOD_MAX = 18;
+
+export type HistoryGraphLayoutMode = 'aggregate' | 'records' | 'neighborhood';
 
 export type LayoutHistoryGraphOptions = {
   readonly width: number;
   readonly height: number;
   readonly seed?: number;
-  readonly maxNodes?: number;
+  readonly selectedId?: string;
+  /** Override adaptive threshold (tests). */
+  readonly recordGraphMax?: number;
+  readonly neighborhoodMax?: number;
 };
 
 export type LayoutHistoryGraphNode = {
-  readonly entityId: string;
-  readonly displayName: string;
+  /** Entity id, or `kind:<kind>` for aggregate hubs. */
+  readonly id: string;
   readonly kind: string;
-  readonly statusLabel: string;
+  readonly label: string;
+  readonly shade: string;
+  readonly glyph: MapEntityGlyph;
+  readonly role: 'record' | 'kind-hub';
   readonly connectionCount: number;
+  /** Present on kind hubs and used for sizing. */
+  readonly recordCount?: number;
+  readonly statusLabel?: string;
+  readonly entityId?: string;
   readonly x: number;
   readonly y: number;
+  readonly r: number;
 };
 
 export type LayoutHistoryGraphEdge = {
-  readonly edgeId: string;
-  readonly fromEntityId: string;
-  readonly toEntityId: string;
-  readonly sentence: string;
-  readonly evidenceCount: number;
+  readonly id: string;
+  readonly fromId: string;
+  readonly toId: string;
+  /** Edge weight (1 for record edges; inter-kind count for aggregate). */
+  readonly weight: number;
+  readonly sentence?: string;
+  readonly evidenceCount?: number;
+  readonly edgeId?: string;
 };
 
 export type LayoutHistoryGraphResult = {
+  readonly mode: HistoryGraphLayoutMode;
   readonly truncated: boolean;
   readonly totalNodeCount: number;
   readonly layoutNodes: readonly LayoutHistoryGraphNode[];
   readonly layoutEdges: readonly LayoutHistoryGraphEdge[];
+  readonly modeNotice: string;
 };
 
-const DEFAULT_MAX_NODES = 80;
-
-/** Mulberry32 — fast, deterministic 32-bit PRNG. */
 function createSeededRandom(seed: number): () => number {
   let state = seed >>> 0;
   return () => {
@@ -51,98 +79,305 @@ function createSeededRandom(seed: number): () => number {
   };
 }
 
-function compareNodesForTruncation(a: HistoryNodeView, b: HistoryNodeView): number {
-  if (b.connectionCount !== a.connectionCount) {
-    return b.connectionCount - a.connectionCount;
-  }
-  return a.displayName.localeCompare(b.displayName);
-}
-
-type SimNode = {
-  readonly entityId: string;
-  readonly displayName: string;
-  readonly kind: string;
-  readonly statusLabel: string;
-  readonly connectionCount: number;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  clusterX: number;
-  clusterY: number;
-};
-
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-function runForceLayout(
-  simNodes: SimNode[],
-  edgePairs: ReadonlyArray<readonly [string, string]>,
+function encodingForNode(node: HistoryNodeView) {
+  const tone = mapToneFromTopics(node.topicTags);
+  return displayEncodingFor(node.kind, tone);
+}
+
+function encodingForKind(kind: string) {
+  return kindEncodingFor(kind);
+}
+
+function hubRadius(count: number, maxCount: number): number {
+  const minR = 18;
+  const maxR = 36;
+  if (maxCount <= 0) return minR;
+  return minR + Math.round((count / maxCount) * (maxR - minR));
+}
+
+function recordRadius(connectionCount: number): number {
+  return clamp(8 + Math.min(connectionCount, 6), 8, 14);
+}
+
+export function resolveHistoryGraphMode(
+  nodeCount: number,
+  selectedId: string | undefined,
+  selectedInView: boolean,
+  recordGraphMax: number = HISTORY_RECORD_GRAPH_MAX,
+): HistoryGraphLayoutMode {
+  if (selectedId && selectedInView) return 'neighborhood';
+  if (nodeCount <= recordGraphMax) return 'records';
+  return 'aggregate';
+}
+
+function layoutAggregate(
+  nodes: readonly HistoryNodeView[],
+  edges: readonly HistoryEdgeView[],
   width: number,
   height: number,
-  random: () => number,
-): void {
-  const padding = 28;
-  const minX = padding;
-  const maxX = width - padding;
-  const minY = padding;
-  const maxY = height - padding;
-  const nodeById = new Map(simNodes.map((node) => [node.entityId, node]));
-
-  for (let iteration = 0; iteration < 48; iteration += 1) {
-    const cooling = 1 - iteration / 48;
-
-    for (let i = 0; i < simNodes.length; i += 1) {
-      for (let j = i + 1; j < simNodes.length; j += 1) {
-        const a = simNodes[i]!;
-        const b = simNodes[j]!;
-        let dx = b.x - a.x;
-        let dy = b.y - a.y;
-        const distSq = dx * dx + dy * dy + 0.01;
-        const dist = Math.sqrt(distSq);
-        const minDist = 22;
-        if (dist < minDist) {
-          const force = ((minDist - dist) / dist) * 0.35 * cooling;
-          dx *= force;
-          dy *= force;
-          a.vx -= dx;
-          a.vy -= dy;
-          b.vx += dx;
-          b.vy += dy;
-        }
-      }
-    }
-
-    for (const [fromId, toId] of edgePairs) {
-      const from = nodeById.get(fromId);
-      const to = nodeById.get(toId);
-      if (!from || !to) continue;
-      let dx = to.x - from.x;
-      let dy = to.y - from.y;
-      const dist = Math.sqrt(dx * dx + dy * dy + 0.01);
-      const target = 56;
-      const force = ((dist - target) / dist) * 0.04 * cooling;
-      dx *= force;
-      dy *= force;
-      from.vx += dx;
-      from.vy += dy;
-      to.vx -= dx;
-      to.vy -= dy;
-    }
-
-    for (const node of simNodes) {
-      const clusterPull = 0.012 * cooling;
-      node.vx += (node.clusterX - node.x) * clusterPull;
-      node.vy += (node.clusterY - node.y) * clusterPull;
-      node.vx += (random() - 0.5) * 0.02 * cooling;
-      node.vy += (random() - 0.5) * 0.02 * cooling;
-      node.vx *= 0.82;
-      node.vy *= 0.82;
-      node.x = clamp(node.x + node.vx, minX, maxX);
-      node.y = clamp(node.y + node.vy, minY, maxY);
-    }
+): Omit<LayoutHistoryGraphResult, 'totalNodeCount'> {
+  const kindCounts = new Map<string, number>();
+  for (const node of nodes) {
+    kindCounts.set(node.kind, (kindCounts.get(node.kind) ?? 0) + 1);
   }
+
+  const kinds = [...kindCounts.keys()].sort((a, b) => a.localeCompare(b));
+  const maxCount = Math.max(...kindCounts.values(), 1);
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const ring = Math.min(width, height) * 0.28;
+
+  const layoutNodes: LayoutHistoryGraphNode[] = kinds.map((kind, index) => {
+    const encoding = encodingForKind(kind);
+    const count = kindCounts.get(kind) ?? 0;
+    const angle = kinds.length === 1 ? -Math.PI / 2 : (index / kinds.length) * Math.PI * 2 - Math.PI / 2;
+    return {
+      id: `kind:${kind}`,
+      kind,
+      label: encoding.label,
+      shade: encoding.shade,
+      glyph: encoding.glyph,
+      role: 'kind-hub' as const,
+      connectionCount: 0,
+      recordCount: count,
+      x: centerX + Math.cos(angle) * ring,
+      y: centerY + Math.sin(angle) * ring,
+      r: hubRadius(count, maxCount),
+    };
+  });
+
+  const nodeKindById = new Map(nodes.map((node) => [node.entityId, node.kind]));
+  const interKind = new Map<string, number>();
+  for (const edge of edges) {
+    const fromKind = nodeKindById.get(edge.fromEntityId);
+    const toKind = nodeKindById.get(edge.toEntityId);
+    if (!fromKind || !toKind || fromKind === toKind) continue;
+    const [a, b] = fromKind < toKind ? [fromKind, toKind] : [toKind, fromKind];
+    const key = `${a}|${b}`;
+    interKind.set(key, (interKind.get(key) ?? 0) + 1);
+  }
+
+  const layoutEdges: LayoutHistoryGraphEdge[] = [...interKind.entries()].map(([key, weight]) => {
+    const [fromKind, toKind] = key.split('|') as [string, string];
+    return {
+      id: `kind-edge:${key}`,
+      fromId: `kind:${fromKind}`,
+      toId: `kind:${toKind}`,
+      weight,
+    };
+  });
+
+  // Attach hub connection counts from inter-kind weights.
+  const hubDegree = new Map<string, number>();
+  for (const edge of layoutEdges) {
+    hubDegree.set(edge.fromId, (hubDegree.get(edge.fromId) ?? 0) + edge.weight);
+    hubDegree.set(edge.toId, (hubDegree.get(edge.toId) ?? 0) + edge.weight);
+  }
+
+  const withDegrees = layoutNodes.map((node) => ({
+    ...node,
+    connectionCount: hubDegree.get(node.id) ?? 0,
+  }));
+
+  return {
+    mode: 'aggregate',
+    truncated: false,
+    layoutNodes: withDegrees,
+    layoutEdges,
+    modeNotice:
+      'Grouped by kind — select a kind to filter, or open a record from the list to focus its connections.',
+  };
+}
+
+function layoutNeighborhood(
+  nodes: readonly HistoryNodeView[],
+  edges: readonly HistoryEdgeView[],
+  selectedId: string,
+  width: number,
+  height: number,
+  neighborhoodMax: number,
+  random: () => number,
+): Omit<LayoutHistoryGraphResult, 'totalNodeCount'> {
+  const byId = new Map(nodes.map((node) => [node.entityId, node]));
+  const selected = byId.get(selectedId);
+  if (!selected) {
+    return layoutRecords(nodes, edges, width, height, neighborhoodMax, random);
+  }
+
+  const neighborIds = new Set<string>();
+  const touchingEdges: HistoryEdgeView[] = [];
+  for (const edge of edges) {
+    const otherId =
+      edge.fromEntityId === selectedId
+        ? edge.toEntityId
+        : edge.toEntityId === selectedId
+          ? edge.fromEntityId
+          : undefined;
+    if (!otherId || !byId.has(otherId)) continue;
+    neighborIds.add(otherId);
+    touchingEdges.push(edge);
+  }
+
+  const neighbors = [...neighborIds]
+    .map((id) => byId.get(id))
+    .filter((node): node is HistoryNodeView => node !== undefined)
+    .sort((a, b) => b.connectionCount - a.connectionCount || a.displayName.localeCompare(b.displayName))
+    .slice(0, neighborhoodMax);
+
+  const truncated = neighborIds.size > neighbors.length;
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const selectedEncoding = encodingForNode(selected);
+
+  const layoutNodes: LayoutHistoryGraphNode[] = [
+    {
+      id: selected.entityId,
+      entityId: selected.entityId,
+      kind: selected.kind,
+      label: selected.displayName,
+      shade: selectedEncoding.shade,
+      glyph: selectedEncoding.glyph,
+      role: 'record',
+      connectionCount: selected.connectionCount,
+      statusLabel: selected.statusLabel,
+      x: centerX,
+      y: centerY,
+      r: recordRadius(selected.connectionCount) + 4,
+    },
+  ];
+
+  const ring = Math.min(width, height) * 0.34;
+  neighbors.forEach((node, index) => {
+    const encoding = encodingForNode(node);
+    const angle =
+      neighbors.length === 1
+        ? -Math.PI / 2
+        : (index / neighbors.length) * Math.PI * 2 - Math.PI / 2;
+    const jitter = (random() - 0.5) * 6;
+    layoutNodes.push({
+      id: node.entityId,
+      entityId: node.entityId,
+      kind: node.kind,
+      label: node.displayName,
+      shade: encoding.shade,
+      glyph: encoding.glyph,
+      role: 'record',
+      connectionCount: node.connectionCount,
+      statusLabel: node.statusLabel,
+      x: centerX + Math.cos(angle) * ring + jitter,
+      y: centerY + Math.sin(angle) * ring + jitter,
+      r: recordRadius(node.connectionCount),
+    });
+  });
+
+  const visible = new Set(layoutNodes.map((node) => node.id));
+  const layoutEdges: LayoutHistoryGraphEdge[] = touchingEdges
+    .filter((edge) => visible.has(edge.fromEntityId) && visible.has(edge.toEntityId))
+    .map((edge) => ({
+      id: edge.edgeId,
+      edgeId: edge.edgeId,
+      fromId: edge.fromEntityId,
+      toId: edge.toEntityId,
+      weight: 1,
+      sentence: edge.sentence,
+      evidenceCount: edge.evidenceCount,
+    }));
+
+  return {
+    mode: 'neighborhood',
+    truncated,
+    layoutNodes,
+    layoutEdges,
+    modeNotice: truncated
+      ? `Showing the closest connections for this record (${neighbors.length} of ${neighborIds.size}).`
+      : neighbors.length === 0
+        ? 'This record has no published connections in the current view.'
+        : 'Focused on this record and its published connections.',
+  };
+}
+
+function layoutRecords(
+  nodes: readonly HistoryNodeView[],
+  edges: readonly HistoryEdgeView[],
+  width: number,
+  height: number,
+  maxNodes: number,
+  random: () => number,
+): Omit<LayoutHistoryGraphResult, 'totalNodeCount'> {
+  const truncated = nodes.length > maxNodes;
+  const selectedNodes = truncated
+    ? [...nodes]
+        .sort(
+          (a, b) =>
+            b.connectionCount - a.connectionCount || a.displayName.localeCompare(b.displayName),
+        )
+        .slice(0, maxNodes)
+    : [...nodes];
+
+  const kinds = [...new Set(selectedNodes.map((node) => node.kind))].sort((a, b) =>
+    a.localeCompare(b),
+  );
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const clusterRadius = Math.min(width, height) * (kinds.length <= 2 ? 0.22 : 0.3);
+
+  const layoutNodes: LayoutHistoryGraphNode[] = [];
+  kinds.forEach((kind, kindIndex) => {
+    const kindNodes = selectedNodes.filter((node) => node.kind === kind);
+    const clusterAngle =
+      kinds.length === 1 ? -Math.PI / 2 : (kindIndex / kinds.length) * Math.PI * 2 - Math.PI / 2;
+    const clusterX = centerX + Math.cos(clusterAngle) * clusterRadius;
+    const clusterY = centerY + Math.sin(clusterAngle) * clusterRadius;
+    const innerRadius = Math.min(28 + kindNodes.length * 6, clusterRadius * 0.7);
+
+    kindNodes.forEach((node, nodeIndex) => {
+      const encoding = encodingForNode(node);
+      const nodeAngle =
+        kindNodes.length === 1 ? clusterAngle + Math.PI : (nodeIndex / kindNodes.length) * Math.PI * 2;
+      const jitter = (random() - 0.5) * 10;
+      layoutNodes.push({
+        id: node.entityId,
+        entityId: node.entityId,
+        kind: node.kind,
+        label: node.displayName,
+        shade: encoding.shade,
+        glyph: encoding.glyph,
+        role: 'record',
+        connectionCount: node.connectionCount,
+        statusLabel: node.statusLabel,
+        x: clamp(clusterX + Math.cos(nodeAngle) * innerRadius + jitter, 36, width - 36),
+        y: clamp(clusterY + Math.sin(nodeAngle) * innerRadius + jitter, 36, height - 36),
+        r: recordRadius(node.connectionCount),
+      });
+    });
+  });
+
+  const visible = new Set(layoutNodes.map((node) => node.id));
+  const layoutEdges: LayoutHistoryGraphEdge[] = edges
+    .filter((edge) => visible.has(edge.fromEntityId) && visible.has(edge.toEntityId))
+    .map((edge) => ({
+      id: edge.edgeId,
+      edgeId: edge.edgeId,
+      fromId: edge.fromEntityId,
+      toId: edge.toEntityId,
+      weight: 1,
+      sentence: edge.sentence,
+      evidenceCount: edge.evidenceCount,
+    }));
+
+  return {
+    mode: 'records',
+    truncated,
+    layoutNodes,
+    layoutEdges,
+    modeNotice: truncated
+      ? `Showing the most connected records (${layoutNodes.length} of ${nodes.length}). Narrow filters for the full set.`
+      : 'Records in this view and their published connections.',
+  };
 }
 
 export function layoutHistoryGraph(
@@ -150,90 +385,27 @@ export function layoutHistoryGraph(
   edges: readonly HistoryEdgeView[],
   options: LayoutHistoryGraphOptions,
 ): LayoutHistoryGraphResult {
-  const { width, height, seed = 1, maxNodes = DEFAULT_MAX_NODES } = options;
-  const totalNodeCount = nodes.length;
-  const truncated = totalNodeCount > maxNodes;
+  const {
+    width,
+    height,
+    seed = 1,
+    selectedId,
+    recordGraphMax = HISTORY_RECORD_GRAPH_MAX,
+    neighborhoodMax = HISTORY_NEIGHBORHOOD_MAX,
+  } = options;
   const random = createSeededRandom(seed);
+  const selectedInView = Boolean(selectedId && nodes.some((node) => node.entityId === selectedId));
+  const mode = resolveHistoryGraphMode(nodes.length, selectedId, selectedInView, recordGraphMax);
 
-  const selectedNodes = truncated
-    ? [...nodes].sort(compareNodesForTruncation).slice(0, maxNodes)
-    : [...nodes];
-
-  const visibleIds = new Set(selectedNodes.map((node) => node.entityId));
-
-  const kinds = [...new Set(selectedNodes.map((node) => node.kind))].sort((a, b) => a.localeCompare(b));
-  const nodesByKind = new Map<string, HistoryNodeView[]>();
-  for (const node of selectedNodes) {
-    const bucket = nodesByKind.get(node.kind) ?? [];
-    bucket.push(node);
-    nodesByKind.set(node.kind, bucket);
-  }
-
-  const centerX = width / 2;
-  const centerY = height / 2;
-  const clusterRadius = Math.min(width, height) * 0.32;
-  const simNodes: SimNode[] = [];
-
-  kinds.forEach((kind, kindIndex) => {
-    const kindNodes = nodesByKind.get(kind) ?? [];
-    const clusterAngle = (kindIndex / kinds.length) * Math.PI * 2 - Math.PI / 2;
-    const clusterX = centerX + Math.cos(clusterAngle) * clusterRadius;
-    const clusterY = centerY + Math.sin(clusterAngle) * clusterRadius;
-    const innerRadius = Math.min(36 + kindNodes.length * 4, clusterRadius * 0.55);
-
-    kindNodes.forEach((node, nodeIndex) => {
-      const nodeAngle =
-        kindNodes.length === 1
-          ? clusterAngle + Math.PI
-          : (nodeIndex / kindNodes.length) * Math.PI * 2;
-      const jitter = (random() - 0.5) * 8;
-      simNodes.push({
-        entityId: node.entityId,
-        displayName: node.displayName,
-        kind: node.kind,
-        statusLabel: node.statusLabel,
-        connectionCount: node.connectionCount,
-        x: clusterX + Math.cos(nodeAngle) * innerRadius + jitter,
-        y: clusterY + Math.sin(nodeAngle) * innerRadius + jitter,
-        vx: 0,
-        vy: 0,
-        clusterX,
-        clusterY,
-      });
-    });
-  });
-
-  const edgePairs: Array<[string, string]> = [];
-  const layoutEdges: LayoutHistoryGraphEdge[] = [];
-
-  for (const edge of edges) {
-    if (!visibleIds.has(edge.fromEntityId) || !visibleIds.has(edge.toEntityId)) continue;
-    edgePairs.push([edge.fromEntityId, edge.toEntityId]);
-    layoutEdges.push({
-      edgeId: edge.edgeId,
-      fromEntityId: edge.fromEntityId,
-      toEntityId: edge.toEntityId,
-      sentence: edge.sentence,
-      evidenceCount: edge.evidenceCount,
-    });
-  }
-
-  runForceLayout(simNodes, edgePairs, width, height, random);
-
-  const layoutNodes: LayoutHistoryGraphNode[] = simNodes.map((node) => ({
-    entityId: node.entityId,
-    displayName: node.displayName,
-    kind: node.kind,
-    statusLabel: node.statusLabel,
-    connectionCount: node.connectionCount,
-    x: node.x,
-    y: node.y,
-  }));
+  const core =
+    mode === 'aggregate'
+      ? layoutAggregate(nodes, edges, width, height)
+      : mode === 'neighborhood' && selectedId
+        ? layoutNeighborhood(nodes, edges, selectedId, width, height, neighborhoodMax, random)
+        : layoutRecords(nodes, edges, width, height, recordGraphMax, random);
 
   return {
-    truncated,
-    totalNodeCount,
-    layoutNodes,
-    layoutEdges,
+    ...core,
+    totalNodeCount: nodes.length,
   };
 }

@@ -414,6 +414,12 @@
   min-width: 0;
 }
 
+.ds-history-graph-viz__mode {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--ds-ink-subtle);
+}
+
 .ds-history-graph-viz__truncation {
   margin: 0;
   font-size: 0.75rem;
@@ -426,6 +432,7 @@
   max-width: 100%;
   min-width: 0;
   height: auto;
+  aspect-ratio: 16 / 9;
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   background: var(--ds-surface);
@@ -439,7 +446,6 @@
 
 .ds-history-graph-viz__edge-line--selected {
   stroke: var(--ds-accent-graphic);
-  stroke-width: 2.5;
 }
 
 .ds-history-graph-viz__edge-hit {
@@ -454,31 +460,26 @@
   outline-offset: 2px;
 }
 
-.ds-history-graph-viz__node-shape,
-.ds-history-graph-viz__node-core {
-  fill: var(--ds-ink);
-  stroke: var(--ds-border-strong);
+.ds-history-graph-viz__node-shape {
   stroke-width: 1.5;
   pointer-events: none;
 }
 
-.ds-history-graph-viz__node-shape--selected,
-.ds-history-graph-viz__node--selected .ds-history-graph-viz__node-core {
-  stroke: var(--ds-accent-graphic);
+.ds-history-graph-viz__node-shape--selected {
   stroke-width: 2.5;
 }
 
-.ds-history-graph-viz__node--selected .ds-history-graph-viz__node-shape {
-  filter: none;
+.ds-history-graph-viz__node-core {
+  pointer-events: none;
 }
 
-.ds-history-graph-viz__node-hit,
+.ds-history-graph-viz__selection-ring {
+  pointer-events: none;
+}
+
 .ds-history-graph-viz__node-focus {
   fill: transparent;
   stroke: none;
-}
-
-.ds-history-graph-viz__node-focus {
   cursor: pointer;
 }
 
@@ -490,19 +491,29 @@
 .ds-history-graph-viz__node-label {
   font-family: var(--ds-font-sans);
   font-size: 0.6875rem;
+  font-weight: 500;
   fill: var(--ds-ink);
   pointer-events: none;
 }
 
-.ds-history-graph-viz__node-name {
-  font-weight: 500;
+.ds-history-graph-viz__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
-.ds-history-graph-viz__node-kind {
-  font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
-  fill: var(--ds-ink-subtle);
-  text-transform: lowercase;
+.ds-history-graph-viz__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
 }
 
 /* Overview strip — record/connection stats, kind bars, decade density */
@@ -591,10 +602,19 @@
 
 .ds-history-overview__kind-label {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: var(--ds-space-2);
   font-family: var(--ds-font-sans);
   font-size: 0.8125rem;
+  min-width: 0;
+}
+
+.ds-history-overview__kind-label-main {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  min-width: 0;
 }
 
 .ds-history-overview__kind-count {
@@ -617,7 +637,7 @@
 .ds-history-overview__kind-bar-fill {
   display: block;
   height: 100%;
-  background: var(--ds-ink);
+  /* Fill color set inline from kindEncodingFor shade — same map vocabulary. */
   border-radius: var(--ds-radius-sm);
 }
 
@@ -708,6 +728,9 @@
 
 .ds-history-kind-chips__chip {
   appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
   margin: 0;
   padding: var(--ds-space-1) var(--ds-space-2);
   border: 0;
@@ -721,6 +744,11 @@
   transition:
     color var(--ds-duration-fast) var(--ds-easing),
     border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-history-kind-chips__glyph {
+  width: 0.625rem;
+  height: 0.625rem;
 }
 
 .ds-history-kind-chips__chip:hover {

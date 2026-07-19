@@ -272,10 +272,12 @@ view).
 **`/search`, `/facts`, `/legal`** — document rhythm: mast, filter row (native controls,
 compact), result list as top-rule entries with mono meta lines. Pagination quiet buttons.
 
-**`/history`** — mast + decade scrubber + SVG relationship graph (nodes/edges) with
-  synchronized list peer, overview strip (counts, kind composition, decade density), and
-  richer facets (kind chips, status, topic, connections). Same instrument language as
-explore.
+**`/history`** — mast + decade scrubber + adaptive relationship graph that shares
+  explore’s kind shade+glyph vocabulary: kind hubs at catalog scale, ego-neighborhood
+  when a record is selected, sparse record graph only after filters shrink the set.
+  Synchronized list peer, overview strip (counts, kind composition with the same
+  shades, decade density), and richer facets (kind chips, status, topic, connections).
+  Same instrument language as explore.
 
 **Longform (`/methodology`, `/about`, `/myths/[slug]`, `/legal/[slug]`)** — single serif
 column (`--ds-content-max`), numbered Sora subheads, mono citations. No cards.

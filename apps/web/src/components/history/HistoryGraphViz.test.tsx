@@ -1,11 +1,13 @@
 /**
- * SSR markup smoke tests for the history graph SVG visualization and panel empty states.
+ * SSR markup smoke tests for the adaptive history graph SVG and panel empty states.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import type { HistoryEdgeView, HistoryNodeView } from '../../lib/history/build-history-graph';
+import { HISTORY_RECORD_GRAPH_MAX } from '../../lib/history/layout-history-graph';
+import { kindEncodingFor } from '../../lib/map-experience/kind-encoding';
 import { HistoryGraphPanel } from './HistoryGraphPanel';
 import { HistoryGraphViz } from './HistoryGraphViz';
 
@@ -36,20 +38,79 @@ const sampleEdge: HistoryEdgeView = {
   sentence: 'Paul Laurence Dunbar High School is located at Washington, D.C.',
 };
 
-test('HistoryGraphViz renders SVG nodes with accessible labels', () => {
+function makeNode(
+  entityId: string,
+  kind: string,
+  connectionCount: number,
+): HistoryNodeView {
+  return {
+    ...sampleNode,
+    entityId,
+    displayName: entityId,
+    kind,
+    connectionCount,
+    href: `/entity/${entityId}`,
+    factLinks: [],
+  };
+}
+
+test('HistoryGraphViz renders SVG nodes with kind shade encoding', () => {
   const html = renderToStaticMarkup(
     createElement(HistoryGraphViz, {
       nodes: [sampleNode],
+      edges: [],
+      onSelectNode: () => {},
+    }),
+  );
+
+  const schoolShade = kindEncodingFor('school').shade;
+  assert.match(html, /<svg/);
+  assert.match(html, /aria-label="Paul Laurence Dunbar High School, school, Historic"/);
+  assert.match(html, new RegExp(schoolShade.replace('#', '\\#')));
+  assert.match(html, /data-mode="records"/);
+  assert.match(html, />School</);
+});
+
+test('HistoryGraphViz focuses neighborhood when a record is selected', () => {
+  const place: HistoryNodeView = {
+    ...sampleNode,
+    entityId: 'ent_dc_place_001',
+    displayName: 'Washington, D.C.',
+    kind: 'place',
+    connectionCount: 1,
+    href: '/entity/ent_dc_place_001',
+    factLinks: [],
+  };
+  const html = renderToStaticMarkup(
+    createElement(HistoryGraphViz, {
+      nodes: [sampleNode, place],
       edges: [sampleEdge],
       selectedId: sampleNode.entityId,
       onSelectNode: () => {},
     }),
   );
 
-  assert.match(html, /<svg/);
-  assert.match(html, /aria-label="Paul Laurence Dunbar High School, school, Historic"/);
+  assert.match(html, /data-mode="neighborhood"/);
+  assert.match(html, /Focused on this record/);
   assert.match(html, /ds-history-graph-viz__node--selected/);
-  assert.match(html, /school/);
+});
+
+test('HistoryGraphViz aggregates large sets into kind hubs', () => {
+  const nodes = Array.from({ length: HISTORY_RECORD_GRAPH_MAX + 3 }, (_, index) =>
+    makeNode(`n${index}`, index % 2 === 0 ? 'school' : 'place', 1),
+  );
+  const html = renderToStaticMarkup(
+    createElement(HistoryGraphViz, {
+      nodes,
+      edges: [],
+      onSelectKind: () => {},
+    }),
+  );
+
+  assert.match(html, /data-mode="aggregate"/);
+  assert.match(html, /Grouped by kind/);
+  assert.match(html, /Kind color key/);
+  assert.match(html, /School kind/);
 });
 
 test('HistoryGraphPanel keeps sparse-decade empty state', () => {

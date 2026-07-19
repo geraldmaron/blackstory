@@ -20,6 +20,7 @@ export type HistoryGraphPanelProps = {
   readonly sparseDecade: boolean;
   readonly onSelectNode?: (entityId: string) => void;
   readonly onSelectEdge?: (edgeId: string) => void;
+  readonly onSelectKind?: (kind: string) => void;
   readonly labelledBy?: string;
   readonly className?: string;
 };
@@ -36,6 +37,7 @@ export function HistoryGraphPanel({
   sparseDecade,
   onSelectNode,
   onSelectEdge,
+  onSelectKind,
   labelledBy,
   className,
 }: HistoryGraphPanelProps) {
@@ -65,6 +67,7 @@ export function HistoryGraphPanel({
         {...(selectedEdgeId ? { selectedEdgeId } : {})}
         {...(onSelectNode ? { onSelectNode } : {})}
         {...(onSelectEdge ? { onSelectEdge } : {})}
+        {...(onSelectKind ? { onSelectKind } : {})}
       />
 
       {selectedNode && selectedNodeEdges.length > 0 ? (

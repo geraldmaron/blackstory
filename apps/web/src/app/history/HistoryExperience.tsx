@@ -33,6 +33,7 @@ import {
   HISTORY_DIGNITY_FRAMING,
 } from '../../lib/history/copy';
 import { HISTORY_DEGRADED_MODE_COPY } from '../../lib/history/snapshot-mode';
+import { kindEncodingFor } from '../../lib/map-experience/kind-encoding';
 import type { HistoryViewModel } from './history-view-model';
 
 export type HistoryExperienceProps = {
@@ -264,6 +265,7 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
     labelledBy: 'history-graph-heading',
     onSelectNode: handleSelectNode,
     onSelectEdge: handleSelectEdge,
+    onSelectKind: handleKindChange,
     ...(view.viewState.selected ? { selectedId: view.viewState.selected } : {}),
     ...(view.viewState.edge ? { selectedEdgeId: view.viewState.edge } : {}),
   };
@@ -313,6 +315,8 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
           <legend className="ds-history-kind-chips__legend">Kind</legend>
           {view.facetOptions.kind.map((option) => {
             const isActive = view.viewState.filters.kind === option.value;
+            const encoding =
+              option.value === 'all' ? undefined : kindEncodingFor(option.value);
             return (
               <button
                 key={option.value}
@@ -325,6 +329,21 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
                 aria-checked={isActive}
                 onClick={() => handleKindChange(option.value)}
               >
+                {encoding ? (
+                  <span
+                    className={cx(
+                      'ds-legend-glyph',
+                      `ds-legend-glyph--${encoding.glyph}`,
+                      'ds-history-kind-chips__glyph',
+                    )}
+                    style={
+                      encoding.glyph === 'ring'
+                        ? { borderColor: encoding.shade, background: 'transparent' }
+                        : { background: encoding.shade, borderColor: encoding.shade }
+                    }
+                    aria-hidden="true"
+                  />
+                ) : null}
                 {formatFacetOptionLabel(option)}
               </button>
             );
