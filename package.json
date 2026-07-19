@@ -10,7 +10,7 @@
   "scripts": {
     "bootstrap": "./scripts/bootstrap.sh",
     "build": "pnpm -r --filter './packages/**' --filter './apps/**' --filter @repo/functions-discovery run build",
-    "apphosting:build": "pnpm --filter @repo/web... build",
+    "apphosting:build": "pnpm --filter @repo/web... --workspace-concurrency=1 build",
     "start": "node apps/web/.next/standalone/apps/web/server.js",
     "test": "pnpm test:preflight && pnpm -r --filter './packages/**' --filter './apps/**' --filter @repo/functions-discovery run --if-present test && uv run pytest",
     "test:preflight": "node --import tsx scripts/test-preflight.mjs",
