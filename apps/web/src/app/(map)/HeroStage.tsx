@@ -7,8 +7,11 @@
  * `HeroHeadlineMorph`) and the TIMELINE INSTRUMENT — a full-width rail of
  * decade ticks that plays the archive decade by decade (decade-flow.ts),
  * scrubbable by tap, pausable, honest about what it shows (documented records,
- * never modeled population). Decade frame changes fade pins / presence fills /
- * relationship lines via MapStage `{ fade: true }` (MapLibre paint transitions).
+ * never modeled population). Decade frame changes dual-buffer crossdissolve pins /
+ * presence fills / relationship lines via MapStage `{ fade: true }` so colors morph
+ * across geography without emptying the plate.
+ * Memorial plate names stagger-fade with each decade frame (`memorialDecade` /
+ * `memorialComplete` on the same patch) — not a bulk wipe.
  *
  * Engagement contract (ADR-017 "Transition contract"): state, background, entity
  * pin, and the copper CTA all fly the matching camera preset first, then funnel
@@ -35,7 +38,7 @@ import { HeroHeadlineMorph } from './HeroHeadlineMorph';
 import { useMapStage } from './MapStage';
 
 /** Dwell per decade frame — slow enough to read, fast enough to feel alive. */
-const DECADE_FRAME_MS = 3600;
+const DECADE_FRAME_MS = 4200;
 
 export type HeroStageProps = {
   readonly featureCollection: ExploreMapFeatureCollection;
@@ -130,7 +133,7 @@ export function HeroStage({
     stage.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
   }, [stage]);
 
-  // Apply the current decade frame to the shared canvas (fade when motion allows).
+  // Apply the current decade frame to the shared canvas (dual-buffer crossfade when motion allows).
   useEffect(() => {
     const frame = decadeFrames[frameIndex];
     const fade = shouldFadeDecadePatch({
@@ -140,15 +143,18 @@ export function HeroStage({
     isInitialDecadeApplyRef.current = false;
 
     if (!frame) {
-      stage.patchData({
-        featureCollection,
-        jurisdictionAreaFeatures,
-        layerMode: 'off',
-        densityLevels: [],
-        countyChoroplethLevels: [],
-        historyEdgesEnabled: false,
-        historyEdgeCollection: { type: 'FeatureCollection', features: [] },
-      });
+      stage.patchData(
+        {
+          featureCollection,
+          jurisdictionAreaFeatures,
+          layerMode: 'off',
+          densityLevels: [],
+          countyChoroplethLevels: [],
+          historyEdgesEnabled: false,
+          historyEdgeCollection: { type: 'FeatureCollection', features: [] },
+        },
+        { memorialComplete: true },
+      );
       return;
     }
     stage.patchData(
@@ -161,7 +167,12 @@ export function HeroStage({
         historyEdgesEnabled: frame.edgeCollection.features.length > 0,
         historyEdgeCollection: frame.edgeCollection,
       },
-      fade ? { fade: true } : undefined,
+      {
+        ...(fade ? { fade: true } : {}),
+        ...(frame.isComplete
+          ? { memorialComplete: true }
+          : { memorialDecade: frame.decade }),
+      },
     );
   }, [stage, decadeFrames, frameIndex, featureCollection, jurisdictionAreaFeatures, reducedMotion]);
 

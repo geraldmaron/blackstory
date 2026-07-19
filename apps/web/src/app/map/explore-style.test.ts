@@ -21,14 +21,24 @@ import {
   EXPLORE_COUNTY_LABEL_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
+  EXPLORE_MEMORIAL_NAMES_LAYER_ID,
+  EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
+  MEMORIAL_NAMES_MAP_LAYER_ENABLED,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  PLATE_BACKGROUND_OPACITY,
+  PLATE_STATE_FILL_OPACITY,
 } from './explore-style';
 
-type LayerLike = { readonly id: string; readonly paint?: Record<string, unknown> };
+type LayerLike = {
+  readonly id: string;
+  readonly type?: string;
+  readonly paint?: Record<string, unknown>;
+  readonly layout?: Record<string, unknown>;
+};
 
 function layerById(style: ReturnType<typeof buildStyleFixture>, id: string): LayerLike {
   const layer = style.layers.find((candidate) => candidate.id === id) as LayerLike | undefined;
@@ -117,6 +127,22 @@ test('state density source starts empty so client join can setData without URL r
   };
   assert.equal(stateSource.data?.type, 'FeatureCollection');
   assert.deepEqual(stateSource.data?.features, []);
+  const incoming = style.sources['explore-state-density-incoming'] as {
+    data?: { type?: string; features?: unknown[] };
+  };
+  assert.equal(incoming.data?.type, 'FeatureCollection');
+  assert.deepEqual(incoming.data?.features, []);
+});
+
+test('dual-buffer incoming density fill starts at opacity 0 for crossdissolve', () => {
+  const style = buildStyleFixture('presence');
+  const incoming = style.layers.find((layer) => layer.id === 'explore-state-density-fill-incoming') as {
+    paint?: { 'fill-opacity'?: number };
+    source?: string;
+  };
+  assert.ok(incoming, 'expected incoming density fill layer');
+  assert.equal(incoming.source, 'explore-state-density-incoming');
+  assert.equal(incoming.paint?.['fill-opacity'], 0);
 });
 
 test('the density layer stays hittable; density tint is controlled by paint not visibility', () => {
@@ -324,6 +350,65 @@ test('dark colorScheme keeps the ink ocean and pageSand state bounds', () => {
   assert.equal(darkPlate.ocean, '#080606');
   assert.equal(layerById(dark, 'explore-state-bounds-line').paint?.['line-color'], darkPlate.stateBounds);
   assert.equal(darkPlate.stateBounds, DIGNITY_PALETTE.pointHalo);
+});
+
+test('plate fills stay opaque — memorial names are a style layer under land, not DOM bleed', () => {
+  assert.equal(PLATE_BACKGROUND_OPACITY, 1, 'ocean plate is fully opaque');
+  assert.equal(PLATE_STATE_FILL_OPACITY, 1, 'state fills occlude memorial names on land');
+
+  const style = buildStyleFixture('presence');
+  assert.equal(layerById(style, 'background').paint?.['background-opacity'], PLATE_BACKGROUND_OPACITY);
+  assert.equal(
+    layerById(style, EXPLORE_STATE_DENSITY_LAYER_ID).paint?.['fill-opacity'],
+    PLATE_STATE_FILL_OPACITY,
+  );
+});
+
+test('memorial names symbol layer stays wired but hidden until re-enabled', () => {
+  assert.equal(
+    MEMORIAL_NAMES_MAP_LAYER_ENABLED,
+    false,
+    'live plate memorial field is parked; flip flag to restore',
+  );
+
+  const style = buildStyleFixture('presence');
+  const layerIds = (style.layers ?? []).map((layer) => layer.id);
+  const backgroundIdx = layerIds.indexOf('background');
+  const memorialIdx = layerIds.indexOf(EXPLORE_MEMORIAL_NAMES_LAYER_ID);
+  const stateIdx = layerIds.indexOf(EXPLORE_STATE_DENSITY_LAYER_ID);
+  assert.ok(backgroundIdx >= 0 && memorialIdx > backgroundIdx);
+  assert.ok(stateIdx > memorialIdx, 'state fills must paint above memorial names');
+
+  const memorial = layerById(style, EXPLORE_MEMORIAL_NAMES_LAYER_ID);
+  assert.equal(memorial.type, 'symbol');
+  assert.equal(memorial.layout?.visibility, 'none');
+  assert.equal(memorial.layout?.['text-allow-overlap'], false);
+  assert.equal(memorial.layout?.['text-ignore-placement'], false);
+  assert.ok((memorial.layout?.['text-padding'] as number) <= 2);
+  assert.deepEqual(memorial.layout?.['text-size'], ['get', 'size']);
+  assert.deepEqual(memorial.layout?.['text-rotate'], ['get', 'rotate']);
+  assert.deepEqual(memorial.layout?.['text-font'], ['Noto Sans Italic']);
+  assert.deepEqual(
+    memorial.layout?.['text-field'],
+    ['get', 'name'],
+    'memorial labels are name-only (no year/place)',
+  );
+  const opacity = memorial.paint?.['text-opacity'];
+  assert.ok(
+    JSON.stringify(opacity).includes('feature-state'),
+    'text-opacity must read feature-state.passed for decade fades',
+  );
+
+  const source = style.sources?.[EXPLORE_MEMORIAL_NAMES_SOURCE_ID] as {
+    data?: { features?: unknown[] };
+    promoteId?: string;
+  };
+  assert.equal(source?.promoteId, 'id');
+  assert.equal(
+    source?.data?.features?.length ?? -1,
+    0,
+    'hidden memorial source stays empty until the layer is re-enabled',
+  );
 });
 
 /** Collect string color outputs nested inside case/match paint expressions. */
