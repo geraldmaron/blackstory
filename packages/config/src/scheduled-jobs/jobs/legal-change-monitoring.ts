@@ -6,17 +6,15 @@
  * LegiScan keys documented as human follow-up.
  */
 import {
-  proposeLegalReviewEvents,
-  type LegalMonitoringPriorState,
-  type LegalMonitoringSourceSnapshot,
-  type LegalReviewQueueEvent,
-} from '../../../../domain/src/legal/index.js';
-import {
   createCongressGovFixtureClient,
   createCourtListenerFixtureClient,
   createEcfrFixtureClient,
   createLegiScanFixtureClient,
-} from '../../../../domain/src/adapters/legal/index.js';
+  proposeLegalReviewEvents,
+  type LegalMonitoringPriorState,
+  type LegalMonitoringSourceSnapshot,
+  type LegalReviewQueueEvent,
+} from '@repo/domain';
 import { completeJobRun, startJobRun, type JobRunRecord } from '../run-record.js';
 import type { ScheduledJobDefinition } from '../types.js';
 
@@ -70,7 +68,9 @@ export function runLegalChangeMonitoringJob(
     detectedAt: input.completedAt,
     current: monitoringRows,
     prior: input.prior,
-    existingDedupeKeys: input.existingDedupeKeys,
+    ...(input.existingDedupeKeys !== undefined
+      ? { existingDedupeKeys: input.existingDedupeKeys }
+      : {}),
     eventTypeBySource: {
       'congress-gov-v3': 'became_law',
       'ecfr-versioner': 'cfr_version',

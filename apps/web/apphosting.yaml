@@ -22,6 +22,9 @@
 #
 # automatic App Hosting rollouts are disabled. Production/staging traffic
 # changes run only via explicit GitHub Actions promote (see docs/runbooks/production-release.md).
+#
+# pnpm workspaces: App Hosting's default adapter does not build workspace package
+# dist/ outputs. apps/web `prebuild` builds `@repo/web^...` first; keep that intact.
 
 runConfig:
   minInstances: 1

@@ -20,12 +20,16 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   transpilePackages: [
+    '@repo/config',
     '@repo/domain',
     '@repo/schemas',
     '@repo/ui',
     '@repo/security',
     '@repo/firebase',
+    '@repo/observability',
   ],
+  // App Hosting / Cloud Run need a self-contained server bundle for monorepo deploys.
+  output: 'standalone',
   webpack: (config, { isServer }) => {
     // NodeNext packages emit `.js` specifiers that map to `.ts`/`.tsx` sources.
     config.resolve.extensionAlias = {

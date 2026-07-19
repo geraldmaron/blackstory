@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack -p ${PORT:-3048}",
+    "prebuild": "pnpm -w --filter @repo/web^... --filter '!blackstory' run build",
     "build": "next build --webpack",
     "start": "next start --port 3048",
     "typecheck": "tsc -p tsconfig.json --noEmit",
