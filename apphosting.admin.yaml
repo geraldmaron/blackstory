@@ -16,8 +16,10 @@
 #
 # Build: no buildCommand override here (that disables the Next.js framework adapter, which
 # broke the buildpack's own pnpm-install phase for this backend). GOOGLE_BUILDABLE below points
-# the adapter's implicit `pnpm run apphosting:build` at apps/admin via
-# scripts/apphosting-build.mjs, which every backend at this rootDirectory shares.
+# the adapter itself at apps/admin for detection; APPHOSTING_BUILD_TARGET (a plain env var —
+# GOOGLE_BUILDABLE is reserved and not forwarded into the build script's own process.env) tells
+# scripts/apphosting-build.mjs, which every backend at this rootDirectory shares, which app to
+# actually build.
 #
 # automatic App Hosting rollouts are disabled, same as web (explicit CLI/Actions promote only).
 
@@ -33,6 +35,10 @@ runConfig:
 
 env:
   - variable: GOOGLE_BUILDABLE
+    value: apps/admin
+    availability:
+      - BUILD
+  - variable: APPHOSTING_BUILD_TARGET
     value: apps/admin
     availability:
       - BUILD

@@ -12,7 +12,10 @@
 import { execSync } from 'node:child_process';
 import { cpSync, mkdirSync } from 'node:fs';
 
-const buildable = process.env.GOOGLE_BUILDABLE ?? 'apps/web';
+// GOOGLE_BUILDABLE itself isn't forwarded into this script's environment (Firebase reserves it
+// for the framework adapter's own internal use), so each backend sets APPHOSTING_BUILD_TARGET
+// instead — a plain user env var — to the same directory value.
+const buildable = process.env.APPHOSTING_BUILD_TARGET ?? 'apps/web';
 
 const APPS = {
   'apps/web': { filter: '@repo/web' },
