@@ -32,10 +32,10 @@ function NextShellLink({ href, className, children, ...rest }: ShellHeaderLinkPr
 
 export function SiteHeader() {
   const pathname = usePathname() || '/';
-  const adminReview = webAdminHref('/stories/review');
+  const adminLogin = webAdminHref('/login');
   const overflow = [
     ...OVERFLOW_NAV,
-    ...(adminReview ? [{ href: adminReview, label: 'Administration' } as const] : []),
+    ...(adminLogin ? [{ href: adminLogin, label: 'Admin login' } as const] : []),
   ];
 
   return (

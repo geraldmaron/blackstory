@@ -1,7 +1,7 @@
 /**
  * Public site footer — Black Ink always, closed by the kit lockup at
  * landmark scale (the page signs off with the brand, not a fine-print row).
- * Administration lives in the shared island "More" menu for consistent traversal.
+ * Admin login lives in the shared island "More" menu for consistent traversal.
  */
 
 import Link from 'next/link';

@@ -1,6 +1,7 @@
 /**
  * Admin app chrome: shared public island navbar + page body + footer.
  * Public routes open on the web origin; admin destinations stay local.
+ * Signed-out Sign in lives in the shell More menu (last overflow item).
  */
 'use client';
 
@@ -30,6 +31,7 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
     { href: '/quick-add', label: 'Quick add' },
     { href: '/console', label: 'Console' },
     { href: '/citation-health', label: 'Citation health' },
+    ...(ready && !user ? [{ href: '/login', label: 'Sign in' }] : []),
   ];
 
   return (
@@ -42,28 +44,26 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
         brandLockupSrc="/brand/lockup-dark.png"
         brandSymbolSrc="/brand/symbol-dark.png"
         cta={{ href: locateHref, label: 'Near you' }}
-        tools={
-          ready && user ? (
-            <>
-              {email ? <span className="ds-shell-header__session">{email}</span> : null}
-              <button
-                type="button"
-                className="ds-shell-header__sign-out"
-                onClick={() => {
-                  void signOut().then(() => {
-                    router.replace('/login');
-                  });
-                }}
-              >
-                Sign out
-              </button>
-            </>
-          ) : (
-            <a className="ds-shell-header__sign-out" href="/login">
-              Sign in
-            </a>
-          )
-        }
+        {...(ready && user
+          ? {
+              tools: (
+                <>
+                  {email ? <span className="ds-shell-header__session">{email}</span> : null}
+                  <button
+                    type="button"
+                    className="ds-shell-header__sign-out"
+                    onClick={() => {
+                      void signOut().then(() => {
+                        router.replace('/login');
+                      });
+                    }}
+                  >
+                    Sign out
+                  </button>
+                </>
+              ),
+            }
+          : {})}
       />
       <div className="admin-shell__body">{children}</div>
       <AdminPageFooter signedIn={Boolean(user)} />

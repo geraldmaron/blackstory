@@ -1,11 +1,12 @@
 /**
- * Admin shell footer — console destinations plus public-site handoff links.
+ * Admin shell footer — signed-in console destinations plus public-site handoff links.
+ * Sign in is canonical in the shell More menu, not the footer.
  */
 import Link from 'next/link';
 import { adminPublicSiteHref } from '../lib/sibling-origins';
 
 export type AdminPageFooterProps = {
-  /** When true, show signed-in destinations; when false, show Sign in. */
+  /** When true, show signed-in admin destinations. */
   readonly signedIn?: boolean;
 };
 
@@ -34,11 +35,7 @@ export function AdminPageFooter({ signedIn = false }: AdminPageFooterProps) {
                   <Link href="/">Admin home</Link>
                 </li>
               </>
-            ) : (
-              <li>
-                <Link href="/login">Sign in</Link>
-              </li>
-            )}
+            ) : null}
             {publicExplore ? (
               <li>
                 <a href={publicExplore}>Explore</a>
