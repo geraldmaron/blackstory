@@ -2,12 +2,12 @@
  * Pure helpers that build shareable hrefs for card and page metadata facets
  * (Where, Era, Kind, Evidence anchor). Callers render labels and optional links;
  * this module owns the URL contract only.
+ *
+ * Client-safe: only import `@repo/domain/map/geography` (pure reference data).
+ * Do not import `@repo/domain` or `@repo/domain/entity-status` — those pull
+ * `@repo/schemas` constitution loaders (`node:fs` / `node:crypto`) into the
+ * Next client graph via NarrativeCard → ExploreMapExperience.
  */
-import {
-  LAW_STATUSES,
-  MOVEMENT_STATUSES,
-  PLACE_LIKE_STATUSES,
-} from '@repo/domain';
 import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS } from './filters';
 import {
@@ -19,10 +19,19 @@ import {
 
 const ACCEPTED_CLAIMS_HASH = 'accepted-claims';
 
+/**
+ * Search `status=` tokens mirrored from `@repo/domain` entity-status vocabularies
+ * (place-like + law + movement). Kept inline so this module stays browser-safe.
+ */
 const SEARCH_STATUS_TOKENS = new Set<string>([
-  ...PLACE_LIKE_STATUSES,
-  ...LAW_STATUSES,
-  ...MOVEMENT_STATUSES,
+  'active',
+  'historic',
+  'inactive',
+  'in_force',
+  'amended',
+  'repealed',
+  'struck_down',
+  'enjoined',
 ]);
 
 function buildDefaultExploreHref(extra: Partial<ExploreViewState> = {}): string {
