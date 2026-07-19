@@ -200,8 +200,8 @@
     ],
     "topicTags": [
       "civil-rights",
-      "nonviolent-direct-action",
-      "freedom-rides",
+      "direct-action",
+      "interstate-travel",
       "sit-ins",
       "voter-registration"
     ],
@@ -247,8 +247,8 @@
     "historicalContext": "CORE pioneered nonviolent direct-action tactics in the 1940s that shaped the mid-twentieth-century civil rights movement, bridging Northern pacifist organizing with the mass mobilizations of the 1960s alongside groups such as SNCC, the SCLC, and the NAACP before shifting toward Black Nationalism under later leadership.",
     "topicIds": [
       "civil-rights",
-      "nonviolent-direct-action",
-      "freedom-rides"
+      "direct-action",
+      "interstate-travel"
     ],
     "mentionedEntityIds": [],
     "keywords": [],
@@ -297,7 +297,7 @@
     ],
     "topicTags": [
       "civil-rights",
-      "arts-culture",
+      "arts",
       "literature",
       "music"
     ],
@@ -343,7 +343,7 @@
     "historicalContext": "Emerging from the Great Migration's reshaping of Harlem into a center of Black urban life, the Harlem Renaissance produced a generation of writers, musicians, and artists whose work asserted a new African American cultural identity and laid intellectual groundwork later drawn upon by the civil rights movement.",
     "topicIds": [
       "civil-rights",
-      "arts-culture",
+      "arts",
       "literature",
       "music"
     ],
@@ -383,8 +383,8 @@
     "topicTags": [
       "civil-rights",
       "abolition",
-      "slavery",
-      "freedom-seekers"
+      "enslavement",
+      "freedom"
     ],
     "jurisdictionLabel": "Church Creek, Maryland",
     "locationPrecision": "city",
@@ -425,12 +425,12 @@
         "citationLabel": "NPS: Harriet Tubman Underground Railroad National Historical Park"
       }
     ],
-    "historicalContext": "Neither underground nor a railroad, this loosely organized network of abolitionists, free Black communities, and formerly enslaved people used coded railway language — lines, stations, conductors — to move freedom seekers northward in defiance of federal fugitive-slave law, laying organizing groundwork later drawn on by the broader civil-rights movement.",
+    "historicalContext": "Neither underground nor a railroad, this loosely organized network of abolitionists, free Black communities, and formerly enslaved people used coded railway language \u2014 lines, stations, conductors \u2014 to move freedom seekers northward in defiance of federal fugitive-slave law, laying organizing groundwork later drawn on by the broader civil-rights movement.",
     "topicIds": [
       "civil-rights",
       "abolition",
-      "slavery",
-      "freedom-seekers"
+      "enslavement",
+      "freedom"
     ],
     "mentionedEntityIds": [],
     "keywords": [
@@ -459,8 +459,8 @@
     ],
     "topicTags": [
       "civil-rights",
-      "organization",
-      "legal-advocacy"
+      "organizing",
+      "constitutional-law"
     ],
     "jurisdictionLabel": "Baltimore, Maryland",
     "locationPrecision": "city",
@@ -501,11 +501,11 @@
         "citationLabel": "NAACP: Contact (national headquarters address)"
       }
     ],
-    "historicalContext": "As the nation's oldest and largest civil rights organization, the NAACP built the legal and organizing infrastructure — including its Legal Defense Fund lineage and The Crisis magazine — that drove landmark victories from anti-lynching advocacy through Brown v. Board of Education and the mid-20th-century civil rights legislative campaigns.",
+    "historicalContext": "As the nation's oldest and largest civil rights organization, the NAACP built the legal and organizing infrastructure \u2014 including its Legal Defense Fund lineage and The Crisis magazine \u2014 that drove landmark victories from anti-lynching advocacy through Brown v. Board of Education and the mid-20th-century civil rights legislative campaigns.",
     "topicIds": [
       "civil-rights",
-      "organization",
-      "legal-advocacy"
+      "organizing",
+      "constitutional-law"
     ],
     "mentionedEntityIds": [],
     "keywords": [
@@ -861,8 +861,7 @@
     ],
     "topicTags": [
       "civil-rights",
-      "naacp",
-      "sociology",
+      "research",
       "pan-africanism"
     ],
     "jurisdictionLabel": "Great Barrington, Massachusetts",
@@ -907,8 +906,7 @@
     "historicalContext": "As the first African American to earn a Harvard Ph.D., Du Bois became the preeminent Black intellectual of his era, shaping debates on race, education, and Pan-Africanism from the turn of the century through the Cold War. His scholarship and activism, from The Souls of Black Folk to his leadership at the NAACP, helped build the intellectual and organizational foundations of the twentieth-century civil rights movement.",
     "topicIds": [
       "civil-rights",
-      "naacp",
-      "sociology",
+      "research",
       "pan-africanism"
     ],
     "mentionedEntityIds": [],
