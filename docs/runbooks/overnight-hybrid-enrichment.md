@@ -73,8 +73,14 @@ ssh gerald@100.119.72.84 'ls -lt ~/Developer/Projects/blackstory/.cache/overnigh
 Artifacts under `.cache/overnight-enrichment/`:
 
 - `subjects-*.json` — enrichment inputs
-- `run-*.json` — full enrichment result
+- `run-*.json` — full enrichment result (written via `enrichment-run --output`, not stdout/`tee`)
 - `summary-*.json` — keep/reject/error counts + `servedBy` (openrouter vs ollama)
+
+Phase 3 must not pipe the full result JSON through systemd journal. A multi-MB
+`console.log` into a 64KiB pipe can truncate `run-*.json` and produce a false
+`itemCount: 0` after JSON parse failure. The CLI writes the run file synchronously
+(`--output`) and prints only a compact summary on stdout; the overnight script
+fail-closes if the run log is invalid JSON or has zero items.
 
 Candidates fixture: `packages/firebase/fixtures/discovery-candidates/run-*.json`.
 

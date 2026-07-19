@@ -255,6 +255,8 @@ ARGS=(
   --operator-id "${OPERATOR_ID}"
   --session-id "${SESSION_ID}"
   --identity-source cli
+  --output "${LOG_FILE}"
+  --omit-raw-model
 )
 
 if [[ "${COMMIT_ENRICHMENT}" == "1" || "${COMMIT_ENRICHMENT}" == "true" ]]; then
@@ -264,19 +266,24 @@ if [[ "${COMMIT_ENRICHMENT}" == "1" || "${COMMIT_ENRICHMENT}" == "true" ]]; then
   fi
 fi
 
+# Write the full result via --output (sync writeFile). Do NOT pipe multi-MB JSON through
+# tee→journal: Node can exit before a large stdout buffer flushes into a 64KiB pipe,
+# truncating run-*.json and yielding a false itemCount:0 summary (2026-07-19 Corsair).
 node --conditions development --import tsx \
   "${ROOT}/packages/operator-cli/src/bin.ts" \
-  "${ARGS[@]}" | tee "${LOG_FILE}"
+  "${ARGS[@]}" >&2
 
 python3 - "${LOG_FILE}" "${SUMMARY_FILE}" "${DISCOVERY_SUMMARY}" "${SEARXNG_SUMMARY}" "${LATEST_CANDIDATES}" <<'PY'
 import json, sys
 log_path, summary_path, discovery_raw, searxng_raw, candidates_path = sys.argv[1:6]
+parse_error = None
 try:
     payload = json.load(open(log_path))
 except Exception as e:
-    payload = {"parseError": str(e)}
-result = payload.get("result", payload)
-items = result.get("items") or []
+    parse_error = str(e)
+    payload = {}
+result = payload.get("result", payload) if isinstance(payload, dict) else {}
+items = result.get("items") or [] if isinstance(result, dict) else []
 served = {}
 for it in items:
     key = it.get("servedBy") or (it.get("packet") or {}).get("model", {}).get("provider") or "unknown"
@@ -293,23 +300,33 @@ try:
     cand_count = len(json.load(open(candidates_path)).get("candidates") or [])
 except Exception:
     cand_count = None
+enrichment = {
+    "itemCount": len(items),
+    "keepCount": result.get("keepCount") if isinstance(result, dict) else None,
+    "rejectCount": result.get("rejectCount") if isinstance(result, dict) else None,
+    "needsEvidenceCount": result.get("needsEvidenceCount") if isinstance(result, dict) else None,
+    "errorCount": result.get("errorCount") if isinstance(result, dict) else None,
+    "concurrency": result.get("concurrency") if isinstance(result, dict) else None,
+    "servedBy": served,
+}
+if parse_error:
+    enrichment["parseError"] = parse_error
+    enrichment["logBytes"] = __import__("os").path.getsize(log_path) if __import__("os").path.exists(log_path) else 0
 summary = {
     "searxng": searxng,
     "discovery": discovery,
     "candidatesFile": candidates_path,
     "candidatePoolSize": cand_count,
-    "enrichment": {
-        "itemCount": len(items),
-        "keepCount": result.get("keepCount"),
-        "rejectCount": result.get("rejectCount"),
-        "needsEvidenceCount": result.get("needsEvidenceCount"),
-        "errorCount": result.get("errorCount"),
-        "concurrency": result.get("concurrency"),
-        "servedBy": served,
-    },
+    "enrichment": enrichment,
 }
 json.dump(summary, open(summary_path, "w"), indent=2)
 print(json.dumps(summary, indent=2))
+if parse_error:
+    print(f"enrichment run log is not valid JSON: {parse_error}", file=sys.stderr)
+    sys.exit(4)
+if len(items) == 0:
+    print("enrichment produced 0 items (subjects may have been empty or judge failed closed)", file=sys.stderr)
+    sys.exit(5)
 PY
 
 echo "Wrote ${LOG_FILE}" >&2

@@ -12,7 +12,7 @@
  * `--publish`, `--approve`, or `--promote` flag anywhere in this CLI see
  * `promotion-boundary.test.ts`.
  */
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import type { RelationshipRole, RelationshipType } from '@repo/domain';
 import type { AtomicStore } from '@repo/firebase';
 import type { SafeFetchDependencies } from '@repo/security/url-safety';
@@ -64,6 +64,8 @@ export type CliDependencies = {
   readonly stdout?: (line: string) => void;
   readonly stderr?: (line: string) => void;
   readonly readFile?: (path: string) => string;
+  /** Sync file writer used by `--output` (defaults to `writeFileSync`). */
+  readonly writeFile?: (path: string, contents: string) => void;
   /** Lazily builds a real Firestore-backed store when `--commit` is set and no `store` is injected. */
   readonly createLiveStore?: () => Promise<AtomicStore>;
   /** Overrides the real DNS/HTTP dependencies `research-intake` passes to `runQuickAddFetch`. */
@@ -82,6 +84,7 @@ const BOOLEAN_FLAGS = new Set([
   '--continue-on-quarantine',
   '--full',
   '--include-curated',
+  '--omit-raw-model',
   '--queue-survivors',
 ]);
 
@@ -127,6 +130,86 @@ function requireFlag(flags: Flags, name: string): string {
 
 function optionalFlag(flags: Flags, name: string): string | undefined {
   return flags.values.get(name);
+}
+
+/**
+ * Emit a large editorial/enrichment JSON payload safely.
+ *
+ * Overnight runs historically piped `console.log(JSON.stringify(result))` through
+ * `tee` into systemd's journal. Node can exit before a multi-MB stdout buffer is
+ * fully flushed into a 64KiB pipe, leaving a truncated file and a false
+ * `itemCount: 0` summary. When `--output` is set we write synchronously to disk
+ * and only print a compact summary on stdout for the journal.
+ */
+function emitRunJson(options: {
+  readonly payload: unknown;
+  readonly flags: Flags;
+  readonly stdout: (line: string) => void;
+  readonly writeFile: (path: string, contents: string) => void;
+}): void {
+  const omitRaw = options.flags.booleans.has('--omit-raw-model');
+  const body = omitRaw ? stripRawModelContent(options.payload) : options.payload;
+  const serialized = `${JSON.stringify(body, null, 2)}\n`;
+  const outputPath = optionalFlag(options.flags, '--output');
+  if (outputPath) {
+    options.writeFile(outputPath, serialized);
+    options.stdout(JSON.stringify(compactRunSummary(body), null, 2));
+    return;
+  }
+  options.stdout(serialized.trimEnd());
+}
+
+function stripRawModelContent(payload: unknown): unknown {
+  if (payload === null || typeof payload !== 'object') return payload;
+  if (Array.isArray(payload)) return payload.map((entry) => stripRawModelContent(entry));
+  const record = payload as Record<string, unknown>;
+  const next: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(record)) {
+    if (key === 'rawModelContent') continue;
+    next[key] = stripRawModelContent(value);
+  }
+  return next;
+}
+
+function compactRunSummary(payload: unknown): Record<string, unknown> {
+  const root =
+    payload !== null && typeof payload === 'object' && !Array.isArray(payload)
+      ? (payload as Record<string, unknown>)
+      : {};
+  const result =
+    root.result !== null && typeof root.result === 'object' && !Array.isArray(root.result)
+      ? (root.result as Record<string, unknown>)
+      : root;
+  const items = Array.isArray(result.items) ? result.items : [];
+  const servedBy: Record<string, number> = {};
+  for (const item of items) {
+    if (item === null || typeof item !== 'object') continue;
+    const row = item as Record<string, unknown>;
+    const packet =
+      row.packet !== null && typeof row.packet === 'object' && !Array.isArray(row.packet)
+        ? (row.packet as Record<string, unknown>)
+        : {};
+    const model =
+      packet.model !== null && typeof packet.model === 'object' && !Array.isArray(packet.model)
+        ? (packet.model as Record<string, unknown>)
+        : {};
+    const key =
+      (typeof row.servedBy === 'string' && row.servedBy) ||
+      (typeof model.provider === 'string' && model.provider) ||
+      'unknown';
+    servedBy[key] = (servedBy[key] ?? 0) + 1;
+  }
+  return {
+    kind: result.kind ?? root.kind ?? 'run.summary.v1',
+    itemCount: items.length,
+    keepCount: result.keepCount ?? null,
+    rejectCount: result.rejectCount ?? null,
+    needsEvidenceCount: result.needsEvidenceCount ?? null,
+    errorCount: result.errorCount ?? null,
+    concurrency: result.concurrency ?? null,
+    servedBy,
+    ...(Array.isArray(root.commits) ? { commitCount: root.commits.length } : {}),
+  };
 }
 
 function readOperatorIdentity(flags: Flags): OperatorIdentity {
@@ -206,6 +289,8 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
   const stdout = deps.stdout ?? ((line: string) => console.log(line));
   const stderr = deps.stderr ?? ((line: string) => console.error(line));
   const readFile = deps.readFile ?? ((path: string) => readFileSync(path, 'utf8'));
+  const writeFile =
+    deps.writeFile ?? ((path: string, contents: string) => writeFileSync(path, contents, 'utf8'));
   const [command, ...rest] = argv;
 
   try {
@@ -682,10 +767,20 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
             if (item.packet.decision === 'reject') continue;
             commits.push(await finish(prepareEditorialPacketIntake(item.packet, context), flags, deps));
           }
-          stdout(JSON.stringify({ result, commits }, null, 2));
+          emitRunJson({
+            payload: { result, commits },
+            flags,
+            stdout,
+            writeFile,
+          });
           return 0;
         }
-        stdout(JSON.stringify(result, null, 2));
+        emitRunJson({
+          payload: result,
+          flags,
+          stdout,
+          writeFile,
+        });
         return 0;
       }
       case 'story-research-run': {

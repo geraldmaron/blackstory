@@ -360,3 +360,52 @@ test('discovery-dispatch --queue-survivors prepares admin draft cases without wr
   assert.ok(payload.survivorQueue.prepared >= 1);
   assert.equal(payload.campaign, undefined);
 });
+
+test('enrichment-run --output writes full JSON sync and prints compact stdout summary', async () => {
+  const { mkdtempSync, readFileSync, writeFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const dir = mkdtempSync(join(tmpdir(), 'enrich-output-'));
+  const subjectsPath = join(dir, 'subjects.json');
+  const outputPath = join(dir, 'run.json');
+  writeFileSync(
+    subjectsPath,
+    JSON.stringify({
+      subjects: [{ subjectId: 'ent_test_001', title: 'Test Subject', existingSummary: 'A note.' }],
+    }),
+  );
+  const written: { path: string; contents: string }[] = [];
+  const out = capture();
+  const code = await runCli(
+    [
+      'enrichment-run',
+      '--subjects',
+      subjectsPath,
+      '--provider',
+      'mock',
+      '--output',
+      outputPath,
+      '--omit-raw-model',
+      ...BASE_FLAGS,
+    ],
+    {
+      stdout: out.stdout,
+      stderr: out.stderr,
+      nowMs: Date.parse('2026-07-19T12:00:00.000Z'),
+      writeFile: (path, contents) => {
+        written.push({ path, contents });
+        writeFileSync(path, contents);
+      },
+    },
+  );
+  assert.equal(code, 0, out.errors.join('\n'));
+  assert.equal(written.length, 1);
+  assert.equal(written[0]?.path, outputPath);
+  const filePayload = JSON.parse(readFileSync(outputPath, 'utf8'));
+  assert.equal(filePayload.kind, 'enrichment.run.v1');
+  assert.equal(filePayload.items.length, 1);
+  assert.equal(filePayload.items[0]?.rawModelContent, undefined);
+  const summary = JSON.parse(out.lines[0] ?? '{}');
+  assert.equal(summary.itemCount, 1);
+  assert.ok(summary.kind === 'enrichment.run.v1' || summary.itemCount === 1);
+});
