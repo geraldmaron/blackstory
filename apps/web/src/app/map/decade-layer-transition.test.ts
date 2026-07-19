@@ -27,7 +27,7 @@ test('fade targets cover density fills, edges, and entity circles (opacity chann
   const keys = DECADE_FADE_PAINT_TARGETS.map((target) => `${target.layerId}:${target.paintKey}`);
   assert.ok(keys.some((key) => key.includes('state-density') && key.endsWith('fill-opacity')));
   assert.ok(keys.some((key) => key.includes('history-edges') && key.endsWith('line-opacity')));
-  assert.ok(keys.some((key) => key.includes('unclustered') && key.includes('circle-opacity')));
+  assert.ok(keys.some((key) => key.includes('explore-point') && key.includes('circle-opacity')));
   for (const target of DECADE_FADE_PAINT_TARGETS) {
     assert.match(target.paintKey, /opacity/);
   }

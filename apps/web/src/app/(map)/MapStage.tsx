@@ -63,6 +63,13 @@ import {
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../map/explore-layer-ids';
 import { buildExploreMapStyle } from '../map/explore-style';
+import {
+  DECADE_LAYER_FADE_MS,
+  restoreDecadeFadePaintFromStyle,
+  setDecadeFadeInLiterals,
+  setDecadeFadeOpacities,
+  setDecadeFadeTransitions,
+} from '../map/decade-layer-transition';
 import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
 import { EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience/dignity-style';
 import type {
@@ -532,10 +539,16 @@ type MapStageEvents = {
 
 type MapStageEventName = keyof MapStageEvents;
 
+/** Optional behavior for `patchData`. `fade` runs an opacity out→swap→in on decade-relevant
+ * layers (pins, presence fill, relationship lines) when motion is allowed. */
+export type MapStageDataPatchOptions = {
+  readonly fade?: boolean;
+};
+
 export type MapStageHandle = {
   /** Patches source data + density/history-edge mode flags; rebuilds the style and reapplies
-   * geography layers + entity markers. */
-  readonly patchData: (patch: MapStageDataPatch) => void;
+   * geography layers + entity markers. Pass `{ fade: true }` for decade-flow transitions. */
+  readonly patchData: (patch: MapStageDataPatch, options?: MapStageDataPatchOptions) => void;
   /** Patches the selected-state / selected-edge highlight filters (and the state-label
    * selection color) without touching source data or the style. */
   readonly applyViewState: (patch: MapStageViewPatch) => void;
@@ -632,6 +645,8 @@ export function MapStageProvider({
     selectedEdge: undefined,
     selectedEntity: undefined,
   });
+  /** Bumps when a faded `patchData` starts so an in-flight out→swap→in can abort cleanly. */
+  const decadeFadeGenerationRef = useRef(0);
 
   const markMapUnavailable = useCallback(() => {
     if (!mapAvailableRef.current) return;
@@ -678,54 +693,65 @@ export function MapStageProvider({
     }
   }, []);
 
-  const applyStyleAndData = useCallback((options?: { readonly recreateEntitiesSource?: boolean }) => {
-    const map = mapRef.current;
-    if (!map || !map.isStyleLoaded()) return;
-    try {
-      // Layers are removed and re-added from the rebuilt style (cheap, main-thread-only) so
-      // mode-dependent paint (density tiers, edge visibility) always matches the config.
-      // Sources are deliberately NOT removed on routine patches — applyGeographyStyle setDatas
-      // them in place; see its doc comment. Grouping toggles pass recreateEntitiesSource.
-      for (const id of [
-        EXPLORE_STATE_DENSITY_LAYER_ID,
-        EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
-        EXPLORE_COUNTY_LINES_LAYER_ID,
-        EXPLORE_COUNTY_LABEL_LAYER_ID,
-        'explore-state-bounds-line',
-        SELECTED_FILL_ID,
-        SELECTED_LINE_ID,
-        'explore-jurisdiction-area-fill',
-        EXPLORE_HISTORY_EDGES_LAYER_ID,
-        EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
-      ]) {
-        if (map.getLayer(id)) map.removeLayer(id);
-      }
+  const applyStyleAndData = useCallback(
+    (options?: {
+      readonly recreateEntitiesSource?: boolean;
+      /** Keep geography layers mounted and sync paint in place — used mid decade-fade so the
+       * opacity transition is not killed by remove/re-add. */
+      readonly retainGeographyLayers?: boolean;
+    }) => {
+      const map = mapRef.current;
+      if (!map || !map.isStyleLoaded()) return;
+      try {
+        // Layers are removed and re-added from the rebuilt style (cheap, main-thread-only) so
+        // mode-dependent paint (density tiers, edge visibility) always matches the config —
+        // unless a decade fade asks to retain them so MapLibre opacity transitions can finish.
+        // Sources are deliberately NOT removed on routine patches — applyGeographyStyle setDatas
+        // them in place; see its doc comment. Grouping toggles pass recreateEntitiesSource.
+        if (!options?.retainGeographyLayers) {
+          for (const id of [
+            EXPLORE_STATE_DENSITY_LAYER_ID,
+            EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
+            EXPLORE_COUNTY_LINES_LAYER_ID,
+            EXPLORE_COUNTY_LABEL_LAYER_ID,
+            'explore-state-bounds-line',
+            SELECTED_FILL_ID,
+            SELECTED_LINE_ID,
+            'explore-jurisdiction-area-fill',
+            EXPLORE_HISTORY_EDGES_LAYER_ID,
+            EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
+          ]) {
+            if (map.getLayer(id)) map.removeLayer(id);
+          }
+        }
 
-      applyGeographyStyle(map, configRef.current.style, {
-        ...(options?.recreateEntitiesSource ? { recreateEntitiesSource: true } : {}),
-      });
-      setSelectedStateFilter(map, configRef.current.selectedState);
-      setHistoryEdgeData(map, configRef.current.historyEdgeCollection);
-      setHistoryEdgesVisibility(map, configRef.current.historyEdgesEnabled);
-      setSelectedEdgeFilter(map, configRef.current.selectedEdge);
-      setSelectedEntityFilter(map, configRef.current.selectedEntity);
-      void loadStatePolygonsWithDensity(map, configRef.current.densityLevels).catch((error) => {
-        console.error('[MapStage] state polygon load failed', error);
-      });
-      const needsCountyGeometry =
-        map.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
-        configRef.current.layerMode === 'blackShare' ||
-        configRef.current.layerMode === 'blackChange';
-      if (needsCountyGeometry) {
-        void loadCountyPolygons(map, configRef.current.countyChoroplethLevels).catch((error) => {
-          console.error('[MapStage] county polygon load failed', error);
+        applyGeographyStyle(map, configRef.current.style, {
+          ...(options?.recreateEntitiesSource ? { recreateEntitiesSource: true } : {}),
         });
+        setSelectedStateFilter(map, configRef.current.selectedState);
+        setHistoryEdgeData(map, configRef.current.historyEdgeCollection);
+        setHistoryEdgesVisibility(map, configRef.current.historyEdgesEnabled);
+        setSelectedEdgeFilter(map, configRef.current.selectedEdge);
+        setSelectedEntityFilter(map, configRef.current.selectedEntity);
+        void loadStatePolygonsWithDensity(map, configRef.current.densityLevels).catch((error) => {
+          console.error('[MapStage] state polygon load failed', error);
+        });
+        const needsCountyGeometry =
+          map.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
+          configRef.current.layerMode === 'blackShare' ||
+          configRef.current.layerMode === 'blackChange';
+        if (needsCountyGeometry) {
+          void loadCountyPolygons(map, configRef.current.countyChoroplethLevels).catch((error) => {
+            console.error('[MapStage] county polygon load failed', error);
+          });
+        }
+        syncEntityMarkers();
+      } catch (error) {
+        console.error('[MapStage] style/data apply failed', error);
       }
-      syncEntityMarkers();
-    } catch (error) {
-      console.error('[MapStage] style/data apply failed', error);
-    }
-  }, [syncEntityMarkers]);
+    },
+    [syncEntityMarkers],
+  );
 
   const syncPlatePaintToTheme = useCallback(
     (map: MapLibreMap, style: StyleSpecification, scheme: MapColorScheme) => {
@@ -737,10 +763,9 @@ export function MapStageProvider({
     [syncStateLabelTheme],
   );
 
-  const patchData = useCallback(
-    (patch: MapStageDataPatch) => {
+  const commitDataPatch = useCallback(
+    (patch: MapStageDataPatch, applyOptions?: Parameters<typeof applyStyleAndData>[0]) => {
       const clusteringEnabled = patch.clusteringEnabled ?? configRef.current.clusteringEnabled;
-      const clusteringChanged = clusteringEnabled !== configRef.current.clusteringEnabled;
       const style = buildExploreMapStyle({
         featureCollection: patch.featureCollection,
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
@@ -761,9 +786,54 @@ export function MapStageProvider({
         historyEdgesEnabled: patch.historyEdgesEnabled,
         historyEdgeCollection: patch.historyEdgeCollection,
       };
-      applyStyleAndData(clusteringChanged ? { recreateEntitiesSource: true } : undefined);
+      applyStyleAndData(applyOptions);
     },
     [applyStyleAndData],
+  );
+
+  const patchData = useCallback(
+    (patch: MapStageDataPatch, options?: MapStageDataPatchOptions) => {
+      const clusteringEnabled = patch.clusteringEnabled ?? configRef.current.clusteringEnabled;
+      const clusteringChanged = clusteringEnabled !== configRef.current.clusteringEnabled;
+      const recreate = clusteringChanged ? ({ recreateEntitiesSource: true } as const) : undefined;
+      const wantsFade = options?.fade === true && !prefersReducedMotion();
+      const map = mapRef.current;
+
+      if (!wantsFade || !map || !map.isStyleLoaded()) {
+        // Invalidate any in-flight decade fade so a later timeout cannot overwrite this snap.
+        decadeFadeGenerationRef.current += 1;
+        commitDataPatch(patch, recreate);
+        return;
+      }
+
+      const generation = ++decadeFadeGenerationRef.current;
+      const durationMs = DECADE_LAYER_FADE_MS;
+      setDecadeFadeTransitions(map, durationMs);
+      setDecadeFadeOpacities(map, 0);
+
+      window.setTimeout(() => {
+        if (generation !== decadeFadeGenerationRef.current) return;
+        commitDataPatch(patch, {
+          ...(recreate ?? {}),
+          retainGeographyLayers: true,
+        });
+        // Hold the new frame at opacity 0 (no transition), then fade literals in.
+        setDecadeFadeTransitions(map, 0);
+        setDecadeFadeOpacities(map, 0);
+        requestAnimationFrame(() => {
+          if (generation !== decadeFadeGenerationRef.current) return;
+          setDecadeFadeTransitions(map, durationMs);
+          setDecadeFadeInLiterals(map);
+          window.setTimeout(() => {
+            if (generation !== decadeFadeGenerationRef.current) return;
+            // Snap kind-aware expressions back once the literal fade has settled.
+            setDecadeFadeTransitions(map, 0);
+            restoreDecadeFadePaintFromStyle(map, configRef.current.style);
+          }, durationMs);
+        });
+      }, durationMs);
+    },
+    [commitDataPatch],
   );
 
   useEffect(() => {
@@ -1108,6 +1178,7 @@ export function MapStageProvider({
 
     return () => {
       cancelled = true;
+      decadeFadeGenerationRef.current += 1;
       if (resizeTimer) clearTimeout(resizeTimer);
       resizeObserver?.disconnect();
       clearMarkers(markersRef.current);

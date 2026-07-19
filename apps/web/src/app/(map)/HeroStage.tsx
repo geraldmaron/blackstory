@@ -7,7 +7,8 @@
  * `HeroHeadlineMorph`) and the TIMELINE INSTRUMENT — a full-width rail of
  * decade ticks that plays the archive decade by decade (decade-flow.ts),
  * scrubbable by tap, pausable, honest about what it shows (documented records,
- * never modeled population).
+ * never modeled population). Decade frame changes fade pins / presence fills /
+ * relationship lines via MapStage `{ fade: true }` (MapLibre paint transitions).
  *
  * Engagement contract (ADR-017 "Transition contract"): state, background, entity
  * pin, and the copper CTA all fly the matching camera preset first, then funnel
@@ -16,7 +17,7 @@
  * Entity pins land on `/explore?selected=…` so the reader stays inside the map
  * journey; the record page remains one click away from explore's list.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Notice } from '@repo/ui';
@@ -29,6 +30,7 @@ import type {
 import { FINAL_FRAME_LABEL, type DecadeFlowFrame } from '../../lib/map-experience/decade-flow';
 import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
 import { buildExploreHref, defaultExploreOverlayState, viewportForState, type ExploreViewport } from '../../lib/map-experience/url-state';
+import { shouldFadeDecadePatch } from '../map/decade-layer-transition';
 import { HeroHeadlineMorph } from './HeroHeadlineMorph';
 import { useMapStage } from './MapStage';
 
@@ -94,10 +96,13 @@ export function HeroStage({
   const [reducedMotion, setReducedMotion] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [frameIndex, setFrameIndex] = useState(0);
+  /** First decade patch after mount (or frames reload) snaps; later advances fade. */
+  const isInitialDecadeApplyRef = useRef(true);
 
   useEffect(() => {
     const reduced = prefersReducedMotion();
     setReducedMotion(reduced);
+    isInitialDecadeApplyRef.current = true;
     if (reduced || decadeFrames.length <= 1) {
       setFrameIndex(Math.max(0, decadeFrames.length - 1));
       setPlaying(false);
@@ -125,9 +130,15 @@ export function HeroStage({
     stage.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
   }, [stage]);
 
-  // Apply the current decade frame to the shared canvas.
+  // Apply the current decade frame to the shared canvas (fade when motion allows).
   useEffect(() => {
     const frame = decadeFrames[frameIndex];
+    const fade = shouldFadeDecadePatch({
+      reducedMotion,
+      isInitialApply: isInitialDecadeApplyRef.current,
+    });
+    isInitialDecadeApplyRef.current = false;
+
     if (!frame) {
       stage.patchData({
         featureCollection,
@@ -140,16 +151,19 @@ export function HeroStage({
       });
       return;
     }
-    stage.patchData({
-      featureCollection: frame.featureCollection,
-      jurisdictionAreaFeatures,
-      layerMode: frame.densityLevels.length > 0 ? 'presence' : 'off',
-      densityLevels: frame.densityLevels,
-      countyChoroplethLevels: [],
-      historyEdgesEnabled: frame.edgeCollection.features.length > 0,
-      historyEdgeCollection: frame.edgeCollection,
-    });
-  }, [stage, decadeFrames, frameIndex, featureCollection, jurisdictionAreaFeatures]);
+    stage.patchData(
+      {
+        featureCollection: frame.featureCollection,
+        jurisdictionAreaFeatures,
+        layerMode: frame.densityLevels.length > 0 ? 'presence' : 'off',
+        densityLevels: frame.densityLevels,
+        countyChoroplethLevels: [],
+        historyEdgesEnabled: frame.edgeCollection.features.length > 0,
+        historyEdgeCollection: frame.edgeCollection,
+      },
+      fade ? { fade: true } : undefined,
+    );
+  }, [stage, decadeFrames, frameIndex, featureCollection, jurisdictionAreaFeatures, reducedMotion]);
 
   // Auto-advance while playing; loops through the closing full-archive frame.
   useEffect(() => {
