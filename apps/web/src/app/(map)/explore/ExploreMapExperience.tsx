@@ -806,7 +806,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       ) : null}
 
       <div className="ds-explore-stage__legend">
-        <MapExperienceLegend defaultCollapsed layerMode={view.viewState.layerMode} />
+        <MapExperienceLegend layerMode={view.viewState.layerMode} />
       </div>
     </div>
   );

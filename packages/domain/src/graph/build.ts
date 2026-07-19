@@ -145,7 +145,10 @@ export function buildGraphReleaseArtifact(input: GraphReleaseArtifactInput): Gra
     { entities: input.entities, relationships: input.relationships },
     { stillActiveCutoff: input.generatedAt },
   );
-  const allTimeView = buildAllTimeView(decadeViews);
+  const allTimeView = buildAllTimeView(decadeViews, {
+    entityIds: input.entityIds,
+    relationships: input.relationships,
+  });
   const contentHash = sha256Json(artifactPayload(adjacencyByEntityId, decadeViews, allTimeView));
 
   return {

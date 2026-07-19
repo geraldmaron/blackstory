@@ -17,12 +17,12 @@
   inset: 0;
   z-index: 0;
   height: 100dvh;
-  /* Pre-style-load flash — dark ocean by default; light theme softens to paper sand. */
+  /* Pre-style-load flash — dark ocean by default; light theme matches white plate. */
   background: #080606;
 }
 
 [data-theme='light'] .ds-map-stage {
-  background: #e8e0d2;
+  background: #ffffff;
 }
 
 /* MapLibre's own container (MapStage.tsx's `containerRef`) — never the plate above. MapLibre

@@ -461,31 +461,202 @@ export async function getHateCrimeYearSummary(
   };
 }
 
+/** Census state FIPS outside `US_STATES` (50 states + D.C.) — decennial county rollups still
+ * include territories; public `/data` labels must not read as "State 72". */
+export const US_TERRITORY_FIPS_NAMES: Readonly<Record<string, string>> = {
+  '60': 'American Samoa',
+  '66': 'Guam',
+  '69': 'Northern Mariana Islands',
+  '72': 'Puerto Rico',
+  '78': 'U.S. Virgin Islands',
+};
+
+/** Merge domain `US_STATES` with territory FIPS for census rollups on `/data`. */
+export function buildStateFipsNameMap(
+  usStates: readonly { readonly fips: string; readonly name: string }[],
+): Readonly<Record<string, string>> {
+  return {
+    ...Object.fromEntries(usStates.map((state) => [state.fips, state.name])),
+    ...US_TERRITORY_FIPS_NAMES,
+  };
+}
+
+export function resolveStateFipsName(
+  stateFips: string,
+  nameByFips: Readonly<Record<string, string>>,
+): string {
+  return nameByFips[stateFips] ?? `State ${stateFips}`;
+}
+
+/** Parallel per-year hate crime summaries — never sum incidents across years. */
+export async function getHateCrimeYearSummaries(
+  years: readonly string[],
+  firestore: Firestore = getServerFirestore(),
+): Promise<readonly HateCrimeYearSummary[]> {
+  const results = await Promise.all(years.map((year) => getHateCrimeYearSummary(year, firestore)));
+  return results
+    .filter((row): row is HateCrimeYearSummary => row !== undefined)
+    .sort((a, b) => Number(a.year) - Number(b.year));
+}
+
+/** Anti-Black share of reported incidents for one year — undefined when incidents are zero. */
+export function hateCrimeAntiBlackShare(
+  summary: Pick<HateCrimeYearSummary, 'incidents' | 'antiBlackIncidents'>,
+): number | null {
+  if (summary.incidents <= 0) {
+    return null;
+  }
+  return summary.antiBlackIncidents / summary.incidents;
+}
+
+export type OpportunityAtlasOutcomeFieldCoverage = {
+  readonly field: string;
+  readonly label: string;
+  readonly tractCount: number;
+};
+
+export type OpportunityAtlasHistogramBin = {
+  readonly id: string;
+  readonly label: string;
+  readonly minInclusive: number;
+  readonly maxExclusive: number;
+  readonly tractCount: number;
+};
+
 export type OpportunityAtlasCoverageSummary = {
   readonly tractCount: number;
+  readonly outcomeFieldCoverage: readonly OpportunityAtlasOutcomeFieldCoverage[];
+  readonly kfrBlackP25Histogram: readonly OpportunityAtlasHistogramBin[];
   readonly source: string;
   readonly sourceUrl: string;
   readonly license: string;
 };
 
-/** Coverage count only — percentile-rank outcome data is not something this file averages
- * into a national figure (averaging ranks across differently-populated tracts would itself
- * be a fabricated statistic; see the module doc on ../external/schema.ts). */
+/** Outcome fields surfaced on `/data` — counts only, never averaged percentile ranks. */
+export const OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS: Readonly<
+  Record<
+    | 'kfrPooledP25'
+    | 'kfrPooledP75'
+    | 'kfrBlackP25'
+    | 'kfrWhiteP25'
+    | 'jailBlackP25'
+    | 'jailPooledP25',
+    string
+  >
+> = {
+  kfrPooledP25: 'Household income rank (pooled, parents p25)',
+  kfrPooledP75: 'Household income rank (pooled, parents p75)',
+  kfrBlackP25: 'Household income rank (Black children, parents p25)',
+  kfrWhiteP25: 'Household income rank (white children, parents p25)',
+  jailBlackP25: 'Incarceration rate (Black children, parents p25)',
+  jailPooledP25: 'Incarceration rate (pooled, parents p25)',
+};
+
+/** Quintile bins on the Opportunity Atlas [0,1] percentile-rank scale for kfrBlackP25. */
+export const KFR_BLACK_P25_HISTOGRAM_BINS: readonly Omit<OpportunityAtlasHistogramBin, 'tractCount'>[] =
+  [
+    { id: '0-20', label: '0–20th', minInclusive: 0, maxExclusive: 0.2 },
+    { id: '20-40', label: '20–40th', minInclusive: 0.2, maxExclusive: 0.4 },
+    { id: '40-60', label: '40–60th', minInclusive: 0.4, maxExclusive: 0.6 },
+    { id: '60-80', label: '60–80th', minInclusive: 0.6, maxExclusive: 0.8 },
+    { id: '80-100', label: '80–100th', minInclusive: 0.8, maxExclusive: 1.0000001 },
+  ];
+
+type OpportunityAtlasTractOutcomesLike = Partial<
+  Record<keyof typeof OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS, number>
+>;
+
+/** Pure aggregate for Opportunity Atlas coverage — histogram counts tracts, not people. */
+export function aggregateOpportunityAtlasCoverage(
+  tracts: readonly { readonly outcomes: OpportunityAtlasTractOutcomesLike }[],
+): {
+  readonly tractCount: number;
+  readonly outcomeFieldCoverage: readonly OpportunityAtlasOutcomeFieldCoverage[];
+  readonly kfrBlackP25Histogram: readonly OpportunityAtlasHistogramBin[];
+} {
+  const fieldCounts = Object.fromEntries(
+    Object.keys(OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS).map((field) => [field, 0]),
+  ) as Record<keyof typeof OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS, number>;
+  const binCounts = Object.fromEntries(KFR_BLACK_P25_HISTOGRAM_BINS.map((bin) => [bin.id, 0])) as Record<
+    string,
+    number
+  >;
+
+  for (const tract of tracts) {
+    for (const field of Object.keys(OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS) as Array<
+      keyof typeof OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS
+    >) {
+      if (tract.outcomes[field] !== undefined) {
+        fieldCounts[field] += 1;
+      }
+    }
+    const rank = tract.outcomes.kfrBlackP25;
+    if (rank !== undefined) {
+      const bin =
+        KFR_BLACK_P25_HISTOGRAM_BINS.find(
+          (candidate) => rank >= candidate.minInclusive && rank < candidate.maxExclusive,
+        ) ?? KFR_BLACK_P25_HISTOGRAM_BINS.at(-1);
+      if (bin) {
+        binCounts[bin.id] = (binCounts[bin.id] ?? 0) + 1;
+      }
+    }
+  }
+
+  return {
+    tractCount: tracts.length,
+    outcomeFieldCoverage: (
+      Object.keys(OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS) as Array<
+        keyof typeof OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS
+      >
+    ).map((field) => ({
+      field,
+      label: OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS[field],
+      tractCount: fieldCounts[field],
+    })),
+    kfrBlackP25Histogram: KFR_BLACK_P25_HISTOGRAM_BINS.map((bin) => ({
+      ...bin,
+      tractCount: binCounts[bin.id] ?? 0,
+    })),
+  };
+}
+
+const OPPORTUNITY_ATLAS_COVERAGE_CACHE_TTL_MS = 15 * 60 * 1000;
+let opportunityAtlasCoverageCache:
+  | { readonly expiresAt: number; readonly value: OpportunityAtlasCoverageSummary }
+  | undefined;
+
+/** Coverage counts + kfrBlackP25 distribution bins — never averages percentile ranks nationally. */
 export async function getOpportunityAtlasCoverageSummary(
   firestore: Firestore = getServerFirestore(),
 ): Promise<OpportunityAtlasCoverageSummary | undefined> {
+  if (
+    opportunityAtlasCoverageCache &&
+    opportunityAtlasCoverageCache.expiresAt > Date.now()
+  ) {
+    return opportunityAtlasCoverageCache.value;
+  }
+
   const collection = firestore.collection('opportunityAtlasTracts');
-  const [agg, sample] = await Promise.all([
-    collection.aggregate({ n: AggregateField.count() }).get(),
-    collection.limit(1).get(),
-  ]);
+  const [sample, snap] = await Promise.all([collection.limit(1).get(), collection.select('outcomes').get()]);
   if (sample.empty) return undefined;
   const doc = sample.docs[0]!.data() as { source?: string; sourceUrl?: string; license?: string };
   if (!doc.source || !doc.sourceUrl || !doc.license) return undefined;
-  return {
-    tractCount: agg.data().n,
+
+  const tracts = snap.docs.map((row) => ({
+    outcomes: (row.data().outcomes ?? {}) as OpportunityAtlasTractOutcomesLike,
+  }));
+  const aggregate = aggregateOpportunityAtlasCoverage(tracts);
+  const value: OpportunityAtlasCoverageSummary = {
+    tractCount: aggregate.tractCount,
+    outcomeFieldCoverage: aggregate.outcomeFieldCoverage,
+    kfrBlackP25Histogram: aggregate.kfrBlackP25Histogram,
     source: doc.source,
     sourceUrl: publicSourceUrl({ source: doc.source, sourceUrl: doc.sourceUrl }),
     license: doc.license,
   };
+  opportunityAtlasCoverageCache = {
+    expiresAt: Date.now() + OPPORTUNITY_ATLAS_COVERAGE_CACHE_TTL_MS,
+    value,
+  };
+  return value;
 }

@@ -14,9 +14,11 @@ import {
   STATE_LABEL_FADE_END_ZOOM,
   STATE_LABEL_FADE_START_ZOOM,
   buildStateLabelMarkers,
+  stateLabelColors,
   stateLabelOpacityForZoom,
   stateLabelPoints,
 } from './state-labels';
+import { brandPalette, darkTheme } from '@repo/ui';
 
 test('every one of the 51 states/D.C. gets exactly one label point', () => {
   const points = stateLabelPoints();
@@ -92,4 +94,14 @@ test('buildStateLabelMarkers position/text are identical regardless of selection
     assert.deepEqual(unselected[i]!.lngLat, selected[i]!.lngLat);
     assert.equal(unselected[i]!.text, selected[i]!.text);
   }
+});
+
+test('stateLabelColors follows light vs dark theme tokens', () => {
+  const light = stateLabelColors('light');
+  assert.equal(light.default, brandPalette.stone);
+  assert.equal(light.selected, brandPalette.copperTextLight);
+
+  const dark = stateLabelColors('dark');
+  assert.equal(dark.default, darkTheme.inkMuted);
+  assert.equal(dark.selected, brandPalette.copperDark);
 });

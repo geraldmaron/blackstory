@@ -8,8 +8,18 @@ export {
   GEOMETRIC_FALLBACKS,
   GEOMETRIC_FALLBACK_IDS,
   geometricFallbackById,
+  PAGE_FIELD_MOTIFS,
+  PAGE_FIELD_MOTIF_IDS,
+  pageFieldMotifById,
 } from './geometric-fallbacks';
-export type { GeometricFallback, GeometricFallbackId } from './geometric-fallbacks';
+export type {
+  GeometricFallback,
+  GeometricFallbackId,
+  PageFieldMotif,
+  PageFieldMotifId,
+} from './geometric-fallbacks';
+export { selectPageField } from './select-page-field';
+export type { PageFieldSelection } from './select-page-field';
 export { selectAtmospherePlane, selectMosaicTiles } from './select-atmosphere-plane';
 export type {
   AtmosphereDensity,

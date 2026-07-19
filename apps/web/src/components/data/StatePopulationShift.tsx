@@ -8,6 +8,7 @@ import {
   rankStateMovers,
   type StateChangeLike,
 } from './population-change';
+import { StatePopulationShiftChart } from './StatePopulationShiftChart';
 
 void React;
 
@@ -18,6 +19,13 @@ export type StatePopulationShiftProps = {
   readonly stateNameByFips: Readonly<Record<string, string>>;
   readonly labelledBy?: string;
 };
+
+function resolveStateName(
+  stateFips: string,
+  stateNameByFips: Readonly<Record<string, string>>,
+): string {
+  return stateNameByFips[stateFips] ?? `State ${stateFips}`;
+}
 
 export function StatePopulationShift({
   fromDecade,
@@ -32,6 +40,12 @@ export function StatePopulationShift({
 
   return (
     <div className="ds-data-state-shift" {...(labelledBy ? { 'aria-labelledby': labelledBy } : {})}>
+      <StatePopulationShiftChart
+        fromDecade={fromDecade}
+        toDecade={toDecade}
+        changes={changes}
+        stateNameByFips={stateNameByFips}
+      />
       <h3 className="ds-sans ds-data-state-shift__title">
         State shift, {fromDecade}→{toDecade}
       </h3>
@@ -46,7 +60,7 @@ export function StatePopulationShift({
             <h4 className="ds-mono ds-data-state-shift__kicker">Largest gains</h4>
             <ol className="ds-data-state-shift__list">
               {gains.map((row) => {
-                const name = stateNameByFips[row.stateFips] ?? `State ${row.stateFips}`;
+                const name = resolveStateName(row.stateFips, stateNameByFips);
                 return (
                   <li key={`gain-${row.stateFips}`}>
                     {formatStateChangeLine(row, name)}
@@ -61,7 +75,7 @@ export function StatePopulationShift({
             <h4 className="ds-mono ds-data-state-shift__kicker">Largest losses</h4>
             <ol className="ds-data-state-shift__list">
               {losses.map((row) => {
-                const name = stateNameByFips[row.stateFips] ?? `State ${row.stateFips}`;
+                const name = resolveStateName(row.stateFips, stateNameByFips);
                 return (
                   <li key={`loss-${row.stateFips}`}>
                     {formatStateChangeLine(row, name)}

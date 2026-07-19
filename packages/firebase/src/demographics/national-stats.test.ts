@@ -5,12 +5,17 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   aggregateCountiesByState,
+  aggregateOpportunityAtlasCoverage,
+  buildStateFipsNameMap,
   computeNationalPopulationChangesFromDecades,
   computePopulationDecadeChange,
   computeStatePopulationChange,
   computeStatePopulationChangesFromDecades,
+  hateCrimeAntiBlackShare,
   POPULATION_DECADE_COMPARABILITY_NOTE,
   publicSourceUrl,
+  resolveStateFipsName,
+  US_TERRITORY_FIPS_NAMES,
 } from './national-stats.js';
 
 test('publicSourceUrl maps census API URLs to decade dataset landing pages', () => {
@@ -158,4 +163,52 @@ test('computeStatePopulationChange preserves endpoint populations', () => {
   assert.equal(change.blackPopulationTo, 3_100_000);
   assert.equal(change.totalPopulationFrom, 19_000_000);
   assert.equal(change.totalPopulationTo, 20_000_000);
+});
+
+test('buildStateFipsNameMap labels Puerto Rico and other territory FIPS', () => {
+  const map = buildStateFipsNameMap([{ fips: '06', name: 'California' }]);
+  assert.equal(map['06'], 'California');
+  assert.equal(map['72'], US_TERRITORY_FIPS_NAMES['72']);
+  assert.equal(resolveStateFipsName('72', map), 'Puerto Rico');
+  assert.equal(resolveStateFipsName('99', map), 'State 99');
+});
+
+test('hateCrimeAntiBlackShare returns null when incidents are zero', () => {
+  assert.equal(
+    hateCrimeAntiBlackShare({ incidents: 0, antiBlackIncidents: 0 }),
+    null,
+  );
+  assert.equal(
+    hateCrimeAntiBlackShare({ incidents: 100, antiBlackIncidents: 62 }).toFixed(2),
+    '0.62',
+  );
+});
+
+test('aggregateOpportunityAtlasCoverage counts outcome fields and histogram bins', () => {
+  const aggregate = aggregateOpportunityAtlasCoverage([
+    { outcomes: { kfrBlackP25: 0.15, kfrWhiteP25: 0.4, jailBlackP25: 0.02 } },
+    { outcomes: { kfrBlackP25: 0.55, kfrPooledP25: 0.5 } },
+    { outcomes: { kfrBlackP25: 0.95 } },
+  ]);
+  assert.equal(aggregate.tractCount, 3);
+  assert.equal(
+    aggregate.outcomeFieldCoverage.find((row) => row.field === 'kfrBlackP25')?.tractCount,
+    3,
+  );
+  assert.equal(
+    aggregate.outcomeFieldCoverage.find((row) => row.field === 'kfrWhiteP25')?.tractCount,
+    1,
+  );
+  assert.equal(
+    aggregate.kfrBlackP25Histogram.find((bin) => bin.id === '0-20')?.tractCount,
+    1,
+  );
+  assert.equal(
+    aggregate.kfrBlackP25Histogram.find((bin) => bin.id === '40-60')?.tractCount,
+    1,
+  );
+  assert.equal(
+    aggregate.kfrBlackP25Histogram.find((bin) => bin.id === '80-100')?.tractCount,
+    1,
+  );
 });

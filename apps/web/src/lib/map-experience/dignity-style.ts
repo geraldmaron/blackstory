@@ -134,10 +134,13 @@ export const CONFIDENCE_TIER_COLOR: Readonly<Record<string, string>> = {
   unrated: DIGNITY_PALETTE.confidenceUnrated,
 };
 
+/** Light plate ocean — pure white per cartography direction (pre-flash matches in map-surfaces.css). */
+export const LIGHT_PLATE_OCEAN = '#FFFFFF';
+
 export function plateForScheme(scheme: MapColorScheme) {
   if (scheme === 'light') {
     return {
-      ocean: DIGNITY_PALETTE.oceanLight,
+      ocean: LIGHT_PLATE_OCEAN,
       selected: DIGNITY_PALETTE.selectedDark,
       densityUnknown: DIGNITY_PALETTE.densityUnknownFillLight,
       densityDisabled: DIGNITY_PALETTE.densityDisabledFillLight,
@@ -145,6 +148,13 @@ export function plateForScheme(scheme: MapColorScheme) {
       street: DIGNITY_PALETTE.streetLight,
       streetLabel: DIGNITY_PALETTE.streetLabelLight,
       clusterText: DIGNITY_PALETTE.selectedDark,
+      /** State bounds — copper brown; stronger than county hairlines on the white plate. */
+      stateBounds: brandPalette.copperTextLight,
+      /** County hairlines — stone (not rule): rule (#D7D0C4) vanishes on white; stone stays distinct from stateBounds brown. */
+      countyLine: brandPalette.stone,
+      /** County name labels — stone text + white halo (WCAG: color is not the only boundary signal). */
+      countyLabel: brandPalette.stone,
+      countyLabelHalo: LIGHT_PLATE_OCEAN,
     } as const;
   }
   return {
@@ -156,5 +166,11 @@ export function plateForScheme(scheme: MapColorScheme) {
     street: DIGNITY_PALETTE.streetDark,
     streetLabel: DIGNITY_PALETTE.streetLabelDark,
     clusterText: DIGNITY_PALETTE.clusterText,
+    /** Dark branch frozen — warm pageSand state ruling (explore-state-bounds-line legacy). */
+    stateBounds: DIGNITY_PALETTE.pointHalo,
+    /** Dark county hairlines — archivePaper ink (was plate.selected before theme split). */
+    countyLine: DIGNITY_PALETTE.selected,
+    countyLabel: DIGNITY_PALETTE.streetLabelDark,
+    countyLabelHalo: DIGNITY_PALETTE.ocean,
   } as const;
 }

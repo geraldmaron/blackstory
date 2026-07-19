@@ -128,12 +128,32 @@ export type AllTimeGraphView = {
   readonly edgeIds: readonly string[];
 };
 
-export function buildAllTimeView(decadeViews: readonly DecadeGraphView[]): AllTimeGraphView {
+export type BuildAllTimeViewOptions = {
+  /** Every published entity id — included in all-time even when absent from decade buckets. */
+  readonly entityIds?: readonly string[];
+  /** When provided, relationship ids whose endpoints are both in the final node set are included. */
+  readonly relationships?: readonly EntityRelationship[];
+};
+
+export function buildAllTimeView(
+  decadeViews: readonly DecadeGraphView[],
+  options: BuildAllTimeViewOptions = {},
+): AllTimeGraphView {
   const nodeIds = new Set<string>();
   const edgeIds = new Set<string>();
   for (const view of decadeViews) {
     for (const id of view.nodeIds) nodeIds.add(id);
     for (const id of view.edgeIds) edgeIds.add(id);
+  }
+  if (options.entityIds) {
+    for (const id of options.entityIds) nodeIds.add(id);
+  }
+  if (options.relationships) {
+    for (const rel of options.relationships) {
+      if (nodeIds.has(rel.fromEntityId) && nodeIds.has(rel.toEntityId)) {
+        edgeIds.add(rel.id);
+      }
+    }
   }
   return {
     nodeIds: [...nodeIds].sort(),

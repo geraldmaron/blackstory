@@ -42,3 +42,51 @@ export function geometricFallbackById(id: GeometricFallbackId): GeometricFallbac
   }
   return found;
 }
+
+const PAGE_FIELD_BASE = '/brand/atmosphere/page-field';
+
+export const PAGE_FIELD_MOTIF_IDS = ['rules', 'ledger', 'pins', 'bands'] as const;
+
+export type PageFieldMotifId = (typeof PAGE_FIELD_MOTIF_IDS)[number];
+
+export type PageFieldMotif = {
+  readonly id: PageFieldMotifId;
+  readonly lightPath: string;
+  readonly darkPath: string;
+  readonly label: string;
+};
+
+export const PAGE_FIELD_MOTIFS: readonly PageFieldMotif[] = [
+  {
+    id: 'rules',
+    lightPath: `${PAGE_FIELD_BASE}/rules-light.svg`,
+    darkPath: `${PAGE_FIELD_BASE}/rules-dark.svg`,
+    label: 'Hairline rule grid',
+  },
+  {
+    id: 'ledger',
+    lightPath: `${PAGE_FIELD_BASE}/ledger-light.svg`,
+    darkPath: `${PAGE_FIELD_BASE}/ledger-dark.svg`,
+    label: 'Horizontal ledger lines',
+  },
+  {
+    id: 'pins',
+    lightPath: `${PAGE_FIELD_BASE}/pins-light.svg`,
+    darkPath: `${PAGE_FIELD_BASE}/pins-dark.svg`,
+    label: 'Place-pin marks',
+  },
+  {
+    id: 'bands',
+    lightPath: `${PAGE_FIELD_BASE}/bands-light.svg`,
+    darkPath: `${PAGE_FIELD_BASE}/bands-dark.svg`,
+    label: 'Flat page-band fills',
+  },
+] as const;
+
+export function pageFieldMotifById(id: PageFieldMotifId): PageFieldMotif {
+  const found = PAGE_FIELD_MOTIFS.find((entry) => entry.id === id);
+  if (!found) {
+    return PAGE_FIELD_MOTIFS[0]!;
+  }
+  return found;
+}

@@ -445,8 +445,28 @@
  * `MapExperienceLegend.tsx`'s props-contract doc comment). What lives here is purely the
  * component's internal layout, sized to stay legible down to a 375px-wide container.
  */
+.ds-explore-legend-stack {
+  display: grid;
+  gap: var(--ds-space-3);
+  max-width: 22rem;
+}
+
+.ds-map-color-key {
+  margin: 0;
+  padding-bottom: var(--ds-space-2);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-legend-line-swatch {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 1.25rem;
+  height: 3px;
+  border-radius: 1px;
+}
+
 .ds-explore-legend {
-  margin-top: var(--ds-space-2);
+  margin-top: 0;
   max-width: 22rem;
   font-family: var(--ds-font-sans);
 }

@@ -44,7 +44,7 @@ export function buildHistoryViewModel(
   entities: readonly PublicEntityView[] = listPublicEntities(),
 ): HistoryViewModel {
   const viewState = parseHistorySearchParams(raw);
-  const artifact = getHistoryGraphReleaseArtifact();
+  const artifact = getHistoryGraphReleaseArtifact(entities);
   const context = buildHistoryGraphContext(artifact, entities);
   const slice = resolveHistoryGraphSlice(artifact, viewState.mode, viewState.decade);
 

@@ -19,7 +19,7 @@ test('explains points, clusters, the density layer, and confidence glyphs in wor
   assert.match(html, /cluster/i);
   assert.match(html, /Group nearby/);
   assert.match(html, /full entity page/);
-  assert.match(html, /presence, not incidents/);
+  assert.match(html, /Choose a model/);
   assert.match(html, /High/);
   assert.match(html, /medium/);
   assert.match(html, /low \(orange\)/);
@@ -68,6 +68,26 @@ test('defaultCollapsed renders the disclosure closed', () => {
   );
   assert.match(html, /<details class="ds-explore-legend">/);
   assert.doesNotMatch(html, /<details[^>]*open/);
+});
+
+test('shows a visible color key for state and county boundary colors', () => {
+  const html = renderToStaticMarkup(
+    createElement(MapExperienceLegend, { colorScheme: 'light' }),
+  );
+  assert.match(html, /Color key/);
+  assert.match(html, /State outline/);
+  assert.match(html, /County line/);
+  assert.match(html, /Selected state/);
+  assert.match(html, /ds-map-color-key/);
+});
+
+test('color key includes share tiers when blackShare layer is active', () => {
+  const html = renderToStaticMarkup(
+    createElement(MapExperienceLegend, { layerMode: 'blackShare', colorScheme: 'light' }),
+  );
+  assert.match(html, /Black population share by county/);
+  assert.match(html, /Under 2%/);
+  assert.match(html, /50%\+/);
 });
 
 test('kind swatches and confidence glyphs are aria-hidden (the accessible content is the adjacent text)', () => {

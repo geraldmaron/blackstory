@@ -8,7 +8,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listPublicEntities } from '../../data/public-seed';
 import { buildExploreMapSource } from '../../lib/map-experience/build-explore-map-source';
-import { DIGNITY_PALETTE, EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience';
+import { DIGNITY_PALETTE, EXPLORE_CLUSTER_CONFIG, LIGHT_PLATE_OCEAN, plateForScheme } from '../../lib/map-experience';
+import { brandPalette } from '@repo/ui';
 import { KIND_ENCODING_ENTRIES } from '../../lib/map-experience/kind-encoding';
 import { markerHaloRadiusExpression, markerRadiusExpression } from '../../lib/map-experience/marker-size';
 import {
@@ -17,6 +18,8 @@ import {
   ENTITY_HALO_OPACITY,
   ENTITY_POINT_FILL_OPACITY,
   EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_COUNTY_LABEL_LAYER_ID,
+  EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
@@ -185,7 +188,7 @@ test('OpenFreeMap street layers are present for casing, fill, and labels', () =>
   assert.ok(style.layers.some((layer) => layer.id === 'explore-street-label'));
 });
 
-test('light colorScheme flips ocean and street ink to the light plate', () => {
+test('light colorScheme uses a white plate with brown state bounds and stone county lines', () => {
   const source = buildExploreMapSource(listPublicEntities());
   const dark = buildExploreMapStyle({
     featureCollection: source.featureCollection,
@@ -202,8 +205,61 @@ test('light colorScheme flips ocean and street ink to the light plate', () => {
   const darkBg = layerById(dark, 'background').paint?.['background-color'];
   const lightBg = layerById(light, 'background').paint?.['background-color'];
   assert.equal(darkBg, DIGNITY_PALETTE.ocean);
-  assert.equal(lightBg, DIGNITY_PALETTE.oceanLight);
+  assert.equal(lightBg, LIGHT_PLATE_OCEAN);
   assert.notEqual(darkBg, lightBg);
+
+  const lightPlate = plateForScheme('light');
+  assert.equal(lightPlate.ocean, LIGHT_PLATE_OCEAN);
+  assert.equal(lightPlate.stateBounds, brandPalette.copperTextLight);
+  assert.equal(lightPlate.countyLine, brandPalette.stone);
+
+  const stateBounds = layerById(light, 'explore-state-bounds-line');
+  assert.equal(stateBounds.paint?.['line-color'], lightPlate.stateBounds);
+
+  const countyLines = layerById(light, EXPLORE_COUNTY_LINES_LAYER_ID);
+  assert.equal(countyLines.paint?.['line-color'], lightPlate.countyLine);
+  assert.notEqual(countyLines.paint?.['line-color'], lightPlate.selected);
+});
+
+test('county label symbol layer reads name from GeoJSON and sits above county lines', () => {
+  const source = buildExploreMapSource(listPublicEntities());
+  const style = buildExploreMapStyle({
+    featureCollection: source.featureCollection,
+    jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
+    layerMode: 'off',
+    colorScheme: 'light',
+  });
+  const labelLayer = layerById(style, EXPLORE_COUNTY_LABEL_LAYER_ID) as {
+    type?: string;
+    source?: string;
+    layout?: Record<string, unknown>;
+    paint?: Record<string, unknown>;
+  };
+  assert.equal(labelLayer.type, 'symbol');
+  assert.equal(labelLayer.source, 'explore-county-lines');
+  assert.deepEqual(labelLayer.layout?.['text-field'], ['get', 'name']);
+  assert.deepEqual(labelLayer.layout?.['text-font'], ['Noto Sans Regular']);
+
+  const lineIndex = style.layers.findIndex((layer) => layer.id === EXPLORE_COUNTY_LINES_LAYER_ID);
+  const labelIndex = style.layers.findIndex((layer) => layer.id === EXPLORE_COUNTY_LABEL_LAYER_ID);
+  const entityIndex = style.layers.findIndex((layer) => layer.id === EXPLORE_UNCLUSTERED_HALO_LAYER_ID);
+  assert.ok(lineIndex >= 0 && labelIndex > lineIndex, 'county labels must render above county lines');
+  assert.ok(entityIndex > labelIndex, 'county labels must sit below entity markers');
+});
+
+test('dark colorScheme keeps the ink ocean and pageSand state bounds', () => {
+  const source = buildExploreMapSource(listPublicEntities());
+  const dark = buildExploreMapStyle({
+    featureCollection: source.featureCollection,
+    jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
+    layerMode: 'off',
+    colorScheme: 'dark',
+  });
+  assert.equal(layerById(dark, 'background').paint?.['background-color'], '#080606');
+  const darkPlate = plateForScheme('dark');
+  assert.equal(darkPlate.ocean, '#080606');
+  assert.equal(layerById(dark, 'explore-state-bounds-line').paint?.['line-color'], darkPlate.stateBounds);
+  assert.equal(darkPlate.stateBounds, DIGNITY_PALETTE.pointHalo);
 });
 
 /** Collect string color outputs nested inside case/match paint expressions. */

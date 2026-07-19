@@ -15,11 +15,48 @@ test.beforeEach(() => {
 });
 
 test('all-time view includes every published seed entity from the graph artifact', () => {
-  const view = buildHistoryViewModel({});
-  assert.equal(view.totalMatched, listPublicEntities().length);
+  const entities = listPublicEntities();
+  const view = buildHistoryViewModel({}, entities);
+  assert.equal(view.totalMatched, entities.length);
   assert.equal(view.viewState.mode, 'all-time');
   assert.ok(view.nodes.length > 0);
   assert.ok(view.contentHash.length > 0);
+});
+
+test('all-time view includes an injected undated entity with undated status label', () => {
+  const undated = {
+    id: 'ent_undated_fixture_001',
+    kind: 'place' as const,
+    displayName: 'Undated Place Fixture',
+    summary: 'No temporal spans.',
+    era: 'undated',
+    notabilityLabels: [] as const,
+    topicTags: ['fixture'] as const,
+    jurisdictionLabel: 'Washington, D.C.',
+    locationPrecision: 'city' as const,
+    locationLabel: 'Washington, D.C.',
+    relevanceExplanation: 'Fixture.',
+    historicalContext: 'Fixture.',
+    recordMaturity: 'minimum_record' as const,
+    researchCoverage: 'partial' as const,
+    mapPin: { x: 50, y: 50 },
+    claims: [] as const,
+    revision: {
+      releaseId: 'seed-snapshot',
+      generatedAt: '2026-07-17T00:00:00.000Z',
+      recordUpdatedAt: '2026-07-01T00:00:00.000Z',
+    },
+    relatedIds: [] as const,
+    related: [] as const,
+    timeline: [] as const,
+  };
+  const catalog = [...listPublicEntities(), undated];
+  const view = buildHistoryViewModel({}, catalog);
+  assert.equal(view.totalMatched, catalog.length);
+  const node = view.nodes.find((entry) => entry.entityId === undated.id);
+  assert.ok(node);
+  assert.equal(node!.statusKind, 'undated');
+  assert.equal(node!.statusLabel, 'Status not yet published for this record');
 });
 
 test('decade view derives node membership from decade artifacts', () => {

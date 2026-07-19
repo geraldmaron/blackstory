@@ -43,11 +43,12 @@ import type {
 } from 'maplibre-gl';
 import type * as MapLibreNamespace from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { brandPalette, darkTheme } from '@repo/ui';
+import { brandPalette, darkTheme, lightTheme } from '@repo/ui';
 import {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
+  EXPLORE_COUNTY_LABEL_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_COUNTY_LINES_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
@@ -78,22 +79,39 @@ import type { StateDensityLevel } from '../../lib/map-experience/density';
 import type { CountyChoroplethLevel } from '../../lib/map-experience/county-choropleth';
 import { joinDensityOntoStatePolygons } from '../../lib/map-experience/join-state-polygons';
 import { joinPopulationOntoCountyPolygons } from '../../lib/map-experience/join-county-population';
-import {
-  buildStateLabelElement,
-  buildStateLabelMarkers,
-  stateLabelOpacityForZoom,
-  STATE_LABEL_SELECTED_CLASS_NAME,
-} from '../../lib/map-experience/state-labels';
+import * as stateLabels from '../../lib/map-experience/state-labels';
 import { US_STATES_GEOJSON_PATH } from '../../lib/map-experience/us-state-polygons';
 import {
   COUNTY_LINES_PREFETCH_ZOOM,
   US_COUNTIES_GEOJSON_PATH,
 } from '../../lib/map-experience/us-county-lines';
 import type { ExploreLayerMode, ExploreViewport } from '../../lib/map-experience/url-state';
+import {
+  PERSISTENT_PLATE_LAYER_IDS,
+  syncLayerPaintFromStyle,
+  syncSingleLayerPaint,
+} from './map-plate-paint';
 
 function readDocumentColorScheme(): MapColorScheme {
   if (typeof document === 'undefined') return 'dark';
   return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+}
+
+/** Theme-aware label colors; prefers `stateLabelColorsForScheme` from state-labels when exported. */
+function stateLabelColorFor(scheme: MapColorScheme, selected: boolean): string {
+  const colorsForScheme = (
+    stateLabels as {
+      stateLabelColorsForScheme?: (
+        colorScheme: MapColorScheme,
+      ) => { readonly muted: string; readonly selected: string };
+    }
+  ).stateLabelColorsForScheme;
+  if (colorsForScheme) {
+    const colors = colorsForScheme(scheme);
+    return selected ? colors.selected : colors.muted;
+  }
+  const theme = scheme === 'light' ? lightTheme : darkTheme;
+  return selected ? brandPalette.copperDark : theme.inkMuted;
 }
 
 type MaplibreModule = typeof MapLibreNamespace;
@@ -127,6 +145,7 @@ const GEOGRAPHY_LAYER_IDS = new Set([
   'explore-state-density-fill',
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
+  EXPLORE_COUNTY_LABEL_LAYER_ID,
   'explore-state-bounds-line',
   'explore-state-selected-fill',
   'explore-state-selected-line',
@@ -398,10 +417,12 @@ function applyGeographyStyle(
     ? EXPLORE_UNCLUSTERED_HALO_LAYER_ID
     : undefined;
   for (const layer of style.layers ?? []) {
-    if (layer.id === 'background') continue;
     if (GEOGRAPHY_LAYER_IDS.has(layer.id)) {
       if (!map.getLayer(layer.id)) {
-        map.addLayer(layer as LayerSpecification, entityAnchor);
+        const beforeId = layer.id === 'background' ? undefined : entityAnchor;
+        map.addLayer(layer as LayerSpecification, beforeId);
+      } else {
+        syncSingleLayerPaint(map, layer);
       }
       continue;
     }
@@ -623,15 +644,24 @@ export function MapStageProvider({
   }, [markMapUnavailable]);
 
   const updateStateLabelSelection = useCallback((selectedPostalCode: string | undefined) => {
+    const scheme = readDocumentColorScheme();
     for (const [postalCode, entry] of stateLabelMarkersRef.current) {
       const selected = postalCode === selectedPostalCode;
-      entry.element.classList.toggle(STATE_LABEL_SELECTED_CLASS_NAME, selected);
-      entry.element.style.color = selected ? brandPalette.copperDark : darkTheme.inkMuted;
+      entry.element.classList.toggle(stateLabels.STATE_LABEL_SELECTED_CLASS_NAME, selected);
+      entry.element.style.color = stateLabelColorFor(scheme, selected);
+    }
+  }, []);
+
+  const syncStateLabelTheme = useCallback((scheme: MapColorScheme) => {
+    for (const [postalCode, entry] of stateLabelMarkersRef.current) {
+      const selected = postalCode === configRef.current.selectedState;
+      entry.element.classList.toggle(stateLabels.STATE_LABEL_SELECTED_CLASS_NAME, selected);
+      entry.element.style.color = stateLabelColorFor(scheme, selected);
     }
   }, []);
 
   const updateStateLabelOpacity = useCallback((zoom: number) => {
-    const opacity = String(stateLabelOpacityForZoom(zoom));
+    const opacity = String(stateLabels.stateLabelOpacityForZoom(zoom));
     for (const [, entry] of stateLabelMarkersRef.current) {
       entry.element.style.opacity = opacity;
     }
@@ -649,6 +679,7 @@ export function MapStageProvider({
         EXPLORE_STATE_DENSITY_LAYER_ID,
         EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
         EXPLORE_COUNTY_LINES_LAYER_ID,
+        EXPLORE_COUNTY_LABEL_LAYER_ID,
         'explore-state-bounds-line',
         SELECTED_FILL_ID,
         SELECTED_LINE_ID,
@@ -685,6 +716,16 @@ export function MapStageProvider({
     }
   }, [syncEntityMarkers]);
 
+  const syncPlatePaintToTheme = useCallback(
+    (map: MapLibreMap, style: StyleSpecification, scheme: MapColorScheme) => {
+      syncLayerPaintFromStyle(map, style, PERSISTENT_PLATE_LAYER_IDS, (update, error) => {
+        console.error(`[MapStage] setPaintProperty ${update.layerId}.${update.paintKey} failed`, error);
+      });
+      syncStateLabelTheme(scheme);
+    },
+    [syncStateLabelTheme],
+  );
+
   const patchData = useCallback(
     (patch: MapStageDataPatch) => {
       const clusteringEnabled = patch.clusteringEnabled ?? configRef.current.clusteringEnabled;
@@ -716,18 +757,21 @@ export function MapStageProvider({
 
   useEffect(() => {
     const syncPlateToTheme = () => {
-      if (!mapRef.current) return;
+      const map = mapRef.current;
+      if (!map || !map.isStyleLoaded()) return;
       const cfg = configRef.current;
+      const scheme = readDocumentColorScheme();
       const style = buildExploreMapStyle({
         featureCollection: cfg.featureCollection,
         jurisdictionAreaFeatures: cfg.jurisdictionAreaFeatures,
         layerMode: cfg.layerMode,
         historyEdgesEnabled: cfg.historyEdgesEnabled,
         clusteringEnabled: cfg.clusteringEnabled,
-        colorScheme: readDocumentColorScheme(),
+        colorScheme: scheme,
       });
       configRef.current = { ...cfg, style };
       applyStyleAndData();
+      syncPlatePaintToTheme(map, style, scheme);
     };
     const observer = new MutationObserver((mutations) => {
       if (mutations.some((mutation) => mutation.attributeName === 'data-theme')) {
@@ -736,7 +780,7 @@ export function MapStageProvider({
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     return () => observer.disconnect();
-  }, [applyStyleAndData]);
+  }, [applyStyleAndData, syncPlatePaintToTheme]);
 
   const applyViewState = useCallback(
     (patch: MapStageViewPatch) => {
@@ -887,14 +931,15 @@ export function MapStageProvider({
 
       // State-label markers mount first so, by DOM insertion order, entity markers layer above
       // them (state-labels.ts's documented belt-and-suspenders stacking guidance).
-      const descriptors = buildStateLabelMarkers(configRef.current.selectedState);
+      const descriptors = stateLabels.buildStateLabelMarkers(configRef.current.selectedState);
       for (const descriptor of descriptors) {
-        const element = buildStateLabelElement(descriptor);
+        const element = stateLabels.buildStateLabelElement(descriptor);
         const marker = new (maplibreglRef.current as MaplibreModule['default']).Marker({ element, anchor: 'center' })
           .setLngLat([descriptor.lngLat[0], descriptor.lngLat[1]])
           .addTo(activeMap);
         stateLabelMarkersRef.current.set(descriptor.postalCode, { marker, element });
       }
+      syncStateLabelTheme(readDocumentColorScheme());
       updateStateLabelOpacity(activeMap.getZoom());
 
       syncEntityMarkers();

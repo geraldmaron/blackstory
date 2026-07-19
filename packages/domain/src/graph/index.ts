@@ -52,6 +52,7 @@ export type {
   DecadeGraphView,
   BuildDecadeViewsInput,
   AllTimeGraphView,
+  BuildAllTimeViewOptions,
 } from './decades.js';
 
 export {

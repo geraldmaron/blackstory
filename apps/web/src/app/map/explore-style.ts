@@ -40,6 +40,7 @@ import {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
+  EXPLORE_COUNTY_LABEL_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_COUNTY_LINES_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
@@ -62,6 +63,7 @@ export {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
+  EXPLORE_COUNTY_LABEL_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_COUNTY_LINES_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
@@ -422,17 +424,17 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
       },
       {
         // County hairlines (the related workstream): the fainter tier of the same boundary system as
-        // the state bounds line below it in this array — same Archive Paper ink, thinner and
-        // more transparent, fading in from `minzoom` so the national frame stays clean. Sits
-        // BELOW state bounds (so state borders keep reading stronger) and far below the entity
-        // marker stack, whose zoom-scaled radius (marker-size.ts's `markerZoomScaleExpression`)
+        // the state bounds line below it in this array — theme-aware ink (stone on light, paper on
+        // dark), thinner and more transparent, fading in from `minzoom` so the national frame stays
+        // clean. Sits BELOW state bounds (so state borders keep reading stronger) and far below the
+        // entity marker stack, whose zoom-scaled radius (marker-size.ts's `markerZoomScaleExpression`)
         // keeps a circle proportionate to the county polygon behind it at every zoom.
         id: EXPLORE_COUNTY_LINES_LAYER_ID,
         type: 'line',
         source: EXPLORE_COUNTY_LINES_SOURCE_ID,
         minzoom: COUNTY_LINES_MIN_ZOOM,
         paint: {
-          'line-color': plate.selected,
+          'line-color': plate.countyLine,
           'line-width': [
             'interpolate',
             ['linear'],
@@ -456,13 +458,42 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
+        id: EXPLORE_COUNTY_LABEL_LAYER_ID,
+        type: 'symbol',
+        source: EXPLORE_COUNTY_LINES_SOURCE_ID,
+        minzoom: COUNTY_LINES_MIN_ZOOM,
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': 10,
+          'text-max-width': 8,
+          'text-letter-spacing': 0.02,
+        },
+        paint: {
+          'text-color': plate.countyLabel,
+          'text-halo-color': plate.countyLabelHalo,
+          'text-halo-width': 1.5,
+          'text-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            COUNTY_LINES_MIN_ZOOM,
+            0,
+            COUNTY_LINES_MIN_ZOOM + 1,
+            0.65,
+            9,
+            0.85,
+          ] as unknown as ExpressionSpecification,
+        },
+      },
+      {
         id: 'explore-state-bounds-line',
         type: 'line',
         source: EXPLORE_STATE_DENSITY_SOURCE_ID,
         paint: {
           // Warm hairlines, not stark paper strokes — state bounds are the
           // chart's ruling, and the entity stack must always read above them.
-          'line-color': DIGNITY_PALETTE.pointHalo,
+          'line-color': plate.stateBounds,
           'line-width': 1,
           'line-opacity': 0.55,
         },

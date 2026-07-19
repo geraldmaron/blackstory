@@ -17,6 +17,7 @@
 // barrel-importing here would drag a Node-only module into the browser bundle.
 import { US_STATES, type UsStateInfo } from '@repo/domain/map/geography';
 import { brandPalette, darkTheme } from '@repo/ui';
+import { type MapColorScheme } from './dignity-style';
 
 export type StateLabelPoint = {
   readonly postalCode: string;
@@ -102,8 +103,44 @@ export function buildStateLabelMarkers(selectedPostalCode?: string): readonly St
 export const STATE_LABEL_CLASS_NAME = 'ds-state-label';
 export const STATE_LABEL_SELECTED_CLASS_NAME = 'ds-state-label--selected';
 
+/** Resolves light/dark from an explicit scheme or `document.documentElement.dataset.theme`. */
+export function resolveStateLabelColorScheme(colorScheme?: MapColorScheme): MapColorScheme {
+  if (colorScheme) return colorScheme;
+  if (typeof document !== 'undefined' && document.documentElement.dataset.theme === 'light') {
+    return 'light';
+  }
+  return 'dark';
+}
+
+/** Theme-aware ink for HTML state abbreviation markers (testable without DOM). */
+export function stateLabelColors(colorScheme?: MapColorScheme): {
+  readonly default: string;
+  readonly selected: string;
+} {
+  const scheme = resolveStateLabelColorScheme(colorScheme);
+  if (scheme === 'light') {
+    return {
+      default: brandPalette.stone,
+      selected: brandPalette.copperTextLight,
+    };
+  }
+  return {
+    default: darkTheme.inkMuted,
+    selected: brandPalette.copperDark,
+  };
+}
+
+/** MapStage integration alias — `{ muted, selected }` shape for theme observer sync. */
+export function stateLabelColorsForScheme(colorScheme: MapColorScheme): {
+  readonly muted: string;
+  readonly selected: string;
+} {
+  const colors = stateLabelColors(colorScheme);
+  return { muted: colors.default, selected: colors.selected };
+}
+
 /**
- * Builds a label's DOM element: IBM Plex Mono caps, Stone-on-dark, copper when selected, never
+ * Builds a label's DOM element: IBM Plex Mono caps, theme-aware muted ink, copper when selected, never
  * interactive. Browser-only (calls `document.createElement`) callers must not invoke this in a
  * non-DOM context (SSR/Node tests); `stateLabelPoints`/`buildStateLabelMarkers` above are this
  * module's SSR/test-safe surface.
@@ -119,7 +156,10 @@ export const STATE_LABEL_SELECTED_CLASS_NAME = 'ds-state-label--selected';
  * markers' DOM nodes below the entity/cluster marker layer (e.g. a lower z-index or insertion
  * order) as a further belt-and-suspenders measure.
  */
-export function buildStateLabelElement(descriptor: StateLabelMarkerDescriptor): HTMLDivElement {
+export function buildStateLabelElement(
+  descriptor: StateLabelMarkerDescriptor,
+  options?: { readonly colorScheme?: MapColorScheme },
+): HTMLDivElement {
   const el = document.createElement('div');
   el.className = descriptor.selected
     ? `${STATE_LABEL_CLASS_NAME} ${STATE_LABEL_SELECTED_CLASS_NAME}`
@@ -137,6 +177,7 @@ export function buildStateLabelElement(descriptor: StateLabelMarkerDescriptor): 
   el.style.letterSpacing = '0.08em';
   el.style.fontSize = '0.6875rem';
   el.style.fontWeight = '500';
-  el.style.color = descriptor.selected ? brandPalette.copperDark : darkTheme.inkMuted;
+  const colors = stateLabelColors(options?.colorScheme);
+  el.style.color = descriptor.selected ? colors.selected : colors.default;
   return el;
 }

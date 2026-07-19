@@ -23,6 +23,8 @@ export const EXPLORE_STATE_DENSITY_LAYER_ID = 'explore-state-density-fill';
 /** the related workstream: county hairlines — the fainter tier of the boundary system beneath the
  * state bounds line, zoom-gated so the national frame stays clean. */
 export const EXPLORE_COUNTY_LINES_LAYER_ID = 'explore-county-lines-line';
+/** County name labels on the same GeoJSON source as hairlines (symbol layer, OpenFreeMap glyphs). */
+export const EXPLORE_COUNTY_LABEL_LAYER_ID = 'explore-county-labels';
 /** County choropleth fill for population share/change models (same GeoJSON source as hairlines). */
 export const EXPLORE_COUNTY_CHOROPLETH_LAYER_ID = 'explore-county-choropleth-fill';
 export const EXPLORE_JURISDICTION_AREA_LAYER_ID = 'explore-jurisdiction-area-fill';

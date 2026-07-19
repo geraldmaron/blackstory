@@ -11,7 +11,9 @@
  */
 import { US_STATES } from '@repo/domain/map/geography';
 import {
+  buildStateFipsNameMap,
   getAcsCoverageSummary,
+  getHateCrimeYearSummaries,
   getHateCrimeYearSummary,
   getNationalPopulationByDecade,
   getNationalPopulationChanges,
@@ -27,6 +29,8 @@ import { Notice } from '@repo/ui';
 import { AcsCoverageChart } from '../../components/data/AcsCoverageChart';
 import { DataStatStrip } from '../../components/data/DataStatStrip';
 import { HateCrimeCompositionChart } from '../../components/data/HateCrimeCompositionChart';
+import { HateCrimeYearSeriesChart } from '../../components/data/HateCrimeYearSeriesChart';
+import { OpportunityAtlasCoverageChart } from '../../components/data/OpportunityAtlasCoverageChart';
 import { nationalChangeStripItems } from '../../components/data/population-change';
 import { PopulationByDecadeChart } from '../../components/data/PopulationByDecadeChart';
 import { StatePopulationShift } from '../../components/data/StatePopulationShift';
@@ -41,6 +45,9 @@ export const metadata = {
 /** Most recent data year with a complete annual FBI UCR release at time of writing. */
 const LATEST_HATE_CRIME_YEAR = '2024';
 
+/** Years shown on the multi-year reporting metrics chart — each year fetched separately. */
+const HATE_CRIME_SERIES_YEARS = ['2010', '2015', '2020', '2021', '2022', '2023', '2024'] as const;
+
 async function safe<T>(promise: Promise<T | undefined>): Promise<T | undefined> {
   try {
     return await promise;
@@ -53,9 +60,7 @@ function formatCount(value: number): string {
   return value.toLocaleString('en-US');
 }
 
-const STATE_NAME_BY_FIPS: Readonly<Record<string, string>> = Object.fromEntries(
-  US_STATES.map((state) => [state.fips, state.name]),
-);
+const STATE_NAME_BY_FIPS = buildStateFipsNameMap(US_STATES);
 
 export default async function DataPage() {
   const [
@@ -64,6 +69,7 @@ export default async function DataPage() {
     stateChanges2010to2020,
     acsCoverage,
     hateCrimeYear,
+    hateCrimeSeries,
     opportunityAtlasCoverage,
   ] = await Promise.all([
     safe(getNationalPopulationByDecade()),
@@ -71,10 +77,12 @@ export default async function DataPage() {
     safe(getStatePopulationChanges('2010', '2020')),
     safe(getAcsCoverageSummary()),
     safe(getHateCrimeYearSummary(LATEST_HATE_CRIME_YEAR)),
+    safe(getHateCrimeYearSummaries(HATE_CRIME_SERIES_YEARS)),
     safe(getOpportunityAtlasCoverageSummary()),
   ]);
 
   const hateCrime = hateCrimeYear as HateCrimeYearSummary | undefined;
+  const hateCrimeByYear = (hateCrimeSeries ?? []) as readonly HateCrimeYearSummary[];
   const acs = acsCoverage as AcsCoverageSummary | undefined;
   const opportunity = opportunityAtlasCoverage as OpportunityAtlasCoverageSummary | undefined;
   const changes = (populationChanges ?? []) as readonly PopulationDecadeChange[];
@@ -174,7 +182,7 @@ export default async function DataPage() {
       <section className="ds-section" aria-labelledby="hate-crime-heading">
         <p className="ds-section__kicker">FBI Uniform Crime Reporting</p>
         <h2 className="ds-section__title" id="hate-crime-heading">
-          Hate crime reporting, {LATEST_HATE_CRIME_YEAR}
+          Hate crime reporting
         </h2>
         <Notice tone="warning" title="Reporting is voluntary">
           Participation in the UCR hate crime program is voluntary for law enforcement agencies.
@@ -184,6 +192,11 @@ export default async function DataPage() {
         </Notice>
         {hateCrime ? (
           <>
+            {hateCrimeByYear.length > 1 ? (
+              <div className="ds-data-section__viz">
+                <HateCrimeYearSeriesChart summaries={hateCrimeByYear} />
+              </div>
+            ) : null}
             <div className="ds-data-section__viz">
               <HateCrimeCompositionChart summary={hateCrime} />
             </div>
@@ -231,18 +244,23 @@ export default async function DataPage() {
           don&rsquo;t publish one here).
         </p>
         {opportunity ? (
-          <DataStatStrip
-            labelledBy="mobility-heading"
-            sources={[{ label: opportunity.source, url: opportunity.sourceUrl }]}
-            items={[
-              {
-                id: 'oa-tracts',
-                value: formatCount(opportunity.tractCount),
-                label: 'Tracts covered (2010 geography)',
-                note: opportunity.license,
-              },
-            ]}
-          />
+          <>
+            <div className="ds-data-section__viz">
+              <OpportunityAtlasCoverageChart coverage={opportunity} />
+            </div>
+            <DataStatStrip
+              labelledBy="mobility-heading"
+              sources={[{ label: opportunity.source, url: opportunity.sourceUrl }]}
+              items={[
+                {
+                  id: 'oa-tracts',
+                  value: formatCount(opportunity.tractCount),
+                  label: 'Tracts covered (2010 geography)',
+                  note: opportunity.license,
+                },
+              ]}
+            />
+          </>
         ) : (
           <p className="ds-sans">Opportunity Atlas data is not available in this environment yet.</p>
         )}

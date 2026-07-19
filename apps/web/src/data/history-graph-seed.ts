@@ -61,23 +61,44 @@ function decadeBucketInputs(entities: readonly PublicEntityView[]): readonly Dec
     .filter((input): input is DecadeBucketEntityInput => input !== undefined);
 }
 
-let cachedArtifact: GraphReleaseArtifact | undefined;
+function catalogCacheKey(entities: readonly PublicEntityView[]): string {
+  return entities
+    .map((entity) => entity.id)
+    .sort((a, b) => a.localeCompare(b))
+    .join('\0');
+}
 
-/** Lazily builds and memoizes the seed graph release artifact for `/history`.  */
-export function getHistoryGraphReleaseArtifact(): GraphReleaseArtifact {
-  if (cachedArtifact) return cachedArtifact;
-  const entities = listPublicEntities();
-  cachedArtifact = buildGraphReleaseArtifact({
+const artifactCache = new Map<string, GraphReleaseArtifact>();
+
+/** Builds a graph release artifact from the injected public entity catalog. */
+export function buildHistoryGraphReleaseArtifact(
+  entities: readonly PublicEntityView[],
+): GraphReleaseArtifact {
+  return buildGraphReleaseArtifact({
     releaseId: HISTORY_GRAPH_RELEASE_ID,
     generatedAt: HISTORY_GRAPH_GENERATED_AT,
     entityIds: entities.map((entity) => entity.id),
     entities: decadeBucketInputs(entities),
     relationships: [...SEED_ENTITY_RELATIONSHIPS],
   });
-  return cachedArtifact;
 }
 
-/** Resets the memoized artifact test-only hook.  */
+/**
+ * Lazily builds and memoizes the graph release artifact for `/history`, keyed by the injected
+ * entity catalog so live and seed snapshots never share a stale cache entry.
+ */
+export function getHistoryGraphReleaseArtifact(
+  entities: readonly PublicEntityView[] = listPublicEntities(),
+): GraphReleaseArtifact {
+  const cacheKey = catalogCacheKey(entities);
+  const cached = artifactCache.get(cacheKey);
+  if (cached) return cached;
+  const artifact = buildHistoryGraphReleaseArtifact(entities);
+  artifactCache.set(cacheKey, artifact);
+  return artifact;
+}
+
+/** Resets the memoized artifact cache — test-only hook. */
 export function resetHistoryGraphReleaseArtifactForTests(): void {
-  cachedArtifact = undefined;
+  artifactCache.clear();
 }

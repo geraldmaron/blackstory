@@ -106,3 +106,20 @@ test('publicRelatedEntriesByEntityId produces the {id, type, direction, timespan
     assert.ok(!('evidenceCount' in entry), 'evidenceCount must not leak into the public shape');
   }
 });
+
+test('all-time view includes every entityId even when the entity has no decade-span inputs', () => {
+  const input: GraphReleaseArtifactInput = {
+    releaseId: 'release-undated',
+    generatedAt: '2026',
+    entityIds: ['dated-entity', 'undated-entity'],
+    entities: [
+      {
+        entityId: 'dated-entity',
+        activeSpans: [{ validFrom: '1950', validTo: '1960', datePrecision: 'year' }],
+      },
+    ],
+    relationships: [],
+  };
+  const artifact = buildGraphReleaseArtifact(input);
+  assert.deepEqual(artifact.allTimeView.nodeIds, ['dated-entity', 'undated-entity']);
+});
