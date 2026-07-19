@@ -1,0 +1,73 @@
+# Firebase App Hosting config at the monorepo root.
+#
+# Why root (not apps/web): App Hosting with rootDirectory=apps/web falls back to
+# npm and fails on pnpm `workspace:*` deps (EUNSUPPORTEDPROTOCOL). With root
+# directory `.`, the buildpack sees pnpm-lock.yaml and uses pnpm.
+#
+# GOOGLE_BUILDABLE points the Next.js adapter at apps/web.
+# automatic App Hosting rollouts stay disabled (explicit CLI/Actions promote only).
+
+scripts:
+  # Relative to repo root. Standalone emit from next.config output:'standalone'.
+  runCommand: node apps/web/.next/standalone/apps/web/server.js
+
+runConfig:
+  minInstances: 1
+  maxInstances: 6
+  concurrency: 40
+  cpu: 1
+  memoryMiB: 512
+
+env:
+  - variable: GOOGLE_BUILDABLE
+    value: apps/web
+    availability:
+      - BUILD
+  - variable: NEXT_PUBLIC_APP_ENV
+    value: production
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: PUBLIC_READ_API_DISABLED
+    value: '0'
+    availability:
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: black-book-efaaf
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: black-book-efaaf.firebaseapp.com
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: black-book-efaaf.firebasestorage.app
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: '332234323945'
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: '1:332234323945:web:17be349ebc9c029b3bfd78'
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: AIzaSyCS6qbiHo3KYAkMOhVbuORCwNa9PNbChFU
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_APP_CHECK_SITE_KEY
+    secret: web-production-app-check-site-key
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: SENTRY_DSN
+    secret: web-production-sentry-dsn
+    availability:
+      - RUNTIME
