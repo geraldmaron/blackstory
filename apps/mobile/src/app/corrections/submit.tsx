@@ -1,94 +1,74 @@
 /**
- * Correction-submission sheet stub — a modal route (`presentation: 'modal'`), reachable from the
- * More tab and, in the future, from an entity record's own correction CTA (MOB-014/MOB-016).
+ * Correction-submission sheet (MOB-016) — a modal route (`presentation: 'modal'`),
+ * reachable from the More tab and from an entity record's correction CTA.
  *
- * Program invariant 7 / this bead's requirement #7: correction content and precise location are
- * NEVER encoded in a URL parameter. The only route params this screen accepts are an optional
- * `entityId` (context — which record the correction is about, validated the same way the entity
- * detail route validates it) and an optional `returnTo` (validated against the safe-route
- * allowlist, same as the filter sheet). The correction text itself lives only in local component
- * state and would be POSTed by MOB-016's real submission flow (through `apps/api-public`, with
- * App Check attestation) — it never becomes a query string, and this screen has no
- * `router.push`/`setParams` call anywhere near the free-text field, by design.
+ * Program invariant 7 / MOB-016 requirement #5: correction content and the
+ * receipt code are NEVER encoded in a URL parameter. The only route params this
+ * screen accepts are an optional `entityId` (context — which record the
+ * correction is about, validated exactly as the entity detail route does) and an
+ * optional `returnTo` (validated against the safe-route allowlist). The
+ * correction text, contact details, and the returned receipt code live ONLY in
+ * local component / feature state — there is no `router.push`/`setParams` call
+ * anywhere near the free-text fields or the receipt, by design. Navigation to
+ * the status screen carries no receipt (the user re-enters it there).
+ *
+ * Draft policy (MOB-016 requirement #6): form content is in-memory only for the
+ * life of this modal. It is deliberately NOT persisted across app restarts — the
+ * simplest safe choice, so correction content never touches the general cache.
+ *
+ * App Check posture (requirement #2): submission FAILS CLOSED — if no attestation
+ * token can be obtained the write is not sent and the form shows a "try again"
+ * notice (see the corrections client). Reads/status lookups do not.
  */
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
-import { ScrollView, TextInput, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { View } from 'react-native';
 
 import { parseEntityId, parseReturnTo } from '../_lib/route-params';
-import { Button, Notice, Text, useThemeColors } from '@/ui';
+import {
+  CorrectionForm,
+  CorrectionReceipt,
+  createCorrectionClientDeps,
+  submitCorrection,
+  type CorrectionClientDeps,
+  type CorrectionFormState,
+  type SubmitResult,
+} from '@/features/corrections';
 
 export default function CorrectionsSubmitSheet() {
   const params = useLocalSearchParams<{ entityId?: string | string[]; returnTo?: string | string[] }>();
   const entityId = parseEntityId(params.entityId);
   const safeReturnTo = parseReturnTo(params.returnTo) ?? '/more';
-  const theme = useThemeColors();
 
-  // Local-only state. Deliberately never passed through router.push/setParams/any URL —
-  // see the module docblock.
-  const [draft, setDraft] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  // The receipt is held only in local state — never in a route/URL param.
+  const [receiptCode, setReceiptCode] = useState<string | null>(null);
 
-  function submit() {
-    // Stub: MOB-016 wires the real POST to apps/api-public with App Check attestation and
-    // returns an opaque receipt id. Nothing here reaches a URL, a log, or a crash report.
-    setSubmitted(true);
+  // Lazily build the transport deps (App Check token provider, SecureStore,
+  // connectivity). Held in a ref-like memo so the native backends load once.
+  const depsPromise = useMemo(() => createCorrectionClientDeps(), []);
+
+  async function handleSubmit(state: CorrectionFormState): Promise<SubmitResult> {
+    const deps: CorrectionClientDeps = await depsPromise;
+    return submitCorrection(state, deps);
   }
 
-  if (submitted) {
+  if (receiptCode) {
     return (
-      <View style={{ padding: 16, gap: 12 }}>
-        <Notice
-          tone="info"
-          title="Correction queued"
-          description="Real submission and opaque receipt status are MOB-016 scope."
-        />
-        <Button label="Done" variant="primary" onPress={() => router.replace(safeReturnTo as never)} />
-      </View>
+      <CorrectionReceipt
+        receiptCode={receiptCode}
+        onCheckStatus={() => router.replace('/corrections/status')}
+        onDone={() => router.replace(safeReturnTo as never)}
+      />
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
-      {entityId ? (
-        <Text variant="body" colorRole="inkMuted">
-          About record: {entityId}
-        </Text>
-      ) : (
-        <Text variant="body" colorRole="inkMuted">
-          General correction (no specific record context).
-        </Text>
-      )}
-
-      <TextInput
-        value={draft}
-        onChangeText={setDraft}
-        placeholder="Describe the correction…"
-        placeholderTextColor={theme.inkMuted}
-        multiline
-        numberOfLines={6}
-        maxLength={4000}
-        accessibilityLabel="Correction details"
-        style={{
-          borderWidth: 1,
-          borderColor: theme.border,
-          borderRadius: 8,
-          padding: 12,
-          minHeight: 140,
-          textAlignVertical: 'top',
-          color: theme.ink,
-        }}
+    <View style={{ flex: 1 }}>
+      <CorrectionForm
+        entityId={entityId ?? undefined}
+        onSubmit={handleSubmit}
+        onAccepted={(code) => setReceiptCode(code)}
       />
-
-      <View style={{ flexDirection: 'row', gap: 12 }}>
-        <Button label="Cancel" variant="ghost" onPress={() => router.back()} />
-        <Button
-          label="Submit"
-          variant="primary"
-          disabled={draft.trim().length === 0}
-          onPress={submit}
-        />
-      </View>
-    </ScrollView>
+    </View>
   );
 }
