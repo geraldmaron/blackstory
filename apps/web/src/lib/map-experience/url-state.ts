@@ -225,8 +225,11 @@ export function buildExploreHref(state: ExploreViewState): string {
 }
 
 /** Default overlay + toggle state for callers building explore links without a full view model. */
-export function defaultExploreOverlayState(): Pick<ExploreViewState, 'layerMode' | 'group' | 'lines'> {
-  return { layerMode: 'off', group: false, lines: false };
+export function defaultExploreOverlayState(): Pick<
+  ExploreViewState,
+  'layerMode' | 'group' | 'lines' | 'showFilters' | 'showResults'
+> {
+  return { layerMode: 'off', group: false, lines: false, showFilters: true, showResults: true };
 }
 
 /**

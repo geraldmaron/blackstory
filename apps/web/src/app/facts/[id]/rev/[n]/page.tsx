@@ -8,7 +8,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Notice } from '@repo/ui';
-import { SeedDataNotice } from '../../../../../components/SeedDataNotice';
 import {
   FactCitationList,
   FactConfidencePanel,
@@ -69,7 +68,6 @@ export default async function FactRevisionPage({ params }: FactRevisionPageProps
       </header>
 
       <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
-        <SeedDataNotice compact />
         <FactStatusBanner fact={fact} />
 
         <Notice tone="warning" title="Pinned revision view">

@@ -25,18 +25,17 @@ const SEARCH_FIXTURE = `
     <header>
       <p>Index</p>
       <h1>Search</h1>
-      <p>Search runs against the current sample catalog.</p>
     </header>
     <form method="get" action="/search">
       <fieldset>
-        <legend>Filter sample records</legend>
+        <legend>Filter records</legend>
         <label for="q">Search</label>
         <input id="q" name="q" type="search" />
         <label for="kind">Kind</label>
         <select id="kind" name="kind"><option value="">All</option></select>
       </fieldset>
     </form>
-    <p id="search-results-heading">3 sample results</p>
+    <p id="search-results-heading">3 results</p>
     <ul aria-labelledby="search-results-heading">
       <li><a href="/entity/ent_seed_place_001">Harlem Cultural Corridor</a></li>
     </ul>

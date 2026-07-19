@@ -1,5 +1,5 @@
 /**
- * Global not-found page for unknown public routes and missing seed entities.
+ * Global not-found page for unknown public routes and missing entities.
  */
 
 import { EmptyState } from '@repo/ui';
@@ -10,14 +10,14 @@ export default function NotFound() {
     <StatusPage
       eyebrow="404"
       title="Page not found"
-      lede="That route is not part of the public shell, or the sample entity id is unknown."
+      lede="That route is not part of the public shell, or the entity id is unknown."
     >
       <div className="ds-page--status__body">
         <EmptyState
           title="Nothing to show here"
           action={
             <a className="ds-button ds-button--primary" href="/search">
-              Browse sample records
+              Search the archive
             </a>
           }
         >

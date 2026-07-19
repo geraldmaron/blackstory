@@ -4,7 +4,6 @@
  */
 import { Suspense } from 'react';
 import { EmptyState, Notice } from '@repo/ui';
-import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { CorrectionForm } from './CorrectionForm';
 import { CORRECTION_FORM_INTRO, CORRECTION_PRIVACY_NOTICE } from './copy';
 
@@ -21,8 +20,6 @@ export default function CorrectionsPage() {
       <p className="ds-page__lede">{CORRECTION_FORM_INTRO}</p>
 
       <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
-        <SeedDataNotice compact />
-
         <Notice tone="warning" title="This is not a public post">
           Corrections enter a restricted quarantine queue for human review. Nothing you
           submit changes the public record until it passes independent review and promotion

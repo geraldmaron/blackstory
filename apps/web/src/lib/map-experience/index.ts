@@ -9,6 +9,7 @@
 export * from './entity-geo';
 export * from './geo-precision';
 export * from './filters';
+export * from './metadata-hrefs';
 export * from './url-state';
 export * from './county-choropleth';
 export * from './join-county-population';

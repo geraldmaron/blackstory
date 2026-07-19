@@ -4,12 +4,21 @@
  * mirrors the map copper ring when returning from “View on map” (`?selected=`).
  *
  * Meta rows use a fixed labeled layout (Kind / Era / Confidence / Evidence / Where)
- * so rows stay uniform when optional fields are sparse.
+ * so rows stay uniform when optional fields are sparse. Metadata values link to explore,
+ * search, or entity anchors independently of the row’s primary select/open control.
  */
 import React from 'react';
 import Link from 'next/link';
 import { cx } from '@repo/ui';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
+import { displayEncodingFor } from '../../lib/map-experience/kind-encoding';
+import {
+  entityEvidenceHref,
+  eraFactLink,
+  exploreHrefForKind,
+  exploreHrefForState,
+  searchHrefForStatus,
+} from '../../lib/map-experience/metadata-hrefs';
 import { ConfidenceMark } from './ConfidenceMark';
 import { KindBadge } from './KindBadge';
 
@@ -25,10 +34,107 @@ export type SynchronizedResultListProps = {
   readonly onSelect?: (entityId: string) => void;
 };
 
-function eraLabel(eraBuckets: readonly string[]): string {
-  if (eraBuckets.length === 0) return 'Undated';
-  if (eraBuckets.length === 1) return eraBuckets[0]!;
-  return `${eraBuckets[0]} \u2013 ${eraBuckets[eraBuckets.length - 1]}`;
+type ResultRowMetaProps = {
+  readonly feature: ExploreMapFeature;
+};
+
+function ResultRowMeta({ feature }: ResultRowMetaProps) {
+  const { properties } = feature;
+  const kindEncoding = displayEncodingFor(properties.kind, properties.mapTone);
+  const era = eraFactLink(properties.eraBuckets);
+  const statePostalCode = properties.statePostalCode?.trim().toUpperCase();
+  const statusHref =
+    properties.status !== undefined ? searchHrefForStatus(properties.status) : undefined;
+  const evidenceLabel = `${properties.evidenceCount} accepted claim${properties.evidenceCount === 1 ? '' : 's'}`;
+
+  return (
+    <dl className="ds-result-list__meta ds-result-list__meta--labeled">
+      <div className="ds-result-meta">
+        <dt>Kind</dt>
+        <dd>
+          <Link
+            className="ds-result-meta__link ds-result-meta__link--kind"
+            href={exploreHrefForKind(properties.kind)}
+            aria-label={`Browse ${kindEncoding.label} records`}
+          >
+            <KindBadge
+              kind={properties.kind}
+              density="compact"
+              {...(properties.mapTone !== undefined ? { mapTone: properties.mapTone } : {})}
+            />
+          </Link>
+        </dd>
+      </div>
+      <div className="ds-result-meta">
+        <dt>Era</dt>
+        <dd className="ds-mono">
+          {era.href ? (
+            <Link
+              className="ds-result-meta__link"
+              href={era.href}
+              aria-label={`Browse records from the ${era.label}`}
+            >
+              {era.label}
+            </Link>
+          ) : (
+            era.label
+          )}
+        </dd>
+      </div>
+      <div className="ds-result-meta">
+        <dt>Confidence</dt>
+        <dd>
+          <ConfidenceMark tier={properties.confidenceTier} labeled className="ds-sans" />
+        </dd>
+      </div>
+      <div className="ds-result-meta">
+        <dt>Evidence</dt>
+        <dd className="ds-sans">
+          <Link
+            className="ds-result-meta__link"
+            href={entityEvidenceHref(properties.href)}
+            aria-label={`View ${evidenceLabel} on full record`}
+          >
+            {evidenceLabel}
+          </Link>
+        </dd>
+      </div>
+      <div className="ds-result-meta">
+        <dt>Where</dt>
+        <dd className="ds-mono">
+          {statePostalCode ? (
+            <Link
+              className="ds-result-meta__link"
+              href={exploreHrefForState(statePostalCode)}
+              aria-label={`View records in ${statePostalCode}`}
+            >
+              {statePostalCode}
+            </Link>
+          ) : (
+            '—'
+          )}
+        </dd>
+      </div>
+      {properties.status !== undefined ? (
+        <div className="ds-result-meta">
+          <dt>Status</dt>
+          <dd className="ds-sans">
+            {statusHref ? (
+              <Link
+                className="ds-result-meta__link"
+                href={statusHref}
+                aria-label={`Search records with status ${properties.status}`}
+              >
+                {properties.status}
+              </Link>
+            ) : (
+              properties.status
+            )}
+          </dd>
+        </div>
+      ) : null}
+    </dl>
+  );
 }
 
 export function SynchronizedResultList({
@@ -43,44 +149,14 @@ export function SynchronizedResultList({
       {features.map((feature) => {
         const { properties } = feature;
         const isSelected = properties.entityId === selectedId;
-        const body = (
-          <>
-            <h3 className="ds-result-list__title">{properties.displayName}</h3>
-            <p className="ds-result-list__summary">{properties.oneLineStory}</p>
-            <dl className="ds-result-list__meta ds-result-list__meta--labeled">
-              <div className="ds-result-meta">
-                <dt>Kind</dt>
-                <dd>
-                  <KindBadge
-                    kind={properties.kind}
-                    density="compact"
-                    {...(properties.mapTone !== undefined ? { mapTone: properties.mapTone } : {})}
-                  />
-                </dd>
-              </div>
-              <div className="ds-result-meta">
-                <dt>Era</dt>
-                <dd className="ds-mono">{eraLabel(properties.eraBuckets)}</dd>
-              </div>
-              <div className="ds-result-meta">
-                <dt>Confidence</dt>
-                <dd>
-                  <ConfidenceMark tier={properties.confidenceTier} labeled className="ds-sans" />
-                </dd>
-              </div>
-              <div className="ds-result-meta">
-                <dt>Evidence</dt>
-                <dd className="ds-sans">
-                  {properties.evidenceCount} claim{properties.evidenceCount === 1 ? '' : 's'}
-                </dd>
-              </div>
-              <div className="ds-result-meta">
-                <dt>Where</dt>
-                <dd className="ds-mono">{properties.statePostalCode ?? '—'}</dd>
-              </div>
-            </dl>
-          </>
-        );
+        const primaryControlProps = {
+          className: cx(
+            'ds-result-list__link',
+            onSelect ? 'ds-result-list__link--button' : undefined,
+          ),
+          'aria-current': isSelected ? ('true' as const) : undefined,
+          'data-entity-id': properties.entityId,
+        };
 
         return (
           <li
@@ -88,25 +164,17 @@ export function SynchronizedResultList({
             className={cx('ds-result-list__item', isSelected && 'ds-result-list__item--selected')}
           >
             {onSelect ? (
-              <button
-                type="button"
-                className="ds-result-list__link ds-result-list__link--button"
-                aria-current={isSelected ? 'true' : undefined}
-                data-entity-id={properties.entityId}
-                onClick={() => onSelect(properties.entityId)}
-              >
-                {body}
+              <button type="button" {...primaryControlProps} onClick={() => onSelect(properties.entityId)}>
+                <h3 className="ds-result-list__title">{properties.displayName}</h3>
+                <p className="ds-result-list__summary">{properties.oneLineStory}</p>
               </button>
             ) : (
-              <Link
-                className="ds-result-list__link"
-                href={properties.href}
-                aria-current={isSelected ? 'true' : undefined}
-                data-entity-id={properties.entityId}
-              >
-                {body}
+              <Link {...primaryControlProps} href={properties.href}>
+                <h3 className="ds-result-list__title">{properties.displayName}</h3>
+                <p className="ds-result-list__summary">{properties.oneLineStory}</p>
               </Link>
             )}
+            <ResultRowMeta feature={feature} />
           </li>
         );
       })}

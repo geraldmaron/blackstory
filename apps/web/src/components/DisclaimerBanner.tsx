@@ -14,7 +14,7 @@
  * already-resolved strings so it has no compile-time dependency on the registry export.
  *
  * Renders through `Notice tone="warning"` — the same muted, non-red treatment already used for
- * `SeedDataNotice` `OfflineNotice`. No danger iconography, no "warning: danger" framing.
+ * `OfflineNotice`. No danger iconography, no "warning: danger" framing.
  */
 
 import React from 'react';

@@ -6,7 +6,6 @@
  */
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Card } from '@repo/ui';
-import { SeedDataNotice } from '../../../components/SeedDataNotice';
 import {
   FactCitationList,
   FactConfidencePanel,
@@ -86,7 +85,6 @@ export default async function FactDetailPage({ params }: FactPageProps) {
       </header>
 
       <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
-        <SeedDataNotice compact />
         <FactStatusBanner fact={fact} />
         <RevisionUpdateChrome fact={fact} />
         <HowToReadThisRecord />

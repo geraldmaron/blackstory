@@ -4,7 +4,6 @@
  */
 import Link from 'next/link';
 import { EmptyState, FilterBar, ResultList } from '@repo/ui';
-import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { getSeedFact, getSeedFactSearchIndex, listSeedFacts } from '../../data/facts-seed';
 import {
   buildFactLibraryHref,
@@ -41,8 +40,6 @@ export default async function FactsLibraryPage({ searchParams }: FactsPageProps)
       </header>
 
       <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
-        <SeedDataNotice compact />
-
         <FilterBar
           method="get"
           action="/facts"

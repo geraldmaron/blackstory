@@ -9,8 +9,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { buildCompactFactViewsForEntity } from '@repo/domain/facts';
+import { findUsStateForPoint } from '@repo/domain/map/geography';
 import { MapFrame, Timeline } from '@repo/ui';
-import { SeedDataNotice } from '../../../components/SeedDataNotice';
 import { KindBadge, ConfidenceMark } from '../../../components/map-experience';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
 import '../../../components/entity/entity-page.css';
@@ -26,8 +26,9 @@ import { CompactFactReference } from '../../../components/facts';
 import { HowToReadThisRecord } from '../../../components/trust';
 import { WhyThisAppears } from '../../../components/why-appears';
 import { seedFactsForEntity } from '../../../data/facts-seed';
-import { buildExploreHref, defaultExploreOverlayState } from '../../../lib/map-experience/url-state';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
+import { exploreHrefForState } from '../../../lib/map-experience/metadata-hrefs';
+import { buildExploreHref, defaultExploreOverlayState } from '../../../lib/map-experience/url-state';
 import { highestConfidence } from '../../../lib/map-experience/build-explore-map-source';
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
@@ -38,6 +39,14 @@ import { deriveHistoricalFraming } from './entity-view-model';
 type EntityPageProps = {
   readonly params: Promise<{ id: string }>;
 };
+
+function statePostalForEntity(entityId: string): string | undefined {
+  const anchor = geoAnchorFor(entityId);
+  if (!anchor) {
+    return undefined;
+  }
+  return findUsStateForPoint(anchor.lat, anchor.lng)?.postalCode;
+}
 
 function entityLinkCatalogFromNeighbors(
   entity: NonNullable<Awaited<ReturnType<typeof resolvePublicEntityView>>['data']>,
@@ -101,6 +110,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const evidenceClaims = toEvidenceClaimInputs(entity.claims);
   const relatedFacts = buildCompactFactViewsForEntity(entity.id, seedFactsForEntity(entity.id));
   const geoAnchor = geoAnchorFor(entity.id);
+  const statePostal = statePostalForEntity(entity.id);
   const entityLinkCatalog = entityLinkCatalogFromNeighbors(entity);
   const continueLearning = entity.continueLearning ?? [];
   const exploreHref = buildExploreHref({
@@ -161,7 +171,9 @@ export default async function EntityPage({ params }: EntityPageProps) {
           <div className="ds-at-a-glance__row">
             <dt>Evidence</dt>
             <dd>
-              {entity.claims.length} accepted claim{entity.claims.length === 1 ? '' : 's'}
+              <Link className="ds-at-a-glance__link" href="#accepted-claims">
+                {entity.claims.length} accepted claim{entity.claims.length === 1 ? '' : 's'}
+              </Link>
             </dd>
           </div>
           <div className="ds-at-a-glance__row">
@@ -177,14 +189,21 @@ export default async function EntityPage({ params }: EntityPageProps) {
           <div className="ds-at-a-glance__row">
             <dt>Location shown</dt>
             <dd>
-              {entity.locationLabel} ({entity.locationPrecision} precision)
+              {statePostal ? (
+                <Link className="ds-at-a-glance__link" href={exploreHrefForState(statePostal)}>
+                  {entity.locationLabel} ({entity.locationPrecision} precision)
+                </Link>
+              ) : (
+                <>
+                  {entity.locationLabel} ({entity.locationPrecision} precision)
+                </>
+              )}
             </dd>
           </div>
         </dl>
       </section>
 
       <div className="ds-entity-body">
-        {resolved.source !== 'live' ? <SeedDataNotice compact /> : null}
         <HowToReadThisRecord variant="compact" />
         {entity.sensitivity ? (
           <EntitySensitivityBanner sensitivity={entity.sensitivity} entityKind={entity.kind} />
@@ -255,7 +274,11 @@ export default async function EntityPage({ params }: EntityPageProps) {
               </div>
             </section>
 
-            <section className="ds-record-section" aria-labelledby="claims-heading">
+            <section
+              className="ds-record-section"
+              id="accepted-claims"
+              aria-labelledby="claims-heading"
+            >
               <p className="ds-section__kicker">
                 <span className="ds-kicker-index" aria-hidden="true" />
                 Claims

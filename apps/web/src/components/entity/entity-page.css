@@ -169,6 +169,17 @@
   font-size: 0.9375rem;
 }
 
+.ds-at-a-glance__link {
+  color: var(--ds-copper-text);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.ds-at-a-glance__link:hover,
+.ds-at-a-glance__link:focus-visible {
+  color: var(--ds-ink);
+}
+
 /* Aside context blocks — flat page sections with a top rule, never Card chrome. */
 .ds-aside-block {
   padding-top: var(--ds-space-4);

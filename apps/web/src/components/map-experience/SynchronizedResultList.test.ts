@@ -13,6 +13,12 @@ function buildFeatures() {
   return buildExploreMapSource(listPublicEntities()).featureCollection.features;
 }
 
+function requireFeature(entityId: string) {
+  const feature = buildFeatures().find((entry) => entry.properties.entityId === entityId);
+  assert.ok(feature, `expected a feature for ${entityId}`);
+  return feature!;
+}
+
 test('renders one real link per feature, each pointing at its entity page', () => {
   const features = buildFeatures();
   const html = renderToStaticMarkup(createElement(SynchronizedResultList, { features }));
@@ -51,7 +57,34 @@ test('with onSelect, rows are buttons that keep the reader on the map surface', 
     createElement(SynchronizedResultList, { features, onSelect: () => undefined }),
   );
   assert.match(html, /ds-result-list__link--button/);
-  assert.doesNotMatch(html, /href="/);
+  assert.doesNotMatch(html, /class="ds-result-list__link"[^>]*href="/);
+});
+
+test('with onSelect, metadata links are not nested inside the row button', () => {
+  const feature = requireFeature('ent_15th_st_church_001');
+  const html = renderToStaticMarkup(
+    createElement(SynchronizedResultList, { features: [feature], onSelect: () => undefined }),
+  );
+
+  const buttonClose = html.indexOf('</button>');
+  const firstMetaHref = html.indexOf('href="/explore?kind=place"');
+  assert.ok(buttonClose > -1, 'expected a row button');
+  assert.ok(firstMetaHref > buttonClose, 'expected metadata links after the row button closes');
+  assert.doesNotMatch(html, /<button[^>]*>[\s\S]*<a[\s\S]*<\/button>/);
+});
+
+test('links Where, Era, Evidence, and Kind metadata to the right site views', () => {
+  const feature = requireFeature('ent_15th_st_church_001');
+  const html = renderToStaticMarkup(createElement(SynchronizedResultList, { features: [feature] }));
+  const { properties } = feature;
+
+  assert.equal(properties.statePostalCode, 'DC');
+  assert.match(html, /href="[^"]*state=DC"/);
+  assert.match(html, /aria-label="View records in DC"/);
+  assert.match(html, /href="[^"]*era=1840s"/);
+  assert.match(html, /href="\/entity\/ent_15th_st_church_001#accepted-claims"/);
+  assert.match(html, /href="[^"]*kind=place"/);
+  assert.match(html, /aria-label="Browse Place records"/);
 });
 
 test('uses a uniform labeled meta layout with short confidence values', () => {

@@ -6,7 +6,6 @@
  */
 import React from 'react';
 import { FilterBar } from '@repo/ui';
-import { SeedDataNotice } from '../../components/SeedDataNotice';
 import {
   DecadeStepper,
   HistoryGraphPanel,
@@ -35,7 +34,7 @@ type HistoryPageProps = {
 
 export default async function HistoryPage({ searchParams }: HistoryPageProps) {
   const params = await searchParams;
-  const { data: entities, source } = await listPublicEntityViews();
+  const { data: entities } = await listPublicEntityViews();
   const view = buildHistoryViewModel(params, entities);
 
   return (
@@ -55,8 +54,6 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
       </header>
 
       <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
-        {source !== 'live' ? <SeedDataNotice compact /> : null}
-
         <noscript>
           <div className="ds-history__noscript">
             <DecadeStepper decades={view.availableDecades} viewState={view.viewState} />

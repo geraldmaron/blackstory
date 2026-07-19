@@ -1,0 +1,775 @@
+[
+  {
+    "id": "ent_richmond_planet_001",
+    "kind": "publication",
+    "displayName": "Richmond Planet",
+    "summary": "Founded in Richmond in 1883 by a group that included lawyer Edwin Archer Randolph, the weekly Richmond Planet became one of the South's most forceful Black newspapers under editor John Mitchell Jr., who took the helm in 1884 and used its pages for antilynching campaigns and voting-rights advocacy until his death in 1929.",
+    "eraBuckets": [
+      "1880s",
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "publication",
+      "press",
+      "civil-rights"
+    ],
+    "jurisdictionLabel": "Richmond, Virginia",
+    "locationPrecision": "city",
+    "locationLabel": "Richmond, Virginia (city of publication)",
+    "lat": 37.5407,
+    "lng": -77.436,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Thirteen African American founders launched the weekly Richmond Planet in Richmond, Virginia in 1883; John Mitchell Jr. became editor in December 1884 and moved the paper to Swan Tavern on Broad Street in 1888 as it gained national readership",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn84025841/",
+        "citationLabel": "Richmond Planet (Richmond, Va.) 1883-1938"
+      },
+      {
+        "predicate": "published_from",
+        "object": "Under Mitchell's editorship the Planet campaigned against lynching, reported on disfranchisement, and circulated well beyond Virginia as a leading Southern Black weekly before ceasing in 1938",
+        "confidenceLevel": "high",
+        "citationSource": "Encyclopedia Virginia",
+        "citationHref": "https://encyclopediavirginia.org/entries/mitchell-john-jr-1863-1929/",
+        "citationLabel": "John Mitchell Jr. (1863–1929)"
+      }
+    ],
+    "historicalContext": "The Planet's masthead imagery and editorials made it a visible counter to post-Reconstruction white supremacy in Virginia; Mitchell's reporting on lynching and labor disputes linked local Black readers to a wider press network that included correspondents such as Ida B. Wells.",
+    "topicIds": [
+      "publication",
+      "press",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_virginia_star_newspaper_001",
+    "kind": "publication",
+    "displayName": "The Virginia Star",
+    "summary": "Established in Richmond in 1877, the Virginia Star is documented as the city's first African American newspaper, published on Saturdays by teachers and community leaders including Otway M. Steward and Peter Henry Woolfolk before competition from the Richmond Planet contributed to its suspension around 1884.",
+    "eraBuckets": [
+      "1870s",
+      "1880s"
+    ],
+    "topicTags": [
+      "publication",
+      "press",
+      "reconstruction"
+    ],
+    "jurisdictionLabel": "Richmond, Virginia",
+    "locationPrecision": "city",
+    "locationLabel": "Richmond, Virginia (city of publication)",
+    "lat": 37.5407,
+    "lng": -77.436,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "The Virginia Star began in Richmond, Virginia in 1877, published every Saturday by Otway M. Steward, Peter Henry Woolfolk, and R.A. Green, M.D., with Robert Peel Brooks later serving as editor",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn83027093/",
+        "citationLabel": "The Virginia Star (Richmond, Va.) 1877-18??"
+      },
+      {
+        "predicate": "ceased_publication",
+        "object": "The Star likely ceased publication around 1884 or 1885 amid rivalry with the newly established Richmond Planet; the New York Globe reported in September 1884 that the Virginia Star had indefinitely suspended",
+        "confidenceLevel": "medium",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn83027093/",
+        "citationLabel": "The Virginia Star — publication history note"
+      }
+    ],
+    "historicalContext": "The Star's brief run illustrates how Reconstruction-era Black educators and professionals built local press institutions in the former Confederacy's capital even before the Planet became Richmond's durable weekly voice.",
+    "topicIds": [
+      "publication",
+      "press",
+      "reconstruction"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_indianapolis_recorder_001",
+    "kind": "publication",
+    "displayName": "Indianapolis Recorder",
+    "summary": "George P. Stewart founded the Recorder in Indianapolis in 1897 as a weekly African American newspaper; it remains one of the nation's longest-running Black-owned papers, documenting Indiana's Black communities through the Great Migration, World War II, and the civil rights era.",
+    "eraBuckets": [
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "publication",
+      "press",
+      "great-migration"
+    ],
+    "jurisdictionLabel": "Indianapolis, Indiana",
+    "locationPrecision": "city",
+    "locationLabel": "Indianapolis, Indiana (city of publication)",
+    "lat": 39.7684,
+    "lng": -86.1581,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "George P. Stewart founded the Recorder in Indianapolis in 1897; the Library of Congress catalogs the title as The Recorder (1897-1910) and The Indianapolis Recorder (1910-current)",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn84025902/",
+        "citationLabel": "The Recorder (Indianapolis, Ind.) 1897-1910"
+      },
+      {
+        "predicate": "continued_publication",
+        "object": "The Indianapolis Recorder has published continuously from Indianapolis as an African American weekly, with Library of Congress holdings extending from 1910 to the present",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress",
+        "citationHref": "https://www.loc.gov/item/sn82014475/",
+        "citationLabel": "The Indianapolis Recorder (Indianapolis, Ind.) 1910-Current"
+      }
+    ],
+    "historicalContext": "Alongside the Freeman, another Indianapolis Black weekly, the Recorder gave Midwestern readers a durable alternative to Chicago-based national papers while chronicling church life, fraternal orders, and migration streams into Indiana's industrial cities.",
+    "topicIds": [
+      "publication",
+      "press",
+      "great-migration"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_kansas_city_call_001",
+    "kind": "publication",
+    "displayName": "Kansas City Call",
+    "summary": "Chester A. Franklin founded the Kansas City Call in 1919, building it into a leading Midwestern African American weekly that reported on Great Migration arrivals, local politics, and civil rights from Missouri's largest city for more than a century.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "publication",
+      "press",
+      "great-migration"
+    ],
+    "jurisdictionLabel": "Kansas City, Missouri",
+    "locationPrecision": "city",
+    "locationLabel": "Kansas City, Missouri (city of publication)",
+    "lat": 39.0997,
+    "lng": -94.5786,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "The Call began in Kansas City, Missouri in 1919; Library of Congress records show early issues published by Franklin and Mosely before the Kansas City Call Co. continued the title from the 1930s onward",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress",
+        "citationHref": "https://www.loc.gov/item/sn90061476/",
+        "citationLabel": "The Call (Kansas City, Mo.) 1919-1922"
+      },
+      {
+        "predicate": "described_as",
+        "object": "By the mid-1930s the Call billed itself as the Southwest's leading weekly African American newspaper, publishing local news and a national edition from Kansas City",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress",
+        "citationHref": "https://www.loc.gov/item/2001225008/",
+        "citationLabel": "The Call (Kansas City, Mo.) 1933-196?"
+      }
+    ],
+    "historicalContext": "The Call anchored Black press coverage in Kansas City's 18th and Vine corridor era, overlapping with the jazz district's institutional growth and giving readers a locally owned counterpart to nationally syndicated migration-era weeklies.",
+    "topicIds": [
+      "publication",
+      "press",
+      "great-migration"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_kansas_city_sun_001",
+    "kind": "publication",
+    "displayName": "Kansas City Sun",
+    "summary": "The weekly Kansas City Sun began in 1908 and, after Nelson C. Crews purchased it in 1911, became one of the Midwest's prominent African American newspapers, campaigning for a second hospital admitting Black patients and for improved schools serving African American students.",
+    "eraBuckets": [
+      "1900s",
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "publication",
+      "press",
+      "organizing"
+    ],
+    "jurisdictionLabel": "Kansas City, Missouri",
+    "locationPrecision": "city",
+    "locationLabel": "Kansas City, Missouri (city of publication)",
+    "lat": 39.0997,
+    "lng": -94.5786,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "The Kansas City Sun commenced weekly publication in Kansas City, Missouri in 1908; Nelson C. Crews purchased the paper in 1911 and used it to promote hospital access and school improvement campaigns",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn90061556/",
+        "citationLabel": "The Kansas City Sun (Kansas City, Mo.) 1908-1924"
+      },
+      {
+        "predicate": "ceased_publication",
+        "object": "Crews continued publishing the eight-page Saturday Sun for roughly another decade after acquiring additional press holdings; the last issue appeared in 1924",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn90061556/",
+        "citationLabel": "The Kansas City Sun — publication end date"
+      }
+    ],
+    "historicalContext": "The Sun's hospital and school campaigns show how regional Black weeklies translated community grievances into sustained editorial pressure long before national civil rights litigation dominated headlines.",
+    "topicIds": [
+      "publication",
+      "press",
+      "organizing"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_rising_son_kansas_city_001",
+    "kind": "publication",
+    "displayName": "The Rising Son",
+    "summary": "Lewis Wood edited the Rising Son, an African American weekly published in Kansas City from 1896 through 1918, giving late-nineteenth-century Black readers in western Missouri a locally produced paper during the city's early urban growth.",
+    "eraBuckets": [
+      "1890s",
+      "1900s",
+      "1910s"
+    ],
+    "topicTags": [
+      "publication",
+      "press"
+    ],
+    "jurisdictionLabel": "Kansas City, Missouri",
+    "locationPrecision": "city",
+    "locationLabel": "Kansas City, Missouri (city of publication)",
+    "lat": 39.0997,
+    "lng": -94.5786,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "The Rising Son was an African American newspaper published in Kansas City, Jackson County, Missouri from 1896 through 1918 with Lewis Wood as editor",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn83025494/",
+        "citationLabel": "The Rising Son (Kansas City, Mo.) 1896-19??"
+      },
+      {
+        "predicate": "published_on",
+        "object": "The Rising Son appeared as an eight-page weekly, initially on Fridays and later on Saturdays after publication-day changes in 1905 and 1906",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn83025494/",
+        "citationLabel": "The Rising Son — publication schedule"
+      }
+    ],
+    "historicalContext": "The Rising Son predated the Kansas City Sun and Call, documenting a generation of Black civic life in Kansas City before the Great Migration dramatically expanded the city's African American population.",
+    "topicIds": [
+      "publication",
+      "press"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_cleveland_call_and_post_001",
+    "kind": "publication",
+    "displayName": "Cleveland Call and Post",
+    "summary": "Garrett A. Morgan founded the Cleveland Call in 1919; after merging with the Cleveland Post it became the Call and Post, a weekly that grew into one of Ohio's principal African American newspapers and remains in publication from Cleveland.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "publication",
+      "press",
+      "great-migration"
+    ],
+    "jurisdictionLabel": "Cleveland, Ohio",
+    "locationPrecision": "city",
+    "locationLabel": "Cleveland, Ohio (city of publication)",
+    "lat": 41.4993,
+    "lng": -81.6944,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Garrett A. Morgan established the Cleveland Call in Cleveland, Ohio in 1919; the title merged with the Cleveland Post to form the Cleveland Call and Post, which began in 1927",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress",
+        "citationHref": "https://www.loc.gov/item/sn83035419/",
+        "citationLabel": "The Cleveland Call (Cleveland, Ohio) 1919-1927"
+      },
+      {
+        "predicate": "continued_publication",
+        "object": "The Call and Post expanded through mid-century editions and related Ohio city editions; Library of Congress holdings document continuous Cleveland publication from 1967 to the present",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress",
+        "citationHref": "https://www.loc.gov/item/sn88077398/",
+        "citationLabel": "Call and Post (Cleveland, Ohio) 1967-Current"
+      }
+    ],
+    "historicalContext": "Published from a Great Migration destination city on Lake Erie, the Call and Post chronicled Black labor, church, and political life in Cleveland while connecting Ohio readers to national debates over segregation and economic opportunity.",
+    "topicIds": [
+      "publication",
+      "press",
+      "great-migration"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_louisiana_weekly_001",
+    "kind": "publication",
+    "displayName": "Louisiana Weekly",
+    "summary": "The Louisiana Weekly has published from New Orleans since 1925 as a long-running African American newspaper covering Louisiana politics, culture, and community news when many daily papers ignored Black readers.",
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "publication",
+      "press"
+    ],
+    "jurisdictionLabel": "New Orleans, Louisiana",
+    "locationPrecision": "city",
+    "locationLabel": "New Orleans, Louisiana (city of publication)",
+    "lat": 29.9511,
+    "lng": -90.0715,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "The Louisiana Weekly began publication in New Orleans in 1925 under the Louisiana Weekly Publishing Company and has continued as an African American weekly",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress",
+        "citationHref": "https://www.loc.gov/item/sn83045291/",
+        "citationLabel": "The Louisiana Weekly (New Orleans [La.]) 1925-Current"
+      },
+      {
+        "predicate": "published_from",
+        "object": "The paper has served New Orleans and statewide African American readers across decades of Jim Crow segregation and civil rights organizing in Louisiana",
+        "confidenceLevel": "medium",
+        "citationSource": "Library of Congress",
+        "citationHref": "https://www.loc.gov/item/sn83045291/",
+        "citationLabel": "The Louisiana Weekly — geographic coverage"
+      }
+    ],
+    "historicalContext": "The Weekly joined an older line of New Orleans Black papers — from Reconstruction-era tribunes to late-nineteenth-century weeklies — that kept a francophone and Gulf South readership informed when white dailies excluded Black voices.",
+    "topicIds": [
+      "publication",
+      "press"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_weekly_pelican_001",
+    "kind": "publication",
+    "displayName": "The Weekly Pelican",
+    "summary": "The Weekly Pelican was a short-lived but digitized African American newspaper published in New Orleans from 1886 to 1889, part of the city's post-Reconstruction burst of Black press institutions competing for readers in Louisiana's largest city.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "publication",
+      "press",
+      "reconstruction"
+    ],
+    "jurisdictionLabel": "New Orleans, Louisiana",
+    "locationPrecision": "city",
+    "locationLabel": "New Orleans, Louisiana (city of publication)",
+    "lat": 29.9511,
+    "lng": -90.0715,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "The Weekly Pelican was published in New Orleans, Louisiana by the Pelican Publishing Company from December 4, 1886 through November 23, 1889",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn83016655/",
+        "citationLabel": "The Weekly Pelican (New Orleans, La.) 1886-1889"
+      },
+      {
+        "predicate": "archived_in",
+        "object": "Issues of the Weekly Pelican are preserved in the Library of Congress Chronicling America digital collection through microfilm sponsored by the Committee on Negro Studies of the American Council of Learned Societies",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn83016655/",
+        "citationLabel": "The Weekly Pelican — digitization note"
+      }
+    ],
+    "historicalContext": "The Pelican's brief run sits among New Orleans papers such as the Louisianian and later Louisiana Weekly that documented Creole and African American civic life under tightening Jim Crow governance.",
+    "topicIds": [
+      "publication",
+      "press",
+      "reconstruction"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_black_republican_new_orleans_001",
+    "kind": "publication",
+    "displayName": "The Black Republican",
+    "summary": "The Black Republican began in New Orleans on April 15, 1865 as one of the first African American newspapers published in the immediate aftermath of emancipation, edited by Rev. Stephen Walter Rodgers and aimed at newly freed readers across Louisiana.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "publication",
+      "press",
+      "reconstruction"
+    ],
+    "jurisdictionLabel": "New Orleans, Louisiana",
+    "locationPrecision": "city",
+    "locationLabel": "New Orleans, Louisiana (city of publication)",
+    "lat": 29.9511,
+    "lng": -90.0715,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "The Black Republican of New Orleans began on April 15, 1865, published every Saturday by the Black Republican Newspaper Association with Rev. S.W. Rodgers as editor",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn83016563/",
+        "citationLabel": "The Black Republican (New Orleans [La.]) 1865-186?"
+      },
+      {
+        "predicate": "ceased_publication",
+        "object": "The paper soon closed for lack of advertising support and because its five-dollar annual subscription proved too costly for many newly freed readers, leaving the New Orleans Tribune as the city's surviving African American weekly",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn83016563/",
+        "citationLabel": "The Black Republican — closure note"
+      }
+    ],
+    "historicalContext": "The Black Republican's 1865 prospectus declared that 'the poor as well as the rich, the freedmen as well as the freemen will be heard,' capturing how press founding accompanied Reconstruction citizenship claims in the Gulf South.",
+    "topicIds": [
+      "publication",
+      "press",
+      "reconstruction"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_jackson_advocate_001",
+    "kind": "publication",
+    "displayName": "Jackson Advocate",
+    "summary": "Percy Greene founded the Jackson Advocate in 1939 in Mississippi's capital, making it the state's longest-running African American weekly; under later owner Charles Tisdale it became an outspoken civil-rights paper despite Greene's earlier accommodationist editorship.",
+    "eraBuckets": [
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s",
+      "1970s"
+    ],
+    "topicTags": [
+      "publication",
+      "press",
+      "civil-rights"
+    ],
+    "jurisdictionLabel": "Jackson, Mississippi",
+    "locationPrecision": "city",
+    "locationLabel": "Jackson, Mississippi (city of publication)",
+    "lat": 32.2988,
+    "lng": -90.1848,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Percy Greene founded the Jackson Advocate in Jackson, Mississippi in 1939; the Library of Congress catalogs it as Mississippi's longest-running African American weekly",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn79000083/",
+        "citationLabel": "Jackson Advocate (Jackson, Miss.) 1939-Current"
+      },
+      {
+        "predicate": "documented_by",
+        "object": "The Advocate campaigned for voting rights and education while operating under segregation; after Greene's death Charles Tisdale purchased the paper in 1978 and pledged to promote civil rights and fight discrimination",
+        "confidenceLevel": "high",
+        "citationSource": "Mississippi Encyclopedia",
+        "citationHref": "https://mississippiencyclopedia.org/entries/jackson-advocate/",
+        "citationLabel": "Jackson Advocate"
+      }
+    ],
+    "historicalContext": "Published from the heart of a Deep South capital, the Advocate survived repeated attacks on its offices while documenting Black political life in a state where white dailies and the Sovereignty Commission surveilled civil-rights activity.",
+    "topicIds": [
+      "publication",
+      "press",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_mississippi_enterprise_001",
+    "kind": "publication",
+    "displayName": "The Mississippi Enterprise",
+    "summary": "Willie J. Miller's Mississippi Enterprise was a Jackson weekly that competed with the Jackson Advocate from the late 1930s, covering church news, entertainment, and local achievements while presenting itself as a conservative state paper for Black readers.",
+    "eraBuckets": [
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "publication",
+      "press"
+    ],
+    "jurisdictionLabel": "Jackson, Mississippi",
+    "locationPrecision": "city",
+    "locationLabel": "Jackson, Mississippi (city of publication)",
+    "lat": 32.2988,
+    "lng": -90.1848,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "The Mississippi Enterprise was one of two long-running contemporary African American weeklies published in Jackson alongside the Jackson Advocate; Willie J. Miller edited the Enterprise from the late 1930s",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress",
+        "citationHref": "https://www.loc.gov/item/sn87065258/",
+        "citationLabel": "The Mississippi Enterprise (Jackson, Miss.) 1938-Current"
+      },
+      {
+        "predicate": "published_as",
+        "object": "The eight-page Enterprise appeared on Saturdays with statewide circulation claims, covering social events, entertainment bookings, and community news across Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress",
+        "citationHref": "https://www.loc.gov/item/sn87065258/",
+        "citationLabel": "The Mississippi Enterprise — publication description"
+      }
+    ],
+    "historicalContext": "The Enterprise's rivalry with the Advocate illustrates how even conservative Black weeklies in Jackson shaped public conversation about education and respectability politics under Jim Crow.",
+    "topicIds": [
+      "publication",
+      "press"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_dallas_express_001",
+    "kind": "publication",
+    "displayName": "Dallas Express",
+    "summary": "Tracing its roots to William E. King's 1892 Dallas Bee, the Dallas Express renamed in 1893 became a leading Texas African American weekly for more than seventy years, promoting Black businesses and reporting on Dallas community life until it closed in the mid-1970s.",
+    "eraBuckets": [
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s",
+      "1970s"
+    ],
+    "topicTags": [
+      "publication",
+      "press"
+    ],
+    "jurisdictionLabel": "Dallas, Texas",
+    "locationPrecision": "city",
+    "locationLabel": "Dallas, Texas (city of publication)",
+    "lat": 32.7767,
+    "lng": -96.797,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "William E. King began publishing the Dallas Bee in 1892 and renamed it the Dallas Express in 1893; by 1920 the paper claimed circulation above 10,000 in Texas's Black weekly market",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn83025779/",
+        "citationLabel": "The Dallas Express (Dallas, Tex.) 1893-1970"
+      },
+      {
+        "predicate": "ceased_publication",
+        "object": "After financial troubles in the 1920s and interim white ownership, Black publishers regained control in 1938; the Express continued until the mid-1970s when declining circulation ended publication",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn83025779/",
+        "citationLabel": "The Dallas Express — ownership and closure"
+      }
+    ],
+    "historicalContext": "The Express marketed itself as the South's oldest and largest Negro newspaper west of the Mississippi, giving Dallas readers a locally printed alternative when Houston and national weeklies dominated Texas Black press circulation.",
+    "topicIds": [
+      "publication",
+      "press"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_black_dispatch_001",
+    "kind": "publication",
+    "displayName": "The Black Dispatch",
+    "summary": "Roscoe Dunjee founded The Black Dispatch in Oklahoma City, printing the first edition on November 5, 1914; the weekly became a civil-rights organ that helped charter Oklahoma's first NAACP chapter and challenged segregation into the 1980s.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s",
+      "1970s",
+      "1980s"
+    ],
+    "topicTags": [
+      "publication",
+      "press",
+      "civil-rights"
+    ],
+    "jurisdictionLabel": "Oklahoma City, Oklahoma",
+    "locationPrecision": "city",
+    "locationLabel": "Oklahoma City, Oklahoma (city of publication)",
+    "lat": 35.4676,
+    "lng": -97.5164,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Roscoe Dunjee purchased a small printing plant in Oklahoma City and published the first edition of The Black Dispatch on November 5, 1914, targeting the city's growing African American community",
+        "confidenceLevel": "high",
+        "citationSource": "Oklahoma Historical Society — Encyclopedia of Oklahoma History & Culture",
+        "citationHref": "https://www.okhistory.org/publications/enc/entry?entry=BL008",
+        "citationLabel": "Black Dispatch"
+      },
+      {
+        "predicate": "cataloged_as",
+        "object": "The Library of Congress Directory of U.S. Newspapers records The Black Dispatch published from Oklahoma City from 1915 through the 1980s",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress",
+        "citationHref": "https://www.loc.gov/item/sn83025214/",
+        "citationLabel": "The Black Dispatch (Oklahoma City, Okla.) 1915-198?"
+      }
+    ],
+    "historicalContext": "From Oklahoma City, Dunjee used the Dispatch to fight restrictive covenants and school segregation, linking Southwestern readers to national NAACP litigation strategies at a time when Oklahoma's All-Black towns were fading but urban Black communities were expanding.",
+    "topicIds": [
+      "publication",
+      "press",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_savannah_tribune_001",
+    "kind": "publication",
+    "displayName": "Savannah Tribune",
+    "summary": "John H. Deveaux founded Savannah's Colored Tribune in 1875, reviving it as the Savannah Tribune in 1886; under editor Solomon C. Johnson from 1889 to 1954 the weekly reported Jim Crow injustices and helped organize streetcar boycotts in coastal Georgia.",
+    "eraBuckets": [
+      "1870s",
+      "1880s",
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s"
+    ],
+    "topicTags": [
+      "publication",
+      "press",
+      "civil-rights"
+    ],
+    "jurisdictionLabel": "Savannah, Georgia",
+    "locationPrecision": "city",
+    "locationLabel": "Savannah, Georgia (city of publication)",
+    "lat": 32.0809,
+    "lng": -81.0912,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "John H. Deveaux founded the Colored Tribune in Savannah in 1875, closed it in 1878 when white printers refused to print it, and revived the Savannah Tribune on October 23, 1886 from a plant on St. Julian Street",
+        "confidenceLevel": "high",
+        "citationSource": "New Georgia Encyclopedia",
+        "citationHref": "https://www.georgiaencyclopedia.org/articles/arts-culture/savannah-tribune/",
+        "citationLabel": "Savannah Tribune"
+      },
+      {
+        "predicate": "edited_by",
+        "object": "Solomon C. Johnson took editorial control in 1889, purchased the Tribune in 1909, and for decades reported segregation, lynchings, and convict lease abuses until his death in 1954",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress — Chronicling America",
+        "citationHref": "https://chroniclingamerica.loc.gov/lccn/sn84020323/",
+        "citationLabel": "The Savannah Tribune (Savannah [Ga.]) 1876-1960"
+      }
+    ],
+    "historicalContext": "The Tribune's reach extended into north Florida, making it a regional voice when Atlanta's Daily World later competed for Georgia's leading Black weekly readership.",
+    "topicIds": [
+      "publication",
+      "press",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  },
+  {
+    "id": "ent_houston_informer_001",
+    "kind": "publication",
+    "displayName": "Houston Informer",
+    "summary": "The Houston Informer began weekly publication in Houston in 1919 and, after merging with the Texas Freeman in 1931, evolved into a family of titles that made the city one of Texas's major centers of African American newspaper publishing.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "publication",
+      "press"
+    ],
+    "jurisdictionLabel": "Houston, Texas",
+    "locationPrecision": "city",
+    "locationLabel": "Houston, Texas (city of publication)",
+    "lat": 29.7604,
+    "lng": -95.3698,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "The Houston Informer began in Houston, Texas in 1919 as a weekly African American newspaper; Library of Congress holdings start with volume 1, number 3 dated June 7, 1919",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress",
+        "citationHref": "https://www.loc.gov/item/sn84024124/",
+        "citationLabel": "The Houston Informer (Houston, Tex.) 1919-1931"
+      },
+      {
+        "predicate": "merged_with",
+        "object": "The Informer merged with the Texas Freeman in 1931 to form The Houston Informer and the Texas Freeman, a title lineage that continued in Houston into the twenty-first century",
+        "confidenceLevel": "high",
+        "citationSource": "Library of Congress",
+        "citationHref": "https://www.loc.gov/item/sn84024123/",
+        "citationLabel": "The Houston Informer and the Texas Freeman (Houston, Tex.) 1931-1934"
+      }
+    ],
+    "historicalContext": "Competing with the Dallas Express for Texas circulation, the Informer documented Houston's expanding Black neighborhoods and port-city labor markets during the interwar decades.",
+    "topicIds": [
+      "publication",
+      "press"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": []
+  }
+]

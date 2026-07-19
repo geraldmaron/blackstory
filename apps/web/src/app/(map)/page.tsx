@@ -14,10 +14,6 @@ import { buildEdgeLineCatalog } from './explore/explore-view-model';
 import { HeroStage } from './HeroStage';
 import { loadMapStageBase } from './shared-map-data';
 
-/** Below this many released records the story rail carries the honest "early release" note —
- * a small hand-verified collection is a fact worth stating, not a defect to hide. */
-const EARLY_RELEASE_THRESHOLD = 25;
-
 /** How many one-tap state chips the Orient beat shows. */
 const TOP_STATE_LIMIT = 5;
 
@@ -89,7 +85,6 @@ export default async function HomePage() {
         featureCount={recordCount}
         stateCount={states.length}
         decadeFrames={decadeFrames}
-        liveData={base.dataSource === 'live'}
       />
 
       <main id="main">
@@ -99,7 +94,6 @@ export default async function HomePage() {
           recordCount={recordCount}
           stateCount={states.length}
           eraSpan={eraSpanOf(base.featureCollection)}
-          showSeedNotice={base.dataSource !== 'live' || base.entities.length < EARLY_RELEASE_THRESHOLD}
         />
       </main>
     </>

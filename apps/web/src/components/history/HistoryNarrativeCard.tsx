@@ -7,6 +7,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Card } from '@repo/ui';
 import type { HistoryNodeView } from '../../lib/history/build-history-graph';
+import { entityEvidenceHref, exploreHrefForKind } from '../../lib/map-experience/metadata-hrefs';
 
 void React;
 
@@ -29,7 +30,9 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
       title={node.displayName}
       meta={
         <>
-          <span className="ds-mono">{node.kind}</span>
+          <Link className="ds-mono ds-history-narrative-card__kind-link" href={exploreHrefForKind(node.kind)}>
+            {node.kind}
+          </Link>
           <span className="ds-sans">{statusMeta}</span>
         </>
       }
@@ -56,7 +59,9 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
         <div>
           <dt>Evidence</dt>
           <dd>
-            {node.evidenceCount} accepted claim{node.evidenceCount === 1 ? '' : 's'}
+            <Link className="ds-history-narrative-card__fact-link" href={entityEvidenceHref(node.href)}>
+              {node.evidenceCount} accepted claim{node.evidenceCount === 1 ? '' : 's'}
+            </Link>
           </dd>
         </div>
       </dl>

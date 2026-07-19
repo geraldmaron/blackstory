@@ -7,6 +7,13 @@ import React from 'react';
 import Link from 'next/link';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import { displayEncodingFor } from '../../lib/map-experience/kind-encoding';
+import {
+  entityEvidenceHref,
+  eraFactLink,
+  exploreHrefForKind,
+  exploreHrefForState,
+  searchHrefForStatus,
+} from '../../lib/map-experience/metadata-hrefs';
 import { ConfidenceMark } from './ConfidenceMark';
 import { KindBadge } from './KindBadge';
 
@@ -19,12 +26,6 @@ export type NarrativeCardProps = {
   readonly onClose?: () => void;
 };
 
-function eraLabel(eraBuckets: readonly string[]): string {
-  if (eraBuckets.length === 0) return 'Undated';
-  if (eraBuckets.length === 1) return eraBuckets[0]!;
-  return `${eraBuckets[0]} – ${eraBuckets[eraBuckets.length - 1]}`;
-}
-
 function radiusAffordanceLabel(feature: ExploreMapFeature): string {
   const { geoPrecisionTier, radiusMeters } = feature.properties;
   if (radiusMeters === undefined) {
@@ -35,14 +36,14 @@ function radiusAffordanceLabel(feature: ExploreMapFeature): string {
   return `Shown at ${geoPrecisionTier} precision — the marker represents a ±${distance} area, not an exact address.`;
 }
 
-function placeLabel(feature: ExploreMapFeature): string {
-  const { statePostalCode } = feature.properties;
-  return statePostalCode && statePostalCode.length > 0 ? statePostalCode : '—';
-}
-
 export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
   const { properties } = feature;
   const kindEncoding = displayEncodingFor(properties.kind, properties.mapTone);
+  const era = eraFactLink(properties.eraBuckets);
+  const statePostalCode = properties.statePostalCode?.trim().toUpperCase();
+  const statusHref =
+    properties.status !== undefined ? searchHrefForStatus(properties.status) : undefined;
+  const evidenceLabel = `${properties.evidenceCount} accepted claim${properties.evidenceCount === 1 ? '' : 's'}`;
 
   return (
     <article
@@ -58,10 +59,16 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
           className="ds-nc__kind-rule"
           style={{ borderColor: kindEncoding.shade }}
         >
-          <KindBadge
-            kind={properties.kind}
-            {...(properties.mapTone !== undefined ? { mapTone: properties.mapTone } : {})}
-          />
+          <Link
+            className="ds-nc__kind-link"
+            href={exploreHrefForKind(properties.kind)}
+            aria-label={`Browse ${kindEncoding.label} records`}
+          >
+            <KindBadge
+              kind={properties.kind}
+              {...(properties.mapTone !== undefined ? { mapTone: properties.mapTone } : {})}
+            />
+          </Link>
         </div>
         {onClose ? (
           <button
@@ -94,16 +101,46 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
       <dl className="ds-nc__facts">
         <div className="ds-nc__fact">
           <dt>Where</dt>
-          <dd className="ds-mono">{placeLabel(feature)}</dd>
+          <dd className="ds-mono">
+            {statePostalCode ? (
+              <Link
+                className="ds-nc__fact-link"
+                href={exploreHrefForState(statePostalCode)}
+                aria-label={`View records in ${statePostalCode}`}
+              >
+                {statePostalCode}
+              </Link>
+            ) : (
+              '—'
+            )}
+          </dd>
         </div>
         <div className="ds-nc__fact">
           <dt>Era</dt>
-          <dd>{eraLabel(properties.eraBuckets)}</dd>
+          <dd>
+            {era.href ? (
+              <Link
+                className="ds-nc__fact-link"
+                href={era.href}
+                aria-label={`Browse records from the ${era.label}`}
+              >
+                {era.label}
+              </Link>
+            ) : (
+              era.label
+            )}
+          </dd>
         </div>
         <div className="ds-nc__fact">
           <dt>Evidence</dt>
           <dd>
-            {properties.evidenceCount} accepted claim{properties.evidenceCount === 1 ? '' : 's'}
+            <Link
+              className="ds-nc__fact-link"
+              href={entityEvidenceHref(properties.href)}
+              aria-label={`View ${evidenceLabel} on full record`}
+            >
+              {evidenceLabel}
+            </Link>
           </dd>
         </div>
         <div className="ds-nc__fact">
@@ -114,7 +151,19 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         </div>
         <div className="ds-nc__fact">
           <dt>Status</dt>
-          <dd>{properties.status ?? '—'}</dd>
+          <dd>
+            {statusHref && properties.status ? (
+              <Link
+                className="ds-nc__fact-link"
+                href={statusHref}
+                aria-label={`Search records with status ${properties.status}`}
+              >
+                {properties.status}
+              </Link>
+            ) : (
+              (properties.status ?? '—')
+            )}
+          </dd>
         </div>
       </dl>
 

@@ -5,7 +5,6 @@
  * in for a published editorial projection.
  */
 import Link from 'next/link';
-import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { listSeedStories } from '../../data/stories-seed';
 
 export const metadata = {
@@ -27,7 +26,6 @@ export default function StoriesIndexPage() {
       </p>
 
       <section className="ds-section ds-section--flush" aria-label="Story list">
-        <SeedDataNotice compact />
         <ul className="ds-story-rail">
           {stories.map((story) => (
             <li key={story.slug}>

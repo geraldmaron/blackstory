@@ -8,7 +8,6 @@
  * `docs/runbooks/moderator-wellbeing.md` for how the review queue is staffed.
  */
 import { EmptyState, Notice } from '@repo/ui';
-import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { SubmitLeadForm } from './SubmitLeadForm';
 
 export const metadata = {
@@ -29,8 +28,6 @@ export default function SubmitLeadPage() {
       </p>
 
       <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
-        <SeedDataNotice compact />
-
         <Notice tone="warning" title="This is not a public post">
           Leads submitted here are never published as-is. Every submission enters a moderated
           quarantine queue, is reviewed independently by multiple reviewers, and — only

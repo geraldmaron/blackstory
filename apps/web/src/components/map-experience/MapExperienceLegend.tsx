@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Accessible legend for the map: explains kind shades + glyphs, semantic tones
  * (massacre / plantation / epicenter), size, density, precision, and confidence
@@ -7,8 +9,6 @@
  * map” guide uses a native `<details>`/`<summary>` for keyboard and screen-reader
  * support without custom JS.
  */
-'use client';
-
 import React, { useEffect, useState } from 'react';
 import {
   CONFIDENCE_TIER_COLOR,

@@ -3,8 +3,8 @@
  * Mirrors safe fields from packages/firebase/fixtures/firestore-seed.ts for
  * demonstrable pages until public projections and search land. This is a real, fully-cited
  * historical dataset (the Fifteenth Street Presbyterian Church / Paul Laurence Dunbar High
- * School cluster) standing in for a live release pipeline — see the homepage's sample-data
- * banner for the system-level framing; the facts and citations below are real, not placeholders.
+ * School cluster) standing in for a live release pipeline until public projections land.
+ * The facts and citations below are real, not placeholders.
  * Never includes residential addresses or unpublished high-impact claims.
  */
 import {

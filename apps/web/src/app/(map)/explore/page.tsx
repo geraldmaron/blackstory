@@ -7,7 +7,6 @@
  * the client island adds the interactive camera, cluster drill-down, and viewport URL sync.
  */
 import { FilterBar } from '@repo/ui';
-import { SeedDataNotice } from '../../../components/SeedDataNotice';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
 import { getSharedPublicEntities } from '../shared-map-data';
 import { ExploreMapExperience } from './ExploreMapExperience';
@@ -31,12 +30,6 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
 
   return (
     <>
-      {view.dataSource !== 'live' ? (
-        <div className="ds-explore-stage__seed-notice">
-          <SeedDataNotice compact />
-        </div>
-      ) : null}
-
       <noscript>
         <div className="ds-explore__noscript ds-container ds-page">
           <FilterBar

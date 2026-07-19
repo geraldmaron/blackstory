@@ -43,9 +43,6 @@ export type HeroStageProps = {
   readonly stateCount: number;
   /** Decades-in-motion frames (newest → oldest, closed by the full-archive frame). */
   readonly decadeFrames: readonly DecadeFlowFrame[];
-  /** True when the page is reading live public projections; the count line's "sample data"
-   * qualifier only renders on the snapshot/seed fallback. */
-  readonly liveData: boolean;
 };
 
 const RESTING_HREF = buildExploreHref({
@@ -86,7 +83,6 @@ export function HeroStage({
   featureCount,
   stateCount,
   decadeFrames,
-  liveData,
 }: HeroStageProps) {
   const router = useRouter();
   const stage = useMapStage();
@@ -260,7 +256,7 @@ export function HeroStage({
               </p>
               <p className="ds-hero-timeline__note">
                 {currentFrame?.isComplete
-                  ? `${currentFrame?.cumulativeCount ?? featureCount} records · ${stateCount} states${liveData ? '' : ' · sample data'}`
+                  ? `${currentFrame?.cumulativeCount ?? featureCount} records · ${stateCount} states`
                   : `${currentFrame?.cumulativeCount ?? 0} records documented through this decade`}
               </p>
             </div>
@@ -311,7 +307,6 @@ export function HeroStage({
         <p className="ds-hero-stage__count">
           {featureCount} record{featureCount === 1 ? '' : 's'} · {stateCount} state
           {stateCount === 1 ? '' : 's'}
-          {liveData ? '' : ' · sample data'}
         </p>
       )}
     </section>

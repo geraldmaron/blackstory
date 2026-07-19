@@ -4,6 +4,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { PublicEntityView } from '../../data/public-seed';
+import { exploreHrefForEra } from '../../lib/map-experience/metadata-hrefs';
 
 void React;
 
@@ -15,7 +16,7 @@ function chipHref(kind: 'theme' | 'era', value: string): string {
   if (kind === 'theme') {
     return `/search?topic=${encodeURIComponent(value)}`;
   }
-  return `/explore?era=${encodeURIComponent(value)}`;
+  return exploreHrefForEra(value);
 }
 
 export function EntityTopicTags({ entity }: EntityTopicTagsProps) {

@@ -5,7 +5,7 @@
  * [source]." "Dangerous today" never appears here as copy, a badge, or a classification: this
  * component has no "danger level" prop, no red/danger styling hook, and no urgency framing. It
  * renders through the same muted `Notice tone="warning"` treatment as every other site notice
- * (`SeedDataNotice`, `OfflineNotice`, `DisclaimerBanner`) never a distinct "danger" tone (the
+ * (`OfflineNotice`, `DisclaimerBanner`) never a distinct "danger" tone (the
  * shared `Notice` component doesn't define one).
  *
  * Advisory data is presentation-only BY CONSTRUCTION AND BY TEST: `packages/domain/src/advisory.ts`

@@ -37,6 +37,32 @@ test('renders name, era, one-line story, evidence count, confidence, and a link 
   assert.match(html, /Open full record/);
 });
 
+test('links Where, Era, Evidence, Kind, and Status metadata to the right site views', () => {
+  const feature = requireFeature('ent_15th_st_church_001');
+  const html = renderToStaticMarkup(createElement(NarrativeCard, { feature }));
+  const { properties } = feature;
+
+  assert.equal(properties.statePostalCode, 'DC');
+  assert.match(html, /href="[^"]*state=DC"/);
+  assert.match(html, /aria-label="View records in DC"/);
+  assert.match(html, /href="[^"]*era=1840s"/);
+  assert.match(html, /href="\/entity\/ent_15th_st_church_001#accepted-claims"/);
+  assert.match(html, /href="[^"]*kind=place"/);
+  assert.match(html, /aria-label="Browse Place records"/);
+  assert.match(html, /href="\/search\?status=active"/);
+});
+
+test('renders an em dash for Where when no postal code is present', () => {
+  const feature = requireFeature('ent_15th_st_church_001');
+  const withoutState = {
+    ...feature,
+    properties: { ...feature.properties, statePostalCode: undefined },
+  };
+  const html = renderToStaticMarkup(createElement(NarrativeCard, { feature: withoutState }));
+  assert.match(html, /—/);
+  assert.doesNotMatch(html, /aria-label="View records in/);
+});
+
 test('renders the radius affordance as words, never as a bare number with no context', () => {
   const feature = requireFeature('ent_dunbar_school_001');
   const html = renderToStaticMarkup(createElement(NarrativeCard, { feature }));

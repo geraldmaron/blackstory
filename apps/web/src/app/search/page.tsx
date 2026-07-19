@@ -14,14 +14,13 @@
 
 import Link from 'next/link';
 import { EmptyState, ResultList } from '@repo/ui';
-import { SeedDataNotice } from '../../components/SeedDataNotice';
 import { KindBadge } from '../../components/map-experience';
 import { getPublicSearchIndex } from '../../lib/public-data/source';
 import { buildSearchPageHref, buildSearchViewModel, type RawSearchParams } from './search-view-model';
 
 export const metadata = {
   title: 'Search',
-  description: 'Search sample BlackStory records by keyword, kind, status, and era.',
+  description: 'Search BlackStory records by keyword, kind, status, and era.',
 };
 
 type SearchPageProps = {
@@ -116,10 +115,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       </form>
 
       <div className="ds-stack" style={{ marginTop: 'var(--ds-space-8)' }}>
-        {index.source !== 'live' ? <SeedDataNotice compact /> : null}
-
         <p className="ds-sans ds-count-label" id="search-results-heading">
-          {view.totalMatched} {index.source === 'live' ? '' : 'sample '}result
+          {view.totalMatched} result
           {view.totalMatched === 1 ? '' : 's'}
         </p>
 

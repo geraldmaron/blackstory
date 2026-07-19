@@ -10,7 +10,6 @@ import { notFound } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
 import { AtmospherePlane, selectAtmospherePlane } from '../../../components/atmosphere';
 import { renderStoryTitle } from '../../../components/atmosphere/story-title';
-import { SeedDataNotice } from '../../../components/SeedDataNotice';
 import { getPublicEntity } from '../../../data/public-seed';
 import { getSeedFact } from '../../../data/facts-seed';
 import { getSeedStory, listSeedStories, type StoryRecord } from '../../../data/stories-seed';
@@ -123,8 +122,6 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
       </header>
 
       <article className="ds-container ds-story-article">
-        <SeedDataNotice compact />
-
         <div className="ds-story-article__body ds-prose">
           {story.body.map((section, index) => (
             <section key={section.heading ?? `section-${index}`}>

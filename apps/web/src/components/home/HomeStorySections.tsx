@@ -10,7 +10,7 @@
  */
 
 import Link from 'next/link';
-import { KindBadge } from '../map-experience';
+import { KindBadge } from '../map-experience/KindBadge';
 import { StateStart, type StateStartEntry } from './StateStart';
 
 export type HomeStoryEntity = {
@@ -30,8 +30,6 @@ export type HomeStorySectionsProps = {
   readonly stateCount: number;
   /** e.g. "1820s–1970s"; omitted when the release carries no dated records. */
   readonly eraSpan?: string | undefined;
-  /** True while the public catalog is still a small early-release set. */
-  readonly showSeedNotice?: boolean;
 };
 
 /** v5 §6.5 "How this works" — three points, evidence before assertion. */
@@ -47,7 +45,6 @@ export function HomeStorySections({
   recordCount,
   stateCount,
   eraSpan,
-  showSeedNotice = false,
 }: HomeStorySectionsProps) {
   return (
     <>
@@ -72,11 +69,6 @@ export function HomeStorySections({
           <p className="ds-section__lede">
             Select a pin on the map above, or step into a full record here.
           </p>
-          {showSeedNotice ? (
-            <p className="ds-story-rail__notice ds-mono">
-              Early release — a small, hand-verified collection, not yet the full archive.
-            </p>
-          ) : null}
           <ul className="ds-story-rail">
             {featured.map((entity) => (
               <li key={entity.id}>
