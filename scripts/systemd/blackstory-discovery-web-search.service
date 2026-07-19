@@ -16,6 +16,7 @@ Environment=DISCOVERY_KILL_SWITCH=disengaged
 Environment=DISCOVERY_STORAGE_TERMS_CONFIRMED=true
 Environment=COMMIT_SURVIVORS=1
 Environment=DISCOVERY_OPERATOR_ID=scheduled-discovery-corsair
+# Optional: DISCOVERY_QUERIES_PER_RUN=3 (default) — rotates corsair-web-search-queries.json
 # Load Firebase / privacy pepper from a root-owned or user env file (never commit secrets).
 EnvironmentFile=-%h/.config/blackstory/discovery.env
 ExecStart=%h/Developer/Projects/blackstory/scripts/run-scheduled-searxng-discovery.sh

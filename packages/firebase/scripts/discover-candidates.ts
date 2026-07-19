@@ -12,7 +12,7 @@
  *
  * Usage:
  *   node --conditions development --import tsx packages/firebase/scripts/discover-candidates.ts \
- *     [--limit=N] [--query="…"] [--apply]
+ *     [--limit=N] [--query="…"] [--concurrency=N] [--merge] [--apply]
  */
 import {
   mkdirSync,
@@ -66,6 +66,120 @@ const SEED_QUERIES = [
   'Black filmmakers pioneers',
   'Black labor unions',
   'Black women suffragists',
+  'Black Women Lead Boston',
+  'African American women scientists',
+  'Black women inventors United States',
+  'Black women engineers NASA',
+  'African American women mathematicians',
+  'Black women physicians pioneers',
+  'African American architects',
+  'Black physicians United States',
+  'Buffalo Soldiers',
+  'Tuskegee Airmen',
+  'Harlem Renaissance figures',
+  'Chicago Black Belt history',
+  'Black freemasonry lodges',
+  'African American historic landmarks',
+  'National Register Black history sites',
+  'Black schools segregation era',
+  'Freedom Schools',
+  'Student Nonviolent Coordinating Committee',
+  'Congress of Racial Equality',
+  'March on Washington organizers',
+  'Black Panther Party chapters',
+  'African American newspapers editors',
+  'Black bankers United States',
+  'Madam C. J. Walker associates',
+  'Black jockeys horse racing',
+  'Negro League baseball stadiums',
+  'African American maritime history',
+  'Black shipyards World War II',
+  'Gullah Geechee communities',
+  'African American farming cooperatives',
+  'Exodusters Kansas',
+  'Allensworth California',
+  'Mound Bayou Mississippi',
+  'Eatonville Florida',
+  'Black resorts United States',
+  'African American hospitals historic',
+  'African American lawyers pioneers',
+  'Black judges United States history',
+  'African American engineers pioneers',
+  'Black scientists United States',
+  'African American nurses historic',
+  'Black midwives United States',
+  'Boston Black women leaders history',
+  'Blue Hill Avenue Black Women Lead',
+  'African American pharmacists pioneers',
+  'Black dentists United States history',
+  'African American educators pioneers',
+  'Black librarians United States',
+  'African American journalists pioneers',
+  'Black radio stations historic',
+  'African American theaters historic',
+  'Black opera singers United States',
+  'African American composers',
+  'Black classical musicians',
+  'African American visual artists',
+  'Black sculptors United States',
+  'Harlem Renaissance artists',
+  'Chicago Black Renaissance',
+  'African American poets Harlem',
+  'Black novelists United States',
+  'African American playwrights',
+  'Black dance companies historic',
+  'African American athletic pioneers',
+  'Black Olympic athletes pioneers',
+  'Negro National League teams',
+  'Black tennis pioneers',
+  'African American golf pioneers',
+  'Black boxing champions historic',
+  'Buffalo Soldier regiments',
+  'African American Civil War soldiers',
+  'United States Colored Troops',
+  'Black World War I units',
+  'African American World War II units',
+  'Montford Point Marines',
+  'Golden Thirteen Navy',
+  'African American Medal of Honor',
+  'Black abolitionists United States',
+  'Underground Railroad conductors',
+  'Free Black communities antebellum',
+  'African American mutual aid societies',
+  'Prince Hall Freemasonry',
+  'African American insurance companies',
+  'Black banks United States historic',
+  'African American chambers of commerce',
+  'Green Book sites United States',
+  'African American churches National Register',
+  'African Methodist Episcopal historic churches',
+  'African American cemeteries National Register',
+  'Rosenwald Schools',
+  'African American boarding schools',
+  'HBCU campuses historic',
+  'Meharry Medical College history',
+  'Howard University historic',
+  'Tuskegee Institute historic',
+  'African American homesteaders',
+  'Black cowboys ranches',
+  'Black towns Texas',
+  'Nicodemus Kansas',
+  'Boley Oklahoma',
+  'Langston Oklahoma',
+  'Gullah islands South Carolina',
+  'Geechee communities Georgia',
+  'Selma to Montgomery sites',
+  'Birmingham civil rights landmarks',
+  'Memphis civil rights sites',
+  'Little Rock Central High',
+  'Black heritage trails United States',
+  'African American historic districts',
+  'Black Main Street districts',
+  'African American fraternal organizations',
+  'Black Greek letter organizations founders',
+  'African American settlement houses',
+  'Black YMCA historic',
+  'African American hospitals National Register',
 ] as const;
 
 type SearchHit = {
@@ -104,12 +218,37 @@ function hasFlag(name: string): boolean {
   return process.argv.includes(`--${name}`);
 }
 
-async function getJson(url: string): Promise<unknown> {
-  const response = await fetch(url, {
-    headers: { 'User-Agent': WIKIMEDIA_USER_AGENT, Accept: 'application/json' },
-  });
-  if (!response.ok) throw new Error(`Wikimedia HTTP ${response.status} for ${url}`);
-  return response.json();
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function getJson(url: string, attempts = 5): Promise<unknown> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        headers: { 'User-Agent': WIKIMEDIA_USER_AGENT, Accept: 'application/json' },
+      });
+      if (response.ok) return response.json();
+      const retryable = response.status === 429 || response.status >= 500;
+      const body = await response.text().catch(() => '');
+      const err = new Error(
+        `Wikimedia HTTP ${response.status} for ${url}${body ? `: ${body.slice(0, 120)}` : ''}`,
+      );
+      lastError = err;
+      if (!retryable || attempt >= attempts) throw err;
+      const retryAfter = Number(response.headers.get('retry-after'));
+      const backoffMs = Number.isFinite(retryAfter) && retryAfter > 0
+        ? retryAfter * 1000
+        : Math.min(60_000, 1_000 * 2 ** (attempt - 1));
+      await sleep(backoffMs);
+    } catch (error) {
+      lastError = error;
+      if (attempt >= attempts) throw error;
+      await sleep(Math.min(60_000, 1_000 * 2 ** (attempt - 1)));
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
 async function searchWikipedia(query: string, limit: number): Promise<readonly SearchHit[]> {
@@ -308,17 +447,66 @@ async function main(): Promise<void> {
   let skippedDuplicate = 0;
   let skippedFilter = 0;
   let skippedCatalog = 0;
+  let queryFailures = 0;
+  const queryConcurrency = arg('concurrency')
+    ? Math.max(1, Number(arg('concurrency')))
+    : 2;
 
-  for (const query of queries) {
-    const hits = await searchWikipedia(query, perQueryLimit);
+  type QueryOutcome = {
+    readonly query: string;
+    readonly hits: readonly SearchHit[];
+    readonly resolved: Awaited<ReturnType<typeof client.resolveEnwikiTitles>>;
+    readonly entities: Map<string, WikidataEntity>;
+    readonly error?: string;
+  };
+
+  async function runQuery(query: string): Promise<QueryOutcome> {
+    try {
+      const hits = await searchWikipedia(query, perQueryLimit);
+      // Pace Wikimedia after each search to stay under rate limits.
+      await sleep(350);
+      const titles = hits.map((h) => h.title);
+      const resolved = await client.resolveEnwikiTitles(titles);
+      const qids = resolved.map((r) => r.wikidataId).filter((q): q is string => q !== undefined);
+      const entities = qids.length > 0 ? await client.fetchEntitiesById(qids) : new Map();
+      archiveJson(`search-${slugify(query)}`, { query, hits });
+      return { query, hits, resolved, entities };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(`Query failed (${query}): ${message.slice(0, 200)}`);
+      return {
+        query,
+        hits: [],
+        resolved: [],
+        entities: new Map(),
+        error: message,
+      };
+    }
+  }
+
+  const queryOutcomes: QueryOutcome[] = [];
+  {
+    let next = 0;
+    const workers = Array.from({ length: Math.min(queryConcurrency, queries.length) }, async () => {
+      for (;;) {
+        const i = next;
+        next += 1;
+        if (i >= queries.length) return;
+        queryOutcomes[i] = await runQuery(queries[i]!);
+      }
+    });
+    await Promise.all(workers);
+  }
+
+  for (const outcome of queryOutcomes) {
+    if (!outcome) continue;
+    if (outcome.error) {
+      queryFailures += 1;
+      report.push({ action: 'query_failed', query: outcome.query, error: outcome.error });
+      continue;
+    }
+    const { query, hits, resolved, entities } = outcome;
     searchHits += hits.length;
-
-    const titles = hits.map((h) => h.title);
-    const resolved = await client.resolveEnwikiTitles(titles);
-    const qids = resolved.map((r) => r.wikidataId).filter((q): q is string => q !== undefined);
-    // Single entity fetch: labels + descriptions + aliases + claims (coords).
-    const entities = qids.length > 0 ? await client.fetchEntitiesById(qids) : new Map();
-    archiveJson(`search-${slugify(query)}`, { query, hits });
 
     const resolvedByTitle = new Map(
       resolved.map((r) => [normalizeTitleKey(r.title), r] as const),
@@ -396,6 +584,7 @@ async function main(): Promise<void> {
   const run = new Date().toISOString().replace(/[:.]/g, '-');
   const summary = {
     queriesRun: queries.length,
+    queryFailures,
     searchHits,
     skippedDuplicate,
     skippedFilter,
@@ -405,6 +594,27 @@ async function main(): Promise<void> {
 
   if (apply) {
     mkdirSync(CANDIDATES_DIR, { recursive: true });
+    const merge = hasFlag('merge');
+    let priorCandidates: DiscoveryCandidate[] = [];
+    if (merge) {
+      const priorFiles = existsSync(CANDIDATES_DIR)
+        ? readdirSync(CANDIDATES_DIR)
+            .filter((f) => f.startsWith('run-') && f.endsWith('.json'))
+            .sort()
+        : [];
+      const latestPrior = priorFiles.at(-1);
+      if (latestPrior) {
+        const prior = JSON.parse(readFileSync(join(CANDIDATES_DIR, latestPrior), 'utf8')) as {
+          candidates?: DiscoveryCandidate[];
+        };
+        priorCandidates = prior.candidates ?? [];
+      }
+    }
+    const byId = new Map<string, DiscoveryCandidate>();
+    for (const c of priorCandidates) byId.set(c.id, c);
+    for (const c of candidates) byId.set(c.id, c);
+    const merged = [...byId.values()];
+
     // Keep a single latest research slice in fixtures (prior runs live in .cache/).
     for (const prior of readdirSync(CANDIDATES_DIR).filter(
       (f) => f.startsWith('run-') && f.endsWith('.json'),
@@ -412,11 +622,19 @@ async function main(): Promise<void> {
       unlinkSync(join(CANDIDATES_DIR, prior));
     }
     const path = join(CANDIDATES_DIR, `run-${run}.json`);
+    const writeSummary = {
+      ...summary,
+      priorCandidates: priorCandidates.length,
+      mergedCandidates: merged.length,
+      newlyFoundThisRun: candidates.length,
+    };
     writeFileSync(
       path,
-      `${JSON.stringify({ generatedAt: new Date().toISOString(), summary, candidates }, null, 2)}\n`,
+      `${JSON.stringify({ generatedAt: new Date().toISOString(), summary: writeSummary, candidates: merged }, null, 2)}\n`,
     );
-    console.log(`Wrote ${candidates.length} candidates → ${path}`);
+    console.log(
+      `Wrote ${merged.length} candidates (new=${candidates.length}, prior=${priorCandidates.length}) → ${path}`,
+    );
   } else {
     console.log('Dry run (pass --apply to stage candidate fixtures).');
     if (candidates.length > 0) {

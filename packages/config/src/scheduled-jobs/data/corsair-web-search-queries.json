@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "corsair-web-search-queries.v1",
+  "updatedAt": "2026-07-19",
+  "purpose": "Rotating SearXNG SERP queries for Corsair discovery. These are search-result leads only — not HTML body scrapes. Full crawl of blackwomenleadproject.org remains gated on source-policy audit (repo-tt2u.13).",
+  "preferredHosts": [
+    "blackwomenleadproject.org",
+    "loc.gov",
+    "chroniclingamerica.loc.gov",
+    "catalog.archives.gov",
+    "archives.gov",
+    "nps.gov",
+    "si.edu",
+    "dp.la",
+    "wikidata.org",
+    "commons.wikimedia.org",
+    "nasa.gov",
+    "orcid.org",
+    "patents.google.com",
+    "reporter.nih.gov",
+    "nces.ed.gov",
+    "npgallery.nps.gov"
+  ],
+  "queries": [
+    {
+      "id": "bwlp-site",
+      "intent": "site_focus",
+      "theme": "boston_black_women_lead",
+      "text": "site:blackwomenleadproject.org Black Women Lead Boston"
+    },
+    {
+      "id": "bwlp-open",
+      "intent": "open_web",
+      "theme": "boston_black_women_lead",
+      "text": "\"Black Women Lead\" Boston \"Blue Hill\" OR \"Greater Grove Hall\" biography"
+    },
+    {
+      "id": "bwlp-bpl",
+      "intent": "partner_authority",
+      "theme": "boston_black_women_lead",
+      "text": "Black Women Lead Boston biography site:bpl.org OR site:northeastern.edu"
+    },
+    {
+      "id": "stem-women-open",
+      "intent": "open_web",
+      "theme": "black_women_stem",
+      "text": "Black women STEM scientists engineers inventors African American history"
+    },
+    {
+      "id": "stem-nasa",
+      "intent": "site_focus",
+      "theme": "black_women_stem",
+      "text": "site:nasa.gov \"African American\" OR \"Black\" women scientist OR mathematician OR engineer"
+    },
+    {
+      "id": "stem-orcid-patents",
+      "intent": "identifier_authority",
+      "theme": "black_women_stem",
+      "text": "Black women inventor OR scientist ORCID OR patent African American"
+    },
+    {
+      "id": "loc-collections",
+      "intent": "site_focus",
+      "theme": "authority_collections",
+      "text": "site:loc.gov African American history collection OR finding aid"
+    },
+    {
+      "id": "nara-catalog",
+      "intent": "site_focus",
+      "theme": "authority_collections",
+      "text": "site:catalog.archives.gov African American OR \"Black history\""
+    },
+    {
+      "id": "nps-people-places",
+      "intent": "site_focus",
+      "theme": "authority_collections",
+      "text": "site:nps.gov African American heritage OR historic site OR people"
+    },
+    {
+      "id": "smithsonian-oa",
+      "intent": "site_focus",
+      "theme": "authority_collections",
+      "text": "site:si.edu African American history OR culture Open Access"
+    },
+    {
+      "id": "dpla",
+      "intent": "site_focus",
+      "theme": "authority_collections",
+      "text": "site:dp.la African American OR \"Black history\" school OR church OR neighborhood"
+    },
+    {
+      "id": "chronicling",
+      "intent": "site_focus",
+      "theme": "newspapers",
+      "text": "site:chroniclingamerica.loc.gov African American newspaper OR \"colored\" school"
+    },
+    {
+      "id": "hbcu-schools",
+      "intent": "open_web",
+      "theme": "education",
+      "text": "HBCU historic campus OR Rosenwald school African American education history"
+    },
+    {
+      "id": "black-wall-street",
+      "intent": "open_web",
+      "theme": "places",
+      "text": "Black Wall Street Greenwood Tulsa African American history"
+    },
+    {
+      "id": "green-book",
+      "intent": "open_web",
+      "theme": "places",
+      "text": "Negro Motorist Green Book historic site African American travel"
+    },
+    {
+      "id": "nrhp-black-history",
+      "intent": "site_focus",
+      "theme": "landmarks",
+      "text": "site:npgallery.nps.gov OR site:nps.gov National Register African American"
+    },
+    {
+      "id": "black-newspapers",
+      "intent": "open_web",
+      "theme": "publishing",
+      "text": "historic Black newspaper archive OR African American press digital collection"
+    },
+    {
+      "id": "mutual-aid",
+      "intent": "open_web",
+      "theme": "institutions",
+      "text": "African American mutual aid society OR fraternal lodge historic"
+    }
+  ]
+}

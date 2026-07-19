@@ -60,19 +60,32 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts disc
 Example SearXNG live (Corsair Tailscale from Mac, or `127.0.0.1:8888` on Corsair):
 
 ```bash
+# Default: rotates 3 queries/day from corsair-web-search-queries.json
+# (includes site:blackwomenleadproject.org + LOC/NARA/NPS/DPLA/NASA + open-web).
 SEARXNG_BASE_URL=http://100.119.72.84:8888 \
-DISCOVERY_SEARXNG_QUERY='Black Wall Street Greenwood Tulsa' \
 DISCOVERY_STORAGE_TERMS_CONFIRMED=true \
 DISCOVERY_KILL_SWITCH=disengaged \
+DISCOVERY_QUERIES_PER_RUN=3 \
 OPERATOR_CLI_PRIVACY_PEPPER=dev \
-node --conditions development --import tsx packages/operator-cli/src/bin.ts discovery-dispatch \
-  --job discovery-campaign-web-search --mode live \
-  --queue-survivors --commit \
-  --operator-id scheduled-discovery --session-id "sess-$(date -u +%Y%m%dT%H%M%SZ)"
+./scripts/run-scheduled-searxng-discovery.sh
+
+# Single-query override (skips roster):
+DISCOVERY_SEARXNG_QUERY='site:blackwomenleadproject.org Black Women Lead Boston' \
+SEARXNG_BASE_URL=http://100.119.72.84:8888 \
+DISCOVERY_STORAGE_TERMS_CONFIRMED=true \
+./scripts/run-scheduled-searxng-discovery.sh
 ```
 
 Survivors become private Firestore `researchCases` (`state: candidate`) for admin
 `/console/candidate-queue` and `/console/research-cases`. Never auto-publishes.
+
+**Query roster:** `packages/config/src/scheduled-jobs/data/corsair-web-search-queries.json`.
+SERP discovery only — not HTML body scrape. Full crawl of `blackwomenleadproject.org`
+remains gated on source-policy audit (`repo-tt2u.13`).
+
+**Overnight hybrid** (`scripts/run-overnight-hybrid-enrichment.sh`) runs SearXNG roster
+first (`SEARXNG_QUERIES_PER_NIGHT`, default 8), then multi-round Wikimedia
+`discover-candidates`, then hybrid LLM enrichment.
 
 **Preferred live schedule:** Corsair systemd user timer
 `scripts/systemd/blackstory-discovery-web-search.timer` (08:30 UTC) →
@@ -80,7 +93,6 @@ Survivors become private Firestore `researchCases` (`state: candidate`) for admi
 `~/.config/blackstory/discovery.env` (`APP_FIREBASE_ALLOW_PRODUCTION=1` + ADC path + pepper
 from 1Password). GCP Functions stay fixture-only (no Tailscale).
 See `~/Developer/Guides/CLI-Reference.md` and `~/Developer/Guides/Secrets-1Password.md`.
-
 ## GitHub Actions
 
 Workflow: `.github/workflows/discovery-campaigns.yml`
