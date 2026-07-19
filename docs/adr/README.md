@@ -36,6 +36,7 @@ Formal decisions for BlackStory platform topology, data, deployment, and securit
 | [ADR-016](./ADR-016-jurisdiction-reference-data.md) | Jurisdiction reference data: scope, storage shape, and precision-radius policy | Accepted (dangling-reference gate documented, not live-wired — see ) |
 | [ADR-017](./ADR-017-persistent-map-canvas.md) | Persistent map canvas | Accepted |
 | [ADR-018](./ADR-018-firebase-scheduled-functions-discovery.md) | Firebase scheduled Functions for discovery automation | Accepted (partially supersedes ADR-007 Jobs-only for capped discovery) |
+| [ADR-019](./ADR-019-acquisition-crawler-runtime.md) | Acquisition crawler runtime: TS adapters + Python Scrapy/Trafilatura | Accepted |
 
 ## Security boundary set (do not expand)
 
