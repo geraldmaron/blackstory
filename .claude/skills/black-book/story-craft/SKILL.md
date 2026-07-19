@@ -16,6 +16,31 @@ before assertion, proud/precise/unflinching, **never trauma-forward as the defau
 Domain: `@repo/domain` → `story-research/` (`story.research.packet.v1`).
 CLI: `story-research-run` → optional `--commit` stages `story_packet` quarantine only.
 
+## Oral methodology (research linking only)
+
+Reverse-engineered from strong oral-history transcripts (e.g. start-line
+relocation essays, political-costume exposés). **Borrow the research moves and
+sentence architecture — not the viral register, trauma hooks, or unsourced
+continental sweeps.** BlackStory voice stays place-first, evidence before
+assertion, proud/precise/unflinching per [`docs/ui/story.md`](../../../docs/ui/story.md).
+
+| Move | Oral craft (transcript) | BlackStory adaptation |
+|---|---|---|
+| Spine | One thesis question the whole piece answers | First framing block; never a clickbait headline |
+| Start line | “The popular telling starts at X — the archive starts at Y” | `conventionalStartLine` → `relocatedStartLine`; move the date before the slogan |
+| Named anchor | Person + date + place + instrument in one breath | `NamedAnchor` with resolved fact/claim cite — no anonymous decoration |
+| Omitted actor | “Here’s the detail that usually gets left out” | `role: omitted`; must resolve to a published cite or stay `needs_evidence` |
+| Winner-built | “What did the winners build?” (constitution, treaty, charter) | `winnerBuiltTest` tied to a fact or published claim — not campaign props |
+| Mechanism | Legal / economic / institutional why, not vibes | `mechanismLayers`; no market billions without a cite |
+| Pattern case | Capped parallel (same structure, different locale) | `patternCases` (max 2); each needs its own cite |
+| Authority witness | Unexpected corroborator (Lincoln, Grant on the record) | Published claim or authority-host **lead** only |
+| Present bridge | Structural continuity + “here’s how you check” | `presentBridge.verificationOffRamp` → entity/fact pages |
+| Close | Verification rule (“watch how they vote, not the corn dog”) | Plain rule pointing to archive off-ramps — not rhetorical headline |
+
+**Rhythm without costume:** short declarative beats, one reveal per paragraph,
+concrete place before abstraction. Direct address is fine in draft body; exclamation
+points and trauma-forward openers are not.
+
 ## Ten research moves (keep)
 
 1. **Thesis question** — one sentence the story answers.

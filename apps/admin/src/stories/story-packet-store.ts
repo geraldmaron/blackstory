@@ -1,6 +1,9 @@
 /**
  * Firestore access for staged story_packet submissions and review decisions.
  * Admin SDK only — never trusts the browser for authorization.
+ *
+ * Listing queries `payload.proposalKind == 'story_packet'` so leads flooding
+ * `submissionInbox` cannot push older packets out of a newest-N scan.
  */
 import { storyPacketToSeedRecord, type StoryResearchPacket } from '@repo/domain';
 import { createServerFirebaseApp, FIRESTORE_ROOT } from '@repo/firebase';
@@ -64,11 +67,32 @@ function extractPacket(payload: Record<string, unknown> | undefined): StoryResea
 
 export async function listStoryPackets(limit = 200): Promise<readonly StoryPacketListItem[]> {
   const db = getDb();
-  const snap = await db
-    .collection(FIRESTORE_ROOT.submissionInbox)
-    .orderBy('createdAt', 'desc')
-    .limit(Math.min(200, Math.max(1, limit)))
-    .get();
+  const capped = Math.min(200, Math.max(1, limit));
+
+  // Prefer an indexed filter so lead floods cannot hide older story packets.
+  let snap;
+  try {
+    snap = await db
+      .collection(FIRESTORE_ROOT.submissionInbox)
+      .where('payload.proposalKind', '==', 'story_packet')
+      .orderBy('createdAt', 'desc')
+      .limit(capped)
+      .get();
+  } catch {
+    // Composite index may be missing in a fresh project — fall back to a wider scan
+    // and filter client-side (still prefer proposalKind match over newest-N-only).
+    const wide = await db
+      .collection(FIRESTORE_ROOT.submissionInbox)
+      .orderBy('createdAt', 'desc')
+      .limit(Math.max(capped * 20, 500))
+      .get();
+    snap = {
+      docs: wide.docs.filter((doc) => {
+        const payload = (doc.data() as { payload?: Record<string, unknown> }).payload;
+        return payload?.proposalKind === 'story_packet' || extractPacket(payload) !== null;
+      }),
+    };
+  }
 
   const reviewsSnap = await db.collection(STORY_PACKET_REVIEW_COLLECTION).get();
   const reviewsById = new Map<
@@ -95,7 +119,7 @@ export async function listStoryPackets(limit = 200): Promise<readonly StoryPacke
   }
 
   const items: StoryPacketListItem[] = [];
-  for (const doc of snap.docs) {
+  for (const doc of snap.docs.slice(0, capped)) {
     const data = doc.data() as {
       createdAt?: string;
       createdBy?: string;
@@ -119,11 +143,55 @@ export async function listStoryPackets(limit = 200): Promise<readonly StoryPacke
   return Object.freeze(items);
 }
 
+
 export async function getStoryPacket(
   submissionId: string,
 ): Promise<StoryPacketListItem | null> {
-  const items = await listStoryPackets(200);
-  return items.find((item) => item.submissionId === submissionId) ?? null;
+  const db = getDb();
+  const doc = await db.collection(FIRESTORE_ROOT.submissionInbox).doc(submissionId).get();
+  if (!doc.exists) return null;
+  const data = doc.data() as {
+    createdAt?: string;
+    createdBy?: string;
+    payload?: Record<string, unknown>;
+  };
+  const packet = extractPacket(data.payload);
+  if (!packet) return null;
+
+  const reviewDoc = await db.collection(STORY_PACKET_REVIEW_COLLECTION).doc(submissionId).get();
+  let review:
+    | {
+        decision: StoryPacketReviewDecision;
+        reviewedAt: string;
+        reviewedByEmail: string;
+      }
+    | undefined;
+  if (reviewDoc.exists) {
+    const rd = reviewDoc.data() as {
+      decision?: StoryPacketReviewDecision;
+      reviewedAt?: string;
+      reviewedByEmail?: string;
+    };
+    if (rd.decision && rd.reviewedAt && rd.reviewedByEmail) {
+      review = {
+        decision: rd.decision,
+        reviewedAt: rd.reviewedAt,
+        reviewedByEmail: rd.reviewedByEmail,
+      };
+    }
+  }
+
+  return {
+    submissionId: doc.id,
+    createdAt: data.createdAt ?? '',
+    createdBy: data.createdBy ?? '',
+    title: packet.draft.title,
+    decision: packet.decision,
+    topicId: packet.topicId,
+    validationIssueCount: packet.validationIssues.length,
+    ...(review ? { review } : {}),
+    packet,
+  };
 }
 
 export async function recordStoryPacketReview(input: {

@@ -123,6 +123,34 @@ headlines; "unlock," "discover" (implies gamification); crime-statistic
 language anywhere near a confidence score (constitution: crime stats never
 enter the composite — see `docs/security/threat-model.md`).
 
+## Longform story craft (oral methodology, citation-gated)
+
+Staged `/stories` articles use the **research linking method** from strong oral
+storytelling — start-line relocation, omitted actors, winner-built tests — without
+importing viral rhetorical costume. Skill reference:
+`.claude/skills/black-book/story-craft/SKILL.md`. Packets use
+`story.research.packet.v1`; human approval maps an approved packet onto
+`apps/web/src/data/stories-seed.ts`. Nothing auto-publishes.
+
+**Adapt from oral craft (keep cite-map + dignity gates):**
+
+| Oral move | Product rule |
+|---|---|
+| Thesis question as spine | One sentence the story answers; may open the draft, not a trauma hook |
+| Start-line relocation | Name the conventional middle, then an earlier checkable origin on the map |
+| Named anchors | Person + date + place + instrument when the catalog supports it |
+| Omitted actors | Who the popular version erased — only with a published cite |
+| Winner-built test | Constitutions, charters, treaties, contracts — what winners wrote, not slogans |
+| Mechanism layer | Legal / economic / institutional why — no unsourced market or continental claims |
+| Verification close | End with an off-ramp to linked entity/fact records, not a call to outrage |
+
+**Hard bans (unchanged):** trauma-as-hook / graphic violence as the opening
+paragraph; unsourced sweeping claims; personal family testimony as proof; open-web
+scrape-as-truth. Authority-host URLs are **leads**, not silent body facts.
+
+**Rhythm:** short declarative sentences, one reveal per paragraph, place and date
+before abstraction. Vivid is allowed; brochure copy and marketing superlatives are not.
+
 ## Naming conventions
 
 - Feature names describe what the thing does, not a coined brand term:
