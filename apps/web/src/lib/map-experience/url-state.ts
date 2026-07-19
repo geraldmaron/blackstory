@@ -124,6 +124,11 @@ export function buildExploreHref(state: ExploreViewState): string {
   return qs ? `/explore?${qs}` : '/explore';
 }
 
+/** Default overlay + toggle state for callers building explore links without a full view model. */
+export function defaultExploreOverlayState(): Pick<ExploreViewState, 'density' | 'group' | 'lines'> {
+  return { density: false, group: false, lines: false };
+}
+
 /**
  * The `state`-tier camera target for a US postal code: the state's bounding-box midpoint (see
  * `@repo/domain`'s `US_STATES`, the same coarse bbox posture used everywhere else this
