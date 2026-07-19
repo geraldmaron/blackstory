@@ -309,11 +309,11 @@ export async function runEditorialJudge(input: EditorialRunInput): Promise<Edito
           total,
           completed,
           subjectId: item.packet.subjectId,
-          title: item.packet.subjectTitle,
+          title: item.packet.subjectTitle ?? input.subjects[index]!.title,
           decision: item.packet.decision,
           ...(item.error !== undefined ? { error: item.error } : {}),
           ...(item.servedBy !== undefined ? { servedBy: item.servedBy } : {}),
-          ...(item.packet.model.modelId !== undefined
+          ...(item.packet.model?.modelId !== undefined
             ? { modelId: item.packet.model.modelId }
             : {}),
         });

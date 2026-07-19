@@ -14,17 +14,14 @@
 # code's own documented solo-operator production mode (see apps/admin/src/auth/mode.ts,
 # apps/admin/.env.example) — not a stopgap hack.
 #
-# Custom build/run commands (bypasses the Next.js framework adapter's auto-detection, matching
-# the same static/public-asset copy pattern the root apphosting.yaml uses for apps/web).
+# Build: no buildCommand override here (that disables the Next.js framework adapter, which
+# broke the buildpack's own pnpm-install phase for this backend). GOOGLE_BUILDABLE below points
+# the adapter's implicit `pnpm run apphosting:build` at apps/admin via
+# scripts/apphosting-build.mjs, which every backend at this rootDirectory shares.
 #
 # automatic App Hosting rollouts are disabled, same as web (explicit CLI/Actions promote only).
 
 scripts:
-  buildCommand: >-
-    pnpm --filter @repo/admin... --workspace-concurrency=1 build &&
-    mkdir -p apps/admin/.next/standalone/apps/admin/.next &&
-    cp -R apps/admin/.next/static apps/admin/.next/standalone/apps/admin/.next/static &&
-    cp -R apps/admin/public apps/admin/.next/standalone/apps/admin/public
   runCommand: node apps/admin/.next/standalone/apps/admin/server.js
 
 runConfig:
