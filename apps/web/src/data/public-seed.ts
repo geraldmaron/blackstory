@@ -20,6 +20,7 @@ import {
   statusHistoryFor,
   type GraphTimelineEntry,
 } from './entity-graph-seed';
+import { NATIONAL_STORY_ENTITY_DRAFTS } from './national-story-seed/entities';
 
 export type PublicEntityKind = 'place' | 'school' | 'event' | 'institution';
 
@@ -406,6 +407,7 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     relatedIds: ['ent_seed_event_001'],
     related: relatedEntriesFor('ent_seed_institution_001'),
   },
+  ...NATIONAL_STORY_ENTITY_DRAFTS,
 ];
 
 const DISPLAY_NAME_LOOKUP: ReadonlyMap<string, { readonly displayName: string }> = new Map(

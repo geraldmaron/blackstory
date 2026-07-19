@@ -15,6 +15,7 @@ import {
   buildFactSearchIndexDocs,
   type FactRecord,
 } from '@black-book/domain';
+import { NATIONAL_STORY_FACTS } from './national-story-seed/facts';
 
 export const FACTS_SEED_RELEASE_ID = 'seed-release-2026-07-17';
 
@@ -273,7 +274,8 @@ export const SEED_FACTS: readonly FactRecord[] = [
     createdAt: '2026-07-15T00:00:00.000Z',
     updatedAt: '2026-07-15T00:00:00.000Z',
   },
-] as const;
+  ...NATIONAL_STORY_FACTS,
+];
 
 export function getSeedFact(id: string): FactRecord | undefined {
   return SEED_FACTS.find((fact) => fact.id === id);

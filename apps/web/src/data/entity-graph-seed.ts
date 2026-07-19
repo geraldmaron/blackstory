@@ -23,13 +23,14 @@ import {
   type PublicRelatedEntry,
   type StatusHistoryEntry,
 } from '@black-book/domain';
+import { NATIONAL_STORY_RELATIONSHIPS } from './national-story-seed/relationships';
 
 // ---------------------------------------------------------------------------
 // Raw typed edges the only hand-authored graph input. `related` entries on
 // `PublicEntityView` are computed FROM these via `relatedEntriesFor`, never typed directly.
 // ---------------------------------------------------------------------------
 
-export const SEED_ENTITY_RELATIONSHIPS: readonly EntityRelationship[] = [
+const BASE_ENTITY_RELATIONSHIPS: readonly EntityRelationship[] = [
   {
     id: 'rel_seed_school_located_at_place',
     fromEntityId: 'ent_seed_school_001',
@@ -60,6 +61,11 @@ export const SEED_ENTITY_RELATIONSHIPS: readonly EntityRelationship[] = [
     createdAt: '2026-07-17T00:00:00.000Z',
     updatedAt: '2026-07-17T00:00:00.000Z',
   },
+] as const;
+
+export const SEED_ENTITY_RELATIONSHIPS: readonly EntityRelationship[] = [
+  ...BASE_ENTITY_RELATIONSHIPS,
+  ...NATIONAL_STORY_RELATIONSHIPS,
 ] as const;
 
 /**
@@ -94,6 +100,51 @@ export const SEED_STATUS_HISTORY: Readonly<Record<string, readonly StatusHistory
   ],
   ent_seed_institution_001: [
     { status: 'active', validFrom: '1975', datePrecision: 'year', basisClaimIds: ['claim_seed_004'] },
+  ],
+  ent_princeville_nc_001: [
+    { status: 'active', validFrom: '1885', datePrecision: 'year', basisClaimIds: ['claim_princeville_incorporated_1885'] },
+  ],
+  ent_boley_historic_district_001: [
+    { status: 'active', validFrom: '1903', datePrecision: 'year', basisClaimIds: ['claim_boley_founded_1903'] },
+  ],
+  ent_fort_mose_001: [
+    { status: 'historic', validFrom: '1738', datePrecision: 'year', basisClaimIds: ['claim_fort_mose_1738'] },
+  ],
+  ent_tubman_underground_railroad_md_001: [
+    { status: 'active', validFrom: '2013', datePrecision: 'year', basisClaimIds: ['claim_hatu_redesignated_2014'] },
+  ],
+  ent_cheyney_university_001: [
+    { status: 'active', validFrom: '1837', datePrecision: 'year', basisClaimIds: ['claim_cheyney_1837'] },
+  ],
+  ent_lincoln_university_pa_001: [
+    { status: 'active', validFrom: '1854', datePrecision: 'year', basisClaimIds: ['claim_lincoln_1854'] },
+  ],
+  ent_howard_university_001: [
+    { status: 'active', validFrom: '1867', datePrecision: 'year', basisClaimIds: ['claim_howard_1867'] },
+  ],
+  ent_emancipation_oak_001: [
+    { status: 'active', validFrom: '1861', datePrecision: 'year', basisClaimIds: ['claim_oak_peake_1861'] },
+  ],
+  ent_hampton_university_001: [
+    { status: 'active', validFrom: '1868', datePrecision: 'year', basisClaimIds: ['claim_hampton_1868'] },
+  ],
+  ent_brotherhood_sleeping_car_porters_001: [
+    { status: 'historic', validFrom: '1925', datePrecision: 'year', basisClaimIds: ['claim_bscp_1925'] },
+  ],
+  ent_schomburg_center_001: [
+    { status: 'active', validFrom: '1925', datePrecision: 'year', basisClaimIds: ['claim_schomburg_nypl'] },
+  ],
+  ent_motown_museum_001: [
+    { status: 'active', validFrom: '1985', datePrecision: 'year', basisClaimIds: ['claim_motown_museum_1985'] },
+  ],
+  ent_richmond_planet_001: [
+    { status: 'historic', validFrom: '1883', datePrecision: 'year', basisClaimIds: ['claim_planet_mitchell'] },
+  ],
+  ent_nmaahc_001: [
+    { status: 'active', validFrom: '2016', datePrecision: 'year', basisClaimIds: ['claim_nmaahc_opened_2016'] },
+  ],
+  ent_little_rock_central_high_001: [
+    { status: 'active', validFrom: '1927', datePrecision: 'year', basisClaimIds: ['claim_chsc_nhs_1998'] },
   ],
 };
 

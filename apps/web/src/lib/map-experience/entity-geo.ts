@@ -13,6 +13,7 @@
  * `buildMapSource` "skippedNoLocation" accounting.
  */
 import { encodeGeohash } from '@black-book/domain';
+import { NATIONAL_STORY_GEO_ANCHORS } from '../../data/national-story-seed/geo';
 
 export type EntityGeoAnchor = {
   readonly lat: number;
@@ -33,13 +34,20 @@ function anchor(lat: number, lng: number, matchMethod = 'manual_research'): Enti
  * (or, once projections are live, this whole module retires in favor of a real
  * `EntityLocation` read from the published release).
  */
-export const ENTITY_GEO_ANCHORS: Readonly<Record<string, EntityGeoAnchor>> = {
+const BASE_GEO_ANCHORS: Readonly<Record<string, EntityGeoAnchor>> = {
   ent_seed_place_001: anchor(38.9072, -77.0369),
   // Same campus the connected school currently occupies (public-seed.ts's summary: "a documented
   // 1954 commemoration held on the connected school's campus").
   ent_seed_school_001: anchor(38.9101, -77.0147),
   ent_seed_event_001: anchor(38.9101, -77.0147),
   ent_seed_institution_001: anchor(38.9047, -77.0163),
+};
+
+export const ENTITY_GEO_ANCHORS: Readonly<Record<string, EntityGeoAnchor>> = {
+  ...BASE_GEO_ANCHORS,
+  ...Object.fromEntries(
+    Object.entries(NATIONAL_STORY_GEO_ANCHORS).map(([id, g]) => [id, anchor(g.lat, g.lng)]),
+  ),
 };
 
 export function geoAnchorFor(entityId: string): EntityGeoAnchor | undefined {
