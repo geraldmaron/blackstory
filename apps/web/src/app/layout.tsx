@@ -52,7 +52,9 @@ export const metadata: Metadata = {
   icons: {
     // Properly-sized renders from the new brand/ kit — see brand.md's source
     // map for how each was generated from the master symbol/lockup art.
+    // `/favicon.ico` covers legacy browser requests that ignore <link rel="icon">.
     icon: [
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
       { url: '/brand/favicon-light-16.png', sizes: '16x16', type: 'image/png' },
       { url: '/brand/favicon-light-32.png', sizes: '32x32', type: 'image/png' },
       { url: '/brand/favicon-light-48.png', sizes: '48x48', type: 'image/png' },
