@@ -1,0 +1,658 @@
+[
+  {
+    "id": "ent_birmingham_campaign_001",
+    "kind": "event",
+    "displayName": "Birmingham Campaign",
+    "summary": "The Birmingham Campaign was a spring 1963 SCLC-led direct-action movement in Birmingham, Alabama, combining sit-ins, marches, and the Children's Crusade to desegregate the city, producing King's \"Letter from Birmingham Jail\" and images of Bull Connor's fire hoses and police dogs.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "nonviolent-protest",
+      "desegregation",
+      "direct-action"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "city",
+    "locationLabel": "Birmingham, Alabama",
+    "lat": 33.5186,
+    "lng": -86.8104,
+    "claims": [
+      {
+        "predicate": "occurred_in",
+        "object": "The Birmingham Campaign ran from April 3, 1963 to May 10, 1963, when King and the SCLC joined Birmingham's existing local movement, the Alabama Christian Movement for Human Rights (ACMHR), in mass direct action against the city's segregation system.",
+        "confidenceLevel": "high",
+        "citationSource": "kinginstitute.stanford.edu",
+        "citationHref": "https://kinginstitute.stanford.edu/birmingham-campaign",
+        "citationLabel": "The Martin Luther King, Jr. Research and Education Institute: Birmingham Campaign"
+      },
+      {
+        "predicate": "led_by",
+        "object": "The campaign was led by Martin Luther King Jr. and Reverends James Bevel and Fred Shuttlesworth, with Shuttlesworth's ACMHR organizing the local groundwork before SCLC joined in April 1963.",
+        "confidenceLevel": "high",
+        "citationSource": "blackpast.org",
+        "citationHref": "https://blackpast.org/african-american-history/birmingham-campaign-1963/",
+        "citationLabel": "BlackPast.org: The Birmingham Campaign (1963)"
+      },
+      {
+        "predicate": "key_event",
+        "object": "Arrested on Good Friday, April 12, 1963, for violating an anti-protest injunction, King was held in solitary confinement, where he wrote \"Letter from Birmingham Jail\" in the margins of a newspaper responding to eight white clergymen's public statement condemning the protests; he was released on bail April 20, 1963.",
+        "confidenceLevel": "high",
+        "citationSource": "blackpast.org",
+        "citationHref": "https://blackpast.org/african-american-history/birmingham-campaign-1963/",
+        "citationLabel": "BlackPast.org: The Birmingham Campaign (1963)"
+      },
+      {
+        "predicate": "outcome",
+        "object": "On May 2, 1963, over 1,000 Black students marched in the Children's Crusade; the following days Commissioner Eugene \"Bull\" Connor's police and firefighters used high-pressure fire hoses, clubs, and dogs against the young demonstrators, and on May 10, 1963, city and business leaders agreed to desegregate lunch counters, restrooms, and fitting rooms within ninety days and to hire Black employees in downtown stores.",
+        "confidenceLevel": "high",
+        "citationSource": "blackpast.org",
+        "citationHref": "https://blackpast.org/african-american-history/birmingham-campaign-1963/",
+        "citationLabel": "BlackPast.org: The Birmingham Campaign (1963)"
+      }
+    ],
+    "historicalContext": "Coming after the failed Albany, Georgia campaign, Birmingham became SCLC's most consequential demonstration of nonviolent direct action, and its televised images of children confronted by fire hoses and police dogs helped galvanize national support for the Civil Rights Act of 1964.",
+    "topicIds": [
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Birmingham Campaign",
+      "Project C",
+      "Children's Crusade",
+      "Letter from Birmingham Jail",
+      "Bull Connor",
+      "SCLC",
+      "Martin Luther King Jr.",
+      "Fred Shuttlesworth"
+    ],
+    "related": []
+  },
+  {
+    "id": "ent_booker_t_washington_001",
+    "kind": "person",
+    "displayName": "Booker T. Washington",
+    "summary": "Educator and reformer born enslaved in Virginia who founded and led Tuskegee Institute from 1881 until his death in 1915, becoming the era's most influential Black leader and author of Up from Slavery.",
+    "eraBuckets": [
+      "1880s",
+      "1890s",
+      "1900s",
+      "1910s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "leadership"
+    ],
+    "jurisdictionLabel": "Tuskegee, Alabama",
+    "locationPrecision": "city",
+    "locationLabel": "Tuskegee, Alabama",
+    "lat": 32.4342,
+    "lng": -85.7061,
+    "claims": [
+      {
+        "predicate": "founded_in",
+        "object": "Washington and a small group opened the Tuskegee Normal and Industrial School on July 4, 1881, in Tuskegee, Alabama, with no initial buildings or land.",
+        "confidenceLevel": "high",
+        "citationSource": "encyclopediaofalabama.org",
+        "citationHref": "https://encyclopediaofalabama.org/article/booker-t-washington/",
+        "citationLabel": "Encyclopedia of Alabama: Booker T. Washington"
+      },
+      {
+        "predicate": "born_in",
+        "object": "Born into slavery on April 5, 1856, in Hale's Ford, Franklin County, Virginia; died November 14, 1915, in Tuskegee, Alabama, at age 59.",
+        "confidenceLevel": "high",
+        "citationSource": "encyclopediaofalabama.org",
+        "citationHref": "https://encyclopediaofalabama.org/article/booker-t-washington/",
+        "citationLabel": "Encyclopedia of Alabama: Booker T. Washington"
+      },
+      {
+        "predicate": "delivered",
+        "object": "Delivered the 'Atlanta Compromise' address at the Cotton States and International Exposition in Atlanta, Georgia, in 1895, arguing Black and white Southerners could be 'as separate as the fingers, yet one as the hand' in social matters.",
+        "confidenceLevel": "high",
+        "citationSource": "encyclopediaofalabama.org",
+        "citationHref": "https://encyclopediaofalabama.org/article/booker-t-washington/",
+        "citationLabel": "Encyclopedia of Alabama: Booker T. Washington"
+      },
+      {
+        "predicate": "authored",
+        "object": "Published his autobiography Up from Slavery in 1901, a bestselling account that shaped early 20th-century African American public discourse.",
+        "confidenceLevel": "high",
+        "citationSource": "encyclopediaofalabama.org",
+        "citationHref": "https://encyclopediaofalabama.org/article/up-from-slavery/",
+        "citationLabel": "Encyclopedia of Alabama: Up From Slavery"
+      }
+    ],
+    "historicalContext": "Washington rose from enslavement to become the preeminent Black educator and political broker of his generation, building Tuskegee Institute into a nationally recognized vocational school while promoting a gradualist, accommodationist strategy for racial progress that later drew sharp criticism from W. E. B. Du Bois and other civil-rights leaders.",
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "leadership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Tuskegee Institute",
+      "Atlanta Compromise",
+      "Up from Slavery",
+      "vocational education",
+      "accommodationism"
+    ],
+    "related": []
+  },
+  {
+    "id": "ent_core_org_001",
+    "kind": "organization",
+    "displayName": "Congress of Racial Equality (CORE)",
+    "summary": "The Congress of Racial Equality (CORE) was founded in 1942 in Chicago by an interracial group of pacifists to pursue nonviolent direct action against segregation, later organizing the 1947 Journey of Reconciliation and the pivotal 1961 Freedom Rides under national director James Farmer.",
+    "eraBuckets": [
+      "1940s",
+      "1950s",
+      "1960s",
+      "1970s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "nonviolent-direct-action",
+      "freedom-rides",
+      "sit-ins",
+      "voter-registration"
+    ],
+    "jurisdictionLabel": "Chicago, Illinois",
+    "locationPrecision": "city",
+    "locationLabel": "Chicago, Illinois",
+    "lat": 41.8781,
+    "lng": -87.6298,
+    "claims": [
+      {
+        "predicate": "founded_in",
+        "object": "Founded in 1942 by an interracial group of pacifists at the University of Chicago; members staged sit-ins at Chicago-area restaurants and challenged restrictive housing covenants before establishing a Southern presence in 1957.",
+        "confidenceLevel": "high",
+        "citationSource": "blackpast.org",
+        "citationHref": "https://blackpast.org/african-american-history/congress-racial-equality-1942/",
+        "citationLabel": "BlackPast.org: \"Congress of Racial Equality (1942)\""
+      },
+      {
+        "predicate": "organized",
+        "object": "In April 1947, CORE and the Fellowship of Reconciliation jointly organized the Journey of Reconciliation, an interracial bus-riding test of the Supreme Court's Morgan v. Virginia ruling banning segregated seating in interstate travel; the two-week trip through Virginia, North Carolina, Tennessee, and Kentucky is considered a precursor to the 1961 Freedom Rides.",
+        "confidenceLevel": "high",
+        "citationSource": "snccdigital.org",
+        "citationHref": "https://snccdigital.org/events/cores-journey-of-reconciliation/",
+        "citationLabel": "SNCC Digital Gateway: \"CORE's Journey of Reconciliation\""
+      },
+      {
+        "predicate": "led_by",
+        "object": "In 1961, CORE's newly installed national director James Farmer, Jr. organized the Freedom Rides to test enforcement of Boynton v. Virginia; interracial teams of riders left Washington, D.C. on May 4, 1961 and met mob violence in Anniston, Birmingham, and Montgomery, Alabama.",
+        "confidenceLevel": "high",
+        "citationSource": "blackpast.org",
+        "citationHref": "https://blackpast.org/african-american-history/freedom-rides-1961/",
+        "citationLabel": "BlackPast.org: \"Freedom Rides (1961)\""
+      },
+      {
+        "predicate": "participated_in",
+        "object": "CORE cosponsored the 1963 March on Washington for Jobs and Freedom, and in 1964 its volunteers took part in Mississippi Freedom Summer, a project to register Black voters that saw three CORE workers murdered by Klansmen in Philadelphia, Mississippi.",
+        "confidenceLevel": "high",
+        "citationSource": "blackpast.org",
+        "citationHref": "https://blackpast.org/african-american-history/congress-racial-equality-1942/",
+        "citationLabel": "BlackPast.org: \"Congress of Racial Equality (1942)\""
+      }
+    ],
+    "historicalContext": "CORE pioneered nonviolent direct-action tactics in the 1940s that shaped the mid-twentieth-century civil rights movement, bridging Northern pacifist organizing with the mass mobilizations of the 1960s alongside groups such as SNCC, the SCLC, and the NAACP before shifting toward Black Nationalism under later leadership.",
+    "topicIds": [
+      "civil-rights",
+      "nonviolent-direct-action",
+      "freedom-rides"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [],
+    "related": []
+  },
+  {
+    "id": "ent_movement_harlem_renaissance",
+    "kind": "movement",
+    "displayName": "Harlem Renaissance",
+    "summary": "A flowering of African American literature, music, art, and intellectual life centered in Harlem, New York City, spanning roughly the late 1910s through the mid-1930s, defined by figures such as Langston Hughes, Zora Neale Hurston, and Duke Ellington.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "arts-culture",
+      "literature",
+      "music"
+    ],
+    "jurisdictionLabel": "New York City, New York",
+    "locationPrecision": "city",
+    "locationLabel": "Harlem, New York City, New York",
+    "lat": 40.8116,
+    "lng": -73.9465,
+    "claims": [
+      {
+        "predicate": "centered_in",
+        "object": "The Harlem Renaissance was centered in the Harlem neighborhood of New York City, lasting roughly from the 1910s through the mid-1930s, and is widely regarded as a golden age of African American culture fueled by the Great Migration, which brought some 300,000 African Americans from the South to the North by 1920, with Harlem among the most popular destinations.",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/articles/harlem-renaissance",
+        "citationLabel": "History.com: Harlem Renaissance - Definition, Artists & How It Started"
+      },
+      {
+        "predicate": "published_in",
+        "object": "The NAACP's magazine The Crisis, where Jessie Redmon Fauset served as literary editor, and the National Urban League's magazine Opportunity, founded and edited by sociologist Charles S. Johnson, were key literary outlets that promoted Harlem Renaissance writers including Langston Hughes.",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/articles/harlem-renaissance",
+        "citationLabel": "History.com: Harlem Renaissance - Definition, Artists & How It Started"
+      },
+      {
+        "predicate": "featured_performances_by",
+        "object": "Harlem's Cotton Club, one of the era's most successful nightspots, featured frequent performances by jazz musicians Duke Ellington and Cab Calloway.",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/articles/harlem-renaissance",
+        "citationLabel": "History.com: Harlem Renaissance - Definition, Artists & How It Started"
+      },
+      {
+        "predicate": "supported_by",
+        "object": "Beginning in 1925, bibliophile Arturo Alfonso Schomburg's donated collection of African diaspora materials at the New York Public Library's 135th Street branch in Harlem became a foundational intellectual resource for Harlem Renaissance figures including Langston Hughes, later growing into the Schomburg Center for Research in Black Culture.",
+        "confidenceLevel": "high",
+        "citationSource": "nypl.org",
+        "citationHref": "https://www.nypl.org/spotlight/schomburg-centennial/timeline",
+        "citationLabel": "New York Public Library: The Schomburg Center Through the Years"
+      }
+    ],
+    "historicalContext": "Emerging from the Great Migration's reshaping of Harlem into a center of Black urban life, the Harlem Renaissance produced a generation of writers, musicians, and artists whose work asserted a new African American cultural identity and laid intellectual groundwork later drawn upon by the civil rights movement.",
+    "topicIds": [
+      "civil-rights",
+      "arts-culture",
+      "literature",
+      "music"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Harlem Renaissance",
+      "Langston Hughes",
+      "Zora Neale Hurston",
+      "Duke Ellington",
+      "The Crisis",
+      "Opportunity magazine",
+      "Schomburg Center",
+      "Great Migration",
+      "Cotton Club"
+    ],
+    "related": []
+  },
+  {
+    "id": "ent_movement_underground_railroad",
+    "kind": "movement",
+    "displayName": "Underground Railroad",
+    "summary": "A clandestine network of routes, safe houses, and abolitionist \"conductors\" that helped enslaved people escape to freedom in the northern United States and Canada, operating most actively from the early 19th century until the Civil War's end in 1865.",
+    "eraBuckets": [
+      "1810s",
+      "1820s",
+      "1830s",
+      "1840s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "abolition",
+      "slavery",
+      "freedom-seekers"
+    ],
+    "jurisdictionLabel": "Church Creek, Maryland",
+    "locationPrecision": "city",
+    "locationLabel": "Church Creek, Maryland",
+    "lat": 38.4445934,
+    "lng": -76.1426984,
+    "claims": [
+      {
+        "predicate": "active_during",
+        "object": "The Underground Railroad's resistance-through-escape efforts spanned from the era of enslavement through the end of the Civil War, with organization intensifying after passage of the Fugitive Slave Act of 1850.",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/subjects/undergroundrailroad/what-is-the-underground-railroad.htm",
+        "citationLabel": "NPS: What is the Underground Railroad?"
+      },
+      {
+        "predicate": "led_by",
+        "object": "Harriet Tubman served as an Underground Railroad conductor, making roughly 13 rescue trips into Maryland between 1849 and 1859 and personally guiding about 70 enslaved people to freedom.",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/people/harriet-tubman.htm",
+        "citationLabel": "NPS: Harriet Tubman"
+      },
+      {
+        "predicate": "associated_with",
+        "object": "William Still, chairman of the Vigilance Committee of the Pennsylvania Anti-Slavery Society, helped nearly 1,000 freedom seekers pass through Philadelphia and documented 846 of their accounts in his 1872 book The Underground Railroad.",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/william-still-marker-at-244-s-12th-street-philadelphia.htm",
+        "citationLabel": "NPS: William Still Marker at 244 S. 12th Street, Philadelphia"
+      },
+      {
+        "predicate": "commemorated_at",
+        "object": "Harriet Tubman Underground Railroad National Historical Park, at 4068 Golden Hill Road in Church Creek, Maryland, preserves the Eastern Shore landscapes Tubman traversed while conducting enslaved people to freedom.",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/hatu/index.htm",
+        "citationLabel": "NPS: Harriet Tubman Underground Railroad National Historical Park"
+      }
+    ],
+    "historicalContext": "Neither underground nor a railroad, this loosely organized network of abolitionists, free Black communities, and formerly enslaved people used coded railway language \u2014 lines, stations, conductors \u2014 to move freedom seekers northward in defiance of federal fugitive-slave law, laying organizing groundwork later drawn on by the broader civil-rights movement.",
+    "topicIds": [
+      "civil-rights",
+      "abolition",
+      "slavery",
+      "freedom-seekers"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Underground Railroad",
+      "Harriet Tubman",
+      "William Still",
+      "abolition",
+      "Fugitive Slave Act",
+      "Network to Freedom"
+    ],
+    "related": []
+  },
+  {
+    "id": "ent_naacp_org_001",
+    "kind": "organization",
+    "displayName": "National Association for the Advancement of Colored People (NAACP)",
+    "summary": "Founded February 12, 1909, in New York City by an interracial group including W. E. B. Du Bois and Ida B. Wells-Barnett, the NAACP is the oldest and largest civil rights organization in the United States, pursuing legal, legislative, and public advocacy against racial discrimination.",
+    "eraBuckets": [
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "organization",
+      "legal-advocacy"
+    ],
+    "jurisdictionLabel": "Baltimore, Maryland",
+    "locationPrecision": "city",
+    "locationLabel": "Baltimore, Maryland",
+    "lat": 39.3445,
+    "lng": -76.7094,
+    "claims": [
+      {
+        "predicate": "founded_in",
+        "object": "The NAACP was founded on February 12, 1909, in New York City by an interracial group of activists, including W. E. B. Du Bois and Ida B. Wells-Barnett, in response to the 1908 Springfield, Illinois race riot; the announcement was timed to coincide with the centennial of Abraham Lincoln's birth.",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/this-day-in-history/february-12/naacp-is-founded-in-new-york-city",
+        "citationLabel": "History.com: The NAACP is founded, February 12, 1909"
+      },
+      {
+        "predicate": "published",
+        "object": "The NAACP launched The Crisis in 1910 under founding editor W. E. B. Du Bois as the organization's official publication.",
+        "confidenceLevel": "high",
+        "citationSource": "naacp.org",
+        "citationHref": "https://naacp.org/about/our-history",
+        "citationLabel": "NAACP: Our History"
+      },
+      {
+        "predicate": "led_legal_campaign_resulting_in",
+        "object": "The NAACP's legal campaign culminated in the Supreme Court's 1954 decision in Brown v. Board of Education, which overturned the 'separate but equal' doctrine of Plessy v. Ferguson (1896) and declared school segregation unconstitutional.",
+        "confidenceLevel": "high",
+        "citationSource": "naacp.org",
+        "citationHref": "https://naacp.org/about/our-history",
+        "citationLabel": "NAACP: Our History"
+      },
+      {
+        "predicate": "headquartered_in",
+        "object": "The NAACP's national headquarters is located at 4805 Mt. Hope Drive, Baltimore, Maryland 21215, after originating from its 1909 offices in New York City.",
+        "confidenceLevel": "high",
+        "citationSource": "naacp.org",
+        "citationHref": "https://naacp.org/contact",
+        "citationLabel": "NAACP: Contact (national headquarters address)"
+      }
+    ],
+    "historicalContext": "As the nation's oldest and largest civil rights organization, the NAACP built the legal and organizing infrastructure \u2014 including its Legal Defense Fund lineage and The Crisis magazine \u2014 that drove landmark victories from anti-lynching advocacy through Brown v. Board of Education and the mid-20th-century civil rights legislative campaigns.",
+    "topicIds": [
+      "civil-rights",
+      "organization",
+      "legal-advocacy"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "NAACP",
+      "The Crisis",
+      "Brown v. Board of Education",
+      "W. E. B. Du Bois",
+      "civil rights organization",
+      "Springfield race riot"
+    ],
+    "related": []
+  },
+  {
+    "id": "ent_sclc_org_001",
+    "kind": "organization",
+    "displayName": "Southern Christian Leadership Conference (SCLC)",
+    "summary": "The Southern Christian Leadership Conference (SCLC) is a civil rights organization officially inaugurated in Atlanta, Georgia on January 10-11, 1957, growing out of the Montgomery bus boycott, with Martin Luther King Jr. as its first president.",
+    "eraBuckets": [
+      "1950s",
+      "1960s",
+      "1970s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "nonviolent-protest",
+      "voting-rights",
+      "organizing"
+    ],
+    "jurisdictionLabel": "Atlanta, Georgia",
+    "locationPrecision": "city",
+    "locationLabel": "Atlanta, Georgia",
+    "lat": 33.749,
+    "lng": -84.388,
+    "claims": [
+      {
+        "predicate": "founded_in",
+        "object": "SCLC was officially inaugurated in Atlanta, Georgia, at Ebenezer Baptist Church on January 10-11, 1957, growing out of the Montgomery Improvement Association's bus boycott.",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/subjects/civilrights/sclc.htm",
+        "citationLabel": "National Park Service: Southern Christian Leadership Conference (SCLC)"
+      },
+      {
+        "predicate": "led_by",
+        "object": "Martin Luther King Jr. served as SCLC's first president from its founding in 1957 until his assassination in 1968; Ralph Abernathy succeeded him and led until 1977.",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/subjects/civilrights/sclc.htm",
+        "citationLabel": "National Park Service: Southern Christian Leadership Conference (SCLC)"
+      },
+      {
+        "predicate": "organized",
+        "object": "SCLC's 1963 Birmingham demonstrations, one of its most significant campaigns against segregation, were planned at the Dorchester Center in Liberty County, Georgia.",
+        "confidenceLevel": "high",
+        "citationSource": "georgiaencyclopedia.org",
+        "citationHref": "https://www.georgiaencyclopedia.org/articles/arts-culture/southern-christian-leadership-conference-sclc/",
+        "citationLabel": "New Georgia Encyclopedia: Southern Christian Leadership Conference (SCLC)"
+      },
+      {
+        "predicate": "organized",
+        "object": "In 1967 SCLC broadened its focus to economic inequality, launching the Poor People's Campaign after playing key roles in the 1963 March on Washington and the 1965 Selma Voting Rights Campaign.",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/southern-christian-leadership-conference.htm",
+        "citationLabel": "National Park Service: Southern Christian Leadership Conference"
+      }
+    ],
+    "historicalContext": "As the organizational engine behind much of the mid-20th-century Southern civil rights movement, SCLC coordinated nonviolent direct-action campaigns from Birmingham to Selma and later expanded its mission to confront economic inequality through the Poor People's Campaign.",
+    "topicIds": [
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "SCLC",
+      "civil rights",
+      "Martin Luther King Jr.",
+      "Atlanta",
+      "nonviolent protest",
+      "voting rights"
+    ],
+    "related": []
+  },
+  {
+    "id": "ent_sncc_org_001",
+    "kind": "organization",
+    "displayName": "Student Nonviolent Coordinating Committee (SNCC)",
+    "summary": "SNCC was a student-led civil rights organization founded in April 1960 at Shaw University in Raleigh, North Carolina, that coordinated sit-ins, Freedom Rides, and Southern voter registration drives before ceasing to exist by 1973.",
+    "eraBuckets": [
+      "1950s",
+      "1960s",
+      "1970s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "nonviolent-protest",
+      "voting-rights",
+      "student-organizing",
+      "direct-action"
+    ],
+    "jurisdictionLabel": "Raleigh, North Carolina",
+    "locationPrecision": "city",
+    "locationLabel": "Raleigh, North Carolina",
+    "lat": 35.770533,
+    "lng": -78.6375403,
+    "claims": [
+      {
+        "predicate": "founded_in",
+        "object": "Ella Baker, a Shaw University alumna and SCLC official, organized an April 1960 conference at Shaw University in Raleigh, North Carolina, out of which the Student Nonviolent Coordinating Committee emerged.",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/000/shaw-university-raleigh-north-carolina.htm",
+        "citationLabel": "National Park Service: Shaw University (Raleigh, North Carolina)"
+      },
+      {
+        "predicate": "led_by",
+        "object": "SNCC's founding conference drew 126 student delegates; the Nashville contingent of Diane Nash, John Lewis, and Marion Barry (SNCC's first chairman) shaped its early commitment to nonviolence, and the group began publishing the newsletter The Student Voice.",
+        "confidenceLevel": "high",
+        "citationSource": "snccdigital.org",
+        "citationHref": "https://snccdigital.org/events/founding-of-sncc/",
+        "citationLabel": "SNCC Digital Gateway: Founding of SNCC"
+      },
+      {
+        "predicate": "organized",
+        "object": "SNCC organized 1961 Freedom Rides to test desegregation of interstate travel, launched Southern voter registration campaigns from 1962 onward, and led the 1964 Mississippi Freedom Summer project.",
+        "confidenceLevel": "high",
+        "citationSource": "archives.gov",
+        "citationHref": "https://www.archives.gov/research/african-americans/black-power/sncc",
+        "citationLabel": "National Archives: The Student Nonviolent Coordinating Committee (SNCC)"
+      },
+      {
+        "predicate": "dissolved_in",
+        "object": "After Stokely Carmichael's 1966 election as chairman and the 1967 expulsion of white members caused steep funding losses, SNCC lost nearly all of its staff and chapters by 1970, and by 1973 the organization no longer existed.",
+        "confidenceLevel": "high",
+        "citationSource": "archives.gov",
+        "citationHref": "https://www.archives.gov/research/african-americans/black-power/sncc",
+        "citationLabel": "National Archives: The Student Nonviolent Coordinating Committee (SNCC)"
+      }
+    ],
+    "historicalContext": "SNCC translated the 1960 sit-in movement into a durable, student-run organizing force, sending field secretaries into the rural Deep South to register Black voters at great personal risk, and its later turn toward Black Power reshaped debates over strategy within the broader civil rights movement.",
+    "topicIds": [
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "SNCC",
+      "civil rights",
+      "Ella Baker",
+      "John Lewis",
+      "Diane Nash",
+      "Shaw University",
+      "Freedom Rides",
+      "voter registration"
+    ],
+    "related": []
+  },
+  {
+    "id": "ent_web_du_bois_001",
+    "kind": "person",
+    "displayName": "W. E. B. Du Bois",
+    "summary": "W. E. B. Du Bois (1868-1963) was a sociologist, historian, and civil rights leader who co-founded the NAACP in 1909, founded and edited its magazine The Crisis from 1910 to 1934, and authored the landmark essay collection The Souls of Black Folk (1903).",
+    "eraBuckets": [
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "naacp",
+      "sociology",
+      "pan-africanism"
+    ],
+    "jurisdictionLabel": "Great Barrington, Massachusetts",
+    "locationPrecision": "city",
+    "locationLabel": "Great Barrington, Massachusetts",
+    "lat": 42.1959,
+    "lng": -73.3629,
+    "claims": [
+      {
+        "predicate": "born_in",
+        "object": "W. E. B. Du Bois was born William Edward Burghardt Du Bois on February 23, 1868, in Great Barrington, Massachusetts.",
+        "confidenceLevel": "high",
+        "citationSource": "duboisnhs.org",
+        "citationHref": "https://www.duboisnhs.org/about/",
+        "citationLabel": "W. E. B. Du Bois National Historic Site: About W.E.B. Du Bois"
+      },
+      {
+        "predicate": "died_in",
+        "object": "Du Bois died on August 27, 1963, in Accra, Ghana, at the age of 95, one day before the March on Washington.",
+        "confidenceLevel": "high",
+        "citationSource": "historians.org",
+        "citationHref": "https://www.historians.org/perspectives-article/w-e-b-du-bois-1868-1963-historian-sociologist-editor-activist-january-2023/",
+        "citationLabel": "American Historical Association, Perspectives on History: W. E. B. Du Bois (1868-1963)"
+      },
+      {
+        "predicate": "co_founded",
+        "object": "Du Bois co-founded the National Association for the Advancement of Colored People (NAACP) in 1909 and served on its board while directing publicity and research.",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/massachusetts-web-du-bois-boyhood-homesite-great-barrington.htm",
+        "citationLabel": "National Park Service: W.E.B. Du Bois Boyhood Homesite, Great Barrington"
+      },
+      {
+        "predicate": "founded_and_edited",
+        "object": "Du Bois founded and edited The Crisis, the NAACP's official magazine, from 1910 until 1934, growing its circulation to roughly 100,000 by 1920 before resigning over disagreements with NAACP leadership.",
+        "confidenceLevel": "high",
+        "citationSource": "naacp.org",
+        "citationHref": "https://naacp.org/find-resources/history-explained/civil-rights-leaders/web-du-bois",
+        "citationLabel": "NAACP: W.E.B. Du Bois"
+      }
+    ],
+    "historicalContext": "As the first African American to earn a Harvard Ph.D., Du Bois became the preeminent Black intellectual of his era, shaping debates on race, education, and Pan-Africanism from the turn of the century through the Cold War. His scholarship and activism, from The Souls of Black Folk to his leadership at the NAACP, helped build the intellectual and organizational foundations of the twentieth-century civil rights movement.",
+    "topicIds": [
+      "civil-rights",
+      "naacp",
+      "sociology",
+      "pan-africanism"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "NAACP",
+      "The Crisis",
+      "The Souls of Black Folk",
+      "Niagara Movement",
+      "Pan-Africanism",
+      "Great Barrington"
+    ],
+    "related": []
+  }
+]
