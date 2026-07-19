@@ -1,4 +1,3 @@
-
 /**
  * A job that exceeds its budget triggers an operator alert, and N consecutive
  * missed runs (silence) trigger an operator alert both delivered through existing
@@ -56,9 +55,12 @@ test('N consecutive missed runs (silence, no failure record needed) raises a wor
 
 test('a job that does not miss runs raises no missed-run alert', () => {
   const runs = [
-    completeJobRun(startJobRun({ jobId: JOB.id, jobRunId: 'r-1', startedAt: '2026-07-16T04:00:00.000Z' }), {
-      completedAt: '2026-07-16T04:05:00.000Z',
-    }),
+    completeJobRun(
+      startJobRun({ jobId: JOB.id, jobRunId: 'r-1', startedAt: '2026-07-16T04:00:00.000Z' }),
+      {
+        completedAt: '2026-07-16T04:05:00.000Z',
+      },
+    ),
   ];
   const evaluation = evaluateMissedRuns({
     job: JOB,
@@ -67,16 +69,24 @@ test('a job that does not miss runs raises no missed-run alert', () => {
     nowIso: '2026-07-16T12:00:00.000Z',
   });
   assert.equal(
-    buildMissedRunAlert({ job: JOB, evaluation, triggeredAt: '2026-07-16T12:00:00.000Z', correlationId: 'r-1' }),
+    buildMissedRunAlert({
+      job: JOB,
+      evaluation,
+      triggeredAt: '2026-07-16T12:00:00.000Z',
+      correlationId: 'r-1',
+    }),
     undefined,
   );
 });
 
 test('a job that exceeds its budget raises a workstream alert', () => {
-  const run = completeJobRun(startJobRun({ jobId: JOB.id, jobRunId: 'r-over', startedAt: '2026-07-17T04:00:00.000Z' }), {
-    completedAt: '2026-07-17T04:05:00.000Z',
-    itemsProcessed: 250,
-  });
+  const run = completeJobRun(
+    startJobRun({ jobId: JOB.id, jobRunId: 'r-over', startedAt: '2026-07-17T04:00:00.000Z' }),
+    {
+      completedAt: '2026-07-17T04:05:00.000Z',
+      itemsProcessed: 250,
+    },
+  );
   const evaluation = evaluateJobBudget({ job: JOB, run });
   assert.equal(evaluation.triggered, true);
 
@@ -93,13 +103,21 @@ test('a job that exceeds its budget raises a workstream alert', () => {
 });
 
 test('a job within budget raises no budget alert', () => {
-  const run = completeJobRun(startJobRun({ jobId: JOB.id, jobRunId: 'r-ok', startedAt: '2026-07-17T04:00:00.000Z' }), {
-    completedAt: '2026-07-17T04:05:00.000Z',
-    itemsProcessed: 50,
-  });
+  const run = completeJobRun(
+    startJobRun({ jobId: JOB.id, jobRunId: 'r-ok', startedAt: '2026-07-17T04:00:00.000Z' }),
+    {
+      completedAt: '2026-07-17T04:05:00.000Z',
+      itemsProcessed: 50,
+    },
+  );
   const evaluation = evaluateJobBudget({ job: JOB, run });
   assert.equal(
-    buildBudgetExceededAlert({ job: JOB, evaluation, triggeredAt: '2026-07-17T04:05:00.000Z', correlationId: run.jobRunId }),
+    buildBudgetExceededAlert({
+      job: JOB,
+      evaluation,
+      triggeredAt: '2026-07-17T04:05:00.000Z',
+      correlationId: run.jobRunId,
+    }),
     undefined,
   );
 });
@@ -111,10 +129,13 @@ test('buildJobRunAlerts combines both evaluations into the full alert set for on
     registeredAtIso: '2026-07-10T04:00:00.000Z',
     nowIso: '2026-07-14T04:00:00.000Z',
   });
-  const run = completeJobRun(startJobRun({ jobId: JOB.id, jobRunId: 'r-both', startedAt: '2026-07-14T04:00:00.000Z' }), {
-    completedAt: '2026-07-14T04:05:00.000Z',
-    itemsProcessed: 300,
-  });
+  const run = completeJobRun(
+    startJobRun({ jobId: JOB.id, jobRunId: 'r-both', startedAt: '2026-07-14T04:00:00.000Z' }),
+    {
+      completedAt: '2026-07-14T04:05:00.000Z',
+      itemsProcessed: 300,
+    },
+  );
   const budget = evaluateJobBudget({ job: JOB, run });
 
   const alerts = buildJobRunAlerts({

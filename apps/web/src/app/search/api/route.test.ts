@@ -105,9 +105,16 @@ test('the status filter narrows results through the real route (AC5)', async () 
   );
 
   const filtered = (await (
-    await handleSearchRequest(searchRequest(`?state=${stateParam}&status=active`), await buildDeps())
+    await handleSearchRequest(
+      searchRequest(`?state=${stateParam}&status=active`),
+      await buildDeps(),
+    )
   ).json()) as SearchBody;
-  assert.equal(filtered.totalMatched, 3, 'the statusless 1975 landmark-listing event is excluded by status=active');
+  assert.equal(
+    filtered.totalMatched,
+    3,
+    'the statusless 1975 landmark-listing event is excluded by status=active',
+  );
   assert.ok(!filtered.results.some((r) => r.id === EVENT_ID));
 });
 
@@ -170,5 +177,8 @@ test('cursor round-trip returns the next page, not the same page', async () => {
   const secondId = second.results[0]?.id;
 
   assert.notEqual(firstId, secondId, 'the second page must not repeat the first page');
-  assert.ok(firstId === SCHOOL_ID || secondId === SCHOOL_ID, 'Dunbar school should appear in top pages');
+  assert.ok(
+    firstId === SCHOOL_ID || secondId === SCHOOL_ID,
+    'Dunbar school should appear in top pages',
+  );
 });

@@ -41,5 +41,9 @@ test('isSparseRecord is true only when claims, related, and timeline are all emp
   const base = requireEntity('ent_15th_st_church_001');
   assert.equal(isSparseRecord(base), false, 'the real seed fixture has claims/related/timeline');
   assert.equal(isSparseRecord({ ...base, claims: [], related: [], timeline: [] }), true);
-  assert.equal(isSparseRecord({ ...base, claims: [], related: [] }), false, 'timeline still populated');
+  assert.equal(
+    isSparseRecord({ ...base, claims: [], related: [] }),
+    false,
+    'timeline still populated',
+  );
 });

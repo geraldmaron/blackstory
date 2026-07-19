@@ -125,7 +125,8 @@ function mockBriefFromTopic(topic: StoryTopicSeed): ModelBriefJson {
           winnerBuiltProves: 'What the winners built after the familiar middle chapter.',
         }
       : {}),
-    verificationRule: 'Move the starting line, then judge by documents and published claims — not props.',
+    verificationRule:
+      'Move the starting line, then judge by documents and published claims — not props.',
     title: topic.title,
     dek: `A place-first narrative that relocates the start line for ${topic.title} and off-ramps to archive records.`,
   };
@@ -140,8 +141,7 @@ function buildBriefFromModel(parsed: ModelBriefJson, topic: StoryTopicSeed): Sto
       parsed.conventionalStartLine?.trim() ||
       `The conventional middle of the ${topic.title} story.`,
     relocatedStartLine:
-      parsed.relocatedStartLine?.trim() ||
-      `An earlier documented origin for ${topic.title}.`,
+      parsed.relocatedStartLine?.trim() || `An earlier documented origin for ${topic.title}.`,
     mechanismLayers: parsed.mechanismSummary
       ? [{ kind: 'institutional', summary: parsed.mechanismSummary.trim() }]
       : [],
@@ -153,9 +153,7 @@ function buildBriefFromModel(parsed: ModelBriefJson, topic: StoryTopicSeed): Sto
           },
         }
       : {}),
-    ...(parsed.verificationRule
-      ? { verificationRule: parsed.verificationRule.trim() }
-      : {}),
+    ...(parsed.verificationRule ? { verificationRule: parsed.verificationRule.trim() } : {}),
   });
 }
 
@@ -166,9 +164,15 @@ function harvestAnchors(topic: StoryTopicSeed): NamedAnchor[] {
     const role = claim.role ?? (index === 0 ? 'named_case' : 'omitted');
     const anchor = buildNamedAnchor({
       id: `anchor-${claim.id}`,
-      role: role === 'winner_built' || role === 'authority_witness' || role === 'present_bridge' || role === 'conventional' || role === 'named_case' || role === 'omitted'
-        ? role
-        : 'named_case',
+      role:
+        role === 'winner_built' ||
+        role === 'authority_witness' ||
+        role === 'present_bridge' ||
+        role === 'conventional' ||
+        role === 'named_case' ||
+        role === 'omitted'
+          ? role
+          : 'named_case',
       who: claim.label ?? claim.id,
       resolvedCiteKind: 'claim',
       resolvedCiteId: claim.id,
@@ -256,8 +260,7 @@ export async function runStoryResearch(
       anchors,
       title: parsed.title?.trim() || topic.title,
       dek:
-        parsed.dek?.trim() ||
-        `Place-first narrative relocating the start line for ${topic.title}.`,
+        parsed.dek?.trim() || `Place-first narrative relocating the start line for ${topic.title}.`,
       eraLabel: topic.eraLabel?.trim() || 'Undated',
       placeLabel: topic.placeLabel?.trim() || 'Place TBD',
       slug: topic.topicId
@@ -317,8 +320,7 @@ export async function runStoryResearch(
     items,
     recommendCount: items.filter((item) => item.packet.decision === 'recommend').length,
     rejectCount: items.filter((item) => item.packet.decision === 'reject').length,
-    needsEvidenceCount: items.filter((item) => item.packet.decision === 'needs_evidence')
-      .length,
+    needsEvidenceCount: items.filter((item) => item.packet.decision === 'needs_evidence').length,
     completedAt: input.nowIso,
   };
 }

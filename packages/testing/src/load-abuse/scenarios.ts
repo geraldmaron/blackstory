@@ -1,4 +1,3 @@
-
 /**
  * abuse scenario runners deterministic fixtures against security guardrails.
  */
@@ -22,7 +21,12 @@ import {
   type LoadAbuseHarnessOptions,
 } from './harness.js';
 import { getCostEstimateForScenario } from './cost-model.js';
-import type { LayeredControlProof, LoadAbuseScenarioId, ScenarioRunResult, SimulatedRequestOutcome } from './types.js';
+import type {
+  LayeredControlProof,
+  LoadAbuseScenarioId,
+  ScenarioRunResult,
+  SimulatedRequestOutcome,
+} from './types.js';
 
 const BASE_NOW_MS = 1_700_000_000_000;
 const STATIC_IP = '203.0.113.1';
@@ -35,9 +39,7 @@ const VALID_SUBMISSION: SubmissionInput = {
   targetRecordId: 'record-123',
 };
 
-export type ScenarioRunner = (
-  harness?: ReturnType<typeof createLoadAbuseHarness>,
-) => {
+export type ScenarioRunner = (harness?: ReturnType<typeof createLoadAbuseHarness>) => {
   readonly result: ScenarioRunResult;
   readonly proof: LayeredControlProof;
 };
@@ -59,7 +61,11 @@ function runner(
 }
 
 export const runHighVolumeStaticScenario = runner('high_volume_static', (h) => {
-  const policy = resolveEndpointPolicy(DEFAULT_ENDPOINT_QUOTA_MATRIX, 'entityRetrieval', 'anonymous');
+  const policy = resolveEndpointPolicy(
+    DEFAULT_ENDPOINT_QUOTA_MATRIX,
+    'entityRetrieval',
+    'anonymous',
+  );
   const outcomes: SimulatedRequestOutcome[] = [];
   for (let i = 0; i < policy.windowCap + 5; i += 1) {
     h.advance(100);
@@ -179,7 +185,11 @@ export const runGeocoderAbuseScenario = runner('geocoder_abuse', (h) => {
     });
     outcomes.push(
       rate.decision.allowed
-        ? { allowed: true, denials: [], estimatedCostUnits: getCostEstimateForScenario('geocoder_abuse').perRequestCostUnits }
+        ? {
+            allowed: true,
+            denials: [],
+            estimatedCostUnits: getCostEstimateForScenario('geocoder_abuse').perRequestCostUnits,
+          }
         : {
             allowed: false,
             denials: [{ layer: mapRateLayer(rate.decision.reason), reason: rate.decision.reason }],
@@ -301,27 +311,30 @@ export const runDistributedLowRateScenario = runner('distributed_low_rate', (h) 
   return { outcomes };
 });
 
-export const runDatabaseConnectionExhaustionScenario = runner('database_connection_exhaustion', (h) => {
-  const harness = createLoadAbuseHarness({ nowMs: BASE_NOW_MS });
-  const max = 10;
-  const outcomes: SimulatedRequestOutcome[] = [
-    harness.simulateDatabaseAcquire('role_public_read', max - 1),
-    harness.simulateDatabaseAcquire('role_public_read', max),
-    harness.simulateDatabaseAcquire('role_public_read', max + 5),
-  ];
-  outcomes.push(
-    h.simulateSearch({
-      query: { q: 'pool pressure probe' },
-      rateLimit: {
-        subject: 'anonymous',
-        endpointClass: 'search',
-        clientIp: '203.0.113.95',
-        appCheckVerified: true,
-      },
-    }),
-  );
-  return { outcomes, options: { withinResourceCaps: true } };
-});
+export const runDatabaseConnectionExhaustionScenario = runner(
+  'database_connection_exhaustion',
+  (h) => {
+    const harness = createLoadAbuseHarness({ nowMs: BASE_NOW_MS });
+    const max = 10;
+    const outcomes: SimulatedRequestOutcome[] = [
+      harness.simulateDatabaseAcquire('role_public_read', max - 1),
+      harness.simulateDatabaseAcquire('role_public_read', max),
+      harness.simulateDatabaseAcquire('role_public_read', max + 5),
+    ];
+    outcomes.push(
+      h.simulateSearch({
+        query: { q: 'pool pressure probe' },
+        rateLimit: {
+          subject: 'anonymous',
+          endpointClass: 'search',
+          clientIp: '203.0.113.95',
+          appCheckVerified: true,
+        },
+      }),
+    );
+    return { outcomes, options: { withinResourceCaps: true } };
+  },
+);
 
 export const runQueueRetryStormsScenario = runner('queue_retry_storms', (h) => {
   const harness = createLoadAbuseHarness({ nowMs: BASE_NOW_MS });
@@ -345,70 +358,25 @@ export const runQueueRetryStormsScenario = runner('queue_retry_storms', (h) => {
   return { outcomes, options: { withinResourceCaps: true } };
 });
 
-export const runExpensiveFilterCombinationsScenario = runner('expensive_filter_combinations', (h) => {
-  const outcomes: SimulatedRequestOutcome[] = [
-    h.simulateSearch({
-      query: {
-        q: 'historical movement',
-        filters: {
-          kind: 'person',
-          state: 'published',
-          precision: 'city',
-          status: 'verified',
-          era: 'civil-rights',
-        },
-        lat: 38.9072,
-        lng: -77.0369,
-        radiusM: 50_000,
-        sort: 'distance',
-        pageSize: 50,
-      },
-      rateLimit: {
-        subject: 'anonymous',
-        endpointClass: 'search',
-        clientIp: '203.0.113.120',
-        appCheckVerified: true,
-      },
-    }),
-    h.simulateSearch({
-      query: {
-        q: 'probe',
-        filters: {
-          kind: 'person',
-          state: 'published',
-          precision: 'city',
-          status: 'verified',
-          era: 'civil-rights',
-          releaseId: 'extra-filter',
-        },
-      },
-      rateLimit: {
-        subject: 'anonymous',
-        endpointClass: 'search',
-        clientIp: '203.0.113.120',
-        appCheckVerified: true,
-      },
-    }),
-    h.simulateSearch({
-      query: { q: 'a'.repeat(DEFAULT_QUERY_GUARDRAIL_LIMITS.maxQueryLength + 1) },
-      rateLimit: {
-        subject: 'anonymous',
-        endpointClass: 'search',
-        clientIp: '203.0.113.121',
-        appCheckVerified: true,
-      },
-    }),
-  ];
-  for (let i = 0; i < 12; i += 1) {
-    outcomes.push(
+export const runExpensiveFilterCombinationsScenario = runner(
+  'expensive_filter_combinations',
+  (h) => {
+    const outcomes: SimulatedRequestOutcome[] = [
       h.simulateSearch({
         query: {
-          q: 'expensive combo',
-          filters: { kind: 'person', state: 'published' },
-          lat: 38.9,
-          lng: -77.0,
+          q: 'historical movement',
+          filters: {
+            kind: 'person',
+            state: 'published',
+            precision: 'city',
+            status: 'verified',
+            era: 'civil-rights',
+          },
+          lat: 38.9072,
+          lng: -77.0369,
           radiusM: 50_000,
           sort: 'distance',
+          pageSize: 50,
         },
         rateLimit: {
           subject: 'anonymous',
@@ -417,10 +385,58 @@ export const runExpensiveFilterCombinationsScenario = runner('expensive_filter_c
           appCheckVerified: true,
         },
       }),
-    );
-  }
-  return { outcomes };
-});
+      h.simulateSearch({
+        query: {
+          q: 'probe',
+          filters: {
+            kind: 'person',
+            state: 'published',
+            precision: 'city',
+            status: 'verified',
+            era: 'civil-rights',
+            releaseId: 'extra-filter',
+          },
+        },
+        rateLimit: {
+          subject: 'anonymous',
+          endpointClass: 'search',
+          clientIp: '203.0.113.120',
+          appCheckVerified: true,
+        },
+      }),
+      h.simulateSearch({
+        query: { q: 'a'.repeat(DEFAULT_QUERY_GUARDRAIL_LIMITS.maxQueryLength + 1) },
+        rateLimit: {
+          subject: 'anonymous',
+          endpointClass: 'search',
+          clientIp: '203.0.113.121',
+          appCheckVerified: true,
+        },
+      }),
+    ];
+    for (let i = 0; i < 12; i += 1) {
+      outcomes.push(
+        h.simulateSearch({
+          query: {
+            q: 'expensive combo',
+            filters: { kind: 'person', state: 'published' },
+            lat: 38.9,
+            lng: -77.0,
+            radiusM: 50_000,
+            sort: 'distance',
+          },
+          rateLimit: {
+            subject: 'anonymous',
+            endpointClass: 'search',
+            clientIp: '203.0.113.120',
+            appCheckVerified: true,
+          },
+        }),
+      );
+    }
+    return { outcomes };
+  },
+);
 
 export const runScrapingPatternsScenario = runner('scraping_patterns', (h) => {
   const baseQuery = { q: 'public archive', filters: { kind: 'person' } };
@@ -452,7 +468,11 @@ export const runScrapingPatternsScenario = runner('scraping_patterns', (h) => {
       },
     }),
   );
-  const entityPolicy = resolveEndpointPolicy(DEFAULT_ENDPOINT_QUOTA_MATRIX, 'entityRetrieval', 'anonymous');
+  const entityPolicy = resolveEndpointPolicy(
+    DEFAULT_ENDPOINT_QUOTA_MATRIX,
+    'entityRetrieval',
+    'anonymous',
+  );
   for (let i = 0; i < entityPolicy.dailyCap + 2; i += 1) {
     h.advance(50);
     const rate = h.simulateRateLimit({

@@ -8,8 +8,17 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import type { EvidenceSource } from '../../provenance/source.js';
-import { createInMemoryObligationsRegistry, defaultSourceObligationsSeed, getSourceObligationsOrThrow } from '../../rights/index.js';
-import { approveSourcePolicy, createInMemorySourceRegistry, registerSource, type SourceRegistryEntry } from '../index.js';
+import {
+  createInMemoryObligationsRegistry,
+  defaultSourceObligationsSeed,
+  getSourceObligationsOrThrow,
+} from '../../rights/index.js';
+import {
+  approveSourcePolicy,
+  createInMemorySourceRegistry,
+  registerSource,
+  type SourceRegistryEntry,
+} from '../index.js';
 import type { SafeHttpResponse } from './shared/http-port.js';
 import {
   buildAdvancedSearchUrl,
@@ -81,12 +90,18 @@ test('Internet Archive adapter starts disabled by default in the  registry', () 
     createdAt: FIXED_NOW,
   });
   assert.equal(store.get('reg_ia')?.registryState, 'disabled');
-  const approved = approveSourcePolicy(store, { id: 'reg_ia', approvedBy: 'admin@blackbook.local', approvedAt: FIXED_NOW });
+  const approved = approveSourcePolicy(store, {
+    id: 'reg_ia',
+    approvedBy: 'admin@blackbook.local',
+    approvedAt: FIXED_NOW,
+  });
   assert.equal(approved.registryState, 'approved');
 });
 
 test('Internet Archive adapter has a registered  obligations entry', () => {
-  const obligationsStore = createInMemoryObligationsRegistry(defaultSourceObligationsSeed(FIXED_NOW));
+  const obligationsStore = createInMemoryObligationsRegistry(
+    defaultSourceObligationsSeed(FIXED_NOW),
+  );
   const obligations = getSourceObligationsOrThrow(obligationsStore, INTERNET_ARCHIVE_ADAPTER_ID);
   assert.equal(obligations.sourceClass, 'internet_archive');
   assert.equal(obligations.livenessRecheckRequired, true);
@@ -134,7 +149,10 @@ test('normalizes docs with a low-authority default classification, capped snippe
 
   assert.equal(candidates.length, 2);
   assert.equal(candidates[0]?.classification, INTERNET_ARCHIVE_DEFAULT_CLASSIFICATION);
-  assert.equal(candidates[0]?.canonicalUrl, buildInternetArchiveCanonicalUrl('piedmont-county-directory-1923'));
+  assert.equal(
+    candidates[0]?.canonicalUrl,
+    buildInternetArchiveCanonicalUrl('piedmont-county-directory-1923'),
+  );
   assert.ok(candidates[0]?.payload.summary!.length <= 320);
   assert.equal('fullText' in candidates[0]!.payload, false);
   assert.equal('body' in candidates[0]!.payload, false);
@@ -174,7 +192,10 @@ test('fetchAdvancedSearch goes through the injected SafeHttpClient (mock, no liv
 
 test('fetchScrapeAll follows the cursor across pages and stops when the cursor disappears', async () => {
   const entry = iaRegistryEntry();
-  const pages = [loadFixture('scrape-response-page1.json'), loadFixture('scrape-response-page2.json')];
+  const pages = [
+    loadFixture('scrape-response-page1.json'),
+    loadFixture('scrape-response-page2.json'),
+  ];
   let callIndex = 0;
   const client = async (): Promise<SafeHttpResponse> => {
     const page = pages[callIndex];
@@ -203,7 +224,12 @@ test('fetchMetadata retries on 429 before succeeding', async () => {
   const client = async (): Promise<SafeHttpResponse> => {
     attempts += 1;
     if (attempts < 2) {
-      return { status: 429, headers: { 'content-type': 'application/json' }, bodyText: '{}', finalUrl: '' };
+      return {
+        status: 429,
+        headers: { 'content-type': 'application/json' },
+        bodyText: '{}',
+        finalUrl: '',
+      };
     }
     return {
       status: 200,
@@ -232,7 +258,14 @@ test('rejects a response whose content type is outside the allowlist', async () 
     finalUrl: '',
   });
   await assert.rejects(
-    () => fetchAdvancedSearch({ query: 'x', registryEntry: entry, runId: 'run', capturedAt: FIXED_NOW, client }),
+    () =>
+      fetchAdvancedSearch({
+        query: 'x',
+        registryEntry: entry,
+        runId: 'run',
+        capturedAt: FIXED_NOW,
+        client,
+      }),
     /content type/,
   );
 });

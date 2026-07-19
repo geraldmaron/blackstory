@@ -96,8 +96,18 @@ test('passes through revision history and a retraction notice untouched', () => 
   const card = buildEvidenceCard({
     ...BASE_CLAIM,
     revisionHistory: [
-      { id: 'rev_1', changedAt: '2026-05-01T00:00:00.000Z', changeKind: 'created', summary: 'Initial claim recorded.' },
-      { id: 'rev_2', changedAt: '2026-06-01T00:00:00.000Z', changeKind: 'corrected', summary: 'Fixed a transcription error in the object value.' },
+      {
+        id: 'rev_1',
+        changedAt: '2026-05-01T00:00:00.000Z',
+        changeKind: 'created',
+        summary: 'Initial claim recorded.',
+      },
+      {
+        id: 'rev_2',
+        changedAt: '2026-06-01T00:00:00.000Z',
+        changeKind: 'corrected',
+        summary: 'Fixed a transcription error in the object value.',
+      },
     ],
     retraction: {
       retractedAt: '2026-07-01T00:00:00.000Z',
@@ -124,9 +134,21 @@ test('totalSourceLineageCount sums independent lineage counts across cards', () 
 
 test('uniqueCitationSourceCount counts distinct non-empty citation sources case-insensitively', () => {
   const cards = buildEvidenceCards([
-    { ...BASE_CLAIM, id: 'a', citation: { ...BASE_CLAIM.citation, source: 'National Archives (seed)' } },
-    { ...BASE_CLAIM, id: 'b', citation: { ...BASE_CLAIM.citation, source: '  national archives (seed)  ' } },
-    { ...BASE_CLAIM, id: 'c', citation: { ...BASE_CLAIM.citation, source: 'D.C. Historical Society (seed)' } },
+    {
+      ...BASE_CLAIM,
+      id: 'a',
+      citation: { ...BASE_CLAIM.citation, source: 'National Archives (seed)' },
+    },
+    {
+      ...BASE_CLAIM,
+      id: 'b',
+      citation: { ...BASE_CLAIM.citation, source: '  national archives (seed)  ' },
+    },
+    {
+      ...BASE_CLAIM,
+      id: 'c',
+      citation: { ...BASE_CLAIM.citation, source: 'D.C. Historical Society (seed)' },
+    },
     { ...BASE_CLAIM, id: 'd', citation: { ...BASE_CLAIM.citation, source: '' } },
   ]);
   assert.equal(uniqueCitationSourceCount(cards), 2);
@@ -142,8 +164,16 @@ test('resolveRecordSourceLineage prefers the sum of per-claim lineage counts', (
 
 test('resolveRecordSourceLineage falls back to distinct citation sources when lineage is absent', () => {
   const cards = buildEvidenceCards([
-    { ...BASE_CLAIM, id: 'a', citation: { ...BASE_CLAIM.citation, source: 'National Archives (seed)' } },
-    { ...BASE_CLAIM, id: 'b', citation: { ...BASE_CLAIM.citation, source: 'D.C. Historical Society (seed)' } },
+    {
+      ...BASE_CLAIM,
+      id: 'a',
+      citation: { ...BASE_CLAIM.citation, source: 'National Archives (seed)' },
+    },
+    {
+      ...BASE_CLAIM,
+      id: 'b',
+      citation: { ...BASE_CLAIM.citation, source: 'D.C. Historical Society (seed)' },
+    },
   ]);
   assert.deepEqual(resolveRecordSourceLineage(cards), { independentLineageCount: 2 });
 });
@@ -158,7 +188,11 @@ test('resolveRecordSourceLineage returns undefined when there is no lineage or c
 
 test('resolveRecordSourceLineage preserves an explicit zero count from the caller', () => {
   const cards = buildEvidenceCards([
-    { ...BASE_CLAIM, id: 'a', citation: { ...BASE_CLAIM.citation, source: 'National Archives (seed)' } },
+    {
+      ...BASE_CLAIM,
+      id: 'a',
+      citation: { ...BASE_CLAIM.citation, source: 'National Archives (seed)' },
+    },
   ]);
   assert.deepEqual(resolveRecordSourceLineage(cards, { independentLineageCount: 0 }), {
     independentLineageCount: 0,
@@ -168,7 +202,11 @@ test('resolveRecordSourceLineage preserves an explicit zero count from the calle
 test('mostRecentLastCheckedAt picks the latest date across claim and coverage fields', () => {
   const cards = buildEvidenceCards([
     { ...BASE_CLAIM, id: 'a', lastCheckedAt: '2026-01-01T00:00:00.000Z' },
-    { ...BASE_CLAIM, id: 'b', researchCoverage: { level: 'partial', lastCheckedAt: '2026-06-01T00:00:00.000Z' } },
+    {
+      ...BASE_CLAIM,
+      id: 'b',
+      researchCoverage: { level: 'partial', lastCheckedAt: '2026-06-01T00:00:00.000Z' },
+    },
   ]);
   assert.equal(mostRecentLastCheckedAt(cards), '2026-06-01T00:00:00.000Z');
 });

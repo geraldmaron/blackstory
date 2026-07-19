@@ -1,4 +1,3 @@
-
 /**
  * public beta disable controls App Hosting env keys and kill-switch ids.
  * Operators can return to static read-only without redeploying product code.
@@ -54,7 +53,11 @@ export interface AppHostingEnvProbe {
 }
 
 export const APP_HOSTING_PUBLIC_READ_PROBES: readonly AppHostingEnvProbe[] = [
-  { file: 'apps/web/apphosting.yaml', variable: PUBLIC_READ_API_DISABLED_ENV, expectedDefault: '0' },
+  {
+    file: 'apps/web/apphosting.yaml',
+    variable: PUBLIC_READ_API_DISABLED_ENV,
+    expectedDefault: '0',
+  },
   {
     file: 'apps/web/apphosting.production.yaml',
     variable: PUBLIC_READ_API_DISABLED_ENV,
@@ -86,8 +89,13 @@ export function assertBetaDisableConfigKeys(repoRoot: string): void {
     if (!content.includes(`variable: ${probe.variable}`)) {
       throw new Error(`${probe.file} does not declare ${probe.variable}.`);
     }
-    if (probe.expectedDefault !== undefined && !content.includes(`value: '${probe.expectedDefault}'`)) {
-      throw new Error(`${probe.file} does not default ${probe.variable} to ${probe.expectedDefault}.`);
+    if (
+      probe.expectedDefault !== undefined &&
+      !content.includes(`value: '${probe.expectedDefault}'`)
+    ) {
+      throw new Error(
+        `${probe.file} does not default ${probe.variable} to ${probe.expectedDefault}.`,
+      );
     }
   }
 }

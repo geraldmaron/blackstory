@@ -1,4 +1,3 @@
-
 /**
  * Public surface of @repo/operator-cli.
  *

@@ -1,4 +1,3 @@
-
 /**
  * Unit tests for domain fixture builders used across test layers.
  */

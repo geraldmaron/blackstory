@@ -8,9 +8,7 @@
       "id": "gc-001",
       "title": "Included school with documented Black educational history \u2014 scenario 1",
       "synthetic": true,
-      "categories": [
-        "included_school"
-      ],
+      "categories": ["included_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -28,18 +26,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-001"
-        ]
+        "lineageRootIds": ["lineage-gc-001"]
       }
     },
     {
       "id": "gc-002",
       "title": "Included school with documented Black educational history \u2014 scenario 2",
       "synthetic": true,
-      "categories": [
-        "included_school"
-      ],
+      "categories": ["included_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -57,18 +51,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-002"
-        ]
+        "lineageRootIds": ["lineage-gc-002"]
       }
     },
     {
       "id": "gc-003",
       "title": "Included school with documented Black educational history \u2014 scenario 3",
       "synthetic": true,
-      "categories": [
-        "included_school"
-      ],
+      "categories": ["included_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -86,18 +76,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-003"
-        ]
+        "lineageRootIds": ["lineage-gc-003"]
       }
     },
     {
       "id": "gc-004",
       "title": "Included school with documented Black educational history \u2014 scenario 4",
       "synthetic": true,
-      "categories": [
-        "included_school"
-      ],
+      "categories": ["included_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -115,18 +101,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-004"
-        ]
+        "lineageRootIds": ["lineage-gc-004"]
       }
     },
     {
       "id": "gc-005",
       "title": "Included school with documented Black educational history \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "included_school"
-      ],
+      "categories": ["included_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -144,18 +126,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-005"
-        ]
+        "lineageRootIds": ["lineage-gc-005"]
       }
     },
     {
       "id": "gc-006",
       "title": "Included school with documented Black educational history \u2014 scenario 6",
       "synthetic": true,
-      "categories": [
-        "included_school"
-      ],
+      "categories": ["included_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -173,18 +151,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-006"
-        ]
+        "lineageRootIds": ["lineage-gc-006"]
       }
     },
     {
       "id": "gc-007",
       "title": "Included school with documented Black educational history \u2014 scenario 7",
       "synthetic": true,
-      "categories": [
-        "included_school"
-      ],
+      "categories": ["included_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -202,18 +176,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-007"
-        ]
+        "lineageRootIds": ["lineage-gc-007"]
       }
     },
     {
       "id": "gc-008",
       "title": "Included school with documented Black educational history \u2014 scenario 8",
       "synthetic": true,
-      "categories": [
-        "included_school"
-      ],
+      "categories": ["included_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -231,18 +201,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-008"
-        ]
+        "lineageRootIds": ["lineage-gc-008"]
       }
     },
     {
       "id": "gc-009",
       "title": "Included school with documented Black educational history \u2014 scenario 9",
       "synthetic": true,
-      "categories": [
-        "included_school"
-      ],
+      "categories": ["included_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -260,18 +226,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-009"
-        ]
+        "lineageRootIds": ["lineage-gc-009"]
       }
     },
     {
       "id": "gc-010",
       "title": "Included school with documented Black educational history \u2014 scenario 10",
       "synthetic": true,
-      "categories": [
-        "included_school"
-      ],
+      "categories": ["included_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -289,18 +251,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-010"
-        ]
+        "lineageRootIds": ["lineage-gc-010"]
       }
     },
     {
       "id": "gc-011",
       "title": "Excluded school with only a coincidental name match \u2014 scenario 1",
       "synthetic": true,
-      "categories": [
-        "excluded_school"
-      ],
+      "categories": ["excluded_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "exclude",
@@ -317,18 +275,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-011"
-        ]
+        "lineageRootIds": ["lineage-gc-011"]
       }
     },
     {
       "id": "gc-012",
       "title": "Excluded school with only a coincidental name match \u2014 scenario 2",
       "synthetic": true,
-      "categories": [
-        "excluded_school"
-      ],
+      "categories": ["excluded_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "exclude",
@@ -345,18 +299,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-012"
-        ]
+        "lineageRootIds": ["lineage-gc-012"]
       }
     },
     {
       "id": "gc-013",
       "title": "Excluded school with only a coincidental name match \u2014 scenario 3",
       "synthetic": true,
-      "categories": [
-        "excluded_school"
-      ],
+      "categories": ["excluded_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "exclude",
@@ -373,18 +323,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-013"
-        ]
+        "lineageRootIds": ["lineage-gc-013"]
       }
     },
     {
       "id": "gc-014",
       "title": "Excluded school with only a coincidental name match \u2014 scenario 4",
       "synthetic": true,
-      "categories": [
-        "excluded_school"
-      ],
+      "categories": ["excluded_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "exclude",
@@ -401,18 +347,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-014"
-        ]
+        "lineageRootIds": ["lineage-gc-014"]
       }
     },
     {
       "id": "gc-015",
       "title": "Excluded school with only a coincidental name match \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "excluded_school"
-      ],
+      "categories": ["excluded_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "exclude",
@@ -429,18 +371,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-015"
-        ]
+        "lineageRootIds": ["lineage-gc-015"]
       }
     },
     {
       "id": "gc-016",
       "title": "Excluded school with only a coincidental name match \u2014 scenario 6",
       "synthetic": true,
-      "categories": [
-        "excluded_school"
-      ],
+      "categories": ["excluded_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "exclude",
@@ -457,18 +395,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-016"
-        ]
+        "lineageRootIds": ["lineage-gc-016"]
       }
     },
     {
       "id": "gc-017",
       "title": "Excluded school with only a coincidental name match \u2014 scenario 7",
       "synthetic": true,
-      "categories": [
-        "excluded_school"
-      ],
+      "categories": ["excluded_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "exclude",
@@ -485,18 +419,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-017"
-        ]
+        "lineageRootIds": ["lineage-gc-017"]
       }
     },
     {
       "id": "gc-018",
       "title": "Excluded school with only a coincidental name match \u2014 scenario 8",
       "synthetic": true,
-      "categories": [
-        "excluded_school"
-      ],
+      "categories": ["excluded_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "exclude",
@@ -513,18 +443,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-018"
-        ]
+        "lineageRootIds": ["lineage-gc-018"]
       }
     },
     {
       "id": "gc-019",
       "title": "Excluded school with only a coincidental name match \u2014 scenario 9",
       "synthetic": true,
-      "categories": [
-        "excluded_school"
-      ],
+      "categories": ["excluded_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "exclude",
@@ -541,18 +467,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-019"
-        ]
+        "lineageRootIds": ["lineage-gc-019"]
       }
     },
     {
       "id": "gc-020",
       "title": "Excluded school with only a coincidental name match \u2014 scenario 10",
       "synthetic": true,
-      "categories": [
-        "excluded_school"
-      ],
+      "categories": ["excluded_school"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "exclude",
@@ -569,18 +491,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-020"
-        ]
+        "lineageRootIds": ["lineage-gc-020"]
       }
     },
     {
       "id": "gc-021",
       "title": "Relevant historical person connected to local Black history \u2014 scenario 1",
       "synthetic": true,
-      "categories": [
-        "relevant_person"
-      ],
+      "categories": ["relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -598,18 +516,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-021"
-        ]
+        "lineageRootIds": ["lineage-gc-021"]
       }
     },
     {
       "id": "gc-022",
       "title": "Relevant historical person connected to local Black history \u2014 scenario 2",
       "synthetic": true,
-      "categories": [
-        "relevant_person"
-      ],
+      "categories": ["relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -627,18 +541,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-022"
-        ]
+        "lineageRootIds": ["lineage-gc-022"]
       }
     },
     {
       "id": "gc-023",
       "title": "Relevant historical person connected to local Black history \u2014 scenario 3",
       "synthetic": true,
-      "categories": [
-        "relevant_person"
-      ],
+      "categories": ["relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -656,18 +566,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-023"
-        ]
+        "lineageRootIds": ["lineage-gc-023"]
       }
     },
     {
       "id": "gc-024",
       "title": "Relevant historical person connected to local Black history \u2014 scenario 4",
       "synthetic": true,
-      "categories": [
-        "relevant_person"
-      ],
+      "categories": ["relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -685,18 +591,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-024"
-        ]
+        "lineageRootIds": ["lineage-gc-024"]
       }
     },
     {
       "id": "gc-025",
       "title": "Relevant historical person connected to local Black history \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "relevant_person"
-      ],
+      "categories": ["relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -714,18 +616,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-025"
-        ]
+        "lineageRootIds": ["lineage-gc-025"]
       }
     },
     {
       "id": "gc-026",
       "title": "Relevant historical person connected to local Black history \u2014 scenario 6",
       "synthetic": true,
-      "categories": [
-        "relevant_person"
-      ],
+      "categories": ["relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -743,18 +641,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-026"
-        ]
+        "lineageRootIds": ["lineage-gc-026"]
       }
     },
     {
       "id": "gc-027",
       "title": "Relevant historical person connected to local Black history \u2014 scenario 7",
       "synthetic": true,
-      "categories": [
-        "relevant_person"
-      ],
+      "categories": ["relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -772,18 +666,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-027"
-        ]
+        "lineageRootIds": ["lineage-gc-027"]
       }
     },
     {
       "id": "gc-028",
       "title": "Relevant historical person connected to local Black history \u2014 scenario 8",
       "synthetic": true,
-      "categories": [
-        "relevant_person"
-      ],
+      "categories": ["relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -801,18 +691,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-028"
-        ]
+        "lineageRootIds": ["lineage-gc-028"]
       }
     },
     {
       "id": "gc-029",
       "title": "Relevant historical person connected to local Black history \u2014 scenario 9",
       "synthetic": true,
-      "categories": [
-        "relevant_person"
-      ],
+      "categories": ["relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -830,18 +716,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-029"
-        ]
+        "lineageRootIds": ["lineage-gc-029"]
       }
     },
     {
       "id": "gc-030",
       "title": "Relevant historical person connected to local Black history \u2014 scenario 10",
       "synthetic": true,
-      "categories": [
-        "relevant_person"
-      ],
+      "categories": ["relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -859,18 +741,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-030"
-        ]
+        "lineageRootIds": ["lineage-gc-030"]
       }
     },
     {
       "id": "gc-031",
       "title": "Irrelevant person sharing a name with a historical subject \u2014 scenario 1",
       "synthetic": true,
-      "categories": [
-        "irrelevant_person"
-      ],
+      "categories": ["irrelevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "exclude",
@@ -887,18 +765,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-031"
-        ]
+        "lineageRootIds": ["lineage-gc-031"]
       }
     },
     {
       "id": "gc-032",
       "title": "Irrelevant person sharing a name with a historical subject \u2014 scenario 2",
       "synthetic": true,
-      "categories": [
-        "irrelevant_person"
-      ],
+      "categories": ["irrelevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "exclude",
@@ -915,18 +789,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-032"
-        ]
+        "lineageRootIds": ["lineage-gc-032"]
       }
     },
     {
       "id": "gc-033",
       "title": "Irrelevant person sharing a name with a historical subject \u2014 scenario 3",
       "synthetic": true,
-      "categories": [
-        "irrelevant_person"
-      ],
+      "categories": ["irrelevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "exclude",
@@ -943,18 +813,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-033"
-        ]
+        "lineageRootIds": ["lineage-gc-033"]
       }
     },
     {
       "id": "gc-034",
       "title": "Irrelevant person sharing a name with a historical subject \u2014 scenario 4",
       "synthetic": true,
-      "categories": [
-        "irrelevant_person"
-      ],
+      "categories": ["irrelevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "exclude",
@@ -971,18 +837,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-034"
-        ]
+        "lineageRootIds": ["lineage-gc-034"]
       }
     },
     {
       "id": "gc-035",
       "title": "Irrelevant person sharing a name with a historical subject \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "irrelevant_person"
-      ],
+      "categories": ["irrelevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "exclude",
@@ -999,18 +861,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-035"
-        ]
+        "lineageRootIds": ["lineage-gc-035"]
       }
     },
     {
       "id": "gc-036",
       "title": "Irrelevant person sharing a name with a historical subject \u2014 scenario 6",
       "synthetic": true,
-      "categories": [
-        "irrelevant_person"
-      ],
+      "categories": ["irrelevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "exclude",
@@ -1027,18 +885,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-036"
-        ]
+        "lineageRootIds": ["lineage-gc-036"]
       }
     },
     {
       "id": "gc-037",
       "title": "Irrelevant person sharing a name with a historical subject \u2014 scenario 7",
       "synthetic": true,
-      "categories": [
-        "irrelevant_person"
-      ],
+      "categories": ["irrelevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "exclude",
@@ -1055,18 +909,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-037"
-        ]
+        "lineageRootIds": ["lineage-gc-037"]
       }
     },
     {
       "id": "gc-038",
       "title": "Irrelevant person sharing a name with a historical subject \u2014 scenario 8",
       "synthetic": true,
-      "categories": [
-        "irrelevant_person"
-      ],
+      "categories": ["irrelevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "exclude",
@@ -1083,18 +933,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-038"
-        ]
+        "lineageRootIds": ["lineage-gc-038"]
       }
     },
     {
       "id": "gc-039",
       "title": "Irrelevant person sharing a name with a historical subject \u2014 scenario 9",
       "synthetic": true,
-      "categories": [
-        "irrelevant_person"
-      ],
+      "categories": ["irrelevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "exclude",
@@ -1111,18 +957,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-039"
-        ]
+        "lineageRootIds": ["lineage-gc-039"]
       }
     },
     {
       "id": "gc-040",
       "title": "Irrelevant person sharing a name with a historical subject \u2014 scenario 10",
       "synthetic": true,
-      "categories": [
-        "irrelevant_person"
-      ],
+      "categories": ["irrelevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "exclude",
@@ -1139,18 +981,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-040"
-        ]
+        "lineageRootIds": ["lineage-gc-040"]
       }
     },
     {
       "id": "gc-041",
       "title": "Disputed claim with credible contradictory accounts \u2014 scenario 1",
       "synthetic": true,
-      "categories": [
-        "disputed_claim"
-      ],
+      "categories": ["disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "supporting_context",
@@ -1167,18 +1005,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-041"
-        ]
+        "lineageRootIds": ["lineage-gc-041"]
       }
     },
     {
       "id": "gc-042",
       "title": "Disputed claim with credible contradictory accounts \u2014 scenario 2",
       "synthetic": true,
-      "categories": [
-        "disputed_claim"
-      ],
+      "categories": ["disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "supporting_context",
@@ -1195,18 +1029,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-042"
-        ]
+        "lineageRootIds": ["lineage-gc-042"]
       }
     },
     {
       "id": "gc-043",
       "title": "Disputed claim with credible contradictory accounts \u2014 scenario 3",
       "synthetic": true,
-      "categories": [
-        "disputed_claim"
-      ],
+      "categories": ["disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "supporting_context",
@@ -1223,18 +1053,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-043"
-        ]
+        "lineageRootIds": ["lineage-gc-043"]
       }
     },
     {
       "id": "gc-044",
       "title": "Disputed claim with credible contradictory accounts \u2014 scenario 4",
       "synthetic": true,
-      "categories": [
-        "disputed_claim"
-      ],
+      "categories": ["disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "supporting_context",
@@ -1251,18 +1077,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-044"
-        ]
+        "lineageRootIds": ["lineage-gc-044"]
       }
     },
     {
       "id": "gc-045",
       "title": "Disputed claim with credible contradictory accounts \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "disputed_claim"
-      ],
+      "categories": ["disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "supporting_context",
@@ -1279,18 +1101,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-045"
-        ]
+        "lineageRootIds": ["lineage-gc-045"]
       }
     },
     {
       "id": "gc-046",
       "title": "Disputed claim with credible contradictory accounts \u2014 scenario 6",
       "synthetic": true,
-      "categories": [
-        "disputed_claim"
-      ],
+      "categories": ["disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "supporting_context",
@@ -1307,18 +1125,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-046"
-        ]
+        "lineageRootIds": ["lineage-gc-046"]
       }
     },
     {
       "id": "gc-047",
       "title": "Disputed claim with credible contradictory accounts \u2014 scenario 7",
       "synthetic": true,
-      "categories": [
-        "disputed_claim"
-      ],
+      "categories": ["disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "supporting_context",
@@ -1335,18 +1149,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-047"
-        ]
+        "lineageRootIds": ["lineage-gc-047"]
       }
     },
     {
       "id": "gc-048",
       "title": "Disputed claim with credible contradictory accounts \u2014 scenario 8",
       "synthetic": true,
-      "categories": [
-        "disputed_claim"
-      ],
+      "categories": ["disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "supporting_context",
@@ -1363,18 +1173,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-048"
-        ]
+        "lineageRootIds": ["lineage-gc-048"]
       }
     },
     {
       "id": "gc-049",
       "title": "Disputed claim with credible contradictory accounts \u2014 scenario 9",
       "synthetic": true,
-      "categories": [
-        "disputed_claim"
-      ],
+      "categories": ["disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "supporting_context",
@@ -1391,18 +1197,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-049"
-        ]
+        "lineageRootIds": ["lineage-gc-049"]
       }
     },
     {
       "id": "gc-050",
       "title": "Disputed claim with credible contradictory accounts \u2014 scenario 10",
       "synthetic": true,
-      "categories": [
-        "disputed_claim"
-      ],
+      "categories": ["disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "supporting_context",
@@ -1419,18 +1221,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-050"
-        ]
+        "lineageRootIds": ["lineage-gc-050"]
       }
     },
     {
       "id": "gc-051",
       "title": "High-impact allegation requiring independent corroboration \u2014 scenario 1",
       "synthetic": true,
-      "categories": [
-        "high_impact_claim"
-      ],
+      "categories": ["high_impact_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "include",
@@ -1448,19 +1246,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-051"
-        ]
+        "lineageRootIds": ["lineage-gc-051"]
       }
     },
     {
       "id": "gc-052",
       "title": "High-impact allegation requiring independent corroboration \u2014 scenario 2",
       "synthetic": true,
-      "categories": [
-        "high_impact_claim",
-        "disputed_claim"
-      ],
+      "categories": ["high_impact_claim", "disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "include",
@@ -1478,18 +1271,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-052"
-        ]
+        "lineageRootIds": ["lineage-gc-052"]
       }
     },
     {
       "id": "gc-053",
       "title": "High-impact allegation requiring independent corroboration \u2014 scenario 3",
       "synthetic": true,
-      "categories": [
-        "high_impact_claim"
-      ],
+      "categories": ["high_impact_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "include",
@@ -1507,19 +1296,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-053"
-        ]
+        "lineageRootIds": ["lineage-gc-053"]
       }
     },
     {
       "id": "gc-054",
       "title": "High-impact allegation requiring independent corroboration \u2014 scenario 4",
       "synthetic": true,
-      "categories": [
-        "high_impact_claim",
-        "disputed_claim"
-      ],
+      "categories": ["high_impact_claim", "disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "include",
@@ -1537,18 +1321,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-054"
-        ]
+        "lineageRootIds": ["lineage-gc-054"]
       }
     },
     {
       "id": "gc-055",
       "title": "High-impact allegation requiring independent corroboration \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "high_impact_claim"
-      ],
+      "categories": ["high_impact_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "include",
@@ -1566,19 +1346,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-055"
-        ]
+        "lineageRootIds": ["lineage-gc-055"]
       }
     },
     {
       "id": "gc-056",
       "title": "High-impact allegation requiring independent corroboration \u2014 scenario 6",
       "synthetic": true,
-      "categories": [
-        "high_impact_claim",
-        "disputed_claim"
-      ],
+      "categories": ["high_impact_claim", "disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "include",
@@ -1596,18 +1371,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-056"
-        ]
+        "lineageRootIds": ["lineage-gc-056"]
       }
     },
     {
       "id": "gc-057",
       "title": "High-impact allegation requiring independent corroboration \u2014 scenario 7",
       "synthetic": true,
-      "categories": [
-        "high_impact_claim"
-      ],
+      "categories": ["high_impact_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "include",
@@ -1625,19 +1396,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-057"
-        ]
+        "lineageRootIds": ["lineage-gc-057"]
       }
     },
     {
       "id": "gc-058",
       "title": "High-impact allegation requiring independent corroboration \u2014 scenario 8",
       "synthetic": true,
-      "categories": [
-        "high_impact_claim",
-        "disputed_claim"
-      ],
+      "categories": ["high_impact_claim", "disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "include",
@@ -1655,18 +1421,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-058"
-        ]
+        "lineageRootIds": ["lineage-gc-058"]
       }
     },
     {
       "id": "gc-059",
       "title": "High-impact allegation requiring independent corroboration \u2014 scenario 9",
       "synthetic": true,
-      "categories": [
-        "high_impact_claim"
-      ],
+      "categories": ["high_impact_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "include",
@@ -1684,19 +1446,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-059"
-        ]
+        "lineageRootIds": ["lineage-gc-059"]
       }
     },
     {
       "id": "gc-060",
       "title": "High-impact allegation requiring independent corroboration \u2014 scenario 10",
       "synthetic": true,
-      "categories": [
-        "high_impact_claim",
-        "disputed_claim"
-      ],
+      "categories": ["high_impact_claim", "disputed_claim"],
       "subjectType": "claim",
       "adjudication": {
         "relevance": "include",
@@ -1714,18 +1471,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-060"
-        ]
+        "lineageRootIds": ["lineage-gc-060"]
       }
     },
     {
       "id": "gc-061",
       "title": "Sparse record with a minimally documented historical identity \u2014 scenario 1",
       "synthetic": true,
-      "categories": [
-        "sparse_record"
-      ],
+      "categories": ["sparse_record"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -1743,19 +1496,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-061"
-        ]
+        "lineageRootIds": ["lineage-gc-061"]
       }
     },
     {
       "id": "gc-062",
       "title": "Sparse record with a minimally documented historical identity \u2014 scenario 2",
       "synthetic": true,
-      "categories": [
-        "sparse_record",
-        "geographic_ambiguity"
-      ],
+      "categories": ["sparse_record", "geographic_ambiguity"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -1772,18 +1520,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-062"
-        ]
+        "lineageRootIds": ["lineage-gc-062"]
       }
     },
     {
       "id": "gc-063",
       "title": "Sparse record with a minimally documented historical identity \u2014 scenario 3",
       "synthetic": true,
-      "categories": [
-        "sparse_record"
-      ],
+      "categories": ["sparse_record"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -1801,19 +1545,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-063"
-        ]
+        "lineageRootIds": ["lineage-gc-063"]
       }
     },
     {
       "id": "gc-064",
       "title": "Sparse record with a minimally documented historical identity \u2014 scenario 4",
       "synthetic": true,
-      "categories": [
-        "sparse_record",
-        "geographic_ambiguity"
-      ],
+      "categories": ["sparse_record", "geographic_ambiguity"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -1830,18 +1569,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-064"
-        ]
+        "lineageRootIds": ["lineage-gc-064"]
       }
     },
     {
       "id": "gc-065",
       "title": "Sparse record with a minimally documented historical identity \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "sparse_record"
-      ],
+      "categories": ["sparse_record"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -1859,19 +1594,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-065"
-        ]
+        "lineageRootIds": ["lineage-gc-065"]
       }
     },
     {
       "id": "gc-066",
       "title": "Sparse record with a minimally documented historical identity \u2014 scenario 6",
       "synthetic": true,
-      "categories": [
-        "sparse_record",
-        "geographic_ambiguity"
-      ],
+      "categories": ["sparse_record", "geographic_ambiguity"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -1888,18 +1618,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-066"
-        ]
+        "lineageRootIds": ["lineage-gc-066"]
       }
     },
     {
       "id": "gc-067",
       "title": "Sparse record with a minimally documented historical identity \u2014 scenario 7",
       "synthetic": true,
-      "categories": [
-        "sparse_record"
-      ],
+      "categories": ["sparse_record"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -1917,19 +1643,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-067"
-        ]
+        "lineageRootIds": ["lineage-gc-067"]
       }
     },
     {
       "id": "gc-068",
       "title": "Sparse record with a minimally documented historical identity \u2014 scenario 8",
       "synthetic": true,
-      "categories": [
-        "sparse_record",
-        "geographic_ambiguity"
-      ],
+      "categories": ["sparse_record", "geographic_ambiguity"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -1946,18 +1667,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-068"
-        ]
+        "lineageRootIds": ["lineage-gc-068"]
       }
     },
     {
       "id": "gc-069",
       "title": "Sparse record with a minimally documented historical identity \u2014 scenario 9",
       "synthetic": true,
-      "categories": [
-        "sparse_record"
-      ],
+      "categories": ["sparse_record"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -1975,19 +1692,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-069"
-        ]
+        "lineageRootIds": ["lineage-gc-069"]
       }
     },
     {
       "id": "gc-070",
       "title": "Sparse record with a minimally documented historical identity \u2014 scenario 10",
       "synthetic": true,
-      "categories": [
-        "sparse_record",
-        "geographic_ambiguity"
-      ],
+      "categories": ["sparse_record", "geographic_ambiguity"],
       "subjectType": "school",
       "adjudication": {
         "relevance": "include",
@@ -2004,19 +1716,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-070"
-        ]
+        "lineageRootIds": ["lineage-gc-070"]
       }
     },
     {
       "id": "gc-071",
       "title": "Living person represented by synthetic public-role evidence \u2014 scenario 1",
       "synthetic": true,
-      "categories": [
-        "living_person",
-        "relevant_person"
-      ],
+      "categories": ["living_person", "relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -2034,19 +1741,14 @@
         "livingPerson": true,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-071"
-        ]
+        "lineageRootIds": ["lineage-gc-071"]
       }
     },
     {
       "id": "gc-072",
       "title": "Living person represented by synthetic public-role evidence \u2014 scenario 2",
       "synthetic": true,
-      "categories": [
-        "living_person",
-        "relevant_person"
-      ],
+      "categories": ["living_person", "relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -2064,19 +1766,14 @@
         "livingPerson": true,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-072"
-        ]
+        "lineageRootIds": ["lineage-gc-072"]
       }
     },
     {
       "id": "gc-073",
       "title": "Living person represented by synthetic public-role evidence \u2014 scenario 3",
       "synthetic": true,
-      "categories": [
-        "living_person",
-        "relevant_person"
-      ],
+      "categories": ["living_person", "relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -2094,19 +1791,14 @@
         "livingPerson": true,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-073"
-        ]
+        "lineageRootIds": ["lineage-gc-073"]
       }
     },
     {
       "id": "gc-074",
       "title": "Living person represented by synthetic public-role evidence \u2014 scenario 4",
       "synthetic": true,
-      "categories": [
-        "living_person",
-        "relevant_person"
-      ],
+      "categories": ["living_person", "relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -2124,19 +1816,14 @@
         "livingPerson": true,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-074"
-        ]
+        "lineageRootIds": ["lineage-gc-074"]
       }
     },
     {
       "id": "gc-075",
       "title": "Living person represented by synthetic public-role evidence \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "living_person",
-        "relevant_person"
-      ],
+      "categories": ["living_person", "relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -2154,19 +1841,14 @@
         "livingPerson": true,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-075"
-        ]
+        "lineageRootIds": ["lineage-gc-075"]
       }
     },
     {
       "id": "gc-076",
       "title": "Living person represented by synthetic public-role evidence \u2014 scenario 6",
       "synthetic": true,
-      "categories": [
-        "living_person",
-        "relevant_person"
-      ],
+      "categories": ["living_person", "relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -2184,19 +1866,14 @@
         "livingPerson": true,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-076"
-        ]
+        "lineageRootIds": ["lineage-gc-076"]
       }
     },
     {
       "id": "gc-077",
       "title": "Living person represented by synthetic public-role evidence \u2014 scenario 7",
       "synthetic": true,
-      "categories": [
-        "living_person",
-        "relevant_person"
-      ],
+      "categories": ["living_person", "relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -2214,19 +1891,14 @@
         "livingPerson": true,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-077"
-        ]
+        "lineageRootIds": ["lineage-gc-077"]
       }
     },
     {
       "id": "gc-078",
       "title": "Living person represented by synthetic public-role evidence \u2014 scenario 8",
       "synthetic": true,
-      "categories": [
-        "living_person",
-        "relevant_person"
-      ],
+      "categories": ["living_person", "relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -2244,19 +1916,14 @@
         "livingPerson": true,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-078"
-        ]
+        "lineageRootIds": ["lineage-gc-078"]
       }
     },
     {
       "id": "gc-079",
       "title": "Living person represented by synthetic public-role evidence \u2014 scenario 9",
       "synthetic": true,
-      "categories": [
-        "living_person",
-        "relevant_person"
-      ],
+      "categories": ["living_person", "relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -2274,19 +1941,14 @@
         "livingPerson": true,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-079"
-        ]
+        "lineageRootIds": ["lineage-gc-079"]
       }
     },
     {
       "id": "gc-080",
       "title": "Living person represented by synthetic public-role evidence \u2014 scenario 10",
       "synthetic": true,
-      "categories": [
-        "living_person",
-        "relevant_person"
-      ],
+      "categories": ["living_person", "relevant_person"],
       "subjectType": "person",
       "adjudication": {
         "relevance": "include",
@@ -2304,18 +1966,14 @@
         "livingPerson": true,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-080"
-        ]
+        "lineageRootIds": ["lineage-gc-080"]
       }
     },
     {
       "id": "gc-081",
       "title": "Private residence appearing in a historical source \u2014 scenario 1",
       "synthetic": true,
-      "categories": [
-        "private_residence"
-      ],
+      "categories": ["private_residence"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2332,18 +1990,14 @@
         "livingPerson": false,
         "privateResidence": true,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-081"
-        ]
+        "lineageRootIds": ["lineage-gc-081"]
       }
     },
     {
       "id": "gc-082",
       "title": "Private residence appearing in a historical source \u2014 scenario 2",
       "synthetic": true,
-      "categories": [
-        "private_residence"
-      ],
+      "categories": ["private_residence"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2360,18 +2014,14 @@
         "livingPerson": false,
         "privateResidence": true,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-082"
-        ]
+        "lineageRootIds": ["lineage-gc-082"]
       }
     },
     {
       "id": "gc-083",
       "title": "Private residence appearing in a historical source \u2014 scenario 3",
       "synthetic": true,
-      "categories": [
-        "private_residence"
-      ],
+      "categories": ["private_residence"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2388,18 +2038,14 @@
         "livingPerson": false,
         "privateResidence": true,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-083"
-        ]
+        "lineageRootIds": ["lineage-gc-083"]
       }
     },
     {
       "id": "gc-084",
       "title": "Private residence appearing in a historical source \u2014 scenario 4",
       "synthetic": true,
-      "categories": [
-        "private_residence"
-      ],
+      "categories": ["private_residence"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2416,18 +2062,14 @@
         "livingPerson": false,
         "privateResidence": true,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-084"
-        ]
+        "lineageRootIds": ["lineage-gc-084"]
       }
     },
     {
       "id": "gc-085",
       "title": "Private residence appearing in a historical source \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "private_residence"
-      ],
+      "categories": ["private_residence"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2444,18 +2086,14 @@
         "livingPerson": false,
         "privateResidence": true,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-085"
-        ]
+        "lineageRootIds": ["lineage-gc-085"]
       }
     },
     {
       "id": "gc-086",
       "title": "Private residence appearing in a historical source \u2014 scenario 6",
       "synthetic": true,
-      "categories": [
-        "private_residence"
-      ],
+      "categories": ["private_residence"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2472,18 +2110,14 @@
         "livingPerson": false,
         "privateResidence": true,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-086"
-        ]
+        "lineageRootIds": ["lineage-gc-086"]
       }
     },
     {
       "id": "gc-087",
       "title": "Private residence appearing in a historical source \u2014 scenario 7",
       "synthetic": true,
-      "categories": [
-        "private_residence"
-      ],
+      "categories": ["private_residence"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2500,18 +2134,14 @@
         "livingPerson": false,
         "privateResidence": true,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-087"
-        ]
+        "lineageRootIds": ["lineage-gc-087"]
       }
     },
     {
       "id": "gc-088",
       "title": "Private residence appearing in a historical source \u2014 scenario 8",
       "synthetic": true,
-      "categories": [
-        "private_residence"
-      ],
+      "categories": ["private_residence"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2528,18 +2158,14 @@
         "livingPerson": false,
         "privateResidence": true,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-088"
-        ]
+        "lineageRootIds": ["lineage-gc-088"]
       }
     },
     {
       "id": "gc-089",
       "title": "Private residence appearing in a historical source \u2014 scenario 9",
       "synthetic": true,
-      "categories": [
-        "private_residence"
-      ],
+      "categories": ["private_residence"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2556,18 +2182,14 @@
         "livingPerson": false,
         "privateResidence": true,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-089"
-        ]
+        "lineageRootIds": ["lineage-gc-089"]
       }
     },
     {
       "id": "gc-090",
       "title": "Private residence appearing in a historical source \u2014 scenario 10",
       "synthetic": true,
-      "categories": [
-        "private_residence"
-      ],
+      "categories": ["private_residence"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2584,18 +2206,14 @@
         "livingPerson": false,
         "privateResidence": true,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-090"
-        ]
+        "lineageRootIds": ["lineage-gc-090"]
       }
     },
     {
       "id": "gc-091",
       "title": "Candidate sundown town supported only by preliminary evidence \u2014 scenario 1",
       "synthetic": true,
-      "categories": [
-        "sundown_town_candidate"
-      ],
+      "categories": ["sundown_town_candidate"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2612,18 +2230,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-091"
-        ]
+        "lineageRootIds": ["lineage-gc-091"]
       }
     },
     {
       "id": "gc-092",
       "title": "Candidate sundown town supported only by preliminary evidence \u2014 scenario 2",
       "synthetic": true,
-      "categories": [
-        "sundown_town_candidate"
-      ],
+      "categories": ["sundown_town_candidate"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2640,18 +2254,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-092"
-        ]
+        "lineageRootIds": ["lineage-gc-092"]
       }
     },
     {
       "id": "gc-093",
       "title": "Candidate sundown town supported only by preliminary evidence \u2014 scenario 3",
       "synthetic": true,
-      "categories": [
-        "sundown_town_candidate"
-      ],
+      "categories": ["sundown_town_candidate"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2668,18 +2278,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-093"
-        ]
+        "lineageRootIds": ["lineage-gc-093"]
       }
     },
     {
       "id": "gc-094",
       "title": "Candidate sundown town supported only by preliminary evidence \u2014 scenario 4",
       "synthetic": true,
-      "categories": [
-        "sundown_town_candidate"
-      ],
+      "categories": ["sundown_town_candidate"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2696,18 +2302,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-094"
-        ]
+        "lineageRootIds": ["lineage-gc-094"]
       }
     },
     {
       "id": "gc-095",
       "title": "Candidate sundown town supported only by preliminary evidence \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "sundown_town_candidate"
-      ],
+      "categories": ["sundown_town_candidate"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2724,18 +2326,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-095"
-        ]
+        "lineageRootIds": ["lineage-gc-095"]
       }
     },
     {
       "id": "gc-096",
       "title": "Candidate sundown town supported only by preliminary evidence \u2014 scenario 6",
       "synthetic": true,
-      "categories": [
-        "sundown_town_candidate"
-      ],
+      "categories": ["sundown_town_candidate"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2752,18 +2350,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-096"
-        ]
+        "lineageRootIds": ["lineage-gc-096"]
       }
     },
     {
       "id": "gc-097",
       "title": "Candidate sundown town supported only by preliminary evidence \u2014 scenario 7",
       "synthetic": true,
-      "categories": [
-        "sundown_town_candidate"
-      ],
+      "categories": ["sundown_town_candidate"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2780,18 +2374,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-097"
-        ]
+        "lineageRootIds": ["lineage-gc-097"]
       }
     },
     {
       "id": "gc-098",
       "title": "Candidate sundown town supported only by preliminary evidence \u2014 scenario 8",
       "synthetic": true,
-      "categories": [
-        "sundown_town_candidate"
-      ],
+      "categories": ["sundown_town_candidate"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2808,18 +2398,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-098"
-        ]
+        "lineageRootIds": ["lineage-gc-098"]
       }
     },
     {
       "id": "gc-099",
       "title": "Candidate sundown town supported only by preliminary evidence \u2014 scenario 9",
       "synthetic": true,
-      "categories": [
-        "sundown_town_candidate"
-      ],
+      "categories": ["sundown_town_candidate"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2836,18 +2422,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-099"
-        ]
+        "lineageRootIds": ["lineage-gc-099"]
       }
     },
     {
       "id": "gc-100",
       "title": "Candidate sundown town supported only by preliminary evidence \u2014 scenario 10",
       "synthetic": true,
-      "categories": [
-        "sundown_town_candidate"
-      ],
+      "categories": ["sundown_town_candidate"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2864,18 +2446,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-100"
-        ]
+        "lineageRootIds": ["lineage-gc-100"]
       }
     },
     {
       "id": "gc-101",
       "title": "Ambiguous place name shared by multiple jurisdictions \u2014 scenario 1",
       "synthetic": true,
-      "categories": [
-        "geographic_ambiguity"
-      ],
+      "categories": ["geographic_ambiguity"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2892,18 +2470,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-101"
-        ]
+        "lineageRootIds": ["lineage-gc-101"]
       }
     },
     {
       "id": "gc-102",
       "title": "Ambiguous place name shared by multiple jurisdictions \u2014 scenario 2",
       "synthetic": true,
-      "categories": [
-        "geographic_ambiguity"
-      ],
+      "categories": ["geographic_ambiguity"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2920,18 +2494,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-102"
-        ]
+        "lineageRootIds": ["lineage-gc-102"]
       }
     },
     {
       "id": "gc-103",
       "title": "Ambiguous place name shared by multiple jurisdictions \u2014 scenario 3",
       "synthetic": true,
-      "categories": [
-        "geographic_ambiguity"
-      ],
+      "categories": ["geographic_ambiguity"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2948,18 +2518,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-103"
-        ]
+        "lineageRootIds": ["lineage-gc-103"]
       }
     },
     {
       "id": "gc-104",
       "title": "Ambiguous place name shared by multiple jurisdictions \u2014 scenario 4",
       "synthetic": true,
-      "categories": [
-        "geographic_ambiguity"
-      ],
+      "categories": ["geographic_ambiguity"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -2976,18 +2542,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-104"
-        ]
+        "lineageRootIds": ["lineage-gc-104"]
       }
     },
     {
       "id": "gc-105",
       "title": "Ambiguous place name shared by multiple jurisdictions \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "geographic_ambiguity"
-      ],
+      "categories": ["geographic_ambiguity"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -3004,18 +2566,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-105"
-        ]
+        "lineageRootIds": ["lineage-gc-105"]
       }
     },
     {
       "id": "gc-106",
       "title": "Ambiguous place name shared by multiple jurisdictions \u2014 scenario 6",
       "synthetic": true,
-      "categories": [
-        "geographic_ambiguity"
-      ],
+      "categories": ["geographic_ambiguity"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -3032,18 +2590,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-106"
-        ]
+        "lineageRootIds": ["lineage-gc-106"]
       }
     },
     {
       "id": "gc-107",
       "title": "Ambiguous place name shared by multiple jurisdictions \u2014 scenario 7",
       "synthetic": true,
-      "categories": [
-        "geographic_ambiguity"
-      ],
+      "categories": ["geographic_ambiguity"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -3060,18 +2614,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-107"
-        ]
+        "lineageRootIds": ["lineage-gc-107"]
       }
     },
     {
       "id": "gc-108",
       "title": "Ambiguous place name shared by multiple jurisdictions \u2014 scenario 8",
       "synthetic": true,
-      "categories": [
-        "geographic_ambiguity"
-      ],
+      "categories": ["geographic_ambiguity"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -3088,18 +2638,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-108"
-        ]
+        "lineageRootIds": ["lineage-gc-108"]
       }
     },
     {
       "id": "gc-109",
       "title": "Ambiguous place name shared by multiple jurisdictions \u2014 scenario 9",
       "synthetic": true,
-      "categories": [
-        "geographic_ambiguity"
-      ],
+      "categories": ["geographic_ambiguity"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -3116,18 +2662,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-109"
-        ]
+        "lineageRootIds": ["lineage-gc-109"]
       }
     },
     {
       "id": "gc-110",
       "title": "Ambiguous place name shared by multiple jurisdictions \u2014 scenario 10",
       "synthetic": true,
-      "categories": [
-        "geographic_ambiguity"
-      ],
+      "categories": ["geographic_ambiguity"],
       "subjectType": "place",
       "adjudication": {
         "relevance": "supporting_context",
@@ -3144,18 +2686,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": true,
-        "lineageRootIds": [
-          "lineage-gc-110"
-        ]
+        "lineageRootIds": ["lineage-gc-110"]
       }
     },
     {
       "id": "gc-111",
       "title": "Source set requiring syndicated-lineage deduplication \u2014 scenario 1",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",
@@ -3173,19 +2711,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-111-a",
-          "lineage-gc-111-b"
-        ]
+        "lineageRootIds": ["lineage-gc-111-a", "lineage-gc-111-b"]
       }
     },
     {
       "id": "gc-112",
       "title": "Source set requiring syndicated-lineage deduplication \u2014 scenario 2",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",
@@ -3203,18 +2736,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-112-shared"
-        ]
+        "lineageRootIds": ["lineage-gc-112-shared"]
       }
     },
     {
       "id": "gc-113",
       "title": "Source set requiring syndicated-lineage deduplication \u2014 scenario 3",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",
@@ -3232,19 +2761,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-113-a",
-          "lineage-gc-113-b"
-        ]
+        "lineageRootIds": ["lineage-gc-113-a", "lineage-gc-113-b"]
       }
     },
     {
       "id": "gc-114",
       "title": "Source set requiring syndicated-lineage deduplication \u2014 scenario 4",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",
@@ -3262,18 +2786,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-114-shared"
-        ]
+        "lineageRootIds": ["lineage-gc-114-shared"]
       }
     },
     {
       "id": "gc-115",
       "title": "Source set requiring syndicated-lineage deduplication \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",
@@ -3291,19 +2811,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-115-a",
-          "lineage-gc-115-b"
-        ]
+        "lineageRootIds": ["lineage-gc-115-a", "lineage-gc-115-b"]
       }
     },
     {
       "id": "gc-116",
       "title": "Source set requiring syndicated-lineage deduplication \u2014 scenario 6",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",
@@ -3321,18 +2836,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-116-shared"
-        ]
+        "lineageRootIds": ["lineage-gc-116-shared"]
       }
     },
     {
       "id": "gc-117",
       "title": "Source set requiring syndicated-lineage deduplication \u2014 scenario 7",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",
@@ -3350,19 +2861,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-117-a",
-          "lineage-gc-117-b"
-        ]
+        "lineageRootIds": ["lineage-gc-117-a", "lineage-gc-117-b"]
       }
     },
     {
       "id": "gc-118",
       "title": "Source set requiring syndicated-lineage deduplication \u2014 scenario 8",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",
@@ -3380,18 +2886,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-118-shared"
-        ]
+        "lineageRootIds": ["lineage-gc-118-shared"]
       }
     },
     {
       "id": "gc-119",
       "title": "Source set requiring syndicated-lineage deduplication \u2014 scenario 9",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",
@@ -3409,19 +2911,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-119-a",
-          "lineage-gc-119-b"
-        ]
+        "lineageRootIds": ["lineage-gc-119-a", "lineage-gc-119-b"]
       }
     },
     {
       "id": "gc-120",
       "title": "Source set requiring syndicated-lineage deduplication \u2014 scenario 10",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",
@@ -3439,18 +2936,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-120-shared"
-        ]
+        "lineageRootIds": ["lineage-gc-120-shared"]
       }
     },
     {
       "id": "gc-121",
       "title": "Apparent independent corroboration collapses under shared RDAP registrant \u2014 Sybil scenario 1",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",
@@ -3468,20 +2961,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-121-a",
-          "lineage-gc-121-b",
-          "lineage-gc-121-c"
-        ]
+        "lineageRootIds": ["lineage-gc-121-a", "lineage-gc-121-b", "lineage-gc-121-c"]
       }
     },
     {
       "id": "gc-122",
       "title": "Apparent independent corroboration collapses under shared ASN and nameserver infrastructure \u2014 Sybil scenario 2",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",
@@ -3499,20 +2986,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-122-a",
-          "lineage-gc-122-b",
-          "lineage-gc-122-c"
-        ]
+        "lineageRootIds": ["lineage-gc-122-a", "lineage-gc-122-b", "lineage-gc-122-c"]
       }
     },
     {
       "id": "gc-123",
       "title": "Coordinated co-registration and near-simultaneous publication fail the top-tier-source gate \u2014 Sybil scenario 3",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "supporting_context",
@@ -3529,19 +3010,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-123-a",
-          "lineage-gc-123-b"
-        ]
+        "lineageRootIds": ["lineage-gc-123-a", "lineage-gc-123-b"]
       }
     },
     {
       "id": "gc-124",
       "title": "Freshly first-seen domains manufacture apparent corroboration at announcement \u2014 Sybil scenario 4",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "supporting_context",
@@ -3558,19 +3034,14 @@
         "livingPerson": false,
         "privateResidence": false,
         "geographicAmbiguity": false,
-        "lineageRootIds": [
-          "lineage-gc-124-a",
-          "lineage-gc-124-b"
-        ]
+        "lineageRootIds": ["lineage-gc-124-a", "lineage-gc-124-b"]
       }
     },
     {
       "id": "gc-125",
       "title": "Genuine independent corroboration with one archival source survives Sybil screening \u2014 scenario 5",
       "synthetic": true,
-      "categories": [
-        "source_lineage"
-      ],
+      "categories": ["source_lineage"],
       "subjectType": "source_lineage",
       "adjudication": {
         "relevance": "include",

@@ -34,7 +34,11 @@ export type GeocodeResolution = {
   readonly precision: GeocodePrecisionResult;
 };
 
-export type GeocodeSuccess = { readonly ok: true; readonly resolution: GeocodeResolution; readonly cacheHit: boolean };
+export type GeocodeSuccess = {
+  readonly ok: true;
+  readonly resolution: GeocodeResolution;
+  readonly cacheHit: boolean;
+};
 export type GeocodeFailure = { readonly ok: false; readonly fallback: ManualPlaceSearchFallback };
 export type GeocodeOutcome = GeocodeSuccess | GeocodeFailure;
 
@@ -74,7 +78,10 @@ function expandCommonAbbreviations(text: string): string {
   });
 }
 
-function normalizeAddressInput(raw: string): { readonly queryText: string; readonly cacheKey: string } {
+function normalizeAddressInput(raw: string): {
+  readonly queryText: string;
+  readonly cacheKey: string;
+} {
   const queryText = expandCommonAbbreviations(normalizeAddressText(raw));
   return { queryText, cacheKey: `addr:${queryText.toUpperCase()}` };
 }
@@ -83,7 +90,10 @@ function coordinateCacheKey(lat: number, lng: number): string {
   return `coord:${(Math.round(lat * 10_000) / 10_000).toFixed(4)},${(Math.round(lng * 10_000) / 10_000).toFixed(4)}`;
 }
 
-function toResolution(match: CensusGeocodeMatch, retainExactCoordinates: boolean): GeocodeResolution {
+function toResolution(
+  match: CensusGeocodeMatch,
+  retainExactCoordinates: boolean,
+): GeocodeResolution {
   const jurisdictionIds = resolveJurisdictionIdsFromMatch(match);
   const tier = geoPrecisionTierForMatch(match);
   const precision = reduceGeocodeCoordinatePrecision({ match, tier, retainExactCoordinates });
@@ -201,7 +211,9 @@ export type ReverseGeocodeOptions = {
 };
 
 /** Reverse geocode: browser-supplied lat/lng -> jurisdiction ids, or a manual-search fallback.  */
-export async function reverseGeocodeCoordinates(options: ReverseGeocodeOptions): Promise<GeocodeOutcome> {
+export async function reverseGeocodeCoordinates(
+  options: ReverseGeocodeOptions,
+): Promise<GeocodeOutcome> {
   const nowMs = options.now?.() ?? Date.now();
   const cacheKey = coordinateCacheKey(options.lat, options.lng);
   const cached = options.cache.get(cacheKey, nowMs);

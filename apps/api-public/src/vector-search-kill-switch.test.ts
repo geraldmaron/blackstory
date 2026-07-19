@@ -3,7 +3,10 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { evaluateVectorSearchKillSwitch, VECTOR_SEARCH_KILL_SWITCH_ID } from './vector-search-kill-switch.ts';
+import {
+  evaluateVectorSearchKillSwitch,
+  VECTOR_SEARCH_KILL_SWITCH_ID,
+} from './vector-search-kill-switch.ts';
 
 test('vector search is allowed with an empty kill-switch snapshot (safe default)', () => {
   const decision = evaluateVectorSearchKillSwitch({});

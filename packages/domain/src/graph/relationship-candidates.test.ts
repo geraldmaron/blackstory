@@ -89,7 +89,10 @@ test('proposeRelationshipCandidates proposes mutual mentions and skips existing 
     ),
     false,
   );
-  assert.equal(candidates.some((candidate) => candidate.reason === 'mutual_mention'), true);
+  assert.equal(
+    candidates.some((candidate) => candidate.reason === 'mutual_mention'),
+    true,
+  );
 });
 
 test('proposeRelationshipCandidates prefers occurred_at when an event shares a geohash prefix', () => {

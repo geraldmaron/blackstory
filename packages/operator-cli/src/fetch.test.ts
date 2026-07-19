@@ -1,4 +1,3 @@
-
 /**
  * Verifies the real DNS-resolve + pinned-transport dependencies (against a local loopback
  * server no external network required) and the pure citation-prefill capture-plan helpers.

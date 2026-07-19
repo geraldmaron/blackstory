@@ -33,7 +33,12 @@ export const US_STATES: readonly UsStateInfo[] = [
   { fips: '08', postalCode: 'CO', name: 'Colorado', bbox: [-109.1, 37.0, -102.0, 41.0] },
   { fips: '09', postalCode: 'CT', name: 'Connecticut', bbox: [-73.8, 40.95, -71.75, 42.05] },
   { fips: '10', postalCode: 'DE', name: 'Delaware', bbox: [-75.8, 38.4, -75.0, 39.85] },
-  { fips: '11', postalCode: 'DC', name: 'District of Columbia', bbox: [-77.12, 38.79, -76.9, 39.0] },
+  {
+    fips: '11',
+    postalCode: 'DC',
+    name: 'District of Columbia',
+    bbox: [-77.12, 38.79, -76.9, 39.0],
+  },
   { fips: '12', postalCode: 'FL', name: 'Florida', bbox: [-87.65, 24.4, -80.0, 31.0] },
   { fips: '13', postalCode: 'GA', name: 'Georgia', bbox: [-85.7, 30.35, -80.8, 35.0] },
   { fips: '15', postalCode: 'HI', name: 'Hawaii', bbox: [-160.3, 18.9, -154.8, 22.3] },

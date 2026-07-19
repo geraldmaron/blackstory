@@ -1,4 +1,3 @@
-
 /**
  * Tests for the ACS 5-year loads (`runAcsCountyLoad`, `runAcsTractLoad`). Injected fake
  * fetch replays the Census API's array-of-arrays shape including ACS sentinel values; no
@@ -63,9 +62,7 @@ function dataRow(
 
 function createFakeFetch(geo: 'county' | 'tract', rows: readonly (readonly (string | null)[])[]) {
   return async (url: string) => {
-    const payload = url.endsWith('/variables.json')
-      ? fakeVariablesJson()
-      : [header(geo), ...rows];
+    const payload = url.endsWith('/variables.json') ? fakeVariablesJson() : [header(geo), ...rows];
     return { ok: true, status: 200, json: async () => payload };
   };
 }
@@ -149,10 +146,10 @@ test('negative ACS sentinels land in suppressed, never in estimates', async () =
   const doc = writer.store.get('48301_2024')!;
   assert.equal(doc.estimates.medianHouseholdIncomeBlack, undefined);
   assert.equal(doc.estimates.medianHouseholdIncome, undefined);
-  assert.deepEqual(
-    [...doc.suppressed].sort(),
-    ['medianHouseholdIncome', 'medianHouseholdIncomeBlack'],
-  );
+  assert.deepEqual([...doc.suppressed].sort(), [
+    'medianHouseholdIncome',
+    'medianHouseholdIncomeBlack',
+  ]);
   assert.equal(doc.estimates.totalPopulation, 100);
 });
 
@@ -182,7 +179,11 @@ test('tract load fans out per state, keys docs by 11-digit GEOID, carries tractV
       return { ok: true, status: 200, json: async () => fakeVariablesJson() };
     }
     const state = /in=state%3A(\d{2})/.exec(url)?.[1] ?? '';
-    return { ok: true, status: 200, json: async () => [header('tract'), ...(byState[state] ?? [])] };
+    return {
+      ok: true,
+      status: 200,
+      json: async () => [header('tract'), ...(byState[state] ?? [])],
+    };
   };
 
   const summary = await runAcsTractLoad({

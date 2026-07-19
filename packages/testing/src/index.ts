@@ -1,4 +1,3 @@
-
 /**
  * Shared test builders, guards, harnesses, and deterministic helpers for BlackStory.
  * Expanded under for multi-layer automated quality foundations.

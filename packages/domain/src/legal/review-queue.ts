@@ -46,7 +46,9 @@ export type LegalReviewQueueEvent = {
   readonly status: ReviewQueueStatus;
 };
 
-export function reviewQueueDedupeKey(event: Pick<LegalReviewQueueEvent, 'source' | 'externalId' | 'evidence'>): string {
+export function reviewQueueDedupeKey(
+  event: Pick<LegalReviewQueueEvent, 'source' | 'externalId' | 'evidence'>,
+): string {
   const hash = event.evidence.changeHashNew ?? '';
   return `${event.source}:${event.externalId}:${hash}`;
 }

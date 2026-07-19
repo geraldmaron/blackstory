@@ -72,7 +72,9 @@ export type ExploreViewState = {
   readonly showKey: boolean;
 };
 
-export type RawExploreSearchParams = Readonly<Record<string, string | readonly string[] | undefined>>;
+export type RawExploreSearchParams = Readonly<
+  Record<string, string | readonly string[] | undefined>
+>;
 
 function firstValue(raw: string | readonly string[] | undefined): string | undefined {
   if (raw === undefined) return undefined;
@@ -107,7 +109,10 @@ function parseLayerMode(raw: RawExploreSearchParams): ExploreLayerMode {
   return 'off';
 }
 
-function parsePopulationDecade(raw: string | undefined, fallback: CensusPopulationDecade): CensusPopulationDecade {
+function parsePopulationDecade(
+  raw: string | undefined,
+  fallback: CensusPopulationDecade,
+): CensusPopulationDecade {
   const trimmed = raw?.trim();
   return trimmed && isCensusPopulationDecade(trimmed) ? trimmed : fallback;
 }
@@ -169,13 +174,17 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const groupOn = groupRaw === '1' || groupRaw === 'true';
 
   const popDecade =
-    layerMode === 'blackShare' ? parsePopulationDecade(popDecadeRaw, DEFAULT_POPULATION_DECADE) : undefined;
+    layerMode === 'blackShare'
+      ? parsePopulationDecade(popDecadeRaw, DEFAULT_POPULATION_DECADE)
+      : undefined;
   const popFrom =
     layerMode === 'blackChange'
       ? parsePopulationDecade(popFromRaw, DEFAULT_POPULATION_CHANGE_FROM)
       : undefined;
   const popTo =
-    layerMode === 'blackChange' ? parsePopulationDecade(popToRaw, DEFAULT_POPULATION_CHANGE_TO) : undefined;
+    layerMode === 'blackChange'
+      ? parsePopulationDecade(popToRaw, DEFAULT_POPULATION_CHANGE_TO)
+      : undefined;
   const { showFilters, showResults, showKey } = parseHidePanels(raw);
 
   return {
@@ -205,7 +214,8 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   const params = new URLSearchParams();
   if (state.filters.era !== DEFAULT_EXPLORE_FILTERS.era) params.set('era', state.filters.era);
   if (state.filters.kind !== DEFAULT_EXPLORE_FILTERS.kind) params.set('kind', state.filters.kind);
-  if (state.filters.theme !== DEFAULT_EXPLORE_FILTERS.theme) params.set('theme', state.filters.theme);
+  if (state.filters.theme !== DEFAULT_EXPLORE_FILTERS.theme)
+    params.set('theme', state.filters.theme);
   if (state.filters.confidence !== DEFAULT_EXPLORE_FILTERS.confidence) {
     params.set('confidence', state.filters.confidence);
   }
@@ -217,7 +227,11 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   if (state.selected) params.set('selected', state.selected);
   if (state.state) params.set('state', state.state);
   if (state.layerMode !== 'off') params.set('layerMode', state.layerMode);
-  if (state.layerMode === 'blackShare' && state.popDecade && state.popDecade !== DEFAULT_POPULATION_DECADE) {
+  if (
+    state.layerMode === 'blackShare' &&
+    state.popDecade &&
+    state.popDecade !== DEFAULT_POPULATION_DECADE
+  ) {
     params.set('popDecade', state.popDecade);
   }
   if (
@@ -227,7 +241,11 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   ) {
     params.set('popFrom', state.popFrom);
   }
-  if (state.layerMode === 'blackChange' && state.popTo && state.popTo !== DEFAULT_POPULATION_CHANGE_TO) {
+  if (
+    state.layerMode === 'blackChange' &&
+    state.popTo &&
+    state.popTo !== DEFAULT_POPULATION_CHANGE_TO
+  ) {
     params.set('popTo', state.popTo);
   }
   if (state.group) params.set('group', '1');

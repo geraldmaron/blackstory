@@ -1,4 +1,3 @@
-
 /**
  * Verifies operator-stamped audit events and paired outbox messages.
  */

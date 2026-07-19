@@ -1,4 +1,3 @@
-
 /**
  * Validates WCAG contrast for critical light/dark text and UI token pairs.
  */

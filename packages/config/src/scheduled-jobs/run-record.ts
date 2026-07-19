@@ -1,4 +1,3 @@
-
 /**
  * Job-run records generalize the research worker's run-health pattern (workers/research/src/
  * black_book_research/adapters/run_health.py, mirrored in packages/domain/src/adapters/

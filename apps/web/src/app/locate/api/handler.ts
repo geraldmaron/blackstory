@@ -113,7 +113,14 @@ export async function handleLocateRequest(
     }
     const lat = Number.parseFloat(latParam);
     const lng = Number.parseFloat(lngParam);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    if (
+      !Number.isFinite(lat) ||
+      !Number.isFinite(lng) ||
+      lat < -90 ||
+      lat > 90 ||
+      lng < -180 ||
+      lng > 180
+    ) {
       return jsonError(400, 'invalid_locate_query', { reason: 'coordinates_out_of_range' });
     }
 
@@ -121,7 +128,9 @@ export async function handleLocateRequest(
       lat,
       lng,
       cache: deps.cache,
-      ...(deps.fetchCoordinatesGeocode ? { fetchCoordinatesGeocode: deps.fetchCoordinatesGeocode } : {}),
+      ...(deps.fetchCoordinatesGeocode
+        ? { fetchCoordinatesGeocode: deps.fetchCoordinatesGeocode }
+        : {}),
     });
     return NextResponse.json(outcome, { status: 200 });
   } finally {

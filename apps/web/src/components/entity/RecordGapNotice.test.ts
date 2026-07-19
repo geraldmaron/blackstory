@@ -17,6 +17,10 @@ for (const kind of KINDS) {
     const copy = RECORD_GAP_COPY[kind];
     assert.match(html, /role="status"/);
     assert.match(html, new RegExp(copy.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-    assert.doesNotMatch(html, /no history/i, 'gap copy must frame research incompleteness, not history absence');
+    assert.doesNotMatch(
+      html,
+      /no history/i,
+      'gap copy must frame research incompleteness, not history absence',
+    );
   });
 }

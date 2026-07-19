@@ -124,10 +124,10 @@ test('color key includes share tiers when blackShare layer is active', () => {
 
 test('kind and tone swatches are aria-hidden (the accessible content is the adjacent text)', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  const glyphSwatchCount = (html.match(/class="ds-legend-glyph[^"]*"[^>]*aria-hidden="true"/g) ?? [])
-    .length;
+  const glyphSwatchCount = (
+    html.match(/class="ds-legend-glyph[^"]*"[^>]*aria-hidden="true"/g) ?? []
+  ).length;
   // Color key + Reading this map each list kinds and tones (2× each vocabulary).
-  const expected =
-    KIND_ENCODING_ENTRIES.length * 2 + SEMANTIC_TONE_ENTRIES.length * 2;
+  const expected = KIND_ENCODING_ENTRIES.length * 2 + SEMANTIC_TONE_ENTRIES.length * 2;
   assert.equal(glyphSwatchCount, expected);
 });

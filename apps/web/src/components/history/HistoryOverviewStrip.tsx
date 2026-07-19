@@ -30,16 +30,17 @@ function sampleDecadeDensity(
   return source.slice(-MAX_DENSITY_BARS);
 }
 
-export function HistoryOverviewStrip({ overview, activeDecade, className }: HistoryOverviewStripProps) {
+export function HistoryOverviewStrip({
+  overview,
+  activeDecade,
+  className,
+}: HistoryOverviewStripProps) {
   const maxKindCount = overview.kindCounts.reduce((max, entry) => Math.max(max, entry.count), 0);
   const densityBars = sampleDecadeDensity(overview.decadeDensity);
   const maxDensityCount = densityBars.reduce((max, entry) => Math.max(max, entry.count), 0);
 
   return (
-    <section
-      className={cx('ds-history-overview', className)}
-      aria-label="History browse overview"
-    >
+    <section className={cx('ds-history-overview', className)} aria-label="History browse overview">
       <dl className="ds-history-overview__stats">
         <div className="ds-history-overview__stat">
           <dt className="ds-history-overview__stat-label">Records in view</dt>
@@ -84,11 +85,7 @@ export function HistoryOverviewStrip({ overview, activeDecade, className }: Hist
                     </span>
                     <span className="ds-history-overview__kind-count">{entry.count}</span>
                   </span>
-                  <span
-                    className="ds-history-overview__kind-bar"
-                    role="img"
-                    aria-label={barLabel}
-                  >
+                  <span className="ds-history-overview__kind-bar" role="img" aria-label={barLabel}>
                     <span
                       className="ds-history-overview__kind-bar-fill"
                       style={{ width: `${widthPercent}%`, background: encoding.shade }}

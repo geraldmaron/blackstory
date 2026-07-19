@@ -123,9 +123,13 @@ test('full demo fixture set through the real redaction pipeline: no raw resident
   for (const entity of MAP_SOURCE_DEMO_FIXTURES) {
     const loc = entity.location;
     if (!loc || loc.lat === undefined || loc.lng === undefined) continue;
-    const precisionIsResidential = ['residence', 'street_address', 'unit', 'parcel', 'exact_coordinates'].includes(
-      loc.precision,
-    );
+    const precisionIsResidential = [
+      'residence',
+      'street_address',
+      'unit',
+      'parcel',
+      'exact_coordinates',
+    ].includes(loc.precision);
     if (!precisionIsResidential) continue;
     // Any fixture whose *source* precision was residential-shaped must never
     // contribute its raw coordinate to the output, regardless of livingStatus.
@@ -143,9 +147,7 @@ test('full demo fixture set through the real redaction pipeline: no raw resident
 
   // Sanity: the non-residential, non-sensitive fixtures still pass through
   // recognizably (proves this isn't a redactor that hides everything).
-  const dcFeature = result.featureCollection.features.find(
-    (f) => f.id === 'ent_fixture_place_dc',
-  );
+  const dcFeature = result.featureCollection.features.find((f) => f.id === 'ent_fixture_place_dc');
   assert.ok(dcFeature);
   assert.equal(dcFeature.properties.precision, 'city');
 });

@@ -1,4 +1,3 @@
-
 /**
  * Shared domain fixture shapes used by test data builders.
  * Aligned with @repo/domain entity kinds; builders remain test-only.
@@ -69,12 +68,7 @@ export interface EvidenceFixture {
   excerpt: string;
   excerptKind?: 'none' | 'short' | 'substantial';
   rightsStatus?:
-    | 'unknown'
-    | 'public_domain'
-    | 'licensed'
-    | 'fair_use'
-    | 'restricted'
-    | 'prohibited';
+    'unknown' | 'public_domain' | 'licensed' | 'fair_use' | 'restricted' | 'prohibited';
   confidence: number;
   capturedAt: string;
   page?: string;

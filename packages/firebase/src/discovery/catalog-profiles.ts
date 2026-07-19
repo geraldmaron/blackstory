@@ -5,7 +5,12 @@
  * entities — new evidence about existing people/places is research-worthy. Load is capped
  * and opt-in via DISCOVERY_CATALOG_FROM=firestore.
  */
-import { isEntityKind, type CanonicalEntity, type EntityKind, type ResolutionProfile } from '@repo/domain';
+import {
+  isEntityKind,
+  type CanonicalEntity,
+  type EntityKind,
+  type ResolutionProfile,
+} from '@repo/domain';
 import type { Firestore } from 'firebase-admin/firestore';
 
 export const DISCOVERY_CATALOG_PROFILE_DEFAULT_MAX = 500 as const;
@@ -24,10 +29,7 @@ export type DiscoveryCatalogPage = {
 };
 
 export type DiscoveryCatalogPager = {
-  page(input: {
-    readonly limit: number;
-    readonly cursor?: string;
-  }): Promise<DiscoveryCatalogPage>;
+  page(input: { readonly limit: number; readonly cursor?: string }): Promise<DiscoveryCatalogPage>;
 };
 
 type LooseSearchIndexRow = {
@@ -64,7 +66,9 @@ export function resolutionProfileFromPublicSearchIndex(
 }
 
 function stringArray(value: unknown): string[] {
-  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string')
+    : [];
 }
 
 /** Normalize a Firestore (or test double) row into a catalog leaf when possible. */
@@ -129,10 +133,7 @@ export async function loadDiscoveryCatalogProfiles(input: {
 
     if (profiles.length >= maxProfiles) {
       // Cap hit: truncated if this page had leftover docs or another page exists.
-      truncated =
-        page.docs.length > remaining ||
-        page.nextCursor !== undefined ||
-        truncated;
+      truncated = page.docs.length > remaining || page.nextCursor !== undefined || truncated;
       break;
     }
     if (page.nextCursor === undefined || page.docs.length === 0) {
@@ -171,9 +172,7 @@ export function createPublicSearchIndexCatalogPager(query: {
       const last = snap.docs[snap.docs.length - 1];
       return {
         docs,
-        ...(last !== undefined && snap.docs.length >= input.limit
-          ? { nextCursor: last.id }
-          : {}),
+        ...(last !== undefined && snap.docs.length >= input.limit ? { nextCursor: last.id } : {}),
       };
     },
   };
@@ -188,10 +187,7 @@ export function createFirestorePublicSearchIndexCatalogPager(
 ): DiscoveryCatalogPager {
   return createPublicSearchIndexCatalogPager({
     async page(input) {
-      let query = firestore
-        .collection('publicSearchIndex')
-        .orderBy('__name__')
-        .limit(input.limit);
+      let query = firestore.collection('publicSearchIndex').orderBy('__name__').limit(input.limit);
       if (input.cursor !== undefined && input.cursor.length > 0) {
         query = query.startAfter(input.cursor);
       }

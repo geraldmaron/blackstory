@@ -1,4 +1,3 @@
-
 /**
  * Native filter controls (fieldset + labelled inputs) for result refinement.
  */
@@ -63,7 +62,9 @@ export function FilterBar({
       method={method}
       action={action}
       onSubmit={handleSubmit}
-    >      <fieldset className="ds-filters__fieldset">
+    >
+      {' '}
+      <fieldset className="ds-filters__fieldset">
         <legend className="ds-filters__legend">{legend}</legend>
         <div className="ds-filters__fields">
           {fields.map((field) => (

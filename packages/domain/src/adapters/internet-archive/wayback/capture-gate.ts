@@ -4,7 +4,11 @@
  * become "review eligible" without first awaiting a real capture and validating the resulting
  * pointer against the evidence-pointer doctrine (../../../rights/evidence-pointer.ts).
  */
-import { assertEvidencePointerValid, buildEvidencePointer, type EvidencePointer } from '../../../rights/evidence-pointer.js';
+import {
+  assertEvidencePointerValid,
+  buildEvidencePointer,
+  type EvidencePointer,
+} from '../../../rights/evidence-pointer.js';
 import { mapWithConcurrency, type SafeHttpClient } from '../shared/http-port.js';
 import { buildWaybackCaptureUrl, pollSpnStatus, submitSpnCapture } from './client.js';
 import type { SpnCredentials } from './types.js';
@@ -42,7 +46,10 @@ export async function captureUrlToEvidencePointer(input: {
     );
   }
 
-  const waybackCaptureUrl = buildWaybackCaptureUrl(status.timestamp, status.originalUrl ?? input.targetUrl);
+  const waybackCaptureUrl = buildWaybackCaptureUrl(
+    status.timestamp,
+    status.originalUrl ?? input.targetUrl,
+  );
   const capturedAtIso = parseWaybackTimestamp(status.timestamp) ?? input.now;
 
   return buildEvidencePointer({
@@ -108,7 +115,9 @@ export function assertReviewEligible(input: {
  * rejects or lacks a capturable URL a discovered URL either gets a real pointer or the run
  * surfaces the error, never a silently-missing pointer.
  */
-export async function requireCaptureForAllCandidates<TCandidate extends { readonly canonicalUrl?: string }>(
+export async function requireCaptureForAllCandidates<
+  TCandidate extends { readonly canonicalUrl?: string },
+>(
   candidates: readonly TCandidate[],
   input: {
     readonly client: SafeHttpClient;

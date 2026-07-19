@@ -7,7 +7,11 @@ import assert from 'node:assert/strict';
 import { generateKeyPairSync } from 'node:crypto';
 import { test } from 'node:test';
 import { sha256Bytes, sha256Json } from '../publication/index.js';
-import { DATA_PACK_SCHEMA_VERSION, signDataPackManifest, type DataPackManifest } from './manifest.js';
+import {
+  DATA_PACK_SCHEMA_VERSION,
+  signDataPackManifest,
+  type DataPackManifest,
+} from './manifest.js';
 import type { DataPackClaimRecord, DataPackEntityRecord } from './records.js';
 import { runDataPackImportPipeline, type DataPackResourcePayload } from './import-pipeline.js';
 
@@ -34,7 +38,12 @@ test('a full valid pack passes every stage and is accepted', () => {
     { externalId: 'ent-1', title: 'Example Site', topicIds: ['church'] },
   ];
   const claims: readonly DataPackClaimRecord[] = [
-    { externalId: 'claim-1', subjectExternalId: 'ent-1', predicate: 'founded_year', object: '1900' },
+    {
+      externalId: 'claim-1',
+      subjectExternalId: 'ent-1',
+      predicate: 'founded_year',
+      object: '1900',
+    },
   ];
 
   const manifest = baseManifest({
@@ -76,7 +85,12 @@ test('a full valid pack passes every stage and is accepted', () => {
     },
   ];
 
-  const result = runDataPackImportPipeline({ signedManifest, publicKey, budget: BUDGET, resources });
+  const result = runDataPackImportPipeline({
+    signedManifest,
+    publicKey,
+    budget: BUDGET,
+    resources,
+  });
 
   assert.equal(result.manifestOutcome, 'accepted');
   assert.deepEqual(result.manifestFindings, []);
@@ -85,7 +99,9 @@ test('a full valid pack passes every stage and is accepted', () => {
     assert.equal(resource.outcome, 'accepted');
     assert.deepEqual(resource.findings, []);
   }
-  assert.deepEqual(result.resources[0]!.namespacedIds, [{ namespace: 'example-dataset', externalId: 'ent-1' }]);
+  assert.deepEqual(result.resources[0]!.namespacedIds, [
+    { namespace: 'example-dataset', externalId: 'ent-1' },
+  ]);
 });
 
 test('checksum mismatch is surfaced as a per-resource finding and quarantines only that resource', () => {
@@ -130,14 +146,22 @@ test('checksum mismatch is surfaced as a per-resource finding and quarantines on
     },
   ];
 
-  const result = runDataPackImportPipeline({ signedManifest, publicKey, budget: BUDGET, resources });
+  const result = runDataPackImportPipeline({
+    signedManifest,
+    publicKey,
+    budget: BUDGET,
+    resources,
+  });
 
   assert.equal(result.manifestOutcome, 'accepted');
   const good = result.resources.find((resource) => resource.resourceName === 'good-entities')!;
   const bad = result.resources.find((resource) => resource.resourceName === 'bad-entities')!;
   assert.equal(good.outcome, 'accepted');
   assert.equal(bad.outcome, 'quarantined');
-  assert.equal(bad.findings.some((finding) => finding.stage === 'checksum'), true);
+  assert.equal(
+    bad.findings.some((finding) => finding.stage === 'checksum'),
+    true,
+  );
 });
 
 test('one resource with shape/vocabulary/reference failures is quarantined without blocking the rest of the batch', () => {
@@ -145,7 +169,11 @@ test('one resource with shape/vocabulary/reference failures is quarantined witho
   const badClaims: readonly DataPackClaimRecord[] = [
     // Missing predicate/object (shape failure), bad topic id (vocabulary failure), and a
     // subjectExternalId that resolves nowhere in the pack (reference-resolution failure).
-    { externalId: 'claim-bad', subjectExternalId: 'does-not-exist', topicIds: ['not-a-real-topic'] },
+    {
+      externalId: 'claim-bad',
+      subjectExternalId: 'does-not-exist',
+      topicIds: ['not-a-real-topic'],
+    },
   ];
 
   const manifest = baseManifest({
@@ -185,7 +213,12 @@ test('one resource with shape/vocabulary/reference failures is quarantined witho
     },
   ];
 
-  const result = runDataPackImportPipeline({ signedManifest, publicKey, budget: BUDGET, resources });
+  const result = runDataPackImportPipeline({
+    signedManifest,
+    publicKey,
+    budget: BUDGET,
+    resources,
+  });
 
   assert.equal(result.manifestOutcome, 'accepted');
   const entitiesResult = result.resources.find((resource) => resource.resourceName === 'entities')!;
@@ -201,7 +234,13 @@ test('signature verification failure rejects the whole batch and quarantines eve
   const entities: readonly DataPackEntityRecord[] = [{ externalId: 'ent-1', title: 'Example' }];
   const manifest = baseManifest({
     resources: [
-      { name: 'entities', path: 'entities.json', kind: 'entities', sha256: sha256Json(entities), byteSize: 10 },
+      {
+        name: 'entities',
+        path: 'entities.json',
+        kind: 'entities',
+        sha256: sha256Json(entities),
+        byteSize: 10,
+      },
     ],
   });
   const signedManifest = signDataPackManifest(manifest, {
@@ -209,7 +248,10 @@ test('signature verification failure rejects the whole batch and quarantines eve
     publicKeyId: 'datapack-key-1',
     privateKey,
   });
-  const tampered = { ...signedManifest, manifest: { ...signedManifest.manifest, datasetVersion: 'tampered' } };
+  const tampered = {
+    ...signedManifest,
+    manifest: { ...signedManifest.manifest, datasetVersion: 'tampered' },
+  };
 
   const resources: readonly DataPackResourcePayload[] = [
     {
@@ -227,7 +269,10 @@ test('signature verification failure rejects the whole batch and quarantines eve
   });
 
   assert.equal(result.manifestOutcome, 'rejected');
-  assert.equal(result.manifestFindings.some((finding) => finding.stage === 'signature'), true);
+  assert.equal(
+    result.manifestFindings.some((finding) => finding.stage === 'signature'),
+    true,
+  );
   assert.equal(result.resources[0]!.outcome, 'quarantined');
 });
 
@@ -235,7 +280,13 @@ test('budget rejection at the pipeline level rejects the whole batch', () => {
   const entities: readonly DataPackEntityRecord[] = [{ externalId: 'ent-1', title: 'Example' }];
   const manifest = baseManifest({
     resources: [
-      { name: 'entities', path: 'entities.json', kind: 'entities', sha256: sha256Json(entities), byteSize: 10 },
+      {
+        name: 'entities',
+        path: 'entities.json',
+        kind: 'entities',
+        sha256: sha256Json(entities),
+        byteSize: 10,
+      },
     ],
   });
   const signedManifest = signDataPackManifest(manifest, {
@@ -259,7 +310,10 @@ test('budget rejection at the pipeline level rejects the whole batch', () => {
   });
 
   assert.equal(result.manifestOutcome, 'rejected');
-  assert.equal(result.manifestFindings.some((finding) => finding.stage === 'budget'), true);
+  assert.equal(
+    result.manifestFindings.some((finding) => finding.stage === 'budget'),
+    true,
+  );
   assert.equal(result.resources[0]!.outcome, 'quarantined');
 });
 
@@ -268,7 +322,13 @@ test('license rejection at the pipeline level rejects the whole batch', () => {
   const manifest = baseManifest({
     license: { name: 'unknown terms', verdict: 'unverified' },
     resources: [
-      { name: 'entities', path: 'entities.json', kind: 'entities', sha256: sha256Json(entities), byteSize: 10 },
+      {
+        name: 'entities',
+        path: 'entities.json',
+        kind: 'entities',
+        sha256: sha256Json(entities),
+        byteSize: 10,
+      },
     ],
   });
   const signedManifest = signDataPackManifest(manifest, {
@@ -284,9 +344,17 @@ test('license rejection at the pipeline level rejects the whole batch', () => {
     },
   ];
 
-  const result = runDataPackImportPipeline({ signedManifest, publicKey, budget: BUDGET, resources });
+  const result = runDataPackImportPipeline({
+    signedManifest,
+    publicKey,
+    budget: BUDGET,
+    resources,
+  });
 
   assert.equal(result.manifestOutcome, 'rejected');
-  assert.equal(result.manifestFindings.some((finding) => finding.stage === 'license'), true);
+  assert.equal(
+    result.manifestFindings.some((finding) => finding.stage === 'license'),
+    true,
+  );
   assert.equal(result.resources[0]!.outcome, 'quarantined');
 });

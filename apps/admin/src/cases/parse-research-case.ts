@@ -159,12 +159,9 @@ export function parseResearchCaseRecord(
   id: string,
   data: Record<string, unknown>,
 ): { readonly record: ResearchCaseRecord; readonly placeHint?: string } | null {
-  const title =
-    typeof data.title === 'string' && data.title.trim() ? data.title.trim() : id;
+  const title = typeof data.title === 'string' && data.title.trim() ? data.title.trim() : id;
   const candidateId =
-    typeof data.candidateId === 'string' && data.candidateId.trim()
-      ? data.candidateId.trim()
-      : id;
+    typeof data.candidateId === 'string' && data.candidateId.trim() ? data.candidateId.trim() : id;
   const state = isState(data.state) ? data.state : 'candidate';
   const createdAt = typeof data.createdAt === 'string' ? data.createdAt : '';
   const updatedAt = typeof data.updatedAt === 'string' ? data.updatedAt : createdAt;

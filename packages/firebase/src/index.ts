@@ -1,4 +1,3 @@
-
 /**
  * Firebase client and Admin helpers shared across BlackStory surfaces.
  * Production project:. Local defaults: demo-repo emulators.

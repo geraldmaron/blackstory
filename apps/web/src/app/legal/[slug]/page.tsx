@@ -46,7 +46,8 @@ export default async function LegalDetailPage({ params }: LegalDetailPageProps) 
     <main className="ds-container ds-page" id="main">
       <header className="ds-entity-mast">
         <p className="ds-page__eyebrow">
-          {humanizeLegalKind(snapshot.kind)} · <span className="ds-mono">{snapshot.jurisdictionId}</span>
+          {humanizeLegalKind(snapshot.kind)} ·{' '}
+          <span className="ds-mono">{snapshot.jurisdictionId}</span>
         </p>
         <h1 className="ds-page__title">{snapshot.title}</h1>
         <p className="ds-page__lede">
@@ -67,7 +68,11 @@ export default async function LegalDetailPage({ params }: LegalDetailPageProps) 
           <Card>
             <p style={{ margin: 0 }}>
               Plain-language explainer pending editorial review. Primary source:{' '}
-              <a href={snapshot.citation.archive.sourceUrl} rel="noopener noreferrer" target="_blank">
+              <a
+                href={snapshot.citation.archive.sourceUrl}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
                 {snapshot.citation.archive.sourceUrl}
               </a>
             </p>
@@ -92,7 +97,11 @@ export default async function LegalDetailPage({ params }: LegalDetailPageProps) 
               <div>
                 <dt>Archived copy</dt>
                 <dd>
-                  <a href={snapshot.citation.archive.archivedCaptureUrl} rel="noopener noreferrer" target="_blank">
+                  <a
+                    href={snapshot.citation.archive.archivedCaptureUrl}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
                     View archived capture
                   </a>
                 </dd>

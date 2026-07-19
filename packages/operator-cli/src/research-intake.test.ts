@@ -1,4 +1,3 @@
-
 /**
  * Verifies the research-intake composition: fetch -> citation prefill -> capture plan -> draft
  * case, using an injected fake `SafeFetchDependencies` (no real network access, no external
@@ -81,9 +80,12 @@ test('a denied fetch never reaches intake — nothing is proposed', async () => 
   const outcome = await runResearchIntake(
     { url: 'https://archive.example.org/blocked' },
     context(),
-    { resolveHost: denyingResolver, transport: async () => {
-      throw new Error('transport must never be called for a denied destination');
-    } },
+    {
+      resolveHost: denyingResolver,
+      transport: async () => {
+        throw new Error('transport must never be called for a denied destination');
+      },
+    },
   );
   assert.equal(outcome.fetch.ok, false);
   assert.equal(outcome.intake, undefined);

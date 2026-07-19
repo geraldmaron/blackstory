@@ -153,10 +153,7 @@ export function publicEntitySnapshotPath(releaseId: string, entityId: string): s
   return `public/releases/${releaseId}/entities/${entityId}.json`;
 }
 
-export {
-  publicReleaseEntitiesListPath,
-  publicReleaseSearchIndexPath,
-} from './release-paths.js';
+export { publicReleaseEntitiesListPath, publicReleaseSearchIndexPath } from './release-paths.js';
 
 function manifestToJson(manifest: ReleaseManifest): JsonValue {
   return {

@@ -1,4 +1,3 @@
-
 /**
  * Validates GitHub repository governance artifacts and workflow policy.
  * Checks: required files, SHA-pinned actions, read-only permissions, forbidden events,

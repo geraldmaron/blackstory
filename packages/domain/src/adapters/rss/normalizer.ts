@@ -2,7 +2,10 @@
  * Normalize parsed RSS/Atom feed items into AdapterCandidateRecord output.
  */
 import { hashUtf8 } from '../../provenance/hashes.js';
-import { MAX_EVIDENCE_SNIPPET_CHARACTERS, MAX_EVIDENCE_SNIPPET_WORDS } from '../../rights/evidence-pointer.js';
+import {
+  MAX_EVIDENCE_SNIPPET_CHARACTERS,
+  MAX_EVIDENCE_SNIPPET_WORDS,
+} from '../../rights/evidence-pointer.js';
 import { stampCandidateProvenance } from '../candidates.js';
 import type { SourceRegistryEntry } from '../types.js';
 import type { FeedRegistryEntry } from './feed-registry.js';

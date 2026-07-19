@@ -25,7 +25,10 @@ export function preserveContradictoryValues(input: {
   const primary: PreservedClaimValue = {
     value: input.primaryValue,
     evidenceLinkIds: input.evidenceLinks
-      .filter((l) => l.role === 'supporting' && (l.assertedValue ?? input.primaryValue) === input.primaryValue)
+      .filter(
+        (l) =>
+          l.role === 'supporting' && (l.assertedValue ?? input.primaryValue) === input.primaryValue,
+      )
       .map((l) => l.id),
     credible: true,
     kind: 'primary',

@@ -8,7 +8,10 @@ import {
 } from '../provenance/source.js';
 import type { SourceRegistryEntry } from './types.js';
 
-const RUNNABLE_REGISTRY_STATES = new Set<SourceRegistryEntry['registryState']>(['approved', 'canary']);
+const RUNNABLE_REGISTRY_STATES = new Set<SourceRegistryEntry['registryState']>([
+  'approved',
+  'canary',
+]);
 
 export function canAdapterRun(
   entry: SourceRegistryEntry,
@@ -36,9 +39,7 @@ export function assertAdapterMayRun(
     );
   }
   if (!entry.approvedAt || !entry.approvedBy) {
-    throw new Error(
-      `Source adapter "${entry.contract.adapterId}" has no approved source policy`,
-    );
+    throw new Error(`Source adapter "${entry.contract.adapterId}" has no approved source policy`);
   }
   assertSourceAdapterCanCreateCandidates(entry.evidenceSource, killSwitch);
 }

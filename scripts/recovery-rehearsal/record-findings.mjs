@@ -34,7 +34,9 @@ function parseArgs(argv) {
     } else if (arg === '--json') {
       options.json = true;
     } else if (arg === '--help' || arg === '-h') {
-      console.log('Usage: record-findings.mjs [--dry-run] [--validate] [--report <file>] [--output <file>]');
+      console.log(
+        'Usage: record-findings.mjs [--dry-run] [--validate] [--report <file>] [--output <file>]',
+      );
       process.exit(0);
     } else {
       throw new Error(`Unknown argument: ${arg}`);
@@ -81,7 +83,13 @@ async function main() {
   const markdown = renderFindings(report, template);
 
   if (options.json) {
-    console.log(JSON.stringify({ ok: validation.ok, report: report.scenarioId, procedures: report.procedures.length }));
+    console.log(
+      JSON.stringify({
+        ok: validation.ok,
+        report: report.scenarioId,
+        procedures: report.procedures.length,
+      }),
+    );
     process.exit(0);
   }
 

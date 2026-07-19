@@ -34,7 +34,8 @@ export function jurisdictionsAreDisjoint(
   const pairs = input.knownDisjointPairs ?? [];
   return pairs.some(
     ([a, b]) =>
-      (a === jurisdictionIdA && b === jurisdictionIdB) || (a === jurisdictionIdB && b === jurisdictionIdA),
+      (a === jurisdictionIdA && b === jurisdictionIdB) ||
+      (a === jurisdictionIdB && b === jurisdictionIdA),
   );
 }
 
@@ -164,7 +165,8 @@ export function computeGrowthRecord(
   end: GrowthObservationInput,
 ): GrowthRecord {
   const absoluteChange = end.estimate - start.estimate;
-  const percentChange = start.estimate === 0 ? null : (absoluteChange / Math.abs(start.estimate)) * 100;
+  const percentChange =
+    start.estimate === 0 ? null : (absoluteChange / Math.abs(start.estimate)) * 100;
 
   const significanceResult: GrowthSignificanceResult =
     start.marginOfError === undefined || end.marginOfError === undefined

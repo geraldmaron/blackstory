@@ -12,7 +12,10 @@ import {
   truncateAndNormalize,
   EMBEDDING_DIMS,
 } from '@repo/firebase';
-import { createFindNearestEndpoint, type FindNearestHttpRequest } from './vector-search-endpoint.ts';
+import {
+  createFindNearestEndpoint,
+  type FindNearestHttpRequest,
+} from './vector-search-endpoint.ts';
 
 const ALLOWED_APP_CHECK: AppCheckDecision = {
   allowed: true,

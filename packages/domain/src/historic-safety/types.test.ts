@@ -55,7 +55,9 @@ test('assertLayerSignalValid rejects a value outside [0,1]', () => {
         placeEntityId: 'place_1',
         value: 1.5,
         asOf: '2026-01-01T00:00:00.000Z',
-        citations: [{ claimId: 'claim_1', sourceLabel: 'EJI', retrievedAt: '2026-01-01T00:00:00.000Z' }],
+        citations: [
+          { claimId: 'claim_1', sourceLabel: 'EJI', retrievedAt: '2026-01-01T00:00:00.000Z' },
+        ],
         methodologyNote: { layerId: 'documented_events', methodologyVersion: 'v1', summary: 'x' },
       }),
     RangeError,
@@ -71,7 +73,9 @@ test('assertLayerSignalValid rejects a mismatched methodologyNote.layerId', () =
         placeEntityId: 'place_1',
         value: 0.5,
         asOf: '2026-01-01T00:00:00.000Z',
-        citations: [{ claimId: 'claim_1', sourceLabel: 'EJI', retrievedAt: '2026-01-01T00:00:00.000Z' }],
+        citations: [
+          { claimId: 'claim_1', sourceLabel: 'EJI', retrievedAt: '2026-01-01T00:00:00.000Z' },
+        ],
         methodologyNote: { layerId: 'sundown_town', methodologyVersion: 'v1', summary: 'x' },
       }),
     /layerId/,
@@ -86,7 +90,9 @@ test('assertLayerSignalValid accepts a well-formed signal', () => {
       placeEntityId: 'place_1',
       value: 0.5,
       asOf: '2026-01-01T00:00:00.000Z',
-      citations: [{ claimId: 'claim_1', sourceLabel: 'EJI', retrievedAt: '2026-01-01T00:00:00.000Z' }],
+      citations: [
+        { claimId: 'claim_1', sourceLabel: 'EJI', retrievedAt: '2026-01-01T00:00:00.000Z' },
+      ],
       methodologyNote: { layerId: 'documented_events', methodologyVersion: 'v1', summary: 'x' },
     }),
   );

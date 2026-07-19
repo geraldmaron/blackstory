@@ -1,4 +1,3 @@
-
 /**
  * Verifies validation, immutable originals, spam scoring, and campaign detection.
  */

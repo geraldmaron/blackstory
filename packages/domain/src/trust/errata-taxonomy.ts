@@ -30,9 +30,7 @@ export const ERRATA_CHANGE_TYPE_LABELS: Readonly<Record<ErrataChangeType, string
  * Maps a fact-revision `changeType` to the errata taxonomy when the revision appears in the
  * public errata log. `style` revisions become `editors_note`; unknown values fail closed.
  */
-export function errataTypeFromFactRevisionChangeType(
-  changeType: string,
-): ErrataChangeType {
+export function errataTypeFromFactRevisionChangeType(changeType: string): ErrataChangeType {
   if (changeType === 'style') {
     return 'editors_note';
   }

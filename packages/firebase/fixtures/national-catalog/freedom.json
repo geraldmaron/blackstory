@@ -4,16 +4,8 @@
     "kind": "place",
     "displayName": "Cedar Hill (Frederick Douglass National Historic Site)",
     "summary": "In 1877 Frederick Douglass purchased Cedar Hill, an 8.5-acre Anacostia estate, defying a racially restrictive covenant to become the neighborhood's first Black homeowner. He lived and wrote there until his death in 1895; the National Park Service has preserved the house and grounds since 1988.",
-    "eraBuckets": [
-      "1870s",
-      "1880s",
-      "1890s"
-    ],
-    "topicTags": [
-      "abolition",
-      "freedom",
-      "preservation"
-    ],
+    "eraBuckets": ["1870s", "1880s", "1890s"],
+    "topicTags": ["abolition", "freedom", "preservation"],
     "jurisdictionLabel": "Washington, D.C.",
     "locationPrecision": "institution",
     "locationLabel": "Cedar Hill, Anacostia, Washington, D.C.",
@@ -38,11 +30,7 @@
       }
     ],
     "historicalContext": "As an elder statesman, Douglass used Cedar Hill to host suffragists, diplomats, and civil rights leaders while serving as U.S. Marshal and Recorder of Deeds for the District. His widow, Helen Pitts Douglass, and the National Association of Colored Women's Clubs preserved the estate after his death, laying groundwork for its 1962 designation as a National Historic Site.",
-    "topicIds": [
-      "abolition",
-      "freedom",
-      "preservation"
-    ],
+    "topicIds": ["abolition", "freedom", "preservation"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -51,16 +39,8 @@
     "kind": "place",
     "displayName": "Harriet Tubman Home for the Aged (Auburn, New York)",
     "summary": "In 1859 Harriet Tubman bought land on South Street in Auburn, New York, from Secretary of State William H. Seward, relocating her aging parents there while she continued Underground Railroad missions. In 1908 she opened the Harriet Tubman Home for the Aged on the same ground; she died there in 1913.",
-    "eraBuckets": [
-      "1850s",
-      "1900s",
-      "1910s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "freedom",
-      "community"
-    ],
+    "eraBuckets": ["1850s", "1900s", "1910s"],
+    "topicTags": ["underground-railroad", "freedom", "community"],
     "jurisdictionLabel": "Auburn, New York",
     "locationPrecision": "campus",
     "locationLabel": "Harriet Tubman Home for the Aged, South Street, Auburn",
@@ -85,11 +65,7 @@
       }
     ],
     "historicalContext": "Auburn's abolitionist and women's-suffrage circles, anchored by the Seward family, gave Tubman a base for her later decades of activism. In 2017 the National Park Service combined the Home for the Aged, the nearby Tubman Residence in Fleming, and the Thompson AME Zion Church parsonage into Harriet Tubman National Historical Park.",
-    "topicIds": [
-      "underground-railroad",
-      "freedom",
-      "community"
-    ],
+    "topicIds": ["underground-railroad", "freedom", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -98,16 +74,8 @@
     "kind": "place",
     "displayName": "Harriet Tubman Underground Railroad National Historical Park",
     "summary": "Harriet Tubman was born into slavery around 1822 in Dorchester County, Maryland, and escaped in 1849 before returning at least 13 times to guide roughly 70 enslaved people north. The 480-acre national historical park preserves this Eastern Shore landscape; its joint state-federal visitor center opened in March 2017.",
-    "eraBuckets": [
-      "1820s",
-      "1830s",
-      "1840s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "abolition",
-      "freedom"
-    ],
+    "eraBuckets": ["1820s", "1830s", "1840s"],
+    "topicTags": ["underground-railroad", "abolition", "freedom"],
     "jurisdictionLabel": "Church Creek, Maryland",
     "locationPrecision": "institution",
     "locationLabel": "Harriet Tubman Underground Railroad Visitor Center, Church Creek",
@@ -132,11 +100,7 @@
       }
     ],
     "historicalContext": "Managed jointly by the National Park Service and Maryland Park Service, the park's visitor center near Church Creek opened March 10, 2017, roughly 11 miles from Cambridge, and anchors the Harriet Tubman Underground Railroad Byway across the landscape Tubman knew as an enslaved young woman.",
-    "topicIds": [
-      "underground-railroad",
-      "abolition",
-      "freedom"
-    ],
+    "topicIds": ["underground-railroad", "abolition", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -145,15 +109,8 @@
     "kind": "place",
     "displayName": "Fort Mose Historic State Park",
     "summary": "In 1738 Spanish Florida's governor chartered Gracia Real de Santa Teresa de Mose as a free settlement for enslaved people who escaped the Carolinas, making it the first legally sanctioned free Black settlement in what is now the United States. A free Black militia under Captain Francisco Menéndez defended it in 1740.",
-    "eraBuckets": [
-      "1730s",
-      "1740s"
-    ],
-    "topicTags": [
-      "freedom",
-      "military",
-      "settlement"
-    ],
+    "eraBuckets": ["1730s", "1740s"],
+    "topicTags": ["freedom", "military", "settlement"],
     "jurisdictionLabel": "St. Augustine, Florida",
     "locationPrecision": "campus",
     "locationLabel": "Fort Mose Historic State Park, St. Augustine",
@@ -178,11 +135,7 @@
       }
     ],
     "historicalContext": "Fort Mose and Spanish St. Augustine functioned as a sanctuary for enslaved people fleeing English colonies for roughly 25 years. Designated a National Historic Landmark in 1994, the site's 1738 fort has since been reconstructed by the Florida Park Service following decades of archaeological research.",
-    "topicIds": [
-      "freedom",
-      "military",
-      "settlement"
-    ],
+    "topicIds": ["freedom", "military", "settlement"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -191,14 +144,8 @@
     "kind": "place",
     "displayName": "Emancipation Oak",
     "summary": "Under this live oak on September 17, 1861, Mary Smith Peake held the first classes for formerly enslaved people freed by the Union's 'contraband' policy at nearby Fort Monroe, defying Virginia's ban on educating Black residents. Local Black Virginians gathered here again in January 1863 for the region's first Southern reading of the Emancipation Proclamation.",
-    "eraBuckets": [
-      "1860s"
-    ],
-    "topicTags": [
-      "freedom",
-      "education",
-      "emancipation"
-    ],
+    "eraBuckets": ["1860s"],
+    "topicTags": ["freedom", "education", "emancipation"],
     "jurisdictionLabel": "Hampton, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Hampton University campus, Hampton",
@@ -235,11 +182,7 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "freedom",
-      "education",
-      "emancipation"
-    ],
+    "topicIds": ["freedom", "education", "emancipation"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -248,16 +191,8 @@
     "kind": "place",
     "displayName": "John P. Parker House",
     "summary": "John P. Parker purchased his freedom in 1845 and by 1853 owned this riverfront house in Ripley, Ohio, from which he crossed the Ohio River to guide enslaved people north for nearly two decades. He later founded the Phoenix Foundry and patented several inventions; the house became a National Historic Landmark in 1997.",
-    "eraBuckets": [
-      "1840s",
-      "1850s",
-      "1860s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "abolition",
-      "invention"
-    ],
+    "eraBuckets": ["1840s", "1850s", "1860s"],
+    "topicTags": ["underground-railroad", "abolition", "invention"],
     "jurisdictionLabel": "Ripley, Ohio",
     "locationPrecision": "institution",
     "locationLabel": "300 North Front Street, Ripley",
@@ -282,11 +217,7 @@
       }
     ],
     "historicalContext": "Parker's own account, later published as 'His Promised Land,' describes repeated river crossings into Kentucky to help enslaved people reach Ripley's Underground Railroad network alongside white abolitionist John Rankin. After emancipation Parker became a self-trained iron manufacturer, running the Phoenix Foundry and patenting a tobacco press and soil pulverizer.",
-    "topicIds": [
-      "underground-railroad",
-      "abolition",
-      "invention"
-    ],
+    "topicIds": ["underground-railroad", "abolition", "invention"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -295,14 +226,8 @@
     "kind": "place",
     "displayName": "Fort Monroe National Monument",
     "summary": "On May 23, 1861, Frank Baker, Shepard Mallory, and James Townsend escaped slavery and reached Fort Monroe; the next day Major General Benjamin Butler refused to return them, declaring them 'contraband of war.' The ruling drew thousands of self-emancipated people to the fort and helped set the course toward the Emancipation Proclamation.",
-    "eraBuckets": [
-      "1860s"
-    ],
-    "topicTags": [
-      "freedom",
-      "military",
-      "emancipation"
-    ],
+    "eraBuckets": ["1860s"],
+    "topicTags": ["freedom", "military", "emancipation"],
     "jurisdictionLabel": "Hampton, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Fort Monroe National Monument, Old Point Comfort, Hampton",
@@ -334,11 +259,7 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": [
-      "freedom",
-      "military",
-      "emancipation"
-    ],
+    "topicIds": ["freedom", "military", "emancipation"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -347,14 +268,8 @@
     "kind": "event",
     "displayName": "Founding of the Niagara Movement",
     "summary": "After Buffalo hotels turned away Black guests, W.E.B. Du Bois, William Monroe Trotter, and 27 other leaders met at Fort Erie, Ontario, July 11-14, 1905, founding the Niagara Movement to demand full civil rights; its first public U.S. meeting followed in August 1906 at Storer College in Harpers Ferry, West Virginia - the direct forerunner of the NAACP.",
-    "eraBuckets": [
-      "1900s"
-    ],
-    "topicTags": [
-      "civil-rights",
-      "organizing",
-      "freedom"
-    ],
+    "eraBuckets": ["1900s"],
+    "topicTags": ["civil-rights", "organizing", "freedom"],
     "jurisdictionLabel": "Harpers Ferry, West Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Storer College campus, Camp Hill, Harpers Ferry (first public U.S. meeting, August 1906)",
@@ -386,11 +301,7 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "civil-rights",
-      "organizing",
-      "freedom"
-    ],
+    "topicIds": ["civil-rights", "organizing", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -399,15 +310,8 @@
     "kind": "event",
     "displayName": "Founding of the NAACP",
     "summary": "Responding to the 1908 Springfield, Illinois race riot, roughly 300 reformers including W.E.B. Du Bois, Ida B. Wells, and Mary White Ovington convened the National Negro Conference at the United Charities Building on May 31-June 1, 1909. The Committee of Forty they formed adopted the name NAACP a year later, on May 12, 1910.",
-    "eraBuckets": [
-      "1900s",
-      "1910s"
-    ],
-    "topicTags": [
-      "civil-rights",
-      "organizing",
-      "freedom"
-    ],
+    "eraBuckets": ["1900s", "1910s"],
+    "topicTags": ["civil-rights", "organizing", "freedom"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "United Charities Building, 105 East 22nd Street, Manhattan",
@@ -439,11 +343,7 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": [
-      "civil-rights",
-      "organizing",
-      "freedom"
-    ],
+    "topicIds": ["civil-rights", "organizing", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -452,14 +352,8 @@
     "kind": "event",
     "displayName": "Founding of the Negro National League",
     "summary": "On February 13, 1920, Andrew 'Rube' Foster and seven other Black team owners met at Kansas City's Paseo YMCA and organized the Negro National League, the first sustained professional Black baseball league, electing Foster its president. The building, listed on the National Register in 1991, now houses the Negro Leagues Baseball Museum's research center.",
-    "eraBuckets": [
-      "1920s"
-    ],
-    "topicTags": [
-      "sports",
-      "business",
-      "organizing"
-    ],
+    "eraBuckets": ["1920s"],
+    "topicTags": ["sports", "business", "organizing"],
     "jurisdictionLabel": "Kansas City, Missouri",
     "locationPrecision": "institution",
     "locationLabel": "Paseo YMCA, 1824 The Paseo, Kansas City",
@@ -491,11 +385,7 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "sports",
-      "business",
-      "organizing"
-    ],
+    "topicIds": ["sports", "business", "organizing"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -504,14 +394,8 @@
     "kind": "place",
     "displayName": "Moton Field / Tuskegee Airmen National Historic Site",
     "summary": "Built in 1941 and named for Tuskegee Institute's second principal Robert Russa Moton, Moton Field was the only primary flight-training site for African American pilot candidates in the World War II Army Air Corps. Congress established Tuskegee Airmen National Historic Site here in 1998 to honor the roughly 1,000 pilots trained there.",
-    "eraBuckets": [
-      "1940s"
-    ],
-    "topicTags": [
-      "military",
-      "aviation",
-      "firsts"
-    ],
+    "eraBuckets": ["1940s"],
+    "topicTags": ["military", "aviation", "firsts"],
     "jurisdictionLabel": "Tuskegee, Alabama",
     "locationPrecision": "campus",
     "locationLabel": "Moton Field, Tuskegee",
@@ -543,11 +427,7 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": [
-      "military",
-      "aviation",
-      "firsts"
-    ],
+    "topicIds": ["military", "aviation", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -556,15 +436,8 @@
     "kind": "place",
     "displayName": "Robert Gould Shaw and Massachusetts 54th Regiment Memorial",
     "summary": "Augustus Saint-Gaudens spent 14 years sculpting this bronze relief, dedicated on Boston Common on May 31, 1897, to Colonel Robert Gould Shaw and the men of the 54th Massachusetts, one of the first Black regiments recruited in the North. Many died in the July 18, 1863 assault on Fort Wagner; the memorial anchors Boston's Black Heritage Trail.",
-    "eraBuckets": [
-      "1860s",
-      "1890s"
-    ],
-    "topicTags": [
-      "military",
-      "memorial",
-      "civil-war"
-    ],
+    "eraBuckets": ["1860s", "1890s"],
+    "topicTags": ["military", "memorial", "civil-war"],
     "jurisdictionLabel": "Boston, Massachusetts",
     "locationPrecision": "institution",
     "locationLabel": "Boston Common, opposite the Massachusetts State House",
@@ -589,11 +462,7 @@
       }
     ],
     "historicalContext": "The 54th Massachusetts recruited nationally, including Frederick Douglass's sons Lewis and Charles, with public meetings held partly at Boston's African Meeting House. Over thirty years passed between the regiment's 1863 assault on Fort Wagner and the memorial's 1897 dedication, and the site remains an active gathering place for civil rights commemoration and protest.",
-    "topicIds": [
-      "military",
-      "memorial",
-      "civil-war"
-    ],
+    "topicIds": ["military", "memorial", "civil-war"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -602,13 +471,8 @@
     "kind": "place",
     "displayName": "Buffalo Soldier Commemorative Area, Fort Leavenworth",
     "summary": "The 10th U.S. Cavalry, one of the Army's first peacetime Black regiments, organized at Fort Leavenworth on September 21, 1866, under Colonel Benjamin Grierson; its troopers earned the name Buffalo Soldiers from the Kiowa and Cheyenne. General Colin Powell, the first Black Chairman of the Joint Chiefs, dedicated the fort's monument to them in 1992.",
-    "eraBuckets": [
-      "1860s"
-    ],
-    "topicTags": [
-      "military",
-      "firsts"
-    ],
+    "eraBuckets": ["1860s"],
+    "topicTags": ["military", "firsts"],
     "jurisdictionLabel": "Fort Leavenworth, Kansas",
     "locationPrecision": "campus",
     "locationLabel": "Buffalo Soldier Commemorative Area, Fort Leavenworth",
@@ -633,10 +497,7 @@
       }
     ],
     "historicalContext": "Comprised of freemen, formerly enslaved men, and Civil War veterans, the 9th and 10th Cavalry regiments scouted, built roads, and strung telegraph lines across the West before serving in the Spanish-American War, the Philippines, and World War II. The Commemorative Area today includes the monument, the Circle of Firsts, and the Walkway of Units, with sculpture by Eddie Dixon.",
-    "topicIds": [
-      "military",
-      "firsts"
-    ],
+    "topicIds": ["military", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -645,15 +506,8 @@
     "kind": "place",
     "displayName": "Pullman National Historical Park — A. Philip Randolph Pullman Porter Museum",
     "summary": "By the 1920s the Pullman Company was the largest single employer of Black Americans in the country, staffing its sleeping cars with porters based out of its Chicago works. In 1925 the porters organized the Brotherhood of Sleeping Car Porters under A. Philip Randolph, winning the first labor contract between a Black union and a major U.S. corporation in 1937.",
-    "eraBuckets": [
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "labor",
-      "organizing",
-      "firsts"
-    ],
+    "eraBuckets": ["1920s", "1930s"],
+    "topicTags": ["labor", "organizing", "firsts"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "campus",
     "locationLabel": "Pullman Historic District, Chicago",
@@ -678,11 +532,7 @@
       }
     ],
     "historicalContext": "The National A. Philip Randolph Pullman Porter Museum operates within the Pullman Historic District, the former company town at the center of the 1894 Pullman Strike, which President Obama designated a national monument in 2015 and Congress redesignated a National Historical Park in 2022.",
-    "topicIds": [
-      "labor",
-      "organizing",
-      "firsts"
-    ],
+    "topicIds": ["labor", "organizing", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -691,14 +541,8 @@
     "kind": "event",
     "displayName": "Juneteenth — General Order No. 3",
     "summary": "On June 19, 1865, Union troops under General Gordon Granger marched through Galveston reading General Order No. 3, informing Texas's more than 250,000 enslaved people of their freedom; their route's final stop was the church now known as Reedy Chapel-AME. Galveston has held an annual Juneteenth celebration on Ashton Villa's lawn since 1979.",
-    "eraBuckets": [
-      "1860s"
-    ],
-    "topicTags": [
-      "emancipation",
-      "freedom",
-      "military"
-    ],
+    "eraBuckets": ["1860s"],
+    "topicTags": ["emancipation", "freedom", "military"],
     "jurisdictionLabel": "Galveston, Texas",
     "locationPrecision": "campus",
     "locationLabel": "Reedy Chapel-AME Church, Broadway, Galveston",
@@ -723,11 +567,7 @@
       }
     ],
     "historicalContext": "General Order No. 3 arrived two and a half years after the Emancipation Proclamation, delayed by Texas's remoteness from Union lines and the need for federal troops to enforce it. Reedy Chapel-AME, first established in 1848, was already a central gathering place for Galveston's Black community when Granger's order reached it, and Juneteenth became a federal holiday in 2021.",
-    "topicIds": [
-      "emancipation",
-      "freedom",
-      "military"
-    ],
+    "topicIds": ["emancipation", "freedom", "military"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -736,17 +576,8 @@
     "kind": "place",
     "displayName": "Seneca Village",
     "summary": "In 1825 Andrew Williams, a 25-year-old Black shoeshiner, bought the first lots of what became Seneca Village, a community of roughly 225 residents — about two-thirds African American — with three churches and a school by 1855. The city cleared the settlement by eminent domain in 1857 to build Central Park, displacing its Black landowners and their voting rights.",
-    "eraBuckets": [
-      "1820s",
-      "1830s",
-      "1840s",
-      "1850s"
-    ],
-    "topicTags": [
-      "community",
-      "property-ownership",
-      "freedom"
-    ],
+    "eraBuckets": ["1820s", "1830s", "1840s", "1850s"],
+    "topicTags": ["community", "property-ownership", "freedom"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "neighborhood",
     "locationLabel": "Seneca Village site, Central Park (West 82nd-89th Streets)",
@@ -771,11 +602,7 @@
       }
     ],
     "historicalContext": "Seneca Village let Black New Yorkers own property away from downtown Manhattan's overcrowding and discrimination, and property ownership was itself required for Black men to vote under New York law. A 2001 historical marker and 2011 Columbia-led archaeological excavation have helped recover the settlement's material history since its erasure.",
-    "topicIds": [
-      "community",
-      "property-ownership",
-      "freedom"
-    ],
+    "topicIds": ["community", "property-ownership", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   }

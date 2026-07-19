@@ -51,14 +51,12 @@ type CatalogEntry = {
 type CacheEntry = {
   readonly query: string;
   readonly fetchedAt: string;
-  readonly match:
-    | {
-        readonly lat: number;
-        readonly lng: number;
-        readonly matchedAddress?: string;
-        readonly stateName?: string;
-      }
-    | null;
+  readonly match: {
+    readonly lat: number;
+    readonly lng: number;
+    readonly matchedAddress?: string;
+    readonly stateName?: string;
+  } | null;
 };
 
 type CacheFile = {
@@ -129,8 +127,12 @@ const censusHttpClient: SafeHttpClient = async (request) => {
 
 function loadCatalog(dir: string): CatalogEntry[] {
   const out: CatalogEntry[] = [];
-  for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
-    const entries = JSON.parse(readFileSync(join(dir, file), 'utf8')) as Array<Record<string, unknown>>;
+  for (const file of readdirSync(dir)
+    .filter((f) => f.endsWith('.json'))
+    .sort()) {
+    const entries = JSON.parse(readFileSync(join(dir, file), 'utf8')) as Array<
+      Record<string, unknown>
+    >;
     entries.forEach((raw, index) => {
       out.push({
         id: String(raw.id),
@@ -149,10 +151,7 @@ function loadCatalog(dir: string): CatalogEntry[] {
   return out;
 }
 
-async function geocodeCached(
-  query: string,
-  cache: CacheFile,
-): Promise<CacheEntry['match']> {
+async function geocodeCached(query: string, cache: CacheFile): Promise<CacheEntry['match']> {
   const normalized = normalizeAddressInput(query);
   if (!normalized.queryText) return null;
   const key = cacheKey(normalized.cacheKey);
@@ -273,7 +272,10 @@ async function main(): Promise<void> {
         d.corrected &&
         d.matchMethod === 'geocode_census',
     );
-    const byFile = new Map<string, Array<{ index: number; id: string; lat: number; lng: number; drift?: number }>>();
+    const byFile = new Map<
+      string,
+      Array<{ index: number; id: string; lat: number; lng: number; drift?: number }>
+    >();
     for (const decision of corrections) {
       const entry = byId.get(decision.entityId);
       if (!entry || !decision.corrected) continue;

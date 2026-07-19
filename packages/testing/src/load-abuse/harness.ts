@@ -1,4 +1,3 @@
-
 /**
  * Layered load/abuse simulation harness.
  * Composes rate limits, query guardrails, submission controls,
@@ -116,7 +115,9 @@ export function createLoadAbuseHarness(options: LoadAbuseHarnessOptions = {}) {
         subject: input.subject,
         endpointClass: input.endpointClass,
         key,
-        ...(input.appCheckVerified !== undefined ? { appCheckVerified: input.appCheckVerified } : {}),
+        ...(input.appCheckVerified !== undefined
+          ? { appCheckVerified: input.appCheckVerified }
+          : {}),
         ...(input.riskSignals !== undefined ? { riskSignals: input.riskSignals } : {}),
       });
       if (input.releaseAfter !== false && decision.allowed) {
@@ -220,7 +221,11 @@ export function createLoadAbuseHarness(options: LoadAbuseHarnessOptions = {}) {
       if (!dispatch.allowed && denials.length === 0) {
         denials.push({ layer: 'resource_queue_dispatch', reason: dispatch.reason });
       }
-      return { allowed: denials.length === 0, denials, estimatedCostUnits: denials.length === 0 ? 6 : 0 };
+      return {
+        allowed: denials.length === 0,
+        denials,
+        estimatedCostUnits: denials.length === 0 ? 6 : 0,
+      };
     },
 
     simulateGeocoderBudget(consumed: number): SimulatedRequestOutcome {
@@ -242,7 +247,9 @@ export function createLoadAbuseHarness(options: LoadAbuseHarnessOptions = {}) {
         allowed: denials.length === 0,
         denials,
         estimatedCostUnits:
-          denials.length === 0 ? getCostEstimateForScenario('geocoder_abuse').perRequestCostUnits : 0,
+          denials.length === 0
+            ? getCostEstimateForScenario('geocoder_abuse').perRequestCostUnits
+            : 0,
       };
     },
 
@@ -281,7 +288,9 @@ export function createLoadAbuseHarness(options: LoadAbuseHarnessOptions = {}) {
             key,
             nowMs,
             consume: true,
-            ...(input.appCheckVerified !== undefined ? { appCheckVerified: input.appCheckVerified } : {}),
+            ...(input.appCheckVerified !== undefined
+              ? { appCheckVerified: input.appCheckVerified }
+              : {}),
           },
           { store },
         );
@@ -297,7 +306,9 @@ export function createLoadAbuseHarness(options: LoadAbuseHarnessOptions = {}) {
           key,
           nowMs,
           consume: true,
-          ...(input.appCheckVerified !== undefined ? { appCheckVerified: input.appCheckVerified } : {}),
+          ...(input.appCheckVerified !== undefined
+            ? { appCheckVerified: input.appCheckVerified }
+            : {}),
         },
         { store },
       );
@@ -327,7 +338,10 @@ export function buildCacheKeyFromQuery(input: SearchQueryInput): string | null {
   return buildSearchCacheKey(decision.canonical);
 }
 
-export function aggregateDistributedLowRate(signals: readonly RiskSignal[], nowMs: number): {
+export function aggregateDistributedLowRate(
+  signals: readonly RiskSignal[],
+  nowMs: number,
+): {
   readonly exceedsThreshold: boolean;
   readonly totalScore: number;
 } {
@@ -382,8 +396,11 @@ export function proveLayeredControls(
   const otherLayers = unique.filter(
     (layer) => !layer.startsWith('rate_limit') && !layer.startsWith('resource'),
   );
-  const families = [rateLayers.length > 0, resourceLayers.length > 0, otherLayers.length > 0].filter(Boolean)
-    .length;
+  const families = [
+    rateLayers.length > 0,
+    resourceLayers.length > 0,
+    otherLayers.length > 0,
+  ].filter(Boolean).length;
   return {
     scenarioId,
     layersObserved: unique,

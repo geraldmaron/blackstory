@@ -86,10 +86,7 @@ test('rights status is required before publishing media or substantial excerpts'
       publicationPermissions: ['display_media'],
     }),
   );
-  assert.equal(
-    canPublishWithRights({ rightsStatus: 'unknown', contentKind: 'citation' }),
-    true,
-  );
+  assert.equal(canPublishWithRights({ rightsStatus: 'unknown', contentKind: 'citation' }), true);
 });
 
 test('evidence may-publish gate blocks restricted media', () => {
@@ -165,7 +162,10 @@ test('duplicate captures are hash-deduplicated', () => {
 
 test('disabled source adapter cannot create new candidates', () => {
   const enabled = sampleSource();
-  assert.equal(canSourceAdapterCreateCandidates(enabled, { id: enabled.killSwitchId!, enabled: false }), true);
+  assert.equal(
+    canSourceAdapterCreateCandidates(enabled, { id: enabled.killSwitchId!, enabled: false }),
+    true,
+  );
 
   const disabled = sampleSource({ adapterEnabled: false });
   assert.equal(canSourceAdapterCreateCandidates(disabled), false);
@@ -184,7 +184,10 @@ test('hostname normalization and lineage root resolution', () => {
 
   assert.equal(resolveLineageRoot({ id: 'ev_root' }), 'ev_root');
   assert.equal(
-    resolveLineageRoot({ id: 'ev_child', syndicatedFromEvidenceId: 'ev_parent' }, { id: 'ev_parent' }),
+    resolveLineageRoot(
+      { id: 'ev_child', syndicatedFromEvidenceId: 'ev_parent' },
+      { id: 'ev_parent' },
+    ),
     'ev_parent',
   );
   assert.doesNotThrow(() =>

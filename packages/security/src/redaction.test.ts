@@ -1,4 +1,3 @@
-
 /**
  * Tests for precision reduction, location redaction, and the deep value scrubber.
  */

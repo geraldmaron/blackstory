@@ -90,7 +90,9 @@ export type StateLabelMarkerDescriptor = {
  * (color); position and text never move, so a caller can key markers by `postalCode` and reuse
  * the same 51 `maplibregl.Marker` instances across re-renders instead of tearing them down.
  */
-export function buildStateLabelMarkers(selectedPostalCode?: string): readonly StateLabelMarkerDescriptor[] {
+export function buildStateLabelMarkers(
+  selectedPostalCode?: string,
+): readonly StateLabelMarkerDescriptor[] {
   return stateLabelPoints().map((point) => ({
     postalCode: point.postalCode,
     name: point.name,

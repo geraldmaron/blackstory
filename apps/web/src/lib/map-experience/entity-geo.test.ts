@@ -17,7 +17,10 @@ test('every active-release entity has a resolvable geo anchor', () => {
 
 test('every anchor is a real point inside the U.S. bounds table', () => {
   for (const [entityId, anchor] of Object.entries(ENTITY_GEO_ANCHORS)) {
-    assert.ok(isWithinUsBounds(anchor.lat, anchor.lng), `${entityId} anchor must be within U.S. bounds`);
+    assert.ok(
+      isWithinUsBounds(anchor.lat, anchor.lng),
+      `${entityId} anchor must be within U.S. bounds`,
+    );
     assert.equal(anchor.geohash.length, 9);
   }
 });

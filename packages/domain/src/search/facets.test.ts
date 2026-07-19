@@ -33,7 +33,11 @@ function record(
 }
 
 // Era labels sourced from the shared era model, never hand-typed.
-const CIVIL_RIGHTS_ERA = deriveEraBuckets({ validFrom: '1955', validTo: '1968', datePrecision: 'year' });
+const CIVIL_RIGHTS_ERA = deriveEraBuckets({
+  validFrom: '1955',
+  validTo: '1968',
+  datePrecision: 'year',
+});
 const EIGHTIES = deriveEraBuckets({ validFrom: '1985', datePrecision: 'year' });
 
 test('computeFacetCounts aggregates every dimension, incrementing multi-valued fields per value', () => {
@@ -76,8 +80,17 @@ test('computeFacetCounts aggregates every dimension, incrementing multi-valued f
 });
 
 test('a status filter narrows results using the status vocabularies', () => {
-  const active = record({ id: 'place', displayName: 'Active Place', status: PLACE_LIKE_STATUSES[0] });
-  const inForce = record({ id: 'law', displayName: 'In-Force Statute', kind: 'law', status: LAW_STATUSES[0] });
+  const active = record({
+    id: 'place',
+    displayName: 'Active Place',
+    status: PLACE_LIKE_STATUSES[0],
+  });
+  const inForce = record({
+    id: 'law',
+    displayName: 'In-Force Statute',
+    kind: 'law',
+    status: LAW_STATUSES[0],
+  });
   const historicMovement = record({
     id: 'movement',
     displayName: 'Historic Movement',
@@ -85,9 +98,10 @@ test('a status filter narrows results using the status vocabularies', () => {
     status: MOVEMENT_STATUSES[1], // 'historic'
   });
 
-  const filtered = applyFilters([active, inForce, historicMovement], [
-    { field: 'status', value: LAW_STATUSES[0] },
-  ]);
+  const filtered = applyFilters(
+    [active, inForce, historicMovement],
+    [{ field: 'status', value: LAW_STATUSES[0] }],
+  );
   assert.deepEqual(
     filtered.map((r) => r.id),
     ['law'],
@@ -95,7 +109,11 @@ test('a status filter narrows results using the status vocabularies', () => {
 });
 
 test('an era filter narrows results using deriveEraBuckets labels', () => {
-  const civilRights = record({ id: 'cr', displayName: 'Civil Rights Place', eraBuckets: CIVIL_RIGHTS_ERA });
+  const civilRights = record({
+    id: 'cr',
+    displayName: 'Civil Rights Place',
+    eraBuckets: CIVIL_RIGHTS_ERA,
+  });
   const eighties = record({ id: 'e80', displayName: 'Eighties Place', eraBuckets: EIGHTIES });
 
   const filtered = applyFilters([civilRights, eighties], [{ field: 'era', value: '1960s' }]);
@@ -106,9 +124,24 @@ test('an era filter narrows results using deriveEraBuckets labels', () => {
 });
 
 test('multiple filters combine with AND semantics across fields', () => {
-  const match = record({ id: 'match', displayName: 'M', kind: 'school', status: PLACE_LIKE_STATUSES[0] });
-  const wrongKind = record({ id: 'wrong-kind', displayName: 'WK', kind: 'place', status: PLACE_LIKE_STATUSES[0] });
-  const wrongStatus = record({ id: 'wrong-status', displayName: 'WS', kind: 'school', status: PLACE_LIKE_STATUSES[1] });
+  const match = record({
+    id: 'match',
+    displayName: 'M',
+    kind: 'school',
+    status: PLACE_LIKE_STATUSES[0],
+  });
+  const wrongKind = record({
+    id: 'wrong-kind',
+    displayName: 'WK',
+    kind: 'place',
+    status: PLACE_LIKE_STATUSES[0],
+  });
+  const wrongStatus = record({
+    id: 'wrong-status',
+    displayName: 'WS',
+    kind: 'school',
+    status: PLACE_LIKE_STATUSES[1],
+  });
 
   const filters: readonly SearchFilter[] = [
     { field: 'kind', value: 'school' },

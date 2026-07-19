@@ -1,4 +1,3 @@
-
 /**
  * Idempotent load/refresh CLI for the `jurisdictions` collection.
  *
@@ -61,7 +60,10 @@ export async function runJurisdictionLoad(
   options: RunJurisdictionLoadOptions,
 ): Promise<RunJurisdictionLoadSummary> {
   const now = options.now ?? (() => new Date().toISOString());
-  const buildOptions = { now, ...(options.sourceVersion ? { sourceVersion: options.sourceVersion } : {}) };
+  const buildOptions = {
+    now,
+    ...(options.sourceVersion ? { sourceVersion: options.sourceVersion } : {}),
+  };
 
   const stateDocs = buildStateJurisdictionDocs(buildOptions);
 
@@ -101,7 +103,10 @@ export async function runJurisdictionLoad(
 }
 
 /** Compares every field except `createdAt`/`updatedAt` for idempotency's "unchanged" check. */
-export function jurisdictionDocsEqualIgnoringTimestamps(a: JurisdictionDoc, b: JurisdictionDoc): boolean {
+export function jurisdictionDocsEqualIgnoringTimestamps(
+  a: JurisdictionDoc,
+  b: JurisdictionDoc,
+): boolean {
   const { createdAt: _a1, updatedAt: _a2, ...restA } = a;
   const { createdAt: _b1, updatedAt: _b2, ...restB } = b;
   return JSON.stringify(restA) === JSON.stringify(restB);

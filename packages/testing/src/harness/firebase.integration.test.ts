@@ -1,4 +1,3 @@
-
 /**
  * Firebase emulator integration tests (Auth/Firestore demo project).
  * Skips when emulators/Java are unavailable; fails closed when CI_REQUIRE_FIREBASE=1.

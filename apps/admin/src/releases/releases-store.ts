@@ -34,7 +34,10 @@ function readString(value: unknown): string | undefined {
   return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
-function toListItem(docId: string, data: Record<string, unknown>): PublicationReleaseListItem | null {
+function toListItem(
+  docId: string,
+  data: Record<string, unknown>,
+): PublicationReleaseListItem | null {
   const status = readString(data.status);
   const searchIndexVersion = readString(data.searchIndexVersion);
   const createdAt = readString(data.createdAt);
@@ -62,9 +65,7 @@ function parseActiveRelease(data: Record<string, unknown>): ActiveReleasePointer
   return { releaseId, activatedAt, searchIndexVersion, manifestHash };
 }
 
-export async function listPublicationReleases(
-  limit = 50,
-): Promise<ReleasesListResult> {
+export async function listPublicationReleases(limit = 50): Promise<ReleasesListResult> {
   const db = getDb();
   const cappedLimit = Math.min(100, Math.max(1, limit));
 

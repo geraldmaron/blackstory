@@ -38,7 +38,10 @@ test('a fact with a contested confidence and no confidenceNote is rejected', () 
 });
 
 test('a fact with a contested confidence and a confidenceNote passes', () => {
-  const fact = buildFixtureFact({ confidence: 'contested', confidenceNote: 'Two sources disagree on the exact date.' });
+  const fact = buildFixtureFact({
+    confidence: 'contested',
+    confidenceNote: 'Two sources disagree on the exact date.',
+  });
   assert.doesNotThrow(() => assertFactRecordStructurallyValid(fact));
 });
 
@@ -51,7 +54,9 @@ test('hasCompleteFactCitations is true only when every citation is complete and 
   assert.equal(hasCompleteFactCitations(buildFixtureFact()), true);
   assert.equal(hasCompleteFactCitations(buildFixtureFact({ citations: [] })), false);
   assert.equal(
-    hasCompleteFactCitations(buildFixtureFact({ citations: [buildFixtureCitation({ excerpt: '' })] })),
+    hasCompleteFactCitations(
+      buildFixtureFact({ citations: [buildFixtureCitation({ excerpt: '' })] }),
+    ),
     false,
   );
 });

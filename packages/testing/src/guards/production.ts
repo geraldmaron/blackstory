@@ -1,4 +1,3 @@
-
 /**
  * Fail-closed production service guards for the test suite.
  * Tests must never target production Firebase, Cloud SQL, or GCP projects.
@@ -22,7 +21,6 @@ const LOCAL_HOST_PATTERN =
   /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0|host\.docker\.internal)(:\d+)?$/i;
 
 const DEMO_PROJECT_PATTERN = /^(demo-|test-|local-|dev-)/i;
-
 
 /**
  * Explicit override for rare break-glass scenarios. Prefer never setting this.

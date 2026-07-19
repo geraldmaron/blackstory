@@ -5,14 +5,8 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { listPublicEntityViews } from '../../lib/public-data/source';
-import {
-  ATMOSPHERE_ATTRIBUTION_HREF,
-  ATMOSPHERE_TILE_CREDITS,
-} from './tile-credits';
-import {
-  LivingAtmosphereMosaic,
-  type MosaicEntityLink,
-} from './LivingAtmosphereMosaic';
+import { ATMOSPHERE_ATTRIBUTION_HREF, ATMOSPHERE_TILE_CREDITS } from './tile-credits';
+import { LivingAtmosphereMosaic, type MosaicEntityLink } from './LivingAtmosphereMosaic';
 import './atmosphere.css';
 
 function humanizeEntityId(entityId: string): string {

@@ -4,10 +4,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { StyleSpecification } from 'maplibre-gl';
-import {
-  collectLayerPaintUpdates,
-  PERSISTENT_PLATE_LAYER_IDS,
-} from './map-plate-paint';
+import { collectLayerPaintUpdates, PERSISTENT_PLATE_LAYER_IDS } from './map-plate-paint';
 
 const SAMPLE_STYLE: StyleSpecification = {
   version: 8,
@@ -62,8 +59,9 @@ test('collectLayerPaintUpdates returns paints only for requested persistent laye
     '#E8E0D2',
   );
   assert.equal(
-    updates.find((entry) => entry.layerId === 'explore-street-label' && entry.paintKey === 'text-halo-color')
-      ?.paintValue,
+    updates.find(
+      (entry) => entry.layerId === 'explore-street-label' && entry.paintKey === 'text-halo-color',
+    )?.paintValue,
     '#E8E0D2',
   );
   assert.ok(!updates.some((entry) => entry.layerId === 'explore-unclustered-point'));

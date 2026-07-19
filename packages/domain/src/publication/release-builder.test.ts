@@ -66,7 +66,10 @@ test('inferNotabilityCriterionFromClaim recognizes a documented "first" claim', 
 
 test('inferNotabilityCriterionFromClaim recognizes a landmark/register claim', () => {
   assert.equal(
-    inferNotabilityCriterionFromClaim('listed_on', 'the National Register of Historic Places in 1984'),
+    inferNotabilityCriterionFromClaim(
+      'listed_on',
+      'the National Register of Historic Places in 1984',
+    ),
     'landmark_or_national_register',
   );
 });
@@ -134,7 +137,14 @@ test('buildReleaseNotabilityBasis never fabricates evidence for an uncited claim
 
 test('computeReleaseResearchCoverage: zero/one cited claim is minimal', () => {
   const claims: readonly ReleaseClaimProjection[] = [
-    { id: 'c1', predicate: 'p', object: 'o', confidenceLevel: 'high', citationSource: 'S', citationLabel: 'L' },
+    {
+      id: 'c1',
+      predicate: 'p',
+      object: 'o',
+      confidenceLevel: 'high',
+      citationSource: 'S',
+      citationLabel: 'L',
+    },
   ];
   assert.equal(computeReleaseResearchCoverage(claims), 'minimal');
 });
@@ -186,7 +196,14 @@ test('resolveReleaseEntityReferences fails closed on an unresolved topicId', () 
 test('resolveReleaseEntityReferences fails closed on a dangling notabilityBasis evidenceId', () => {
   const entry = baseEntry();
   const claims: readonly ReleaseClaimProjection[] = [
-    { id: 'claim_real', predicate: 'p', object: 'o', confidenceLevel: 'high', citationSource: 'S', citationLabel: 'L' },
+    {
+      id: 'claim_real',
+      predicate: 'p',
+      object: 'o',
+      confidenceLevel: 'high',
+      citationSource: 'S',
+      citationLabel: 'L',
+    },
   ];
   const result = resolveReleaseEntityReferences(entry, claims, [
     { criterion: 'documented_site', note: 'note', evidenceIds: ['claim_does_not_exist'] },
@@ -315,9 +332,7 @@ test('buildReleaseEntityArtifacts prefers context.relatedEntries over entry.rela
   });
   const result = buildReleaseEntityArtifacts(entry, {
     ...CONTEXT,
-    relatedEntries: [
-      { id: 'ent_graph_001', type: 'located_at', direction: 'outgoing' },
-    ],
+    relatedEntries: [{ id: 'ent_graph_001', type: 'located_at', direction: 'outgoing' }],
   });
   assert.equal(result.ok, true);
   if (!result.ok) return;

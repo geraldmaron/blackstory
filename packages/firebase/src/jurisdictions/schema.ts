@@ -1,4 +1,3 @@
-
 /**
  * Firestore document schema for the `jurisdictions` collection.
  *
@@ -48,7 +47,6 @@ export const jurisdictionCentroidSchema = z.object({
 
 export type JurisdictionCentroidDoc = z.infer<typeof jurisdictionCentroidSchema>;
 
-
 /**
  * Where the bbox came from, so a coarse Gazetteer-only approximation is never confused with a
  * precise cartographic-boundary-derived box. See docs/adr/ADR-016 "County bbox precision."
@@ -72,7 +70,10 @@ export const jurisdictionSchema = z.object({
   /** Parent jurisdiction id (state's parent is `us`; county's parent is its state's id). */
   parentId: z.string().min(1).optional(),
   /** 2-digit state or 5-digit county FIPS/GEOID (Census); absent for the country row. */
-  fipsCode: z.string().regex(/^\d{2}(\d{3})?$/).optional(),
+  fipsCode: z
+    .string()
+    .regex(/^\d{2}(\d{3})?$/)
+    .optional(),
   /** 2-letter USPS postal code; states only. */
   postalCode: z.string().length(2).optional(),
   /** Parent state's 2-digit FIPS; counties only, a denormalized convenience for querying. */
@@ -106,7 +107,6 @@ export function stateJurisdictionId(stateFips: string): string {
 export function countyJurisdictionId(stateFips: string, countyFips3: string): string {
   return `us-${stateFips}-${countyFips3}`;
 }
-
 
 /**
  * Minimal Firestore data-converter shape, duplicated locally (not imported from

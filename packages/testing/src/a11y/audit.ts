@@ -1,4 +1,3 @@
-
 /**
  * WCAG-oriented HTML fixture audits for core public journeys.
  * Complements lightweight smoke checks with heading order, landmark, and form-label rules
@@ -15,14 +14,15 @@ export type A11yAuditResult = {
 
 const HEADING_TAG = /<(h[1-6])\b[^>]*>/gi;
 
-
 /**
  * Runs smoke checks plus heading-order and supplementary landmark assertions.
  */
 export function auditHtmlFixture(html: string): A11yAuditResult {
   const issues: A11yFixtureIssue[] = [...auditHtmlSmoke(html)];
 
-  const headings = [...html.matchAll(HEADING_TAG)].map((match) => match[1]?.toLowerCase()).filter(Boolean);
+  const headings = [...html.matchAll(HEADING_TAG)]
+    .map((match) => match[1]?.toLowerCase())
+    .filter(Boolean);
   if (headings.length > 0) {
     const first = headings[0];
     if (first !== 'h1') {
@@ -59,7 +59,11 @@ export function auditHtmlFixture(html: string): A11yAuditResult {
     });
   }
 
-  if (/<nav\b/i.test(html) && !/<nav\b[^>]*\baria-label=/i.test(html) && !/<nav\b[^>]*\baria-labelledby=/i.test(html)) {
+  if (
+    /<nav\b/i.test(html) &&
+    !/<nav\b[^>]*\baria-label=/i.test(html) &&
+    !/<nav\b[^>]*\baria-labelledby=/i.test(html)
+  ) {
     issues.push({
       code: 'nav-accessible-name',
       message: 'Navigation regions require aria-label or aria-labelledby',

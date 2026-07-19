@@ -4,7 +4,10 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { buildTrySearchingForSubject, buildTrySearchingForSuggestion } from './try-searching-for.js';
+import {
+  buildTrySearchingForSubject,
+  buildTrySearchingForSuggestion,
+} from './try-searching-for.js';
 
 test('builds the owner-brief example shape from title, author, and named entities', () => {
   const suggestion = buildTrySearchingForSuggestion({

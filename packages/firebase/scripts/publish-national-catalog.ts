@@ -50,10 +50,7 @@ import {
   type EntityAdjacency,
   type ReleaseSourceEntity,
 } from '@repo/domain';
-import {
-  publicEntityProjectionSchema,
-  publicSearchIndexSchema,
-} from '../src/firestore/types.ts';
+import { publicEntityProjectionSchema, publicSearchIndexSchema } from '../src/firestore/types.ts';
 import {
   DEFAULT_PUBLIC_MEDIA_BUCKET,
   buildReleaseCatalogArtifacts,
@@ -116,7 +113,9 @@ function loadCatalog(): ReleaseSourceEntity[] {
   }
   const entries: ReleaseSourceEntity[] = [];
   for (const file of files.sort()) {
-    const parsed = JSON.parse(readFileSync(join(catalogDir, file), 'utf8')) as ReleaseSourceEntity[];
+    const parsed = JSON.parse(
+      readFileSync(join(catalogDir, file), 'utf8'),
+    ) as ReleaseSourceEntity[];
     if (!Array.isArray(parsed)) throw new Error(`${file}: expected a JSON array`);
     for (const entry of parsed) entries.push(entry);
     console.log(`  ${file}: ${parsed.length} entries`);
@@ -177,18 +176,16 @@ function adjacencyToFirestoreDoc(adjacency: EntityAdjacency): Record<string, unk
   };
 }
 
-const SPOTLIGHT_ENTITY_IDS = [
-  'ent_rosa_parks_museum_001',
-  'ent_edmund_pettus_bridge_001',
-] as const;
+const SPOTLIGHT_ENTITY_IDS = ['ent_rosa_parks_museum_001', 'ent_edmund_pettus_bridge_001'] as const;
 
 function logRelationshipSummary(
   relationshipCount: number,
   skippedCount: number,
   relatedByEntity: ReadonlyMap<string, readonly unknown[]>,
 ): void {
-  const entitiesWithRelated = [...relatedByEntity.values()].filter((entries) => entries.length > 0)
-    .length;
+  const entitiesWithRelated = [...relatedByEntity.values()].filter(
+    (entries) => entries.length > 0,
+  ).length;
   console.log(
     `Relationships: ${relationshipCount} canonical edges (${skippedCount} skipped); ${entitiesWithRelated} entities with related > 0`,
   );
@@ -293,14 +290,14 @@ async function main(): Promise<void> {
     if (locs.empty) continue;
     // Prefer current, then historical, then any doc with a point.
     const ranked = [...locs.docs].sort((a, b) => {
-      const roleRank = (role: unknown) =>
-        role === 'current' ? 0 : role === 'historical' ? 1 : 2;
+      const roleRank = (role: unknown) => (role === 'current' ? 0 : role === 'historical' ? 1 : 2);
       return roleRank(a.data().role) - roleRank(b.data().role);
     });
     for (const doc of ranked) {
       const data = doc.data();
       const point = data.point as { lat?: number; lng?: number } | undefined;
-      const geometry = data.geometry as { type?: string; coordinates?: [number, number] } | undefined;
+      const geometry = data.geometry as
+        { type?: string; coordinates?: [number, number] } | undefined;
       const lat =
         typeof point?.lat === 'number'
           ? point.lat
@@ -424,7 +421,10 @@ async function main(): Promise<void> {
   }
 
   for (const [entityId, adjacency] of graphArtifact.adjacencyByEntityId) {
-    await queueMerge(publicGraphAdjacencyPath(releaseId, entityId), adjacencyToFirestoreDoc(adjacency));
+    await queueMerge(
+      publicGraphAdjacencyPath(releaseId, entityId),
+      adjacencyToFirestoreDoc(adjacency),
+    );
     adjacencyWrites += 1;
   }
 
@@ -445,7 +445,9 @@ async function main(): Promise<void> {
   await flush();
 
   const written = writeReleaseCatalogArtifactsToDir(catalogArtifacts, artifactsRoot);
-  console.log(`Wrote local artifacts:\n  ${written.entitiesListFile}\n  ${written.searchIndexFile}`);
+  console.log(
+    `Wrote local artifacts:\n  ${written.entitiesListFile}\n  ${written.searchIndexFile}`,
+  );
 
   if (UPLOAD_ARTIFACTS) {
     const bucket = getStorage().bucket(DEFAULT_PUBLIC_MEDIA_BUCKET);

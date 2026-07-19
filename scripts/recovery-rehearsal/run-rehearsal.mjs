@@ -105,7 +105,9 @@ async function main() {
 
   if (options.verifyOnly) {
     const payload = { ok: true, verified: verifications.map((v) => v.stepId) };
-    console.log(options.json ? JSON.stringify(payload, null, 2) : `Verified: ${payload.verified.join(', ')}`);
+    console.log(
+      options.json ? JSON.stringify(payload, null, 2) : `Verified: ${payload.verified.join(', ')}`,
+    );
     process.exit(0);
   }
 
@@ -122,7 +124,9 @@ async function main() {
     console.log(JSON.stringify(report, null, 2));
   } else {
     console.log(`\nRehearsal report written: ${options.output}`);
-    console.log(`Total measured: ${report.totalMeasuredMinutes} min | within RTO: ${report.allWithinRto}`);
+    console.log(
+      `Total measured: ${report.totalMeasuredMinutes} min | within RTO: ${report.allWithinRto}`,
+    );
     for (const proc of report.procedures) {
       const flag = proc.withinRto ? 'PASS' : 'MISS';
       console.log(

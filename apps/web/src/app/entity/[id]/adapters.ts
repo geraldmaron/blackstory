@@ -170,6 +170,9 @@ export function buildWhyThisAppearsForEntity(entity: PublicEntityView): PublicWh
     explanation: entity.relevanceExplanation,
     evidence: relevanceEvidenceForEntity(entity),
     notabilityBasis: notabilityBasisFor(entity),
-    storyTexts: [entity.historicalContext, ...entity.claims.map((c) => `${c.predicate} ${c.object}`)],
+    storyTexts: [
+      entity.historicalContext,
+      ...entity.claims.map((c) => `${c.predicate} ${c.object}`),
+    ],
   });
 }

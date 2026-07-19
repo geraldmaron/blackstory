@@ -146,9 +146,14 @@ async function main(): Promise<void> {
     const bucket = getStorage().bucket(BUCKET);
     await bucket.upload(filePath, {
       destination: STORAGE_PATH,
-      metadata: { contentType: 'application/geo+json', metadata: { sha256: datasetChecksum, sourceUrl: SOURCE_URL } },
+      metadata: {
+        contentType: 'application/geo+json',
+        metadata: { sha256: datasetChecksum, sourceUrl: SOURCE_URL },
+      },
     });
-    await bucket.file(`${STORAGE_PATH}.sha256`).save(`${datasetChecksum}  mappinginequality.json\n`);
+    await bucket
+      .file(`${STORAGE_PATH}.sha256`)
+      .save(`${datasetChecksum}  mappinginequality.json\n`);
     console.log('Upload complete.');
   }
 

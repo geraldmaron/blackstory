@@ -1,4 +1,3 @@
-
 /**
  * Tests for the idempotent jurisdiction load/refresh orchestration (`runJurisdictionLoad`).
  * Uses an injected in-memory writer no Firestore/network dependency, matching
@@ -16,14 +15,18 @@ import {
 } from './load-cli.js';
 import type { JurisdictionDoc } from './schema.js';
 
-const FIXTURE_PATH = fileURLToPath(new URL('./fixtures/sample-gazetteer-counties.txt', import.meta.url));
+const FIXTURE_PATH = fileURLToPath(
+  new URL('./fixtures/sample-gazetteer-counties.txt', import.meta.url),
+);
 
 async function loadFixture(): Promise<string> {
   return readFile(FIXTURE_PATH, 'utf-8');
 }
 
 /** In-memory stand-in for Firestore: same idempotent compare-then-set logic the real CLI uses. */
-function createInMemoryWriter(): JurisdictionWriter & { readonly store: Map<string, JurisdictionDoc> } {
+function createInMemoryWriter(): JurisdictionWriter & {
+  readonly store: Map<string, JurisdictionDoc>;
+} {
   const store = new Map<string, JurisdictionDoc>();
   return {
     store,
@@ -113,7 +116,10 @@ test('jurisdictionDocsEqualIgnoringTimestamps ignores createdAt/updatedAt but no
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
   };
-  const sameContentLaterTimestamp: JurisdictionDoc = { ...base, updatedAt: '2027-01-01T00:00:00.000Z' };
+  const sameContentLaterTimestamp: JurisdictionDoc = {
+    ...base,
+    updatedAt: '2027-01-01T00:00:00.000Z',
+  };
   const differentContent: JurisdictionDoc = { ...base, name: 'Different' };
 
   assert.ok(jurisdictionDocsEqualIgnoringTimestamps(base, sameContentLaterTimestamp));

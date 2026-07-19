@@ -1,4 +1,3 @@
-
 /**
  * In-memory transaction tests for atomic commit, idempotent replay, retry, and dead letters.
  */

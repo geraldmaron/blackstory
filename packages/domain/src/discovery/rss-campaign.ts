@@ -105,10 +105,7 @@ function defaultRssDiscoveryPack(createdAt: string): QueryPack {
   });
 }
 
-function ensureApprovedRssRegistry(
-  store: SourceRegistryStore,
-  now: string,
-): SourceRegistryEntry {
+function ensureApprovedRssRegistry(store: SourceRegistryStore, now: string): SourceRegistryEntry {
   const existing = store.get('reg_rss_discovery');
   if (existing?.registryState === 'approved' || existing?.registryState === 'canary') {
     return existing;
@@ -208,7 +205,9 @@ function rankSurvivorsByTitle(
 function toRankedLead(candidate: DiscoveryCandidateRecord): RssDiscoveryRankedLead {
   return {
     candidateId: candidate.id,
-    ...(candidate.adapterRecord.title !== undefined ? { title: candidate.adapterRecord.title } : {}),
+    ...(candidate.adapterRecord.title !== undefined
+      ? { title: candidate.adapterRecord.title }
+      : {}),
     ...(candidate.adapterRecord.canonicalUrl !== undefined
       ? { canonicalUrl: candidate.adapterRecord.canonicalUrl }
       : {}),
@@ -259,9 +258,7 @@ export async function runRssDiscoveryCampaign(
   }
 
   if (records.length === 0) {
-    throw new Error(
-      'RSS discovery campaign received no eligible feed XML after curated exclusion',
-    );
+    throw new Error('RSS discovery campaign received no eligible feed XML after curated exclusion');
   }
 
   const pack = input.pack ?? defaultRssDiscoveryPack(input.stampedAt);

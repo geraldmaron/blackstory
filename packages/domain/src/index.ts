@@ -90,7 +90,12 @@ export type {
   EvidenceLineage,
 } from './provenance/index.js';
 
-export { livingStatuses, treatAsLiving, DEFAULT_LIVING_STATUS, deriveLivingStatus } from './living.js';
+export {
+  livingStatuses,
+  treatAsLiving,
+  DEFAULT_LIVING_STATUS,
+  deriveLivingStatus,
+} from './living.js';
 export type { LivingStatus, LivingStatusDerivationSignal } from './living.js';
 
 export { ENTITY_KINDS, isEntityKind } from './entity-kinds.js';
@@ -143,12 +148,7 @@ export type {
 // barrel export so packages/firebase/src/embeddings/text.ts can import the shared
 // `deriveEraBuckets` (replacing its local duplicate) and so have a
 // single vocabulary source to import from — see ADR-015.
-export {
-  DATE_PRECISIONS,
-  deriveDecadeLabel,
-  deriveEraBuckets,
-  isDatePrecision,
-} from './era.js';
+export { DATE_PRECISIONS, deriveDecadeLabel, deriveEraBuckets, isDatePrecision } from './era.js';
 export type { DatePrecision, EraSpan } from './era.js';
 
 export {

@@ -31,7 +31,11 @@ export type CorrectionSubmissionStore = {
   save(entry: StoredCorrection): void;
   getBySubmissionId(id: string): StoredCorrection | undefined;
   getByReceiptCode(receiptCode: string, pepper: string): StoredCorrection | undefined;
-  attachAppeal(receiptCode: string, pepper: string, appeal: StoredAppeal): StoredCorrection | undefined;
+  attachAppeal(
+    receiptCode: string,
+    pepper: string,
+    appeal: StoredAppeal,
+  ): StoredCorrection | undefined;
   markClosed(
     submissionId: string,
     closureReason: PublicClosureReason,

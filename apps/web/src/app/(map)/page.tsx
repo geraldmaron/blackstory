@@ -4,10 +4,7 @@
  * (design-direction-v5 §6.1): About, From the data (archive + `/data` census viz), the story
  * rail, and the "how this works" band.
  */
-import {
-  getNationalPopulationByDecade,
-  getNationalPopulationChanges,
-} from '@repo/firebase';
+import { getNationalPopulationByDecade, getNationalPopulationChanges } from '@repo/firebase';
 import { HomeStorySections } from '../../components/home/HomeStorySections';
 import type { StateStartEntry } from '../../components/home/StateStart';
 import { FEATURED_SEED_IDS } from '../../data/public-seed';
@@ -72,9 +69,9 @@ export default async function HomePage() {
 
   // Feature the curated ids when the active release carries them; otherwise lead with whatever
   // the release does hold, so the rail never goes empty just because curation lagged a release.
-  const curated = FEATURED_SEED_IDS.map((id) => base.entities.find((entity) => entity.id === id)).filter(
-    (entity): entity is NonNullable<typeof entity> => Boolean(entity),
-  );
+  const curated = FEATURED_SEED_IDS.map((id) =>
+    base.entities.find((entity) => entity.id === id),
+  ).filter((entity): entity is NonNullable<typeof entity> => Boolean(entity));
   const featured = curated.length > 0 ? curated : base.entities.slice(0, 3);
 
   const states = tallyStates(base.featureCollection);

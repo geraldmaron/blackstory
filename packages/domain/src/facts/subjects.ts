@@ -13,7 +13,10 @@
  * convention), so a fact can never reference an entity that does not exist or was resolved under
  * the wrong kind.
  */
-import { mirrorFactSubjectsIntoRelationships, type FactSubjectSource } from '../graph/fact-subjects.js';
+import {
+  mirrorFactSubjectsIntoRelationships,
+  type FactSubjectSource,
+} from '../graph/fact-subjects.js';
 import type { EntityKind } from '../entity-kinds.js';
 import type { TemporalContext } from '../relationship.js';
 import type { FactRecord } from './record.js';
@@ -78,7 +81,9 @@ export function assertFactSubjectsResolve(
           : `${d.entityId} (expected kind ${d.expectedKind}, resolved as ${d.resolvedKind})`,
       )
       .join(', ');
-    throw new Error(`Fact ${fact.id} has dangling/kind-mismatched subjects[] references: ${detail}`);
+    throw new Error(
+      `Fact ${fact.id} has dangling/kind-mismatched subjects[] references: ${detail}`,
+    );
   }
 }
 
@@ -92,7 +97,10 @@ export function toFactSubjectSource(
   fact: Pick<FactRecord, 'id' | 'subjects' | 'citations' | 'when'>,
 ): FactSubjectSource {
   const temporal: TemporalContext | undefined = fact.when
-    ? { validFrom: fact.when.validFrom, ...(fact.when.validTo !== undefined ? { validTo: fact.when.validTo } : {}) }
+    ? {
+        validFrom: fact.when.validFrom,
+        ...(fact.when.validTo !== undefined ? { validTo: fact.when.validTo } : {}),
+      }
     : undefined;
   return {
     factId: fact.id,

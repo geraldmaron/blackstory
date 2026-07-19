@@ -1,4 +1,3 @@
-
 /**
  * Tests for the `jurisdictions` Firestore doc schema/converter.
  */

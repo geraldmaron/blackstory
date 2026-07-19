@@ -1,4 +1,3 @@
-
 /**
  * Shared types for load, abuse, and cost simulation harnesses.
  * Scenarios exercise @repo/security guardrails locally no live endpoint attacks.

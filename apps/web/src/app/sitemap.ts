@@ -16,9 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return buildPublicSitemapEntries({
     entities: entities.map((entity) => ({
       id: entity.id,
-      ...(entity.revision.recordUpdatedAt
-        ? { updatedAt: entity.revision.recordUpdatedAt }
-        : {}),
+      ...(entity.revision.recordUpdatedAt ? { updatedAt: entity.revision.recordUpdatedAt } : {}),
     })),
     ...(releaseGeneratedAt ? { releaseGeneratedAt } : {}),
   });

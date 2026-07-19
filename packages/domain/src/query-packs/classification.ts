@@ -2,15 +2,14 @@
  * Signal-strength classification for query-pack matches.
  * Weak signals may produce candidates only never independent promotion.
  */
-import type {
-  MatchOutcome,
-  QueryTerm,
-  SignalStrength,
-  TermClass,
-} from './types.js';
+import type { MatchOutcome, QueryTerm, SignalStrength, TermClass } from './types.js';
 
 const STRONG_CLASSES: ReadonlySet<TermClass> = new Set(['positive', 'historical', 'modern']);
-const SUPPORTING_CLASSES: ReadonlySet<TermClass> = new Set(['geographic', 'alias', 'source_specific']);
+const SUPPORTING_CLASSES: ReadonlySet<TermClass> = new Set([
+  'geographic',
+  'alias',
+  'source_specific',
+]);
 const WEAK_ONLY_CLASSES: ReadonlySet<TermClass> = new Set(['negative', 'alias', 'geographic']);
 
 export type ClassifySignalInput = {

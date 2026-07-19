@@ -37,7 +37,10 @@ test('radius is monotonically non-decreasing in evidenceCount at a fixed confide
   let previous = -Infinity;
   for (const count of counts) {
     const radius = markerRadius(count, 'high');
-    assert.ok(radius >= previous, `radius must not decrease as evidenceCount grows (count=${count})`);
+    assert.ok(
+      radius >= previous,
+      `radius must not decrease as evidenceCount grows (count=${count})`,
+    );
     previous = radius;
   }
 });
@@ -100,7 +103,10 @@ test('the confidence-modifier expression is built from CONFIDENCE_SIZE_MODIFIER 
  * shape `markerRadiusEvidenceExpression()` produces, so this test can prove the built expression
  * evaluates to the same numbers `markerRadius()` computes without pulling in a full MapLibre
  * expression runtime. */
-function evaluateLinearInterpolate(stops: ReadonlyArray<readonly [number, number]>, input: number): number {
+function evaluateLinearInterpolate(
+  stops: ReadonlyArray<readonly [number, number]>,
+  input: number,
+): number {
   if (input <= stops[0]![0]) return stops[0]![1];
   const last = stops[stops.length - 1]!;
   if (input >= last[0]) return last[1];

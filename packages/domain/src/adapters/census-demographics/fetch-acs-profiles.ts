@@ -26,7 +26,10 @@ async function assertVintageDictionary(vintage: AcsVintage, fetchImpl: FetchLike
   if (!response.ok) {
     throw new Error(`${vintage.dataset}: variables.json fetch failed (${response.status})`);
   }
-  assertAcsVariableLabels(vintage, (await response.json()) as Parameters<typeof assertAcsVariableLabels>[1]);
+  assertAcsVariableLabels(
+    vintage,
+    (await response.json()) as Parameters<typeof assertAcsVariableLabels>[1],
+  );
 }
 
 async function fetchParsed(
@@ -65,7 +68,12 @@ export async function fetchAcsTractProfiles(
   if (options.assertDictionary !== false) {
     await assertVintageDictionary(vintage, fetchImpl);
   }
-  return fetchParsed(vintage, buildAcsTractUrl(vintage, stateFips, options.apiKey), 'tract', fetchImpl);
+  return fetchParsed(
+    vintage,
+    buildAcsTractUrl(vintage, stateFips, options.apiKey),
+    'tract',
+    fetchImpl,
+  );
 }
 
 /** One dictionary assertion for a whole fan-out run. */

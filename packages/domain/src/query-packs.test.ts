@@ -84,7 +84,10 @@ test('content hash changes when terms change (reviewable versioning)', () => {
   const v2 = buildQueryPack({
     ...base,
     semver: '1.0.1',
-    terms: [{ text: 'activist', termClass: 'positive' }, { text: 'Montgomery', termClass: 'geographic' }],
+    terms: [
+      { text: 'activist', termClass: 'positive' },
+      { text: 'Montgomery', termClass: 'geographic' },
+    ],
   });
   assert.notEqual(v1.version.contentHash, v2.version.contentHash);
   assert.notEqual(v1.versionId, v2.versionId);
@@ -219,7 +222,10 @@ test('fixture expectations for matches and exclusions', () => {
     if (didMatch && expectation.matchedTermClasses) {
       const classes = new Set(matched.map((term) => term.termClass));
       for (const expectedClass of expectation.matchedTermClasses) {
-        assert.ok(classes.has(expectedClass), `Missing class ${expectedClass} for: ${expectation.input}`);
+        assert.ok(
+          classes.has(expectedClass),
+          `Missing class ${expectedClass} for: ${expectation.input}`,
+        );
       }
     }
   }

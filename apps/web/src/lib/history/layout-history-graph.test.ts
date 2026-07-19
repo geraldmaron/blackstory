@@ -32,11 +32,7 @@ function makeNode(
   };
 }
 
-function makeEdge(
-  edgeId: string,
-  fromEntityId: string,
-  toEntityId: string,
-): HistoryEdgeView {
+function makeEdge(edgeId: string, fromEntityId: string, toEntityId: string): HistoryEdgeView {
   return {
     edgeId,
     relationshipId: edgeId,
@@ -60,12 +56,7 @@ test('resolveHistoryGraphMode prefers neighborhood, then records, then aggregate
 
 test('layoutHistoryGraph aggregates by kind when the set is large', () => {
   const nodes = Array.from({ length: HISTORY_RECORD_GRAPH_MAX + 5 }, (_, index) =>
-    makeNode(
-      `n${index}`,
-      `Record ${index}`,
-      index % 2 === 0 ? 'school' : 'place',
-      index % 3,
-    ),
+    makeNode(`n${index}`, `Record ${index}`, index % 2 === 0 ? 'school' : 'place', index % 3),
   );
   const edges = [makeEdge('e0', 'n0', 'n1'), makeEdge('e1', 'n2', 'n3')];
   const result = layoutHistoryGraph(nodes, edges, { width: 640, height: 360, seed: 1 });

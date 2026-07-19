@@ -66,10 +66,7 @@ test('assertDiscoveryRunCannotPublish passes for publicEffect none', () => {
 test('assertDiscoveryRunCannotPublish throws when publicEffect is not none', () => {
   const doc = buildDiscoveryCampaignRunDoc(BASE_INPUT);
   const tampered = { ...doc, publicEffect: 'auto-publish' as 'none' };
-  assert.throws(
-    () => assertDiscoveryRunCannotPublish(tampered),
-    /cannot publish/,
-  );
+  assert.throws(() => assertDiscoveryRunCannotPublish(tampered), /cannot publish/);
 });
 
 test('in-memory store saves and retrieves by run id', () => {

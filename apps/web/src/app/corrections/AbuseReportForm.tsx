@@ -110,7 +110,13 @@ export function AbuseReportForm({ receiptCode }: { readonly receiptCode?: string
         <label className="ds-filters__label" htmlFor={statementId}>
           What happened? <span aria-hidden="true">*</span>
         </label>
-        <textarea className="ds-filters__control" id={statementId} name="statement" rows={4} required />
+        <textarea
+          className="ds-filters__control"
+          id={statementId}
+          name="statement"
+          rows={4}
+          required
+        />
       </div>
 
       <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>

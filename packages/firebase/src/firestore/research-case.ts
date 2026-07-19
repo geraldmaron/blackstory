@@ -1,4 +1,3 @@
-
 /**
  * Enforces server-side research-case permissions before executing domain transitions,
  * publication promotion, retraction, assignment, evidence, preview, or backfill work.
@@ -69,7 +68,6 @@ export function assertResearchCaseTransitionAuthorized(
   }
   assertResearchCaseActionAuthorized(token, 'transition', options);
 }
-
 
 /**
  * Executes a domain transition only after server authorization and verifies that the

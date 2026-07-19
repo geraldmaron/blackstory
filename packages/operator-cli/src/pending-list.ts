@@ -21,7 +21,9 @@ export type PendingListResult = {
 };
 
 function asRecord(value: unknown): Record<string, unknown> | undefined {
-  return value !== null && typeof value === 'object' ? (value as Record<string, unknown>) : undefined;
+  return value !== null && typeof value === 'object'
+    ? (value as Record<string, unknown>)
+    : undefined;
 }
 
 function readJson(path: string): unknown {
@@ -45,7 +47,9 @@ export function loadPendingEditorialItems(paths: readonly string[]): PendingList
           subjectId: row.subjectId,
           title: row.title,
           ...(typeof row.kind === 'string' ? { kind: row.kind } : {}),
-          ...(typeof row.existingSummary === 'string' ? { existingSummary: row.existingSummary } : {}),
+          ...(typeof row.existingSummary === 'string'
+            ? { existingSummary: row.existingSummary }
+            : {}),
           ...(typeof row.source === 'string' ? { source: row.source } : {}),
         });
       }
@@ -76,7 +80,10 @@ export function loadPendingEditorialItems(paths: readonly string[]): PendingList
         const subjectId =
           typeof row.candidateId === 'string'
             ? row.candidateId
-            : `pending_${title.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 48)}`;
+            : `pending_${title
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '_')
+                .slice(0, 48)}`;
         items.push({
           subjectId,
           title,

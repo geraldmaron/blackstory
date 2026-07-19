@@ -70,9 +70,7 @@ export function isOversizedLiveCatalogSentinel(
  * Decide what Next's data cache may store for a loaded catalog: the value itself when it
  * fits, otherwise only the oversized sentinel (fat payload must live in process memory).
  */
-export function nextDataCacheValueForCatalog<T>(
-  loaded: T,
-): T | OversizedLiveCatalogSentinel {
+export function nextDataCacheValueForCatalog<T>(loaded: T): T | OversizedLiveCatalogSentinel {
   if (!fitsNextDataCache(estimateJsonCacheBytes(loaded))) {
     return OVERSIZED_LIVE_CATALOG_SENTINEL;
   }

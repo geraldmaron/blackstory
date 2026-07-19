@@ -32,7 +32,9 @@ export type FetchFeedInput = {
   readonly retries?: number;
 };
 
-export async function fetchAndNormalizeFeed(input: FetchFeedInput): Promise<readonly RssCandidateRecord[]> {
+export async function fetchAndNormalizeFeed(
+  input: FetchFeedInput,
+): Promise<readonly RssCandidateRecord[]> {
   const response = await withRetry(
     () =>
       input.client({

@@ -1,4 +1,3 @@
-
 /**
  * Minimal, dependency-free embedding math + a deterministic mock provider for the retrieval
  * eval in retrieval-eval.ts.
@@ -38,7 +37,6 @@ function makeSeededRandom(seed: number): () => number {
     return state / 0xffffffff;
   };
 }
-
 
 /**
  * Deterministic, hash-seeded pseudo-random embedding same algorithm shape as

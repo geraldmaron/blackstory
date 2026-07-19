@@ -1,4 +1,3 @@
-
 /**
  * Automated acceptance checks for the threat abuse corpus.
  * Full security CI gates land in; this scaffold only validates the corpus.

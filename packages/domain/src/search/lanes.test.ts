@@ -59,11 +59,10 @@ test('eraBucketOverlapsRecord uses deriveEraBuckets labels', () => {
 });
 
 test('structured lane respects kill switch', () => {
-  const result = runStructuredLane(
-    { normalizedQuery: 'alpha', filters: [], limit: 10 },
-    INDEX,
-    { structuredEnabled: false, vectorEnabled: true },
-  );
+  const result = runStructuredLane({ normalizedQuery: 'alpha', filters: [], limit: 10 }, INDEX, {
+    structuredEnabled: false,
+    vectorEnabled: true,
+  });
   assert.equal(result.status, 'disabled');
   assert.equal(result.ranked.length, 0);
 });

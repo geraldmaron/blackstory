@@ -3,7 +3,11 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { buildPublicCorrectionStatus, isAppealEligible, mapModerationToPublicPhase } from './public-status';
+import {
+  buildPublicCorrectionStatus,
+  isAppealEligible,
+  mapModerationToPublicPhase,
+} from './public-status';
 
 test('maps coordinated campaign moderation to under_review without exposing brigading', () => {
   const status = buildPublicCorrectionStatus({

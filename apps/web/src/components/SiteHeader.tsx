@@ -6,11 +6,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  OVERFLOW_NAV,
-  PRIMARY_NAV,
-  absolutizeShellNav,
-} from '@repo/config';
+import { OVERFLOW_NAV, PRIMARY_NAV, absolutizeShellNav } from '@repo/config';
 import { ShellHeader, type ShellHeaderLinkProps } from '@repo/ui';
 import { webAdminHref } from '../lib/sibling-origins';
 

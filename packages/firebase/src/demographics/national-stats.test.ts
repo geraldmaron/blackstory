@@ -43,7 +43,8 @@ test('publicSourceUrl maps CDE signedurl to the FBI hate-crime hub', () => {
   assert.equal(
     publicSourceUrl({
       source: 'fbi-ucr-hate-crime',
-      sourceUrl: 'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/hate-crime/hate_crime.zip',
+      sourceUrl:
+        'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/hate-crime/hate_crime.zip',
     }),
     'https://ucr.fbi.gov/hate-crime',
   );
@@ -142,10 +143,34 @@ test('computeNationalPopulationChangesFromDecades builds adjacent decade pairs',
 
 test('computeStatePopulationChangesFromDecades ranks by absolute Black population change', () => {
   const rows = [
-    { stateFips: '06', decade: '2010' as const, countyCount: 58, totalPopulation: 37_000_000, blackPopulation: 2_000_000 },
-    { stateFips: '06', decade: '2020' as const, countyCount: 58, totalPopulation: 39_000_000, blackPopulation: 2_200_000 },
-    { stateFips: '48', decade: '2010' as const, countyCount: 254, totalPopulation: 25_000_000, blackPopulation: 3_000_000 },
-    { stateFips: '48', decade: '2020' as const, countyCount: 254, totalPopulation: 29_000_000, blackPopulation: 3_500_000 },
+    {
+      stateFips: '06',
+      decade: '2010' as const,
+      countyCount: 58,
+      totalPopulation: 37_000_000,
+      blackPopulation: 2_000_000,
+    },
+    {
+      stateFips: '06',
+      decade: '2020' as const,
+      countyCount: 58,
+      totalPopulation: 39_000_000,
+      blackPopulation: 2_200_000,
+    },
+    {
+      stateFips: '48',
+      decade: '2010' as const,
+      countyCount: 254,
+      totalPopulation: 25_000_000,
+      blackPopulation: 3_000_000,
+    },
+    {
+      stateFips: '48',
+      decade: '2020' as const,
+      countyCount: 254,
+      totalPopulation: 29_000_000,
+      blackPopulation: 3_500_000,
+    },
   ];
   const changes = computeStatePopulationChangesFromDecades(rows, '2010', '2020');
   assert.equal(changes.length, 2);
@@ -156,8 +181,20 @@ test('computeStatePopulationChangesFromDecades ranks by absolute Black populatio
 
 test('computeStatePopulationChange preserves endpoint populations', () => {
   const change = computeStatePopulationChange(
-    { stateFips: '36', decade: '2010', countyCount: 62, totalPopulation: 19_000_000, blackPopulation: 3_000_000 },
-    { stateFips: '36', decade: '2020', countyCount: 62, totalPopulation: 20_000_000, blackPopulation: 3_100_000 },
+    {
+      stateFips: '36',
+      decade: '2010',
+      countyCount: 62,
+      totalPopulation: 19_000_000,
+      blackPopulation: 3_000_000,
+    },
+    {
+      stateFips: '36',
+      decade: '2020',
+      countyCount: 62,
+      totalPopulation: 20_000_000,
+      blackPopulation: 3_100_000,
+    },
   );
   assert.equal(change.blackPopulationFrom, 3_000_000);
   assert.equal(change.blackPopulationTo, 3_100_000);
@@ -174,10 +211,7 @@ test('buildStateFipsNameMap labels Puerto Rico and other territory FIPS', () => 
 });
 
 test('hateCrimeAntiBlackShare returns null when incidents are zero', () => {
-  assert.equal(
-    hateCrimeAntiBlackShare({ incidents: 0, antiBlackIncidents: 0 }),
-    null,
-  );
+  assert.equal(hateCrimeAntiBlackShare({ incidents: 0, antiBlackIncidents: 0 }), null);
   assert.equal(
     hateCrimeAntiBlackShare({ incidents: 100, antiBlackIncidents: 62 }).toFixed(2),
     '0.62',
@@ -199,16 +233,7 @@ test('aggregateOpportunityAtlasCoverage counts outcome fields and histogram bins
     aggregate.outcomeFieldCoverage.find((row) => row.field === 'kfrWhiteP25')?.tractCount,
     1,
   );
-  assert.equal(
-    aggregate.kfrBlackP25Histogram.find((bin) => bin.id === '0-20')?.tractCount,
-    1,
-  );
-  assert.equal(
-    aggregate.kfrBlackP25Histogram.find((bin) => bin.id === '40-60')?.tractCount,
-    1,
-  );
-  assert.equal(
-    aggregate.kfrBlackP25Histogram.find((bin) => bin.id === '80-100')?.tractCount,
-    1,
-  );
+  assert.equal(aggregate.kfrBlackP25Histogram.find((bin) => bin.id === '0-20')?.tractCount, 1);
+  assert.equal(aggregate.kfrBlackP25Histogram.find((bin) => bin.id === '40-60')?.tractCount, 1);
+  assert.equal(aggregate.kfrBlackP25Histogram.find((bin) => bin.id === '80-100')?.tractCount, 1);
 });

@@ -1,4 +1,3 @@
-
 /**
  * Retrieval-quality eval over gold corpus, for semantic search (recall@k).
  *
@@ -43,7 +42,6 @@ export function buildRetrievalDocuments(corpus: GoldCorpus): readonly RetrievalE
   }));
 }
 
-
 /**
  * One query per example, built from subjectType + categories deliberately not the example's
  * title, so the query is a different string than any single stored document (see module doc).
@@ -87,7 +85,6 @@ export type RetrievalEvalResult = {
 };
 
 const DEFAULT_K_VALUES = [5, 10] as const;
-
 
 /**
  * Runs the retrieval eval end to end: embeds every document and query with the injected

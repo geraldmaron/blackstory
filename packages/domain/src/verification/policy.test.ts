@@ -71,7 +71,10 @@ test('resolveVerificationPolicy breaks ties by preferring the narrower predicate
     id: 'broad-person-policy',
     appliesToPredicates: ['vital_status', 'current_office', 'employer'],
   });
-  const narrow = policy({ id: 'narrow-vital-status-policy', appliesToPredicates: ['vital_status'] });
+  const narrow = policy({
+    id: 'narrow-vital-status-policy',
+    appliesToPredicates: ['vital_status'],
+  });
   const resolved = resolveVerificationPolicy([broad, narrow], {
     entityClass: 'person',
     predicate: 'vital_status',

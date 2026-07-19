@@ -1,4 +1,3 @@
-
 /**
  * performance regression budgets config-driven thresholds that fail CI when exceeded.
  * Metrics are supplied by Lighthouse CI, bundle analyzers, or synthetic harnesses; this module
@@ -70,7 +69,6 @@ export const DEFAULT_PERFORMANCE_BUDGET = Object.freeze({
 function thresholdKey(threshold: PerformanceBudgetThreshold): string {
   return `${threshold.journey ?? 'global'}:${threshold.metric}`;
 }
-
 
 /**
  * Evaluates sampled metrics against configured budgets. Returns violations for CI gates.

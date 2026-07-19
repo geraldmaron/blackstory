@@ -13,10 +13,17 @@ export type LegalExplainerSectionsProps = {
   readonly statusBadge: React.ReactNode;
 };
 
-export function LegalExplainerSections({ explainer, citation, statusBadge }: LegalExplainerSectionsProps) {
+export function LegalExplainerSections({
+  explainer,
+  citation,
+  statusBadge,
+}: LegalExplainerSectionsProps) {
   return (
     <div className="ds-stack">
-      <p className="ds-sans" style={{ margin: 0, fontSize: '0.875rem', color: 'var(--ds-ink-muted)' }}>
+      <p
+        className="ds-sans"
+        style={{ margin: 0, fontSize: '0.875rem', color: 'var(--ds-ink-muted)' }}
+      >
         Reviewed {formatReviewDate(explainer.reviewedAt)} · {citation} · {statusBadge}
       </p>
 

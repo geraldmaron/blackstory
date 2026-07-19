@@ -1,4 +1,3 @@
-
 /**
  * Exercises App Check rollout, replay, trusted-identity, and token-redaction
  * behavior without requiring Firebase network access.

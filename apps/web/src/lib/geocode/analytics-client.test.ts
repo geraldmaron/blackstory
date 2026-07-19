@@ -4,7 +4,10 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { buildCoarseLocationAnalyticsEvent, type CoarseAnalyticsResolutionLike } from './analytics-client';
+import {
+  buildCoarseLocationAnalyticsEvent,
+  type CoarseAnalyticsResolutionLike,
+} from './analytics-client';
 
 const FIXED_NOW = () => '2026-01-01T00:00:00.000Z';
 

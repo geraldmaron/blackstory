@@ -95,8 +95,14 @@ export function eraBucketOverlapsRecord(
   recordEraBuckets: readonly string[],
 ): boolean {
   if (!eraBucket) return false;
-  const spanBuckets = deriveEraBuckets({ validFrom: eraBucket.replace(/s$/, ''), datePrecision: 'decade' });
-  return spanBuckets.some((bucket) => recordEraBuckets.includes(bucket)) || recordEraBuckets.includes(eraBucket);
+  const spanBuckets = deriveEraBuckets({
+    validFrom: eraBucket.replace(/s$/, ''),
+    datePrecision: 'decade',
+  });
+  return (
+    spanBuckets.some((bucket) => recordEraBuckets.includes(bucket)) ||
+    recordEraBuckets.includes(eraBucket)
+  );
 }
 
 /**

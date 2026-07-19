@@ -1,4 +1,3 @@
-
 /**
  * Composes the real safe fetch + citation prefill + draft-case creation into one
  * operator workflow: "take a URL/topic, run it through capture + citation scaffolding + draft-
@@ -40,7 +39,6 @@ export type ResearchIntakeOutcome = {
   readonly capturePlan?: CapturePlan;
   readonly intake?: OperatorIntakeOutcome;
 };
-
 
 /**
  * Fetches `input.url` through, pre-fills citation metadata from what comes back, notes

@@ -20,7 +20,11 @@ import {
 import type { LayerSignal } from './types.js';
 
 const PLACE = 'place_composite_1';
-const CITATION = { claimId: 'claim_1', sourceLabel: 'EJI', retrievedAt: '2026-01-01T00:00:00.000Z' };
+const CITATION = {
+  claimId: 'claim_1',
+  sourceLabel: 'EJI',
+  retrievedAt: '2026-01-01T00:00:00.000Z',
+};
 
 function layerSignal(
   layerId: LayerSignal['layerId'],
@@ -55,7 +59,11 @@ test('computeComposite derives value ONLY from layers 1-4 with published weights
     exclusionInfrastructure: layerSignal('exclusion_infrastructure', 1),
     presenceAffirmation: layerSignal('presence_affirmation', 0),
   };
-  const result = computeComposite({ placeEntityId: PLACE, layers, calculatedAt: '2026-07-17T00:00:00.000Z' });
+  const result = computeComposite({
+    placeEntityId: PLACE,
+    layers,
+    calculatedAt: '2026-07-17T00:00:00.000Z',
+  });
   assert.equal(result.value, 1);
   assert.deepEqual(result.layerContributions, {
     documented_events: 1,
@@ -120,7 +128,11 @@ test('recalculateComposite stamps  audit metadata with fingerprints and recalcul
   const layers: CompositeLayerInputs = {
     documentedEvents: layerSignal('documented_events', 0.8),
   };
-  const first = recalculateComposite({ placeEntityId: PLACE, layers, calculatedAt: '2026-07-17T00:00:00.000Z' });
+  const first = recalculateComposite({
+    placeEntityId: PLACE,
+    layers,
+    calculatedAt: '2026-07-17T00:00:00.000Z',
+  });
   assert.equal(first.audit.auditVersion, COMPOSITE_AUDIT_VERSION);
   assert.equal(first.audit.engineVersion, COMPOSITE_ENGINE_VERSION);
   assert.equal(first.audit.methodologyVersion, COMPOSITE_METHODOLOGY_VERSION);

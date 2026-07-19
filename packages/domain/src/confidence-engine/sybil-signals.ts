@@ -231,7 +231,11 @@ function findSharedValueFindings(
     const sorted = [...new Set(lineageRootIds)].sort();
     for (let i = 0; i < sorted.length; i += 1) {
       for (let j = i + 1; j < sorted.length; j += 1) {
-        findings.push({ kind, lineageRootIds: pairKey(sorted[i]!, sorted[j]!), sharedValue: value });
+        findings.push({
+          kind,
+          lineageRootIds: pairKey(sorted[i]!, sorted[j]!),
+          sharedValue: value,
+        });
       }
     }
   }
@@ -415,7 +419,9 @@ export function assessAdvisorySignals(input: {
     coRegistration,
     nearSimultaneousPublication,
     recentFirstSeen,
-    independenceDiscount: round4(Math.min(MAX_ADVISORY_INDEPENDENCE_DISCOUNT, clamp01(rawDiscount))),
+    independenceDiscount: round4(
+      Math.min(MAX_ADVISORY_INDEPENDENCE_DISCOUNT, clamp01(rawDiscount)),
+    ),
   };
 }
 

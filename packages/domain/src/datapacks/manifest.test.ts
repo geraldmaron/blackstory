@@ -54,7 +54,10 @@ test('assertDataPackManifestShapeValid accepts a well-formed manifest', () => {
 });
 
 test('assertDataPackManifestShapeValid rejects an empty resources array', () => {
-  assert.throws(() => assertDataPackManifestShapeValid(baseManifest({ resources: [] })), /non-empty/);
+  assert.throws(
+    () => assertDataPackManifestShapeValid(baseManifest({ resources: [] })),
+    /non-empty/,
+  );
 });
 
 test('assertDataPackManifestShapeValid rejects duplicate resource names', () => {
@@ -110,7 +113,10 @@ test('verifySignedDataPackManifest rejects a tampered signature value', () => {
   });
   const tampered = {
     ...signed,
-    signature: { ...signed.signature, value: Buffer.from('not-a-real-signature').toString('base64') },
+    signature: {
+      ...signed.signature,
+      value: Buffer.from('not-a-real-signature').toString('base64'),
+    },
   };
   assert.equal(verifySignedDataPackManifest(tampered, publicKey), false);
 });

@@ -1,4 +1,3 @@
-
 /**
  * Thin audit/outbox builders for operator proposals.
  *

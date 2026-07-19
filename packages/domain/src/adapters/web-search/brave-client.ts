@@ -42,7 +42,9 @@ export function buildBraveWebSearchUrl(input: BuildBraveSearchUrlInput): string 
 function parseResult(
   raw: unknown,
   index: number,
-): { readonly result: WebSearchRawResult } | { readonly rejected: { readonly index: number; readonly reason: string } } {
+):
+  | { readonly result: WebSearchRawResult }
+  | { readonly rejected: { readonly index: number; readonly reason: string } } {
   if (!raw || typeof raw !== 'object') {
     return { rejected: { index, reason: 'not_an_object' } };
   }
@@ -51,11 +53,18 @@ function parseResult(
   if (!url) {
     return { rejected: { index, reason: 'missing_url' } };
   }
-  const title = typeof record.title === 'string' && record.title.trim() ? record.title.trim() : undefined;
+  const title =
+    typeof record.title === 'string' && record.title.trim() ? record.title.trim() : undefined;
   const description =
-    typeof record.description === 'string' && record.description.trim() ? record.description.trim() : undefined;
+    typeof record.description === 'string' && record.description.trim()
+      ? record.description.trim()
+      : undefined;
   const pageAge =
-    typeof record.page_age === 'string' ? record.page_age : typeof record.age === 'string' ? record.age : undefined;
+    typeof record.page_age === 'string'
+      ? record.page_age
+      : typeof record.age === 'string'
+        ? record.age
+        : undefined;
 
   return {
     result: {
@@ -73,7 +82,10 @@ export function parseBraveSearchResponse(raw: unknown): WebSearchParsedBatch {
     throw new Error('Brave web search response must be an object');
   }
   const record = raw as Record<string, unknown>;
-  const web = record.web && typeof record.web === 'object' ? (record.web as Record<string, unknown>) : undefined;
+  const web =
+    record.web && typeof record.web === 'object'
+      ? (record.web as Record<string, unknown>)
+      : undefined;
   const rawResults = web && Array.isArray(web.results) ? web.results : [];
 
   const results: WebSearchRawResult[] = [];

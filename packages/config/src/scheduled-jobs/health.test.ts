@@ -1,4 +1,3 @@
-
 /**
  * Silence is a failure mode, not just explicit failure. A job that simply
  * stops running (no run records at) must be detected, and a job that
@@ -42,9 +41,12 @@ test('a job with no run history at all, silently overdue, triggers a missed-run 
 
 test('a job that ran recently and on cadence is not flagged as missed', () => {
   const runs = [
-    completeJobRun(startJobRun({ jobId: JOB.id, jobRunId: 'r-1', startedAt: '2026-07-16T04:00:00.000Z' }), {
-      completedAt: '2026-07-16T04:05:00.000Z',
-    }),
+    completeJobRun(
+      startJobRun({ jobId: JOB.id, jobRunId: 'r-1', startedAt: '2026-07-16T04:00:00.000Z' }),
+      {
+        completedAt: '2026-07-16T04:05:00.000Z',
+      },
+    ),
   ];
   const evaluation = evaluateMissedRuns({
     job: JOB,
@@ -58,10 +60,13 @@ test('a job that ran recently and on cadence is not flagged as missed', () => {
 
 test('an explicit failure run does not reset the silence clock — a job that keeps loudly failing is still "missed" for alerting purposes', () => {
   const runs = [
-    failJobRun(startJobRun({ jobId: JOB.id, jobRunId: 'r-crashed', startedAt: '2026-07-10T04:00:00.000Z' }), {
-      completedAt: '2026-07-10T04:00:05.000Z',
-      errorSummary: 'adapter timeout',
-    }),
+    failJobRun(
+      startJobRun({ jobId: JOB.id, jobRunId: 'r-crashed', startedAt: '2026-07-10T04:00:00.000Z' }),
+      {
+        completedAt: '2026-07-10T04:00:05.000Z',
+        errorSummary: 'adapter timeout',
+      },
+    ),
   ];
   const evaluation = evaluateMissedRuns({
     job: JOB,
@@ -76,20 +81,26 @@ test('an explicit failure run does not reset the silence clock — a job that ke
 });
 
 test('a run within budget does not trigger a budget alert', () => {
-  const run = completeJobRun(startJobRun({ jobId: JOB.id, jobRunId: 'r-ok', startedAt: '2026-07-17T04:00:00.000Z' }), {
-    completedAt: '2026-07-17T04:05:00.000Z',
-    itemsProcessed: 50,
-  });
+  const run = completeJobRun(
+    startJobRun({ jobId: JOB.id, jobRunId: 'r-ok', startedAt: '2026-07-17T04:00:00.000Z' }),
+    {
+      completedAt: '2026-07-17T04:05:00.000Z',
+      itemsProcessed: 50,
+    },
+  );
   const evaluation = evaluateJobBudget({ job: JOB, run });
   assert.equal(evaluation.triggered, false);
   assert.equal(evaluation.percentOfBudget, 50);
 });
 
 test('a run that exceeds its declared budget triggers a budget alert', () => {
-  const run = completeJobRun(startJobRun({ jobId: JOB.id, jobRunId: 'r-over', startedAt: '2026-07-17T04:00:00.000Z' }), {
-    completedAt: '2026-07-17T04:05:00.000Z',
-    itemsProcessed: 250,
-  });
+  const run = completeJobRun(
+    startJobRun({ jobId: JOB.id, jobRunId: 'r-over', startedAt: '2026-07-17T04:00:00.000Z' }),
+    {
+      completedAt: '2026-07-17T04:05:00.000Z',
+      itemsProcessed: 250,
+    },
+  );
   const evaluation = evaluateJobBudget({ job: JOB, run });
   assert.equal(evaluation.triggered, true);
   assert.equal(evaluation.observed, 250);

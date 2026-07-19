@@ -1,4 +1,3 @@
-
 /**
  * Tests for the real Gemini embedding provider request/response shaping only, via
  * an injected fake client. No network access or API key is used or required.

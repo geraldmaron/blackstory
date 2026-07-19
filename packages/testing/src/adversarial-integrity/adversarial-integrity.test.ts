@@ -1,4 +1,3 @@
-
 /**
  * acceptance tests: adversarial integrity scenarios against real domain/security gates.
  * No live network attacks fixtures import evaluators directly from workspace packages.

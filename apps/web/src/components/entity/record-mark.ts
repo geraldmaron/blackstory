@@ -19,9 +19,7 @@ export type RecordMarkShapeMeta = {
   readonly altNoun: string;
 };
 
-export const RECORD_MARK_SHAPE_META: Readonly<
-  Record<RecordMarkShape, RecordMarkShapeMeta>
-> = {
+export const RECORD_MARK_SHAPE_META: Readonly<Record<RecordMarkShape, RecordMarkShapeMeta>> = {
   book: { id: 'book', label: 'Open book', altNoun: 'an open-book silhouette' },
   pin: { id: 'pin', label: 'Place pin', altNoun: 'a place-pin silhouette' },
   arch: { id: 'arch', label: 'Arch', altNoun: 'an arch silhouette' },
@@ -82,11 +80,8 @@ export function recordMarkAlt(input: {
   readonly jurisdictionLabel?: string;
 }): string {
   const meta = RECORD_MARK_SHAPE_META[input.shape];
-  const kindBit =
-    input.kindLabel !== undefined ? ` (${input.kindLabel} record)` : '';
-  const placeBit = input.jurisdictionLabel?.trim()
-    ? ` in ${input.jurisdictionLabel.trim()}`
-    : '';
+  const kindBit = input.kindLabel !== undefined ? ` (${input.kindLabel} record)` : '';
+  const placeBit = input.jurisdictionLabel?.trim() ? ` in ${input.jurisdictionLabel.trim()}` : '';
 
   return (
     `Symbolic record mark in the shape of ${meta.altNoun} for ${input.entityName}` +
@@ -95,16 +90,13 @@ export function recordMarkAlt(input: {
   );
 }
 
-export const RECORD_MARK_CAPTION =
-  'Record mark · awaits a rights-cleared photo';
+export const RECORD_MARK_CAPTION = 'Record mark · awaits a rights-cleared photo';
 
 /** When a published primary URL failed every candidate in the mast chain. */
-export const RECORD_MARK_CAPTION_UNAVAILABLE =
-  'Record mark · published photo unavailable';
+export const RECORD_MARK_CAPTION_UNAVAILABLE = 'Record mark · published photo unavailable';
 
 /** When Save-Data prefers the symbolic mark over fetching the photo. */
-export const RECORD_MARK_CAPTION_DATA_SAVER =
-  'Record mark · photo deferred for data saver';
+export const RECORD_MARK_CAPTION_DATA_SAVER = 'Record mark · photo deferred for data saver';
 
 /** Visible figcaption for a given mark reason (defaults to awaits-photo). */
 export function recordMarkCaption(reason?: RecordMarkReason): string {

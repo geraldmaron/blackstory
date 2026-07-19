@@ -57,12 +57,7 @@ export type RelevanceGateResult = {
 };
 
 export type RelevanceEvidenceKind =
-  | 'signal'
-  | 'geographic'
-  | 'thematic'
-  | 'source'
-  | 'gate'
-  | 'override';
+  'signal' | 'geographic' | 'thematic' | 'source' | 'gate' | 'override';
 
 export type RelevanceEvidence = {
   readonly kind: RelevanceEvidenceKind;

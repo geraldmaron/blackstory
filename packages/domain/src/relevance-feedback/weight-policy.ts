@@ -24,7 +24,11 @@
  * `relevance-feedback.test.ts`'s "report alone cannot mutate live weights" tests.
  */
 import { hashUtf8 } from '../provenance/hashes.js';
-import { RELEVANCE_DIMENSIONS, RELEVANCE_DIMENSION_WEIGHTS, type RelevanceDimension } from '../relevance/index.js';
+import {
+  RELEVANCE_DIMENSIONS,
+  RELEVANCE_DIMENSION_WEIGHTS,
+  type RelevanceDimension,
+} from '../relevance/index.js';
 import { RELEVANCE_FEEDBACK_SCHEMA_VERSION } from './types.js';
 
 export const RELEVANCE_WEIGHT_POLICY_SCHEMA_VERSION = 'relevance-weight-policy.v1' as const;
@@ -57,7 +61,9 @@ function assertWeightsValid(weights: Readonly<Record<RelevanceDimension, number>
   for (const dimension of RELEVANCE_DIMENSIONS) {
     const value = weights[dimension];
     if (!Number.isFinite(value) || value < 0 || value > 1) {
-      throw new RangeError(`Relevance weight for "${dimension}" must be a finite number between 0 and 1`);
+      throw new RangeError(
+        `Relevance weight for "${dimension}" must be a finite number between 0 and 1`,
+      );
     }
   }
   const sum = RELEVANCE_DIMENSIONS.reduce((total, dimension) => total + weights[dimension], 0);
@@ -90,10 +96,13 @@ export function buildRelevanceWeightPolicy(input: {
   }
   assertWeightsValid(input.weights);
   const weights = Object.freeze(
-    Object.fromEntries(RELEVANCE_DIMENSIONS.map((dimension) => [dimension, input.weights[dimension]])),
+    Object.fromEntries(
+      RELEVANCE_DIMENSIONS.map((dimension) => [dimension, input.weights[dimension]]),
+    ),
   ) as Readonly<Record<RelevanceDimension, number>>;
   const contentHash = `sha256:${
-    hashUtf8(JSON.stringify(canonicalize({ policyVersion: input.policyVersion.trim(), weights }))).digest
+    hashUtf8(JSON.stringify(canonicalize({ policyVersion: input.policyVersion.trim(), weights })))
+      .digest
   }`;
   return Object.freeze({
     schemaVersion: RELEVANCE_WEIGHT_POLICY_SCHEMA_VERSION,
@@ -134,7 +143,9 @@ export function proposeWeightChange(input: {
     throw new Error('Weight change proposal requires a non-empty rationale');
   }
   if (input.candidatePolicy.contentHash === input.currentPolicy.contentHash) {
-    throw new Error('Proposed weight policy is identical to the current policy; nothing to propose');
+    throw new Error(
+      'Proposed weight policy is identical to the current policy; nothing to propose',
+    );
   }
   return Object.freeze({
     schemaVersion: RELEVANCE_FEEDBACK_SCHEMA_VERSION,

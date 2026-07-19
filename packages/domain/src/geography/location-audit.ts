@@ -121,7 +121,6 @@ export function streetAddressesCompatible(locationLabel: string, matchedAddress:
   return true;
 }
 
-
 /** Labels that are clearly city/area phrasing even if precision is finer. */
 const AREA_ONLY_HINT =
   /\b(area|region|county|parish|metro|metropolitan|greater)\b|\(.*\b(site|massacre|arrest)\b.*\)/i;
@@ -136,12 +135,19 @@ export type ClassifyLocationEvidenceInput = {
  * Street numbers win; city/county/state (and neighborhood without a place name) are area-only;
  * everything else is a named place (campus, museum, base, park).
  */
-export function classifyLocationEvidence(input: ClassifyLocationEvidenceInput): LocationEvidenceClass {
+export function classifyLocationEvidence(
+  input: ClassifyLocationEvidenceInput,
+): LocationEvidenceClass {
   const label = input.locationLabel.trim();
   if (STREET_NUMBER_PATTERN.test(label)) return 'street_address';
 
   const precision = input.locationPrecision.trim().toLowerCase();
-  if (precision === 'city' || precision === 'county' || precision === 'state' || precision === 'country') {
+  if (
+    precision === 'city' ||
+    precision === 'county' ||
+    precision === 'state' ||
+    precision === 'country'
+  ) {
     return 'area_only';
   }
   if (precision === 'neighborhood' && AREA_ONLY_HINT.test(label)) {
@@ -234,7 +240,9 @@ function statesRoughlyMatch(jurisdictionLabel: string, geocodeStateName?: string
  * Auto-correct only for street-address evidence with a Census (or other) match inside the
  * declared state and beyond the tier drift threshold — never invent a sharper pin for area-only.
  */
-export function decideLocationCorrection(input: DecideLocationCorrectionInput): LocationCorrectionDecision {
+export function decideLocationCorrection(
+  input: DecideLocationCorrectionInput,
+): LocationCorrectionDecision {
   const evidenceClass = classifyLocationEvidence({
     locationLabel: input.locationLabel,
     locationPrecision: input.locationPrecision,
@@ -248,7 +256,8 @@ export function decideLocationCorrection(input: DecideLocationCorrectionInput): 
         entityId: input.entityId,
         evidenceClass,
         action: 'correct_coordinates',
-        reason: 'stored coordinates outside jurisdiction state bbox; geocode is inside declared state',
+        reason:
+          'stored coordinates outside jurisdiction state bbox; geocode is inside declared state',
         thresholdMeters,
         suggestedPrecision,
         corrected: { lat: input.geocode.lat, lng: input.geocode.lng },
@@ -408,7 +417,10 @@ export function decideLocationCorrection(input: DecideLocationCorrectionInput): 
 }
 
 /** Build the one-line geocode query from catalog fields (street-preferring, Census-oriented). */
-export function buildLocationGeocodeQuery(locationLabel: string, jurisdictionLabel: string): string {
+export function buildLocationGeocodeQuery(
+  locationLabel: string,
+  jurisdictionLabel: string,
+): string {
   return buildCensusGeocodeQuery(locationLabel, jurisdictionLabel);
 }
 
@@ -431,7 +443,10 @@ export function placeTitleCandidatesFromLabel(locationLabel: string): readonly s
     .replace(/\s+/g, ' ')
     .trim();
   const beforeStreet = cleaned.split(/\b\d{1,5}\s+[A-Za-z0-9]/)[0]?.trim();
-  const head = (beforeStreet && beforeStreet.length >= 3 ? beforeStreet : cleaned).replace(/,\s*$/, '');
+  const head = (beforeStreet && beforeStreet.length >= 3 ? beforeStreet : cleaned).replace(
+    /,\s*$/,
+    '',
+  );
   const segments = head
     .split(',')
     .map((s) => s.trim())
@@ -521,11 +536,6 @@ const US_STATE_PLACE_TITLES = new Set(
 
 /** True when a title is only a US state / DC (unsafe as a Wikidata pin source). */
 export function isJurisdictionOnlyPlaceTitle(title: string): boolean {
-  const normalized = title
-    .trim()
-    .toLowerCase()
-    .replace(/\.$/, '')
-    .replace(/\s+/g, ' ');
+  const normalized = title.trim().toLowerCase().replace(/\.$/, '').replace(/\s+/g, ' ');
   return US_STATE_PLACE_TITLES.has(normalized);
 }
-

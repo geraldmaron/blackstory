@@ -127,7 +127,7 @@ export function assertLayerSignalValid(signal: LayerSignal): void {
     assertLayerCitationValid(citation);
   }
   if (signal.methodologyNote.layerId !== signal.layerId) {
-    throw new Error('LayerSignal.methodologyNote.layerId must match the signal\'s own layerId');
+    throw new Error("LayerSignal.methodologyNote.layerId must match the signal's own layerId");
   }
   assertLayerMethodologyNoteValid(signal.methodologyNote);
 }

@@ -134,7 +134,8 @@ function layoutAggregate(
   const layoutNodes: LayoutHistoryGraphNode[] = kinds.map((kind, index) => {
     const encoding = encodingForKind(kind);
     const count = kindCounts.get(kind) ?? 0;
-    const angle = kinds.length === 1 ? -Math.PI / 2 : (index / kinds.length) * Math.PI * 2 - Math.PI / 2;
+    const angle =
+      kinds.length === 1 ? -Math.PI / 2 : (index / kinds.length) * Math.PI * 2 - Math.PI / 2;
     return {
       id: `kind:${kind}`,
       kind,
@@ -225,7 +226,9 @@ function layoutNeighborhood(
   const neighbors = [...neighborIds]
     .map((id) => byId.get(id))
     .filter((node): node is HistoryNodeView => node !== undefined)
-    .sort((a, b) => b.connectionCount - a.connectionCount || a.displayName.localeCompare(b.displayName))
+    .sort(
+      (a, b) => b.connectionCount - a.connectionCount || a.displayName.localeCompare(b.displayName),
+    )
     .slice(0, neighborhoodMax);
 
   const truncated = neighborIds.size > neighbors.length;
@@ -337,7 +340,9 @@ function layoutRecords(
     kindNodes.forEach((node, nodeIndex) => {
       const encoding = encodingForNode(node);
       const nodeAngle =
-        kindNodes.length === 1 ? clusterAngle + Math.PI : (nodeIndex / kindNodes.length) * Math.PI * 2;
+        kindNodes.length === 1
+          ? clusterAngle + Math.PI
+          : (nodeIndex / kindNodes.length) * Math.PI * 2;
       const jitter = (random() - 0.5) * 10;
       layoutNodes.push({
         id: node.entityId,

@@ -20,9 +20,7 @@ const BASE_CLAIM: PublicClaimView = {
 };
 
 test('toEvidenceClaimInputs maps explicit independentLineageCount when greater than zero', () => {
-  const [mapped] = toEvidenceClaimInputs([
-    { ...BASE_CLAIM, independentLineageCount: 3 },
-  ]);
+  const [mapped] = toEvidenceClaimInputs([{ ...BASE_CLAIM, independentLineageCount: 3 }]);
   assert.deepEqual(mapped!.sourceLineage, { independentLineageCount: 3 });
 });
 
@@ -32,8 +30,6 @@ test('toEvidenceClaimInputs omits sourceLineage when count is absent (panel uses
 });
 
 test('toEvidenceClaimInputs omits sourceLineage when count is zero', () => {
-  const [mapped] = toEvidenceClaimInputs([
-    { ...BASE_CLAIM, independentLineageCount: 0 },
-  ]);
+  const [mapped] = toEvidenceClaimInputs([{ ...BASE_CLAIM, independentLineageCount: 0 }]);
   assert.equal(mapped!.sourceLineage, undefined);
 });

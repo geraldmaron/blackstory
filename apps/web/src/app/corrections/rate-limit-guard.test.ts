@@ -15,7 +15,11 @@ test('denies anonymous corrections without App Check verification', () => {
 
 test('allows only two verified anonymous corrections per rolling window', () => {
   const guard = createCorrectionRateLimitGuard({ now: () => 0 });
-  const request = { subject: 'anonymous' as const, clientIp: '203.0.113.11', appCheckVerified: true };
+  const request = {
+    subject: 'anonymous' as const,
+    clientIp: '203.0.113.11',
+    appCheckVerified: true,
+  };
 
   const first = guard.evaluate(request);
   assert.equal(first.allowed, true);

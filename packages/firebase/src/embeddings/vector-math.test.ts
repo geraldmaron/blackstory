@@ -1,4 +1,3 @@
-
 /**
  * Tests for pure embedding-vector math.
  */

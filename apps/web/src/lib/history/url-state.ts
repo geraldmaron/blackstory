@@ -21,7 +21,9 @@ export type HistoryViewState = {
   readonly edge?: string;
 };
 
-export type RawHistorySearchParams = Readonly<Record<string, string | readonly string[] | undefined>>;
+export type RawHistorySearchParams = Readonly<
+  Record<string, string | readonly string[] | undefined>
+>;
 
 function firstValue(raw: string | readonly string[] | undefined): string | undefined {
   if (raw === undefined) return undefined;

@@ -1,4 +1,3 @@
-
 /**
  * Confidence indicator with text/mono cue so status is never color-only.
  */

@@ -1,4 +1,3 @@
-
 /**
  * Deterministic cost-per-abusive-request estimates.
  * Uses policy metadata from /026/033 not live billing data.
@@ -44,10 +43,17 @@ const EXPENSIVE_FILTER_COMBO: CanonicalSearchQuery = {
   shape: 'text_geo_filters',
 };
 
-const expensiveComboCost = estimateQueryCost(EXPENSIVE_FILTER_COMBO, DEFAULT_QUERY_GUARDRAIL_LIMITS);
+const expensiveComboCost = estimateQueryCost(
+  EXPENSIVE_FILTER_COMBO,
+  DEFAULT_QUERY_GUARDRAIL_LIMITS,
+);
 
 function staticReadCost(): number {
-  const policy = resolveEndpointPolicy(DEFAULT_ENDPOINT_QUOTA_MATRIX, 'entityRetrieval', 'anonymous');
+  const policy = resolveEndpointPolicy(
+    DEFAULT_ENDPOINT_QUOTA_MATRIX,
+    'entityRetrieval',
+    'anonymous',
+  );
   return policy.costTier === 'static_read' ? 1 : 5;
 }
 

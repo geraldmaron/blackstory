@@ -30,9 +30,7 @@
       "breakGlassIdentity": "human-platform-admin",
       "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/block-traffic.stub.sh",
       "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step block-malicious-traffic",
-      "references": [
-        "infra/gcp/armor/emergency-deny-runbook.md"
-      ]
+      "references": ["infra/gcp/armor/emergency-deny-runbook.md"]
     },
     {
       "order": 3,
@@ -42,9 +40,7 @@
       "breakGlassIdentity": "human-platform-admin",
       "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/disable-submissions.stub.sh",
       "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step disable-submissions",
-      "references": [
-        "infra/gcp/kill-switches/kill-switch-matrix.json"
-      ]
+      "references": ["infra/gcp/kill-switches/kill-switch-matrix.json"]
     },
     {
       "order": 4,
@@ -54,9 +50,7 @@
       "breakGlassIdentity": "human-platform-admin",
       "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/pause-queues.stub.sh",
       "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step pause-queues",
-      "references": [
-        "infra/gcp/kill-switches/queue-pause.stub.json"
-      ]
+      "references": ["infra/gcp/kill-switches/queue-pause.stub.json"]
     },
     {
       "order": 5,
@@ -80,9 +74,7 @@
       "breakGlassIdentity": "human-platform-admin",
       "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/rotate-secrets.stub.sh",
       "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step rotate-secrets",
-      "references": [
-        "docs/runbooks/incidents/secret-leak.md"
-      ]
+      "references": ["docs/runbooks/incidents/secret-leak.md"]
     },
     {
       "order": 7,
@@ -92,10 +84,7 @@
       "breakGlassIdentity": "human-platform-admin",
       "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/release-rollback.stub.sh",
       "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step active-release-rollback",
-      "references": [
-        "docs/runbooks/backup-restore.md",
-        "packages/domain/src/publication/index.ts"
-      ]
+      "references": ["docs/runbooks/backup-restore.md", "packages/domain/src/publication/index.ts"]
     },
     {
       "order": 8,
@@ -105,10 +94,7 @@
       "breakGlassIdentity": "backup-restore-sa",
       "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/database-restore.stub.sh",
       "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step database-restore",
-      "references": [
-        "docs/runbooks/backup-restore.md",
-        "scripts/backup-restore/verify-restore.mjs"
-      ]
+      "references": ["docs/runbooks/backup-restore.md", "scripts/backup-restore/verify-restore.mjs"]
     },
     {
       "order": 9,
@@ -131,9 +117,7 @@
       "breakGlassIdentity": "backup-restore-sa",
       "dryRunCommand": "bash scripts/recovery-rehearsal/stubs/restore-public-object.stub.sh",
       "verificationCommand": "node scripts/recovery-rehearsal/run-rehearsal.mjs --verify-only --step restore-deleted-public-object",
-      "references": [
-        "infra/firebase/backup/rpo-rto.md"
-      ]
+      "references": ["infra/firebase/backup/rpo-rto.md"]
     },
     {
       "order": 11,
@@ -143,9 +127,7 @@
       "breakGlassIdentity": "security-operator",
       "dryRunCommand": "node scripts/recovery-rehearsal/record-findings.mjs --dry-run",
       "verificationCommand": "node scripts/recovery-rehearsal/record-findings.mjs --dry-run --validate",
-      "references": [
-        "infra/gcp/recovery-rehearsal/findings-template.md"
-      ]
+      "references": ["infra/gcp/recovery-rehearsal/findings-template.md"]
     }
   ]
 }

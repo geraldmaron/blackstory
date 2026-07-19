@@ -1,4 +1,3 @@
-
 /**
  * REAL roster entry: Reddit deletion-sync. Wraps `@repo/domain`'s
  * Reddit deletion-sync module (packages/domain/src/adapters/reddit/deletion-sync.ts), which in
@@ -61,7 +60,6 @@ export type RedditDeletionSyncJobResult = {
   };
 };
 
-
 /**
  * Runs one scheduled Reddit deletion-sync sweep: re-checks liveness for every supplied pointer
  * via the real domain-layer sweep, then applies every resulting purge plan's mutations against
@@ -97,7 +95,9 @@ export async function runRedditDeletionSyncJob(
     completedAt: input.completedAt,
     itemsExpected: input.pointers.length,
     itemsProcessed: outcomes.length,
-    issues: outcomes.filter((outcome) => outcome.purgePlan).map((outcome) => `${outcome.pointerId}:purged`),
+    issues: outcomes
+      .filter((outcome) => outcome.purgePlan)
+      .map((outcome) => `${outcome.pointerId}:purged`),
   });
 
   return {

@@ -22,7 +22,10 @@ import {
   type EntityRelationship,
 } from './relationship.js';
 
-const BASE: Pick<EntityRelationship, 'id' | 'fromEntityId' | 'toEntityId' | 'evidenceIds' | 'createdAt' | 'updatedAt'> = {
+const BASE: Pick<
+  EntityRelationship,
+  'id' | 'fromEntityId' | 'toEntityId' | 'evidenceIds' | 'createdAt' | 'updatedAt'
+> = {
   id: 'rel-1',
   fromEntityId: 'ent-a',
   toEntityId: 'ent-b',
@@ -123,7 +126,9 @@ test('RELATIONSHIP_ROLES carries organizer|speaker|participant', () => {
 });
 
 test('assertRelationshipRoleValidForType accepts a role on attended', () => {
-  assert.doesNotThrow(() => assertRelationshipRoleValidForType({ type: 'attended', role: 'organizer' }));
+  assert.doesNotThrow(() =>
+    assertRelationshipRoleValidForType({ type: 'attended', role: 'organizer' }),
+  );
   assert.doesNotThrow(() => assertRelationshipRoleValidForType({ type: 'attended' }));
 });
 
@@ -208,10 +213,9 @@ test('guardrail REJECTS a systemic_consensus claim missing a documented consensu
 test('guardrail is a no-op (always allowed) for every non-caused/enabled type, including the other five additions', () => {
   const nonCausalTypes = RELATIONSHIP_TYPES.filter((t) => !isCausalAssertionRelationshipType(t));
   for (const type of nonCausalTypes) {
-    assert.deepEqual(
-      evaluateCausalEdgeGuardrail(type, { scope: 'contested_or_single_incident' }),
-      { allowed: true },
-    );
+    assert.deepEqual(evaluateCausalEdgeGuardrail(type, { scope: 'contested_or_single_incident' }), {
+      allowed: true,
+    });
   }
 });
 
@@ -225,7 +229,8 @@ test('guardrail distinction is exercised end-to-end: two claims about the same p
   });
   const settledSystemic = evaluateCausalEdgeGuardrail('enabled', {
     scope: 'systemic_consensus',
-    consensusBasis: 'Documented in multiple peer-reviewed histories as a systemic, non-contested enabling condition.',
+    consensusBasis:
+      'Documented in multiple peer-reviewed histories as a systemic, non-contested enabling condition.',
   });
   assert.equal(contestedSingleIncident.allowed, false);
   assert.equal(settledSystemic.allowed, true);

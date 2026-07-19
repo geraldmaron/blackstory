@@ -15,7 +15,9 @@ export async function GET(request: Request): Promise<Response> {
     const decisions = await listCatalogDecisions(items.map((item) => item.id));
     const withDecisions = items.map((item) => {
       const decision = decisions.get(item.id);
-      return decision ? { ...item, decision: { action: decision.action, reason: decision.reason } } : item;
+      return decision
+        ? { ...item, decision: { action: decision.action, reason: decision.reason } }
+        : item;
     });
     return Response.json({ items: withDecisions, count: withDecisions.length });
   } catch (error) {

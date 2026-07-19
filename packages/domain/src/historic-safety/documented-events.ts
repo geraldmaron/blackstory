@@ -31,11 +31,12 @@ export function isDocumentedEventCategory(value: string): value is DocumentedEve
  * methodology-version bump, never a silent tuning edit). Displacement is weighted lower than
  * direct violence because it documents a different, though still significant, historical harm.
  */
-export const DOCUMENTED_EVENT_CATEGORY_WEIGHTS: Readonly<Record<DocumentedEventCategory, number>> = {
-  lynching: 1,
-  massacre_or_riot: 1,
-  documented_displacement: 0.7,
-};
+export const DOCUMENTED_EVENT_CATEGORY_WEIGHTS: Readonly<Record<DocumentedEventCategory, number>> =
+  {
+    lynching: 1,
+    massacre_or_riot: 1,
+    documented_displacement: 0.7,
+  };
 
 export const DOCUMENTED_EVENTS_METHODOLOGY_VERSION = 'documented-events-methodology.v1' as const;
 
@@ -51,7 +52,8 @@ export type DocumentedEventRecord = {
 
 export function assertDocumentedEventRecordValid(record: DocumentedEventRecord): void {
   if (!record.id.trim()) throw new Error('DocumentedEventRecord.id is required');
-  if (!record.placeEntityId.trim()) throw new Error('DocumentedEventRecord.placeEntityId is required');
+  if (!record.placeEntityId.trim())
+    throw new Error('DocumentedEventRecord.placeEntityId is required');
   if (!isDocumentedEventCategory(record.category)) {
     throw new Error(`Unknown documented-event category: ${record.category}`);
   }
@@ -96,7 +98,9 @@ function round4(value: number): number {
  */
 function aggregateEventWeights(events: readonly DocumentedEventRecord[]): number {
   const complement = events.reduce((product, event) => {
-    const weight = clamp01(DOCUMENTED_EVENT_CATEGORY_WEIGHTS[event.category] * event.proximityWeight);
+    const weight = clamp01(
+      DOCUMENTED_EVENT_CATEGORY_WEIGHTS[event.category] * event.proximityWeight,
+    );
     return product * (1 - weight);
   }, 1);
   return clamp01(1 - complement);
@@ -120,7 +124,9 @@ export function computeDocumentedEventsLayerSignal(
   for (const event of input.events) {
     assertDocumentedEventRecordValid(event);
     if (event.placeEntityId !== input.placeEntityId) {
-      throw new Error('All events passed to computeDocumentedEventsLayerSignal must match placeEntityId');
+      throw new Error(
+        'All events passed to computeDocumentedEventsLayerSignal must match placeEntityId',
+      );
     }
   }
 
@@ -140,7 +146,7 @@ export function computeDocumentedEventsLayerSignal(
       summary:
         'Proximity/density of documented historic events (lynchings, massacres/riots, documented ' +
         'displacement) drawn from EJI/Seguin-Rigby lynching records and vetted corpus sources. ' +
-        'Combines each event\'s published category weight with its proximity to this place using ' +
+        "Combines each event's published category weight with its proximity to this place using " +
         'a saturating aggregation; NEVER time-decayed \u2014 an event from any era counts fully. ' +
         `Era bands present: ${eraBands.join(', ')}.`,
     },

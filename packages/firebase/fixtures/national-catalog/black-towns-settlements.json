@@ -4,16 +4,8 @@
     "kind": "place",
     "displayName": "Princeville",
     "summary": "Freed people camped on the Tar River opposite Tarboro after Union occupation in 1865, naming Freedom Hill before incorporating as Princeville in 1885 — the oldest U.S. town chartered by African Americans. Despite repeated flooding, residents rebuilt schools, churches, and businesses anchoring Edgecombe County's Black civic life for generations.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "settlement",
-      "self-governance",
-      "community"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1880s"],
+    "topicTags": ["settlement", "self-governance", "community"],
     "jurisdictionLabel": "Princeville, North Carolina",
     "locationPrecision": "town",
     "locationLabel": "Princeville, Edgecombe County",
@@ -39,34 +31,17 @@
     ],
     "historicalContext": "Princeville grew from a Freedmen's Bureau-era refuge into a self-governing municipality whose residents purchased lots, opened businesses, and resisted late-nineteenth-century campaigns to dissolve the town. Its endurance through hurricanes Floyd and Matthew reflects a community whose political identity is inseparable from land ownership and local control.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "self-governance",
-      "community"
-    ],
+    "topicIds": ["settlement", "self-governance", "community"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "freedom hill",
-      "freedom colony",
-      "edgecombe county",
-      "chartered black town"
-    ]
+    "keywords": ["freedom hill", "freedom colony", "edgecombe county", "chartered black town"]
   },
   {
     "id": "ent_hobson_city_al_001",
     "kind": "place",
     "displayName": "Hobson City",
     "summary": "When Oxford, Alabama, redrew its limits in 1899 to exclude the Mooree Quarter, 125 African American residents incorporated Hobson City on August 16 — among the earliest U.S. municipalities governed entirely by Black citizens. Anniston steel wages once supported roughly 1,500 residents before deindustrialization narrowed the town's base.",
-    "eraBuckets": [
-      "1890s",
-      "1900s",
-      "1910s"
-    ],
-    "topicTags": [
-      "settlement",
-      "self-governance",
-      "community"
-    ],
+    "eraBuckets": ["1890s", "1900s", "1910s"],
+    "topicTags": ["settlement", "self-governance", "community"],
     "jurisdictionLabel": "Hobson City, Alabama",
     "locationPrecision": "town",
     "locationLabel": "Hobson City, Calhoun County",
@@ -92,34 +67,17 @@
     ],
     "historicalContext": "Hobson City's founding responded directly to disfranchisement by annexation: excluded voters built their own town hall, school, and civic institutions rather than accept political erasure. The community illustrates how Reconstruction-era mobility and Jim Crow boundary politics shaped where Black self-government could survive in the Deep South.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "self-governance",
-      "community"
-    ],
+    "topicIds": ["settlement", "self-governance", "community"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "mooree quarter",
-      "calhoun county",
-      "black municipality",
-      "anniston"
-    ]
+    "keywords": ["mooree quarter", "calhoun county", "black municipality", "anniston"]
   },
   {
     "id": "ent_antioch_colony_tx_001",
     "kind": "place",
     "displayName": "Antioch Colony",
     "summary": "After the Civil War, formerly enslaved families in north Hays County purchased land along Onion Creek beginning in 1870, forming the rural freedom colony of Antioch with its own school, churches, and Masonic lodge. Descendants revived land ownership in the 1970s after mid-century out-migration, and a Texas Historical Commission marker now stands at Antioch Colony Park on Old Black Colony Road.",
-    "eraBuckets": [
-      "1870s",
-      "1880s",
-      "1890s"
-    ],
-    "topicTags": [
-      "settlement",
-      "land-ownership",
-      "community"
-    ],
+    "eraBuckets": ["1870s", "1880s", "1890s"],
+    "topicTags": ["settlement", "land-ownership", "community"],
     "jurisdictionLabel": "Buda, Texas",
     "locationPrecision": "community",
     "locationLabel": "Antioch Colony, Hays County",
@@ -145,34 +103,17 @@
     ],
     "historicalContext": "Antioch Colony typifies the Texas freedom-colony pattern: families pooled scarce capital for land, built institutions before incorporation, and maintained community through school consolidation and out-migration. Its partial revival by descendants underscores how oral history and land records preserve settlements absent from standard maps.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "land-ownership",
-      "community"
-    ],
+    "topicIds": ["settlement", "land-ownership", "community"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "freedom colony",
-      "hays county",
-      "onion creek",
-      "buda"
-    ]
+    "keywords": ["freedom colony", "hays county", "onion creek", "buda"]
   },
   {
     "id": "ent_dewitty_ne_001",
     "kind": "place",
     "displayName": "DeWitty (Audacious)",
     "summary": "Along the North Loup River in Cherry County, DeWitty — later Audacious — became Nebraska's largest rural African American settlement after homesteaders filed claims under the 1904 Kinkaid Act. At its 1915 peak roughly 150 residents supported a church, store, post office, and the North Loup Sluggers before drought emptied the colony by 1936.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "settlement",
-      "land-ownership",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["settlement", "land-ownership", "community"],
     "jurisdictionLabel": "Brownlee, Nebraska",
     "locationPrecision": "community",
     "locationLabel": "DeWitty (Audacious) colony, Cherry County",
@@ -198,35 +139,17 @@
     ],
     "historicalContext": "DeWitty drew families who sought land ownership beyond the reach of Southern crop liens and violence. Education, church life, and an annual August colony picnic bound a Sandhills community whose story parallels better-known Exoduster towns but remains less visible in national narratives of Black homesteading.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "land-ownership",
-      "community"
-    ],
+    "topicIds": ["settlement", "land-ownership", "community"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "audacious",
-      "kinkaid act",
-      "cherry county",
-      "black homesteaders",
-      "sandhills"
-    ]
+    "keywords": ["audacious", "kinkaid act", "cherry county", "black homesteaders", "sandhills"]
   },
   {
     "id": "ent_shankleville_tx_001",
     "kind": "place",
     "displayName": "Shankleville",
     "summary": "Jim Shankle and Stephen Alexander McBride purchased land in northern Newton County after Emancipation and built Shankleville into a freedom colony of farms, mills, stores, and churches. McBride College operated from 1883 to 1909, and descendants still gather for the Purple Hull Pea Festival that sustains the community's oral and material heritage.",
-    "eraBuckets": [
-      "1870s",
-      "1880s",
-      "1890s"
-    ],
-    "topicTags": [
-      "settlement",
-      "education",
-      "community"
-    ],
+    "eraBuckets": ["1870s", "1880s", "1890s"],
+    "topicTags": ["settlement", "education", "community"],
     "jurisdictionLabel": "Burkeville vicinity, Texas",
     "locationPrecision": "community",
     "locationLabel": "Shankleville, Newton County",
@@ -252,34 +175,17 @@
     ],
     "historicalContext": "Shankleville shows how East Texas freedom colonies combined agricultural enterprise with institution-building: gins, syrup mills, and a college anchored a settlement that never incorporated but maintained identity through land retention and descendant-led heritage work.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "education",
-      "community"
-    ],
+    "topicIds": ["settlement", "education", "community"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "freedom colony",
-      "newton county",
-      "mcbride college",
-      "purple hull pea festival"
-    ]
+    "keywords": ["freedom colony", "newton county", "mcbride college", "purple hull pea festival"]
   },
   {
     "id": "ent_james_city_nc_001",
     "kind": "place",
     "displayName": "James City",
     "summary": "Union-occupied New Bern became a refuge for enslaved people seeking freedom during the Civil War; in 1863 the Army consolidated camps into the Trent River settlement, later renamed James City for chaplain Horace James. The cohesive Black community persisted until an 1893 court defeat over land ownership, yet James City remains an unincorporated area of roughly 700 residents east of New Bern.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "settlement",
-      "land-ownership",
-      "community"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1880s"],
+    "topicTags": ["settlement", "land-ownership", "community"],
     "jurisdictionLabel": "James City, North Carolina",
     "locationPrecision": "community",
     "locationLabel": "James City, Craven County",
@@ -321,34 +227,17 @@
     ],
     "historicalContext": "James City was one of North Carolina's three major postwar resettlement colonies alongside Princeville and Roanoke Island's Freedmen's Colony. Its struggle to convert tenancy into fee-simple ownership foreshadowed how legal title — not settlement alone — determined whether freedom colonies could endure.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "land-ownership",
-      "community"
-    ],
+    "topicIds": ["settlement", "land-ownership", "community"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "freedmen's colony",
-      "new bern",
-      "craven county",
-      "horace james"
-    ]
+    "keywords": ["freedmen's colony", "new bern", "craven county", "horace james"]
   },
   {
     "id": "ent_rentiesville_ok_001",
     "kind": "place",
     "displayName": "Rentiesville",
     "summary": "Organized in 1903 on forty acres owned by William Rentie and Phoebe McIntosh, Rentiesville grew as a flag stop on the MKT Railway with a school enrolling eighty-one children by 1904. Historian John Hope Franklin was born here in 1915; the town hosts the Dusk 'til Dawn Blues Festival near the Civil War Battle of Honey Springs.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "settlement",
-      "self-governance",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["settlement", "self-governance", "community"],
     "jurisdictionLabel": "Rentiesville, Oklahoma",
     "locationPrecision": "town",
     "locationLabel": "Rentiesville, McIntosh County",
@@ -374,34 +263,17 @@
     ],
     "historicalContext": "Rentiesville's promoters marketed Oklahoma's All-Black towns to Southern readers seeking autonomy under segregation. The community's later cultural profile — anchored by Franklin's scholarship and blues heritage — shows how small towns retained identity long after railroad-era population peaks faded.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "self-governance",
-      "community"
-    ],
+    "topicIds": ["settlement", "self-governance", "community"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "all-black town",
-      "mcintosh county",
-      "john hope franklin",
-      "honey springs"
-    ]
+    "keywords": ["all-black town", "mcintosh county", "john hope franklin", "honey springs"]
   },
   {
     "id": "ent_tullahassee_ok_001",
     "kind": "place",
     "displayName": "Tullahassee",
     "summary": "Rooted in an 1850 Creek Nation manual-labor school, Tullahassee became a Freedmen's town when the Creek council transferred the site on October 24, 1881; it is considered the oldest of Oklahoma's surviving All-Black towns. Flipper-Key-Davis University operated from 1914 until 1936 as the state's only private Black institution of higher education.",
-    "eraBuckets": [
-      "1880s",
-      "1890s",
-      "1900s"
-    ],
-    "topicTags": [
-      "settlement",
-      "education",
-      "self-governance"
-    ],
+    "eraBuckets": ["1880s", "1890s", "1900s"],
+    "topicTags": ["settlement", "education", "self-governance"],
     "jurisdictionLabel": "Tullahassee, Oklahoma",
     "locationPrecision": "town",
     "locationLabel": "Tullahassee, Wagoner County",
@@ -435,11 +307,7 @@
     ],
     "historicalContext": "Tullahassee illustrates how Indian Territory Freedmen converted mission-school infrastructure into municipal life. Railroad access and townsite-company promotion brought Southern settlers, while the college extended the community's educational reach beyond the Rosenwald-era public schools common in other All-Black towns.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "education",
-      "self-governance"
-    ],
+    "topicIds": ["settlement", "education", "self-governance"],
     "mentionedEntityIds": [],
     "keywords": [
       "creek freedmen",
@@ -453,16 +321,8 @@
     "kind": "place",
     "displayName": "Sweet Home",
     "summary": "The rural African American community of Sweet Home in Guadalupe County supported a church, Rosenwald school, and farm households south of Seguin from the late nineteenth century into the mid-twentieth. The 1924 Sweet Home Vocational and Agricultural High School — listed on the National Register — now serves homecomings and a community nutrition program under Sweet Home Baptist Church.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "settlement",
-      "education",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["settlement", "education", "community"],
     "jurisdictionLabel": "Seguin vicinity, Texas",
     "locationPrecision": "community",
     "locationLabel": "Sweet Home, Guadalupe County",
@@ -496,34 +356,17 @@
     ],
     "historicalContext": "Sweet Home represents the Central Texas freedom-colony pattern: landowning families clustered around church and school while remaining unincorporated. Rosenwald funding elevated a community institution whose survival today depends on descendant stewardship rather than municipal budgets.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "education",
-      "community"
-    ],
+    "topicIds": ["settlement", "education", "community"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "freedom colony",
-      "guadalupe county",
-      "rosenwald school",
-      "seguin"
-    ]
+    "keywords": ["freedom colony", "guadalupe county", "rosenwald school", "seguin"]
   },
   {
     "id": "ent_idlewild_mi_001",
     "kind": "place",
     "displayName": "Idlewild",
     "summary": "Founded in 1912 on 2,700 Lake County acres, Idlewild offered African American families a segregated-era resort for vacation and property ownership when most white resorts barred them. Known as Black Eden, it drew tens of thousands of visitors before travel and civil-rights changes reshaped leisure; the historic district is on the National Register.",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "settlement",
-      "community",
-      "culture"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s"],
+    "topicTags": ["settlement", "community", "culture"],
     "jurisdictionLabel": "Idlewild, Michigan",
     "locationPrecision": "community",
     "locationLabel": "Idlewild, Lake County",
@@ -557,34 +400,17 @@
     ],
     "historicalContext": "Idlewild was not a farming colony but a deliberate leisure settlement — proof that Black placemaking included resort architecture, entertainment economies, and second-home ownership. Preservation efforts today treat Idlewild as cultural infrastructure whose cottages and clubs document how families claimed rest and recreation on their own terms.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "community",
-      "culture"
-    ],
+    "topicIds": ["settlement", "community", "culture"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "black eden",
-      "lake county",
-      "segregation-era resort",
-      "yates township"
-    ]
+    "keywords": ["black eden", "lake county", "segregation-era resort", "yates township"]
   },
   {
     "id": "ent_clearview_ok_001",
     "kind": "place",
     "displayName": "Clearview",
     "summary": "Platted in 1903 along the Fort Smith and Western Railroad in Okfuskee County, Clearview supported newspapers, the Abe Lincoln Trading Company, and a brick school within its first decade. The Abe Lincoln Trading Company building is listed on the National Register, and Clearview remains one of thirteen surviving Oklahoma All-Black towns.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "settlement",
-      "business",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["settlement", "business", "community"],
     "jurisdictionLabel": "Clearview, Oklahoma",
     "locationPrecision": "town",
     "locationLabel": "Clearview, Okfuskee County",
@@ -610,11 +436,7 @@
     ],
     "historicalContext": "Clearview's early commerce — including land sales through the Abe Lincoln Trading Company — shows how townsite promoters blended boosterism with cooperative retail. Cotton price collapse and Depression out-migration reduced the population to a few dozen, yet the town's NRHP-listed commercial building anchors ongoing heritage recognition.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "business",
-      "community"
-    ],
+    "topicIds": ["settlement", "business", "community"],
     "mentionedEntityIds": [],
     "keywords": [
       "all-black town",
@@ -628,16 +450,8 @@
     "kind": "place",
     "displayName": "Hopkinsville Community",
     "summary": "In 1872 Henry Hopkins purchased forty-two acres in DeWitt County and established Hopkinsville, a freedom colony where formerly enslaved families built Antioch Baptist Church in 1873 and operated a school by the 1880s. The Texas Historical Commission marker documents a settlement that outlasted the school closure of 1956 and continues worship near Cuero.",
-    "eraBuckets": [
-      "1870s",
-      "1880s",
-      "1890s"
-    ],
-    "topicTags": [
-      "settlement",
-      "land-ownership",
-      "community"
-    ],
+    "eraBuckets": ["1870s", "1880s", "1890s"],
+    "topicTags": ["settlement", "land-ownership", "community"],
     "jurisdictionLabel": "Cuero vicinity, Texas",
     "locationPrecision": "community",
     "locationLabel": "Hopkinsville Community, DeWitt County",
@@ -663,34 +477,17 @@
     ],
     "historicalContext": "Hopkinsville typifies Gulf Coast freedom colonies founded on small acreage purchases rather than townsite incorporation. Church and school provided governance where no mayor existed, linking DeWitt County's Black farmers to a wider network of post-Emancipation settlements across South Texas.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "land-ownership",
-      "community"
-    ],
+    "topicIds": ["settlement", "land-ownership", "community"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "freedom colony",
-      "dewitt county",
-      "cuero",
-      "antioch baptist church"
-    ]
+    "keywords": ["freedom colony", "dewitt county", "cuero", "antioch baptist church"]
   },
   {
     "id": "ent_brooksville_ok_001",
     "kind": "place",
     "displayName": "Brooksville",
     "summary": "Established as Sewell in 1903 and renamed in 1912 for farmer and cotton buyer A. R. Brooks, Brooksville in Pottawatomie County drew Southern settlers through Rev. Jedson White's promotion and supported a Santa Fe depot, Rosenwald-funded Banneker School, and St. John's Baptist Church. The town incorporated in 1972 and remains one of Oklahoma's thirteen surviving All-Black towns.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "settlement",
-      "education",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["settlement", "education", "community"],
     "jurisdictionLabel": "Brooksville, Oklahoma",
     "locationPrecision": "town",
     "locationLabel": "Brooksville, Pottawatomie County",
@@ -716,34 +513,17 @@
     ],
     "historicalContext": "Brooksville demonstrates how All-Black towns combined railroad access, church-led recruitment, and Rosenwald education. Late incorporation in 1972 preserved municipal identity after cotton-market decline — a pattern repeated across Oklahoma's surviving Black towns.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "education",
-      "community"
-    ],
+    "topicIds": ["settlement", "education", "community"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "all-black town",
-      "pottawatomie county",
-      "banneker school",
-      "sewell"
-    ]
+    "keywords": ["all-black town", "pottawatomie county", "banneker school", "sewell"]
   },
   {
     "id": "ent_red_bird_ok_001",
     "kind": "place",
     "displayName": "Red Bird",
     "summary": "The Red Bird Investment Company recruited Southern families to a Wagoner County townsite whose 1907 grand opening drew more than six hundred attendees. Miller Washington High School, Red Bird City Hall, and commercial buildings from 1910 are documented in the National Register and Oklahoma Landmarks Inventory; Mayor I. W. Lane successfully challenged Wagoner County voting restrictions in 1938.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "settlement",
-      "self-governance",
-      "civil-rights"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["settlement", "self-governance", "civil-rights"],
     "jurisdictionLabel": "Red Bird, Oklahoma",
     "locationPrecision": "town",
     "locationLabel": "Red Bird, Wagoner County",
@@ -785,11 +565,7 @@
     ],
     "historicalContext": "Red Bird combined booster-era town building with durable civic architecture and voting-rights litigation. Its NRHP-listed school and city hall record how All-Black towns invested in public buildings even as agricultural economies contracted.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "self-governance",
-      "civil-rights"
-    ],
+    "topicIds": ["settlement", "self-governance", "civil-rights"],
     "mentionedEntityIds": [],
     "keywords": [
       "all-black town",
@@ -803,16 +579,8 @@
     "kind": "place",
     "displayName": "Taft",
     "summary": "Beginning as Twine on Creek Freedmen allotments west of Muskogee, Taft was renamed in 1904 and promoted as the fastest-growing Colored community in Oklahoma, supporting two newspapers and a broad commercial strip before 1910. Taft City Hall (1910) is listed on the National Register, and in 1973 Lelia Foley-Davis became the nation's first elected African American woman mayor.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "settlement",
-      "self-governance",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["settlement", "self-governance", "community"],
     "jurisdictionLabel": "Taft, Oklahoma",
     "locationPrecision": "town",
     "locationLabel": "Taft, Muskogee County",
@@ -862,17 +630,8 @@
     ],
     "historicalContext": "Taft's dual story — railroad-era commercial ambition and later service as a state institutional host community — shows how Oklahoma's All-Black towns adapted when agriculture alone could not sustain population. Foley-Davis's 1973 mayoral election linked Taft to a wider history of Black women in municipal leadership.",
     "related": [],
-    "topicIds": [
-      "settlement",
-      "self-governance",
-      "community"
-    ],
+    "topicIds": ["settlement", "self-governance", "community"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "all-black town",
-      "muskogee county",
-      "creek freedmen",
-      "lelia foley-davis"
-    ]
+    "keywords": ["all-black town", "muskogee county", "creek freedmen", "lelia foley-davis"]
   }
 ]

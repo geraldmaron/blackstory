@@ -135,12 +135,7 @@ export type SearchFilter = {
 
 /** Sort modes. `relevance` is the default text-relevance + connection-strength order. */
 export type SearchSort =
-  | 'relevance'
-  | 'name_asc'
-  | 'name_desc'
-  | 'date_asc'
-  | 'date_desc'
-  | 'distance';
+  'relevance' | 'name_asc' | 'name_desc' | 'date_asc' | 'date_desc' | 'distance';
 
 /**
  * Fully-normalized search execution input. `offset`/`pageSize` are computed upstream by the route

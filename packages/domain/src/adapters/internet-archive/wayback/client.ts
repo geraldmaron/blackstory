@@ -63,7 +63,9 @@ export async function submitSpnCapture(
   );
   assertAllowedContentType(response, SPN_ALLOWED_CONTENT_TYPES);
   if (response.status >= 400) {
-    throw new Error(`Wayback SPN submit failed with status ${response.status}: ${response.bodyText.slice(0, 200)}`);
+    throw new Error(
+      `Wayback SPN submit failed with status ${response.status}: ${response.bodyText.slice(0, 200)}`,
+    );
   }
   const body = parseJsonBody(response.bodyText, 'Wayback SPN submit');
   const jobId = body.job_id;
@@ -109,7 +111,8 @@ export async function pollSpnStatus(
 ): Promise<SpnStatusResult> {
   const maxAttempts = options.maxAttempts ?? 10;
   const delayMs = options.delayMs ?? 1000;
-  const sleep = options.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
+  const sleep =
+    options.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
 
   for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     const response = await withRetry(

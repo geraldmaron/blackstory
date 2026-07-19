@@ -16,9 +16,7 @@ const { createElement } = React;
 (globalThis as Record<string, unknown>).React = React;
 
 test('renders a labelled address/ZIP search field with a submit action', () => {
-  const html = renderToStaticMarkup(
-    createElement(ManualPlaceSearchForm, { onSubmit: () => {} }),
-  );
+  const html = renderToStaticMarkup(createElement(ManualPlaceSearchForm, { onSubmit: () => {} }));
   assert.match(html, /<label[^>]*for="locate-address"/);
   assert.match(html, /<input[^>]*id="locate-address"/);
   assert.match(html, /<input[^>]*name="address"/);

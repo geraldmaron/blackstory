@@ -82,8 +82,7 @@ test('high-impact actions require both a reason and privileged fresh-auth author
 
   await assert.rejects(
     authorizeConsoleAction({ headers: HEADERS, action }, authorizer),
-    (error: unknown) =>
-      error instanceof ConsoleActionError && error.code === 'REASON_REQUIRED',
+    (error: unknown) => error instanceof ConsoleActionError && error.code === 'REASON_REQUIRED',
   );
   assert.deepEqual(calls, []);
 
@@ -103,8 +102,7 @@ test('console routes cannot target active public projections', () => {
         'active-public-projection',
       ),
     (error: unknown) =>
-      error instanceof ConsoleActionError &&
-      error.code === 'ACTIVE_PROJECTION_WRITE_PROHIBITED',
+      error instanceof ConsoleActionError && error.code === 'ACTIVE_PROJECTION_WRITE_PROHIBITED',
   );
   assert.doesNotThrow(() =>
     assertNoActiveProjectionWrite('/api/admin/releases/candidate-1', 'release-candidate'),
@@ -117,8 +115,7 @@ test('bulk actions require preview, enforce limits, and issue a rollback token',
   });
   assert.throws(
     () => previewBulkAction(action, ['one', 'two', 'three']),
-    (error: unknown) =>
-      error instanceof ConsoleActionError && error.code === 'BULK_LIMIT_EXCEEDED',
+    (error: unknown) => error instanceof ConsoleActionError && error.code === 'BULK_LIMIT_EXCEEDED',
   );
 
   const preview = previewBulkAction(action, ['one', 'two']);

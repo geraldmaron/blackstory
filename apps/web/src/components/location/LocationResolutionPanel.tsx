@@ -42,7 +42,8 @@ export function LocationResolutionPanel({ result }: LocationResolutionPanelProps
           {parts.length > 0 ? parts.join(', ') : 'A U.S. jurisdiction was resolved for this input.'}
         </p>
         <p className="ds-mono" style={{ fontSize: '0.8125rem' }}>
-          Jurisdiction: {jurisdictionIds.countyId ?? jurisdictionIds.stateId ?? jurisdictionIds.countryId}
+          Jurisdiction:{' '}
+          {jurisdictionIds.countyId ?? jurisdictionIds.stateId ?? jurisdictionIds.countryId}
         </p>
         <p className="ds-sans">
           <Link className="ds-cta ds-cta--ink" href="/search">

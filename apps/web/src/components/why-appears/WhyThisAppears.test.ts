@@ -124,7 +124,9 @@ test('renders the shared trauma-content disclaimer only when the harm dimension 
         evidenceIds: ['ev-4'],
       },
     ],
-    storyTexts: ['The community founded the school and organized mutual aid alongside daily celebrations.'],
+    storyTexts: [
+      'The community founded the school and organized mutual aid alongside daily celebrations.',
+    ],
   });
   const balancedHtml = renderToStaticMarkup(
     createElement(WhyThisAppears, {

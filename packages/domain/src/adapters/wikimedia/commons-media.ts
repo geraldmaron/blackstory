@@ -76,20 +76,14 @@ export type EntityResourceLinkPropose = {
 
 /** Normalize a display name into an English Wikipedia title candidate. */
 export function enwikiTitleFromDisplayName(displayName: string): string {
-  return displayName
-    .trim()
-    .replace(/\s+/g, ' ')
-    .replace(/ /g, '_');
+  return displayName.trim().replace(/\s+/g, ' ').replace(/ /g, '_');
 }
 
 /**
  * Exact, case-insensitive label match against a Wikidata/enwiki entity label.
  * Rejects missing/missing-label entities. Does not fuzzy-match.
  */
-export function isExactLabelMatch(
-  displayName: string,
-  entityLabel: string | undefined,
-): boolean {
+export function isExactLabelMatch(displayName: string, entityLabel: string | undefined): boolean {
   if (!entityLabel) return false;
   return normalizeLabel(displayName) === normalizeLabel(entityLabel);
 }
@@ -121,7 +115,9 @@ export function extractP18Candidates(entity?: WikidataEntity): readonly CommonsP
 
 export function selectSingleP18(
   candidates: readonly CommonsP18Candidate[],
-): { readonly ok: true; readonly fileTitle: string } | { readonly ok: false; readonly reason: string } {
+):
+  | { readonly ok: true; readonly fileTitle: string }
+  | { readonly ok: false; readonly reason: string } {
   if (candidates.length === 0) {
     return { ok: false, reason: 'no_p18' };
   }
@@ -339,10 +335,7 @@ function isBareRightsLabel(part: string): boolean {
   );
 }
 
-function creditPartImpliesRights(
-  part: string,
-  rightsStatus: PublishableRightsStatus,
-): boolean {
+function creditPartImpliesRights(part: string, rightsStatus: PublishableRightsStatus): boolean {
   const key = part.trim().toLowerCase().replace(/\s+/g, ' ');
   switch (rightsStatus) {
     case 'public_domain':
@@ -357,11 +350,7 @@ function creditPartImpliesRights(
     case 'fair_use':
       return key === 'fair use' || key.includes('fair use');
     case 'licensed':
-      return (
-        key === 'licensed' ||
-        /^cc[- ]by\b/.test(key) ||
-        key.includes('attribution')
-      );
+      return key === 'licensed' || /^cc[- ]by\b/.test(key) || key.includes('attribution');
     default: {
       const _exhaustive: never = rightsStatus;
       return _exhaustive;
@@ -584,7 +573,10 @@ export function summarizeCommonsMediaProposes(
 }
 
 /** Chunk an array for Wikimedia batch APIs (default 50 titles/ids). */
-export function chunkForWikimediaBatch<T>(items: readonly T[], size = 50): readonly (readonly T[])[] {
+export function chunkForWikimediaBatch<T>(
+  items: readonly T[],
+  size = 50,
+): readonly (readonly T[])[] {
   if (size < 1) throw new Error('batch size must be >= 1');
   const out: T[][] = [];
   for (let i = 0; i < items.length; i += size) {

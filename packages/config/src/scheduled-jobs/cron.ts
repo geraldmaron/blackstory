@@ -1,4 +1,3 @@
-
 /**
  * Minimal structural cron validation for the scheduled-job registry. Deliberately not a full
  * cron semantics engine (day-of-month overflow, leap years, etc.) needs to catch

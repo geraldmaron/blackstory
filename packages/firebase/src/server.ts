@@ -1,4 +1,3 @@
-
 /**
  * Server-side Firebase Admin SDK initialization boundary.
  * Prefer Application Default Credentials or emulator mode; never commit keys.
@@ -63,7 +62,6 @@ function buildCredential(environment: EnvironmentLike, credentials?: string) {
   }
   return applicationDefault();
 }
-
 
 /**
  * Initialize the Admin SDK. Emulator mode needs no credentials.

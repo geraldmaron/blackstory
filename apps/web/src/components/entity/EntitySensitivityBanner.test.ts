@@ -23,7 +23,14 @@ test('renders the registry class label and sensitive-content disclaimer body for
   );
   assert.match(html, new RegExp(SENSITIVITY_CLASS_PRESENTATION_LABELS.contested_legacy));
   assert.match(html, /Documented dispute over a 1920s land-use displacement action\./);
-  assert.match(html, new RegExp(getDisclaimer('sensitive_content').body.slice(0, 30).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.match(
+    html,
+    new RegExp(
+      getDisclaimer('sensitive_content')
+        .body.slice(0, 30)
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+    ),
+  );
 });
 
 test('never renders the non-endorsement disclaimer for a non-person entity kind', () => {

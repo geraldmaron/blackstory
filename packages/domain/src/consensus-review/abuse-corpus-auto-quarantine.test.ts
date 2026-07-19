@@ -64,7 +64,11 @@ test('XSS payloads land inert in quarantine, never as a canonical write', () => 
       },
       context(),
     );
-    assert.equal(result.accepted, true, `expected ${payload} to be accepted into quarantine, not silently dropped`);
+    assert.equal(
+      result.accepted,
+      true,
+      `expected ${payload} to be accepted into quarantine, not silently dropped`,
+    );
     if (!result.accepted) continue;
     // The payload is stored verbatim (for moderator review) but only ever inside the
     // quarantine record never marked eligible for a canonical or public write.

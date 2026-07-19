@@ -94,7 +94,11 @@ async function callLocateApi(
 
   const outcome = body as { readonly ok: boolean };
   if (outcome.ok) {
-    const success = outcome as { readonly ok: true; readonly resolution: LocateResolution; readonly cacheHit: boolean };
+    const success = outcome as {
+      readonly ok: true;
+      readonly resolution: LocateResolution;
+      readonly cacheHit: boolean;
+    };
     return { kind: 'resolved', resolution: success.resolution, cacheHit: success.cacheHit };
   }
   const failure = outcome as { readonly ok: false; readonly fallback: LocateFallback };
@@ -115,5 +119,8 @@ export function fetchLocateByCoordinates(
   lng: number,
   appCheckHeaders: Readonly<Record<string, string>> = {},
 ): Promise<LocateClientResult> {
-  return callLocateApi(new URLSearchParams({ lat: String(lat), lng: String(lng) }), appCheckHeaders);
+  return callLocateApi(
+    new URLSearchParams({ lat: String(lat), lng: String(lng) }),
+    appCheckHeaders,
+  );
 }

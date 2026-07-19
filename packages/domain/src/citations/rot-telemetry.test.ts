@@ -34,11 +34,16 @@ test('sorts source classes by descending rot rate', () => {
     { sourceClassification: 'stable_source', linkStatus: 'alive' },
     { sourceClassification: 'rotten_source', linkStatus: 'dead' },
   ]);
-  assert.deepEqual(rows.map((r) => r.sourceClassification), ['rotten_source', 'stable_source']);
+  assert.deepEqual(
+    rows.map((r) => r.sourceClassification),
+    ['rotten_source', 'stable_source'],
+  );
 });
 
 test('groups citations with no recorded classification under "unclassified" rather than dropping them', () => {
-  const rows = computeRotRateBySourceClass([{ sourceClassification: undefined, linkStatus: 'dead' }]);
+  const rows = computeRotRateBySourceClass([
+    { sourceClassification: undefined, linkStatus: 'dead' },
+  ]);
   assert.equal(rows.length, 1);
   assert.equal(rows[0]?.sourceClassification, 'unclassified');
 });

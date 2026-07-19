@@ -19,7 +19,12 @@ export type {
   ConsensusRoutingDecision,
 } from './types.js';
 
-export { assertIndependentReviews, recordReview, tallyReviews, routeConsensusReview } from './review.js';
+export {
+  assertIndependentReviews,
+  recordReview,
+  tallyReviews,
+  routeConsensusReview,
+} from './review.js';
 
 export { advanceToDiscoveryCandidate } from './advance.js';
 export type { QuarantinedLeadSummary, DiscoveryCandidateAdvancement } from './advance.js';

@@ -15,20 +15,23 @@ export type BuildSitemapOptions = {
   readonly entities?: readonly SitemapEntityEntry[];
 };
 
-const STATIC_PUBLIC_ROUTES: readonly { readonly path: string; readonly changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']; readonly priority: number }[] =
-  Object.freeze([
-    { path: '/', changeFrequency: 'weekly', priority: 1 },
-    { path: '/search', changeFrequency: 'daily', priority: 0.9 },
-    { path: '/explore', changeFrequency: 'daily', priority: 0.9 },
-    { path: '/locate', changeFrequency: 'monthly', priority: 0.7 },
-    { path: '/corrections', changeFrequency: 'monthly', priority: 0.6 },
-    { path: '/about', changeFrequency: 'monthly', priority: 0.5 },
-    { path: '/methodology', changeFrequency: 'monthly', priority: 0.5 },
-    { path: '/errata', changeFrequency: 'weekly', priority: 0.6 },
-    { path: '/legal', changeFrequency: 'weekly', priority: 0.7 },
-    { path: '/history', changeFrequency: 'weekly', priority: 0.8 },
-    { path: '/stories', changeFrequency: 'weekly', priority: 0.6 },
-  ]);
+const STATIC_PUBLIC_ROUTES: readonly {
+  readonly path: string;
+  readonly changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'];
+  readonly priority: number;
+}[] = Object.freeze([
+  { path: '/', changeFrequency: 'weekly', priority: 1 },
+  { path: '/search', changeFrequency: 'daily', priority: 0.9 },
+  { path: '/explore', changeFrequency: 'daily', priority: 0.9 },
+  { path: '/locate', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/corrections', changeFrequency: 'monthly', priority: 0.6 },
+  { path: '/about', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/methodology', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/errata', changeFrequency: 'weekly', priority: 0.6 },
+  { path: '/legal', changeFrequency: 'weekly', priority: 0.7 },
+  { path: '/history', changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/stories', changeFrequency: 'weekly', priority: 0.6 },
+]);
 
 function resolveSiteUrl(siteUrl: string | undefined): string {
   return siteUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3048';
@@ -41,7 +44,9 @@ function toAbsolute(siteUrl: string, path: string): string {
 /**
  * Builds sitemap entries for static routes plus entity pages from the active release catalog.
  */
-export function buildPublicSitemapEntries(options: BuildSitemapOptions = {}): MetadataRoute.Sitemap {
+export function buildPublicSitemapEntries(
+  options: BuildSitemapOptions = {},
+): MetadataRoute.Sitemap {
   const siteUrl = resolveSiteUrl(options.siteUrl);
   const releaseStamp = options.releaseGeneratedAt ?? new Date().toISOString();
   const staticEntries: MetadataRoute.Sitemap = STATIC_PUBLIC_ROUTES.map((route) => ({

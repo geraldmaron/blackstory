@@ -156,11 +156,10 @@ test('duplicate of included candidate is excluded', () => {
       capturedAt: '2026-07-17T01:00:00.000Z',
     },
   };
-  const duplicate = ingestApiCandidate(
-    { record: duplicateRecord },
-    loadQueryPack(),
-    { now: FIXED_NOW, candidateId: 'rel_dup_b' },
-  );
+  const duplicate = ingestApiCandidate({ record: duplicateRecord }, loadQueryPack(), {
+    now: FIXED_NOW,
+    candidateId: 'rel_dup_b',
+  });
 
   const assessments = evaluateCandidateRelevanceBatch([included, duplicate], {
     assessedAt: FIXED_NOW,
@@ -182,11 +181,7 @@ test('gold relevance fixtures pass expected decisions', () => {
       entry.expectedDecision,
       `case ${entry.id}: expected ${entry.expectedDecision}, got ${assessment.decision}`,
     );
-    assert.equal(
-      assessment.passes,
-      entry.expectedPasses,
-      `case ${entry.id}: pass/fail mismatch`,
-    );
+    assert.equal(assessment.passes, entry.expectedPasses, `case ${entry.id}: pass/fail mismatch`);
 
     if (entry.expectedGateFailures?.length) {
       for (const gateId of entry.expectedGateFailures) {

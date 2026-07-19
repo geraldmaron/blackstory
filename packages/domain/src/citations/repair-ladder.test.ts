@@ -60,21 +60,32 @@ test('applyRepairLadder: permanent redirect updates the location and preserves t
   const citation = baseCitation();
   const outcome = await applyRepairLadder({
     citation,
-    classification: { status: 'redirected', permanentRedirect: true, redirectTarget: 'https://gazette.example/archive/story-1' },
+    classification: {
+      status: 'redirected',
+      permanentRedirect: true,
+      redirectTarget: 'https://gazette.example/archive/story-1',
+    },
     attemptSpn: async () => {
       throw new Error('attemptSpn must not be called for a permanent-redirect repair');
     },
     now: '2026-07-17T00:00:00.000Z',
   });
   assert.equal(outcome.step, 'permanent_redirect');
-  assert.deepEqual(outcome.citation.location, { kind: 'url', url: 'https://gazette.example/archive/story-1' });
+  assert.deepEqual(outcome.citation.location, {
+    kind: 'url',
+    url: 'https://gazette.example/archive/story-1',
+  });
   assert.equal(outcome.citation.originallyPublishedAtUrl, 'https://gazette.example/story/1');
   assert.equal(outcome.citation.linkStatus, 'alive');
 });
 
 test('applyRepairLadder: step 2 swaps to the stored Wayback capture and never calls attemptSpn', async () => {
   const citation = baseCitation({
-    capture: { captureId: 'capture-1', waybackCaptureUrl: 'https://web.archive.org/web/20260101000000/https://gazette.example/story/1' },
+    capture: {
+      captureId: 'capture-1',
+      waybackCaptureUrl:
+        'https://web.archive.org/web/20260101000000/https://gazette.example/story/1',
+    },
   });
   const outcome = await applyRepairLadder({
     citation,
@@ -101,13 +112,21 @@ test('applyRepairLadder: step 3 attempts SPN only when no capture exists, and sw
     classification: { status: 'dead' },
     attemptSpn: async (url) => {
       spnCalledWith = url;
-      return { ok: true, waybackCaptureUrl: 'https://web.archive.org/web/20260717000000/https://gazette.example/story/1', capturedAt: '2026-07-17T00:00:00.000Z' };
+      return {
+        ok: true,
+        waybackCaptureUrl:
+          'https://web.archive.org/web/20260717000000/https://gazette.example/story/1',
+        capturedAt: '2026-07-17T00:00:00.000Z',
+      };
     },
     now: '2026-07-17T00:00:00.000Z',
   });
   assert.equal(spnCalledWith, 'https://gazette.example/story/1');
   assert.equal(outcome.step, 'retroactive_spn');
-  assert.equal(outcome.citation.capture.waybackCaptureUrl, 'https://web.archive.org/web/20260717000000/https://gazette.example/story/1');
+  assert.equal(
+    outcome.citation.capture.waybackCaptureUrl,
+    'https://web.archive.org/web/20260717000000/https://gazette.example/story/1',
+  );
   assert.equal(outcome.citation.originallyPublishedAtUrl, 'https://gazette.example/story/1');
 });
 
@@ -140,7 +159,11 @@ test('the full ladder order is exercised end to end as capture availability chan
     (
       await applyRepairLadder({
         citation: baseCitation(),
-        classification: { status: 'redirected', permanentRedirect: true, redirectTarget: 'https://gazette.example/moved' },
+        classification: {
+          status: 'redirected',
+          permanentRedirect: true,
+          redirectTarget: 'https://gazette.example/moved',
+        },
         attemptSpn: async () => ({ ok: false, reason: 'unused' }),
         now,
       })
@@ -151,7 +174,12 @@ test('the full ladder order is exercised end to end as capture availability chan
   stepsObserved.push(
     (
       await applyRepairLadder({
-        citation: baseCitation({ capture: { captureId: 'c', waybackCaptureUrl: 'https://web.archive.org/web/1/https://gazette.example/story/1' } }),
+        citation: baseCitation({
+          capture: {
+            captureId: 'c',
+            waybackCaptureUrl: 'https://web.archive.org/web/1/https://gazette.example/story/1',
+          },
+        }),
         classification: { status: 'dead' },
         attemptSpn: async () => {
           throw new Error('unexpected SPN call');
@@ -167,7 +195,11 @@ test('the full ladder order is exercised end to end as capture availability chan
       await applyRepairLadder({
         citation: baseCitation(),
         classification: { status: 'dead' },
-        attemptSpn: async () => ({ ok: true, waybackCaptureUrl: 'https://web.archive.org/web/2/https://gazette.example/story/1', capturedAt: now }),
+        attemptSpn: async () => ({
+          ok: true,
+          waybackCaptureUrl: 'https://web.archive.org/web/2/https://gazette.example/story/1',
+          capturedAt: now,
+        }),
         now,
       })
     ).step,
@@ -185,7 +217,12 @@ test('the full ladder order is exercised end to end as capture availability chan
     ).step,
   );
 
-  assert.deepEqual(stepsObserved, ['permanent_redirect', 'wayback_swap', 'retroactive_spn', 'dead_mark']);
+  assert.deepEqual(stepsObserved, [
+    'permanent_redirect',
+    'wayback_swap',
+    'retroactive_spn',
+    'dead_mark',
+  ]);
 });
 
 test('spn-client: buildSpnSaveUrl builds the archive.org save endpoint for a target URL', () => {
@@ -197,7 +234,10 @@ test('spn-client: buildSpnSaveUrl builds the archive.org save endpoint for a tar
 
 test('spn-client: interpretSpnFetchResult only accepts a genuine web.archive.org capture URL', () => {
   const good: SpnCaptureOutcome = interpretSpnFetchResult(
-    { ok: true, finalUrl: 'https://web.archive.org/web/20260717000000/https://gazette.example/story/1' },
+    {
+      ok: true,
+      finalUrl: 'https://web.archive.org/web/20260717000000/https://gazette.example/story/1',
+    },
     '2026-07-17T00:00:00.000Z',
   );
   assert.equal(good.ok, true);
@@ -208,6 +248,9 @@ test('spn-client: interpretSpnFetchResult only accepts a genuine web.archive.org
   );
   assert.equal(bad.ok, false);
 
-  const failed = interpretSpnFetchResult({ ok: false, reason: 'transport_failed' }, '2026-07-17T00:00:00.000Z');
+  const failed = interpretSpnFetchResult(
+    { ok: false, reason: 'transport_failed' },
+    '2026-07-17T00:00:00.000Z',
+  );
   assert.equal(failed.ok, false);
 });

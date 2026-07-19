@@ -1,4 +1,3 @@
-
 /**
  * Adapters that normalize producer signals into security telemetry events.
  * Structural contracts mirror existing producers no rewrites required.
@@ -133,7 +132,9 @@ export function adaptAuditEvent(
     ...(audit.releaseId === undefined ? {} : { releaseId: audit.releaseId }),
     runbookId: defaultRunbookForKind(kind),
   };
-  const severity = IMMEDIATE_NOTIFICATION_KINDS.has(kind) ? 'critical' : defaultSeverityForKind(kind);
+  const severity = IMMEDIATE_NOTIFICATION_KINDS.has(kind)
+    ? 'critical'
+    : defaultSeverityForKind(kind);
   return baseEvent(
     kind,
     context,
@@ -168,33 +169,25 @@ export function adaptRateLimitDenial(
   if (kind === undefined) {
     return undefined;
   }
-  return baseEvent(
-    kind,
-    context,
-    {
-      endpointClass: input.endpointClass,
-      subject: input.subject,
-      reason: input.reason,
-      policyVersion: input.policyVersion,
-    },
-  );
+  return baseEvent(kind, context, {
+    endpointClass: input.endpointClass,
+    subject: input.subject,
+    reason: input.reason,
+    policyVersion: input.policyVersion,
+  });
 }
 
 export function adaptSlowQuery(
   input: SlowQueryInput,
   context: SecurityEventContext,
 ): SecurityTelemetryEvent {
-  return baseEvent(
-    'database.slow_query',
-    context,
-    {
-      endpointClass: input.endpointClass,
-      queryHash: input.queryHash,
-      durationMs: input.durationMs,
-      timedOut: input.timedOut,
-      estimatedCost: input.estimatedCost,
-    },
-  );
+  return baseEvent('database.slow_query', context, {
+    endpointClass: input.endpointClass,
+    queryHash: input.queryHash,
+    durationMs: input.durationMs,
+    timedOut: input.timedOut,
+    estimatedCost: input.estimatedCost,
+  });
 }
 
 export function adaptQueueSignal(
@@ -202,18 +195,10 @@ export function adaptQueueSignal(
   context: SecurityEventContext,
 ): SecurityTelemetryEvent | undefined {
   if (input.depth !== undefined && input.depth > 0) {
-    return baseEvent(
-      'queue.depth',
-      context,
-      { topic: input.topic, depth: input.depth },
-    );
+    return baseEvent('queue.depth', context, { topic: input.topic, depth: input.depth });
   }
   if (input.retryCount !== undefined && input.retryCount > 0) {
-    return baseEvent(
-      'queue.retry',
-      context,
-      { topic: input.topic, retryCount: input.retryCount },
-    );
+    return baseEvent('queue.retry', context, { topic: input.topic, retryCount: input.retryCount });
   }
   return undefined;
 }
@@ -223,15 +208,11 @@ export function adaptArmorSignal(
   context: SecurityEventContext,
 ): SecurityTelemetryEvent {
   const kind = input.action === 'deny' ? 'armor.deny' : 'armor.throttle';
-  return baseEvent(
-    kind,
-    context,
-    {
-      policy: input.policy,
-      backendService: input.backendService,
-      ...(input.rulePriority === undefined ? {} : { rulePriority: input.rulePriority }),
-    },
-  );
+  return baseEvent(kind, context, {
+    policy: input.policy,
+    backendService: input.backendService,
+    ...(input.rulePriority === undefined ? {} : { rulePriority: input.rulePriority }),
+  });
 }
 
 export function adaptStorageDenial(
@@ -256,25 +237,17 @@ export function adaptServiceHealth(
   context: SecurityEventContext,
 ): SecurityTelemetryEvent | undefined {
   if (input.errorCount !== undefined && input.errorCount > 0) {
-    return baseEvent(
-      'service.error_rate',
-      context,
-      {
-        route: input.route,
-        errorCount: input.errorCount,
-        ...(input.statusCode === undefined ? {} : { statusCode: input.statusCode }),
-      },
-    );
+    return baseEvent('service.error_rate', context, {
+      route: input.route,
+      errorCount: input.errorCount,
+      ...(input.statusCode === undefined ? {} : { statusCode: input.statusCode }),
+    });
   }
   if (input.latencyMs !== undefined) {
-    return baseEvent(
-      'service.latency',
-      context,
-      {
-        route: input.route,
-        latencyMs: input.latencyMs,
-      },
-    );
+    return baseEvent('service.latency', context, {
+      route: input.route,
+      latencyMs: input.latencyMs,
+    });
   }
   return undefined;
 }
@@ -302,11 +275,7 @@ export function adaptSourceAdapterAnomaly(
   reason: string,
   context: SecurityEventContext,
 ): SecurityTelemetryEvent {
-  return baseEvent(
-    'source_adapter.anomaly',
-    context,
-    { adapterId, reason },
-  );
+  return baseEvent('source_adapter.anomaly', context, { adapterId, reason });
 }
 
 export function adaptUnexpectedPublicWrite(
@@ -328,9 +297,5 @@ export function adaptDatabaseConnections(
   activeConnections: number,
   context: SecurityEventContext,
 ): SecurityTelemetryEvent {
-  return baseEvent(
-    'database.connection',
-    context,
-    { role, activeConnections },
-  );
+  return baseEvent('database.connection', context, { role, activeConnections });
 }

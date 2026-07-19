@@ -1,4 +1,3 @@
-
 /**
  * Dry-run-first command implementation for corpus evaluation and before/after reports.
  * Output is written only when an explicit --out path is supplied.

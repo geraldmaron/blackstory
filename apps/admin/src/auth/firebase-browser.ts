@@ -5,12 +5,7 @@
 'use client';
 
 import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
-import {
-  browserLocalPersistence,
-  getAuth,
-  initializeAuth,
-  type Auth,
-} from 'firebase/auth';
+import { browserLocalPersistence, getAuth, initializeAuth, type Auth } from 'firebase/auth';
 
 function readPublicConfig() {
   const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;

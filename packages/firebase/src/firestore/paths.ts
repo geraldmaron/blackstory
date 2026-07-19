@@ -1,4 +1,3 @@
-
 /**
  * Firestore collection path constants for BlackStory (ADR-011 018).
  * Paths always use even segment counts (collection/doc[/collection/doc...]).
@@ -92,8 +91,7 @@ export const firestorePaths = {
   outboxConsumerReceipt: (receiptId: string) =>
     `${FIRESTORE_ROOT.outboxConsumerReceipts}/${receiptId}`,
   killSwitch: (switchId: string) => `${FIRESTORE_ROOT.killSwitches}/${switchId}`,
-  discoveryCampaignRun: (runId: string) =>
-    `${FIRESTORE_ROOT.discoveryCampaignRuns}/${runId}`,
+  discoveryCampaignRun: (runId: string) => `${FIRESTORE_ROOT.discoveryCampaignRuns}/${runId}`,
   /** Convention: source adapter kill switches use this id pattern. */
   sourceAdapterKillSwitch: (adapterId: string) =>
     `${FIRESTORE_ROOT.killSwitches}/source-adapter-${adapterId}`,

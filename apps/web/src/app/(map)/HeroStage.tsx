@@ -29,7 +29,12 @@ import type {
 } from '../../lib/map-experience/build-explore-map-source';
 import { FINAL_FRAME_LABEL, type DecadeFlowFrame } from '../../lib/map-experience/decade-flow';
 import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
-import { buildExploreHref, defaultExploreOverlayState, viewportForState, type ExploreViewport } from '../../lib/map-experience/url-state';
+import {
+  buildExploreHref,
+  defaultExploreOverlayState,
+  viewportForState,
+  type ExploreViewport,
+} from '../../lib/map-experience/url-state';
 import { shouldFadeDecadePatch } from '../map/decade-layer-transition';
 import { HeroHeadlineMorph } from './HeroHeadlineMorph';
 import { useMapStage } from './MapStage';
@@ -126,7 +131,11 @@ export function HeroStage({
   // frame (ADR-017: "the reverse transition eases back to the national preset as
   // hero chrome returns"); the decade-flow effect below owns the data patches.
   useEffect(() => {
-    stage.applyViewState({ selectedState: undefined, selectedEdge: undefined, selectedEntity: undefined });
+    stage.applyViewState({
+      selectedState: undefined,
+      selectedEdge: undefined,
+      selectedEntity: undefined,
+    });
     stage.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
   }, [stage]);
 
@@ -177,7 +186,9 @@ export function HeroStage({
   useEffect(() => {
     const unsubscribe = [
       stage.subscribe('select', (entityId: string) => {
-        const feature = featureCollection.features.find((item) => item.properties.entityId === entityId);
+        const feature = featureCollection.features.find(
+          (item) => item.properties.entityId === entityId,
+        );
         if (feature?.geometry.type === 'Point') {
           const [lng, lat] = feature.geometry.coordinates;
           stage.flyPreset('point', { center: [lng, lat], zoom: CAMERA_POINT_ZOOM });
@@ -191,8 +202,7 @@ export function HeroStage({
           );
           return;
         }
-        const href =
-          feature?.properties.href ?? `/entity/${encodeURIComponent(entityId)}`;
+        const href = feature?.properties.href ?? `/entity/${encodeURIComponent(entityId)}`;
         router.push(href);
       }),
       stage.subscribe('stateSelect', (postalCode: string) => {
@@ -209,10 +219,7 @@ export function HeroStage({
         );
       }),
       stage.subscribe('activate', (viewport: ExploreViewport) => {
-        stage.flyPreset(
-          'locality',
-          { center: [viewport.lng, viewport.lat], zoom: viewport.zoom },
-        );
+        stage.flyPreset('locality', { center: [viewport.lng, viewport.lat], zoom: viewport.zoom });
         engage(
           buildExploreHref({
             filters: DEFAULT_EXPLORE_FILTERS,
@@ -242,8 +249,8 @@ export function HeroStage({
     >
       {!stage.mapAvailable ? (
         <Notice tone="warning" title="Map unavailable">
-          The map canvas could not start in this browser. Use Explore to browse documented
-          records as a list.
+          The map canvas could not start in this browser. Use Explore to browse documented records
+          as a list.
         </Notice>
       ) : null}
       <p className="ds-hero-stage__kicker">Documented Black history</p>
@@ -262,7 +269,11 @@ export function HeroStage({
       </div>
 
       {decadeFrames.length > 1 ? (
-        <div className="ds-hero-timeline" role="group" aria-label="Decades in motion, newest to oldest">
+        <div
+          className="ds-hero-timeline"
+          role="group"
+          aria-label="Decades in motion, newest to oldest"
+        >
           <div className="ds-hero-timeline__head">
             <div className="ds-hero-timeline__readout" aria-live="polite">
               <p className="ds-hero-timeline__decade">
@@ -278,7 +289,11 @@ export function HeroStage({
               type="button"
               className="ds-hero-timeline__toggle"
               aria-pressed={playing}
-              aria-label={playing ? 'Pause the decade-by-decade animation' : 'Play the decade-by-decade animation'}
+              aria-label={
+                playing
+                  ? 'Pause the decade-by-decade animation'
+                  : 'Play the decade-by-decade animation'
+              }
               onClick={() => {
                 if (!playing && reducedMotion) {
                   // Under reduced motion, play is still a deliberate choice —

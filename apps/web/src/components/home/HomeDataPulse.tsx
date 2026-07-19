@@ -5,10 +5,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import type {
-  NationalPopulationByDecade,
-  PopulationDecadeChange,
-} from '@repo/firebase';
+import type { NationalPopulationByDecade, PopulationDecadeChange } from '@repo/firebase';
 import { DataStatStrip } from '../data/DataStatStrip';
 import { PopulationByDecadeChart } from '../data/PopulationByDecadeChart';
 import { BlackPopulationShareChart } from '../data/BlackPopulationShareChart';
@@ -74,17 +71,14 @@ export function HomeDataPulse({
               <h3 className="ds-home-data-pulse__subhead" id="home-population-change-heading">
                 Decade-over-decade change
               </h3>
-              <DataStatStrip
-                labelledBy="home-population-change-heading"
-                items={changeStripItems}
-              />
+              <DataStatStrip labelledBy="home-population-change-heading" items={changeStripItems} />
             </div>
           ) : null}
         </div>
       ) : (
         <p className="ds-sans ds-home-data-pulse__fallback">
-          National census rollups are not available in this environment yet. The full modeling
-          page lists every series and citation when the release carries them.
+          National census rollups are not available in this environment yet. The full modeling page
+          lists every series and citation when the release carries them.
         </p>
       )}
 

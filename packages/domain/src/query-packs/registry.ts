@@ -54,9 +54,7 @@ export function resolveQueryPackForRun(
     );
   }
   if (matches.length > 1) {
-    throw new Error(
-      `Ambiguous query pack for entityKind=${input.entityKind} theme=${input.theme}`,
-    );
+    throw new Error(`Ambiguous query pack for entityKind=${input.entityKind} theme=${input.theme}`);
   }
   return matches[0]!;
 }

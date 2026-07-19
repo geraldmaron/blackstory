@@ -114,7 +114,9 @@ function artifactPayload(
                 ...(entry.timespan.validFrom !== undefined
                   ? { validFrom: entry.timespan.validFrom }
                   : {}),
-                ...(entry.timespan.validTo !== undefined ? { validTo: entry.timespan.validTo } : {}),
+                ...(entry.timespan.validTo !== undefined
+                  ? { validTo: entry.timespan.validTo }
+                  : {}),
               },
             }
           : {}),

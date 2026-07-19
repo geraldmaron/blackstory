@@ -51,7 +51,9 @@ test('assertResultsNotViolenceOnlyCollapse passes when at least one harm entity 
 });
 
 test('assertResultsNotViolenceOnlyCollapse passes when the set mixes harm-only with non-harm entities', () => {
-  assert.doesNotThrow(() => assertResultsNotViolenceOnlyCollapse([['harm'], ['achievement', 'joy']]));
+  assert.doesNotThrow(() =>
+    assertResultsNotViolenceOnlyCollapse([['harm'], ['achievement', 'joy']]),
+  );
 });
 
 test('assertResultsNotViolenceOnlyCollapse throws when every harm-classified entity in the set is harm-only', () => {

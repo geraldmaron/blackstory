@@ -5,7 +5,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { ExploreMapFeature } from './build-explore-map-source';
-import { applyExploreFilters, buildExploreFacetOptions, DEFAULT_EXPLORE_FILTERS, filterFeaturesInBounds, sortFeaturesForList } from './filters';
+import {
+  applyExploreFilters,
+  buildExploreFacetOptions,
+  DEFAULT_EXPLORE_FILTERS,
+  filterFeaturesInBounds,
+  sortFeaturesForList,
+} from './filters';
 
 function feature(overrides: Partial<ExploreMapFeature['properties']>): ExploreMapFeature {
   return {
@@ -39,21 +45,43 @@ test('the default filter state (all "all") returns every feature unfiltered', ()
 
 test('kind/era/theme/confidence filters are opt-in and compose with AND semantics', () => {
   const features = [
-    feature({ entityId: 'a', kind: 'place', eraBuckets: ['1950s'], topicTags: ['education'], confidenceTier: 'high' }),
-    feature({ entityId: 'b', kind: 'school', eraBuckets: ['1960s'], topicTags: ['freedmen'], confidenceTier: 'low' }),
+    feature({
+      entityId: 'a',
+      kind: 'place',
+      eraBuckets: ['1950s'],
+      topicTags: ['education'],
+      confidenceTier: 'high',
+    }),
+    feature({
+      entityId: 'b',
+      kind: 'school',
+      eraBuckets: ['1960s'],
+      topicTags: ['freedmen'],
+      confidenceTier: 'low',
+    }),
   ];
 
   const kindOnly = applyExploreFilters(features, { ...DEFAULT_EXPLORE_FILTERS, kind: 'school' });
-  assert.deepEqual(kindOnly.map((f) => f.properties.entityId), ['b']);
+  assert.deepEqual(
+    kindOnly.map((f) => f.properties.entityId),
+    ['b'],
+  );
 
   const eraAndTheme = applyExploreFilters(features, {
     ...DEFAULT_EXPLORE_FILTERS,
     era: '1950s',
     theme: 'education',
   });
-  assert.deepEqual(eraAndTheme.map((f) => f.properties.entityId), ['a']);
+  assert.deepEqual(
+    eraAndTheme.map((f) => f.properties.entityId),
+    ['a'],
+  );
 
-  const noMatch = applyExploreFilters(features, { ...DEFAULT_EXPLORE_FILTERS, kind: 'place', era: '1960s' });
+  const noMatch = applyExploreFilters(features, {
+    ...DEFAULT_EXPLORE_FILTERS,
+    kind: 'place',
+    era: '1960s',
+  });
   assert.equal(noMatch.length, 0);
 });
 
@@ -85,7 +113,11 @@ test('sortFeaturesForList orders chronologically by earliest era, undated last, 
     feature({ entityId: 'undated', displayName: 'Undated Hall', eraBuckets: [] }),
     feature({ entityId: 'newer', displayName: 'Newer School', eraBuckets: ['1960s', '1970s'] }),
     feature({ entityId: 'older-b', displayName: 'Bethel Church', eraBuckets: ['1840s'] }),
-    feature({ entityId: 'older-a', displayName: 'Avery Institute', eraBuckets: ['1840s', '1900s'] }),
+    feature({
+      entityId: 'older-a',
+      displayName: 'Avery Institute',
+      eraBuckets: ['1840s', '1900s'],
+    }),
   ];
   assert.deepEqual(
     sortFeaturesForList(features).map((f) => f.properties.entityId),
@@ -145,8 +177,5 @@ test('filterFeaturesInBounds handles antimeridian-crossing extents', () => {
     east: -160,
     north: 10,
   });
-  assert.deepEqual(
-    wrapped.map((f) => f.properties.entityId).sort(),
-    ['east', 'west'],
-  );
+  assert.deepEqual(wrapped.map((f) => f.properties.entityId).sort(), ['east', 'west']);
 });

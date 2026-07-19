@@ -8,10 +8,18 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listPublicEntities } from '../../data/public-seed';
 import { buildExploreMapSource } from '../../lib/map-experience/build-explore-map-source';
-import { DIGNITY_PALETTE, EXPLORE_CLUSTER_CONFIG, LIGHT_PLATE_OCEAN, plateForScheme } from '../../lib/map-experience';
+import {
+  DIGNITY_PALETTE,
+  EXPLORE_CLUSTER_CONFIG,
+  LIGHT_PLATE_OCEAN,
+  plateForScheme,
+} from '../../lib/map-experience';
 import { brandPalette } from '@repo/ui';
 import { KIND_ENCODING_ENTRIES } from '../../lib/map-experience/kind-encoding';
-import { markerHaloRadiusExpression, markerRadiusExpression } from '../../lib/map-experience/marker-size';
+import {
+  markerHaloRadiusExpression,
+  markerRadiusExpression,
+} from '../../lib/map-experience/marker-size';
 import {
   buildExploreMapStyle,
   ENTITY_CLUSTER_OPACITY,
@@ -94,7 +102,9 @@ test('unclustered point fill and halo use the shared translucent opacity constan
   const opacityOutputs = matchExpressionOutputs(pointLayer.paint?.['circle-opacity']);
   assert.ok(opacityOutputs.includes(ENTITY_POINT_FILL_OPACITY));
   assert.ok(
-    opacityOutputs.every((value) => typeof value === 'number' && value <= ENTITY_POINT_FILL_OPACITY),
+    opacityOutputs.every(
+      (value) => typeof value === 'number' && value <= ENTITY_POINT_FILL_OPACITY,
+    ),
     'no kind fill may be more opaque than the solid-fill constant',
   );
 });
@@ -139,7 +149,9 @@ test('the jurisdiction-area layer renders fill geometry (never a point layer) an
   const style = buildStyleFixture('presence');
   const areaLayer = style.layers.find((layer) => layer.id === EXPLORE_JURISDICTION_AREA_LAYER_ID);
   assert.equal(areaLayer?.type, 'fill');
-  const areaSource = style.sources['explore-jurisdiction-areas'] as { data: { features: readonly unknown[] } };
+  const areaSource = style.sources['explore-jurisdiction-areas'] as {
+    data: { features: readonly unknown[] };
+  };
   assert.deepEqual(areaSource.data.features, []);
 });
 
@@ -161,7 +173,10 @@ test('every paint color used is one of the dignity-palette values (no new hue in
     const paint = (layer as { paint?: Record<string, unknown> }).paint ?? {};
     for (const [key, value] of Object.entries(paint)) {
       if (typeof value !== 'string' || !key.includes('color')) continue;
-      assert.ok(allowed.has(value), `layer "${layer.id}" paint "${key}" = "${value}" must come from DIGNITY_PALETTE`);
+      assert.ok(
+        allowed.has(value),
+        `layer "${layer.id}" paint "${key}" = "${value}" must come from DIGNITY_PALETTE`,
+      );
     }
   }
 });
@@ -229,7 +244,14 @@ test('street casing and fill use muted zoom stops with motorway→minor class hi
   assert.equal(widthForClass(fillZ14, 'trunk'), 2.0);
 
   // Fill stays thinner than casing at every named class (and the fallback).
-  for (const roadClass of ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'minor'] as const) {
+  for (const roadClass of [
+    'motorway',
+    'trunk',
+    'primary',
+    'secondary',
+    'tertiary',
+    'minor',
+  ] as const) {
     assert.ok(
       widthForClass(fillZ14, roadClass) < widthForClass(casingZ14, roadClass),
       `${roadClass} fill must be thinner than casing at z14`,
@@ -306,8 +328,13 @@ test('county label symbol layer reads name from GeoJSON and sits above county li
 
   const lineIndex = style.layers.findIndex((layer) => layer.id === EXPLORE_COUNTY_LINES_LAYER_ID);
   const labelIndex = style.layers.findIndex((layer) => layer.id === EXPLORE_COUNTY_LABEL_LAYER_ID);
-  const entityIndex = style.layers.findIndex((layer) => layer.id === EXPLORE_UNCLUSTERED_HALO_LAYER_ID);
-  assert.ok(lineIndex >= 0 && labelIndex > lineIndex, 'county labels must render above county lines');
+  const entityIndex = style.layers.findIndex(
+    (layer) => layer.id === EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+  );
+  assert.ok(
+    lineIndex >= 0 && labelIndex > lineIndex,
+    'county labels must render above county lines',
+  );
   assert.ok(entityIndex > labelIndex, 'county labels must sit below entity markers');
 });
 
@@ -322,7 +349,10 @@ test('dark colorScheme keeps the ink ocean and pageSand state bounds', () => {
   assert.equal(layerById(dark, 'background').paint?.['background-color'], '#080606');
   const darkPlate = plateForScheme('dark');
   assert.equal(darkPlate.ocean, '#080606');
-  assert.equal(layerById(dark, 'explore-state-bounds-line').paint?.['line-color'], darkPlate.stateBounds);
+  assert.equal(
+    layerById(dark, 'explore-state-bounds-line').paint?.['line-color'],
+    darkPlate.stateBounds,
+  );
   assert.equal(darkPlate.stateBounds, DIGNITY_PALETTE.pointHalo);
 });
 
@@ -354,7 +384,10 @@ test('the point layer colors kinds and semantic tones from DIGNITY_PALETTE via s
   assert.ok(colorOutputs.includes(DIGNITY_PALETTE.kindEpicenter));
   const allowed = new Set<string>(Object.values(DIGNITY_PALETTE));
   for (const output of colorOutputs) {
-    assert.ok(allowed.has(output), `circle-color output "${output}" must come from DIGNITY_PALETTE`);
+    assert.ok(
+      allowed.has(output),
+      `circle-color output "${output}" must come from DIGNITY_PALETTE`,
+    );
   }
 });
 
@@ -376,7 +409,7 @@ test('halo and event-glyph layers use the same kind color expression as the poin
   assert.notEqual(haloLayer.paint?.['circle-color'], DIGNITY_PALETTE.pointHalo);
 });
 
-test('the point layer\'s fill/stroke signature (the non-color glyph channel) is not identical across every kind', () => {
+test("the point layer's fill/stroke signature (the non-color glyph channel) is not identical across every kind", () => {
   const style = buildStyleFixture('presence');
   const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
   const opacityOutputs = matchExpressionOutputs(pointLayer.paint?.['circle-opacity']);
@@ -384,8 +417,14 @@ test('the point layer\'s fill/stroke signature (the non-color glyph channel) is 
   // At least one kind (institution, the "ring" glyph) must differ from the others on both
   // opacity (mostly hollow) and stroke-width (thick) proof the glyph channel is real, not
   // decorative filler that happens to be identical everywhere.
-  assert.ok(new Set(opacityOutputs).size > 1, 'circle-opacity must differ across kinds (fill vs. mostly-hollow)');
-  assert.ok(new Set(strokeWidthOutputs).size > 1, 'circle-stroke-width must differ across kinds (thin vs. thick rim)');
+  assert.ok(
+    new Set(opacityOutputs).size > 1,
+    'circle-opacity must differ across kinds (fill vs. mostly-hollow)',
+  );
+  assert.ok(
+    new Set(strokeWidthOutputs).size > 1,
+    'circle-stroke-width must differ across kinds (thin vs. thick rim)',
+  );
 });
 
 test('the institution "ring" glyph is mostly hollow with a thick Stone-sourced stroke', () => {
@@ -395,7 +434,10 @@ test('the institution "ring" glyph is mostly hollow with a thick Stone-sourced s
   const strokeColorExpr = pointLayer.paint?.['circle-stroke-color'] as unknown[];
   const institutionIndex = (opacityExpr as unknown[]).indexOf('institution');
   assert.ok(institutionIndex > 0, 'expected "institution" as a match case in circle-opacity');
-  assert.ok((opacityExpr[institutionIndex + 1] as number) < 1, 'institution fill must be less than fully opaque (a ring, not a solid dot)');
+  assert.ok(
+    (opacityExpr[institutionIndex + 1] as number) < 1,
+    'institution fill must be less than fully opaque (a ring, not a solid dot)',
+  );
   const strokeInstitutionIndex = strokeColorExpr.indexOf('institution');
   assert.equal(strokeColorExpr[strokeInstitutionIndex + 1], DIGNITY_PALETTE.kindInstitutionStroke);
 });
@@ -403,16 +445,26 @@ test('the institution "ring" glyph is mostly hollow with a thick Stone-sourced s
 test('the event kind gets a second, unfilled glyph-ring layer filtered to kind === "event"', () => {
   const style = buildStyleFixture('presence');
   const eventGlyphLayer = layerById(style, EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID);
-  assert.equal(eventGlyphLayer.paint?.['circle-opacity'], 0, 'the event glyph ring must be unfilled (stroke only)');
+  assert.equal(
+    eventGlyphLayer.paint?.['circle-opacity'],
+    0,
+    'the event glyph ring must be unfilled (stroke only)',
+  );
   const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
   assert.deepEqual(
     eventGlyphLayer.paint?.['circle-stroke-color'],
     pointLayer.paint?.['circle-color'],
   );
-  const layerSpec = style.layers.find((layer) => layer.id === EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID) as {
+  const layerSpec = style.layers.find(
+    (layer) => layer.id === EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
+  ) as {
     filter?: unknown;
   };
-  assert.deepEqual(layerSpec.filter, ['all', ['!', ['has', 'point_count']], ['==', ['get', 'kind'], 'event']]);
+  assert.deepEqual(layerSpec.filter, [
+    'all',
+    ['!', ['has', 'point_count']],
+    ['==', ['get', 'kind'], 'event'],
+  ]);
 });
 
 test('point and halo radii are literally markerRadiusExpression()/markerHaloRadiusExpression() (one source of truth with marker-size.ts)', () => {

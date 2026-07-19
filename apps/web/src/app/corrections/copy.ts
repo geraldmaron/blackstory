@@ -8,8 +8,7 @@ import type { PublicCorrectionPhase } from './public-status';
 
 export const CORRECTION_PRIVACY_NOTICE = {
   title: 'Privacy and review',
-  body:
-    'Corrections are never published as submitted. Every submission enters a restricted quarantine queue for human review. We do not show your contact details publicly. Moderators may reach out using optional contact information you provide. Do not include anyone’s home address or other sensitive personal details about a living person unless strictly necessary for the correction.',
+  body: 'Corrections are never published as submitted. Every submission enters a restricted quarantine queue for human review. We do not show your contact details publicly. Moderators may reach out using optional contact information you provide. Do not include anyone’s home address or other sensitive personal details about a living person unless strictly necessary for the correction.',
 } as const;
 
 export const CORRECTION_FORM_INTRO =

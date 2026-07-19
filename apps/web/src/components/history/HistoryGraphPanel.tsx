@@ -25,7 +25,10 @@ export type HistoryGraphPanelProps = {
   readonly className?: string;
 };
 
-function edgesForNode(nodeId: string, edges: readonly HistoryEdgeView[]): readonly HistoryEdgeView[] {
+function edgesForNode(
+  nodeId: string,
+  edges: readonly HistoryEdgeView[],
+): readonly HistoryEdgeView[] {
   return edges.filter((edge) => edge.fromEntityId === nodeId || edge.toEntityId === nodeId);
 }
 
@@ -76,7 +79,10 @@ export function HistoryGraphPanel({
             Connections for {selectedNode.displayName} ({selectedNodeEdges.length})
           </summary>
           <p className="ds-history-graph__node-header">
-            <Link className="ds-cta ds-cta--quiet ds-history-graph__node-link" href={selectedNode.href}>
+            <Link
+              className="ds-cta ds-cta--quiet ds-history-graph__node-link"
+              href={selectedNode.href}
+            >
               Open record
             </Link>
           </p>

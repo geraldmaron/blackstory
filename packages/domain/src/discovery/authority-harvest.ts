@@ -53,9 +53,7 @@ function hostnameOf(url: URL): string {
 
 export function isAuthorityHost(hostname: string): boolean {
   const host = hostname.replace(/^www\./i, '').toLowerCase();
-  return AUTHORITY_HOST_SUFFIXES.some(
-    (suffix) => host === suffix || host.endsWith(`.${suffix}`),
-  );
+  return AUTHORITY_HOST_SUFFIXES.some((suffix) => host === suffix || host.endsWith(`.${suffix}`));
 }
 
 /**
@@ -136,11 +134,7 @@ export function harvestAuthorityFollowUpsForCandidate(
     typeof input.candidate.adapterRecord.payload?.summary === 'string'
       ? input.candidate.adapterRecord.payload.summary
       : '';
-  const textParts = [
-    input.candidate.adapterRecord.title ?? '',
-    summary,
-    input.sourceText ?? '',
-  ];
+  const textParts = [input.candidate.adapterRecord.title ?? '', summary, input.sourceText ?? ''];
   const rawUrls = [
     ...payloadLinkHints(input.candidate),
     ...(input.linkHints ?? []),

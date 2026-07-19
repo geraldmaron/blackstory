@@ -1,4 +1,3 @@
-
 /**
  * Contract-layer tests for shared API health payload shape.
  */

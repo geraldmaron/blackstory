@@ -7,7 +7,10 @@
  * take a fetcher port backed, in production, by `../adapters/census-geo/fetch-geocode.ts`.
  */
 import { normalizeAddressInput, coordinateCacheKey } from './address-normalize.js';
-import { geoPrecisionTierForMatch, reduceGeocodeCoordinatePrecision } from './coordinate-precision.js';
+import {
+  geoPrecisionTierForMatch,
+  reduceGeocodeCoordinatePrecision,
+} from './coordinate-precision.js';
 import type { GeocodeCache } from './geocode-cache.js';
 import { resolveJurisdictionIdsFromMatch } from './jurisdiction-ids.js';
 import { buildManualPlaceSearchFallback } from './manual-fallback.js';
@@ -20,11 +23,18 @@ import type {
 } from './types.js';
 import type { CensusGeocodeMatch } from '../adapters/census-geo/types.js';
 
-export type GeocodeSuccess = { readonly ok: true; readonly resolution: GeocodeResolution; readonly cacheHit: boolean };
+export type GeocodeSuccess = {
+  readonly ok: true;
+  readonly resolution: GeocodeResolution;
+  readonly cacheHit: boolean;
+};
 export type GeocodeFailure = { readonly ok: false; readonly fallback: ManualPlaceSearchFallback };
 export type GeocodeResult = GeocodeSuccess | GeocodeFailure;
 
-function toResolution(match: CensusGeocodeMatch, retainExactCoordinates: boolean): GeocodeResolution {
+function toResolution(
+  match: CensusGeocodeMatch,
+  retainExactCoordinates: boolean,
+): GeocodeResolution {
   const jurisdictionIds = resolveJurisdictionIdsFromMatch(match);
   const tier = geoPrecisionTierForMatch(match);
   const precision = reduceGeocodeCoordinatePrecision({ match, tier, retainExactCoordinates });
@@ -99,7 +109,9 @@ export type ReverseGeocodeInput = {
 };
 
 /** Reverse geocode: a browser-supplied lat/lng -> a resolved jurisdiction result, or a manual-search fallback. */
-export async function reverseGeocodeCoordinates(input: ReverseGeocodeInput): Promise<GeocodeResult> {
+export async function reverseGeocodeCoordinates(
+  input: ReverseGeocodeInput,
+): Promise<GeocodeResult> {
   const cacheKey = coordinateCacheKey(input.lat, input.lng);
   const nowMs = input.now?.() ?? Date.now();
 

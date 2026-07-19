@@ -19,7 +19,10 @@ test('extractMessageContent prefers content over reasoning', () => {
 
 test('extractMessageContent pulls JSON from reasoning when content empty', () => {
   const reasoning = 'thinking… {"decision":"keep","rationale":"x"} trailing';
-  assert.equal(extractMessageContent({ content: '', reasoning }), '{"decision":"keep","rationale":"x"}');
+  assert.equal(
+    extractMessageContent({ content: '', reasoning }),
+    '{"decision":"keep","rationale":"x"}',
+  );
 });
 
 test('hybrid fails over to ollama when openrouter returns retryable error', async () => {

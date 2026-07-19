@@ -1,4 +1,3 @@
-
 /**
  * Typed environment schemas for Firebase web, admin, and server surfaces.
  * Local/test validation never requires production credentials.
@@ -104,7 +103,6 @@ function mergeClientConfig(
   });
 }
 
-
 /**
  * Public web client env. Emulator mode supplies demo defaults; production uses
  * registered BlackStory Web identifiers unless overridden.
@@ -120,7 +118,6 @@ export function parseWebFirebaseEnv(
   return appCheckSiteKey ? { mode, config, appCheckSiteKey } : { mode, config };
 }
 
-
 /**
  * Admin console client env. Uses the separate BlackStory Admin app id.
  */
@@ -134,7 +131,6 @@ export function parseAdminFirebaseEnv(
   const appCheckSiteKey = readOptional(environment, 'NEXT_PUBLIC_FIREBASE_APP_CHECK_SITE_KEY');
   return appCheckSiteKey ? { mode, config, appCheckSiteKey } : { mode, config };
 }
-
 
 /**
  * Server Admin SDK env. Local tests need only emulator signals + demo project.

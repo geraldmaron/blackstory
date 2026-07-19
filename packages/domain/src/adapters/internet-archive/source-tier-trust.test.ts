@@ -23,7 +23,9 @@ import type { DiscoveryCandidateRecord } from '../../discovery/types.js';
 
 const FIXED_NOW = '2026-07-17T20:00:00.000Z';
 
-function communityCandidate(overrides: Partial<DiscoveryCandidateRecord> = {}): DiscoveryCandidateRecord {
+function communityCandidate(
+  overrides: Partial<DiscoveryCandidateRecord> = {},
+): DiscoveryCandidateRecord {
   const base: DiscoveryCandidateRecord = {
     schemaVersion: 'discovery-candidate.v1',
     id: 'disc_rss_weak_1',
@@ -67,7 +69,11 @@ function communityCandidate(overrides: Partial<DiscoveryCandidateRecord> = {}): 
 }
 
 test('LOW_AUTHORITY_SOURCE_TIERS matches the three constitution tiers this module maps', () => {
-  assert.deepEqual([...LOW_AUTHORITY_SOURCE_TIERS].sort(), ['community_oral', 'news_reportage', 'self_published']);
+  assert.deepEqual([...LOW_AUTHORITY_SOURCE_TIERS].sort(), [
+    'community_oral',
+    'news_reportage',
+    'self_published',
+  ]);
   assert.equal(isLowAuthoritySourceTier('community_oral'), true);
   assert.equal(isLowAuthoritySourceTier('self_published'), true);
   assert.equal(isLowAuthoritySourceTier('news_reportage'), true);
@@ -81,13 +87,19 @@ test('a weak-signal RSS/community_oral candidate does not independently reach in
   assert.notEqual(assessment.decision, 'include');
   // The hard downgrade is a no-op here because the existing gate pipeline already blocked it
   // proving the two layers agree rather than fighting each other.
-  assert.equal(enforceLowAuthorityTierCannotIncludeIndependently(candidate, assessment.decision), assessment.decision);
+  assert.equal(
+    enforceLowAuthorityTierCannotIncludeIndependently(candidate, assessment.decision),
+    assessment.decision,
+  );
 });
 
 test('enforceLowAuthorityTierCannotIncludeIndependently downgrades a hypothetical include for an uncorroborated weak/low-tier candidate', () => {
   const candidate = communityCandidate();
   // Simulate a caller that (incorrectly) resolved this to include the hard gate must still catch it.
-  assert.equal(enforceLowAuthorityTierCannotIncludeIndependently(candidate, 'include'), 'supporting_context');
+  assert.equal(
+    enforceLowAuthorityTierCannotIncludeIndependently(candidate, 'include'),
+    'supporting_context',
+  );
 });
 
 test('enforceLowAuthorityTierCannotIncludeIndependently leaves strong-signal or non-low-tier candidates untouched', () => {
@@ -100,12 +112,18 @@ test('enforceLowAuthorityTierCannotIncludeIndependently leaves strong-signal or 
       reasons: ['strong positive + historical match'],
     },
   });
-  assert.equal(enforceLowAuthorityTierCannotIncludeIndependently(strongSignal, 'include'), 'include');
+  assert.equal(
+    enforceLowAuthorityTierCannotIncludeIndependently(strongSignal, 'include'),
+    'include',
+  );
 
   const highAuthoritySource = communityCandidate({
     adapterRecord: { ...communityCandidate().adapterRecord, classification: 'primary_archival' },
   });
-  assert.equal(enforceLowAuthorityTierCannotIncludeIndependently(highAuthoritySource, 'include'), 'include');
+  assert.equal(
+    enforceLowAuthorityTierCannotIncludeIndependently(highAuthoritySource, 'include'),
+    'include',
+  );
 });
 
 test('isPurelyCrowdsourcedEvidence / isCrowdsourcedClaimSourceTier identify RSS, Internet Archive default, and self-published tiers', () => {

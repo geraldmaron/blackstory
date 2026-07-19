@@ -1,4 +1,3 @@
-
 /**
  * REAL roster entry: source drift + adapter run-health checks. Wraps
  * @repo/domain's evaluateRunHealth/shouldQuarantineRun/shouldDeadLetterRun the exact

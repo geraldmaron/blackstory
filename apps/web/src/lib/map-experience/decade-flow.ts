@@ -32,7 +32,10 @@
 // reintroduce the problem — `StateAggregateCount` is a structural duplicate of `@repo/domain`'s
 // `MapStateAggregate` (same four fields), freely interchangeable via TypeScript's structural
 // typing with `density.ts`'s `buildStateDensityLevels`, which expects the latter.
-import { aggregateDecadePresence, type StateAggregateCount } from '@repo/domain/map/decade-presence';
+import {
+  aggregateDecadePresence,
+  type StateAggregateCount,
+} from '@repo/domain/map/decade-presence';
 import type { ExploreMapFeature, ExploreMapFeatureCollection } from './build-explore-map-source';
 import type { HistoryEdgeLineCollection } from './build-history-edge-lines';
 import { buildStateDensityLevels, type StateDensityLevel } from './density';
@@ -76,9 +79,7 @@ function earliestDecadeOf(feature: ExploreMapFeature): number | undefined {
   return earliest;
 }
 
-function stateResolved(
-  feature: ExploreMapFeature,
-): feature is ExploreMapFeature & {
+function stateResolved(feature: ExploreMapFeature): feature is ExploreMapFeature & {
   properties: { stateFips: string; statePostalCode: string; stateName: string };
 } {
   const { stateFips, statePostalCode, stateName } = feature.properties;
@@ -90,7 +91,9 @@ function stateResolved(
  * membership: an undated-but-located record still belongs on the map today, even though
  * it can never honestly claim a specific decade's ACTIVE presence (see
  * `aggregateDecadePresence`'s doc comment on why decade-scoped presence excludes it). */
-function densityOfAllFeatures(features: readonly ExploreMapFeature[]): readonly StateDensityLevel[] {
+function densityOfAllFeatures(
+  features: readonly ExploreMapFeature[],
+): readonly StateDensityLevel[] {
   const byState = new Map<string, { fips: string; postal: string; name: string; count: number }>();
   for (const feature of features) {
     if (!stateResolved(feature)) continue;
@@ -99,7 +102,12 @@ function densityOfAllFeatures(features: readonly ExploreMapFeature[]): readonly 
     if (entry) {
       entry.count += 1;
     } else {
-      byState.set(stateFips, { fips: stateFips, postal: statePostalCode, name: stateName, count: 1 });
+      byState.set(stateFips, {
+        fips: stateFips,
+        postal: statePostalCode,
+        name: stateName,
+        count: 1,
+      });
     }
   }
   const aggregates: StateAggregateCount[] = [...byState.values()].map((entry) => ({

@@ -34,13 +34,18 @@ export type BuildCountyChoroplethLevelsInput = {
   readonly fips5List?: readonly string[];
 };
 
-function allFips5Keys(index: CountyPopulationIndex | undefined, fips5List?: readonly string[]): readonly string[] {
+function allFips5Keys(
+  index: CountyPopulationIndex | undefined,
+  fips5List?: readonly string[],
+): readonly string[] {
   if (fips5List && fips5List.length > 0) return fips5List;
   if (!index) return [];
   return Object.keys(index.counties);
 }
 
-export function buildCountyChoroplethLevels(input: BuildCountyChoroplethLevelsInput): readonly CountyChoroplethLevel[] {
+export function buildCountyChoroplethLevels(
+  input: BuildCountyChoroplethLevelsInput,
+): readonly CountyChoroplethLevel[] {
   const keys = allFips5Keys(input.index, input.fips5List);
   if (keys.length === 0) return [];
 

@@ -26,10 +26,17 @@ test('productionResplitTarget names the ADR-012 three-project topology', () => {
   assert.equal(target.status, 'design-not-applied');
 
   const projectIds = target.projects.map((p) => p.projectId).sort();
-  assert.deepEqual(projectIds, ['black-book-efaaf', 'blackbook-internal', 'blackbook-staging'].sort());
+  assert.deepEqual(
+    projectIds,
+    ['black-book-efaaf', 'blackbook-internal', 'blackbook-staging'].sort(),
+  );
 
   const prod = target.projects.find((p) => p.projectId === PROD_PROJECT_ID);
-  assert.equal(prod.retainedFrom, PROD_PROJECT_ID, 'blackbook-prod must be the retained project, not a fresh one');
+  assert.equal(
+    prod.retainedFrom,
+    PROD_PROJECT_ID,
+    'blackbook-prod must be the retained project, not a fresh one',
+  );
 
   const staging = target.projects.find((p) => p.projectId === 'blackbook-staging');
   const internal = target.projects.find((p) => p.projectId === 'blackbook-internal');
@@ -59,7 +66,10 @@ test('crossProjectGrants is exactly the ADR-012 one-way promotion asymmetry', ()
       !grant.to.toLowerCase().includes('blackbook-internal'),
       `grant ${grant.id} must not grant anything into blackbook-internal (zero prod-principal IAM invariant), got: ${grant.to}`,
     );
-    assert.ok(grant.rationale.includes('ADR-012'), `grant ${grant.id} rationale must reference ADR-012`);
+    assert.ok(
+      grant.rationale.includes('ADR-012'),
+      `grant ${grant.id} rationale must reference ADR-012`,
+    );
   }
 
   const grantIds = grants.map((g) => g.id).sort();
@@ -74,11 +84,20 @@ test('crossProjectGrants is exactly the ADR-012 one-way promotion asymmetry', ()
   );
 
   const promotionFirestore = grants.find((g) => g.id === 'promotion-write-prod-firestore');
-  assert.ok(promotionFirestore.condition.includes('/public/'), 'promotion write must be scoped to public/** projections');
+  assert.ok(
+    promotionFirestore.condition.includes('/public/'),
+    'promotion write must be scoped to public/** projections',
+  );
 
   const pullerRead = grants.find((g) => g.id === 'submissions-puller-read-prod');
-  assert.ok(pullerRead.role.includes('Viewer') || pullerRead.role.includes('viewer'), 'submissions-puller must be read-only');
-  assert.ok(pullerRead.condition.includes('/submissions/'), 'puller read must be scoped to the submissions collection');
+  assert.ok(
+    pullerRead.role.includes('Viewer') || pullerRead.role.includes('viewer'),
+    'submissions-puller must be read-only',
+  );
+  assert.ok(
+    pullerRead.condition.includes('/submissions/'),
+    'puller read must be scoped to the submissions collection',
+  );
 });
 
 test('promotion and submissions-puller identities exist and stay out of prod-forbidden territory', () => {
@@ -124,7 +143,11 @@ test('the four ADR-012-relocated service accounts and private-evidence resolve t
   for (const id of ['admin', 'publication', 'security', 'research']) {
     const sa = byId[id];
     assert.ok(sa, `serviceAccounts must include ${id}`);
-    assert.equal(sa.project, 'blackbook-internal', `${id} must resolve to blackbook-internal under ADR-012, not ${sa.project}`);
+    assert.equal(
+      sa.project,
+      'blackbook-internal',
+      `${id} must resolve to blackbook-internal under ADR-012, not ${sa.project}`,
+    );
     assert.ok(
       sa.mustNotHave.some((m) => m.toLowerCase().includes('blackbook-prod')) || id === 'security',
       `${id}.mustNotHave should flag the absence of any blackbook-prod grant (security's grant is documented as a legitimate cross-project exception instead)`,
@@ -134,7 +157,11 @@ test('the four ADR-012-relocated service accounts and private-evidence resolve t
   const buckets = Object.fromEntries(matrix.buckets.map((b) => [b.id, b]));
   const privateEvidence = buckets['private-evidence'];
   assert.ok(privateEvidence, 'buckets must include private-evidence');
-  assert.equal(privateEvidence.project, 'blackbook-internal', 'private-evidence must resolve to blackbook-internal under ADR-012');
+  assert.equal(
+    privateEvidence.project,
+    'blackbook-internal',
+    'private-evidence must resolve to blackbook-internal under ADR-012',
+  );
   assert.equal(privateEvidence.namePattern, 'blackbook-internal-private-evidence');
   assert.ok(
     !privateEvidence.readers.some((r) => r.includes('api-internal')),

@@ -46,10 +46,7 @@ import type { ResolutionProfile } from '../resolution/types.js';
 export const ARCHIVE_DPLA_CAMPAIGN_KIND = 'archive-dpla-discovery.v1' as const;
 
 /** Allowed community adapter ids — never includes federal `dpla-items-v1`. */
-export const ARCHIVE_DPLA_ADAPTER_IDS = [
-  INTERNET_ARCHIVE_ADAPTER_ID,
-  DPLA_V2_ADAPTER_ID,
-] as const;
+export const ARCHIVE_DPLA_ADAPTER_IDS = [INTERNET_ARCHIVE_ADAPTER_ID, DPLA_V2_ADAPTER_ID] as const;
 
 /**
  * Sub-budget policy between Internet Archive and DPLA v2 lanes.
@@ -194,7 +191,10 @@ export function applyArchiveDplaSubBudgets(input: {
   readonly dplaRecords: readonly AdapterCandidateRecord[];
   readonly policy?: typeof ARCHIVE_DPLA_SUB_BUDGET_POLICY;
   readonly maxCandidates?: number;
-}): { readonly records: readonly AdapterCandidateRecord[]; readonly subBudget: ArchiveDplaSubBudgetSnapshot } {
+}): {
+  readonly records: readonly AdapterCandidateRecord[];
+  readonly subBudget: ArchiveDplaSubBudgetSnapshot;
+} {
   const policy = input.policy ?? ARCHIVE_DPLA_SUB_BUDGET_POLICY;
   const sharedCap = input.maxCandidates ?? policy.maxCandidates;
   const iaSlice = input.internetArchiveRecords.slice(0, policy.maxInternetArchive);

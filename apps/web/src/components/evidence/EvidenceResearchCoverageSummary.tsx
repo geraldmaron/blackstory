@@ -29,7 +29,9 @@ export function EvidenceResearchCoverageSummary({
   retractionNotices = [],
 }: EvidenceResearchCoverageSummaryProps) {
   const lastChecked = lastCheckedAt ?? researchCoverage.lastCheckedAt;
-  const hasBody = Boolean(sourceLineage || researchCoverage.notes || lastChecked || retractionNotices.length > 0);
+  const hasBody = Boolean(
+    sourceLineage || researchCoverage.notes || lastChecked || retractionNotices.length > 0,
+  );
 
   if (!hasBody) {
     return (
@@ -49,8 +51,8 @@ export function EvidenceResearchCoverageSummary({
             <dt className="ds-dt">Source lineage</dt>
             <dd style={{ margin: '0 0 var(--ds-space-3) 0' }}>
               <span className="ds-mono">{sourceLineage.independentLineageCount}</span> independent{' '}
-              {sourceLineage.independentLineageCount === 1 ? 'source' : 'sources'} across this record&rsquo;s
-              evidenced claims.
+              {sourceLineage.independentLineageCount === 1 ? 'source' : 'sources'} across this
+              record&rsquo;s evidenced claims.
             </dd>
           </>
         ) : null}

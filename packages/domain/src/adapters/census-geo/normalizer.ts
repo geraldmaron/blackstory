@@ -5,7 +5,12 @@
  * also carries TIGER/MTFCC/area fields this product has no use for and would otherwise be
  * tempted to pass through unbounded).
  */
-import type { RawCensusAddressMatch, RawCensusGeographiesBlock, RawCensusGeographyEntry, CensusGeocodeMatch } from './types.js';
+import type {
+  RawCensusAddressMatch,
+  RawCensusGeographiesBlock,
+  RawCensusGeographyEntry,
+  CensusGeocodeMatch,
+} from './types.js';
 
 function stringField(entry: RawCensusGeographyEntry | undefined, key: string): string | undefined {
   const value = entry?.[key];
@@ -35,10 +40,14 @@ export type ExtractedCensusGeography = {
   readonly placeName?: string;
 };
 
-export function extractCensusGeography(geographies: RawCensusGeographiesBlock | undefined): ExtractedCensusGeography {
+export function extractCensusGeography(
+  geographies: RawCensusGeographiesBlock | undefined,
+): ExtractedCensusGeography {
   const state = firstEntry(geographies, 'States');
   const county = firstEntry(geographies, 'Counties');
-  const place = firstEntry(geographies, 'Incorporated Places') ?? firstEntry(geographies, 'Census Designated Places');
+  const place =
+    firstEntry(geographies, 'Incorporated Places') ??
+    firstEntry(geographies, 'Census Designated Places');
 
   const stateFips = stringField(state, 'STATE');
   const stateName = stringField(state, 'NAME');
@@ -58,7 +67,9 @@ export function extractCensusGeography(geographies: RawCensusGeographiesBlock | 
 }
 
 /** Normalizes one forward-geocode (`onelineaddress`) match. `undefined` when coordinates are absent. */
-export function normalizeCensusAddressMatch(raw: RawCensusAddressMatch): CensusGeocodeMatch | undefined {
+export function normalizeCensusAddressMatch(
+  raw: RawCensusAddressMatch,
+): CensusGeocodeMatch | undefined {
   if (!raw.coordinates) return undefined;
   const geography = extractCensusGeography(raw.geographies);
   const zip = stringField(raw.addressComponents, 'zip');

@@ -49,7 +49,9 @@ import type { DiscoveryCandidateRecord } from '../discovery/index.ts';
 const NOW = '2026-07-17T04:00:00.000Z';
 const LATER = '2026-07-17T05:00:00.000Z';
 
-function featureValues(overrides: Partial<Record<RelevanceFeatureValue['dimension'], number>> = {}): readonly RelevanceFeatureValue[] {
+function featureValues(
+  overrides: Partial<Record<RelevanceFeatureValue['dimension'], number>> = {},
+): readonly RelevanceFeatureValue[] {
   const defaults: Record<RelevanceFeatureValue['dimension'], number> = {
     signal_strength: 0.8,
     thematic_alignment: 0.7,
@@ -70,13 +72,15 @@ function featureValues(overrides: Partial<Record<RelevanceFeatureValue['dimensio
   });
 }
 
-function assessment(input: {
-  readonly candidateId?: string;
-  readonly decision?: RelevanceAssessment['decision'];
-  readonly compositeScore?: number;
-  readonly override?: RelevanceAssessment['override'];
-  readonly featureOverrides?: Partial<Record<RelevanceFeatureValue['dimension'], number>>;
-} = {}): RelevanceAssessment {
+function assessment(
+  input: {
+    readonly candidateId?: string;
+    readonly decision?: RelevanceAssessment['decision'];
+    readonly compositeScore?: number;
+    readonly override?: RelevanceAssessment['override'];
+    readonly featureOverrides?: Partial<Record<RelevanceFeatureValue['dimension'], number>>;
+  } = {},
+): RelevanceAssessment {
   return {
     schemaVersion: 'relevance-assessment.v1',
     candidateId: input.candidateId ?? 'candidate-1',
@@ -121,7 +125,9 @@ function caseWithVerdict(input: {
 }): ResearchCaseRecord {
   const reasonCode =
     input.reasonCode ??
-    (input.targetState === 'relevance_confirmed' ? 'relevance_confirmed' : 'relevance_not_established');
+    (input.targetState === 'relevance_confirmed'
+      ? 'relevance_confirmed'
+      : 'relevance_not_established');
   return transitionResearchCase(caseAtRelevanceReview(input.caseId, input.candidateId), {
     targetState: input.targetState,
     actorId: 'researcher-1',
@@ -165,7 +171,11 @@ test('extractRelevanceDecisionLog classifies excluding an engine-exclude candida
     caseId: 'case-agree-exclude',
     candidateId: 'candidate-agree-exclude',
     targetState: 'excluded',
-    relevanceAssessment: assessment({ candidateId: 'candidate-agree-exclude', decision: 'exclude', compositeScore: 0.1 }),
+    relevanceAssessment: assessment({
+      candidateId: 'candidate-agree-exclude',
+      decision: 'exclude',
+      compositeScore: 0.1,
+    }),
   });
   const [entry] = extractRelevanceDecisionLog([record]);
   assert.ok(entry);
@@ -277,7 +287,10 @@ test('buildRelevanceCalibrationDataset sorts entries deterministically by caseId
     entries: extractRelevanceDecisionLog([recordB, recordA]),
     extractedAt: NOW,
   });
-  assert.deepEqual(dataset.entries.map((entry) => entry.caseId), ['case-a', 'case-b']);
+  assert.deepEqual(
+    dataset.entries.map((entry) => entry.caseId),
+    ['case-a', 'case-b'],
+  );
 });
 
 // --- recalibration-report.ts ------------------------------------------------------------------
@@ -349,7 +362,12 @@ test('analyzeGraylistYield reports unavailable when no input is supplied ( gap) 
     { parkedSignalId: 'p1', parkedAt: NOW, corroboratedAt: LATER },
     { parkedSignalId: 'p2', parkedAt: NOW },
   ]);
-  assert.deepEqual(available, { available: true, parkedCount: 2, corroboratedCount: 1, yieldRate: 0.5 });
+  assert.deepEqual(available, {
+    available: true,
+    parkedCount: 2,
+    corroboratedCount: 1,
+    yieldRate: 0.5,
+  });
 });
 
 test('analyzeSourceTierPrecision groups by adapter+tier and excludes unenriched entries', () => {
@@ -393,7 +411,10 @@ test('buildRecalibrationReport composes every analysis and an overall disagreeme
     caseId: 'case-report-reject',
     candidateId: 'candidate-report-reject',
     targetState: 'excluded',
-    relevanceAssessment: assessment({ candidateId: 'candidate-report-reject', decision: 'include' }),
+    relevanceAssessment: assessment({
+      candidateId: 'candidate-report-reject',
+      decision: 'include',
+    }),
   });
   const entries = extractRelevanceDecisionLog([accepted, rejected]);
   const report = buildRecalibrationReport({ generatedAt: NOW, decisionLog: entries });
@@ -460,7 +481,11 @@ test('proposeWeightChange refuses a proposal identical to the current policy', (
 
 test('approveWeightChange refuses same-identity proposer and approver (proposer != approver)', () => {
   const current = currentRelevanceWeightPolicy({ policyVersion: '1.0.0', createdAt: NOW });
-  const candidate = buildRelevanceWeightPolicy({ policyVersion: '1.1.0', weights: candidateWeights(), createdAt: NOW });
+  const candidate = buildRelevanceWeightPolicy({
+    policyVersion: '1.1.0',
+    weights: candidateWeights(),
+    createdAt: NOW,
+  });
   const proposal = proposeWeightChange({
     proposedBy: 'system:recalibration-report',
     proposedAt: NOW,
@@ -483,7 +508,11 @@ test('approveWeightChange refuses same-identity proposer and approver (proposer 
 
 test('approveWeightChange refuses a proposal that fails the gold-corpus gate', () => {
   const current = currentRelevanceWeightPolicy({ policyVersion: '1.0.0', createdAt: NOW });
-  const candidate = buildRelevanceWeightPolicy({ policyVersion: '1.1.0', weights: candidateWeights(), createdAt: NOW });
+  const candidate = buildRelevanceWeightPolicy({
+    policyVersion: '1.1.0',
+    weights: candidateWeights(),
+    createdAt: NOW,
+  });
   const proposal = proposeWeightChange({
     proposedBy: 'system:recalibration-report',
     proposedAt: NOW,
@@ -492,7 +521,10 @@ test('approveWeightChange refuses a proposal that fails the gold-corpus gate', (
     candidatePolicy: candidate,
     sourceReportGeneratedAt: NOW,
   });
-  assert.throws(() => requireGoldCorpusGatePassed({ proposal, gate: FAILING_GATE }), /gold-corpus gate/i);
+  assert.throws(
+    () => requireGoldCorpusGatePassed({ proposal, gate: FAILING_GATE }),
+    /gold-corpus gate/i,
+  );
   assert.throws(
     () =>
       approveWeightChange({
@@ -508,7 +540,11 @@ test('approveWeightChange refuses a proposal that fails the gold-corpus gate', (
 test('approveWeightChange succeeds with a distinct human approver and a passing gate, and never mutates the live engine weights', () => {
   const liveWeightsBefore = { ...RELEVANCE_DIMENSION_WEIGHTS };
   const current = currentRelevanceWeightPolicy({ policyVersion: '1.0.0', createdAt: NOW });
-  const candidate = buildRelevanceWeightPolicy({ policyVersion: '1.1.0', weights: candidateWeights(), createdAt: NOW });
+  const candidate = buildRelevanceWeightPolicy({
+    policyVersion: '1.1.0',
+    weights: candidateWeights(),
+    createdAt: NOW,
+  });
   const proposal = proposeWeightChange({
     proposedBy: 'system:recalibration-report',
     proposedAt: NOW,
@@ -574,7 +610,12 @@ test('evaluateRelevanceDriftAlarm does not trigger below the minimum sample size
 });
 
 test('evaluateRelevanceDriftAlarm triggers once disagreement rate exceeds threshold with enough samples', () => {
-  const records = [driftEntry('accept'), driftEntry('reject'), driftEntry('reject'), driftEntry('reject')];
+  const records = [
+    driftEntry('accept'),
+    driftEntry('reject'),
+    driftEntry('reject'),
+    driftEntry('reject'),
+  ];
   const entries = extractRelevanceDecisionLog(records);
   const evaluation = evaluateRelevanceDriftAlarm({
     entries,

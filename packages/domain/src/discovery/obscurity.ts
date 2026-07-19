@@ -138,10 +138,7 @@ function clip01(value: number): number {
 }
 
 function tokenize(text: string): readonly string[] {
-  const normalized = text
-    .toLowerCase()
-    .normalize('NFKD')
-    .replace(/\p{M}/gu, '');
+  const normalized = text.toLowerCase().normalize('NFKD').replace(/\p{M}/gu, '');
   return normalized.match(TOKEN_RE) ?? [];
 }
 
@@ -174,7 +171,10 @@ export function catalogNoveltyRaw(candidate: DiscoveryCandidateRecord): {
     return { raw: 1, rationale: 'Catalog blocking returned no_match.' };
   }
   if (match.outcome === 'review_required') {
-    return { raw: 0.55, rationale: 'Catalog blocking requires human review (ambiguous/low confidence).' };
+    return {
+      raw: 0.55,
+      rationale: 'Catalog blocking requires human review (ambiguous/low confidence).',
+    };
   }
   const confidence = match.topMatches[0]?.confidence ?? 0.9;
   const raw = clip01(1 - confidence);
@@ -408,7 +408,9 @@ export function scoreObscurity(input: ScoreObscurityInput): ObscurityAssessment 
     },
   ];
 
-  const score = clip01(Number(factors.reduce((sum, factor) => sum + factor.weighted, 0).toFixed(4)));
+  const score = clip01(
+    Number(factors.reduce((sum, factor) => sum + factor.weighted, 0).toFixed(4)),
+  );
 
   return {
     methodologyVersion: OBSCURITY_METHODOLOGY_VERSION,
@@ -425,7 +427,6 @@ export function rankByObscurity(
   assessments: readonly ObscurityAssessment[],
 ): readonly ObscurityAssessment[] {
   return [...assessments].sort(
-    (left, right) =>
-      right.score - left.score || left.candidateId.localeCompare(right.candidateId),
+    (left, right) => right.score - left.score || left.candidateId.localeCompare(right.candidateId),
   );
 }

@@ -1,4 +1,3 @@
-
 /**
  * PROVES the acceptance-critical invariant for: an operator can PROPOSE (submit a lead,
  * register a source, attach evidence) but publishing always requires a distinct, fresh-auth
@@ -13,11 +12,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  evaluatePromotionGate,
-  type PromotionClaim,
-  type PromotionEvidence,
-} from '@repo/domain';
+import { evaluatePromotionGate, type PromotionClaim, type PromotionEvidence } from '@repo/domain';
 import {
   AdminAuthorizationError,
   assertResearchCaseActionAuthorized,
@@ -99,7 +94,8 @@ test('the operator identity that proposed a lead has no permission to promote or
       executeAuthorizedResearchCaseAction(proposerToken, 'promote', () => {
         throw new Error('must never run');
       }),
-    (error: unknown) => error instanceof AdminAuthorizationError && error.code === 'ADMIN_PERMISSION_DENIED',
+    (error: unknown) =>
+      error instanceof AdminAuthorizationError && error.code === 'ADMIN_PERMISSION_DENIED',
   );
 });
 
@@ -114,7 +110,8 @@ test('even a publication-permitted token cannot promote without a FRESH, separat
       executeAuthorizedResearchCaseAction(stalePublicationToken, 'promote', () => 'published', {
         nowEpochSeconds: NOW_EPOCH,
       }),
-    (error: unknown) => error instanceof AdminAuthorizationError && error.code === 'ADMIN_REAUTH_REQUIRED',
+    (error: unknown) =>
+      error instanceof AdminAuthorizationError && error.code === 'ADMIN_REAUTH_REQUIRED',
   );
 
   const freshPublicationToken = adminToken({
@@ -133,7 +130,10 @@ test('even a publication-permitted token cannot promote without a FRESH, separat
 
 test('a prepared operator intake outcome carries no approval, publication, or promotion field', () => {
   const outcome = prepareLeadIntake(
-    { description: 'A lead used only to inspect the shape of the outcome object.', url: 'https://archive.example.org/x' },
+    {
+      description: 'A lead used only to inspect the shape of the outcome object.',
+      url: 'https://archive.example.org/x',
+    },
     {
       identity: { operatorId: 'operator-1', sessionId: 'session-1', source: 'cli' },
       privacyPepper: 'test-only-pepper',

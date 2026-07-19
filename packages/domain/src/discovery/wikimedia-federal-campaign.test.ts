@@ -13,10 +13,7 @@ import {
   SCHOOL_HISTORY_ADAPTER_ID,
 } from '../adapters/federal/index.js';
 import { WIKIMEDIA_ADAPTER_ID } from '../adapters/wikimedia/index.js';
-import {
-  CAMPAIGN_RUNNER_HELPERS_VERSION,
-  listCampaignSurvivors,
-} from './campaign-runner.js';
+import { CAMPAIGN_RUNNER_HELPERS_VERSION, listCampaignSurvivors } from './campaign-runner.js';
 import {
   computeAdapterSubBudgets,
   PARTICIPATING_ADAPTER_IDS,
@@ -55,7 +52,10 @@ test('computeAdapterSubBudgets reserves wikimedia slice and splits federal remai
 test('computeAdapterSubBudgets equal-splits small budgets (max 2 per adapter when maxCandidates=10)', () => {
   const budgets = computeAdapterSubBudgets(10, PARTICIPATING_ADAPTER_IDS);
   const slices = [...budgets.values()];
-  assert.equal(slices.reduce((sum, value) => sum + value, 0), 10);
+  assert.equal(
+    slices.reduce((sum, value) => sum + value, 0),
+    10,
+  );
   assert.ok(slices.every((slice) => slice >= 1 && slice <= 2));
 });
 
@@ -99,7 +99,10 @@ test('per-adapter sub-budget slices are respected before campaign ingest', async
 
   for (const yieldRow of result.perAdapterYield) {
     const cap = budgets.get(yieldRow.adapterId) ?? 0;
-    assert.ok(yieldRow.sliced <= cap, `${yieldRow.adapterId} sliced ${yieldRow.sliced} > cap ${cap}`);
+    assert.ok(
+      yieldRow.sliced <= cap,
+      `${yieldRow.adapterId} sliced ${yieldRow.sliced} > cap ${cap}`,
+    );
   }
   const ingested = result.perAdapterYield.reduce((sum, row) => sum + row.sliced, 0);
   assert.ok(ingested <= maxCandidates);

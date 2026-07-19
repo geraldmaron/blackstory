@@ -12,7 +12,10 @@ import {
   toPublicRelatedEntries,
 } from './adjacency.js';
 
-function rel(overrides: Partial<EntityRelationship> & Pick<EntityRelationship, 'id' | 'fromEntityId' | 'toEntityId' | 'type'>): EntityRelationship {
+function rel(
+  overrides: Partial<EntityRelationship> &
+    Pick<EntityRelationship, 'id' | 'fromEntityId' | 'toEntityId' | 'type'>,
+): EntityRelationship {
   return {
     evidenceIds: ['ev-1'],
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -54,7 +57,13 @@ test('buildEntityAdjacency orders by evidence count descending, then id/type/rel
 
 test('buildEntityAdjacency caps at the default top-N and reports totalCandidates uncapped', () => {
   const relationships = Array.from({ length: DEFAULT_ADJACENCY_CAP + 10 }, (_, i) =>
-    rel({ id: `r${i}`, fromEntityId: 'a', toEntityId: `n${i}`, type: 'cites', evidenceIds: ['e1'] }),
+    rel({
+      id: `r${i}`,
+      fromEntityId: 'a',
+      toEntityId: `n${i}`,
+      type: 'cites',
+      evidenceIds: ['e1'],
+    }),
   );
   const adjacency = buildEntityAdjacency('a', relationships);
   assert.equal(adjacency.entries.length, DEFAULT_ADJACENCY_CAP);
@@ -78,15 +87,24 @@ test('buildEntityAdjacency skips self-loops', () => {
 
 test('buildEntityAdjacency with a decade filter includes timeless edges and excludes non-overlapping ones', () => {
   const relationships = [
-    rel({ id: 'r1', fromEntityId: 'a', toEntityId: 'b', type: 'attended', temporal: { validFrom: '1963' } }),
-    rel({ id: 'r2', fromEntityId: 'a', toEntityId: 'c', type: 'attended', temporal: { validFrom: '1990' } }),
+    rel({
+      id: 'r1',
+      fromEntityId: 'a',
+      toEntityId: 'b',
+      type: 'attended',
+      temporal: { validFrom: '1963' },
+    }),
+    rel({
+      id: 'r2',
+      fromEntityId: 'a',
+      toEntityId: 'c',
+      type: 'attended',
+      temporal: { validFrom: '1990' },
+    }),
     rel({ id: 'r3', fromEntityId: 'a', toEntityId: 'd', type: 'cites' }), // timeless
   ];
   const adjacency = buildEntityAdjacency('a', relationships, { decade: '1960s' });
-  assert.deepEqual(
-    adjacency.entries.map((e) => e.id).sort(),
-    ['b', 'd'],
-  );
+  assert.deepEqual(adjacency.entries.map((e) => e.id).sort(), ['b', 'd']);
 });
 
 test('buildAllEntityAdjacency returns a deterministically (sorted) keyed map', () => {

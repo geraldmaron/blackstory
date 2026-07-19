@@ -22,7 +22,10 @@
       "timeoutSec": 3600,
       "idempotencyKeyScheme": "job:{jobId}:{isoWeekStart}",
       "killSwitchId": "research-campaigns",
-      "targetWorker": { "package": "research", "function": "discovery.campaign.run_wikimedia_federal_campaign" },
+      "targetWorker": {
+        "package": "research",
+        "function": "discovery.campaign.run_wikimedia_federal_campaign"
+      },
       "publicEffect": "none",
       "rosterStatus": "real",
       "implementationOwnerBead": "BB-073"
@@ -50,7 +53,10 @@
       "timeoutSec": 1800,
       "idempotencyKeyScheme": "job:{jobId}:{isoWeekStart}",
       "killSwitchId": "research-campaigns",
-      "targetWorker": { "package": "research", "function": "discovery.campaign.run_community_obscurity_campaign" },
+      "targetWorker": {
+        "package": "research",
+        "function": "discovery.campaign.run_community_obscurity_campaign"
+      },
       "publicEffect": "none",
       "rosterStatus": "real"
     },
@@ -63,7 +69,10 @@
       "timeoutSec": 3600,
       "idempotencyKeyScheme": "job:{jobId}:{isoWeekStart}",
       "killSwitchId": "research-campaigns",
-      "targetWorker": { "package": "research", "function": "discovery.campaign.run_archive_dpla_campaign" },
+      "targetWorker": {
+        "package": "research",
+        "function": "discovery.campaign.run_archive_dpla_campaign"
+      },
       "publicEffect": "none",
       "rosterStatus": "real",
       "implementationOwnerBead": "BB-073/BB-075"
@@ -77,7 +86,10 @@
       "timeoutSec": 3600,
       "idempotencyKeyScheme": "job:{jobId}:{dayStart}",
       "killSwitchId": "research-campaigns",
-      "targetWorker": { "package": "research", "function": "discovery.campaign.run_web_search_campaign" },
+      "targetWorker": {
+        "package": "research",
+        "function": "discovery.campaign.run_web_search_campaign"
+      },
       "publicEffect": "none",
       "rosterStatus": "real",
       "implementationOwnerBead": "BB-073/BB-075"
@@ -105,7 +117,10 @@
       "timeoutSec": 3600,
       "idempotencyKeyScheme": "job:{jobId}:{isoWeekStart}",
       "killSwitchId": "source-adapter-citation-link-health-sweep",
-      "targetWorker": { "package": "security", "function": "url_safety.link_health.sweep_citations" },
+      "targetWorker": {
+        "package": "security",
+        "function": "url_safety.link_health.sweep_citations"
+      },
       "publicEffect": "link-repair-archived-copy",
       "rosterStatus": "stub",
       "implementationOwnerBead": "BB-083"
@@ -133,7 +148,10 @@
       "timeoutSec": 600,
       "idempotencyKeyScheme": "job:{jobId}:{quarterStart}",
       "killSwitchId": "source-adapter-external-dataset-refresh-tougaloo-mapping-inequality",
-      "targetWorker": { "package": "research", "function": "dataset_refresh.check_tougaloo_mapping_inequality" },
+      "targetWorker": {
+        "package": "research",
+        "function": "dataset_refresh.check_tougaloo_mapping_inequality"
+      },
       "publicEffect": "none",
       "rosterStatus": "stub",
       "implementationOwnerBead": "BB-082"
@@ -147,7 +165,10 @@
       "timeoutSec": 7200,
       "idempotencyKeyScheme": "job:{jobId}:{monthStart}",
       "killSwitchId": "source-adapter-relevance-confidence-recalibration-report",
-      "targetWorker": { "package": "research", "function": "confidence_engine.recalibration_report.generate" },
+      "targetWorker": {
+        "package": "research",
+        "function": "confidence_engine.recalibration_report.generate"
+      },
       "publicEffect": "none",
       "rosterStatus": "stub",
       "implementationOwnerBead": "BB-081"
@@ -161,7 +182,10 @@
       "timeoutSec": 1800,
       "idempotencyKeyScheme": "job:{jobId}:{dayStart}",
       "killSwitchId": "research-campaigns",
-      "targetWorker": { "package": "research", "function": "adapters.run_health.evaluate_run_health" },
+      "targetWorker": {
+        "package": "research",
+        "function": "adapters.run_health.evaluate_run_health"
+      },
       "publicEffect": "none",
       "rosterStatus": "real"
     },
@@ -187,7 +211,10 @@
       "timeoutSec": 900,
       "idempotencyKeyScheme": "job:{jobId}:{dayStart}",
       "killSwitchId": "source-adapter-backup-verification-daily",
-      "targetWorker": { "package": "security", "function": "ops.backup_verification.verify_restore" },
+      "targetWorker": {
+        "package": "security",
+        "function": "ops.backup_verification.verify_restore"
+      },
       "publicEffect": "none",
       "rosterStatus": "real"
     },
@@ -200,7 +227,10 @@
       "timeoutSec": 600,
       "idempotencyKeyScheme": "job:{jobId}:{quarterStart}",
       "killSwitchId": "source-adapter-restore-drill-quarterly",
-      "targetWorker": { "package": "security", "function": "ops.backup_verification.staging_restore_drill" },
+      "targetWorker": {
+        "package": "security",
+        "function": "ops.backup_verification.staging_restore_drill"
+      },
       "publicEffect": "none",
       "rosterStatus": "real"
     },
@@ -227,7 +257,10 @@
       "timeoutSec": 3600,
       "idempotencyKeyScheme": "job:{jobId}:{releaseId}",
       "killSwitchId": "source-adapter-release-coupled-rebuild",
-      "targetWorker": { "package": "publication", "function": "release.rebuild_map_and_search_index" },
+      "targetWorker": {
+        "package": "publication",
+        "function": "release.rebuild_map_and_search_index"
+      },
       "publicEffect": "release-coupled-rebuild",
       "rosterStatus": "stub",
       "implementationOwnerBead": "BB-070"

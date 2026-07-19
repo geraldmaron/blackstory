@@ -110,16 +110,7 @@
       "assets": ["api-public", "api-submissions", "api-internal", "admin", "DB roles"],
       "actors": ["authenticated attacker", "curious user", "compromised client"],
       "abuseCaseIds": ["AC-04"],
-      "implementationBeads": [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-      ],
+      "implementationBeads": ["", "", "", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "Separate deployables and networks per ADR-005 / ",
@@ -185,17 +176,7 @@
       "assets": ["claims", "evidence", "public projections", "trust of corpus"],
       "actors": ["ideological adversary", "grifter", "lazy secondary mirror"],
       "abuseCaseIds": ["AC-06"],
-      "implementationBeads": [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-      ],
+      "implementationBeads": ["", "", "", "", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "Constitution gates for inclusion, confidence, and precision",
@@ -459,16 +440,7 @@
       "assets": ["GCP billing", "model APIs", "egress", "Cloud Run/Jobs"],
       "actors": ["cost attacker", "misconfigured autoscaler", "runaway worker"],
       "abuseCaseIds": ["AC-14"],
-      "implementationBeads": [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-      ],
+      "implementationBeads": ["", "", "", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "Budgets and hard quotas per project/env (/033)",
@@ -501,16 +473,7 @@
       "assets": ["living-person data", "sensitive locations", "public API responses", "logs"],
       "actors": ["doxxer", "stalker", "curious scraper", "insider"],
       "abuseCaseIds": ["AC-15"],
-      "implementationBeads": [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-      ],
+      "implementationBeads": ["", "", "", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "Constitution: unknown living status treated as living",
@@ -543,16 +506,7 @@
       "assets": ["public projections", "release channel", "CDN content"],
       "actors": ["compromised admin", "broken authZ", "CI deployer"],
       "abuseCaseIds": ["AC-16"],
-      "implementationBeads": [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-      ],
+      "implementationBeads": ["", "", "", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "Immutable release snapshots; activation is explicit",
@@ -585,16 +539,7 @@
       "assets": ["staging/prod isolation", "promotion UI", "release activation"],
       "actors": ["well-meaning operator", "fat-finger deployer"],
       "abuseCaseIds": ["AC-17"],
-      "implementationBeads": [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-      ],
+      "implementationBeads": ["", "", "", "", "", "", "", ""],
       "controls": {
         "preventive": [
           "Strict env isolation; no shared prod resources",

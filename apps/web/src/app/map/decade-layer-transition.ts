@@ -85,7 +85,10 @@ export function setDecadeFadeOpacities(map: MapLibreMap, opacity: number): void 
     try {
       map.setPaintProperty(target.layerId, target.paintKey, opacity);
     } catch (error) {
-      console.error(`[decade-fade] setPaintProperty ${target.layerId}.${target.paintKey} failed`, error);
+      console.error(
+        `[decade-fade] setPaintProperty ${target.layerId}.${target.paintKey} failed`,
+        error,
+      );
     }
   }
 }
@@ -94,14 +97,28 @@ export function setDecadeFadeOpacities(map: MapLibreMap, opacity: number): void 
  * Fade-in targets as literals so MapLibre can interpolate 0 → N. Data-driven
  * circle-opacity expressions are restored afterward (duration 0) once the fade completes.
  */
-export const DECADE_FADE_IN_LITERALS: readonly (DecadeFadePaintTarget & { readonly value: number })[] = [
+export const DECADE_FADE_IN_LITERALS: readonly (DecadeFadePaintTarget & {
+  readonly value: number;
+})[] = [
   { layerId: EXPLORE_STATE_DENSITY_LAYER_ID, paintKey: 'fill-opacity', value: 1 },
   { layerId: EXPLORE_HISTORY_EDGES_LAYER_ID, paintKey: 'line-opacity', value: 0.9 },
   { layerId: EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID, paintKey: 'line-opacity', value: 1 },
-  { layerId: EXPLORE_UNCLUSTERED_HALO_LAYER_ID, paintKey: 'circle-opacity', value: ENTITY_HALO_OPACITY },
-  { layerId: EXPLORE_UNCLUSTERED_POINT_LAYER_ID, paintKey: 'circle-opacity', value: ENTITY_POINT_FILL_OPACITY },
+  {
+    layerId: EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+    paintKey: 'circle-opacity',
+    value: ENTITY_HALO_OPACITY,
+  },
+  {
+    layerId: EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+    paintKey: 'circle-opacity',
+    value: ENTITY_POINT_FILL_OPACITY,
+  },
   { layerId: EXPLORE_UNCLUSTERED_POINT_LAYER_ID, paintKey: 'circle-stroke-opacity', value: 0.9 },
-  { layerId: EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID, paintKey: 'circle-stroke-opacity', value: 0.9 },
+  {
+    layerId: EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
+    paintKey: 'circle-stroke-opacity',
+    value: 0.9,
+  },
   { layerId: EXPLORE_CLUSTER_LAYER_ID, paintKey: 'circle-opacity', value: ENTITY_CLUSTER_OPACITY },
 ];
 

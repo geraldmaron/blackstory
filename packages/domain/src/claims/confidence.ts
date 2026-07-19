@@ -115,13 +115,14 @@ type LineageAggregate = {
 function linkQuality(link: ClaimEvidenceLink): number {
   const authority = sourceAuthorityForClassification(link.sourceClassification);
   return (
-    authority +
-    link.directness +
-    link.temporalProximity +
-    link.geographicPrecision +
-    link.entityMatchQuality +
-    link.extractionQuality
-  ) / 6;
+    (authority +
+      link.directness +
+      link.temporalProximity +
+      link.geographicPrecision +
+      link.entityMatchQuality +
+      link.extractionQuality) /
+    6
+  );
 }
 
 /**
@@ -198,7 +199,12 @@ export function calculateClaimConfidence(input: ConfidenceEngineInput): Confiden
     entityMatchQuality: round4(mean(supporting.map((s) => s.entityMatchQuality))),
     extractionQuality: round4(mean(supporting.map((s) => s.extractionQuality))),
     contradictionPenalty: round4(
-      clamp01(Math.min(CONTRADICTION_PENALTY_CAP, contradicting.length * CONTRADICTION_PENALTY_PER_LINEAGE)),
+      clamp01(
+        Math.min(
+          CONTRADICTION_PENALTY_CAP,
+          contradicting.length * CONTRADICTION_PENALTY_PER_LINEAGE,
+        ),
+      ),
     ),
   };
 
@@ -221,7 +227,8 @@ export function calculateClaimConfidence(input: ConfidenceEngineInput): Confiden
     policyVersion: policy.policyVersion,
     independentLineageCount,
     supportingEvidenceCount: input.evidenceLinks.filter((l) => l.role === 'supporting').length,
-    contradictingEvidenceCount: input.evidenceLinks.filter((l) => l.role === 'contradicting').length,
+    contradictingEvidenceCount: input.evidenceLinks.filter((l) => l.role === 'contradicting')
+      .length,
     contributingEvidenceIds: supporting.map((s) => s.evidenceId),
     calculatedAt,
     passesPublishThreshold: thresholdEval.passesPublishThreshold,

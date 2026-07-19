@@ -56,7 +56,8 @@ const stubPublicationRelease = {
     createdAt: seedActiveRelease.activatedAt,
     createdBy: 'bootstrap-public-seed',
     activatedAt: seedActiveRelease.activatedAt,
-    notes: 'Bootstrap seed release for black-book-efaaf stand-up (not a signed production promote).',
+    notes:
+      'Bootstrap seed release for black-book-efaaf stand-up (not a signed production promote).',
     signedManifest: {
       manifestHash: seedActiveRelease.manifestHash,
       algorithm: 'bootstrap-unsigned',

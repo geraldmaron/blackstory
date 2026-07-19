@@ -69,7 +69,12 @@ export type GeographicRelationshipContext = {
 // requiring a separate `CandidateRelationship` type (see note on `createdFromCandidateId` below).
 // ---------------------------------------------------------------------------
 
-export const RELATIONSHIP_WORKFLOW_STATUSES = ['candidate', 'in_review', 'accepted', 'rejected'] as const;
+export const RELATIONSHIP_WORKFLOW_STATUSES = [
+  'candidate',
+  'in_review',
+  'accepted',
+  'rejected',
+] as const;
 export type RelationshipWorkflowStatus = (typeof RELATIONSHIP_WORKFLOW_STATUSES)[number];
 
 export function isRelationshipWorkflowStatus(value: string): value is RelationshipWorkflowStatus {
@@ -81,7 +86,9 @@ export function isRelationshipWorkflowStatus(value: string): value is Relationsh
 export const RELATIONSHIP_PUBLICATION_STATUSES = ['unpublished', 'published', 'retracted'] as const;
 export type RelationshipPublicationStatus = (typeof RELATIONSHIP_PUBLICATION_STATUSES)[number];
 
-export function isRelationshipPublicationStatus(value: string): value is RelationshipPublicationStatus {
+export function isRelationshipPublicationStatus(
+  value: string,
+): value is RelationshipPublicationStatus {
   return (RELATIONSHIP_PUBLICATION_STATUSES as readonly string[]).includes(value);
 }
 
@@ -93,7 +100,11 @@ export function isRelationshipPublicationStatus(value: string): value is Relatio
  * describes the joint resolution state of an edge's *two* endpoints, which is a different
  * (relationship-shaped) question no existing enum answers directly.
  */
-export const RELATIONSHIP_RESOLUTION_STATES = ['unresolved', 'partially_resolved', 'resolved'] as const;
+export const RELATIONSHIP_RESOLUTION_STATES = [
+  'unresolved',
+  'partially_resolved',
+  'resolved',
+] as const;
 export type RelationshipResolutionState = (typeof RELATIONSHIP_RESOLUTION_STATES)[number];
 
 export function isRelationshipResolutionState(value: string): value is RelationshipResolutionState {
@@ -162,15 +173,19 @@ export type RelationshipTypeSemantics = {
   readonly requiresTemporalContext: boolean;
 };
 
-export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, RelationshipTypeSemantics>> = {
+export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<
+  Record<RelationshipType, RelationshipTypeSemantics>
+> = {
   located_at: {
     direction: 'fromEntity is LOCATED_AT toEntity (a place/location entity).',
-    temporalSemantics: 'validFrom/validTo bound the occupancy window; open-ended means still located there.',
+    temporalSemantics:
+      'validFrom/validTo bound the occupancy window; open-ended means still located there.',
     requiresTemporalContext: false,
   },
   occurred_at: {
     direction: 'fromEntity (typically an event) OCCURRED_AT toEntity (a place).',
-    temporalSemantics: 'validFrom/validTo describe the event window, when distinct from the event entity’s own dates.',
+    temporalSemantics:
+      'validFrom/validTo describe the event window, when distinct from the event entity’s own dates.',
     requiresTemporalContext: false,
   },
   attended: {
@@ -178,19 +193,22 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, Rela
       'fromEntity (person) ATTENDED toEntity (event). The optional `role` qualifier ' +
       '(organizer|speaker|participant, ) distinguishes organizing/speaking weight from ' +
       'rank-and-file attendance without changing the edge type.',
-    temporalSemantics: 'validFrom/validTo scope multi-day attendance; a single-day event needs only validFrom.',
+    temporalSemantics:
+      'validFrom/validTo scope multi-day attendance; a single-day event needs only validFrom.',
     requiresTemporalContext: false,
   },
   founded: {
     direction:
       'fromEntity (person/organization) FOUNDED toEntity (organization/institution). Reserved for ' +
       'orgs/institutions — creation of a publication/artifact uses `authored`  instead.',
-    temporalSemantics: 'validFrom is the founding date; validTo is not meaningful (founding is a point in time).',
+    temporalSemantics:
+      'validFrom is the founding date; validTo is not meaningful (founding is a point in time).',
     requiresTemporalContext: false,
   },
   employed_by: {
     direction: 'fromEntity (person) is EMPLOYED_BY toEntity (organization/institution).',
-    temporalSemantics: 'validFrom/validTo bound the employment window; open-ended means still employed.',
+    temporalSemantics:
+      'validFrom/validTo bound the employment window; open-ended means still employed.',
     requiresTemporalContext: false,
   },
   member_of: {
@@ -199,7 +217,8 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, Rela
     requiresTemporalContext: false,
   },
   related_to: {
-    direction: 'Symmetric/loose association between fromEntity and toEntity with no stronger typed fit.',
+    direction:
+      'Symmetric/loose association between fromEntity and toEntity with no stronger typed fit.',
     temporalSemantics: 'Optional; use only when the association itself has a documented window.',
     requiresTemporalContext: false,
   },
@@ -215,12 +234,14 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, Rela
       'required landing type for contested or single-incident causal claims that do not meet the ' +
       '`caused`/`enabled` guardrail (see `evaluateCausalEdgeGuardrail`), and for  FactRecord ' +
       '`subjects[]` co-mentions mirrored into the graph (see `./graph/fact-subjects.ts`).',
-    temporalSemantics: 'Optional; validFrom may record when the citing source was published/observed.',
+    temporalSemantics:
+      'Optional; validFrom may record when the citing source was published/observed.',
     requiresTemporalContext: false,
   },
   governed_by: {
     direction: 'fromEntity is GOVERNED_BY toEntity (a law, or a governing body).',
-    temporalSemantics: 'validFrom/validTo bound the governance window; open-ended means still in force.',
+    temporalSemantics:
+      'validFrom/validTo bound the governance window; open-ended means still in force.',
     requiresTemporalContext: false,
   },
   part_of: {
@@ -228,7 +249,8 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, Rela
       'fromEntity is PART_OF toEntity (a coarser containing entity — e.g. a neighborhood part_of a ' +
       'city). Chained with `located_at`, this is the containment edge ’s containment-chain ' +
       'materialization walks (see `./graph/containment.ts`).',
-    temporalSemantics: 'validFrom/validTo bound containment when a boundary changed (annexation, redistricting).',
+    temporalSemantics:
+      'validFrom/validTo bound containment when a boundary changed (annexation, redistricting).',
     requiresTemporalContext: false,
   },
   successor_of: {
@@ -275,7 +297,8 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<Record<RelationshipType, Rela
   },
   overturned: {
     direction: 'fromEntity (case/law) OVERTURNED toEntity (a prior case/law) — legal supersession.',
-    temporalSemantics: 'validFrom (required) is the decision/enactment date the supersession took effect.',
+    temporalSemantics:
+      'validFrom (required) is the decision/enactment date the supersession took effect.',
     requiresTemporalContext: true,
   },
   commemorates: {

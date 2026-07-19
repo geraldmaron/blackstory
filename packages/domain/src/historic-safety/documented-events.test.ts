@@ -10,11 +10,19 @@ import {
   type DocumentedEventRecord,
 } from './documented-events.js';
 
-const CITATION = { claimId: 'claim_1', sourceLabel: 'EJI Lynching in America', retrievedAt: '2026-01-01T00:00:00.000Z' };
+const CITATION = {
+  claimId: 'claim_1',
+  sourceLabel: 'EJI Lynching in America',
+  retrievedAt: '2026-01-01T00:00:00.000Z',
+};
 
 test('computeDocumentedEventsLayerSignal returns undefined with no documented events', () => {
   assert.equal(
-    computeDocumentedEventsLayerSignal({ placeEntityId: 'place_1', events: [], asOf: '2026-01-01T00:00:00.000Z' }),
+    computeDocumentedEventsLayerSignal({
+      placeEntityId: 'place_1',
+      events: [],
+      asOf: '2026-01-01T00:00:00.000Z',
+    }),
     undefined,
   );
 });
@@ -56,7 +64,11 @@ test('density aggregation saturates toward 1 but never exceeds it', () => {
     proximityWeight: 0.9,
     citation: CITATION,
   }));
-  const signal = computeDocumentedEventsLayerSignal({ placeEntityId: 'place_1', events, asOf: '2026-01-01T00:00:00.000Z' });
+  const signal = computeDocumentedEventsLayerSignal({
+    placeEntityId: 'place_1',
+    events,
+    asOf: '2026-01-01T00:00:00.000Z',
+  });
   assert.ok((signal?.value ?? 0) <= 1);
   assert.ok((signal?.value ?? 0) > 0.9);
 });

@@ -1,4 +1,3 @@
-
 /**
  * Runs the gold-corpus retrieval eval against the deterministic mock embedding provider
  * (no network access, no API key) and records real recall@k MRR numbers.
@@ -17,7 +16,11 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { loadGoldCorpus } from './load.ts';
 import { createDeterministicMockEvalProvider } from './retrieval-embedding.ts';
-import { buildRetrievalDocuments, buildRetrievalQueries, runRetrievalEval } from './retrieval-eval.ts';
+import {
+  buildRetrievalDocuments,
+  buildRetrievalQueries,
+  runRetrievalEval,
+} from './retrieval-eval.ts';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 const fixturePath = join(

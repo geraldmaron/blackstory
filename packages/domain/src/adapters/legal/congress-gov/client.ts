@@ -25,14 +25,19 @@ type CongressLawsResponse = {
 };
 
 function loadFixture(): CongressLawsResponse {
-  return JSON.parse(readFileSync(join(FIXTURES_DIR, 'laws-response.json'), 'utf8')) as CongressLawsResponse;
+  return JSON.parse(
+    readFileSync(join(FIXTURES_DIR, 'laws-response.json'), 'utf8'),
+  ) as CongressLawsResponse;
 }
 
 function toSnapshot(law: CongressLawFixture): LegalSnapshot {
   const externalId = `${law.congress}/${law.type}/${law.number}`;
   return {
     id: `legal-congress-${law.congress}-${law.type}-${law.number}`,
-    slug: law.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+    slug: law.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, ''),
     kind: 'federal-statute',
     title: law.title,
     jurisdictionId: 'us',

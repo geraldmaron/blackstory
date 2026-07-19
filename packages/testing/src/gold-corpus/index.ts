@@ -1,4 +1,3 @@
-
 /**
  * Public module boundary for BlackStory gold-corpus evaluation, comparison, and
  * automatic-publication gating.

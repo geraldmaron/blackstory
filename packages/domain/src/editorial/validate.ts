@@ -2,7 +2,10 @@
  * Editorial draft validation: learning-index summary contract and public-language
  * procedural-status gates over stripped prose-link markup.
  */
-import { evaluatePublicLanguage, type PublicLanguageEvaluation } from '../confidence-engine/index.js';
+import {
+  evaluatePublicLanguage,
+  type PublicLanguageEvaluation,
+} from '../confidence-engine/index.js';
 import {
   validateLearningSummary,
   type LearningIndexContractIssue,

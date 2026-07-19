@@ -1,4 +1,3 @@
-
 /**
  * Firestore document schema for the `censusCountyDecades` collection — one doc per county per
  * decennial vintage: total + Black ("Black or African American alone") population counts.

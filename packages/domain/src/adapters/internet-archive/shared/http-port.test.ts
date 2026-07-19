@@ -38,7 +38,10 @@ async function* chunks(...values: readonly string[]): AsyncGenerator<Uint8Array>
  * transport with method/body support, which is exactly why the port is generalized beyond
  * `executeSafeFetch`.
  */
-function buildRealSafeHttpClient(deps: { readonly resolveHost: ResolveHost; readonly transport: PinnedTransport }): SafeHttpClient {
+function buildRealSafeHttpClient(deps: {
+  readonly resolveHost: ResolveHost;
+  readonly transport: PinnedTransport;
+}): SafeHttpClient {
   return async (request): Promise<SafeHttpResponse> => {
     const parsed = evaluateExternalUrl(request.url);
     if (!parsed.allowed) {
@@ -118,7 +121,10 @@ test('SSRF via DNS rebinding to a private IP is rejected even though the hostnam
       throw new Error('transport must never be called for a private DNS answer');
     },
   });
-  await assert.rejects(() => client({ url: 'https://internal.example.org/', method: 'GET' }), /DNS pinning/);
+  await assert.rejects(
+    () => client({ url: 'https://internal.example.org/', method: 'GET' }),
+    /DNS pinning/,
+  );
 });
 
 test('withRetry and mapWithConcurrency compose with the real client without live timers', async () => {
@@ -130,20 +136,32 @@ test('withRetry and mapWithConcurrency compose with the real client without live
       if (attempts < 2) {
         return { status: 429, headers: {}, remoteAddress: '93.184.216.34', body: chunks('') };
       }
-      return { status: 200, headers: { 'content-type': 'application/json' }, remoteAddress: '93.184.216.34', body: chunks('{}') };
+      return {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+        remoteAddress: '93.184.216.34',
+        body: chunks('{}'),
+      };
     },
   });
 
-  const response = await withRetry(() => client({ url: 'https://archive.org/metadata/example', method: 'GET' }), {
-    retries: 3,
-    baseDelayMs: 1,
-    isRetryable: (res) => res?.status === 429,
-    sleep: async () => {},
-  });
+  const response = await withRetry(
+    () => client({ url: 'https://archive.org/metadata/example', method: 'GET' }),
+    {
+      retries: 3,
+      baseDelayMs: 1,
+      isRetryable: (res) => res?.status === 429,
+      sleep: async () => {},
+    },
+  );
   assert.equal(response.status, 200);
   assert.equal(attempts, 2);
 
-  const urls = ['https://archive.org/metadata/a', 'https://archive.org/metadata/b', 'https://archive.org/metadata/c'];
+  const urls = [
+    'https://archive.org/metadata/a',
+    'https://archive.org/metadata/b',
+    'https://archive.org/metadata/c',
+  ];
   const results = await mapWithConcurrency(urls, 2, (url) => client({ url, method: 'GET' }));
   assert.equal(results.length, 3);
 });

@@ -75,12 +75,14 @@ export const ROSENWALD_SCHOOL_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-rosenwald-shiloh-al-1',
-        statement: 'Shiloh Rosenwald School is documented as a Rosenwald Fund school building in Notasulga, Alabama.',
+        statement:
+          'Shiloh Rosenwald School is documented as a Rosenwald Fund school building in Notasulga, Alabama.',
       },
     ],
     completeness: 'partial',
     sourceCorpus: 'nrhp',
-    inclusionRationale: 'NPS Places entry documents a Rosenwald school with public federal provenance.',
+    inclusionRationale:
+      'NPS Places entry documents a Rosenwald school with public federal provenance.',
     externalIds: [{ system: 'nps-place', value: 'shiloh-rosenwald-school' }],
   },
   {
@@ -108,12 +110,14 @@ export const ROSENWALD_SCHOOL_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-rosenwald-ridgeley-md-1',
-        statement: 'Ridgeley Rosenwald School is a documented Rosenwald school in Prince George\'s County, Maryland.',
+        statement:
+          "Ridgeley Rosenwald School is a documented Rosenwald school in Prince George's County, Maryland.",
       },
     ],
     completeness: 'partial',
     sourceCorpus: 'nrhp',
-    inclusionRationale: 'Federal NPS documentation satisfies Rosenwald campaign evidence bar without Fisk bulk import.',
+    inclusionRationale:
+      'Federal NPS documentation satisfies Rosenwald campaign evidence bar without Fisk bulk import.',
   },
   {
     id: 'seed-rosenwald-pine-grove-va',
@@ -140,7 +144,8 @@ export const ROSENWALD_SCHOOL_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-rosenwald-pine-grove-va-1',
-        statement: 'Pine Grove Rosenwald School is listed on the National Register of Historic Places in Virginia.',
+        statement:
+          'Pine Grove Rosenwald School is listed on the National Register of Historic Places in Virginia.',
       },
     ],
     completeness: 'sparse',
@@ -172,7 +177,8 @@ export const ROSENWALD_SCHOOL_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-rosenwald-russell-nc-1',
-        statement: 'Russell School is a documented Rosenwald school building in Durham, North Carolina.',
+        statement:
+          'Russell School is a documented Rosenwald school building in Durham, North Carolina.',
       },
     ],
     completeness: 'partial',
@@ -204,12 +210,14 @@ export const ROSENWALD_SCHOOL_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-rosenwald-carver-phoenix-az-1',
-        statement: 'George Washington Carver School is a documented Rosenwald school in Phoenix, Arizona.',
+        statement:
+          'George Washington Carver School is a documented Rosenwald school in Phoenix, Arizona.',
       },
     ],
     completeness: 'sparse',
     sourceCorpus: 'nrhp',
-    inclusionRationale: 'Western Rosenwald sample; many western states lack Rosenwald NRHP listings.',
+    inclusionRationale:
+      'Western Rosenwald sample; many western states lack Rosenwald NRHP listings.',
   },
 ];
 
@@ -246,7 +254,8 @@ export const FREEDMENS_SCHOOL_RECORDS: readonly SeedRecord[] = [
     ],
     completeness: 'partial',
     sourceCorpus: 'hbcu-list',
-    inclusionRationale: "Federal ED HBCU list documents Howard's Bureau-era founding without invented narrative.",
+    inclusionRationale:
+      "Federal ED HBCU list documents Howard's Bureau-era founding without invented narrative.",
   },
   {
     id: 'seed-freedmens-hampton-va',
@@ -273,7 +282,8 @@ export const FREEDMENS_SCHOOL_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-freedmens-hampton-va-1',
-        statement: 'Hampton University originated as a Bureau-era normal school in Hampton, Virginia.',
+        statement:
+          'Hampton University originated as a Bureau-era normal school in Hampton, Virginia.',
       },
     ],
     completeness: 'partial',
@@ -324,7 +334,7 @@ export const FREEDMENS_SCHOOL_RECORDS: readonly SeedRecord[] = [
     documentedGeoPrecisionTier: 'exact-site',
     notabilityBasis: {
       criterion: 'documented_site',
-      note: 'NPS-documented Freedmen\'s Bureau-era college site at Harpers Ferry.',
+      note: "NPS-documented Freedmen's Bureau-era college site at Harpers Ferry.",
       evidenceIds: ['citation:seed-freedmens-storer-wv-nps'],
     },
     citations: [
@@ -337,11 +347,13 @@ export const FREEDMENS_SCHOOL_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-freedmens-storer-wv-1',
-        statement: 'Storer College operated as a Bureau-supported institution at Harpers Ferry, West Virginia.',
+        statement:
+          'Storer College operated as a Bureau-supported institution at Harpers Ferry, West Virginia.',
       },
     ],
     completeness: 'sparse',
-    inclusionRationale: 'Closed institution preserved as NPS-documented site — sparse record allowed per AC3.',
+    inclusionRationale:
+      'Closed institution preserved as NPS-documented site — sparse record allowed per AC3.',
   },
 ];
 
@@ -358,13 +370,22 @@ export const HBCU_SAMPLE_RECORDS: readonly SeedRecord[] = [
     documentedGeoPrecisionTier: 'exact-site',
     notabilityBasis: {
       criterion: 'community_anchor',
-      note: 'NCES/ED HBCU list — historically Black women\'s college anchor in Atlanta.',
+      note: "NCES/ED HBCU list — historically Black women's college anchor in Atlanta.",
       evidenceIds: ['citation:seed-hbcu-spelman-ga-ed'],
     },
     citations: [
-      ncesCitation({ id: 'seed-hbcu-spelman-ga-ed', url: 'https://www.ed.gov/hbcu', institutionId: 'spelman' }),
+      ncesCitation({
+        id: 'seed-hbcu-spelman-ga-ed',
+        url: 'https://www.ed.gov/hbcu',
+        institutionId: 'spelman',
+      }),
     ],
-    claims: [{ id: 'claim-hbcu-spelman-ga-1', statement: 'Spelman College is listed on the federal HBCU roster.' }],
+    claims: [
+      {
+        id: 'claim-hbcu-spelman-ga-1',
+        statement: 'Spelman College is listed on the federal HBCU roster.',
+      },
+    ],
     completeness: 'partial',
     sourceCorpus: 'hbcu-list',
     inclusionRationale: 'Deep South HBCU sample — not full NCES inventory.',
@@ -385,10 +406,17 @@ export const HBCU_SAMPLE_RECORDS: readonly SeedRecord[] = [
       evidenceIds: ['citation:seed-hbcu-ncat-nc-ed'],
     },
     citations: [
-      ncesCitation({ id: 'seed-hbcu-ncat-nc-ed', url: 'https://www.ed.gov/hbcu', institutionId: 'ncat' }),
+      ncesCitation({
+        id: 'seed-hbcu-ncat-nc-ed',
+        url: 'https://www.ed.gov/hbcu',
+        institutionId: 'ncat',
+      }),
     ],
     claims: [
-      { id: 'claim-hbcu-ncat-nc-1', statement: 'North Carolina A&T is on the U.S. Department of Education HBCU list.' },
+      {
+        id: 'claim-hbcu-ncat-nc-1',
+        statement: 'North Carolina A&T is on the U.S. Department of Education HBCU list.',
+      },
     ],
     completeness: 'partial',
     sourceCorpus: 'hbcu-list',
@@ -410,10 +438,17 @@ export const HBCU_SAMPLE_RECORDS: readonly SeedRecord[] = [
       evidenceIds: ['citation:seed-hbcu-southern-la-ed'],
     },
     citations: [
-      ncesCitation({ id: 'seed-hbcu-southern-la-ed', url: 'https://www.ed.gov/hbcu', institutionId: 'southern-la' }),
+      ncesCitation({
+        id: 'seed-hbcu-southern-la-ed',
+        url: 'https://www.ed.gov/hbcu',
+        institutionId: 'southern-la',
+      }),
     ],
     claims: [
-      { id: 'claim-hbcu-southern-la-1', statement: 'Southern University is listed on the federal HBCU roster.' },
+      {
+        id: 'claim-hbcu-southern-la-1',
+        statement: 'Southern University is listed on the federal HBCU roster.',
+      },
     ],
     completeness: 'partial',
     sourceCorpus: 'hbcu-list',
@@ -435,10 +470,17 @@ export const HBCU_SAMPLE_RECORDS: readonly SeedRecord[] = [
       evidenceIds: ['citation:seed-hbcu-lincoln-mo-ed'],
     },
     citations: [
-      ncesCitation({ id: 'seed-hbcu-lincoln-mo-ed', url: 'https://www.ed.gov/hbcu', institutionId: 'lincoln-mo' }),
+      ncesCitation({
+        id: 'seed-hbcu-lincoln-mo-ed',
+        url: 'https://www.ed.gov/hbcu',
+        institutionId: 'lincoln-mo',
+      }),
     ],
     claims: [
-      { id: 'claim-hbcu-lincoln-mo-1', statement: 'Lincoln University of Missouri is on the federal HBCU list.' },
+      {
+        id: 'claim-hbcu-lincoln-mo-1',
+        statement: 'Lincoln University of Missouri is on the federal HBCU list.',
+      },
     ],
     completeness: 'partial',
     sourceCorpus: 'hbcu-list',
@@ -452,7 +494,7 @@ export const HBCU_SAMPLE_RECORDS: readonly SeedRecord[] = [
     stateOrTerritory: 'AL',
     censusRegion: 'South',
     city: 'Tuskegee',
-    coordinates: { lat: 32.430, lng: -85.707 },
+    coordinates: { lat: 32.43, lng: -85.707 },
     documentedGeoPrecisionTier: 'exact-site',
     notabilityBasis: {
       criterion: 'community_anchor',
@@ -460,10 +502,17 @@ export const HBCU_SAMPLE_RECORDS: readonly SeedRecord[] = [
       evidenceIds: ['citation:seed-hbcu-tuskegee-al-ed'],
     },
     citations: [
-      ncesCitation({ id: 'seed-hbcu-tuskegee-al-ed', url: 'https://www.ed.gov/hbcu', institutionId: 'tuskegee' }),
+      ncesCitation({
+        id: 'seed-hbcu-tuskegee-al-ed',
+        url: 'https://www.ed.gov/hbcu',
+        institutionId: 'tuskegee',
+      }),
     ],
     claims: [
-      { id: 'claim-hbcu-tuskegee-al-1', statement: 'Tuskegee University is listed on the federal HBCU roster.' },
+      {
+        id: 'claim-hbcu-tuskegee-al-1',
+        statement: 'Tuskegee University is listed on the federal HBCU roster.',
+      },
     ],
     completeness: 'partial',
     sourceCorpus: 'hbcu-list',
@@ -497,7 +546,8 @@ export const DESEGREGATION_LITIGATION_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-deseg-little-rock-ar-1',
-        statement: 'Little Rock Central High School is a National Historic Site for the 1957 desegregation crisis.',
+        statement:
+          'Little Rock Central High School is a National Historic Site for the 1957 desegregation crisis.',
       },
     ],
     completeness: 'substantial',
@@ -534,7 +584,8 @@ export const DESEGREGATION_LITIGATION_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-deseg-moton-va-1',
-        statement: 'Moton High School is documented by NPS as central to Davis v. County School Board of Prince Edward County.',
+        statement:
+          'Moton High School is documented by NPS as central to Davis v. County School Board of Prince Edward County.',
       },
     ],
     completeness: 'partial',
@@ -570,11 +621,13 @@ export const DESEGREGATION_LITIGATION_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-deseg-clinton-tn-1',
-        statement: 'Clinton High School was the first public high school desegregated in Tennessee after Brown.',
+        statement:
+          'Clinton High School was the first public high school desegregated in Tennessee after Brown.',
       },
     ],
     completeness: 'partial',
-    inclusionRationale: 'Appalachian Tennessee desegregation case with published encyclopedia source.',
+    inclusionRationale:
+      'Appalachian Tennessee desegregation case with published encyclopedia source.',
   },
   {
     id: 'seed-deseg-scotts-branch-sc',
@@ -588,7 +641,7 @@ export const DESEGREGATION_LITIGATION_RECORDS: readonly SeedRecord[] = [
     documentedGeoPrecisionTier: 'locality',
     notabilityBasis: {
       criterion: 'court_precedent',
-      note: 'Briggs v. Elliott (1952) originated in Clarendon County schools including Scott\'s Branch.',
+      note: "Briggs v. Elliott (1952) originated in Clarendon County schools including Scott's Branch.",
       evidenceIds: ['citation:seed-deseg-scotts-branch-sc-nps'],
     },
     citations: [
@@ -606,11 +659,13 @@ export const DESEGREGATION_LITIGATION_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-deseg-scotts-branch-sc-1',
-        statement: "Scott's Branch High School is documented in the Briggs v. Elliott Clarendon County case.",
+        statement:
+          "Scott's Branch High School is documented in the Briggs v. Elliott Clarendon County case.",
       },
     ],
     completeness: 'sparse',
-    inclusionRationale: 'Sparse locality-precision record allowed — litigation significance documented by NPS.',
+    inclusionRationale:
+      'Sparse locality-precision record allowed — litigation significance documented by NPS.',
   },
   {
     id: 'seed-deseg-mansfield-tx',
@@ -642,11 +697,13 @@ export const DESEGREGATION_LITIGATION_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-deseg-mansfield-tx-1',
-        statement: 'Mansfield High School was the site of a documented 1956 Texas school desegregation incident.',
+        statement:
+          'Mansfield High School was the site of a documented 1956 Texas school desegregation incident.',
       },
     ],
     completeness: 'sparse',
-    inclusionRationale: 'Southwest desegregation sample with published state historical association source.',
+    inclusionRationale:
+      'Southwest desegregation sample with published state historical association source.',
   },
 ];
 
@@ -676,7 +733,8 @@ export const BLACK_EDUCATIONAL_MOVEMENT_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-movement-highlander-tn-1',
-        statement: 'Highlander Folk School trained Civil Rights Movement organizers including citizenship school leaders.',
+        statement:
+          'Highlander Folk School trained Civil Rights Movement organizers including citizenship school leaders.',
       },
     ],
     completeness: 'partial',
@@ -699,7 +757,11 @@ export const BLACK_EDUCATIONAL_MOVEMENT_RECORDS: readonly SeedRecord[] = [
       evidenceIds: ['citation:seed-movement-tougaloo-ms-ed'],
     },
     citations: [
-      ncesCitation({ id: 'seed-movement-tougaloo-ms-ed', url: 'https://www.ed.gov/hbcu', institutionId: 'tougaloo' }),
+      ncesCitation({
+        id: 'seed-movement-tougaloo-ms-ed',
+        url: 'https://www.ed.gov/hbcu',
+        institutionId: 'tougaloo',
+      }),
     ],
     claims: [
       {
@@ -741,11 +803,13 @@ export const BLACK_EDUCATIONAL_MOVEMENT_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-movement-penn-center-sc-1',
-        statement: 'Penn Center originated as Penn School during Reconstruction and served Movement-era education work.',
+        statement:
+          'Penn Center originated as Penn School during Reconstruction and served Movement-era education work.',
       },
     ],
     completeness: 'partial',
-    inclusionRationale: 'Sea Islands Reconstruction-to-Movement educational continuity with NPS documentation.',
+    inclusionRationale:
+      'Sea Islands Reconstruction-to-Movement educational continuity with NPS documentation.',
   },
   {
     id: 'seed-movement-tuskegee-al',
@@ -755,11 +819,11 @@ export const BLACK_EDUCATIONAL_MOVEMENT_RECORDS: readonly SeedRecord[] = [
     stateOrTerritory: 'AL',
     censusRegion: 'South',
     city: 'Tuskegee',
-    coordinates: { lat: 32.430, lng: -85.707 },
+    coordinates: { lat: 32.43, lng: -85.707 },
     documentedGeoPrecisionTier: 'exact-site',
     notabilityBasis: {
       criterion: 'movement_significance',
-      note: 'NPS NHS documenting Booker T. Washington\'s industrial education movement model.',
+      note: "NPS NHS documenting Booker T. Washington's industrial education movement model.",
       evidenceIds: ['citation:seed-movement-tuskegee-al-nps'],
     },
     citations: [
@@ -772,7 +836,8 @@ export const BLACK_EDUCATIONAL_MOVEMENT_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-movement-tuskegee-al-1',
-        statement: 'Tuskegee Institute is a National Historic Site for the industrial education movement.',
+        statement:
+          'Tuskegee Institute is a National Historic Site for the industrial education movement.',
       },
     ],
     completeness: 'substantial',
@@ -812,11 +877,13 @@ export const NATIONALLY_SIGNIFICANT_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-national-dunbar-dc-1',
-        statement: 'Paul Laurence Dunbar High School is documented as a pioneering Black public high school.',
+        statement:
+          'Paul Laurence Dunbar High School is documented as a pioneering Black public high school.',
       },
     ],
     completeness: 'partial',
-    inclusionRationale: 'National first-in-scope educational institution with NPS heritage documentation.',
+    inclusionRationale:
+      'National first-in-scope educational institution with NPS heritage documentation.',
   },
   {
     id: 'seed-national-cheyney-pa',
@@ -834,7 +901,11 @@ export const NATIONALLY_SIGNIFICANT_RECORDS: readonly SeedRecord[] = [
       evidenceIds: ['citation:seed-national-cheyney-pa-ed'],
     },
     citations: [
-      ncesCitation({ id: 'seed-national-cheyney-pa-ed', url: 'https://www.ed.gov/hbcu', institutionId: 'cheyney' }),
+      ncesCitation({
+        id: 'seed-national-cheyney-pa-ed',
+        url: 'https://www.ed.gov/hbcu',
+        institutionId: 'cheyney',
+      }),
     ],
     claims: [
       {
@@ -871,7 +942,8 @@ export const NATIONALLY_SIGNIFICANT_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-national-wilberforce-oh-1',
-        statement: 'Wilberforce University is documented as the oldest private HBCU in the United States.',
+        statement:
+          'Wilberforce University is documented as the oldest private HBCU in the United States.',
       },
     ],
     completeness: 'partial',
@@ -903,7 +975,8 @@ export const NATIONALLY_SIGNIFICANT_RECORDS: readonly SeedRecord[] = [
     claims: [
       {
         id: 'claim-national-berea-ky-1',
-        statement: 'Berea College is NRHP-listed for its historic campus and interracial education history.',
+        statement:
+          'Berea College is NRHP-listed for its historic campus and interracial education history.',
       },
     ],
     completeness: 'partial',

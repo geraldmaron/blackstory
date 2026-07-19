@@ -1,4 +1,3 @@
-
 /**
  * automated accessibility checks for core journey HTML fixtures.
  */

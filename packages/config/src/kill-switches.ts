@@ -1,4 +1,3 @@
-
 /**
  * Typed runtime kill switches and fail-safe evaluation helpers.
  * Switches are independently addressable; an engaged switch denies only its workload,
@@ -192,7 +191,6 @@ export function sourceAdapterKillSwitchId(adapterId: string): SourceAdapterKillS
   }
   return `source-adapter-${normalized}`;
 }
-
 
 /**
  * Evaluates one switch independently.

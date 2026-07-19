@@ -1,4 +1,3 @@
-
 /**
  * Accessible map frame placeholder for geographic result context (pin + caption).
  */

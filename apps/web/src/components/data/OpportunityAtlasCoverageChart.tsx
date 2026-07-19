@@ -41,11 +41,21 @@ export function OpportunityAtlasCoverageChart({ coverage }: OpportunityAtlasCove
     CHART_MARGIN.left,
     CHART_MARGIN.left + plotWidth(),
   );
-  const fieldYScale = scaleLinear(0, maxFieldValue, CHART_MARGIN.top + plotHeight(), CHART_MARGIN.top);
+  const fieldYScale = scaleLinear(
+    0,
+    maxFieldValue,
+    CHART_MARGIN.top + plotHeight(),
+    CHART_MARGIN.top,
+  );
 
   const binGroupWidth = plotWidth() / Math.max(histogram.length, 1);
   const binBarWidth = binGroupWidth * 0.65;
-  const binXScale = scaleLinear(0, histogram.length, CHART_MARGIN.left, CHART_MARGIN.left + plotWidth());
+  const binXScale = scaleLinear(
+    0,
+    histogram.length,
+    CHART_MARGIN.left,
+    CHART_MARGIN.left + plotWidth(),
+  );
   const binYScale = scaleLinear(0, maxBinValue, CHART_MARGIN.top + plotHeight(), CHART_MARGIN.top);
 
   return (
@@ -89,8 +99,19 @@ export function OpportunityAtlasCoverageChart({ coverage }: OpportunityAtlasCove
             const barBottom = fieldYScale(0);
             return (
               <g key={row.key}>
-                <rect x={barX} y={barTop} width={fieldBarWidth} height={barBottom - barTop} fill={row.fill} />
-                <text className="ds-data-chart__axis-label" x={centerX} y={barTop - 8} textAnchor="middle">
+                <rect
+                  x={barX}
+                  y={barTop}
+                  width={fieldBarWidth}
+                  height={barBottom - barTop}
+                  fill={row.fill}
+                />
+                <text
+                  className="ds-data-chart__axis-label"
+                  x={centerX}
+                  y={barTop - 8}
+                  textAnchor="middle"
+                >
                   {formatChartCount(row.value)}
                 </text>
                 <text
@@ -99,7 +120,9 @@ export function OpportunityAtlasCoverageChart({ coverage }: OpportunityAtlasCove
                   y={CHART_HEIGHT - CHART_MARGIN.bottom + 28}
                   textAnchor="middle"
                 >
-                  {row.label.replace('Household income rank ', 'Income ').replace('Incarceration rate ', 'Jail ')}
+                  {row.label
+                    .replace('Household income rank ', 'Income ')
+                    .replace('Incarceration rate ', 'Jail ')}
                 </text>
               </g>
             );
@@ -153,7 +176,12 @@ export function OpportunityAtlasCoverageChart({ coverage }: OpportunityAtlasCove
                   height={barBottom - barTop}
                   fill="var(--ds-accent-graphic)"
                 />
-                <text className="ds-data-chart__axis-label" x={centerX} y={barTop - 8} textAnchor="middle">
+                <text
+                  className="ds-data-chart__axis-label"
+                  x={centerX}
+                  y={barTop - 8}
+                  textAnchor="middle"
+                >
                   {formatChartCount(bin.tractCount)}
                 </text>
                 <text

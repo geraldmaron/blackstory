@@ -16,9 +16,7 @@ function containsControlCharacters(value: string): boolean {
 /** Sanitize a filename for Content-Disposition (no path segments or control chars).  */
 export function sanitizeFilename(filename: string): string {
   const base = filename.split(/[/\\]/).pop() ?? 'download';
-  const withoutControl = [...base]
-    .filter((char) => char.charCodeAt(0) > 0x1f)
-    .join('');
+  const withoutControl = [...base].filter((char) => char.charCodeAt(0) > 0x1f).join('');
   const stripped = withoutControl.replace(CONTROL_OR_SEPARATOR, '_').trim();
   const collapsed = stripped.replace(/_+/g, '_');
   return collapsed.length > 0 ? collapsed.slice(0, 255) : 'download';

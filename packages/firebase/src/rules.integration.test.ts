@@ -1,4 +1,3 @@
-
 /**
  * Firestore and Storage security rules tests against local emulators.
  * Skips when emulators are down unless CI_REQUIRE_FIREBASE=1.

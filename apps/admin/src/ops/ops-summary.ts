@@ -25,9 +25,10 @@ export type OpsEnvironment = {
 };
 
 /** Count story packets awaiting human review (no review record yet). */
-export function countPendingStoryPackets(
-  items: readonly Pick<StoryPacketListItem, 'review'>[],
-): { readonly pending: number; readonly total: number } {
+export function countPendingStoryPackets(items: readonly Pick<StoryPacketListItem, 'review'>[]): {
+  readonly pending: number;
+  readonly total: number;
+} {
   let pending = 0;
   for (const item of items) {
     if (!item.review) pending += 1;
@@ -58,7 +59,10 @@ export async function loadOpsQueueSummary(): Promise<OpsQueueSummary> {
 async function loadResearchCaseQueueSummary(): Promise<
   Pick<OpsQueueSummary, 'researchCasePending' | 'researchCaseSource'>
 > {
-  const items = await tryListAdminResearchCases({ states: ['candidate', 'relevance_review', 'insufficient_evidence'], limit: 200 });
+  const items = await tryListAdminResearchCases({
+    states: ['candidate', 'relevance_review', 'insufficient_evidence'],
+    limit: 200,
+  });
   if (items === null) {
     return { researchCaseSource: 'unavailable' };
   }
@@ -69,10 +73,7 @@ async function loadResearchCaseQueueSummary(): Promise<
 }
 
 async function loadStoryPacketQueueSummary(): Promise<
-  Pick<
-    OpsQueueSummary,
-    'storyPacketsPending' | 'storyPacketsTotal' | 'storyPacketsSource'
-  >
+  Pick<OpsQueueSummary, 'storyPacketsPending' | 'storyPacketsTotal' | 'storyPacketsSource'>
 > {
   try {
     const items = await listStoryPackets(200);
@@ -92,9 +93,7 @@ export function loadOpsEnvironment(): OpsEnvironment {
   return {
     appEnv: process.env.NEXT_PUBLIC_APP_ENV ?? process.env.NODE_ENV ?? 'unknown',
     firebaseProjectId:
-      process.env.FIREBASE_PROJECT_ID ??
-      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ??
-      'unknown',
+      process.env.FIREBASE_PROJECT_ID ?? process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? 'unknown',
     authMode: process.env.ADMIN_AUTH_MODE ?? 'firebase',
     publicSiteOrigin: adminPublicSiteOrigin(),
     productionBreakGlass: process.env.APP_FIREBASE_ALLOW_PRODUCTION === '1',

@@ -24,7 +24,10 @@ const EXTERNAL_ID_PROPERTIES: Readonly<Record<string, string>> = {
 
 const LOCATION_PROPERTIES = new Set(['P131', 'P276', 'P937', 'P19', 'P20', 'P159']);
 
-export function extractWikidataId(page: MediaWikiPage, entity?: WikidataEntity): string | undefined {
+export function extractWikidataId(
+  page: MediaWikiPage,
+  entity?: WikidataEntity,
+): string | undefined {
   if (entity?.id) {
     return entity.id;
   }
@@ -38,7 +41,10 @@ export function extractAliases(entity?: WikidataEntity, language = 'en'): readon
   return entity.aliases[language].map((entry) => entry.value).filter(Boolean);
 }
 
-export function extractLocations(entity?: WikidataEntity, language = 'en'): readonly WikimediaLocationHint[] {
+export function extractLocations(
+  entity?: WikidataEntity,
+  language = 'en',
+): readonly WikimediaLocationHint[] {
   if (!entity?.claims) {
     return [];
   }
@@ -84,13 +90,16 @@ export function extractRelationships(entity?: WikidataEntity): readonly Wikimedi
 
   const relationships: WikimediaRelationship[] = [];
   for (const [property, claims] of Object.entries(entity.claims)) {
-    if (EXTERNAL_ID_PROPERTIES[property] || LOCATION_PROPERTIES.has(property) || property === 'P625') {
+    if (
+      EXTERNAL_ID_PROPERTIES[property] ||
+      LOCATION_PROPERTIES.has(property) ||
+      property === 'P625'
+    ) {
       continue;
     }
     for (const claim of claims) {
       const claimValue = claim.mainsnak.datavalue?.value;
-      const targetId =
-        claimValue && typeof claimValue === 'object' ? claimValue.id : undefined;
+      const targetId = claimValue && typeof claimValue === 'object' ? claimValue.id : undefined;
       if (targetId?.startsWith('Q')) {
         relationships.push({
           property,
@@ -102,7 +111,9 @@ export function extractRelationships(entity?: WikidataEntity): readonly Wikimedi
   return relationships;
 }
 
-export function extractExternalReferences(entity?: WikidataEntity): readonly WikimediaExternalReference[] {
+export function extractExternalReferences(
+  entity?: WikidataEntity,
+): readonly WikimediaExternalReference[] {
   if (!entity?.claims) {
     return [];
   }
@@ -164,7 +175,9 @@ function locationHintFromClaim(
   return undefined;
 }
 
-function dedupeLocations(locations: readonly WikimediaLocationHint[]): readonly WikimediaLocationHint[] {
+function dedupeLocations(
+  locations: readonly WikimediaLocationHint[],
+): readonly WikimediaLocationHint[] {
   const seen = new Set<string>();
   const deduped: WikimediaLocationHint[] = [];
   for (const location of locations) {
@@ -209,7 +222,10 @@ export function buildStableIdentifier(project: string, pageId: number): string {
   return `wikimedia:${normalizedProject}:page:${pageId}`;
 }
 
-export function readLatestRevision(page: MediaWikiPage): { revisionId: number; revisionTimestamp: string } {
+export function readLatestRevision(page: MediaWikiPage): {
+  revisionId: number;
+  revisionTimestamp: string;
+} {
   const latest = page.revisions?.[0];
   if (!latest) {
     throw new Error(`MediaWiki page "${page.title}" is missing revision metadata`);
@@ -220,7 +236,11 @@ export function readLatestRevision(page: MediaWikiPage): { revisionId: number; r
   };
 }
 
-export function resolvePageTitle(entity: WikidataEntity | undefined, page: MediaWikiPage, language = 'en'): string {
+export function resolvePageTitle(
+  entity: WikidataEntity | undefined,
+  page: MediaWikiPage,
+  language = 'en',
+): string {
   const wikidataLabel = entity?.labels?.[language]?.value;
   return wikidataLabel ?? page.title;
 }

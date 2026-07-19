@@ -1,4 +1,3 @@
-
 /**
  * Firestore document schemas for BlackStory (ADR-011 018).
  * Entity/geography, provenance, claims/confidence.
@@ -213,7 +212,6 @@ export const datePrecisionSchema = z.enum(['day', 'month', 'year', 'decade', 'ci
 
 export type DatePrecisionDoc = z.infer<typeof datePrecisionSchema>;
 
-
 /**
  * Entity-lifecycle status only: place/school/organization/institution
  * active|historic|inactive, law in_force|amended|repealed|struck_down|enjoined, movement
@@ -403,7 +401,6 @@ export const canonicalEntitySchema = z.object({
 
 export type CanonicalEntityDoc = z.infer<typeof canonicalEntitySchema>;
 
-
 /**
  * Historical-causation edges (caused/enabled/influenced/participated_in/overturned/
  * commemorates) plus `authored` (creation attribution, distinct from `founded`). Direction and
@@ -449,16 +446,29 @@ const unitInterval = z.number().min(0).max(1);
  * `RELATIONSHIP_WORKFLOW_STATUSES`/`RELATIONSHIP_PUBLICATION_STATUSES`. Relationships add an
  * explicit `candidate` state claims don't have, for the candidate -> review -> published
  * pipeline (BB the related workstream). */
-export const relationshipWorkflowStatusSchema = z.enum(['candidate', 'in_review', 'accepted', 'rejected']);
+export const relationshipWorkflowStatusSchema = z.enum([
+  'candidate',
+  'in_review',
+  'accepted',
+  'rejected',
+]);
 export type RelationshipWorkflowStatusDoc = z.infer<typeof relationshipWorkflowStatusSchema>;
 
-export const relationshipPublicationStatusSchema = z.enum(['unpublished', 'published', 'retracted']);
+export const relationshipPublicationStatusSchema = z.enum([
+  'unpublished',
+  'published',
+  'retracted',
+]);
 export type RelationshipPublicationStatusDoc = z.infer<typeof relationshipPublicationStatusSchema>;
 
 /** See `@repo/domain`'s `RelationshipResolutionState` doc comment: distinct from
  * `ResolutionOutcome` (a single candidate-to-entity match decision) this describes the joint
  * resolution state of both of an edge's endpoints. */
-export const relationshipResolutionStateSchema = z.enum(['unresolved', 'partially_resolved', 'resolved']);
+export const relationshipResolutionStateSchema = z.enum([
+  'unresolved',
+  'partially_resolved',
+  'resolved',
+]);
 export type RelationshipResolutionStateDoc = z.infer<typeof relationshipResolutionStateSchema>;
 
 export const confidenceComponentsSchema = z.object({
@@ -992,7 +1002,7 @@ export const evidenceRecordSchema = z.object({
 
   /**
    * @deprecated Prefer rightsStatus. Kept for transitional reads of early seeds.
- */
+   */
   rights: rightsStatusSchema.optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime().optional(),
@@ -1184,7 +1194,7 @@ export const publicEntityProjectionSchema = z.object({
    * sufficient for "related people, places…" and "timelines" sections. Never carries a
    * numeric field beyond what's already elsewhere on this schema (evidence counts are an
    * internal ranking key on the adjacency doc, not part of this public shape).
- */
+   */
   related: z
     .array(
       z.object({
@@ -1204,7 +1214,6 @@ export const publicEntityProjectionSchema = z.object({
 });
 
 export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSchema>;
-
 
 /**
  * persisted search index document the server-read shape @repo/domain's
@@ -1275,7 +1284,7 @@ export const publicSearchIndexSchema = z.object({
    * SERVER-INTERNAL ranking inputs ONLY the two permitted numeric fields on this schema. Never
    * projected into the client-facing SearchResultView. `relatedCount` is a connection-strength
    * proxy (count of related/adjacency entries); `claimCount` is the supporting-claim count.
- */
+   */
   relatedCount: z.number().int().min(0),
   claimCount: z.number().int().min(0),
 });

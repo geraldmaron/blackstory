@@ -96,7 +96,10 @@ export type MapPointFeatureProperties = {
 export type MapPointFeature = {
   readonly type: 'Feature';
   readonly id: string;
-  readonly geometry: { readonly type: 'Point'; readonly coordinates: readonly [lng: number, lat: number] };
+  readonly geometry: {
+    readonly type: 'Point';
+    readonly coordinates: readonly [lng: number, lat: number];
+  };
   readonly properties: MapPointFeatureProperties;
 };
 

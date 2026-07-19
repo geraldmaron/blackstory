@@ -8,7 +8,8 @@ import './legal.css';
 
 export const metadata = {
   title: 'Legal landscape',
-  description: 'Plain-language access to landmark civil-rights statutes, regulations, and court decisions.',
+  description:
+    'Plain-language access to landmark civil-rights statutes, regulations, and court decisions.',
 };
 
 type LegalPageProps = {

@@ -1,4 +1,3 @@
-
 /**
  * Tests for the entity-ontology Zod mirrors: entityKindSchema's 12th `movement` kind,
  * canonicalEntitySchema's statusHistory/notabilityBasis/sensitivity/movement additions, and the
@@ -156,7 +155,9 @@ const VALID_SEARCH_DOC = {
   jurisdictionState: 'Alabama',
   status: 'in_force',
   eraBuckets: ['1960s'],
-  notabilityBasis: [{ criterion: 'court_precedent', note: 'Landmark ruling.', evidenceIds: ['ev-1'] }],
+  notabilityBasis: [
+    { criterion: 'court_precedent', note: 'Landmark ruling.', evidenceIds: ['ev-1'] },
+  ],
   notabilityLabels: ['Set binding precedent affecting civil rights.'],
   sensitivityClass: 'contested_legacy' as const,
   recordMaturity: 'partial_enrichment',
@@ -186,8 +187,14 @@ test('publicSearchIndexSchema exposes NO numeric field beyond the two internal-r
 
 test('publicSearchIndexSchema rejects a numeric score smuggled into a non-count field', () => {
   // Defense-in-depth: a stray relevanceScore-style number in any string field must fail parsing.
-  assert.equal(publicSearchIndexSchema.safeParse({ ...VALID_SEARCH_DOC, status: 0.9 }).success, false);
-  assert.equal(publicSearchIndexSchema.safeParse({ ...VALID_SEARCH_DOC, nameLower: 42 }).success, false);
+  assert.equal(
+    publicSearchIndexSchema.safeParse({ ...VALID_SEARCH_DOC, status: 0.9 }).success,
+    false,
+  );
+  assert.equal(
+    publicSearchIndexSchema.safeParse({ ...VALID_SEARCH_DOC, nameLower: 42 }).success,
+    false,
+  );
   assert.equal(
     publicSearchIndexSchema.safeParse({ ...VALID_SEARCH_DOC, notabilityLabels: [7] }).success,
     false,

@@ -1,4 +1,3 @@
-
 /**
  * REAL roster entry: legal change monitoring. Wraps `@repo/domain`'s legal
  * monitoring module and fixture-only adapter clients automation proposes review_queue events,
@@ -48,7 +47,6 @@ function collectMonitoringRows(): readonly LegalMonitoringSourceSnapshot[] {
   ];
   return clients.flatMap((client) => client.parseFixtures().monitoringRows);
 }
-
 
 /**
  * Runs one legal monitoring sweep over fixture adapter outputs. Pure aside from the injected

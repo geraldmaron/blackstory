@@ -26,7 +26,9 @@ const BASE_RELATIONSHIP = {
 // ---------------------------------------------------------------------------
 
 test('assertRelationshipEndpointsResolvedForPublish accepts "resolved"', () => {
-  assert.doesNotThrow(() => assertRelationshipEndpointsResolvedForPublish({ resolutionState: 'resolved' }));
+  assert.doesNotThrow(() =>
+    assertRelationshipEndpointsResolvedForPublish({ resolutionState: 'resolved' }),
+  );
 });
 
 test('assertRelationshipEndpointsResolvedForPublish rejects unresolved/partial/undefined', () => {
@@ -34,7 +36,9 @@ test('assertRelationshipEndpointsResolvedForPublish rejects unresolved/partial/u
     () => assertRelationshipEndpointsResolvedForPublish({ resolutionState: 'unresolved' }),
     /must both be resolved/,
   );
-  assert.throws(() => assertRelationshipEndpointsResolvedForPublish({ resolutionState: 'partially_resolved' }));
+  assert.throws(() =>
+    assertRelationshipEndpointsResolvedForPublish({ resolutionState: 'partially_resolved' }),
+  );
   assert.throws(() => assertRelationshipEndpointsResolvedForPublish({}));
 });
 
@@ -42,7 +46,7 @@ test('assertRelationshipEndpointsResolvedForPublish rejects unresolved/partial/u
 // self-corroboration guard.
 // ---------------------------------------------------------------------------
 
-test('excludeSelfFromCorroboration drops the relationship\'s own id', () => {
+test("excludeSelfFromCorroboration drops the relationship's own id", () => {
   const result = excludeSelfFromCorroboration({
     relationshipId: 'rel-1',
     corroboratingRelationshipIds: ['rel-1', 'rel-2', 'rel-3'],

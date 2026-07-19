@@ -1,4 +1,3 @@
-
 /**
  * Elevation, border, focus, icon, motion, and data-visualization tokens.
  */
@@ -49,7 +48,6 @@ export const motion = {
   easingEmphasized: 'cubic-bezier(0.16, 1, 0.3, 1)',
   reducedMotionQuery: '(prefers-reduced-motion: reduce)',
 } as const;
-
 
 /**
  * Restrained categorical/sequential colors for charts pigment-anchored

@@ -12,10 +12,7 @@
  */
 
 export type CoarseLocationAnalyticsEventKind =
-  | 'geocode_resolved'
-  | 'geocode_failed'
-  | 'browser_location_used'
-  | 'manual_fallback_used';
+  'geocode_resolved' | 'geocode_failed' | 'browser_location_used' | 'manual_fallback_used';
 
 /**
  * Deliberately excludes `lat`/`lng`/address/ZIP fields the type itself is the enforcement that
@@ -38,7 +35,8 @@ export function buildCoarseLocationAnalyticsEvent(
   resolution: CoarseAnalyticsResolutionLike | undefined,
   now: () => string = () => new Date().toISOString(),
 ): CoarseLocationAnalyticsEvent {
-  const jurisdictionId = resolution?.jurisdictionIds.countyId ?? resolution?.jurisdictionIds.stateId;
+  const jurisdictionId =
+    resolution?.jurisdictionIds.countyId ?? resolution?.jurisdictionIds.stateId;
   return {
     kind,
     occurredAt: now(),

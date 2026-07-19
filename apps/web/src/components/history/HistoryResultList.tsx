@@ -27,14 +27,20 @@ export function HistoryResultList({
   className,
 }: HistoryResultListProps) {
   return (
-    <ul className={cx('ds-result-list', 'ds-history-result-list', className)} aria-labelledby={labelledBy}>
+    <ul
+      className={cx('ds-result-list', 'ds-history-result-list', className)}
+      aria-labelledby={labelledBy}
+    >
       {nodes.map((node) => {
         const isSelected = node.entityId === selectedId;
 
         return (
           <li
             key={node.entityId}
-            className={cx('ds-result-list__item', isSelected && 'ds-history-result-list__item--selected')}
+            className={cx(
+              'ds-result-list__item',
+              isSelected && 'ds-history-result-list__item--selected',
+            )}
           >
             <Link
               className="ds-result-list__link"

@@ -1,4 +1,3 @@
-
 /**
  * Thin wrapper over the real discovery campaign gate (`@repo/domain`).
  *
@@ -54,7 +53,6 @@ export function summarizeDiscoveryYield(result: DiscoveryCampaignResult): Discov
     totalCandidates: result.candidates.length,
   };
 }
-
 
 /**
  * Runs one bounded discovery campaign over an already-assembled candidate batch and returns

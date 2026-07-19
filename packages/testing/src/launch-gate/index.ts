@@ -1,4 +1,3 @@
-
 /**
  * Local barrel for beta launch gate harness (parent merges package root).
  */
@@ -31,9 +30,7 @@ export {
 } from './evidence-checks.js';
 export type { MachineCheckResult } from './evidence-checks.js';
 
-export {
-  BETA_LAUNCH_DECISION_SCHEMA_VERSION,
-} from './types.js';
+export { BETA_LAUNCH_DECISION_SCHEMA_VERSION } from './types.js';
 export type {
   BetaLaunchEvaluationInput,
   BetaLaunchEvaluationReport,

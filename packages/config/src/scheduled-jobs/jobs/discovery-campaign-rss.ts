@@ -48,9 +48,7 @@ export async function runRssDiscoveryCampaignJob(
     campaignId: `camp_${RSS_DISCOVERY_CAMPAIGN_JOB_ID}_${input.jobRunId}`,
     runId: input.jobRunId,
     ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
-    ...(input.includeCuratedCommunityFeeds === true
-      ? { excludeCuratedCommunityFeeds: false }
-      : {}),
+    ...(input.includeCuratedCommunityFeeds === true ? { excludeCuratedCommunityFeeds: false } : {}),
     ...(input.catalogProfiles !== undefined ? { catalogProfiles: input.catalogProfiles } : {}),
   });
   const run = completeJobRun(started, {

@@ -83,7 +83,9 @@ test('ConfidenceLabelWithNuance includes grade definition link and optional note
 });
 
 test('RevisionUpdateChrome links multi-revision corrections to errata', () => {
-  const html = renderToStaticMarkup(createElement(RevisionUpdateChrome, { fact: MULTI_REVISION_FACT }));
+  const html = renderToStaticMarkup(
+    createElement(RevisionUpdateChrome, { fact: MULTI_REVISION_FACT }),
+  );
   assert.match(html, /see what changed/);
   assert.match(html, /href="\/errata"/);
   assert.match(html, /role="status"/);

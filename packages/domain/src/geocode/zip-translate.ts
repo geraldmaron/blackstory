@@ -37,7 +37,9 @@ export type TranslateZipToPlaceInput = {
 
 const ZIP_PATTERN = /^\d{5}(-\d{4})?$/;
 
-export async function translateZipToPlace(input: TranslateZipToPlaceInput): Promise<ZipTranslationResult> {
+export async function translateZipToPlace(
+  input: TranslateZipToPlaceInput,
+): Promise<ZipTranslationResult> {
   const zip = input.zip.trim();
   if (!ZIP_PATTERN.test(zip)) {
     return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };

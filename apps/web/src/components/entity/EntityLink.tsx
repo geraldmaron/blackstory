@@ -34,11 +34,7 @@ export function EntityLink({ entityId, children, className }: EntityLinkProps) {
 }
 
 export function EntityLinkDiscoveryHint() {
-  return (
-    <p className="ds-entity-link-hint">
-      Record names link onward — click to keep learning.
-    </p>
-  );
+  return <p className="ds-entity-link-hint">Record names link onward — click to keep learning.</p>;
 }
 
 export function resolveEntityLabel(

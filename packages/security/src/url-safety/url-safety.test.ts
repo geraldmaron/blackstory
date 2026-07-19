@@ -1,4 +1,3 @@
-
 /**
  * Exercises URL parsing, IP classification, DNS pinning, redirects, resource
  * limits, parser quarantine, and the asynchronous queue contract without network I/O.
@@ -24,9 +23,7 @@ async function* chunks(...values: readonly string[]): AsyncGenerator<Uint8Array>
   for (const value of values) yield encoder.encode(value);
 }
 
-function response(
-  overrides: Partial<PinnedTransportResponse> = {},
-): PinnedTransportResponse {
+function response(overrides: Partial<PinnedTransportResponse> = {}): PinnedTransportResponse {
   return {
     status: 200,
     headers: { 'content-type': 'text/plain' },
@@ -214,8 +211,7 @@ test('terminates slow responses and blocks disallowed content types', async () =
 
   const binary = await executeSafeFetch('https://example.org/', {
     resolveHost: publicResolver,
-    transport: async () =>
-      response({ headers: { 'content-type': 'application/octet-stream' } }),
+    transport: async () => response({ headers: { 'content-type': 'application/octet-stream' } }),
   });
   assert.equal(binary.ok, false);
   if (!binary.ok) assert.equal(binary.reason, 'content_type_not_allowed');

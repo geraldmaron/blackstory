@@ -108,9 +108,10 @@ function readDocumentColorScheme(): MapColorScheme {
 function stateLabelColorFor(scheme: MapColorScheme, selected: boolean): string {
   const colorsForScheme = (
     stateLabels as {
-      stateLabelColorsForScheme?: (
-        colorScheme: MapColorScheme,
-      ) => { readonly muted: string; readonly selected: string };
+      stateLabelColorsForScheme?: (colorScheme: MapColorScheme) => {
+        readonly muted: string;
+        readonly selected: string;
+      };
     }
   ).stateLabelColorsForScheme;
   if (colorsForScheme) {
@@ -126,7 +127,10 @@ type MaplibreModule = typeof MapLibreNamespace;
 const SELECTED_FILL_ID = 'explore-state-selected-fill';
 const SELECTED_LINE_ID = 'explore-state-selected-line';
 
-const EMPTY_EDGE_COLLECTION: HistoryEdgeLineCollection = { type: 'FeatureCollection', features: [] };
+const EMPTY_EDGE_COLLECTION: HistoryEdgeLineCollection = {
+  type: 'FeatureCollection',
+  features: [],
+};
 
 const ARCHIVE_BASE_STYLE: StyleSpecification = {
   version: 8,
@@ -234,7 +238,9 @@ function syncCircularMarkers(
     if (typeof entityId !== 'string') continue;
 
     const label =
-      typeof feature.properties.displayName === 'string' ? feature.properties.displayName : 'Documented record';
+      typeof feature.properties.displayName === 'string'
+        ? feature.properties.displayName
+        : 'Documented record';
 
     const el = document.createElement('button');
     el.type = 'button';
@@ -263,7 +269,9 @@ function syncCircularMarkers(
       onSelect(entityId);
     });
 
-    const marker = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([lng, lat]).addTo(map);
+    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
+      .setLngLat([lng, lat])
+      .addTo(map);
     markers.push(marker);
   }
 }
@@ -521,7 +529,12 @@ export type MapStageFlyOptions = {
   /** Override uniform preset padding — e.g. clear the right results rail for a selected point. */
   readonly padding?:
     | number
-    | { readonly top: number; readonly bottom: number; readonly left: number; readonly right: number };
+    | {
+        readonly top: number;
+        readonly bottom: number;
+        readonly left: number;
+        readonly right: number;
+      };
 };
 
 type MapStageEvents = {
@@ -555,14 +568,21 @@ export type MapStageHandle = {
   /** The only sanctioned way to move the camera (ADR-017: "raw flyTo defaults are banned").
    * Resolves `target` (an explicit center+zoom, or a bounding box via `cameraForBounds`), then
    * flies/eases/jumps according to `name`'s preset and the current reduced-motion state. */
-  readonly flyPreset: (name: CameraPresetName, target: CameraFlyTarget, options?: MapStageFlyOptions) => void;
+  readonly flyPreset: (
+    name: CameraPresetName,
+    target: CameraFlyTarget,
+    options?: MapStageFlyOptions,
+  ) => void;
   /** `false` once the canvas has failed to start (WebGL unavailable, marker mount threw); pages
    * render their own graceful fallback notice off this. */
   readonly mapAvailable: boolean;
   /** Subscribes to one canvas event; returns an unsubscribe function. `'error'` and `'viewport'`
    * replay their latest value immediately to a subscriber that attaches after the fact (the
    * stage may already be alive with state from a previous page). */
-  readonly subscribe: <E extends MapStageEventName>(event: E, handler: (...args: MapStageEvents[E]) => void) => () => void;
+  readonly subscribe: <E extends MapStageEventName>(
+    event: E,
+    handler: (...args: MapStageEvents[E]) => void,
+  ) => () => void;
 };
 
 const MapStageContext = createContext<MapStageHandle | null>(null);
@@ -598,8 +618,17 @@ type StageConfig = {
   selectedEntity: string | undefined;
 };
 
-function makeListenerStore(): { [K in MapStageEventName]: Set<(...args: MapStageEvents[K]) => void> } {
-  return { select: new Set(), stateSelect: new Set(), edgeSelect: new Set(), activate: new Set(), viewport: new Set(), error: new Set() };
+function makeListenerStore(): {
+  [K in MapStageEventName]: Set<(...args: MapStageEvents[K]) => void>;
+} {
+  return {
+    select: new Set(),
+    stateSelect: new Set(),
+    edgeSelect: new Set(),
+    activate: new Set(),
+    viewport: new Set(),
+    error: new Set(),
+  };
 }
 
 function notify<E extends MapStageEventName>(
@@ -623,9 +652,9 @@ export function MapStageProvider({
   const mapRef = useRef<MapLibreMap | null>(null);
   const maplibreglRef = useRef<MaplibreModule['default'] | null>(null);
   const markersRef = useRef<Marker[]>([]);
-  const stateLabelMarkersRef = useRef<Map<string, { readonly marker: Marker; readonly element: HTMLDivElement }>>(
-    new Map(),
-  );
+  const stateLabelMarkersRef = useRef<
+    Map<string, { readonly marker: Marker; readonly element: HTMLDivElement }>
+  >(new Map());
   const listenersRef = useRef(makeListenerStore());
   const lastViewportRef = useRef<ExploreViewportFrame | undefined>(undefined);
   const [mapAvailable, setMapAvailable] = useState(true);
@@ -660,8 +689,12 @@ export function MapStageProvider({
     const maplibregl = maplibreglRef.current;
     if (!map || !maplibregl) return;
     try {
-      syncCircularMarkers(map, maplibregl, configRef.current.featureCollection.features, markersRef.current, (entityId) =>
-        notify(listenersRef.current, 'select', entityId),
+      syncCircularMarkers(
+        map,
+        maplibregl,
+        configRef.current.featureCollection.features,
+        markersRef.current,
+        (entityId) => notify(listenersRef.current, 'select', entityId),
       );
     } catch (error) {
       console.error('[MapStage] marker sync failed', error);
@@ -756,7 +789,10 @@ export function MapStageProvider({
   const syncPlatePaintToTheme = useCallback(
     (map: MapLibreMap, style: StyleSpecification, scheme: MapColorScheme) => {
       syncLayerPaintFromStyle(map, style, PERSISTENT_PLATE_LAYER_IDS, (update, error) => {
-        console.error(`[MapStage] setPaintProperty ${update.layerId}.${update.paintKey} failed`, error);
+        console.error(
+          `[MapStage] setPaintProperty ${update.layerId}.${update.paintKey} failed`,
+          error,
+        );
       });
       syncStateLabelTheme(scheme);
     },
@@ -859,7 +895,10 @@ export function MapStageProvider({
         syncPlateToTheme();
       }
     });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
     return () => observer.disconnect();
   }, [applyStyleAndData, syncPlatePaintToTheme]);
 
@@ -881,66 +920,82 @@ export function MapStageProvider({
     [updateStateLabelSelection],
   );
 
-  const flyPreset = useCallback((name: CameraPresetName, target: CameraFlyTarget, options?: MapStageFlyOptions) => {
-    const map = mapRef.current;
-    if (!map) return;
-    const reduced = prefersReducedMotion();
-    const preset = cameraPresetFor(name, reduced);
+  const flyPreset = useCallback(
+    (name: CameraPresetName, target: CameraFlyTarget, options?: MapStageFlyOptions) => {
+      const map = mapRef.current;
+      if (!map) return;
+      const reduced = prefersReducedMotion();
+      const preset = cameraPresetFor(name, reduced);
 
-    let center: [number, number];
-    let zoom: number;
-    if ('center' in target) {
-      center = [target.center[0], target.center[1]];
-      zoom = target.zoom;
-    } else {
-      const [west, south, east, north] = target.bounds;
-      const camera = (() => {
-        try {
-          return map.cameraForBounds([west, south, east, north] as [number, number, number, number], {
-            padding: preset.padding,
-          });
-        } catch (error) {
-          console.error('[MapStage] cameraForBounds failed', error);
-          return undefined;
-        }
-      })();
-      if (camera?.center && typeof camera.zoom === 'number') {
-        center = lngLatTuple(camera.center);
-        zoom = camera.zoom;
+      let center: [number, number];
+      let zoom: number;
+      if ('center' in target) {
+        center = [target.center[0], target.center[1]];
+        zoom = target.zoom;
       } else {
-        center = [(west + east) / 2, (south + north) / 2];
-        zoom = 3.4;
+        const [west, south, east, north] = target.bounds;
+        const camera = (() => {
+          try {
+            return map.cameraForBounds(
+              [west, south, east, north] as [number, number, number, number],
+              {
+                padding: preset.padding,
+              },
+            );
+          } catch (error) {
+            console.error('[MapStage] cameraForBounds failed', error);
+            return undefined;
+          }
+        })();
+        if (camera?.center && typeof camera.zoom === 'number') {
+          center = lngLatTuple(camera.center);
+          zoom = camera.zoom;
+        } else {
+          center = [(west + east) / 2, (south + north) / 2];
+          zoom = 3.4;
+        }
       }
-    }
 
-    const paddingOption = options?.padding ?? preset.padding;
-    const padding =
-      typeof paddingOption === 'number'
-        ? { top: paddingOption, bottom: paddingOption, left: paddingOption, right: paddingOption }
-        : paddingOption;
+      const paddingOption = options?.padding ?? preset.padding;
+      const padding =
+        typeof paddingOption === 'number'
+          ? { top: paddingOption, bottom: paddingOption, left: paddingOption, right: paddingOption }
+          : paddingOption;
 
-    if (reduced || preset.duration <= 0) {
-      map.jumpTo({ center, zoom, padding });
-      return;
-    }
-    if ((options?.mode ?? 'fly') === 'ease') {
-      map.easeTo({ center, zoom, padding, duration: preset.duration, easing: preset.easing, essential: true });
-    } else {
-      map.flyTo({
-        center,
-        zoom,
-        padding,
-        duration: preset.duration,
-        curve: preset.curve,
-        speed: preset.speed,
-        easing: preset.easing,
-        essential: true,
-      });
-    }
-  }, []);
+      if (reduced || preset.duration <= 0) {
+        map.jumpTo({ center, zoom, padding });
+        return;
+      }
+      if ((options?.mode ?? 'fly') === 'ease') {
+        map.easeTo({
+          center,
+          zoom,
+          padding,
+          duration: preset.duration,
+          easing: preset.easing,
+          essential: true,
+        });
+      } else {
+        map.flyTo({
+          center,
+          zoom,
+          padding,
+          duration: preset.duration,
+          curve: preset.curve,
+          speed: preset.speed,
+          easing: preset.easing,
+          essential: true,
+        });
+      }
+    },
+    [],
+  );
 
   const subscribe = useCallback(
-    <E extends MapStageEventName>(event: E, handler: (...args: MapStageEvents[E]) => void): (() => void) => {
+    <E extends MapStageEventName>(
+      event: E,
+      handler: (...args: MapStageEvents[E]) => void,
+    ): (() => void) => {
       const set = listenersRef.current[event];
       set.add(handler);
       // Latch: replay the most recent value to a subscriber that attaches after the fact — the
@@ -1015,7 +1070,10 @@ export function MapStageProvider({
       const descriptors = stateLabels.buildStateLabelMarkers(configRef.current.selectedState);
       for (const descriptor of descriptors) {
         const element = stateLabels.buildStateLabelElement(descriptor);
-        const marker = new (maplibreglRef.current as MaplibreModule['default']).Marker({ element, anchor: 'center' })
+        const marker = new (maplibreglRef.current as MaplibreModule['default']).Marker({
+          element,
+          anchor: 'center',
+        })
           .setLngLat([descriptor.lngLat[0], descriptor.lngLat[1]])
           .addTo(activeMap);
         stateLabelMarkersRef.current.set(descriptor.postalCode, { marker, element });
@@ -1068,7 +1126,9 @@ export function MapStageProvider({
           EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
           EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
         ].filter((id) => activeMap.getLayer(id));
-        const hits = hitLayers.length ? activeMap.queryRenderedFeatures(event.point, { layers: hitLayers }) : [];
+        const hits = hitLayers.length
+          ? activeMap.queryRenderedFeatures(event.point, { layers: hitLayers })
+          : [];
         if (hits.length > 0) return;
         notify(listenersRef.current, 'activate', readViewport(activeMap));
       }

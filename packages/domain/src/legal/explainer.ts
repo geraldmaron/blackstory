@@ -43,7 +43,9 @@ function isNonEmpty(value: string | undefined): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
-export function assertLegalPlainLanguageExplainerValid(explainer: LegalPlainLanguageExplainer): void {
+export function assertLegalPlainLanguageExplainerValid(
+  explainer: LegalPlainLanguageExplainer,
+): void {
   if (!isNonEmpty(explainer.whatItSays)) {
     throw new Error('LegalPlainLanguageExplainer.whatItSays must be non-empty');
   }

@@ -3,16 +3,9 @@
  * for tests. Firestore persistence uses `discoveryCampaignRuns/{runId}` via Admin SDK writers
  * outside this module; every run records `publicEffect: 'none'`.
  */
-import {
-  discoveryCampaignRunSchema,
-  type DiscoveryCampaignRunDoc,
-} from '../firestore/types.js';
+import { discoveryCampaignRunSchema, type DiscoveryCampaignRunDoc } from '../firestore/types.js';
 
-export const DISCOVERY_CAMPAIGN_RUN_STATUSES = [
-  'success',
-  'skipped_kill_switch',
-  'error',
-] as const;
+export const DISCOVERY_CAMPAIGN_RUN_STATUSES = ['success', 'skipped_kill_switch', 'error'] as const;
 
 export type DiscoveryCampaignRunStatus = (typeof DISCOVERY_CAMPAIGN_RUN_STATUSES)[number];
 
@@ -66,9 +59,7 @@ export function buildDiscoveryCampaignRunDoc(
 /** Fail closed when a persisted run claims any automatic public effect. */
 export function assertDiscoveryRunCannotPublish(doc: DiscoveryCampaignRunDoc): void {
   if (doc.publicEffect !== 'none') {
-    throw new Error(
-      `Discovery campaign run ${doc.id} cannot publish: publicEffect must be "none"`,
-    );
+    throw new Error(`Discovery campaign run ${doc.id} cannot publish: publicEffect must be "none"`);
   }
 }
 

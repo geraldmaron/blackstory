@@ -28,7 +28,9 @@ export type JurisdictionResolver = {
 /** Synchronous variant for callers that have already loaded every candidate id in bulk. */
 export type JurisdictionIdSet = ReadonlySet<string> | ReadonlyArray<string>;
 
-export function createInMemoryJurisdictionResolver(knownIds: JurisdictionIdSet): JurisdictionResolver {
+export function createInMemoryJurisdictionResolver(
+  knownIds: JurisdictionIdSet,
+): JurisdictionResolver {
   const ids = knownIds instanceof Set ? knownIds : new Set(knownIds);
   return {
     exists(jurisdictionId: string) {
@@ -96,9 +98,7 @@ export async function assertJurisdictionReferencesResolve(
 ): Promise<void> {
   const result = await evaluateJurisdictionReferences(subjects, resolver);
   if (!result.ok) {
-    const detail = result.dangling
-      .map((d) => `${d.subjectId} -> "${d.jurisdictionId}"`)
-      .join(', ');
+    const detail = result.dangling.map((d) => `${d.subjectId} -> "${d.jurisdictionId}"`).join(', ');
     throw new Error(
       `Projection build blocked: dangling jurisdiction reference(s) [${detail}]. ` +
         'Every jurisdictionId must resolve to a jurisdictions/{id} document (fail-closed).',

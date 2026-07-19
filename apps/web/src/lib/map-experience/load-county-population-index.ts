@@ -26,15 +26,22 @@ export type CountyPopulationIndexFile = {
 
 let indexPromise: Promise<CountyPopulationIndex | undefined> | undefined;
 
-function parseRecord(raw: { readonly total?: number; readonly black?: number } | undefined): CountyPopulationRecord | undefined {
+function parseRecord(
+  raw: { readonly total?: number; readonly black?: number } | undefined,
+): CountyPopulationRecord | undefined {
   if (!raw || typeof raw.total !== 'number' || typeof raw.black !== 'number') return undefined;
   if (raw.total < 0 || raw.black < 0) return undefined;
   return { totalPopulation: raw.total, blackPopulation: raw.black };
 }
 
-export function parseCountyPopulationIndexFile(payload: CountyPopulationIndexFile): CountyPopulationIndex {
+export function parseCountyPopulationIndexFile(
+  payload: CountyPopulationIndexFile,
+): CountyPopulationIndex {
   const vintages = (payload.vintages ?? CENSUS_POPULATION_DECADES).filter(isCensusPopulationDecade);
-  const counties: Record<string, Partial<Record<CensusPopulationDecade, CountyPopulationRecord>>> = {};
+  const counties: Record<
+    string,
+    Partial<Record<CensusPopulationDecade, CountyPopulationRecord>>
+  > = {};
   for (const [fips5, byDecade] of Object.entries(payload.counties ?? {})) {
     const decadeMap: Partial<Record<CensusPopulationDecade, CountyPopulationRecord>> = {};
     for (const [decadeRaw, counts] of Object.entries(byDecade ?? {})) {

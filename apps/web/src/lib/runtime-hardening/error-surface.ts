@@ -19,9 +19,7 @@ export function isProductionPublicRuntime(): boolean {
 }
 
 /** Strip stack traces and long internal messages before client display or logs.  */
-export function sanitizeClientErrorDisplay(
-  error: Error & { digest?: string },
-): ClientErrorDisplay {
+export function sanitizeClientErrorDisplay(error: Error & { digest?: string }): ClientErrorDisplay {
   const digest = error.digest;
   if (isProductionPublicRuntime()) {
     return {

@@ -74,7 +74,10 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
           <p className="ds-sans ds-explore__results-count" id="explore-results-heading-njs">
             {view.totalMatched} documented record{view.totalMatched === 1 ? '' : 's'} in view
           </p>
-          <SynchronizedResultList features={view.filteredFeatures} labelledBy="explore-results-heading-njs" />
+          <SynchronizedResultList
+            features={view.filteredFeatures}
+            labelledBy="explore-results-heading-njs"
+          />
         </div>
       </noscript>
 

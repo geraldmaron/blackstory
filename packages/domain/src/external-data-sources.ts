@@ -121,11 +121,13 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     // Resolve a fresh download URL with:
     //   GET https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=<this path>
     // Public UI citations use homepageUrl (FBI UCR hate-crime hub), never the signedurl API.
-    dataUrl: 'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/hate-crime/hate_crime.zip',
+    dataUrl:
+      'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/hate-crime/hate_crime.zip',
     license: {
       name: 'U.S. government work — public domain (17 U.S.C. §105)',
       verdict: 'public-domain',
-      notes: 'Cite the FBI UCR Program and the data year; the CDE download is the canonical artifact.',
+      notes:
+        'Cite the FBI UCR Program and the data year; the CDE download is the canonical artifact.',
     },
     vintage: 'hate_crime.csv, data years 1991–2024 (265,834 incidents; released 2025-07-09)',
     geographies: ['county', 'state', 'facility'],
@@ -163,7 +165,8 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     displayName: 'FBI UCR Program participation (1960–2024)',
     custodian: 'FBI Criminal Justice Information Services (CJIS) Division / UCR Program',
     homepageUrl: 'https://ucr.fbi.gov/hate-crime',
-    dataUrl: 'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/ucr/ucr_participation_1960_2024.csv',
+    dataUrl:
+      'https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=additional-datasets/ucr/ucr_participation_1960_2024.csv',
     license: {
       name: 'U.S. government work — public domain (17 U.S.C. §105)',
       verdict: 'public-domain',
@@ -305,8 +308,7 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     displayName: 'USDA Food Access Research Atlas',
     custodian: 'USDA Economic Research Service',
     homepageUrl: 'https://www.ers.usda.gov/data-products/food-access-research-atlas/',
-    dataUrl:
-      'https://www.ers.usda.gov/data-products/food-access-research-atlas/download-the-data/',
+    dataUrl: 'https://www.ers.usda.gov/data-products/food-access-research-atlas/download-the-data/',
     license: { name: 'U.S. government work — public domain', verdict: 'public-domain' },
     vintage: '2019 atlas (2010 tract geography)',
     geographies: ['tract'],
@@ -359,7 +361,8 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     displayName: 'EPA Superfund National Priorities List site boundaries',
     custodian: 'U.S. Environmental Protection Agency',
     homepageUrl: 'https://www.epa.gov/superfund',
-    dataUrl: 'https://catalog.data.gov/dataset/superfund-national-priorities-list-npl-site-boundaries',
+    dataUrl:
+      'https://catalog.data.gov/dataset/superfund-national-priorities-list-npl-site-boundaries',
     license: { name: 'U.S. government work — public domain', verdict: 'public-domain' },
     vintage: 'current NPL boundary release',
     geographies: ['facility'],
@@ -417,7 +420,8 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     license: {
       name: 'Free for registered IPUMS users — IPUMS terms of use (attribution required)',
       verdict: 'attribution-required',
-      notes: 'Registration and NHGIS_API_KEY required; no automated ingest until human gate clears.',
+      notes:
+        'Registration and NHGIS_API_KEY required; no automated ingest until human gate clears.',
     },
     vintage: 'Historical decennial county race tables 1790–2020 (NHGIS time series + crosswalks)',
     geographies: ['county', 'state'],

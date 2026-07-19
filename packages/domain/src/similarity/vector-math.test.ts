@@ -3,7 +3,12 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { InvalidEmbeddingVectorError, cosineSimilarity, dotProduct, isUnitVector } from './vector-math.js';
+import {
+  InvalidEmbeddingVectorError,
+  cosineSimilarity,
+  dotProduct,
+  isUnitVector,
+} from './vector-math.js';
 
 test('dotProduct computes the sum of pairwise products', () => {
   assert.equal(dotProduct([1, 0, 0], [1, 0, 0]), 1);

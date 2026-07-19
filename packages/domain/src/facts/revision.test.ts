@@ -59,7 +59,10 @@ test('buildNextRevision appends a gapless sequence number', () => {
 
 test('assertRevisionsAppendOnly accepts a valid append', () => {
   const previous = [revision()];
-  const next = [revision(), revision({ revisionNumber: 2, changeType: 'correction', summary: 'Fixed a typo.' })];
+  const next = [
+    revision(),
+    revision({ revisionNumber: 2, changeType: 'correction', summary: 'Fixed a typo.' }),
+  ];
   assert.doesNotThrow(() => assertRevisionsAppendOnly(previous, next));
 });
 

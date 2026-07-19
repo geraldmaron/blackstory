@@ -21,7 +21,9 @@ import {
 
 const FIXED_NOW = '2026-07-17T20:00:00.000Z';
 
-function buildCandidate(overrides: Partial<DiscoveryCandidateRecord> = {}): DiscoveryCandidateRecord {
+function buildCandidate(
+  overrides: Partial<DiscoveryCandidateRecord> = {},
+): DiscoveryCandidateRecord {
   const base: DiscoveryCandidateRecord = {
     schemaVersion: 'discovery-candidate.v1',
     id: 'disc_rss_1',
@@ -120,7 +122,10 @@ test('graylist entries are queryable by corroboration key — nothing is silentl
   });
   const unrelated = buildCandidate({
     id: 'disc_c',
-    adapterRecord: { ...buildCandidate().adapterRecord, title: 'Completely unrelated topic entirely' },
+    adapterRecord: {
+      ...buildCandidate().adapterRecord,
+      title: 'Completely unrelated topic entirely',
+    },
   });
 
   const assessmentA = evaluateCandidateRelevance({ candidate: candidateA, assessedAt: FIXED_NOW });
@@ -131,7 +136,10 @@ test('graylist entries are queryable by corroboration key — nothing is silentl
   parkCandidate(store, candidateB, assessmentB, FIXED_NOW);
   parkCandidate(store, unrelated, assessmentC, FIXED_NOW);
 
-  const matches = queryGraylistByCorroborationKey(store, 'Rosewood Community Newsletter mentions local school history');
+  const matches = queryGraylistByCorroborationKey(
+    store,
+    'Rosewood Community Newsletter mentions local school history',
+  );
   assert.equal(matches.length, 2);
   assert.ok(matches.some((entry) => entry.candidateId === 'disc_a'));
   assert.ok(matches.some((entry) => entry.candidateId === 'disc_b'));
@@ -144,7 +152,12 @@ test('promoting a graylist entry requires a reason and flags it for re-review wi
   const entry = parkCandidate(store, candidate, assessment, FIXED_NOW);
 
   assert.throws(
-    () => promoteGraylistEntry(store, entry.id, { promotedBy: 'admin@blackbook.local', reason: '', now: FIXED_NOW }),
+    () =>
+      promoteGraylistEntry(store, entry.id, {
+        promotedBy: 'admin@blackbook.local',
+        reason: '',
+        now: FIXED_NOW,
+      }),
     /reason is required/,
   );
 
@@ -156,7 +169,11 @@ test('promoting a graylist entry requires a reason and flags it for re-review wi
   assert.equal(promoted.status, 'promoted');
   assert.equal(promoted.promotedBy, 'admin@blackbook.local');
 
-  assert.throws(() => promoteGraylistEntry(store, entry.id, { promotedBy: 'x', reason: 'again', now: FIXED_NOW }), /already promoted/);
+  assert.throws(
+    () =>
+      promoteGraylistEntry(store, entry.id, { promotedBy: 'x', reason: 'again', now: FIXED_NOW }),
+    /already promoted/,
+  );
 });
 
 test('archiving a graylist entry removes it from corroboration search but keeps it queryable by disposition history', () => {
@@ -183,9 +200,15 @@ test('listGraylistByDisposition filters correctly', () => {
 
   const matching = listGraylistByDisposition(store, entry.disposition);
   assert.equal(matching.length, 1);
-  const nonMatching = (['below_threshold', 'negative_only_signal', 'duplicate_of_included', 'awaiting_corroboration', 'weak_signal_uncorroborated'] as const).filter(
-    (d) => d !== entry.disposition,
-  );
+  const nonMatching = (
+    [
+      'below_threshold',
+      'negative_only_signal',
+      'duplicate_of_included',
+      'awaiting_corroboration',
+      'weak_signal_uncorroborated',
+    ] as const
+  ).filter((d) => d !== entry.disposition);
   for (const disposition of nonMatching) {
     assert.equal(listGraylistByDisposition(store, disposition).length, 0);
   }

@@ -1,4 +1,3 @@
-
 /**
  * beta launch gate tests fail-closed human attestations and non-zero exit on NO_GO.
  */
@@ -40,9 +39,7 @@ describe('evaluateBetaLaunchGate', () => {
   });
 
   it('returns GO when machine checks pass and all human gates are attested', () => {
-    const attestations = loadHumanAttestationBundle(
-      join(fixtureDir, 'all-pass-attestations.json'),
-    );
+    const attestations = loadHumanAttestationBundle(join(fixtureDir, 'all-pass-attestations.json'));
     const report = evaluateBetaLaunchGate({
       repoRoot,
       evaluator: 'test-harness',
@@ -56,9 +53,7 @@ describe('evaluateBetaLaunchGate', () => {
   });
 
   it('lists missing human gate ids for partial attestation bundles', () => {
-    const attestations = loadHumanAttestationBundle(
-      join(fixtureDir, 'partial-attestations.json'),
-    );
+    const attestations = loadHumanAttestationBundle(join(fixtureDir, 'partial-attestations.json'));
     const missing = missingHumanAttestations(attestations);
     assert.ok(missing.length >= 6);
     assert.ok(!missing.includes('published-claims-with-evidence'));

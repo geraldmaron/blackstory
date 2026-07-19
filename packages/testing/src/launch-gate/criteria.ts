@@ -1,4 +1,3 @@
-
 /**
  * launch gate inventory measurable machine checks plus fail-closed human attestations.
  */
@@ -107,7 +106,8 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
     title: 'Restore rehearsal complete ()',
     kind: 'machine',
     required: true,
-    description: 'Recovery rehearsal runner and last dry-run report fixtures are present and valid.',
+    description:
+      'Recovery rehearsal runner and last dry-run report fixtures are present and valid.',
     evidence: [
       {
         type: 'command',
@@ -141,7 +141,8 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
     title: 'Load and abuse limits verified ()',
     kind: 'machine',
     required: true,
-    description: 'Load/abuse harness module and operator doc exist; scenario inventory is complete.',
+    description:
+      'Load/abuse harness module and operator doc exist; scenario inventory is complete.',
     evidence: [
       {
         type: 'doc',
@@ -200,7 +201,8 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
     title: 'Legal and privacy review issues tracked',
     kind: 'human',
     required: true,
-    description: 'Operator attests legal/privacy review findings are filed and tracked to resolution or waiver.',
+    description:
+      'Operator attests legal/privacy review findings are filed and tracked to resolution or waiver.',
     evidence: [
       {
         type: 'file',
@@ -251,8 +253,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
     title: 'Public beta disable / static read-only path documented',
     kind: 'machine',
     required: true,
-    description:
-      'Kill-switch keys and App Hosting env hooks exist; disable runbook is documented.',
+    description: 'Kill-switch keys and App Hosting env hooks exist; disable runbook is documented.',
     evidence: [
       {
         type: 'doc',

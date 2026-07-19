@@ -1,11 +1,10 @@
-
 /**
  * Light/dark theme toggle that sets `data-theme` on the document element.
  */
 
 'use client';
 
-import React, {  useEffect, useState  } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;

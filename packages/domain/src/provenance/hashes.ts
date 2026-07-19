@@ -21,7 +21,11 @@ export type HashDedupCandidate = {
 
 export type HashDedupResult =
   | { readonly kind: 'new'; readonly contentHash: ContentHash }
-  | { readonly kind: 'duplicate'; readonly contentHash: ContentHash; readonly existingCaptureId: string };
+  | {
+      readonly kind: 'duplicate';
+      readonly contentHash: ContentHash;
+      readonly existingCaptureId: string;
+    };
 
 const HEX_SHA256 = /^[a-f0-9]{64}$/;
 
@@ -36,7 +40,10 @@ export function normalizeContentHash(hash: ContentHash): ContentHash {
   return { algorithm: 'sha256', digest };
 }
 
-export function hashBytes(bytes: Uint8Array | Buffer, algorithm: ContentHashAlgorithm = 'sha256'): ContentHash {
+export function hashBytes(
+  bytes: Uint8Array | Buffer,
+  algorithm: ContentHashAlgorithm = 'sha256',
+): ContentHash {
   if (algorithm !== 'sha256') {
     throw new Error(`Unsupported hash algorithm: ${algorithm}`);
   }

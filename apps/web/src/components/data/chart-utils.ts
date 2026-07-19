@@ -32,7 +32,12 @@ export function formatSharePct(blackPopulation: number, totalPopulation: number)
   return `${((blackPopulation / totalPopulation) * 100).toFixed(1)}%`;
 }
 
-export function scaleLinear(domainMin: number, domainMax: number, rangeMin: number, rangeMax: number) {
+export function scaleLinear(
+  domainMin: number,
+  domainMax: number,
+  rangeMin: number,
+  rangeMax: number,
+) {
   const span = domainMax - domainMin || 1;
   return (value: number) => rangeMin + ((value - domainMin) / span) * (rangeMax - rangeMin);
 }

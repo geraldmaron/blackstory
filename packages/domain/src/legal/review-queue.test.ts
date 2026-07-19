@@ -21,7 +21,8 @@ const BASE_EVENT: LegalReviewQueueEvent = {
   detectedAt: '2026-07-17T06:00:00.000Z',
   evidence: {
     sourceUrl: 'https://api.congress.gov/v3/law/89/pub/110',
-    archivedCaptureUrl: 'https://web.archive.org/web/20260717000000/https://api.congress.gov/v3/law/89/pub/110',
+    archivedCaptureUrl:
+      'https://web.archive.org/web/20260717000000/https://api.congress.gov/v3/law/89/pub/110',
     changeHashNew: 'hash-v2',
   },
   proposedAction: 'Review and update snapshot.',

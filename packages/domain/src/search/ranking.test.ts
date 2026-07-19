@@ -43,7 +43,11 @@ test('exact name match ranks above a substring match', () => {
 test('connection strength never overrides a stronger text tier', () => {
   // The substring record is far more connected, but the exact match must still win.
   const exact = record({ id: 'exact', displayName: 'School', relatedCount: 0 });
-  const substring = record({ id: 'popular', displayName: 'Popular School Annex', relatedCount: 999 });
+  const substring = record({
+    id: 'popular',
+    displayName: 'Popular School Annex',
+    relatedCount: 999,
+  });
   const ranked = rankRecords('school', [substring, exact]);
   assert.deepEqual(
     ranked.map((r) => r.record.id),
@@ -78,7 +82,11 @@ test('a 2-char query is NOT fuzzy-matched (stays clear of minQueryLength)', () =
 });
 
 test('alias substring match beats a summary match', () => {
-  const aliasHit = record({ id: 'alias', displayName: 'Unrelated Name', aliases: ['freedom school'] });
+  const aliasHit = record({
+    id: 'alias',
+    displayName: 'Unrelated Name',
+    aliases: ['freedom school'],
+  });
   const summaryHit = record({
     id: 'summary',
     displayName: 'Another Name',

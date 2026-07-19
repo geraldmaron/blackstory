@@ -152,7 +152,7 @@ export async function runCommonsMediaEnrichment(
     const single = candidates.length === 1 ? candidates[0]!.fileTitle : undefined;
     const image =
       single !== undefined
-        ? imageMeta.get(single) ?? imageMeta.get(single.replace(/^File:/i, ''))
+        ? (imageMeta.get(single) ?? imageMeta.get(single.replace(/^File:/i, '')))
         : undefined;
 
     proposes.push(

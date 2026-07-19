@@ -119,8 +119,8 @@ export default function CaseDetailPage() {
       </p>
       <h1 className="acq__title">{detail?.title ?? caseId}</h1>
       <p className="acq__lede">
-        Full research-case context. Decide with a written reason — audited, private, and not
-        a public publish.
+        Full research-case context. Decide with a written reason — audited, private, and not a
+        public publish.
       </p>
       <ol className="acq__steps" aria-label="How to decide on a case">
         {CASE_TRIAGE_STEPS.map((step) => (
@@ -234,9 +234,7 @@ export default function CaseDetailPage() {
                 <span>Exclude reason code</span>
                 <select
                   value={reasonCode}
-                  onChange={(event) =>
-                    setReasonCode(event.target.value as ResearchCaseReasonCode)
-                  }
+                  onChange={(event) => setReasonCode(event.target.value as ResearchCaseReasonCode)}
                 >
                   {EXCLUSION_REASON_CODES.map((code) => (
                     <option key={code} value={code}>

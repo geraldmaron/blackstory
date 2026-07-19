@@ -21,7 +21,9 @@ export type EvidenceCardProps = {
 
 export function EvidenceCard({ card }: EvidenceCardProps) {
   const citationId = `${card.id}-evidence-citation`;
-  const hasCoverageMeta = Boolean(card.sourceLineage || card.researchCoverage || card.lastCheckedAt);
+  const hasCoverageMeta = Boolean(
+    card.sourceLineage || card.researchCoverage || card.lastCheckedAt,
+  );
   const lastChecked = card.lastCheckedAt ?? card.researchCoverage?.lastCheckedAt;
   const predicateLabel = humanizeToken(card.predicate);
 
@@ -57,7 +59,10 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
           {...(card.citation.href ? { href: card.citation.href } : {})}
         />
         {card.citation.withheldReason ? (
-          <p className="ds-sans" style={{ margin: 'var(--ds-space-2) 0 0 0', color: 'var(--ds-ink-muted)' }}>
+          <p
+            className="ds-sans"
+            style={{ margin: 'var(--ds-space-2) 0 0 0', color: 'var(--ds-ink-muted)' }}
+          >
             {card.citation.withheldReason}
           </p>
         ) : null}
@@ -77,7 +82,10 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
             {card.excerpt.text}
           </blockquote>
         ) : (
-          <p className="ds-sans" style={{ margin: 'var(--ds-space-3) 0 0 0', color: 'var(--ds-ink-muted)' }}>
+          <p
+            className="ds-sans"
+            style={{ margin: 'var(--ds-space-3) 0 0 0', color: 'var(--ds-ink-muted)' }}
+          >
             {card.excerpt.reason}
           </p>
         )
@@ -86,12 +94,15 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
       {card.dispute?.hasDispute ? (
         <div style={{ marginTop: 'var(--ds-space-3)' }}>
           <Notice tone="dispute" title="Preserved contradiction">
-            {card.dispute.note ? <p style={{ margin: '0 0 var(--ds-space-2) 0' }}>{card.dispute.note}</p> : null}
+            {card.dispute.note ? (
+              <p style={{ margin: '0 0 var(--ds-space-2) 0' }}>{card.dispute.note}</p>
+            ) : null}
             {card.dispute.alternates.length > 0 ? (
               <ul style={{ margin: 0, paddingLeft: 'var(--ds-space-5)' }}>
                 {card.dispute.alternates.map((alternate) => (
                   <li key={`${card.id}_${alternate.value}`}>
-                    <span className="ds-mono">{alternate.value}</span>{' \u2014 '}
+                    <span className="ds-mono">{alternate.value}</span>
+                    {' \u2014 '}
                     {humanizeToken(alternate.kind)}
                     {alternate.credible ? '' : ' (not independently credible)'}
                   </li>
@@ -103,11 +114,16 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
       ) : null}
 
       {hasCoverageMeta ? (
-        <p className="ds-sans" style={{ margin: 'var(--ds-space-3) 0 0 0', color: 'var(--ds-ink-muted)' }}>
+        <p
+          className="ds-sans"
+          style={{ margin: 'var(--ds-space-3) 0 0 0', color: 'var(--ds-ink-muted)' }}
+        >
           {card.sourceLineage ? (
             <>
-              Source lineage: <span className="ds-mono">{card.sourceLineage.independentLineageCount}</span>{' '}
-              independent {card.sourceLineage.independentLineageCount === 1 ? 'source' : 'sources'}.{' '}
+              Source lineage:{' '}
+              <span className="ds-mono">{card.sourceLineage.independentLineageCount}</span>{' '}
+              independent {card.sourceLineage.independentLineageCount === 1 ? 'source' : 'sources'}
+              .{' '}
             </>
           ) : null}
           {card.researchCoverage ? (
@@ -124,7 +140,10 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
           <summary className="ds-sans" style={{ fontWeight: 600, cursor: 'pointer' }}>
             Revision history ({card.revisionHistory.length})
           </summary>
-          <ol className="ds-sans" style={{ margin: 'var(--ds-space-2) 0 0 0', paddingLeft: 'var(--ds-space-5)' }}>
+          <ol
+            className="ds-sans"
+            style={{ margin: 'var(--ds-space-2) 0 0 0', paddingLeft: 'var(--ds-space-5)' }}
+          >
             {card.revisionHistory.map((entry) => (
               <li key={entry.id}>
                 <span className="ds-mono">{humanizeToken(entry.changeKind)}</span>
@@ -142,7 +161,8 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
             <p style={{ margin: 0 }}>{card.retraction.reason}</p>
             {card.retraction.supersededByClaimId ? (
               <p style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
-                Superseded by <span className="ds-mono">{card.retraction.supersededByClaimId}</span>.
+                Superseded by <span className="ds-mono">{card.retraction.supersededByClaimId}</span>
+                .
               </p>
             ) : null}
           </Notice>

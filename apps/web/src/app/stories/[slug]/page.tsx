@@ -131,9 +131,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
         <div className="ds-story-article__body ds-prose">
           {story.body.map((section, index) => (
             <section key={section.heading ?? `section-${index}`}>
-              {section.heading ? (
-                <h2 className="ds-section__title">{section.heading}</h2>
-              ) : null}
+              {section.heading ? <h2 className="ds-section__title">{section.heading}</h2> : null}
               {section.paragraphs.map((paragraph) => (
                 <p key={paragraph.slice(0, 48)} className="ds-story-article__p">
                   {paragraph}

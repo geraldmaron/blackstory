@@ -49,14 +49,12 @@ export const DEFAULT_VERIFICATION_CADENCES: Readonly<
   living_or_unknown_vital_status: {
     volatilityClass: 'high',
     defaultReviewInterval: { unit: 'month', count: 1 },
-    rationale:
-      'Living/unknown vital status can change at any time (death); monthly per bead spec.',
+    rationale: 'Living/unknown vital status can change at any time (death); monthly per bead spec.',
   },
   current_office_role_or_employment: {
     volatilityClass: 'high',
     defaultReviewInterval: { unit: 'month', count: 1 },
-    rationale:
-      'Bead spec allows monthly-to-quarterly; monthly is the conservative seed default.',
+    rationale: 'Bead spec allows monthly-to-quarterly; monthly is the conservative seed default.',
   },
   active_law_or_court_status: {
     volatilityClass: 'medium',
@@ -79,7 +77,6 @@ export const DEFAULT_VERIFICATION_CADENCES: Readonly<
   citation_link_health: {
     volatilityClass: 'medium',
     defaultReviewInterval: { unit: 'month', count: 1 },
-    rationale:
-      'Bead spec allows monthly-to-quarterly; monthly is the conservative seed default.',
+    rationale: 'Bead spec allows monthly-to-quarterly; monthly is the conservative seed default.',
   },
 };

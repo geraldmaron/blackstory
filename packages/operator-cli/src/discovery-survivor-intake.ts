@@ -43,11 +43,13 @@ export type PrepareDiscoverySurvivorIntakeInput = {
   readonly maxSurvivors?: number;
 };
 
-function leadFromSurvivor(candidate: DiscoveryCandidateRecord): {
-  readonly title: string;
-  readonly url: string;
-  readonly description: string;
-} | undefined {
+function leadFromSurvivor(candidate: DiscoveryCandidateRecord):
+  | {
+      readonly title: string;
+      readonly url: string;
+      readonly description: string;
+    }
+  | undefined {
   const preview = toEditorialLeadPreview(candidate);
   const url = preview.canonicalUrl?.trim();
   if (!url) return undefined;

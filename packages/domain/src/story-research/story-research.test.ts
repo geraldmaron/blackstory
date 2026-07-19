@@ -49,9 +49,11 @@ function alamoBrief() {
     presentBridge: {
       continuityClaim:
         'Families in the Southwest still say the border moved across them after 1848.',
-      verificationOffRamp: 'Read Treaty of Guadalupe Hidalgo land-grant promises vs later court outcomes.',
+      verificationOffRamp:
+        'Read Treaty of Guadalupe Hidalgo land-grant promises vs later court outcomes.',
     },
-    verificationRule: 'Move the starting line before the battle cry, then judge by what the winners built.',
+    verificationRule:
+      'Move the starting line before the battle cry, then judge by what the winners built.',
   });
 }
 
@@ -282,7 +284,7 @@ test('trauma-hook opener is blocked', () => {
     body: [
       {
         paragraphs: [
-          'They cut her open while she was still alive — trigger warning, it\'s about to get graphic.',
+          "They cut her open while she was still alive — trigger warning, it's about to get graphic.",
         ],
       },
     ],
@@ -316,7 +318,9 @@ test('unsourced sweeping market claim is blocked without a cite', () => {
     placeLabel: 'Global',
     body: [
       {
-        paragraphs: ['The global skin lightening market is worth between 14 and 19 billion per year.'],
+        paragraphs: [
+          'The global skin lightening market is worth between 14 and 19 billion per year.',
+        ],
       },
     ],
   };

@@ -2,7 +2,10 @@
  * Normalize Internet Archive search/metadata docs into AdapterCandidateRecord output
  *
  */
-import { MAX_EVIDENCE_SNIPPET_CHARACTERS, MAX_EVIDENCE_SNIPPET_WORDS } from '../../rights/evidence-pointer.js';
+import {
+  MAX_EVIDENCE_SNIPPET_CHARACTERS,
+  MAX_EVIDENCE_SNIPPET_WORDS,
+} from '../../rights/evidence-pointer.js';
 import { stampCandidateProvenance } from '../candidates.js';
 import type { SourceRegistryEntry } from '../types.js';
 import {
@@ -41,7 +44,9 @@ export type NormalizeInternetArchiveDocInput = {
   readonly classification?: string;
 };
 
-export function normalizeInternetArchiveDoc(input: NormalizeInternetArchiveDocInput): InternetArchiveCandidateRecord {
+export function normalizeInternetArchiveDoc(
+  input: NormalizeInternetArchiveDocInput,
+): InternetArchiveCandidateRecord {
   const summary = capSummary(input.doc.description);
   const classification = input.classification ?? INTERNET_ARCHIVE_DEFAULT_CLASSIFICATION;
 
@@ -92,7 +97,10 @@ export function assertInternetArchiveCandidate(candidate: InternetArchiveCandida
   if (candidate.payload.schemaVersion !== INTERNET_ARCHIVE_PAYLOAD_SCHEMA_VERSION) {
     throw new Error(`Unexpected payload schema version: ${candidate.payload.schemaVersion}`);
   }
-  if (candidate.payload.summary && candidate.payload.summary.length > MAX_EVIDENCE_SNIPPET_CHARACTERS) {
+  if (
+    candidate.payload.summary &&
+    candidate.payload.summary.length > MAX_EVIDENCE_SNIPPET_CHARACTERS
+  ) {
     throw new Error('Internet Archive candidate summary exceeds the evidence-pointer snippet cap');
   }
 }

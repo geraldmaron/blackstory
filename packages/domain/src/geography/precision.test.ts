@@ -139,9 +139,24 @@ test('resolveEntityLocationPrecision fails closed on an invalid (finer) redacted
 
 test('redaction is the exception across a mixed batch: only flagged records coarsen', () => {
   const records = [
-    { id: 'a', documentedTier: 'exact-site' as const, documentedBasis: 'source-documented' as const, redactionRequired: false },
-    { id: 'b', documentedTier: 'block' as const, documentedBasis: 'geocoded' as const, redactionRequired: false },
-    { id: 'c', documentedTier: 'exact-site' as const, documentedBasis: 'source-documented' as const, redactionRequired: true },
+    {
+      id: 'a',
+      documentedTier: 'exact-site' as const,
+      documentedBasis: 'source-documented' as const,
+      redactionRequired: false,
+    },
+    {
+      id: 'b',
+      documentedTier: 'block' as const,
+      documentedBasis: 'geocoded' as const,
+      redactionRequired: false,
+    },
+    {
+      id: 'c',
+      documentedTier: 'exact-site' as const,
+      documentedBasis: 'source-documented' as const,
+      redactionRequired: true,
+    },
   ];
 
   const resolved = records.map((r) => ({

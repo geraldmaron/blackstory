@@ -247,10 +247,26 @@ export const ENTITY_RING_FILL_OPACITY = 0.2;
 const GLYPH_PAINT_SIGNATURE: Readonly<Record<string, KindGlyphPaintSignature>> = {
   // Solid-fill kinds sit below full opacity so geography stays legible through the disc.
   // `ring` stays far lower; mostly-hollow IS its glyph signature.
-  circle: { opacity: ENTITY_POINT_FILL_OPACITY, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
-  square: { opacity: ENTITY_POINT_FILL_OPACITY, strokeWidth: 4, strokeColor: DIGNITY_PALETTE.selected },
-  diamond: { opacity: ENTITY_POINT_FILL_OPACITY, strokeWidth: 1.5, strokeColor: DIGNITY_PALETTE.selected },
-  ring: { opacity: ENTITY_RING_FILL_OPACITY, strokeWidth: 3, strokeColor: DIGNITY_PALETTE.kindInstitutionStroke },
+  circle: {
+    opacity: ENTITY_POINT_FILL_OPACITY,
+    strokeWidth: 1.5,
+    strokeColor: DIGNITY_PALETTE.selected,
+  },
+  square: {
+    opacity: ENTITY_POINT_FILL_OPACITY,
+    strokeWidth: 4,
+    strokeColor: DIGNITY_PALETTE.selected,
+  },
+  diamond: {
+    opacity: ENTITY_POINT_FILL_OPACITY,
+    strokeWidth: 1.5,
+    strokeColor: DIGNITY_PALETTE.selected,
+  },
+  ring: {
+    opacity: ENTITY_RING_FILL_OPACITY,
+    strokeWidth: 3,
+    strokeColor: DIGNITY_PALETTE.kindInstitutionStroke,
+  },
 };
 
 const DEFAULT_GLYPH_PAINT_SIGNATURE: KindGlyphPaintSignature = GLYPH_PAINT_SIGNATURE.circle!;
@@ -309,8 +325,7 @@ function kindStrokeWidthExpression(): ExpressionSpecification {
 
 function kindStrokeColorExpression(rimColor: string): ExpressionSpecification {
   return kindMatchExpression(
-    (entry) =>
-      entry.glyph === 'ring' ? DIGNITY_PALETTE.kindInstitutionStroke : rimColor,
+    (entry) => (entry.glyph === 'ring' ? DIGNITY_PALETTE.kindInstitutionStroke : rimColor),
     rimColor,
   );
 }
@@ -343,7 +358,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
   const plate = plateForScheme(input.colorScheme ?? 'dark');
   const clusteringEnabled = input.clusteringEnabled !== false;
   const presenceFillActive = input.layerMode === 'presence';
-  const populationFillActive = input.layerMode === 'blackShare' || input.layerMode === 'blackChange';
+  const populationFillActive =
+    input.layerMode === 'blackShare' || input.layerMode === 'blackChange';
   const shareFillExpression: ExpressionSpecification = [
     'match',
     ['get', 'shareTier'],

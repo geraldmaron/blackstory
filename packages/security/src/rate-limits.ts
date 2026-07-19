@@ -1,4 +1,3 @@
-
 /**
  * Endpoint rate limits and abuse quotas.
  *
@@ -264,7 +263,11 @@ function createInitialBucketState(policyRow: EndpointQuotaPolicy, nowMs: number)
   };
 }
 
-function refillTokens(state: TokenBucketState, policyRow: EndpointQuotaPolicy, nowMs: number): void {
+function refillTokens(
+  state: TokenBucketState,
+  policyRow: EndpointQuotaPolicy,
+  nowMs: number,
+): void {
   const elapsedSec = Math.max(0, (nowMs - state.lastRefillMs) / 1000);
   if (elapsedSec <= 0) {
     return;
@@ -273,7 +276,11 @@ function refillTokens(state: TokenBucketState, policyRow: EndpointQuotaPolicy, n
   state.lastRefillMs = nowMs;
 }
 
-function resetWindowsIfNeeded(state: TokenBucketState, policyRow: EndpointQuotaPolicy, nowMs: number): void {
+function resetWindowsIfNeeded(
+  state: TokenBucketState,
+  policyRow: EndpointQuotaPolicy,
+  nowMs: number,
+): void {
   if (nowMs - state.windowStartMs >= policyRow.windowMs) {
     state.windowStartMs = nowMs;
     state.windowCount = 0;
@@ -317,7 +324,10 @@ export function formatRateLimitResponse(decision: QuotaDecisionDenied): RateLimi
   };
 }
 
-export function aggregateRiskScore(signals: readonly RiskSignal[] | undefined, nowMs: number): number {
+export function aggregateRiskScore(
+  signals: readonly RiskSignal[] | undefined,
+  nowMs: number,
+): number {
   if (!signals?.length) {
     return 0;
   }
@@ -335,12 +345,7 @@ export function buildRateLimitKey(parts: {
   deviceId?: string;
   sessionId?: string;
 }): string {
-  const identity =
-    parts.userId ??
-    parts.deviceId ??
-    parts.sessionId ??
-    parts.clientIp ??
-    'unknown';
+  const identity = parts.userId ?? parts.deviceId ?? parts.sessionId ?? parts.clientIp ?? 'unknown';
   return `${parts.subject}:${parts.endpointClass}:${identity}`;
 }
 
@@ -406,7 +411,10 @@ export function compareSubjectQuota(
   endpointClass: EndpointClass,
   left: RateLimitSubject,
   right: RateLimitSubject,
-  matrix: Record<EndpointClass, Record<RateLimitSubject, EndpointQuotaPolicy>> = DEFAULT_ENDPOINT_QUOTA_MATRIX,
+  matrix: Record<
+    EndpointClass,
+    Record<RateLimitSubject, EndpointQuotaPolicy>
+  > = DEFAULT_ENDPOINT_QUOTA_MATRIX,
 ): number {
   const leftPolicy = resolveEndpointPolicy(matrix, endpointClass, left);
   const rightPolicy = resolveEndpointPolicy(matrix, endpointClass, right);
@@ -419,17 +427,17 @@ export function compareSubjectQuota(
 export function isExpensiveEndpointStricter(
   endpointClass: EndpointClass,
   subject: RateLimitSubject = 'anonymous',
-  matrix: Record<EndpointClass, Record<RateLimitSubject, EndpointQuotaPolicy>> = DEFAULT_ENDPOINT_QUOTA_MATRIX,
+  matrix: Record<
+    EndpointClass,
+    Record<RateLimitSubject, EndpointQuotaPolicy>
+  > = DEFAULT_ENDPOINT_QUOTA_MATRIX,
 ): boolean {
   const expensive = resolveEndpointPolicy(matrix, endpointClass, subject);
   const staticRead = resolveEndpointPolicy(matrix, 'entityRetrieval', subject);
   return expensive.windowCap < staticRead.windowCap && expensive.dailyCap < staticRead.dailyCap;
 }
 
-function deny(
-  reason: QuotaDenialReason,
-  retryAfterMs: number,
-): QuotaDecisionDenied {
+function deny(reason: QuotaDenialReason, retryAfterMs: number): QuotaDecisionDenied {
   return {
     allowed: false,
     reason,
@@ -481,7 +489,10 @@ export function evaluateQuota(
     return deny('app_check_required', 30_000);
   }
 
-  if (input.appCheckVerified === false && input.riskSignals?.some((s) => s.kind === 'missing_app_check')) {
+  if (
+    input.appCheckVerified === false &&
+    input.riskSignals?.some((s) => s.kind === 'missing_app_check')
+  ) {
     return deny('app_check_required', 30_000);
   }
 
@@ -568,7 +579,9 @@ export function createRateLimitEvaluator(options: RateLimitEvaluatorOptions = {}
 }
 
 function mergePolicyMatrix(
-  overrides?: Partial<Record<EndpointClass, Partial<Record<RateLimitSubject, EndpointQuotaPolicy>>>>,
+  overrides?: Partial<
+    Record<EndpointClass, Partial<Record<RateLimitSubject, EndpointQuotaPolicy>>>
+  >,
 ): Record<EndpointClass, Record<RateLimitSubject, EndpointQuotaPolicy>> {
   if (!overrides) {
     return DEFAULT_ENDPOINT_QUOTA_MATRIX;
@@ -591,7 +604,10 @@ function mergePolicyMatrix(
 
 /** Validates matrix ordering: anonymous < authenticated < admin < service. */
 export function assertSubjectQuotaOrdering(
-  matrix: Record<EndpointClass, Record<RateLimitSubject, EndpointQuotaPolicy>> = DEFAULT_ENDPOINT_QUOTA_MATRIX,
+  matrix: Record<
+    EndpointClass,
+    Record<RateLimitSubject, EndpointQuotaPolicy>
+  > = DEFAULT_ENDPOINT_QUOTA_MATRIX,
 ): void {
   for (const endpointClass of endpointClasses) {
     const anon = resolveEndpointPolicy(matrix, endpointClass, 'anonymous');
@@ -599,16 +615,18 @@ export function assertSubjectQuotaOrdering(
     const admin = resolveEndpointPolicy(matrix, endpointClass, 'admin');
     const service = resolveEndpointPolicy(matrix, endpointClass, 'service');
 
-    if (!(anon.dailyCap <= auth.dailyCap && auth.dailyCap <= admin.dailyCap && admin.dailyCap <= service.dailyCap)) {
+    if (!(
+      anon.dailyCap <= auth.dailyCap &&
+      auth.dailyCap <= admin.dailyCap &&
+      admin.dailyCap <= service.dailyCap
+    )) {
       throw new Error(`daily cap ordering violated for ${endpointClass}`);
     }
-    if (
-      !(
-        anon.windowCap <= auth.windowCap &&
-        auth.windowCap <= admin.windowCap &&
-        admin.windowCap <= service.windowCap
-      )
-    ) {
+    if (!(
+      anon.windowCap <= auth.windowCap &&
+      auth.windowCap <= admin.windowCap &&
+      admin.windowCap <= service.windowCap
+    )) {
       throw new Error(`window cap ordering violated for ${endpointClass}`);
     }
     if (!(SUBJECT_ORDER.anonymous < SUBJECT_ORDER.authenticated)) {

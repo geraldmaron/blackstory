@@ -41,9 +41,7 @@ function cleanSelectParam(raw: string | undefined): string {
   return trimmed === '' ? 'all' : trimmed;
 }
 
-function snapshotToBrowseItem(
-  snapshot: (typeof SEED_LEGAL_SNAPSHOTS)[number],
-): LegalBrowseItem {
+function snapshotToBrowseItem(snapshot: (typeof SEED_LEGAL_SNAPSHOTS)[number]): LegalBrowseItem {
   const catalog = getLegalCatalogEntry(snapshot.id);
   return {
     id: snapshot.id,
@@ -57,7 +55,10 @@ function snapshotToBrowseItem(
   };
 }
 
-function buildFacetOptions(values: readonly string[], allLabel: string): readonly { value: string; label: string }[] {
+function buildFacetOptions(
+  values: readonly string[],
+  allLabel: string,
+): readonly { value: string; label: string }[] {
   const unique = [...new Set(values)].sort();
   return [{ value: 'all', label: allLabel }, ...unique.map((value) => ({ value, label: value }))];
 }
@@ -74,7 +75,8 @@ export function buildLegalBrowseViewModel(raw: RawLegalBrowseParams): LegalBrows
     if (topic !== 'all' && !snapshot.topics.includes(topic as never)) return false;
     if (status !== 'all' && snapshot.lawStatus !== status) return false;
     if (q) {
-      const haystack = `${snapshot.title} ${snapshot.citation.canonicalCitation} ${snapshot.topics.join(' ')}`.toLowerCase();
+      const haystack =
+        `${snapshot.title} ${snapshot.citation.canonicalCitation} ${snapshot.topics.join(' ')}`.toLowerCase();
       if (!haystack.includes(q)) return false;
     }
     return true;
@@ -87,8 +89,14 @@ export function buildLegalBrowseViewModel(raw: RawLegalBrowseParams): LegalBrows
     status,
     items: filtered.map(snapshotToBrowseItem),
     totalMatched: filtered.length,
-    kindOptions: buildFacetOptions(allSnapshots.map((s) => s.kind), 'All kinds'),
-    topicOptions: buildFacetOptions(allSnapshots.flatMap((s) => [...s.topics]), 'All topics'),
+    kindOptions: buildFacetOptions(
+      allSnapshots.map((s) => s.kind),
+      'All kinds',
+    ),
+    topicOptions: buildFacetOptions(
+      allSnapshots.flatMap((s) => [...s.topics]),
+      'All topics',
+    ),
   };
 }
 

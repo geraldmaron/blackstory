@@ -15,10 +15,7 @@ export type EntityPrimaryImageObjectRef = {
  * Canonical object path for an entity primary image inside the public-media bucket.
  * Example: `public/entities/ent_seed_school_001/primary.png`
  */
-export function entityPrimaryImageObjectPath(
-  entityId: string,
-  filename = 'primary.png',
-): string {
+export function entityPrimaryImageObjectPath(entityId: string, filename = 'primary.png'): string {
   const safeId = entityId.trim();
   if (!safeId) {
     throw new Error('entityId is required for primary image object path');

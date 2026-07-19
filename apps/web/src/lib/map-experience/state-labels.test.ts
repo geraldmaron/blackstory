@@ -51,11 +51,21 @@ test('the documented AK/HI/FL/MI overrides are actually applied, not the raw bbo
     const [west, south, east, north] = state.bbox;
     const rawCentroid = [(west + east) / 2, (south + north) / 2];
     const point = points.get(postalCode)!;
-    assert.notEqual(point.lng, rawCentroid[0], `${postalCode} should use its documented override, not raw bbox centroid lng`);
+    assert.notEqual(
+      point.lng,
+      rawCentroid[0],
+      `${postalCode} should use its documented override, not raw bbox centroid lng`,
+    );
     // Every override must still land inside (or acceptably near) the state's own bbox rather
     // than drifting to an unrelated part of the country.
-    assert.ok(point.lng >= west - 2 && point.lng <= east + 2, `${postalCode} override lng ${point.lng} is nowhere near its bbox`);
-    assert.ok(point.lat >= south - 2 && point.lat <= north + 2, `${postalCode} override lat ${point.lat} is nowhere near its bbox`);
+    assert.ok(
+      point.lng >= west - 2 && point.lng <= east + 2,
+      `${postalCode} override lng ${point.lng} is nowhere near its bbox`,
+    );
+    assert.ok(
+      point.lat >= south - 2 && point.lat <= north + 2,
+      `${postalCode} override lat ${point.lat} is nowhere near its bbox`,
+    );
   }
 });
 
@@ -69,7 +79,8 @@ test('opacity is fully visible at/below the fade-start zoom and fully hidden at/
 test('opacity fades linearly between the start and end zoom', () => {
   const midpoint = (STATE_LABEL_FADE_START_ZOOM + STATE_LABEL_FADE_END_ZOOM) / 2;
   assert.ok(Math.abs(stateLabelOpacityForZoom(midpoint) - 0.5) < 1e-9);
-  const quarter = STATE_LABEL_FADE_START_ZOOM + (STATE_LABEL_FADE_END_ZOOM - STATE_LABEL_FADE_START_ZOOM) * 0.25;
+  const quarter =
+    STATE_LABEL_FADE_START_ZOOM + (STATE_LABEL_FADE_END_ZOOM - STATE_LABEL_FADE_START_ZOOM) * 0.25;
   assert.ok(Math.abs(stateLabelOpacityForZoom(quarter) - 0.75) < 1e-9);
 });
 

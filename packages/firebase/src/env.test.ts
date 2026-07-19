@@ -1,4 +1,3 @@
-
 /**
  * Unit tests for Firebase env validation and production/emulator guards.
  */

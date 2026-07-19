@@ -4,11 +4,7 @@
  * unique extras. Replaces repeating full SOURCE boxes under every metric.
  */
 import React, { type ReactNode } from 'react';
-import {
-  partitionStripSources,
-  SourceFootnote,
-  type DataSourceRef,
-} from './SourceFootnote';
+import { partitionStripSources, SourceFootnote, type DataSourceRef } from './SourceFootnote';
 
 void React;
 

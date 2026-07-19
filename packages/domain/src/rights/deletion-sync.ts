@@ -15,7 +15,12 @@
  * context), so that translation step is deliberately left to the caller.
  */
 import { randomUUID } from 'node:crypto';
-import { auditCategoryFor, type AuditActor, type DomainAuditEvent, type DomainOutboxMessage } from '../audit/index.js';
+import {
+  auditCategoryFor,
+  type AuditActor,
+  type DomainAuditEvent,
+  type DomainOutboxMessage,
+} from '../audit/index.js';
 
 export const DELETION_SYNC_CASCADE_KINDS = [
   'quarantine',

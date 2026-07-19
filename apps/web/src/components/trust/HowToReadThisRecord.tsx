@@ -21,9 +21,8 @@ export function HowToReadThisRecord({
   if (variant === 'compact') {
     return (
       <p className="ds-entity-trust-offramp ds-sans">
-        How this record is built —{' '}
-        <Link href={methodologyHref}>read the methodology</Link> for source hierarchy, confidence,
-        and verification steps.
+        How this record is built — <Link href={methodologyHref}>read the methodology</Link> for
+        source hierarchy, confidence, and verification steps.
       </p>
     );
   }
@@ -38,7 +37,10 @@ export function HowToReadThisRecord({
           built so you can check it yourself.
         </p>
       </Notice>
-      <ul className="ds-sans" style={{ margin: 'var(--ds-space-4) 0 0 0', paddingLeft: 'var(--ds-space-5)' }}>
+      <ul
+        className="ds-sans"
+        style={{ margin: 'var(--ds-space-4) 0 0 0', paddingLeft: 'var(--ds-space-5)' }}
+      >
         {PREBUNK_TECHNIQUE_FRAMES.map((frame) => (
           <li key={frame.id} style={{ marginBottom: 'var(--ds-space-3)' }}>
             <strong>{frame.technique}.</strong> {frame.readerAction}
@@ -46,8 +48,8 @@ export function HowToReadThisRecord({
         ))}
       </ul>
       <p className="ds-sans" style={{ margin: 'var(--ds-space-4) 0 0 0' }}>
-        <Link href={methodologyHref}>Read our full methodology</Link> for definitions, source hierarchy, and
-        verification steps.
+        <Link href={methodologyHref}>Read our full methodology</Link> for definitions, source
+        hierarchy, and verification steps.
       </p>
     </section>
   );

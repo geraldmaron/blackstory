@@ -29,7 +29,8 @@ function readExplicit(value: string | undefined): string | null {
 
 /** Public web origin (e.g. http://localhost:3048). */
 export function resolvePublicSiteOrigin(env: SiblingOriginEnv = process.env): string | null {
-  const explicit = readExplicit(env.NEXT_PUBLIC_SITE_URL) ?? readExplicit(env.NEXT_PUBLIC_WEB_ORIGIN);
+  const explicit =
+    readExplicit(env.NEXT_PUBLIC_SITE_URL) ?? readExplicit(env.NEXT_PUBLIC_WEB_ORIGIN);
   if (explicit) return explicit;
   if (isDevelopment(env)) return 'http://localhost:3048';
   return null;

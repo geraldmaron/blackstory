@@ -1,4 +1,3 @@
-
 /**
  * Proves the backup-verification job body is REAL. Two layers:
  * 1. A hermetic unit test with an injected fake execFile, proving argument-building and
@@ -15,13 +14,18 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { test } from 'node:test';
-import { buildVerifyRestoreArgs, runBackupVerificationJob, type ExecFileFn } from './backup-verification.ts';
+import {
+  buildVerifyRestoreArgs,
+  runBackupVerificationJob,
+  type ExecFileFn,
+} from './backup-verification.ts';
 
 test('buildVerifyRestoreArgs includes only the flags that were supplied', () => {
-  assert.deepEqual(
-    buildVerifyRestoreArgs({ metadataPath: '/tmp/metadata.json' }),
-    ['--json', '--metadata', '/tmp/metadata.json'],
-  );
+  assert.deepEqual(buildVerifyRestoreArgs({ metadataPath: '/tmp/metadata.json' }), [
+    '--json',
+    '--metadata',
+    '/tmp/metadata.json',
+  ]);
   assert.deepEqual(
     buildVerifyRestoreArgs({
       metadataPath: '/tmp/metadata.json',
@@ -47,7 +51,11 @@ test('a passing verification (hermetic, fake execFile) completes the job as succ
   const fakeExecFile: ExecFileFn = async (command, args) => {
     assert.equal(command, 'node');
     assert.ok(args.includes('--json'));
-    return { stdout: JSON.stringify({ export: { ok: true, errors: [] }, activeRelease: null }), stderr: '', exitCode: 0 };
+    return {
+      stdout: JSON.stringify({ export: { ok: true, errors: [] }, activeRelease: null }),
+      stderr: '',
+      exitCode: 0,
+    };
   };
   const result = await runBackupVerificationJob({
     jobRunId: 'run-1',
@@ -108,7 +116,11 @@ test('integration: runs the real scripts/backup-restore/verify-restore.mjs as a 
         return { stdout, stderr, exitCode: 0 };
       } catch (error) {
         const err = error as { stdout?: string; stderr?: string; code?: number };
-        return { stdout: err.stdout ?? '', stderr: err.stderr ?? String(error), exitCode: err.code ?? 1 };
+        return {
+          stdout: err.stdout ?? '',
+          stderr: err.stderr ?? String(error),
+          exitCode: err.code ?? 1,
+        };
       }
     };
 

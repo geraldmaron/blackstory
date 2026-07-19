@@ -66,7 +66,8 @@ async function main(): Promise<void> {
       sessionId: `corsair-triage-commit-${Date.now()}`,
       source: 'cli' as const,
     },
-    privacyPepper: process.env.OPERATOR_CLI_PRIVACY_PEPPER ?? 'dev-preview-pepper-not-for-production',
+    privacyPepper:
+      process.env.OPERATOR_CLI_PRIVACY_PEPPER ?? 'dev-preview-pepper-not-for-production',
   };
 
   let committed = 0;

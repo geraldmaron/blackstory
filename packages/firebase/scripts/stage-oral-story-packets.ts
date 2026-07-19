@@ -71,15 +71,10 @@ function buildDraftAndCiteMap(topic: HandcraftedTopic): {
     `The archive starts earlier: ${topic.brief.relocatedStartLine}`,
   ];
   for (const text of framingTexts) {
-    citeMap.push(
-      buildStoryCiteEntry({ sentenceId: nextId('framing'), text, citeKind: 'framing' }),
-    );
+    citeMap.push(buildStoryCiteEntry({ sentenceId: nextId('framing'), text, citeKind: 'framing' }));
   }
 
-  const body: StoryDraftSection[] = [
-    { paragraphs: framingTexts },
-    ...topic.sections,
-  ];
+  const body: StoryDraftSection[] = [{ paragraphs: framingTexts }, ...topic.sections];
 
   for (const section of topic.sections) {
     for (const paragraph of section.paragraphs) {
@@ -152,8 +147,7 @@ const TOPICS: readonly HandcraftedTopic[] = [
     topicId: 'topic-dunbar-church-basement',
     topicTitle: 'Church basement public trust',
     title: 'A public school in a church basement',
-    dek:
-      'Before Dunbar was Dunbar — before M Street, before the poet’s name — forty-five students and one teacher opened America’s first Black public high school under a congregation’s roof.',
+    dek: 'Before Dunbar was Dunbar — before M Street, before the poet’s name — forty-five students and one teacher opened America’s first Black public high school under a congregation’s roof.',
     eraLabel: '1870',
     placeLabel: 'Washington, D.C.',
     slug: 'public-school-in-a-church-basement',
@@ -245,8 +239,7 @@ const TOPICS: readonly HandcraftedTopic[] = [
     topicId: 'topic-dunbar-two-names-before-poet',
     topicTitle: 'Two names before the poet',
     title: 'Two names before Dunbar',
-    dek:
-      'The school carried two earlier titles — Preparatory High School for Colored Youth, then M Street — before the 1916 move that borrowed a poet’s name.',
+    dek: 'The school carried two earlier titles — Preparatory High School for Colored Youth, then M Street — before the 1916 move that borrowed a poet’s name.',
     eraLabel: '1870–1916',
     placeLabel: 'Washington, D.C.',
     slug: 'two-names-before-dunbar',
@@ -255,7 +248,8 @@ const TOPICS: readonly HandcraftedTopic[] = [
     brief: buildStoryResearchBrief({
       thesisQuestion:
         'What disappears when we start the Dunbar story at the poet’s name instead of the rename chain?',
-      conventionalStartLine: 'Paul Laurence Dunbar High School — as if the institution appeared under that title.',
+      conventionalStartLine:
+        'Paul Laurence Dunbar High School — as if the institution appeared under that title.',
       relocatedStartLine:
         '1870 preparatory school, 1891 M Street High School, 1916 rename tied to a new Snowden Ashford building.',
       mechanismLayers: [
@@ -329,8 +323,7 @@ const TOPICS: readonly HandcraftedTopic[] = [
     topicId: 'topic-dunbar-inventory-day-1975',
     topicTitle: 'April 29, 1975 inventory day',
     title: 'What April 29, 1975 actually marks',
-    dek:
-      'Historic listing and living campus are different claims — the D.C. Inventory date is checkable even when later demolition timelines get fuzzy.',
+    dek: 'Historic listing and living campus are different claims — the D.C. Inventory date is checkable even when later demolition timelines get fuzzy.',
     eraLabel: '1975',
     placeLabel: 'Washington, D.C.',
     slug: 'inventory-day-1975',
@@ -405,15 +398,15 @@ const TOPICS: readonly HandcraftedTopic[] = [
     topicId: 'topic-dunbar-walls-came-down-twice',
     topicTitle: 'Walls came down twice',
     title: 'The walls came down twice',
-    dek:
-      'The campus students enter today is not the 1916 building — demolition in 1977 and again in 2013 is part of the place story visitors need before they arrive.',
+    dek: 'The campus students enter today is not the 1916 building — demolition in 1977 and again in 2013 is part of the place story visitors need before they arrive.',
     eraLabel: '1977–2013',
     placeLabel: 'Washington, D.C.',
     slug: 'walls-came-down-twice',
     relatedEntityIds: ['ent_dunbar_school_001'],
     relatedFactIds: ['BB-F-000003', 'BB-F-000005'],
     brief: buildStoryResearchBrief({
-      thesisQuestion: 'When did the Dunbar campus become replaceable — and what does “same school” mean after that?',
+      thesisQuestion:
+        'When did the Dunbar campus become replaceable — and what does “same school” mean after that?',
       conventionalStartLine: 'Alumni nostalgia anchored to one immortal building.',
       relocatedStartLine:
         '1977 demolition of the 1916 Ashford building; 2013 demolition of its 1970s replacement; 2013 opening of a new structure on the same footprint.',
@@ -468,8 +461,7 @@ const TOPICS: readonly HandcraftedTopic[] = [
     topicId: 'topic-dunbar-alumni-thread',
     topicTitle: 'Alumni federation thread',
     title: 'Who holds the thread when walls turn over',
-    dek:
-      'The Dunbar Alumni Federation organized in 2002 — a living institution beside the school record when buildings cannot carry memory alone.',
+    dek: 'The Dunbar Alumni Federation organized in 2002 — a living institution beside the school record when buildings cannot carry memory alone.',
     eraLabel: '2002–',
     placeLabel: 'Washington, D.C.',
     slug: 'alumni-thread-2002',
@@ -530,8 +522,7 @@ const TOPICS: readonly HandcraftedTopic[] = [
     topicId: 'topic-princeville-before-charter',
     topicTitle: 'Freedom Hill before the charter name',
     title: 'Freedom Hill before Princeville',
-    dek:
-      'On the Tar River floodplain opposite Tarboro, freedpeople governed daily life for twenty years before the 1885 charter — and the charter name honors Turner Prince, not the other way around.',
+    dek: 'On the Tar River floodplain opposite Tarboro, freedpeople governed daily life for twenty years before the 1885 charter — and the charter name honors Turner Prince, not the other way around.',
     eraLabel: '1865–1885',
     placeLabel: 'Princeville, North Carolina',
     slug: 'freedom-hill-before-princeville',
@@ -735,15 +726,18 @@ async function main(): Promise<void> {
         continue;
       }
       const result = await commitOperatorIntake(store, outcome);
-      const submissionId = outcome.mutations.find((m) => m.path.includes('submissionInbox'))?.path
-        .split('/')
+      const submissionId = outcome.mutations
+        .find((m) => m.path.includes('submissionInbox'))
+        ?.path.split('/')
         .pop();
       report.packets[index] = {
         ...report.packets[index]!,
         ...(submissionId !== undefined ? { submissionId } : {}),
         committed: result.committed,
       };
-      console.log(`Staged ${packet.topicId} committed=${result.committed} id=${submissionId ?? '?'}`);
+      console.log(
+        `Staged ${packet.topicId} committed=${result.committed} id=${submissionId ?? '?'}`,
+      );
     }
   } else {
     console.log('Dry run — pass --commit to stage quarantine packets.');

@@ -12,10 +12,7 @@ import {
   HistoryOverviewStrip,
   HistoryResultList,
 } from '../../components/history';
-import {
-  HISTORY_DECADE_FRAMING,
-  HISTORY_DIGNITY_FRAMING,
-} from '../../lib/history';
+import { HISTORY_DECADE_FRAMING, HISTORY_DIGNITY_FRAMING } from '../../lib/history';
 import type { HistoryFacetOption } from '../../lib/history/filters';
 import { listPublicEntityViews } from '../../lib/public-data/source';
 import { HistoryExperience } from './HistoryExperience';

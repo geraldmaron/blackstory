@@ -45,7 +45,10 @@ export function createWikimediaAdapterContract(
     refreshSchedule: '0 4 * * 0',
     rateLimits: { requestsPerMinute: 60, burst: 10 },
     volume: { expectedRecordsPerRun: 250, countToleranceFraction: 0.2 },
-    geographicCoverage: { countries: ['global'], notes: 'English Wikipedia primary; Wikidata global' },
+    geographicCoverage: {
+      countries: ['global'],
+      notes: 'English Wikipedia primary; Wikidata global',
+    },
     expectedSchemaVersion: ADAPTER_CANDIDATE_SCHEMA_VERSION,
     canarySampleFraction: 0.05,
     ...overrides,

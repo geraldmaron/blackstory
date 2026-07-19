@@ -117,7 +117,10 @@ function buildNameCandidates(
   return candidates.sort((left, right) => right.name.length - left.name.length);
 }
 
-function findSpanMatches(plain: string, candidates: readonly NameCandidate[]): readonly SpanMatch[] {
+function findSpanMatches(
+  plain: string,
+  candidates: readonly NameCandidate[],
+): readonly SpanMatch[] {
   const occupied = new Array<boolean>(plain.length).fill(false);
   const matches: SpanMatch[] = [];
 
@@ -145,7 +148,10 @@ function findSpanMatches(plain: string, candidates: readonly NameCandidate[]): r
   return matches.sort((left, right) => left.start - right.start);
 }
 
-function linkifyPlainSegment(plain: string, candidates: readonly NameCandidate[]): {
+function linkifyPlainSegment(
+  plain: string,
+  candidates: readonly NameCandidate[],
+): {
   readonly text: string;
   readonly links: readonly ProseEntityRef[];
 } {

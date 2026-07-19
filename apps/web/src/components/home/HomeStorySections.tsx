@@ -10,10 +10,7 @@
  */
 
 import Link from 'next/link';
-import type {
-  NationalPopulationByDecade,
-  PopulationDecadeChange,
-} from '@repo/firebase';
+import type { NationalPopulationByDecade, PopulationDecadeChange } from '@repo/firebase';
 import { KindBadge } from '../map-experience/KindBadge';
 import { HomeAbout } from './HomeAbout';
 import { HomeDataPulse } from './HomeDataPulse';

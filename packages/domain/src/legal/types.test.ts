@@ -19,7 +19,8 @@ const BASE_SNAPSHOT: LegalSnapshot = {
     licenseTag: 'public-domain',
     archive: {
       sourceUrl: 'https://api.congress.gov/v3/law/88/pub/352',
-      archivedCaptureUrl: 'https://web.archive.org/web/20260717000000/https://api.congress.gov/v3/law/88/pub/352',
+      archivedCaptureUrl:
+        'https://web.archive.org/web/20260717000000/https://api.congress.gov/v3/law/88/pub/352',
       retrievedAt: '2026-07-17T00:00:00.000Z',
     },
   },

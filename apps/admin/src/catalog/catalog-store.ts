@@ -42,9 +42,7 @@ function readString(value: unknown): string | undefined {
   return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
-function readLivingStatus(
-  value: unknown,
-): 'living' | 'deceased' | 'unknown' | undefined {
+function readLivingStatus(value: unknown): 'living' | 'deceased' | 'unknown' | undefined {
   if (value === 'living' || value === 'deceased' || value === 'unknown') {
     return value;
   }
@@ -203,9 +201,7 @@ export async function getCanonicalEntityDetail(id: string): Promise<CatalogEntit
       const note = readString(record.note);
       return { system, value, ...(note ? { note } : {}) };
     })
-    .filter(
-      (entry): entry is { system: string; value: string; note?: string } => entry !== null,
-    );
+    .filter((entry): entry is { system: string; value: string; note?: string } => entry !== null);
 
   const locations = locationsSnap.docs.map((doc) =>
     parseLocation(doc.id, doc.data() as Record<string, unknown>),
@@ -232,9 +228,7 @@ export async function tryListCanonicalEntities(
   }
 }
 
-export async function tryGetCanonicalEntityDetail(
-  id: string,
-): Promise<CatalogEntityDetail | null> {
+export async function tryGetCanonicalEntityDetail(id: string): Promise<CatalogEntityDetail | null> {
   try {
     return await getCanonicalEntityDetail(id);
   } catch (error) {

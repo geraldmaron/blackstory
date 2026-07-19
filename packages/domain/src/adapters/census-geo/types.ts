@@ -35,7 +35,9 @@ export type RawCensusCoordinates = {
 export type RawCensusGeographyEntry = Readonly<Record<string, unknown>>;
 
 /** Keyed by human-readable Census layer name, e.g. "States", "Counties", "Incorporated Places". */
-export type RawCensusGeographiesBlock = Readonly<Record<string, readonly RawCensusGeographyEntry[] | undefined>>;
+export type RawCensusGeographiesBlock = Readonly<
+  Record<string, readonly RawCensusGeographyEntry[] | undefined>
+>;
 
 export type RawCensusAddressMatch = {
   readonly tigerLine?: Readonly<Record<string, unknown>>;

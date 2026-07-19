@@ -5,7 +5,11 @@
 import type { EntityRelationship, GraphReleaseArtifact } from '@repo/domain';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 import { resolveAllTimeStatusLabel, resolveDecadeStatusLabel } from './decade-status';
-import { applyHistoryKindFilter, buildHistoryKindFacetOptions, type HistoryFilterState } from './filters';
+import {
+  applyHistoryKindFilter,
+  buildHistoryKindFacetOptions,
+  type HistoryFilterState,
+} from './filters';
 import type { HistoryViewMode } from './url-state';
 
 export type HistoryNodeView = {
@@ -61,11 +65,7 @@ function entityHref(entityId: string): string {
   return `/entity/${entityId}`;
 }
 
-function relationshipSentence(
-  rel: EntityRelationship,
-  fromName: string,
-  toName: string,
-): string {
+function relationshipSentence(rel: EntityRelationship, fromName: string, toName: string): string {
   const templates: Readonly<Record<string, (from: string, to: string) => string>> = {
     located_at: (from, to) => `${from} is located at ${to}.`,
     occurred_at: (from, to) => `${from} occurred at ${to}.`,
@@ -221,7 +221,9 @@ export function buildHistoryEdges(
       ...(rel.temporal
         ? {
             timespan: {
-              ...(rel.temporal.validFrom !== undefined ? { validFrom: rel.temporal.validFrom } : {}),
+              ...(rel.temporal.validFrom !== undefined
+                ? { validFrom: rel.temporal.validFrom }
+                : {}),
               ...(rel.temporal.validTo !== undefined ? { validTo: rel.temporal.validTo } : {}),
             },
           }

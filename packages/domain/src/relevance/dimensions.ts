@@ -111,11 +111,7 @@ function scoreGeographicConnection(candidate: DiscoveryCandidateRecord): Relevan
 function scoreSourceAuthority(candidate: DiscoveryCandidateRecord): RelevanceFeatureValue {
   const classification = candidate.adapterRecord.classification ?? 'unknown';
   const value = SOURCE_AUTHORITY_VALUES[classification] ?? SOURCE_AUTHORITY_VALUES.unknown!;
-  return buildFeature(
-    'source_authority',
-    value,
-    `Source classified as ${classification}.`,
-  );
+  return buildFeature('source_authority', value, `Source classified as ${classification}.`);
 }
 
 function scoreSignalStrength(candidate: DiscoveryCandidateRecord): RelevanceFeatureValue {

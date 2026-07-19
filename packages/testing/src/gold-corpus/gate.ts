@@ -1,4 +1,3 @@
-
 /**
  * Fail-closed gate preventing automatic publication unless the current corpus version has
  * a passing evaluation record for the algorithm being enabled.

@@ -14,7 +14,10 @@ test('every seed story has body copy and related entity ids', () => {
   for (const story of stories) {
     assert.ok(story.slug.length > 0);
     assert.ok(story.body.length > 0);
-    assert.ok(story.relatedEntityIds.length > 0, `${story.slug} needs at least one related entity id`);
+    assert.ok(
+      story.relatedEntityIds.length > 0,
+      `${story.slug} needs at least one related entity id`,
+    );
     for (const entityId of story.relatedEntityIds) {
       assert.match(entityId, /^ent_/, `related entity id must be canonical: ${entityId}`);
       // Dunbar-cluster ids stay in the offline seed; national-catalog ids are live-only.

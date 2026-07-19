@@ -26,7 +26,10 @@ test('renders record-level retraction notices distinctly from research coverage'
     createElement(EvidenceResearchCoverageSummary, {
       researchCoverage: { level: 'minimal' },
       retractionNotices: [
-        { retractedAt: '2026-07-10T00:00:00.000Z', reason: 'The sole supporting source was later retracted by its publisher.' },
+        {
+          retractedAt: '2026-07-10T00:00:00.000Z',
+          reason: 'The sole supporting source was later retracted by its publisher.',
+        },
       ],
     }),
   );

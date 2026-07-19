@@ -80,7 +80,12 @@ function lawFact(
     confidence: 'established',
     citations: [
       {
-        csl: { id: `csl-${slug}`, type: 'legislation', title: shortStatement, URL: `https://example.gov/law/${slug}` },
+        csl: {
+          id: `csl-${slug}`,
+          type: 'legislation',
+          title: shortStatement,
+          URL: `https://example.gov/law/${slug}`,
+        },
         sourceClass: 'primary',
         role: 'supports',
         excerpt: statement.slice(0, 120),
@@ -148,7 +153,9 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     citation: {
       canonicalCitation: 'Pub. L. 90-284, Title VIII',
       licenseTag: 'public-domain',
-      archive: archive('https://www.hud.gov/program_offices/fair_housing_equal_opp/fair_housing_act_overview'),
+      archive: archive(
+        'https://www.hud.gov/program_offices/fair_housing_equal_opp/fair_housing_act_overview',
+      ),
     },
     externalIds: [{ source: 'congress-gov-v3', externalId: '90/pub/284' }],
     factId: 'BB-F-000012',
@@ -164,7 +171,10 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     citation: {
       canonicalCitation: '42 U.S.C. § 1983',
       licenseTag: 'public-domain',
-      archive: archive('https://www.ecfr.gov/current/title-42/chapter-21/subchapter-I/part-1983', '2026-01-01'),
+      archive: archive(
+        'https://www.ecfr.gov/current/title-42/chapter-21/subchapter-I/part-1983',
+        '2026-01-01',
+      ),
     },
     externalIds: [{ source: 'ecfr-versioner', externalId: 'title-42/part-1983' }],
     factId: 'BB-F-000013',
@@ -180,7 +190,10 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     citation: {
       canonicalCitation: '347 U.S. 483 (1954)',
       licenseTag: 'public-domain',
-      archive: archive('https://www.courtlistener.com/opinion/108713/brown-v-board-of-education/', '1954-05-17:347 U.S. 483'),
+      archive: archive(
+        'https://www.courtlistener.com/opinion/108713/brown-v-board-of-education/',
+        '1954-05-17:347 U.S. 483',
+      ),
     },
     externalIds: [{ source: 'courtlistener-bulk', externalId: '108713' }],
     factId: 'BB-F-000014',
@@ -196,7 +209,10 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     citation: {
       canonicalCitation: '570 U.S. 529 (2013)',
       licenseTag: 'public-domain',
-      archive: archive('https://www.courtlistener.com/opinion/813086/shelby-county-v-holder/', '2013-06-25:570 U.S. 529'),
+      archive: archive(
+        'https://www.courtlistener.com/opinion/813086/shelby-county-v-holder/',
+        '2013-06-25:570 U.S. 529',
+      ),
     },
     externalIds: [{ source: 'courtlistener-bulk', externalId: '813086' }],
     factId: 'BB-F-000015',
@@ -260,7 +276,10 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     citation: {
       canonicalCitation: '29 CFR Part 1604',
       licenseTag: 'public-domain',
-      archive: archive('https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1604', '2026-01-01'),
+      archive: archive(
+        'https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1604',
+        '2026-01-01',
+      ),
     },
     externalIds: [{ source: 'ecfr-versioner', externalId: 'title-29/part-1604' }],
     factId: 'BB-F-000019',
@@ -292,7 +311,10 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     citation: {
       canonicalCitation: '600 U.S. 181 (2023)',
       licenseTag: 'public-domain',
-      archive: archive('https://www.supremecourt.gov/opinions/22pdf/20-1199_hgdj.pdf', '2023-06-29:600 U.S. 181'),
+      archive: archive(
+        'https://www.supremecourt.gov/opinions/22pdf/20-1199_hgdj.pdf',
+        '2023-06-29:600 U.S. 181',
+      ),
     },
     externalIds: [{ source: 'courtlistener-bulk', externalId: '9383451' }],
     factId: 'BB-F-000021',
@@ -314,13 +336,28 @@ export const SEED_LEGAL_CATALOG: readonly LegalCatalogEntry[] = [
         'The Act gave federal courts a direct tool to strike down segregation laws that states had kept for decades.',
       ],
       [
-        { label: 'File an employment discrimination charge (EEOC)', agencyUrl: 'https://www.eeoc.gov/filing-charge-discrimination' },
-        { label: 'Report housing discrimination (HUD)', agencyUrl: 'https://www.hud.gov/program_offices/fair_housing_equal_opp/online-complaint' },
+        {
+          label: 'File an employment discrimination charge (EEOC)',
+          agencyUrl: 'https://www.eeoc.gov/filing-charge-discrimination',
+        },
+        {
+          label: 'Report housing discrimination (HUD)',
+          agencyUrl: 'https://www.hud.gov/program_offices/fair_housing_equal_opp/online-complaint',
+        },
       ],
       [
-        { label: 'Congress.gov — Pub. L. 88-352', url: 'https://api.congress.gov/v3/law/88/pub/352', licenseTag: 'public-domain' },
+        {
+          label: 'Congress.gov — Pub. L. 88-352',
+          url: 'https://api.congress.gov/v3/law/88/pub/352',
+          licenseTag: 'public-domain',
+        },
       ],
-      [{ term: 'public accommodation', wexUrl: 'https://www.law.cornell.edu/wex/public_accommodation' }],
+      [
+        {
+          term: 'public accommodation',
+          wexUrl: 'https://www.law.cornell.edu/wex/public_accommodation',
+        },
+      ],
     ),
   },
   {
@@ -337,10 +374,22 @@ export const SEED_LEGAL_CATALOG: readonly LegalCatalogEntry[] = [
         'The Act is widely credited with dramatically increasing Black voter registration in the Deep South.',
       ],
       [
-        { label: 'Report a voting rights violation (DOJ Civil Rights Division)', agencyUrl: 'https://civilrights.justice.gov/' },
-        { label: 'Find your election office (USA.gov)', agencyUrl: 'https://www.usa.gov/election-office' },
+        {
+          label: 'Report a voting rights violation (DOJ Civil Rights Division)',
+          agencyUrl: 'https://civilrights.justice.gov/',
+        },
+        {
+          label: 'Find your election office (USA.gov)',
+          agencyUrl: 'https://www.usa.gov/election-office',
+        },
       ],
-      [{ label: 'Congress.gov — Pub. L. 89-110', url: 'https://api.congress.gov/v3/law/89/pub/110', licenseTag: 'public-domain' }],
+      [
+        {
+          label: 'Congress.gov — Pub. L. 89-110',
+          url: 'https://api.congress.gov/v3/law/89/pub/110',
+          licenseTag: 'public-domain',
+        },
+      ],
       [{ term: 'preclearance', wexUrl: 'https://www.law.cornell.edu/wex/preclearance' }],
     ),
   },
@@ -358,20 +407,39 @@ export const SEED_LEGAL_CATALOG: readonly LegalCatalogEntry[] = [
         'Many districts resisted for years; federal troops were sent to Little Rock Central High School in 1957.',
       ],
       [
-        { label: 'File an education civil-rights complaint (DOJ)', agencyUrl: 'https://civilrights.justice.gov/' },
-        { label: 'File a school discrimination complaint (OCR)', agencyUrl: 'https://www2.ed.gov/about/offices/list/ocr/complaintintro.html' },
+        {
+          label: 'File an education civil-rights complaint (DOJ)',
+          agencyUrl: 'https://civilrights.justice.gov/',
+        },
+        {
+          label: 'File a school discrimination complaint (OCR)',
+          agencyUrl: 'https://www2.ed.gov/about/offices/list/ocr/complaintintro.html',
+        },
       ],
       [
-        { label: 'CourtListener — Brown v. Board', url: 'https://www.courtlistener.com/opinion/108713/brown-v-board-of-education/', licenseTag: 'public-domain' },
-        { label: 'Oyez case summary (link + attributed quote only)', url: 'https://www.oyez.org/cases/1940-1955/347us483', licenseTag: 'link-only' },
+        {
+          label: 'CourtListener — Brown v. Board',
+          url: 'https://www.courtlistener.com/opinion/108713/brown-v-board-of-education/',
+          licenseTag: 'public-domain',
+        },
+        {
+          label: 'Oyez case summary (link + attributed quote only)',
+          url: 'https://www.oyez.org/cases/1940-1955/347us483',
+          licenseTag: 'link-only',
+        },
       ],
-      [{ term: 'Equal Protection Clause', wexUrl: 'https://www.law.cornell.edu/wex/equal_protection' }],
+      [
+        {
+          term: 'Equal Protection Clause',
+          wexUrl: 'https://www.law.cornell.edu/wex/equal_protection',
+        },
+      ],
     ),
   },
   {
     snapshotId: 'legal-shelby-2013',
     explainer: explainer(
-      'Shelby County v. Holder, 570 U.S. 529 (2013), struck down the Voting Rights Act\'s coverage formula that determined which states needed federal preclearance for election changes.',
+      "Shelby County v. Holder, 570 U.S. 529 (2013), struck down the Voting Rights Act's coverage formula that determined which states needed federal preclearance for election changes.",
       [
         'The Court said the 1965 coverage formula was outdated and violated state sovereignty.',
         'Section 2 still bans discriminatory voting practices nationwide, but preclearance no longer applies automatically.',
@@ -382,9 +450,18 @@ export const SEED_LEGAL_CATALOG: readonly LegalCatalogEntry[] = [
         'Civil-rights groups argue the decision removed a key guardrail against voter suppression.',
       ],
       [
-        { label: 'Report a voting rights violation (DOJ)', agencyUrl: 'https://civilrights.justice.gov/' },
+        {
+          label: 'Report a voting rights violation (DOJ)',
+          agencyUrl: 'https://civilrights.justice.gov/',
+        },
       ],
-      [{ label: 'CourtListener — Shelby County', url: 'https://www.courtlistener.com/opinion/813086/shelby-county-v-holder/', licenseTag: 'public-domain' }],
+      [
+        {
+          label: 'CourtListener — Shelby County',
+          url: 'https://www.courtlistener.com/opinion/813086/shelby-county-v-holder/',
+          licenseTag: 'public-domain',
+        },
+      ],
     ),
   },
   {
@@ -402,9 +479,18 @@ export const SEED_LEGAL_CATALOG: readonly LegalCatalogEntry[] = [
       ],
       [
         { label: 'Report police misconduct (DOJ)', agencyUrl: 'https://civilrights.justice.gov/' },
-        { label: 'Find a legal aid office (LSC)', agencyUrl: 'https://www.lsc.gov/about-lsc/what-legal-aid/get-legal-help' },
+        {
+          label: 'Find a legal aid office (LSC)',
+          agencyUrl: 'https://www.lsc.gov/about-lsc/what-legal-aid/get-legal-help',
+        },
       ],
-      [{ label: 'eCFR — 42 U.S.C. § 1983', url: 'https://www.ecfr.gov/current/title-42/chapter-21/subchapter-I/part-1983', licenseTag: 'public-domain' }],
+      [
+        {
+          label: 'eCFR — 42 U.S.C. § 1983',
+          url: 'https://www.ecfr.gov/current/title-42/chapter-21/subchapter-I/part-1983',
+          licenseTag: 'public-domain',
+        },
+      ],
       [{ term: 'color of law', wexUrl: 'https://www.law.cornell.edu/wex/color_of_law' }],
     ),
   },
@@ -470,7 +556,7 @@ export const SEED_LEGAL_FACTS: readonly FactRecord[] = [
   lawFact(
     'BB-F-000017',
     'fourteenth-amendment-equal-protection',
-    'The Fourteenth Amendment guarantees equal protection of the laws and due process to all persons within a state\'s jurisdiction.',
+    "The Fourteenth Amendment guarantees equal protection of the laws and due process to all persons within a state's jurisdiction.",
     '14th Amendment — equal protection',
     'ent_seed_law_14th',
     '1868',

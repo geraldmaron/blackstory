@@ -1,4 +1,3 @@
-
 /**
  * Scheduled jobs reuse existing kill-switch mechanism verbatim (packages/config/src/
  * kill-switches.ts) rather than inventing a parallel one. Discovery-campaign jobs reuse the

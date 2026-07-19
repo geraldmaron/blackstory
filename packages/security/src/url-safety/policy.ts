@@ -1,4 +1,3 @@
-
 /**
  * Parses external URLs and classifies every literal or DNS-resolved destination.
  * The policy fails closed for non-web schemes, credentials, ambiguous DNS, and
@@ -54,9 +53,8 @@ const METADATA_HOSTS = new Set([
 ]);
 
 function canonicalHostname(hostname: string): string {
-  const unwrapped = hostname.startsWith('[') && hostname.endsWith(']')
-    ? hostname.slice(1, -1)
-    : hostname;
+  const unwrapped =
+    hostname.startsWith('[') && hostname.endsWith(']') ? hostname.slice(1, -1) : hostname;
   return unwrapped.toLowerCase().replace(/\.$/u, '');
 }
 
@@ -105,7 +103,8 @@ function expandIpv6(address: string): bigint | undefined {
   if (embedded) {
     const value = ipv4Number(embedded[1]!);
     if (value === undefined) return undefined;
-    candidate = candidate.slice(0, -embedded[1]!.length) +
+    candidate =
+      candidate.slice(0, -embedded[1]!.length) +
       `${((value >>> 16) & 0xffff).toString(16)}:${(value & 0xffff).toString(16)}`;
   }
   const halves = candidate.split('::');
@@ -114,7 +113,8 @@ function expandIpv6(address: string): bigint | undefined {
   const right = halves[1] ? halves[1].split(':') : [];
   const missing = 8 - left.length - right.length;
   if ((halves.length === 1 && missing !== 0) || missing < 0) return undefined;
-  const groups = halves.length === 2 ? [...left, ...Array<string>(missing).fill('0'), ...right] : left;
+  const groups =
+    halves.length === 2 ? [...left, ...Array<string>(missing).fill('0'), ...right] : left;
   if (groups.length !== 8 || groups.some((group) => !/^[\da-f]{1,4}$/u.test(group))) {
     return undefined;
   }
@@ -147,8 +147,10 @@ export function isPublicIpAddress(address: string): boolean {
   const family = isIP(canonical);
   if (family === 4) {
     const value = ipv4Number(canonical);
-    return value !== undefined &&
-      !BLOCKED_IPV4_RANGES.some(([base, prefix]) => inIpv4Range(value, base, prefix));
+    return (
+      value !== undefined &&
+      !BLOCKED_IPV4_RANGES.some(([base, prefix]) => inIpv4Range(value, base, prefix))
+    );
   }
   if (family === 6) {
     const value = expandIpv6(canonical);

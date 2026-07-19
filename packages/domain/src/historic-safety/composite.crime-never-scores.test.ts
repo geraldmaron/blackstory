@@ -22,7 +22,11 @@ import {
 import type { LayerSignal } from './types.js';
 
 const PLACE = 'place_crime_guard_1';
-const CITATION = { claimId: 'claim_1', sourceLabel: 'EJI', retrievedAt: '2026-01-01T00:00:00.000Z' };
+const CITATION = {
+  claimId: 'claim_1',
+  sourceLabel: 'EJI',
+  retrievedAt: '2026-01-01T00:00:00.000Z',
+};
 
 function layerSignal(
   layerId: LayerSignal['layerId'],
@@ -60,7 +64,12 @@ test('defense 1: CompositeLayerInputs has no slot for modern_context or crime-co
 
 test('defense 2: assertNoExcludedLayerInComposite rejects a modern_context signal in every slot', () => {
   const modernSignal = layerSignal('modern_context', 0.9);
-  for (const slot of ['documentedEvents', 'sundownTown', 'exclusionInfrastructure', 'presenceAffirmation'] as const) {
+  for (const slot of [
+    'documentedEvents',
+    'sundownTown',
+    'exclusionInfrastructure',
+    'presenceAffirmation',
+  ] as const) {
     assert.throws(
       () => assertNoExcludedLayerInComposite({ [slot]: modernSignal }),
       /modern_context|never enter the composite/,
@@ -79,7 +88,12 @@ test('defense 3: computeComposite output passes assertScoringInputFreeOfExcluded
 test('defense 3: assertScoringInputFreeOfExcludedData rejects every general-crime banned key at any depth', () => {
   for (const key of GENERAL_CRIME_STATS_SCORING_BANNED_KEYS) {
     assert.throws(
-      () => assertGeneralCrimeStatsAbsentFromScoringInput({ placeEntityId: PLACE, value: 0.5, [key]: 42 }),
+      () =>
+        assertGeneralCrimeStatsAbsentFromScoringInput({
+          placeEntityId: PLACE,
+          value: 0.5,
+          [key]: 42,
+        }),
       ScoringExclusionError,
     );
   }
@@ -94,7 +108,8 @@ test('defense 3: a GeneralCrimeContextRecord is labeled context only and never f
     sourceLabel: 'FBI CDE/NIBRS',
   });
   assert.throws(
-    () => assertGeneralCrimeStatsAbsentFromScoringInput({ layers: { documentedEvents: crimeContext } }),
+    () =>
+      assertGeneralCrimeStatsAbsentFromScoringInput({ layers: { documentedEvents: crimeContext } }),
     /nibrsOffenseCount|generalCrimeContext/,
   );
   assert.throws(
@@ -122,7 +137,12 @@ test('defense 3: advisory fields in a composite-shaped object are rejected ( ext
       assertScoringInputFreeOfExcludedData({
         placeEntityId: PLACE,
         value: 0.4,
-        layerContributions: { documented_events: 0.4, sundown_town: 0, exclusion_infrastructure: 0, presence_affirmation: 0 },
+        layerContributions: {
+          documented_events: 0.4,
+          sundown_town: 0,
+          exclusion_infrastructure: 0,
+          presence_affirmation: 0,
+        },
         advisoryRecord: advisory,
       }),
     /advisoryRecord|advisory data must never enter/,

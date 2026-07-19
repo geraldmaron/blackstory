@@ -7,7 +7,10 @@
  * (via `Pick`) so callers can validate against partial data without constructing a full
  * `EntityRelationship`.
  */
-import { assertRelationshipHasEvidence, assertRelationshipTemporalRequirement } from './relationship.js';
+import {
+  assertRelationshipHasEvidence,
+  assertRelationshipTemporalRequirement,
+} from './relationship.js';
 import type { EntityRelationship } from './relationship.js';
 
 // ---------------------------------------------------------------------------
@@ -41,9 +44,7 @@ export type SelfCorroborationCheck = {
 };
 
 /** Removes self-references from a proposed corroboration set. Pure; never throws. */
-export function excludeSelfFromCorroboration(
-  input: SelfCorroborationCheck,
-): readonly string[] {
+export function excludeSelfFromCorroboration(input: SelfCorroborationCheck): readonly string[] {
   return input.corroboratingRelationshipIds.filter((id) => id !== input.relationshipId);
 }
 
@@ -112,7 +113,9 @@ export type RelationshipPublishInvariantInput = {
  * counting callers that need `independentLineageCount` should compute it via
  * `countUniqueSyndicatedEvidenceLineages` before calling this.
  */
-export function assertRelationshipPublishInvariants(input: RelationshipPublishInvariantInput): void {
+export function assertRelationshipPublishInvariants(
+  input: RelationshipPublishInvariantInput,
+): void {
   assertRelationshipHasEvidence(input.relationship);
   assertRelationshipEndpointsResolvedForPublish(input.relationship);
   assertRelationshipTemporalRequirement(input.relationship);

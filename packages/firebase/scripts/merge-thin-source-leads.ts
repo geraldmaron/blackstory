@@ -126,7 +126,9 @@ function scoreLead(lead: Lead, entity: CatalogEntity): number {
   if (tokenHit) score += 15;
   else score -= 12;
 
-  if (/african.?american|black history|freedom colony|historic places|national register/i.test(title)) {
+  if (
+    /african.?american|black history|freedom colony|historic places|national register/i.test(title)
+  ) {
     score += 6;
   }
 
@@ -151,7 +153,9 @@ function buildClaim(lead: Lead, entity: CatalogEntity): CatalogClaim {
   };
 }
 
-function loadCatalog(catalogDir: string): Map<string, { file: string; entity: CatalogEntity; index: number }> {
+function loadCatalog(
+  catalogDir: string,
+): Map<string, { file: string; entity: CatalogEntity; index: number }> {
   const map = new Map<string, { file: string; entity: CatalogEntity; index: number }>();
   for (const name of readdirSync(catalogDir)) {
     if (!name.endsWith('.json') || name.startsWith('_')) continue;

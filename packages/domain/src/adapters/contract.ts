@@ -2,7 +2,12 @@
  * Source adapter contract validation.
  */
 import { assertEvidenceSourceValid } from '../provenance/source.js';
-import type { GeographicCoverage, RateLimitPolicy, SourceAdapterContract, VolumeExpectation } from './types.js';
+import type {
+  GeographicCoverage,
+  RateLimitPolicy,
+  SourceAdapterContract,
+  VolumeExpectation,
+} from './types.js';
 
 export function assertRateLimitPolicyValid(policy: RateLimitPolicy): void {
   if (!Number.isFinite(policy.requestsPerMinute) || policy.requestsPerMinute <= 0) {

@@ -14,7 +14,10 @@ test('buildCompactFactView carries the canonical URL and citation set every embe
 });
 
 test('buildCompactFactView prefers a supports-role citation as primary', () => {
-  const contradicts = buildFixtureCitation({ csl: { id: 'c1', type: 'webpage' }, role: 'contradicts' });
+  const contradicts = buildFixtureCitation({
+    csl: { id: 'c1', type: 'webpage' },
+    role: 'contradicts',
+  });
   const supports = buildFixtureCitation({ csl: { id: 'c2', type: 'webpage' }, role: 'supports' });
   const fact = buildFixtureFact({ citations: [contradicts, supports] });
   const view = buildCompactFactView(fact);
@@ -22,7 +25,10 @@ test('buildCompactFactView prefers a supports-role citation as primary', () => {
 });
 
 test('buildCompactFactView falls back to the first citation when none supports', () => {
-  const contradicts = buildFixtureCitation({ csl: { id: 'c1', type: 'webpage' }, role: 'contradicts' });
+  const contradicts = buildFixtureCitation({
+    csl: { id: 'c1', type: 'webpage' },
+    role: 'contradicts',
+  });
   const fact = buildFixtureFact({ citations: [contradicts] });
   const view = buildCompactFactView(fact);
   assert.equal(view.primaryCitation?.role, 'contradicts');

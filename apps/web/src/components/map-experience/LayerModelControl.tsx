@@ -44,7 +44,11 @@ export function LayerModelControl({
     <div className="ds-explore__layer-model">
       <fieldset className="ds-explore__layer-model-fieldset">
         <legend className="ds-sans">Map data model</legend>
-        <div className="ds-explore__layer-model-options" role="radiogroup" aria-label="Map data model">
+        <div
+          className="ds-explore__layer-model-options"
+          role="radiogroup"
+          aria-label="Map data model"
+        >
           {LAYER_OPTIONS.map((option) => (
             <label className="ds-explore__layer-model-option" key={option.value}>
               <input
@@ -67,7 +71,9 @@ export function LayerModelControl({
             className="ds-pill-select__control"
             id="explore-pop-decade"
             value={popDecade}
-            onChange={(event) => onPopDecadeChange(event.currentTarget.value as CensusPopulationDecade)}
+            onChange={(event) =>
+              onPopDecadeChange(event.currentTarget.value as CensusPopulationDecade)
+            }
           >
             {CENSUS_POPULATION_DECADES.map((decade) => (
               <option key={decade} value={decade}>
@@ -86,7 +92,9 @@ export function LayerModelControl({
               className="ds-pill-select__control"
               id="explore-pop-from"
               value={popFrom}
-              onChange={(event) => onPopFromChange(event.currentTarget.value as CensusPopulationDecade)}
+              onChange={(event) =>
+                onPopFromChange(event.currentTarget.value as CensusPopulationDecade)
+              }
             >
               {CENSUS_POPULATION_DECADES.map((decade) => (
                 <option key={decade} value={decade}>
@@ -101,7 +109,9 @@ export function LayerModelControl({
               className="ds-pill-select__control"
               id="explore-pop-to"
               value={popTo}
-              onChange={(event) => onPopToChange(event.currentTarget.value as CensusPopulationDecade)}
+              onChange={(event) =>
+                onPopToChange(event.currentTarget.value as CensusPopulationDecade)
+              }
             >
               {CENSUS_POPULATION_DECADES.map((decade) => (
                 <option key={decade} value={decade}>

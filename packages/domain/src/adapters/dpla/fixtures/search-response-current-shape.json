@@ -7,7 +7,9 @@
       "id": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
       "sourceResource": {
         "title": ["Piedmont County Colored School, class photograph, 1931"],
-        "description": ["Class photograph from the Piedmont County Colored School, donated by the county historical society."],
+        "description": [
+          "Class photograph from the Piedmont County Colored School, donated by the county historical society."
+        ],
         "date": { "displayDate": "1931" },
         "subject": [{ "name": "Schools" }, { "name": "Piedmont County" }]
       },

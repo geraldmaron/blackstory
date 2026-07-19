@@ -10,13 +10,9 @@ function uniqueSourceReferences(
   const seen = new Set<string>();
   const merged: SourceReference[] = [];
   for (const ref of references) {
-    const key = [
-      ref.sourceId,
-      ref.adapterId,
-      ref.stableIdentifier,
-      ref.runId,
-      ref.capturedAt,
-    ].join('::');
+    const key = [ref.sourceId, ref.adapterId, ref.stableIdentifier, ref.runId, ref.capturedAt].join(
+      '::',
+    );
     if (seen.has(key)) {
       continue;
     }

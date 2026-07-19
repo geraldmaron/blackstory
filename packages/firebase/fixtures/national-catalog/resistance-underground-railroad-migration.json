@@ -4,13 +4,8 @@
     "kind": "event",
     "displayName": "Stono Rebellion",
     "summary": "On September 9, 1739, roughly 20 enslaved Africans near the Stono River seized weapons from a store, killed several enslavers, and marched south toward Spanish Florida calling on others to join them in freedom before militia crushed the revolt — the largest slave uprising in Britain's mainland North American colonies.",
-    "eraBuckets": [
-      "1730s"
-    ],
-    "topicTags": [
-      "resistance",
-      "rebellion"
-    ],
+    "eraBuckets": ["1730s"],
+    "topicTags": ["resistance", "rebellion"],
     "jurisdictionLabel": "Rantowles, South Carolina",
     "locationPrecision": "campus",
     "locationLabel": "Stono Rebellion historical marker, Savannah Highway (US 17), Rantowles",
@@ -36,10 +31,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "The rebellion's suppression prompted South Carolina's 1740 Negro Act, which tightened restrictions on enslaved people's movement, assembly, and literacy for generations. Historians read the marchers' choice of Spanish Florida — where Fort Mose already sheltered self-emancipated people — as a deliberate, informed bid for freedom rather than a spontaneous outburst.",
-    "topicIds": [
-      "resistance",
-      "rebellion"
-    ],
+    "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -48,13 +40,8 @@
     "kind": "event",
     "displayName": "New York Slave Revolt of 1712",
     "summary": "Before dawn on April 7, 1712, enslaved New Yorkers set fire to a building near Maiden Lane and attacked responding colonists with guns and hatchets in a coordinated bid for freedom — one of the earliest organized uprisings against slavery in Britain's mainland colonies, met with brutal mass executions.",
-    "eraBuckets": [
-      "1710s"
-    ],
-    "topicTags": [
-      "resistance",
-      "rebellion"
-    ],
+    "eraBuckets": ["1710s"],
+    "topicTags": ["resistance", "rebellion"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "neighborhood",
     "locationLabel": "Maiden Lane, Lower Manhattan",
@@ -80,10 +67,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "New York held one of the largest enslaved populations of any British mainland colony — roughly one in five residents was enslaved in 1712 — and enslaved and free people often worked and lived in close proximity, which colonial authorities blamed for enabling the coordinated action. The uprising is among the earliest organized slave revolts documented in what became the United States.",
-    "topicIds": [
-      "resistance",
-      "rebellion"
-    ],
+    "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -92,13 +76,8 @@
     "kind": "event",
     "displayName": "New York Conspiracy of 1741",
     "summary": "After a string of fires swept Manhattan in spring 1741, colonial authorities prosecuted more than 150 enslaved and free Black New Yorkers and white co-defendants on charges of plotting to burn the city, executing 30 Black defendants in one of the largest mass executions in American history.",
-    "eraBuckets": [
-      "1740s"
-    ],
-    "topicTags": [
-      "resistance",
-      "rebellion"
-    ],
+    "eraBuckets": ["1740s"],
+    "topicTags": ["resistance", "rebellion"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "campus",
     "locationLabel": "Site of the colonial New York City Hall (now Federal Hall National Memorial), Wall and Nassau Streets",
@@ -124,10 +103,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Whatever the underlying truth, the trials produced one of the largest mass executions in American history and were followed by tighter restrictions on enslaved New Yorkers' assembly, movement, and access to water pumps — a reminder that even a doubtful conspiracy charge could be wielded to terrorize an entire community.",
-    "topicIds": [
-      "resistance",
-      "rebellion"
-    ],
+    "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -136,14 +112,8 @@
     "kind": "event",
     "displayName": "Gabriel's Rebellion",
     "summary": "In the summer of 1800, Gabriel, an enslaved blacksmith, organized enslaved and free Black Virginians across ten counties to march on Richmond, seize the armory, and hold Governor James Monroe hostage until Virginia abolished slavery; a storm and betrayal halted the plan before it began.",
-    "eraBuckets": [
-      "1800s"
-    ],
-    "topicTags": [
-      "resistance",
-      "rebellion",
-      "organizing"
-    ],
+    "eraBuckets": ["1800s"],
+    "topicTags": ["resistance", "rebellion", "organizing"],
     "jurisdictionLabel": "Richmond, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Gabriel's Execution historical marker, East Broad Street between 15th and 16th Streets",
@@ -169,11 +139,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Gabriel modeled his plan partly on the Haitian Revolution and the rhetoric of the American and French Revolutions, and reportedly planned to spare Quakers, Methodists, and Frenchmen as potential allies. Virginia's legislature responded not with reform but with harsher restrictions on free Black residents and enslaved people's education, assembly, and hiring.",
-    "topicIds": [
-      "resistance",
-      "rebellion",
-      "organizing"
-    ],
+    "topicIds": ["resistance", "rebellion", "organizing"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -182,13 +148,8 @@
     "kind": "event",
     "displayName": "Pointe Coupée Slave Conspiracy of 1795",
     "summary": "In spring 1795, enslaved people on Julien Poydras's and neighboring plantations in Spanish Louisiana's Pointe Coupée district planned an uprising inspired by the Haitian and French Revolutions; authorities uncovered the plot, tried dozens, and hanged 23 conspirators, their bodies displayed along the road as a warning.",
-    "eraBuckets": [
-      "1790s"
-    ],
-    "topicTags": [
-      "resistance",
-      "rebellion"
-    ],
+    "eraBuckets": ["1790s"],
+    "topicTags": ["resistance", "rebellion"],
     "jurisdictionLabel": "New Roads, Louisiana",
     "locationPrecision": "city",
     "locationLabel": "Pointe Coupee Parish, near New Roads",
@@ -214,10 +175,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Investigators found a copy of the French Declaration of the Rights of Man in an enslaved man's cabin, underscoring how Atlantic revolutionary ideas circulated among the enslaved population of the lower Mississippi Valley. Governor Francisco Luis Héctor de Carondelet used the conspiracy to justify stricter controls on Louisiana's enslaved population.",
-    "topicIds": [
-      "resistance",
-      "rebellion"
-    ],
+    "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -226,13 +184,8 @@
     "kind": "event",
     "displayName": "1811 German Coast Uprising",
     "summary": "On January 8-10, 1811, enslaved men led by Charles Deslondes marched from plantations near LaPlace toward New Orleans in the largest slave rebellion in U.S. history, growing to several hundred participants before militia and U.S. troops suppressed it; the trials were held at Destrehan Plantation.",
-    "eraBuckets": [
-      "1810s"
-    ],
-    "topicTags": [
-      "resistance",
-      "rebellion"
-    ],
+    "eraBuckets": ["1810s"],
+    "topicTags": ["resistance", "rebellion"],
     "jurisdictionLabel": "Destrehan, Louisiana",
     "locationPrecision": "institution",
     "locationLabel": "Destrehan Plantation, 13034 River Road, Destrehan",
@@ -258,10 +211,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Though larger in scale than Nat Turner's later rebellion, the German Coast Uprising is comparatively little known outside Louisiana; a 2019 reenactment led by artist Dread Scott retraced the marchers' route to restore the event to public memory as an act of organized resistance rather than a footnote.",
-    "topicIds": [
-      "resistance",
-      "rebellion"
-    ],
+    "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -270,14 +220,8 @@
     "kind": "event",
     "displayName": "Denmark Vesey Conspiracy",
     "summary": "In 1822, Denmark Vesey, a free Black carpenter and church founder, organized a plan for enslaved and free Black Charlestonians to seize the city's armories and sail to Haiti; informants betrayed the plot before it began, and authorities hanged 35 people, including Vesey, that July.",
-    "eraBuckets": [
-      "1820s"
-    ],
-    "topicTags": [
-      "resistance",
-      "rebellion",
-      "organizing"
-    ],
+    "eraBuckets": ["1820s"],
+    "topicTags": ["resistance", "rebellion", "organizing"],
     "jurisdictionLabel": "Charleston, South Carolina",
     "locationPrecision": "institution",
     "locationLabel": "Old Charleston Jail, 21 Magazine Street, Charleston",
@@ -303,11 +247,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Vesey had helped found Charleston's African Church (the congregation that became Emanuel AME) two years earlier, and the conspiracy's exposure led the city to shutter that church and pass some of the antebellum South's most restrictive laws on Black assembly and literacy. Vesey is honored today with a Charleston monument dedicated in 2014 after decades of public debate.",
-    "topicIds": [
-      "resistance",
-      "rebellion",
-      "organizing"
-    ],
+    "topicIds": ["resistance", "rebellion", "organizing"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -316,15 +256,8 @@
     "kind": "person",
     "displayName": "Denmark Vesey",
     "summary": "A formerly enslaved carpenter who purchased his freedom with lottery winnings in 1799, Denmark Vesey became a Charleston community leader and church founder before organizing one of the most ambitious plans for Black liberation in U.S. history, for which he was executed in 1822.",
-    "eraBuckets": [
-      "1790s",
-      "1820s"
-    ],
-    "topicTags": [
-      "resistance",
-      "organizing",
-      "freedom"
-    ],
+    "eraBuckets": ["1790s", "1820s"],
+    "topicTags": ["resistance", "organizing", "freedom"],
     "jurisdictionLabel": "Charleston, South Carolina",
     "locationPrecision": "institution",
     "locationLabel": "Denmark Vesey House, 56 Bull Street, Charleston",
@@ -349,11 +282,7 @@
       }
     ],
     "historicalContext": "This entry is anchored at the Bull Street property because it is Vesey's federally designated National Historic Landmark, even though researchers now believe his actual home stood nearby and is no longer extant. He is more fully documented through the 1822 conspiracy he organized, held separately in this catalog.",
-    "topicIds": [
-      "resistance",
-      "organizing",
-      "freedom"
-    ],
+    "topicIds": ["resistance", "organizing", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -362,13 +291,8 @@
     "kind": "event",
     "displayName": "Nat Turner's Rebellion",
     "summary": "On August 21-22, 1831, Nat Turner, an enslaved preacher, led dozens of enslaved and free Black Virginians in an armed march through Southampton County that killed about 55 white residents before militia crushed the revolt — the deadliest slave uprising in U.S. history and a direct rebuke to slavery's claim of total control.",
-    "eraBuckets": [
-      "1830s"
-    ],
-    "topicTags": [
-      "resistance",
-      "rebellion"
-    ],
+    "eraBuckets": ["1830s"],
+    "topicTags": ["resistance", "rebellion"],
     "jurisdictionLabel": "Boykins, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Nat Turner's Insurrection historical marker, Route 35, Boykins",
@@ -394,10 +318,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Turner described his rebellion as a mission of divine judgment against slaveholders, framing his actions as fulfillment of prophecy rather than random violence. His confession, dictated to attorney Thomas Gray before his execution, remains a primary source for understanding his motives, though scholars caution that Gray's transcription reflects his own framing of events.",
-    "topicIds": [
-      "resistance",
-      "rebellion"
-    ],
+    "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -406,13 +327,8 @@
     "kind": "place",
     "displayName": "Southampton County Courthouse (Nat Turner Trial Site)",
     "summary": "In the town then known as Jerusalem, Virginia (renamed Courtland in 1888), the Southampton County Courthouse hosted the trials of Nat Turner and dozens of his fellow rebels between August and November 1831; the 1834 courthouse that replaced the trial-era building still stands on the same site.",
-    "eraBuckets": [
-      "1830s"
-    ],
-    "topicTags": [
-      "resistance",
-      "rebellion"
-    ],
+    "eraBuckets": ["1830s"],
+    "topicTags": ["resistance", "rebellion"],
     "jurisdictionLabel": "Courtland, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Southampton County Courthouse, Main Street, Courtland",
@@ -438,10 +354,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Distinct from the rebellion's starting point near present-day Boykins, this courthouse site represents the machinery of law that both tried Turner's rebels and, for over two centuries before 1831, had enforced Virginia's slave codes — a place where the state's response to Black resistance played out as much as the revolt itself.",
-    "topicIds": [
-      "resistance",
-      "rebellion"
-    ],
+    "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -450,12 +363,8 @@
     "kind": "event",
     "displayName": "Igbo Landing",
     "summary": "In 1803, a group of enslaved Igbo Africans who had overthrown their captors during a coastal Georgia slave sale marched into the waters of Dunbar Creek near St. Simons Island rather than submit to bondage, an act of self-liberation through death that became a lasting symbol of resistance in Black folklore.",
-    "eraBuckets": [
-      "1800s"
-    ],
-    "topicTags": [
-      "resistance"
-    ],
+    "eraBuckets": ["1800s"],
+    "topicTags": ["resistance"],
     "jurisdictionLabel": "St. Simons Island, Georgia",
     "locationPrecision": "neighborhood",
     "locationLabel": "Dunbar Creek, near Frederica Road and Sea Island Road, St. Simons Island",
@@ -481,9 +390,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Precise casualty figures and some details of the episode vary across oral traditions and the few surviving contemporaneous accounts, but the National Park Service and Georgia Historical Society both frame the event as a deliberate act of self-determination — 'you may enslave my body, but not my mind, not my soul' — rather than a story of passive victimhood, and it became a touchstone of the 'Flying Africans' folklore later documented across the Gullah Geechee corridor.",
-    "topicIds": [
-      "resistance"
-    ],
+    "topicIds": ["resistance"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -492,14 +399,8 @@
     "kind": "place",
     "displayName": "Negro Fort at Prospect Bluff",
     "summary": "Formerly enslaved people who had escaped to British-held Florida during the War of 1812 built a self-governing community of several hundred free Black settlers and Seminole allies around a fort at Prospect Bluff; U.S. forces destroyed it in a massive 1816 explosion, killing most of its occupants.",
-    "eraBuckets": [
-      "1810s"
-    ],
-    "topicTags": [
-      "resistance",
-      "freedom",
-      "community"
-    ],
+    "eraBuckets": ["1810s"],
+    "topicTags": ["resistance", "freedom", "community"],
     "jurisdictionLabel": "Sumatra, Florida",
     "locationPrecision": "campus",
     "locationLabel": "Prospect Bluff Historic Sites, Apalachicola National Forest, near Sumatra",
@@ -525,11 +426,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Prospect Bluff represented the largest community of free Black people in North America before the Civil War, and its destruction — ordered because U.S. commanders viewed an armed, self-governing Black settlement as an intolerable threat — is considered by some historians a precipitating event of the First Seminole War. The site is preserved today within the Apalachicola National Forest and listed on the National Register of Historic Places.",
-    "topicIds": [
-      "resistance",
-      "freedom",
-      "community"
-    ],
+    "topicIds": ["resistance", "freedom", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -538,15 +435,8 @@
     "kind": "place",
     "displayName": "Great Dismal Swamp Maroon Communities",
     "summary": "From at least the 1660s until the Civil War, thousands of self-emancipated Black maroons built durable, self-sufficient communities on the dry 'islands' inside the Great Dismal Swamp straddling Virginia and North Carolina, evading recapture for generations in one of the longest-running acts of collective resistance in American history.",
-    "eraBuckets": [
-      "1700s",
-      "1800s"
-    ],
-    "topicTags": [
-      "resistance",
-      "freedom",
-      "community"
-    ],
+    "eraBuckets": ["1700s", "1800s"],
+    "topicTags": ["resistance", "freedom", "community"],
     "jurisdictionLabel": "Suffolk, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Washington Ditch entrance, Great Dismal Swamp National Wildlife Refuge, Suffolk",
@@ -571,11 +461,7 @@
       }
     ],
     "historicalContext": "Unlike single rebellions that ended in defeat, the Dismal Swamp's maroon communities sustained multigenerational, self-governing Black life largely outside slaveholders' control for roughly two centuries — a sustained practice of self-determination that predates and outlasted most documented armed uprisings. The 111,000-acre refuge, established by Congress in 1974, today protects both the wetland ecosystem and this archaeological record.",
-    "topicIds": [
-      "resistance",
-      "freedom",
-      "community"
-    ],
+    "topicIds": ["resistance", "freedom", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -584,14 +470,8 @@
     "kind": "case",
     "displayName": "The Amistad Case",
     "summary": "After Mende captives led by Sengbe Pieh (Joseph Cinqué) seized the schooner La Amistad in 1839 and were taken into U.S. custody off Long Island, their two-year legal fight — argued before the Supreme Court by former President John Quincy Adams — ended in 1841 with the captives' freedom, a landmark affirmation of self-emancipation under American law.",
-    "eraBuckets": [
-      "1830s",
-      "1840s"
-    ],
-    "topicTags": [
-      "resistance",
-      "freedom"
-    ],
+    "eraBuckets": ["1830s", "1840s"],
+    "topicTags": ["resistance", "freedom"],
     "jurisdictionLabel": "New Haven, Connecticut",
     "locationPrecision": "campus",
     "locationLabel": "Amistad Memorial, site of the former New Haven Jail, New Haven",
@@ -616,10 +496,7 @@
       }
     ],
     "historicalContext": "The Amistad case became a rallying point for the American abolitionist movement and helped establish the Amistad Committee, which evolved into the American Missionary Association and later laid groundwork for Connecticut's statewide Freedom Trail of nearly 160 sites.",
-    "topicIds": [
-      "resistance",
-      "freedom"
-    ],
+    "topicIds": ["resistance", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -628,13 +505,8 @@
     "kind": "case",
     "displayName": "The Creole Case",
     "summary": "On November 7, 1841, Madison Washington led 18 fellow enslaved people in seizing control of the brig Creole en route from Richmond to New Orleans, sailing it to the British Bahamas where all 135 enslaved people aboard were declared free — the most successful slave revolt in U.S. history.",
-    "eraBuckets": [
-      "1840s"
-    ],
-    "topicTags": [
-      "resistance",
-      "freedom"
-    ],
+    "eraBuckets": ["1840s"],
+    "topicTags": ["resistance", "freedom"],
     "jurisdictionLabel": "Richmond, Virginia",
     "locationPrecision": "neighborhood",
     "locationLabel": "Richmond waterfront on the James River, departure point of the brig Creole",
@@ -659,10 +531,7 @@
       }
     ],
     "historicalContext": "Because it freed more enslaved people than any other slave-ship rebellion in U.S. history, the Creole case became a diplomatic flashpoint between the United States and Britain and a celebrated example for abolitionists, including Frederick Douglass, who fictionalized Madison Washington's leadership in his 1853 novella 'The Heroic Slave.'",
-    "topicIds": [
-      "resistance",
-      "freedom"
-    ],
+    "topicIds": ["resistance", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -671,13 +540,8 @@
     "kind": "event",
     "displayName": "John Brown's Raid on Harpers Ferry",
     "summary": "On October 16-18, 1859, John Brown led 21 men, including five Black raiders, in seizing the U.S. armory at Harpers Ferry, Virginia, intending to arm an insurrection against slavery; U.S. Marines retook the armory and Brown was hanged, but the raid accelerated the nation's path to civil war.",
-    "eraBuckets": [
-      "1850s"
-    ],
-    "topicTags": [
-      "resistance",
-      "abolition"
-    ],
+    "eraBuckets": ["1850s"],
+    "topicTags": ["resistance", "abolition"],
     "jurisdictionLabel": "Harpers Ferry, West Virginia",
     "locationPrecision": "campus",
     "locationLabel": "John Brown's Fort, Harpers Ferry National Historical Park",
@@ -703,10 +567,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Black raiders Copeland and Green were tried separately and hanged; Osborne Perry Anderson was the only Black participant to escape and later published an eyewitness account, 'A Voice from Harper's Ferry.' Frederick Douglass, who declined to join the raid himself, called Brown's willingness to die for Black freedom a turning point in the nation's reckoning with slavery.",
-    "topicIds": [
-      "resistance",
-      "abolition"
-    ],
+    "topicIds": ["resistance", "abolition"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -715,15 +576,8 @@
     "kind": "place",
     "displayName": "Levi Coffin House",
     "summary": "Known as the 'Grand Central Station' of the Underground Railroad, this Fountain City, Indiana home stood at the junction of three escape routes; Quaker abolitionists Levi and Catharine Coffin sheltered an estimated 2,000 freedom seekers here between 1826 and 1847.",
-    "eraBuckets": [
-      "1820s",
-      "1830s",
-      "1840s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "freedom"
-    ],
+    "eraBuckets": ["1820s", "1830s", "1840s"],
+    "topicTags": ["underground-railroad", "freedom"],
     "jurisdictionLabel": "Fountain City, Indiana",
     "locationPrecision": "campus",
     "locationLabel": "Levi and Catharine Coffin State Historic Site, Fountain City",
@@ -748,10 +602,7 @@
       }
     ],
     "historicalContext": "The Coffins operated openly rather than in total secrecy, trusting their Quaker community's shared abolitionist commitment and the protection of a well-organized regional network. The house is administered today by the Indiana State Museum and Historic Sites and is part of the National Park Service's Network to Freedom program.",
-    "topicIds": [
-      "underground-railroad",
-      "freedom"
-    ],
+    "topicIds": ["underground-railroad", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -760,17 +611,8 @@
     "kind": "person",
     "displayName": "William Still",
     "summary": "As chairman of Philadelphia's Vigilance Committee, William Still personally aided an estimated 800 freedom seekers and kept detailed written records of their journeys, publishing them in 1872 as 'The Underground Railroad' — earning him recognition as the 'Father of the Underground Railroad.'",
-    "eraBuckets": [
-      "1840s",
-      "1850s",
-      "1860s",
-      "1870s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "organizing",
-      "freedom"
-    ],
+    "eraBuckets": ["1840s", "1850s", "1860s", "1870s"],
+    "topicTags": ["underground-railroad", "organizing", "freedom"],
     "jurisdictionLabel": "Philadelphia, Pennsylvania",
     "locationPrecision": "neighborhood",
     "locationLabel": "Pennsylvania Anti-Slavery Society offices, Old City, Philadelphia",
@@ -795,11 +637,7 @@
       }
     ],
     "historicalContext": "Still was moved to document fugitives' stories in part by his own family history: his older brother Peter Still, left enslaved in Alabama when their mother escaped with only two of her children, walked into the Philadelphia Anti-Slavery office decades later and the two brothers recognized each other. This entry is anchored near the historic Anti-Slavery Society offices in Philadelphia's Old City, the center of Still's decades of vigilance-committee work.",
-    "topicIds": [
-      "underground-railroad",
-      "organizing",
-      "freedom"
-    ],
+    "topicIds": ["underground-railroad", "organizing", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -808,16 +646,8 @@
     "kind": "place",
     "displayName": "Josiah Henson Museum and Park",
     "summary": "Josiah Henson was enslaved on the Isaac Riley plantation, now in North Bethesda, Maryland, from 1795 until his 1830 escape north with his wife and children; his 1849 autobiography inspired Harriet Beecher Stowe's 'Uncle Tom's Cabin,' and the site is preserved as a museum and park.",
-    "eraBuckets": [
-      "1790s",
-      "1800s",
-      "1810s",
-      "1820s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "freedom"
-    ],
+    "eraBuckets": ["1790s", "1800s", "1810s", "1820s"],
+    "topicTags": ["underground-railroad", "freedom"],
     "jurisdictionLabel": "North Bethesda, Maryland",
     "locationPrecision": "institution",
     "locationLabel": "Josiah Henson Museum and Park, 11410 Old Georgetown Road, North Bethesda",
@@ -842,10 +672,7 @@
       }
     ],
     "historicalContext": "After reaching Canada, Henson co-founded the Dawn Settlement, a self-governing community for formerly enslaved people in Ontario, and returned to the United States only as a free man and celebrated speaker. The Montgomery County site, part of the National Park Service's Network to Freedom, now includes a visitor center and the 1850s-era Riley-Bolten House.",
-    "topicIds": [
-      "underground-railroad",
-      "freedom"
-    ],
+    "topicIds": ["underground-railroad", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -854,14 +681,8 @@
     "kind": "place",
     "displayName": "Rokeby Museum",
     "summary": "This Ferrisburgh, Vermont farm was home to four generations of the Quaker Robinson family from 1793 to 1961; under abolitionist Rowland T. Robinson, Rokeby sheltered freedom seekers as a documented Underground Railroad station in the 1830s and 1840s.",
-    "eraBuckets": [
-      "1830s",
-      "1840s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "abolition"
-    ],
+    "eraBuckets": ["1830s", "1840s"],
+    "topicTags": ["underground-railroad", "abolition"],
     "jurisdictionLabel": "Ferrisburgh, Vermont",
     "locationPrecision": "institution",
     "locationLabel": "Rokeby Museum, 4334 US Route 7, Ferrisburgh",
@@ -886,10 +707,7 @@
       }
     ],
     "historicalContext": "The Robinson family's own history is layered: earlier generations of Robinsons had been enslavers before Thomas and Jemima Robinson's descendants became committed abolitionists, and the museum's exhibits address that transformation directly rather than erasing it.",
-    "topicIds": [
-      "underground-railroad",
-      "abolition"
-    ],
+    "topicIds": ["underground-railroad", "abolition"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -898,16 +716,8 @@
     "kind": "institution",
     "displayName": "Second Baptist Church of Detroit",
     "summary": "Founded in 1836 by thirteen formerly enslaved people who broke away from a segregated congregation, Second Baptist Church of Detroit became one of the last Underground Railroad stations before freedom seekers crossed into Canada, sheltering an estimated 5,000 people over more than three decades.",
-    "eraBuckets": [
-      "1830s",
-      "1840s",
-      "1850s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "freedom",
-      "organizing"
-    ],
+    "eraBuckets": ["1830s", "1840s", "1850s"],
+    "topicTags": ["underground-railroad", "freedom", "organizing"],
     "jurisdictionLabel": "Detroit, Michigan",
     "locationPrecision": "institution",
     "locationLabel": "Second Baptist Church, 441 Monroe Street, Detroit",
@@ -932,11 +742,7 @@
       }
     ],
     "historicalContext": "Frederick Douglass, Sojourner Truth, and John Brown all worked with Second Baptist's congregation, which moved to its present Monroe Street building in 1857 after a fire destroyed its original meeting hall. The church remains an active congregation today.",
-    "topicIds": [
-      "underground-railroad",
-      "freedom",
-      "organizing"
-    ],
+    "topicIds": ["underground-railroad", "freedom", "organizing"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -945,13 +751,8 @@
     "kind": "place",
     "displayName": "Niagara Falls Suspension Bridge Crossing",
     "summary": "After 1855, the International Suspension Bridge at Niagara Falls carried trains directly to the Canadian border, letting freedom seekers ride from Underground Railroad hubs in Philadelphia, Baltimore, and New York City and cross to freedom simply by staying aboard; Harriet Tubman led multiple groups across it.",
-    "eraBuckets": [
-      "1850s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "freedom"
-    ],
+    "eraBuckets": ["1850s"],
+    "topicTags": ["underground-railroad", "freedom"],
     "jurisdictionLabel": "Niagara Falls, New York",
     "locationPrecision": "institution",
     "locationLabel": "Niagara Falls Underground Railroad Heritage Center, 825 Depot Avenue West, Niagara Falls",
@@ -976,10 +777,7 @@
       }
     ],
     "historicalContext": "Niagara Falls's flourishing tourism industry employed many Black waiters and staff who quietly supported the Underground Railroad network, and the city's accessibility via the Erie Canal and multiple rail lines made it one of the most heavily trafficked northern crossing points into Canada.",
-    "topicIds": [
-      "underground-railroad",
-      "freedom"
-    ],
+    "topicIds": ["underground-railroad", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -988,15 +786,8 @@
     "kind": "place",
     "displayName": "Freedom House Museum",
     "summary": "This Alexandria, Virginia building housed the offices of Franklin and Armfield, the largest domestic slave-trading firm in the antebellum United States, which trafficked at least 5,000 enslaved people through its holding pens; it now operates as a museum honoring the enslaved and free Black people of Alexandria.",
-    "eraBuckets": [
-      "1820s",
-      "1830s",
-      "1840s"
-    ],
-    "topicTags": [
-      "freedom",
-      "resistance"
-    ],
+    "eraBuckets": ["1820s", "1830s", "1840s"],
+    "topicTags": ["freedom", "resistance"],
     "jurisdictionLabel": "Alexandria, Virginia",
     "locationPrecision": "institution",
     "locationLabel": "Freedom House Museum, 1315 Duke Street, Alexandria",
@@ -1022,10 +813,7 @@
     ],
     "sensitivityClass": "perpetrator_associated",
     "historicalContext": "Franklin and Armfield were among the wealthiest Americans of their era, building their fortune on forced separation of families; the museum today centers the perspective of the enslaved people trafficked through the site rather than the traders who profited from it, and is listed on the National Register of Historic Places.",
-    "topicIds": [
-      "freedom",
-      "resistance"
-    ],
+    "topicIds": ["freedom", "resistance"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1034,13 +822,8 @@
     "kind": "event",
     "displayName": "Christiana Resistance",
     "summary": "On September 11, 1851, William Parker, a self-emancipated man, organized armed Black residents of Christiana, Pennsylvania to resist a federal marshal's raid to recover four freedom seekers under the Fugitive Slave Act, killing enslaver Edward Gorsuch and successfully repelling the raid.",
-    "eraBuckets": [
-      "1850s"
-    ],
-    "topicTags": [
-      "resistance",
-      "underground-railroad"
-    ],
+    "eraBuckets": ["1850s"],
+    "topicTags": ["resistance", "underground-railroad"],
     "jurisdictionLabel": "Christiana, Pennsylvania",
     "locationPrecision": "campus",
     "locationLabel": "Christiana Riot Monument, Green Street and Slokom Avenue, Christiana",
@@ -1066,10 +849,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Federal prosecutors charged more than 30 participants, mostly Black, with treason, but a Philadelphia jury acquitted the first defendant within minutes and the government dropped the remaining cases, making Christiana a rare instance of successful armed Black self-defense against the Fugitive Slave Act rather than a story of retribution.",
-    "topicIds": [
-      "resistance",
-      "underground-railroad"
-    ],
+    "topicIds": ["resistance", "underground-railroad"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1078,13 +858,8 @@
     "kind": "event",
     "displayName": "Oberlin-Wellington Rescue",
     "summary": "On September 13, 1858, several hundred residents of Oberlin and Wellington, Ohio, Black and white together, surrounded a hotel to free John Price, a freedom seeker seized by slave catchers, and returned him safely to Oberlin before he escaped to Canada.",
-    "eraBuckets": [
-      "1850s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "resistance"
-    ],
+    "eraBuckets": ["1850s"],
+    "topicTags": ["underground-railroad", "resistance"],
     "jurisdictionLabel": "Wellington, Ohio",
     "locationPrecision": "neighborhood",
     "locationLabel": "Wellington public square, Wellington",
@@ -1109,10 +884,7 @@
       }
     ],
     "historicalContext": "The rescue is considered one of the events pushing the nation toward civil war, and it demonstrated the biracial character of Ohio's Underground Railroad network. Charles Langston's brother John Mercer Langston, a prominent Black attorney and later congressman, helped organize the rescuers' legal defense.",
-    "topicIds": [
-      "underground-railroad",
-      "resistance"
-    ],
+    "topicIds": ["underground-railroad", "resistance"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1121,16 +893,8 @@
     "kind": "place",
     "displayName": "Thomas Garrett Underground Railroad Station",
     "summary": "Working openly rather than in secrecy, Wilmington, Delaware station master Thomas Garrett helped an estimated 2,500 enslaved people reach freedom over four decades, coordinating closely with William Still in Philadelphia and providing Harriet Tubman with money and supplies on many of her missions.",
-    "eraBuckets": [
-      "1820s",
-      "1830s",
-      "1840s",
-      "1850s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "freedom"
-    ],
+    "eraBuckets": ["1820s", "1830s", "1840s", "1850s"],
+    "topicTags": ["underground-railroad", "freedom"],
     "jurisdictionLabel": "Wilmington, Delaware",
     "locationPrecision": "institution",
     "locationLabel": "227 Shipley Street, Wilmington",
@@ -1155,10 +919,7 @@
       }
     ],
     "historicalContext": "Garrett was convicted and fined in 1848 for helping the Hawkins family escape slavery, a judgment that left him financially devastated but did not stop his work; he continued aiding freedom seekers until his death in 1871, after which formerly enslaved Wilmington residents carried his coffin to burial.",
-    "topicIds": [
-      "underground-railroad",
-      "freedom"
-    ],
+    "topicIds": ["underground-railroad", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1167,16 +928,8 @@
     "kind": "place",
     "displayName": "John Rankin House",
     "summary": "Perched on a hill above Ripley, Ohio overlooking the Ohio River and Kentucky shore, this 1828 home let Presbyterian minister John Rankin signal freedom seekers with a lantern when it was safe to cross; Rankin and his family are credited with helping more than 2,000 enslaved people reach freedom.",
-    "eraBuckets": [
-      "1820s",
-      "1830s",
-      "1840s",
-      "1850s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "freedom"
-    ],
+    "eraBuckets": ["1820s", "1830s", "1840s", "1850s"],
+    "topicTags": ["underground-railroad", "freedom"],
     "jurisdictionLabel": "Ripley, Ohio",
     "locationPrecision": "institution",
     "locationLabel": "John Rankin House, 6152 Rankin Hill Road, Ripley",
@@ -1201,10 +954,7 @@
       }
     ],
     "historicalContext": "Ripley's riverfront position and its concentration of committed abolitionists, including Rankin and fellow conductor John P. Parker, made it one of the most active Underground Railroad crossing points on the entire Ohio River.",
-    "topicIds": [
-      "underground-railroad",
-      "freedom"
-    ],
+    "topicIds": ["underground-railroad", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1213,16 +963,8 @@
     "kind": "person",
     "displayName": "Jermain Wesley Loguen",
     "summary": "After escaping slavery in Tennessee, Jermain Wesley Loguen settled in Syracuse, New York, where his open defiance of the Fugitive Slave Act and work sheltering an estimated 1,500 freedom seekers earned him the title 'Underground Railroad King.'",
-    "eraBuckets": [
-      "1840s",
-      "1850s",
-      "1860s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "resistance",
-      "abolition"
-    ],
+    "eraBuckets": ["1840s", "1850s", "1860s"],
+    "topicTags": ["underground-railroad", "resistance", "abolition"],
     "jurisdictionLabel": "Syracuse, New York",
     "locationPrecision": "institution",
     "locationLabel": "Clinton Square (Jerry Rescue site), Syracuse",
@@ -1247,11 +989,7 @@
       }
     ],
     "historicalContext": "Loguen publicly declared at Syracuse City Hall in October 1850, 'I don't respect this law. I don't fear it. I won't obey it!' — helping establish Syracuse as a self-declared 'open city' for freedom seekers. He later became a bishop of the African Methodist Episcopal Zion Church, serving until his death in 1872.",
-    "topicIds": [
-      "underground-railroad",
-      "resistance",
-      "abolition"
-    ],
+    "topicIds": ["underground-railroad", "resistance", "abolition"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1260,14 +998,8 @@
     "kind": "place",
     "displayName": "Lewis and Harriet Hayden House",
     "summary": "Formerly enslaved in Kentucky, Lewis and Harriet Hayden turned their Boston home into the city's most active Underground Railroad safe house, reportedly keeping gunpowder ready to destroy it rather than allow anyone sheltered there to be recaptured.",
-    "eraBuckets": [
-      "1840s",
-      "1850s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "freedom"
-    ],
+    "eraBuckets": ["1840s", "1850s"],
+    "topicTags": ["underground-railroad", "freedom"],
     "jurisdictionLabel": "Boston, Massachusetts",
     "locationPrecision": "institution",
     "locationLabel": "Lewis and Harriet Hayden House, 66 Phillips Street, Boston",
@@ -1292,10 +1024,7 @@
       }
     ],
     "historicalContext": "During the Civil War, Hayden recruited Black soldiers for the 54th Massachusetts Regiment, and he later served in the Massachusetts House of Representatives in 1873, one of the state's first Black legislators.",
-    "topicIds": [
-      "underground-railroad",
-      "freedom"
-    ],
+    "topicIds": ["underground-railroad", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1304,14 +1033,8 @@
     "kind": "person",
     "displayName": "David Ruggles",
     "summary": "A Black abolitionist publisher and bookseller, David Ruggles co-founded the New York Committee of Vigilance in 1835 to defend Black New Yorkers from kidnappers and slave catchers, sheltering an estimated 600 freedom seekers, including a young Frederick Douglass in 1838.",
-    "eraBuckets": [
-      "1830s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "organizing",
-      "resistance"
-    ],
+    "eraBuckets": ["1830s"],
+    "topicTags": ["underground-railroad", "organizing", "resistance"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "36 Lispenard Street, Manhattan",
@@ -1336,11 +1059,7 @@
       }
     ],
     "historicalContext": "Ruggles also ran the first Black-owned bookstore and printing press in the United States and published one of the earliest Black-edited magazines; he later moved to Northampton, Massachusetts, where he became known as a pioneering hydrotherapist. This entry is anchored at his documented Lispenard Street residence in Manhattan.",
-    "topicIds": [
-      "underground-railroad",
-      "organizing",
-      "resistance"
-    ],
+    "topicIds": ["underground-railroad", "organizing", "resistance"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1349,16 +1068,8 @@
     "kind": "person",
     "displayName": "Harriet Jacobs",
     "summary": "To evade her enslaver and protect her children, Harriet Jacobs hid for nearly seven years in a cramped garret in her grandmother's Edenton, North Carolina home before escaping north in 1842; her 1861 memoir, 'Incidents in the Life of a Slave Girl,' remains a landmark first-person account of enslaved women's resistance.",
-    "eraBuckets": [
-      "1830s",
-      "1840s",
-      "1860s"
-    ],
-    "topicTags": [
-      "underground-railroad",
-      "resistance",
-      "freedom"
-    ],
+    "eraBuckets": ["1830s", "1840s", "1860s"],
+    "topicTags": ["underground-railroad", "resistance", "freedom"],
     "jurisdictionLabel": "Edenton, North Carolina",
     "locationPrecision": "campus",
     "locationLabel": "Harriet Jacobs historical marker, North Broad Street and Gale Street, Edenton",
@@ -1383,11 +1094,7 @@
       }
     ],
     "historicalContext": "Jacobs later worked as a nurse and relief organizer among formerly enslaved refugees during and after the Civil War in Virginia and Georgia before settling in Washington, D.C. Many buildings from her Edenton years no longer stand, but a self-guided walking tour from the Edenton State Historic Site Visitor Center traces the sites she describes.",
-    "topicIds": [
-      "underground-railroad",
-      "resistance",
-      "freedom"
-    ],
+    "topicIds": ["underground-railroad", "resistance", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1396,13 +1103,8 @@
     "kind": "person",
     "displayName": "Ona Judge",
     "summary": "Enslaved as a seamstress to Martha Washington, Ona Judge slipped out of the presidential mansion in Philadelphia in 1796 and reached Portsmouth, New Hampshire's free Black community; she evaded two Washington-family recapture attempts, including a 1799 escape to nearby Greenland, and died free in 1848.",
-    "eraBuckets": [
-      "1790s"
-    ],
-    "topicTags": [
-      "resistance",
-      "freedom"
-    ],
+    "eraBuckets": ["1790s"],
+    "topicTags": ["resistance", "freedom"],
     "jurisdictionLabel": "Greenland, New Hampshire",
     "locationPrecision": "city",
     "locationLabel": "Greenland, New Hampshire",
@@ -1427,10 +1129,7 @@
       }
     ],
     "historicalContext": "No structure tied to Judge's time in Greenland survives, so this entry is anchored at the town itself, honestly reflecting the limits of the physical record; a 2023 mural in Portsmouth commemorates her life. Judge refused two direct offers to return to the Washingtons' custody, telling an interviewer late in life she preferred 'death rather than to go back into slavery.'",
-    "topicIds": [
-      "resistance",
-      "freedom"
-    ],
+    "topicIds": ["resistance", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1439,14 +1138,8 @@
     "kind": "publication",
     "displayName": "The North Star",
     "summary": "Frederick Douglass launched The North Star from Rochester, New York on December 3, 1847, funded by his British speaking-tour earnings, to give formerly enslaved and free Black writers direct control of an abolitionist newspaper; it merged into Frederick Douglass' Paper in 1851.",
-    "eraBuckets": [
-      "1840s"
-    ],
-    "topicTags": [
-      "abolition",
-      "underground-railroad",
-      "organizing"
-    ],
+    "eraBuckets": ["1840s"],
+    "topicTags": ["abolition", "underground-railroad", "organizing"],
     "jurisdictionLabel": "Rochester, New York",
     "locationPrecision": "institution",
     "locationLabel": "Talman Building, 25 East Main Street, Rochester",
@@ -1471,11 +1164,7 @@
       }
     ],
     "historicalContext": "The North Star's masthead motto — 'Right is of no Sex, Truth is of no Color, God is the Father of us all, and we are all Brethren' — reflected Douglass's insistence on Black-led abolitionist journalism independent of white-run antislavery papers of the era.",
-    "topicIds": [
-      "abolition",
-      "underground-railroad",
-      "organizing"
-    ],
+    "topicIds": ["abolition", "underground-railroad", "organizing"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1484,13 +1173,8 @@
     "kind": "case",
     "displayName": "The Trial of Anthony Burns",
     "summary": "Anthony Burns, who escaped slavery in Virginia in 1854, was arrested in Boston under the Fugitive Slave Act; his rendition required 2,000 federal troops to enforce over mass abolitionist protests and a failed courthouse rescue, galvanizing Massachusetts opposition to slavery before Boston abolitionists later purchased his freedom.",
-    "eraBuckets": [
-      "1850s"
-    ],
-    "topicTags": [
-      "resistance",
-      "underground-railroad"
-    ],
+    "eraBuckets": ["1850s"],
+    "topicTags": ["resistance", "underground-railroad"],
     "jurisdictionLabel": "Boston, Massachusetts",
     "locationPrecision": "campus",
     "locationLabel": "Boston Courthouse site, Court Square, Boston",
@@ -1515,10 +1199,7 @@
       }
     ],
     "historicalContext": "Public outrage over the Burns case shifted Massachusetts opinion sharply against the Fugitive Slave Law and led the state legislature to pass a Personal Liberty Law making the federal act nearly unenforceable there — a case where the law's brutal enforcement backfired into political defeat for slavery's federal defenders.",
-    "topicIds": [
-      "resistance",
-      "underground-railroad"
-    ],
+    "topicIds": ["resistance", "underground-railroad"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1527,20 +1208,8 @@
     "kind": "movement",
     "displayName": "The Great Migration",
     "summary": "Between 1916 and 1970, roughly six million African Americans left the rural South for cities in the North, Midwest, and West, escaping Jim Crow segregation, disenfranchisement, and sharecropping debt peonage in the largest internal migration in U.S. history, permanently reshaping the nation's cities and culture.",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s",
-      "1940s",
-      "1950s",
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "freedom",
-      "organizing"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s", "1940s", "1950s", "1960s", "1970s"],
+    "topicTags": ["great-migration", "freedom", "organizing"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "neighborhood",
     "locationLabel": "Former Illinois Central Railroad Central Station, Michigan Avenue and Roosevelt Road, Chicago",
@@ -1565,11 +1234,7 @@
       }
     ],
     "historicalContext": "Historians typically divide the migration into two waves: the First Great Migration (1916-1940), spurred partly by World War I labor demand, and the Second Great Migration (1940-1970), driven by World War II defense industry jobs and reaching further into the West Coast. The movement was an act of collective self-determination — millions of families weighing danger and opportunity and choosing, in massive numbers, to leave rather than continue living under Jim Crow.",
-    "topicIds": [
-      "great-migration",
-      "freedom",
-      "organizing"
-    ],
+    "topicIds": ["great-migration", "freedom", "organizing"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1578,16 +1243,8 @@
     "kind": "publication",
     "displayName": "Chicago Defender",
     "summary": "Founded by Robert S. Abbott in 1905 with an initial press run of 300 copies, the Chicago Defender became the nation's most influential Black weekly by World War I, using editorials, job listings, and train schedules to actively recruit Southern Black readers north during the Great Migration.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "organizing",
-      "publication"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["great-migration", "organizing", "publication"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "Chicago Defender Building, 2400 South Michigan Avenue, Chicago",
@@ -1612,11 +1269,7 @@
       }
     ],
     "historicalContext": "The Defender was banned or suppressed by some Southern authorities and vigilantes who recognized its power to encourage Black Southerners to leave; its distribution network of Pullman porters, who carried bundles of papers on southbound trains, made it a form of institution-building resistance in its own right, not merely a chronicle of the migration it helped cause.",
-    "topicIds": [
-      "great-migration",
-      "organizing",
-      "publication"
-    ],
+    "topicIds": ["great-migration", "organizing", "publication"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1625,18 +1278,8 @@
     "kind": "publication",
     "displayName": "Pittsburgh Courier",
     "summary": "Founded in 1907 and built into a national powerhouse under editor Robert Lee Vann after 1910, the Pittsburgh Courier grew to a circulation of 250,000 across 14 American cities by 1940, using its influence to document the Great Migration and later launch the World War II-era 'Double V' campaign.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s",
-      "1930s",
-      "1940s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "organizing",
-      "publication"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s", "1930s", "1940s"],
+    "topicTags": ["great-migration", "organizing", "publication"],
     "jurisdictionLabel": "Pittsburgh, Pennsylvania",
     "locationPrecision": "neighborhood",
     "locationLabel": "Hill District, Pittsburgh",
@@ -1661,11 +1304,7 @@
       }
     ],
     "historicalContext": "The Courier was based in Pittsburgh's Hill District, itself a major Great Migration destination neighborhood, and its reporters covered the community's rapid growth from roughly 10,000 Black residents in 1890 to over 37,000 by 1920. The paper's 1942 'Double Victory' campaign later linked the fight against fascism abroad to the fight against segregation at home.",
-    "topicIds": [
-      "great-migration",
-      "organizing",
-      "publication"
-    ],
+    "topicIds": ["great-migration", "organizing", "publication"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1674,14 +1313,8 @@
     "kind": "organization",
     "displayName": "National Urban League",
     "summary": "Founded in New York City in 1910 by Ruth Standish Baldwin and Dr. George Edmund Haynes as the Committee on Urban Conditions Among Negroes, the organization that became the National Urban League helped Great Migration arrivals find housing, jobs, and a foothold in unfamiliar Northern cities.",
-    "eraBuckets": [
-      "1900s",
-      "1910s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "organizing"
-    ],
+    "eraBuckets": ["1900s", "1910s"],
+    "topicTags": ["great-migration", "organizing"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "city",
     "locationLabel": "New York City",
@@ -1706,10 +1339,7 @@
       }
     ],
     "historicalContext": "Unlike the NAACP, which focused on legal and political rights, the Urban League concentrated on the practical, day-to-day work of economic self-sufficiency for Great Migration arrivals — job placement, housing assistance, and vocational training — establishing affiliates in dozens of cities as the migration accelerated through the 1910s and 1920s.",
-    "topicIds": [
-      "great-migration",
-      "organizing"
-    ],
+    "topicIds": ["great-migration", "organizing"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1718,17 +1348,8 @@
     "kind": "place",
     "displayName": "Black Bottom and Paradise Valley",
     "summary": "Settled by Great Migration arrivals as Detroit's Black population grew from about 5,700 in 1910 to 120,000 by 1930, Black Bottom and Paradise Valley became home to more than 300 Black-owned businesses and a thriving nightclub scene before both neighborhoods were demolished in the early 1960s for highway construction.",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s",
-      "1940s",
-      "1950s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "community"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s", "1940s", "1950s"],
+    "topicTags": ["great-migration", "community"],
     "jurisdictionLabel": "Detroit, Michigan",
     "locationPrecision": "neighborhood",
     "locationLabel": "Black Bottom and Paradise Valley, bounded roughly by Brush Street, the Grand Trunk railroad, and the Detroit River",
@@ -1753,10 +1374,7 @@
       }
     ],
     "historicalContext": "The name 'Black Bottom' originated with French colonial settlers describing the area's dark, fertile soil, predating the Black community that later built its economic and cultural life there; Paradise Valley specifically referred to the neighborhood's entertainment district of jazz clubs and theaters that drew major touring performers through the 1940s and 1950s.",
-    "topicIds": [
-      "great-migration",
-      "community"
-    ],
+    "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1765,15 +1383,8 @@
     "kind": "place",
     "displayName": "Fillmore District",
     "summary": "San Francisco's African American population grew nearly ninefold during World War II as Great Migration arrivals filled homes vacated by Japanese American internment, building the Fillmore District into 'Harlem of the West,' a jazz district that drew Louis Armstrong, Billie Holiday, and Ella Fitzgerald before 1960s-70s redevelopment displaced thousands of Black families.",
-    "eraBuckets": [
-      "1940s",
-      "1950s",
-      "1960s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "community"
-    ],
+    "eraBuckets": ["1940s", "1950s", "1960s"],
+    "topicTags": ["great-migration", "community"],
     "jurisdictionLabel": "San Francisco, California",
     "locationPrecision": "neighborhood",
     "locationLabel": "Fillmore District, San Francisco",
@@ -1798,10 +1409,7 @@
       }
     ],
     "historicalContext": "Many former Fillmore residents describe the redevelopment era's demolitions as 'Negro Removal' rather than neutral urban renewal, and Black-owned businesses have organized in recent years to reclaim commercial space in the neighborhood their families built during the Second Great Migration.",
-    "topicIds": [
-      "great-migration",
-      "community"
-    ],
+    "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1810,18 +1418,8 @@
     "kind": "place",
     "displayName": "Central District",
     "summary": "Anchored by William Grose's 1882 land purchase, Seattle's Central District grew from a few hundred Black residents in 1900 to become, by the 1970s, the heart of Black Seattle and the center of the city's civil rights movement, as Great Migration arrivals were channeled there by redlining.",
-    "eraBuckets": [
-      "1880s",
-      "1900s",
-      "1940s",
-      "1950s",
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "community"
-    ],
+    "eraBuckets": ["1880s", "1900s", "1940s", "1950s", "1960s", "1970s"],
+    "topicTags": ["great-migration", "community"],
     "jurisdictionLabel": "Seattle, Washington",
     "locationPrecision": "neighborhood",
     "locationLabel": "Central District, Seattle",
@@ -1846,10 +1444,7 @@
       }
     ],
     "historicalContext": "By the 1970s the Central District had become the organizing center of Seattle's civil rights movement, home to churches, Black-owned businesses, and community institutions built over nearly a century, even as discriminatory redlining had initially forced that concentration rather than freely choosing it.",
-    "topicIds": [
-      "great-migration",
-      "community"
-    ],
+    "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1858,19 +1453,8 @@
     "kind": "place",
     "displayName": "Hill District",
     "summary": "Pittsburgh's Hill District grew from about 10,000 Black residents in 1890 to more than 37,000 by 1920 as Great Migration arrivals came for steel-mill jobs, building a jazz scene that hosted Duke Ellington, Louis Armstrong, and homegrown talents Lena Horne, Billy Eckstine, and Earl 'Fatha' Hines.",
-    "eraBuckets": [
-      "1890s",
-      "1900s",
-      "1910s",
-      "1920s",
-      "1930s",
-      "1940s",
-      "1950s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "community"
-    ],
+    "eraBuckets": ["1890s", "1900s", "1910s", "1920s", "1930s", "1940s", "1950s"],
+    "topicTags": ["great-migration", "community"],
     "jurisdictionLabel": "Pittsburgh, Pennsylvania",
     "locationPrecision": "neighborhood",
     "locationLabel": "Hill District, Pittsburgh",
@@ -1895,10 +1479,7 @@
       }
     ],
     "historicalContext": "In the mid-1950s a substantial section of the Hill District was demolished for redevelopment, displacing about 8,000 residents — a pattern of urban renewal-driven displacement that struck Great Migration destination neighborhoods across the country, from Pittsburgh to Detroit to St. Louis.",
-    "topicIds": [
-      "great-migration",
-      "community"
-    ],
+    "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1907,16 +1488,8 @@
     "kind": "place",
     "displayName": "Rondo",
     "summary": "From the late 1800s, Rondo was the heart of St. Paul's African American community, home by the 1950s to 85 percent of the city's Black residents and institutions including Pilgrim Baptist Church and the Hallie Q. Brown Community Center, before Interstate 94's construction demolished its core between 1956 and 1968.",
-    "eraBuckets": [
-      "1900s",
-      "1930s",
-      "1950s",
-      "1960s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1930s", "1950s", "1960s"],
+    "topicTags": ["great-migration", "community"],
     "jurisdictionLabel": "St. Paul, Minnesota",
     "locationPrecision": "neighborhood",
     "locationLabel": "Rondo neighborhood, St. Paul",
@@ -1941,10 +1514,7 @@
       }
     ],
     "historicalContext": "Since 1983, the annual Rondo Days festival has celebrated the neighborhood's history and continuing legacy, and the ReConnect Rondo initiative has since organized to physically reunite the community the freeway split in two.",
-    "topicIds": [
-      "great-migration",
-      "community"
-    ],
+    "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1953,16 +1523,8 @@
     "kind": "place",
     "displayName": "Mill Creek Valley",
     "summary": "Home to more than 20,000 Black St. Louisans by the early 1950s and cultural institutions like the Phillis Wheatley YWCA, Mill Creek Valley was demolished by the city beginning in 1959, destroying 5,600 housing units, 800 businesses, and 40 churches to build a highway — one of the largest single acts of urban-renewal displacement in U.S. history.",
-    "eraBuckets": [
-      "1900s",
-      "1920s",
-      "1940s",
-      "1950s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1920s", "1940s", "1950s"],
+    "topicTags": ["great-migration", "community"],
     "jurisdictionLabel": "St. Louis, Missouri",
     "locationPrecision": "neighborhood",
     "locationLabel": "Mill Creek Valley, St. Louis",
@@ -1987,10 +1549,7 @@
       }
     ],
     "historicalContext": "A 2023 memorial, 'Pillars of the Valley,' and a 2025 Missouri History Museum exhibit have worked to restore Mill Creek Valley to public memory; St. Louis's other major historic Black neighborhood, the Ville, survived urban renewal and remains a distinct North Side community today.",
-    "topicIds": [
-      "great-migration",
-      "community"
-    ],
+    "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1999,16 +1558,8 @@
     "kind": "place",
     "displayName": "Overtown",
     "summary": "Settled around 1900 by Black Bahamian and Southern migrants who built Henry Flagler's railroad, Overtown grew into the 'Harlem of the South,' a thriving entertainment district that hosted Black performers barred from segregated Miami Beach hotels, before Interstate 95's construction displaced roughly 40,000 residents.",
-    "eraBuckets": [
-      "1900s",
-      "1930s",
-      "1940s",
-      "1950s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1930s", "1940s", "1950s"],
+    "topicTags": ["great-migration", "community"],
     "jurisdictionLabel": "Miami, Florida",
     "locationPrecision": "neighborhood",
     "locationLabel": "Overtown, Miami",
@@ -2033,10 +1584,7 @@
       }
     ],
     "historicalContext": "Overtown's musicians and hoteliers built a self-sufficient entertainment economy precisely because segregation barred Black performers and patrons from Miami Beach's hotels and clubs — turning exclusion into an engine of Black-owned enterprise until federal highway construction displaced it.",
-    "topicIds": [
-      "great-migration",
-      "community"
-    ],
+    "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2045,15 +1593,8 @@
     "kind": "place",
     "displayName": "Watts",
     "summary": "Incorporated in 1903 as a mixed working-class community, Watts became two-thirds Black by 1945 as Second Great Migration arrivals, many recruited for wartime defense jobs, settled there under housing restrictions that barred Black Angelenos from most of the city, up from just 14 percent Black in 1920.",
-    "eraBuckets": [
-      "1900s",
-      "1920s",
-      "1940s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1920s", "1940s"],
+    "topicTags": ["great-migration", "community"],
     "jurisdictionLabel": "Los Angeles, California",
     "locationPrecision": "neighborhood",
     "locationLabel": "Watts, Los Angeles",
@@ -2078,10 +1619,7 @@
       }
     ],
     "historicalContext": "By the 1940s, 95 percent of Los Angeles-area housing was effectively off-limits to Black residents through restrictive covenants, concentrating Second Great Migration arrivals into Watts and a handful of other South Los Angeles neighborhoods regardless of their individual preferences or means.",
-    "topicIds": [
-      "great-migration",
-      "community"
-    ],
+    "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2090,18 +1628,8 @@
     "kind": "person",
     "displayName": "Ida B. Wells",
     "summary": "Born enslaved in Mississippi in 1862, Ida B. Wells became a pioneering investigative journalist whose 1892 anti-lynching crusade, launched after a mob murdered three of her Memphis friends, used data and firsthand reporting to challenge lynching's justifications and helped lay groundwork for the NAACP.",
-    "eraBuckets": [
-      "1880s",
-      "1890s",
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "organizing",
-      "resistance",
-      "journalism"
-    ],
+    "eraBuckets": ["1880s", "1890s", "1900s", "1910s", "1920s"],
+    "topicTags": ["organizing", "resistance", "journalism"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "Ida B. Wells-Barnett House, 3624 South Martin Luther King Drive, Chicago",
@@ -2126,11 +1654,7 @@
       }
     ],
     "historicalContext": "Wells's investigative method — traveling to lynching sites, interviewing witnesses, and publishing statistical analysis in pamphlets like 'Southern Horrors' and 'A Red Record' — pioneered techniques of data journalism decades before the term existed, and she remained an outspoken organizer in Chicago's Black community, including Great Migration-era settlement work, until her death in 1931.",
-    "topicIds": [
-      "organizing",
-      "resistance",
-      "journalism"
-    ],
+    "topicIds": ["organizing", "resistance", "journalism"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2139,17 +1663,8 @@
     "kind": "person",
     "displayName": "Robert S. Abbott",
     "summary": "Robert Sengstacke Abbott founded the Chicago Defender in 1905 and built it into the nation's most influential Black newspaper, using its editorials, cartoons, and job listings to actively recruit hundreds of thousands of Southern Black readers to migrate north during the Great Migration.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "organizing",
-      "journalism"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s", "1930s"],
+    "topicTags": ["great-migration", "organizing", "journalism"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "Robert S. Abbott House, 4742 South Martin Luther King Drive, Chicago",
@@ -2174,11 +1689,7 @@
       }
     ],
     "historicalContext": "Abbott's paper depended on an underground distribution network of Pullman porters who carried bundles south, since some Southern communities banned the Defender outright for its role in encouraging Black residents to leave. His grand-nephew John H. Sengstacke later ran the paper and helped found the National Newspaper Publishers Association.",
-    "topicIds": [
-      "great-migration",
-      "organizing",
-      "journalism"
-    ],
+    "topicIds": ["great-migration", "organizing", "journalism"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2187,12 +1698,8 @@
     "kind": "event",
     "displayName": "East St. Louis Massacre",
     "summary": "From late May to early July 1917, white mobs in East St. Louis, Illinois attacked Black residents whose Great Migration arrival for wartime industrial jobs had stoked labor tensions, killing at least 39 Black residents, burning entire blocks, and displacing about 6,000 people in one of the era's deadliest race massacres.",
-    "eraBuckets": [
-      "1910s"
-    ],
-    "topicTags": [
-      "great-migration"
-    ],
+    "eraBuckets": ["1910s"],
+    "topicTags": ["great-migration"],
     "jurisdictionLabel": "East St. Louis, Illinois",
     "locationPrecision": "city",
     "locationLabel": "East St. Louis, Illinois",
@@ -2218,9 +1725,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "The Silent Parade organized in response was itself a landmark act of collective Black political resistance — one of the first major civil rights demonstrations in American history — using disciplined, wordless protest to demand federal action against lynching and mob violence rather than framing the massacre's survivors as passive victims.",
-    "topicIds": [
-      "great-migration"
-    ],
+    "topicIds": ["great-migration"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2229,12 +1734,8 @@
     "kind": "event",
     "displayName": "Chicago Race Riot of 1919",
     "summary": "After a white man stoned Black teenager Eugene Williams to death for drifting into a segregated section of Lake Michigan on July 27, 1919, a week of mob violence swept Chicago's South Side, killing 38 people and leaving thousands of Black Chicagoans, whose Great Migration-era arrival had reshaped the city, homeless.",
-    "eraBuckets": [
-      "1910s"
-    ],
-    "topicTags": [
-      "great-migration"
-    ],
+    "eraBuckets": ["1910s"],
+    "topicTags": ["great-migration"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "campus",
     "locationLabel": "Eugene Williams Memorial, 29th Street Beach, Chicago",
@@ -2260,9 +1761,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "The riot erupted in a city whose Black population had roughly tripled during the Great Migration's first wave, intensifying competition for housing and jobs that white mobs weaponized into violence. A 2021 initiative secured Eugene Williams a marked grave at Lincoln Cemetery, and public memorials now center the riot's Black victims by name rather than treating the violence as an anonymous statistic.",
-    "topicIds": [
-      "great-migration"
-    ],
+    "topicIds": ["great-migration"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2271,13 +1770,8 @@
     "kind": "event",
     "displayName": "Elaine Massacre",
     "summary": "In September 1919, Black sharecroppers near Elaine, Arkansas organized the Progressive Farmers and Household Union to demand fair payment for their cotton; white mobs and federal troops responded with a massacre that killed an estimated hundreds of Black residents, one of the deadliest racial confrontations in U.S. history.",
-    "eraBuckets": [
-      "1910s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "organizing"
-    ],
+    "eraBuckets": ["1910s"],
+    "topicTags": ["great-migration", "organizing"],
     "jurisdictionLabel": "Elaine, Arkansas",
     "locationPrecision": "city",
     "locationLabel": "Elaine, Arkansas",
@@ -2303,10 +1797,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "The massacre is most accurately understood as the violent suppression of a labor organizing effort — Black sharecroppers exercising their right to collectively bargain — rather than a spontaneous racial conflict, and the NAACP's successful Supreme Court appeal in Moore v. Dempsey established that mob-dominated trials violated due process, a foundational precedent for federal habeas corpus review of state convictions.",
-    "topicIds": [
-      "great-migration",
-      "organizing"
-    ],
+    "topicIds": ["great-migration", "organizing"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2315,12 +1806,8 @@
     "kind": "event",
     "displayName": "Rosewood Massacre",
     "summary": "During the first week of January 1923, white mobs destroyed Rosewood, Florida, a self-sufficient Black community of homeowners and business owners, killing at least six Black residents; in 1994 Florida became the first U.S. state legislature to pay reparations to massacre survivors and their descendants.",
-    "eraBuckets": [
-      "1920s"
-    ],
-    "topicTags": [
-      "great-migration"
-    ],
+    "eraBuckets": ["1920s"],
+    "topicTags": ["great-migration"],
     "jurisdictionLabel": "Rosewood, Florida",
     "locationPrecision": "campus",
     "locationLabel": "Rosewood historical marker, State Road 24, Rosewood",
@@ -2346,9 +1833,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Rosewood's residents were largely self-sufficient property owners rather than a struggling community, which makes the massacre's erasure of accumulated Black wealth and multi-generational institution-building especially stark; survivors and descendants who fled preserved the town's memory in family testimony for seven decades before public reckoning began in the 1980s and 1990s.",
-    "topicIds": [
-      "great-migration"
-    ],
+    "topicIds": ["great-migration"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2357,12 +1842,8 @@
     "kind": "event",
     "displayName": "Wilmington Massacre and Coup of 1898",
     "summary": "On November 10, 1898, a mob of white supremacists in Wilmington, North Carolina overthrew the city's legitimately elected biracial Fusionist government, killed as many as 60 Black residents, and destroyed Black-owned businesses including the city's only Black newspaper, in the only successful coup d'état in U.S. history.",
-    "eraBuckets": [
-      "1890s"
-    ],
-    "topicTags": [
-      "great-migration"
-    ],
+    "eraBuckets": ["1890s"],
+    "topicTags": ["great-migration"],
     "jurisdictionLabel": "Wilmington, North Carolina",
     "locationPrecision": "neighborhood",
     "locationLabel": "Downtown Wilmington, North Carolina",
@@ -2388,9 +1869,7 @@
     ],
     "sensitivityClass": "violence_associated",
     "historicalContext": "Before 1898, Wilmington had a thriving Black professional and merchant class and a functioning biracial city government, making the coup a deliberate reversal of Reconstruction-era Black political power rather than a spontaneous riot; the exodus of Black Wilmingtonians in its aftermath is considered by some historians a direct forerunner of the Great Migration's later, larger waves.",
-    "topicIds": [
-      "great-migration"
-    ],
+    "topicIds": ["great-migration"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2399,15 +1878,8 @@
     "kind": "movement",
     "displayName": "Kansas Exodus of 1879",
     "summary": "In 1879, as many as 40,000 formerly enslaved 'Exodusters' left Mississippi, Louisiana, and other former Confederate states for Kansas, Oklahoma, and Colorado, organizing the first mass Black migration after Reconstruction's collapse to escape racial violence, debt peonage, and the loss of political rights.",
-    "eraBuckets": [
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "organizing",
-      "freedom"
-    ],
+    "eraBuckets": ["1870s", "1880s"],
+    "topicTags": ["great-migration", "organizing", "freedom"],
     "jurisdictionLabel": "Topeka, Kansas",
     "locationPrecision": "city",
     "locationLabel": "Topeka, Kansas, hub of Exoduster relief efforts",
@@ -2432,11 +1904,7 @@
       }
     ],
     "historicalContext": "Organizers including Benjamin 'Pap' Singleton framed the Exodus explicitly as self-determined flight from a South that had failed to deliver on Reconstruction's promises, predating the twentieth century's larger Great Migration by nearly four decades and establishing Kansas towns including Nicodemus and the Singleton Colony at Dunlap as models of independent Black community-building.",
-    "topicIds": [
-      "great-migration",
-      "organizing",
-      "freedom"
-    ],
+    "topicIds": ["great-migration", "organizing", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2445,15 +1913,8 @@
     "kind": "person",
     "displayName": "Benjamin \"Pap\" Singleton",
     "summary": "A formerly enslaved Tennessean who organized the Edgefield Real Estate and Homestead Association in 1874, Benjamin 'Pap' Singleton became the leading promoter of the 1879 Kansas Exodus, personally guiding thousands of Black Tennesseans to found the Singleton Colony near Dunlap, Kansas.",
-    "eraBuckets": [
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "organizing",
-      "freedom"
-    ],
+    "eraBuckets": ["1870s", "1880s"],
+    "topicTags": ["great-migration", "organizing", "freedom"],
     "jurisdictionLabel": "Dunlap, Kansas",
     "locationPrecision": "city",
     "locationLabel": "Singleton Colony, Dunlap, Kansas",
@@ -2478,11 +1939,7 @@
       }
     ],
     "historicalContext": "Singleton framed Black land ownership and self-governing colonies as the only reliable protection against Southern racial violence and broken promises, telling followers he wanted them to become 'a people' rather than remain dependent on white landowners; most Dunlap settlers initially lived in dugouts before establishing permanent homes, farms, and a Freedmen's Academy planned by the Presbyterian Church.",
-    "topicIds": [
-      "great-migration",
-      "organizing",
-      "freedom"
-    ],
+    "topicIds": ["great-migration", "organizing", "freedom"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2491,14 +1948,8 @@
     "kind": "event",
     "displayName": "Combahee River Raid",
     "summary": "On June 2, 1863, Harriet Tubman guided Union gunboats up South Carolina's Combahee River, becoming the first woman to plan and lead an armed U.S. military expedition; the raid liberated more than 750 enslaved people and destroyed Confederate supplies and infrastructure along the river.",
-    "eraBuckets": [
-      "1860s"
-    ],
-    "topicTags": [
-      "resistance",
-      "freedom",
-      "underground-railroad"
-    ],
+    "eraBuckets": ["1860s"],
+    "topicTags": ["resistance", "freedom", "underground-railroad"],
     "jurisdictionLabel": "Yemassee, South Carolina",
     "locationPrecision": "campus",
     "locationLabel": "Harriet Tubman Memorial Bridge, Combahee River, near Yemassee",
@@ -2523,11 +1974,7 @@
       }
     ],
     "historicalContext": "The raid built directly on Tubman's Underground Railroad expertise in stealth and reconnaissance, applied here at a wartime, military scale that liberated in a single night more than ten times the number of people she guided to freedom across her entire prewar career as a conductor.",
-    "topicIds": [
-      "resistance",
-      "freedom",
-      "underground-railroad"
-    ],
+    "topicIds": ["resistance", "freedom", "underground-railroad"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2536,14 +1983,8 @@
     "kind": "organization",
     "displayName": "Universal Negro Improvement Association (Harlem Chapter)",
     "summary": "Marcus Garvey organized the first U.S. chapter of the Universal Negro Improvement Association in Harlem in May 1917, and by 1919 its Liberty Hall headquarters on West 138th Street was filling with up to 6,000 members promoting Black economic self-sufficiency, racial pride, and pan-African nationhood.",
-    "eraBuckets": [
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "organizing"
-    ],
+    "eraBuckets": ["1910s", "1920s"],
+    "topicTags": ["great-migration", "organizing"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "Liberty Hall, 120 West 138th Street, Harlem",
@@ -2568,10 +2009,7 @@
       }
     ],
     "historicalContext": "Garvey built the UNIA into the largest Black nationalist organization in history, claiming millions of members and hundreds of branches worldwide within a few years, promoting economic self-sufficiency ventures including the Black Star Line shipping company alongside its message of racial pride and eventual return to an independent Africa.",
-    "topicIds": [
-      "great-migration",
-      "organizing"
-    ],
+    "topicIds": ["great-migration", "organizing"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2580,16 +2018,8 @@
     "kind": "publication",
     "displayName": "The Negro Motorist Green Book",
     "summary": "Conceived in 1936 by Harlem postal worker Victor Hugo Green, this annual guidebook listed hotels, restaurants, and service stations that welcomed Black travelers, helping African American motorists navigate Jim Crow-era travel safely for three decades until its final edition in 1966.",
-    "eraBuckets": [
-      "1930s",
-      "1940s",
-      "1950s",
-      "1960s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "organizing"
-    ],
+    "eraBuckets": ["1930s", "1940s", "1950s", "1960s"],
+    "topicTags": ["great-migration", "organizing"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "neighborhood",
     "locationLabel": "Harlem, Manhattan",
@@ -2614,10 +2044,7 @@
       }
     ],
     "historicalContext": "A 1941 edition of the Green Book was displayed at the opening of the Smithsonian's National Museum of African American History and Culture in 2016, and many of the businesses it once listed have since become the focus of dedicated preservation and mapping projects documenting Black commercial life in the Jim Crow era.",
-    "topicIds": [
-      "great-migration",
-      "organizing"
-    ],
+    "topicIds": ["great-migration", "organizing"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2626,13 +2053,8 @@
     "kind": "event",
     "displayName": "March on Washington Movement of 1941",
     "summary": "In January 1941, A. Philip Randolph, founder of the Brotherhood of Sleeping Car Porters, threatened to bring 100,000 Black Americans to march on Washington against discrimination in wartime defense industries; the threat pressured President Roosevelt into signing Executive Order 8802, the first presidential directive on race since Reconstruction.",
-    "eraBuckets": [
-      "1940s"
-    ],
-    "topicTags": [
-      "organizing",
-      "great-migration"
-    ],
+    "eraBuckets": ["1940s"],
+    "topicTags": ["organizing", "great-migration"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "neighborhood",
     "locationLabel": "Harlem, Manhattan — Brotherhood of Sleeping Car Porters headquarters",
@@ -2657,10 +2079,7 @@
       }
     ],
     "historicalContext": "Historian Lerone Bennett Jr. called Randolph's threatened march 'one of the most brilliant power plays ever executed by a Negro leader,' and the organizing model Randolph built here — an all-Black-led mass mobilization threatening direct action to force federal concessions — directly prefigured the 1963 March on Washington for Jobs and Freedom that Randolph and Bayard Rustin organized more than two decades later.",
-    "topicIds": [
-      "organizing",
-      "great-migration"
-    ],
+    "topicIds": ["organizing", "great-migration"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2669,17 +2088,8 @@
     "kind": "publication",
     "displayName": "Norfolk Journal and Guide",
     "summary": "After buying a small fraternal-order newsletter in 1910, publisher P.B. Young built the Norfolk Journal and Guide into the largest Black newspaper in the South by 1928 and the South's single largest Black-owned employer by World War II, chronicling Great Migration-era Black life in Virginia and beyond.",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s",
-      "1940s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "organizing",
-      "publication"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s", "1940s"],
+    "topicTags": ["great-migration", "organizing", "publication"],
     "jurisdictionLabel": "Norfolk, Virginia",
     "locationPrecision": "neighborhood",
     "locationLabel": "Downtown Norfolk, Virginia",
@@ -2704,11 +2114,7 @@
       }
     ],
     "historicalContext": "Young steered the paper toward a gradualist, Booker T. Washington-influenced editorial line that sometimes put him at odds with more militant Black journalists of his era, but the Journal and Guide's reporting and job-listing pages served the same practical function for Virginia's Great Migration-era Black community that the Chicago Defender served in the Midwest.",
-    "topicIds": [
-      "great-migration",
-      "organizing",
-      "publication"
-    ],
+    "topicIds": ["great-migration", "organizing", "publication"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2717,18 +2123,8 @@
     "kind": "person",
     "displayName": "Charlotta Bass",
     "summary": "Believed to be the first Black woman to own and operate a newspaper in the United States, Charlotta Bass ran Los Angeles's California Eagle from 1912 to 1951, using it to confront the Ku Klux Klan, housing discrimination, and police brutality before becoming the first Black woman nominated for U.S. vice president in 1952.",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s",
-      "1940s",
-      "1950s"
-    ],
-    "topicTags": [
-      "great-migration",
-      "organizing",
-      "journalism"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s", "1940s", "1950s"],
+    "topicTags": ["great-migration", "organizing", "journalism"],
     "jurisdictionLabel": "Los Angeles, California",
     "locationPrecision": "neighborhood",
     "locationLabel": "Central Avenue, Los Angeles",
@@ -2753,11 +2149,7 @@
       }
     ],
     "historicalContext": "Bass's paper documented and organized around the same Second Great Migration-era housing restrictions that concentrated Black Angelenos in neighborhoods like Watts, and her 1952 nomination for vice president on the Progressive Party ticket made her the first Black woman to run for that office on a national ticket.",
-    "topicIds": [
-      "great-migration",
-      "organizing",
-      "journalism"
-    ],
+    "topicIds": ["great-migration", "organizing", "journalism"],
     "mentionedEntityIds": [],
     "keywords": []
   }

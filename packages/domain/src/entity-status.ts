@@ -92,7 +92,8 @@ export function statusAsOf<S extends string>(
 ): S | undefined {
   const covering = (history ?? []).filter((entry) => {
     if (entry.validFrom !== undefined && asOf < entry.validFrom) return false;
-    if (entry.validTo !== undefined && entry.validTo !== null && asOf >= entry.validTo) return false;
+    if (entry.validTo !== undefined && entry.validTo !== null && asOf >= entry.validTo)
+      return false;
     return true;
   });
   return latestByValidFrom(covering)?.status;
@@ -109,7 +110,9 @@ export type PersonDerivedStatus = 'living' | 'deceased';
  * independent statusHistory field exists on person entities a second source of truth would
  * drift against the living-person compliance lane.
  */
-export function personStatusFromLiving(livingStatus: LivingStatus | undefined): PersonDerivedStatus {
+export function personStatusFromLiving(
+  livingStatus: LivingStatus | undefined,
+): PersonDerivedStatus {
   return treatAsLiving(livingStatus ?? 'unknown') ? 'living' : 'deceased';
 }
 
@@ -167,7 +170,7 @@ export const NOTABILITY_RUBRIC: Readonly<Record<NotabilityCriterion, string>> = 
     'Register of Historic Places, National Historic Landmark, or an equivalent state/local ' +
     'landmark register entry — with documented listing evidence.',
   court_precedent:
-    "The entity (case, law, person) is tied to a judicial decision that set binding or widely " +
+    'The entity (case, law, person) is tied to a judicial decision that set binding or widely ' +
     "cited precedent affecting Black Americans' rights or status.",
   movement_significance:
     'The entity (person, organization, event, place, or a movement-kind entity itself) played a ' +

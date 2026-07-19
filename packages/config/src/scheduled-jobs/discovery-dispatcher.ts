@@ -50,10 +50,7 @@ export const DISCOVERY_CAMPAIGN_JOB_IDS = [
 
 export type DiscoveryCampaignJobId = (typeof DISCOVERY_CAMPAIGN_JOB_IDS)[number];
 export type DiscoveryCampaignDispatchMode = 'fixture' | 'live';
-export type DiscoveryCampaignDispatchStatus =
-  | 'success'
-  | 'skipped_kill_switch'
-  | 'error';
+export type DiscoveryCampaignDispatchStatus = 'success' | 'skipped_kill_switch' | 'error';
 
 export type DiscoveryCampaignDispatchResult = {
   readonly dispatcherVersion: typeof DISCOVERY_DISPATCHER_VERSION;
@@ -143,9 +140,7 @@ function resolveKillSwitchEngaged(input: DispatchDiscoveryCampaignInput): boolea
 }
 
 /** Explicitly disengaged snapshot for local/CI fixture runs (missing flag would deny). */
-export function disengagedResearchCampaignsSnapshot(
-  updatedAt: string,
-): KillSwitchSnapshot {
+export function disengagedResearchCampaignsSnapshot(updatedAt: string): KillSwitchSnapshot {
   const state: KillSwitchState = {
     id: RESEARCH_CAMPAIGNS_KILL_SWITCH,
     enabled: false,
@@ -196,9 +191,7 @@ async function runFixtureOrLiveJob(
         completedAt: input.completedAt,
         feedXmlByFeedId: new Map([['feed_the_american_blackstory', readText(xmlPath)]]),
         catalogTitles: input.catalogTitles ?? defaultCatalogTitles(),
-        ...(input.catalogProfiles !== undefined
-          ? { catalogProfiles: input.catalogProfiles }
-          : {}),
+        ...(input.catalogProfiles !== undefined ? { catalogProfiles: input.catalogProfiles } : {}),
         ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
       });
       return {
@@ -216,9 +209,7 @@ async function runFixtureOrLiveJob(
       );
       const livePath = env.DISCOVERY_FEED_XML?.trim();
       if (input.mode === 'live' && (livePath === undefined || livePath.length === 0)) {
-        throw new Error(
-          'live rss requires DISCOVERY_FEED_XML=/path/to/feed.xml (download first)',
-        );
+        throw new Error('live rss requires DISCOVERY_FEED_XML=/path/to/feed.xml (download first)');
       }
       const xmlPath = input.mode === 'live' && livePath ? livePath : fixturePath;
       const result = await runRssDiscoveryCampaignJob({
@@ -227,9 +218,7 @@ async function runFixtureOrLiveJob(
         completedAt: input.completedAt,
         feedXmlByFeedId: new Map([['feed_historical_society', readText(xmlPath)]]),
         ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
-        ...(input.catalogProfiles !== undefined
-          ? { catalogProfiles: input.catalogProfiles }
-          : {}),
+        ...(input.catalogProfiles !== undefined ? { catalogProfiles: input.catalogProfiles } : {}),
       });
       return {
         run: result.run,
@@ -246,9 +235,7 @@ async function runFixtureOrLiveJob(
         startedAt: input.startedAt,
         completedAt: input.completedAt,
         ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
-        ...(input.catalogProfiles !== undefined
-          ? { catalogProfiles: input.catalogProfiles }
-          : {}),
+        ...(input.catalogProfiles !== undefined ? { catalogProfiles: input.catalogProfiles } : {}),
       });
       return {
         run: result.run,
@@ -281,9 +268,7 @@ async function runFixtureOrLiveJob(
         internetArchiveSearchJson: readJson(iaLive && iaLive.length > 0 ? iaLive : iaFixture),
         dplaSearchJson: readJson(dplaLive && dplaLive.length > 0 ? dplaLive : dplaFixture),
         ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
-        ...(input.catalogProfiles !== undefined
-          ? { catalogProfiles: input.catalogProfiles }
-          : {}),
+        ...(input.catalogProfiles !== undefined ? { catalogProfiles: input.catalogProfiles } : {}),
       });
       return {
         run: result.run,
@@ -390,9 +375,7 @@ async function runFixtureOrLiveJob(
         providerConfig,
         requireWaybackCapture: false,
         ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
-        ...(input.catalogProfiles !== undefined
-          ? { catalogProfiles: input.catalogProfiles }
-          : {}),
+        ...(input.catalogProfiles !== undefined ? { catalogProfiles: input.catalogProfiles } : {}),
         ...(env.DISCOVERY_SEARXNG_QUERY?.trim()
           ? { queryText: env.DISCOVERY_SEARXNG_QUERY.trim() }
           : {}),
@@ -475,9 +458,7 @@ export async function dispatchDiscoveryCampaign(
         ...(outcome.kind !== undefined ? { kind: outcome.kind } : {}),
       },
       run: outcome.run,
-      ...(input.includeCampaign && outcome.campaign
-        ? { campaign: outcome.campaign }
-        : {}),
+      ...(input.includeCampaign && outcome.campaign ? { campaign: outcome.campaign } : {}),
     };
   } catch (error) {
     return {

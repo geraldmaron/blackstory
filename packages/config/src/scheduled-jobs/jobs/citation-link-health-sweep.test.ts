@@ -1,4 +1,3 @@
-
 /**
  * Proves the citation-link-health-sweep job body is REAL: it drives
  * @repo/domain's citation link-health/repair-ladder logic (not a reimplementation), the
@@ -8,15 +7,8 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  DEFAULT_SAFE_FETCH_LIMITS,
-  type PinnedTransportResponse,
-} from '@repo/security/url-safety';
-import {
-  initialLinkHealthState,
-  type Citation,
-  type LinkCheckFetchResult,
-} from '@repo/domain';
+import { DEFAULT_SAFE_FETCH_LIMITS, type PinnedTransportResponse } from '@repo/security/url-safety';
+import { initialLinkHealthState, type Citation, type LinkCheckFetchResult } from '@repo/domain';
 import {
   checkCitationLinkThroughSafeFetch,
   runCitationLinkHealthSweepJob,
@@ -45,8 +37,15 @@ test('a citation that is still alive is checked but never touched by a repair', 
     jobRunId: 'run-1',
     startedAt: '2026-07-17T09:00:00.000Z',
     completedAt: '2026-07-17T09:01:00.000Z',
-    checks: [{ citation: citation(), state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z') }],
-    fetchLink: async () => ({ ok: true, finalUrl: 'https://gazette.example/story/1', redirectCount: 0, contentHash: 'a'.repeat(64) }),
+    checks: [
+      { citation: citation(), state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z') },
+    ],
+    fetchLink: async () => ({
+      ok: true,
+      finalUrl: 'https://gazette.example/story/1',
+      redirectCount: 0,
+      contentHash: 'a'.repeat(64),
+    }),
     attemptSpn: NEVER_SPN,
   });
   assert.equal(result.run.status, 'success');
@@ -63,7 +62,9 @@ test('an offline citation with no URL is skipped rather than fetched', async () 
     completedAt: '2026-07-17T09:01:00.000Z',
     checks: [
       {
-        citation: citation({ location: { kind: 'offline', designation: { kind: 'book', description: 'Some archive' } } }),
+        citation: citation({
+          location: { kind: 'offline', designation: { kind: 'book', description: 'Some archive' } },
+        }),
         state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z'),
       },
     ],
@@ -80,7 +81,9 @@ test('a single ambiguous failure stays within the retry budget: no repair yet', 
     jobRunId: 'run-3',
     startedAt: '2026-07-17T09:00:00.000Z',
     completedAt: '2026-07-17T09:01:00.000Z',
-    checks: [{ citation: citation(), state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z') }],
+    checks: [
+      { citation: citation(), state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z') },
+    ],
     fetchLink: async () => ({ ok: false, reason: 'transport_failed' }),
     attemptSpn: NEVER_SPN,
     maxRetriesBeforeDead: 3,
@@ -93,13 +96,21 @@ test('a single ambiguous failure stays within the retry budget: no repair yet', 
 
 test('a dead citation with an existing Wayback capture auto-applies the wayback_swap repair (the declared public effect)', async () => {
   const capturedCitation = citation({
-    capture: { captureId: 'capture-1', waybackCaptureUrl: 'https://web.archive.org/web/1/https://gazette.example/story/1' },
+    capture: {
+      captureId: 'capture-1',
+      waybackCaptureUrl: 'https://web.archive.org/web/1/https://gazette.example/story/1',
+    },
   });
   const result = await runCitationLinkHealthSweepJob({
     jobRunId: 'run-4',
     startedAt: '2026-07-17T09:00:00.000Z',
     completedAt: '2026-07-17T09:01:00.000Z',
-    checks: [{ citation: capturedCitation, state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z') }],
+    checks: [
+      {
+        citation: capturedCitation,
+        state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z'),
+      },
+    ],
     fetchLink: async () => ({ ok: false, reason: 'transport_failed', httpStatus: 404 }),
     attemptSpn: NEVER_SPN,
   });
@@ -118,7 +129,9 @@ test('a dead citation with no capture proposes retroactive_spn rather than auto-
     jobRunId: 'run-5',
     startedAt: '2026-07-17T09:00:00.000Z',
     completedAt: '2026-07-17T09:01:00.000Z',
-    checks: [{ citation: citation(), state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z') }],
+    checks: [
+      { citation: citation(), state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z') },
+    ],
     fetchLink: async () => ({ ok: false, reason: 'transport_failed', httpStatus: 404 }),
     attemptSpn: async () => ({
       ok: true,
@@ -138,7 +151,9 @@ test('a dead citation with no capture and a failed SPN attempt auto-applies dead
     jobRunId: 'run-6',
     startedAt: '2026-07-17T09:00:00.000Z',
     completedAt: '2026-07-17T09:01:00.000Z',
-    checks: [{ citation: citation(), state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z') }],
+    checks: [
+      { citation: citation(), state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z') },
+    ],
     fetchLink: async () => ({ ok: false, reason: 'transport_failed', httpStatus: 410 }),
     attemptSpn: async () => ({ ok: false, reason: 'spn_unavailable' }),
   });
@@ -153,7 +168,9 @@ test('a permanent redirect is proposed, not auto-applied, and never triggers an 
     jobRunId: 'run-7',
     startedAt: '2026-07-17T09:00:00.000Z',
     completedAt: '2026-07-17T09:01:00.000Z',
-    checks: [{ citation: citation(), state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z') }],
+    checks: [
+      { citation: citation(), state: initialLinkHealthState('cit-1', '2026-07-10T09:00:00.000Z') },
+    ],
     fetchLink: async () => ({
       ok: true,
       finalUrl: 'https://gazette.example/archive/story-1',
@@ -171,11 +188,22 @@ test('a permanent redirect is proposed, not auto-applied, and never triggers an 
 
 test('a batch is processed in order, and the summary tallies match the individual outcomes', async () => {
   const checks = [
-    { citation: citation({ id: 'a' }), state: initialLinkHealthState('a', '2026-07-01T00:00:00.000Z') },
-    { citation: citation({ id: 'b' }), state: initialLinkHealthState('b', '2026-07-01T00:00:00.000Z') },
+    {
+      citation: citation({ id: 'a' }),
+      state: initialLinkHealthState('a', '2026-07-01T00:00:00.000Z'),
+    },
+    {
+      citation: citation({ id: 'b' }),
+      state: initialLinkHealthState('b', '2026-07-01T00:00:00.000Z'),
+    },
   ];
   const fetchResults: Record<string, LinkCheckFetchResult> = {
-    a: { ok: true, finalUrl: 'https://gazette.example/story/1', redirectCount: 0, contentHash: 'c'.repeat(64) },
+    a: {
+      ok: true,
+      finalUrl: 'https://gazette.example/story/1',
+      redirectCount: 0,
+      contentHash: 'c'.repeat(64),
+    },
     b: { ok: false, reason: 'dns_resolution_failed' },
   };
   let callIndex = 0;
@@ -196,7 +224,6 @@ test('a batch is processed in order, and the summary tallies match the individua
   assert.equal(result.summary.dead, 1);
   assert.equal(result.outcomes[1]?.appliedRepair?.step, 'dead_mark');
 });
-
 
 /**
  * Proves `checkCitationLinkThroughSafeFetch` genuinely drives real `executeSafeFetch`

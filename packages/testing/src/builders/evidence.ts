@@ -1,4 +1,3 @@
-
 /**
  * Test data builder for evidence fixtures linking claims to sources.
  */

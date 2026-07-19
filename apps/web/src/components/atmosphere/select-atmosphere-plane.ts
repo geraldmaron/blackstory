@@ -92,7 +92,11 @@ export function selectMosaicTiles(
   }
 
   const start = hashString(`tiles:${seedKey}`) % ATMOSPHERE_TILE_CREDITS.length;
-  for (let offset = 0; offset < ATMOSPHERE_TILE_CREDITS.length && out.length < density; offset += 1) {
+  for (
+    let offset = 0;
+    offset < ATMOSPHERE_TILE_CREDITS.length && out.length < density;
+    offset += 1
+  ) {
     const tile = ATMOSPHERE_TILE_CREDITS[(start + offset) % ATMOSPHERE_TILE_CREDITS.length]!;
     if (seen.has(tile.path)) continue;
     seen.add(tile.path);

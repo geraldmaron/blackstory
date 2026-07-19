@@ -22,7 +22,9 @@ function formatPercent(value: number): string {
 export default function CitationHealthPage() {
   const rotRates = computeRotRateBySourceClass(CITATION_HEALTH_FIXTURES);
   const deadCitation = CITATION_HEALTH_FIXTURES.find((citation) => citation.linkStatus === 'dead');
-  const driftedCitation = CITATION_HEALTH_FIXTURES.find((citation) => citation.linkStatus === 'drifted');
+  const driftedCitation = CITATION_HEALTH_FIXTURES.find(
+    (citation) => citation.linkStatus === 'drifted',
+  );
 
   return (
     <main className="ds-container ds-prose ds-page citation-health-page" id="main">
@@ -41,7 +43,9 @@ export default function CitationHealthPage() {
         </div>
         <div className="citation-health-table-wrap">
           <table>
-            <caption className="ds-visually-hidden">Citation rot rate by source classification</caption>
+            <caption className="ds-visually-hidden">
+              Citation rot rate by source classification
+            </caption>
             <thead>
               <tr>
                 <th scope="col">Source class</th>
@@ -69,8 +73,8 @@ export default function CitationHealthPage() {
         <p className="citation-health-note">
           Rot rate also feeds an additive confidence-engine authority signal —{' '}
           <code>citationRotRateAuthoritySignal</code> in
-          packages/domain/src/confidence-engine/engine.ts — as a durability signal for confidence durability,
-          without changing the existing weighted confidence computation.
+          packages/domain/src/confidence-engine/engine.ts — as a durability signal for confidence
+          durability, without changing the existing weighted confidence computation.
         </p>
       </section>
 
@@ -86,10 +90,16 @@ export default function CitationHealthPage() {
         {deadCitation ? (
           <Citation
             source={deadCitation.sourceName}
-            {...(deadCitation.originallyPublishedAtUrl ? { href: deadCitation.originallyPublishedAtUrl } : {})}
+            {...(deadCitation.originallyPublishedAtUrl
+              ? { href: deadCitation.originallyPublishedAtUrl }
+              : {})}
             linkStatus="dead"
-            {...(deadCitation.linkStatusAsOf ? { deadAsOfDate: deadCitation.linkStatusAsOf.slice(0, 10) } : {})}
-            {...(deadCitation.capture.waybackCaptureUrl ? { archivedHref: deadCitation.capture.waybackCaptureUrl } : {})}
+            {...(deadCitation.linkStatusAsOf
+              ? { deadAsOfDate: deadCitation.linkStatusAsOf.slice(0, 10) }
+              : {})}
+            {...(deadCitation.capture.waybackCaptureUrl
+              ? { archivedHref: deadCitation.capture.waybackCaptureUrl }
+              : {})}
             trySearchingFor={buildTrySearchingForSuggestion(deadCitation)}
           />
         ) : null}

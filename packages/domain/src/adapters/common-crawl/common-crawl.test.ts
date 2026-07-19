@@ -13,7 +13,12 @@ import { test } from 'node:test';
 import type { EvidenceSource } from '../../provenance/source.js';
 import { buildQueryPack, parseQueryPackFixture } from '../../query-packs/pack.js';
 import type { QueryPack } from '../../query-packs/types.js';
-import { approveSourcePolicy, createInMemorySourceRegistry, registerSource, type SourceRegistryEntry } from '../index.js';
+import {
+  approveSourcePolicy,
+  createInMemorySourceRegistry,
+  registerSource,
+  type SourceRegistryEntry,
+} from '../index.js';
 import type { SafeHttpRequest, SafeHttpResponse } from '../internet-archive/shared/http-port.js';
 import {
   assertFilterPatternHasNoResearchOnlyOffensiveTerms,
@@ -43,7 +48,14 @@ function loadFixtureText(name: string): string {
 function loadPack(): QueryPack {
   const raw = JSON.parse(
     readFileSync(
-      join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'query-packs', 'fixtures', 'person-civil-rights-fixture.v1.json'),
+      join(
+        dirname(fileURLToPath(import.meta.url)),
+        '..',
+        '..',
+        'query-packs',
+        'fixtures',
+        'person-civil-rights-fixture.v1.json',
+      ),
       'utf8',
     ),
   ) as unknown;
@@ -101,7 +113,11 @@ test('Common Crawl adapter starts disabled by default in the  registry', () => {
     createdAt: FIXED_NOW,
   });
   assert.equal(store.get('reg_cc')?.registryState, 'disabled');
-  const approved = approveSourcePolicy(store, { id: 'reg_cc', approvedBy: 'admin@blackbook.local', approvedAt: FIXED_NOW });
+  const approved = approveSourcePolicy(store, {
+    id: 'reg_cc',
+    approvedBy: 'admin@blackbook.local',
+    approvedAt: FIXED_NOW,
+  });
   assert.equal(approved.registryState, 'approved');
 });
 
@@ -112,7 +128,11 @@ test('Common Crawl adapter starts disabled by default in the  registry', () => {
 test('buildCdxIndexUrl produces a well-formed CDX query URL and requires crawlId/host', () => {
   const url = buildCdxIndexUrl({
     crawlId: 'CC-MAIN-2016-07',
-    seed: { host: 'piedmontcountyhistory.example.org', matchType: 'domain', geographicLabel: 'Montgomery' },
+    seed: {
+      host: 'piedmontcountyhistory.example.org',
+      matchType: 'domain',
+      geographicLabel: 'Montgomery',
+    },
     limit: 500,
     filterPattern: 'freedom|rider',
   });
@@ -125,7 +145,11 @@ test('buildCdxIndexUrl produces a well-formed CDX query URL and requires crawlId
   assert.equal(parsed.searchParams.get('filter'), '~url:freedom|rider');
 
   assert.throws(
-    () => buildCdxIndexUrl({ crawlId: '', seed: { host: 'x', matchType: 'domain', geographicLabel: 'x' } }),
+    () =>
+      buildCdxIndexUrl({
+        crawlId: '',
+        seed: { host: 'x', matchType: 'domain', geographicLabel: 'x' },
+      }),
     /crawlId is required/,
   );
 });
@@ -184,16 +208,25 @@ test('assertFilterPatternHasNoResearchOnlyOffensiveTerms throws when offensive t
     () => assertFilterPatternHasNoResearchOnlyOffensiveTerms('freedom|rider|colored school', pack),
     /researchOnlyOffensive term/,
   );
-  assert.doesNotThrow(() => assertFilterPatternHasNoResearchOnlyOffensiveTerms('freedom|rider|montgomery', pack));
+  assert.doesNotThrow(() =>
+    assertFilterPatternHasNoResearchOnlyOffensiveTerms('freedom|rider|montgomery', pack),
+  );
 });
 
 test('assertSeedGeographicLabelMatchesPack requires the seed to match a geographic term in the pack', () => {
   const pack = loadPack();
   assert.doesNotThrow(() =>
-    assertSeedGeographicLabelMatchesPack({ host: 'x.example.org', matchType: 'domain', geographicLabel: 'Montgomery' }, pack),
+    assertSeedGeographicLabelMatchesPack(
+      { host: 'x.example.org', matchType: 'domain', geographicLabel: 'Montgomery' },
+      pack,
+    ),
   );
   assert.throws(
-    () => assertSeedGeographicLabelMatchesPack({ host: 'x.example.org', matchType: 'domain', geographicLabel: 'Nowhereville' }, pack),
+    () =>
+      assertSeedGeographicLabelMatchesPack(
+        { host: 'x.example.org', matchType: 'domain', geographicLabel: 'Nowhereville' },
+        pack,
+      ),
     /does not match any geographic term/,
   );
 });
@@ -203,20 +236,33 @@ test('buildCommonCrawlQueries builds one query per crawlId x seedTarget pair', (
   const queries = buildCommonCrawlQueries({
     pack,
     seedTargets: [
-      { host: 'piedmontcountyhistory.example.org', matchType: 'domain', geographicLabel: 'Montgomery' },
+      {
+        host: 'piedmontcountyhistory.example.org',
+        matchType: 'domain',
+        geographicLabel: 'Montgomery',
+      },
       { host: 'alabamaarchives.example.gov', matchType: 'domain', geographicLabel: 'Alabama' },
     ],
     crawlIds: ['CC-MAIN-2016-07', 'CC-MAIN-2020-05'],
   });
   assert.equal(queries.length, 4);
-  assert.ok(queries.every((query) => query.filterPattern && !query.filterPattern.toLowerCase().includes('colored school')));
+  assert.ok(
+    queries.every(
+      (query) =>
+        query.filterPattern && !query.filterPattern.toLowerCase().includes('colored school'),
+    ),
+  );
 });
 
 function sampleQueryProvenance() {
   return stampCommonCrawlQueryProvenance({
     query: {
       crawlId: 'CC-MAIN-2016-07',
-      seed: { host: 'piedmontcountyhistory.example.org', matchType: 'domain', geographicLabel: 'Montgomery' },
+      seed: {
+        host: 'piedmontcountyhistory.example.org',
+        matchType: 'domain',
+        geographicLabel: 'Montgomery',
+      },
       limit: 500,
       filterPattern: 'freedom|rider',
     },
@@ -274,12 +320,21 @@ test('fetchCommonCrawlCdx goes through the injected SafeHttpClient (mock, no liv
   const requests: SafeHttpRequest[] = [];
   const client = async (request: SafeHttpRequest): Promise<SafeHttpResponse> => {
     requests.push(request);
-    return { status: 200, headers: { 'content-type': 'text/plain' }, bodyText: loadFixtureText('cdx-response.ndjson'), finalUrl: request.url };
+    return {
+      status: 200,
+      headers: { 'content-type': 'text/plain' },
+      bodyText: loadFixtureText('cdx-response.ndjson'),
+      finalUrl: request.url,
+    };
   };
   const candidates = await fetchCommonCrawlCdx({
     query: {
       crawlId: 'CC-MAIN-2016-07',
-      seed: { host: 'piedmontcountyhistory.example.org', matchType: 'domain', geographicLabel: 'Montgomery' },
+      seed: {
+        host: 'piedmontcountyhistory.example.org',
+        matchType: 'domain',
+        geographicLabel: 'Montgomery',
+      },
       limit: 500,
       filterPattern: 'freedom|rider',
     },
@@ -299,12 +354,25 @@ test('fetchCommonCrawlCdxBatch fans out across queries with bounded concurrency'
   let calls = 0;
   const client = async (): Promise<SafeHttpResponse> => {
     calls += 1;
-    return { status: 200, headers: { 'content-type': 'text/plain' }, bodyText: loadFixtureText('cdx-response.ndjson'), finalUrl: '' };
+    return {
+      status: 200,
+      headers: { 'content-type': 'text/plain' },
+      bodyText: loadFixtureText('cdx-response.ndjson'),
+      finalUrl: '',
+    };
   };
   const candidates = await fetchCommonCrawlCdxBatch({
     queries: [
-      { crawlId: 'CC-MAIN-2016-07', seed: { host: 'a.example.org', matchType: 'domain', geographicLabel: 'Montgomery' }, limit: 100 },
-      { crawlId: 'CC-MAIN-2020-05', seed: { host: 'b.example.org', matchType: 'domain', geographicLabel: 'Montgomery' }, limit: 100 },
+      {
+        crawlId: 'CC-MAIN-2016-07',
+        seed: { host: 'a.example.org', matchType: 'domain', geographicLabel: 'Montgomery' },
+        limit: 100,
+      },
+      {
+        crawlId: 'CC-MAIN-2020-05',
+        seed: { host: 'b.example.org', matchType: 'domain', geographicLabel: 'Montgomery' },
+        limit: 100,
+      },
     ],
     registryEntry: entry,
     runId: 'run_1',
@@ -317,11 +385,20 @@ test('fetchCommonCrawlCdxBatch fans out across queries with bounded concurrency'
 
 test('fetchCommonCrawlCdx rejects a response whose content type is outside the allowlist', async () => {
   const entry = commonCrawlRegistryEntry();
-  const client = async (): Promise<SafeHttpResponse> => ({ status: 200, headers: { 'content-type': 'text/html' }, bodyText: '<html></html>', finalUrl: '' });
+  const client = async (): Promise<SafeHttpResponse> => ({
+    status: 200,
+    headers: { 'content-type': 'text/html' },
+    bodyText: '<html></html>',
+    finalUrl: '',
+  });
   await assert.rejects(
     () =>
       fetchCommonCrawlCdx({
-        query: { crawlId: 'CC-MAIN-2016-07', seed: { host: 'x.example.org', matchType: 'domain', geographicLabel: 'Montgomery' }, limit: 100 },
+        query: {
+          crawlId: 'CC-MAIN-2016-07',
+          seed: { host: 'x.example.org', matchType: 'domain', geographicLabel: 'Montgomery' },
+          limit: 100,
+        },
         registryEntry: entry,
         runId: 'run_1',
         capturedAt: FIXED_NOW,
@@ -353,12 +430,21 @@ test('ingestCommonCrawlCandidatesThroughPipeline routes candidates through the W
   const client = async (request: SafeHttpRequest): Promise<SafeHttpResponse> => {
     if (request.url === 'https://web.archive.org/save') {
       submitCount += 1;
-      return { status: 200, headers: { 'content-type': 'application/json' }, bodyText: JSON.stringify({ job_id: 'job-1' }), finalUrl: '' };
+      return {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+        bodyText: JSON.stringify({ job_id: 'job-1' }),
+        finalUrl: '',
+      };
     }
     return {
       status: 200,
       headers: { 'content-type': 'application/json' },
-      bodyText: JSON.stringify({ status: 'success', timestamp: '20260717140512', original_url: candidate.canonicalUrl }),
+      bodyText: JSON.stringify({
+        status: 'success',
+        timestamp: '20260717140512',
+        original_url: candidate.canonicalUrl,
+      }),
       finalUrl: '',
     };
   };
@@ -371,7 +457,11 @@ test('ingestCommonCrawlCandidatesThroughPipeline routes candidates through the W
     now: FIXED_NOW,
   });
 
-  assert.equal(submitCount, 1, 'the discovered URL must go through a real Wayback capture before ingestion');
+  assert.equal(
+    submitCount,
+    1,
+    'the discovered URL must go through a real Wayback capture before ingestion',
+  );
   assert.equal(ingested.length, 1);
   assert.equal(ingested[0]?.ingestMode, 'api');
   assert.equal(ingested[0]?.adapterRecord.provenance.adapterId, COMMON_CRAWL_ADAPTER_ID);

@@ -87,16 +87,21 @@ function tokens(value: string): readonly string[] {
 function isFuzzyMatch(query: string, target: string): boolean {
   if (levenshtein(query, target, MAX_FUZZY_DISTANCE) <= MAX_FUZZY_DISTANCE) return true;
   // Also tolerate a typo of a single token within a multi-word target.
-  return tokens(target).some((token) => levenshtein(query, token, MAX_FUZZY_DISTANCE) <= MAX_FUZZY_DISTANCE);
+  return tokens(target).some(
+    (token) => levenshtein(query, token, MAX_FUZZY_DISTANCE) <= MAX_FUZZY_DISTANCE,
+  );
 }
 
 function bestAliasMatch(query: string, aliases: readonly string[]): MatchInfo | undefined {
   let best: MatchInfo | undefined;
   for (const alias of aliases) {
     let candidate: MatchInfo | undefined;
-    if (alias === query) candidate = { tier: TIER_ALIAS_EXACT, matchedOn: 'alias', matchedText: alias };
-    else if (alias.startsWith(query)) candidate = { tier: TIER_ALIAS_PREFIX, matchedOn: 'alias', matchedText: alias };
-    else if (alias.includes(query)) candidate = { tier: TIER_ALIAS_SUBSTRING, matchedOn: 'alias', matchedText: alias };
+    if (alias === query)
+      candidate = { tier: TIER_ALIAS_EXACT, matchedOn: 'alias', matchedText: alias };
+    else if (alias.startsWith(query))
+      candidate = { tier: TIER_ALIAS_PREFIX, matchedOn: 'alias', matchedText: alias };
+    else if (alias.includes(query))
+      candidate = { tier: TIER_ALIAS_SUBSTRING, matchedOn: 'alias', matchedText: alias };
     if (candidate && (!best || candidate.tier > best.tier)) best = candidate;
   }
   return best;
@@ -109,9 +114,12 @@ function bestAliasMatch(query: string, aliases: readonly string[]): MatchInfo | 
  */
 function scoreRecord(query: string, record: SearchableEntityRecord): MatchInfo | undefined {
   const name = record.nameLower;
-  if (name === query) return { tier: TIER_NAME_EXACT, matchedOn: 'displayName', matchedText: record.displayName };
-  if (name.startsWith(query)) return { tier: TIER_NAME_PREFIX, matchedOn: 'displayName', matchedText: record.displayName };
-  if (name.includes(query)) return { tier: TIER_NAME_SUBSTRING, matchedOn: 'displayName', matchedText: record.displayName };
+  if (name === query)
+    return { tier: TIER_NAME_EXACT, matchedOn: 'displayName', matchedText: record.displayName };
+  if (name.startsWith(query))
+    return { tier: TIER_NAME_PREFIX, matchedOn: 'displayName', matchedText: record.displayName };
+  if (name.includes(query))
+    return { tier: TIER_NAME_SUBSTRING, matchedOn: 'displayName', matchedText: record.displayName };
 
   const alias = bestAliasMatch(query, record.aliases);
   if (alias) return alias;
@@ -158,7 +166,8 @@ export function rankRecords(
 
   matched.sort((a, b) => {
     if (a.info.tier !== b.info.tier) return b.info.tier - a.info.tier;
-    if (a.record.relatedCount !== b.record.relatedCount) return b.record.relatedCount - a.record.relatedCount;
+    if (a.record.relatedCount !== b.record.relatedCount)
+      return b.record.relatedCount - a.record.relatedCount;
     return a.record.id.localeCompare(b.record.id);
   });
 

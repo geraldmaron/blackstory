@@ -1,4 +1,3 @@
-
 /**
  * Public serialization choke point for BlackStory.
  *
@@ -117,7 +116,6 @@ export function assertNoProhibitedPublicPrecision(
   }
 }
 
-
 /**
  * Fail-closed structural audit of a payload bound for a public surface.
  * Rejects prohibited precision levels, address-component keys, address-shaped strings,
@@ -207,7 +205,6 @@ export type PublicEntityProjectionOptions = {
   readonly related?: readonly PublicRelatedEntry[];
 };
 
-
 /**
  * Build a public entity projection from a canonical entity and an optional internal
  * location. The location is reduced through {@link redactLocationForPublic} using the
@@ -292,7 +289,6 @@ export function toPublicEntityProjection(
   return projection;
 }
 
-
 /**
  * Build a search-index document. Search docs deliberately carry no coordinates or
  * address fields only a name token and a coarse geohash so queries can never
@@ -333,7 +329,6 @@ export function toPublicSearchDocument(
   assertPublicProjectionSafe(doc);
   return doc;
 }
-
 
 /**
  * Redact an arbitrary record for public export. Deep-strips address components and

@@ -1,4 +1,3 @@
-
 /**
  * REAL roster entry: citation link-health sweep. Wraps `@repo/domain`'s citation
  * link-health repair-ladder logic (packages/domain/src/citations/) — the pure classification,
@@ -101,7 +100,6 @@ export const nodePinnedTransport: PinnedTransport = (pinnedRequest) =>
     clientRequest.end();
   });
 
-
 /**
  * Wraps a `PinnedTransport` to additionally record every hop's HTTP status. `executeSafeFetch`'s
  * own return type discards per-hop status codes (see packages/domain/src/citations/
@@ -109,7 +107,10 @@ export const nodePinnedTransport: PinnedTransport = (pinnedRequest) =>
  * (final hop) and `permanentRedirect` (whether the *first* hop was 301/308) without modifying
  * itself.
  */
-function withStatusCapture(base: PinnedTransport): { transport: PinnedTransport; statuses: () => readonly number[] } {
+function withStatusCapture(base: PinnedTransport): {
+  transport: PinnedTransport;
+  statuses: () => readonly number[];
+} {
   const statuses: number[] = [];
   const transport: PinnedTransport = async (request) => {
     const response = await base(request);
@@ -118,7 +119,6 @@ function withStatusCapture(base: PinnedTransport): { transport: PinnedTransport;
   };
   return { transport, statuses: () => statuses };
 }
-
 
 /**
  * The Node-backed link-health fetcher: performs one SSRF-safe re-verification fetch and
@@ -213,9 +213,13 @@ function citationUrl(citation: Citation): string | undefined {
 }
 
 function requireJobDefinition(): ScheduledJobDefinition {
-  const definition = DEFAULT_SCHEDULED_JOBS.find((job) => job.id === CITATION_LINK_HEALTH_SWEEP_JOB_ID);
+  const definition = DEFAULT_SCHEDULED_JOBS.find(
+    (job) => job.id === CITATION_LINK_HEALTH_SWEEP_JOB_ID,
+  );
   if (!definition) {
-    throw new Error(`Scheduled job "${CITATION_LINK_HEALTH_SWEEP_JOB_ID}" is not registered in the roster`);
+    throw new Error(
+      `Scheduled job "${CITATION_LINK_HEALTH_SWEEP_JOB_ID}" is not registered in the roster`,
+    );
   }
   return definition;
 }
@@ -224,7 +228,6 @@ const NEVER_ATTEMPT_SPN: (url: string) => Promise<SpnCaptureOutcome> = async () 
   ok: false,
   reason: 'not_attempted_this_step_does_not_require_spn',
 });
-
 
 /**
  * Runs one scheduled sweep over the supplied citation checks. Pure aside from the injected
@@ -260,7 +263,9 @@ export async function runCitationLinkHealthSweepJob(
     const fetchResult = await fetchLink(url);
     const classification = classifyLinkCheckAttempt({
       fetch: fetchResult,
-      ...(check.citation.capture.contentHash ? { capturedContentHash: check.citation.capture.contentHash } : {}),
+      ...(check.citation.capture.contentHash
+        ? { capturedContentHash: check.citation.capture.contentHash }
+        : {}),
     });
     const nextState = advanceLinkHealthState(check.state, classification, {
       checkedAt: input.completedAt,
@@ -282,8 +287,10 @@ export async function runCitationLinkHealthSweepJob(
     } else if (nextState.status === 'dead') {
       // A retry-exhausted 'pending_retry' classification still means "dead" for the ladder,
       // even though this attempt's own classification wasn't an explicit dead signal.
-      const deadClassification: Pick<LinkCheckClassification, 'status' | 'permanentRedirect' | 'redirectTarget'> =
-        classification.status === 'dead' ? classification : { status: 'dead' };
+      const deadClassification: Pick<
+        LinkCheckClassification,
+        'status' | 'permanentRedirect' | 'redirectTarget'
+      > = classification.status === 'dead' ? classification : { status: 'dead' };
       const hasWaybackCapture = Boolean(check.citation.capture.waybackCaptureUrl);
 
       if (hasWaybackCapture) {

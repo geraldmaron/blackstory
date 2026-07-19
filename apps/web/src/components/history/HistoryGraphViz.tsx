@@ -144,7 +144,10 @@ export function HistoryGraphViz({
   );
 
   const legendKinds = useMemo(() => {
-    const seen = new Map<string, { kind: string; shade: string; glyph: MapEntityGlyph; label: string }>();
+    const seen = new Map<
+      string,
+      { kind: string; shade: string; glyph: MapEntityGlyph; label: string }
+    >();
     for (const node of layout.layoutNodes) {
       if (seen.has(node.kind)) continue;
       const encoding = kindEncodingFor(node.kind);
@@ -229,10 +232,7 @@ export function HistoryGraphViz({
 
         <g className="ds-history-graph-viz__nodes">
           {layout.layoutNodes.map((node) => {
-            const isSelected =
-              node.role === 'record'
-                ? node.entityId === selectedId
-                : false;
+            const isSelected = node.role === 'record' ? node.entityId === selectedId : false;
             const showLabel = shouldShowLabel(node, layout.mode, selectedId, showLabelsForCount);
             const label =
               node.role === 'kind-hub'

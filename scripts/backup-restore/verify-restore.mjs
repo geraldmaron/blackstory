@@ -6,10 +6,7 @@
  */
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import {
-  verifyExportMetadata,
-  verifyActiveReleasePointer,
-} from './lib/verification.mjs';
+import { verifyExportMetadata, verifyActiveReleasePointer } from './lib/verification.mjs';
 
 function parseArgs(argv) {
   const options = {
@@ -102,8 +99,7 @@ async function main() {
     report.activeRelease = verifyActiveReleasePointer(activePointer, release);
   }
 
-  const ok =
-    report.export.ok && (report.activeRelease === null || report.activeRelease.ok);
+  const ok = report.export.ok && (report.activeRelease === null || report.activeRelease.ok);
 
   if (options.json) {
     console.log(JSON.stringify(report, null, 2));

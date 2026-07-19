@@ -6,9 +6,5 @@
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "src/**/*.test.ts",
-    "src/map/generate-demo-map-source.ts",
-    "dist"
-  ]
+  "exclude": ["src/**/*.test.ts", "src/map/generate-demo-map-source.ts", "dist"]
 }

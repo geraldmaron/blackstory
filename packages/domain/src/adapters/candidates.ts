@@ -1,7 +1,11 @@
 /**
  * Adapter candidate validation and provenance stamping.
  */
-import type { AdapterCandidateProvenance, AdapterCandidateRecord, SourceRegistryEntry } from './types.js';
+import type {
+  AdapterCandidateProvenance,
+  AdapterCandidateRecord,
+  SourceRegistryEntry,
+} from './types.js';
 
 export const ADAPTER_CANDIDATE_SCHEMA_VERSION = 'candidate-record.v1' as const;
 

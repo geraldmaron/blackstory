@@ -14,9 +14,7 @@ import {
   type KillSwitchDocSnapshot,
 } from './kill-switch.js';
 
-function createGetter(
-  docs: Readonly<Record<string, KillSwitchDocSnapshot>>,
-): DocGetter {
+function createGetter(docs: Readonly<Record<string, KillSwitchDocSnapshot>>): DocGetter {
   return {
     async getDoc(path) {
       return docs[path] ?? null;

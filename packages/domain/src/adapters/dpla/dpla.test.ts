@@ -10,8 +10,17 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import type { EvidenceSource } from '../../provenance/source.js';
-import { createInMemoryObligationsRegistry, defaultSourceObligationsSeed, getSourceObligationsOrThrow } from '../../rights/index.js';
-import { approveSourcePolicy, createInMemorySourceRegistry, registerSource, type SourceRegistryEntry } from '../index.js';
+import {
+  createInMemoryObligationsRegistry,
+  defaultSourceObligationsSeed,
+  getSourceObligationsOrThrow,
+} from '../../rights/index.js';
+import {
+  approveSourcePolicy,
+  createInMemorySourceRegistry,
+  registerSource,
+  type SourceRegistryEntry,
+} from '../index.js';
 import type { SafeHttpResponse } from '../internet-archive/shared/http-port.js';
 import {
   buildDplaCanonicalUrl,
@@ -79,7 +88,11 @@ test('DPLA v2 adapter starts disabled by default in the  registry', () => {
     createdAt: FIXED_NOW,
   });
   assert.equal(store.get('reg_dpla')?.registryState, 'disabled');
-  const approved = approveSourcePolicy(store, { id: 'reg_dpla', approvedBy: 'admin@blackbook.local', approvedAt: FIXED_NOW });
+  const approved = approveSourcePolicy(store, {
+    id: 'reg_dpla',
+    approvedBy: 'admin@blackbook.local',
+    approvedAt: FIXED_NOW,
+  });
   assert.equal(approved.registryState, 'approved');
 });
 
@@ -89,7 +102,9 @@ test('DPLA v2 adapter id is distinct from the fixture-only federal DPLA adapter 
 });
 
 test('DPLA v2 adapter has a registered  obligations entry', () => {
-  const obligationsStore = createInMemoryObligationsRegistry(defaultSourceObligationsSeed(FIXED_NOW));
+  const obligationsStore = createInMemoryObligationsRegistry(
+    defaultSourceObligationsSeed(FIXED_NOW),
+  );
   const obligations = getSourceObligationsOrThrow(obligationsStore, DPLA_V2_ADAPTER_ID);
   assert.equal(obligations.sourceClass, 'dpla');
   assert.equal(obligations.livenessRecheckRequired, true);
@@ -102,7 +117,10 @@ test('parses the current DPLA v2 response shape (array/object title, date object
   assert.equal(batch.docs[0]?.displayDate, '1931');
   assert.deepEqual(batch.docs[0]?.subjects, ['Schools', 'Piedmont County']);
   assert.equal(batch.docs[0]?.providerName, 'State Digital Library');
-  assert.equal(batch.docs[1]?.title, 'Rosewood Baptist Church cornerstone dedication program, 1949');
+  assert.equal(
+    batch.docs[1]?.title,
+    'Rosewood Baptist Church cornerstone dedication program, 1949',
+  );
   // doc[1] has neither `provider` nor `dataProvider` in the fixture providerName stays absent.
   assert.equal(batch.docs[1]?.providerName, undefined);
 });
@@ -114,7 +132,10 @@ test('tolerates a plausible post-transition (Cleveland Public Library) response 
   assert.equal(batch.rejected[0]?.reason, 'missing_title');
   assert.equal(batch.docs[0]?.id, 'cpl-0001');
   assert.equal(batch.docs[0]?.title, "Cross County Freedmen's School ledger, 1867-1869");
-  assert.equal(batch.docs[0]?.isShownAt, 'https://digital.crosscounty.example.gov/items/freedmens-school-ledger');
+  assert.equal(
+    batch.docs[0]?.isShownAt,
+    'https://digital.crosscounty.example.gov/items/freedmens-school-ledger',
+  );
   assert.equal(batch.docs[0]?.providerName, 'Cross County Public Library');
 });
 
@@ -128,7 +149,12 @@ test('rejects records missing both id fields, and a wholly non-object response t
 test('normalizes docs with a reputable_secondary default classification and capped snippet', () => {
   const entry = dplaRegistryEntry();
   const batch = parseDplaSearchResponse(loadFixture('search-response-current-shape.json'));
-  const candidates = normalizeDplaBatch({ docs: batch.docs, registryEntry: entry, runId: 'run_dpla_1', capturedAt: FIXED_NOW });
+  const candidates = normalizeDplaBatch({
+    docs: batch.docs,
+    registryEntry: entry,
+    runId: 'run_dpla_1',
+    capturedAt: FIXED_NOW,
+  });
 
   assert.equal(candidates.length, 2);
   assert.equal(candidates[0]?.classification, DPLA_V2_DEFAULT_CLASSIFICATION);
@@ -152,7 +178,15 @@ test('fetchDplaSearch requires a non-empty API key and never hardcodes one', asy
     finalUrl: '',
   });
   await assert.rejects(
-    () => fetchDplaSearch({ query: 'x', apiKey: '', registryEntry: entry, runId: 'r', capturedAt: FIXED_NOW, client }),
+    () =>
+      fetchDplaSearch({
+        query: 'x',
+        apiKey: '',
+        registryEntry: entry,
+        runId: 'r',
+        capturedAt: FIXED_NOW,
+        client,
+      }),
     /DPLA_API_KEY is required/,
   );
 });
@@ -183,7 +217,12 @@ test('fetchDplaSearch goes through the injected SafeHttpClient (mock, no live ne
 });
 
 test('buildDplaSearchUrl builds a well-formed api.dp.la/v2 URL', () => {
-  const url = buildDplaSearchUrl({ query: 'Rosewood', apiKey: FAKE_API_KEY, page: 2, pageSize: 25 });
+  const url = buildDplaSearchUrl({
+    query: 'Rosewood',
+    apiKey: FAKE_API_KEY,
+    page: 2,
+    pageSize: 25,
+  });
   const parsed = new URL(url);
   assert.equal(parsed.pathname, '/v2/items');
   assert.equal(parsed.searchParams.get('page'), '2');

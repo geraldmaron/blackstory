@@ -1,4 +1,3 @@
-
 /**
  * Tests proving state jurisdiction docs are sourced solely from the existing
  * `@repo/domain` `US_STATES` table.
@@ -7,7 +6,11 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { US_STATES } from '@repo/domain';
 import { jurisdictionSchema } from './schema.js';
-import { buildCountryJurisdictionDoc, buildStateJurisdictionDocs, stateInfoByFips } from './us-states-source.js';
+import {
+  buildCountryJurisdictionDoc,
+  buildStateJurisdictionDocs,
+  stateInfoByFips,
+} from './us-states-source.js';
 
 test('buildStateJurisdictionDocs produces exactly 51 states + D.C. plus one country row', () => {
   const docs = buildStateJurisdictionDocs({ now: () => '2026-01-01T00:00:00.000Z' });
@@ -45,10 +48,7 @@ test('every state doc parents to the single country row', () => {
 test('state jurisdiction ids are deterministic (idempotent re-run produces identical ids)', () => {
   const first = buildStateJurisdictionDocs({ now: () => '2026-01-01T00:00:00.000Z' });
   const second = buildStateJurisdictionDocs({ now: () => '2027-06-06T00:00:00.000Z' });
-  assert.deepEqual(
-    first.map((d) => d.id).sort(),
-    second.map((d) => d.id).sort(),
-  );
+  assert.deepEqual(first.map((d) => d.id).sort(), second.map((d) => d.id).sort());
 });
 
 test('stateInfoByFips resolves a known FIPS and returns undefined for an unknown one', () => {

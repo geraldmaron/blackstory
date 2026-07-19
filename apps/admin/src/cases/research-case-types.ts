@@ -43,11 +43,7 @@ export type AdminCaseDetail = {
 };
 
 export type AdminCaseTransitionAction =
-  | 'send_to_relevance'
-  | 'confirm_relevance'
-  | 'needs_evidence'
-  | 'exclude'
-  | 'merge';
+  'send_to_relevance' | 'confirm_relevance' | 'needs_evidence' | 'exclude' | 'merge';
 
 export type AdminCaseTransitionRequest = {
   readonly action: AdminCaseTransitionAction;
@@ -170,7 +166,9 @@ function actionLabelSafe(action: AdminCaseTransitionAction): string {
   }
 }
 
-export function legalActionsForState(state: ResearchCaseState): readonly AdminCaseTransitionAction[] {
+export function legalActionsForState(
+  state: ResearchCaseState,
+): readonly AdminCaseTransitionAction[] {
   switch (state) {
     case 'candidate':
       return ['send_to_relevance', 'merge'];

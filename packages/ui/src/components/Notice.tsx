@@ -1,4 +1,3 @@
-
 /**
  * Status notice for warning, dispute, and error with mono cue labels (not color-only).
  */

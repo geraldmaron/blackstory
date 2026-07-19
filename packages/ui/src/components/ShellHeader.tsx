@@ -5,13 +5,7 @@
  */
 'use client';
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-  type MouseEventHandler,
-} from 'react';
+import { useEffect, useRef, useState, type ReactNode, type MouseEventHandler } from 'react';
 import { ThemeToggle } from './ThemeToggle.js';
 import { cx } from '../utils/cx.js';
 
@@ -214,7 +208,11 @@ export function ShellHeader({
             aria-hidden="true"
             onClick={() => setMenuOpen(false)}
           />
-          <nav id="shell-nav-drawer" className="ds-shell-nav ds-shell-nav--drawer" aria-label="Primary">
+          <nav
+            id="shell-nav-drawer"
+            className="ds-shell-nav ds-shell-nav--drawer"
+            aria-label="Primary"
+          >
             <ul className="ds-shell-nav__list">
               {primaryNav.map((item) => (
                 <NavLink key={item.href} item={item} pathname={pathname} renderLink={renderLink} />

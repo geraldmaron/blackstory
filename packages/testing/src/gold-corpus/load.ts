@@ -1,14 +1,10 @@
-
 /**
  * Loads versioned gold-corpus and prediction JSON files from local disk for tests and
  * dry-run command-line evaluation.
  */
 import { readFileSync } from 'node:fs';
 import type { GoldCorpus, GoldPredictions } from './types.js';
-import {
-  GOLD_CORPUS_SCHEMA_VERSION,
-  GOLD_PREDICTIONS_SCHEMA_VERSION,
-} from './types.js';
+import { GOLD_CORPUS_SCHEMA_VERSION, GOLD_PREDICTIONS_SCHEMA_VERSION } from './types.js';
 
 function readJson(path: string): unknown {
   return JSON.parse(readFileSync(path, 'utf8')) as unknown;

@@ -29,7 +29,10 @@ const advanceDecision = routeConsensusReview(
 test('advanceToDiscoveryCandidate opens a research case in the earliest candidate state', () => {
   const result = advanceToDiscoveryCandidate({
     decision: advanceDecision,
-    lead: { submissionId: 'submission-1', title: 'A closed Facebook group post about a lost school' },
+    lead: {
+      submissionId: 'submission-1',
+      title: 'A closed Facebook group post about a lost school',
+    },
     researchCaseId: 'research-case-1',
     now: NOW,
   });

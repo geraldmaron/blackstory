@@ -34,19 +34,26 @@ export function FactProvenanceDisplay({ fact }: FactProvenanceDisplayProps) {
           confidence={fact.confidence}
           {...(fact.confidenceNote !== undefined ? { confidenceNote: fact.confidenceNote } : {})}
         />
-        <p className="ds-sans" style={{ margin: 'var(--ds-space-2) 0 0 0', color: 'var(--ds-ink-muted)' }}>
-          Workflow status: <span className="ds-mono">{humanizeToken(fact.status)}</span> — independent
-          from the evidence grade above.
+        <p
+          className="ds-sans"
+          style={{ margin: 'var(--ds-space-2) 0 0 0', color: 'var(--ds-ink-muted)' }}
+        >
+          Workflow status: <span className="ds-mono">{humanizeToken(fact.status)}</span> —
+          independent from the evidence grade above.
         </p>
       </section>
       <section aria-labelledby="fact-our-basis">
         <h2 className="ds-section__title" id="fact-our-basis">
           Our basis
         </h2>
-        <p className="ds-sans" style={{ margin: 0 }}>{fact.statement}</p>
+        <p className="ds-sans" style={{ margin: 0 }}>
+          {fact.statement}
+        </p>
         <dl className="ds-sans" style={{ margin: 'var(--ds-space-3) 0 0 0' }}>
           <dt style={{ fontWeight: 600 }}>Research method</dt>
-          <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>{humanizeToken(fact.provenance.method)}</dd>
+          <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>
+            {humanizeToken(fact.provenance.method)}
+          </dd>
           <dt style={{ fontWeight: 600 }}>Researched by</dt>
           <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>{fact.provenance.researchedBy}</dd>
           {fact.provenance.reviewedBy ? (

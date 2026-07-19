@@ -1,4 +1,3 @@
-
 /**
  * Firestore-backed jurisdiction lookups for the `jurisdictions` collection.
  *
@@ -17,7 +16,9 @@ export type FirestoreJurisdictionResolver = {
   get(jurisdictionId: string): Promise<JurisdictionDoc | undefined>;
 };
 
-export function createFirestoreJurisdictionResolver(firestore: Firestore): FirestoreJurisdictionResolver {
+export function createFirestoreJurisdictionResolver(
+  firestore: Firestore,
+): FirestoreJurisdictionResolver {
   const collection = firestore.collection(FIRESTORE_ROOT.jurisdictions);
   return {
     async exists(jurisdictionId: string) {

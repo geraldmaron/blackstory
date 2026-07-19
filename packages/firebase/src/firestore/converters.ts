@@ -1,13 +1,9 @@
-
 /**
  * Zod-backed Firestore converters and parse helpers for BlackStory documents.
  */
 import type { FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase/firestore';
 import type { z } from 'zod';
-import {
-  assertLearningIndexProjection,
-  sanitizePrimaryImageForRelease,
-} from '@repo/domain';
+import { assertLearningIndexProjection, sanitizePrimaryImageForRelease } from '@repo/domain';
 import { assertPublicProjectionSafe } from '@repo/security';
 import {
   auditEventSchema,
@@ -93,7 +89,9 @@ export function preparePublicEntityProjectionForWrite(
           credit: parsed.primaryImage.credit,
           rightsStatus: parsed.primaryImage.rightsStatus,
           ...(parsed.primaryImage.width !== undefined ? { width: parsed.primaryImage.width } : {}),
-          ...(parsed.primaryImage.height !== undefined ? { height: parsed.primaryImage.height } : {}),
+          ...(parsed.primaryImage.height !== undefined
+            ? { height: parsed.primaryImage.height }
+            : {}),
           ...(parsed.primaryImage.objectPath !== undefined
             ? { objectPath: parsed.primaryImage.objectPath }
             : {}),

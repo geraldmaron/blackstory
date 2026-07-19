@@ -36,7 +36,10 @@ const PILLARS = [
 
 export function HomeAbout({ topStates, OrientControl = StateStart }: HomeAboutProps) {
   return (
-    <section className="ds-section ds-section--flush ds-home-about" aria-labelledby="home-about-heading">
+    <section
+      className="ds-section ds-section--flush ds-home-about"
+      aria-labelledby="home-about-heading"
+    >
       <p className="ds-section__kicker">About</p>
       <h2 className="ds-section__title" id="home-about-heading">
         History, pinned to place.

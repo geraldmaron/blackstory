@@ -1,4 +1,3 @@
-
 /**
  * Fail-closed beta launch gate evaluator aggregates machine checks and human attestations.
  */

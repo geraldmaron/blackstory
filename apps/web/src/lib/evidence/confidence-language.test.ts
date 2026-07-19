@@ -25,16 +25,27 @@ test('formats a calibrated confidence label distinctly when the caller proves ca
 });
 
 test('assertNoUncalibratedProbabilityLanguage throws on probability language without calibration', () => {
-  assert.throws(() => assertNoUncalibratedProbabilityLanguage('60% probability this is true', false));
-  assert.doesNotThrow(() => assertNoUncalibratedProbabilityLanguage('60% probability this is true', true));
-  assert.doesNotThrow(() => assertNoUncalibratedProbabilityLanguage('Evidence score: high (0.78 of 1.00)', false));
+  assert.throws(() =>
+    assertNoUncalibratedProbabilityLanguage('60% probability this is true', false),
+  );
+  assert.doesNotThrow(() =>
+    assertNoUncalibratedProbabilityLanguage('60% probability this is true', true),
+  );
+  assert.doesNotThrow(() =>
+    assertNoUncalibratedProbabilityLanguage('Evidence score: high (0.78 of 1.00)', false),
+  );
 });
 
 test('EVIDENCE_DIMENSION_COPY gives confidence, relevance, connection strength, and research coverage each a distinct label and description', () => {
   const keys = Object.keys(EVIDENCE_DIMENSION_COPY);
-  assert.deepEqual(keys.sort(), ['confidence', 'connectionStrength', 'relevance', 'researchCoverage'].sort());
+  assert.deepEqual(
+    keys.sort(),
+    ['confidence', 'connectionStrength', 'relevance', 'researchCoverage'].sort(),
+  );
   const labels = new Set(Object.values(EVIDENCE_DIMENSION_COPY).map((entry) => entry.label));
-  const descriptions = new Set(Object.values(EVIDENCE_DIMENSION_COPY).map((entry) => entry.description));
+  const descriptions = new Set(
+    Object.values(EVIDENCE_DIMENSION_COPY).map((entry) => entry.description),
+  );
   assert.equal(labels.size, 4, 'every dimension must have a unique label');
   assert.equal(descriptions.size, 4, 'every dimension must have a unique description');
   // The confidence description explicitly clarifies it is a score, not a probability —

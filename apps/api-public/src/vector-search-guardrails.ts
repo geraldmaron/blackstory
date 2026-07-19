@@ -53,9 +53,7 @@ export type VectorSearchGuardRequest = {
 };
 
 export type VectorSearchDenialReason =
-  | QueryGuardrailDenialReason
-  | 'era_bucket_invalid'
-  | 'distance_threshold_invalid';
+  QueryGuardrailDenialReason | 'era_bucket_invalid' | 'distance_threshold_invalid';
 
 export const DEFAULT_DISTANCE_THRESHOLD = 0.5;
 const MAX_ERA_BUCKET_LENGTH = 16;
@@ -89,8 +87,7 @@ export type VectorSearchGuardDecisionDenied = {
 };
 
 export type VectorSearchGuardDecision =
-  | VectorSearchGuardDecisionAllowed
-  | VectorSearchGuardDecisionDenied;
+  VectorSearchGuardDecisionAllowed | VectorSearchGuardDecisionDenied;
 
 function deny(
   path: string,
@@ -158,7 +155,8 @@ export function evaluateVectorSearchGuardrails(
     eraBucket = normalized;
   }
 
-  const distanceThreshold = parseOptionalFloat(request.query.distanceThreshold) ?? DEFAULT_DISTANCE_THRESHOLD;
+  const distanceThreshold =
+    parseOptionalFloat(request.query.distanceThreshold) ?? DEFAULT_DISTANCE_THRESHOLD;
   if (!Number.isFinite(distanceThreshold) || distanceThreshold < -1 || distanceThreshold > 1) {
     return deny(
       request.path,

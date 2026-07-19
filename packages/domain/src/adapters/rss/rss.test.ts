@@ -8,8 +8,17 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import type { EvidenceSource } from '../../provenance/source.js';
-import { getSourceObligationsOrThrow, defaultSourceObligationsSeed, createInMemoryObligationsRegistry } from '../../rights/index.js';
-import { approveSourcePolicy, createInMemorySourceRegistry, registerSource, type SourceRegistryEntry } from '../index.js';
+import {
+  getSourceObligationsOrThrow,
+  defaultSourceObligationsSeed,
+  createInMemoryObligationsRegistry,
+} from '../../rights/index.js';
+import {
+  approveSourcePolicy,
+  createInMemorySourceRegistry,
+  registerSource,
+  type SourceRegistryEntry,
+} from '../index.js';
 import type { SafeHttpResponse } from '../internet-archive/shared/http-port.js';
 import {
   addFeedToRegistry,
@@ -78,7 +87,9 @@ test('RSS adapter starts disabled by default and requires an approved policy to 
 });
 
 test('RSS adapter has a registered  obligations entry (fail-closed lookup succeeds)', () => {
-  const obligationsStore = createInMemoryObligationsRegistry(defaultSourceObligationsSeed(FIXED_NOW));
+  const obligationsStore = createInMemoryObligationsRegistry(
+    defaultSourceObligationsSeed(FIXED_NOW),
+  );
   const obligations = getSourceObligationsOrThrow(obligationsStore, RSS_ADAPTER_ID);
   assert.equal(obligations.sourceClass, 'rss');
   assert.equal(obligations.attributionRequired, true);
@@ -94,9 +105,15 @@ test('parses RSS 2.0 feeds into normalized items', () => {
     parsed.items[0]?.title,
     "Oral history collection digitized: Freedmen's Bureau correspondence, 1866-1870",
   );
-  assert.equal(parsed.items[0]?.link, 'https://www.piedmonthistoricalsociety.example.org/news/freedmens-bureau-correspondence');
+  assert.equal(
+    parsed.items[0]?.link,
+    'https://www.piedmonthistoricalsociety.example.org/news/freedmens-bureau-correspondence',
+  );
   assert.ok(parsed.items[0]?.summary?.includes('214 letters'));
-  assert.equal(parsed.items[0]?.publishedAt, new Date('Wed, 15 Jul 2026 14:00:00 GMT').toISOString());
+  assert.equal(
+    parsed.items[0]?.publishedAt,
+    new Date('Wed, 15 Jul 2026 14:00:00 GMT').toISOString(),
+  );
 });
 
 test('parses outbound href linkHints from content:encoded without storing full body', () => {
@@ -117,15 +134,26 @@ test('parses Atom 1.0 feeds into normalized items', () => {
   assert.equal(parsed.format, 'atom');
   assert.equal(parsed.items.length, 2);
   assert.equal(parsed.items[0]?.title, 'New collection: Rosewood School Photographs, 1948-1965');
-  assert.equal(parsed.items[0]?.link, 'https://digital.crosscountylibrary.example.gov/collections/rosewood-school-photographs');
+  assert.equal(
+    parsed.items[0]?.link,
+    'https://digital.crosscountylibrary.example.gov/collections/rosewood-school-photographs',
+  );
 });
 
 test('rejects unrecognized feed formats rather than guessing', () => {
-  assert.throws(() => parseRssOrAtomFeed('<html><body>not a feed</body></html>'), /Unrecognized feed format/);
+  assert.throws(
+    () => parseRssOrAtomFeed('<html><body>not a feed</body></html>'),
+    /Unrecognized feed format/,
+  );
 });
 
 test('normalizes feed items into provenance-stamped, syndication-only candidates', () => {
-  const entry = { ...rssRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
+  const entry = {
+    ...rssRegistryEntry(),
+    registryState: 'approved' as const,
+    approvedAt: FIXED_NOW,
+    approvedBy: 'admin@blackbook.local',
+  };
   const feed = {
     id: 'feed_piedmont_historical_society',
     feedUrl: 'https://www.piedmonthistoricalsociety.example.org/feed.xml',
@@ -138,7 +166,13 @@ test('normalizes feed items into provenance-stamped, syndication-only candidates
     addedBy: 'admin@blackbook.local',
   };
   const xml = loadFixtureXml('historical-society-feed.rss.xml');
-  const candidates = normalizeFeedXml({ feed, xml, registryEntry: entry, runId: 'run_rss_1', capturedAt: FIXED_NOW });
+  const candidates = normalizeFeedXml({
+    feed,
+    xml,
+    registryEntry: entry,
+    runId: 'run_rss_1',
+    capturedAt: FIXED_NOW,
+  });
 
   assert.equal(candidates.length, 2);
   assert.equal(candidates[0]?.provenance.adapterId, RSS_ADAPTER_ID);
@@ -164,7 +198,13 @@ test('feed registry add/remove is versioned and produces a  audit event', () => 
       classification: 'community_oral',
       institutionType: 'historical_society',
     },
-    { actor, reason: 'Curated seed list — vetted historical society.', requestId: 'req_1', correlationId: 'corr_1', now: FIXED_NOW },
+    {
+      actor,
+      reason: 'Curated seed list — vetted historical society.',
+      requestId: 'req_1',
+      correlationId: 'corr_1',
+      now: FIXED_NOW,
+    },
   );
   auditLog.append(added.auditEvent);
 
@@ -213,7 +253,13 @@ test('feed registry rejects non-https feed URLs and empty removal reasons', () =
     () =>
       addFeedToRegistry(
         store,
-        { id: 'feed_x', feedUrl: 'http://insecure.example.org/feed.xml', displayName: 'x', classification: 'self_published', institutionType: 'personal_blog' },
+        {
+          id: 'feed_x',
+          feedUrl: 'http://insecure.example.org/feed.xml',
+          displayName: 'x',
+          classification: 'self_published',
+          institutionType: 'personal_blog',
+        },
         { actor, reason: 'r', requestId: 'req', correlationId: 'corr', now: FIXED_NOW },
       ),
     /must use https/,
@@ -221,7 +267,12 @@ test('feed registry rejects non-https feed URLs and empty removal reasons', () =
 });
 
 test('fetchAndNormalizeFeed goes through the injected SafeHttpClient (mock, no live network) and enforces content-type allowlist', async () => {
-  const entry = { ...rssRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
+  const entry = {
+    ...rssRegistryEntry(),
+    registryState: 'approved' as const,
+    approvedAt: FIXED_NOW,
+    approvedBy: 'admin@blackbook.local',
+  };
   const feed = {
     id: 'feed_library',
     feedUrl: 'https://digital.crosscountylibrary.example.gov/feed.atom',
@@ -245,14 +296,25 @@ test('fetchAndNormalizeFeed goes through the injected SafeHttpClient (mock, no l
     };
   };
 
-  const candidates = await fetchAndNormalizeFeed({ feed, registryEntry: entry, runId: 'run_1', capturedAt: FIXED_NOW, client });
+  const candidates = await fetchAndNormalizeFeed({
+    feed,
+    registryEntry: entry,
+    runId: 'run_1',
+    capturedAt: FIXED_NOW,
+    client,
+  });
   assert.equal(calls, 1);
   assert.equal(candidates.length, 2);
   assert.equal(candidates[0]?.provenance.sourceId, 'src_rss');
 });
 
 test('fetchAndNormalizeFeed retries on 429 and eventually succeeds', async () => {
-  const entry = { ...rssRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
+  const entry = {
+    ...rssRegistryEntry(),
+    registryState: 'approved' as const,
+    approvedAt: FIXED_NOW,
+    approvedBy: 'admin@blackbook.local',
+  };
   const feed = {
     id: 'feed_piedmont',
     feedUrl: 'https://www.piedmonthistoricalsociety.example.org/feed.xml',
@@ -269,9 +331,19 @@ test('fetchAndNormalizeFeed retries on 429 and eventually succeeds', async () =>
   const client = async (): Promise<SafeHttpResponse> => {
     attempts += 1;
     if (attempts < 3) {
-      return { status: 429, headers: { 'content-type': 'text/plain' }, bodyText: '', finalUrl: feed.feedUrl };
+      return {
+        status: 429,
+        headers: { 'content-type': 'text/plain' },
+        bodyText: '',
+        finalUrl: feed.feedUrl,
+      };
     }
-    return { status: 200, headers: { 'content-type': 'application/rss+xml' }, bodyText: xml, finalUrl: feed.feedUrl };
+    return {
+      status: 200,
+      headers: { 'content-type': 'application/rss+xml' },
+      bodyText: xml,
+      finalUrl: feed.feedUrl,
+    };
   };
 
   const candidates = await fetchAndNormalizeFeed({
@@ -287,7 +359,12 @@ test('fetchAndNormalizeFeed retries on 429 and eventually succeeds', async () =>
 });
 
 test('fetchAndNormalizeFeeds fans out with modest bounded concurrency', async () => {
-  const entry = { ...rssRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
+  const entry = {
+    ...rssRegistryEntry(),
+    registryState: 'approved' as const,
+    approvedAt: FIXED_NOW,
+    approvedBy: 'admin@blackbook.local',
+  };
   const rssXml = loadFixtureXml('historical-society-feed.rss.xml');
   const atomXml = loadFixtureXml('library-digital-collections.atom.xml');
   const feeds = [

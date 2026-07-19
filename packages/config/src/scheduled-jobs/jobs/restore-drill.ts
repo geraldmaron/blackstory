@@ -1,4 +1,3 @@
-
 /**
  * REAL roster entry: restore-drill scheduling. Invokes the actual,
  * already-existing print-only script (scripts/backup-restore/staging-restore.stub.sh, which in
@@ -31,7 +30,9 @@ export type RestoreDrillJobResult = {
   readonly printedPlan: string;
 };
 
-export async function runRestoreDrillJob(input: RestoreDrillJobInput): Promise<RestoreDrillJobResult> {
+export async function runRestoreDrillJob(
+  input: RestoreDrillJobInput,
+): Promise<RestoreDrillJobResult> {
   const started = startJobRun({
     jobId: RESTORE_DRILL_JOB_ID,
     jobRunId: input.jobRunId,
@@ -44,7 +45,11 @@ export async function runRestoreDrillJob(input: RestoreDrillJobInput): Promise<R
 
   const ok = exitCode === 0;
   const run = ok
-    ? completeJobRun(started, { completedAt: input.completedAt, itemsExpected: 1, itemsProcessed: 1 })
+    ? completeJobRun(started, {
+        completedAt: input.completedAt,
+        itemsExpected: 1,
+        itemsProcessed: 1,
+      })
     : failJobRun(started, {
         completedAt: input.completedAt,
         errorSummary: `scripts/backup-restore/staging-restore.stub.sh exited ${exitCode}`,

@@ -116,8 +116,7 @@ export async function prepareLocate(
 
   const stored = input.stored ?? { lat: best.lat, lng: best.lng };
   const effectiveJurisdiction =
-    jurisdictionLabel ||
-    [best.placeName, best.stateName].filter(Boolean).join(', ');
+    jurisdictionLabel || [best.placeName, best.stateName].filter(Boolean).join(', ');
 
   const decision = decideLocationCorrection({
     entityId: input.entityId,

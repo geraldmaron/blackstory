@@ -110,7 +110,10 @@ test('population modes round-trip decade params', () => {
   };
   const shareQs = buildExploreSearchParams(share);
   assert.equal(shareQs, 'layerMode=blackShare&popDecade=2010');
-  assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams(shareQs))), share);
+  assert.deepEqual(
+    parseExploreSearchParams(Object.fromEntries(new URLSearchParams(shareQs))),
+    share,
+  );
 
   const change = {
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
@@ -201,7 +204,10 @@ test('hidePanels=filters hides only the filters panel', () => {
     showKey: true,
   };
   assert.equal(buildExploreSearchParams(state), 'hidePanels=filters');
-  assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=filters'))), state);
+  assert.deepEqual(
+    parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=filters'))),
+    state,
+  );
 });
 
 test('hidePanels=results hides only the results rail', () => {
@@ -220,7 +226,10 @@ test('hidePanels=results hides only the results rail', () => {
     showKey: true,
   };
   assert.equal(buildExploreSearchParams(state), 'hidePanels=results');
-  assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=results'))), state);
+  assert.deepEqual(
+    parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=results'))),
+    state,
+  );
 });
 
 test('hidePanels=key hides only the color key legend', () => {
@@ -239,7 +248,10 @@ test('hidePanels=key hides only the color key legend', () => {
     showKey: false,
   };
   assert.equal(buildExploreSearchParams(state), 'hidePanels=key');
-  assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=key'))), state);
+  assert.deepEqual(
+    parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=key'))),
+    state,
+  );
 });
 
 test('hidePanels=filters,results,key hides all panels regardless of token order', () => {
@@ -268,11 +280,15 @@ test('hidePanels=filters,results,key hides all panels regardless of token order'
     'filters,results,key',
   );
   assert.deepEqual(
-    parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=filters,results,key'))),
+    parseExploreSearchParams(
+      Object.fromEntries(new URLSearchParams('hidePanels=filters,results,key')),
+    ),
     state,
   );
   assert.deepEqual(
-    parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=key,results,filters'))),
+    parseExploreSearchParams(
+      Object.fromEntries(new URLSearchParams('hidePanels=key,results,filters')),
+    ),
     state,
   );
 });

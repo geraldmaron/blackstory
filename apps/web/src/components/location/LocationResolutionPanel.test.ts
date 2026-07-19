@@ -16,7 +16,11 @@ test('renders resolved jurisdiction names and a link to search, never the raw co
     kind: 'resolved',
     cacheHit: false,
     resolution: {
-      match: { placeName: 'Washington', countyName: 'District of Columbia', stateName: 'District of Columbia' },
+      match: {
+        placeName: 'Washington',
+        countyName: 'District of Columbia',
+        stateName: 'District of Columbia',
+      },
       jurisdictionIds: { countryId: 'us', stateId: 'us-11', countyId: 'us-11-001' },
       precision: { tier: 'exact-site', exactCoordinatesRetained: true, lat: 38.846, lng: -76.927 },
     },
@@ -67,7 +71,9 @@ test('renders a network-error notice', () => {
 
 test('renders an invalid-query notice', () => {
   const html = renderToStaticMarkup(
-    createElement(LocationResolutionPanel, { result: { kind: 'invalid_query', reason: 'empty_address' } }),
+    createElement(LocationResolutionPanel, {
+      result: { kind: 'invalid_query', reason: 'empty_address' },
+    }),
   );
   assert.match(html, /could not be read as an address/);
 });

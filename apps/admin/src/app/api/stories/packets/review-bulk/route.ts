@@ -12,11 +12,7 @@ import {
   type StoryPacketReviewDecision,
 } from '../../../../../stories/story-packet-store';
 
-const DECISIONS = new Set<StoryPacketReviewDecision>([
-  'approved',
-  'rejected',
-  'needs_evidence',
-]);
+const DECISIONS = new Set<StoryPacketReviewDecision>(['approved', 'rejected', 'needs_evidence']);
 
 type Body = {
   readonly submissionIds?: unknown;
@@ -35,7 +31,10 @@ export async function POST(request: Request): Promise<Response> {
         { status: 400 },
       );
     }
-    if (!Array.isArray(body.submissionIds) || !body.submissionIds.every((id) => typeof id === 'string')) {
+    if (
+      !Array.isArray(body.submissionIds) ||
+      !body.submissionIds.every((id) => typeof id === 'string')
+    ) {
       return Response.json({ error: 'submissionIds must be a string array' }, { status: 400 });
     }
 

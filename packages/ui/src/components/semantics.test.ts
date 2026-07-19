@@ -1,4 +1,3 @@
-
 /**
  * Semantic HTML a11y smoke tests for design-system components via SSR markup.
  */
@@ -68,7 +67,13 @@ test('MapExplorer renders an accessible feature legend independent of the map ca
       title: 'National presence map',
       caption: 'Public precision only.',
       features: [
-        { id: 'e1', displayName: 'Seed Historical Place', kind: 'place', precision: 'city', statePostalCode: 'DC' },
+        {
+          id: 'e1',
+          displayName: 'Seed Historical Place',
+          kind: 'place',
+          precision: 'city',
+          statePostalCode: 'DC',
+        },
       ],
       stateAggregates: [{ stateName: 'District of Columbia', statePostalCode: 'DC', count: 1 }],
     }),

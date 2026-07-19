@@ -67,7 +67,9 @@ export function getPolicyVersion(policy: ProductConstitution = loadProductConsti
 /** Load a named constitution fixture used by evaluation tests.  */
 export function loadConstitutionFixture(kind: FixtureKind): ConstitutionFixture {
   const fileName = FIXTURE_FILES[kind];
-  return constitutionFixtureSchema.parse(readJsonFile(join(constitutionDir(), 'fixtures', fileName)));
+  return constitutionFixtureSchema.parse(
+    readJsonFile(join(constitutionDir(), 'fixtures', fileName)),
+  );
 }
 
 /** Load all constitution fixtures (included, excluded, disputed, sparse, sensitive, living-person).  */

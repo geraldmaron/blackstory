@@ -1,4 +1,3 @@
-
 /**
  * Representative HTML fixtures for core public journeys.
  * Strings mirror the server-rendered structure of search, explore, entity, locate,
@@ -6,12 +5,7 @@
  */
 
 export type CoreJourneyId =
-  | 'search'
-  | 'explore'
-  | 'entity'
-  | 'locate'
-  | 'corrections'
-  | 'degraded-shell';
+  'search' | 'explore' | 'entity' | 'locate' | 'corrections' | 'degraded-shell';
 
 export type CoreJourneyFixture = {
   readonly id: CoreJourneyId;

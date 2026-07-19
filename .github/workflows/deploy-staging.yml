@@ -14,7 +14,7 @@ on:
       confirm:
         description: Type deploy-staging to run
         required: true
-        default: ""
+        default: ''
   push:
     branches: [staging]
 

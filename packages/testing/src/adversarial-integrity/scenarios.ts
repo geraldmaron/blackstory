@@ -1,4 +1,3 @@
-
 /**
  * red-team scenario runners deterministic fixtures against real integrity gates.
  */
@@ -18,9 +17,7 @@ import {
   transitionResearchCase,
   type SourceIndependenceMetadata,
 } from '@repo/domain';
-import {
-  MASS_ASSIGNMENT_FIXTURE,
-} from '../security-gates/fixtures.js';
+import { MASS_ASSIGNMENT_FIXTURE } from '../security-gates/fixtures.js';
 import {
   assertPublicProjectionSafe,
   createQuarantinedSubmission,
@@ -156,40 +153,43 @@ export const runSourceLaunderingScenario = runner('source_laundering', () => {
   ];
 });
 
-export const runCoordinatedCitationRepetitionScenario = runner('coordinated_citation_repetition', () => {
-  const coordinated = Array.from({ length: 12 }, (_, index) =>
-    promotionEvidence(`repeat-${index}`, `lineage-${index}`, {
-      coordinatedGroupId: 'citation-ring-1',
-      independenceGroupId: `actor-${index}`,
-    }),
-  );
-  const detection = detectDuplicateAndCoordinatedEvidence(coordinated);
-  const collapsed = collapseSupportingEvidence(coordinated);
-  const gate = evaluatePromotionGate({
-    claim: promotionClaim({ confidence: 0.99, evidence: coordinated }),
-    approverId: 'approver-bb060',
-  });
+export const runCoordinatedCitationRepetitionScenario = runner(
+  'coordinated_citation_repetition',
+  () => {
+    const coordinated = Array.from({ length: 12 }, (_, index) =>
+      promotionEvidence(`repeat-${index}`, `lineage-${index}`, {
+        coordinatedGroupId: 'citation-ring-1',
+        independenceGroupId: `actor-${index}`,
+      }),
+    );
+    const detection = detectDuplicateAndCoordinatedEvidence(coordinated);
+    const collapsed = collapseSupportingEvidence(coordinated);
+    const gate = evaluatePromotionGate({
+      claim: promotionClaim({ confidence: 0.99, evidence: coordinated }),
+      approverId: 'approver-bb060',
+    });
 
-  return [
-    {
-      attackBlocked: !gate.approved,
-      publicContentMutated: false,
-      lineageInflationPrevented:
-        gate.rawSupportingEvidenceCount > gate.independentLineageCount &&
-        gate.independentLineageCount <= 1,
-      controls: [
-        {
-          layer: 'lineage_collapse',
-          reason: `coordinated:${detection.coordinatedEvidenceIds.length},independent:${collapsed.length}`,
-        },
-        {
-          layer: 'promotion_gate',
-          reason: gate.reasons.join(','),
-        },
-      ],
-    },
-  ];
-});
+    return [
+      {
+        attackBlocked: !gate.approved,
+        publicContentMutated: false,
+        lineageInflationPrevented:
+          gate.rawSupportingEvidenceCount > gate.independentLineageCount &&
+          gate.independentLineageCount <= 1,
+        controls: [
+          {
+            layer: 'lineage_collapse',
+            reason: `coordinated:${detection.coordinatedEvidenceIds.length},independent:${collapsed.length}`,
+          },
+          {
+            layer: 'promotion_gate',
+            reason: gate.reasons.join(','),
+          },
+        ],
+      },
+    ];
+  },
+);
 
 export const runAlteredDocumentsScenario = runner('altered_documents', () => {
   const originals = [

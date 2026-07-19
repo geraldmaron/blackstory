@@ -160,7 +160,7 @@ test('per-decade density levels cover exactly the states of entities ACTIVE that
   }
 });
 
-test('ACTIVE vs CUMULATIVE genuinely diverge: an entity that is no longer active drops out of a later decade\'s density, even though its pin never leaves once arrived', () => {
+test("ACTIVE vs CUMULATIVE genuinely diverge: an entity that is no longer active drops out of a later decade's density, even though its pin never leaves once arrived", () => {
   // 'new-in-1900s' exists purely so a distinct 1900s frame gets built at all — the
   // frame axis only steps on a NEW arrival (a feature's OWN earliest decade), never
   // on every decade a longer-lived feature's span merely touches.
@@ -178,12 +178,13 @@ test('ACTIVE vs CUMULATIVE genuinely diverge: an entity that is no longer active
 
   assert.deepEqual(d1870s.densityLevels.map((l) => l.statePostalCode).sort(), ['DC', 'GA']);
   // 'short-lived' (DC) is not active in the 1900s — density drops to GA only...
-  assert.deepEqual(d1900s.densityLevels.map((l) => l.statePostalCode), ['GA']);
+  assert.deepEqual(
+    d1900s.densityLevels.map((l) => l.statePostalCode),
+    ['GA'],
+  );
   // ...but its pin is still on the map (cumulative reveal never removes a pin).
   assert.equal(d1900s.cumulativeCount, 3);
-  assert.ok(
-    d1900s.featureCollection.features.some((f) => f.properties.entityId === 'short-lived'),
-  );
+  assert.ok(d1900s.featureCollection.features.some((f) => f.properties.entityId === 'short-lived'));
 });
 
 test('the closing/complete frame density is era-agnostic cumulative — includes an undated-but-located record no decade could honestly claim', () => {
@@ -194,8 +195,8 @@ test('the closing/complete frame density is era-agnostic cumulative — includes
 
   const finalFrame = frames.at(-1)!;
   assert.equal(finalFrame.isComplete, true);
-  assert.deepEqual(
-    finalFrame.densityLevels.map((level) => level.statePostalCode).sort(),
-    ['DC', 'GA'],
-  );
+  assert.deepEqual(finalFrame.densityLevels.map((level) => level.statePostalCode).sort(), [
+    'DC',
+    'GA',
+  ]);
 });

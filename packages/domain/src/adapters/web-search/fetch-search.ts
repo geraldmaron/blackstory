@@ -11,11 +11,12 @@ import {
   type SafeHttpClient,
 } from '../internet-archive/shared/http-port.js';
 import type { SourceRegistryEntry } from '../types.js';
-import { BRAVE_API_KEY_HEADER, buildBraveWebSearchUrl, parseBraveSearchResponse } from './brave-client.js';
 import {
-  buildSearxngSearchUrl,
-  parseSearxngSearchResponse,
-} from './searxng-client.js';
+  BRAVE_API_KEY_HEADER,
+  buildBraveWebSearchUrl,
+  parseBraveSearchResponse,
+} from './brave-client.js';
+import { buildSearxngSearchUrl, parseSearxngSearchResponse } from './searxng-client.js';
 import {
   evaluateWebSearchQueryBudget,
   type DailyBudgetEvaluator,
@@ -42,7 +43,9 @@ export type FetchBraveWebSearchInput = {
   readonly offset?: number;
 };
 
-export async function fetchBraveWebSearch(input: FetchBraveWebSearchInput): Promise<readonly WebSearchCandidateRecord[]> {
+export async function fetchBraveWebSearch(
+  input: FetchBraveWebSearchInput,
+): Promise<readonly WebSearchCandidateRecord[]> {
   if (input.config.provider !== 'brave') {
     throw new Error(`fetchBraveWebSearch requires provider=brave; got ${input.config.provider}`);
   }
@@ -103,11 +106,15 @@ export async function fetchSearxngWebSearch(
   input: FetchSearxngWebSearchInput,
 ): Promise<readonly WebSearchCandidateRecord[]> {
   if (input.config.provider !== 'searxng') {
-    throw new Error(`fetchSearxngWebSearch requires provider=searxng; got ${input.config.provider}`);
+    throw new Error(
+      `fetchSearxngWebSearch requires provider=searxng; got ${input.config.provider}`,
+    );
   }
   const baseUrl = input.config.baseUrl?.trim();
   if (!baseUrl) {
-    throw new Error('SEARXNG_BASE_URL is required on WebSearchProviderConfig.baseUrl for live SearXNG fetch');
+    throw new Error(
+      'SEARXNG_BASE_URL is required on WebSearchProviderConfig.baseUrl for live SearXNG fetch',
+    );
   }
   const url = buildSearxngSearchUrl({
     baseUrl,
@@ -172,7 +179,9 @@ export async function fetchBraveWebSearchBudgeted(
     evaluateDailyBudget: input.evaluateDailyBudget,
   });
   if (!budgetDecision.allowed) {
-    throw new Error(`Web search query budget denied: ${budgetDecision.reason ?? 'budget exceeded'}`);
+    throw new Error(
+      `Web search query budget denied: ${budgetDecision.reason ?? 'budget exceeded'}`,
+    );
   }
   const candidates = await fetchBraveWebSearch(input);
   return { candidates, budgetDecision };

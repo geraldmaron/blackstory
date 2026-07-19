@@ -22,30 +22,21 @@ test('statusLabelToSlug produces stable hyphenated slugs', () => {
 });
 
 test('applyHistoryStatusFilter matches by slug case-insensitively', () => {
-  const nodes = [
-    { statusLabel: 'Historic' },
-    { statusLabel: 'Active' },
-  ];
+  const nodes = [{ statusLabel: 'Historic' }, { statusLabel: 'Active' }];
   const filtered = applyHistoryStatusFilter(nodes, 'historic');
   assert.equal(filtered.length, 1);
   assert.equal(filtered[0]!.statusLabel, 'Historic');
 });
 
 test('applyHistoryTopicFilter matches topic tag membership', () => {
-  const nodes = [
-    { topicTags: ['education', 'schools'] },
-    { topicTags: ['church'] },
-  ];
+  const nodes = [{ topicTags: ['education', 'schools'] }, { topicTags: ['church'] }];
   const filtered = applyHistoryTopicFilter(nodes, 'education');
   assert.equal(filtered.length, 1);
   assert.equal(filtered[0]!.topicTags[0], 'education');
 });
 
 test('applyHistoryConnectionsFilter separates connected and isolated nodes', () => {
-  const nodes = [
-    { connectionCount: 2 },
-    { connectionCount: 0 },
-  ];
+  const nodes = [{ connectionCount: 2 }, { connectionCount: 0 }];
   assert.equal(applyHistoryConnectionsFilter(nodes, 'with').length, 1);
   assert.equal(applyHistoryConnectionsFilter(nodes, 'without').length, 1);
   assert.equal(applyHistoryConnectionsFilter(nodes, 'all').length, 2);

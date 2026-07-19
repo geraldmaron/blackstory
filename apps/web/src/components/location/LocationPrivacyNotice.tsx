@@ -15,7 +15,10 @@ void React;
 export function LocationPrivacyNotice() {
   return (
     <Notice tone="warning" title="How this lookup uses your location">
-      <ul className="ds-stack" style={{ gap: 'var(--ds-space-1)', margin: 0, paddingLeft: '1.1em' }}>
+      <ul
+        className="ds-stack"
+        style={{ gap: 'var(--ds-space-1)', margin: 0, paddingLeft: '1.1em' }}
+      >
         <li>
           Using your device&rsquo;s location requires you to press the button below — this page
           never requests it automatically.
@@ -25,13 +28,13 @@ export function LocationPrivacyNotice() {
           only to resolve the state, county, and (when applicable) city it falls within.
         </li>
         <li>
-          The exact coordinate is discarded immediately after that resolution; a ZIP code you
-          enter is translated to a place and then discarded — neither is kept as a stored history
-          of your searches.
+          The exact coordinate is discarded immediately after that resolution; a ZIP code you enter
+          is translated to a place and then discarded — neither is kept as a stored history of your
+          searches.
         </li>
         <li>
-          If the lookup fails or the result is outside the 50 states and D.C., you can always
-          search by place name instead.
+          If the lookup fails or the result is outside the 50 states and D.C., you can always search
+          by place name instead.
         </li>
       </ul>
     </Notice>

@@ -1,4 +1,3 @@
-
 /**
  * Presentational shell for the map data platform's real geographic map.
  *
@@ -16,7 +15,7 @@
  * `@repo/domain`.
  */
 
-import React, { type  ReactNode  } from 'react';
+import React, { type ReactNode } from 'react';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;

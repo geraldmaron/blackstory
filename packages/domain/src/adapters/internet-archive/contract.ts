@@ -40,7 +40,10 @@ export function createInternetArchiveAdapterContract(
     refreshSchedule: '0 5 * * *',
     rateLimits: { requestsPerMinute: 60, burst: 10 },
     volume: { expectedRecordsPerRun: 300, countToleranceFraction: 0.3 },
-    geographicCoverage: { countries: ['global'], notes: 'Digitized newspapers, city directories, community uploads' },
+    geographicCoverage: {
+      countries: ['global'],
+      notes: 'Digitized newspapers, city directories, community uploads',
+    },
     expectedSchemaVersion: ADAPTER_CANDIDATE_SCHEMA_VERSION,
     canarySampleFraction: 0.05,
     ...overrides,

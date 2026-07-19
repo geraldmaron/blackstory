@@ -1,4 +1,3 @@
-
 /**
  * Hybrid retrieval evaluation harness.
  *
@@ -73,7 +72,11 @@ export type HybridRetrievalRunner = (input: {
   readonly limit: number;
 }) => Promise<readonly string[]> | readonly string[];
 
-function precisionAtK(retrieved: readonly string[], relevant: ReadonlySet<string>, k: number): number {
+function precisionAtK(
+  retrieved: readonly string[],
+  relevant: ReadonlySet<string>,
+  k: number,
+): number {
   const top = retrieved.slice(0, k);
   if (top.length === 0) return 0;
   const hits = top.filter((id) => relevant.has(id)).length;
@@ -92,7 +95,9 @@ function reciprocalRank(retrieved: readonly string[], relevant: ReadonlySet<stri
   return index >= 0 ? 1 / (index + 1) : 0;
 }
 
-function buildFilters(query: HybridRetrievalLabeledQuery): readonly { field: 'state' | 'era'; value: string }[] {
+function buildFilters(
+  query: HybridRetrievalLabeledQuery,
+): readonly { field: 'state' | 'era'; value: string }[] {
   const filters: { field: 'state' | 'era'; value: string }[] = [];
   if (query.stateFilter) filters.push({ field: 'state', value: query.stateFilter });
   if (query.eraFilter) filters.push({ field: 'era', value: query.eraFilter });

@@ -54,7 +54,12 @@ test('a good record is indexed and a gate-failing record is skipped in the same 
 });
 
 test('the indexed doc is a structural superset carrying releaseId plus every searchable field', () => {
-  const rec = record({ id: 'e1', displayName: 'Alpha', aliases: ['beta'], topicTags: ['education'] });
+  const rec = record({
+    id: 'e1',
+    displayName: 'Alpha',
+    aliases: ['beta'],
+    topicTags: ['education'],
+  });
   const { docs } = buildPublicSearchIndexDocs('rel-1', [rec]);
   const doc = docs[0];
   assert.ok(doc);

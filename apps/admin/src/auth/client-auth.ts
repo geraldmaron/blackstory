@@ -6,12 +6,7 @@
  */
 'use client';
 
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-  type User,
-} from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
 import { getAdminClientAuth } from './firebase-browser';
 
 export function subscribeAdminAuth(listener: (user: User | null) => void): () => void {
@@ -68,10 +63,7 @@ async function assertSessionUser(user: User): Promise<User> {
 /**
  * Sign in with email and password for a Firebase Auth user.
  */
-export async function signInAdminWithEmailPassword(
-  email: string,
-  password: string,
-): Promise<User> {
+export async function signInAdminWithEmailPassword(email: string, password: string): Promise<User> {
   const auth = getAdminClientAuth();
   try {
     const result = await signInWithEmailAndPassword(auth, email.trim(), password);

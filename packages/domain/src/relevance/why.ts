@@ -15,9 +15,7 @@ export type BuildWhyInput = {
 };
 
 function joinEvidenceSummaries(evidence: readonly RelevanceEvidence[]): string {
-  const summaries = evidence
-    .filter((entry) => entry.kind !== 'gate')
-    .map((entry) => entry.summary);
+  const summaries = evidence.filter((entry) => entry.kind !== 'gate').map((entry) => entry.summary);
   if (summaries.length === 0) {
     return 'No substantive relevance evidence was found.';
   }

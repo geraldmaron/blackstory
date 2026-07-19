@@ -16,7 +16,11 @@ import Link from 'next/link';
 import { EmptyState, ResultList } from '@repo/ui';
 import { KindBadge, StatusMark } from '../../components/map-experience';
 import { getPublicSearchIndex } from '../../lib/public-data/source';
-import { buildSearchPageHref, buildSearchViewModel, type RawSearchParams } from './search-view-model';
+import {
+  buildSearchPageHref,
+  buildSearchViewModel,
+  type RawSearchParams,
+} from './search-view-model';
 
 export const metadata = {
   title: 'Search',
@@ -39,12 +43,7 @@ function FacetSelect({ id, name, label, defaultValue, options }: FacetSelectProp
   return (
     <label className="ds-pill-select" htmlFor={id}>
       <span className="ds-pill-select__label">{label}</span>
-      <select
-        className="ds-pill-select__control"
-        id={id}
-        name={name}
-        defaultValue={defaultValue}
-      >
+      <select className="ds-pill-select__control" id={id} name={name} defaultValue={defaultValue}>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -129,8 +128,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               </Link>
             }
           >
-            Try a broader keyword, or set Kind / Status / Era back to “All”. The archive grows
-            with every release.
+            Try a broader keyword, or set Kind / Status / Era back to “All”. The archive grows with
+            every release.
           </EmptyState>
         ) : (
           <>

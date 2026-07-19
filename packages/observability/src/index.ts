@@ -1,4 +1,3 @@
-
 /**
  * Structured logging, operational errors, and security telemetry shared across services.
  */
@@ -90,9 +89,7 @@ export type {
   CostAnomalyInput,
 } from './security-adapters.js';
 
-export {
-  createSecurityTelemetryRecorder,
-} from './security-telemetry.js';
+export { createSecurityTelemetryRecorder } from './security-telemetry.js';
 export type {
   SecurityTelemetrySink,
   SecurityTelemetryRecorderOptions,
@@ -109,7 +106,6 @@ export interface Logger {
   warn(message: string, context?: LogContext): void;
   error(message: string, error?: unknown, context?: LogContext): void;
 }
-
 
 /**
  * Redacts a structured log record before it is written. Wire the central redactor

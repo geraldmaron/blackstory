@@ -34,12 +34,8 @@ function escapeHtml(text: string): string {
 function renderPacket(packet: StoryResearchPacket, index: number): string {
   const bodyHtml = packet.draft.body
     .map((section) => {
-      const heading = section.heading
-        ? `<h3>${escapeHtml(section.heading)}</h3>`
-        : '';
-      const paragraphs = section.paragraphs
-        .map((p) => `<p>${escapeHtml(p)}</p>`)
-        .join('\n');
+      const heading = section.heading ? `<h3>${escapeHtml(section.heading)}</h3>` : '';
+      const paragraphs = section.paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join('\n');
       return `${heading}${paragraphs}`;
     })
     .join('\n');

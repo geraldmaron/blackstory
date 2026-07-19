@@ -7,10 +7,7 @@ import Link from 'next/link';
 import { useActionState, useEffect, useState } from 'react';
 import { useAdminAuth } from '../../auth/AdminAuthProvider';
 import { EVIDENCE_ATTACH_INITIAL, submitEvidenceAttach } from './actions';
-import {
-  EVIDENCE_ATTACH_STEPS,
-  evidenceSubmitLabel,
-} from './evidence-intake-copy';
+import { EVIDENCE_ATTACH_STEPS, evidenceSubmitLabel } from './evidence-intake-copy';
 
 export function EvidenceAttachForm() {
   const { user } = useAdminAuth();
@@ -110,8 +107,8 @@ export function EvidenceAttachForm() {
                 <Link href={`/cases/${state.researchCaseId}`}>{state.researchCaseId}</Link>.
               </p>
               <p>
-                Check commit and submit again to persist, or{' '}
-                <Link href="/inbox">open inbox</Link> to continue triage.
+                Check commit and submit again to persist, or <Link href="/inbox">open inbox</Link>{' '}
+                to continue triage.
               </p>
             </div>
           </div>

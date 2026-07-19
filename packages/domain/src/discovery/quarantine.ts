@@ -121,9 +121,6 @@ export function shouldContinueCampaign(
   return quarantinedCount < maxQuarantined;
 }
 
-export function shouldStopForDeadLetters(
-  deadLetterCount: number,
-  maxDeadLetter: number,
-): boolean {
+export function shouldStopForDeadLetters(deadLetterCount: number, maxDeadLetter: number): boolean {
   return deadLetterCount >= maxDeadLetter;
 }

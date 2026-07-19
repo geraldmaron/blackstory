@@ -276,7 +276,8 @@
   margin: 0;
   padding: var(--ds-space-5) var(--ds-space-5);
   padding-bottom: max(var(--ds-space-8), env(safe-area-inset-bottom));
-  border-top: var(--ds-border-width) solid color-mix(in srgb, var(--ds-fixed-paper) 14%, transparent);
+  border-top: var(--ds-border-width) solid
+    color-mix(in srgb, var(--ds-fixed-paper) 14%, transparent);
   border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
   background: color-mix(in srgb, var(--ds-fixed-ink) 96%, transparent);
   backdrop-filter: blur(24px);

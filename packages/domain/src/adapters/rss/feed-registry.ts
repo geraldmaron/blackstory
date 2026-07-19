@@ -39,7 +39,9 @@ export type FeedRegistryStore = {
   nextRevision(): number;
 };
 
-export function createInMemoryFeedRegistry(seed: readonly FeedRegistryEntry[] = []): FeedRegistryStore {
+export function createInMemoryFeedRegistry(
+  seed: readonly FeedRegistryEntry[] = [],
+): FeedRegistryStore {
   const entries = new Map<string, FeedRegistryEntry>(seed.map((entry) => [entry.id, entry]));
   let revision = seed.reduce((max, entry) => Math.max(max, entry.revision), 0);
   return {
@@ -100,7 +102,11 @@ function buildAuditEvent(input: {
     action: input.action,
     category: 'administrative',
     actor: input.actor,
-    subject: { type: 'rss_feed_registry_entry', id: input.feedId, path: `rssFeedRegistry/${input.feedId}` },
+    subject: {
+      type: 'rss_feed_registry_entry',
+      id: input.feedId,
+      path: `rssFeedRegistry/${input.feedId}`,
+    },
     reason: input.reason,
     requestId: input.requestId,
     correlationId: input.correlationId,
@@ -114,7 +120,13 @@ function buildAuditEvent(input: {
 export function addFeedToRegistry(
   store: FeedRegistryStore,
   input: AddFeedInput,
-  context: { readonly actor: AuditActor; readonly reason: string; readonly requestId: string; readonly correlationId: string; readonly now: string },
+  context: {
+    readonly actor: AuditActor;
+    readonly reason: string;
+    readonly requestId: string;
+    readonly correlationId: string;
+    readonly now: string;
+  },
 ): FeedRegistryMutationResult {
   if (store.get(input.id)) {
     throw new Error(`Feed registry entry already exists: ${input.id}`);
@@ -146,7 +158,12 @@ export function addFeedToRegistry(
     correlationId: context.correlationId,
     occurredAt: context.now,
     feedId: entry.id,
-    data: { mutation: 'feed_added', feedUrl: entry.feedUrl, classification: entry.classification, revision: entry.revision },
+    data: {
+      mutation: 'feed_added',
+      feedUrl: entry.feedUrl,
+      classification: entry.classification,
+      revision: entry.revision,
+    },
   });
 
   return { entry, auditEvent };
@@ -156,7 +173,13 @@ export function addFeedToRegistry(
 export function removeFeedFromRegistry(
   store: FeedRegistryStore,
   id: string,
-  context: { readonly actor: AuditActor; readonly reason: string; readonly requestId: string; readonly correlationId: string; readonly now: string },
+  context: {
+    readonly actor: AuditActor;
+    readonly reason: string;
+    readonly requestId: string;
+    readonly correlationId: string;
+    readonly now: string;
+  },
 ): FeedRegistryMutationResult {
   const existing = store.get(id);
   if (!existing) {

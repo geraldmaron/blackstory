@@ -37,10 +37,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  extractCatalogRelationships,
-  type ReleaseSourceEntity,
-} from '@repo/domain';
+import { extractCatalogRelationships, type ReleaseSourceEntity } from '@repo/domain';
 
 /** Fixed generation timestamp — never `Date.now()`, so re-runs are byte-for-byte comparable. */
 const GENERATED_AT = '2026-07-19T00:00:00.000Z';
@@ -310,9 +307,7 @@ function main(): void {
       `already present in the top-level files (see duplicate-id overlap below).`,
   );
   const idsOnlyInFull = [...fullUniqueIds].filter((id) => !pipelineUniqueIds.has(id));
-  console.log(
-    `  ids present in full on-disk but NOT in pipeline-visible: ${idsOnlyInFull.length}`,
-  );
+  console.log(`  ids present in full on-disk but NOT in pipeline-visible: ${idsOnlyInFull.length}`);
   console.log();
 
   // -------------------------------------------------------------------------

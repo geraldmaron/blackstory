@@ -41,10 +41,7 @@ function getStore() {
   return createAdminAtomicStore(getDb());
 }
 
-function toListItem(
-  record: ResearchCaseRecord,
-  placeHint?: string,
-): AdminCaseListItem {
+function toListItem(record: ResearchCaseRecord, placeHint?: string): AdminCaseListItem {
   const progress = checklistProgress(record.checklist);
   return {
     id: record.id,
@@ -55,17 +52,12 @@ function toListItem(
     createdAt: record.createdAt,
     checklistComplete: progress.complete,
     checklistTotal: progress.total,
-    ...(record.assignment?.reviewerId
-      ? { assigneeId: record.assignment.reviewerId }
-      : {}),
+    ...(record.assignment?.reviewerId ? { assigneeId: record.assignment.reviewerId } : {}),
     ...(placeHint ? { placeHint } : {}),
   };
 }
 
-function toDetail(
-  record: ResearchCaseRecord,
-  placeHint?: string,
-): AdminCaseDetail {
+function toDetail(record: ResearchCaseRecord, placeHint?: string): AdminCaseDetail {
   return {
     id: record.id,
     title: record.title,
@@ -76,9 +68,7 @@ function toDetail(
     checklist: record.checklist,
     history: record.history,
     record,
-    ...(record.relevanceAssessment
-      ? { relevanceAssessment: record.relevanceAssessment }
-      : {}),
+    ...(record.relevanceAssessment ? { relevanceAssessment: record.relevanceAssessment } : {}),
     ...(record.assignment ? { assignment: record.assignment } : {}),
     ...(record.publication ? { publication: record.publication } : {}),
     ...(record.retraction ? { retraction: record.retraction } : {}),
@@ -97,7 +87,10 @@ export async function listAdminResearchCases(options?: {
 
   let snap;
   if (states.length > 0 && states.length <= 10) {
-    snap = await collection.where('state', 'in', [...states]).limit(limit).get();
+    snap = await collection
+      .where('state', 'in', [...states])
+      .limit(limit)
+      .get();
   } else {
     snap = await collection.limit(limit).get();
   }
@@ -112,9 +105,7 @@ export async function listAdminResearchCases(options?: {
   return [...items].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
-export async function getAdminResearchCaseDetail(
-  id: string,
-): Promise<AdminCaseDetail | null> {
+export async function getAdminResearchCaseDetail(id: string): Promise<AdminCaseDetail | null> {
   const db = getDb();
   const snap = await db.collection(FIRESTORE_ROOT.researchCases).doc(id).get();
   if (!snap.exists) return null;

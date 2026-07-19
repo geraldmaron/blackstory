@@ -3,10 +3,7 @@
  * scanning the full public release collection.
  */
 
-import {
-  LEARNING_CONTINUE_LEARNING_CAP,
-  LEARNING_RELATED_DISPLAY_CAP,
-} from '@repo/domain';
+import { LEARNING_CONTINUE_LEARNING_CAP, LEARNING_RELATED_DISPLAY_CAP } from '@repo/domain';
 
 export type RelatedEdgeLike = {
   readonly id: string;

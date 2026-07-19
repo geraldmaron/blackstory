@@ -146,7 +146,10 @@ export function SynchronizedResultList({
   onSelect,
 }: SynchronizedResultListProps) {
   return (
-    <ul className={cx('ds-result-list', 'ds-explore-result-list', className)} aria-labelledby={labelledBy}>
+    <ul
+      className={cx('ds-result-list', 'ds-explore-result-list', className)}
+      aria-labelledby={labelledBy}
+    >
       {features.map((feature) => {
         const { properties } = feature;
         const isSelected = properties.entityId === selectedId;
@@ -165,7 +168,11 @@ export function SynchronizedResultList({
             className={cx('ds-result-list__item', isSelected && 'ds-result-list__item--selected')}
           >
             {onSelect ? (
-              <button type="button" {...primaryControlProps} onClick={() => onSelect(properties.entityId)}>
+              <button
+                type="button"
+                {...primaryControlProps}
+                onClick={() => onSelect(properties.entityId)}
+              >
                 <h3 className="ds-result-list__title">{properties.displayName}</h3>
                 <p className="ds-result-list__summary">{properties.oneLineStory}</p>
               </button>

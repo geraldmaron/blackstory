@@ -63,10 +63,7 @@ export type GeocodeResolution = {
 };
 
 export type ManualPlaceSearchReason =
-  | 'no_match'
-  | 'geocoder_unavailable'
-  | 'geocoder_error'
-  | 'ambiguous_match';
+  'no_match' | 'geocoder_unavailable' | 'geocoder_error' | 'ambiguous_match';
 
 export type ManualPlaceSearchFallback = {
   readonly available: true;
@@ -82,7 +79,9 @@ export type ManualPlaceSearchFallback = {
  * `SafeHttpClient`) so this module's pipeline/zip-translate/pure functions stay unit-testable
  * without any network I/O.
  */
-export type CensusAddressGeocodeFetcher = (queryText: string) => Promise<readonly CensusGeocodeMatch[]>;
+export type CensusAddressGeocodeFetcher = (
+  queryText: string,
+) => Promise<readonly CensusGeocodeMatch[]>;
 
 /** Injection seam for the live Census reverse-geocode call (browser location flow). */
 export type CensusCoordinatesGeocodeFetcher = (point: {
@@ -92,7 +91,8 @@ export type CensusCoordinatesGeocodeFetcher = (point: {
 
 /** Coarse, aggregate-safe analytics event never an exact coordinate or a raw address string. */
 export type CoarseLocationAnalyticsEvent = {
-  readonly kind: 'geocode_resolved' | 'geocode_failed' | 'browser_location_used' | 'manual_fallback_used';
+  readonly kind:
+    'geocode_resolved' | 'geocode_failed' | 'browser_location_used' | 'manual_fallback_used';
   readonly jurisdictionId?: string;
   readonly geoPrecisionTier?: GeoPrecisionTier;
   readonly occurredAt: string;

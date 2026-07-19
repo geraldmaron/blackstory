@@ -19,7 +19,9 @@ export type EvaluateCategoryGateInput = {
  * Fail-closed gate: a page is eligible only when it matches at least one curated seed category.
  * Expand/reference categories may appear in traversal metadata but never grant inclusion alone.
  */
-export function evaluateCategoryGate(input: EvaluateCategoryGateInput): WikimediaCategoryGateResult {
+export function evaluateCategoryGate(
+  input: EvaluateCategoryGateInput,
+): WikimediaCategoryGateResult {
   const graph = input.graph ?? DEFAULT_WIKIMEDIA_CATEGORY_GRAPH;
   const seedTitles = new Set(listSeedCategoryTitles(graph).map((title) => title.toLowerCase()));
   const matchedSeedCategories = input.pageCategories.filter((category) =>

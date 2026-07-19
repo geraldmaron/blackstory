@@ -27,7 +27,10 @@ import { getStorage } from 'firebase-admin/storage';
 import { getExternalDataSource, sha256Json } from '@repo/domain';
 import { idempotentBatchUpsert, loadExistingHashes } from '../src/external/batch-upsert.ts';
 import { recordDatasetAcquisition } from '../src/external/capture.ts';
-import { opportunityAtlasTractSchema, type OpportunityAtlasTractDoc } from '../src/external/schema.ts';
+import {
+  opportunityAtlasTractSchema,
+  type OpportunityAtlasTractDoc,
+} from '../src/external/schema.ts';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
 const ALLOW = process.env.APP_FIREBASE_ALLOW_PRODUCTION === '1';
@@ -58,12 +61,42 @@ const OUTCOME_COLUMNS: readonly {
   readonly nColumn: string;
   readonly nField: string;
 }[] = [
-  { column: 'kfr_pooled_pooled_p25', field: 'kfrPooledP25', nColumn: 'kfr_pooled_pooled_n', nField: 'kfrPooledN' },
-  { column: 'kfr_pooled_pooled_p75', field: 'kfrPooledP75', nColumn: 'kfr_pooled_pooled_n', nField: 'kfrPooledN' },
-  { column: 'kfr_black_pooled_p25', field: 'kfrBlackP25', nColumn: 'kfr_black_pooled_n', nField: 'kfrBlackN' },
-  { column: 'kfr_white_pooled_p25', field: 'kfrWhiteP25', nColumn: 'kfr_white_pooled_n', nField: 'kfrWhiteN' },
-  { column: 'jail_black_pooled_p25', field: 'jailBlackP25', nColumn: 'jail_black_pooled_n', nField: 'jailBlackN' },
-  { column: 'jail_pooled_pooled_p25', field: 'jailPooledP25', nColumn: 'jail_pooled_pooled_n', nField: 'jailPooledN' },
+  {
+    column: 'kfr_pooled_pooled_p25',
+    field: 'kfrPooledP25',
+    nColumn: 'kfr_pooled_pooled_n',
+    nField: 'kfrPooledN',
+  },
+  {
+    column: 'kfr_pooled_pooled_p75',
+    field: 'kfrPooledP75',
+    nColumn: 'kfr_pooled_pooled_n',
+    nField: 'kfrPooledN',
+  },
+  {
+    column: 'kfr_black_pooled_p25',
+    field: 'kfrBlackP25',
+    nColumn: 'kfr_black_pooled_n',
+    nField: 'kfrBlackN',
+  },
+  {
+    column: 'kfr_white_pooled_p25',
+    field: 'kfrWhiteP25',
+    nColumn: 'kfr_white_pooled_n',
+    nField: 'kfrWhiteN',
+  },
+  {
+    column: 'jail_black_pooled_p25',
+    field: 'jailBlackP25',
+    nColumn: 'jail_black_pooled_n',
+    nField: 'jailBlackN',
+  },
+  {
+    column: 'jail_pooled_pooled_p25',
+    field: 'jailPooledP25',
+    nColumn: 'jail_pooled_pooled_n',
+    nField: 'jailPooledN',
+  },
 ];
 
 function arg(name: string): string | undefined {
@@ -109,9 +142,14 @@ async function main(): Promise<void> {
     await bucket.upload(filePath, {
       destination: STORAGE_PATH,
       resumable: true,
-      metadata: { contentType: 'text/csv', metadata: { sha256: datasetChecksum, sourceUrl: SOURCE_URL } },
+      metadata: {
+        contentType: 'text/csv',
+        metadata: { sha256: datasetChecksum, sourceUrl: SOURCE_URL },
+      },
     });
-    await bucket.file(`${STORAGE_PATH}.sha256`).save(`${datasetChecksum}  tract_outcomes_early.csv\n`);
+    await bucket
+      .file(`${STORAGE_PATH}.sha256`)
+      .save(`${datasetChecksum}  tract_outcomes_early.csv\n`);
     console.log('Upload complete.');
   }
 
@@ -128,9 +166,14 @@ async function main(): Promise<void> {
     if (!header) {
       header = line.split(',').map((c) => c.replace(/^"|"$/g, ''));
       colIndex = new Map(header.map((name, idx) => [name, idx]));
-      const missing = ['state', 'county', 'tract', ...OUTCOME_COLUMNS.flatMap((c) => [c.column, c.nColumn])]
-        .filter((c) => !colIndex.has(c));
-      if (missing.length > 0) throw new Error(`CSV header missing expected columns: ${missing.join(', ')}`);
+      const missing = [
+        'state',
+        'county',
+        'tract',
+        ...OUTCOME_COLUMNS.flatMap((c) => [c.column, c.nColumn]),
+      ].filter((c) => !colIndex.has(c));
+      if (missing.length > 0)
+        throw new Error(`CSV header missing expected columns: ${missing.join(', ')}`);
       continue;
     }
     const cells = line.split(',');

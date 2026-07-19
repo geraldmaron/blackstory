@@ -84,9 +84,7 @@ export function computeEffectivenessMetrics(
   const falsePositiveRate = totalMatches === 0 ? 0 : totalFalsePositives / totalMatches;
 
   const effectivenessScore =
-    totalMatches === 0
-      ? 0
-      : Math.max(0, matchRate - falsePositiveRate - exclusionRate * 0.25);
+    totalMatches === 0 ? 0 : Math.max(0, matchRate - falsePositiveRate - exclusionRate * 0.25);
 
   return {
     packId: input.packId,
@@ -109,6 +107,7 @@ export function listEffectivenessRecords(
   versionId?: QueryPackVersionId,
 ): readonly QueryPackEffectivenessRecord[] {
   return store.records.filter(
-    (record) => record.packId === packId && (versionId === undefined || record.versionId === versionId),
+    (record) =>
+      record.packId === packId && (versionId === undefined || record.versionId === versionId),
   );
 }

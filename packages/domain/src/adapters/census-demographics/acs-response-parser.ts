@@ -112,7 +112,10 @@ export function parseAcsResponse(
     }
 
     rows.push({
-      geoid: geography === 'tract' ? `${stateFips}${countyFips}${tractCode}` : `${stateFips}${countyFips}`,
+      geoid:
+        geography === 'tract'
+          ? `${stateFips}${countyFips}${tractCode}`
+          : `${stateFips}${countyFips}`,
       stateFips,
       countyFips,
       ...(geography === 'tract' ? { tractCode: tractCode! } : {}),

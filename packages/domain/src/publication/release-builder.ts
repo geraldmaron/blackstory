@@ -204,10 +204,7 @@ export type ReleaseSearchIndexFields = {
 };
 
 export type ReleaseBuildFailureReason =
-  | 'no_citations'
-  | 'notability_basis_gate'
-  | 'reference_resolution'
-  | 'catalog_decision_retracted';
+  'no_citations' | 'notability_basis_gate' | 'reference_resolution' | 'catalog_decision_retracted';
 
 export type ReleaseBuildResult =
   | {
@@ -349,7 +346,9 @@ export function buildReleaseNotabilityBasis(
       .filter((claim) => claim.citationSource.trim().length > 0)
       .map((claim) => claim.id);
     const [sample] = predicateClaims;
-    const criterion = sample ? inferNotabilityCriterionFromClaim(predicate, sample.object) : 'documented_site';
+    const criterion = sample
+      ? inferNotabilityCriterionFromClaim(predicate, sample.object)
+      : 'documented_site';
     records.push({
       criterion,
       note: buildNotabilityBasisNote(predicate, predicateClaims),
@@ -403,7 +402,10 @@ export function resolveReleaseEntityReferences(
 ): ReferenceResolutionResult {
   const unresolvedTopics = (entry.topicIds ?? []).filter((id) => !isValidTopicId(id));
   if (unresolvedTopics.length > 0) {
-    return { ok: false, reason: `topicIds do not resolve against TOPIC_REGISTRY: ${unresolvedTopics.join(', ')}` };
+    return {
+      ok: false,
+      reason: `topicIds do not resolve against TOPIC_REGISTRY: ${unresolvedTopics.join(', ')}`,
+    };
   }
 
   const claimIds = new Set(claims.map((claim) => claim.id));
@@ -418,13 +420,19 @@ export function resolveReleaseEntityReferences(
   }
 
   if (entry.jurisdictionLabel.trim().length === 0) {
-    return { ok: false, reason: 'jurisdictionLabel does not resolve to a real jurisdiction (empty)' };
+    return {
+      ok: false,
+      reason: 'jurisdictionLabel does not resolve to a real jurisdiction (empty)',
+    };
   }
   if (entry.locationLabel.trim().length === 0) {
     return { ok: false, reason: 'locationLabel does not resolve to a real location (empty)' };
   }
   if (entry.locationPrecision.trim().length === 0) {
-    return { ok: false, reason: 'locationPrecision does not resolve to a real precision level (empty)' };
+    return {
+      ok: false,
+      reason: 'locationPrecision does not resolve to a real precision level (empty)',
+    };
   }
 
   return { ok: true };
@@ -521,14 +529,18 @@ export function buildReleaseEntityArtifacts(
   const locationLabel = context.locationOverride?.locationLabel ?? entry.locationLabel;
   const matchMethod = context.locationOverride?.matchMethod ?? 'manual_research';
   const geo: GeoPointFields = buildGeoPointFields(lat, lng, geohashPrecision);
-  const notabilityLabels = [...new Set(notabilityBasis.map((basis) => NOTABILITY_RUBRIC[basis.criterion]))];
+  const notabilityLabels = [
+    ...new Set(notabilityBasis.map((basis) => NOTABILITY_RUBRIC[basis.criterion])),
+  ];
   const related = resolveRelatedEntries(entry, context);
   const derivedStatus = deriveCatalogEntityStatus({
     id: entry.id,
     kind: entry.kind,
     displayName: entry.displayName,
     summary: entry.summary,
-    ...(entry.historicalContext !== undefined ? { historicalContext: entry.historicalContext } : {}),
+    ...(entry.historicalContext !== undefined
+      ? { historicalContext: entry.historicalContext }
+      : {}),
     ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
     ...(entry.claims !== undefined ? { claims: entry.claims } : {}),
     ...(entry.statusHistory !== undefined ? { statusHistory: entry.statusHistory as never } : {}),
@@ -566,7 +578,9 @@ export function buildReleaseEntityArtifacts(
     notabilityLabels,
     notabilityBasis,
     researchCoverage,
-    ...(entry.historicalContext !== undefined ? { historicalContext: entry.historicalContext } : {}),
+    ...(entry.historicalContext !== undefined
+      ? { historicalContext: entry.historicalContext }
+      : {}),
     ...(related.length > 0 ? { related } : {}),
     generatedAt: context.generatedAt,
     recordUpdatedAt: context.generatedAt,

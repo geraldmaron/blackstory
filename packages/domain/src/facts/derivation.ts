@@ -68,7 +68,11 @@ export type FactDerivationCheckFailureReason =
 
 export type FactDerivationCheckResult =
   | { readonly ok: true }
-  | { readonly ok: false; readonly reason: FactDerivationCheckFailureReason; readonly message: string };
+  | {
+      readonly ok: false;
+      readonly reason: FactDerivationCheckFailureReason;
+      readonly message: string;
+    };
 
 export type FactDerivationCheckInput = {
   readonly fact: {
@@ -99,7 +103,9 @@ const SINGLE_SOURCE_LINEAGE = 1;
  * See the module doc for the full rule. Intentionally conservative: it only ever returns a
  * grade the claim's own recorded signals can justify, never guesses upward.
  */
-export function maxFactConfidenceGradeForClaim(claim: FactDerivationBackingClaim): FactConfidenceGrade {
+export function maxFactConfidenceGradeForClaim(
+  claim: FactDerivationBackingClaim,
+): FactConfidenceGrade {
   if (!isClaimPublished(claim)) return 'contested';
 
   const confidence = claim.confidence;
@@ -123,7 +129,9 @@ export function maxFactConfidenceGradeForClaim(claim: FactDerivationBackingClaim
  * `backingClaims`  see the module doc for why a missing claim fails closed rather than being
  * skipped.
  */
-export function evaluateFactDerivationConsistency(input: FactDerivationCheckInput): FactDerivationCheckResult {
+export function evaluateFactDerivationConsistency(
+  input: FactDerivationCheckInput,
+): FactDerivationCheckResult {
   const { fact, backingClaims } = input;
   const factLabel = fact.id ?? '(unspecified fact id)';
 
@@ -149,7 +157,9 @@ export function evaluateFactDerivationConsistency(input: FactDerivationCheckInpu
   const backing = fact.derivedFromClaimIds.map((id) => byId.get(id)!);
 
   // --- confidence ceiling: the fact cannot be stronger than its WEAKEST backing claim ---
-  const ceilingRank = Math.max(...backing.map((claim) => GRADE_RANK[maxFactConfidenceGradeForClaim(claim)]));
+  const ceilingRank = Math.max(
+    ...backing.map((claim) => GRADE_RANK[maxFactConfidenceGradeForClaim(claim)]),
+  );
   const factRank = GRADE_RANK[fact.confidence];
   if (factRank < ceilingRank) {
     const ceilingGrade = FACT_CONFIDENCE_GRADES.find((grade) => GRADE_RANK[grade] === ceilingRank)!;

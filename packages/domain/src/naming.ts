@@ -135,7 +135,9 @@ export function isTrustedIdentifierNamespace(namespace: string): boolean {
  * `EntityIdentifierRecord` shape. `system` becomes `namespace`; `note` is dropped (it was
  * free-text, not modeled here).
  */
-export function migrateEntityIdentifiers(entity: CanonicalEntity): readonly EntityIdentifierRecord[] {
+export function migrateEntityIdentifiers(
+  entity: CanonicalEntity,
+): readonly EntityIdentifierRecord[] {
   return (entity.identifiers ?? []).map((identifier) => ({
     entityId: entity.id,
     namespace: identifier.system,
@@ -167,7 +169,10 @@ export function findIdentifierUniquenessViolations(
   options: { readonly ambiguousEntityIds?: ReadonlySet<string> } = {},
 ): readonly IdentifierUniquenessViolation[] {
   const ambiguous = options.ambiguousEntityIds ?? new Set<string>();
-  const byKey = new Map<string, { namespace: string; normalizedValue: string; entityIds: Set<string> }>();
+  const byKey = new Map<
+    string,
+    { namespace: string; normalizedValue: string; entityIds: Set<string> }
+  >();
   for (const record of records) {
     if (ambiguous.has(record.entityId)) continue;
     const namespace = normalizeAlias(record.namespace);
@@ -176,7 +181,11 @@ export function findIdentifierUniquenessViolations(
     if (existing) {
       existing.entityIds.add(record.entityId);
     } else {
-      byKey.set(key, { namespace, normalizedValue: record.normalizedValue, entityIds: new Set([record.entityId]) });
+      byKey.set(key, {
+        namespace,
+        normalizedValue: record.normalizedValue,
+        entityIds: new Set([record.entityId]),
+      });
     }
   }
   const violations: IdentifierUniquenessViolation[] = [];

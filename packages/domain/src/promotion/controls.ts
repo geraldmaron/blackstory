@@ -76,10 +76,7 @@ export function detectDuplicateAndCoordinatedEvidence(
   }
 
   for (const item of evidence) {
-    if (
-      item.coordinatedGroupId &&
-      (coordinatedCounts.get(item.coordinatedGroupId) ?? 0) > 1
-    ) {
+    if (item.coordinatedGroupId && (coordinatedCounts.get(item.coordinatedGroupId) ?? 0) > 1) {
       coordinatedEvidenceIds.push(item.evidenceId);
     }
   }
@@ -221,7 +218,9 @@ export function evaluatePromotionGate(input: {
     policyVersion: policy.policyVersion,
     queue: routePromotionReview(
       input.claim.claimClass,
-      Number.isFinite(input.claim.confidence) ? Math.max(0, Math.min(1, input.claim.confidence)) : 0,
+      Number.isFinite(input.claim.confidence)
+        ? Math.max(0, Math.min(1, input.claim.confidence))
+        : 0,
       policy,
     ),
     reasons: Object.freeze([...reasons].sort()),

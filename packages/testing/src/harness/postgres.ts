@@ -1,4 +1,3 @@
-
 /**
  * PostgreSQL integration harness for disposable local/CI databases.
  * Skips when Docker/Postgres is unavailable unless CI_REQUIRE_POSTGRES=1.
@@ -38,7 +37,6 @@ function canConnect(connectionString: string): boolean {
   });
   return result.status === 0;
 }
-
 
 /**
  * Opens a disposable schema on a local/CI Postgres instance.

@@ -66,7 +66,8 @@ function parseResult(
   if (!url) {
     return { rejected: { index, reason: 'missing_url' } };
   }
-  const title = typeof record.title === 'string' && record.title.trim() ? record.title.trim() : undefined;
+  const title =
+    typeof record.title === 'string' && record.title.trim() ? record.title.trim() : undefined;
   // SearXNG uses `content` for the snippet; tolerate `description` aliases.
   const descriptionRaw =
     typeof record.content === 'string'

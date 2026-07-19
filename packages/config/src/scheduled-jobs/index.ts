@@ -1,4 +1,3 @@
-
 /**
  * Scheduled-job registry public surface. Other packages' recurring jobs plug into this
  * framework — see types.ts for the design note and roster.ts for the initial job roster
@@ -21,7 +20,11 @@ export {
   type ScheduledJobDefinition,
 } from './types.js';
 
-export { isValidCronExpression, assertValidCronExpression, EVENT_DRIVEN_CADENCE_SENTINEL } from './cron.js';
+export {
+  isValidCronExpression,
+  assertValidCronExpression,
+  EVENT_DRIVEN_CADENCE_SENTINEL,
+} from './cron.js';
 
 export { scheduledJobKillSwitchId } from './kill-switch.js';
 
@@ -58,11 +61,7 @@ export {
   type BudgetEvaluation,
 } from './health.js';
 
-export {
-  buildMissedRunAlert,
-  buildBudgetExceededAlert,
-  buildJobRunAlerts,
-} from './alerting.js';
+export { buildMissedRunAlert, buildBudgetExceededAlert, buildJobRunAlerts } from './alerting.js';
 
 export { assertScheduledJobOperationAllowed, jobDeclaresPublicEffect } from './publish-guard.js';
 

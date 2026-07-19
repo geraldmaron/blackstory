@@ -1,4 +1,3 @@
-
 /**
  * Connect Firebase JS Admin SDK instances to local emulators when configured.
  */
@@ -40,7 +39,6 @@ function hostPort(hostPortValue: string): { host: string; port: number } {
   return { host: url.hostname, port };
 }
 
-
 /**
  * Wire Auth/Firestore/Storage emulators onto a client FirebaseApp (idempotent-ish).
  */
@@ -67,7 +65,6 @@ export function connectClientEmulators(
 
   return { auth, firestore, storage };
 }
-
 
 /**
  * Point the Admin SDK at emulators via process env (Admin SDK convention).

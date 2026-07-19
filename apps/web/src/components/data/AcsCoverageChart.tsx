@@ -22,8 +22,18 @@ export type AcsCoverageChartProps = {
 
 export function AcsCoverageChart({ coverage }: AcsCoverageChartProps) {
   const series = [
-    { key: 'counties', label: 'Counties covered', value: coverage.countyCount, fill: 'var(--ds-accent-graphic)' },
-    { key: 'tracts', label: 'Census tracts covered', value: coverage.tractCount, fill: 'var(--ds-accent-muted)' },
+    {
+      key: 'counties',
+      label: 'Counties covered',
+      value: coverage.countyCount,
+      fill: 'var(--ds-accent-graphic)',
+    },
+    {
+      key: 'tracts',
+      label: 'Census tracts covered',
+      value: coverage.tractCount,
+      fill: 'var(--ds-accent-muted)',
+    },
   ] as const;
 
   const maxValue = niceMax(Math.max(coverage.countyCount, coverage.tractCount));
@@ -77,7 +87,12 @@ export function AcsCoverageChart({ coverage }: AcsCoverageChartProps) {
                 y1={y}
                 y2={y}
               />
-              <text className="ds-data-chart__axis-label" x={CHART_MARGIN.left - 8} y={y + 4} textAnchor="end">
+              <text
+                className="ds-data-chart__axis-label"
+                x={CHART_MARGIN.left - 8}
+                y={y + 4}
+                textAnchor="end"
+              >
                 {formatChartCount(Math.round(tick))}
               </text>
             </g>
@@ -90,8 +105,19 @@ export function AcsCoverageChart({ coverage }: AcsCoverageChartProps) {
           const barBottom = yScale(0);
           return (
             <g key={item.key}>
-              <rect x={barX} y={barTop} width={barWidth} height={barBottom - barTop} fill={item.fill} />
-              <text className="ds-data-chart__axis-label" x={centerX} y={barTop - 8} textAnchor="middle">
+              <rect
+                x={barX}
+                y={barTop}
+                width={barWidth}
+                height={barBottom - barTop}
+                fill={item.fill}
+              />
+              <text
+                className="ds-data-chart__axis-label"
+                x={centerX}
+                y={barTop - 8}
+                textAnchor="middle"
+              >
                 {formatChartCount(item.value)}
               </text>
               <text

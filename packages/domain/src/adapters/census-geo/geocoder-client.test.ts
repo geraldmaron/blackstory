@@ -12,7 +12,10 @@ import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import type { SafeHttpResponse } from '../internet-archive/shared/http-port.js';
 import { buildCensusCoordinatesUrl, buildCensusOneLineAddressUrl } from './url-builder.js';
-import { parseCensusAddressGeocodeResponse, parseCensusCoordinatesGeocodeResponse } from './response-parser.js';
+import {
+  parseCensusAddressGeocodeResponse,
+  parseCensusCoordinatesGeocodeResponse,
+} from './response-parser.js';
 import { extractCensusGeography, normalizeCensusAddressMatch } from './normalizer.js';
 import { fetchCensusAddressGeocode, fetchCensusCoordinatesGeocode } from './fetch-geocode.js';
 
@@ -22,8 +25,13 @@ function loadFixture(name: string): unknown {
 }
 
 test('buildCensusOneLineAddressUrl pins benchmark/vintage and encodes the address', () => {
-  const url = buildCensusOneLineAddressUrl({ address: '4600 Silver Hill Rd, Washington, DC 20233' });
-  assert.match(url, /^https:\/\/geocoding\.geo\.census\.gov\/geocoder\/geographies\/onelineaddress\?/);
+  const url = buildCensusOneLineAddressUrl({
+    address: '4600 Silver Hill Rd, Washington, DC 20233',
+  });
+  assert.match(
+    url,
+    /^https:\/\/geocoding\.geo\.census\.gov\/geocoder\/geographies\/onelineaddress\?/,
+  );
   assert.match(url, /benchmark=Public_AR_Current/);
   assert.match(url, /vintage=Current_Current/);
   assert.match(url, /address=4600\+Silver\+Hill/);
@@ -56,11 +64,16 @@ test('parseCensusAddressGeocodeResponse returns an empty array for a no-match re
 test('parseCensusAddressGeocodeResponse never throws on a malformed/unexpected shape', () => {
   assert.deepEqual(parseCensusAddressGeocodeResponse(null), []);
   assert.deepEqual(parseCensusAddressGeocodeResponse({}), []);
-  assert.deepEqual(parseCensusAddressGeocodeResponse({ result: { addressMatches: 'not-an-array' } }), []);
+  assert.deepEqual(
+    parseCensusAddressGeocodeResponse({ result: { addressMatches: 'not-an-array' } }),
+    [],
+  );
 });
 
 test('parseCensusCoordinatesGeocodeResponse extracts the geographies block from the fixture', () => {
-  const geographies = parseCensusCoordinatesGeocodeResponse(loadFixture('coordinates-geographies.json'));
+  const geographies = parseCensusCoordinatesGeocodeResponse(
+    loadFixture('coordinates-geographies.json'),
+  );
   assert.equal(geographies?.Counties?.[0]?.COUNTY, '031');
 });
 
@@ -91,7 +104,9 @@ test('normalizeCensusAddressMatch returns undefined when the raw match has no co
   assert.equal(normalizeCensusAddressMatch({ matchedAddress: 'no coords' }), undefined);
 });
 
-function fakeClient(body: unknown): (request: { readonly url: string }) => Promise<SafeHttpResponse> {
+function fakeClient(
+  body: unknown,
+): (request: { readonly url: string }) => Promise<SafeHttpResponse> {
   return async (request) => ({
     status: 200,
     headers: { 'content-type': 'application/json' },
@@ -138,5 +153,7 @@ test('fetchCensusAddressGeocode rejects a disallowed content type (fail closed)'
     bodyText: '<html>not json</html>',
     finalUrl: request.url,
   });
-  await assert.rejects(() => fetchCensusAddressGeocode({ address: '123 Main St', client, retries: 0 }));
+  await assert.rejects(() =>
+    fetchCensusAddressGeocode({ address: '123 Main St', client, retries: 0 }),
+  );
 });

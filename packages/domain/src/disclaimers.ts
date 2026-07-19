@@ -123,7 +123,9 @@ export function assertDisclaimerRegistryComplete(): void {
   for (const disclaimerClass of DISCLAIMER_CLASSES) {
     const record = DISCLAIMER_REGISTRY[disclaimerClass];
     if (!record || record.class !== disclaimerClass) {
-      throw new Error(`Disclaimer registry missing or mismatched entry for class "${disclaimerClass}"`);
+      throw new Error(
+        `Disclaimer registry missing or mismatched entry for class "${disclaimerClass}"`,
+      );
     }
     if (!record.title.trim()) {
       throw new Error(`Disclaimer "${disclaimerClass}" has a blank title.`);

@@ -43,11 +43,16 @@ export function geoPrecisionTierForPublicPrecision(publicPrecision: string): Geo
  * every other state/locality combination fails closed (see `resolveDisplayRadiusMeters` below)
  * rather than guessing, matching fail-closed radius policy (`precision.ts` module doc).
  */
-const DC_BBOX: JurisdictionBBox | undefined = US_STATES.find((state) => state.postalCode === 'DC')?.bbox;
+const DC_BBOX: JurisdictionBBox | undefined = US_STATES.find(
+  (state) => state.postalCode === 'DC',
+)?.bbox;
 
 export type RadiusResolution =
   | { readonly ok: true; readonly radiusMeters: number }
-  | { readonly ok: false; readonly reason: 'jurisdiction_bbox_unresolved' | 'state_bbox_unresolved' };
+  | {
+      readonly ok: false;
+      readonly reason: 'jurisdiction_bbox_unresolved' | 'state_bbox_unresolved';
+    };
 
 /**
  * Resolves the display-radius affordance for a rendered point. Never guesses: a

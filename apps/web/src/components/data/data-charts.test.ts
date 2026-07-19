@@ -6,7 +6,11 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import type { HateCrimeYearSummary, NationalPopulationByDecade, OpportunityAtlasCoverageSummary } from '@repo/firebase';
+import type {
+  HateCrimeYearSummary,
+  NationalPopulationByDecade,
+  OpportunityAtlasCoverageSummary,
+} from '@repo/firebase';
 import { HateCrimeCompositionChart } from './HateCrimeCompositionChart';
 import { HateCrimeYearSeriesChart } from './HateCrimeYearSeriesChart';
 import { OpportunityAtlasCoverageChart } from './OpportunityAtlasCoverageChart';
@@ -41,7 +45,9 @@ const SAMPLE_POPULATION: readonly NationalPopulationByDecade[] = [
 ];
 
 test('PopulationByDecadeChart renders decade labels and share annotations', () => {
-  const html = renderToStaticMarkup(createElement(PopulationByDecadeChart, { rows: SAMPLE_POPULATION }));
+  const html = renderToStaticMarkup(
+    createElement(PopulationByDecadeChart, { rows: SAMPLE_POPULATION }),
+  );
   assert.match(html, /2000/);
   assert.match(html, /2010/);
   assert.match(html, /2020/);
@@ -141,12 +147,26 @@ test('OpportunityAtlasCoverageChart renders outcome coverage and histogram bins'
   const coverage: OpportunityAtlasCoverageSummary = {
     tractCount: 3,
     outcomeFieldCoverage: [
-      { field: 'kfrBlackP25', label: 'Household income rank (Black children, parents p25)', tractCount: 3 },
-      { field: 'kfrWhiteP25', label: 'Household income rank (white children, parents p25)', tractCount: 1 },
+      {
+        field: 'kfrBlackP25',
+        label: 'Household income rank (Black children, parents p25)',
+        tractCount: 3,
+      },
+      {
+        field: 'kfrWhiteP25',
+        label: 'Household income rank (white children, parents p25)',
+        tractCount: 1,
+      },
     ],
     kfrBlackP25Histogram: [
       { id: '0-20', label: '0–20th', minInclusive: 0, maxExclusive: 0.2, tractCount: 1 },
-      { id: '80-100', label: '80–100th', minInclusive: 0.8, maxExclusive: 1.0000001, tractCount: 2 },
+      {
+        id: '80-100',
+        label: '80–100th',
+        minInclusive: 0.8,
+        maxExclusive: 1.0000001,
+        tractCount: 2,
+      },
     ],
     source: 'Opportunity Insights',
     sourceUrl: 'https://opportunityinsights.org/data/',

@@ -28,7 +28,10 @@ import {
 const FIXED_NOW = '2026-07-16T23:00:00.000Z';
 const POLICY = loadProductConstitution();
 
-function link(overrides: Partial<ClaimEvidenceLink> & Pick<ClaimEvidenceLink, 'id' | 'role' | 'lineageRootId' | 'evidenceId'>): ClaimEvidenceLink {
+function link(
+  overrides: Partial<ClaimEvidenceLink> &
+    Pick<ClaimEvidenceLink, 'id' | 'role' | 'lineageRootId' | 'evidenceId'>,
+): ClaimEvidenceLink {
   const base: ClaimEvidenceLink = {
     id: overrides.id,
     claimId: 'claim_gold_001',
@@ -187,7 +190,9 @@ test('high-impact claims use a higher publication threshold', () => {
   });
   assert.equal(standard.threshold, 0.75);
   assert.ok(standard.score === result.score);
-  assert.ok(standard.passesPublishThreshold || !result.passesPublishThreshold || standard.score >= 0.9);
+  assert.ok(
+    standard.passesPublishThreshold || !result.passesPublishThreshold || standard.score >= 0.9,
+  );
 });
 
 test('contradictory credible values are preserved', () => {

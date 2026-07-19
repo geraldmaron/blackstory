@@ -88,8 +88,7 @@ async function main(): Promise<void> {
   const byMatchedEntity: Record<string, number> = {};
   for (const row of rows) {
     if (row.kind === 'existing_match' && row.matchedEntityId) {
-      byMatchedEntity[row.matchedEntityId] =
-        (byMatchedEntity[row.matchedEntityId] ?? 0) + 1;
+      byMatchedEntity[row.matchedEntityId] = (byMatchedEntity[row.matchedEntityId] ?? 0) + 1;
     }
   }
 
@@ -120,7 +119,11 @@ async function main(): Promise<void> {
   writeFileSync(join(OUT_DIR, 'catalog-dedupe-report.json'), JSON.stringify(report, null, 2));
   writeFileSync(
     join(OUT_DIR, 'enrichment-suggestions-existing.json'),
-    JSON.stringify({ suggestions: enrichmentSuggestions, count: enrichmentSuggestions.length }, null, 2),
+    JSON.stringify(
+      { suggestions: enrichmentSuggestions, count: enrichmentSuggestions.length },
+      null,
+      2,
+    ),
   );
 
   if (!apply) {
@@ -146,9 +149,7 @@ async function main(): Promise<void> {
     .filter((row) => row.kind === 'existing_match')
     .map((row) => row.subjectId);
   // Park thin local/person leads that still need stronger place-first evidence.
-  const parkNew = rows
-    .filter((row) => row.kind === 'new_candidate')
-    .map((row) => row.subjectId);
+  const parkNew = rows.filter((row) => row.kind === 'new_candidate').map((row) => row.subjectId);
 
   let excluded = 0;
   let parked = 0;

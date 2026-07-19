@@ -8,9 +8,16 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { CensusGeocodeMatch } from '../adapters/census-geo/types.js';
-import { normalizeAddressInput, coordinateCacheKey, expandCommonAbbreviations } from './address-normalize.js';
+import {
+  normalizeAddressInput,
+  coordinateCacheKey,
+  expandCommonAbbreviations,
+} from './address-normalize.js';
 import { buildCoarseLocationAnalyticsEvent } from './analytics.js';
-import { geoPrecisionTierForMatch, reduceGeocodeCoordinatePrecision } from './coordinate-precision.js';
+import {
+  geoPrecisionTierForMatch,
+  reduceGeocodeCoordinatePrecision,
+} from './coordinate-precision.js';
 import { createGeocodeCache } from './geocode-cache.js';
 import { buildManualPlaceSearchFallback } from './manual-fallback.js';
 import { geocodeAddress, reverseGeocodeCoordinates, type GeocodeResult } from './pipeline.js';
@@ -98,7 +105,11 @@ test('reduceGeocodeCoordinatePrecision retains the coordinate only when explicit
     tier: 'county',
     retainExactCoordinates: true,
   });
-  assert.equal(stillReduced.exactCoordinatesRetained, false, 'county tier never retains an exact point');
+  assert.equal(
+    stillReduced.exactCoordinatesRetained,
+    false,
+    'county tier never retains an exact point',
+  );
 });
 
 test('buildManualPlaceSearchFallback is always available and defaults to /search', () => {
@@ -119,12 +130,19 @@ test('geocodeAddress resolves jurisdiction ids without exact coordinates by defa
   assert.equal(success.resolution.jurisdictionIds.countyId, 'us-11-001');
   assert.equal(success.resolution.precision.exactCoordinatesRetained, false);
   assert.equal(success.resolution.precision.lat, undefined);
-  assert.equal((success.resolution.match as { lat?: number }).lat, undefined, 'match summary must not carry a coordinate');
+  assert.equal(
+    (success.resolution.match as { lat?: number }).lat,
+    undefined,
+    'match summary must not carry a coordinate',
+  );
   assert.equal(success.cacheHit, false);
 });
 
 test('geocodeAddress falls back to manual search on an empty/blank address', async () => {
-  const result = await geocodeAddress({ address: '   ', fetchAddressGeocode: async () => [DC_MATCH] });
+  const result = await geocodeAddress({
+    address: '   ',
+    fetchAddressGeocode: async () => [DC_MATCH],
+  });
   assert.equal(result.ok, false);
   assert.equal((result as Extract<GeocodeResult, { ok: false }>).fallback.reason, 'no_match');
 });
@@ -137,11 +155,17 @@ test('geocodeAddress falls back to manual search when the fetcher throws (geocod
     },
   });
   assert.equal(result.ok, false);
-  assert.equal((result as Extract<GeocodeResult, { ok: false }>).fallback.reason, 'geocoder_unavailable');
+  assert.equal(
+    (result as Extract<GeocodeResult, { ok: false }>).fallback.reason,
+    'geocoder_unavailable',
+  );
 });
 
 test('geocodeAddress falls back to manual search on no matches and on an out-of-scope territory', async () => {
-  const noMatch = await geocodeAddress({ address: 'nowhere at all', fetchAddressGeocode: async () => [] });
+  const noMatch = await geocodeAddress({
+    address: 'nowhere at all',
+    fetchAddressGeocode: async () => [],
+  });
   assert.equal((noMatch as Extract<GeocodeResult, { ok: false }>).fallback.reason, 'no_match');
 
   const territory = await geocodeAddress({
@@ -156,7 +180,10 @@ test('geocodeAddress falls back on an ambiguous (multi-)match rather than guessi
     address: 'Main St',
     fetchAddressGeocode: async () => [DC_MATCH, { ...DC_MATCH, placeFips: '99999' }],
   });
-  assert.equal((result as Extract<GeocodeResult, { ok: false }>).fallback.reason, 'ambiguous_match');
+  assert.equal(
+    (result as Extract<GeocodeResult, { ok: false }>).fallback.reason,
+    'ambiguous_match',
+  );
 });
 
 test('geocodeAddress reuses a cached resolution on the second call without re-invoking the fetcher', async () => {
@@ -167,8 +194,18 @@ test('geocodeAddress reuses a cached resolution on the second call without re-in
     return [DC_MATCH];
   };
 
-  const first = await geocodeAddress({ address: '4600 Silver Hill Rd', fetchAddressGeocode, cache, now: () => 0 });
-  const second = await geocodeAddress({ address: '4600 Silver Hill Rd', fetchAddressGeocode, cache, now: () => 0 });
+  const first = await geocodeAddress({
+    address: '4600 Silver Hill Rd',
+    fetchAddressGeocode,
+    cache,
+    now: () => 0,
+  });
+  const second = await geocodeAddress({
+    address: '4600 Silver Hill Rd',
+    fetchAddressGeocode,
+    cache,
+    now: () => 0,
+  });
 
   assert.equal(calls, 1, 'the fetcher must only be called once');
   assert.equal((first as Extract<GeocodeResult, { ok: true }>).cacheHit, false);
@@ -179,7 +216,12 @@ test('reverseGeocodeCoordinates never retains an exact coordinate even implicitl
   const result = await reverseGeocodeCoordinates({
     lat: 38.846,
     lng: -76.927,
-    fetchCoordinatesGeocode: async () => ({ lat: 38.846, lng: -76.927, stateFips: '11', countyFips3: '001' }),
+    fetchCoordinatesGeocode: async () => ({
+      lat: 38.846,
+      lng: -76.927,
+      stateFips: '11',
+      countyFips3: '001',
+    }),
   });
   assert.ok(result.ok);
   const success = result as Extract<GeocodeResult, { ok: true }>;
@@ -196,11 +238,17 @@ test('reverseGeocodeCoordinates falls back to manual search when the reverse fet
     },
   });
   assert.equal(result.ok, false);
-  assert.equal((result as Extract<GeocodeResult, { ok: false }>).fallback.reason, 'geocoder_unavailable');
+  assert.equal(
+    (result as Extract<GeocodeResult, { ok: false }>).fallback.reason,
+    'geocoder_unavailable',
+  );
 });
 
 test('translateZipToPlace resolves jurisdiction ids and never echoes the raw ZIP back', async () => {
-  const result = await translateZipToPlace({ zip: '20233', fetchAddressGeocode: async () => [DC_MATCH] });
+  const result = await translateZipToPlace({
+    zip: '20233',
+    fetchAddressGeocode: async () => [DC_MATCH],
+  });
   assert.ok(result.ok);
   if (result.ok) {
     assert.equal(result.placeName, 'Washington');
@@ -241,7 +289,12 @@ test('buildCoarseLocationAnalyticsEvent never carries a coordinate, address, or 
     (result as Extract<GeocodeResult, { ok: true }>).resolution,
     { now: () => '2026-07-17T00:00:00.000Z' },
   );
-  assert.deepEqual(Object.keys(event).sort(), ['geoPrecisionTier', 'jurisdictionId', 'kind', 'occurredAt']);
+  assert.deepEqual(Object.keys(event).sort(), [
+    'geoPrecisionTier',
+    'jurisdictionId',
+    'kind',
+    'occurredAt',
+  ]);
   assert.equal(event.jurisdictionId, 'us-11-001');
   assert.equal(event.geoPrecisionTier, 'exact-site');
 });

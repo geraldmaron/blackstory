@@ -27,7 +27,9 @@ function errorMessage(error: unknown): string {
  * Wrap adapter output so failures route to quarantine/dead-letter only.
  * Publication serving is never mutated by adapter run outcomes.
  */
-export function buildIsolatedFederalRunResult(input: BuildIsolatedRunInput): IsolatedFederalRunResult {
+export function buildIsolatedFederalRunResult(
+  input: BuildIsolatedRunInput,
+): IsolatedFederalRunResult {
   const { context, completedAt } = input;
   const adapterId = context.registryEntry.contract.adapterId;
   const { expectedRecordsPerRun, countToleranceFraction } = context.registryEntry.contract.volume;

@@ -111,7 +111,9 @@ export type ResolvedEntityLocationPrecision = {
 function nextCoarserTier(tier: GeoPrecisionTier): GeoPrecisionTier {
   const rank = GEO_PRECISION_TIER_RANK[tier];
   const nextRank = Math.min(rank + 1, GEO_PRECISION_TIER_RANK.state);
-  const next = GEO_PRECISION_TIERS.find((candidate) => GEO_PRECISION_TIER_RANK[candidate] === nextRank);
+  const next = GEO_PRECISION_TIERS.find(
+    (candidate) => GEO_PRECISION_TIER_RANK[candidate] === nextRank,
+  );
   return next ?? 'state';
 }
 

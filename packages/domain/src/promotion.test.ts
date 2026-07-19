@@ -133,7 +133,9 @@ test('duplicate content is detected independently of its URL or source id', () =
     evidence('copy', 'lineage-b', { contentFingerprint: 'same-content' }),
   ];
 
-  assert.deepEqual(detectDuplicateAndCoordinatedEvidence(duplicates).duplicateEvidenceIds, ['copy']);
+  assert.deepEqual(detectDuplicateAndCoordinatedEvidence(duplicates).duplicateEvidenceIds, [
+    'copy',
+  ]);
   assert.equal(collapseSupportingEvidence(duplicates).length, 1);
 });
 
@@ -183,10 +185,7 @@ test('approval is deterministic and separates proposer from approver', () => {
   assert.ok(conflict.reasons.includes('proposer_approver_conflict'));
   assert.equal(approved.approved, true);
   assert.equal(approved.deterministic, true);
-  assert.deepEqual(
-    evaluatePromotionGate({ claim: claim(), approverId: 'approver-1' }),
-    approved,
-  );
+  assert.deepEqual(evaluatePromotionGate({ claim: claim(), approverId: 'approver-1' }), approved);
 });
 
 test('contradiction search and unresolved credible contradictions fail closed', () => {

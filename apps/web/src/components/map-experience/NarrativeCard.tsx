@@ -56,10 +56,7 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
     >
       <p className="ds-nc__kicker">Selected record</p>
       <div className="ds-nc__top">
-        <div
-          className="ds-nc__kind-rule"
-          style={{ borderColor: kindEncoding.shade }}
-        >
+        <div className="ds-nc__kind-rule" style={{ borderColor: kindEncoding.shade }}>
           <Link
             className="ds-nc__kind-link"
             href={exploreHrefForKind(properties.kind)}

@@ -7,10 +7,7 @@ import { SURFACE_ID } from './posture.js';
 
 export { createPublicApiAppCheckGuard } from './app-check.js';
 export type { PublicApiAppCheckOptions } from './app-check.js';
-export {
-  createPublicRateLimitGuard,
-  resolvePublicEndpointClass,
-} from './rate-limits.js';
+export { createPublicRateLimitGuard, resolvePublicEndpointClass } from './rate-limits.js';
 export type {
   PublicRateLimitGuardDecision,
   PublicRateLimitGuardOptions,
@@ -48,7 +45,10 @@ export type {
   VectorSearchGuardRequest,
   VectorSearchHttpQuery,
 } from './vector-search-guardrails.js';
-export { VECTOR_SEARCH_KILL_SWITCH_ID, evaluateVectorSearchKillSwitch } from './vector-search-kill-switch.js';
+export {
+  VECTOR_SEARCH_KILL_SWITCH_ID,
+  evaluateVectorSearchKillSwitch,
+} from './vector-search-kill-switch.js';
 export { createFindNearestEndpoint } from './vector-search-endpoint.js';
 export type {
   FindNearestEndpoint,

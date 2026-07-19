@@ -38,5 +38,8 @@ test('suggestRelatedEntitiesFromVectors applies a similarity floor', () => {
     suggestions.map((entry) => entry.entityId),
     ['entity-a', 'entity-b'],
   );
-  assert.equal(suggestions.find((entry) => entry.entityId === 'entity-c'), undefined);
+  assert.equal(
+    suggestions.find((entry) => entry.entityId === 'entity-c'),
+    undefined,
+  );
 });

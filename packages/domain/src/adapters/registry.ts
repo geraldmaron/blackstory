@@ -71,7 +71,10 @@ export function registerSource(
   return entry;
 }
 
-export function getSourceEntry(store: SourceRegistryStore, id: string): SourceRegistryEntry | undefined {
+export function getSourceEntry(
+  store: SourceRegistryStore,
+  id: string,
+): SourceRegistryEntry | undefined {
   return store.get(id);
 }
 

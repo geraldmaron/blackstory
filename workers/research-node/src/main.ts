@@ -34,7 +34,9 @@ function requiredEnv(
   return value;
 }
 
-function readMode(environment: Readonly<Record<string, string | undefined>>): DiscoveryCampaignDispatchMode {
+function readMode(
+  environment: Readonly<Record<string, string | undefined>>,
+): DiscoveryCampaignDispatchMode {
   const raw = environment.DISCOVERY_MODE?.trim() ?? 'fixture';
   if (raw !== 'fixture' && raw !== 'live') {
     throw new Error('DISCOVERY_MODE must be fixture or live');
@@ -42,9 +44,7 @@ function readMode(environment: Readonly<Record<string, string | undefined>>): Di
   return raw;
 }
 
-function readKillSwitchEngaged(
-  environment: Readonly<Record<string, string | undefined>>,
-): boolean {
+function readKillSwitchEngaged(environment: Readonly<Record<string, string | undefined>>): boolean {
   const raw = environment.DISCOVERY_KILL_SWITCH?.trim() ?? 'disengaged';
   if (raw !== 'engaged' && raw !== 'disengaged') {
     throw new Error('DISCOVERY_KILL_SWITCH must be engaged or disengaged');

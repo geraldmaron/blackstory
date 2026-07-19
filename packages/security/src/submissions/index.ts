@@ -1,4 +1,3 @@
-
 /**
  * Exposes the submission quarantine contract from one package-local boundary.
  */

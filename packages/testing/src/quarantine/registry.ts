@@ -1,4 +1,3 @@
-
 /**
  * Flaky-test quarantine registry. Quarantined tests must declare an owner and
  * deadline; expired entries fail closed instead of being retried forever.

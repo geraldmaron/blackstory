@@ -1,4 +1,3 @@
-
 /**
  * Verifies server-side authorization for research transitions, assignments,
  * publication promotion, and replacement-release retraction.

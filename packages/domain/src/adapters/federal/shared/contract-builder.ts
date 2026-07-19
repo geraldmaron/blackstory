@@ -6,7 +6,12 @@ import type { EvidenceSource } from '../../../provenance/source.js';
 import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from '../../candidates.js';
 import type { RateLimitPolicy, SourceAdapterContract } from '../../types.js';
 import { federalAdapterKillSwitchId } from './kill-switch.js';
-import type { FederalAdapterDefinition, FederalAdapterFamily, FederalExportFilterPolicy, FederalRetentionRules } from './types.js';
+import type {
+  FederalAdapterDefinition,
+  FederalAdapterFamily,
+  FederalExportFilterPolicy,
+  FederalRetentionRules,
+} from './types.js';
 
 export type BuildFederalContractInput = {
   readonly family: FederalAdapterFamily;
@@ -27,7 +32,9 @@ export type BuildFederalContractInput = {
   readonly exportFilter: FederalExportFilterPolicy;
 };
 
-export function buildFederalAdapterDefinition(input: BuildFederalContractInput): FederalAdapterDefinition {
+export function buildFederalAdapterDefinition(
+  input: BuildFederalContractInput,
+): FederalAdapterDefinition {
   const killSwitchId = federalAdapterKillSwitchId(input.adapterId);
   const policy = {
     snapshotMode: 'selective' as const,
@@ -101,7 +108,15 @@ export const FEDERAL_SECONDARY_RIGHTS: RightsPolicy = {
 export const DEFAULT_FEDERAL_EXPORT_FILTER: FederalExportFilterPolicy = {
   maxPayloadBytes: 8_192,
   stripKeys: ['fullText', 'ocrText', 'mediaStream', 'binaryBlob', 'attachments'],
-  essentialKeys: ['id', 'stableIdentifier', 'title', 'canonicalUrl', 'classification', 'date', 'subjects'],
+  essentialKeys: [
+    'id',
+    'stableIdentifier',
+    'title',
+    'canonicalUrl',
+    'classification',
+    'date',
+    'subjects',
+  ],
 };
 
 export const DEFAULT_FEDERAL_RETENTION: FederalRetentionRules = {

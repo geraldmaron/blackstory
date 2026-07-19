@@ -46,8 +46,6 @@ test('RRF tie-breaks by id ascending', () => {
 });
 
 test('RRF fusion scores are internal and never zero-sum empty', () => {
-  const fused = reciprocalRankFusion([
-    { laneId: 'structured', weight: 1, items: [{ id: 'x' }] },
-  ]);
+  const fused = reciprocalRankFusion([{ laneId: 'structured', weight: 1, items: [{ id: 'x' }] }]);
   assert.ok(fused[0]!.fusionScore > 0);
 });

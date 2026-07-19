@@ -9,14 +9,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import {
-  addFeedToRegistry,
-  createInMemoryFeedRegistry,
-} from '../adapters/rss/index.js';
-import {
-  RSS_DISCOVERY_CAMPAIGN_KIND,
-  runRssDiscoveryCampaign,
-} from './rss-campaign.js';
+import { addFeedToRegistry, createInMemoryFeedRegistry } from '../adapters/rss/index.js';
+import { RSS_DISCOVERY_CAMPAIGN_KIND, runRssDiscoveryCampaign } from './rss-campaign.js';
 
 const FIXED_NOW = '2026-07-18T21:00:00.000Z';
 const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), '..', 'adapters', 'rss', 'fixtures');

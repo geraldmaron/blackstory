@@ -1,4 +1,3 @@
-
 /**
  * security telemetry event vocabulary, redaction, metrics, anomaly rules, and adapters.
  */

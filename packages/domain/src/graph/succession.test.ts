@@ -62,7 +62,11 @@ test('buildSuccessorPublicView keeps linkedHistoricalContext structurally separa
   const predecessorStatusHistoryById = new Map([
     ['gg-place-historic-town', predecessorStatusHistory],
   ]);
-  const view = buildSuccessorPublicView('gg-place-modern-city', [edge], predecessorStatusHistoryById);
+  const view = buildSuccessorPublicView(
+    'gg-place-modern-city',
+    [edge],
+    predecessorStatusHistoryById,
+  );
 
   assert.equal(view.successorEntityId, 'gg-place-modern-city');
   assert.equal(view.linkedHistoricalContext.length, 2);
@@ -103,7 +107,11 @@ test('end-to-end scenario proof: querying the modern successor never returns "hi
 
   assert.equal(derivedPublicStatus, 'active');
   assert.ok(
-    !linkedContext.some((entry) => entry.designation === derivedPublicStatus && entry.predecessorEntityId === successorEntity.id),
+    !linkedContext.some(
+      (entry) =>
+        entry.designation === derivedPublicStatus &&
+        entry.predecessorEntityId === successorEntity.id,
+    ),
     'no linked-context entry may be misattributed to the successor id',
   );
   // The historic designation exists ONLY inside linkedContext, never as derivedPublicStatus.

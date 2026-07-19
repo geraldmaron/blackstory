@@ -61,12 +61,7 @@ export async function submitQuickAdd(
       createNodeSafeFetchDependencies(),
     );
 
-    if (
-      shouldCommit &&
-      outcome.fetch.ok &&
-      outcome.intake &&
-      outcome.intake.accepted
-    ) {
+    if (shouldCommit && outcome.fetch.ok && outcome.intake && outcome.intake.accepted) {
       const { app } = createServerFirebaseApp(process.env);
       const store = createAdminAtomicStore(getFirestore(app));
       const commitResult = await commitOperatorIntake(
@@ -78,7 +73,9 @@ export async function submitQuickAdd(
         outcome,
         sessionId,
         auditEventId: commitResult.eventId,
-        ...(outcome.intake.researchCase?.id ? { researchCaseId: outcome.intake.researchCase.id } : {}),
+        ...(outcome.intake.researchCase?.id
+          ? { researchCaseId: outcome.intake.researchCase.id }
+          : {}),
       };
     }
 

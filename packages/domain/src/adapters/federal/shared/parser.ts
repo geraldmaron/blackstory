@@ -5,7 +5,11 @@ import { stampCandidateProvenance } from '../../candidates.js';
 import type { SourceRegistryEntry } from '../../types.js';
 import { filterLargeExportPayload } from './export-filter.js';
 import { partitionByRetention } from './retention.js';
-import type { FederalAdapterDefinition, FederalParseResult, RawFederalExportRecord } from './types.js';
+import type {
+  FederalAdapterDefinition,
+  FederalParseResult,
+  RawFederalExportRecord,
+} from './types.js';
 
 function asExportRecords(raw: unknown): RawFederalExportRecord[] {
   if (!Array.isArray(raw)) {
@@ -45,7 +49,9 @@ export function parseFederalFixtureBatch(
         ...(typeof record.title === 'string' ? { title: record.title } : {}),
         ...(typeof record.canonicalUrl === 'string' ? { canonicalUrl: record.canonicalUrl } : {}),
         classification:
-          typeof record.classification === 'string' ? record.classification : definition.contract.classification,
+          typeof record.classification === 'string'
+            ? record.classification
+            : definition.contract.classification,
         payload: filtered.payload,
       }),
     );

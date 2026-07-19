@@ -96,12 +96,16 @@ function stateTargetForPostal(postalCode: string | undefined): CloseCameraTarget
   };
 }
 
-function stateTargetForPoint(center: readonly [lng: number, lat: number]): CloseCameraTarget | undefined {
+function stateTargetForPoint(
+  center: readonly [lng: number, lat: number],
+): CloseCameraTarget | undefined {
   const state = findUsStateForPoint(center[1], center[0]);
   return state ? stateTargetForPostal(state.postalCode) : undefined;
 }
 
-function resolveCenter(input: ResolveCloseCameraInput): readonly [lng: number, lat: number] | undefined {
+function resolveCenter(
+  input: ResolveCloseCameraInput,
+): readonly [lng: number, lat: number] | undefined {
   if (input.entityCenter) return input.entityCenter;
   if (input.preSelectViewport) {
     return [input.preSelectViewport.lng, input.preSelectViewport.lat];

@@ -217,9 +217,7 @@ export async function runWebSearchCampaign(
 
   const provider = input.providerConfig.provider;
   if (provider !== 'searxng' && provider !== 'brave') {
-    throw new Error(
-      `Web search campaign supports searxng|brave in v1; got provider=${provider}`,
-    );
+    throw new Error(`Web search campaign supports searxng|brave in v1; got provider=${provider}`);
   }
 
   const responseRaw = input.searchResponseRaw ?? input.braveResponseRaw;
@@ -234,16 +232,13 @@ export async function runWebSearchCampaign(
   const queryTexts = allQueryTexts.slice(0, maxQueries);
   const capApplied = allQueryTexts.length > maxQueries;
   const queryText =
-    input.queryText?.trim() ||
-    queryTexts[0] ||
-    'freedom rider Montgomery County Alabama';
+    input.queryText?.trim() || queryTexts[0] || 'freedom rider Montgomery County Alabama';
 
   const parsed = parseProviderResponse(provider, responseRaw);
   const sourceRegistry = input.sourceRegistry ?? createInMemorySourceRegistry();
   const registryEntry = ensureApprovedRegistry(sourceRegistry, provider, input.stampedAt);
   const runId = input.runId ?? `run_web_search_${input.stampedAt}`;
-  const adapterId =
-    provider === 'searxng' ? SEARXNG_SEARCH_ADAPTER_ID : BRAVE_SEARCH_ADAPTER_ID;
+  const adapterId = provider === 'searxng' ? SEARXNG_SEARCH_ADAPTER_ID : BRAVE_SEARCH_ADAPTER_ID;
 
   const queryProvenance = stampExternalQueryProvenance({
     provider,
@@ -305,10 +300,7 @@ export async function runWebSearchCampaign(
   });
 
   const editorialReviews = input.editorialHook
-    ? await runOptionalEditorialHook(
-        input.editorialHook,
-        survivors.map(toEditorialLeadPreview),
-      )
+    ? await runOptionalEditorialHook(input.editorialHook, survivors.map(toEditorialLeadPreview))
     : undefined;
 
   return {
@@ -328,11 +320,10 @@ export async function runWebSearchCampaign(
     rejectedResultCount: parsed.rejected.length,
     storageTermsGate: {
       confirmedAtRunTime: true,
-      providerDecisionConfirmedInWriting: WEB_SEARCH_PROVIDER_DECISION.storageTermsConfirmedInWriting,
+      providerDecisionConfirmedInWriting:
+        WEB_SEARCH_PROVIDER_DECISION.storageTermsConfirmedInWriting,
     },
-    ...(editorialReviews !== undefined && editorialReviews.length > 0
-      ? { editorialReviews }
-      : {}),
+    ...(editorialReviews !== undefined && editorialReviews.length > 0 ? { editorialReviews } : {}),
     completedAt: input.completedAt,
   };
 }

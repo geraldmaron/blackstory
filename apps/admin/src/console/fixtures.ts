@@ -1,12 +1,7 @@
 /**
  * Supplies deterministic console fixtures for route shells without connecting live services.
  */
-import type {
-  ConsoleAction,
-  ConsoleFixtureRow,
-  ConsoleSurface,
-  ConsoleSurfaceId,
-} from './model';
+import type { ConsoleAction, ConsoleFixtureRow, ConsoleSurface, ConsoleSurfaceId } from './model';
 
 const EMPTY_DIFF = {
   added: 0,
@@ -277,7 +272,8 @@ const surfaces: readonly ConsoleSurface[] = [
     id: 'retractions',
     label: 'Retraction & rollback',
     eyebrow: 'Release safety',
-    description: 'Replace releases through immutable history; never edit or delete an active projection.',
+    description:
+      'Replace releases through immutable history; never edit or delete an active projection.',
     rows: rows(
       {
         id: 'RTR-92',

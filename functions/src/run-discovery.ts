@@ -7,7 +7,10 @@
  */
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { dispatchDiscoveryCampaign, type DiscoveryCampaignDispatchResult } from '../../packages/config/src/scheduled-jobs/discovery-dispatcher.js';
+import {
+  dispatchDiscoveryCampaign,
+  type DiscoveryCampaignDispatchResult,
+} from '../../packages/config/src/scheduled-jobs/discovery-dispatcher.js';
 import {
   DISCOVERY_CATALOG_PROFILE_DEFAULT_MAX,
   createFirestorePublicSearchIndexCatalogPager,
@@ -140,9 +143,7 @@ export async function runScheduledDiscovery(
     ...(jobRunId !== undefined && jobRunId.length > 0 ? { jobRunId } : {}),
     ...(nowIso !== undefined && nowIso.length > 0 ? { nowIso } : {}),
     environment,
-    ...(catalog.catalogProfiles !== undefined
-      ? { catalogProfiles: catalog.catalogProfiles }
-      : {}),
+    ...(catalog.catalogProfiles !== undefined ? { catalogProfiles: catalog.catalogProfiles } : {}),
     ...(catalog.catalogTitles !== undefined ? { catalogTitles: catalog.catalogTitles } : {}),
   });
 }

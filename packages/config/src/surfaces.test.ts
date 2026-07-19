@@ -1,4 +1,3 @@
-
 /**
  * Acceptance tests for ADR-005 surface capability matrix.
  */
@@ -60,8 +59,7 @@ test('internal publication endpoints reject end-user tokens', () => {
   assert.equal(isAuthAccepted('api-internal', 'end-user-token'), false);
   assert.throws(
     () => assertAuthAccepted('api-internal', 'end-user-token'),
-    (error: unknown) =>
-      error instanceof SurfaceCapabilityError && error.reason === 'auth-denied',
+    (error: unknown) => error instanceof SurfaceCapabilityError && error.reason === 'auth-denied',
   );
   assert.doesNotThrow(() => assertAuthAccepted('api-internal', 'service-identity'));
 });

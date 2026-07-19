@@ -82,7 +82,10 @@ test('searchHrefForStatus returns undefined for all, empty, or unknown values', 
 });
 
 test('entityEvidenceHref appends or replaces the accepted-claims hash', () => {
-  assert.equal(entityEvidenceHref('/entity/ent_dunbar_school_001'), '/entity/ent_dunbar_school_001#accepted-claims');
+  assert.equal(
+    entityEvidenceHref('/entity/ent_dunbar_school_001'),
+    '/entity/ent_dunbar_school_001#accepted-claims',
+  );
   assert.equal(
     entityEvidenceHref('/entity/ent_dunbar_school_001?ref=map'),
     '/entity/ent_dunbar_school_001?ref=map#accepted-claims',

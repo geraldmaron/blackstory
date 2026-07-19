@@ -23,7 +23,10 @@
 import { createHash } from 'node:crypto';
 import type { PlaceAdvisoryRecord } from '../advisory.js';
 import type { ConfidenceComponents } from '../claims/index.js';
-import { assertScoringInputFreeOfExcludedData, type GeneralCrimeContextRecord } from './scoring-guard.js';
+import {
+  assertScoringInputFreeOfExcludedData,
+  type GeneralCrimeContextRecord,
+} from './scoring-guard.js';
 import {
   COMPOSITE_ELIGIBLE_LAYER_IDS,
   type CompositeEligibleLayerId,
@@ -41,7 +44,9 @@ export const COMPOSITE_AUDIT_VERSION = 'historic-safety-composite-audit.v1' as c
  * the harm composite (see `COUNTERWEIGHT_MAX_REDUCTION`), never a raw negative term that could
  * push the composite below zero or let a single markers-heavy place erase documented harm.
  */
-export const COMPOSITE_LAYER_WEIGHTS: Readonly<Record<Exclude<CompositeEligibleLayerId, 'presence_affirmation'>, number>> = {
+export const COMPOSITE_LAYER_WEIGHTS: Readonly<
+  Record<Exclude<CompositeEligibleLayerId, 'presence_affirmation'>, number>
+> = {
   documented_events: 0.4,
   sundown_town: 0.3,
   exclusion_infrastructure: 0.3,
@@ -71,7 +76,10 @@ const SLOT_TO_LAYER_ID: Readonly<Record<keyof CompositeLayerInputs, CompositeEli
  * which slot a caller (mistakenly or otherwise) tries to place it in.
  */
 export function assertNoExcludedLayerInComposite(inputs: CompositeLayerInputs): void {
-  for (const [slot, layerId] of Object.entries(SLOT_TO_LAYER_ID) as [keyof CompositeLayerInputs, CompositeEligibleLayerId][]) {
+  for (const [slot, layerId] of Object.entries(SLOT_TO_LAYER_ID) as [
+    keyof CompositeLayerInputs,
+    CompositeEligibleLayerId,
+  ][]) {
     const signal = inputs[slot];
     if (!signal) continue;
     if (signal.layerId !== layerId) {
@@ -111,7 +119,10 @@ function computeCompositeValue(inputs: CompositeLayerInputs): {
   readonly missingLayers: CompositeEligibleLayerId[];
 } {
   const missingLayers: CompositeEligibleLayerId[] = [];
-  function resolveLayerValue(layerId: CompositeEligibleLayerId, signal: LayerSignal | undefined): number {
+  function resolveLayerValue(
+    layerId: CompositeEligibleLayerId,
+    signal: LayerSignal | undefined,
+  ): number {
     if (signal) return signal.value;
     missingLayers.push(layerId);
     return 0;
@@ -119,8 +130,14 @@ function computeCompositeValue(inputs: CompositeLayerInputs): {
 
   const documentedEventsValue = resolveLayerValue('documented_events', inputs.documentedEvents);
   const sundownTownValue = resolveLayerValue('sundown_town', inputs.sundownTown);
-  const exclusionInfrastructureValue = resolveLayerValue('exclusion_infrastructure', inputs.exclusionInfrastructure);
-  const presenceAffirmationValue = resolveLayerValue('presence_affirmation', inputs.presenceAffirmation);
+  const exclusionInfrastructureValue = resolveLayerValue(
+    'exclusion_infrastructure',
+    inputs.exclusionInfrastructure,
+  );
+  const presenceAffirmationValue = resolveLayerValue(
+    'presence_affirmation',
+    inputs.presenceAffirmation,
+  );
 
   const harmComposite =
     documentedEventsValue * COMPOSITE_LAYER_WEIGHTS.documented_events +
@@ -179,7 +196,9 @@ export function computeComposite(input: ComputeCompositeInput): CompositeResult 
 // pattern: versioned methodology, input fingerprints, audited recalculation
 // ---------------------------------------------------------------------------
 
-export type CompositeInputFingerprints = Readonly<Record<CompositeEligibleLayerId | 'weights', string>>;
+export type CompositeInputFingerprints = Readonly<
+  Record<CompositeEligibleLayerId | 'weights', string>
+>;
 
 export type CompositeAudit = {
   readonly auditVersion: typeof COMPOSITE_AUDIT_VERSION;
@@ -210,7 +229,9 @@ function canonicalize(value: unknown): unknown {
 }
 
 function fingerprint(value: unknown): string {
-  return `sha256:${createHash('sha256').update(JSON.stringify(canonicalize(value))).digest('hex')}`;
+  return `sha256:${createHash('sha256')
+    .update(JSON.stringify(canonicalize(value)))
+    .digest('hex')}`;
 }
 
 const SLOT_BY_LAYER_ID: Readonly<Record<CompositeEligibleLayerId, keyof CompositeLayerInputs>> = {
@@ -220,9 +241,14 @@ const SLOT_BY_LAYER_ID: Readonly<Record<CompositeEligibleLayerId, keyof Composit
   presence_affirmation: 'presenceAffirmation',
 };
 
-export function compositeInputFingerprints(layers: CompositeLayerInputs): CompositeInputFingerprints {
+export function compositeInputFingerprints(
+  layers: CompositeLayerInputs,
+): CompositeInputFingerprints {
   const perLayer = Object.fromEntries(
-    COMPOSITE_ELIGIBLE_LAYER_IDS.map((layerId) => [layerId, fingerprint(layers[SLOT_BY_LAYER_ID[layerId]] ?? null)]),
+    COMPOSITE_ELIGIBLE_LAYER_IDS.map((layerId) => [
+      layerId,
+      fingerprint(layers[SLOT_BY_LAYER_ID[layerId]] ?? null),
+    ]),
   ) as Record<CompositeEligibleLayerId, string>;
   return {
     ...perLayer,
@@ -234,7 +260,10 @@ function changedInputs(
   current: CompositeInputFingerprints,
   previous?: CompositeInputFingerprints,
 ): (CompositeEligibleLayerId | 'weights')[] {
-  const kinds: readonly (CompositeEligibleLayerId | 'weights')[] = [...COMPOSITE_ELIGIBLE_LAYER_IDS, 'weights'];
+  const kinds: readonly (CompositeEligibleLayerId | 'weights')[] = [
+    ...COMPOSITE_ELIGIBLE_LAYER_IDS,
+    'weights',
+  ];
   if (!previous) return [...kinds];
   return kinds.filter((kind) => current[kind] !== previous[kind]);
 }
@@ -257,7 +286,10 @@ export function recalculateComposite(input: RecalculateCompositeInput): AuditedC
       weights: COMPOSITE_LAYER_WEIGHTS,
       counterweightMaxReduction: COUNTERWEIGHT_MAX_REDUCTION,
       inputFingerprints,
-      recalculationReasons: changedInputs(inputFingerprints, input.previous?.audit.inputFingerprints),
+      recalculationReasons: changedInputs(
+        inputFingerprints,
+        input.previous?.audit.inputFingerprints,
+      ),
     },
   };
 }
@@ -275,8 +307,14 @@ type NoKeyOverlap<A, B> = Extract<keyof A, keyof B> extends never ? true : false
  * alike) and is not itself a scoring leak. `GENERAL_CRIME_STATS_SCORING_BANNED_KEYS` and
  * `ADVISORY_SCORING_BANNED_KEYS` are the actual leak surface this check guards.
  */
-type BannedGeneralCrimeFields = Pick<GeneralCrimeContextRecord, 'nibrsOffenseCount' | 'reportedCrimeRate' | 'policingPatternCaveat'>;
-type BannedAdvisoryFields = Pick<PlaceAdvisoryRecord, 'advisoryClass' | 'sourcedClaimIds' | 'reviewCadence'>;
+type BannedGeneralCrimeFields = Pick<
+  GeneralCrimeContextRecord,
+  'nibrsOffenseCount' | 'reportedCrimeRate' | 'policingPatternCaveat'
+>;
+type BannedAdvisoryFields = Pick<
+  PlaceAdvisoryRecord,
+  'advisoryClass' | 'sourcedClaimIds' | 'reviewCadence'
+>;
 
 export const HISTORIC_SAFETY_COMPOSITE_TYPE_INVARIANTS: {
   readonly noOverlapWithGeneralCrimeFields: NoKeyOverlap<CompositeResult, BannedGeneralCrimeFields>;

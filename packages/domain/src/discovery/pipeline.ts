@@ -14,13 +14,8 @@ import {
   recordWithinCampaignBoundaries,
   type CampaignBudgetSnapshot,
 } from './campaign.js';
-import {
-  attachCatalogMatchesToSurvivors,
-  type CatalogMatchCatalog,
-} from './catalog-match.js';
-import {
-  harvestAuthorityFollowUpsForCandidates,
-} from './authority-harvest.js';
+import { attachCatalogMatchesToSurvivors, type CatalogMatchCatalog } from './catalog-match.js';
+import { harvestAuthorityFollowUpsForCandidates } from './authority-harvest.js';
 import { mergeDuplicateCandidates } from './deduplication.js';
 import { stampDiscoveryReproducibility } from './hashing.js';
 import { ingestBulkCandidates } from './ingestion.js';
@@ -112,9 +107,7 @@ function processCandidate(
           ? snapshot.quarantined + 1
           : snapshot.quarantined,
       deadLetter:
-        failure.candidate.status === 'dead_letter'
-          ? snapshot.deadLetter + 1
-          : snapshot.deadLetter,
+        failure.candidate.status === 'dead_letter' ? snapshot.deadLetter + 1 : snapshot.deadLetter,
     };
     return { candidate: failure.candidate, snapshot: next };
   }
@@ -133,14 +126,10 @@ export function runDiscoveryCampaign(input: RunDiscoveryCampaignInput): Discover
   ];
   const reproducibility = stampDiscoveryReproducibility(stampedRun, parserVersions);
 
-  const ingested = ingestBulkCandidates(
-    { records: input.records },
-    input.pack,
-    {
-      now: input.stampedAt,
-      ...(input.idPrefix !== undefined ? { idPrefix: input.idPrefix } : {}),
-    },
-  );
+  const ingested = ingestBulkCandidates({ records: input.records }, input.pack, {
+    now: input.stampedAt,
+    ...(input.idPrefix !== undefined ? { idPrefix: input.idPrefix } : {}),
+  });
 
   let snapshot = emptySnapshot();
   const processed: DiscoveryCandidateRecord[] = [];

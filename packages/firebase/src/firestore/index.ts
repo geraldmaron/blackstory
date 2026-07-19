@@ -1,4 +1,3 @@
-
 /**
  * Firestore model surface for BlackStory (ADR-011 019).
  */
@@ -220,7 +219,4 @@ export {
   executeAuthorizedResearchCaseTransition,
   executeAuthorizedResearchCaseAction,
 } from './research-case.js';
-export type {
-  ResearchCaseServerAction,
-  ServerResearchCaseState,
-} from './research-case.js';
+export type { ResearchCaseServerAction, ServerResearchCaseState } from './research-case.js';

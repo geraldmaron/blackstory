@@ -4,7 +4,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createInMemorySourceRegistry } from './adapters/registry.js';
-import { assertCorpusVettedForBulkImport, createInMemoryCorpusVettingStore } from './corpus-vetting.js';
+import {
+  assertCorpusVettedForBulkImport,
+  createInMemoryCorpusVettingStore,
+} from './corpus-vetting.js';
 import {
   BOUNDARY_EXCLUDED_CORPUS_SLUGS,
   LAUNCH_CORPUS_SLUGS,
@@ -23,10 +26,7 @@ test('all 7 named launch corpora are registered with a recorded license verdict'
   });
 
   assert.equal(records.length, 7);
-  assert.deepEqual(
-    records.map((record) => record.corpus).sort(),
-    [...LAUNCH_CORPUS_SLUGS].sort(),
-  );
+  assert.deepEqual(records.map((record) => record.corpus).sort(), [...LAUNCH_CORPUS_SLUGS].sort());
   for (const record of records) {
     assert.ok(record.licenseVerdict, `${record.corpus} must record a license verdict`);
     assert.ok(record.licenseNotes.trim().length > 0, `${record.corpus} must record license notes`);
@@ -38,7 +38,10 @@ test('all 7 named launch corpora are registered with a recorded license verdict'
 test('Rosenwald schools is registered but marked deferred/unverified, and fails closed for bulk import', () => {
   const registryStore = createInMemorySourceRegistry();
   const vettingStore = createInMemoryCorpusVettingStore();
-  registerLaunchCorpora(registryStore, vettingStore, { vettedBy: 'operator-gerald', vettedAt: NOW });
+  registerLaunchCorpora(registryStore, vettingStore, {
+    vettedBy: 'operator-gerald',
+    vettedAt: NOW,
+  });
 
   const rosenwald = vettingStore.get('rosenwald-schools');
   assert.ok(rosenwald, 'rosenwald-schools should still be registered as a vetting record');
@@ -53,7 +56,10 @@ test('Rosenwald schools is registered but marked deferred/unverified, and fails 
 test('the other 6 launch corpora are cleared for bulk import', () => {
   const registryStore = createInMemorySourceRegistry();
   const vettingStore = createInMemoryCorpusVettingStore();
-  registerLaunchCorpora(registryStore, vettingStore, { vettedBy: 'operator-gerald', vettedAt: NOW });
+  registerLaunchCorpora(registryStore, vettingStore, {
+    vettedBy: 'operator-gerald',
+    vettedAt: NOW,
+  });
 
   const clearedSlugs = LAUNCH_CORPUS_SLUGS.filter((slug) => slug !== 'rosenwald-schools');
   assert.equal(clearedSlugs.length, 6);
@@ -92,7 +98,11 @@ test('statutes/cases () and Tougaloo sundown data () are not in the launch corpu
   const inputs = buildLaunchCorpusVettingInputs({ vettedBy: 'operator-gerald', vettedAt: NOW });
   const slugs = new Set(inputs.map((input) => input.corpus));
   for (const excluded of BOUNDARY_EXCLUDED_CORPUS_SLUGS) {
-    assert.equal(slugs.has(excluded.slug), false, `${excluded.slug} (${excluded.ownerBead}) must not appear here`);
+    assert.equal(
+      slugs.has(excluded.slug),
+      false,
+      `${excluded.slug} (${excluded.ownerBead}) must not appear here`,
+    );
   }
   assert.equal(slugs.has('statutes'), false);
   assert.equal(slugs.has('cases'), false);

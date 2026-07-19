@@ -77,10 +77,20 @@ test('shared RDAP registrant collapses two lineage roots and can flip a claim fr
   });
 
   assert.equal(withSignals.independentLineageCount, 1, 'clustered lineages collapse to one');
-  assert.ok(withSignals.score < withoutSignals.score, 'collapsing clustered lineages lowers the score');
-  assert.equal(withSignals.passesPublishThreshold, false, 'the discounted score falls below threshold');
+  assert.ok(
+    withSignals.score < withoutSignals.score,
+    'collapsing clustered lineages lowers the score',
+  );
+  assert.equal(
+    withSignals.passesPublishThreshold,
+    false,
+    'the discounted score falls below threshold',
+  );
   assert.equal(withSignals.sourceIndependence.sharedInfrastructureFindings.length, 1);
-  assert.equal(withSignals.sourceIndependence.sharedInfrastructureFindings[0]?.kind, 'shared_registrant');
+  assert.equal(
+    withSignals.sourceIndependence.sharedInfrastructureFindings[0]?.kind,
+    'shared_registrant',
+  );
   assert.deepEqual(withSignals.sourceIndependence.sharedInfrastructureClusters, [
     { canonicalLineageRootId: 'root_a', lineageRootIds: ['root_a', 'root_b'] },
   ]);
@@ -195,11 +205,7 @@ test('a freshly first-seen domain is flagged as an advisory recency signal', () 
 });
 
 test('low-trust corroboration alone, however numerous, never reaches published confidence', () => {
-  const links = [
-    evidence('a', 'root_a'),
-    evidence('b', 'root_b'),
-    evidence('c', 'root_c'),
-  ];
+  const links = [evidence('a', 'root_a'), evidence('b', 'root_b'), evidence('c', 'root_c')];
   const base = recalculateConfidence({
     claimClass: 'standard',
     evidenceLinks: links,

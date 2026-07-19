@@ -13,7 +13,11 @@
  * in tests and degraded mode).
  */
 import { NextResponse } from 'next/server';
-import { encodeSearchCursor, evaluateSearchQueryGuardrails, type SearchQueryInput } from '@repo/security';
+import {
+  encodeSearchCursor,
+  evaluateSearchQueryGuardrails,
+  type SearchQueryInput,
+} from '@repo/security';
 import type { PublicSearchIndexDoc } from '@repo/domain';
 import {
   readHybridFlagFromParams,

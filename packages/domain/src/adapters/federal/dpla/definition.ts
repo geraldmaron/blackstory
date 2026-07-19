@@ -33,6 +33,13 @@ export const dplaAdapterDefinition = buildFederalAdapterDefinition({
     ...DEFAULT_FEDERAL_EXPORT_FILTER,
     maxPayloadBytes: 4_096,
     stripKeys: [...DEFAULT_FEDERAL_EXPORT_FILTER.stripKeys, 'aggregatedPreview', 'providerRecord'],
-    essentialKeys: ['stableIdentifier', 'title', 'canonicalUrl', 'classification', 'provider', 'date'],
+    essentialKeys: [
+      'stableIdentifier',
+      'title',
+      'canonicalUrl',
+      'classification',
+      'provider',
+      'date',
+    ],
   },
 });

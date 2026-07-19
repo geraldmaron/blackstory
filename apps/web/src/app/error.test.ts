@@ -15,9 +15,7 @@ test('Error boundary renders a digest reference in production, never the raw mes
   const error = Object.assign(new Error('secret connection string at db.internal'), {
     digest: 'abc123',
   });
-  const html = renderToStaticMarkup(
-    createElement(ErrorBoundary, { error, reset: () => {} }),
-  );
+  const html = renderToStaticMarkup(createElement(ErrorBoundary, { error, reset: () => {} }));
   assert.match(html, /Reference abc123/);
   assert.doesNotMatch(html, /secret connection string/);
   process.env.NEXT_PUBLIC_APP_ENV = prior;

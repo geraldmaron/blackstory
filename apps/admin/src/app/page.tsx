@@ -42,10 +42,10 @@ export default async function AdminHomePage() {
           BlackStory Admin
         </h1>
         <p className="admin-ops__lede">
-          Start here after sign-in. Each card is a desk with one job — Inbox for pending
-          research decisions, Story review for packets, Catalog for what already exists,
-          Cases to browse every research state, Releases to publish, Quick add for new URLs.
-          Decisions here do not publish until you activate a release.
+          Start here after sign-in. Each card is a desk with one job — Inbox for pending research
+          decisions, Story review for packets, Catalog for what already exists, Cases to browse
+          every research state, Releases to publish, Quick add for new URLs. Decisions here do not
+          publish until you activate a release.
         </p>
 
         <p className="admin-ops__env" aria-label="Runtime environment">
@@ -72,9 +72,7 @@ export default async function AdminHomePage() {
                 unavailable
               </span>
             ) : (
-              <span className="admin-ops__card-metric">
-                {researchMetric.text} pending
-              </span>
+              <span className="admin-ops__card-metric">{researchMetric.text} pending</span>
             )}
             <span className="admin-ops__card-detail">
               Pending research only — triage, confirm, exclude, or request evidence
@@ -88,9 +86,7 @@ export default async function AdminHomePage() {
                 unavailable
               </span>
             ) : (
-              <span className="admin-ops__card-metric">
-                {storyMetric.text} pending
-              </span>
+              <span className="admin-ops__card-metric">{storyMetric.text} pending</span>
             )}
             <span className="admin-ops__card-detail">
               Staged packets — approve does not publish to the public site

@@ -1,4 +1,3 @@
-
 /**
  * Tests for the degraded-citation UI additions to Citation.tsx. Confirms the new props are
  * additive (the default, no-`linkStatus` render is byte-for-byte the pre-existing markup) and
@@ -41,20 +40,29 @@ test('linkStatus dead with an archived copy links to it and still discloses the 
     }),
   );
   assert.match(html, /Original link unavailable — archived copy/);
-  assert.match(html, /href="https:\/\/web\.archive\.org\/web\/1\/https:\/\/gazette\.example\/story\/1"/);
+  assert.match(
+    html,
+    /href="https:\/\/web\.archive\.org\/web\/1\/https:\/\/gazette\.example\/story\/1"/,
+  );
   assert.match(html, /link dead as of 2026-07-17/);
   assert.match(html, /Try searching for/);
 });
 
 test('linkStatus drifted flags content-changed-since-capture for research review', () => {
-  const html = renderToStaticMarkup(createElement(Citation, { source: 'County Clerk', linkStatus: 'drifted' }));
+  const html = renderToStaticMarkup(
+    createElement(Citation, { source: 'County Clerk', linkStatus: 'drifted' }),
+  );
   assert.match(html, /Content may have changed since capture/);
   assert.match(html, /evidentiary anchor/);
 });
 
 test('linkStatus alive/redirected renders no degraded block', () => {
-  const alive = renderToStaticMarkup(createElement(Citation, { source: 'Local Gazette', linkStatus: 'alive' }));
+  const alive = renderToStaticMarkup(
+    createElement(Citation, { source: 'Local Gazette', linkStatus: 'alive' }),
+  );
   assert.doesNotMatch(alive, /ds-notice/);
-  const redirected = renderToStaticMarkup(createElement(Citation, { source: 'Local Gazette', linkStatus: 'redirected' }));
+  const redirected = renderToStaticMarkup(
+    createElement(Citation, { source: 'Local Gazette', linkStatus: 'redirected' }),
+  );
   assert.doesNotMatch(redirected, /ds-notice/);
 });

@@ -12,15 +12,14 @@ import { join } from 'node:path';
 import { US_STATES } from '@repo/domain';
 import type { Firestore } from 'firebase-admin/firestore';
 import type { EntityKindDoc } from '../firestore/types.js';
-import type {
-  CanonicalEntitySource,
-  CanonicalEntitySourcePage,
-} from './backfill-cli.js';
+import type { CanonicalEntitySource, CanonicalEntitySourcePage } from './backfill-cli.js';
 import type { EntityEmbeddingInput } from './pipeline.js';
 
 const PAGE_SIZE = 200;
 
-const STATE_BY_NAME = new Map(US_STATES.map((state) => [state.name.toLowerCase(), state.postalCode]));
+const STATE_BY_NAME = new Map(
+  US_STATES.map((state) => [state.name.toLowerCase(), state.postalCode]),
+);
 const STATE_BY_POSTAL = new Map(US_STATES.map((state) => [state.postalCode, state.postalCode]));
 
 const ENTITY_KINDS = new Set<string>([
@@ -92,12 +91,13 @@ export function mapSearchIndexRecordToEmbeddingInput(
       : undefined;
   if (!displayName) return undefined;
 
-  const entityId =
-    typeof data.id === 'string' && data.id.trim() ? data.id.trim() : docId.trim();
+  const entityId = typeof data.id === 'string' && data.id.trim() ? data.id.trim() : docId.trim();
   if (!entityId) return undefined;
 
   const aliases = Array.isArray(data.aliases)
-    ? data.aliases.filter((alias): alias is string => typeof alias === 'string' && alias.trim().length > 0)
+    ? data.aliases.filter(
+        (alias): alias is string => typeof alias === 'string' && alias.trim().length > 0,
+      )
     : undefined;
   const summary =
     typeof data.summary === 'string' && data.summary.trim() ? data.summary.trim() : undefined;
@@ -142,7 +142,9 @@ export function mapCatalogFixtureRecordToEmbeddingInput(
   if (!entityId || !displayName) return undefined;
 
   const aliases = Array.isArray(data.aliases)
-    ? data.aliases.filter((alias): alias is string => typeof alias === 'string' && alias.trim().length > 0)
+    ? data.aliases.filter(
+        (alias): alias is string => typeof alias === 'string' && alias.trim().length > 0,
+      )
     : undefined;
   const summary =
     typeof data.summary === 'string' && data.summary.trim() ? data.summary.trim() : undefined;

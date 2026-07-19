@@ -112,7 +112,9 @@ function identifierFactor(candidate: ResolutionCandidate, entity: CanonicalEntit
     return {
       factor: 'identifier',
       score: 0,
-      rationale: candidateIdentifiers.length ? 'no identifier match' : 'no candidate identifier supplied',
+      rationale: candidateIdentifiers.length
+        ? 'no identifier match'
+        : 'no candidate identifier supplied',
     };
   }
   const trusted = isTrustedIdentifierNamespace(match[0]);
@@ -343,9 +345,7 @@ export function resolutionCandidateFromDiscovery(
   const year = typeof yearValue === 'number' ? yearValue : undefined;
   const kindValue = payloadStrings(payload, 'kind')[0];
   const title = candidate.adapterRecord.title ?? '';
-  const name =
-    payloadStrings(payload, 'name')[0] ??
-    (title ? stripEditorialDayPrefix(title) : '');
+  const name = payloadStrings(payload, 'name')[0] ?? (title ? stripEditorialDayPrefix(title) : '');
   return {
     id: candidate.id,
     name,

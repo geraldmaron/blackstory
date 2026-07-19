@@ -30,7 +30,10 @@ describe('BB-033 cost controls matrix', () => {
     assert.ok(matrix.services.length >= 5);
 
     for (const service of matrix.services) {
-      assert.ok(service.maxInstances >= 1 && service.maxInstances <= 100, `${service.id} maxInstances`);
+      assert.ok(
+        service.maxInstances >= 1 && service.maxInstances <= 100,
+        `${service.id} maxInstances`,
+      );
       assert.ok(service.minInstances <= service.maxInstances, `${service.id} min/max`);
       assert.ok(service.concurrency >= 1, `${service.id} concurrency`);
     }
@@ -96,13 +99,7 @@ describe('BB-033 cost controls matrix', () => {
   it('maps five acceptance criteria', () => {
     const matrix = readJson('cost-controls-matrix.json');
     const ids = matrix.acceptanceCriteria.map((a) => a.id).sort();
-    assert.deepEqual(ids, [
-      'AC-COST-1',
-      'AC-COST-2',
-      'AC-COST-3',
-      'AC-COST-4',
-      'AC-COST-5',
-    ]);
+    assert.deepEqual(ids, ['AC-COST-1', 'AC-COST-2', 'AC-COST-3', 'AC-COST-4', 'AC-COST-5']);
   });
 });
 
@@ -110,13 +107,7 @@ describe('BB-033 daily budgets', () => {
   it('includes geocoder, model, OCR, source, and research campaign caps', () => {
     const matrix = readJson('cost-controls-matrix.json');
     const categories = matrix.dailyBudgets.map((b) => b.category).sort();
-    assert.deepEqual(categories, [
-      'geocoder',
-      'model',
-      'ocr',
-      'research_campaign',
-      'source_fetch',
-    ]);
+    assert.deepEqual(categories, ['geocoder', 'model', 'ocr', 'research_campaign', 'source_fetch']);
 
     for (const budget of matrix.dailyBudgets) {
       assert.equal(budget.hardStopAtPercent, 100);

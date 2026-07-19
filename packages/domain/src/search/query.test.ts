@@ -7,7 +7,11 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { buildPublicSearchIndexDocs } from './index-build.js';
 import { runPublicSearch } from './query.js';
-import type { PublicSearchIndexDoc, SearchExecutionInput, SearchableEntityRecord } from './types.js';
+import type {
+  PublicSearchIndexDoc,
+  SearchExecutionInput,
+  SearchableEntityRecord,
+} from './types.js';
 
 function record(
   overrides: Partial<SearchableEntityRecord> & Pick<SearchableEntityRecord, 'id' | 'displayName'>,
@@ -93,7 +97,12 @@ const INDEX: readonly PublicSearchIndexDoc[] = buildPublicSearchIndexDocs('rel-1
 
 test('query + kind filter + pagination: order, facets, totalMatched, and hasMore', () => {
   const page1 = runPublicSearch(
-    input({ normalizedQuery: 'school', filters: [{ field: 'kind', value: 'school' }], offset: 0, pageSize: 2 }),
+    input({
+      normalizedQuery: 'school',
+      filters: [{ field: 'kind', value: 'school' }],
+      offset: 0,
+      pageSize: 2,
+    }),
     INDEX,
   );
 
@@ -121,7 +130,12 @@ test('query + kind filter + pagination: order, facets, totalMatched, and hasMore
   assert.equal(page1.results[0]?.explanation, 'Matched on name.');
 
   const page2 = runPublicSearch(
-    input({ normalizedQuery: 'school', filters: [{ field: 'kind', value: 'school' }], offset: 2, pageSize: 2 }),
+    input({
+      normalizedQuery: 'school',
+      filters: [{ field: 'kind', value: 'school' }],
+      offset: 2,
+      pageSize: 2,
+    }),
     INDEX,
   );
   assert.deepEqual(
@@ -134,7 +148,11 @@ test('query + kind filter + pagination: order, facets, totalMatched, and hasMore
 
 test('name_asc sort reorders the matched set deterministically', () => {
   const result = runPublicSearch(
-    input({ normalizedQuery: 'school', filters: [{ field: 'kind', value: 'school' }], sort: 'name_asc' }),
+    input({
+      normalizedQuery: 'school',
+      filters: [{ field: 'kind', value: 'school' }],
+      sort: 'name_asc',
+    }),
     INDEX,
   );
   assert.deepEqual(

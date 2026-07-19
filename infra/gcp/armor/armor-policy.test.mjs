@@ -41,7 +41,7 @@ describe('BB-023 ingress matrix', () => {
       assert.equal(
         backend.cloudRunIngress,
         'internal-and-cloud-load-balancing',
-        `${backend.id} must not allow public run.app ingress`
+        `${backend.id} must not allow public run.app ingress`,
       );
     }
   });
@@ -60,20 +60,12 @@ describe('BB-023 ingress matrix', () => {
   it('defines four acceptance criteria', () => {
     const matrix = readJson('ingress-matrix.json');
     const acIds = matrix.acceptanceCriteria.map((a) => a.id).sort();
-    assert.deepEqual(acIds, [
-      'AC-ARMOR-1',
-      'AC-ARMOR-2',
-      'AC-ARMOR-3',
-      'AC-ARMOR-4',
-    ]);
+    assert.deepEqual(acIds, ['AC-ARMOR-1', 'AC-ARMOR-2', 'AC-ARMOR-3', 'AC-ARMOR-4']);
   });
 });
 
 describe('BB-023 Cloud Armor policies', () => {
-  const policyFiles = [
-    'policies/api-public-policy.json',
-    'policies/api-submissions-policy.json',
-  ];
+  const policyFiles = ['policies/api-public-policy.json', 'policies/api-submissions-policy.json'];
 
   for (const file of policyFiles) {
     it(`${file} parses and includes emergency, WAF, rate-limit, and default rules`, () => {
@@ -102,7 +94,7 @@ describe('BB-023 Cloud Armor policies', () => {
     assert.ok(
       subGlobal.rateLimitOptions.rateLimitThreshold.count <
         pubGlobal.rateLimitOptions.rateLimitThreshold.count,
-      'submissions global ceiling must be lower than api-public'
+      'submissions global ceiling must be lower than api-public',
     );
   });
 });

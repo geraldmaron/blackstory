@@ -21,9 +21,9 @@ export default function CorrectionsPage() {
 
       <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
         <Notice tone="warning" title="This is not a public post">
-          Corrections enter a restricted quarantine queue for human review. Nothing you
-          submit changes the public record until it passes independent review and promotion
-          controls. {CORRECTION_PRIVACY_NOTICE.body}
+          Corrections enter a restricted quarantine queue for human review. Nothing you submit
+          changes the public record until it passes independent review and promotion controls.{' '}
+          {CORRECTION_PRIVACY_NOTICE.body}
         </Notice>
 
         <Suspense fallback={<p className="ds-sans">Loading correction form…</p>}>

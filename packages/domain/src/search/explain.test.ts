@@ -24,7 +24,10 @@ const REC: SearchableEntityRecord = {
 };
 
 test('a name match explains "Matched on name"', () => {
-  assert.equal(buildExplanation(REC, 'displayName', REC.displayName, 'freedom'), 'Matched on name.');
+  assert.equal(
+    buildExplanation(REC, 'displayName', REC.displayName, 'freedom'),
+    'Matched on name.',
+  );
 });
 
 test('an alias match quotes the alias', () => {
@@ -35,15 +38,24 @@ test('an alias match quotes the alias', () => {
 });
 
 test('a topic match names and capitalizes the topic', () => {
-  assert.equal(buildExplanation(REC, 'topicTags', 'education', 'education'), 'Matched topic: Education.');
+  assert.equal(
+    buildExplanation(REC, 'topicTags', 'education', 'education'),
+    'Matched topic: Education.',
+  );
 });
 
 test('a summary match is described without echoing internal text', () => {
-  assert.equal(buildExplanation(REC, 'summary', 'freedom', 'freedom'), 'Matched in the summary text.');
+  assert.equal(
+    buildExplanation(REC, 'summary', 'freedom', 'freedom'),
+    'Matched in the summary text.',
+  );
 });
 
 test('an empty query yields a neutral browse explanation', () => {
-  assert.equal(buildExplanation(REC, 'displayName', REC.displayName, ''), 'Included in the current release.');
+  assert.equal(
+    buildExplanation(REC, 'displayName', REC.displayName, ''),
+    'Included in the current release.',
+  );
 });
 
 test('no explanation ever contains a numeric score, evidence count, or the word "score"', () => {

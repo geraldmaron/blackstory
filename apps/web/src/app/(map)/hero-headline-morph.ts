@@ -7,12 +7,7 @@
 
 /** Phases of the hero subject morph (History → … → Black Story). */
 export type HeroHeadlinePhaseId =
-  | 'history'
-  | 'his-story'
-  | 'her-story'
-  | 'their-story'
-  | 'your-story'
-  | 'black-story';
+  'history' | 'his-story' | 'her-story' | 'their-story' | 'your-story' | 'black-story';
 
 export type HeroHeadlinePhase = {
   readonly id: HeroHeadlinePhaseId;

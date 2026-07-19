@@ -108,7 +108,13 @@ test('sends the provided App Check headers on the outgoing request', async () =>
   let capturedHeaders: HeadersInit | undefined;
   globalThis.fetch = (async (_url: string, init?: RequestInit) => {
     capturedHeaders = init?.headers;
-    return { status: 200, json: async () => ({ ok: false, fallback: { available: true, reason: 'no_match', message: 'x', searchHref: '/search' } }) } as Response;
+    return {
+      status: 200,
+      json: async () => ({
+        ok: false,
+        fallback: { available: true, reason: 'no_match', message: 'x', searchHref: '/search' },
+      }),
+    } as Response;
   }) as typeof fetch;
   try {
     await fetchLocateByAddress('123 Main St', { 'X-Firebase-AppCheck': 'token-123' });

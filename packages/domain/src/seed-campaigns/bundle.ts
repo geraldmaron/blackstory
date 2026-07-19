@@ -57,8 +57,9 @@ export function countRecordsByCampaign(
 ): Readonly<Record<SeedCampaignId, number>> {
   const grouped = recordsByCampaign(records);
   return Object.freeze(
-    Object.fromEntries(
-      Object.entries(grouped).map(([id, list]) => [id, list.length]),
-    ) as Record<SeedCampaignId, number>,
+    Object.fromEntries(Object.entries(grouped).map(([id, list]) => [id, list.length])) as Record<
+      SeedCampaignId,
+      number
+    >,
   );
 }

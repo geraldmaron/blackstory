@@ -1,4 +1,3 @@
-
 /**
  * End-to-end smoke harness. Full browser flows land with product UI.
  * Executable now: validates the gate contract and skips unless E2E_BASE_URL is set.

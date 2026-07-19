@@ -65,14 +65,18 @@ const VALID_CORRECTION = {
   targetType: 'entity',
   targetRecordId: 'entity-rosewood',
   category: 'factual_error',
-  statement: 'The published opening year should be 1924 according to the county superintendent ledger.',
+  statement:
+    'The published opening year should be 1924 according to the county superintendent ledger.',
   sourceUrl: 'https://example.org/ledger',
   privacyConsent: true,
 };
 
 test('accepts a correction into quarantine and returns a receipt code (AC1)', async () => {
   const deps = await buildDeps();
-  const response = await handleCorrectionSubmitRequest(postJson('/corrections/api', VALID_CORRECTION), deps);
+  const response = await handleCorrectionSubmitRequest(
+    postJson('/corrections/api', VALID_CORRECTION),
+    deps,
+  );
   assert.equal(response.status, 202);
   const body = (await response.json()) as { receiptCode: string; statusHref: string };
   assert.match(body.receiptCode, /^BB-COR-/);
@@ -81,13 +85,24 @@ test('accepts a correction into quarantine and returns a receipt code (AC1)', as
 
 test('tight anonymous rate limits block correction floods (AC2)', async () => {
   const deps = await buildDeps();
-  const first = await handleCorrectionSubmitRequest(postJson('/corrections/api', VALID_CORRECTION, '203.0.113.21'), deps);
+  const first = await handleCorrectionSubmitRequest(
+    postJson('/corrections/api', VALID_CORRECTION, '203.0.113.21'),
+    deps,
+  );
   const second = await handleCorrectionSubmitRequest(
-    postJson('/corrections/api', { ...VALID_CORRECTION, targetRecordId: 'entity-2' }, '203.0.113.21'),
+    postJson(
+      '/corrections/api',
+      { ...VALID_CORRECTION, targetRecordId: 'entity-2' },
+      '203.0.113.21',
+    ),
     deps,
   );
   const third = await handleCorrectionSubmitRequest(
-    postJson('/corrections/api', { ...VALID_CORRECTION, targetRecordId: 'entity-3' }, '203.0.113.21'),
+    postJson(
+      '/corrections/api',
+      { ...VALID_CORRECTION, targetRecordId: 'entity-3' },
+      '203.0.113.21',
+    ),
     deps,
   );
   assert.equal(first.status, 202);
@@ -97,8 +112,14 @@ test('tight anonymous rate limits block correction floods (AC2)', async () => {
 
 test('coordinated duplicate corrections stay quarantined without public brigading signals (AC3)', async () => {
   const deps = await buildDeps();
-  const first = await handleCorrectionSubmitRequest(postJson('/corrections/api', VALID_CORRECTION, '203.0.113.22'), deps);
-  const second = await handleCorrectionSubmitRequest(postJson('/corrections/api', VALID_CORRECTION, '203.0.113.22'), deps);
+  const first = await handleCorrectionSubmitRequest(
+    postJson('/corrections/api', VALID_CORRECTION, '203.0.113.22'),
+    deps,
+  );
+  const second = await handleCorrectionSubmitRequest(
+    postJson('/corrections/api', VALID_CORRECTION, '203.0.113.22'),
+    deps,
+  );
   assert.equal(first.status, 202);
   assert.equal(second.status, 202);
 
@@ -108,7 +129,9 @@ test('coordinated duplicate corrections stay quarantined without public brigadin
   assert.notEqual(stored.record.moderationState, 'pending_review');
 
   const statusResponse = await handleCorrectionStatusRequest(
-    new Request(`http://localhost/corrections/status/api?receipt=${encodeURIComponent(secondBody.receiptCode)}`),
+    new Request(
+      `http://localhost/corrections/status/api?receipt=${encodeURIComponent(secondBody.receiptCode)}`,
+    ),
     deps,
   );
   assert.equal(statusResponse.status, 200);
@@ -121,7 +144,10 @@ test('coordinated duplicate corrections stay quarantined without public brigadin
 
 test('status lookup requires an exact receipt code and cannot enumerate others (AC4)', async () => {
   const deps = await buildDeps();
-  const accepted = await handleCorrectionSubmitRequest(postJson('/corrections/api', VALID_CORRECTION, '203.0.113.23'), deps);
+  const accepted = await handleCorrectionSubmitRequest(
+    postJson('/corrections/api', VALID_CORRECTION, '203.0.113.23'),
+    deps,
+  );
   const body = (await accepted.json()) as { receiptCode: string };
 
   const missing = await handleCorrectionStatusRequest(
@@ -131,7 +157,9 @@ test('status lookup requires an exact receipt code and cannot enumerate others (
   assert.equal(missing.status, 404);
 
   const found = await handleCorrectionStatusRequest(
-    new Request(`http://localhost/corrections/status/api?receipt=${encodeURIComponent(body.receiptCode)}`),
+    new Request(
+      `http://localhost/corrections/status/api?receipt=${encodeURIComponent(body.receiptCode)}`,
+    ),
     deps,
   );
   assert.equal(found.status, 200);
@@ -139,19 +167,26 @@ test('status lookup requires an exact receipt code and cannot enumerate others (
 
 test('appeals re-enter review for rejected closures without exposing moderation details', async () => {
   const deps = await buildDeps();
-  const accepted = await handleCorrectionSubmitRequest(postJson('/corrections/api', VALID_CORRECTION, '203.0.113.24'), deps);
+  const accepted = await handleCorrectionSubmitRequest(
+    postJson('/corrections/api', VALID_CORRECTION, '203.0.113.24'),
+    deps,
+  );
   const body = (await accepted.json()) as { receiptCode: string };
   const stored = deps.store.getByReceiptCode(body.receiptCode, PEPPER);
   assert.ok(stored);
   deps.store.markClosed(stored.record.id, 'rejected');
 
   const appeal = await handleCorrectionAppealRequest(
-    postJson('/corrections/appeal/api', {
-      receiptCode: body.receiptCode,
-      statement: 'The county ledger clearly shows 1924 and the rejection should be reconsidered.',
-      sourceUrl: 'https://example.org/ledger-copy',
-      privacyConsent: true,
-    }, '203.0.113.24'),
+    postJson(
+      '/corrections/appeal/api',
+      {
+        receiptCode: body.receiptCode,
+        statement: 'The county ledger clearly shows 1924 and the rejection should be reconsidered.',
+        sourceUrl: 'https://example.org/ledger-copy',
+        privacyConsent: true,
+      },
+      '203.0.113.24',
+    ),
     deps,
   );
   assert.equal(appeal.status, 202);
@@ -160,10 +195,15 @@ test('appeals re-enter review for rejected closures without exposing moderation 
 test('abuse reports enter quarantine as abuse_report submissions', async () => {
   const deps = await buildDeps();
   const response = await handleCorrectionAbuseReportRequest(
-    postJson('/corrections/abuse/api', {
-      statement: 'Multiple near-identical corrections are targeting the same entity in bad faith.',
-      privacyConsent: true,
-    }, '203.0.113.25'),
+    postJson(
+      '/corrections/abuse/api',
+      {
+        statement:
+          'Multiple near-identical corrections are targeting the same entity in bad faith.',
+        privacyConsent: true,
+      },
+      '203.0.113.25',
+    ),
     deps,
   );
   assert.equal(response.status, 202);

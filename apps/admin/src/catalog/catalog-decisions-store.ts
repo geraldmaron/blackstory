@@ -45,7 +45,9 @@ function getStore() {
   return createAdminAtomicStore(getDb());
 }
 
-function auditActionFor(action: CatalogDecisionAction): 'moderation.escalated' | 'moderation.approved' {
+function auditActionFor(
+  action: CatalogDecisionAction,
+): 'moderation.escalated' | 'moderation.approved' {
   return action === 'clear_flag' ? 'moderation.approved' : 'moderation.escalated';
 }
 
@@ -118,7 +120,9 @@ async function recordCatalogDecision(input: {
   };
 
   const result = await commitWithAudit(getStore(), {
-    mutations: [{ operation: 'set', path, data: record as unknown as Readonly<Record<string, unknown>> }],
+    mutations: [
+      { operation: 'set', path, data: record as unknown as Readonly<Record<string, unknown>> },
+    ],
     auditEvent: auditEvent as unknown as AuditEventDoc,
     outboxMessage,
   });

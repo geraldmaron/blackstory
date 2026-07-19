@@ -29,9 +29,6 @@ export function buildStateShiftBarRows(
 export function divergingBarDomain(rows: readonly StateShiftBarRow[]): {
   readonly maxAbs: number;
 } {
-  const maxAbs = rows.reduce(
-    (max, row) => Math.max(max, Math.abs(row.blackAbsoluteChange)),
-    0,
-  );
+  const maxAbs = rows.reduce((max, row) => Math.max(max, Math.abs(row.blackAbsoluteChange)), 0);
   return { maxAbs: maxAbs > 0 ? maxAbs : 1 };
 }

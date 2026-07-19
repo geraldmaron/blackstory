@@ -1,4 +1,3 @@
-
 /**
  * The initial job roster registers cleanly, every entry declares owner
  * cadence budget timeout idempotency scheme kill switch target worker, and the
@@ -23,7 +22,9 @@ test('roster job ids are unique', () => {
 
 test('exactly thirteen real job bodies are registered (prior nine plus four discovery campaigns)', () => {
   const store = createDefaultScheduledJobRegistry();
-  const real = listScheduledJobs(store, { rosterStatus: 'real' }).map((job) => job.id).sort();
+  const real = listScheduledJobs(store, { rosterStatus: 'real' })
+    .map((job) => job.id)
+    .sort();
   assert.deepEqual(real, [
     'backup-verification-daily',
     'citation-link-health-sweep',
@@ -77,7 +78,9 @@ test('every job with a public-facing effect declares its own kill switch, distin
 });
 
 test('discovery-campaign jobs share the research-campaigns kill switch (exact workstream semantic fit)', () => {
-  const discoveryJobs = DEFAULT_SCHEDULED_JOBS.filter((job) => job.id.startsWith('discovery-campaign-'));
+  const discoveryJobs = DEFAULT_SCHEDULED_JOBS.filter((job) =>
+    job.id.startsWith('discovery-campaign-'),
+  );
   assert.ok(discoveryJobs.length >= 4);
   for (const job of discoveryJobs) {
     assert.equal(job.killSwitchId, 'research-campaigns');

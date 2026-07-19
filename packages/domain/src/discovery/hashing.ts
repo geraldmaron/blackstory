@@ -59,7 +59,9 @@ export function stampDiscoveryReproducibility(
   run: StampedDiscoveryRun,
   sourceParserVersions: readonly string[],
 ): DiscoveryReproducibilityStamp {
-  const sortedVersions = [...new Set(sourceParserVersions.map((v) => v.trim()).filter(Boolean))].sort();
+  const sortedVersions = [
+    ...new Set(sourceParserVersions.map((v) => v.trim()).filter(Boolean)),
+  ].sort();
   const material = canonicalJson({
     sourceParserVersions: sortedVersions,
     queryPackVersionId: run.queryPackVersionId,

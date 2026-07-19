@@ -4,15 +4,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { loadProductConstitution } from '@repo/schemas';
-import {
-  buildEditorialPacket,
-  EDITORIAL_PACKET_KIND,
-  type EditorialFieldDraft,
-} from './packet.js';
-import {
-  EDITORIAL_LANGUAGE_PROCEDURAL_STATUS,
-  validateEditorialDrafts,
-} from './validate.js';
+import { buildEditorialPacket, EDITORIAL_PACKET_KIND, type EditorialFieldDraft } from './packet.js';
+import { EDITORIAL_LANGUAGE_PROCEDURAL_STATUS, validateEditorialDrafts } from './validate.js';
 
 const NOW = '2026-07-18T23:53:00.000Z';
 

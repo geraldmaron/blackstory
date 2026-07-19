@@ -1,4 +1,3 @@
-
 /**
  * Atomic Firestore promotion to publication candidacy with audit, outbox, and idempotency.
  */
@@ -120,9 +119,7 @@ function assertPromotionEnvelope(
     !Number.isFinite(input.candidate.confidenceThreshold) ||
     input.candidate.confidenceThreshold < 0 ||
     input.candidate.confidenceThreshold > 1 ||
-    Object.values(input.candidate.preview).some(
-      (count) => !Number.isInteger(count) || count < 0,
-    )
+    Object.values(input.candidate.preview).some((count) => !Number.isInteger(count) || count < 0)
   ) {
     throw new Error('Publication candidate metadata is invalid');
   }
@@ -150,7 +147,8 @@ export async function promoteClaimToPublicationCandidate(
   store: AtomicStore,
   input: PromoteClaimInput,
 ): Promise<PromoteClaimResult> {
-  if (!Number.isFinite(Date.parse(input.now))) throw new Error('now must be an ISO-compatible date');
+  if (!Number.isFinite(Date.parse(input.now)))
+    throw new Error('now must be an ISO-compatible date');
   const auditEvent = auditEventSchema.parse(input.auditEvent);
   const outboxMessage = outboxMessageSchema.parse(input.outboxMessage);
   assertPromotionEnvelope(input, auditEvent, outboxMessage);
@@ -178,7 +176,8 @@ export async function promoteClaimToPublicationCandidate(
     }
 
     const promotionSnapshot = await transaction.get(promotionPath);
-    if (!promotionSnapshot.exists) throw new Error(`Promotion does not exist: ${input.promotionId}`);
+    if (!promotionSnapshot.exists)
+      throw new Error(`Promotion does not exist: ${input.promotionId}`);
     const promotion = parseAcceptedPromotion(promotionSnapshot.data());
     if (promotion.stage !== 'accepted_claim') {
       throw new Error(`Promotion stage ${promotion.stage} cannot become a publication candidate`);

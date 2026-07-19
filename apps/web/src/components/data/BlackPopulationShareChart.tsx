@@ -37,12 +37,20 @@ export function BlackPopulationShareChart({ rows }: BlackPopulationShareChartPro
   const maxShare = Math.max(...shares);
   const domainMin = Math.max(0, Math.floor(minShare - 1));
   const domainMax = Math.ceil(maxShare + 1);
-  const xScale = scaleLinear(0, rows.length - 1, CHART_MARGIN.left, CHART_MARGIN.left + plotWidth());
-  const yScale = scaleLinear(domainMin, domainMax, CHART_MARGIN.top + plotHeight(), CHART_MARGIN.top);
+  const xScale = scaleLinear(
+    0,
+    rows.length - 1,
+    CHART_MARGIN.left,
+    CHART_MARGIN.left + plotWidth(),
+  );
+  const yScale = scaleLinear(
+    domainMin,
+    domainMax,
+    CHART_MARGIN.top + plotHeight(),
+    CHART_MARGIN.top,
+  );
   const yTicks = [domainMin, (domainMin + domainMax) / 2, domainMax];
-  const points = rows
-    .map((row, index) => `${xScale(index)},${yScale(shareValue(row))}`)
-    .join(' ');
+  const points = rows.map((row, index) => `${xScale(index)},${yScale(shareValue(row))}`).join(' ');
   const sources = sourcesFromDecadeRows(rows);
 
   return (
@@ -88,18 +96,18 @@ export function BlackPopulationShareChart({ rows }: BlackPopulationShareChartPro
                 y1={y}
                 y2={y}
               />
-              <text className="ds-data-chart__axis-label" x={CHART_MARGIN.left - 8} y={y + 4} textAnchor="end">
+              <text
+                className="ds-data-chart__axis-label"
+                x={CHART_MARGIN.left - 8}
+                y={y + 4}
+                textAnchor="end"
+              >
                 {tick.toFixed(1)}%
               </text>
             </g>
           );
         })}
-        <polyline
-          fill="none"
-          stroke="var(--ds-accent-graphic)"
-          strokeWidth={2}
-          points={points}
-        />
+        <polyline fill="none" stroke="var(--ds-accent-graphic)" strokeWidth={2} points={points} />
         {rows.map((row, index) => (
           <g key={row.decade}>
             <circle
@@ -130,7 +138,10 @@ export function BlackPopulationShareChart({ rows }: BlackPopulationShareChartPro
       </svg>
       <ul className="ds-data-chart__legend" aria-hidden="true">
         <li className="ds-data-chart__legend-item">
-          <span className="ds-data-chart__legend-swatch" style={{ background: 'var(--ds-accent-graphic)' }} />
+          <span
+            className="ds-data-chart__legend-swatch"
+            style={{ background: 'var(--ds-accent-graphic)' }}
+          />
           Black population share (line)
         </li>
       </ul>

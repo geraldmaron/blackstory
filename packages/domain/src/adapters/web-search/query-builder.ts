@@ -31,7 +31,10 @@ function collectResearchOnlyOffensiveTexts(pack: QueryPack): readonly string[] {
  * automatically by `buildWebSearchQueryTexts`; also exported so it can be asserted directly in
  * tests without going through the full builder.
  */
-export function assertQueryTextHasNoResearchOnlyOffensiveTerms(queryText: string, pack: QueryPack): void {
+export function assertQueryTextHasNoResearchOnlyOffensiveTerms(
+  queryText: string,
+  pack: QueryPack,
+): void {
   const lower = queryText.toLowerCase();
   for (const offensive of collectResearchOnlyOffensiveTexts(pack)) {
     if (lower.includes(offensive)) {
@@ -72,13 +75,18 @@ export function buildWebSearchQueryTexts(input: BuildWebSearchQueryTextsInput): 
     );
   }
   if (input.geographicSeeds.length === 0) {
-    throw new Error('At least one geographic seed (state/county) is required to build web-search queries');
+    throw new Error(
+      'At least one geographic seed (state/county) is required to build web-search queries',
+    );
   }
 
-  const coreClause = coreTerms.length > 1 ? `(${coreTerms.map(quoteTerm).join(' OR ')})` : quoteTerm(coreTerms[0]!);
+  const coreClause =
+    coreTerms.length > 1 ? `(${coreTerms.map(quoteTerm).join(' OR ')})` : quoteTerm(coreTerms[0]!);
 
   return input.geographicSeeds.map((seed) => {
-    const geoText = [seed.county, seed.state].filter((part) => Boolean(part && part.trim())).join(' ');
+    const geoText = [seed.county, seed.state]
+      .filter((part) => Boolean(part && part.trim()))
+      .join(' ');
     const queryText = geoText ? `${coreClause} ${geoText}`.trim() : coreClause;
     assertQueryTextHasNoResearchOnlyOffensiveTerms(queryText, input.pack);
     return queryText;

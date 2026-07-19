@@ -13,11 +13,11 @@ function hasExactLocator(locator: EvidenceLocator | undefined): locator is Evide
   if (!locator) return false;
   return Boolean(
     locator.page?.trim() ||
-      locator.pages?.trim() ||
-      locator.paragraph?.trim() ||
-      locator.label?.trim() ||
-      locator.uriFragment?.trim() ||
-      (Number.isInteger(locator.offsetStart) && Number.isInteger(locator.offsetEnd)),
+    locator.pages?.trim() ||
+    locator.paragraph?.trim() ||
+    locator.label?.trim() ||
+    locator.uriFragment?.trim() ||
+    (Number.isInteger(locator.offsetStart) && Number.isInteger(locator.offsetEnd)),
   );
 }
 

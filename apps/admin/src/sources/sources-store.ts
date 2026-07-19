@@ -22,7 +22,10 @@ function readString(value: unknown): string | undefined {
   return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
-function toListItem(docId: string, data: Record<string, unknown>): SourceOrganizationListItem | null {
+function toListItem(
+  docId: string,
+  data: Record<string, unknown>,
+): SourceOrganizationListItem | null {
   const name = readString(data.name);
   const createdAt = readString(data.createdAt);
   const updatedAt = readString(data.updatedAt);

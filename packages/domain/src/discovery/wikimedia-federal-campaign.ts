@@ -341,8 +341,7 @@ export async function runWikimediaFederalCampaign(
   const pack = input.pack ?? defaultCampaignPack(input.stampedAt);
   const campaignInput: RunDiscoveryCampaignInput = {
     config: createDiscoveryCampaignConfig({
-      campaignId:
-        input.campaignId ?? `camp_wikimedia_federal_${input.stampedAt.slice(0, 10)}`,
+      campaignId: input.campaignId ?? `camp_wikimedia_federal_${input.stampedAt.slice(0, 10)}`,
       budget: {
         maxCandidates,
         maxQuarantined: 40,

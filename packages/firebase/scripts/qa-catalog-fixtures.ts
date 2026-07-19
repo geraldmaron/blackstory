@@ -49,8 +49,18 @@ type Entry = {
 };
 
 const KINDS = new Set([
-  'person', 'place', 'school', 'organization', 'institution', 'event',
-  'law', 'case', 'publication', 'artifact', 'movement', 'other',
+  'person',
+  'place',
+  'school',
+  'organization',
+  'institution',
+  'event',
+  'law',
+  'case',
+  'publication',
+  'artifact',
+  'movement',
+  'other',
 ]);
 const CONFIDENCE = new Set(['high', 'medium', 'low']);
 const ERA = /^\d{4}s$/;
@@ -79,7 +89,9 @@ const seenNames = new Map<string, string>();
 let total = 0;
 
 for (const dir of dirs) {
-  for (const file of readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
+  for (const file of readdirSync(dir)
+    .filter((f) => f.endsWith('.json'))
+    .sort()) {
     const where = `${dir}/${file}`;
     let entries: Entry[];
     try {
@@ -99,10 +111,12 @@ for (const dir of dirs) {
       const tag = `${file}[${index}] ${entry.id ?? entry.displayName ?? '?'}`;
       const flag = (msg: string) => problems.push(`${tag}: ${msg}`);
 
-      if (!entry.id || !/^ent_[a-z0-9_]+$/.test(entry.id)) flag('bad or missing id (ent_snake_case)');
+      if (!entry.id || !/^ent_[a-z0-9_]+$/.test(entry.id))
+        flag('bad or missing id (ent_snake_case)');
       if (!entry.kind || !KINDS.has(entry.kind)) flag(`bad kind "${entry.kind}"`);
       if (!entry.displayName?.trim()) flag('missing displayName');
-      if (!entry.summary || entry.summary.trim().length < 40) flag('summary missing or too thin (<40 chars)');
+      if (!entry.summary || entry.summary.trim().length < 40)
+        flag('summary missing or too thin (<40 chars)');
       if (!entry.jurisdictionLabel?.trim()) flag('missing jurisdictionLabel');
       if (!entry.locationPrecision?.trim()) flag('missing locationPrecision');
       if (!entry.locationLabel?.trim()) flag('missing locationLabel');
@@ -144,7 +158,11 @@ for (const dir of dirs) {
           );
         }
       }
-      if (typeof entry.lat === 'number' && typeof entry.lng === 'number' && entry.jurisdictionLabel) {
+      if (
+        typeof entry.lat === 'number' &&
+        typeof entry.lng === 'number' &&
+        entry.jurisdictionLabel
+      ) {
         const state = stateFor(entry.jurisdictionLabel);
         if (!state) {
           flag(`cannot resolve state from jurisdictionLabel "${entry.jurisdictionLabel}"`);
@@ -163,7 +181,8 @@ for (const dir of dirs) {
       if (claims.length === 0) flag('no claims — at least one cited claim required');
       claims.forEach((claim, claimIndex) => {
         const cTag = `claim[${claimIndex}]`;
-        if (!claim.predicate?.trim() || !claim.object?.trim()) flag(`${cTag}: missing predicate/object`);
+        if (!claim.predicate?.trim() || !claim.object?.trim())
+          flag(`${cTag}: missing predicate/object`);
         if (!claim.confidenceLevel || !CONFIDENCE.has(claim.confidenceLevel)) {
           flag(`${cTag}: bad confidenceLevel "${claim.confidenceLevel}"`);
         }

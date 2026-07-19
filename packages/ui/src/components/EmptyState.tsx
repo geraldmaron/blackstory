@@ -1,4 +1,3 @@
-
 /**
  * Empty-state panel for zero-result and unset collection screens.
  */

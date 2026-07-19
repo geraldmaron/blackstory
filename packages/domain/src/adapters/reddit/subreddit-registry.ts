@@ -63,7 +63,9 @@ const SUBREDDIT_NAME_PATTERN = /^[A-Za-z0-9_]{2,21}$/;
 
 function assertValidSubredditName(name: string): void {
   if (!SUBREDDIT_NAME_PATTERN.test(name)) {
-    throw new Error(`Subreddit name is not a valid Reddit community name (no "r/" prefix): ${name}`);
+    throw new Error(
+      `Subreddit name is not a valid Reddit community name (no "r/" prefix): ${name}`,
+    );
   }
 }
 
@@ -96,7 +98,11 @@ function buildAuditEvent(input: {
     action: input.action,
     category: 'administrative',
     actor: input.actor,
-    subject: { type: 'reddit_subreddit_registry_entry', id: input.subredditId, path: `redditSubredditRegistry/${input.subredditId}` },
+    subject: {
+      type: 'reddit_subreddit_registry_entry',
+      id: input.subredditId,
+      path: `redditSubredditRegistry/${input.subredditId}`,
+    },
     reason: input.reason,
     requestId: input.requestId,
     correlationId: input.correlationId,
@@ -111,7 +117,13 @@ function buildAuditEvent(input: {
 export function addSubredditToRegistry(
   store: SubredditRegistryStore,
   input: AddSubredditInput,
-  context: { readonly actor: AuditActor; readonly reason: string; readonly requestId: string; readonly correlationId: string; readonly now: string },
+  context: {
+    readonly actor: AuditActor;
+    readonly reason: string;
+    readonly requestId: string;
+    readonly correlationId: string;
+    readonly now: string;
+  },
 ): SubredditRegistryMutationResult {
   if (store.get(input.id)) {
     throw new Error(`Subreddit registry entry already exists: ${input.id}`);
@@ -143,7 +155,12 @@ export function addSubredditToRegistry(
     correlationId: context.correlationId,
     occurredAt: context.now,
     subredditId: entry.id,
-    data: { mutation: 'subreddit_added', subredditName: entry.subredditName, category: entry.category, revision: entry.revision },
+    data: {
+      mutation: 'subreddit_added',
+      subredditName: entry.subredditName,
+      category: entry.category,
+      revision: entry.revision,
+    },
   });
 
   return { entry, auditEvent };
@@ -154,7 +171,13 @@ export function addSubredditToRegistry(
 export function removeSubredditFromRegistry(
   store: SubredditRegistryStore,
   id: string,
-  context: { readonly actor: AuditActor; readonly reason: string; readonly requestId: string; readonly correlationId: string; readonly now: string },
+  context: {
+    readonly actor: AuditActor;
+    readonly reason: string;
+    readonly requestId: string;
+    readonly correlationId: string;
+    readonly now: string;
+  },
 ): SubredditRegistryMutationResult {
   const existing = store.get(id);
   if (!existing) {
@@ -184,13 +207,19 @@ export function removeSubredditFromRegistry(
     correlationId: context.correlationId,
     occurredAt: context.now,
     subredditId: entry.id,
-    data: { mutation: 'subreddit_removed', subredditName: entry.subredditName, revision: entry.revision },
+    data: {
+      mutation: 'subreddit_removed',
+      subredditName: entry.subredditName,
+      revision: entry.revision,
+    },
   });
 
   return { entry, auditEvent };
 }
 
-export function listActiveSubreddits(store: SubredditRegistryStore): readonly SubredditRegistryEntry[] {
+export function listActiveSubreddits(
+  store: SubredditRegistryStore,
+): readonly SubredditRegistryEntry[] {
   return store.list().filter((entry) => entry.status === 'active');
 }
 
@@ -199,7 +228,10 @@ export function listActiveSubreddits(store: SubredditRegistryStore): readonly Su
  * subs where family-history and neighborhood-memory leads plausibly surface. Deliberately
  * short — adding more is a one-line `addSubredditToRegistry` call, not a code change.
  */
-export function defaultSubredditRegistrySeed(seedAt: string, addedBy = 'system:bb074-seed'): readonly SubredditRegistryEntry[] {
+export function defaultSubredditRegistrySeed(
+  seedAt: string,
+  addedBy = 'system:bb074-seed',
+): readonly SubredditRegistryEntry[] {
   const entries: Array<Omit<SubredditRegistryEntry, 'revision'>> = [
     {
       id: 'sub_askhistorians',

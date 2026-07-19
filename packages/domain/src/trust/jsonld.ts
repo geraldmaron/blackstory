@@ -67,7 +67,9 @@ export function buildNewsMediaOrganizationJsonLd(
     ownershipFundingInfo: input.ownershipFundingInfoUrl,
     masthead: input.mastheadUrl,
     actionableFeedbackPolicy: input.actionableFeedbackPolicyUrl,
-    ...(input.errataFeedUrl ? { subjectOf: { '@type': 'DataFeed', url: input.errataFeedUrl } } : {}),
+    ...(input.errataFeedUrl
+      ? { subjectOf: { '@type': 'DataFeed', url: input.errataFeedUrl } }
+      : {}),
   };
 }
 

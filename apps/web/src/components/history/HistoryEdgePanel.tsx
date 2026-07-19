@@ -17,7 +17,10 @@ export type HistoryEdgePanelProps = {
 
 export function HistoryEdgePanel({ edge, onClose }: HistoryEdgePanelProps) {
   return (
-    <Card title="Documented connection" meta={<span className="ds-mono">{edge.type.replaceAll('_', ' ')}</span>}>
+    <Card
+      title="Documented connection"
+      meta={<span className="ds-mono">{edge.type.replaceAll('_', ' ')}</span>}
+    >
       {onClose ? (
         <button
           type="button"

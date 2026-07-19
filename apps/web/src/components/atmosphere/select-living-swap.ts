@@ -27,8 +27,7 @@ export function pickLivingTileSwap(
   if (candidates.length === 0) return null;
 
   const slot = hashString(`swap-slot:${seedKey}:${tick}`) % visible.length;
-  const tile =
-    candidates[hashString(`swap-tile:${seedKey}:${tick}`) % candidates.length]!;
+  const tile = candidates[hashString(`swap-tile:${seedKey}:${tick}`) % candidates.length]!;
 
   return { slot, tile };
 }

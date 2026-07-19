@@ -18,9 +18,7 @@ export function AdminPageFooter({ signedIn = false }: AdminPageFooterProps) {
   return (
     <footer className="admin-footer">
       <div className="admin-footer__inner">
-        <p className="admin-footer__brand">
-          BlackStory Admin · History, pinned to place.
-        </p>
+        <p className="admin-footer__brand">BlackStory Admin · History, pinned to place.</p>
         <nav className="admin-footer__nav" aria-label="Admin footer">
           <ul className="admin-footer__links">
             {signedIn ? (

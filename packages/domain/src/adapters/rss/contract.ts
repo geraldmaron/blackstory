@@ -11,7 +11,9 @@ export const RSS_ATTRIBUTION_NOTICE =
   'Content derived from RSS/Atom syndication feeds retains the publisher as the attributed ' +
   'source; only title, link, and a short syndicated summary are stored ( evidence-pointer doctrine).';
 
-export function createRssAdapterContract(overrides: Partial<SourceAdapterContract> = {}): SourceAdapterContract {
+export function createRssAdapterContract(
+  overrides: Partial<SourceAdapterContract> = {},
+): SourceAdapterContract {
   return {
     adapterId: RSS_ADAPTER_ID,
     parserVersion: RSS_PARSER_VERSION,
@@ -38,7 +40,10 @@ export function createRssAdapterContract(overrides: Partial<SourceAdapterContrac
     refreshSchedule: '0 */6 * * *',
     rateLimits: { requestsPerMinute: 30, burst: 5 },
     volume: { expectedRecordsPerRun: 50, countToleranceFraction: 0.4 },
-    geographicCoverage: { countries: ['US'], notes: 'Curated US historical-society/library/museum feeds' },
+    geographicCoverage: {
+      countries: ['US'],
+      notes: 'Curated US historical-society/library/museum feeds',
+    },
     expectedSchemaVersion: ADAPTER_CANDIDATE_SCHEMA_VERSION,
     canarySampleFraction: 0.1,
     ...overrides,

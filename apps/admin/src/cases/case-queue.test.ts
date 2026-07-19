@@ -38,7 +38,13 @@ test('applyCaseQueue filters inbox and search', () => {
   const rows: AdminCaseListItem[] = [
     sample,
     { ...sample, id: 'case-2', state: 'excluded', title: 'Other' },
-    { ...sample, id: 'case-3', state: 'relevance_review', title: 'Review me', placeHint: 'Chicago' },
+    {
+      ...sample,
+      id: 'case-3',
+      state: 'relevance_review',
+      title: 'Review me',
+      placeHint: 'Chicago',
+    },
   ];
   const inbox = applyCaseQueue(rows, {
     search: '',

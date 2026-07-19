@@ -25,15 +25,19 @@
  * that does not supply `backingClaims` for a fact that HAS declared derivation ids fails the gate
  * closed rather than silently skipping the check (see `derivation.ts` for why).
  */
-import { isSearchIndexableFactStatus, isPubliclyResolvableFactStatus, type FactStatus } from './status.js';
+import {
+  isSearchIndexableFactStatus,
+  isPubliclyResolvableFactStatus,
+  type FactStatus,
+} from './status.js';
 import { hasCompleteFactCitations, type FactRecord } from './record.js';
-import { evaluateFactDerivationConsistency, type FactDerivationBackingClaim } from './derivation.js';
+import {
+  evaluateFactDerivationConsistency,
+  type FactDerivationBackingClaim,
+} from './derivation.js';
 
 export type FactPublishGateFailureReason =
-  | 'no_citations'
-  | 'incomplete_citation'
-  | 'not_a_publishable_status'
-  | 'derivation_inconsistent';
+  'no_citations' | 'incomplete_citation' | 'not_a_publishable_status' | 'derivation_inconsistent';
 
 /** Per-call options for the derivation-consistency sub-check; omit entirely (or leave
  * `backingClaims` unset) for a fact whose `derivedFromClaimIds` is empty. */
@@ -125,11 +129,22 @@ export function evaluateFactProjectionPublishGate(
   facts: readonly (Pick<FactRecord, 'id' | 'citations' | 'status'> &
     Partial<Pick<FactRecord, 'derivedFromClaimIds' | 'confidence'>>)[],
   options: FactProjectionPublishGateOptions = {},
-): { readonly ok: true } | { readonly ok: false; readonly failures: readonly { readonly factId: string; readonly reason: FactPublishGateFailureReason }[] } {
+):
+  | { readonly ok: true }
+  | {
+      readonly ok: false;
+      readonly failures: readonly {
+        readonly factId: string;
+        readonly reason: FactPublishGateFailureReason;
+      }[];
+    } {
   const failures: { readonly factId: string; readonly reason: FactPublishGateFailureReason }[] = [];
   for (const fact of facts) {
     const backingClaims = options.backingClaimsByFactId?.get(fact.id);
-    const result = evaluateFactPublishGate(fact, backingClaims !== undefined ? { backingClaims } : {});
+    const result = evaluateFactPublishGate(
+      fact,
+      backingClaims !== undefined ? { backingClaims } : {},
+    );
     if (!result.ok) {
       failures.push({ factId: fact.id, reason: result.reason });
     }

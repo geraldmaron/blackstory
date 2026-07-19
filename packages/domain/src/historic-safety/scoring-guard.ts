@@ -92,13 +92,17 @@ export function assertNoBannedScoringKeys(
   path = '$',
 ): void {
   if (Array.isArray(value)) {
-    value.forEach((item, index) => assertNoBannedScoringKeys(item, bannedKeys, reason, `${path}[${index}]`));
+    value.forEach((item, index) =>
+      assertNoBannedScoringKeys(item, bannedKeys, reason, `${path}[${index}]`),
+    );
     return;
   }
   if (value && typeof value === 'object') {
     for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
       if (bannedKeys.includes(key)) {
-        throw new ScoringExclusionError(`Field "${key}" found in scoring/composite input at ${path}.${key} — ${reason}`);
+        throw new ScoringExclusionError(
+          `Field "${key}" found in scoring/composite input at ${path}.${key} — ${reason}`,
+        );
       }
       assertNoBannedScoringKeys(entry, bannedKeys, reason, `${path}.${key}`);
     }
@@ -137,9 +141,18 @@ export { ADVISORY_SCORING_BANNED_KEYS };
 type NoKeyOverlap<A, B> = Extract<keyof A, keyof B> extends never ? true : false;
 
 export const HISTORIC_SAFETY_SCORING_TYPE_INVARIANTS: {
-  readonly noOverlapWithConfidenceComponents: NoKeyOverlap<GeneralCrimeContextRecord, ConfidenceComponents>;
-  readonly noOverlapWithRelevanceFeatureValue: NoKeyOverlap<GeneralCrimeContextRecord, RelevanceFeatureValue>;
-  readonly noOverlapWithRelevanceAssessment: NoKeyOverlap<GeneralCrimeContextRecord, RelevanceAssessment>;
+  readonly noOverlapWithConfidenceComponents: NoKeyOverlap<
+    GeneralCrimeContextRecord,
+    ConfidenceComponents
+  >;
+  readonly noOverlapWithRelevanceFeatureValue: NoKeyOverlap<
+    GeneralCrimeContextRecord,
+    RelevanceFeatureValue
+  >;
+  readonly noOverlapWithRelevanceAssessment: NoKeyOverlap<
+    GeneralCrimeContextRecord,
+    RelevanceAssessment
+  >;
 } = {
   noOverlapWithConfidenceComponents: true,
   noOverlapWithRelevanceFeatureValue: true,

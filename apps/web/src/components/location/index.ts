@@ -8,5 +8,8 @@
 export { LocateExperience } from './LocateExperience';
 export { LocationConsentButton, type LocationConsentButtonProps } from './LocationConsentButton';
 export { LocationPrivacyNotice } from './LocationPrivacyNotice';
-export { LocationResolutionPanel, type LocationResolutionPanelProps } from './LocationResolutionPanel';
+export {
+  LocationResolutionPanel,
+  type LocationResolutionPanelProps,
+} from './LocationResolutionPanel';
 export { ManualPlaceSearchForm, type ManualPlaceSearchFormProps } from './ManualPlaceSearchForm';

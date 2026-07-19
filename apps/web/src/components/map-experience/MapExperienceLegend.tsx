@@ -89,10 +89,7 @@ export type MapExperienceLegendProps = {
   readonly onHide?: () => void;
 };
 
-function LegendSwatch(props: {
-  readonly glyph: MapEntityGlyph;
-  readonly shade: string;
-}) {
+function LegendSwatch(props: { readonly glyph: MapEntityGlyph; readonly shade: string }) {
   const { glyph, shade } = props;
   return (
     <span
@@ -186,7 +183,9 @@ function MapColorKey(props: {
           </li>
         ))}
       </ul>
-      <p className="ds-explore-legend__note">Historical tones (shade only — shape stays with kind)</p>
+      <p className="ds-explore-legend__note">
+        Historical tones (shade only — shape stays with kind)
+      </p>
       <ul className="ds-explore-legend__kind-list">
         {SEMANTIC_TONE_ENTRIES.map(([tone, entry]) => (
           <li key={tone}>
@@ -248,9 +247,9 @@ function MapColorKey(props: {
         </>
       ) : null}
       <p className="ds-explore-legend__note">
-        Each map color pairs with a label or glyph — color is never the only signal. Markers on
-        the canvas are discs; square / diamond / ring names are rim and fill signatures, not
-        literal MapLibre shapes.
+        Each map color pairs with a label or glyph — color is never the only signal. Markers on the
+        canvas are discs; square / diamond / ring names are rim and fill signatures, not literal
+        MapLibre shapes.
       </p>
     </div>
   );
@@ -301,11 +300,11 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
             </h3>
             <p className="ds-explore-legend__note">
               Color marks the kind of place or record, and a few historical tones noted below
-              &mdash; it says nothing about the people connected to a place. Each kind also has
-              a named shape identity (circle, square, diamond, or ring). On the map those
-              identities paint as discs with matching rim or fill: thick rim for square kinds
-              (school, law, publication), an orbit ring for diamond kinds (event, case,
-              movement), and a hollow disc for ring kinds (organization, institution).
+              &mdash; it says nothing about the people connected to a place. Each kind also has a
+              named shape identity (circle, square, diamond, or ring). On the map those identities
+              paint as discs with matching rim or fill: thick rim for square kinds (school, law,
+              publication), an orbit ring for diamond kinds (event, case, movement), and a hollow
+              disc for ring kinds (organization, institution).
             </p>
             <ul className="ds-explore-legend__kind-list">
               {KIND_ENCODING_ENTRIES.map(([kind, entry]) => (
@@ -328,10 +327,9 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
             </h3>
             <p className="ds-explore-legend__note">
               When topic tags identify a massacre, plantation, or Black epicenter (for example
-              Tulsa&rsquo;s Greenwood / Black Wall Street), the marker shade follows that tone
-              while keeping the record&rsquo;s kind shape. Tones are vocabulary the map can
-              paint; a tone may be rare or absent in the current catalog until matching topics
-              are present.
+              Tulsa&rsquo;s Greenwood / Black Wall Street), the marker shade follows that tone while
+              keeping the record&rsquo;s kind shape. Tones are vocabulary the map can paint; a tone
+              may be rare or absent in the current catalog until matching topics are present.
             </p>
             <ul className="ds-explore-legend__kind-list">
               {SEMANTIC_TONE_ENTRIES.map(([tone, entry]) => (
@@ -352,7 +350,11 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
             </h3>
             <div className="ds-explore-legend__size-scale" aria-hidden="true">
               {SIZE_SCALE_STEPS.map((diameter, index) => (
-                <span key={index} className="ds-explore-legend__size-dot" style={{ width: diameter, height: diameter }} />
+                <span
+                  key={index}
+                  className="ds-explore-legend__size-dot"
+                  style={{ width: diameter, height: diameter }}
+                />
               ))}
             </div>
             <p>
@@ -374,23 +376,23 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
               <dt>Clusters</dt>
               <dd>
                 When &ldquo;Group nearby&rdquo; is on, a number inside a marker means several
-                records are grouped at this zoom level. Zoom in or activate a cluster to reveal
-                the named records inside it &mdash; every cluster opens to individual entities
-                within two interactions. Turn grouping off to see every disc even when zoomed out.
+                records are grouped at this zoom level. Zoom in or activate a cluster to reveal the
+                named records inside it &mdash; every cluster opens to individual entities within
+                two interactions. Turn grouping off to see every disc even when zoomed out.
               </dd>
             </div>
             <div>
               <dt>Opening a record</dt>
               <dd>
-                Activating a pin or a list row opens the full entity page &mdash; evidence,
-                context, and chronology &mdash; not a floating preview card on the map.
+                Activating a pin or a list row opens the full entity page &mdash; evidence, context,
+                and chronology &mdash; not a floating preview card on the map.
               </dd>
             </div>
             <div>
               <dt>Streets</dt>
               <dd>
-                Road lines and names appear as you zoom in (roughly city scale and closer) so
-                places can be read against a street network, not only state outlines.
+                Road lines and names appear as you zoom in (roughly city scale and closer) so places
+                can be read against a street network, not only state outlines.
               </dd>
             </div>
             <div>
@@ -402,9 +404,7 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
             </div>
             <div>
               <dt>County names</dt>
-              <dd>
-                County names fade in with county lines as you zoom past the national frame.
-              </dd>
+              <dd>County names fade in with county lines as you zoom past the national frame.</dd>
             </div>
             <div>
               <dt>Map data model</dt>
@@ -466,10 +466,9 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
                 <span style={{ color: CONFIDENCE_TIER_COLOR.low }} aria-hidden="true">
                   {CONFIDENCE_TIER_GLYPH.low}
                 </span>{' '}
-                low (orange), and{' '}
-                <span aria-hidden="true">{CONFIDENCE_TIER_GLYPH.unrated}</span> unrated reflect how
-                strongly the strongest accepted claim on a record is evidenced &mdash; shown as a
-                glyph, a word, and a color ramp, never color alone.
+                low (orange), and <span aria-hidden="true">{CONFIDENCE_TIER_GLYPH.unrated}</span>{' '}
+                unrated reflect how strongly the strongest accepted claim on a record is evidenced
+                &mdash; shown as a glyph, a word, and a color ramp, never color alone.
               </dd>
             </div>
           </dl>

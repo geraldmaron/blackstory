@@ -28,8 +28,7 @@ function appendUncertainty(
 ): void {
   if (
     !uncertainties.some(
-      (existing) =>
-        existing.code === uncertainty.code && existing.detail === uncertainty.detail,
+      (existing) => existing.code === uncertainty.code && existing.detail === uncertainty.detail,
     )
   ) {
     uncertainties.push(uncertainty);

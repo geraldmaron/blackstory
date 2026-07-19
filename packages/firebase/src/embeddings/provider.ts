@@ -1,4 +1,3 @@
-
 /**
  * Embedding provider abstraction. Everything downstream (the pipeline, the backfill
  * CLI, the gold-corpus eval) depends on this interface, not on any specific SDK that's the
@@ -36,7 +35,6 @@ const DEFAULT_BASE_DELAY_MS = 250;
 function defaultSleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
 
 /**
  * Wraps a provider with bounded exponential-backoff retries. Retries the whole batch call
@@ -104,7 +102,6 @@ export type MockEmbeddingProviderOptions = {
   readonly dims?: number;
   readonly model?: string;
 };
-
 
 /**
  * Deterministic, dependency-free fake embedding provider for tests and CI. It hashes each input

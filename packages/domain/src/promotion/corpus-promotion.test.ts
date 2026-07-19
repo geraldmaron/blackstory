@@ -52,7 +52,10 @@ function vettedRecord(overrides: Partial<RegisterCorpusVettingInput> = {}) {
 
 const COMPLETE_CITATION = {
   sourceName: 'NPS National Register of Historic Places',
-  location: { kind: 'url' as const, url: 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/00000001_text' },
+  location: {
+    kind: 'url' as const,
+    url: 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/00000001_text',
+  },
   capture: { captureId: 'capture-1' },
   retrievalDate: NOW,
 };
@@ -171,7 +174,9 @@ test('a spot-check-sampled record with a fail verdict demotes; a pass verdict st
 });
 
 test('selectSpotCheckSample always samples at least one record from a non-empty batch (mandatory per-batch sample)', () => {
-  const candidates = Array.from({ length: 3 }, (_, index) => candidate({ sourceRecordId: `rec-${index}` }));
+  const candidates = Array.from({ length: 3 }, (_, index) =>
+    candidate({ sourceRecordId: `rec-${index}` }),
+  );
   const sample = selectSpotCheckSample(candidates, 0.1);
   assert.ok(sample.length >= 1);
 
@@ -227,7 +232,11 @@ test('buildCorpusBulkImportBatchReport aggregates counts, precision tiers, spot-
 
   assert.equal(report.counts.total, 3);
   assert.equal(report.counts.accepted, 1);
-  assert.equal(report.counts.fastTracked, 2, 'passing + duplicate candidates both evaluated as fast-track-eligible');
+  assert.equal(
+    report.counts.fastTracked,
+    2,
+    'passing + duplicate candidates both evaluated as fast-track-eligible',
+  );
   assert.equal(report.counts.demotedToConsensus, 1);
   assert.equal(report.counts.rejected, 1);
   assert.equal(report.counts.skippedDuplicate, 1);

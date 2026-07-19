@@ -16,7 +16,9 @@ import type {
   EvidenceExcerptView,
 } from './types';
 
-function excerptContentKind(excerptKind: EvidenceExcerptInput['excerptKind']): PublicationContentKind {
+function excerptContentKind(
+  excerptKind: EvidenceExcerptInput['excerptKind'],
+): PublicationContentKind {
   if (excerptKind === 'substantial') return 'substantial_excerpt';
   if (excerptKind === 'short') return 'short_excerpt';
   return 'citation';
@@ -29,7 +31,9 @@ export function resolveExcerptForDisplay(input: EvidenceExcerptInput): EvidenceE
   const publishable = canPublishWithRights({
     rightsStatus: input.rightsStatus,
     contentKind,
-    ...(input.publicationPermissions ? { publicationPermissions: input.publicationPermissions } : {}),
+    ...(input.publicationPermissions
+      ? { publicationPermissions: input.publicationPermissions }
+      : {}),
     ...(input.prohibitedUses ? { prohibitedUses: input.prohibitedUses } : {}),
   });
 

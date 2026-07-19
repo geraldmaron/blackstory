@@ -1,4 +1,3 @@
-
 /**
  * degraded-mode and public-page stability contracts.
  * Canonical copy strings must stay aligned with apps/web snapshot-mode and DegradedModeNotice.

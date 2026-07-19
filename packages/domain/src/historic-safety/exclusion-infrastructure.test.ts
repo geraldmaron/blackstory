@@ -3,7 +3,10 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { RedliningGradeDesignationRecord, RestrictiveCovenantDesignationRecord } from './layer-record.js';
+import type {
+  RedliningGradeDesignationRecord,
+  RestrictiveCovenantDesignationRecord,
+} from './layer-record.js';
 import {
   computeExclusionInfrastructureLayerSignal,
   HOLC_GRADE_WEIGHTS,
@@ -13,7 +16,16 @@ import type { LayerCitation } from './types.js';
 
 const PLACE = 'place_exclusion_1';
 const AREA_GEOMETRY = {
-  shape: { type: 'Polygon' as const, coordinates: [[-90, 32], [-90, 33], [-89, 33], [-89, 32], [-90, 32]] },
+  shape: {
+    type: 'Polygon' as const,
+    coordinates: [
+      [-90, 32],
+      [-90, 33],
+      [-89, 33],
+      [-89, 32],
+      [-90, 32],
+    ],
+  },
   documentedPrecisionTier: 'locality' as const,
 };
 
@@ -23,7 +35,9 @@ const CITATION: LayerCitation = {
   retrievedAt: '2026-01-01T00:00:00.000Z',
 };
 
-function redliningRecord(grade: RedliningGradeDesignationRecord['grade']): RedliningGradeDesignationRecord {
+function redliningRecord(
+  grade: RedliningGradeDesignationRecord['grade'],
+): RedliningGradeDesignationRecord {
   return {
     id: `holc_${grade}`,
     placeEntityId: PLACE,

@@ -96,9 +96,9 @@ export default async function DataPage() {
       <h1 className="ds-page__title">Data behind the archive</h1>
       <p className="ds-page__lede">
         The national numbers underneath BlackStory&rsquo;s map and records — population shift,
-        economic, and civil-rights context, each carrying the exact source it came from.
-        County choropleths and alternate map models live on Explore; this page is the
-        national-scale summary and the paper trail.
+        economic, and civil-rights context, each carrying the exact source it came from. County
+        choropleths and alternate map models live on Explore; this page is the national-scale
+        summary and the paper trail.
       </p>
 
       <section className="ds-section" aria-labelledby="population-heading">
@@ -185,10 +185,10 @@ export default async function DataPage() {
           Hate crime reporting
         </h2>
         <Notice tone="warning" title="Reporting is voluntary">
-          Participation in the UCR hate crime program is voluntary for law enforcement agencies.
-          A county with no reported incidents means no participating agency reported one that
-          year &mdash; it is a fact about reporting, not a claim that nothing happened. Always
-          read these counts beside the national participation rate below.
+          Participation in the UCR hate crime program is voluntary for law enforcement agencies. A
+          county with no reported incidents means no participating agency reported one that year
+          &mdash; it is a fact about reporting, not a claim that nothing happened. Always read these
+          counts beside the national participation rate below.
         </Notice>
         {hateCrime ? (
           <>
@@ -239,9 +239,9 @@ export default async function DataPage() {
         </h2>
         <p className="ds-section__lede">
           Household income rank in adulthood by race and parental income percentile, from the
-          Opportunity Atlas &mdash; tract-level, not a national average (averaging percentile
-          ranks across differently sized tracts would itself be a fabricated statistic, so we
-          don&rsquo;t publish one here).
+          Opportunity Atlas &mdash; tract-level, not a national average (averaging percentile ranks
+          across differently sized tracts would itself be a fabricated statistic, so we don&rsquo;t
+          publish one here).
         </p>
         {opportunity ? (
           <>
@@ -262,7 +262,9 @@ export default async function DataPage() {
             />
           </>
         ) : (
-          <p className="ds-sans">Opportunity Atlas data is not available in this environment yet.</p>
+          <p className="ds-sans">
+            Opportunity Atlas data is not available in this environment yet.
+          </p>
         )}
       </section>
     </main>

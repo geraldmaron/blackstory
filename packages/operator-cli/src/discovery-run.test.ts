@@ -1,4 +1,3 @@
-
 /**
  * Verifies the discovery-run wrapper calls the real campaign gate and summarizes yield,
  * using this monorepo's existing domain fixtures rather than inventing new candidate shapes.
@@ -79,7 +78,12 @@ test('an invalid budget is rejected by the real domain validation, not silently 
         },
         config: {
           campaignId: 'operator-campaign-2',
-          budget: { maxCandidates: 0, maxQuarantined: 5, maxDeadLetter: 2, maxRetriesPerCandidate: 1 },
+          budget: {
+            maxCandidates: 0,
+            maxQuarantined: 5,
+            maxDeadLetter: 2,
+            maxRetriesPerCandidate: 1,
+          },
           boundaries: { countries: ['US'] },
           continueOnQuarantine: true,
         },

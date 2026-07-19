@@ -1,4 +1,3 @@
-
 /**
  * Verifies administrator claims, MFA and recent-authentication gates, server-only role
  * mutations, session revocation, and authentication alert emission.

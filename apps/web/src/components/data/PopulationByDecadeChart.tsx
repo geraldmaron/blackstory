@@ -82,7 +82,12 @@ export function PopulationByDecadeChart({ rows }: PopulationByDecadeChartProps) 
                 y1={y}
                 y2={y}
               />
-              <text className="ds-data-chart__axis-label" x={CHART_MARGIN.left - 8} y={y + 4} textAnchor="end">
+              <text
+                className="ds-data-chart__axis-label"
+                x={CHART_MARGIN.left - 8}
+                y={y + 4}
+                textAnchor="end"
+              >
                 {formatChartCount(Math.round(tick))}
               </text>
             </g>
@@ -103,7 +108,12 @@ export function PopulationByDecadeChart({ rows }: PopulationByDecadeChartProps) 
                 height={barBottom - barTop}
                 fill="var(--ds-accent-graphic)"
               />
-              <text className="ds-data-chart__axis-label" x={centerX} y={barTop - 8} textAnchor="middle">
+              <text
+                className="ds-data-chart__axis-label"
+                x={centerX}
+                y={barTop - 8}
+                textAnchor="middle"
+              >
                 {share}
               </text>
               <text
@@ -129,11 +139,17 @@ export function PopulationByDecadeChart({ rows }: PopulationByDecadeChartProps) 
       </svg>
       <ul className="ds-data-chart__legend" aria-hidden="true">
         <li className="ds-data-chart__legend-item">
-          <span className="ds-data-chart__legend-swatch" style={{ background: 'var(--ds-accent-graphic)' }} />
+          <span
+            className="ds-data-chart__legend-swatch"
+            style={{ background: 'var(--ds-accent-graphic)' }}
+          />
           Black population (bars)
         </li>
         <li className="ds-data-chart__legend-item">
-          <span className="ds-data-chart__legend-swatch" style={{ background: 'var(--ds-surface-raised)' }} />
+          <span
+            className="ds-data-chart__legend-swatch"
+            style={{ background: 'var(--ds-surface-raised)' }}
+          />
           Share of total population (above each bar)
         </li>
       </ul>

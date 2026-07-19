@@ -123,7 +123,9 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
         };
         if (!response.ok) throw new Error(body.error ?? `Detail failed (${response.status})`);
         setDetail(body.item ?? null);
-        setLegalActions(body.legalActions ?? (body.item ? legalActionsForState(body.item.state) : []));
+        setLegalActions(
+          body.legalActions ?? (body.item ? legalActionsForState(body.item.state) : []),
+        );
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err));
       }
@@ -153,10 +155,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
     setQuery((current) => ({ ...current, ...partial }));
   }
 
-  async function runTransition(
-    action: AdminCaseTransitionAction,
-    caseIds: readonly string[],
-  ) {
+  async function runTransition(action: AdminCaseTransitionAction, caseIds: readonly string[]) {
     if (caseIds.length === 0) return;
     if (!reason.trim()) {
       setError(missingDecisionReasonMessage(action));
@@ -261,8 +260,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
     }
   }
 
-  const allVisibleSelected =
-    visible.length > 0 && visible.every((row) => selectedIds.has(row.id));
+  const allVisibleSelected = visible.length > 0 && visible.every((row) => selectedIds.has(row.id));
 
   const showChecklistColumn = visible.some((row) => row.checklistTotal > 0);
   const showPlaceColumn = visible.some((row) => Boolean(row.placeHint?.trim()));
@@ -272,9 +270,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
       <header className="acq__header">
         <div>
           <p className="acq__eyebrow">{mode === 'inbox' ? 'Work queue' : 'All cases'}</p>
-          <h1 className="acq__title">
-            {mode === 'inbox' ? 'Inbox' : 'Research cases'}
-          </h1>
+          <h1 className="acq__title">{mode === 'inbox' ? 'Inbox' : 'Research cases'}</h1>
           <p className="acq__lede">{CASE_QUEUE_INTENT_COPY[mode]}</p>
           <ol className="acq__steps" aria-label="How to decide on a case">
             {CASE_TRIAGE_STEPS.map((step) => (
@@ -346,9 +342,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
           <span>Sort</span>
           <select
             value={query.sortKey}
-            onChange={(event) =>
-              patchQuery({ sortKey: event.target.value as CaseQueueSortKey })
-            }
+            onChange={(event) => patchQuery({ sortKey: event.target.value as CaseQueueSortKey })}
           >
             <option value="updatedAt">Updated</option>
             <option value="title">Title</option>
@@ -411,14 +405,10 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                 key={action}
                 type="button"
                 className={
-                  action === 'exclude'
-                    ? 'acq__button'
-                    : 'acq__button acq__button--primary'
+                  action === 'exclude' ? 'acq__button' : 'acq__button acq__button--primary'
                 }
                 title={actionHelp(action)}
-                disabled={
-                  busy || selectedIds.size > RESEARCH_CASE_BULK_LIMIT || !reason.trim()
-                }
+                disabled={busy || selectedIds.size > RESEARCH_CASE_BULK_LIMIT || !reason.trim()}
                 onClick={() => void runTransition(action, [...selectedIds])}
               >
                 {actionLabel(action)}
@@ -676,8 +666,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                 <div className="acq-sheet__decide">
                   <h3 className="acq-sheet__decide-title">Decide</h3>
                   <p className="acq-sheet__decide-lede" id={reasonHintId}>
-                    Write a decision reason, then choose an action. Available moves for this
-                    state:
+                    Write a decision reason, then choose an action. Available moves for this state:
                   </p>
                   {legalActions.length > 0 ? (
                     <ul className="acq-sheet__action-help">

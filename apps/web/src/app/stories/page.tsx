@@ -21,8 +21,8 @@ export default function StoriesIndexPage() {
       <p className="ds-page__eyebrow">From the archive</p>
       <h1 className="ds-page__title">Stories</h1>
       <p className="ds-page__lede">
-        Longform history from the record — narratives pinned to place, era, and evidence. Each
-        story off-ramps to the entities and quick facts it rests on.
+        Longform history from the record — narratives pinned to place, era, and evidence. Each story
+        off-ramps to the entities and quick facts it rests on.
       </p>
 
       <section className="ds-section ds-section--flush" aria-label="Story list">

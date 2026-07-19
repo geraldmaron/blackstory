@@ -18,18 +18,18 @@ policies:
     emergencyRulePriority: 10
     activate:
       action: deny(403)
-      match: "true"
+      match: 'true'
     deactivate:
       action: allow
-      match: "true"
+      match: 'true'
   - name: black-book-api-submissions-armor
     emergencyRulePriority: 10
     activate:
       action: deny(403)
-      match: "true"
+      match: 'true'
     deactivate:
       action: allow
-      match: "true"
+      match: 'true'
 
 # Optional: block a single abusive /24 without touching application code
 # (create at priority 15; remove when incident ends)

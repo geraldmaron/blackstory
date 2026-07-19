@@ -141,15 +141,15 @@ export default function ReleasesPage() {
       {activeRelease ? (
         <section className="story-review__notice" aria-label="Active release">
           <p className="ds-sans">
-            Active release{' '}
-            <span className="ds-mono">{activeRelease.releaseId}</span> · activated{' '}
+            Active release <span className="ds-mono">{activeRelease.releaseId}</span> · activated{' '}
             {formatWhen(activeRelease.activatedAt)} · index{' '}
             <span className="ds-mono">{activeRelease.searchIndexVersion}</span>
           </p>
         </section>
       ) : (
         <p className="story-review__notice" role="status">
-          No active release pointer found in <span className="ds-mono">publicMeta/activeRelease</span>.
+          No active release pointer found in{' '}
+          <span className="ds-mono">publicMeta/activeRelease</span>.
         </p>
       )}
 
@@ -238,9 +238,7 @@ export default function ReleasesPage() {
                         </p>
                       </td>
                       <td>
-                        <span
-                          className={`story-review__badge story-review__badge--${row.status}`}
-                        >
+                        <span className={`story-review__badge story-review__badge--${row.status}`}>
                           {row.status}
                         </span>
                       </td>

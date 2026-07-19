@@ -19,7 +19,11 @@ export const WIKIMEDIA_USER_AGENT =
 export type WikimediaHttpFetch = (
   url: string,
   init?: { readonly headers?: Readonly<Record<string, string>> },
-) => Promise<{ readonly ok: boolean; readonly status: number; readonly json: () => Promise<unknown> }>;
+) => Promise<{
+  readonly ok: boolean;
+  readonly status: number;
+  readonly json: () => Promise<unknown>;
+}>;
 
 export type EnwikiTitleResolveResult = {
   readonly title: string;
@@ -38,10 +42,7 @@ export type FetchCommonsMediaClientOptions = {
 
 function defaultFetch(): WikimediaHttpFetch {
   return async (url, init) => {
-    const response = await fetch(
-      url,
-      init?.headers ? { headers: { ...init.headers } } : {},
-    );
+    const response = await fetch(url, init?.headers ? { headers: { ...init.headers } } : {});
     return {
       ok: response.ok,
       status: response.status,
@@ -163,7 +164,9 @@ export function createCommonsMediaClient(options: FetchCommonsMediaClientOptions
         origin: '*',
       });
       const raw = (await getJson(`${WIKIDATA_API}?${params.toString()}`)) as {
-        readonly entities?: Readonly<Record<string, WikidataEntity & { readonly missing?: string }>>;
+        readonly entities?: Readonly<
+          Record<string, WikidataEntity & { readonly missing?: string }>
+        >;
       };
       for (const [id, entity] of Object.entries(raw.entities ?? {})) {
         if (entity.missing !== undefined) continue;
@@ -208,9 +211,7 @@ export function createCommonsMediaClient(options: FetchCommonsMediaClientOptions
                 readonly imageinfo?: readonly {
                   readonly url?: string;
                   readonly thumburl?: string;
-                  readonly extmetadata?: Readonly<
-                    Record<string, { readonly value?: string }>
-                  >;
+                  readonly extmetadata?: Readonly<Record<string, { readonly value?: string }>>;
                 }[];
               }
             >
@@ -243,7 +244,11 @@ export function createCommonsMediaClient(options: FetchCommonsMediaClientOptions
               }
             : {}),
           ...(meta.Copyrighted?.value !== undefined
-            ? { copyrighted: String(meta.Copyrighted.value).toLowerCase() === '1' || String(meta.Copyrighted.value).toLowerCase() === 'true' }
+            ? {
+                copyrighted:
+                  String(meta.Copyrighted.value).toLowerCase() === '1' ||
+                  String(meta.Copyrighted.value).toLowerCase() === 'true',
+              }
             : {}),
         });
         // Also index without File: prefix variants for lookup convenience

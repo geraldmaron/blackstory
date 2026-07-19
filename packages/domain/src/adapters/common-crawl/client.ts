@@ -6,7 +6,12 @@
  * given crawl -- that is treated as zero records, not an error, since "no captures for this seed
  * in this crawl" is an expected, common outcome, not a malformed response.
  */
-import type { CommonCrawlCdxMatchType, CommonCrawlParsedBatch, CommonCrawlQuery, CommonCrawlSeedTarget } from './types.js';
+import type {
+  CommonCrawlCdxMatchType,
+  CommonCrawlParsedBatch,
+  CommonCrawlQuery,
+  CommonCrawlSeedTarget,
+} from './types.js';
 import { COMMON_CRAWL_INDEX_HOST } from './types.js';
 
 export type BuildCdxIndexUrlInput = {
@@ -18,7 +23,12 @@ export type BuildCdxIndexUrlInput = {
 };
 
 function assertMatchType(matchType: CommonCrawlCdxMatchType): void {
-  if (matchType !== 'exact' && matchType !== 'prefix' && matchType !== 'host' && matchType !== 'domain') {
+  if (
+    matchType !== 'exact' &&
+    matchType !== 'prefix' &&
+    matchType !== 'host' &&
+    matchType !== 'domain'
+  ) {
     throw new Error(`Unknown Common Crawl CDX matchType: ${matchType}`);
   }
 }

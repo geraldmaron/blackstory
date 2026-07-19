@@ -35,7 +35,11 @@ import {
 } from './adapters/registry.js';
 import { assertAdapterMayRun, canAdapterRun } from './adapters/gates.js';
 import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from './adapters/candidates.js';
-import type { RateLimitPolicy, SourceAdapterContract, SourceRegistryEntry } from './adapters/types.js';
+import type {
+  RateLimitPolicy,
+  SourceAdapterContract,
+  SourceRegistryEntry,
+} from './adapters/types.js';
 import type { EvidenceSource, SourceKillSwitchState } from './provenance/source.js';
 import type { RightsPolicy } from './provenance/rights.js';
 import { GEO_PRECISION_TIERS, type GeoPrecisionTier } from './geography/precision.js';
@@ -92,7 +96,14 @@ export function isCorpusAuthorityTier(value: string): value is CorpusAuthorityTi
   return (CORPUS_AUTHORITY_TIERS as readonly string[]).includes(value);
 }
 
-export const REFRESH_CADENCES = ['static', 'ad_hoc', 'weekly', 'monthly', 'quarterly', 'annual'] as const;
+export const REFRESH_CADENCES = [
+  'static',
+  'ad_hoc',
+  'weekly',
+  'monthly',
+  'quarterly',
+  'annual',
+] as const;
 
 export type RefreshCadence = (typeof REFRESH_CADENCES)[number];
 
@@ -118,13 +129,13 @@ export const EXCLUDED_CORPUS_LANES: readonly {
   {
     corpusSlugPattern: /^(statutes?|cases?|legal[-_]?corpus)$/iu,
     ownerBead: '',
-    reason: 'Statutes and cases are \'s legal corpus lane, never the  bulk-intake lane.',
+    reason: "Statutes and cases are 's legal corpus lane, never the  bulk-intake lane.",
   },
   {
     corpusSlugPattern: /^tougaloo([-_]sundown([-_]data)?)?$/iu,
     ownerBead: '',
     reason:
-      'Tougaloo sundown-town data is \'s exclusion-infrastructure lane, never the  bulk-intake lane.',
+      "Tougaloo sundown-town data is 's exclusion-infrastructure lane, never the  bulk-intake lane.",
   },
 ];
 
@@ -182,7 +193,8 @@ export function assertCorpusVettingRecordValid(record: CorpusVettingRecord): voi
   if (!isLicenseVerdict(record.licenseVerdict)) {
     throw new Error(`Unknown licenseVerdict: ${record.licenseVerdict}`);
   }
-  if (!record.licenseNotes.trim()) throw new Error('licenseNotes is required (even for deferred verdicts)');
+  if (!record.licenseNotes.trim())
+    throw new Error('licenseNotes is required (even for deferred verdicts)');
   if (!isCorpusAuthorityTier(record.authorityTier)) {
     throw new Error(`Unknown authorityTier: ${record.authorityTier}`);
   }
@@ -196,7 +208,8 @@ export function assertCorpusVettingRecordValid(record: CorpusVettingRecord): voi
     throw new Error(`Unknown refreshCadence: ${record.refreshCadence}`);
   }
   if (!record.vettedBy.trim()) throw new Error('vettedBy is required');
-  if (!Number.isFinite(Date.parse(record.vettedAt))) throw new Error('vettedAt must be an ISO date');
+  if (!Number.isFinite(Date.parse(record.vettedAt)))
+    throw new Error('vettedAt must be an ISO date');
   if (!record.sourceRegistryEntryId.trim()) throw new Error('sourceRegistryEntryId is required');
   if (!(NOTABILITY_CRITERIA as readonly string[]).includes(record.notabilityCriterion)) {
     throw new Error(`Unknown notabilityCriterion: ${record.notabilityCriterion}`);
@@ -218,7 +231,9 @@ export type CorpusVettingStore = {
 export function createInMemoryCorpusVettingStore(
   seed: readonly CorpusVettingRecord[] = [],
 ): CorpusVettingStore {
-  const records = new Map<string, CorpusVettingRecord>(seed.map((record) => [record.corpus, record]));
+  const records = new Map<string, CorpusVettingRecord>(
+    seed.map((record) => [record.corpus, record]),
+  );
   return {
     get(corpus: string) {
       return records.get(corpus);
@@ -440,7 +455,8 @@ export function assertWithinCorpusBulkImportBudget(input: {
   }
   if (
     input.budget.maxRecordsPerRefreshWindow !== undefined &&
-    (input.priorRecordsInWindow ?? 0) + input.batchRecordCount > input.budget.maxRecordsPerRefreshWindow
+    (input.priorRecordsInWindow ?? 0) + input.batchRecordCount >
+      input.budget.maxRecordsPerRefreshWindow
   ) {
     throw new Error(
       `Bulk import batch would push corpus imports to ` +

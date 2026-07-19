@@ -38,7 +38,9 @@ export type CreateGeocodeCacheOptions = {
   readonly now?: () => number;
 };
 
-export function createGeocodeCache<Value>(options: CreateGeocodeCacheOptions = {}): GeocodeCache<Value> {
+export function createGeocodeCache<Value>(
+  options: CreateGeocodeCacheOptions = {},
+): GeocodeCache<Value> {
   const maxEntries = options.maxEntries ?? DEFAULT_GEOCODE_CACHE_MAX_ENTRIES;
   const defaultTtlMs = options.defaultTtlMs ?? DEFAULT_GEOCODE_CACHE_TTL_MS;
   const now = options.now ?? (() => Date.now());

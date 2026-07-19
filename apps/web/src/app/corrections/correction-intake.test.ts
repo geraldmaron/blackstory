@@ -14,7 +14,8 @@ test('accepts a structured correction and maps it to kind correction', () => {
     targetType: 'entity',
     targetRecordId: 'entity-rosewood-school',
     category: 'factual_error',
-    statement: 'The opening year on the public record should be 1924, not 1927, per county archives.',
+    statement:
+      'The opening year on the public record should be 1924, not 1927, per county archives.',
     sourceUrl: 'https://example.org/archives/rosewood',
     privacyConsent: true,
   });
@@ -51,7 +52,8 @@ test('marks classification disputes for appeal eligibility metadata', () => {
     targetType: 'entity',
     targetRecordId: 'entity-1',
     category: 'classification_dispute',
-    statement: 'This institution should be classified as a mutual aid society, not a fraternal order.',
+    statement:
+      'This institution should be classified as a mutual aid society, not a fraternal order.',
     sourceUrl: 'https://example.org/classification',
     privacyConsent: true,
   });
@@ -72,7 +74,8 @@ test('validates appeal submissions with supporting HTTPS links', () => {
 
 test('accepts abuse reports without a related receipt code', () => {
   const result = validateAbuseReportSubmission({
-    statement: 'Someone is flooding duplicate corrections about the same entity from many accounts.',
+    statement:
+      'Someone is flooding duplicate corrections about the same entity from many accounts.',
     privacyConsent: true,
   });
   assert.equal(result.valid, true);

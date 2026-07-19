@@ -60,7 +60,9 @@ function resolveEventType(
  * Emits `pending_review` events when a monitored source's change hash differs from prior state.
  * Every event carries archived capture evidence events without a capture are dropped.
  */
-export function proposeLegalReviewEvents(input: ProposeLegalReviewEventsInput): readonly LegalReviewQueueEvent[] {
+export function proposeLegalReviewEvents(
+  input: ProposeLegalReviewEventsInput,
+): readonly LegalReviewQueueEvent[] {
   const priorMap = priorHashLookup(input.prior);
   const confidence = input.confidence ?? 'medium';
   const eventTypeBySource = input.eventTypeBySource ?? {};

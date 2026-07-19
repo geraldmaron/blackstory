@@ -1,4 +1,3 @@
-
 /**
  * National-rollup readers for the public `/data` page (apps/web). Every function here
  * computes an aggregate (never a per-record dump) via Firestore's server-side
@@ -59,9 +58,12 @@ export function publicSourceUrl(input: {
     source.startsWith('us-census-decennial') ||
     (sourceUrl.includes('api.census.gov/data/20') && sourceUrl.includes('/dec/'))
   ) {
-    if (source.includes('2000') || sourceUrl.includes('/2000/')) return CENSUS_HOMEPAGE_BY_DECADE['2000'];
-    if (source.includes('2010') || sourceUrl.includes('/2010/')) return CENSUS_HOMEPAGE_BY_DECADE['2010'];
-    if (source.includes('2020') || sourceUrl.includes('/2020/')) return CENSUS_HOMEPAGE_BY_DECADE['2020'];
+    if (source.includes('2000') || sourceUrl.includes('/2000/'))
+      return CENSUS_HOMEPAGE_BY_DECADE['2000'];
+    if (source.includes('2010') || sourceUrl.includes('/2010/'))
+      return CENSUS_HOMEPAGE_BY_DECADE['2010'];
+    if (source.includes('2020') || sourceUrl.includes('/2020/'))
+      return CENSUS_HOMEPAGE_BY_DECADE['2020'];
   }
   if (source.startsWith('us-census-acs') || sourceUrl.includes('/acs/acs')) {
     return ACS_HOMEPAGE;
@@ -80,7 +82,11 @@ export function publicSourceUrl(input: {
   ) {
     return OPPORTUNITY_ATLAS_HOMEPAGE;
   }
-  if (sourceUrl.includes('api.census.gov') || sourceUrl.includes('signedurl') || sourceUrl.includes('.amazonaws.com')) {
+  if (
+    sourceUrl.includes('api.census.gov') ||
+    sourceUrl.includes('signedurl') ||
+    sourceUrl.includes('.amazonaws.com')
+  ) {
     // Fail closed toward known hubs rather than exposing a raw machine endpoint.
     if (sourceUrl.includes('census.gov')) return ACS_HOMEPAGE;
   }
@@ -141,7 +147,10 @@ function blackPopulationShare(blackPopulation: number, totalPopulation: number):
 
 /** Rolls county-decade rows up to state totals for one decennial vintage. */
 export function aggregateCountiesByState(
-  counties: readonly Pick<CensusCountyDecadeDoc, 'stateFips' | 'totalPopulation' | 'blackPopulation'>[],
+  counties: readonly Pick<
+    CensusCountyDecadeDoc,
+    'stateFips' | 'totalPopulation' | 'blackPopulation'
+  >[],
   decade: CensusCountyDecadeDecade,
 ): StatePopulationByDecade[] {
   const byState = new Map<
@@ -275,9 +284,7 @@ export function computeStatePopulationChangesFromDecades(
     if (!toRow) continue;
     changes.push(computeStatePopulationChange(fromRow, toRow));
   }
-  return changes.sort(
-    (a, b) => Math.abs(b.blackAbsoluteChange) - Math.abs(a.blackAbsoluteChange),
-  );
+  return changes.sort((a, b) => Math.abs(b.blackAbsoluteChange) - Math.abs(a.blackAbsoluteChange));
 }
 
 /** One sum-aggregation query per decade — reads zero full documents. */
@@ -553,14 +560,16 @@ export const OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS: Readonly<
 };
 
 /** Quintile bins on the Opportunity Atlas [0,1] percentile-rank scale for kfrBlackP25. */
-export const KFR_BLACK_P25_HISTOGRAM_BINS: readonly Omit<OpportunityAtlasHistogramBin, 'tractCount'>[] =
-  [
-    { id: '0-20', label: '0–20th', minInclusive: 0, maxExclusive: 0.2 },
-    { id: '20-40', label: '20–40th', minInclusive: 0.2, maxExclusive: 0.4 },
-    { id: '40-60', label: '40–60th', minInclusive: 0.4, maxExclusive: 0.6 },
-    { id: '60-80', label: '60–80th', minInclusive: 0.6, maxExclusive: 0.8 },
-    { id: '80-100', label: '80–100th', minInclusive: 0.8, maxExclusive: 1.0000001 },
-  ];
+export const KFR_BLACK_P25_HISTOGRAM_BINS: readonly Omit<
+  OpportunityAtlasHistogramBin,
+  'tractCount'
+>[] = [
+  { id: '0-20', label: '0–20th', minInclusive: 0, maxExclusive: 0.2 },
+  { id: '20-40', label: '20–40th', minInclusive: 0.2, maxExclusive: 0.4 },
+  { id: '40-60', label: '40–60th', minInclusive: 0.4, maxExclusive: 0.6 },
+  { id: '60-80', label: '60–80th', minInclusive: 0.6, maxExclusive: 0.8 },
+  { id: '80-100', label: '80–100th', minInclusive: 0.8, maxExclusive: 1.0000001 },
+];
 
 type OpportunityAtlasTractOutcomesLike = Partial<
   Record<keyof typeof OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS, number>
@@ -577,10 +586,9 @@ export function aggregateOpportunityAtlasCoverage(
   const fieldCounts = Object.fromEntries(
     Object.keys(OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS).map((field) => [field, 0]),
   ) as Record<keyof typeof OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS, number>;
-  const binCounts = Object.fromEntries(KFR_BLACK_P25_HISTOGRAM_BINS.map((bin) => [bin.id, 0])) as Record<
-    string,
-    number
-  >;
+  const binCounts = Object.fromEntries(
+    KFR_BLACK_P25_HISTOGRAM_BINS.map((bin) => [bin.id, 0]),
+  ) as Record<string, number>;
 
   for (const tract of tracts) {
     for (const field of Object.keys(OPPORTUNITY_ATLAS_OUTCOME_FIELD_LABELS) as Array<
@@ -622,22 +630,21 @@ export function aggregateOpportunityAtlasCoverage(
 
 const OPPORTUNITY_ATLAS_COVERAGE_CACHE_TTL_MS = 15 * 60 * 1000;
 let opportunityAtlasCoverageCache:
-  | { readonly expiresAt: number; readonly value: OpportunityAtlasCoverageSummary }
-  | undefined;
+  { readonly expiresAt: number; readonly value: OpportunityAtlasCoverageSummary } | undefined;
 
 /** Coverage counts + kfrBlackP25 distribution bins — never averages percentile ranks nationally. */
 export async function getOpportunityAtlasCoverageSummary(
   firestore: Firestore = getServerFirestore(),
 ): Promise<OpportunityAtlasCoverageSummary | undefined> {
-  if (
-    opportunityAtlasCoverageCache &&
-    opportunityAtlasCoverageCache.expiresAt > Date.now()
-  ) {
+  if (opportunityAtlasCoverageCache && opportunityAtlasCoverageCache.expiresAt > Date.now()) {
     return opportunityAtlasCoverageCache.value;
   }
 
   const collection = firestore.collection('opportunityAtlasTracts');
-  const [sample, snap] = await Promise.all([collection.limit(1).get(), collection.select('outcomes').get()]);
+  const [sample, snap] = await Promise.all([
+    collection.limit(1).get(),
+    collection.select('outcomes').get(),
+  ]);
   if (sample.empty) return undefined;
   const doc = sample.docs[0]!.data() as { source?: string; sourceUrl?: string; license?: string };
   if (!doc.source || !doc.sourceUrl || !doc.license) return undefined;

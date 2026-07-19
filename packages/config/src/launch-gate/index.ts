@@ -1,4 +1,3 @@
-
 /**
  * Local barrel for launch-gate kill-switch configuration hooks.
  */

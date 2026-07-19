@@ -15,7 +15,11 @@
  * OAuth-backed one built on `checkRedditPostLivenessViaListingLookup` below).
  */
 import type { SafeHttpClient } from '../internet-archive/shared/http-port.js';
-import { buildRedditInfoUrl, isPostRemovedOrDeleted, parseRedditListingResponse } from './client.js';
+import {
+  buildRedditInfoUrl,
+  isPostRemovedOrDeleted,
+  parseRedditListingResponse,
+} from './client.js';
 import type { RedditStoredPointer } from './types.js';
 
 export const REDDIT_LIVENESS_REASONS = [
@@ -38,7 +42,9 @@ export type RedditLivenessCheckResult = {
  * Structurally intended to be backed by a real OAuth-authenticated Reddit lookup in production
  * (see `checkRedditPostLivenessViaListingLookup`); tests inject a fixture-driven fake so the
  * automated suite never performs live network I/O. */
-export type RedditLivenessChecker = (pointer: RedditStoredPointer) => Promise<RedditLivenessCheckResult>;
+export type RedditLivenessChecker = (
+  pointer: RedditStoredPointer,
+) => Promise<RedditLivenessCheckResult>;
 
 /**
  * Real, tested reference implementation of `RedditLivenessChecker`: looks the pointer's post up
@@ -55,7 +61,11 @@ export function checkRedditPostLivenessViaListingLookup(
   return async (pointer: RedditStoredPointer): Promise<RedditLivenessCheckResult> => {
     const fullname = `t3_${pointer.postId}`;
     const url = buildRedditInfoUrl([fullname]);
-    const response = await client({ url, method: 'GET', allowedContentTypes: ['application/json', 'text/json'] });
+    const response = await client({
+      url,
+      method: 'GET',
+      allowedContentTypes: ['application/json', 'text/json'],
+    });
     const raw = JSON.parse(response.bodyText) as unknown;
     const parsed = parseRedditListingResponse(raw);
     const checkedAt = new Date().toISOString();
@@ -64,7 +74,8 @@ export function checkRedditPostLivenessViaListingLookup(
       return { pointerId: pointer.id, checkedAt, live: false, reason: 'not_found' };
     }
     if (isPostRemovedOrDeleted(post)) {
-      const reason: RedditLivenessReason = post.author === '[deleted]' ? 'deleted_by_author' : 'removed_by_moderator_or_admin';
+      const reason: RedditLivenessReason =
+        post.author === '[deleted]' ? 'deleted_by_author' : 'removed_by_moderator_or_admin';
       return { pointerId: pointer.id, checkedAt, live: false, reason };
     }
     return { pointerId: pointer.id, checkedAt, live: true, reason: 'live' };

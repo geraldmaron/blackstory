@@ -24,7 +24,12 @@
 import { isDatePrecision, type DatePrecision } from '../era.js';
 import { isGeoPrecisionTier, type GeoPrecisionTier } from '../geography/precision.js';
 import type { EntityKind } from '../entity-kinds.js';
-import { assertFactClaimTypeValid, claimTypeRequiresGeo, claimTypeRequiresWhen, type FactClaimType } from './claim-type.js';
+import {
+  assertFactClaimTypeValid,
+  claimTypeRequiresGeo,
+  claimTypeRequiresWhen,
+  type FactClaimType,
+} from './claim-type.js';
 import { assertFactConfidenceValid, type FactConfidenceGrade } from './confidence.js';
 import { assertFactCitationStructurallyComplete, type FactCitation } from './citation.js';
 import { assertRevisionsAppendOnly, type FactRevision } from './revision.js';
@@ -166,14 +171,18 @@ export function assertFactRecordStructurallyValid(fact: FactRecord): void {
     throw new Error(`FactRecord.claimType "${fact.claimType}" requires a geo anchor`);
   }
   if (fact.geo && !isGeoPrecisionTier(fact.geo.geoPrecision)) {
-    throw new Error(`FactRecord.geo.geoPrecision "${fact.geo.geoPrecision}" is not a recognized GeoPrecisionTier`);
+    throw new Error(
+      `FactRecord.geo.geoPrecision "${fact.geo.geoPrecision}" is not a recognized GeoPrecisionTier`,
+    );
   }
 
   if (claimTypeRequiresWhen(fact.claimType) && !fact.when) {
     throw new Error(`FactRecord.claimType "${fact.claimType}" requires a when anchor`);
   }
   if (fact.when && !isDatePrecision(fact.when.datePrecision)) {
-    throw new Error(`FactRecord.when.datePrecision "${fact.when.datePrecision}" is not a recognized DatePrecision`);
+    throw new Error(
+      `FactRecord.when.datePrecision "${fact.when.datePrecision}" is not a recognized DatePrecision`,
+    );
   }
   if (fact.when && !isNonEmpty(fact.when.validFrom)) {
     throw new Error('FactRecord.when.validFrom must be non-empty when when is present');
@@ -203,7 +212,9 @@ export function assertFactRecordStructurallyValid(fact: FactRecord): void {
   }
   for (const relationshipId of fact.derivedFromRelationshipIds) {
     if (!isNonEmpty(relationshipId)) {
-      throw new Error('FactRecord.derivedFromRelationshipIds[] entries must be non-empty when present');
+      throw new Error(
+        'FactRecord.derivedFromRelationshipIds[] entries must be non-empty when present',
+      );
     }
   }
 
@@ -225,12 +236,15 @@ export function assertFactRecordStructurallyValid(fact: FactRecord): void {
  * per-record predicate `./publish-gate.ts` uses before allowing a status transition to
  * published/corrected. Does not itself decide publishability; see that module. */
 export function hasCompleteFactCitations(fact: Pick<FactRecord, 'citations'>): boolean {
-  return fact.citations.length > 0 && fact.citations.every((citation) => {
-    try {
-      assertFactCitationStructurallyComplete(citation);
-      return true;
-    } catch {
-      return false;
-    }
-  });
+  return (
+    fact.citations.length > 0 &&
+    fact.citations.every((citation) => {
+      try {
+        assertFactCitationStructurallyComplete(citation);
+        return true;
+      } catch {
+        return false;
+      }
+    })
+  );
 }

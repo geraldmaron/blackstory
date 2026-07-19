@@ -11,7 +11,7 @@ export function humanizeToken(value: string): string {
   return value
     .split(/[_-]/)
     .filter((word) => word.length > 0)
-    .map((word) => (word.charAt(0).toUpperCase() + word.slice(1)))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
 
@@ -37,9 +37,7 @@ export function statusBannerTitle(status: FactStatus): string | undefined {
   }
 }
 
-export function mapConfidenceToUiLevel(
-  grade: FactConfidenceGrade,
-): 'high' | 'medium' | 'low' {
+export function mapConfidenceToUiLevel(grade: FactConfidenceGrade): 'high' | 'medium' | 'low' {
   switch (grade) {
     case 'established':
     case 'corroborated':

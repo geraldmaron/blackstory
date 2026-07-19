@@ -52,7 +52,9 @@ export function SensitivityContextBanner({
     <div className="ds-stack" role="group" aria-label={`Sensitivity context: ${classLabel}`}>
       <Notice tone="warning" title={classLabel}>
         <p style={{ margin: 0 }}>{sensitivity.note}</p>
-        <p style={{ margin: 0, marginTop: 'var(--ds-space-2)' }}>{sensitiveContentDisclaimer.body}</p>
+        <p style={{ margin: 0, marginTop: 'var(--ds-space-2)' }}>
+          {sensitiveContentDisclaimer.body}
+        </p>
       </Notice>
       {showNonEndorsement && nonEndorsementDisclaimer ? (
         <DisclaimerBanner {...nonEndorsementDisclaimer} />

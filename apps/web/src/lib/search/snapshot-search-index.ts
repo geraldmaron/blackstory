@@ -23,7 +23,10 @@ import {
 } from '@repo/domain';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 
-const RUBRIC_ENTRIES = Object.entries(NOTABILITY_RUBRIC) as readonly [NotabilityCriterion, string][];
+const RUBRIC_ENTRIES = Object.entries(NOTABILITY_RUBRIC) as readonly [
+  NotabilityCriterion,
+  string,
+][];
 
 function criterionForLabel(label: string): NotabilityCriterion {
   const match = RUBRIC_ENTRIES.find(([, text]) => text === label);
@@ -51,9 +54,7 @@ function synthesizeNotabilityBasis(entity: PublicEntityView): readonly Notabilit
   const note = noteFromCitedClaims(entity);
   const labels = entity.notabilityLabels ?? [];
   if (labels.length === 0) {
-    return evidenceIds.length === 0
-      ? []
-      : [{ criterion: 'documented_site', note, evidenceIds }];
+    return evidenceIds.length === 0 ? [] : [{ criterion: 'documented_site', note, evidenceIds }];
   }
   return labels.map((label) => ({
     criterion: criterionForLabel(label),

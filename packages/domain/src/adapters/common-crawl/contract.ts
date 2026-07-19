@@ -13,7 +13,9 @@ import {
   COMMON_CRAWL_STABLE_ID_SCHEME,
 } from './types.js';
 
-export function createCommonCrawlAdapterContract(overrides: Partial<SourceAdapterContract> = {}): SourceAdapterContract {
+export function createCommonCrawlAdapterContract(
+  overrides: Partial<SourceAdapterContract> = {},
+): SourceAdapterContract {
   return {
     adapterId: COMMON_CRAWL_ADAPTER_ID,
     parserVersion: COMMON_CRAWL_PARSER_VERSION,

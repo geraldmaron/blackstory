@@ -67,9 +67,7 @@ function earliestYear(entry: CatalogStatusSource): string | undefined {
 }
 
 function basisClaimIds(entry: CatalogStatusSource): readonly string[] {
-  const ids = (entry.claims ?? [])
-    .map((c, i) => c.id ?? `${entry.id}_claim_${i}`)
-    .filter(Boolean);
+  const ids = (entry.claims ?? []).map((c, i) => c.id ?? `${entry.id}_claim_${i}`).filter(Boolean);
   return ids.slice(0, 4);
 }
 
@@ -78,7 +76,11 @@ function derivePlaceLike(entry: CatalogStatusSource): PlaceLikeStatus {
   if (HISTORIC_RE.test(text) && !ACTIVE_RE.test(text)) return 'historic';
   if (ACTIVE_RE.test(text)) return 'active';
   // Districts, museums, universities, churches, towns default active unless historic cues
-  if (/\b(university|college|museum|church|cathedral|mosque|synagogue|library|park|district|town|city|school)\b/i.test(text)) {
+  if (
+    /\b(university|college|museum|church|cathedral|mosque|synagogue|library|park|district|town|city|school)\b/i.test(
+      text,
+    )
+  ) {
     return 'active';
   }
   if (/\b(movement|league|association|union|federation)\b/i.test(text) && HISTORIC_RE.test(text)) {
@@ -131,7 +133,11 @@ export function deriveCatalogEntityStatus(entry: CatalogStatusSource): DerivedCa
     const open = entry.statusHistory.find((e) => e.validTo === undefined || e.validTo === null);
     return {
       statusHistory: entry.statusHistory,
-      ...(open ? { status: open.status } : entry.status ? { status: entry.status as EntityStatusValue } : {}),
+      ...(open
+        ? { status: open.status }
+        : entry.status
+          ? { status: entry.status as EntityStatusValue }
+          : {}),
     };
   }
 

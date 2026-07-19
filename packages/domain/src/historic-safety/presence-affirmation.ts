@@ -26,7 +26,9 @@ export function isPresenceAffirmationCategory(value: string): value is PresenceA
 /** Published category weights (methodology, versioned below). HBCUs and churches/schools are
  * weighted as strong, durable community anchors; a single heritage marker is weighted lower
  * because a marker documents remembrance of a site rather than an ongoing institution. */
-export const PRESENCE_AFFIRMATION_CATEGORY_WEIGHTS: Readonly<Record<PresenceAffirmationCategory, number>> = {
+export const PRESENCE_AFFIRMATION_CATEGORY_WEIGHTS: Readonly<
+  Record<PresenceAffirmationCategory, number>
+> = {
   green_book_site: 0.7,
   historic_black_church: 0.85,
   historic_black_school: 0.85,
@@ -35,7 +37,8 @@ export const PRESENCE_AFFIRMATION_CATEGORY_WEIGHTS: Readonly<Record<PresenceAffi
   heritage_marker: 0.5,
 };
 
-export const PRESENCE_AFFIRMATION_METHODOLOGY_VERSION = 'presence-affirmation-methodology.v1' as const;
+export const PRESENCE_AFFIRMATION_METHODOLOGY_VERSION =
+  'presence-affirmation-methodology.v1' as const;
 
 export type PresenceAffirmationRecord = {
   readonly id: string;
@@ -48,12 +51,19 @@ export type PresenceAffirmationRecord = {
 
 export function assertPresenceAffirmationRecordValid(record: PresenceAffirmationRecord): void {
   if (!record.id.trim()) throw new Error('PresenceAffirmationRecord.id is required');
-  if (!record.placeEntityId.trim()) throw new Error('PresenceAffirmationRecord.placeEntityId is required');
+  if (!record.placeEntityId.trim())
+    throw new Error('PresenceAffirmationRecord.placeEntityId is required');
   if (!isPresenceAffirmationCategory(record.category)) {
     throw new Error(`Unknown presence-affirmation category: ${record.category}`);
   }
-  if (!Number.isFinite(record.proximityWeight) || record.proximityWeight < 0 || record.proximityWeight > 1) {
-    throw new RangeError('PresenceAffirmationRecord.proximityWeight must be a finite number in [0,1]');
+  if (
+    !Number.isFinite(record.proximityWeight) ||
+    record.proximityWeight < 0 ||
+    record.proximityWeight > 1
+  ) {
+    throw new RangeError(
+      'PresenceAffirmationRecord.proximityWeight must be a finite number in [0,1]',
+    );
   }
   assertLayerCitationValid(record.citation);
 }
@@ -68,7 +78,9 @@ function round4(value: number): number {
 
 function aggregatePresenceWeights(records: readonly PresenceAffirmationRecord[]): number {
   const complement = records.reduce((product, record) => {
-    const weight = clamp01(PRESENCE_AFFIRMATION_CATEGORY_WEIGHTS[record.category] * record.proximityWeight);
+    const weight = clamp01(
+      PRESENCE_AFFIRMATION_CATEGORY_WEIGHTS[record.category] * record.proximityWeight,
+    );
     return product * (1 - weight);
   }, 1);
   return clamp01(1 - complement);
@@ -106,7 +118,7 @@ export function computePresenceAffirmationLayerSignal(
       summary:
         'The counterweight layer: documented Black presence and community life (Green Book sites, ' +
         'historic Black churches/schools/business districts, HBCUs, heritage markers) drawn from ' +
-        'our own corpus. Combines each record\'s published category weight with its proximity to ' +
+        "our own corpus. Combines each record's published category weight with its proximity to " +
         `this place using the same saturating aggregation as Layer 1. Categories present: ${categories.join(', ')}.`,
     },
   };

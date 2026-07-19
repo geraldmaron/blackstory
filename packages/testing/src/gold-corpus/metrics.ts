@@ -1,4 +1,3 @@
-
 /**
  * Deterministic metric calculators for complete prediction sets evaluated against a
  * versioned gold corpus.
@@ -79,16 +78,12 @@ function calibrationMetrics(
     };
   });
   const brierScore = divide(
-    pairs.reduce(
-      (total, pair) => total + (pair.confidence - (pair.outcome ? 1 : 0)) ** 2,
-      0,
-    ),
+    pairs.reduce((total, pair) => total + (pair.confidence - (pair.outcome ? 1 : 0)) ** 2, 0),
     pairs.length,
   );
   const expectedCalibrationError = divide(
     bins.reduce(
-      (total, bin) =>
-        total + bin.count * Math.abs(bin.meanConfidence - bin.observedRate),
+      (total, bin) => total + bin.count * Math.abs(bin.meanConfidence - bin.observedRate),
       0,
     ),
     pairs.length,
@@ -126,10 +121,7 @@ function predictionMap(
   return predictions;
 }
 
-function entityResolutionCorrect(
-  example: GoldCorpusExample,
-  prediction: GoldPrediction,
-): boolean {
+function entityResolutionCorrect(example: GoldCorpusExample, prediction: GoldPrediction): boolean {
   if (prediction.entityResolution !== example.adjudication.entityResolution) return false;
   if (example.adjudication.entityResolution !== 'match') return true;
   return prediction.resolvedEntityId === example.adjudication.expectedEntityId;
@@ -178,9 +170,8 @@ export function calculateCorpusMetrics(
       aligned.length,
     ),
     entityResolutionAccuracy: divide(
-      aligned.filter(({ example, prediction }) =>
-        entityResolutionCorrect(example, prediction),
-      ).length,
+      aligned.filter(({ example, prediction }) => entityResolutionCorrect(example, prediction))
+        .length,
       aligned.length,
     ),
   };
@@ -198,9 +189,7 @@ export function evaluateCorpus(input: {
     ...(metrics.relevance.precision < thresholds.minimumPrecision
       ? ['precision_below_threshold']
       : []),
-    ...(metrics.relevance.recall < thresholds.minimumRecall
-      ? ['recall_below_threshold']
-      : []),
+    ...(metrics.relevance.recall < thresholds.minimumRecall ? ['recall_below_threshold'] : []),
     ...(exceeds(metrics.falsePublicationRate, thresholds.maximumFalsePublicationRate)
       ? ['false_publication_rate_above_threshold']
       : []),

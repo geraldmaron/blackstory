@@ -167,4 +167,8 @@ export {
 export type { FactSubjectEntityResolver, DanglingFactSubjectReference } from './subjects.js';
 
 export { buildFactSearchIndexDoc, buildFactSearchIndexDocs } from './search-index.js';
-export type { FactSearchIndexDoc, SkippedFactRecord, BuildFactSearchIndexResult } from './search-index.js';
+export type {
+  FactSearchIndexDoc,
+  SkippedFactRecord,
+  BuildFactSearchIndexResult,
+} from './search-index.js';

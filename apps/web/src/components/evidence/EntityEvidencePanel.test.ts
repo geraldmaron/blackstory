@@ -19,7 +19,11 @@ const CLAIMS: readonly EvidenceClaimInput[] = [
     object: '1867',
     confidenceScore: 0.78,
     confidenceLevel: 'high',
-    citation: { source: 'National Archives (seed)', label: 'Primary archival', href: 'https://catalog.archives.gov/' },
+    citation: {
+      source: 'National Archives (seed)',
+      label: 'Primary archival',
+      href: 'https://catalog.archives.gov/',
+    },
     sourceLineage: { independentLineageCount: 2 },
   },
   {
@@ -94,7 +98,11 @@ const CLAIMS_WITHOUT_LINEAGE: readonly EvidenceClaimInput[] = [
     object: '1867',
     confidenceScore: 0.78,
     confidenceLevel: 'high',
-    citation: { source: 'National Archives (seed)', label: 'Primary archival', href: 'https://catalog.archives.gov/' },
+    citation: {
+      source: 'National Archives (seed)',
+      label: 'Primary archival',
+      href: 'https://catalog.archives.gov/',
+    },
   },
   {
     id: 'claim_seed_005',
@@ -160,7 +168,10 @@ test('renders record-level retraction notices when supplied', () => {
       claims: CLAIMS,
       researchCoverage: { level: 'partial' },
       retractionNotices: [
-        { retractedAt: '2026-07-10T00:00:00.000Z', reason: 'A key supporting source was later retracted.' },
+        {
+          retractedAt: '2026-07-10T00:00:00.000Z',
+          reason: 'A key supporting source was later retracted.',
+        },
       ],
     }),
   );

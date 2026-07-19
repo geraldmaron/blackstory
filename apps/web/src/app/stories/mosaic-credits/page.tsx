@@ -37,8 +37,8 @@ export default function MosaicCreditsPage() {
           {ATMOSPHERE_TILE_CREDITS.length} curated tiles
         </h2>
         <p className="ds-section__lede">
-          Each tile maps to a published entity primary image (GCS public-media). Rebuild the
-          local pool with the collage tile script when the Commons promote set changes.
+          Each tile maps to a published entity primary image (GCS public-media). Rebuild the local
+          pool with the collage tile script when the Commons promote set changes.
         </p>
         <ol className="ds-story-mosaic-credits">
           {ATMOSPHERE_TILE_CREDITS.map((tile) => (

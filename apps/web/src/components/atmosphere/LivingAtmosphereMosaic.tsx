@@ -10,14 +10,8 @@
 
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  applyLivingTileSwap,
-  pickLivingTileSwap,
-} from './select-living-swap';
-import {
-  selectAtmospherePlane,
-  type AtmosphereDensity,
-} from './select-atmosphere-plane';
+import { applyLivingTileSwap, pickLivingTileSwap } from './select-living-swap';
+import { selectAtmospherePlane, type AtmosphereDensity } from './select-atmosphere-plane';
 import { ATMOSPHERE_TILE_CREDITS, type AtmosphereTileCredit } from './tile-credits';
 import './atmosphere.css';
 
@@ -95,8 +89,7 @@ export function LivingAtmosphereMosaic({
       typeof navigator !== 'undefined' &&
       'connection' in navigator &&
       Boolean(
-        (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
-          ?.saveData,
+        (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
       );
     if (reducedMotion || saveData) {
       setPreferStatic(true);
@@ -188,10 +181,7 @@ export function LivingAtmosphereMosaic({
   }, [preferStatic, mosaicFailed, selection.mode, selection.tiles.length, seedKey, swapIntervalMs]);
 
   const showLive =
-    selection.mode === 'mosaic' &&
-    selection.tiles.length > 0 &&
-    !mosaicFailed &&
-    !preferStatic;
+    selection.mode === 'mosaic' && selection.tiles.length > 0 && !mosaicFailed && !preferStatic;
 
   const renderCells: readonly CellLayers[] = showLive
     ? cells

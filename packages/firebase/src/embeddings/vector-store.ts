@@ -1,4 +1,3 @@
-
 /**
  * Firestore-backed (and in-memory, for tests/dev) storage for entity embeddings.
  *
@@ -36,7 +35,6 @@ export type EntityEmbeddingDoc = {
   readonly sourceTextHash: string;
   readonly updatedAt: string;
 };
-
 
 /**
  * Query-side `kind` is a plain string (not the narrow EntityKindDoc enum): it originates from
@@ -81,7 +79,6 @@ function clampLimit(limit: number): number {
   }
   return Math.min(limit, PLATFORM_MAX_NEIGHBORS);
 }
-
 
 /**
  * Real Admin SDK-backed implementation. Uses `firestore.collection(...).where(...).findNearest(...)`
@@ -147,7 +144,6 @@ export function createAdminVectorIndexStore(firestore: Firestore): VectorIndexSt
   };
 }
 
-
 /**
  * In-memory implementation replicating Firestore's KNN semantics exactly (equality pre-filters,
  * DOT_PRODUCT `distance >= threshold` note the direction is inverted vs COSINE/EUCLIDEAN,
@@ -189,15 +185,13 @@ export function createInMemoryVectorIndexStore(): VectorIndexStore {
 
       filtered.sort((a, b) => b.distance - a.distance);
 
-      return filtered.slice(0, limit).map(
-        (entry): VectorQueryMatch => ({
-          entityId: entry.doc.entityId,
-          kind: entry.doc.kind,
-          ...(entry.doc.state ? { state: entry.doc.state } : {}),
-          ...(entry.doc.eraBucket ? { eraBucket: entry.doc.eraBucket } : {}),
-          distance: entry.distance,
-        }),
-      );
+      return filtered.slice(0, limit).map((entry): VectorQueryMatch => ({
+        entityId: entry.doc.entityId,
+        kind: entry.doc.kind,
+        ...(entry.doc.state ? { state: entry.doc.state } : {}),
+        ...(entry.doc.eraBucket ? { eraBucket: entry.doc.eraBucket } : {}),
+        distance: entry.distance,
+      }));
     },
   };
 }

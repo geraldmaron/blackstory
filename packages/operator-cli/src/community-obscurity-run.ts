@@ -60,9 +60,7 @@ export function summarizeCommunityObscurityRun(
   };
 }
 
-export function runCommunityObscurityOperatorCampaign(
-  input: CommunityObscurityRunInput,
-): {
+export function runCommunityObscurityOperatorCampaign(input: CommunityObscurityRunInput): {
   readonly result: CommunityObscurityCampaignResult;
   readonly summary: CommunityObscurityRunSummary;
 } {
