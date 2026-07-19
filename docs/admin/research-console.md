@@ -5,7 +5,7 @@ public web application. Primary desks are ops-first:
 
 | Desk | Path | Role |
 |------|------|------|
-| Home | `/` | Queue posture, env strip, deep links |
+| Ops | `/` | Post-login landing; queue posture, env strip, deep links |
 | Inbox | `/inbox` | Pending research cases with full detail + live transitions |
 | Cases | `/cases`, `/cases/[id]` | All research-case states + deep detail |
 | Catalog | `/catalog` | Canonical entities and places |
@@ -13,6 +13,9 @@ public web application. Primary desks are ops-first:
 | Sources | `/sources` | Source organization registry |
 | Releases | `/releases` | Release manifests + privileged stage activate/rollback |
 | More | Quick add, evidence, graylist, audit, switches, legacy `/console` | Intake and safety |
+
+Sign-in defaults to Ops (`/`). A safe `?next=` path (for example the desk that bounced the
+operator to login) is honored; open redirects are rejected.
 
 ## Live research triage
 

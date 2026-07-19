@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useAdminAuth } from '../../../auth/AdminAuthProvider';
 import type { CatalogEntityDetail } from '../../../catalog/catalog-store';
+import { formatLivingStatusLabel } from '../living-status-label';
 
 function formatWhen(iso: string): string {
   if (!iso) return '—';
@@ -71,7 +72,15 @@ export default function CatalogEntityDetailPage() {
           <p className="ds-page__eyebrow">Canonical catalog</p>
           <h1 className="ds-page__title">{detail?.displayName ?? entityId}</h1>
           <p className="ds-page__lede">
+            Read-only canonical record — identifiers, aliases, and stored locations already in the
+            archive. Edits and promotion stay in research triage, not on this desk.
+          </p>
+          <p className="story-review__notice">
             <Link href="/catalog">← Back to catalog</Link>
+            {' · '}
+            <Link href="/inbox">Open inbox</Link>
+            {' · '}
+            <Link href="/cases">All cases</Link>
           </p>
         </div>
         <button
@@ -93,12 +102,15 @@ export default function CatalogEntityDetailPage() {
       {loading && !detail ? (
         <p className="ds-mono">Loading entity…</p>
       ) : !detail ? (
-        <p className="ds-sans">Entity not found.</p>
+        <p className="ds-sans">
+          Entity not found. Confirm the id in <Link href="/catalog">Catalog</Link> or check whether
+          it is still pending in <Link href="/inbox">Inbox</Link>.
+        </p>
       ) : (
         <section className="story-review__detail" aria-label="Entity detail">
           <p className="story-review__detail-meta ds-mono">
             {detail.kind} · updated {formatWhen(detail.updatedAt)}
-            {detail.livingStatus ? ` · ${detail.livingStatus}` : ''}
+            {detail.livingStatus ? ` · ${formatLivingStatusLabel(detail.livingStatus)}` : ''}
             {detail.claimCount !== undefined ? ` · ${detail.claimCount} claims` : ''}
           </p>
 

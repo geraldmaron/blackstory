@@ -3,6 +3,7 @@
  */
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { useAdminAuth } from '../../auth/AdminAuthProvider';
 import type { KillSwitchListItem } from '../../ops/switches-store';
@@ -66,7 +67,16 @@ export default function SwitchesPage() {
           <p className="ds-page__eyebrow">Operations</p>
           <h1 className="ds-page__title">Kill switches</h1>
           <p className="ds-page__lede">
-            Circuit breakers for discovery campaigns, source adapters, and public surfaces.
+            Operational circuit breakers for discovery campaigns, source adapters, and public
+            surfaces. Engaged switches halt automated work — they are not a publication or catalog
+            editing desk.
+          </p>
+          <p className="story-review__notice">
+            Read-only mirror — no toggles here. A human platform administrator engages or disengages
+            switches in Firestore <span className="ds-mono">killSwitches/{'{id}'}</span> documents
+            (IAP-protected ops path) with a durable reason; each change is recorded in{' '}
+            <Link href="/audit">Audit</Link>. See{' '}
+            <span className="ds-mono">infra/gcp/kill-switches/</span> for the matrix and runbooks.
           </p>
         </div>
         <button
@@ -93,10 +103,17 @@ export default function SwitchesPage() {
         {loading && rows.length === 0 ? (
           <p className="ds-mono">Loading kill switches…</p>
         ) : rows.length === 0 ? (
-          <p className="ds-sans">No kill switches found.</p>
+          <p className="ds-sans">
+            No kill switches found in this project. When configured, their state appears here —
+            return to <Link href="/">Operations</Link> or review changes in{' '}
+            <Link href="/audit">Audit</Link>.
+          </p>
         ) : (
           <div className="story-review__table-wrap">
             <table className="story-review__table">
+              <caption className="ds-visually-hidden">
+                Kill switch state, operator reason, and last update time
+              </caption>
               <thead>
                 <tr>
                   <th scope="col">Switch</th>

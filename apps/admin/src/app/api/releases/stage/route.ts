@@ -23,7 +23,7 @@ export async function POST(request: Request): Promise<Response> {
     }
     if (!body.reason?.trim()) {
       return Response.json(
-        { error: 'A durable operator reason is required for release actions' },
+        { error: 'A decision reason is required for release actions' },
         { status: 400 },
       );
     }

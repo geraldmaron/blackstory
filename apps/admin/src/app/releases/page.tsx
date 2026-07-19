@@ -10,6 +10,12 @@ import type {
   PublicationReleaseListItem,
 } from '../../releases/releases-store';
 
+const RELEASE_STAGE_STEPS = [
+  'Select a release — click a row in the table or paste a release id.',
+  'Write a decision reason — every stage action is audited.',
+  'Stage activate or rollback. This records intent for review only; the live public pointer does not change until privileged apply with signed-manifest verification.',
+] as const;
+
 function formatWhen(iso: string): string {
   if (!iso) return '—';
   const date = new Date(iso);
@@ -70,7 +76,7 @@ export default function ReleasesPage() {
 
   async function stage(mode: 'activate' | 'rollback') {
     if (!selectedId || !reason.trim()) {
-      setError('Select a release and provide a durable operator reason');
+      setError('Select a release and add a decision reason.');
       return;
     }
     setBusy(true);
@@ -112,10 +118,15 @@ export default function ReleasesPage() {
           <p className="ds-page__eyebrow">Publication</p>
           <h1 className="ds-page__title">Releases</h1>
           <p className="ds-page__lede">
-            Signed release manifests and the current <span className="ds-mono">activeRelease</span>{' '}
-            pointer. Activation is privileged — stage with a reason first; this desk never edits
-            public projections in place.
+            Signed release manifests and the live public pointer (
+            <span className="ds-mono">publicMeta/activeRelease</span>) for operator review. Staging
+            here never edits the active pointer in place — privileged apply does that later.
           </p>
+          <ol id="release-stage-steps" aria-label="How to stage a release change">
+            {RELEASE_STAGE_STEPS.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
         </div>
         <button
           type="button"
@@ -164,12 +175,13 @@ export default function ReleasesPage() {
           />
         </label>
         <label className="story-review__field">
-          <span>Operator reason (required)</span>
+          <span>Decision reason (required)</span>
           <input
             type="text"
             value={reason}
             onChange={(event) => setReason(event.target.value)}
-            placeholder="Why activate or roll back"
+            placeholder="Example: Manifest digest verified against catalog diff"
+            aria-describedby="release-stage-steps"
           />
         </label>
         <div className="story-review__bulk-actions">

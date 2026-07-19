@@ -109,6 +109,67 @@ export function stateLabel(state: ResearchCaseState): string {
   }
 }
 
+/** Filter chip labels — same operator language as {@link stateLabel} badges. */
+export function filterChipLabel(filter: ResearchCaseState | 'all' | 'inbox'): string {
+  switch (filter) {
+    case 'inbox':
+      return 'Inbox';
+    case 'all':
+      return 'All';
+    default:
+      return stateLabel(filter);
+  }
+}
+
+export const CASE_QUEUE_INTENT_COPY = {
+  inbox:
+    'Work the pending queue — decide relevance, confirm, exclude, or mark needs evidence. These do not publish.',
+  cases:
+    'Browse every research case by state. Open a row for full context. Publishing happens only via Releases after story review.',
+} as const;
+
+/** Numbered operator steps shared by Inbox, Cases queue, and case detail. */
+export const CASE_TRIAGE_STEPS = [
+  'Open a case (or select rows for bulk).',
+  'Write a short decision reason — every move is audited.',
+  'Choose an action. Nothing here publishes to the public site; Releases does that later.',
+] as const;
+
+/** Plain-language explanation of what each transition does. */
+export function actionHelp(action: AdminCaseTransitionAction): string {
+  switch (action) {
+    case 'send_to_relevance':
+      return 'Move this case into relevance review. Use when the lead looks on-topic and worth a closer look.';
+    case 'confirm_relevance':
+      return 'Mark the case in-scope. Ready for enrichment — still not public.';
+    case 'needs_evidence':
+      return 'Park the case until stronger sources land. It stays in the inbox under Needs evidence.';
+    case 'exclude':
+      return 'Close the case as out of scope or otherwise not advancing. Pick an exclude reason code.';
+    case 'merge':
+      return 'Fold this case into another research case id (duplicate).';
+  }
+}
+
+export function missingDecisionReasonMessage(action: AdminCaseTransitionAction): string {
+  return `Add a decision reason before “${actionLabelSafe(action)}”. Every move is audited and does not publish by itself.`;
+}
+
+function actionLabelSafe(action: AdminCaseTransitionAction): string {
+  switch (action) {
+    case 'send_to_relevance':
+      return 'Send to relevance';
+    case 'confirm_relevance':
+      return 'Confirm relevance';
+    case 'needs_evidence':
+      return 'Needs evidence';
+    case 'exclude':
+      return 'Exclude';
+    case 'merge':
+      return 'Merge';
+  }
+}
+
 export function legalActionsForState(state: ResearchCaseState): readonly AdminCaseTransitionAction[] {
   switch (state) {
     case 'candidate':

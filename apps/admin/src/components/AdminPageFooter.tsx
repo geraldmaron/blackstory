@@ -26,7 +26,7 @@ export function AdminPageFooter({ signedIn = false }: AdminPageFooterProps) {
             {signedIn ? (
               <>
                 <li>
-                  <Link href="/">Home</Link>
+                  <Link href="/">Ops</Link>
                 </li>
                 <li>
                   <Link href="/inbox">Inbox</Link>

@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAdminAuth } from '../../auth/AdminAuthProvider';
 import type { CatalogEntityListItem } from '../../catalog/catalog-store';
+import { formatLivingStatusLabel } from './living-status-label';
 
 function formatWhen(iso: string): string {
   if (!iso) return '—';
@@ -81,8 +82,13 @@ export default function CatalogPage() {
           <p className="ds-page__eyebrow">Canonical catalog</p>
           <h1 className="ds-page__title">Entities</h1>
           <p className="ds-page__lede">
-            Browse canonical entities in Firestore. Read-only inspection — promotion and edits stay
-            in operator workflows.
+            Browse canonical entities in Firestore with kind, living status, and update timestamps.
+            Read-only inspection — promotion and edits stay in operator triage workflows, not here.
+          </p>
+          <p className="story-review__notice">
+            Pending research lives in <Link href="/inbox">Inbox</Link>
+            {' · '}
+            <Link href="/cases">All cases</Link>
           </p>
         </div>
         <button
@@ -118,13 +124,21 @@ export default function CatalogPage() {
           <p className="ds-mono">Loading entities…</p>
         ) : visible.length === 0 ? (
           <p className="ds-sans">
-            {rows.length === 0
-              ? 'No canonical entities found in this project.'
-              : 'No entities match the current search.'}
+            {rows.length === 0 ? (
+              <>
+                No canonical entities found in this project. New material enters through{' '}
+                <Link href="/inbox">Inbox</Link> triage before it lands here.
+              </>
+            ) : (
+              'No entities match the current search.'
+            )}
           </p>
         ) : (
           <div className="story-review__table-wrap">
             <table className="story-review__table">
+              <caption className="ds-visually-hidden">
+                Canonical entities with kind, living status, and last update
+              </caption>
               <thead>
                 <tr>
                   <th scope="col">Display name</th>
@@ -143,7 +157,7 @@ export default function CatalogPage() {
                       <p className="story-review__row-meta ds-mono">{row.id}</p>
                     </td>
                     <td className="ds-mono">{row.kind}</td>
-                    <td className="ds-mono">{row.livingStatus ?? '—'}</td>
+                    <td>{formatLivingStatusLabel(row.livingStatus)}</td>
                     <td className="ds-mono">{formatWhen(row.updatedAt)}</td>
                   </tr>
                 ))}

@@ -3,9 +3,11 @@
  */
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { useAdminAuth } from '../../auth/AdminAuthProvider';
 import type { GraylistListItem } from '../../ops/graylist-store';
+import { formatGraylistDisposition, formatGraylistStatus } from './graylist-labels';
 
 function formatWhen(iso: string): string {
   if (!iso) return '—';
@@ -67,6 +69,14 @@ export default function GraylistPage() {
           <h1 className="ds-page__title">Graylist</h1>
           <p className="ds-page__lede">
             Below-threshold discovery candidates parked for corroboration — not silently dropped.
+            Review scores and reasons here; promoting to Inbox or publishing stays in triage and
+            release desks.
+          </p>
+          <p className="story-review__notice">
+            Next:{' '}
+            <Link href="/inbox">Open inbox</Link>
+            {' · '}
+            <Link href="/discovery">Campaign runs</Link>
           </p>
         </div>
         <button
@@ -93,10 +103,17 @@ export default function GraylistPage() {
         {loading && rows.length === 0 ? (
           <p className="ds-mono">Loading graylist…</p>
         ) : rows.length === 0 ? (
-          <p className="ds-sans">No graylist entries found.</p>
+          <p className="ds-sans">
+            No graylist entries found. When discovery runs produce below-threshold candidates, they
+            appear here — check <Link href="/discovery">campaign runs</Link> or triage survivors in{' '}
+            <Link href="/inbox">Inbox</Link>.
+          </p>
         ) : (
           <div className="story-review__table-wrap">
             <table className="story-review__table">
+              <caption className="ds-visually-hidden">
+                Graylist candidates with disposition, status, score, and parked time
+              </caption>
               <thead>
                 <tr>
                   <th scope="col">Candidate</th>
@@ -117,10 +134,10 @@ export default function GraylistPage() {
                       </p>
                       <p className="ds-sans">{row.reason}</p>
                     </td>
-                    <td className="ds-mono">{row.disposition}</td>
+                    <td>{formatGraylistDisposition(row.disposition)}</td>
                     <td>
                       <span className={`story-review__badge story-review__badge--${row.status}`}>
-                        {row.status}
+                        {formatGraylistStatus(row.status)}
                       </span>
                     </td>
                     <td className="ds-mono">{row.compositeScore.toFixed(2)}</td>

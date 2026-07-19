@@ -157,6 +157,52 @@
   font-family: var(--ds-font-sans);
 }
 
+.console-legacy-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) clamp(var(--ds-space-4), 3vw, var(--ds-space-8));
+  color: var(--ds-ink);
+  background: var(--ds-surface);
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9rem;
+}
+
+.console-legacy-banner p {
+  margin: 0;
+}
+
+.console-legacy-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+.console-legacy-banner__primary,
+.console-legacy-banner__secondary {
+  display: inline-block;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  font-family: var(--ds-font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.console-legacy-banner__primary {
+  color: var(--ds-inverse-ink);
+  background: var(--ds-accent);
+  border: var(--ds-border-width) solid var(--ds-accent);
+}
+
+.console-legacy-banner__secondary {
+  color: var(--ds-ink);
+  background: var(--ds-canvas);
+  border: var(--ds-border-width) solid var(--ds-border);
+}
+
 .console-section-heading {
   display: flex;
   align-items: baseline;

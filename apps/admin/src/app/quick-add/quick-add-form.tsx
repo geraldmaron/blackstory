@@ -39,13 +39,13 @@ function ResultPanel({ state }: { readonly state: QuickAddFormState }) {
             </p>
             {caseId ? (
               <p>
-                Open the draft case in{' '}
-                <Link href={`/cases/${caseId}`}>Cases</Link> or continue from{' '}
-                <Link href="/inbox">Inbox</Link>.
+                <Link href={`/cases/${caseId}`}>Open case</Link>
+                {' · '}
+                <Link href="/inbox">Open inbox</Link>
               </p>
             ) : (
               <p>
-                Continue triage in <Link href="/inbox">Inbox</Link>.
+                <Link href="/inbox">Open inbox</Link>
               </p>
             )}
           </div>

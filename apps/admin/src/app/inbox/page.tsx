@@ -1,11 +1,11 @@
 /**
- * Inbox — unified pending research work queue with live transitions.
+ * Inbox — pending research-case triage queue (candidate, relevance review, needs evidence).
  */
 import { CaseQueue } from '../../cases/CaseQueue';
 
 export const metadata = {
   title: 'Inbox — BlackStory Admin',
-  description: 'Triage pending research cases with full detail and live decisions.',
+  description: 'Work the pending research-case queue before anything publishes.',
 };
 
 export default function InboxPage() {

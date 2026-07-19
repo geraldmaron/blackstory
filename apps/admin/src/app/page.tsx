@@ -37,12 +37,15 @@ export default async function AdminHomePage() {
   return (
     <main className="admin-home admin-ops" id="main">
       <section className="admin-ops__panel" aria-labelledby="admin-home-title">
-        <p className="admin-ops__eyebrow">Operations</p>
+        <p className="admin-ops__eyebrow">Operations desk</p>
         <h1 className="admin-ops__title" id="admin-home-title">
           BlackStory Admin
         </h1>
         <p className="admin-ops__lede">
-          Triage research cases, review story packets, browse the catalog, and manage releases.
+          Start here after sign-in. Each card is a desk with one job — Inbox for pending
+          research decisions, Story review for packets, Catalog for what already exists,
+          Cases to browse every research state, Releases to publish, Quick add for new URLs.
+          Decisions here do not publish until you activate a release.
         </p>
 
         <p className="admin-ops__env" aria-label="Runtime environment">
@@ -74,7 +77,7 @@ export default async function AdminHomePage() {
               </span>
             )}
             <span className="admin-ops__card-detail">
-              Decide on candidates and relevance review
+              Pending research only — triage, confirm, exclude, or request evidence
             </span>
           </Link>
 
@@ -90,7 +93,7 @@ export default async function AdminHomePage() {
               </span>
             )}
             <span className="admin-ops__card-detail">
-              Review staged story packets (approve does not publish)
+              Staged packets — approve does not publish to the public site
             </span>
           </Link>
 
@@ -98,7 +101,7 @@ export default async function AdminHomePage() {
             <span className="admin-ops__card-label">Catalog</span>
             <span className="admin-ops__card-metric">What exists</span>
             <span className="admin-ops__card-detail">
-              Browse canonical entities and places
+              Canonical entities already in the archive — browse, do not triage
             </span>
           </Link>
 
@@ -106,7 +109,7 @@ export default async function AdminHomePage() {
             <span className="admin-ops__card-label">All cases</span>
             <span className="admin-ops__card-metric">Every state</span>
             <span className="admin-ops__card-detail">
-              Search research cases beyond the inbox
+              Full research-case browser — not just the pending inbox
             </span>
           </Link>
 
@@ -114,7 +117,7 @@ export default async function AdminHomePage() {
             <span className="admin-ops__card-label">Releases</span>
             <span className="admin-ops__card-metric">Publication desk</span>
             <span className="admin-ops__card-detail">
-              Preview and activate release candidates
+              The only place activation publishes a release to the public site
             </span>
           </Link>
 
@@ -122,7 +125,7 @@ export default async function AdminHomePage() {
             <span className="admin-ops__card-label">Quick add</span>
             <span className="admin-ops__card-metric">New intake</span>
             <span className="admin-ops__card-detail">
-              Stage or commit a URL into quarantine
+              Drop a URL into quarantine — it appears in Inbox for triage
             </span>
           </Link>
         </nav>

@@ -3,6 +3,7 @@
  */
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { useAdminAuth } from '../../auth/AdminAuthProvider';
 import type { AuditEventListItem } from '../../ops/audit-store';
@@ -64,7 +65,13 @@ export default function AuditPage() {
           <p className="ds-page__eyebrow">Operations</p>
           <h1 className="ds-page__title">Audit log</h1>
           <p className="ds-page__lede">
-            Recent append-only audit events from trusted staff and system actors.
+            Append-only audit trail of operator and system actions across intake, triage, and
+            publication. Read-only history — this desk does not replay, undo, or mutate underlying
+            records.
+          </p>
+          <p className="story-review__notice">
+            Use the <span className="ds-mono">Reason</span> column to see why an action happened —
+            durable operator notes for transitions, releases, and kill-switch changes.
           </p>
         </div>
         <button
@@ -87,10 +94,16 @@ export default function AuditPage() {
         {loading && rows.length === 0 ? (
           <p className="ds-mono">Loading audit events…</p>
         ) : rows.length === 0 ? (
-          <p className="ds-sans">No audit events found.</p>
+          <p className="ds-sans">
+            No audit events found yet. Actions from Inbox, Releases, and kill-switch changes will
+            appear here — return to <Link href="/">Operations</Link> to work the live queues.
+          </p>
         ) : (
           <div className="story-review__table-wrap">
             <table className="story-review__table">
+              <caption className="ds-visually-hidden">
+                Recent audit events with action, actor, subject, and operator reason
+              </caption>
               <thead>
                 <tr>
                   <th scope="col">When</th>

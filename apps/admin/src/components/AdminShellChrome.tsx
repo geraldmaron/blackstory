@@ -13,7 +13,7 @@ import { adminPublicSiteHref } from '../lib/sibling-origins';
 import { AdminPageFooter } from './AdminPageFooter';
 
 const OPS_PRIMARY_NAV = [
-  { href: '/', label: 'Home' },
+  { href: '/', label: 'Ops' },
   { href: '/inbox', label: 'Inbox' },
   { href: '/cases', label: 'Cases' },
   { href: '/catalog', label: 'Catalog' },

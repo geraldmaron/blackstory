@@ -5,13 +5,16 @@
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useAdminAuth } from '../../../auth/AdminAuthProvider';
 import { actionLabel, formatWhen } from '../../../cases/case-queue';
 import type { ResearchCaseReasonCode } from '@repo/domain';
 import {
+  CASE_TRIAGE_STEPS,
   EXCLUSION_REASON_CODES,
+  actionHelp,
   legalActionsForState,
+  missingDecisionReasonMessage,
   stateLabel,
   type AdminCaseDetail,
   type AdminCaseTransitionAction,
@@ -32,6 +35,8 @@ export default function CaseDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const reasonRef = useRef<HTMLTextAreaElement>(null);
+  const reasonHintId = useId();
 
   const load = useCallback(async () => {
     if (!caseId) return;
@@ -62,8 +67,14 @@ export default function CaseDetailPage() {
   }, [user, load]);
 
   async function runTransition(action: AdminCaseTransitionAction) {
-    if (!caseId || !reason.trim()) {
-      setError('A durable operator reason is required');
+    if (!caseId) return;
+    if (!reason.trim()) {
+      setError(missingDecisionReasonMessage(action));
+      reasonRef.current?.focus();
+      return;
+    }
+    if (action === 'merge' && !mergeTarget.trim()) {
+      setError('Enter the research case id to merge into before Merge.');
       return;
     }
     setBusy(true);
@@ -107,6 +118,15 @@ export default function CaseDetailPage() {
         <Link href="/cases">Cases</Link> / detail
       </p>
       <h1 className="acq__title">{detail?.title ?? caseId}</h1>
+      <p className="acq__lede">
+        Full research-case context. Decide with a written reason — audited, private, and not
+        a public publish.
+      </p>
+      <ol className="acq__steps" aria-label="How to decide on a case">
+        {CASE_TRIAGE_STEPS.map((step) => (
+          <li key={step}>{step}</li>
+        ))}
+      </ol>
       {error ? (
         <p className="acq__alert" role="alert">
           {error}
@@ -177,13 +197,36 @@ export default function CaseDetailPage() {
             )}
           </section>
 
-          <section className="acq__bulk">
+          <section className="acq__bulk" aria-labelledby="decide-heading">
+            <div className="acq-sheet__decide">
+              <h2 className="acq-sheet__decide-title" id="decide-heading">
+                Decide
+              </h2>
+              <p className="acq-sheet__decide-lede" id={reasonHintId}>
+                Write a decision reason, then choose an action:
+              </p>
+              {legalActions.length > 0 ? (
+                <ul className="acq-sheet__action-help">
+                  {legalActions.map((action) => (
+                    <li key={action}>
+                      <strong>{actionLabel(action)}.</strong> {actionHelp(action)}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="acq-sheet__meta">No triage actions for this state.</p>
+              )}
+            </div>
             <label className="acq__field acq__field--grow">
-              <span>Operator reason</span>
+              <span>Decision reason (required)</span>
               <textarea
+                ref={reasonRef}
                 rows={3}
                 value={reason}
                 onChange={(event) => setReason(event.target.value)}
+                placeholder="Example: On-topic Tulsa / Greenwood lead from discovery"
+                aria-describedby={reasonHintId}
+                required
               />
             </label>
             {legalActions.includes('exclude') ? (
@@ -210,6 +253,7 @@ export default function CaseDetailPage() {
                   type="text"
                   value={mergeTarget}
                   onChange={(event) => setMergeTarget(event.target.value)}
+                  placeholder="Target research case id"
                 />
               </label>
             ) : null}
@@ -219,7 +263,8 @@ export default function CaseDetailPage() {
                   key={action}
                   type="button"
                   className="acq__button acq__button--primary"
-                  disabled={busy}
+                  title={actionHelp(action)}
+                  disabled={busy || !reason.trim()}
                   onClick={() => void runTransition(action)}
                 >
                   {actionLabel(action)}

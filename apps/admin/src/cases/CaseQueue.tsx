@@ -21,8 +21,13 @@ import {
   type CaseQueueSortKey,
 } from './case-queue';
 import {
+  CASE_QUEUE_INTENT_COPY,
+  CASE_TRIAGE_STEPS,
   EXCLUSION_REASON_CODES,
+  actionHelp,
+  filterChipLabel,
   legalActionsForState,
+  missingDecisionReasonMessage,
   stateLabel,
   type AdminCaseDetail,
   type AdminCaseListItem,
@@ -57,7 +62,14 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const bulkReasonRef = useRef<HTMLInputElement>(null);
+  const sheetReasonRef = useRef<HTMLTextAreaElement>(null);
   const sheetTitleId = useId();
+  const reasonHintId = useId();
+
+  function focusReasonField() {
+    (sheetReasonRef.current ?? bulkReasonRef.current)?.focus();
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -147,7 +159,12 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
   ) {
     if (caseIds.length === 0) return;
     if (!reason.trim()) {
-      setError('A durable operator reason is required');
+      setError(missingDecisionReasonMessage(action));
+      focusReasonField();
+      return;
+    }
+    if (action === 'merge' && !mergeTarget.trim()) {
+      setError('Enter the research case id to merge into before Merge.');
       return;
     }
     setBusy(true);
@@ -247,6 +264,9 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
   const allVisibleSelected =
     visible.length > 0 && visible.every((row) => selectedIds.has(row.id));
 
+  const showChecklistColumn = visible.some((row) => row.checklistTotal > 0);
+  const showPlaceColumn = visible.some((row) => Boolean(row.placeHint?.trim()));
+
   return (
     <div className="acq" data-mode={mode}>
       <header className="acq__header">
@@ -255,10 +275,12 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
           <h1 className="acq__title">
             {mode === 'inbox' ? 'Inbox' : 'Research cases'}
           </h1>
-          <p className="acq__lede">
-            Review full case context, then send to relevance, confirm, exclude, or mark needs
-            evidence. Nothing here publishes to the public site.
-          </p>
+          <p className="acq__lede">{CASE_QUEUE_INTENT_COPY[mode]}</p>
+          <ol className="acq__steps" aria-label="How to decide on a case">
+            {CASE_TRIAGE_STEPS.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
         </div>
         <button
           type="button"
@@ -283,21 +305,21 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
           className={query.state === 'candidate' ? 'is-active' : undefined}
           onClick={() => patchQuery({ state: 'candidate' })}
         >
-          Candidates <strong>{counts.candidate}</strong>
+          {filterChipLabel('candidate')} <strong>{counts.candidate}</strong>
         </button>
         <button
           type="button"
           className={query.state === 'relevance_review' ? 'is-active' : undefined}
           onClick={() => patchQuery({ state: 'relevance_review' })}
         >
-          Relevance <strong>{counts.relevanceReview}</strong>
+          {filterChipLabel('relevance_review')} <strong>{counts.relevanceReview}</strong>
         </button>
         <button
           type="button"
           className={query.state === 'insufficient_evidence' ? 'is-active' : undefined}
           onClick={() => patchQuery({ state: 'insufficient_evidence' })}
         >
-          Needs evidence <strong>{counts.needsEvidence}</strong>
+          {filterChipLabel('insufficient_evidence')} <strong>{counts.needsEvidence}</strong>
         </button>
         {mode === 'cases' ? (
           <button
@@ -305,7 +327,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
             className={query.state === 'all' ? 'is-active' : undefined}
             onClick={() => patchQuery({ state: 'all' })}
           >
-            All <strong>{counts.total}</strong>
+            {filterChipLabel('all')} <strong>{counts.total}</strong>
           </button>
         ) : null}
       </section>
@@ -368,14 +390,21 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
               : ''}
           </p>
           <label className="acq__field acq__field--grow">
-            <span>Operator reason</span>
+            <span>Decision reason (required)</span>
             <input
+              ref={bulkReasonRef}
               type="text"
               value={reason}
               onChange={(event) => setReason(event.target.value)}
-              placeholder="Required for every decision"
+              placeholder="Example: On-topic Tulsa / Greenwood lead from discovery"
+              aria-describedby={reasonHintId}
+              required
             />
           </label>
+          <p className="acq__bulk-note" id={reasonHintId}>
+            Write the reason first, then choose an action. Bulk moves are audited and do not
+            publish.
+          </p>
           <div className="acq__bulk-actions">
             {bulkActions.map((action) => (
               <button
@@ -386,7 +415,10 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                     ? 'acq__button'
                     : 'acq__button acq__button--primary'
                 }
-                disabled={busy || selectedIds.size > RESEARCH_CASE_BULK_LIMIT}
+                title={actionHelp(action)}
+                disabled={
+                  busy || selectedIds.size > RESEARCH_CASE_BULK_LIMIT || !reason.trim()
+                }
                 onClick={() => void runTransition(action, [...selectedIds])}
               >
                 {actionLabel(action)}
@@ -435,8 +467,8 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                 </th>
                 <th scope="col">Title</th>
                 <th scope="col">State</th>
-                <th scope="col">Checklist</th>
-                <th scope="col">Place</th>
+                {showChecklistColumn ? <th scope="col">Checklist</th> : null}
+                {showPlaceColumn ? <th scope="col">Place</th> : null}
                 <th scope="col">Updated</th>
               </tr>
             </thead>
@@ -471,18 +503,30 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                       </label>
                     </td>
                     <td>
-                      <span className="acq__title">{row.title}</span>
-                      <span className="acq__title-id">{row.id}</span>
+                      <span className="acq__row-title">{row.title}</span>
+                      <span className="acq__row-id">{row.id}</span>
                     </td>
                     <td>
                       <span className="acq__badge">{stateLabel(row.state)}</span>
                     </td>
-                    <td className="acq__mono">
-                      {row.checklistTotal === 0
-                        ? '—'
-                        : `${row.checklistComplete}/${row.checklistTotal}`}
-                    </td>
-                    <td>{row.placeHint ?? '—'}</td>
+                    {showChecklistColumn ? (
+                      <td className="acq__mono">
+                        {row.checklistTotal === 0 ? (
+                          <span className="acq__not-set">Not set</span>
+                        ) : (
+                          `${row.checklistComplete}/${row.checklistTotal}`
+                        )}
+                      </td>
+                    ) : null}
+                    {showPlaceColumn ? (
+                      <td>
+                        {row.placeHint?.trim() ? (
+                          row.placeHint
+                        ) : (
+                          <span className="acq__not-set">Not set</span>
+                        )}
+                      </td>
+                    ) : null}
                     <td className="acq__updated">{formatWhen(row.updatedAt)}</td>
                   </tr>
                 );
@@ -629,13 +673,37 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
               </div>
 
               <footer className="acq-sheet__footer">
+                <div className="acq-sheet__decide">
+                  <h3 className="acq-sheet__decide-title">Decide</h3>
+                  <p className="acq-sheet__decide-lede" id={reasonHintId}>
+                    Write a decision reason, then choose an action. Available moves for this
+                    state:
+                  </p>
+                  {legalActions.length > 0 ? (
+                    <ul className="acq-sheet__action-help">
+                      {legalActions.map((action) => (
+                        <li key={action}>
+                          <strong>{actionLabel(action)}.</strong> {actionHelp(action)}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="acq-sheet__meta">
+                      No triage actions for this state — browse only, or continue enrichment
+                      elsewhere.
+                    </p>
+                  )}
+                </div>
                 <label className="acq__field acq__field--grow">
-                  <span>Operator reason</span>
+                  <span>Decision reason (required)</span>
                   <textarea
+                    ref={sheetReasonRef}
                     rows={2}
                     value={reason}
                     onChange={(event) => setReason(event.target.value)}
-                    placeholder="Required for decisions"
+                    placeholder="Example: On-topic Tulsa / Greenwood lead from discovery"
+                    aria-describedby={reasonHintId}
+                    required
                   />
                 </label>
                 {legalActions.includes('exclude') ? (
@@ -676,7 +744,8 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
                           ? 'acq__button'
                           : 'acq__button acq__button--primary'
                       }
-                      disabled={busy}
+                      title={actionHelp(action)}
+                      disabled={busy || !reason.trim()}
                       onClick={() => void runTransition(action, [activeId])}
                     >
                       {actionLabel(action)}

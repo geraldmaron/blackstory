@@ -62,7 +62,9 @@ export default function SourcesPage() {
           <p className="ds-page__eyebrow">Evidence registry</p>
           <h1 className="ds-page__title">Source organizations</h1>
           <p className="ds-page__lede">
-            Registered organizations backing evidence sources and adapter policies.
+            Registered organizations backing evidence sources and adapter policies. Browse
+            provenance metadata here; entity promotion and publication stay in catalog and release
+            workflows.
           </p>
         </div>
         <button

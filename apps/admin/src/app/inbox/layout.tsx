@@ -1,5 +1,5 @@
 /**
- * Auth gate for inbox.
+ * Auth gate for inbox triage routes.
  */
 import type { ReactNode } from 'react';
 import { RequireAdminAuth } from '../../components/RequireAdminAuth';

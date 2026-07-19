@@ -41,8 +41,10 @@ export async function submitEvidenceAttach(
 
   if (!researchCaseId) return { status: 'error', error: 'Research case id is required.' };
   if (!description) return { status: 'error', error: 'Description is required.' };
-  if (!sourceUrl) return { status: 'error', error: 'A source URL is required.' };
-  if (!operatorId) return { status: 'error', error: 'Operator id is required.' };
+  if (!sourceUrl) return { status: 'error', error: 'Source URL is required.' };
+  if (!operatorId) {
+    return { status: 'error', error: 'Operator id is required to stamp this proposal for audit.' };
+  }
 
   const privacyPepper = process.env.OPERATOR_CLI_PRIVACY_PEPPER;
   if (!privacyPepper) {

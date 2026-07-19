@@ -11,7 +11,15 @@ import {
   toggleCaseSelection,
 } from './case-queue.ts';
 import type { AdminCaseListItem } from './research-case-types.ts';
-import { legalActionsForState, stateLabel } from './research-case-types.ts';
+import {
+  CASE_QUEUE_INTENT_COPY,
+  CASE_TRIAGE_STEPS,
+  actionHelp,
+  filterChipLabel,
+  legalActionsForState,
+  missingDecisionReasonMessage,
+  stateLabel,
+} from './research-case-types.ts';
 import { parseResearchCaseRecord } from './parse-research-case.ts';
 
 const sample: AdminCaseListItem = {
@@ -77,7 +85,32 @@ test('commonActionsForSelection intersects legal actions', () => {
 
 test('legalActionsForState and stateLabel cover triage states', () => {
   assert.deepEqual(legalActionsForState('candidate'), ['send_to_relevance', 'merge']);
+  assert.equal(stateLabel('candidate'), 'Awaiting triage');
   assert.equal(stateLabel('insufficient_evidence'), 'Needs evidence');
+  assert.equal(stateLabel('relevance_review'), 'Relevance review');
+});
+
+test('filterChipLabel matches state badges for operator-facing filters', () => {
+  assert.equal(filterChipLabel('candidate'), stateLabel('candidate'));
+  assert.equal(filterChipLabel('candidate'), 'Awaiting triage');
+  assert.equal(filterChipLabel('relevance_review'), 'Relevance review');
+  assert.equal(filterChipLabel('insufficient_evidence'), 'Needs evidence');
+  assert.equal(filterChipLabel('inbox'), 'Inbox');
+  assert.equal(filterChipLabel('all'), 'All');
+});
+
+test('CASE_QUEUE_INTENT_COPY distinguishes inbox from cases browse', () => {
+  assert.match(CASE_QUEUE_INTENT_COPY.inbox, /do not publish/i);
+  assert.match(CASE_QUEUE_INTENT_COPY.cases, /Releases/i);
+  assert.notEqual(CASE_QUEUE_INTENT_COPY.inbox, CASE_QUEUE_INTENT_COPY.cases);
+});
+
+test('CASE_TRIAGE_STEPS and actionHelp explain the decision workflow', () => {
+  assert.equal(CASE_TRIAGE_STEPS.length, 3);
+  assert.match(CASE_TRIAGE_STEPS[1]!, /reason/i);
+  assert.match(actionHelp('send_to_relevance'), /relevance review/i);
+  assert.match(missingDecisionReasonMessage('send_to_relevance'), /Send to relevance/);
+  assert.match(missingDecisionReasonMessage('send_to_relevance'), /does not publish/i);
 });
 
 test('parseResearchCaseRecord coerces sparse Firestore docs', () => {

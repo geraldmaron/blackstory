@@ -81,7 +81,7 @@ export async function authorizeConsoleAction(
   if (privilegedAction && !reason) {
     throw new ConsoleActionError(
       'REASON_REQUIRED',
-      'High-impact actions require a durable operator reason',
+      'High-impact actions require a decision reason',
     );
   }
 

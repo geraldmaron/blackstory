@@ -44,6 +44,29 @@ function overviewCountLabel(
   return `${surface.rows.length} sample fixture${surface.rows.length === 1 ? '' : 's'}`;
 }
 
+export function ConsoleLegacyBanner() {
+  return (
+    <div
+      className="console-legacy-banner"
+      role="note"
+      aria-label="Legacy console notice"
+    >
+      <p>
+        <strong>Legacy fixture shell.</strong> Live triage is{' '}
+        <Link href="/inbox">Inbox</Link> and <Link href="/cases">Cases</Link>.
+      </p>
+      <div className="console-legacy-banner__actions">
+        <Link className="console-legacy-banner__primary" href="/inbox">
+          Open inbox
+        </Link>
+        <Link className="console-legacy-banner__secondary" href="/">
+          Operations home
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export function ConsoleShell({ children }: { readonly children: ReactNode }) {
   return (
     <>
@@ -52,7 +75,7 @@ export function ConsoleShell({ children }: { readonly children: ReactNode }) {
       </a>
       <header className="console-header">
         <div>
-          <p className="console-kicker">Private operations</p>
+          <p className="console-kicker">Legacy fixture shell</p>
           <Link className="console-brand" href="/console">
             BlackStory Admin
           </Link>
@@ -61,9 +84,10 @@ export function ConsoleShell({ children }: { readonly children: ReactNode }) {
           IAP + Firebase session required
         </p>
       </header>
+      <ConsoleLegacyBanner />
       <div className="console-frame">
-        <nav className="console-nav" aria-label="Administration console">
-          <p className="console-nav__label">Workspaces</p>
+        <nav className="console-nav" aria-label="Legacy console workspaces">
+          <p className="console-nav__label">Fixture workspaces</p>
           <ul>
             {CONSOLE_SURFACES.map((surface) => (
               <li key={surface.id}>
@@ -88,12 +112,12 @@ export function ConsoleOverview({
   return (
     <div className="console-page">
       <header className="console-page__header">
-        <p className="console-kicker">Research and publication</p>
+        <p className="console-kicker">Legacy fixture shell</p>
         <h1>Administration console</h1>
         <p>
-          Live triage lives in <Link href="/inbox">Inbox</Link> and{' '}
-          <Link href="/cases">Cases</Link>. Catalog, sources, and releases are first-class desks.
-          Remaining console workspaces below are fixture shells until their handlers land.
+          Fixture workspaces for publication-boundary previews and guarded-action contracts.
+          Catalog, sources, and releases are live desks on Operations home — this shell does not
+          publish or replace Inbox triage.
         </p>
       </header>
       <section aria-labelledby="workspace-heading">
@@ -164,7 +188,7 @@ function PermissionGatedAction({ action }: { readonly action: ConsoleAction }) {
       {action.privilegedAction ? (
         <fieldset>
           <legend>High-impact authorization</legend>
-          <label htmlFor={reasonId}>Operator reason (required)</label>
+          <label htmlFor={reasonId}>Decision reason (required)</label>
           <textarea
             aria-describedby={`${reasonId}-help`}
             id={reasonId}
@@ -173,8 +197,7 @@ function PermissionGatedAction({ action }: { readonly action: ConsoleAction }) {
             rows={3}
           />
           <p id={`${reasonId}-help`}>
-            A fresh Firebase authentication event and this durable reason are required by the
-            server before execution.
+            Sign in again recently and add a decision reason before the server will run this action.
           </p>
         </fieldset>
       ) : null}
@@ -216,9 +239,15 @@ export function ConsoleSurfacePage({
         {useResearchCaseQueue ? (
           <p>
             Live triage moved to <Link href="/inbox">Inbox</Link> and{' '}
-            <Link href="/cases">Cases</Link> with full detail and decisions.
+            <Link href="/cases">Cases</Link> with full detail and decisions. This fixture surface
+            does not accept new decisions or publish.
           </p>
-        ) : null}
+        ) : (
+          <p>
+            Sample records and disabled action previews only — use Operations home for live desks.
+            Nothing here publishes or edits active public projections.
+          </p>
+        )}
       </header>
       <div className="console-notice" role="note">
         <strong>Immutable publication boundary.</strong> Drafts and release candidates only — never

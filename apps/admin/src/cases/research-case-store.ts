@@ -170,7 +170,11 @@ function resolveTransition(
   now: string,
 ): { readonly next: ResearchCaseRecord; readonly targetState: ResearchCaseState } {
   const reason = request.reason.trim();
-  if (!reason) throw new Error('A durable operator reason is required');
+  if (!reason) {
+    throw new Error(
+      'Add a decision reason before this action. Every move is audited and does not publish by itself.',
+    );
+  }
 
   const map: Record<
     AdminCaseTransitionAction,

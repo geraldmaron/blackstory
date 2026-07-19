@@ -4,9 +4,18 @@
  */
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { StoryResearchPacket } from '@repo/domain';
 import { useAdminAuth } from '../../../auth/AdminAuthProvider';
+import {
+  STORY_REVIEW_EMPTY_COPY,
+  STORY_REVIEW_INTENT_COPY,
+  STORY_REVIEW_STEPS,
+  storyReviewActionHelp,
+  storyReviewActionLabel,
+  type StoryReviewAction,
+} from '../../../stories/story-review-copy';
 import {
   DEFAULT_STORY_REVIEW_QUERY,
   STORY_REVIEW_BULK_LIMIT,
@@ -18,6 +27,7 @@ import {
   type StoryReviewSortKey,
   type StoryReviewStatusFilter,
 } from '../../../stories/story-review-queue';
+import '../../../cases/case-queue.css';
 
 type ReviewState = {
   readonly decision: string;
@@ -228,10 +238,12 @@ export default function StoryReviewPage() {
         <div>
           <p className="ds-page__eyebrow">From quarantine</p>
           <h1 className="ds-page__title">Story review</h1>
-          <p className="ds-page__lede">
-            Pending human review for staged <span className="ds-mono">story_packet</span>{' '}
-            proposals. Decisions are recorded only — nothing publishes to the public site.
-          </p>
+          <p className="ds-page__lede">{STORY_REVIEW_INTENT_COPY}</p>
+          <ol className="acq__steps" aria-label="How to review a story packet">
+            {STORY_REVIEW_STEPS.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
         </div>
         <button
           type="button"
@@ -385,6 +397,7 @@ export default function StoryReviewPage() {
               type="button"
               className="ds-button ds-button--primary"
               disabled={busy || selectedIds.size > STORY_REVIEW_BULK_LIMIT}
+              title={storyReviewActionHelp('approved')}
               onClick={() => void submitReview('approved', bulkTargets)}
             >
               Approve selected
@@ -393,6 +406,7 @@ export default function StoryReviewPage() {
               type="button"
               className="ds-button ds-button--secondary"
               disabled={busy || selectedIds.size > STORY_REVIEW_BULK_LIMIT}
+              title={storyReviewActionHelp('needs_evidence')}
               onClick={() => void submitReview('needs_evidence', bulkTargets)}
             >
               Needs evidence
@@ -401,6 +415,7 @@ export default function StoryReviewPage() {
               type="button"
               className="ds-button ds-button--secondary"
               disabled={busy || selectedIds.size > STORY_REVIEW_BULK_LIMIT}
+              title={storyReviewActionHelp('rejected')}
               onClick={() => void submitReview('rejected', bulkTargets)}
             >
               Reject selected
@@ -422,11 +437,16 @@ export default function StoryReviewPage() {
           {loading && rows.length === 0 ? (
             <p className="ds-mono">Loading packets…</p>
           ) : visible.length === 0 ? (
-            <p className="ds-sans">
-              {rows.length === 0
-                ? 'No staged story packets yet. Run story-research-run --commit first.'
-                : 'No packets match the current filters.'}
-            </p>
+            <div className="ds-sans">
+              <p>
+                {rows.length === 0
+                  ? STORY_REVIEW_EMPTY_COPY.noPackets
+                  : STORY_REVIEW_EMPTY_COPY.noMatch}
+              </p>
+              {rows.length === 0 ? (
+                <p className="acq-sheet__meta ds-mono">{STORY_REVIEW_EMPTY_COPY.cliHint}</p>
+              ) : null}
+            </div>
           ) : (
             <div className="story-review__table-wrap">
               <table className="story-review__table">
@@ -492,11 +512,13 @@ export default function StoryReviewPage() {
 
         <section className="story-review__detail" aria-label="Selected packet">
           {!selected ? (
-            <p className="ds-sans">Select a packet to inspect cites and decide.</p>
+            <p className="ds-sans">
+              Select a story packet from the queue to read cites and decide.
+            </p>
           ) : (
             <>
               <p className="story-review__detail-meta ds-mono">
-                {reviewLabel(selected)} · packet:{selected.decision} ·{' '}
+                {reviewLabel(selected)} · proposal {selected.decision} ·{' '}
                 {selected.packet.draft.eraLabel} · {selected.packet.draft.placeLabel}
               </p>
               <h2 className="ds-section__title">{selected.packet.draft.title}</h2>
@@ -587,28 +609,49 @@ export default function StoryReviewPage() {
               </ul>
 
               <label className="story-review__field story-review__note">
-                <span>Operator note</span>
+                <span>Decision note (optional)</span>
                 <textarea
                   value={note}
                   onChange={(event) => setNote(event.target.value)}
                   rows={3}
-                  placeholder="Optional durable note stored with the review decision"
+                  placeholder="Example: Strong cite map; approve for seed handoff after one more primary source"
                 />
               </label>
+
+              <div className="acq-sheet__decide">
+                <h3 className="acq-sheet__decide-title">Decide</h3>
+                <p className="acq-sheet__decide-lede">
+                  Approval records your review and may return a seed handoff — it does not publish.
+                  For missing sources,{' '}
+                  <Link href="/evidence">attach evidence</Link> before re-running story research.
+                </p>
+                <ul className="acq-sheet__action-help">
+                  {(['approved', 'needs_evidence', 'rejected'] as const satisfies readonly StoryReviewAction[]).map(
+                    (action) => (
+                      <li key={action}>
+                        <strong>{storyReviewActionLabel(action)}.</strong>{' '}
+                        {storyReviewActionHelp(action)}
+                      </li>
+                    ),
+                  )}
+                </ul>
+              </div>
 
               <div className="story-review__actions">
                 <button
                   type="button"
                   className="ds-button ds-button--primary"
                   disabled={busy}
+                  title={storyReviewActionHelp('approved')}
                   onClick={() => void submitReview('approved', [selected.submissionId])}
                 >
-                  Approve (seed handoff)
+                  Approve
                 </button>
                 <button
                   type="button"
                   className="ds-button ds-button--secondary"
                   disabled={busy}
+                  title={storyReviewActionHelp('needs_evidence')}
                   onClick={() => void submitReview('needs_evidence', [selected.submissionId])}
                 >
                   Needs evidence
@@ -617,6 +660,7 @@ export default function StoryReviewPage() {
                   type="button"
                   className="ds-button ds-button--secondary"
                   disabled={busy}
+                  title={storyReviewActionHelp('rejected')}
                   onClick={() => void submitReview('rejected', [selected.submissionId])}
                 >
                   Reject
@@ -627,8 +671,9 @@ export default function StoryReviewPage() {
                 <div className="story-review__handoff">
                   <h3 className="ds-section__title">Seed handoff</h3>
                   <p className="ds-sans">
-                    Paste into <span className="ds-mono">apps/web/src/data/stories-seed.ts</span>.
-                    Not published automatically.
+                    Approval does not publish. Paste this JSON into{' '}
+                    <span className="ds-mono">apps/web/src/data/stories-seed.ts</span> when ready to
+                    ship — Releases handles public activation later.
                   </p>
                   <pre className="ds-mono">{seedHandoff}</pre>
                 </div>

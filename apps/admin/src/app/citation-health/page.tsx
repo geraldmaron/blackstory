@@ -25,14 +25,13 @@ export default function CitationHealthPage() {
   const driftedCitation = CITATION_HEALTH_FIXTURES.find((citation) => citation.linkStatus === 'drifted');
 
   return (
-    <main className="ds-container ds-prose citation-health-page">
-      <p className="citation-health-kicker">Operator dashboard tile · citation link health</p>
-      <h1>Citation health</h1>
-      <p>
-        Rot rate per source class, from the weekly <code>citation-link-health-sweep</code>{' '}
-        scheduled job (packages/config/src/scheduled-jobs/jobs/citation-link-health-sweep.ts).
-        This shell renders fixture data and exposes no live mutation handlers — the real sweep
-        writes its findings to the citation store, which a future integration would read here.
+    <main className="ds-container ds-prose ds-page citation-health-page" id="main">
+      <p className="ds-page__eyebrow">Evidence quality</p>
+      <h1 className="ds-page__title">Citation health</h1>
+      <p className="ds-page__lede">
+        Rot rate by source class from the scheduled citation link-health sweep, plus a preview of
+        the reader-facing degraded-citation treatment. This desk reads fixture telemetry only — it
+        does not repair links, mutate citations, or publish catalog changes.
       </p>
 
       <section aria-labelledby="rot-rate-heading">
@@ -100,7 +99,7 @@ export default function CitationHealthPage() {
       </section>
 
       <p className="citation-health-footer">
-        <Link href="/console">Back to the administration console</Link>
+        <Link href="/">Back to operations</Link>
       </p>
     </main>
   );

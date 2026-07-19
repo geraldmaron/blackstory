@@ -1,5 +1,7 @@
 /**
  * Client login UI — email + password for Firebase Authentication operators.
+ * After auth, operators land on the operations desk (`/`) unless `?next=` is a
+ * safe same-origin path (e.g. the page that bounced them to login).
  * Shell navbar/footer come from the root AdminShellChrome.
  */
 'use client';
@@ -7,13 +9,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAdminAuth } from '../../auth/AdminAuthProvider';
-
-function safeNextPath(raw: string | null): string {
-  if (!raw || !raw.startsWith('/') || raw.startsWith('//') || raw.includes('://')) {
-    return '/stories/review';
-  }
-  return raw;
-}
+import { safeAdminNextPath } from './safe-admin-next-path';
 
 export default function LoginClient() {
   const router = useRouter();
@@ -25,7 +21,7 @@ export default function LoginClient() {
   const [busy, setBusy] = useState(false);
 
   const nextPath = useMemo(
-    () => safeNextPath(searchParams.get('next')),
+    () => safeAdminNextPath(searchParams.get('next')),
     [searchParams],
   );
 
@@ -56,11 +52,13 @@ export default function LoginClient() {
           Sign in
         </h1>
         <p className="admin-login__lede">
-          History, pinned to place — private console for research and story review.
+          Private operations desk for research triage, story review, and releases. Nothing
+          here publishes to the public site by itself.
         </p>
         <p className="admin-login__meta">
-          Use an administrator account provisioned in Firebase Authentication. There is no
-          public sign-up on this portal.
+          After sign-in you land on Home — pick Inbox for pending cases, or open the desk you
+          need from the nav. Use an administrator account provisioned in Firebase
+          Authentication. There is no public sign-up on this portal.
         </p>
 
         {error ? (

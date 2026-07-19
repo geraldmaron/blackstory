@@ -10,6 +10,11 @@ import {
   countStoryReviewQueue,
   type StoryReviewQueueItem,
 } from './story-review-queue.ts';
+import {
+  STORY_REVIEW_INTENT_COPY,
+  STORY_REVIEW_STEPS,
+  storyReviewActionHelp,
+} from './story-review-copy.ts';
 
 function item(
   partial: Partial<StoryReviewQueueItem> & Pick<StoryReviewQueueItem, 'submissionId' | 'title'>,
@@ -123,4 +128,12 @@ test('bulk selection enforces non-empty unique capped ids', () => {
     () => assertStoryBulkSelection(Array.from({ length: 51 }, (_, i) => `id-${i}`)),
     /limited to 50/,
   );
+});
+
+test('STORY_REVIEW copy explains intent, steps, and actions without jargon', () => {
+  assert.match(STORY_REVIEW_INTENT_COPY, /do not publish|nothing here publishes/i);
+  assert.equal(STORY_REVIEW_STEPS.length, 3);
+  assert.match(STORY_REVIEW_STEPS[1]!, /optional/i);
+  assert.match(storyReviewActionHelp('approved'), /does not publish/i);
+  assert.match(storyReviewActionHelp('needs_evidence'), /evidence/i);
 });
