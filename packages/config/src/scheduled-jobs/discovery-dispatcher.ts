@@ -345,8 +345,12 @@ export async function dispatchDiscoveryCampaign(
       ...base,
       status: 'success',
       summary: {
-        itemsProcessed: outcome.run.itemsProcessed,
-        itemsExpected: outcome.run.itemsExpected,
+        ...(outcome.run.itemsProcessed !== undefined
+          ? { itemsProcessed: outcome.run.itemsProcessed }
+          : {}),
+        ...(outcome.run.itemsExpected !== undefined
+          ? { itemsExpected: outcome.run.itemsExpected }
+          : {}),
         ...(outcome.survivors !== undefined ? { survivors: outcome.survivors } : {}),
         ...(outcome.accepted !== undefined ? { accepted: outcome.accepted } : {}),
         ...(outcome.kind !== undefined ? { kind: outcome.kind } : {}),

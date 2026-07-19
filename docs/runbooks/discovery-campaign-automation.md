@@ -1,12 +1,14 @@
 # Discovery campaign automation
 
 Firebase-first control plane for roster discovery jobs. Scrapers do **not** run on App Hosting
-(ADR-001 / ADR-007 / ADR-009). Automation uses:
+(ADR-001 / ADR-009). Per **ADR-018**, production schedules prefer **Firebase Functions v2
+`onSchedule`** (research SA); Cloud Run Jobs remain for long/heavy batch. Automation layers:
 
 1. **Dispatcher** (`@repo/config` `dispatchDiscoveryCampaign`) — roster gate + `research-campaigns` kill switch
 2. **Firestore** — `killSwitches/research-campaigns` + optional `discoveryCampaignRuns/{runId}`
-3. **GHA** — `workflow_dispatch` + weekly **fixture** smoke for community obscurity
-4. **Cloud Run Job** (`workers/research-node`) — production batch entry (human GCP apply)
+3. **Firebase Functions v2** — preferred production cron (`functions/` / `@repo/functions-discovery`)
+4. **GHA** — `workflow_dispatch` + weekly **fixture** smoke for community obscurity (dev/CI)
+5. **Cloud Run Job** (`workers/research-node`) — escalate when a run may exceed ~30 minutes
 
 Live network fetch is still “download then inject” for RSS/ABS/IA/DPLA/Brave JSON. Wikimedia+federal automation uses committed fixtures until live clients ship.
 
@@ -84,7 +86,31 @@ killSwitches/research-campaigns
 
 Optional run persistence: `discoveryCampaignRuns/{runId}` (`publicEffect: none` only). See `infra/firebase/FIRESTORE_MODEL.md`.
 
-## Cloud Run Job (human apply)
+## Production schedule (Firebase Functions — preferred)
+
+Per **ADR-018**, production discovery crons deploy as Cloud Functions for Firebase v2
+(`onSchedule`) from `functions/` (package `@repo/functions-discovery`).
+
+App Hosting does **not** host these functions. Each roster job has a scheduled export;
+timeouts are capped at **1800s**. Escalate to Cloud Run Jobs when a single run needs longer.
+
+```bash
+pnpm --filter @repo/functions-discovery test
+pnpm --filter @repo/functions-discovery build
+# Human apply (research SA; kill switch doc materialised):
+FIREBASE_CLI_DISABLE_UPDATE_CHECK=true firebase deploy \
+  --only functions:discovery \
+  --config infra/firebase/firebase.json \
+  --project <project-id>
+```
+
+Local fixture invoke: `DISCOVERY_JOB_ID=discovery-campaign-rss pnpm --filter @repo/functions-discovery start`
+
+Until Functions are deployed in GCP: use GHA `workflow_dispatch` + operator `discovery-dispatch`.
+
+## Cloud Run Job (human apply) — long campaigns
+
+Prefer **Firebase Functions v2 `onSchedule`** for capped discovery (ADR-018). Use `workers/research-node` Cloud Run Jobs when a single run may exceed **30 minutes** or needs Job parallelism.
 
 Image build from `workers/research-node/Dockerfile`. Env:
 

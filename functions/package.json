@@ -1,0 +1,31 @@
+{
+  "name": "@repo/functions-discovery",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Firebase Functions v2 scheduled discovery dispatch (ADR-018). Research SA only; never publishes.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": ".deploy/index.js",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "node --conditions development --import tsx src/local-invoke.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --conditions development --import tsx --test src/mode.test.ts src/timeout.test.ts src/kill-switch-env.test.ts",
+    "lint": "echo 'lint: use root pnpm lint'"
+  },
+  "dependencies": {
+    "@repo/config": "workspace:*",
+    "@repo/firebase": "workspace:*",
+    "firebase-admin": "^13.4.0",
+    "firebase-functions": "^6.4.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:^",
+    "@types/node": "^22.20.1",
+    "esbuild": "^0.25.8",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}

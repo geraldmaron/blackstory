@@ -160,7 +160,8 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts rss-
 # Discovery automation dispatcher (fixture; GHA workflow_dispatch also available)
 node --conditions development --import tsx packages/operator-cli/src/bin.ts discovery-dispatch \
   --job discovery-campaign-wikimedia-federal --mode fixture
-# See docs/runbooks/discovery-campaign-automation.md
+# Scheduled Functions (ADR-018): pnpm --filter @repo/functions-discovery start
+# See docs/runbooks/discovery-campaign-automation.md and functions/README.md
 
 # Editorial enrichment (LLM stage-only; --provider mock|openrouter|ollama; --catalog-from=firestore)
 # OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \

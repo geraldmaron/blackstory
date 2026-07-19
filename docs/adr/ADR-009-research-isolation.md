@@ -2,9 +2,9 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-16
-- **Bead:** BB-002
+- **Bead:**
 - **Depends on:** ADR-003, ADR-005, ADR-007
-- **Implements toward:** BB-005, research engine beads (BB-037+)
+- **Implements toward:** , research engine beads (+)
 
 ## Scaffold vs target
 
@@ -17,7 +17,7 @@
 ## 2026-07-16 addendum — equivalent isolation inside one project
 
 The user selected `black-book-efaaf` as the one production project. A dedicated research project is
-deferred; it must not be represented as live or created by BB-011. The non-publishing invariant is
+deferred; it must not be represented as live or created by . The non-publishing invariant is
 now enforced by a distinct `research` SA, no public-media/release/deploy grants, `role_research`,
 private job ingress, separate secrets/logs/quotas, and a research kill switch.
 
@@ -32,13 +32,13 @@ Research ingests untrusted external sources, URLs, and (later) model outputs. Th
 
 ## Decision
 
-1. Use **equivalent lower-layer isolation** for production research in `black-book-efaaf` now; retain a dedicated project as the preferred migration target (BB-005/D-013).
+1. Use **equivalent lower-layer isolation** for production research in `black-book-efaaf` now; retain a dedicated project as the preferred migration target (/D-013).
 2. **Research service account** may write research/evidence staging only; **cannot** modify public projections, release pointers, or publication activation.
 3. **Research workers cannot publish**; **LLMs cannot publish or approve their own claims**; **public rendering never invokes an LLM** (invariants 4–6).
-4. Source adapters and campaigns run as **Cloud Run Jobs** with budgets, concurrency caps, and kill switches (ADR-007, BB-033, BB-035).
+4. Source adapters and campaigns run as **isolated research compute** — Firebase Functions v2 schedules for capped discovery (ADR-018) and/or **Cloud Run Jobs** for long batch — with budgets, concurrency caps, and kill switches (ADR-007, ADR-018).
 5. Cross-project access is **explicit and minimal**; public services cannot read private evidence blobs; quarantine objects are not publicly serveable.
 6. Promotion to public requires the **publication workflow** via internal/publication identities only (ADR-004, ADR-005).
-7. External URLs/files are untrusted; fetches happen in security/research workers with SSRF controls (BB-030), never in public request handlers.
+7. External URLs/files are untrusted; fetches happen in security/research workers with SSRF controls, never in public request handlers.
 
 ## Rejected alternatives
 
@@ -55,13 +55,13 @@ Research ingests untrusted external sources, URLs, and (later) model outputs. Th
 - Same-project operation is simpler now but has greater IAM and billing blast radius.
 - Data movement research → canonical → public is always mediated and auditable.
 - Cost controls stop research before they stop public corpus serving.
-- Future LLM framework (BB-064/065) must inherit these isolation rules.
+- Future LLM framework (/065) must inherit these isolation rules.
 
 ## Migration triggers
 
 - Move research to a dedicated project when the D-013 migration triggers are met.
-- Add upload quarantine boundary (BB-031) as an extension of security isolation, not research publishing rights.
-- Expand model tool use only after prompt-injection isolation bead (BB-065).
+- Add upload quarantine boundary as an extension of security isolation, not research publishing rights.
+- Expand model tool use only after prompt-injection isolation bead.
 
 ## Rollback considerations
 

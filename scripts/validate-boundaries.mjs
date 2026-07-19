@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WORKSPACE_ROOTS = ['apps', 'packages'];
+/** Root-level Firebase Functions package (ADR-018 discovery schedules). */
+const ROOT_DEPLOYABLES = ['functions'];
 const SOURCE_EXTENSIONS = ['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx'];
 const IGNORED_DIRECTORIES = new Set(['.next', 'coverage', 'dist', 'node_modules']);
 const IMPORT_PATTERN =
@@ -40,6 +42,23 @@ async function discoverWorkspaces() {
         if (error?.code !== 'ENOENT') {
           throw error;
         }
+      }
+    }
+  }
+
+  for (const deployable of ROOT_DEPLOYABLES) {
+    const directory = path.join(ROOT, deployable);
+    try {
+      const manifest = await readJson(path.join(directory, 'package.json'));
+      workspaces.push({
+        directory,
+        kind: 'app',
+        manifest,
+        name: manifest.name,
+      });
+    } catch (error) {
+      if (error?.code !== 'ENOENT') {
+        throw error;
       }
     }
   }
