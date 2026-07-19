@@ -834,7 +834,7 @@
 
 .ds-hero-stage__headline {
   margin: var(--ds-space-4) 0 0;
-  max-width: 12ch;
+  max-width: 14ch;
   color: var(--ds-fixed-paper);
   font-family: var(--ds-font-display);
   font-weight: 500;
@@ -842,6 +842,112 @@
   letter-spacing: -0.04em;
   line-height: 1.02;
   animation: ds-rise var(--ds-duration-slow) var(--ds-easing) 0.06s both;
+}
+
+/* Hero subject morph — History → His Story → … → Black Story.
+   Flat matte only: opacity + width. No scale on the S (keeps the baseline stable).
+   Split easing is gentler than the global snap ease so the letter does not jump. */
+.ds-hero-headline-morph {
+  --ds-hero-morph-ease: cubic-bezier(0.33, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: nowrap;
+}
+
+.ds-hero-headline-morph__prefix {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  min-width: max-content;
+}
+
+.ds-hero-headline-morph__prefix-out {
+  position: absolute;
+  inset: 0 auto auto 0;
+  white-space: nowrap;
+  animation: ds-hero-prefix-out var(--ds-duration-slow) var(--ds-hero-morph-ease) both;
+}
+
+.ds-hero-headline-morph__prefix-in {
+  white-space: nowrap;
+}
+
+.ds-hero-headline-morph__prefix-out + .ds-hero-headline-morph__prefix-in {
+  animation: ds-hero-prefix-in var(--ds-duration-slow) var(--ds-hero-morph-ease) both;
+}
+
+.ds-hero-headline-morph__gap {
+  display: inline-block;
+  width: 0;
+  flex: 0 0 auto;
+  transition: width var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
+}
+
+.ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__gap {
+  width: 0.28em;
+}
+
+/* Clip-slot opens; the S glyph itself never scales or reflows off the baseline. */
+.ds-hero-headline-morph__s-slot {
+  display: inline-block;
+  overflow: hidden;
+  width: 0;
+  flex: 0 0 auto;
+  vertical-align: baseline;
+  transition: width var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
+}
+
+.ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__s-slot {
+  width: 0.72em;
+}
+
+.ds-hero-headline-morph__s {
+  display: inline-block;
+  opacity: 0;
+  text-transform: uppercase;
+  line-height: inherit;
+  vertical-align: baseline;
+  transition: opacity var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
+}
+
+.ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__s {
+  opacity: 1;
+}
+
+.ds-hero-headline-morph__story {
+  display: inline-flex;
+  align-items: baseline;
+  flex: 0 0 auto;
+}
+
+.ds-hero-headline-morph__tail {
+  display: inline-block;
+  line-height: inherit;
+  vertical-align: baseline;
+}
+
+.ds-hero-headline-morph__trailer {
+  color: inherit;
+}
+
+@keyframes ds-hero-prefix-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ds-hero-prefix-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .ds-hero-stage__support {
@@ -1742,6 +1848,17 @@
   .ds-hero-timeline,
   .ds-shell-nav--drawer,
   .ds-loading__bar {
+    animation: none;
+  }
+
+  .ds-hero-headline-morph__gap,
+  .ds-hero-headline-morph__s-slot,
+  .ds-hero-headline-morph__s {
+    transition: none;
+  }
+
+  .ds-hero-headline-morph__prefix-out,
+  .ds-hero-headline-morph__prefix-out + .ds-hero-headline-morph__prefix-in {
     animation: none;
   }
 }

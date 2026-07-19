@@ -3,10 +3,11 @@
 /**
  * Homepage hero chrome: cinema over the live plate. The persistent
  * `MapStage` canvas renders behind this (mounted once, at the `(map)` layout);
- * `HeroStage` renders the floating typography and the TIMELINE INSTRUMENT —
- * a full-width rail of decade ticks that plays the archive decade by decade
- * (decade-flow.ts), scrubbable by tap, pausable, honest about what it shows
- * (documented records, never modeled population).
+ * `HeroStage` renders the floating typography (subject morph via
+ * `HeroHeadlineMorph`) and the TIMELINE INSTRUMENT — a full-width rail of
+ * decade ticks that plays the archive decade by decade (decade-flow.ts),
+ * scrubbable by tap, pausable, honest about what it shows (documented records,
+ * never modeled population).
  *
  * Engagement contract (ADR-017 "Transition contract"): state, background, entity
  * pin, and the copper CTA all fly the matching camera preset first, then funnel
@@ -28,6 +29,7 @@ import type {
 import { FINAL_FRAME_LABEL, type DecadeFlowFrame } from '../../lib/map-experience/decade-flow';
 import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
 import { buildExploreHref, viewportForState, type ExploreViewport } from '../../lib/map-experience/url-state';
+import { HeroHeadlineMorph } from './HeroHeadlineMorph';
 import { useMapStage } from './MapStage';
 
 /** Dwell per decade frame — slow enough to read, fast enough to feel alive. */
@@ -241,9 +243,7 @@ export function HeroStage({
         </Notice>
       ) : null}
       <p className="ds-hero-stage__kicker">Documented Black history</p>
-      <h1 className="ds-hero-stage__headline" id="hero-headline">
-        History happened <em>here</em>.
-      </h1>
+      <HeroHeadlineMorph />
       <p className="ds-hero-stage__support">
         Every pin is a documented record — people, places, schools, and events, each carrying its
         evidence. Start with the places you know.

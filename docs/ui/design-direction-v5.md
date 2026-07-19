@@ -19,8 +19,8 @@ Where anything below contradicts an earlier section of this document, **this sec
   orientation mark of the system (`.ds-page__eyebrow::before`).
 - **Display register with a serif italic accent.** Masts scale to `clamp(2.75rem → 5rem)`
   (hero to 6.25rem); one warm word per headline may sit in Source Serif italic copper
-  (`.ds-page__title em`). Copy pattern: "History happened *here*.", "Search the *archive*.",
-  "Decade by *decade*."
+  (`.ds-page__title em`). Copy pattern: hero morphs History → His/Her/Their/Your/Black Story
+  happened *here*.; pages keep "Search the *archive*.", "Decade by *decade*."
 - **The timeline instrument.** The hero's decades-in-motion is a full-width scrubbable rail of
   decade ticks (`.ds-hero-timeline`): passed decades burn copper, the live decade reads at
   display scale in mono, every tick is a 44px jump target, play/pause is a circular key.
