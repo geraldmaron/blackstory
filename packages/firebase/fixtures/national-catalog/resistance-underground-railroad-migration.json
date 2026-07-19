@@ -772,7 +772,14 @@
       "freedom"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_william_still_001",
@@ -820,7 +827,14 @@
       "freedom"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_josiah_henson_site_001",
@@ -910,7 +924,14 @@
       "abolition"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_second_baptist_detroit_001",
@@ -963,6 +984,11 @@
         "id": "ent_great_migration_001",
         "type": "related_to",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
       }
     ]
   },
@@ -1007,7 +1033,14 @@
       "freedom"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_freedom_house_museum_001",
@@ -1140,7 +1173,14 @@
       "resistance"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_thomas_garrett_house_001",
@@ -1197,6 +1237,11 @@
         "id": "ent_tubman_underground_railroad_md_001",
         "type": "related_to",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
       }
     ]
   },
@@ -1244,7 +1289,14 @@
       "freedom"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_jermain_loguen_001",
@@ -1291,7 +1343,14 @@
       "abolition"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_lewis_hayden_house_001",
@@ -1335,7 +1394,14 @@
       "freedom"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_david_ruggles_001",
@@ -1515,7 +1581,14 @@
       "organizing"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_anthony_burns_case_001",
@@ -2189,6 +2262,11 @@
       {
         "id": "ent_naacp_founding_001",
         "type": "attended",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_naacp_org_001",
+        "type": "founded",
         "direction": "outgoing"
       }
     ]

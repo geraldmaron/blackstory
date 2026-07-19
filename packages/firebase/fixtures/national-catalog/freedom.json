@@ -97,6 +97,16 @@
         "id": "ent_tubman_underground_railroad_md_001",
         "type": "related_to",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
       }
     ]
   },
@@ -145,7 +155,19 @@
       "freedom"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "commemorates",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_fort_mose_001",
@@ -306,6 +328,11 @@
         "id": "ent_john_rankin_house_001",
         "type": "related_to",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
       }
     ]
   },
@@ -407,6 +434,11 @@
       {
         "id": "ent_naacp_founding_001",
         "type": "influenced",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_naacp_org_001",
+        "type": "enabled",
         "direction": "outgoing"
       }
     ],

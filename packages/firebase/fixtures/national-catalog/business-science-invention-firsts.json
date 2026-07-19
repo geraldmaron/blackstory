@@ -2237,6 +2237,11 @@
         "id": "ent_howard_university_001",
         "type": "employed_by",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_harlem_renaissance",
+        "type": "participated_in",
+        "direction": "outgoing"
       }
     ]
   },

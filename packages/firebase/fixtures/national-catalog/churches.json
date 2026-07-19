@@ -103,7 +103,14 @@
       "denomination-founding"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_first_baptist_petersburg_001",
@@ -437,6 +444,11 @@
         "id": "ent_kelly_ingram_park_001",
         "type": "related_to",
         "direction": "incoming"
+      },
+      {
+        "id": "ent_web_du_bois_001",
+        "type": "cites",
+        "direction": "outgoing"
       }
     ],
     "topicIds": [
@@ -661,6 +673,11 @@
       {
         "id": "ent_bronzeville_001",
         "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
         "direction": "outgoing"
       }
     ],
@@ -1252,7 +1269,14 @@
       "burial-ground"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "commemorates",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_gospel_pilgrim_cemetery_athens_001",
@@ -1446,7 +1470,14 @@
       "underground-railroad"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_st_philips_episcopal_harlem_001",
@@ -1590,7 +1621,14 @@
       "community"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_old_ship_ame_zion_montgomery_001",

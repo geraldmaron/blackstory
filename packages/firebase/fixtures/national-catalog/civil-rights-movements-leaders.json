@@ -60,6 +60,11 @@
         "id": "ent_sncc_founding_001",
         "type": "influenced",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_core_org_001",
+        "type": "part_of",
+        "direction": "outgoing"
       }
     ]
   },
@@ -115,6 +120,11 @@
         "id": "ent_shaw_university_001",
         "type": "occurred_at",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_org_001",
+        "type": "part_of",
+        "direction": "outgoing"
       }
     ]
   },
@@ -168,6 +178,11 @@
     "related": [
       {
         "id": "ent_movement_civil_rights_movement",
+        "type": "part_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
         "type": "part_of",
         "direction": "outgoing"
       }
@@ -1392,7 +1407,14 @@
       "birmingham-campaign",
       "sclc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_org_001",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_montgomery_improvement_association_001",
@@ -1525,6 +1547,11 @@
       {
         "id": "ent_memphis_sanitation_strike_1968_001",
         "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "founded",
         "direction": "outgoing"
       }
     ]
@@ -1659,6 +1686,21 @@
         "id": "ent_sncc_founding_001",
         "type": "attended",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "employed_by",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_org_001",
+        "type": "founded",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_naacp_org_001",
+        "type": "employed_by",
+        "direction": "outgoing"
       }
     ]
   },
@@ -1781,6 +1823,11 @@
         "id": "ent_mfdp_dnc_challenge_001",
         "type": "participated_in",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_org_001",
+        "type": "employed_by",
+        "direction": "outgoing"
       }
     ]
   },
@@ -1902,6 +1949,11 @@
         "id": "ent_selma_to_montgomery_marches_001",
         "type": "attended",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_org_001",
+        "type": "founded",
+        "direction": "outgoing"
       }
     ]
   },
@@ -1968,6 +2020,11 @@
         "id": "ent_cofo_001",
         "type": "member_of",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_org_001",
+        "type": "member_of",
+        "direction": "outgoing"
       }
     ]
   },
@@ -2024,6 +2081,16 @@
       {
         "id": "ent_bethel_baptist_church_collegeville_001",
         "type": "located_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "founded",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_naacp_org_001",
+        "type": "member_of",
         "direction": "outgoing"
       }
     ]
@@ -2085,6 +2152,16 @@
         "id": "ent_dorothy_cotton_001",
         "type": "related_to",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_naacp_org_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "employed_by",
+        "direction": "outgoing"
       }
     ]
   },
@@ -2144,6 +2221,11 @@
       {
         "id": "ent_little_rock_central_high_001",
         "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_naacp_org_001",
+        "type": "member_of",
         "direction": "outgoing"
       }
     ]
@@ -2325,6 +2407,21 @@
         "id": "ent_diane_nash_001",
         "type": "influenced",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_org_001",
+        "type": "influenced",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "member_of",
+        "direction": "outgoing"
       }
     ]
   },
@@ -2401,6 +2498,11 @@
         "id": "ent_poor_peoples_campaign_001",
         "type": "participated_in",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "founded",
+        "direction": "outgoing"
       }
     ]
   },
@@ -2467,6 +2569,11 @@
         "id": "ent_selma_to_montgomery_marches_001",
         "type": "attended",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "employed_by",
+        "direction": "outgoing"
       }
     ]
   },
@@ -2527,6 +2634,11 @@
       {
         "id": "ent_john_lewis_001",
         "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "employed_by",
         "direction": "outgoing"
       }
     ]
@@ -2650,6 +2762,11 @@
         "id": "ent_albany_movement_001",
         "type": "participated_in",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_org_001",
+        "type": "employed_by",
+        "direction": "outgoing"
       }
     ]
   },
@@ -2704,6 +2821,11 @@
       {
         "id": "ent_chicago_freedom_movement_001",
         "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "employed_by",
         "direction": "outgoing"
       }
     ]
@@ -2760,6 +2882,11 @@
         "id": "ent_freedom_vote_1963_001",
         "type": "participated_in",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_org_001",
+        "type": "employed_by",
+        "direction": "outgoing"
       }
     ]
   },
@@ -2809,7 +2936,14 @@
     "mentionedEntityIds": [
       "sncc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sncc_org_001",
+        "type": "founded",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_dorothy_cotton_001",
@@ -2859,7 +2993,14 @@
     "mentionedEntityIds": [
       "sclc"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_org_001",
+        "type": "employed_by",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_unita_blackwell_001",
@@ -3073,6 +3214,16 @@
         "id": "ent_sixteenth_street_baptist_001",
         "type": "located_at",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_birmingham_campaign_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "employed_by",
+        "direction": "outgoing"
       }
     ]
   },
@@ -3122,7 +3273,14 @@
     "mentionedEntityIds": [
       "core"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_core_org_001",
+        "type": "part_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_cofo_001",
@@ -3173,6 +3331,11 @@
     "related": [
       {
         "id": "ent_freedom_vote_1963_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
         "type": "cites",
         "direction": "outgoing"
       }
@@ -3228,6 +3391,26 @@
       {
         "id": "ent_movement_civil_rights_movement",
         "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_naacp_org_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_core_org_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_org_001",
+        "type": "cites",
         "direction": "outgoing"
       }
     ]
@@ -3331,6 +3514,11 @@
       {
         "id": "ent_movement_black_power_movement",
         "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_core_org_001",
+        "type": "related_to",
         "direction": "outgoing"
       }
     ]

@@ -151,6 +151,11 @@
         "id": "ent_harlem_001",
         "type": "located_at",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_harlem_renaissance",
+        "type": "cites",
+        "direction": "outgoing"
       }
     ],
     "topicIds": [
@@ -766,7 +771,14 @@
       "abolition"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "commemorates",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_iaam_charleston_001",

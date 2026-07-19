@@ -2003,7 +2003,14 @@
       "judiciary"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_naacp_org_001",
+        "type": "employed_by",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_jane_bolin_001",
@@ -3630,7 +3637,14 @@
       "diplomacy"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_naacp_org_001",
+        "type": "employed_by",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_james_wormley_jones_001",

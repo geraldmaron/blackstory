@@ -240,7 +240,14 @@
       "music"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_harlem_renaissance",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_morehouse_college_001",
@@ -779,6 +786,11 @@
       {
         "id": "ent_greensboro_woolworth_sit_in_site_001",
         "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_org_001",
+        "type": "influenced",
         "direction": "outgoing"
       }
     ],

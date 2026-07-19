@@ -110,6 +110,11 @@
         "id": "ent_montgomery_bus_boycott_001",
         "type": "occurred_at",
         "direction": "incoming"
+      },
+      {
+        "id": "ent_naacp_org_001",
+        "type": "cites",
+        "direction": "outgoing"
       }
     ],
     "topicIds": [
@@ -328,6 +333,11 @@
         "id": "ent_sncc_founding_001",
         "type": "influenced",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_org_001",
+        "type": "influenced",
+        "direction": "outgoing"
       }
     ],
     "topicIds": [
@@ -434,6 +444,11 @@
       {
         "id": "ent_sixteenth_street_baptist_001",
         "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_org_001",
+        "type": "cites",
         "direction": "outgoing"
       }
     ],
@@ -601,7 +616,19 @@
     "mentionedEntityIds": [
       "freedom-rides"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_core_org_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_core_org_001",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_moton_high_school_001",
@@ -790,7 +817,14 @@
       "organizing-schools"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_org_001",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_highlander_folk_school_001",
@@ -838,7 +872,14 @@
       "education"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_org_001",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_mason_temple_001",
@@ -944,6 +985,13 @@
       "organizing"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_org_001",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   }
 ]

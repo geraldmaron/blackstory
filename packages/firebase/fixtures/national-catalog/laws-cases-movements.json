@@ -552,7 +552,14 @@
       "fugitive-slave-law"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_movement_underground_railroad",
+        "type": "influenced",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_law_missouri_compromise_1820",
@@ -1495,7 +1502,14 @@
       "segregation"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_naacp_org_001",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_smith_v_allwright_1944",
@@ -2692,7 +2706,14 @@
       "civil-rights"
     ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_naacp_org_001",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_naacp_v_button_1963",
@@ -2743,6 +2764,11 @@
     "related": [
       {
         "id": "ent_case_naacp_v_alabama_1958",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_naacp_org_001",
         "type": "cites",
         "direction": "outgoing"
       }

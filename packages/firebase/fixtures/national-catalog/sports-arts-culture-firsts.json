@@ -1194,6 +1194,11 @@
         "id": "ent_harlem_001",
         "type": "located_at",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_harlem_renaissance",
+        "type": "participated_in",
+        "direction": "outgoing"
       }
     ]
   },

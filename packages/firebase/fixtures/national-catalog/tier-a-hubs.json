@@ -67,7 +67,13 @@
       "Martin Luther King Jr.",
       "Fred Shuttlesworth"
     ],
-    "related": []
+    "related": [
+      {
+        "id": "ent_kelly_ingram_park_001",
+        "type": "occurred_at",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_booker_t_washington_001",
@@ -138,7 +144,48 @@
       "vocational education",
       "accommodationism"
     ],
-    "related": []
+    "related": [
+      {
+        "id": "ent_ag_gaston_001",
+        "type": "influenced",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_allensworth_001",
+        "type": "influenced",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_boley_historic_district_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_george_washington_carver_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_hampton_university_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_hayti_durham_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_tuskegee_university_001",
+        "type": "founded",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_grambling_state_university_001",
+        "type": "influenced",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_core_org_001",
@@ -205,7 +252,38 @@
     ],
     "mentionedEntityIds": [],
     "keywords": [],
-    "related": []
+    "related": [
+      {
+        "id": "ent_cofo_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_case_boynton_v_virginia_1960",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_meredith_march_against_fear_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_journey_of_reconciliation_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_meredith_march_against_fear_001",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_movement_harlem_renaissance",
@@ -281,7 +359,13 @@
       "Great Migration",
       "Cotton Club"
     ],
-    "related": []
+    "related": [
+      {
+        "id": "ent_harlem_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_movement_underground_railroad",
@@ -341,7 +425,7 @@
         "citationLabel": "NPS: Harriet Tubman Underground Railroad National Historical Park"
       }
     ],
-    "historicalContext": "Neither underground nor a railroad, this loosely organized network of abolitionists, free Black communities, and formerly enslaved people used coded railway language \u2014 lines, stations, conductors \u2014 to move freedom seekers northward in defiance of federal fugitive-slave law, laying organizing groundwork later drawn on by the broader civil-rights movement.",
+    "historicalContext": "Neither underground nor a railroad, this loosely organized network of abolitionists, free Black communities, and formerly enslaved people used coded railway language — lines, stations, conductors — to move freedom seekers northward in defiance of federal fugitive-slave law, laying organizing groundwork later drawn on by the broader civil-rights movement.",
     "topicIds": [
       "civil-rights",
       "abolition",
@@ -417,7 +501,7 @@
         "citationLabel": "NAACP: Contact (national headquarters address)"
       }
     ],
-    "historicalContext": "As the nation's oldest and largest civil rights organization, the NAACP built the legal and organizing infrastructure \u2014 including its Legal Defense Fund lineage and The Crisis magazine \u2014 that drove landmark victories from anti-lynching advocacy through Brown v. Board of Education and the mid-20th-century civil rights legislative campaigns.",
+    "historicalContext": "As the nation's oldest and largest civil rights organization, the NAACP built the legal and organizing infrastructure — including its Legal Defense Fund lineage and The Crisis magazine — that drove landmark victories from anti-lynching advocacy through Brown v. Board of Education and the mid-20th-century civil rights legislative campaigns.",
     "topicIds": [
       "civil-rights",
       "organization",
@@ -432,7 +516,63 @@
       "civil rights organization",
       "Springfield race riot"
     ],
-    "related": []
+    "related": [
+      {
+        "id": "ent_albany_movement_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_cofo_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_dockum_drug_store_sit_in_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_east_st_louis_massacre_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_elaine_massacre_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_ernest_everett_just_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_vote_1963_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_little_rock_central_high_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_medgar_evers_home_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_albany_movement_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_sclc_org_001",
@@ -502,7 +642,68 @@
       "nonviolent protest",
       "voting rights"
     ],
-    "related": []
+    "related": [
+      {
+        "id": "ent_albany_movement_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_chicago_freedom_movement_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_cofo_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_dorchester_academy_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_gaston_motel_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_kelly_ingram_park_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_meredith_march_against_fear_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_poor_peoples_campaign_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_st_augustine_movement_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_selma_to_montgomery_marches_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_founding_001",
+        "type": "cites",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_sncc_org_001",
@@ -575,7 +776,73 @@
       "Freedom Rides",
       "voter registration"
     ],
-    "related": []
+    "related": [
+      {
+        "id": "ent_albany_movement_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_cofo_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_vote_1963_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_lowndes_county_freedom_org_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_meredith_march_against_fear_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_movement_civil_rights_movement",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_nashville_student_movement_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_selma_to_montgomery_marches_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_shaw_university_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_albany_movement_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_vote_1963_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_meredith_march_against_fear_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_greensboro_woolworth_sit_in_site_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_web_du_bois_001",
@@ -653,6 +920,37 @@
       "Pan-Africanism",
       "Great Barrington"
     ],
-    "related": []
+    "related": [
+      {
+        "id": "ent_clark_atlanta_university_001",
+        "type": "employed_by",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_east_st_louis_massacre_001",
+        "type": "cites",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_fisk_university_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_hayti_durham_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_naacp_founding_001",
+        "type": "attended",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_niagara_movement_001",
+        "type": "attended",
+        "direction": "outgoing"
+      }
+    ]
   }
 ]
