@@ -260,6 +260,13 @@ slim data aside (map, precision, maturity, revision — media lives in the mast)
 hairline-ruled with automatic index numerals. Connected records are one room (1-hop + optional
 2-hop).
 
+**`/stories/[slug]`** — atmosphere mast: rights-cleared B&W collage mosaic (deterministic per
+slug via `selectAtmospherePlane`; tiles from `/brand/collage/tiles/`) over a flat geometric SVG
+fallback when tiles fail, Save-Data, or reduced motion. The mosaic is symbolic atmosphere — not
+a portrait of the story subject. Attribution at `/stories/mosaic-credits`. Editorial serif body
+(`--ds-content-max`); copper **View on map** CTA when geo is available (one primary action per
+view).
+
 **`/search`, `/facts`, `/legal`** — document rhythm: mast, filter row (native controls,
 compact), result list as top-rule entries with mono meta lines. Pagination quiet buttons.
 
@@ -289,6 +296,9 @@ requires updating every prior use of the pattern it replaces — no parallel voc
 - `ds-data-strip` — mono numbers row.
 - `ds-band` — fixed-ink full-bleed band (one per page max).
 - `ds-card` — boxed object (photo, form region, aside module only).
+- `AtmospherePlane` + `selectAtmospherePlane` — story mast media plane (`mode: mosaic` default,
+  `geometric` fallback); tiles from `tile-credits.ts`. Entity pages use `EntityRecordMark`
+  instead — never collage mosaics on `/entity/[id]`.
 - `Notice` — the only honest-state surface; never toasts.
 - Tokens only; no raw hex, no shadows, no gradients; hairlines carry separation.
 

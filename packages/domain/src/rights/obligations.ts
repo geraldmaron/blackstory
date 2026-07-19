@@ -15,6 +15,7 @@
 /** Named source classes the calls out explicitly; extend as new UGC adapters land. */
 export const OBLIGATION_SOURCE_CLASSES = [
   'reddit',
+  'searxng_search',
   'brave_search',
   'exa_search',
   'rss',
@@ -144,6 +145,21 @@ export function defaultSourceObligationsSeed(seedAt: string): readonly SourceObl
       livenessRecheckRequired: true,
       livenessRecheckIntervalDays: 7,
       notes: 'Gated channel ().',
+      createdAt: seedAt,
+      updatedAt: seedAt,
+    },
+    {
+      adapterId: 'searxng_search',
+      sourceClass: 'searxng_search',
+      deletionSync: { required: false, contractual: false },
+      republicationProhibited: true,
+      mlTrainingProhibited: false,
+      storageRightsTierRequired: true,
+      attributionRequired: true,
+      livenessRecheckRequired: false,
+      notes:
+        'Self-hosted SearXNG. Operator must confirm upstream-engine policy before caching ' +
+        'beyond the evidence-pointer doctrine (../rights/evidence-pointer.js).',
       createdAt: seedAt,
       updatedAt: seedAt,
     },

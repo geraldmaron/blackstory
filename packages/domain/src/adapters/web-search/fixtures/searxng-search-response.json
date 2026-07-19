@@ -1,0 +1,35 @@
+{
+  "query": "freedom rider Montgomery County Alabama",
+  "number_of_results": 0,
+  "results": [
+    {
+      "url": "https://piedmontcountyhistory.example.org/freedom-riders",
+      "title": "Piedmont County Historical Society -- Freedom Riders Remembered",
+      "content": "A local historical society page recalling Piedmont County residents who joined the Freedom Rides through Alabama in the early 1960s.",
+      "engine": "duckduckgo",
+      "engines": ["duckduckgo"]
+    },
+    {
+      "url": "https://janedoe-example-blog.example.net/grandmother-montgomery",
+      "title": "Personal blog: my grandmother's civil rights activism in Montgomery",
+      "content": "A grandchild's blog post about her grandmother's involvement in the Montgomery civil rights movement.",
+      "engine": "duckduckgo",
+      "engines": ["duckduckgo"]
+    },
+    {
+      "url": "https://malformed-example.test/no-title-result",
+      "content": "missing title ok",
+      "engine": "duckduckgo",
+      "engines": ["duckduckgo"]
+    },
+    {
+      "title": "unrelated result with no url",
+      "content": "should be rejected"
+    }
+  ],
+  "answers": [],
+  "corrections": [],
+  "infoboxes": [],
+  "suggestions": [],
+  "unresponsive_engines": []
+}

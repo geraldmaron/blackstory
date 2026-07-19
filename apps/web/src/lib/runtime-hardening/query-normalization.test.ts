@@ -80,7 +80,7 @@ test('normalizeQueryString keeps allowlisted /explore map params', () => {
     lng: '-77.0',
     zoom: '6',
     selected: 'ent_dunbar_school_001',
-    density: '1',
+    layerMode: 'presence',
     state: 'DC',
     group: '1',
     lines: '1',
@@ -91,7 +91,7 @@ test('normalizeQueryString keeps allowlisted /explore map params', () => {
   });
   assert.equal(
     qs,
-    'era=1970s&kind=school&lat=38.9000&lng=-77.0000&zoom=6.00&selected=ent_dunbar_school_001&state=DC&density=1&group=1&lines=1&decade=1970s&edge=rel_landmark_occurred_at_school',
+    'era=1970s&kind=school&lat=38.9000&lng=-77.0000&zoom=6.00&selected=ent_dunbar_school_001&state=DC&layerMode=presence&group=1&lines=1&decade=1970s&edge=rel_landmark_occurred_at_school',
   );
 });
 
@@ -107,14 +107,14 @@ test('normalizeQueryString preserves /explore?state= revisit links (homepage chi
   );
 });
 
-test('normalizeQueryString canonicalizes explore density/true and viewport precision', () => {
+test('normalizeQueryString canonicalizes explore layerMode and viewport precision', () => {
   const qs = normalizeQueryString('/explore', {
     density: 'true',
     lat: '38.90721234',
     lng: '-77.03691234',
     zoom: '11.555',
   });
-  assert.equal(qs, 'lat=38.9072&lng=-77.0369&zoom=11.55&density=1');
+  assert.equal(qs, 'lat=38.9072&lng=-77.0369&zoom=11.55&layerMode=presence');
 });
 
 test('normalizeQueryString keeps allowlisted /history browse params', () => {

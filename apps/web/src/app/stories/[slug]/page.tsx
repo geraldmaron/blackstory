@@ -1,9 +1,9 @@
 /**
  * Longform story article page at `/stories/{slug}`.
  *
- * Geometric atmosphere mast, editorial serif body, related entity/fact off-ramps,
- * and a single copper map CTA when a related entity has a geo anchor. Emits
- * schema.org Article JSON-LD only — never ClaimReview.
+ * Atmosphere mast (rights-cleared mosaic or geometric fallback), editorial serif
+ * body, related entity/fact off-ramps, and a single copper map CTA when a related
+ * entity has a geo anchor. Emits schema.org Article JSON-LD only — never ClaimReview.
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -85,7 +85,10 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
     .map((id) => getSeedFact(id))
     .filter((fact): fact is NonNullable<typeof fact> => fact !== undefined);
 
-  const atmosphere = selectAtmospherePlane({ seedKey: story.slug });
+  const atmosphere = selectAtmospherePlane({
+    seedKey: story.slug,
+    relatedEntityIds: story.relatedEntityIds,
+  });
   const mapCta = mapCtaForStory(story.relatedEntityIds);
   const jsonLd = buildStoryArticleJsonLd(story);
 
@@ -113,8 +116,8 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
             </p>
           ) : null}
           <p className="ds-story-mast__credit">
-            Geometric atmosphere · {atmosphere.geometric.label} — not a photograph of this
-            story.
+            Archive mosaic · symbolic atmosphere — not a photograph of this story.{' '}
+            <Link href={atmosphere.attributionHref}>Mosaic credits</Link>
           </p>
         </div>
       </header>
@@ -179,6 +182,8 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
 
         <p className="ds-sans ds-story-article__footer">
           <Link href="/stories">All stories</Link>
+          {' · '}
+          <Link href="/stories/mosaic-credits">Archive mosaic credits</Link>
         </p>
       </article>
     </main>

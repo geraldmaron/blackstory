@@ -674,3 +674,4 @@ export * from './learning-index/index.js';
 // Statistics storage model: StatisticalSeries/StatisticalObservation/DerivedMeasurement + the
 // safe-combination validators (disjoint-geography sums, MOE propagation, growth significance).
 export * from './statistics/index.js';
+export * from './demographics/index.js';

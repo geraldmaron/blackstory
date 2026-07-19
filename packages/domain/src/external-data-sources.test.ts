@@ -42,3 +42,13 @@ test('tier-1 ingested sources carry their artifact checksums', () => {
     assert.match(source?.checksumSha256 ?? '', /^[a-f0-9]{64}$/, `${id}: checksum recorded`);
   }
 });
+
+test('NHGIS county race entry is registered disabled pending API key', () => {
+  const nhgis = getExternalDataSource('nhgis-county-race');
+  assert.ok(nhgis);
+  assert.equal(nhgis.registryState, 'disabled');
+  assert.equal(nhgis.license.verdict, 'attribution-required');
+  assert.deepEqual([...nhgis.geographies].sort(), ['county', 'state']);
+  assert.match(nhgis.dataUrl, /^https:\/\/api\.ipums\.org\//);
+  assert.match(nhgis.notes, /NHGIS_API_KEY/);
+});

@@ -17,6 +17,8 @@ import {
   OPENFREEMAP_GLYPHS_URL,
   OPENFREEMAP_SOURCE_ID,
   OPENFREEMAP_TILE_SOURCE_URL,
+  POPULATION_CHANGE_TIER_FILL,
+  POPULATION_SHARE_TIER_FILL,
   plateForScheme,
   type MapColorScheme,
 } from '../../lib/map-experience/dignity-style';
@@ -37,6 +39,7 @@ import type {
 import {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_COUNTY_LINES_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
@@ -53,10 +56,12 @@ import {
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
 import { COUNTY_LINES_MIN_ZOOM } from '../../lib/map-experience/us-county-lines';
+import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
 
 export {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_COUNTY_LINES_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
@@ -198,7 +203,7 @@ function kindStrokeColorExpression(rimColor: string): ExpressionSpecification {
 export type BuildExploreMapStyleInput = {
   readonly featureCollection: ExploreMapFeatureCollection;
   readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
-  readonly densityLayerEnabled: boolean;
+  readonly layerMode: ExploreLayerMode;
   readonly historyEdgesEnabled?: boolean;
   /**
    * When true, nearby points aggregate while zoomed out (opt-in via `/explore?group=1`). When false, every
@@ -222,6 +227,38 @@ export type BuildExploreMapStyleInput = {
 export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpecification {
   const plate = plateForScheme(input.colorScheme ?? 'dark');
   const clusteringEnabled = input.clusteringEnabled !== false;
+  const presenceFillActive = input.layerMode === 'presence';
+  const populationFillActive = input.layerMode === 'blackShare' || input.layerMode === 'blackChange';
+  const shareFillExpression: ExpressionSpecification = [
+    'match',
+    ['get', 'shareTier'],
+    'majority',
+    POPULATION_SHARE_TIER_FILL.majority,
+    'high',
+    POPULATION_SHARE_TIER_FILL.high,
+    'mid',
+    POPULATION_SHARE_TIER_FILL.mid,
+    'low',
+    POPULATION_SHARE_TIER_FILL.low,
+    'trace',
+    POPULATION_SHARE_TIER_FILL.trace,
+    plate.densityUnknown,
+  ] as unknown as ExpressionSpecification;
+  const changeFillExpression: ExpressionSpecification = [
+    'match',
+    ['get', 'changeTier'],
+    'gainStrong',
+    POPULATION_CHANGE_TIER_FILL.gainStrong,
+    'gainModerate',
+    POPULATION_CHANGE_TIER_FILL.gainModerate,
+    'neutral',
+    POPULATION_CHANGE_TIER_FILL.neutral,
+    'lossModerate',
+    POPULATION_CHANGE_TIER_FILL.lossModerate,
+    'lossStrong',
+    POPULATION_CHANGE_TIER_FILL.lossStrong,
+    plate.densityUnknown,
+  ] as unknown as ExpressionSpecification;
   return {
     version: 8,
     name: 'BlackStory — Explore',
@@ -349,7 +386,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         // Always hittable for state selection density tint is optional chrome on top.
         layout: { visibility: 'visible' },
         paint: {
-          'fill-color': input.densityLayerEnabled
+          'fill-color': presenceFillActive
             ? [
                 'match',
                 ['get', 'densityTier'],
@@ -363,6 +400,24 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               ]
             : plate.densityDisabled,
           'fill-opacity': 1,
+        },
+      },
+      {
+        id: EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
+        type: 'fill',
+        source: EXPLORE_COUNTY_LINES_SOURCE_ID,
+        minzoom: COUNTY_LINES_MIN_ZOOM,
+        layout: {
+          visibility: populationFillActive ? 'visible' : 'none',
+        },
+        paint: {
+          'fill-color':
+            input.layerMode === 'blackShare'
+              ? shareFillExpression
+              : input.layerMode === 'blackChange'
+                ? changeFillExpression
+                : plate.densityDisabled,
+          'fill-opacity': populationFillActive ? 0.85 : 0,
         },
       },
       {

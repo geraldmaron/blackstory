@@ -1,6 +1,7 @@
 /**
- * Atmosphere plane presentation — full-bleed charcoal mast plate with a flat
- * geometric SVG pattern. Decorative layer is aria-hidden in the component.
+ * Atmosphere plane presentation — full-bleed charcoal mast plate with soft mosaic
+ * or geometric fallback. Flat matte only; decorative layer is aria-hidden in the
+ * component. Reduced-motion readers get geometric via CSS (client also gates mosaic).
  */
 
 .ds-atmosphere {
@@ -20,7 +21,29 @@
   opacity: 0.22;
 }
 
+.ds-atmosphere__mosaic {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-auto-rows: 1fr;
+  opacity: 0.16;
+  filter: grayscale(1) contrast(1.12);
+}
+
+.ds-atmosphere__tile {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  min-height: 4.5rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .ds-atmosphere__mosaic {
+    display: none;
+  }
+
   .ds-atmosphere__geometric {
     opacity: 0.28;
   }

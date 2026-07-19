@@ -29,19 +29,24 @@ test('filtering by era reduces results without hiding unmatched entities silentl
   }
 });
 
-test('parses shareable URL viewport and density state', () => {
+test('parses shareable URL viewport and layer model state', () => {
   const view = buildExploreViewModel({
     lat: '38.9072',
     lng: '-77.0369',
     zoom: '11.5',
-    density: '1',
+    layerMode: 'presence',
     selected: 'ent_15th_st_church_001',
   });
   assert.ok(view.viewState.viewport);
   assert.equal(view.viewState.viewport!.lat, 38.9072);
-  assert.equal(view.viewState.density, true);
+  assert.equal(view.viewState.layerMode, 'presence');
   assert.equal(view.viewState.selected, 'ent_15th_st_church_001');
   assert.equal(view.viewState.lines, false);
+});
+
+test('legacy density=1 deep links still open presence layer', () => {
+  const view = buildExploreViewModel({ density: '1' });
+  assert.equal(view.viewState.layerMode, 'presence');
 });
 
 test('lines=1 projects evidence-backed history edges onto the map', () => {

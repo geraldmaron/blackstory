@@ -10,7 +10,9 @@ Firebase-first control plane for roster discovery jobs. Scrapers do **not** run 
 4. **GHA** — `workflow_dispatch` + weekly **fixture** smoke for community obscurity (dev/CI)
 5. **Cloud Run Job** (`workers/research-node`) — escalate when a run may exceed ~30 minutes
 
-Live network fetch is still “download then inject” for RSS/ABS/IA/DPLA/Brave JSON. Wikimedia+federal automation uses committed fixtures until live clients ship.
+Live network fetch is still “download then inject” for RSS/ABS/IA/DPLA JSON. Web-search
+defaults to **SearXNG** (self-hosted on Corsair via Tailscale, or injected JSON). Brave remains
+an explicit fallback. Wikimedia+federal automation uses committed fixtures until live clients ship.
 
 ## Local / CI fixture dispatch
 
@@ -42,7 +44,7 @@ Job ids: `community-obscurity-discovery`, `discovery-campaign-rss`,
 |-----|-----|
 | community-obscurity / rss | `DISCOVERY_FEED_XML=/path/to/feed.xml` |
 | archive-dpla | `DISCOVERY_IA_JSON=…` and/or `DISCOVERY_DPLA_JSON=…` |
-| web-search | `DISCOVERY_BRAVE_JSON=…` **and** `DISCOVERY_STORAGE_TERMS_CONFIRMED=true` (only after written Brave storage-rights) |
+| web-search | `DISCOVERY_SEARXNG_JSON=…` and/or `SEARXNG_BASE_URL=…` **and** `DISCOVERY_STORAGE_TERMS_CONFIRMED=true` (operator engine-policy confirmation). Brave fallback: `DISCOVERY_WEB_SEARCH_PROVIDER=brave` + `DISCOVERY_BRAVE_JSON=…` |
 | wikimedia-federal | fixture fan-out only (no live clients yet) |
 
 Example ABS live:
@@ -54,6 +56,30 @@ DISCOVERY_FEED_XML=/tmp/abs-feed.xml \
 node --conditions development --import tsx packages/operator-cli/src/bin.ts discovery-dispatch \
   --job community-obscurity-discovery --mode live
 ```
+
+Example SearXNG live (Corsair Tailscale from Mac, or `127.0.0.1:8888` on Corsair):
+
+```bash
+SEARXNG_BASE_URL=http://100.119.72.84:8888 \
+DISCOVERY_SEARXNG_QUERY='Black Wall Street Greenwood Tulsa' \
+DISCOVERY_STORAGE_TERMS_CONFIRMED=true \
+DISCOVERY_KILL_SWITCH=disengaged \
+OPERATOR_CLI_PRIVACY_PEPPER=dev \
+node --conditions development --import tsx packages/operator-cli/src/bin.ts discovery-dispatch \
+  --job discovery-campaign-web-search --mode live \
+  --queue-survivors --commit \
+  --operator-id scheduled-discovery --session-id "sess-$(date -u +%Y%m%dT%H%M%SZ)"
+```
+
+Survivors become private Firestore `researchCases` (`state: candidate`) for admin
+`/console/candidate-queue` and `/console/research-cases`. Never auto-publishes.
+
+**Preferred live schedule:** Corsair systemd user timer
+`scripts/systemd/blackstory-discovery-web-search.timer` (08:30 UTC) →
+`scripts/run-scheduled-searxng-discovery.sh`. Credentials live only on Corsair in
+`~/.config/blackstory/discovery.env` (`APP_FIREBASE_ALLOW_PRODUCTION=1` + ADC path + pepper
+from 1Password). GCP Functions stay fixture-only (no Tailscale).
+See `~/Developer/Guides/CLI-Reference.md` and `~/Developer/Guides/Secrets-1Password.md`.
 
 ## GitHub Actions
 
@@ -93,6 +119,11 @@ Per **ADR-018**, production discovery crons deploy as Cloud Functions for Fireba
 
 App Hosting does **not** host these functions. Each roster job has a scheduled export;
 timeouts are capped at **1800s**. Escalate to Cloud Run Jobs when a single run needs longer.
+
+**Web-search / SearXNG:** Cloud Functions stay on `DISCOVERY_MODE=fixture` until the
+runtime can reach the Corsair Tailscale host. For live daily SearXNG, install the Mac
+launchd agent (`scripts/com.blackstory.discovery-web-search.plist`) or run
+`scripts/run-scheduled-searxng-discovery.sh` on any Tailscale peer with this checkout.
 
 ```bash
 pnpm --filter @repo/functions-discovery test

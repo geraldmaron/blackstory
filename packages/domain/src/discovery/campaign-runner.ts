@@ -214,3 +214,10 @@ export function toEditorialLeadPreview(
       : {}),
   };
 }
+
+/** Convenience: map survivors to editorial lead previews (URL/title/summary). */
+export function listSurvivorLeadPreviews(
+  campaign: DiscoveryCampaignResult,
+): readonly EditorialLeadPreview[] {
+  return listCampaignSurvivors(campaign).map(toEditorialLeadPreview);
+}

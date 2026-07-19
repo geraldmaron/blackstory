@@ -10,10 +10,15 @@ export {
   geometricFallbackById,
 } from './geometric-fallbacks';
 export type { GeometricFallback, GeometricFallbackId } from './geometric-fallbacks';
-export { selectAtmospherePlane } from './select-atmosphere-plane';
+export { selectAtmospherePlane, selectMosaicTiles } from './select-atmosphere-plane';
 export type {
   AtmosphereDensity,
   AtmospherePlaneSelection,
   AtmospherePlaneSelectionInput,
 } from './select-atmosphere-plane';
+export {
+  ATMOSPHERE_ATTRIBUTION_HREF,
+  ATMOSPHERE_TILE_CREDITS,
+} from './tile-credits';
+export type { AtmosphereTileCredit } from './tile-credits';
 export { renderStoryTitle, STORY_TITLE_ACCENTS } from './story-title';

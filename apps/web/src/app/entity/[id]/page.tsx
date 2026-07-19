@@ -19,8 +19,7 @@ import { EntityRelatedList } from '../../../components/entity/EntityRelatedList'
 import { EntityLinkDiscoveryHint } from '../../../components/entity/EntityLink';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
-import { EntityPrimaryImage } from '../../../components/entity/EntityPrimaryImage';
-import { EntityRecordMark } from '../../../components/entity/EntityRecordMark';
+import { EntityMastMedia } from '../../../components/entity/EntityMastMedia';
 import { RecordGapNotice } from '../../../components/entity/RecordGapNotice';
 import { EntityEvidencePanel } from '../../../components/evidence';
 import { CompactFactReference } from '../../../components/facts';
@@ -117,16 +116,14 @@ export default async function EntityPage({ params }: EntityPageProps) {
     <main className="ds-container ds-page" id="main">
       <header className="ds-entity-mast">
         <div className="ds-entity-mast__media">
-          {entity.primaryImage ? (
-            <EntityPrimaryImage image={entity.primaryImage} entityName={entity.displayName} priority />
-          ) : (
-            <EntityRecordMark
-              entityId={entity.id}
-              entityName={entity.displayName}
-              kind={entity.kind}
-              jurisdictionLabel={entity.jurisdictionLabel}
-            />
-          )}
+          <EntityMastMedia
+            entityId={entity.id}
+            entityName={entity.displayName}
+            kind={entity.kind}
+            jurisdictionLabel={entity.jurisdictionLabel}
+            {...(entity.primaryImage !== undefined ? { primaryImage: entity.primaryImage } : {})}
+            priority
+          />
         </div>
         <div className="ds-entity-mast__identity">
           <p className="ds-page__eyebrow">

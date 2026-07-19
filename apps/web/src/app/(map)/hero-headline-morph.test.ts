@@ -34,15 +34,15 @@ const EXPECTED_SUBJECT_LABELS: readonly string[] = [
   'Black Story',
 ];
 
-/** Cumulative ms when each phase begins (transition + dwell of prior phases). */
-const PHASE_START_MS: readonly number[] = [
-  0, // history: transition 0, dwell 2400
-  2400, // his-story: transition 1200, dwell 1800
-  5400, // her-story: transition 800, dwell 1100
-  7300, // their-story
-  9200, // your-story
-  11100, // black-story
-];
+/** Cumulative ms when each phase begins (derived from the live schedule). */
+function expectedPhaseStartMs(index: number): number {
+  let startMs = 0;
+  for (let i = 0; i < index; i += 1) {
+    const phase = HERO_HEADLINE_PHASES[i]!;
+    startMs += phase.transitionMs + phase.dwellMs;
+  }
+  return startMs;
+}
 
 test('phases appear in morph order with expected subject labels', () => {
   assert.deepEqual(
@@ -85,23 +85,25 @@ test('elapsed zero starts on History', () => {
 });
 
 test('phase start times match cumulative transition + dwell schedule', () => {
-  for (let index = 0; index < PHASE_START_MS.length; index += 1) {
-    assert.equal(heroHeadlinePhaseStartMs(index), PHASE_START_MS[index]);
+  for (let index = 0; index < HERO_HEADLINE_PHASES.length; index += 1) {
+    assert.equal(heroHeadlinePhaseStartMs(index), expectedPhaseStartMs(index));
   }
 });
 
-test('History → His Story boundary at 2399 / 2400 ms', () => {
+test('History → His Story boundary follows History dwell', () => {
   const historyIndex = getHeroHeadlinePhaseIndexById('history');
   const hisStoryIndex = getHeroHeadlinePhaseIndexById('his-story');
+  const boundaryMs = expectedPhaseStartMs(hisStoryIndex);
 
-  assert.equal(resolveHeroHeadlinePhaseIndex(2399, false), historyIndex);
-  assert.equal(resolveHeroHeadlinePhaseIndex(2400, false), hisStoryIndex);
+  assert.equal(resolveHeroHeadlinePhaseIndex(boundaryMs - 1, false), historyIndex);
+  assert.equal(resolveHeroHeadlinePhaseIndex(boundaryMs, false), hisStoryIndex);
 });
 
-test('Black Story begins at 11100 ms', () => {
+test('Black Story begins at the final cumulative start', () => {
   const blackStoryIndex = getHeroHeadlinePhaseIndexById('black-story');
+  const blackStartMs = expectedPhaseStartMs(blackStoryIndex);
 
-  assert.equal(resolveHeroHeadlinePhaseIndex(11100, false), blackStoryIndex);
+  assert.equal(resolveHeroHeadlinePhaseIndex(blackStartMs, false), blackStoryIndex);
   assert.equal(getHeroHeadlinePhaseById('black-story').prefix, 'Black');
 });
 
@@ -119,12 +121,12 @@ test('historySplitHint describes the shared-s History → His Story morph', () =
   assert.equal(hint.sharedS, true);
 });
 
-test('cumulative timing lands mid-phase for Her Story at 5400 ms', () => {
+test('cumulative timing lands mid-phase for Her Story', () => {
   const herStoryIndex = getHeroHeadlinePhaseIndexById('her-story');
-  const herStoryStartMs = PHASE_START_MS[herStoryIndex]!;
+  const herStoryStartMs = heroHeadlinePhaseStartMs(herStoryIndex);
   const herStoryPhase = getHeroHeadlinePhaseById('her-story');
 
-  assert.equal(herStoryStartMs, 5400);
+  assert.equal(herStoryStartMs, expectedPhaseStartMs(herStoryIndex));
   assert.equal(resolveHeroHeadlinePhaseIndex(herStoryStartMs, false), herStoryIndex);
   assert.equal(
     resolveHeroHeadlinePhaseIndex(

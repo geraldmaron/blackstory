@@ -1,7 +1,7 @@
 /**
- * Presentational record anatomy card (kind → name → story → facts → CTA). Kept for SSR
- * smoke tests and any surface that still wants a compact off-ramp; Explore and the home
- * map navigate to `/entity/[id]` instead of mounting this overlay.
+ * Presentational record anatomy card (kind → name → story → facts → CTA). Explore mounts this
+ * in the spotlight shell as a preview-first selection; the copper CTA is the off-ramp to the
+ * full entity page. Also used for SSR smoke tests and any other compact record surface.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -83,7 +83,7 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
       </div>
 
       <h3 className="ds-nc__title" id="ds-nc-title">
-        <Link className="ds-nc__title-link" href={properties.href}>
+        <Link className="ds-nc__title-link" href={properties.href} scroll={false}>
           {properties.displayName}
         </Link>
       </h3>
@@ -134,7 +134,7 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
 
       <p className="ds-nc__precision">{radiusAffordanceLabel(feature)}</p>
 
-      <Link className="ds-cta ds-cta--copper ds-nc__action" href={properties.href}>
+      <Link className="ds-cta ds-cta--copper ds-nc__action" href={properties.href} scroll={false}>
         Open full record
       </Link>
     </article>

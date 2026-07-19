@@ -180,7 +180,10 @@
 .ds-kind-badge {
   display: inline-flex;
   align-items: center;
+  flex-wrap: nowrap;
   gap: var(--ds-space-2);
+  max-width: 100%;
+  white-space: nowrap;
 }
 
 .ds-kind-badge__label {
@@ -190,6 +193,13 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ds-ink-muted);
+  white-space: nowrap;
+}
+
+.ds-kind-badge__icon {
+  flex-shrink: 0;
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
 .ds-kind-badge--compact {
@@ -201,9 +211,9 @@
   letter-spacing: 0.08em;
 }
 
-.ds-kind-badge .ds-legend-glyph--ring {
-  background: transparent !important;
-  border-width: 2px;
+.ds-kind-badge--compact .ds-kind-badge__icon {
+  width: 0.625rem;
+  height: 0.625rem;
 }
 
 /* Narrative card inherits record typography; tier color/weight from shell.css tokens. */
@@ -363,6 +373,56 @@
   gap: var(--ds-space-2);
 }
 
+.ds-explore__layer-model {
+  display: grid;
+  gap: var(--ds-space-3);
+  min-width: min(100%, 18rem);
+}
+
+.ds-explore__layer-model-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.ds-explore__layer-model-fieldset legend {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-explore__layer-model-options {
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-explore__layer-model-option {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: 2.75rem;
+  padding: var(--ds-space-2) 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.ds-explore__layer-model-option input {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--ds-copper-text);
+}
+
+.ds-explore__layer-model-range {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
 .ds-explore__results-count {
   margin: 0;
   font-family: var(--ds-font-mono);
@@ -374,14 +434,8 @@
 }
 
 .ds-explore-result-list {
-  max-height: min(60svh, 32rem);
-  overflow: auto;
-}
-
-@media (min-width: 56rem) {
-  .ds-explore-result-list {
-    max-height: calc(100svh - 22rem);
-  }
+  max-height: none;
+  overflow: visible;
 }
 
 /*

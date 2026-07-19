@@ -56,6 +56,14 @@ export {
 export { commitOperatorIntake } from './commit.js';
 
 export {
+  prepareDiscoverySurvivorIntake,
+  DISCOVERY_SURVIVOR_INTAKE_VERSION,
+  type DiscoverySurvivorIntakeItem,
+  type DiscoverySurvivorIntakeResult,
+  type PrepareDiscoverySurvivorIntakeInput,
+} from './discovery-survivor-intake.js';
+
+export {
   buildCitationPrefill,
   createNodeSafeFetchDependencies,
   nodePinnedTransport,

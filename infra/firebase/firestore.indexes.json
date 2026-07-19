@@ -164,6 +164,14 @@
         { "fieldPath": "kind", "order": "ASCENDING" },
         { "fieldPath": "parentId", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "researchCases",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "state", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

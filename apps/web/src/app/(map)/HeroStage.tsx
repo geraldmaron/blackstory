@@ -28,7 +28,7 @@ import type {
 } from '../../lib/map-experience/build-explore-map-source';
 import { FINAL_FRAME_LABEL, type DecadeFlowFrame } from '../../lib/map-experience/decade-flow';
 import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
-import { buildExploreHref, viewportForState, type ExploreViewport } from '../../lib/map-experience/url-state';
+import { buildExploreHref, defaultExploreOverlayState, viewportForState, type ExploreViewport } from '../../lib/map-experience/url-state';
 import { HeroHeadlineMorph } from './HeroHeadlineMorph';
 import { useMapStage } from './MapStage';
 
@@ -50,9 +50,7 @@ export type HeroStageProps = {
 
 const RESTING_HREF = buildExploreHref({
   filters: DEFAULT_EXPLORE_FILTERS,
-  density: false,
-  group: false,
-  lines: false,
+  ...defaultExploreOverlayState(),
 });
 const TRANSITION_FLAG = 'ds-map-transition';
 
@@ -138,8 +136,9 @@ export function HeroStage({
       stage.patchData({
         featureCollection,
         jurisdictionAreaFeatures,
-        densityEnabled: false,
+        layerMode: 'off',
         densityLevels: [],
+        countyChoroplethLevels: [],
         historyEdgesEnabled: false,
         historyEdgeCollection: { type: 'FeatureCollection', features: [] },
       });
@@ -148,8 +147,9 @@ export function HeroStage({
     stage.patchData({
       featureCollection: frame.featureCollection,
       jurisdictionAreaFeatures,
-      densityEnabled: frame.densityLevels.length > 0,
+      layerMode: frame.densityLevels.length > 0 ? 'presence' : 'off',
       densityLevels: frame.densityLevels,
+      countyChoroplethLevels: [],
       historyEdgesEnabled: frame.edgeCollection.features.length > 0,
       historyEdgeCollection: frame.edgeCollection,
     });
@@ -174,9 +174,7 @@ export function HeroStage({
           engage(
             buildExploreHref({
               filters: DEFAULT_EXPLORE_FILTERS,
-              density: false,
-              group: false,
-              lines: false,
+              ...defaultExploreOverlayState(),
               selected: entityId,
               viewport: { lat, lng, zoom: CAMERA_POINT_ZOOM },
             }),
@@ -195,9 +193,7 @@ export function HeroStage({
         engage(
           buildExploreHref({
             filters: DEFAULT_EXPLORE_FILTERS,
-            density: false,
-            group: false,
-            lines: false,
+            ...defaultExploreOverlayState(),
             state: postalCode,
           }),
         );
@@ -210,9 +206,7 @@ export function HeroStage({
         engage(
           buildExploreHref({
             filters: DEFAULT_EXPLORE_FILTERS,
-            density: false,
-            group: false,
-            lines: false,
+            ...defaultExploreOverlayState(),
             viewport,
           }),
         );

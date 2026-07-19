@@ -409,6 +409,27 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     notes: 'Black-owned nonemployer business counts and receipts.',
   },
   {
+    id: 'nhgis-county-race',
+    displayName: 'IPUMS NHGIS county race / Black population time series',
+    custodian: 'IPUMS NHGIS (University of Minnesota)',
+    homepageUrl: 'https://www.nhgis.org/',
+    dataUrl: 'https://api.ipums.org/',
+    license: {
+      name: 'Free for registered IPUMS users — IPUMS terms of use (attribution required)',
+      verdict: 'attribution-required',
+      notes: 'Registration and NHGIS_API_KEY required; no automated ingest until human gate clears.',
+    },
+    vintage: 'Historical decennial county race tables 1790–2020 (NHGIS time series + crosswalks)',
+    geographies: ['county', 'state'],
+    cadence: 'irregular',
+    registryState: 'disabled',
+    notes:
+      'Historical decennial 1790–2020 county race counts for pre-2000 decades and boundary-stable ' +
+      'Δ via NHGIS time-series tables + crosswalks. Blocked on human NHGIS_API_KEY registration — ' +
+      'see packages/domain/src/adapters/nhgis/ scaffold and demographics/comparability.ts for ' +
+      'category comparability notes (do not invent harmonized totals).',
+  },
+  {
     id: 'fcc-broadband-map',
     displayName: 'FCC National Broadband Map (BDC)',
     custodian: 'Federal Communications Commission',

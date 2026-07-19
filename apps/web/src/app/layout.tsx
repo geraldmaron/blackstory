@@ -12,6 +12,8 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Sora, Inter, Source_Serif_4, IBM_Plex_Mono } from 'next/font/google';
 import '@repo/ui/styles.css';
+import '@fortawesome/fontawesome-svg-core/styles.css';
+import '../lib/fontawesome';
 import { SiteShell } from '../components/SiteShell';
 import './shell.css';
 

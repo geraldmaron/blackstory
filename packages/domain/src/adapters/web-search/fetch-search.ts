@@ -1,16 +1,8 @@
 /**
- * Fetches Brave Web Search results through the safe HTTP port. Never calls
- * `fetch` directly -- see ../internet-archive/shared/http-port.ts for why. The API key is always
- * supplied by the caller (e.g. `BRAVE_SEARCH_API_KEY`) -- never hardcoded or read from an env var
- * here; tests pass a deterministic fake key, mirroring ../dpla/fetch-search.ts's convention.
- *
- * `fetchBraveWebSearchBudgeted` checks the -backed budget guard (./budget-guard.ts) BEFORE
- * issuing the query at all -- a denied budget never reaches the network. `fetchBraveWebSearch`
- * performs the HTTP call and normalization; normalization's own storage-terms gate
- * (./normalizer.ts `assertStorageTermsConfirmed`) is a separate, independent check -- a search
- * call itself is not gated by storage-rights confirmation (only persistence is), so
- * `fetchBraveWebSearch` may execute the live query even when `storageTermsConfirmed` is false and
- * will only fail once it tries to turn a result into a storable candidate.
+ * Fetches web-search results (Brave or SearXNG) through the safe HTTP port. Never calls
+ * `fetch` directly — see ../internet-archive/shared/http-port.ts. Caller supplies keys /
+ * base URLs; this module never reads env vars. Budgeted helpers check the campaign budget
+ * guard before any network call. Storage-terms gating happens at normalize/persist time.
  */
 import {
   assertAllowedContentType,
@@ -20,6 +12,10 @@ import {
 } from '../internet-archive/shared/http-port.js';
 import type { SourceRegistryEntry } from '../types.js';
 import { BRAVE_API_KEY_HEADER, buildBraveWebSearchUrl, parseBraveSearchResponse } from './brave-client.js';
+import {
+  buildSearxngSearchUrl,
+  parseSearxngSearchResponse,
+} from './searxng-client.js';
 import {
   evaluateWebSearchQueryBudget,
   type DailyBudgetEvaluator,
@@ -47,6 +43,9 @@ export type FetchBraveWebSearchInput = {
 };
 
 export async function fetchBraveWebSearch(input: FetchBraveWebSearchInput): Promise<readonly WebSearchCandidateRecord[]> {
+  if (input.config.provider !== 'brave') {
+    throw new Error(`fetchBraveWebSearch requires provider=brave; got ${input.config.provider}`);
+  }
   if (!input.config.apiKey.trim()) {
     throw new Error('BRAVE_SEARCH_API_KEY is required -- see .env.example (never hardcode a key)');
   }
@@ -68,6 +67,71 @@ export async function fetchBraveWebSearch(input: FetchBraveWebSearchInput): Prom
   assertAllowedContentType(response, WEB_SEARCH_ALLOWED_CONTENT_TYPES);
   const raw = JSON.parse(response.bodyText) as unknown;
   const batch = parseBraveSearchResponse(raw);
+
+  const queryProvenance = stampExternalQueryProvenance({
+    provider: input.config.provider,
+    queryText: input.query,
+    executedAt: input.capturedAt,
+    planTermsVersion: input.config.planTermsVersion,
+  });
+
+  return normalizeWebSearchBatch({
+    results: batch.results,
+    registryEntry: input.registryEntry,
+    runId: input.runId,
+    capturedAt: input.capturedAt,
+    config: input.config,
+    queryProvenance,
+    ...(input.classification !== undefined ? { classification: input.classification } : {}),
+  });
+}
+
+export type FetchSearxngWebSearchInput = {
+  readonly query: string;
+  readonly config: WebSearchProviderConfig;
+  readonly registryEntry: SourceRegistryEntry;
+  readonly runId: string;
+  readonly capturedAt: string;
+  readonly client: SafeHttpClient;
+  readonly retries?: number;
+  readonly classification?: string;
+  readonly categories?: string;
+  readonly language?: string;
+};
+
+export async function fetchSearxngWebSearch(
+  input: FetchSearxngWebSearchInput,
+): Promise<readonly WebSearchCandidateRecord[]> {
+  if (input.config.provider !== 'searxng') {
+    throw new Error(`fetchSearxngWebSearch requires provider=searxng; got ${input.config.provider}`);
+  }
+  const baseUrl = input.config.baseUrl?.trim();
+  if (!baseUrl) {
+    throw new Error('SEARXNG_BASE_URL is required on WebSearchProviderConfig.baseUrl for live SearXNG fetch');
+  }
+  const url = buildSearxngSearchUrl({
+    baseUrl,
+    query: input.query,
+    ...(input.categories !== undefined ? { categories: input.categories } : {}),
+    ...(input.language !== undefined ? { language: input.language } : {}),
+  });
+  const headers: Record<string, string> = { accept: 'application/json' };
+  if (input.config.apiKey.trim()) {
+    headers.authorization = `Bearer ${input.config.apiKey}`;
+  }
+  const response = await withRetry(
+    () =>
+      input.client({
+        url,
+        method: 'GET',
+        headers,
+        allowedContentTypes: WEB_SEARCH_ALLOWED_CONTENT_TYPES,
+      }),
+    { retries: input.retries ?? 3, baseDelayMs: 250, isRetryable: defaultIsRetryable },
+  );
+  assertAllowedContentType(response, WEB_SEARCH_ALLOWED_CONTENT_TYPES);
+  const raw = JSON.parse(response.bodyText) as unknown;
+  const batch = parseSearxngSearchResponse(raw);
 
   const queryProvenance = stampExternalQueryProvenance({
     provider: input.config.provider,

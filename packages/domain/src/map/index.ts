@@ -41,6 +41,28 @@ export { buildDecadePresenceAggregates } from './decade-presence-from-spans.js';
 export type { DecadePresenceEntityInput } from './decade-presence-from-spans.js';
 
 export {
+  CENSUS_POPULATION_DECADES,
+  DEFAULT_POPULATION_CHANGE_FROM,
+  DEFAULT_POPULATION_CHANGE_TO,
+  DEFAULT_POPULATION_DECADE,
+  blackPopulationChange,
+  blackSharePercent,
+  bucketBlackChangeTier,
+  bucketBlackShareTier,
+  countyFips5,
+  isCensusPopulationDecade,
+  readCountyPopulation,
+} from './county-population.js';
+export type {
+  BlackChangeTier,
+  BlackPopulationChange,
+  BlackShareTier,
+  CensusPopulationDecade,
+  CountyPopulationIndex,
+  CountyPopulationRecord,
+} from './county-population.js';
+
+export {
   MAP_SOURCE_DEMO_FIXTURES,
   PLACE_DC_FIXTURE,
   SCHOOL_DC_FIXTURE,

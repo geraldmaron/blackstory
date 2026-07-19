@@ -47,6 +47,7 @@ import { brandPalette, darkTheme } from '@repo/ui';
 import {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_COUNTY_LINES_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
@@ -74,7 +75,9 @@ import {
 } from '../../lib/map-experience/camera-presets';
 import type { HistoryEdgeLineCollection } from '../../lib/map-experience/build-history-edge-lines';
 import type { StateDensityLevel } from '../../lib/map-experience/density';
+import type { CountyChoroplethLevel } from '../../lib/map-experience/county-choropleth';
 import { joinDensityOntoStatePolygons } from '../../lib/map-experience/join-state-polygons';
+import { joinPopulationOntoCountyPolygons } from '../../lib/map-experience/join-county-population';
 import {
   buildStateLabelElement,
   buildStateLabelMarkers,
@@ -86,7 +89,7 @@ import {
   COUNTY_LINES_PREFETCH_ZOOM,
   US_COUNTIES_GEOJSON_PATH,
 } from '../../lib/map-experience/us-county-lines';
-import type { ExploreViewport } from '../../lib/map-experience/url-state';
+import type { ExploreLayerMode, ExploreViewport } from '../../lib/map-experience/url-state';
 
 function readDocumentColorScheme(): MapColorScheme {
   if (typeof document === 'undefined') return 'dark';
@@ -122,6 +125,7 @@ const GEOGRAPHY_LAYER_IDS = new Set([
   'explore-street-fill',
   'explore-street-label',
   'explore-state-density-fill',
+  EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   'explore-state-bounds-line',
   'explore-state-selected-fill',
@@ -296,16 +300,21 @@ async function loadStatePolygonsWithDensity(
   source.setData(joined as any);
 }
 
-let countyLinesPromise: Promise<unknown> | undefined;
+type CountyPolygonCollection = {
+  type: 'FeatureCollection';
+  features: { type: string; id?: string; properties: Record<string, unknown>; geometry: unknown }[];
+};
 
-function fetchCountyLines(): Promise<unknown> {
+let countyLinesPromise: Promise<CountyPolygonCollection> | undefined;
+
+function fetchCountyPolygons(): Promise<CountyPolygonCollection> {
   if (!countyLinesPromise) {
     countyLinesPromise = fetch(US_COUNTIES_GEOJSON_PATH).then(async (response) => {
       if (!response.ok) {
         countyLinesPromise = undefined;
         throw new Error(`Failed to load ${US_COUNTIES_GEOJSON_PATH}: ${response.status}`);
       }
-      return (await response.json()) as unknown;
+      return (await response.json()) as CountyPolygonCollection;
     });
   }
   return countyLinesPromise;
@@ -316,18 +325,28 @@ function fetchCountyLines(): Promise<unknown> {
  * GeoJSON worker for nothing. */
 const countyLinesLoaded = new WeakSet<MapLibreMap>();
 
-/** Lazily fills the county-lines source (the related workstream). Deliberately zoom-triggered by the
- * caller, not eager: the ~2.3 MB asset is invisible below the layer's `minzoom`, so the
+/** Lazily fills the county source (hairlines + optional choropleth). Deliberately zoom-triggered
+ * by the caller, not eager: the ~2.3 MB asset is invisible below the layer's `minzoom`, so the
  * national resting frame never pays for it. */
-async function loadCountyLines(map: MapLibreMap): Promise<void> {
-  if (countyLinesLoaded.has(map)) return;
+async function loadCountyPolygons(
+  map: MapLibreMap,
+  choroplethLevels: readonly CountyChoroplethLevel[],
+): Promise<void> {
   const source = map.getSource(EXPLORE_COUNTY_LINES_SOURCE_ID) as GeoJSONSource | undefined;
   if (!source) return;
-  const collection = await fetchCountyLines();
-  if (countyLinesLoaded.has(map)) return;
+  const collection = await fetchCountyPolygons();
+  const joined =
+    choroplethLevels.length > 0
+      ? joinPopulationOntoCountyPolygons(collection, choroplethLevels)
+      : collection;
+  if (countyLinesLoaded.has(map)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+    source.setData(joined as any);
+    return;
+  }
   countyLinesLoaded.add(map);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-  source.setData(collection as any);
+  source.setData(joined as any);
 }
 
 function applyGeographyStyle(
@@ -431,8 +450,9 @@ function setSelectedStateFilter(map: MapLibreMap, postalCode: string | undefined
 export type MapStageDataPatch = {
   readonly featureCollection: ExploreMapFeatureCollection;
   readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
-  readonly densityEnabled: boolean;
+  readonly layerMode: ExploreLayerMode;
   readonly densityLevels: readonly StateDensityLevel[];
+  readonly countyChoroplethLevels?: readonly CountyChoroplethLevel[];
   /** When false, recreate the entities source without MapLibre clustering. Omitted patches keep the current stage value (default false). */
   readonly clusteringEnabled?: boolean;
   readonly historyEdgesEnabled: boolean;
@@ -522,8 +542,9 @@ type StageConfig = {
   style: StyleSpecification;
   featureCollection: ExploreMapFeatureCollection;
   jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
-  densityEnabled: boolean;
+  layerMode: ExploreLayerMode;
   densityLevels: readonly StateDensityLevel[];
+  countyChoroplethLevels: readonly CountyChoroplethLevel[];
   clusteringEnabled: boolean;
   historyEdgesEnabled: boolean;
   historyEdgeCollection: HistoryEdgeLineCollection;
@@ -569,8 +590,9 @@ export function MapStageProvider({
     style: initialStyle,
     featureCollection: initialFeatureCollection,
     jurisdictionAreaFeatures: initialJurisdictionAreaFeatures,
-    densityEnabled: false,
+    layerMode: 'off',
     densityLevels: [],
+    countyChoroplethLevels: [],
     clusteringEnabled: false,
     historyEdgesEnabled: false,
     historyEdgeCollection: EMPTY_EDGE_COLLECTION,
@@ -625,6 +647,7 @@ export function MapStageProvider({
       // them in place; see its doc comment. Grouping toggles pass recreateEntitiesSource.
       for (const id of [
         EXPLORE_STATE_DENSITY_LAYER_ID,
+        EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
         EXPLORE_COUNTY_LINES_LAYER_ID,
         'explore-state-bounds-line',
         SELECTED_FILL_ID,
@@ -647,11 +670,13 @@ export function MapStageProvider({
       void loadStatePolygonsWithDensity(map, configRef.current.densityLevels).catch((error) => {
         console.error('[MapStage] state polygon load failed', error);
       });
-      // County hairlines only cost their 2.3 MB once the camera is actually near their minzoom
-      // (deep links can land there directly, so the zoomend prefetch alone isn't enough).
-      if (map.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM) {
-        void loadCountyLines(map).catch((error) => {
-          console.error('[MapStage] county lines load failed', error);
+      const needsCountyGeometry =
+        map.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
+        configRef.current.layerMode === 'blackShare' ||
+        configRef.current.layerMode === 'blackChange';
+      if (needsCountyGeometry) {
+        void loadCountyPolygons(map, configRef.current.countyChoroplethLevels).catch((error) => {
+          console.error('[MapStage] county polygon load failed', error);
         });
       }
       syncEntityMarkers();
@@ -667,7 +692,7 @@ export function MapStageProvider({
       const style = buildExploreMapStyle({
         featureCollection: patch.featureCollection,
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
-        densityLayerEnabled: patch.densityEnabled,
+        layerMode: patch.layerMode,
         historyEdgesEnabled: patch.historyEdgesEnabled,
         clusteringEnabled,
         colorScheme: readDocumentColorScheme(),
@@ -677,8 +702,9 @@ export function MapStageProvider({
         style,
         featureCollection: patch.featureCollection,
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
-        densityEnabled: patch.densityEnabled,
+        layerMode: patch.layerMode,
         densityLevels: patch.densityLevels,
+        countyChoroplethLevels: patch.countyChoroplethLevels ?? [],
         clusteringEnabled,
         historyEdgesEnabled: patch.historyEdgesEnabled,
         historyEdgeCollection: patch.historyEdgeCollection,
@@ -695,7 +721,7 @@ export function MapStageProvider({
       const style = buildExploreMapStyle({
         featureCollection: cfg.featureCollection,
         jurisdictionAreaFeatures: cfg.jurisdictionAreaFeatures,
-        densityLayerEnabled: cfg.densityEnabled,
+        layerMode: cfg.layerMode,
         historyEdgesEnabled: cfg.historyEdgesEnabled,
         clusteringEnabled: cfg.clusteringEnabled,
         colorScheme: readDocumentColorScheme(),
@@ -953,9 +979,14 @@ export function MapStageProvider({
       activeMap.on('zoom', () => updateStateLabelOpacity(activeMap.getZoom()));
       activeMap.on('zoomend', () => {
         syncEntityMarkers();
-        if (activeMap.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM) {
-          void loadCountyLines(activeMap).catch((error) => {
-            console.error('[MapStage] county lines load failed', error);
+        const cfg = configRef.current;
+        if (
+          activeMap.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
+          cfg.layerMode === 'blackShare' ||
+          cfg.layerMode === 'blackChange'
+        ) {
+          void loadCountyPolygons(activeMap, cfg.countyChoroplethLevels).catch((error) => {
+            console.error('[MapStage] county polygon load failed', error);
           });
         }
       });

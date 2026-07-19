@@ -23,6 +23,9 @@ import {
   type BulkImportSummary,
 } from './bulk-import.js';
 import { commitOperatorIntake } from './commit.js';
+import {
+  prepareDiscoverySurvivorIntake,
+} from './discovery-survivor-intake.js';
 import type { DiscoveryRunBatch } from './discovery-run.js';
 import { runBoundedDiscoveryCampaign } from './discovery-run.js';
 import {
@@ -74,7 +77,13 @@ type Flags = {
 };
 
 const REPEATABLE_FLAGS = new Set(['--source-url', '--feed-xml', '--from']);
-const BOOLEAN_FLAGS = new Set(['--commit', '--continue-on-quarantine', '--full']);
+const BOOLEAN_FLAGS = new Set([
+  '--commit',
+  '--continue-on-quarantine',
+  '--full',
+  '--include-curated',
+  '--queue-survivors',
+]);
 
 type EditorialSubjectFile = {
   readonly subjectId: string;
@@ -480,17 +489,81 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
         const jobRunId = optionalFlag(flags, '--run-id');
         const maxCandidatesRaw = optionalFlag(flags, '--max-candidates');
+        const queueSurvivors = flags.booleans.has('--queue-survivors');
+        const maxSurvivorsRaw = optionalFlag(flags, '--max-survivors');
         const result = await dispatchDiscoveryCampaign({
           jobId,
           mode: modeRaw,
           killSwitchEngaged: killRaw === 'engaged',
           nowIso,
+          includeCampaign: queueSurvivors,
           ...(jobRunId !== undefined ? { jobRunId } : {}),
           ...(maxCandidatesRaw !== undefined
             ? { maxCandidates: Number(maxCandidatesRaw) }
             : {}),
         });
-        stdout(JSON.stringify(result, null, 2));
+
+        let queueSummary: Record<string, unknown> | undefined;
+        if (queueSurvivors && result.status === 'success' && result.campaign) {
+          const intake = prepareDiscoverySurvivorIntake({
+            campaign: result.campaign,
+            context: buildContext(flags, deps),
+            ...(maxSurvivorsRaw !== undefined
+              ? { maxSurvivors: Number(maxSurvivorsRaw) }
+              : {}),
+          });
+          const commits: Record<string, unknown>[] = [];
+          if (flags.booleans.has('--commit')) {
+            const store = deps.store ?? (await (deps.createLiveStore ?? createDefaultLiveStore)());
+            for (const item of intake.items) {
+              if (!item.outcome.accepted) continue;
+              const committed = await commitOperatorIntake(store, item.outcome);
+              commits.push({
+                candidateId: item.candidateId,
+                researchCaseId: item.outcome.researchCase?.id,
+                committed: committed.committed,
+                replayed: committed.replayed,
+                auditEventId: committed.eventId,
+              });
+            }
+          }
+          queueSummary = {
+            version: intake.version,
+            considered: intake.considered,
+            prepared: intake.prepared,
+            skippedNoUrl: intake.skippedNoUrl,
+            skippedRejected: intake.skippedRejected,
+            committed: flags.booleans.has('--commit'),
+            commitCount: commits.length,
+            ...(flags.booleans.has('--full')
+              ? {
+                  items: intake.items.map((item) => ({
+                    candidateId: item.candidateId,
+                    title: item.title,
+                    url: item.url,
+                    researchCaseId: item.outcome.accepted
+                      ? item.outcome.researchCase?.id
+                      : undefined,
+                  })),
+                }
+              : {}),
+            ...(commits.length > 0 ? { commits } : {}),
+          };
+        } else if (queueSurvivors && result.status === 'success' && !result.campaign) {
+          throw new Error(
+            'discovery-dispatch --queue-survivors expected campaign payload but none was returned',
+          );
+        }
+
+        const payload: Record<string, unknown> = {
+          ...result,
+          ...(queueSummary ? { survivorQueue: queueSummary } : {}),
+        };
+        // Drop bulky campaign from stdout unless --full (queue path already summarized).
+        if (queueSurvivors && !flags.booleans.has('--full') && 'campaign' in payload) {
+          delete payload.campaign;
+        }
+        stdout(JSON.stringify(payload, null, 2));
         return result.status === 'success' ? 0 : 1;
       }
       case 'pending-list': {

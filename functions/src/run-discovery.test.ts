@@ -23,6 +23,21 @@ test('runScheduledDiscovery omits catalog when DISCOVERY_CATALOG_FROM is unset',
   assert.equal(result.status, 'success');
 });
 
+test('runScheduledDiscovery web-search fixture uses SearXNG path', async () => {
+  const result = await runScheduledDiscovery({
+    jobId: 'discovery-campaign-web-search',
+    environment: {
+      DISCOVERY_MODE: 'fixture',
+      DISCOVERY_KILL_SWITCH: 'disengaged',
+    },
+    readFirestoreDoc: async () => ({ exists: true, data: () => ({ enabled: false }) }),
+  });
+  assert.equal(result.status, 'success');
+  assert.equal(result.jobId, 'discovery-campaign-web-search');
+  assert.ok((result.summary?.accepted ?? 0) >= 2);
+  assert.equal(result.summary?.kind, 'web-search-discovery.v1');
+});
+
 test('runScheduledDiscovery loads soft catalog when DISCOVERY_CATALOG_FROM=firestore', async () => {
   let catalogLoaderCalls = 0;
   const result = await runScheduledDiscovery({

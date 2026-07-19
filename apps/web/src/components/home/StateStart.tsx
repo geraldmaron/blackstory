@@ -18,7 +18,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { US_STATES } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
-import { buildExploreHref } from '../../lib/map-experience/url-state';
+import { buildExploreHref, defaultExploreOverlayState } from '../../lib/map-experience/url-state';
 
 export type StateStartEntry = {
   readonly postalCode: string;
@@ -34,9 +34,7 @@ export type StateStartProps = {
 function exploreHrefForState(postalCode: string): string {
   return buildExploreHref({
     filters: DEFAULT_EXPLORE_FILTERS,
-    density: false,
-    group: false,
-    lines: false,
+    ...defaultExploreOverlayState(),
     state: postalCode,
   });
 }

@@ -36,7 +36,7 @@ import {
   runDiscoveryCampaignWikimediaFederalJob,
 } from './jobs/discovery-campaign-wikimedia-federal.js';
 import type { JobRunRecord } from './run-record.js';
-import type { ResolutionProfile } from '@repo/domain';
+import type { DiscoveryCampaignResult, ResolutionProfile } from '@repo/domain';
 
 export const DISCOVERY_DISPATCHER_VERSION = 'discovery-dispatcher.v1' as const;
 
@@ -69,6 +69,11 @@ export type DiscoveryCampaignDispatchResult = {
     readonly message?: string;
   };
   readonly run?: JobRunRecord;
+  /**
+   * Full private campaign payload when `includeCampaign` was requested.
+   * Used by operator-cli to queue survivors into admin researchCases — never published.
+   */
+  readonly campaign?: DiscoveryCampaignResult;
   readonly publicEffect: 'none';
 };
 
@@ -90,6 +95,11 @@ export type DispatchDiscoveryCampaignInput = {
   readonly catalogProfiles?: readonly ResolutionProfile[];
   /** Titles for obscurity novelty scoring; defaults to a small famous-name list. */
   readonly catalogTitles?: readonly string[];
+  /**
+   * When true, attach the full DiscoveryCampaignResult for survivor intake.
+   * Omit on Cloud Functions to keep scheduler payloads small.
+   */
+  readonly includeCampaign?: boolean;
 };
 
 const RESEARCH_CAMPAIGNS_KILL_SWITCH = 'research-campaigns' as const;
@@ -148,6 +158,14 @@ function isDiscoveryJobId(jobId: string): jobId is DiscoveryCampaignJobId {
   return (DISCOVERY_CAMPAIGN_JOB_IDS as readonly string[]).includes(jobId);
 }
 
+type JobOutcome = {
+  readonly run: JobRunRecord;
+  readonly survivors?: number;
+  readonly accepted?: number;
+  readonly kind?: string;
+  readonly campaign?: DiscoveryCampaignResult;
+};
+
 async function runFixtureOrLiveJob(
   input: DispatchDiscoveryCampaignInput & {
     readonly jobId: DiscoveryCampaignJobId;
@@ -155,7 +173,7 @@ async function runFixtureOrLiveJob(
     readonly startedAt: string;
     readonly completedAt: string;
   },
-): Promise<{ run: JobRunRecord; survivors?: number; accepted?: number; kind?: string }> {
+): Promise<JobOutcome> {
   const root = repoRootFromHere();
   const env = input.environment ?? process.env;
 
@@ -188,6 +206,7 @@ async function runFixtureOrLiveJob(
         survivors: result.campaign.ranked.length,
         accepted: result.campaign.campaign.acceptedCount,
         kind: result.campaign.kind,
+        campaign: result.campaign.campaign,
       };
     }
     case RSS_DISCOVERY_CAMPAIGN_JOB_ID: {
@@ -217,6 +236,7 @@ async function runFixtureOrLiveJob(
         survivors: result.campaign.yield.survivors,
         accepted: result.campaign.campaign.acceptedCount,
         kind: result.campaign.kind,
+        campaign: result.campaign.campaign,
       };
     }
     case DISCOVERY_CAMPAIGN_WIKIMEDIA_FEDERAL_JOB_ID: {
@@ -235,6 +255,7 @@ async function runFixtureOrLiveJob(
         survivors: result.campaign.summary.survivors,
         accepted: result.campaign.summary.accepted,
         kind: result.campaign.kind,
+        campaign: result.campaign.campaign,
       };
     }
     case DISCOVERY_CAMPAIGN_ARCHIVE_DPLA_JOB_ID: {
@@ -269,43 +290,111 @@ async function runFixtureOrLiveJob(
         survivors: result.campaign.yield.survivors,
         accepted: result.campaign.yield.accepted,
         kind: result.campaign.kind,
+        campaign: result.campaign.campaign,
       };
     }
     case DISCOVERY_CAMPAIGN_WEB_SEARCH_JOB_ID: {
+      const searxngFixture = join(
+        root,
+        'packages/domain/src/adapters/web-search/fixtures/searxng-search-response.json',
+      );
       const braveFixture = join(
         root,
         'packages/domain/src/adapters/web-search/fixtures/brave-search-response.json',
       );
+      const searxngLive = env.DISCOVERY_SEARXNG_JSON?.trim();
       const braveLive = env.DISCOVERY_BRAVE_JSON?.trim();
-      if (input.mode === 'live' && (braveLive === undefined || braveLive.length === 0)) {
-        throw new Error(
-          'live web-search requires DISCOVERY_BRAVE_JSON=/path/to/brave-response.json and written storage terms',
-        );
-      }
+      const searxngBase = env.SEARXNG_BASE_URL?.trim();
+      const preferBrave = env.DISCOVERY_WEB_SEARCH_PROVIDER?.trim() === 'brave';
+
       const storageConfirmed =
         env.DISCOVERY_STORAGE_TERMS_CONFIRMED === 'true' || input.mode === 'fixture';
       if (!storageConfirmed) {
         throw new Error(
-          'web-search refuses to run without DISCOVERY_STORAGE_TERMS_CONFIRMED=true (written Brave storage-rights only)',
+          'web-search refuses to run without DISCOVERY_STORAGE_TERMS_CONFIRMED=true ' +
+            '(operator engine-policy confirmation for SearXNG, or Brave storage-rights)',
         );
       }
-      const result = await runDiscoveryCampaignWebSearchJob({
-        jobRunId: input.jobRunId,
-        startedAt: input.startedAt,
-        completedAt: input.completedAt,
-        braveResponseRaw: readJson(
-          braveLive && braveLive.length > 0 ? braveLive : braveFixture,
-        ),
-        providerConfig: {
+
+      let searchResponseRaw: unknown;
+      let providerConfig: {
+        provider: 'searxng' | 'brave';
+        apiKey: string;
+        storageTermsConfirmed: true;
+        planTermsVersion: string;
+        baseUrl?: string;
+      };
+
+      if (preferBrave || (Boolean(braveLive) && !searxngLive && !searxngBase)) {
+        if (input.mode === 'live' && !braveLive) {
+          throw new Error(
+            'live Brave web-search requires DISCOVERY_BRAVE_JSON=/path/to/brave-response.json',
+          );
+        }
+        searchResponseRaw = readJson(braveLive && braveLive.length > 0 ? braveLive : braveFixture);
+        providerConfig = {
           provider: 'brave',
           apiKey: env.BRAVE_SEARCH_API_KEY?.trim() || 'fixture-deterministic-brave-key',
           storageTermsConfirmed: true,
           planTermsVersion: 'brave-storage-rights-tier-2026-07',
-        },
+        };
+      } else if (searxngLive && searxngLive.length > 0) {
+        searchResponseRaw = readJson(searxngLive);
+        providerConfig = {
+          provider: 'searxng',
+          apiKey: env.SEARXNG_AUTH_TOKEN?.trim() || '',
+          storageTermsConfirmed: true,
+          planTermsVersion: 'searxng-self-hosted-research-2026-07',
+          ...(searxngBase ? { baseUrl: searxngBase } : {}),
+        };
+      } else if (input.mode === 'live' && searxngBase && searxngBase.length > 0) {
+        const query =
+          env.DISCOVERY_SEARXNG_QUERY?.trim() ||
+          'freedom rider Montgomery County Alabama African American';
+        const { buildSearxngSearchUrl } = await import('@repo/domain');
+        const url = buildSearxngSearchUrl({ baseUrl: searxngBase, query });
+        const headers: Record<string, string> = { Accept: 'application/json' };
+        const token = env.SEARXNG_AUTH_TOKEN?.trim();
+        if (token) headers.Authorization = `Bearer ${token}`;
+        const response = await fetch(url, { headers });
+        if (!response.ok) {
+          throw new Error(`SearXNG HTTP ${response.status} for ${url}`);
+        }
+        searchResponseRaw = await response.json();
+        providerConfig = {
+          provider: 'searxng',
+          apiKey: token || '',
+          storageTermsConfirmed: true,
+          planTermsVersion: 'searxng-self-hosted-research-2026-07',
+          baseUrl: searxngBase,
+        };
+      } else if (input.mode === 'live') {
+        throw new Error(
+          'live SearXNG web-search requires SEARXNG_BASE_URL=… and/or DISCOVERY_SEARXNG_JSON=/path/to.json',
+        );
+      } else {
+        searchResponseRaw = readJson(searxngFixture);
+        providerConfig = {
+          provider: 'searxng',
+          apiKey: '',
+          storageTermsConfirmed: true,
+          planTermsVersion: 'searxng-self-hosted-research-2026-07',
+        };
+      }
+
+      const result = await runDiscoveryCampaignWebSearchJob({
+        jobRunId: input.jobRunId,
+        startedAt: input.startedAt,
+        completedAt: input.completedAt,
+        searchResponseRaw,
+        providerConfig,
         requireWaybackCapture: false,
         ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
         ...(input.catalogProfiles !== undefined
           ? { catalogProfiles: input.catalogProfiles }
+          : {}),
+        ...(env.DISCOVERY_SEARXNG_QUERY?.trim()
+          ? { queryText: env.DISCOVERY_SEARXNG_QUERY.trim() }
           : {}),
       });
       return {
@@ -313,6 +402,7 @@ async function runFixtureOrLiveJob(
         survivors: result.campaign.yield.survivors,
         accepted: result.campaign.yield.accepted,
         kind: result.campaign.kind,
+        campaign: result.campaign.campaign,
       };
     }
     default: {
@@ -385,6 +475,9 @@ export async function dispatchDiscoveryCampaign(
         ...(outcome.kind !== undefined ? { kind: outcome.kind } : {}),
       },
       run: outcome.run,
+      ...(input.includeCampaign && outcome.campaign
+        ? { campaign: outcome.campaign }
+        : {}),
     };
   } catch (error) {
     return {

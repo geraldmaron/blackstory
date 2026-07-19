@@ -82,7 +82,12 @@ export { createAdminFirebaseClient } from './admin-client.js';
 export type { AdminFirebaseClient } from './admin-client.js';
 export * from './admin-auth.js';
 
-export { createServerFirebaseApp, getServerFirebaseApp, getServerFirestore } from './server.js';
+export {
+  createServerFirebaseApp,
+  ensureGoogleCloudQuotaProject,
+  getServerFirebaseApp,
+  getServerFirestore,
+} from './server.js';
 export type { ServerFirebaseApp } from './server.js';
 
 export {
@@ -384,13 +389,25 @@ export type {
 // deliberately absent here; its CC BY-NC-SA rights gate excludes it from every public reader.
 export {
   getNationalPopulationByDecade,
+  getNationalPopulationChanges,
+  getStatePopulationByDecade,
+  getStatePopulationChanges,
   getAcsCoverageSummary,
   getHateCrimeYearSummary,
   getOpportunityAtlasCoverageSummary,
   publicSourceUrl,
+  POPULATION_DECADE_COMPARABILITY_NOTE,
+  aggregateCountiesByState,
+  computePopulationDecadeChange,
+  computeStatePopulationChange,
+  computeNationalPopulationChangesFromDecades,
+  computeStatePopulationChangesFromDecades,
 } from './demographics/national-stats.js';
 export type {
   NationalPopulationByDecade,
+  PopulationDecadeChange,
+  StatePopulationByDecade,
+  StatePopulationChange,
   AcsCoverageSummary,
   HateCrimeYearSummary,
   OpportunityAtlasCoverageSummary,

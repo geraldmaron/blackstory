@@ -2,34 +2,45 @@
 
 /**
  * Client orchestrator for `/explore`. Wires the shared `MapStage` (via `useMapStage()`
- * instead of mounting its own canvas), the synchronized accessible list, density toggle,
+ * instead of mounting its own canvas), the synchronized accessible list, map data model
+ * picker (record presence | Black population share | share change), nearby-points grouping
  * nearby-points grouping toggle, relationship lines, decade settings, filter form, and
- * shareable URL state. Pin or list selection navigates to the entity record page — the map
- * keeps `?selected=` only as an orientation ring (e.g. return from “View on map”). History
- * edge clicks still open a connection panel. The server-rendered snapshot catalog is the
+ * shareable URL state. Pin or list selection opens a preview narrative card in the spotlight
+ * shell; the full record is one CTA away at `/entity/[id]`. `?selected=` is shareable preview
+ * state (e.g. return from “View on map”). History edge clicks still open a connection panel.
+ * The server-rendered snapshot catalog is the
  * source of truth; `/explore/api` refine is optional progressive enhancement when App Check
  * is configured.
  *
  * Camera: deep links and back/forward reconcile the camera from the URL via `easeTo`
  * (`reconcileCamera`, run once on mount and again on every `popstate`) never a raw default
- * flight (ADR-017). Selecting a pin flies briefly then leaves for the record page.
+ * flight (ADR-017). Selecting a pin flies briefly then opens the preview card.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Notice } from '@repo/ui';
 import { US_CONUS_BOUNDS, findUsStateByPostalCode } from '@repo/domain/map/geography';
+import type { CensusPopulationDecade } from '@repo/domain/map/county-population';
 import { HistoryEdgePanel } from '../../../components/history/HistoryEdgePanel';
-import { DensityLayerToggle } from '../../../components/map-experience/DensityLayerToggle';
+import { LayerModelControl } from '../../../components/map-experience/LayerModelControl';
 import { GroupingToggle } from '../../../components/map-experience/GroupingToggle';
 import { MapExperienceLegend } from '../../../components/map-experience/MapExperienceLegend';
+import { NarrativeCard } from '../../../components/map-experience/NarrativeCard';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
 import { CAMERA_POINT_ZOOM, prefersReducedMotion } from '../../../lib/map-experience/camera-presets';
 import { DEGRADED_MODE_COPY } from '../../../lib/map-experience/snapshot-mode';
 import {
+  buildCountyChoroplethLevels,
+  type CountyChoroplethLevel,
+} from '../../../lib/map-experience/county-choropleth';
+import { fetchCountyPopulationIndex } from '../../../lib/map-experience/load-county-population-index';
+import {
   buildExploreHref,
+  isPopulationLayerMode,
   parseExploreSearchParams,
   viewportForState,
+  type ExploreLayerMode,
   type ExploreViewState,
   type ExploreViewport,
 } from '../../../lib/map-experience/url-state';
@@ -80,7 +91,7 @@ function mergeViewState(
 ): ExploreViewState {
   const next: ExploreViewState = {
     filters: patch.filters ?? base.filters,
-    density: patch.density ?? base.density,
+    layerMode: patch.layerMode ?? base.layerMode,
     group: patch.group ?? base.group,
     lines: patch.lines ?? base.lines,
   };
@@ -91,6 +102,7 @@ function mergeViewState(
     ...resolveState(base, patch),
     ...resolveDecade(base, patch),
     ...resolveEdge(base, patch),
+    ...resolvePopulationDecades(base, patch),
   };
 
   if (patch.viewport) {
@@ -142,6 +154,25 @@ function resolveEdge(
   return {};
 }
 
+function resolvePopulationDecades(
+  base: ExploreViewState,
+  patch: Partial<ExploreViewState> & { readonly clearPopulationDecades?: boolean },
+): Pick<ExploreViewState, 'popDecade' | 'popFrom' | 'popTo'> {
+  if (patch.clearPopulationDecades) return {};
+  const layerMode = patch.layerMode ?? base.layerMode;
+  if (layerMode === 'blackShare') {
+    const popDecade = patch.popDecade ?? base.popDecade;
+    return popDecade ? { popDecade } : {};
+  }
+  if (layerMode === 'blackChange') {
+    return {
+      ...(patch.popFrom ?? base.popFrom ? { popFrom: patch.popFrom ?? base.popFrom! } : {}),
+      ...(patch.popTo ?? base.popTo ? { popTo: patch.popTo ?? base.popTo! } : {}),
+    };
+  }
+  return {};
+}
+
 /** Facet render order matches how people actually narrow: what (kind) → when
  * (era) → about (theme) → how solid (confidence). One row each, auto-applying. */
 const FACET_ROWS: readonly { readonly key: keyof ExploreFilterState; readonly label: string }[] = [
@@ -161,6 +192,10 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   // Agent B: latch hero→explore on first client render before any effect clears sessionStorage.
   const [fromHeroTransition] = useState(readHeroTransitionFlag);
   const [entering, setEntering] = useState(false);
+  const [populationIndexLoaded, setPopulationIndexLoaded] = useState(false);
+  const [populationIndex, setPopulationIndex] = useState<
+    Awaited<ReturnType<typeof fetchCountyPopulationIndex>> | undefined
+  >(undefined);
   // Mirror of the latest committed view state for the debounced viewport handler below. React
   // may replay setState updater functions during render, so an updater must stay pure — the
   // handler needs the current view state OUTSIDE an updater to build the next URL.
@@ -173,6 +208,39 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   useEffect(() => {
     viewStateRef.current = view.viewState;
   }, [view.viewState]);
+
+  useEffect(() => {
+    if (!isPopulationLayerMode(view.viewState.layerMode)) return;
+    let cancelled = false;
+    void fetchCountyPopulationIndex().then((index) => {
+      if (cancelled) return;
+      setPopulationIndex(index);
+      setPopulationIndexLoaded(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [view.viewState.layerMode]);
+
+  const countyChoroplethLevels = useMemo((): readonly CountyChoroplethLevel[] => {
+    const { layerMode, popDecade, popFrom, popTo } = view.viewState;
+    if (layerMode === 'blackShare') {
+      return buildCountyChoroplethLevels({
+        index: populationIndex,
+        mode: 'blackShare',
+        ...(popDecade ? { decade: popDecade } : {}),
+      });
+    }
+    if (layerMode === 'blackChange') {
+      return buildCountyChoroplethLevels({
+        index: populationIndex,
+        mode: 'blackChange',
+        ...(popFrom ? { fromDecade: popFrom } : {}),
+        ...(popTo ? { toDecade: popTo } : {}),
+      });
+    }
+    return [];
+  }, [populationIndex, view.viewState]);
 
   // Agent B: hero landing — panel enter animation (reconcile skip is in the mount effect below).
   useEffect(() => {
@@ -252,8 +320,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     stage.patchData({
       featureCollection: { type: 'FeatureCollection', features: filteredFeatures },
       jurisdictionAreaFeatures: view.source.jurisdictionAreaFeatures,
-      densityEnabled: view.viewState.density,
-      densityLevels: view.densityLevels,
+      layerMode: view.viewState.layerMode,
+      densityLevels: view.viewState.layerMode === 'presence' ? view.densityLevels : [],
+      countyChoroplethLevels: countyChoroplethLevels,
       clusteringEnabled: view.viewState.group,
       historyEdgesEnabled: view.viewState.lines,
       historyEdgeCollection: view.edgeLineCollection,
@@ -262,9 +331,10 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     stage,
     filteredFeatures,
     view.source.jurisdictionAreaFeatures,
-    view.viewState.density,
+    view.viewState.layerMode,
     view.viewState.group,
     view.densityLevels,
+    countyChoroplethLevels,
     view.viewState.lines,
     view.edgeLineCollection,
   ]);
@@ -366,11 +436,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           { padding: SELECTION_CAMERA_PADDING },
         );
       }
-      // Page-first: the record lives at `/entity/[id]`, not in a map overlay card.
-      const href = feature?.properties.href ?? `/entity/${encodeURIComponent(entityId)}`;
-      router.push(href);
+      commitViewState(
+        mergeViewState(view.viewState, { selected: entityId, clearEdge: true }),
+      );
     },
-    [router, stage, view.allFeatures],
+    [commitViewState, stage, view.allFeatures, view.viewState],
   );
 
   const handleStateSelect = useCallback(
@@ -408,9 +478,38 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     commitViewState(mergeViewState(view.viewState, { clearSelected: true }));
   }, [commitViewState, stage, view.viewState]);
 
-  const handleDensityToggle = useCallback(() => {
-    commitViewState(mergeViewState(view.viewState, { density: !view.viewState.density }));
-  }, [commitViewState, view.viewState]);
+  const handleLayerModeChange = useCallback(
+    (layerMode: ExploreLayerMode) => {
+      commitViewState(
+        mergeViewState(view.viewState, {
+          layerMode,
+          ...(layerMode === 'off' || layerMode === 'presence' ? { clearPopulationDecades: true } : {}),
+        }),
+      );
+    },
+    [commitViewState, view.viewState],
+  );
+
+  const handlePopDecadeChange = useCallback(
+    (popDecade: CensusPopulationDecade) => {
+      commitViewState(mergeViewState(view.viewState, { layerMode: 'blackShare', popDecade }));
+    },
+    [commitViewState, view.viewState],
+  );
+
+  const handlePopFromChange = useCallback(
+    (popFrom: CensusPopulationDecade) => {
+      commitViewState(mergeViewState(view.viewState, { layerMode: 'blackChange', popFrom }));
+    },
+    [commitViewState, view.viewState],
+  );
+
+  const handlePopToChange = useCallback(
+    (popTo: CensusPopulationDecade) => {
+      commitViewState(mergeViewState(view.viewState, { layerMode: 'blackChange', popTo }));
+    },
+    [commitViewState, view.viewState],
+  );
 
   const handleGroupToggle = useCallback(() => {
     commitViewState(mergeViewState(view.viewState, { group: !view.viewState.group }));
@@ -443,11 +542,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     commitViewState(mergeViewState(view.viewState, { clearEdge: true }));
   }, [commitViewState, view.viewState]);
 
-  // Edge spotlight: focus the connection panel; Escape dismisses. Entity selection no longer
-  // mounts a narrative card — it navigates to the record page.
+  // Spotlight: focus the panel card; Escape dismisses preview or connection panel.
+  const spotlightOpen = Boolean(view.selectedEdge) || Boolean(selectedFeature);
+  const dismissSpotlight = view.selectedEdge ? handleCloseEdge : handleClearSelected;
   useEffect(() => {
-    const edgeOpen = Boolean(view.selectedEdge);
-    if (!edgeOpen) return undefined;
+    if (!spotlightOpen) return undefined;
 
     const frame = window.requestAnimationFrame(() => {
       spotlightRef.current?.querySelector<HTMLElement>('article, [tabindex]')?.focus();
@@ -455,14 +554,14 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key !== 'Escape') return;
       event.preventDefault();
-      handleCloseEdge();
+      dismissSpotlight();
     }
     window.addEventListener('keydown', onKeyDown);
     return () => {
       window.cancelAnimationFrame(frame);
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [view.selectedEdge, handleCloseEdge]);
+  }, [spotlightOpen, dismissSpotlight]);
 
   const handleViewportChange = useCallback(
     (viewport: ExploreViewport) => {
@@ -524,6 +623,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const listProps = {
     features: sortedListFeatures,
     labelledBy: 'explore-results-heading',
+    onSelect: handleSelect,
     ...(view.viewState.selected ? { selectedId: view.viewState.selected } : {}),
   };
 
@@ -570,7 +670,22 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         </div>
 
         <div className="ds-explore-stage__toolbar">
-          <DensityLayerToggle enabled={view.viewState.density} onToggle={handleDensityToggle} />
+          <LayerModelControl
+            layerMode={view.viewState.layerMode}
+            {...(view.viewState.popDecade ? { popDecade: view.viewState.popDecade } : {})}
+            {...(view.viewState.popFrom ? { popFrom: view.viewState.popFrom } : {})}
+            {...(view.viewState.popTo ? { popTo: view.viewState.popTo } : {})}
+            onLayerModeChange={handleLayerModeChange}
+            onPopDecadeChange={handlePopDecadeChange}
+            onPopFromChange={handlePopFromChange}
+            onPopToChange={handlePopToChange}
+          />
+          {isPopulationLayerMode(view.viewState.layerMode) && populationIndexLoaded && !populationIndex ? (
+            <p className="ds-sans ds-explore__settings-note">
+              County population data is not loaded yet — choropleth tiers stay neutral until the
+              static index is available.
+            </p>
+          ) : null}
           <GroupingToggle enabled={view.viewState.group} onToggle={handleGroupToggle} />
           <details className="ds-explore-stage__disclosure" open={view.viewState.lines}>
             <summary className="ds-explore-stage__disclosure-summary">Map settings</summary>
@@ -648,7 +763,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
       <div
         className={
-          view.selectedEdge
+          view.selectedEdge || selectedFeature
             ? 'ds-explore-stage__results ds-explore-stage__results--dimmed'
             : 'ds-explore-stage__results'
         }
@@ -667,27 +782,31 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         <SynchronizedResultList {...listProps} />
       </div>
 
-      {view.selectedEdge ? (
+      {spotlightOpen ? (
         <div className="ds-explore-stage__spotlight" ref={spotlightRef}>
           <button
             type="button"
             className="ds-explore-stage__spotlight-scrim"
-            aria-label="Dismiss connection panel"
-            onClick={handleCloseEdge}
+            aria-label={view.selectedEdge ? 'Dismiss connection panel' : 'Dismiss record preview'}
+            onClick={dismissSpotlight}
           />
           <div
             className="ds-explore-stage__spotlight-panel"
             role="dialog"
             aria-modal="true"
-            aria-label="Selected connection"
+            aria-label={view.selectedEdge ? 'Selected connection' : 'Selected record'}
           >
-            <HistoryEdgePanel edge={view.selectedEdge} onClose={handleCloseEdge} />
+            {view.selectedEdge ? (
+              <HistoryEdgePanel edge={view.selectedEdge} onClose={handleCloseEdge} />
+            ) : selectedFeature ? (
+              <NarrativeCard feature={selectedFeature} onClose={handleClearSelected} />
+            ) : null}
           </div>
         </div>
       ) : null}
 
       <div className="ds-explore-stage__legend">
-        <MapExperienceLegend defaultCollapsed />
+        <MapExperienceLegend defaultCollapsed layerMode={view.viewState.layerMode} />
       </div>
     </div>
   );

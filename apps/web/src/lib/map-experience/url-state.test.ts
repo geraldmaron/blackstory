@@ -1,6 +1,6 @@
 /**
  * Confirms shareable URL state round-trips: parse(build(state)) reproduces the same
- * filters/viewport/selection/density, so a copied `/explore?...` URL reproduces the same view.
+ * filters/viewport/selection/layerMode, so a copied `/explore?...` URL reproduces the same view.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -17,7 +17,7 @@ test('an empty query string parses to the "all" default filter state with no vie
   assert.deepEqual(parsed.filters, { era: 'all', kind: 'all', theme: 'all', confidence: 'all' });
   assert.equal(parsed.viewport, undefined);
   assert.equal(parsed.selected, undefined);
-  assert.equal(parsed.density, false);
+  assert.equal(parsed.layerMode, 'off');
   assert.equal(parsed.group, false);
   assert.equal(parsed.lines, false);
   assert.equal(parsed.decade, undefined);
@@ -30,7 +30,7 @@ test('round-trips a full view state through build -> parse', () => {
     viewport: { lat: 38.9072, lng: -77.0369, zoom: 11.5 },
     selected: 'ent_dunbar_school_001',
     state: 'DC',
-    density: true,
+    layerMode: 'presence' as const,
     group: false,
     lines: true,
     decade: '1970s',
@@ -51,7 +51,7 @@ test('round-trips a full view state through build -> parse', () => {
   assert.equal(parsed.viewport!.zoom, 11.5);
   assert.equal(parsed.selected, state.selected);
   assert.equal(parsed.state, 'DC');
-  assert.equal(parsed.density, true);
+  assert.equal(parsed.layerMode, 'presence');
   assert.equal(parsed.group, false);
   assert.equal(parsed.lines, true);
   assert.equal(parsed.decade, '1970s');
@@ -61,11 +61,56 @@ test('round-trips a full view state through build -> parse', () => {
 test('default filter values are omitted from the query string (minimal shareable URL)', () => {
   const qs = buildExploreSearchParams({
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-    density: false,
+    layerMode: 'off',
     group: false,
     lines: false,
   });
   assert.equal(qs, '');
+});
+
+test('layerMode=presence is emitted; off is omitted', () => {
+  assert.equal(
+    buildExploreSearchParams({
+      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      layerMode: 'presence',
+      group: false,
+      lines: false,
+    }),
+    'layerMode=presence',
+  );
+});
+
+test('legacy density=1 migrates to presence on parse', () => {
+  assert.equal(parseExploreSearchParams({ density: '1' }).layerMode, 'presence');
+  assert.equal(parseExploreSearchParams({ density: 'true' }).layerMode, 'presence');
+});
+
+test('population modes round-trip decade params', () => {
+  const share = {
+    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    layerMode: 'blackShare' as const,
+    popDecade: '2010' as const,
+    group: false,
+    lines: false,
+  };
+  const shareQs = buildExploreSearchParams(share);
+  assert.equal(shareQs, 'layerMode=blackShare&popDecade=2010');
+  assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams(shareQs))), share);
+
+  const change = {
+    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    layerMode: 'blackChange' as const,
+    popFrom: '2000' as const,
+    popTo: '2020' as const,
+    group: false,
+    lines: false,
+  };
+  const changeQs = buildExploreSearchParams(change);
+  assert.equal(changeQs, 'layerMode=blackChange&popFrom=2000');
+  assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams(changeQs))), {
+    ...change,
+    popTo: '2020',
+  });
 });
 
 test('group=1 turns nearby-point grouping on; omitted group defaults off', () => {
@@ -77,9 +122,22 @@ test('group=1 turns nearby-point grouping on; omitted group defaults off', () =>
 });
 
 test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
-  assert.match(buildExploreSearchParams({ filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' }, density: false, group: true, lines: false }), /^group=1$/);
+  assert.match(
+    buildExploreSearchParams({
+      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      layerMode: 'off',
+      group: true,
+      lines: false,
+    }),
+    /^group=1$/,
+  );
   assert.equal(
-    buildExploreSearchParams({ filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' }, density: false, group: false, lines: false }),
+    buildExploreSearchParams({
+      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      layerMode: 'off',
+      group: false,
+      lines: false,
+    }),
     '',
   );
 });

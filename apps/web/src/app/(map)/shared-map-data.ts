@@ -41,7 +41,7 @@ export const loadMapStageBase = cache(async function loadMapStageBase(): Promise
   const style = buildExploreMapStyle({
     featureCollection: mapSource.featureCollection,
     jurisdictionAreaFeatures: mapSource.jurisdictionAreaFeatures,
-    densityLayerEnabled: false,
+    layerMode: 'off',
   });
   return {
     entities,

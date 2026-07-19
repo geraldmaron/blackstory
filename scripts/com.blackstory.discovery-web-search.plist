@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+  <!--
+  launchd agent: daily SearXNG web-search discovery (08:30 UTC) → admin researchCases.
+  Prefer Corsair systemd (scripts/systemd/blackstory-discovery-web-search.timer) for live.
+  This Mac agent is a Tailscale fallback only — unload if Corsair owns the schedule.
+  Install (once):
+    cp scripts/com.blackstory.discovery-web-search.plist ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.blackstory.discovery-web-search.plist
+  Unload:
+    launchctl bootout gui/$(id -u)/com.blackstory.discovery-web-search
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.blackstory.discovery-web-search</string>
+  <key>WorkingDirectory</key>
+  <string>/Users/geralddagher/Developer/Projects/blackstory</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/geralddagher/Developer/Projects/blackstory/scripts/run-scheduled-searxng-discovery.sh</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <!-- 08:30 UTC -->
+    <key>Hour</key>
+    <integer>8</integer>
+    <key>Minute</key>
+    <integer>30</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>/Users/geralddagher/Developer/Projects/blackstory/.cache/discovery-scheduled/launchd.stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/geralddagher/Developer/Projects/blackstory/.cache/discovery-scheduled/launchd.stderr.log</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string>
+    <key>DISCOVERY_MODE</key>
+    <string>live</string>
+    <key>SEARXNG_BASE_URL</key>
+    <string>http://100.119.72.84:8888</string>
+    <key>DISCOVERY_STORAGE_TERMS_CONFIRMED</key>
+    <string>true</string>
+    <key>DISCOVERY_KILL_SWITCH</key>
+    <string>disengaged</string>
+    <key>COMMIT_SURVIVORS</key>
+    <string>1</string>
+    <key>DISCOVERY_OPERATOR_ID</key>
+    <string>scheduled-discovery-mac</string>
+  </dict>
+</dict>
+</plist>

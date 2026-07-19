@@ -1,28 +1,26 @@
 /**
  * Web-search discovery adapter types.
  *
- * Provider decision: Brave Search API is the primary/default provider see
- * ./provider-decision.ts for the full researched reasoning (cost, storage-rights mechanism,
- * coverage, and why Bing/Google Programmable Search are excluded). This module defines shapes
- * generic across providers; Exa support could be added later behind the same
- * `WebSearchProvider` union and `WebSearchProviderConfig` without touching the contract
- * or pipeline wiring only a provider-specific client module (mirroring ./brave-client.ts)
- * would be new.
+ * Provider decision: SearXNG (self-hosted OSS meta-search) is the preferred default —
+ * see ./provider-decision.ts. Brave remains supported; Exa is reserved in the union.
+ * Shapes are provider-generic; each concrete client lives in its own module
+ * (`./searxng-client.ts`, `./brave-client.ts`).
  *
- * CRITICAL: neither provider's base-tier ToS grants result-storage
- * rights. `WebSearchProviderConfig.storageTermsConfirmed` defaults to `false` everywhere it is
- * constructed in this codebase and gates the normalize/persist path
+ * CRITICAL: commercial providers' base-tier ToS generally do not grant result-storage
+ * rights. Self-hosted SearXNG still requires an operator policy confirmation because
+ * upstream engines retain their own terms. `WebSearchProviderConfig.storageTermsConfirmed`
+ * defaults to `false` everywhere it is constructed and gates the normalize/persist path
  * (./normalizer.ts's `assertStorageTermsConfirmed`) independently of the registry's
- * disabled-by-default state (../gates.ts) two separate fail-closed gates, not one. Nothing in
- * this module ever flips `storageTermsConfirmed` automatically; only a human who has obtained
- * real written confirmation from the vendor may set it true at the call site.
+ * disabled-by-default state (../gates.ts) — two separate fail-closed gates. Nothing in
+ * this module ever flips `storageTermsConfirmed` automatically.
  */
 import type { AdapterCandidateRecord } from '../types.js';
 
-export const WEB_SEARCH_PROVIDERS = ['brave', 'exa'] as const;
+export const WEB_SEARCH_PROVIDERS = ['searxng', 'brave', 'exa'] as const;
 export type WebSearchProvider = (typeof WEB_SEARCH_PROVIDERS)[number];
 
-/** Matches the obligations registry's pre-registered `brave_search`/`exa_search` source classes. */
+/** Matches the obligations registry's pre-registered source classes. */
+export const SEARXNG_SEARCH_ADAPTER_ID = 'searxng_search' as const;
 export const BRAVE_SEARCH_ADAPTER_ID = 'brave_search' as const;
 export const EXA_SEARCH_ADAPTER_ID = 'exa_search' as const;
 
@@ -39,22 +37,26 @@ export const WEB_SEARCH_PAYLOAD_SCHEMA_VERSION = 'web-search-payload.v1' as cons
 export const WEB_SEARCH_DEFAULT_CLASSIFICATION = 'unknown' as const;
 
 export function webSearchAdapterId(provider: WebSearchProvider): string {
-  return provider === 'brave' ? BRAVE_SEARCH_ADAPTER_ID : EXA_SEARCH_ADAPTER_ID;
+  if (provider === 'searxng') return SEARXNG_SEARCH_ADAPTER_ID;
+  if (provider === 'brave') return BRAVE_SEARCH_ADAPTER_ID;
+  return EXA_SEARCH_ADAPTER_ID;
 }
 
 /**
- * Storage-rights + plan configuration for a web-search provider call. `apiKey` is always
- * supplied by the caller (e.g. an env-var-backed secret such as `BRAVE_SEARCH_API_KEY`) this
- * module never reads an environment variable or hardcodes a key itself; tests pass a
- * deterministic fake key, mirroring ../dpla/fetch-search.ts's convention.
+ * Storage-rights + plan configuration for a web-search provider call.
+ * - Brave/Exa: `apiKey` is the vendor subscription token (caller-supplied; never hardcoded).
+ * - SearXNG: `apiKey` is optional reverse-proxy auth (empty string when Tailscale-only).
+ * This module never reads env vars itself; tests pass deterministic fakes.
  */
 export type WebSearchProviderConfig = {
   readonly provider: WebSearchProvider;
   readonly apiKey: string;
   /** MUST default to false at every construction site in this codebase; see module doc comment. */
   readonly storageTermsConfirmed: boolean;
-  /** Human-readable plan/terms version stamped on every candidate for audit, e.g. "brave-storage-rights-tier-2026-07". */
+  /** Human-readable plan/terms version stamped on every candidate for audit. */
   readonly planTermsVersion: string;
+  /** Required for live SearXNG fetches (e.g. http://100.119.72.84:8888). Ignored by Brave. */
+  readonly baseUrl?: string;
 };
 
 export type WebSearchRawResult = {

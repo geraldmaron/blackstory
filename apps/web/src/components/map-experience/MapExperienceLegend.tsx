@@ -10,7 +10,11 @@ import React from 'react';
 import {
   CONFIDENCE_TIER_COLOR,
   CONFIDENCE_TIER_GLYPH,
+  POPULATION_CHANGE_TIER_FILL,
+  POPULATION_CHANGE_TIER_GLYPH,
+  POPULATION_SHARE_TIER_FILL,
 } from '../../lib/map-experience/dignity-style';
+import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
 import {
   KIND_ENCODING_ENTRIES,
   SEMANTIC_TONE_ENTRIES,
@@ -38,6 +42,7 @@ export type MapExperienceLegendProps = {
   /** Seeds the initial open/closed state of the `<details>` disclosure. Defaults to open
    * (`false`). See this module's doc comment for the full props contract. */
   readonly defaultCollapsed?: boolean;
+  readonly layerMode?: ExploreLayerMode;
 };
 
 function LegendSwatch(props: {
@@ -60,6 +65,7 @@ function LegendSwatch(props: {
 
 export function MapExperienceLegend(props?: MapExperienceLegendProps) {
   const defaultCollapsed = props?.defaultCollapsed ?? false;
+  const layerMode = props?.layerMode ?? 'off';
   return (
     <details className="ds-explore-legend" open={!defaultCollapsed}>
       <summary className="ds-explore-legend__summary" id="explore-legend-heading">
@@ -166,13 +172,93 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
             </dd>
           </div>
           <div>
-            <dt>Density layer (optional)</dt>
+            <dt>Map data model</dt>
             <dd>
-              When turned on, states are shaded by how many documented records they contain
-              &mdash; presence, not incidents or severity. Darker shading means more documented
-              records, not more danger.
+              {layerMode === 'off' ? (
+                <>Choose a model in the toolbar to shade geography beneath the pins.</>
+              ) : layerMode === 'presence' ? (
+                <>
+                  States are shaded by how many documented records they contain — presence of
+                  evidence in this archive, not incidents, severity, or population counts.
+                </>
+              ) : layerMode === 'blackShare' ? (
+                <>
+                  Counties are shaded by Black share of total population for the selected Census
+                  decennial vintage (published decennial counts, not modeled story density).
+                </>
+              ) : (
+                <>
+                  Counties are shaded by change in Black share between the selected decades —
+                  copper tones mark gain, stone tones mark loss. Arrows in the tier list are a
+                  second signal; color is never the only cue.
+                </>
+              )}
             </dd>
           </div>
+          {layerMode === 'blackShare' ? (
+            <div>
+              <dt>Black population share tiers</dt>
+              <dd>
+                <ul className="ds-explore-legend__kind-list">
+                  {(
+                    [
+                      ['trace', 'Under 2%'],
+                      ['low', '2–10%'],
+                      ['mid', '10–25%'],
+                      ['high', '25–50%'],
+                      ['majority', '50%+'],
+                    ] as const
+                  ).map(([tier, label]) => (
+                    <li key={tier}>
+                      <span
+                        className="ds-legend-glyph ds-legend-glyph--circle"
+                        style={{ backgroundColor: POPULATION_SHARE_TIER_FILL[tier] }}
+                        aria-hidden="true"
+                      />
+                      <span>{label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          ) : null}
+          {layerMode === 'blackChange' ? (
+            <div>
+              <dt>Black share change tiers</dt>
+              <dd>
+                <ul className="ds-explore-legend__kind-list">
+                  {(
+                    [
+                      ['gainStrong', 'Gain ≥ 5 pp'],
+                      ['gainModerate', 'Gain 1–5 pp'],
+                      ['neutral', 'Within ±1 pp'],
+                      ['lossModerate', 'Loss 1–5 pp'],
+                      ['lossStrong', 'Loss ≥ 5 pp'],
+                    ] as const
+                  ).map(([tier, label]) => (
+                    <li key={tier}>
+                      <span aria-hidden="true">{POPULATION_CHANGE_TIER_GLYPH[tier]} </span>
+                      <span
+                        className="ds-legend-glyph ds-legend-glyph--circle"
+                        style={{ backgroundColor: POPULATION_CHANGE_TIER_FILL[tier] }}
+                        aria-hidden="true"
+                      />
+                      <span>{label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          ) : null}
+          {layerMode === 'presence' ? (
+            <div>
+              <dt>Record presence shading</dt>
+              <dd>
+                Darker copper means more documented records in a state — never more danger, never
+                a claim that a lighter state lacks history.
+              </dd>
+            </div>
+          ) : null}
           <div>
             <dt>Confidence</dt>
             <dd>

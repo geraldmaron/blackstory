@@ -52,17 +52,17 @@ export const DIGNITY_PALETTE = {
   densityDisabledFillLight: 'rgba(109, 103, 95, 0.08)',
 
   kindPerson: brandPalette.copperPin,
-  kindPlace: '#C48A4A',
-  kindSchool: brandPalette.pageSand,
-  kindOrganization: brandPalette.copperTextLight,
-  kindInstitution: '#EDE4D2',
-  kindInstitutionStroke: brandPalette.stone,
+  kindPlace: '#E09A55',
+  kindSchool: '#7A8B52',
+  kindOrganization: '#9A5828',
+  kindInstitution: '#8B7355',
+  kindInstitutionStroke: '#C9BA9A',
   kindEvent: brandPalette.copperDark,
-  kindLaw: '#3D6B9A',
-  kindCase: '#5A7FA8',
-  kindPublication: '#6D7A5C',
-  kindArtifact: '#9A7B5A',
-  kindMovement: '#A65D3A',
+  kindLaw: '#356494',
+  kindCase: '#7BA8D4',
+  kindPublication: '#5C6B4E',
+  kindArtifact: '#A68968',
+  kindMovement: '#C4683A',
   kindOther: brandPalette.stone,
 
   kindMassacre: '#B83A2A',
@@ -86,6 +86,38 @@ export const DENSITY_TIER_FILL: Readonly<Record<'documented' | 'emerging' | 'con
   documented: DIGNITY_PALETTE.densityLow,
   emerging: DIGNITY_PALETTE.densityMid,
   concentrated: DIGNITY_PALETTE.densityHigh,
+};
+
+/** Black share of county population — copper/sand opacity scale (never alarm red). */
+export const POPULATION_SHARE_TIER_FILL: Readonly<
+  Record<'trace' | 'low' | 'mid' | 'high' | 'majority', string>
+> = {
+  trace: 'rgba(184, 107, 42, 0.08)',
+  low: 'rgba(184, 107, 42, 0.16)',
+  mid: 'rgba(216, 161, 120, 0.28)',
+  high: 'rgba(184, 107, 42, 0.38)',
+  majority: 'rgba(184, 107, 42, 0.52)',
+};
+
+/** Decade-over-decade share change — copper gain, stone loss, neutral sand. */
+export const POPULATION_CHANGE_TIER_FILL: Readonly<
+  Record<'gainStrong' | 'gainModerate' | 'neutral' | 'lossModerate' | 'lossStrong', string>
+> = {
+  gainStrong: 'rgba(184, 107, 42, 0.48)',
+  gainModerate: 'rgba(216, 161, 120, 0.32)',
+  neutral: 'rgba(216, 161, 120, 0.12)',
+  lossModerate: 'rgba(109, 103, 95, 0.28)',
+  lossStrong: 'rgba(109, 103, 95, 0.42)',
+};
+
+export const POPULATION_CHANGE_TIER_GLYPH: Readonly<
+  Record<'gainStrong' | 'gainModerate' | 'neutral' | 'lossModerate' | 'lossStrong', string>
+> = {
+  gainStrong: '↑',
+  gainModerate: '↗',
+  neutral: '·',
+  lossModerate: '↘',
+  lossStrong: '↓',
 };
 
 export const CONFIDENCE_TIER_GLYPH: Readonly<Record<string, string>> = {

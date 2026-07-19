@@ -127,6 +127,7 @@ export type WikidataClaim = {
 export type WikidataEntity = {
   readonly id: string;
   readonly labels?: Readonly<Record<string, { readonly value: string }>>;
+  readonly descriptions?: Readonly<Record<string, { readonly value: string }>>;
   readonly aliases?: Readonly<Record<string, readonly { readonly value: string }[]>>;
   readonly claims?: Readonly<Record<string, readonly WikidataClaim[]>>;
 };

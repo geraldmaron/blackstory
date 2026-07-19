@@ -1,14 +1,19 @@
 /**
- * Unit tests for record mark shape selection, alt copy, and caption constants.
+ * Unit tests for record mark shape selection, alt copy, captions, and photo alt helpers.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   RECORD_MARK_CAPTION,
+  RECORD_MARK_CAPTION_DATA_SAVER,
+  RECORD_MARK_CAPTION_UNAVAILABLE,
+  entityPrimaryImageAlt,
   kindLabelForMark,
+  primaryImageRightsLabel,
   recordMarkAlt,
+  recordMarkCaption,
   selectRecordMarkShape,
-} from './record-mark.ts';
+} from './record-mark.js';
 
 test('selectRecordMarkShape maps person and movement to arch', () => {
   assert.equal(selectRecordMarkShape('person'), 'arch');
@@ -44,19 +49,49 @@ test('kindLabelForMark returns title-case labels', () => {
   assert.equal(kindLabelForMark(undefined), undefined);
 });
 
-test('alt text refuses likeness and photograph framing', () => {
+test('alt text refuses likeness framing and avoids person-or-place only wording', () => {
   const alt = recordMarkAlt({
-    entityName: 'Test Person',
-    shape: 'arch',
-    kindLabel: 'Person',
+    entityName: 'Howard University',
+    shape: 'book',
+    kindLabel: 'School',
+    jurisdictionLabel: 'Washington, D.C.',
   });
   assert.match(alt, /symbolic record mark/i);
-  assert.match(alt, /not a photograph/i);
-  assert.match(alt, /Test Person/);
+  assert.match(alt, /Howard University/);
+  assert.match(alt, /School record/);
+  assert.match(alt, /Washington, D\.C\./);
+  assert.match(alt, /not a photograph of Howard University/i);
+  assert.doesNotMatch(alt, /person or place/i);
   assert.doesNotMatch(alt, /^Photograph of/i);
 });
 
-test('RECORD_MARK_CAPTION is present and honest', () => {
-  assert.match(RECORD_MARK_CAPTION, /record mark/i);
-  assert.match(RECORD_MARK_CAPTION, /rights-cleared photo/i);
+test('visible captions state load failure and data-saver reasons accurately', () => {
+  assert.match(recordMarkCaption('exhausted'), /unavailable/i);
+  assert.match(recordMarkCaption('prefer_mark'), /data saver/i);
+  assert.match(recordMarkCaption('absent'), /rights-cleared photo/i);
+});
+
+test('recordMarkCaption maps each reason to an honest visible string', () => {
+  assert.equal(recordMarkCaption('absent'), RECORD_MARK_CAPTION);
+  assert.equal(recordMarkCaption('exhausted'), RECORD_MARK_CAPTION_UNAVAILABLE);
+  assert.equal(recordMarkCaption('prefer_mark'), RECORD_MARK_CAPTION_DATA_SAVER);
+  assert.equal(recordMarkCaption(undefined), RECORD_MARK_CAPTION);
+});
+
+test('entityPrimaryImageAlt prefers published alt and avoids likeness fallback', () => {
+  assert.equal(
+    entityPrimaryImageAlt('Official portrait of Kamala Harris, 2021', 'Kamala Harris'),
+    'Official portrait of Kamala Harris, 2021',
+  );
+  assert.equal(
+    entityPrimaryImageAlt('  ', 'Kamala Harris'),
+    'Photograph associated with Kamala Harris',
+  );
+  assert.doesNotMatch(entityPrimaryImageAlt('', 'Kamala Harris'), /^Photograph of/i);
+});
+
+test('primaryImageRightsLabel expands snake_case statuses', () => {
+  assert.equal(primaryImageRightsLabel('public_domain'), 'public domain');
+  assert.equal(primaryImageRightsLabel('fair_use'), 'fair use');
+  assert.equal(primaryImageRightsLabel('licensed'), 'licensed');
 });

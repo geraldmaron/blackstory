@@ -1,0 +1,274 @@
+{
+  "generatedAt": "2026-07-19T02:35:10.318Z",
+  "summary": {
+    "queriesRun": 20,
+    "searchHits": 160,
+    "skippedDuplicate": 13,
+    "skippedFilter": 118,
+    "skippedCatalog": 9,
+    "newCandidates": 20
+  },
+  "candidates": [
+    {
+      "id": "disc_tulsa_race_massacre_q1824714",
+      "kind": "event",
+      "displayName": "Tulsa Race Massacre",
+      "summary": "racially charged mass attack in Tulsa, Oklahoma, USA in May-June 1921",
+      "wikidataId": "Q1824714",
+      "aliases": [
+        "Tulsa Massacre",
+        "Tulsa Pogrom",
+        "Tulsa Race Riot",
+        "Greenwood Massacre",
+        "Black Wall Street Riot",
+        "Black Wall Street Massacre",
+        "Tulsa Riot"
+      ],
+      "sourceQuery": "Black Wall Street",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+      "lat": 36.15972,
+      "lng": -95.98583,
+      "discoveredAt": "2026-07-19T02:34:58.829Z"
+    },
+    {
+      "id": "disc_black_wall_street_q16952102",
+      "kind": "other",
+      "displayName": "Black Wall Street",
+      "summary": "Hub of African-American business in the 19-20th centuries",
+      "wikidataId": "Q16952102",
+      "aliases": [],
+      "sourceQuery": "Black Wall Street",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Wall_Street_(Durham%2C_North_Carolina)",
+      "discoveredAt": "2026-07-19T02:34:58.829Z"
+    },
+    {
+      "id": "disc_the_black_wall_street_times_q122945494",
+      "kind": "organization",
+      "displayName": "The Black Wall Street Times",
+      "summary": "African-American newspaper founded in Tulsa, Oklahoma in 2017",
+      "wikidataId": "Q122945494",
+      "aliases": [],
+      "sourceQuery": "Greenwood District Tulsa",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/The_Black_Wall_Street_Times",
+      "discoveredAt": "2026-07-19T02:34:59.486Z"
+    },
+    {
+      "id": "disc_jim_crow_laws_q865365",
+      "kind": "other",
+      "displayName": "Jim Crow laws",
+      "summary": "state and local laws enforcing racial segregation in the Southern United States",
+      "wikidataId": "Q865365",
+      "aliases": [],
+      "sourceQuery": "Rosewood massacre",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Jim_Crow_laws",
+      "discoveredAt": "2026-07-19T02:35:00.010Z"
+    },
+    {
+      "id": "disc_underground_railroad_q868393",
+      "kind": "other",
+      "displayName": "Underground Railroad",
+      "summary": "network of secret routes & safehouses in 19th-century U.S. used by slaves to find freedom",
+      "wikidataId": "Q868393",
+      "aliases": [],
+      "sourceQuery": "Underground Railroad sites",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Underground_Railroad",
+      "discoveredAt": "2026-07-19T02:35:01.603Z"
+    },
+    {
+      "id": "disc_harriet_tubman_underground_railroad_national_mon_q14691942",
+      "kind": "other",
+      "displayName": "Harriet Tubman Underground Railroad National Monument",
+      "summary": "National Historical Park of the United States in Maryland",
+      "wikidataId": "Q14691942",
+      "aliases": [
+        "HATU"
+      ],
+      "sourceQuery": "Underground Railroad sites",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Harriet_Tubman_Underground_Railroad_National_Historical_Park",
+      "lat": 38.4483,
+      "lng": -76.1387,
+      "discoveredAt": "2026-07-19T02:35:01.603Z"
+    },
+    {
+      "id": "disc_harriet_tubman_underground_railroad_visitor_cent_q29097633",
+      "kind": "place",
+      "displayName": "Harriet Tubman Underground Railroad Visitor Center",
+      "summary": "museum and visitor center in Maryland",
+      "wikidataId": "Q29097633",
+      "aliases": [],
+      "sourceQuery": "Underground Railroad sites",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Harriet_Tubman_Underground_Railroad_Visitor_Center",
+      "lat": 38.44975,
+      "lng": -76.13816,
+      "discoveredAt": "2026-07-19T02:35:01.603Z"
+    },
+    {
+      "id": "disc_the_underground_rail_road_q7771382",
+      "kind": "other",
+      "displayName": "The Underground Rail Road",
+      "summary": "1872 book by William Still",
+      "wikidataId": "Q7771382",
+      "aliases": [
+        "The Underground Railroad"
+      ],
+      "sourceQuery": "Underground Railroad sites",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/The_Underground_Railroad_(Still)",
+      "discoveredAt": "2026-07-19T02:35:01.603Z"
+    },
+    {
+      "id": "disc_black_press_q4921504",
+      "kind": "organization",
+      "displayName": "Black Press",
+      "summary": "Canadian publisher of newspapers",
+      "wikidataId": "Q4921504",
+      "aliases": [
+        "Black Press Group",
+        "Black Press Media",
+        "Black Press Group Ltd"
+      ],
+      "sourceQuery": "Black owned newspapers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Press",
+      "discoveredAt": "2026-07-19T02:35:02.226Z"
+    },
+    {
+      "id": "disc_amsterdam_news_q1140177",
+      "kind": "organization",
+      "displayName": "Amsterdam News",
+      "summary": "African-American newspaper from Harlem, Manhattan, New York City",
+      "wikidataId": "Q1140177",
+      "aliases": [
+        "The New York Amsterdam News",
+        "New York Amsterdam News",
+        "The New York Amsterdam news",
+        "amsterdamnews.com",
+        "N.Y. Amsterdam News",
+        "The Amsterdam News",
+        "NY Amsterdam News"
+      ],
+      "sourceQuery": "Black owned newspapers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/New_York_Amsterdam_News",
+      "discoveredAt": "2026-07-19T02:35:02.226Z"
+    },
+    {
+      "id": "disc_seattle_medium_q7442135",
+      "kind": "organization",
+      "displayName": "Seattle Medium",
+      "summary": "Black newspaper serving Seattle",
+      "wikidataId": "Q7442135",
+      "aliases": [
+        "The Medium"
+      ],
+      "sourceQuery": "Black owned newspapers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Seattle_Medium",
+      "discoveredAt": "2026-07-19T02:35:02.226Z"
+    },
+    {
+      "id": "disc_california_african_american_museum_q5020212",
+      "kind": "place",
+      "displayName": "California African American Museum",
+      "summary": "museum in Los Angeles, California",
+      "wikidataId": "Q5020212",
+      "aliases": [
+        "CAAM",
+        "California Afro-American Museum"
+      ],
+      "sourceQuery": "African American museums",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/California_African_American_Museum",
+      "lat": 34.0158,
+      "lng": -118.283,
+      "discoveredAt": "2026-07-19T02:35:03.075Z"
+    },
+    {
+      "id": "disc_rural_african_american_museum_q65807727",
+      "kind": "place",
+      "displayName": "Rural African American Museum",
+      "summary": "African American Museum in Opelousas, Louisiana",
+      "wikidataId": "Q65807727",
+      "aliases": [],
+      "sourceQuery": "African American museums",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Rural_African_American_Museum",
+      "lat": 30.54667,
+      "lng": -92.07944,
+      "discoveredAt": "2026-07-19T02:35:03.075Z"
+    },
+    {
+      "id": "disc_bontemps_african_american_museum_q4942613",
+      "kind": "place",
+      "displayName": "Bontemps African American Museum",
+      "summary": "museum in Alexandria, Louisiana, U.S",
+      "wikidataId": "Q4942613",
+      "aliases": [],
+      "sourceQuery": "African American museums",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Bontemps_African_American_Museum",
+      "lat": 31.3099,
+      "lng": -92.4423,
+      "discoveredAt": "2026-07-19T02:35:03.075Z"
+    },
+    {
+      "id": "disc_jews_in_the_civil_rights_movement_q123758211",
+      "kind": "event",
+      "displayName": "Jews in the civil rights movement",
+      "summary": "Jewish organizations and individuals in the American Civil Rights Movement",
+      "wikidataId": "Q123758211",
+      "aliases": [],
+      "sourceQuery": "Civil Rights Movement leaders",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Jews_in_the_civil_rights_movement",
+      "discoveredAt": "2026-07-19T02:35:03.811Z"
+    },
+    {
+      "id": "disc_civil_rights_movement_1896_1954_q10579095",
+      "kind": "event",
+      "displayName": "civil rights movement (1896–1954)",
+      "summary": "social movement in the United States",
+      "wikidataId": "Q10579095",
+      "aliases": [],
+      "sourceQuery": "Civil Rights Movement leaders",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Civil_rights_movement_(1896%E2%80%931954)",
+      "discoveredAt": "2026-07-19T02:35:03.811Z"
+    },
+    {
+      "id": "disc_oakland_black_cowboy_association_q107969508",
+      "kind": "organization",
+      "displayName": "Oakland Black Cowboy Association",
+      "summary": "American nonprofit organization",
+      "wikidataId": "Q107969508",
+      "aliases": [],
+      "sourceQuery": "Black cowboys",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Oakland_Black_Cowboy_Association",
+      "discoveredAt": "2026-07-19T02:35:04.418Z"
+    },
+    {
+      "id": "disc_national_association_for_black_veterans_q6970559",
+      "kind": "organization",
+      "displayName": "National Association for Black Veterans",
+      "summary": "US Veterans Service Organization",
+      "wikidataId": "Q6970559",
+      "aliases": [],
+      "sourceQuery": "Black veterans organizations",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/National_Association_for_Black_Veterans",
+      "discoveredAt": "2026-07-19T02:35:05.045Z"
+    },
+    {
+      "id": "disc_alfred_niger_q111214355",
+      "kind": "person",
+      "displayName": "Alfred Niger",
+      "summary": "antebellum Black suffrage activist and barber from Providence, Rhode Island",
+      "wikidataId": "Q111214355",
+      "aliases": [],
+      "sourceQuery": "Black suffrage movement",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Alfred_Niger",
+      "discoveredAt": "2026-07-19T02:35:06.531Z"
+    },
+    {
+      "id": "disc_richmond_s_african_burial_grounds_and_historic_a_q116636568",
+      "kind": "place",
+      "displayName": "Richmond's African Burial Grounds and Historic African American Cemeteries",
+      "summary": "historic African American cemetery in Richmond, Virginia",
+      "wikidataId": "Q116636568",
+      "aliases": [],
+      "sourceQuery": "African American cemeteries",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African_burial_grounds_and_historic_African_American_cemeteries_of_Richmond%2C_Virginia",
+      "discoveredAt": "2026-07-19T02:35:08.397Z"
+    }
+  ]
+}

@@ -6,10 +6,13 @@
  * `WebSearchProviderConfig.storageTermsConfirmed` is also true (./normalizer.ts
  * `assertStorageTermsConfirmed`).
  */
-import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from '../candidates.js';
+import {
+  ADAPTER_CANDIDATE_SCHEMA_VERSION,
+} from '../candidates.js';
 import type { SourceAdapterContract } from '../types.js';
 import {
   BRAVE_SEARCH_ADAPTER_ID,
+  SEARXNG_SEARCH_ADAPTER_ID,
   WEB_SEARCH_DEFAULT_CLASSIFICATION,
   WEB_SEARCH_PARSER_VERSION,
   WEB_SEARCH_STABLE_ID_SCHEME,
@@ -44,6 +47,45 @@ export function createBraveSearchAdapterContract(overrides: Partial<SourceAdapte
     permittedClaimClasses: ['biographical_fact', 'geographic_fact', 'organizational_fact'],
     refreshSchedule: '0 */12 * * *',
     rateLimits: { requestsPerMinute: 10, burst: 3 },
+    volume: { expectedRecordsPerRun: 100, countToleranceFraction: 0.5 },
+    geographicCoverage: { countries: ['US'] },
+    expectedSchemaVersion: ADAPTER_CANDIDATE_SCHEMA_VERSION,
+    canarySampleFraction: 0.05,
+    ...overrides,
+  };
+}
+
+export function createSearxngSearchAdapterContract(
+  overrides: Partial<SourceAdapterContract> = {},
+): SourceAdapterContract {
+  return {
+    adapterId: SEARXNG_SEARCH_ADAPTER_ID,
+    parserVersion: WEB_SEARCH_PARSER_VERSION,
+    displayName: 'SearXNG Meta-Search Discovery',
+    classification: WEB_SEARCH_DEFAULT_CLASSIFICATION,
+    stableIdScheme: WEB_SEARCH_STABLE_ID_SCHEME,
+    policy: {
+      snapshotMode: 'selective',
+      rights: {
+        defaultStatus: 'unknown',
+        publicationPermissions: ['cite', 'short_excerpt'],
+        prohibitedUses: ['full_text_republication', 'unattributed_reuse'],
+      },
+      permittedClaimClasses: ['biographical_fact', 'geographic_fact', 'organizational_fact'],
+      refreshSchedule: '0 */12 * * *',
+      notes:
+        'Self-hosted SearXNG (preferred OSS web-search). Operator must confirm engine-policy ' +
+        'acceptance via storageTermsConfirmed before persistence — see provider-decision.ts. ' +
+        'Adapter starts disabled by default independent of the storage-terms gate.',
+    },
+    rights: {
+      defaultStatus: 'unknown',
+      publicationPermissions: ['cite', 'short_excerpt'],
+      prohibitedUses: ['full_text_republication', 'unattributed_reuse'],
+    },
+    permittedClaimClasses: ['biographical_fact', 'geographic_fact', 'organizational_fact'],
+    refreshSchedule: '0 */12 * * *',
+    rateLimits: { requestsPerMinute: 20, burst: 5 },
     volume: { expectedRecordsPerRun: 100, countToleranceFraction: 0.5 },
     geographicCoverage: { countries: ['US'] },
     expectedSchemaVersion: ADAPTER_CANDIDATE_SCHEMA_VERSION,

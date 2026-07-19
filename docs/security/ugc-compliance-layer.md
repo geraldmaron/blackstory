@@ -19,6 +19,7 @@ without both an approved  registry entry *and* a registered  obligations entry.
 | Source | Deletion sync | Republication | ML training | Storage-rights tier | Attribution | Liveness re-check |
 |---|---|---|---|---|---|---|
 | Reddit | Required, ≤48h, contractual | Prohibited | Prohibited | — | Required | Every 7 days |
+| SearXNG (self-hosted) | — | Prohibited | Allowed | Required (operator engine policy) | Required | — |
 | Brave Search | — | Prohibited | Allowed | Required | Required | — |
 | Exa Search | — | Prohibited | Allowed | Required | Required | — |
 | RSS | — | Allowed | Allowed | — | Required | Every 30 days |

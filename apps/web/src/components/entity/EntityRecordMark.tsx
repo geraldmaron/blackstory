@@ -1,14 +1,16 @@
 /**
  * Flat matte symbolic record mark for entities without a rights-cleared primaryImage.
  * Kind selects book, pin, or arch silhouette — never a portrait or photo mosaic.
+ * Accessible name (aria-labelledby) and figcaption stay aligned with why the mark is shown.
  */
 import React from 'react';
 import {
-  RECORD_MARK_CAPTION,
   RECORD_MARK_SHAPE_META,
   kindLabelForMark,
   recordMarkAlt,
+  recordMarkCaption,
   selectRecordMarkShape,
+  type RecordMarkReason,
   type RecordMarkShape,
 } from './record-mark';
 
@@ -19,6 +21,8 @@ export type EntityRecordMarkProps = {
   readonly entityName: string;
   readonly kind?: string;
   readonly jurisdictionLabel?: string;
+  /** Why this mark is shown — drives both accessible name and visible caption. */
+  readonly reason?: RecordMarkReason;
 };
 
 export function EntityRecordMark({
@@ -26,21 +30,38 @@ export function EntityRecordMark({
   entityName,
   kind,
   jurisdictionLabel,
+  reason = 'absent',
 }: EntityRecordMarkProps) {
   const shape = selectRecordMarkShape(kind);
   const kindLabel = kindLabelForMark(kind);
-  const alt = recordMarkAlt({
+  const suffix = hashSuffix(entityId);
+  const nameId = `record-mark-name-${suffix}`;
+  const captionId = `record-mark-caption-${suffix}`;
+  const markId = `record-mark-${shape}-${suffix}`;
+
+  const accessibleName = recordMarkAlt({
     entityName,
     shape,
     ...(kindLabel !== undefined ? { kindLabel } : {}),
+    ...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {}),
   });
-  const markId = `record-mark-${shape}-${hashSuffix(entityId)}`;
+  const caption = recordMarkCaption(reason);
 
-  const contextParts = [kindLabel, jurisdictionLabel].filter(Boolean);
+  const contextParts = [kindLabel, jurisdictionLabel].filter(
+    (part): part is string => typeof part === 'string' && part.trim().length > 0,
+  );
 
   return (
     <figure className="ds-entity-photo ds-entity-photo--mark">
-      <div className="ds-entity-mark" role="img" aria-label={alt}>
+      <div
+        className="ds-entity-mark"
+        role="img"
+        aria-labelledby={nameId}
+        aria-describedby={captionId}
+      >
+        <span id={nameId} className="ds-visually-hidden">
+          {accessibleName}
+        </span>
         <svg
           className="ds-entity-mark__svg"
           viewBox="0 0 240 280"
@@ -52,11 +73,13 @@ export function EntityRecordMark({
           <RecordMarkShapeGraphic shape={shape} markId={markId} />
         </svg>
         {contextParts.length > 0 ? (
-          <p className="ds-entity-mark__context ds-mono">{contextParts.join(' · ')}</p>
+          <p className="ds-entity-mark__context ds-mono" aria-hidden="true">
+            {contextParts.join(' · ')}
+          </p>
         ) : null}
       </div>
-      <figcaption className="ds-entity-photo__credit ds-sans">
-        {RECORD_MARK_CAPTION}
+      <figcaption id={captionId} className="ds-entity-photo__credit ds-sans">
+        {caption}
         <span className="ds-mono"> · {RECORD_MARK_SHAPE_META[shape].label}</span>
       </figcaption>
     </figure>

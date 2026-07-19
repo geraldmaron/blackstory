@@ -1,23 +1,13 @@
 /**
- * Brave web-search discovery campaign (fixture-first, fail-closed).
+ * Web-search discovery campaign (fixture-first, fail-closed).
  *
- * Flow: `parseBraveSearchResponse` → `normalizeWebSearchBatch` with explicit
- * `WebSearchProviderConfig` → `runDiscoveryCampaign` → campaign-runner yield summary.
+ * Preferred provider: SearXNG (self-hosted OSS). Brave remains supported.
+ * Flow: parse provider response → `normalizeWebSearchBatch` → `runDiscoveryCampaign`.
  *
  * Fail-closed gates (in order):
  * 1. Campaign refuses to run unless `providerConfig.storageTermsConfirmed === true`
- *    (independent of registry approval; see `WEB_SEARCH_PROVIDER_DECISION` — written
- *    confirmation remains false in-repo until a human obtains vendor terms).
- * 2. `normalizeWebSearchBatch` re-checks via `assertStorageTermsConfirmed`.
- * 3. `assertCampaignCannotPublish` on every yield path — discovery never publishes.
- *
- * Request budget: roster caps at 50 requests/run (`WEB_SEARCH_MAX_REQUESTS_PER_RUN`).
- * Fixture dry-runs count as 1 request equivalent; live paths would delegate per-query
- * checks to `evaluateWebSearchQueryBudget` before issuing HTTP.
- *
- * Wayback: default `requireWaybackCapture: true`. Fixture mode does not invent capture
- * pointers — survivors carry `waybackGate: 'required_unmet'` until a live SPN run succeeds.
- * Set `requireWaybackCapture: false` only in tests that explicitly opt out.
+ * 2. `normalizeWebSearchBatch` re-checks via `assertStorageTermsConfirmed`
+ * 3. `assertCampaignCannotPublish` — discovery never publishes
  */
 import {
   approveSourcePolicy,
@@ -29,13 +19,19 @@ import {
 import {
   assertStorageTermsConfirmed,
   BRAVE_SEARCH_ADAPTER_ID,
+  SEARXNG_SEARCH_ADAPTER_ID,
   buildWebSearchQueryTexts,
   createBraveSearchAdapterContract,
+  createSearxngSearchAdapterContract,
   parseBraveSearchResponse,
+  parseSearxngSearchResponse,
   normalizeWebSearchBatch,
   stampExternalQueryProvenance,
+  webSearchAdapterId,
   WEB_SEARCH_PROVIDER_DECISION,
   type WebSearchGeographicSeed,
+  type WebSearchParsedBatch,
+  type WebSearchProvider,
   type WebSearchProviderConfig,
 } from '../adapters/web-search/index.js';
 import type { EvidenceSource } from '../provenance/source.js';
@@ -64,7 +60,6 @@ export type WebSearchWaybackGate = 'deferred' | 'required_unmet' | 'satisfied';
 
 export type WebSearchCampaignRequestBudget = {
   readonly maxRequestsPerRun: typeof WEB_SEARCH_MAX_REQUESTS_PER_RUN;
-  /** Requests charged this run (fixture path = 1). */
   readonly requestsIssued: number;
   readonly queriesPlanned: number;
   readonly queriesExecuted: number;
@@ -73,7 +68,7 @@ export type WebSearchCampaignRequestBudget = {
 
 export type WebSearchCampaignResult = {
   readonly kind: typeof WEB_SEARCH_CAMPAIGN_KIND;
-  readonly adapterId: typeof BRAVE_SEARCH_ADAPTER_ID;
+  readonly adapterId: typeof SEARXNG_SEARCH_ADAPTER_ID | typeof BRAVE_SEARCH_ADAPTER_ID;
   readonly campaign: DiscoveryCampaignResult;
   readonly yield: CampaignYieldSummary;
   readonly waybackGate: WebSearchWaybackGate;
@@ -82,7 +77,6 @@ export type WebSearchCampaignResult = {
   readonly rejectedResultCount: number;
   readonly storageTermsGate: {
     readonly confirmedAtRunTime: true;
-    /** Always mirrors provider-decision module — never flipped by campaign code. */
     readonly providerDecisionConfirmedInWriting: typeof WEB_SEARCH_PROVIDER_DECISION.storageTermsConfirmedInWriting;
   };
   readonly editorialReviews?: readonly EditorialReviewResult[];
@@ -91,8 +85,12 @@ export type WebSearchCampaignResult = {
 
 export type RunWebSearchCampaignInput = {
   readonly providerConfig: WebSearchProviderConfig;
-  /** Parsed via `parseBraveSearchResponse` — fixture-first dry-run path. */
-  readonly braveResponseRaw: unknown;
+  /**
+   * Provider JSON payload. Prefer `searchResponseRaw`. `braveResponseRaw` is kept as a
+   * deprecated alias for Brave-era call sites.
+   */
+  readonly searchResponseRaw?: unknown;
+  readonly braveResponseRaw?: unknown;
   readonly stampedAt: string;
   readonly completedAt: string;
   readonly campaignId?: string;
@@ -102,10 +100,6 @@ export type RunWebSearchCampaignInput = {
   readonly geographicSeeds?: readonly WebSearchGeographicSeed[];
   readonly maxQueries?: number;
   readonly maxCandidates?: number;
-  /**
-   * When true (default), fixture runs mark `waybackGate: 'required_unmet'` because no SPN
-   * capture pointers are supplied — never fabricate Wayback success.
-   */
   readonly requireWaybackCapture?: boolean;
   readonly sourceRegistry?: SourceRegistryStore;
   readonly catalogProfiles?: readonly ResolutionProfile[];
@@ -146,47 +140,57 @@ function resolveMaxQueries(maxQueries: number | undefined): number {
   return cap;
 }
 
-/**
- * Campaign-level storage gate — throws before parse/normalize/discovery when terms are unconfirmed.
- * Tests may pass `storageTermsConfirmed: true` in injected config only; the provider-decision
- * constant `storageTermsConfirmedInWriting` stays false until human vendor confirmation.
- */
 export function assertWebSearchCampaignStorageTerms(config: WebSearchProviderConfig): void {
   assertStorageTermsConfirmed(config);
 }
 
-function ensureApprovedBraveRegistry(
+function parseProviderResponse(provider: WebSearchProvider, raw: unknown): WebSearchParsedBatch {
+  if (provider === 'searxng') return parseSearxngSearchResponse(raw);
+  if (provider === 'brave') return parseBraveSearchResponse(raw);
+  throw new Error(`Web search campaign does not yet support provider=${provider}`);
+}
+
+function ensureApprovedRegistry(
   store: SourceRegistryStore,
+  provider: WebSearchProvider,
   now: string,
 ): SourceRegistryEntry {
-  const existing = store.get('reg_brave_search_campaign');
+  if (provider === 'exa') {
+    throw new Error('Exa web-search campaign wiring is not implemented');
+  }
+  const adapterId = webSearchAdapterId(provider);
+  const regId = `reg_${adapterId}_campaign`;
+  const existing = store.get(regId);
   if (existing?.registryState === 'approved' || existing?.registryState === 'canary') {
     return existing;
   }
-  const contract = createBraveSearchAdapterContract();
+  const contract =
+    provider === 'searxng'
+      ? createSearxngSearchAdapterContract()
+      : createBraveSearchAdapterContract();
   const evidenceSource: EvidenceSource = {
-    id: 'src_brave_search_campaign',
+    id: `src_${adapterId}_campaign`,
     organizationId: 'org_community',
-    displayName: 'Brave Search API Discovery (campaign)',
+    displayName: contract.displayName,
     classification: contract.classification,
-    adapterId: BRAVE_SEARCH_ADAPTER_ID,
+    adapterId,
     stableIdScheme: contract.stableIdScheme,
     policy: contract.policy,
     adapterEnabled: true,
-    killSwitchId: 'adapter:brave_search',
+    killSwitchId: `adapter:${adapterId}`,
     createdAt: now,
     updatedAt: now,
   };
   if (!existing) {
     registerSource(store, {
-      id: 'reg_brave_search_campaign',
+      id: regId,
       contract,
       evidenceSource,
       createdAt: now,
     });
   }
   return approveSourcePolicy(store, {
-    id: 'reg_brave_search_campaign',
+    id: regId,
     approvedBy: 'web-search-campaign',
     approvedAt: now,
   });
@@ -203,7 +207,7 @@ function resolveWaybackGate(input: {
 }
 
 /**
- * Run a fixture-first Brave web-search discovery campaign. Private candidates only — no publish.
+ * Run a fixture-first web-search discovery campaign. Private candidates only — no publish.
  */
 export async function runWebSearchCampaign(
   input: RunWebSearchCampaignInput,
@@ -211,10 +215,16 @@ export async function runWebSearchCampaign(
   assertCampaignCannotPublish();
   assertWebSearchCampaignStorageTerms(input.providerConfig);
 
-  if (input.providerConfig.provider !== 'brave') {
+  const provider = input.providerConfig.provider;
+  if (provider !== 'searxng' && provider !== 'brave') {
     throw new Error(
-      `Web search campaign supports Brave only in v1; got provider=${input.providerConfig.provider}`,
+      `Web search campaign supports searxng|brave in v1; got provider=${provider}`,
     );
+  }
+
+  const responseRaw = input.searchResponseRaw ?? input.braveResponseRaw;
+  if (responseRaw === undefined) {
+    throw new Error('searchResponseRaw (or legacy braveResponseRaw) is required');
   }
 
   const maxQueries = resolveMaxQueries(input.maxQueries);
@@ -228,13 +238,15 @@ export async function runWebSearchCampaign(
     queryTexts[0] ||
     'freedom rider Montgomery County Alabama';
 
-  const parsed = parseBraveSearchResponse(input.braveResponseRaw);
+  const parsed = parseProviderResponse(provider, responseRaw);
   const sourceRegistry = input.sourceRegistry ?? createInMemorySourceRegistry();
-  const registryEntry = ensureApprovedBraveRegistry(sourceRegistry, input.stampedAt);
+  const registryEntry = ensureApprovedRegistry(sourceRegistry, provider, input.stampedAt);
   const runId = input.runId ?? `run_web_search_${input.stampedAt}`;
+  const adapterId =
+    provider === 'searxng' ? SEARXNG_SEARCH_ADAPTER_ID : BRAVE_SEARCH_ADAPTER_ID;
 
   const queryProvenance = stampExternalQueryProvenance({
-    provider: input.providerConfig.provider,
+    provider,
     queryText,
     executedAt: input.stampedAt,
     planTermsVersion: input.providerConfig.planTermsVersion,
@@ -263,14 +275,14 @@ export async function runWebSearchCampaign(
         maxDeadLetter: 10,
         maxRetriesPerCandidate: 2,
       },
-      boundaries: { countries: ['US'], adapterIds: [BRAVE_SEARCH_ADAPTER_ID] },
+      boundaries: { countries: ['US'], adapterIds: [adapterId] },
       continueOnQuarantine: true,
     }),
     records: adapterRecords,
     pack,
     runContext: {
       runId,
-      adapterId: BRAVE_SEARCH_ADAPTER_ID,
+      adapterId,
       startedAt: input.stampedAt,
       entityKind: pack.entityKind,
       theme: pack.theme,
@@ -301,7 +313,7 @@ export async function runWebSearchCampaign(
 
   return {
     kind: WEB_SEARCH_CAMPAIGN_KIND,
-    adapterId: BRAVE_SEARCH_ADAPTER_ID,
+    adapterId,
     campaign,
     yield: yieldSummary,
     waybackGate,

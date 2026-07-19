@@ -845,10 +845,10 @@
 }
 
 /* Hero subject morph — History → His Story → … → Black Story.
-   Flat matte only: opacity + width. No scale on the S (keeps the baseline stable).
-   Split easing is gentler than the global snap ease so the letter does not jump. */
+   Flat matte only: opacity + width. Prefix slot width is JS-interpolated so
+   Story slides with the crossfade; the S never scales (baseline stays put). */
 .ds-hero-headline-morph {
-  --ds-hero-morph-ease: cubic-bezier(0.33, 0, 0.2, 1);
+  --ds-hero-morph-ease: cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: baseline;
   flex-wrap: nowrap;
@@ -856,31 +856,37 @@
 
 .ds-hero-headline-morph__prefix {
   position: relative;
-  display: inline-flex;
-  align-items: baseline;
-  min-width: max-content;
+  display: inline-block;
+  vertical-align: baseline;
+  white-space: nowrap;
+  overflow-x: clip;
+  overflow-y: visible;
+  box-sizing: content-box;
 }
 
 .ds-hero-headline-morph__prefix-out {
   position: absolute;
   inset: 0 auto auto 0;
   white-space: nowrap;
-  animation: ds-hero-prefix-out var(--ds-duration-slow) var(--ds-hero-morph-ease) both;
+  pointer-events: none;
+  animation: ds-hero-prefix-out var(--ds-hero-prefix-ms, 1100ms) var(--ds-hero-morph-ease) both;
 }
 
 .ds-hero-headline-morph__prefix-in {
+  display: inline-block;
   white-space: nowrap;
+  vertical-align: baseline;
 }
 
 .ds-hero-headline-morph__prefix-out + .ds-hero-headline-morph__prefix-in {
-  animation: ds-hero-prefix-in var(--ds-duration-slow) var(--ds-hero-morph-ease) both;
+  animation: ds-hero-prefix-in var(--ds-hero-prefix-ms, 1100ms) var(--ds-hero-morph-ease) both;
 }
 
 .ds-hero-headline-morph__gap {
   display: inline-block;
   width: 0;
   flex: 0 0 auto;
-  transition: width var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
+  transition: width var(--ds-hero-split-ms, 1500ms) var(--ds-hero-morph-ease);
 }
 
 .ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__gap {
@@ -894,7 +900,7 @@
   width: 0;
   flex: 0 0 auto;
   vertical-align: baseline;
-  transition: width var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
+  transition: width var(--ds-hero-split-ms, 1500ms) var(--ds-hero-morph-ease);
 }
 
 .ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__s-slot {
@@ -907,7 +913,7 @@
   text-transform: uppercase;
   line-height: inherit;
   vertical-align: baseline;
-  transition: opacity var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
+  transition: opacity var(--ds-hero-split-ms, 1500ms) var(--ds-hero-morph-ease);
 }
 
 .ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__s {
@@ -1898,7 +1904,10 @@
 .ds-kind-badge {
   display: inline-flex;
   align-items: center;
+  flex-wrap: nowrap;
   gap: var(--ds-space-2);
+  max-width: 100%;
+  white-space: nowrap;
 }
 
 .ds-kind-badge__label {
@@ -1907,6 +1916,13 @@
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ds-kind-badge__icon {
+  flex-shrink: 0;
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
 .ds-kind-badge--compact {
@@ -1916,6 +1932,11 @@
 .ds-kind-badge--compact .ds-kind-badge__label {
   font-size: inherit;
   letter-spacing: inherit;
+}
+
+.ds-kind-badge--compact .ds-kind-badge__icon {
+  width: 0.625rem;
+  height: 0.625rem;
 }
 
 .ds-confidence-mark {

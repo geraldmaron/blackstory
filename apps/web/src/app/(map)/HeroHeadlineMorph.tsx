@@ -3,7 +3,8 @@
 /**
  * Home hero headline subject morph: History splits into His Story (gap +
  * uppercase S), then the prefix crossfades through Her / Their / Your / Black
- * Story before holding. Trailer stays "happened *here*." Letter spans are
+ * Story before holding. The prefix slot width interpolates so Story slides
+ * instead of jumping. Trailer stays "happened *here*." Letter spans are
  * aria-hidden; the h1 exposes the full accessible label.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -36,6 +37,10 @@ function readClientMotionPreference(): { readonly reduced: boolean; readonly pha
   return { reduced, phaseIndex: reduced ? FINAL_INDEX : 0 };
 }
 
+/**
+ * Crossfades prefix words while interpolating the slot width so the following
+ * "Story" slides into place instead of snapping when word lengths differ.
+ */
 function MorphingPrefix({
   value,
   transitionMs,
@@ -45,11 +50,15 @@ function MorphingPrefix({
   readonly transitionMs: number;
   readonly animate: boolean;
 }) {
+  const rootRef = useRef<HTMLSpanElement>(null);
+  const inRef = useRef<HTMLSpanElement>(null);
+  const previousRef = useRef(value);
   const [current, setCurrent] = useState(value);
   const [outgoing, setOutgoing] = useState<string | null>(null);
-  const previousRef = useRef(value);
+  const [slotWidthPx, setSlotWidthPx] = useState<number | null>(null);
+  const [widthTransition, setWidthTransition] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (value === previousRef.current) return undefined;
 
     const from = previousRef.current;
@@ -58,25 +67,64 @@ function MorphingPrefix({
     if (!animate) {
       setOutgoing(null);
       setCurrent(value);
+      setSlotWidthPx(null);
+      setWidthTransition(false);
       return undefined;
     }
 
+    const fromWidth = rootRef.current?.getBoundingClientRect().width ?? 0;
     setOutgoing(from);
     setCurrent(value);
-    const timer = window.setTimeout(() => setOutgoing(null), transitionMs);
-    return () => window.clearTimeout(timer);
+    setWidthTransition(false);
+    setSlotWidthPx(fromWidth);
+
+    let raf2 = 0;
+    const raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => {
+        const toWidth = inRef.current?.scrollWidth ?? fromWidth;
+        setWidthTransition(true);
+        setSlotWidthPx(toWidth);
+      });
+    });
+
+    const timer = window.setTimeout(() => {
+      setOutgoing(null);
+      setSlotWidthPx(null);
+      setWidthTransition(false);
+    }, transitionMs);
+
+    return () => {
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
+      window.clearTimeout(timer);
+    };
   }, [value, animate, transitionMs]);
 
   const durationStyle = { animationDuration: `${transitionMs}ms` };
+  const slotStyle =
+    slotWidthPx !== null
+      ? {
+          width: `${slotWidthPx}px`,
+          transition: widthTransition
+            ? `width ${transitionMs}ms var(--ds-hero-morph-ease)`
+            : 'none',
+        }
+      : undefined;
 
   return (
-    <span className="ds-hero-headline-morph__prefix">
+    <span
+      ref={rootRef}
+      className="ds-hero-headline-morph__prefix"
+      data-morphing={outgoing !== null ? 'true' : 'false'}
+      style={slotStyle}
+    >
       {outgoing !== null ? (
         <span className="ds-hero-headline-morph__prefix-out" style={durationStyle}>
           {outgoing}
         </span>
       ) : null}
       <span
+        ref={inRef}
         className="ds-hero-headline-morph__prefix-in"
         style={outgoing !== null ? durationStyle : undefined}
       >
@@ -135,7 +183,8 @@ export function HeroHeadlineMorph() {
   const split = phase.storySplit || reducedMotion;
   const prefix = subjectPrefix(phase);
   const animatePrefix = !reducedMotion && phase.storySplit && phase.id !== 'his-story';
-  const splitMs = HERO_HEADLINE_PHASES[1]?.transitionMs ?? 1200;
+  const splitMs = HERO_HEADLINE_PHASES[1]?.transitionMs ?? 1500;
+  const prefixMs = phase.transitionMs > 0 ? phase.transitionMs : 700;
 
   return (
     <h1
@@ -148,13 +197,12 @@ export function HeroHeadlineMorph() {
         aria-hidden="true"
         data-phase={phase.id}
         data-split={split ? 'true' : 'false'}
-        style={{ ['--ds-hero-split-ms' as string]: `${splitMs}ms` }}
+        style={{
+          ['--ds-hero-split-ms' as string]: `${splitMs}ms`,
+          ['--ds-hero-prefix-ms' as string]: `${prefixMs}ms`,
+        }}
       >
-        <MorphingPrefix
-          value={prefix}
-          transitionMs={phase.transitionMs > 0 ? phase.transitionMs : 500}
-          animate={animatePrefix}
-        />
+        <MorphingPrefix value={prefix} transitionMs={prefixMs} animate={animatePrefix} />
         <span className="ds-hero-headline-morph__gap" />
         <span className="ds-hero-headline-morph__story">
           <span className="ds-hero-headline-morph__s-slot">

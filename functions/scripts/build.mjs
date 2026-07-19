@@ -21,6 +21,7 @@ const FIXTURE_RELATIVE_PATHS = [
   'packages/domain/src/adapters/internet-archive/fixtures/advanced-search-response.json',
   'packages/domain/src/adapters/dpla/fixtures/search-response-current-shape.json',
   'packages/domain/src/adapters/web-search/fixtures/brave-search-response.json',
+  'packages/domain/src/adapters/web-search/fixtures/searxng-search-response.json',
   'packages/schemas/constitution/policy.v1.json',
   'packages/schemas/constitution/product-constitution.schema.json',
 ];

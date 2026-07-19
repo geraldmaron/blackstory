@@ -5,7 +5,9 @@
 import type { ExternalQueryProvenance, WebSearchProvider } from './types.js';
 
 function apiNameFor(provider: WebSearchProvider): string {
-  return provider === 'brave' ? 'Brave Search API' : 'Exa Search API';
+  if (provider === 'searxng') return 'SearXNG';
+  if (provider === 'brave') return 'Brave Search API';
+  return 'Exa Search API';
 }
 
 export function stampExternalQueryProvenance(input: {

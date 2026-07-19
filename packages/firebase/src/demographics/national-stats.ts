@@ -22,9 +22,14 @@
  */
 import type { Firestore } from 'firebase-admin/firestore';
 import { AggregateField } from 'firebase-admin/firestore';
+import { computeGrowthRecord } from '@repo/domain';
 import { getServerFirestore } from '../server.js';
 import { FIRESTORE_ROOT } from '../firestore/paths.js';
-import { censusCountyDecadeSchema, type CensusCountyDecadeDecade } from './schema.js';
+import {
+  censusCountyDecadeSchema,
+  type CensusCountyDecadeDecade,
+  type CensusCountyDecadeDoc,
+} from './schema.js';
 import { hateCrimeCountyYearSchema, ucrStateParticipationSchema } from '../external/ucr-schema.js';
 
 const CENSUS_HOMEPAGE_BY_DECADE: Readonly<Record<CensusCountyDecadeDecade, string>> = {
@@ -91,6 +96,190 @@ export type NationalPopulationByDecade = {
   readonly sourceUrl: string;
 };
 
+export type PopulationDecadeChange = {
+  readonly fromDecade: CensusCountyDecadeDecade;
+  readonly toDecade: CensusCountyDecadeDecade;
+  readonly blackAbsoluteChange: number;
+  readonly blackPercentChange: number | null;
+  readonly shareFrom: number;
+  readonly shareTo: number;
+  readonly shareChangePp: number;
+  readonly comparabilityNote: string;
+  readonly source: string;
+  readonly sourceUrl: string;
+};
+
+export type StatePopulationByDecade = {
+  readonly stateFips: string;
+  readonly decade: CensusCountyDecadeDecade;
+  readonly countyCount: number;
+  readonly totalPopulation: number;
+  readonly blackPopulation: number;
+};
+
+export type StatePopulationChange = {
+  readonly stateFips: string;
+  readonly fromDecade: CensusCountyDecadeDecade;
+  readonly toDecade: CensusCountyDecadeDecade;
+  readonly blackAbsoluteChange: number;
+  readonly blackPercentChange: number | null;
+  readonly shareFrom: number;
+  readonly shareTo: number;
+  readonly shareChangePp: number;
+  readonly blackPopulationFrom: number;
+  readonly blackPopulationTo: number;
+  readonly totalPopulationFrom: number;
+  readonly totalPopulationTo: number;
+};
+
+export const POPULATION_DECADE_COMPARABILITY_NOTE =
+  'Black alone (Census race table) across 2000–2020 SF1/PL vintages; county boundary changes can affect local Δ — see demographics comparability matrix.';
+
+function blackPopulationShare(blackPopulation: number, totalPopulation: number): number {
+  return totalPopulation === 0 ? 0 : (blackPopulation / totalPopulation) * 100;
+}
+
+/** Rolls county-decade rows up to state totals for one decennial vintage. */
+export function aggregateCountiesByState(
+  counties: readonly Pick<CensusCountyDecadeDoc, 'stateFips' | 'totalPopulation' | 'blackPopulation'>[],
+  decade: CensusCountyDecadeDecade,
+): StatePopulationByDecade[] {
+  const byState = new Map<
+    string,
+    { countyCount: number; totalPopulation: number; blackPopulation: number }
+  >();
+  for (const county of counties) {
+    const existing = byState.get(county.stateFips) ?? {
+      countyCount: 0,
+      totalPopulation: 0,
+      blackPopulation: 0,
+    };
+    byState.set(county.stateFips, {
+      countyCount: existing.countyCount + 1,
+      totalPopulation: existing.totalPopulation + county.totalPopulation,
+      blackPopulation: existing.blackPopulation + county.blackPopulation,
+    });
+  }
+  return [...byState.entries()]
+    .map(([stateFips, aggregate]) => ({
+      stateFips,
+      decade,
+      countyCount: aggregate.countyCount,
+      totalPopulation: aggregate.totalPopulation,
+      blackPopulation: aggregate.blackPopulation,
+    }))
+    .sort((a, b) => a.stateFips.localeCompare(b.stateFips));
+}
+
+/** Pure helper for national or state rollups — uses domain growth math for Black population Δ. */
+export function computePopulationDecadeChange(input: {
+  readonly fromDecade: CensusCountyDecadeDecade;
+  readonly toDecade: CensusCountyDecadeDecade;
+  readonly blackPopulationFrom: number;
+  readonly blackPopulationTo: number;
+  readonly totalPopulationFrom: number;
+  readonly totalPopulationTo: number;
+  readonly source: string;
+  readonly sourceUrl: string;
+}): PopulationDecadeChange {
+  const growth = computeGrowthRecord(
+    { observationId: `us_${input.fromDecade}_black`, estimate: input.blackPopulationFrom },
+    { observationId: `us_${input.toDecade}_black`, estimate: input.blackPopulationTo },
+  );
+  const shareFrom = blackPopulationShare(input.blackPopulationFrom, input.totalPopulationFrom);
+  const shareTo = blackPopulationShare(input.blackPopulationTo, input.totalPopulationTo);
+  return {
+    fromDecade: input.fromDecade,
+    toDecade: input.toDecade,
+    blackAbsoluteChange: growth.absoluteChange,
+    blackPercentChange: growth.percentChange,
+    shareFrom,
+    shareTo,
+    shareChangePp: shareTo - shareFrom,
+    comparabilityNote: POPULATION_DECADE_COMPARABILITY_NOTE,
+    source: input.source,
+    sourceUrl: input.sourceUrl,
+  };
+}
+
+export function computeStatePopulationChange(
+  from: StatePopulationByDecade,
+  to: StatePopulationByDecade,
+): StatePopulationChange {
+  const growth = computeGrowthRecord(
+    {
+      observationId: `us_${from.stateFips}_${from.decade}_black`,
+      estimate: from.blackPopulation,
+    },
+    {
+      observationId: `us_${to.stateFips}_${to.decade}_black`,
+      estimate: to.blackPopulation,
+    },
+  );
+  const shareFrom = blackPopulationShare(from.blackPopulation, from.totalPopulation);
+  const shareTo = blackPopulationShare(to.blackPopulation, to.totalPopulation);
+  return {
+    stateFips: from.stateFips,
+    fromDecade: from.decade,
+    toDecade: to.decade,
+    blackAbsoluteChange: growth.absoluteChange,
+    blackPercentChange: growth.percentChange,
+    shareFrom,
+    shareTo,
+    shareChangePp: shareTo - shareFrom,
+    blackPopulationFrom: from.blackPopulation,
+    blackPopulationTo: to.blackPopulation,
+    totalPopulationFrom: from.totalPopulation,
+    totalPopulationTo: to.totalPopulation,
+  };
+}
+
+export function computeNationalPopulationChangesFromDecades(
+  rows: readonly NationalPopulationByDecade[],
+): PopulationDecadeChange[] {
+  const sorted = [...rows].sort((a, b) => Number(a.decade) - Number(b.decade));
+  const changes: PopulationDecadeChange[] = [];
+  for (let index = 1; index < sorted.length; index += 1) {
+    const from = sorted[index - 1]!;
+    const to = sorted[index]!;
+    changes.push(
+      computePopulationDecadeChange({
+        fromDecade: from.decade,
+        toDecade: to.decade,
+        blackPopulationFrom: from.blackPopulation,
+        blackPopulationTo: to.blackPopulation,
+        totalPopulationFrom: from.totalPopulation,
+        totalPopulationTo: to.totalPopulation,
+        source: to.source,
+        sourceUrl: to.sourceUrl,
+      }),
+    );
+  }
+  return changes;
+}
+
+export function computeStatePopulationChangesFromDecades(
+  rows: readonly StatePopulationByDecade[],
+  fromDecade: CensusCountyDecadeDecade,
+  toDecade: CensusCountyDecadeDecade,
+): StatePopulationChange[] {
+  const fromRows = new Map(
+    rows.filter((row) => row.decade === fromDecade).map((row) => [row.stateFips, row]),
+  );
+  const toRows = new Map(
+    rows.filter((row) => row.decade === toDecade).map((row) => [row.stateFips, row]),
+  );
+  const changes: StatePopulationChange[] = [];
+  for (const [stateFips, fromRow] of fromRows) {
+    const toRow = toRows.get(stateFips);
+    if (!toRow) continue;
+    changes.push(computeStatePopulationChange(fromRow, toRow));
+  }
+  return changes.sort(
+    (a, b) => Math.abs(b.blackAbsoluteChange) - Math.abs(a.blackAbsoluteChange),
+  );
+}
+
 /** One sum-aggregation query per decade — reads zero full documents. */
 export async function getNationalPopulationByDecade(
   firestore: Firestore = getServerFirestore(),
@@ -123,6 +312,58 @@ export async function getNationalPopulationByDecade(
     });
   }
   return results;
+}
+
+/** Adjacent-decade national Black population change for 2000→2010 and 2010→2020. */
+export async function getNationalPopulationChanges(
+  firestore: Firestore = getServerFirestore(),
+): Promise<readonly PopulationDecadeChange[]> {
+  try {
+    const byDecade = await getNationalPopulationByDecade(firestore);
+    return computeNationalPopulationChangesFromDecades(byDecade);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * State rollups for each loaded decennial vintage. Firestore aggregate queries cannot group by
+ * `stateFips`, so this streams county docs once per decade (~3k rows/vintage) and aggregates in
+ * memory — acceptable for Admin SDK server reads on the public `/data` page.
+ */
+export async function getStatePopulationByDecade(
+  firestore: Firestore = getServerFirestore(),
+): Promise<readonly StatePopulationByDecade[]> {
+  try {
+    const decades: readonly CensusCountyDecadeDecade[] = ['2000', '2010', '2020'];
+    const results: StatePopulationByDecade[] = [];
+    for (const decade of decades) {
+      const snap = await firestore
+        .collection(FIRESTORE_ROOT.censusCountyDecades)
+        .where('decade', '==', decade)
+        .get();
+      if (snap.empty) continue;
+      const counties = snap.docs.map((doc) => censusCountyDecadeSchema.parse(doc.data()));
+      results.push(...aggregateCountiesByState(counties, decade));
+    }
+    return results;
+  } catch {
+    return [];
+  }
+}
+
+/** State-level decade change ranked by absolute Black population change (largest movers first). */
+export async function getStatePopulationChanges(
+  fromDecade: CensusCountyDecadeDecade,
+  toDecade: CensusCountyDecadeDecade,
+  firestore: Firestore = getServerFirestore(),
+): Promise<readonly StatePopulationChange[]> {
+  try {
+    const rows = await getStatePopulationByDecade(firestore);
+    return computeStatePopulationChangesFromDecades(rows, fromDecade, toDecade);
+  } catch {
+    return [];
+  }
 }
 
 export type AcsCoverageSummary = {

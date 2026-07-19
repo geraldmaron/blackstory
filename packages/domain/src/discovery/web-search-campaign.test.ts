@@ -96,6 +96,34 @@ test('fixture with storageTermsConfirmed true yields survivors from brave-search
   assert.ok(titles.some((t) => t.includes('grandmother')));
 });
 
+test('SearXNG fixture campaign yields survivors and uses searxng_search adapter', async () => {
+  const searxngPath = join(
+    dirname(fileURLToPath(import.meta.url)),
+    '..',
+    'adapters',
+    'web-search',
+    'fixtures',
+    'searxng-search-response.json',
+  );
+  const result = await runWebSearchCampaign({
+    providerConfig: {
+      provider: 'searxng',
+      apiKey: '',
+      storageTermsConfirmed: true,
+      planTermsVersion: 'searxng-self-hosted-research-2026-07',
+      baseUrl: 'http://100.119.72.84:8888',
+    },
+    searchResponseRaw: JSON.parse(readFileSync(searxngPath, 'utf8')),
+    stampedAt: FIXED_NOW,
+    completedAt: FIXED_NOW,
+    requireWaybackCapture: false,
+  });
+  assert.equal(result.adapterId, 'searxng_search');
+  assert.ok(result.yield.survivors >= 2);
+  assert.equal(result.rejectedResultCount, 1);
+  assert.equal(WEB_SEARCH_PROVIDER_DECISION.chosenProvider, 'searxng');
+});
+
 test('cap 50 honored — query planning truncates at roster max', async () => {
   const pack = buildQueryPack({
     id: 'qp-cap-test',
@@ -131,7 +159,7 @@ test('cap 50 honored — query planning truncates at roster max', async () => {
 
 test('provider-decision still has storageTermsConfirmedInWriting === false', () => {
   assert.equal(WEB_SEARCH_PROVIDER_DECISION.storageTermsConfirmedInWriting, false);
-  assert.equal(WEB_SEARCH_PROVIDER_DECISION.chosenProvider, 'brave');
+  assert.equal(WEB_SEARCH_PROVIDER_DECISION.chosenProvider, 'searxng');
 });
 
 test('requireWaybackCapture default marks required_unmet without inventing captures', async () => {

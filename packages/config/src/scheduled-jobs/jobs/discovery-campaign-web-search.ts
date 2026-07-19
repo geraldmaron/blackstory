@@ -1,9 +1,9 @@
 /**
- * REAL roster entry: Brave web-search discovery campaign (fixture-first).
+ * REAL roster entry: web-search discovery campaign (fixture-first).
  *
- * Wraps domain runWebSearchCampaign with job-run bookkeeping. Private candidates only —
- * publicEffect none. Fixture JSON is injected by the dispatcher (local/CI); live fetch
- * remains behind budget guard + storage-terms confirmation.
+ * Preferred provider: SearXNG (self-hosted OSS). Brave remains supported via
+ * providerConfig. Wraps domain runWebSearchCampaign with job-run bookkeeping.
+ * Private candidates only — publicEffect none.
  */
 import {
   runWebSearchCampaign,
@@ -20,7 +20,10 @@ export type DiscoveryCampaignWebSearchJobInput = {
   readonly jobRunId: string;
   readonly startedAt: string;
   readonly completedAt: string;
-  readonly braveResponseRaw: unknown;
+  /** Preferred field name for provider JSON (SearXNG or Brave). */
+  readonly searchResponseRaw?: unknown;
+  /** @deprecated Prefer searchResponseRaw — kept for Brave-era call sites. */
+  readonly braveResponseRaw?: unknown;
   readonly providerConfig: WebSearchProviderConfig;
   readonly queryText?: string;
   readonly maxQueries?: number;
@@ -43,9 +46,14 @@ export async function runDiscoveryCampaignWebSearchJob(
     startedAt: input.startedAt,
   });
 
+  const searchResponseRaw = input.searchResponseRaw ?? input.braveResponseRaw;
+  if (searchResponseRaw === undefined) {
+    throw new Error('searchResponseRaw (or legacy braveResponseRaw) is required');
+  }
+
   const campaign = await runWebSearchCampaign({
     providerConfig: input.providerConfig,
-    braveResponseRaw: input.braveResponseRaw,
+    searchResponseRaw,
     stampedAt: input.startedAt,
     completedAt: input.completedAt,
     campaignId: `camp_${DISCOVERY_CAMPAIGN_WEB_SEARCH_JOB_ID}_${input.jobRunId}`,

@@ -321,3 +321,42 @@ test('rss-campaign-run ranks historical-society fixture without writing and excl
   assert.ok(summary.excludedCuratedFeedIds.includes('feed_the_american_blackstory'));
   assert.ok(!summary.feedIds.includes('feed_the_american_blackstory'));
 });
+
+test('discovery-dispatch --queue-survivors prepares admin draft cases without writing', async () => {
+  const out = capture();
+  const store = new MemoryAtomicStore();
+  const code = await runCli(
+    [
+      'discovery-dispatch',
+      '--job',
+      'discovery-campaign-web-search',
+      '--mode',
+      'fixture',
+      '--kill-switch',
+      'disengaged',
+      '--queue-survivors',
+      '--max-survivors',
+      '5',
+      '--operator-id',
+      'operator-1',
+      '--session-id',
+      'session-1',
+      '--privacy-pepper',
+      'test-only-pepper',
+    ],
+    {
+      store,
+      stdout: out.stdout,
+      stderr: out.stderr,
+      nowMs: Date.parse('2026-07-19T08:30:00.000Z'),
+    },
+  );
+  assert.equal(code, 0, out.errors.join('\n'));
+  assert.equal(store.writes.length, 0);
+  const payload = JSON.parse(out.lines[0] ?? '{}');
+  assert.equal(payload.status, 'success');
+  assert.ok(payload.survivorQueue);
+  assert.equal(payload.survivorQueue.committed, false);
+  assert.ok(payload.survivorQueue.prepared >= 1);
+  assert.equal(payload.campaign, undefined);
+});

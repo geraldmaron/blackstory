@@ -35,3 +35,16 @@ export type {
   GrowthSignificanceResult,
   GrowthRecord,
 } from './combination-rules.js';
+
+export {
+  CENSUS_COUNTY_BLACK_POPULATION_SERIES,
+  CENSUS_COUNTY_TOTAL_POPULATION_SERIES,
+  CENSUS_COUNTY_BLACK_POPULATION_SERIES_ID,
+  CENSUS_COUNTY_TOTAL_POPULATION_SERIES_ID,
+  censusCountyDecadeToObservations,
+  nationalBlackGrowthFromDecades,
+} from './census-county-decade.js';
+export type {
+  CensusCountyDecadeObservationInput,
+  NationalBlackPopulationDecadeRow,
+} from './census-county-decade.js';

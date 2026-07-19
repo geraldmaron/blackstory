@@ -49,7 +49,7 @@ export const HERO_HEADLINE_PHASES: readonly HeroHeadlinePhase[] = [
     prefix: '',
     storySplit: false,
     transitionMs: 0,
-    dwellMs: 2400,
+    dwellMs: 2800,
   },
   {
     id: 'his-story',
@@ -57,9 +57,9 @@ export const HERO_HEADLINE_PHASES: readonly HeroHeadlinePhase[] = [
     accessibleLabel: buildAccessibleLabel('His Story'),
     prefix: 'His',
     storySplit: true,
-    /** Gap + capital-S reveal — keep slower than prefix crossfades so the split reads. */
-    transitionMs: 1200,
-    dwellMs: 1800,
+    /** Gap + capital-S reveal — slower than prefix crossfades so the split reads. */
+    transitionMs: 1500,
+    dwellMs: 2000,
   },
   {
     id: 'her-story',
@@ -67,8 +67,8 @@ export const HERO_HEADLINE_PHASES: readonly HeroHeadlinePhase[] = [
     accessibleLabel: buildAccessibleLabel('Her Story'),
     prefix: 'Her',
     storySplit: true,
-    transitionMs: 800,
-    dwellMs: 1100,
+    transitionMs: 1100,
+    dwellMs: 1400,
   },
   {
     id: 'their-story',
@@ -76,8 +76,8 @@ export const HERO_HEADLINE_PHASES: readonly HeroHeadlinePhase[] = [
     accessibleLabel: buildAccessibleLabel('Their Story'),
     prefix: 'Their',
     storySplit: true,
-    transitionMs: 800,
-    dwellMs: 1100,
+    transitionMs: 1100,
+    dwellMs: 1400,
   },
   {
     id: 'your-story',
@@ -85,8 +85,8 @@ export const HERO_HEADLINE_PHASES: readonly HeroHeadlinePhase[] = [
     accessibleLabel: buildAccessibleLabel('Your Story'),
     prefix: 'Your',
     storySplit: true,
-    transitionMs: 800,
-    dwellMs: 1100,
+    transitionMs: 1100,
+    dwellMs: 1400,
   },
   {
     id: 'black-story',
@@ -94,7 +94,7 @@ export const HERO_HEADLINE_PHASES: readonly HeroHeadlinePhase[] = [
     accessibleLabel: buildAccessibleLabel('Black Story'),
     prefix: 'Black',
     storySplit: true,
-    transitionMs: 900,
+    transitionMs: 1200,
     dwellMs: Number.POSITIVE_INFINITY,
   },
 ] as const;

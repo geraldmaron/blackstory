@@ -1,13 +1,20 @@
 /**
- * Shareable URL state for `/explore`: viewport + filters + selected entity + density
- * toggle + optional point grouping + selected state + optional relationship lines decade
+ * Shareable URL state for `/explore`: viewport + filters + selected entity + map layer model
+ * + optional point grouping + selected state + optional relationship lines decade
  * selected edge. Pure parse/serialize so the server-rendered page and the client
  * orchestrator read and write the exact same shape.
  *
- * Selection note: `selected` orients the copper ring on the map (e.g. “View on map” from a
- * record page). Opening a record from a pin or list navigates to `/entity/[id]` — the map
- * does not host a narrative card overlay.
+ * Selection note: `selected` opens the preview narrative card and orients the copper ring on
+ * the map (e.g. “View on map” from a record page). The full record is reached via the card
+ * CTA at `/entity/[id]`, not by pin/list selection alone.
  */
+import {
+  DEFAULT_POPULATION_CHANGE_FROM,
+  DEFAULT_POPULATION_CHANGE_TO,
+  DEFAULT_POPULATION_DECADE,
+  isCensusPopulationDecade,
+  type CensusPopulationDecade,
+} from '@repo/domain/map/county-population';
 import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS, type ExploreFilterState } from './filters';
 
@@ -17,13 +24,22 @@ export type ExploreViewport = {
   readonly zoom: number;
 };
 
+export type ExploreLayerMode = 'off' | 'presence' | 'blackShare' | 'blackChange';
+
 export type ExploreViewState = {
   readonly filters: ExploreFilterState;
   readonly viewport?: ExploreViewport;
   readonly selected?: string;
   /** USPS state DC postal code when a state shape is selected on the map.  */
   readonly state?: string;
-  readonly density: boolean;
+  /** Map overlay model — `off` hides all choropleth/density fills. */
+  readonly layerMode: ExploreLayerMode;
+  /** Decennial vintage for `blackShare` (2000 | 2010 | 2020). */
+  readonly popDecade?: CensusPopulationDecade;
+  /** From-decade for `blackChange` (default 2010). */
+  readonly popFrom?: CensusPopulationDecade;
+  /** To-decade for `blackChange` (default 2020). */
+  readonly popTo?: CensusPopulationDecade;
   /**
    * When true, nearby points aggregate while zoomed out (opt-in via `group=1`). Omitted from
    * shareable URLs when off (the default).
@@ -56,6 +72,27 @@ function cleanSelectParam(raw: string | undefined): string {
   return trimmed === '' ? 'all' : trimmed;
 }
 
+const LAYER_MODES: readonly ExploreLayerMode[] = ['off', 'presence', 'blackShare', 'blackChange'];
+
+function isLayerMode(raw: string | undefined): raw is ExploreLayerMode {
+  return raw !== undefined && (LAYER_MODES as readonly string[]).includes(raw);
+}
+
+function parseLayerMode(raw: RawExploreSearchParams): ExploreLayerMode {
+  const layerModeRaw = firstValue(raw.layerMode)?.trim();
+  if (isLayerMode(layerModeRaw)) return layerModeRaw;
+
+  const densityRaw = firstValue(raw.density);
+  if (densityRaw === '1' || densityRaw === 'true') return 'presence';
+
+  return 'off';
+}
+
+function parsePopulationDecade(raw: string | undefined, fallback: CensusPopulationDecade): CensusPopulationDecade {
+  const trimmed = raw?.trim();
+  return trimmed && isCensusPopulationDecade(trimmed) ? trimmed : fallback;
+}
+
 export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreViewState {
   const filters: ExploreFilterState = {
     era: cleanSelectParam(firstValue(raw.era)),
@@ -70,14 +107,25 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
 
   const selectedRaw = firstValue(raw.selected)?.trim();
   const stateRaw = firstValue(raw.state)?.trim().toUpperCase();
-  const densityRaw = firstValue(raw.density);
   const groupRaw = firstValue(raw.group);
   const linesRaw = firstValue(raw.lines);
   const decadeRaw = firstValue(raw.decade)?.trim();
   const edgeRaw = firstValue(raw.edge)?.trim();
+  const layerMode = parseLayerMode(raw);
+  const popDecadeRaw = firstValue(raw.popDecade)?.trim();
+  const popFromRaw = firstValue(raw.popFrom)?.trim();
+  const popToRaw = firstValue(raw.popTo)?.trim();
 
-  // Grouping defaults off; explicit on flags opt in (`group=1` / `true`).
   const groupOn = groupRaw === '1' || groupRaw === 'true';
+
+  const popDecade =
+    layerMode === 'blackShare' ? parsePopulationDecade(popDecadeRaw, DEFAULT_POPULATION_DECADE) : undefined;
+  const popFrom =
+    layerMode === 'blackChange'
+      ? parsePopulationDecade(popFromRaw, DEFAULT_POPULATION_CHANGE_FROM)
+      : undefined;
+  const popTo =
+    layerMode === 'blackChange' ? parsePopulationDecade(popToRaw, DEFAULT_POPULATION_CHANGE_TO) : undefined;
 
   return {
     filters,
@@ -86,7 +134,10 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
       : {}),
     ...(selectedRaw ? { selected: selectedRaw } : {}),
     ...(stateRaw && stateRaw !== 'ALL' ? { state: stateRaw } : {}),
-    density: densityRaw === '1' || densityRaw === 'true',
+    layerMode,
+    ...(popDecade ? { popDecade } : {}),
+    ...(popFrom ? { popFrom } : {}),
+    ...(popTo ? { popTo } : {}),
     group: groupOn,
     lines: linesRaw === '1' || linesRaw === 'true',
     ...(decadeRaw ? { decade: decadeRaw } : {}),
@@ -111,7 +162,20 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   }
   if (state.selected) params.set('selected', state.selected);
   if (state.state) params.set('state', state.state);
-  if (state.density) params.set('density', '1');
+  if (state.layerMode !== 'off') params.set('layerMode', state.layerMode);
+  if (state.layerMode === 'blackShare' && state.popDecade && state.popDecade !== DEFAULT_POPULATION_DECADE) {
+    params.set('popDecade', state.popDecade);
+  }
+  if (
+    state.layerMode === 'blackChange' &&
+    state.popFrom &&
+    state.popFrom !== DEFAULT_POPULATION_CHANGE_FROM
+  ) {
+    params.set('popFrom', state.popFrom);
+  }
+  if (state.layerMode === 'blackChange' && state.popTo && state.popTo !== DEFAULT_POPULATION_CHANGE_TO) {
+    params.set('popTo', state.popTo);
+  }
   if (state.group) params.set('group', '1');
   if (state.lines) params.set('lines', '1');
   if (state.decade) params.set('decade', state.decade);
@@ -125,8 +189,8 @@ export function buildExploreHref(state: ExploreViewState): string {
 }
 
 /** Default overlay + toggle state for callers building explore links without a full view model. */
-export function defaultExploreOverlayState(): Pick<ExploreViewState, 'density' | 'group' | 'lines'> {
-  return { density: false, group: false, lines: false };
+export function defaultExploreOverlayState(): Pick<ExploreViewState, 'layerMode' | 'group' | 'lines'> {
+  return { layerMode: 'off', group: false, lines: false };
 }
 
 /**
@@ -159,4 +223,18 @@ export function viewportForState(postalCode: string): ExploreViewport | undefine
 export function nationalViewport(): ExploreViewport {
   const [west, south, east, north] = US_CONUS_BOUNDS;
   return { lng: (west + east) / 2, lat: (south + north) / 2, zoom: 3.4 };
+}
+
+export function isPopulationLayerMode(
+  layerMode: ExploreLayerMode,
+): layerMode is 'blackShare' | 'blackChange' {
+  return layerMode === 'blackShare' || layerMode === 'blackChange';
+}
+
+export function isPresenceLayerMode(layerMode: ExploreLayerMode): boolean {
+  return layerMode === 'presence';
+}
+
+export function isLayerOverlayActive(layerMode: ExploreLayerMode): boolean {
+  return layerMode !== 'off';
 }

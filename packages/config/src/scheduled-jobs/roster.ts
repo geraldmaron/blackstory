@@ -110,7 +110,7 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     id: 'discovery-campaign-web-search',
     owner: 'discovery/archive-web',
     description:
-      'Budget-gated Brave web-search discovery (fails closed without storageTermsConfirmed; see cost-controls-matrix.json).',
+      'Budget-gated web-search discovery (SearXNG preferred; Brave fallback). Fails closed without storageTermsConfirmed; see cost-controls-matrix.json.',
     cadence: { cronExpression: '30 8 * * *', nominalIntervalMs: DAY_MS, humanReadable: 'daily 08:30 UTC' },
     budget: { unit: 'requests', maxPerRun: 50 },
     timeoutSec: 3_600,

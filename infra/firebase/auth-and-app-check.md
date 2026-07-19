@@ -25,7 +25,11 @@ human provider choice and a successful metrics-only rollout.**
    - `localhost` (emulator / local Next)
    - `black-book-efaaf.firebaseapp.com`
    - `black-book-efaaf.web.app`
-   - Final App Hosting custom domain when assigned (after Blaze + backend create)
+   - App Hosting defaults when backends exist:
+     `black-book-web-staging--black-book-efaaf.us-central1.hosted.app`,
+     `black-book-web-production--black-book-efaaf.us-central1.hosted.app`
+   - Custom apex: `blackstory.app` (add `www.blackstory.app` separately if used)
+4. **Provider choice (human required before enabling):**
 4. **Provider choice (human required before enabling):**
    - Recommended default for public beta: **no social providers** until a product decision.
    - Admin path: prefer Cloud IAP on Cloud Run; if Firebase Auth is used for admin UX, restrict to an allowlisted Google Workspace / Cloud Identity domain.

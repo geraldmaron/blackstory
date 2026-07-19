@@ -1,0 +1,11 @@
+# Daily 08:30 UTC — same cadence as former Mac launchd / GCP fixture schedule.
+[Unit]
+Description=BlackStory SearXNG discovery timer (daily 08:30 UTC)
+
+[Timer]
+OnCalendar=*-*-* 08:30:00 UTC
+Persistent=true
+Unit=blackstory-discovery-web-search.service
+
+[Install]
+WantedBy=timers.target

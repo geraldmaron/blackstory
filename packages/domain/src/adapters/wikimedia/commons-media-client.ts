@@ -143,7 +143,8 @@ export function createCommonsMediaClient(options: FetchCommonsMediaClientOptions
   }
 
   /**
-   * Fetch Wikidata entities (claims) by QID in batches of ≤50.
+   * Fetch Wikidata entities by QID in batches of ≤50.
+   * One call returns claims, labels, descriptions, and aliases (no parallel prop fetches).
    */
   async function fetchEntitiesById(
     qids: readonly string[],
@@ -156,7 +157,7 @@ export function createCommonsMediaClient(options: FetchCommonsMediaClientOptions
       const params = new URLSearchParams({
         action: 'wbgetentities',
         ids: batch.join('|'),
-        props: 'claims|labels',
+        props: 'claims|labels|descriptions|aliases',
         languages: 'en',
         format: 'json',
         origin: '*',

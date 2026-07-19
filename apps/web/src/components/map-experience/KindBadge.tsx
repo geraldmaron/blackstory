@@ -1,24 +1,16 @@
 /**
- * Kind badge: shade + glyph + label for entity kinds. Color is never the only
- * signal (WCAG 1.4.1) — pairs the map legend encoding with readable text so the
- * NarrativeCard, result list, and entity page stay visually consistent with the
- * Explore map markers.
+ * Kind badge: shade + Font Awesome icon + label for entity kinds. Color is never
+ * the only signal (WCAG 1.4.1) — pairs the map legend encoding with readable text
+ * so the NarrativeCard, result list, and entity page stay visually consistent with
+ * the Explore map markers (which keep geometric glyphs).
  */
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { cx } from '@repo/ui';
-import {
-  displayEncodingFor,
-  type MapEntityGlyph,
-} from '../../lib/map-experience/kind-encoding';
+import { displayEncodingFor } from '../../lib/map-experience/kind-encoding';
+import { kindIconFor } from '../../lib/map-experience/kind-icons';
 
 void React;
-
-const GLYPH_CLASS: Readonly<Record<MapEntityGlyph, string>> = {
-  circle: 'ds-legend-glyph--circle',
-  square: 'ds-legend-glyph--square',
-  diamond: 'ds-legend-glyph--diamond',
-  ring: 'ds-legend-glyph--ring',
-};
 
 export type KindBadgeProps = {
   readonly kind: string;
@@ -31,10 +23,7 @@ export type KindBadgeProps = {
 
 export function KindBadge({ kind, mapTone, className, density = 'default' }: KindBadgeProps) {
   const encoding = displayEncodingFor(kind, mapTone);
-  const glyphStyle =
-    encoding.glyph === 'ring'
-      ? { borderColor: encoding.shade, backgroundColor: 'transparent' as const }
-      : { backgroundColor: encoding.shade, borderColor: encoding.shade };
+  const icon = kindIconFor(kind, mapTone);
 
   return (
     <span
@@ -42,9 +31,10 @@ export function KindBadge({ kind, mapTone, className, density = 'default' }: Kin
       data-kind={kind}
       {...(mapTone ? { 'data-map-tone': mapTone } : {})}
     >
-      <span
-        className={cx('ds-legend-glyph', GLYPH_CLASS[encoding.glyph])}
-        style={glyphStyle}
+      <FontAwesomeIcon
+        icon={icon}
+        className="ds-kind-badge__icon"
+        style={{ color: encoding.shade }}
         aria-hidden="true"
       />
       <span className="ds-kind-badge__label">{encoding.label}</span>

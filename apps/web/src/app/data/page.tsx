@@ -3,36 +3,33 @@
  * FBI hate crime reporting, and Opportunity Atlas economic-mobility coverage — shown as
  * national rollups with mandatory source citations (public-numeric-policy category 3).
  *
- * Every number here is a server-side AGGREGATE (`@repo/firebase`'s national-stats readers),
- * never a per-record dump; the per-county/per-tract detail lives on the Explore map's
- * upcoming choropleth layer (the related workstream), not here. Reads use the Admin SDK directly
- * (bypasses the client-facing Firestore rules that keep some of these collections closed to
- * browsers) and fail soft: a reader returning nothing renders "not yet available," never a
- * fabricated zero.
+ * Population section: one chart of decennial levels (counts + share annotation) plus a strip
+ * of decade-over-decade Δ Black / Δ share and a state movers list — not a triple listing of
+ * the same levels. County choropleth detail lives on Explore map layer models.
  *
- * HOLC (Mapping Inequality) is deliberately absent from this page — its vector dataset is
- * CC BY-NC-SA and stays off every public surface until a rights review clears a specific
- * public treatment (see @repo/domain's launch-corpora.ts).
- *
- * Source display: identical sources across a strip hoist to one group footer; unique
- * per-decade/per-metric sources stay compact under that figure only (see DataStatStrip).
+ * HOLC (Mapping Inequality) is deliberately absent — CC BY-NC-SA rights hold.
  */
+import { US_STATES } from '@repo/domain/map/geography';
 import {
   getAcsCoverageSummary,
   getHateCrimeYearSummary,
   getNationalPopulationByDecade,
+  getNationalPopulationChanges,
   getOpportunityAtlasCoverageSummary,
+  getStatePopulationChanges,
   type AcsCoverageSummary,
   type HateCrimeYearSummary,
-  type NationalPopulationByDecade,
   type OpportunityAtlasCoverageSummary,
+  type PopulationDecadeChange,
+  type StatePopulationChange,
 } from '@repo/firebase';
 import { Notice } from '@repo/ui';
 import { AcsCoverageChart } from '../../components/data/AcsCoverageChart';
-import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataStatStrip } from '../../components/data/DataStatStrip';
 import { HateCrimeCompositionChart } from '../../components/data/HateCrimeCompositionChart';
+import { nationalChangeStripItems } from '../../components/data/population-change';
 import { PopulationByDecadeChart } from '../../components/data/PopulationByDecadeChart';
+import { StatePopulationShift } from '../../components/data/StatePopulationShift';
 import '../../components/data/data-charts.css';
 
 export const metadata = {
@@ -56,9 +53,22 @@ function formatCount(value: number): string {
   return value.toLocaleString('en-US');
 }
 
+const STATE_NAME_BY_FIPS: Readonly<Record<string, string>> = Object.fromEntries(
+  US_STATES.map((state) => [state.fips, state.name]),
+);
+
 export default async function DataPage() {
-  const [populationByDecade, acsCoverage, hateCrimeYear, opportunityAtlasCoverage] = await Promise.all([
+  const [
+    populationByDecade,
+    populationChanges,
+    stateChanges2010to2020,
+    acsCoverage,
+    hateCrimeYear,
+    opportunityAtlasCoverage,
+  ] = await Promise.all([
     safe(getNationalPopulationByDecade()),
+    safe(getNationalPopulationChanges()),
+    safe(getStatePopulationChanges('2010', '2020')),
     safe(getAcsCoverageSummary()),
     safe(getHateCrimeYearSummary(LATEST_HATE_CRIME_YEAR)),
     safe(getOpportunityAtlasCoverageSummary()),
@@ -67,15 +77,19 @@ export default async function DataPage() {
   const hateCrime = hateCrimeYear as HateCrimeYearSummary | undefined;
   const acs = acsCoverage as AcsCoverageSummary | undefined;
   const opportunity = opportunityAtlasCoverage as OpportunityAtlasCoverageSummary | undefined;
+  const changes = (populationChanges ?? []) as readonly PopulationDecadeChange[];
+  const stateChanges = (stateChanges2010to2020 ?? []) as readonly StatePopulationChange[];
+  const changeStripItems = nationalChangeStripItems(changes);
+  const comparabilityNote = changes[0]?.comparabilityNote;
 
   return (
     <main className="ds-container ds-page" id="main">
       <p className="ds-page__eyebrow">Modeling</p>
       <h1 className="ds-page__title">Data behind the archive</h1>
       <p className="ds-page__lede">
-        The national numbers underneath BlackStory&rsquo;s map and records — population, economic, and
-        civil-rights context, each carrying the exact source it came from. County- and
-        tract-level detail is landing on the Explore map as a choropleth layer; this page is the
+        The national numbers underneath BlackStory&rsquo;s map and records — population shift,
+        economic, and civil-rights context, each carrying the exact source it came from.
+        County choropleths and alternate map models live on Explore; this page is the
         national-scale summary and the paper trail.
       </p>
 
@@ -85,25 +99,34 @@ export default async function DataPage() {
           Black population by decade
         </h2>
         <p className="ds-section__lede">
-          Decennial counts for every U.S. county, joined by 5-digit FIPS code to every other
-          dataset on this page.
+          Decennial Black alone counts for every U.S. county (2000–2020), joined by 5-digit FIPS.
+          The chart shows levels; the figures below show decade-over-decade change.
         </p>
         {populationByDecade && populationByDecade.length > 0 ? (
           <>
-            <div className="ds-data-section__viz ds-data-section__viz--pair">
+            <div className="ds-data-section__viz">
               <PopulationByDecadeChart rows={populationByDecade} />
-              <BlackPopulationShareChart rows={populationByDecade} />
             </div>
-            <DataStatStrip
-              labelledBy="population-heading"
-              items={populationByDecade.map((row: NationalPopulationByDecade) => ({
-                id: row.decade,
-                value: formatCount(row.blackPopulation),
-                label: `Black population, ${row.decade} census`,
-                note: `of ${formatCount(row.totalPopulation)} total population across ${formatCount(row.countyCount)} counties`,
-                sources: [{ label: row.source, url: row.sourceUrl }],
-              }))}
-            />
+            {changeStripItems.length > 0 ? (
+              <>
+                <h3 className="ds-sans" id="population-change-heading">
+                  Decade-over-decade change
+                </h3>
+                <DataStatStrip labelledBy="population-change-heading" items={changeStripItems} />
+                {comparabilityNote ? (
+                  <p className="ds-sans ds-data-comparability-note">{comparabilityNote}</p>
+                ) : null}
+              </>
+            ) : null}
+            {stateChanges.length > 0 ? (
+              <StatePopulationShift
+                fromDecade="2010"
+                toDecade="2020"
+                changes={stateChanges}
+                stateNameByFips={STATE_NAME_BY_FIPS}
+                labelledBy="population-heading"
+              />
+            ) : null}
           </>
         ) : (
           <p className="ds-sans">Census data is not available in this environment yet.</p>
@@ -113,11 +136,12 @@ export default async function DataPage() {
       <section className="ds-section" aria-labelledby="acs-heading">
         <p className="ds-section__kicker">American Community Survey</p>
         <h2 className="ds-section__title" id="acs-heading">
-          Income, education, and housing (5-year estimates)
+          ACS coverage (county and tract profiles)
         </h2>
         <p className="ds-section__lede">
-          Median household income, tenure, and educational attainment — including a
-          Black-householder income breakout — at county and tract level.
+          Starter estimate fields — income, tenure, education, and related ACS variables — are
+          ingested for map and modeling use. This page shows coverage counts only until metric
+          rollups ship here; it does not yet publish those estimate values nationally.
         </p>
         {acs ? (
           <>
