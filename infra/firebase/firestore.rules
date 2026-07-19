@@ -363,6 +363,16 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // National decennial race totals 1790–1990 (twps0056, public domain). Same class as
+    // censusCountyDecades — published federal statistics with provenance. ~21 tiny docs.
+    // Writes via packages/firebase/src/demographics/national-load-cli.ts. The public /data
+    // page reads the materialized publicMeta/nationalPopulationTimeline snapshot (Admin SDK),
+    // not this collection directly.
+    match /censusNationalDecades/{decadeId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // ACS 5-year county estimates: same class as censusCountyDecades (published federal
     // statistics with provenance). Writes via packages/firebase/src/demographics/acs-load-cli.ts.
     match /acsCountyProfiles/{countyVintageId} {

@@ -1,4 +1,3 @@
-
 /**
  * Firebase client and Admin helpers shared across BlackStory surfaces.
  * Production project:. Local defaults: demo-repo emulators.
@@ -56,6 +55,7 @@ export {
 export type { AppCheckClientRuntime, AppCheckScaffoldOptions } from './app-check.js';
 export {
   APP_CHECK_HEADER,
+  appCheckSatisfiesRateLimitGate,
   createAppCheckGuard,
   createFirebaseAppCheckVerifier,
   parseAppCheckMode,
@@ -422,6 +422,19 @@ export type {
   OpportunityAtlasOutcomeFieldCoverage,
   OpportunityAtlasHistogramBin,
 } from './demographics/national-stats.js';
+export {
+  buildNationalPopulationTimelineSnapshot,
+  writeNationalPopulationTimelineSnapshot,
+  getNationalPopulationTimelineSnapshot,
+  mergeTimelineRows,
+} from './demographics/national-timeline.js';
+export type {
+  NationalPopulationTimelineSnapshot,
+  NationalTimelineSource,
+} from './demographics/national-timeline.js';
+// Re-export the domain row/change contracts so web chart components can type snapshot data
+// without reaching past the firebase reader boundary.
+export type { NationalPopulationTimelineRow, NationalPopulationChange } from '@repo/domain';
 export {
   censusCountyDecadeSchema,
   censusCountyDecadeDecadeSchema,

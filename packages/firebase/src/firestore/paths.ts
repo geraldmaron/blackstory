@@ -1,4 +1,3 @@
-
 /**
  * Firestore collection path constants for BlackStory (ADR-011 018).
  * Paths always use even segment counts (collection/doc[/collection/doc...]).
@@ -36,6 +35,9 @@ export const FIRESTORE_ROOT = {
   jurisdictions: 'jurisdictions',
   /** Published census statistics: one doc per county per decennial vintage (the related workstream). */
   censusCountyDecades: 'censusCountyDecades',
+  /** Published national census statistics: one doc per decade 1790–1990 (twps0056 historical
+   * lane). Small (~21 docs); the modern 2000–2020 national number comes from county sums. */
+  censusNationalDecades: 'censusNationalDecades',
   /** ACS 5-year county estimates: one doc per county per vintage. */
   acsCountyProfiles: 'acsCountyProfiles',
   /** ACS 5-year tract estimates (~85k/vintage): county-bounded reads only, never full scans. */
@@ -82,6 +84,9 @@ export const firestorePaths = {
   evidenceLineage: (lineageId: string) => `${FIRESTORE_ROOT.evidenceLineage}/${lineageId}`,
   publicationRelease: (releaseId: string) => `${FIRESTORE_ROOT.publicationReleases}/${releaseId}`,
   publicActiveRelease: () => `${FIRESTORE_ROOT.publicMeta}/activeRelease`,
+  /** The single materialized national-population-timeline snapshot doc (1790–2020), rebuilt by
+   * the snapshot builder and read once per page render instead of live aggregation. */
+  publicNationalPopulationTimeline: () => `${FIRESTORE_ROOT.publicMeta}/nationalPopulationTimeline`,
   publicEntity: (releaseId: string, entityId: string) =>
     `${FIRESTORE_ROOT.publicReleases}/${releaseId}/entities/${entityId}`,
   publicSearchIndex: (docId: string) => `${FIRESTORE_ROOT.publicSearchIndex}/${docId}`,
@@ -92,8 +97,7 @@ export const firestorePaths = {
   outboxConsumerReceipt: (receiptId: string) =>
     `${FIRESTORE_ROOT.outboxConsumerReceipts}/${receiptId}`,
   killSwitch: (switchId: string) => `${FIRESTORE_ROOT.killSwitches}/${switchId}`,
-  discoveryCampaignRun: (runId: string) =>
-    `${FIRESTORE_ROOT.discoveryCampaignRuns}/${runId}`,
+  discoveryCampaignRun: (runId: string) => `${FIRESTORE_ROOT.discoveryCampaignRuns}/${runId}`,
   /** Convention: source adapter kill switches use this id pattern. */
   sourceAdapterKillSwitch: (adapterId: string) =>
     `${FIRESTORE_ROOT.killSwitches}/source-adapter-${adapterId}`,
