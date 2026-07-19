@@ -1,10 +1,9 @@
 /**
  * Seed catalog of longform history Stories for `/stories`.
  *
- * Stands in for a published editorial projection the same way `facts-seed.ts` stands in for the
- * fact registry. Related entity ids for national-story records resolve from live Firestore
- * projections (national catalog); the Dunbar-cluster offline seed covers only those two
- * local stories' entity off-ramps. Facts remain seed-backed until a facts projection lands.
+ * Stands in for a published editorial projection. Related entity ids for national-story
+ * records resolve from live Firestore projections (national catalog); the Dunbar-cluster
+ * offline seed covers only those two local stories' entity off-ramps.
  */
 import { NATIONAL_STORY_RECORDS } from './national-story-seed/stories';
 
@@ -22,7 +21,6 @@ export type StoryRecord = {
   readonly placeLabel: string;
   readonly body: readonly StorySection[];
   readonly relatedEntityIds: readonly string[];
-  readonly relatedFactIds: readonly string[];
 };
 
 /** Fifteenth national story: Hampton Institute founding as its own place-first chapter beside Emancipation Oak. */
@@ -36,7 +34,6 @@ const HAMPTON_INSTITUTE_STORY: StoryRecord = {
   eraLabel: '1868–',
   placeLabel: 'Hampton, Virginia',
   relatedEntityIds: ['ent_hampton_university_001', 'ent_emancipation_oak_001'],
-  relatedFactIds: ['BB-F-000117', 'BB-F-000115'],
   body: [
     {
       paragraphs: [
@@ -71,7 +68,6 @@ export const SEED_STORIES: readonly StoryRecord[] = [
     eraLabel: '1870–1891',
     placeLabel: 'Washington, D.C.',
     relatedEntityIds: ['ent_dunbar_school_001', 'ent_15th_st_church_001'],
-    relatedFactIds: ['BB-F-000001', 'BB-F-000002'],
     body: [
       {
         paragraphs: [
@@ -106,7 +102,6 @@ export const SEED_STORIES: readonly StoryRecord[] = [
     eraLabel: '1916',
     placeLabel: 'Washington, D.C.',
     relatedEntityIds: ['ent_dunbar_school_001'],
-    relatedFactIds: ['BB-F-000003'],
     body: [
       {
         paragraphs: [
@@ -131,7 +126,6 @@ export const SEED_STORIES: readonly StoryRecord[] = [
     eraLabel: '1977–2013',
     placeLabel: 'Washington, D.C.',
     relatedEntityIds: ['ent_dunbar_school_001', 'ent_dc_landmark_listing_1975'],
-    relatedFactIds: ['BB-F-000004', 'BB-F-000005'],
     body: [
       {
         paragraphs: [
@@ -156,7 +150,6 @@ export const SEED_STORIES: readonly StoryRecord[] = [
     eraLabel: '2002–',
     placeLabel: 'Washington, D.C.',
     relatedEntityIds: ['ent_dunbar_alumni_federation_001', 'ent_dunbar_school_001'],
-    relatedFactIds: ['BB-F-000006'],
     body: [
       {
         paragraphs: [

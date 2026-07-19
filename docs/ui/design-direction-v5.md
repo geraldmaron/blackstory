@@ -269,7 +269,7 @@ a portrait of the story subject. Attribution at `/stories/mosaic-credits`. Edito
 (`--ds-content-max`); copper **View on map** CTA when geo is available (one primary action per
 view).
 
-**`/search`, `/facts`, `/legal`** — document rhythm: mast, filter row (native controls,
+**`/search`, `/legal`** — document rhythm: mast, filter row (native controls,
 compact), result list as top-rule entries with mono meta lines. Pagination quiet buttons.
 
 **`/history`** — mast + decade scrubber + adaptive relationship graph that shares
@@ -279,7 +279,7 @@ compact), result list as top-rule entries with mono meta lines. Pagination quiet
   shades, decade density), and richer facets (kind chips, status, topic, connections).
   Same instrument language as explore.
 
-**Longform (`/methodology`, `/about`, `/myths/[slug]`, `/legal/[slug]`)** — single serif
+**Longform (`/methodology`, `/about`, `/legal/[slug]`)** — single serif
 column (`--ds-content-max`), numbered Sora subheads, mono citations. No cards.
 
 **Forms (`/submit`, `/corrections`)** — single column, native controls at 44px, labels in

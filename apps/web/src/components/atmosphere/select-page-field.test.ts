@@ -32,11 +32,7 @@ test('/history selects rules with page-field asset paths', () => {
   assert.equal(selection.label, 'Hairline rule grid');
 });
 
-test('facts and search prefixes follow data and history mappings', () => {
-  const facts = selectPageField('/facts/example/rev/1/');
-  assert.ok(facts);
-  assert.equal(facts.motifId, 'ledger');
-
+test('search prefix follows history mapping', () => {
   const search = selectPageField('/search');
   assert.ok(search);
   assert.equal(search.motifId, 'rules');

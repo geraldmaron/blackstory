@@ -1,11 +1,11 @@
 /**
- * MediaWiki-style revision chrome "Updated {date} see what changed" ambient booster
- * linking to per-revision permalinks and the errata log when corrections exist.
+ * MediaWiki-style revision chrome — "Updated {date}" ambient booster linking to
+ * the public errata log when corrections exist. Fact revision permalinks were retired
+ * with the public /facts surface; corrections surface on /errata.
  */
 import React from 'react';
 import Link from 'next/link';
 import {
-  buildFactRevisionPath,
   currentFactRevision,
   type FactRecord,
 } from '@repo/domain/facts';
@@ -19,22 +19,18 @@ export type RevisionUpdateChromeProps = {
 export function RevisionUpdateChrome({ fact, errataHref = '/errata' }: RevisionUpdateChromeProps) {
   const revision = currentFactRevision(fact.revisions);
   const updatedLabel = formatIsoDate(revision?.timestamp ?? fact.updatedAt);
-  const latestPath =
-    revision && revision.revisionNumber > 1
-      ? buildFactRevisionPath(fact.id, revision.revisionNumber)
-      : undefined;
   const isCorrection = revision?.changeType === 'correction' || fact.status === 'corrected';
+  const hasHistory = (revision?.revisionNumber ?? 0) > 1;
 
   return (
     <p className="ds-sans" role="status" style={{ margin: 0, color: 'var(--ds-ink-muted)' }}>
       Updated {updatedLabel}
-      {latestPath ? (
+      {hasHistory || isCorrection ? (
         <>
           {' '}
           —{' '}
-          <Link href={latestPath}>
-            see what changed
-            {isCorrection ? ' (correction logged)' : ''}
+          <Link href={errataHref}>
+            {isCorrection ? 'see what changed (correction logged)' : 'see what changed'}
           </Link>
         </>
       ) : null}

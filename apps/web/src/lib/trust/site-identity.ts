@@ -32,7 +32,6 @@ export const TRUST_PATHS = {
   errataFeedJson: '/errata/feed.json',
   errataFeedRss: '/errata/feed.xml',
   corrections: '/corrections',
-  myths: '/myths',
 } as const;
 
 export function resolveTrustUrl(path: string, baseUrl?: string): string {

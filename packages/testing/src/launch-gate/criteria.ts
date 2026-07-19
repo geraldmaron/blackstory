@@ -193,10 +193,6 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
         type: 'file',
         ref: 'apps/web/src/app/errata/page.tsx',
       },
-      {
-        type: 'file',
-        ref: 'apps/web/src/app/myths/page.tsx',
-      },
     ],
   },
   {

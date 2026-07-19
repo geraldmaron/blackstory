@@ -136,15 +136,13 @@ test('sort by connections orders higher-degree nodes first', () => {
   }
 });
 
-test('nodes link to entity pages and surface fact links when present', () => {
+test('nodes link to entity pages', () => {
   const view = buildHistoryViewModel({ decade: '1970s' });
   for (const node of view.nodes) {
     assert.match(node.href, /^\/entity\//);
   }
   const place = view.nodes.find((node) => node.entityId === 'ent_15th_st_church_001');
   assert.ok(place);
-  assert.ok(place!.factLinks.length > 0);
-  assert.match(place!.factLinks[0]!.href, /^\/facts\//);
 });
 
 test('topic filter reduces results to matching topic tags', () => {

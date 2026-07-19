@@ -1,14 +1,13 @@
 /**
  * Query-string normalization for public routes.
  * Random tracking params must not alter cache keys or force regeneration.
- * Shareable map/history/facts links are canonicalized so revisit/bookmark URLs stay stable.
+ * Shareable map/history links are canonicalized so revisit/bookmark URLs stay stable.
  */
 
 import { buildExploreSearchParams, parseExploreSearchParams } from '../map-experience/url-state';
 import { buildHistorySearchParams, parseHistorySearchParams } from '../history/url-state';
 import {
   EXPLORE_PAGE_PARAM_ALLOWLIST,
-  FACTS_PAGE_PARAM_ALLOWLIST,
   HISTORY_PAGE_PARAM_ALLOWLIST,
   SEARCH_PAGE_PARAM_ALLOWLIST,
   TRACKING_QUERY_KEYS,
@@ -39,9 +38,6 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   }
   if (path === '/history') {
     return HISTORY_PAGE_PARAM_ALLOWLIST;
-  }
-  if (path === '/facts') {
-    return FACTS_PAGE_PARAM_ALLOWLIST;
   }
   return [];
 }

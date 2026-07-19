@@ -52,22 +52,6 @@ export function HistoryResultList({
                 </span>
               </div>
             </Link>
-            {/* Sibling of the entity link, never inside it — nested <a> is
-                invalid HTML and hydration-breaks. Plain inline links, not
-                CTA pills: these are references, not actions. */}
-            {node.factLinks.length > 0 ? (
-              <p className="ds-sans ds-history-result-list__facts">
-                Related fact{node.factLinks.length === 1 ? '' : 's'}:{' '}
-                {node.factLinks.map((fact, index) => (
-                  <React.Fragment key={fact.href}>
-                    {index > 0 ? ', ' : null}
-                    <Link className="ds-history-result-list__fact-link" href={fact.href}>
-                      {fact.label}
-                    </Link>
-                  </React.Fragment>
-                ))}
-              </p>
-            ) : null}
           </li>
         );
       })}

@@ -2,12 +2,11 @@
  * Longform story article page at `/stories/{slug}`.
  *
  * Atmosphere mast (rights-cleared mosaic or geometric fallback), editorial serif
- * body, related entity/fact off-ramps, and a single copper map CTA when a related
- * entity has a geo anchor. Emits schema.org Article JSON-LD only — never ClaimReview.
+ * body, related entity off-ramps, and a single copper map CTA when a related entity
+ * has a geo anchor. Emits schema.org Article JSON-LD only — never ClaimReview.
  *
  * Related entities resolve from live Firestore projections first (national catalog);
- * the bundled Dunbar seed is only a snapshot fallback. Facts remain seed-backed until
- * a public facts projection lands.
+ * the bundled Dunbar seed is only a snapshot fallback.
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -15,7 +14,6 @@ import { assertNeverClaimReview } from '@repo/domain';
 import { AtmospherePlane, selectAtmospherePlane } from '../../../components/atmosphere';
 import { renderStoryTitle } from '../../../components/atmosphere/story-title';
 import type { PublicEntityView } from '../../../data/public-seed';
-import { getSeedFact } from '../../../data/facts-seed';
 import { getSeedStory, listSeedStories, type StoryRecord } from '../../../data/stories-seed';
 import { resolvePublicEntityView } from '../../../lib/public-data/source';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
@@ -23,7 +21,6 @@ import {
   buildExploreHref,
   defaultExploreOverlayState,
 } from '../../../lib/map-experience/url-state';
-import { factPageHref } from '../../facts/facts-view-model';
 import './../stories.css';
 
 type StoryPageProps = {
@@ -92,9 +89,6 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   const relatedEntities = relatedEntityResults
     .map((result) => result.data)
     .filter((entity): entity is PublicEntityView => entity !== undefined);
-  const relatedFacts = story.relatedFactIds
-    .map((id) => getSeedFact(id))
-    .filter((fact): fact is NonNullable<typeof fact> => fact !== undefined);
 
   const atmosphere = selectAtmospherePlane({
     seedKey: story.slug,
@@ -162,26 +156,6 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
                     <span className="ds-story-link__meta">{entity.kind}</span>
                     <h3 className="ds-story-link__title">{entity.displayName}</h3>
                     <p className="ds-story-link__summary">{entity.summary}</p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        {relatedFacts.length > 0 ? (
-          <section className="ds-section" aria-labelledby="story-facts-heading">
-            <p className="ds-section__kicker">Evidence</p>
-            <h2 className="ds-section__title" id="story-facts-heading">
-              Related quick facts
-            </h2>
-            <ul className="ds-story-rail">
-              {relatedFacts.map((fact) => (
-                <li key={fact.id}>
-                  <Link className="ds-story-link" href={factPageHref(fact.id, fact.slug)}>
-                    <span className="ds-story-link__meta ds-mono">{fact.id}</span>
-                    <h3 className="ds-story-link__title">{fact.shortStatement}</h3>
-                    <p className="ds-story-link__summary">{fact.statement}</p>
                   </Link>
                 </li>
               ))}

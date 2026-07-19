@@ -19,12 +19,11 @@ test('buildLegalBrowseViewModel filters by topic', () => {
   }
 });
 
-test('buildLegalDetailViewModel resolves explainer and fact link for CRA 1964', () => {
+test('buildLegalDetailViewModel resolves explainer for CRA 1964', () => {
   const view = buildLegalDetailViewModel('civil-rights-act-1964');
   assert.equal(view.kind, 'ok');
   if (view.kind !== 'ok') return;
   assert.ok(view.explainer);
-  assert.equal(view.factHref, '/facts/civil-rights-act-1964-enacted');
 });
 
 test('buildLegalDetailViewModel returns not_found for unknown slug', () => {

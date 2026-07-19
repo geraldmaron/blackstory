@@ -1,13 +1,10 @@
 /**
- * Public errata log seed data reverse-chronological editorial changes wired to
- * fact revisions and corrections policy. Production replaces this with a live projection.
+ * Public errata log seed data — reverse-chronological editorial changes wired to
+ * methodology and corrections policy. Production replaces this with a live projection.
+ * Fact-revision-derived URLs previously pointed at /facts; those routes were retired,
+ * so affected URLs point at trust surfaces instead.
  */
-import { buildFactPath } from '@repo/domain';
-import { listSeedFacts } from '../../data/facts-seed';
-import {
-  errataTypeFromFactRevisionChangeType,
-  type ErrataChangeType,
-} from './domain-trust';
+import type { ErrataChangeType } from './domain-trust';
 
 export type ErrataEntry = {
   readonly id: string;
@@ -19,27 +16,6 @@ export type ErrataEntry = {
   readonly affectedFactId?: string;
 };
 
-function factRevisionErrataEntries(): ErrataEntry[] {
-  const entries: ErrataEntry[] = [];
-  for (const fact of listSeedFacts()) {
-    for (const revision of fact.revisions) {
-      if (revision.changeType === 'update' && revision.revisionNumber === 1) {
-        continue;
-      }
-      entries.push({
-        id: `errata_${fact.id}_rev_${revision.revisionNumber}`,
-        timestamp: revision.timestamp,
-        changeType: errataTypeFromFactRevisionChangeType(revision.changeType),
-        headline: `${fact.shortStatement} — ${revision.summary}`,
-        summary: revision.summary,
-        affectedUrl: buildFactPath(fact.id, fact.slug),
-        affectedFactId: fact.id,
-      });
-    }
-  }
-  return entries;
-}
-
 const EDITORIAL_ERRATA: readonly ErrataEntry[] = [
   {
     id: 'errata_methodology_launch_2026',
@@ -50,12 +26,31 @@ const EDITORIAL_ERRATA: readonly ErrataEntry[] = [
       'Published the full methodology page, corrections policy, and reverse-chronological errata log with RSS and JSON feeds.',
     affectedUrl: '/methodology',
   },
+  {
+    id: 'errata_dunbar_rename_precision_2026',
+    timestamp: '2026-07-16T15:00:00.000Z',
+    changeType: 'correction',
+    headline: 'Dunbar rename statement clarified',
+    summary:
+      'Corrected short-statement wording so the 1916 rename is not read as a founding date. Full methodology and entity records remain the public sources of truth.',
+    affectedUrl: '/entity/ent_dunbar_school_001',
+    affectedFactId: 'BB-F-000003',
+  },
+  {
+    id: 'errata_campus_rebuild_note_2026',
+    timestamp: '2026-07-15T18:00:00.000Z',
+    changeType: 'clarification',
+    headline: 'Campus rebuild note expanded',
+    summary:
+      'Added clarification that institutional continuity of Dunbar does not imply continuity of the 1916 building fabric.',
+    affectedUrl: '/corrections',
+    affectedFactId: 'BB-F-000005',
+  },
 ];
 
-export const ERRATA_SEED: readonly ErrataEntry[] = [
-  ...EDITORIAL_ERRATA,
-  ...factRevisionErrataEntries(),
-].sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+export const ERRATA_SEED: readonly ErrataEntry[] = [...EDITORIAL_ERRATA].sort((a, b) =>
+  b.timestamp.localeCompare(a.timestamp),
+);
 
 export function listErrataEntries(): readonly ErrataEntry[] {
   return ERRATA_SEED;

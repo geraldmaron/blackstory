@@ -46,7 +46,7 @@ function isMapSurface(path: string): boolean {
 }
 
 function resolveMotifId(path: string): PageFieldMotifId {
-  if (matchesRoutePrefix(path, '/data') || matchesRoutePrefix(path, '/facts')) {
+  if (matchesRoutePrefix(path, '/data')) {
     return 'ledger';
   }
 
@@ -69,7 +69,6 @@ function resolveMotifId(path: string): PageFieldMotifId {
   if (
     matchesRoutePrefix(path, '/methodology') ||
     matchesRoutePrefix(path, '/legal') ||
-    matchesRoutePrefix(path, '/myths') ||
     matchesRoutePrefix(path, '/corrections') ||
     matchesRoutePrefix(path, '/errata') ||
     matchesRoutePrefix(path, '/submit') ||

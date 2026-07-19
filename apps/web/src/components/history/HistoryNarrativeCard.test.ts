@@ -18,7 +18,6 @@ const sampleNode: HistoryNodeView = {
   evidenceCount: 3,
   connectionCount: 2,
   href: '/entity/ent_dunbar_school_001',
-  factLinks: [],
   topicTags: ['education'],
 };
 

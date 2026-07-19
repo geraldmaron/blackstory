@@ -1,18 +1,12 @@
 /**
  * Builds display-ready history graph nodes and edges from release artifacts.
- * Consumes pre-derived `DecadeGraphView` `AllTimeGraphView` docs no request-time traversal.
+ * Consumes pre-derived `DecadeGraphView` / `AllTimeGraphView` docs — no request-time traversal.
  */
 import type { EntityRelationship, GraphReleaseArtifact } from '@repo/domain';
-import { seedFactsForEntity } from '../../data/facts-seed';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 import { resolveAllTimeStatusLabel, resolveDecadeStatusLabel } from './decade-status';
 import { applyHistoryKindFilter, buildHistoryKindFacetOptions, type HistoryFilterState } from './filters';
 import type { HistoryViewMode } from './url-state';
-
-export type HistoryFactLink = {
-  readonly href: string;
-  readonly label: string;
-};
 
 export type HistoryNodeView = {
   readonly entityId: string;
@@ -25,7 +19,6 @@ export type HistoryNodeView = {
   /** Evidence-backed edges touching this node in the current graph slice. */
   readonly connectionCount: number;
   readonly href: string;
-  readonly factLinks: readonly HistoryFactLink[];
   readonly topicTags: readonly string[];
 };
 
@@ -68,10 +61,6 @@ function entityHref(entityId: string): string {
   return `/entity/${entityId}`;
 }
 
-function factHref(_factId: string, slug: string): string {
-  return `/facts/${slug}`;
-}
-
 function relationshipSentence(
   rel: EntityRelationship,
   fromName: string,
@@ -109,13 +98,6 @@ function resolveEdgeCitations(
   });
 }
 
-function buildFactLinks(entityId: string): readonly HistoryFactLink[] {
-  return seedFactsForEntity(entityId).map((fact) => ({
-    href: factHref(fact.id, fact.slug),
-    label: fact.shortStatement,
-  }));
-}
-
 function buildNodeView(
   entity: PublicEntityView,
   mode: HistoryViewMode,
@@ -136,7 +118,6 @@ function buildNodeView(
     evidenceCount: entity.claims.length,
     connectionCount: 0,
     href: entityHref(entity.id),
-    factLinks: buildFactLinks(entity.id),
     topicTags: entity.topicTags,
   };
 }

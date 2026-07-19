@@ -1,7 +1,6 @@
 /**
  * Narrative off-ramp card for a selected history graph node. Mirrors
- * `NarrativeCard` name, kind, status-as-of-decade, evidence count, and links to the entity page
- * and any published facts.
+ * `NarrativeCard` name, kind, status-as-of-decade, evidence count, and links to the entity page.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -65,21 +64,6 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
           </dd>
         </div>
       </dl>
-
-      {node.factLinks.length > 0 ? (
-        <div className="ds-history-narrative-card__facts-links">
-          <p className="ds-sans">Published facts referencing this record:</p>
-          <ul>
-            {node.factLinks.map((fact) => (
-              <li key={fact.href}>
-                <Link className="ds-cta ds-cta--ghost" href={fact.href}>
-                  {fact.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
 
       <Link className="ds-cta ds-cta--ink" href={node.href}>
         Open full record

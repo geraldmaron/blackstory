@@ -71,19 +71,6 @@ export const HISTORY_PAGE_PARAM_ALLOWLIST = [
 
 export type HistoryPageParam = (typeof HISTORY_PAGE_PARAM_ALLOWLIST)[number];
 
-/**
- * Allowed filter/pagination keys on /facts library browse.
- * Must stay aligned with `buildFactLibraryHref` in facts/facts-view-model.ts.
- */
-export const FACTS_PAGE_PARAM_ALLOWLIST = [
-  'q',
-  'claimType',
-  'confidence',
-  'offset',
-] as const;
-
-export type FactsPageParam = (typeof FACTS_PAGE_PARAM_ALLOWLIST)[number];
-
 /** Tracking analytics prefixes stripped even when allowlisted routes accept other params.  */
 export const TRACKING_QUERY_PREFIXES = ['utm_', 'mc_', 'pk_', 'vero_'] as const;
 

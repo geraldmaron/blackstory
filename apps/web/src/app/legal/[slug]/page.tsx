@@ -1,7 +1,6 @@
 /**
  * Legal landscape detail page at `/legal/{slug}` with plain-language explainer sections.
  */
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Card } from '@repo/ui';
 import {
@@ -40,7 +39,7 @@ export default async function LegalDetailPage({ params }: LegalDetailPageProps) 
     notFound();
   }
 
-  const { snapshot, explainer, factHref } = view;
+  const { snapshot, explainer } = view;
   const statusBadge = <LegalStatusBadge status={snapshot.lawStatus} />;
 
   return (
@@ -57,15 +56,6 @@ export default async function LegalDetailPage({ params }: LegalDetailPageProps) 
 
       <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
         <LegalDisclaimer />
-
-        {factHref ? (
-          <Card>
-            <p style={{ margin: 0 }}>
-              This entry links to a canonical{' '}
-              <Link href={factHref}>fact record</Link> with structured citations and revision history.
-            </p>
-          </Card>
-        ) : null}
 
         {explainer ? (
           <LegalExplainerSections

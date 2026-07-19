@@ -28,7 +28,6 @@ function makeNode(
     evidenceCount: 1,
     connectionCount,
     href: `/entity/${entityId}`,
-    factLinks: [],
     topicTags: [],
   };
 }

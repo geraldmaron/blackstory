@@ -134,18 +134,6 @@ test('normalizeQueryString keeps allowlisted /history browse params', () => {
   );
 });
 
-test('normalizeQueryString keeps allowlisted /facts library params', () => {
-  const qs = normalizeQueryString('/facts', {
-    q: ' school ',
-    claimType: 'founding',
-    confidence: 'high',
-    offset: '20',
-    utm_source: 'newsletter',
-    junk: '1',
-  });
-  assert.equal(qs, 'claimType=founding&confidence=high&offset=20&q=school');
-});
-
 test('buildNormalizedUrl issues canonical /explore URLs for revisit', () => {
   const normalized = buildNormalizedUrl(
     new URL('https://example.com/explore?utm_source=x&state=va&group=true&lines=1'),

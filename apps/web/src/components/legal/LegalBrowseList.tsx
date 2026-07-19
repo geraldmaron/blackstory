@@ -17,7 +17,6 @@ export type LegalBrowseItem = {
   readonly lawStatus: LawStatus;
   readonly topics: readonly string[];
   readonly hasExplainer: boolean;
-  readonly factHref?: string;
 };
 
 export type LegalBrowseListProps = {
@@ -49,11 +48,6 @@ export function LegalBrowseList({ items, labelledBy }: LegalBrowseListProps) {
                 <span className="ds-sans">Plain-language explainer available</span>
               ) : null}
             </div>
-            {item.factHref ? (
-              <p style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
-                <Link href={item.factHref}>View canonical fact record</Link>
-              </p>
-            ) : null}
           </article>
         </li>
       ))}

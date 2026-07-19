@@ -100,7 +100,6 @@ export function checkMethodologyCorrections(repoRoot: string): MachineCheckResul
     'apps/web/src/app/methodology/page.tsx',
     'apps/web/src/app/corrections/page.tsx',
     'apps/web/src/app/errata/page.tsx',
-    'apps/web/src/app/myths/page.tsx',
   ];
   const missing = paths.filter((ref) => !pathExists(repoRoot, ref));
   if (missing.length > 0) {

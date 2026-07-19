@@ -14,7 +14,6 @@ export type StoryRecord = {
   readonly eraLabel: string;
   readonly placeLabel: string;
   readonly relatedEntityIds: readonly string[];
-  readonly relatedFactIds: readonly string[];
   readonly body: readonly StorySection[];
 };
 
@@ -27,7 +26,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1865–1885',
     placeLabel: 'Princeville, North Carolina',
     relatedEntityIds: ['ent_princeville_nc_001'],
-    relatedFactIds: ['BB-F-000101', 'BB-F-000102'],
     body: [
       {
         paragraphs: [
@@ -52,7 +50,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1903–1975',
     placeLabel: 'Boley, Oklahoma',
     relatedEntityIds: ['ent_boley_historic_district_001'],
-    relatedFactIds: ['BB-F-000103', 'BB-F-000104'],
     body: [
       {
         paragraphs: [
@@ -77,7 +74,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1738–1740s',
     placeLabel: 'St. Augustine, Florida',
     relatedEntityIds: ['ent_fort_mose_001'],
-    relatedFactIds: ['BB-F-000105', 'BB-F-000106'],
     body: [
       {
         paragraphs: [
@@ -102,7 +98,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1820s–2014',
     placeLabel: 'Church Creek, Maryland',
     relatedEntityIds: ['ent_tubman_underground_railroad_md_001'],
-    relatedFactIds: ['BB-F-000107', 'BB-F-000108'],
     body: [
       {
         paragraphs: [
@@ -127,7 +122,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1837–present',
     placeLabel: 'Cheyney, Pennsylvania',
     relatedEntityIds: ['ent_cheyney_university_001'],
-    relatedFactIds: ['BB-F-000109', 'BB-F-000110'],
     body: [
       {
         paragraphs: [
@@ -152,7 +146,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1854–1866',
     placeLabel: 'Lincoln University, Pennsylvania',
     relatedEntityIds: ['ent_lincoln_university_pa_001'],
-    relatedFactIds: ['BB-F-000111', 'BB-F-000112'],
     body: [
       {
         paragraphs: [
@@ -177,7 +170,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1867–present',
     placeLabel: 'Washington, D.C.',
     relatedEntityIds: ['ent_howard_university_001'],
-    relatedFactIds: ['BB-F-000113', 'BB-F-000114'],
     body: [
       {
         paragraphs: [
@@ -202,7 +194,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1861–1868',
     placeLabel: 'Hampton, Virginia',
     relatedEntityIds: ['ent_emancipation_oak_001', 'ent_hampton_university_001'],
-    relatedFactIds: ['BB-F-000115', 'BB-F-000116', 'BB-F-000117'],
     body: [
       {
         paragraphs: [
@@ -227,7 +218,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1925–1937',
     placeLabel: 'New York, New York',
     relatedEntityIds: ['ent_brotherhood_sleeping_car_porters_001'],
-    relatedFactIds: ['BB-F-000118', 'BB-F-000119'],
     body: [
       {
         paragraphs: [
@@ -252,7 +242,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1920s–present',
     placeLabel: 'Harlem, New York',
     relatedEntityIds: ['ent_schomburg_center_001'],
-    relatedFactIds: ['BB-F-000120'],
     body: [
       {
         paragraphs: [
@@ -277,7 +266,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1959–1985',
     placeLabel: 'Detroit, Michigan',
     relatedEntityIds: ['ent_motown_museum_001'],
-    relatedFactIds: ['BB-F-000121', 'BB-F-000122'],
     body: [
       {
         paragraphs: [
@@ -302,7 +290,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1880s–1900s',
     placeLabel: 'Richmond, Virginia',
     relatedEntityIds: ['ent_richmond_planet_001'],
-    relatedFactIds: ['BB-F-000123', 'BB-F-000124'],
     body: [
       {
         paragraphs: [
@@ -327,7 +314,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '2003–2016',
     placeLabel: 'Washington, D.C.',
     relatedEntityIds: ['ent_nmaahc_001'],
-    relatedFactIds: ['BB-F-000125', 'BB-F-000126'],
     body: [
       {
         paragraphs: [
@@ -352,7 +338,6 @@ export const NATIONAL_STORY_RECORDS: readonly StoryRecord[] = [
     eraLabel: '1927–1998',
     placeLabel: 'Little Rock, Arkansas',
     relatedEntityIds: ['ent_little_rock_central_high_001'],
-    relatedFactIds: ['BB-F-000127', 'BB-F-000128'],
     body: [
       {
         paragraphs: [

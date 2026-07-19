@@ -62,16 +62,6 @@ const nextConfig = {
       static: 300,
     },
   },
-  async rewrites() {
-    // Machine JSON stays at the public `/facts/{id}.json` URL; the handler lives under
-    // `/facts/json/{id}` so it does not collide with the slug HTML page at `/facts/[id]`.
-    return [
-      {
-        source: '/facts/:id.json',
-        destination: '/facts/json/:id',
-      },
-    ];
-  },
   async redirects() {
     return [
       {
@@ -82,6 +72,26 @@ const nextConfig = {
       {
         source: '/topics/:path*',
         destination: '/stories',
+        permanent: true,
+      },
+      {
+        source: '/facts',
+        destination: '/search',
+        permanent: true,
+      },
+      {
+        source: '/facts/:path*',
+        destination: '/search',
+        permanent: true,
+      },
+      {
+        source: '/myths',
+        destination: '/methodology',
+        permanent: true,
+      },
+      {
+        source: '/myths/:path*',
+        destination: '/methodology',
         permanent: true,
       },
     ];

@@ -1,5 +1,5 @@
 /**
- * SSR smoke tests for trust components technique-based copy, disclaimer integration, and
+ * SSR smoke tests for trust components — technique-based copy, disclaimer integration, and
  * accessibility roles.
  */
 import assert from 'node:assert/strict';
@@ -7,7 +7,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { getDisclaimer } from '@repo/domain/disclaimers';
-import { listSeedFacts } from '../../data/facts-seed';
+import type { FactCounterClaim, FactRecord } from '@repo/domain/facts';
 import {
   CommonMisreadings,
   ConfidenceLabelWithNuance,
@@ -15,6 +15,38 @@ import {
   RevisionUpdateChrome,
   TrustSiteDisclaimer,
 } from './index';
+
+const SAMPLE_COUNTER_CLAIMS: readonly FactCounterClaim[] = [
+  {
+    misreading: 'The school was founded in 1916 when it took the Dunbar name.',
+    refutation:
+      'Primary records show an 1870 founding under an earlier name; 1916 is a rename tied to a new building.',
+  },
+];
+
+const MULTI_REVISION_FACT: Pick<FactRecord, 'id' | 'updatedAt' | 'revisions' | 'status'> = {
+  id: 'BB-F-000003',
+  updatedAt: '2026-07-16T15:00:00.000Z',
+  status: 'corrected',
+  revisions: [
+    {
+      revisionNumber: 1,
+      timestamp: '2026-07-01T12:00:00.000Z',
+      changeType: 'update',
+      summary: 'Initial published statement',
+      agent: { type: 'user', id: 'editor' },
+      diff: [],
+    },
+    {
+      revisionNumber: 2,
+      timestamp: '2026-07-16T15:00:00.000Z',
+      changeType: 'correction',
+      summary: 'Clarified rename vs founding',
+      agent: { type: 'user', id: 'editor' },
+      diff: [],
+    },
+  ],
+};
 
 test('HowToReadThisRecord names techniques and links to methodology', () => {
   const html = renderToStaticMarkup(createElement(HowToReadThisRecord));
@@ -30,14 +62,12 @@ test('HowToReadThisRecord compact variant is a one-line methodology off-ramp', (
   assert.doesNotMatch(html, /out of context/i);
 });
 
-test('CommonMisreadings renders counterClaims from seed facts', () => {
-  const fact = listSeedFacts().find((entry) => entry.counterClaims.length > 0);
-  assert.ok(fact);
+test('CommonMisreadings renders counterClaims without naming people or groups', () => {
   const html = renderToStaticMarkup(
-    createElement(CommonMisreadings, { counterClaims: fact!.counterClaims }),
+    createElement(CommonMisreadings, { counterClaims: SAMPLE_COUNTER_CLAIMS }),
   );
   assert.match(html, /You may see this described as/);
-  assert.match(html, new RegExp(fact!.counterClaims[0]!.misreading.slice(0, 20)));
+  assert.match(html, /founded in 1916/);
 });
 
 test('ConfidenceLabelWithNuance includes grade definition link and optional note', () => {
@@ -52,11 +82,10 @@ test('ConfidenceLabelWithNuance includes grade definition link and optional note
   assert.match(html, /~1,200/);
 });
 
-test('RevisionUpdateChrome links to revision permalink for multi-revision facts', () => {
-  const fact = listSeedFacts().find((entry) => entry.revisions.length > 1);
-  assert.ok(fact);
-  const html = renderToStaticMarkup(createElement(RevisionUpdateChrome, { fact: fact! }));
+test('RevisionUpdateChrome links multi-revision corrections to errata', () => {
+  const html = renderToStaticMarkup(createElement(RevisionUpdateChrome, { fact: MULTI_REVISION_FACT }));
   assert.match(html, /see what changed/);
+  assert.match(html, /href="\/errata"/);
   assert.match(html, /role="status"/);
 });
 

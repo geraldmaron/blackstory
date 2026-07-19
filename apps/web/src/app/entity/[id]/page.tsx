@@ -8,7 +8,6 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { buildCompactFactViewsForEntity } from '@repo/domain/facts';
 import { findUsStateForPoint } from '@repo/domain/map/geography';
 import { MapFrame, Timeline } from '@repo/ui';
 import { KindBadge, ConfidenceMark } from '../../../components/map-experience';
@@ -22,10 +21,8 @@ import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
 import { EntityMastMedia } from '../../../components/entity/EntityMastMedia';
 import { RecordGapNotice } from '../../../components/entity/RecordGapNotice';
 import { EntityEvidencePanel } from '../../../components/evidence';
-import { CompactFactReference } from '../../../components/facts';
 import { HowToReadThisRecord } from '../../../components/trust';
 import { WhyThisAppears } from '../../../components/why-appears';
-import { seedFactsForEntity } from '../../../data/facts-seed';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import { exploreHrefForState } from '../../../lib/map-experience/metadata-hrefs';
 import { buildExploreHref, defaultExploreOverlayState } from '../../../lib/map-experience/url-state';
@@ -111,7 +108,6 @@ export default async function EntityPage({ params }: EntityPageProps) {
     }
   })();
   const evidenceClaims = toEvidenceClaimInputs(entity.claims);
-  const relatedFacts = buildCompactFactViewsForEntity(entity.id, seedFactsForEntity(entity.id));
   const geoAnchor = entity.geoAnchor ?? geoAnchorFor(entity.id);
   const statePostal = statePostalFromAnchor(geoAnchor);
   const entityLinkCatalog = entityLinkCatalogFromNeighbors(entity);
@@ -304,18 +300,6 @@ export default async function EntityPage({ params }: EntityPageProps) {
                   />
                 )}
               </div>
-              {relatedFacts.length > 0 ? (
-                <div className="ds-record-section__nested" aria-labelledby="facts-heading">
-                  <h3 className="ds-subheading" id="facts-heading">
-                    Related fact records
-                  </h3>
-                  <div className="ds-stack">
-                    {relatedFacts.map((view) => (
-                      <CompactFactReference key={view.id} view={view} />
-                    ))}
-                  </div>
-                </div>
-              ) : null}
             </section>
 
             <section className="ds-record-section" aria-labelledby="timeline-heading">

@@ -1,12 +1,10 @@
 /**
  * Pure view-model for the `/legal` browse and detail pages. No Next.js runtime dependency.
  */
-import { buildFactPath } from '@repo/domain';
 import type { LegalBrowseItem } from '../../components/legal';
 import { isLawStatus } from '../../components/legal/format';
 import {
   getLegalCatalogEntry,
-  getLegalFact,
   getLegalSnapshotBySlug,
   listLegalSnapshots,
   type SEED_LEGAL_SNAPSHOTS,
@@ -36,7 +34,6 @@ export type LegalDetailViewModel =
       readonly kind: 'ok';
       readonly snapshot: (typeof SEED_LEGAL_SNAPSHOTS)[number];
       readonly explainer?: NonNullable<ReturnType<typeof getLegalCatalogEntry>>['explainer'];
-      readonly factHref?: string;
     };
 
 function cleanSelectParam(raw: string | undefined): string {
@@ -48,7 +45,6 @@ function snapshotToBrowseItem(
   snapshot: (typeof SEED_LEGAL_SNAPSHOTS)[number],
 ): LegalBrowseItem {
   const catalog = getLegalCatalogEntry(snapshot.id);
-  const fact = snapshot.factId ? getLegalFact(snapshot.factId) : undefined;
   return {
     id: snapshot.id,
     slug: snapshot.slug,
@@ -58,7 +54,6 @@ function snapshotToBrowseItem(
     lawStatus: snapshot.lawStatus,
     topics: snapshot.topics,
     hasExplainer: catalog !== undefined,
-    ...(fact ? { factHref: buildFactPath(fact.id, fact.slug) } : {}),
   };
 }
 
@@ -102,13 +97,11 @@ export function buildLegalDetailViewModel(slug: string): LegalDetailViewModel {
   if (!snapshot) return { kind: 'not_found' };
 
   const catalog = getLegalCatalogEntry(snapshot.id);
-  const fact = snapshot.factId ? getLegalFact(snapshot.factId) : undefined;
 
   return {
     kind: 'ok',
     snapshot,
     ...(catalog ? { explainer: catalog.explainer } : {}),
-    ...(fact ? { factHref: buildFactPath(fact.id, fact.slug) } : {}),
   };
 }
 

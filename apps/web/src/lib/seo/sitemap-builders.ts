@@ -25,8 +25,6 @@ const STATIC_PUBLIC_ROUTES: readonly { readonly path: string; readonly changeFre
     { path: '/about', changeFrequency: 'monthly', priority: 0.5 },
     { path: '/methodology', changeFrequency: 'monthly', priority: 0.5 },
     { path: '/errata', changeFrequency: 'weekly', priority: 0.6 },
-    { path: '/myths', changeFrequency: 'weekly', priority: 0.5 },
-    { path: '/facts', changeFrequency: 'daily', priority: 0.8 },
     { path: '/legal', changeFrequency: 'weekly', priority: 0.7 },
     { path: '/history', changeFrequency: 'weekly', priority: 0.8 },
     { path: '/stories', changeFrequency: 'weekly', priority: 0.6 },

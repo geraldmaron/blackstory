@@ -1,11 +1,7 @@
 /**
- * Barrel for fact registry presentation components.
+ * Shared fact-display helpers still used by trust/methodology surfaces.
+ * Public /facts browse and detail routes were retired; page-only panels live elsewhere or were removed.
  */
-export * from './format';
-export * from './FactStatusBanner';
-export * from './FactConfidencePanel';
+
 export * from './FactCitationList';
-export * from './FactSubjectList';
-export * from './FactRevisionPanel';
-export * from './CompactFactReference';
-export * from './FactJsonLdScript';
+export * from './format';

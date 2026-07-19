@@ -21,7 +21,6 @@ const sampleNode: HistoryNodeView = {
   evidenceCount: 2,
   connectionCount: 1,
   href: '/entity/ent_dunbar_school_001',
-  factLinks: [{ href: '/facts/dunbar-founding-1870', label: 'Sample fact' }],
   topicTags: ['education'],
 };
 
@@ -50,7 +49,6 @@ function makeNode(
     kind,
     connectionCount,
     href: `/entity/${entityId}`,
-    factLinks: [],
   };
 }
 
@@ -79,7 +77,6 @@ test('HistoryGraphViz focuses neighborhood when a record is selected', () => {
     kind: 'place',
     connectionCount: 1,
     href: '/entity/ent_dc_place_001',
-    factLinks: [],
   };
   const html = renderToStaticMarkup(
     createElement(HistoryGraphViz, {

@@ -8,5 +8,4 @@ export * from './FactProvenanceDisplay';
 export * from './RevisionUpdateChrome';
 export * from './TrustSiteJsonLdScript';
 export * from './PublishingPrinciplesJsonLdScript';
-export * from './MythClaimReviewScript';
 export * from './TrustSiteDisclaimer';

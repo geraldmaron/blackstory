@@ -21,7 +21,6 @@ const sampleNode = {
   evidenceCount: 2,
   connectionCount: 1,
   href: '/entity/ent_dunbar_school_001',
-  factLinks: [{ href: '/facts/dunbar-founding-1870', label: 'Sample fact' }],
   topicTags: ['education'],
 };
 
@@ -38,11 +37,10 @@ test('DecadeStepper renders tablist with all-time and decade tabs', () => {
   assert.match(html, /aria-selected="true"/);
 });
 
-test('HistoryResultList renders entity links and fact off-ramps', () => {
+test('HistoryResultList renders entity links', () => {
   const html = renderToStaticMarkup(
     <HistoryResultList nodes={[sampleNode]} labelledBy="history-results" selectedId="ent_dunbar_school_001" />,
   );
   assert.match(html, /href="\/entity\/ent_dunbar_school_001"/);
   assert.match(html, /aria-current="true"/);
-  assert.match(html, /href="\/facts\/dunbar-founding-1870"/);
 });
