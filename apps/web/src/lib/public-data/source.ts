@@ -2,8 +2,10 @@
  * Public data source selector: live release artifacts + Firestore with seed snapshot fallback.
  * Hydrates 1-hop related neighbor stubs and composes capped 2-hop continue-learning.
  * Entity pages fetch only related neighbor docs (bounded). List/map/search prefer ADR-004
- * catalog artifacts, then cross-request `unstable_cache`d Firestore reads — never rebuild
+ * catalog artifacts, then process-local TTL + size-gated `unstable_cache` — never rebuild
  * search from a full entity scan when the written search index (artifact or collection) exists.
+ * Oversized live catalogs (>~1.8MB) stay in process memory only; Next's 2MB data-cache limit
+ * must not receive the fat array (console warn + repeated origin fetches).
  */
 
 import { unstable_cache } from 'next/cache';
@@ -41,6 +43,13 @@ import {
   parseSearchIndexDoc,
   shouldUseLivePublicProjections,
 } from './firestore-readers';
+import {
+  createLiveCatalogMemoryCache,
+  isOversizedLiveCatalogSentinel,
+  liveCatalogCacheKey,
+  nextDataCacheValueForCatalog,
+  type LiveCatalogMemoryCache,
+} from './live-catalog-cache';
 import { mapProjectionToPublicEntityView, type PublicProjectionInput } from './map-projection';
 import { mapFirestoreSearchIndexDoc } from './map-search-index';
 import { collectOneHopNeighborIds, collectTwoHopNeighborIds } from './neighbor-ids';
@@ -53,6 +62,15 @@ export type { PublicReadSource };
 
 /** Cross-request cache window for release catalog / search index (seconds). */
 const RELEASE_CATALOG_REVALIDATE_SECONDS = 300;
+const RELEASE_CATALOG_TTL_MS = RELEASE_CATALOG_REVALIDATE_SECONDS * 1000;
+
+/** Process-local store for public release catalogs (never private/research docs). */
+const liveEntitiesMemory = createLiveCatalogMemoryCache<readonly PublicEntityView[]>({
+  defaultTtlMs: RELEASE_CATALOG_TTL_MS,
+});
+const liveSearchIndexMemory = createLiveCatalogMemoryCache<readonly PublicSearchIndexDoc[]>({
+  defaultTtlMs: RELEASE_CATALOG_TTL_MS,
+});
 
 function toNeighborLookup(entity: PublicEntityView): NeighborLookup {
   return {
@@ -172,26 +190,85 @@ async function loadLiveSearchIndexForRelease(
   return undefined;
 }
 
+/**
+ * Load a live catalog with process-local TTL for fat payloads and size-gated Next data cache.
+ * When the serialized catalog exceeds the safe ceiling, Next stores only a tiny oversized
+ * sentinel (never the full array) so SET no longer warns and every instance still fills memory.
+ */
+async function cacheLiveCatalog<T>(options: {
+  readonly kind: 'entities' | 'search-index';
+  readonly releaseId: string;
+  readonly activatedAt: string;
+  readonly memory: LiveCatalogMemoryCache<T>;
+  readonly load: () => Promise<T | undefined>;
+  readonly nextCacheKeyPrefix: string;
+}): Promise<T | undefined> {
+  const memKey = liveCatalogCacheKey(options.kind, options.releaseId, options.activatedAt);
+  const memoryHit = options.memory.get(memKey);
+  if (memoryHit !== undefined) {
+    return memoryHit;
+  }
+
+  const fromNext = await unstable_cache(
+    async () => {
+      const loaded = await options.load();
+      if (loaded === undefined) {
+        return undefined;
+      }
+      const forNext = nextDataCacheValueForCatalog(loaded);
+      if (isOversizedLiveCatalogSentinel(forNext)) {
+        options.memory.set(memKey, loaded);
+      }
+      return forNext;
+    },
+    [options.nextCacheKeyPrefix, options.releaseId, options.activatedAt],
+    { revalidate: RELEASE_CATALOG_REVALIDATE_SECONDS },
+  )();
+
+  if (isOversizedLiveCatalogSentinel(fromNext)) {
+    const afterFactory = options.memory.get(memKey);
+    if (afterFactory !== undefined) {
+      return afterFactory;
+    }
+    const loaded = await options.load();
+    if (loaded !== undefined) {
+      options.memory.set(memKey, loaded);
+    }
+    return loaded;
+  }
+
+  if (fromNext !== undefined) {
+    options.memory.set(memKey, fromNext);
+  }
+  return fromNext;
+}
+
 function cachedLiveEntities(
   releaseId: string,
   activatedAt: string,
 ): Promise<readonly PublicEntityView[] | undefined> {
-  return unstable_cache(
-    async () => loadLiveEntitiesForRelease(releaseId),
-    ['public-release-entities', releaseId, activatedAt],
-    { revalidate: RELEASE_CATALOG_REVALIDATE_SECONDS },
-  )();
+  return cacheLiveCatalog({
+    kind: 'entities',
+    releaseId,
+    activatedAt,
+    memory: liveEntitiesMemory,
+    load: () => loadLiveEntitiesForRelease(releaseId),
+    nextCacheKeyPrefix: 'public-release-entities',
+  });
 }
 
 function cachedLiveSearchIndex(
   releaseId: string,
   activatedAt: string,
 ): Promise<readonly PublicSearchIndexDoc[] | undefined> {
-  return unstable_cache(
-    async () => loadLiveSearchIndexForRelease(releaseId),
-    ['public-release-search-index', releaseId, activatedAt],
-    { revalidate: RELEASE_CATALOG_REVALIDATE_SECONDS },
-  )();
+  return cacheLiveCatalog({
+    kind: 'search-index',
+    releaseId,
+    activatedAt,
+    memory: liveSearchIndexMemory,
+    load: () => loadLiveSearchIndexForRelease(releaseId),
+    nextCacheKeyPrefix: 'public-release-search-index',
+  });
 }
 
 async function loadLiveEntities(): Promise<readonly PublicEntityView[] | undefined> {

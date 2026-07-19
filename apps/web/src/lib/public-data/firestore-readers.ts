@@ -41,8 +41,9 @@ export async function fetchPublicEntityProjection(
 }
 
 /**
- * Unbounded collection get — prefer release `entities.json` artifacts or
- * `unstable_cache` wrappers in `source.ts`. Kept for artifact-miss fallback.
+ * Unbounded collection get — prefer release `entities.json` artifacts or the
+ * size-gated catalog cache in `source.ts` (process TTL + Next data cache when
+ * under 2MB). Kept for artifact-miss fallback.
  */
 export async function listPublicEntityProjections(
   releaseId: string,
