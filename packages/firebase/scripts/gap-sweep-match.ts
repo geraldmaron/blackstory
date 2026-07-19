@@ -90,8 +90,9 @@ function main(): void {
     return undefined;
   }
 
-  const absent: any[] = [];
-  const kindMismatch: any[] = [];
+  type GapRow = { name: string; inferredKindGroup: string; sources: number; existsAsKinds: string[] };
+  const absent: GapRow[] = [];
+  const kindMismatch: GapRow[] = [];
   for (const [n, a] of agg) {
     const sources = a.sources.size;
     if (sources < minSources) continue;
