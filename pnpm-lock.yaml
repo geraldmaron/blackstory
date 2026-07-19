@@ -369,8 +369,8 @@ importers:
         version: 3.25.76
     devDependencies:
       '@firebase/rules-unit-testing':
-        specifier: ^4.0.1
-        version: 4.0.1(firebase@11.10.0)
+        specifier: ^5.0.1
+        version: 5.0.1(firebase@11.10.0)
       '@repo/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
@@ -1131,11 +1131,11 @@ packages:
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/rules-unit-testing@4.0.1':
-    resolution: {integrity: sha512-Vu8iMLP+dO9hCAqUCitWZQdORyM6CxucilRZtleeTZd5bejZmyOiaBPwYm3NOYG6025ac99CEeA+ETmJRxa9zg==}
-    engines: {node: '>=18.0.0'}
+  '@firebase/rules-unit-testing@5.0.1':
+    resolution: {integrity: sha512-EvbxUvgoY2cG7vgtdhKc7gjalKzeO3AWr2NiUuyEEmcXaSaOJanV3hXLj3Viigs+Y/jFYQmtVPpSoiwUs/ZlPg==}
+    engines: {node: '>=20.0.0'}
     peerDependencies:
-      firebase: ^11.0.0
+      firebase: ^12.0.0
 
   '@firebase/storage-compat@0.3.24':
     resolution: {integrity: sha512-XHn2tLniiP7BFKJaPZ0P8YQXKiVJX+bMyE2j2YWjYfaddqiJnROJYqSomwW6L3Y+gZAga35ONXUJQju6MB6SOQ==}
@@ -5012,7 +5012,7 @@ snapshots:
       '@firebase/util': 1.12.1
       tslib: 2.8.1
 
-  '@firebase/rules-unit-testing@4.0.1(firebase@11.10.0)':
+  '@firebase/rules-unit-testing@5.0.1(firebase@11.10.0)':
     dependencies:
       firebase: 11.10.0
 

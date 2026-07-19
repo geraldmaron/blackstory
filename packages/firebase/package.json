@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:^",
-    "@firebase/rules-unit-testing": "^4.0.1",
+    "@firebase/rules-unit-testing": "^5.0.1",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
