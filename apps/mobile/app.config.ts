@@ -82,6 +82,18 @@ const config: ExpoConfig = {
     // GoogleService-Info.plist via a config plugin (e.g.
     // `@react-native-firebase/app`'s plugin) keyed by APP_VARIANT. No
     // Firebase config file is committed by this bead; do not fabricate one.
+    //
+    // Universal Links (MOB-008, mobile-identity.md's URL-scheme section, threat-model T4
+    // "Universal-link domain binding"): declares this app as the handler for
+    // https://blackbook.app/* links, verified by iOS against the real
+    // apple-app-site-association file served from that domain's /.well-known/ path. Only
+    // production points at the bare production domain; dev/preview builds never claim it
+    // (avoids a dev build racing production for the same verified domain on a shared test
+    // device). The AASA file itself is a local template only — see
+    // apps/mobile/public/.well-known/README.md for what's real vs. templated, and
+    // mobile-identity.md's open human gates (#1: Apple Team ID) for what's still missing
+    // before this can be verified/published for real.
+    associatedDomains: APP_VARIANT === 'production' ? ['applinks:blackbook.app'] : [],
   },
   android: {
     // Native minimum OS floor per ADR-020 SS7: Android 8.0 (API 26)+.
@@ -95,6 +107,24 @@ const config: ExpoConfig = {
     predictiveBackGestureEnabled: false,
     // TODO(MOB-010): wire google-services.json via a config plugin per
     // APP_VARIANT once real Firebase Android apps exist. Not committed here.
+    //
+    // Android App Links (MOB-008), the Android analogue of iOS associatedDomains above:
+    // autoVerify asks Android to verify this app against the real assetlinks.json served
+    // from https://blackbook.app/.well-known/assetlinks.json before treating the app as the
+    // default handler for that host — see apps/mobile/public/.well-known/README.md for
+    // what's templated vs. real (this needs a real Android signing SHA-256, mobile-identity.md
+    // human gate #2, which doesn't exist yet). Production-only, same rationale as iOS.
+    intentFilters:
+      APP_VARIANT === 'production'
+        ? [
+            {
+              action: 'VIEW',
+              autoVerify: true,
+              data: [{ scheme: 'https', host: 'blackbook.app' }],
+              category: ['BROWSABLE', 'DEFAULT'],
+            },
+          ]
+        : [],
   },
   web: {
     output: 'static',

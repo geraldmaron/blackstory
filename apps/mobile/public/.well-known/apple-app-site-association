@@ -1,0 +1,35 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TODO_APPLE_TEAM_ID.app.blackbook.mobile",
+        "paths": [
+          "/explore",
+          "/search",
+          "/learn",
+          "/more",
+          "/entity/*",
+          "/history",
+          "/history/*",
+          "/stories",
+          "/stories/*",
+          "/myths",
+          "/myths/*",
+          "/methodology",
+          "/about",
+          "/corrections",
+          "/corrections/*",
+          "/errata",
+          "/facts",
+          "/facts/*",
+          "NOT /submit/api/*",
+          "NOT /corrections/api/*",
+          "NOT /search/api/*",
+          "NOT /history/api/*",
+          "NOT /locate/api/*"
+        ]
+      }
+    ]
+  }
+}
