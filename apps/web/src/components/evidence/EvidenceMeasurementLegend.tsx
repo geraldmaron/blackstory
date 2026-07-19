@@ -1,25 +1,26 @@
 /**
- * Renders the measurement-dimension legend so a reader can tell confidence, relevance,
+ * Collapsible measurement-dimension legend so a reader can tell confidence, relevance,
  * connection strength, and research coverage apart rather than treating them as one blended
  * trust figure. Copy is centralized in `../../lib/evidence/confidence-language.ts`'s
- * `EVIDENCE_DIMENSION_COPY`, never hand-typed here.
+ * `EVIDENCE_DIMENSION_COPY`, never hand-typed here. Renders as `<details>` so claims lead
+ * and pedagogy stays available without competing Card chrome.
  */
 
 import React from 'react';
-import { Card } from '@repo/ui';
 import { EVIDENCE_DIMENSION_COPY } from '../../lib/evidence';
 
 export function EvidenceMeasurementLegend() {
   return (
-    <Card title="How to read this record's measurements" as="section">
-      <dl className="ds-sans" style={{ margin: 0 }}>
+    <details className="ds-evidence-legend">
+      <summary className="ds-evidence-legend__summary">How to read this record&rsquo;s measurements</summary>
+      <dl className="ds-sans ds-evidence-legend__body">
         {Object.values(EVIDENCE_DIMENSION_COPY).map((entry) => (
           <React.Fragment key={entry.label}>
-            <dt style={{ fontWeight: 600 }}>{entry.label}</dt>
-            <dd style={{ margin: '0 0 var(--ds-space-3) 0' }}>{entry.description}</dd>
+            <dt>{entry.label}</dt>
+            <dd>{entry.description}</dd>
           </React.Fragment>
         ))}
       </dl>
-    </Card>
+    </details>
   );
 }

@@ -1552,18 +1552,13 @@
 .ds-entity-layout {
   display: grid;
   gap: var(--ds-space-8);
-  margin-top: var(--ds-space-8);
+  margin-top: var(--ds-space-2);
 }
 
 .ds-entity-aside {
   display: grid;
   gap: var(--ds-space-4);
   align-content: start;
-}
-
-.ds-entity-mast {
-  padding-bottom: var(--ds-space-8);
-  border-bottom: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
 .ds-entity-tags {
@@ -1573,13 +1568,14 @@
   margin-top: var(--ds-space-4);
 }
 
+/* Hairline mono chips — editorial discovery links, not SaaS filter pills. */
 .ds-entity-tag {
   display: inline-flex;
   align-items: center;
   min-height: 2rem;
-  padding: 0.2rem 0.75rem;
+  padding: 0.2rem 0.55rem;
   border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-sm);
   color: var(--ds-ink);
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
@@ -1588,11 +1584,13 @@
   background: transparent;
   transition:
     background-color var(--ds-duration-fast) var(--ds-easing),
-    color var(--ds-duration-fast) var(--ds-easing);
+    color var(--ds-duration-fast) var(--ds-easing),
+    border-color var(--ds-duration-fast) var(--ds-easing);
 }
 
 .ds-entity-tag:hover,
 .ds-entity-tag:focus-visible {
+  border-color: var(--ds-ink);
   background: var(--ds-ink);
   color: var(--ds-canvas);
 }

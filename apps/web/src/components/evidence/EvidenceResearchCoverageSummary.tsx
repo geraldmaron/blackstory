@@ -1,12 +1,12 @@
 /**
  * Record-level summary: research coverage, total source lineage count across every
  * evidenced claim, the most recent last-checked date, and any record-level retraction or
- * correction notices that apply beyond a single claim. Kept as its own `Card` so this rollup
- * reads as a distinct fact from any individual claim's confidence.
+ * correction notices that apply beyond a single claim. Flat aside-block chrome — not a nested
+ * Card — so it does not compete with the entity section heading or the maturity rail.
  */
 
 import React from 'react';
-import { Card, Notice } from '@repo/ui';
+import { Notice } from '@repo/ui';
 import {
   formatIsoDate,
   humanizeToken,
@@ -29,13 +29,24 @@ export function EvidenceResearchCoverageSummary({
   retractionNotices = [],
 }: EvidenceResearchCoverageSummaryProps) {
   const lastChecked = lastCheckedAt ?? researchCoverage.lastCheckedAt;
+  const hasBody = Boolean(sourceLineage || researchCoverage.notes || lastChecked || retractionNotices.length > 0);
+
+  if (!hasBody) {
+    return (
+      <p className="ds-aside-block__meta ds-mono" style={{ margin: 0 }}>
+        Research coverage: {humanizeToken(researchCoverage.level)}
+      </p>
+    );
+  }
 
   return (
-    <Card title="Research coverage" meta={<span className="ds-mono">{humanizeToken(researchCoverage.level)}</span>} as="section">
+    <section className="ds-aside-block" aria-label="Research coverage">
+      <h3 className="ds-aside-block__title">Research coverage</h3>
+      <p className="ds-aside-block__meta ds-mono">{humanizeToken(researchCoverage.level)}</p>
       <dl className="ds-sans" style={{ margin: 0 }}>
         {sourceLineage ? (
           <>
-            <dt style={{ fontWeight: 600 }}>Source lineage</dt>
+            <dt className="ds-dt">Source lineage</dt>
             <dd style={{ margin: '0 0 var(--ds-space-3) 0' }}>
               <span className="ds-mono">{sourceLineage.independentLineageCount}</span> independent{' '}
               {sourceLineage.independentLineageCount === 1 ? 'source' : 'sources'} across this record&rsquo;s
@@ -45,13 +56,13 @@ export function EvidenceResearchCoverageSummary({
         ) : null}
         {researchCoverage.notes ? (
           <>
-            <dt style={{ fontWeight: 600 }}>Coverage notes</dt>
+            <dt className="ds-dt">Coverage notes</dt>
             <dd style={{ margin: '0 0 var(--ds-space-3) 0' }}>{researchCoverage.notes}</dd>
           </>
         ) : null}
         {lastChecked ? (
           <>
-            <dt style={{ fontWeight: 600 }}>Last checked</dt>
+            <dt className="ds-dt">Last checked</dt>
             <dd style={{ margin: 0 }}>{formatIsoDate(lastChecked)}</dd>
           </>
         ) : null}
@@ -75,6 +86,6 @@ export function EvidenceResearchCoverageSummary({
           ))}
         </div>
       ) : null}
-    </Card>
+    </section>
   );
 }

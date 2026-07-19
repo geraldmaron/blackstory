@@ -132,6 +132,12 @@ test('renders a visible excerpt as a blockquote when rights permit it', () => {
   assert.match(html, /A public-domain sentence quoted for context\./);
 });
 
+test('does not surface raw claim ids in the Card meta (public surface)', () => {
+  const html = renderToStaticMarkup(createElement(EvidenceCard, { card: buildEvidenceCard(BASE_CLAIM) }));
+  assert.doesNotMatch(html, />claim_seed_001</);
+  assert.match(html, /Primary archival/);
+});
+
 test('renders revision history and a retraction notice when present', () => {
   const html = renderToStaticMarkup(
     createElement(EvidenceCard, {

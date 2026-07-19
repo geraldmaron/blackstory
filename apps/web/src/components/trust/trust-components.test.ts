@@ -23,6 +23,13 @@ test('HowToReadThisRecord names techniques and links to methodology', () => {
   assert.doesNotMatch(html, /deniers|critics/i);
 });
 
+test('HowToReadThisRecord compact variant is a one-line methodology off-ramp', () => {
+  const html = renderToStaticMarkup(createElement(HowToReadThisRecord, { variant: 'compact' }));
+  assert.match(html, /How this record is built/);
+  assert.match(html, /read the methodology/);
+  assert.doesNotMatch(html, /out of context/i);
+});
+
 test('CommonMisreadings renders counterClaims from seed facts', () => {
   const fact = listSeedFacts().find((entry) => entry.counterClaims.length > 0);
   assert.ok(fact);

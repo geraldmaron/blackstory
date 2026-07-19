@@ -9,10 +9,8 @@
  * content notice (from the shared disclaimer registry) and honest "coverage note" missing-
  * perspective indicators render additively alongside the explanation, never in place of it.
  *
- * Callers resolve a `PublicWhyThisAppears` value via `buildPublicWhyThisAppears` from
- * `@repo/domain` (typically from an entity's `relevanceExplanation` /
- * `historicalContext` / claim text and `notabilityBasis`) and mount
- * `<WhyThisAppears result={...} />` on the entity detail page.
+ * Default `variant="flat"` fits entity pages that already own the section `h2`. Pass
+ * `variant="card"` when a standalone titled Card is required.
  */
 
 import React from 'react';
@@ -25,20 +23,28 @@ export type WhyThisAppearsProps = {
   /** Distinguishes multiple mounts on the same page (e.g. a list of search results) in generated
    * element ids. Defaults to a stable value safe for a single per-page mount. */
   readonly instanceId?: string;
+  /** Flat body for section-owned headings; card wraps a titled Card for standalone mounts. */
+  readonly variant?: 'flat' | 'card';
 };
 
-export function WhyThisAppears({ result, instanceId = 'why-this-appears' }: WhyThisAppearsProps) {
+function WhyThisAppearsBody({
+  result,
+  instanceId,
+  showAuditableTag,
+}: {
+  readonly result: PublicWhyThisAppears;
+  readonly instanceId: string;
+  readonly showAuditableTag: boolean;
+}) {
   const basisHeadingId = `${instanceId}-basis-heading`;
   const coverageHeadingId = `${instanceId}-coverage-heading`;
 
   return (
-    <Card
-      title={WHY_THIS_APPEARS_COPY.heading}
-      meta={<span className="ds-mono">{WHY_THIS_APPEARS_COPY.auditableTag}</span>}
-    >
-      <p className="ds-sans" style={{ margin: 0 }}>
-        {result.explanation}
-      </p>
+    <>
+      <p className="ds-sans ds-why-appears__explanation">{result.explanation}</p>
+      {showAuditableTag ? (
+        <p className="ds-mono ds-why-appears__tag">{WHY_THIS_APPEARS_COPY.auditableTag}</p>
+      ) : null}
 
       {result.traumaContentNotice.warranted && result.traumaContentNotice.disclaimer ? (
         <Notice tone="warning" title={result.traumaContentNotice.disclaimer.title}>
@@ -46,10 +52,10 @@ export function WhyThisAppears({ result, instanceId = 'why-this-appears' }: WhyT
         </Notice>
       ) : null}
 
-      <section aria-labelledby={basisHeadingId} style={{ marginTop: 'var(--ds-space-4)' }}>
-        <h4 id={basisHeadingId} className="ds-sans" style={{ margin: 0 }}>
+      <section aria-labelledby={basisHeadingId} className="ds-why-appears__block">
+        <h3 id={basisHeadingId} className="ds-subheading">
           {WHY_THIS_APPEARS_COPY.basisHeading}
-        </h4>
+        </h3>
         {result.notabilityBasis.length === 0 ? (
           <EmptyState title={WHY_THIS_APPEARS_COPY.basisHeading}>
             {WHY_THIS_APPEARS_COPY.noBasisRecorded}
@@ -74,14 +80,10 @@ export function WhyThisAppears({ result, instanceId = 'why-this-appears' }: WhyT
       </section>
 
       {result.missingPerspectiveIndicators.length > 0 ? (
-        <section
-          aria-labelledby={coverageHeadingId}
-          className="ds-stack"
-          style={{ marginTop: 'var(--ds-space-4)' }}
-        >
-          <h4 id={coverageHeadingId} className="ds-sans" style={{ margin: 0 }}>
+        <section aria-labelledby={coverageHeadingId} className="ds-why-appears__block ds-stack">
+          <h3 id={coverageHeadingId} className="ds-subheading">
             {WHY_THIS_APPEARS_COPY.missingPerspectiveHeading}
-          </h4>
+          </h3>
           <ul>
             {result.missingPerspectiveIndicators.map((indicator) => (
               <li key={indicator.dimension} className="ds-sans">
@@ -91,6 +93,33 @@ export function WhyThisAppears({ result, instanceId = 'why-this-appears' }: WhyT
           </ul>
         </section>
       ) : null}
-    </Card>
+    </>
   );
+}
+
+export function WhyThisAppears({
+  result,
+  instanceId = 'why-this-appears',
+  variant = 'flat',
+}: WhyThisAppearsProps) {
+  const body = (
+    <WhyThisAppearsBody
+      result={result}
+      instanceId={instanceId}
+      showAuditableTag={variant === 'flat'}
+    />
+  );
+
+  if (variant === 'card') {
+    return (
+      <Card
+        title={WHY_THIS_APPEARS_COPY.heading}
+        meta={<span className="ds-mono">{WHY_THIS_APPEARS_COPY.auditableTag}</span>}
+      >
+        {body}
+      </Card>
+    );
+  }
+
+  return <div className="ds-why-appears">{body}</div>;
 }

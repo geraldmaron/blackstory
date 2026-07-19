@@ -253,9 +253,12 @@ right rail (hairline rows, no box-per-result), full-height on desktop, bottom sh
 mobile. Legend: one-line strip bottom-left, disclosure for detail. Panel widths stay compact
 (19/21/20rem); panel fills at 92% + blur; radius-md; nothing overlaps the map's center third.
 
-**`/entity/[id]`** — record mast (mono slug KIND / PLACE / ERA, Sora name, serif summary),
-then a 2-column desktop layout: narrative/evidence main column (serif), data aside (photo,
-precision, status, map frame — the aside is the only boxed region). Sections hairline-ruled.
+**`/entity/[id]`** — editorial mast: media plane (rights-cleared photo or archive collage)
+beside/above mono KIND · PLACE · framing slug, Sora name, and serif summary; slim at-a-glance
+(non-mast labeled facts); then 2-column desktop layout: narrative/evidence main column (serif),
+slim data aside (map, precision, maturity, revision — media lives in the mast). Sections
+hairline-ruled with automatic index numerals. Connected records are one room (1-hop + optional
+2-hop).
 
 **`/search`, `/facts`, `/legal`** — document rhythm: mast, filter row (native controls,
 compact), result list as top-rule entries with mono meta lines. Pagination quiet buttons.

@@ -41,11 +41,26 @@ test('renders the measurement legend distinguishing all four dimensions (AC2)', 
       researchCoverage: { level: 'partial' },
     }),
   );
+  assert.match(html, /<details/);
   assert.match(html, /How to read this record.{0,10}s measurements/);
   assert.match(html, /Confidence.{0,20}evidence score/);
   assert.match(html, /Relevance/);
   assert.match(html, /Connection strength/);
   assert.match(html, /Research coverage/);
+});
+
+test('leads with claim cards before the collapsed measurement legend', () => {
+  const html = renderToStaticMarkup(
+    createElement(EntityEvidencePanel, {
+      labelledBy: 'evidence-heading',
+      claims: CLAIMS,
+      researchCoverage: { level: 'partial' },
+    }),
+  );
+  const claimIdx = html.indexOf('id="claim_seed_001"');
+  const legendIdx = html.indexOf('How to read this record');
+  assert.ok(claimIdx >= 0 && legendIdx >= 0, 'expected claim and legend markup');
+  assert.ok(claimIdx < legendIdx, 'claims must precede the measurement legend');
 });
 
 test('renders one evidence card per claim', () => {

@@ -28,7 +28,7 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
     <Card
       id={card.id}
       title={`${humanizeToken(card.predicate)}: ${card.object}`}
-      meta={<span className="ds-mono">{card.id}</span>}
+      meta={<span className="ds-mono">{card.citation.label}</span>}
       aria-describedby={citationId}
     >
       <div className="ds-row" style={{ marginBottom: 'var(--ds-space-3)', flexWrap: 'wrap' }}>

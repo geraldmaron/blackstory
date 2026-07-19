@@ -1,15 +1,15 @@
 /**
- * Entity detail page for place/school/event/institution public records. Shared layout,
- * type-specific sections: relevance, historical context, status,
- * accepted claims via EntityEvidencePanel, graph-derived related records and
- * timeline, location precision, record maturity, revision metadata, and a sensitivity
- * context banner when the record carries one. Sparse sections render the approved
- * `RecordGapNotice` copy instead of a silent empty list.
+ * Entity detail page for place/school/event/institution public records. Editorial mast
+ * (media plane + name + serif summary) leads; slim at-a-glance labeled facts follow before
+ * sustained reading. Main spine: relevance, historical context, status, accepted claims,
+ * timeline, and unified connected records. Slim context rail: map, maturity, revision.
+ * Sparse sections render the approved `RecordGapNotice` copy instead of a silent empty list.
  */
 
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { buildCompactFactViewsForEntity } from '@repo/domain';
-import { MapFrame, Notice, Timeline } from '@repo/ui';
+import { MapFrame, Timeline } from '@repo/ui';
 import { SeedDataNotice } from '../../../components/SeedDataNotice';
 import { KindBadge, ConfidenceMark } from '../../../components/map-experience';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
@@ -17,6 +17,7 @@ import '../../../components/entity/entity-page.css';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
 import { EntityRelatedList } from '../../../components/entity/EntityRelatedList';
 import { EntityLinkDiscoveryHint } from '../../../components/entity/EntityLink';
+import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
 import { EntityPrimaryImage } from '../../../components/entity/EntityPrimaryImage';
 import { EntityArchiveCollage } from '../../../components/entity/EntityArchiveCollage';
@@ -35,6 +36,21 @@ import { deriveHistoricalFraming } from './entity-view-model';
 type EntityPageProps = {
   readonly params: Promise<{ id: string }>;
 };
+
+function entityLinkCatalogFromNeighbors(
+  entity: NonNullable<Awaited<ReturnType<typeof resolvePublicEntityView>>['data']>,
+): readonly EntityLinkCatalogEntry[] {
+  const seen = new Set<string>();
+  const catalog: EntityLinkCatalogEntry[] = [];
+  for (const neighbor of [...(entity.relatedNeighbors ?? []), ...(entity.continueLearning ?? [])]) {
+    if (seen.has(neighbor.id) || neighbor.displayName.trim().length === 0) {
+      continue;
+    }
+    seen.add(neighbor.id);
+    catalog.push({ id: neighbor.id, displayName: neighbor.displayName });
+  }
+  return catalog;
+}
 
 export async function generateStaticParams() {
   const { data: entities } = await listPublicEntityViews();
@@ -83,6 +99,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const evidenceClaims = toEvidenceClaimInputs(entity.claims);
   const relatedFacts = buildCompactFactViewsForEntity(entity.id, seedFactsForEntity(entity.id));
   const geoAnchor = geoAnchorFor(entity.id);
+  const entityLinkCatalog = entityLinkCatalogFromNeighbors(entity);
+  const continueLearning = entity.continueLearning ?? [];
   const exploreHref = buildExploreHref({
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
     density: false,
@@ -97,49 +115,50 @@ export default async function EntityPage({ params }: EntityPageProps) {
   return (
     <main className="ds-container ds-page" id="main">
       <header className="ds-entity-mast">
-        <p className="ds-page__eyebrow">
-          <span className="ds-entity-mast__meta">
-            <KindBadge
+        <div className="ds-entity-mast__media">
+          {entity.primaryImage ? (
+            <EntityPrimaryImage image={entity.primaryImage} entityName={entity.displayName} priority />
+          ) : (
+            <EntityArchiveCollage
+              entityId={entity.id}
+              entityName={entity.displayName}
               kind={entity.kind}
-              {...(mapTone !== undefined ? { mapTone } : {})}
             />
-            <span className="ds-entity-mast__meta-sep" aria-hidden="true">
-              ·
-            </span>
-            <span className="ds-mono ds-entity-mast__meta-item">{entity.jurisdictionLabel}</span>
-            <span className="ds-entity-mast__meta-sep" aria-hidden="true">
-              ·
-            </span>
-            <span className="ds-entity-mast__meta-item">{framingLabel}</span>
-          </span>
-        </p>
-        <h1 className="ds-page__title">{entity.displayName}</h1>
-        <p className="ds-page__lede">{entity.summary}</p>
-        <EntityTopicTags entity={entity} />
-      </header>
-
-      {/* Summary before story (v5.1 cognitive-accessibility law): the whole
-          record as labeled facts, before any prose asks for sustained reading. */}
-      <section className="ds-at-a-glance" aria-label="At a glance">
-        <p className="ds-at-a-glance__title">At a glance</p>
-        <dl className="ds-at-a-glance__grid">
-          <div className="ds-at-a-glance__row">
-            <dt>Kind</dt>
-            <dd>
+          )}
+        </div>
+        <div className="ds-entity-mast__identity">
+          <p className="ds-page__eyebrow">
+            <span className="ds-entity-mast__meta">
               <KindBadge
                 kind={entity.kind}
                 {...(mapTone !== undefined ? { mapTone } : {})}
               />
-            </dd>
-          </div>
-          <div className="ds-at-a-glance__row">
-            <dt>Where</dt>
-            <dd>{entity.jurisdictionLabel}</dd>
-          </div>
-          <div className="ds-at-a-glance__row">
-            <dt>Record type</dt>
-            <dd>{framingLabel}</dd>
-          </div>
+              <span className="ds-entity-mast__meta-sep" aria-hidden="true">
+                ·
+              </span>
+              <span className="ds-mono ds-entity-mast__meta-item">{entity.jurisdictionLabel}</span>
+              <span className="ds-entity-mast__meta-sep" aria-hidden="true">
+                ·
+              </span>
+              <span className="ds-entity-mast__meta-item">{framingLabel}</span>
+            </span>
+          </p>
+          <h1 className="ds-page__title">{entity.displayName}</h1>
+          <LinkedProse
+            className="ds-page__lede"
+            text={entity.summary}
+            skipEntityIds={[entity.id]}
+            catalog={entityLinkCatalog}
+          />
+          <EntityTopicTags entity={entity} />
+        </div>
+      </header>
+
+      {/* Summary before story (v5.1 cognitive-accessibility law): labeled facts the mast
+          does not already state, before any prose asks for sustained reading. */}
+      <section className="ds-at-a-glance" aria-label="At a glance">
+        <p className="ds-at-a-glance__title">At a glance</p>
+        <dl className="ds-at-a-glance__grid">
           <div className="ds-at-a-glance__row">
             <dt>Evidence</dt>
             <dd>
@@ -165,10 +184,9 @@ export default async function EntityPage({ params }: EntityPageProps) {
         </dl>
       </section>
 
-      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
+      <div className="ds-entity-body">
         {resolved.source !== 'live' ? <SeedDataNotice compact /> : null}
-        <HowToReadThisRecord />
-
+        <HowToReadThisRecord variant="compact" />
         {entity.sensitivity ? (
           <EntitySensitivityBanner sensitivity={entity.sensitivity} entityKind={entity.kind} />
         ) : null}
@@ -176,11 +194,14 @@ export default async function EntityPage({ params }: EntityPageProps) {
         <div className="ds-entity-layout">
           <div className="ds-stack ds-entity-sections">
             <section className="ds-record-section" aria-labelledby="relevance-heading">
-              <p className="ds-section__kicker"><span className="ds-kicker-index" aria-hidden="true" />Relevance</p>
+              <p className="ds-section__kicker">
+                <span className="ds-kicker-index" aria-hidden="true" />
+                Relevance
+              </p>
               <h2 className="ds-section__title" id="relevance-heading">
                 Why this appears
               </h2>
-              <div style={{ marginTop: 'var(--ds-space-4)' }}>
+              <div className="ds-record-section__body">
                 {whyThisAppears ? (
                   <WhyThisAppears result={whyThisAppears} instanceId={`entity-${entity.id}-why`} />
                 ) : (
@@ -190,12 +211,20 @@ export default async function EntityPage({ params }: EntityPageProps) {
             </section>
 
             <section className="ds-record-section" aria-labelledby="context-heading">
-              <p className="ds-section__kicker"><span className="ds-kicker-index" aria-hidden="true" />Context</p>
+              <p className="ds-section__kicker">
+                <span className="ds-kicker-index" aria-hidden="true" />
+                Context
+              </p>
               <h2 className="ds-section__title" id="context-heading">
                 Historical context
               </h2>
               {entity.historicalContext.trim().length > 0 ? (
-                <p className="ds-section__lede">{entity.historicalContext}</p>
+                <LinkedProse
+                  className="ds-section__lede"
+                  text={entity.historicalContext}
+                  skipEntityIds={[entity.id]}
+                  catalog={entityLinkCatalog}
+                />
               ) : (
                 <RecordGapNotice kind="context" />
               )}
@@ -203,7 +232,10 @@ export default async function EntityPage({ params }: EntityPageProps) {
 
             {entity.extendedNarrative ? (
               <section className="ds-record-section" aria-labelledby="further-heading">
-                <p className="ds-section__kicker"><span className="ds-kicker-index" aria-hidden="true" />Reading</p>
+                <p className="ds-section__kicker">
+                  <span className="ds-kicker-index" aria-hidden="true" />
+                  Reading
+                </p>
                 <h2 className="ds-section__title" id="further-heading">
                   Further reading
                 </h2>
@@ -212,21 +244,27 @@ export default async function EntityPage({ params }: EntityPageProps) {
             ) : null}
 
             <section className="ds-record-section" aria-labelledby="status-heading">
-              <p className="ds-section__kicker"><span className="ds-kicker-index" aria-hidden="true" />Status</p>
+              <p className="ds-section__kicker">
+                <span className="ds-kicker-index" aria-hidden="true" />
+                Status
+              </p>
               <h2 className="ds-section__title" id="status-heading">
                 {entity.kind === 'event' ? 'When this happened' : 'Status and history'}
               </h2>
-              <div style={{ marginTop: 'var(--ds-space-4)' }}>
+              <div className="ds-record-section__body">
                 <EntityStatusPanel entity={entity} framing={framing} />
               </div>
             </section>
 
             <section className="ds-record-section" aria-labelledby="claims-heading">
-              <p className="ds-section__kicker"><span className="ds-kicker-index" aria-hidden="true" />Claims</p>
+              <p className="ds-section__kicker">
+                <span className="ds-kicker-index" aria-hidden="true" />
+                Claims
+              </p>
               <h2 className="ds-section__title" id="claims-heading">
                 Accepted claims
               </h2>
-              <div style={{ marginTop: 'var(--ds-space-4)' }}>
+              <div className="ds-record-section__body">
                 {entity.claims.length === 0 ? (
                   <RecordGapNotice kind="claims" />
                 ) : (
@@ -237,115 +275,72 @@ export default async function EntityPage({ params }: EntityPageProps) {
                   />
                 )}
               </div>
+              {relatedFacts.length > 0 ? (
+                <div className="ds-record-section__nested" aria-labelledby="facts-heading">
+                  <h3 className="ds-subheading" id="facts-heading">
+                    Related fact records
+                  </h3>
+                  <div className="ds-stack">
+                    {relatedFacts.map((view) => (
+                      <CompactFactReference key={view.id} view={view} />
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </section>
 
-            {relatedFacts.length > 0 ? (
-              <section className="ds-record-section" aria-labelledby="facts-heading">
-                <p className="ds-section__kicker"><span className="ds-kicker-index" aria-hidden="true" />Facts</p>
-                <h2 className="ds-section__title" id="facts-heading">
-                  Related fact records
-                </h2>
-                <div className="ds-stack" style={{ marginTop: 'var(--ds-space-4)' }}>
-                  {relatedFacts.map((view) => (
-                    <CompactFactReference key={view.id} view={view} />
-                  ))}
-                </div>
-              </section>
-            ) : null}
-
             <section className="ds-record-section" aria-labelledby="timeline-heading">
-              <p className="ds-section__kicker"><span className="ds-kicker-index" aria-hidden="true" />Chronology</p>
+              <p className="ds-section__kicker">
+                <span className="ds-kicker-index" aria-hidden="true" />
+                Chronology
+              </p>
               <h2 className="ds-section__title" id="timeline-heading">
                 Timeline
               </h2>
-              <div style={{ marginTop: 'var(--ds-space-4)' }}>
+              <div className="ds-record-section__body">
                 {entity.timeline.length === 0 ? (
                   <RecordGapNotice kind="timeline" />
                 ) : (
                   <Timeline labelledBy="timeline-heading" items={entity.timeline} />
                 )}
               </div>
-              <p className="ds-sans" style={{ color: 'var(--ds-ink-muted)', marginTop: 'var(--ds-space-2)' }}>
-                Derived from this record&rsquo;s published history graph and status
-                history — never hand-authored prose.
+              <p className="ds-entity-footnote ds-sans">
+                Derived from this record&rsquo;s published history graph and status history.
               </p>
             </section>
 
             <section className="ds-record-section" aria-labelledby="related-heading">
-              <p className="ds-section__kicker"><span className="ds-kicker-index" aria-hidden="true" />More</p>
+              <p className="ds-section__kicker">
+                <span className="ds-kicker-index" aria-hidden="true" />
+                Connected
+              </p>
               <h2 className="ds-section__title" id="related-heading">
-                Related records
+                Connected records
               </h2>
               <EntityLinkDiscoveryHint />
-              <div style={{ marginTop: 'var(--ds-space-4)' }}>
+              <div className="ds-record-section__body">
                 <EntityRelatedList entity={entity} labelledBy="related-heading" />
               </div>
-            </section>
-
-            {(entity.continueLearning?.length ?? 0) > 0 ? (
-              <section className="ds-record-section" aria-labelledby="continue-heading">
-                <p className="ds-section__kicker"><span className="ds-kicker-index" aria-hidden="true" />Continue</p>
-                <h2 className="ds-section__title" id="continue-heading">
-                  Also connected
-                </h2>
-                <p className="ds-section__lede">
-                  Nearby records one step further in the published graph — keep learning without
-                  dead ends.
-                </p>
-                <EntityLinkDiscoveryHint />
-                <div style={{ marginTop: 'var(--ds-space-4)' }}>
+              {continueLearning.length > 0 ? (
+                <div className="ds-record-section__nested" aria-labelledby="continue-heading">
+                  <h3 className="ds-subheading" id="continue-heading">
+                    Also connected
+                  </h3>
+                  <p className="ds-section__lede">
+                    Nearby records one step further in the published graph — keep learning without
+                    dead ends.
+                  </p>
                   <EntityRelatedList
                     entity={entity}
                     labelledBy="continue-heading"
                     continueLearning
                   />
                 </div>
-              </section>
-            ) : null}
+              ) : null}
+            </section>
           </div>
 
           <aside className="ds-entity-aside" aria-label="Record context">
-            {entity.primaryImage ? (
-              <EntityPrimaryImage image={entity.primaryImage} entityName={entity.displayName} />
-            ) : (
-              <EntityArchiveCollage
-                entityId={entity.id}
-                entityName={entity.displayName}
-                kind={entity.kind}
-              />
-            )}
-
-            <Notice tone="warning" title={`Location precision: ${entity.locationPrecision}`}>
-              Showing {entity.locationLabel}. Exact residential addresses are never rendered on
-              public pages.
-            </Notice>
-
-            <section className="ds-aside-block" aria-labelledby="maturity-heading">
-              <h2 className="ds-aside-block__title" id="maturity-heading">
-                Record maturity
-              </h2>
-              <p className="ds-aside-block__meta ds-mono">{entity.recordMaturity}</p>
-              <p className="ds-sans" style={{ margin: 0 }}>
-                Research coverage: <strong>{entity.researchCoverage}</strong>. Maturity labels
-                follow the product constitution vocabulary and will be projection-backed in a later release.
-              </p>
-            </section>
-
-            <section className="ds-aside-block" aria-labelledby="revision-heading">
-              <h2 className="ds-aside-block__title" id="revision-heading">
-                Revision
-              </h2>
-              <p className="ds-aside-block__meta ds-mono">{entity.revision.releaseId}</p>
-              <dl className="ds-sans" style={{ margin: 0 }}>
-                <dt style={{ fontWeight: 600 }}>Record last updated</dt>
-                <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>
-                  {entity.revision.recordUpdatedAt || 'Not yet tracked'}
-                </dd>
-                <dt style={{ fontWeight: 600 }}>Release generated</dt>
-                <dd style={{ margin: 0 }}>{entity.revision.generatedAt || 'Not yet tracked'}</dd>
-              </dl>
-            </section>
-
             <MapFrame
               title={`${entity.displayName} map context`}
               caption="Schematic pin — not survey-grade geometry. Open the national map for the live geographic context."
@@ -358,11 +353,41 @@ export default async function EntityPage({ params }: EntityPageProps) {
                 },
               ]}
             />
-            <p style={{ margin: 0 }}>
-              <a className="ds-cta ds-cta--ink" href={exploreHref}>
+            <p className="ds-entity-aside__cta">
+              <Link className="ds-cta ds-cta--ink" href={exploreHref} scroll={false}>
                 View on map
-              </a>
+              </Link>
             </p>
+            <p className="ds-entity-aside__precision ds-sans">
+              Location precision: <strong>{entity.locationPrecision}</strong>. Showing{' '}
+              {entity.locationLabel}. Exact residential addresses are never rendered on public pages.
+            </p>
+
+            <section className="ds-aside-block" aria-labelledby="maturity-heading">
+              <h2 className="ds-aside-block__title" id="maturity-heading">
+                Record maturity
+              </h2>
+              <p className="ds-aside-block__meta ds-mono">{entity.recordMaturity}</p>
+              <p className="ds-sans" style={{ margin: 0 }}>
+                Research coverage: <strong>{entity.researchCoverage}</strong>. Maturity labels
+                follow the product constitution vocabulary.
+              </p>
+            </section>
+
+            <section className="ds-aside-block" aria-labelledby="revision-heading">
+              <h2 className="ds-aside-block__title" id="revision-heading">
+                Revision
+              </h2>
+              <p className="ds-aside-block__meta ds-mono">{entity.revision.releaseId}</p>
+              <dl className="ds-sans" style={{ margin: 0 }}>
+                <dt className="ds-dt">Record last updated</dt>
+                <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>
+                  {entity.revision.recordUpdatedAt || 'Not yet tracked'}
+                </dd>
+                <dt className="ds-dt">Release generated</dt>
+                <dd style={{ margin: 0 }}>{entity.revision.generatedAt || 'Not yet tracked'}</dd>
+              </dl>
+            </section>
           </aside>
         </div>
       </div>

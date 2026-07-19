@@ -1,16 +1,33 @@
 /**
- * Site-wide "How to read this record" pre-bunking component forewarning plus
- * technique-based reader empowerment. Names manipulation techniques, never people or groups.
+ * Site-wide "How to read this record" pre-bunking component. Full variant: technique-based
+ * reader empowerment (names manipulation techniques, never people or groups). Compact variant:
+ * one-line methodology off-ramp for entity pages where trust pedagogy must not precede the story.
  */
 import React from 'react';
+import Link from 'next/link';
 import { Notice } from '@repo/ui';
 import { PREBUNK_TECHNIQUE_FRAMES } from '../../lib/trust/domain-trust';
 
 export type HowToReadThisRecordProps = {
   readonly methodologyHref?: string;
+  /** Compact = single methodology link; full = technique list + notice (default). */
+  readonly variant?: 'full' | 'compact';
 };
 
-export function HowToReadThisRecord({ methodologyHref = '/methodology' }: HowToReadThisRecordProps) {
+export function HowToReadThisRecord({
+  methodologyHref = '/methodology',
+  variant = 'full',
+}: HowToReadThisRecordProps) {
+  if (variant === 'compact') {
+    return (
+      <p className="ds-entity-trust-offramp ds-sans">
+        How this record is built —{' '}
+        <Link href={methodologyHref}>read the methodology</Link> for source hierarchy, confidence,
+        and verification steps.
+      </p>
+    );
+  }
+
   return (
     <section aria-labelledby="how-to-read-heading">
       <Notice tone="dispute" title="How to read this record">
@@ -29,7 +46,7 @@ export function HowToReadThisRecord({ methodologyHref = '/methodology' }: HowToR
         ))}
       </ul>
       <p className="ds-sans" style={{ margin: 'var(--ds-space-4) 0 0 0' }}>
-        <a href={methodologyHref}>Read our full methodology</a> for definitions, source hierarchy, and
+        <Link href={methodologyHref}>Read our full methodology</Link> for definitions, source hierarchy, and
         verification steps.
       </p>
     </section>

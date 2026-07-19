@@ -20,18 +20,20 @@ function requireEntity(id: string) {
 test('renders the current status and full time-scoped statusHistory for a place-like kind', () => {
   const school = requireEntity('ent_dunbar_school_001');
   const html = renderToStaticMarkup(createElement(EntityStatusPanel, { entity: school, framing: 'present_day' }));
+  assert.match(html, /Current status/);
   assert.match(html, /Active/);
   assert.match(html, /Historic/);
   assert.match(html, /1870/);
   assert.match(html, /1891/);
-  assert.match(html, /Present-day record/);
+  // Framing badge lives on the entity mast — do not repeat it here.
+  assert.doesNotMatch(html, /Present-day record/);
 });
 
 test('renders an eventWindow panel (never active/historic) for an event kind', () => {
   const event = requireEntity('ent_dc_landmark_listing_1975');
   const html = renderToStaticMarkup(createElement(EntityStatusPanel, { entity: event, framing: 'historical' }));
-  assert.match(html, /When this happened/);
   assert.match(html, /1975/);
+  assert.match(html, /when-span is authoritative/);
   assert.doesNotMatch(html, />Active</);
   assert.doesNotMatch(html, />Historic</);
 });

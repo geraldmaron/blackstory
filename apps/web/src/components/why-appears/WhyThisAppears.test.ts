@@ -33,7 +33,8 @@ test('renders the explanation and an auditable notabilityBasis list, never a sco
 
   const html = renderToStaticMarkup(createElement(WhyThisAppears, { result }));
 
-  assert.match(html, /Why this appears/);
+  // Flat variant: section heading lives on the page; body still carries the auditable tag.
+  assert.doesNotMatch(html, /<h[12][^>]*>Why this appears/);
   assert.match(html, /Auditable basis/);
   assert.match(html, /Included because archival records document/);
   assert.match(html, /Notability basis/);
@@ -43,6 +44,19 @@ test('renders the explanation and an auditable notabilityBasis list, never a sco
   // The heading copy explicitly reassures "not a score" assert no actual numeric SCORE VALUE
   // (a decimal like 0.82) ever renders, rather than banning the reassurance word itself.
   assert.doesNotMatch(html, /\b0\.\d{2,}\b/);
+});
+
+test('card variant still owns the titled Card for standalone mounts', () => {
+  const result = buildPublicWhyThisAppears({
+    explanation: 'Standalone card mount explanation.',
+    evidence: ACCEPTED_EVIDENCE,
+    notabilityBasis: [
+      { criterion: 'documented_site', note: 'Documented site.', evidenceIds: ['ev-1'] },
+    ],
+  });
+  const html = renderToStaticMarkup(createElement(WhyThisAppears, { result, variant: 'card' }));
+  assert.match(html, /Why this appears/);
+  assert.match(html, /Auditable basis/);
 });
 
 test('renders the shared trauma-content disclaimer only when the harm dimension is classified', () => {
