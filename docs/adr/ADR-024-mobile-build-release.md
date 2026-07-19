@@ -1,9 +1,9 @@
-# ADR-023: Mobile build, distribution, OTA update, and release-rollback model
+# ADR-024: Mobile build, distribution, OTA update, and release-rollback model
 
 - **Status:** Proposed — independent red-team complete, awaiting owner acceptance
 - **Date:** 2026-07-19
 - **Bead:** MOB-002 (architecture, threat model, contract boundary ADRs)
-- **Depends on:** ADR-004, ADR-006, ADR-021
+- **Depends on:** ADR-004, ADR-006, ADR-022
 - **Blocks:** MOB-005, MOB-019, MOB-020, MOB-021
 
 ## Scaffold vs target
@@ -25,7 +25,7 @@ The identity record (`docs/mobile/decisions/mobile-identity.md`) already fixes t
 Two adjacent mobile ADRs bound this one:
 
 - **ADR-004** (immutable public releases): mobile *content and map artifacts* still ride the server-side release pointer; a mobile build never bakes in a canonical snapshot, so a content rollback is a server release rollback, not an app resubmission. This ADR governs only the *client binary and its JS bundle*, not the data it reads.
-- **ADR-021** (mobile data boundary, drafted in parallel): sets the public API's N / N-1 version compatibility window and the minimum-supported-app signal. This ADR decides what the *client* does when the server says the app is below minimum (see Decision §4); ADR-021 owns the server contract that emits that signal.
+- **ADR-022** (mobile data boundary, drafted in parallel): sets the public API's N / N-1 version compatibility window and the minimum-supported-app signal. This ADR decides what the *client* does when the server says the app is below minimum (see Decision §4); ADR-022 owns the server contract that emits that signal.
 
 ## Decision
 
@@ -73,14 +73,14 @@ Two independent numbers, matching store requirements:
 
 The pair `(appVersion, buildNumber)` uniquely identifies an immutable binary; `(channel, updateId)` uniquely identifies an immutable OTA bundle. Together they are the mobile "immutable release artifact" set invariant 4 demands.
 
-### 4. Minimum-supported-app enforcement (tie-in to ADR-021)
+### 4. Minimum-supported-app enforcement (tie-in to ADR-022)
 
-ADR-021 fixes the public API's N / N-1 compatibility window and defines a **minimum-supported-app** signal the server returns (e.g. a minimum acceptable `(appVersion, buildNumber)` and/or minimum contract version in a response header or bootstrap payload). This ADR decides the **client behavior** when the server reports that the running app is below that minimum:
+ADR-022 fixes the public API's N / N-1 compatibility window and defines a **minimum-supported-app** signal the server returns (e.g. a minimum acceptable `(appVersion, buildNumber)` and/or minimum contract version in a response header or bootstrap payload). This ADR decides the **client behavior** when the server reports that the running app is below that minimum:
 
-- The app presents a **blocking forced-update screen** that prevents all further use of the product (no bypass, no "later"), because a below-minimum client is, by ADR-021's definition, outside the supported contract window and may misrender or mishandle server responses.
+- The app presents a **blocking forced-update screen** that prevents all further use of the product (no bypass, no "later"), because a below-minimum client is, by ADR-022's definition, outside the supported contract window and may misrender or mishandle server responses.
 - The screen carries a **store deep link** (App Store / Play Store product page for `app.blackbook.mobile`) so the user can update in one tap.
 - The check runs at launch and on the first successful (bootstrap) response, so a client that goes stale mid-session is caught on its next server round-trip. (There are no user accounts at launch — MOB-001 non-goal — so "bootstrap response" here means the first successful unauthenticated read, not an authenticated session.)
-- The forced-update state is driven **only** by the server signal, never by a client-baked constant, so raising the floor is a server-side act (ADR-021's surface) that needs no app resubmission — consistent with keeping the server authoritative (program invariant 6).
+- The forced-update state is driven **only** by the server signal, never by a client-baked constant, so raising the floor is a server-side act (ADR-022's surface) that needs no app resubmission — consistent with keeping the server authoritative (program invariant 6).
 
 **Fail-open when the min-version signal itself is unavailable or malformed (red-team-resolved).** The blocking
 forced-update screen fires **only** on an *affirmative, well-formed* below-minimum signal — never on the *absence*
@@ -96,7 +96,7 @@ or corruption of one. Concretely:
   service an attacker could aim for. The bounded downside of fail-open — a genuinely-too-old client keeps talking
   for a little longer — is already contained: below-minimum clients gain no capability (invariant 6, server
   re-validates every parameter), and the server retains a **hard backstop** independent of this soft signal.
-- **Backstop / reconciliation with ADR-021.** ADR-021's `CLIENT_VERSION_UNSUPPORTED` / `426 Upgrade Required` is
+- **Backstop / reconciliation with ADR-022.** ADR-022's `CLIENT_VERSION_UNSUPPORTED` / `426 Upgrade Required` is
   that hard backstop: it is the server *affirmatively rejecting* a request from a known-too-old client, and the
   client **does** honor it (it is a well-formed below-minimum signal, delivered per-request). The bootstrap
   min-version field decided here is the *proactive* self-fence that lets a client warn/block itself before it hits
@@ -146,7 +146,7 @@ EAS is a **narrow, reversible vendor boundary**, chosen the same way ADR-013 cho
 | **OTA-ship anything, including native/permission changes** | Technically impossible for native code and a privacy/review-integrity violation for permission changes (invariant 7). The runtime-version guard exists precisely to prevent it. |
 | **One build profile with runtime environment switches** | Would let a dev/preview build point at production Firebase and let an OTA cross environment boundaries — exactly the "accidental production use from dev builds" risk the identity doc mitigates structurally. Three profiles bound to three bundle IDs and three channels keep the boundary physical. |
 | **Auto-submit to the production store track on every `main` merge** | The direct analogue of ADR-006's rejected "automatic App Hosting rollout on every push": untested/unaudited commits reach public users. Production requires a tagged, audited commit. |
-| **Soft "please update" banner instead of a blocking forced-update screen** | A below-minimum client is outside ADR-021's supported contract window and may mishandle responses; a dismissible banner lets a broken client keep talking to the server. Blocking is the safe default; the server controls when the floor rises. |
+| **Soft "please update" banner instead of a blocking forced-update screen** | A below-minimum client is outside ADR-022's supported contract window and may mishandle responses; a dismissible banner lets a broken client keep talking to the server. Blocking is the safe default; the server controls when the floor rises. |
 | **Long-lived personal EAS/Apple/Google credentials in GitHub secrets** | Same objection ADR-006 raises to standing GCP keys: leak blast-radius and no revocation story. Use EAS managed credentials plus a single scoped, revocable EAS token. |
 | **Assert rollback works in this doc and move on** | Violates the epic's runtime-evidence closure discipline and invariant 4's "proven." MOB-021 must drill it (§6). |
 | **Store-only releases, no OTA at all** | Loses the minutes-fast rollback path for JS regressions and forces every copy/bug fix through multi-day store review — a worse rollback posture than invariant 4 wants, for no security gain (OTA is environment- and runtime-version-fenced). |
@@ -155,7 +155,7 @@ EAS is a **narrow, reversible vendor boundary**, chosen the same way ADR-013 cho
 
 - `apps/mobile` gains an `eas.json` with three profiles and a channel-per-profile binding; MOB-006 scaffolds it, MOB-019 wires the GitHub Actions jobs (`preview` on merge, `production` on tag).
 - Release provenance grows a mobile record: `(appVersion, buildNumber, commitSHA, easBuildId, runtimeVersion)` per binary and `(channel, updateId)` per OTA — the mobile parallel to `infra/github/release-metadata/`.
-- The client must implement a launch/bootstrap minimum-version check and a blocking forced-update screen (MOB-008/MOB-009 surface, driven by ADR-021's server signal).
+- The client must implement a launch/bootstrap minimum-version check and a blocking forced-update screen (MOB-008/MOB-009 surface, driven by ADR-022's server signal).
 - MOB-021's launch evidence index must include the OTA rollback drill artifacts before production go/no-go.
 - A hard dependency on the MOB-001 human gates (Apple/Google/EAS accounts, MFA custody, spend ceiling) — no production build is signed until those clear; nothing here unblocks earlier engineering (MOB-003/006/007 proceed on dev/preview identifiers).
 
@@ -163,14 +163,14 @@ EAS is a **narrow, reversible vendor boundary**, chosen the same way ADR-013 cho
 
 - Move off the EAS free tier (then off EAS entirely to Fastlane/self-hosted) per §7's recorded trigger — measured build volume / OTA metering / spend-ceiling breach, not a guess.
 - Revisit the OTA-vs-rebuild boundary only if Expo changes what `expo-updates` can safely deliver; the permission/native/SDK exclusions are non-negotiable regardless.
-- Reconsider the forced-update blocking behavior only if ADR-021 changes the N / N-1 window such that below-minimum clients become provably safe to keep serving (they are not today).
+- Reconsider the forced-update blocking behavior only if ADR-022 changes the N / N-1 window such that below-minimum clients become provably safe to keep serving (they are not today).
 - Change the build-number source only with a scheme that preserves strict monotonicity across the change (dual-track until the new source is proven ≥ the old high-water mark).
 
 ## Rollback considerations
 
 - **JS/OTA regression:** republish the previous immutable update to the affected channel (§2); recovery bounded by client update-check interval, no store review. This is the fast path and the drilled path (§6).
 - **Native/binary regression:** halt the store staged rollout, promote the prior known-good store build, and request expedited review for a fix build (§6 contingency); OTA cannot help here.
-- **Below-minimum clients:** the server raises the minimum-supported version (ADR-021); affected clients self-fence via the forced-update screen (§4) until they update — a coarse but reliable last-resort "rollback" of a whole compatibility generation.
+- **Below-minimum clients:** the server raises the minimum-supported version (ADR-022); affected clients self-fence via the forced-update screen (§4) until they update — a coarse but reliable last-resort "rollback" of a whole compatibility generation.
 - **Content/data regression:** not a mobile-build concern — the app reads server-side immutable releases, so content rollback is an ADR-004 active-release-pointer flip, requiring no app action at all.
 - Never "hotfix" a shipped binary in place; publish a new build or roll back an OTA channel, mirroring ADR-004's "do not fix an active release in place."
 
@@ -181,7 +181,7 @@ findings and dispositions):
 
 - **Fail-open vs. fail-closed when the minimum-supported-app signal itself is unavailable or malformed —
   *resolved: fail open* (§4).** The blocking forced-update screen fires only on an affirmative, well-formed
-  below-minimum signal (bootstrap floor) or an affirmative server rejection (ADR-021 `426` /
+  below-minimum signal (bootstrap floor) or an affirmative server rejection (ADR-022 `426` /
   `CLIENT_VERSION_UNSUPPORTED`). A missing, empty, or malformed floor signal is treated as "no floor asserted," the
   client proceeds, and the malformed value is logged as a privacy-safe anomaly for MOB-018 rather than blocking any
   user. Fail-closed was rejected because it turns a transient signal outage or one bad deploy into a total,

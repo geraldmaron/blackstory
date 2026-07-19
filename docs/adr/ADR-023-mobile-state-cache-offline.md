@@ -1,9 +1,9 @@
-# ADR-022: Mobile client state, local cache, and offline-read mode
+# ADR-023: Mobile client state, local cache, and offline-read mode
 
 - **Status:** Proposed — independent red-team complete, awaiting owner acceptance
 - **Date:** 2026-07-19
 - **Bead:** MOB-002 (`black-book-mobile-002`)
-- **Depends on:** ADR-004 (public projection / immutable snapshots), ADR-008 (bounded static-first search and geocoding), ADR-013 (map stack), ADR-020 (mobile stack), ADR-021 (mobile data boundary)
+- **Depends on:** ADR-004 (public projection / immutable snapshots), ADR-008 (bounded static-first search and geocoding), ADR-013 (map stack), ADR-022 (mobile stack), ADR-022 (mobile data boundary)
 - **Blocks:** MOB-009 (typed API client, SQLite cache, offline mode, migrations), MOB-012 (native Explore map, synchronized list, filters, narrative sheet)
 
 ## Scaffold vs target
@@ -11,7 +11,7 @@
 | Aspect | Today | Target (MOB-009 and beyond) |
 |--------|-------|------------------------------|
 | Client state | No `apps/mobile` exists | TanStack Query (server-state/cache) + Zustand (UI-only client state) |
-| Persistent cache | None | SQLite cache (engine per ADR-020) with the caching policy in this ADR layered on top |
+| Persistent cache | None | SQLite cache (engine per ADR-022) with the caching policy in this ADR layered on top |
 | Offline behavior | None | Offline **read** of previously-viewed content, explicitly marked stale; no silent failures |
 | Release awareness | None | Client compares a server release stamp against its cache stamp and invalidates entity data on mismatch |
 
@@ -19,7 +19,7 @@ This ADR is a decision record, not an implementation. MOB-009 wires it; MOB-012/
 
 ## Context
 
-The mobile app (ADR-020 stack: Expo React Native, custom dev builds, MapLibre Native) is a **read client** over `apps/api-public` (program invariant 2; ADR-021 data boundary). It duplicates no canonical data, holds no write path to the system of record, and — per the program non-goals — ships **no user accounts and no full offline basemap** at launch. "Offline" in this ADR therefore means exactly one thing: **offline read of content the user already fetched while online** (last-viewed entities, their evidence, prior search results, and map-viewport GeoJSON already downloaded). It is not an offline-first sync engine and not a basemap download; either would be a scope change governed by MOB-022.
+The mobile app (ADR-022 stack: Expo React Native, custom dev builds, MapLibre Native) is a **read client** over `apps/api-public` (program invariant 2; ADR-022 data boundary). It duplicates no canonical data, holds no write path to the system of record, and — per the program non-goals — ships **no user accounts and no full offline basemap** at launch. "Offline" in this ADR therefore means exactly one thing: **offline read of content the user already fetched while online** (last-viewed entities, their evidence, prior search results, and map-viewport GeoJSON already downloaded). It is not an offline-first sync engine and not a basemap download; either would be a scope change governed by MOB-022.
 
 Three pieces of existing doctrine constrain this record and must be extended, not contradicted:
 
@@ -45,9 +45,9 @@ Rationale:
 - **Against plain Context.** Context is not a data-fetching or caching library; using it as one means re-implementing staleness, de-duplication, retry, and eviction by hand — more bespoke code for the maintainer to own, and the well-known re-render/perf pitfalls at scale. Context remains fine for a couple of truly static app-wide values (e.g. a theme token provider), and TanStack Query uses one provider internally; it is just not the state architecture.
 - **Reversibility.** Both libraries are unopinionated about transport and storage: they sit *above* the typed API client (MOB-009) and *above* SQLite, touching neither the contract nor the persistence schema. Swapping either is a client-internal refactor with no contract, server, or on-disk-format consequence (see §6).
 
-### 2. Local persistent cache policy (SQLite engine per ADR-020)
+### 2. Local persistent cache policy (SQLite engine per ADR-022)
 
-ADR-020 already selects **SQLite** as the mobile storage engine — this ADR does **not** re-decide that. It defines the **caching policy** layered on top. TanStack Query's in-memory cache is the hot tier; SQLite is the cold, cross-launch persistence tier that also backs offline read. A thin persistence adapter writes selected query results through to SQLite and rehydrates them on cold start.
+ADR-022 already selects **SQLite** as the mobile storage engine — this ADR does **not** re-decide that. It defines the **caching policy** layered on top. TanStack Query's in-memory cache is the hot tier; SQLite is the cold, cross-launch persistence tier that also backs offline read. A thin persistence adapter writes selected query results through to SQLite and rehydrates them on cold start.
 
 **What is cached to disk (allowed):**
 
@@ -104,7 +104,7 @@ The SQLite store here is a **cache, not a system of record.** Therefore:
 
 - **Schema version is a single pragma/meta value.** On app launch, if the app's expected cache schema version differs from the on-disk version, the migration is **drop the cache tables and recreate them empty** — then repopulate lazily from the network as the user browses.
 - **No in-place `ALTER TABLE` / data-preserving migration path is maintained.** Every row is reconstructable from `api-public`; there is nothing irreplaceable to preserve. Drop-and-rebuild is dramatically lower risk and lower complexity than hand-written forward migrations, and it eliminates an entire class of partial-migration corruption bugs — a meaningful saving for a one-maintainer program.
-- This is explicitly the *opposite* of the policy a system-of-record database would take. It is safe **only because** ADR-004/ADR-021 keep the server authoritative and the client purely derivative. The one visible cost — a one-time empty cache and a fresh fetch after an app update that changes the cache schema — is acceptable and self-healing, and it degrades exactly like a first launch (which the offline contract in §3 already handles honestly).
+- This is explicitly the *opposite* of the policy a system-of-record database would take. It is safe **only because** ADR-004/ADR-022 keep the server authoritative and the client purely derivative. The one visible cost — a one-time empty cache and a fresh fetch after an app update that changes the cache schema — is acceptable and self-healing, and it degrades exactly like a first launch (which the offline contract in §3 already handles honestly).
 
 ### 6. Reversal cost
 
@@ -122,12 +122,12 @@ The SQLite store here is a **cache, not a system of record.** Therefore:
 | Persisting query text / correction content / precise location for offline history | Violates program invariant 7. These stay in-memory only or are excluded entirely. |
 | In-place ALTER-based cache migrations | Unjustified risk/complexity for a disposable, network-reconstructable cache; drop-and-rebuild is strictly simpler and safer here. |
 | Client TTL as the primary freshness signal | Immutable releases make the release stamp a stronger, correct signal; TTL alone could serve superseded content as current. TTL is kept only as a background-revalidation backstop. |
-| AsyncStorage/MMKV as the primary cache store | ADR-020 already selects SQLite; key-value stores don't fit release-stamped, LRU-evicted, size-capped structured cache and would fragment the storage story. |
+| AsyncStorage/MMKV as the primary cache store | ADR-022 already selects SQLite; key-value stores don't fit release-stamped, LRU-evicted, size-capped structured cache and would fragment the storage story. |
 
 ## Consequences
 
 - MOB-009 owns: the SQLite persistence adapter for TanStack Query, the release-stamp invalidation check, the LRU/byte-ceiling eviction, the drop-and-rebuild migration, and enforcement of the never-cache exclusions.
-- The public contract (MOB-003 / ADR-021) must surface the **active release stamp** on responses the client caches — a small, already-implied extension of ADR-004's "responses include release/revision metadata."
+- The public contract (MOB-003 / ADR-022) must surface the **active release stamp** on responses the client caches — a small, already-implied extension of ADR-004's "responses include release/revision metadata."
 - Privacy review (MOB-010/MOB-018) must include a check that no query text, correction content, or precise/unredacted location is ever written to SQLite — testable by asserting on the on-disk schema and inserted rows, analogous to ADR-013's redaction regression test.
 - The offline contract adds explicit "last updated" and degraded-mode affordances to every content surface (MOB-012/014/015), and an honest disabled state to correction submission (MOB-016).
 - The cache byte ceiling and TTLs are documented targets to be measured on real devices in MOB-009/MOB-018, not fabricated guarantees.

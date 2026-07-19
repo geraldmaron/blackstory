@@ -1,4 +1,4 @@
-# ADR-021: Mobile data boundary — public contracts package, API v1 versioning, and the client/server line
+# ADR-022: Mobile data boundary — public contracts package, API v1 versioning, and the client/server line
 
 - **Status:** Proposed — independent red-team complete, awaiting owner acceptance
 - **Date:** 2026-07-19
