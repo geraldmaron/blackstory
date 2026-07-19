@@ -35,6 +35,10 @@ runConfig:
   memoryMiB: 384
 
 env:
+  - variable: GOOGLE_BUILDABLE
+    value: apps/admin
+    availability:
+      - BUILD
   - variable: NEXT_PUBLIC_APP_ENV
     value: production
     availability:
