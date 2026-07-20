@@ -159,22 +159,38 @@ const STATE_CAPITOL_QUERY: Record<string, string> = {
   Indiana: 'Indiana Statehouse',
 };
 
-function extractUsState(jurisdictionLabel: string): string | undefined {
-  return US_STATES.find((state) => jurisdictionLabel.includes(state));
+/**
+ * A bare state name, optionally with a ", United States"/", U.S." suffix — NOT
+ * a "City, State" jurisdiction. Matching on substring-contains would wrongly
+ * treat "New York, New York" (a CITY) as the state of New York and anchor it
+ * to Albany instead of NYC — this only fires when the jurisdiction is exactly
+ * the state itself, which is what locationPrecision === 'state' means.
+ */
+function extractBareUsState(jurisdictionLabel: string): string | undefined {
+  const stripped = jurisdictionLabel.replace(/,\s*(United States|U\.S\.?)$/iu, '').trim();
+  return US_STATES.find((state) => stripped === state);
 }
 
-function isFederalJurisdiction(jurisdictionLabel: string): boolean {
-  const lower = jurisdictionLabel.toLowerCase();
-  return (
-    (lower.includes('washington, d.c') || lower.includes('washington dc') || lower.includes('united states')) &&
-    !extractUsState(jurisdictionLabel)
-  );
+/** Loose state match used ONLY to disambiguate a search query, never to decide behavior. */
+function extractSearchDisambiguator(jurisdictionLabel: string): string {
+  return US_STATES.find((state) => jurisdictionLabel.includes(state)) ?? 'United States';
 }
 
-async function resolveViaSearchThenCoordinates(query: string): Promise<{ lat: number; lng: number } | undefined> {
+/**
+ * `query` alone is tried as an exact title first (works for well-known, unambiguous
+ * names). The search fallback appends `disambiguator` (the subject's own state,
+ * loosely) to the SEARCH query only — never to the direct title lookup — so a name
+ * like "Lake City Public Library" doesn't silently resolve to a same-named place in
+ * the wrong state; Wikipedia's own relevance ranking does the disambiguating work.
+ */
+async function resolveViaSearchThenCoordinates(
+  query: string,
+  disambiguator?: string,
+): Promise<{ lat: number; lng: number } | undefined> {
   const direct = await fetchWikipediaCoordinates(query);
   if (direct) return direct;
-  const hits = await searchWikipediaApi(query);
+  const searchQuery = disambiguator ? `${query} ${disambiguator}` : query;
+  const hits = await searchWikipediaApi(searchQuery);
   for (const hit of hits.slice(0, 2)) {
     const coords = await fetchWikipediaCoordinates(hit.title);
     if (coords) return coords;
@@ -191,41 +207,61 @@ async function resolveViaSearchThenCoordinates(query: string): Promise<{ lat: nu
  * lookup, just anchored to a different, more specific or more general subject
  * than the original one.
  *
- * Resolution order:
- *  1. The specific named site the judge proposed (a headquarters, milestone
- *     event location, building) — often has its own geo-tagged article even
- *     when the broader subject doesn't.
- *  2. The government center for the subject's jurisdiction: a state capitol
- *     building for state-level laws/bodies, the U.S. Capitol for federal ones
- *     — this is the "government center" anchor convention, not a fallback of
- *     last resort; it only applies when no more specific site was named.
- *  3. The jurisdiction/location text itself (a city, county, or state) — this
- *     virtually always resolves, since basically every place-name has a real,
- *     stable Wikidata-coordinated article.
+ * Dispatches on locationPrecision, the judge's own signal for how specific the
+ * location actually is — NOT on fuzzy string matching against the label text,
+ * which is unreliable (e.g. "New York" is both a city and a state name):
+ *  - institution/site/address/campus/building/stadium/airport/museum/district:
+ *    a specific named place (headquarters, milestone event site) — resolve it
+ *    directly; it often has its own geo-tagged article even when the subject
+ *    doesn't.
+ *  - state: the jurisdiction genuinely IS just a state (no more specific city
+ *    given) — anchor to that state's capitol building, the "government
+ *    center" convention for state-level laws/bodies.
+ *  - country: genuinely national scope with no specific site — anchor to the
+ *    U.S. Capitol, the federal government center.
+ *  - anything else (city/county/neighborhood/town/region/campus/etc.): the
+ *    label already names a specific-enough place — geocode it directly.
  */
+// Generic descriptive words the judge sometimes fills in instead of an actual
+// place name — searching these literally matches an unrelated same-named page
+// (a real incident: "headquarters" alone matched an unrelated NY building
+// instead of resolving to the subject's real Washington, D.C. jurisdiction).
+const GENERIC_LOCATION_LABELS = new Set([
+  'headquarters', 'corporate headquarters', 'site', 'location', 'campus', 'building',
+  'office', 'offices', 'institution', 'address', 'facility',
+]);
+
+function isUsableLocationLabel(label: string): boolean {
+  return label.trim().length > 0 && !GENERIC_LOCATION_LABELS.has(label.trim().toLowerCase());
+}
+
 export async function resolveGovernmentCenterCoordinates(
   jurisdictionLabel: string,
   locationLabel: string,
   locationPrecision: string,
 ): Promise<{ lat: number; lng: number } | undefined> {
+  const disambiguator = extractSearchDisambiguator(jurisdictionLabel);
+  const usableLocationLabel = isUsableLocationLabel(locationLabel) ? locationLabel : undefined;
   const SITE_PRECISIONS = new Set([
     'institution', 'site', 'address', 'campus', 'building', 'stadium', 'airport', 'museum', 'district',
   ]);
-  if (locationLabel && locationLabel !== jurisdictionLabel && SITE_PRECISIONS.has(locationPrecision)) {
-    const bySite = await resolveViaSearchThenCoordinates(locationLabel);
+  if (usableLocationLabel && usableLocationLabel !== jurisdictionLabel && SITE_PRECISIONS.has(locationPrecision)) {
+    const bySite = await resolveViaSearchThenCoordinates(usableLocationLabel, disambiguator);
     if (bySite) return bySite;
   }
 
-  const state = extractUsState(jurisdictionLabel);
-  if (state) {
-    const byCapitol = await resolveViaSearchThenCoordinates(STATE_CAPITOL_QUERY[state] ?? `${state} State Capitol`);
-    if (byCapitol) return byCapitol;
-  } else if (isFederalJurisdiction(jurisdictionLabel)) {
+  if (locationPrecision === 'state') {
+    const state = extractBareUsState(jurisdictionLabel);
+    if (state) {
+      const byCapitol = await resolveViaSearchThenCoordinates(STATE_CAPITOL_QUERY[state] ?? `${state} State Capitol`);
+      if (byCapitol) return byCapitol;
+    }
+  } else if (locationPrecision === 'country') {
     const byCapitol = await resolveViaSearchThenCoordinates('United States Capitol');
     if (byCapitol) return byCapitol;
   }
 
-  return resolveViaSearchThenCoordinates(locationLabel || jurisdictionLabel);
+  return resolveViaSearchThenCoordinates(usableLocationLabel || jurisdictionLabel, disambiguator);
 }
 
 async function findViaWikipediaApi(
