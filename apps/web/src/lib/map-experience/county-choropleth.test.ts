@@ -75,3 +75,23 @@ test('joinPopulationOntoCountyPolygons copies tiers onto county features', () =>
   assert.equal(joined.features[0]?.properties.changeTier, 'gainStrong');
   assert.equal(joined.features[0]?.properties.fips5, '17031');
 });
+
+test('empty population index yields no levels (missing data stays unknown, never invented)', () => {
+  assert.deepEqual(
+    buildCountyChoroplethLevels({
+      index: undefined,
+      mode: 'blackShare',
+      decade: '2020',
+    }),
+    [],
+  );
+  assert.deepEqual(
+    buildCountyChoroplethLevels({
+      index: { vintages: ['2020'], counties: {} },
+      mode: 'blackChange',
+      fromDecade: '2010',
+      toDecade: '2020',
+    }),
+    [],
+  );
+});

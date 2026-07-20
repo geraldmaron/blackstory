@@ -1213,6 +1213,9 @@ export function MapStageProvider({
     (patch: MapStageDataPatch, options?: MapStageDataPatchOptions) => {
       const clusteringEnabled = patch.clusteringEnabled ?? configRef.current.clusteringEnabled;
       const clusteringChanged = clusteringEnabled !== configRef.current.clusteringEnabled;
+      // Population choropleth visibility + fill-color expressions live in style layout/paint.
+      // Decade morph is configOnly and never syncs those — a layerMode change must full-apply.
+      const layerModeChanged = patch.layerMode !== configRef.current.layerMode;
       const recreate = clusteringChanged ? ({ recreateEntitiesSource: true } as const) : undefined;
       const wantsFade = options?.fade === true && !prefersReducedMotion();
       const map = mapRef.current;
@@ -1227,7 +1230,7 @@ export function MapStageProvider({
         map.getLayer(EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID),
       );
 
-      if (!wantsFade || !map || !morphLayersReady || clusteringChanged) {
+      if (!wantsFade || !map || !morphLayersReady || clusteringChanged || layerModeChanged) {
         // Invalidate any in-flight decade morph so a later timeout cannot overwrite this snap.
         decadeFadeGenerationRef.current += 1;
         decadeDissolveInFlightRef.current = false;

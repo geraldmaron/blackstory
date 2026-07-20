@@ -85,6 +85,34 @@ test('kind/era/theme/confidence filters are opt-in and compose with AND semantic
   assert.equal(noMatch.length, 0);
 });
 
+test('theme filter prefers topicIds over legacy topicTags (same as facet options)', () => {
+  const features = [
+    feature({
+      entityId: 'ids-only',
+      topicTags: [],
+      topicIds: ['education'],
+    }),
+    feature({
+      entityId: 'tags-only',
+      topicTags: ['education'],
+    }),
+    feature({
+      entityId: 'other',
+      topicTags: ['freedmen'],
+      topicIds: ['freedmen'],
+    }),
+  ];
+
+  const filtered = applyExploreFilters(features, {
+    ...DEFAULT_EXPLORE_FILTERS,
+    theme: 'education',
+  });
+  assert.deepEqual(
+    filtered.map((row) => row.properties.entityId).sort(),
+    ['ids-only', 'tags-only'],
+  );
+});
+
 test('facet options lead with an "All ___" option and count real occurrences', () => {
   const features = [
     feature({ entityId: 'a', kind: 'place', eraBuckets: ['1950s'] }),

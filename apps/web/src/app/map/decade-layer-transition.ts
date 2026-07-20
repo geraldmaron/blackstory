@@ -142,6 +142,20 @@ export function shouldFadeDecadePatch(options: {
   return !options.reducedMotion && !options.isInitialApply;
 }
 
+/**
+ * Decade morph must not run when the map data model changes (`presence` ↔ `blackShare` ↔
+ * `blackChange`). Morph uses `configOnly` and never syncs choropleth layout/paint — so a
+ * layerMode flip would leave share/change fills invisible or stuck on the previous expression.
+ */
+export function shouldMorphDecadeDataPatch(options: {
+  readonly reducedMotion: boolean;
+  readonly isInitialApply: boolean;
+  readonly layerModeChanged: boolean;
+}): boolean {
+  if (options.layerModeChanged) return false;
+  return shouldFadeDecadePatch(options);
+}
+
 /** @deprecated Alias of shouldFadeDecadePatch. */
 export const shouldCrossfadeDecadePatch = shouldFadeDecadePatch;
 

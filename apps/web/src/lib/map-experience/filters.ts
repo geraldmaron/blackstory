@@ -47,7 +47,8 @@ export function applyExploreFilters(
   return features.filter((feature) => {
     if (filters.kind !== 'all' && feature.properties.kind !== filters.kind) return false;
     if (filters.era !== 'all' && !feature.properties.eraBuckets.includes(filters.era)) return false;
-    if (filters.theme !== 'all' && !feature.properties.topicTags.includes(filters.theme))
+    // Theme facet options come from effectiveTopicIds (topicIds preferred); filter the same set.
+    if (filters.theme !== 'all' && !effectiveTopicIds(feature).includes(filters.theme))
       return false;
     if (filters.confidence !== 'all' && feature.properties.confidenceTier !== filters.confidence)
       return false;

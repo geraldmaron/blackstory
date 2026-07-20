@@ -16,6 +16,7 @@ import {
   lerpHexColor,
   paintTransitionKey,
   shouldFadeDecadePatch,
+  shouldMorphDecadeDataPatch,
 } from './decade-layer-transition';
 import {
   EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
@@ -34,6 +35,33 @@ test('shouldFadeDecadePatch skips the initial apply and reduced motion', () => {
   assert.equal(shouldFadeDecadePatch({ reducedMotion: false, isInitialApply: true }), false);
   assert.equal(shouldFadeDecadePatch({ reducedMotion: true, isInitialApply: false }), false);
   assert.equal(shouldFadeDecadePatch({ reducedMotion: false, isInitialApply: false }), true);
+});
+
+test('shouldMorphDecadeDataPatch refuses morph when layerMode changes', () => {
+  assert.equal(
+    shouldMorphDecadeDataPatch({
+      reducedMotion: false,
+      isInitialApply: false,
+      layerModeChanged: true,
+    }),
+    false,
+  );
+  assert.equal(
+    shouldMorphDecadeDataPatch({
+      reducedMotion: false,
+      isInitialApply: false,
+      layerModeChanged: false,
+    }),
+    true,
+  );
+  assert.equal(
+    shouldMorphDecadeDataPatch({
+      reducedMotion: false,
+      isInitialApply: true,
+      layerModeChanged: false,
+    }),
+    false,
+  );
 });
 
 test('crossfade out targets cover pins, edges, and clusters — not density (color lerp)', () => {

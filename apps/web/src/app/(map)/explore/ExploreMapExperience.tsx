@@ -45,7 +45,7 @@ import { MapExperienceLegend } from '../../../components/map-experience/MapExper
 import { NarrativeCard } from '../../../components/map-experience/NarrativeCard';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
 import { MetaFieldLabel } from '../../../components/map-experience/MetaFieldLabel';
-import { shouldFadeDecadePatch } from '../../map/decade-layer-transition';
+import { shouldMorphDecadeDataPatch } from '../../map/decade-layer-transition';
 import {
   CAMERA_POINT_ZOOM,
   prefersReducedMotion,
@@ -298,6 +298,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const [listBounds, setListBounds] = useState<ExploreMapBounds | undefined>(undefined);
   /** First data patch after mount snaps; later decade/filter patches fade (continuous flow). */
   const isInitialDataApplyRef = useRef(true);
+  const previousLayerModeRef = useRef(initial.viewState.layerMode);
   /** Guards one-shot fly-to when applying place-search radius from a deep-linked URL. */
   const urlRadiusAppliedRef = useRef<string | null>(null);
   /** Camera before the most recent point-selection flight (hierarchical close target). */
@@ -561,12 +562,16 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   // Every source-data-affecting slice of view state patches the shared canvas — never a style
   // rebuild the surface calls into (MapStage.patchData rebuilds the style internally).
   // After the first paint, patches dual-buffer crossdissolve so decade scrubbing and filter
-  // changes morph presence colors / pins without emptying the plate.
+  // changes morph presence colors / pins without emptying the plate. Layer-mode flips skip
+  // morph: configOnly never syncs choropleth visibility/paint (blackShare / blackChange).
   useEffect(() => {
     const decade = view.viewState.decade;
-    const fade = shouldFadeDecadePatch({
+    const layerModeChanged = previousLayerModeRef.current !== view.viewState.layerMode;
+    previousLayerModeRef.current = view.viewState.layerMode;
+    const fade = shouldMorphDecadeDataPatch({
       reducedMotion: prefersReducedMotion(),
       isInitialApply: isInitialDataApplyRef.current,
+      layerModeChanged,
     });
     isInitialDataApplyRef.current = false;
     stage.patchData(

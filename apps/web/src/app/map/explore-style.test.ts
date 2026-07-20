@@ -31,6 +31,7 @@ import {
   ENTITY_HALO_OPACITY,
   ENTITY_POINT_FILL_OPACITY,
   EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LABEL_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
@@ -178,6 +179,45 @@ test('the density layer stays hittable; density tint is controlled by paint not 
   assert.equal(onLayer.layout?.visibility, 'visible');
   assert.equal(offLayer.layout?.visibility, 'visible');
   assert.notDeepEqual(onLayer.paint?.['fill-color'], offLayer.paint?.['fill-color']);
+});
+
+test('population layer modes expose county choropleth fill keyed to shareTier / changeTier', () => {
+  const share = buildStyleFixture('blackShare');
+  const change = buildStyleFixture('blackChange');
+  const presence = buildStyleFixture('presence');
+
+  const shareLayer = layerById(share, EXPLORE_COUNTY_CHOROPLETH_LAYER_ID) as {
+    layout?: { visibility?: string };
+    paint?: { 'fill-opacity'?: number; 'fill-color'?: unknown };
+    minzoom?: number;
+  };
+  const changeLayer = layerById(change, EXPLORE_COUNTY_CHOROPLETH_LAYER_ID) as {
+    layout?: { visibility?: string };
+    paint?: { 'fill-color'?: unknown };
+  };
+  const hidden = layerById(presence, EXPLORE_COUNTY_CHOROPLETH_LAYER_ID) as {
+    layout?: { visibility?: string };
+    paint?: { 'fill-opacity'?: number };
+  };
+
+  assert.equal(shareLayer.layout?.visibility, 'visible');
+  assert.equal(shareLayer.paint?.['fill-opacity'], 0.85);
+  assert.equal(shareLayer.minzoom, undefined, 'national frame must show share fills');
+  assert.deepEqual((shareLayer.paint?.['fill-color'] as unknown[])?.slice(0, 3), [
+    'match',
+    ['get', 'shareTier'],
+    'majority',
+  ]);
+
+  assert.equal(changeLayer.layout?.visibility, 'visible');
+  assert.deepEqual((changeLayer.paint?.['fill-color'] as unknown[])?.slice(0, 3), [
+    'match',
+    ['get', 'changeTier'],
+    'gainStrong',
+  ]);
+
+  assert.equal(hidden.layout?.visibility, 'none');
+  assert.equal(hidden.paint?.['fill-opacity'], 0);
 });
 
 test('the jurisdiction-area layer renders fill geometry (never a point layer) and is empty by default', () => {
