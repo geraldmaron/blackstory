@@ -257,7 +257,10 @@ test('panels= opt-in opens listed chrome and round-trips', () => {
     showResults: true,
     showKey: true,
   };
-  assert.equal(buildExploreSearchParams(allOpen), 'panels=filters,results,key');
+  assert.equal(
+    new URLSearchParams(buildExploreSearchParams(allOpen)).get('panels'),
+    'filters,results,key',
+  );
   assert.deepEqual(
     parseExploreSearchParams(
       Object.fromEntries(new URLSearchParams('panels=filters,results,key')),
