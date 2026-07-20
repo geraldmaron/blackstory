@@ -19,6 +19,8 @@ import { US_STATES } from '@repo/domain/map/geography';
 
 const METERS_PER_MILE = 1609.344;
 const METERS_PER_FOOT = 0.3048;
+/** Below this span, user-facing copy uses feet; at/above, nearest quarter-mile. */
+const FEET_DISPLAY_CEILING_METERS = METERS_PER_MILE * 0.25;
 
 /** Finest-known public precision -> the GeoPrecisionTier its radius circle should render at.  */
 const PUBLIC_PRECISION_TO_GEO_TIER: Readonly<Record<string, GeoPrecisionTier>> = {
@@ -84,13 +86,15 @@ export function resolveDisplayRadiusMeters(
   return { ok: false, reason: 'jurisdiction_bbox_unresolved' };
 }
 
-/** User-facing ± span for a display-radius affordance (US framing: feet below a mile, miles at mile+). */
+/**
+ * User-facing ± span for a display-radius affordance (US framing).
+ * Under ~0.25 mi: feet (nearest 10 ft). At/above: nearest quarter-mile (`0.25 mi`, `0.5 mi`, …).
+ */
 export function formatDisplayRadiusSpan(meters: number): string {
   const safe = Math.max(0, meters);
-  if (safe >= METERS_PER_MILE) {
-    const miles = safe / METERS_PER_MILE;
-    const rounded = miles >= 10 ? Math.round(miles) : Math.round(miles * 10) / 10;
-    return `${rounded} mi`;
+  if (safe >= FEET_DISPLAY_CEILING_METERS) {
+    const quarterMiles = Math.round((safe / METERS_PER_MILE) * 4) / 4;
+    return `${Math.max(0.25, quarterMiles)} mi`;
   }
   const feet = safe / METERS_PER_FOOT;
   return `${Math.round(feet / 10) * 10} ft`;

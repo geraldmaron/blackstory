@@ -65,11 +65,17 @@ test('county tier fails closed — no county-bbox reference data is wired yet', 
   assert.equal(result.ok, false);
 });
 
-test('formatDisplayRadiusSpan prefers feet below a mile and miles at mile scale', () => {
+test('formatDisplayRadiusSpan uses feet below 0.25 mi and quarter-mile steps at/above', () => {
   assert.equal(formatDisplayRadiusSpan(30), '100 ft');
   assert.equal(formatDisplayRadiusSpan(200), '660 ft');
-  assert.match(formatDisplayRadiusSpan(2000), /^1(\.2)? mi$/);
-  assert.match(formatDisplayRadiusSpan(120_000), /^\d+ mi$/);
+  // Just under 0.25 mi stays in feet (~1310 ft).
+  assert.equal(formatDisplayRadiusSpan(399), '1310 ft');
+  assert.equal(formatDisplayRadiusSpan(402.336), '0.25 mi');
+  assert.equal(formatDisplayRadiusSpan(800), '0.5 mi');
+  assert.equal(formatDisplayRadiusSpan(1200), '0.75 mi');
+  assert.equal(formatDisplayRadiusSpan(1609.344), '1 mi');
+  assert.equal(formatDisplayRadiusSpan(2000), '1.25 mi');
+  assert.equal(formatDisplayRadiusSpan(120_000), '74.5 mi');
 });
 
 test('radiusAffordanceLabel uses feet for block-tier affordances and avoids em dashes', () => {

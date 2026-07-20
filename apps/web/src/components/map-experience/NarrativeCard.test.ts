@@ -56,7 +56,7 @@ test('links Where to external maps and other metadata to the right site views', 
   assert.match(html, /href="\/search\?status=active"/);
 });
 
-test('renders an em dash for Where when no postal code is present', () => {
+test('Where still links to maps when postal code is absent but coordinates exist', () => {
   const feature = requireFeature('ent_15th_st_church_001');
   const { statePostalCode: _omit, ...propertiesWithoutState } = feature.properties;
   void _omit;
@@ -65,7 +65,7 @@ test('renders an em dash for Where when no postal code is present', () => {
     properties: propertiesWithoutState,
   };
   const html = renderToStaticMarkup(createElement(NarrativeCard, { feature: withoutState }));
-  assert.match(html, /—/);
+  assert.match(html, /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=/);
   assert.doesNotMatch(html, /aria-label="View records in/);
   assert.doesNotMatch(html, /href="[^"]*state=/);
 });
