@@ -95,7 +95,11 @@ if [[ -z "${OLLAMA_BASE_URL:-}" ]]; then
 fi
 
 export EDITORIAL_LLM_PROVIDER="${EDITORIAL_LLM_PROVIDER:-hybrid}"
-export OPENROUTER_MODEL="${OPENROUTER_MODEL:-openrouter/free}"
+# Free-model rotation roster: on 429/5xx/empty the provider advances to the next
+# model instead of retrying one rate-limited router. Set OPENROUTER_MODEL to pin
+# a single model instead (an explicit pin wins over the roster).
+export OPENROUTER_MODELS="${OPENROUTER_MODELS:-tencent/hy3:free,nvidia/nemotron-3-super-120b-a12b:free,nvidia/nemotron-3-nano-30b-a3b:free,google/gemma-4-31b-it:free,openai/gpt-oss-20b:free}"
+export OPENROUTER_MODEL="${OPENROUTER_MODEL:-}"
 export OLLAMA_MODEL="${OLLAMA_MODEL:-qwen3:8b}"
 
 # Discovery kill switch + storage terms for SearXNG child script.

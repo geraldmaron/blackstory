@@ -244,9 +244,27 @@ async function withRetries(
   throw new Error(`${label} failed after ${maxAttempts} attempt(s): ${message}`);
 }
 
+/**
+ * Free-model rotation roster: when `OPENROUTER_MODELS` (comma-separated) is set, a
+ * retryable failure on one model (429/5xx/empty) rotates to the next instead of
+ * burning every attempt on a single rate-limited free router.
+ */
+export function resolveOpenRouterModels(options: {
+  readonly model?: string;
+  readonly models?: readonly string[];
+}): readonly string[] {
+  if (options.models && options.models.length > 0) return options.models;
+  const fromEnv = process.env.OPENROUTER_MODELS?.split(',')
+    .map((model) => model.trim())
+    .filter(Boolean);
+  if (fromEnv && fromEnv.length > 0) return fromEnv;
+  return [options.model ?? process.env.OPENROUTER_MODEL ?? DEFAULT_OPENROUTER_MODEL];
+}
+
 export function createOpenRouterLlmProvider(options: {
   readonly apiKey?: string;
   readonly model?: string;
+  readonly models?: readonly string[];
   readonly fetchImpl?: typeof fetch;
   readonly maxAttempts?: number;
 }): LlmProvider {
@@ -255,20 +273,36 @@ export function createOpenRouterLlmProvider(options: {
     throw new Error('OPENROUTER_API_KEY is required for provider=openrouter (use run-with-dev-secrets)');
   }
   const fetchImpl = options.fetchImpl ?? fetch;
-  const defaultModel = options.model ?? process.env.OPENROUTER_MODEL ?? DEFAULT_OPENROUTER_MODEL;
-  const maxAttempts = options.maxAttempts ?? 3;
+  const models = resolveOpenRouterModels(options);
+  const maxAttempts = options.maxAttempts ?? Math.max(3, models.length);
   return {
     id: 'openrouter',
-    complete(request) {
-      return withRetries('openrouter', maxAttempts, () =>
-        completeOpenAiCompatible(
-          'openrouter',
-          'https://openrouter.ai/api/v1',
-          apiKey,
-          { ...request, model: request.model || defaultModel },
-          fetchImpl,
-        ),
-      );
+    async complete(request) {
+      let lastError: unknown;
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        // A caller-pinned model stays pinned; otherwise rotate through the roster.
+        const model = request.model || models[(attempt - 1) % models.length]!;
+        try {
+          const result = await completeOpenAiCompatible(
+            'openrouter',
+            'https://openrouter.ai/api/v1',
+            apiKey,
+            { ...request, model },
+            fetchImpl,
+          );
+          return { ...result, attempts: attempt };
+        } catch (error) {
+          lastError = error;
+          const retryable =
+            error instanceof Error &&
+            'retryable' in error &&
+            (error as { retryable?: boolean }).retryable === true;
+          if (!retryable || attempt >= maxAttempts) break;
+          await sleep(Math.min(8_000, 400 * 2 ** (attempt - 1)));
+        }
+      }
+      const message = lastError instanceof Error ? lastError.message : String(lastError);
+      throw new Error(`openrouter failed after ${maxAttempts} attempt(s): ${message}`);
     },
   };
 }
@@ -340,10 +374,9 @@ export function createHybridLlmProvider(options: {
     id: 'hybrid',
     async complete(request) {
       try {
-        const primary = await openrouter.complete({
-          ...request,
-          model: request.model || DEFAULT_OPENROUTER_MODEL,
-        });
+        // Pass the model through untouched: empty lets the OpenRouter provider
+        // rotate its roster instead of pinning the single default router.
+        const primary = await openrouter.complete(request);
         if (!looksLikeJsonObject(primary.content)) {
           throw Object.assign(new Error('openrouter returned non-JSON content'), {
             retryable: true,

@@ -160,6 +160,14 @@
   opacity: 0.38;
 }
 
+/* Exact columns×rows so the mast never clips a half-row of faces. */
+.ds-atmosphere__mosaic--fill {
+  grid-template-columns: repeat(var(--ds-atmosphere-columns, 8), 1fr);
+  grid-template-rows: repeat(var(--ds-atmosphere-rows, 6), 1fr);
+  grid-auto-rows: unset;
+  align-content: stretch;
+}
+
 .ds-atmosphere--interactive .ds-atmosphere__mosaic--living {
   opacity: 0.48;
 }
@@ -172,6 +180,11 @@
   display: block;
   color: inherit;
   text-decoration: none;
+}
+
+.ds-atmosphere__mosaic--fill .ds-atmosphere__cell {
+  min-height: 0;
+  height: 100%;
 }
 
 .ds-atmosphere__cell--link {
@@ -196,7 +209,14 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Bias toward faces/upper subjects instead of cropping through foreheads. */
+  object-position: center 18%;
   transition: opacity 1.8s cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+/* Fill grids use portrait-leaning cells; keep the face window a bit higher. */
+.ds-atmosphere__mosaic--fill .ds-atmosphere__tile-layer {
+  object-position: center 14%;
 }
 
 .ds-atmosphere__tile-layer--over {
@@ -240,31 +260,36 @@
   z-index: 0;
 }
 
-/* Matte charcoal plate behind thesis copy — hard edge, not a gradient.
-   Captures pointer events so mosaic tiles under the thesis stay non-targets. */
-.ds-about-mast__scrim {
-  position: absolute;
-  z-index: 1;
-  inset: 0 auto 0 0;
-  width: min(36rem, 58%);
-  background: var(--ds-fixed-charcoal);
-  opacity: 0.82;
-  pointer-events: auto;
-}
-
 .ds-about-mast .ds-atmosphere__mosaic--living {
-  grid-auto-rows: minmax(4.25rem, 1fr);
+  /* Fill mode owns row sizing — do not stretch incomplete auto-rows. */
+  grid-auto-rows: unset;
+  /* Even wash — legibility comes from the copy plate, not a side scrim. */
+  opacity: 0.48;
 }
 
 .ds-about-mast .ds-atmosphere__cell {
-  min-height: 4.25rem;
-  height: auto;
+  min-height: 0;
+  height: 100%;
 }
 
 .ds-about-mast__inner {
   position: relative;
   z-index: 2;
+  /* Let mosaic tiles remain clickable beside the thesis plate. */
+  pointer-events: none;
+}
+
+/*
+ * Thesis sits on opaque fixed-ink (v5 a11y floor): paper / stone / copper-dark
+ * pairs only — never translucent type over variable mosaic luminance.
+ */
+.ds-about-mast__copy {
   max-width: 36rem;
+  padding: var(--ds-space-6) var(--ds-space-7);
+  background: var(--ds-fixed-ink);
+  color: var(--ds-fixed-paper);
+  border-radius: var(--ds-radius-md);
+  pointer-events: auto;
 }
 
 .ds-about-mast .ds-page__eyebrow {
@@ -286,7 +311,8 @@
 }
 
 .ds-about-mast .ds-page__lede {
-  color: color-mix(in srgb, var(--ds-fixed-paper) 88%, transparent);
+  /* Solid paper on ink — do not fade below AA against fixed-ink. */
+  color: var(--ds-fixed-paper);
   max-width: 32rem;
 }
 
@@ -300,7 +326,7 @@
 
 .ds-about-mast .ds-cta--quiet {
   color: var(--ds-fixed-paper);
-  border-color: color-mix(in srgb, var(--ds-fixed-paper) 35%, transparent);
+  border-color: color-mix(in srgb, var(--ds-fixed-paper) 45%, transparent);
 }
 
 .ds-about-mast .ds-cta--quiet:hover,
@@ -314,6 +340,7 @@
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
+  /* Fixed stone on dark surfaces is the light stone token (AA on ink). */
   color: var(--ds-fixed-stone);
 }
 
@@ -344,10 +371,6 @@
   .ds-about__pillar-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--ds-space-6);
-  }
-
-  .ds-about-mast__scrim {
-    width: min(40rem, 52%);
   }
 }
 
@@ -503,8 +526,105 @@
     min-height: min(70vh, 32rem);
   }
 
-  .ds-about-mast__scrim {
-    width: 100%;
-    opacity: 0.78;
+  .ds-about-mast__copy {
+    max-width: none;
+    padding: var(--ds-space-5);
+  }
+}
+
+/* —— Map memorial names field (strictly under MapLibre canvas) ——
+   Scattered typographic field — not a uniform grid. Ghosts through translucent
+   plate fills (ocean/land); never paints above geography/markers. */
+.ds-map-names-wall {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  background: var(--ds-fixed-ink);
+}
+
+.ds-map-names-wall__glyph {
+  position: absolute;
+  display: grid;
+  max-width: min(28vw, 14rem);
+  transform: translate(-50%, -50%) scale(var(--ds-names-wall-scale, 1))
+    rotate(var(--ds-names-wall-rotate, 0deg));
+  transform-origin: center center;
+  opacity: 0;
+  transition: opacity 2.4s cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+.ds-map-names-wall__glyph--present {
+  opacity: var(--ds-names-wall-ink, 0.28);
+}
+
+.ds-map-names-wall__glyph--empty {
+  opacity: 0;
+}
+
+.ds-map-names-wall__layer {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.08rem;
+  transition: opacity 2.4s cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+.ds-map-names-wall__layer--over {
+  opacity: 1;
+  z-index: 1;
+}
+
+.ds-map-names-wall__layer--under {
+  opacity: 0;
+  z-index: 0;
+}
+
+.ds-map-names-wall__name {
+  font-family: var(--ds-font-editorial);
+  font-size: clamp(0.58rem, 0.5rem + 0.32vw, 0.92rem);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+  color: color-mix(in srgb, var(--ds-fixed-paper) 100%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-map-names-wall__meta {
+  font-family: var(--ds-font-mono);
+  font-size: clamp(0.45rem, 0.42rem + 0.12vw, 0.58rem);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--ds-fixed-paper) 62%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-map-names-wall__glyph--accent .ds-map-names-wall__name {
+  font-weight: 600;
+}
+
+[data-theme='light'] .ds-map-names-wall {
+  background: var(--ds-fixed-paper);
+}
+
+[data-theme='light'] .ds-map-names-wall__name {
+  color: color-mix(in srgb, var(--ds-fixed-ink) 100%, transparent);
+}
+
+[data-theme='light'] .ds-map-names-wall__meta {
+  color: color-mix(in srgb, var(--ds-fixed-ink) 58%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-map-names-wall__glyph,
+  .ds-map-names-wall__layer {
+    transition: none;
   }
 }

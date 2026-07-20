@@ -17,6 +17,8 @@ import { geocodeAddress, reverseGeocodeCoordinates, type GeocodeResult } from '.
 import { evaluateGeocodeProductScope } from './product-scope.js';
 import type { GeocodeResolution } from './types.js';
 import { translateZipToPlace } from './zip-translate.js';
+import { isUsZipOnlyInput, normalizeUsZipInput } from './zip-normalize.js';
+import { lookupUsZipCentroid } from './zip-centroid.js';
 
 const DC_MATCH: CensusGeocodeMatch = {
   matchedAddress: '4600 SILVER HILL RD, WASHINGTON, DC, 20233',
@@ -199,8 +201,35 @@ test('reverseGeocodeCoordinates falls back to manual search when the reverse fet
   assert.equal((result as Extract<GeocodeResult, { ok: false }>).fallback.reason, 'geocoder_unavailable');
 });
 
+test('normalizeUsZipInput accepts 5-digit ZIP and ZIP+4 bases', () => {
+  assert.equal(normalizeUsZipInput('46202'), '46202');
+  assert.equal(normalizeUsZipInput('46202-1234'), '46202');
+  assert.equal(normalizeUsZipInput(' 60601 '), '60601');
+  assert.equal(normalizeUsZipInput('not-a-zip'), undefined);
+});
+
+test('isUsZipOnlyInput is true only for standalone postal codes', () => {
+  assert.equal(isUsZipOnlyInput('10001'), true);
+  assert.equal(isUsZipOnlyInput('10001-0001'), true);
+  assert.equal(isUsZipOnlyInput('Indianapolis, IN 46202'), false);
+});
+
+test('lookupUsZipCentroid resolves known U.S. ZIP centroids', () => {
+  const hit = lookupUsZipCentroid('46202');
+  assert.ok(hit);
+  assert.equal(hit!.zip5, '46202');
+  assert.ok(Number.isFinite(hit!.lat));
+  assert.ok(Number.isFinite(hit!.lng));
+  assert.equal(hit!.city, 'Indianapolis');
+  assert.equal(hit!.stateAbbrev, 'IN');
+});
+
 test('translateZipToPlace resolves jurisdiction ids and never echoes the raw ZIP back', async () => {
-  const result = await translateZipToPlace({ zip: '20233', fetchAddressGeocode: async () => [DC_MATCH] });
+  const result = await translateZipToPlace({
+    zip: '20233',
+    lookupZipCentroid: () => ({ zip5: '20233', lat: 38.846, lng: -76.927, city: 'Washington' }),
+    fetchCoordinatesGeocode: async () => DC_MATCH,
+  });
   assert.ok(result.ok);
   if (result.ok) {
     assert.equal(result.placeName, 'Washington');
@@ -213,20 +242,39 @@ test('translateZipToPlace rejects a malformed ZIP without calling the fetcher', 
   let called = false;
   const result = await translateZipToPlace({
     zip: 'not-a-zip',
-    fetchAddressGeocode: async () => {
+    lookupZipCentroid: () => ({ zip5: '20233', lat: 38.846, lng: -76.927 }),
+    fetchCoordinatesGeocode: async () => {
       called = true;
-      return [DC_MATCH];
+      return DC_MATCH;
     },
   });
   assert.equal(result.ok, false);
   assert.equal(called, false);
 });
 
-test('translateZipToPlace falls back to manual search when the geocoder has no match for the ZIP', async () => {
-  const result = await translateZipToPlace({ zip: '00000', fetchAddressGeocode: async () => [] });
+test('translateZipToPlace falls back to manual search when the centroid is unknown', async () => {
+  const result = await translateZipToPlace({
+    zip: '00000',
+    lookupZipCentroid: () => undefined,
+    fetchCoordinatesGeocode: async () => DC_MATCH,
+  });
   assert.equal(result.ok, false);
   if (!result.ok) {
     assert.equal(result.fallback.reason, 'no_match');
+  }
+});
+
+test('translateZipToPlace falls back when Census reverse geocode fails for the centroid', async () => {
+  const result = await translateZipToPlace({
+    zip: '46202',
+    lookupZipCentroid: () => ({ zip5: '46202', lat: 39.7851, lng: -86.1595 }),
+    fetchCoordinatesGeocode: async () => {
+      throw new Error('network error');
+    },
+  });
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.equal(result.fallback.reason, 'geocoder_unavailable');
   }
 });
 

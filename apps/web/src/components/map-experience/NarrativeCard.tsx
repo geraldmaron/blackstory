@@ -11,12 +11,13 @@ import {
   entityEvidenceHref,
   eraFactLink,
   exploreHrefForKind,
-  exploreHrefForState,
   searchHrefForStatus,
 } from '../../lib/map-experience/metadata-hrefs';
+import { exploreWhereMapsLink } from '../../lib/map-experience/explore-where-maps-link';
 import { ConfidenceMark } from './ConfidenceMark';
 import { KindBadge } from './KindBadge';
 import { StatusMark } from './StatusMark';
+import { MapsExternalLink } from './MapsExternalLink';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source (same note as
 // `@repo/ui`'s own components, e.g. MapExplorer.tsx).
@@ -41,7 +42,7 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
   const { properties } = feature;
   const kindEncoding = displayEncodingFor(properties.kind, properties.mapTone);
   const era = eraFactLink(properties.eraBuckets);
-  const statePostalCode = properties.statePostalCode?.trim().toUpperCase();
+  const whereMaps = exploreWhereMapsLink(feature);
   const statusHref =
     properties.status !== undefined ? searchHrefForStatus(properties.status) : undefined;
   const evidenceLabel = `${properties.evidenceCount} accepted claim${properties.evidenceCount === 1 ? '' : 's'}`;
@@ -103,14 +104,15 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         <div className="ds-nc__fact">
           <dt>Where</dt>
           <dd className="ds-mono">
-            {statePostalCode ? (
-              <Link
+            {whereMaps ? (
+              <MapsExternalLink
                 className="ds-nc__fact-link"
-                href={exploreHrefForState(statePostalCode)}
-                aria-label={`View records in ${statePostalCode}`}
+                href={whereMaps.href}
+                placeLabel={whereMaps.placeLabel}
+                title={`Where: ${whereMaps.label}. Open in your maps app.`}
               >
-                {statePostalCode}
-              </Link>
+                {whereMaps.label}
+              </MapsExternalLink>
             ) : (
               '—'
             )}

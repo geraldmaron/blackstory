@@ -1,20 +1,19 @@
 /**
- * Public blap shell — design-direction-v5, "the atlas instrument" revision.
+ * Public BlackStory shell — design-direction-v5 page surfaces.
  *
- * The chrome language, in one breath: ONE floating ink island for
- * navigation (never a full-width bar, never theme-flipped), pill-shaped
- * actions, oversized Sora masts with a serif italic accent register,
- * hairline-ruled ledger rows instead of cards, a timeline instrument on
- * the hero, and a mega-wordmark footer. Copper stays an orientation
- * signal at 10–15% presence — one copper action per composition.
+ * Navigation chrome lives in @repo/ui `shell-header.css` (theme-aware full-width
+ * bar). This file owns document page patterns: oversized Sora masts with a serif
+ * italic accent register, hairline-ruled ledger rows, hero timeline, mega footer.
+ * Copper stays an orientation signal at 10–15% presence — one copper action per
+ * composition.
  *
  * Type registers (v5 §3): Sora display · Inter UI/chrome · Source Serif 4
  * editorial · IBM Plex Mono strictly for data (slugs, counts, dates,
  * decades, citations). Caps in exactly two registers: mono data slugs and
  * sans nav/CTA labels.
  *
- * Fixed-ink surfaces (map plate, island, footer, bands, hero chrome)
- * ignore [data-theme] — see base.css --ds-fixed-*.
+ * Fixed-ink surfaces (map plate, footer, bands, hero chrome) still use
+ * --ds-fixed-* where the plate must not theme-flip — see base.css.
  */
 
 .ds-shell {
@@ -25,28 +24,21 @@
 
 .ds-shell-body {
   flex: 1 0 auto;
-  /* The island header floats — document pages clear it themselves. */
+  /* Theme-aware shell bar — document pages clear it themselves. */
   padding-top: calc(var(--ds-island-clearance));
 }
 
-:root {
-  /* Island geometry, shared by everything that offsets around it. */
-  --ds-island-offset: 0.875rem;
-  --ds-island-height: 3.25rem;
-  --ds-island-clearance: calc(var(--ds-island-offset) + var(--ds-island-height) + 1.25rem);
-}
-
 /* Map surfaces own the full viewport — the hero/explore stage runs under
-   the island by design. */
+   the shell bar by design. */
 .ds-shell-body:has([data-surface='map']) {
   padding-top: 0;
 }
 
-/* Explore: condense the island — symbol mark, hide primary nav; map instruments own the frame
+/* Explore: condense the bar — symbol mark, hide primary nav; map instruments own the frame
    (ADR-017 transition contract). */
 .ds-shell-body:has(.ds-explore-stage) .ds-shell-header__inner {
   gap: var(--ds-space-1);
-  padding-inline: 0.375rem 0.5rem;
+  padding-inline: var(--ds-gutter);
 }
 
 .ds-shell-body:has(.ds-explore-stage) .ds-shell-nav--desktop,
@@ -55,10 +47,22 @@
 }
 
 .ds-shell-body:has(.ds-explore-stage) .ds-shell-wordmark__img--lockup {
+  display: none !important;
+}
+
+.ds-shell-body:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+  display: block;
+}
+
+.ds-shell-body:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
   display: none;
 }
 
-.ds-shell-body:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol {
+[data-theme='dark'] .ds-shell-body:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+  display: none;
+}
+
+[data-theme='dark'] .ds-shell-body:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
   display: block;
 }
 
@@ -66,290 +70,8 @@
   display: none;
 }
 
-/* —— The island — one floating ink pill, every surface, every theme ——  */
-.ds-shell-header {
-  position: fixed;
-  top: var(--ds-island-offset);
-  left: 0;
-  right: 0;
-  z-index: 80;
-  display: flex;
-  justify-content: center;
-  padding-inline: var(--ds-gutter);
-  pointer-events: none;
-}
-
-.ds-shell-header__inner {
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  max-width: 100%;
-  min-height: var(--ds-island-height);
-  padding: 0.375rem 0.5rem 0.375rem 1rem;
-  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-fixed-paper) 14%, transparent);
-  border-radius: var(--ds-radius-full);
-  background: color-mix(in srgb, var(--ds-fixed-ink) 84%, transparent);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-}
-
-.ds-shell-header :focus-visible {
-  outline-color: var(--ds-fixed-paper);
-}
-
-.ds-shell-wordmark {
-  display: inline-flex;
-  align-items: center;
-  margin-right: var(--ds-space-2);
-  text-decoration: none;
-  line-height: 1;
-  border-radius: var(--ds-radius-full);
-  transition: opacity var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-shell-wordmark:hover {
-  opacity: 0.75;
-}
-
-/* Kit lockup (3:1), dark variant only — the island is always ink. */
-.ds-shell-wordmark__img {
-  display: block;
-  width: 6.25rem;
-  height: auto;
-}
-
-.ds-shell-wordmark__img--symbol {
-  display: none;
-  width: 2rem;
-  height: 2rem;
-}
-
-@media (max-width: 47.9375rem) {
-  .ds-shell-wordmark__img--lockup {
-    display: none;
-  }
-
-  .ds-shell-wordmark__img--symbol {
-    display: block;
-  }
-}
-
-/* —— Island nav — sans caps, paper at rest, paper pill when here ——  */
-.ds-shell-nav__list {
-  display: flex;
-  align-items: center;
-  gap: 0.125rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.ds-shell-nav__link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.5rem;
-  padding: 0 var(--ds-space-3);
-  border-radius: var(--ds-radius-full);
-  color: color-mix(in srgb, var(--ds-fixed-paper) 72%, transparent);
-  font-family: var(--ds-font-sans);
-  font-size: 0.71875rem;
-  font-weight: 600;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition:
-    color var(--ds-duration-fast) var(--ds-easing),
-    background-color var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-shell-nav__link:hover {
-  color: var(--ds-fixed-paper);
-  background: color-mix(in srgb, var(--ds-fixed-paper) 8%, transparent);
-}
-
-.ds-shell-nav__link.is-active {
-  color: var(--ds-fixed-ink);
-  background: var(--ds-fixed-paper);
-}
-
-.ds-shell-nav--desktop {
-  display: none;
-}
-
-/* "More" disclosure — ink glass panel dropping from the island. */
-.ds-shell-more {
-  position: relative;
-}
-
-.ds-shell-more__summary {
-  list-style: none;
-  cursor: pointer;
-}
-
-.ds-shell-more__summary::-webkit-details-marker {
-  display: none;
-}
-
-.ds-shell-more__panel {
-  position: absolute;
-  top: calc(100% + var(--ds-space-3));
-  right: 0;
-  z-index: 90;
-  display: grid;
-  min-width: 13rem;
-  margin: 0;
-  padding: var(--ds-space-2);
-  list-style: none;
-  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-fixed-paper) 14%, transparent);
-  border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, var(--ds-fixed-ink) 92%, transparent);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-.ds-shell-more__panel .ds-shell-nav__link {
-  width: 100%;
-  justify-content: flex-start;
-}
-
-/* —— Island utilities: locate CTA, theme toggle, menu ——  */
-.ds-shell-header__cta {
-  display: none;
-}
-
-@media (min-width: 64rem) {
-  .ds-shell-header__cta {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.5rem;
-    padding: 0 var(--ds-space-4);
-    border-radius: var(--ds-radius-full);
-    background: var(--ds-accent-graphic);
-    color: var(--ds-fixed-ink);
-    font-family: var(--ds-font-sans);
-    font-size: 0.71875rem;
-    font-weight: 600;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: opacity var(--ds-duration-fast) var(--ds-easing);
-  }
-
-  .ds-shell-header__cta:hover {
-    opacity: 0.85;
-  }
-}
-
-.ds-shell-header__tools {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-1);
-}
-
-/* The theme toggle rides the island — paper on ink, whatever the theme. */
-.ds-shell-header__tools .ds-theme-toggle {
-  border-color: transparent;
-  background: transparent;
-  color: var(--ds-fixed-paper);
-}
-
-.ds-shell-header__tools .ds-theme-toggle:hover {
-  background: color-mix(in srgb, var(--ds-fixed-paper) 8%, transparent);
-}
-
-/* —— Mobile menu trigger + bottom-sheet drawer ——  */
-.ds-shell-menu__summary {
-  list-style: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.5rem;
-  min-width: 2.75rem;
-  padding: 0 var(--ds-space-3);
-  border: 0;
-  border-radius: var(--ds-radius-full);
-  background: transparent;
-  color: var(--ds-fixed-paper);
-  font-family: var(--ds-font-sans);
-  font-size: 0.71875rem;
-  font-weight: 600;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.ds-shell-menu__summary:hover {
-  background: color-mix(in srgb, var(--ds-fixed-paper) 8%, transparent);
-}
-
-.ds-shell-menu__summary::-webkit-details-marker {
-  display: none;
-}
-
-/* Tap-away scrim behind the bottom sheet. Rendered as a sibling of the
-   island (never inside it — see SiteHeader's containing-block note). */
-.ds-shell-drawer-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 95;
-  pointer-events: auto;
-  background: color-mix(in srgb, var(--ds-fixed-ink) 55%, transparent);
-}
-
-.ds-shell-nav--drawer {
-  position: fixed;
-  inset: auto 0 0 0;
-  z-index: 100;
-  pointer-events: auto;
-  max-height: 84vh;
-  overflow-y: auto;
-  margin: 0;
-  padding: var(--ds-space-5) var(--ds-space-5);
-  padding-bottom: max(var(--ds-space-8), env(safe-area-inset-bottom));
-  border-top: var(--ds-border-width) solid color-mix(in srgb, var(--ds-fixed-paper) 14%, transparent);
-  border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
-  background: color-mix(in srgb, var(--ds-fixed-ink) 96%, transparent);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  color: var(--ds-fixed-paper);
-  animation: ds-sheet-rise var(--ds-duration-base) var(--ds-easing) both;
-}
-
-@keyframes ds-sheet-rise {
-  from {
-    transform: translateY(1.5rem);
-    opacity: 0;
-  }
-  to {
-    transform: none;
-    opacity: 1;
-  }
-}
-
-.ds-shell-nav--drawer .ds-shell-nav__list {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0;
-}
-
-.ds-shell-nav--drawer .ds-shell-nav__link {
-  width: 100%;
-  min-height: 3rem;
-  justify-content: flex-start;
-  border-radius: var(--ds-radius-sm);
-  font-size: 0.8125rem;
-}
-
-.ds-shell-nav__more-label {
-  margin: var(--ds-space-5) 0 var(--ds-space-1);
-  padding: 0 var(--ds-space-3);
-  color: color-mix(in srgb, var(--ds-fixed-paper) 50%, transparent);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+.ds-shell-body:has(.ds-explore-stage) .ds-shell-header__tools {
+  margin-left: auto;
 }
 
 .ds-shell-offline {
@@ -509,7 +231,7 @@
 .ds-skip-link:focus,
 .ds-skip-link:focus-visible {
   position: fixed;
-  top: var(--ds-space-2);
+  top: calc(var(--ds-island-offset) + var(--ds-space-2));
   left: var(--ds-space-2);
   z-index: 1000;
   width: auto;
@@ -2088,23 +1810,9 @@
 }
 
 @media (min-width: 48rem) {
-  .ds-shell-menu {
-    display: none;
-  }
-
-  .ds-shell-nav--desktop {
-    display: block;
-  }
-
   .ds-feature-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--ds-space-5);
-  }
-}
-
-@media (max-width: 47.9375rem) {
-  .ds-shell-nav--desktop {
-    display: none;
   }
 }
 
@@ -2167,6 +1875,7 @@
   font-size: 0.75rem;
   line-height: 1.2;
   font-weight: 500;
+  cursor: help;
 }
 
 .ds-confidence-mark__icon {
@@ -2179,19 +1888,6 @@
   overflow-wrap: anywhere;
   word-break: break-word;
   letter-spacing: 0.02em;
-}
-
-/* When a field title is already present, hide the redundant word — icon + aria-label carry meaning. */
-.ds-confidence-mark[data-labeled='true'] .ds-confidence-mark__text {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }
 
 /* Icon + word + green→orange confidence ramp (high=green, low=orange). */
@@ -2223,6 +1919,30 @@
   color: #d07a32;
 }
 
+/* Dotted underline invites hover help on field titles (Kind, Status, …). */
+.ds-meta-field-label {
+  cursor: help;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+}
+
+/* External maps deep links — inherit meta/link styling; underline on hover/focus. */
+.ds-maps-external-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-maps-external-link:hover,
+.ds-maps-external-link:focus-visible {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
 /* Status chips — icon + mono label (not color-only). */
 .ds-status-mark {
   display: inline-flex;
@@ -2233,24 +1953,13 @@
   font-weight: 500;
   letter-spacing: 0.02em;
   text-transform: none;
+  cursor: help;
 }
 
 .ds-status-mark__icon {
   width: 0.75rem;
   height: 0.75rem;
   flex: 0 0 auto;
-}
-
-.ds-status-mark[data-labeled='true'] .ds-status-mark__text {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }
 
 .ds-status-mark--active,

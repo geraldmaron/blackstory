@@ -6,6 +6,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { cx } from '@repo/ui';
 import { statusIconFor, statusShortLabel } from '../../lib/map-experience/status-icons';
+import { statusHelp } from '../../lib/map-experience/metadata-help';
 
 void React;
 
@@ -19,13 +20,15 @@ export type StatusMarkProps = {
 export function StatusMark({ status, className, labeled = false }: StatusMarkProps) {
   const icon = statusIconFor(status);
   const label = statusShortLabel(status);
+  const help = statusHelp(status);
   return (
     <span
       className={cx('ds-status-mark', `ds-status-mark--${status}`, className)}
       data-status={status}
       data-labeled={labeled ? 'true' : 'false'}
       role="img"
-      aria-label={`Status: ${label}`}
+      aria-label={`Status: ${label}. ${help}`}
+      title={help}
     >
       <FontAwesomeIcon icon={icon} className="ds-status-mark__icon" aria-hidden="true" />
       <span className="ds-status-mark__text">{label}</span>

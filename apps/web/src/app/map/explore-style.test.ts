@@ -120,11 +120,13 @@ test('selected-entity ring layer exists and starts with an empty filter', () => 
   assert.equal(selected.paint?.['circle-color'], 'rgba(0,0,0,0)');
 });
 
-test('state density source starts empty so client join can setData without URL race', () => {
+test('state density source starts empty with promoteId for feature-state morphs', () => {
   const style = buildStyleFixture('presence');
   const stateSource = style.sources['explore-state-density'] as {
+    promoteId?: string;
     data?: { type?: string; features?: unknown[] };
   };
+  assert.equal(stateSource.promoteId, 'id');
   assert.equal(stateSource.data?.type, 'FeatureCollection');
   assert.deepEqual(stateSource.data?.features, []);
   const incoming = style.sources['explore-state-density-incoming'] as {
@@ -199,8 +201,15 @@ test('the state-selected fill and density fallback tints are relocated DIGNITY_P
   assert.equal(selectedFillLayer.paint?.['fill-color'], DIGNITY_PALETTE.selectedStateFill);
 
   const densityLayerOn = layerById(on, EXPLORE_STATE_DENSITY_LAYER_ID);
-  const outputs = matchExpressionOutputs(densityLayerOn.paint?.['fill-color']);
-  assert.ok(outputs.includes(DIGNITY_PALETTE.densityUnknownFill));
+  const fillColor = densityLayerOn.paint?.['fill-color'] as unknown[];
+  assert.equal(fillColor[0], 'interpolate');
+  assert.deepEqual(fillColor[2], ['coalesce', ['feature-state', 'blend'], 0]);
+
+  const colorAExpr = fillColor[4] as unknown[];
+  const restingColor = colorAExpr[2] as unknown[];
+  const tierFallback = restingColor[2] as unknown[];
+  const tierOutputs = matchExpressionOutputs(tierFallback);
+  assert.ok(tierOutputs.includes(DIGNITY_PALETTE.densityUnknownFill));
 
   const densityLayerOff = layerById(off, EXPLORE_STATE_DENSITY_LAYER_ID);
   assert.equal(densityLayerOff.paint?.['fill-color'], DIGNITY_PALETTE.densityDisabledFill);

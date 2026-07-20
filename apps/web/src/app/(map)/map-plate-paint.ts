@@ -65,14 +65,24 @@ export function syncLayerPaintFromStyle(
   applyLayerPaintUpdates(map, collectLayerPaintUpdates(style, layerIds), onError);
 }
 
+export type SyncSingleLayerPaintOptions = {
+  /**
+   * Skip these `layerId:paintKey` channels (e.g. decade-fade opacities held at 0
+   * during a dual-buffer crossdissolve so mid-dissolve style sync cannot flash full opacity).
+   */
+  readonly omitChannels?: ReadonlySet<string>;
+};
+
 /** Syncs paint for one style layer onto a live map layer when present. */
 export function syncSingleLayerPaint(
   map: MapLibreMap,
   layer: StyleSpecification['layers'][number] | undefined,
+  options?: SyncSingleLayerPaintOptions,
 ): void {
   if (!layer || !map.getLayer(layer.id)) return;
   if (!('paint' in layer) || !layer.paint || typeof layer.paint !== 'object') return;
   for (const [paintKey, paintValue] of Object.entries(layer.paint)) {
+    if (options?.omitChannels?.has(`${layer.id}:${paintKey}`)) continue;
     try {
       map.setPaintProperty(layer.id, paintKey, paintValue);
     } catch (error) {

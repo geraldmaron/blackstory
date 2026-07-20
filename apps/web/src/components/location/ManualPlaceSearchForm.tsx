@@ -25,6 +25,14 @@ export type ManualPlaceSearchFormProps = {
   readonly disabled?: boolean;
   readonly helperText?: string;
   readonly defaultValue?: string;
+  /** Input id — must be unique per page (explore reuses this form beside locate). */
+  readonly fieldId?: string;
+  readonly legend?: string;
+  readonly label?: string;
+  readonly placeholder?: string;
+  readonly submitLabel?: string;
+  readonly busyLabel?: string;
+  readonly className?: string;
 };
 
 export function ManualPlaceSearchForm({
@@ -32,19 +40,26 @@ export function ManualPlaceSearchForm({
   disabled = false,
   helperText,
   defaultValue,
+  fieldId = 'locate-address',
+  legend = 'Search by address, city, or ZIP',
+  label = 'Address, city and state, or ZIP',
+  placeholder = '123 Main St, city, state, or ZIP',
+  submitLabel = 'Find jurisdiction',
+  busyLabel = 'Looking up…',
+  className,
 }: ManualPlaceSearchFormProps) {
   return (
-    <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
+    <div className={className ?? 'ds-stack'} style={className ? undefined : { gap: 'var(--ds-space-2)' }}>
       {helperText ? <p className="ds-sans">{helperText}</p> : null}
       <FilterBar
-        legend="Search by address, city, or ZIP"
+        legend={legend}
         fields={[
           {
-            id: 'locate-address',
+            id: fieldId,
             name: 'address',
-            label: 'Address, city and state, or ZIP',
+            label,
             type: 'search',
-            placeholder: '123 Main St, city, state, or ZIP',
+            placeholder,
             ...(defaultValue !== undefined ? { defaultValue } : {}),
           },
         ]}
@@ -54,7 +69,7 @@ export function ManualPlaceSearchForm({
         }}
         actions={
           <Button type="submit" disabled={disabled}>
-            {disabled ? 'Looking up…' : 'Find jurisdiction'}
+            {disabled ? busyLabel : submitLabel}
           </Button>
         }
       />

@@ -1,19 +1,24 @@
 /**
- * Confirms Explore panel chrome class hooks for hide/show rails stay stable for CSS and a11y.
+ * Confirms Explore panel chrome class hooks and left-tab resolution stay stable for CSS and a11y.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  exploreFiltersPanelClassName,
-  exploreLegendPanelClassName,
+  exploreInstrumentsPanelClassName,
+  exploreNarrowExclusivePatch,
   exploreResultsPanelClassName,
+  exploreStageChromeAttrs,
+  resolveExploreLeftTab,
 } from './explore-panel-chrome';
 
-test('filters panel class reflects visible vs hidden state', () => {
-  assert.equal(exploreFiltersPanelClassName({ visible: true }), 'ds-explore-stage__filters');
+test('instruments panel class reflects visible vs hidden state', () => {
   assert.equal(
-    exploreFiltersPanelClassName({ visible: false }),
-    'ds-explore-stage__filters ds-explore-stage__filters--hidden',
+    exploreInstrumentsPanelClassName({ visible: true }),
+    'ds-explore-stage__instruments',
+  );
+  assert.equal(
+    exploreInstrumentsPanelClassName({ visible: false }),
+    'ds-explore-stage__instruments ds-explore-stage__instruments--hidden',
   );
 });
 
@@ -32,10 +37,68 @@ test('results panel class combines hidden and dimmed modifiers independently', (
   );
 });
 
-test('legend panel class reflects visible vs hidden state', () => {
-  assert.equal(exploreLegendPanelClassName({ visible: true }), 'ds-explore-stage__legend');
+test('resolveExploreLeftTab closes chassis when both sections are hidden', () => {
   assert.equal(
-    exploreLegendPanelClassName({ visible: false }),
-    'ds-explore-stage__legend ds-explore-stage__legend--hidden',
+    resolveExploreLeftTab({ showFilters: false, showKey: false }),
+    null,
   );
+});
+
+test('resolveExploreLeftTab follows the only visible section', () => {
+  assert.equal(
+    resolveExploreLeftTab({ showFilters: true, showKey: false }),
+    'filters',
+  );
+  assert.equal(
+    resolveExploreLeftTab({ showFilters: false, showKey: true }),
+    'key',
+  );
+});
+
+test('resolveExploreLeftTab uses preferredTab when both sections are visible', () => {
+  assert.equal(
+    resolveExploreLeftTab({ showFilters: true, showKey: true, preferredTab: null }),
+    'filters',
+  );
+  assert.equal(
+    resolveExploreLeftTab({ showFilters: true, showKey: true, preferredTab: 'key' }),
+    'key',
+  );
+});
+
+test('stage chrome attrs mirror instrument chassis and results for zoom safe-zones', () => {
+  assert.deepEqual(
+    exploreStageChromeAttrs({
+      instrumentsVisible: true,
+      leftTab: 'key',
+      resultsVisible: false,
+    }),
+    {
+      'data-instruments': 'open',
+      'data-instruments-tab': 'key',
+      'data-results': 'closed',
+    },
+  );
+  assert.deepEqual(
+    exploreStageChromeAttrs({
+      instrumentsVisible: false,
+      leftTab: null,
+      resultsVisible: true,
+    }),
+    {
+      'data-instruments': 'closed',
+      'data-instruments-tab': 'none',
+      'data-results': 'open',
+    },
+  );
+});
+
+test('narrow exclusive patch collapses the competing primary panel', () => {
+  assert.deepEqual(exploreNarrowExclusivePatch({ opening: 'instruments' }), {
+    showResults: false,
+  });
+  assert.deepEqual(exploreNarrowExclusivePatch({ opening: 'results' }), {
+    showFilters: false,
+    showKey: false,
+  });
 });

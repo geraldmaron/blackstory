@@ -1,12 +1,12 @@
 /**
- * Admin app chrome: ops-first island navbar + page body + footer.
+ * Admin app chrome: ops-first theme-aware shell navbar + page body + footer.
  * Primary nav stays on local admin routes; public-site handoffs live in overflow.
  * Signed-out Sign in lives in the shell More menu (last overflow item).
  */
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { PRIMARY_NAV, absolutizeShellNav } from '@repo/config';
+import { BRAND_ASSETS, PRIMARY_NAV, absolutizeShellNav } from '@repo/config';
 import { ShellHeader } from '@repo/ui';
 import { useAdminAuth } from '../auth/AdminAuthProvider';
 import { adminPublicSiteHref } from '../lib/sibling-origins';
@@ -60,8 +60,8 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
         homeHref="/"
         primaryNav={OPS_PRIMARY_NAV}
         overflowNav={overflowNav}
-        brandLockupSrc="/brand/lockup-dark.png"
-        brandSymbolSrc="/brand/symbol-dark.png"
+        brandLockup={BRAND_ASSETS.lockup}
+        brandSymbol={BRAND_ASSETS.symbol}
         cta={{ href: '/inbox', label: 'Inbox' }}
         {...(ready && user
           ? {

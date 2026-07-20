@@ -8,6 +8,20 @@ export const EDITORIAL_PACKET_KIND = 'editorial.packet.v1' as const;
 
 export type EditorialDecision = 'keep' | 'reject' | 'needs_evidence';
 
+/**
+ * Structured claim draft mirroring `ReleaseSourceClaim` so kept subjects arrive
+ * publish-shaped instead of needing a manual claims backfill. Citations must point
+ * at sources the judge was actually given — validation rejects fabricated hrefs.
+ */
+export type EditorialClaimDraft = {
+  readonly predicate: string;
+  readonly object: string;
+  readonly confidenceLevel: 'high' | 'medium' | 'low';
+  readonly citationSource: string;
+  readonly citationHref: string;
+  readonly citationLabel: string;
+};
+
 export type EditorialFieldDraft = {
   readonly publicSummary?: string;
   readonly historicalContext?: string;
@@ -15,6 +29,13 @@ export type EditorialFieldDraft = {
   readonly relevanceNote?: string;
   readonly relatedEntityIds?: readonly string[];
   readonly proposedRelationshipNotes?: string;
+  /** Full-field enrichment (v2): claim drafts with per-claim citations. */
+  readonly claims?: readonly EditorialClaimDraft[];
+  /** Registered topic ids only — validated against the topic registry. */
+  readonly topicIds?: readonly string[];
+  /** Decade buckets like "1910s"; only when the era is evidenced. */
+  readonly eraBuckets?: readonly string[];
+  readonly keywords?: readonly string[];
 };
 
 export type EditorialPacketModel = {

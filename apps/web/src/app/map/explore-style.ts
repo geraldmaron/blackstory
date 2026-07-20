@@ -352,6 +352,45 @@ function kindStrokeColorExpression(rimColor: string): ExpressionSpecification {
   );
 }
 
+/**
+ * Presence density fill — resting `fillColor` on each feature, with optional
+ * feature-state colorA/colorB/blend lerp for decade morphs (A→B per state).
+ */
+export function buildPresenceDensityFillColorExpression(
+  plate: ReturnType<typeof plateForScheme>,
+  presenceFillActive: boolean,
+): ExpressionSpecification {
+  if (!presenceFillActive) {
+    return plate.densityDisabled as unknown as ExpressionSpecification;
+  }
+
+  const tierFallback = [
+    'match',
+    ['get', 'densityTier'],
+    'concentrated',
+    DENSITY_TIER_FILL.concentrated,
+    'emerging',
+    DENSITY_TIER_FILL.emerging,
+    'documented',
+    DENSITY_TIER_FILL.documented,
+    plate.densityUnknown,
+  ] as unknown as ExpressionSpecification;
+
+  const restingColor = ['coalesce', ['get', 'fillColor'], tierFallback] as unknown as ExpressionSpecification;
+  const colorA = ['coalesce', ['feature-state', 'colorA'], restingColor] as unknown as ExpressionSpecification;
+  const colorB = ['coalesce', ['feature-state', 'colorB'], restingColor] as unknown as ExpressionSpecification;
+
+  return [
+    'interpolate',
+    ['linear'],
+    ['coalesce', ['feature-state', 'blend'], 0],
+    0,
+    colorA,
+    1,
+    colorB,
+  ] as unknown as ExpressionSpecification;
+}
+
 export type BuildExploreMapStyleInput = {
   readonly featureCollection: ExploreMapFeatureCollection;
   readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
@@ -424,6 +463,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
       },
       [EXPLORE_STATE_DENSITY_SOURCE_ID]: {
         type: 'geojson',
+        promoteId: 'id',
         // Empty until ExploreMapCanvas fetches `/geo/us-states-20m.geojson` and joins density.
         // Do not point `data` at the URL — MapLibre’s async URL load would overwrite setData.
         data: { type: 'FeatureCollection', features: [] },
@@ -596,43 +636,18 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         // Always hittable for state selection density tint is optional chrome on top.
         layout: { visibility: 'visible' },
         paint: {
-          'fill-color': presenceFillActive
-            ? [
-                'match',
-                ['get', 'densityTier'],
-                'concentrated',
-                DENSITY_TIER_FILL.concentrated,
-                'emerging',
-                DENSITY_TIER_FILL.emerging,
-                'documented',
-                DENSITY_TIER_FILL.documented,
-                plate.densityUnknown,
-              ]
-            : plate.densityDisabled,
+          'fill-color': buildPresenceDensityFillColorExpression(plate, presenceFillActive),
           'fill-opacity': PLATE_STATE_FILL_OPACITY,
         },
       },
       {
-        // Incoming presence buffer — crossdissolves over the current fill so decade
-        // colors morph across states without emptying the plate.
+        // Legacy incoming buffer — pins still dual-buffer; density morphs via feature-state color lerp.
         id: EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
         type: 'fill',
         source: EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
         layout: { visibility: 'visible' },
         paint: {
-          'fill-color': presenceFillActive
-            ? [
-                'match',
-                ['get', 'densityTier'],
-                'concentrated',
-                DENSITY_TIER_FILL.concentrated,
-                'emerging',
-                DENSITY_TIER_FILL.emerging,
-                'documented',
-                DENSITY_TIER_FILL.documented,
-                plate.densityUnknown,
-              ]
-            : plate.densityDisabled,
+          'fill-color': buildPresenceDensityFillColorExpression(plate, presenceFillActive),
           'fill-opacity': 0,
         },
       },

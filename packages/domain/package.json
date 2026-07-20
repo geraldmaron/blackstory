@@ -110,12 +110,14 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "@repo/schemas": "workspace:*"
+    "@repo/schemas": "workspace:*",
+    "zipcodes": "^8.0.0"
   },
   "devDependencies": {
     "@repo/security": "workspace:*",
     "@repo/testing": "workspace:*",
     "@repo/typescript-config": "workspace:^",
+    "@types/zipcodes": "^8.0.5",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

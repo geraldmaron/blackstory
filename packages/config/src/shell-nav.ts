@@ -1,6 +1,6 @@
 /**
  * Shared public-shell navigation IA (primary + overflow + footer columns).
- * Used by web and admin so both surfaces render the same island navbar.
+ * Used by web and admin so both surfaces render the same theme-aware shell bar.
  */
 
 export type ShellNavItem = {
@@ -8,7 +8,7 @@ export type ShellNavItem = {
   readonly label: string;
 };
 
-/** Always-visible top-level nav — mono caps, active route gets the paper pill. */
+/** Always-visible top-level nav — sans caps; active route gets a copper underline. */
 export const PRIMARY_NAV: readonly ShellNavItem[] = [
   { href: '/explore', label: 'Explore' },
   { href: '/search', label: 'Search' },

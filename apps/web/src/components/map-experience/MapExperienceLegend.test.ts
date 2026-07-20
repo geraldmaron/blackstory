@@ -20,11 +20,18 @@ test('explains points, clusters, the density layer, and confidence glyphs in wor
   assert.match(html, /cluster/i);
   assert.match(html, /Group nearby/);
   assert.match(html, /full entity page/);
-  assert.match(html, /Choose a model/);
+  assert.match(html, /States are shaded by how many documented records/);
   assert.match(html, /High/);
   assert.match(html, /medium/);
   assert.match(html, /low \(orange\)/);
   assert.match(html, /Streets/);
+});
+
+test('off layer mode invites choosing a map data model', () => {
+  const html = renderToStaticMarkup(
+    createElement(MapExperienceLegend, { layerMode: 'off' }),
+  );
+  assert.match(html, /Choose a model/);
 });
 
 test('states that color marks kind and historical tones, in words', () => {
@@ -110,6 +117,20 @@ test('onHide renders an accessible Hide key control beside the Color key heading
   assert.match(html, /ds-explore-stage__panel-hide/);
 });
 
+test('embedded mode omits Color key heading/hide (chassis owns chrome)', () => {
+  const html = renderToStaticMarkup(
+    createElement<MapExperienceLegendProps>(MapExperienceLegend, {
+      colorScheme: 'light',
+      embedded: true,
+      onHide: () => undefined,
+    }),
+  );
+  assert.match(html, /ds-map-color-key--embedded/);
+  assert.match(html, /aria-label="Color key"/);
+  assert.doesNotMatch(html, /id="map-color-key-heading"/);
+  assert.doesNotMatch(html, /Hide key/);
+});
+
 test('color key includes share tiers when blackShare layer is active', () => {
   const html = renderToStaticMarkup(
     createElement<MapExperienceLegendProps>(MapExperienceLegend, {
@@ -127,7 +148,9 @@ test('kind and tone swatches are aria-hidden (the accessible content is the adja
   const glyphSwatchCount = (html.match(/class="ds-legend-glyph[^"]*"[^>]*aria-hidden="true"/g) ?? [])
     .length;
   // Color key + Reading this map each list kinds and tones (2× each vocabulary).
+  // Default layerMode is presence, which adds three presence-tier discs in the color key.
+  const presenceTier = 3;
   const expected =
-    KIND_ENCODING_ENTRIES.length * 2 + SEMANTIC_TONE_ENTRIES.length * 2;
+    KIND_ENCODING_ENTRIES.length * 2 + SEMANTIC_TONE_ENTRIES.length * 2 + presenceTier;
   assert.equal(glyphSwatchCount, expected);
 });

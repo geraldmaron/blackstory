@@ -173,3 +173,59 @@ test('hybrid fails over when openrouter returns non-JSON content', async () => {
   assert.equal(result.servedBy, 'ollama');
   assert.equal(ollamaCalls, 1);
 });
+
+test('openrouter rotates through the model roster on retryable failures', async () => {
+  const attemptedModels: string[] = [];
+  const fetchImpl: typeof fetch = async (_input, init) => {
+    const body = JSON.parse(String(init?.body)) as { model: string };
+    attemptedModels.push(body.model);
+    if (attemptedModels.length < 3) {
+      return new Response('rate limited', { status: 429 });
+    }
+    return Response.json({
+      model: body.model,
+      choices: [{ message: { role: 'assistant', content: '{"ok":true}' } }],
+    });
+  };
+  const { createOpenRouterLlmProvider } = await import('./llm-provider.ts');
+  const provider = createOpenRouterLlmProvider({
+    apiKey: 'test-key',
+    models: ['tencent/hy3:free', 'nvidia/nemotron-3-super-120b-a12b:free', 'google/gemma-4-31b-it:free'],
+    fetchImpl,
+  });
+  const result = await provider.complete({ model: '', messages: [{ role: 'user', content: 'x' }] });
+  assert.deepEqual(attemptedModels, [
+    'tencent/hy3:free',
+    'nvidia/nemotron-3-super-120b-a12b:free',
+    'google/gemma-4-31b-it:free',
+  ]);
+  assert.equal(result.modelId, 'google/gemma-4-31b-it:free');
+  assert.equal(result.attempts, 3);
+});
+
+test('openrouter keeps a caller-pinned model pinned across retries', async () => {
+  const attemptedModels: string[] = [];
+  const fetchImpl: typeof fetch = async (_input, init) => {
+    const body = JSON.parse(String(init?.body)) as { model: string };
+    attemptedModels.push(body.model);
+    if (attemptedModels.length < 2) {
+      return new Response('overloaded', { status: 503 });
+    }
+    return Response.json({
+      model: body.model,
+      choices: [{ message: { role: 'assistant', content: '{"ok":true}' } }],
+    });
+  };
+  const { createOpenRouterLlmProvider } = await import('./llm-provider.ts');
+  const provider = createOpenRouterLlmProvider({
+    apiKey: 'test-key',
+    models: ['tencent/hy3:free', 'nvidia/nemotron-3-super-120b-a12b:free'],
+    fetchImpl,
+  });
+  const result = await provider.complete({
+    model: 'openrouter/free',
+    messages: [{ role: 'user', content: 'x' }],
+  });
+  assert.deepEqual(attemptedModels, ['openrouter/free', 'openrouter/free']);
+  assert.equal(result.attempts, 2);
+});

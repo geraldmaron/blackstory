@@ -6,15 +6,16 @@ Owner verdict on the first v5 pass: "it all looks the same … nothing to rememb
 professional-grade, modern UX." This revision replaces the v5 chrome primitives wholesale.
 Where anything below contradicts an earlier section of this document, **this section wins**:
 
-- **The island.** Navigation is ONE floating ink pill (`.ds-shell-header__inner`), fixed near
-  the top edge, detached from the page, identical on every surface and in both themes. There
-  is no full-width header bar and no `--onmap` variant anymore — the island is a brand-fixed
-  ink object like the map plate and footer. Active nav = paper pill; the single copper pill in
-  the island is NEAR YOU (the product's one standing orientation action). Mobile: symbol +
-  MENU in the island; the drawer is a bottom sheet rendered OUTSIDE the pill (its
-  backdrop-filter creates a containing block for fixed descendants) with a tap-away scrim.
+- **The shell bar.** Navigation is a full-width theme-aware bar (`.ds-shell-header__inner`),
+  fixed to the top edge, using `--ds-surface` / `--ds-ink` / `--ds-border` so it follows
+  light and dark. Official lockup artwork swaps with `[data-theme]` (light/dark kit pairs);
+  lockup renders at brand minimum (≥168px digital), symbol-only below 48rem and on
+  `/explore`. Active nav uses a copper underline — not a paper pill. The copper CTA is
+  NEAR YOU. Mobile: symbol + MENU; drawer is a bottom sheet outside the bar with a
+  tap-away scrim.
 - **Pill action language.** `.ds-cta` and `.ds-button` share one pill recipe
-  (`--ds-radius-full`). Radius 8/16/28 still governs boxes/sheets; actions are pills, full stop.
+  (`--ds-radius-full`). Radius 8/16/28 still governs boxes/sheets; page actions remain
+  pills. The shell bar itself is not a pill — it is a flat matte bar.
 - **The copper tick.** Every eyebrow/kicker leads with a 1.75rem copper rule — the recurring
   orientation mark of the system (`.ds-page__eyebrow::before`).
 - **Display register with a serif italic accent.** Masts scale to `clamp(2.75rem → 5rem)`
@@ -254,6 +255,10 @@ label + native selects, collapsed by default on mobile into a bottom sheet. Resu
 right rail (hairline rows, no box-per-result), full-height on desktop, bottom sheet on
 mobile. Legend: one-line strip bottom-left, disclosure for detail. Panel widths stay compact
 (19/21/20rem); panel fills at 92% + blur; radius-md; nothing overlaps the map's center third.
+Memorial names are a MapLibre symbol layer in the plate stack (above background, below
+state/land fills and markers): ocean/fringe typography coupled to the ambient decade
+timeline — all visible at start; each decade stagger-fades the names who died then
+(feature-state, not a bulk wipe); land occludes; never overlapping; never above markers.
 
 **`/entity/[id]`** — editorial mast: media plane (rights-cleared photo or kind-derived record mark)
 beside/above mono KIND · PLACE · framing slug, Sora name, and serif summary; slim at-a-glance
@@ -282,7 +287,8 @@ compact), result list as top-rule entries with mono meta lines. Pagination quiet
 **Longform (`/methodology`, `/legal/[slug]`)** — single serif
 column (`--ds-content-max`), numbered Sora subheads, mono citations. No cards.
 
-**`/about`** — full-bleed living mosaic mast (thesis + copper CTA over archive collage), then
+**`/about`** — full-bleed living mosaic mast (thesis on an opaque fixed-ink copy plate over
+even archive collage — paper/stone/copper-dark pairs only; no side scrim), then
 presence/evidence/dignity pillars, three numbered editorial beats, one ink publish-bar band, and
 destination rows. Tiles swap softly and open `/entity/[id]` when selected. Attribution at
 `/stories/mosaic-credits`. Not a documentation longform column.
@@ -344,6 +350,6 @@ The binding logo source is the root `brand/` kit: a **standalone book-and-pin sy
 B)** beside a **lowercase `blap` wordmark**, used exactly as provided (light/dark transparent
 lockups + symbol-only variants + app icons; PNG artwork). The v3-era "the symbol is the first
 B / never type the second B" rules are retired — see the supersession note atop
-`docs/ui/brand.md`. Header uses the lockup (symbol-only below 30rem); footer uses the dark
-symbol; app icons serve as browser/apple icons until proper favicon renders are produced from
-the kit.
+`docs/ui/brand.md`. Header uses the theme-paired lockup (symbol-only below 48rem and on
+`/explore`); footer uses the dark lockup on the fixed-ink band; app icons serve as
+browser/apple icons.

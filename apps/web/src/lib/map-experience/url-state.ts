@@ -103,8 +103,12 @@ function parseLayerMode(raw: RawExploreSearchParams): ExploreLayerMode {
 
   const densityRaw = firstValue(raw.density);
   if (densityRaw === '1' || densityRaw === 'true') return 'presence';
+  // Explicit density=0 / false keeps the overlay off (legacy deep links).
+  if (densityRaw === '0' || densityRaw === 'false') return 'off';
 
-  return 'off';
+  // Default: Record presence — entity pins always paint; this shades geography by
+  // documented-record count so the map opens with archive presence visible.
+  return 'presence';
 }
 
 function parsePopulationDecade(raw: string | undefined, fallback: CensusPopulationDecade): CensusPopulationDecade {
@@ -217,7 +221,7 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   }
   if (state.selected) params.set('selected', state.selected);
   if (state.state) params.set('state', state.state);
-  if (state.layerMode !== 'off') params.set('layerMode', state.layerMode);
+  if (state.layerMode !== 'presence') params.set('layerMode', state.layerMode);
   if (state.layerMode === 'blackShare' && state.popDecade && state.popDecade !== DEFAULT_POPULATION_DECADE) {
     params.set('popDecade', state.popDecade);
   }
@@ -251,7 +255,7 @@ export function defaultExploreOverlayState(): Pick<
   'layerMode' | 'group' | 'lines' | 'showFilters' | 'showResults' | 'showKey'
 > {
   return {
-    layerMode: 'off',
+    layerMode: 'presence',
     group: false,
     lines: false,
     showFilters: true,

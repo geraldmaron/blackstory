@@ -71,6 +71,8 @@ export type ExploreMapFeatureProperties = {
   readonly stateFips?: string;
   readonly statePostalCode?: string;
   readonly stateName?: string;
+  /** Public location prose from the release (never a redacted residential exact). */
+  readonly locationLabel?: string;
 };
 
 export type ExploreMapFeature = {
@@ -225,6 +227,7 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
       ...(feature.properties.stateFips ? { stateFips: feature.properties.stateFips } : {}),
       ...(feature.properties.statePostalCode ? { statePostalCode: feature.properties.statePostalCode } : {}),
       ...(feature.properties.stateName ? { stateName: feature.properties.stateName } : {}),
+      ...(entity.locationLabel.trim().length > 0 ? { locationLabel: entity.locationLabel.trim() } : {}),
     },
   };
 }

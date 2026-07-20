@@ -8,6 +8,7 @@ import { test } from 'node:test';
 import type { FirebaseApp } from 'firebase/app';
 import { configureAppCheckDebugToken, initializeAppCheckScaffold } from './app-check.js';
 import {
+  appCheckSatisfiesRateLimitGate,
   createAppCheckGuard,
   type AppCheckTelemetryEvent,
   type AppCheckVerifier,
@@ -45,6 +46,34 @@ test('monitor mode observes a missing token without rejecting the request', asyn
     reason: 'missing_token',
   });
   assert.equal(events[0]?.outcome, 'monitored_failure');
+  assert.equal(
+    appCheckSatisfiesRateLimitGate(decision),
+    true,
+    'monitor allow-through must satisfy the expensive-read quota gate',
+  );
+});
+
+test('appCheckSatisfiesRateLimitGate requires cryptographic verify outside monitor mode', () => {
+  assert.equal(
+    appCheckSatisfiesRateLimitGate({
+      allowed: true,
+      verified: true,
+      mode: 'enforce',
+      trustedService: false,
+      appId: 'web-app',
+    }),
+    true,
+  );
+  assert.equal(
+    appCheckSatisfiesRateLimitGate({
+      allowed: true,
+      verified: false,
+      mode: 'enforce',
+      trustedService: false,
+      reason: 'missing_token',
+    }),
+    false,
+  );
 });
 
 test('enforce mode rejects missing and invalid tokens with a stable response', async () => {

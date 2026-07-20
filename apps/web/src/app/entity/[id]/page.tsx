@@ -8,7 +8,6 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { findUsStateForPoint } from '@repo/domain/map/geography';
 import { MapFrame, Timeline } from '@repo/ui';
 import { KindBadge, ConfidenceMark } from '../../../components/map-experience';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
@@ -24,7 +23,7 @@ import { EntityEvidencePanel } from '../../../components/evidence';
 import { HowToReadThisRecord } from '../../../components/trust';
 import { WhyThisAppears } from '../../../components/why-appears';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
-import { exploreHrefForState } from '../../../lib/map-experience/metadata-hrefs';
+import { buildExternalMapsSearchUrl } from '../../../lib/geography/external-maps-url';
 import { buildExploreHref, defaultExploreOverlayState } from '../../../lib/map-experience/url-state';
 import { highestConfidence } from '../../../lib/map-experience/build-explore-map-source';
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
@@ -40,13 +39,6 @@ import { deriveHistoricalFraming } from './entity-view-model';
 type EntityPageProps = {
   readonly params: Promise<{ id: string }>;
 };
-
-function statePostalFromAnchor(
-  anchor: { readonly lat: number; readonly lng: number } | undefined,
-): string | undefined {
-  if (!anchor) return undefined;
-  return findUsStateForPoint(anchor.lat, anchor.lng)?.postalCode;
-}
 
 function entityLinkCatalogFromNeighbors(
   entity: NonNullable<Awaited<ReturnType<typeof resolvePublicEntityView>>['data']>,
@@ -109,7 +101,10 @@ export default async function EntityPage({ params }: EntityPageProps) {
   })();
   const evidenceClaims = toEvidenceClaimInputs(entity.claims);
   const geoAnchor = entity.geoAnchor ?? geoAnchorFor(entity.id);
-  const statePostal = statePostalFromAnchor(geoAnchor);
+  const mapsHref = buildExternalMapsSearchUrl({
+    ...(geoAnchor ? { lat: geoAnchor.lat, lng: geoAnchor.lng } : {}),
+    query: entity.locationLabel,
+  });
   const entityLinkCatalog = entityLinkCatalogFromNeighbors(entity);
   const continueLearning = entity.continueLearning ?? [];
   const exploreHref = buildExploreHref({
@@ -188,10 +183,16 @@ export default async function EntityPage({ params }: EntityPageProps) {
           <div className="ds-at-a-glance__row">
             <dt>Location shown</dt>
             <dd>
-              {statePostal ? (
-                <Link className="ds-at-a-glance__link" href={exploreHrefForState(statePostal)}>
+              {mapsHref ? (
+                <a
+                  className="ds-at-a-glance__link ds-maps-external-link"
+                  href={mapsHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Open ${entity.locationLabel} in maps`}
+                >
                   {entity.locationLabel} ({entity.locationPrecision} precision)
-                </Link>
+                </a>
               ) : (
                 <>
                   {entity.locationLabel} ({entity.locationPrecision} precision)

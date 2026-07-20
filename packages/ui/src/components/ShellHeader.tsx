@@ -1,7 +1,6 @@
 /**
- * Shared floating ink-island navbar used by the public web app and admin console.
- * Same primary/overflow IA on both surfaces so operators can traverse without a
- * second chrome language. Callers supply resolved hrefs (relative or absolute).
+ * Shared theme-aware shell navbar used by the public web app and admin console.
+ * Full-width flat bar with dual light/dark brand artwork; callers supply resolved hrefs.
  */
 'use client';
 
@@ -17,9 +16,23 @@ import { cx } from '../utils/cx.js';
 
 const DESKTOP_NAV_MQ = '(min-width: 48rem)';
 
+/** Writes measured shell header height to the document root for clearance tokens. */
+export function syncShellHeaderHeight(header: HTMLElement): void {
+  const heightPx = header.getBoundingClientRect().height;
+  if (!Number.isFinite(heightPx) || heightPx <= 0) {
+    return;
+  }
+  document.documentElement.style.setProperty('--ds-island-height', `${heightPx}px`);
+}
+
 export type ShellNavItem = {
   readonly href: string;
   readonly label: string;
+};
+
+export type ShellBrandAssets = {
+  readonly light: string;
+  readonly dark: string;
 };
 
 export type ShellHeaderLinkProps = {
@@ -36,8 +49,10 @@ export type ShellHeaderProps = {
   readonly homeHref: string;
   readonly primaryNav: readonly ShellNavItem[];
   readonly overflowNav: readonly ShellNavItem[];
-  readonly brandLockupSrc: string;
-  readonly brandSymbolSrc: string;
+  /** Light-canvas and dark-canvas lockup paths (official kit artwork). */
+  readonly brandLockup: ShellBrandAssets;
+  /** Light-canvas and dark-canvas symbol paths (official kit artwork). */
+  readonly brandSymbol: ShellBrandAssets;
   readonly cta?: ShellNavItem;
   /** Extra trailing tools (sign out, session email, etc.). Theme toggle always included. */
   readonly tools?: ReactNode;
@@ -96,8 +111,8 @@ export function ShellHeader({
   homeHref,
   primaryNav,
   overflowNav,
-  brandLockupSrc,
-  brandSymbolSrc,
+  brandLockup,
+  brandSymbol,
   cta,
   tools,
   renderLink = DefaultLink,
@@ -124,6 +139,24 @@ export function ShellHeader({
     setMenuOpen(false);
   }, [pathname]);
 
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) {
+      return;
+    }
+
+    syncShellHeaderHeight(header);
+
+    const observer = new ResizeObserver(() => {
+      syncShellHeaderHeight(header);
+    });
+    observer.observe(header);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [menuOpen, isDesktop]);
+
   return (
     <header ref={headerRef} className="ds-shell-header">
       <div className="ds-shell-header__inner">
@@ -134,14 +167,26 @@ export function ShellHeader({
           children: (
             <>
               <img
-                className="ds-shell-wordmark__img ds-shell-wordmark__img--lockup"
-                src={brandLockupSrc}
+                className="ds-shell-wordmark__img ds-shell-wordmark__img--lockup ds-shell-wordmark__img--theme-light"
+                src={brandLockup.light}
                 alt=""
                 aria-hidden="true"
               />
               <img
-                className="ds-shell-wordmark__img ds-shell-wordmark__img--symbol"
-                src={brandSymbolSrc}
+                className="ds-shell-wordmark__img ds-shell-wordmark__img--lockup ds-shell-wordmark__img--theme-dark"
+                src={brandLockup.dark}
+                alt=""
+                aria-hidden="true"
+              />
+              <img
+                className="ds-shell-wordmark__img ds-shell-wordmark__img--symbol ds-shell-wordmark__img--theme-light"
+                src={brandSymbol.light}
+                alt=""
+                aria-hidden="true"
+              />
+              <img
+                className="ds-shell-wordmark__img ds-shell-wordmark__img--symbol ds-shell-wordmark__img--theme-dark"
+                src={brandSymbol.dark}
                 alt=""
                 aria-hidden="true"
               />

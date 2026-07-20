@@ -48,18 +48,19 @@ export async function AboutMosaicMast({ children }: AboutMosaicMastProps) {
     <header className="ds-about-mast">
       <LivingAtmosphereMosaic
         seedKey="about"
-        density={48}
-        columns={8}
+        fillContainer
         entityLinks={entityLinks}
         className="ds-about-mast__plane"
       />
-      <div className="ds-about-mast__scrim" aria-hidden="true" />
       <div className="ds-container ds-about-mast__inner">
-        {children}
-        <p className="ds-about-mast__credit">
-          Archive mosaic · symbolic atmosphere · select a tile to open its record.{' '}
-          <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
-        </p>
+        {/* Opaque fixed-ink plate: WCAG pairs only — never translucent over mosaic tiles. */}
+        <div className="ds-about-mast__copy">
+          {children}
+          <p className="ds-about-mast__credit">
+            Archive mosaic · symbolic atmosphere · select a tile to open its record.{' '}
+            <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
+          </p>
+        </div>
       </div>
     </header>
   );

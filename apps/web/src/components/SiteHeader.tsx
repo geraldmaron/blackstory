@@ -1,5 +1,5 @@
 /**
- * Public site navigation — thin wrapper around the shared ShellHeader island.
+ * Public site navigation — thin wrapper around the shared theme-aware ShellHeader.
  * Uses Next.js Link for same-origin traversal so the persistent map shell stays mounted.
  */
 'use client';
@@ -7,6 +7,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
+  BRAND_ASSETS,
   OVERFLOW_NAV,
   PRIMARY_NAV,
   absolutizeShellNav,
@@ -44,8 +45,8 @@ export function SiteHeader() {
       homeHref="/"
       primaryNav={PRIMARY_NAV}
       overflowNav={absolutizeShellNav(overflow, null)}
-      brandLockupSrc="/brand/lockup-dark.png"
-      brandSymbolSrc="/brand/symbol-dark.png"
+      brandLockup={BRAND_ASSETS.lockup}
+      brandSymbol={BRAND_ASSETS.symbol}
       cta={{ href: '/locate', label: 'Near you' }}
       renderLink={NextShellLink}
     />

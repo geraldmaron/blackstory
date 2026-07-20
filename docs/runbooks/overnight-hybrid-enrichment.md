@@ -98,7 +98,8 @@ Candidates fixture: `packages/firebase/fixtures/discovery-candidates/run-*.json`
 | `COMMIT_ENRICHMENT` | 0 | `1` = stage quarantine packets (`--commit`) |
 | `COMMIT_SURVIVORS` | 1 | SearXNG survivors → Firestore |
 | `OLLAMA_MODEL` | `qwen3:8b` | Failover model |
-| `OPENROUTER_MODEL` | `openrouter/free` | Primary model |
+| `OPENROUTER_MODEL` | (empty) | Pin a single primary model; wins over the roster |
+| `OPENROUTER_MODELS` | hy3 + nemotron-3 + gemma-4 + gpt-oss roster | Free-model rotation: 429/5xx/empty advances to the next model |
 
 Override via systemd drop-in:
 `~/.config/systemd/user/blackstory-overnight-enrichment.service.d/override.conf`.
@@ -110,6 +111,26 @@ Override via systemd drop-in:
 - OpenRouter empty/non-JSON or rate limit: hybrid provider fails over to Ollama.
 - Single-subject LLM failure: `needs_evidence` packet + `error` field; other subjects continue.
 - systemd: `Restart=on-failure` with burst limit on the unit.
+
+## Status
+
+One-shot operator status (Firestore counts + latest Corsair run summaries):
+
+```bash
+node --conditions development --import tsx packages/firebase/scripts/corsair-status-report.ts
+# machine-readable:
+node --conditions development --import tsx packages/firebase/scripts/corsair-status-report.ts --json
+```
+
+Firestore counts (published entities, `researchCases` by state) are always live. The
+overnight-run and triage-inventory sections only see `.cache/` on the machine the
+script runs on — pass `--cache-dir` after rsyncing Corsair's `.cache/overnight-enrichment`
+locally, or SSH and run the script on Corsair directly:
+
+```bash
+ssh gerald@100.119.72.84 'cd ~/Developer/Projects/blackstory && \
+  node --conditions development --import tsx packages/firebase/scripts/corsair-status-report.ts'
+```
 
 ## Related
 

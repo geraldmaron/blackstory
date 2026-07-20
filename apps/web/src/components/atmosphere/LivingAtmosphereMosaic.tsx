@@ -1,21 +1,22 @@
 /**
  * Living archive mosaic — B&W collage with soft, preloaded tile crossfades.
  *
- * Incoming images load before opacity flips so fades never flash empty cells.
- * Multiple cells may crossfade concurrently. When `entityLinks` is provided,
- * visible tiles that match a published record become keyboard-accessible links.
- * Static under prefers-reduced-motion, Save-Data, or a hidden document.
+ * When `fillContainer` is set, columns/rows/density are derived from the plane
+ * size so every cell stays fully visible (no mid-face mast clipping) and larger
+ * screens receive more tiles. Incoming images preload before opacity flips.
  */
 'use client';
 
 import Link from 'next/link';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { computeFillMosaicLayout } from './compute-fill-mosaic-layout';
 import {
   applyLivingTileSwap,
   pickLivingTileSwap,
 } from './select-living-swap';
 import {
   selectAtmospherePlane,
+  selectMosaicTiles,
   type AtmosphereDensity,
 } from './select-atmosphere-plane';
 import { ATMOSPHERE_TILE_CREDITS, type AtmosphereTileCredit } from './tile-credits';
@@ -23,9 +24,7 @@ import './atmosphere.css';
 
 void React;
 
-/** How often we *start* a new soft swap (overlapping fades allowed). */
 const DEFAULT_SWAP_INTERVAL_MS = 1600;
-/** Must match CSS transition duration. */
 const CROSSFADE_MS = 1800;
 
 export type MosaicEntityLink = {
@@ -35,24 +34,29 @@ export type MosaicEntityLink = {
 
 export type LivingAtmosphereMosaicProps = {
   readonly seedKey: string;
-  readonly density?: AtmosphereDensity;
-  /** Grid columns: story mast uses 8; about living mast prefers 8; compact rails use 4. */
-  readonly columns?: 3 | 4 | 6 | 8;
+  readonly density?: AtmosphereDensity | number;
+  readonly columns?: 3 | 4 | 6 | 8 | 10 | 12;
   readonly swapIntervalMs?: number;
   readonly className?: string;
   /**
-   * Published entity records keyed by entityId. When set, matching visible tiles
-   * render as links to `/entity/[id]`; unmatched tiles stay non-interactive.
+   * Size the grid from the plane’s box: complete rows only, denser on larger
+   * viewports. Overrides fixed density/columns while active.
    */
+  readonly fillContainer?: boolean;
   readonly entityLinks?: Readonly<Record<string, MosaicEntityLink>>;
 };
 
 type CellLayers = {
   readonly a: AtmosphereTileCredit;
   readonly b: AtmosphereTileCredit;
-  /** When true, layer B is the visible face. */
   readonly showB: boolean;
   readonly fading: boolean;
+};
+
+type LayoutState = {
+  readonly columns: number;
+  readonly rows: number;
+  readonly density: number;
 };
 
 function preloadImage(src: string): Promise<boolean> {
@@ -65,25 +69,88 @@ function preloadImage(src: string): Promise<boolean> {
   });
 }
 
+function cellsFromTiles(tiles: readonly AtmosphereTileCredit[]): CellLayers[] {
+  return tiles.map((tile) => ({ a: tile, b: tile, showB: false, fading: false }));
+}
+
 export function LivingAtmosphereMosaic({
   seedKey,
   density = 48,
   columns = 4,
   swapIntervalMs = DEFAULT_SWAP_INTERVAL_MS,
   className,
+  fillContainer = false,
   entityLinks,
 }: LivingAtmosphereMosaicProps) {
-  const selection = selectAtmospherePlane({ seedKey, density });
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [layout, setLayout] = useState<LayoutState>(() =>
+    fillContainer
+      ? { columns: 10, rows: 6, density: 60 }
+      : {
+          columns,
+          rows: Math.max(1, Math.ceil(Number(density) / columns)),
+          density: Number(density),
+        },
+  );
+
+  const geometric = selectAtmospherePlane({ seedKey, density: 16, preferGeometric: true }).geometric;
+  const planeId = selectAtmospherePlane({ seedKey, density: layout.density }).planeId;
+  const tiles = selectMosaicTiles(seedKey, layout.density);
+
   const [mosaicFailed, setMosaicFailed] = useState(false);
   const [preferStatic, setPreferStatic] = useState(false);
-  const [cells, setCells] = useState<readonly CellLayers[]>(() =>
-    selection.tiles.map((tile) => ({ a: tile, b: tile, showB: false, fading: false })),
-  );
-  const visibleRef = useRef<readonly AtmosphereTileCredit[]>(selection.tiles);
+  const [cells, setCells] = useState<readonly CellLayers[]>(() => cellsFromTiles(tiles));
+  const visibleRef = useRef<readonly AtmosphereTileCredit[]>(tiles);
   const cellsRef = useRef(cells);
   const tickRef = useRef(0);
   const busySlotsRef = useRef<Set<number>>(new Set());
+  const layoutKeyRef = useRef(`${layout.columns}x${layout.rows}`);
   const interactive = Boolean(entityLinks && Object.keys(entityLinks).length > 0);
+
+  useLayoutEffect(() => {
+    if (!fillContainer) {
+      setLayout({
+        columns,
+        rows: Math.max(1, Math.ceil(Number(density) / columns)),
+        density: Number(density),
+      });
+      return;
+    }
+
+    const node = rootRef.current;
+    if (!node) return;
+
+    const applySize = (width: number, height: number) => {
+      // Ignore collapsed first paint / hidden tabs — keep the last good grid.
+      if (width < 120 || height < 120) return;
+      const next = computeFillMosaicLayout(width, height, ATMOSPHERE_TILE_CREDITS.length);
+      setLayout((prev) =>
+        prev.columns === next.columns && prev.rows === next.rows && prev.density === next.density
+          ? prev
+          : next,
+      );
+    };
+
+    applySize(node.clientWidth, node.clientHeight);
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const { width, height } = entry.contentRect;
+      applySize(width, height);
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [fillContainer, columns, density]);
+
+  useEffect(() => {
+    const key = `${layout.columns}x${layout.rows}:${layout.density}`;
+    if (layoutKeyRef.current === key) return;
+    layoutKeyRef.current = key;
+    const nextTiles = selectMosaicTiles(seedKey, layout.density);
+    busySlotsRef.current.clear();
+    visibleRef.current = nextTiles;
+    setCells(cellsFromTiles(nextTiles));
+  }, [layout.columns, layout.rows, layout.density, seedKey]);
 
   useEffect(() => {
     cellsRef.current = cells;
@@ -108,12 +175,7 @@ export function LivingAtmosphereMosaic({
   }, [cells]);
 
   useEffect(() => {
-    if (
-      preferStatic ||
-      mosaicFailed ||
-      selection.mode !== 'mosaic' ||
-      selection.tiles.length === 0
-    ) {
+    if (preferStatic || mosaicFailed || cells.length === 0) {
       return;
     }
 
@@ -185,23 +247,19 @@ export function LivingAtmosphereMosaic({
       window.clearInterval(intervalId);
       window.clearTimeout(kickId);
     };
-  }, [preferStatic, mosaicFailed, selection.mode, selection.tiles.length, seedKey, swapIntervalMs]);
+  }, [preferStatic, mosaicFailed, cells.length, seedKey, swapIntervalMs]);
 
-  const showLive =
-    selection.mode === 'mosaic' &&
-    selection.tiles.length > 0 &&
-    !mosaicFailed &&
-    !preferStatic;
-
+  const showLive = cells.length > 0 && !mosaicFailed && !preferStatic;
   const renderCells: readonly CellLayers[] = showLive
     ? cells
-    : selection.tiles.map((tile) => ({ a: tile, b: tile, showB: false, fading: false }));
+    : cellsFromTiles(tiles);
 
-  const showMosaic = (showLive || preferStatic) && selection.tiles.length > 0 && !mosaicFailed;
+  const showMosaic = renderCells.length > 0 && !mosaicFailed;
 
   const rootClass = [
     'ds-atmosphere',
     'ds-atmosphere--living',
+    fillContainer ? 'ds-atmosphere--fill' : '',
     interactive ? 'ds-atmosphere--interactive' : '',
     className,
   ]
@@ -210,20 +268,31 @@ export function LivingAtmosphereMosaic({
 
   return (
     <div
+      ref={rootRef}
       className={rootClass}
       aria-hidden={interactive ? undefined : true}
-      data-plane-id={selection.planeId}
-      data-columns={columns}
-      style={{ ['--ds-atmosphere-columns' as string]: String(columns) }}
+      data-plane-id={planeId}
+      data-columns={layout.columns}
+      data-rows={layout.rows}
+      style={{
+        ['--ds-atmosphere-columns' as string]: String(layout.columns),
+        ['--ds-atmosphere-rows' as string]: String(layout.rows),
+      }}
     >
       <div
         className="ds-atmosphere__geometric"
-        style={{ backgroundImage: `url(${selection.geometric.path})` }}
+        style={{ backgroundImage: `url(${geometric.path})` }}
         aria-hidden="true"
       />
       {showMosaic ? (
         <div
-          className="ds-atmosphere__mosaic ds-atmosphere__mosaic--living"
+          className={[
+            'ds-atmosphere__mosaic',
+            'ds-atmosphere__mosaic--living',
+            fillContainer ? 'ds-atmosphere__mosaic--fill' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
           role={interactive ? 'list' : undefined}
           aria-label={interactive ? 'Archive mosaic — open a record' : undefined}
         >
@@ -254,7 +323,7 @@ export function LivingAtmosphereMosaic({
                   width={96}
                   height={120}
                   decoding="async"
-                  loading={index < 8 ? 'eager' : 'lazy'}
+                  loading={index < layout.columns ? 'eager' : 'lazy'}
                   onError={() => setMosaicFailed(true)}
                 />
                 {/* eslint-disable-next-line @next/next/no-img-element -- decorative mosaic layers; fail-closed via onError */}
