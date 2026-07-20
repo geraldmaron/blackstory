@@ -56,6 +56,40 @@ function extractSignificantTerms(text: string): ReadonlySet<string> {
 }
 
 /**
+ * A person's own Wikipedia article never opens by describing itself as a place —
+ * that phrasing is the signature of a SETTLEMENT article. Live incident: "Bill
+ * Gilmer" (a lynching victim) got corroborated against "Gilmer, Texas" because
+ * that town's own article happens to separately document an unrelated 1919
+ * lynching, so the exact generic vocabulary every lynching-victim mention
+ * context uses (county, mob, lynched, African American) coincidentally
+ * overlapped enough to pass the old threshold below. A person subject citing a
+ * page with this signature is a same-name collision with a place, not a match.
+ */
+const SETTLEMENT_SIGNATURE_RE = /\b(is a city in|is a town in|is a village in|county seat of|is an unincorporated|is a populated place|is a census-designated place)\b/iu;
+
+export function looksLikeSettlementArticle(text: string): boolean {
+  return SETTLEMENT_SIGNATURE_RE.test(text);
+}
+
+/**
+ * Requires the candidate's own page TITLE to share at least one significant name
+ * token with the subject — catches wrong-article matches driven purely by
+ * thematic vocabulary overlap rather than the page actually being about someone
+ * with this name. Live incidents this catches: "Slab Pitts" (a lynching victim)
+ * corroborated against "Tulsa race massacre" (zero name overlap — matched purely
+ * on shared lynching-narrative vocabulary), and "Anna M. Dumas" (a Reconstruction
+ * postmaster) corroborated against "Minnie M. Cox" (a different, unrelated
+ * postmaster whose own article happens to mention Dumas in passing, so the
+ * context-overlap check below passed even though the article isn't about her).
+ */
+export function sharesNameToken(subjectName: string, candidateTitle: string): boolean {
+  const nameTerms = extractSignificantTerms(subjectName);
+  if (nameTerms.size === 0) return true;
+  const titleTerms = extractSignificantTerms(candidateTitle);
+  return [...nameTerms].some((term) => titleTerms.has(term));
+}
+
+/**
  * Disambiguation guard: Wikipedia's search API frequently resolves an ambiguous
  * or common name to the WRONG article — a same-named Secret Service director
  * instead of an 1870s landowner, an NFL tight end instead of a defunct 1880s
@@ -64,7 +98,17 @@ function extractSignificantTerms(text: string): ReadonlySet<string> {
  * signal is whether the record's own surrounding context (what it actually
  * says the subject did) shows up anywhere in the candidate page.
  */
-function isPlausibleMatch(subjectName: string, context: string | undefined, candidateText: string): boolean {
+export function isPlausibleMatch(
+  subjectName: string,
+  context: string | undefined,
+  candidateText: string,
+  candidateTitle: string,
+  kind?: string,
+): boolean {
+  if (kind === 'person') {
+    if (!sharesNameToken(subjectName, candidateTitle)) return false;
+    if (looksLikeSettlementArticle(candidateText)) return false;
+  }
   if (!context) return true;
   const nameTerms = extractSignificantTerms(subjectName);
   const contextTerms = [...extractSignificantTerms(context)].filter((term) => !nameTerms.has(term));
@@ -267,13 +311,14 @@ export async function resolveGovernmentCenterCoordinates(
 async function findViaWikipediaApi(
   subjectName: string,
   context?: string,
+  kind?: string,
 ): Promise<CorroboratingSource | undefined> {
   const hits = await searchWikipediaApi(subjectName);
   for (const hit of hits) {
     const url = `https://en.wikipedia.org/wiki/${encodeURIComponent(hit.title.replace(/ /gu, '_'))}`;
     const page = await fetchPage(url);
     if (!page) continue;
-    if (!isPlausibleMatch(subjectName, context, page.text)) continue;
+    if (!isPlausibleMatch(subjectName, context, page.text, hit.title, kind)) continue;
     const coordinates = await fetchWikipediaCoordinates(hit.title);
     return { url, title: hit.title, text: page.text, method: 'wikipedia_api', html: page.html, ...(coordinates ? { coordinates } : {}) };
   }
@@ -364,9 +409,9 @@ async function findViaSearch(subjectName: string, searxngBaseUrl: string): Promi
  */
 export async function findAnySource(
   subjectName: string,
-  options: { readonly searxngBaseUrl?: string; readonly context?: string } = {},
+  options: { readonly searxngBaseUrl?: string; readonly context?: string; readonly kind?: string } = {},
 ): Promise<CorroboratingSource | undefined> {
-  const viaWikipedia = await findViaWikipediaApi(subjectName, options.context);
+  const viaWikipedia = await findViaWikipediaApi(subjectName, options.context, options.kind);
   if (viaWikipedia) return viaWikipedia;
   const baseUrl = options.searxngBaseUrl ?? process.env.SEARXNG_BASE_URL;
   if (!baseUrl) return undefined;

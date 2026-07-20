@@ -224,15 +224,38 @@ function looksRelevant(title: string, description: string | undefined): boolean 
   return terms.some((term) => hay.includes(term));
 }
 
+/**
+ * Live incident: defaulting every unmatched title to 'person' silently mis-tagged
+ * parks, buildings, legislative acts, and robberies as people (Peck's Pier and
+ * Pavilion, the Wham Paymaster Robbery, the Arizona Organic Act, George Washington
+ * Carver Homestead Site, all surfaced as kind='person' this run) -- which then
+ * needlessly tripped the person-living-status privacy gate for things that were
+ * never people at all, requiring manual review to discover they weren't a privacy
+ * concern in the first place. Person is now a POSITIVE match (a birth-death year
+ * range or explicit biographical language in the description) rather than the
+ * fallback; anything else lands in 'other', a neutral bucket the privacy gate
+ * doesn't apply to.
+ */
 function inferKind(title: string, description: string | undefined): string {
   const hay = `${title} ${description ?? ''}`.toLowerCase();
   if (/\b(college|university|hbcu|school|academy)\b/.test(hay)) return 'institution';
-  if (/\b(museum|library|archive|cemetery|church|mosque|synagogue|fort|camp)\b/.test(hay)) return 'place';
+  if (
+    /\b(museum|library|archive|cemetery|church|mosque|synagogue|fort|camp|park|canyon|hotel|building|pier|pavilion|lodge|homestead|townsite)\b/.test(
+      hay,
+    )
+  )
+    return 'place';
   if (/\b(neighborhood|district|town|settlement|community)\b/.test(hay)) return 'place';
-  if (/\b(massacre|riot|movement|boycott|march|battle|expedition)\b/.test(hay)) return 'event';
+  if (/\b(massacre|riot|movement|boycott|march|battle|expedition|incident|robbery|death of|killing of)\b/.test(hay))
+    return 'event';
   if (/\b(newspaper|journal|magazine|publisher)\b/.test(hay)) return 'organization';
-  if (/\b(union|organization|association|society|league|regiment|cavalry|infantry)\b/.test(hay)) return 'organization';
-  return 'person';
+  if (/\b(union|organization|association|society|league|regiment|cavalry|infantry|club|team)\b/.test(hay))
+    return 'organization';
+  if (/\b(act|law|amendment|ordinance|constitution)\b/.test(hay)) return 'other';
+  if (description && /\(\s*(?:c\.\s*)?\d{3,4}\s*[-–]\s*(?:\d{3,4}|present|\?)?\s*\)/.test(description)) return 'person';
+  if (/\b(born|american \w+|writer|activist|politician|athlete|soldier|educator|artist|entrepreneur|pioneer)\b/.test(hay))
+    return 'person';
+  return 'other';
 }
 
 type GapCandidate = {

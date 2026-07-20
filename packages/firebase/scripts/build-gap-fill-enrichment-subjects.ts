@@ -77,7 +77,7 @@ async function main(): Promise<void> {
       // actually says about this subject) is passed through so the lookup can reject
       // a same-named-but-wrong Wikipedia article instead of accepting it blindly.
       const context = candidate.gapFill.mentionContexts.join(' ');
-      const primary = await findAnySource(candidate.displayName, { context });
+      const primary = await findAnySource(candidate.displayName, { context, kind: candidate.kind });
       const tier1 = await findCorroboratingTier1Source(candidate.displayName, {
         ...(primary?.html ? { html: primary.html, url: primary.url } : {}),
       });
