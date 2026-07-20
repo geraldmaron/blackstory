@@ -3,6 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import type { AppCheck } from 'firebase/app-check';
 import { fetchAppCheckHeaders } from './fetch-app-check-headers.ts';
 import { buildContentSecurityPolicy } from '../web-security/csp.ts';
 
@@ -11,7 +12,7 @@ test('fetchAppCheckHeaders returns {} when App Check is undefined', async () => 
 });
 
 test('fetchAppCheckHeaders times out instead of hanging when getToken never settles', async () => {
-  const never = {} as import('firebase/app-check').AppCheck;
+  const never = {} as AppCheck;
   const start = Date.now();
   const headers = await fetchAppCheckHeaders(
     never,

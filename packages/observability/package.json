@@ -16,7 +16,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/index.test.ts src/security.test.ts",
+    "test": "node --conditions development --import tsx --test src/index.test.ts src/security.test.ts src/logger-redaction.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

@@ -89,7 +89,7 @@ export function applyCaseQueue(
   });
 
   filtered = [...filtered].sort((left, right) => {
-    let cmp = 0;
+    let cmp: number;
     switch (query.sortKey) {
       case 'title':
         cmp = left.title.localeCompare(right.title);

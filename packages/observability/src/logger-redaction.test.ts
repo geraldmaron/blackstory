@@ -1,12 +1,13 @@
 
 /**
- * Proves the observability logger, wired with the central redactor, keeps residential
+ * Proves the observability logger wired with @repo/security redaction keeps residential
  * addresses and exact coordinates out of log output and error telemetry.
+ * Lives here (not in @repo/security) to avoid a workspace build cycle.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { AppError, createLogger, type LogContext } from '@repo/observability';
-import { createSensitiveDataRedactor } from './index.ts';
+import { createSensitiveDataRedactor } from '@repo/security';
+import { AppError, createLogger, type LogContext } from './index.ts';
 
 function wiredLogger(lines: string[]) {
   const redactor = createSensitiveDataRedactor();

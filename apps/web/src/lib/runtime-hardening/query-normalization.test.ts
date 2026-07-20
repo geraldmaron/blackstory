@@ -89,9 +89,10 @@ test('normalizeQueryString keeps allowlisted /explore map params', () => {
     utm_source: 'x',
     junk: '1',
   });
+  // Default layerMode=presence is omitted from the canonical query (cleaner revisit URLs).
   assert.equal(
     qs,
-    'era=1970s&kind=school&lat=38.9000&lng=-77.0000&zoom=6.00&selected=ent_dunbar_school_001&state=DC&layerMode=presence&group=1&lines=1&decade=1970s&edge=rel_landmark_occurred_at_school',
+    'era=1970s&kind=school&lat=38.9000&lng=-77.0000&zoom=6.00&selected=ent_dunbar_school_001&state=DC&group=1&lines=1&decade=1970s&edge=rel_landmark_occurred_at_school',
   );
 });
 
@@ -114,7 +115,17 @@ test('normalizeQueryString canonicalizes explore layerMode and viewport precisio
     lng: '-77.03691234',
     zoom: '11.555',
   });
-  assert.equal(qs, 'lat=38.9072&lng=-77.0369&zoom=11.55&layerMode=presence');
+  // density→presence is the default layer; omit layerMode from the canonical query.
+  assert.equal(qs, 'lat=38.9072&lng=-77.0369&zoom=11.55');
+  assert.equal(
+    normalizeQueryString('/explore', {
+      layerMode: 'blackShare',
+      lat: '38.90721234',
+      lng: '-77.03691234',
+      zoom: '11.555',
+    }),
+    'lat=38.9072&lng=-77.0369&zoom=11.55&layerMode=blackShare',
+  );
 });
 
 test('normalizeQueryString keeps allowlisted /history browse params', () => {

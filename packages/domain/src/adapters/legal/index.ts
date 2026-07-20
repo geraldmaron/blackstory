@@ -39,6 +39,7 @@ export {
 } from './legiscan/client.js';
 
 export type { LegalAdapterParseResult, LegalFixtureClient } from './types.js';
+import type { LegalAdapterParseResult } from './types.js';
 
 export const LEGAL_FIXTURE_CLIENTS = [
   'congress-gov-v3',
@@ -52,7 +53,7 @@ import { createEcfrFixtureClient } from './ecfr/client.js';
 import { createCourtListenerFixtureClient } from './courtlistener/client.js';
 import { createLegiScanFixtureClient } from './legiscan/client.js';
 
-export function parseAllLegalFixtures(): readonly import('./types.js').LegalAdapterParseResult[] {
+export function parseAllLegalFixtures(): readonly LegalAdapterParseResult[] {
   return [
     createCongressGovFixtureClient().parseFixtures(),
     createEcfrFixtureClient().parseFixtures(),

@@ -471,9 +471,6 @@ importers:
         specifier: workspace:*
         version: link:../schemas
     devDependencies:
-      '@repo/observability':
-        specifier: workspace:*
-        version: link:../observability
       '@repo/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config

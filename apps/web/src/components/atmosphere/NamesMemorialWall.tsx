@@ -131,7 +131,6 @@ export function NamesMemorialWall({
     if (prefersReducedMotion() || saveDataEnabled()) return;
 
     let cancelled = false;
-    let intervalId: ReturnType<typeof setInterval> | undefined;
     const busy = new Set<number>();
     const timeoutIds: number[] = [];
 
@@ -168,13 +167,13 @@ export function NamesMemorialWall({
       }
     };
 
-    intervalId = setInterval(runBatch, swapIntervalMs);
+    const intervalId = setInterval(runBatch, swapIntervalMs);
     const kickId = window.setTimeout(runBatch, 1400);
     timeoutIds.push(kickId);
 
     return () => {
       cancelled = true;
-      if (intervalId) clearInterval(intervalId);
+      clearInterval(intervalId);
       for (const id of timeoutIds) window.clearTimeout(id);
     };
   }, [pool, seedKey, swapIntervalMs, layout.density, layout.slots.length]);

@@ -64,10 +64,9 @@ test('collectPublicRenderPathFindings flags forbidden imports', () => {
   // requires a literal "import"/"export" keyword) so this fixture
   // exercises the real detector without the repo-wide boundary scanner
   // mistaking it for an actual cross-boundary import.
-  const forbiddenModuleSpecifier = ['@blap', 'data-access/firestore'].join('/');
   const findings = collectPublicRenderPathFindings(
     'fake.tsx',
-    `// re-exported from '${forbiddenModuleSpecifier}' upstream`,
+    `// re-exported from '@repo/data-access' upstream`,
   );
   assert.equal(findings.length, 1);
 });

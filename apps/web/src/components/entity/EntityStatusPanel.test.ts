@@ -23,7 +23,7 @@ test('renders the current status and full time-scoped statusHistory for a place-
   assert.match(html, /Current status/);
   assert.match(html, /ds-status-mark/);
   assert.match(html, /ds-status-mark__icon/);
-  assert.match(html, /aria-label="Status: active"/);
+  assert.match(html, /aria-label="Status: active\./);
   assert.match(html, /Active/);
   assert.match(html, /Historic/);
   assert.match(html, /1870/);

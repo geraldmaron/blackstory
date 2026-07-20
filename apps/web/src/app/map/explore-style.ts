@@ -74,6 +74,7 @@ import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
 import {
   buildMemorialNameFeatures,
   MEMORIAL_LABEL_TEXT_FONT,
+  type MemorialNameFeatureCollection,
 } from '../../lib/map-experience/build-memorial-name-features';
 
 export {
@@ -525,10 +526,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         promoteId: 'id',
         // Hidden for now — keep the source wired; builders/data stay in-repo.
         // Re-enable: MEMORIAL_NAMES_MAP_LAYER_ENABLED + restore feature build below.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
         data: (MEMORIAL_NAMES_MAP_LAYER_ENABLED
           ? buildMemorialNameFeatures({ seedKey: 'map-stage' })
-          : { type: 'FeatureCollection', features: [] }) as any,
+          : { type: 'FeatureCollection', features: [] }) satisfies MemorialNameFeatureCollection,
       },
     },
     layers: [
