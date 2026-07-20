@@ -1,12 +1,38 @@
 # ADR-022: Mobile data boundary — public contracts package, API v1 versioning, and the client/server line
 
-- **Status:** Proposed — independent red-team complete, awaiting owner acceptance
-- **Date:** 2026-07-19
-- **Bead:** MOB-002 (`black-book-mobile-002`) — architecture, threat model, contract boundary ADRs
+- **Status:** **Accepted (with amendments)** — 2026-07-20 adversarial review; owner authorized decision-making after review + research
+- **Date:** 2026-07-19 (accepted-with-amendments 2026-07-20)
+- **Bead:** MOB-002 (`black-book-mobile-002`); acceptance gate `repo-5os2`
 - **Depends on:** ADR-004, ADR-005, ADR-011
 - **Blocks:** MOB-003 (`packages/public-contracts`), MOB-004 (bounded public API v1 in `apps/api-public`)
 
-> **Proposed, not accepted.** The independent red-team pass has run; its dispositions of every question this ADR raised are recorded in "Red-team resolutions" at the end. Owner sign-off is still required before this ADR is accepted.
+## Adversarial review disposition (2026-07-20)
+
+Verdict: **Accepted with amendments.** This is the strongest ADR of the set — its central decision is not
+only sound but **already shipped and verified**: `packages/public-contracts` exists as a real `@repo` package
+with subpath exports, `apps/api-public` serves the `/v1` read surface (`/v1/entity/{id}`, `/v1/search`,
+`/v1/bootstrap`, `/v1/compatibility`, `/v1/health` in `src/http/router.ts`) and consumes the contracts via
+`workspace:*`, and the **compile-time boundary gate is real and green**: `packages/public-contracts/scripts/check-boundary.mjs`
+passes (17 files, only `zod` external, zero `node:*` built-ins, zero server-only imports). The §1/§2 CI-gate
+and `/v1` mechanisms are therefore **implemented, not merely proposed**. Amendments:
+
+1. **§1 scope claim was imprecise.** §1 states "confirmed the real scope in this repo — `packages/domain` is
+   `@repo/domain`." Not literally true: `packages/domain` is still named **`@black-book/domain`** in its
+   `package.json` (the repo is mid-rebrand); it is only *aliased* to `@repo/domain` by consumers (e.g.
+   `apps/api-public` declares `"@repo/domain": "workspace:@black-book/domain@*"`). What is unambiguously
+   `@repo`-native is the **new** package this ADR creates, `@repo/public-contracts`. Corrected inline. The
+   binding rule stands: mobile-facing packages use the rebrand-stable `@repo/*` scope; never `@black-book/*`.
+   The repo-wide rename of the remaining `@black-book/*` packages is already tracked by **`repo-5uol` (OPEN)**.
+2. **Consumption path differs for mobile.** `apps/api-public` consumes the contracts via `workspace:*`, but
+   `apps/mobile` is excluded from the pnpm workspace (ADR-020 §5 amendment) and consumes it via a `file:`
+   dependency resolved by Metro (`extraNodeModules` + the `development` export condition). The dependency
+   direction the diagram in §4 asserts (types-only, no runtime coupling, no server-only imports) is preserved
+   and enforced by the gate; only the resolver differs. Note `packages/public-contracts/dist/` is not
+   currently built — the dev/test path uses the `development`→`src` condition, so non-Metro consumers relying
+   on the `import`→`dist` condition require a prior `pnpm --filter @repo/public-contracts build` (build-order
+   concern, not a boundary breach).
+
+No decision reversed.
 
 ## Scaffold vs target
 
@@ -38,7 +64,7 @@ A concrete, already-felt hazard motivates the central decision. The repo already
 
 ### 1. A new package `packages/public-contracts` with a hard client/server boundary
 
-Create (in MOB-003, not here) `packages/public-contracts`, published under the existing brand-agnostic `@repo` scope (confirmed the real scope in this repo — `packages/domain` is `@repo/domain`). This ADR fixes its **boundary rules**; MOB-003 builds it.
+Create (in MOB-003, not here) `packages/public-contracts`, published under the rebrand-stable `@repo` scope. This ADR fixes its **boundary rules**; MOB-003 builds it. (**Corrected 2026-07-20:** the package ships natively as `@repo/public-contracts`. Note the repo is mid-rebrand — `packages/domain` is still *named* `@black-book/domain` and only *aliased* to `@repo/domain` by consumers such as `apps/api-public` — so all new mobile-facing packages must be `@repo/*`-native, never `@black-book/*`.)
 
 **It MAY contain, and only these:**
 

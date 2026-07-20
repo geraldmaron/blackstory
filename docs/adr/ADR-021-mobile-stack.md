@@ -1,12 +1,56 @@
 # ADR-021: Mobile stack — Expo React Native, MapLibre Native, App Check attestation, and SQLite offline cache
 
-- **Status:** Proposed — independent red-team complete, awaiting owner acceptance
-- **Date:** 2026-07-19
-- **Deciders:** mobile-program-review (agent); pending owner sign-off and an independent adversarial red-team pass before acceptance
-- **Bead:** MOB-002 (`black-book-mobile-002`)
+- **Status:** **Accepted (with amendments)** — 2026-07-20 adversarial review; owner authorized decision-making after review + research (supersedes the prior "awaiting owner acceptance" gate)
+- **Date:** 2026-07-19 (accepted-with-amendments 2026-07-20)
+- **Deciders:** mobile-program-review (agent); accepted under explicit owner authorization to decide after adversarial review
+- **Bead:** MOB-002 (`black-book-mobile-002`); acceptance gate `repo-5os2`
 - **Supersedes:** none
 - **Depends on:** ADR-004, ADR-005, ADR-008, ADR-010, ADR-011, ADR-013
 - **Blocks:** MOB-003, MOB-006, MOB-010, MOB-011
+
+## Adversarial review disposition (2026-07-20)
+
+Verdict: **Accepted with amendments.** Every core decision (Expo managed + CNG, Expo Router, MapLibre
+Native, RN Firebase App Check only, `expo-sqlite`) survived the adversarial pass and matches both 2026
+official guidance and what the branch actually shipped (`apps/mobile` now exists — MOB-004…018 landed; the
+"Today: does not exist" tables below are historical). Amendments, all validated against the live repo:
+
+1. **SDK/OS-floor facts were stale (§7).** This ADR was drafted against Expo SDK 54 / RN 0.81. The branch
+   ships **Expo SDK 56.0.16** (released 2026-05-21), **React Native 0.85.3**, **React 19.2.3**,
+   `react-native-web` 0.21, **TypeScript 6.0.3** — verified in `apps/mobile/package.json` and against
+   Expo's SDK 56 changelog and versions table (expo.dev/changelog/sdk-56;
+   docs.expo.dev/versions/v56.0.0). SDK 56's platform minimums are **iOS 16.4 / Android 7 (API 24)**.
+   `app.config.ts` correctly re-verified this at scaffold time: `ios.deploymentTarget: '16.4'` (the
+   platform minimum now *exceeds* the proposed 16.0 floor, exactly as §7 anticipated — "whichever SDK
+   MOB-006 pins governs"), and Android is deliberately held **above** the SDK minimum at
+   `minSdkVersion: 26` via `expo-build-properties`. §7's "current stable = SDK 54 … iOS 15.1 / API 24"
+   prose is superseded by this block.
+2. **New Architecture is now mandatory, not optional.** SDK 55+/RN 0.83+ removed the legacy architecture
+   (expo.dev/blog/upgrading-to-sdk-56); `app.config.ts` sets no `newArchEnabled` toggle because the field
+   no longer exists. MapLibre RN **v11 is new-arch-only** (Fabric/TurboModules;
+   maplibre.org/maplibre-react-native) and RN Firebase App Check **v25** is new-arch-compatible (new arch
+   *required* from v26; rnfirebase.io/app-check/usage) — both shipped pins (`^11.3.6`, `^25.1.0`) are
+   consistent. This closes the "RN new-arch breakage" adversarial challenge: the stack is new-arch-native.
+3. **pnpm layout: the §5 isolation *fallback* is what shipped, not the primary decision.** §5 preferred
+   keeping `apps/mobile` inside the workspace with targeted `public-hoist-pattern` entries and only
+   isolating as a last resort. The branch took the **isolation path**: `pnpm-workspace.yaml` excludes
+   `apps/mobile` (`'!apps/mobile'`), the app carries its **own npm lockfile**, and `metro.config.js`
+   resolves `@repo/public-contracts` via `extraNodeModules` + `watchFolders` + the package's `development`
+   export condition. This is defensible and arguably *stronger* than the primary plan: mobile is entirely
+   outside the pnpm dependency graph, so the root `pnpm install --frozen-lockfile` and every
+   web/admin/api-*/worker build are provably unaffected by construction (the §5 blocking gate is satisfied
+   trivially). Cost: two package managers in one repo, and `@repo/public-contracts` must build to `dist/`
+   for any non-Metro consumer. §5's "do NOT exclude / keep in workspace" preference is amended to record
+   that isolation was adopted on measured pnpm/Metro friction.
+4. **App Check "reads fail open" is only partly true today (§3).** §3 claims reads fail open under an App
+   Check outage. That holds for **static reads**, but `@repo/security`'s quota matrix currently
+   **hard-denies `expensive_read` (e.g. `/v1/search`) for anonymous callers without a verified token**,
+   with no outage carve-out — a real contradiction, candidly flagged in `apps/mobile/src/security/app-check.ts`
+   and tracked by **`repo-uqmm` (OPEN)**. §3's fail-open language is scoped accordingly below; the
+   platform-wide fix is an owner/security decision, not a mobile-program change.
+
+No decision is reversed. Rejected alternatives stand. Remaining risk that stays open by design: `repo-uqmm`
+(App Check fail-open vs expensive-read hard-deny).
 
 ## Scaffold vs target
 
@@ -142,7 +186,12 @@ show the false-negative rate on genuine clients is negligible, so enforcement ca
 provider quirk. (3) **Even under enforcement, reads fail open** to rate-limited `anonymous` access on an App Check
 *outage* (threat model T2; ADR-010 degraded-read doctrine) — enforcement raises abuse cost, it is never a hard
 availability gate on public content. This staged posture is the mobile analogue of ADR-010's "tighten (never
-silently loosen) App Check enforcement when moving staging → prod."
+silently loosen) App Check enforcement when moving staging → prod." **Amended 2026-07-20:** this fail-open
+guarantee holds for **static reads** but does **not** hold for `expensive_read` (e.g. `/v1/search`) today —
+`@repo/security`'s quota matrix hard-denies unattested expensive reads with no outage carve-out (candidly
+noted in `apps/mobile/src/security/app-check.ts`). Reconciliation is a platform-wide owner/security decision
+tracked by **`repo-uqmm` (OPEN)**; the client surfaces the server's honest `429` rather than assuming a
+fail-open it cannot rely on.
 
 ### 4. Local storage — `expo-sqlite`
 
@@ -208,6 +257,12 @@ project commit the native folders (a near-one-way door — see "Reversal cost").
 ### 7. Supported OS floor — iOS 16+, Android 8 (API 26)+ (proposed; re-verify at MOB-006)
 
 Adopt the MOB-001 proposal: **iOS 16+ and Android 8.0 (API level 26)+**.
+
+> **Amended 2026-07-20 (see disposition block):** the pins below were re-verified at scaffold time to
+> **Expo SDK 56 / RN 0.85** (platform minimums **iOS 16.4 / Android 7 / API 24**). `app.config.ts` sets
+> `ios.deploymentTarget: '16.4'` (platform minimum now governs, exceeding the proposed 16.0) and holds
+> Android at `minSdkVersion: 26`. The SDK-54 verification prose immediately below is retained only as the
+> original drafting record.
 
 Verification against the current Expo SDK as of this writing: the current stable line is **Expo SDK 54**
 (released ~September 2025, bundling React Native 0.81). Its actual platform minimums are **lower** than this

@@ -1,12 +1,35 @@
 # ADR-025: Mobile map data — self-hosted PMTiles, native range requests, attribution, and failure strategy
 
-- **Status:** Proposed — awaiting owner acceptance
-- **Date:** 2026-07-19
-- **Deciders:** mobile-program-review (agent); pending owner sign-off
+- **Status:** **Accepted (with amendments)** — 2026-07-20 adversarial review; owner authorized decision-making after review + research
+- **Date:** 2026-07-19 (accepted-with-amendments 2026-07-20)
+- **Deciders:** mobile-program-review (agent); accepted under explicit owner authorization to decide after adversarial review
 - **Bead:** MOB-011 (`black-book-mobile-011`)
 - **Supersedes:** none
 - **Depends on:** ADR-004, ADR-008, ADR-010, ADR-011, ADR-013, ADR-021
 - **Blocks:** MOB-012 (native Explore map, synchronized list, narrative sheet)
+
+## Adversarial review disposition (2026-07-20)
+
+Verdict: **Accepted with amendments.** The data platform (self-hosted U.S. Protomaps PMTiles on the existing
+Firebase/CDN, native `pmtiles://` HTTPS range requests, `206`/`Accept-Ranges` requirement, release-versioned
+immutable paths, `MAP_BASEMAP_ENABLED` cost kill-switch, the flat-GeoJSON→vector-tile threshold, the tested
+`classifyMapError` failure modes, always-visible attribution, and the inherited server-side redaction
+invariant) is the correct mobile parallel of ADR-013 and survives the adversarial pass. `USE_FRAMEWORKS=static`
+is confirmed set in `app.config.ts` (reconciling MapLibre + RN Firebase on iOS). Amendment:
+
+1. **The "Deferred" section overstates what exists — no custom MapLibre config plugin is present.** It claims
+   "its config plugin (`app.plugin.js` → `withMapLibre`) is present and valid." There is **no `app.plugin.js`
+   and no `withMapLibre`** anywhere in `apps/mobile`, and `@maplibre/maplibre-react-native` is **not** in
+   `app.config.ts`'s `plugins` array. The dependency **is** installed (`^11.3.6`). Per MapLibre RN v11's
+   official 2026 guidance (maplibre.org/maplibre-react-native/docs/setup/expo/), the correct wiring is simply
+   adding the package's **own** config plugin — `"plugins": ["@maplibre/maplibre-react-native"]` — which
+   injects `$MLRN.post_install(installer)` into the iOS Podfile; **no bespoke `withMapLibre` plugin is needed
+   or should be authored.** Corrected in "Deferred" below. Net effect unchanged: native MapLibre setup is a
+   real MOB-012/build-gate task (register the official plugin + `expo prebuild` + `pod install`), still
+   correctly deferred — but the claim that a custom plugin already exists is removed as inaccurate.
+
+No decision reversed. `@maplibre/maplibre-react-native` v11 is verified new-arch-only and dev-build-only
+(not Expo Go), consistent with ADR-020.
 
 ## Scaffold vs target
 
@@ -250,12 +273,17 @@ default silently.
 - **Production PMTiles archive authoring** — real geodata work (planetiler build, dark styling, glyphs/sprites,
   refresh pipeline); out of scope for this decision bead. The spike renders the demo dark canvas + redacted points.
 - **Full iOS `expo prebuild` + `pod install` for MapLibre Native** — deferred to the coordinated build gate.
-  Rationale: it requires registering the `withMapLibre` config plugin **and** setting `USE_FRAMEWORKS=static` in the
-  shared `app.config.ts`/`expo-build-properties`, which must reconcile with RN Firebase's identical static-frameworks
-  requirement (MOB-010, just landed) and is **outside this bead's exclusive file ownership**. The dependency is
-  installed, lockfile-consistent, its config plugin (`app.plugin.js` → `withMapLibre`) is present and valid, and
-  **`expo-doctor` reports 21/21 checks passed with the dependency added**. A prior scratch-app spike already proved
-  `pod install` succeeds with `USE_FRAMEWORKS=static`. Tracked as a follow-up bead.
+  Rationale: it requires registering MapLibre RN's **own official config plugin** — add
+  `"@maplibre/maplibre-react-native"` to `app.config.ts`'s `plugins` array (it injects
+  `$MLRN.post_install(installer)` into the iOS Podfile; no custom plugin is authored) — **and** setting
+  `USE_FRAMEWORKS=static` (already set in `app.config.ts`), which must reconcile with RN Firebase's identical
+  static-frameworks requirement (MOB-010, just landed) and is **outside this bead's exclusive file ownership**.
+  The dependency is installed and lockfile-consistent. **Corrected 2026-07-20:** an earlier draft of this
+  section claimed a bespoke `app.plugin.js` → `withMapLibre` plugin was "present and valid" — that file does
+  not exist and no custom plugin is needed; the official package plugin is the wiring path. The MapLibre plugin
+  is **not yet registered** in `app.config.ts`, so a real `expo prebuild` does not yet set up the iOS pods —
+  this is the deferred build-gate work. Tracked by follow-up bead **`repo-umwk`** (MapLibre Native iOS
+  prebuild + `pod install` + device map benchmarks).
 - **Device-based benchmarks** — cold/warm payload + memory traces, live CDN failure injection, real range-request
   `206` verification against a deployed archive, low-memory-device cycling, and attribution-not-occluded screenshots
   — require a deployed archive and physical devices (MOB-012/MOB-019/MOB-021). Documented, not faked.

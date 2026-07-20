@@ -1,10 +1,41 @@
 # ADR-024: Mobile build, distribution, OTA update, and release-rollback model
 
-- **Status:** Proposed — independent red-team complete, awaiting owner acceptance
-- **Date:** 2026-07-19
-- **Bead:** MOB-002 (architecture, threat model, contract boundary ADRs)
+- **Status:** **Accepted (with amendments)** — 2026-07-20 adversarial review; owner authorized decision-making after review + research
+- **Date:** 2026-07-19 (accepted-with-amendments 2026-07-20)
+- **Bead:** MOB-002 (architecture, threat model, contract boundary ADRs); acceptance gate `repo-5os2`
 - **Depends on:** ADR-004, ADR-006, ADR-022
 - **Blocks:** MOB-005, MOB-019, MOB-020, MOB-021
+
+## Adversarial review disposition (2026-07-20)
+
+Verdict: **Accepted with amendments.** The pipeline shape (EAS Build/Submit/Update, three profiles bound to
+three bundle IDs and three channels, tag-gated production, forced-update driven only by a server signal,
+fail-open on a missing/malformed min-version signal, drilled rollback as a launch gate) is sound and matches
+2026 EAS guidance. `eas.json` and `app.config.ts` implement the three profiles and channels. Two material
+amendments from research + repo state:
+
+1. **EAS Update end-to-end code signing is a PAID-PLAN feature, not just an SDK-support question (§2/§6/§7;
+   threat-model T6).** Per Expo's docs, "EAS Update Code Signing is only available to accounts subscribed to
+   the EAS Production or Enterprise plans" (docs.expo.dev/eas-update/code-signing). T6 and this ADR framed
+   enabling code signing as contingent on *SDK support*; it is supported on SDK 56, but adopting it **breaks
+   the free-tier-first posture** (§7). Decision: on the free tier, OTA ships **without** end-to-end code
+   signing, and the T6 blast-radius controls reduce to **phishing-resistant MFA custody + a scoped, revocable
+   CI-only EAS token + channel/staged-rollout discipline + immutable-update rollback**. Enabling code signing
+   is a **cost-gated upgrade trigger**, folded into §7's recorded triggers (adopt when moving to a paid EAS
+   plan for other reasons, or when a threat assessment makes the un-signed-OTA residual unacceptable). This is
+   a **remaining risk accepted by design** until the paid plan is adopted.
+2. **`expo-updates` is not yet wired.** `apps/mobile/package.json` does **not** include `expo-updates`, and
+   `app.config.ts` sets no `runtimeVersion` policy or `updates.url`. The entire OTA mechanism §2 relies on is
+   therefore **not yet installed** — a legitimate MOB-019 deferral, but the ADR implied it as present.
+   Amended to: OTA/EAS Update is the decided mechanism; wiring (`expo install expo-updates`,
+   `eas update:configure`, `runtimeVersion: { policy: "appVersion" }`) is a MOB-019 task and a prerequisite
+   for the §6 OTA rollback drill. Until then there is no OTA path and JS fixes ride full store releases.
+3. **Minor:** `eas.json` uses `appVersionSource: "remote"` (EAS-managed version), whereas §3 describes a
+   manual bump in `app.config`. Both are valid; the remote source is EAS's current recommendation. §3's
+   "manually bumped" is reconciled to "the semantic app version is a deliberate human act per release, whether
+   set in `app.config` or via EAS remote version management."
+
+No decision reversed.
 
 ## Scaffold vs target
 

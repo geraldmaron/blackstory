@@ -1,10 +1,28 @@
 # ADR-023: Mobile client state, local cache, and offline-read mode
 
-- **Status:** Proposed — independent red-team complete, awaiting owner acceptance
-- **Date:** 2026-07-19
-- **Bead:** MOB-002 (`black-book-mobile-002`)
+- **Status:** **Accepted (with a minor amendment)** — 2026-07-20 adversarial review; owner authorized decision-making after review + research
+- **Date:** 2026-07-19 (accepted-with-amendments 2026-07-20)
+- **Bead:** MOB-002 (`black-book-mobile-002`); acceptance gate `repo-5os2`
 - **Depends on:** ADR-004 (public projection / immutable snapshots), ADR-008 (bounded static-first search and geocoding), ADR-013 (map stack), ADR-021 (mobile stack), ADR-022 (mobile data boundary)
 - **Blocks:** MOB-009 (typed API client, SQLite cache, offline mode, migrations), MOB-012 (native Explore map, synchronized list, filters, narrative sheet)
+
+## Adversarial review disposition (2026-07-20)
+
+Verdict: **Accepted with a minor amendment.** The architecture — TanStack Query for server-state, SQLite as
+the cold persistence tier, release-stamp (not TTL) as the authoritative freshness signal, drop-and-rebuild
+cache migrations, honest degraded-mode UX, and the invariant-7 never-cache exclusions — is correct for a
+bounded read client and matches 2026 practice. The branch shipped the correct persistence mechanism:
+**`@tanstack/react-query` `^5.101.2` + `@tanstack/react-query-persist-client`** (`apps/mobile/package.json`),
+which is the current official pattern for backing TanStack Query with a persistent store. Amendment:
+
+1. **Zustand is decided but not yet a dependency.** §1 mandates Zustand for UI-only client state, but
+   `apps/mobile/package.json` has **no `zustand` dependency** today — the current surface's small UI state is
+   handled with React/component state. This is not a contradiction of the decision, but the ADR overstated
+   present reality. Amended to: **Zustand is the chosen store for UI-only client state and is adopted when a
+   genuine cross-component UI store is first needed; until then component/local state suffices.** The
+   reversibility argument in §6 (state library sits above the API client and SQLite) makes this deferral free.
+
+Otherwise no change. The single global release-stamp invalidation (vs per-artifact) disposition stands.
 
 ## Scaffold vs target
 

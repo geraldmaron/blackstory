@@ -1,9 +1,22 @@
 # Mobile threat model
 
-- **Bead**: `black-book-mobile-002` (MOB-002)
-- **Date**: 2026-07-19
-- **Status**: Proposed — independent red-team complete, awaiting owner acceptance
-- **Prepared by**: mobile-program-review (agent), pending owner and red-team sign-off
+- **Bead**: `black-book-mobile-002` (MOB-002); acceptance gate `repo-5os2`
+- **Date**: 2026-07-19 (accepted-with-amendments 2026-07-20)
+- **Status**: **Accepted (with amendments)** — 2026-07-20 adversarial review; owner authorized decision-making after review + research
+- **Prepared by**: mobile-program-review (agent); accepted under explicit owner authorization
+
+> **Adversarial review disposition (2026-07-20).** Accepted with two amendments, both reconciling stated
+> mitigations with verified repo/vendor reality:
+> - **T2 fail-open is only partially implemented.** Read fail-open holds for **static reads** but NOT for
+>   `expensive_read` (e.g. `/v1/search`): `@repo/security`'s quota matrix hard-denies unattested expensive
+>   reads with no App Check outage carve-out — a real contradiction, candidly flagged in
+>   `apps/mobile/src/security/app-check.ts` and tracked by **`repo-uqmm` (OPEN)**. See the amendment note in
+>   T2. This is a **remaining risk open by design** pending a platform-wide owner/security decision.
+> - **T6 code signing is a paid-EAS-plan feature.** EAS Update end-to-end code signing requires an EAS
+>   Production/Enterprise plan (docs.expo.dev/eas-update/code-signing), so on the free tier the T6 blast-radius
+>   controls are MFA custody + scoped CI token + staged rollout + rollback, and code signing is a cost-gated
+>   upgrade. Also, `expo-updates` is not yet installed in `apps/mobile`, so the OTA path itself is a pending
+>   MOB-019 task. See the amendment note in T6.
 
 ## Purpose and scope
 
@@ -51,7 +64,7 @@ inventing parallel controls. Named primitives cited below (see `packages/securit
 ### A note on referenced sibling ADRs
 
 The bead references ADR-022 (mobile state/cache/offline) and ADR-023 (mobile build/release) as the homes for two
-mitigations. **Both are now drafted in this same MOB-002 pass and carry `Status: Proposed`** (`docs/adr/ADR-022-*`,
+mitigations. **Both are drafted in this same MOB-002 pass and are now `Accepted (with amendments)` (2026-07-20)** (`docs/adr/ADR-022-*`,
 `docs/adr/ADR-023-*`); they are pending the same red-team + owner acceptance as this model. This model still
 **states each mitigation in its own words** so it stands alone, and the sibling ADRs ratify the mechanism: ADR-022
 §4 ratifies the release-invalidation stamp (T5/T7) and ADR-023 §2/§6 ratify OTA custody, code signing, staged
@@ -142,6 +155,17 @@ third-party hiccup into a full product outage and handing attackers a denial-of-
 rate-limiter's floor. Accepted: the content is public and non-sensitive, and rate limits + budget
 caps (T9) still bound exposure. Availability of the public corpus outranks maximal bot-resistance,
 consistent with ADR-010.
+
+**Amendment (2026-07-20) — fail-open is not fully implemented for expensive reads.** The mitigation above
+is implemented for **static reads**, but `@repo/security`'s `evaluateQuota` currently **hard-denies
+`expensive_read` (e.g. `/v1/search`) for callers without a verified App Check token, with no
+outage/degraded-mode carve-out** — so during a genuine App Check outage a legitimate client's *search* is
+denied, contradicting the fail-open intent stated here. This is verified in the shipped code and candidly
+noted in `apps/mobile/src/security/app-check.ts`. Because the fix is a **platform-wide** change to
+`packages/security` (shared with `apps/web`), it is an explicit owner/security decision, tracked by
+**`repo-uqmm` (OPEN)**. Until resolved, this threat's fail-open guarantee should be read as scoped to
+static reads; the client must surface the server's honest `429` for expensive reads rather than assume
+fail-open. **Remaining risk, open by design.**
 
 **Evidence to close.** MOB-010 test simulating App Check provider failure and asserting reads still
 succeed (as `anonymous`, rate-limited) rather than 4xx-lockout; MOB-021 chaos/game-day exercise
@@ -272,7 +296,7 @@ content is shown as "last updated {date}, may be out of date," never as freshly 
 **Evidence to close.** MOB-009 test advancing the server release stamp and asserting cached records
 from the prior stamp are dropped/refetched before render; MOB-016 end-to-end test publishing a
 retraction and confirming the mobile client stops presenting the retracted claim after its next
-online read; **ADR-022 drafted (Proposed)**, ratifying the stamp mechanism (§4).
+online read; **ADR-022 (Accepted with amendments, 2026-07-20)**, ratifying the stamp mechanism (§4).
 
 ---
 
@@ -295,9 +319,15 @@ mobile risk, because OTA reaches every device without a store gate.
   never embedded in the repo or CI logs.
 - **EAS Update code signing.** Enable EAS Update's code-signing feature so clients verify a
   signature on each update bundle against a key the publish credentials alone cannot forge; a
-  publish-credential theft without the signing key cannot ship an accepted bundle. (MOB-019 to
-  confirm current Expo SDK support and wire it; if unavailable on the chosen SDK, this becomes an
-  accepted risk documented at MOB-019 with compensating controls.)
+  publish-credential theft without the signing key cannot ship an accepted bundle. **Amendment
+  (2026-07-20):** code signing is supported on SDK 56 but is a **paid-plan feature** — "EAS Update Code
+  Signing is only available to accounts subscribed to the EAS Production or Enterprise plans"
+  (docs.expo.dev/eas-update/code-signing). On the free tier it is therefore **not** enabled by default;
+  the blast-radius controls below (MFA custody, scoped CI-only token, staged rollout, immutable-update
+  rollback) carry the risk, and enabling code signing is a **cost-gated upgrade trigger** (ADR-023 §7).
+  Additionally, `expo-updates` is **not yet installed** in `apps/mobile`, so the OTA path itself is a
+  pending MOB-019 task; until it is wired there is no OTA channel to compromise. **Remaining risk, open
+  by design** on the free tier.
 - **Channel/rollout discipline and rollback.** Updates go through preview → staged rollout, not an
   instant 100% production push (mirrors invariant 4: immutable artifacts, atomic activation, proven
   rollback). A malicious or bad update is revertible by re-pointing the channel to the last
@@ -311,7 +341,7 @@ Native-code changes still go through store review.
 
 **Evidence to close.** MOB-019 evidence that EAS publish requires MFA'd, CI-scoped credentials and
 (if supported) code-signing is enforced; a documented + drilled OTA rollback (MOB-021 rollback
-drill); **ADR-023 drafted (Proposed)** covering build/release/OTA custody and rollback (§2/§6).
+drill); **ADR-023 (Accepted with amendments, 2026-07-20)** covering build/release/OTA custody and rollback (§2/§6) — note the T6 code-signing/`expo-updates` amendment above and `repo-ovn7`.
 
 ---
 
@@ -433,8 +463,9 @@ runbook entry naming the single operator and the recovery path.
 | T9 | One-maintainer operational reality | MOB-018 (observability), MOB-021 (launch gate) | Mobile-API kill-switch + budget caps + automated soft-shutdown |
 | — | Overall adversarial sign-off | MOB-021 (launch gate) | Red-team review, abuse simulation, rollback drill converge here |
 
-*ADR-022 (mobile state/cache/offline) and ADR-023 (mobile build/release) are now drafted (`Status: Proposed`) in
-this MOB-002 pass; T5, T6, and T7 verified that they ratify — and do not weaken — the requirements stated above.*
+*ADR-022 (mobile state/cache/offline) and ADR-023 (mobile build/release) are `Accepted (with amendments)` (2026-07-20)
+from this MOB-002 pass; T5, T6, and T7 verified that they ratify — and do not weaken — the requirements stated above
+(T6's code-signing/`expo-updates` gap is amended above and tracked by `repo-ovn7`).*
 
 ---
 
