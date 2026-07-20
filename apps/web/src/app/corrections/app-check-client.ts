@@ -6,11 +6,11 @@
  */
 import { initializeApp, type FirebaseApp } from 'firebase/app';
 import {
-  getToken,
   initializeAppCheck,
   ReCaptchaEnterpriseProvider,
   type AppCheck,
 } from 'firebase/app-check';
+import { fetchAppCheckHeaders } from '../../lib/firebase/fetch-app-check-headers';
 
 let cachedAppCheck: AppCheck | undefined;
 
@@ -65,12 +65,5 @@ function getOrInitAppCheck(): AppCheck | undefined {
 }
 
 export async function getCorrectionAppCheckHeaders(): Promise<Readonly<Record<string, string>>> {
-  const appCheck = getOrInitAppCheck();
-  if (!appCheck) return {};
-  try {
-    const result = await getToken(appCheck);
-    return { 'X-Firebase-AppCheck': result.token };
-  } catch {
-    return {};
-  }
+  return fetchAppCheckHeaders(getOrInitAppCheck());
 }
