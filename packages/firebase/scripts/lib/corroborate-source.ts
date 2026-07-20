@@ -32,6 +32,29 @@ export type CorroboratingSource = {
   readonly method: 'citation_trail' | 'search';
 };
 
+/**
+ * SearXNG's own local capacity isn't the constraint — its upstream engines
+ * (Brave, DuckDuckGo, Google CSE, Startpage, Wikipedia) each enforce their
+ * OWN rate limits and will suspend within seconds of a concurrent burst,
+ * however many mapPool workers are calling this concurrently. A single
+ * healthy poll before a batch is not a reliable signal the engines can
+ * sustain that batch — observed directly: one query returned 19 results,
+ * then a 182-candidate run immediately re-suspended every engine. So every
+ * SearXNG query in this process is serialized through one queue with a hard
+ * minimum spacing, independent of caller concurrency.
+ */
+const SEARXNG_MIN_SPACING_MS = 4_000;
+let searxngQueue: Promise<void> = Promise.resolve();
+
+function throttledSearxngCall<T>(run: () => Promise<T>): Promise<T> {
+  const result = searxngQueue.then(run);
+  searxngQueue = result
+    .then(() => undefined)
+    .catch(() => undefined)
+    .then(() => new Promise((resolve) => setTimeout(resolve, SEARXNG_MIN_SPACING_MS)));
+  return result;
+}
+
 /** Checks a fetched page's own outbound links for a reachable Tier-1 hit. */
 async function findViaCitationTrail(html: string, baseUrl: string): Promise<CorroboratingSource | undefined> {
   const tier1Links = extractOutboundLinks(html, baseUrl).filter(isTier1Host);
@@ -42,26 +65,50 @@ async function findViaCitationTrail(html: string, baseUrl: string): Promise<Corr
   return undefined;
 }
 
-async function findViaSearch(
-  subjectName: string,
+async function searchAndFetch(
+  query: string,
   searxngBaseUrl: string,
+  pick: (results: readonly { readonly url: string; readonly title?: string }[]) => { readonly url: string; readonly title?: string } | undefined,
 ): Promise<CorroboratingSource | undefined> {
-  try {
-    const query = `"${subjectName}" (site:nps.gov OR site:loc.gov OR site:archives.gov OR site:si.edu OR site:census.gov)`;
-    const searchUrl = buildSearxngSearchUrl({ baseUrl: searxngBaseUrl, query });
-    // Fixed operator-configured endpoint, not attacker-controlled content — the
-    // RESULT urls it returns are untrusted and go through fetchPage below.
-    const response = await fetch(searchUrl, { signal: AbortSignal.timeout(15_000) });
-    if (!response.ok) return undefined;
-    const batch = parseSearxngSearchResponse(await response.json());
-    const tier1Hit = batch.results.find((result) => isTier1Host(result.url));
-    if (!tier1Hit) return undefined;
-    const page = await fetchPage(tier1Hit.url);
-    if (!page) return undefined;
-    return { url: tier1Hit.url, ...(tier1Hit.title ? { title: tier1Hit.title } : {}), text: page.text, method: 'search' };
-  } catch {
-    return undefined;
-  }
+  const hit = await throttledSearxngCall(async () => {
+    try {
+      const searchUrl = buildSearxngSearchUrl({ baseUrl: searxngBaseUrl, query });
+      // Fixed operator-configured endpoint, not attacker-controlled content — the
+      // RESULT urls it returns are untrusted and go through fetchPage below.
+      const response = await fetch(searchUrl, { signal: AbortSignal.timeout(15_000) });
+      if (!response.ok) return undefined;
+      const batch = parseSearxngSearchResponse(await response.json());
+      return pick(batch.results);
+    } catch {
+      return undefined;
+    }
+  });
+  if (!hit) return undefined;
+  const page = await fetchPage(hit.url);
+  if (!page) return undefined;
+  return { url: hit.url, ...(hit.title ? { title: hit.title } : {}), text: page.text, method: 'search' };
+}
+
+async function findViaSearch(subjectName: string, searxngBaseUrl: string): Promise<CorroboratingSource | undefined> {
+  const query = `"${subjectName}" (site:nps.gov OR site:loc.gov OR site:archives.gov OR site:si.edu OR site:census.gov)`;
+  return searchAndFetch(query, searxngBaseUrl, (results) => results.find((r) => isTier1Host(r.url)));
+}
+
+/**
+ * Broad (non-Tier-1-restricted) search for a subject with no known source at
+ * all yet — e.g. a gap-fill candidate discovered only as a name mentioned in
+ * another record's claim, not from a page of its own. Used as the PRIMARY
+ * lookup for such subjects, distinct from `findCorroboratingTier1Source`
+ * (which assumes a starting source already exists and looks for a second,
+ * independent one).
+ */
+export async function findAnySource(
+  subjectName: string,
+  options: { readonly searxngBaseUrl?: string } = {},
+): Promise<CorroboratingSource | undefined> {
+  const baseUrl = options.searxngBaseUrl ?? process.env.SEARXNG_BASE_URL;
+  if (!baseUrl) return undefined;
+  return searchAndFetch(`"${subjectName}"`, baseUrl, (results) => results[0]);
 }
 
 /**
