@@ -87,9 +87,12 @@ Handlers depend on the `PublicDataAccess` port (`data-access.ts`). Two adapters 
   `apps/web/src/lib/public-data/firestore-readers.ts`). Selected at boot by
   `createProductionHandlerDeps` (`./compose.ts`) when the live gate is true.
 
-**Live wiring gaps (honest, tracked in repo-rw1p):** timeline hydration (projection has no timeline
-field — always `[]` until release builder adds one), Firebase-emulator integration tests,
-independent reviewer sign-off on authorization/redaction/cost paths.
+**Live wiring gap (honest):** timeline hydration — the projection has no timeline field (always
+`[]` until the release builder adds one).
+
+**Fixed in repo-rw1p (closed 2026-07-20):** Firestore-emulator integration tests
+(`firestore-data-access.integration.test.ts`), load/cost read-budget report (`read-budget.md`), and
+independent adversarial reviewer sign-off on authorization/redaction/cost paths (PR #19).
 
 **Fixed in MOB-004 read-budget pass:** deterministic Firestore read counts per `/v1` endpoint with
 an injectable recording fake — see [`read-budget.md`](./read-budget.md).
@@ -165,8 +168,11 @@ Genuinely tested: ID enumeration (unpublished vs nonexistent → byte-identical 
 App Check on a read (served identically, fail-open), oversized query string (414), oversized request
 body (413), JSON depth bomb (`parseJsonWithDepthLimit` rejects), malformed entity id (400), search
 query injection (SQL/regex/field-selection denied via the shared guardrail), unbounded-array defense
-(response schema caps), and negative redaction snapshots (internal/ranking/precise-geo fields absent).
+(response schema caps), negative redaction snapshots (internal/ranking/precise-geo fields absent),
+T3 enumeration indistinguishability (`enumeration-indistinguishability.test.ts` — deterministic
+backend trace, no flaky wall-clock timing; emulator HTTP layer in
+`firestore-data-access.integration.test.ts`), and SSRF-through-citation/media-URL regression
+(`ssrf-url-safety.test.ts` — handler never server-fetches user-controlled URLs; malicious schemes
+rejected at the data-access port).
 
-Deferred: real Firestore-backed enumeration **timing** attacks and SSRF-through-citation/media-URL
-checks (no live media fetch path exists in this pass). Read budgets are documented in
-[`read-budget.md`](./read-budget.md).
+Read budgets and per-endpoint Firestore costs are documented in [`read-budget.md`](./read-budget.md).
