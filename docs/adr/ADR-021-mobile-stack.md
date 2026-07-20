@@ -52,13 +52,13 @@ official guidance and what the branch actually shipped (`apps/mobile` now exists
    it relaxes to a **bounded degraded quota** (`deriveOutageDegradedPolicy`, ~1/4 of anonymous caps, floored
    at 1, single concurrency) — never to free/unbounded access. `risk_score_exceeded` still fails closed during
    an outage (a real abuse signal, not mere token absence). Static reads were always ungated and remain so.
-   §3's fail-open language below is updated accordingly. Follow-up: distinguishing a genuine App Check outage
-   from one caller's missing token needs an operator/circuit input — `@repo/firebase`'s verifier-failure →
-   outage-signal auto-detection is a separate, smaller follow-up tracked by **`repo-vdnm`**.
+   §3's fail-open language below is updated accordingly. **Update 2026-07-20 (repo-vdnm resolved, CLOSED):**
+   `@repo/firebase`'s rolling-window verifier-failure circuit breaker and `apps/api-public`'s
+   `resolveAppCheckAvailability` provider now auto-emit `'outage'` on sustained verifier throws; manual
+   `APP_CHECK_OUTAGE_OVERRIDE` still wins when set (commit b94a990d / PR #19).
 
-No decision is reversed. Rejected alternatives stand. `repo-uqmm` is resolved and closed (2026-07-20); the
-only remaining open item from this thread is the smaller `@repo/firebase` verifier-outage auto-detection
-follow-up noted above.
+No decision is reversed. Rejected alternatives stand. `repo-uqmm` and `repo-vdnm` are both resolved and closed
+(2026-07-20).
 
 ## Scaffold vs target
 
@@ -203,9 +203,10 @@ enumeration/abuse defense); during a confirmed outage, the hard-deny relaxes to 
 (`deriveOutageDegradedPolicy`, ~1/4 of anonymous caps) rather than either a hard lockout or free access.
 `risk_score_exceeded` still fails closed on a genuine abuse spike even during an outage. The client should
 still treat a `429` as authoritative rather than assuming unlimited fail-open — the guarantee is bounded
-availability, not unlimited access. Follow-up: deriving the `'outage'` signal automatically from repeated
-verifier failures (rather than only an operator kill-switch) is a small remaining `@repo/firebase` circuit-
-breaker follow-up, tracked by **`repo-vdnm`**.
+availability, not unlimited access. **Update 2026-07-20 (repo-vdnm resolved, CLOSED):** automatic outage
+detection is live — `@repo/firebase`'s verifier-failure circuit breaker flips `appCheckAvailability` to
+`'outage'` on a sustained throw pattern; the operator `APP_CHECK_OUTAGE_OVERRIDE` env flag still takes
+precedence when set.
 
 ### 4. Local storage — `expo-sqlite`
 

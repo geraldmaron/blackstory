@@ -12,8 +12,9 @@
 >   reads with no App Check outage carve-out — a real contradiction, tracked by **`repo-uqmm`**. `repo-uqmm`
 >   is now **CLOSED**: `@repo/security` takes an explicit `appCheckAvailability` signal, and a confirmed outage
 >   now degrades `expensive_read` to a **bounded** quota instead of a hard deny (never free access). See the
->   amendment note in T2. A small follow-up (`repo-vdnm`) remains for auto-deriving the outage signal from
->   verifier failures rather than only an operator flag.
+>   amendment note in T2. **Update 2026-07-20 (repo-vdnm resolved, CLOSED):** `@repo/firebase`'s
+>   verifier-failure circuit breaker and `apps/api-public`'s availability resolver now auto-derive `'outage'`
+>   from sustained verifier throws; manual `APP_CHECK_OUTAGE_OVERRIDE` still wins when set (b94a990d / PR #19).
 > - **T6 code signing is a paid-EAS-plan feature.** EAS Update end-to-end code signing requires an EAS
 >   Production/Enterprise plan (docs.expo.dev/eas-update/code-signing), so on the free tier the T6 blast-radius
 >   controls are MFA custody + scoped CI token + staged rollout + rollback, and code signing is a cost-gated
@@ -152,6 +153,9 @@ third-party hiccup into a full product outage and handing attackers a denial-of-
   `risk_score_exceeded` denial), or the mobile kill-switch (T9) is engaged.
 - The `evaluateQuota` input already models this: `appCheckVerified` is an optional input and
   `missing_app_check` is a weighted risk signal, not a hard deny.
+- **Automatic outage detection (repo-vdnm, closed 2026-07-20).** Sustained App Check verifier failures
+  flip `appCheckAvailability` to `'outage'` via `@repo/firebase`'s circuit breaker wired through
+  `apps/api-public`; the operator `APP_CHECK_OUTAGE_OVERRIDE` flag still takes precedence when set.
 
 **Accepted risk.** During an App Check outage, automated-abuse cost temporarily drops to the
 rate-limiter's floor. Accepted: the content is public and non-sensitive, and rate limits + budget
