@@ -4,8 +4,17 @@
     "kind": "place",
     "displayName": "Mother Bethel AME Church",
     "summary": "Founded in 1794 by Richard Allen on land he purchased in 1791 — the oldest parcel in the United States continuously owned by Black Americans. The African Methodist Episcopal denomination was organized here in 1816, and the present 1890 sanctuary still seats an active congregation.",
-    "eraBuckets": ["1790s", "1810s", "1890s"],
-    "topicTags": ["church", "community", "abolition", "denomination-founding"],
+    "eraBuckets": [
+      "1790s",
+      "1810s",
+      "1890s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "abolition",
+      "denomination-founding"
+    ],
     "jurisdictionLabel": "Philadelphia, Pennsylvania",
     "locationPrecision": "institution",
     "locationLabel": "419 S. 6th Street at Lombard Street, Society Hill",
@@ -38,17 +47,32 @@
       }
     ],
     "historicalContext": "Independent Black congregations like Mother Bethel doubled as schools, mutual-aid societies, and organizing halls at a time when most civic institutions excluded Black Philadelphians.",
-    "topicIds": ["church", "community", "abolition", "denomination-founding"],
+    "topicIds": [
+      "church",
+      "community",
+      "abolition",
+      "denomination-founding"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mother_ame_zion_001",
     "kind": "place",
     "displayName": "Mother African Methodist Episcopal Zion Church",
     "summary": "Organized in 1796 by Black Methodists who left the segregated John Street Church, Mother Zion is New York City's oldest Black congregation and the mother church of the AME Zion denomination. Called the 'Freedom Church' for its Underground Railroad work, it built its present West 137th Street sanctuary in 1923-25 to a design by Black architect George W. Foster Jr.",
-    "eraBuckets": ["1790s", "1820s", "1920s"],
-    "topicTags": ["church", "community", "underground-railroad", "denomination-founding"],
+    "eraBuckets": [
+      "1790s",
+      "1820s",
+      "1920s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "underground-railroad",
+      "denomination-founding"
+    ],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "140-148 W. 137th Street between Lenox Avenue and Adam Clayton Powell Jr. Boulevard, Harlem",
@@ -73,17 +97,31 @@
       }
     ],
     "historicalContext": "New York's early Black churches were the city's first Black-controlled public institutions, organizing abolition campaigns, schools, and burial societies decades before emancipation in the state.",
-    "topicIds": ["church", "community", "underground-railroad", "denomination-founding"],
+    "topicIds": [
+      "church",
+      "community",
+      "underground-railroad",
+      "denomination-founding"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_first_baptist_petersburg_001",
     "kind": "place",
     "displayName": "First Baptist Church of Petersburg",
     "summary": "Organized in 1774 from a body of Black Baptists worshipping in Prince George County since the 1750s, First Baptist is among the oldest Black congregations in North America. Settled on Harrison Street in Petersburg by 1820, it ran one of the nation's earliest schools for Black children and remained an organizing base into the civil rights era.",
-    "eraBuckets": ["1770s", "1820s", "1960s"],
-    "topicTags": ["church", "community", "education"],
+    "eraBuckets": [
+      "1770s",
+      "1820s",
+      "1960s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "education"
+    ],
     "jurisdictionLabel": "Petersburg, Virginia",
     "locationPrecision": "institution",
     "locationLabel": "236 Harrison Street, Poplar Lawn area, Petersburg",
@@ -108,17 +146,29 @@
       }
     ],
     "historicalContext": "Petersburg held the largest free Black population in the antebellum South, and its churches were the community's schools, credit networks, and political meeting grounds.",
-    "topicIds": ["church", "community", "education"],
+    "topicIds": [
+      "church",
+      "community",
+      "education"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_first_african_baptist_savannah_001",
     "kind": "place",
     "displayName": "First African Baptist Church",
     "summary": "Tracing its organization to 1773 under Rev. George Leile at Brampton Plantation, First African Baptist is among the oldest Black congregations in North America. Its Franklin Square sanctuary, completed in 1859, was built of Savannah Grey brick by congregants both free and enslaved.",
-    "eraBuckets": ["1770s", "1850s"],
-    "topicTags": ["church", "community", "founding-era"],
+    "eraBuckets": [
+      "1770s",
+      "1850s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "founding-era"
+    ],
     "jurisdictionLabel": "Savannah, Georgia",
     "locationPrecision": "institution",
     "locationLabel": "23 Montgomery Street on Franklin Square, Savannah Historic District",
@@ -175,17 +225,30 @@
       }
     ],
     "historicalContext": "Savannah's early Black Baptist congregations organized under slavery and built institutions — schools, missionary networks, and later a church-housed credit union — that outlasted it.",
-    "topicIds": ["church", "community", "founding-era"],
+    "topicIds": [
+      "church",
+      "community",
+      "founding-era"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_african_meeting_house_001",
     "kind": "place",
     "displayName": "African Meeting House",
     "summary": "Built in 1806 by Boston's free Black community on the north slope of Beacon Hill, the African Meeting House is the oldest surviving Black church building in the United States. It housed a church and school and hosted the founding of the New England Anti-Slavery Society in 1832; Frederick Douglass and Maria Stewart spoke from its pulpit.",
-    "eraBuckets": ["1800s", "1830s"],
-    "topicTags": ["church", "community", "abolition", "education"],
+    "eraBuckets": [
+      "1800s",
+      "1830s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "abolition",
+      "education"
+    ],
     "jurisdictionLabel": "Boston, Massachusetts",
     "locationPrecision": "institution",
     "locationLabel": "8 Smith Court off Joy Street, north slope of Beacon Hill",
@@ -210,17 +273,32 @@
       }
     ],
     "historicalContext": "Known as the 'Black Faneuil Hall,' the Meeting House shows how a single congregation's building could serve an entire community as church, school, and political assembly.",
-    "topicIds": ["church", "community", "abolition", "education"],
+    "topicIds": [
+      "church",
+      "community",
+      "abolition",
+      "education"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_abyssinian_baptist_001",
     "kind": "place",
     "displayName": "Abyssinian Baptist Church",
     "summary": "Founded in 1808 when Black worshippers left First Baptist Church of New York over segregated seating, Abyssinian moved uptown to its Gothic and Tudor sanctuary on West 138th Street in 1923. Under Adam Clayton Powell Sr. and Jr. it grew into one of the country's largest congregations and a base for Harlem's political life.",
-    "eraBuckets": ["1800s", "1920s", "1940s"],
-    "topicTags": ["church", "community", "civil-rights", "harlem"],
+    "eraBuckets": [
+      "1800s",
+      "1920s",
+      "1940s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "civil-rights",
+      "harlem"
+    ],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "132 W. 138th Street (Odell Clark Place), Harlem",
@@ -252,8 +330,15 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": ["church", "community", "civil-rights", "harlem"],
-    "mentionedEntityIds": ["ent_adam_clayton_powell_001"],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "harlem"
+    ],
+    "mentionedEntityIds": [
+      "ent_adam_clayton_powell_001"
+    ],
     "keywords": []
   },
   {
@@ -261,8 +346,17 @@
     "kind": "place",
     "displayName": "Emanuel African Methodist Episcopal Church (Mother Emanuel)",
     "summary": "Founded in 1816 by free and enslaved Black Charlestonians led by Morris Brown, Emanuel is the oldest AME congregation in the South. Forced underground when Black churches were outlawed in 1834, it reorganized openly in 1865 and raised its Gothic Revival sanctuary on Calhoun Street in 1891, anchoring over two centuries of worship and civic leadership.",
-    "eraBuckets": ["1810s", "1890s", "2010s"],
-    "topicTags": ["church", "community", "civil-rights", "resilience"],
+    "eraBuckets": [
+      "1810s",
+      "1890s",
+      "2010s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "civil-rights",
+      "resilience"
+    ],
     "jurisdictionLabel": "Charleston, South Carolina",
     "locationPrecision": "institution",
     "locationLabel": "110 Calhoun Street, downtown Charleston",
@@ -288,17 +382,32 @@
       }
     ],
     "historicalContext": "Charleston's Black congregations preserved community, learning, and organized resistance through the era of slavery and after; Emanuel's two-century record made it a civic anchor for the Lowcountry.",
-    "topicIds": ["church", "community", "civil-rights", "resilience"],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "resilience"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_sixteenth_street_baptist_001",
     "kind": "place",
     "displayName": "Sixteenth Street Baptist Church",
     "summary": "Organized in 1873 as the First Colored Baptist Church of Birmingham, the congregation built its landmark sanctuary in 1909-11 to a design by Black architect Wallace A. Rayfield. A century-long center of Black civic life, it hosted W.E.B. Du Bois and Mary McLeod Bethune and served as a staging ground for the 1963 Birmingham campaign.",
-    "eraBuckets": ["1870s", "1900s", "1960s"],
-    "topicTags": ["church", "community", "civil-rights", "black-architects"],
+    "eraBuckets": [
+      "1870s",
+      "1900s",
+      "1960s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "civil-rights",
+      "black-architects"
+    ],
     "jurisdictionLabel": "Birmingham, Alabama",
     "locationPrecision": "institution",
     "locationLabel": "1530 6th Avenue North at 16th Street, Birmingham Civil Rights District",
@@ -331,8 +440,15 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": ["church", "community", "civil-rights", "black-architects"],
-    "mentionedEntityIds": ["ent_law_ku_klux_klan_act_1871"],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "black-architects"
+    ],
+    "mentionedEntityIds": [
+      "ent_law_ku_klux_klan_act_1871"
+    ],
     "keywords": []
   },
   {
@@ -340,8 +456,17 @@
     "kind": "place",
     "displayName": "Ebenezer Baptist Church",
     "summary": "Founded in 1886 by Rev. John A. Parker with eight members, Ebenezer built its Auburn Avenue heritage sanctuary in 1922. Martin Luther King Jr. was baptized and ordained here and served as co-pastor from 1960 to 1968; his funeral was held in the sanctuary, now preserved within Martin Luther King Jr. National Historical Park.",
-    "eraBuckets": ["1880s", "1920s", "1960s"],
-    "topicTags": ["church", "community", "civil-rights", "sweet-auburn"],
+    "eraBuckets": [
+      "1880s",
+      "1920s",
+      "1960s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "civil-rights",
+      "sweet-auburn"
+    ],
     "jurisdictionLabel": "Atlanta, Georgia",
     "locationPrecision": "institution",
     "locationLabel": "407 Auburn Avenue NE, Sweet Auburn",
@@ -373,8 +498,15 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": ["church", "community", "civil-rights", "sweet-auburn"],
-    "mentionedEntityIds": ["ent_martin_luther_king_jr_001"],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "sweet-auburn"
+    ],
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001"
+    ],
     "keywords": []
   },
   {
@@ -382,8 +514,17 @@
     "kind": "place",
     "displayName": "Dexter Avenue King Memorial Baptist Church",
     "summary": "Organized in 1877 by formerly enslaved Montgomerians, the congregation completed its brick church a block from the Alabama Capitol in 1889. Martin Luther King Jr. served as pastor from 1954 to 1960, and the Montgomery bus boycott was coordinated from its basement beginning in December 1955; it was named a National Historic Landmark in 1974.",
-    "eraBuckets": ["1870s", "1880s", "1950s"],
-    "topicTags": ["church", "community", "civil-rights", "montgomery-bus-boycott"],
+    "eraBuckets": [
+      "1870s",
+      "1880s",
+      "1950s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "civil-rights",
+      "montgomery-bus-boycott"
+    ],
     "jurisdictionLabel": "Montgomery, Alabama",
     "locationPrecision": "institution",
     "locationLabel": "454 Dexter Avenue, one block from the Alabama State Capitol",
@@ -413,13 +554,21 @@
         "id": "ent_montgomery_bus_boycott_001",
         "type": "related_to",
         "direction": "incoming"
+      },
+      {
+        "id": "ent_montgomery_bus_boycott_001",
+        "type": "occurred_at",
+        "direction": "incoming"
       }
     ],
-    "topicIds": ["church", "community", "civil-rights"],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights"
+    ],
     "mentionedEntityIds": [
       "ent_martin_luther_king_jr_001",
-      "ent_montgomery_bus_boycott_001",
-      "montgomery-bus-boycott"
+      "ent_montgomery_bus_boycott_001"
     ],
     "keywords": []
   },
@@ -428,8 +577,17 @@
     "kind": "place",
     "displayName": "Brown Chapel AME Church",
     "summary": "Founded in 1866, Brown Chapel raised its twin-towered Romanesque Revival sanctuary in 1908 under Black builder A. J. Farley. In early 1965 it was headquarters for the Selma voting rights campaign: the March 7 'Bloody Sunday' march stepped off from its doors, and the completed Selma-to-Montgomery march followed on March 21.",
-    "eraBuckets": ["1860s", "1900s", "1960s"],
-    "topicTags": ["church", "community", "civil-rights", "voting-rights"],
+    "eraBuckets": [
+      "1860s",
+      "1900s",
+      "1960s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "civil-rights",
+      "voting-rights"
+    ],
     "jurisdictionLabel": "Selma, Alabama",
     "locationPrecision": "institution",
     "locationLabel": "410 Martin Luther King Street, near the George Washington Carver Homes",
@@ -461,7 +619,12 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": ["church", "community", "civil-rights", "voting-rights"],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "voting-rights"
+    ],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -470,8 +633,17 @@
     "kind": "place",
     "displayName": "Quinn Chapel AME Church",
     "summary": "Chicago's first Black congregation began as an 1844 prayer group and organized in 1847 as Quinn Chapel AME. It sheltered freedom seekers on the Underground Railroad before the Civil War, lost its first building to the 1871 fire, and completed its present Wabash Avenue sanctuary in 1892; it was listed on the National Register in 1979.",
-    "eraBuckets": ["1840s", "1850s", "1890s"],
-    "topicTags": ["church", "community", "underground-railroad", "abolition"],
+    "eraBuckets": [
+      "1840s",
+      "1850s",
+      "1890s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "underground-railroad",
+      "abolition"
+    ],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "2401 S. Wabash Avenue, Near South Side",
@@ -503,7 +675,12 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": ["church", "community", "underground-railroad", "abolition"],
+    "topicIds": [
+      "church",
+      "community",
+      "underground-railroad",
+      "abolition"
+    ],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -512,8 +689,17 @@
     "kind": "place",
     "displayName": "Big Bethel AME Church",
     "summary": "Formed in 1847 by enslaved members of Atlanta's first congregation, Big Bethel is the city's oldest congregation. It hosted Gate City Colored School, Atlanta's first public school for Black children, in 1879, and Morris Brown College held its first classes in the church's basement in 1885; its 'Jesus Saves' steeple still marks Auburn Avenue.",
-    "eraBuckets": ["1840s", "1870s", "1880s"],
-    "topicTags": ["church", "community", "education", "sweet-auburn"],
+    "eraBuckets": [
+      "1840s",
+      "1870s",
+      "1880s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "education",
+      "sweet-auburn"
+    ],
     "jurisdictionLabel": "Atlanta, Georgia",
     "locationPrecision": "institution",
     "locationLabel": "220 Auburn Avenue NE, Sweet Auburn",
@@ -545,7 +731,12 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": ["church", "community", "education", "sweet-auburn"],
+    "topicIds": [
+      "church",
+      "community",
+      "education",
+      "sweet-auburn"
+    ],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -554,8 +745,17 @@
     "kind": "place",
     "displayName": "Metropolitan AME Church",
     "summary": "Founded in 1838 as Union Bethel AME, the congregation dedicated its brick Gothic Revival sanctuary on M Street NW in 1886. Frederick Douglass's funeral was held here in 1895 and Rosa Parks's in 2005, sustaining its standing as the 'National Cathedral of African Methodism' a few blocks from the White House.",
-    "eraBuckets": ["1830s", "1880s", "1890s"],
-    "topicTags": ["church", "community", "civil-rights", "national-capital"],
+    "eraBuckets": [
+      "1830s",
+      "1880s",
+      "1890s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "civil-rights",
+      "national-capital"
+    ],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "1518 M Street NW, downtown Washington",
@@ -580,17 +780,32 @@
       }
     ],
     "historicalContext": "In the capital, Black congregations stood as visible civic institutions within sight of federal power, hosting the funerals, conventions, and protests that marked national Black political life.",
-    "topicIds": ["church", "community", "civil-rights", "national-capital"],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "national-capital"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_st_augustine_catholic_nola_001",
     "kind": "place",
     "displayName": "St. Augustine Catholic Church",
     "summary": "Established in 1841 by free people of color in Faubourg Tremé and dedicated in 1842, St. Augustine is regarded as the oldest Black Catholic parish in the United States. Its founders purchased pews for enslaved worshippers to use; parishioners have included Homer Plessy, and the Tomb of the Unknown Slave was dedicated on its grounds in 2004.",
-    "eraBuckets": ["1840s", "1890s", "2000s"],
-    "topicTags": ["church", "community", "free-people-of-color", "treme"],
+    "eraBuckets": [
+      "1840s",
+      "1890s",
+      "2000s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "free-people-of-color",
+      "treme"
+    ],
     "jurisdictionLabel": "New Orleans, Louisiana",
     "locationPrecision": "institution",
     "locationLabel": "1210 Governor Nicholls Street, Faubourg Tremé",
@@ -622,8 +837,15 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": ["church", "community", "free-people-of-color", "treme"],
-    "mentionedEntityIds": ["ent_treme_001"],
+    "topicIds": [
+      "church",
+      "community",
+      "free-people-of-color",
+      "treme"
+    ],
+    "mentionedEntityIds": [
+      "ent_treme_001"
+    ],
     "keywords": []
   },
   {
@@ -631,8 +853,17 @@
     "kind": "place",
     "displayName": "Vernon AME Church",
     "summary": "Founded in 1905 in Tulsa's Greenwood District, Vernon AME had completed its basement in 1919 when the 1921 Tulsa Race Massacre destroyed the sanctuary rising above it. The congregation worshipped in the surviving basement and rebuilt through the 1920s; it is Greenwood's only intact Black-owned structure from the Black Wall Street era, listed on the National Register in 2018.",
-    "eraBuckets": ["1900s", "1920s", "2010s"],
-    "topicTags": ["church", "community", "greenwood", "resilience"],
+    "eraBuckets": [
+      "1900s",
+      "1920s",
+      "2010s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "greenwood",
+      "resilience"
+    ],
     "jurisdictionLabel": "Tulsa, Oklahoma",
     "locationPrecision": "institution",
     "locationLabel": "311 N. Greenwood Avenue, Greenwood District",
@@ -665,7 +896,12 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": ["church", "community", "greenwood", "resilience"],
+    "topicIds": [
+      "church",
+      "community",
+      "greenwood",
+      "resilience"
+    ],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -674,8 +910,17 @@
     "kind": "place",
     "displayName": "Clayborn Temple",
     "summary": "Completed in the early 1890s for Second Presbyterian Church and purchased by an AME congregation in 1949, Clayborn Temple anchored the 1968 Memphis sanitation workers' strike: the 'I AM A MAN' placards were printed there and daily marches to City Hall left from its doors. Largely destroyed by fire in April 2025 during restoration, its preservation effort continues.",
-    "eraBuckets": ["1890s", "1940s", "1960s"],
-    "topicTags": ["church", "community", "civil-rights", "labor"],
+    "eraBuckets": [
+      "1890s",
+      "1940s",
+      "1960s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "civil-rights",
+      "labor"
+    ],
     "jurisdictionLabel": "Memphis, Tennessee",
     "locationPrecision": "institution",
     "locationLabel": "294 Hernando Street at Pontotoc Avenue, south of Beale Street downtown",
@@ -707,7 +952,12 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": ["church", "community", "civil-rights", "labor"],
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "labor"
+    ],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -716,8 +966,19 @@
     "kind": "place",
     "displayName": "Laurel Grove South Cemetery",
     "summary": "Opened in 1853 when Savannah reserved land at Laurel Grove for African American burials, this 90-acre municipal cemetery replaced older Black graveyards displaced by the city's expanding square plan. More free African Americans were interred here during slavery than at any other cemetery in the Southeast, and its stones record pastors, educators, and civil-rights figures across two centuries.",
-    "eraBuckets": ["1850s", "1860s", "1870s", "1880s", "1890s", "1900s"],
-    "topicTags": ["cemetery", "community", "burial-ground"],
+    "eraBuckets": [
+      "1850s",
+      "1860s",
+      "1870s",
+      "1880s",
+      "1890s",
+      "1900s"
+    ],
+    "topicTags": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
     "jurisdictionLabel": "Savannah, Georgia",
     "locationPrecision": "site",
     "locationLabel": "2101 Kollock Street at the west end of 37th Street, Laurel Grove South",
@@ -742,17 +1003,34 @@
       }
     ],
     "historicalContext": "When Savannah's older Black cemeteries closed, Laurel Grove South became the principal burial ground for both enslaved and free African Americans, making its surviving markers one of the richest public archives of Black life in the antebellum and Jim Crow South.",
-    "topicIds": ["cemetery", "community", "burial-ground"],
+    "topicIds": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_evergreen_cemetery_richmond_001",
     "kind": "place",
     "displayName": "Evergreen Cemetery",
     "summary": "Founded in 1891 by Richmond's Evergreen Cemetery Association, this 59-acre African American burial ground was designed as a Jim Crow-era counterpart to white-only Hollywood Cemetery. Its hills hold thousands of markers — including those of Maggie L. Walker and John Mitchell Jr. — and the site is listed on the National Register of Historic Places.",
-    "eraBuckets": ["1890s", "1900s", "1910s", "1920s", "1930s", "1940s", "1950s"],
-    "topicTags": ["cemetery", "community", "burial-ground"],
+    "eraBuckets": [
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s"
+    ],
+    "topicTags": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
     "jurisdictionLabel": "Richmond, Virginia",
     "locationPrecision": "site",
     "locationLabel": "50 Evergreen Road, East End, Richmond",
@@ -777,17 +1055,38 @@
       }
     ],
     "historicalContext": "Evergreen and its neighboring East End Cemetery formed one of the largest African American-controlled cemetery groupings in the South, giving Black Richmonders a landscaped place to bury fraternal leaders, educators, and entrepreneurs when white cemeteries remained closed to them.",
-    "topicIds": ["cemetery", "community", "burial-ground"],
-    "mentionedEntityIds": ["ent_east_end_cemetery_richmond_001", "ent_maggie_l_walker_001"],
-    "keywords": []
+    "topicIds": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
+    "mentionedEntityIds": [
+      "ent_east_end_cemetery_richmond_001",
+      "ent_maggie_l_walker_001"
+    ],
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_east_end_cemetery_richmond_001",
     "kind": "place",
     "displayName": "East End Cemetery",
     "summary": "Organized in 1897 by Richmond's East End Memorial Burial Association, this 16-acre African American cemetery straddles the city–Henrico County line beside Evergreen Cemetery. An estimated 17,500 people rest here, and the City of Richmond now stewards the site after decades of volunteer reclamation from neglect.",
-    "eraBuckets": ["1890s", "1900s", "1910s", "1920s", "1930s", "1940s", "1950s", "1960s"],
-    "topicTags": ["cemetery", "community", "burial-ground"],
+    "eraBuckets": [
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
     "jurisdictionLabel": "Richmond, Virginia",
     "locationPrecision": "site",
     "locationLabel": "50 Evergreen Road vicinity, East End (adjacent to Evergreen Cemetery)",
@@ -812,17 +1111,36 @@
       }
     ],
     "historicalContext": "During Jim Crow, East End gave Black Richmond families a public arena for memorial art and fraternal display; after years of abandonment, community volunteers mapped thousands of markers to recover names that otherwise existed only in family memory.",
-    "topicIds": ["cemetery", "community", "burial-ground"],
-    "mentionedEntityIds": ["ent_evergreen_cemetery_richmond_001"],
-    "keywords": []
+    "topicIds": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
+    "mentionedEntityIds": [
+      "ent_evergreen_cemetery_richmond_001"
+    ],
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_african_cemetery_no2_lexington_001",
     "kind": "place",
     "displayName": "African Cemetery No. 2",
     "summary": "Chartered in 1869 by Lexington's Union Benevolent Society No. 2, this 7.7-acre cemetery is the earliest burial ground in the city organized, owned, and managed by African Americans. Its graves include United States Colored Troops veterans, educators, and horse-racing workers such as Kentucky Derby jockey Isaac Murphy.",
-    "eraBuckets": ["1860s", "1870s", "1880s", "1890s", "1900s", "1910s", "1920s"],
-    "topicTags": ["cemetery", "community", "burial-ground"],
+    "eraBuckets": [
+      "1860s",
+      "1870s",
+      "1880s",
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
     "jurisdictionLabel": "Lexington, Kentucky",
     "locationPrecision": "site",
     "locationLabel": "419 East Seventh Street, Lexington",
@@ -847,17 +1165,35 @@
       }
     ],
     "historicalContext": "The cemetery's charter required the land be held solely for burial, making it a durable expression of mutual aid in a Bluegrass city where Black benevolent societies also funded schools, fairs, and orphan care.",
-    "topicIds": ["cemetery", "community", "burial-ground"],
+    "topicIds": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mount_auburn_cemetery_baltimore_001",
     "kind": "place",
     "displayName": "Mount Auburn Cemetery",
     "summary": "Dedicated in 1872 by Sharp Street Memorial United Methodist Church and originally called \"The City of the Dead for Colored People,\" Mount Auburn is Baltimore's oldest surviving African American cemetery still owned by a Black congregation. More than 55,000 people are interred across its 34 acres, and the site is listed on the National Register.",
-    "eraBuckets": ["1870s", "1880s", "1890s", "1900s", "1910s", "1920s", "1930s", "1940s"],
-    "topicTags": ["cemetery", "community", "burial-ground"],
+    "eraBuckets": [
+      "1870s",
+      "1880s",
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
     "jurisdictionLabel": "Baltimore, Maryland",
     "locationPrecision": "site",
     "locationLabel": "2614 Annapolis Road, Westport / Mount Winans, Baltimore",
@@ -882,17 +1218,34 @@
       }
     ],
     "historicalContext": "Until Baltimore's cemeteries desegregated, Mount Auburn may have been the only burial site available to many Black families, making its monuments a ledger of church members, Civil War veterans, and civil-rights-era community leaders.",
-    "topicIds": ["cemetery", "community", "burial-ground"],
+    "topicIds": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_union_baptist_cemetery_cincinnati_001",
     "kind": "place",
     "displayName": "Union Baptist Cemetery",
     "summary": "Established in 1864 by Union Baptist Church — Cincinnati's oldest African American Baptist congregation — this Price Hill burial ground was among the only places Black residents could be interred in the city during the Civil War era. The cemetery district is listed on the National Register and holds veterans of the United States Colored Troops.",
-    "eraBuckets": ["1860s", "1870s", "1880s", "1890s", "1900s", "1910s", "1920s"],
-    "topicTags": ["cemetery", "community", "burial-ground"],
+    "eraBuckets": [
+      "1860s",
+      "1870s",
+      "1880s",
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
     "jurisdictionLabel": "Cincinnati, Ohio",
     "locationPrecision": "site",
     "locationLabel": "4933 Cleves Warsaw Pike, Price Hill, Cincinnati",
@@ -917,17 +1270,34 @@
       }
     ],
     "historicalContext": "Church-owned cemeteries like Union Baptist linked worship, mutual aid, and burial rights on the Ohio River, preserving names of Underground Railroad participants and USCT soldiers when public records were thin.",
-    "topicIds": ["cemetery", "community", "burial-ground"],
+    "topicIds": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_gospel_pilgrim_cemetery_athens_001",
     "kind": "place",
     "displayName": "Gospel Pilgrim Cemetery",
     "summary": "Founded in 1882 by the Gospel Pilgrim Society, a Black fraternal burial-insurance organization, this ten-acre Athens cemetery served African Americans who sought graves outside church-owned plots. An estimated 3,500 people rest here, including state legislator Madison Davis and quilt artist Harriet Powers, and the site is on the National Register.",
-    "eraBuckets": ["1880s", "1890s", "1900s", "1910s", "1920s", "1930s", "1940s"],
-    "topicTags": ["cemetery", "community", "burial-ground"],
+    "eraBuckets": [
+      "1880s",
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
     "jurisdictionLabel": "Athens, Georgia",
     "locationPrecision": "site",
     "locationLabel": "530 Fourth Street, East Athens",
@@ -952,17 +1322,31 @@
       }
     ],
     "historicalContext": "Gospel Pilgrim illustrates how post-emancipation benevolent societies pooled dues for dignified burials, creating cemeteries that doubled as outdoor archives of Black craft, politics, and faith in the Georgia piedmont.",
-    "topicIds": ["cemetery", "community", "burial-ground"],
+    "topicIds": [
+      "cemetery",
+      "community",
+      "burial-ground"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_shiloh_baptist_old_site_fredericksburg_001",
     "kind": "place",
     "displayName": "Shiloh Baptist Church (Old Site)",
     "summary": "Tracing its congregation to the 1850s and housed since 1890 in a brick Classical Revival sanctuary on the Rappahannock River, Shiloh (Old Site) is among Fredericksburg's oldest African American churches. Listed on the National Register in 2015, it supported Black schools and later produced the city's first Black mayor, Lawrence A. Davies.",
-    "eraBuckets": ["1850s", "1890s", "1960s", "1970s"],
-    "topicTags": ["church", "community", "education"],
+    "eraBuckets": [
+      "1850s",
+      "1890s",
+      "1960s",
+      "1970s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "education"
+    ],
     "jurisdictionLabel": "Fredericksburg, Virginia",
     "locationPrecision": "institution",
     "locationLabel": "801 Sophia Street at Hanover Street, downtown Fredericksburg",
@@ -987,17 +1371,29 @@
       }
     ],
     "historicalContext": "Riverfront Black congregations like Shiloh anchored Fredericksburg's free and freed communities with schools and civic leadership long before the city elected its first African American officials in the 1970s.",
-    "topicIds": ["church", "community", "education"],
+    "topicIds": [
+      "church",
+      "community",
+      "education"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_allen_chapel_ame_fort_worth_001",
     "kind": "place",
     "displayName": "Allen Chapel AME Church",
     "summary": "Completed in 1914, Allen Chapel's Tudor Gothic Revival sanctuary was designed by William Sidney Pittman — architect and son-in-law of Booker T. Washington — for one of Fort Worth's oldest Black congregations. The building is listed on the National Register and stands as a landmark of early-twentieth-century African American church architecture in Texas.",
-    "eraBuckets": ["1910s", "1920s"],
-    "topicTags": ["church", "community", "architecture"],
+    "eraBuckets": [
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "architecture"
+    ],
     "jurisdictionLabel": "Fort Worth, Texas",
     "locationPrecision": "institution",
     "locationLabel": "116 Elm Street at East 1st Street, Sundance Square",
@@ -1022,17 +1418,34 @@
       }
     ],
     "historicalContext": "Urban southern AME churches like Allen Chapel doubled as meeting halls and cultural anchors in segregated Fort Worth, and Pittman's design linked the congregation to a national network of Black architects trained at Tuskegee.",
-    "topicIds": ["church", "community", "architecture"],
-    "mentionedEntityIds": ["ent_tuskegee_university_001"],
-    "keywords": []
+    "topicIds": [
+      "church",
+      "community",
+      "architecture"
+    ],
+    "mentionedEntityIds": [
+      "ent_tuskegee_university_001"
+    ],
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_bethel_ame_indianapolis_001",
     "kind": "place",
     "displayName": "Bethel A.M.E. Church (Indianapolis)",
     "summary": "Organized in 1836, Bethel is Indianapolis's oldest African American congregation and occupied its West Vermont Street sanctuary from 1869 until 2016. The Romanesque church served as an Underground Railroad stop and later ran kindergarten, credit-union, and health programs for the city's Black community, and it is listed on the National Register.",
-    "eraBuckets": ["1830s", "1860s", "1870s", "1890s", "1900s"],
-    "topicTags": ["church", "community", "underground-railroad"],
+    "eraBuckets": [
+      "1830s",
+      "1860s",
+      "1870s",
+      "1890s",
+      "1900s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "underground-railroad"
+    ],
     "jurisdictionLabel": "Indianapolis, Indiana",
     "locationPrecision": "institution",
     "locationLabel": "414 West Vermont Street, near Indiana Avenue",
@@ -1057,17 +1470,30 @@
       }
     ],
     "historicalContext": "Bethel anchored Indianapolis's near-westside Black community through Reconstruction, the Great Migration, and urban renewal, linking AME discipline to mutual aid institutions that outlasted the original sanctuary.",
-    "topicIds": ["church", "community", "underground-railroad"],
+    "topicIds": [
+      "church",
+      "community",
+      "underground-railroad"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_st_philips_episcopal_harlem_001",
     "kind": "place",
     "displayName": "St. Philip's Episcopal Church",
     "summary": "Founded in 1809 as the Free African Church of St. Philip, this Harlem parish is New York City's oldest Black Episcopal congregation. Its 1910–1911 neo-Gothic sanctuary at West 134th Street was designed by the Black architectural firm Tandy and Foster and is listed on the National Register.",
-    "eraBuckets": ["1800s", "1910s", "1920s"],
-    "topicTags": ["church", "community", "architecture"],
+    "eraBuckets": [
+      "1800s",
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "architecture"
+    ],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "210–216 West 134th Street, Harlem",
@@ -1092,17 +1518,30 @@
       }
     ],
     "historicalContext": "St. Philip's move to Harlem preceded much of the neighborhood's Black population shift, making the parish both a spiritual home and a prestige address for African American elites who shaped Harlem's twentieth-century politics and culture.",
-    "topicIds": ["church", "community", "architecture"],
+    "topicIds": [
+      "church",
+      "community",
+      "architecture"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_butler_street_cme_atlanta_001",
     "kind": "place",
     "displayName": "Butler Street CME Church",
     "summary": "Built about 1920 in Late Gothic Revival style near Auburn Avenue, Butler Street Colored Methodist Episcopal Church is a National Register landmark of downtown Atlanta's Black institutional corridor. The historic building at Jesse Hill Jr. Drive SE remains a documented worship site though the congregation also meets on Martin Luther King Jr. Drive.",
-    "eraBuckets": ["1920s", "1930s", "1940s"],
-    "topicTags": ["church", "community", "architecture"],
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "architecture"
+    ],
     "jurisdictionLabel": "Atlanta, Georgia",
     "locationPrecision": "institution",
     "locationLabel": "23 Jesse Hill Jr. Drive SE (historic Butler Street site), Sweet Auburn area",
@@ -1127,17 +1566,32 @@
       }
     ],
     "historicalContext": "CME congregations like Butler Street lined Auburn Avenue's church row, giving working-class Atlantans sanctuaries within walking distance of the rail jobs and retail that defined Black downtown life before suburbanization.",
-    "topicIds": ["church", "community", "architecture"],
+    "topicIds": [
+      "church",
+      "community",
+      "architecture"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mount_zion_ame_woolwich_001",
     "kind": "place",
     "displayName": "Mount Zion AME Church and Cemetery",
     "summary": "Founded in 1799 in the Quaker-sponsored free Black settlement of Small Gloucester, Mount Zion AME Church and its quarter-acre cemetery were listed together on the National Register in 2001. The 1834 sanctuary served as an Underground Railroad station on the Greenwich Line, with a vestibule trap door leading to a crawlspace hideaway.",
-    "eraBuckets": ["1790s", "1830s", "1850s", "1860s"],
-    "topicTags": ["church", "cemetery", "underground-railroad", "community"],
+    "eraBuckets": [
+      "1790s",
+      "1830s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "church",
+      "cemetery",
+      "underground-railroad",
+      "community"
+    ],
     "jurisdictionLabel": "Woolwich Township, New Jersey",
     "locationPrecision": "institution",
     "locationLabel": "172 Garwin Road, Small Gloucester, Woolwich Township",
@@ -1162,17 +1616,31 @@
       }
     ],
     "historicalContext": "South Jersey's free Black hamlets linked Quaker abolitionists, AME congregations, and wooded escape routes; Mount Zion's surviving building and burial ground document that network in brick, tombstones, and oral history.",
-    "topicIds": ["church", "cemetery", "underground-railroad", "community"],
+    "topicIds": [
+      "church",
+      "cemetery",
+      "underground-railroad",
+      "community"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_old_ship_ame_zion_montgomery_001",
     "kind": "place",
     "displayName": "Old Ship AME Zion Church",
     "summary": "Established in 1852 when Montgomery's Court Street Methodist Church gave Black members a frame building they rolled to Holcombe Street, Old Ship is the city's oldest African American congregation. The present Classical Revival sanctuary, completed in 1918–1920 to designs by Jim Alexander, is listed on the National Register.",
-    "eraBuckets": ["1850s", "1910s", "1920s"],
-    "topicTags": ["church", "community", "architecture"],
+    "eraBuckets": [
+      "1850s",
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "architecture"
+    ],
     "jurisdictionLabel": "Montgomery, Alabama",
     "locationPrecision": "institution",
     "locationLabel": "483 Holcombe Street near Mildred Street, Montgomery",
@@ -1197,17 +1665,31 @@
       }
     ],
     "historicalContext": "Old Ship's move-by-log origin story captures how enslaved and free Black Methodists claimed sacred space in the Alabama capital generations before the civil rights movement centered on Montgomery's streets.",
-    "topicIds": ["church", "community", "architecture"],
+    "topicIds": [
+      "church",
+      "community",
+      "architecture"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_first_african_baptist_lexington_001",
     "kind": "place",
     "displayName": "First African Baptist Church (Lexington, Kentucky)",
     "summary": "Tracing its roots to the 1790s and housed since 1856 in an Italianate brick sanctuary on East Short Street, First African Baptist is the oldest Black Baptist church in Kentucky and among the oldest in the United States west of the Allegheanies. The building is listed on the National Register though the active congregation now worships on Price Road.",
-    "eraBuckets": ["1790s", "1850s", "1860s", "1870s"],
-    "topicTags": ["church", "community", "education"],
+    "eraBuckets": [
+      "1790s",
+      "1850s",
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "education"
+    ],
     "jurisdictionLabel": "Lexington, Kentucky",
     "locationPrecision": "institution",
     "locationLabel": "264–272 East Short Street, downtown Lexington",
@@ -1232,17 +1714,34 @@
       }
     ],
     "historicalContext": "Lexington's First African Baptist anchored a massive antebellum Black membership that built schools and mutual-aid networks in a border-state city where slavery and free Black life overlapped.",
-    "topicIds": ["church", "community", "education"],
-    "mentionedEntityIds": ["ent_first_african_baptist_savannah_001"],
-    "keywords": []
+    "topicIds": [
+      "church",
+      "community",
+      "education"
+    ],
+    "mentionedEntityIds": [
+      "ent_first_african_baptist_savannah_001"
+    ],
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_wheat_street_baptist_atlanta_001",
     "kind": "place",
     "displayName": "Wheat Street Baptist Church",
     "summary": "Founded in 1869 from Friendship Baptist Church members seeking a nearer sanctuary, Wheat Street became a mother church to several Atlanta congregations and hosted early Morehouse classes. Its 1921 Gothic Revival building on Auburn Avenue — within the National Register-listed Martin Luther King Jr. Historic District — was a civil-rights-era pulpit under pastor William Holmes Borders.",
-    "eraBuckets": ["1860s", "1920s", "1930s", "1960s"],
-    "topicTags": ["church", "community", "civil-rights", "education"],
+    "eraBuckets": [
+      "1860s",
+      "1920s",
+      "1930s",
+      "1960s"
+    ],
+    "topicTags": [
+      "church",
+      "community",
+      "civil-rights",
+      "education"
+    ],
     "jurisdictionLabel": "Atlanta, Georgia",
     "locationPrecision": "institution",
     "locationLabel": "359 Auburn Avenue NE, Sweet Auburn",
@@ -1267,8 +1766,17 @@
       }
     ],
     "historicalContext": "Wheat Street linked Baptist worship to Black Atlanta's economic ambitions — from washerwomen's strikes in the 1880s to Borders's housing and credit programs — making its Auburn Avenue corner a laboratory for church-led development.",
-    "topicIds": ["church", "community", "civil-rights", "education"],
-    "mentionedEntityIds": ["ent_martin_luther_king_jr_001", "ent_morehouse_college_001"],
-    "keywords": []
+    "topicIds": [
+      "church",
+      "community",
+      "civil-rights",
+      "education"
+    ],
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001",
+      "ent_morehouse_college_001"
+    ],
+    "keywords": [],
+    "related": []
   }
 ]

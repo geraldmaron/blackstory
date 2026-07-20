@@ -1,14 +1,15 @@
 /**
- * Migration logic (the related workstream): splits a legacy `topicTags` array into the four
- * controlled-taxonomy fields (`topicIds`, `mentionedEntityIds`, `keywords`) — `campaignIds`
- * has no legacy source (it's internal ingestion/research campaign membership, never derived
- * from a public-facing tag) so it isn't produced here.
+ * Migration logic: splits a legacy `topicTags` array into the four controlled-taxonomy fields
+ * (`topicIds`, `mentionedEntityIds`, `keywords`) — `campaignIds` has no legacy source (it's
+ * internal ingestion/research campaign membership, never derived from a public-facing tag) so
+ * it isn't produced here.
  *
  * Routing rules, in order:
  *  1. A tag matching a registered `TOPIC_REGISTRY` id -> `topicIds` (validated theme).
  *  2. A tag in `ORGANIZATION_SHAPED_LEGACY_TAGS` or `EVENT_OR_LAW_SHAPED_LEGACY_TAGS` ->
- *     `mentionedEntityIds`, carried through as a raw string placeholder id (no real
- *     entity-resolution here — see topics.ts's header comment; that's the related workstream's job).
+ *     `mentionedEntityIds`, resolved to a canonical `ent_*` id via
+ *     `LEGACY_MENTION_TAG_TO_ENTITY_ID` when available (otherwise the raw tag is kept so the
+ *     gap is visible rather than silently dropped).
  *  3. Anything else (a tag that was never part of the vetted allowlist, i.e. genuine free text)
  *     -> `keywords`, since it's clearly not a theme and doesn't look person/org/event-shaped
  *     either.
@@ -17,6 +18,7 @@ import {
   EVENT_OR_LAW_SHAPED_LEGACY_TAGS,
   ORGANIZATION_SHAPED_LEGACY_TAGS,
   isValidTopicId,
+  resolveLegacyMentionTag,
 } from './topics.js';
 
 export type SplitTopicTagsResult = {
@@ -37,7 +39,7 @@ export function splitTopicTags(topicTags: readonly string[]): SplitTopicTagsResu
       ORGANIZATION_SHAPED_LEGACY_TAGS.has(tag) ||
       EVENT_OR_LAW_SHAPED_LEGACY_TAGS.has(tag)
     ) {
-      mentionedEntityIds.push(tag);
+      mentionedEntityIds.push(resolveLegacyMentionTag(tag) ?? tag);
     } else {
       keywords.push(tag);
     }

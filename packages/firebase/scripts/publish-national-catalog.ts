@@ -31,6 +31,8 @@
  *   APP_FIREBASE_ALLOW_PRODUCTION=1 node --conditions development --import tsx \
  *     packages/firebase/scripts/publish-national-catalog.ts
  *   DRY_RUN=1 ... — validate + print without writing.
+ *   DRY_RUN=1 WRITE_LOCAL_ARTIFACTS=1 ... — validate and refresh local
+ *     `packages/firebase/fixtures/release-artifacts/` only (no Firestore/GCS writes).
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -61,6 +63,7 @@ import {
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
 const ALLOW = process.env.APP_FIREBASE_ALLOW_PRODUCTION === '1';
 const DRY_RUN = process.env.DRY_RUN === '1';
+const WRITE_LOCAL_ARTIFACTS = process.env.WRITE_LOCAL_ARTIFACTS === '1';
 const UPLOAD_ARTIFACTS = process.env.APP_UPLOAD_RELEASE_ARTIFACTS === '1';
 /** Geohash character precision for public anchors — matches the bootstrap fixtures' choice. */
 const GEOHASH_PRECISION = 5;
@@ -386,7 +389,13 @@ async function main(): Promise<void> {
       console.log(`  sample: ${projection.id} — ${projection.displayName} (${projection.kind})`);
     }
     logRelationshipSummary(relationships.length, skipped.length, relatedByEntity);
-    console.log('Dry run complete; nothing written.');
+    if (WRITE_LOCAL_ARTIFACTS) {
+      const written = writeReleaseCatalogArtifactsToDir(catalogArtifacts, artifactsRoot);
+      console.log(
+        `Wrote local artifacts (dry-run, no Firestore/GCS):\n  ${written.entitiesListFile}\n  ${written.searchIndexFile}`,
+      );
+    }
+    console.log('Dry run complete; nothing written to Firestore/GCS.');
     return;
   }
 

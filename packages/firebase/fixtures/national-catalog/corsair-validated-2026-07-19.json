@@ -4,8 +4,16 @@
     "kind": "person",
     "displayName": "Ellen Eglin",
     "summary": "Ellen F. Eglin (died c. 1915), a Washington, D.C. housekeeper and later Census Office clerk, invented a clothes wringer in the 1880s. In 1888 she sold the rights for $18 rather than patent in her own name, telling The Woman Inventor she feared white customers would refuse a wringer known to come from a Black woman.",
-    "eraBuckets": ["1880s", "1890s"],
-    "topicTags": ["invention", "science", "women", "labor"],
+    "eraBuckets": [
+      "1880s",
+      "1890s"
+    ],
+    "topicTags": [
+      "invention",
+      "science",
+      "women",
+      "labor"
+    ],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "address",
     "locationLabel": "1929 11th Street NW, Washington, D.C.",
@@ -30,17 +38,36 @@
       }
     ],
     "historicalContext": "Eglin's sale of her wringer is a documented case of how racial barriers shaped who could claim credit and profit from late-19th-century domestic inventions.",
-    "topicIds": ["invention", "science", "women", "labor"],
+    "topicIds": [
+      "invention",
+      "science",
+      "women",
+      "labor"
+    ],
     "mentionedEntityIds": [],
-    "keywords": ["clothes wringer", "Woman Inventor", "Census Office"]
+    "keywords": [
+      "clothes wringer",
+      "Woman Inventor",
+      "Census Office"
+    ],
+    "related": []
   },
   {
     "id": "ent_marjorie_joyner_001",
     "kind": "person",
     "displayName": "Marjorie Joyner",
     "summary": "Marjorie Stewart Joyner (1896–1994) died in Chicago's Bronzeville after a career as national adviser to Madam C.J. Walker's beauty schools. She patented a permanent-wave machine in 1928 and later helped write Illinois cosmetology law and co-founded national Black beautician associations with Mary McLeod Bethune.",
-    "eraBuckets": ["1920s", "1930s", "1940s"],
-    "topicTags": ["invention", "business", "women", "community"],
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "invention",
+      "business",
+      "women",
+      "community"
+    ],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "neighborhood",
     "locationLabel": "Bronzeville, Chicago",
@@ -72,17 +99,38 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": ["invention", "business", "women", "community"],
-    "mentionedEntityIds": ["ent_madam_cj_walker_001"],
-    "keywords": ["permanent wave", "Bronzeville", "Madam C.J. Walker"]
+    "topicIds": [
+      "invention",
+      "business",
+      "women",
+      "community"
+    ],
+    "mentionedEntityIds": [
+      "ent_madam_cj_walker_001"
+    ],
+    "keywords": [
+      "permanent wave",
+      "Bronzeville",
+      "Madam C.J. Walker"
+    ]
   },
   {
     "id": "ent_christine_darden_001",
     "kind": "person",
     "displayName": "Christine Darden",
     "summary": "Christine Darden (b. 1942) joined NASA Langley in 1967 as a human computer, earned a doctorate in engineering, and led sonic-boom research for high-speed flight. She became the first African American woman at Langley promoted into the Senior Executive Service and received the Congressional Gold Medal in 2019.",
-    "eraBuckets": ["1960s", "1970s", "1980s", "1990s"],
-    "topicTags": ["science", "space", "mathematics", "women"],
+    "eraBuckets": [
+      "1960s",
+      "1970s",
+      "1980s",
+      "1990s"
+    ],
+    "topicTags": [
+      "science",
+      "space",
+      "mathematics",
+      "women"
+    ],
     "jurisdictionLabel": "Hampton, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "NASA Langley Research Center, Hampton, Virginia",
@@ -124,21 +172,39 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": ["science", "space", "mathematics", "women"],
+    "topicIds": [
+      "science",
+      "space",
+      "mathematics",
+      "women"
+    ],
     "mentionedEntityIds": [
       "ent_dorothy_vaughan_001",
       "ent_katherine_johnson_001",
       "ent_mary_jackson_001"
     ],
-    "keywords": ["sonic boom", "Hidden Figures", "Langley"]
+    "keywords": [
+      "sonic boom",
+      "Hidden Figures",
+      "Langley"
+    ]
   },
   {
     "id": "ent_carter_g_woodson_001",
     "kind": "person",
     "displayName": "Carter G. Woodson",
     "summary": "Carter G. Woodson (1875–1950) died in 1950 after founding the Association for the Study of Negro Life and History and launching Negro History Week in 1926 — the seed of Black History Month. From his Washington office-home he edited the Journal of Negro History under Jim Crow.",
-    "eraBuckets": ["1910s", "1920s", "1930s", "1940s"],
-    "topicTags": ["education", "civil-rights", "community"],
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "education",
+      "civil-rights",
+      "community"
+    ],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "address",
     "locationLabel": "1538 9th Street NW, Washington, D.C.",
@@ -170,17 +236,35 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": ["education", "civil-rights", "community"],
-    "mentionedEntityIds": ["ent_carter_woodson_home_nhs_001"],
-    "keywords": ["ASALH", "Negro History Week", "Black History Month"]
+    "topicIds": [
+      "education",
+      "civil-rights",
+      "community"
+    ],
+    "mentionedEntityIds": [
+      "ent_carter_woodson_home_nhs_001"
+    ],
+    "keywords": [
+      "ASALH",
+      "Negro History Week",
+      "Black History Month"
+    ]
   },
   {
     "id": "ent_carter_woodson_home_nhs_001",
     "kind": "place",
     "displayName": "Carter G. Woodson Home National Historic Site",
     "summary": "The Carter G. Woodson Home National Historic Site protects the Washington, D.C. row house where Dr. Woodson lived and worked while building ASALH and Negro History Week. The National Park Service interprets the office-home as the institutional birthplace of organized African American historical study.",
-    "eraBuckets": ["1920s", "1930s", "1940s"],
-    "topicTags": ["museum", "education", "civil-rights"],
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "museum",
+      "education",
+      "civil-rights"
+    ],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "address",
     "locationLabel": "1538 9th Street NW, Washington, D.C.",
@@ -212,17 +296,37 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": ["museum", "education", "civil-rights"],
-    "mentionedEntityIds": ["ent_carter_g_woodson_001"],
-    "keywords": ["ASALH", "9th Street", "Black History Month"]
+    "topicIds": [
+      "museum",
+      "education",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [
+      "ent_carter_g_woodson_001"
+    ],
+    "keywords": [
+      "ASALH",
+      "9th Street",
+      "Black History Month"
+    ]
   },
   {
     "id": "ent_boston_african_american_nhs_001",
     "kind": "place",
     "displayName": "Boston African American National Historic Site",
     "summary": "Boston African American National Historic Site preserves and interprets Beacon Hill's 19th-century free Black community, the Black Heritage Trail, Underground Railroad networks, and the Massachusetts 54th Infantry Regiment story. Ranger-led and self-guided tours connect meeting houses, residences, and schools that anchored abolitionist Boston.",
-    "eraBuckets": ["1800s", "1830s", "1850s", "1860s"],
-    "topicTags": ["museum", "abolition", "civil-rights", "community"],
+    "eraBuckets": [
+      "1800s",
+      "1830s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "museum",
+      "abolition",
+      "civil-rights",
+      "community"
+    ],
     "jurisdictionLabel": "Boston, Massachusetts",
     "locationPrecision": "address",
     "locationLabel": "46 Joy Street, Beacon Hill, Boston",
@@ -247,8 +351,20 @@
       }
     ],
     "historicalContext": "Beacon Hill's Black community built churches, schools, and mutual-aid institutions that made Boston a northern hub of abolition and enlistment for the 54th Massachusetts.",
-    "topicIds": ["museum", "abolition", "civil-rights", "community"],
-    "mentionedEntityIds": ["ent_maah_boston_001"],
-    "keywords": ["Black Heritage Trail", "Beacon Hill", "54th Massachusetts"]
+    "topicIds": [
+      "museum",
+      "abolition",
+      "civil-rights",
+      "community"
+    ],
+    "mentionedEntityIds": [
+      "ent_maah_boston_001"
+    ],
+    "keywords": [
+      "Black Heritage Trail",
+      "Beacon Hill",
+      "54th Massachusetts"
+    ],
+    "related": []
   }
 ]

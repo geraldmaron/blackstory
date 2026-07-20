@@ -29,7 +29,8 @@
  *
  * See `packages/domain/src/taxonomy/split-topic-tags.ts` for the migration logic that routes
  * legacy `topicTags` values into `topicIds` / `mentionedEntityIds` / `keywords` using this
- * registry plus the excluded-tag lists above.
+ * registry plus the excluded-tag lists above. Org/event/law-shaped tags resolve to canonical
+ * `ent_*` ids via `LEGACY_MENTION_TAG_TO_ENTITY_ID`.
  */
 
 export const TOPIC_TAXONOMY_SCHEMA_VERSION = 1;
@@ -272,8 +273,7 @@ export function getTopicLabel(id: string): string | undefined {
 /**
  * Legacy `topicTags` values that look like an organization acronym rather than a theme.
  * Used by the migration in `split-topic-tags.ts` to route these into `mentionedEntityIds`
- * as raw string placeholder ids. Real resolution against canonical entity ids is
- * the related workstream's job — this only prevents them from being mis-filed as topics.
+ * after resolving through `LEGACY_MENTION_TAG_TO_ENTITY_ID`.
  */
 export const ORGANIZATION_SHAPED_LEGACY_TAGS: ReadonlySet<string> = new Set([
   'cofo',
@@ -287,8 +287,7 @@ export const ORGANIZATION_SHAPED_LEGACY_TAGS: ReadonlySet<string> = new Set([
 /**
  * Legacy `topicTags` values that name one specific event, campaign, group, or law rather than a
  * recurring theme. Used by the migration in `split-topic-tags.ts` to route these into
- * `mentionedEntityIds` as raw string placeholder ids (same caveat as above: no real
- * entity-resolution here, that's the related workstream).
+ * `mentionedEntityIds` after resolving through `LEGACY_MENTION_TAG_TO_ENTITY_ID`.
  */
 export const EVENT_OR_LAW_SHAPED_LEGACY_TAGS: ReadonlySet<string> = new Set([
   'birmingham-campaign',
@@ -300,3 +299,29 @@ export const EVENT_OR_LAW_SHAPED_LEGACY_TAGS: ReadonlySet<string> = new Set([
   'montgomery-bus-boycott',
   'selma',
 ]);
+
+/**
+ * Canonical national-catalog entity ids for legacy org/event/law-shaped topic tags.
+ * Keep in sync with fixtures under `packages/firebase/fixtures/national-catalog/`.
+ */
+export const LEGACY_MENTION_TAG_TO_ENTITY_ID: Readonly<Record<string, string>> = {
+  cofo: 'ent_cofo_001',
+  core: 'ent_core_001',
+  mfdp: 'ent_mfdp_001',
+  naacp: 'ent_naacp_001',
+  sclc: 'ent_sclc_001',
+  sncc: 'ent_sncc_001',
+  'birmingham-campaign': 'ent_birmingham_campaign_001',
+  'civil-rights-act-1866': 'ent_law_civil_rights_act_1866',
+  'freedom-rides': 'ent_freedom_rides_001',
+  'freedom-summer': 'ent_freedom_summer_001',
+  'little-rock-nine': 'ent_little_rock_nine_001',
+  'march-on-washington': 'ent_march_on_washington_1963_001',
+  'montgomery-bus-boycott': 'ent_montgomery_bus_boycott_001',
+  selma: 'ent_selma_to_montgomery_marches_001',
+};
+
+/** Resolve a legacy mention-shaped tag to its catalog entity id when known. */
+export function resolveLegacyMentionTag(tag: string): string | undefined {
+  return LEGACY_MENTION_TAG_TO_ENTITY_ID[tag];
+}

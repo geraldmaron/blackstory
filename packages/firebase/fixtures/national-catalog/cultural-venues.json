@@ -4,8 +4,19 @@
     "kind": "place",
     "displayName": "Howard Theatre",
     "summary": "Designed by J. Edward Storck and opened in 1910 at 620 T Street NW, the Howard Theatre served Black audiences and performers for more than five decades as one of the nation's oldest theaters built expressly for African American entertainment — a peer of the Apollo, the Royal in Baltimore, and Philadelphia's Pearl.",
-    "eraBuckets": ["1910s", "1920s", "1930s", "1940s", "1950s", "1960s"],
-    "topicTags": ["theater", "music", "culture"],
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "theater",
+      "music",
+      "culture"
+    ],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "620 T Street Northwest, Shaw",
@@ -30,17 +41,33 @@
       }
     ],
     "historicalContext": "Segregated booking circuits made it difficult for Black artists to develop and receive recognition; the Howard, along with theaters in Harlem, Baltimore, and Philadelphia, provided the stages on which many of the most prominent entertainers of the mid-twentieth century debuted before desegregation and urban change reshaped Washington's U Street corridor.",
-    "topicIds": ["theater", "music", "culture"],
-    "mentionedEntityIds": ["ent_howard_university_001"],
-    "keywords": []
+    "topicIds": [
+      "theater",
+      "music",
+      "culture"
+    ],
+    "mentionedEntityIds": [
+      "ent_howard_university_001"
+    ],
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_gem_theater_kansas_city_001",
     "kind": "place",
     "displayName": "Gem Theater",
     "summary": "Built in 1912 as the Star Theater at 1615 East 18th Street and renamed the Gem after a 1924 terra cotta renovation, this Kansas City movie and vaudeville house anchored the 18th and Vine district as one of the best-known theaters serving the city's Black community through the jazz age.",
-    "eraBuckets": ["1910s", "1920s", "1930s", "1940s"],
-    "topicTags": ["theater", "music", "jazz"],
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "theater",
+      "music",
+      "jazz"
+    ],
     "jurisdictionLabel": "Kansas City, Missouri",
     "locationPrecision": "institution",
     "locationLabel": "1615 East 18th Street, 18th and Vine",
@@ -65,17 +92,33 @@
       }
     ],
     "historicalContext": "The Gem stood alongside the New Rialto and Eblon theaters on 18th and Vine Streets as Kansas City's Black commercial and nightlife center incubated the swing-era bands that made the district nationally synonymous with jazz.",
-    "topicIds": ["theater", "music", "jazz"],
+    "topicIds": [
+      "theater",
+      "music",
+      "jazz"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_douglass_theatre_macon_001",
     "kind": "place",
     "displayName": "Douglass Theatre",
     "summary": "Charles Henry Douglass, Macon's leading Black entrepreneur, opened the present Douglass Theatre in 1921 at 355 Martin Luther King Jr. Boulevard after earlier venues dating to 1912. Affiliated with the Theatre Owners Booking Association, it hosted Bessie Smith, Ma Rainey, Duke Ellington, and Otis Redding before closing in 1973 and reopening after restoration in 1997.",
-    "eraBuckets": ["1910s", "1920s", "1930s", "1940s", "1950s", "1960s"],
-    "topicTags": ["theater", "music", "blues"],
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "theater",
+      "music",
+      "blues"
+    ],
     "jurisdictionLabel": "Macon, Georgia",
     "locationPrecision": "institution",
     "locationLabel": "355 Martin Luther King Jr. Boulevard, downtown Macon",
@@ -100,17 +143,32 @@
       }
     ],
     "historicalContext": "The Douglass Theatre's surviving business records document Macon's place on the Chitlin Circuit and the programming choices — race films, TOBA vaudeville, and local talent shows — that shaped Black leisure in central Georgia before integration.",
-    "topicIds": ["theater", "music", "blues"],
+    "topicIds": [
+      "theater",
+      "music",
+      "blues"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_liberty_theatre_columbus_001",
     "kind": "place",
     "displayName": "Liberty Theatre",
     "summary": "Built in 1924 and opened in 1925 at 821 Eighth Avenue, the Liberty Theatre was Columbus, Georgia's first theater built solely for Black patrons and one of the largest movie houses in the city. Columbus native Ma Rainey and other blues and jazz artists performed on its stage until it closed in 1974; it reopened in 1996 as a performing arts cultural center.",
-    "eraBuckets": ["1920s", "1930s", "1940s", "1950s", "1960s"],
-    "topicTags": ["theater", "music", "blues"],
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "theater",
+      "music",
+      "blues"
+    ],
     "jurisdictionLabel": "Columbus, Georgia",
     "locationPrecision": "institution",
     "locationLabel": "821 Eighth Avenue, Columbus",
@@ -135,17 +193,31 @@
       }
     ],
     "historicalContext": "Few Southern cities had a theater built exclusively for Black patrons in the 1920s; the Liberty's scale and Martin chain ownership made it a regional anchor for race films, stage shows, and the blues traditions linked to Ma Rainey's Columbus roots.",
-    "topicIds": ["theater", "music", "blues"],
+    "topicIds": [
+      "theater",
+      "music",
+      "blues"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_carver_theatre_birmingham_001",
     "kind": "place",
     "displayName": "Carver Theatre",
     "summary": "Opened in 1935 at 1631 Fourth Avenue North in Birmingham's Fourth Avenue Historic District, the Carver Theatre was a segregated-era movie palace where African Americans could see first-run films. Restored by the city as the Carver Performing Arts Center, it now houses the Alabama Jazz Hall of Fame.",
-    "eraBuckets": ["1930s", "1940s", "1950s", "1960s"],
-    "topicTags": ["theater", "music", "jazz"],
+    "eraBuckets": [
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "theater",
+      "music",
+      "jazz"
+    ],
     "jurisdictionLabel": "Birmingham, Alabama",
     "locationPrecision": "institution",
     "locationLabel": "1631 Fourth Avenue North, Fourth Avenue Historic District",
@@ -170,17 +242,32 @@
       }
     ],
     "historicalContext": "Fourth Avenue's Famous and Carver theaters, the Colored Masonic Temple, and Penny Savings Bank formed a compact Black business district where Birmingham's workforce built professional and entertainment institutions barred from white downtown venues.",
-    "topicIds": ["theater", "music", "jazz"],
+    "topicIds": [
+      "theater",
+      "music",
+      "jazz"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_dreamland_ballroom_omaha_001",
     "kind": "place",
     "displayName": "Dreamland Ballroom",
     "summary": "The second-floor Dreamland Ballroom in James Jewell Sr.'s 1923 Jewell Building at 2221 North 24th Street gave Omaha's Near North Side its own jazz venue from the 1920s through the 1960s, hosting Duke Ellington, Count Basie, Louis Armstrong, Nat King Cole, and Dinah Washington when Black audiences were excluded from comparable halls elsewhere in the city.",
-    "eraBuckets": ["1920s", "1930s", "1940s", "1950s", "1960s"],
-    "topicTags": ["ballroom", "music", "jazz"],
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "ballroom",
+      "music",
+      "jazz"
+    ],
     "jurisdictionLabel": "Omaha, Nebraska",
     "locationPrecision": "institution",
     "locationLabel": "2221 North 24th Street, Near North Side",
@@ -205,17 +292,32 @@
       }
     ],
     "historicalContext": "North 24th Street's Dreamland anchored a Black business district that also supported Preston Love, Anna Mae Winburn, and Lloyd Hunter; activist Whitney Young spoke there on civil rights, and the building later housed community organizations including the Great Plains Black History Museum.",
-    "topicIds": ["ballroom", "music", "jazz"],
+    "topicIds": [
+      "ballroom",
+      "music",
+      "jazz"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_royal_theatre_baltimore_001",
     "kind": "place",
     "displayName": "Royal Theatre",
     "summary": "Opening in 1921 as the Douglass Theatre and reopening by 1925 as the Royal, the Pennsylvania Avenue movie and vaudeville palace ranked with the Apollo, Howard, Regal, and Earl theaters as a premier stage for Black entertainment. Nat King Cole, Billie Holiday, Duke Ellington, and later Motown acts played the Royal until it closed in 1971 and was demolished.",
-    "eraBuckets": ["1920s", "1930s", "1940s", "1950s", "1960s"],
-    "topicTags": ["theater", "music", "culture"],
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "theater",
+      "music",
+      "culture"
+    ],
     "jurisdictionLabel": "Baltimore, Maryland",
     "locationPrecision": "city",
     "locationLabel": "Pennsylvania Avenue and Lanvale Street, Old West Baltimore (former Royal Theatre site)",
@@ -240,21 +342,36 @@
       }
     ],
     "historicalContext": "Old West Baltimore's Sphinx Club, Strand Ballroom, and Royal Theatre made Pennsylvania Avenue a mid-Atlantic counterpart to U Street and 125th Street; a commemorative marquee now marks the site diagonally opposite the Billie Holiday statue.",
-    "topicIds": ["theater", "music", "culture"],
+    "topicIds": [
+      "theater",
+      "music",
+      "culture"
+    ],
     "mentionedEntityIds": [
       "ent_billie_holiday_001",
       "ent_douglass_theatre_macon_001",
       "ent_u_street_corridor_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ritz_theatre_jacksonville_001",
     "kind": "place",
     "displayName": "Ritz Theatre",
     "summary": "Jefferson Powell's 1929 Art Deco Ritz Theatre at 829 North Davis Street anchored LaVilla — Jacksonville's Harlem of the South — as a 970-seat movie house for Black audiences through 1972. A 1999 rebuilding preserved the northwest corner marquee and opened the Ritz Theatre and Museum on the historic site.",
-    "eraBuckets": ["1920s", "1930s", "1940s", "1950s", "1960s"],
-    "topicTags": ["theater", "music", "culture"],
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "theater",
+      "music",
+      "culture"
+    ],
     "jurisdictionLabel": "Jacksonville, Florida",
     "locationPrecision": "institution",
     "locationLabel": "829 North Davis Street, LaVilla",
@@ -279,17 +396,32 @@
       }
     ],
     "historicalContext": "LaVilla's railroad-era Black professional class supported churches, fraternal halls, and theaters along Davis Street; the Ritz's revival documents Northeast Florida's Gullah Geechee urban heritage after decades of highway construction and disinvestment.",
-    "topicIds": ["theater", "music", "culture"],
+    "topicIds": [
+      "theater",
+      "music",
+      "culture"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_regal_theater_chicago_001",
     "kind": "place",
     "displayName": "Regal Theater",
     "summary": "Opened February 4, 1928 at 4719 South Parkway (now Martin Luther King Jr. Drive) in Bronzeville, the Regal Theater was among the first U.S. entertainment complexes built expressly for Black audiences, seating about 3,000 and employing Black management and staff while hosting Duke Ellington, Ella Fitzgerald, Nat King Cole, and the Jackson Five until closing about 1968 and demolition in 1973.",
-    "eraBuckets": ["1920s", "1930s", "1940s", "1950s", "1960s"],
-    "topicTags": ["theater", "music", "jazz"],
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "theater",
+      "music",
+      "jazz"
+    ],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "city",
     "locationLabel": "4719 South Dr. Martin Luther King Jr. Drive, Bronzeville (former Regal Theater site)",
@@ -314,17 +446,32 @@
       }
     ],
     "historicalContext": "The Regal and adjacent Savoy Ballroom made 47th and South Parkway Chicago's answer to Harlem; community protest kept the Regal open when Balaban & Katz attempted to close it during the Depression, preserving a flagship stage for the Great Migration's South Side cultural capital.",
-    "topicIds": ["theater", "music", "jazz"],
-    "mentionedEntityIds": ["ent_savoy_ballroom_chicago_001"],
-    "keywords": []
+    "topicIds": [
+      "theater",
+      "music",
+      "jazz"
+    ],
+    "mentionedEntityIds": [
+      "ent_savoy_ballroom_chicago_001"
+    ],
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_lincoln_theatre_baton_rouge_001",
     "kind": "place",
     "displayName": "Lincoln Theatre",
     "summary": "Designed by A. Hays Town and opened August 25, 1950 at 1305 Myrtle Walk, the Lincoln Theatre was Baton Rouge's primary movie and entertainment venue for African Americans during segregation, seating about 600 until closing in 1986. Listed in the National Register in 2010, the building is undergoing restoration as a cultural center.",
-    "eraBuckets": ["1950s", "1960s", "1970s"],
-    "topicTags": ["theater", "music", "culture"],
+    "eraBuckets": [
+      "1950s",
+      "1960s",
+      "1970s"
+    ],
+    "topicTags": [
+      "theater",
+      "music",
+      "culture"
+    ],
     "jurisdictionLabel": "Baton Rouge, Louisiana",
     "locationPrecision": "institution",
     "locationLabel": "1305 Myrtle Walk, Baton Rouge",
@@ -349,17 +496,31 @@
       }
     ],
     "historicalContext": "Mid-century Baton Rouge's Black neighborhoods supported a parallel commercial life along Myrtle Walk; the Lincoln's Art Moderne design and downtown proximity made it one of the few places where African American families could see first-run films together under Jim Crow.",
-    "topicIds": ["theater", "music", "culture"],
+    "topicIds": [
+      "theater",
+      "music",
+      "culture"
+    ],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_calanthean_temple_shreveport_001",
     "kind": "place",
     "displayName": "Calanthean Temple",
     "summary": "Built in 1923 at 1103 Texas Avenue by the Grand Court Order of Calanthe under Cora M. Allen, this four-story Classical Revival temple housed Black professional offices and a rooftop ballroom where Louis Armstrong, Duke Ellington, Count Basie, and Cab Calloway performed for Shreveport audiences barred from downtown white clubs.",
-    "eraBuckets": ["1920s", "1930s", "1940s", "1950s"],
-    "topicTags": ["ballroom", "music", "culture"],
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s"
+    ],
+    "topicTags": [
+      "ballroom",
+      "music",
+      "culture"
+    ],
     "jurisdictionLabel": "Shreveport, Louisiana",
     "locationPrecision": "institution",
     "locationLabel": "1103 Texas Avenue, downtown Shreveport",
@@ -384,17 +545,33 @@
       }
     ],
     "historicalContext": "Texas Avenue's Antioch Baptist Church, Palace Ballroom, and Calanthean Temple formed Shreveport's Black commercial spine; the temple's scale — reported as the tallest building in the city when built — signaled the economic reach of Calantheans and Black professionals under segregation.",
-    "topicIds": ["ballroom", "music", "culture"],
-    "mentionedEntityIds": ["ent_duke_ellington_001", "ent_louis_armstrong_001"],
-    "keywords": []
+    "topicIds": [
+      "ballroom",
+      "music",
+      "culture"
+    ],
+    "mentionedEntityIds": [
+      "ent_duke_ellington_001",
+      "ent_louis_armstrong_001"
+    ],
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_sunset_cafe_chicago_001",
     "kind": "place",
     "displayName": "Sunset Cafe",
     "summary": "Remodeled from a 1909 automobile garage in 1921, the Sunset Cafe at 315 East 35th Street became one of Chicago's earliest integrated Black-and-tan jazz clubs. Louis Armstrong, Earl Hines, Johnny Dodds, and Benny Goodman played its house orchestra before a 1937 remodeling renamed it the Grand Terrace Cafe, which remained popular until 1950.",
-    "eraBuckets": ["1920s", "1930s", "1940s"],
-    "topicTags": ["music", "jazz", "culture"],
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "music",
+      "jazz",
+      "culture"
+    ],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "315 East 35th Street, Bronzeville",
@@ -419,17 +596,31 @@
       }
     ],
     "historicalContext": "Unlike New York's demolished Cotton Club site, the Sunset/Grand Terrace building still stands in Bronzeville with period murals — a rare physical trace of the integrated jazz incubators that made Chicago a creative capital between 1917 and the bebop era.",
-    "topicIds": ["music", "jazz", "culture"],
-    "mentionedEntityIds": ["ent_louis_armstrong_001"],
-    "keywords": []
+    "topicIds": [
+      "music",
+      "jazz",
+      "culture"
+    ],
+    "mentionedEntityIds": [
+      "ent_louis_armstrong_001"
+    ],
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_paradise_theater_detroit_001",
     "kind": "place",
     "displayName": "Paradise Theater",
     "summary": "From Christmas Eve 1941 through 1951, Orchestra Hall at 3711 Woodward Avenue operated as the Paradise Theater, Detroit's premier jazz venue in the Paradise Valley neighborhood adjacent to Black Bottom. Ella Fitzgerald, Billie Holiday, Duke Ellington, Louis Armstrong, and Cab Calloway played the hall before it returned to symphonic use as Orchestra Hall.",
-    "eraBuckets": ["1940s", "1950s"],
-    "topicTags": ["theater", "music", "jazz"],
+    "eraBuckets": [
+      "1940s",
+      "1950s"
+    ],
+    "topicTags": [
+      "theater",
+      "music",
+      "jazz"
+    ],
     "jurisdictionLabel": "Detroit, Michigan",
     "locationPrecision": "institution",
     "locationLabel": "3711 Woodward Avenue, Midtown Detroit",
@@ -454,17 +645,32 @@
       }
     ],
     "historicalContext": "Paradise Valley's Flame Show Bar, Club Harlem, and Paradise Theater channeled Great Migration wages into a dense Black entertainment economy until postwar urban renewal and the 1943 race riot reduced mixed audiences; the hall's 1970s preservation campaign saved one of Crane's finest acoustical designs.",
-    "topicIds": ["theater", "music", "jazz"],
-    "mentionedEntityIds": ["ent_black_bottom_paradise_valley_001"],
-    "keywords": []
+    "topicIds": [
+      "theater",
+      "music",
+      "jazz"
+    ],
+    "mentionedEntityIds": [
+      "ent_black_bottom_paradise_valley_001"
+    ],
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_savoy_ballroom_chicago_001",
     "kind": "place",
     "displayName": "Savoy Ballroom",
     "summary": "Opening Thanksgiving Eve 1927 at 4733 South Parkway in Bronzeville, the Savoy Ballroom seated roughly 3,800 dancers in a refined setting that showcased Louis Armstrong, Count Basie, and other national bands seven nights a week until closing in 1948. Built alongside the Regal Theater, it was demolished in the 1970s; the Harold Washington Cultural Center now occupies the site.",
-    "eraBuckets": ["1920s", "1930s", "1940s"],
-    "topicTags": ["ballroom", "music", "jazz"],
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "ballroom",
+      "music",
+      "jazz"
+    ],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "city",
     "locationLabel": "4733 South Dr. Martin Luther King Jr. Drive, Bronzeville (former Savoy Ballroom site)",
@@ -489,22 +695,35 @@
       }
     ],
     "historicalContext": "Promoter I. Jay Faggen modeled Chicago's Savoy on Harlem's namesake ballroom; the South Side Chamber of Commerce, Binga State Bank, and the Chicago Defender held events there, tying Bronzeville's business elite to the dance-floor modernity of the jazz age.",
-    "topicIds": ["ballroom", "music", "jazz"],
+    "topicIds": [
+      "ballroom",
+      "music",
+      "jazz"
+    ],
     "mentionedEntityIds": [
       "ent_chicago_defender_001",
       "ent_harold_washington_001",
       "ent_louis_armstrong_001",
       "ent_regal_theater_chicago_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_dunbar_theatre_dc_001",
     "kind": "place",
     "displayName": "Dunbar Theatre",
     "summary": "Completed in 1921 at 1901–1903 Seventh Street NW, the Southern Aid Society–Dunbar Theater Building combined the Washington headquarters of the nation's oldest Black life insurance company with the Dunbar Theatre movie house designed by Reginald W. Geare on the first floor — a mixed-use anchor of the Seventh and U Street Black commercial corridor.",
-    "eraBuckets": ["1920s", "1930s", "1940s"],
-    "topicTags": ["theater", "culture", "architecture"],
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "theater",
+      "culture",
+      "architecture"
+    ],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "1901–1903 Seventh Street Northwest, Shaw",
@@ -529,8 +748,16 @@
       }
     ],
     "historicalContext": "Facing the Howard Theatre across T Street, the Dunbar gave segregated Washington a Black-owned cinema and insurance headquarters in one building — part of a U Street economy that also included the Whitelaw Hotel, True Reformer Building, and Murray Palace Casino.",
-    "topicIds": ["theater", "culture", "architecture"],
-    "mentionedEntityIds": ["ent_howard_theatre_dc_001", "ent_u_street_corridor_001"],
-    "keywords": []
+    "topicIds": [
+      "theater",
+      "culture",
+      "architecture"
+    ],
+    "mentionedEntityIds": [
+      "ent_howard_theatre_dc_001",
+      "ent_u_street_corridor_001"
+    ],
+    "keywords": [],
+    "related": []
   }
 ]

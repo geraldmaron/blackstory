@@ -1,6 +1,7 @@
 /**
  * About mosaic mast — full-bleed living collage behind the product thesis.
- * Resolves entity link targets for tiles that open published records.
+ * Resolves entity link targets only for tiles that match a published public record
+ * (avoids 404s in seed/degraded mode when collage ids are not in the live catalog).
  */
 import Link from 'next/link';
 import type { ReactNode } from 'react';
@@ -28,12 +29,12 @@ export async function AboutMosaicMast({ children }: AboutMosaicMastProps) {
   const byId = new Map(entities.map((entity) => [entity.id, entity] as const));
 
   const entityLinks: Readonly<Record<string, MosaicEntityLink>> = Object.fromEntries(
-    ATMOSPHERE_TILE_CREDITS.map((tile) => {
+    ATMOSPHERE_TILE_CREDITS.flatMap((tile) => {
       const entity = byId.get(tile.entityId);
-      const label = entity?.displayName.trim() || humanizeEntityId(tile.entityId);
+      if (!entity) return [];
+      const label = entity.displayName.trim() || humanizeEntityId(tile.entityId);
       return [
-        tile.entityId,
-        { href: `/entity/${tile.entityId}`, label } satisfies MosaicEntityLink,
+        [tile.entityId, { href: `/entity/${tile.entityId}`, label } satisfies MosaicEntityLink],
       ];
     }),
   );
