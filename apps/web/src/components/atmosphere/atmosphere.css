@@ -17,8 +17,8 @@
   inset: 0;
   background-color: var(--ds-fixed-charcoal);
   background-repeat: repeat;
-  background-size: 12rem 12rem;
-  opacity: 0.22;
+  background-size: 16rem 16rem;
+  opacity: 0.14;
 }
 
 .ds-atmosphere__mosaic {
@@ -27,8 +27,8 @@
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-auto-rows: 1fr;
-  opacity: 0.16;
-  filter: grayscale(1) contrast(1.12);
+  opacity: 0.1;
+  filter: grayscale(1) contrast(1.06);
 }
 
 .ds-atmosphere__tile {
@@ -45,7 +45,7 @@
   }
 
   .ds-atmosphere__geometric {
-    opacity: 0.28;
+    opacity: 0.16;
   }
 }
 
@@ -157,7 +157,7 @@
   align-content: start;
   height: 100%;
   overflow: hidden;
-  opacity: 0.38;
+  opacity: 0.24;
 }
 
 /* Exact columns×rows so the mast never clips a half-row of faces. */
@@ -169,7 +169,7 @@
 }
 
 .ds-atmosphere--interactive .ds-atmosphere__mosaic--living {
-  opacity: 0.48;
+  opacity: 0.3;
 }
 
 .ds-atmosphere__cell {
@@ -264,7 +264,7 @@
   /* Fill mode owns row sizing — do not stretch incomplete auto-rows. */
   grid-auto-rows: unset;
   /* Even wash — legibility comes from the copy plate, not a side scrim. */
-  opacity: 0.48;
+  opacity: 0.28;
 }
 
 .ds-about-mast .ds-atmosphere__cell {
@@ -557,7 +557,7 @@
 }
 
 .ds-map-names-wall__glyph--present {
-  opacity: var(--ds-names-wall-ink, 0.28);
+  opacity: var(--ds-names-wall-ink, 0.14);
 }
 
 .ds-map-names-wall__glyph--empty {

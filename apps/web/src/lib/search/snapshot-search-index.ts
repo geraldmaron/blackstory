@@ -16,6 +16,7 @@
 import {
   NOTABILITY_RUBRIC,
   buildPublicSearchIndexDocs,
+  formatClaimInclusionNote,
   type NotabilityBasisRecord,
   type NotabilityCriterion,
   type PublicSearchIndexDoc,
@@ -42,8 +43,7 @@ function noteFromCitedClaims(entity: PublicEntityView): string {
     return 'Inclusion is pending linked source citations.';
   }
   const [first] = cited;
-  const sources = [...new Set(cited.map((claim) => claim.citationSource.trim()))];
-  return `${first!.predicate.replaceAll('_', ' ')}: ${first!.object}. Cited from ${sources.join('; ')}.`;
+  return formatClaimInclusionNote(first!.predicate, first!.object);
 }
 
 function synthesizeNotabilityBasis(entity: PublicEntityView): readonly NotabilityBasisRecord[] {
@@ -67,14 +67,22 @@ function notabilityBasisFor(entity: PublicEntityView): readonly NotabilityBasisR
   if (entity.notabilityBasis && entity.notabilityBasis.length > 0) {
     const citedIds = citedClaimIds(entity);
     const fallbackNote = noteFromCitedClaims(entity);
-    return entity.notabilityBasis.map((record) => ({
-      criterion: record.criterion,
-      note:
+    const byId = new Map(entity.claims.map((claim) => [claim.id, claim] as const));
+    return entity.notabilityBasis.map((record) => {
+      const evidenceIds = record.evidenceIds.length > 0 ? record.evidenceIds : citedIds;
+      const linked = evidenceIds.map((id) => byId.get(id)).find((claim) => claim !== undefined);
+      const note =
         record.note.trim() === NOTABILITY_RUBRIC[record.criterion].trim()
           ? fallbackNote
-          : record.note,
-      evidenceIds: record.evidenceIds.length > 0 ? record.evidenceIds : citedIds,
-    }));
+          : linked
+            ? formatClaimInclusionNote(linked.predicate, linked.object)
+            : record.note;
+      return {
+        criterion: record.criterion,
+        note,
+        evidenceIds,
+      };
+    });
   }
   return synthesizeNotabilityBasis(entity);
 }

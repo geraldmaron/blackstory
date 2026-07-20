@@ -222,8 +222,8 @@ export function buildMemorialNameFeatures(options?: {
     const uPri = unit(`memorial-p:${seedKey}:${i}`);
     const uSize = unit(`memorial-s:${seedKey}:${i}`);
     const uRot = unit(`memorial-r:${seedKey}:${i}`);
-    // Stronger ink so the field reads as a memorial, not a whisper.
-    const ink = 0.42 + uInk * 0.28;
+    // Soft ink — field should stay atmospheric, not compete with map labels or UI chrome.
+    const ink = 0.12 + uInk * 0.14;
     // Size + rotation variance — collage texture, not a typeset grid.
     const size =
       MEMORIAL_LABEL_SIZE_MIN +

@@ -3,15 +3,16 @@
  * public "why this appears" payloads. Keeps the entity page free of field-renaming clutter.
  *
  * Inclusion basis must resolve to named claim citations. When a release carries real
- * `notabilityBasis` with `evidenceIds`, those ids are kept; notes that are only a dump of
- * `NOTABILITY_RUBRIC` methodology prose are rewritten from the entity's cited claims so already-
- * published projections stay honest without a republish. Seed fixtures that only have
- * `notabilityLabels` get a single citation-backed basis (not empty-evidence theater).
+ * `notabilityBasis` with `evidenceIds`, those ids are kept; notes are rebuilt from linked
+ * claims as prose (`formatClaimInclusionNote`) so already-published "predicate: object. Cited
+ * from …" dumps read cleanly without a republish. Rubric-only notes and seed fixtures that only
+ * have `notabilityLabels` still get citation-backed basis (not empty-evidence theater).
  * Topic tags and jurisdiction labels are catalog metadata — never passed as source evidence.
  */
 import {
   NOTABILITY_RUBRIC,
   buildPublicWhyThisAppears,
+  formatClaimInclusionNote,
   type NotabilityBasisRecord,
   type NotabilityCriterion,
   type PublicWhyThisAppears,
@@ -38,19 +39,41 @@ function citedClaimIds(entity: PublicEntityView): readonly string[] {
   return citedClaims(entity).map((claim) => claim.id);
 }
 
+function noteFromClaim(claim: PublicClaimView): string {
+  return formatClaimInclusionNote(claim.predicate, claim.object);
+}
+
 /** Record-specific inclusion note from cited claims — never methodology rubric prose alone. */
 function noteFromCitedClaims(entity: PublicEntityView): string {
   const cited = citedClaims(entity);
   if (cited.length === 0) {
     return 'Inclusion is pending linked source citations.';
   }
-  const [first] = cited;
-  const sources = [...new Set(cited.map((claim) => claim.citationSource.trim()))];
-  return `${first!.predicate.replaceAll('_', ' ')}: ${first!.object}. Cited from ${sources.join('; ')}.`;
+  return noteFromClaim(cited[0]!);
 }
 
 function isRubricOnlyNote(criterion: NotabilityCriterion, note: string): boolean {
   return note.trim() === NOTABILITY_RUBRIC[criterion].trim();
+}
+
+/** Prefer claim-linked prose; fall back to stored note only when evidence ids do not resolve. */
+function noteForBasisRecord(
+  entity: PublicEntityView,
+  record: {
+    readonly criterion: NotabilityCriterion;
+    readonly note: string;
+    readonly evidenceIds: readonly string[];
+  },
+): string {
+  if (isRubricOnlyNote(record.criterion, record.note)) {
+    return noteFromCitedClaims(entity);
+  }
+  const byId = new Map(entity.claims.map((claim) => [claim.id, claim] as const));
+  for (const id of record.evidenceIds) {
+    const claim = byId.get(id);
+    if (claim) return noteFromClaim(claim);
+  }
+  return record.note;
 }
 
 /**
@@ -64,10 +87,9 @@ function notabilityBasisFor(entity: PublicEntityView): readonly NotabilityBasisR
   if (entity.notabilityBasis && entity.notabilityBasis.length > 0) {
     return entity.notabilityBasis.map((record) => {
       const evidenceIds = record.evidenceIds.length > 0 ? record.evidenceIds : citedIds;
-      const note = isRubricOnlyNote(record.criterion, record.note) ? fallbackNote : record.note;
       return {
         criterion: record.criterion,
-        note,
+        note: noteForBasisRecord(entity, { ...record, evidenceIds }),
         evidenceIds,
       };
     });
@@ -78,13 +100,12 @@ function notabilityBasisFor(entity: PublicEntityView): readonly NotabilityBasisR
     if (citedIds.length === 0) {
       return [];
     }
-    return [
-      {
-        criterion: 'documented_site' as const,
-        note: fallbackNote,
-        evidenceIds: citedIds,
-      },
-    ];
+    // One basis row per cited claim so multi-claim sites (e.g. served as + bombed on) stay distinct.
+    return citedClaims(entity).map((claim) => ({
+      criterion: 'documented_site' as const,
+      note: noteFromClaim(claim),
+      evidenceIds: [claim.id],
+    }));
   }
 
   return labels.map((label) => ({

@@ -292,8 +292,8 @@
 }
 
 /* —— Page field — subtle repeating motif behind non-map archive canvases.
-   Decorative only (aria-hidden in PageField.tsx); opacity on the layer keeps
-   ink readable. Map routes opt out via :has([data-surface='map']). ——  */
+   Decorative only (aria-hidden in PageField.tsx); keep effective contrast low so
+   long-form body copy stays primary. Map routes opt out via :has([data-surface='map']). ——  */
 .ds-shell-page-transition__content {
   position: relative;
   z-index: 1;
@@ -307,13 +307,13 @@
   background-color: transparent;
   background-image: var(--ds-page-field-light);
   background-repeat: repeat;
-  background-size: 12rem 12rem;
-  opacity: 0.16;
+  background-size: 20rem 20rem;
+  opacity: 0.055;
 }
 
 [data-theme='dark'] .ds-page-field {
   background-image: var(--ds-page-field-dark);
-  opacity: 0.22;
+  opacity: 0.075;
 }
 
 /* ADR-017: no motif over the persistent map canvas. */
@@ -329,7 +329,7 @@
   width: min(28vw, 11rem);
   height: min(18vw, 4.5rem);
   background: var(--ds-accent-muted);
-  opacity: 0.07;
+  opacity: 0.035;
   pointer-events: none;
 }
 
@@ -345,7 +345,7 @@
 
 [data-theme='dark'] .ds-page-field--accents::before,
 [data-theme='dark'] .ds-page-field--accents::after {
-  opacity: 0.1;
+  opacity: 0.048;
 }
 
 /* —— Page mast — the room's nameplate. Oversized, ruled, unmistakable ——  */

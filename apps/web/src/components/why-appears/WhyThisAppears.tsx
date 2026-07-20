@@ -5,9 +5,9 @@
  * presents the already-validated `PublicWhyThisAppears` structure plus optional claim-citation
  * resolution so readers see named sources (and hrefs) instead of opaque evidence-id counts.
  *
- * Never renders a score: `notabilityBasis` renders as a labeled, sourced list (criterion label +
- * record-specific note + citation links). A trauma-content notice and honest coverage notes
- * render additively alongside the explanation, never in place of it.
+ * Never renders a score: `notabilityBasis` renders as criterion groups (label once) with prose
+ * notes and a deduped citation list. A trauma-content notice and honest coverage notes render
+ * additively alongside the explanation, never in place of it.
  *
  * Default `variant="flat"` fits entity pages that already own the section `h2`. Pass
  * `variant="card"` when a standalone titled Card is required.
@@ -15,7 +15,7 @@
 
 import React from 'react';
 import { Card, EmptyState, Notice } from '@repo/ui';
-import type { PublicWhyThisAppears } from '@repo/domain';
+import type { PublicNotabilityBasisItem, PublicWhyThisAppears } from '@repo/domain';
 import { WHY_THIS_APPEARS_COPY } from './copy';
 
 export type WhyAppearsCitation = {
@@ -36,41 +36,96 @@ export type WhyThisAppearsProps = {
   readonly evidenceById?: Readonly<Record<string, WhyAppearsCitation>>;
 };
 
-function CitationList({
-  evidenceIds,
-  evidenceById,
-}: {
-  readonly evidenceIds: readonly string[];
-  readonly evidenceById: Readonly<Record<string, WhyAppearsCitation>> | undefined;
-}) {
-  if (evidenceIds.length === 0) {
-    return <p className="ds-sans">{WHY_THIS_APPEARS_COPY.noLinkedCitations}</p>;
+type BasisGroup = {
+  readonly criterion: PublicNotabilityBasisItem['criterion'];
+  readonly criterionLabel: string;
+  readonly items: readonly PublicNotabilityBasisItem[];
+};
+
+function groupBasisByCriterion(
+  items: readonly PublicNotabilityBasisItem[],
+): readonly BasisGroup[] {
+  const groups: BasisGroup[] = [];
+  for (const item of items) {
+    const last = groups[groups.length - 1];
+    if (last && last.criterion === item.criterion) {
+      groups[groups.length - 1] = {
+        ...last,
+        items: [...last.items, item],
+      };
+      continue;
+    }
+    groups.push({
+      criterion: item.criterion,
+      criterionLabel: item.criterionLabel,
+      items: [item],
+    });
+  }
+  return groups;
+}
+
+function uniqueCitationsForGroup(
+  items: readonly PublicNotabilityBasisItem[],
+  evidenceById: Readonly<Record<string, WhyAppearsCitation>> | undefined,
+): {
+  readonly resolved: readonly WhyAppearsCitation[];
+  readonly hadEvidenceIds: boolean;
+} {
+  const seen = new Set<string>();
+  const resolved: WhyAppearsCitation[] = [];
+  let hadEvidenceIds = false;
+
+  for (const item of items) {
+    for (const id of item.evidenceIds) {
+      hadEvidenceIds = true;
+      const citation = evidenceById?.[id];
+      if (!citation) continue;
+      const key = citation.href?.trim() || `${citation.source}|${citation.label}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      resolved.push(citation);
+    }
   }
 
-  const resolved = evidenceIds
-    .map((id) => evidenceById?.[id])
-    .filter((citation): citation is WhyAppearsCitation => citation !== undefined);
+  return { resolved, hadEvidenceIds };
+}
 
-  if (resolved.length === 0) {
-    return <p className="ds-sans">{WHY_THIS_APPEARS_COPY.noLinkedCitations}</p>;
+function CitationList({
+  items,
+  evidenceById,
+}: {
+  readonly items: readonly PublicNotabilityBasisItem[];
+  readonly evidenceById: Readonly<Record<string, WhyAppearsCitation>> | undefined;
+}) {
+  const { resolved, hadEvidenceIds } = uniqueCitationsForGroup(items, evidenceById);
+
+  if (!hadEvidenceIds || resolved.length === 0) {
+    return <p className="ds-sans ds-why-appears__cite-gap">{WHY_THIS_APPEARS_COPY.noLinkedCitations}</p>;
   }
 
   return (
     <ul className="ds-why-appears__citations" aria-label={WHY_THIS_APPEARS_COPY.citationsHeading}>
-      {resolved.map((citation) => (
-        <li key={citation.id} className="ds-sans">
-          {citation.href ? (
-            <a href={citation.href} rel="noopener noreferrer">
-              {citation.source}
-            </a>
-          ) : (
-            <span>{citation.source}</span>
-          )}
-          {citation.label.trim().length > 0 ? (
-            <span className="ds-mono"> — {citation.label}</span>
-          ) : null}
-        </li>
-      ))}
+      {resolved.map((citation) => {
+        const linkText =
+          citation.label.trim().length > 0 ? citation.label.trim() : citation.source.trim();
+        const showHost =
+          citation.label.trim().length > 0 &&
+          citation.source.trim().length > 0 &&
+          !citation.label.toLowerCase().includes(citation.source.toLowerCase());
+
+        return (
+          <li key={citation.id} className="ds-sans">
+            {citation.href ? (
+              <a href={citation.href} rel="noopener noreferrer">
+                {linkText}
+              </a>
+            ) : (
+              <span>{linkText}</span>
+            )}
+            {showHost ? <span className="ds-mono"> ({citation.source})</span> : null}
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -88,6 +143,7 @@ function WhyThisAppearsBody({
 }) {
   const basisHeadingId = `${instanceId}-basis-heading`;
   const coverageHeadingId = `${instanceId}-coverage-heading`;
+  const basisGroups = groupBasisByCriterion(result.notabilityBasis);
 
   return (
     <>
@@ -106,22 +162,26 @@ function WhyThisAppearsBody({
         <h3 id={basisHeadingId} className="ds-subheading">
           {WHY_THIS_APPEARS_COPY.basisHeading}
         </h3>
-        {result.notabilityBasis.length === 0 ? (
+        {basisGroups.length === 0 ? (
           <EmptyState title={WHY_THIS_APPEARS_COPY.basisHeading}>
             {WHY_THIS_APPEARS_COPY.noBasisRecorded}
           </EmptyState>
         ) : (
-          <ol className="ds-qualify-list" aria-label={WHY_THIS_APPEARS_COPY.basisHeading}>
-            {result.notabilityBasis.map((item, index) => (
-              <li key={`${item.criterion}_${index}`}>
-                <span className="ds-mono">{item.criterionLabel}</span>
-                <p className="ds-sans" style={{ margin: 0, fontWeight: 400 }}>
-                  {item.note}
-                </p>
-                <CitationList evidenceIds={item.evidenceIds} evidenceById={evidenceById} />
-              </li>
+          <div className="ds-why-appears__basis" aria-label={WHY_THIS_APPEARS_COPY.basisHeading}>
+            {basisGroups.map((group, groupIndex) => (
+              <div key={`${group.criterion}_${groupIndex}`} className="ds-why-appears__basis-group">
+                <p className="ds-mono ds-why-appears__criterion">{group.criterionLabel}</p>
+                <ul className="ds-why-appears__notes">
+                  {group.items.map((item, index) => (
+                    <li key={`${item.criterion}_${index}`} className="ds-sans">
+                      {item.note}
+                    </li>
+                  ))}
+                </ul>
+                <CitationList items={group.items} evidenceById={evidenceById} />
+              </div>
             ))}
-          </ol>
+          </div>
         )}
       </section>
 
