@@ -2,8 +2,8 @@
 
 /**
  * Zero-permission place orientation: a native state select covering all 51
- * states/D.C., one-tap chips for deepest coverage, and a quiet /locate hand-off.
- * Lives under the homepage About beat (no longer the lead Orient headline).
+ * states/D.C., editorial coverage shortcuts for deepest coverage, and a quiet
+ * /locate hand-off. Lives under the homepage About beat.
  *
  * Navigation is router.push (continuous-experience contract): the persistent
  * map canvas survives the transition and flies to the state's camera preset
@@ -66,22 +66,34 @@ export function StateStart({ topStates }: StateStartProps) {
             </option>
           ))}
         </select>
-        <button className="ds-button ds-button--secondary" type="submit" disabled={!selected}>
+        <button
+          className="ds-button ds-button--secondary ds-state-start__submit"
+          type="submit"
+          disabled={!selected}
+        >
           See its records
         </button>
       </form>
 
       {topStates.length > 0 ? (
-        <ul className="ds-state-start__chips" aria-label="States with the most records">
-          {topStates.map((state) => (
-            <li key={state.postalCode}>
-              <Link className="ds-state-chip" href={exploreHrefForState(state.postalCode)}>
-                {state.name}
-                <span className="ds-state-chip__count">{state.count}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <div className="ds-state-start__coverage">
+          <p className="ds-state-start__coverage-label" id="state-start-coverage-label">
+            Deepest coverage
+          </p>
+          <ul
+            className="ds-state-start__chips"
+            aria-labelledby="state-start-coverage-label"
+          >
+            {topStates.map((state) => (
+              <li key={state.postalCode}>
+                <Link className="ds-state-chip" href={exploreHrefForState(state.postalCode)}>
+                  <span className="ds-state-chip__name">{state.name}</span>
+                  <span className="ds-state-chip__count">{state.count}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : null}
 
       <p className="ds-state-start__locate">

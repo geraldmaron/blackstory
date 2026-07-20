@@ -4,6 +4,7 @@
  * sustained reading. Main spine: relevance, historical context, status, accepted claims,
  * timeline, and unified connected records. Slim context rail: map, maturity, revision.
  * Sparse sections render the approved `RecordGapNotice` copy instead of a silent empty list.
+ * Timeline is omitted entirely when no dated status or relationship timespans exist.
  */
 
 import Link from 'next/link';
@@ -20,6 +21,7 @@ import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/en
 import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
 import { EntityMastMedia } from '../../../components/entity/EntityMastMedia';
 import { RecordGapNotice } from '../../../components/entity/RecordGapNotice';
+import { humanizeToken } from '../../../components/entity/format';
 import { EntityEvidencePanel } from '../../../components/evidence';
 import { HowToReadThisRecord } from '../../../components/trust';
 import { WhyThisAppears } from '../../../components/why-appears';
@@ -185,7 +187,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
           </div>
           <div className="ds-at-a-glance__row">
             <dt>Coverage</dt>
-            <dd>{entity.researchCoverage}</dd>
+            <dd>{humanizeToken(entity.researchCoverage)}</dd>
           </div>
           <div className="ds-at-a-glance__row">
             <dt>Location shown</dt>
@@ -309,25 +311,23 @@ export default async function EntityPage({ params }: EntityPageProps) {
               </div>
             </section>
 
-            <section className="ds-record-section" aria-labelledby="timeline-heading">
-              <p className="ds-section__kicker">
-                <span className="ds-kicker-index" aria-hidden="true" />
-                Chronology
-              </p>
-              <h2 className="ds-section__title" id="timeline-heading">
-                Timeline
-              </h2>
-              <div className="ds-record-section__body">
-                {entity.timeline.length === 0 ? (
-                  <RecordGapNotice kind="timeline" />
-                ) : (
+            {entity.timeline.length > 0 ? (
+              <section className="ds-record-section" aria-labelledby="timeline-heading">
+                <p className="ds-section__kicker">
+                  <span className="ds-kicker-index" aria-hidden="true" />
+                  Chronology
+                </p>
+                <h2 className="ds-section__title" id="timeline-heading">
+                  Timeline
+                </h2>
+                <div className="ds-record-section__body">
                   <Timeline labelledBy="timeline-heading" items={entity.timeline} />
-                )}
-              </div>
-              <p className="ds-entity-footnote ds-sans">
-                Derived from this record&rsquo;s published history graph and status history.
-              </p>
-            </section>
+                </div>
+                <p className="ds-entity-footnote ds-sans">
+                  Dated status changes and relationship timespans published for this record.
+                </p>
+              </section>
+            ) : null}
 
             <section className="ds-record-section" aria-labelledby="related-heading">
               <p className="ds-section__kicker">
@@ -408,10 +408,12 @@ export default async function EntityPage({ params }: EntityPageProps) {
               <h2 className="ds-aside-block__title" id="maturity-heading">
                 Record maturity
               </h2>
-              <p className="ds-aside-block__meta ds-mono">{entity.recordMaturity}</p>
+              <p className="ds-aside-block__meta ds-mono">
+                {humanizeToken(entity.recordMaturity)}
+              </p>
               <p className="ds-sans" style={{ margin: 0 }}>
-                Research coverage: <strong>{entity.researchCoverage}</strong>. Maturity labels
-                follow the product constitution vocabulary.
+                Research coverage: <strong>{humanizeToken(entity.researchCoverage)}</strong>.
+                Maturity labels follow the product constitution vocabulary.
               </p>
             </section>
 
@@ -420,13 +422,15 @@ export default async function EntityPage({ params }: EntityPageProps) {
                 Revision
               </h2>
               <p className="ds-aside-block__meta ds-mono">{entity.revision.releaseId}</p>
-              <dl className="ds-sans" style={{ margin: 0 }}>
-                <dt className="ds-dt">Record last updated</dt>
-                <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>
-                  {entity.revision.recordUpdatedAt || 'Not yet tracked'}
-                </dd>
-                <dt className="ds-dt">Release generated</dt>
-                <dd style={{ margin: 0 }}>{entity.revision.generatedAt || 'Not yet tracked'}</dd>
+              <dl className="ds-entity-meta-list">
+                <div className="ds-entity-meta-list__row">
+                  <dt>Record last updated</dt>
+                  <dd>{entity.revision.recordUpdatedAt || 'Not yet tracked'}</dd>
+                </div>
+                <div className="ds-entity-meta-list__row">
+                  <dt>Release generated</dt>
+                  <dd>{entity.revision.generatedAt || 'Not yet tracked'}</dd>
+                </div>
               </dl>
             </section>
           </aside>

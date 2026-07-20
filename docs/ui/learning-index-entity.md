@@ -38,6 +38,8 @@ retraction history for operators; that trail is not the learning-index UI.
   awaited.
 - No extended narrative: **omit** that section entirely.
 - Empty related: `RecordGapNotice` plus tag and map CTAs still provide learning paths.
+- Empty timeline: **omit** the Chronology section entirely — timeline only appears when dated
+  status-history entries or relationship timespans exist.
 - Neighbor stubs are denormalized at read time; do not embed full neighbor docs on every projection.
 - Listed entity names link quietly via `EntityLink` / `ds-entity-link` (inherit color; underline on hover/focus — not copper pills). Related rails keep `ds-story-link` row anatomy; a short discovery hint invites clicking onward.
 - At-a-glance keeps only non-mast facts (evidence count, confidence, coverage, location precision).

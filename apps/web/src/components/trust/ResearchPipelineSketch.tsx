@@ -1,5 +1,6 @@
 /**
- * Hand-sketch architecture diagrams for the public methodology page.
+ * Hand-sketch architecture diagrams for the public methodology page (and a
+ * compact reuse on the homepage How-this-works band).
  *
  * Shows generalized research flow: curated + broad-net intake → fragment
  * aggregation → local home-server models and paid models → vector/data layer →
@@ -9,6 +10,11 @@
 import React from 'react';
 
 void React;
+
+export type ResearchPipelineSketchProps = {
+  /** Homepage trust band: SVG + short caption, no stage legend (points live beside it). */
+  readonly compact?: boolean;
+};
 
 /** Embedded so SVG shapes stay visible even if the page forgets the CSS side-effect import. */
 const PIPELINE_SKETCH_SVG_STYLE = `
@@ -74,8 +80,198 @@ function SketchArrowHead({ x, y }: { readonly x: number; readonly y: number }) {
   );
 }
 
+const PIPELINE_DESC =
+  'Two intake nets feed adapters: a curated net of government records, archives, museums, and ' +
+  'scholarship, and a broad net of forums, Reddit, web search, and community feeds. Fragments ' +
+  'aggregate like puzzle pieces, then run through a private local AI home server for a first ' +
+  'pass and paid models for deeper research. Vectors and provenance sit in a data layer. Human ' +
+  'verification and a publish gate decide what reaches the public record. Discovery tools never ' +
+  'publish alone.';
+
+/** Condensed horizontal sketch for the homepage — same stages, ~1/3 the height. */
+function CompactResearchPipelineFigure() {
+  const titleId = 'research-pipeline-sketch-home-title';
+  const descId = 'research-pipeline-sketch-home-desc';
+
+  return (
+    <figure
+      className="ds-pipeline-sketch ds-pipeline-sketch--compact"
+      aria-labelledby={titleId}
+      aria-describedby={descId}
+    >
+      <figcaption className="ds-pipeline-sketch__figcaption" id={titleId}>
+        Research pipeline — intake to publish gate
+      </figcaption>
+      <p className="ds-visually-hidden" id={descId}>
+        {PIPELINE_DESC}
+      </p>
+      <svg
+        className="ds-pipeline-sketch__svg"
+        viewBox="0 0 720 268"
+        role="img"
+        aria-hidden="true"
+        focusable="false"
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <style>{PIPELINE_SKETCH_SVG_STYLE}</style>
+        <title>Research pipeline sketch</title>
+
+        <text className="ds-pipeline-sketch__note" x="24" y="22">
+          01 · intake
+        </text>
+        <path
+          className="ds-pipeline-sketch__box ds-pipeline-sketch__box--accent"
+          d="M 24 36 C 22 34, 28 32, 40 34 L 168 32 C 180 33, 184 38, 182 50 L 180 118 C 181 130, 174 136, 160 134 L 36 132 C 24 131, 18 124, 20 112 Z"
+        />
+        <text className="ds-pipeline-sketch__title" x="40" y="58">
+          Curated net
+        </text>
+        <text className="ds-pipeline-sketch__label" x="40" y="78">
+          Gov · Archives
+        </text>
+        <text className="ds-pipeline-sketch__label" x="40" y="96">
+          Museums · Law
+        </text>
+        <path
+          className="ds-pipeline-sketch__box"
+          d="M 24 148 C 22 146, 28 144, 40 146 L 168 144 C 180 145, 184 150, 182 162 L 180 230 C 181 242, 174 248, 160 246 L 36 244 C 24 243, 18 236, 20 224 Z"
+        />
+        <text className="ds-pipeline-sketch__title" x="40" y="170">
+          Broad net
+        </text>
+        <text className="ds-pipeline-sketch__label" x="40" y="190">
+          Forums · Search
+        </text>
+        <text className="ds-pipeline-sketch__label" x="40" y="208">
+          RSS · Community
+        </text>
+
+        <path
+          className="ds-pipeline-sketch__connector ds-pipeline-sketch__connector--accent"
+          d="M 186 90 C 198 90, 206 112, 218 134"
+        />
+        <path
+          className="ds-pipeline-sketch__connector ds-pipeline-sketch__connector--accent"
+          d="M 186 190 C 198 190, 206 168, 218 146"
+        />
+        <SketchArrowHead x={220} y={140} />
+
+        <text className="ds-pipeline-sketch__note" x="236" y="22">
+          02 · assemble
+        </text>
+        <path
+          className="ds-pipeline-sketch__box"
+          d="M 236 48 C 234 46, 240 44, 252 46 L 360 44 C 372 45, 376 52, 374 64 L 372 220 C 373 234, 366 240, 352 238 L 248 236 C 236 235, 230 228, 232 214 Z"
+        />
+        <text className="ds-pipeline-sketch__title" x="252" y="72">
+          Puzzle pieces
+        </text>
+        <text className="ds-pipeline-sketch__label" x="252" y="92">
+          Claims · Place
+        </text>
+        <text className="ds-pipeline-sketch__label" x="252" y="110">
+          Citations · Dedup
+        </text>
+        <path className="ds-pipeline-sketch__piece" d="M 268 140 L 300 136 L 304 168 L 272 172 Z" />
+        <path className="ds-pipeline-sketch__piece" d="M 296 148 L 328 144 L 332 176 L 300 180 Z" />
+        <path
+          className="ds-pipeline-sketch__piece ds-pipeline-sketch__piece--fill"
+          d="M 280 176 L 312 172 L 316 204 L 284 208 Z"
+        />
+        <text className="ds-pipeline-sketch__note" x="252" y="228">
+          quarantine · not a dump
+        </text>
+
+        <path
+          className="ds-pipeline-sketch__connector ds-pipeline-sketch__connector--accent"
+          d="M 380 140 L 408 140"
+        />
+        <SketchArrowHead x={412} y={140} />
+
+        <text className="ds-pipeline-sketch__note" x="424" y="22">
+          03 · models
+        </text>
+        <path
+          className="ds-pipeline-sketch__box ds-pipeline-sketch__box--accent"
+          d="M 424 36 C 422 34, 428 32, 440 34 L 548 32 C 560 33, 564 38, 562 50 L 560 118 C 561 130, 554 136, 540 134 L 436 132 C 424 131, 418 124, 420 112 Z"
+        />
+        <text className="ds-pipeline-sketch__title" x="440" y="58">
+          Local server
+        </text>
+        <text className="ds-pipeline-sketch__label" x="440" y="78">
+          First pass · private
+        </text>
+        <text className="ds-pipeline-sketch__note" x="440" y="100">
+          stages drafts only
+        </text>
+        <path
+          className="ds-pipeline-sketch__box"
+          d="M 424 148 C 422 146, 428 144, 440 146 L 548 144 C 560 145, 564 150, 562 162 L 560 230 C 561 242, 554 248, 540 246 L 436 244 C 424 243, 418 236, 420 224 Z"
+        />
+        <text className="ds-pipeline-sketch__title" x="440" y="170">
+          Paid models
+        </text>
+        <text className="ds-pipeline-sketch__label" x="440" y="190">
+          Deeper research
+        </text>
+        <text className="ds-pipeline-sketch__note" x="440" y="212">
+          still human-gated
+        </text>
+
+        <path
+          className="ds-pipeline-sketch__connector ds-pipeline-sketch__connector--accent"
+          d="M 566 90 C 578 90, 586 112, 598 134"
+        />
+        <path
+          className="ds-pipeline-sketch__connector ds-pipeline-sketch__connector--accent"
+          d="M 566 190 C 578 190, 586 168, 598 146"
+        />
+        <SketchArrowHead x={600} y={140} />
+
+        <text className="ds-pipeline-sketch__note" x="612" y="22">
+          04 · gate
+        </text>
+        <path
+          className="ds-pipeline-sketch__box"
+          d="M 612 48 C 610 46, 616 44, 628 46 L 696 44 C 706 45, 710 52, 708 64 L 706 120 C 707 132, 700 138, 688 136 L 624 134 C 612 133, 606 126, 608 114 Z"
+        />
+        <text className="ds-pipeline-sketch__title" x="628" y="72">
+          Verify
+        </text>
+        <text className="ds-pipeline-sketch__label" x="628" y="92">
+          People review
+        </text>
+        <text className="ds-pipeline-sketch__note" x="628" y="112">
+          provenance
+        </text>
+        <path
+          className="ds-pipeline-sketch__box ds-pipeline-sketch__box--accent"
+          d="M 612 152 C 610 150, 616 148, 628 150 L 696 148 C 706 149, 710 156, 708 168 L 706 224 C 707 236, 700 242, 688 240 L 624 238 C 612 237, 606 230, 608 218 Z"
+        />
+        <text className="ds-pipeline-sketch__title" x="628" y="176">
+          Publish gate
+        </text>
+        <text className="ds-pipeline-sketch__label" x="628" y="196">
+          Human decision
+        </text>
+        <text className="ds-pipeline-sketch__note" x="628" y="216">
+          public record
+        </text>
+
+        <text className="ds-pipeline-sketch__note" x="24" y="262">
+          Discovery tools never publish alone
+        </text>
+      </svg>
+    </figure>
+  );
+}
+
 /** Full end-to-end research pipeline as a notebook-style sketch. */
-export function ResearchPipelineSketch() {
+export function ResearchPipelineSketch({ compact = false }: ResearchPipelineSketchProps) {
+  if (compact) {
+    return <CompactResearchPipelineFigure />;
+  }
+
   const titleId = 'research-pipeline-sketch-title';
   const descId = 'research-pipeline-sketch-desc';
 
@@ -85,12 +281,7 @@ export function ResearchPipelineSketch() {
         Research pipeline (sketch) — how fragments become a published record
       </figcaption>
       <p className="ds-visually-hidden" id={descId}>
-        Two intake nets feed adapters: a curated net of government records, archives, museums, and
-        scholarship, and a broad net of forums, Reddit, web search, and community feeds. Fragments
-        aggregate like puzzle pieces, then run through a private local AI home server for a first
-        pass and paid models for deeper research. Vectors and provenance sit in a data layer. Human
-        verification and a publish gate decide what reaches the public record. Discovery tools never
-        publish alone.
+        {PIPELINE_DESC}
       </p>
       <svg
         className="ds-pipeline-sketch__svg"
@@ -451,35 +642,35 @@ export function ResearchPipelineSketch() {
       </svg>
 
       <ol className="ds-pipeline-sketch__legend">
-        <li>
-          <span className="ds-pipeline-sketch__legend-mark">01</span>
-          <span>
-            Curated sources are registered and rights-checked; broad-net leads (including community
-            forums) only surface candidates.
-          </span>
-        </li>
-        <li>
-          <span className="ds-pipeline-sketch__legend-mark">02</span>
-          <span>
-            Fragments assemble like puzzle pieces — citations, place, and claims — through dedup and
-            quarantine, not a single scrape dump.
-          </span>
-        </li>
-        <li>
-          <span className="ds-pipeline-sketch__legend-mark">03</span>
-          <span>
-            Local models on a private home server run a first pass; paid models deepen research. Both
-            stage drafts for people — they never write the public projection.
-          </span>
-        </li>
-        <li>
-          <span className="ds-pipeline-sketch__legend-mark">04</span>
-          <span>
-            Vectors help search and near-duplicate screening; provenance travels with every claim.
-            Human verification and the publish gate decide what readers see.
-          </span>
-        </li>
-      </ol>
+          <li>
+            <span className="ds-pipeline-sketch__legend-mark">01</span>
+            <span>
+              Curated sources are registered and rights-checked; broad-net leads (including community
+              forums) only surface candidates.
+            </span>
+          </li>
+          <li>
+            <span className="ds-pipeline-sketch__legend-mark">02</span>
+            <span>
+              Fragments assemble like puzzle pieces — citations, place, and claims — through dedup
+              and quarantine, not a single scrape dump.
+            </span>
+          </li>
+          <li>
+            <span className="ds-pipeline-sketch__legend-mark">03</span>
+            <span>
+              Local models on a private home server run a first pass; paid models deepen research.
+              Both stage drafts for people — they never write the public projection.
+            </span>
+          </li>
+          <li>
+            <span className="ds-pipeline-sketch__legend-mark">04</span>
+            <span>
+              Vectors help search and near-duplicate screening; provenance travels with every claim.
+              Human verification and the publish gate decide what readers see.
+            </span>
+          </li>
+        </ol>
     </figure>
   );
 }

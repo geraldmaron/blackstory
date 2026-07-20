@@ -1105,6 +1105,12 @@ export const publicEntityProjectionSchema = z.object({
   /** Derived current status label (e.g. "active", "in_force", "living") never a scalar the
    * reader hand-edits; always derived via @repo/domain's `currentEntityStatus`. */
   status: z.string().min(1).optional(),
+  /**
+   * Time-scoped lifecycle designations that back `status` (entity-lifecycle only — never
+   * sundown/redlining layer records). Optional for bootstrap-window stubs that predate the
+   * release builder shipping this field; national-catalog releases carry it when derived.
+   */
+  statusHistory: z.array(statusHistoryEntrySchema).optional(),
   /** Decade labels the entity's dated span overlaps (e.g. ["1950s", "1960s"]) derived via
    * @repo/domain's `deriveEraBuckets`, replacing the free-text `era` string. */
   eraBuckets: z.array(z.string().min(1)).optional(),

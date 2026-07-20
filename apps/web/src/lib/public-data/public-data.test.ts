@@ -10,7 +10,7 @@ import {
   mapProjectionToPublicEntityView,
   resolveJurisdictionLabel,
 } from './map-projection';
-
+import { hydrateEntityLearningLinks } from './source';
 test('shouldUseLivePublicProjections is off by default in development', () => {
   assert.equal(
     shouldUseLivePublicProjections({
@@ -285,4 +285,97 @@ test('mapProjectionToPublicEntityView maps independentLineageCount when present 
   });
   assert.equal(view.claims[0]!.independentLineageCount, 3);
   assert.equal(view.claims[1]!.independentLineageCount, undefined);
+});
+
+test('mapProjectionToPublicEntityView maps shipped statusHistory onto the view', () => {
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_status_shipped_001',
+    releaseId: 'rel_live_004',
+    kind: 'school',
+    displayName: 'Status Shipped School',
+    nameLower: 'status shipped school',
+    summary: 'A school projection that already carries release-shipped status history.',
+    claimIds: [],
+    status: 'active',
+    statusHistory: [
+      {
+        status: 'historic',
+        validFrom: '1870',
+        validTo: '1891',
+        datePrecision: 'year',
+        basisClaimIds: ['claim_a'],
+      },
+      {
+        status: 'active',
+        validFrom: '1891',
+        datePrecision: 'year',
+        basisClaimIds: ['claim_b'],
+      },
+    ],
+  });
+  assert.equal(view.status, 'active');
+  assert.equal(view.statusHistory?.length, 2);
+  assert.equal(view.statusHistory?.[0]?.status, 'historic');
+  assert.equal(view.statusHistory?.[1]?.validFrom, '1891');
+});
+
+test('mapProjectionToPublicEntityView derives statusHistory when only status/era signals exist', () => {
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_status_derive_001',
+    releaseId: 'rel_live_005',
+    kind: 'place',
+    displayName: 'Active Campus Site',
+    nameLower: 'active campus site',
+    summary:
+      'This university campus remains a working research university with an active campus today.',
+    claimIds: [],
+    eraBuckets: ['1860s'],
+    status: 'active',
+  });
+  assert.equal(view.status, 'active');
+  assert.ok(view.statusHistory);
+  assert.equal(view.statusHistory?.[0]?.status, 'active');
+  assert.equal(view.statusHistory?.[0]?.validFrom, '1860');
+});
+
+test('hydrateEntityLearningLinks builds a timeline from status history and dated related edges', () => {
+  const base = mapProjectionToPublicEntityView({
+    id: 'ent_timeline_self_001',
+    releaseId: 'rel_live_006',
+    kind: 'place',
+    displayName: 'Timeline Self',
+    nameLower: 'timeline self',
+    summary: 'Entity used to verify hydrate-time timeline composition from status history.',
+    claimIds: [],
+    status: 'active',
+    statusHistory: [
+      {
+        status: 'active',
+        validFrom: '1900',
+        datePrecision: 'year',
+        basisClaimIds: [],
+      },
+    ],
+    related: [
+      {
+        id: 'ent_timeline_neighbor_001',
+        type: 'located_at',
+        direction: 'outgoing',
+        timespan: { validFrom: '1910' },
+      },
+    ],
+  });
+  const neighbor = mapProjectionToPublicEntityView({
+    id: 'ent_timeline_neighbor_001',
+    releaseId: 'rel_live_006',
+    kind: 'place',
+    displayName: 'Timeline Neighbor',
+    nameLower: 'timeline neighbor',
+    summary: 'Neighbor entity used only for display-name resolution in timeline sentences.',
+    claimIds: [],
+  });
+  const hydrated = hydrateEntityLearningLinks(base, [base, neighbor]);
+  assert.ok(hydrated.timeline.length >= 2);
+  assert.ok(hydrated.timeline.some((item) => item.time === '1900'));
+  assert.ok(hydrated.timeline.some((item) => item.time === '1910'));
 });

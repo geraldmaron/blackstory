@@ -30,12 +30,14 @@ export const RECORD_GAP_COPY: Readonly<Record<RecordGapKind, RecordGapCopy>> = {
   timeline: {
     title: 'No dated history yet',
     body:
-      'No dated timeline entries are available yet for this record\u2019s published history graph ' +
-      'and status history.',
+      'No dated status changes or relationship timespans have been published for this record yet. ' +
+      'This reflects the current state of research, not an absence of history.',
   },
   statusHistory: {
-    title: 'No status history recorded',
-    body: 'No time-scoped status designation has been entered for this record yet.',
+    title: 'No status recorded',
+    body:
+      'No lifecycle status has been published for this record yet. This reflects the current ' +
+      'state of research, not an absence of history.',
   },
   context: {
     title: 'Historical context forthcoming',

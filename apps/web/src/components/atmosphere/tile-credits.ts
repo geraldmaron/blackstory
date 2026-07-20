@@ -14,7 +14,7 @@ export type AtmosphereTileCredit = {
   readonly sourceUrl: string;
 };
 
-/** 233-tile pool — index order matches public/brand/collage/tiles/manifest.json. */
+/** 232-tile pool — index order matches public/brand/collage/tiles/manifest.json. */
 export const ATMOSPHERE_TILE_CREDITS: readonly AtmosphereTileCredit[] = [
   {
     index: '001',
@@ -372,13 +372,6 @@ export const ATMOSPHERE_TILE_CREDITS: readonly AtmosphereTileCredit[] = [
     path: '/brand/collage/tiles/051.jpg',
     sourceUrl:
       'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_harlem_001/primary.jpg',
-  },
-  {
-    index: '052',
-    entityId: 'ent_nicodemus_001',
-    path: '/brand/collage/tiles/052.jpg',
-    sourceUrl:
-      'https://storage.googleapis.com/black-book-efaaf-public-media/public/entities/ent_nicodemus_001/primary.jpg',
   },
   {
     index: '053',

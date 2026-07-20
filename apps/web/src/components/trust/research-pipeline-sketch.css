@@ -148,6 +148,26 @@
   color: var(--ds-accent);
 }
 
+.ds-pipeline-sketch--compact {
+  margin-top: 0;
+  padding: var(--ds-space-3);
+}
+
+.ds-pipeline-sketch--compact .ds-pipeline-sketch__figcaption {
+  margin-bottom: var(--ds-space-2);
+  font-size: 0.75rem;
+}
+
+.ds-pipeline-sketch--compact .ds-pipeline-sketch__svg {
+  max-width: none;
+  /* Condensed viewBox is ~268 tall — keep height proportional, never overflow the column. */
+  aspect-ratio: 720 / 268;
+}
+
+.ds-pipeline-sketch--compact .ds-pipeline-sketch__legend {
+  display: none;
+}
+
 @media (max-width: 640px) {
   .ds-pipeline-sketch {
     padding: var(--ds-space-3);
@@ -165,3 +185,4 @@
     font-size: 7.5px;
   }
 }
+

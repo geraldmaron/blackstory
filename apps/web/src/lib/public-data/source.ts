@@ -29,6 +29,7 @@ import {
   type PublicEntityView,
   type RelatedNeighborView,
 } from '../../data/public-seed';
+import { buildGraphTimeline } from '../../data/entity-graph-seed';
 import {
   isPublicReadApiDisabled,
   resolvePublicEntity,
@@ -124,7 +125,8 @@ function asRelatedNeighborViews(
   );
 }
 
-/** Attach 1-hop stubs + capped 2-hop continue-learning using a neighbor catalog. */
+/** Attach 1-hop stubs + capped 2-hop continue-learning using a neighbor catalog.
+ * Also composes the dated timeline once neighbor display names are resolvable. */
 export function hydrateEntityLearningLinks(
   entity: PublicEntityView,
   catalog: readonly PublicEntityView[],
@@ -139,8 +141,23 @@ export function hydrateEntityLearningLinks(
     composeContinueLearningStubs(entity.id, relatedNeighbors, neighborsById),
   );
 
+  const displayNameLookup = new Map(
+    catalog.map((item) => [item.id, { displayName: item.displayName }]),
+  );
+  displayNameLookup.set(entity.id, { displayName: entity.displayName });
+  // Prefer already-hydrated neighbor stubs when the catalog is thin (single-entity path).
+  for (const neighbor of relatedNeighbors) {
+    if (!displayNameLookup.has(neighbor.id)) {
+      displayNameLookup.set(neighbor.id, { displayName: neighbor.displayName });
+    }
+  }
+  const timeline = buildGraphTimeline(entity, displayNameLookup).filter(
+    (item) => !/^undated$/i.test(item.time.trim()),
+  );
+
   return {
     ...entity,
+    timeline,
     ...(relatedNeighbors.length > 0 ? { relatedNeighbors } : {}),
     ...(continueLearning.length > 0 ? { continueLearning } : {}),
   };

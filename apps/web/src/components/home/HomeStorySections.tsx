@@ -2,21 +2,23 @@
  * The paper-canvas beats below the persistent map hero (design-direction-v5
  * §6.1): About (product thesis + quiet place orientation), From the data
  * (archive counts + `/data` census visualizations), Discover (story rail), and
- * one fixed-ink "How this works" band handing off to /methodology.
+ * one fixed-ink "How this works" band (methodology sketch + three points).
  *
- * Typed loosely against the featured-entity shape `app/(map)/page.tsx` already
- * builds from the public entity source so either stream can adjust its own
- * data plumbing without touching this component's contract.
+ * Chart and pipeline-sketch CSS are imported by `app/(map)/page.tsx` so this
+ * module stays unit-testable under node/tsx without CSS loaders.
  */
 
+import React from 'react';
 import Link from 'next/link';
 import type { NationalPopulationTimelineSnapshot } from '@repo/firebase';
 import { isDisplayableJurisdictionLabel } from '../../lib/public-data/map-projection';
 import { KindBadge } from '../map-experience/KindBadge';
-import { HomeAbout } from './HomeAbout';
+import { HomeAbout, type HomeAboutProps } from './HomeAbout';
 import { HomeDataPulse } from './HomeDataPulse';
+import { HomeHowThisWorks } from './HomeHowThisWorks';
 import type { StateStartEntry } from './StateStart';
-import '../data/data-charts.css';
+
+void React;
 
 export type HomeStoryEntity = {
   readonly id: string;
@@ -37,14 +39,9 @@ export type HomeStorySectionsProps = {
   readonly eraSpan?: string | undefined;
   /** Merged 1790–2020 national timeline snapshot for the data pulse. */
   readonly timeline?: NationalPopulationTimelineSnapshot | undefined;
+  /** Override for tests — defaults to the live StateStart client control. */
+  readonly OrientControl?: HomeAboutProps['OrientControl'];
 };
-
-/** v5 §6.5 "How this works" — three points, evidence before assertion. */
-const HOW_ITEMS = [
-  'Every record is documented: people, places, schools, and events with accepted claims, citations, and confidence you can read for yourself.',
-  'Contradictions stay visible. When sources disagree, the record says so: confidence is never a color alone, and disputes are part of the story.',
-  'Dignity is a rule, not a tone. Street-level residences stay off the public map, living people stay protected, and presence is never framed as deficit.',
-] as const;
 
 export function HomeStorySections({
   featured,
@@ -53,11 +50,15 @@ export function HomeStorySections({
   stateCount,
   eraSpan,
   timeline,
+  OrientControl,
 }: HomeStorySectionsProps) {
   return (
     <>
       <div className="ds-container ds-page">
-        <HomeAbout topStates={topStates} />
+        <HomeAbout
+          topStates={topStates}
+          {...(OrientControl ? { OrientControl } : {})}
+        />
 
         <HomeDataPulse
           recordCount={recordCount}
@@ -101,24 +102,7 @@ export function HomeStorySections({
         </section>
       </div>
 
-      <section className="ds-band" aria-labelledby="how-heading">
-        <div className="ds-container">
-          <p className="ds-section__kicker">How this works</p>
-          <h2 className="ds-section__title" id="how-heading">
-            Evidence before assertion.
-          </h2>
-          <ol className="ds-qualify-list">
-            {HOW_ITEMS.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ol>
-          <p className="ds-band__cta">
-            <Link className="ds-cta ds-cta--solid" href="/methodology">
-              Read the methodology
-            </Link>
-          </p>
-        </div>
-      </section>
+      <HomeHowThisWorks />
     </>
   );
 }

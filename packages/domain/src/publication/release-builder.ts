@@ -162,6 +162,14 @@ export type ReleaseEntityProjectionFields = {
   readonly jurisdictionLabel: string;
   readonly locationLabel: string;
   readonly status?: string;
+  /** Time-scoped lifecycle designations that back `status`. Present when derived or authored. */
+  readonly statusHistory?: readonly {
+    readonly status: string;
+    readonly validFrom?: string;
+    readonly validTo?: string | null;
+    readonly datePrecision: string;
+    readonly basisClaimIds: readonly string[];
+  }[];
   readonly eraBuckets?: readonly string[];
   readonly sensitivityClass?: string;
   readonly topicTags: readonly string[];
@@ -562,6 +570,7 @@ export function buildReleaseEntityArtifacts(
     ...(entry.livingStatus !== undefined ? { livingStatus: entry.livingStatus } : {}),
   });
   const publicStatus = derivedStatus.status ?? entry.status;
+  const publicStatusHistory = derivedStatus.statusHistory;
 
   const projection: ReleaseEntityProjectionFields = {
     id: entry.id,
@@ -583,6 +592,9 @@ export function buildReleaseEntityArtifacts(
     jurisdictionLabel: entry.jurisdictionLabel,
     locationLabel,
     ...(publicStatus !== undefined ? { status: publicStatus } : {}),
+    ...(publicStatusHistory !== undefined && publicStatusHistory.length > 0
+      ? { statusHistory: publicStatusHistory }
+      : {}),
     ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
     ...(entry.sensitivityClass !== undefined ? { sensitivityClass: entry.sensitivityClass } : {}),
     topicTags: entry.topicTags ?? [],

@@ -22,6 +22,11 @@ export type EvidenceResearchCoverageSummaryProps = {
   readonly retractionNotices?: readonly EvidenceRetractionNotice[];
 };
 
+function sourceLineageSentence(count: number): string {
+  const noun = count === 1 ? 'source' : 'sources';
+  return `${count} independent ${noun} across this record\u2019s evidenced claims.`;
+}
+
 export function EvidenceResearchCoverageSummary({
   researchCoverage,
   sourceLineage,
@@ -45,28 +50,24 @@ export function EvidenceResearchCoverageSummary({
     <section className="ds-aside-block" aria-label="Research coverage">
       <h3 className="ds-aside-block__title">Research coverage</h3>
       <p className="ds-aside-block__meta ds-mono">{humanizeToken(researchCoverage.level)}</p>
-      <dl className="ds-sans" style={{ margin: 0 }}>
+      <dl className="ds-entity-meta-list">
         {sourceLineage ? (
-          <>
-            <dt className="ds-dt">Source lineage</dt>
-            <dd style={{ margin: '0 0 var(--ds-space-3) 0' }}>
-              <span className="ds-mono">{sourceLineage.independentLineageCount}</span> independent{' '}
-              {sourceLineage.independentLineageCount === 1 ? 'source' : 'sources'} across this
-              record&rsquo;s evidenced claims.
-            </dd>
-          </>
+          <div className="ds-entity-meta-list__row">
+            <dt>Source lineage</dt>
+            <dd>{sourceLineageSentence(sourceLineage.independentLineageCount)}</dd>
+          </div>
         ) : null}
         {researchCoverage.notes ? (
-          <>
-            <dt className="ds-dt">Coverage notes</dt>
-            <dd style={{ margin: '0 0 var(--ds-space-3) 0' }}>{researchCoverage.notes}</dd>
-          </>
+          <div className="ds-entity-meta-list__row">
+            <dt>Coverage notes</dt>
+            <dd>{researchCoverage.notes}</dd>
+          </div>
         ) : null}
         {lastChecked ? (
-          <>
-            <dt className="ds-dt">Last checked</dt>
-            <dd style={{ margin: 0 }}>{formatIsoDate(lastChecked)}</dd>
-          </>
+          <div className="ds-entity-meta-list__row">
+            <dt>Last checked</dt>
+            <dd>{formatIsoDate(lastChecked)}</dd>
+          </div>
         ) : null}
       </dl>
 

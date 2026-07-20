@@ -90,6 +90,39 @@ function assertNoNumericLeaf(value: unknown, path = '$'): void {
   }
 }
 
+test('publicEntityProjectionSchema parses statusHistory lifecycle entries', () => {
+  const parsed = publicEntityProjectionSchema.parse({
+    id: 'ent-school-1',
+    releaseId: 'rel-1',
+    kind: 'school',
+    displayName: 'Example High School',
+    nameLower: 'example high school',
+    summary:
+      'A documented school in the public learning index with published provenance and ' +
+      'accepted claims suitable for civic education and research.',
+    claimIds: ['claim-1'],
+    status: 'active',
+    statusHistory: [
+      {
+        status: 'historic',
+        validFrom: '1870',
+        validTo: '1891',
+        datePrecision: 'year',
+        basisClaimIds: ['claim-1'],
+      },
+      {
+        status: 'active',
+        validFrom: '1891',
+        datePrecision: 'year',
+        basisClaimIds: ['claim-1'],
+      },
+    ],
+  });
+  assert.equal(parsed.statusHistory?.length, 2);
+  assert.equal(parsed.statusHistory?.[0]?.status, 'historic');
+  assert.equal(parsed.statusHistory?.[1]?.validFrom, '1891');
+});
+
 test('publicEntityProjectionSchema additions never carry a numeric score', () => {
   const parsed = publicEntityProjectionSchema.parse({
     id: 'ent-law-1',

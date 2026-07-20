@@ -5,7 +5,13 @@
  * public coordinates via `findUsStateForPoint` — never invents "Unknown" or seed text.
  */
 
-import { type NotabilityCriterion } from '@repo/domain';
+import {
+  deriveCatalogEntityStatus,
+  type EntityStatusValue,
+  type NotabilityCriterion,
+  type StatusHistoryEntry,
+} from '@repo/domain';
+import { isDatePrecision } from '@repo/domain/era';
 import { findUsStateForPoint } from '@repo/domain/map/geography';
 import { type PublicEntityView } from '../../data/public-seed';
 
@@ -46,6 +52,14 @@ export type PublicProjectionInput = {
     readonly independentLineageCount?: number;
   }[];
   readonly status?: string;
+  /** Time-scoped lifecycle designations that back `status` when the release builder shipped them. */
+  readonly statusHistory?: readonly {
+    readonly status: string;
+    readonly validFrom?: string;
+    readonly validTo?: string | null;
+    readonly datePrecision: string;
+    readonly basisClaimIds?: readonly string[];
+  }[];
   readonly eraBuckets?: readonly string[];
   readonly notabilityLabels?: readonly string[];
   /** Structured, auditable inclusion basis (the related workstream's release builder). Present on
@@ -122,6 +136,69 @@ function mapClaims(claims: PublicProjectionInput['claims']): PublicEntityView['c
   }));
 }
 
+function mapStatusHistory(
+  history: PublicProjectionInput['statusHistory'],
+): readonly StatusHistoryEntry<EntityStatusValue>[] | undefined {
+  if (!history || history.length === 0) return undefined;
+  return history.map((entry) => ({
+    status: entry.status as EntityStatusValue,
+    datePrecision: isDatePrecision(entry.datePrecision) ? entry.datePrecision : 'circa',
+    basisClaimIds: entry.basisClaimIds ?? [],
+    ...(entry.validFrom !== undefined ? { validFrom: entry.validFrom } : {}),
+    ...(entry.validTo !== undefined ? { validTo: entry.validTo } : {}),
+  }));
+}
+
+/**
+ * Prefer release-shipped statusHistory. When older projections only carry a derived `status`
+ * scalar (pre-statusHistory public shape), re-run the same catalog derivation the release
+ * builder uses so status panels and timelines can render dated lifecycle entries without
+ * waiting for a republish.
+ */
+function resolveStatusHistory(
+  projection: PublicProjectionInput,
+  claims: PublicEntityView['claims'],
+): {
+  readonly status?: string;
+  readonly statusHistory?: readonly StatusHistoryEntry<EntityStatusValue>[];
+} {
+  const shipped = mapStatusHistory(projection.statusHistory);
+  if (shipped) {
+    return {
+      ...(projection.status !== undefined ? { status: projection.status } : {}),
+      statusHistory: shipped,
+    };
+  }
+
+  const derived = deriveCatalogEntityStatus({
+    id: projection.id,
+    kind: projection.kind,
+    displayName: projection.displayName,
+    ...(projection.summary !== undefined ? { summary: projection.summary } : {}),
+    ...(projection.historicalContext !== undefined
+      ? { historicalContext: projection.historicalContext }
+      : {}),
+    ...(projection.eraBuckets !== undefined ? { eraBuckets: projection.eraBuckets } : {}),
+    claims: claims.map((claim) => ({
+      id: claim.id,
+      predicate: claim.predicate,
+      object: claim.object,
+    })),
+    ...(projection.status !== undefined ? { status: projection.status } : {}),
+  });
+
+  return {
+    ...(projection.status !== undefined
+      ? { status: projection.status }
+      : derived.status !== undefined
+        ? { status: derived.status }
+        : {}),
+    ...(derived.statusHistory !== undefined && derived.statusHistory.length > 0
+      ? { statusHistory: derived.statusHistory }
+      : {}),
+  };
+}
+
 function mapGeoAnchor(location: PublicProjectionInput['location']): PublicEntityView['geoAnchor'] {
   if (!location) return undefined;
   return {
@@ -190,6 +267,7 @@ export function mapProjectionToPublicEntityView(
   const primaryImage = mapPrimaryImage(projection.primaryImage);
   const geoAnchor = mapGeoAnchor(projection.location);
   const claims = mapClaims(projection.claims);
+  const { status, statusHistory } = resolveStatusHistory(projection, claims);
 
   const lat = projection.location?.lat;
   const lng = projection.location?.lng;
@@ -208,7 +286,8 @@ export function mapProjectionToPublicEntityView(
     displayName: projection.displayName,
     summary,
     era: projection.eraBuckets?.[0] ?? 'unknown',
-    ...(projection.status !== undefined ? { status: projection.status } : {}),
+    ...(status !== undefined ? { status } : {}),
+    ...(statusHistory !== undefined ? { statusHistory } : {}),
     ...(projection.eraBuckets !== undefined ? { eraBuckets: projection.eraBuckets } : {}),
     notabilityLabels:
       projection.notabilityLabels && projection.notabilityLabels.length > 0
@@ -245,6 +324,8 @@ export function mapProjectionToPublicEntityView(
     researchCoverage: projection.researchCoverage ?? (claims.length >= 2 ? 'partial' : 'minimal'),
     mapPin,
     claims,
+    // Timeline is composed at hydrate time once neighbor display names are known
+    // (`hydrateEntityLearningLinks` → `buildGraphTimeline`).
     timeline: [],
     revision: {
       releaseId: projection.releaseId,

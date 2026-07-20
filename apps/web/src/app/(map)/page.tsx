@@ -17,6 +17,8 @@ import {
 } from '@repo/domain/map/state-population';
 import { HomeStorySections } from '../../components/home/HomeStorySections';
 import type { StateStartEntry } from '../../components/home/StateStart';
+import '../../components/data/data-charts.css';
+import '../../components/trust/research-pipeline-sketch.css';
 import { FEATURED_SEED_IDS } from '../../data/public-seed';
 import type { ExploreMapFeatureCollection } from '../../lib/map-experience/build-explore-map-source';
 import type { HistoryEdgeLineCollection } from '../../lib/map-experience/build-history-edge-lines';

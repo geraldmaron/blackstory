@@ -14,6 +14,12 @@ export const WHY_THIS_APPEARS_COPY = {
   noBasisRecorded:
     'No inclusion evidence with linked citations has been recorded for this record yet.',
   noLinkedCitations: 'No linked source citations for this inclusion reason yet.',
-  missingPerspectiveHeading: 'Coverage note',
+  missingPerspectiveHeading: 'Research balance',
+  /** Lead sentence when accepted evidence is harm-heavy and balancing dimensions are thin. */
+  missingPerspectiveLead:
+    'Accepted evidence for this record is still weighted toward harm. Documented connections ' +
+    'across the following have not yet cleared the evidence bar:',
+  missingPerspectiveClose:
+    'This reflects the current state of research, not an absence of history.',
   citationsHeading: 'Sources',
 } as const;

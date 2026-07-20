@@ -160,7 +160,11 @@ test('renders the shared trauma-content disclaimer only when the harm dimension 
     }),
   );
   assert.match(harmHtml, /Sensitive content/);
-  assert.match(harmHtml, /Coverage note/);
+  assert.match(harmHtml, /Research balance/);
+  assert.match(harmHtml, /weighted toward harm/);
+  assert.doesNotMatch(harmHtml, /No documented joy connection/);
+  assert.match(harmHtml, /Joy/);
+  assert.match(harmHtml, /Family/);
 
   const balancedResult = buildPublicWhyThisAppears({
     explanation:
@@ -186,7 +190,7 @@ test('renders the shared trauma-content disclaimer only when the harm dimension 
     }),
   );
   assert.doesNotMatch(balancedHtml, /Sensitive content/);
-  assert.doesNotMatch(balancedHtml, /Coverage note/);
+  assert.doesNotMatch(balancedHtml, /Research balance/);
 });
 
 test('renders the approved gap notice when an entity carries zero notabilityBasis items', () => {

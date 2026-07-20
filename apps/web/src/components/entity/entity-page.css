@@ -259,6 +259,42 @@
   color: var(--ds-ink-muted);
 }
 
+.ds-why-appears__coverage {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-entity-meta-list {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: 0;
+}
+
+.ds-entity-meta-list__row {
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-entity-meta-list__row dt {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-entity-meta-list__row dd {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--ds-ink);
+}
+
 .ds-evidence-legend {
   margin: 0;
   padding-top: var(--ds-space-3);

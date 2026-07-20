@@ -190,13 +190,12 @@ function WhyThisAppearsBody({
           <h3 id={coverageHeadingId} className="ds-subheading">
             {WHY_THIS_APPEARS_COPY.missingPerspectiveHeading}
           </h3>
-          <ul>
-            {result.missingPerspectiveIndicators.map((indicator) => (
-              <li key={indicator.dimension} className="ds-sans">
-                {indicator.note}
-              </li>
-            ))}
-          </ul>
+          <p className="ds-sans ds-why-appears__coverage">
+            {WHY_THIS_APPEARS_COPY.missingPerspectiveLead}{' '}
+            {result.missingPerspectiveIndicators.map((indicator) => indicator.label).join(', ')}.
+            {' '}
+            {WHY_THIS_APPEARS_COPY.missingPerspectiveClose}
+          </p>
         </section>
       ) : null}
     </>

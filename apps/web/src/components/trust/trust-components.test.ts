@@ -110,6 +110,19 @@ test('ResearchPipelineSketch exposes a text alternative for the pipeline figure'
   assert.doesNotMatch(html, /repo-|BB-\d+/);
 });
 
+test('ResearchPipelineSketch compact uses a condensed SVG and omits the stage legend', () => {
+  const html = renderToStaticMarkup(createElement(ResearchPipelineSketch, { compact: true }));
+  assert.match(html, /ds-pipeline-sketch--compact/);
+  assert.match(html, /Research pipeline — intake to publish gate/);
+  assert.match(html, /Local server/);
+  assert.match(html, /Publish gate/);
+  assert.match(html, /viewBox="0 0 720 268"/);
+  assert.match(html, /Discovery tools never publish alone/);
+  assert.doesNotMatch(html, /never write the public projection/i);
+  assert.doesNotMatch(html, /ds-pipeline-sketch__legend/);
+  assert.doesNotMatch(html, /viewBox="0 0 720 824"/);
+});
+
 test('SourceTypesSketch ranks authority against discovery without inventing completeness', () => {
   const html = renderToStaticMarkup(createElement(SourceTypesSketch));
   assert.match(html, /Authority sources include government/i);

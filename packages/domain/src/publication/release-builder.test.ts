@@ -408,4 +408,7 @@ test('buildReleaseEntityArtifacts derives status when entry has no status field'
   if (!result.ok) return;
   assert.equal(result.projection.status, 'active');
   assert.equal(result.searchIndex.status, 'active');
+  assert.ok(result.projection.statusHistory);
+  assert.equal(result.projection.statusHistory?.[0]?.status, 'active');
+  assert.equal(result.projection.statusHistory?.[0]?.validFrom, '1860');
 });

@@ -51,5 +51,17 @@ test('renders the approved statusHistory gap notice when a place-like kind has n
   const html = renderToStaticMarkup(
     createElement(EntityStatusPanel, { entity: withoutHistory, framing: 'historical' }),
   );
-  assert.match(html, /No status history recorded/);
+  assert.match(html, /No status recorded/);
+});
+
+test('renders current status alone when history is missing', () => {
+  const school = requireEntity('ent_dunbar_school_001');
+  const { statusHistory: _statusHistory, ...statusOnly } = school;
+  const html = renderToStaticMarkup(
+    createElement(EntityStatusPanel, { entity: statusOnly, framing: 'present_day' }),
+  );
+  assert.match(html, /Current status/);
+  assert.match(html, /Active/);
+  assert.match(html, /fuller time-scoped status history has not been published/);
+  assert.doesNotMatch(html, /No status recorded/);
 });

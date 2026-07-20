@@ -16,9 +16,10 @@ test('renders the research coverage level, source lineage count, and last-checke
     }),
   );
   assert.match(html, /Partial/);
-  assert.match(html, /3.*independent.*sources/s);
+  assert.match(html, /3 independent sources across this record/);
   assert.match(html, /Last checked/);
   assert.match(html, /2026-06-01/);
+  assert.doesNotMatch(html, /sourcesacross/i);
 });
 
 test('renders record-level retraction notices distinctly from research coverage', () => {
