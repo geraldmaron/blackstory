@@ -2,12 +2,20 @@
  * Data page chrome below the mast: on-page TOC, orientation beats, numbered
  * record sections, and destination CTAs. Chart/viz styles stay in
  * `components/data/data-charts.css`.
+ *
+ * Typography is intentionally lighter than the global section chrome — stacked
+ * kickers, chart titles, and strips felt bulky at medium/semibold everywhere.
  */
 
 .ds-data-page {
   margin-top: var(--ds-space-6);
   max-width: 100%;
   overflow-x: clip;
+}
+
+/* Soften the page mast when this surface is present (title sits outside .ds-data-page). */
+.ds-page:has(> .ds-data-page) .ds-page__title {
+  font-weight: 400;
 }
 
 .ds-data-page [id] {
@@ -18,8 +26,27 @@
   padding-block: var(--ds-space-8);
 }
 
+.ds-data-page .ds-section__title {
+  font-family: var(--ds-font-sans);
+  font-weight: 400;
+  font-size: clamp(1.125rem, 1.05rem + 0.45vw, 1.375rem);
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+
+.ds-data-page .ds-section__kicker {
+  font-weight: 400;
+  margin-bottom: var(--ds-space-3);
+  color: var(--ds-ink-muted);
+}
+
+.ds-data-page .ds-section__kicker::before {
+  /* Keep the copper orientation tick; mute the rest of the kicker line. */
+  color: var(--ds-accent);
+}
+
 .ds-data-page .ds-section__lede {
-  margin-top: var(--ds-space-4);
+  margin-top: var(--ds-space-3);
   font-size: 0.9375rem;
   line-height: 1.55;
 }
@@ -44,7 +71,7 @@
   color: var(--ds-accent);
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -62,17 +89,20 @@
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
-  color: var(--ds-ink);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 400;
   text-decoration: none;
   border-bottom: 2px solid transparent;
-  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+  transition:
+    color var(--ds-duration-fast) var(--ds-easing),
+    border-color var(--ds-duration-fast) var(--ds-easing);
 }
 
 .ds-data-page__nav-link:hover,
 .ds-data-page__nav-link:focus-visible {
+  color: var(--ds-ink);
   border-bottom-color: var(--ds-accent-graphic);
 }
 
@@ -109,7 +139,7 @@
   color: var(--ds-accent);
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -119,25 +149,33 @@
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
   font-size: 0.875rem;
+  font-weight: 400;
   line-height: 1.5;
 }
 
 .ds-data-page__subhead {
   margin: var(--ds-space-6) 0 var(--ds-space-3);
-  font-family: var(--ds-font-display);
-  font-weight: 500;
-  font-size: 1rem;
-  letter-spacing: -0.02em;
-  line-height: 1.25;
+  font-family: var(--ds-font-sans);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  color: var(--ds-ink);
 }
 
 .ds-data-page__callout {
   margin-top: var(--ds-space-4);
 }
 
+.ds-data-page__callout .ds-notice__title,
+.ds-data-page__callout .ds-notice__cue {
+  font-weight: 500;
+}
+
 .ds-data-page__empty {
   margin: var(--ds-space-4) 0 0;
   color: var(--ds-ink-muted);
+  font-weight: 400;
 }
 
 .ds-data-page__actions {
@@ -146,4 +184,24 @@
   gap: var(--ds-space-3);
   margin: var(--ds-space-5) 0 0;
   align-items: center;
+}
+
+/* Charts / strips on this page: keep hierarchy without medium weight everywhere. */
+.ds-data-page .ds-data-chart__title,
+.ds-data-page .ds-data-state-shift__title,
+.ds-data-page .ds-data-state-shift__kicker {
+  font-weight: 400;
+}
+
+.ds-data-page .ds-data-strip__value {
+  font-weight: 400;
+}
+
+.ds-data-page .ds-data-strip__label {
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+.ds-data-page .ds-citation__label {
+  font-weight: 400;
 }
