@@ -69,10 +69,14 @@ async function main(): Promise<void> {
           candidate.gapFill.mentionContexts.join(' | '),
       ];
 
-      const [primary, tier1] = await Promise.all([
-        findAnySource(candidate.displayName),
-        findCorroboratingTier1Source(candidate.displayName, {}),
-      ]);
+      // Sequenced, not parallel: primary lookup (Wikipedia API first) gives us a page
+      // whose OWN citation trail is checked for Tier-1 corroboration before falling
+      // back to a fresh (SearXNG) search — avoids firing two independent, partly
+      // redundant lookups per candidate.
+      const primary = await findAnySource(candidate.displayName);
+      const tier1 = await findCorroboratingTier1Source(candidate.displayName, {
+        ...(primary?.html ? { html: primary.html, url: primary.url } : {}),
+      });
 
       if (primary) {
         foundSource += 1;
