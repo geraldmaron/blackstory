@@ -21,6 +21,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 .ds-shell-body {
@@ -164,8 +166,15 @@
 }
 
 /* The kit lockup at landmark scale — the page signs off with the brand. */
+.ds-shell-footer__wordmark-slot {
+  max-width: 100%;
+  min-width: 0;
+}
+
 .ds-shell-footer__wordmark {
+  display: block;
   width: min(70%, 26rem);
+  max-width: 100%;
   height: auto;
   margin-top: var(--ds-space-4);
 }
@@ -1061,6 +1070,8 @@
   display: grid;
   gap: var(--ds-space-8);
   margin-top: var(--ds-space-6);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .ds-home-data-pulse__subhead {

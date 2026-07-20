@@ -19,6 +19,8 @@
   margin: 0;
   padding: var(--ds-space-5) 0 0;
   border-top: var(--ds-border-width) solid var(--ds-rule);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .ds-data-chart__title {
@@ -32,13 +34,16 @@
 }
 
 .ds-data-chart__viz {
+  min-width: 0;
+  max-width: 100%;
+  /* Nested chart scroll only — must not widen the page. */
   overflow-x: auto;
 }
 
 .ds-data-chart__svg {
   display: block;
   width: 100%;
-  max-width: 40rem;
+  max-width: min(100%, 40rem);
   height: auto;
 }
 

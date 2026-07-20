@@ -106,7 +106,8 @@
 /* Explore: bottom-right zoom, inset when the records sheet/rail is open. */
 .ds-map-surface:has(.ds-explore-stage) {
   --ds-explore-edge: var(--ds-space-4);
-  --ds-explore-results-width: min(92vw, 22.5rem);
+  /* % of the fixed containing block (viewport) — avoid 100vw scrollbar gutter. */
+  --ds-explore-results-width: min(22.5rem, 92%);
   --ds-explore-zoom-right: var(--ds-explore-edge);
   --ds-explore-zoom-bottom: var(--ds-explore-edge);
 }
@@ -126,7 +127,7 @@
 
 @media (max-width: 64rem) {
   .ds-map-surface:has(.ds-explore-stage) {
-    --ds-explore-results-width: min(92vw, 22.5rem);
+    --ds-explore-results-width: min(22.5rem, 92%);
   }
 
   /* Records become a bottom sheet — park zoom above it, not beside a right rail. */
@@ -139,7 +140,8 @@
 @media (max-width: 39.9375rem) {
   .ds-map-surface:has(.ds-explore-stage) {
     --ds-explore-edge: var(--ds-space-3);
-    --ds-explore-results-width: calc(100vw - var(--ds-explore-edge) * 2);
+    /* Width comes from left+right insets on the panel; keep a length for zoom math. */
+    --ds-explore-results-width: calc(100% - var(--ds-explore-edge) * 2);
   }
 
   .ds-map-surface:has(.ds-explore-stage[data-results='open']) {
@@ -232,8 +234,9 @@
  */
 .ds-explore-stage {
   --ds-explore-edge: var(--ds-space-4);
-  --ds-explore-instruments-width: min(88vw, 19rem);
-  --ds-explore-results-width: min(92vw, 22.5rem);
+  /* Prefer % over vw so classic scrollbars cannot widen fixed chrome past the layout viewport. */
+  --ds-explore-instruments-width: min(19rem, 88%);
+  --ds-explore-results-width: min(22.5rem, 92%);
   position: relative;
   z-index: 1;
   color: var(--ds-ink);
@@ -244,7 +247,8 @@
   top: calc(var(--ds-island-clearance) + var(--ds-space-2));
   left: 50%;
   z-index: 3;
-  width: min(92vw, 34rem);
+  width: min(34rem, calc(100% - var(--ds-explore-edge) * 2));
+  max-width: calc(100% - var(--ds-explore-edge) * 2);
   transform: translateX(-50%);
 }
 
@@ -735,7 +739,8 @@
 .ds-explore-stage__spotlight-panel {
   position: relative;
   z-index: 1;
-  width: min(92vw, 32rem);
+  width: min(32rem, 100%);
+  max-width: 100%;
   max-height: min(78svh, 40rem);
   padding: var(--ds-space-8);
   overflow-y: auto;
@@ -930,17 +935,20 @@
 @media (max-width: 39.9375rem) {
   .ds-explore-stage {
     --ds-explore-edge: var(--ds-space-3);
-    --ds-explore-instruments-width: calc(100vw - var(--ds-explore-edge) * 2);
-    --ds-explore-results-width: calc(100vw - var(--ds-explore-edge) * 2);
+    /* Inset with left+right instead of 100vw width — hide translates cannot outgrow the viewport math. */
+    --ds-explore-instruments-width: auto;
+    --ds-explore-results-width: auto;
   }
 
   .ds-explore-stage__instruments {
     left: var(--ds-explore-edge);
-    width: var(--ds-explore-instruments-width);
+    right: var(--ds-explore-edge);
+    width: auto;
   }
 
   .ds-explore-stage__results {
+    left: var(--ds-explore-edge);
     right: var(--ds-explore-edge);
-    width: var(--ds-explore-results-width);
+    width: auto;
   }
 }

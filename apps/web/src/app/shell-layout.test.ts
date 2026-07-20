@@ -48,3 +48,33 @@ describe('on-map shell header treatment', () => {
     assert.match(uiShellHeaderCss, /background:\s*var\(--ds-surface\)/);
   });
 });
+
+describe('horizontal overflow guards', () => {
+  const baseCss = readFileSync(
+    join(here, '../../../../packages/ui/src/styles/base.css'),
+    'utf8',
+  );
+  const mapSurfacesCss = readFileSync(join(here, '(map)/map-surfaces.css'), 'utf8');
+
+  it('clips document and shell sideways overflow without orphaning overflow-y', () => {
+    assert.match(baseCss, /html\s*\{[^}]*overflow-x:\s*clip/s);
+    assert.match(baseCss, /html\s*\{[^}]*overflow-y:\s*auto/s);
+    assert.match(baseCss, /body\s*\{[^}]*overflow-x:\s*clip/s);
+    assert.match(shellCss, /\.ds-shell\s*\{[^}]*overflow-x:\s*clip/s);
+  });
+
+  it('does not size explore chrome with 100vw (scrollbar gutter / hide-translate overflow)', () => {
+    assert.doesNotMatch(mapSurfacesCss, /calc\(\s*100vw/);
+    assert.doesNotMatch(mapSurfacesCss, /min\(\s*\d+vw/);
+    assert.match(mapSurfacesCss, /\.ds-explore-stage__instruments\s*\{[^}]*left:\s*var\(--ds-explore-edge\)/s);
+    assert.match(mapSurfacesCss, /\.ds-explore-stage__results\s*\{[^}]*right:\s*var\(--ds-explore-edge\)/s);
+    assert.match(
+      mapSurfacesCss,
+      /@media\s*\(max-width:\s*39\.9375rem\)\s*\{[^}]*--ds-explore-instruments-width:\s*auto/s,
+    );
+    assert.match(
+      mapSurfacesCss,
+      /@media\s*\(max-width:\s*39\.9375rem\)\s*\{[^}]*--ds-explore-results-width:\s*auto/s,
+    );
+  });
+});
