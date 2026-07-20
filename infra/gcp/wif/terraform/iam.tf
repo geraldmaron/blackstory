@@ -24,8 +24,12 @@ resource "google_project_iam_member" "github_deploy_roles" {
   for_each = var.manage_deploy_project_roles ? local.deploy_project_roles : toset([])
 
   project = var.project_id
-  role    = each.value
-  member  = "serviceAccount:${local.production_deploy_sa_email}"
+  # deploy_project_roles (run.admin, firebaseapphosting.admin, artifactregistry.writer) is the
+  # minimum set a CD identity needs to deploy Cloud Run + App Hosting; scoped to this project
+  # only, mirrored for staging/internal below.
+  #trivy:ignore:AVD-GCP-0007
+  role   = each.value
+  member = "serviceAccount:${local.production_deploy_sa_email}"
 }
 
 # --- blackbook-staging (ADR-012: distinct project, not a same-project namespace) ---
@@ -92,6 +96,7 @@ resource "google_project_iam_member" "github_deploy_internal_roles" {
   )
 
   project = var.internal_project_id
-  role    = each.value
-  member  = "serviceAccount:${google_service_account.github_deploy_internal[0].email}"
+  #trivy:ignore:AVD-GCP-0007
+  role   = each.value
+  member = "serviceAccount:${google_service_account.github_deploy_internal[0].email}"
 }

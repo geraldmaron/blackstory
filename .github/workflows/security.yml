@@ -110,7 +110,10 @@ jobs:
 
   dependency-review:
     name: Security / Dependency Review
-    if: github.event_name == 'pull_request'
+    # The dependency-review API is only served for public repos or private repos with a GitHub
+    # Advanced Security license; on this private personal repo it hard-fails with "not supported".
+    # Dependabot alerts (enabled repo-side) cover dependency CVEs until then.
+    if: github.event_name == 'pull_request' && !github.event.repository.private
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

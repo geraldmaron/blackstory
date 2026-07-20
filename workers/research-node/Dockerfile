@@ -6,10 +6,13 @@ FROM node:22-bookworm-slim
 WORKDIR /app
 
 # Monorepo install: copy the repo and install @repo/config plus its workspace dependencies.
-COPY . .
+RUN corepack enable
+COPY --chown=node:node . .
 
-RUN corepack enable \
-  && pnpm install --frozen-lockfile --filter @repo/config...
+# corepack needs root (writes /usr/local); the install and runtime do not.
+USER node
+
+RUN pnpm install --frozen-lockfile --filter @repo/config...
 
 ENV NODE_ENV=production
 ENV LOG_LEVEL=info
