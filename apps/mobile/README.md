@@ -1,5 +1,14 @@
 # @repo/mobile — BlackStory native app (Expo)
 
+
+## Monorepo isolation
+
+`apps/mobile` is **excluded** from the root pnpm workspace (`!apps/mobile` in
+`pnpm-workspace.yaml`) and uses its own npm lockfile. Shared wire types come from
+`@repo/public-contracts` via a `file:` dependency + Metro/tsconfig/Jest resolution
+(see `metro.config.js`, `jest.config.js`). Do not rename packages to `@black-book/*`
+— the brand-agnostic scope is `@repo/*`.
+
 Bare scaffold only (`black-book-mobile-006` / MOB-006): Expo + Expo Router + TypeScript
 strict + `expo-dev-client`, dev/preview/prod identity, EAS build profiles. **No UI, state,
 network, map, or Firebase libraries are installed yet** — those land in MOB-007+ per the

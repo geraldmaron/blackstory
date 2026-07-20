@@ -43,7 +43,7 @@ export { createSqliteStore } from './db/sqlite-store';
 export { META_KEYS, RELEASE_COUPLED_NAMESPACES } from './db/store';
 export type { CacheStore, StoredEntry, CacheNamespace } from './db/store';
 
-export { createManualConnectivity } from './offline';
+export { createManualConnectivity, createNetInfoConnectivity } from './offline';
 export type { Connectivity, ConnectivityState } from './offline';
 
 export { createSecretStore, assertSmallSecret, SECRET_KEYS, MAX_SECRET_BYTES, SecretTooLargeError } from './secure-store';

@@ -8,6 +8,15 @@
       ],
       "@/assets/*": [
         "./assets/*"
+      ],
+      "@repo/public-contracts/version": [
+        "../../packages/public-contracts/src/version.ts"
+      ],
+      "@repo/public-contracts/errors": [
+        "../../packages/public-contracts/src/errors.ts"
+      ],
+      "@repo/public-contracts/v1/*": [
+        "../../packages/public-contracts/src/v1/*"
       ]
     }
   },

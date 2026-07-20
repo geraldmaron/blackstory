@@ -100,7 +100,6 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

@@ -14,12 +14,7 @@
  * in `content-repository.test.ts` against the same cache primitives with a memory store.
  */
 import { useEffect, useState } from 'react';
-import { createRuntimeCache, createReleaseCache, META_KEYS, type CacheStore, type Connectivity } from '@/data';
-// `createNetInfoConnectivity` is not re-exported from the `@/data` barrel (only
-// `createManualConnectivity` is, see `src/data/index.ts`) — imported from its module directly,
-// same lazy-native-module discipline the barrel itself documents (this import is still lazy at
-// the VALUE level: `createNetInfoConnectivity` itself only `import()`s NetInfo when called).
-import { createNetInfoConnectivity } from '@/data/offline';
+import { createReleaseCache, META_KEYS, type CacheStore, type Connectivity } from '@/data';
 import { createContentRepository, UNBOOTSTRAPPED_STAMP, type ContentReadResult } from './content-repository';
 import type { CatalogSectionId } from './content-catalog';
 
@@ -33,9 +28,9 @@ let runtimeSingleton: Promise<RuntimeHandles> | null = null;
 async function getRuntimeHandles(): Promise<RuntimeHandles> {
   if (!runtimeSingleton) {
     runtimeSingleton = (async () => {
-      const { store } = await createRuntimeCache();
-      const connectivity = await createNetInfoConnectivity();
-      return { store, connectivity };
+      const { getAppRuntime } = await import('@/runtime');
+      const app = await getAppRuntime();
+      return { store: app.store, connectivity: app.connectivity };
     })();
   }
   return runtimeSingleton;

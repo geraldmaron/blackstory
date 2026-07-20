@@ -23,15 +23,11 @@
  * that binds the real native singletons, analogous to `data/index.ts`'s `createRuntimeCache`.
  */
 import {
-  createReleaseCache,
-  createRuntimeCache,
-  createTransport,
   TransportError,
   type CacheStore,
   type Connectivity,
   type ReleaseCache,
 } from '@/data';
-import { createDefaultApiClient } from '@/security';
 import { normalizeEntity } from './normalize';
 import type { Entity } from './types';
 
@@ -144,21 +140,20 @@ export async function fetchEntityDetail(id: string, deps: EntityDataDeps): Promi
 let runtimeDepsPromise: Promise<EntityDataDeps> | null = null;
 
 /**
- * Binds the real native singletons (expo-sqlite via `createRuntimeCache`, NetInfo via the
- * lazy-imported connectivity module, App Check-attesting transport via `@/security`). Memoized
- * module-level so the SQLite database and transport are opened once per app session, not once
- * per screen mount. Not imported by any unit test (those inject fakes directly).
+ * Binds entity fetch deps to the shared app runtime (repo-8b5h). Memoized so
+ * screens do not re-resolve the composition root on every mount.
  */
 export function createRuntimeEntityDataDeps(): Promise<EntityDataDeps> {
   if (!runtimeDepsPromise) {
     runtimeDepsPromise = (async () => {
-      const { store } = await createRuntimeCache();
-      const releaseCache = createReleaseCache(store);
-      const apiClient = createDefaultApiClient();
-      const transport = createTransport({ apiClient });
-      const { createNetInfoConnectivity } = await import('@/data/offline');
-      const connectivity = await createNetInfoConnectivity();
-      return { transport, releaseCache, store, connectivity };
+      const { getAppRuntime } = await import('@/runtime');
+      const app = await getAppRuntime();
+      return {
+        transport: app.transport,
+        releaseCache: app.releaseCache,
+        store: app.store,
+        connectivity: app.connectivity,
+      };
     })();
   }
   return runtimeDepsPromise;

@@ -1,5 +1,5 @@
 /**
- * Root Expo Router layout (MOB-008).
+ * Root Expo Router layout (MOB-008 / repo-8b5h).
  *
  * Route tree:
  *   (tabs)/                 four primary tabs (Explore, Search, Learn, More), headerShown:false
@@ -16,11 +16,16 @@
  * Parameters *within* a matched route (the entity id, search query, filter state) are validated
  * by `./_lib/route-params.ts` at the point of use — matching a route is necessary but not
  * sufficient; the params inside it are never trusted un-parsed.
+ *
+ * Composition root (repo-8b5h): AppProviders owns QueryClient + PersistQueryClientProvider,
+ * bootstrap-sync on launch, App Check init, and observability wiring so features share one
+ * data-layer runtime instead of independent singletons.
  */
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
+import { AppProviders } from '@/runtime';
 import { useBrandFonts } from '@/ui';
 
 SplashScreen.preventAutoHideAsync().catch(() => {
@@ -41,17 +46,19 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="entity/[id]" options={{ title: 'Record', headerShown: true }} />
-      <Stack.Screen
-        name="filters-sheet"
-        options={{ presentation: 'modal', title: 'Filters', headerShown: true }}
-      />
-      <Stack.Screen
-        name="corrections/submit"
-        options={{ presentation: 'modal', title: 'Submit a correction', headerShown: true }}
-      />
-    </Stack>
+    <AppProviders>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="entity/[id]" options={{ title: 'Record', headerShown: true }} />
+        <Stack.Screen
+          name="filters-sheet"
+          options={{ presentation: 'modal', title: 'Filters', headerShown: true }}
+        />
+        <Stack.Screen
+          name="corrections/submit"
+          options={{ presentation: 'modal', title: 'Submit a correction', headerShown: true }}
+        />
+      </Stack>
+    </AppProviders>
   );
 }
