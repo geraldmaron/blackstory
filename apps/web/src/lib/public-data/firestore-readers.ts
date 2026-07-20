@@ -29,6 +29,12 @@ export { shouldUseLivePublicProjections };
 
 const SEARCH_INDEX_PAGE_SIZE = 400;
 
+/**
+ * Firestore Admin `getAll` / batchGet caps refs per RPC (commonly 100). Chunk above this
+ * so mosaic rails and dense neighbor sets do not fail or silently truncate.
+ */
+export const FIRESTORE_GET_ALL_CHUNK_SIZE = 100;
+
 /** Fields needed for `/stories` index cards — excludes body prose and related ids. */
 const STORY_LIST_SELECT_FIELDS = [
   'id',
@@ -77,7 +83,9 @@ export async function listPublicEntityProjections(
 
 /**
  * Point-get a bounded set of entity projections by id (1 read per id).
- * Prefer this over `listPublicEntityProjections` for entity-page neighbor hydration.
+ * Prefer this over `listPublicEntityProjections` for entity-page neighbor hydration
+ * and thin card rails (`listPublicEntityViewsByIds`). Chunks `getAll` at
+ * {@link FIRESTORE_GET_ALL_CHUNK_SIZE}.
  */
 export async function fetchPublicEntityProjectionsByIds(
   releaseId: string,
@@ -88,12 +96,15 @@ export async function fetchPublicEntityProjectionsByIds(
 
   const db = getServerFirestore();
   const refs = unique.map((entityId) => db.doc(firestorePaths.publicEntity(releaseId, entityId)));
-  const snaps = await db.getAll(...refs);
   const entities: PublicEntityProjectionDoc[] = [];
-  for (const snap of snaps) {
-    if (!snap.exists) continue;
-    const parsed = parseEntityProjection(snap.data());
-    if (parsed) entities.push(parsed);
+  for (let offset = 0; offset < refs.length; offset += FIRESTORE_GET_ALL_CHUNK_SIZE) {
+    const chunk = refs.slice(offset, offset + FIRESTORE_GET_ALL_CHUNK_SIZE);
+    const snaps = await db.getAll(...chunk);
+    for (const snap of snaps) {
+      if (!snap.exists) continue;
+      const parsed = parseEntityProjection(snap.data());
+      if (parsed) entities.push(parsed);
+    }
   }
   return entities;
 }

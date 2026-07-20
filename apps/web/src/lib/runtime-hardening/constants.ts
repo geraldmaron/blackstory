@@ -104,7 +104,7 @@ export type ResponseSizeKind = keyof typeof RESPONSE_SIZE_LIMITS;
  */
 export const APP_HOSTING_RUN_LIMITS = {
   production: {
-    minInstances: 2,
+    minInstances: 1,
     maxInstances: 6,
     concurrency: 40,
     cpu: 1,

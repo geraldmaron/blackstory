@@ -36,8 +36,10 @@ test('every service has conservative bounded maxInstances', () => {
 
 test('web scaling mirrors  App Hosting production caps', () => {
   const web = DEFAULT_SERVICE_SCALING_LIMITS.web;
+  assert.equal(web.minInstances, BB022_APP_HOSTING_LIMITS.production.minInstances);
   assert.equal(web.maxInstances, BB022_APP_HOSTING_LIMITS.production.maxInstances);
   assert.equal(web.concurrency, BB022_APP_HOSTING_LIMITS.production.concurrency);
+  assert.equal(web.minInstances, 1, 'idle cost: production defaults to one warm instance');
   assert.equal(web.bb022Ref, 'apps/web/apphosting.production.yaml');
 });
 

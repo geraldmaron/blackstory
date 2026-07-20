@@ -21,7 +21,7 @@
       "id": "web",
       "runtime": "firebase-app-hosting",
       "tier": "public_serving",
-      "minInstances": 2,
+      "minInstances": 1,
       "maxInstances": 6,
       "concurrency": 40,
       "cpu": 1,

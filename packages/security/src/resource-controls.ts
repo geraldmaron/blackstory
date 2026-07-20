@@ -167,7 +167,7 @@ export type ResourceControlDecision =
  */
 export const BB022_APP_HOSTING_LIMITS = {
   production: {
-    minInstances: 2,
+    minInstances: 1,
     maxInstances: 6,
     concurrency: 40,
     cpu: 1,

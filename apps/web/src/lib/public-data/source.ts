@@ -3,10 +3,18 @@
  * Hydrates 1-hop related neighbor stubs and composes capped 2-hop continue-learning on entity
  * pages only. List/map/search/stories prefer ADR-004 catalog artifacts (when present) then
  * process-local TTL + size-gated `unstable_cache`. The `/stories` index caches field-masked
- * list items (no body). Story detail related rails use a thin batched point-get
- * (`listPublicEntityViewsByIds`) — never the 2-hop learning graph.
+ * list items (no body). Story detail / about mosaic / similar card rails use a thin batched
+ * point-get (`listPublicEntityViewsByIds`) — never the 2-hop learning graph.
+ * Sitemap and entity `generateStaticParams` use `getPublicSearchIndex` (ids only), not the
+ * full hydrated entity catalog.
  * Oversized live catalogs (>~1.8MB) stay in process memory only; Next's 2MB data-cache limit
  * must not receive the fat array (console warn + repeated origin fetches).
+ *
+ * Cost knobs (env / App Hosting):
+ * - `PUBLIC_READ_API_DISABLED=1` — snapshot-only (no live Firestore/artifact reads)
+ * - `PUBLIC_DATA_SOURCE=seed|firestore` — force seed vs live (see `live-policy.ts`)
+ * - `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL` — CDN/GCS base for entities.json / search-index.json
+ * - `apps/web/apphosting*.yaml` `runConfig.minInstances` — primary idle App Hosting cost driver
  */
 
 import { unstable_cache } from 'next/cache';
@@ -89,6 +97,26 @@ const liveStoriesMemory = createLiveCatalogMemoryCache<readonly PublicStoryListI
 
 /** One active-release pointer read per request (shared across entities/stories/search). */
 const getCachedActiveRelease = cache(fetchActiveRelease);
+
+/**
+ * Thin active-release meta for sitemap / cache keys — one pointer read, no catalog load.
+ */
+export const getPublicActiveReleaseMeta = cache(async function getPublicActiveReleaseMeta(): Promise<
+  | {
+      readonly releaseId: string;
+      readonly activatedAt: string;
+    }
+  | undefined
+> {
+  if (!shouldUseLivePublicProjections()) return undefined;
+  try {
+    const active = await getCachedActiveRelease();
+    if (!active) return undefined;
+    return { releaseId: active.releaseId, activatedAt: active.activatedAt };
+  } catch {
+    return undefined;
+  }
+});
 
 function toNeighborLookup(entity: PublicEntityView): NeighborLookup {
   return {

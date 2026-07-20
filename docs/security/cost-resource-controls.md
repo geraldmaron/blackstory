@@ -41,7 +41,7 @@ Ensure a traffic spike, retry storm, or budget burn cannot scale every service w
 
 ## References to other beads (not rewritten)
 
-- **:** Web `maxInstances=6`, `concurrency=40` — validated via `BB022_APP_HOSTING_LIMITS` mirror
+- **:** Web `maxInstances=6`, `concurrency=40`, `minInstances=1` (idle cost; raise for cold-start SLOs) — validated via `BB022_APP_HOSTING_LIMITS` mirror
 - **:** Endpoint quotas — referenced via `BB025_POLICY_REF`; rate-limit math unchanged
 
 ## Retry policy
