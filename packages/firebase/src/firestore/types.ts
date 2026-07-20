@@ -1081,7 +1081,7 @@ export const publicEntityProjectionSchema = z.object({
    * bootstrap-window stubs carry only `claimIds`; national-catalog projections carry both. */
   claims: z.array(publicClaimProjectionSchema).optional(),
   /** "City, State" jurisdiction label for cards/facets; optional on bootstrap-window stubs
-   * (the web mapper falls back to bundled-seed enrichment there). */
+   * (the web mapper derives a state name from `location` coordinates when absent). */
   jurisdictionLabel: z.string().min(1).optional(),
   /** Public location description at the record's allowed precision — never a street address
    * finer than the constitution's public precision for the record. */

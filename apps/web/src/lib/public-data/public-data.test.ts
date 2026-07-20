@@ -5,7 +5,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { shouldUseLivePublicProjections } from './live-policy';
-import { mapProjectionToPublicEntityView } from './map-projection';
+import {
+  isDisplayableJurisdictionLabel,
+  mapProjectionToPublicEntityView,
+  resolveJurisdictionLabel,
+} from './map-projection';
 
 test('shouldUseLivePublicProjections is off by default in development', () => {
   assert.equal(
@@ -101,6 +105,87 @@ test('mapProjectionToPublicEntityView does not backfill from the bundled seed ca
   });
   assert.equal(view.claims.length, 0);
   assert.deepEqual(view.topicTags, []);
+});
+
+test('mapProjectionToPublicEntityView derives jurisdiction from public coordinates when label is absent', () => {
+  // Bootstrap stubs (featured Dunbar / 15th Street projections) omit jurisdictionLabel but
+  // carry location — same path production used when cards rendered UNKNOWN.
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_dunbar_school_001',
+    releaseId: 'rel_live_001',
+    kind: 'school',
+    displayName: 'Paul Laurence Dunbar High School',
+    nameLower: 'paul laurence dunbar high school',
+    summary: 'Bootstrap stub without jurisdictionLabel.',
+    claimIds: [],
+    location: {
+      lat: 38.9098,
+      lng: -77.0143,
+      geohash: 'dqcj',
+      precision: 'campus',
+    },
+  });
+  assert.equal(view.jurisdictionLabel, 'District of Columbia');
+});
+
+test('mapProjectionToPublicEntityView prefers an explicit jurisdictionLabel over coordinate derivation', () => {
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_national_example_dc',
+    releaseId: 'rel_live_001',
+    kind: 'place',
+    displayName: 'Catalog DC Site',
+    nameLower: 'catalog dc site',
+    summary: 'National catalog entry with curated jurisdiction label.',
+    claimIds: [],
+    jurisdictionLabel: 'Washington, D.C.',
+    location: {
+      lat: 38.9098,
+      lng: -77.0143,
+      geohash: 'dqcj',
+      precision: 'campus',
+    },
+  });
+  assert.equal(view.jurisdictionLabel, 'Washington, D.C.');
+});
+
+test('mapProjectionToPublicEntityView leaves jurisdiction empty when label and coordinates are both missing', () => {
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_no_place_001',
+    releaseId: 'rel_live_001',
+    kind: 'place',
+    displayName: 'No Place Yet',
+    nameLower: 'no place yet',
+    summary: 'Projection with neither jurisdiction nor coordinates.',
+    claimIds: [],
+  });
+  assert.equal(view.jurisdictionLabel, '');
+  assert.equal(isDisplayableJurisdictionLabel(view.jurisdictionLabel), false);
+});
+
+test('resolveJurisdictionLabel ignores placeholder Unknown strings', () => {
+  assert.equal(
+    resolveJurisdictionLabel({
+      id: 'ent_x',
+      releaseId: 'rel_x',
+      kind: 'place',
+      displayName: 'X',
+      nameLower: 'x',
+      claimIds: [],
+      jurisdictionLabel: 'Unknown',
+      // Albany, NY — unambiguous vs near-border NYC/NJ bbox overlap.
+      location: { lat: 42.6526, lng: -73.7562, geohash: 'dredd' },
+    }),
+    'New York',
+  );
+});
+
+test('isDisplayableJurisdictionLabel rejects empty and Unknown placeholders', () => {
+  assert.equal(isDisplayableJurisdictionLabel(undefined), false);
+  assert.equal(isDisplayableJurisdictionLabel(''), false);
+  assert.equal(isDisplayableJurisdictionLabel('  '), false);
+  assert.equal(isDisplayableJurisdictionLabel('Unknown'), false);
+  assert.equal(isDisplayableJurisdictionLabel('UNKNOWN'), false);
+  assert.equal(isDisplayableJurisdictionLabel('Washington, D.C.'), true);
 });
 
 test('live-only projections get a default notability label for search-pool parity', () => {

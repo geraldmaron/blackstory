@@ -1,9 +1,12 @@
 /**
  * Maps Firestore public entity projections onto the web `PublicEntityView` shape.
  * Renders live projection data as-is without enrichment from bundled seed records.
+ * When jurisdictionLabel is absent (bootstrap stubs), derives a state-level label from
+ * public coordinates via `findUsStateForPoint` — never invents "Unknown" or seed text.
  */
 
 import { type NotabilityCriterion } from '@repo/domain';
+import { findUsStateForPoint } from '@repo/domain/map/geography';
 import { type PublicEntityView } from '../../data/public-seed';
 
 /**
@@ -27,7 +30,7 @@ export type PublicProjectionInput = {
   };
   readonly claimIds: readonly string[];
   /** State/city jurisdiction label carried by release projections (national-catalog era);
-   * absent on bootstrap-window stubs, where the seed enrichment supplies it instead. */
+   * absent on bootstrap-window stubs — mapper derives state name from `location` when present. */
   readonly jurisdictionLabel?: string;
   readonly locationLabel?: string;
   /** Accepted public claims with citations. Non-numeric by standing policy: the projection
@@ -147,6 +150,35 @@ function mapPrimaryImage(
 }
 
 /**
+ * True when a jurisdiction string is worth rendering (non-empty, not a placeholder).
+ * UI surfaces should omit the jurisdiction segment when this is false.
+ */
+export function isDisplayableJurisdictionLabel(label: string | undefined): boolean {
+  const trimmed = label?.trim() ?? '';
+  if (trimmed.length === 0) return false;
+  return !/^unknown$/iu.test(trimmed);
+}
+
+/**
+ * Prefer the release projection's jurisdictionLabel; otherwise derive a state-level
+ * label from public coordinates (same bbox attribution as the explore map). Empty when
+ * neither is available — never fabricate "Unknown".
+ */
+export function resolveJurisdictionLabel(projection: PublicProjectionInput): string {
+  const explicit = projection.jurisdictionLabel?.trim();
+  if (explicit && isDisplayableJurisdictionLabel(explicit)) {
+    return explicit;
+  }
+  const lat = projection.location?.lat;
+  const lng = projection.location?.lng;
+  if (typeof lat === 'number' && typeof lng === 'number') {
+    const state = findUsStateForPoint(lat, lng);
+    if (state) return state.name;
+  }
+  return '';
+}
+
+/**
  * Convert a public projection doc into a page-ready view.
  * Renders live projection data as-is without enrichment from bundled seed records.
  */
@@ -189,7 +221,7 @@ export function mapProjectionToPublicEntityView(
       ? { sensitivityClass: projection.sensitivityClass }
       : {}),
     topicTags,
-    jurisdictionLabel: projection.jurisdictionLabel ?? 'Unknown',
+    jurisdictionLabel: resolveJurisdictionLabel(projection),
     locationPrecision: locationPrecisionFromProjection(projection.location?.precision),
     locationLabel: projection.locationLabel ?? projection.displayName,
     relevanceExplanation:

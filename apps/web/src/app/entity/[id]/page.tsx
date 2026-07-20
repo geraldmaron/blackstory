@@ -30,6 +30,7 @@ import { highestConfidence } from '../../../lib/map-experience/build-explore-map
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
 import { listPublicEntityViews, resolvePublicEntityView } from '../../../lib/public-data/source';
+import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
 import {
   buildWhyThisAppearsForEntity,
   toEvidenceClaimInputs,
@@ -88,6 +89,9 @@ export default async function EntityPage({ params }: EntityPageProps) {
 
   const framing = deriveHistoricalFraming(entity);
   const framingLabel = framing === 'present_day' ? 'Present-day record' : 'Historical record';
+  const jurisdictionLabel = isDisplayableJurisdictionLabel(entity.jurisdictionLabel)
+    ? entity.jurisdictionLabel.trim()
+    : undefined;
   const confidenceTier = highestConfidence(entity.claims);
   const mapTone = mapToneFromTopics(entity.topicTags);
   // Fail-closed, not fail-crashed: the domain layer throws when a record lacks
@@ -125,7 +129,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
             entityId={entity.id}
             entityName={entity.displayName}
             kind={entity.kind}
-            jurisdictionLabel={entity.jurisdictionLabel}
+            {...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {})}
             {...(entity.primaryImage !== undefined ? { primaryImage: entity.primaryImage } : {})}
             priority
           />
@@ -137,10 +141,14 @@ export default async function EntityPage({ params }: EntityPageProps) {
                 kind={entity.kind}
                 {...(mapTone !== undefined ? { mapTone } : {})}
               />
-              <span className="ds-entity-mast__meta-sep" aria-hidden="true">
-                ·
-              </span>
-              <span className="ds-mono ds-entity-mast__meta-item">{entity.jurisdictionLabel}</span>
+              {jurisdictionLabel ? (
+                <>
+                  <span className="ds-entity-mast__meta-sep" aria-hidden="true">
+                    ·
+                  </span>
+                  <span className="ds-mono ds-entity-mast__meta-item">{jurisdictionLabel}</span>
+                </>
+              ) : null}
               <span className="ds-entity-mast__meta-sep" aria-hidden="true">
                 ·
               </span>

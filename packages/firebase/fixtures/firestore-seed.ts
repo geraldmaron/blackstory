@@ -97,6 +97,8 @@ export const seedPublicEntity: PublicEntityProjectionDoc = {
     'nation’s first public high school for Black students in its basement.',
   location: placeCurrentPoint,
   claimIds: ['claim_seed_001'],
+  jurisdictionLabel: 'Washington, D.C.',
+  locationLabel: 'Dupont/Sixteenth Street Historic District area (neighborhood-level pin)',
   topicTags: ['church', 'education', 'community'],
   historicalContext:
     'Washington’s historically Black Presbyterian congregations built and sustained educational ' +
@@ -339,6 +341,8 @@ export const seedPublicSchoolEntity: PublicEntityProjectionDoc = {
     'Dunbar High School (1916).',
   location: schoolCurrentPoint,
   claimIds: [],
+  jurisdictionLabel: 'Washington, D.C.',
+  locationLabel: 'New Jersey Avenue NW campus, Truxton Circle (campus-level pin)',
   topicTags: ['education', 'schools', 'preservation'],
   historicalContext:
     'The Preparatory High School for Colored Youth opened during Reconstruction, when Black ' +

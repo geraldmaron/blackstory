@@ -11,6 +11,7 @@
 
 import Link from 'next/link';
 import type { NationalPopulationTimelineSnapshot } from '@repo/firebase';
+import { isDisplayableJurisdictionLabel } from '../../lib/public-data/map-projection';
 import { KindBadge } from '../map-experience/KindBadge';
 import { HomeAbout } from './HomeAbout';
 import { HomeDataPulse } from './HomeDataPulse';
@@ -74,19 +75,28 @@ export function HomeStorySections({
             Select a pin on the map above, or step into a full record here.
           </p>
           <ul className="ds-story-rail">
-            {featured.map((entity) => (
-              <li key={entity.id}>
-                <Link className="ds-story-link" href={`/entity/${entity.id}`}>
-                  <span className="ds-story-link__meta">
-                    <KindBadge kind={entity.kind} density="compact" />
-                    <span aria-hidden="true">/</span>
-                    <span>{entity.jurisdictionLabel}</span>
-                  </span>
-                  <h3 className="ds-story-link__title">{entity.displayName}</h3>
-                  <p className="ds-story-link__summary">{entity.summary}</p>
-                </Link>
-              </li>
-            ))}
+            {featured.map((entity) => {
+              const jurisdiction = isDisplayableJurisdictionLabel(entity.jurisdictionLabel)
+                ? entity.jurisdictionLabel.trim()
+                : undefined;
+              return (
+                <li key={entity.id}>
+                  <Link className="ds-story-link" href={`/entity/${entity.id}`}>
+                    <span className="ds-story-link__meta">
+                      <KindBadge kind={entity.kind} density="compact" />
+                      {jurisdiction ? (
+                        <>
+                          <span aria-hidden="true">/</span>
+                          <span>{jurisdiction}</span>
+                        </>
+                      ) : null}
+                    </span>
+                    <h3 className="ds-story-link__title">{entity.displayName}</h3>
+                    <p className="ds-story-link__summary">{entity.summary}</p>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </section>
       </div>
