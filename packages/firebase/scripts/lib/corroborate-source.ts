@@ -37,13 +37,58 @@ const WIKIPEDIA_USER_AGENT = 'BlackStory research pipeline (contact: geraldmaron
 
 type WikipediaSearchHit = { readonly title: string };
 
+const STOP_WORDS = new Set([
+  'the', 'a', 'an', 'and', 'or', 'of', 'in', 'on', 'at', 'to', 'for', 'with', 'by', 'was', 'were',
+  'is', 'are', 'that', 'this', 'from', 'as', 'its', 'it', 'be', 'been', 'his', 'her', 'their',
+  'also', 'over', 'into', 'after', 'before', 'which', 'who', 'whom', 'has', 'have', 'had', 'not',
+  'but', 'than', 'then', 'when', 'where', 'while', 'during', 'about', 'between', 'through',
+  'under', 'above', 'both', 'more', 'most', 'some', 'such', 'only', 'own', 'same', 'because',
+]);
+
+function extractSignificantTerms(text: string): ReadonlySet<string> {
+  return new Set(
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/gu, ' ')
+      .split(/\s+/u)
+      .filter((word) => word.length > 3 && !STOP_WORDS.has(word)),
+  );
+}
+
+/**
+ * Disambiguation guard: Wikipedia's search API frequently resolves an ambiguous
+ * or common name to the WRONG article — a same-named Secret Service director
+ * instead of an 1870s landowner, an NFL tight end instead of a defunct 1880s
+ * college. The subject's own name always trivially "matches" a wrong page that
+ * happens to share it, so it's excluded from the comparison; the only real
+ * signal is whether the record's own surrounding context (what it actually
+ * says the subject did) shows up anywhere in the candidate page.
+ */
+function isPlausibleMatch(subjectName: string, context: string | undefined, candidateText: string): boolean {
+  if (!context) return true;
+  const nameTerms = extractSignificantTerms(subjectName);
+  const contextTerms = [...extractSignificantTerms(context)].filter((term) => !nameTerms.has(term));
+  if (contextTerms.length === 0) return true;
+  const candidateLower = candidateText.toLowerCase();
+  const matched = contextTerms.filter((term) => candidateLower.includes(term));
+  const required = contextTerms.length <= 3 ? 1 : Math.ceil(contextTerms.length * 0.2);
+  return matched.length >= required;
+}
+
+function buildContextQuery(subjectName: string, context: string | undefined): string {
+  if (!context) return `"${subjectName}"`;
+  const nameTerms = extractSignificantTerms(subjectName);
+  const contextTerms = [...extractSignificantTerms(context)].filter((term) => !nameTerms.has(term)).slice(0, 6);
+  return contextTerms.length > 0 ? `"${subjectName}" ${contextTerms.join(' ')}` : `"${subjectName}"`;
+}
+
 /** Wikipedia's own search API with retry/backoff — mirrors discover-candidates.ts's proven pattern. */
 async function searchWikipediaApi(query: string, attempts = 3): Promise<readonly WikipediaSearchHit[]> {
   const params = new URLSearchParams({
     action: 'query',
     list: 'search',
     srsearch: query,
-    srlimit: '3',
+    srlimit: '5',
     format: 'json',
     origin: '*',
   });
@@ -91,14 +136,20 @@ async function fetchWikipediaCoordinates(title: string): Promise<{ lat: number; 
   }
 }
 
-async function findViaWikipediaApi(subjectName: string): Promise<CorroboratingSource | undefined> {
+async function findViaWikipediaApi(
+  subjectName: string,
+  context?: string,
+): Promise<CorroboratingSource | undefined> {
   const hits = await searchWikipediaApi(subjectName);
-  const first = hits[0];
-  if (!first) return undefined;
-  const url = `https://en.wikipedia.org/wiki/${encodeURIComponent(first.title.replace(/ /gu, '_'))}`;
-  const [page, coordinates] = await Promise.all([fetchPage(url), fetchWikipediaCoordinates(first.title)]);
-  if (!page) return undefined;
-  return { url, title: first.title, text: page.text, method: 'wikipedia_api', html: page.html, ...(coordinates ? { coordinates } : {}) };
+  for (const hit of hits) {
+    const url = `https://en.wikipedia.org/wiki/${encodeURIComponent(hit.title.replace(/ /gu, '_'))}`;
+    const page = await fetchPage(url);
+    if (!page) continue;
+    if (!isPlausibleMatch(subjectName, context, page.text)) continue;
+    const coordinates = await fetchWikipediaCoordinates(hit.title);
+    return { url, title: hit.title, text: page.text, method: 'wikipedia_api', html: page.html, ...(coordinates ? { coordinates } : {}) };
+  }
+  return undefined;
 }
 
 export type CorroboratingSource = {
@@ -185,13 +236,13 @@ async function findViaSearch(subjectName: string, searxngBaseUrl: string): Promi
  */
 export async function findAnySource(
   subjectName: string,
-  options: { readonly searxngBaseUrl?: string } = {},
+  options: { readonly searxngBaseUrl?: string; readonly context?: string } = {},
 ): Promise<CorroboratingSource | undefined> {
-  const viaWikipedia = await findViaWikipediaApi(subjectName);
+  const viaWikipedia = await findViaWikipediaApi(subjectName, options.context);
   if (viaWikipedia) return viaWikipedia;
   const baseUrl = options.searxngBaseUrl ?? process.env.SEARXNG_BASE_URL;
   if (!baseUrl) return undefined;
-  return searchAndFetch(`"${subjectName}"`, baseUrl, (results) => results[0]);
+  return searchAndFetch(buildContextQuery(subjectName, options.context), baseUrl, (results) => results[0]);
 }
 
 /**
