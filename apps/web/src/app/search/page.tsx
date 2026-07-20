@@ -6,6 +6,9 @@
  * display-scale input over a heavy rule, pill facet selects beneath, and a
  * numbered ledger index for results. No filter card, no boxed rows.
  *
+ * Density: search.css keeps ledger rows compact (clamped dek, lighter type)
+ * so results scan as an index rather than oversized cards.
+ *
  * This Server Component stays intentionally thin — `buildSearchViewModel` in
  * the co-located `./search-view-model.ts` (plain, synchronously testable, no
  * Next.js runtime dependency) does all query-parsing, filter-building, and
@@ -21,6 +24,7 @@ import {
   buildSearchViewModel,
   type RawSearchParams,
 } from './search-view-model';
+import './search.css';
 
 export const metadata = {
   title: 'Search',
@@ -54,13 +58,21 @@ function FacetSelect({ id, name, label, defaultValue, options }: FacetSelectProp
   );
 }
 
+/** Hide "Matched:" when it only repeats the title. */
+function matchedMeta(displayName: string, matchedText: string | undefined): string | null {
+  const matched = matchedText?.trim();
+  if (!matched) return null;
+  if (matched.toLowerCase() === displayName.trim().toLowerCase()) return null;
+  return matched;
+}
+
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const index = await getPublicSearchIndex();
   const view = buildSearchViewModel(params, index.data);
 
   return (
-    <main className="ds-container ds-page" id="main">
+    <main className="ds-container ds-page ds-search-page" id="main">
       <header>
         <p className="ds-page__eyebrow">Index</p>
         <h1 className="ds-page__title">
@@ -113,10 +125,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </div>
       </form>
 
-      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-8)' }}>
-        <p className="ds-sans ds-count-label" id="search-results-heading">
-          {view.totalMatched} result
-          {view.totalMatched === 1 ? '' : 's'}
+      <div className="ds-stack ds-search-page__results">
+        <p className="ds-sans ds-count-label ds-search-page__count" id="search-results-heading">
+          {view.totalMatched === 1 ? '1 result' : `${view.totalMatched} results`}
         </p>
 
         {view.results.length === 0 ? (
@@ -137,19 +148,22 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               className="ds-index"
               labelledBy="search-results-heading"
               LinkComponent={Link}
-              items={view.results.map((result) => ({
-                id: result.id,
-                href: `/entity/${result.id}`,
-                title: result.displayName,
-                summary: result.summary ?? '',
-                meta: (
-                  <>
-                    <KindBadge kind={result.kind} density="compact" />
-                    {result.status ? <StatusMark status={result.status} labeled /> : null}
-                    <span>Matched: {result.matchedText}</span>
-                  </>
-                ),
-              }))}
+              items={view.results.map((result) => {
+                const matched = matchedMeta(result.displayName, result.matchedText);
+                return {
+                  id: result.id,
+                  href: `/entity/${result.id}`,
+                  title: result.displayName,
+                  summary: result.summary ?? '',
+                  meta: (
+                    <>
+                      <KindBadge kind={result.kind} density="compact" />
+                      {result.status ? <StatusMark status={result.status} labeled /> : null}
+                      {matched ? <span>Matched: {matched}</span> : null}
+                    </>
+                  ),
+                };
+              })}
             />
 
             {view.previousOffset !== undefined || view.nextOffset !== undefined ? (
@@ -178,11 +192,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         )}
 
         {view.results.length === 0 && view.recommendations.length > 0 ? (
-          <section
-            className="ds-stack"
-            style={{ marginTop: 'var(--ds-space-8)' }}
-            aria-labelledby="search-recs-heading"
-          >
+          <section className="ds-stack ds-search-page__recs" aria-labelledby="search-recs-heading">
             <p className="ds-sans ds-count-label" id="search-recs-heading">
               From the archive
             </p>

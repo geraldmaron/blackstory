@@ -1465,12 +1465,11 @@
 }
 
 /* —— Ledger index — the shared `@repo/ui` ResultList reskinned for search
-   results and any ranked archive listing: numbered rows, serif-display
-   titles, slug meta. Rows, never cards. Scoped as descendant overrides on
-   ResultList's own BEM classes (`className="ds-index"` on the component)
-   rather than a parallel markup, so search keeps the one accessible list
-   component `@repo/testing`'s peer contract requires
-   (packages/testing/src/a11y/map-search-peers.test.ts). ——  */
+   results: numbered rows, compact sans titles, clamped dek. Rows, never
+   cards. Scoped as descendant overrides on ResultList's own BEM classes
+   (`className="ds-index"` on the component) rather than a parallel markup,
+   so search keeps the one accessible list component `@repo/testing`'s peer
+   contract requires (packages/testing/src/a11y/map-search-peers.test.ts). ——  */
 .ds-index {
   margin: var(--ds-space-6) 0 0;
   counter-reset: ds-index;
@@ -1483,19 +1482,19 @@
 .ds-index .ds-result-list__link {
   position: relative;
   display: grid;
-  grid-template-columns: 3rem minmax(0, 1fr);
-  gap: var(--ds-space-2) var(--ds-space-4);
-  padding: var(--ds-space-6) 0;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: var(--ds-space-1) var(--ds-space-3);
+  padding: var(--ds-space-4) 0;
 }
 
 .ds-index .ds-result-list__link::before {
   content: counter(ds-index, decimal-leading-zero);
   grid-row: 1 / span 3;
-  padding-top: 0.35rem;
+  padding-top: 0.25rem;
   color: var(--ds-ink-subtle);
   font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 400;
   transition: color var(--ds-duration-fast) var(--ds-easing);
 }
 
@@ -1505,10 +1504,10 @@
 }
 
 .ds-index .ds-result-list__title {
-  font-family: var(--ds-font-display);
-  font-weight: 500;
-  font-size: clamp(1.0625rem, 1rem + 0.5vw, 1.375rem);
-  letter-spacing: -0.02em;
+  font-family: var(--ds-font-sans);
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: -0.015em;
   line-height: 1.3;
 }
 
@@ -1520,15 +1519,16 @@
 }
 
 .ds-index .ds-result-list__summary {
-  max-width: 48rem;
-  font-family: var(--ds-font-editorial);
-  font-size: 0.9375rem;
-  line-height: 1.55;
+  max-width: 40rem;
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
 }
 
 .ds-index .ds-result-list__meta {
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
+  font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
