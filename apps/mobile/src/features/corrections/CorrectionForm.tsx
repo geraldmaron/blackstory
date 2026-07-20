@@ -41,6 +41,12 @@ import {
   type CorrectionFormState,
 } from './validation';
 
+/** Apple HIG / Material minimum touch target (dp), mirrored from `@/ui/Button.tsx`'s own
+ * constant — this form's hand-rolled `ChipRow`/`Checkbox` controls are not built on `Button`
+ * (they need radio/checkbox semantics `Button` doesn't expose), so they enforce the same 44pt
+ * floor directly rather than silently falling short of it (MOB-017). */
+const MIN_TOUCH_TARGET = 44;
+
 export type CorrectionFormProps = {
   /** Optional record context — pre-fills the target id (validated upstream). */
   readonly entityId?: string | undefined;
@@ -261,6 +267,8 @@ function ChipRow<T extends string>({
             accessibilityState={{ selected: isSelected }}
             onPress={() => onSelect(value)}
             style={{
+              minHeight: MIN_TOUCH_TARGET,
+              justifyContent: 'center',
               borderWidth: 1,
               borderColor: isSelected ? theme.accent : theme.border,
               backgroundColor: isSelected ? theme.surfaceRaised : 'transparent',
@@ -298,7 +306,12 @@ function Checkbox({
         accessibilityState={{ checked }}
         accessibilityLabel={label}
         onPress={onToggle}
-        style={{ flexDirection: 'row', gap: space['3'], alignItems: 'flex-start' }}
+        style={{
+          flexDirection: 'row',
+          gap: space['3'],
+          alignItems: 'center',
+          minHeight: MIN_TOUCH_TARGET,
+        }}
       >
         <View
           style={{

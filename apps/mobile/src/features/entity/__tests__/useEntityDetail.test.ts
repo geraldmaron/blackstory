@@ -37,9 +37,13 @@ describe('useEntityDetail', () => {
     // mistake an undisciplined call site could make.
     const { result, rerender } = await renderHook(() => useEntityDetail('ent_place_full_001', depsResolvingTo(readJson)));
     await waitFor(() => expect(result.current.state.kind).toBe('ready'));
-    await rerender();
-    await rerender();
-    await rerender();
+    // The hook-invoking callback ignores its argument (it closes over the same fixed id/deps
+    // on every call), so `rerender` is driven with `undefined` purely to satisfy its typed
+    // `(props: Props) => Promise<void>` signature — this version of `renderHook` requires an
+    // explicit argument even when the underlying hook takes none.
+    await rerender(undefined);
+    await rerender(undefined);
+    await rerender(undefined);
     expect(readJson).toHaveBeenCalledTimes(1);
   });
 

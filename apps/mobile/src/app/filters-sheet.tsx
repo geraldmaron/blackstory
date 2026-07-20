@@ -41,14 +41,23 @@ export default function FiltersSheet() {
       </Text>
 
       <View style={{ gap: 8 }}>
-        {ENTITY_KINDS.map((candidate) => (
-          <Button
-            key={candidate}
-            label={candidate === kind ? `✓ ${candidate}` : candidate}
-            variant={candidate === kind ? 'primary' : 'secondary'}
-            onPress={() => setKind(candidate === kind ? undefined : candidate)}
-          />
-        ))}
+        {ENTITY_KINDS.map((candidate) => {
+          const isSelected = candidate === kind;
+          return (
+            <Button
+              key={candidate}
+              label={isSelected ? `✓ ${candidate}` : candidate}
+              // The visual "✓ " prefix is sighted-only decoration; the accessible name stays the
+              // plain kind name and `accessibilityState.selected` carries the selection to
+              // VoiceOver/TalkBack instead (MOB-017 — no redundant/duplicated state in the label).
+              accessibilityLabel={candidate}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: isSelected }}
+              variant={isSelected ? 'primary' : 'secondary'}
+              onPress={() => setKind(isSelected ? undefined : candidate)}
+            />
+          );
+        })}
       </View>
 
       <View style={{ flexDirection: 'row', gap: 12 }}>

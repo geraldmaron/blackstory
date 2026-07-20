@@ -2,7 +2,12 @@
  * Themed flat container. The brand system is flat by design (elevation is
  * "none" everywhere, matching the web design system — hairline borders carry
  * separation, not shadows); Surface never grows a shadow prop.
+ *
+ * Forwards its ref to the underlying `View` (MOB-017) so a caller can drive assistive-tech
+ * focus onto a Surface directly — e.g. `useAccessibilityFocus`'s `ref` — without needing a
+ * separate wrapper element just to be focusable.
  */
+import { forwardRef } from 'react';
 import { View, type ViewProps } from 'react-native';
 import { radius, space, useThemeColors, type RadiusKey, type SpaceKey } from './tokens';
 
@@ -15,18 +20,15 @@ export type SurfaceProps = ViewProps & {
   bordered?: boolean;
 };
 
-export function Surface({
-  tone = 'surface',
-  radiusKey = 'md',
-  paddingKey,
-  bordered = false,
-  style,
-  ...rest
-}: SurfaceProps) {
+export const Surface = forwardRef<View, SurfaceProps>(function Surface(
+  { tone = 'surface', radiusKey = 'md', paddingKey, bordered = false, style, ...rest },
+  ref,
+) {
   const theme = useThemeColors();
 
   return (
     <View
+      ref={ref}
       style={[
         {
           backgroundColor: theme[tone],
@@ -40,4 +42,4 @@ export function Surface({
       {...rest}
     />
   );
-}
+});

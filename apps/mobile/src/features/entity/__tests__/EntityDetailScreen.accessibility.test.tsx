@@ -37,7 +37,7 @@ function readyState(): EntityDetailState {
  * given a guessed level. They are still real headers a screen reader will announce; this test's
  * scope is the numbered hierarchy this bead's own code controls.
  */
-function headingLevelsInOrder(root: ReturnType<typeof render>): number[] {
+function headingLevelsInOrder(root: Awaited<ReturnType<typeof render>>): number[] {
   const headers = root.getAllByRole('header');
   const levels: number[] = [];
   for (const node of headers) {

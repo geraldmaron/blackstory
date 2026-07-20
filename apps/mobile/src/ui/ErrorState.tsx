@@ -2,11 +2,17 @@
  * Error/offline-state primitive. Uses accessibilityLiveRegion="assertive" so
  * assistive tech announces the failure as soon as it renders (e.g. after a
  * failed fetch), distinct from EmptyState's neutral, non-interrupting tone.
+ *
+ * `accessibilityLiveRegion` is Android-only (see React Native's own docs) — `useAnnounceOnMount`
+ * additionally fires a cross-platform `AccessibilityInfo.announceForAccessibility` call once per
+ * mount so VoiceOver on iOS gets the same "announced without you having to swipe to find it"
+ * behavior TalkBack already gets from the live region (MOB-017).
  */
 import { StyleSheet, View } from 'react-native';
 import { Button, type ButtonProps } from './Button';
 import { Text } from './Text';
 import { space, useStatusColors } from './tokens';
+import { useAnnounceOnMount } from './useAnnounceOnMount';
 
 export type ErrorStateProps = {
   title: string;
@@ -17,6 +23,8 @@ export type ErrorStateProps = {
 
 export function ErrorState({ title, description, retry }: ErrorStateProps) {
   const status = useStatusColors();
+
+  useAnnounceOnMount(`${title}${description ? `. ${description}` : ''}`);
 
   return (
     <View

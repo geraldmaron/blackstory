@@ -16,3 +16,5 @@ export { Image, type ImageProps } from './Image';
 export { EntityMark, type EntityMarkProps, type EntityMarkShape, type EntityMarkReason } from './EntityMark';
 export { Logo, logoClearSpaceDp, type LogoProps } from './Logo';
 export { ListRow, type ListRowProps } from './ListRow';
+export { useAccessibilityFocus } from './useAccessibilityFocus';
+export { useAnnounceOnMount } from './useAnnounceOnMount';

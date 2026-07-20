@@ -1,9 +1,10 @@
 /**
  * Pressable-based Button primitive with native accessible press semantics:
- * accessibilityRole="button", accessibilityState (disabled/busy) kept in
- * sync, and a minimum 44x44dp hit target (Apple HIG / Material guidance) via
- * hitSlop when the rendered box is smaller. Colors/radius/spacing/motion all
- * come from generated tokens.
+ * accessibilityRole="button" (overridable via a passed-through `accessibilityRole`, e.g.
+ * "radio" for a toggle/filter chip), accessibilityState (disabled/busy, merged with an optional
+ * caller-supplied `selected`/`checked`/`expanded` — see `accessibilityState` prop, MOB-017) kept
+ * in sync, and a minimum 44x44dp hit target (Apple HIG / Material guidance) via hitSlop when the
+ * rendered box is smaller. Colors/radius/spacing/motion all come from generated tokens.
  */
 import { useState } from 'react';
 import {
@@ -20,7 +21,7 @@ const MIN_TOUCH_TARGET = 44;
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
-export type ButtonProps = Omit<PressableProps, 'children' | 'style'> & {
+export type ButtonProps = Omit<PressableProps, 'children' | 'style' | 'accessibilityState'> & {
   /** Visible label. Also becomes the default accessibilityLabel. */
   label: string;
   variant?: ButtonVariant;
@@ -28,6 +29,17 @@ export type ButtonProps = Omit<PressableProps, 'children' | 'style'> & {
   loading?: boolean;
   /** Overrides the default (label-derived) accessible name — use for icon-only or ambiguous labels. */
   accessibilityLabel?: string;
+  /**
+   * Extra accessibilityState to merge with the button's own tracked `disabled`/`busy` state —
+   * e.g. `{ selected: true }` when `Button` is used as a toggle/radio-style control (pair with
+   * `accessibilityRole="radio"`, which flows through as an ordinary `Pressable` prop). Merged
+   * rather than replacing the whole object so callers can't accidentally drop the disabled/busy
+   * tracking by supplying this.
+   */
+  accessibilityState?: Pick<
+    NonNullable<PressableProps['accessibilityState']>,
+    'selected' | 'checked' | 'expanded'
+  >;
 };
 
 export function Button({
@@ -36,6 +48,7 @@ export function Button({
   loading = false,
   disabled,
   accessibilityLabel,
+  accessibilityState,
   onPress,
   ...rest
 }: ButtonProps) {
@@ -53,7 +66,7 @@ export function Button({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityState={{ disabled: isDisabled, busy: loading }}
+      accessibilityState={{ disabled: isDisabled, busy: loading, ...accessibilityState }}
       disabled={isDisabled}
       hitSlop={8}
       onPressIn={() => setPressed(true)}

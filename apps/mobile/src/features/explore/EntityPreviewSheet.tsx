@@ -10,9 +10,17 @@
  * Accessibility: the sheet is a modal dialog (`accessibilityViewIsModal`) with a
  * 44pt close target; the whole panel is announced. It is anchored above the map
  * attribution so it never fully occludes the license text (ADR-024 §8).
+ *
+ * Focus movement (MOB-017): this sheet mounts OVER the map on the same screen — not a route
+ * push — so neither VoiceOver nor TalkBack move focus here on their own the way they would for
+ * a new screen. Selecting a NEW feature (id changes, including from no-selection) drives explicit
+ * assistive-tech focus onto the panel via `useAccessibilityFocus`, so a screen-reader user who
+ * just activated a map point or list row lands directly on the preview, not stranded on whatever
+ * they pressed a moment ago.
  */
+import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Surface, Text, useThemeColors } from '@/ui';
+import { Button, Surface, Text, useAccessibilityFocus, useThemeColors } from '@/ui';
 import { featureSubtitle, type ExploreFeature } from './explore-feature';
 
 export type EntityPreviewSheetProps = {
@@ -23,6 +31,12 @@ export type EntityPreviewSheetProps = {
 
 export function EntityPreviewSheet({ feature, onOpenEntity, onClose }: EntityPreviewSheetProps) {
   const theme = useThemeColors();
+  const { ref: sheetRef, focus } = useAccessibilityFocus();
+
+  useEffect(() => {
+    if (feature) focus();
+  }, [feature?.entityId, focus]);
+
   if (!feature) return null;
 
   return (
@@ -33,6 +47,7 @@ export function EntityPreviewSheet({ feature, onOpenEntity, onClose }: EntityPre
       accessibilityViewIsModal
     >
       <Surface
+        ref={sheetRef}
         tone="surfaceRaised"
         bordered
         paddingKey="4"

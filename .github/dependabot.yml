@@ -26,6 +26,19 @@ updates:
           - 'tsx'
           - '@types/*'
 
+  - package-ecosystem: npm
+    # apps/mobile keeps its own npm lockfile — deliberately excluded from the root pnpm
+    # workspace (pnpm-workspace.yaml `!apps/mobile`) — so it needs its own Dependabot entry.
+    directory: /apps/mobile
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+      - javascript
+      - mobile
+
   - package-ecosystem: pip
     directory: /
     schedule:
