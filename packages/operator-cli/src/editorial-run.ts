@@ -264,21 +264,25 @@ async function judgeOneSubject(input: {
         : {}),
       ...(draftsIn.claims !== undefined
         ? {
-            claims: (Array.isArray(draftsIn.claims) ? draftsIn.claims : []).map(
-              (claim): EditorialClaimDraft => ({
-                predicate: toSafeString(claim?.predicate),
-                object: toSafeString(claim?.object),
-                confidenceLevel:
-                  claim?.confidenceLevel === 'high' ||
-                  claim?.confidenceLevel === 'medium' ||
-                  claim?.confidenceLevel === 'low'
-                    ? claim.confidenceLevel
-                    : 'low',
-                citationSource: toSafeString(claim?.citationSource),
-                citationHref: toSafeString(claim?.citationHref),
-                citationLabel: toSafeString(claim?.citationLabel),
-              }),
-            ),
+            claims: (Array.isArray(draftsIn.claims) ? draftsIn.claims : [])
+              .map(
+                (claim): EditorialClaimDraft => ({
+                  predicate: toSafeString(claim?.predicate),
+                  object: toSafeString(claim?.object),
+                  confidenceLevel:
+                    claim?.confidenceLevel === 'high' ||
+                    claim?.confidenceLevel === 'medium' ||
+                    claim?.confidenceLevel === 'low'
+                      ? claim.confidenceLevel
+                      : 'low',
+                  citationSource: toSafeString(claim?.citationSource),
+                  citationHref: toSafeString(claim?.citationHref),
+                  citationLabel: toSafeString(claim?.citationLabel),
+                }),
+              )
+              // Free/paid models occasionally emit stray {} entries alongside real
+              // claims — drop rather than fail validation on an empty predicate/object.
+              .filter((claim) => claim.predicate !== '' && claim.object !== ''),
           }
         : {}),
       // Free models invent plausible-but-unregistered topic ids (e.g. "montgomery-bus-boycott"
