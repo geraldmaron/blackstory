@@ -1,0 +1,160 @@
+[
+  {
+    "id": "recon_james_g_patterson",
+    "kind": "person",
+    "displayName": "James G. Patterson",
+    "summary": "James G. Patterson served as a teacher and state legislator representing Yazoo County in the Mississippi House during Reconstruction. He was lynched on October 20, 1875, during a wave of political violence targeting Black officeholders, underscoring the perilous struggle for Black political participation in the post-Civil War South.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "reconstruction",
+      "education",
+      "firsts"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "reconstruction",
+      "education",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction legislator",
+      "Black officeholder",
+      "Mississippi House",
+      "lynching",
+      "Yazoo County"
+    ],
+    "jurisdictionLabel": "Yazoo County, Mississippi",
+    "locationPrecision": "county",
+    "locationLabel": "Represented Yazoo County in state legislature",
+    "lat": 33.8,
+    "lng": -90.4,
+    "claims": [
+      {
+        "predicate": "held office in",
+        "object": "Mississippi House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/James_G._Patterson",
+        "citationLabel": "Wikipedia: James G. Patterson"
+      },
+      {
+        "predicate": "represented",
+        "object": "Yazoo County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/James_G._Patterson",
+        "citationLabel": "Wikipedia: James G. Patterson"
+      },
+      {
+        "predicate": "served during",
+        "object": "1874–1875",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/James_G._Patterson",
+        "citationLabel": "Wikipedia: James G. Patterson"
+      },
+      {
+        "predicate": "was lynched on",
+        "object": "October 20, 1875",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/James_G._Patterson",
+        "citationLabel": "Wikipedia: James G. Patterson"
+      },
+      {
+        "predicate": "was a",
+        "object": "teacher",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/James_G._Patterson",
+        "citationLabel": "Wikipedia: James G. Patterson"
+      },
+      {
+        "predicate": "was targeted due to",
+        "object": "political violence against Black officeholders during Reconstruction",
+        "confidenceLevel": "high",
+        "citationSource": "mshistorynow.mdah.ms.gov",
+        "citationHref": "https://mshistorynow.mdah.ms.gov/issue/first-black-legislators-mississippi",
+        "citationLabel": "MSHistoryNow: First Black Legislators in Mississippi"
+      }
+    ],
+    "historicalContext": "Patterson’s election and assassination occurred during Radical Reconstruction, a period when newly enfranchised Black men gained political office under federal protections like the Fifteenth Amendment. His lynching reflects the violent white resistance that ultimately dismantled Black political power in Mississippi after federal oversight waned."
+  },
+  {
+    "id": "recon_j_w_randolph",
+    "kind": "person",
+    "displayName": "J. W. Randolph",
+    "summary": "J. W. Randolph was a Black educator and principal in Pass Christian, Mississippi, honored by renaming the Harrison County Training School after him in 1939. The school, built in 1928 with Rosenwald Fund support, served African American students during segregation and was later designated a Mississippi Landmark and listed on the National Register of Historic Places in 2025.",
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "education",
+      "segregation",
+      "civil-rights",
+      "community-organizing"
+    ],
+    "topicIds": [
+      "education",
+      "segregation",
+      "civil-rights",
+      "community-organizing"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "J.W. Randolph School",
+      "Rosenwald School",
+      "Black education Mississippi",
+      "school segregation",
+      "Pass Christian"
+    ],
+    "jurisdictionLabel": "Pass Christian, Mississippi",
+    "locationPrecision": "address",
+    "locationLabel": "315 Clark Avenue, Pass Christian, Mississippi",
+    "lat": 30.318611,
+    "lng": -89.25,
+    "claims": [
+      {
+        "predicate": "was principal of",
+        "object": "Harrison County Training School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/J._W._Randolph_School",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had school renamed in honor of",
+        "object": "J.W. Randolph",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/J._W._Randolph_School",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "led school during segregation era",
+        "object": "African American education in Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/J._W._Randolph_School",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was associated with Rosenwald Fund-supported school",
+        "object": "J.W. Randolph School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/J._W._Randolph_School",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "During the era of Jim Crow segregation, Black communities in Mississippi relied on underfunded public and philanthropically supported schools like those backed by the Rosenwald Fund. Renaming the school for J. W. Randolph in 1939 reflected community recognition of Black educational leadership amid systemic inequality."
+  }
+]

@@ -1,1 +1,232 @@
-[]
+[
+  {
+    "id": "recon_john_c_rollins",
+    "kind": "person",
+    "displayName": "John C. Rollins",
+    "summary": "John C. Rollins served as a Republican member of the Arkansas House of Representatives in 1873, representing Ashley, Chicot, Drew, and Desha counties during the Reconstruction era. He was one of several African Americans elected to state office in Arkansas in the years following emancipation, before systemic disenfranchisement curtailed Black political power.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "voting-rights"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "voting-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Arkansas House of Representatives",
+      "Black legislator",
+      "Republican",
+      "1873"
+    ],
+    "jurisdictionLabel": "Little Rock, Arkansas",
+    "locationPrecision": "institution",
+    "locationLabel": "Arkansas State Capitol",
+    "lat": 34.74666667,
+    "lng": -92.28916667,
+    "claims": [
+      {
+        "predicate": "served as member of",
+        "object": "Arkansas House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_C._Rollins",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Ashley County, Arkansas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_C._Rollins",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was political party",
+        "object": "Republican",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_C._Rollins",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was one of the African Americans who served in Arkansas’ legislature during Reconstruction",
+        "object": "Reconstruction-era Black officeholder",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_C._Rollins",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "During Reconstruction, the 14th and 15th Amendments enabled Black men to vote and hold office across the South. In Arkansas, this led to over 80 African Americans serving in the state legislature between 1868 and 1893. Rollins’ election reflects this brief but significant expansion of Black political agency, which was later dismantled by Jim Crow-era voting restrictions."
+  },
+  {
+    "id": "recon_egbert_sammis",
+    "kind": "person",
+    "displayName": "Egbert Sammis",
+    "summary": "Egbert C. Sammis served as a state senator representing Duval County in the Florida Senate in 1885 during the Reconstruction era, a period of brief political inclusion for Black Americans in the South. He was identified as 'mulatto' in historical records and was part of the extended Kingsley family, linked to the Kingsley Plantation community.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "black-architects",
+      "free-people-of-color"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "black-architects",
+      "free-people-of-color"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Florida Senate",
+      "Duval County",
+      "Reconstruction",
+      "Kingsley Plantation",
+      "Black officeholder"
+    ],
+    "jurisdictionLabel": "Tallahassee, FL",
+    "locationPrecision": "institution",
+    "locationLabel": "Florida State Capitol",
+    "lat": 30.43811,
+    "lng": -84.2816,
+    "claims": [
+      {
+        "predicate": "served as state senator",
+        "object": "representing Duval County in the Florida Senate in 1885",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Egbert_Sammis",
+        "citationLabel": "Wikipedia: Egbert Sammis"
+      },
+      {
+        "predicate": "was identified as",
+        "object": "mulatto in historical records",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Egbert_Sammis",
+        "citationLabel": "Wikipedia: Egbert Sammis"
+      },
+      {
+        "predicate": "was grandson of",
+        "object": "Zephaniah Kingsley and Anna of the Kingsley Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Egbert_Sammis",
+        "citationLabel": "Wikipedia: Egbert Sammis"
+      },
+      {
+        "predicate": "held political office during",
+        "object": "Reconstruction era in Florida",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Egbert_Sammis",
+        "citationLabel": "Wikipedia: Egbert Sammis"
+      }
+    ],
+    "historicalContext": "Sammis’s election reflects the short-lived political empowerment of Black men in Southern state legislatures during Reconstruction, enabled by federal enforcement of civil rights after the Civil War. His service occurred before the rise of Jim Crow laws that systematically disenfranchised Black voters and excluded them from officeholding in Florida and across the South."
+  },
+  {
+    "id": "recon_emanuel_fortune",
+    "kind": "person",
+    "displayName": "Emanuel Fortune",
+    "summary": "Emanuel Fortune, a formerly enslaved man from Jackson County, Florida, served as a Black legislator during Reconstruction, holding office in the Florida House of Representatives from 1868 to 1870 and participating in the state's Constitutional Convention. He is also recognized as the father of civil rights leader and journalist Timothy Thomas Fortune.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "politics",
+      "self-governance"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "politics",
+      "self-governance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction politician",
+      "Florida House of Representatives",
+      "Constitutional Convention",
+      "Black legislator",
+      "Jackson County"
+    ],
+    "jurisdictionLabel": "Marianna, Florida",
+    "locationPrecision": "city",
+    "locationLabel": "Jackson County, Florida",
+    "lat": 30.8,
+    "lng": -85.21,
+    "claims": [
+      {
+        "predicate": "served in",
+        "object": "Florida House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Timothy_Thomas_Fortune",
+        "citationLabel": "Wikipedia on Timothy Thomas Fortune"
+      },
+      {
+        "predicate": "participated in",
+        "object": "Florida Constitutional Convention",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Timothy_Thomas_Fortune",
+        "citationLabel": "Wikipedia on Timothy Thomas Fortune"
+      },
+      {
+        "predicate": "was father of",
+        "object": "Timothy Thomas Fortune",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Timothy_Thomas_Fortune",
+        "citationLabel": "Wikipedia on Timothy Thomas Fortune"
+      },
+      {
+        "predicate": "was born into slavery",
+        "object": "Jackson County, Florida",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Timothy_Thomas_Fortune",
+        "citationLabel": "Wikipedia on Timothy Thomas Fortune"
+      },
+      {
+        "predicate": "held political office during",
+        "object": "Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Timothy_Thomas_Fortune",
+        "citationLabel": "Wikipedia on Timothy Thomas Fortune"
+      },
+      {
+        "predicate": "was a Black officeholder in",
+        "object": "post-Civil War Florida",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Timothy_Thomas_Fortune",
+        "citationLabel": "Wikipedia on Timothy Thomas Fortune"
+      }
+    ],
+    "historicalContext": "Emanuel Fortune's election to the Florida House during Reconstruction reflects the brief expansion of Black political power following the Civil War, enabled by federal enforcement of the 14th and 15th Amendments. His service occurred amid efforts by newly enfranchised African Americans to shape state constitutions and public policy before the rise of Jim Crow laws dismantled these gains."
+  }
+]

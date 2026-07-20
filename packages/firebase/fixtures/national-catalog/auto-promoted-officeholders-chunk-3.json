@@ -1,0 +1,350 @@
+[
+  {
+    "id": "recon_joseph_mansion",
+    "kind": "person",
+    "displayName": "Joseph Mansion",
+    "summary": "Joseph Mansion served as a state legislator and tax assessor in Louisiana during Reconstruction, representing Orleans Parish in the Louisiana House of Representatives in 1868.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Louisiana",
+      "Orleans Parish",
+      "Black legislator",
+      "Republican"
+    ],
+    "jurisdictionLabel": "New Orleans, LA",
+    "locationPrecision": "city",
+    "locationLabel": "Orleans Parish seat of government",
+    "lat": 29.9761,
+    "lng": -90.0783,
+    "claims": [
+      {
+        "predicate": "served as member of",
+        "object": "Louisiana House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Joseph_Mansion_(politician)",
+        "citationLabel": "Wikipedia: Joseph Mansion (politician)"
+      },
+      {
+        "predicate": "represented",
+        "object": "Orleans Parish",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Joseph_Mansion_(politician)",
+        "citationLabel": "Wikipedia: Joseph Mansion (politician)"
+      },
+      {
+        "predicate": "held office during",
+        "object": "Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://house.louisiana.gov/H_PDFdocs/HouseMembership_History_CURRENT.pdf",
+        "citationLabel": "Louisiana House of Representatives Membership History"
+      },
+      {
+        "predicate": "served as",
+        "object": "state tax assessor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Joseph_Mansion_(politician)",
+        "citationLabel": "Wikipedia: Joseph Mansion (politician)"
+      },
+      {
+        "predicate": "was affiliated with",
+        "object": "Republican Party",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Joseph_Mansion_(politician)",
+        "citationLabel": "Wikipedia: Joseph Mansion (politician)"
+      }
+    ],
+    "historicalContext": "Mansion's election occurred during Reconstruction, a period when constitutional amendments and federal enforcement briefly expanded Black political participation in the South. His role in Louisiana’s legislature reflects the broader movement of newly enfranchised African Americans asserting civic agency in state governments, despite rising resistance that would culminate in Jim Crow disenfranchisement."
+  },
+  {
+    "id": "recon_anna_m_dumas",
+    "kind": "person",
+    "displayName": "Anna M. Dumas",
+    "summary": "Anna M. Dumas served as postmaster of Covington, Louisiana, from 1872 to 1885, making her one of the earliest Black federal officeholders in the state during Reconstruction. Her appointment preceded Minnie Cox’s better-known postmastership in Mississippi, highlighting Louisiana’s role in Black civic leadership during this era.",
+    "eraBuckets": [
+      "1870s",
+      "1880s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "federal-intervention",
+      "firsts",
+      "government"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "federal-intervention",
+      "firsts",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "postmaster",
+      "Covington",
+      "Louisiana",
+      "Reconstruction",
+      "Black officeholder"
+    ],
+    "jurisdictionLabel": "Covington, Louisiana",
+    "locationPrecision": "institution",
+    "locationLabel": "Post Office, Covington",
+    "lat": 30.4,
+    "lng": -89.96,
+    "claims": [
+      {
+        "predicate": "served as",
+        "object": "postmaster of Covington, Louisiana",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Creswell",
+        "citationLabel": "John Creswell (Wikipedia)"
+      },
+      {
+        "predicate": "was appointed in",
+        "object": "1872",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Creswell",
+        "citationLabel": "John Creswell (Wikipedia)"
+      },
+      {
+        "predicate": "preceded",
+        "object": "Minnie M. Cox as a Black postmaster in the South",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Creswell",
+        "citationLabel": "John Creswell (Wikipedia)"
+      },
+      {
+        "predicate": "served during",
+        "object": "Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Creswell",
+        "citationLabel": "John Creswell (Wikipedia)"
+      },
+      {
+        "predicate": "held office until",
+        "object": "1885",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Creswell",
+        "citationLabel": "John Creswell (Wikipedia)"
+      },
+      {
+        "predicate": "was part of",
+        "object": "federal appointments of Black Americans during Reconstruction",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Creswell",
+        "citationLabel": "John Creswell (Wikipedia)"
+      }
+    ],
+    "historicalContext": "During Reconstruction, the federal government appointed Black Americans to local offices across the South, including postmasterships, as part of efforts to integrate freed people into civic life. Dumas’s role in Covington reflects both the reach of federal authority and the emergence of Black leadership in local institutions, even in areas with strong white resistance."
+  },
+  {
+    "id": "recon_wiley_h_bates",
+    "kind": "person",
+    "displayName": "Wiley H. Bates",
+    "summary": "Wiley H. Bates, born into slavery in North Carolina in 1859, became a prominent Black businessman and civic leader in Annapolis, Maryland. Elected to the Annapolis Board of Aldermen in 1897, he advocated for equitable teacher pay and condemned the 1898 lynching of Wright Smith. A philanthropist, he donated $500 toward the 1932 opening of Wiley H.",
+    "eraBuckets": [
+      "1890s",
+      "1930s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "desegregation",
+      "leadership",
+      "community-organizing"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "desegregation",
+      "leadership",
+      "community-organizing"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Wiley H. Bates High School",
+      "Annapolis Board of Aldermen",
+      "Brewer Hill Cemetery",
+      "Black philanthropy",
+      "Jim Crow Maryland"
+    ],
+    "jurisdictionLabel": "Annapolis, Maryland",
+    "locationPrecision": "address",
+    "locationLabel": "Residence and business at Cathedral Street",
+    "lat": 40.75861111,
+    "lng": -73.97638889,
+    "claims": [
+      {
+        "predicate": "was elected to",
+        "object": "Annapolis Board of Aldermen",
+        "confidenceLevel": "high",
+        "citationSource": "msa.maryland.gov",
+        "citationHref": "https://msa.maryland.gov/megafile/msa/speccol/sc3500/sc3520/001900/001942/html/1942bio.html",
+        "citationLabel": "MSA SC 3520-1942"
+      },
+      {
+        "predicate": "was the third Black man elected as alderman in Annapolis",
+        "object": "third Black alderman",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Wiley_H._Bates",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "advocated for due process by condemning the lynching of Wright Smith",
+        "object": "condemned lynching of Wright Smith",
+        "confidenceLevel": "high",
+        "citationSource": "msa.maryland.gov",
+        "citationHref": "https://msa.maryland.gov/megafile/msa/speccol/sc3500/sc3520/001900/001942/html/1942bio.html",
+        "citationLabel": "MSA SC 3520-1942"
+      },
+      {
+        "predicate": "donated $500 toward land purchase for first public high school for Black students in Anne Arundel County",
+        "object": "funded land for Wiley H. Bates High School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Wiley_H._Bates",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was born into slavery in North Carolina",
+        "object": "born into slavery",
+        "confidenceLevel": "high",
+        "citationSource": "msa.maryland.gov",
+        "citationHref": "https://msa.maryland.gov/megafile/msa/speccol/sc3500/sc3520/001900/001942/html/1942bio.html",
+        "citationLabel": "MSA SC 3520-1942"
+      },
+      {
+        "predicate": "ensured equal teacher salary increases for Black schools",
+        "object": "advocated for Black teacher pay equity",
+        "confidenceLevel": "medium",
+        "citationSource": "msa.maryland.gov",
+        "citationHref": "https://msa.maryland.gov/megafile/msa/speccol/sc3500/sc3520/001900/001942/html/1942bio.html",
+        "citationLabel": "MSA SC 3520-1942"
+      }
+    ],
+    "historicalContext": "Bates' political service occurred during the erosion of Reconstruction gains, as Jim Crow laws suppressed Black enfranchisement. His election and activism reflect persistent Black civic engagement in Maryland despite disenfranchisement. His support for Black education responded directly to systemic underfunding under segregation, a strategy of community self-determination common among Black leaders of the era."
+  },
+  {
+    "id": "recon_hannibal_c_carter",
+    "kind": "person",
+    "displayName": "Hannibal C. Carter",
+    "summary": "Hannibal C. Carter served as Mississippi Secretary of State in 1873–1874 during Reconstruction, one of the first African Americans in that role, and represented Warren County in the state House. A Republican-turned-Democrat, he later promoted Black migration to Oklahoma and was born to a free Black family active in the Underground Railroad.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "military",
+      "government",
+      "underground-railroad",
+      "migration",
+      "black-power"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "military",
+      "government",
+      "underground-railroad",
+      "migration",
+      "black-power"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Mississippi Secretary of State",
+      "United States Colored Troops",
+      "Freedmen's Oklahoma Immigration Association",
+      "Warren County"
+    ],
+    "jurisdictionLabel": "Jackson, Mississippi",
+    "locationPrecision": "institution",
+    "locationLabel": "Mississippi State Capitol",
+    "lat": 32.30388889,
+    "lng": -90.18222222,
+    "claims": [
+      {
+        "predicate": "served as",
+        "object": "Secretary of State of Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hannibal_C._Carter",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served in",
+        "object": "Mississippi House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hannibal_C._Carter",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "succeeded",
+        "object": "Hiram R. Revels",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hannibal_C._Carter",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was born to",
+        "object": "free Black family active in the Underground Railroad",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hannibal_C._Carter",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "helped establish",
+        "object": "Freedmen's Oklahoma Immigration Association",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hannibal_C._Carter",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served as",
+        "object": "Captain in the United States Colored Troops",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hannibal_C._Carter",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Carter's political appointments occurred during Reconstruction, a period when constitutional amendments and federal enforcement enabled Black men to hold office in the South for the first time. His service reflects the brief expansion of Black political power before the rise of Jim Crow laws systematically disenfranchised African Americans."
+  }
+]

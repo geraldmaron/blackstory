@@ -69,5 +69,368 @@
       }
     ],
     "historicalContext": "Eatonville’s incorporation in 1887 as a self-governing Black municipality emerged during Reconstruction’s waning years, when Black communities sought autonomy amid rising white supremacist resistance. Federal appointments like the postmastership provided rare avenues for Black civic authority, economic access, and communication infrastructure in segregated communities."
+  },
+  {
+    "id": "recon_romulus_moore",
+    "kind": "person",
+    "displayName": "Romulus Moore",
+    "summary": "Reverend Romulus Moore, born enslaved in Georgia, was elected to the Georgia House of Representatives in 1868 as one of the first Black legislators during Reconstruction. He was expelled because of his race, later reinstated by federal action, and advocated for the 15th Amendment and the Civil Rights Act of 1875, helping shape early civil rights policy in the post-slavery South.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "voting-rights",
+      "firsts",
+      "segregation",
+      "grassroots-leadership"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "voting-rights",
+      "firsts",
+      "segregation",
+      "grassroots-leadership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction legislator",
+      "expelled from legislature",
+      "15th Amendment",
+      "Civil Rights Act of 1875",
+      "Georgia House of Representatives"
+    ],
+    "jurisdictionLabel": "Atlanta, GA",
+    "locationPrecision": "institution",
+    "locationLabel": "Georgia State Capitol, where he served and was later commemorated",
+    "lat": 36.16583333,
+    "lng": -86.78416667,
+    "claims": [
+      {
+        "predicate": "was elected to the Georgia House of Representatives",
+        "object": "Columbia County district, 1868",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Romulus_Moore",
+        "citationLabel": "Wikipedia: Romulus Moore"
+      },
+      {
+        "predicate": "was expelled from the Georgia General Assembly",
+        "object": "in 1868 along with other Black legislators known as the 'Original 33'",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Romulus_Moore",
+        "citationLabel": "Wikipedia: Romulus Moore"
+      },
+      {
+        "predicate": "was reinstated to the Georgia General Assembly",
+        "object": "in 1870 by an Act of Congress",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Romulus_Moore",
+        "citationLabel": "Wikipedia: Romulus Moore"
+      },
+      {
+        "predicate": "advocated for the ratification of the Civil Rights Act of 1875",
+        "object": "as a petitioner to the U.S. Congress listed in the Congressional Record of February 3, 1874",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Romulus_Moore",
+        "citationLabel": "Wikipedia: Romulus Moore"
+      },
+      {
+        "predicate": "was active in advocating for the 15th Amendment",
+        "object": "to the U.S. Constitution, which protected voting rights regardless of race",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Romulus_Moore",
+        "citationLabel": "Wikipedia: Romulus Moore"
+      },
+      {
+        "predicate": "was born enslaved",
+        "object": "in Taliaferro County, Georgia, in January 1818",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Romulus_Moore",
+        "citationLabel": "Wikipedia: Romulus Moore"
+      }
+    ],
+    "historicalContext": "Moore’s election and expulsion occurred during Reconstruction, a period when newly enfranchised Black men gained political power in Southern legislatures, only to be violently or bureaucratically removed as white supremacist forces reasserted control. His reinstatement by an Act of Congress reflects federal efforts to enforce constitutional amendments guaranteeing Black citizenship and voting rights."
+  },
+  {
+    "id": "recon_john_w_e_thomas",
+    "kind": "person",
+    "displayName": "John W. E. Thomas",
+    "summary": "John W. E. Thomas, born into slavery in Alabama, became the first African American elected to the Illinois General Assembly in 1876. As a Republican representative from Chicago, he introduced the state's first anti-discrimination law in public accommodations in 1885, advancing civil rights during Reconstruction.",
+    "eraBuckets": [
+      "1870s",
+      "1880s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "reconstruction",
+      "firsts",
+      "public-accommodations"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "reconstruction",
+      "firsts",
+      "public-accommodations"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "first African American legislator Illinois",
+      "anti-discrimination law Illinois",
+      "Reconstruction politics",
+      "Black lawmaker Chicago",
+      "public accommodations civil rights"
+    ],
+    "jurisdictionLabel": "Chicago, Illinois",
+    "locationPrecision": "city",
+    "locationLabel": "Illinois House of Representatives chambers and Chicago community leadership sites",
+    "lat": 42.03833333,
+    "lng": -88.32277778,
+    "claims": [
+      {
+        "predicate": "was the first African American elected to the Illinois General Assembly",
+        "object": "Illinois General Assembly",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_W._E._Thomas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "introduced Illinois' first anti-discrimination law in public accommodations",
+        "object": "Illinois anti-discrimination in public accommodations law",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_W._E._Thomas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was born into slavery in Alabama",
+        "object": "Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_W._E._Thomas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served in the Illinois House of Representatives from the 2nd district",
+        "object": "2nd district",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_W._E._Thomas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served in the Illinois House of Representatives from the 3rd district",
+        "object": "3rd district",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_W._E._Thomas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was admitted to the bar in 1880",
+        "object": "1880",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_W._E._Thomas",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Thomas's election and legislative work occurred during Reconstruction, a period when newly enfranchised Black men gained political office across the U.S. His 1885 anti-discrimination bill challenged racial segregation in public spaces, predating similar federal efforts by decades and reflecting early state-level civil rights organizing in the North."
+  },
+  {
+    "id": "recon_james_s_davidson",
+    "kind": "person",
+    "displayName": "James S. Davidson",
+    "summary": "James S. Davidson served as a Republican representative and senator from Iberville Parish during Reconstruction, holding office in the Louisiana House (1871–1880, 1884–1892) and Senate (1880–1884). He participated in the 1876 Republican State Convention and the 1879 Louisiana Constitutional Convention, contributing to Black political engagement during a transformative era.",
+    "eraBuckets": [
+      "1870s",
+      "1880s",
+      "1890s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Louisiana legislature",
+      "Black officeholder",
+      "Iberville Parish",
+      "Republican Party"
+    ],
+    "jurisdictionLabel": "Iberville Parish, Louisiana",
+    "locationPrecision": "district",
+    "locationLabel": "Louisiana State Capitol and local parish jurisdiction",
+    "lat": 30.4475,
+    "lng": -91.17861111,
+    "claims": [
+      {
+        "predicate": "served in",
+        "object": "Louisiana House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/James_S._Davidson",
+        "citationLabel": "Wikipedia: James S. Davidson"
+      },
+      {
+        "predicate": "represented",
+        "object": "Iberville Parish",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/James_S._Davidson",
+        "citationLabel": "Wikipedia: James S. Davidson"
+      },
+      {
+        "predicate": "served in",
+        "object": "Louisiana Senate",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/James_S._Davidson",
+        "citationLabel": "Wikipedia: James S. Davidson"
+      },
+      {
+        "predicate": "was delegate to",
+        "object": "1879 Louisiana Constitutional Convention",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/James_S._Davidson",
+        "citationLabel": "Wikipedia: James S. Davidson"
+      },
+      {
+        "predicate": "was delegate to",
+        "object": "1876 Republican State Convention",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/James_S._Davidson",
+        "citationLabel": "Wikipedia: James S. Davidson"
+      },
+      {
+        "predicate": "was member of",
+        "object": "Republican Party",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/James_S._Davidson",
+        "citationLabel": "Wikipedia: James S. Davidson"
+      }
+    ],
+    "historicalContext": "Davidson's tenure occurred during Reconstruction, when newly enfranchised Black men in Louisiana gained elected office despite rising white supremacist resistance. His sustained service reflects the brief expansion of Black political power before Jim Crow laws dismantled it."
+  },
+  {
+    "id": "recon_henry_demas",
+    "kind": "person",
+    "displayName": "Henry Demas",
+    "summary": "Henry Demas, born into slavery in St. John the Baptist Parish, Louisiana, served in the Union Army before becoming a constable, state legislator, and civil rights advocate during Reconstruction. He served in the Louisiana House and Senate across two decades, was involved in founding Southern University, and advised sugarcane workers during a labor strike.",
+    "eraBuckets": [
+      "1860s",
+      "1870s",
+      "1880s",
+      "1890s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "enslavement",
+      "military",
+      "education",
+      "labor",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "enslavement",
+      "military",
+      "education",
+      "labor",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Louisiana legislator",
+      "United States Colored Infantry",
+      "Southern University",
+      "sugarcane strike"
+    ],
+    "jurisdictionLabel": "Edgard, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "St. John the Baptist Parish, burial site at St John the Baptist Church",
+    "lat": 51.447,
+    "lng": -0.3255,
+    "claims": [
+      {
+        "predicate": "was born into slavery in",
+        "object": "St. John the Baptist Parish, Louisiana",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_Demas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served in the Union Army as a corporal in",
+        "object": "Company H, 80th Regiment, United States Colored Infantry",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_Demas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served as a state legislator in Louisiana for approximately two decades during Reconstruction",
+        "object": "Louisiana House and Senate, representing St. John the Baptist Parish",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_Demas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was involved in organizing",
+        "object": "Southern University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_Demas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "advised sugarcane workers during a strike in 1880 over wages and living costs",
+        "object": "St. John the Baptist Parish, Louisiana",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_Demas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was appointed to the New Orleans Naval Office in 1897 by President William McKinley",
+        "object": "federal civil service position",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_Demas",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Demas’s political career unfolded during Reconstruction, a period when newly enfranchised Black men gained elected office in Southern state legislatures despite ongoing white supremacist opposition. His service in Louisiana—a state with a significant Black population and intense political conflict—reflects broader struggles over land, labor, and governance after slavery. His later appointment to federal office illustrates both the reach of Black political networks and the backlash that fueled Jim Crow’s rise."
   }
 ]

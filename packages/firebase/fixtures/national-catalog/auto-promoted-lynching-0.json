@@ -1,68 +1,5 @@
 [
   {
-    "id": "lynching_bill_gilmer_memphis_tennessee",
-    "kind": "person",
-    "displayName": "Bill Gilmer",
-    "summary": "Bill Gilmer was lynched in Memphis, Tennessee, in March\u2013April 1879 after being accused of shooting white attorney Thomas J. Wood, who had whipped him for speaking near his wife. His killing reflects the pattern of racial terror lynching used to enforce racial hierarchy in the post-Reconstruction South.",
-    "eraBuckets": [
-      "1870s"
-    ],
-    "topicTags": [
-      "resistance"
-    ],
-    "topicIds": [
-      "resistance"
-    ],
-    "mentionedEntityIds": [],
-    "keywords": [
-      "lynching",
-      "Memphis",
-      "racial violence",
-      "Reconstruction",
-      "extrajudicial killing"
-    ],
-    "jurisdictionLabel": "Memphis, Tennessee",
-    "locationPrecision": "city",
-    "locationLabel": "Site of lynching in Shelby County",
-    "lat": 35.14611111,
-    "lng": -90.05194444,
-    "claims": [
-      {
-        "predicate": "was lynched",
-        "object": "in Memphis, Tennessee",
-        "confidenceLevel": "high",
-        "citationSource": "wikipedia_api",
-        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
-        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
-      },
-      {
-        "predicate": "was accused of shooting",
-        "object": "attorney Thomas J. Wood",
-        "confidenceLevel": "high",
-        "citationSource": "wikipedia_api",
-        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
-        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
-      },
-      {
-        "predicate": "was whipped by Thomas J. Wood",
-        "object": "for using offensive language near Wood's wife",
-        "confidenceLevel": "high",
-        "citationSource": "wikipedia_api",
-        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
-        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
-      },
-      {
-        "predicate": "died as a result of racial terror lynching",
-        "object": "in the post-Reconstruction South",
-        "confidenceLevel": "high",
-        "citationSource": "wikipedia_api",
-        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
-        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
-      }
-    ],
-    "historicalContext": "Lynching was a widespread tool of racial control in the late 19th century, particularly in Southern states like Tennessee, where Black men were often targeted for perceived transgressions against white social norms. Memphis, a major urban center with a growing Black population, experienced racial tensions exacerbated by economic competition and white supremacist backlash following Reconstruction."
-  },
-  {
     "id": "lynching_bartley_james_grenada_mississippi",
     "kind": "person",
     "displayName": "Bartley James",
@@ -276,5 +213,135 @@
       }
     ],
     "historicalContext": "John Pattishall's lynching occurred during the Jim Crow era, a period marked by widespread racial violence and the use of lynching as a tool of white supremacy. His case is part of a documented history of six lynchings in Chatham County, reflecting the systemic racial terror faced by Black communities in the post-Reconstruction South."
+  },
+  {
+    "id": "lynching_gus_roberson_clarkesville_georgia",
+    "kind": "person",
+    "displayName": "Gus Roberson",
+    "summary": "Gus Roberson was lynched on May 17, 1892, in Clarkesville, Georgia, following accusations of assaulting Toccoa City Marshal James Carter. The incident reflects the racial violence and systemic injustice of the Jim Crow era.",
+    "eraBuckets": [
+      "1890s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "civil-rights",
+      "segregation"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "civil-rights",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "jim crow",
+      "georgia",
+      "1892",
+      "racial violence"
+    ],
+    "jurisdictionLabel": "Clarkesville, Georgia",
+    "locationPrecision": "city",
+    "locationLabel": "Clarkesville, Georgia",
+    "lat": 34.61027778,
+    "lng": -83.52833333,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "Gus Roberson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_in_the_United_States",
+        "citationLabel": "Lynching in the United States"
+      },
+      {
+        "predicate": "occurred in",
+        "object": "Clarkesville, Georgia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_in_the_United_States",
+        "citationLabel": "Lynching in the United States"
+      },
+      {
+        "predicate": "accused of",
+        "object": "assaulting Toccoa City Marshal James Carter",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_in_the_United_States",
+        "citationLabel": "Lynching in the United States"
+      },
+      {
+        "predicate": "part of",
+        "object": "Jim Crow-era racial violence",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_in_the_United_States",
+        "citationLabel": "Lynching in the United States"
+      }
+    ],
+    "historicalContext": "Lynching was a tool of white supremacy in the post-Reconstruction South, used to enforce racial hierarchy and intimidate Black communities. Gus Roberson's lynching exemplifies the violence and legal impunity that characterized this period."
+  },
+  {
+    "id": "lynching_bill_gilmer_memphis_tennessee",
+    "kind": "person",
+    "displayName": "Bill Gilmer",
+    "summary": "Bill Gilmer was lynched in Memphis, Tennessee, in March\u2013April 1879 after being accused of shooting white attorney Thomas J. Wood, who had whipped him for speaking near his wife. His killing reflects the pattern of racial terror lynching used to enforce racial hierarchy in the post-Reconstruction South.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "resistance"
+    ],
+    "topicIds": [
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Memphis",
+      "racial violence",
+      "Reconstruction",
+      "extrajudicial killing"
+    ],
+    "jurisdictionLabel": "Memphis, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Site of lynching in Shelby County",
+    "lat": 35.14611111,
+    "lng": -90.05194444,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "in Memphis, Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
+        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
+      },
+      {
+        "predicate": "was accused of shooting",
+        "object": "attorney Thomas J. Wood",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
+        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
+      },
+      {
+        "predicate": "was whipped by Thomas J. Wood",
+        "object": "for using offensive language near Wood's wife",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
+        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
+      },
+      {
+        "predicate": "died as a result of racial terror lynching",
+        "object": "in the post-Reconstruction South",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
+        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
+      }
+    ],
+    "historicalContext": "Lynching was a widespread tool of racial control in the late 19th century, particularly in Southern states like Tennessee, where Black men were often targeted for perceived transgressions against white social norms. Memphis, a major urban center with a growing Black population, experienced racial tensions exacerbated by economic competition and white supremacist backlash following Reconstruction."
   }
 ]
