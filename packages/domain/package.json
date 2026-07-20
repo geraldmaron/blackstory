@@ -39,6 +39,11 @@
       "types": "./dist/map/state-population.d.ts",
       "import": "./dist/map/state-population.js"
     },
+    "./demographics/population-decades": {
+      "development": "./src/demographics/population-decades.ts",
+      "types": "./dist/demographics/population-decades.d.ts",
+      "import": "./dist/demographics/population-decades.js"
+    },
     "./entity-status": {
       "development": "./src/entity-status.ts",
       "types": "./dist/entity-status.d.ts",

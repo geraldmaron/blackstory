@@ -53,8 +53,8 @@ const DESTINATIONS = [
     detail: 'National rollups from cited public statistics — census, ACS, related coverage.',
   },
   {
-    href: '/legal',
-    label: 'Legal landscape',
+    href: '/law',
+    label: 'Law',
     detail: 'Plain-language entry points to landmark civil-rights statutes and decisions.',
   },
   {

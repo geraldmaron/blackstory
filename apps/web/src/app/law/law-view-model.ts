@@ -1,5 +1,5 @@
 /**
- * Pure view-model for the `/legal` browse and detail pages. No Next.js runtime dependency.
+ * Pure view-model for the `/law` browse and detail pages. No Next.js runtime dependency.
  */
 import type { LegalBrowseItem } from '../../components/legal';
 import { isLawStatus } from '../../components/legal/format';
@@ -10,14 +10,14 @@ import {
   type SEED_LEGAL_SNAPSHOTS,
 } from '../../data/legal-seed';
 
-export type RawLegalBrowseParams = {
+export type RawLawBrowseParams = {
   readonly q?: string;
   readonly kind?: string;
   readonly topic?: string;
   readonly status?: string;
 };
 
-export type LegalBrowseViewModel = {
+export type LawBrowseViewModel = {
   readonly q: string;
   readonly kind: string;
   readonly topic: string;
@@ -28,7 +28,7 @@ export type LegalBrowseViewModel = {
   readonly topicOptions: readonly { readonly value: string; readonly label: string }[];
 };
 
-export type LegalDetailViewModel =
+export type LawDetailViewModel =
   | { readonly kind: 'not_found' }
   | {
       readonly kind: 'ok';
@@ -63,7 +63,7 @@ function buildFacetOptions(
   return [{ value: 'all', label: allLabel }, ...unique.map((value) => ({ value, label: value }))];
 }
 
-export function buildLegalBrowseViewModel(raw: RawLegalBrowseParams): LegalBrowseViewModel {
+export function buildLawBrowseViewModel(raw: RawLawBrowseParams): LawBrowseViewModel {
   const q = (raw.q ?? '').trim().toLowerCase();
   const kind = cleanSelectParam(raw.kind);
   const topic = cleanSelectParam(raw.topic);
@@ -100,7 +100,7 @@ export function buildLegalBrowseViewModel(raw: RawLegalBrowseParams): LegalBrows
   };
 }
 
-export function buildLegalDetailViewModel(slug: string): LegalDetailViewModel {
+export function buildLawDetailViewModel(slug: string): LawDetailViewModel {
   const snapshot = getLegalSnapshotBySlug(slug);
   if (!snapshot) return { kind: 'not_found' };
 
@@ -113,7 +113,7 @@ export function buildLegalDetailViewModel(slug: string): LegalDetailViewModel {
   };
 }
 
-export function listLegalStaticParams(): readonly { readonly slug: string }[] {
+export function listLawStaticParams(): readonly { readonly slug: string }[] {
   return listLegalSnapshots().map((snapshot) => ({ slug: snapshot.slug }));
 }
 

@@ -8,7 +8,12 @@ export { LegalExplainerSections } from './LegalExplainerSections';
 export type { LegalExplainerSectionsProps } from './LegalExplainerSections';
 export { LegalBrowseList } from './LegalBrowseList';
 export type { LegalBrowseItem, LegalBrowseListProps } from './LegalBrowseList';
-export { LEGAL_DISCLAIMER_TITLE, LEGAL_SECTION_LABELS, LEGAL_BROWSE_LEDE } from './copy';
+export {
+  LEGAL_DISCLAIMER_TITLE,
+  LEGAL_SECTION_LABELS,
+  LAW_BROWSE_LEDE,
+  LEGAL_BROWSE_LEDE,
+} from './copy';
 export {
   humanizeLegalKind,
   humanizeLegalTopic,

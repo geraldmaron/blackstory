@@ -14,8 +14,11 @@ export const LEGAL_SECTION_LABELS = {
   primarySources: 'Primary sources',
 } as const;
 
-export const LEGAL_BROWSE_LEDE =
+export const LAW_BROWSE_LEDE =
   'Landmark federal statutes, regulations, and court decisions that shape civil rights — explained in plain language with links to official sources and canonical fact records.';
+
+/** @deprecated Use LAW_BROWSE_LEDE — kept for internal seed/catalog references only. */
+export const LEGAL_BROWSE_LEDE = LAW_BROWSE_LEDE;
 
 export const LEGAL_KIND_LABELS: Readonly<Record<string, string>> = {
   'federal-statute': 'Federal statute',

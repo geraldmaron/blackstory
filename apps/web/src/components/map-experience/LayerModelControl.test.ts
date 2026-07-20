@@ -12,8 +12,10 @@ test('exposes a radiogroup labelled Map data model', () => {
   const html = renderToStaticMarkup(
     createElement(LayerModelControl, {
       layerMode: 'blackShare',
-      popDecade: '2020',
+      popGeo: 'state',
+      popDecade: '1870',
       onLayerModeChange: noop,
+      onPopGeoChange: noop,
       onPopDecadeChange: noop,
       onPopFromChange: noop,
       onPopToChange: noop,
@@ -22,5 +24,8 @@ test('exposes a radiogroup labelled Map data model', () => {
   assert.match(html, /role="radiogroup"/);
   assert.match(html, /aria-label="Map data model"/);
   assert.match(html, /Black population share/);
+  assert.match(html, /Geography/);
+  assert.match(html, /State \(1790–2020\)/);
   assert.match(html, /Census decade/);
+  assert.match(html, /1870/);
 });

@@ -1,0 +1,293 @@
+/**
+ * Law page body — compact reference surface with on-page nav, ledger browse rows,
+ * and section cards aligned with the methodology delivery model.
+ */
+
+.ds-law {
+  margin-top: var(--ds-space-6);
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.ds-law [id] {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+.ds-law .ds-section {
+  padding-block: var(--ds-space-8);
+}
+
+/* —— On-page index —— */
+.ds-law__nav {
+  margin: 0;
+  padding: var(--ds-space-4) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-law__nav-title {
+  margin: 0 0 var(--ds-space-3);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ds-law__nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-law__nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-law__nav-link:hover,
+.ds-law__nav-link:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-law__nav-link {
+    transition: none;
+  }
+}
+
+/* —— Filter band —— */
+.ds-law__filter-band {
+  padding-top: var(--ds-space-6);
+}
+
+.ds-law__count {
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+}
+
+/* —— Browse ledger —— */
+.ds-law__browse-ledger {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-law__browse-item {
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  min-width: 0;
+}
+
+.ds-law__browse-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-law__browse-title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.ds-law__browse-title a {
+  color: var(--ds-ink);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-law__browse-title a:hover,
+.ds-law__browse-title a:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-law__browse-title a {
+    transition: none;
+  }
+}
+
+.ds-law__browse-citation {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ds-law__browse-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-2);
+}
+
+.ds-law__chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.2rem 0.55rem;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.ds-law__chip--topic {
+  border-color: color-mix(in srgb, var(--ds-accent-graphic) 35%, var(--ds-border));
+}
+
+.ds-law__browse-note {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.75rem;
+}
+
+/* —— Detail explainer sections —— */
+.ds-law__explainer-stack {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-4);
+}
+
+.ds-law__section-card {
+  margin: 0;
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  min-width: 0;
+}
+
+.ds-law__section-title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.ds-law__section-body {
+  margin: var(--ds-space-3) 0 0;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-editorial);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.ds-law__section-body p {
+  margin: 0;
+}
+
+.ds-law__section-body p + p {
+  margin-top: var(--ds-space-3);
+}
+
+.ds-law__section-list {
+  margin: var(--ds-space-3) 0 0;
+  padding-left: var(--ds-space-4);
+  font-family: var(--ds-font-editorial);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.ds-law__section-list li + li {
+  margin-top: var(--ds-space-2);
+}
+
+.ds-law__review-line {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.ds-law__terms-nav {
+  margin-top: var(--ds-space-4);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-law__terms-kicker {
+  margin: 0 0 var(--ds-space-2);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* —— Provenance block —— */
+.ds-law__provenance-dl {
+  margin: var(--ds-space-3) 0 0;
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.ds-law__provenance-row {
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-law__provenance-row dt {
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ds-law__provenance-row dd {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+/* —— Footer cross-links —— */
+.ds-law__next {
+  padding-block: var(--ds-space-8);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-law__next .ds-band__cta {
+  margin-top: var(--ds-space-4);
+}

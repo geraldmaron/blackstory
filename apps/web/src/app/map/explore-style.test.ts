@@ -75,12 +75,16 @@ function matchExpressionOutputs(expression: unknown): readonly unknown[] {
   return outputs;
 }
 
-function buildStyleFixture(layerMode: 'off' | 'presence' | 'blackShare' | 'blackChange') {
+function buildStyleFixture(
+  layerMode: 'off' | 'presence' | 'blackShare' | 'blackChange',
+  popGeo: 'state' | 'county' = 'county',
+) {
   const source = buildExploreMapSource(listPublicEntities());
   return buildExploreMapStyle({
     featureCollection: source.featureCollection,
     jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
     layerMode,
+    popGeo,
   });
 }
 
@@ -218,6 +222,24 @@ test('population layer modes expose county choropleth fill keyed to shareTier / 
 
   assert.equal(hidden.layout?.visibility, 'none');
   assert.equal(hidden.paint?.['fill-opacity'], 0);
+});
+
+test('state population share paints on the state density layer, not county choropleth', () => {
+  const share = buildStyleFixture('blackShare', 'state');
+  const stateLayer = layerById(share, EXPLORE_STATE_DENSITY_LAYER_ID) as {
+    paint?: { 'fill-color'?: unknown };
+  };
+  const countyLayer = layerById(share, EXPLORE_COUNTY_CHOROPLETH_LAYER_ID) as {
+    layout?: { visibility?: string };
+    paint?: { 'fill-opacity'?: number };
+  };
+  assert.deepEqual((stateLayer.paint?.['fill-color'] as unknown[])?.slice(0, 3), [
+    'match',
+    ['get', 'shareTier'],
+    'majority',
+  ]);
+  assert.equal(countyLayer.layout?.visibility, 'none');
+  assert.equal(countyLayer.paint?.['fill-opacity'], 0);
 });
 
 test('the jurisdiction-area layer renders fill geometry (never a point layer) and is empty by default', () => {

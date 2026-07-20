@@ -94,6 +94,16 @@ const nextConfig = {
         destination: '/methodology',
         permanent: true,
       },
+      {
+        source: '/legal',
+        destination: '/law',
+        permanent: true,
+      },
+      {
+        source: '/legal/:path*',
+        destination: '/law/:path*',
+        permanent: true,
+      },
     ];
   },
   async headers() {

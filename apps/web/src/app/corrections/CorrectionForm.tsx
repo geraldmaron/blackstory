@@ -15,7 +15,7 @@ import {
   CORRECTION_TARGET_TYPES,
   type CorrectionTargetType,
 } from './categories';
-import { CORRECTION_FORM_INTRO, CORRECTION_PRIVACY_NOTICE } from './copy';
+import { CORRECTION_PRIVACY_NOTICE } from './copy';
 import { getCorrectionAppCheckHeaders } from './app-check-client';
 
 type SubmitState =
@@ -131,12 +131,8 @@ export function CorrectionForm() {
       className="ds-stack"
       onSubmit={handleSubmit}
       noValidate
-      aria-describedby="correction-form-intro"
+      aria-describedby="corrections-lede"
     >
-      <p id="correction-form-intro" className="ds-sans">
-        {CORRECTION_FORM_INTRO}
-      </p>
-
       {state.status === 'error' && !state.fieldIssues ? (
         <Notice tone="error" title="Submission failed">
           {state.message}

@@ -22,14 +22,14 @@ test('isShellNavActive understands absolute sibling hrefs', () => {
   assert.equal(isShellNavActive('/explore', '/stories'), false);
 });
 
-test('footer IA groups Legal under Explore, not Trust', () => {
+test('footer IA groups Law under Explore, not Trust', () => {
   const explore = FOOTER_NAV_COLUMNS.find((column) => column.title === 'Explore');
   const trust = FOOTER_NAV_COLUMNS.find((column) => column.title === 'Trust');
   assert.ok(explore);
   assert.ok(trust);
   assert.deepEqual(
     explore.items.map((item) => item.href),
-    ['/explore', '/search', '/history', '/stories', '/data', '/legal'],
+    ['/explore', '/search', '/history', '/stories', '/data', '/law'],
   );
   assert.deepEqual(
     trust.items.map((item) => item.href),

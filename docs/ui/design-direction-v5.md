@@ -255,6 +255,12 @@ label + native selects, collapsed by default on mobile into a bottom sheet. Resu
 right rail (hairline rows, no box-per-result), full-height on desktop, bottom sheet on
 mobile. Legend: one-line strip bottom-left, disclosure for detail. Panel widths stay compact
 (19/21/20rem); panel fills at 92% + blur; radius-md; nothing overlaps the map's center third.
+**Map data model — population:** Black share and share-change layers expose an explicit
+**Geography** control: **State (1790–2020)** uses `/geo/state-population-decades.json` and
+state polygon fills; **County (2000–2020)** keeps the modern FIPS county choropleth only —
+no pre-2000 county invention. Comparability notes surface at 1870 (Southern undercount),
+1790–1860 (free+enslaved combined totals), and 2000 (Black-alone definition boundary).
+Shareable URL keys: `layerMode`, `popGeo`, `popDecade`, `popFrom`, `popTo`.
 Memorial names are a MapLibre symbol layer in the plate stack (above background, below
 state/land fills and markers): ocean/fringe typography coupled to the ambient decade
 timeline — all visible at start; each decade stagger-fades the names who died then
@@ -274,7 +280,7 @@ a portrait of the story subject. Attribution at `/stories/mosaic-credits`. Edito
 (`--ds-content-max`); copper **View on map** CTA when geo is available (one primary action per
 view).
 
-**`/search`, `/legal`** — document rhythm: mast, filter row (native controls,
+**`/search`, `/law`** — document rhythm: mast, filter row (native controls,
 compact), result list as top-rule entries with mono meta lines. Pagination quiet buttons.
 
 **`/history`** — mast + decade scrubber + adaptive relationship graph that shares
@@ -284,7 +290,7 @@ compact), result list as top-rule entries with mono meta lines. Pagination quiet
   shades, decade density), and richer facets (kind chips, status, topic, connections).
   Same instrument language as explore.
 
-**Longform (`/methodology`, `/legal/[slug]`)** — single serif
+**Longform (`/methodology`, `/law/[slug]`)** — single serif
 column (`--ds-content-max`), numbered Sora subheads, mono citations. No cards.
 
 **`/about`** — full-bleed living mosaic mast (thesis on an opaque fixed-ink copy plate over

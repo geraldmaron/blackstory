@@ -1,8 +1,7 @@
 /**
- * Five-section plain-language explainer layout for legal detail pages.
+ * Five-section plain-language explainer layout for law detail pages.
  */
 import React from 'react';
-import { Card } from '@repo/ui';
 import type { LegalPlainLanguageExplainer } from '@repo/domain';
 import { LEGAL_SECTION_LABELS } from './copy';
 import { formatReviewDate } from './format';
@@ -19,36 +18,29 @@ export function LegalExplainerSections({
   statusBadge,
 }: LegalExplainerSectionsProps) {
   return (
-    <div className="ds-stack">
-      <p
-        className="ds-sans"
-        style={{ margin: 0, fontSize: '0.875rem', color: 'var(--ds-ink-muted)' }}
-      >
+    <div className="ds-law__explainer-stack">
+      <p className="ds-law__review-line">
         Reviewed {formatReviewDate(explainer.reviewedAt)} · {citation} · {statusBadge}
       </p>
 
-      <Card>
-        <h2 className="ds-section__title" id="legal-what-it-says">
-          {LEGAL_SECTION_LABELS.whatItSays}
-        </h2>
-        <p style={{ margin: 'var(--ds-space-3) 0 0 0' }}>{explainer.whatItSays}</p>
-      </Card>
+      <article className="ds-law__section-card" id="what-it-says">
+        <h2 className="ds-law__section-title">{LEGAL_SECTION_LABELS.whatItSays}</h2>
+        <div className="ds-law__section-body">
+          <p>{explainer.whatItSays}</p>
+        </div>
+      </article>
 
-      <Card>
-        <h2 className="ds-section__title" id="legal-what-it-means">
-          {LEGAL_SECTION_LABELS.whatItMeans}
-        </h2>
-        <div className="ds-stack" style={{ marginTop: 'var(--ds-space-3)' }}>
+      <article className="ds-law__section-card" id="what-it-means">
+        <h2 className="ds-law__section-title">{LEGAL_SECTION_LABELS.whatItMeans}</h2>
+        <div className="ds-law__section-body">
           {explainer.whatItMeans.map((paragraph) => (
-            <p key={paragraph.slice(0, 40)} style={{ margin: 0 }}>
-              {paragraph}
-            </p>
+            <p key={paragraph.slice(0, 40)}>{paragraph}</p>
           ))}
         </div>
         {explainer.termOfArtLinks && explainer.termOfArtLinks.length > 0 ? (
-          <nav aria-label="Terms of art" style={{ marginTop: 'var(--ds-space-4)' }}>
-            <p className="ds-section__kicker">Terms of art</p>
-            <ul className="ds-list">
+          <nav className="ds-law__terms-nav" aria-label="Terms of art">
+            <p className="ds-law__terms-kicker">Terms of art</p>
+            <ul className="ds-law__section-list">
               {explainer.termOfArtLinks.map((link) => (
                 <li key={link.term}>
                   <a href={link.wexUrl} rel="noopener noreferrer" target="_blank">
@@ -60,27 +52,21 @@ export function LegalExplainerSections({
             </ul>
           </nav>
         ) : null}
-      </Card>
+      </article>
 
-      <Card>
-        <h2 className="ds-section__title" id="legal-why-it-matters">
-          {LEGAL_SECTION_LABELS.whyItMatters}
-        </h2>
-        <div className="ds-stack" style={{ marginTop: 'var(--ds-space-3)' }}>
+      <article className="ds-law__section-card" id="why-it-matters">
+        <h2 className="ds-law__section-title">{LEGAL_SECTION_LABELS.whyItMatters}</h2>
+        <div className="ds-law__section-body">
           {explainer.whyItMatters.map((paragraph) => (
-            <p key={paragraph.slice(0, 40)} style={{ margin: 0 }}>
-              {paragraph}
-            </p>
+            <p key={paragraph.slice(0, 40)}>{paragraph}</p>
           ))}
         </div>
-      </Card>
+      </article>
 
-      <Card>
-        <h2 className="ds-section__title" id="legal-rights-today">
-          {LEGAL_SECTION_LABELS.rightsToday}
-        </h2>
+      <article className="ds-law__section-card" id="rights-today">
+        <h2 className="ds-law__section-title">{LEGAL_SECTION_LABELS.rightsToday}</h2>
         {explainer.rightsToday.length > 0 ? (
-          <ul className="ds-list" style={{ marginTop: 'var(--ds-space-3)' }}>
+          <ul className="ds-law__section-list">
             {explainer.rightsToday.map((bullet) => (
               <li key={bullet.label}>
                 <a href={bullet.agencyUrl} rel="noopener noreferrer" target="_blank">
@@ -91,17 +77,15 @@ export function LegalExplainerSections({
             ))}
           </ul>
         ) : (
-          <p style={{ margin: 'var(--ds-space-3) 0 0 0' }}>
+          <p className="ds-law__section-body">
             Consult official agency resources linked in Primary sources below.
           </p>
         )}
-      </Card>
+      </article>
 
-      <Card>
-        <h2 className="ds-section__title" id="legal-primary-sources">
-          {LEGAL_SECTION_LABELS.primarySources}
-        </h2>
-        <ul className="ds-list" style={{ marginTop: 'var(--ds-space-3)' }}>
+      <article className="ds-law__section-card" id="primary-sources">
+        <h2 className="ds-law__section-title">{LEGAL_SECTION_LABELS.primarySources}</h2>
+        <ul className="ds-law__section-list">
           {explainer.primarySources.map((source) => (
             <li key={source.url}>
               <a href={source.url} rel="noopener noreferrer" target="_blank">
@@ -122,7 +106,7 @@ export function LegalExplainerSections({
             </li>
           ))}
         </ul>
-      </Card>
+      </article>
     </div>
   );
 }

@@ -16,15 +16,19 @@
  * the map (e.g. “View on map” from a record page). The full record is reached via the card
  * CTA at `/entity/[id]`, not by pin/list selection alone.
  */
-import {
-  DEFAULT_POPULATION_CHANGE_FROM,
-  DEFAULT_POPULATION_CHANGE_TO,
-  DEFAULT_POPULATION_DECADE,
-  isCensusPopulationDecade,
-  type CensusPopulationDecade,
-} from '@repo/domain/map/county-population';
+import { isPopulationDecade } from '@repo/domain/demographics/population-decades';
 import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS, type ExploreFilterState } from './filters';
+import {
+  coercePopulationGeoForDecade,
+  DEFAULT_POPULATION_GEO,
+  defaultPopulationChangeFrom,
+  defaultPopulationChangeTo,
+  defaultPopulationDecade,
+  parseExplorePopulationDecade,
+  parseExplorePopulationGeo,
+  type ExplorePopulationGeo,
+} from './explore-population';
 import { EXPLORE_RADIUS_PRESETS, type ExploreRadiusPresetId } from './explore-place-radius';
 
 export type ExploreViewport = {
@@ -56,12 +60,14 @@ export type ExploreViewState = {
   readonly state?: string;
   /** Map overlay model — `off` hides all choropleth/density fills. */
   readonly layerMode: ExploreLayerMode;
-  /** Decennial vintage for `blackShare` (2000 | 2010 | 2020). */
-  readonly popDecade?: CensusPopulationDecade;
-  /** From-decade for `blackChange` (default 2010). */
-  readonly popFrom?: CensusPopulationDecade;
-  /** To-decade for `blackChange` (default 2020). */
-  readonly popTo?: CensusPopulationDecade;
+  /** Geography for population layers — state (1790–2020) or county (2000–2020 only). */
+  readonly popGeo?: ExplorePopulationGeo;
+  /** Decennial vintage for `blackShare`. */
+  readonly popDecade?: string;
+  /** From-decade for `blackChange`. */
+  readonly popFrom?: string;
+  /** To-decade for `blackChange`. */
+  readonly popTo?: string;
   /**
    * When true, nearby points aggregate while zoomed out (opt-in via `group=1`). Omitted from
    * shareable URLs when off (the default).
@@ -126,12 +132,16 @@ function parseLayerMode(raw: RawExploreSearchParams): ExploreLayerMode {
   return 'presence';
 }
 
-function parsePopulationDecade(
+export type { ExplorePopulationGeo } from './explore-population';
+
+function parsePopulationDecadeRaw(
   raw: string | undefined,
-  fallback: CensusPopulationDecade,
-): CensusPopulationDecade {
+  popGeoBase: ExplorePopulationGeo,
+  fallback: string,
+): string {
   const trimmed = raw?.trim();
-  return trimmed && isCensusPopulationDecade(trimmed) ? trimmed : fallback;
+  if (trimmed && isPopulationDecade(trimmed)) return trimmed;
+  return parseExplorePopulationDecade(raw, popGeoBase, fallback);
 }
 
 type PanelToken = 'filters' | 'results' | 'key';
@@ -228,6 +238,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const decadeRaw = firstValue(raw.decade)?.trim();
   const edgeRaw = firstValue(raw.edge)?.trim();
   const layerMode = parseLayerMode(raw);
+  const popGeoRaw = firstValue(raw.popGeo)?.trim();
   const popDecadeRaw = firstValue(raw.popDecade)?.trim();
   const popFromRaw = firstValue(raw.popFrom)?.trim();
   const popToRaw = firstValue(raw.popTo)?.trim();
@@ -236,17 +247,40 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
 
   const groupOn = groupRaw === '1' || groupRaw === 'true';
 
-  const popDecade =
+  const popGeoBase = parseExplorePopulationGeo(popGeoRaw, DEFAULT_POPULATION_GEO);
+  const popDecadeParsed =
     layerMode === 'blackShare'
-      ? parsePopulationDecade(popDecadeRaw, DEFAULT_POPULATION_DECADE)
+      ? parsePopulationDecadeRaw(popDecadeRaw, popGeoBase, defaultPopulationDecade(popGeoBase))
+      : undefined;
+  const popFromParsed =
+    layerMode === 'blackChange'
+      ? parsePopulationDecadeRaw(popFromRaw, popGeoBase, defaultPopulationChangeFrom(popGeoBase))
+      : undefined;
+  const popToParsed =
+    layerMode === 'blackChange'
+      ? parsePopulationDecadeRaw(popToRaw, popGeoBase, defaultPopulationChangeTo(popGeoBase))
+      : undefined;
+  const popGeo =
+    layerMode === 'blackShare' || layerMode === 'blackChange'
+      ? coercePopulationGeoForDecade(
+          popGeoBase,
+          popDecadeParsed ??
+            popToParsed ??
+            popFromParsed ??
+            defaultPopulationDecade(popGeoBase),
+        )
+      : undefined;
+  const popDecade =
+    layerMode === 'blackShare' && popGeo
+      ? parseExplorePopulationDecade(popDecadeRaw, popGeo, defaultPopulationDecade(popGeo))
       : undefined;
   const popFrom =
-    layerMode === 'blackChange'
-      ? parsePopulationDecade(popFromRaw, DEFAULT_POPULATION_CHANGE_FROM)
+    layerMode === 'blackChange' && popGeo
+      ? parseExplorePopulationDecade(popFromRaw, popGeo, defaultPopulationChangeFrom(popGeo))
       : undefined;
   const popTo =
-    layerMode === 'blackChange'
-      ? parsePopulationDecade(popToRaw, DEFAULT_POPULATION_CHANGE_TO)
+    layerMode === 'blackChange' && popGeo
+      ? parseExplorePopulationDecade(popToRaw, popGeo, defaultPopulationChangeTo(popGeo))
       : undefined;
   const { showFilters, showResults, showKey } = parsePanelVisibility(raw);
   const radius = parseRadius(radiusRaw);
@@ -260,6 +294,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     ...(selectedRaw ? { selected: selectedRaw } : {}),
     ...(stateRaw && stateRaw !== 'ALL' ? { state: stateRaw } : {}),
     layerMode,
+    ...(popGeo ? { popGeo } : {}),
     ...(popDecade ? { popDecade } : {}),
     ...(popFrom ? { popFrom } : {}),
     ...(popTo ? { popTo } : {}),
@@ -295,25 +330,29 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   if (state.state) params.set('state', state.state);
   if (state.layerMode !== 'presence') params.set('layerMode', state.layerMode);
   if (
-    state.layerMode === 'blackShare' &&
-    state.popDecade &&
-    state.popDecade !== DEFAULT_POPULATION_DECADE
+    (state.layerMode === 'blackShare' || state.layerMode === 'blackChange') &&
+    state.popGeo &&
+    state.popGeo !== DEFAULT_POPULATION_GEO
   ) {
-    params.set('popDecade', state.popDecade);
+    params.set('popGeo', state.popGeo);
   }
-  if (
-    state.layerMode === 'blackChange' &&
-    state.popFrom &&
-    state.popFrom !== DEFAULT_POPULATION_CHANGE_FROM
-  ) {
-    params.set('popFrom', state.popFrom);
+  if (state.layerMode === 'blackShare' && state.popDecade && state.popGeo) {
+    const defaultDecade = defaultPopulationDecade(state.popGeo);
+    if (state.popDecade !== defaultDecade) {
+      params.set('popDecade', state.popDecade);
+    }
   }
-  if (
-    state.layerMode === 'blackChange' &&
-    state.popTo &&
-    state.popTo !== DEFAULT_POPULATION_CHANGE_TO
-  ) {
-    params.set('popTo', state.popTo);
+  if (state.layerMode === 'blackChange' && state.popFrom && state.popGeo) {
+    const defaultFrom = defaultPopulationChangeFrom(state.popGeo);
+    if (state.popFrom !== defaultFrom) {
+      params.set('popFrom', state.popFrom);
+    }
+  }
+  if (state.layerMode === 'blackChange' && state.popTo && state.popGeo) {
+    const defaultTo = defaultPopulationChangeTo(state.popGeo);
+    if (state.popTo !== defaultTo) {
+      params.set('popTo', state.popTo);
+    }
   }
   if (state.group) params.set('group', '1');
   if (state.lines) params.set('lines', '1');

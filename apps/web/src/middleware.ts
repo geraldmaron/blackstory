@@ -17,6 +17,8 @@ export const config = {
     '/explore',
     '/history',
     '/history/api',
+    '/law',
+    '/law/:path*',
     '/legal',
     '/legal/:path*',
     '/errata',

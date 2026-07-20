@@ -52,10 +52,14 @@ test('stories, about, and topics use bands; legal and submit use pins', () => {
   assert.ok(topics);
   assert.equal(topics.motifId, 'bands');
 
-  const legal = selectPageField('/legal/terms');
-  assert.ok(legal);
-  assert.equal(legal.motifId, 'pins');
-  assert.equal(legal.darkPath, `${PAGE_FIELD_BASE}/pins-dark.svg`);
+  const law = selectPageField('/law/civil-rights-act-1964');
+  assert.ok(law);
+  assert.equal(law.motifId, 'pins');
+  assert.equal(law.darkPath, `${PAGE_FIELD_BASE}/pins-dark.svg`);
+
+  const legalRedirect = selectPageField('/legal/terms');
+  assert.ok(legalRedirect);
+  assert.equal(legalRedirect.motifId, 'pins');
 
   const submit = selectPageField('/submit');
   assert.ok(submit);

@@ -74,6 +74,7 @@ import {
   COUNTY_LINES_MIN_ZOOM,
 } from '../../lib/map-experience/us-county-lines';
 import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
+import { DEFAULT_POPULATION_GEO, type ExplorePopulationGeo } from '../../lib/map-experience/explore-population';
 import {
   buildMemorialNameFeatures,
   MEMORIAL_LABEL_TEXT_FONT,
@@ -426,6 +427,8 @@ export type BuildExploreMapStyleInput = {
   readonly featureCollection: ExploreMapFeatureCollection;
   readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
   readonly layerMode: ExploreLayerMode;
+  /** Population choropleth geography — county (modern FIPS) or state (historical). */
+  readonly popGeo?: ExplorePopulationGeo;
   readonly historyEdgesEnabled?: boolean;
   /**
    * When true, nearby points aggregate while zoomed out (opt-in via `/explore?group=1`). When false, every
@@ -449,9 +452,12 @@ export type BuildExploreMapStyleInput = {
 export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpecification {
   const plate = plateForScheme(input.colorScheme ?? 'dark');
   const clusteringEnabled = input.clusteringEnabled !== false;
+  const popGeo = input.popGeo ?? DEFAULT_POPULATION_GEO;
   const presenceFillActive = input.layerMode === 'presence';
   const populationFillActive =
     input.layerMode === 'blackShare' || input.layerMode === 'blackChange';
+  const statePopulationFillActive = populationFillActive && popGeo === 'state';
+  const countyPopulationFillActive = populationFillActive && popGeo === 'county';
   const shareFillExpression: ExpressionSpecification = [
     'match',
     ['get', 'shareTier'],
@@ -667,7 +673,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         // Always hittable for state selection density tint is optional chrome on top.
         layout: { visibility: 'visible' },
         paint: {
-          'fill-color': buildPresenceDensityFillColorExpression(plate, presenceFillActive),
+          'fill-color': statePopulationFillActive
+            ? input.layerMode === 'blackShare'
+              ? shareFillExpression
+              : changeFillExpression
+            : buildPresenceDensityFillColorExpression(plate, presenceFillActive),
           'fill-opacity': PLATE_STATE_FILL_OPACITY,
         },
       },
@@ -678,7 +688,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
         layout: { visibility: 'visible' },
         paint: {
-          'fill-color': buildPresenceDensityFillColorExpression(plate, presenceFillActive),
+          'fill-color': statePopulationFillActive
+            ? input.layerMode === 'blackShare'
+              ? shareFillExpression
+              : changeFillExpression
+            : buildPresenceDensityFillColorExpression(plate, presenceFillActive),
           'fill-opacity': 0,
         },
       },
@@ -688,9 +702,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_COUNTY_LINES_SOURCE_ID,
         // Population choropleths must read at the national resting frame; hairlines stay
         // gated at COUNTY_LINES_MIN_ZOOM so the CONUS view is not noisy with county borders.
-        ...(populationFillActive ? {} : { minzoom: COUNTY_LINES_MIN_ZOOM }),
+        ...(countyPopulationFillActive ? {} : { minzoom: COUNTY_LINES_MIN_ZOOM }),
         layout: {
-          visibility: populationFillActive ? 'visible' : 'none',
+          visibility: countyPopulationFillActive ? 'visible' : 'none',
         },
         paint: {
           'fill-color':
@@ -699,7 +713,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               : input.layerMode === 'blackChange'
                 ? changeFillExpression
                 : plate.densityDisabled,
-          'fill-opacity': populationFillActive ? 0.85 : 0,
+          'fill-opacity': countyPopulationFillActive ? 0.85 : 0,
         },
       },
       {

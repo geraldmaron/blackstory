@@ -25,7 +25,7 @@ import {
   plateForScheme,
   type MapColorScheme,
 } from '../../lib/map-experience/dignity-style';
-import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
+import type { ExploreLayerMode, ExplorePopulationGeo } from '../../lib/map-experience/url-state';
 import {
   KIND_ENCODING_ENTRIES,
   SEMANTIC_TONE_ENTRIES,
@@ -84,6 +84,7 @@ export type MapExperienceLegendProps = {
    * (`false`). See this module's doc comment for the full props contract. */
   readonly defaultCollapsed?: boolean;
   readonly layerMode?: ExploreLayerMode;
+  readonly popGeo?: ExplorePopulationGeo;
   /** Optional override for tests; live UI reads `document.documentElement.dataset.theme`. */
   readonly colorScheme?: MapColorScheme;
   /** When set, renders a “Hide key” control beside the Color key heading (standalone chrome). */
@@ -148,11 +149,12 @@ function initialColorScheme(override: MapColorScheme | undefined): MapColorSchem
 
 function MapColorKey(props: {
   readonly layerMode: ExploreLayerMode;
+  readonly popGeo: ExplorePopulationGeo;
   readonly colorScheme: MapColorScheme;
   readonly onHide?: () => void;
   readonly embedded?: boolean;
 }) {
-  const { layerMode, colorScheme, onHide, embedded = false } = props;
+  const { layerMode, popGeo, colorScheme, onHide, embedded = false } = props;
   const plate = plateForScheme(colorScheme);
 
   return (
@@ -237,7 +239,9 @@ function MapColorKey(props: {
       ) : null}
       {layerMode === 'blackShare' ? (
         <>
-          <p className="ds-explore-legend__note">Black population share by county</p>
+          <p className="ds-explore-legend__note">
+            Black population share by {popGeo === 'state' ? 'state' : 'county'}
+          </p>
           <ul className="ds-explore-legend__kind-list">
             {SHARE_TIER_ROWS.map(([tier, label]) => (
               <li key={tier}>
@@ -254,7 +258,9 @@ function MapColorKey(props: {
       ) : null}
       {layerMode === 'blackChange' ? (
         <>
-          <p className="ds-explore-legend__note">Black share change by county</p>
+          <p className="ds-explore-legend__note">
+            Black share change by {popGeo === 'state' ? 'state' : 'county'}
+          </p>
           <ul className="ds-explore-legend__kind-list">
             {CHANGE_TIER_ROWS.map(([tier, label]) => (
               <li key={tier}>
@@ -282,6 +288,7 @@ function MapColorKey(props: {
 export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
   const defaultCollapsed = props.defaultCollapsed ?? false;
   const layerMode = props.layerMode ?? 'presence';
+  const popGeo = props.popGeo ?? 'county';
   const onHide = props.onHide;
   const embedded = props.embedded ?? false;
   const [colorScheme, setColorScheme] = useState<MapColorScheme>(() =>
@@ -312,6 +319,7 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
     <div className="ds-explore-legend-stack">
       <MapColorKey
         layerMode={layerMode}
+        popGeo={popGeo}
         colorScheme={colorScheme}
         embedded={embedded}
         {...(!embedded && onHide ? { onHide } : {})}
@@ -445,14 +453,15 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
                   </>
                 ) : layerMode === 'blackShare' ? (
                   <>
-                    Counties are shaded by Black share of total population for the selected Census
-                    decennial vintage (published decennial counts, not modeled story density).
+                    {popGeo === 'state' ? 'States' : 'Counties'} are shaded by Black share of
+                    total population for the selected Census decennial vintage (published decennial
+                    counts, not modeled story density).
                   </>
                 ) : (
                   <>
-                    Counties are shaded by change in Black share between the selected decades —
-                    copper tones mark gain, stone tones mark loss. Arrows in the tier list are a
-                    second signal; color is never the only cue.
+                    {popGeo === 'state' ? 'States' : 'Counties'} are shaded by change in Black
+                    share between the selected decades — copper tones mark gain, stone tones mark
+                    loss. Arrows in the tier list are a second signal; color is never the only cue.
                   </>
                 )}
               </dd>

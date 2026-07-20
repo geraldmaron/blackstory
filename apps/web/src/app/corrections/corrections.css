@@ -1,0 +1,253 @@
+/**
+ * Corrections page body — compact trust surface below the hero mast.
+ * Ledger rows, rule strips, and form panel mirror methodology delivery patterns.
+ */
+
+.ds-corrections {
+  margin-top: var(--ds-space-6);
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.ds-corrections [id] {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+.ds-corrections .ds-section {
+  padding-block: var(--ds-space-8);
+}
+
+.ds-corrections .ds-section__lede {
+  margin-top: var(--ds-space-4);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+/* —— On-page index —— */
+.ds-corrections__nav {
+  margin: 0;
+  padding: var(--ds-space-4) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-corrections__nav-title {
+  margin: 0 0 var(--ds-space-3);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ds-corrections__nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-corrections__nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-corrections__nav-link:hover,
+.ds-corrections__nav-link:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-corrections__nav-link {
+    transition: none;
+  }
+}
+
+/* —— Process beats — three-column grid —— */
+.ds-corrections__beat-grid {
+  display: grid;
+  gap: var(--ds-space-4);
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 48rem) {
+  .ds-corrections__beat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--ds-space-5);
+  }
+}
+
+.ds-corrections__beat {
+  margin: 0;
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  min-width: 0;
+}
+
+.ds-corrections__beat-kicker {
+  margin: 0 0 var(--ds-space-2);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-corrections__beat-body {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* —— Ledger stack —— */
+.ds-corrections__ledger {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-4);
+}
+
+.ds-corrections__ledger-item {
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  isolation: isolate;
+  min-width: 0;
+}
+
+.ds-corrections__ledger-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-corrections__chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.2rem 0.55rem;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.ds-corrections__ledger-summary {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* —— Form panel —— */
+.ds-corrections__form-panel {
+  margin-top: var(--ds-space-4);
+  padding: var(--ds-space-5) var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  min-width: 0;
+}
+
+@media (min-width: 48rem) {
+  .ds-corrections__form-panel {
+    padding: var(--ds-space-6);
+  }
+}
+
+.ds-corrections__form-panel .ds-stack {
+  gap: var(--ds-space-4);
+}
+
+.ds-corrections__callout {
+  margin-top: var(--ds-space-4);
+}
+
+/* —— Numbered rule strip —— */
+.ds-corrections__rule-strip {
+  display: grid;
+  gap: 0;
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ds-corrections-rule;
+}
+
+.ds-corrections__rule-row {
+  position: relative;
+  counter-increment: ds-corrections-rule;
+  padding: var(--ds-space-3) 0 var(--ds-space-3) var(--ds-space-10);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  min-width: 0;
+}
+
+.ds-corrections__rule-row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.ds-corrections__rule-row::before {
+  content: counter(ds-corrections-rule, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: var(--ds-space-3);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.ds-corrections__rule-row:first-child::before {
+  top: 0;
+}
+
+.ds-corrections__rule-text {
+  display: block;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ds-corrections__rule-text a {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* —— Footer links —— */
+.ds-corrections__next {
+  padding-block: var(--ds-space-8);
+}
+
+.ds-corrections__next .ds-band__cta {
+  margin-top: var(--ds-space-4);
+}

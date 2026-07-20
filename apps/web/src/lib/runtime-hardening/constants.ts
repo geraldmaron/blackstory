@@ -45,6 +45,7 @@ export const EXPLORE_PAGE_PARAM_ALLOWLIST = [
   'selected',
   'state',
   'layerMode',
+  'popGeo',
   'popDecade',
   'popFrom',
   'popTo',

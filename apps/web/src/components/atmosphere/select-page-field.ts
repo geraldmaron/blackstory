@@ -65,6 +65,7 @@ function resolveMotifId(path: string): PageFieldMotifId {
 
   if (
     matchesRoutePrefix(path, '/methodology') ||
+    matchesRoutePrefix(path, '/law') ||
     matchesRoutePrefix(path, '/legal') ||
     matchesRoutePrefix(path, '/corrections') ||
     matchesRoutePrefix(path, '/errata') ||

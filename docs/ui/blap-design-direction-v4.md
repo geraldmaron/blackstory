@@ -157,7 +157,7 @@ block the visiting job.
 | `/errata`, `/corrections` | Visible fallibility | Dated entries, hairline separation | — |
 | `/submit` | Community intake | Guided form on shell rhythm, moderation framing, App Check | full-width fields |
 | `/about` | Who/why | Longform serif + voice lines | — |
-| `/legal` | Plain-language law | Serif longform + mono citations | — |
+| `/law` | Plain-language law | Serif longform + mono citations | — |
 | `/design-system` | Internal reference | Token/primitive gallery — stays current with this doc | — |
 | Notices (seed/offline/degraded) | Honest state | `Notice` primitive only, never toasts | — |
 

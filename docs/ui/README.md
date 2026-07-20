@@ -68,8 +68,10 @@ pnpm --filter @repo/web exec next dev --port 3048
 | `/explore` | Location discovery scaffold ( later) |
 | `/stories` | History articles from the archive (seed today; draft via `story-research-run`, review at admin `/stories/review` with Firebase Auth — human approve before seed) |
 | `/methodology` | Inclusion, research flow, confidence, precision, and operational policy |
+| `/law` | Plain-language law reference — statutes, regulations, and landmark decisions |
 | `/about` | Product framing |
-| `/corrections` | Correction intake scaffold ( later) |
+| `/corrections` | Correction intake — quarantine review lane with receipt codes |
+| `/errata` | Reverse-chronological errata log with taxonomy, feeds, and policy |
 | `/entity/[id]` | Entity detail scaffold (seed ids) |
 | `/design-system` |  component fixtures |
 

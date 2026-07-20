@@ -1,5 +1,5 @@
 /**
- * Browse list row for the `/legal` index page.
+ * Browse ledger rows for the `/law` index page.
  * Uses Next.js `Link` for soft in-app transitions.
  */
 import React from 'react';
@@ -26,29 +26,26 @@ export type LegalBrowseListProps = {
 
 export function LegalBrowseList({ items, labelledBy }: LegalBrowseListProps) {
   return (
-    <ul className="ds-result-list ds-legal-browse-list" aria-labelledby={labelledBy}>
+    <ul className="ds-law__browse-ledger" aria-labelledby={labelledBy}>
       {items.map((item) => (
-        <li key={item.id} className="ds-result-list__item ds-legal-browse-list__item">
-          <article className="ds-legal-browse-list__record">
-            <h3 className="ds-result-list__title" style={{ margin: 0 }}>
-              <Link href={`/legal/${item.slug}`}>{item.title}</Link>
-            </h3>
-            <p className="ds-result-list__summary" style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
-              <span className="ds-mono">{item.citation}</span>
-            </p>
-            <div
-              className="ds-row"
-              style={{ marginTop: 'var(--ds-space-2)', gap: 'var(--ds-space-2)', flexWrap: 'wrap' }}
-            >
-              <span className="ds-sans">{humanizeLegalKind(item.kind)}</span>
+        <li key={item.id} className="ds-law__browse-item">
+          <article>
+            <div className="ds-law__browse-head">
+              <h3 className="ds-law__browse-title">
+                <Link href={`/law/${item.slug}`}>{item.title}</Link>
+              </h3>
               <LegalStatusBadge status={item.lawStatus} />
+            </div>
+            <p className="ds-law__browse-citation">{item.citation}</p>
+            <div className="ds-law__browse-meta">
+              <span className="ds-law__chip">{humanizeLegalKind(item.kind)}</span>
               {item.topics.map((topic) => (
-                <span key={topic} className="ds-badge">
+                <span key={topic} className="ds-law__chip ds-law__chip--topic">
                   {humanizeLegalTopic(topic)}
                 </span>
               ))}
               {item.hasExplainer ? (
-                <span className="ds-sans">Plain-language explainer available</span>
+                <span className="ds-law__browse-note">Plain-language explainer</span>
               ) : null}
             </div>
           </article>

@@ -134,6 +134,7 @@ test('population modes round-trip decade params', () => {
   const share = {
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
     layerMode: 'blackShare' as const,
+    popGeo: 'county' as const,
     popDecade: '2010' as const,
     group: false,
     lines: false,
@@ -151,6 +152,7 @@ test('population modes round-trip decade params', () => {
   const change = {
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
     layerMode: 'blackChange' as const,
+    popGeo: 'county' as const,
     popFrom: '2000' as const,
     popTo: '2020' as const,
     group: false,
@@ -165,6 +167,38 @@ test('population modes round-trip decade params', () => {
     ...change,
     popTo: '2020',
   });
+});
+
+test('state historical share coerces county geo and round-trips popGeo=state', () => {
+  const parsed = parseExploreSearchParams({
+    layerMode: 'blackShare',
+    popDecade: '1870',
+    popGeo: 'state',
+  });
+  assert.equal(parsed.popGeo, 'state');
+  assert.equal(parsed.popDecade, '1870');
+
+  const coerced = parseExploreSearchParams({
+    layerMode: 'blackShare',
+    popDecade: '1870',
+    popGeo: 'county',
+  });
+  assert.equal(coerced.popGeo, 'state');
+  assert.equal(coerced.popDecade, '1870');
+
+  const qs = buildExploreSearchParams({
+    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    layerMode: 'blackShare',
+    popGeo: 'state',
+    popDecade: '1870',
+    group: false,
+    lines: false,
+    showFilters: false,
+    showResults: false,
+    showKey: false,
+  });
+  assert.match(qs, /popGeo=state/);
+  assert.match(qs, /popDecade=1870/);
 });
 
 test('group=1 turns nearby-point grouping on; omitted group defaults off', () => {

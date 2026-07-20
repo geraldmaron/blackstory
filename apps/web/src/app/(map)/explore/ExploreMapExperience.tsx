@@ -35,7 +35,14 @@ import {
 import Link from 'next/link';
 import { Notice } from '@repo/ui';
 import { US_CONUS_BOUNDS, findUsStateByPostalCode } from '@repo/domain/map/geography';
-import type { CensusPopulationDecade } from '@repo/domain/map/county-population';
+import {
+  DEFAULT_POPULATION_GEO,
+  coercePopulationGeoForDecade,
+  defaultPopulationChangeFrom,
+  defaultPopulationChangeTo,
+  defaultPopulationDecade,
+  type ExplorePopulationGeo,
+} from '../../../lib/map-experience/explore-population';
 import { HistoryEdgePanel } from '../../../components/history/HistoryEdgePanel';
 import { ExploreAddressSearch } from '../../../components/map-experience/ExploreAddressSearch';
 import type { ExploreAddressResolvedPayload } from '../../../components/map-experience/ExploreAddressSearch';
@@ -69,6 +76,8 @@ import {
   type CountyChoroplethLevel,
 } from '../../../lib/map-experience/county-choropleth';
 import { fetchCountyPopulationIndex } from '../../../lib/map-experience/load-county-population-index';
+import { fetchStatePopulationIndex } from '../../../lib/map-experience/load-state-population-index';
+import { buildStateChoroplethLevels } from '../../../lib/map-experience/state-choropleth';
 import {
   buildExploreHref,
   isPopulationLayerMode,
@@ -218,17 +227,27 @@ function resolveEdge(
 function resolvePopulationDecades(
   base: ExploreViewState,
   patch: Partial<ExploreViewState> & { readonly clearPopulationDecades?: boolean },
-): Pick<ExploreViewState, 'popDecade' | 'popFrom' | 'popTo'> {
+): Pick<ExploreViewState, 'popGeo' | 'popDecade' | 'popFrom' | 'popTo'> {
   if (patch.clearPopulationDecades) return {};
   const layerMode = patch.layerMode ?? base.layerMode;
   if (layerMode === 'blackShare') {
-    const popDecade = patch.popDecade ?? base.popDecade;
-    return popDecade ? { popDecade } : {};
+    const popGeo = coercePopulationGeoForDecade(
+      patch.popGeo ?? base.popGeo ?? DEFAULT_POPULATION_GEO,
+      patch.popDecade ?? base.popDecade ?? defaultPopulationDecade(patch.popGeo ?? base.popGeo ?? DEFAULT_POPULATION_GEO),
+    );
+    const popDecade = patch.popDecade ?? base.popDecade ?? defaultPopulationDecade(popGeo);
+    return { popGeo, popDecade };
   }
   if (layerMode === 'blackChange') {
+    const popGeo = patch.popGeo ?? base.popGeo ?? DEFAULT_POPULATION_GEO;
     return {
-      ...((patch.popFrom ?? base.popFrom) ? { popFrom: patch.popFrom ?? base.popFrom! } : {}),
-      ...((patch.popTo ?? base.popTo) ? { popTo: patch.popTo ?? base.popTo! } : {}),
+      popGeo,
+      ...((patch.popFrom ?? base.popFrom)
+        ? { popFrom: patch.popFrom ?? base.popFrom! }
+        : { popFrom: defaultPopulationChangeFrom(popGeo) }),
+      ...((patch.popTo ?? base.popTo)
+        ? { popTo: patch.popTo ?? base.popTo! }
+        : { popTo: defaultPopulationChangeTo(popGeo) }),
     };
   }
   return {};
@@ -283,8 +302,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const [fromHeroTransition] = useState(readHeroTransitionFlag);
   const [entering, setEntering] = useState(false);
   const [populationIndexLoaded, setPopulationIndexLoaded] = useState(false);
-  const [populationIndex, setPopulationIndex] = useState<
+  const [countyPopulationIndex, setCountyPopulationIndex] = useState<
     Awaited<ReturnType<typeof fetchCountyPopulationIndex>> | undefined
+  >(undefined);
+  const [statePopulationIndex, setStatePopulationIndex] = useState<
+    Awaited<ReturnType<typeof fetchStatePopulationIndex>> | undefined
   >(undefined);
   // Mirror of the latest committed view state for the debounced viewport handler below. React
   // may replay setState updater functions during render, so an updater must stay pure — the
@@ -299,6 +321,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   /** First data patch after mount snaps; later decade/filter patches fade (continuous flow). */
   const isInitialDataApplyRef = useRef(true);
   const previousLayerModeRef = useRef(initial.viewState.layerMode);
+  const previousPopGeoRef = useRef(initial.viewState.popGeo ?? DEFAULT_POPULATION_GEO);
   /** Guards one-shot fly-to when applying place-search radius from a deep-linked URL. */
   const urlRadiusAppliedRef = useRef<string | null>(null);
   /** Camera before the most recent point-selection flight (hierarchical close target). */
@@ -381,35 +404,75 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   useEffect(() => {
     if (!isPopulationLayerMode(view.viewState.layerMode)) return;
     let cancelled = false;
-    void fetchCountyPopulationIndex().then((index) => {
-      if (cancelled) return;
-      setPopulationIndex(index);
-      setPopulationIndexLoaded(true);
+    const popGeo = view.viewState.popGeo ?? DEFAULT_POPULATION_GEO;
+    const loaders: Promise<void>[] = [];
+    if (popGeo === 'county') {
+      loaders.push(
+        fetchCountyPopulationIndex().then((index) => {
+          if (cancelled) return;
+          setCountyPopulationIndex(index);
+        }),
+      );
+    }
+    if (popGeo === 'state') {
+      loaders.push(
+        fetchStatePopulationIndex().then((index) => {
+          if (cancelled) return;
+          setStatePopulationIndex(index);
+        }),
+      );
+    }
+    void Promise.all(loaders).then(() => {
+      if (!cancelled) setPopulationIndexLoaded(true);
     });
     return () => {
       cancelled = true;
     };
-  }, [view.viewState.layerMode]);
+  }, [view.viewState.layerMode, view.viewState.popGeo]);
 
   const countyChoroplethLevels = useMemo((): readonly CountyChoroplethLevel[] => {
-    const { layerMode, popDecade, popFrom, popTo } = view.viewState;
+    const { layerMode, popGeo, popDecade, popFrom, popTo } = view.viewState;
+    const geo = popGeo ?? DEFAULT_POPULATION_GEO;
+    if (geo !== 'county') return [];
     if (layerMode === 'blackShare') {
       return buildCountyChoroplethLevels({
-        index: populationIndex,
+        index: countyPopulationIndex,
+        mode: 'blackShare',
+        decade: (popDecade ?? '2020') as '2000' | '2010' | '2020',
+      });
+    }
+    if (layerMode === 'blackChange') {
+      return buildCountyChoroplethLevels({
+        index: countyPopulationIndex,
+        mode: 'blackChange',
+        fromDecade: (popFrom ?? '2010') as '2000' | '2010' | '2020',
+        toDecade: (popTo ?? '2020') as '2000' | '2010' | '2020',
+      });
+    }
+    return [];
+  }, [countyPopulationIndex, view.viewState]);
+
+  const stateChoroplethLevels = useMemo(() => {
+    const { layerMode, popGeo, popDecade, popFrom, popTo } = view.viewState;
+    const geo = popGeo ?? DEFAULT_POPULATION_GEO;
+    if (geo !== 'state') return [];
+    if (layerMode === 'blackShare') {
+      return buildStateChoroplethLevels({
+        index: statePopulationIndex,
         mode: 'blackShare',
         decade: popDecade ?? '2020',
       });
     }
     if (layerMode === 'blackChange') {
-      return buildCountyChoroplethLevels({
-        index: populationIndex,
+      return buildStateChoroplethLevels({
+        index: statePopulationIndex,
         mode: 'blackChange',
         fromDecade: popFrom ?? '2010',
         toDecade: popTo ?? '2020',
       });
     }
     return [];
-  }, [populationIndex, view.viewState]);
+  }, [statePopulationIndex, view.viewState]);
 
   /** Presence fills track the line-decade scrubber (active records that decade). */
   const presenceDensityByDecade = useMemo(
@@ -568,10 +631,12 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     const decade = view.viewState.decade;
     const layerModeChanged = previousLayerModeRef.current !== view.viewState.layerMode;
     previousLayerModeRef.current = view.viewState.layerMode;
+    previousPopGeoRef.current = view.viewState.popGeo ?? DEFAULT_POPULATION_GEO;
     const fade = shouldMorphDecadeDataPatch({
       reducedMotion: prefersReducedMotion(),
       isInitialApply: isInitialDataApplyRef.current,
       layerModeChanged,
+      populationLayerActive: isPopulationLayerMode(view.viewState.layerMode),
     });
     isInitialDataApplyRef.current = false;
     stage.patchData(
@@ -579,7 +644,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         featureCollection: { type: 'FeatureCollection', features: filteredFeatures },
         jurisdictionAreaFeatures: view.source.jurisdictionAreaFeatures,
         layerMode: view.viewState.layerMode,
+        popGeo: view.viewState.popGeo ?? DEFAULT_POPULATION_GEO,
         densityLevels: presenceDensityLevels,
+        stateChoroplethLevels,
         countyChoroplethLevels: countyChoroplethLevels,
         clusteringEnabled: view.viewState.group,
         historyEdgesEnabled: view.viewState.lines,
@@ -598,7 +665,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     view.viewState.group,
     view.viewState.decade,
     presenceDensityLevels,
+    stateChoroplethLevels,
     countyChoroplethLevels,
+    view.viewState.popGeo,
     view.viewState.lines,
     view.edgeLineCollection,
   ]);
@@ -954,20 +1023,24 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const handleLayerModeChange = useCallback(
     (layerMode: ExploreLayerMode) => {
       if (layerMode === 'blackShare') {
+        const popGeo = view.viewState.popGeo ?? DEFAULT_POPULATION_GEO;
         commitViewState(
           mergeViewState(view.viewState, {
             layerMode,
-            popDecade: view.viewState.popDecade ?? '2020',
+            popGeo,
+            popDecade: view.viewState.popDecade ?? defaultPopulationDecade(popGeo),
           }),
         );
         return;
       }
       if (layerMode === 'blackChange') {
+        const popGeo = view.viewState.popGeo ?? DEFAULT_POPULATION_GEO;
         commitViewState(
           mergeViewState(view.viewState, {
             layerMode,
-            popFrom: view.viewState.popFrom ?? '2010',
-            popTo: view.viewState.popTo ?? '2020',
+            popGeo,
+            popFrom: view.viewState.popFrom ?? defaultPopulationChangeFrom(popGeo),
+            popTo: view.viewState.popTo ?? defaultPopulationChangeTo(popGeo),
           }),
         );
         return;
@@ -982,23 +1055,69 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     [commitViewState, view.viewState],
   );
 
+  const handlePopGeoChange = useCallback(
+    (popGeo: ExplorePopulationGeo) => {
+      const { layerMode } = view.viewState;
+      if (layerMode === 'blackShare') {
+        const popDecade = view.viewState.popDecade ?? defaultPopulationDecade(popGeo);
+        commitViewState(
+          mergeViewState(view.viewState, {
+            layerMode,
+            popGeo,
+            popDecade,
+          }),
+        );
+        return;
+      }
+      if (layerMode === 'blackChange') {
+        commitViewState(
+          mergeViewState(view.viewState, {
+            layerMode,
+            popGeo,
+            popFrom: view.viewState.popFrom ?? defaultPopulationChangeFrom(popGeo),
+            popTo: view.viewState.popTo ?? defaultPopulationChangeTo(popGeo),
+          }),
+        );
+      }
+    },
+    [commitViewState, view.viewState],
+  );
+
   const handlePopDecadeChange = useCallback(
-    (popDecade: CensusPopulationDecade) => {
-      commitViewState(mergeViewState(view.viewState, { layerMode: 'blackShare', popDecade }));
+    (popDecade: string) => {
+      const popGeo = coercePopulationGeoForDecade(
+        view.viewState.popGeo ?? DEFAULT_POPULATION_GEO,
+        popDecade,
+      );
+      commitViewState(
+        mergeViewState(view.viewState, { layerMode: 'blackShare', popGeo, popDecade }),
+      );
     },
     [commitViewState, view.viewState],
   );
 
   const handlePopFromChange = useCallback(
-    (popFrom: CensusPopulationDecade) => {
-      commitViewState(mergeViewState(view.viewState, { layerMode: 'blackChange', popFrom }));
+    (popFrom: string) => {
+      commitViewState(
+        mergeViewState(view.viewState, {
+          layerMode: 'blackChange',
+          popGeo: view.viewState.popGeo ?? DEFAULT_POPULATION_GEO,
+          popFrom,
+        }),
+      );
     },
     [commitViewState, view.viewState],
   );
 
   const handlePopToChange = useCallback(
-    (popTo: CensusPopulationDecade) => {
-      commitViewState(mergeViewState(view.viewState, { layerMode: 'blackChange', popTo }));
+    (popTo: string) => {
+      const popGeo = coercePopulationGeoForDecade(
+        view.viewState.popGeo ?? DEFAULT_POPULATION_GEO,
+        popTo,
+      );
+      commitViewState(
+        mergeViewState(view.viewState, { layerMode: 'blackChange', popGeo, popTo }),
+      );
     },
     [commitViewState, view.viewState],
   );
@@ -1308,20 +1427,32 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           <div className="ds-explore-stage__toolbar">
             <LayerModelControl
               layerMode={view.viewState.layerMode}
+              popGeo={view.viewState.popGeo ?? DEFAULT_POPULATION_GEO}
               {...(view.viewState.popDecade ? { popDecade: view.viewState.popDecade } : {})}
               {...(view.viewState.popFrom ? { popFrom: view.viewState.popFrom } : {})}
               {...(view.viewState.popTo ? { popTo: view.viewState.popTo } : {})}
               onLayerModeChange={handleLayerModeChange}
+              onPopGeoChange={handlePopGeoChange}
               onPopDecadeChange={handlePopDecadeChange}
               onPopFromChange={handlePopFromChange}
               onPopToChange={handlePopToChange}
             />
             {isPopulationLayerMode(view.viewState.layerMode) &&
             populationIndexLoaded &&
-            !populationIndex ? (
+            (view.viewState.popGeo ?? DEFAULT_POPULATION_GEO) === 'county' &&
+            !countyPopulationIndex ? (
               <p className="ds-sans ds-explore__settings-note">
                 County population data is not loaded yet — choropleth tiers stay neutral until the
                 static index is available.
+              </p>
+            ) : null}
+            {isPopulationLayerMode(view.viewState.layerMode) &&
+            populationIndexLoaded &&
+            (view.viewState.popGeo ?? DEFAULT_POPULATION_GEO) === 'state' &&
+            !statePopulationIndex ? (
+              <p className="ds-sans ds-explore__settings-note">
+                State population data is not loaded yet — state fills stay neutral until the static
+                index is available.
               </p>
             ) : null}
             <GroupingToggle enabled={view.viewState.group} onToggle={handleGroupToggle} />
@@ -1407,7 +1538,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           aria-labelledby="explore-tab-key"
           {...(leftTab === 'key' ? {} : { hidden: true })}
         >
-          <MapExperienceLegend layerMode={view.viewState.layerMode} embedded />
+          <MapExperienceLegend
+            layerMode={view.viewState.layerMode}
+            popGeo={view.viewState.popGeo ?? DEFAULT_POPULATION_GEO}
+            embedded
+          />
         </div>
       </div>
 

@@ -151,8 +151,10 @@ export function shouldMorphDecadeDataPatch(options: {
   readonly reducedMotion: boolean;
   readonly isInitialApply: boolean;
   readonly layerModeChanged: boolean;
+  readonly populationLayerActive?: boolean;
 }): boolean {
   if (options.layerModeChanged) return false;
+  if (options.populationLayerActive) return false;
   return shouldFadeDecadePatch(options);
 }
 

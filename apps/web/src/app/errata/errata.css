@@ -1,0 +1,258 @@
+/**
+ * Errata page body — compact trust surface below the hero mast.
+ * Taxonomy ledger, change-log cards, and feed links mirror methodology patterns.
+ */
+
+.ds-errata {
+  margin-top: var(--ds-space-6);
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.ds-errata [id] {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+.ds-errata .ds-section {
+  padding-block: var(--ds-space-8);
+}
+
+.ds-errata .ds-section__lede {
+  margin-top: var(--ds-space-4);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+/* —— On-page index —— */
+.ds-errata__nav {
+  margin: 0;
+  padding: var(--ds-space-4) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-errata__nav-title {
+  margin: 0 0 var(--ds-space-3);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ds-errata__nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-errata__nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-errata__nav-link:hover,
+.ds-errata__nav-link:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-errata__nav-link {
+    transition: none;
+  }
+}
+
+/* —— Term chips —— */
+.ds-errata__chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.2rem 0.55rem;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+/* —— Taxonomy ledger —— */
+.ds-errata__ledger {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-4);
+}
+
+.ds-errata__ledger-item {
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  isolation: isolate;
+  min-width: 0;
+}
+
+.ds-errata__ledger-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-errata__ledger-title {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.ds-errata__ledger-summary {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ds-errata__ledger-meta {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ds-errata__ledger-link {
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+}
+
+.ds-errata__ledger-link a {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* —— Change log stack — numbered entries —— */
+.ds-errata__log {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ds-errata-log;
+}
+
+.ds-errata__log-item {
+  position: relative;
+  counter-increment: ds-errata-log;
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-3) var(--ds-space-10);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  min-width: 0;
+}
+
+.ds-errata__log-item::before {
+  content: counter(ds-errata-log, decimal-leading-zero);
+  position: absolute;
+  left: var(--ds-space-4);
+  top: var(--ds-space-3);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+/* —— Policy follow-up link —— */
+.ds-errata__policy-link {
+  margin: var(--ds-space-5) 0 0;
+  max-width: 46rem;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.ds-errata__policy-link a {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* —— Feed links band — compact secondary —— */
+.ds-errata__feeds {
+  margin-top: var(--ds-space-4);
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+}
+
+.ds-errata__feeds-kicker {
+  margin: 0 0 var(--ds-space-2);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-errata__feeds-body {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.ds-errata__feeds-body a {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* —— Empty state —— */
+.ds-errata__empty {
+  margin: var(--ds-space-4) 0 0;
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) dashed var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* —— Footer links —— */
+.ds-errata__next {
+  padding-block: var(--ds-space-8);
+}
+
+.ds-errata__next .ds-band__cta {
+  margin-top: var(--ds-space-4);
+}

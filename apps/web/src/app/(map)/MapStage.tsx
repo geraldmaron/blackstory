@@ -108,11 +108,13 @@ import {
 import type { HistoryEdgeLineCollection } from '../../lib/map-experience/build-history-edge-lines';
 import type { StateDensityLevel } from '../../lib/map-experience/density';
 import type { CountyChoroplethLevel } from '../../lib/map-experience/county-choropleth';
+import type { StateChoroplethLevel } from '../../lib/map-experience/state-choropleth';
 import {
   joinDensityOntoStatePolygons,
   indexDensityFillColors,
 } from '../../lib/map-experience/join-state-polygons';
 import { joinPopulationOntoCountyPolygons } from '../../lib/map-experience/join-county-population';
+import { joinPopulationOntoStatePolygons } from '../../lib/map-experience/join-state-population';
 import * as stateLabels from '../../lib/map-experience/state-labels';
 import { US_STATES_GEOJSON_PATH } from '../../lib/map-experience/us-state-polygons';
 import {
@@ -120,6 +122,10 @@ import {
   US_COUNTIES_GEOJSON_PATH,
 } from '../../lib/map-experience/us-county-lines';
 import type { ExploreLayerMode, ExploreViewportFrame } from '../../lib/map-experience/url-state';
+import {
+  DEFAULT_POPULATION_GEO,
+  type ExplorePopulationGeo,
+} from '../../lib/map-experience/explore-population';
 import {
   PERSISTENT_PLATE_LAYER_IDS,
   syncLayerPaintFromStyle,
@@ -388,6 +394,7 @@ function fetchStatePolygons(): Promise<StatePolygonCollection> {
 async function loadStatePolygonsWithDensity(
   map: MapLibreMap,
   densityLevels: readonly StateDensityLevel[],
+  stateChoroplethLevels: readonly StateChoroplethLevel[] = [],
   sourceId: string = EXPLORE_STATE_DENSITY_SOURCE_ID,
   colorScheme: MapColorScheme = readDocumentColorScheme(),
 ): Promise<ReturnType<typeof joinDensityOntoStatePolygons>> {
@@ -396,7 +403,10 @@ async function loadStatePolygonsWithDensity(
     return { type: 'FeatureCollection', features: [] };
   }
   const collection = await fetchStatePolygons();
-  const joined = joinDensityOntoStatePolygons(collection, densityLevels, { colorScheme });
+  const joined =
+    stateChoroplethLevels.length > 0
+      ? joinPopulationOntoStatePolygons(collection, stateChoroplethLevels)
+      : joinDensityOntoStatePolygons(collection, densityLevels, { colorScheme });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
   source.setData(joined as any);
   await waitForGeoJsonSourceData(map, sourceId);
@@ -501,10 +511,10 @@ async function loadCountyPolygons(
 /** County geometry + population join still need to land during decade-morph `configOnly`
  * patches — those skip `applyStyleAndData`, which previously left blackShare without tiers. */
 function requestCountyPolygonLoad(map: MapLibreMap, cfg: StageConfig): void {
+  const popGeo = cfg.popGeo ?? DEFAULT_POPULATION_GEO;
   const needsCountyGeometry =
     map.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
-    cfg.layerMode === 'blackShare' ||
-    cfg.layerMode === 'blackChange';
+    ((cfg.layerMode === 'blackShare' || cfg.layerMode === 'blackChange') && popGeo === 'county');
   if (!needsCountyGeometry) return;
   void loadCountyPolygons(map, cfg.countyChoroplethLevels).catch((error) => {
     console.error('[MapStage] county polygon load failed', error);
@@ -664,7 +674,9 @@ export type MapStageDataPatch = {
   readonly featureCollection: ExploreMapFeatureCollection;
   readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
   readonly layerMode: ExploreLayerMode;
+  readonly popGeo?: ExplorePopulationGeo;
   readonly densityLevels: readonly StateDensityLevel[];
+  readonly stateChoroplethLevels?: readonly StateChoroplethLevel[];
   readonly countyChoroplethLevels?: readonly CountyChoroplethLevel[];
   /** When false, recreate the entities source without MapLibre clustering. Omitted patches keep the current stage value (default false). */
   readonly clusteringEnabled?: boolean;
@@ -781,7 +793,9 @@ type StageConfig = {
   featureCollection: ExploreMapFeatureCollection;
   jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
   layerMode: ExploreLayerMode;
+  popGeo: ExplorePopulationGeo;
   densityLevels: readonly StateDensityLevel[];
+  stateChoroplethLevels: readonly StateChoroplethLevel[];
   countyChoroplethLevels: readonly CountyChoroplethLevel[];
   clusteringEnabled: boolean;
   historyEdgesEnabled: boolean;
@@ -844,7 +858,9 @@ export function MapStageProvider({
     featureCollection: initialFeatureCollection,
     jurisdictionAreaFeatures: initialJurisdictionAreaFeatures,
     layerMode: 'off',
+    popGeo: DEFAULT_POPULATION_GEO,
     densityLevels: [],
+    stateChoroplethLevels: [],
     countyChoroplethLevels: [],
     clusteringEnabled: false,
     historyEdgesEnabled: false,
@@ -958,7 +974,11 @@ export function MapStageProvider({
         setSelectedEdgeFilter(map, configRef.current.selectedEdge);
         setSelectedEntityFilter(map, configRef.current.selectedEntity);
         if (!options?.skipPrimaryDensityLoad) {
-          void loadStatePolygonsWithDensity(map, configRef.current.densityLevels)
+          void loadStatePolygonsWithDensity(
+            map,
+            configRef.current.densityLevels,
+            configRef.current.stateChoroplethLevels,
+          )
             .then((joined) => {
               settledDensityFillByFipsRef.current = indexDensityFillColors(joined);
             })
@@ -1004,10 +1024,12 @@ export function MapStageProvider({
       },
     ) => {
       const clusteringEnabled = patch.clusteringEnabled ?? configRef.current.clusteringEnabled;
+      const popGeo = patch.popGeo ?? configRef.current.popGeo;
       const style = buildExploreMapStyle({
         featureCollection: patch.featureCollection,
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
         layerMode: patch.layerMode,
+        popGeo,
         historyEdgesEnabled: patch.historyEdgesEnabled,
         clusteringEnabled,
         colorScheme: readDocumentColorScheme(),
@@ -1018,7 +1040,9 @@ export function MapStageProvider({
         featureCollection: patch.featureCollection,
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
         layerMode: patch.layerMode,
+        popGeo,
         densityLevels: patch.densityLevels,
+        stateChoroplethLevels: patch.stateChoroplethLevels ?? [],
         countyChoroplethLevels: patch.countyChoroplethLevels ?? [],
         clusteringEnabled,
         historyEdgesEnabled: patch.historyEdgesEnabled,
@@ -1110,7 +1134,11 @@ export function MapStageProvider({
     ): Promise<void> => {
       const cfg = configRef.current;
       try {
-        const joined = await loadStatePolygonsWithDensity(map, cfg.densityLevels);
+        const joined = await loadStatePolygonsWithDensity(
+          map,
+          cfg.densityLevels,
+          cfg.stateChoroplethLevels,
+        );
         if (generation !== decadeFadeGenerationRef.current) return;
         settledDensityFillByFipsRef.current = indexDensityFillColors(joined);
         clearDensityMorphFeatureState(map, morphStates);
@@ -1216,6 +1244,7 @@ export function MapStageProvider({
       // Population choropleth visibility + fill-color expressions live in style layout/paint.
       // Decade morph is configOnly and never syncs those — a layerMode change must full-apply.
       const layerModeChanged = patch.layerMode !== configRef.current.layerMode;
+      const popGeoChanged = (patch.popGeo ?? configRef.current.popGeo) !== configRef.current.popGeo;
       const recreate = clusteringChanged ? ({ recreateEntitiesSource: true } as const) : undefined;
       const wantsFade = options?.fade === true && !prefersReducedMotion();
       const map = mapRef.current;
@@ -1230,7 +1259,14 @@ export function MapStageProvider({
         map.getLayer(EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID),
       );
 
-      if (!wantsFade || !map || !morphLayersReady || clusteringChanged || layerModeChanged) {
+      if (
+        !wantsFade ||
+        !map ||
+        !morphLayersReady ||
+        clusteringChanged ||
+        layerModeChanged ||
+        popGeoChanged
+      ) {
         // Invalidate any in-flight decade morph so a later timeout cannot overwrite this snap.
         decadeFadeGenerationRef.current += 1;
         decadeDissolveInFlightRef.current = false;

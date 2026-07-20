@@ -51,6 +51,15 @@ test('shouldMorphDecadeDataPatch refuses morph when layerMode changes', () => {
       reducedMotion: false,
       isInitialApply: false,
       layerModeChanged: false,
+      populationLayerActive: true,
+    }),
+    false,
+  );
+  assert.equal(
+    shouldMorphDecadeDataPatch({
+      reducedMotion: false,
+      isInitialApply: false,
+      layerModeChanged: false,
     }),
     true,
   );
