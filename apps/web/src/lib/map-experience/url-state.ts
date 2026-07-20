@@ -1,8 +1,13 @@
 /**
- * Shareable URL state for `/explore`: viewport + filters + selected entity + map layer model
+ * Shareable URL state for `/explore`: filters + selected entity + map layer model
  * + optional point grouping + selected state + optional relationship lines decade
  * selected edge. Pure parse/serialize so the server-rendered page and the client
  * orchestrator read and write the exact same shape.
+ *
+ * Camera (`lat`/`lng`/`zoom`): parsed for inbound deep links (e.g. locate → explore with a
+ * place radius). The explore client does not continuously sync the live camera into the
+ * address bar; pan/zoom stay in-memory. Serialize still emits viewport when a caller builds
+ * an intentional deep link (`buildLocateExploreHref`).
  *
  * Selection note: `selected` opens the preview narrative card and orients the copper ring on
  * the map (e.g. “View on map” from a record page). The full record is reached via the card
@@ -124,8 +129,7 @@ function parsePopulationDecade(raw: string | undefined, fallback: CensusPopulati
   return trimmed && isCensusPopulationDecade(trimmed) ? trimmed : fallback;
 }
 
-const HIDE_PANELS_TOKENS = ['filters', 'results', 'key'] as const;
-type HidePanelsToken = (typeof HIDE_PANELS_TOKENS)[number];
+type HidePanelsToken = 'filters' | 'results' | 'key';
 
 function parseHidePanels(
   raw: RawExploreSearchParams,

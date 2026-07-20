@@ -18,16 +18,13 @@ function parseExploreHref(href: string) {
   return parseExploreSearchParams(Object.fromEntries(new URLSearchParams(qs)));
 }
 
-test('exploreHrefForState normalizes postal code and includes state + viewport for Texas', () => {
+test('exploreHrefForState normalizes postal code and includes state (camera from state param)', () => {
   const href = exploreHrefForState(' tx ');
-  assert.match(href, /^\/explore\?/);
+  assert.equal(href, '/explore?state=TX');
 
   const parsed = parseExploreHref(href);
   assert.equal(parsed.state, 'TX');
-  assert.ok(parsed.viewport);
-  assert.equal(typeof parsed.viewport!.lat, 'number');
-  assert.equal(typeof parsed.viewport!.lng, 'number');
-  assert.equal(parsed.viewport!.zoom, 6.2);
+  assert.equal(parsed.viewport, undefined);
   assert.deepEqual(parsed.filters, { era: 'all', kind: 'all', theme: 'all', confidence: 'all' });
   assert.equal(parsed.showFilters, true);
   assert.equal(parsed.showResults, true);

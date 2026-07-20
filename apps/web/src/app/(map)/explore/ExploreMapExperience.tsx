@@ -15,11 +15,13 @@
  * server-rendered snapshot catalog is the source of truth; `/explore/api` refine is optional
  * progressive enhancement when App Check is configured.
  *
- * Camera: deep links and back/forward reconcile the camera from the URL via `easeTo`
- * (`reconcileCamera`, run once on mount and again on every `popstate`) never a raw default
- * flight (ADR-017). Selecting a pin flies briefly then opens the preview card. Closing the
- * card eases one geographic tier up (county → state → country) from the pre-select camera,
- * never a jump cut to full CONUS when the reader was already in a tighter frame.
+ * Camera: inbound deep links (`lat`/`lng`/`zoom`, `state`, radius) and back/forward reconcile
+ * the camera via `easeTo` (`reconcileCamera`, once on mount and on every `popstate`) — never a
+ * raw default flight (ADR-017). Pan/zoom updates live camera + list bounds only; camera
+ * position is not written back into the address bar. Selecting a pin flies briefly then opens
+ * the preview card. Closing the card eases one geographic tier up (county → state → country)
+ * from the pre-select camera, never a jump cut to full CONUS when the reader was already in a
+ * tighter frame.
  */
 import {
   useCallback,
@@ -264,7 +266,6 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const router = useRouter();
   const stage = useMapStage();
   const [view, setView] = useState(initial);
-  const viewportTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const filterRegionRef = useRef<HTMLDivElement | null>(null);
   const spotlightRef = useRef<HTMLDivElement | null>(null);
   // Agent B: latch hero→explore on first client render before any effect clears sessionStorage.
@@ -413,7 +414,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   const pushViewState = useCallback(
     (next: ExploreViewState) => {
-      router.replace(buildExploreHref(next), { scroll: false });
+      // Shareable URL carries filters/selection/overlays — not the live camera.
+      // Inbound `?lat=&lng=&zoom=` deep links still parse for reconcileCamera / radius.
+      const { viewport: _camera, ...shareable } = next;
+      void _camera;
+      router.replace(buildExploreHref(shareable), { scroll: false });
     },
     [router],
   );
@@ -631,10 +636,18 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   // Deep link entry: reconcile the camera against the URL exactly once on mount (`easeTo`, never
   // a cinematic arc — arriving at a URL is a restore, not a descent). Skip when latched from hero
   // — its in-flight camera descent must not be interrupted (Agent B / ADR-017).
+  // Drop leftover pan/zoom query noise from the address bar after restore; keep camera params
+  // when a place-radius deep link still needs them for share/reload (`radius` + viewport).
   useEffect(() => {
     if (fromHeroTransition) return;
     reconcileCamera(initial.viewState, 'ease');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const { viewport, radius, ...rest } = initial.viewState;
+    if (viewport && !(radius && radius !== 'all')) {
+      const cleaned = radius ? { ...rest, radius } : rest;
+      viewStateRef.current = cleaned;
+      setView((current) => ({ ...current, viewState: cleaned }));
+      router.replace(buildExploreHref(cleaned), { scroll: false });
+    }
   }, []);
 
   // Back/forward: the URL changes under us via `popstate`. Restore the full shareable view
@@ -1005,66 +1018,29 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     };
   }, [spotlightOpen, dismissSpotlight]);
 
-  const handleViewportChange = useCallback(
-    (frame: ExploreViewportFrame) => {
-      const viewport: ExploreViewport = {
-        lat: frame.lat,
-        lng: frame.lng,
-        zoom: frame.zoom,
-      };
-      liveViewportRef.current = viewport;
-      // While a record is open the camera sits at point zoom — keep the list scoped to the
-      // pre-select framing so selecting a pin does not empty the records rail.
-      if (!viewStateRef.current.selected) {
-        preSelectViewportRef.current = viewport;
-        setListBounds((previous) =>
-          previous &&
-          previous.west === frame.bounds.west &&
-          previous.south === frame.bounds.south &&
-          previous.east === frame.bounds.east &&
-          previous.north === frame.bounds.north
-            ? previous
-            : frame.bounds,
-        );
-      }
-      // The stage replays its latched viewport to every new subscriber, and this component
-      // resubscribes whenever its handlers' view state changes — so an unchanged viewport MUST
-      // be a no-op here. Without this guard the replay itself triggers `router.replace`, whose
-      // RSC re-render recreates the handlers, which resubscribes, which replays: an infinite
-      // one-per-second replace loop. Compare at URL precision (buildExploreHref's toFixed).
-      const current = viewStateRef.current.viewport;
-      if (
-        current &&
-        current.lat.toFixed(4) === viewport.lat.toFixed(4) &&
-        current.lng.toFixed(4) === viewport.lng.toFixed(4) &&
-        current.zoom.toFixed(2) === viewport.zoom.toFixed(2)
-      ) {
-        return;
-      }
-      if (viewportTimerRef.current) {
-        clearTimeout(viewportTimerRef.current);
-      }
-      viewportTimerRef.current = setTimeout(() => {
-        // Build `next` from the ref mirror, not inside the setView updater: updaters must stay
-        // pure (React replays them during render), and `pushViewState` calls `router.replace` —
-        // a Router state update that must never run mid-render.
-        const next = mergeViewState(viewStateRef.current, { viewport });
-        viewStateRef.current = next;
-        setView((current) => ({ ...current, viewState: next }));
-        pushViewState(next);
-      }, 400);
-    },
-    [pushViewState],
-  );
-
-  useEffect(
-    () => () => {
-      if (viewportTimerRef.current) {
-        clearTimeout(viewportTimerRef.current);
-      }
-    },
-    [],
-  );
+  const handleViewportChange = useCallback((frame: ExploreViewportFrame) => {
+    const viewport: ExploreViewport = {
+      lat: frame.lat,
+      lng: frame.lng,
+      zoom: frame.zoom,
+    };
+    liveViewportRef.current = viewport;
+    // While a record is open the camera sits at point zoom — keep the list scoped to the
+    // pre-select framing so selecting a pin does not empty the records rail.
+    if (!viewStateRef.current.selected) {
+      preSelectViewportRef.current = viewport;
+      setListBounds((previous) =>
+        previous &&
+        previous.west === frame.bounds.west &&
+        previous.south === frame.bounds.south &&
+        previous.east === frame.bounds.east &&
+        previous.north === frame.bounds.north
+          ? previous
+          : frame.bounds,
+      );
+    }
+    // Camera stays in-memory only — pan/zoom must not rewrite the address bar.
+  }, []);
 
   // Canvas event wiring — resubscribes whenever a handler's closed-over view state changes
   // (cheap Set add/delete; the alternative, stale closures, is worse).

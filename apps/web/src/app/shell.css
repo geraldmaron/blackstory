@@ -37,6 +37,29 @@
   padding-top: 0;
 }
 
+/* Explore map shell — dedicated full-viewport composition (header + canvas).
+   Homepage under `(map)/` stays a scrollable document with footer below the hero.
+   Selector matches SSR explore markup (`.ds-explore-stage`) — no client class needed. */
+.ds-shell:has(.ds-explore-stage) {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.ds-shell:has(.ds-explore-stage) .ds-shell-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-shell:has(.ds-explore-stage) .ds-map-surface {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
 /* Explore: condense the bar — symbol mark, hide primary nav; map instruments own the frame
    (ADR-017 transition contract). Header is a sibling of `.ds-shell-body`, so scope from
    `.ds-shell:has(...)` — not `.ds-shell-body:has(...)` (that never matched the header). */

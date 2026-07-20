@@ -4,7 +4,8 @@
  * (memoized per-request, ADR-017 "one fetch per request, however many server components ask for
  * it") and renders `ExploreMapExperience`'s floating chrome — filters, results list, narrative
  * off-ramps, legend — over the persisted canvas. Filters use native GET navigation (no-JS safe);
- * the client island adds the interactive camera, cluster drill-down, and viewport URL sync.
+ * the client island adds the interactive camera and cluster drill-down (camera stays
+ * in-memory; shareable URL carries filters/selection, not pan/zoom).
  */
 import { FilterBar } from '@repo/ui';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';

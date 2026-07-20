@@ -29,9 +29,10 @@
   pointer-events: none;
 }
 
-/* Footer sits outside `.ds-map-surface` but the plate is viewport-fixed — raise
-   it so document scroll ends on opaque chrome, not trapped map glass. */
-.ds-shell:has([data-surface='map']) .ds-shell-footer {
+/* Homepage map surface: footer sits outside `.ds-map-surface` but the plate is
+   viewport-fixed — raise it so document scroll ends on opaque chrome, not trapped
+   map glass. Explore omits the footer from the shell composition entirely. */
+.ds-shell:has([data-surface='map']):not(:has(.ds-explore-stage)) .ds-shell-footer {
   position: relative;
   z-index: 1;
 }
@@ -239,6 +240,10 @@
   --ds-explore-results-width: min(22.5rem, 92%);
   position: relative;
   z-index: 1;
+  /* Fill the map-explore shell so floating chrome anchors to a real surface height. */
+  flex: 1 1 auto;
+  min-height: 100%;
+  height: 100%;
   color: var(--ds-ink);
 }
 

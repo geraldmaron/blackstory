@@ -39,6 +39,23 @@ describe('shell explore header condensation selectors', () => {
   });
 });
 
+describe('explore map shell layout', () => {
+  it('locks the dedicated explore shell to the viewport (not a footer-over-map document)', () => {
+    assert.match(
+      shellCss,
+      /\.ds-shell:has\(\.ds-explore-stage\)\s*\{[^}]*height:\s*100dvh[^}]*overflow:\s*hidden/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-shell:has\(\.ds-explore-stage\)\s+\.ds-shell-body\s*\{[^}]*min-height:\s*0[^}]*overflow:\s*hidden/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-shell:has\(\.ds-explore-stage\)\s+\.ds-map-surface\s*\{[^}]*height:\s*100%/s,
+    );
+  });
+});
+
 describe('on-map shell header treatment', () => {
   it('restyles the bar with fixed ink tokens over map surfaces', () => {
     assert.match(

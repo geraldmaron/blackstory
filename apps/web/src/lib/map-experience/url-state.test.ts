@@ -46,6 +46,10 @@ test('round-trips a full view state through build -> parse', () => {
   const href = buildExploreHref(state);
   assert.match(href, /^\/explore\?/);
   assert.doesNotMatch(href, /group=/);
+  // Intentional deep links may still carry camera; live explore pan/zoom does not rewrite it.
+  assert.match(href, /lat=38\.9072/);
+  assert.match(href, /lng=-77\.0369/);
+  assert.match(href, /zoom=11\.50/);
 
   const [, qs] = href.split('?');
   const parsed = parseExploreSearchParams(Object.fromEntries(new URLSearchParams(qs)));
@@ -62,6 +66,23 @@ test('round-trips a full view state through build -> parse', () => {
   assert.equal(parsed.lines, true);
   assert.equal(parsed.decade, '1970s');
   assert.equal(parsed.edge, 'rel_landmark_occurred_at_school');
+});
+
+test('shareable explore URLs without an intentional camera omit lat/lng/zoom', () => {
+  const qs = buildExploreSearchParams({
+    filters: { era: '1970s', kind: 'all', theme: 'all', confidence: 'all' },
+    layerMode: 'presence',
+    group: false,
+    lines: false,
+    showFilters: true,
+    showResults: true,
+    showKey: true,
+    state: 'DC',
+  });
+  assert.equal(qs, 'era=1970s&state=DC');
+  assert.doesNotMatch(qs, /lat=/);
+  assert.doesNotMatch(qs, /lng=/);
+  assert.doesNotMatch(qs, /zoom=/);
 });
 
 test('default filter values are omitted from the query string (minimal shareable URL)', () => {

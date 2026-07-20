@@ -13,7 +13,6 @@ import { DEFAULT_EXPLORE_FILTERS } from './filters';
 import {
   buildExploreHref,
   defaultExploreOverlayState,
-  viewportForState,
   type ExploreViewState,
 } from './url-state';
 
@@ -46,17 +45,15 @@ function normalizePostalCode(postalCode: string): string {
   return postalCode.trim().toUpperCase();
 }
 
-/** Explore filtered to a USPS state, with camera viewport when known. */
+/** Explore filtered to a USPS state. Camera framing uses `state` via `viewportForState`. */
 export function exploreHrefForState(postalCode: string): string {
   const normalized = normalizePostalCode(postalCode);
   if (!normalized || !findUsStateByPostalCode(normalized)) {
     return '/explore';
   }
 
-  const viewport = viewportForState(normalized);
   return buildDefaultExploreHref({
     state: normalized,
-    ...(viewport ? { viewport } : {}),
   });
 }
 
