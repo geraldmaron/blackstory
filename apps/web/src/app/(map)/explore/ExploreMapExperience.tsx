@@ -868,7 +868,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   const handleAddressResolved = useCallback(
     (payload: ExploreAddressResolvedPayload) => {
-      const { target, radiusMeters, radiusLabel } = payload;
+      const { target, radiusMeters, radiusLabel, entityId } = payload;
       preSelectViewportRef.current = liveViewportRef.current ?? viewStateRef.current.viewport;
       const center = { lat: target.viewport.lat, lng: target.viewport.lng };
 
@@ -906,7 +906,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       commitViewState(
         mergeViewState(view.viewState, {
           viewport: target.viewport,
-          clearSelected: true,
+          ...(entityId ? { selected: entityId } : { clearSelected: true }),
           clearEdge: true,
         }),
       );
@@ -1210,7 +1210,10 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           >
             Filters
           </p>
-          <ExploreAddressSearch onResolved={handleAddressResolved} />
+          <ExploreAddressSearch
+            onResolved={handleAddressResolved}
+            catalogFeatures={view.allFeatures}
+          />
           {placeSearchFocus ? (
             <div className="ds-explore-place-focus" role="status" aria-live="polite">
               {placeSearchFocus.radiusMeters === null ? (

@@ -7,6 +7,8 @@
  * take a fetcher port backed, in production, by `../adapters/census-geo/fetch-geocode.ts`.
  */
 import { normalizeAddressInput, coordinateCacheKey } from './address-normalize.js';
+import { lookupUsCityCentroid, type LookupUsCityCentroid } from './city-centroid.js';
+import { parseCityStateInput } from './city-normalize.js';
 import {
   geoPrecisionTierForMatch,
   reduceGeocodeCoordinatePrecision,
@@ -53,11 +55,64 @@ function toResolution(
 export type GeocodeAddressInput = {
   readonly address: string;
   readonly fetchAddressGeocode: CensusAddressGeocodeFetcher;
+  /** Required for city/state locality fallback when street geocode returns empty. */
+  readonly fetchCoordinatesGeocode?: CensusCoordinatesGeocodeFetcher;
+  readonly lookupCityCentroid?: LookupUsCityCentroid;
   readonly cache?: GeocodeCache<GeocodeResolution>;
   readonly now?: () => number;
   /** Opt-in only see `./coordinate-precision.ts`'s module doc for the fail-safe default. */
   readonly retainExactCoordinates?: boolean;
 };
+
+async function resolveViaCityCentroid(
+  address: string,
+  input: GeocodeAddressInput,
+  nowMs: number,
+  cacheKey: string,
+): Promise<GeocodeResult | undefined> {
+  if (!input.fetchCoordinatesGeocode) return undefined;
+  const parsed = parseCityStateInput(address);
+  if (!parsed) return undefined;
+
+  const lookup = input.lookupCityCentroid ?? lookupUsCityCentroid;
+  const centroid = lookup(parsed.city, parsed.stateAbbrev);
+  if (!centroid) return undefined;
+
+  let match: CensusGeocodeMatch;
+  try {
+    match = await input.fetchCoordinatesGeocode({ lat: centroid.lat, lng: centroid.lng });
+  } catch {
+    return { ok: false, fallback: buildManualPlaceSearchFallback('geocoder_unavailable') };
+  }
+
+  const scope = evaluateGeocodeProductScope(match);
+  if (!scope.inScope) {
+    return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
+  }
+
+  const retainExactCoordinates = input.retainExactCoordinates === true;
+  const base = toResolution(match, false);
+  const placeName = base.match.placeName ?? centroid.city;
+  const resolution: GeocodeResolution = {
+    ...base,
+    match: {
+      ...base.match,
+      ...(placeName ? { placeName } : {}),
+    },
+    ...(retainExactCoordinates
+      ? {
+          precision: {
+            tier: 'locality' as const,
+            exactCoordinatesRetained: true,
+            lat: centroid.lat,
+            lng: centroid.lng,
+          },
+        }
+      : {}),
+  };
+  input.cache?.set(cacheKey, resolution, nowMs);
+  return { ok: true, resolution, cacheHit: false };
+}
 
 /** Forward geocode: normalized address/ZIP text -> a resolved jurisdiction result, or a manual-search fallback. */
 export async function geocodeAddress(input: GeocodeAddressInput): Promise<GeocodeResult> {
@@ -86,6 +141,13 @@ export async function geocodeAddress(input: GeocodeAddressInput): Promise<Geocod
   }
   const best = matches[0];
   if (!best) {
+    const cityFallback = await resolveViaCityCentroid(
+      normalized.queryText,
+      input,
+      nowMs,
+      normalized.cacheKey,
+    );
+    if (cityFallback) return cityFallback;
     return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
   }
 

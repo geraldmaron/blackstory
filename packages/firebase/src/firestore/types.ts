@@ -1247,6 +1247,17 @@ export const publicStoryProjectionSchema = z.object({
 export type PublicStoryProjectionDoc = z.infer<typeof publicStoryProjectionSchema>;
 
 /**
+ * Index/list projection for `/stories` — same identity fields as the full story doc,
+ * without `body` or `relatedEntityIds` so list reads and caches stay small.
+ */
+export const publicStoryListItemSchema = publicStoryProjectionSchema.omit({
+  body: true,
+  relatedEntityIds: true,
+});
+
+export type PublicStoryListItemDoc = z.infer<typeof publicStoryListItemSchema>;
+
+/**
  * persisted search index document the server-read shape @repo/domain's
  * `buildPublicSearchIndexDocs` produces (`packages/domain/src/search/`). Follows the exact
  * conventions of `publicEntityProjectionSchema` above: reuses `entityKindSchema`

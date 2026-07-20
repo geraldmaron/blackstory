@@ -139,6 +139,7 @@ test('buildSearchPageHref preserves current filters and only overrides offset', 
     kindOptions: [],
     statusOptions: [],
     eraOptions: [],
+    recommendations: [],
   };
   const href = buildSearchPageHref(view, 40);
   const url = new URL(href, 'https://example.test');
@@ -163,6 +164,18 @@ test('buildSearchPageHref omits the offset param entirely for offset 0 (clean fi
     kindOptions: [],
     statusOptions: [],
     eraOptions: [],
+    recommendations: [],
   };
   assert.equal(buildSearchPageHref(view, 0), '/search');
+});
+
+test('zero-result queries expose catalog recommendations from the index', () => {
+  const index = [
+    fixtureDoc({ id: 'p1', displayName: 'Harlem', relatedCount: 4 }),
+    fixtureDoc({ id: 'p2', displayName: 'Sweet Auburn', relatedCount: 2 }),
+  ];
+  const view = buildSearchViewModel({ q: 'xyzzy-no-such-record' }, index);
+  assert.equal(view.totalMatched, 0);
+  assert.ok(view.recommendations.length >= 1);
+  assert.equal(view.recommendations[0]?.id, 'p1');
 });

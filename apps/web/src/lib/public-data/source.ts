@@ -1,9 +1,10 @@
 /**
  * Public data source selector: live release artifacts + Firestore with seed snapshot fallback.
- * Hydrates 1-hop related neighbor stubs and composes capped 2-hop continue-learning.
- * Entity pages fetch only related neighbor docs (bounded). List/map/search prefer ADR-004
- * catalog artifacts, then process-local TTL + size-gated `unstable_cache` — never rebuild
- * search from a full entity scan when the written search index (artifact or collection) exists.
+ * Hydrates 1-hop related neighbor stubs and composes capped 2-hop continue-learning on entity
+ * pages only. List/map/search/stories prefer ADR-004 catalog artifacts (when present) then
+ * process-local TTL + size-gated `unstable_cache`. The `/stories` index caches field-masked
+ * list items (no body). Story detail related rails use a thin batched point-get
+ * (`listPublicEntityViewsByIds`) — never the 2-hop learning graph.
  * Oversized live catalogs (>~1.8MB) stay in process memory only; Next's 2MB data-cache limit
  * must not receive the fat array (console warn + repeated origin fetches).
  */
@@ -14,6 +15,7 @@ import type { PublicSearchIndexDoc } from '@repo/domain/search';
 import type {
   PublicEntityProjectionDoc,
   PublicSearchIndexDoc as FirestoreSearchIndexDoc,
+  PublicStoryListItemDoc,
   PublicStoryProjectionDoc,
 } from '@repo/firebase';
 import {
@@ -43,6 +45,8 @@ import {
   listPublicEntityProjections,
   listPublicSearchIndexDocs,
   listPublicStoryProjections,
+  listPublicStorySummaries,
+  listSnapshotStoryListItems,
   listSnapshotStoryProjections,
   parseEntityProjection,
   parseSearchIndexDoc,
@@ -53,6 +57,7 @@ import {
   isOversizedLiveCatalogSentinel,
   liveCatalogCacheKey,
   nextDataCacheValueForCatalog,
+  type LiveCatalogKind,
   type LiveCatalogMemoryCache,
 } from './live-catalog-cache';
 import { mapProjectionToPublicEntityView, type PublicProjectionInput } from './map-projection';
@@ -65,7 +70,7 @@ import {
 
 export type { PublicReadSource };
 
-/** Cross-request cache window for release catalog / search index (seconds). */
+/** Cross-request cache window for release catalog / search index / stories (seconds). */
 const RELEASE_CATALOG_REVALIDATE_SECONDS = 300;
 const RELEASE_CATALOG_TTL_MS = RELEASE_CATALOG_REVALIDATE_SECONDS * 1000;
 
@@ -76,6 +81,13 @@ const liveEntitiesMemory = createLiveCatalogMemoryCache<readonly PublicEntityVie
 const liveSearchIndexMemory = createLiveCatalogMemoryCache<readonly PublicSearchIndexDoc[]>({
   defaultTtlMs: RELEASE_CATALOG_TTL_MS,
 });
+/** Thin story list cards only — never full `body[]` prose. */
+const liveStoriesMemory = createLiveCatalogMemoryCache<readonly PublicStoryListItemDoc[]>({
+  defaultTtlMs: RELEASE_CATALOG_TTL_MS,
+});
+
+/** One active-release pointer read per request (shared across entities/stories/search). */
+const getCachedActiveRelease = cache(fetchActiveRelease);
 
 function toNeighborLookup(entity: PublicEntityView): NeighborLookup {
   return {
@@ -199,7 +211,7 @@ async function loadLiveSearchIndexForRelease(
  * sentinel (never the full array) so SET no longer warns and every instance still fills memory.
  */
 async function cacheLiveCatalog<T>(options: {
-  readonly kind: 'entities' | 'search-index';
+  readonly kind: LiveCatalogKind;
   readonly releaseId: string;
   readonly activatedAt: string;
   readonly memory: LiveCatalogMemoryCache<T>;
@@ -274,9 +286,26 @@ function cachedLiveSearchIndex(
   });
 }
 
+function cachedLiveStoryListItems(
+  releaseId: string,
+  activatedAt: string,
+): Promise<readonly PublicStoryListItemDoc[] | undefined> {
+  return cacheLiveCatalog({
+    kind: 'stories',
+    releaseId,
+    activatedAt,
+    memory: liveStoriesMemory,
+    load: async () => {
+      const stories = await listPublicStorySummaries(releaseId);
+      return stories.length > 0 ? stories : undefined;
+    },
+    nextCacheKeyPrefix: 'public-release-stories',
+  });
+}
+
 async function loadLiveEntities(): Promise<readonly PublicEntityView[] | undefined> {
   if (!shouldUseLivePublicProjections()) return undefined;
-  const active = await fetchActiveRelease();
+  const active = await getCachedActiveRelease();
   if (!active) return undefined;
   return cachedLiveEntities(active.releaseId, active.activatedAt);
 }
@@ -284,10 +313,11 @@ async function loadLiveEntities(): Promise<readonly PublicEntityView[] | undefin
 /**
  * Live single-entity path: point-get the entity + bounded related/2-hop neighbors.
  * Must not full-scan `publicReleases/{id}/entities` (that was ~N reads per entity page).
+ * Entity pages only — story/list cards use `listPublicEntityViewsByIds` instead.
  */
 async function loadLiveEntity(entityId: string): Promise<PublicEntityView | undefined> {
   if (!shouldUseLivePublicProjections()) return undefined;
-  const active = await fetchActiveRelease();
+  const active = await getCachedActiveRelease();
   if (!active) return undefined;
   const projection = await fetchPublicEntityProjection(active.releaseId, entityId);
   if (!projection) return undefined;
@@ -309,6 +339,21 @@ async function loadLiveEntity(entityId: string): Promise<PublicEntityView | unde
   } catch {
     return hydrateEntityLearningLinks(entity, [...listPublicEntities(), entity]);
   }
+}
+
+/**
+ * Thin batched entity load for card/list surfaces (story related rails). One active-release
+ * read + one `getAll` for the requested ids — no 1-hop/2-hop neighbor expansion.
+ */
+async function loadLiveEntitiesByIdsThin(
+  entityIds: readonly string[],
+): Promise<readonly PublicEntityView[] | undefined> {
+  if (!shouldUseLivePublicProjections()) return undefined;
+  const active = await getCachedActiveRelease();
+  if (!active) return undefined;
+  const projections = await fetchPublicEntityProjectionsByIds(active.releaseId, entityIds);
+  if (projections.length === 0) return undefined;
+  return projections.map((item) => mapProjectionToPublicEntityView(item as PublicProjectionInput));
 }
 
 /** Resolve one entity: live projection first, then bundled seed snapshot.  */
@@ -353,7 +398,7 @@ export const getPublicSearchIndex = cache(async function getPublicSearchIndex():
 
   try {
     if (shouldUseLivePublicProjections()) {
-      const active = await fetchActiveRelease();
+      const active = await getCachedActiveRelease();
       if (active) {
         const live = await cachedLiveSearchIndex(active.releaseId, active.activatedAt);
         if (live !== undefined && live.length > 0) {
@@ -368,6 +413,79 @@ export const getPublicSearchIndex = cache(async function getPublicSearchIndex():
   return { data: getSnapshotSearchIndex(), source: 'snapshot' };
 });
 
+/**
+ * Batched entity cards for non-entity pages (story related rails). Dedupes + sorts ids for a
+ * stable `React.cache` key (arrays are reference-unstable), then reorders to request order.
+ * Never runs learning-graph hydration.
+ */
+const listPublicEntityViewsByIdsCached = cache(async function listPublicEntityViewsByIdsCached(
+  stableIdsKey: string,
+): Promise<{
+  readonly byId: ReadonlyMap<string, PublicEntityView>;
+  readonly source: PublicReadSource;
+}> {
+  const unique =
+    stableIdsKey.length === 0 ? ([] as string[]) : stableIdsKey.split('\u0001').filter(Boolean);
+
+  function fromSnapshot(): ReadonlyMap<string, PublicEntityView> {
+    const map = new Map<string, PublicEntityView>();
+    for (const id of unique) {
+      const entity = getPublicEntity(id);
+      if (entity) map.set(id, entity);
+    }
+    return map;
+  }
+
+  if (unique.length === 0) {
+    return { byId: new Map(), source: 'none' };
+  }
+
+  if (isPublicReadApiDisabled()) {
+    return { byId: fromSnapshot(), source: 'snapshot' };
+  }
+
+  try {
+    const live = await loadLiveEntitiesByIdsThin(unique);
+    if (live !== undefined && live.length > 0) {
+      const byId = new Map(live.map((entity) => [entity.id, entity] as const));
+      for (const id of unique) {
+        if (!byId.has(id)) {
+          const seed = getPublicEntity(id);
+          if (seed) byId.set(id, seed);
+        }
+      }
+      return { byId, source: 'live' };
+    }
+  } catch {
+    // fall through
+  }
+
+  return { byId: fromSnapshot(), source: 'snapshot' };
+});
+
+export async function listPublicEntityViewsByIds(
+  entityIds: readonly string[],
+): Promise<{
+  readonly data: readonly PublicEntityView[];
+  readonly source: PublicReadSource;
+}> {
+  const requestOrder = [
+    ...new Set(entityIds.map((id) => id.trim()).filter((id) => id.length > 0)),
+  ];
+  if (requestOrder.length === 0) {
+    return { data: [], source: 'none' };
+  }
+
+  const stableIdsKey = [...requestOrder].sort().join('\u0001');
+  const { byId, source } = await listPublicEntityViewsByIdsCached(stableIdsKey);
+  const ordered: PublicEntityView[] = [];
+  for (const id of requestOrder) {
+    const hit = byId.get(id);
+    if (hit) ordered.push(hit);
+  }
+  return { data: ordered, source };
+}
+
 /** Sync helpers for call sites that still need seed during static generation.  */
 export function getSeedPublicEntity(entityId: string): PublicEntityView | undefined {
   return getPublicEntity(entityId);
@@ -378,26 +496,49 @@ export function listSeedPublicEntities(): readonly PublicEntityView[] {
 }
 
 export type PublicStoryView = PublicStoryProjectionDoc;
+export type PublicStoryListItem = PublicStoryListItemDoc;
 
-async function loadLiveStories(): Promise<readonly PublicStoryView[] | undefined> {
+async function loadLiveStoryListItems(): Promise<readonly PublicStoryListItem[] | undefined> {
   if (!shouldUseLivePublicProjections()) return undefined;
-  const active = await fetchActiveRelease();
+  const active = await getCachedActiveRelease();
   if (!active) return undefined;
-  const stories = await listPublicStoryProjections(active.releaseId);
-  if (stories.length === 0) return undefined;
-  return stories;
+  return cachedLiveStoryListItems(active.releaseId, active.activatedAt);
 }
 
 async function loadLiveStory(slug: string): Promise<PublicStoryView | undefined> {
   if (!shouldUseLivePublicProjections()) return undefined;
-  const active = await fetchActiveRelease();
+  const active = await getCachedActiveRelease();
   if (!active) return undefined;
   return fetchPublicStoryProjection(active.releaseId, slug);
 }
 
 /**
- * List longform stories: live `publicReleases/{id}/stories` first, then the same
- * Firebase seed corpus (never a parallel apps/web body catalog).
+ * Thin story list for `/stories` index cards. Live path uses field-masked Firestore reads
+ * + process TTL / `unstable_cache`; never pulls full `body[]` into the list cache.
+ */
+export const listPublicStoryListItems = cache(async function listPublicStoryListItems(): Promise<{
+  readonly data: readonly PublicStoryListItem[];
+  readonly source: PublicReadSource;
+}> {
+  if (isPublicReadApiDisabled()) {
+    return { data: listSnapshotStoryListItems(), source: 'snapshot' };
+  }
+
+  try {
+    const live = await loadLiveStoryListItems();
+    if (live !== undefined) {
+      return { data: live, source: 'live' };
+    }
+  } catch {
+    // fall through
+  }
+
+  return { data: listSnapshotStoryListItems(), source: 'snapshot' };
+});
+
+/**
+ * Full story docs for `generateStaticParams` and callers that need bodies/related ids.
+ * Not used by the `/stories` index (see `listPublicStoryListItems`).
  */
 export const listPublicStoryViews = cache(async function listPublicStoryViews(): Promise<{
   readonly data: readonly PublicStoryView[];
@@ -408,9 +549,14 @@ export const listPublicStoryViews = cache(async function listPublicStoryViews():
   }
 
   try {
-    const live = await loadLiveStories();
-    if (live !== undefined) {
-      return { data: live, source: 'live' };
+    if (shouldUseLivePublicProjections()) {
+      const active = await getCachedActiveRelease();
+      if (active) {
+        const stories = await listPublicStoryProjections(active.releaseId);
+        if (stories.length > 0) {
+          return { data: stories, source: 'live' };
+        }
+      }
     }
   } catch {
     // fall through

@@ -16,8 +16,13 @@
  * external/programmatic callers, not hand-constructed here. A plain offset is the simplest correct
  * mechanism for this server-rendered page's own forward/back links.
  */
-import { runPublicSearch } from '@repo/domain';
-import type { PublicSearchIndexDoc, SearchFilter, SearchResultView } from '@repo/domain';
+import { buildSearchRecommendations, runPublicSearch } from '@repo/domain';
+import type {
+  PublicSearchIndexDoc,
+  SearchFilter,
+  SearchRecommendation,
+  SearchResultView,
+} from '@repo/domain';
 import { normalizeSearchText } from '@repo/security';
 
 /** Matches `DEFAULT_QUERY_GUARDRAIL_LIMITS.defaultPageSize`. Kept as a local constant
@@ -51,6 +56,11 @@ export type SearchViewModel = {
   readonly kindOptions: readonly FacetOption[];
   readonly statusOptions: readonly FacetOption[];
   readonly eraOptions: readonly FacetOption[];
+  /**
+   * Catalog-grounded suggestions for empty / zero-result states (and a short "from the
+   * archive" strip when browsing with no query).
+   */
+  readonly recommendations: readonly SearchRecommendation[];
 };
 
 /** Trims a select-style param and defaults an empty value to `'all'`.  */
@@ -130,6 +140,18 @@ export function buildSearchViewModel(
   const nextOffset = executionResult.hasMore ? offset + SEARCH_PAGE_SIZE : undefined;
   const previousOffset = offset > 0 ? Math.max(0, offset - SEARCH_PAGE_SIZE) : undefined;
 
+  // Zero-result only: suggest real catalog records (browse-ranked when the query itself
+  // matched nothing). Populated browse already surfaces the index — no duplicate strip.
+  const recommendations =
+    executionResult.totalMatched === 0
+      ? buildSearchRecommendations({
+          query: '',
+          index,
+          limit: 8,
+          allowBrowse: true,
+        })
+      : [];
+
   return {
     q,
     kind,
@@ -144,6 +166,7 @@ export function buildSearchViewModel(
     kindOptions: buildFacetOptions(executionResult.facets.kind, 'All kinds'),
     statusOptions: buildFacetOptions(executionResult.facets.status, 'All statuses'),
     eraOptions: buildFacetOptions(executionResult.facets.era, 'All eras'),
+    recommendations,
   };
 }
 

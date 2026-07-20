@@ -85,4 +85,8 @@ test('liveCatalogCacheKey encodes kind and release identity', () => {
     liveCatalogCacheKey('search-index', 'rel_1', '2026-01-01T00:00:00.000Z'),
     'search-index:rel_1:2026-01-01T00:00:00.000Z',
   );
+  assert.equal(
+    liveCatalogCacheKey('stories', 'rel_1', '2026-01-01T00:00:00.000Z'),
+    'stories:rel_1:2026-01-01T00:00:00.000Z',
+  );
 });

@@ -177,6 +177,41 @@ test('geocodeAddress falls back to manual search on no matches and on an out-of-
   assert.equal((territory as Extract<GeocodeResult, { ok: false }>).fallback.reason, 'no_match');
 });
 
+test('geocodeAddress falls back to city centroid when street geocode returns empty', async () => {
+  let reverseCalls = 0;
+  const result = await geocodeAddress({
+    address: 'Montgomery, AL',
+    fetchAddressGeocode: async () => [],
+    fetchCoordinatesGeocode: async ({ lat, lng }) => {
+      reverseCalls += 1;
+      return {
+        lat,
+        lng,
+        stateFips: '01',
+        stateName: 'Alabama',
+        countyFips3: '101',
+        countyName: 'Montgomery County',
+        placeFips: '51000',
+        placeName: 'Montgomery city',
+      };
+    },
+    lookupCityCentroid: () => ({
+      city: 'Montgomery',
+      stateAbbrev: 'AL',
+      lat: 32.36,
+      lng: -86.3,
+      zipCount: 3,
+    }),
+    retainExactCoordinates: true,
+  });
+  assert.equal(result.ok, true);
+  assert.equal(reverseCalls, 1);
+  const success = result as Extract<GeocodeResult, { ok: true }>;
+  assert.equal(success.resolution.match.placeName, 'Montgomery city');
+  assert.equal(success.resolution.precision.exactCoordinatesRetained, true);
+  assert.equal(success.resolution.precision.lat, 32.36);
+});
+
 test('geocodeAddress falls back on an ambiguous (multi-)match rather than guessing', async () => {
   const result = await geocodeAddress({
     address: 'Main St',

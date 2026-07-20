@@ -2,12 +2,14 @@
 
 /**
  * Lean place finder for `/explore`: one search field + radius chips (All / 5–50 mi).
- * Calls `/locate/api` for camera framing; parent owns catalog ranking and empty-state intro.
+ * Suggests matching catalog records from already-loaded map data, then falls back to
+ * `/locate/api` (Census + city/state centroid) for camera framing. Parent owns ranking.
  */
-import React, { useId, useState } from 'react';
+import React, { useId, useMemo, useState } from 'react';
 import { Button } from '@repo/ui';
 import { getExploreAppCheckHeaders } from '../../app/(map)/explore/app-check-client';
 import { fetchLocateByAddress } from '../../lib/geocode/locate-client';
+import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import {
   DEFAULT_EXPLORE_RADIUS_ID,
   EXPLORE_RADIUS_PRESETS,
@@ -19,6 +21,11 @@ import {
   resolveExploreAddressCamera,
   type ExploreAddressCameraTarget,
 } from '../../lib/map-experience/resolve-explore-address-camera';
+import { CAMERA_COUNTY_ZOOM } from '../../lib/map-experience/camera-presets';
+import {
+  suggestCatalogRecords,
+  type CatalogRecordSuggestion,
+} from '../../lib/map-experience/suggest-catalog-records';
 
 void React;
 
@@ -28,10 +35,14 @@ export type ExploreAddressResolvedPayload = {
   readonly radiusMeters: number | null;
   readonly radiusLabel: string;
   readonly radiusId: ExploreRadiusPresetId;
+  /** When the user picked a catalog record, the entity id for optional selection. */
+  readonly entityId?: string;
 };
 
 export type ExploreAddressSearchProps = {
   readonly onResolved: (payload: ExploreAddressResolvedPayload) => void;
+  /** Live explore catalog — recommendations are drawn from these published features. */
+  readonly catalogFeatures?: readonly ExploreMapFeature[];
   readonly disabled?: boolean;
 };
 
@@ -42,7 +53,7 @@ type SearchStatus =
   | { readonly kind: 'error'; readonly message: string };
 
 const ERROR_MESSAGES = {
-  fallback: 'No match for that place. Try a city and state, or a ZIP.',
+  fallback: 'No match for that place. Try a city and state, a ZIP, or pick a record below.',
   rate_limited: 'Too many location lookups. Wait a moment and try again.',
   app_check_denied: 'This browser session could not be verified. Reload and try again.',
   invalid_query: 'That input could not be read as an address, city, or ZIP.',
@@ -50,24 +61,70 @@ const ERROR_MESSAGES = {
   no_camera: 'That place resolved, but the map could not frame it.',
 } as const;
 
-export function ExploreAddressSearch({ onResolved, disabled = false }: ExploreAddressSearchProps) {
+function cameraFromCatalogRecord(record: CatalogRecordSuggestion): ExploreAddressCameraTarget {
+  return {
+    preset: 'locality',
+    viewport: { lat: record.lat, lng: record.lng, zoom: CAMERA_COUNTY_ZOOM },
+    label: record.jurisdictionLabel
+      ? `${record.displayName}, ${record.jurisdictionLabel}`
+      : record.displayName,
+  };
+}
+
+export function ExploreAddressSearch({
+  onResolved,
+  catalogFeatures = [],
+  disabled = false,
+}: ExploreAddressSearchProps) {
   const [status, setStatus] = useState<SearchStatus>({ kind: 'idle' });
   const [radiusId, setRadiusId] = useState<ExploreRadiusPresetId>(DEFAULT_EXPLORE_RADIUS_ID);
   const [query, setQuery] = useState('');
   const statusId = useId();
   const fieldId = useId();
   const radiusGroupId = useId();
+  const listboxId = useId();
   const loading = status.kind === 'loading' || disabled;
   const radiusPreset = exploreRadiusPresetById(radiusId);
+
+  const recommendations = useMemo(
+    () => suggestCatalogRecords(query, catalogFeatures, 6),
+    [query, catalogFeatures],
+  );
+
+  function emitResolved(target: ExploreAddressCameraTarget, entityId?: string) {
+    const preset = exploreRadiusPresetById(radiusId);
+    onResolved({
+      target,
+      radiusMeters: preset.meters,
+      radiusLabel: preset.statusLabel,
+      radiusId: preset.id,
+      ...(entityId ? { entityId } : {}),
+    });
+    setStatus({ kind: 'ready', label: target.label });
+  }
+
+  function pickRecord(record: CatalogRecordSuggestion) {
+    setQuery(record.displayName);
+    emitResolved(cameraFromCatalogRecord(record), record.entityId);
+  }
 
   async function runSearch(address: string) {
     const trimmed = address.trim();
     if (!trimmed) return;
 
+    // Exact / strong catalog hit first — grounded in published coords, no geocoder round-trip.
+    const catalogHit = suggestCatalogRecords(trimmed, catalogFeatures, 1)[0];
+    if (
+      catalogHit &&
+      catalogHit.displayName.toLowerCase() === trimmed.toLowerCase()
+    ) {
+      emitResolved(cameraFromCatalogRecord(catalogHit), catalogHit.entityId);
+      return;
+    }
+
     setStatus({ kind: 'loading' });
     const headers = await getExploreAppCheckHeaders();
     const result = await fetchLocateByAddress(trimmed, headers, { forCamera: true });
-    const preset = exploreRadiusPresetById(radiusId);
 
     if (result.kind === 'resolved') {
       const target = resolveExploreAddressCamera(result.resolution);
@@ -75,17 +132,19 @@ export function ExploreAddressSearch({ onResolved, disabled = false }: ExploreAd
         setStatus({ kind: 'error', message: ERROR_MESSAGES.no_camera });
         return;
       }
-      onResolved({
-        target,
-        radiusMeters: preset.meters,
-        radiusLabel: preset.statusLabel,
-        radiusId: preset.id,
-      });
-      setStatus({ kind: 'ready', label: target.label });
+      emitResolved(target);
       return;
     }
 
+    // Geocoder miss: if catalog still has partial matches, keep them visible and surface error.
     if (result.kind === 'fallback') {
+      if (recommendations.length > 0) {
+        setStatus({
+          kind: 'error',
+          message: 'No street or city match — pick a record from the archive below, or try City, ST.',
+        });
+        return;
+      }
       setStatus({ kind: 'error', message: result.fallback.message || ERROR_MESSAGES.fallback });
       return;
     }
@@ -131,19 +190,55 @@ export function ExploreAddressSearch({ onResolved, disabled = false }: ExploreAd
             className="ds-explore-place__input"
             type="search"
             name="place"
-            autoComplete="address-level2"
+            autoComplete="off"
             enterKeyHint="search"
-            placeholder="City, state, or ZIP"
+            placeholder="Record, city, state, or ZIP"
             value={query}
             disabled={loading}
             aria-describedby={statusId}
-            onChange={(event) => setQuery(event.currentTarget.value)}
+            aria-controls={recommendations.length > 0 ? listboxId : undefined}
+            aria-expanded={recommendations.length > 0}
+            aria-autocomplete="list"
+            onChange={(event) => {
+              setQuery(event.currentTarget.value);
+              if (status.kind === 'error' || status.kind === 'ready') {
+                setStatus({ kind: 'idle' });
+              }
+            }}
           />
         </label>
         <Button type="submit" disabled={loading || query.trim().length === 0}>
           {loading ? 'Looking up…' : 'Go'}
         </Button>
       </form>
+
+      {recommendations.length > 0 ? (
+        <div className="ds-explore-place__recs">
+          <p className="ds-explore-place__label" id={`${listboxId}-label`}>
+            From the archive
+          </p>
+          <ul
+            id={listboxId}
+            className="ds-explore-place__rec-list"
+            role="listbox"
+            aria-labelledby={`${listboxId}-label`}
+          >
+            {recommendations.map((record) => (
+              <li key={record.entityId} role="option">
+                <button
+                  type="button"
+                  className="ds-explore-place__rec-btn"
+                  disabled={loading}
+                  onClick={() => pickRecord(record)}
+                >
+                  <span className="ds-explore-place__rec-name">{record.displayName}</span>
+                  <span className="ds-mono ds-explore-place__rec-kind">{record.kind}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <div className="ds-explore-place__radius" role="radiogroup" aria-labelledby={radiusGroupId}>
         <p className="ds-explore-place__label" id={radiusGroupId}>

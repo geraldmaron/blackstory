@@ -54,6 +54,14 @@ export {
   type LookupUsZipCentroid,
 } from './zip-centroid.js';
 
+export { parseCityStateInput, type ParsedCityState } from './city-normalize.js';
+
+export {
+  lookupUsCityCentroid,
+  type UsCityCentroid,
+  type LookupUsCityCentroid,
+} from './city-centroid.js';
+
 export {
   isInProductScopeStateFips,
   evaluateGeocodeProductScope,

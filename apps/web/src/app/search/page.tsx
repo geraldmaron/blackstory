@@ -128,8 +128,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               </Link>
             }
           >
-            Try a broader keyword, or set Kind / Status / Era back to “All”. The archive grows with
-            every release.
+            Try a broader keyword, or set Kind / Status / Era back to “All”. Below are records
+            already in this release of the archive.
           </EmptyState>
         ) : (
           <>
@@ -176,6 +176,35 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             ) : null}
           </>
         )}
+
+        {view.results.length === 0 && view.recommendations.length > 0 ? (
+          <section
+            className="ds-stack"
+            style={{ marginTop: 'var(--ds-space-8)' }}
+            aria-labelledby="search-recs-heading"
+          >
+            <p className="ds-sans ds-count-label" id="search-recs-heading">
+              From the archive
+            </p>
+            <ResultList
+              className="ds-index"
+              labelledBy="search-recs-heading"
+              LinkComponent={Link}
+              items={view.recommendations.map((rec) => ({
+                id: `rec-${rec.id}`,
+                href: `/entity/${rec.id}`,
+                title: rec.displayName,
+                summary: rec.summary ?? '',
+                meta: (
+                  <>
+                    <KindBadge kind={rec.kind} density="compact" />
+                    {rec.jurisdictionState ? <span>{rec.jurisdictionState}</span> : null}
+                  </>
+                ),
+              }))}
+            />
+          </section>
+        ) : null}
       </div>
     </main>
   );

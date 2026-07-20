@@ -38,14 +38,18 @@ export function normalizeAddressText(raw: string): string {
 
 /**
  * Expands common street-suffix abbreviations for the OUTGOING Census query (the geocoder
- * tolerates both forms, but a single canonical form maximizes cache-hit consistency). Word
- * boundaries only never touches letters inside a longer word.
+ * tolerates both forms, but a single canonical form maximizes cache-hit consistency).
+ *
+ * Only the trailing token of a house-number segment is expanded ("123 Main St" → street).
+ * Leading "St" in place names ("St Louis, MO") is left alone.
  */
 export function expandCommonAbbreviations(text: string): string {
-  return text.replace(/\b[A-Za-z]+\.?/g, (word) => {
-    const key = word.toLowerCase().replace(/\.$/, '');
-    const expansion = STREET_SUFFIX_EXPANSIONS[key];
-    return expansion ?? word;
+  return text.replace(/(^|,\s*)(\d{1,5}(?:\s+1\/[234])?\s+[^,]+)/g, (full, prefix: string, segment: string) => {
+    const expanded = segment.replace(/\b([A-Za-z]+)\.?\s*$/i, (word) => {
+      const key = word.toLowerCase().replace(/\.$/, '');
+      return STREET_SUFFIX_EXPANSIONS[key] ?? word;
+    });
+    return `${prefix}${expanded}`;
   });
 }
 

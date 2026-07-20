@@ -13,8 +13,8 @@ import { AtmospherePlane, selectAtmospherePlane } from '../../../components/atmo
 import { renderStoryTitle } from '../../../components/atmosphere/story-title';
 import type { PublicEntityView } from '../../../data/public-seed';
 import {
+  listPublicEntityViewsByIds,
   listPublicStoryViews,
-  resolvePublicEntityView,
   resolvePublicStoryView,
   type PublicStoryView,
 } from '../../../lib/public-data/source';
@@ -88,12 +88,8 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   const story = storyResult.data;
   if (!story) notFound();
 
-  const relatedEntityResults = await Promise.all(
-    story.relatedEntityIds.map((id) => resolvePublicEntityView(id)),
-  );
-  const relatedEntities = relatedEntityResults
-    .map((result) => result.data)
-    .filter((entity): entity is PublicEntityView => entity !== undefined);
+  // Thin batched point-get — never the entity-page 1-hop/2-hop learning graph.
+  const { data: relatedEntities } = await listPublicEntityViewsByIds(story.relatedEntityIds);
 
   const atmosphere = selectAtmospherePlane({
     seedKey: story.slug,

@@ -15,10 +15,12 @@ import {
   publicActiveReleaseSchema,
   publicEntityProjectionSchema,
   publicSearchIndexSchema,
+  publicStoryListItemSchema,
   publicStoryProjectionSchema,
   type PublicActiveReleaseDoc,
   type PublicEntityProjectionDoc,
   type PublicSearchIndexDoc as FirestorePublicSearchIndexDoc,
+  type PublicStoryListItemDoc,
   type PublicStoryProjectionDoc,
 } from '@repo/firebase';
 import { shouldUseLivePublicProjections } from './live-policy';
@@ -26,6 +28,18 @@ import { shouldUseLivePublicProjections } from './live-policy';
 export { shouldUseLivePublicProjections };
 
 const SEARCH_INDEX_PAGE_SIZE = 400;
+
+/** Fields needed for `/stories` index cards — excludes body prose and related ids. */
+const STORY_LIST_SELECT_FIELDS = [
+  'id',
+  'releaseId',
+  'slug',
+  'title',
+  'dek',
+  'publishedAt',
+  'eraLabel',
+  'placeLabel',
+] as const;
 
 export async function fetchActiveRelease(): Promise<PublicActiveReleaseDoc | undefined> {
   const snap = await getServerFirestore().doc(firestorePaths.publicActiveRelease()).get();
@@ -142,6 +156,11 @@ export function parseStoryProjection(data: unknown): PublicStoryProjectionDoc | 
   return parsed.success ? parsed.data : undefined;
 }
 
+export function parseStoryListItem(data: unknown): PublicStoryListItemDoc | undefined {
+  const parsed = publicStoryListItemSchema.safeParse(data);
+  return parsed.success ? parsed.data : undefined;
+}
+
 export async function fetchPublicStoryProjection(
   releaseId: string,
   slug: string,
@@ -151,7 +170,7 @@ export async function fetchPublicStoryProjection(
   return parseStoryProjection(snap.data());
 }
 
-/** Unbounded collection get for a release's longform stories (Admin SDK). */
+/** Unbounded collection get for a release's longform stories (Admin SDK). Full docs. */
 export async function listPublicStoryProjections(
   releaseId: string,
 ): Promise<readonly PublicStoryProjectionDoc[]> {
@@ -164,9 +183,46 @@ export async function listPublicStoryProjections(
   return stories;
 }
 
+/**
+ * Field-masked story list for `/stories` index cards. Omits `body` and `relatedEntityIds`
+ * so list TTFB and caches stay small relative to full article docs.
+ */
+export async function listPublicStorySummaries(
+  releaseId: string,
+): Promise<readonly PublicStoryListItemDoc[]> {
+  const query = await getServerFirestore()
+    .collection(`publicReleases/${releaseId}/stories`)
+    .select(...STORY_LIST_SELECT_FIELDS)
+    .get();
+  const stories: PublicStoryListItemDoc[] = [];
+  for (const doc of query.docs) {
+    const parsed = parseStoryListItem(doc.data());
+    if (parsed) stories.push(parsed);
+  }
+  return stories;
+}
+
+/** Map a full story projection to the list-card shape (seed / offline path). */
+export function toStoryListItem(story: PublicStoryProjectionDoc): PublicStoryListItemDoc {
+  return {
+    id: story.id,
+    releaseId: story.releaseId,
+    slug: story.slug,
+    title: story.title,
+    dek: story.dek,
+    publishedAt: story.publishedAt,
+    eraLabel: story.eraLabel,
+    placeLabel: story.placeLabel,
+  };
+}
+
 /** Offline / seed-mode story list: same corpus written into Firestore fixtures. */
 export function listSnapshotStoryProjections(): readonly PublicStoryProjectionDoc[] {
   return listSeedStoryProjections();
+}
+
+export function listSnapshotStoryListItems(): readonly PublicStoryListItemDoc[] {
+  return listSeedStoryProjections().map(toStoryListItem);
 }
 
 export function getSnapshotStoryProjection(slug: string): PublicStoryProjectionDoc | undefined {

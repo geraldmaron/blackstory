@@ -1,11 +1,12 @@
 /**
  * Stories index: longform history narratives pinned to place and evidence.
  *
- * Loads from the public release story projection (Firestore / Firebase seed),
- * the same path as other public catalog data. No in-app story body corpus.
+ * Loads thin list items from the public release story projection (field-masked
+ * Firestore / Firebase seed) — title, dek, era, and place only. Full bodies
+ * load on the article page.
  */
 import Link from 'next/link';
-import { listPublicStoryViews } from '../../lib/public-data/source';
+import { listPublicStoryListItems } from '../../lib/public-data/source';
 
 export const metadata = {
   title: 'Stories',
@@ -14,7 +15,7 @@ export const metadata = {
 };
 
 export default async function StoriesIndexPage() {
-  const { data: stories } = await listPublicStoryViews();
+  const { data: stories } = await listPublicStoryListItems();
 
   return (
     <main className="ds-container ds-page" id="main">

@@ -435,6 +435,59 @@
   color: var(--ds-ink-muted);
 }
 
+.ds-explore-place__recs {
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-explore-place__rec-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1px;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  overflow: hidden;
+  background: var(--ds-border);
+}
+
+.ds-explore-place__rec-btn {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+  width: 100%;
+  min-height: 2.75rem;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border: 0;
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--ds-font-ui);
+  font-size: 0.875rem;
+}
+
+.ds-explore-place__rec-btn:hover,
+.ds-explore-place__rec-btn:focus-visible {
+  background: var(--ds-canvas);
+  outline: 2px solid var(--ds-accent);
+  outline-offset: -2px;
+}
+
+.ds-explore-place__rec-name {
+  min-width: 0;
+}
+
+.ds-explore-place__rec-kind {
+  flex-shrink: 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
 .ds-explore-place-focus {
   display: grid;
   gap: var(--ds-space-2);

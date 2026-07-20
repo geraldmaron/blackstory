@@ -12,8 +12,10 @@ import {
   fetchCensusAddressGeocode,
   fetchCensusCoordinatesGeocode,
   geoPrecisionTierForMatch,
+  lookupUsCityCentroid,
   lookupUsZipCentroid,
   normalizeUsZipInput,
+  parseCityStateInput,
   reduceGeocodeCoordinatePrecision,
   resolveJurisdictionIdsFromMatch,
   type CensusGeocodeMatch,
@@ -73,11 +75,18 @@ function normalizeAddressText(raw: string): string {
     .trim();
 }
 
+/** Only expand street suffixes on house-number segments — leave "St Louis" alone. */
 function expandCommonAbbreviations(text: string): string {
-  return text.replace(/\b[A-Za-z]+\.?/g, (word) => {
-    const key = word.toLowerCase().replace(/\.$/, '');
-    return STREET_SUFFIX_EXPANSIONS[key] ?? word;
-  });
+  return text.replace(
+    /(^|,\s*)(\d{1,5}(?:\s+1\/[234])?\s+[^,]+)/g,
+    (_full, prefix: string, segment: string) => {
+      const expanded = segment.replace(/\b([A-Za-z]+)\.?\s*$/i, (word) => {
+        const key = word.toLowerCase().replace(/\.$/, '');
+        return STREET_SUFFIX_EXPANSIONS[key] ?? word;
+      });
+      return `${prefix}${expanded}`;
+    },
+  );
 }
 
 function normalizeAddressInput(raw: string): {
@@ -164,6 +173,8 @@ export type GeocodeAddressOptions = {
   readonly cache: LocateCache;
   readonly now?: () => number;
   readonly fetchAddressGeocode?: typeof fetchCensusAddressGeocode;
+  /** Used for city/state locality fallback when street geocode returns empty. */
+  readonly fetchCoordinatesGeocode?: typeof fetchCensusCoordinatesGeocode;
   /**
    * Opt in to keep lat/lng on the resolution for a single map-camera response
    * (`/locate/api?camera=1`). Cached under a distinct key so ordinary locate lookups never
@@ -171,6 +182,60 @@ export type GeocodeAddressOptions = {
    */
   readonly retainExactCoordinates?: boolean;
 };
+
+async function resolveViaCityCentroid(options: {
+  readonly queryText: string;
+  readonly cache: LocateCache;
+  readonly cacheKey: string;
+  readonly nowMs: number;
+  readonly retainExactCoordinates: boolean;
+  readonly fetchCoordinatesGeocode?: typeof fetchCensusCoordinatesGeocode;
+}): Promise<GeocodeOutcome | undefined> {
+  const parsed = parseCityStateInput(options.queryText);
+  if (!parsed) return undefined;
+
+  const centroid = lookupUsCityCentroid(parsed.city, parsed.stateAbbrev);
+  if (!centroid) return undefined;
+
+  const fetcher = options.fetchCoordinatesGeocode ?? fetchCensusCoordinatesGeocode;
+  let match: CensusGeocodeMatch;
+  try {
+    match = await fetcher({
+      lat: centroid.lat,
+      lng: centroid.lng,
+      client: safeHttpClient,
+    });
+  } catch {
+    return { ok: false, fallback: buildManualPlaceSearchFallback('geocoder_unavailable') };
+  }
+
+  const scope = evaluateGeocodeProductScope(match);
+  if (!scope.inScope) {
+    return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
+  }
+
+  const base = toResolution(match, false);
+  const placeName = base.match.placeName ?? centroid.city;
+  const resolution: GeocodeResolution = {
+    ...base,
+    match: {
+      ...base.match,
+      ...(placeName ? { placeName } : {}),
+    },
+    ...(options.retainExactCoordinates
+      ? {
+          precision: {
+            tier: 'locality',
+            exactCoordinatesRetained: true,
+            lat: centroid.lat,
+            lng: centroid.lng,
+          },
+        }
+      : {}),
+  };
+  options.cache.set(options.cacheKey, resolution, options.nowMs);
+  return { ok: true, resolution, cacheHit: false };
+}
 
 /** Forward geocode: free-text address, city/state, or ZIP -> jurisdiction ids, or a manual-search fallback.  */
 export async function geocodeAddress(options: GeocodeAddressOptions): Promise<GeocodeOutcome> {
@@ -200,6 +265,17 @@ export async function geocodeAddress(options: GeocodeAddressOptions): Promise<Ge
   }
   const best = matches[0];
   if (!best) {
+    const cityFallback = await resolveViaCityCentroid({
+      queryText,
+      cache: options.cache,
+      cacheKey,
+      nowMs,
+      retainExactCoordinates,
+      ...(options.fetchCoordinatesGeocode
+        ? { fetchCoordinatesGeocode: options.fetchCoordinatesGeocode }
+        : {}),
+    });
+    if (cityFallback) return cityFallback;
     return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
   }
 
