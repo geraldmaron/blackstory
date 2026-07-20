@@ -1,0 +1,3400 @@
+{
+  "count": 563,
+  "year_span": [
+    1831,
+    2020
+  ],
+  "primary_sources": [
+    "Equal Justice Initiative (EJI) — National Memorial for Peace and Justice / Lynching in America research (aggregate documentation; individual names cross-checked via secondary lists)",
+    "Southern Poverty Law Center — Civil Rights Memorial martyrs (Black victims only) and “The Forgotten” display list",
+    "NAACP historical investigations and anti-lynching campaign documentation (e.g., Mary Turner, Emmett Till, Claude Neal, Harry & Harriette Moore)",
+    "Wikipedia “List of lynching victims in the United States” — rows explicitly marked African American / Black / Biracial (African American), with unnamed victims omitted",
+    "Veterans of the Civil Rights Movement (crmvet.org) — “41 Lives for Freedom” Civil Rights Memorial roster"
+  ],
+  "notes": [
+    "Accuracy-first: unnamed victims omitted; white Civil Rights Memorial martyrs omitted; Clarence Cloninger omitted (insufficient public confirmation in source text for this use).",
+    "Nat Turner included only as judicial execution after the 1831 rebellion — not as a lynching victim.",
+    "EJI documents thousands of racial terror lynchings (names on county monuments); this file is a verified named subset suitable for a memorial collage, not the complete EJI inventory.",
+    "Context phrases are brief memorial labels, not full case narratives."
+  ],
+  "victims": [
+    {
+      "name": "Nat Turner",
+      "year": 1831,
+      "place": "Jerusalem, Virginia",
+      "context": "executed after rebellion"
+    },
+    {
+      "name": "Francis McIntosh",
+      "year": 1836,
+      "place": "St. Louis, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Tucker",
+      "year": 1845,
+      "place": "Indianapolis, Indiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Anthony",
+      "year": 1854,
+      "place": "Denton, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "David Thomas",
+      "year": 1854,
+      "place": "Denton, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Bill Saul Thompson",
+      "year": 1858,
+      "place": "Greensburg, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Sloan Despano",
+      "year": 1858,
+      "place": "Greensburg, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Adam",
+      "year": 1859,
+      "place": "Tampa, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Hollman",
+      "year": 1859,
+      "place": "Marshall, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jim",
+      "year": 1859,
+      "place": "Marshall, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John",
+      "year": 1859,
+      "place": "Marshall, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Marshall Clarke",
+      "year": 1861,
+      "place": "Milwaukee, Wisconsin",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jacob Hamilton",
+      "year": 1861,
+      "place": "Smyrna, Delaware",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jim Wilson",
+      "year": 1862,
+      "place": "Oakland, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Joshua Boyd",
+      "year": 1863,
+      "place": "Detroit, Michigan",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jerry Atkins",
+      "year": 1865,
+      "place": "Union County, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Pompey O'Bannon",
+      "year": 1866,
+      "place": "Wilkinson County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William \"Obie\" Evans",
+      "year": 1867,
+      "place": "Leipsic, Delaware",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Gilbert Quinn",
+      "year": 1868,
+      "place": "Coffeeville, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Isaac Moore",
+      "year": 1868,
+      "place": "Bel Air, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Lawrence Bowman",
+      "year": 1868,
+      "place": "Franklin, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Tom McLain",
+      "year": 1868,
+      "place": "Coffeeville, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jim Quinn",
+      "year": 1869,
+      "place": "Jarrettsville, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Wyatt Outlaw",
+      "year": 1870,
+      "place": "Graham, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Charles Davis",
+      "year": 1871,
+      "place": "Charlestown, Indiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "David Weston",
+      "year": 1871,
+      "place": "Union Mills, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Johnson",
+      "year": 1871,
+      "place": "Charlestown, Indiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jim Williams",
+      "year": 1871,
+      "place": "York County, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Silas Weston",
+      "year": 1871,
+      "place": "Union Mills, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Squire Taylor",
+      "year": 1871,
+      "place": "Charlestown, Indiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Theodosia Weston",
+      "year": 1871,
+      "place": "Union Mills, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Charles Howard Nelson",
+      "year": 1874,
+      "place": "Des Moines, Iowa",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Eli",
+      "year": 1874,
+      "place": "Alachua County, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Mollie French",
+      "year": 1874,
+      "place": "Des Moines, Iowa",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Arthur W. St. Clair",
+      "year": 1877,
+      "place": "Hernando County, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Simeon Garnet",
+      "year": 1877,
+      "place": "Oxford, Ohio",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Michael Green",
+      "year": 1878,
+      "place": "Upper Marlboro, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Albert Easley",
+      "year": 1879,
+      "place": "Jacksonville, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Johnson Spencer",
+      "year": 1879,
+      "place": "Jacksonville, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Washington Peck",
+      "year": 1880,
+      "place": "Poolesville, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Diggs-Dorsey",
+      "year": 1880,
+      "place": "Rockville, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Christopher Davis",
+      "year": 1881,
+      "place": "Athens, Ohio",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Three Men",
+      "year": 1881,
+      "place": "Sevier County, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Charles Thurber",
+      "year": 1882,
+      "place": "Grand Forks, Dakota",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William \"Sam Joe\" Harvey",
+      "year": 1883,
+      "place": "Salt Lake City, Utah",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Huie Conorly",
+      "year": 1884,
+      "place": "Bogalusa, Louisiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Richard May",
+      "year": 1884,
+      "place": "Owensboro, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Harriet Finch",
+      "year": 1885,
+      "place": "Chatham County, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jerry Finch",
+      "year": 1885,
+      "place": "Chatham County, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Pattishall",
+      "year": 1885,
+      "place": "Chatham County, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Lee Tyson",
+      "year": 1885,
+      "place": "Chatham County, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Charles Whitley",
+      "year": 1886,
+      "place": "Prince Frederick, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Eliza Woods",
+      "year": 1886,
+      "place": "Jackson, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Peter Betters",
+      "year": 1887,
+      "place": "Greene County, Ohio",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Amos Miller",
+      "year": 1888,
+      "place": "Franklin, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Meadows",
+      "year": 1889,
+      "place": "N/A, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Harrison Johnson",
+      "year": 1889,
+      "place": "Barnwell vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Hugh Furz",
+      "year": 1889,
+      "place": "Barnwell vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Judge Jones",
+      "year": 1889,
+      "place": "Barnwell vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Keith Bowen",
+      "year": 1889,
+      "place": "Aberdeen, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Mitchell Adams",
+      "year": 1889,
+      "place": "Barnwell vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Orion Anderson",
+      "year": 1889,
+      "place": "Leesburg, Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Peter Bell",
+      "year": 1889,
+      "place": "Barnwell vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ralph Morral",
+      "year": 1889,
+      "place": "Barnwell vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ripley Johnson",
+      "year": 1889,
+      "place": "Barnwell vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Phoenix",
+      "year": 1889,
+      "place": "Barnwell vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Calvin McDowell",
+      "year": 1891,
+      "place": "Edgefield, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Dick Lundy",
+      "year": 1891,
+      "place": "Edgefield, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George(AKA Joe Coe) Smith",
+      "year": 1891,
+      "place": "Omaha, Nebraska",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jim Taylor",
+      "year": 1891,
+      "place": "Franklin, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Lewis Hodges",
+      "year": 1891,
+      "place": "Louisville, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Tony Champion",
+      "year": 1891,
+      "place": "Gainesville, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Will Stewart",
+      "year": 1891,
+      "place": "Edgefield, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Bob Addison",
+      "year": 1892,
+      "place": "Nashville, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Calvin McDowell",
+      "year": 1892,
+      "place": "Memphis, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Charles Ruggles",
+      "year": 1892,
+      "place": "Redding, California",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Gus Roberson",
+      "year": 1892,
+      "place": "Nashville, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Grizzard",
+      "year": 1892,
+      "place": "Nashville, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Stewart",
+      "year": 1892,
+      "place": "Memphis, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Ruggles",
+      "year": 1892,
+      "place": "Redding, California",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Julian Mosley",
+      "year": 1892,
+      "place": "Halley, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Donnelly",
+      "year": 1892,
+      "place": "Marianna, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Lewis",
+      "year": 1892,
+      "place": "Port Jervis, New York",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Thomas Moss",
+      "year": 1892,
+      "place": "Memphis, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Henson Hilliard",
+      "year": 1895,
+      "place": "Tyler, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Alfred Daniels",
+      "year": 1896,
+      "place": "Gainesville, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Sidney Randolph",
+      "year": 1896,
+      "place": "Gaithersburg, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Frazier B. Baker",
+      "year": 1898,
+      "place": "Lake City, South Carolina",
+      "context": "racial terror murder"
+    },
+    {
+      "name": "John Henry James",
+      "year": 1898,
+      "place": "Charlottesville, Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Julia Baker",
+      "year": 1898,
+      "place": "Lake City, South Carolina",
+      "context": "racial terror murder"
+    },
+    {
+      "name": "Frank Embree",
+      "year": 1899,
+      "place": "Fayette, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Sam Hose",
+      "year": 1899,
+      "place": "Newnan, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Anderson Gause",
+      "year": 1900,
+      "place": "Henning, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Avery Mills",
+      "year": 1900,
+      "place": "Forest City, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Bud Rowland",
+      "year": 1900,
+      "place": "Rockport, Indiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Dago Pete",
+      "year": 1900,
+      "place": "Tutwiler, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jim Henderson",
+      "year": 1900,
+      "place": "Rockport, Indiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Preston Porter",
+      "year": 1900,
+      "place": "Limon, Colorado",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Thomas Clayton",
+      "year": 1900,
+      "place": "Hernando, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Walter Cotton",
+      "year": 1900,
+      "place": "Emporia, Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Lee",
+      "year": 1900,
+      "place": "Hinton, West Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ballie Crutchfield",
+      "year": 1901,
+      "place": "Rome, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ed Dodson",
+      "year": 1901,
+      "place": "Quitman County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Felton Brigman",
+      "year": 1901,
+      "place": "Louisiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Fred Alexander",
+      "year": 1901,
+      "place": "Leavenworth, Kansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Fred Rochelle",
+      "year": 1901,
+      "place": "Bartow, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "French Godley",
+      "year": 1901,
+      "place": "Pierce, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Carter",
+      "year": 1901,
+      "place": "Paris, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Ward",
+      "year": 1901,
+      "place": "Terre Haute, Indiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Peter Berryman",
+      "year": 1901,
+      "place": "Mena, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Peter Hampton",
+      "year": 1901,
+      "place": "Pierce, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Silas Estes",
+      "year": 1901,
+      "place": "Hodgenville, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Godley",
+      "year": 1901,
+      "place": "Pierce, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Alonzo Tucker",
+      "year": 1902,
+      "place": "Marshfield, Oregon",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Charles Craven",
+      "year": 1902,
+      "place": "Leesburg, Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Curtis And Burley, Garfield Brown",
+      "year": 1902,
+      "place": "Newbern, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Harrison Gillespie",
+      "year": 1902,
+      "place": "Salisbury, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James Carter",
+      "year": 1902,
+      "place": "Amherst, Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James Dillard",
+      "year": 1902,
+      "place": "Sullivan, Indiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James Gillespie",
+      "year": 1902,
+      "place": "Salisbury, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Manny Price",
+      "year": 1902,
+      "place": "Newberry, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Scruggs",
+      "year": 1902,
+      "place": "Newberry, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "David Wyatt",
+      "year": 1903,
+      "place": "Brooklyn, Illinois",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George White",
+      "year": 1903,
+      "place": "Wilmington, Delaware",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Hellom",
+      "year": 1903,
+      "place": "Mississippi County, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "J. D. Mayfield",
+      "year": 1903,
+      "place": "Danville, Illinois",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jennie Steers",
+      "year": 1903,
+      "place": "rural area near Shreveport, Louisiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Fambro",
+      "year": 1903,
+      "place": "Griffin, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Johnson",
+      "year": 1903,
+      "place": "Thebes, Illinois",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "\"General\" Lee",
+      "year": 1904,
+      "place": "Reevesville, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Horace Maples",
+      "year": 1904,
+      "place": "Huntsville, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jumbo Clark",
+      "year": 1904,
+      "place": "High Springs, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Luther Holbert",
+      "year": 1904,
+      "place": "Doddsville, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Marie Thompson",
+      "year": 1904,
+      "place": "Lebanon Junction, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Paul Reed",
+      "year": 1904,
+      "place": "Statesboro, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Richard Dickerson",
+      "year": 1904,
+      "place": "Springfield, Ohio",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Unnamed Female",
+      "year": 1904,
+      "place": "Doddsville, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Will Cato",
+      "year": 1904,
+      "place": "Statesboro, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Augustus Goodman",
+      "year": 1905,
+      "place": "Bainbridge, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jim Green",
+      "year": 1905,
+      "place": "Boyle, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "\"Jack\" Dillingham",
+      "year": 1906,
+      "place": "Salisbury, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Anthony Davis",
+      "year": 1906,
+      "place": "Texarkana, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Bunk Richardson",
+      "year": 1906,
+      "place": "Gadsden, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Dick And Thompson Robinson",
+      "year": 1906,
+      "place": "Pritchard, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ed Johnson",
+      "year": 1906,
+      "place": "Chattanooga, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Fred Coker",
+      "year": 1906,
+      "place": "Springfield, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Irwin",
+      "year": 1906,
+      "place": "Salisbury, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Davis",
+      "year": 1906,
+      "place": "Annapolis, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Lee",
+      "year": 1906,
+      "place": "Salisbury, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Horace B. Duncan",
+      "year": 1906,
+      "place": "Springfield, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Gillepsie",
+      "year": 1906,
+      "place": "Salisbury, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Nease Gillepsie",
+      "year": 1906,
+      "place": "Salisbury, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Slab Pitts",
+      "year": 1906,
+      "place": "Toyah, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Allen",
+      "year": 1906,
+      "place": "Springfield, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Burns",
+      "year": 1907,
+      "place": "Cumberland, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Charley Scott",
+      "year": 1908,
+      "place": "Conroe, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Cleveland Williams",
+      "year": 1908,
+      "place": "Hemphill, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "David,his Wife Andfour Children Walker",
+      "year": 1908,
+      "place": "Hickman, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Earnest Williams",
+      "year": 1908,
+      "place": "Parkdale, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Eli Pigot",
+      "year": 1908,
+      "place": "Brookhaven, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Frank Williams",
+      "year": 1908,
+      "place": "Hemphill, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jerry Evans",
+      "year": 1908,
+      "place": "Hemphill, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Joseph Riley",
+      "year": 1908,
+      "place": "Russellville, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Lawson \"Nelse\" Patton",
+      "year": 1908,
+      "place": "Oxford, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Leander Shaw",
+      "year": 1908,
+      "place": "Pensacola, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Moss Spellman",
+      "year": 1908,
+      "place": "Hemphill, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Jones",
+      "year": 1908,
+      "place": "Russellville, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ted Smith",
+      "year": 1908,
+      "place": "Greenville, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Thomas Jones",
+      "year": 1908,
+      "place": "Russellville, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Virgil Jones",
+      "year": 1908,
+      "place": "Russellville, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Will Johnson",
+      "year": 1908,
+      "place": "Hemphill, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Will Manuel",
+      "year": 1908,
+      "place": "Hemphill, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Miller",
+      "year": 1908,
+      "place": "Brighton, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Hilliard",
+      "year": 1909,
+      "place": "Hope, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William James",
+      "year": 1909,
+      "place": "Cairo, Illinois",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Allen Brooks",
+      "year": 1910,
+      "place": "Dallas, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Grant Richardson",
+      "year": 1910,
+      "place": "Centreville, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Gentry",
+      "year": 1910,
+      "place": "Belton, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ben Pettigrew",
+      "year": 1911,
+      "place": "Decaturville, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Commodore Jones",
+      "year": 1911,
+      "place": "Farmersville, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ernest Harrison",
+      "year": 1911,
+      "place": "Wickliffe, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Eugene Marshall",
+      "year": 1911,
+      "place": "Shelbyville, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Frank Howard",
+      "year": 1911,
+      "place": "Wickliffe, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Fred Petttigrew",
+      "year": 1911,
+      "place": "Decaturville, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James West",
+      "year": 1911,
+      "place": "Shelbyville, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Lee",
+      "year": 1911,
+      "place": "Durant, Oklahoma",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "King Johnson",
+      "year": 1911,
+      "place": "Brooklyn, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "L.D. Nelson",
+      "year": 1911,
+      "place": "Okemah, Oklahoma",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Laura Nelson",
+      "year": 1911,
+      "place": "Okemah, Oklahoma",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Pearl Pettigrew",
+      "year": 1911,
+      "place": "Decaturville, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Sam Reed",
+      "year": 1911,
+      "place": "Wickliffe, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Wade Patterson",
+      "year": 1911,
+      "place": "Shelbyville, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Will Porter",
+      "year": 1911,
+      "place": "Livermore, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Bradford",
+      "year": 1911,
+      "place": "Chunky, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Zachariah Walker",
+      "year": 1911,
+      "place": "Coatesville, Pennsylvania",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Dan Davis",
+      "year": 1912,
+      "place": "Tyler, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Rob Edwards",
+      "year": 1912,
+      "place": "Cumming, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Sanford Lewis",
+      "year": 1912,
+      "place": "Fort Smith, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Walter Johnson",
+      "year": 1912,
+      "place": "Princeton, West Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Andrew Williams",
+      "year": 1913,
+      "place": "Houston, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Bennie/Dennis Simmons",
+      "year": 1913,
+      "place": "Anadarko, Oklahoma",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Divel Rucker",
+      "year": 1913,
+      "place": "Houston, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry White",
+      "year": 1913,
+      "place": "Campville, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "J.C. Collins",
+      "year": 1913,
+      "place": "Mondak, Montana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Joe Green",
+      "year": 1913,
+      "place": "Heath, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Joseph Richardson",
+      "year": 1913,
+      "place": "Leitchfield, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Allen Turner",
+      "year": 1914,
+      "place": "Union Parish, Louisiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Dallas Shields",
+      "year": 1914,
+      "place": "Fayette, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Fred Sullivan",
+      "year": 1914,
+      "place": "Byhalia, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jane Sullivan",
+      "year": 1914,
+      "place": "Byhalia, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Alonzo Green",
+      "year": 1915,
+      "place": "Jones County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Caesar Sheffield",
+      "year": 1915,
+      "place": "Lake Park, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Cordella Stevenson",
+      "year": 1915,
+      "place": "Columbus, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James D. Green",
+      "year": 1915,
+      "place": "Jones County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Unidentified Man",
+      "year": 1915,
+      "place": "Cedarbluff, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Will Stanley",
+      "year": 1915,
+      "place": "Temple, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Bostick",
+      "year": 1915,
+      "place": "Jones County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Andrew McHenry",
+      "year": 1916,
+      "place": "Newberry, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Anthony Crawford",
+      "year": 1916,
+      "place": "Abbeville, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Bert Dennis",
+      "year": 1916,
+      "place": "Newberry, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Dewey Lake",
+      "year": 1916,
+      "place": "Lee and Worth County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ed Lang",
+      "year": 1916,
+      "place": "Rice, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Felix Lake",
+      "year": 1916,
+      "place": "Lee and Worth County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Frank Lake",
+      "year": 1916,
+      "place": "Lee and Worth County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James Dennis",
+      "year": 1916,
+      "place": "Newberry, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jeff Brown",
+      "year": 1916,
+      "place": "Cedarbluff, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jesse Washington",
+      "year": 1916,
+      "place": "Waco, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Richards",
+      "year": 1916,
+      "place": "Goldsboro, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Joseph Black",
+      "year": 1916,
+      "place": "Greene County, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Major Lake",
+      "year": 1916,
+      "place": "Lee and Worth County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Mary Dennis",
+      "year": 1916,
+      "place": "Newberry, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Rev. Josh J. Baskins",
+      "year": 1916,
+      "place": "Newberry, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Semore, Bodius (other Spellings: Semore, Rodius; Leamon, Rodium)",
+      "year": 1916,
+      "place": "Lee and Worth County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Silas Hoskins",
+      "year": 1916,
+      "place": "Elaine, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Stella Young",
+      "year": 1916,
+      "place": "Newberry, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ell Persons",
+      "year": 1917,
+      "place": "Memphis, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Lation Scott",
+      "year": 1917,
+      "place": "Dyer, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Allie Thompson",
+      "year": 1918,
+      "place": "Culpeper, Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Alma Howze",
+      "year": 1918,
+      "place": "Shubuta, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Andrew Clark",
+      "year": 1918,
+      "place": "Shubuta, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Edward Woodson",
+      "year": 1918,
+      "place": "Green River, Wyoming",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Taylor",
+      "year": 1918,
+      "place": "Rolesville, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Hayes Turner",
+      "year": 1918,
+      "place": "Brooks County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jim McIlherron",
+      "year": 1918,
+      "place": "Estill Springs, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Maggie Howze",
+      "year": 1918,
+      "place": "Shubuta, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Major Clark",
+      "year": 1918,
+      "place": "Shubuta, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Mary Turner",
+      "year": 1918,
+      "place": "Lowndes County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Allie/Halley Richardson",
+      "year": 1919,
+      "place": "Moberly, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Benny Richards",
+      "year": 1919,
+      "place": "Warrenton, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Berry Washington",
+      "year": 1919,
+      "place": "Milan, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Bob Ashley",
+      "year": 1919,
+      "place": "Dublin, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Chilton Jennings",
+      "year": 1919,
+      "place": "Gilmer, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Daniel Mack",
+      "year": 1919,
+      "place": "Worth County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Elisha Harper",
+      "year": 1919,
+      "place": "Newberry, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Eugene Hamilton",
+      "year": 1919,
+      "place": "Jasper County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Eugene Williams",
+      "year": 1919,
+      "place": "Chicago, Illinois",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Frank Livingston",
+      "year": 1919,
+      "place": "El Dorado, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Adams",
+      "year": 1919,
+      "place": "Moberly, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Holden",
+      "year": 1919,
+      "place": "Monroe, Louisiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Prince",
+      "year": 1919,
+      "place": "Hawkinsville, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Ruffin",
+      "year": 1919,
+      "place": "Perkins, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James Anderson",
+      "year": 1919,
+      "place": "Moberly, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jim Waters",
+      "year": 1919,
+      "place": "Johnson County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Hartfield",
+      "year": 1919,
+      "place": "Ellisville, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Ruffin",
+      "year": 1919,
+      "place": "Perkins, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jordan Jameson",
+      "year": 1919,
+      "place": "Magnolia, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Lemuel Walters",
+      "year": 1919,
+      "place": "Longview, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Lloyd Clay",
+      "year": 1919,
+      "place": "Vicksburg, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Miles(or Relius) Phifer",
+      "year": 1919,
+      "place": "Montgomery, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Obe Cox",
+      "year": 1919,
+      "place": "Oglethorpe County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Paul Jones",
+      "year": 1919,
+      "place": "Macon, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Crosky",
+      "year": 1919,
+      "place": "Montgomery, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Robinson",
+      "year": 1919,
+      "place": "Chicago, Illinois",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Sam Mosely",
+      "year": 1919,
+      "place": "Lake City, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Samuel Gorman",
+      "year": 1919,
+      "place": "Darby, Pennsylvania",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Sanford Taylor",
+      "year": 1919,
+      "place": "Moberly, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Scott Clark",
+      "year": 1919,
+      "place": "East St. Louis, Illinois",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Wilbur Little",
+      "year": 1919,
+      "place": "Blakely, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Will Brown",
+      "year": 1919,
+      "place": "Omaha, Nebraska",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Will Moore",
+      "year": 1919,
+      "place": "Ten Mile, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Willie Temple",
+      "year": 1919,
+      "place": "Montgomery, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Willie Wilkins",
+      "year": 1919,
+      "place": "Perkins, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Coleman Brown",
+      "year": 1920,
+      "place": "Purvis, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Dave Hurst",
+      "year": 1920,
+      "place": "Kent Junction, Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Edward \"Red\" Roach",
+      "year": 1920,
+      "place": "Roxboro, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Elias Clayton",
+      "year": 1920,
+      "place": "Duluth, Minnesota",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Elmer Jackson",
+      "year": 1920,
+      "place": "Duluth, Minnesota",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Scott",
+      "year": 1920,
+      "place": "Bartow, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Herman Arthur",
+      "year": 1920,
+      "place": "Paris, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Irving Arthur",
+      "year": 1920,
+      "place": "Paris, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Isaac McGhie",
+      "year": 1920,
+      "place": "Duluth, Minnesota",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Julius \"July\" Perry",
+      "year": 1920,
+      "place": "Ocoee, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Lige Daniels",
+      "year": 1920,
+      "place": "Center, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Phillip Gathers",
+      "year": 1920,
+      "place": "Effingham County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Wade Thomas",
+      "year": 1920,
+      "place": "Jonesboro, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Brownie Tuggles",
+      "year": 1921,
+      "place": "Hope, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Eugene Daniel",
+      "year": 1921,
+      "place": "Pittsboro, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Fred Rouse",
+      "year": 1921,
+      "place": "Fort Worth, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Cade",
+      "year": 1921,
+      "place": "Sour Lake, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Lowry",
+      "year": 1921,
+      "place": "Nodena, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jesse Eley",
+      "year": 1921,
+      "place": "Murfreesboro, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Turner",
+      "year": 1921,
+      "place": "Helena, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Alex Smith",
+      "year": 1922,
+      "place": "Gulfport, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Alfred Williams",
+      "year": 1922,
+      "place": "Harlem, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Bayner Blackwell",
+      "year": 1922,
+      "place": "Swansboro, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Bill McAllister",
+      "year": 1922,
+      "place": "the border of Williamsburg and Florence Counties, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Charles Atkins",
+      "year": 1922,
+      "place": "Davisboro, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Charles Strong",
+      "year": 1922,
+      "place": "Mayo, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Cupid(also Found As Cubrit Dixon) Dickson",
+      "year": 1922,
+      "place": "Madison, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Early, Thomas (aka Thomas Early, Jim Earlie)",
+      "year": 1922,
+      "place": "Plantersville, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Gay",
+      "year": 1922,
+      "place": "Streetman, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Tompkins",
+      "year": 1922,
+      "place": "Indianapolis, Indiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Gilbert Harris",
+      "year": 1922,
+      "place": "Hot Springs, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Gilbert Wilson",
+      "year": 1922,
+      "place": "Bryan, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Grover C. Everett",
+      "year": 1922,
+      "place": "Abilene, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Hullen Owens",
+      "year": 1922,
+      "place": "Texarkana, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jake Brooks",
+      "year": 1922,
+      "place": "Oklahoma City, Oklahoma",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James Harvey",
+      "year": 1922,
+      "place": "Lanes Bridge, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jerry Ingram",
+      "year": 1922,
+      "place": "Crawford, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jesse Thomas",
+      "year": 1922,
+      "place": "Waco, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jim Johnston",
+      "year": 1922,
+      "place": "Wrightsville, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jim Reed Long",
+      "year": 1922,
+      "place": "Winder, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Joe Jordan",
+      "year": 1922,
+      "place": "Lanes Bridge, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Joe Pemberton",
+      "year": 1922,
+      "place": "Benton, Louisiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Joe Winters",
+      "year": 1922,
+      "place": "Conroe, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John (or Harry Harrison) Harrison",
+      "year": 1922,
+      "place": "Malvern, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Brown",
+      "year": 1922,
+      "place": "Montgomery, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Glover",
+      "year": 1922,
+      "place": "Holton, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Steelman",
+      "year": 1922,
+      "place": "Lambert, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John West",
+      "year": 1922,
+      "place": "Guernsey, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Johnny (or H. Varney) Cornish",
+      "year": 1922,
+      "place": "Kirvin, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Less Smith",
+      "year": 1922,
+      "place": "Morrilton, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "McKinley Curry",
+      "year": 1922,
+      "place": "Kirvin, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Mose Bozier",
+      "year": 1922,
+      "place": "Alleyton, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Mose Jones",
+      "year": 1922,
+      "place": "Kirvin, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "O.J. Johnson",
+      "year": 1922,
+      "place": "Newton, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Oscar Mack",
+      "year": 1922,
+      "place": "Lake Jennie Jewel, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "P. Norman",
+      "year": 1922,
+      "place": "Texarkana, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Philip Tankard",
+      "year": 1922,
+      "place": "Belhaven, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Collins",
+      "year": 1922,
+      "place": "Summit, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Thomas Rivers",
+      "year": 1922,
+      "place": "Bossier Parish, Louisiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Warren Lewis",
+      "year": 1922,
+      "place": "New Dacus, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Will Jones",
+      "year": 1922,
+      "place": "Ellaville, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Will Thrasher",
+      "year": 1922,
+      "place": "Crystal Springs, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Anderson",
+      "year": 1922,
+      "place": "Moultrie, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Arthur Bell",
+      "year": 1922,
+      "place": "Pontotoc County, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Baker",
+      "year": 1922,
+      "place": "Aberdeen, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Byrd",
+      "year": 1922,
+      "place": "Brentwood, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Willie Lee Jenkins",
+      "year": 1922,
+      "place": "Eufaula, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Wright, Charles; Young, Albert And An Unidentified Black Man",
+      "year": 1922,
+      "place": "Perry, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Abraham Wilson",
+      "year": 1923,
+      "place": "Newberry, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Simmons",
+      "year": 1923,
+      "place": "Palm Beach, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James T. Scott",
+      "year": 1923,
+      "place": "Columbia, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Joe Pullen",
+      "year": 1923,
+      "place": "Drew, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Sam Carter",
+      "year": 1923,
+      "place": "Rosewood, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Samuel Smith",
+      "year": 1924,
+      "place": "Nashville, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Bell",
+      "year": 1924,
+      "place": "Chicago, Illinois",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James Jordan",
+      "year": 1925,
+      "place": "Waverly, Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "L. Q. Ivy",
+      "year": 1925,
+      "place": "Rocky Ford, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Marshall",
+      "year": 1925,
+      "place": "Price, Utah",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Willie Washington",
+      "year": 1925,
+      "place": "Jacksonville, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Bertha Lowman",
+      "year": 1926,
+      "place": "Aiken vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Clarence Lowman",
+      "year": 1926,
+      "place": "Aiken vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Demon Lowman",
+      "year": 1926,
+      "place": "Aiken vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Buddington",
+      "year": 1926,
+      "place": "Waldo, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James Clark",
+      "year": 1926,
+      "place": "Eau Gallie, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Raymond Arthur Byrd",
+      "year": 1926,
+      "place": "Wythe County, Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Samuel Nelson",
+      "year": 1926,
+      "place": "Delray Beach, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Albert Williams",
+      "year": 1927,
+      "place": "Chiefland, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Bernice Raspberry",
+      "year": 1927,
+      "place": "Leakesville, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Dan Anderson",
+      "year": 1927,
+      "place": "Macon, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Choate",
+      "year": 1927,
+      "place": "Columbia, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jim Fox",
+      "year": 1927,
+      "place": "Louisville, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Joe Smith",
+      "year": 1927,
+      "place": "Yazoo City, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Carter",
+      "year": 1927,
+      "place": "Little Rock, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Joseph Upchurch",
+      "year": 1927,
+      "place": "Paris, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Leonard Woods",
+      "year": 1927,
+      "place": "Pound Gap, Kentucky",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Mark Fox",
+      "year": 1927,
+      "place": "Louisville, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Owen Flemming",
+      "year": 1927,
+      "place": "Mellwood, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Thomas Bradshaw",
+      "year": 1927,
+      "place": "Bailey, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Thomas Williams",
+      "year": 1927,
+      "place": "Memphis, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Tom Payne",
+      "year": 1927,
+      "place": "Willis, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Will Sherod",
+      "year": 1927,
+      "place": "Braggadocio, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Winston Pounds",
+      "year": 1927,
+      "place": "Wilmot, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James Bearden",
+      "year": 1928,
+      "place": "Brookhaven, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Stanly Bearden",
+      "year": 1928,
+      "place": "Brookhaven, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Louis \"Slim\" Seeman",
+      "year": 1929,
+      "place": "North Platte, Nebraska",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Abram Smith",
+      "year": 1930,
+      "place": "Marion, Indiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Allen Green",
+      "year": 1930,
+      "place": "Walhalla vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Dan Jenkins",
+      "year": 1930,
+      "place": "Union vicinity, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Grant",
+      "year": 1930,
+      "place": "Darien, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Hughes",
+      "year": 1930,
+      "place": "Sherman, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Johnson",
+      "year": 1930,
+      "place": "Honey Grove, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry Argo",
+      "year": 1930,
+      "place": "Chickasha, Oklahoma",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Jack Robertson",
+      "year": 1930,
+      "place": "Round Rock, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John H. Wilkins",
+      "year": 1930,
+      "place": "Locust Grove, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Lacy Mitchell",
+      "year": 1930,
+      "place": "Thomasville, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Oliver Moore",
+      "year": 1930,
+      "place": "Edgecombe County, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Thomas Shipp",
+      "year": 1930,
+      "place": "Marion, Indiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "William Roan",
+      "year": 1930,
+      "place": "Bryan, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Parker",
+      "year": 1931,
+      "place": "Conway, Arkansas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Matthew Williams",
+      "year": 1931,
+      "place": "Salisbury, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Mrs. Wise",
+      "year": 1931,
+      "place": "Frankfort, Virginia, Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Raymond Gunn",
+      "year": 1931,
+      "place": "Maryville, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Dave Tillis",
+      "year": 1932,
+      "place": "Crockett, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Shedrick Thompson",
+      "year": 1932,
+      "place": "rural, Virginia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "David Gregory",
+      "year": 1933,
+      "place": "Kountze, Texas",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Elizabeth Lawrence",
+      "year": 1933,
+      "place": "rural, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Armwood",
+      "year": 1933,
+      "place": "Princess Anne, Maryland",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James Cordie Cheek",
+      "year": 1933,
+      "place": "Maury County, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Norris Dendy",
+      "year": 1933,
+      "place": "Clinton, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Reuben Micou",
+      "year": 1933,
+      "place": "Louisville, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Claude Neal",
+      "year": 1934,
+      "place": "Marianna, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Johnson",
+      "year": 1934,
+      "place": "Tampa, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Bert Moore",
+      "year": 1935,
+      "place": "Columbus, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Dooley Morton",
+      "year": 1935,
+      "place": "Columbus, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Elwood Higginbotham",
+      "year": 1935,
+      "place": "Oxford, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Reuben Stacy",
+      "year": 1935,
+      "place": "Fort Lauderdale, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Reuben(also Found As Rubin Stacy) Stacey",
+      "year": 1935,
+      "place": "Fort Lauderdale, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert McDaniels",
+      "year": 1935,
+      "place": "Oxford, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Albert Gooden",
+      "year": 1937,
+      "place": "Covington, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ernest Ponder",
+      "year": 1937,
+      "place": "Tallahassee, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Richard Hawkins",
+      "year": 1937,
+      "place": "Tallahassee, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Austin Callaway",
+      "year": 1940,
+      "place": "LaGrange, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Elbert Williams",
+      "year": 1940,
+      "place": "Brownsville, Tennessee",
+      "context": "racial terror murder"
+    },
+    {
+      "name": "Jesse Thornton",
+      "year": 1940,
+      "place": "Luverne, Alabama",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Felix Hall",
+      "year": 1941,
+      "place": "Fort Benning, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Charlie Lang",
+      "year": 1942,
+      "place": "Shubuta, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Cleo Wright",
+      "year": 1942,
+      "place": "Sikeston, Missouri",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ernest Green",
+      "year": 1942,
+      "place": "Shubuta, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Cellos Harrison",
+      "year": 1943,
+      "place": "Marianna, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Hall",
+      "year": 1943,
+      "place": "Newton, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Willie James Howard",
+      "year": 1944,
+      "place": "Live Oak, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Alton Collier",
+      "year": 1946,
+      "place": "Coronado, California",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Dorothy Dorsey Malcom",
+      "year": 1946,
+      "place": "Walton County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George W. Dorsey",
+      "year": 1946,
+      "place": "Walton County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "John Cecil Jones",
+      "year": 1946,
+      "place": "Minden, Louisiana",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Mae Murray Dorsey",
+      "year": 1946,
+      "place": "Walton County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Roger Malcom",
+      "year": 1946,
+      "place": "Walton County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Henry \"Peg\" Gilbert",
+      "year": 1947,
+      "place": "Harris County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Willie Earle",
+      "year": 1947,
+      "place": "Greenville, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Robert Mallard",
+      "year": 1948,
+      "place": "Lyons, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Harry T. Moore",
+      "year": 1951,
+      "place": "Mims, Florida",
+      "context": "civil rights assassination"
+    },
+    {
+      "name": "Harriette Moore",
+      "year": 1952,
+      "place": "Mims, Florida",
+      "context": "civil rights assassination"
+    },
+    {
+      "name": "Hilliard Brooks",
+      "year": 1952,
+      "place": "Montgomery, Alabama",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Lynn Council",
+      "year": 1952,
+      "place": "Raleigh, North Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Isadore Banks",
+      "year": 1954,
+      "place": "Marion, Arkansas",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Izell Henry",
+      "year": 1954,
+      "place": "Greensburg, Louisiana",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Emmett Till",
+      "year": 1955,
+      "place": "Money, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "George Wesley Lee",
+      "year": 1955,
+      "place": "Belzoni, Mississippi",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "J. E. Evanston",
+      "year": 1955,
+      "place": "Long Lake, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "John Earl Reese",
+      "year": 1955,
+      "place": "Mayflower, Texas",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "Lamar Smith",
+      "year": 1955,
+      "place": "Brookhaven, Mississippi",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "Clinton Melton",
+      "year": 1956,
+      "place": "Sumner, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Jessie James Shelby",
+      "year": 1956,
+      "place": "Yazoo City, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Maybelle Mahone",
+      "year": 1956,
+      "place": "Molena, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Thomas Brewer",
+      "year": 1956,
+      "place": "Columbus, Georgia",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "C. H. Pickett",
+      "year": 1957,
+      "place": "Columbus, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Charles Brown",
+      "year": 1957,
+      "place": "Yazoo City, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Rogers Hamilton",
+      "year": 1957,
+      "place": "Lowndes County, Alabama",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "W. G. Singleton",
+      "year": 1957,
+      "place": "Shelby, North Carolina",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Willie Edwards Jr.",
+      "year": 1957,
+      "place": "Montgomery, Alabama",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Willie Joe Sanford",
+      "year": 1957,
+      "place": "Hawkinsville, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Ed Smith",
+      "year": 1958,
+      "place": "State Line, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Ernest Hunter",
+      "year": 1958,
+      "place": "St. Marys, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "George Love",
+      "year": 1958,
+      "place": "Indianola, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "James Brazier",
+      "year": 1958,
+      "place": "Dawson, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Joe Franklin Jeter",
+      "year": 1958,
+      "place": "Atlanta, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Larry Bolden",
+      "year": 1958,
+      "place": "Chattanooga, Tennessee",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Richard Lillard",
+      "year": 1958,
+      "place": "Nashville, Tennessee",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Willie Countryman",
+      "year": 1958,
+      "place": "Dawson, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Woodrow Wilson Daniels",
+      "year": 1958,
+      "place": "Water Valley, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Booker T. Mixon",
+      "year": 1959,
+      "place": "Clarksdale, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Luther Jackson",
+      "year": 1959,
+      "place": "Philadelphia, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Mack Charles Parker",
+      "year": 1959,
+      "place": "Poplarville, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Sam O'Quinn",
+      "year": 1959,
+      "place": "Centreville, Mississippi",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "William Roy Prather",
+      "year": 1959,
+      "place": "Corinth, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Albert Pitts",
+      "year": 1960,
+      "place": "Monroe, Louisiana",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "David Pitts",
+      "year": 1960,
+      "place": "Monroe, Louisiana",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Ernest McPharland",
+      "year": 1960,
+      "place": "Monroe, Louisiana",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Fred Robinson",
+      "year": 1960,
+      "place": "Edisto Island, South Carolina",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Marshall Johnson",
+      "year": 1960,
+      "place": "Monroe, Louisiana",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Mattie Greene",
+      "year": 1960,
+      "place": "Ringgold, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Eli Brumfield",
+      "year": 1961,
+      "place": "McComb, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Herbert Lee",
+      "year": 1961,
+      "place": "Liberty, Mississippi",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "A. C. Hall",
+      "year": 1962,
+      "place": "Macon, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Joseph Hill Dumas",
+      "year": 1962,
+      "place": "Perry, Florida",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Addie Mae Collins",
+      "year": 1963,
+      "place": "Birmingham, Alabama",
+      "context": "church bombing victim"
+    },
+    {
+      "name": "Andrew Lee Anderson",
+      "year": 1963,
+      "place": "Marion, Arkansas",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Carole Robertson",
+      "year": 1963,
+      "place": "Birmingham, Alabama",
+      "context": "church bombing victim"
+    },
+    {
+      "name": "Cynthia Wesley",
+      "year": 1963,
+      "place": "Birmingham, Alabama",
+      "context": "church bombing victim"
+    },
+    {
+      "name": "Denise McNair",
+      "year": 1963,
+      "place": "Birmingham, Alabama",
+      "context": "church bombing victim"
+    },
+    {
+      "name": "Johnny Robinson",
+      "year": 1963,
+      "place": "Birmingham, Alabama",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Medgar Evers",
+      "year": 1963,
+      "place": "Jackson, Mississippi",
+      "context": "civil rights assassination"
+    },
+    {
+      "name": "Sylvester Maxwell",
+      "year": 1963,
+      "place": "Canton, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Virgil Lamar Ware",
+      "year": 1963,
+      "place": "Birmingham, Alabama",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Charles Eddie Moore",
+      "year": 1964,
+      "place": "Meadville, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Clifton Walker",
+      "year": 1964,
+      "place": "Adams County, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Ernest Jells",
+      "year": 1964,
+      "place": "Clarksdale, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Frank Andrews",
+      "year": 1964,
+      "place": "Lisman, Alabama",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Frank Morris",
+      "year": 1964,
+      "place": "Ferriday, Louisiana",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Henry Hezekiah Dee",
+      "year": 1964,
+      "place": "Meadville, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Hubert Orsby",
+      "year": 1964,
+      "place": "Canton, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Isaiah Taylor",
+      "year": 1964,
+      "place": "Ruleville, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "James Andrew Miller",
+      "year": 1964,
+      "place": "Jackson, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "James Chaney",
+      "year": 1964,
+      "place": "Philadelphia, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James Earl Chaney",
+      "year": 1964,
+      "place": "Philadelphia, Mississippi",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "Jasper Greenwood",
+      "year": 1964,
+      "place": "Vicksburg, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Jimmy Powell",
+      "year": 1964,
+      "place": "Brooklyn, New York",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Johnnie Mae Chappell",
+      "year": 1964,
+      "place": "Jacksonville, Florida",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Lemuel Augustus Penn",
+      "year": 1964,
+      "place": "Madison County, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Lemuel Penn",
+      "year": 1964,
+      "place": "Colbert, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Louis Allen",
+      "year": 1964,
+      "place": "Liberty, Mississippi",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "Nehemiah Montgomery",
+      "year": 1964,
+      "place": "Merigold, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Pheld Evans",
+      "year": 1964,
+      "place": "Canton, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Silas Caston",
+      "year": 1964,
+      "place": "Jackson, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Arthur James Hill",
+      "year": 1965,
+      "place": "Villa Rica, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Donald Rasberry",
+      "year": 1965,
+      "place": "Okolona, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Freddie Lee Thomas",
+      "year": 1965,
+      "place": "LeFlore County, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "James Waymers",
+      "year": 1965,
+      "place": "Allendale, South Carolina",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Jessie Brown",
+      "year": 1965,
+      "place": "Winona, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Jimmie Lee Griffith",
+      "year": 1965,
+      "place": "Sturgis, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Jimmie Lee Jackson",
+      "year": 1965,
+      "place": "Marion, Alabama",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "John Lee",
+      "year": 1965,
+      "place": "Goshen Springs, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "John Wesley Wilder",
+      "year": 1965,
+      "place": "Ruston, Louisiana",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Johnny Queen",
+      "year": 1965,
+      "place": "Fayette, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Marshall Scott Jr.",
+      "year": 1965,
+      "place": "New Orleans, Louisiana",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Oneal Moore",
+      "year": 1965,
+      "place": "Bogalusa, Louisiana",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "Robert McNair",
+      "year": 1965,
+      "place": "Pelahatchie, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Saleam Triggs",
+      "year": 1965,
+      "place": "Hattiesburg, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Willie Brewster",
+      "year": 1965,
+      "place": "Anniston, Alabama",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Willie Henry Lee",
+      "year": 1965,
+      "place": "Rankin County, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Winifred Rembert",
+      "year": 1965,
+      "place": "Cuthbert, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Alphonso Harris",
+      "year": 1966,
+      "place": "Albany, Georgia",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "Ben Chester White",
+      "year": 1966,
+      "place": "Natchez, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Clarence Triggs",
+      "year": 1966,
+      "place": "Bogalusa, Louisiana",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "Collie Hampton",
+      "year": 1966,
+      "place": "Winchester, Kentucky",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Eddie James Stewart",
+      "year": 1966,
+      "place": "Crystal Springs, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Hubert Varner",
+      "year": 1966,
+      "place": "Atlanta, Georgia",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Samuel Leamon Younge Jr.",
+      "year": 1966,
+      "place": "Tuskegee, Alabama",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "Vernon Ferdinand Dahmer",
+      "year": 1966,
+      "place": "Hattiesburg, Mississippi",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "Vincent Dahmon",
+      "year": 1966,
+      "place": "Natchez, Mississippi",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Archie Wooden",
+      "year": 1967,
+      "place": "Camden, Alabama",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Benjamin Brown",
+      "year": 1967,
+      "place": "Jackson, Mississippi",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "Carrie Brumfield",
+      "year": 1967,
+      "place": "Franklinton, Louisiana",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "James Earl Motley",
+      "year": 1967,
+      "place": "Wetumpka, Alabama",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Rodell Williamson",
+      "year": 1967,
+      "place": "Camden, Alabama",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "Wharlest Jackson",
+      "year": 1967,
+      "place": "Natchez, Mississippi",
+      "context": "civil rights martyr"
+    },
+    {
+      "name": "Delano Herman Middleton",
+      "year": 1968,
+      "place": "Orangeburg, South Carolina",
+      "context": "Orangeburg Massacre victim"
+    },
+    {
+      "name": "Henry Ezekial Smith",
+      "year": 1968,
+      "place": "Orangeburg, South Carolina",
+      "context": "Orangeburg Massacre victim"
+    },
+    {
+      "name": "Larry Payne",
+      "year": 1968,
+      "place": "Memphis, Tennessee",
+      "context": "racial terror killing"
+    },
+    {
+      "name": "Martin Luther King Jr.",
+      "year": 1968,
+      "place": "Memphis, Tennessee",
+      "context": "civil rights assassination"
+    },
+    {
+      "name": "Samuel Ephesians Hammond Jr.",
+      "year": 1968,
+      "place": "Orangeburg, South Carolina",
+      "context": "Orangeburg Massacre victim"
+    },
+    {
+      "name": "Betty Gardner",
+      "year": 1978,
+      "place": "St. Helena Island, South Carolina",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Michael Donald",
+      "year": 1981,
+      "place": "Mobile, Alabama",
+      "context": "Klan racial terror lynching"
+    },
+    {
+      "name": "Willie Turks",
+      "year": 1982,
+      "place": "New York City, New York",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Wayne Timothy Coggins",
+      "year": 1983,
+      "place": "Griffin, Georgia",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Kerrick Majors",
+      "year": 1987,
+      "place": "Nashville, Tennessee",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Yusef Hawkins",
+      "year": 1989,
+      "place": "New York City, New York",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Christopher Wilson",
+      "year": 1993,
+      "place": "Valrico, Florida",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "James Byrd Jr.",
+      "year": 1998,
+      "place": "Jasper, Texas",
+      "context": "racial terror murder"
+    },
+    {
+      "name": "James Craig Anderson",
+      "year": 2011,
+      "place": "Jackson, Mississippi",
+      "context": "racial terror lynching"
+    },
+    {
+      "name": "Ahmaud Arbery",
+      "year": 2020,
+      "place": "Satilla Shores, Georgia",
+      "context": "racial terror killing"
+    }
+  ]
+}

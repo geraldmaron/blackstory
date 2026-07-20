@@ -43,7 +43,10 @@
       "direct-action",
       "nonviolence"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_freedom_rides_museum_001",
+      "ent_journey_of_reconciliation_001"
+    ],
     "keywords": []
   },
   {
@@ -90,6 +93,11 @@
       "student-activism"
     ],
     "mentionedEntityIds": [
+      "ent_ella_baker_001",
+      "ent_freedom_rides_museum_001",
+      "ent_freedom_summer_mount_zion_001",
+      "ent_martin_luther_king_jr_001",
+      "ent_shaw_university_001",
       "sncc"
     ],
     "keywords": []
@@ -138,6 +146,13 @@
       "nonviolence"
     ],
     "mentionedEntityIds": [
+      "ent_bayard_rustin_001",
+      "ent_ebenezer_baptist_atlanta_001",
+      "ent_fred_shuttlesworth_001",
+      "ent_martin_luther_king_jr_001",
+      "ent_montgomery_improvement_association_001",
+      "ent_poor_peoples_campaign_001",
+      "ent_ralph_abernathy_001",
       "sclc"
     ],
     "keywords": []
@@ -186,7 +201,9 @@
       "self-defense",
       "community-programs"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_lowndes_county_freedom_org_001"
+    ],
     "keywords": []
   },
   {
@@ -231,7 +248,11 @@
       "commemoration",
       "birthplace"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_ebenezer_baptist_atlanta_001",
+      "ent_martin_luther_king_jr_001",
+      "ent_sweet_auburn_001"
+    ],
     "keywords": []
   },
   {
@@ -277,6 +298,7 @@
       "commemoration"
     ],
     "mentionedEntityIds": [
+      "ent_montgomery_bus_boycott_001",
       "montgomery-bus-boycott"
     ],
     "keywords": []
@@ -323,7 +345,9 @@
       "memorial",
       "national-mall"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_civil_rights_act_1964"
+    ],
     "keywords": []
   },
   {
@@ -368,7 +392,9 @@
       "birthplace",
       "commemoration"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_ku_klux_klan_act_1871"
+    ],
     "keywords": []
   },
   {
@@ -504,7 +530,9 @@
       "education",
       "commemoration"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001"
+    ],
     "keywords": []
   },
   {
@@ -550,7 +578,9 @@
       "childhood",
       "commemoration"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_unia_harlem_001"
+    ],
     "keywords": []
   },
   {
@@ -597,7 +627,13 @@
       "student-activism",
       "nonviolence"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_diane_nash_001",
+      "ent_fisk_university_001",
+      "ent_james_bevel_001",
+      "ent_james_lawson_001",
+      "ent_john_lewis_001"
+    ],
     "keywords": []
   },
   {
@@ -644,6 +680,8 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [
+      "ent_charles_sherrod_001",
+      "ent_martin_luther_king_jr_001",
       "sncc"
     ],
     "keywords": []
@@ -692,6 +730,7 @@
       "desegregation"
     ],
     "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001",
       "sclc"
     ],
     "keywords": []
@@ -740,7 +779,9 @@
       "self-defense",
       "desegregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_gloria_richardson_001"
+    ],
     "keywords": []
   },
   {
@@ -788,7 +829,9 @@
       "direct-action",
       "police-violence"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001"
+    ],
     "keywords": []
   },
   {
@@ -835,6 +878,8 @@
       "northern-movement"
     ],
     "mentionedEntityIds": [
+      "ent_james_bevel_001",
+      "ent_martin_luther_king_jr_001",
       "sclc"
     ],
     "keywords": []
@@ -883,6 +928,10 @@
       "black-power"
     ],
     "mentionedEntityIds": [
+      "ent_deacons_for_defense_001",
+      "ent_james_meredith_001",
+      "ent_mfdp_dnc_challenge_001",
+      "ent_stokely_carmichael_001",
       "sncc"
     ],
     "keywords": []
@@ -931,6 +980,8 @@
       "poverty"
     ],
     "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001",
+      "ent_ralph_abernathy_001",
       "sclc"
     ],
     "keywords": []
@@ -978,7 +1029,9 @@
       "student-activism",
       "police-violence"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_cleveland_sellers_001"
+    ],
     "keywords": []
   },
   {
@@ -1025,6 +1078,11 @@
       "black-power"
     ],
     "mentionedEntityIds": [
+      "ent_black_panther_party_founding_001",
+      "ent_law_voting_rights_act_1965",
+      "ent_selma_to_montgomery_marches_001",
+      "ent_sncc_founding_001",
+      "ent_stokely_carmichael_001",
       "sncc"
     ],
     "keywords": []
@@ -1073,8 +1131,9 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [
-      "freedom-summer",
-      "cofo"
+      "cofo",
+      "ent_cofo_001",
+      "freedom-summer"
     ],
     "keywords": []
   },
@@ -1123,7 +1182,9 @@
       "desegregation",
       "federal-intervention"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_james_meredith_001"
+    ],
     "keywords": []
   },
   {
@@ -1170,7 +1231,10 @@
       "desegregation",
       "federal-intervention"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_autherine_lucy_ua_001",
+      "ent_law_civil_rights_act_1964"
+    ],
     "keywords": []
   },
   {
@@ -1216,7 +1280,9 @@
       "higher-education",
       "desegregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954"
+    ],
     "keywords": []
   },
   {
@@ -1356,6 +1422,8 @@
       "organizing"
     ],
     "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001",
+      "ent_montgomery_bus_boycott_001",
       "montgomery-bus-boycott"
     ],
     "keywords": []
@@ -1403,6 +1471,9 @@
       "nonviolence"
     ],
     "mentionedEntityIds": [
+      "ent_ebenezer_baptist_atlanta_001",
+      "ent_lorraine_motel_001",
+      "ent_montgomery_bus_boycott_001",
       "sclc"
     ],
     "keywords": []
@@ -1451,7 +1522,9 @@
       "black-nationalism",
       "nation-of-islam"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_audubon_ballroom_001"
+    ],
     "keywords": []
   },
   {
@@ -1501,8 +1574,9 @@
       "grassroots-leadership"
     ],
     "mentionedEntityIds": [
-      "sncc",
-      "sclc"
+      "ent_shaw_university_001",
+      "sclc",
+      "sncc"
     ],
     "keywords": []
   },
@@ -1552,6 +1626,11 @@
       "nonviolence"
     ],
     "mentionedEntityIds": [
+      "ent_freedom_rides_museum_001",
+      "ent_journey_of_reconciliation_001",
+      "ent_march_on_washington_1963_001",
+      "ent_marian_anderson_lincoln_memorial_concert_001",
+      "ent_martin_luther_king_jr_001",
       "march-on-washington"
     ],
     "keywords": []
@@ -1599,6 +1678,7 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [
+      "ent_mfdp_dnc_challenge_001",
       "mfdp",
       "sncc"
     ],
@@ -1648,6 +1728,10 @@
       "student-activism"
     ],
     "mentionedEntityIds": [
+      "ent_freedom_rides_museum_001",
+      "ent_james_bevel_001",
+      "ent_law_voting_rights_act_1965",
+      "ent_nashville_student_movement_001",
       "sncc"
     ],
     "keywords": []
@@ -1696,8 +1780,9 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [
-      "sncc",
-      "selma"
+      "ent_edmund_pettus_bridge_001",
+      "selma",
+      "sncc"
     ],
     "keywords": []
   },
@@ -1746,6 +1831,9 @@
       "pan-africanism"
     ],
     "mentionedEntityIds": [
+      "ent_john_lewis_001",
+      "ent_lowndes_county_freedom_org_001",
+      "ent_meredith_march_against_fear_001",
       "sncc"
     ],
     "keywords": []
@@ -1795,8 +1883,10 @@
       "organizing"
     ],
     "mentionedEntityIds": [
-      "sclc",
-      "birmingham-campaign"
+      "birmingham-campaign",
+      "ent_bethel_baptist_church_collegeville_001",
+      "ent_law_ku_klux_klan_act_1871",
+      "sclc"
     ],
     "keywords": []
   },
@@ -1845,7 +1935,9 @@
       "education",
       "citizenship-schools"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_highlander_folk_school_001"
+    ],
     "keywords": []
   },
   {
@@ -1941,7 +2033,11 @@
       "voting-rights",
       "desegregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_constance_baker_motley_001",
+      "ent_meredith_march_against_fear_001",
+      "ent_ole_miss_integration_001"
+    ],
     "keywords": []
   },
   {
@@ -1988,7 +2084,10 @@
       "self-defense",
       "women-leaders"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_freedom_rides_museum_001",
+      "ent_movement_black_power_movement"
+    ],
     "keywords": []
   },
   {
@@ -2036,6 +2135,8 @@
       "student-activism"
     ],
     "mentionedEntityIds": [
+      "ent_freedom_rides_museum_001",
+      "ent_nashville_student_movement_001",
       "sclc"
     ],
     "keywords": []
@@ -2084,8 +2185,12 @@
       "organizing"
     ],
     "mentionedEntityIds": [
-      "sclc",
-      "montgomery-bus-boycott"
+      "ent_first_baptist_petersburg_001",
+      "ent_martin_luther_king_jr_001",
+      "ent_montgomery_improvement_association_001",
+      "ent_poor_peoples_campaign_001",
+      "montgomery-bus-boycott",
+      "sclc"
     ],
     "keywords": []
   },
@@ -2133,6 +2238,9 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [
+      "ent_freedom_rides_museum_001",
+      "ent_law_voting_rights_act_1965",
+      "ent_martin_luther_king_jr_001",
       "sclc",
       "selma"
     ],
@@ -2182,6 +2290,10 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [
+      "ent_edmund_pettus_bridge_001",
+      "ent_john_lewis_001",
+      "ent_martin_luther_king_jr_001",
+      "ent_sclc_founding_001",
       "sclc",
       "selma"
     ],
@@ -2233,6 +2345,7 @@
       "women-leaders"
     ],
     "mentionedEntityIds": [
+      "ent_law_voting_rights_act_1965",
       "selma"
     ],
     "keywords": []
@@ -2281,6 +2394,7 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [
+      "ent_albany_movement_001",
       "sncc"
     ],
     "keywords": []
@@ -2329,6 +2443,8 @@
       "organizing"
     ],
     "mentionedEntityIds": [
+      "ent_diane_nash_001",
+      "ent_james_lawson_001",
       "sclc"
     ],
     "keywords": []
@@ -2376,8 +2492,9 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [
-      "sncc",
-      "freedom-summer"
+      "ent_cofo_001",
+      "freedom-summer",
+      "sncc"
     ],
     "keywords": []
   },
@@ -2425,6 +2542,7 @@
       "politics"
     ],
     "mentionedEntityIds": [
+      "ent_morehouse_college_001",
       "sncc"
     ],
     "keywords": []
@@ -2475,6 +2593,8 @@
       "women-leaders"
     ],
     "mentionedEntityIds": [
+      "ent_lorraine_motel_001",
+      "ent_martin_luther_king_jr_001",
       "sclc"
     ],
     "keywords": []
@@ -2524,6 +2644,7 @@
       "women-leaders"
     ],
     "mentionedEntityIds": [
+      "ent_mfdp_dnc_challenge_001",
       "mfdp"
     ],
     "keywords": []
@@ -2571,6 +2692,7 @@
       "voting-rights"
     ],
     "mentionedEntityIds": [
+      "ent_law_ku_klux_klan_act_1871",
       "naacp"
     ],
     "keywords": []
@@ -2618,6 +2740,9 @@
       "student-activism"
     ],
     "mentionedEntityIds": [
+      "ent_freedom_summer_mount_zion_001",
+      "ent_orangeburg_massacre_001",
+      "ent_selma_to_montgomery_marches_001",
       "sncc"
     ],
     "keywords": []
@@ -2665,8 +2790,10 @@
       "organizing"
     ],
     "mentionedEntityIds": [
-      "sclc",
-      "birmingham-campaign"
+      "birmingham-campaign",
+      "ent_law_civil_rights_act_1964",
+      "ent_martin_luther_king_jr_001",
+      "sclc"
     ],
     "keywords": []
   },
@@ -2714,7 +2841,9 @@
       "interstate-travel"
     ],
     "mentionedEntityIds": [
-      "core"
+      "core",
+      "ent_bayard_rustin_001",
+      "ent_freedom_rides_museum_001"
     ],
     "keywords": []
   },
@@ -2762,7 +2891,11 @@
       "organizing",
       "coalition"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_freedom_summer_mount_zion_001",
+      "ent_freedom_vote_1963_001",
+      "ent_voter_education_project_001"
+    ],
     "keywords": []
   },
   {
@@ -2809,7 +2942,9 @@
       "organizing",
       "philanthropy"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_national_urban_league_001"
+    ],
     "keywords": []
   },
   {
@@ -2856,6 +2991,7 @@
     ],
     "mentionedEntityIds": [
       "cofo",
+      "ent_freedom_summer_mount_zion_001",
       "sncc"
     ],
     "keywords": []
@@ -2904,7 +3040,8 @@
       "organizing"
     ],
     "mentionedEntityIds": [
-      "core"
+      "core",
+      "ent_meredith_march_against_fear_001"
     ],
     "keywords": []
   },
@@ -2952,6 +3089,7 @@
       "politics"
     ],
     "mentionedEntityIds": [
+      "ent_fannie_lou_hamer_001",
       "mfdp"
     ],
     "keywords": []

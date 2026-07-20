@@ -3,9 +3,8 @@
  * is encoded as icon shape (never hue alone) — matches NarrativeCard and the
  * Explore legend so entity pages do not invent a second confidence language.
  *
- * When a nearby "Confidence" field title is present, pass `labeled` so the
- * visible word stays compact (or hidden via CSS) while aria-label keeps the
- * full phrase for screen readers.
+ * `labeled` shortens the visible word when a nearby "Confidence" field title
+ * exists; `title` + aria-label still carry the full plain-language help on hover.
  */
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,6 +13,7 @@ import {
   confidenceIconFor,
   type ConfidenceTierKey,
 } from '../../lib/map-experience/confidence-icons';
+import { confidenceHelp } from '../../lib/map-experience/metadata-help';
 
 void React;
 
@@ -55,7 +55,8 @@ export function ConfidenceMark({ tier, className, labeled = false }: ConfidenceM
   const tierKey = confidenceTierKey(tier);
   const icon = confidenceIconFor(tierKey);
   const text = confidenceLabel(tier, labeled);
-  const aria = labeled ? `${confidenceShortLabel(tier)} confidence` : text;
+  const help = confidenceHelp(tierKey);
+  const aria = labeled ? `${confidenceShortLabel(tier)} confidence. ${help}` : `${text}. ${help}`;
   return (
     <span
       className={cx('ds-confidence-mark', `ds-confidence-mark--${tierKey}`, className)}
@@ -63,6 +64,7 @@ export function ConfidenceMark({ tier, className, labeled = false }: ConfidenceM
       data-labeled={labeled ? 'true' : 'false'}
       role="img"
       aria-label={aria}
+      title={help}
     >
       <FontAwesomeIcon icon={icon} className="ds-confidence-mark__icon" aria-hidden="true" />
       <span className="ds-confidence-mark__text">{text}</span>

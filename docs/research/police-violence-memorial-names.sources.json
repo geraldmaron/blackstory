@@ -1,0 +1,100 @@
+{
+  "entry_count": 1104,
+  "selection_policy": [
+    "Include Wikipedia cited list of unarmed African Americans killed by law enforcement (primary bulk source).",
+    "Include curated high-profile / historical police or state-violence cases corroborated across major news and memorial discourse.",
+    "Include names appearing in BOTH The Guardian The Counted (Black, 2015\u201316) AND Washington Post Fatal Force (Black), for dual open-dataset corroboration.",
+    "Exclude lynching, civilian killings, terrorist massacres, and non-police assassinations even if common on some Say Their Names lists.",
+    "Context phrases are brief memorial labels, not legal verdicts."
+  ],
+  "primary_sources": [
+    {
+      "name": "Wikipedia \u2014 List of unarmed African Americans killed by law enforcement officers in the United States",
+      "url": "https://en.wikipedia.org/wiki/List_of_unarmed_African_Americans_killed_by_law_enforcement_officers_in_the_United_States"
+    },
+    {
+      "name": "The Guardian \u2014 The Counted (2015\u20132016)",
+      "url": "https://www.theguardian.com/us-news/series/counted-us-police-killings",
+      "data": "https://github.com/flother/thecounted"
+    },
+    {
+      "name": "Washington Post \u2014 Fatal Force (2015\u20132024)",
+      "url": "https://www.washingtonpost.com/graphics/investigations/police-shootings-database/",
+      "data": "https://github.com/washingtonpost/data-police-shootings"
+    },
+    {
+      "name": "SPLC Civil Rights Martyrs (historical police/state cases)",
+      "url": "https://www.splcenter.org/civil-rights-martyrs/"
+    },
+    {
+      "name": "Cross-checked major reporting / memorial discourse",
+      "examples": [
+        "Eric Garner",
+        "George Floyd",
+        "Breonna Taylor",
+        "Amadou Diallo",
+        "Tamir Rice",
+        "Fred Hampton",
+        "Orangeburg Massacre"
+      ]
+    }
+  ],
+  "related_not_bulk_imported": [
+    {
+      "name": "Mapping Police Violence",
+      "url": "https://mappingpoliceviolence.us/",
+      "note": "Authoritative ongoing database; not bulk-copied here due to MPV reproduction terms. Overlap expected with WaPo/Counted/Wikipedia."
+    },
+    {
+      "name": "Project Say Their Names / NON:op Say Their Names map",
+      "note": "Memorial projects used for cross-checks of high-profile names; not used as sole authority because some lists mix civilian killings."
+    }
+  ],
+  "intentionally_excluded_examples": [
+    {
+      "name": "Emmett Till",
+      "reason": "Lynched by civilians, not police"
+    },
+    {
+      "name": "Trayvon Martin",
+      "reason": "Killed by civilian"
+    },
+    {
+      "name": "Ahmaud Arbery",
+      "reason": "Killed by civilians"
+    },
+    {
+      "name": "Jordan Neely",
+      "reason": "Killed by civilian on subway"
+    },
+    {
+      "name": "Charleston church victims",
+      "reason": "Terrorist massacre, not police"
+    },
+    {
+      "name": "Martin Luther King Jr. / Malcolm X / Medgar Evers",
+      "reason": "Assassinations not by police as primary actor"
+    }
+  ],
+  "counts_by_decade": {
+    "1870s": 1,
+    "1890s": 1,
+    "1930s": 1,
+    "1940s": 2,
+    "1950s": 2,
+    "1960s": 50,
+    "1970s": 22,
+    "1980s": 14,
+    "1990s": 60,
+    "2000s": 135,
+    "2010s": 777,
+    "2020s": 39
+  },
+  "files": {
+    "full": "docs/research/police-violence-memorial-names.json",
+    "core_collage_recommended": "docs/research/police-violence-memorial-names.core.json",
+    "full_count": 1104,
+    "core_count": 513,
+    "core_note": "Pre-2010 completeness + widely memorialized / distinctive-context cases; better default for a dignified collage than the full dual-dataset expansion."
+  }
+}

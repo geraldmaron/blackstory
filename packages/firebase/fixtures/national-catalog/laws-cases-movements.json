@@ -43,7 +43,9 @@
       "constitutional-law",
       "emancipation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_emancipation_proclamation_1863"
+    ],
     "keywords": []
   },
   {
@@ -90,7 +92,11 @@
       "constitutional-law",
       "equal-protection"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954",
+      "ent_case_dred_scott_v_sandford_1857",
+      "ent_case_loving_v_virginia_1967"
+    ],
     "keywords": []
   },
   {
@@ -137,7 +143,10 @@
       "reconstruction",
       "constitutional-law"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_guinn_v_united_states_1915",
+      "ent_law_voting_rights_act_1965"
+    ],
     "keywords": []
   },
   {
@@ -184,7 +193,11 @@
       "law",
       "citizenship"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_jones_v_alfred_h_mayer_1968",
+      "ent_case_runyon_v_mccrary_1976",
+      "ent_law_14th_amendment_1868"
+    ],
     "keywords": []
   },
   {
@@ -231,7 +244,10 @@
       "law",
       "public-accommodations"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_civil_rights_cases_1883",
+      "ent_law_civil_rights_act_1964"
+    ],
     "keywords": []
   },
   {
@@ -323,7 +339,9 @@
       "public-accommodations",
       "employment"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_katzenbach_v_mcclung_1964"
+    ],
     "keywords": []
   },
   {
@@ -368,7 +386,10 @@
       "voting-rights",
       "law"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_shelby_county_v_holder_2013",
+      "ent_case_south_carolina_v_katzenbach_1966"
+    ],
     "keywords": []
   },
   {
@@ -415,7 +436,11 @@
       "housing",
       "fair-housing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_jones_v_alfred_h_mayer_1968",
+      "ent_law_civil_rights_act_1866",
+      "ent_martin_luther_king_jr_001"
+    ],
     "keywords": []
   },
   {
@@ -460,7 +485,9 @@
       "law",
       "employment"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_griggs_v_duke_power_1971"
+    ],
     "keywords": []
   },
   {
@@ -505,7 +532,9 @@
       "emancipation",
       "law"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_13th_amendment_1865"
+    ],
     "keywords": []
   },
   {
@@ -596,7 +625,10 @@
       "enslavement",
       "sectionalism"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_dred_scott_v_sandford_1857",
+      "ent_law_kansas_nebraska_act_1854"
+    ],
     "keywords": []
   },
   {
@@ -641,7 +673,9 @@
       "enslavement",
       "sectionalism"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_missouri_compromise_1820"
+    ],
     "keywords": []
   },
   {
@@ -686,7 +720,9 @@
       "law",
       "voting-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_14th_amendment_1868"
+    ],
     "keywords": []
   },
   {
@@ -731,7 +767,12 @@
       "voting-rights",
       "law"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_us_v_cruikshank_1876",
+      "ent_case_us_v_reese_1876",
+      "ent_law_15th_amendment_1870",
+      "ent_law_ku_klux_klan_act_1871"
+    ],
     "keywords": []
   },
   {
@@ -776,7 +817,9 @@
       "law",
       "voting-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_core_founding_001"
+    ],
     "keywords": []
   },
   {
@@ -823,7 +866,9 @@
       "education",
       "emancipation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_core_founding_001"
+    ],
     "keywords": []
   },
   {
@@ -916,7 +961,10 @@
       "law",
       "segregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_core_founding_001",
+      "ent_law_civil_rights_act_1866"
+    ],
     "keywords": []
   },
   {
@@ -1012,7 +1060,9 @@
       "law",
       "transportation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_plessy_v_ferguson_1896"
+    ],
     "keywords": []
   },
   {
@@ -1060,7 +1110,9 @@
       "eugenics",
       "anti-miscegenation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_loving_v_virginia_1967"
+    ],
     "keywords": []
   },
   {
@@ -1108,7 +1160,11 @@
       "enslavement",
       "citizenship"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_13th_amendment_1865",
+      "ent_law_14th_amendment_1868",
+      "ent_law_missouri_compromise_1820"
+    ],
     "keywords": []
   },
   {
@@ -1155,7 +1211,9 @@
       "segregation",
       "jim-crow"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954"
+    ],
     "keywords": []
   },
   {
@@ -1202,7 +1260,12 @@
       "school-desegregation",
       "equal-protection"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_bolling_v_sharpe_1954",
+      "ent_case_cooper_v_aaron_1958",
+      "ent_case_plessy_v_ferguson_1896",
+      "ent_thurgood_marshall_001"
+    ],
     "keywords": []
   },
   {
@@ -1249,7 +1312,9 @@
       "school-desegregation",
       "due-process"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954"
+    ],
     "keywords": []
   },
   {
@@ -1296,7 +1361,9 @@
       "marriage",
       "equal-protection"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_virginia_racial_integrity_act_1924"
+    ],
     "keywords": []
   },
   {
@@ -1343,7 +1410,10 @@
       "housing",
       "restrictive-covenants"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_corrigan_v_buckley_1926",
+      "ent_case_jones_v_alfred_h_mayer_1968"
+    ],
     "keywords": []
   },
   {
@@ -1390,7 +1460,10 @@
       "education",
       "segregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954",
+      "ent_case_mclaurin_v_oklahoma_state_regents_1950"
+    ],
     "keywords": []
   },
   {
@@ -1437,7 +1510,10 @@
       "education",
       "segregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954",
+      "ent_lincoln_university_of_missouri_001"
+    ],
     "keywords": []
   },
   {
@@ -1482,7 +1558,10 @@
       "supreme-court",
       "voting-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_terry_v_adams_1953",
+      "ent_law_15th_amendment_1870"
+    ],
     "keywords": []
   },
   {
@@ -1527,7 +1606,10 @@
       "supreme-court",
       "voting-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_15th_amendment_1870",
+      "ent_law_voting_rights_act_1965"
+    ],
     "keywords": []
   },
   {
@@ -1574,7 +1656,11 @@
       "housing",
       "segregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_corrigan_v_buckley_1926",
+      "ent_case_shelley_v_kraemer_1948",
+      "ent_law_14th_amendment_1868"
+    ],
     "keywords": []
   },
   {
@@ -1621,7 +1707,9 @@
       "criminal-justice",
       "right-to-counsel"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_norris_v_alabama_1935"
+    ],
     "keywords": []
   },
   {
@@ -1715,7 +1803,9 @@
       "education",
       "affirmative-action"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_sffa_v_harvard_2023"
+    ],
     "keywords": []
   },
   {
@@ -1760,7 +1850,9 @@
       "supreme-court",
       "school-desegregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_milliken_v_bradley_1974"
+    ],
     "keywords": []
   },
   {
@@ -1807,7 +1899,10 @@
       "public-accommodations",
       "commerce-clause"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_katzenbach_v_mcclung_1964",
+      "ent_law_civil_rights_act_1964"
+    ],
     "keywords": []
   },
   {
@@ -1852,7 +1947,10 @@
       "supreme-court",
       "voting-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_shelby_county_v_holder_2013",
+      "ent_law_voting_rights_act_1965"
+    ],
     "keywords": []
   },
   {
@@ -1897,7 +1995,9 @@
       "supreme-court",
       "school-desegregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954"
+    ],
     "keywords": []
   },
   {
@@ -1942,7 +2042,10 @@
       "supreme-court",
       "voting-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_south_carolina_v_katzenbach_1966",
+      "ent_law_voting_rights_act_1965"
+    ],
     "keywords": []
   },
   {
@@ -1989,7 +2092,9 @@
       "employment",
       "disparate-impact"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_civil_rights_act_1991"
+    ],
     "keywords": []
   },
   {
@@ -2036,7 +2141,9 @@
       "education"
     ],
     "mentionedEntityIds": [
-      "civil-rights-act-1866"
+      "civil-rights-act-1866",
+      "ent_case_jones_v_alfred_h_mayer_1968",
+      "ent_law_civil_rights_act_1866"
     ],
     "keywords": []
   },
@@ -2084,7 +2191,9 @@
       "public-accommodations",
       "reconstruction"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_civil_rights_act_1875"
+    ],
     "keywords": []
   },
   {
@@ -2131,7 +2240,10 @@
       "reconstruction",
       "voting-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_us_v_reese_1876",
+      "ent_law_enforcement_act_1870"
+    ],
     "keywords": []
   },
   {
@@ -2178,7 +2290,12 @@
       "voting-rights",
       "reconstruction"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_guinn_v_united_states_1915",
+      "ent_law_15th_amendment_1870",
+      "ent_law_enforcement_act_1870",
+      "ent_law_voting_rights_act_1965"
+    ],
     "keywords": []
   },
   {
@@ -2272,7 +2389,9 @@
       "education",
       "segregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_plessy_v_ferguson_1896"
+    ],
     "keywords": []
   },
   {
@@ -2319,7 +2438,10 @@
       "housing",
       "restrictive-covenants"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_buchanan_v_warley_1917",
+      "ent_case_shelley_v_kraemer_1948"
+    ],
     "keywords": []
   },
   {
@@ -2366,7 +2488,11 @@
       "education",
       "segregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_mclaurin_v_oklahoma_state_regents_1950",
+      "ent_case_sweatt_v_painter_1950",
+      "ent_thurgood_marshall_001"
+    ],
     "keywords": []
   },
   {
@@ -2413,7 +2539,11 @@
       "education",
       "segregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954",
+      "ent_case_sipuel_v_board_of_regents_1948",
+      "ent_case_sweatt_v_painter_1950"
+    ],
     "keywords": []
   },
   {
@@ -2460,7 +2590,10 @@
       "transportation",
       "segregation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_core_founding_001",
+      "ent_freedom_rides_museum_001"
+    ],
     "keywords": []
   },
   {
@@ -2507,7 +2640,10 @@
       "first-amendment",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_naacp_v_button_1963",
+      "ent_montgomery_bus_boycott_001"
+    ],
     "keywords": []
   },
   {
@@ -2554,7 +2690,9 @@
       "first-amendment",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954"
+    ],
     "keywords": []
   },
   {
@@ -2601,7 +2739,10 @@
       "voting-rights",
       "gerrymandering"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_15th_amendment_1870",
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -2648,7 +2789,9 @@
       "peonage",
       "labor"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_13th_amendment_1865"
+    ],
     "keywords": []
   },
   {
@@ -2695,7 +2838,9 @@
       "criminal-justice",
       "jury-selection"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_powell_v_alabama_1932"
+    ],
     "keywords": []
   },
   {
@@ -2740,7 +2885,10 @@
       "supreme-court",
       "voting-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_smith_v_allwright_1944",
+      "ent_law_15th_amendment_1870"
+    ],
     "keywords": []
   },
   {
@@ -2787,7 +2935,9 @@
       "housing"
     ],
     "mentionedEntityIds": [
-      "civil-rights-act-1866"
+      "civil-rights-act-1866",
+      "ent_law_civil_rights_act_1866",
+      "ent_law_fair_housing_act_1968"
     ],
     "keywords": []
   },
@@ -2835,7 +2985,9 @@
       "school-desegregation",
       "busing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_milliken_v_bradley_1974"
+    ],
     "keywords": []
   },
   {
@@ -2929,7 +3081,9 @@
       "employment",
       "equal-protection"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_griggs_v_duke_power_1971"
+    ],
     "keywords": []
   },
   {
@@ -2976,7 +3130,9 @@
       "public-accommodations",
       "commerce-clause"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_civil_rights_act_1964"
+    ],
     "keywords": []
   },
   {
@@ -3023,7 +3179,9 @@
       "education",
       "affirmative-action"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_regents_uc_v_bakke_1978"
+    ],
     "keywords": []
   },
   {
@@ -3071,7 +3229,13 @@
       "nonviolence",
       "organizing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954",
+      "ent_ebenezer_baptist_atlanta_001",
+      "ent_law_fair_housing_act_1968",
+      "ent_martin_luther_king_jr_001",
+      "ent_sclc_founding_001"
+    ],
     "keywords": []
   },
   {
@@ -3119,7 +3283,11 @@
       "self-determination",
       "organizing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_black_panther_party_founding_001",
+      "ent_meredith_march_against_fear_001",
+      "ent_stokely_carmichael_001"
+    ],
     "keywords": []
   }
 ]

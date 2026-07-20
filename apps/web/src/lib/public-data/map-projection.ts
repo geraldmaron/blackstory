@@ -161,13 +161,14 @@ export function mapProjectionToPublicEntityView(
 
   const lat = projection.location?.lat;
   const lng = projection.location?.lng;
+  // MapFrame pins are CSS percentages (0–100), matching bundled seed fixtures.
   const mapPin =
     typeof lat === 'number' && typeof lng === 'number'
       ? {
-          x: Math.min(1, Math.max(0, (lng + 125) / 60)),
-          y: Math.min(1, Math.max(0, (50 - lat) / 25)),
+          x: Math.min(100, Math.max(0, ((lng + 125) / 60) * 100)),
+          y: Math.min(100, Math.max(0, ((50 - lat) / 25) * 100)),
         }
-      : { x: 0.5, y: 0.5 };
+      : { x: 50, y: 50 };
 
   return {
     id: projection.id,

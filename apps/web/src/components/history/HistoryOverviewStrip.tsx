@@ -1,13 +1,11 @@
 /**
- * Overview strip for `/history` browse: matched record and connection counts, kind
- * composition bars, and decade density sparkline derived from the view-model overview.
- * Visual only — decade selection stays on the stepper. History-scoped classes avoid
- * coupling to home/data chart strips.
+ * Overview strip for `/history` browse: matched record and connection counts, plus
+ * decade density sparkline. Kind composition lives on the data panel (filterable) so
+ * this strip stays a compact coverage summary.
  */
 import React from 'react';
 import { cx } from '@repo/ui';
 import type { HistoryOverview } from '../../lib/history/overview';
-import { kindEncodingFor } from '../../lib/map-experience/kind-encoding';
 
 void React;
 
@@ -31,7 +29,6 @@ function sampleDecadeDensity(
 }
 
 export function HistoryOverviewStrip({ overview, activeDecade, className }: HistoryOverviewStripProps) {
-  const maxKindCount = overview.kindCounts.reduce((max, entry) => Math.max(max, entry.count), 0);
   const densityBars = sampleDecadeDensity(overview.decadeDensity);
   const maxDensityCount = densityBars.reduce((max, entry) => Math.max(max, entry.count), 0);
 
@@ -50,56 +47,6 @@ export function HistoryOverviewStrip({ overview, activeDecade, className }: Hist
           <dd className="ds-history-overview__stat-value">{overview.totalConnections}</dd>
         </div>
       </dl>
-
-      {overview.kindCounts.length > 0 ? (
-        <div className="ds-history-overview__kinds">
-          <h3 className="ds-history-overview__section-label">Kind composition</h3>
-          <ul className="ds-history-overview__kind-list">
-            {overview.kindCounts.map((entry) => {
-              const encoding = kindEncodingFor(entry.kind);
-              const widthPercent =
-                maxKindCount > 0 ? Math.max(4, Math.round((entry.count / maxKindCount) * 100)) : 0;
-              const barLabel = `${encoding.label}: ${entry.count} record${
-                entry.count === 1 ? '' : 's'
-              }`;
-
-              return (
-                <li key={entry.kind} className="ds-history-overview__kind-row">
-                  <span className="ds-history-overview__kind-label">
-                    <span className="ds-history-overview__kind-label-main">
-                      <span
-                        className={cx(
-                          'ds-legend-glyph',
-                          `ds-legend-glyph--${encoding.glyph}`,
-                          'ds-history-overview__kind-glyph',
-                        )}
-                        style={
-                          encoding.glyph === 'ring'
-                            ? { borderColor: encoding.shade, background: 'transparent' }
-                            : { background: encoding.shade, borderColor: encoding.shade }
-                        }
-                        aria-hidden="true"
-                      />
-                      {encoding.label}
-                    </span>
-                    <span className="ds-history-overview__kind-count">{entry.count}</span>
-                  </span>
-                  <span
-                    className="ds-history-overview__kind-bar"
-                    role="img"
-                    aria-label={barLabel}
-                  >
-                    <span
-                      className="ds-history-overview__kind-bar-fill"
-                      style={{ width: `${widthPercent}%`, background: encoding.shade }}
-                    />
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ) : null}
 
       {densityBars.length > 0 ? (
         <div className="ds-history-overview__density">

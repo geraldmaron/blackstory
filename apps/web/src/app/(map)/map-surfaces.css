@@ -27,15 +27,21 @@
 
 /* MapLibre's own container (MapStage.tsx's `containerRef`) — never the plate above. MapLibre
    stamps `maplibregl-map` (position: relative, from maplibre-gl.css) onto whatever element it's
-   given, so that class name must land here, one level in, not on the fixed plate. */
+   given, so that class name must land here, one level in, not on the fixed plate. Memorial
+   names live inside the MapLibre style stack (ocean symbol layer under land fills), not as a
+   DOM sibling under this canvas. */
 .ds-map-stage__canvas {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
+  /* Isolate MapLibre stacking so canvas children cannot slip under chrome. */
+  isolation: isolate;
 }
 
 /* The stock zoom control re-dressed in the island language — ink glass, not
-   white plastic. Hidden on touch-scale viewports: pinch zoom carries it, and
-   top-right is island/instrument territory there. */
+   white plastic. Hero keeps top-right; Explore parks zoom bottom-right so the
+   records rail never covers it (see `:has(.ds-explore-stage)` rules below). */
 .ds-map-stage .maplibregl-ctrl-top-right {
   top: calc(var(--ds-island-offset) + var(--ds-island-height) + var(--ds-space-3));
 }
@@ -74,9 +80,55 @@
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
+/* Hero / non-explore: hide zoom on touch-scale (pinch carries it). Explore keeps
+   zoom visible and repositions it into a safe zone below. */
 @media (max-width: 47.9375rem) {
-  .ds-map-stage .maplibregl-ctrl-top-right {
+  .ds-map-surface:not(:has(.ds-explore-stage)) .maplibregl-ctrl-top-right {
     display: none;
+  }
+}
+
+/* Explore: bottom-right zoom, inset when the records sheet/rail is open. */
+.ds-map-surface:has(.ds-explore-stage) {
+  --ds-explore-edge: var(--ds-space-4);
+  --ds-explore-results-width: min(92vw, 22.5rem);
+  --ds-explore-zoom-right: var(--ds-explore-edge);
+  --ds-explore-zoom-bottom: var(--ds-explore-edge);
+}
+
+.ds-map-surface:has(.ds-explore-stage) .maplibregl-ctrl-top-right {
+  top: auto;
+  right: var(--ds-explore-zoom-right);
+  bottom: var(--ds-explore-zoom-bottom);
+  display: block;
+}
+
+.ds-map-surface:has(.ds-explore-stage[data-results='open']) {
+  --ds-explore-zoom-right: calc(
+    var(--ds-explore-edge) + var(--ds-explore-results-width) + var(--ds-space-3)
+  );
+}
+
+@media (max-width: 64rem) {
+  .ds-map-surface:has(.ds-explore-stage) {
+    --ds-explore-results-width: min(92vw, 22.5rem);
+  }
+
+  /* Records become a bottom sheet — park zoom above it, not beside a right rail. */
+  .ds-map-surface:has(.ds-explore-stage[data-results='open']) {
+    --ds-explore-zoom-right: var(--ds-explore-edge);
+    --ds-explore-zoom-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
+  }
+}
+
+@media (max-width: 39.9375rem) {
+  .ds-map-surface:has(.ds-explore-stage) {
+    --ds-explore-edge: var(--ds-space-3);
+    --ds-explore-results-width: calc(100vw - var(--ds-explore-edge) * 2);
+  }
+
+  .ds-map-surface:has(.ds-explore-stage[data-results='open']) {
+    --ds-explore-zoom-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
   }
 }
 
@@ -140,9 +192,8 @@
   }
 }
 
-.ds-explore-stage--entering .ds-explore-stage__filters,
-.ds-explore-stage--entering .ds-explore-stage__results,
-.ds-explore-stage--entering .ds-explore-stage__legend {
+.ds-explore-stage--entering .ds-explore-stage__instruments,
+.ds-explore-stage--entering .ds-explore-stage__results {
   animation: ds-explore-panel-enter var(--ds-duration-base) var(--ds-easing) both;
 }
 
@@ -150,14 +201,9 @@
   animation-delay: 60ms;
 }
 
-.ds-explore-stage--entering .ds-explore-stage__legend {
-  animation-delay: 100ms;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .ds-explore-stage--entering .ds-explore-stage__filters,
-  .ds-explore-stage--entering .ds-explore-stage__results,
-  .ds-explore-stage--entering .ds-explore-stage__legend {
+  .ds-explore-stage--entering .ds-explore-stage__instruments,
+  .ds-explore-stage--entering .ds-explore-stage__results {
     animation: none;
     opacity: 1;
     transform: none;
@@ -165,12 +211,14 @@
 }
 
 /* —— Explore stage: floating chrome over the shared canvas ——
- * The map fills the viewport behind this; every panel below is independently fixed-positioned
- * (a grid would force a layout the map doesn't need) so the canvas stays interactive everywhere
- * a panel isn't. Mobile-sheet consolidation of these panels is bead the related workstream's scope, not
- * this one's — the stacked/simplified mobile rules here are a functional floor, not the final
- * polish pass. */
+ * One left instrument chassis (Filters | Color key tabs) + optional records rail/sheet.
+ * Zoom safe-zones live on `.ds-map-surface:has(.ds-explore-stage…)` above — not inset
+ * stacking of a separate legend box.
+ */
 .ds-explore-stage {
+  --ds-explore-edge: var(--ds-space-4);
+  --ds-explore-instruments-width: min(88vw, 19rem);
+  --ds-explore-results-width: min(92vw, 22.5rem);
   position: relative;
   z-index: 1;
   color: var(--ds-ink);
@@ -185,36 +233,250 @@
   transform: translateX(-50%);
 }
 
-/* Instruments follow the reader theme — glassy surface over the map plate.
-   Keep enough translucency for continuity, but not so thin that state labels /
-   dark markers bleed through the legend and read as stray black UI chrome. */
-.ds-explore-stage__filters {
+/* Left instrument chassis — Filters + Color key share one surface via tabs. */
+.ds-explore-stage__instruments {
   position: fixed;
   top: calc(var(--ds-island-clearance) + var(--ds-space-2));
-  left: var(--ds-space-4);
-  z-index: 2;
+  left: var(--ds-explore-edge);
+  z-index: 3;
   display: grid;
+  align-content: start;
   gap: var(--ds-space-2);
-  width: min(88vw, 19rem);
+  width: var(--ds-explore-instruments-width);
   max-height: calc(100svh - var(--ds-island-clearance) - var(--ds-space-8));
   padding: var(--ds-space-3);
   overflow-y: auto;
+  scroll-padding-top: var(--ds-space-2);
   border: var(--ds-border-width) solid var(--ds-border);
-  /* Instruments read radius-md — radius-lg is reserved for sheets/dialogs. */
   border-radius: var(--ds-radius-md);
   background: color-mix(in srgb, var(--ds-surface) 96%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 
-/* Compact facet row — one coherent control register (md radius, hairline
-   border, ≥44px hit area). Replaces default capsule pill-select language. */
-.ds-explore-stage__filters .ds-pill-select__label {
+.ds-explore-stage__tabs {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: var(--ds-space-1);
+}
+
+.ds-explore-stage__tab {
+  flex: 1 1 0;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-2);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.ds-explore-stage__tab[aria-selected='true'] {
+  border-color: var(--ds-accent);
+  color: var(--ds-accent);
+}
+
+.ds-explore-stage__tab:hover {
+  border-color: var(--ds-border-strong);
+  color: var(--ds-ink);
+}
+
+.ds-explore-stage__tab:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-explore-stage__tabpanel {
+  display: grid;
+  gap: var(--ds-space-2);
+  min-width: 0;
+}
+
+.ds-explore-stage__tabpanel[hidden] {
+  display: none;
+}
+
+/* Place finder — lean instrument: search + radius chips (not a stacked form stack). */
+.ds-explore-place {
+  display: grid;
+  gap: var(--ds-space-2);
+  padding-bottom: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+}
+
+.ds-explore-place__form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--ds-space-2);
+  align-items: end;
+}
+
+.ds-explore-place__field {
+  display: grid;
+  gap: var(--ds-space-1);
+  min-width: 0;
+}
+
+.ds-explore-place__label {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-explore-place__input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-ui);
+  font-size: 0.875rem;
+}
+
+.ds-explore-place__input:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+  border-color: var(--ds-accent);
+}
+
+.ds-explore-place__radius {
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-explore-place__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1);
+}
+
+.ds-explore-place__chip {
+  min-height: 2.25rem;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.ds-explore-place__chip:hover,
+.ds-explore-place__chip:focus-visible {
+  border-color: var(--ds-accent);
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+.ds-explore-place__chip--selected {
+  background: var(--ds-fixed-ink);
+  border-color: var(--ds-fixed-ink);
+  color: var(--ds-fixed-paper);
+}
+
+.ds-explore-place__chip--selected:hover,
+.ds-explore-place__chip--selected:focus-visible {
+  border-color: var(--ds-fixed-accent);
+  outline-color: var(--ds-fixed-accent);
+}
+
+.ds-explore-place__status {
+  margin: 0;
+  min-height: 1.15rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--ds-ink-muted);
+}
+
+.ds-explore-place-focus {
+  display: grid;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-2) 0 var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+}
+
+.ds-explore-place-focus__message {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ds-ink);
+}
+
+.ds-explore-place-focus__closest {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-explore-place-focus__closest-btn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+  width: 100%;
+  min-height: 2.5rem;
+  padding: var(--ds-space-2) 0;
+  border: 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ds-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ds-explore-place-focus__closest-btn:hover,
+.ds-explore-place-focus__closest-btn:focus-visible {
+  color: var(--ds-accent);
+  outline: none;
+}
+
+.ds-explore-place-focus__closest-btn:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+.ds-explore-place-focus__closest-name {
+  font-family: var(--ds-font-ui);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.ds-explore-place-focus__closest-dist {
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--ds-ink-muted);
+}
+
+/* Legacy address-search hooks — kept for any residual class references during HMR. */
+.ds-explore-address-search {
+  display: contents;
+}
+
+.ds-explore-stage__instruments .ds-pill-select__label {
   font-size: 0.625rem;
   letter-spacing: 0.08em;
 }
 
-.ds-explore-stage__filters .ds-pill-select__control {
+.ds-explore-stage__instruments .ds-pill-select__control {
   width: 100%;
   min-height: 2.75rem;
   padding: 0 var(--ds-space-3);
@@ -225,34 +487,40 @@
   font-weight: 500;
 }
 
-.ds-explore-stage__filters .ds-pill-select__control:hover {
+.ds-explore-stage__instruments .ds-pill-select__control:hover {
   border-color: var(--ds-border-strong);
   background: color-mix(in srgb, var(--ds-ink) 4%, transparent);
 }
 
-.ds-explore-stage__filters .ds-pill-select__control:focus-visible {
+.ds-explore-stage__instruments .ds-pill-select__control:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: var(--ds-focus-offset);
 }
 
 /* Copper marks the open instrument — an orientation moment (selected filter group), not a
    decorative wash; the closed registers stay muted ink. */
-.ds-explore-stage__filters details[open] > .ds-explore-stage__disclosure-summary,
+.ds-explore-stage__instruments details[open] > .ds-explore-stage__disclosure-summary,
 .ds-explore-stage__results details[open] > .ds-explore-stage__disclosure-summary {
   color: var(--ds-accent);
 }
 
-.ds-explore-stage__filters:focus-visible {
+.ds-explore-stage__instruments:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: var(--ds-focus-offset);
 }
 
-/* Panel chrome — title row + hide control; restore buttons when a rail is collapsed. */
+/* Panel chrome — tab row / title + hide control. Sticky within scrollable panels. */
 .ds-explore-stage__panel-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--ds-space-2);
+  padding-bottom: var(--ds-space-2);
+  margin-bottom: calc(-1 * var(--ds-space-2));
+  background: color-mix(in srgb, var(--ds-surface) 96%, transparent);
 }
 
 .ds-explore-stage__panel-header .ds-explore-stage__panel-title,
@@ -263,28 +531,27 @@
 
 .ds-explore-stage__panel-hide {
   flex: 0 0 auto;
-  align-self: flex-start;
+  align-self: stretch;
   white-space: nowrap;
+  margin-left: var(--ds-space-1);
 }
 
-.ds-explore-stage__filters--hidden,
-.ds-explore-stage__results--hidden,
-.ds-explore-stage__legend--hidden {
+.ds-explore-stage__instruments--hidden,
+.ds-explore-stage__results--hidden {
   visibility: hidden;
   pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .ds-explore-stage__filters,
-  .ds-explore-stage__results,
-  .ds-explore-stage__legend {
+  .ds-explore-stage__instruments,
+  .ds-explore-stage__results {
     transition:
       opacity var(--ds-duration-fast) var(--ds-easing),
       transform var(--ds-duration-fast) var(--ds-easing),
       visibility var(--ds-duration-fast) var(--ds-easing);
   }
 
-  .ds-explore-stage__filters--hidden {
+  .ds-explore-stage__instruments--hidden {
     opacity: 0;
     transform: translateX(calc(-1 * var(--ds-space-4)));
   }
@@ -293,16 +560,39 @@
     opacity: 0;
     transform: translateX(var(--ds-space-4));
   }
+}
 
-  .ds-explore-stage__legend--hidden {
-    opacity: 0;
-    transform: translateY(var(--ds-space-4));
-  }
+/* Compact restore dock — chips only when a chassis/rail is fully collapsed. */
+.ds-explore-stage__restore-dock {
+  position: fixed;
+  top: calc(var(--ds-island-clearance) + var(--ds-space-2));
+  left: var(--ds-explore-edge);
+  right: var(--ds-explore-edge);
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  pointer-events: none;
+}
+
+.ds-explore-stage__restore-dock .ds-explore-stage__panel-restore {
+  pointer-events: auto;
+}
+
+.ds-explore-stage__restore-dock .ds-explore-stage__panel-restore--results {
+  margin-left: auto;
+}
+
+.ds-explore-stage[data-instruments='open'] .ds-explore-stage__restore-dock {
+  /* Instruments own the top-left — park remaining chips (Records) top-right. */
+  justify-content: flex-end;
+}
+
+.ds-explore-stage[data-instruments='open'] .ds-explore-stage__restore-dock .ds-explore-stage__panel-restore--results {
+  margin-left: 0;
 }
 
 .ds-explore-stage__panel-restore {
-  position: fixed;
-  z-index: 2;
   min-height: 2.75rem;
   min-width: 2.75rem;
   padding: 0 var(--ds-space-3);
@@ -315,21 +605,6 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   white-space: nowrap;
-}
-
-.ds-explore-stage__panel-restore--filters {
-  top: calc(var(--ds-island-clearance) + var(--ds-space-2));
-  left: var(--ds-space-4);
-}
-
-.ds-explore-stage__panel-restore--results {
-  top: calc(var(--ds-island-clearance) + var(--ds-space-2));
-  right: var(--ds-space-4);
-}
-
-.ds-explore-stage__panel-restore--key {
-  bottom: var(--ds-space-4);
-  left: var(--ds-space-4);
 }
 
 .ds-explore-stage__panel-restore:focus-visible {
@@ -365,8 +640,6 @@
   border-top: var(--ds-border-width) solid var(--ds-border);
 }
 
-/* Full-width instrument toggles — compact height, sm radius, shared outline
-   register with facet selects (secondary off, copper on). */
 .ds-explore-stage__toolbar .ds-button {
   width: 100%;
   justify-content: flex-start;
@@ -394,14 +667,15 @@
 .ds-explore-stage__results {
   position: fixed;
   top: calc(var(--ds-island-clearance) + var(--ds-space-2));
-  right: var(--ds-space-4);
-  z-index: 2;
+  right: var(--ds-explore-edge);
+  z-index: 3;
   display: grid;
   gap: var(--ds-space-3);
-  width: min(92vw, 22.5rem);
+  width: var(--ds-explore-results-width);
   max-height: calc(100svh - var(--ds-island-clearance) - var(--ds-space-8));
   padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-6);
   overflow-y: auto;
+  scroll-padding-top: var(--ds-space-2);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   background: color-mix(in srgb, var(--ds-surface) 96%, transparent);
@@ -448,7 +722,6 @@
   z-index: 1;
   width: min(92vw, 32rem);
   max-height: min(78svh, 40rem);
-  /* Roomier than the instrument panels — card content needs clear margin from the copper rule. */
   padding: var(--ds-space-8);
   overflow-y: auto;
   border: var(--ds-border-width) solid var(--ds-border);
@@ -475,8 +748,6 @@
   cursor: pointer;
 }
 
-/* Selected row — copper left rule + subtle fill (story-rail register), never
-   an inset card on a different surface. */
 .ds-explore-stage__results .ds-result-list__link {
   gap: var(--ds-space-1);
   padding: var(--ds-space-3) 0 var(--ds-space-3) var(--ds-space-2);
@@ -528,7 +799,6 @@
   gap: var(--ds-space-1) var(--ds-space-2);
 }
 
-/* Kind badge needs full row — never crushed into a narrow meta cell. */
 .ds-explore-stage__results .ds-result-meta:first-child {
   grid-column: 1 / -1;
 }
@@ -591,42 +861,40 @@
   }
 }
 
-.ds-explore-stage__legend {
-  position: fixed;
-  bottom: var(--ds-space-4);
-  left: var(--ds-space-4);
-  z-index: 2;
-  width: min(88vw, 20rem);
-  max-height: min(50vh, 28rem);
-  padding: var(--ds-space-2) var(--ds-space-3);
-  overflow-y: auto;
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, var(--ds-surface) 88%, transparent);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+.ds-map-color-key--embedded {
+  padding-bottom: var(--ds-space-2);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
 @media (max-width: 64rem) {
-  .ds-explore-stage__filters,
+  .ds-explore-stage__instruments,
   .ds-explore-stage__results {
-    max-height: 40vh;
+    max-height: min(42vh, 22rem);
   }
 
   .ds-explore-stage__results {
     top: auto;
-    bottom: var(--ds-space-4);
-    right: var(--ds-space-4);
+    bottom: var(--ds-explore-edge);
+    right: var(--ds-explore-edge);
   }
 
   .ds-explore-stage__results--dimmed {
     opacity: 0;
   }
 
-  .ds-explore-stage__panel-restore--results {
+  .ds-explore-stage[data-instruments='open'] .ds-explore-stage__restore-dock,
+  .ds-explore-stage[data-instruments='closed'] .ds-explore-stage__restore-dock {
     top: auto;
-    bottom: var(--ds-space-4);
-    right: var(--ds-space-4);
+    bottom: var(--ds-explore-edge);
+    left: var(--ds-explore-edge);
+    right: var(--ds-explore-edge);
+    max-width: none;
+    justify-content: flex-start;
+  }
+
+  /* Keep restore chips above an open records sheet. */
+  .ds-explore-stage[data-results='open'] .ds-explore-stage__restore-dock {
+    bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
   }
 
   .ds-explore-stage__spotlight {
@@ -642,36 +910,22 @@
     border-left-width: var(--ds-border-width);
     border-top: 3px solid var(--ds-accent);
   }
-
-  .ds-explore-stage__legend {
-    display: none;
-  }
-
-  .ds-explore-stage__panel-restore--key {
-    display: none;
-  }
 }
 
 @media (max-width: 39.9375rem) {
-  .ds-explore-stage__filters {
-    left: var(--ds-space-3);
-    width: calc(100vw - var(--ds-space-3) * 2);
+  .ds-explore-stage {
+    --ds-explore-edge: var(--ds-space-3);
+    --ds-explore-instruments-width: calc(100vw - var(--ds-explore-edge) * 2);
+    --ds-explore-results-width: calc(100vw - var(--ds-explore-edge) * 2);
+  }
+
+  .ds-explore-stage__instruments {
+    left: var(--ds-explore-edge);
+    width: var(--ds-explore-instruments-width);
   }
 
   .ds-explore-stage__results {
-    right: var(--ds-space-3);
-    width: calc(100vw - var(--ds-space-3) * 2);
-  }
-
-  .ds-explore-stage__panel-restore--filters {
-    left: var(--ds-space-3);
-  }
-
-  .ds-explore-stage__panel-restore--results {
-    right: var(--ds-space-3);
-  }
-
-  .ds-explore-stage__panel-restore--key {
-    left: var(--ds-space-3);
+    right: var(--ds-explore-edge);
+    width: var(--ds-explore-results-width);
   }
 }

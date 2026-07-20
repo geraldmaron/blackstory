@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" fill="none">
   <!-- Sparse place-pin marks for dark shell page fields; one copper orientation pin -->
-  <g fill="#D7D0C4" opacity="0.4">
+  <g fill="#D7D0C4" opacity="0.22">
     <circle cx="40" cy="36" r="4"/>
     <path d="M40 40v28"/>
     <circle cx="112" cy="56" r="4"/>
@@ -12,7 +12,7 @@
     <circle cx="140" cy="132" r="4"/>
     <path d="M140 136v22"/>
   </g>
-  <g fill="#D07A32" opacity="0.45">
+  <g fill="#D07A32" opacity="0.24">
     <circle cx="88" cy="72" r="5"/>
     <path d="M88 77v18"/>
   </g>

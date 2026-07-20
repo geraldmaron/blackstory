@@ -29,7 +29,7 @@ test('renders name, era, one-line story, evidence count, confidence, and a link 
   assert.match(html, /ds-confidence-mark/);
   assert.match(html, /data-labeled="true"/);
   assert.match(html, /ds-confidence-mark__icon/);
-  assert.match(html, /aria-label="[^"]*confidence"/i);
+  assert.match(html, /aria-label="High confidence/i);
   assert.match(html, /ds-status-mark/);
   assert.match(html, new RegExp(`href="${feature.properties.href}"`));
   assert.match(html, /Selected record/);
@@ -38,14 +38,17 @@ test('renders name, era, one-line story, evidence count, confidence, and a link 
   assert.match(html, /Open full record/);
 });
 
-test('links Where, Era, Evidence, Kind, and Status metadata to the right site views', () => {
+test('links Where to external maps and other metadata to the right site views', () => {
   const feature = requireFeature('ent_15th_st_church_001');
   const html = renderToStaticMarkup(createElement(NarrativeCard, { feature }));
   const { properties } = feature;
 
   assert.equal(properties.statePostalCode, 'DC');
-  assert.match(html, /href="[^"]*state=DC"/);
-  assert.match(html, /aria-label="View records in DC"/);
+  assert.match(html, /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=/);
+  assert.match(html, /aria-label="Open [^"]+ in maps"/);
+  assert.match(html, /rel="noopener noreferrer"/);
+  assert.match(html, /target="_blank"/);
+  assert.doesNotMatch(html, /href="[^"]*state=DC"/);
   assert.match(html, /href="[^"]*era=1840s"/);
   assert.match(html, /href="\/entity\/ent_15th_st_church_001#accepted-claims"/);
   assert.match(html, /href="[^"]*kind=place"/);
@@ -62,6 +65,7 @@ test('renders an em dash for Where when no postal code is present', () => {
   const html = renderToStaticMarkup(createElement(NarrativeCard, { feature: withoutState }));
   assert.match(html, /—/);
   assert.doesNotMatch(html, /aria-label="View records in/);
+  assert.doesNotMatch(html, /href="[^"]*state=/);
 });
 
 test('renders the radius affordance as words, never as a bare number with no context', () => {

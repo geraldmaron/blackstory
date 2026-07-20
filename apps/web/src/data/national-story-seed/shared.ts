@@ -27,10 +27,11 @@ export function revisionFor(recordUpdatedAt: string): RevisionMetadata {
   };
 }
 
+/** Schematic MapFrame pin as CSS percentages (0–100) from a public lat/lng. */
 export function mapPinFromGeo(lat: number, lng: number): { readonly x: number; readonly y: number } {
   return {
-    x: Math.min(1, Math.max(0, (lng + 125) / 60)),
-    y: Math.min(1, Math.max(0, (50 - lat) / 25)),
+    x: Math.min(100, Math.max(0, ((lng + 125) / 60) * 100)),
+    y: Math.min(100, Math.max(0, ((50 - lat) / 25) * 100)),
   };
 }
 

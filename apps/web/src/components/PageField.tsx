@@ -2,7 +2,8 @@
  * Decorative shell page-field motif layer for non-map archive surfaces.
  *
  * Renders a full-bleed, aria-hidden repeating SVG tile behind routed page content.
- * Map routes opt out via selectPageField(null) and shell.css `:has([data-surface='map'])`.
+ * Opacity and tile size are tuned in shell.css so body copy stays primary. Map routes
+ * opt out via selectPageField(null) and shell.css `:has([data-surface='map'])`.
  */
 'use client';
 

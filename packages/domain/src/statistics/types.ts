@@ -69,6 +69,7 @@ export const STATISTICAL_GEOGRAPHY_TYPES = [
   'school',
   'facility',
   'state',
+  'nation',
 ] as const;
 
 export type StatisticalGeographyType = (typeof STATISTICAL_GEOGRAPHY_TYPES)[number];

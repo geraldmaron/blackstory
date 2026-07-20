@@ -31,7 +31,7 @@ export const HISTORY_GAP_COPY: Readonly<Record<HistoryGapKind, HistoryGapCopy>> 
     title: 'No records match these filters',
     body:
       'Try clearing filters or choosing a different decade. The synchronized list always reflects ' +
-      'the same filtered set as the graph panel.',
+      'the same filtered set as the data panel.',
   },
 };
 

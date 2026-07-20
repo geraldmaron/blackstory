@@ -1,16 +1,19 @@
 /**
  * ZIP-to-place translate-then-discard (; ADR-016 "ZIPs: never
- * stored as reference data"). A user-entered ZIP is used ONLY to ask the Census Geocoder what
- * place/state/county it falls within the raw ZIP is never returned by this function. This is
- * enforced at the type level, not just by convention: `ZipTranslation` carries no `zip` field,
- * so a caller cannot accidentally thread the raw ZIP through to a persisted record just by
- * spreading this function's return value.
+ * stored as reference data"). A user-entered ZIP is used ONLY to ask what place/state/county it
+ * falls within — the raw ZIP is never returned by this function. Census Geocoder's forward
+ * `onelineaddress` endpoint does not match bare ZIP codes, so this module resolves the ZIP to an
+ * approximate centroid (open-source `zipcodes` dataset) and reverse-geocodes those coordinates
+ * through Census for jurisdiction ids.
  */
 import { assertZipNotHistoricalBoundary } from '../geography/location.js';
+import { evaluateGeocodeProductScope } from './product-scope.js';
 import { buildManualPlaceSearchFallback } from './manual-fallback.js';
 import { resolveJurisdictionIdsFromMatch } from './jurisdiction-ids.js';
+import { lookupUsZipCentroid, type LookupUsZipCentroid } from './zip-centroid.js';
+import { normalizeUsZipInput } from './zip-normalize.js';
 import type {
-  CensusAddressGeocodeFetcher,
+  CensusCoordinatesGeocodeFetcher,
   ManualPlaceSearchFallback,
   ResolvedJurisdictionIds,
 } from './types.js';
@@ -32,14 +35,13 @@ export type ZipTranslationResult = ZipTranslation | ZipTranslationFailure;
 
 export type TranslateZipToPlaceInput = {
   readonly zip: string;
-  readonly fetchAddressGeocode: CensusAddressGeocodeFetcher;
+  readonly fetchCoordinatesGeocode: CensusCoordinatesGeocodeFetcher;
+  readonly lookupZipCentroid?: LookupUsZipCentroid;
 };
 
-const ZIP_PATTERN = /^\d{5}(-\d{4})?$/;
-
 export async function translateZipToPlace(input: TranslateZipToPlaceInput): Promise<ZipTranslationResult> {
-  const zip = input.zip.trim();
-  if (!ZIP_PATTERN.test(zip)) {
+  const zip5 = normalizeUsZipInput(input.zip);
+  if (!zip5) {
     return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
   }
 
@@ -48,27 +50,34 @@ export async function translateZipToPlace(input: TranslateZipToPlaceInput): Prom
   // different role literal.
   assertZipNotHistoricalBoundary('modern_lookup');
 
-  let matches: readonly Awaited<ReturnType<CensusAddressGeocodeFetcher>>[number][];
+  const lookup = input.lookupZipCentroid ?? lookupUsZipCentroid;
+  const centroid = lookup(zip5);
+  if (!centroid) {
+    return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
+  }
+
+  let match: Awaited<ReturnType<CensusCoordinatesGeocodeFetcher>>;
   try {
-    matches = await input.fetchAddressGeocode(zip);
+    match = await input.fetchCoordinatesGeocode({ lat: centroid.lat, lng: centroid.lng });
   } catch {
     return { ok: false, fallback: buildManualPlaceSearchFallback('geocoder_unavailable') };
   }
 
-  const best = matches[0];
-  if (!best) {
+  const scope = evaluateGeocodeProductScope(match);
+  if (!scope.inScope) {
     return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
   }
 
-  const jurisdictionIds = resolveJurisdictionIdsFromMatch(best);
+  const jurisdictionIds = resolveJurisdictionIdsFromMatch(match);
+  const placeName = match.placeName ?? centroid.city;
 
-  // `zip` (the input) and `best.zip` (echoed back by Census, when present) are deliberately
-  // NOT included below translate-then-discard.
+  // `zip` (the input) and any echoed ZIP from Census are deliberately NOT included below —
+  // translate-then-discard.
   return {
     ok: true,
-    ...(best.placeName ? { placeName: best.placeName } : {}),
-    ...(best.stateName ? { stateName: best.stateName } : {}),
-    ...(best.countyName ? { countyName: best.countyName } : {}),
+    ...(placeName ? { placeName } : {}),
+    ...(match.stateName ? { stateName: match.stateName } : {}),
+    ...(match.countyName ? { countyName: match.countyName } : {}),
     jurisdictionIds,
   };
 }

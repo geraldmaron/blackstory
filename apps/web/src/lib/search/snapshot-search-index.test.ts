@@ -46,7 +46,8 @@ test('notabilityBasis resolves the real rubric criterion since seed labels now q
       (doc.notabilityBasis[0]?.evidenceIds.length ?? 0) > 0,
       `${doc.id} must attach cited claim ids to inclusion evidence`,
     );
-    assert.match(doc.notabilityBasis[0]!.note, /Cited from /);
+    assert.doesNotMatch(doc.notabilityBasis[0]!.note, /Cited from /i);
+    assert.match(doc.notabilityBasis[0]!.note, /^.+\.$/);
   }
 });
 

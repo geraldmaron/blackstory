@@ -13,6 +13,10 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { AppCheckVerifier } from '@repo/firebase';
 import type { CensusGeocodeMatch } from '@repo/domain';
+import {
+  DEFAULT_ENDPOINT_QUOTA_MATRIX,
+  resolveEndpointPolicy,
+} from '@repo/security';
 import { createLocateCache } from '../../../lib/geocode/pipeline';
 import { createLocateAppCheckGuard } from './app-check-guard';
 import { createLocateRateLimitGuard } from './rate-limit-guard';
@@ -116,14 +120,52 @@ test('resolves a real address to jurisdiction ids with exact coordinates dropped
   assert.equal(body.resolution.precision.lng, undefined, 'exact lng must not leak once reduced');
 });
 
-test('a ZIP input resolves to a place and never echoes the ZIP back (AC6 translate-then-discard)', async () => {
+test('camera=1 retains coordinates for a one-shot explore map fly-to', async () => {
   const deps = await buildDeps({ fetchAddressGeocode: fakeAddressFetcher([DC_MATCH]) });
+  const response = await handleLocateRequest(
+    locateRequest('?address=4600+Silver+Hill+Rd%2C+Washington%2C+DC&camera=1'),
+    deps,
+  );
+  assert.equal(response.status, 200);
+
+  const body = (await response.json()) as LocateSuccessBody;
+  assert.equal(body.ok, true);
+  assert.equal(body.resolution.precision.exactCoordinatesRetained, true);
+  assert.equal(body.resolution.precision.lat, DC_MATCH.lat);
+  assert.equal(body.resolution.precision.lng, DC_MATCH.lng);
+});
+
+test('a ZIP input resolves to a place and never echoes the ZIP back (AC6 translate-then-discard)', async () => {
+  const deps = await buildDeps({ fetchCoordinatesGeocode: fakeCoordinatesFetcher(DC_MATCH) });
   const response = await handleLocateRequest(locateRequest('?address=20233'), deps);
   assert.equal(response.status, 200);
 
   const raw = await response.text();
   assert.doesNotMatch(raw, /20233/, 'the raw ZIP must not appear anywhere in the response body');
   const body = JSON.parse(raw) as LocateSuccessBody;
+  assert.equal(body.resolution.jurisdictionIds.stateId, 'us-11');
+});
+
+test('a ZIP input with camera=1 retains centroid coordinates for explore map fly-to', async () => {
+  const deps = await buildDeps({ fetchCoordinatesGeocode: fakeCoordinatesFetcher(DC_MATCH) });
+  const response = await handleLocateRequest(locateRequest('?address=46202&camera=1'), deps);
+  assert.equal(response.status, 200);
+
+  const body = (await response.json()) as LocateSuccessBody;
+  assert.equal(body.ok, true);
+  assert.equal(body.resolution.precision.exactCoordinatesRetained, true);
+  assert.equal(body.resolution.precision.tier, 'locality');
+  assert.equal(typeof body.resolution.precision.lat, 'number');
+  assert.equal(typeof body.resolution.precision.lng, 'number');
+});
+
+test('ZIP+4 input normalizes to the 5-digit base for lookup', async () => {
+  const deps = await buildDeps({ fetchCoordinatesGeocode: fakeCoordinatesFetcher(DC_MATCH) });
+  const response = await handleLocateRequest(locateRequest('?address=20233-0001'), deps);
+  assert.equal(response.status, 200);
+
+  const body = (await response.json()) as LocateSuccessBody;
+  assert.equal(body.ok, true);
   assert.equal(body.resolution.jurisdictionIds.stateId, 'us-11');
 });
 
@@ -211,11 +253,38 @@ test('a missing App Check token is denied (401 app_check_required)', async () =>
   assert.equal(body.reason, 'missing_token');
 });
 
+test('monitor mode without an App Check token still geocodes (not a fake 429)', async () => {
+  // Local/dev defaults to APP_CHECK_MODE=monitor and often has no App Check site key, so the
+  // client sends no token. Monitor must allow the request through without the rate-limit layer
+  // re-enforcing App Check as rate_limit_exceeded.
+  const appCheckGuard = await createLocateAppCheckGuard({
+    mode: 'monitor',
+    verifier: acceptingVerifier(),
+    telemetry: { record: () => {} },
+  });
+  const deps = await buildDeps({
+    appCheckGuard,
+    fetchAddressGeocode: fakeAddressFetcher([DC_MATCH]),
+  });
+  const response = await handleLocateRequest(
+    locateRequest('?address=4600+Silver+Hill+Rd', { appCheck: false }),
+    deps,
+  );
+  assert.equal(response.status, 200);
+  const body = (await response.json()) as LocateSuccessBody;
+  assert.equal(body.ok, true);
+  assert.equal(body.resolution.jurisdictionIds.stateId, 'us-11');
+});
+
 test('repeated calls exhaust the geocoding rate limit and are denied (429, AC5)', async () => {
-  // Anonymous `geocoding` rolling-window cap is 5 (stricter than search's 8); on a fixed clock no
-  // tokens refill, so the 6th call in the window must be denied.
+  const windowCap = resolveEndpointPolicy(
+    DEFAULT_ENDPOINT_QUOTA_MATRIX,
+    'geocoding',
+    'anonymous',
+  ).windowCap;
+  // Fixed clock: no token refill. Call windowCap times, then the next must be denied.
   const deps = await buildDeps({ fetchAddressGeocode: fakeAddressFetcher([DC_MATCH]) });
-  for (let i = 0; i < 5; i += 1) {
+  for (let i = 0; i < windowCap; i += 1) {
     const ok = await handleLocateRequest(locateRequest(`?address=query+${i}`), deps);
     assert.equal(ok.status, 200, `call ${i + 1} should be allowed`);
   }

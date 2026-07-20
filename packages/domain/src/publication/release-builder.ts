@@ -296,30 +296,44 @@ export function isNotabilityCriterion(value: string): value is NotabilityCriteri
 }
 
 /**
+ * Turns a claim predicate + object into one inclusion-evidence sentence.
+ * Predicates are snake_case catalog keys (`served_as`, `bombed_on`); objects are usually
+ * lowercase continuations authored to follow those keys. Sentence-case the predicate and join
+ * without a colon so public copy reads as prose, not a field dump. Source names belong in the
+ * citation list (evidenceIds), not inline in the note.
+ */
+export function formatClaimInclusionNote(predicate: string, object: string): string {
+  const lead = predicate.replaceAll('_', ' ').trim();
+  const body = object.trim();
+  if (lead.length === 0) {
+    if (body.length === 0) return '';
+    return /[.!?]$/.test(body) ? body : `${body}.`;
+  }
+  const sentenceLead = `${lead.charAt(0).toUpperCase()}${lead.slice(1)}`;
+  if (body.length === 0) return `${sentenceLead}.`;
+  const sentence = `${sentenceLead} ${body}`;
+  return /[.!?]$/.test(sentence) ? sentence : `${sentence}.`;
+}
+
+/**
  * Human-readable inclusion note for one claim-predicate group. Must be specific to this
- * record's claim text and named external sources — never a dump of `NOTABILITY_RUBRIC`
- * methodology prose (that text is criterion definition for methodology pages, not a per-record
- * reason). BlackStory assembles/cites; it does not originate the historical fact.
+ * record's claim text — never a dump of `NOTABILITY_RUBRIC` methodology prose (that text is
+ * criterion definition for methodology pages, not a per-record reason). Citations stay on
+ * `evidenceIds` for the public surface to link; this note does not repeat "Cited from …".
+ * BlackStory assembles/cites; it does not originate the historical fact.
  */
 export function buildNotabilityBasisNote(
   predicate: string,
   predicateClaims: readonly ReleaseClaimProjection[],
 ): string {
   const [sample] = predicateClaims;
-  const claimText = sample
-    ? `${predicate.replaceAll('_', ' ')}: ${sample.object}`
-    : predicate.replaceAll('_', ' ');
-  const sources = [
-    ...new Set(
-      predicateClaims
-        .map((claim) => claim.citationSource.trim())
-        .filter((source) => source.length > 0),
-    ),
-  ];
-  if (sources.length === 0) {
-    return `${claimText}. Linked source citation is incomplete.`;
+  const note = formatClaimInclusionNote(predicate, sample?.object ?? '');
+  const hasCitation = predicateClaims.some((claim) => claim.citationSource.trim().length > 0);
+  if (!hasCitation) {
+    const stem = note.replace(/[.!?]$/, '');
+    return `${stem}. Linked source citation is incomplete.`;
   }
-  return `${claimText}. Cited from ${sources.join('; ')}.`;
+  return note;
 }
 
 /**

@@ -14,15 +14,27 @@
  * provides manual place search), not request errors.
  */
 import { NextResponse } from 'next/server';
+import type { fetchCensusAddressGeocode, fetchCensusCoordinatesGeocode } from '@repo/domain';
 import {
   geocodeAddress,
   reverseGeocodeCoordinates,
   translateZipToPlace,
   type LocateCache,
 } from '../../../lib/geocode/pipeline';
-import type { fetchCensusAddressGeocode, fetchCensusCoordinatesGeocode } from '@repo/domain';
 import type { LocateAppCheckGuard } from './app-check-guard';
 import type { createLocateRateLimitGuard } from './rate-limit-guard';
+
+/**
+ * Mirrors `@repo/firebase`'s `appCheckSatisfiesRateLimitGate` without a static
+ * `@repo/firebase` import (that barrel pulls Admin SDK / top-level await and breaks
+ * this CJS-rooted app's load path — see `./app-check-guard.ts`).
+ */
+function appCheckSatisfiesRateLimitGate(decision: {
+  readonly verified: boolean;
+  readonly mode: 'monitor' | 'enforce';
+}): boolean {
+  return decision.verified || decision.mode === 'monitor';
+}
 
 export type LocateRouteDependencies = {
   readonly appCheckGuard: LocateAppCheckGuard;
@@ -69,7 +81,7 @@ export async function handleLocateRequest(
   const rateDecision = deps.rateLimitGuard.evaluate({
     subject: 'anonymous',
     ...(clientIp ? { clientIp } : {}),
-    appCheckVerified: appCheckDecision.verified,
+    appCheckVerified: appCheckSatisfiesRateLimitGate(appCheckDecision),
   });
   if (!rateDecision.allowed) {
     const response = deps.rateLimitGuard.formatDeniedResponse(rateDecision);
@@ -98,12 +110,23 @@ export async function handleLocateRequest(
       if (!addressParam.trim()) {
         return jsonError(400, 'invalid_locate_query', { reason: 'empty_address' });
       }
+      // `camera=1` opts into retaining lat/lng for a one-shot explore map fly-to (ADR-008
+      // decision 5: coordinates kept only while needed for the current response). Ordinary
+      // `/locate` UI never sets this flag.
+      const retainExactCoordinates = url.searchParams.get('camera') === '1';
       const outcome = ZIP_ONLY_PATTERN.test(addressParam.trim())
-        ? await translateZipToPlace(addressParam, deps.cache, undefined, deps.fetchAddressGeocode)
+        ? await translateZipToPlace(
+            addressParam,
+            deps.cache,
+            undefined,
+            deps.fetchCoordinatesGeocode,
+            retainExactCoordinates,
+          )
         : await geocodeAddress({
             address: addressParam,
             cache: deps.cache,
             ...(deps.fetchAddressGeocode ? { fetchAddressGeocode: deps.fetchAddressGeocode } : {}),
+            ...(retainExactCoordinates ? { retainExactCoordinates: true } : {}),
           });
       return NextResponse.json(outcome, { status: 200 });
     }

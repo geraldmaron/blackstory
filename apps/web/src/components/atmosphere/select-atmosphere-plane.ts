@@ -23,7 +23,8 @@ export type AtmosphereDensity = 12 | 16 | 24 | 32 | 48;
 export type AtmospherePlaneSelectionInput = {
   readonly seedKey: string;
   readonly relatedEntityIds?: readonly string[];
-  readonly density?: AtmosphereDensity;
+  /** Story masts use AtmosphereDensity; living fill mode may pass any positive count. */
+  readonly density?: number;
   /** Force geometric plane (failed tiles, reduced motion, Save-Data). */
   readonly preferGeometric?: boolean;
 };
@@ -77,22 +78,25 @@ function pickGeometric(seedKey: string): GeometricFallback {
  */
 export function selectMosaicTiles(
   seedKey: string,
-  density: AtmosphereDensity,
+  density: number,
   relatedEntityIds?: readonly string[],
 ): readonly AtmosphereTileCredit[] {
+  const target = Math.max(0, Math.floor(density));
   const out: AtmosphereTileCredit[] = [];
   const seen = new Set<string>();
 
   for (const entityId of relatedEntityIds ?? []) {
-    if (out.length >= density) break;
+    if (out.length >= target) break;
     const tile = ATMOSPHERE_TILE_CREDITS.find((entry) => entry.entityId === entityId);
     if (!tile || seen.has(tile.path)) continue;
     seen.add(tile.path);
     out.push(tile);
   }
 
+  if (ATMOSPHERE_TILE_CREDITS.length === 0 || target === 0) return out;
+
   const start = hashString(`tiles:${seedKey}`) % ATMOSPHERE_TILE_CREDITS.length;
-  for (let offset = 0; offset < ATMOSPHERE_TILE_CREDITS.length && out.length < density; offset += 1) {
+  for (let offset = 0; offset < ATMOSPHERE_TILE_CREDITS.length && out.length < target; offset += 1) {
     const tile = ATMOSPHERE_TILE_CREDITS[(start + offset) % ATMOSPHERE_TILE_CREDITS.length]!;
     if (seen.has(tile.path)) continue;
     seen.add(tile.path);

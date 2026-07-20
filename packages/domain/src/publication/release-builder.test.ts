@@ -5,9 +5,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  buildNotabilityBasisNote,
   buildReleaseEntityArtifacts,
   buildReleaseNotabilityBasis,
   computeReleaseResearchCoverage,
+  formatClaimInclusionNote,
   inferNotabilityCriterionFromClaim,
   resolveReleaseClaimId,
   resolveReleaseEntityReferences,
@@ -106,13 +108,41 @@ test('buildReleaseNotabilityBasis groups claims by predicate with real evidenceI
   const foundedBasis = basis.find((b) => b.evidenceIds.length === 2);
   assert.ok(foundedBasis, 'expected a basis record covering both founded_year claims');
   assert.equal(foundedBasis!.criterion, 'documented_site');
-  assert.match(foundedBasis!.note, /founded year: 1900/i);
-  assert.match(foundedBasis!.note, /Cited from Source A; Source B/);
+  assert.match(foundedBasis!.note, /^Founded year 1900\./);
+  assert.doesNotMatch(foundedBasis!.note, /Cited from/i);
   assert.doesNotMatch(foundedBasis!.note, /documented site of a historically significant/i);
   const landmarkBasis = basis.find((b) => b.criterion === 'landmark_or_national_register');
   assert.ok(landmarkBasis, 'expected a landmark_or_national_register basis record');
   assert.equal(landmarkBasis!.evidenceIds.length, 1);
-  assert.match(landmarkBasis!.note, /Cited from Source C/);
+  assert.match(landmarkBasis!.note, /^Listed on the National Register of Historic Places\./);
+  assert.doesNotMatch(landmarkBasis!.note, /Cited from/i);
+});
+
+test('formatClaimInclusionNote / buildNotabilityBasisNote read as prose, not predicate dumps', () => {
+  assert.equal(
+    formatClaimInclusionNote(
+      'served_as',
+      "the Birmingham campaign's headquarters from April through May 1963",
+    ),
+    "Served as the Birmingham campaign's headquarters from April through May 1963.",
+  );
+  assert.equal(
+    formatClaimInclusionNote('bombed_on', 'May 11, 1963, the day after the truce was announced'),
+    'Bombed on May 11, 1963, the day after the truce was announced.',
+  );
+  assert.equal(
+    buildNotabilityBasisNote('served_as', [
+      {
+        id: 'c1',
+        predicate: 'served_as',
+        object: "the campaign's headquarters",
+        confidenceLevel: 'high',
+        citationSource: 'nps.gov',
+        citationLabel: 'NPS',
+      },
+    ]),
+    "Served as the campaign's headquarters.",
+  );
 });
 
 test('buildReleaseNotabilityBasis never fabricates evidence for an uncited claim', () => {

@@ -8,9 +8,9 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { findUsStateForPoint } from '@repo/domain/map/geography';
 import { MapFrame, Timeline } from '@repo/ui';
-import { KindBadge, ConfidenceMark } from '../../../components/map-experience';
+import { KindBadge, ConfidenceMark, MapsExternalLink } from '../../../components/map-experience';
+import { EntityLocationMap } from '../../../components/entity/EntityLocationMap';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
 import '../../../components/entity/entity-page.css';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
@@ -24,7 +24,7 @@ import { EntityEvidencePanel } from '../../../components/evidence';
 import { HowToReadThisRecord } from '../../../components/trust';
 import { WhyThisAppears } from '../../../components/why-appears';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
-import { exploreHrefForState } from '../../../lib/map-experience/metadata-hrefs';
+import { buildExternalMapsSearchUrl } from '../../../lib/geography/external-maps-url';
 import { buildExploreHref, defaultExploreOverlayState } from '../../../lib/map-experience/url-state';
 import { highestConfidence } from '../../../lib/map-experience/build-explore-map-source';
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
@@ -40,13 +40,6 @@ import { deriveHistoricalFraming } from './entity-view-model';
 type EntityPageProps = {
   readonly params: Promise<{ id: string }>;
 };
-
-function statePostalFromAnchor(
-  anchor: { readonly lat: number; readonly lng: number } | undefined,
-): string | undefined {
-  if (!anchor) return undefined;
-  return findUsStateForPoint(anchor.lat, anchor.lng)?.postalCode;
-}
 
 function entityLinkCatalogFromNeighbors(
   entity: NonNullable<Awaited<ReturnType<typeof resolvePublicEntityView>>['data']>,
@@ -109,7 +102,10 @@ export default async function EntityPage({ params }: EntityPageProps) {
   })();
   const evidenceClaims = toEvidenceClaimInputs(entity.claims);
   const geoAnchor = entity.geoAnchor ?? geoAnchorFor(entity.id);
-  const statePostal = statePostalFromAnchor(geoAnchor);
+  const mapsHref = buildExternalMapsSearchUrl({
+    ...(geoAnchor ? { lat: geoAnchor.lat, lng: geoAnchor.lng } : {}),
+    query: entity.locationLabel,
+  });
   const entityLinkCatalog = entityLinkCatalogFromNeighbors(entity);
   const continueLearning = entity.continueLearning ?? [];
   const exploreHref = buildExploreHref({
@@ -188,10 +184,15 @@ export default async function EntityPage({ params }: EntityPageProps) {
           <div className="ds-at-a-glance__row">
             <dt>Location shown</dt>
             <dd>
-              {statePostal ? (
-                <Link className="ds-at-a-glance__link" href={exploreHrefForState(statePostal)}>
+              {mapsHref ? (
+                <MapsExternalLink
+                  className="ds-at-a-glance__link"
+                  href={mapsHref}
+                  placeLabel={entity.locationLabel}
+                  title={`Open ${entity.locationLabel} in your maps app`}
+                >
                   {entity.locationLabel} ({entity.locationPrecision} precision)
-                </Link>
+                </MapsExternalLink>
               ) : (
                 <>
                   {entity.locationLabel} ({entity.locationPrecision} precision)
@@ -354,21 +355,41 @@ export default async function EntityPage({ params }: EntityPageProps) {
           </div>
 
           <aside className="ds-entity-aside" aria-label="Record context">
-            <MapFrame
-              title={`${entity.displayName} map context`}
-              caption="Schematic pin — not survey-grade geometry. Open the national map for the live geographic context."
-              pins={[
-                {
-                  id: entity.id,
-                  label: entity.displayName,
-                  x: entity.mapPin.x,
-                  y: entity.mapPin.y,
-                },
-              ]}
-            />
+            {geoAnchor ? (
+              <EntityLocationMap
+                lat={geoAnchor.lat}
+                lng={geoAnchor.lng}
+                label={entity.locationLabel}
+                precision={entity.locationPrecision}
+                caption="Public-precision street context (OpenStreetMap). Not survey-grade — use Open in maps for Google, Apple, or your default maps app."
+              />
+            ) : (
+              <MapFrame
+                title={`${entity.displayName} map context`}
+                caption="No public coordinates for this record yet. Open the national map to browse nearby archive geography."
+                pins={[
+                  {
+                    id: entity.id,
+                    label: entity.displayName,
+                    x: entity.mapPin.x,
+                    y: entity.mapPin.y,
+                  },
+                ]}
+              />
+            )}
             <p className="ds-entity-aside__cta">
+              {mapsHref ? (
+                <MapsExternalLink
+                  className="ds-cta ds-cta--copper"
+                  href={mapsHref}
+                  placeLabel={entity.locationLabel}
+                  title={`Open ${entity.locationLabel} in your maps app`}
+                >
+                  Open in maps
+                </MapsExternalLink>
+              ) : null}
               <Link className="ds-cta ds-cta--ink" href={exploreHref} scroll={false}>
-                View on map
+                View on national map
               </Link>
             </p>
             <p className="ds-entity-aside__precision ds-sans">

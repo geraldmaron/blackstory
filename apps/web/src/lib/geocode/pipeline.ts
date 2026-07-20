@@ -12,6 +12,8 @@ import {
   fetchCensusAddressGeocode,
   fetchCensusCoordinatesGeocode,
   geoPrecisionTierForMatch,
+  lookupUsZipCentroid,
+  normalizeUsZipInput,
   reduceGeocodeCoordinatePrecision,
   resolveJurisdictionIdsFromMatch,
   type CensusGeocodeMatch,
@@ -151,15 +153,23 @@ export type GeocodeAddressOptions = {
   readonly cache: LocateCache;
   readonly now?: () => number;
   readonly fetchAddressGeocode?: typeof fetchCensusAddressGeocode;
+  /**
+   * Opt in to keep lat/lng on the resolution for a single map-camera response
+   * (`/locate/api?camera=1`). Cached under a distinct key so ordinary locate lookups never
+   * inherit retained coordinates from a prior camera request.
+   */
+  readonly retainExactCoordinates?: boolean;
 };
 
 /** Forward geocode: free-text address, city/state, or ZIP -> jurisdiction ids, or a manual-search fallback.  */
 export async function geocodeAddress(options: GeocodeAddressOptions): Promise<GeocodeOutcome> {
-  const { queryText, cacheKey } = normalizeAddressInput(options.address);
+  const { queryText, cacheKey: baseCacheKey } = normalizeAddressInput(options.address);
   if (!queryText) {
     return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
   }
 
+  const retainExactCoordinates = options.retainExactCoordinates === true;
+  const cacheKey = retainExactCoordinates ? `${baseCacheKey}:cam` : baseCacheKey;
   const nowMs = options.now?.() ?? Date.now();
   const cached = options.cache.get(cacheKey, nowMs);
   if (cached) {
@@ -187,7 +197,7 @@ export async function geocodeAddress(options: GeocodeAddressOptions): Promise<Ge
     return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
   }
 
-  const resolution = toResolution(best, false);
+  const resolution = toResolution(best, retainExactCoordinates);
   options.cache.set(cacheKey, resolution, nowMs);
   return { ok: true, resolution, cacheHit: false };
 }
@@ -227,45 +237,73 @@ export async function reverseGeocodeCoordinates(options: ReverseGeocodeOptions):
   return { ok: true, resolution, cacheHit: false };
 }
 
-const ZIP_PATTERN = /^\d{5}(-\d{4})?$/;
 
 /**
  * ZIP-to-place translate-then-discard (mirrors
- * `packages/domain/src/geocode/zip-translate.ts`): the raw ZIP is sent to the geocoder as a
- * one-shot lookup query and then discarded — this function's success branch carries no `zip`
- * field, so a caller cannot thread the raw ZIP through to anything persisted just by spreading
- * the result. `assertZipNotHistoricalBoundary('modern_lookup')` fails closed if this call site is
+ * `packages/domain/src/geocode/zip-translate.ts`): Census forward geocode does not match bare
+ * ZIP codes, so the 5-digit base is resolved to an approximate centroid (`zipcodes` dataset),
+ * reverse-geocoded through Census for jurisdiction ids, then the raw ZIP is discarded from the
+ * response. `assertZipNotHistoricalBoundary('modern_lookup')` fails closed if this call site is
  * ever repurposed for anything other than a live, current-day lookup.
  */
 export async function translateZipToPlace(
   zip: string,
   cache: LocateCache,
   now?: () => number,
-  fetchAddressGeocode?: typeof fetchCensusAddressGeocode,
+  fetchCoordinatesGeocode?: typeof fetchCensusCoordinatesGeocode,
+  retainExactCoordinates?: boolean,
 ): Promise<GeocodeOutcome> {
-  const trimmedZip = zip.trim();
-  if (!ZIP_PATTERN.test(trimmedZip)) {
+  const zip5 = normalizeUsZipInput(zip);
+  if (!zip5) {
     return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
   }
   assertZipNotHistoricalBoundary('modern_lookup');
-  const outcome = await geocodeAddress({
-    address: trimmedZip,
-    cache,
-    ...(now ? { now } : {}),
-    ...(fetchAddressGeocode ? { fetchAddressGeocode } : {}),
-  });
-  if (!outcome.ok) {
-    return outcome;
+
+  const cacheKey = retainExactCoordinates ? `zip:${zip5}:cam` : `zip:${zip5}`;
+  const nowMs = now?.() ?? Date.now();
+  const cached = cache.get(cacheKey, nowMs);
+  if (cached) {
+    return { ok: true, resolution: cached, cacheHit: true };
   }
 
-  // Translate-then-discard: `matchedAddress` is Census's full
-  // echoed address string, which contains the raw ZIP as trailing text dropped here so a ZIP
-  // lookup's response carries no field the raw ZIP could be read back out of. A full-address
-  // lookup (`geocodeAddress` called directly, not through this function) legitimately keeps
-  // `matchedAddress` since the caller already supplied the whole address, not just a ZIP.
-  const { matchedAddress: _discardedMatchedAddress, ...zipSafeMatch } = outcome.resolution.match;
-  return {
-    ...outcome,
-    resolution: { ...outcome.resolution, match: zipSafeMatch },
+  const centroid = lookupUsZipCentroid(zip5);
+  if (!centroid) {
+    return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
+  }
+
+  const fetcher = fetchCoordinatesGeocode ?? fetchCensusCoordinatesGeocode;
+  let match: CensusGeocodeMatch;
+  try {
+    match = await fetcher({ lat: centroid.lat, lng: centroid.lng, client: safeHttpClient });
+  } catch {
+    return { ok: false, fallback: buildManualPlaceSearchFallback('geocoder_unavailable') };
+  }
+
+  const scope = evaluateGeocodeProductScope(match);
+  if (!scope.inScope) {
+    return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
+  }
+
+  const resolution = toResolution(match, false);
+  const placeName = resolution.match.placeName ?? centroid.city;
+  const { matchedAddress: _discardedMatchedAddress, ...zipSafeMatch } = {
+    ...resolution.match,
+    ...(placeName ? { placeName } : {}),
   };
+  const zipSafeResolution = {
+    ...resolution,
+    match: zipSafeMatch,
+    ...(retainExactCoordinates
+      ? {
+          precision: {
+            tier: 'locality' as const,
+            exactCoordinatesRetained: true,
+            lat: centroid.lat,
+            lng: centroid.lng,
+          },
+        }
+      : {}),
+  };
+  cache.set(cacheKey, zipSafeResolution, nowMs);
+  return { ok: true, resolution: zipSafeResolution, cacheHit: false };
 }

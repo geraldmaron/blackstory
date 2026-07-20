@@ -1,0 +1,25 @@
+{
+  "count": 1660,
+  "yearSpan": [
+    1831,
+    2024
+  ],
+  "categories": {
+    "police_violence": 1097,
+    "racial_terror": 562,
+    "state_execution": 1
+  },
+  "selectionPolicy": [
+    "Police/state violence: Wikipedia unarmed African Americans killed by law enforcement; dual corroboration Guardian The Counted + Washington Post Fatal Force; curated historical cases.",
+    "Racial terror: SPLC Civil Rights Memorial / The Forgotten, NAACP/EJI-documented cases, Wikipedia lynching list rows marked African American.",
+    "Deduped by lowercase name + year. Context phrases are memorial labels, not legal findings.",
+    "Nat Turner included as state_execution (executed after rebellion), not framed as a lynching victim."
+  ],
+  "sources": [
+    "https://en.wikipedia.org/wiki/List_of_unarmed_African_Americans_killed_by_law_enforcement_officers_in_the_United_States",
+    "https://www.theguardian.com/us-news/series/counted-us-police-killings",
+    "https://www.washingtonpost.com/graphics/investigations/police-shootings-database/",
+    "https://www.splcenter.org/civil-rights-martyrs/",
+    "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States"
+  ]
+}

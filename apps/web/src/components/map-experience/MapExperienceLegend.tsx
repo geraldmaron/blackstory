@@ -9,8 +9,9 @@
  *
  * A compact color key stays visible above the disclosure. The longer “Reading this
  * map” guide uses a native `<details>`/`<summary>` for keyboard and screen-reader
- * support without custom JS. Explore may pass `onHide` so the Color key row mirrors
- * the filters/records “Hide …” chrome; visibility itself is owned by URL state.
+ * support without custom JS. Explore embeds this inside the instrument chassis Color
+ * key tab (`embedded`); standalone surfaces may pass `onHide`. Visibility / tab state
+ * is owned by Explore URL chrome, not this component.
  */
 import React, { useEffect, useState } from 'react';
 import {
@@ -85,8 +86,13 @@ export type MapExperienceLegendProps = {
   readonly layerMode?: ExploreLayerMode;
   /** Optional override for tests; live UI reads `document.documentElement.dataset.theme`. */
   readonly colorScheme?: MapColorScheme;
-  /** When set, renders a “Hide key” control beside the Color key heading (Explore chrome). */
+  /** When set, renders a “Hide key” control beside the Color key heading (standalone chrome). */
   readonly onHide?: () => void;
+  /**
+   * When true, omits the Color key heading/hide row — Explore’s instrument chassis already
+   * labels the Color key tab and owns hide/show.
+   */
+  readonly embedded?: boolean;
 };
 
 function LegendSwatch(props: {
@@ -137,27 +143,35 @@ function MapColorKey(props: {
   readonly layerMode: ExploreLayerMode;
   readonly colorScheme: MapColorScheme;
   readonly onHide?: () => void;
+  readonly embedded?: boolean;
 }) {
-  const { layerMode, colorScheme, onHide } = props;
+  const { layerMode, colorScheme, onHide, embedded = false } = props;
   const plate = plateForScheme(colorScheme);
 
   return (
-    <div className="ds-map-color-key" aria-labelledby="map-color-key-heading">
-      <div className="ds-explore-stage__panel-header">
-        <h3 className="ds-explore-legend__subhead" id="map-color-key-heading">
-          Color key
-        </h3>
-        {onHide ? (
-          <button
-            type="button"
-            className="ds-button ds-button--secondary ds-button--compact ds-explore-stage__panel-hide"
-            aria-label="Hide key"
-            onClick={onHide}
-          >
-            Hide key
-          </button>
-        ) : null}
-      </div>
+    <div
+      className={embedded ? 'ds-map-color-key ds-map-color-key--embedded' : 'ds-map-color-key'}
+      {...(embedded
+        ? { 'aria-label': 'Color key' }
+        : { 'aria-labelledby': 'map-color-key-heading' })}
+    >
+      {embedded ? null : (
+        <div className="ds-explore-stage__panel-header">
+          <h3 className="ds-explore-legend__subhead" id="map-color-key-heading">
+            Color key
+          </h3>
+          {onHide ? (
+            <button
+              type="button"
+              className="ds-button ds-button--secondary ds-button--compact ds-explore-stage__panel-hide"
+              aria-label="Hide key"
+              onClick={onHide}
+            >
+              Hide key
+            </button>
+          ) : null}
+        </div>
+      )}
       <ul className="ds-explore-legend__kind-list">
         <li>
           <LineSwatch color={plate.stateBounds} />
@@ -258,8 +272,9 @@ function MapColorKey(props: {
 
 export function MapExperienceLegend(props?: MapExperienceLegendProps) {
   const defaultCollapsed = props?.defaultCollapsed ?? false;
-  const layerMode = props?.layerMode ?? 'off';
+  const layerMode = props?.layerMode ?? 'presence';
   const onHide = props?.onHide;
+  const embedded = props?.embedded ?? false;
   const [colorScheme, setColorScheme] = useState<MapColorScheme>(
     () => props?.colorScheme ?? readDocumentColorScheme(),
   );
@@ -288,7 +303,8 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
       <MapColorKey
         layerMode={layerMode}
         colorScheme={colorScheme}
-        {...(onHide ? { onHide } : {})}
+        embedded={embedded}
+        {...(!embedded && onHide ? { onHide } : {})}
       />
       <details className="ds-explore-legend" open={!defaultCollapsed}>
         <summary className="ds-explore-legend__summary" id="explore-legend-heading">
@@ -356,7 +372,7 @@ export function MapExperienceLegend(props?: MapExperienceLegendProps) {
                 <span key={index} className="ds-explore-legend__size-dot" style={{ width: diameter, height: diameter }} />
               ))}
             </div>
-            <p>
+            <p className="ds-explore-legend__note">
               A larger marker means more documented evidence on that record &mdash; small does not
               mean less true, only less evidenced so far. Confidence in that evidence is shown
               separately below, as a glyph and a green-to-orange color, never by size alone.

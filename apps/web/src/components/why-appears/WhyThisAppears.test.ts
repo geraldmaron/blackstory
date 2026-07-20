@@ -3,7 +3,7 @@
  * `buildPublicWhyThisAppears` composer from `@repo/domain` rather than a hand-shaped fixture
  * object, so these tests fail if the domain composer's output shape ever drifts from what this
  * component renders. Citations must render as named sources (with hrefs when provided), never as
- * opaque "N documented sources" counts.
+ * opaque "N documented sources" counts. Inclusion evidence groups by criterion and dedupes sources.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';
@@ -24,7 +24,7 @@ test('renders the explanation and citation-linked inclusion evidence, never a sc
     notabilityBasis: [
       {
         criterion: 'documented_site',
-        note: 'founded year: 1870. Cited from Howard University Moorland-Spingarn Research Center.',
+        note: 'Founded year 1870.',
         evidenceIds: ['ev-1', 'ev-2'],
       },
     ],
@@ -37,13 +37,13 @@ test('renders the explanation and citation-linked inclusion evidence, never a sc
       evidenceById: {
         'ev-1': {
           id: 'ev-1',
-          source: 'Howard University Moorland-Spingarn Research Center — finding aid',
+          source: 'Howard University Moorland-Spingarn Research Center',
           label: 'Archival finding aid',
           href: 'https://dh.howard.edu/finaid_manu/74/',
         },
         'ev-2': {
           id: 'ev-2',
-          source: 'HMdb.org — historical marker database',
+          source: 'HMdb.org',
           label: 'Historical marker',
           href: 'https://www.hmdb.org/m.asp?m=112661',
         },
@@ -56,11 +56,63 @@ test('renders the explanation and citation-linked inclusion evidence, never a sc
   assert.match(html, /Included because archival records document/);
   assert.match(html, /Inclusion evidence/);
   assert.match(html, /Documented site/);
-  assert.match(html, /founded year: 1870/);
-  assert.match(html, /Howard University Moorland-Spingarn Research Center/);
+  assert.match(html, /Founded year 1870/);
+  assert.doesNotMatch(html, /founded year:/i);
+  assert.match(html, /Archival finding aid/);
   assert.match(html, /https:\/\/dh\.howard\.edu\/finaid_manu\/74\//);
+  assert.doesNotMatch(html, /ds-qualify-list/);
   assert.doesNotMatch(html, /\d+ documented sources/);
   assert.doesNotMatch(html, /\b0\.\d{2,}\b/);
+});
+
+test('groups same-criterion notes and dedupes identical citations', () => {
+  const result = buildPublicWhyThisAppears({
+    explanation: 'Included because National Park Service records document this motel.',
+    evidence: ACCEPTED_EVIDENCE,
+    notabilityBasis: [
+      {
+        criterion: 'documented_site',
+        note: "Served as the Birmingham campaign's headquarters from Room 30.",
+        evidenceIds: ['ev-nps-1'],
+      },
+      {
+        criterion: 'documented_site',
+        note: 'Bombed on May 11, 1963, the day after the truce was announced.',
+        evidenceIds: ['ev-nps-2'],
+      },
+    ],
+  });
+
+  const html = renderToStaticMarkup(
+    createElement(WhyThisAppears, {
+      result,
+      evidenceById: {
+        'ev-nps-1': {
+          id: 'ev-nps-1',
+          source: 'nps.gov',
+          label: 'National Park Service: The A.G. Gaston Motel',
+          href: 'https://www.nps.gov/articles/ag-gaston-motel-birmingham-civil-rights-monument.htm',
+        },
+        'ev-nps-2': {
+          id: 'ev-nps-2',
+          source: 'nps.gov',
+          label: 'National Park Service: The A.G. Gaston Motel',
+          href: 'https://www.nps.gov/articles/ag-gaston-motel-birmingham-civil-rights-monument.htm',
+        },
+      },
+    }),
+  );
+
+  assert.match(html, /Served as the Birmingham campaign/);
+  assert.match(html, /Bombed on May 11, 1963/);
+  assert.equal((html.match(/Documented site/g) ?? []).length, 1);
+  assert.equal(
+    (html.match(/National Park Service: The A\.G\. Gaston Motel/g) ?? []).length,
+    1,
+  );
+  assert.match(html, /\(nps\.gov\)/);
+  assert.doesNotMatch(html, /served as:/i);
+  assert.doesNotMatch(html, /Cited from nps\.gov/i);
 });
 
 test('card variant still owns the titled Card for standalone mounts', () => {
@@ -70,7 +122,7 @@ test('card variant still owns the titled Card for standalone mounts', () => {
     notabilityBasis: [
       {
         criterion: 'documented_site',
-        note: 'listed on: National Register. Cited from Source C.',
+        note: 'Listed on National Register.',
         evidenceIds: ['ev-1'],
       },
     ],
@@ -86,7 +138,7 @@ test('card variant still owns the titled Card for standalone mounts', () => {
   );
   assert.match(html, /Why this appears/);
   assert.match(html, /Cited from external sources/);
-  assert.match(html, /Source C/);
+  assert.match(html, /Citation C/);
 });
 
 test('renders the shared trauma-content disclaimer only when the harm dimension is classified', () => {
@@ -97,7 +149,7 @@ test('renders the shared trauma-content disclaimer only when the harm dimension 
     notabilityBasis: [
       {
         criterion: 'documented_site',
-        note: 'site of: 1921 church burning. Cited from Source D.',
+        note: 'Site of 1921 church burning.',
         evidenceIds: ['ev-3'],
       },
     ],
@@ -120,7 +172,7 @@ test('renders the shared trauma-content disclaimer only when the harm dimension 
     notabilityBasis: [
       {
         criterion: 'community_anchor',
-        note: 'hosted founding of: Preparatory High School. Cited from Source E.',
+        note: 'Hosted founding of Preparatory High School.',
         evidenceIds: ['ev-4'],
       },
     ],
@@ -160,7 +212,7 @@ test('shows honest gap copy when evidenceIds are present but citations are unres
     notabilityBasis: [
       {
         criterion: 'documented_site',
-        note: 'founded year: 1900. Cited from Source A.',
+        note: 'Founded year 1900.',
         evidenceIds: ['missing-id'],
       },
     ],

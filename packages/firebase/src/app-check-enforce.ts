@@ -88,6 +88,22 @@ export function parseAppCheckMode(value: string | undefined): AppCheckMode {
   throw new Error('APP_CHECK_MODE must be "monitor" or "enforce"');
 }
 
+/**
+ * Maps an *allowed* App Check decision onto `@repo/security`'s `appCheckVerified`
+ * quota gate for anonymous expensive reads / mutations.
+ *
+ * Cryptographic verification always qualifies. Monitor-mode allow-through also
+ * qualifies: monitor means observe without blocking, so the rate limiter must not
+ * re-enforce a missing/invalid token as a fake `429 rate_limit_exceeded` (reason
+ * `app_check_required`). Enforce-mode denials never reach this helper — the route
+ * guard returns 401 first.
+ */
+export function appCheckSatisfiesRateLimitGate(
+  decision: Extract<AppCheckDecision, { readonly allowed: true }>,
+): boolean {
+  return decision.verified || decision.mode === 'monitor';
+}
+
 export function createFirebaseAppCheckVerifier(app?: App): AppCheckVerifier {
   const appCheck = getAppCheck(app);
   return {

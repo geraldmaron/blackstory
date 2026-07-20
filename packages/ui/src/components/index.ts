@@ -23,6 +23,8 @@ export { ThemeToggle, type ThemeToggleProps } from './ThemeToggle.js';
 export {
   ShellHeader,
   isShellNavActive,
+  syncShellHeaderHeight,
+  type ShellBrandAssets,
   type ShellHeaderLinkProps,
   type ShellHeaderProps,
   type ShellNavItem,

@@ -44,7 +44,10 @@
       "unions",
       "railroad"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_march_on_washington_1963_001",
+      "ent_march_on_washington_movement_1941_001"
+    ],
     "keywords": []
   },
   {
@@ -137,7 +140,10 @@
       "unions",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_brotherhood_sleeping_car_porters_001",
+      "ent_march_on_washington_1963_001"
+    ],
     "keywords": []
   },
   {
@@ -183,7 +189,9 @@
       "unions",
       "reconstruction"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_core_founding_001"
+    ],
     "keywords": []
   },
   {
@@ -228,7 +236,10 @@
       "unions",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001",
+      "ent_poor_peoples_campaign_001"
+    ],
     "keywords": []
   },
   {
@@ -274,7 +285,9 @@
       "unions",
       "automotive"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_league_revolutionary_black_workers_001"
+    ],
     "keywords": []
   },
   {
@@ -320,7 +333,9 @@
       "unions",
       "black-power"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_drum_detroit_001"
+    ],
     "keywords": []
   },
   {
@@ -365,7 +380,9 @@
       "agriculture",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_mfdp_dnc_challenge_001"
+    ],
     "keywords": []
   },
   {
@@ -506,7 +523,9 @@
       "domestic-work",
       "women"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_hill_district_pittsburgh_001"
+    ],
     "keywords": []
   },
   {
@@ -555,7 +574,9 @@
       "agriculture",
       "economic-justice"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_movement_civil_rights_movement"
+    ],
     "keywords": []
   },
   {
@@ -602,7 +623,9 @@
       "craft",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_movement_civil_rights_movement"
+    ],
     "keywords": []
   },
   {
@@ -654,7 +677,10 @@
       "unions",
       "healthcare"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_harlem_001",
+      "ent_martin_luther_king_jr_001"
+    ],
     "keywords": []
   },
   {

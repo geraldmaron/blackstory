@@ -5,14 +5,11 @@
 
 import React from 'react';
 import Link from 'next/link';
-import type {
-  NationalPopulationByDecade,
-  PopulationDecadeChange,
-} from '@repo/firebase';
+import type { NationalPopulationTimelineSnapshot } from '@repo/firebase';
 import { DataStatStrip } from '../data/DataStatStrip';
 import { PopulationByDecadeChart } from '../data/PopulationByDecadeChart';
 import { BlackPopulationShareChart } from '../data/BlackPopulationShareChart';
-import { nationalChangeStripItems } from '../data/population-change';
+import { timelineChangeStripItems } from '../data/population-change';
 
 void React;
 
@@ -21,19 +18,29 @@ export type HomeDataPulseProps = {
   readonly stateCount: number;
   /** e.g. "1820s–1970s"; omitted when the release carries no dated records. */
   readonly eraSpan?: string | undefined;
-  readonly populationByDecade?: readonly NationalPopulationByDecade[] | undefined;
-  readonly populationChanges?: readonly PopulationDecadeChange[] | undefined;
+  /** The merged 1790–2020 national timeline snapshot; omitted when not built in this environment. */
+  readonly timeline?: NationalPopulationTimelineSnapshot | undefined;
 };
 
-export function HomeDataPulse({
-  recordCount,
-  stateCount,
-  eraSpan,
-  populationByDecade,
-  populationChanges,
-}: HomeDataPulseProps) {
-  const hasPopulation = Boolean(populationByDecade && populationByDecade.length > 0);
-  const changeStripItems = populationChanges ? nationalChangeStripItems(populationChanges) : [];
+export function HomeDataPulse({ recordCount, stateCount, eraSpan, timeline }: HomeDataPulseProps) {
+  const rows = timeline?.rows ?? [];
+  const hasPopulation = rows.length > 0;
+  const chartSources = (timeline?.sources ?? []).map((source) => ({
+    label: source.label,
+    url: source.sourceUrl,
+  }));
+  const lastRow = rows.at(-1);
+  const primarySource = lastRow
+    ? (() => {
+        const match = timeline?.sources.find((source) => source.sourceId === lastRow.sourceId);
+        return match
+          ? { label: match.label, url: match.sourceUrl }
+          : { label: lastRow.sourceId, url: lastRow.sourceUrl };
+      })()
+    : { label: 'U.S. Census Bureau', url: 'https://www.census.gov' };
+  const changeStripItems = timeline
+    ? timelineChangeStripItems(timeline.changes, primarySource, 3)
+    : [];
 
   return (
     <section className="ds-section ds-home-data-pulse" aria-labelledby="home-data-heading">
@@ -63,28 +70,25 @@ export function HomeDataPulse({
         ) : null}
       </ul>
 
-      {hasPopulation && populationByDecade ? (
+      {hasPopulation ? (
         <div className="ds-home-data-pulse__viz">
           <div className="ds-data-section__viz ds-data-section__viz--pair">
-            <PopulationByDecadeChart rows={populationByDecade} />
-            <BlackPopulationShareChart rows={populationByDecade} />
+            <PopulationByDecadeChart rows={rows} sources={chartSources} />
+            <BlackPopulationShareChart rows={rows} sources={chartSources} />
           </div>
           {changeStripItems.length > 0 ? (
             <div className="ds-home-data-pulse__changes">
               <h3 className="ds-home-data-pulse__subhead" id="home-population-change-heading">
-                Decade-over-decade change
+                Recent decade-over-decade change
               </h3>
-              <DataStatStrip
-                labelledBy="home-population-change-heading"
-                items={changeStripItems}
-              />
+              <DataStatStrip labelledBy="home-population-change-heading" items={changeStripItems} />
             </div>
           ) : null}
         </div>
       ) : (
         <p className="ds-sans ds-home-data-pulse__fallback">
-          National census rollups are not available in this environment yet. The full modeling
-          page lists every series and citation when the release carries them.
+          National census rollups are not available in this environment yet. The full modeling page
+          lists every series and citation when the release carries them.
         </p>
       )}
 

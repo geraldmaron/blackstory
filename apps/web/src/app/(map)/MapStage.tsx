@@ -45,30 +45,49 @@ import type * as MapLibreNamespace from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { brandPalette, darkTheme, lightTheme } from '@repo/ui';
 import {
+  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LABEL_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_COUNTY_LINES_SOURCE_ID,
+  EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
+  EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
+  EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
+  EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
+  MEMORIAL_NAMES_MAP_LAYER_ENABLED,
   EXPLORE_SELECTED_POINT_LAYER_ID,
+  EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
+  EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
+  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
+  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+  EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../map/explore-layer-ids';
 import { buildExploreMapStyle } from '../map/explore-style';
 import {
+  applyDensityBlendProgress,
+  buildDensityColorMorphStates,
+  clearDensityMorphFeatureState,
+  DECADE_CROSSFADE_IN_TARGETS,
+  DECADE_CROSSFADE_OUT_TARGETS,
   DECADE_LAYER_FADE_MS,
-  restoreDecadeFadePaintFromStyle,
-  setDecadeFadeInLiterals,
-  setDecadeFadeOpacities,
-  setDecadeFadeTransitions,
+  isDecadeFadePaintChannel,
+  runDecadeMorphAnimation,
+  setDecadeCrossfadeIdleOpacities,
+  setDecadeCrossfadeTransitions,
+  type DecadeMorphAnimationHandle,
+  type DensityColorMorphState,
 } from '../map/decade-layer-transition';
 import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
 import { EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience/dignity-style';
@@ -76,6 +95,11 @@ import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
 } from '../../lib/map-experience/build-explore-map-source';
+import { buildMemorialNameFeatures } from '../../lib/map-experience/build-memorial-name-features';
+import {
+  applyMemorialDecadeFrame,
+  type MemorialDecadeApplyHandle,
+} from '../../lib/map-experience/memorial-decade-fade';
 import {
   cameraPresetFor,
   prefersReducedMotion,
@@ -84,7 +108,7 @@ import {
 import type { HistoryEdgeLineCollection } from '../../lib/map-experience/build-history-edge-lines';
 import type { StateDensityLevel } from '../../lib/map-experience/density';
 import type { CountyChoroplethLevel } from '../../lib/map-experience/county-choropleth';
-import { joinDensityOntoStatePolygons } from '../../lib/map-experience/join-state-polygons';
+import { joinDensityOntoStatePolygons, indexDensityFillColors } from '../../lib/map-experience/join-state-polygons';
 import { joinPopulationOntoCountyPolygons } from '../../lib/map-experience/join-county-population';
 import * as stateLabels from '../../lib/map-experience/state-labels';
 import { US_STATES_GEOJSON_PATH } from '../../lib/map-experience/us-state-polygons';
@@ -146,10 +170,12 @@ const ARCHIVE_BASE_STYLE: StyleSpecification = {
 
 const GEOGRAPHY_LAYER_IDS = new Set([
   'background',
+  'explore-memorial-names-label',
   'explore-street-casing',
   'explore-street-fill',
   'explore-street-label',
   'explore-state-density-fill',
+  EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_COUNTY_LABEL_LAYER_ID,
@@ -158,11 +184,13 @@ const GEOGRAPHY_LAYER_IDS = new Set([
   'explore-state-selected-line',
   'explore-jurisdiction-area-fill',
   EXPLORE_HISTORY_EDGES_LAYER_ID,
+  EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
 ]);
 
 /** The entity-marker stack from `buildExploreMapStyle`, in its stacking order: halo beneath
- * point beneath the event glyph ring, clusters above singles, selected ring on top. Added once
+ * point beneath the event glyph ring, clusters above singles, selected ring on top. Incoming
+ * dual-buffer layers sit above the current stack and below the selected ring. Added once
  * then paint-refreshed on style rebuild (theme plate stroke, kind shade expressions). */
 const ENTITY_LAYER_IDS = new Set([
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
@@ -170,6 +198,11 @@ const ENTITY_LAYER_IDS = new Set([
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
+  EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
+  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
+  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
+  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
 ]);
 
@@ -178,8 +211,20 @@ const ENTITY_LAYER_IDS = new Set([
  * never `setData` it back over the loaded polygons. */
 const LAZY_GEOGRAPHY_SOURCE_IDS = new Set<string>([
   EXPLORE_STATE_DENSITY_SOURCE_ID,
+  EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_COUNTY_LINES_SOURCE_ID,
 ]);
+
+/** Primary decade sources held steady during dual-buffer crossdissolve (incoming stages the next frame). */
+const DECADE_PRIMARY_DATA_SOURCE_IDS = new Set<string>([
+  EXPLORE_ENTITIES_SOURCE_ID,
+  EXPLORE_HISTORY_EDGES_SOURCE_ID,
+]);
+
+const EMPTY_FEATURE_COLLECTION = { type: 'FeatureCollection', features: [] } as const;
+
+/** Memorial names breathe via MapStage setData — style rebuilds must not clobber the tick. */
+const BREATH_MANAGED_SOURCE_IDS = new Set<string>([EXPLORE_MEMORIAL_NAMES_SOURCE_ID]);
 
 /** Normalizes `maplibre-gl`'s `LngLatLike` union (a `LngLat` instance, a `{lng,lat}` or
  * `{lon,lat}` object literal, or a `[lng, lat]` tuple) to a plain tuple. `cameraForBounds`
@@ -298,7 +343,11 @@ function setSelectedEdgeFilter(map: MapLibreMap, edgeId: string | undefined): vo
 
 function setHistoryEdgesVisibility(map: MapLibreMap, enabled: boolean): void {
   const visibility = enabled ? 'visible' : 'none';
-  for (const id of [EXPLORE_HISTORY_EDGES_LAYER_ID, EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID]) {
+  for (const id of [
+    EXPLORE_HISTORY_EDGES_LAYER_ID,
+    EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
+    EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
+  ]) {
     if (map.getLayer(id)) {
       map.setLayoutProperty(id, 'visibility', visibility);
     }
@@ -328,13 +377,42 @@ function fetchStatePolygons(): Promise<StatePolygonCollection> {
 async function loadStatePolygonsWithDensity(
   map: MapLibreMap,
   densityLevels: readonly StateDensityLevel[],
-): Promise<void> {
-  const source = map.getSource(EXPLORE_STATE_DENSITY_SOURCE_ID) as GeoJSONSource | undefined;
-  if (!source) return;
+  sourceId: string = EXPLORE_STATE_DENSITY_SOURCE_ID,
+  colorScheme: MapColorScheme = readDocumentColorScheme(),
+): Promise<ReturnType<typeof joinDensityOntoStatePolygons>> {
+  const source = map.getSource(sourceId) as GeoJSONSource | undefined;
+  if (!source) {
+    return { type: 'FeatureCollection', features: [] };
+  }
   const collection = await fetchStatePolygons();
-  const joined = joinDensityOntoStatePolygons(collection, densityLevels);
+  const joined = joinDensityOntoStatePolygons(collection, densityLevels, { colorScheme });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
   source.setData(joined as any);
+  await waitForGeoJsonSourceData(map, sourceId);
+  return joined;
+}
+
+/**
+ * Resolves after MapLibre finishes applying a GeoJSON `setData` for `sourceId`
+ * (sourcedata + isSourceLoaded), or after a short timeout. Promote must not lift
+ * the incoming cover until the primary density source holds the new frame.
+ */
+function waitForGeoJsonSourceData(map: MapLibreMap, sourceId: string, timeoutMs = 500): Promise<void> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      map.off('sourcedata', onSourceData);
+      window.clearTimeout(timer);
+      resolve();
+    };
+    const onSourceData = (event: { sourceId?: string; isSourceLoaded?: boolean }) => {
+      if (event.sourceId === sourceId && event.isSourceLoaded) finish();
+    };
+    map.on('sourcedata', onSourceData);
+    const timer = window.setTimeout(finish, timeoutMs);
+  });
 }
 
 type CountyPolygonCollection = {
@@ -346,13 +424,18 @@ let countyLinesPromise: Promise<CountyPolygonCollection> | undefined;
 
 function fetchCountyPolygons(): Promise<CountyPolygonCollection> {
   if (!countyLinesPromise) {
-    countyLinesPromise = fetch(US_COUNTIES_GEOJSON_PATH).then(async (response) => {
-      if (!response.ok) {
+    countyLinesPromise = fetch(US_COUNTIES_GEOJSON_PATH)
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to load ${US_COUNTIES_GEOJSON_PATH}: ${response.status}`);
+        }
+        return (await response.json()) as CountyPolygonCollection;
+      })
+      .catch((error) => {
+        // Clear the cached promise so a later blackShare/zoom retry can recover.
         countyLinesPromise = undefined;
-        throw new Error(`Failed to load ${US_COUNTIES_GEOJSON_PATH}: ${response.status}`);
-      }
-      return (await response.json()) as CountyPolygonCollection;
-    });
+        throw error;
+      });
   }
   return countyLinesPromise;
 }
@@ -361,37 +444,99 @@ function fetchCountyPolygons(): Promise<CountyPolygonCollection> {
  * prefetch threshold, and re-`setData`ing 3k polygons on every camera settle would churn the
  * GeoJSON worker for nothing. */
 const countyLinesLoaded = new WeakSet<MapLibreMap>();
+/** Per-map generation so a stale empty-levels fetch cannot overwrite a later choropleth join. */
+const countyLinesLoadGeneration = new WeakMap<MapLibreMap, number>();
+/** Once a choropleth join is requested, ignore empty-level loads (even mid-flight). */
+const countyChoroplethJoinRequested = new WeakSet<MapLibreMap>();
 
 /** Lazily fills the county source (hairlines + optional choropleth). Deliberately zoom-triggered
  * by the caller, not eager: the ~2.3 MB asset is invisible below the layer's `minzoom`, so the
- * national resting frame never pays for it. */
+ * national resting frame never pays for it — except population choropleths, which load at any
+ * zoom when `blackShare` / `blackChange` is active.
+ *
+ * Empty-level calls after geometry is present — or after a join was requested — are no-ops so
+ * fade-path / StrictMode patches with `[]` cannot wipe `shareTier`. */
 async function loadCountyPolygons(
   map: MapLibreMap,
   choroplethLevels: readonly CountyChoroplethLevel[],
 ): Promise<void> {
   const source = map.getSource(EXPLORE_COUNTY_LINES_SOURCE_ID) as GeoJSONSource | undefined;
   if (!source) return;
+  if (choroplethLevels.length > 0) {
+    countyChoroplethJoinRequested.add(map);
+  } else if (countyLinesLoaded.has(map) || countyChoroplethJoinRequested.has(map)) {
+    return;
+  }
+  const generation = (countyLinesLoadGeneration.get(map) ?? 0) + 1;
+  countyLinesLoadGeneration.set(map, generation);
   const collection = await fetchCountyPolygons();
+  if (countyLinesLoadGeneration.get(map) !== generation) {
+    // A newer load (usually with choropleth tiers) superseded this one mid-flight.
+    return;
+  }
   const joined =
     choroplethLevels.length > 0
       ? joinPopulationOntoCountyPolygons(collection, choroplethLevels)
       : collection;
-  if (countyLinesLoaded.has(map)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-    source.setData(joined as any);
-    return;
-  }
   countyLinesLoaded.add(map);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
   source.setData(joined as any);
 }
 
+/** County geometry + population join still need to land during decade-morph `configOnly`
+ * patches — those skip `applyStyleAndData`, which previously left blackShare without tiers. */
+function requestCountyPolygonLoad(map: MapLibreMap, cfg: StageConfig): void {
+  const needsCountyGeometry =
+    map.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
+    cfg.layerMode === 'blackShare' ||
+    cfg.layerMode === 'blackChange';
+  if (!needsCountyGeometry) return;
+  void loadCountyPolygons(map, cfg.countyChoroplethLevels).catch((error) => {
+    console.error('[MapStage] county polygon load failed', error);
+  });
+}
+
+/** Channels decade morph holds during dissolve — mid-swap style sync must not touch them. */
+const DECADE_FADE_OMIT_CHANNELS = new Set(
+  [...DECADE_CROSSFADE_OUT_TARGETS, ...DECADE_CROSSFADE_IN_TARGETS].map(
+    (target) => `${target.layerId}:${target.paintKey}`,
+  ),
+);
+
+function syncLayerLayoutVisibility(
+  map: MapLibreMap,
+  layer: StyleSpecification['layers'][number],
+): void {
+  if (!('layout' in layer) || !layer.layout || typeof layer.layout !== 'object') return;
+  if (!map.getLayer(layer.id)) return;
+  const visibility = (layer.layout as { visibility?: string }).visibility;
+  if (visibility !== 'visible' && visibility !== 'none') return;
+  try {
+    map.setLayoutProperty(layer.id, 'visibility', visibility);
+  } catch (error) {
+    console.error(`[MapStage] setLayoutProperty ${layer.id}.visibility failed`, error);
+  }
+}
+
 function applyGeographyStyle(
   map: MapLibreMap,
   style: StyleSpecification,
-  options?: { readonly recreateEntitiesSource?: boolean },
+  options?: {
+    readonly recreateEntitiesSource?: boolean;
+    /**
+     * When true, skip decade-crossfade opacity channels so an in-flight dissolve
+     * cannot flash full opacity when setData / paint sync runs.
+     */
+    readonly preserveDecadeFadeOpacities?: boolean;
+    /**
+     * Hold primary entities/edges setData during dual-buffer staging so the
+     * visible frame stays put while incoming sources receive the next decade.
+     */
+    readonly deferPrimaryDecadeData?: boolean;
+  },
 ): void {
   const recreateEntities = options?.recreateEntitiesSource === true;
+  const paintOmit = options?.preserveDecadeFadeOpacities ? DECADE_FADE_OMIT_CHANNELS : undefined;
 
   if (recreateEntities) {
     // Clustering is baked into the GeoJSON source at add time — toggling it requires a
@@ -402,6 +547,9 @@ function applyGeographyStyle(
     }
     if (map.getSource(EXPLORE_ENTITIES_SOURCE_ID)) {
       map.removeSource(EXPLORE_ENTITIES_SOURCE_ID);
+    }
+    if (map.getSource(EXPLORE_ENTITIES_INCOMING_SOURCE_ID)) {
+      map.removeSource(EXPLORE_ENTITIES_INCOMING_SOURCE_ID);
     }
   }
 
@@ -416,8 +564,13 @@ function applyGeographyStyle(
       // inline style data is an empty placeholder that their own loaders overwrite —
       // setData'ing the placeholder first would just blank-flash the loaded polygons. The
       // entities source DOES setData here: that is how a surface's filter changes reach the
-      // GL circle layers.
-      if (LAZY_GEOGRAPHY_SOURCE_IDS.has(id)) continue;
+      // GL circle layers. During dual-buffer crossdissolve, primary decade sources stay put
+      // while incoming buffers stage the next frame.
+      if (LAZY_GEOGRAPHY_SOURCE_IDS.has(id) || BREATH_MANAGED_SOURCE_IDS.has(id)) continue;
+      if (options?.deferPrimaryDecadeData && DECADE_PRIMARY_DATA_SOURCE_IDS.has(id)) continue;
+      if (id === EXPLORE_ENTITIES_INCOMING_SOURCE_ID || id === EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID) {
+        continue;
+      }
       const data = (source as { data?: unknown }).data;
       if (typeof existing.setData === 'function' && data && typeof data === 'object') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
@@ -427,10 +580,10 @@ function applyGeographyStyle(
     }
     map.addSource(id, source as SourceSpecification);
   }
-  // Geography layers slot in BENEATH the entity-marker stack whenever it already exists (they
-  // are removed and re-added on every apply for mode-dependent paint; the entity layers are
-  // not, so without an anchor each re-add would climb above the markers and bury them under
-  // state fills). Entity layers append once, in the style array's own stacking order.
+  // Geography + entity layers stay mounted across decade/data patches (in-place setData +
+  // paint/layout sync). Removing them on every apply read as a full map refresh and killed
+  // MapLibre opacity transitions. New layers still append beneath the entity stack when the
+  // halo anchor already exists.
   const entityAnchor = map.getLayer(EXPLORE_UNCLUSTERED_HALO_LAYER_ID)
     ? EXPLORE_UNCLUSTERED_HALO_LAYER_ID
     : undefined;
@@ -440,17 +593,20 @@ function applyGeographyStyle(
         const beforeId = layer.id === 'background' ? undefined : entityAnchor;
         map.addLayer(layer as LayerSpecification, beforeId);
       } else {
-        syncSingleLayerPaint(map, layer);
+        syncSingleLayerPaint(map, layer, paintOmit ? { omitChannels: paintOmit } : undefined);
+        syncLayerLayoutVisibility(map, layer);
       }
       continue;
     }
     if (ENTITY_LAYER_IDS.has(layer.id)) {
       if (!map.getLayer(layer.id)) {
         map.addLayer(layer as LayerSpecification);
-      } else if (layer.type === 'circle' && 'paint' in layer && layer.paint) {
+      } else if ('paint' in layer && layer.paint) {
         // Refresh kind-shade / plate-dependent paint when the style rebuilds (theme toggle,
-        // encoding updates). Source geometry still updates via setData above.
+        // encoding updates). Source geometry still updates via setData above. Decade-fade
+        // opacity channels are omitted mid-swap so the crossfade stays continuous.
         for (const [paintKey, paintValue] of Object.entries(layer.paint)) {
+          if (paintOmit && isDecadeFadePaintChannel(layer.id, paintKey)) continue;
           try {
             map.setPaintProperty(layer.id, paintKey, paintValue);
           } catch (error) {
@@ -539,15 +695,22 @@ type MapStageEvents = {
 
 type MapStageEventName = keyof MapStageEvents;
 
-/** Optional behavior for `patchData`. `fade` runs an opacity out→swap→in on decade-relevant
- * layers (pins, presence fill, relationship lines) when motion is allowed. */
+/** Optional behavior for `patchData`. `fade` runs a dual-buffer crossdissolve on
+ * presence fills, pins, and relationship lines when motion is allowed — geography
+ * never empties. Memorial names couple via `memorialDecade` / `memorialComplete`
+ * (staggered feature-state, not a wipe). */
 export type MapStageDataPatchOptions = {
   readonly fade?: boolean;
+  /** Ambient decade label ("2010s") — names who died that decade stagger-fade out. */
+  readonly memorialDecade?: string;
+  /** Full-archive / Today frame — restore every memorial name. */
+  readonly memorialComplete?: boolean;
 };
 
 export type MapStageHandle = {
   /** Patches source data + density/history-edge mode flags; rebuilds the style and reapplies
-   * geography layers + entity markers. Pass `{ fade: true }` for decade-flow transitions. */
+   * geography layers + entity markers. Pass `{ fade: true }` for decade-flow dual-buffer
+   * crossdissolve (presence colors morph; plate never blanks). */
   readonly patchData: (patch: MapStageDataPatch, options?: MapStageDataPatchOptions) => void;
   /** Patches the selected-state / selected-edge highlight filters (and the state-label
    * selection color) without touching source data or the style. */
@@ -645,8 +808,27 @@ export function MapStageProvider({
     selectedEdge: undefined,
     selectedEntity: undefined,
   });
-  /** Bumps when a faded `patchData` starts so an in-flight out→swap→in can abort cleanly. */
+  /** Bumps when a faded `patchData` starts so an in-flight dual-buffer crossdissolve can abort cleanly. */
   const decadeFadeGenerationRef = useRef(0);
+  /** True while a dual-buffer morph is staging, dissolving, or promoting. */
+  const decadeDissolveInFlightRef = useRef(false);
+  /** Active rAF morph handle — cancelled when a newer decade patch supersedes. */
+  const decadeMorphAnimationRef = useRef<DecadeMorphAnimationHandle | null>(null);
+  /** Settled per-state fill colors — colorA source for the next decade lerp. */
+  const settledDensityFillByFipsRef = useRef<Map<string, string>>(new Map());
+  /** Last in-flight density morph states — cleared on promote. */
+  const activeDensityMorphRef = useRef<readonly DensityColorMorphState[]>([]);
+  /**
+   * Latches true on MapLibre `load`. Do NOT gate decade morphs on `isStyleLoaded()` —
+   * GeoJSON setData / tile fetches flip that false and force the snap path (full refresh).
+   */
+  const mapStyleReadyRef = useRef(false);
+  const memorialFeaturesRef = useRef(
+    MEMORIAL_NAMES_MAP_LAYER_ENABLED
+      ? buildMemorialNameFeatures({ seedKey: 'map-stage' })
+      : { type: 'FeatureCollection' as const, features: [] },
+  );
+  const memorialDecadeApplyRef = useRef<MemorialDecadeApplyHandle | null>(null);
 
   const markMapUnavailable = useCallback(() => {
     if (!mapAvailableRef.current) return;
@@ -696,56 +878,49 @@ export function MapStageProvider({
   const applyStyleAndData = useCallback(
     (options?: {
       readonly recreateEntitiesSource?: boolean;
-      /** Keep geography layers mounted and sync paint in place — used mid decade-fade so the
-       * opacity transition is not killed by remove/re-add. */
-      readonly retainGeographyLayers?: boolean;
+      /**
+       * Mid decade crossdissolve: keep opacity channels owned by the dissolve
+       * while setData / paint sync runs so buffers stay continuous.
+       */
+      readonly preserveDecadeFadeOpacities?: boolean;
+      /** Hold primary entities/edges while incoming buffers stage the next frame. */
+      readonly deferPrimaryDecadeData?: boolean;
+      /** Skip entity HTML marker sync (defer until promote after crossdissolve). */
+      readonly skipEntityMarkers?: boolean;
+      /** Skip primary density load (incoming buffer stages density during dissolve). */
+      readonly skipPrimaryDensityLoad?: boolean;
     }) => {
       const map = mapRef.current;
       if (!map || !map.isStyleLoaded()) return;
       try {
-        // Layers are removed and re-added from the rebuilt style (cheap, main-thread-only) so
-        // mode-dependent paint (density tiers, edge visibility) always matches the config —
-        // unless a decade fade asks to retain them so MapLibre opacity transitions can finish.
-        // Sources are deliberately NOT removed on routine patches — applyGeographyStyle setDatas
-        // them in place; see its doc comment. Grouping toggles pass recreateEntitiesSource.
-        if (!options?.retainGeographyLayers) {
-          for (const id of [
-            EXPLORE_STATE_DENSITY_LAYER_ID,
-            EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
-            EXPLORE_COUNTY_LINES_LAYER_ID,
-            EXPLORE_COUNTY_LABEL_LAYER_ID,
-            'explore-state-bounds-line',
-            SELECTED_FILL_ID,
-            SELECTED_LINE_ID,
-            'explore-jurisdiction-area-fill',
-            EXPLORE_HISTORY_EDGES_LAYER_ID,
-            EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
-          ]) {
-            if (map.getLayer(id)) map.removeLayer(id);
-          }
-        }
-
+        // Geography layers stay mounted — in-place setData + paint/layout sync.
+        // Remove/re-add was cheap CPU-wise but read as a full map refresh and
+        // aborted MapLibre opacity transitions mid-decade.
         applyGeographyStyle(map, configRef.current.style, {
           ...(options?.recreateEntitiesSource ? { recreateEntitiesSource: true } : {}),
+          ...(options?.preserveDecadeFadeOpacities ? { preserveDecadeFadeOpacities: true } : {}),
+          ...(options?.deferPrimaryDecadeData ? { deferPrimaryDecadeData: true } : {}),
         });
         setSelectedStateFilter(map, configRef.current.selectedState);
-        setHistoryEdgeData(map, configRef.current.historyEdgeCollection);
+        if (!options?.deferPrimaryDecadeData) {
+          setHistoryEdgeData(map, configRef.current.historyEdgeCollection);
+        }
         setHistoryEdgesVisibility(map, configRef.current.historyEdgesEnabled);
         setSelectedEdgeFilter(map, configRef.current.selectedEdge);
         setSelectedEntityFilter(map, configRef.current.selectedEntity);
-        void loadStatePolygonsWithDensity(map, configRef.current.densityLevels).catch((error) => {
-          console.error('[MapStage] state polygon load failed', error);
-        });
-        const needsCountyGeometry =
-          map.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
-          configRef.current.layerMode === 'blackShare' ||
-          configRef.current.layerMode === 'blackChange';
-        if (needsCountyGeometry) {
-          void loadCountyPolygons(map, configRef.current.countyChoroplethLevels).catch((error) => {
-            console.error('[MapStage] county polygon load failed', error);
-          });
+        if (!options?.skipPrimaryDensityLoad) {
+          void loadStatePolygonsWithDensity(map, configRef.current.densityLevels)
+            .then((joined) => {
+              settledDensityFillByFipsRef.current = indexDensityFillColors(joined);
+            })
+            .catch((error) => {
+              console.error('[MapStage] state polygon load failed', error);
+            });
         }
-        syncEntityMarkers();
+        requestCountyPolygonLoad(map, configRef.current);
+        if (!options?.skipEntityMarkers) {
+          syncEntityMarkers();
+        }
       } catch (error) {
         console.error('[MapStage] style/data apply failed', error);
       }
@@ -764,7 +939,18 @@ export function MapStageProvider({
   );
 
   const commitDataPatch = useCallback(
-    (patch: MapStageDataPatch, applyOptions?: Parameters<typeof applyStyleAndData>[0]) => {
+    (
+      patch: MapStageDataPatch,
+      applyOptions?: Parameters<typeof applyStyleAndData>[0] & {
+        /**
+         * Decade morph: write config only — do not sync style/paint/visibility onto the
+         * live map. A full applyGeographyStyle mid-morph reads as a map refresh and
+         * aborts MapLibre opacity transitions (also trips on React StrictMode’s
+         * double effect invoke via the old interrupt→snap path).
+         */
+        readonly configOnly?: boolean;
+      },
+    ) => {
       const clusteringEnabled = patch.clusteringEnabled ?? configRef.current.clusteringEnabled;
       const style = buildExploreMapStyle({
         featureCollection: patch.featureCollection,
@@ -786,9 +972,168 @@ export function MapStageProvider({
         historyEdgesEnabled: patch.historyEdgesEnabled,
         historyEdgeCollection: patch.historyEdgeCollection,
       };
-      applyStyleAndData(applyOptions);
+      if (applyOptions?.configOnly) {
+        // Decade morph holds live style sync, but population choropleth joins still
+        // must apply when the compact index arrives after the first paint.
+        const map = mapRef.current;
+        if (map && mapStyleReadyRef.current) {
+          requestCountyPolygonLoad(map, configRef.current);
+        }
+        return;
+      }
+      const styleApplyOptions = applyOptions
+        ? {
+            ...(applyOptions.recreateEntitiesSource ? { recreateEntitiesSource: true as const } : {}),
+            ...(applyOptions.preserveDecadeFadeOpacities ? { preserveDecadeFadeOpacities: true as const } : {}),
+            ...(applyOptions.deferPrimaryDecadeData ? { deferPrimaryDecadeData: true as const } : {}),
+            ...(applyOptions.skipEntityMarkers ? { skipEntityMarkers: true as const } : {}),
+            ...(applyOptions.skipPrimaryDensityLoad ? { skipPrimaryDensityLoad: true as const } : {}),
+          }
+        : undefined;
+      applyStyleAndData(styleApplyOptions);
     },
     [applyStyleAndData],
+  );
+
+  const applyMemorialForPatch = useCallback((options?: MapStageDataPatchOptions) => {
+    // Memorial plate field is parked — skip decade feature-state work until re-enabled.
+    if (!MEMORIAL_NAMES_MAP_LAYER_ENABLED) return;
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded()) return;
+    if (!map.getSource(EXPLORE_MEMORIAL_NAMES_SOURCE_ID)) return;
+    memorialDecadeApplyRef.current?.cancel();
+    memorialDecadeApplyRef.current = applyMemorialDecadeFrame(
+      map,
+      memorialFeaturesRef.current.features,
+      {
+        ...(options?.memorialDecade ? { decade: options.memorialDecade } : {}),
+        ...(options?.memorialComplete ? { isComplete: true } : {}),
+      },
+      { reducedMotion: prefersReducedMotion() },
+    );
+  }, []);
+
+  const stageIncomingDecadeBuffers = useCallback(async (map: MapLibreMap): Promise<void> => {
+    const cfg = configRef.current;
+    const entitiesIncoming = map.getSource(EXPLORE_ENTITIES_INCOMING_SOURCE_ID) as GeoJSONSource | undefined;
+    if (entitiesIncoming) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+      entitiesIncoming.setData(cfg.featureCollection as any);
+      await waitForGeoJsonSourceData(map, EXPLORE_ENTITIES_INCOMING_SOURCE_ID);
+    }
+    const edgesIncoming = map.getSource(EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID) as GeoJSONSource | undefined;
+    if (edgesIncoming) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+      edgesIncoming.setData(cfg.historyEdgeCollection as any);
+    }
+  }, []);
+
+  const clearIncomingDecadeBuffers = useCallback((map: MapLibreMap): void => {
+    for (const sourceId of [EXPLORE_ENTITIES_INCOMING_SOURCE_ID, EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID]) {
+      const source = map.getSource(sourceId) as GeoJSONSource | undefined;
+      if (!source) continue;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+      source.setData(EMPTY_FEATURE_COLLECTION as any);
+    }
+  }, []);
+
+  const settleDensityColorMorph = useCallback(
+    async (
+      map: MapLibreMap,
+      generation: number,
+      morphStates: readonly DensityColorMorphState[],
+    ): Promise<void> => {
+      const cfg = configRef.current;
+      try {
+        const joined = await loadStatePolygonsWithDensity(map, cfg.densityLevels);
+        if (generation !== decadeFadeGenerationRef.current) return;
+        settledDensityFillByFipsRef.current = indexDensityFillColors(joined);
+        clearDensityMorphFeatureState(map, morphStates);
+        activeDensityMorphRef.current = [];
+      } catch (error) {
+        console.error('[MapStage] density color morph settle failed', error);
+      }
+    },
+    [],
+  );
+
+  const promoteIncomingDecadeBuffers = useCallback(
+    async (map: MapLibreMap, generation: number): Promise<void> => {
+      const cfg = configRef.current;
+      setDecadeCrossfadeTransitions(map, 0);
+      const entities = map.getSource(EXPLORE_ENTITIES_SOURCE_ID) as GeoJSONSource | undefined;
+      if (entities) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+        entities.setData(cfg.featureCollection as any);
+        await waitForGeoJsonSourceData(map, EXPLORE_ENTITIES_SOURCE_ID);
+      }
+      if (generation !== decadeFadeGenerationRef.current) return;
+      setHistoryEdgeData(map, cfg.historyEdgeCollection);
+      if (generation !== decadeFadeGenerationRef.current) return;
+      setDecadeCrossfadeIdleOpacities(map);
+      clearIncomingDecadeBuffers(map);
+      setHistoryEdgesVisibility(map, cfg.historyEdgesEnabled);
+      syncEntityMarkers();
+    },
+    [clearIncomingDecadeBuffers, syncEntityMarkers],
+  );
+
+  const runDecadeMorph = useCallback(
+    (map: MapLibreMap, generation: number, durationMs: number, options?: MapStageDataPatchOptions) => {
+      void (async () => {
+        decadeMorphAnimationRef.current?.cancel();
+        decadeMorphAnimationRef.current = null;
+
+        setHistoryEdgesVisibility(map, true);
+        let morphStates: readonly DensityColorMorphState[] = [];
+        try {
+          await stageIncomingDecadeBuffers(map);
+          const cfg = configRef.current;
+          const collection = await fetchStatePolygons();
+          const nextJoined = joinDensityOntoStatePolygons(collection, cfg.densityLevels, {
+            colorScheme: readDocumentColorScheme(),
+          });
+          morphStates = buildDensityColorMorphStates(settledDensityFillByFipsRef.current, nextJoined.features);
+          activeDensityMorphRef.current = morphStates;
+          applyDensityBlendProgress(map, morphStates, 0);
+        } catch (error) {
+          console.error('[MapStage] incoming decade buffer stage failed', error);
+          if (generation !== decadeFadeGenerationRef.current) return;
+          decadeDissolveInFlightRef.current = false;
+          applyStyleAndData();
+          applyMemorialForPatch(options);
+          return;
+        }
+        if (generation !== decadeFadeGenerationRef.current) return;
+
+        applyMemorialForPatch(options);
+
+        const animation = runDecadeMorphAnimation({
+          map,
+          durationMs,
+          isCurrent: () => generation === decadeFadeGenerationRef.current,
+          onProgress: (eased) => applyDensityBlendProgress(map, morphStates, eased),
+        });
+        decadeMorphAnimationRef.current = animation;
+        await animation.done;
+        if (generation !== decadeFadeGenerationRef.current) return;
+        decadeMorphAnimationRef.current = null;
+
+        await settleDensityColorMorph(map, generation, morphStates);
+        if (generation !== decadeFadeGenerationRef.current) return;
+        await promoteIncomingDecadeBuffers(map, generation);
+        if (generation === decadeFadeGenerationRef.current) {
+          decadeDissolveInFlightRef.current = false;
+        }
+      })();
+    },
+    [
+      applyMemorialForPatch,
+      applyStyleAndData,
+      promoteIncomingDecadeBuffers,
+      settleDensityColorMorph,
+      stageIncomingDecadeBuffers,
+    ],
   );
 
   const patchData = useCallback(
@@ -798,42 +1143,45 @@ export function MapStageProvider({
       const recreate = clusteringChanged ? ({ recreateEntitiesSource: true } as const) : undefined;
       const wantsFade = options?.fade === true && !prefersReducedMotion();
       const map = mapRef.current;
+      // Morph when the dual-buffer layers exist. `isStyleLoaded()` is the wrong gate —
+      // it goes false during routine GeoJSON/tile work and was forcing a hard snap
+      // on every decade advance (the “full refresh” the eye sees).
+      const morphLayersReady = Boolean(
+        map &&
+          mapStyleReadyRef.current &&
+          map.getLayer(EXPLORE_STATE_DENSITY_LAYER_ID) &&
+          map.getLayer(EXPLORE_UNCLUSTERED_POINT_LAYER_ID) &&
+          map.getLayer(EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID),
+      );
 
-      if (!wantsFade || !map || !map.isStyleLoaded()) {
-        // Invalidate any in-flight decade fade so a later timeout cannot overwrite this snap.
+      if (!wantsFade || !map || !morphLayersReady || clusteringChanged) {
+        // Invalidate any in-flight decade morph so a later timeout cannot overwrite this snap.
         decadeFadeGenerationRef.current += 1;
+        decadeDissolveInFlightRef.current = false;
+        decadeMorphAnimationRef.current?.cancel();
+        decadeMorphAnimationRef.current = null;
+        if (map && activeDensityMorphRef.current.length > 0) {
+          clearDensityMorphFeatureState(map, activeDensityMorphRef.current);
+          activeDensityMorphRef.current = [];
+        }
         commitDataPatch(patch, recreate);
+        applyMemorialForPatch(options);
         return;
       }
 
       const generation = ++decadeFadeGenerationRef.current;
       const durationMs = DECADE_LAYER_FADE_MS;
-      setDecadeFadeTransitions(map, durationMs);
-      setDecadeFadeOpacities(map, 0);
+      decadeDissolveInFlightRef.current = true;
+      decadeMorphAnimationRef.current?.cancel();
+      decadeMorphAnimationRef.current = null;
 
-      window.setTimeout(() => {
-        if (generation !== decadeFadeGenerationRef.current) return;
-        commitDataPatch(patch, {
-          ...(recreate ?? {}),
-          retainGeographyLayers: true,
-        });
-        // Hold the new frame at opacity 0 (no transition), then fade literals in.
-        setDecadeFadeTransitions(map, 0);
-        setDecadeFadeOpacities(map, 0);
-        requestAnimationFrame(() => {
-          if (generation !== decadeFadeGenerationRef.current) return;
-          setDecadeFadeTransitions(map, durationMs);
-          setDecadeFadeInLiterals(map);
-          window.setTimeout(() => {
-            if (generation !== decadeFadeGenerationRef.current) return;
-            // Snap kind-aware expressions back once the literal fade has settled.
-            setDecadeFadeTransitions(map, 0);
-            restoreDecadeFadePaintFromStyle(map, configRef.current.style);
-          }, durationMs);
-        });
-      }, durationMs);
+      // Config only — never paint-sync the live style mid-morph (that was the full refresh).
+      // Superseding an in-flight morph (including React StrictMode’s double effect) restages
+      // incoming and restarts the dissolve; it must not snap primary sources.
+      commitDataPatch(patch, { configOnly: true });
+      runDecadeMorph(map, generation, durationMs, options);
     },
-    [commitDataPatch],
+    [applyMemorialForPatch, commitDataPatch, runDecadeMorph],
   );
 
   useEffect(() => {
@@ -1074,6 +1422,7 @@ export function MapStageProvider({
       }
 
       activeMap.once('load', () => {
+        mapStyleReadyRef.current = true;
         applyStyleAndData();
         if (activeMap.getLayer(EXPLORE_STATE_DENSITY_LAYER_ID)) {
           activeMap.on('click', EXPLORE_STATE_DENSITY_LAYER_ID, handleStateClick);
@@ -1095,6 +1444,16 @@ export function MapStageProvider({
         }
         activeMap.on('click', handleBackgroundClick);
         activeMap.resize();
+        // Memorial plate field is parked (MEMORIAL_NAMES_MAP_LAYER_ENABLED).
+        // When re-enabled: start complete, then HeroStage/explore decade patches drive fades.
+        if (MEMORIAL_NAMES_MAP_LAYER_ENABLED) {
+          memorialDecadeApplyRef.current?.cancel();
+          memorialDecadeApplyRef.current = applyMemorialDecadeFrame(
+            activeMap,
+            memorialFeaturesRef.current.features,
+            { isComplete: true },
+          );
+        }
       });
 
       activeMap.on('moveend', () => {
@@ -1105,16 +1464,7 @@ export function MapStageProvider({
       activeMap.on('zoom', () => updateStateLabelOpacity(activeMap.getZoom()));
       activeMap.on('zoomend', () => {
         syncEntityMarkers();
-        const cfg = configRef.current;
-        if (
-          activeMap.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
-          cfg.layerMode === 'blackShare' ||
-          cfg.layerMode === 'blackChange'
-        ) {
-          void loadCountyPolygons(activeMap, cfg.countyChoroplethLevels).catch((error) => {
-            console.error('[MapStage] county polygon load failed', error);
-          });
-        }
+        requestCountyPolygonLoad(activeMap, configRef.current);
       });
 
       // Cluster expansion (dignity-style.ts's EXPLORE_CLUSTER_CONFIG contract: "every cluster
@@ -1179,6 +1529,12 @@ export function MapStageProvider({
     return () => {
       cancelled = true;
       decadeFadeGenerationRef.current += 1;
+      decadeDissolveInFlightRef.current = false;
+      decadeMorphAnimationRef.current?.cancel();
+      decadeMorphAnimationRef.current = null;
+      mapStyleReadyRef.current = false;
+      memorialDecadeApplyRef.current?.cancel();
+      memorialDecadeApplyRef.current = null;
       if (resizeTimer) clearTimeout(resizeTimer);
       resizeObserver?.disconnect();
       clearMarkers(markersRef.current);

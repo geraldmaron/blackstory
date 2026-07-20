@@ -410,6 +410,11 @@
   gap: var(--ds-space-2);
 }
 
+.ds-explore__clear-filters {
+  justify-self: start;
+  margin-block-start: var(--ds-space-1);
+}
+
 .ds-explore__layer-model {
   display: grid;
   gap: var(--ds-space-3);
@@ -476,11 +481,10 @@
 }
 
 /*
- * legend. `.ds-explore-legend` is the component's own root (a native `<details>`) it
- * carries no fixed/floating position of its own; a wrapping container supplied by the map-stage
- * surface is what pins it as a bottom-left floating panel over the canvas (see
- * `MapExperienceLegend.tsx`'s props-contract doc comment). What lives here is purely the
- * component's internal layout, sized to stay legible down to a 375px-wide container.
+ * Legend internals. `.ds-explore-legend` is the component's own root (a native `<details>`);
+ * Explore mounts it inside the left instrument chassis Color key tab — positioning is owned
+ * by `.ds-explore-stage__instruments` in map-surfaces.css. Styles here are layout within
+ * that surface, sized to stay legible down to a 375px-wide container.
  */
 .ds-explore-legend-stack {
   display: grid;
@@ -492,6 +496,9 @@
   margin: 0;
   padding-bottom: var(--ds-space-2);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
 }
 
 .ds-legend-line-swatch {
@@ -506,12 +513,14 @@
   margin-top: 0;
   max-width: 22rem;
   font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
 }
 
 .ds-explore-legend__summary {
   cursor: pointer;
   font-weight: 700;
-  font-size: 0.8125rem;
+  font-size: inherit;
   list-style: revert;
 }
 
@@ -524,6 +533,7 @@
   display: grid;
   gap: var(--ds-space-4);
   margin-top: var(--ds-space-3);
+  font-size: inherit;
 }
 
 .ds-explore-legend__subhead {
@@ -538,7 +548,7 @@
 
 .ds-explore-legend__note {
   margin: 0 0 var(--ds-space-2);
-  font-size: 0.8125rem;
+  font-size: inherit;
   color: var(--ds-ink-muted);
 }
 
@@ -548,7 +558,13 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 0.8125rem;
+  font-size: inherit;
+  color: var(--ds-ink-muted);
+}
+
+.ds-explore-legend__kind-label {
+  font-size: inherit;
+  color: inherit;
 }
 
 .ds-explore-legend__kind-list li {
@@ -558,7 +574,8 @@
 }
 
 .ds-explore-legend__kind-glyph-name {
-  color: var(--ds-ink-muted);
+  color: inherit;
+  opacity: 0.85;
 }
 
 .ds-legend-glyph {
@@ -610,7 +627,7 @@
   display: grid;
   gap: var(--ds-space-3);
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: inherit;
 }
 
 .ds-explore-legend__list dt {

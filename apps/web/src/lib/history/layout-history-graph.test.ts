@@ -6,7 +6,9 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { HistoryEdgeView, HistoryNodeView } from './build-history-graph';
 import {
+  HISTORY_KIND_HUB_RADIUS,
   HISTORY_RECORD_GRAPH_MAX,
+  aggregateKindBoardColumns,
   layoutHistoryGraph,
   resolveHistoryGraphMode,
 } from './layout-history-graph';
@@ -74,7 +76,49 @@ test('layoutHistoryGraph aggregates by kind when the set is large', () => {
   assert.equal(result.layoutNodes.length, 2);
   assert.ok(result.layoutNodes.every((node) => node.role === 'kind-hub'));
   assert.ok(result.layoutNodes.every((node) => node.shade === kindEncodingFor(node.kind).shade));
+  assert.ok(result.layoutNodes.every((node) => node.r === HISTORY_KIND_HUB_RADIUS));
   assert.ok(result.layoutEdges.length >= 1);
+  assert.match(result.modeNotice, /Kinds in this view/);
+});
+
+test('aggregate kind board keeps hubs spaced and ranked by volume', () => {
+  const kinds = [
+    'person',
+    'place',
+    'school',
+    'event',
+    'institution',
+    'organization',
+    'law',
+    'case',
+    'publication',
+    'movement',
+  ] as const;
+  const nodes = kinds.flatMap((kind, kindIndex) =>
+    Array.from({ length: (kinds.length - kindIndex) * 3 }, (_, index) =>
+      makeNode(`${kind}-${index}`, `${kind} ${index}`, kind, 1),
+    ),
+  );
+  const result = layoutHistoryGraph(nodes, [], { width: 640, height: 400, seed: 1 });
+  assert.equal(result.mode, 'aggregate');
+  assert.equal(result.layoutNodes[0]?.kind, 'person');
+  assert.equal(result.layoutNodes.length, kinds.length);
+  assert.equal(aggregateKindBoardColumns(kinds.length), 5);
+
+  const minCenterDistance = HISTORY_KIND_HUB_RADIUS * 2 + 24;
+  for (let i = 0; i < result.layoutNodes.length; i += 1) {
+    for (let j = i + 1; j < result.layoutNodes.length; j += 1) {
+      const a = result.layoutNodes[i]!;
+      const b = result.layoutNodes[j]!;
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      const distance = Math.hypot(dx, dy);
+      assert.ok(
+        distance >= minCenterDistance,
+        `hubs ${a.kind} and ${b.kind} too close (${distance.toFixed(1)})`,
+      );
+    }
+  }
 });
 
 test('layoutHistoryGraph focuses on a selected record neighborhood', () => {

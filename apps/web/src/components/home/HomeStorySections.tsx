@@ -10,10 +10,7 @@
  */
 
 import Link from 'next/link';
-import type {
-  NationalPopulationByDecade,
-  PopulationDecadeChange,
-} from '@repo/firebase';
+import type { NationalPopulationTimelineSnapshot } from '@repo/firebase';
 import { KindBadge } from '../map-experience/KindBadge';
 import { HomeAbout } from './HomeAbout';
 import { HomeDataPulse } from './HomeDataPulse';
@@ -37,8 +34,8 @@ export type HomeStorySectionsProps = {
   readonly stateCount: number;
   /** e.g. "1820s–1970s"; omitted when the release carries no dated records. */
   readonly eraSpan?: string | undefined;
-  readonly populationByDecade?: readonly NationalPopulationByDecade[] | undefined;
-  readonly populationChanges?: readonly PopulationDecadeChange[] | undefined;
+  /** Merged 1790–2020 national timeline snapshot for the data pulse. */
+  readonly timeline?: NationalPopulationTimelineSnapshot | undefined;
 };
 
 /** v5 §6.5 "How this works" — three points, evidence before assertion. */
@@ -54,8 +51,7 @@ export function HomeStorySections({
   recordCount,
   stateCount,
   eraSpan,
-  populationByDecade,
-  populationChanges,
+  timeline,
 }: HomeStorySectionsProps) {
   return (
     <>
@@ -66,8 +62,7 @@ export function HomeStorySections({
           recordCount={recordCount}
           stateCount={stateCount}
           eraSpan={eraSpan}
-          populationByDecade={populationByDecade}
-          populationChanges={populationChanges}
+          timeline={timeline}
         />
 
         <section className="ds-section" aria-labelledby="featured-heading">

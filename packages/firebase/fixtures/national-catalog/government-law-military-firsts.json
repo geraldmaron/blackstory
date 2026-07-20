@@ -88,7 +88,9 @@
       "firsts",
       "house-of-representatives"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fort_concho_nhl_001"
+    ],
     "keywords": []
   },
   {
@@ -178,7 +180,9 @@
       "firsts",
       "governors"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_southern_university_001"
+    ],
     "keywords": []
   },
   {
@@ -273,7 +277,10 @@
       "house-of-representatives",
       "civil-war"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_core_founding_001",
+      "ent_fort_concho_nhl_001"
+    ],
     "keywords": []
   },
   {
@@ -321,7 +328,10 @@
       "education",
       "house-of-representatives"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_university_001",
+      "ent_langston_hughes_001"
+    ],
     "keywords": []
   },
   {
@@ -409,7 +419,9 @@
       "law",
       "education"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_university_001"
+    ],
     "keywords": []
   },
   {
@@ -547,7 +559,9 @@
       "civil-war",
       "medicine"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_university_001"
+    ],
     "keywords": []
   },
   {
@@ -683,7 +697,9 @@
       "firsts",
       "mayors"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_richard_hatcher_001"
+    ],
     "keywords": []
   },
   {
@@ -728,7 +744,9 @@
       "firsts",
       "mayors"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_carl_stokes_001"
+    ],
     "keywords": []
   },
   {
@@ -861,7 +879,9 @@
       "firsts",
       "mayors"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_barack_obama_001"
+    ],
     "keywords": []
   },
   {
@@ -1301,7 +1321,9 @@
       "firsts",
       "house-of-representatives"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_mfdp_dnc_challenge_001"
+    ],
     "keywords": []
   },
   {
@@ -1345,7 +1367,9 @@
       "firsts",
       "senate"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_fair_housing_act_1968"
+    ],
     "keywords": []
   },
   {
@@ -1389,7 +1413,10 @@
       "firsts",
       "house-of-representatives"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_andrew_young_001",
+      "ent_mfdp_dnc_challenge_001"
+    ],
     "keywords": []
   },
   {
@@ -1563,7 +1590,9 @@
       "firsts",
       "governors"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_douglas_wilder_001"
+    ],
     "keywords": []
   },
   {
@@ -1695,7 +1724,9 @@
       "firsts",
       "house-of-representatives"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_adam_clayton_powell_001"
+    ],
     "keywords": []
   },
   {
@@ -1824,7 +1855,9 @@
       "firsts",
       "cabinet"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_fair_housing_act_1968"
+    ],
     "keywords": []
   },
   {
@@ -1868,7 +1901,9 @@
       "firsts",
       "cabinet"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_robert_c_weaver_001"
+    ],
     "keywords": []
   },
   {
@@ -1916,7 +1951,9 @@
       "supreme-court",
       "judiciary"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954"
+    ],
     "keywords": []
   },
   {
@@ -2223,7 +2260,10 @@
       "firsts",
       "cabinet"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954",
+      "ent_robert_c_weaver_001"
+    ],
     "keywords": []
   },
   {
@@ -2446,7 +2486,10 @@
       "military",
       "cabinet"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_barack_obama_001",
+      "ent_condoleezza_rice_001"
+    ],
     "keywords": []
   },
   {
@@ -2489,7 +2532,9 @@
       "firsts",
       "cabinet"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_colin_powell_001"
+    ],
     "keywords": []
   },
   {
@@ -2620,7 +2665,9 @@
       "firsts",
       "vice-president"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_thurgood_marshall_001"
+    ],
     "keywords": []
   },
   {
@@ -2752,7 +2799,9 @@
       "firsts",
       "cabinet"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_condoleezza_rice_001"
+    ],
     "keywords": []
   },
   {
@@ -2797,7 +2846,9 @@
       "cabinet",
       "military"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_kamala_harris_001"
+    ],
     "keywords": []
   },
   {
@@ -2888,7 +2939,9 @@
       "military",
       "army"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_benjamin_davis_jr_001"
+    ],
     "keywords": []
   },
   {
@@ -2935,7 +2988,10 @@
       "military",
       "air-force"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_benjamin_davis_sr_001",
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -2981,7 +3037,9 @@
       "military",
       "army"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_wilberforce_university_001"
+    ],
     "keywords": []
   },
   {
@@ -3072,7 +3130,9 @@
       "military",
       "army"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_shaw_university_001"
+    ],
     "keywords": []
   },
   {
@@ -3117,7 +3177,9 @@
       "military",
       "air-force"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_spelman_college_001"
+    ],
     "keywords": []
   },
   {
@@ -3254,7 +3316,9 @@
       "military",
       "air-force"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -3486,7 +3550,9 @@
       "army",
       "medicine"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_executive_order_9981_1948"
+    ],
     "keywords": []
   },
   {
@@ -3573,7 +3639,9 @@
       "firsts",
       "diplomacy"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_thurgood_marshall_001"
+    ],
     "keywords": []
   },
   {
@@ -3660,7 +3728,9 @@
       "firsts",
       "public-safety"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_african_meeting_house_001"
+    ],
     "keywords": []
   },
   {
@@ -3751,7 +3821,9 @@
       "firsts",
       "law-enforcement"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_aamp_philadelphia_001"
+    ],
     "keywords": []
   }
 ]

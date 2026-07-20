@@ -92,15 +92,19 @@ function encodingForKind(kind: string) {
   return kindEncodingFor(kind);
 }
 
-function hubRadius(count: number, maxCount: number): number {
-  const minR = 18;
-  const maxR = 36;
-  if (maxCount <= 0) return minR;
-  return minR + Math.round((count / maxCount) * (maxR - minR));
-}
+/** Aggregate hubs stay equal-sized — volume is carried by the count label, not radius. */
+export const HISTORY_KIND_HUB_RADIUS = 15;
 
 function recordRadius(connectionCount: number): number {
   return clamp(8 + Math.min(connectionCount, 6), 8, 14);
+}
+
+/** Column count for the aggregate kind board (readable at catalog scale). */
+export function aggregateKindBoardColumns(kindCount: number): number {
+  if (kindCount <= 4) return kindCount;
+  if (kindCount <= 6) return 3;
+  if (kindCount <= 9) return 3;
+  return 5;
 }
 
 export function resolveHistoryGraphMode(
@@ -125,16 +129,28 @@ function layoutAggregate(
     kindCounts.set(node.kind, (kindCounts.get(node.kind) ?? 0) + 1);
   }
 
-  const kinds = [...kindCounts.keys()].sort((a, b) => a.localeCompare(b));
-  const maxCount = Math.max(...kindCounts.values(), 1);
-  const centerX = width / 2;
-  const centerY = height / 2;
-  const ring = Math.min(width, height) * 0.28;
+  // Rank by volume so the densest kinds lead the board; name breaks ties.
+  const kinds = [...kindCounts.keys()].sort((a, b) => {
+    const countDelta = (kindCounts.get(b) ?? 0) - (kindCounts.get(a) ?? 0);
+    return countDelta !== 0 ? countDelta : a.localeCompare(b);
+  });
+
+  const cols = aggregateKindBoardColumns(kinds.length);
+  const rows = Math.max(1, Math.ceil(kinds.length / cols));
+  const padX = 36;
+  const padY = 28;
+  const labelReserve = 36;
+  const cellW = (width - padX * 2) / cols;
+  const cellH = (height - padY * 2) / rows;
 
   const layoutNodes: LayoutHistoryGraphNode[] = kinds.map((kind, index) => {
     const encoding = encodingForKind(kind);
     const count = kindCounts.get(kind) ?? 0;
-    const angle = kinds.length === 1 ? -Math.PI / 2 : (index / kinds.length) * Math.PI * 2 - Math.PI / 2;
+    const col = index % cols;
+    const row = Math.floor(index / cols);
+    // Glyph sits in the upper half of the cell so the kind + count label has clear room.
+    const x = padX + cellW * (col + 0.5);
+    const y = padY + cellH * row + (cellH - labelReserve) * 0.55;
     return {
       id: `kind:${kind}`,
       kind,
@@ -144,9 +160,9 @@ function layoutAggregate(
       role: 'kind-hub' as const,
       connectionCount: 0,
       recordCount: count,
-      x: centerX + Math.cos(angle) * ring,
-      y: centerY + Math.sin(angle) * ring,
-      r: hubRadius(count, maxCount),
+      x,
+      y,
+      r: HISTORY_KIND_HUB_RADIUS,
     };
   });
 
@@ -189,7 +205,7 @@ function layoutAggregate(
     layoutNodes: withDegrees,
     layoutEdges,
     modeNotice:
-      'Grouped by kind — select a kind to filter, or open a record from the list to focus its connections.',
+      'Kinds in this view — select a kind to filter the list, or open a record to focus its connections.',
   };
 }
 

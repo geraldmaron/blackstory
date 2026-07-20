@@ -17,7 +17,7 @@ test('an empty query string parses to the "all" default filter state with no vie
   assert.deepEqual(parsed.filters, { era: 'all', kind: 'all', theme: 'all', confidence: 'all' });
   assert.equal(parsed.viewport, undefined);
   assert.equal(parsed.selected, undefined);
-  assert.equal(parsed.layerMode, 'off');
+  assert.equal(parsed.layerMode, 'presence');
   assert.equal(parsed.group, false);
   assert.equal(parsed.lines, false);
   assert.equal(parsed.decade, undefined);
@@ -67,7 +67,7 @@ test('round-trips a full view state through build -> parse', () => {
 test('default filter values are omitted from the query string (minimal shareable URL)', () => {
   const qs = buildExploreSearchParams({
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-    layerMode: 'off',
+    layerMode: 'presence',
     group: false,
     lines: false,
     showFilters: true,
@@ -77,7 +77,19 @@ test('default filter values are omitted from the query string (minimal shareable
   assert.equal(qs, '');
 });
 
-test('layerMode=presence is emitted; off is omitted', () => {
+test('layerMode=off is emitted; presence (default) is omitted', () => {
+  assert.equal(
+    buildExploreSearchParams({
+      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      layerMode: 'off',
+      group: false,
+      lines: false,
+      showFilters: true,
+      showResults: true,
+      showKey: true,
+    }),
+    'layerMode=off',
+  );
   assert.equal(
     buildExploreSearchParams({
       filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
@@ -88,7 +100,7 @@ test('layerMode=presence is emitted; off is omitted', () => {
       showResults: true,
       showKey: true,
     }),
-    'layerMode=presence',
+    '',
   );
 });
 
@@ -143,7 +155,7 @@ test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
   assert.match(
     buildExploreSearchParams({
       filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-      layerMode: 'off',
+      layerMode: 'presence',
       group: true,
       lines: false,
       showFilters: true,
@@ -155,7 +167,7 @@ test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
   assert.equal(
     buildExploreSearchParams({
       filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-      layerMode: 'off',
+      layerMode: 'presence',
       group: false,
       lines: false,
       showFilters: true,
@@ -174,7 +186,7 @@ test('hidePanels defaults all panels to shown when param is absent', () => {
   assert.equal(
     buildExploreSearchParams({
       filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-      layerMode: 'off',
+      layerMode: 'presence',
       group: false,
       lines: false,
       showFilters: true,
@@ -193,7 +205,7 @@ test('hidePanels=filters hides only the filters panel', () => {
 
   const state = {
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-    layerMode: 'off' as const,
+    layerMode: 'presence' as const,
     group: false,
     lines: false,
     showFilters: false,
@@ -212,7 +224,7 @@ test('hidePanels=results hides only the results rail', () => {
 
   const state = {
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-    layerMode: 'off' as const,
+    layerMode: 'presence' as const,
     group: false,
     lines: false,
     showFilters: true,
@@ -231,7 +243,7 @@ test('hidePanels=key hides only the color key legend', () => {
 
   const state = {
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-    layerMode: 'off' as const,
+    layerMode: 'presence' as const,
     group: false,
     lines: false,
     showFilters: true,
@@ -256,7 +268,7 @@ test('hidePanels=filters,results,key hides all panels regardless of token order'
 
   const state = {
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-    layerMode: 'off' as const,
+    layerMode: 'presence' as const,
     group: false,
     lines: false,
     showFilters: false,

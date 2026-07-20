@@ -270,7 +270,9 @@
       "history",
       "education"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_african_meeting_house_001"
+    ],
     "keywords": []
   },
   {
@@ -315,7 +317,9 @@
       "history",
       "culture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_negro_leagues_baseball_museum_001"
+    ],
     "keywords": []
   },
   {
@@ -451,7 +455,10 @@
       "civil-rights",
       "history"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_edmund_pettus_bridge_001",
+      "ent_law_voting_rights_act_1965"
+    ],
     "keywords": []
   },
   {
@@ -542,7 +549,9 @@
       "art",
       "history"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_hampton_university_001"
+    ],
     "keywords": []
   },
   {
@@ -633,7 +642,9 @@
       "civil-rights",
       "education"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_andrew_young_001"
+    ],
     "keywords": []
   },
   {
@@ -724,7 +735,9 @@
       "music",
       "culture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_louis_armstrong_001"
+    ],
     "keywords": []
   },
   {

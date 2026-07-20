@@ -5,11 +5,13 @@
  * needs_evidence packets so overnight batches do not abort on a single bad completion.
  */
 import {
+  TOPIC_REGISTRY,
   buildEditorialPacket,
   linkifyProseAgainstCatalog,
   suggestRelatedEntitiesFromVectors,
   validateEditorialDrafts,
   type CatalogLinkTarget,
+  type EditorialClaimDraft,
   type EditorialDecision,
   type EditorialPacket,
   type EmbeddingVector,
@@ -81,6 +83,15 @@ export type EditorialRunResult = {
   readonly concurrency: number;
 };
 
+type ModelClaimJson = {
+  readonly predicate?: string;
+  readonly object?: string;
+  readonly confidenceLevel?: string;
+  readonly citationSource?: string;
+  readonly citationHref?: string;
+  readonly citationLabel?: string;
+};
+
 type ModelJson = {
   readonly decision?: string;
   readonly rationale?: string;
@@ -92,18 +103,54 @@ type ModelJson = {
     readonly relevanceNote?: string;
     readonly relatedEntityIds?: readonly string[];
     readonly proposedRelationshipNotes?: string;
+    readonly claims?: readonly ModelClaimJson[];
+    readonly topicIds?: readonly string[];
+    readonly eraBuckets?: readonly string[];
+    readonly keywords?: readonly string[];
   };
 };
 
+const TOPIC_ID_LIST = TOPIC_REGISTRY.map((topic) => topic.id).join(', ');
+
 const SYSTEM_PROMPT = `You are an editorial judge for BlackStory (History, pinned to place).
 Return ONLY JSON with keys: decision (keep|reject|needs_evidence), rationale, confidence (0-1),
-drafts: { publicSummary, historicalContext, identityLabel?, relevanceNote?, relatedEntityIds?, proposedRelationshipNotes? }.
+drafts: { publicSummary, historicalContext, identityLabel?, relevanceNote?, relatedEntityIds?,
+proposedRelationshipNotes?, claims?, topicIds?, eraBuckets?, keywords? }.
 Rules:
 - publicSummary 120-400 chars, specific evidence-led prose, no sensational framing, no completeness claims.
+- historicalContext: 1-3 sentences of teaching context — why this record matters, how it connects to
+  the laws, institutions, and structural forces around it (e.g. segregation statutes, migration,
+  land ownership). Only context supported by the provided material or uncontroversial consensus history.
+- claims: 1-6 atomic factual claims that the provided sourceSnippets explicitly support. Each claim is
+  {predicate, object, confidenceLevel: high|medium|low, citationSource: hostname, citationHref, citationLabel}.
+  citationHref MUST be one of the URLs provided in sourceSnippets — never invent or modify a URL.
+  If the snippets support no verifiable claim, return an empty claims array and decision needs_evidence.
+- topicIds: 2-5 ids chosen ONLY from this registry: ${TOPIC_ID_LIST}.
+- eraBuckets: decade strings like "1910s", only when the era is evidenced in the material.
+- keywords: 2-5 short search phrases from the material.
+- proposedRelationshipNotes: propose typed edges to catalog entities (located_at, part_of, governed_by,
+  influenced, caused, commemorates, attended, member_of) with a one-line evidence note each; mark any
+  caused/enabled proposal as requiring consensus review.
 - When mentioning other catalog entities, use markup [[entityId|Display Name]] for known ids only.
 - Do not invent citations or claim legal procedural status.
 - reject spam/commerce/off-topic; needs_evidence when thin; keep when learnable with place context.
 - relatedEntityIds must be existing catalog ids only.`;
+
+/**
+ * Free-model JSON output is not guaranteed to match the declared shape at runtime
+ * (a field the type says is `string` can arrive as a number, null, nested object, or
+ * be missing entirely). Coerce defensively so a malformed field degrades to an empty
+ * string caught by domain validation, instead of throwing deep inside `.trim()` calls
+ * and turning the whole subject into an opaque `needs_evidence` error.
+ */
+function toSafeString(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
+function toSafeStringArray(value: unknown): readonly string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === 'string');
+}
 
 function parseDecision(raw: string | undefined): EditorialDecision {
   if (raw === 'reject' || raw === 'needs_evidence' || raw === 'keep') return raw;
@@ -192,8 +239,34 @@ async function judgeOneSubject(input: {
       ...(draftsIn.proposedRelationshipNotes !== undefined
         ? { proposedRelationshipNotes: draftsIn.proposedRelationshipNotes }
         : {}),
+      ...(draftsIn.claims !== undefined
+        ? {
+            claims: (Array.isArray(draftsIn.claims) ? draftsIn.claims : []).map(
+              (claim): EditorialClaimDraft => ({
+                predicate: toSafeString(claim?.predicate),
+                object: toSafeString(claim?.object),
+                confidenceLevel:
+                  claim?.confidenceLevel === 'high' ||
+                  claim?.confidenceLevel === 'medium' ||
+                  claim?.confidenceLevel === 'low'
+                    ? claim.confidenceLevel
+                    : 'low',
+                citationSource: toSafeString(claim?.citationSource),
+                citationHref: toSafeString(claim?.citationHref),
+                citationLabel: toSafeString(claim?.citationLabel),
+              }),
+            ),
+          }
+        : {}),
+      ...(draftsIn.topicIds !== undefined ? { topicIds: toSafeStringArray(draftsIn.topicIds) } : {}),
+      ...(draftsIn.eraBuckets !== undefined ? { eraBuckets: toSafeStringArray(draftsIn.eraBuckets) } : {}),
+      ...(draftsIn.keywords !== undefined ? { keywords: toSafeStringArray(draftsIn.keywords) } : {}),
     };
-    const validation = validateEditorialDrafts(drafts);
+    // Claims may cite only URLs the judge was actually shown — fabricated hrefs fail validation.
+    const allowedCitationHrefs = (subject.sourceSnippets ?? []).flatMap(
+      (snippet) => snippet.match(/https?:\/\/\S+/gu) ?? [],
+    );
+    const validation = validateEditorialDrafts(drafts, { allowedCitationHrefs });
     const targetVector =
       input.targetVectorBySubjectId?.get(subject.subjectId) ??
       input.catalog.find((entry) => entry.id === subject.subjectId)?.vector;

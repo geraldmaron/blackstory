@@ -37,49 +37,78 @@ import type {
   JurisdictionAreaFeature,
 } from '../../lib/map-experience/build-explore-map-source';
 import {
+  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LABEL_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_COUNTY_LINES_SOURCE_ID,
+  EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
+  EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
+  EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
   EXPLORE_JURISDICTION_AREAS_SOURCE_ID,
+  EXPLORE_MEMORIAL_NAMES_LAYER_ID,
+  EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
+  MEMORIAL_NAMES_MAP_LAYER_ENABLED,
   EXPLORE_SELECTED_POINT_LAYER_ID,
+  EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
+  EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
+  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
+  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+  EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
 import { COUNTY_LINES_MIN_ZOOM } from '../../lib/map-experience/us-county-lines';
 import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
+import {
+  buildMemorialNameFeatures,
+  MEMORIAL_LABEL_TEXT_FONT,
+} from '../../lib/map-experience/build-memorial-name-features';
 
 export {
+  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LABEL_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
   EXPLORE_COUNTY_LINES_SOURCE_ID,
+  EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
+  EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
+  EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
   EXPLORE_JURISDICTION_AREAS_SOURCE_ID,
+  EXPLORE_MEMORIAL_NAMES_LAYER_ID,
+  EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
+  MEMORIAL_NAMES_MAP_LAYER_ENABLED,
   EXPLORE_SELECTED_POINT_LAYER_ID,
+  EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
+  EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
+  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
+  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+  EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
-
 /**
  * OpenMapTiles `transportation.class` width ladder — motorway heaviest down through residential
  * (`minor`) to service/path/track fallback. Used inside zoom-interpolated street casing/fill so
@@ -244,6 +273,14 @@ export const ENTITY_CLUSTER_OPACITY = 0.55;
 /** Institution "ring" glyph — mostly hollow by design. */
 export const ENTITY_RING_FILL_OPACITY = 0.2;
 
+/**
+ * Opaque plate fills — memorial names live as a MapLibre symbol layer in the
+ * style stack (above background, below land fills), so the ocean plate stays
+ * fully opaque and state fills occlude names on land. No DOM under-canvas bleed.
+ */
+export const PLATE_BACKGROUND_OPACITY = 1;
+export const PLATE_STATE_FILL_OPACITY = 1;
+
 const GLYPH_PAINT_SIGNATURE: Readonly<Record<string, KindGlyphPaintSignature>> = {
   // Solid-fill kinds sit below full opacity so geography stays legible through the disc.
   // `ring` stays far lower; mostly-hollow IS its glyph signature.
@@ -313,6 +350,45 @@ function kindStrokeColorExpression(rimColor: string): ExpressionSpecification {
       entry.glyph === 'ring' ? DIGNITY_PALETTE.kindInstitutionStroke : rimColor,
     rimColor,
   );
+}
+
+/**
+ * Presence density fill — resting `fillColor` on each feature, with optional
+ * feature-state colorA/colorB/blend lerp for decade morphs (A→B per state).
+ */
+export function buildPresenceDensityFillColorExpression(
+  plate: ReturnType<typeof plateForScheme>,
+  presenceFillActive: boolean,
+): ExpressionSpecification {
+  if (!presenceFillActive) {
+    return plate.densityDisabled as unknown as ExpressionSpecification;
+  }
+
+  const tierFallback = [
+    'match',
+    ['get', 'densityTier'],
+    'concentrated',
+    DENSITY_TIER_FILL.concentrated,
+    'emerging',
+    DENSITY_TIER_FILL.emerging,
+    'documented',
+    DENSITY_TIER_FILL.documented,
+    plate.densityUnknown,
+  ] as unknown as ExpressionSpecification;
+
+  const restingColor = ['coalesce', ['get', 'fillColor'], tierFallback] as unknown as ExpressionSpecification;
+  const colorA = ['coalesce', ['feature-state', 'colorA'], restingColor] as unknown as ExpressionSpecification;
+  const colorB = ['coalesce', ['feature-state', 'colorB'], restingColor] as unknown as ExpressionSpecification;
+
+  return [
+    'interpolate',
+    ['linear'],
+    ['coalesce', ['feature-state', 'blend'], 0],
+    0,
+    colorA,
+    1,
+    colorB,
+  ] as unknown as ExpressionSpecification;
 }
 
 export type BuildExploreMapStyleInput = {
@@ -387,8 +463,14 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
       },
       [EXPLORE_STATE_DENSITY_SOURCE_ID]: {
         type: 'geojson',
+        promoteId: 'id',
         // Empty until ExploreMapCanvas fetches `/geo/us-states-20m.geojson` and joins density.
         // Do not point `data` at the URL — MapLibre’s async URL load would overwrite setData.
+        data: { type: 'FeatureCollection', features: [] },
+      },
+      [EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID]: {
+        type: 'geojson',
+        // Dual-buffer partner for decade/filter presence crossdissolve — idle empty at opacity 0.
         data: { type: 'FeatureCollection', features: [] },
       },
       [EXPLORE_COUNTY_LINES_SOURCE_ID]: {
@@ -418,16 +500,89 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
             }
           : { cluster: false }),
       },
+      [EXPLORE_ENTITIES_INCOMING_SOURCE_ID]: {
+        type: 'geojson',
+        // Dual-buffer pin stack — empty until a decade/filter crossdissolve stages the next frame.
+        data: { type: 'FeatureCollection', features: [] },
+        ...(clusteringEnabled
+          ? {
+              cluster: true,
+              clusterRadius: EXPLORE_CLUSTER_CONFIG.clusterRadius,
+              clusterMaxZoom: EXPLORE_CLUSTER_CONFIG.clusterMaxZoom,
+            }
+          : { cluster: false }),
+      },
       [EXPLORE_HISTORY_EDGES_SOURCE_ID]: {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] },
+      },
+      [EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID]: {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] },
+      },
+      [EXPLORE_MEMORIAL_NAMES_SOURCE_ID]: {
+        type: 'geojson',
+        promoteId: 'id',
+        // Hidden for now — keep the source wired; builders/data stay in-repo.
+        // Re-enable: MEMORIAL_NAMES_MAP_LAYER_ENABLED + restore feature build below.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+        data: (MEMORIAL_NAMES_MAP_LAYER_ENABLED
+          ? buildMemorialNameFeatures({ seedKey: 'map-stage' })
+          : { type: 'FeatureCollection', features: [] }) as any,
       },
     },
     layers: [
       {
         id: 'background',
         type: 'background',
-        paint: { 'background-color': plate.ocean },
+        paint: {
+          'background-color': plate.ocean,
+          'background-opacity': PLATE_BACKGROUND_OPACITY,
+        },
+      },
+      {
+        // Memorial typographic field — eligible full names on non-state anchors.
+        // Name-only; Italic face + per-feature size/rotation for collage texture
+        // (not a typeset grid). Currently hidden via MEMORIAL_NAMES_MAP_LAYER_ENABLED.
+        // Decade fade via paint feature-state only when the layer is live again.
+        id: EXPLORE_MEMORIAL_NAMES_LAYER_ID,
+        type: 'symbol',
+        source: EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
+        layout: {
+          visibility: MEMORIAL_NAMES_MAP_LAYER_ENABLED ? 'visible' : 'none',
+          'text-field': ['get', 'name'],
+          'text-font': [...MEMORIAL_LABEL_TEXT_FONT],
+          'text-size': ['get', 'size'],
+          'text-rotate': ['get', 'rotate'],
+          'text-letter-spacing': 0.05,
+          'text-max-width': 7,
+          'text-justify': 'center',
+          'text-anchor': 'center',
+          'text-allow-overlap': false,
+          'text-ignore-placement': false,
+          // Minimal padding — pack the ocean field; MapLibre still blocks overlaps.
+          'text-padding': 0.75,
+          'text-optional': false,
+          'symbol-sort-key': ['get', 'priority'],
+          'symbol-z-order': 'source',
+        },
+        paint: {
+          'text-color':
+            (input.colorScheme ?? 'dark') === 'light'
+              ? brandPalette.blackInk
+              : brandPalette.archivePaper,
+          // feature-state is paint-only in MapLibre — layout.text-size cannot use it.
+          'text-opacity': [
+            'case',
+            ['boolean', ['feature-state', 'passed'], false],
+            0,
+            ['get', 'ink'],
+          ],
+          'text-opacity-transition': { duration: 720, delay: 0 },
+          // Flat matte contrast on the ocean plate — not a glow/shadow.
+          'text-halo-color': plate.ocean,
+          'text-halo-width': 0.75,
+        },
       },
       {
         id: 'explore-street-casing',
@@ -481,27 +636,28 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         // Always hittable for state selection density tint is optional chrome on top.
         layout: { visibility: 'visible' },
         paint: {
-          'fill-color': presenceFillActive
-            ? [
-                'match',
-                ['get', 'densityTier'],
-                'concentrated',
-                DENSITY_TIER_FILL.concentrated,
-                'emerging',
-                DENSITY_TIER_FILL.emerging,
-                'documented',
-                DENSITY_TIER_FILL.documented,
-                plate.densityUnknown,
-              ]
-            : plate.densityDisabled,
-          'fill-opacity': 1,
+          'fill-color': buildPresenceDensityFillColorExpression(plate, presenceFillActive),
+          'fill-opacity': PLATE_STATE_FILL_OPACITY,
+        },
+      },
+      {
+        // Legacy incoming buffer — pins still dual-buffer; density morphs via feature-state color lerp.
+        id: EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
+        type: 'fill',
+        source: EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
+        layout: { visibility: 'visible' },
+        paint: {
+          'fill-color': buildPresenceDensityFillColorExpression(plate, presenceFillActive),
+          'fill-opacity': 0,
         },
       },
       {
         id: EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
         type: 'fill',
         source: EXPLORE_COUNTY_LINES_SOURCE_ID,
-        minzoom: COUNTY_LINES_MIN_ZOOM,
+        // Population choropleths must read at the national resting frame; hairlines stay
+        // gated at COUNTY_LINES_MIN_ZOOM so the CONUS view is not noisy with county borders.
+        ...(populationFillActive ? {} : { minzoom: COUNTY_LINES_MIN_ZOOM }),
         layout: {
           visibility: populationFillActive ? 'visible' : 'none',
         },
@@ -630,6 +786,21 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'line-color': DIGNITY_PALETTE.pointHalo,
           'line-width': 2.5,
           'line-opacity': 0.9,
+        },
+      },
+      {
+        id: EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
+        type: 'line',
+        source: EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
+        layout: {
+          visibility: input.historyEdgesEnabled ? 'visible' : 'none',
+          'line-cap': 'round',
+          'line-join': 'round',
+        },
+        paint: {
+          'line-color': DIGNITY_PALETTE.pointHalo,
+          'line-width': 2.5,
+          'line-opacity': 0,
         },
       },
       {
@@ -775,6 +946,118 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'text-font': ['Noto Sans Regular'],
         },
         paint: { 'text-color': plate.clusterText },
+      },
+      {
+        id: EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-radius': markerHaloRadiusExpression(),
+          'circle-color': kindColorExpression(),
+          'circle-opacity': 0,
+        },
+      },
+      {
+        id: EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-radius': markerRadiusExpression(),
+          'circle-color': kindColorExpression(),
+          'circle-opacity': 0,
+          'circle-stroke-width': kindStrokeWidthExpression(),
+          'circle-stroke-color': kindStrokeColorExpression(plate.selected),
+          'circle-stroke-opacity': 0,
+        },
+      },
+      {
+        id: EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
+        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'kind'], 'event']],
+        paint: {
+          'circle-radius': markerRadiusPlusExpression(4),
+          'circle-color': kindColorExpression(),
+          'circle-opacity': 0,
+          'circle-stroke-width': 1.5,
+          'circle-stroke-color': kindColorExpression(),
+          'circle-stroke-opacity': 0,
+        },
+      },
+      {
+        id: EXPLORE_CLUSTER_INCOMING_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            3,
+            [
+              '*',
+              [
+                'step',
+                ['get', 'point_count'],
+                CLUSTER_RADIUS_BY_COUNT[0]![1],
+                CLUSTER_RADIUS_BY_COUNT[1]![0],
+                CLUSTER_RADIUS_BY_COUNT[1]![1],
+                CLUSTER_RADIUS_BY_COUNT[2]![0],
+                CLUSTER_RADIUS_BY_COUNT[2]![1],
+                CLUSTER_RADIUS_BY_COUNT[3]![0],
+                CLUSTER_RADIUS_BY_COUNT[3]![1],
+              ],
+              0.45,
+            ],
+            5.5,
+            [
+              '*',
+              [
+                'step',
+                ['get', 'point_count'],
+                CLUSTER_RADIUS_BY_COUNT[0]![1],
+                CLUSTER_RADIUS_BY_COUNT[1]![0],
+                CLUSTER_RADIUS_BY_COUNT[1]![1],
+                CLUSTER_RADIUS_BY_COUNT[2]![0],
+                CLUSTER_RADIUS_BY_COUNT[2]![1],
+                CLUSTER_RADIUS_BY_COUNT[3]![0],
+                CLUSTER_RADIUS_BY_COUNT[3]![1],
+              ],
+              0.85,
+            ],
+            9,
+            [
+              'step',
+              ['get', 'point_count'],
+              CLUSTER_RADIUS_BY_COUNT[0]![1],
+              CLUSTER_RADIUS_BY_COUNT[1]![0],
+              CLUSTER_RADIUS_BY_COUNT[1]![1],
+              CLUSTER_RADIUS_BY_COUNT[2]![0],
+              CLUSTER_RADIUS_BY_COUNT[2]![1],
+              CLUSTER_RADIUS_BY_COUNT[3]![0],
+              CLUSTER_RADIUS_BY_COUNT[3]![1],
+            ],
+          ],
+          'circle-color': DIGNITY_PALETTE.point,
+          'circle-opacity': 0,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': plate.selected,
+        },
+      },
+      {
+        id: EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
+        type: 'symbol',
+        source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
+        filter: ['has', 'point_count'],
+        layout: {
+          'text-field': ['get', 'point_count_abbreviated'],
+          'text-size': 11,
+          'text-font': ['Noto Sans Regular'],
+        },
+        paint: { 'text-color': plate.clusterText, 'text-opacity': 0 },
       },
       {
         id: EXPLORE_SELECTED_POINT_LAYER_ID,

@@ -65,6 +65,27 @@ test('mapProjectionToPublicEntityView renders claims carried by the projection i
   assert.equal(view.revision.releaseId, 'rel_seed_001');
 });
 
+test('mapProjectionToPublicEntityView places MapFrame pins as 0–100 percentages', () => {
+  const view = mapProjectionToPublicEntityView({
+    id: 'ent_pin_pct_001',
+    releaseId: 'rel_live_001',
+    kind: 'place',
+    displayName: 'Pin Percent Site',
+    nameLower: 'pin percent site',
+    summary: 'Has public coordinates for schematic pin placement.',
+    claimIds: [],
+    location: {
+      lat: 40.8336,
+      lng: -73.9154,
+      geohash: 'dr72',
+      precision: 'neighborhood',
+    },
+    locationLabel: 'Bronx, New York',
+  });
+  assert.ok(view.mapPin.x > 1 && view.mapPin.x <= 100);
+  assert.ok(view.mapPin.y > 1 && view.mapPin.y <= 100);
+});
+
 test('mapProjectionToPublicEntityView does not backfill from the bundled seed catalog even when the id matches', () => {
   // `ent_15th_st_church_001` is a real bundled seed id with its own summary/claims. A live
   // projection sharing that id must render only its own (thinner) data — never silently pull

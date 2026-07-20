@@ -205,7 +205,7 @@ body {
 
 .admin-shell__body {
   flex: 1;
-  padding-top: var(--ds-island-clearance, 5.375rem);
+  padding-top: var(--ds-island-clearance, 5.5rem);
 }
 
 .admin-shell__top {

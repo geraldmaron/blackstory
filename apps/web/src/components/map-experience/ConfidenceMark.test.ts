@@ -1,6 +1,6 @@
 /**
- * ConfidenceMark: Font Awesome icon + accessible label. When labeled, the visible
- * word is visually hidden (field title already present); aria-label keeps the phrase.
+ * ConfidenceMark: Font Awesome icon + accessible label. Short visible word when
+ * labeled; aria-label + title carry the full help phrase on hover.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';
@@ -31,9 +31,10 @@ test('ConfidenceMark renders icon + short text when labeled', () => {
   const html = renderToStaticMarkup(createElement(ConfidenceMark, { tier: 'high', labeled: true }));
   assert.match(html, /data-labeled="true"/);
   assert.match(html, /ds-confidence-mark__icon/);
-  assert.match(html, /aria-label="High confidence"/);
+  assert.match(html, /aria-label="High confidence\. High confidence:/);
+  assert.match(html, /title="High confidence:/);
   assert.match(html, /ds-confidence-mark__text">High</);
-  // Visible word is short "High"; full phrase lives only in aria-label.
+  // Visible word is short "High"; full phrase lives in aria-label + title.
   assert.match(html, /fa-circle-check/);
 });
 

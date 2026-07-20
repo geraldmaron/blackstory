@@ -73,14 +73,17 @@ test('with onSelect, metadata links are not nested inside the row button', () =>
   assert.doesNotMatch(html, /<button[^>]*>[\s\S]*<a[\s\S]*<\/button>/);
 });
 
-test('links Where, Era, Evidence, and Kind metadata to the right site views', () => {
+test('links Where to external maps and other metadata to the right site views', () => {
   const feature = requireFeature('ent_15th_st_church_001');
   const html = renderToStaticMarkup(createElement(SynchronizedResultList, { features: [feature] }));
   const { properties } = feature;
 
   assert.equal(properties.statePostalCode, 'DC');
-  assert.match(html, /href="[^"]*state=DC"/);
-  assert.match(html, /aria-label="View records in DC"/);
+  assert.match(html, /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=/);
+  assert.match(html, /aria-label="Open [^"]+ in maps"/);
+  assert.match(html, /rel="noopener noreferrer"/);
+  assert.match(html, /target="_blank"/);
+  assert.doesNotMatch(html, /href="[^"]*state=DC"/);
   assert.match(html, /href="[^"]*era=1840s"/);
   assert.match(html, /href="\/entity\/ent_15th_st_church_001#accepted-claims"/);
   assert.match(html, /href="[^"]*kind=place"/);
@@ -91,14 +94,14 @@ test('uses a uniform labeled meta layout with short confidence values', () => {
   const features = buildFeatures();
   const html = renderToStaticMarkup(createElement(SynchronizedResultList, { features }));
   assert.match(html, /ds-result-list__meta--labeled/);
-  assert.match(html, /><dt>Kind<\/dt>/);
-  assert.match(html, /><dt>Era<\/dt>/);
-  assert.match(html, /><dt>Confidence<\/dt>/);
-  assert.match(html, /><dt>Evidence<\/dt>/);
-  assert.match(html, /><dt>Where<\/dt>/);
+  assert.match(html, /ds-meta-field-label/);
+  assert.match(html, />Kind</);
+  assert.match(html, />Era</);
+  assert.match(html, />Confidence</);
+  assert.match(html, />Evidence</);
+  assert.match(html, />Where</);
   assert.match(html, /data-labeled="true"/);
-  // Visible text stays short ("High"); aria-label carries the full phrase for screen readers
-  // (see ConfidenceMark.tsx's own doc comment) — check the visible span specifically, not the
-  // whole markup, since the aria-label legitimately says "High confidence".
+  // Visible text stays short ("High"); aria-label + title carry the full help phrase.
   assert.doesNotMatch(html, /ds-confidence-mark__text">[^<]*confidence/i);
+  assert.match(html, /title="High confidence:/);
 });

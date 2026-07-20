@@ -6,6 +6,10 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import type {
+  NationalPopulationTimelineRow,
+  NationalPopulationTimelineSnapshot,
+} from '@repo/firebase';
 import { HomeAbout } from './HomeAbout';
 import { HomeDataPulse } from './HomeDataPulse';
 
@@ -45,58 +49,70 @@ describe('HomeDataPulse', () => {
     assert.match(html, /not available in this environment/);
   });
 
-  it('renders census charts when decade rows are provided', () => {
-    const rows = [
-      {
-        decade: '2000',
-        countyCount: 100,
-        totalPopulation: 281_421_906,
-        blackPopulation: 34_658_190,
-        source: 'Census Bureau',
-        sourceUrl: 'https://www.census.gov/',
-      },
-      {
-        decade: '2010',
-        countyCount: 100,
-        totalPopulation: 308_745_538,
-        blackPopulation: 38_929_319,
-        source: 'Census Bureau',
-        sourceUrl: 'https://www.census.gov/',
-      },
-      {
-        decade: '2020',
-        countyCount: 100,
-        totalPopulation: 331_449_281,
-        blackPopulation: 41_104_200,
-        source: 'Census Bureau',
-        sourceUrl: 'https://www.census.gov/',
-      },
-    ] as const;
+  it('renders census charts when a timeline snapshot is provided', () => {
+    const row = (
+      decade: NationalPopulationTimelineRow['decade'],
+      year: number,
+      totalPopulation: number,
+      blackPopulation: number,
+    ): NationalPopulationTimelineRow => ({
+      decade,
+      year,
+      totalPopulation,
+      blackPopulation,
+      freeBlackPopulation: null,
+      enslavedBlackPopulation: null,
+      blackShareOfTotalPct: (blackPopulation / totalPopulation) * 100,
+      raceCategoryLabel: 'Black or African American alone',
+      nationalSource: 'census-county-sum',
+      sourceId: 'us-census-decennial-2020-pl',
+      sourceUrl: 'https://www.census.gov/',
+      opensDefinitionBoundary: decade === '2000',
+      southernUndercountCaveat: false,
+      hasFreeEnslavedSplit: false,
+    });
+
+    const timeline: NationalPopulationTimelineSnapshot = {
+      rows: [
+        row('2000', 2000, 281_421_906, 34_658_190),
+        row('2010', 2010, 308_745_538, 38_929_319),
+        row('2020', 2020, 331_449_281, 41_104_200),
+      ],
+      changes: [
+        {
+          fromDecade: '2010',
+          toDecade: '2020',
+          growth: {
+            startObservationId: 'us_2010_black',
+            endObservationId: 'us_2020_black',
+            absoluteChange: 2_174_881,
+            percentChange: 5.6,
+            significanceResult: {
+              method: 'insufficient-margin-of-error-data',
+              distinguishable: null,
+            },
+          },
+          sharePointChange: -0.2,
+          crossesDefinitionBoundary: false,
+        },
+      ],
+      sources: [
+        {
+          sourceId: 'us-census-decennial-2020-pl',
+          sourceUrl: 'https://www.census.gov/',
+          label: 'Census Bureau',
+        },
+      ],
+      generatedAt: '2026-07-19T00:00:00.000Z',
+      contentHash: 'a'.repeat(64),
+    };
 
     const html = renderToStaticMarkup(
-      <HomeDataPulse
-        recordCount={104}
-        stateCount={24}
-        populationByDecade={rows}
-        populationChanges={[
-          {
-            fromDecade: '2010',
-            toDecade: '2020',
-            blackAbsoluteChange: 2_174_881,
-            blackPercentChange: 5.6,
-            shareFrom: 12.6,
-            shareTo: 12.4,
-            shareChangePp: -0.2,
-            source: 'Census Bureau',
-            sourceUrl: 'https://www.census.gov/',
-            comparabilityNote: 'Decennial race categories differ across vintages.',
-          },
-        ]}
-      />,
+      <HomeDataPulse recordCount={104} stateCount={24} timeline={timeline} />,
     );
     assert.match(html, /Black population by census decade/);
     assert.match(html, /Black population share by decade/);
-    assert.match(html, /Decade-over-decade change/);
+    assert.match(html, /decade-over-decade change/i);
     assert.doesNotMatch(html, /not available in this environment/);
   });
 });

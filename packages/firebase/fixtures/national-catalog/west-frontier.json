@@ -41,7 +41,9 @@
       "military",
       "frontier"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_henry_o_flipper_001"
+    ],
     "keywords": []
   },
   {
@@ -354,7 +356,10 @@
       "town",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fort_concho_nhl_001",
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -398,7 +403,9 @@
       "town",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_brooksville_ok_001"
+    ],
     "keywords": []
   },
   {

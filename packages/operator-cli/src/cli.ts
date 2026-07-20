@@ -146,7 +146,8 @@ function defaultModelForProvider(
   switch (providerName) {
     case 'openrouter':
     case 'hybrid':
-      return process.env.OPENROUTER_MODEL ?? 'openrouter/free';
+      // Empty model when a rotation roster is configured — the provider picks per attempt.
+      return process.env.OPENROUTER_MODEL ?? (process.env.OPENROUTER_MODELS ? '' : 'openrouter/free');
     case 'ollama':
       return ollamaModel ?? process.env.OLLAMA_MODEL ?? 'qwen3:8b';
     case 'mock':

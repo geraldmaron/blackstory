@@ -125,7 +125,9 @@
       "firsts",
       "entrepreneurship"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_core_founding_001"
+    ],
     "keywords": []
   },
   {
@@ -173,7 +175,10 @@
       "firsts",
       "entrepreneurship"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_paul_laurence_dunbar_high_school_historic_001",
+      "ent_reginald_lewis_museum_001"
+    ],
     "keywords": []
   },
   {
@@ -505,7 +510,12 @@
       "entrepreneurship",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_gaston_motel_001",
+      "ent_kelly_ingram_park_001",
+      "ent_martin_luther_king_jr_001",
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -652,7 +662,9 @@
       "publishing",
       "entrepreneurship"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_morgan_state_university_001"
+    ],
     "keywords": []
   },
   {
@@ -791,7 +803,9 @@
       "women",
       "education"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -1263,7 +1277,10 @@
       "firsts",
       "military"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_marlon_green_001",
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -1537,7 +1554,9 @@
       "medicine",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_university_001"
+    ],
     "keywords": []
   },
   {
@@ -1680,7 +1699,9 @@
       "biology",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_university_001"
+    ],
     "keywords": []
   },
   {
@@ -1726,7 +1747,10 @@
       "mathematics",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_university_001",
+      "ent_southern_university_001"
+    ],
     "keywords": []
   },
   {
@@ -1884,7 +1908,9 @@
       "diplomacy",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_university_001"
+    ],
     "keywords": []
   },
   {
@@ -1949,7 +1975,9 @@
       "firsts",
       "women"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_university_001"
+    ],
     "keywords": []
   },
   {
@@ -2185,7 +2213,9 @@
       "firsts",
       "arts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_university_001"
+    ],
     "keywords": []
   },
   {
@@ -2287,7 +2317,10 @@
       "women",
       "space"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_euphemia_lofton_haynes_001",
+      "ent_marjorie_lee_browne_001"
+    ],
     "keywords": []
   },
   {
@@ -2742,7 +2775,9 @@
       "agriculture",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -2787,7 +2822,10 @@
       "invention",
       "medicine"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fisk_university_001",
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -2835,7 +2873,9 @@
       "space",
       "women"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_morgan_state_university_001"
+    ],
     "keywords": []
   },
   {
@@ -3443,7 +3483,9 @@
       "firsts",
       "military"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_marlon_green_001"
+    ],
     "keywords": []
   },
   {

@@ -1,0 +1,3080 @@
+[
+  {
+    "name": "Henry Truman",
+    "year": 1870,
+    "place": "Philadelphia, Pennsylvania",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Lizzie Durr",
+    "year": 1895,
+    "place": "Birmingham, Alabama",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Berry Lawson",
+    "year": 1938,
+    "place": "Seattle, Washington",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Thomas P. Foster",
+    "year": 1942,
+    "place": "Little Rock, Arkansas",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Robert \"Bobby\" Hall",
+    "year": 1943,
+    "place": "Baker County, Georgia",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Daniel Bell",
+    "year": 1958,
+    "place": "Milwaukee, Wisconsin",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Luther Jackson",
+    "year": 1959,
+    "place": "Philadelphia, Mississippi",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Roman Ducksworth Jr.",
+    "year": 1962,
+    "place": "Taylorsville, Mississippi",
+    "context": "shot by police officer"
+  },
+  {
+    "name": "Johnny Robinson",
+    "year": 1963,
+    "place": "Birmingham, Alabama",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Jimmie Lee Jackson",
+    "year": 1965,
+    "place": "Marion, Alabama",
+    "context": "shot by state trooper"
+  },
+  {
+    "name": "Jonathan Daniels",
+    "year": 1965,
+    "place": "Hayneville, Alabama",
+    "context": "shot by deputy sheriff"
+  },
+  {
+    "name": "Leonard Deadwyler",
+    "year": 1966,
+    "place": "Los Angeles, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Matthew Johnson#Shooting_of_Matthew_Johnson)",
+    "year": 1966,
+    "place": "San Francisco, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Albert Robinson",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Alfred Peachlum",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Alphonso Smith",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Arthur Johnson",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Benjamin Brown",
+    "year": 1967,
+    "place": "Jackson, Mississippi",
+    "context": "shot by police at protest"
+  },
+  {
+    "name": "Carl Cooper",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Cornelius Murray",
+    "year": 1967,
+    "place": "Newark, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Eddie Moss",
+    "year": 1967,
+    "place": "Newark, New Jersey",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Edward Kemp",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Eloise Spellman",
+    "year": 1967,
+    "place": "Newark, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Emanuel Cosbey",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Ernest Roquemore",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Frank Tanner",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "George Talbert",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Henry Denson",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Herman Canty",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "James Rutledge",
+    "year": 1967,
+    "place": "Newark, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "John LeRoy",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Joseph Chandler",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Leroy Boyd",
+    "year": 1967,
+    "place": "Newark, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Martin Chambers",
+    "year": 1967,
+    "place": "Tampa, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Michael Pugh",
+    "year": 1967,
+    "place": "Newark, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Mike Williams",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Raymond Gilmer",
+    "year": 1967,
+    "place": "Newark, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Richard Sims",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Robert Beal",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Ronald Evans",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Roy Banks",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Rufus Council",
+    "year": 1967,
+    "place": "Newark, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Tedock Bell",
+    "year": 1967,
+    "place": "Newark, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Tonia Blanding",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "William Dalton",
+    "year": 1967,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "William Furr",
+    "year": 1967,
+    "place": "Newark, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Daniel Kenneth Henry",
+    "year": 1968,
+    "place": "Salisbury, Maryland",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Delano Middleton",
+    "year": 1968,
+    "place": "Orangeburg, South Carolina",
+    "context": "Orangeburg Massacre police shooting"
+  },
+  {
+    "name": "Henry Ezekial Smith",
+    "year": 1968,
+    "place": "Orangeburg, South Carolina",
+    "context": "Orangeburg Massacre police shooting"
+  },
+  {
+    "name": "Larry Payne",
+    "year": 1968,
+    "place": "Memphis, Tennessee",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Roosevelt Jackson",
+    "year": 1968,
+    "place": "Port Gibson, Mississippi",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Samuel Ephesians Hammond Jr.",
+    "year": 1968,
+    "place": "Orangeburg, South Carolina",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Samuel Hammond Jr.",
+    "year": 1968,
+    "place": "Orangeburg, South Carolina",
+    "context": "Orangeburg Massacre police shooting"
+  },
+  {
+    "name": "William Leonard",
+    "year": 1968,
+    "place": "Los Angeles, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Fred Hampton",
+    "year": 1969,
+    "place": "Chicago, Illinois",
+    "context": "killed in police raid"
+  },
+  {
+    "name": "Mark Clark",
+    "year": 1969,
+    "place": "Chicago, Illinois",
+    "context": "killed in police raid"
+  },
+  {
+    "name": "Vivian Strong",
+    "year": 1969,
+    "place": "Omaha, Nebraska",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Charlie Mack Murphy",
+    "year": 1970,
+    "place": "Augusta, Georgia",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "James Stokes",
+    "year": 1970,
+    "place": "Augusta, Georgia",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Jerry Lee Amie",
+    "year": 1970,
+    "place": "Los Angeles, California",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "John Bennett",
+    "year": 1970,
+    "place": "Augusta, Georgia",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Mack Wilson",
+    "year": 1970,
+    "place": "Augusta, Georgia",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Phillip Lafayette Gibbs",
+    "year": 1970,
+    "place": "Jackson, Mississippi",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Sammie McCullough",
+    "year": 1970,
+    "place": "Augusta, Georgia",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "William Wright",
+    "year": 1970,
+    "place": "Augusta, Georgia",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Carnell Russ",
+    "year": 1971,
+    "place": "Star City, Arkansas",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Leonard Brown",
+    "year": 1972,
+    "place": "Baton Rouge, Louisiana",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Clifford Glover",
+    "year": 1973,
+    "place": "New York, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Rita Lloyd",
+    "year": 1973,
+    "place": "New York, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Edward Garner",
+    "year": 1974,
+    "place": "Memphis, Tennessee",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Bernard Whitehurst",
+    "year": 1975,
+    "place": "Montgomery, Alabama",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Michael Sherard",
+    "year": 1976,
+    "place": "Philadelphia, Pennsylvania",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Randolph Evans",
+    "year": 1976,
+    "place": "New York, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Arthur Miller Jr.",
+    "year": 1978,
+    "place": "New York, New York",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Cornell Warren",
+    "year": 1978,
+    "place": "Philadelphia, Pennsylvania",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Michael Carpenter",
+    "year": 1978,
+    "place": "Philadelphia, Pennsylvania",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Arthur McDuffie",
+    "year": 1979,
+    "place": "Miami, Florida",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Bonita Carter",
+    "year": 1979,
+    "place": "Birmingham, Alabama",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Emery Robinson",
+    "year": 1979,
+    "place": "Pelham Manor, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Michael Smith",
+    "year": 1980,
+    "place": "Indianapolis, Indiana",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Ernest Lacy",
+    "year": 1981,
+    "place": "Milwaukee, Wisconsin",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Anthony Nelson",
+    "year": 1982,
+    "place": "Miami, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Donald Harp",
+    "year": 1983,
+    "place": "Miami, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Michael Stewart",
+    "year": 1983,
+    "place": "New York, New York",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Eleanor Bumpurs",
+    "year": 1984,
+    "place": "New York, New York",
+    "context": "shot during eviction"
+  },
+  {
+    "name": "Sal Saran Scott",
+    "year": 1984,
+    "place": "Minneapolis, Minnesota",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Edmund Perry",
+    "year": 1985,
+    "place": "New York, New York",
+    "context": "shot by police officer"
+  },
+  {
+    "name": "Lloyd D. Stevenson",
+    "year": 1985,
+    "place": "Portland, Oregon",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "MOVE Bombing",
+    "year": 1985,
+    "place": "Philadelphia, Pennsylvania",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Erdman Bascomb",
+    "year": 1986,
+    "place": "Seattle, Washington",
+    "context": "killed during police raid"
+  },
+  {
+    "name": "Robert V. Logan",
+    "year": 1986,
+    "place": "Indianapolis, Indiana",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Yvonne Smallwood",
+    "year": 1987,
+    "place": "New York, New York",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Clement Lloyd",
+    "year": 1989,
+    "place": "Miami, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Adolph Archie",
+    "year": 1990,
+    "place": "New Orleans, Louisiana",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Leonard Bennett",
+    "year": 1990,
+    "place": "Indianapolis, Indiana",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Phillip Pannell",
+    "year": 1990,
+    "place": "Teaneck, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Christopher Rogers",
+    "year": 1991,
+    "place": "Boston, Massachusetts",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Grady Alexis",
+    "year": 1991,
+    "place": "New York, New York",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Roy Lee Jones",
+    "year": 1991,
+    "place": "Cairo, Illinois",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Steve Clemons",
+    "year": 1991,
+    "place": "Los Angeles, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Brian Edmund Andrew",
+    "year": 1992,
+    "place": "Compton, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Charles William Orebo",
+    "year": 1992,
+    "place": "Los Angeles, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Howard Eugene Martin",
+    "year": 1992,
+    "place": "Pasadena, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "John L. DanielsJr.",
+    "year": 1992,
+    "place": "Los Angeles, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Malice Green",
+    "year": 1992,
+    "place": "Detroit, Michigan",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Marshall Smith Jr",
+    "year": 1992,
+    "place": "Albuquerque, New Mexico",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Don Myrick",
+    "year": 1993,
+    "place": "Los Angeles, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Johnnie Cromartie",
+    "year": 1993,
+    "place": "New York, New York",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Lester Steven Yarbrough",
+    "year": 1993,
+    "place": "Mount Vernon, New York",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Paul Monroe",
+    "year": 1993,
+    "place": "Austin, Texas",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Simmont Donta Thomas",
+    "year": 1993,
+    "place": "Baltimore, Maryland",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Windy Gail Thompson",
+    "year": 1993,
+    "place": "Charlotte, North Carolina",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Anthony Baez",
+    "year": 1994,
+    "place": "New York, New York",
+    "context": "died from police chokehold"
+  },
+  {
+    "name": "Anthony Merisier",
+    "year": 1994,
+    "place": "New York, New York",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Edward Mallet",
+    "year": 1994,
+    "place": "Phoenix, Arizona",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Eric Pitt",
+    "year": 1994,
+    "place": "New York, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Ernest Sayon",
+    "year": 1994,
+    "place": "New York, New York",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Nicholas Heyward Jr.",
+    "year": 1994,
+    "place": "New York, New York",
+    "context": "shot holding toy gun"
+  },
+  {
+    "name": "Nicholas HeywardJr.",
+    "year": 1994,
+    "place": "New York, New York",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Preston Tate",
+    "year": 1994,
+    "place": "Corcoran, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Shu'aib Abdul-Latif",
+    "year": 1994,
+    "place": "New York, New York",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Dan Davis",
+    "year": 1995,
+    "place": "Birmingham, Alabama",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Jerry Jackson",
+    "year": 1995,
+    "place": "Pittsburgh, Pennsylvania",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Johnny Gammage",
+    "year": 1995,
+    "place": "Brentwood, Pennsylvania",
+    "context": "died after police restraint"
+  },
+  {
+    "name": "Jonny Gammage",
+    "year": 1995,
+    "place": "Pittsburgh, Pennsylvania",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Joseph Gould",
+    "year": 1995,
+    "place": "Chicago, Illinois",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Lawrence Meyers",
+    "year": 1995,
+    "place": "Paterson, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Christopher Thomas",
+    "year": 1996,
+    "place": "Paterson, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Edward Anderson",
+    "year": 1996,
+    "place": "Seattle, Washington",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Eric Smith",
+    "year": 1996,
+    "place": "Forest View, Illinois",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "James Cooper",
+    "year": 1996,
+    "place": "Charlotte, North Carolina",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Nathaniel Levi Gaines",
+    "year": 1996,
+    "place": "New York, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Carolyn Sue Boetticher",
+    "year": 1997,
+    "place": "Charlotte, North Carolina",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Dwight Stiggons",
+    "year": 1997,
+    "place": "West Covina, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Frankie Ann Perkins",
+    "year": 1997,
+    "place": "Chicago, Illinois",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Kevin Robinson",
+    "year": 1997,
+    "place": "Los Angeles, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Malik Jones",
+    "year": 1997,
+    "place": "New Haven, Connecticut",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "William J. Whitfield",
+    "year": 1997,
+    "place": "New York, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Deron Grimmitt",
+    "year": 1998,
+    "place": "Pittsburgh, Pennsylvania",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Donta Dawson",
+    "year": 1998,
+    "place": "Philadelphia, Pennsylvania",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Franklyn Reid",
+    "year": 1998,
+    "place": "New Milford, Connecticut",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Tyisha Miller",
+    "year": 1998,
+    "place": "Riverside, California",
+    "context": "shot while unconscious in car"
+  },
+  {
+    "name": "Amadou Diallo",
+    "year": 1999,
+    "place": "New York, New York",
+    "context": "shot; wallet mistaken for gun"
+  },
+  {
+    "name": "Antonio Butler",
+    "year": 1999,
+    "place": "Miami, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Aquan Salmon",
+    "year": 1999,
+    "place": "Hartford, Connecticut",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Demetrius DuBose",
+    "year": 1999,
+    "place": "San Diego, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Desmond Rudolph",
+    "year": 1999,
+    "place": "Louisville, Kentucky",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Gregory Riley",
+    "year": 1999,
+    "place": "Chicago, Illinois",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "LaTanya Haggerty",
+    "year": 1999,
+    "place": "Chicago, Illinois",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Mardio House",
+    "year": 1999,
+    "place": "Baltimore, Maryland",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Margaret LaVerne Mitchell",
+    "year": 1999,
+    "place": "Los Angeles, California",
+    "context": "shot pushing shopping cart"
+  },
+  {
+    "name": "Robert Russ",
+    "year": 1999,
+    "place": "Chicago, Illinois",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Stanton L. Crew",
+    "year": 1999,
+    "place": "Parsippany–Troy Hills, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Anthony Lee",
+    "year": 2000,
+    "place": "Los Angeles, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Earl Murray",
+    "year": 2000,
+    "place": "Berkeley, Missouri",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Errol Shaw",
+    "year": 2000,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Eugene Pitchford",
+    "year": 2000,
+    "place": "Peoria, Illinois",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "George Bibins",
+    "year": 2000,
+    "place": "Omaha, Nebraska",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Keith Daughtry",
+    "year": 2000,
+    "place": "Fort Pierce, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Malcolm Ferguson",
+    "year": 2000,
+    "place": "New York, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Melvin Guy",
+    "year": 2000,
+    "place": "Tallulah, Louisiana",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Patrick Dorismond",
+    "year": 2000,
+    "place": "New York, New York",
+    "context": "shot by undercover police"
+  },
+  {
+    "name": "Prince Jones",
+    "year": 2000,
+    "place": "Fairfax County, Virginia",
+    "context": "shot by undercover police"
+  },
+  {
+    "name": "Richard Holtz",
+    "year": 2000,
+    "place": "East Windsor, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Robert Brown",
+    "year": 2000,
+    "place": "Philadelphia, Pennsylvania",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Roger Owensby Jr.",
+    "year": 2000,
+    "place": "Cincinnati, Ohio",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Ronald Beasley",
+    "year": 2000,
+    "place": "Berkeley, Missouri",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Adrena Kitt",
+    "year": 2001,
+    "place": "Pensacola, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Andrea Nicole Reedy",
+    "year": 2001,
+    "place": "Hampton, Virginia",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Annette Green",
+    "year": 2001,
+    "place": "St. Louis, Missouri",
+    "context": "killed during police raid"
+  },
+  {
+    "name": "Bilal Dashawn Colbert",
+    "year": 2001,
+    "place": "Irvington, New Jersey",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Charmene Pickering",
+    "year": 2001,
+    "place": "New York, New York",
+    "context": "killed during police raid"
+  },
+  {
+    "name": "Clifford Lewis",
+    "year": 2001,
+    "place": "Louisville, Kentucky",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Donald D.J. Venable",
+    "year": 2001,
+    "place": "Sacramento, California",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Timothy Thomas",
+    "year": 2001,
+    "place": "Cincinnati, Ohio",
+    "context": "shot during foot pursuit"
+  },
+  {
+    "name": "Vernard Davis",
+    "year": 2001,
+    "place": "Rochester, New York",
+    "context": "killed during police raid"
+  },
+  {
+    "name": "Bernard Rogers",
+    "year": 2002,
+    "place": "Pittsburgh, Pennsylvania",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Charles Dixon Sr.",
+    "year": 2002,
+    "place": "Mount Oliver, Pennsylvania",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Corey Ward",
+    "year": 2002,
+    "place": "Atlanta, Georgia",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Eddie Lee Macklin",
+    "year": 2002,
+    "place": "Miami, Florida",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Egbert David Dewgard",
+    "year": 2002,
+    "place": "New York, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Eric Daniel Foster Jr.",
+    "year": 2002,
+    "place": "Fresno, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Genie McMeans Jr",
+    "year": 2002,
+    "place": "Tallahassee, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Kenneth Strother",
+    "year": 2002,
+    "place": "New Orleans, Louisiana",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Michael Ellerbe",
+    "year": 2002,
+    "place": "Uniontown, Pennsylvania",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Trey Antuan Lively",
+    "year": 2002,
+    "place": "Miami Gardens, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Willie Murray Jr.",
+    "year": 2002,
+    "place": "Boston, Massachusetts",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Alberta Spruill",
+    "year": 2003,
+    "place": "New York, New York",
+    "context": "died after mistaken raid"
+  },
+  {
+    "name": "Allen Simpson",
+    "year": 2003,
+    "place": "Dallas, Texas",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Charquissa Johnson",
+    "year": 2003,
+    "place": "Washington, District of Columbia",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Cornelius Ware",
+    "year": 2003,
+    "place": "Chicago, Illinois",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Deondre Brunston",
+    "year": 2003,
+    "place": "Compton, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "James Gerth",
+    "year": 2003,
+    "place": "Rockford, Illinois",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "John Eric Henderson",
+    "year": 2003,
+    "place": "Chattanooga, Tennessee",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Justin Fields",
+    "year": 2003,
+    "place": "Milwaukee, Wisconsin",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Kendra James",
+    "year": 2003,
+    "place": "Portland, Oregon",
+    "context": "shot during traffic stop"
+  },
+  {
+    "name": "Mannix Franklin Sr.",
+    "year": 2003,
+    "place": "Milwaukee, Wisconsin",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Marquis Hudspeth",
+    "year": 2003,
+    "place": "Shreveport, Louisiana",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Michael Pleasance",
+    "year": 2003,
+    "place": "Chicago, Illinois",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Nathaniel Jones",
+    "year": 2003,
+    "place": "Cincinnati, Ohio",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Orlando Barlow",
+    "year": 2003,
+    "place": "Spring Valley, Nevada",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Ousmane Zongo",
+    "year": 2003,
+    "place": "New York, New York",
+    "context": "shot during warehouse raid"
+  },
+  {
+    "name": "Ronnie Diamond",
+    "year": 2003,
+    "place": "Amite City, Louisiana",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Roy Jean Williams",
+    "year": 2003,
+    "place": "Roland, Oklahoma",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Christopher Hicks",
+    "year": 2004,
+    "place": "Chicago, Illinois",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "D'Koy Dancy",
+    "year": 2004,
+    "place": "Baltimore, Maryland",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Dennis Crawford",
+    "year": 2004,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "James Jahar Perez",
+    "year": 2004,
+    "place": "Portland, Oregon",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Leslie Prater",
+    "year": 2004,
+    "place": "Chattanooga, Tennessee",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Timothy Stansbury Jr.",
+    "year": 2004,
+    "place": "New York, New York",
+    "context": "shot on apartment rooftop"
+  },
+  {
+    "name": "William Lomax",
+    "year": 2004,
+    "place": "Las Vegas, Nevada",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Devin Brown",
+    "year": 2005,
+    "place": "Los Angeles, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Erson Alexander Welchen",
+    "year": 2005,
+    "place": "Bakersfield, California",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Henry Glover",
+    "year": 2005,
+    "place": "New Orleans, Louisiana",
+    "context": "shot after Hurricane Katrina"
+  },
+  {
+    "name": "James Brisette",
+    "year": 2005,
+    "place": "New Orleans, Louisiana",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "James Brissette",
+    "year": 2005,
+    "place": "New Orleans, Louisiana",
+    "context": "Danziger Bridge police shooting"
+  },
+  {
+    "name": "Jashon Bryant",
+    "year": 2005,
+    "place": "Hartford, Connecticut",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Raymond Robair",
+    "year": 2005,
+    "place": "New Orleans, Louisiana",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Ronald Madison",
+    "year": 2005,
+    "place": "New Orleans, Louisiana",
+    "context": "Danziger Bridge police shooting"
+  },
+  {
+    "name": "Benjamin Uwumarogie",
+    "year": 2006,
+    "place": "Glen Ellyn, Illinois",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Brandon Moore",
+    "year": 2006,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Darren Faulkner",
+    "year": 2006,
+    "place": "Byhalia, Mississippi",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Deon Studiemyer",
+    "year": 2006,
+    "place": "Decatur, Georgia",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Dominic Felder",
+    "year": 2006,
+    "place": "Minneapolis, Minnesota",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Ellis Woodland",
+    "year": 2006,
+    "place": "Chicago, Illinois",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Herman Barnes",
+    "year": 2006,
+    "place": "Harris County, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "James Sims",
+    "year": 2006,
+    "place": "Phoenix, Arizona",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Jesse Levelt Everett Jones",
+    "year": 2006,
+    "place": "Banning, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Kathryn Johnston",
+    "year": 2006,
+    "place": "Atlanta, Georgia",
+    "context": "killed during police raid"
+  },
+  {
+    "name": "Lorenzo Matthews",
+    "year": 2006,
+    "place": "Stone Mountain, Georgia",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Marcus Roach-Burris",
+    "year": 2006,
+    "place": "Neenah, Wisconsin",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Martin Anderson",
+    "year": 2006,
+    "place": "Panama City, Florida",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Sean Bell",
+    "year": 2006,
+    "place": "New York, New York",
+    "context": "shot before wedding day"
+  },
+  {
+    "name": "Vincent Smith",
+    "year": 2006,
+    "place": "Gary, Indiana",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Youwus Vilpre",
+    "year": 2006,
+    "place": "Lithonia, Georgia",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Anthony Smashum",
+    "year": 2007,
+    "place": "Savannah, Georgia",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Brandon Washington",
+    "year": 2007,
+    "place": "Dallas, Texas",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "David Antjuan Ware",
+    "year": 2007,
+    "place": "Ypsilanti, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "DeAunta Farrow",
+    "year": 2007,
+    "place": "West Memphis, Arkansas",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Frisco Blackwood",
+    "year": 2007,
+    "place": "Miami, Florida",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Haki Thurston",
+    "year": 2007,
+    "place": "Santa Rosa, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Jerriel Da'Shawn Allen",
+    "year": 2007,
+    "place": "San Bernardino, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Khiel Coppin",
+    "year": 2007,
+    "place": "New York, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Michael Knight",
+    "year": 2007,
+    "place": "Miami, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Phillip Miller",
+    "year": 2007,
+    "place": "Los Angeles, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Robert Harper",
+    "year": 2007,
+    "place": "Newport News, Virginia",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Shawn Watson",
+    "year": 2007,
+    "place": "Dallas, Texas",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Aaren Gwinn",
+    "year": 2008,
+    "place": "North Chicago, Illinois",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Andre DeMon Thomas",
+    "year": 2008,
+    "place": "Swissvale, Pennsylvania",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Artavious DeBose",
+    "year": 2008,
+    "place": "Jacksonville, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Baron Pikes",
+    "year": 2008,
+    "place": "Winnfield, Louisiana",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Derrick Jordan",
+    "year": 2008,
+    "place": "Dayton, Ohio",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Dewayne Chatt",
+    "year": 2008,
+    "place": "West Memphis, Arkansas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Dontaze Storey Jr.",
+    "year": 2008,
+    "place": "Los Angeles, California",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Edward Lamont Hunt",
+    "year": 2008,
+    "place": "Baltimore, Maryland",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Frederick Devon McAllister",
+    "year": 2008,
+    "place": "Bridgeport, Connecticut",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Glen Boldware",
+    "year": 2008,
+    "place": "Los Angeles, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Henry Bryant",
+    "year": 2008,
+    "place": "Indianapolis, Indiana",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Julian Alexander",
+    "year": 2008,
+    "place": "Anaheim, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Kenneth Marion",
+    "year": 2008,
+    "place": "Jacksonville, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Lawrence Allen",
+    "year": 2008,
+    "place": "Philadelphia, Pennsylvania",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Mack Woodfox",
+    "year": 2008,
+    "place": "Oakland, California",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Maurice Leroy Cox",
+    "year": 2008,
+    "place": "Los Angeles, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Michael Byoune",
+    "year": 2008,
+    "place": "Inglewood, California",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Ruben Ortega",
+    "year": 2008,
+    "place": "Inglewood, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Tarika Wilson",
+    "year": 2008,
+    "place": "Lima, Ohio",
+    "context": "killed during police raid"
+  },
+  {
+    "name": "Tyrone Hawkins",
+    "year": 2008,
+    "place": "Dundee, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Xavier Jones",
+    "year": 2008,
+    "place": "Coral Gables, Florida",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Avery Cody Jr.",
+    "year": 2009,
+    "place": "Compton, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Broderick Dixon",
+    "year": 2009,
+    "place": "Birmingham, Alabama",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Darrick Collins",
+    "year": 2009,
+    "place": "West Athens, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Domonick Washington",
+    "year": 2009,
+    "place": "Milwaukee, Wisconsin",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Harold Phillips",
+    "year": 2009,
+    "place": "Colfax, Louisiana",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Joseph Forrest",
+    "year": 2009,
+    "place": "Baltimore, Maryland",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Kiwane Carrington",
+    "year": 2009,
+    "place": "Champaign, Illinois",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Leonard Bailey Jr.",
+    "year": 2009,
+    "place": "Richmond, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Mark Barmore Jr.",
+    "year": 2009,
+    "place": "Rockford, Illinois",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Michael Patrick Jacobs Jr.",
+    "year": 2009,
+    "place": "Fort Worth, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Michael Wayne McKnight Jr.",
+    "year": 2009,
+    "place": "San Antonio, Texas",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Oscar Grant",
+    "year": 2009,
+    "place": "Oakland, California",
+    "context": "shot while restrained on platform"
+  },
+  {
+    "name": "Parnell Smith",
+    "year": 2009,
+    "place": "Oakland, California",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Robert Mitchell",
+    "year": 2009,
+    "place": "Detroit, Michigan",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Roy Glenn Jr.",
+    "year": 2009,
+    "place": "Humboldt, Tennessee",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Shatona Evette Robinson",
+    "year": 2009,
+    "place": "Charlotte, North Carolina",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Shem Walker",
+    "year": 2009,
+    "place": "New York, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Stephanie Montague",
+    "year": 2009,
+    "place": "Frayser, Tennessee",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Woodrow Player III",
+    "year": 2009,
+    "place": "Los Angeles, California",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Yvette Williams",
+    "year": 2009,
+    "place": "Rock Hill, South Carolina",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Aaron Campbell",
+    "year": 2010,
+    "place": "Portland, Oregon",
+    "context": "shot during welfare check"
+  },
+  {
+    "name": "Aiyana Jones",
+    "year": 2010,
+    "place": "Detroit, Michigan",
+    "context": "killed during police raid"
+  },
+  {
+    "name": "Aiyana Stanley-Jones",
+    "year": 2010,
+    "place": "Detroit, Michigan",
+    "context": "killed during police raid"
+  },
+  {
+    "name": "Damon Lamont Falls",
+    "year": 2010,
+    "place": "Oklahoma City, Oklahoma",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Darrell Swain",
+    "year": 2010,
+    "place": "Wilmington, Delaware",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "David Smith",
+    "year": 2010,
+    "place": "Minneapolis, Minnesota",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Derrick Jones",
+    "year": 2010,
+    "place": "Oakland, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Eugene Ellison",
+    "year": 2010,
+    "place": "Little Rock, Arkansas",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Jamail Amron",
+    "year": 2010,
+    "place": "Harris County, Texas",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "James Rivera Jr.",
+    "year": 2010,
+    "place": "Stockton, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Keith Briscoe",
+    "year": 2010,
+    "place": "Winslow Township, New Jersey",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Reginald Wallace",
+    "year": 2010,
+    "place": "Nashville, Tennessee",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Steven Washington",
+    "year": 2010,
+    "place": "Los Angeles, California",
+    "context": "shot; autistic and unarmed"
+  },
+  {
+    "name": "Trevon Cole",
+    "year": 2010,
+    "place": "Las Vegas, Nevada",
+    "context": "killed during police raid"
+  },
+  {
+    "name": "Tyrone Brown",
+    "year": 2010,
+    "place": "Baltimore, Maryland",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Alonzo Ashley",
+    "year": 2011,
+    "place": "Denver, Colorado",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Ariston Waiters",
+    "year": 2011,
+    "place": "Union City, Georgia",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Cletis Williams",
+    "year": 2011,
+    "place": "Jonesboro, Arkansas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Darius Pinex",
+    "year": 2011,
+    "place": "Chicago, Illinois",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Derek Williams",
+    "year": 2011,
+    "place": "Milwaukee, Wisconsin",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Dwight Person",
+    "year": 2011,
+    "place": "East Point, Georgia",
+    "context": "killed during police raid"
+  },
+  {
+    "name": "Everette Howard",
+    "year": 2011,
+    "place": "Cincinnati, Ohio",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Flint Farmer",
+    "year": 2011,
+    "place": "Chicago, Illinois",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Jason Moore",
+    "year": 2011,
+    "place": "Ferguson, Missouri",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Kenneth Chamberlain Sr.",
+    "year": 2011,
+    "place": "White Plains, New York",
+    "context": "shot after medical alert"
+  },
+  {
+    "name": "Stanley Gibson",
+    "year": 2011,
+    "place": "Las Vegas, Nevada",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Willie Ray Banks",
+    "year": 2011,
+    "place": "Granite Shoals, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Chavis Carter",
+    "year": 2012,
+    "place": "Jonesboro, Arkansas",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Craig Ruise Jr",
+    "year": 2012,
+    "place": "Jacksonville, Florida",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "James Brown Jr.",
+    "year": 2012,
+    "place": "El Paso, Texas",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Kendrec McDade",
+    "year": 2012,
+    "place": "Pasadena, California",
+    "context": "shot after false 911 call"
+  },
+  {
+    "name": "Kerwin Harris",
+    "year": 2012,
+    "place": "St. Louis, Missouri",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Lamont Harmon",
+    "year": 2012,
+    "place": "Sacramento, California",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Malissa Williams",
+    "year": 2012,
+    "place": "Cleveland, Ohio",
+    "context": "shot in car by police"
+  },
+  {
+    "name": "Manuel Loggins Jr.",
+    "year": 2012,
+    "place": "San Clemente, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Marquez Smart",
+    "year": 2012,
+    "place": "Wichita, Kansas",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Ramarley Graham",
+    "year": 2012,
+    "place": "New York, New York",
+    "context": "shot inside family home"
+  },
+  {
+    "name": "Rekia Boyd",
+    "year": 2012,
+    "place": "Chicago, Illinois",
+    "context": "shot by off-duty officer"
+  },
+  {
+    "name": "Shereese Francis",
+    "year": 2012,
+    "place": "New York, New York",
+    "context": "died after police restraint"
+  },
+  {
+    "name": "Timothy Russell",
+    "year": 2012,
+    "place": "Cleveland, Ohio",
+    "context": "shot in car by police"
+  },
+  {
+    "name": "Troy Stewart",
+    "year": 2012,
+    "place": "Corpus Christi, Texas",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Wendell Allen",
+    "year": 2012,
+    "place": "New Orleans, Louisiana",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Adam Trammell",
+    "year": 2013,
+    "place": "West Milwaukee, Wisconsin",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Akeem Terrell",
+    "year": 2013,
+    "place": "Phoenix, Arizona",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Albert Dorsey",
+    "year": 2013,
+    "place": "Los Angeles, California",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Anton Black",
+    "year": 2013,
+    "place": "Greensboro, Maryland",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Armando Frank",
+    "year": 2013,
+    "place": "Marksville, Louisiana",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Arthur Green Jr.",
+    "year": 2013,
+    "place": "Tampa, Florida",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Brandon Jones",
+    "year": 2013,
+    "place": "Cleveland, Ohio",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Breonte Johnson- Davis",
+    "year": 2013,
+    "place": "Palmetto, Florida",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Calvin Wilks Jr.",
+    "year": 2013,
+    "place": "Crestview, Florida",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Cameron Ford",
+    "year": 2013,
+    "place": "Omaha, Nebraska",
+    "context": "killed during police raid"
+  },
+  {
+    "name": "Charles Adair",
+    "year": 2013,
+    "place": "Kansas City, Kansas",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Chinedu Okobi",
+    "year": 2013,
+    "place": "Millbrae, California",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Christian Black",
+    "year": 2013,
+    "place": "Dayton, Ohio",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Christopher Eisinger",
+    "year": 2013,
+    "place": "Anaheim, California",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Craig McKinnis",
+    "year": 2013,
+    "place": "Kansas City, Kansas",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "D'Andre Berghardt",
+    "year": 2013,
+    "place": "Red Rock Canyon, Nevada",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Dainell Simmons",
+    "year": 2013,
+    "place": "Middle Island, New York",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Damien Cameron",
+    "year": 2013,
+    "place": "Braxton, Mississippi",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Damon Grimes",
+    "year": 2013,
+    "place": "Detroit, Michigan",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Damon Lamarr Johnson",
+    "year": 2013,
+    "place": "Portland, Oregon",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Donald Dontay Ivy",
+    "year": 2013,
+    "place": "Albany, New York",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Dujuan Armstrong",
+    "year": 2013,
+    "place": "Dublin, California",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Elroy Clarke",
+    "year": 2013,
+    "place": "Punta Gorda, Florida",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Eric Allen",
+    "year": 2013,
+    "place": "Mount Juliet, Tennessee",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Eric Harris",
+    "year": 2013,
+    "place": "Tulsa, Oklahoma",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Eurie Martin",
+    "year": 2013,
+    "place": "Deepstep, Georgia",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Frank Tyson",
+    "year": 2013,
+    "place": "Canton, Ohio",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Fred Brown",
+    "year": 2013,
+    "place": "North Las Vegas, Nevada",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Freddie Walker",
+    "year": 2013,
+    "place": "Louisville, Georgia",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Genesis Hicks",
+    "year": 2013,
+    "place": "Frisco, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "George King Jr",
+    "year": 2013,
+    "place": "Baltimore, Maryland",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Gershun Freeman",
+    "year": 2013,
+    "place": "Memphis, Tennessee",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Gregory Towns",
+    "year": 2013,
+    "place": "East Point, Georgia",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Herman Whitfield",
+    "year": 2013,
+    "place": "Indianapolis, Indiana",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "J'Allen Jones",
+    "year": 2013,
+    "place": "Newtown, Connecticut",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Jamarr Thompson",
+    "year": 2013,
+    "place": "Houston, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Jameek Lowery",
+    "year": 2013,
+    "place": "Paterson, New Jersey",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "James Holland Sr.",
+    "year": 2013,
+    "place": "Avondale, Arizona",
+    "context": "died after police taser"
+  },
+  {
+    "name": "James Lowery",
+    "year": 2013,
+    "place": "Titusville, Florida",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Javier Ambler",
+    "year": 2013,
+    "place": "Austin, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Jawan Dallas",
+    "year": 2013,
+    "place": "Mobile, Alabama",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Jeffrey Melvin",
+    "year": 2013,
+    "place": "Colorado Springs, Colorado",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Jerame Reid",
+    "year": 2013,
+    "place": "Bridgeton, New Jersey",
+    "context": "killed at traffic stop"
+  },
+  {
+    "name": "Jermaine Jones",
+    "year": 2013,
+    "place": "Augusta, Georgia",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Jermaine Sonnier",
+    "year": 2013,
+    "place": "Houston, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Jessica Williams",
+    "year": 2013,
+    "place": "San Francisco, California",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Jim Rogers",
+    "year": 2013,
+    "place": "Pittsburgh, Pennsylvania",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Jonathan Ferrell",
+    "year": 2013,
+    "place": "Charlotte, North Carolina",
+    "context": "shot seeking help after crash"
+  },
+  {
+    "name": "Joshua Leon Wright",
+    "year": 2013,
+    "place": "Kyle, Texas",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Jovontay Williams",
+    "year": 2013,
+    "place": "Charlotte, North Carolina",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Keeven Robinson",
+    "year": 2013,
+    "place": "Jefferson Parish, Louisiana",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Keith Childress",
+    "year": 2013,
+    "place": "Las Vegas, Nevada",
+    "context": "shot; object mistaken for gun"
+  },
+  {
+    "name": "Keith Murriel",
+    "year": 2013,
+    "place": "Jackson, Mississippi",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Kenneth Anderson",
+    "year": 2013,
+    "place": "Houston, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Kenneth Johnson",
+    "year": 2013,
+    "place": "Reading, Pennsylvania",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Kenneth Knotts",
+    "year": 2013,
+    "place": "Dallas, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Kevin Hicks",
+    "year": 2013,
+    "place": "Indianapolis, Indiana",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Kevin Matthews",
+    "year": 2013,
+    "place": "Detroit, Michigan",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Kimani Gray",
+    "year": 2013,
+    "place": "New York, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Lashano Gilbert",
+    "year": 2013,
+    "place": "New London, Connecticut",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Leonard Cure",
+    "year": 2013,
+    "place": "Camden County, Georgia",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Maalik Roquemore",
+    "year": 2013,
+    "place": "Cleveland, Ohio",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Marcus Burks",
+    "year": 2013,
+    "place": "Newburgh, New York",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Marshall Miles",
+    "year": 2013,
+    "place": "Sacramento, California",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Messiah Nantwi",
+    "year": 2013,
+    "place": "Marcy, New York",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Micah Key",
+    "year": 2013,
+    "place": "San Angelo, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Michael Charles Thompson",
+    "year": 2013,
+    "place": "El Paso, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Michael Noel",
+    "year": 2013,
+    "place": "Saint Martinville, Louisiana",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Miguel Espinal",
+    "year": 2013,
+    "place": "Yonkers, New York",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Miriam Carey",
+    "year": 2013,
+    "place": "Washington, District of Columbia",
+    "context": "shot near Capitol grounds"
+  },
+  {
+    "name": "Norman Cooper",
+    "year": 2013,
+    "place": "San Antonio, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Oliver Gregoire",
+    "year": 2013,
+    "place": "Baytown, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Paterson Brown Jr.",
+    "year": 2013,
+    "place": "Chesterfield County, Virginia",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Quantez Burks",
+    "year": 2013,
+    "place": "Beaver, West Virginia",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Richard Gregory Davis",
+    "year": 2013,
+    "place": "Rochester, New York",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Robert Brooks",
+    "year": 2013,
+    "place": "Marcy, New York",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Robert Loggins",
+    "year": 2013,
+    "place": "Grenada, Mississippi",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Roderick Brooks",
+    "year": 2013,
+    "place": "Houston, Texas",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Rolin Hill",
+    "year": 2013,
+    "place": "Virginia Beach, Virginia",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Sean Moore",
+    "year": 2013,
+    "place": "San Francisco, California",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Shacoby Kenny",
+    "year": 2013,
+    "place": "Boston, Massachusetts",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Tasha Grant",
+    "year": 2013,
+    "place": "Cleveland, Ohio",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Tashii Farmer",
+    "year": 2013,
+    "place": "Las Vegas, Nevada",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Tawon Boyd",
+    "year": 2013,
+    "place": "Middle River, Maryland",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Terrance Ivor Watts",
+    "year": 2013,
+    "place": "Frederick, Maryland",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Tony Robinson",
+    "year": 2013,
+    "place": "Madison, Wisconsin",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Trey Pringle",
+    "year": 2013,
+    "place": "Seabrook, South Carolina",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Tyrone West",
+    "year": 2013,
+    "place": "Baltimore, Maryland",
+    "context": "died from police restraint"
+  },
+  {
+    "name": "Willie Lee Bingham Jr.",
+    "year": 2013,
+    "place": "Cleveland, Mississippi",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Akai Gurley",
+    "year": 2014,
+    "place": "New York, New York",
+    "context": "shot in stairwell by police"
+  },
+  {
+    "name": "Aura Rosser",
+    "year": 2014,
+    "place": "Ann Arbor, Michigan",
+    "context": "shot during domestic call"
+  },
+  {
+    "name": "Dante Parker",
+    "year": 2014,
+    "place": "San Bernardino County, California",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Dontre Hamilton",
+    "year": 2014,
+    "place": "Milwaukee, Wisconsin",
+    "context": "shot during park encounter"
+  },
+  {
+    "name": "Eric Garner",
+    "year": 2014,
+    "place": "New York, New York",
+    "context": "died from police chokehold"
+  },
+  {
+    "name": "Ezell Ford",
+    "year": 2014,
+    "place": "Los Angeles, California",
+    "context": "shot during police encounter"
+  },
+  {
+    "name": "John Crawford III",
+    "year": 2014,
+    "place": "Beavercreek, Ohio",
+    "context": "shot holding toy BB gun"
+  },
+  {
+    "name": "Laquan McDonald",
+    "year": 2014,
+    "place": "Chicago, Illinois",
+    "context": "shot by police officer"
+  },
+  {
+    "name": "Michael Brown",
+    "year": 2014,
+    "place": "Ferguson, Missouri",
+    "context": "shot by police officer"
+  },
+  {
+    "name": "Michelle Cusseaux",
+    "year": 2014,
+    "place": "Phoenix, Arizona",
+    "context": "shot during mental-health call"
+  },
+  {
+    "name": "Rumain Brisbon",
+    "year": 2014,
+    "place": "Phoenix, Arizona",
+    "context": "shot; bottle mistaken for gun"
+  },
+  {
+    "name": "Tamir Rice",
+    "year": 2014,
+    "place": "Cleveland, Ohio",
+    "context": "shot holding toy pellet gun"
+  },
+  {
+    "name": "Tanisha Anderson",
+    "year": 2014,
+    "place": "Cleveland, Ohio",
+    "context": "died after police takedown"
+  },
+  {
+    "name": "Victor White III",
+    "year": 2014,
+    "place": "Iberia Parish, Louisiana",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Yvette Smith",
+    "year": 2014,
+    "place": "Bastrop, Texas",
+    "context": "shot answering front door"
+  },
+  {
+    "name": "Anthony Ashford",
+    "year": 2015,
+    "place": "San Diego, California",
+    "context": "shot by police; unarmed"
+  },
+  {
+    "name": "Anthony Hill",
+    "year": 2015,
+    "place": "DeKalb County, Georgia",
+    "context": "shot while naked unarmed"
+  },
+  {
+    "name": "Bettie Jones",
+    "year": 2015,
+    "place": "Chicago, Illinois",
+    "context": "shot answering wrong door"
+  },
+  {
+    "name": "Brendon Glenn",
+    "year": 2015,
+    "place": "Los Angeles, California",
+    "context": "shot on Venice boardwalk"
+  },
+  {
+    "name": "Christian Taylor",
+    "year": 2015,
+    "place": "Arlington, Texas",
+    "context": "shot by police in store"
+  },
+  {
+    "name": "Corey Jones",
+    "year": 2015,
+    "place": "Palm Beach Gardens, Florida",
+    "context": "shot by plainclothes officer"
+  },
+  {
+    "name": "Freddie Blue",
+    "year": 2015,
+    "place": "Covington, Georgia",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Freddie Gray",
+    "year": 2015,
+    "place": "Baltimore, Maryland",
+    "context": "died from injury in custody"
+  },
+  {
+    "name": "India Kager",
+    "year": 2015,
+    "place": "Virginia Beach, Virginia",
+    "context": "shot in car with infant"
+  },
+  {
+    "name": "Jamar Clark",
+    "year": 2015,
+    "place": "Minneapolis, Minnesota",
+    "context": "shot during police encounter"
+  },
+  {
+    "name": "Jeremy McDole",
+    "year": 2015,
+    "place": "Wilmington, Delaware",
+    "context": "shot while in wheelchair"
+  },
+  {
+    "name": "Junior Prosper",
+    "year": 2015,
+    "place": "Miami, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Leroy Browning",
+    "year": 2015,
+    "place": "Palmdale, California",
+    "context": "shot by police; unarmed"
+  },
+  {
+    "name": "Mya Hall",
+    "year": 2015,
+    "place": "Fort Meade, Maryland",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Natasha McKenna",
+    "year": 2015,
+    "place": "Fairfax County, Virginia",
+    "context": "died after jail taser"
+  },
+  {
+    "name": "Quintonio LeGrier",
+    "year": 2015,
+    "place": "Chicago, Illinois",
+    "context": "shot during mental-health call"
+  },
+  {
+    "name": "Richard Davis",
+    "year": 2015,
+    "place": "Rochester, New York",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Samuel DuBose",
+    "year": 2015,
+    "place": "Cincinnati, Ohio",
+    "context": "shot at traffic stop"
+  },
+  {
+    "name": "Sandra Bland",
+    "year": 2015,
+    "place": "Waller County, Texas",
+    "context": "died in police custody"
+  },
+  {
+    "name": "Spencer McCain",
+    "year": 2015,
+    "place": "Owings Mills, Maryland",
+    "context": "shot by police; unarmed"
+  },
+  {
+    "name": "Walter Scott",
+    "year": 2015,
+    "place": "North Charleston, South Carolina",
+    "context": "shot while fleeing police"
+  },
+  {
+    "name": "Alfred Olango",
+    "year": 2016,
+    "place": "El Cajon, California",
+    "context": "shot; hands raised with object"
+  },
+  {
+    "name": "Alton Sterling",
+    "year": 2016,
+    "place": "Baton Rouge, Louisiana",
+    "context": "shot while pinned by police"
+  },
+  {
+    "name": "Calin Roquemore",
+    "year": 2016,
+    "place": "Beckville, Texas",
+    "context": "shot by police; unarmed"
+  },
+  {
+    "name": "Deborah Danner",
+    "year": 2016,
+    "place": "New York, New York",
+    "context": "shot during wellness check"
+  },
+  {
+    "name": "India Beaty",
+    "year": 2016,
+    "place": "Norfolk, Virginia",
+    "context": "killed by law enforcement"
+  },
+  {
+    "name": "Joseph Mann",
+    "year": 2016,
+    "place": "Sacramento, California",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Keith Lamont Scott",
+    "year": 2016,
+    "place": "Charlotte, North Carolina",
+    "context": "shot in apartment parking lot"
+  },
+  {
+    "name": "Korryn Gaines",
+    "year": 2016,
+    "place": "Randallstown, Maryland",
+    "context": "shot during standoff"
+  },
+  {
+    "name": "Philando Castile",
+    "year": 2016,
+    "place": "Falcon Heights, Minnesota",
+    "context": "shot at traffic stop"
+  },
+  {
+    "name": "Terence Crutcher",
+    "year": 2016,
+    "place": "Tulsa, Oklahoma",
+    "context": "shot beside disabled vehicle"
+  },
+  {
+    "name": "Alteria Woods",
+    "year": 2017,
+    "place": "Gainesville, Florida",
+    "context": "killed during police raid"
+  },
+  {
+    "name": "Charleena Lyles",
+    "year": 2017,
+    "place": "Seattle, Washington",
+    "context": "shot during wellness call"
+  },
+  {
+    "name": "Jordan Edwards",
+    "year": 2017,
+    "place": "Balch Springs, Texas",
+    "context": "shot leaving party in car"
+  },
+  {
+    "name": "Antwon Rose Jr.",
+    "year": 2018,
+    "place": "East Pittsburgh, Pennsylvania",
+    "context": "shot while fleeing traffic stop"
+  },
+  {
+    "name": "Botham Jean",
+    "year": 2018,
+    "place": "Dallas, Texas",
+    "context": "shot in own apartment"
+  },
+  {
+    "name": "Danny Ray Thomas",
+    "year": 2018,
+    "place": "Houston, Texas",
+    "context": "shot during street encounter"
+  },
+  {
+    "name": "Dominique Clayton",
+    "year": 2018,
+    "place": "Little Rock, Arkansas",
+    "context": "shot by off-duty officer"
+  },
+  {
+    "name": "Emantic Fitzgerald Bradford Jr.",
+    "year": 2018,
+    "place": "Hoover, Alabama",
+    "context": "shot in mall after gunfire"
+  },
+  {
+    "name": "Harith Augustus",
+    "year": 2018,
+    "place": "Chicago, Illinois",
+    "context": "shot carrying holstered gun"
+  },
+  {
+    "name": "Jemel Roberson",
+    "year": 2018,
+    "place": "Robbins, Illinois",
+    "context": "security guard shot by police"
+  },
+  {
+    "name": "Marcus-David Peters",
+    "year": 2018,
+    "place": "Richmond, Virginia",
+    "context": "shot during mental-health crisis"
+  },
+  {
+    "name": "Saheed Vassell",
+    "year": 2018,
+    "place": "New York, New York",
+    "context": "shot; metal object mistaken"
+  },
+  {
+    "name": "Stephon Clark",
+    "year": 2018,
+    "place": "Sacramento, California",
+    "context": "shot in grandparents' backyard"
+  },
+  {
+    "name": "Atatiana Jefferson",
+    "year": 2019,
+    "place": "Fort Worth, Texas",
+    "context": "shot through home window"
+  },
+  {
+    "name": "Elijah McClain",
+    "year": 2019,
+    "place": "Aurora, Colorado",
+    "context": "died after police restraint"
+  },
+  {
+    "name": "Michael Dean",
+    "year": 2019,
+    "place": "Temple, Texas",
+    "context": "shot during traffic stop"
+  },
+  {
+    "name": "Pamela Turner",
+    "year": 2019,
+    "place": "Baytown, Texas",
+    "context": "shot outside apartment complex"
+  },
+  {
+    "name": "Ronald Greene",
+    "year": 2019,
+    "place": "Monroe, Louisiana",
+    "context": "died after state police stop"
+  },
+  {
+    "name": "Willie McCoy",
+    "year": 2019,
+    "place": "Vallejo, California",
+    "context": "shot asleep in drive-thru"
+  },
+  {
+    "name": "Andre Hill",
+    "year": 2020,
+    "place": "Columbus, Ohio",
+    "context": "shot holding cellphone"
+  },
+  {
+    "name": "Breonna Taylor",
+    "year": 2020,
+    "place": "Louisville, Kentucky",
+    "context": "killed during no-knock raid"
+  },
+  {
+    "name": "Casey Goodson Jr.",
+    "year": 2020,
+    "place": "Columbus, Ohio",
+    "context": "shot outside family home"
+  },
+  {
+    "name": "Daniel Prude",
+    "year": 2020,
+    "place": "Rochester, New York",
+    "context": "died after police hood restraint"
+  },
+  {
+    "name": "David McAtee",
+    "year": 2020,
+    "place": "Louisville, Kentucky",
+    "context": "shot during protest unrest"
+  },
+  {
+    "name": "Dijon Kizzee",
+    "year": 2020,
+    "place": "Los Angeles, California",
+    "context": "shot after bike stop"
+  },
+  {
+    "name": "George Floyd",
+    "year": 2020,
+    "place": "Minneapolis, Minnesota",
+    "context": "died from police neck restraint"
+  },
+  {
+    "name": "Jonathan Price",
+    "year": 2020,
+    "place": "Wolfe City, Texas",
+    "context": "shot intervening in dispute"
+  },
+  {
+    "name": "Julian Edward Roosevelt Lewis",
+    "year": 2020,
+    "place": "Sycamore, Georgia",
+    "context": "shot during traffic stop"
+  },
+  {
+    "name": "Kurt Reinhold",
+    "year": 2020,
+    "place": "San Clemente, California",
+    "context": "shot during sidewalk stop"
+  },
+  {
+    "name": "Manuel Ellis",
+    "year": 2020,
+    "place": "Tacoma, Washington",
+    "context": "died during police restraint"
+  },
+  {
+    "name": "Patrick Warren Sr.",
+    "year": 2020,
+    "place": "Killeen, Texas",
+    "context": "shot during wellness check"
+  },
+  {
+    "name": "Rayshard Brooks",
+    "year": 2020,
+    "place": "Atlanta, Georgia",
+    "context": "shot after Wendy's encounter"
+  },
+  {
+    "name": "Tony McDade",
+    "year": 2020,
+    "place": "Tallahassee, Florida",
+    "context": "shot by police officers"
+  },
+  {
+    "name": "Walter Wallace Jr.",
+    "year": 2020,
+    "place": "Philadelphia, Pennsylvania",
+    "context": "shot during mental-health call"
+  },
+  {
+    "name": "William Green",
+    "year": 2020,
+    "place": "Prince George's County, Maryland",
+    "context": "shot while handcuffed in car"
+  },
+  {
+    "name": "Andrew Brown Jr.",
+    "year": 2021,
+    "place": "Elizabeth City, North Carolina",
+    "context": "shot during warrant service"
+  },
+  {
+    "name": "Daunte Wright",
+    "year": 2021,
+    "place": "Brooklyn Center, Minnesota",
+    "context": "shot during traffic stop"
+  },
+  {
+    "name": "Ma'Khia Bryant",
+    "year": 2021,
+    "place": "Columbus, Ohio",
+    "context": "shot during fight call"
+  },
+  {
+    "name": "Marvin Scott III",
+    "year": 2021,
+    "place": "McKinney, Texas",
+    "context": "died in jail restraint"
+  },
+  {
+    "name": "Winston Smith",
+    "year": 2021,
+    "place": "Minneapolis, Minnesota",
+    "context": "shot during U.S. Marshals raid"
+  },
+  {
+    "name": "Amir Locke",
+    "year": 2022,
+    "place": "Minneapolis, Minnesota",
+    "context": "shot during no-knock raid"
+  },
+  {
+    "name": "Donovan Lewis",
+    "year": 2022,
+    "place": "Columbus, Ohio",
+    "context": "shot in bed during warrant"
+  },
+  {
+    "name": "Jayland Walker",
+    "year": 2022,
+    "place": "Akron, Ohio",
+    "context": "shot during police chase"
+  },
+  {
+    "name": "Patrick Lyoya",
+    "year": 2022,
+    "place": "Grand Rapids, Michigan",
+    "context": "shot during traffic stop"
+  },
+  {
+    "name": "Keenan Anderson",
+    "year": 2023,
+    "place": "Los Angeles, California",
+    "context": "died after police taser"
+  },
+  {
+    "name": "Ta'Kiya Young",
+    "year": 2023,
+    "place": "Blendon Township, Ohio",
+    "context": "shot at grocery store"
+  },
+  {
+    "name": "Tyre Nichols",
+    "year": 2023,
+    "place": "Memphis, Tennessee",
+    "context": "beaten by police officers"
+  },
+  {
+    "name": "Sonya Massey",
+    "year": 2024,
+    "place": "Springfield, Illinois",
+    "context": "shot after calling 911"
+  }
+]

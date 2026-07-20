@@ -103,7 +103,9 @@ export async function handleHistoryRefineRequest(
   const rateDecision = deps.rateLimitGuard.evaluate({
     subject: 'anonymous',
     ...(clientIp ? { clientIp } : {}),
-    appCheckVerified: appCheckDecision.verified,
+    // Monitor allow-through must satisfy the quota gate (see @repo/firebase
+    // `appCheckSatisfiesRateLimitGate`); otherwise missing App Check tokens become fake 429s.
+    appCheckVerified: appCheckDecision.verified || appCheckDecision.mode === 'monitor',
   });
   if (!rateDecision.allowed) {
     const response = deps.rateLimitGuard.formatDeniedResponse(rateDecision);

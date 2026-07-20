@@ -48,3 +48,20 @@ export type {
   CensusCountyDecadeObservationInput,
   NationalBlackPopulationDecadeRow,
 } from './census-county-decade.js';
+
+export {
+  CENSUS_NATIONAL_TOTAL_POPULATION_SERIES,
+  CENSUS_NATIONAL_BLACK_POPULATION_SERIES,
+  CENSUS_NATIONAL_FREE_BLACK_POPULATION_SERIES,
+  CENSUS_NATIONAL_ENSLAVED_BLACK_POPULATION_SERIES,
+  censusNationalDecadeToObservations,
+  freeEnslavedTotalDiscrepancy,
+  blackShareOfTotalPct,
+  computeNationalPopulationChanges,
+  assertKnownTimelineDecade,
+} from './census-national-decade.js';
+export type {
+  CensusNationalDecadeObservationInput,
+  NationalPopulationTimelineRow,
+  NationalPopulationChange,
+} from './census-national-decade.js';

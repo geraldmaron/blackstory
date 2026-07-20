@@ -4,14 +4,16 @@
  * Client orchestrator for `/explore`. Wires the shared `MapStage` (via `useMapStage()`
  * instead of mounting its own canvas), the synchronized accessible list, map data model
  * picker (record presence | Black population share | share change), nearby-points grouping
- * toggle, relationship lines, decade settings, filter form, and shareable URL state. The
- * records list is scoped to the live map camera bounds (plus active filters) so its count
- * and rows match what is geographically on screen. Pin or list selection opens a preview
- * narrative card in the spotlight shell; the full record is one CTA away at `/entity/[id]`.
- * `?selected=` is shareable preview state (e.g. return from “View on map”). History edge
- * clicks still open a connection panel. The server-rendered snapshot catalog is the source
- * of truth; `/explore/api` refine is optional progressive enhancement when App Check is
- * configured.
+ * toggle, relationship lines, decade settings, address/place search (Census via `/locate/api`
+ * with camera fly-to), filter form, and shareable URL state. Floating chrome is a left
+ * instrument chassis (Filters | Color key tabs) plus a records rail/sheet; MapLibre zoom
+ * parks in a safe zone so rails never cover it. The records list is scoped to the live map
+ * camera bounds (plus active filters) so its count and rows match what is geographically on
+ * screen. Pin or list selection opens a preview narrative card in the spotlight shell; the
+ * full record is one CTA away at `/entity/[id]`. `?selected=` is shareable preview state
+ * (e.g. return from “View on map”). History edge clicks still open a connection panel. The
+ * server-rendered snapshot catalog is the source of truth; `/explore/api` refine is optional
+ * progressive enhancement when App Check is configured.
  *
  * Camera: deep links and back/forward reconcile the camera from the URL via `easeTo`
  * (`reconcileCamera`, run once on mount and again on every `popstate`) never a raw default
@@ -19,20 +21,41 @@
  * card eases one geographic tier up (county → state → country) from the pre-select camera,
  * never a jump cut to full CONUS when the reader was already in a tighter frame.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Notice } from '@repo/ui';
 import { US_CONUS_BOUNDS, findUsStateByPostalCode } from '@repo/domain/map/geography';
 import type { CensusPopulationDecade } from '@repo/domain/map/county-population';
 import { HistoryEdgePanel } from '../../../components/history/HistoryEdgePanel';
+import { ExploreAddressSearch } from '../../../components/map-experience/ExploreAddressSearch';
+import type { ExploreAddressResolvedPayload } from '../../../components/map-experience/ExploreAddressSearch';
 import { LayerModelControl } from '../../../components/map-experience/LayerModelControl';
 import { GroupingToggle } from '../../../components/map-experience/GroupingToggle';
 import { MapExperienceLegend } from '../../../components/map-experience/MapExperienceLegend';
 import { NarrativeCard } from '../../../components/map-experience/NarrativeCard';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
+import { MetaFieldLabel } from '../../../components/map-experience/MetaFieldLabel';
+import { shouldFadeDecadePatch } from '../../map/decade-layer-transition';
 import { CAMERA_POINT_ZOOM, prefersReducedMotion } from '../../../lib/map-experience/camera-presets';
 import { resolveCloseCameraTarget } from '../../../lib/map-experience/close-camera';
+import {
+  closestFeatures,
+  emptyRadiusStatusMessage,
+  featuresWithinRadius,
+  formatExploreDistance,
+  mapBoundsForRadius,
+  matchesRadiusStatusMessage,
+  placeOnlyStatusMessage,
+  type ExploreNearbyFeature,
+} from '../../../lib/map-experience/explore-place-radius';
 import { DEGRADED_MODE_COPY } from '../../../lib/map-experience/snapshot-mode';
 import {
   buildCountyChoroplethLevels,
@@ -52,6 +75,7 @@ import {
 } from '../../../lib/map-experience/url-state';
 import {
   applyExploreFilters,
+  DEFAULT_EXPLORE_FILTERS,
   filterFeaturesInBounds,
   sortFeaturesForList,
   type ExploreFilterState,
@@ -59,11 +83,20 @@ import {
 import { useMapStage } from '../MapStage';
 import { pickExploreEdgeSlice } from './explore-edge-catalog';
 import {
-  exploreFiltersPanelClassName,
-  exploreLegendPanelClassName,
+  EXPLORE_SINGLE_PANEL_MEDIA,
+  exploreInstrumentsPanelClassName,
+  exploreNarrowExclusivePatch,
   exploreResultsPanelClassName,
+  exploreStageChromeAttrs,
+  resolveExploreLeftTab,
+  type ExploreLeftTab,
 } from './explore-panel-chrome';
 import type { ExploreViewModel } from './explore-view-model';
+
+function isExploreSinglePanelViewport(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia(EXPLORE_SINGLE_PANEL_MEDIA).matches;
+}
 
 export type ExploreMapExperienceProps = {
   readonly initial: ExploreViewModel;
@@ -190,11 +223,15 @@ function resolvePopulationDecades(
 
 /** Facet render order matches how people actually narrow: what (kind) → when
  * (era) → about (theme) → how solid (confidence). One row each, auto-applying. */
-const FACET_ROWS: readonly { readonly key: keyof ExploreFilterState; readonly label: string }[] = [
-  { key: 'kind', label: 'Kind' },
-  { key: 'era', label: 'Era' },
-  { key: 'theme', label: 'Theme' },
-  { key: 'confidence', label: 'Confidence' },
+const FACET_ROWS: readonly {
+  readonly key: keyof ExploreFilterState;
+  readonly label: string;
+  readonly field: 'kind' | 'era' | 'theme' | 'confidence';
+}[] = [
+  { key: 'kind', label: 'Kind', field: 'kind' },
+  { key: 'era', label: 'Era', field: 'era' },
+  { key: 'theme', label: 'Theme', field: 'theme' },
+  { key: 'confidence', label: 'Confidence', field: 'confidence' },
 ];
 
 export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
@@ -219,8 +256,24 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const liveViewportRef = useRef<ExploreViewport | undefined>(initial.viewState.viewport);
   /** Bounds used to scope the records list to what's geographically on the map. */
   const [listBounds, setListBounds] = useState<ExploreMapBounds | undefined>(undefined);
+  /** First data patch after mount snaps; later decade/filter patches fade (continuous flow). */
+  const isInitialDataApplyRef = useRef(true);
   /** Camera before the most recent point-selection flight (hierarchical close target). */
   const preSelectViewportRef = useRef<ExploreViewport | undefined>(initial.viewState.viewport);
+  /** Preferred Filters | Color key tab when both URL sections are visible. */
+  const [leftTabPreference, setLeftTabPreference] = useState<ExploreLeftTab | null>(null);
+  /**
+   * Active place-search focus. Finite radius may annotate the list; the map catalog stays
+   * unscoped so pins never disappear when framing a place.
+   */
+  const [placeSearchFocus, setPlaceSearchFocus] = useState<{
+    readonly center: { readonly lat: number; readonly lng: number };
+    readonly radiusMeters: number | null;
+    readonly placeLabel: string;
+    readonly radiusLabel: string;
+    readonly within: readonly ExploreNearbyFeature[];
+    readonly closest: readonly ExploreNearbyFeature[];
+  } | null>(null);
 
   useEffect(() => {
     setView(initial);
@@ -285,6 +338,35 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     [view.allFeatures, view.viewState.filters, view.viewState.state],
   );
 
+  const placeSearchCenter = placeSearchFocus?.center;
+  const placeSearchRadiusMeters = placeSearchFocus?.radiusMeters;
+
+  // Keep an active place-search ranking in sync with facet changes (same center/radius).
+  useEffect(() => {
+    if (!placeSearchCenter || placeSearchRadiusMeters === undefined) return;
+    if (placeSearchRadiusMeters === null) {
+      setPlaceSearchFocus((prev) => {
+        if (!prev) return prev;
+        return { ...prev, within: [], closest: [] };
+      });
+      return;
+    }
+    // Rank against the live facet set — never force a state lock from place search.
+    const catalog = applyExploreFilters(view.allFeatures, view.viewState.filters);
+    const within = featuresWithinRadius(catalog, placeSearchCenter, placeSearchRadiusMeters);
+    const closest =
+      within.length > 0 ? [] : closestFeatures(catalog, placeSearchCenter, 3);
+    setPlaceSearchFocus((prev) => {
+      if (!prev) return prev;
+      return { ...prev, within, closest };
+    });
+  }, [
+    view.allFeatures,
+    view.viewState.filters,
+    placeSearchCenter,
+    placeSearchRadiusMeters,
+  ]);
+
   // Resolve from the full catalog so a deep-linked `?selected=` still orients the copper ring
   // (and list highlight) even when the current facet set would hide that row.
   const selectedFeature = useMemo(
@@ -331,35 +413,67 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     [commitViewState, view.viewState],
   );
 
+  const handleClearFilters = useCallback(() => {
+    commitViewState(
+      mergeViewState(view.viewState, {
+        filters: { ...DEFAULT_EXPLORE_FILTERS },
+      }),
+    );
+  }, [commitViewState, view.viewState]);
+
+  const hasActiveFilters =
+    view.viewState.filters.era !== DEFAULT_EXPLORE_FILTERS.era ||
+    view.viewState.filters.kind !== DEFAULT_EXPLORE_FILTERS.kind ||
+    view.viewState.filters.theme !== DEFAULT_EXPLORE_FILTERS.theme ||
+    view.viewState.filters.confidence !== DEFAULT_EXPLORE_FILTERS.confidence;
+
   // Deterministic reading order for the accessible list (chronological, undated
-  // last) — scoped to the live map camera so the list matches what's on screen.
-  // Until the first viewport event, fall back to the full filter set (SSR / pre-map).
+  // last). A finite place-search radius may scope the list; "All" and no place focus
+  // keep the list matched to the live camera. Map pins always use filteredFeatures.
   const sortedListFeatures = useMemo(() => {
+    if (placeSearchFocus && placeSearchFocus.radiusMeters !== null) {
+      return sortFeaturesForList(placeSearchFocus.within.map((row) => row.feature));
+    }
     const scoped = listBounds
       ? filterFeaturesInBounds(filteredFeatures, listBounds)
       : filteredFeatures;
     return sortFeaturesForList(scoped);
-  }, [filteredFeatures, listBounds]);
+  }, [filteredFeatures, listBounds, placeSearchFocus]);
 
   // Every source-data-affecting slice of view state patches the shared canvas — never a style
   // rebuild the surface calls into (MapStage.patchData rebuilds the style internally).
+  // After the first paint, patches dual-buffer crossdissolve so decade scrubbing and filter
+  // changes morph presence colors / pins without emptying the plate.
   useEffect(() => {
-    stage.patchData({
-      featureCollection: { type: 'FeatureCollection', features: filteredFeatures },
-      jurisdictionAreaFeatures: view.source.jurisdictionAreaFeatures,
-      layerMode: view.viewState.layerMode,
-      densityLevels: view.viewState.layerMode === 'presence' ? view.densityLevels : [],
-      countyChoroplethLevels: countyChoroplethLevels,
-      clusteringEnabled: view.viewState.group,
-      historyEdgesEnabled: view.viewState.lines,
-      historyEdgeCollection: view.edgeLineCollection,
+    const decade = view.viewState.decade;
+    const fade = shouldFadeDecadePatch({
+      reducedMotion: prefersReducedMotion(),
+      isInitialApply: isInitialDataApplyRef.current,
     });
+    isInitialDataApplyRef.current = false;
+    stage.patchData(
+      {
+        featureCollection: { type: 'FeatureCollection', features: filteredFeatures },
+        jurisdictionAreaFeatures: view.source.jurisdictionAreaFeatures,
+        layerMode: view.viewState.layerMode,
+        densityLevels: view.viewState.layerMode === 'presence' ? view.densityLevels : [],
+        countyChoroplethLevels: countyChoroplethLevels,
+        clusteringEnabled: view.viewState.group,
+        historyEdgesEnabled: view.viewState.lines,
+        historyEdgeCollection: view.edgeLineCollection,
+      },
+      {
+        ...(fade ? { fade: true } : {}),
+        ...(decade ? { memorialDecade: decade } : { memorialComplete: true }),
+      },
+    );
   }, [
     stage,
     filteredFeatures,
     view.source.jurisdictionAreaFeatures,
     view.viewState.layerMode,
     view.viewState.group,
+    view.viewState.decade,
     view.densityLevels,
     countyChoroplethLevels,
     view.viewState.lines,
@@ -454,10 +568,15 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   const handleHideFilters = useCallback(() => {
     commitViewState(mergeViewState(view.viewState, { showFilters: false }));
+    if (view.viewState.showKey) setLeftTabPreference('key');
   }, [commitViewState, view.viewState]);
 
   const handleShowFilters = useCallback(() => {
-    commitViewState(mergeViewState(view.viewState, { showFilters: true }));
+    setLeftTabPreference('filters');
+    const exclusive = isExploreSinglePanelViewport()
+      ? exploreNarrowExclusivePatch({ opening: 'instruments' })
+      : {};
+    commitViewState(mergeViewState(view.viewState, { showFilters: true, ...exclusive }));
   }, [commitViewState, view.viewState]);
 
   const handleHideResults = useCallback(() => {
@@ -465,16 +584,80 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   }, [commitViewState, view.viewState]);
 
   const handleShowResults = useCallback(() => {
-    commitViewState(mergeViewState(view.viewState, { showResults: true }));
+    const exclusive = isExploreSinglePanelViewport()
+      ? exploreNarrowExclusivePatch({ opening: 'results' })
+      : {};
+    commitViewState(mergeViewState(view.viewState, { showResults: true, ...exclusive }));
   }, [commitViewState, view.viewState]);
 
   const handleHideKey = useCallback(() => {
     commitViewState(mergeViewState(view.viewState, { showKey: false }));
+    if (view.viewState.showFilters) setLeftTabPreference('filters');
   }, [commitViewState, view.viewState]);
 
   const handleShowKey = useCallback(() => {
-    commitViewState(mergeViewState(view.viewState, { showKey: true }));
+    setLeftTabPreference('key');
+    const exclusive = isExploreSinglePanelViewport()
+      ? exploreNarrowExclusivePatch({ opening: 'instruments' })
+      : {};
+    commitViewState(mergeViewState(view.viewState, { showKey: true, ...exclusive }));
   }, [commitViewState, view.viewState]);
+
+  const handleSelectLeftTab = useCallback(
+    (tab: ExploreLeftTab) => {
+      setLeftTabPreference(tab);
+      const exclusive = isExploreSinglePanelViewport()
+        ? exploreNarrowExclusivePatch({ opening: 'instruments' })
+        : {};
+      if (tab === 'filters') {
+        commitViewState(mergeViewState(view.viewState, { showFilters: true, ...exclusive }));
+        return;
+      }
+      commitViewState(mergeViewState(view.viewState, { showKey: true, ...exclusive }));
+    },
+    [commitViewState, view.viewState],
+  );
+
+  const handleInstrumentsTabKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLDivElement>) => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      const active = resolveExploreLeftTab({
+        showFilters: viewStateRef.current.showFilters,
+        showKey: viewStateRef.current.showKey,
+        preferredTab: leftTabPreference,
+      });
+      if (!active) return;
+      event.preventDefault();
+      const next: ExploreLeftTab =
+        event.key === 'ArrowRight'
+          ? active === 'filters'
+            ? 'key'
+            : 'filters'
+          : active === 'key'
+            ? 'filters'
+            : 'key';
+      handleSelectLeftTab(next);
+      const focusId = next === 'filters' ? 'explore-tab-filters' : 'explore-tab-key';
+      document.getElementById(focusId)?.focus();
+    },
+    [handleSelectLeftTab, leftTabPreference],
+  );
+
+  /** On tablet/phone, keep a single primary panel so sheets never stack over the map/zoom. */
+  useEffect(() => {
+    const media = window.matchMedia(EXPLORE_SINGLE_PANEL_MEDIA);
+    const enforce = () => {
+      if (!media.matches) return;
+      const current = viewStateRef.current;
+      const leftOpen = current.showFilters || current.showKey;
+      if (leftOpen && current.showResults) {
+        commitViewState(mergeViewState(current, { showResults: false }));
+      }
+    };
+    enforce();
+    media.addEventListener('change', enforce);
+    return () => media.removeEventListener('change', enforce);
+  }, [commitViewState]);
 
   const handleSelect = useCallback(
     (entityId: string) => {
@@ -514,6 +697,59 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     },
     [commitViewState, stage, view.viewState],
   );
+
+  const handleAddressResolved = useCallback(
+    (payload: ExploreAddressResolvedPayload) => {
+      const { target, radiusMeters, radiusLabel } = payload;
+      preSelectViewportRef.current = liveViewportRef.current ?? viewStateRef.current.viewport;
+      const center = { lat: target.viewport.lat, lng: target.viewport.lng };
+
+      // Fly to the place — never lock the state filter (that collapsed the map to a handful
+      // of pins). Map catalog stays filteredFeatures only.
+      if (radiusMeters === null) {
+        stage.flyPreset(target.preset, {
+          center: [target.viewport.lng, target.viewport.lat],
+          zoom: target.viewport.zoom,
+        });
+        setPlaceSearchFocus({
+          center,
+          radiusMeters: null,
+          placeLabel: target.label,
+          radiusLabel,
+          within: [],
+          closest: [],
+        });
+      } else {
+        const bounds = mapBoundsForRadius(center, radiusMeters);
+        stage.flyPreset(target.preset === 'state' ? 'state' : 'locality', { bounds });
+        const catalog = applyExploreFilters(view.allFeatures, view.viewState.filters);
+        const within = featuresWithinRadius(catalog, center, radiusMeters);
+        const closest =
+          within.length > 0 ? [] : closestFeatures(catalog, center, 3);
+        setPlaceSearchFocus({
+          center,
+          radiusMeters,
+          placeLabel: target.label,
+          radiusLabel,
+          within,
+          closest,
+        });
+      }
+
+      commitViewState(
+        mergeViewState(view.viewState, {
+          viewport: target.viewport,
+          clearSelected: true,
+          clearEdge: true,
+        }),
+      );
+    },
+    [commitViewState, stage, view.allFeatures, view.viewState],
+  );
+
+  const handleClearPlaceSearch = useCallback(() => {
+    setPlaceSearchFocus(null);
+  }, []);
 
   const handleClearState = useCallback(() => {
     stage.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
@@ -710,6 +946,12 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const filtersVisible = view.viewState.showFilters;
   const resultsVisible = view.viewState.showResults;
   const keyVisible = view.viewState.showKey;
+  const leftTab = resolveExploreLeftTab({
+    showFilters: filtersVisible,
+    showKey: keyVisible,
+    preferredTab: leftTabPreference,
+  });
+  const instrumentsVisible = leftTab !== null;
   const resultsDimmed = Boolean(view.selectedEdge || selectedFeature);
 
   const listProps = {
@@ -718,6 +960,15 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     onSelect: handleSelect,
     ...(view.viewState.selected ? { selectedId: view.viewState.selected } : {}),
   };
+
+  const stageChrome = exploreStageChromeAttrs({
+    instrumentsVisible,
+    leftTab,
+    resultsVisible,
+  });
+
+  const hideActiveAriaLabel = leftTab === 'key' ? 'Hide key' : 'Hide filters';
+  const hideActiveHandler = leftTab === 'key' ? handleHideKey : handleHideFilters;
 
   return (
     /* Instruments follow the site theme (light/dark) — map plate syncs via MapStage. */
@@ -728,6 +979,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           : 'ds-explore-stage'
       }
       data-map-journey={entering ? 'entering' : 'explore'}
+      {...stageChrome}
     >
       {!stage.mapAvailable && degradedCopy ? (
         <div className="ds-explore-stage__notice">
@@ -738,146 +990,288 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       ) : null}
 
       <div
-        className={exploreFiltersPanelClassName({ visible: filtersVisible })}
+        className={exploreInstrumentsPanelClassName({ visible: instrumentsVisible })}
         ref={filterRegionRef}
-        tabIndex={filtersVisible ? -1 : undefined}
-        aria-label="Map filters"
-        {...(filtersVisible ? {} : { hidden: true })}
+        tabIndex={instrumentsVisible ? -1 : undefined}
+        aria-label="Map instruments"
+        {...(instrumentsVisible ? {} : { hidden: true })}
       >
         <div className="ds-explore-stage__panel-header">
-          <p className="ds-explore-stage__panel-title" id="explore-facets-heading">
-            Filters
-          </p>
+          <div
+            className="ds-explore-stage__tabs"
+            role="tablist"
+            aria-label="Map instruments"
+            onKeyDown={handleInstrumentsTabKeyDown}
+          >
+            <button
+              type="button"
+              role="tab"
+              id="explore-tab-filters"
+              className="ds-explore-stage__tab"
+              aria-selected={leftTab === 'filters'}
+              aria-controls="explore-tabpanel-filters"
+              tabIndex={leftTab === 'filters' ? 0 : -1}
+              onClick={() => handleSelectLeftTab('filters')}
+            >
+              Filters
+            </button>
+            <button
+              type="button"
+              role="tab"
+              id="explore-tab-key"
+              className="ds-explore-stage__tab"
+              aria-selected={leftTab === 'key'}
+              aria-controls="explore-tabpanel-key"
+              tabIndex={leftTab === 'key' ? 0 : -1}
+              onClick={() => handleSelectLeftTab('key')}
+            >
+              Color key
+            </button>
+          </div>
           <button
             type="button"
             className="ds-button ds-button--secondary ds-button--compact ds-explore-stage__panel-hide"
-            aria-label="Hide filters"
-            onClick={handleHideFilters}
+            aria-label={hideActiveAriaLabel}
+            onClick={hideActiveHandler}
           >
-            Hide filters
+            Hide
           </button>
         </div>
-        <div className="ds-explore__facets" role="group" aria-labelledby="explore-facets-heading">
-          {FACET_ROWS.map(({ key, label }) => (
-            <label className="ds-pill-select ds-explore__facet" key={key} htmlFor={`explore-${key}`}>
-              <span className="ds-pill-select__label">{label}</span>
-              <select
-                className="ds-pill-select__control"
-                id={`explore-${key}`}
-                value={view.viewState.filters[key]}
-                onChange={(event) => handleFilterChange(key, event.currentTarget.value)}
-              >
-                {view.facetOptions[key].map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ))}
-        </div>
 
-        <div className="ds-explore-stage__toolbar">
-          <LayerModelControl
-            layerMode={view.viewState.layerMode}
-            {...(view.viewState.popDecade ? { popDecade: view.viewState.popDecade } : {})}
-            {...(view.viewState.popFrom ? { popFrom: view.viewState.popFrom } : {})}
-            {...(view.viewState.popTo ? { popTo: view.viewState.popTo } : {})}
-            onLayerModeChange={handleLayerModeChange}
-            onPopDecadeChange={handlePopDecadeChange}
-            onPopFromChange={handlePopFromChange}
-            onPopToChange={handlePopToChange}
-          />
-          {isPopulationLayerMode(view.viewState.layerMode) && populationIndexLoaded && !populationIndex ? (
-            <p className="ds-sans ds-explore__settings-note">
-              County population data is not loaded yet — choropleth tiers stay neutral until the
-              static index is available.
-            </p>
-          ) : null}
-          <GroupingToggle enabled={view.viewState.group} onToggle={handleGroupToggle} />
-          <details className="ds-explore-stage__disclosure" open={view.viewState.lines}>
-            <summary className="ds-explore-stage__disclosure-summary">Map settings</summary>
-            <div className="ds-explore__settings-body">
-              <fieldset className="ds-explore__settings-fieldset">
-                <legend className="ds-sans">Relationship lines</legend>
-                <button
-                  type="button"
-                  className="ds-button"
-                  aria-pressed={view.viewState.lines}
-                  onClick={handleLinesToggle}
-                >
-                  Lines: {view.viewState.lines ? 'on' : 'off'}
-                </button>
-                <p className="ds-sans ds-explore__settings-note">
-                  Evidence-backed History connections only. Campus-shared endpoints show a short
-                  display stub.
+        <div
+          className="ds-explore-stage__tabpanel"
+          role="tabpanel"
+          id="explore-tabpanel-filters"
+          aria-labelledby="explore-tab-filters"
+          {...(leftTab === 'filters' ? {} : { hidden: true })}
+        >
+          <p className="ds-explore-stage__panel-title ds-visually-hidden" id="explore-facets-heading">
+            Filters
+          </p>
+          <ExploreAddressSearch onResolved={handleAddressResolved} />
+          {placeSearchFocus ? (
+            <div className="ds-explore-place-focus" role="status" aria-live="polite">
+              {placeSearchFocus.radiusMeters === null ? (
+                <p className="ds-sans ds-explore-place-focus__message">
+                  {placeOnlyStatusMessage(placeSearchFocus.placeLabel)}
                 </p>
-              </fieldset>
+              ) : placeSearchFocus.within.length > 0 ? (
+                <p className="ds-sans ds-explore-place-focus__message">
+                  {matchesRadiusStatusMessage({
+                    count: placeSearchFocus.within.length,
+                    placeLabel: placeSearchFocus.placeLabel,
+                    radiusLabel: placeSearchFocus.radiusLabel,
+                  })}
+                </p>
+              ) : (
+                <>
+                  <p className="ds-sans ds-explore-place-focus__message">
+                    {emptyRadiusStatusMessage({
+                      placeLabel: placeSearchFocus.placeLabel,
+                      radiusLabel: placeSearchFocus.radiusLabel,
+                    })}
+                  </p>
+                  {placeSearchFocus.closest.length > 0 ? (
+                    <ul className="ds-explore-place-focus__closest">
+                      {placeSearchFocus.closest.map((row) => (
+                        <li key={row.feature.properties.entityId}>
+                          <button
+                            type="button"
+                            className="ds-explore-place-focus__closest-btn"
+                            onClick={() => {
+                              handleSelect(row.feature.properties.entityId);
+                              setPlaceSearchFocus(null);
+                            }}
+                          >
+                            <span className="ds-explore-place-focus__closest-name">
+                              {row.feature.properties.displayName}
+                            </span>
+                            <span className="ds-mono ds-explore-place-focus__closest-dist">
+                              {formatExploreDistance(row.distanceMeters)}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </>
+              )}
+              <button
+                type="button"
+                className="ds-button ds-button--secondary ds-button--compact"
+                onClick={handleClearPlaceSearch}
+              >
+                Clear place
+              </button>
+            </div>
+          ) : null}
+          <div className="ds-explore__facets" role="group" aria-labelledby="explore-facets-heading">
+            {FACET_ROWS.map(({ key, label, field }) => (
+              <label className="ds-pill-select ds-explore__facet" key={key} htmlFor={`explore-${key}`}>
+                <MetaFieldLabel field={field} as="span" className="ds-pill-select__label">
+                  {label}
+                </MetaFieldLabel>
+                <select
+                  className="ds-pill-select__control"
+                  id={`explore-${key}`}
+                  value={view.viewState.filters[key]}
+                  onChange={(event) => handleFilterChange(key, event.currentTarget.value)}
+                >
+                  {view.facetOptions[key].map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+            {hasActiveFilters ? (
+              <button
+                type="button"
+                className="ds-button ds-button--secondary ds-button--compact ds-explore__clear-filters"
+                onClick={handleClearFilters}
+              >
+                Clear filters
+              </button>
+            ) : null}
+          </div>
 
-              {view.viewState.lines ? (
+          <div className="ds-explore-stage__toolbar">
+            <LayerModelControl
+              layerMode={view.viewState.layerMode}
+              {...(view.viewState.popDecade ? { popDecade: view.viewState.popDecade } : {})}
+              {...(view.viewState.popFrom ? { popFrom: view.viewState.popFrom } : {})}
+              {...(view.viewState.popTo ? { popTo: view.viewState.popTo } : {})}
+              onLayerModeChange={handleLayerModeChange}
+              onPopDecadeChange={handlePopDecadeChange}
+              onPopFromChange={handlePopFromChange}
+              onPopToChange={handlePopToChange}
+            />
+            {isPopulationLayerMode(view.viewState.layerMode) && populationIndexLoaded && !populationIndex ? (
+              <p className="ds-sans ds-explore__settings-note">
+                County population data is not loaded yet — choropleth tiers stay neutral until the
+                static index is available.
+              </p>
+            ) : null}
+            <GroupingToggle enabled={view.viewState.group} onToggle={handleGroupToggle} />
+            <details className="ds-explore-stage__disclosure" open={view.viewState.lines}>
+              <summary className="ds-explore-stage__disclosure-summary">Map settings</summary>
+              <div className="ds-explore__settings-body">
                 <fieldset className="ds-explore__settings-fieldset">
-                  <legend className="ds-sans">Decade</legend>
-                  <div className="ds-explore__decade-row" role="tablist" aria-label="Line decade">
-                    <button
-                      type="button"
-                      role="tab"
-                      className="ds-button"
-                      aria-selected={!view.viewState.decade}
-                      onClick={() => handleDecadeSelect(undefined)}
-                    >
-                      All time
-                    </button>
-                    {view.availableDecades.map((decade) => (
+                  <legend className="ds-sans">Relationship lines</legend>
+                  <button
+                    type="button"
+                    className="ds-button"
+                    aria-pressed={view.viewState.lines}
+                    onClick={handleLinesToggle}
+                  >
+                    Lines: {view.viewState.lines ? 'on' : 'off'}
+                  </button>
+                  <p className="ds-sans ds-explore__settings-note">
+                    Evidence-backed History connections only. Campus-shared endpoints show a short
+                    display stub.
+                  </p>
+                </fieldset>
+
+                {view.viewState.lines ? (
+                  <fieldset className="ds-explore__settings-fieldset">
+                    <legend className="ds-sans">Decade</legend>
+                    <div className="ds-explore__decade-row" role="tablist" aria-label="Line decade">
                       <button
-                        key={decade}
                         type="button"
                         role="tab"
                         className="ds-button"
-                        aria-selected={view.viewState.decade === decade}
-                        onClick={() => handleDecadeSelect(decade)}
+                        aria-selected={!view.viewState.decade}
+                        onClick={() => handleDecadeSelect(undefined)}
                       >
-                        {decade}
+                        All time
                       </button>
-                    ))}
-                  </div>
-                </fieldset>
-              ) : null}
+                      {view.availableDecades.map((decade) => (
+                        <button
+                          key={decade}
+                          type="button"
+                          role="tab"
+                          className="ds-button"
+                          aria-selected={view.viewState.decade === decade}
+                          onClick={() => handleDecadeSelect(decade)}
+                        >
+                          {decade}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+                ) : null}
 
-              <p className="ds-sans">
-                <Link href="/history">Open the full history graph</Link> for the decade narrative panel.
-              </p>
-            </div>
-          </details>
-          {view.viewState.state ? (
-            <button
-              type="button"
-              className="ds-button ds-button--secondary ds-button--compact"
-              onClick={handleClearState}
-            >
-              Clear state
-            </button>
-          ) : null}
-          {view.viewState.selected && selectedFeature ? (
-            <button
-              type="button"
-              className="ds-button ds-button--secondary ds-button--compact"
-              onClick={handleClearSelected}
-            >
-              Clear map focus
-            </button>
-          ) : null}
+                <p className="ds-sans">
+                  <Link href="/history">Open the full history graph</Link> for the decade narrative panel.
+                </p>
+              </div>
+            </details>
+            {view.viewState.state ? (
+              <button
+                type="button"
+                className="ds-button ds-button--secondary ds-button--compact"
+                onClick={handleClearState}
+              >
+                Clear state
+              </button>
+            ) : null}
+            {view.viewState.selected && selectedFeature ? (
+              <button
+                type="button"
+                className="ds-button ds-button--secondary ds-button--compact"
+                onClick={handleClearSelected}
+              >
+                Clear map focus
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        <div
+          className="ds-explore-stage__tabpanel"
+          role="tabpanel"
+          id="explore-tabpanel-key"
+          aria-labelledby="explore-tab-key"
+          {...(leftTab === 'key' ? {} : { hidden: true })}
+        >
+          <MapExperienceLegend layerMode={view.viewState.layerMode} embedded />
         </div>
       </div>
 
-      {!filtersVisible ? (
-        <button
-          type="button"
-          className="ds-button ds-button--secondary ds-explore-stage__panel-restore ds-explore-stage__panel-restore--filters"
-          aria-label="Show filters"
-          onClick={handleShowFilters}
-        >
-          Show filters
-        </button>
+      {!instrumentsVisible || !resultsVisible ? (
+        <div className="ds-explore-stage__restore-dock" aria-label="Show map panels">
+          {!instrumentsVisible ? (
+            <>
+              <button
+                type="button"
+                className="ds-button ds-button--secondary ds-explore-stage__panel-restore"
+                aria-label="Show filters"
+                onClick={handleShowFilters}
+              >
+                Filters
+              </button>
+              <button
+                type="button"
+                className="ds-button ds-button--secondary ds-explore-stage__panel-restore"
+                aria-label="Show key"
+                onClick={handleShowKey}
+              >
+                Color key
+              </button>
+            </>
+          ) : null}
+          {!resultsVisible ? (
+            <button
+              type="button"
+              className="ds-button ds-button--secondary ds-explore-stage__panel-restore ds-explore-stage__panel-restore--results"
+              aria-label="Show records"
+              onClick={handleShowResults}
+            >
+              Records
+            </button>
+          ) : null}
+        </div>
       ) : null}
 
       <div
@@ -887,14 +1281,29 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         <div className="ds-explore-stage__panel-header">
           {/* The count labels the list it sits above — oldest records first. */}
           <p className="ds-sans ds-explore__results-count" id="explore-results-heading">
-            {sortedListFeatures.length} documented record{sortedListFeatures.length === 1 ? '' : 's'}
-            {selectedStateName ? ` in ${selectedStateName}` : ' in view'}
+            {placeSearchFocus &&
+            placeSearchFocus.radiusMeters !== null &&
+            placeSearchFocus.within.length === 0
+              ? `No documented records within ${placeSearchFocus.radiusLabel} of ${placeSearchFocus.placeLabel}`
+              : placeSearchFocus && placeSearchFocus.radiusMeters !== null
+                ? `${sortedListFeatures.length} documented record${
+                    sortedListFeatures.length === 1 ? '' : 's'
+                  } within ${placeSearchFocus.radiusLabel} of ${placeSearchFocus.placeLabel}`
+                : `${sortedListFeatures.length} documented record${
+                    sortedListFeatures.length === 1 ? '' : 's'
+                  }${selectedStateName ? ` in ${selectedStateName}` : ' in view'}`}
             {view.viewState.lines
               ? ` · ${view.edgeLineCollection.features.length} connection${
                   view.edgeLineCollection.features.length === 1 ? '' : 's'
                 }`
               : ''}
-            {' · oldest first'}
+            {!(
+              placeSearchFocus &&
+              placeSearchFocus.radiusMeters !== null &&
+              placeSearchFocus.within.length === 0
+            )
+              ? ' · oldest first'
+              : ''}
           </p>
           <button
             type="button"
@@ -907,17 +1316,6 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         </div>
         <SynchronizedResultList {...listProps} />
       </div>
-
-      {!resultsVisible ? (
-        <button
-          type="button"
-          className="ds-button ds-button--secondary ds-explore-stage__panel-restore ds-explore-stage__panel-restore--results"
-          aria-label="Show records"
-          onClick={handleShowResults}
-        >
-          Show records
-        </button>
-      ) : null}
 
       {spotlightOpen ? (
         <div className="ds-explore-stage__spotlight" ref={spotlightRef}>
@@ -940,27 +1338,6 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
             ) : null}
           </div>
         </div>
-      ) : null}
-
-      <div
-        className={exploreLegendPanelClassName({ visible: keyVisible })}
-        {...(keyVisible ? {} : { hidden: true })}
-      >
-        <MapExperienceLegend
-          layerMode={view.viewState.layerMode}
-          onHide={handleHideKey}
-        />
-      </div>
-
-      {!keyVisible ? (
-        <button
-          type="button"
-          className="ds-button ds-button--secondary ds-explore-stage__panel-restore ds-explore-stage__panel-restore--key"
-          aria-label="Show key"
-          onClick={handleShowKey}
-        >
-          Show key
-        </button>
       ) : null}
     </div>
   );

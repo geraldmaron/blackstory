@@ -76,6 +76,12 @@ if [[ -s "${HOME}/.nvm/nvm.sh" ]]; then
   nvm use 22 >/dev/null 2>&1 || nvm use default >/dev/null 2>&1 || true
 fi
 
+# Same reason: uv (for the Trafilatura extraction bridge, lib/trafilatura.ts)
+# installs to ~/.local/bin, which a systemd unit's PATH won't include.
+if [[ -d "${HOME}/.local/bin" ]]; then
+  export PATH="${HOME}/.local/bin:${PATH}"
+fi
+
 # Optional machine env (OpenRouter key, pepper, Firebase). Never commit this file.
 ENV_FILE="${ENRICHMENT_ENV_FILE:-${HOME}/.config/blackstory/enrichment.env}"
 if [[ -f "${ENV_FILE}" ]]; then
@@ -95,7 +101,11 @@ if [[ -z "${OLLAMA_BASE_URL:-}" ]]; then
 fi
 
 export EDITORIAL_LLM_PROVIDER="${EDITORIAL_LLM_PROVIDER:-hybrid}"
-export OPENROUTER_MODEL="${OPENROUTER_MODEL:-openrouter/free}"
+# Free-model rotation roster: on 429/5xx/empty the provider advances to the next
+# model instead of retrying one rate-limited router. Set OPENROUTER_MODEL to pin
+# a single model instead (an explicit pin wins over the roster).
+export OPENROUTER_MODELS="${OPENROUTER_MODELS:-tencent/hy3:free,nvidia/nemotron-3-super-120b-a12b:free,nvidia/nemotron-3-nano-30b-a3b:free,google/gemma-4-31b-it:free,openai/gpt-oss-20b:free}"
+export OPENROUTER_MODEL="${OPENROUTER_MODEL:-}"
 export OLLAMA_MODEL="${OLLAMA_MODEL:-qwen3:8b}"
 
 # Discovery kill switch + storage terms for SearXNG child script.
@@ -222,26 +232,15 @@ if [[ -z "${LATEST_CANDIDATES}" ]]; then
   exit 3
 fi
 
-python3 - "${LATEST_CANDIDATES}" "${SUBJECTS_FILE}" "${ENRICH_MAX_SUBJECTS}" <<'PY'
-import json, sys
-src, dest, max_n = sys.argv[1], sys.argv[2], int(sys.argv[3])
-data = json.load(open(src))
-cands = data.get("candidates") or []
-subjects = []
-for c in cands[:max_n]:
-    subjects.append({
-        "subjectId": c["id"],
-        "title": c.get("displayName") or c["id"],
-        "kind": c.get("kind"),
-        "existingSummary": (c.get("summary") or "")[:400] or None,
-        "sourceSnippets": [s for s in [c.get("summary"), c.get("canonicalUrl")] if s],
-    })
-clean = []
-for s in subjects:
-    clean.append({k: v for k, v in s.items() if v is not None})
-json.dump({"subjects": clean, "source": src, "count": len(clean)}, open(dest, "w"), indent=2)
-print(f"Wrote {len(clean)} subjects → {dest}", file=sys.stderr)
-PY
+# Fetches each candidate's canonicalUrl into real page text instead of handing
+# the judge a bare unfetched link — a stub summary + an unread URL is why the
+# discovery lane's keep rate was low; see build-discovery-enrichment-subjects.ts.
+node --conditions development --import tsx \
+  "${ROOT}/packages/firebase/scripts/build-discovery-enrichment-subjects.ts" \
+  --candidates "${LATEST_CANDIDATES}" \
+  --out "${SUBJECTS_FILE}" \
+  --max "${ENRICH_MAX_SUBJECTS}" \
+  --concurrency "${DISCOVERY_CONCURRENCY}"
 
 echo "Phase 3: enrichment-run provider=${EDITORIAL_LLM_PROVIDER} concurrency=${ENRICH_CONCURRENCY} commit=${COMMIT_ENRICHMENT}" >&2
 

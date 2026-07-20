@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" fill="none">
   <!-- Flat horizontal page-band motif for dark shell page fields; Page Sand decorative fills -->
-  <rect x="0" y="12" width="192" height="8" fill="#D8A178" opacity="0.14"/>
-  <rect x="0" y="52" width="192" height="6" fill="#D07A32" opacity="0.12"/>
-  <rect x="0" y="96" width="192" height="10" fill="#D8A178" opacity="0.1"/>
-  <rect x="0" y="140" width="192" height="5" fill="#B86B2A" opacity="0.1"/>
-  <rect x="0" y="176" width="192" height="8" fill="#D8A178" opacity="0.12"/>
+  <rect x="0" y="12" width="192" height="8" fill="#D8A178" opacity="0.08"/>
+  <rect x="0" y="52" width="192" height="6" fill="#D07A32" opacity="0.07"/>
+  <rect x="0" y="96" width="192" height="10" fill="#D8A178" opacity="0.06"/>
+  <rect x="0" y="140" width="192" height="5" fill="#B86B2A" opacity="0.06"/>
+  <rect x="0" y="176" width="192" height="8" fill="#D8A178" opacity="0.07"/>
 </svg>

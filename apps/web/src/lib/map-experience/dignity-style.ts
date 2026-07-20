@@ -90,6 +90,17 @@ export const DENSITY_TIER_FILL: Readonly<Record<'documented' | 'emerging' | 'con
   concentrated: DIGNITY_PALETTE.densityHigh,
 };
 
+/** Presence fill for one state polygon — tier match with plate-aware unknown fallback. */
+export function resolveDensityFillColor(
+  tier: string,
+  plate: ReturnType<typeof plateForScheme>,
+): string {
+  if (tier === 'concentrated') return DENSITY_TIER_FILL.concentrated;
+  if (tier === 'emerging') return DENSITY_TIER_FILL.emerging;
+  if (tier === 'documented') return DENSITY_TIER_FILL.documented;
+  return plate.densityUnknown;
+}
+
 /** Black share of county population — copper/sand opacity scale (never alarm red). */
 export const POPULATION_SHARE_TIER_FILL: Readonly<
   Record<'trace' | 'low' | 'mid' | 'high' | 'majority', string>

@@ -81,7 +81,67 @@
 }
 
 .ds-entity-aside__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
   margin: 0;
+}
+
+.ds-entity-aside__cta .ds-cta {
+  text-decoration: none;
+}
+
+.ds-entity-location-map {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+}
+
+.ds-entity-location-map__frame {
+  position: relative;
+  width: 100%;
+  min-height: 14rem;
+  height: 14rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  /* Pre-style-load flash — matches MapStage ocean plate per theme. */
+  background: #080606;
+  overflow: hidden;
+}
+
+[data-theme='light'] .ds-entity-location-map__frame {
+  background: #ffffff;
+}
+
+.ds-entity-location-map__frame[data-load-state='loading']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--ds-canvas) 8%, transparent);
+  pointer-events: none;
+}
+
+.ds-entity-location-map__frame .maplibregl-map,
+.ds-entity-location-map__frame .maplibregl-canvas-container,
+.ds-entity-location-map__frame .maplibregl-canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.ds-entity-location-map__frame .maplibregl-ctrl-attrib {
+  font-size: 0.625rem;
+  background: color-mix(in srgb, var(--ds-canvas) 88%, transparent);
+}
+
+.ds-entity-location-map__caption,
+.ds-entity-location-map__fallback {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-size: 0.8125rem;
+}
+
+.ds-entity-location-map__fallback {
+  color: var(--ds-ink);
 }
 
 .ds-entity-aside__precision {
@@ -126,6 +186,77 @@
 
 .ds-why-appears__block .ds-subheading {
   margin: 0 0 var(--ds-space-3);
+}
+
+/* Compact inclusion basis: criterion once, prose notes, deduped sources — not the heavy editorial qualify-list. */
+.ds-why-appears__basis {
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.ds-why-appears__basis-group {
+  padding: var(--ds-space-3) 0 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-why-appears__basis-group:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.ds-why-appears__criterion {
+  margin: 0 0 var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-why-appears__notes {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-why-appears__notes li {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--ds-ink);
+}
+
+.ds-why-appears__citations {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin: var(--ds-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-why-appears__citations li {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
+}
+
+.ds-why-appears__citations a {
+  color: var(--ds-copper-text);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.ds-why-appears__citations .ds-mono {
+  font-size: 0.75rem;
+}
+
+.ds-why-appears__cite-gap {
+  margin: var(--ds-space-2) 0 0;
+  font-size: 0.8125rem;
+  color: var(--ds-ink-muted);
 }
 
 .ds-evidence-legend {

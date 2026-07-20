@@ -1,6 +1,6 @@
 /**
- * Temporal history graph browse page: all-time union view plus decade stepper over
- * published graph release artifacts, relationship graph visualization, synchronized
+ * Temporal history browse page: all-time union view plus decade stepper over
+ * published graph release artifacts, composition/connection data panel, synchronized
  * accessible list peer, and shareable URL state. SSR-first from the bundled snapshot;
  * filters use native GET navigation (no-JS safe).
  */
@@ -31,7 +31,7 @@ function formatFacetOptionLabel(option: HistoryFacetOption): string {
 export const metadata = {
   title: 'History',
   description:
-    'Browse documented Black history by decade — relationship graph, connection filters, and synchronized record list from published release artifacts.',
+    'Browse documented Black history by decade — kind composition, evidence-backed connections, and a synchronized record list from published release artifacts.',
 };
 
 type HistoryPageProps = {
@@ -51,8 +51,8 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
           Decade by <em>decade</em>.
         </h1>
         <p className="ds-page__lede">
-          Step through published release artifacts decade by decade — a relationship graph of
-          documented records and their connections, with filters and a synchronized list peer.
+          Step through published release artifacts decade by decade — kind composition,
+          documented connections, and archive framings alongside a synchronized list peer.
           Status and presence reflect what was active in each era, never present-day status
           backfilled.
         </p>

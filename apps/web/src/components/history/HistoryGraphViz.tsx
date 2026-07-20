@@ -2,6 +2,9 @@
  * Adaptive SVG relationship visualization for `/history`. Paints with the shared map
  * kind shade + glyph vocabulary (`kind-encoding`), switches between kind aggregation,
  * ego-neighborhood, and sparse record graphs by data volume, and never relies on color alone.
+ *
+ * Aggregate mode uses a ranked kind board (equal-size hubs, labels under each cell) so
+ * catalog-scale views stay readable — volume is count text, not colliding radii.
  */
 import React, { useMemo } from 'react';
 import { cx } from '@repo/ui';
@@ -15,7 +18,7 @@ import { kindEncodingFor, type MapEntityGlyph } from '../../lib/map-experience/k
 void React;
 
 const GRAPH_WIDTH = 640;
-const GRAPH_HEIGHT = 360;
+const GRAPH_HEIGHT = 400;
 
 const KIND_GLYPH_CLASS: Readonly<Record<MapEntityGlyph, string>> = {
   circle: 'ds-legend-glyph--circle',
@@ -59,6 +62,10 @@ function shouldShowLabel(
 function truncateLabel(label: string, max = 22): string {
   if (label.length <= max) return label;
   return `${label.slice(0, max - 1)}…`;
+}
+
+function estimateLabelWidth(text: string): number {
+  return Math.min(120, Math.max(48, text.length * 6.2));
 }
 
 function renderNodeShape(node: LayoutHistoryGraphNode, selected: boolean): React.ReactNode {
@@ -117,6 +124,20 @@ function renderNodeShape(node: LayoutHistoryGraphNode, selected: boolean): React
   }
 }
 
+function aggregateEdgePath(
+  from: LayoutHistoryGraphNode,
+  to: LayoutHistoryGraphNode,
+): string {
+  const midX = (from.x + to.x) / 2;
+  const midY = (from.y + to.y) / 2;
+  // Soft bow toward the board center so grid links stay distinct from label bands.
+  const centerX = GRAPH_WIDTH / 2;
+  const centerY = GRAPH_HEIGHT / 2;
+  const controlX = midX + (centerX - midX) * 0.18;
+  const controlY = midY + (centerY - midY) * 0.18;
+  return `M ${from.x} ${from.y} Q ${controlX} ${controlY} ${to.x} ${to.y}`;
+}
+
 export function HistoryGraphViz({
   nodes,
   edges,
@@ -159,12 +180,13 @@ export function HistoryGraphViz({
   }, [layout.layoutNodes]);
 
   const showLabelsForCount = layout.layoutNodes.length;
+  const isAggregate = layout.mode === 'aggregate';
 
   return (
     <div className={cx('ds-history-graph-viz', className)} data-mode={layout.mode}>
       <p className="ds-mono ds-history-graph-viz__mode" role="status">
         {layout.modeNotice}
-        {layout.mode === 'aggregate'
+        {isAggregate
           ? ` · ${layout.totalNodeCount} records across ${layout.layoutNodes.length} kinds`
           : null}
       </p>
@@ -176,8 +198,8 @@ export function HistoryGraphViz({
         height="auto"
         role="img"
         aria-label={
-          layout.mode === 'aggregate'
-            ? 'Kind relationship overview for records in view'
+          isAggregate
+            ? 'Kind relationship board for records in view'
             : 'History records and their evidence-backed connections'
         }
       >
@@ -187,7 +209,25 @@ export function HistoryGraphViz({
             const to = positionById.get(edge.toId);
             if (!from || !to) return null;
             const isSelected = Boolean(edge.edgeId && selectedEdgeId === edge.edgeId);
-            const strokeWidth = Math.min(1.25 + edge.weight * 0.35, 4);
+            const strokeWidth = isAggregate
+              ? Math.min(1 + edge.weight * 0.12, 2.5)
+              : Math.min(1.25 + edge.weight * 0.35, 4);
+
+            if (isAggregate) {
+              return (
+                <path
+                  key={edge.id}
+                  className={cx(
+                    'ds-history-graph-viz__edge-line',
+                    'ds-history-graph-viz__edge-line--aggregate',
+                    isSelected && 'ds-history-graph-viz__edge-line--selected',
+                  )}
+                  d={aggregateEdgePath(from, to)}
+                  fill="none"
+                  strokeWidth={strokeWidth}
+                />
+              );
+            }
 
             return (
               <g key={edge.id} className="ds-history-graph-viz__edge">
@@ -229,15 +269,15 @@ export function HistoryGraphViz({
 
         <g className="ds-history-graph-viz__nodes">
           {layout.layoutNodes.map((node) => {
-            const isSelected =
-              node.role === 'record'
-                ? node.entityId === selectedId
-                : false;
+            const isSelected = node.role === 'record' ? node.entityId === selectedId : false;
             const showLabel = shouldShowLabel(node, layout.mode, selectedId, showLabelsForCount);
-            const label =
-              node.role === 'kind-hub'
-                ? `${node.label} (${node.recordCount ?? 0})`
-                : truncateLabel(node.label);
+            const kindLabel = node.label;
+            const countLabel =
+              node.role === 'kind-hub' ? String(node.recordCount ?? 0) : undefined;
+            const recordLabel = node.role === 'record' ? truncateLabel(node.label) : undefined;
+            const plateWidth = estimateLabelWidth(
+              node.role === 'kind-hub' ? `${kindLabel} ${countLabel}` : (recordLabel ?? kindLabel),
+            );
 
             return (
               <g
@@ -285,14 +325,40 @@ export function HistoryGraphViz({
                     }}
                   />
                 ) : null}
-                {showLabel ? (
+                {showLabel && node.role === 'kind-hub' ? (
+                  <g className="ds-history-graph-viz__node-label-group" aria-hidden="true">
+                    <rect
+                      className="ds-history-graph-viz__label-plate"
+                      x={-plateWidth / 2}
+                      y={node.r + 4}
+                      width={plateWidth}
+                      height={28}
+                      rx={4}
+                    />
+                    <text
+                      className="ds-history-graph-viz__node-label"
+                      y={node.r + 16}
+                      textAnchor="middle"
+                    >
+                      {kindLabel}
+                    </text>
+                    <text
+                      className="ds-history-graph-viz__node-label-count"
+                      y={node.r + 28}
+                      textAnchor="middle"
+                    >
+                      {countLabel}
+                    </text>
+                  </g>
+                ) : null}
+                {showLabel && node.role === 'record' ? (
                   <text
                     className="ds-history-graph-viz__node-label"
                     y={node.r + 14}
                     textAnchor="middle"
                     aria-hidden="true"
                   >
-                    {label}
+                    {recordLabel}
                   </text>
                 ) : null}
               </g>

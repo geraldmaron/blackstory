@@ -16,12 +16,14 @@ import {
   entityEvidenceHref,
   eraFactLink,
   exploreHrefForKind,
-  exploreHrefForState,
   searchHrefForStatus,
 } from '../../lib/map-experience/metadata-hrefs';
+import { exploreWhereMapsLink } from '../../lib/map-experience/explore-where-maps-link';
 import { ConfidenceMark } from './ConfidenceMark';
 import { StatusMark } from './StatusMark';
 import { KindBadge } from './KindBadge';
+import { MetaFieldLabel } from './MetaFieldLabel';
+import { MapsExternalLink } from './MapsExternalLink';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;
@@ -43,7 +45,7 @@ function ResultRowMeta({ feature }: ResultRowMetaProps) {
   const { properties } = feature;
   const kindEncoding = displayEncodingFor(properties.kind, properties.mapTone);
   const era = eraFactLink(properties.eraBuckets);
-  const statePostalCode = properties.statePostalCode?.trim().toUpperCase();
+  const whereMaps = exploreWhereMapsLink(feature);
   const statusHref =
     properties.status !== undefined ? searchHrefForStatus(properties.status) : undefined;
   const evidenceLabel = `${properties.evidenceCount} accepted claim${properties.evidenceCount === 1 ? '' : 's'}`;
@@ -51,12 +53,13 @@ function ResultRowMeta({ feature }: ResultRowMetaProps) {
   return (
     <dl className="ds-result-list__meta ds-result-list__meta--labeled">
       <div className="ds-result-meta">
-        <dt>Kind</dt>
+        <MetaFieldLabel field="kind">Kind</MetaFieldLabel>
         <dd>
           <Link
             className="ds-result-meta__link ds-result-meta__link--kind"
             href={exploreHrefForKind(properties.kind)}
             aria-label={`Browse ${kindEncoding.label} records`}
+            title={`Kind: ${kindEncoding.label}. What kind of record this is.`}
           >
             <KindBadge
               kind={properties.kind}
@@ -67,50 +70,53 @@ function ResultRowMeta({ feature }: ResultRowMetaProps) {
         </dd>
       </div>
       <div className="ds-result-meta">
-        <dt>Era</dt>
+        <MetaFieldLabel field="era">Era</MetaFieldLabel>
         <dd className="ds-mono">
           {era.href ? (
             <Link
               className="ds-result-meta__link"
               href={era.href}
               aria-label={`Browse records from the ${era.label}`}
+              title={`Era: ${era.label}. The time period most associated with this record.`}
             >
               {era.label}
             </Link>
           ) : (
-            era.label
+            <span title={`Era: ${era.label}`}>{era.label}</span>
           )}
         </dd>
       </div>
       <div className="ds-result-meta">
-        <dt>Confidence</dt>
+        <MetaFieldLabel field="confidence">Confidence</MetaFieldLabel>
         <dd>
           <ConfidenceMark tier={properties.confidenceTier} labeled className="ds-sans" />
         </dd>
       </div>
       <div className="ds-result-meta">
-        <dt>Evidence</dt>
+        <MetaFieldLabel field="evidence">Evidence</MetaFieldLabel>
         <dd className="ds-sans">
           <Link
             className="ds-result-meta__link"
             href={entityEvidenceHref(properties.href)}
             aria-label={`View ${evidenceLabel} on full record`}
+            title={`${evidenceLabel}. How many accepted, cited claims sit on the full record.`}
           >
             {evidenceLabel}
           </Link>
         </dd>
       </div>
       <div className="ds-result-meta">
-        <dt>Where</dt>
+        <MetaFieldLabel field="where">Where</MetaFieldLabel>
         <dd className="ds-mono">
-          {statePostalCode ? (
-            <Link
+          {whereMaps ? (
+            <MapsExternalLink
               className="ds-result-meta__link"
-              href={exploreHrefForState(statePostalCode)}
-              aria-label={`View records in ${statePostalCode}`}
+              href={whereMaps.href}
+              placeLabel={whereMaps.placeLabel}
+              title={`Where: ${whereMaps.label}. Open in your maps app.`}
             >
-              {statePostalCode}
-            </Link>
+              {whereMaps.label}
+            </MapsExternalLink>
           ) : (
             '—'
           )}
@@ -118,7 +124,7 @@ function ResultRowMeta({ feature }: ResultRowMetaProps) {
       </div>
       {properties.status !== undefined ? (
         <div className="ds-result-meta">
-          <dt>Status</dt>
+          <MetaFieldLabel field="status">Status</MetaFieldLabel>
           <dd>
             {statusHref ? (
               <Link

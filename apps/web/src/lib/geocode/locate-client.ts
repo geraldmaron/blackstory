@@ -101,12 +101,23 @@ async function callLocateApi(
   return { kind: 'fallback', fallback: failure.fallback };
 }
 
+export type FetchLocateByAddressOptions = {
+  /**
+   * When true, asks `/locate/api` for lat/lng suitable for an explore camera fly-to
+   * (`camera=1`). Ordinary jurisdiction lookup leaves this unset.
+   */
+  readonly forCamera?: boolean;
+};
+
 /** Forward geocode: free-text address, city/state, or ZIP.  */
 export function fetchLocateByAddress(
   address: string,
   appCheckHeaders: Readonly<Record<string, string>> = {},
+  options: FetchLocateByAddressOptions = {},
 ): Promise<LocateClientResult> {
-  return callLocateApi(new URLSearchParams({ address }), appCheckHeaders);
+  const params = new URLSearchParams({ address });
+  if (options.forCamera) params.set('camera', '1');
+  return callLocateApi(params, appCheckHeaders);
 }
 
 /** Reverse geocode: browser-supplied coordinates (only ever called after explicit user consent).  */
