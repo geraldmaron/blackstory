@@ -15,9 +15,12 @@
  *    tests and legitimately usable as the ADR-004 degraded/immutable-snapshot source (it reads a
  *    fixed set of already-released, already-redacted public projections held in memory).
  * 2. `createFirestorePublicDataAccess` — binds the port to injected `@repo/firebase` public
- *    projection readers + a projection→DTO mapper. The mapper (projection document → `EntityV1`)
- *    is the seam that lands with live release wiring (MOB-005); it is injected, not invented here,
- *    so this module never imports a server-only Firestore shape it would have to redact.
+ *    projection readers + a projection→DTO mapper. The readers are injected, not invented here, so
+ *    this module never imports a server-only Firestore shape it would have to redact; the concrete
+ *    live binding (real `@repo/firebase` reads + the projection→`EntityV1` mapper) lives in
+ *    `./firestore-data-access.ts` and is selected at runtime by `./compose.ts` per
+ *    `./live-policy.ts`'s live/fixture gate (MOB-004 live wiring landed; see that file's header for
+ *    what remains a documented gap — e.g. `related` hydration and index-backed search).
  *
  * All entity data returned by any adapter is validated against the shared `entityV1Schema` before
  * it leaves this module, so the response-redaction guarantee (no internal/ranking/precise-geo
@@ -77,7 +80,14 @@ export const EMPTY_FACETS: SearchFacetCountsV1 = {
 // ---------------------------------------------------------------------------
 
 export type InMemoryPublicDataOptions = {
-  readonly pointer: ReleasePointer;
+  /**
+   * Omit when no active release is configured — `getReleasePointer` then honestly reports
+   * `undefined` (ADR-004 pre-release bootstrap) instead of fabricating one. This is the default
+   * fallback `./compose.ts` uses when the runtime environment does not satisfy the live-Firestore
+   * gate (`./live-policy.ts`): an unconfigured deployment returns `UPSTREAM_UNAVAILABLE` rather
+   * than silently serving stale/fake sample data as if it were a real release.
+   */
+  readonly pointer?: ReleasePointer;
   /** The published, already-redacted public projections for the active release. */
   readonly entities: readonly EntityV1[];
   /**
@@ -106,26 +116,42 @@ export function createInMemoryPublicDataAccess(options: InMemoryPublicDataOption
     },
 
     async search(canonical) {
-      const needle = canonical.q.trim().toLowerCase();
-      const matches = [...byId.values()].filter((entity) => {
-        if (needle.length === 0) return true;
-        return (
-          entity.displayName.toLowerCase().includes(needle) ||
-          entity.summary.toLowerCase().includes(needle)
-        );
-      });
-
-      const offset = (canonical.depth - 1) * canonical.pageSize;
-      const pageEntities = matches.slice(offset, offset + canonical.pageSize);
-      const results: SearchResultV1[] = pageEntities.map((entity) => toSearchResult(entity, needle));
-
-      return {
-        results,
-        facets: EMPTY_FACETS,
-        totalMatched: matches.length,
-        hasMore: offset + canonical.pageSize < matches.length,
-      };
+      return searchOverEntities([...byId.values()], canonical);
     },
+  };
+}
+
+/**
+ * Pure substring match + cursor-offset pagination over an already-loaded entity array. Shared by
+ * `createInMemoryPublicDataAccess` and the live Firestore reader (`./firestore-data-access.ts`) so
+ * both adapters rank/paginate identically — this is a known, documented gap, not a hidden one:
+ * neither adapter applies `canonical.filters`/`geo`/`dateRange` yet (no facet-backed index exists
+ * behind this port today); only the free-text `q` substring match runs. Bounding every query by a
+ * real search INDEX (rather than scanning a loaded entity array) is tracked in repo-rw1p's
+ * load/cost-report follow-up, not solved here.
+ */
+export function searchOverEntities(
+  entities: readonly EntityV1[],
+  canonical: CanonicalSearchQuery,
+): SearchPage {
+  const needle = canonical.q.trim().toLowerCase();
+  const matches = entities.filter((entity) => {
+    if (needle.length === 0) return true;
+    return (
+      entity.displayName.toLowerCase().includes(needle) ||
+      entity.summary.toLowerCase().includes(needle)
+    );
+  });
+
+  const offset = (canonical.depth - 1) * canonical.pageSize;
+  const pageEntities = matches.slice(offset, offset + canonical.pageSize);
+  const results: SearchResultV1[] = pageEntities.map((entity) => toSearchResult(entity, needle));
+
+  return {
+    results,
+    facets: EMPTY_FACETS,
+    totalMatched: matches.length,
+    hasMore: offset + canonical.pageSize < matches.length,
   };
 }
 
@@ -150,7 +176,7 @@ function toSearchResult(entity: EntityV1, needle: string): SearchResultV1 {
 }
 
 // ---------------------------------------------------------------------------
-// Firestore adapter (binding seam — live wiring/emulator integration deferred)
+// Firestore adapter (live wiring via `./firestore-data-access.ts` + `./compose.ts`)
 // ---------------------------------------------------------------------------
 
 /**
@@ -159,8 +185,8 @@ function toSearchResult(entity: EntityV1, needle: string): SearchResultV1 {
  * — see `apps/web/src/lib/public-data/firestore-readers.ts` for the same access pattern) composed
  * with the domain projection→`EntityV1` mapper. They are injected rather than imported here so this
  * app module never depends on a raw Firestore document shape, and so the port stays unit-testable
- * with fakes. Binding these to the real readers + running them against the Firebase emulator is the
- * DEFERRED integration lane (no emulator credentials in this sandbox).
+ * with fakes (`./firestore-data-access.test.ts`). Firebase-emulator integration tests remain a
+ * repo-rw1p follow-up; live production wiring is selected at runtime by `./live-policy.ts`.
  */
 export type FirestoreDataAccessReaders = {
   readonly readReleasePointer: () => Promise<ReleasePointer | undefined>;

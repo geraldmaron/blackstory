@@ -6,8 +6,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "start": "node dist/index.js",
-    "test": "node --conditions development --import tsx --test src/index.test.ts src/rate-limits.test.ts src/search-guardrails.test.ts src/vector-search-guardrails.test.ts src/vector-search-kill-switch.test.ts src/vector-search-endpoint.test.ts src/http/handlers.test.ts src/http/redaction.test.ts src/http/server.test.ts",
+    "start": "node dist/main.js",
+    "dev": "node --conditions development --import tsx src/main.ts",
+    "test": "node --conditions development --import tsx --test src/index.test.ts src/rate-limits.test.ts src/search-guardrails.test.ts src/vector-search-guardrails.test.ts src/vector-search-kill-switch.test.ts src/vector-search-endpoint.test.ts src/http/handlers.test.ts src/http/redaction.test.ts src/http/server.test.ts src/http/live-policy.test.ts src/http/app-check-availability.test.ts src/http/firestore-data-access.test.ts src/http/compose.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

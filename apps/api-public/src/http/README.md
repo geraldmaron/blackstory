@@ -75,22 +75,76 @@ to App Check and is a UX affordance for honest clients, not a security control (
 resolution #2): a valid attestation on a below-floor client still gets `426`, and a spoofed version
 gains nothing because every parameter is re-validated server-side and there is no write path.
 
-## Data access & what is DEFERRED
+## Data access
 
 Handlers depend on the `PublicDataAccess` port (`data-access.ts`). Two adapters ship:
 
 - `createInMemoryPublicDataAccess` — real, fully tested; also usable as the ADR-004
-  degraded/immutable-snapshot source.
+  degraded/immutable-snapshot source. Used when `./live-policy.ts`'s gate is false (emulators,
+  missing break-glass, explicit `PUBLIC_DATA_SOURCE=fixtures|seed`, or `PUBLIC_READ_API_DISABLED`).
 - `createFirestorePublicDataAccess` — binds the port to injected `@repo/firebase` public-projection
   readers + the domain projection→`EntityV1` mapper (same access pattern as
-  `apps/web/src/lib/public-data/firestore-readers.ts`).
+  `apps/web/src/lib/public-data/firestore-readers.ts`). Selected at boot by
+  `createProductionHandlerDeps` (`./compose.ts`) when the live gate is true.
 
-**Deferred (honestly, not stubbed green):** wiring `createFirestorePublicDataAccess` to the live
-`@repo/firebase` readers and running the Firebase-emulator integration tests the bead lists. This
-sandbox has no emulator credentials, so the live binding + emulator lane is left as a documented
-seam (owned alongside MOB-005 live-release wiring). Everything else — routing, guards, redaction,
-pagination, ETag/caching, compatibility, error envelopes, and the adversarial cases below — is real
-and exercised by `node --test`.
+**Live wiring gaps (honest, tracked in repo-rw1p):** claims/timeline hydration (projection carries
+`claimIds` only), index-backed search/facet filters (live search scans up to
+`MAX_LIVE_SEARCH_SCAN` entities), Firebase-emulator integration tests, timing-attack tests,
+load/read-budget tests, and SSRF-via-media-URL tests.
+
+## Local run against live Firebase (production project)
+
+Same convention as `apps/web` / `apps/admin`: Application Default Credentials (ADC), an explicit
+production break-glass flag, and optional `run-with-dev-secrets` for any `op://` references in
+`~/.env.1password` (never commit secrets; never print resolved values).
+
+**Prerequisites**
+
+1. `gcloud auth application-default login` (user ADC — no service-account JSON in the repo).
+2. Quota project for Google APIs App Check / Identity Toolkit calls over ADC:
+   `gcloud auth application-default set-quota-project black-book-efaaf`, or set
+   `GOOGLE_CLOUD_QUOTA_PROJECT=black-book-efaaf` in the environment.
+3. Production break-glass: `BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1` (required for local
+   `NODE_ENV=development`; Cloud Run production omits this).
+
+**Start the server**
+
+```bash
+cd apps/api-public
+
+# Inject any 1Password-backed env refs (GOOGLE_APPLICATION_CREDENTIALS op://, etc.) without
+# writing secrets to disk. Confirm injection with `env | rg '^[A-Z_]+='` — never echo key values.
+run-with-dev-secrets -- env \
+  BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 \
+  FIREBASE_PROJECT_ID=black-book-efaaf \
+  GOOGLE_CLOUD_QUOTA_PROJECT=black-book-efaaf \
+  APP_CHECK_MODE=monitor \
+  pnpm dev
+```
+
+Smoke (no App Check token required for bootstrap/entity in monitor mode):
+
+```bash
+curl -sS 'http://127.0.0.1:8080/v1/health' | jq .
+curl -sS 'http://127.0.0.1:8080/v1/bootstrap' | jq .
+```
+
+**Environment reference**
+
+| Variable | Role |
+|----------|------|
+| `BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1` | Break-glass for local reads against `black-book-efaaf` |
+| `FIREBASE_PROJECT_ID` / `GOOGLE_CLOUD_PROJECT` | Must resolve to `black-book-efaaf` unless `PUBLIC_DATA_SOURCE=firestore` |
+| `GOOGLE_CLOUD_QUOTA_PROJECT` | ADC quota project for App Check verifier API calls |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Optional; ADC is preferred. If set via `op://`, use `run-with-dev-secrets` |
+| `PUBLIC_READ_API_DISABLED=1` | Kill-switch — forces empty in-memory adapter |
+| `PUBLIC_DATA_SOURCE=fixtures\|seed` | Force in-memory adapter |
+| `APP_CHECK_MODE` | `monitor` (default) or `enforce` — see `app-check.ts` |
+| `APP_CHECK_OUTAGE_OVERRIDE=outage` | Operator systemic signal for repo-uqmm degraded search quota (never per-request) |
+
+Gate logic lives in `./live-policy.ts` (mirrors `apps/web/src/lib/public-data/live-policy.ts`).
+Auto-detecting App Check verifier failures as an outage signal is tracked separately as repo-vdnm
+(`@repo/firebase` scope); this app wires the operator flag half via `./app-check-availability.ts`.
 
 ## Adversarial coverage (see `*.test.ts`)
 
