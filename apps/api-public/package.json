@@ -8,7 +8,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "start": "node dist/main.js",
     "dev": "node --conditions development --import tsx src/main.ts",
-    "test": "node --conditions development --import tsx --test src/index.test.ts src/rate-limits.test.ts src/search-guardrails.test.ts src/vector-search-guardrails.test.ts src/vector-search-kill-switch.test.ts src/vector-search-endpoint.test.ts src/http/handlers.test.ts src/http/redaction.test.ts src/http/ssrf-url-safety.test.ts src/http/enumeration-indistinguishability.test.ts src/http/bootstrap-compat-drift.test.ts src/http/server.test.ts src/http/live-policy.test.ts src/http/app-check-availability.test.ts src/http/firestore-data-access.test.ts src/http/compose.test.ts",
+    "test": "node --conditions development --import tsx --test src/index.test.ts src/rate-limits.test.ts src/search-guardrails.test.ts src/vector-search-guardrails.test.ts src/vector-search-kill-switch.test.ts src/vector-search-endpoint.test.ts src/http/handlers.test.ts src/http/redaction.test.ts src/http/ssrf-url-safety.test.ts src/http/enumeration-indistinguishability.test.ts src/http/bootstrap-compat-drift.test.ts src/http/server.test.ts src/http/live-policy.test.ts src/http/app-check-availability.test.ts src/http/firestore-data-access.test.ts src/http/firestore-data-access.integration.test.ts src/http/compose.test.ts",
+    "test:integration": "node --conditions development --import tsx --test src/http/firestore-data-access.integration.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
     "@repo/security": "workspace:*"
   },
   "devDependencies": {
+    "@repo/testing": "workspace:*",
     "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",
