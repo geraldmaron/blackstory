@@ -285,11 +285,14 @@
  */
 .ds-about-mast__copy {
   max-width: 36rem;
-  padding: var(--ds-space-6) var(--ds-space-7);
+  /* Extra block-end room for wrapped mosaic credit + link underline/descenders. */
+  padding-block: var(--ds-space-6) var(--ds-space-8);
+  padding-inline: var(--ds-space-6);
   background: var(--ds-fixed-ink);
   color: var(--ds-fixed-paper);
   border-radius: var(--ds-radius-md);
   pointer-events: auto;
+  overflow: visible;
 }
 
 .ds-about-mast .ds-page__eyebrow {
@@ -340,6 +343,7 @@
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
+  line-height: 1.55;
   /* Fixed stone on dark surfaces is the light stone token (AA on ink). */
   color: var(--ds-fixed-stone);
 }
@@ -347,12 +351,19 @@
 .ds-about-mast__credit a {
   color: var(--ds-fixed-stone);
   text-decoration: underline;
+  text-decoration-skip-ink: auto;
   text-underline-offset: 0.15em;
 }
 
 .ds-about-mast__credit a:hover,
 .ds-about-mast__credit a:focus-visible {
   color: var(--ds-fixed-paper);
+}
+
+.ds-about-mast__credit a:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-fixed-accent);
+  outline-offset: var(--ds-focus-offset);
+  border-radius: var(--ds-radius-sm);
 }
 
 .ds-about__body {
@@ -571,7 +582,8 @@
 
   .ds-about-mast__copy {
     max-width: none;
-    padding: var(--ds-space-5);
+    padding-block: var(--ds-space-5) var(--ds-space-6);
+    padding-inline: var(--ds-space-5);
   }
 }
 
