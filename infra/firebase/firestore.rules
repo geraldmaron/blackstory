@@ -306,6 +306,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    match /publicReleases/{releaseId}/stories/{slug} {
+      // Longform `/stories` articles: Admin SDK or release artifacts only.
+      allow read, write: if false;
+    }
+
     match /publicSearchIndex/{docId} {
       // Search serves from release search-index.json artifacts or Admin SDK reads.
       allow read, write: if false;

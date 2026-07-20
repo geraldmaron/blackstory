@@ -49,7 +49,7 @@ export async function POST(
       review: result.review,
       seedHandoff: result.seedHandoff ?? null,
       published: false,
-      note: 'Approval records a review decision only. Paste seedHandoff into stories-seed.ts to ship.',
+      note: 'Approval records a review decision only. Paste seedHandoff into packages/firebase public-story-seed.ts to ship.',
     });
   } catch (error) {
     if (error instanceof Error && error.message.includes('not found')) {

@@ -30,6 +30,7 @@
 | `publicationReleases` | Release manifests / drafts | `publication`/`admin` | No |
 | `publicMeta` | Active release pointer | Yes | No |
 | `publicReleases/{id}/entities/{id}` | Released projections (web: Admin SDK or CDN `entities.json`) | No (client SDK denied) | No |
+| `publicReleases/{id}/stories/{slug}` | Longform `/stories` articles (Admin SDK) | No (client SDK denied) | No |
 | `publicSearchIndex` | Search index docs (web: Admin SDK or CDN `search-index.json`) | No (client SDK denied) | No |
 | `submissionInbox` | Quarantine inbox | Own docs or security/admin | Create quarantined only |
 | `auditEvents` | Append-only audit (BB-018) | Admin/security read; trusted staff append | Create only |

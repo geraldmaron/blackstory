@@ -1,14 +1,14 @@
 /**
- * Plain-language copy for the story packet review desk — intent lede, steps, and action help.
+ * Plain-language copy for the story packet review desk: intent lede, steps, and action help.
  */
 
 export const STORY_REVIEW_INTENT_COPY =
-  'Review staged story packets from research runs. Record approve, reject, or needs evidence — nothing here publishes to the public site.';
+  'Review staged story packets from research runs. Record approve, reject, or needs evidence. Nothing here publishes to the public site.';
 
 /** Numbered operator steps for the story review queue. */
 export const STORY_REVIEW_STEPS = [
   'Open a story packet (or select rows for bulk).',
-  'Add a decision note if helpful — optional, but stored with your review.',
+  'Add a decision note if helpful (optional, but stored with your review).',
   'Choose approve, needs evidence, or reject. Approval prepares a seed handoff; shipping happens separately.',
 ] as const;
 
@@ -18,7 +18,7 @@ export type StoryReviewAction = 'approved' | 'rejected' | 'needs_evidence';
 export function storyReviewActionHelp(action: StoryReviewAction): string {
   switch (action) {
     case 'approved':
-      return 'Record that this packet is ready for seed handoff. Paste the handoff JSON into stories-seed.ts later — it does not publish automatically.';
+      return 'Record that this packet is ready for seed handoff. Paste the handoff JSON into packages/firebase public story seed later. It does not publish automatically.';
     case 'needs_evidence':
       return 'Send the packet back for stronger sources. Attach evidence on the evidence desk, then re-run story research when ready.';
     case 'rejected':

@@ -672,8 +672,11 @@ export default function StoryReviewPage() {
                   <h3 className="ds-section__title">Seed handoff</h3>
                   <p className="ds-sans">
                     Approval does not publish. Paste this JSON into{' '}
-                    <span className="ds-mono">apps/web/src/data/stories-seed.ts</span> when ready to
-                    ship — Releases handles public activation later.
+                    <span className="ds-mono">
+                      packages/firebase/src/firestore/public-story-seed.ts
+                    </span>{' '}
+                    (then bootstrap/seed Firestore) when ready to ship. Releases handles public
+                    activation later.
                   </p>
                   <pre className="ds-mono">{seedHandoff}</pre>
                 </div>

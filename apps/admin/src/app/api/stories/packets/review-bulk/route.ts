@@ -72,7 +72,7 @@ export async function POST(request: Request): Promise<Response> {
       results,
       seedHandoffs,
       published: false,
-      note: 'Bulk review records decisions only. Paste seed handoffs into stories-seed.ts to ship.',
+      note: 'Bulk review records decisions only. Paste seed handoffs into packages/firebase public-story-seed.ts to ship.',
     });
   } catch (error) {
     return authErrorResponse(error);

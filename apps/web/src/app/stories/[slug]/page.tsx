@@ -1,12 +1,10 @@
 /**
  * Longform story article page at `/stories/{slug}`.
  *
- * Atmosphere mast (rights-cleared mosaic or geometric fallback), editorial serif
- * body, related entity off-ramps, and a single copper map CTA when a related entity
- * has a geo anchor. Emits schema.org Article JSON-LD only — never ClaimReview.
- *
- * Related entities resolve from live Firestore projections first (national catalog);
- * the bundled Dunbar seed is only a snapshot fallback.
+ * Atmosphere mast, editorial serif body, related entity off-ramps, and a copper
+ * map CTA when a related entity has a geo anchor. Story bodies load from the
+ * public release projection (Firestore / Firebase seed), not an apps/web corpus.
+ * Emits schema.org Article JSON-LD only, never ClaimReview.
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -14,8 +12,12 @@ import { assertNeverClaimReview } from '@repo/domain';
 import { AtmospherePlane, selectAtmospherePlane } from '../../../components/atmosphere';
 import { renderStoryTitle } from '../../../components/atmosphere/story-title';
 import type { PublicEntityView } from '../../../data/public-seed';
-import { getSeedStory, listSeedStories, type StoryRecord } from '../../../data/stories-seed';
-import { resolvePublicEntityView } from '../../../lib/public-data/source';
+import {
+  listPublicStoryViews,
+  resolvePublicEntityView,
+  resolvePublicStoryView,
+  type PublicStoryView,
+} from '../../../lib/public-data/source';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import {
   buildExploreHref,
@@ -28,12 +30,14 @@ type StoryPageProps = {
 };
 
 export async function generateStaticParams() {
-  return listSeedStories().map((story) => ({ slug: story.slug }));
+  const { data: stories } = await listPublicStoryViews();
+  return stories.map((story) => ({ slug: story.slug }));
 }
 
 export async function generateMetadata({ params }: StoryPageProps) {
   const { slug } = await params;
-  const story = getSeedStory(slug);
+  const result = await resolvePublicStoryView(slug);
+  const story = result.data;
   if (!story) return { title: 'Story not found' };
   return {
     title: story.title,
@@ -42,7 +46,7 @@ export async function generateMetadata({ params }: StoryPageProps) {
   };
 }
 
-function buildStoryArticleJsonLd(story: StoryRecord) {
+function buildStoryArticleJsonLd(story: PublicStoryView) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -80,7 +84,8 @@ function mapCtaForRelatedEntities(entities: readonly PublicEntityView[]): {
 
 export default async function StoryDetailPage({ params }: StoryPageProps) {
   const { slug } = await params;
-  const story = getSeedStory(slug);
+  const storyResult = await resolvePublicStoryView(slug);
+  const story = storyResult.data;
   if (!story) notFound();
 
   const relatedEntityResults = await Promise.all(
@@ -121,7 +126,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
             </p>
           ) : null}
           <p className="ds-story-mast__credit">
-            Archive mosaic · symbolic atmosphere — not a photograph of this story.{' '}
+            Archive mosaic · symbolic atmosphere, not a photograph of this story.{' '}
             <Link href={atmosphere.attributionHref}>Mosaic credits</Link>
           </p>
         </div>

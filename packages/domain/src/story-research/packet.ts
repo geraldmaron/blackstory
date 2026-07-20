@@ -1,6 +1,6 @@
 /**
  * Story research packet contract: brief, anchors, cite map, draft body aligned
- * with the public StoryRecord seed shape. Staging only — never publication authority.
+ * with the public story projection shape. Staging only, never publication authority.
  */
 
 import type { NamedAnchor } from './anchor.js';
@@ -11,7 +11,7 @@ export const STORY_RESEARCH_PACKET_KIND = 'story.research.packet.v1' as const;
 
 export type StoryResearchDecision = 'recommend' | 'needs_evidence' | 'reject';
 
-/** Mirrors apps/web StorySection / StoryRecord draft fields without coupling to the app. */
+/** Mirrors publicStoryProjection draft fields without coupling to Firestore. */
 export type StoryDraftSection = {
   readonly heading?: string;
   readonly paragraphs: readonly string[];
@@ -122,8 +122,9 @@ export function buildStoryResearchPacket(
 }
 
 /**
- * Map an approved packet onto the public seed StoryRecord shape (human paste path).
- * Does not write anything — returns a plain object for operator handoff.
+ * Map an approved packet onto the public story projection shape (human paste path).
+ * Does not write anything. Returns a plain object for operator handoff into
+ * `packages/firebase` public story seed / release fixtures.
  */
 export function storyPacketToSeedRecord(
   packet: StoryResearchPacket,

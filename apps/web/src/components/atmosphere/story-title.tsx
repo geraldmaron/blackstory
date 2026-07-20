@@ -1,17 +1,18 @@
 /**
- * Editorial title accent for story headlines — one warm serif italic word,
+ * Editorial title accent for story headlines: one warm serif italic word,
  * matching the v5 `.ds-page__title em` register used on search/history/home.
  */
 import React from 'react';
 
 void React;
 
-/** Seed slug → substring to wrap in `<em>` (first match, case-sensitive). */
+/** Story slug → substring to wrap in `<em>` (first match, case-sensitive). */
 export const STORY_TITLE_ACCENTS: Readonly<Record<string, string>> = {
-  'basement-to-m-street': 'basement',
-  'naming-dunbar-1916': 'Dunbar',
-  'same-footprint-new-walls': 'footprint',
-  'alumni-keep-the-thread': 'thread',
+  'before-the-battle-cry': 'battle',
+  'what-the-winners-wrote': 'winners',
+  'the-log-cabin-costume': 'costume',
+  'twelve-years-then-redemption': 'redemption',
+  'after-the-second-reconstruction': 'second',
 };
 
 export function renderStoryTitle(slug: string, title: string): React.ReactNode {

@@ -23,6 +23,7 @@ import {
   seedPublicEntity,
   seedPublicSchoolEntity,
 } from '../fixtures/firestore-seed.ts';
+import { SEED_STORY_PROJECTIONS } from '../src/firestore/public-story-seed.ts';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
 const ALLOW = process.env.APP_FIREBASE_ALLOW_PRODUCTION === '1';
@@ -85,8 +86,38 @@ ensured.set('publicReleases/rel_seed_001/entities/ent_dunbar_school_001', {
   path: 'publicReleases/rel_seed_001/entities/ent_dunbar_school_001',
   data: preparePublicEntityProjectionForWrite(seedPublicSchoolEntity),
 });
+for (const storyDoc of SEED_STORY_PROJECTIONS) {
+  ensured.set(`publicReleases/rel_seed_001/stories/${storyDoc.slug}`, {
+    path: `publicReleases/rel_seed_001/stories/${storyDoc.slug}`,
+    data: storyDoc,
+  });
+}
 
 const toWrite = [...ensured.values()].sort((a, b) => a.path.localeCompare(b.path));
+
+/** Canonical story slugs for the active release — the only docs allowed to remain. */
+const CANONICAL_STORY_SLUGS = new Set(SEED_STORY_PROJECTIONS.map((story) => story.slug));
+const STORIES_COLLECTION = 'publicReleases/rel_seed_001/stories';
+
+/**
+ * Prune orphaned story docs. Bootstrap writes are merge-only, so slugs that were
+ * renamed or removed from the seed corpus would otherwise linger in Firestore and
+ * surface on `/stories`. Delete any story doc whose id is not in the canonical set
+ * so the live collection always converges to exactly the seeded stories.
+ */
+async function pruneOrphanStories(
+  db: ReturnType<typeof getFirestore>,
+): Promise<readonly string[]> {
+  const snapshot = await db.collection(STORIES_COLLECTION).get();
+  const orphans = snapshot.docs.filter((doc) => !CANONICAL_STORY_SLUGS.has(doc.id));
+  if (orphans.length === 0) return [];
+  const batch = db.batch();
+  for (const doc of orphans) {
+    batch.delete(doc.ref);
+  }
+  await batch.commit();
+  return orphans.map((doc) => doc.id);
+}
 
 async function main(): Promise<void> {
   console.log(`Project: ${PROJECT_ID}`);
@@ -96,6 +127,8 @@ async function main(): Promise<void> {
   }
 
   if (DRY_RUN) {
+    console.log(`Canonical stories: ${[...CANONICAL_STORY_SLUGS].sort().join(', ')}`);
+    console.log('Orphan prune: skipped (dry-run)');
     return;
   }
 
@@ -113,10 +146,19 @@ async function main(): Promise<void> {
   }
   await batch.commit();
 
+  const prunedStories = await pruneOrphanStories(db);
+  if (prunedStories.length > 0) {
+    console.log(`Pruned ${prunedStories.length} orphan story doc(s): ${prunedStories.join(', ')}`);
+  } else {
+    console.log('Orphan prune: no orphan stories found.');
+  }
+
   const active = await db.doc('publicMeta/activeRelease').get();
   const entities = await db.collection('publicReleases/rel_seed_001/entities').get();
+  const stories = await db.collection(STORIES_COLLECTION).get();
   console.log('activeRelease:', active.exists ? active.data()?.releaseId : 'MISSING');
   console.log('entity count:', entities.size);
+  console.log('story count:', stories.size);
   console.log('Bootstrap complete.');
 }
 

@@ -8,7 +8,8 @@ description: Use when drafting or recommending longform /stories articles from a
 Assembles recommendable longform stories for `/stories` using the **research linking
 method** reverse-engineered from strong oral storytelling — not the viral rhetorical
 costume. LLM drafts stay proposals. Human approval maps an approved packet onto
-`StoryRecord` in `apps/web/src/data/stories-seed.ts`. There is no auto-publish.
+`publicStoryProjection` in `packages/firebase/src/firestore/public-story-seed.ts`
+(seeded to `publicReleases/{releaseId}/stories/{slug}`). There is no auto-publish.
 
 Brand register: [`docs/ui/story.md`](../../../docs/ui/story.md) — place-first, evidence
 before assertion, proud/precise/unflinching, **never trauma-forward as the default lead**.
@@ -115,11 +116,12 @@ There is no `--publish` / `--promote`.
 2. Open **Story review**: `http://localhost:3001/stories/review`.
    Default queue is **pending** human review. Use status chips, search, filters,
    sort, multi-select, and bulk approve / needs-evidence / reject (cap 50).
-3. Approve returns seed handoff JSON only — paste into `apps/web/src/data/stories-seed.ts`.
+3. Approve returns seed handoff JSON only — paste into
+   `packages/firebase/src/firestore/public-story-seed.ts`, then bootstrap/seed Firestore.
    Nothing auto-publishes.
 3. Inspect `validationIssues`, cite map, and draft body.
 4. **Approve** records a review decision and returns seed handoff JSON — it does **not**
-   publish. Paste into `apps/web/src/data/stories-seed.ts`.
+   publish. Paste into `packages/firebase/src/firestore/public-story-seed.ts`.
 5. Reject / needs_evidence updates the review record for follow-up research cases.
 
 CLI `--commit` only stages quarantine; the portal is where you review.

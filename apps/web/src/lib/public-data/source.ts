@@ -14,6 +14,7 @@ import type { PublicSearchIndexDoc } from '@repo/domain/search';
 import type {
   PublicEntityProjectionDoc,
   PublicSearchIndexDoc as FirestoreSearchIndexDoc,
+  PublicStoryProjectionDoc,
 } from '@repo/firebase';
 import {
   buildRelatedNeighborStubs,
@@ -37,8 +38,12 @@ import {
   fetchActiveRelease,
   fetchPublicEntityProjection,
   fetchPublicEntityProjectionsByIds,
+  fetchPublicStoryProjection,
+  getSnapshotStoryProjection,
   listPublicEntityProjections,
   listPublicSearchIndexDocs,
+  listPublicStoryProjections,
+  listSnapshotStoryProjections,
   parseEntityProjection,
   parseSearchIndexDoc,
   shouldUseLivePublicProjections,
@@ -381,3 +386,70 @@ export function getSeedPublicEntity(entityId: string): PublicEntityView | undefi
 export function listSeedPublicEntities(): readonly PublicEntityView[] {
   return listPublicEntities();
 }
+
+export type PublicStoryView = PublicStoryProjectionDoc;
+
+async function loadLiveStories(): Promise<readonly PublicStoryView[] | undefined> {
+  if (!shouldUseLivePublicProjections()) return undefined;
+  const active = await fetchActiveRelease();
+  if (!active) return undefined;
+  const stories = await listPublicStoryProjections(active.releaseId);
+  if (stories.length === 0) return undefined;
+  return stories;
+}
+
+async function loadLiveStory(slug: string): Promise<PublicStoryView | undefined> {
+  if (!shouldUseLivePublicProjections()) return undefined;
+  const active = await fetchActiveRelease();
+  if (!active) return undefined;
+  return fetchPublicStoryProjection(active.releaseId, slug);
+}
+
+/**
+ * List longform stories: live `publicReleases/{id}/stories` first, then the same
+ * Firebase seed corpus (never a parallel apps/web body catalog).
+ */
+export const listPublicStoryViews = cache(async function listPublicStoryViews(): Promise<{
+  readonly data: readonly PublicStoryView[];
+  readonly source: PublicReadSource;
+}> {
+  if (isPublicReadApiDisabled()) {
+    return { data: listSnapshotStoryProjections(), source: 'snapshot' };
+  }
+
+  try {
+    const live = await loadLiveStories();
+    if (live !== undefined) {
+      return { data: live, source: 'live' };
+    }
+  } catch {
+    // fall through
+  }
+
+  return { data: listSnapshotStoryProjections(), source: 'snapshot' };
+});
+
+/** Resolve one story by slug: live projection, then Firebase seed snapshot. */
+export const resolvePublicStoryView = cache(
+  async function resolvePublicStoryView(
+    slug: string,
+  ): Promise<PublicReadResult<PublicStoryView>> {
+    if (isPublicReadApiDisabled()) {
+      const snapshot = getSnapshotStoryProjection(slug);
+      return snapshot
+        ? { data: snapshot, source: 'snapshot' }
+        : { data: undefined, source: 'none' };
+    }
+
+    try {
+      const live = await loadLiveStory(slug);
+      if (live) return { data: live, source: 'live' };
+    } catch {
+      // fall through
+    }
+
+    const snapshot = getSnapshotStoryProjection(slug);
+    if (snapshot) return { data: snapshot, source: 'snapshot' };
+    return { data: undefined, source: 'none' };
+  },
+);

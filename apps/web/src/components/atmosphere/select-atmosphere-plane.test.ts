@@ -6,8 +6,8 @@ import { test } from 'node:test';
 import { selectAtmospherePlane, selectMosaicTiles } from './select-atmosphere-plane';
 
 test('selectAtmospherePlane is stable for the same seed key', () => {
-  const a = selectAtmospherePlane({ seedKey: 'basement-to-m-street' });
-  const b = selectAtmospherePlane({ seedKey: 'basement-to-m-street' });
+  const a = selectAtmospherePlane({ seedKey: 'before-the-battle-cry' });
+  const b = selectAtmospherePlane({ seedKey: 'before-the-battle-cry' });
   assert.equal(a.planeId, b.planeId);
   assert.equal(a.mode, 'mosaic');
   assert.equal(a.tiles.length, 16);

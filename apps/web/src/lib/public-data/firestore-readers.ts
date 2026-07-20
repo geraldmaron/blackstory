@@ -10,12 +10,16 @@ import {
   FIRESTORE_ROOT,
   firestorePaths,
   getServerFirestore,
+  getSeedStoryProjection,
+  listSeedStoryProjections,
   publicActiveReleaseSchema,
   publicEntityProjectionSchema,
   publicSearchIndexSchema,
+  publicStoryProjectionSchema,
   type PublicActiveReleaseDoc,
   type PublicEntityProjectionDoc,
   type PublicSearchIndexDoc as FirestorePublicSearchIndexDoc,
+  type PublicStoryProjectionDoc,
 } from '@repo/firebase';
 import { shouldUseLivePublicProjections } from './live-policy';
 
@@ -131,4 +135,42 @@ export function parseEntityProjection(data: unknown): PublicEntityProjectionDoc 
 export function parseSearchIndexDoc(data: unknown): FirestorePublicSearchIndexDoc | undefined {
   const parsed = publicSearchIndexSchema.safeParse(data);
   return parsed.success ? parsed.data : undefined;
+}
+
+export function parseStoryProjection(data: unknown): PublicStoryProjectionDoc | undefined {
+  const parsed = publicStoryProjectionSchema.safeParse(data);
+  return parsed.success ? parsed.data : undefined;
+}
+
+export async function fetchPublicStoryProjection(
+  releaseId: string,
+  slug: string,
+): Promise<PublicStoryProjectionDoc | undefined> {
+  const snap = await getServerFirestore()
+    .doc(firestorePaths.publicStory(releaseId, slug))
+    .get();
+  if (!snap.exists) return undefined;
+  return parseStoryProjection(snap.data());
+}
+
+/** Unbounded collection get for a release's longform stories (Admin SDK). */
+export async function listPublicStoryProjections(
+  releaseId: string,
+): Promise<readonly PublicStoryProjectionDoc[]> {
+  const query = await getServerFirestore().collection(`publicReleases/${releaseId}/stories`).get();
+  const stories: PublicStoryProjectionDoc[] = [];
+  for (const doc of query.docs) {
+    const parsed = parseStoryProjection(doc.data());
+    if (parsed) stories.push(parsed);
+  }
+  return stories;
+}
+
+/** Offline / seed-mode story list: same corpus written into Firestore fixtures. */
+export function listSnapshotStoryProjections(): readonly PublicStoryProjectionDoc[] {
+  return listSeedStoryProjections();
+}
+
+export function getSnapshotStoryProjection(slug: string): PublicStoryProjectionDoc | undefined {
+  return getSeedStoryProjection(slug);
 }

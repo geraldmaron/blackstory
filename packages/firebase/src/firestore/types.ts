@@ -1205,6 +1205,33 @@ export const publicEntityProjectionSchema = z.object({
 
 export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSchema>;
 
+/** One section of a longform public story article. */
+export const publicStorySectionSchema = z.object({
+  heading: z.string().min(1).optional(),
+  paragraphs: z.array(z.string().min(1)).min(1),
+});
+
+export type PublicStorySectionDoc = z.infer<typeof publicStorySectionSchema>;
+
+/**
+ * Public longform story projection under `publicReleases/{releaseId}/stories/{slug}`.
+ * Editorial narrative for `/stories`; related entities resolve through the entity projection path.
+ * Non-numeric by standing policy. Body prose is the article; citations live on linked entities.
+ */
+export const publicStoryProjectionSchema = z.object({
+  id: z.string().min(1),
+  releaseId: z.string().min(1),
+  slug: z.string().min(1).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  title: z.string().min(1).max(160),
+  dek: z.string().min(1).max(400),
+  publishedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  eraLabel: z.string().min(1).max(80),
+  placeLabel: z.string().min(1).max(120),
+  body: z.array(publicStorySectionSchema).min(1),
+  relatedEntityIds: z.array(z.string().min(1)).min(1),
+});
+
+export type PublicStoryProjectionDoc = z.infer<typeof publicStoryProjectionSchema>;
 
 /**
  * persisted search index document the server-read shape @repo/domain's

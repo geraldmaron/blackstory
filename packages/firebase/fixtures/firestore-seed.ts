@@ -34,6 +34,7 @@ import type {
   SourceOrganizationDoc,
   SubmissionInboxDoc,
 } from '../src/firestore/types.js';
+import { SEED_STORY_PROJECTIONS } from '../src/firestore/public-story-seed.js';
 
 export type SeedDocument = {
   readonly path: string;
@@ -737,6 +738,10 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
     path: 'publicReleases/rel_seed_001/entities/ent_dunbar_school_001',
     data: seedPublicSchoolEntity,
   },
+  ...SEED_STORY_PROJECTIONS.map((storyDoc) => ({
+    path: `publicReleases/rel_seed_001/stories/${storyDoc.slug}`,
+    data: storyDoc as unknown as Record<string, unknown>,
+  })),
   {
     path: 'publicSearchIndex/ent_15th_st_church_001',
     data: {

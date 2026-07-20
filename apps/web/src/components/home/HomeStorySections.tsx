@@ -42,7 +42,7 @@ export type HomeStorySectionsProps = {
 /** v5 §6.5 "How this works" — three points, evidence before assertion. */
 const HOW_ITEMS = [
   'Every record is documented: people, places, schools, and events with accepted claims, citations, and confidence you can read for yourself.',
-  'Contradictions stay visible. When sources disagree, the record says so — confidence is never a color alone, and disputes are part of the story.',
+  'Contradictions stay visible. When sources disagree, the record says so: confidence is never a color alone, and disputes are part of the story.',
   'Dignity is a rule, not a tone. Street-level residences stay off the public map, living people stay protected, and presence is never framed as deficit.',
 ] as const;
 

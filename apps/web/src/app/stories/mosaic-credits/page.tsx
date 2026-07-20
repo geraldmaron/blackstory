@@ -1,5 +1,5 @@
 /**
- * Archive mosaic credits — lists the rights-cleared collage tiles used as
+ * Archive mosaic credits: lists the rights-cleared collage tiles used as
  * decorative atmosphere on story masts and the about-page living mosaic.
  * Tiles are local copies of Commons promotions; this page satisfies attribution
  * for licensed sources used symbolically (never as portraits of a subject).
@@ -24,8 +24,8 @@ export default function MosaicCreditsPage() {
         </h1>
         <p className="ds-page__lede">
           Story masts and the about page may show a soft black-and-white mosaic. Those tiles are
-          rights-cleared archive images, served from this site — never hotlinked from Wikimedia at
-          request time. The mosaic is symbolic atmosphere, not a photograph of a page subject. On
+          rights-cleared archive images, served from this site (never hotlinked from Wikimedia at
+          request time). The mosaic is symbolic atmosphere, not a photograph of a page subject. On
           about, tiles periodically swap from the broader pool; motion stops under reduced-motion or
           Save-Data. When a tile matches a published record, it opens that entity page.
         </p>
