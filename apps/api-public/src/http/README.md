@@ -89,7 +89,10 @@ Handlers depend on the `PublicDataAccess` port (`data-access.ts`). Two adapters 
 
 **Live wiring gaps (honest, tracked in repo-rw1p):** timeline hydration (projection has no timeline
 field — always `[]` until release builder adds one), Firebase-emulator integration tests,
-load/read-budget tests, and independent reviewer sign-off on authorization/redaction/cost paths.
+independent reviewer sign-off on authorization/redaction/cost paths.
+
+**Fixed in MOB-004 read-budget pass:** deterministic Firestore read counts per `/v1` endpoint with
+an injectable recording fake — see [`read-budget.md`](./read-budget.md).
 
 **Fixed in MOB-004 index search pass (2f8563c9):** live `/v1/search` prefers the release-scoped
 `publicSearchIndex` composite query (`releaseId == activeRelease`, `orderBy __name__`, paginated at
@@ -164,5 +167,6 @@ body (413), JSON depth bomb (`parseJsonWithDepthLimit` rejects), malformed entit
 query injection (SQL/regex/field-selection denied via the shared guardrail), unbounded-array defense
 (response schema caps), and negative redaction snapshots (internal/ranking/precise-geo fields absent).
 
-Deferred: real Firestore-backed enumeration **timing** attacks, live load / Firestore-read-budget
-tests, and SSRF-through-citation/media-URL checks (no live media fetch path exists in this pass).
+Deferred: real Firestore-backed enumeration **timing** attacks and SSRF-through-citation/media-URL
+checks (no live media fetch path exists in this pass). Read budgets are documented in
+[`read-budget.md`](./read-budget.md).
