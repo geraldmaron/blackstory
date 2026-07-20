@@ -10,9 +10,11 @@ export {
   APP_ENV_PREFIX,
   GCP_PROJECT_ID_PROD,
   BRAND_ASSETS,
+  MAKER,
   brandLockup,
   brandSymbol,
   brandOpenGraph,
+  makerMark,
 } from './identity.js';
 export type { BrandTheme } from './identity.js';
 

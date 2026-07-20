@@ -1,5 +1,5 @@
 /**
- * Unit coverage for homepage About + data-pulse composition helpers and copy contracts.
+ * Unit coverage for homepage About, How-this-works, and data-pulse composition.
  */
 
 import assert from 'node:assert/strict';
@@ -12,11 +12,13 @@ import type {
 } from '@repo/firebase';
 import { HomeAbout } from './HomeAbout';
 import { HomeDataPulse } from './HomeDataPulse';
+import { HomeHowThisWorks } from './HomeHowThisWorks';
+import { HomeStorySections } from './HomeStorySections';
 
 void React;
 
 describe('HomeAbout', () => {
-  it('renders product thesis, pillars, and primary CTAs', () => {
+  it('renders product thesis, numbered pillars, CTAs, and orient hand-off', () => {
     function OrientStub() {
       return <p>Orient stub</p>;
     }
@@ -27,13 +29,65 @@ describe('HomeAbout', () => {
         OrientControl={OrientStub}
       />,
     );
-    assert.match(html, /History, pinned to place/);
+    assert.match(html, /History, pinned to(?: <em>)?place(?:<\/em>)?\./);
+    assert.match(html, /ds-home-about__intro/);
+    assert.match(html, /ds-home-about__pillar-index/);
     assert.match(html, /Presence/);
     assert.match(html, /Evidence/);
     assert.match(html, /Dignity/);
+    assert.match(html, /Start with a place/);
     assert.match(html, /href="\/explore"/);
     assert.match(html, /href="\/about"/);
+    assert.match(html, /href="\/methodology"/);
     assert.match(html, /Orient stub/);
+    assert.match(html, /href="https:\/\/geralddagher\.com"/);
+    assert.match(html, /Built by/);
+    assert.match(html, /Gerald Dagher/);
+    assert.match(html, /gd-mark-light\.png/);
+    assert.match(html, /gd-mark-dark\.png/);
+  });
+});
+
+describe('HomeHowThisWorks', () => {
+  it('reuses the compact research pipeline sketch with three trust points', () => {
+    const html = renderToStaticMarkup(<HomeHowThisWorks />);
+    assert.match(html, /How this works/);
+    assert.match(html, /Evidence before assertion/);
+    assert.match(html, /ds-home-how__compose/);
+    assert.match(html, /ds-pipeline-sketch--compact/);
+    assert.match(html, /Research pipeline — intake to publish gate/);
+    assert.match(html, /viewBox="0 0 720 268"/);
+    assert.match(html, /Local server/);
+    assert.match(html, /Publish gate/);
+    assert.match(html, /Every record is documented/);
+    assert.match(html, /Contradictions stay visible/);
+    assert.match(html, /Dignity is a rule, not a tone/);
+    assert.match(html, /href="\/methodology"/);
+    assert.match(html, /Read the methodology/);
+    assert.doesNotMatch(html, /viewBox="0 0 720 824"/);
+    assert.doesNotMatch(html, /never write the public projection/);
+  });
+});
+
+describe('HomeStorySections', () => {
+  it('composes About and How-this-works with OrientControl override', () => {
+    function OrientStub() {
+      return <p>Orient stub</p>;
+    }
+
+    const html = renderToStaticMarkup(
+      <HomeStorySections
+        featured={[]}
+        topStates={[]}
+        recordCount={12}
+        stateCount={4}
+        OrientControl={OrientStub}
+      />,
+    );
+    assert.match(html, /History, pinned to/);
+    assert.match(html, /Orient stub/);
+    assert.match(html, /Evidence before assertion/);
+    assert.match(html, /ds-pipeline-sketch--compact/);
   });
 });
 

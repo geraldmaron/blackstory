@@ -123,3 +123,18 @@ describe('horizontal overflow guards', () => {
     );
   });
 });
+
+describe('maker credit theme marks', () => {
+  it('swaps inline GD marks with [data-theme] like the shell wordmark', () => {
+    assert.match(shellCss, /\.ds-maker-credit__mark--theme-light\s*\{[^}]*display:\s*block/s);
+    assert.match(shellCss, /\.ds-maker-credit__mark--theme-dark\s*\{[^}]*display:\s*none/s);
+    assert.match(
+      shellCss,
+      /\[data-theme='dark'\]\s+\.ds-maker-credit__mark--theme-light\s*\{[^}]*display:\s*none/s,
+    );
+    assert.match(
+      shellCss,
+      /\[data-theme='dark'\]\s+\.ds-maker-credit__mark--theme-dark\s*\{[^}]*display:\s*block/s,
+    );
+  });
+});

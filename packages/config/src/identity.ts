@@ -70,3 +70,20 @@ export function brandSymbol(theme: BrandTheme): string {
 export function brandOpenGraph(theme: BrandTheme): string {
   return BRAND_ASSETS.openGraph[theme];
 }
+
+/**
+ * Personal maker attribution (not BlackStory product brand). Mark paths follow the
+ * same light/dark theme contract as BRAND_ASSETS: light = ink on paper, dark = paper on ink.
+ */
+export const MAKER = {
+  name: 'Gerald Dagher',
+  url: 'https://geralddagher.com',
+  mark: {
+    light: '/maker/gd-mark-light.png',
+    dark: '/maker/gd-mark-dark.png',
+  },
+} as const;
+
+export function makerMark(theme: BrandTheme): string {
+  return MAKER.mark[theme];
+}

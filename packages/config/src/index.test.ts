@@ -11,6 +11,7 @@ import {
   PACKAGE_SCOPE,
   GCP_PROJECT_ID_PROD,
   BRAND_ASSETS,
+  MAKER,
 } from './index.ts';
 
 test('parseNodeEnv defaults to development', () => {
@@ -30,6 +31,10 @@ test('identity constants keep product name separate from code prefixes', () => {
   assert.equal(PACKAGE_SCOPE, '@repo');
   assert.equal(GCP_PROJECT_ID_PROD, 'black-book-efaaf');
   assert.equal(BRAND_ASSETS.lockup.dark, '/brand/lockup-dark.png');
+  assert.equal(MAKER.name, 'Gerald Dagher');
+  assert.equal(MAKER.url, 'https://geralddagher.com');
+  assert.equal(MAKER.mark.light, '/maker/gd-mark-light.png');
+  assert.equal(MAKER.mark.dark, '/maker/gd-mark-dark.png');
 });
 
 test('local runtime environment does not require production variables', () => {

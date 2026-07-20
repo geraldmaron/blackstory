@@ -1,11 +1,13 @@
 /**
  * Public site footer — Black Ink always, closed by the kit lockup at
  * landmark scale (the page signs off with the brand, not a fine-print row).
+ * Maker credit links to geralddagher.com with the white GD mark (fixed-ink plate).
  * Admin login lives in the shared island "More" menu for consistent traversal.
  */
 
 import Link from 'next/link';
 import { FOOTER_NAV_COLUMNS } from '../lib/nav';
+import { MakerCredit } from './MakerCredit';
 
 export function SiteFooter() {
   return (
@@ -42,10 +44,13 @@ export function SiteFooter() {
           />
         </div>
 
-        <p className="ds-shell-footer__meta ds-mono">
-          Public shell · released projections only, with visible provenance and confidence · no
-          authentication required
-        </p>
+        <div className="ds-shell-footer__meta-row">
+          <p className="ds-shell-footer__meta ds-mono">
+            Public shell · released projections only, with visible provenance and confidence · no
+            authentication required
+          </p>
+          <MakerCredit variant="footer" className="ds-shell-footer__maker" />
+        </div>
       </div>
     </footer>
   );

@@ -176,11 +176,20 @@
   margin-top: var(--ds-space-4);
 }
 
-.ds-shell-footer__meta {
-  margin: 0;
+.ds-shell-footer__meta-row {
+  display: grid;
+  gap: var(--ds-space-4);
   padding-top: var(--ds-space-5);
   border-top: var(--ds-border-width) solid var(--ds-fixed-rule);
+}
+
+.ds-shell-footer__meta {
+  margin: 0;
   color: var(--ds-fixed-stone);
+}
+
+.ds-shell-footer__maker {
+  margin: 0;
 }
 
 .ds-shell-footer__operator {
@@ -197,9 +206,85 @@
   outline-offset: 3px;
 }
 
+/* Maker credit — GD mark + personal site link (footer / about / home about). */
+.ds-maker-credit {
+  margin: 0;
+}
+
+.ds-maker-credit__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  min-height: 2.75rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-maker-credit__mark {
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.ds-maker-credit__mark--theme-light {
+  display: block;
+}
+
+.ds-maker-credit__mark--theme-dark {
+  display: none;
+}
+
+[data-theme='dark'] .ds-maker-credit__mark--theme-light {
+  display: none;
+}
+
+[data-theme='dark'] .ds-maker-credit__mark--theme-dark {
+  display: block;
+}
+
+.ds-maker-credit__label {
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ds-maker-credit__name {
+  letter-spacing: 0.04em;
+}
+
+.ds-maker-credit--inline .ds-maker-credit__link {
+  color: var(--ds-ink-muted);
+}
+
+.ds-maker-credit--inline .ds-maker-credit__link:hover,
+.ds-maker-credit--inline .ds-maker-credit__link:focus-visible {
+  color: var(--ds-accent);
+}
+
+.ds-maker-credit--inline .ds-maker-credit__link:focus-visible {
+  outline: 2px solid var(--ds-accent-graphic);
+  outline-offset: 3px;
+}
+
+.ds-home-about__maker {
+  margin-top: var(--ds-space-10);
+  padding-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
 @media (min-width: 40rem) {
   .ds-shell-footer__columns {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ds-shell-footer__meta-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--ds-space-6);
   }
 }
 
@@ -213,7 +298,7 @@
     grid-column: 1 / -1;
   }
 
-  .ds-shell-footer__meta {
+  .ds-shell-footer__meta-row {
     grid-column: 1 / -1;
   }
 }
@@ -971,54 +1056,94 @@
 }
 
 /* —— Home About —— product thesis + quiet place orientation —— */
+.ds-home-about__intro {
+  max-width: 40rem;
+}
+
+.ds-home-about__title {
+  font-size: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.ds-home-about__lede {
+  margin-top: var(--ds-space-5);
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+}
+
 .ds-home-about__pillars {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--ds-space-8);
-  margin: var(--ds-space-8) 0 0;
+  gap: 0;
+  margin: var(--ds-space-10) 0 0;
   padding: 0;
   list-style: none;
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
 @media (min-width: 48rem) {
   .ds-home-about__pillars {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--ds-space-8);
   }
 }
 
 .ds-home-about__pillar {
   display: grid;
   gap: var(--ds-space-3);
-  padding: var(--ds-space-5) 0 0;
-  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
+  align-content: start;
+  padding: var(--ds-space-6) var(--ds-space-6) var(--ds-space-6) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+@media (min-width: 48rem) {
+  .ds-home-about__pillar {
+    padding: var(--ds-space-6) var(--ds-space-6) var(--ds-space-8) 0;
+    border-bottom: 0;
+    border-right: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  .ds-home-about__pillar:last-child {
+    border-right: 0;
+    padding-right: 0;
+  }
+}
+
+.ds-home-about__pillar-index {
+  margin: 0;
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
 }
 
 .ds-home-about__pillar-kicker {
   margin: 0;
-  color: var(--ds-accent);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .ds-home-about__pillar-title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.25rem;
+  font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem);
   font-weight: 600;
-  line-height: 1.25;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
   color: var(--ds-ink);
 }
 
 .ds-home-about__pillar-body {
   margin: 0;
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-serif);
+  font-family: var(--ds-font-editorial);
   font-size: 1rem;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 .ds-home-about__actions {
@@ -1026,21 +1151,32 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ds-space-3);
-  margin: var(--ds-space-8) 0 0;
+  margin: var(--ds-space-10) 0 0;
 }
 
 .ds-home-about__orient {
   display: grid;
-  gap: var(--ds-space-4);
-  margin: var(--ds-space-10) 0 0;
-  padding: var(--ds-space-6) 0 0;
+  gap: var(--ds-space-3);
+  margin: var(--ds-space-12) 0 0;
+  padding: var(--ds-space-8) 0 0;
   border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-home-about__orient-kicker {
+  margin: 0;
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .ds-home-about__orient-lede {
   margin: 0;
+  max-width: 36rem;
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-serif);
+  font-family: var(--ds-font-editorial);
   font-size: 1.0625rem;
   line-height: 1.55;
 }
@@ -1083,13 +1219,14 @@
 .ds-state-start {
   display: grid;
   gap: var(--ds-space-5);
+  margin-top: var(--ds-space-2);
 }
 
 .ds-state-start__form {
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  gap: var(--ds-space-2);
+  gap: var(--ds-space-3);
 }
 
 .ds-state-start__select {
@@ -1098,12 +1235,36 @@
   min-height: 2.75rem;
   padding: var(--ds-space-2) var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-border-strong);
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-md);
   background: var(--ds-surface-raised);
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
   /* ≥16px avoids iOS zoom-on-focus. */
   font-size: 1rem;
+}
+
+.ds-state-start__select:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
+  outline-offset: 2px;
+}
+
+.ds-state-start__submit {
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-state-start__coverage {
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.ds-state-start__coverage-label {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .ds-state-start__chips {
@@ -1118,14 +1279,14 @@
 .ds-state-chip {
   display: inline-flex;
   align-items: center;
-  gap: var(--ds-space-2);
+  gap: var(--ds-space-3);
   min-height: 2.75rem;
   padding: 0 var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-full);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-md);
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   text-decoration: none;
   transition:
@@ -1134,20 +1295,32 @@
 }
 
 .ds-state-chip:hover {
-  border-color: var(--ds-border-strong);
+  border-color: var(--ds-ink);
   background: var(--ds-surface-raised);
+}
+
+.ds-state-chip:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
+  outline-offset: 2px;
+}
+
+.ds-state-chip__name {
+  color: inherit;
 }
 
 .ds-state-chip__count {
   color: var(--ds-accent);
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .ds-state-start__locate {
+  margin: 0;
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  font-family: var(--ds-font-editorial);
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .ds-state-start__locate a {
@@ -1155,6 +1328,122 @@
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
+}
+
+.ds-state-start__locate a:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
+  outline-offset: 2px;
+}
+
+/* —— Home “How this works” — ink band composition with methodology sketch —— */
+.ds-home-how__intro {
+  max-width: 40rem;
+}
+
+.ds-home-how__title {
+  font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.ds-home-how__lede {
+  color: var(--ds-fixed-stone);
+}
+
+.ds-home-how__compose {
+  display: grid;
+  gap: var(--ds-space-8);
+  margin-top: var(--ds-space-8);
+  align-items: start;
+}
+
+@media (min-width: 64rem) {
+  .ds-home-how__compose {
+    grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
+    gap: var(--ds-space-8);
+  }
+}
+
+.ds-home-how__sketch {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/*
+ * Paper plate inside the fixed-ink band so the hand-drawn sketch keeps
+ * archive-paper contrast regardless of [data-theme].
+ */
+.ds-home-how__sketch .ds-pipeline-sketch {
+  --ds-surface: var(--ds-fixed-paper);
+  --ds-surface-raised: var(--ds-fixed-paper);
+  --ds-ink: var(--ds-fixed-ink);
+  --ds-ink-muted: color-mix(in srgb, var(--ds-fixed-ink) 58%, var(--ds-fixed-paper));
+  --ds-accent: var(--ds-fixed-accent);
+  --ds-accent-graphic: var(--ds-fixed-accent);
+  --ds-rule: color-mix(in srgb, var(--ds-fixed-ink) 16%, transparent);
+  margin: 0;
+  background: var(--ds-fixed-paper);
+  color: var(--ds-fixed-ink);
+  border-color: color-mix(in srgb, var(--ds-fixed-paper) 22%, transparent);
+}
+
+.ds-home-how__sketch .ds-pipeline-sketch__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+.ds-home-how__points {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+}
+
+.ds-home-how__point {
+  display: grid;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-4) 0;
+  border-top: var(--ds-border-width) solid var(--ds-fixed-rule);
+}
+
+.ds-home-how__point:last-child {
+  border-bottom: var(--ds-border-width) solid var(--ds-fixed-rule);
+}
+
+.ds-home-how__point-index {
+  color: var(--ds-fixed-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.ds-home-how__point-title {
+  margin: 0;
+  color: var(--ds-fixed-paper);
+  font-family: var(--ds-font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.ds-home-how__point-body {
+  margin: 0;
+  color: var(--ds-fixed-stone);
+  font-family: var(--ds-font-editorial);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.ds-home-how__cta {
+  margin-top: var(--ds-space-8);
 }
 
 /* —— Story rail — top-rule entries, never boxes ——  */

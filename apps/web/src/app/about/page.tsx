@@ -6,6 +6,7 @@
 
 import Link from 'next/link';
 import { AboutMosaicMast } from '../../components/atmosphere/AboutMosaicRail';
+import { MakerCredit } from '../../components/MakerCredit';
 
 export const metadata = {
   title: 'About',
@@ -87,12 +88,25 @@ export default function AboutPage() {
       </AboutMosaicMast>
 
       <div className="ds-container ds-about__body">
-        <section className="ds-about__pillars" aria-label="What the archive stands on">
-          <ul className="ds-about__pillar-list">
-            {PILLARS.map((pillar) => (
+        <section className="ds-about__pillars" aria-labelledby="about-pillars-heading">
+          <header className="ds-about__pillars-intro">
+            <p className="ds-section__kicker">What holds</p>
+            <h2 className="ds-section__title ds-about__pillars-title" id="about-pillars-heading">
+              Presence. Evidence. Dignity.
+            </h2>
+            <p className="ds-section__lede">
+              Three commitments travel with every record — place first, receipts attached, and
+              protections that are rules rather than tone.
+            </p>
+          </header>
+          <ul className="ds-about__pillar-list" aria-label="What the archive stands on">
+            {PILLARS.map((pillar, index) => (
               <li key={pillar.kicker} className="ds-about__pillar">
+                <p className="ds-about__pillar-index" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </p>
                 <p className="ds-about__pillar-kicker">{pillar.kicker}</p>
-                <h2 className="ds-about__pillar-title">{pillar.title}</h2>
+                <h3 className="ds-about__pillar-title">{pillar.title}</h3>
                 <p className="ds-about__pillar-body">{pillar.body}</p>
               </li>
             ))}
@@ -193,6 +207,8 @@ export default function AboutPage() {
             </Link>
           </p>
         </section>
+
+        <MakerCredit variant="inline" className="ds-about__maker" />
       </div>
     </main>
   );
