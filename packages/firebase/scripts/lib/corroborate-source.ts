@@ -136,6 +136,98 @@ async function fetchWikipediaCoordinates(title: string): Promise<{ lat: number; 
   }
 }
 
+const US_STATES = [
+  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
+  'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
+  'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan',
+  'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
+  'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio',
+  'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+  'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
+  'Wisconsin', 'Wyoming',
+];
+
+// Wikipedia's search API is forgiving of most "<State> State Capitol" queries via
+// fuzzy matching, but a handful of states name their building something else
+// entirely — override only those to avoid a wasted round-trip.
+const STATE_CAPITOL_QUERY: Record<string, string> = {
+  'South Carolina': 'South Carolina State House',
+  Ohio: 'Ohio Statehouse',
+  Massachusetts: 'Massachusetts State House',
+  'New Hampshire': 'New Hampshire State House',
+  Vermont: 'Vermont State House',
+  Indiana: 'Indiana Statehouse',
+};
+
+function extractUsState(jurisdictionLabel: string): string | undefined {
+  return US_STATES.find((state) => jurisdictionLabel.includes(state));
+}
+
+function isFederalJurisdiction(jurisdictionLabel: string): boolean {
+  const lower = jurisdictionLabel.toLowerCase();
+  return (
+    (lower.includes('washington, d.c') || lower.includes('washington dc') || lower.includes('united states')) &&
+    !extractUsState(jurisdictionLabel)
+  );
+}
+
+async function resolveViaSearchThenCoordinates(query: string): Promise<{ lat: number; lng: number } | undefined> {
+  const direct = await fetchWikipediaCoordinates(query);
+  if (direct) return direct;
+  const hits = await searchWikipediaApi(query);
+  for (const hit of hits.slice(0, 2)) {
+    const coords = await fetchWikipediaCoordinates(hit.title);
+    if (coords) return coords;
+  }
+  return undefined;
+}
+
+/**
+ * Backfills real coordinates for a subject the judge already located in TEXT
+ * (jurisdictionLabel/locationLabel) but whose own Wikipedia article has no
+ * Wikidata coordinates — the common case for laws, government bodies, and
+ * organizations with no single point of their own. Never guesses: every
+ * candidate here is itself a real, separately-verifiable Wikipedia/Wikidata
+ * lookup, just anchored to a different, more specific or more general subject
+ * than the original one.
+ *
+ * Resolution order:
+ *  1. The specific named site the judge proposed (a headquarters, milestone
+ *     event location, building) — often has its own geo-tagged article even
+ *     when the broader subject doesn't.
+ *  2. The government center for the subject's jurisdiction: a state capitol
+ *     building for state-level laws/bodies, the U.S. Capitol for federal ones
+ *     — this is the "government center" anchor convention, not a fallback of
+ *     last resort; it only applies when no more specific site was named.
+ *  3. The jurisdiction/location text itself (a city, county, or state) — this
+ *     virtually always resolves, since basically every place-name has a real,
+ *     stable Wikidata-coordinated article.
+ */
+export async function resolveGovernmentCenterCoordinates(
+  jurisdictionLabel: string,
+  locationLabel: string,
+  locationPrecision: string,
+): Promise<{ lat: number; lng: number } | undefined> {
+  const SITE_PRECISIONS = new Set([
+    'institution', 'site', 'address', 'campus', 'building', 'stadium', 'airport', 'museum', 'district',
+  ]);
+  if (locationLabel && locationLabel !== jurisdictionLabel && SITE_PRECISIONS.has(locationPrecision)) {
+    const bySite = await resolveViaSearchThenCoordinates(locationLabel);
+    if (bySite) return bySite;
+  }
+
+  const state = extractUsState(jurisdictionLabel);
+  if (state) {
+    const byCapitol = await resolveViaSearchThenCoordinates(STATE_CAPITOL_QUERY[state] ?? `${state} State Capitol`);
+    if (byCapitol) return byCapitol;
+  } else if (isFederalJurisdiction(jurisdictionLabel)) {
+    const byCapitol = await resolveViaSearchThenCoordinates('United States Capitol');
+    if (byCapitol) return byCapitol;
+  }
+
+  return resolveViaSearchThenCoordinates(locationLabel || jurisdictionLabel);
+}
+
 async function findViaWikipediaApi(
   subjectName: string,
   context?: string,
