@@ -834,7 +834,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'line-join': 'round',
         },
         paint: {
-          'line-color': DIGNITY_PALETTE.pointHalo,
+          // Theme-aware copper — never pageSand on the light plate (vanishes against white).
+          'line-color': plate.historyEdge,
           'line-width': 2.5,
           'line-opacity': 0.9,
         },
@@ -849,7 +850,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'line-join': 'round',
         },
         paint: {
-          'line-color': DIGNITY_PALETTE.pointHalo,
+          'line-color': plate.historyEdge,
           'line-width': 2.5,
           'line-opacity': 0,
         },
@@ -865,7 +866,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'line-join': 'round',
         },
         paint: {
-          'line-color': DIGNITY_PALETTE.point,
+          'line-color': plate.historyEdgeSelected,
           'line-width': 4,
           'line-opacity': 1,
         },

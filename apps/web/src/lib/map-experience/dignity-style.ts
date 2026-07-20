@@ -170,6 +170,13 @@ export function plateForScheme(scheme: MapColorScheme) {
       /** County name labels — stone text + white halo (WCAG: color is not the only boundary signal). */
       countyLabel: brandPalette.stone,
       countyLabelHalo: LIGHT_PLATE_OCEAN,
+      /**
+       * History relationship lines — copper brown on white (≥3:1 non-text). pageSand
+       * (`pointHalo`) reads as invisible wash on the light plate (~2.3:1).
+       */
+      historyEdge: brandPalette.copperTextLight,
+      /** Selected relationship line — Copper Pin accent (navigational signal). */
+      historyEdgeSelected: brandPalette.copperPin,
     } as const;
   }
   return {
@@ -187,5 +194,11 @@ export function plateForScheme(scheme: MapColorScheme) {
     countyLine: DIGNITY_PALETTE.selected,
     countyLabel: DIGNITY_PALETTE.streetLabelDark,
     countyLabelHalo: DIGNITY_PALETTE.ocean,
+    /**
+     * History relationship lines — copper on ink (≥3:1). pageSand blends into presence
+     * density fills; copperDark stays a clear navigational signal without alarm red.
+     */
+    historyEdge: brandPalette.copperDark,
+    historyEdgeSelected: DIGNITY_PALETTE.point,
   } as const;
 }

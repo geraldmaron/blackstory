@@ -34,6 +34,9 @@ import {
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LABEL_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
+  EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
+  EXPLORE_HISTORY_EDGES_LAYER_ID,
+  EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
   EXPLORE_MEMORIAL_NAMES_LAYER_ID,
   EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
@@ -409,6 +412,59 @@ test('light colorScheme uses a white plate with brown state bounds and stone cou
   const countyLines = layerById(light, EXPLORE_COUNTY_LINES_LAYER_ID);
   assert.equal(countyLines.paint?.['line-color'], lightPlate.countyLine);
   assert.notEqual(countyLines.paint?.['line-color'], lightPlate.selected);
+});
+
+test('history relationship edge lines use theme-aware copper and toggle visibility', () => {
+  const source = buildExploreMapSource(listPublicEntities());
+  const lightOff = buildExploreMapStyle({
+    featureCollection: source.featureCollection,
+    jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
+    layerMode: 'presence',
+    colorScheme: 'light',
+    historyEdgesEnabled: false,
+  });
+  const lightOn = buildExploreMapStyle({
+    featureCollection: source.featureCollection,
+    jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
+    layerMode: 'presence',
+    colorScheme: 'light',
+    historyEdgesEnabled: true,
+  });
+  const darkOn = buildExploreMapStyle({
+    featureCollection: source.featureCollection,
+    jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
+    layerMode: 'presence',
+    colorScheme: 'dark',
+    historyEdgesEnabled: true,
+  });
+
+  const lightPlate = plateForScheme('light');
+  const darkPlate = plateForScheme('dark');
+
+  const lightEdge = layerById(lightOn, EXPLORE_HISTORY_EDGES_LAYER_ID);
+  const lightIncoming = layerById(lightOn, EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID);
+  const lightSelected = layerById(lightOn, EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID);
+  const lightEdgeOff = layerById(lightOff, EXPLORE_HISTORY_EDGES_LAYER_ID);
+  const darkEdge = layerById(darkOn, EXPLORE_HISTORY_EDGES_LAYER_ID);
+  const darkSelected = layerById(darkOn, EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID);
+
+  assert.equal(lightEdgeOff.layout?.visibility, 'none');
+  assert.equal(lightEdge.layout?.visibility, 'visible');
+  assert.equal(lightIncoming.layout?.visibility, 'visible');
+  assert.equal(lightSelected.layout?.visibility, 'visible');
+
+  // pageSand vanishes on the white plate — edges must use copper text/graphic tokens.
+  assert.equal(lightEdge.paint?.['line-color'], lightPlate.historyEdge);
+  assert.equal(lightEdge.paint?.['line-color'], brandPalette.copperTextLight);
+  assert.notEqual(lightEdge.paint?.['line-color'], DIGNITY_PALETTE.pointHalo);
+  assert.equal(lightSelected.paint?.['line-color'], lightPlate.historyEdgeSelected);
+  assert.equal(lightEdge.paint?.['line-opacity'], 0.9);
+  assert.equal(lightIncoming.paint?.['line-opacity'], 0);
+
+  assert.equal(darkEdge.paint?.['line-color'], darkPlate.historyEdge);
+  assert.equal(darkEdge.paint?.['line-color'], brandPalette.copperDark);
+  assert.notEqual(darkEdge.paint?.['line-color'], DIGNITY_PALETTE.pointHalo);
+  assert.equal(darkSelected.paint?.['line-color'], darkPlate.historyEdgeSelected);
 });
 
 test('county label symbol layer reads name from GeoJSON and sits above county lines', () => {

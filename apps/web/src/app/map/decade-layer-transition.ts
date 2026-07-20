@@ -146,15 +146,22 @@ export function shouldFadeDecadePatch(options: {
  * Decade morph must not run when the map data model changes (`presence` ↔ `blackShare` ↔
  * `blackChange`). Morph uses `configOnly` and never syncs choropleth layout/paint — so a
  * layerMode flip would leave share/change fills invisible or stuck on the previous expression.
+ *
+ * Relationship-line toggles also refuse morph: `configOnly` leaves the primary edge GeoJSON
+ * empty until promote, so a lines on/off flip would paint nothing for the dissolve duration
+ * (and can strand opacity at 0 if promote is superseded). Snap-apply keeps lines visible.
  */
 export function shouldMorphDecadeDataPatch(options: {
   readonly reducedMotion: boolean;
   readonly isInitialApply: boolean;
   readonly layerModeChanged: boolean;
   readonly populationLayerActive?: boolean;
+  /** True when Explore `lines` URL/view flag flipped — force a full style/data apply. */
+  readonly historyEdgesToggled?: boolean;
 }): boolean {
   if (options.layerModeChanged) return false;
   if (options.populationLayerActive) return false;
+  if (options.historyEdgesToggled) return false;
   return shouldFadeDecadePatch(options);
 }
 

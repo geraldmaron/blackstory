@@ -37,6 +37,27 @@ test('shouldFadeDecadePatch skips the initial apply and reduced motion', () => {
   assert.equal(shouldFadeDecadePatch({ reducedMotion: false, isInitialApply: false }), true);
 });
 
+test('shouldMorphDecadeDataPatch refuses morph when relationship lines toggle', () => {
+  assert.equal(
+    shouldMorphDecadeDataPatch({
+      reducedMotion: false,
+      isInitialApply: false,
+      layerModeChanged: false,
+      historyEdgesToggled: true,
+    }),
+    false,
+  );
+  assert.equal(
+    shouldMorphDecadeDataPatch({
+      reducedMotion: false,
+      isInitialApply: false,
+      layerModeChanged: false,
+      historyEdgesToggled: false,
+    }),
+    true,
+  );
+});
+
 test('shouldMorphDecadeDataPatch refuses morph when layerMode changes', () => {
   assert.equal(
     shouldMorphDecadeDataPatch({

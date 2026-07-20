@@ -9,8 +9,9 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import { DENSITY_TIER_FILL, DIGNITY_PALETTE, POPULATION_SHARE_TIER_FILL } from './dignity-style';
+import { DENSITY_TIER_FILL, DIGNITY_PALETTE, POPULATION_SHARE_TIER_FILL, plateForScheme } from './dignity-style';
 import { KIND_ENCODING_ENTRIES, MAP_SEMANTIC_TONE_ENCODING } from './kind-encoding';
+import { brandPalette } from '@repo/ui';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -67,6 +68,39 @@ function isRedHued(rgb: readonly [number, number, number]): boolean {
   const inRedBand = h < 15 || h > 345;
   return inRedBand && s > 0.25;
 }
+
+function relativeLuminance(rgb: readonly [number, number, number]): number {
+  const channel = (c: number) => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * channel(rgb[0]) + 0.7152 * channel(rgb[1]) + 0.0722 * channel(rgb[2]);
+}
+
+function contrastRatio(fg: string, bg: string): number {
+  const L1 = relativeLuminance(hexToRgb(fg));
+  const L2 = relativeLuminance(hexToRgb(bg));
+  const [hi, lo] = L1 > L2 ? [L1, L2] : [L2, L1];
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+test('history relationship edge plate colors meet WCAG 1.4.11 (≥3:1) on both themes', () => {
+  const light = plateForScheme('light');
+  const dark = plateForScheme('dark');
+  assert.equal(light.historyEdge, brandPalette.copperTextLight);
+  assert.equal(dark.historyEdge, brandPalette.copperDark);
+  assert.notEqual(light.historyEdge, DIGNITY_PALETTE.pointHalo);
+  assert.notEqual(dark.historyEdge, DIGNITY_PALETTE.pointHalo);
+  assert.ok(
+    contrastRatio(light.historyEdge, light.ocean) >= 3,
+    `light historyEdge ${light.historyEdge} on ${light.ocean} must be ≥3:1`,
+  );
+  assert.ok(
+    contrastRatio(dark.historyEdge, dark.ocean) >= 3,
+    `dark historyEdge ${dark.historyEdge} on ${dark.ocean} must be ≥3:1`,
+  );
+  assert.ok(contrastRatio(DIGNITY_PALETTE.pointHalo, light.ocean) < 3, 'pageSand must fail on white');
+});
 
 test('no color in DIGNITY_PALETTE is red-hued except the allowlisted massacre tone', () => {
   for (const color of Object.values(DIGNITY_PALETTE)) {

@@ -321,6 +321,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   /** First data patch after mount snaps; later decade/filter patches fade (continuous flow). */
   const isInitialDataApplyRef = useRef(true);
   const previousLayerModeRef = useRef(initial.viewState.layerMode);
+  const previousLinesRef = useRef(initial.viewState.lines);
   const previousPopGeoRef = useRef(initial.viewState.popGeo ?? DEFAULT_POPULATION_GEO);
   /** Guards one-shot fly-to when applying place-search radius from a deep-linked URL. */
   const urlRadiusAppliedRef = useRef<string | null>(null);
@@ -631,12 +632,15 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     const decade = view.viewState.decade;
     const layerModeChanged = previousLayerModeRef.current !== view.viewState.layerMode;
     previousLayerModeRef.current = view.viewState.layerMode;
+    const historyEdgesToggled = previousLinesRef.current !== view.viewState.lines;
+    previousLinesRef.current = view.viewState.lines;
     previousPopGeoRef.current = view.viewState.popGeo ?? DEFAULT_POPULATION_GEO;
     const fade = shouldMorphDecadeDataPatch({
       reducedMotion: prefersReducedMotion(),
       isInitialApply: isInitialDataApplyRef.current,
       layerModeChanged,
       populationLayerActive: isPopulationLayerMode(view.viewState.layerMode),
+      historyEdgesToggled,
     });
     isInitialDataApplyRef.current = false;
     stage.patchData(

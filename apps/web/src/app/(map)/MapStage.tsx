@@ -228,6 +228,16 @@ const LAZY_GEOGRAPHY_SOURCE_IDS = new Set<string>([
   EXPLORE_COUNTY_LINES_SOURCE_ID,
 ]);
 
+/**
+ * History edge GeoJSON is owned by `setHistoryEdgeData` / decade incoming staging — the style
+ * always ships an empty FeatureCollection placeholder. setData'ing that placeholder on every
+ * apply would blank toggled-on relationship lines between sync ticks.
+ */
+const EDGE_MANAGED_SOURCE_IDS = new Set<string>([
+  EXPLORE_HISTORY_EDGES_SOURCE_ID,
+  EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
+]);
+
 /** Primary decade sources held steady during dual-buffer crossdissolve (incoming stages the next frame). */
 const DECADE_PRIMARY_DATA_SOURCE_IDS = new Set<string>([
   EXPLORE_ENTITIES_SOURCE_ID,
@@ -592,11 +602,9 @@ function applyGeographyStyle(
       // GL circle layers. During dual-buffer crossdissolve, primary decade sources stay put
       // while incoming buffers stage the next frame.
       if (LAZY_GEOGRAPHY_SOURCE_IDS.has(id) || BREATH_MANAGED_SOURCE_IDS.has(id)) continue;
+      if (EDGE_MANAGED_SOURCE_IDS.has(id)) continue;
       if (options?.deferPrimaryDecadeData && DECADE_PRIMARY_DATA_SOURCE_IDS.has(id)) continue;
-      if (
-        id === EXPLORE_ENTITIES_INCOMING_SOURCE_ID ||
-        id === EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID
-      ) {
+      if (id === EXPLORE_ENTITIES_INCOMING_SOURCE_ID) {
         continue;
       }
       const data = (source as { data?: unknown }).data;
@@ -1161,7 +1169,7 @@ export function MapStageProvider({
         await waitForGeoJsonSourceData(map, EXPLORE_ENTITIES_SOURCE_ID);
       }
       if (generation !== decadeFadeGenerationRef.current) return;
-      setHistoryEdgeData(map, cfg.historyEdgeCollection);
+        setHistoryEdgeData(map, cfg.historyEdgeCollection);
       if (generation !== decadeFadeGenerationRef.current) return;
       setDecadeCrossfadeIdleOpacities(map);
       clearIncomingDecadeBuffers(map);
