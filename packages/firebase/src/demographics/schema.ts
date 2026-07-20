@@ -137,6 +137,77 @@ export function parseCensusNationalDecadeDoc(data: unknown): CensusNationalDecad
 }
 
 /**
+ * State decennial population doc — one per state (or D.C.) per decade 1790–1990 from
+ * twps0056 Tables 15–65. Not every state appears every decade (admission / coverage). The
+ * modern 2000–2020 state number comes from `censusCountyDecades` sums, so this collection
+ * deliberately stops at 1990. Free/enslaved fields follow the national lane rules.
+ */
+export const censusStateDecadeSchema = z
+  .object({
+    /** Deterministic id `${stateFips}_${decade}`, e.g. `01_1860`. */
+    id: z.string().regex(/^\d{2}_\d{4}$/),
+    stateFips: z.string().regex(/^\d{2}$/),
+    stateName: z.string().min(1),
+    decade: censusNationalDecadeDecadeSchema,
+    totalPopulation: z.number().int().nonnegative(),
+    blackPopulation: z.number().int().nonnegative(),
+    freeBlackPopulation: z.number().int().nonnegative().optional(),
+    enslavedBlackPopulation: z.number().int().nonnegative().optional(),
+    ...datasetArtifactProvenanceFields,
+  })
+  .superRefine((doc, ctx) => {
+    if (doc.id !== `${doc.stateFips}_${doc.decade}`) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'id must equal `${stateFips}_${decade}`',
+        path: ['id'],
+      });
+    }
+    const hasFree = doc.freeBlackPopulation !== undefined;
+    const hasEnslaved = doc.enslavedBlackPopulation !== undefined;
+    if (hasFree !== hasEnslaved) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'freeBlackPopulation and enslavedBlackPopulation must both be present or both absent',
+        path: ['freeBlackPopulation'],
+      });
+    }
+    const splitDecade = (FREE_ENSLAVED_SPLIT_DECADES as readonly string[]).includes(doc.decade);
+    if (hasFree && !splitDecade) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `decade ${doc.decade} must not carry a free/enslaved split`,
+        path: ['freeBlackPopulation'],
+      });
+    }
+    if (hasFree && hasEnslaved) {
+      const discrepancy =
+        doc.freeBlackPopulation! + doc.enslavedBlackPopulation! - doc.blackPopulation;
+      if (Math.abs(discrepancy) > FREE_ENSLAVED_TOLERANCE) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `free + enslaved (${doc.freeBlackPopulation! + doc.enslavedBlackPopulation!}) must equal Black total (${doc.blackPopulation}) within ±${FREE_ENSLAVED_TOLERANCE}`,
+          path: ['blackPopulation'],
+        });
+      }
+    }
+  });
+
+export type CensusStateDecadeDoc = z.infer<typeof censusStateDecadeSchema>;
+
+export function censusStateDecadeId(
+  stateFips: string,
+  decade: CensusNationalDecadeDecade,
+): string {
+  return `${stateFips}_${decade}`;
+}
+
+export function parseCensusStateDecadeDoc(data: unknown): CensusStateDecadeDoc {
+  return censusStateDecadeSchema.parse(data);
+}
+
+/**
  * Historical county race doc from NHGIS (one per county per decade, 1790–1960). Counties are
  * keyed by NHGIS `gisJoin` on that decade's HISTORICAL boundaries (`boundaryVersion` =
  * `nhgis-<decade>`) — NOT a modern 5-digit FIPS, so cross-vintage or modern joins require an

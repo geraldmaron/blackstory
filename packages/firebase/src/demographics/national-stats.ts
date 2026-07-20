@@ -374,6 +374,16 @@ export type AcsCoverageSummary = {
   readonly sourceUrl: string;
 };
 
+/** Coverage for the historical state lane (`censusStateDecades`, twps0056 Tables 15–65). */
+export type HistoricalStatePopulationCoverage = {
+  readonly rowCount: number;
+  readonly stateCount: number;
+  readonly decadeMin: string;
+  readonly decadeMax: string;
+  readonly source: string;
+  readonly sourceUrl: string;
+};
+
 /** County + tract coverage counts for the latest ACS 5-year vintage — a coverage summary,
  * not a per-county browser (that's the Explore map's job once the related workstream's choropleth
  * layer lands). */
@@ -396,6 +406,51 @@ export async function getAcsCoverageSummary(
     tractCount: tractAgg.data().n,
     source: doc.source,
     sourceUrl: publicSourceUrl({ source: doc.source, sourceUrl: doc.sourceUrl }),
+  };
+}
+
+/** Row/state/decade coverage for twps0056 state tables loaded into `censusStateDecades`. */
+export async function getHistoricalStatePopulationCoverage(
+  firestore: Firestore = getServerFirestore(),
+): Promise<HistoricalStatePopulationCoverage | undefined> {
+  const collection = firestore.collection(FIRESTORE_ROOT.censusStateDecades);
+  const [countAgg, sample] = await Promise.all([
+    collection.aggregate({ n: AggregateField.count() }).get(),
+    collection.limit(1).get(),
+  ]);
+  const rowCount = countAgg.data().n;
+  if (rowCount === 0 || sample.empty) return undefined;
+
+  const sampleDoc = sample.docs[0]!.data() as {
+    source?: string;
+    sourceUrl?: string;
+  };
+  if (!sampleDoc.source || !sampleDoc.sourceUrl) return undefined;
+
+  // Bounded scan: ~900 docs — fine as Admin-SDK coverage, not a public client path.
+  const snap = await collection.select('stateFips', 'decade').get();
+  const states = new Set<string>();
+  const decades = new Set<string>();
+  for (const doc of snap.docs) {
+    const data = doc.data() as { stateFips?: string; decade?: string };
+    if (data.stateFips) states.add(data.stateFips);
+    if (data.decade) decades.add(data.decade);
+  }
+  const sortedDecades = [...decades].sort();
+  const decadeMin = sortedDecades[0];
+  const decadeMax = sortedDecades.at(-1);
+  if (!decadeMin || !decadeMax) return undefined;
+
+  return {
+    rowCount,
+    stateCount: states.size,
+    decadeMin,
+    decadeMax,
+    source: sampleDoc.source,
+    sourceUrl: publicSourceUrl({
+      source: sampleDoc.source,
+      sourceUrl: sampleDoc.sourceUrl,
+    }),
   };
 }
 

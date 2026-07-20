@@ -38,6 +38,9 @@ export const FIRESTORE_ROOT = {
   /** Published national census statistics: one doc per decade 1790–1990 (twps0056 historical
    * lane). Small (~21 docs); the modern 2000–2020 national number comes from county sums. */
   censusNationalDecades: 'censusNationalDecades',
+  /** Published state census statistics: one doc per state/D.C. per decade 1790–1990
+   * (twps0056 Tables 15–65). ~900 docs; modern 2000–2020 state totals come from county sums. */
+  censusStateDecades: 'censusStateDecades',
   /** Historical county race from NHGIS: one doc per NHGIS county (gisJoin) per decade 1790–1960
    * (~45k docs). Client read CLOSED — served via a bounded static artifact, never scanned. */
   censusCountyHistoricalDecades: 'censusCountyHistoricalDecades',

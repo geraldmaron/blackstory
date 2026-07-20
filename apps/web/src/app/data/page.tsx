@@ -15,11 +15,13 @@ import {
   getAcsCoverageSummary,
   getHateCrimeYearSummaries,
   getHateCrimeYearSummary,
+  getHistoricalStatePopulationCoverage,
   getNationalPopulationTimelineSnapshot,
   getOpportunityAtlasCoverageSummary,
   getStatePopulationChanges,
   type AcsCoverageSummary,
   type HateCrimeYearSummary,
+  type HistoricalStatePopulationCoverage,
   type NationalPopulationTimelineSnapshot,
   type OpportunityAtlasCoverageSummary,
   type StatePopulationChange,
@@ -66,6 +68,7 @@ export default async function DataPage() {
   const [
     timelineSnapshot,
     stateChanges2010to2020,
+    historicalStateCoverage,
     acsCoverage,
     hateCrimeYear,
     hateCrimeSeries,
@@ -73,6 +76,7 @@ export default async function DataPage() {
   ] = await Promise.all([
     safe(getNationalPopulationTimelineSnapshot()),
     safe(getStatePopulationChanges('2010', '2020')),
+    safe(getHistoricalStatePopulationCoverage()),
     safe(getAcsCoverageSummary()),
     safe(getHateCrimeYearSummary(LATEST_HATE_CRIME_YEAR)),
     safe(getHateCrimeYearSummaries(HATE_CRIME_SERIES_YEARS)),
@@ -83,6 +87,7 @@ export default async function DataPage() {
   const hateCrimeByYear = (hateCrimeSeries ?? []) as readonly HateCrimeYearSummary[];
   const acs = acsCoverage as AcsCoverageSummary | undefined;
   const opportunity = opportunityAtlasCoverage as OpportunityAtlasCoverageSummary | undefined;
+  const historicalStates = historicalStateCoverage as HistoricalStatePopulationCoverage | undefined;
   const timeline = (timelineSnapshot ?? undefined) as
     NationalPopulationTimelineSnapshot | undefined;
   const timelineRows = timeline?.rows ?? [];
@@ -156,6 +161,36 @@ export default async function DataPage() {
                 stateNameByFips={STATE_NAME_BY_FIPS}
                 labelledBy="population-heading"
               />
+            ) : null}
+            {historicalStates ? (
+              <>
+                <h3 className="ds-sans" id="historical-state-coverage-heading">
+                  Historical state coverage (1790–1990)
+                </h3>
+                <DataStatStrip
+                  labelledBy="historical-state-coverage-heading"
+                  sources={[
+                    {
+                      label: 'U.S. Census Bureau, Working Paper 56 (state tables 15–65)',
+                      url: historicalStates.sourceUrl,
+                    },
+                  ]}
+                  items={[
+                    {
+                      id: 'hist-state-rows',
+                      value: formatCount(historicalStates.rowCount),
+                      label: 'State-decade rows',
+                      note: `${historicalStates.decadeMin}–${historicalStates.decadeMax}`,
+                    },
+                    {
+                      id: 'hist-state-count',
+                      value: formatCount(historicalStates.stateCount),
+                      label: 'States / D.C. covered',
+                      note: 'Not every state appears every decade',
+                    },
+                  ]}
+                />
+              </>
             ) : null}
           </>
         ) : (

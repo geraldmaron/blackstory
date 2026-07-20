@@ -373,6 +373,14 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // State decennial race totals 1790–1990 (twps0056 Tables 15–65, public domain). ~900 docs.
+    // Writes via packages/firebase/src/demographics/state-load-cli.ts. Modern 2000–2020 state
+    // totals stay on censusCountyDecades sums; this collection stops at 1990.
+    match /censusStateDecades/{stateDecadeId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // Historical county race from NHGIS (1790–1960, ~45k docs). Client read stays CLOSED — the
     // public map reads a bounded static artifact, never this collection (a public rule would
     // invite full scans). Admin SDK bypasses rules for the loader and the artifact builder.

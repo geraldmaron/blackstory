@@ -428,16 +428,17 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
         'raw table01.xlsx machine URL.',
     },
     vintage:
-      'Working Paper 56, Table 1 — national race totals 1790–1990 (Internet release 2002-09-13)',
-    geographies: ['nation'],
+      'Working Paper 56 — national Table 1 + state Tables 15–65 (Internet release 2002-09-13)',
+    geographies: ['nation', 'state'],
     cadence: 'static',
     notes:
-      'National Total/White/Black population by decade 1790–1990, with the Black column split ' +
-      'into Free/Slave for 1790–1860. Public-domain historical enumerations — the 1790–1990 ' +
-      'lane of the national timeline (2000–2020 comes from censusCountyDecades sums). Race labels ' +
-      'are twps0056-harmonized ("Black"); comparability bands in demographics/comparability.ts ' +
-      'record the period terminology ("Negro"/"colored") and the pre-2000 vs "Black alone" ' +
-      'measurement-regime boundary. Region/division/state tables (2–65) are deferred (repo-lcl9.2).',
+      'National Total/White/Black population by decade 1790–1990 (Table 1), with the Black column ' +
+      'split into Free/Slave for 1790–1860, plus per-state Tables 15–65 loaded into ' +
+      'censusStateDecades. Public-domain historical enumerations — the 1790–1990 lane of the ' +
+      'national/state timelines (2000–2020 comes from censusCountyDecades sums). Race labels are ' +
+      'twps0056-harmonized ("Black"); comparability bands in demographics/comparability.ts record ' +
+      'the period terminology ("Negro"/"colored") and the pre-2000 vs "Black alone" ' +
+      'measurement-regime boundary. Machine artifacts: table01.xlsx (national), tabs15-65.xlsx (states).',
     registryState: 'disabled',
   },
   {
