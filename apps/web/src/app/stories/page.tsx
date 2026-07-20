@@ -3,31 +3,37 @@
  *
  * Loads thin list items from the public release story projection (field-masked
  * Firestore / Firebase seed) — title, dek, era, and place only. Full bodies
- * load on the article page.
+ * load on the article page. Index chrome is denser than the shared story-rail
+ * used on home/entity (see stories.css under `.ds-stories-page`).
  */
 import Link from 'next/link';
 import { listPublicStoryListItems } from '../../lib/public-data/source';
+import './stories.css';
 
 export const metadata = {
   title: 'Stories',
   description:
-    'Longform history narratives from the BlackStory archive: place-first articles with links to records.',
+    'Longform history from the BlackStory archive: place-first articles with sources and links to records.',
 };
 
 export default async function StoriesIndexPage() {
   const { data: stories } = await listPublicStoryListItems();
+  const countLabel = stories.length === 1 ? '1 story' : `${stories.length} stories`;
 
   return (
-    <main className="ds-container ds-page" id="main">
-      <p className="ds-page__eyebrow">From the archive</p>
+    <main className="ds-container ds-page ds-stories-page" id="main">
+      <p className="ds-page__eyebrow">Longform</p>
       <h1 className="ds-page__title">Stories</h1>
       <p className="ds-page__lede">
-        Longform history from the record: narratives pinned to place, era, and evidence. Each story
-        off-ramps to the entities it rests on.
+        History pinned to place and era. Each piece links to the records it rests on, with sources
+        you can open.
       </p>
 
-      <section className="ds-section ds-section--flush" aria-label="Story list">
-        <ul className="ds-story-rail">
+      <section className="ds-section ds-section--flush ds-stories-page__list" aria-label="Story list">
+        <p className="ds-sans ds-count-label ds-stories-page__count" id="stories-list-heading">
+          {countLabel}
+        </p>
+        <ul className="ds-story-rail" aria-labelledby="stories-list-heading">
           {stories.map((story) => (
             <li key={story.slug}>
               <Link className="ds-story-link" href={`/stories/${story.slug}`}>

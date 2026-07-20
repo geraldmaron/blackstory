@@ -1,8 +1,75 @@
 /**
- * Presentation for longform `/stories/[slug]` articles. Editorial Source Serif
- * body on the archive-paper canvas; mono for dates. Atmosphere mast styles live in
- * `components/atmosphere/atmosphere.css`.
+ * Stories surfaces: denser `/stories` index chrome, plus longform article body
+ * styles for `/stories/[slug]`. Atmosphere mast styles live in
+ * `components/atmosphere/atmosphere.css`. Index rules are scoped to
+ * `.ds-stories-page` so shared `.ds-story-link` rails on home/entity stay intact.
  */
+
+/* —— Index: ledger density, not oversized story cards —— */
+.ds-stories-page .ds-page__title {
+  font-weight: 400;
+}
+
+.ds-stories-page .ds-page__lede {
+  max-width: 36rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.ds-stories-page__list {
+  margin-top: var(--ds-space-6);
+  padding-top: 0;
+}
+
+.ds-stories-page__count {
+  margin: 0 0 var(--ds-space-3);
+}
+
+.ds-stories-page .ds-story-rail {
+  margin-top: var(--ds-space-4);
+  gap: 0;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 56rem) {
+  .ds-stories-page .ds-story-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--ds-space-8);
+  }
+}
+
+.ds-stories-page .ds-story-link {
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-4) 0;
+  border-top-width: var(--ds-border-width);
+  border-top-color: var(--ds-rule);
+}
+
+.ds-stories-page .ds-story-link__meta {
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+.ds-stories-page .ds-story-link__title {
+  font-family: var(--ds-font-sans);
+  font-weight: 400;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+
+.ds-stories-page .ds-story-link__summary {
+  max-width: 36rem;
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* —— Article body —— */
 .ds-story-article {
   display: grid;
   gap: var(--ds-space-6);
