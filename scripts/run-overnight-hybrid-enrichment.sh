@@ -226,26 +226,15 @@ if [[ -z "${LATEST_CANDIDATES}" ]]; then
   exit 3
 fi
 
-python3 - "${LATEST_CANDIDATES}" "${SUBJECTS_FILE}" "${ENRICH_MAX_SUBJECTS}" <<'PY'
-import json, sys
-src, dest, max_n = sys.argv[1], sys.argv[2], int(sys.argv[3])
-data = json.load(open(src))
-cands = data.get("candidates") or []
-subjects = []
-for c in cands[:max_n]:
-    subjects.append({
-        "subjectId": c["id"],
-        "title": c.get("displayName") or c["id"],
-        "kind": c.get("kind"),
-        "existingSummary": (c.get("summary") or "")[:400] or None,
-        "sourceSnippets": [s for s in [c.get("summary"), c.get("canonicalUrl")] if s],
-    })
-clean = []
-for s in subjects:
-    clean.append({k: v for k, v in s.items() if v is not None})
-json.dump({"subjects": clean, "source": src, "count": len(clean)}, open(dest, "w"), indent=2)
-print(f"Wrote {len(clean)} subjects → {dest}", file=sys.stderr)
-PY
+# Fetches each candidate's canonicalUrl into real page text instead of handing
+# the judge a bare unfetched link — a stub summary + an unread URL is why the
+# discovery lane's keep rate was low; see build-discovery-enrichment-subjects.ts.
+node --conditions development --import tsx \
+  "${ROOT}/packages/firebase/scripts/build-discovery-enrichment-subjects.ts" \
+  --candidates "${LATEST_CANDIDATES}" \
+  --out "${SUBJECTS_FILE}" \
+  --max "${ENRICH_MAX_SUBJECTS}" \
+  --concurrency "${DISCOVERY_CONCURRENCY}"
 
 echo "Phase 3: enrichment-run provider=${EDITORIAL_LLM_PROVIDER} concurrency=${ENRICH_CONCURRENCY} commit=${COMMIT_ENRICHMENT}" >&2
 
