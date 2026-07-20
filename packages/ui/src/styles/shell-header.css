@@ -39,7 +39,9 @@ html {
   border: 0;
   border-bottom: var(--ds-border-width) solid var(--ds-border);
   border-radius: 0;
+  /* Follows [data-theme] via --ds-surface / --ds-ink (never a hardcoded cream plate). */
   background: var(--ds-surface);
+  color: var(--ds-ink);
 }
 
 .ds-shell-header :focus-visible {
@@ -411,5 +413,82 @@ html {
 @media (max-width: 47.9375rem) {
   .ds-shell-nav--desktop {
     display: none;
+  }
+}
+
+/*
+ * On-map treatment (design-direction-v4 theming contract): map plate + footer are
+ * theme-invariant ink. While a map surface is mounted, restyle the shell bar with
+ * --ds-fixed-* so cream light-theme chrome never sits over the ink canvas.
+ * Document routes (no [data-surface=map]) keep ordinary --ds-* theme tokens.
+ */
+.ds-shell:has([data-surface='map']) .ds-shell-header__inner {
+  background: var(--ds-fixed-charcoal);
+  border-bottom-color: var(--ds-fixed-rule);
+  color: var(--ds-fixed-paper);
+}
+
+.ds-shell:has([data-surface='map']) .ds-shell-nav__link {
+  color: color-mix(in srgb, var(--ds-fixed-paper) 72%, transparent);
+}
+
+.ds-shell:has([data-surface='map']) .ds-shell-nav__link:hover {
+  color: var(--ds-fixed-paper);
+  background: color-mix(in srgb, var(--ds-fixed-paper) 8%, transparent);
+}
+
+.ds-shell:has([data-surface='map']) .ds-shell-nav__link.is-active {
+  color: var(--ds-fixed-accent);
+  border-bottom-color: var(--ds-fixed-accent);
+  background: transparent;
+}
+
+.ds-shell:has([data-surface='map']) .ds-shell-more__panel {
+  border-color: var(--ds-fixed-rule);
+  background: var(--ds-fixed-ink);
+}
+
+.ds-shell:has([data-surface='map']) .ds-shell-menu__summary,
+.ds-shell:has([data-surface='map']) .ds-shell-header__tools .ds-theme-toggle,
+.ds-shell:has([data-surface='map']) .ds-shell-header__sign-out {
+  color: var(--ds-fixed-paper);
+}
+
+.ds-shell:has([data-surface='map']) .ds-shell-menu__summary:hover,
+.ds-shell:has([data-surface='map']) .ds-shell-header__tools .ds-theme-toggle:hover,
+.ds-shell:has([data-surface='map']) .ds-shell-header__sign-out:hover {
+  background: color-mix(in srgb, var(--ds-fixed-paper) 8%, transparent);
+}
+
+.ds-shell:has([data-surface='map']) .ds-shell-header__session {
+  color: color-mix(in srgb, var(--ds-fixed-paper) 65%, transparent);
+}
+
+.ds-shell:has([data-surface='map']) .ds-shell-nav--drawer {
+  background: var(--ds-fixed-charcoal);
+  border-top-color: var(--ds-fixed-rule);
+  color: var(--ds-fixed-paper);
+}
+
+/* Prefer dark-kit artwork over the ink bar regardless of reader [data-theme]. */
+.ds-shell:has([data-surface='map']) .ds-shell-wordmark__img--lockup.ds-shell-wordmark__img--theme-light {
+  display: none;
+}
+
+.ds-shell:has([data-surface='map']) .ds-shell-wordmark__img--lockup.ds-shell-wordmark__img--theme-dark {
+  display: block;
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-shell:has([data-surface='map']) .ds-shell-wordmark__img--lockup {
+    display: none !important;
+  }
+
+  .ds-shell:has([data-surface='map']) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+    display: none;
+  }
+
+  .ds-shell:has([data-surface='map']) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
+    display: block;
   }
 }

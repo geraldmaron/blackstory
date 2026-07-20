@@ -6,9 +6,8 @@
  *
  * Because `/` and `/explore` are siblings under this layout, navigating between them re-renders
  * the page trees but never this layout: the canvas element, WebGL context, loaded tiles, and
- * camera all survive by construction. `data-surface="map"` on the wrapper is the hook the shell
- * stream's header CSS uses to restyle over the ink canvas (`.ds-shell-header--onmap`,
- * design-direction-v3.md "Shell").
+ * camera all survive by construction. `data-surface="map"` on the wrapper is the hook
+ * `@repo/ui` shell-header CSS uses for the on-map ink bar (`.ds-shell:has([data-surface='map'])`).
  */
 import type { ReactNode } from 'react';
 import { loadMapStageBase } from './shared-map-data';

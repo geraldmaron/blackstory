@@ -36,42 +36,35 @@
 }
 
 /* Explore: condense the bar — symbol mark, hide primary nav; map instruments own the frame
-   (ADR-017 transition contract). */
-.ds-shell-body:has(.ds-explore-stage) .ds-shell-header__inner {
+   (ADR-017 transition contract). Header is a sibling of `.ds-shell-body`, so scope from
+   `.ds-shell:has(...)` — not `.ds-shell-body:has(...)` (that never matched the header). */
+.ds-shell:has(.ds-explore-stage) .ds-shell-header__inner {
   gap: var(--ds-space-1);
   padding-inline: var(--ds-gutter);
 }
 
-.ds-shell-body:has(.ds-explore-stage) .ds-shell-nav--desktop,
-.ds-shell-body:has(.ds-explore-stage) .ds-shell-menu {
+.ds-shell:has(.ds-explore-stage) .ds-shell-nav--desktop,
+.ds-shell:has(.ds-explore-stage) .ds-shell-menu {
   display: none;
 }
 
-.ds-shell-body:has(.ds-explore-stage) .ds-shell-wordmark__img--lockup {
+.ds-shell:has(.ds-explore-stage) .ds-shell-wordmark__img--lockup {
   display: none !important;
 }
 
-.ds-shell-body:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+.ds-shell:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+  display: none;
+}
+
+.ds-shell:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
   display: block;
 }
 
-.ds-shell-body:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
+.ds-shell:has(.ds-explore-stage) .ds-shell-header__cta {
   display: none;
 }
 
-[data-theme='dark'] .ds-shell-body:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
-  display: none;
-}
-
-[data-theme='dark'] .ds-shell-body:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
-  display: block;
-}
-
-.ds-shell-body:has(.ds-explore-stage) .ds-shell-header__cta {
-  display: none;
-}
-
-.ds-shell-body:has(.ds-explore-stage) .ds-shell-header__tools {
+.ds-shell:has(.ds-explore-stage) .ds-shell-header__tools {
   margin-left: auto;
 }
 
@@ -89,7 +82,10 @@
   margin-top: auto;
   background: var(--ds-fixed-ink);
   color: var(--ds-fixed-paper);
-  padding-block: var(--ds-space-16) var(--ds-space-8);
+  /* Top padding at least clears the fixed shell bar when the mast scrolls under it. */
+  padding-top: max(var(--ds-space-16), var(--ds-island-clearance));
+  padding-bottom: var(--ds-space-8);
+  scroll-margin-top: var(--ds-island-clearance);
 }
 
 .ds-shell-footer__inner {

@@ -4,6 +4,7 @@
  */
 import type { ReactNode } from 'react';
 import { Sora, Inter, IBM_Plex_Mono } from 'next/font/google';
+import { THEME_BOOTSTRAP_SCRIPT } from '@repo/ui';
 import '@repo/ui/styles.css';
 import { AdminAuthProvider } from '../auth/AdminAuthProvider';
 import { AdminShellChrome } from '../components/AdminShellChrome';
@@ -40,7 +41,10 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
+      </head>
       <body className={`${displayFace.variable} ${sans.variable} ${mono.variable}`}>
         <AdminAuthProvider>
           <AdminShellChrome>{children}</AdminShellChrome>

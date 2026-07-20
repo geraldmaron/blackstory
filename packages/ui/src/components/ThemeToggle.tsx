@@ -1,28 +1,30 @@
-
 /**
  * Light/dark theme toggle that sets `data-theme` on the document element.
+ * Initial value matches the head bootstrap script (storage → prefers-color-scheme).
  */
 
 'use client';
 
-import React, {  useEffect, useState  } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;
 import type { ThemeName } from '../tokens/colors.js';
+import { resolvePreferredTheme, THEME_STORAGE_KEY } from '../theme/document-theme.js';
 import { cx } from '../utils/cx.js';
-
-const STORAGE_KEY = 'ds-theme';
 
 function readPreferredTheme(): ThemeName {
   if (typeof window === 'undefined') {
     return 'light';
   }
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (stored === 'light' || stored === 'dark') {
-    return stored;
+  const fromDom = document.documentElement.dataset.theme;
+  if (fromDom === 'light' || fromDom === 'dark') {
+    return fromDom;
   }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return resolvePreferredTheme(
+    window.localStorage.getItem(THEME_STORAGE_KEY),
+    window.matchMedia('(prefers-color-scheme: dark)').matches,
+  );
 }
 
 export type ThemeToggleProps = {
@@ -42,7 +44,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
     const next: ThemeName = theme === 'light' ? 'dark' : 'light';
     setTheme(next);
     document.documentElement.dataset.theme = next;
-    window.localStorage.setItem(STORAGE_KEY, next);
+    window.localStorage.setItem(THEME_STORAGE_KEY, next);
   }
 
   const next = theme === 'light' ? 'dark' : 'light';

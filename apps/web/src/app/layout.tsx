@@ -11,6 +11,7 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Sora, Inter, Source_Serif_4, IBM_Plex_Mono } from 'next/font/google';
+import { THEME_BOOTSTRAP_SCRIPT } from '@repo/ui';
 import '@repo/ui/styles.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import '../lib/fontawesome';
@@ -115,9 +116,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      data-theme="light"
+      suppressHydrationWarning
       className={`${displayFace.variable} ${sans.variable} ${editorial.variable} ${mono.variable}`}
     >
+      <head>
+        {/* Blocking theme apply before paint — matches ThemeToggle storage + prefers-color-scheme. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
+      </head>
       <body>
         <a className="ds-skip-link" href="#main">
           Skip to main content
