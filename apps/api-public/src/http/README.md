@@ -87,18 +87,20 @@ Handlers depend on the `PublicDataAccess` port (`data-access.ts`). Two adapters 
   `apps/web/src/lib/public-data/firestore-readers.ts`). Selected at boot by
   `createProductionHandlerDeps` (`./compose.ts`) when the live gate is true.
 
-**Live wiring gaps (honest, tracked in repo-rw1p):** release `search-index.json` artifact reads
-(web prefers artifact then Firestore — api-public uses Firestore `publicSearchIndex` only today),
-timeline hydration (projection has no timeline field — always `[]` until release builder adds one),
-Firebase-emulator integration tests, timing-attack tests, load/read-budget tests, and
-SSRF-via-media-URL tests.
+**Live wiring gaps (honest, tracked in repo-rw1p):** timeline hydration (projection has no timeline
+field — always `[]` until release builder adds one), Firebase-emulator integration tests,
+load/read-budget tests, and independent reviewer sign-off on authorization/redaction/cost paths.
 
-**Fixed in MOB-004 index search pass:** live `/v1/search` prefers the release-scoped
+**Fixed in MOB-004 index search pass (2f8563c9):** live `/v1/search` prefers the release-scoped
 `publicSearchIndex` composite query (`releaseId == activeRelease`, `orderBy __name__`, paginated at
 400 docs/page — same shape as `apps/web/src/lib/public-data/firestore-readers.ts`) and runs
 `@repo/domain`'s `runPublicSearch` for filters, facets, ranking, and depth pagination. When no
 index rows exist for the release, search honestly falls back to a bounded entity-collection scan
 (`MAX_LIVE_SEARCH_SCAN`, free-text match only, empty facets).
+
+**Fixed in MOB-004 artifact parity pass:** live search now prefers release `search-index.json`
+(CDN/GCS via `@repo/firebase`'s `fetchReleaseSearchIndexArtifact`, same object path as web) before
+the Firestore `publicSearchIndex` query — matching `apps/web`'s artifact-first order.
 
 ## Local run against live Firebase (production project)
 

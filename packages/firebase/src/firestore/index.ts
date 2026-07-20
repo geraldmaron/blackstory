@@ -182,7 +182,10 @@ export {
   publicReleaseSearchIndexPath,
   writeReleaseCatalogArtifactsToDir,
   uploadReleaseCatalogArtifacts,
+  fetchReleaseSearchIndexArtifact,
+  type ArtifactFetchImpl,
   type BuiltReleaseCatalogArtifacts,
+  type FetchReleaseArtifactOptions,
   type ReleaseEntitiesListArtifact,
   type ReleaseSearchIndexArtifact,
 } from './release-artifacts.js';

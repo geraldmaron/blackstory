@@ -32,6 +32,7 @@
  *   `apps/web`'s `map-projection.ts` uses — never fabricated curated content.
  */
 import {
+  fetchReleaseSearchIndexArtifact,
   firestorePaths,
   FIRESTORE_ROOT,
   getServerFirestore,
@@ -42,6 +43,7 @@ import {
   type PublicClaimProjectionDoc,
   type PublicEntityProjectionDoc,
   type PublicSearchIndexDoc as FirestoreSearchIndexDoc,
+  type ReleaseSearchIndexArtifact,
 } from '@repo/firebase';
 import type { NotabilityBasisRecord, PublicSearchIndexDoc } from '@repo/domain';
 import { findUsStateForPoint } from '@repo/domain';
@@ -89,6 +91,10 @@ export type CreateFirestoreDataAccessReadersOptions = {
   readonly environment?: EnvironmentLike;
   /** Injected for tests; defaults to the real `@repo/firebase` server Firestore client. */
   readonly firestore?: FirestoreClientLike;
+  /** Injected for tests; defaults to `@repo/firebase`'s HTTPS artifact fetch (no local fallback). */
+  readonly fetchSearchIndexArtifact?: (
+    releaseId: string,
+  ) => Promise<ReleaseSearchIndexArtifact | undefined>;
 };
 
 /** Bounds entity-collection fallback reads when no `publicSearchIndex` rows exist for the active
@@ -320,6 +326,48 @@ export async function loadReleaseSearchIndexDocs(
   return docs;
 }
 
+function mapSearchIndexDocsFromArtifact(
+  artifact: ReleaseSearchIndexArtifact,
+  releaseId: string,
+): readonly PublicSearchIndexDoc[] {
+  if (artifact.releaseId !== releaseId || artifact.docs.length === 0) {
+    return [];
+  }
+
+  const docs: PublicSearchIndexDoc[] = [];
+  for (const raw of artifact.docs) {
+    const parsed = parseSearchIndexDoc(raw);
+    if (parsed) docs.push(mapSearchIndexDoc(parsed));
+  }
+  return docs;
+}
+
+/**
+ * Prefer release `search-index.json` artifact (same order as `apps/web`'s
+ * `loadLiveSearchIndexForRelease`), then paginated Firestore `publicSearchIndex`.
+ */
+export async function loadReleaseSearchIndexForSearch(
+  firestore: FirestoreClientLike,
+  releaseId: string,
+  options: {
+    readonly fetchSearchIndexArtifact?: (
+      id: string,
+    ) => Promise<ReleaseSearchIndexArtifact | undefined>;
+  } = {},
+): Promise<readonly PublicSearchIndexDoc[]> {
+  const fetchArtifact =
+    options.fetchSearchIndexArtifact ??
+    ((id) => fetchReleaseSearchIndexArtifact(id, { allowLocalFallback: false }));
+
+  const artifact = await fetchArtifact(releaseId);
+  if (artifact) {
+    const fromArtifact = mapSearchIndexDocsFromArtifact(artifact, releaseId);
+    if (fromArtifact.length > 0) return fromArtifact;
+  }
+
+  return loadReleaseSearchIndexDocs(firestore, releaseId);
+}
+
 async function loadFallbackEntitySearchPool(
   firestore: FirestoreClientLike,
   releaseId: string,
@@ -350,6 +398,9 @@ export function createFirestoreDataAccessReaders(
 ): FirestoreDataAccessReaders {
   const firestore: FirestoreClientLike =
     options.firestore ?? getServerFirestore(options.environment ?? process.env);
+  const fetchSearchIndexArtifact =
+    options.fetchSearchIndexArtifact ??
+    ((releaseId) => fetchReleaseSearchIndexArtifact(releaseId, { allowLocalFallback: false }));
 
   return {
     async readReleasePointer(): Promise<ReleasePointer | undefined> {
@@ -370,7 +421,9 @@ export function createFirestoreDataAccessReaders(
       canonical: CanonicalSearchQuery,
       searchOptions: { readonly releaseId: string },
     ): Promise<SearchPage> {
-      const indexDocs = await loadReleaseSearchIndexDocs(firestore, searchOptions.releaseId);
+      const indexDocs = await loadReleaseSearchIndexForSearch(firestore, searchOptions.releaseId, {
+        fetchSearchIndexArtifact,
+      });
       if (indexDocs.length > 0) {
         return searchOverIndex(indexDocs, canonical);
       }

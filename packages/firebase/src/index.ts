@@ -207,6 +207,7 @@ export {
   publicReleaseSearchIndexPath,
   writeReleaseCatalogArtifactsToDir,
   uploadReleaseCatalogArtifacts,
+  fetchReleaseSearchIndexArtifact,
   submissionInboxConverter,
   auditEventConverter,
   outboxMessageConverter,

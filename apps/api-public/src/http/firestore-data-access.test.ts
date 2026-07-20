@@ -9,6 +9,7 @@ import { entityV1Schema } from '@repo/public-contracts/v1/entity';
 import {
   createFirestoreDataAccessReaders,
   loadReleaseSearchIndexDocs,
+  loadReleaseSearchIndexForSearch,
   mapProjectionToEntityV1,
   mapSearchIndexDoc,
   MAX_LIVE_SEARCH_SCAN,
@@ -353,6 +354,52 @@ test('createFirestoreDataAccessReaders search paginates index-backed results by 
   assert.equal(page1.hasMore, true);
   assert.equal(page2.results.length, 1);
   assert.notEqual(page1.results[0]?.id, page2.results[0]?.id);
+});
+
+test('loadReleaseSearchIndexForSearch prefers search-index.json artifact over Firestore', async () => {
+  const trace = { entityScans: 0, searchIndexQueries: 0 };
+  const loaded = await loadReleaseSearchIndexForSearch(fakeFirestore({ trace }), RELEASE_ID, {
+    fetchSearchIndexArtifact: async () => ({
+      schemaVersion: 1,
+      releaseId: RELEASE_ID,
+      generatedAt: '2026-07-20T00:00:00.000Z',
+      docCount: 1,
+      docs: [sampleSearchIndexDoc],
+    }),
+  });
+  assert.equal(loaded.length, 1);
+  assert.equal(loaded[0]?.id, sampleSearchIndexDoc.id);
+  assert.equal(trace.searchIndexQueries, 0);
+});
+
+test('createFirestoreDataAccessReaders search prefers search-index.json artifact over Firestore', async () => {
+  const trace = { entityScans: 0, searchIndexQueries: 0 };
+  const readers = createFirestoreDataAccessReaders({
+    firestore: fakeFirestore({
+      trace,
+      searchIndex: new Map([
+        [
+          'ent_firestore_only',
+          { ...sampleSearchIndexDoc, id: 'ent_firestore_only', nameLower: 'firestore only' },
+        ],
+      ]),
+    }),
+    fetchSearchIndexArtifact: async () => ({
+      schemaVersion: 1,
+      releaseId: RELEASE_ID,
+      generatedAt: '2026-07-20T00:00:00.000Z',
+      docCount: 1,
+      docs: [sampleSearchIndexDoc],
+    }),
+  });
+  const page = await readers.readSearchPage(
+    { q: 'seed', pageSize: 10, depth: 1, filters: [], geo: undefined, dateRange: undefined, sort: 'relevance', shape: 'search' },
+    { releaseId: RELEASE_ID },
+  );
+  assert.equal(page.results.length, 1);
+  assert.equal(page.results[0]?.id, sampleSearchIndexDoc.id);
+  assert.equal(trace.searchIndexQueries, 0);
+  assert.equal(trace.entityScans, 0);
 });
 
 test('createFirestoreDataAccessReaders search falls back to bounded entity scan when index is absent', async () => {
