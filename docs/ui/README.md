@@ -67,7 +67,7 @@ pnpm --filter @repo/web exec next dev --port 3048
 | `/search` | Seed-backed browse with FilterBar + ResultList |
 | `/explore` | Location discovery scaffold ( later) |
 | `/stories` | History articles from the archive (seed today; draft via `story-research-run`, review at admin `/stories/review` with Firebase Auth — human approve before seed) |
-| `/methodology` | Inclusion, confidence, precision |
+| `/methodology` | Inclusion, research flow, confidence, precision, and operational policy |
 | `/about` | Product framing |
 | `/corrections` | Correction intake scaffold ( later) |
 | `/entity/[id]` | Entity detail scaffold (seed ids) |

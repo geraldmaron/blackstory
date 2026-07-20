@@ -15,6 +15,7 @@ import {
   RevisionUpdateChrome,
   TrustSiteDisclaimer,
 } from './index';
+import { ResearchPipelineSketch, SourceTypesSketch } from './ResearchPipelineSketch';
 
 const SAMPLE_COUNTER_CLAIMS: readonly FactCounterClaim[] = [
   {
@@ -95,4 +96,24 @@ test('TrustSiteDisclaimer renders registry copy without inline ad-hoc strings', 
   const html = renderToStaticMarkup(createElement(TrustSiteDisclaimer));
   assert.match(html, new RegExp(getDisclaimer('site_wide').title));
   assert.match(html, /Reviewed/);
+});
+
+test('ResearchPipelineSketch exposes a text alternative for the pipeline figure', () => {
+  const html = renderToStaticMarkup(createElement(ResearchPipelineSketch));
+  assert.match(html, /role="img"|aria-labelledby/);
+  assert.match(html, /Local home server/);
+  assert.match(html, /Paid cloud models/);
+  assert.match(html, /puzzle pieces/i);
+  assert.match(html, /never write the public projection/i);
+  assert.match(html, /ds-pipeline-sketch__box/);
+  assert.match(html, /var\(--ds-ink\)/);
+  assert.doesNotMatch(html, /repo-|BB-\d+/);
+});
+
+test('SourceTypesSketch ranks authority against discovery without inventing completeness', () => {
+  const html = renderToStaticMarkup(createElement(SourceTypesSketch));
+  assert.match(html, /Authority sources include government/i);
+  assert.match(html, /Reddit/);
+  assert.match(html, /Discovery never outranks/i);
+  assert.match(html, /ds-pipeline-sketch__arrowhead/);
 });

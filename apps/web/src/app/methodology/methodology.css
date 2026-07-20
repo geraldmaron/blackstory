@@ -1,0 +1,582 @@
+/**
+ * Methodology page body — compact trust surface below the hero mast.
+ * Ledger rows, grade cards, rule strips, and callouts replace dense definition grids.
+ */
+
+.ds-methodology {
+  margin-top: var(--ds-space-6);
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+/* On-page nav targets sit below the fixed header island. */
+.ds-methodology [id] {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+.ds-methodology .ds-section {
+  padding-block: var(--ds-space-8);
+}
+
+.ds-methodology .ds-section__lede {
+  margin-top: var(--ds-space-4);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.ds-methodology .ds-section__lede + .ds-sans,
+.ds-methodology .ds-section__lede + .ds-methodology__mission-grid {
+  margin-top: var(--ds-space-4);
+}
+
+/* —— On-page index — orientation only, copper tick inherited —— */
+.ds-methodology__nav {
+  margin: 0;
+  padding: var(--ds-space-4) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-methodology__nav-title {
+  margin: 0 0 var(--ds-space-3);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ds-methodology__nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-methodology__nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-methodology__nav-link:hover,
+.ds-methodology__nav-link:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-methodology__nav-link {
+    transition: none;
+  }
+}
+
+/* —— Mission beats — three declarative columns on wide viewports —— */
+.ds-methodology__mission-grid {
+  display: grid;
+  gap: var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 48rem) {
+  .ds-methodology__mission-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--ds-space-5);
+  }
+}
+
+.ds-methodology__mission-item {
+  margin: 0;
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-methodology__mission-kicker {
+  margin: 0 0 var(--ds-space-2);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-methodology__mission-body {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* —— Section subheads —— */
+.ds-methodology__subhead {
+  margin: var(--ds-space-6) 0 0;
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.ds-methodology__subhead:first-of-type {
+  margin-top: var(--ds-space-5);
+}
+
+/* —— Callouts —— */
+.ds-methodology__callout {
+  margin-top: var(--ds-space-4);
+}
+
+/* —— Term chips — mono slugs, never color-only —— */
+.ds-methodology__chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.2rem 0.55rem;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.ds-methodology__chip--internal {
+  border-style: dashed;
+}
+
+.ds-methodology__chip--public {
+  border-color: color-mix(in srgb, var(--ds-accent-graphic) 35%, var(--ds-border));
+}
+
+/* —— Ledger stack — single-column scannable rows —— */
+.ds-methodology__ledger {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-4);
+}
+
+.ds-methodology__ledger-item {
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  isolation: isolate;
+  min-width: 0;
+}
+
+.ds-methodology__ledger-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-methodology__ledger-meta {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ds-methodology__ledger-summary {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ds-methodology__ledger-detail {
+  margin-top: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.ds-methodology__ledger-detail summary {
+  color: var(--ds-accent);
+  cursor: pointer;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ds-methodology__ledger-detail summary:hover,
+.ds-methodology__ledger-detail summary:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-methodology__ledger-detail p {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+}
+
+/* —— Source tier stack — numbered proximity ladder —— */
+.ds-methodology__tier-stack {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-methodology__tier-item {
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  min-width: 0;
+}
+
+.ds-methodology__tier-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-methodology__tier-index {
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+/* —— How-to-read technique cards —— */
+.ds-methodology__technique-grid {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 48rem) {
+  .ds-methodology__technique-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .ds-methodology__technique-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.ds-methodology__technique {
+  margin: 0;
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+}
+
+.ds-methodology__technique-name {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.ds-methodology__technique-action {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.ds-methodology__technique-grid > li,
+.ds-methodology__split > * {
+  min-width: 0;
+}
+
+.ds-methodology__technique-name,
+.ds-methodology__technique-action {
+  overflow-wrap: anywhere;
+}
+
+/* —— Source hierarchy + sketch pairing —— */
+.ds-methodology__split {
+  display: grid;
+  gap: var(--ds-space-5);
+  margin-top: var(--ds-space-4);
+}
+
+@media (min-width: 72rem) {
+  .ds-methodology__split {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+    align-items: start;
+  }
+
+  .ds-methodology__split .ds-pipeline-sketch {
+    margin-top: 0;
+  }
+}
+
+.ds-methodology .ds-pipeline-sketch {
+  max-width: 100%;
+}
+
+.ds-methodology .ds-pipeline-sketch__svg {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* —— Policy stack — verification through limitations —— */
+.ds-methodology__policy-block {
+  padding-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-methodology__policy-block:first-child {
+  padding-top: var(--ds-space-4);
+  border-top: 0;
+}
+
+.ds-methodology__policy-title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.ds-methodology__policy-lede {
+  margin: var(--ds-space-2) 0 0;
+  max-width: 42rem;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* —— Confidence grade cards — glyph + label + one line —— */
+.ds-methodology__grade-grid {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-4);
+}
+
+@media (min-width: 48rem) {
+  .ds-methodology__grade-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ds-methodology__grade-card {
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  min-width: 0;
+}
+
+.ds-methodology__grade-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-methodology__grade-label {
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ds-methodology__grade-summary {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* —— Compact rule strip — numbered rows, not essay bullets —— */
+.ds-methodology__rule-strip {
+  display: grid;
+  gap: 0;
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ds-method-rule;
+}
+
+.ds-methodology__rule-row {
+  position: relative;
+  counter-increment: ds-method-rule;
+  padding: var(--ds-space-3) 0 var(--ds-space-3) var(--ds-space-10);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  min-width: 0;
+}
+
+.ds-methodology__rule-row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.ds-methodology__rule-row::before {
+  content: counter(ds-method-rule, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: var(--ds-space-3);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.ds-methodology__rule-row:first-child::before {
+  top: 0;
+}
+
+.ds-methodology__rule-text {
+  display: block;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* —— Secondary ink band — operational policy, compact grid —— */
+.ds-methodology__secondary {
+  margin-top: var(--ds-space-4);
+}
+
+.ds-methodology__secondary-grid {
+  display: grid;
+  gap: var(--ds-space-6);
+  margin-top: var(--ds-space-6);
+}
+
+@media (min-width: 48rem) {
+  .ds-methodology__secondary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ds-space-8) var(--ds-space-10);
+  }
+}
+
+.ds-methodology__secondary-item {
+  margin: 0;
+  min-width: 0;
+}
+
+.ds-methodology__secondary-kicker {
+  margin: 0 0 var(--ds-space-2);
+  color: var(--ds-fixed-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-methodology__secondary-title {
+  margin: 0;
+  color: var(--ds-fixed-paper);
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.ds-methodology__secondary-body {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-fixed-stone);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.ds-methodology__secondary-body a {
+  color: var(--ds-fixed-paper);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-methodology__secondary-body a:hover {
+  opacity: 0.85;
+}
+
+.ds-methodology__secondary-list {
+  margin: var(--ds-space-2) 0 0;
+  padding-left: var(--ds-space-4);
+  color: var(--ds-fixed-stone);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.ds-methodology__secondary-list li + li {
+  margin-top: var(--ds-space-1);
+}
+
+.ds-methodology__secondary-ledger {
+  margin-top: var(--ds-space-3);
+}
+
+.ds-methodology__secondary-ledger .ds-methodology__ledger-item {
+  background: color-mix(in srgb, var(--ds-fixed-paper) 4%, transparent);
+  border-color: var(--ds-fixed-rule);
+}
+
+.ds-methodology__secondary-ledger .ds-methodology__chip {
+  background: transparent;
+  border-color: var(--ds-fixed-rule);
+  color: var(--ds-fixed-paper);
+}
+
+.ds-methodology__secondary-ledger .ds-methodology__ledger-meta,
+.ds-methodology__secondary-ledger .ds-methodology__ledger-summary,
+.ds-methodology__secondary-ledger .ds-methodology__ledger-detail p {
+  color: var(--ds-fixed-stone);
+}
+
+.ds-methodology__secondary-ledger .ds-methodology__ledger-detail summary {
+  color: var(--ds-fixed-accent);
+}
+
+/* —— Footer links —— */
+.ds-methodology__next {
+  padding-block: var(--ds-space-8);
+}
+
+.ds-methodology__next .ds-band__cta {
+  margin-top: var(--ds-space-4);
+}

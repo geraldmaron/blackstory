@@ -9,3 +9,4 @@ export * from './RevisionUpdateChrome';
 export * from './TrustSiteJsonLdScript';
 export * from './PublishingPrinciplesJsonLdScript';
 export * from './TrustSiteDisclaimer';
+export * from './ResearchPipelineSketch';

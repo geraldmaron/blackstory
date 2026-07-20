@@ -1,0 +1,167 @@
+/**
+ * Hand-sketch architecture diagrams for the public methodology page.
+ * Flat matte fills only; copper reserved for orientation markers (arrows / pin).
+ */
+
+.ds-pipeline-sketch {
+  margin: var(--ds-space-6) 0 0;
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+}
+
+.ds-pipeline-sketch__figcaption {
+  margin: 0 0 var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-sm);
+  line-height: 1.45;
+}
+
+.ds-pipeline-sketch__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 1px;
+  max-width: 52rem;
+  margin-inline: auto;
+  overflow: visible;
+  color: var(--ds-ink);
+}
+
+.ds-pipeline-sketch__svg text {
+  fill: currentColor;
+  font-family: var(--ds-font-mono);
+}
+
+.ds-pipeline-sketch__label {
+  font-size: 9px;
+  letter-spacing: 0.01em;
+}
+
+.ds-pipeline-sketch__label--center {
+  text-anchor: middle;
+}
+
+.ds-pipeline-sketch__title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.ds-pipeline-sketch__note {
+  font-size: 8.5px;
+  letter-spacing: 0.01em;
+  fill: var(--ds-ink-muted);
+}
+
+.ds-pipeline-sketch__box {
+  fill: var(--ds-surface-raised);
+  stroke: var(--ds-ink);
+  stroke-width: 1.75;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.ds-pipeline-sketch__box--accent {
+  stroke: var(--ds-accent-graphic);
+  stroke-width: 2;
+}
+
+.ds-pipeline-sketch__box--muted {
+  fill: var(--ds-surface);
+  stroke: var(--ds-ink-muted);
+  stroke-width: 1.75;
+}
+
+.ds-pipeline-sketch__connector {
+  fill: none;
+  stroke: var(--ds-ink-muted);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ds-pipeline-sketch__connector--accent {
+  stroke: var(--ds-accent-graphic);
+  stroke-width: 1.85;
+}
+
+.ds-pipeline-sketch__dash {
+  stroke-dasharray: 4 5;
+}
+
+.ds-pipeline-sketch__piece {
+  fill: var(--ds-surface);
+  stroke: var(--ds-ink);
+  stroke-width: 1.65;
+  stroke-linejoin: round;
+}
+
+.ds-pipeline-sketch__piece--fill {
+  fill: color-mix(in srgb, var(--ds-accent-graphic) 18%, var(--ds-surface-raised));
+  stroke: var(--ds-accent-graphic);
+  stroke-width: 1.85;
+}
+
+.ds-pipeline-sketch__glyph {
+  fill: none;
+  stroke: var(--ds-ink);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ds-pipeline-sketch__glyph-dot {
+  fill: var(--ds-ink);
+  stroke: var(--ds-ink);
+  stroke-width: 1.2;
+}
+
+.ds-pipeline-sketch__arrowhead {
+  fill: var(--ds-accent-graphic);
+  stroke: none;
+}
+
+.ds-pipeline-sketch__legend {
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-sm);
+  color: var(--ds-ink-muted);
+}
+
+.ds-pipeline-sketch__legend li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--ds-space-2);
+  align-items: baseline;
+}
+
+.ds-pipeline-sketch__legend-mark {
+  font-family: var(--ds-font-mono);
+  font-size: 0.85em;
+  color: var(--ds-accent);
+}
+
+@media (max-width: 640px) {
+  .ds-pipeline-sketch {
+    padding: var(--ds-space-3);
+  }
+
+  .ds-pipeline-sketch__title {
+    font-size: 9.5px;
+  }
+
+  .ds-pipeline-sketch__label {
+    font-size: 8px;
+  }
+
+  .ds-pipeline-sketch__note {
+    font-size: 7.5px;
+  }
+}

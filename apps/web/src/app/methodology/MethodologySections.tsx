@@ -1,11 +1,16 @@
 /**
- * Methodology page sections: mission, definitions, source hierarchy, verification,
- * confidence, geographic dignity, limitations, cadence, corrections, funding, masthead,
- * Trust Project vocabulary, and IFCN alignment — wired to domain trust constants.
+ * Methodology page sections: mission, research pipeline, trust pedagogy, definitions,
+ * source hierarchy, verification, confidence, map dignity, limitations, and a compact
+ * secondary band for cadence, corrections, funding, masthead, transparency, and IFCN.
  */
 import React from 'react';
 import Link from 'next/link';
-import { FACT_CONFIDENCE_DEFINITIONS } from '@repo/domain/facts';
+import { Notice } from '@repo/ui';
+import {
+  FACT_CONFIDENCE_DEFINITIONS,
+  type FactConfidenceGrade,
+  type FactStatus,
+} from '@repo/domain/facts';
 import {
   CULTURAL_FIGURE_NOTABILITY_CALIBRATION_NOTE,
   NOTABILITY_CRITERIA,
@@ -15,321 +20,616 @@ import {
   ENTITY_STATUS_VOCABULARY,
   FACT_STATUS_LIFECYCLE_DEFINITIONS,
   IFCN_COMMITMENTS,
+  PREBUNK_TECHNIQUE_FRAMES,
   SOURCE_HIERARCHY_LEVELS,
   TRUST_PROJECT_INDICATORS,
 } from '../../lib/trust/domain-trust';
-import { humanizeToken } from '../../components/facts/format';
-import { HowToReadThisRecord } from '../../components/trust/HowToReadThisRecord';
+import { humanizeToken, mapConfidenceToUiLevel } from '../../components/facts/format';
+import { ConfidenceMark } from '../../components/map-experience/ConfidenceMark';
+import {
+  ResearchPipelineSketch,
+  SourceTypesSketch,
+} from '../../components/trust/ResearchPipelineSketch';
 import { TrustSiteDisclaimer } from '../../components/trust/TrustSiteDisclaimer';
+import '../../components/trust/research-pipeline-sketch.css';
+import './methodology.css';
 
-function DefinitionList({
+const PAGE_SECTIONS = [
+  { id: 'mission', label: 'Mission' },
+  { id: 'research-pipeline', label: 'Research flow' },
+  { id: 'how-to-read', label: 'How to read' },
+  { id: 'definitions', label: 'Definitions' },
+  { id: 'sources', label: 'Sources' },
+  { id: 'standards', label: 'Standards' },
+  { id: 'operations', label: 'Operations' },
+] as const;
+
+const MISSION_BEATS = [
+  {
+    kicker: 'Not erased',
+    body: 'Corrections append; disagreements stay visible; withdrawn records remain resolvable.',
+  },
+  {
+    kicker: 'Not hidden',
+    body: 'Every public claim carries citations and a path back to sources.',
+  },
+  {
+    kicker: 'About you',
+    body: 'History pinned to states, cities, campuses, and documented sites near where people live and learn.',
+  },
+] as const;
+
+const VERIFICATION_STEPS = [
+  'Identify primary sources closest to the event or record creation.',
+  'Cross-check against independent secondary scholarship where primaries are sparse.',
+  'Document contradictions in confidence notes and counter-claims rather than hiding them.',
+  'Append every change to the revision log with a mandatory edit summary.',
+] as const;
+
+const DIGNITY_RULES = [
+  'Public precision runs from country through campus or institution — never street addresses or exact residence coordinates for living people.',
+  'Points render no sharper than stored public precision. A coarsened point is never labeled as an exact address.',
+  'No red or alarm hues for violence-adjacent records; no crime-heat rendering. Color is never the only signal.',
+  'Unknown living status is treated as living. Current residential addresses do not appear on public pages or hand-offs.',
+  'Hard history is documented where the sources support it, but presence — people, institutions, places across time — is the default lens, not a trauma-first feed.',
+] as const;
+
+const LIMITATION_RULES = [
+  'Coverage is uneven across places and eras. Absence on the map is not proof that nothing happened — it may mean sources have not cleared the publish gate yet.',
+  'Single-source facts are published only with an explicit confidence note explaining why.',
+  'External statistics (census, ACS, voluntary reporting series) carry their own coverage limits; participation and suppression are part of the reading, not optional footnotes.',
+  'Link rot and missing archives happen. Where a web source was captured, the capture travels with the citation; where it was not, the gap is visible.',
+] as const;
+
+const INTERNAL_FACT_STATUSES = new Set<FactStatus>(['draft', 'under_review']);
+
+function summarizeDefinition(text: string, maxLength = 128): { readonly summary: string; readonly hasMore: boolean } {
+  const trimmed = text.trim();
+  const sentenceMatch = trimmed.match(/^[^.!?]+[.!?]/);
+  const firstSentence = sentenceMatch?.[0]?.trim() ?? trimmed;
+  if (firstSentence.length <= maxLength && firstSentence === trimmed) {
+    return { summary: trimmed, hasMore: false };
+  }
+  const summary =
+    firstSentence.length <= maxLength
+      ? firstSentence
+      : `${trimmed.slice(0, maxLength - 1).trim()}…`;
+  return { summary, hasMore: summary !== trimmed };
+}
+
+function TermChip({
+  children,
+  variant,
+}: {
+  readonly children: React.ReactNode;
+  readonly variant?: 'default' | 'internal' | 'public';
+}) {
+  return (
+    <span
+      className={[
+        'ds-methodology__chip',
+        variant === 'internal' ? 'ds-methodology__chip--internal' : '',
+        variant === 'public' ? 'ds-methodology__chip--public' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      {children}
+    </span>
+  );
+}
+
+function LedgerCard({
+  term,
+  definition,
+  meta,
+  termVariant,
+}: {
+  readonly term: string;
+  readonly definition: string;
+  readonly meta?: string;
+  readonly termVariant?: 'default' | 'internal' | 'public';
+}) {
+  const { summary, hasMore } = summarizeDefinition(definition);
+
+  return (
+    <article className="ds-methodology__ledger-item">
+      <div className="ds-methodology__ledger-head">
+        <TermChip {...(termVariant ? { variant: termVariant } : {})}>{term}</TermChip>
+        {meta ? <span className="ds-methodology__ledger-meta">{meta}</span> : null}
+      </div>
+      <p className="ds-methodology__ledger-summary">{summary}</p>
+      {hasMore ? (
+        <details className="ds-methodology__ledger-detail">
+          <summary>Read full definition</summary>
+          <p>{definition}</p>
+        </details>
+      ) : null}
+    </article>
+  );
+}
+
+function LedgerStack({
+  items,
+  className,
+}: {
+  readonly items: readonly {
+    readonly id: string;
+    readonly term: string;
+    readonly definition: string;
+    readonly meta?: string;
+    readonly termVariant?: 'default' | 'internal' | 'public';
+  }[];
+  readonly className?: string;
+}) {
+  return (
+    <div className={['ds-methodology__ledger', className ?? ''].filter(Boolean).join(' ')}>
+      {items.map((item) => (
+        <LedgerCard
+          key={item.id}
+          term={item.term}
+          definition={item.definition}
+          {...(item.meta ? { meta: item.meta } : {})}
+          {...(item.termVariant ? { termVariant: item.termVariant } : {})}
+        />
+      ))}
+    </div>
+  );
+}
+
+function ConfidenceGradeCard({
+  grade,
+  definition,
+}: {
+  readonly grade: FactConfidenceGrade;
+  readonly definition: string;
+}) {
+  const uiLevel = mapConfidenceToUiLevel(grade);
+  const label = humanizeToken(grade);
+  const { summary, hasMore } = summarizeDefinition(definition);
+
+  return (
+    <article className="ds-methodology__grade-card">
+      <div className="ds-methodology__grade-head">
+        <ConfidenceMark tier={uiLevel} labeled />
+        <span className="ds-methodology__grade-label">{label}</span>
+      </div>
+      <p className="ds-methodology__grade-summary">{summary}</p>
+      {hasMore ? (
+        <details className="ds-methodology__ledger-detail">
+          <summary>Read full grade definition</summary>
+          <p>{definition}</p>
+        </details>
+      ) : null}
+    </article>
+  );
+}
+
+function RuleStrip({
+  rules,
+  label,
+}: {
+  readonly rules: readonly string[];
+  readonly label: string;
+}) {
+  return (
+    <ol className="ds-methodology__rule-strip" aria-label={label}>
+      {rules.map((rule) => (
+        <li key={rule} className="ds-methodology__rule-row">
+          <span className="ds-methodology__rule-text">{rule}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function SourceTierStack({
   entries,
 }: {
   readonly entries: readonly { readonly term: string; readonly definition: string }[];
 }) {
   return (
-    <dl className="ds-sans">
-      {entries.map((entry) => (
-        <div key={entry.term} style={{ marginBottom: 'var(--ds-space-4)' }}>
-          <dt className="ds-dt">{entry.term}</dt>
-          <dd style={{ margin: 'var(--ds-space-1) 0 0 0' }}>{entry.definition}</dd>
-        </div>
-      ))}
-    </dl>
+    <ol className="ds-methodology__tier-stack">
+      {entries.map((entry, index) => {
+        const { summary, hasMore } = summarizeDefinition(entry.definition);
+        return (
+          <li key={entry.term} className="ds-methodology__tier-item">
+            <div className="ds-methodology__tier-head">
+              <span className="ds-methodology__tier-index" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <TermChip>{entry.term}</TermChip>
+            </div>
+            <p className="ds-methodology__ledger-summary">{summary}</p>
+            {hasMore ? (
+              <details className="ds-methodology__ledger-detail">
+                <summary>Read full tier definition</summary>
+                <p>{entry.definition}</p>
+              </details>
+            ) : null}
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
 export function MethodologySections() {
+  const notabilityItems = NOTABILITY_CRITERIA.map((criterion) => ({
+    id: criterion,
+    term: humanizeToken(criterion),
+    definition: NOTABILITY_RUBRIC[criterion],
+  }));
+
+  const lifecycleItems = Object.entries(FACT_STATUS_LIFECYCLE_DEFINITIONS).map(([status, definition]) => ({
+    id: status,
+    term: humanizeToken(status),
+    definition,
+    meta: INTERNAL_FACT_STATUSES.has(status as FactStatus) ? 'Off public surfaces' : 'Public projection',
+    termVariant: INTERNAL_FACT_STATUSES.has(status as FactStatus) ? ('internal' as const) : ('public' as const),
+  }));
+
+  const entityStatusItems = [
+    ...ENTITY_STATUS_VOCABULARY.place_like.map((entry) => ({
+      id: `place-${entry.value}`,
+      term: `Place · ${humanizeToken(entry.value)}`,
+      definition: entry.definition,
+    })),
+    ...ENTITY_STATUS_VOCABULARY.law.map((entry) => ({
+      id: `law-${entry.value}`,
+      term: `Law · ${humanizeToken(entry.value)}`,
+      definition: entry.definition,
+    })),
+    ...ENTITY_STATUS_VOCABULARY.movement.map((entry) => ({
+      id: `movement-${entry.value}`,
+      term: `Movement · ${humanizeToken(entry.value)}`,
+      definition: entry.definition,
+    })),
+  ];
+
+  const sourceEntries = SOURCE_HIERARCHY_LEVELS.map((level) => ({
+    term: humanizeToken(level.tier),
+    definition: level.definition,
+  }));
+
+  const confidenceGrades = Object.keys(FACT_CONFIDENCE_DEFINITIONS) as FactConfidenceGrade[];
+
+  const trustIndicatorItems = TRUST_PROJECT_INDICATORS.map((indicator) => ({
+    id: indicator.id,
+    term: indicator.title,
+    definition: indicator.summary,
+    meta: indicator.schemaProperty,
+  }));
+
+  const ifcnItems = IFCN_COMMITMENTS.map((commitment, index) => ({
+    id: `ifcn-${index}`,
+    term: commitment.title,
+    definition: commitment.body,
+  }));
+
   return (
-    <div className="ds-stack" style={{ marginTop: 'var(--ds-space-8)' }}>
+    <div className="ds-methodology">
       <TrustSiteDisclaimer />
 
+      <nav className="ds-methodology__nav" aria-labelledby="methodology-toc-title">
+        <p className="ds-methodology__nav-title" id="methodology-toc-title">
+          On this page
+        </p>
+        <ul className="ds-methodology__nav-list">
+          {PAGE_SECTIONS.map((section) => (
+            <li key={section.id}>
+              <a className="ds-methodology__nav-link" href={`#${section.id}`}>
+                {section.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div className="ds-entity-sections">
+        <section
+          className="ds-section ds-record-section ds-section--flush"
+          aria-labelledby="mission-method"
+          id="mission"
+        >
+          <p className="ds-section__kicker">
+            <span className="ds-kicker-index" aria-hidden="true" />
+            Mission &amp; scope
+          </p>
+          <h2 className="ds-section__title" id="mission-method">
+            Released projections with receipts
+          </h2>
+          <p className="ds-section__lede">
+            BlackStory publishes place-connected Black history with provenance, confidence grades,
+            and living-person protections. We document what primary and secondary sources support,
+            state what they do not, and preserve disagreements instead of collapsing them into a
+            single winner.
+          </p>
+          <ul className="ds-methodology__mission-grid">
+            {MISSION_BEATS.map((beat) => (
+              <li key={beat.kicker} className="ds-methodology__mission-item">
+                <p className="ds-methodology__mission-kicker">{beat.kicker}</p>
+                <p className="ds-methodology__mission-body">{beat.body}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section
+          className="ds-section ds-record-section"
+          aria-labelledby="research-pipeline-method"
+          id="research-pipeline"
+        >
+          <p className="ds-section__kicker">
+            <span className="ds-kicker-index" aria-hidden="true" />
+            How research moves
+          </p>
+          <h2 className="ds-section__title" id="research-pipeline-method">
+            From intake to publish gate
+          </h2>
+          <p className="ds-section__lede">
+            Discovery tools find candidates; they never substitute for verification. Fragments
+            aggregate, models assist research on private surfaces, and human review decides what
+            reaches the public record.
+          </p>
+          <ResearchPipelineSketch />
+        </section>
+
+        <section
+          className="ds-section ds-record-section"
+          aria-labelledby="how-to-read-method"
+          id="how-to-read"
+        >
+          <p className="ds-section__kicker">
+            <span className="ds-kicker-index" aria-hidden="true" />
+            How to read a record
+          </p>
+          <h2 className="ds-section__title" id="how-to-read-method">
+            Check the evidence yourself
+          </h2>
+          <p className="ds-section__lede">
+            Historical records get challenged in predictable ways — out-of-context quotes,
+            impossible documentation demands, or attacks on the messenger instead of the evidence.
+            Name the technique, then follow the citation chain.
+          </p>
+          <ul className="ds-methodology__technique-grid">
+            {PREBUNK_TECHNIQUE_FRAMES.map((frame) => (
+              <li key={frame.id} className="ds-methodology__technique">
+                <p className="ds-methodology__technique-name">{frame.technique}</p>
+                <p className="ds-methodology__technique-action">{frame.readerAction}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section
+          className="ds-section ds-record-section"
+          aria-labelledby="definitions-method"
+          id="definitions"
+        >
+          <p className="ds-section__kicker">
+            <span className="ds-kicker-index" aria-hidden="true" />
+            Definitions &amp; inclusion
+          </p>
+          <h2 className="ds-section__title" id="definitions-method">
+            Shared vocabulary
+          </h2>
+          <p className="ds-section__lede">
+            Precision in definitions lets a reader compare this archive to others without talking
+            past each other. Inclusion is never a popularity contest — every entity needs at least
+            one documented notability basis.
+          </p>
+
+          <h3 className="ds-methodology__subhead">Notability basis (per kind)</h3>
+          <LedgerStack items={notabilityItems} />
+          <Notice
+            className="ds-methodology__callout"
+            tone="warning"
+            title="Cultural-figure calibration"
+          >
+            {CULTURAL_FIGURE_NOTABILITY_CALIBRATION_NOTE}
+          </Notice>
+
+          <h3 className="ds-methodology__subhead">Fact record status lifecycle</h3>
+          <Notice className="ds-methodology__callout" tone="warning" title="Public projection gate">
+            Only published (and later corrected, superseded, or deprecated) facts appear on public
+            surfaces. Draft and under-review work stay off the public projection and search index.
+          </Notice>
+          <LedgerStack items={lifecycleItems} />
+
+          <h3 className="ds-methodology__subhead">Entity status vocabularies</h3>
+          <LedgerStack items={entityStatusItems} />
+        </section>
+
+        <section
+          className="ds-section ds-record-section"
+          aria-labelledby="source-hierarchy-method"
+          id="sources"
+        >
+          <p className="ds-section__kicker">
+            <span className="ds-kicker-index" aria-hidden="true" />
+            Source hierarchy
+          </p>
+          <h2 className="ds-section__title" id="source-hierarchy-method">
+            Proximity to the event
+          </h2>
+          <p className="ds-section__lede">
+            Sources are ranked by proximity to the event and by independence. Discovery tools help
+            find candidates; they do not substitute for verification.
+          </p>
+          <div className="ds-methodology__split">
+            <SourceTierStack entries={sourceEntries} />
+            <SourceTypesSketch />
+          </div>
+        </section>
+
+        <section
+          className="ds-section ds-record-section"
+          aria-labelledby="standards-method"
+          id="standards"
+        >
+          <p className="ds-section__kicker">
+            <span className="ds-kicker-index" aria-hidden="true" />
+            Verification &amp; limits
+          </p>
+          <h2 className="ds-section__title" id="standards-method">
+            Standards you can audit
+          </h2>
+
+          <div className="ds-methodology__policy-block" id="verification">
+            <h3 className="ds-methodology__policy-title" id="verification-method">
+              Verification &amp; triangulation
+            </h3>
+            <p className="ds-methodology__policy-lede">
+              Every published fact passes an independent citation-completeness gate before release.
+              Triangulation means at least two independent lineages before corroborated grade;
+              syndicated copies do not inflate scores.
+            </p>
+            <RuleStrip label="Verification steps" rules={VERIFICATION_STEPS} />
+          </div>
+
+          <div className="ds-methodology__policy-block" id="confidence">
+            <h3 className="ds-methodology__policy-title" id="confidence-method">
+              Confidence grades
+            </h3>
+            <p className="ds-methodology__policy-lede">
+              Confidence is never color alone — every grade carries a glyph, a text label, and a
+              published definition. Crime statistics never enter the composite confidence score.
+            </p>
+            <div className="ds-methodology__grade-grid">
+              {confidenceGrades.map((grade) => (
+                <ConfidenceGradeCard
+                  key={grade}
+                  grade={grade}
+                  definition={FACT_CONFIDENCE_DEFINITIONS[grade]}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="ds-methodology__policy-block" id="dignity">
+            <h3 className="ds-methodology__policy-title" id="dignity-method">
+              Geographic precision &amp; map dignity
+            </h3>
+            <p className="ds-methodology__policy-lede">
+              Place is the product&apos;s organizing idea — and also where harm is easiest to cause.
+              Public maps follow dignity rules that are load-bearing, not decorative.
+            </p>
+            <RuleStrip label="Map dignity rules" rules={DIGNITY_RULES} />
+          </div>
+
+          <div className="ds-methodology__policy-block" id="limitations">
+            <h3 className="ds-methodology__policy-title" id="limitations-method">
+              Known limitations &amp; gaps
+            </h3>
+            <p className="ds-methodology__policy-lede">
+              An archive of sourced facts will contain errors. Every correction is logged publicly
+              and preserved in the record&apos;s history — nothing is silently edited.
+            </p>
+            <RuleStrip label="Known limitations" rules={LIMITATION_RULES} />
+          </div>
+        </section>
+      </div>
+
       <section
-        className="ds-section"
-        aria-labelledby="mission-method"
-        style={{ paddingTop: 0 }}
-        id="mission"
+        className="ds-band ds-methodology__secondary"
+        aria-labelledby="operations-method"
+        id="operations"
       >
-        <h2 className="ds-section__title" id="mission-method">
-          Mission &amp; scope
+        <p className="ds-section__kicker">Operations &amp; accountability</p>
+        <h2 className="ds-section__title" id="operations-method">
+          How the archive stays current
         </h2>
         <p className="ds-section__lede">
-          BlackStory publishes released historical projections — place-connected Black history with
-          provenance, confidence grades, and living-person protections. History should not be
-          erased: corrections append; disagreements stay visible; withdrawn records remain
-          resolvable. History should not be hard to find: every public claim carries citations and a
-          path back to sources. History should be accessible because it is about you — pinned to
-          states, cities, campuses, and documented sites near where people live and learn.
+          Corrections, funding disclosures, editorial roles, and external alignment frameworks —
+          the operational layer behind the evidence bar.
         </p>
-        <p className="ds-sans">
-          We document what primary and secondary sources support, state what they do not, and
-          preserve disagreements instead of collapsing them into a single winner. Presence and proof
-          travel together: the map shows scale; each record shows receipts.
-        </p>
+
+        <div className="ds-methodology__secondary-grid">
+          <article className="ds-methodology__secondary-item" id="cadence">
+            <p className="ds-methodology__secondary-kicker">Update cadence</p>
+            <h3 className="ds-methodology__secondary-title" id="cadence-method">
+              Corrections ship when verified
+            </h3>
+            <p className="ds-methodology__secondary-body">
+              Routine content reviews run quarterly; present-day advisories carry their own review
+              dates on each record. Major methodology changes receive an editor&apos;s note in the{' '}
+              <Link href="/errata">errata log</Link>.
+            </p>
+          </article>
+
+          <article className="ds-methodology__secondary-item" id="report-error">
+            <p className="ds-methodology__secondary-kicker">Corrections lane</p>
+            <h3 className="ds-methodology__secondary-title" id="report-error-method">
+              How to report an error
+            </h3>
+            <p className="ds-methodology__secondary-body">
+              Use the <Link href="/corrections">corrections lane</Link> to challenge a published
+              record, suggest missing evidence, or report a precision issue. Submissions enter a
+              restricted review queue; nothing changes publicly until it passes independent
+              verification. You receive a receipt code to track status.
+            </p>
+          </article>
+
+          <article className="ds-methodology__secondary-item" id="funding">
+            <p className="ds-methodology__secondary-kicker">Independence</p>
+            <h3 className="ds-methodology__secondary-title" id="funding-method">
+              Funding &amp; editorial firewall
+            </h3>
+            <p className="ds-methodology__secondary-body" id="independence">
+              BlackStory is an independent editorial project. Funding sources, when applicable, are
+              listed here and updated when they change. No funder receives advance editorial review
+              or veto over published records. When formal funding disclosures apply, they will
+              appear in this section with dates.
+            </p>
+          </article>
+
+          <article className="ds-methodology__secondary-item" id="masthead">
+            <p className="ds-methodology__secondary-kicker">Masthead</p>
+            <h3 className="ds-methodology__secondary-title" id="masthead-method">
+              Named accountability
+            </h3>
+            <p className="ds-methodology__secondary-body">
+              Editorial accountability is named by role, not hidden behind an anonymous brand
+              voice. Public bios link here as the team publishes them.
+            </p>
+            <ul className="ds-methodology__secondary-list">
+              <li>Editorial lead — methodology, corrections policy, and publish gate</li>
+              <li>Research lead — source verification and citation completeness</li>
+              <li>Platform lead — projection integrity and security posture</li>
+            </ul>
+          </article>
+
+          <article className="ds-methodology__secondary-item" id="transparency">
+            <p className="ds-methodology__secondary-kicker">Trust Project</p>
+            <h3 className="ds-methodology__secondary-title" id="transparency-method">
+              Transparency indicators
+            </h3>
+            <p className="ds-methodology__secondary-body">
+              We adopt the eight transparency practices and their schema.org vocabulary (CC-BY-SA)
+              without using any trademarked program name or badge. Each indicator maps to a
+              published policy URL on this site.
+            </p>
+            <LedgerStack className="ds-methodology__secondary-ledger" items={trustIndicatorItems} />
+          </article>
+
+          <article className="ds-methodology__secondary-item" id="ifcn">
+            <p className="ds-methodology__secondary-kicker">IFCN alignment</p>
+            <h3 className="ds-methodology__secondary-title" id="ifcn-method">
+              Fact-checking commitments
+            </h3>
+            <p className="ds-methodology__secondary-body">
+              The five International Fact-Checking Network commitments below are reproduced as
+              editorial alignment. BlackStory is not a paid IFCN signatory; the badge requires
+              signatory status. The commitment language is public and guides our corrections and
+              verification posture.
+            </p>
+            <LedgerStack className="ds-methodology__secondary-ledger" items={ifcnItems} />
+          </article>
+        </div>
       </section>
 
-      <section className="ds-section" aria-labelledby="how-to-read-method">
-        <HowToReadThisRecord methodologyHref="#definitions" />
-      </section>
-
-      <section className="ds-section" aria-labelledby="definitions-method" id="definitions">
-        <h2 className="ds-section__title" id="definitions-method">
-          Definitions &amp; inclusion criteria
-        </h2>
-        <p className="ds-section__lede">
-          Precision in definitions is what lets a reader compare this archive to others without
-          talking past each other. Inclusion is never a popularity contest — every entity needs at
-          least one documented notability basis.
-        </p>
-        <h3 className="ds-section__title ds-subheading">Notability basis (per kind)</h3>
-        <DefinitionList
-          entries={NOTABILITY_CRITERIA.map((criterion) => ({
-            term: humanizeToken(criterion),
-            definition: NOTABILITY_RUBRIC[criterion],
-          }))}
-        />
-        <p className="ds-sans">{CULTURAL_FIGURE_NOTABILITY_CALIBRATION_NOTE}</p>
-        <h3 className="ds-section__title ds-subheading" style={{ marginTop: 'var(--ds-space-6)' }}>
-          Fact record status lifecycle
-        </h3>
-        <p className="ds-sans">
-          Only published (and later corrected, superseded, or deprecated) facts appear on public
-          surfaces. Draft and under-review work stay off the public projection and search index.
-        </p>
-        <DefinitionList
-          entries={Object.entries(FACT_STATUS_LIFECYCLE_DEFINITIONS).map(
-            ([status, definition]) => ({
-              term: humanizeToken(status),
-              definition,
-            }),
-          )}
-        />
-        <h3 className="ds-section__title ds-subheading" style={{ marginTop: 'var(--ds-space-6)' }}>
-          Entity status vocabularies
-        </h3>
-        <DefinitionList
-          entries={[
-            ...ENTITY_STATUS_VOCABULARY.place_like.map((entry) => ({
-              term: `Place-like · ${humanizeToken(entry.value)}`,
-              definition: entry.definition,
-            })),
-            ...ENTITY_STATUS_VOCABULARY.law.map((entry) => ({
-              term: `Law · ${humanizeToken(entry.value)}`,
-              definition: entry.definition,
-            })),
-            ...ENTITY_STATUS_VOCABULARY.movement.map((entry) => ({
-              term: `Movement · ${humanizeToken(entry.value)}`,
-              definition: entry.definition,
-            })),
-          ]}
-        />
-      </section>
-
-      <section className="ds-section" aria-labelledby="source-hierarchy-method" id="sources">
-        <h2 className="ds-section__title" id="source-hierarchy-method">
-          Source hierarchy
-        </h2>
-        <p className="ds-section__lede">
-          Sources are ranked by proximity to the event and by independence. Discovery tools help
-          find candidates; they do not substitute for verification.
-        </p>
-        <DefinitionList
-          entries={SOURCE_HIERARCHY_LEVELS.map((level) => ({
-            term: humanizeToken(level.tier),
-            definition: level.definition,
-          }))}
-        />
-      </section>
-
-      <section className="ds-section" aria-labelledby="verification-method" id="verification">
-        <h2 className="ds-section__title" id="verification-method">
-          Verification &amp; triangulation
-        </h2>
-        <p className="ds-section__lede">
-          Every published fact passes an independent citation-completeness gate: structured CSL-JSON
-          references, supporting excerpts, retrieval dates, and archived captures for web sources.
-          Triangulation means at least two independent lineages before a fact reaches corroborated
-          grade; syndicated copies do not inflate scores.
-        </p>
-        <ol className="ds-sans" style={{ paddingLeft: 'var(--ds-space-5)' }}>
-          <li>Identify primary sources closest to the event or record creation.</li>
-          <li>Cross-check against independent secondary scholarship where primaries are sparse.</li>
-          <li>
-            Document contradictions in confidence notes and counter-claims rather than hiding them.
-          </li>
-          <li>Append every change to the revision log with a mandatory edit summary.</li>
-        </ol>
-      </section>
-
-      <section className="ds-section" aria-labelledby="confidence-method" id="confidence">
-        <h2 className="ds-section__title" id="confidence-method">
-          Confidence grades
-        </h2>
-        <p className="ds-section__lede">
-          Confidence is never color alone. Every grade carries a text label and a non-color glyph so
-          the signal survives colorblind reading, screenshots, and print. Crime statistics never
-          enter the composite confidence score.
-        </p>
-        <DefinitionList
-          entries={Object.entries(FACT_CONFIDENCE_DEFINITIONS).map(([grade, definition]) => ({
-            term: humanizeToken(grade),
-            definition,
-          }))}
-        />
-      </section>
-
-      <section className="ds-section" aria-labelledby="dignity-method" id="dignity">
-        <h2 className="ds-section__title" id="dignity-method">
-          Geographic precision &amp; map dignity
-        </h2>
-        <p className="ds-section__lede">
-          Place is the product&apos;s organizing idea — and also where harm is easiest to cause.
-          Public maps follow dignity rules that are load-bearing, not decorative.
-        </p>
-        <ul className="ds-sans" style={{ paddingLeft: 'var(--ds-space-5)' }}>
-          <li>
-            Public precision runs from country through campus or institution — never street
-            addresses or exact residence coordinates for living people.
-          </li>
-          <li>
-            Points render no sharper than stored public precision. A coarsened point is never
-            labeled as an exact address.
-          </li>
-          <li>
-            No red or alarm hues for violence-adjacent records; no crime-heat rendering. Color is
-            never the only signal.
-          </li>
-          <li>
-            Unknown living status is treated as living. Current residential addresses do not appear
-            on public pages or hand-offs.
-          </li>
-          <li>
-            Hard history is documented where the sources support it, but presence — people,
-            institutions, places across time — is the default lens, not a trauma-first feed.
-          </li>
-        </ul>
-      </section>
-
-      <section className="ds-section" aria-labelledby="limitations-method" id="limitations">
-        <h2 className="ds-section__title" id="limitations-method">
-          Known limitations &amp; gaps
-        </h2>
-        <p className="ds-section__lede">
-          An archive of sourced facts will contain errors. What matters is what happens next: every
-          correction is logged publicly, timestamped, and preserved in the record&apos;s history —
-          nothing is silently edited. Many historical events were deliberately never documented; we
-          state those gaps plainly rather than inventing certainty. Completeness is not claimed.
-        </p>
-        <ul className="ds-sans" style={{ paddingLeft: 'var(--ds-space-5)' }}>
-          <li>
-            Coverage is uneven across places and eras. Absence on the map is not proof that nothing
-            happened — it may mean sources have not cleared the publish gate yet.
-          </li>
-          <li>
-            Single-source facts are published only with an explicit confidence note explaining why.
-          </li>
-          <li>
-            External statistics (census, ACS, voluntary reporting series) carry their own coverage
-            limits; participation and suppression are part of the reading, not optional footnotes.
-          </li>
-          <li>
-            Link rot and missing archives happen. Where a web source was captured, the capture
-            travels with the citation; where it was not, the gap is visible.
-          </li>
-        </ul>
-      </section>
-
-      <section className="ds-section" aria-labelledby="cadence-method" id="cadence">
-        <h2 className="ds-section__title" id="cadence-method">
-          Update cadence
-        </h2>
-        <p className="ds-section__lede">
-          Corrections ship as soon as verified — fully, quickly, and without defensiveness. Routine
-          content reviews run quarterly; present-day advisories carry their own review dates on each
-          record. Major methodology changes receive an editor&apos;s note in the{' '}
-          <Link href="/errata">errata log</Link>.
-        </p>
-      </section>
-
-      <section className="ds-section" aria-labelledby="report-error-method" id="report-error">
-        <h2 className="ds-section__title" id="report-error-method">
-          How to report an error
-        </h2>
-        <p className="ds-section__lede">
-          Use the <Link href="/corrections">corrections lane</Link> to challenge a published record,
-          suggest missing evidence, or report a precision issue. Submissions enter a restricted
-          review queue; nothing changes publicly until it passes independent verification. You
-          receive a receipt code to track status. A correction is normal system function — not an
-          admission that the archive failed; it is how the archive refuses silent erasure.
-        </p>
-      </section>
-
-      <section className="ds-section" aria-labelledby="funding-method" id="funding">
-        <h2 className="ds-section__title" id="funding-method">
-          Funding &amp; independence
-        </h2>
-        <p className="ds-section__lede" id="independence">
-          BlackStory is an independent editorial project. Funding sources, when applicable, are
-          listed here and updated when they change. No funder receives advance editorial review or
-          veto over published records. Research promotion and admin tooling remain on private
-          surfaces.
-        </p>
-        <p className="ds-sans" style={{ color: 'var(--ds-ink-muted)' }}>
-          When formal funding disclosures apply, they will appear in this section with dates. Until
-          then, treat independence as the operating rule: evidence decides publication.
-        </p>
-      </section>
-
-      <section className="ds-section" aria-labelledby="masthead-method" id="masthead">
-        <h2 className="ds-section__title" id="masthead-method">
-          Masthead
-        </h2>
-        <p className="ds-section__lede">
-          Editorial accountability is named by role, not hidden behind an anonymous brand voice.
-          Public bios link here as the team publishes them.
-        </p>
-        <ul className="ds-sans" style={{ paddingLeft: 'var(--ds-space-5)' }}>
-          <li>Editorial lead — methodology, corrections policy, and publish gate</li>
-          <li>Research lead — source verification and citation completeness</li>
-          <li>Platform lead — projection integrity and security posture</li>
-        </ul>
-      </section>
-
-      <section className="ds-section" aria-labelledby="transparency-method" id="transparency">
-        <h2 className="ds-section__title" id="transparency-method">
-          Transparency indicators
-        </h2>
-        <p className="ds-section__lede">
-          We adopt the eight transparency practices and their schema.org vocabulary (CC-BY-SA)
-          without using any trademarked program name or badge. Each indicator maps to a published
-          policy URL on this site.
-        </p>
-        <DefinitionList
-          entries={TRUST_PROJECT_INDICATORS.map((indicator) => ({
-            term: `${indicator.title} (${indicator.schemaProperty})`,
-            definition: indicator.summary,
-          }))}
-        />
-      </section>
-
-      <section className="ds-section" aria-labelledby="ifcn-method" id="ifcn">
-        <h2 className="ds-section__title" id="ifcn-method">
-          Aligned with IFCN fact-checking commitments
-        </h2>
-        <p className="ds-section__lede">
-          The five International Fact-Checking Network commitments below are reproduced as editorial
-          alignment. BlackStory is not a paid IFCN signatory; the badge requires signatory status.
-          The commitment language is public and guides our corrections and verification posture.
-        </p>
-        <DefinitionList
-          entries={IFCN_COMMITMENTS.map((commitment) => ({
-            term: commitment.title,
-            definition: commitment.body,
-          }))}
-        />
-      </section>
-
-      <section className="ds-section" aria-labelledby="next-method" id="next">
+      <section className="ds-section ds-methodology__next" aria-labelledby="next-method" id="next">
         <h2 className="ds-section__title" id="next-method">
           Keep going
         </h2>
