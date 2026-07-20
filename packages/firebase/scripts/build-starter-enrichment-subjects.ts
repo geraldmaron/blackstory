@@ -17,15 +17,13 @@
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { fetchPageText } from './lib/fetch-page.ts';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(scriptDir, '../../..');
 const catalogDir = join(repoRoot, 'packages/firebase/fixtures/national-catalog');
 const reportPath = join(repoRoot, '.cache/starter-seed/report.json');
 const outDir = join(repoRoot, '.cache/starter-enrichment');
-
-const MAX_SNIPPET_CHARS = 4_000;
-const FETCH_TIMEOUT_MS = 20_000;
 
 type CatalogEntry = {
   readonly id: string;
@@ -52,36 +50,6 @@ function loadCatalogEntries(): Map<string, CatalogEntry> {
     }
   }
   return entries;
-}
-
-/** Crude but dependency-free readability: drop script/style/nav, strip tags, collapse space. */
-function htmlToText(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/giu, ' ')
-    .replace(/<style[\s\S]*?<\/style>/giu, ' ')
-    .replace(/<nav[\s\S]*?<\/nav>/giu, ' ')
-    .replace(/<header[\s\S]*?<\/header>/giu, ' ')
-    .replace(/<footer[\s\S]*?<\/footer>/giu, ' ')
-    .replace(/<[^>]+>/gu, ' ')
-    .replace(/&nbsp;/gu, ' ')
-    .replace(/&amp;/gu, '&')
-    .replace(/&#\d+;|&[a-z]+;/giu, ' ')
-    .replace(/\s+/gu, ' ')
-    .trim();
-}
-
-async function fetchSourceText(url: string): Promise<string | undefined> {
-  try {
-    const response = await fetch(url, {
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      headers: { 'user-agent': 'BlackStory research pipeline (contact: geraldmarondagher@gmail.com)' },
-    });
-    if (!response.ok) return undefined;
-    const text = htmlToText(await response.text());
-    return text.length > 100 ? text.slice(0, MAX_SNIPPET_CHARS) : undefined;
-  } catch {
-    return undefined;
-  }
 }
 
 async function main(): Promise<void> {
@@ -115,7 +83,7 @@ async function main(): Promise<void> {
     ];
     const snippets: string[] = [];
     for (const url of urls) {
-      const text = await fetchSourceText(url);
+      const text = await fetchPageText(url);
       if (text) {
         fetched += 1;
         snippets.push(`SOURCE ${url}\n${text}`);

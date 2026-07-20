@@ -11,10 +11,14 @@
  * The bar (ALL must hold, or the item is held for human review with a reason):
  *  1. decision === 'keep', confidence >= AUTO_PROMOTE_CONFIDENCE_FLOOR (stricter than the
  *     0.6 staging floor in commit-enrichment-keeps.ts), zero validationIssues.
- *  2. At least one claim, and every claim's citationHref resolves to a Tier-1 host
- *     (federal/state .gov, .mil, or a small named allowlist of federal-adjacent
- *     archives — nps.gov, loc.gov, archives.gov, si.edu, census.gov). This mirrors the
- *     source-program workbook's Tier 1 definition; Tier 2/3 sources stay human-reviewed.
+ *  2. At least one claim, and EVERY claim clears the product constitution's real
+ *     confidence-publish threshold (lib/confidence.ts — sourceAuthority + lineage-
+ *     independence + directness + ... , weighted, same engine canonicalClaims uses,
+ *     not a duplicate/looser one). A claim's evidence is its own citation PLUS the
+ *     subject's independently-found corroborating source when one exists (built by
+ *     build-discovery-enrichment-subjects.ts's citation-trail/search step) — this is
+ *     what lets a Wikipedia-sourced claim clear the bar when a real Tier-1 source
+ *     corroborates it, instead of being capped by whichever one source it started with.
  *  3. subject.kind !== 'person'. Living-status privacy determination (methodology rule 6)
  *     requires human judgment this script does not attempt; person entities always fall
  *     through to human review regardless of source tier.
@@ -37,6 +41,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildReleaseEntityArtifacts, type ReleaseSourceClaim, type ReleaseSourceEntity } from '@repo/domain';
+import { computeClaimConfidence, type SourceForConfidence } from './lib/confidence.ts';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(scriptDir, '../../..');
@@ -44,26 +49,6 @@ const catalogDir = join(repoRoot, 'packages/firebase/fixtures/national-catalog')
 const reportDir = join(repoRoot, '.cache/auto-promotion');
 
 const AUTO_PROMOTE_CONFIDENCE_FLOOR = 0.8;
-
-const TIER1_HOST_PATTERNS: readonly RegExp[] = [
-  /\.gov$/iu,
-  /\.mil$/iu,
-  /(^|\.)nps\.gov$/iu,
-  /(^|\.)loc\.gov$/iu,
-  /(^|\.)archives\.gov$/iu,
-  /(^|\.)si\.edu$/iu,
-  /(^|\.)census\.gov$/iu,
-];
-
-function isTier1Host(url: string | undefined): boolean {
-  if (!url) return false;
-  try {
-    const hostname = new URL(url).hostname;
-    return TIER1_HOST_PATTERNS.some((pattern) => pattern.test(hostname));
-  } catch {
-    return false;
-  }
-}
 
 type SubjectMeta = {
   readonly subjectId: string;
@@ -74,6 +59,7 @@ type SubjectMeta = {
   readonly locationLabel?: string;
   readonly lat?: number;
   readonly lng?: number;
+  readonly corroboratingSourceUrl?: string;
 };
 
 type PacketClaim = {
@@ -160,19 +146,31 @@ function main(): void {
       held.push({ subjectId: packet.subjectId, title, reason: 'no structured claims in draft' });
       continue;
     }
-    const nonTier1 = draftClaims.filter((claim) => !isTier1Host(claim.citationHref));
-    if (nonTier1.length > 0) {
-      held.push({
-        subjectId: packet.subjectId,
-        title,
-        reason: `${nonTier1.length} claim(s) cite a non-Tier-1 source: ${nonTier1
-          .map((c) => c.citationHref ?? '(missing url)')
-          .join(', ')}`,
-      });
-      continue;
-    }
     if (!subject.jurisdictionLabel || !subject.locationLabel || !subject.locationPrecision) {
       held.push({ subjectId: packet.subjectId, title, reason: 'missing jurisdiction/location fields' });
+      continue;
+    }
+
+    const belowThreshold: string[] = [];
+    draftClaims.forEach((claim, index) => {
+      if (!claim.citationHref) {
+        belowThreshold.push(`claims[${index}]: no citationHref`);
+        return;
+      }
+      const sources: SourceForConfidence[] = [{ url: claim.citationHref, textContainsSubjectName: true }];
+      if (subject.corroboratingSourceUrl && subject.corroboratingSourceUrl !== claim.citationHref) {
+        sources.push({ url: subject.corroboratingSourceUrl, textContainsSubjectName: true });
+      }
+      const result = computeClaimConfidence(`${packet.subjectId}-claim-${index}`, sources);
+      if (!result.passesPublishThreshold) {
+        belowThreshold.push(
+          `claims[${index}]: confidence ${result.score} below threshold ${result.threshold} ` +
+            `(${result.independentLineageCount} independent source(s), authority ${result.components.sourceAuthority})`,
+        );
+      }
+    });
+    if (belowThreshold.length > 0) {
+      held.push({ subjectId: packet.subjectId, title, reason: `insufficient confidence: ${belowThreshold.join('; ')}` });
       continue;
     }
 

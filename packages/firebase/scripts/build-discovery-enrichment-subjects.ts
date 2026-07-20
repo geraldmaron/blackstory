@@ -6,9 +6,16 @@
  * overnight discovery lane's keep rate was low; this closes that gap the
  * same way `build-starter-enrichment-subjects.ts` does for the starter seed.
  *
- * Best-effort: a source that fails to fetch (dead link, block, timeout) still
- * produces a subject — its snippet says so explicitly so the judge doesn't
- * treat silence as evidence, and a per-item failure never aborts the batch.
+ * Also looks for one independent Tier-1 corroborating source per candidate
+ * (via lib/corroborate-source.ts — the source's own citation trail first,
+ * SearXNG search as fallback), so a Wikipedia-only discovery candidate has a
+ * real path to building multi-source confidence instead of being capped at
+ * whatever one non-Tier-1 source said.
+ *
+ * Best-effort throughout: a source that fails to fetch (dead link, block,
+ * timeout) still produces a subject — its snippet says so explicitly so the
+ * judge doesn't treat silence as evidence, and a per-item failure never
+ * aborts the batch.
  *
  * Usage:
  *   node --conditions development --import tsx \
@@ -17,9 +24,11 @@
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-
-const MAX_SNIPPET_CHARS = 4_000;
-const FETCH_TIMEOUT_MS = 15_000;
+import { fetchPage } from './lib/fetch-page.ts';
+import { findCorroboratingTier1Source } from './lib/corroborate-source.ts';
+// Relative import across the package boundary (operator-cli already depends on
+// @repo/firebase, so the reverse package.json dependency would cycle).
+import { mapPool } from '../../operator-cli/src/map-pool.ts';
 
 type Candidate = {
   readonly id: string;
@@ -34,47 +43,6 @@ type Candidate = {
 function readArgFlag(name: string): string | undefined {
   const index = process.argv.indexOf(name);
   return index >= 0 ? process.argv[index + 1] : undefined;
-}
-
-function htmlToText(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/giu, ' ')
-    .replace(/<style[\s\S]*?<\/style>/giu, ' ')
-    .replace(/<nav[\s\S]*?<\/nav>/giu, ' ')
-    .replace(/<[^>]+>/gu, ' ')
-    .replace(/&nbsp;/gu, ' ')
-    .replace(/&amp;/gu, '&')
-    .replace(/&#\d+;|&[a-z]+;/giu, ' ')
-    .replace(/\s+/gu, ' ')
-    .trim();
-}
-
-async function fetchSourceText(url: string): Promise<string | undefined> {
-  try {
-    const response = await fetch(url, {
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      headers: { 'user-agent': 'BlackStory research pipeline (contact: geraldmarondagher@gmail.com)' },
-    });
-    if (!response.ok) return undefined;
-    const text = htmlToText(await response.text());
-    return text.length > 100 ? text.slice(0, MAX_SNIPPET_CHARS) : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-async function mapPool<T, R>(items: readonly T[], concurrency: number, fn: (item: T) => Promise<R>): Promise<R[]> {
-  const results: R[] = new Array(items.length);
-  let next = 0;
-  async function worker(): Promise<void> {
-    while (next < items.length) {
-      const index = next;
-      next += 1;
-      results[index] = await fn(items[index]!);
-    }
-  }
-  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
-  return results;
 }
 
 async function main(): Promise<void> {
@@ -92,38 +60,58 @@ async function main(): Promise<void> {
 
   let fetched = 0;
   let unreachable = 0;
-  const subjects = await mapPool(candidates, concurrency, async (candidate) => {
-    const snippets: string[] = [];
-    if (candidate.summary) snippets.push(`DISCOVERY SUMMARY\n${candidate.summary}`);
-    if (candidate.canonicalUrl) {
-      const text = await fetchSourceText(candidate.canonicalUrl);
-      if (text) {
-        fetched += 1;
-        snippets.push(`SOURCE ${candidate.canonicalUrl}\n${text}`);
-      } else {
-        unreachable += 1;
+  let corroborated = 0;
+  const subjects = await mapPool(
+    candidates,
+    async (candidate) => {
+      const snippets: string[] = [];
+      if (candidate.summary) snippets.push(`DISCOVERY SUMMARY\n${candidate.summary}`);
+      let originalPage: Awaited<ReturnType<typeof fetchPage>>;
+      if (candidate.canonicalUrl) {
+        originalPage = await fetchPage(candidate.canonicalUrl);
+        if (originalPage) {
+          fetched += 1;
+          snippets.push(`SOURCE ${candidate.canonicalUrl}\n${originalPage.text}`);
+        } else {
+          unreachable += 1;
+          snippets.push(
+            `SOURCE ${candidate.canonicalUrl}\n(page not fetchable at build time; cite only if the discovery summary supports the claim)`,
+          );
+        }
+      }
+      const corroboration = await findCorroboratingTier1Source(candidate.displayName ?? candidate.id, {
+        ...(originalPage ? { html: originalPage.html, url: candidate.canonicalUrl } : {}),
+      });
+      if (corroboration) {
+        corroborated += 1;
         snippets.push(
-          `SOURCE ${candidate.canonicalUrl}\n(page not fetchable at build time; cite only if the discovery summary supports the claim)`,
+          `INDEPENDENT TIER-1 SOURCE (via ${corroboration.method}) ${corroboration.url}\n${corroboration.text}`,
         );
       }
-    }
-    return {
-      subjectId: candidate.id,
-      title: candidate.displayName ?? candidate.id,
-      ...(candidate.kind ? { kind: candidate.kind } : {}),
-      ...(candidate.summary ? { existingSummary: candidate.summary.slice(0, 400) } : {}),
-      sourceSnippets: snippets,
-      ...(candidate.lat !== undefined ? { lat: candidate.lat } : {}),
-      ...(candidate.lng !== undefined ? { lng: candidate.lng } : {}),
-    };
-  });
+      return {
+        subjectId: candidate.id,
+        title: candidate.displayName ?? candidate.id,
+        ...(candidate.kind ? { kind: candidate.kind } : {}),
+        ...(candidate.summary ? { existingSummary: candidate.summary.slice(0, 400) } : {}),
+        sourceSnippets: snippets,
+        ...(candidate.lat !== undefined ? { lat: candidate.lat } : {}),
+        ...(candidate.lng !== undefined ? { lng: candidate.lng } : {}),
+        // Explicit field (not just embedded in the snippet text) so auto-promote can
+        // build a real independent evidence lineage without string-parsing snippets.
+        ...(corroboration ? { corroboratingSourceUrl: corroboration.url } : {}),
+      };
+    },
+    { concurrency },
+  );
 
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(
     outPath,
     `${JSON.stringify({ subjects, count: subjects.length, source: candidatesPath }, null, 2)}\n`,
   );
-  console.log(JSON.stringify({ subjects: subjects.length, sourcesFetched: fetched, sourcesUnreachable: unreachable, outPath }));
+  console.log(
+    JSON.stringify({ subjects: subjects.length, sourcesFetched: fetched, sourcesUnreachable: unreachable, corroborated, outPath }),
+  );
 }
 
 main().catch((error) => {
