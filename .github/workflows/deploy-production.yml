@@ -1,8 +1,9 @@
 # Production deploy via GitHub OIDC + GCP Workload Identity Federation (BB-010 / BB-062).
 # workflow_dispatch only — not a required status check. Requires protected Environment "production".
 # Deploys only a pinned, staging-tested commit SHA. Automatic App Hosting rollouts stay disabled;
-# explicit promote step runs after Firestore rules/indexes migrate and before traffic shift.
-# No live cloud apply in repo acceptance — dry-run scripts document human operator steps.
+# explicit promote step runs after Firestore rules/indexes migrate and creates a live App Hosting
+# rollout for that SHA via OIDC (promote-app-hosting.sh). Firestore migrate remains dry-run until
+# migrate scripts are promoted separately.
 
 name: Deploy Production
 
@@ -142,15 +143,49 @@ jobs:
     name: Promote App Hosting Production
     needs: [gate, deploy-surfaces]
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # App Hosting builds commonly take 10–25m; keep headroom.
+    timeout-minutes: 45
     environment: production
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout exact commit
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ needs.gate.outputs.commit_sha }}
-      - name: Explicit App Hosting promote (auto rollouts disabled)
-        run: bash infra/github/release-pipeline/promote-app-hosting-dry-run.sh "${{ needs.gate.outputs.commit_sha }}" production
+
+      - name: Authenticate to Google Cloud (OIDC)
+        id: auth
+        if: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && vars.GCP_SERVICE_ACCOUNT != '' }}
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID || 'black-book-efaaf' }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          export_environment_variables: true
+
+      - name: Require WIF for live promote
+        if: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER == '' || vars.GCP_SERVICE_ACCOUNT == '' }}
+        run: |
+          echo "::error::Live App Hosting promote requires Environment production vars GCP_WORKLOAD_IDENTITY_PROVIDER and GCP_SERVICE_ACCOUNT."
+          echo "Apply WIF (infra/github/scripts/apply-wif.sh --apply), then set those vars."
+          echo "Until then, promote locally: bash infra/github/release-pipeline/promote-app-hosting.sh <sha> production"
+          exit 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools@15.17.0
+
+      - name: Explicit App Hosting promote (live — auto rollouts stay disabled)
+        env:
+          FIREBASE_PROJECT_ID: ${{ vars.GCP_PROJECT_ID || 'black-book-efaaf' }}
+        run: bash infra/github/release-pipeline/promote-app-hosting.sh "${{ needs.gate.outputs.commit_sha }}" production
 
   health-check:
     name: Health Check Production

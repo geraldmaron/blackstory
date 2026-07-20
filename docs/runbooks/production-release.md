@@ -4,9 +4,10 @@
 validation, progressive release metadata, protected production approval, explicit App Hosting
 promote, post-deploy health checks, and rollback rehearsal.
 
-**Repo acceptance:** Workflows and scripts in this bead are **dry-run safe**. No `gcloud`,
-`firebase deploy`, or App Hosting API mutation is executed by CI until a human operator completes
-the cloud prerequisites below.
+**Repo acceptance:** Firestore migrate / surface deploy / rollback helpers stay **dry-run safe**.
+App Hosting **promote is live** (`promote-app-hosting.sh`) when Environment WIF vars are set;
+without WIF, run the same script locally with Firebase CLI auth. Automatic App Hosting rollouts
+remain disabled.
 
 **Architecture anchors:** [ADR-006](../adr/ADR-006-github-actions-deployment.md),
 [ADR-011](../adr/ADR-011-firestore-system-of-record.md) (Firestore rules/indexes before traffic;
@@ -54,7 +55,7 @@ GitHub→Firebase integration. Production traffic moves only through explicit pr
 
 - `node infra/github/release-pipeline/assert-no-auto-rollout.mjs` (also runs in deploy workflows)
 - `apps/web/apphosting.production.yaml` documents the policy
-- Deploy workflows use `promote-app-hosting-dry-run.sh` — never `on: push: branches: [main]`
+- Deploy workflows use `promote-app-hosting.sh` (live OIDC promote) — never `on: push: branches: [main]`
 
 ---
 
@@ -71,6 +72,14 @@ gh workflow run deploy-staging.yml \
   -f confirm=deploy-staging
 ```
 
+Requires GitHub Environment `staging` vars `GCP_WORKLOAD_IDENTITY_PROVIDER` and
+`GCP_SERVICE_ACCOUNT` (after `infra/github/scripts/apply-wif.sh --apply`). Until WIF is live,
+promote the same SHA locally:
+
+```bash
+bash infra/github/release-pipeline/promote-app-hosting.sh "$(git rev-parse HEAD)" staging
+```
+
 Or push to the `staging` branch (uses `github.sha` from the push event).
 
 **Production:**
@@ -85,6 +94,12 @@ gh workflow run deploy-production.yml \
   -f commit_sha="$TESTED_SHA" \
   -f prior_release_sha="<optional-prior-good-sha>" \
   -f confirm=deploy
+```
+
+Local promote (same script GHA runs) when Environment `production` WIF vars are not set yet:
+
+```bash
+bash infra/github/release-pipeline/promote-app-hosting.sh "$TESTED_SHA" production
 ```
 
 Download `deployment-provenance-<sha>` artifact and verify `git.commitSha` matches `TESTED_SHA`.
@@ -135,7 +150,7 @@ firebase deploy --only firestore:rules,firestore:indexes \
   --project=black-book-efaaf --config=infra/firebase/firebase.json
 firebase deploy --only storage \
   --project=black-book-efaaf --config=infra/firebase/firebase.json
-bash infra/github/release-pipeline/promote-app-hosting-dry-run.sh "$TESTED_SHA" production
+bash infra/github/release-pipeline/promote-app-hosting.sh "$TESTED_SHA" production
 ```
 
 CI runs `migrate-firestore-dry-run.sh` as a gate — it prints the same order without mutating cloud.

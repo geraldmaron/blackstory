@@ -91,6 +91,20 @@ test('example provenance fixture validates against schema', async () => {
   assert.equal(result.ok, true, result.errors.join('; '));
 });
 
+test('promote-app-hosting dry-run exits zero and does not call firebase', () => {
+  const head = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' });
+  const sha = head.stdout.trim();
+  const result = spawnSync(
+    'bash',
+    [path.join(ROOT, 'infra/github/release-pipeline/promote-app-hosting-dry-run.sh'), sha, 'staging'],
+    { cwd: ROOT, encoding: 'utf8' },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /DRY-RUN/);
+  assert.match(result.stdout, /black-book-web-staging/);
+  assert.match(result.stdout, new RegExp(sha));
+});
+
 test('rollback dry-run script exits zero with valid SHA', () => {
   const head = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' });
   const sha = head.stdout.trim();
