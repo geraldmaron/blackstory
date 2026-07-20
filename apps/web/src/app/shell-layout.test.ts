@@ -124,6 +124,43 @@ describe('horizontal overflow guards', () => {
   });
 });
 
+describe('shell footer theme tokens', () => {
+  it('styles the mega footer with theme canvas/ink tokens, not fixed-ink palette', () => {
+    assert.match(shellCss, /\.ds-shell-footer\s*\{[^}]*background:\s*var\(--ds-canvas\)/s);
+    assert.match(shellCss, /\.ds-shell-footer\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
+    assert.match(shellCss, /\.ds-shell-footer__core\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
+    assert.match(
+      shellCss,
+      /\.ds-shell-footer__support\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink\)/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-shell-footer__links a:focus-visible\s*\{[^}]*outline:[^}]*var\(--ds-accent-graphic\)/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-shell-footer__operator\s*\{[^}]*color:\s*var\(--ds-accent\)/s,
+    );
+    assert.doesNotMatch(shellCss, /\.ds-shell-footer[^{]*\{[^}]*--ds-fixed-/s);
+  });
+
+  it('swaps footer lockup artwork with [data-theme] like the shell header', () => {
+    assert.match(shellCss, /\.ds-shell-footer__wordmark--theme-light\s*\{[^}]*display:\s*block/s);
+    assert.match(
+      shellCss,
+      /\[data-theme='dark'\]\s+\.ds-shell-footer__wordmark--theme-light\s*\{[^}]*display:\s*none/s,
+    );
+    assert.match(
+      shellCss,
+      /\[data-theme='dark'\]\s+\.ds-shell-footer__wordmark--theme-dark\s*\{[^}]*display:\s*block/s,
+    );
+  });
+});
+
 describe('maker credit theme marks', () => {
   it('swaps inline GD marks with [data-theme] like the shell wordmark', () => {
     assert.match(shellCss, /\.ds-maker-credit__mark--theme-light\s*\{[^}]*display:\s*block/s);

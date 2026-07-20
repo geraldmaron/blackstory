@@ -1,13 +1,17 @@
 /**
- * Public site footer — Black Ink always, closed by the kit lockup at
+ * Public site footer — theme-aware canvas plate closed by the kit lockup at
  * landmark scale (the page signs off with the brand, not a fine-print row).
- * Maker credit links to geralddagher.com with the white GD mark (fixed-ink plate).
+ * Maker credit links to geralddagher.com with theme-swapped GD marks.
  * Admin login lives in the shared island "More" menu for consistent traversal.
  */
 
 import Link from 'next/link';
+import React from 'react';
+import { BRAND_ASSETS } from '@repo/config';
 import { FOOTER_NAV_COLUMNS } from '../lib/nav';
 import { MakerCredit } from './MakerCredit';
+
+void React;
 
 export function SiteFooter() {
   return (
@@ -37,8 +41,15 @@ export function SiteFooter() {
           {/* Brand lockup is served as static PNG artwork, not next/image. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            className="ds-shell-footer__wordmark"
-            src="/brand/lockup-dark.png"
+            className="ds-shell-footer__wordmark ds-shell-footer__wordmark--theme-light"
+            src={BRAND_ASSETS.lockup.light}
+            alt=""
+            aria-hidden="true"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="ds-shell-footer__wordmark ds-shell-footer__wordmark--theme-dark"
+            src={BRAND_ASSETS.lockup.dark}
             alt=""
             aria-hidden="true"
           />

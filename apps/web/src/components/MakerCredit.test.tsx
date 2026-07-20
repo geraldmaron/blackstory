@@ -12,13 +12,15 @@ import { MakerCredit } from './MakerCredit';
 void React;
 
 describe('MakerCredit', () => {
-  it('footer variant uses the white mark and links to the personal site', () => {
+  it('footer variant uses theme marks and links to the personal site', () => {
     const html = renderToStaticMarkup(<MakerCredit variant="footer" />);
     assert.match(html, new RegExp(`href="${MAKER.url}"`));
     assert.match(html, /Built by/);
     assert.match(html, new RegExp(MAKER.name));
+    assert.match(html, new RegExp(`src="${MAKER.mark.light}"`));
     assert.match(html, new RegExp(`src="${MAKER.mark.dark}"`));
-    assert.doesNotMatch(html, new RegExp(`src="${MAKER.mark.light}"`));
+    assert.match(html, /ds-maker-credit__mark--theme-light/);
+    assert.match(html, /ds-maker-credit__mark--theme-dark/);
     assert.match(html, /ds-maker-credit--footer/);
     assert.match(html, /ds-shell-footer__operator/);
   });
