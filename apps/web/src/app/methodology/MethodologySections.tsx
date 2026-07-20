@@ -532,7 +532,7 @@ export function MethodologySections() {
       </div>
 
       <section
-        className="ds-band ds-methodology__secondary"
+        className="ds-section ds-methodology__secondary"
         aria-labelledby="operations-method"
         id="operations"
       >
