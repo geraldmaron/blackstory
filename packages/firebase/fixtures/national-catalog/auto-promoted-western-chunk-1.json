@@ -1,0 +1,1475 @@
+[
+  {
+    "id": "west_robin_holmes_q60770787",
+    "kind": "person",
+    "displayName": "Robin Holmes",
+    "summary": "Robin Holmes, born enslaved in Virginia in 1810, sued for the freedom of his children in the Oregon Territory in 1852. His case, Holmes v. Ford, reached the territorial Supreme Court, which in 1853 ruled in his favor, marking a decisive end to slavery in Oregon. The case challenged the legality of enslavement in a free territory and affirmed the rights of African Americans under U.S. law.",
+    "eraBuckets": [
+      "1840s",
+      "1850s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "freedom",
+      "firsts",
+      "resistance",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "enslavement",
+      "freedom",
+      "firsts",
+      "resistance",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "freedom suit",
+      "Holmes v. Ford",
+      "Oregon Trail",
+      "enslavement in Oregon",
+      "African American pioneers"
+    ],
+    "jurisdictionLabel": "Salem, Oregon",
+    "locationPrecision": "city",
+    "locationLabel": "Site of the Oregon Territorial Supreme Court proceedings",
+    "lat": 44.9375,
+    "lng": -123.0275,
+    "claims": [
+      {
+        "predicate": "was born enslaved in",
+        "object": "Virginia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robin_Holmes",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "traveled the Oregon Trail with enslaver",
+        "object": "Nathaniel Ford",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robin_Holmes",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was plaintiff in freedom suit",
+        "object": "Holmes v. Ford",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robin_Holmes",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "secured freedom for children through court ruling in",
+        "object": "1853",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robin_Holmes",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "challenged the legality of enslavement in Oregon Territory",
+        "object": "Oregon Territory",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robin_Holmes",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "testified that freedom was promised in exchange for labor in Oregon",
+        "object": "Nathaniel Ford",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robin_Holmes",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Holmes v. Ford case occurred during a period when Oregon Territory was officially free under the Northwest Ordinance, yet slavery persisted through informal arrangements. The ruling reinforced federal anti-slavery provisions in territories and reflected broader national tensions over slavery's expansion, contributing to the legal and moral resistance that preceded the Civil War."
+  },
+  {
+    "id": "west_black_panther_park_q139553357",
+    "kind": "person",
+    "displayName": "Black Panther Park",
+    "summary": "Black Panther Park in Skyway, Washington, established in 2026, honors the legacy of the local Black Panther Party chapter through a community-built public space featuring a lending library, food pantry, herb garden, and public art. Funded by participatory budgeting, it serves as a living monument to Black resistance, education, and self-determination in King County.",
+    "eraBuckets": [
+      "2020s"
+    ],
+    "topicTags": [
+      "community-organizing",
+      "civil-rights",
+      "commemoration",
+      "community-programs",
+      "public-accommodations",
+      "resistance"
+    ],
+    "topicIds": [
+      "community-organizing",
+      "civil-rights",
+      "commemoration",
+      "community-programs",
+      "public-accommodations",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Black Panther Party",
+      "Skyway",
+      "living history",
+      "participatory budgeting",
+      "community garden"
+    ],
+    "jurisdictionLabel": "Skyway, Washington",
+    "locationPrecision": "site",
+    "locationLabel": "Intersection of 75th Avenue South and Renton Avenue South",
+    "lat": 47.4929,
+    "lng": -122.2402,
+    "claims": [
+      {
+        "predicate": "was named for",
+        "object": "a local chapter of the Black Panther Party",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Black_Panther_Park",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "received funding for",
+        "object": "construction of a living history space about the Black Panther Party",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://kingcounty.gov/en/dept/local-services/about-king-county/about-local-services/newsroom/2025-news-releases/20250313-empowerment-grants",
+        "citationLabel": "King County Department of Local Services"
+      },
+      {
+        "predicate": "includes",
+        "object": "a lending library, food pantry, herb and berry garden, and public artwork",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://kingcounty.gov/en/dept/local-services/about-king-county/about-local-services/newsroom/2025-news-releases/20250313-empowerment-grants",
+        "citationLabel": "King County Department of Local Services"
+      },
+      {
+        "predicate": "was dedicated in",
+        "object": "March 2026",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Black_Panther_Park",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is located at",
+        "object": "the intersection of 75th Avenue South and Renton Avenue South in Skyway, Washington",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Black_Panther_Park",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was developed through",
+        "object": "a participatory budgeting initiative led by King County residents",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://kingcounty.gov/en/dept/local-services/about-king-county/about-local-services/newsroom/2025-news-releases/20250313-empowerment-grants",
+        "citationLabel": "King County Department of Local Services"
+      }
+    ],
+    "historicalContext": "The park's creation reflects a contemporary effort to memorialize the Black Panther Party's role in community organizing and social justice advocacy during the civil rights era, particularly in underserved areas like Skyway. By embedding food justice, education, and mental health support into its design, the park continues the Panthers' tradition of direct-action community programs amid ongoing struggles for racial equity in urban King County."
+  },
+  {
+    "id": "west_rebecca_g_howard_q15713164",
+    "kind": "person",
+    "displayName": "Rebecca G. Howard",
+    "summary": "Rebecca G. Howard, a Black businesswoman in 1860s Olympia, Washington Territory, owned and operated the Pacific Hotel and Restaurant, amassing over $50,000 in property by 1870—exceptional wealth for a woman of her time and race.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "business",
+      "entrepreneurship",
+      "economic-justice",
+      "frontier",
+      "resilience"
+    ],
+    "topicIds": [
+      "business",
+      "entrepreneurship",
+      "economic-justice",
+      "frontier",
+      "resilience"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Pacific Hotel and Restaurant",
+      "Olympia",
+      "Washington Territory",
+      "Black businesswoman",
+      "property wealth"
+    ],
+    "jurisdictionLabel": "Olympia, WA",
+    "locationPrecision": "site",
+    "locationLabel": "Site of the Pacific Hotel and Restaurant on Capitol Way",
+    "lat": 38.90472222,
+    "lng": -77.01638889,
+    "claims": [
+      {
+        "predicate": "owned and operated",
+        "object": "Pacific Hotel and Restaurant in Olympia, Washington Territory",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rebecca_G._Howard",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "accumulated property wealth exceeding $50,000",
+        "object": "by 1870 in Washington Territory",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rebecca_G._Howard",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was one of the few Black taxpayers",
+        "object": "in Washington Territory in 1870",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rebecca_G._Howard",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "hosted",
+        "object": "President Rutherford B. Hayes and his wife Lucy in 1880",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rebecca_G._Howard",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was recognized as a community booster",
+        "object": "in Olympia, Washington Territory",
+        "confidenceLevel": "medium",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.olympiawa.gov/services/parks___recreation/parks___trails/rebecca_howard_park.php",
+        "citationLabel": "City of Olympia"
+      }
+    ],
+    "historicalContext": "During the mid-19th century, Black individuals in the Pacific Northwest faced exclusionary laws and social marginalization. Howard’s success as a Black woman entrepreneur in this context highlights both personal resilience and the rare economic agency possible in frontier settlements, where formal racial codes were less entrenched than in other regions, though still present."
+  },
+  {
+    "id": "west_edwin_t_pratt_q5346861",
+    "kind": "person",
+    "displayName": "Edwin T. Pratt",
+    "summary": "Edwin T. Pratt was a civil rights leader in Seattle who led the Triad Plan to desegregate public schools and advanced equal housing opportunities as Executive Director of the Seattle Urban League. He was assassinated in 1969, and is commemorated by Pratt Park, the Pratt Fine Arts Center, and an early learning center in Shoreline, Washington.",
+    "eraBuckets": [
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "desegregation",
+      "school-desegregation",
+      "housing",
+      "economic-justice",
+      "leadership"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "desegregation",
+      "school-desegregation",
+      "housing",
+      "economic-justice",
+      "leadership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Seattle Urban League",
+      "Triad Plan",
+      "school desegregation",
+      "equal housing",
+      "assassination"
+    ],
+    "jurisdictionLabel": "Shoreline, Washington",
+    "locationPrecision": "address",
+    "locationLabel": "Home where he was assassinated",
+    "lat": 38.89194444,
+    "lng": -77.02027778,
+    "claims": [
+      {
+        "predicate": "served as Executive Director of",
+        "object": "Seattle Urban League",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edwin_T._Pratt",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "led the Triad Plan to desegregate",
+        "object": "Seattle Public Schools",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edwin_T._Pratt",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "led initiative for equal housing opportunities in",
+        "object": "Seattle",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edwin_T._Pratt",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was assassinated outside his home in",
+        "object": "Shoreline, Washington",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edwin_T._Pratt",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is commemorated by",
+        "object": "Pratt Park",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edwin_T._Pratt",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is commemorated by",
+        "object": "Pratt Fine Arts Center",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edwin_T._Pratt",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "As Executive Director of the Seattle Urban League, Pratt worked during a period of de facto segregation in Northern and Western cities, where discriminatory housing and education practices persisted despite the absence of Jim Crow laws. His efforts in school desegregation and fair housing reflected broader national civil rights strategies to combat systemic racial inequity through institutional reform and community organizing."
+  },
+  {
+    "id": "west_history_of_slavery_in_colorado_q107073212",
+    "kind": "person",
+    "displayName": "History of slavery in Colorado",
+    "summary": "Slavery in Colorado encompassed Indigenous enslavement by Spanish colonists and African American bondage at sites like Bent's Fort. Enslaved individuals such as Charlotte and Dick Green labored there in the 1830s. The 1877 state law banned slavery except for convicts, a loophole closed only in 2018. Native nations including the Ute had long occupied the region before colonial incursions.",
+    "eraBuckets": [
+      "1830s",
+      "1840s",
+      "1870s",
+      "2010s"
+    ],
+    "topicTags": [
+      "enslavement"
+    ],
+    "topicIds": [
+      "enslavement"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Bent's Fort",
+      "Genízaro",
+      "Charlotte Green",
+      "Dick Green",
+      "Ute"
+    ],
+    "jurisdictionLabel": "La Junta, Colorado",
+    "locationPrecision": "site",
+    "locationLabel": "Bent's Fort",
+    "lat": 38.0406,
+    "lng": -103.4294,
+    "claims": [
+      {
+        "predicate": "includes event",
+        "object": "Enslavement of Ute and other Native Americans by Spanish colonists in Santa Fe de Nuevo México",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/History_of_slavery_in_Colorado",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "includes event",
+        "object": "Charlotte and Dick Green were enslaved at Bent's Fort beginning in 1833",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/History_of_slavery_in_Colorado",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "includes event",
+        "object": "William Bent freed Charlotte and Dick Green after Dick assisted in tracking down assassins of Charles Bent",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/History_of_slavery_in_Colorado",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "includes event",
+        "object": "Colorado passed a law in 1877 banning slavery except for convicted individuals",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/History_of_slavery_in_Colorado",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "includes event",
+        "object": "Colorado amended its constitution in 2018 to ban slavery and forced labor for convicted persons",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/History_of_slavery_in_Colorado",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "describes practice",
+        "object": "Ute and Comanche raids on other Indigenous groups resulted in capture and enslavement of adults and children",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/History_of_slavery_in_Colorado",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The history of slavery in Colorado reflects overlapping systems of bondage: Spanish colonial enslavement of Native Americans, Southern-style chattel slavery introduced by Anglo settlers, and postbellum penal labor. These practices unfolded amid westward expansion, the Mexican-American War, and struggles over statehood, situating Colorado within broader national conflicts over slavery and racial hierarchy."
+  },
+  {
+    "id": "west_winks_panorama_q8025498",
+    "kind": "person",
+    "displayName": "Winks Panorama",
+    "summary": "Winks Panorama, built in 1928 near Pinecliffe, Colorado, was a resort for African-American tourists during segregation, part of Lincoln Hills Country Club—the only Black-owned resort in the western U.S. at the time. It hosted figures like Langston Hughes and Duke Ellington and served as a vital space for Black leisure and community when such opportunities were otherwise denied.",
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "segregation",
+      "jim-crow",
+      "community",
+      "civil-rights",
+      "entrepreneurship"
+    ],
+    "topicIds": [
+      "segregation",
+      "jim-crow",
+      "community",
+      "civil-rights",
+      "entrepreneurship"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Winks Panorama",
+      "Lincoln Hills",
+      "African-American resort",
+      "segregation",
+      "Obrey Wendell Hamlet"
+    ],
+    "jurisdictionLabel": "Pinecliffe, Colorado",
+    "locationPrecision": "site",
+    "locationLabel": "Near Pinecliffe, Gilpin County, Colorado",
+    "lat": 39.92111111,
+    "lng": -105.45694444,
+    "claims": [
+      {
+        "predicate": "was built by",
+        "object": "Obrey Wendell \"Winks\" Hamlet",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Winks_Panorama",
+        "citationLabel": "Wikipedia: Winks Panorama"
+      },
+      {
+        "predicate": "catered to",
+        "object": "African-American tourists during the early and middle 20th century",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Winks_Panorama",
+        "citationLabel": "Wikipedia: Winks Panorama"
+      },
+      {
+        "predicate": "was part of",
+        "object": "Lincoln Hills Country Club",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Winks_Panorama",
+        "citationLabel": "Wikipedia: Winks Panorama"
+      },
+      {
+        "predicate": "hosted",
+        "object": "Langston Hughes",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Winks_Panorama",
+        "citationLabel": "Wikipedia: Winks Panorama"
+      },
+      {
+        "predicate": "was listed on",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/80000901",
+        "citationLabel": "NPS NRIS: Winks Panorama"
+      },
+      {
+        "predicate": "was designated as",
+        "object": "National Historic Landmark",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Winks_Panorama",
+        "citationLabel": "Wikipedia: Winks Panorama"
+      }
+    ],
+    "historicalContext": "During the Jim Crow era, African Americans faced widespread racial segregation and exclusion from public accommodations, including resorts and recreational spaces. Winks Panorama provided a rare, self-determined space for Black families and cultural leaders to gather, rest, and build community in the West, reflecting broader patterns of Black entrepreneurship and resilience in the face of systemic discrimination."
+  },
+  {
+    "id": "west_moulin_rouge_hotel_q6919006",
+    "kind": "person",
+    "displayName": "Moulin Rouge Hotel",
+    "summary": "The Moulin Rouge Hotel, located in West Las Vegas, Nevada, was the first desegregated hotel-casino in the United States, operating from 1955 to 1955. It hosted prominent Black entertainers and challenged segregation norms in Las Vegas.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "desegregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "desegregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Moulin Rouge Hotel",
+      "Las Vegas",
+      "desegregation",
+      "Black entertainers",
+      "casino"
+    ],
+    "jurisdictionLabel": "Las Vegas, Nevada",
+    "locationPrecision": "address",
+    "locationLabel": "900 W. Bonanza Rd.",
+    "lat": 36.17833333,
+    "lng": -115.15361111,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "first desegregated hotel-casino in the United States",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Moulin_Rouge_Hotel",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "hosted",
+        "object": "prominent Black entertainers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Moulin_Rouge_Hotel",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "integrated top to bottom",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Moulin_Rouge_Hotel",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "popular with Black entertainers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Moulin_Rouge_Hotel",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "named after the Paris nightclub, the Moulin Rouge",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Moulin_Rouge_Hotel",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Moulin Rouge Hotel was significant in the context of segregation in the 1950s, as it was the first integrated hotel-casino in the United States. It provided a space for Black entertainers and patrons, challenging the segregation norms prevalent in Las Vegas at the time."
+  },
+  {
+    "id": "west_mountain_view_officers_club_q111939142",
+    "kind": "place",
+    "displayName": "Mountain View Officers' Club",
+    "summary": "The Mountain View Officers' Club, built in 1942 at Fort Huachuca, Arizona, served as a recreational facility for African American officers during segregation. As the only surviving building of its kind from that era at the fort, it was listed on the National Register of Historic Places in 2017 and is being restored to interpret the Black World War II military experience.",
+    "eraBuckets": [
+      "1940s",
+      "2010s"
+    ],
+    "topicTags": [
+      "military",
+      "civil-rights",
+      "segregation",
+      "history",
+      "commemoration"
+    ],
+    "topicIds": [
+      "military",
+      "civil-rights",
+      "segregation",
+      "history",
+      "commemoration"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Fort Huachuca",
+      "African American officers",
+      "segregation",
+      "World War II",
+      "National Register of Historic Places"
+    ],
+    "jurisdictionLabel": "Fort Huachuca, Arizona",
+    "locationPrecision": "site",
+    "locationLabel": "Kilbourn Ave., Fort Huachuca",
+    "lat": 31.54584,
+    "lng": -110.33669,
+    "claims": [
+      {
+        "predicate": "was built in",
+        "object": "1942",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mountain_View_Officers'_Club",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served as",
+        "object": "an officers' club for African American soldiers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mountain_View_Officers'_Club",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is located at",
+        "object": "Fort Huachuca, Arizona",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mountain_View_Officers'_Club",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was listed on",
+        "object": "the National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/100000549",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "was the only surviving recreational facility from",
+        "object": "the period of African American military segregation at Fort Huachuca",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mountain_View_Officers'_Club",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is associated with",
+        "object": "the Black World War II military experience",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mountain_View_Officers'_Club",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "During World War II, the U.S. military remained segregated, and Fort Huachuca housed some of the largest numbers of African American soldiers, including the 92nd and 93rd Infantry Divisions. The Mountain View Officers' Club provided a rare dedicated space for Black officers, reflecting both the institutionalized segregation of the armed forces and the resilience of Black service members who fought for democracy abroad while denied full rights at home."
+  },
+  {
+    "id": "west_okemah_phoenix_q125293338",
+    "kind": "place",
+    "displayName": "Okemah, Phoenix",
+    "summary": "Okemah was a Black neighborhood established in 1927 in Phoenix, Arizona, founded by migrants from Oklahoma and Texas who settled on subdivided land previously part of the Bartlett-Heard Ranch. Due to segregation and redlining, it became one of the few areas where Black families could own homes in the region.",
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s",
+      "1970s"
+    ],
+    "topicTags": [
+      "segregation",
+      "land-ownership",
+      "great-migration"
+    ],
+    "topicIds": [
+      "segregation",
+      "land-ownership",
+      "great-migration"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Black neighborhood Phoenix",
+      "segregation Arizona",
+      "eminent domain displacement",
+      "Great Migration Southwest",
+      "Interstate 10 construction"
+    ],
+    "jurisdictionLabel": "Phoenix, Arizona",
+    "locationPrecision": "neighborhood",
+    "locationLabel": "Area bounded by 32nd to 48th Streets and Broadway Road to the Salt River",
+    "lat": 33.41673472,
+    "lng": -112.00048083,
+    "claims": [
+      {
+        "predicate": "was founded by Black migrants",
+        "object": "Okemah (Phoenix)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Okemah%2C_Phoenix",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was established in",
+        "object": "1927",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Okemah%2C_Phoenix",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was one of the few areas where Black families could buy land due to segregation and redlining",
+        "object": "Okemah (Phoenix)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Okemah%2C_Phoenix",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was subdivided and sold for residential use by the Marshall Mortgage Company",
+        "object": "Okemah (Phoenix)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Okemah%2C_Phoenix",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was displaced by Interstate 10 construction using eminent domain",
+        "object": "Okemah (Phoenix)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Okemah%2C_Phoenix",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was named after Okemah, Oklahoma, which was named for a Kickapoo chief",
+        "object": "Okemah (Phoenix)",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Okemah%2C_Phoenix",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Okemah emerged during the Great Migration as Black families sought economic opportunity and land ownership in the West, only to face displacement through 20th-century urban renewal and highway construction that disproportionately impacted African American communities. Its history reflects the interplay of racial segregation, land access, and federal infrastructure policy in shaping urban Black life in the Southwest."
+  },
+  {
+    "id": "west_swindall_tourist_inn_q28153720",
+    "kind": "person",
+    "displayName": "Swindall Tourist Inn",
+    "summary": "The Swindall Tourist Inn, located at 1021 E. Washington St. in Phoenix, was the last known surviving African American boarding house in the city during the Jim Crow era. Built in 1913 and used predominantly for Black lodgers until 1940, it provided essential shelter when racial segregation restricted housing options.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "segregation",
+      "housing",
+      "black-architects",
+      "resilience"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "segregation",
+      "housing",
+      "black-architects",
+      "resilience"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "African American boarding house",
+      "Jim Crow Arizona",
+      "Phoenix historic site",
+      "Black travelers",
+      "segregated housing"
+    ],
+    "jurisdictionLabel": "Phoenix, Arizona",
+    "locationPrecision": "address",
+    "locationLabel": "1021 E. Washington St.",
+    "lat": 33.44805556,
+    "lng": -112.05861111,
+    "claims": [
+      {
+        "predicate": "was built in 1913",
+        "object": "1913",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Swindall_Tourist_Inn",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was used as a boarding house predominantly for African American lodgers until 1940",
+        "object": "1940",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Swindall_Tourist_Inn",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "has area of less than one acre",
+        "object": "less than one acre",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Swindall_Tourist_Inn",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "During the early 20th century, Jim Crow laws and de facto segregation in the American Southwest severely limited housing and travel options for African Americans. Boarding houses like the Swindall Tourist Inn filled a critical role by offering safe lodging in a racially hostile environment. Its recognition on the National Register underscores its function not just as shelter, but as part of a broader network of Black survival and community formation under segregation."
+  },
+  {
+    "id": "west_lincoln_jackson_school_q48791685",
+    "kind": "institution",
+    "displayName": "Lincoln Jackson School",
+    "summary": "The Lincoln Jackson School in Clovis, New Mexico, served as an elementary school for predominantly African American students from 1954 to 1965, replacing the earlier 'Colored School' during the transition out of legally segregated education.",
+    "eraBuckets": [
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "segregation",
+      "education",
+      "civil-rights",
+      "school-desegregation"
+    ],
+    "topicIds": [
+      "segregation",
+      "education",
+      "civil-rights",
+      "school-desegregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Lincoln Jackson School",
+      "Colored School",
+      "Clovis New Mexico",
+      "segregated education",
+      "National Register of Historic Places"
+    ],
+    "jurisdictionLabel": "Clovis, New Mexico",
+    "locationPrecision": "address",
+    "locationLabel": "206 Alphon Street",
+    "lat": 34.4,
+    "lng": -103.22527778,
+    "claims": [
+      {
+        "predicate": "served as elementary school for predominantly African American students",
+        "object": "from 1954 to 1965",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lincoln_Jackson_School",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "replaced prior buildings that served African-American students only during racial segregation",
+        "object": "in Clovis County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lincoln_Jackson_School",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was originally known as",
+        "object": "the Colored School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lincoln_Jackson_School",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on the National Register of Historic Places",
+        "object": "reference number 100001716, added October 4, 2017",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/100001716",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "is significant for",
+        "object": "Black social history and education",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/100001716",
+        "citationLabel": "National Park Service"
+      }
+    ],
+    "historicalContext": "The school operated during a critical period following the 1954 Brown v. Board of Education decision, serving a Black community that had been formally segregated in education. Its establishment reflects both the persistence of racial separation in practice after de jure segregation ended and the community's access to dedicated educational infrastructure during a transformative era in civil rights."
+  },
+  {
+    "id": "west_south_broadway_q97671613",
+    "kind": "place",
+    "displayName": "South Broadway",
+    "summary": "South Broadway in Albuquerque was the historic center of the city's African American community, home to Black-owned businesses and Grant Chapel AME, New Mexico's oldest Black church. Developed in the 1880s near railroad employment, it remained a cultural hub despite demographic shifts and urban decline after the mid-20th century.",
+    "eraBuckets": [
+      "1880s",
+      "1890s",
+      "1900s",
+      "1910s",
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "community",
+      "desegregation",
+      "great-migration",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "community",
+      "desegregation",
+      "great-migration",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "African American community",
+      "Grant Chapel AME",
+      "Black-owned businesses",
+      "Albuquerque",
+      "railroad workers"
+    ],
+    "jurisdictionLabel": "Albuquerque, New Mexico",
+    "locationPrecision": "neighborhood",
+    "locationLabel": "South Broadway neighborhood",
+    "lat": 35.07,
+    "lng": -106.645,
+    "claims": [
+      {
+        "predicate": "was the center of Albuquerque's African American community",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Broadway%2C_Albuquerque",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was home to New Mexico's oldest Black church",
+        "object": "Grant Chapel AME",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Broadway%2C_Albuquerque",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was home to many Black-owned businesses",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Broadway%2C_Albuquerque",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "developed between the 1880s and early 1900s",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Broadway%2C_Albuquerque",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had a 6% Black population in 2010",
+        "object": "6%",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Broadway%2C_Albuquerque",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "As a working-class neighborhood adjacent to major rail infrastructure, South Broadway provided early economic opportunity for Black residents in a region marked by racial exclusion. Its role as a center of Black life in New Mexico reflects broader patterns of African American urban settlement in the Southwest, shaped by employment access and community institution-building amid segregation and shifting demographics."
+  },
+  {
+    "id": "west_trinity_a_m_e_church_q7842558",
+    "kind": "place",
+    "displayName": "Trinity A.M.E. Church",
+    "summary": "Trinity A.M.E. Church, built in 1909 at 239 E. 600 South in Salt Lake City, was Utah's first Black congregation, established in the 1880s.",
+    "eraBuckets": [
+      "1880s",
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "church",
+      "religion",
+      "community",
+      "firsts"
+    ],
+    "topicIds": [
+      "church",
+      "religion",
+      "community",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "African Methodist Episcopal",
+      "Utah's first Black congregation",
+      "Mary Bright",
+      "National Register of Historic Places",
+      "Black social history"
+    ],
+    "jurisdictionLabel": "Salt Lake City, Utah",
+    "locationPrecision": "address",
+    "locationLabel": "239 E. 600 South",
+    "lat": 40.75666667,
+    "lng": -111.88361111,
+    "claims": [
+      {
+        "predicate": "was founded as",
+        "object": "Utah's first Black congregation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Trinity_A.M.E._Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was established in",
+        "object": "the 1880s",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Trinity_A.M.E._Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was funded by donation from",
+        "object": "Mary Bright, a Black cook who made her fortune in Leadville, Colorado",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Trinity_A.M.E._Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "purchased property in",
+        "object": "1907",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Trinity_A.M.E._Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "building constructed in",
+        "object": "1909",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Trinity_A.M.E._Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "added to National Register of Historic Places for significance in",
+        "object": "Black social history",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/76001831",
+        "citationLabel": "NPGallery NRHP Asset"
+      }
+    ],
+    "historicalContext": "As Utah's first African American congregation, Trinity A.M.E. Church emerged during a period of western migration and racial exclusion, providing a rare institutional base for Black community life in a state with restrictive racial laws. Its founding and physical establishment reflect both self-determination and the role of Black economic agency in building religious infrastructure despite systemic marginalization."
+  },
+  {
+    "id": "west_history_of_african_americans_in_kansas_q109621034",
+    "kind": "person",
+    "displayName": "history of African Americans in Kansas",
+    "summary": "African Americans in Kansas established Nicodemus, the oldest surviving all-Black town west of the Mississippi, founded in 1877 by formerly enslaved migrants. The state was central to the Exoduster Movement and later home to [[west_brown_v_board_of_education_q875738|Brown v. Board of Education]], the landmark 1954 Supreme Court case that ended legal school segregation.",
+    "eraBuckets": [
+      "1860s",
+      "1870s",
+      "1880s",
+      "1950s",
+      "2010s",
+      "2020s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "emancipation",
+      "great-migration",
+      "hbcu",
+      "civil-rights",
+      "desegregation",
+      "school-desegregation",
+      "land-ownership",
+      "founding-era",
+      "black-power",
+      "community",
+      "resistance",
+      "firsts",
+      "segregation",
+      "self-determination"
+    ],
+    "topicIds": [
+      "enslavement",
+      "emancipation",
+      "great-migration",
+      "hbcu",
+      "civil-rights",
+      "desegregation",
+      "school-desegregation",
+      "land-ownership",
+      "founding-era",
+      "black-power",
+      "community",
+      "resistance",
+      "firsts",
+      "segregation",
+      "self-determination"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Nicodemus",
+      "Brown v. Board of Education",
+      "Exodusters",
+      "Jim Crow",
+      "Black town"
+    ],
+    "jurisdictionLabel": "Kansas, USA",
+    "locationPrecision": "state",
+    "locationLabel": "State of Kansas",
+    "lat": 38,
+    "lng": -98,
+    "claims": [
+      {
+        "predicate": "was founded by formerly enslaved African Americans",
+        "object": "Nicodemus, Kansas",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/nico/index.htm",
+        "citationLabel": "National Park Service - Nicodemus National Historic Site"
+      },
+      {
+        "predicate": "is the oldest surviving all-Black town west of the Mississippi River",
+        "object": "Nicodemus, Kansas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/African_Americans_in_Kansas",
+        "citationLabel": "Wikipedia - African Americans in Kansas"
+      },
+      {
+        "predicate": "was the site of the legal case that led to the desegregation of public schools nationwide",
+        "object": "Brown v. Board of Education of Topeka",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/African_Americans_in_Kansas",
+        "citationLabel": "Wikipedia - African Americans in Kansas"
+      },
+      {
+        "predicate": "elected the first African American to the state legislature in 1888",
+        "object": "Alfred Fairfax",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/African_Americans_in_Kansas",
+        "citationLabel": "Wikipedia - African Americans in Kansas"
+      },
+      {
+        "predicate": "saw the election of the first Black mayor of Wichita in 2011",
+        "object": "Carl Brewer",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/African_Americans_in_Kansas",
+        "citationLabel": "Wikipedia - African Americans in Kansas"
+      },
+      {
+        "predicate": "experienced racial violence including lynchings and mob attacks in the late 19th and early 20th centuries",
+        "object": "African Americans in Kansas",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/African_Americans_in_Kansas",
+        "citationLabel": "Wikipedia - African Americans in Kansas"
+      }
+    ],
+    "historicalContext": "Nicodemus and the Exoduster Movement reflect African Americans' pursuit of land ownership and autonomy after Reconstruction, countering displacement and violence in the South. Brown v. Board of Education emerged from Kansas's segregated schools, challenging Jim Crow under the Equal Protection Clause. These developments intersect with federal homesteading policy, the Great Migration, and national civil rights organizing."
+  },
+  {
+    "id": "west_brown_v_board_of_education_q875738",
+    "kind": "institution",
+    "displayName": "Brown v. Board of Education",
+    "summary": "Brown v. Board of Education (1954) was a unanimous U.S. Supreme Court decision that declared racial segregation in public schools a violation of the Equal Protection Clause of the Fourteenth Amendment. The case, originating in Topeka, Kansas, overturned Plessy v. Ferguson's 'separate but equal' doctrine and catalyzed nationwide school desegregation efforts.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "desegregation",
+      "school-desegregation",
+      "equal-protection",
+      "supreme-court",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "desegregation",
+      "school-desegregation",
+      "equal-protection",
+      "supreme-court",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "school segregation",
+      "equal protection",
+      "NAACP",
+      "Thurgood Marshall",
+      "Topeka"
+    ],
+    "jurisdictionLabel": "Topeka, Kansas",
+    "locationPrecision": "institution",
+    "locationLabel": "Topeka Board of Education",
+    "lat": 39.03472222,
+    "lng": -95.69555556,
+    "claims": [
+      {
+        "predicate": "ruled that racial segregation in public schools violates the Equal Protection Clause of the Fourteenth Amendment",
+        "object": "unanimous U.S. Supreme Court decision in Brown v. Board of Education",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Brown_v._Board_of_Education",
+        "citationLabel": "Wikipedia - Brown v. Board of Education"
+      },
+      {
+        "predicate": "overturned the 'separate but equal' doctrine established in Plessy v. Ferguson",
+        "object": "Brown v. Board of Education decision",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Brown_v._Board_of_Education",
+        "citationLabel": "Wikipedia - Brown v. Board of Education"
+      },
+      {
+        "predicate": "was part of a strategic legal campaign led by the NAACP and Howard University School of Law to challenge segregation",
+        "object": "Brown v. Board of Education case",
+        "confidenceLevel": "high",
+        "citationSource": "si.edu",
+        "citationHref": "https://americanhistory.si.edu/brown/history/3-organized/legal-campaign.html",
+        "citationLabel": "Smithsonian - Legal Campaign"
+      },
+      {
+        "predicate": "originated from a class action lawsuit filed by Oliver Brown and twelve other Black families in Topeka, Kansas",
+        "object": "Brown v. Board of Education case",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Brown_v._Board_of_Education",
+        "citationLabel": "Wikipedia - Brown v. Board of Education"
+      },
+      {
+        "predicate": "led to the principle that 'separate educational facilities are inherently unequal'",
+        "object": "U.S. Supreme Court's holding in Brown v. Board of Education",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Brown_v._Board_of_Education",
+        "citationLabel": "Wikipedia - Brown v. Board of Education"
+      },
+      {
+        "predicate": "paved the way for integration and became a model for future impact litigation in the civil rights movement",
+        "object": "Brown v. Board of Education decision",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Brown_v._Board_of_Education",
+        "citationLabel": "Wikipedia - Brown v. Board of Education"
+      }
+    ],
+    "historicalContext": "This decision was the culmination of a decades-long legal strategy by the NAACP and Howard University-trained attorneys to dismantle Jim Crow laws through the courts. By invalidating state-mandated school segregation, it challenged the constitutional legitimacy of racial hierarchy in public institutions and became a cornerstone of the civil rights movement’s legal victories."
+  },
+  {
+    "id": "west_dunlap_colored_cemetery_q117597040",
+    "kind": "place",
+    "displayName": "Dunlap Colored Cemetery",
+    "summary": "Dunlap Colored Cemetery, established in 1880 in Morris County, Kansas, was created by [[west_exodusters_q5420574|Exodusters]]—formerly enslaved African Americans who migrated from the South—after white residents denied them burial space.",
+    "eraBuckets": [
+      "1880s",
+      "1890s",
+      "1930s"
+    ],
+    "topicTags": [
+      "emancipation",
+      "segregation",
+      "cemetery",
+      "great-migration",
+      "self-determination",
+      "community"
+    ],
+    "topicIds": [
+      "emancipation",
+      "segregation",
+      "cemetery",
+      "great-migration",
+      "self-determination",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Exodusters",
+      "Emancipation Day",
+      "Black cemetery",
+      "Benjamin Singleton",
+      "racial segregation"
+    ],
+    "jurisdictionLabel": "Dunlap, Kansas",
+    "locationPrecision": "address",
+    "locationLabel": "2050 S. 100 Road, Dunlap, Kansas",
+    "lat": 38.5875,
+    "lng": -96.20333333,
+    "claims": [
+      {
+        "predicate": "was established in",
+        "object": "1880",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dunlap_Colored_Cemetery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was created because white settlers objected to",
+        "object": "shared burial of Black and white residents",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dunlap_Colored_Cemetery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is associated with",
+        "object": "the Exoduster movement led by Benjamin \"Pap\" Singleton",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dunlap_Colored_Cemetery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served as site for",
+        "object": "annual Emancipation Day processions and ceremonies",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dunlap_Colored_Cemetery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was added to the National Register of Historic Places in",
+        "object": "2018",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/100002967",
+        "citationLabel": "NPS NRHP Registration"
+      },
+      {
+        "predicate": "buried individuals include",
+        "object": "Ralph Maddox and A. J. Howard, Exodusters and cofounders of the cemetery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dunlap_Colored_Cemetery",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The cemetery emerged during the post-Reconstruction era when systemic racism and economic disenfranchisement drove thousands of African Americans to seek autonomy in the West. The Exoduster movement represented one of the first mass migrations of Black Americans seeking land ownership and political freedom, often establishing self-reliant communities in response to Jim Crow precursors in the South. Dunlap Colored Cemetery reflects both the racial exclusion of the time and the resilience of Black settlers in creating enduring cultural and civic institutions."
+  },
+  {
+    "id": "west_exodusters_q5420574",
+    "kind": "event",
+    "displayName": "Exodusters",
+    "summary": "Between 1879 and the early 1880s, thousands of African Americans migrated from Southern states to Kansas to escape racial violence, political disenfranchisement, and economic repression following Reconstruction's end. Known as Exodusters, these migrants sought land ownership and civil rights in a state symbolizing abolitionist ideals, forming new communities amid significant hardship.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "great-migration",
+      "reconstruction",
+      "segregation",
+      "black-codes",
+      "civil-rights",
+      "land-ownership",
+      "resistance",
+      "migration"
+    ],
+    "topicIds": [
+      "great-migration",
+      "reconstruction",
+      "segregation",
+      "black-codes",
+      "civil-rights",
+      "land-ownership",
+      "resistance",
+      "migration"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Exodusters",
+      "Kansas Exodus",
+      "Black migration",
+      "post-Reconstruction",
+      "racial violence"
+    ],
+    "jurisdictionLabel": "Kansas, United States",
+    "locationPrecision": "state",
+    "locationLabel": "Primary destination of the Exoduster migration",
+    "lat": 39.04805556,
+    "lng": -95.67805556,
+    "claims": [
+      {
+        "predicate": "was a mass migration of African Americans from the Southern United States to Kansas",
+        "object": "Kansas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Exodusters",
+        "citationLabel": "Wikipedia: Exodusters"
+      },
+      {
+        "predicate": "occurred primarily in 1879 and is also known as the Exodus of 1879",
+        "object": "1879",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Exodusters",
+        "citationLabel": "Wikipedia: Exodusters"
+      },
+      {
+        "predicate": "was motivated by escape from racial violence, Black Codes, and economic repression after Reconstruction",
+        "object": "racial violence, Black Codes, economic repression",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.archives.gov/publications/prologue/2008/summer/exodus.html",
+        "citationLabel": "National Archives: Exodus to Kansas"
+      },
+      {
+        "predicate": "involved as many as 40,000 African Americans settling in Kansas, Oklahoma, and Colorado",
+        "object": "40,000 African Americans",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Exodusters",
+        "citationLabel": "Wikipedia: Exodusters"
+      },
+      {
+        "predicate": "was supported by organizers including Benjamin Singleton, Henry Adams, and Philip D. Armour",
+        "object": "Benjamin Singleton, Henry Adams, Philip D. Armour",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Exodusters",
+        "citationLabel": "Wikipedia: Exodusters"
+      },
+      {
+        "predicate": "is recognized as the first major voluntary mass migration of African Americans after the Civil War",
+        "object": "first major voluntary mass migration of African Americans after the Civil War",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.archives.gov/publications/prologue/2008/summer/exodus.html",
+        "citationLabel": "National Archives: Exodus to Kansas"
+      }
+    ],
+    "historicalContext": "The Exoduster Movement emerged after the 1877 Compromise ended federal Reconstruction, enabling Southern 'Redeemer' governments to impose Black Codes and suppress Black voting through terror. With land ownership blocked and livelihoods undermined, many African Americans fled to Kansas—a state associated with John Brown and antislavery struggle—seeking self-determination. This migration reflected both desperation and agency in the face of systemic oppression."
+  }
+]

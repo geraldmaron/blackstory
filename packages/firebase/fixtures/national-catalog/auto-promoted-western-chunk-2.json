@@ -1,0 +1,259 @@
+[
+  {
+    "id": "west_george_washington_carver_homestead_site_q60755946",
+    "kind": "person",
+    "displayName": "George Washington Carver Homestead Site",
+    "summary": "The George Washington Carver Homestead Site, a 160-acre tract near Beeler, Kansas, was settled by Carver in 1886, where he built a sod house, cultivated crops, and contributed to local farming knowledge. As one of few Black homesteaders in Ness County, his work exemplifies African American participation in western land settlement during Reconstruction.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "agriculture",
+      "land-ownership",
+      "great-migration",
+      "science",
+      "self-determination"
+    ],
+    "topicIds": [
+      "agriculture",
+      "land-ownership",
+      "great-migration",
+      "science",
+      "self-determination"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "homesteading",
+      "Black farmers",
+      "sod house",
+      "land settlement",
+      "agricultural innovation"
+    ],
+    "jurisdictionLabel": "Beeler, Kansas",
+    "locationPrecision": "site",
+    "locationLabel": "1.5 miles south of Beeler",
+    "lat": 38.477195,
+    "lng": -100.151297,
+    "claims": [
+      {
+        "predicate": "was settled by George Washington Carver",
+        "object": "in 1886",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_Washington_Carver_Homestead_Site",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "included construction of a sod house and cultivation of crops and trees",
+        "object": "by George Washington Carver",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_Washington_Carver_Homestead_Site",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was one of few Black homesteaders in Ness County, Kansas",
+        "object": "and provided assistance to others in building sod structures",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_Washington_Carver_Homestead_Site",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is recognized for significance in Black exploration and settlement",
+        "object": "under the National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/77000593",
+        "citationLabel": "NPS NRIS"
+      },
+      {
+        "predicate": "represents early agricultural experimentation by an African American scientist",
+        "object": "prior to Carver's work at Tuskegee Institute",
+        "confidenceLevel": "medium",
+        "citationSource": "citation_trail",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/77000593",
+        "citationLabel": "NPS NRIS"
+      }
+    ],
+    "historicalContext": "Carver's homesteading occurred during a period of westward expansion when formerly enslaved people and free Black Americans sought land ownership under the Homestead Act of 1862. His presence in rural Kansas reflects broader patterns of Black migration and self-determination in the post-Civil War era, countering systemic exclusion from property ownership in the South."
+  },
+  {
+    "id": "west_quindaro_townsite_q7272207",
+    "kind": "person",
+    "displayName": "Quindaro Townsite",
+    "summary": "Founded in 1857 by Wyandot and abolitionist allies, Quindaro Townsite in Kansas City, Kansas, served as a key port for Free-Staters and a station on the Underground Railroad. It later became home to Quindaro Freedman's School, the first Black school west of the Mississippi River, established in 1865.",
+    "eraBuckets": [
+      "1850s",
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "underground-railroad",
+      "education",
+      "hbcu",
+      "free-people-of-color",
+      "resistance"
+    ],
+    "topicIds": [
+      "underground-railroad",
+      "education",
+      "hbcu",
+      "free-people-of-color",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Quindaro Freedman's School",
+      "Underground Railroad",
+      "Free-State port",
+      "Western University",
+      "Wyandot"
+    ],
+    "jurisdictionLabel": "Kansas City, Kansas",
+    "locationPrecision": "site",
+    "locationLabel": "North 27th Street and Missouri Pacific Railroad tracks",
+    "lat": 39.15388889,
+    "lng": -94.66166667,
+    "claims": [
+      {
+        "predicate": "was founded as a Free-State port to resist the expansion of slavery",
+        "object": "Quindaro Townsite",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Quindaro_Townsite",
+        "citationLabel": "Wikipedia: Quindaro Townsite"
+      },
+      {
+        "predicate": "served as a station on the Underground Railroad",
+        "object": "Quindaro Townsite",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Quindaro_Townsite",
+        "citationLabel": "Wikipedia: Quindaro Townsite"
+      },
+      {
+        "predicate": "hosted the first Black school west of the Mississippi River",
+        "object": "Quindaro Townsite",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Quindaro_Townsite",
+        "citationLabel": "Wikipedia: Quindaro Townsite"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places in 2002",
+        "object": "Quindaro Townsite",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/02000547",
+        "citationLabel": "NPS NRHP Listing: Quindaro Townsite"
+      },
+      {
+        "predicate": "was designated the Quindaro Townsite National Commemorative Site in 2019",
+        "object": "Quindaro Townsite",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Quindaro_Townsite",
+        "citationLabel": "Wikipedia: Quindaro Townsite"
+      },
+      {
+        "predicate": "was developed on land purchased from Nancy Quindaro Brown, a Wyandot woman",
+        "object": "Quindaro Townsite",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Quindaro_Townsite",
+        "citationLabel": "Wikipedia: Quindaro Townsite"
+      }
+    ],
+    "historicalContext": "Quindaro emerged during the violent struggle over whether Kansas would enter the Union as a free or slave state, a conflict fueled by the Kansas–Nebraska Act. Its founding as a Free-State port enabled anti-slavery migration, while its role in the Underground Railroad and later as a center for Black education illustrates how Black communities leveraged physical and institutional spaces to resist enslavement and build self-determination in the post-Emancipation era."
+  },
+  {
+    "id": "west_topeka_council_of_colored_women_s_clubs_building_q58030644",
+    "kind": "person",
+    "displayName": "Topeka Council of Colored Women's Clubs Building",
+    "summary": "The Topeka Council of Colored Women's Clubs Building, located at 1149 SW Lincoln Street in Topeka, Kansas, served as a clubhouse purchased in 1931 by a coalition of Black women's clubs founded in 1923. Affiliated with the National Association of Colored Women's Clubs, the organization used the space for civic and social programming during segregation.",
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "community-organizing",
+      "desegregation",
+      "education",
+      "women-leaders",
+      "black-architects"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "community-organizing",
+      "desegregation",
+      "education",
+      "women-leaders",
+      "black-architects"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Topeka Council of Colored Women's Clubs",
+      "Beatrice Childs",
+      "National Register of Historic Places"
+    ],
+    "jurisdictionLabel": "Topeka, Kansas",
+    "locationPrecision": "address",
+    "locationLabel": "1149 SW Lincoln Street",
+    "lat": 39.0479,
+    "lng": -95.6942,
+    "claims": [
+      {
+        "predicate": "was built in",
+        "object": "1901",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Topeka_Council_of_Colored_Women's_Clubs_Building",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was purchased by the Topeka Council of Colored Women's Clubs in",
+        "object": "1931",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Topeka_Council_of_Colored_Women's_Clubs_Building",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was founded by",
+        "object": "Beatrice Childs",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Topeka_Council_of_Colored_Women's_Clubs_Building",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is affiliated with",
+        "object": "National Association of Colored Women's Clubs",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Topeka_Council_of_Colored_Women's_Clubs_Building",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is located at",
+        "object": "1149 SW Lincoln Street, Topeka, Kansas",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/09001169",
+        "citationLabel": "NPGallery"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places in",
+        "object": "2009",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/09001169",
+        "citationLabel": "NPGallery"
+      }
+    ],
+    "historicalContext": "During the Jim Crow era, Black women's clubs provided critical infrastructure for community organizing, education, and resistance to racial discrimination. The TCCWC, founded in 1923 and housed in this building from 1931, operated within a national network that advocated for civil rights, public health, and racial uplift, reflecting broader patterns of African American women's leadership in social justice when excluded from mainstream institutions."
+  }
+]
