@@ -148,13 +148,20 @@ async function completeOpenAiCompatible(
   // Free-tier models vary in response_format support (some reject json_object outright,
   // e.g. tencent/hy3:free requires json_schema instead) — omit it rather than hardcode
   // one shape, and rely on the system prompt + extractJsonObject's brace-scanning instead.
+  //
+  // 900 was the old default and is too small: live-reproduced finish_reason "length"
+  // (hard truncation, not a refusal or formatting quirk) on a well-documented subject
+  // whose Wikipedia article gave the judge enough material for a full 1-6 claim answer —
+  // the response was cut off mid-claims-array with no closing braces, which is a second,
+  // distinct cause of the "hybrid failed (...both non-JSON...)" errors seen throughout
+  // the 2026-07-19/20 run, on top of the markdown-code-fence issue fixed alongside this.
   const response = await fetchImpl(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
       model: request.model,
       temperature: request.temperature ?? 0.2,
-      max_tokens: request.maxTokens ?? 900,
+      max_tokens: request.maxTokens ?? 2000,
       messages: request.messages,
       ...extraBody,
     }),
@@ -208,7 +215,7 @@ async function completeOllamaNative(
       think: false,
       options: {
         temperature: request.temperature ?? 0.2,
-        num_predict: request.maxTokens ?? 900,
+        num_predict: request.maxTokens ?? 2000,
       },
       messages: request.messages,
       format: 'json',
