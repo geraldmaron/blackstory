@@ -38,12 +38,16 @@ test('CSP includes strict defaults and frame-ancestors none', () => {
   assert.match(csp, /worker-src 'self' blob:/);
   assert.match(csp, /demotiles\.maplibre\.org/);
   assert.match(csp, /storage\.googleapis\.com/);
+  assert.match(csp, /recaptchaenterprise\.googleapis\.com/);
+  assert.match(csp, /frame-src https:\/\/www\.google\.com\/recaptcha\//);
 });
 
 test('CSP development relaxes script-src for Next.js hydration and HMR', () => {
   const csp = buildContentSecurityPolicy({ isDev: true });
   assert.match(csp, /script-src 'self' 'unsafe-inline' 'unsafe-eval'/);
-  assert.match(csp, /connect-src 'self' https:\/\/demotiles\.maplibre\.org https:\/\/tiles\.openfreemap\.org ws: wss:/);
+  assert.match(csp, /connect-src 'self' https:\/\/demotiles\.maplibre\.org https:\/\/tiles\.openfreemap\.org/);
+  assert.match(csp, /connect-src[^;]*recaptchaenterprise\.googleapis\.com/);
+  assert.match(csp, /connect-src[^;]* ws: wss:/);
   assert.doesNotMatch(csp, /upgrade-insecure-requests/);
 });
 
