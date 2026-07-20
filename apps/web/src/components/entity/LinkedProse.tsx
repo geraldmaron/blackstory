@@ -75,7 +75,7 @@ function segmentsFromCatalog(
   if (linked.links.length === 0) {
     return [{ kind: 'text', text }];
   }
-  return segmentsFromMarkup(linked.text);
+  return segmentsFromMarkup(linked.text, skipEntityIds);
 }
 
 function toSegments(

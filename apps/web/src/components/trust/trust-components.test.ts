@@ -7,7 +7,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { getDisclaimer } from '@repo/domain/disclaimers';
-import type { FactCounterClaim, FactRecord } from '@repo/domain/facts';
+import { asFactId, type FactCounterClaim, type FactRecord } from '@repo/domain/facts';
 import {
   CommonMisreadings,
   ConfidenceLabelWithNuance,
@@ -25,7 +25,7 @@ const SAMPLE_COUNTER_CLAIMS: readonly FactCounterClaim[] = [
 ];
 
 const MULTI_REVISION_FACT: Pick<FactRecord, 'id' | 'updatedAt' | 'revisions' | 'status'> = {
-  id: 'BB-F-000003',
+  id: asFactId('BB-F-000003'),
   updatedAt: '2026-07-16T15:00:00.000Z',
   status: 'corrected',
   revisions: [

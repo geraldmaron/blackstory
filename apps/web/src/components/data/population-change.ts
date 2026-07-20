@@ -93,6 +93,14 @@ export function rankStateMovers(
   return { gains, losses };
 }
 
+/** Formats the count + share portion shared by the stat list and the bar chart's a11y table. */
+export function formatStateChangeMagnitude(row: {
+  readonly blackAbsoluteChange: number;
+  readonly shareChangePp: number;
+}): string {
+  return `${formatSignedCount(row.blackAbsoluteChange)} Black population (${formatSignedPp(row.shareChangePp)} share)`;
+}
+
 export function formatStateChangeLine(row: StateChangeLike, stateName: string): string {
-  return `${stateName}: ${formatSignedCount(row.blackAbsoluteChange)} Black population (${formatSignedPp(row.shareChangePp)} share)`;
+  return `${stateName}: ${formatStateChangeMagnitude(row)}`;
 }

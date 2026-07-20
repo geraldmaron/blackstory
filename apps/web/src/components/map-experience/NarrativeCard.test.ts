@@ -55,10 +55,8 @@ test('links Where, Era, Evidence, Kind, and Status metadata to the right site vi
 
 test('renders an em dash for Where when no postal code is present', () => {
   const feature = requireFeature('ent_15th_st_church_001');
-  const withoutState = {
-    ...feature,
-    properties: { ...feature.properties, statePostalCode: undefined },
-  };
+  const { statePostalCode: _statePostalCode, ...propertiesWithoutState } = feature.properties;
+  const withoutState = { ...feature, properties: propertiesWithoutState };
   const html = renderToStaticMarkup(createElement(NarrativeCard, { feature: withoutState }));
   assert.match(html, /—/);
   assert.doesNotMatch(html, /aria-label="View records in/);

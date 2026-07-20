@@ -10,7 +10,7 @@ import {
   divergingBarDomain,
   type StateShiftBarRow,
 } from './state-population-shift';
-import { formatStateChangeLine, type StateChangeLike } from './population-change';
+import { formatStateChangeMagnitude, type StateChangeLike } from './population-change';
 
 void React;
 
@@ -132,7 +132,7 @@ export function StatePopulationShiftChart({
             {rows.map((row) => (
               <tr key={row.stateFips}>
                 <th scope="row">{row.stateName}</th>
-                <td>{formatStateChangeLine(row, row.stateName).split(': ')[1]}</td>
+                <td>{formatStateChangeMagnitude(row)}</td>
                 <td>{formatSignedPp(row.shareChangePp)}</td>
               </tr>
             ))}
