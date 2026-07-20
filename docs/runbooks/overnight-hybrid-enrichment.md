@@ -10,10 +10,22 @@ Tailscale. Staging only by default — never publishes.
    Firestore `researchCases` for admin review.
 2. **Wikimedia discovery** — multi-round `packages/firebase/scripts/discover-candidates.ts`
    with `--merge` until `TARGET_CANDIDATES` (default 1000) or `DISCOVERY_ROUNDS` exhausted.
+2.5. **Real source fetch** (as of 2026-07-20) — `build-discovery-enrichment-subjects.ts`
+   fetches each candidate's own page (not just its one-line discovery summary) plus an
+   independent Tier-1 corroborating source when one exists, via the same
+   `lib/safe-fetch.ts` (SSRF-safe, Trafilatura-extracted) + `lib/corroborate-source.ts`
+   (Wikipedia API primary, citation-trail, throttled-SearXNG-last-resort) stack the
+   [gap-fill pipeline](./gap-fill-research.md) uses — see that doc for why SearXNG isn't
+   the primary lookup and the malware-false-positive fix this depends on.
 3. **Hybrid enrichment** — `operator-cli enrichment-run --provider hybrid --concurrency N`
-   - Primary: OpenRouter `openrouter/free`
+   - Primary: OpenRouter free-model roster (`OPENROUTER_MODELS`, rotates on any error)
    - Failover: Ollama on Corsair (`qwen3:8b`, native `/api/chat` with `think: false`)
    - Per-item failures become `needs_evidence` (batch does not abort)
+4. **Confidence-gated auto-promotion** (as of 2026-07-20, optional) —
+   `auto-promote-corsair-keeps.ts` stages a national-catalog fixture for keeps that clear
+   the real multi-source confidence engine (`lib/confidence.ts`); see the gap-fill runbook
+   for the full explanation. Not wired into this script by default — run it manually
+   against the resulting `run-*.json` + `subjects-*.json` when you want to promote.
 
 ## Host
 
