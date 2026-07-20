@@ -11,7 +11,7 @@ import {
   ReCaptchaEnterpriseProvider,
   type AppCheck,
 } from 'firebase/app-check';
-import { fetchAppCheckHeaders } from '../../lib/firebase/fetch-app-check-headers';
+import { fetchAppCheckHeaders } from '../../../lib/firebase/fetch-app-check-headers';
 
 let cachedAppCheck: AppCheck | undefined;
 
