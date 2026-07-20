@@ -10,7 +10,7 @@ test('selectAtmospherePlane is stable for the same seed key', () => {
   const b = selectAtmospherePlane({ seedKey: 'before-the-battle-cry' });
   assert.equal(a.planeId, b.planeId);
   assert.equal(a.mode, 'mosaic');
-  assert.equal(a.tiles.length, 16);
+  assert.equal(a.tiles.length, 8);
   assert.deepEqual(
     a.tiles.map((tile) => tile.index),
     b.tiles.map((tile) => tile.index),
@@ -18,14 +18,13 @@ test('selectAtmospherePlane is stable for the same seed key', () => {
   assert.equal(a.geometric.id, b.geometric.id);
 });
 
-test('selectAtmospherePlane defaults to mosaic mode with density 16', () => {
+test('selectAtmospherePlane defaults to mosaic mode with density 8', () => {
   const selection = selectAtmospherePlane({ seedKey: 'naming-dunbar-1916' });
   assert.equal(selection.mode, 'mosaic');
-  assert.equal(selection.tiles.length, 16);
+  assert.equal(selection.tiles.length, 8);
   assert.equal(selection.attributionHref, '/stories/mosaic-credits');
   assert.ok(selection.geometric.path.startsWith('/brand/atmosphere/fallback/'));
 });
-
 test('preferGeometric returns geometric mode with empty tiles', () => {
   const selection = selectAtmospherePlane({
     seedKey: 'same-footprint-new-walls',

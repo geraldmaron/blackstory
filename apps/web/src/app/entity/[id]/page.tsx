@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { MapFrame, Timeline } from '@repo/ui';
 import { KindBadge, ConfidenceMark, MapsExternalLink } from '../../../components/map-experience';
-import { EntityLocationMap } from '../../../components/entity/EntityLocationMap';
+import { EntityLocationMapLazy } from '../../../components/entity/EntityLocationMapLazy';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
 import '../../../components/entity/entity-page.css';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
@@ -34,7 +34,10 @@ import {
 import { highestConfidence } from '../../../lib/map-experience/build-explore-map-source';
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
-import { listPublicEntityViews, resolvePublicEntityView } from '../../../lib/public-data/source';
+import {
+  getPublicSearchIndex,
+  resolvePublicEntityView,
+} from '../../../lib/public-data/source';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
 import {
   buildWhyThisAppearsForEntity,
@@ -63,8 +66,9 @@ function entityLinkCatalogFromNeighbors(
 }
 
 export async function generateStaticParams() {
-  const { data: entities } = await listPublicEntityViews();
-  return entities.map((entity) => ({ id: entity.id }));
+  // Thin id list from the search index — never hydrate full entity graphs for GSP.
+  const { data: index } = await getPublicSearchIndex();
+  return index.map((doc) => ({ id: doc.id }));
 }
 
 export async function generateMetadata({ params }: EntityPageProps) {
@@ -362,7 +366,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
 
           <aside className="ds-entity-aside" aria-label="Record context">
             {geoAnchor ? (
-              <EntityLocationMap
+              <EntityLocationMapLazy
                 lat={geoAnchor.lat}
                 lng={geoAnchor.lng}
                 label={entity.locationLabel}

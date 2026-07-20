@@ -338,22 +338,24 @@
   font-weight: 600;
 }
 
-/* —— Shell page transition — enter on template remount only (no exit-on-click).
-   Map routes opt out via data-surface="map" (ADR-017). ——  */
+/* —— Shell page transition — subtle enter on template remount only (no exit-on-click).
+   Do NOT fade from opacity 0: that blanks loading.tsx during slow RSC/compile and makes
+   story ↔ entity navigations look broken. Map routes opt out via data-surface="map"
+   (ADR-017). ——  */
 @keyframes ds-shell-page-enter {
   from {
-    opacity: 0;
+    transform: translateY(0.2rem);
   }
 
   to {
-    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 .ds-shell-page-transition {
   position: relative;
   isolation: isolate;
-  animation: ds-shell-page-enter var(--ds-duration-base) var(--ds-easing) both;
+  animation: ds-shell-page-enter var(--ds-duration-fast) var(--ds-easing) both;
 }
 
 /* ADR-017: never signal a crossfade over the persistent map canvas subtree. */

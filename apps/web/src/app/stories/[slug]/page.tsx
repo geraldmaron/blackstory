@@ -9,7 +9,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
-import { AtmospherePlane, selectAtmospherePlane } from '../../../components/atmosphere';
+import { AtmospherePlane } from '../../../components/atmosphere/AtmospherePlane';
+import { selectAtmospherePlane } from '../../../components/atmosphere/select-atmosphere-plane';
 import { renderStoryTitle } from '../../../components/atmosphere/story-title';
 import { SourceFootnote } from '../../../components/data/SourceFootnote';
 import type { PublicEntityView } from '../../../data/public-seed';
@@ -130,6 +131,26 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
       </header>
 
       <article className="ds-container ds-story-article">
+        {relatedEntities.length > 0 ? (
+          <section className="ds-section ds-section--flush" aria-labelledby="story-entities-heading">
+            <p className="ds-section__kicker">Records</p>
+            <h2 className="ds-section__title" id="story-entities-heading">
+              Related entities
+            </h2>
+            <ul className="ds-story-rail">
+              {relatedEntities.map((entity) => (
+                <li key={entity.id}>
+                  <Link className="ds-story-link" href={`/entity/${entity.id}`} prefetch>
+                    <span className="ds-story-link__meta">{entity.kind}</span>
+                    <h3 className="ds-story-link__title">{entity.displayName}</h3>
+                    <p className="ds-story-link__summary">{entity.summary}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
         <div className="ds-story-article__body ds-prose">
           {story.body.map((section, index) => (
             <section key={section.heading ?? `section-${index}`}>
@@ -150,26 +171,6 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
           </h2>
           <SourceFootnote sources={story.sources} density="group" />
         </section>
-
-        {relatedEntities.length > 0 ? (
-          <section className="ds-section" aria-labelledby="story-entities-heading">
-            <p className="ds-section__kicker">Records</p>
-            <h2 className="ds-section__title" id="story-entities-heading">
-              Related entities
-            </h2>
-            <ul className="ds-story-rail">
-              {relatedEntities.map((entity) => (
-                <li key={entity.id}>
-                  <Link className="ds-story-link" href={`/entity/${entity.id}`}>
-                    <span className="ds-story-link__meta">{entity.kind}</span>
-                    <h3 className="ds-story-link__title">{entity.displayName}</h3>
-                    <p className="ds-story-link__summary">{entity.summary}</p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
 
         <p className="ds-sans ds-story-article__footer">
           <Link href="/stories">All stories</Link>

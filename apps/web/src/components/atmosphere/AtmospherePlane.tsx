@@ -69,7 +69,7 @@ export function AtmospherePlane({
               width={80}
               height={96}
               decoding="async"
-              loading={index < 4 ? 'eager' : 'lazy'}
+              loading={index < 1 ? 'eager' : 'lazy'}
               onError={() => setMosaicFailed(true)}
             />
           ))}

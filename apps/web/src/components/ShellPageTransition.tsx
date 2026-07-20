@@ -1,10 +1,10 @@
 /**
- * Soft shell-page enter opacity when the App Router remounts `template.tsx`.
+ * Soft shell-page enter when the App Router remounts `template.tsx`.
  *
- * Deliberately does **not** fade the current page out on link click. An early
- * exit-to-transparent left a blank canvas for seconds while Next compiled or
- * streamed `/stories/[slug]` and `/entity/[id]` — navigation felt broken.
- * Map surfaces under `(map)/` still skip enter via `data-surface="map"` in CSS.
+ * Deliberately does **not** fade opacity to 0 (exit or enter). Opacity-0 enter
+ * hid loading.tsx for `/stories/[slug]` and `/entity/[id]` while Next compiled
+ * or streamed — navigations looked broken. Enter is a short translate only
+ * (see shell.css). Map surfaces under `(map)/` skip enter via `data-surface="map"`.
  */
 'use client';
 

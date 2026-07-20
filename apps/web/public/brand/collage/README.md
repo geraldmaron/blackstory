@@ -6,7 +6,7 @@ living mosaic mast (not entity pages).
 - **Entity pages** (`/entity/[id]`) use `EntityRecordMark` when there is no primary image — not
   collage mosaics.
 - **Story atmosphere masts** (`/stories/[slug]`) use these tiles as a soft B&W mosaic via
-  `AtmospherePlane` + `selectAtmospherePlane` (mosaic default; geometric SVG fallback when tiles
+  `AtmospherePlane` + `selectAtmospherePlane` (mosaic default density 8; geometric SVG fallback when tiles
   fail, Save-Data, or reduced motion).
 - **About** (`/about`) uses `LivingAtmosphereMosaic` in a full-bleed mast: soft preloaded
   crossfades from the full rights-cleared pool; tiles that match a published entity open

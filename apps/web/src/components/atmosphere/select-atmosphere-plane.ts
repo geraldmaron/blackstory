@@ -18,7 +18,7 @@ import {
   type AtmosphereTileCredit,
 } from './tile-credits';
 
-export type AtmosphereDensity = 12 | 16 | 24 | 32 | 48;
+export type AtmosphereDensity = 8 | 12 | 16 | 24 | 32 | 48;
 
 export type AtmospherePlaneSelectionInput = {
   readonly seedKey: string;
@@ -37,7 +37,7 @@ export type AtmospherePlaneSelection = {
   readonly attributionHref: string;
 };
 
-const DEFAULT_DENSITY: AtmosphereDensity = 16;
+const DEFAULT_DENSITY: AtmosphereDensity = 8;
 
 export function selectAtmospherePlane(
   input: AtmospherePlaneSelectionInput,
