@@ -8,15 +8,15 @@
  *
  * This endpoint is routed under the `geocoding` endpoint class, distinct from `search`:
  * `@repo/security`'s policy matrix (`DEFAULT_ENDPOINT_QUOTA_MATRIX` in `rate-limits.ts`)
- * gives `geocoding` a stricter `expensive_read` tier (anonymous: capacity 5 window cap 5
- * daily 25 concurrency 1) than `search` (anonymous: capacity 8) because every call proxies to
- * the free, unauthenticated, "reasonable use" U.S. Census Geocoder this repo's own quota is
- * what actually bounds call volume against that vendor, not a vendor-issued key (see
- * `packages/domain/src/adapters/census-geo/fetch-geocode.ts`'s module doc). There is no exported
- * `GEOCODING_ENDPOINT_CLASS` constant in `@repo/security` today (only `SEARCH_ENDPOINT_CLASS`
- * exists, in `query-guardrails.ts`) — the literal `'geocoding'` below is typed against the real
- * `EndpointClass` union via `satisfies`, so this still fails to compile if that class is ever
- * renamed or removed.
+ * gives `geocoding` an `expensive_read` tier (anonymous: capacity/window 20, daily 120,
+ * concurrency 1) sized for explore Place retries while remaining stricter than static entity
+ * reads. Every call proxies to the free, unauthenticated, "reasonable use" U.S. Census
+ * Geocoder — this repo's own quota bounds call volume against that vendor, not a vendor-
+ * issued key (see `packages/domain/src/adapters/census-geo/fetch-geocode.ts`'s module doc).
+ * There is no exported `GEOCODING_ENDPOINT_CLASS` constant in `@repo/security` today (only
+ * `SEARCH_ENDPOINT_CLASS` exists, in `query-guardrails.ts`) — the literal `'geocoding'` below
+ * is typed against the real `EndpointClass` union via `satisfies`, so this still fails to
+ * compile if that class is ever renamed or removed.
  */
 import {
   aggregateDistributedRisk,

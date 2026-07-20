@@ -186,10 +186,13 @@ export const DEFAULT_ENDPOINT_QUOTA_MATRIX: Record<
     service: policy(120, 2.5, 120, 60_000, 2_000, 10, 'expensive_read'),
   },
   geocoding: {
-    anonymous: policy(5, 0.1, 5, 60_000, 25, 1, 'expensive_read'),
-    authenticated: policy(15, 0.35, 15, 60_000, 120, 2, 'expensive_read'),
-    admin: policy(30, 0.7, 30, 60_000, 350, 4, 'expensive_read'),
-    service: policy(80, 1.8, 80, 60_000, 1_500, 8, 'expensive_read'),
+    // Explore Place search + /locate share this class; anonymous needs headroom for
+    // a few retries without tripping before Census responds. Still well under static reads.
+    // Keep maxConcurrency at 1 for anonymous to limit parallel geocoder abuse.
+    anonymous: policy(20, 0.4, 20, 60_000, 120, 1, 'expensive_read'),
+    authenticated: policy(40, 0.8, 40, 60_000, 300, 3, 'expensive_read'),
+    admin: policy(60, 1.2, 60, 60_000, 600, 5, 'expensive_read'),
+    service: policy(120, 2.5, 120, 60_000, 2_000, 10, 'expensive_read'),
   },
   nearbyDiscovery: {
     anonymous: policy(6, 0.12, 6, 60_000, 30, 1, 'expensive_read'),

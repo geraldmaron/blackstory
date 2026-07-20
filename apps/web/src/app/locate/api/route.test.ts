@@ -13,6 +13,10 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { AppCheckVerifier } from '@repo/firebase';
 import type { CensusGeocodeMatch } from '@repo/domain';
+import {
+  DEFAULT_ENDPOINT_QUOTA_MATRIX,
+  resolveEndpointPolicy,
+} from '@repo/security';
 import { createLocateCache } from '../../../lib/geocode/pipeline';
 import { createLocateAppCheckGuard } from './app-check-guard';
 import { createLocateRateLimitGuard } from './rate-limit-guard';
@@ -273,10 +277,14 @@ test('monitor mode without an App Check token still geocodes (not a fake 429)', 
 });
 
 test('repeated calls exhaust the geocoding rate limit and are denied (429, AC5)', async () => {
-  // Anonymous `geocoding` rolling-window cap is 5 (stricter than search's 8); on a fixed clock no
-  // tokens refill, so the 6th call in the window must be denied.
+  const windowCap = resolveEndpointPolicy(
+    DEFAULT_ENDPOINT_QUOTA_MATRIX,
+    'geocoding',
+    'anonymous',
+  ).windowCap;
+  // Fixed clock: no token refill. Call windowCap times, then the next must be denied.
   const deps = await buildDeps({ fetchAddressGeocode: fakeAddressFetcher([DC_MATCH]) });
-  for (let i = 0; i < 5; i += 1) {
+  for (let i = 0; i < windowCap; i += 1) {
     const ok = await handleLocateRequest(locateRequest(`?address=query+${i}`), deps);
     assert.equal(ok.status, 200, `call ${i + 1} should be allowed`);
   }
