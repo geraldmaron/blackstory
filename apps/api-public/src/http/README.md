@@ -50,11 +50,21 @@ App Check is an **abuse signal, never an authorization gate** for reads. Implica
   `DEFAULT_ENDPOINT_QUOTA_MATRIX` denies `app_check_required` (surfaced as `429 RATE_LIMITED`) when
   an anonymous caller hits an `expensive_read`/`mutation` tier without a verified token (ADR-010:
   App Check gates expensive reads). A real mobile client always attests, so this is transparent to
-  it. **Open tension flagged for the independent reviewer:** this cost-tier gate hard-denies
-  unverified `search` even during an App Check *outage*, which is in tension with threat-model T2's
-  "reads still succeed as anonymous, rate-limited." Resolving it (e.g. an outage-mode carve-out)
-  would touch `@repo/security`'s shared quota policy, which is out of this bead's exclusive scope —
-  it is called out here rather than silently overridden in the handler.
+  it. This hard-deny is the **enumeration/abuse defense during normal operation** — relaxing it
+  unconditionally would make expensive search free enumeration for any tokenless caller.
+- **App Check OUTAGE carve-out (repo-uqmm — resolved).** The prior T2 tension (a hard-deny of
+  unattested `search` even during an App Check *outage*) is resolved in `@repo/security`, not
+  overridden in the handler. `evaluateQuota` now takes an explicit `appCheckAvailability` signal:
+  under `'outage'` the expensive-read hard-deny relaxes to a **bounded degraded quota**
+  (`deriveOutageDegradedPolicy`, ~¼ of the anonymous caps, single-concurrency) rather than a hard
+  deny — fail-open for availability without becoming free enumeration. `risk_score_exceeded` still
+  fails closed on a genuine abuse spike even during an outage. This handler samples the signal via
+  the optional `HandlerDeps.appCheckAvailability` provider (defaults to `'available'`, so normal
+  operation is unchanged); wire it to a **systemic** operator kill-switch flag or an App Check
+  verification circuit breaker — never a single caller's missing token. Distinguishing a genuine
+  outage from an individually-unverified caller currently requires an operator/circuit input because
+  the `@repo/firebase` App Check guard maps a verifier throw to `invalid_token` (it does not yet
+  surface an "outage" reason); auto-detection is a follow-up in that package's scope.
 - **`health` and `compatibility` do NOT invoke the guard** — trivial operational / version-math
   endpoints with no corpus data and no meaningful cost.
 - **`bootstrap` is an intentionally-unauthenticated immutable artifact** (the active-release

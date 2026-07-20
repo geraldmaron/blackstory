@@ -20,11 +20,19 @@
  *     (`DEFAULT_ENDPOINT_QUOTA_MATRIX`) REQUIRES a verified App Check token for anonymous callers
  *     and denies `app_check_required` (surfaced as 429) otherwise — the App Check GUARD still never
  *     hard-denies; the cost-tier quota policy does. `health` and `compatibility` do NOT invoke the
- *     guard. See `./README.md` for the per-endpoint table and the reviewer-flagged T2 tension.
+ *     guard.
+ *   - App Check OUTAGE carve-out (repo-uqmm; resolved): the search hard-deny is the enumeration
+ *     defense during NORMAL operation. During a *confirmed App Check service outage*, T2 requires
+ *     fail-open. `@repo/security` now honors an explicit `appCheckAvailability='outage'` signal that
+ *     relaxes the expensive-read hard-deny to a BOUNDED degraded quota (never free access). This
+ *     handler samples that signal via the optional `HandlerDeps.appCheckAvailability` provider
+ *     (defaults to `'available'`); wire it to a systemic operator/circuit signal, never a single
+ *     caller's missing token. See `./README.md` for the per-endpoint table.
  */
 import type { AppCheckDecision, AppCheckHeaders } from '@repo/firebase';
 import {
   encodeSearchCursor,
+  type AppCheckAvailability,
   type CanonicalSearchQuery,
   type QueryGuardrailDecisionAllowed,
   type RateLimitSubject,
@@ -64,6 +72,16 @@ export type HandlerDeps = {
   readonly appCheckGuard: (request: { readonly headers: AppCheckHeaders }) => Promise<AppCheckDecision>;
   readonly rateLimitGuard: ReturnType<typeof createPublicRateLimitGuard>;
   readonly searchGuard: ReturnType<typeof createPublicSearchGuard>;
+  /**
+   * Confirmed App Check service availability, sampled per request (repo-uqmm). Optional; when
+   * omitted the rate limiter defaults to `'available'` (no behavior change). Wire this to a
+   * systemic outage signal — an operator kill-switch flag or an App Check verification circuit
+   * breaker — so that during a confirmed App Check outage, unattested `expensive_read` (search)
+   * degrades to a bounded rate-limited quota instead of a hard `app_check_required` deny
+   * (threat-model T2 / ADR-020 §3 fail-open). A single unverified request is NOT an outage, so
+   * this must never be derived from one caller's missing token.
+   */
+  readonly appCheckAvailability?: () => AppCheckAvailability;
 };
 
 const ENTITY_ID_PATTERN = /^[A-Za-z0-9_-]{1,200}$/;
@@ -374,11 +392,13 @@ async function runRateLimit(
   deps: HandlerDeps,
   appCheck: AppCheckDecision,
 ): Promise<{ readonly limitResponse: ApiResponse | null; readonly release: () => void }> {
+  const appCheckAvailability = deps.appCheckAvailability?.();
   const decision = deps.rateLimitGuard.evaluate({
     method: 'GET',
     path,
     subject: RATE_LIMIT_SUBJECT,
     appCheckVerified: appCheck.verified,
+    ...(appCheckAvailability !== undefined ? { appCheckAvailability } : {}),
     ...(request.clientIp ? { clientIp: request.clientIp } : {}),
   });
 

@@ -180,6 +180,23 @@ test('search (expensive_read) requires App Check for anonymous callers → 429 w
   assert.equal(publicApiErrorEnvelopeSchema.parse(res.body).error.code, 'RATE_LIMITED');
 });
 
+test('repo-uqmm: under a confirmed App Check OUTAGE, unattested search fails OPEN (200, bounded)', async () => {
+  // Same request as the 429 case above, but with a systemic outage signal wired in: T2 fail-open.
+  const deps = makeDeps({ appCheckAvailability: () => 'outage' });
+  const res = await dispatch(makeRequest('/v1/search', { query: 'q=dunbar' }), deps);
+  assert.equal(res.status, 200, 'search must degrade to a bounded read, not lock out, during an outage');
+  const parsed = searchResponseV1Schema.parse(res.body);
+  assert.equal(parsed.results[0]?.id, 'ent_dunbar_school_001');
+});
+
+test('repo-uqmm: default availability (no outage signal) keeps the search hard-deny (429)', async () => {
+  // Explicitly proving the carve-out is opt-in: without the outage provider, behavior is unchanged.
+  const deps = makeDeps({ appCheckAvailability: () => 'available' });
+  const res = await dispatch(makeRequest('/v1/search', { query: 'q=dunbar' }), deps);
+  assert.equal(res.status, 429);
+  assert.equal(publicApiErrorEnvelopeSchema.parse(res.body).error.code, 'RATE_LIMITED');
+});
+
 test('ADVERSARIAL: App Check omitted → read still served identically (fail-open, T2/invariant 6)', async () => {
   const deps = makeDeps();
   const withToken = await dispatch(

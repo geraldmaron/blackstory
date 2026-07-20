@@ -42,15 +42,23 @@ official guidance and what the branch actually shipped (`apps/mobile` now exists
    trivially). Cost: two package managers in one repo, and `@repo/public-contracts` must build to `dist/`
    for any non-Metro consumer. §5's "do NOT exclude / keep in workspace" preference is amended to record
    that isolation was adopted on measured pnpm/Metro friction.
-4. **App Check "reads fail open" is only partly true today (§3).** §3 claims reads fail open under an App
-   Check outage. That holds for **static reads**, but `@repo/security`'s quota matrix currently
-   **hard-denies `expensive_read` (e.g. `/v1/search`) for anonymous callers without a verified token**,
-   with no outage carve-out — a real contradiction, candidly flagged in `apps/mobile/src/security/app-check.ts`
-   and tracked by **`repo-uqmm` (OPEN)**. §3's fail-open language is scoped accordingly below; the
-   platform-wide fix is an owner/security decision, not a mobile-program change.
+4. **App Check "reads fail open" — resolved (§3).** §3 originally claimed unconditional read fail-open under
+   an App Check outage, but `@repo/security`'s quota matrix hard-denied `expensive_read` (e.g. `/v1/search`)
+   for unattested anonymous callers with no outage carve-out — a real contradiction, tracked by `repo-uqmm`.
+   **Update 2026-07-20 (repo-uqmm resolved, CLOSED):** `@repo/security` now takes an explicit
+   `appCheckAvailability: 'available' | 'outage'` signal. Normal operation is unchanged (unattested
+   `expensive_read`/`mutation` still hard-denies `app_check_required` — the enumeration/abuse defense stays).
+   Only when a systemic operator/circuit signal reports a confirmed `'outage'` does the hard-deny relax, and
+   it relaxes to a **bounded degraded quota** (`deriveOutageDegradedPolicy`, ~1/4 of anonymous caps, floored
+   at 1, single concurrency) — never to free/unbounded access. `risk_score_exceeded` still fails closed during
+   an outage (a real abuse signal, not mere token absence). Static reads were always ungated and remain so.
+   §3's fail-open language below is updated accordingly. Follow-up: distinguishing a genuine App Check outage
+   from one caller's missing token needs an operator/circuit input — `@repo/firebase`'s verifier-failure →
+   outage-signal auto-detection is a separate, smaller follow-up tracked by **`repo-vdnm`**.
 
-No decision is reversed. Rejected alternatives stand. Remaining risk that stays open by design: `repo-uqmm`
-(App Check fail-open vs expensive-read hard-deny).
+No decision is reversed. Rejected alternatives stand. `repo-uqmm` is resolved and closed (2026-07-20); the
+only remaining open item from this thread is the smaller `@repo/firebase` verifier-outage auto-detection
+follow-up noted above.
 
 ## Scaffold vs target
 
@@ -186,12 +194,18 @@ show the false-negative rate on genuine clients is negligible, so enforcement ca
 provider quirk. (3) **Even under enforcement, reads fail open** to rate-limited `anonymous` access on an App Check
 *outage* (threat model T2; ADR-010 degraded-read doctrine) — enforcement raises abuse cost, it is never a hard
 availability gate on public content. This staged posture is the mobile analogue of ADR-010's "tighten (never
-silently loosen) App Check enforcement when moving staging → prod." **Amended 2026-07-20:** this fail-open
-guarantee holds for **static reads** but does **not** hold for `expensive_read` (e.g. `/v1/search`) today —
-`@repo/security`'s quota matrix hard-denies unattested expensive reads with no outage carve-out (candidly
-noted in `apps/mobile/src/security/app-check.ts`). Reconciliation is a platform-wide owner/security decision
-tracked by **`repo-uqmm` (OPEN)**; the client surfaces the server's honest `429` rather than assuming a
-fail-open it cannot rely on.
+silently loosen) App Check enforcement when moving staging → prod." **Amended 2026-07-20 (repo-uqmm resolved):**
+static reads were always ungated and remain fully fail-open in every mode. For `expensive_read` (e.g.
+`/v1/search`), `@repo/security`'s quota matrix now distinguishes normal operation from a *confirmed* App Check
+outage via an explicit `appCheckAvailability` signal (never inferred from a single caller's missing token):
+during normal operation, an unattested anonymous caller is still hard-denied `app_check_required` (the
+enumeration/abuse defense); during a confirmed outage, the hard-deny relaxes to a **bounded degraded quota**
+(`deriveOutageDegradedPolicy`, ~1/4 of anonymous caps) rather than either a hard lockout or free access.
+`risk_score_exceeded` still fails closed on a genuine abuse spike even during an outage. The client should
+still treat a `429` as authoritative rather than assuming unlimited fail-open — the guarantee is bounded
+availability, not unlimited access. Follow-up: deriving the `'outage'` signal automatically from repeated
+verifier failures (rather than only an operator kill-switch) is a small remaining `@repo/firebase` circuit-
+breaker follow-up, tracked by **`repo-vdnm`**.
 
 ### 4. Local storage — `expo-sqlite`
 

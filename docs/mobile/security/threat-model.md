@@ -7,11 +7,13 @@
 
 > **Adversarial review disposition (2026-07-20).** Accepted with two amendments, both reconciling stated
 > mitigations with verified repo/vendor reality:
-> - **T2 fail-open is only partially implemented.** Read fail-open holds for **static reads** but NOT for
->   `expensive_read` (e.g. `/v1/search`): `@repo/security`'s quota matrix hard-denies unattested expensive
->   reads with no App Check outage carve-out — a real contradiction, candidly flagged in
->   `apps/mobile/src/security/app-check.ts` and tracked by **`repo-uqmm` (OPEN)**. See the amendment note in
->   T2. This is a **remaining risk open by design** pending a platform-wide owner/security decision.
+> - **T2 fail-open gap — resolved 2026-07-20.** Read fail-open originally held for **static reads** but NOT
+>   for `expensive_read` (e.g. `/v1/search`): `@repo/security`'s quota matrix hard-denied unattested expensive
+>   reads with no App Check outage carve-out — a real contradiction, tracked by **`repo-uqmm`**. `repo-uqmm`
+>   is now **CLOSED**: `@repo/security` takes an explicit `appCheckAvailability` signal, and a confirmed outage
+>   now degrades `expensive_read` to a **bounded** quota instead of a hard deny (never free access). See the
+>   amendment note in T2. A small follow-up (`repo-vdnm`) remains for auto-deriving the outage signal from
+>   verifier failures rather than only an operator flag.
 > - **T6 code signing is a paid-EAS-plan feature.** EAS Update end-to-end code signing requires an EAS
 >   Production/Enterprise plan (docs.expo.dev/eas-update/code-signing), so on the free tier the T6 blast-radius
 >   controls are MFA custody + scoped CI token + staged rollout + rollback, and code signing is a cost-gated

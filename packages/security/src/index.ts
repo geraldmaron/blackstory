@@ -51,8 +51,11 @@ export type {
 export {
   RATE_LIMIT_POLICY_VERSION,
   DEFAULT_ENDPOINT_QUOTA_MATRIX,
+  OUTAGE_DEGRADED_QUOTA_FACTOR,
+  deriveOutageDegradedPolicy,
   endpointClasses,
   rateLimitSubjects,
+  appCheckAvailabilityStates,
   safeRetryAfter,
   formatRateLimitResponse,
   aggregateRiskScore,
@@ -70,6 +73,7 @@ export {
 export type {
   RateLimitSubject,
   EndpointClass,
+  AppCheckAvailability,
   RiskSignalKind,
   RiskSignal,
   QuotaDenialReason,
