@@ -127,6 +127,9 @@ async function completeOpenAiCompatible(
     headers['HTTP-Referer'] = 'https://blackstory.local';
     headers['X-Title'] = 'BlackStory editorial staging';
   }
+  // Free-tier models vary in response_format support (some reject json_object outright,
+  // e.g. tencent/hy3:free requires json_schema instead) — omit it rather than hardcode
+  // one shape, and rely on the system prompt + extractJsonObject's brace-scanning instead.
   const response = await fetchImpl(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
     method: 'POST',
     headers,
@@ -135,7 +138,6 @@ async function completeOpenAiCompatible(
       temperature: request.temperature ?? 0.2,
       max_tokens: request.maxTokens ?? 900,
       messages: request.messages,
-      response_format: { type: 'json_object' },
       ...extraBody,
     }),
   });
@@ -145,6 +147,8 @@ async function completeOpenAiCompatible(
       `${providerId} completion failed (${response.status}): ${body.slice(0, 400)}`,
     ) as Error & { status?: number; retryable?: boolean };
     err.status = response.status;
+    // A roster is tried model-by-model regardless of status (see createOpenRouterLlmProvider);
+    // `retryable` here only controls whether a single-model caller backs off and retries.
     err.retryable = isRetryableStatus(response.status);
     throw err;
   }
@@ -293,12 +297,20 @@ export function createOpenRouterLlmProvider(options: {
           return { ...result, attempts: attempt };
         } catch (error) {
           lastError = error;
-          const retryable =
-            error instanceof Error &&
-            'retryable' in error &&
-            (error as { retryable?: boolean }).retryable === true;
-          if (!retryable || attempt >= maxAttempts) break;
-          await sleep(Math.min(8_000, 400 * 2 ** (attempt - 1)));
+          if (attempt >= maxAttempts) break;
+          // A different model next is a fresh attempt regardless of error kind — a 400
+          // "this model doesn't support X" from one router says nothing about the next
+          // one, so don't gate rotation on `retryable` (that flag only means "worth
+          // retrying the SAME endpoint"). Only back off when about to repeat a model.
+          const nextModel = request.model || models[attempt % models.length]!;
+          if (nextModel === model) {
+            const retryable =
+              error instanceof Error &&
+              'retryable' in error &&
+              (error as { retryable?: boolean }).retryable === true;
+            if (!retryable) break;
+            await sleep(Math.min(8_000, 400 * 2 ** (attempt - 1)));
+          }
         }
       }
       const message = lastError instanceof Error ? lastError.message : String(lastError);

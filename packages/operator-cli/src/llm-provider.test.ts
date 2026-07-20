@@ -229,3 +229,27 @@ test('openrouter keeps a caller-pinned model pinned across retries', async () =>
   assert.deepEqual(attemptedModels, ['openrouter/free', 'openrouter/free']);
   assert.equal(result.attempts, 2);
 });
+
+test('openrouter rotates to the next model even on a non-retryable error (e.g. 400 unsupported feature)', async () => {
+  const attemptedModels: string[] = [];
+  const fetchImpl: typeof fetch = async (_input, init) => {
+    const body = JSON.parse(String(init?.body)) as { model: string };
+    attemptedModels.push(body.model);
+    if (body.model === 'tencent/hy3:free') {
+      return new Response('unsupported response_format', { status: 400 });
+    }
+    return Response.json({
+      model: body.model,
+      choices: [{ message: { role: 'assistant', content: '{"ok":true}' } }],
+    });
+  };
+  const { createOpenRouterLlmProvider } = await import('./llm-provider.ts');
+  const provider = createOpenRouterLlmProvider({
+    apiKey: 'test-key',
+    models: ['tencent/hy3:free', 'nvidia/nemotron-3-super-120b-a12b:free'],
+    fetchImpl,
+  });
+  const result = await provider.complete({ model: '', messages: [{ role: 'user', content: 'x' }] });
+  assert.deepEqual(attemptedModels, ['tencent/hy3:free', 'nvidia/nemotron-3-super-120b-a12b:free']);
+  assert.equal(result.modelId, 'nvidia/nemotron-3-super-120b-a12b:free');
+});
