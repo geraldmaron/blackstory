@@ -2,10 +2,10 @@
 
 /**
  * Client orchestrator for `/history` temporal browse experience. Wires the decade
- * stepper, overview strip, filter toolbar, progressive-disclosure graph panel,
- * synchronized accessible list, narrative/edge cards, and shareable URL state. The
- * server-rendered graph release snapshot is the source of truth; `/history/api` refine
- * is optional progressive enhancement when App Check is configured.
+ * stepper, overview strip, filter toolbar, data panel (composition + connections +
+ * archive framings), synchronized accessible list, narrative/edge cards, and shareable
+ * URL state. The server-rendered graph release snapshot is the source of truth;
+ * `/history/api` refine is optional progressive enhancement when App Check is configured.
  */
 import { startTransition, useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
@@ -431,11 +431,14 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
       </div>
 
       <div className="ds-history__layout">
-        <div className="ds-history-graph-panel">
+      <div className="ds-history-graph-panel">
           <h2 className="ds-section__kicker" id="history-graph-heading">
-            Relationship graph
+            Records &amp; connections
           </h2>
-          <HistoryGraphPanel {...graphProps} />
+          <HistoryGraphPanel
+            {...graphProps}
+            activeKind={view.viewState.filters.kind}
+          />
         </div>
 
         <div className="ds-history__list-panel">

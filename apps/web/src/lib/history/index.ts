@@ -4,6 +4,7 @@
 export * from './build-history-graph';
 export * from './copy';
 export * from './decade-status';
+export * from './did-you-know';
 export * from './filters';
 export * from './history-view-model';
 export * from './layout-history-graph';

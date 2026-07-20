@@ -446,17 +446,27 @@ function fetchCountyPolygons(): Promise<CountyPolygonCollection> {
 const countyLinesLoaded = new WeakSet<MapLibreMap>();
 /** Per-map generation so a stale empty-levels fetch cannot overwrite a later choropleth join. */
 const countyLinesLoadGeneration = new WeakMap<MapLibreMap, number>();
+/** Once a choropleth join is requested, ignore empty-level loads (even mid-flight). */
+const countyChoroplethJoinRequested = new WeakSet<MapLibreMap>();
 
 /** Lazily fills the county source (hairlines + optional choropleth). Deliberately zoom-triggered
  * by the caller, not eager: the ~2.3 MB asset is invisible below the layer's `minzoom`, so the
  * national resting frame never pays for it — except population choropleths, which load at any
- * zoom when `blackShare` / `blackChange` is active. */
+ * zoom when `blackShare` / `blackChange` is active.
+ *
+ * Empty-level calls after geometry is present — or after a join was requested — are no-ops so
+ * fade-path / StrictMode patches with `[]` cannot wipe `shareTier`. */
 async function loadCountyPolygons(
   map: MapLibreMap,
   choroplethLevels: readonly CountyChoroplethLevel[],
 ): Promise<void> {
   const source = map.getSource(EXPLORE_COUNTY_LINES_SOURCE_ID) as GeoJSONSource | undefined;
   if (!source) return;
+  if (choroplethLevels.length > 0) {
+    countyChoroplethJoinRequested.add(map);
+  } else if (countyLinesLoaded.has(map) || countyChoroplethJoinRequested.has(map)) {
+    return;
+  }
   const generation = (countyLinesLoadGeneration.get(map) ?? 0) + 1;
   countyLinesLoadGeneration.set(map, generation);
   const collection = await fetchCountyPolygons();
@@ -468,14 +478,22 @@ async function loadCountyPolygons(
     choroplethLevels.length > 0
       ? joinPopulationOntoCountyPolygons(collection, choroplethLevels)
       : collection;
-  if (countyLinesLoaded.has(map)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-    source.setData(joined as any);
-    return;
-  }
   countyLinesLoaded.add(map);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
   source.setData(joined as any);
+}
+
+/** County geometry + population join still need to land during decade-morph `configOnly`
+ * patches — those skip `applyStyleAndData`, which previously left blackShare without tiers. */
+function requestCountyPolygonLoad(map: MapLibreMap, cfg: StageConfig): void {
+  const needsCountyGeometry =
+    map.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
+    cfg.layerMode === 'blackShare' ||
+    cfg.layerMode === 'blackChange';
+  if (!needsCountyGeometry) return;
+  void loadCountyPolygons(map, cfg.countyChoroplethLevels).catch((error) => {
+    console.error('[MapStage] county polygon load failed', error);
+  });
 }
 
 /** Channels decade morph holds during dissolve — mid-swap style sync must not touch them. */
@@ -899,15 +917,7 @@ export function MapStageProvider({
               console.error('[MapStage] state polygon load failed', error);
             });
         }
-        const needsCountyGeometry =
-          map.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
-          configRef.current.layerMode === 'blackShare' ||
-          configRef.current.layerMode === 'blackChange';
-        if (needsCountyGeometry) {
-          void loadCountyPolygons(map, configRef.current.countyChoroplethLevels).catch((error) => {
-            console.error('[MapStage] county polygon load failed', error);
-          });
-        }
+        requestCountyPolygonLoad(map, configRef.current);
         if (!options?.skipEntityMarkers) {
           syncEntityMarkers();
         }
@@ -962,7 +972,15 @@ export function MapStageProvider({
         historyEdgesEnabled: patch.historyEdgesEnabled,
         historyEdgeCollection: patch.historyEdgeCollection,
       };
-      if (applyOptions?.configOnly) return;
+      if (applyOptions?.configOnly) {
+        // Decade morph holds live style sync, but population choropleth joins still
+        // must apply when the compact index arrives after the first paint.
+        const map = mapRef.current;
+        if (map && mapStyleReadyRef.current) {
+          requestCountyPolygonLoad(map, configRef.current);
+        }
+        return;
+      }
       const styleApplyOptions = applyOptions
         ? {
             ...(applyOptions.recreateEntitiesSource ? { recreateEntitiesSource: true as const } : {}),
@@ -1446,16 +1464,7 @@ export function MapStageProvider({
       activeMap.on('zoom', () => updateStateLabelOpacity(activeMap.getZoom()));
       activeMap.on('zoomend', () => {
         syncEntityMarkers();
-        const cfg = configRef.current;
-        if (
-          activeMap.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
-          cfg.layerMode === 'blackShare' ||
-          cfg.layerMode === 'blackChange'
-        ) {
-          void loadCountyPolygons(activeMap, cfg.countyChoroplethLevels).catch((error) => {
-            console.error('[MapStage] county polygon load failed', error);
-          });
-        }
+        requestCountyPolygonLoad(activeMap, configRef.current);
       });
 
       // Cluster expansion (dignity-style.ts's EXPLORE_CLUSTER_CONFIG contract: "every cluster

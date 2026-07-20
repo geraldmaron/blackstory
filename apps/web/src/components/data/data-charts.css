@@ -127,10 +127,6 @@
   gap: var(--ds-space-8);
 }
 
-.ds-data-chart__axis-label--wrap {
-  font-size: 9px;
-}
-
 .ds-data-state-shift__title {
   margin: 0 0 var(--ds-space-2);
   font-size: 1.125rem;

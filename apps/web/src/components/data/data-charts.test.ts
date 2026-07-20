@@ -13,7 +13,10 @@ import type {
 } from '@repo/firebase';
 import { HateCrimeCompositionChart } from './HateCrimeCompositionChart';
 import { HateCrimeYearSeriesChart } from './HateCrimeYearSeriesChart';
-import { OpportunityAtlasCoverageChart } from './OpportunityAtlasCoverageChart';
+import {
+  compactOutcomeFieldLabel,
+  OpportunityAtlasCoverageChart,
+} from './OpportunityAtlasCoverageChart';
 import { PopulationByDecadeChart } from './PopulationByDecadeChart';
 import { StatePopulationShiftChart } from './StatePopulationShiftChart';
 
@@ -209,4 +212,19 @@ test('OpportunityAtlasCoverageChart renders outcome coverage and histogram bins'
   assert.match(html, /kfrBlackP25 tract distribution/);
   assert.match(html, /0–20th/);
   assert.match(html, /Opportunity Insights/);
+  // Horizontal bars: compact axis labels + full names in the accessible table.
+  assert.match(html, /Income \(Black, p25\)/);
+  assert.match(html, /Household income rank \(Black children, parents p25\)/);
+  assert.match(html, /text-anchor="end"/);
+});
+
+test('compactOutcomeFieldLabel shortens long Opportunity Atlas field names', () => {
+  assert.equal(
+    compactOutcomeFieldLabel('Household income rank (Black children, parents p25)'),
+    'Income (Black, p25)',
+  );
+  assert.equal(
+    compactOutcomeFieldLabel('Incarceration rate (pooled, parents p25)'),
+    'Jail (pooled, p25)',
+  );
 });
