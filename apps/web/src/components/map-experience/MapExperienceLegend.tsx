@@ -131,8 +131,9 @@ function LineSwatch(props: { readonly color: string }) {
   );
 }
 
-/** Live document theme — client-only. Never call during render/SSR (hydration mismatch). */
+/** Live document theme — client-only (useEffect). Never call during render/SSR. */
 function readDocumentColorScheme(): MapColorScheme {
+  if (typeof document === 'undefined') return 'light';
   return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
 }
 

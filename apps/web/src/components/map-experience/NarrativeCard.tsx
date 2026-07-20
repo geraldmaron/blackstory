@@ -177,7 +177,10 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
       ) : null}
 
       <p className="ds-nc__precision">
-        {radiusAffordanceLabel(feature.properties.geoPrecisionTier, feature.properties.radiusMeters)}
+        {radiusAffordanceLabel(
+          feature.properties.geoPrecisionTier,
+          feature.properties.radiusMeters,
+        )}
       </p>
 
       <Link className="ds-cta ds-cta--copper ds-nc__action" href={properties.href} scroll={false}>

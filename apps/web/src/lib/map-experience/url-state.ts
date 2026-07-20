@@ -9,6 +9,9 @@
  * address bar; pan/zoom stay in-memory. Serialize still emits viewport when a caller builds
  * an intentional deep link (`buildLocateExploreHref`).
  *
+ * Panel chrome: map-first by default (filters / color key / records collapsed). Open panels
+ * serialize as opt-in `panels=filters,results,key`. Legacy `hidePanels=` still parses.
+ *
  * Selection note: `selected` opens the preview narrative card and orients the copper ring on
  * the map (e.g. “View on map” from a record page). The full record is reached via the card
  * CTA at `/entity/[id]`, not by pin/list selection alone.

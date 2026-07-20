@@ -28,7 +28,9 @@ test('explains points, clusters, the density layer, and confidence glyphs in wor
 });
 
 test('off layer mode invites choosing a map data model', () => {
-  const html = renderToStaticMarkup(MapExperienceLegend({ layerMode: 'off' }));
+  const html = renderToStaticMarkup(
+    createElement<MapExperienceLegendProps>(MapExperienceLegend, { layerMode: 'off' }),
+  );
   assert.match(html, /Choose a model/);
 });
 

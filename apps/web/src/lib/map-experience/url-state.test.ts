@@ -262,9 +262,7 @@ test('panels= opt-in opens listed chrome and round-trips', () => {
     'filters,results,key',
   );
   assert.deepEqual(
-    parseExploreSearchParams(
-      Object.fromEntries(new URLSearchParams('panels=filters,results,key')),
-    ),
+    parseExploreSearchParams(Object.fromEntries(new URLSearchParams('panels=filters,results,key'))),
     allOpen,
   );
 });
