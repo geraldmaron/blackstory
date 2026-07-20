@@ -5,13 +5,8 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-<<<<<<< HEAD:packages/observability/src/logger-redaction.test.ts
 import { createSensitiveDataRedactor } from '@repo/security';
 import { AppError, createLogger, type LogContext } from './index.ts';
-=======
-import { AppError, createLogger, type LogContext } from '@repo/observability';
-import { createSensitiveDataRedactor } from './index.ts';
->>>>>>> 6c9ca7d8 (Align mobile branch package scope with @repo and harden api-public live reads.):packages/security/src/logging.test.ts
 
 function wiredLogger(lines: string[]) {
   const redactor = createSensitiveDataRedactor();
