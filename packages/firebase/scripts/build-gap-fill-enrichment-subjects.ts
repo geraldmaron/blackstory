@@ -93,6 +93,10 @@ async function main(): Promise<void> {
         snippets.push('(no fetchable source found; judge only from the mention context above — decision should be needs_evidence unless the context alone is sufficient)');
       }
 
+      // Real Wikidata coordinates when the article has any (a specific place/located
+      // event) — legitimately absent for an organization/law/movement with no single
+      // point; those correctly stay held for human review, not force-geocoded.
+      const coordinates = primary?.coordinates ?? tier1?.coordinates;
       return {
         subjectId: candidate.id,
         title: candidate.displayName,
@@ -100,6 +104,7 @@ async function main(): Promise<void> {
         existingSummary: candidate.summary.slice(0, 400),
         sourceSnippets: snippets,
         ...(tier1 ? { corroboratingSourceUrl: tier1.url } : {}),
+        ...(coordinates ? { lat: coordinates.lat, lng: coordinates.lng } : {}),
       };
     },
     { concurrency },

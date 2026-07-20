@@ -66,14 +66,39 @@ async function searchWikipediaApi(query: string, attempts = 3): Promise<readonly
   return [];
 }
 
+/**
+ * Wikidata coordinates attached to the Wikipedia article, when the API has any.
+ * Real for a specific place/located event (a plantation, a massacre site);
+ * legitimately absent for an organization/law/movement with no single point —
+ * that's correct, not a gap to paper over with a guessed geocode.
+ */
+async function fetchWikipediaCoordinates(title: string): Promise<{ lat: number; lng: number } | undefined> {
+  try {
+    const params = new URLSearchParams({ action: 'query', prop: 'coordinates', titles: title, format: 'json' });
+    const response = await fetch(`${WIKIPEDIA_SEARCH_API}?${params.toString()}`, {
+      headers: { 'User-Agent': WIKIPEDIA_USER_AGENT, Accept: 'application/json' },
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!response.ok) return undefined;
+    const raw = (await response.json()) as {
+      query?: { pages?: Record<string, { coordinates?: readonly { lat: number; lon: number }[] }> };
+    };
+    const page = Object.values(raw.query?.pages ?? {})[0];
+    const coords = page?.coordinates?.[0];
+    return coords ? { lat: coords.lat, lng: coords.lon } : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 async function findViaWikipediaApi(subjectName: string): Promise<CorroboratingSource | undefined> {
   const hits = await searchWikipediaApi(subjectName);
   const first = hits[0];
   if (!first) return undefined;
   const url = `https://en.wikipedia.org/wiki/${encodeURIComponent(first.title.replace(/ /gu, '_'))}`;
-  const page = await fetchPage(url);
+  const [page, coordinates] = await Promise.all([fetchPage(url), fetchWikipediaCoordinates(first.title)]);
   if (!page) return undefined;
-  return { url, title: first.title, text: page.text, method: 'wikipedia_api', html: page.html };
+  return { url, title: first.title, text: page.text, method: 'wikipedia_api', html: page.html, ...(coordinates ? { coordinates } : {}) };
 }
 
 export type CorroboratingSource = {
@@ -83,6 +108,8 @@ export type CorroboratingSource = {
   readonly method: 'wikipedia_api' | 'citation_trail' | 'search';
   /** Raw HTML, when available, so a caller can citation-trail-follow this source too. */
   readonly html?: string;
+  /** Wikidata coordinates, when the Wikipedia article has any (see fetchWikipediaCoordinates). */
+  readonly coordinates?: { readonly lat: number; readonly lng: number };
 };
 
 /**
