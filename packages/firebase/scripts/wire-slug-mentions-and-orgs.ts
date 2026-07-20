@@ -75,7 +75,11 @@ function walkJsonFiles(dir: string): string[] {
 
 function addRelated(entity: CatalogEntity, entry: RelatedEntry): void {
   const existing = entity.related ?? [];
-  if (existing.some((r) => r.id === entry.id && r.type === entry.type && r.direction === entry.direction)) {
+  if (
+    existing.some(
+      (r) => r.id === entry.id && r.type === entry.type && r.direction === entry.direction,
+    )
+  ) {
     return;
   }
   entity.related = [...existing, entry];
@@ -120,7 +124,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
       kind: 'organization',
       displayName: 'Southern Christian Leadership Conference (SCLC)',
       summary:
-        'Founded in Atlanta in 1957 by Black ministers and civil rights leaders including Martin Luther King Jr., the Southern Christian Leadership Conference coordinated nonviolent mass campaigns across the South — from Birmingham and St. Augustine to the Poor People\'s Campaign — as a clergy-led network rooted in the Montgomery bus boycott.',
+        "Founded in Atlanta in 1957 by Black ministers and civil rights leaders including Martin Luther King Jr., the Southern Christian Leadership Conference coordinated nonviolent mass campaigns across the South — from Birmingham and St. Augustine to the Poor People's Campaign — as a clergy-led network rooted in the Montgomery bus boycott.",
       eraBuckets: ['1950s', '1960s'],
       topicTags: ['civil-rights', 'organizing', 'nonviolence'],
       jurisdictionLabel: 'Atlanta, Georgia',
@@ -141,7 +145,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
         {
           predicate: 'coordinated',
           object:
-            'nonviolent direct-action campaigns including the 1963 Birmingham Campaign, the St. Augustine movement, and the 1968 Poor People\'s Campaign',
+            "nonviolent direct-action campaigns including the 1963 Birmingham Campaign, the St. Augustine movement, and the 1968 Poor People's Campaign",
           confidenceLevel: 'high',
           citationSource: 'nps.gov',
           citationHref: 'https://www.nps.gov/articles/southern-christian-leadership-conference.htm',
@@ -149,7 +153,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
         },
       ],
       historicalContext:
-        'SCLC gave the Montgomery bus boycott\'s clergy leadership a regional structure. Unlike SNCC\'s student-led field organizing, SCLC centered ministers and church networks while collaborating (and sometimes competing) with SNCC, CORE, and the NAACP on shared campaigns.',
+        "SCLC gave the Montgomery bus boycott's clergy leadership a regional structure. Unlike SNCC's student-led field organizing, SCLC centered ministers and church networks while collaborating (and sometimes competing) with SNCC, CORE, and the NAACP on shared campaigns.",
       topicIds: ['civil-rights', 'organizing', 'nonviolence'],
       mentionedEntityIds: [
         'ent_sclc_founding_001',
@@ -172,7 +176,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
       kind: 'organization',
       displayName: 'Student Nonviolent Coordinating Committee (SNCC)',
       summary:
-        'Formed at Shaw University in April 1960 under Ella Baker\'s convening, SNCC became the student-led engine of sit-ins, Freedom Rides follow-on work, Mississippi voter registration, Freedom Summer, and the Lowndes County Freedom Organization — prioritizing local leadership over top-down celebrity.',
+        "Formed at Shaw University in April 1960 under Ella Baker's convening, SNCC became the student-led engine of sit-ins, Freedom Rides follow-on work, Mississippi voter registration, Freedom Summer, and the Lowndes County Freedom Organization — prioritizing local leadership over top-down celebrity.",
       eraBuckets: ['1960s'],
       topicTags: ['civil-rights', 'organizing', 'student-activism'],
       jurisdictionLabel: 'Raleigh, North Carolina',
@@ -224,7 +228,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
       kind: 'organization',
       displayName: 'National Association for the Advancement of Colored People (NAACP)',
       summary:
-        'Founded after the 1909 National Negro Conference in New York, the NAACP became the nation\'s longest-running civil rights organization, combining legal challenges, anti-lynching campaigns, and local branch organizing from Ida B. Wells\'s generation through Brown v. Board and the Voting Rights Act era.',
+        "Founded after the 1909 National Negro Conference in New York, the NAACP became the nation's longest-running civil rights organization, combining legal challenges, anti-lynching campaigns, and local branch organizing from Ida B. Wells's generation through Brown v. Board and the Voting Rights Act era.",
       eraBuckets: ['1900s', '1910s', '1960s'],
       topicTags: ['civil-rights', 'organizing', 'freedom'],
       jurisdictionLabel: 'New York, New York',
@@ -303,7 +307,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
         },
       ],
       historicalContext:
-        'CORE\'s early experiments with Gandhian nonviolence shaped later mass campaigns. In the 1960s it worked alongside SNCC and COFO in the Deep South while maintaining chapters nationwide.',
+        "CORE's early experiments with Gandhian nonviolence shaped later mass campaigns. In the 1960s it worked alongside SNCC and COFO in the Deep South while maintaining chapters nationwide.",
       topicIds: ['civil-rights', 'organizing', 'direct-action', 'nonviolence'],
       mentionedEntityIds: [
         'ent_core_founding_001',
@@ -324,7 +328,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
       kind: 'organization',
       displayName: 'Mississippi Freedom Democratic Party (MFDP)',
       summary:
-        'Organized in 1964 as an integrated alternative to Mississippi\'s segregated regular Democratic Party, the MFDP ran parallel primaries, sent a 68-delegate challenge delegation to the Atlantic City convention, and forced a national reckoning over Black political exclusion in the South.',
+        "Organized in 1964 as an integrated alternative to Mississippi's segregated regular Democratic Party, the MFDP ran parallel primaries, sent a 68-delegate challenge delegation to the Atlantic City convention, and forced a national reckoning over Black political exclusion in the South.",
       eraBuckets: ['1960s'],
       topicTags: ['civil-rights', 'voting-rights', 'politics'],
       jurisdictionLabel: 'Jackson, Mississippi',
@@ -346,7 +350,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
         {
           predicate: 'challenged',
           object:
-            'the seating of Mississippi\'s all-white regular delegation at the August 1964 Democratic National Convention in Atlantic City',
+            "the seating of Mississippi's all-white regular delegation at the August 1964 Democratic National Convention in Atlantic City",
           confidenceLevel: 'high',
           citationSource: 'blackpast.org',
           citationHref:
@@ -355,7 +359,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
         },
       ],
       historicalContext:
-        'Built through COFO\'s Freedom Vote and Freedom Summer infrastructure, the MFDP made Fannie Lou Hamer\'s testimony a national broadcast moment and helped set the stage for later Democratic Party reforms on delegate selection.',
+        "Built through COFO's Freedom Vote and Freedom Summer infrastructure, the MFDP made Fannie Lou Hamer's testimony a national broadcast moment and helped set the stage for later Democratic Party reforms on delegate selection.",
       topicIds: ['civil-rights', 'voting-rights', 'politics'],
       mentionedEntityIds: [
         'ent_mfdp_dnc_challenge_001',
@@ -377,7 +381,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
       kind: 'event',
       displayName: 'Birmingham Campaign',
       summary:
-        'In spring 1963, SCLC and the Alabama Christian Movement for Human Rights led by Fred Shuttlesworth confronted Birmingham\'s segregation laws with mass marches, a downtown boycott, and the children\'s crusade — drawing national attention after police used dogs and fire hoses, and helping build momentum for the March on Washington and federal civil rights legislation.',
+        "In spring 1963, SCLC and the Alabama Christian Movement for Human Rights led by Fred Shuttlesworth confronted Birmingham's segregation laws with mass marches, a downtown boycott, and the children's crusade — drawing national attention after police used dogs and fire hoses, and helping build momentum for the March on Washington and federal civil rights legislation.",
       eraBuckets: ['1960s'],
       topicTags: ['civil-rights', 'direct-action', 'nonviolence'],
       jurisdictionLabel: 'Birmingham, Alabama',
@@ -484,7 +488,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
       kind: 'event',
       displayName: 'Freedom Summer (1964)',
       summary:
-        'In 1964, COFO brought roughly a thousand volunteers — many northern students — into Mississippi for a statewide voter-registration, Freedom School, and MFDP organizing project. The season was marked by the murders of Chaney, Goodman, and Schwerner and by the MFDP\'s challenge at the Democratic National Convention.',
+        "In 1964, COFO brought roughly a thousand volunteers — many northern students — into Mississippi for a statewide voter-registration, Freedom School, and MFDP organizing project. The season was marked by the murders of Chaney, Goodman, and Schwerner and by the MFDP's challenge at the Democratic National Convention.",
       eraBuckets: ['1960s'],
       topicTags: ['civil-rights', 'voting-rights', 'organizing'],
       jurisdictionLabel: 'Jackson, Mississippi',
@@ -505,7 +509,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
         {
           predicate: 'drew_national_attention_after',
           object:
-            'the June 1964 murders of James Chaney, Andrew Goodman, and Michael Schwerner near Philadelphia, Mississippi, during the project\'s opening weeks',
+            "the June 1964 murders of James Chaney, Andrew Goodman, and Michael Schwerner near Philadelphia, Mississippi, during the project's opening weeks",
           confidenceLevel: 'high',
           citationSource: 'nps.gov',
           citationHref: 'https://www.nps.gov/articles/freedomsummer.htm',
@@ -513,7 +517,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
         },
       ],
       historicalContext:
-        'Freedom Summer grew from the 1963 Freedom Vote and Bob Moses\'s SNCC Mississippi work. Local Black leadership remained central even as national media focused on white volunteers; the MFDP challenge carried the season\'s political demand to Atlantic City.',
+        "Freedom Summer grew from the 1963 Freedom Vote and Bob Moses's SNCC Mississippi work. Local Black leadership remained central even as national media focused on white volunteers; the MFDP challenge carried the season's political demand to Atlantic City.",
       topicIds: ['civil-rights', 'voting-rights', 'organizing'],
       mentionedEntityIds: [
         'ent_cofo_001',
@@ -566,7 +570,7 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
         },
       ],
       historicalContext:
-        'The crisis made Little Rock a worldwide symbol of massive resistance. The students\' endurance, Bates\'s organizing, and federal enforcement together defined a pivotal early implementation fight after Brown.',
+        "The crisis made Little Rock a worldwide symbol of massive resistance. The students' endurance, Bates's organizing, and federal enforcement together defined a pivotal early implementation fight after Brown.",
       topicIds: ['civil-rights', 'education', 'desegregation'],
       mentionedEntityIds: [
         'ent_daisy_bates_001',
@@ -581,7 +585,11 @@ const NEW_ENTITIES: ReadonlyArray<{ file: string; entity: CatalogEntity }> = [
           type: 'related_to',
           direction: 'outgoing',
         },
-        { id: 'ent_little_rock_central_high_school_001', type: 'located_at', direction: 'outgoing' },
+        {
+          id: 'ent_little_rock_central_high_school_001',
+          type: 'located_at',
+          direction: 'outgoing',
+        },
         { id: 'ent_daisy_bates_001', type: 'related_to', direction: 'outgoing' },
       ],
     },
@@ -760,7 +768,9 @@ function main(): void {
   console.log(`slug remaps applied: ${remapped}`);
   console.log(`related edges added (approx): ${edgesAdded}`);
   console.log(`catalog size: ${byId.size}`);
-  console.log(`extractCatalogRelationships: ${extracted.relationships.length} edges, ${extracted.skipped.length} skipped`);
+  console.log(
+    `extractCatalogRelationships: ${extracted.relationships.length} edges, ${extracted.skipped.length} skipped`,
+  );
   if (extracted.skipped.length) {
     console.log('skipped sample:', extracted.skipped.slice(0, 15));
   }

@@ -86,7 +86,11 @@ function infer(sourceKind: string, targetKind: string): Omit<Rel, 'id'> {
 
 function addRel(entity: Ent, entry: Rel): void {
   const existing = entity.related ?? [];
-  if (existing.some((r) => r.id === entry.id && r.type === entry.type && r.direction === entry.direction)) {
+  if (
+    existing.some(
+      (r) => r.id === entry.id && r.type === entry.type && r.direction === entry.direction,
+    )
+  ) {
     return;
   }
   entity.related = [...existing, entry];
@@ -110,7 +114,11 @@ function main(): void {
     const prior = JSON.parse(priorRaw) as Ent[];
     if (!Array.isArray(prior)) continue;
     for (const e of prior) {
-      if (e?.related?.length) priorRelated.set(e.id, e.related.map((r) => ({ ...r })));
+      if (e?.related?.length)
+        priorRelated.set(
+          e.id,
+          e.related.map((r) => ({ ...r })),
+        );
     }
   }
 
@@ -220,7 +228,9 @@ function main(): void {
 
   console.log(`relationships=${relationships.length} skipped=${skipped.length}`);
   console.log(`MLK projected=${mlk.length} SCLC on MLK=`, sclcOnMlk);
-  console.log(`mosaic people missing related=${mosaicMissing.length} slug leftovers=${slugs.length}`);
+  console.log(
+    `mosaic people missing related=${mosaicMissing.length} slug leftovers=${slugs.length}`,
+  );
 
   if (mosaicMissing.length || slugs.length || sclcOnMlk.length === 0) {
     process.exit(1);

@@ -4,23 +4,9 @@
     "kind": "school",
     "displayName": "Little Rock Central High School",
     "summary": "Little Rock Central High School is preserved by the National Park Service as a National Historic Site in Little Rock, Arkansas. The NPS frames its history and culture around the 1957 struggle for school integration and the people connected to it.",
-    "eraBuckets": [
-      "1950s"
-    ],
-    "topicTags": [
-      "school-desegregation",
-      "civil-rights",
-      "segregation",
-      "education",
-      "history"
-    ],
-    "topicIds": [
-      "school-desegregation",
-      "civil-rights",
-      "segregation",
-      "education",
-      "history"
-    ],
+    "eraBuckets": ["1950s"],
+    "topicTags": ["school-desegregation", "civil-rights", "segregation", "education", "history"],
+    "topicIds": ["school-desegregation", "civil-rights", "segregation", "education", "history"],
     "mentionedEntityIds": [],
     "keywords": [
       "Little Rock",
@@ -61,20 +47,8 @@
     "displayName": "Magnolia Plantation",
     "summary": "Magnolia Plantation in Derry, Louisiana, is interpreted by the National Park Service as part of Cane River Creole National Historical Park. NPS offers ranger-led grounds tours of its outbuildings, tagging the site for Black and African American heritage.",
     "eraBuckets": [],
-    "topicTags": [
-      "enslavement",
-      "history",
-      "preservation",
-      "architecture",
-      "community"
-    ],
-    "topicIds": [
-      "enslavement",
-      "history",
-      "preservation",
-      "architecture",
-      "community"
-    ],
+    "topicTags": ["enslavement", "history", "preservation", "architecture", "community"],
+    "topicIds": ["enslavement", "history", "preservation", "architecture", "community"],
     "mentionedEntityIds": [],
     "keywords": [
       "Magnolia Plantation",
@@ -114,25 +88,9 @@
     "kind": "place",
     "displayName": "Oakland Plantation",
     "summary": "Oakland Plantation in Natchez, LA, part of Cane River Creole National Historical Park, was founded ca. 1785 by Jean Pierre Emanuel Prud'homme. Its workforce was originally enslaved; after emancipation, sharecroppers and tenant farmers worked the cotton fields for nearly 200 years.",
-    "eraBuckets": [
-      "1780s",
-      "1860s",
-      "1870s"
-    ],
-    "topicTags": [
-      "enslavement",
-      "emancipation",
-      "agriculture",
-      "land-ownership",
-      "history"
-    ],
-    "topicIds": [
-      "enslavement",
-      "emancipation",
-      "agriculture",
-      "land-ownership",
-      "history"
-    ],
+    "eraBuckets": ["1780s", "1860s", "1870s"],
+    "topicTags": ["enslavement", "emancipation", "agriculture", "land-ownership", "history"],
+    "topicIds": ["enslavement", "emancipation", "agriculture", "land-ownership", "history"],
     "mentionedEntityIds": [],
     "keywords": [
       "Creole plantation",
@@ -188,9 +146,7 @@
     "kind": "event",
     "displayName": "Marian Anderson Lincoln Memorial Concert",
     "summary": "In 1939, Marian Anderson performed an open-air concert on the Lincoln Memorial steps after being denied a segregated venue. The National Park Service records this as a landmark moment in the memorial's civic history in Washington, D.C.",
-    "eraBuckets": [
-      "1930s"
-    ],
+    "eraBuckets": ["1930s"],
     "topicTags": [
       "civil-rights",
       "segregation",
@@ -198,16 +154,8 @@
       "national-mall",
       "memory"
     ],
-    "topicIds": [
-      "civil-rights",
-      "segregation",
-      "public-accommodations",
-      "national-mall",
-      "memory"
-    ],
-    "mentionedEntityIds": [
-      "ent_marian_anderson_001"
-    ],
+    "topicIds": ["civil-rights", "segregation", "public-accommodations", "national-mall", "memory"],
+    "mentionedEntityIds": ["ent_marian_anderson_001"],
     "keywords": [
       "Marian Anderson",
       "Lincoln Memorial steps",
