@@ -655,7 +655,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         id: EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
         type: 'fill',
         source: EXPLORE_COUNTY_LINES_SOURCE_ID,
-        minzoom: COUNTY_LINES_MIN_ZOOM,
+        // Population choropleths must read at the national resting frame; hairlines stay
+        // gated at COUNTY_LINES_MIN_ZOOM so the CONUS view is not noisy with county borders.
+        ...(populationFillActive ? {} : { minzoom: COUNTY_LINES_MIN_ZOOM }),
         layout: {
           visibility: populationFillActive ? 'visible' : 'none',
         },

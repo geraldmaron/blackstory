@@ -424,13 +424,18 @@ let countyLinesPromise: Promise<CountyPolygonCollection> | undefined;
 
 function fetchCountyPolygons(): Promise<CountyPolygonCollection> {
   if (!countyLinesPromise) {
-    countyLinesPromise = fetch(US_COUNTIES_GEOJSON_PATH).then(async (response) => {
-      if (!response.ok) {
+    countyLinesPromise = fetch(US_COUNTIES_GEOJSON_PATH)
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to load ${US_COUNTIES_GEOJSON_PATH}: ${response.status}`);
+        }
+        return (await response.json()) as CountyPolygonCollection;
+      })
+      .catch((error) => {
+        // Clear the cached promise so a later blackShare/zoom retry can recover.
         countyLinesPromise = undefined;
-        throw new Error(`Failed to load ${US_COUNTIES_GEOJSON_PATH}: ${response.status}`);
-      }
-      return (await response.json()) as CountyPolygonCollection;
-    });
+        throw error;
+      });
   }
   return countyLinesPromise;
 }
@@ -439,17 +444,26 @@ function fetchCountyPolygons(): Promise<CountyPolygonCollection> {
  * prefetch threshold, and re-`setData`ing 3k polygons on every camera settle would churn the
  * GeoJSON worker for nothing. */
 const countyLinesLoaded = new WeakSet<MapLibreMap>();
+/** Per-map generation so a stale empty-levels fetch cannot overwrite a later choropleth join. */
+const countyLinesLoadGeneration = new WeakMap<MapLibreMap, number>();
 
 /** Lazily fills the county source (hairlines + optional choropleth). Deliberately zoom-triggered
  * by the caller, not eager: the ~2.3 MB asset is invisible below the layer's `minzoom`, so the
- * national resting frame never pays for it. */
+ * national resting frame never pays for it — except population choropleths, which load at any
+ * zoom when `blackShare` / `blackChange` is active. */
 async function loadCountyPolygons(
   map: MapLibreMap,
   choroplethLevels: readonly CountyChoroplethLevel[],
 ): Promise<void> {
   const source = map.getSource(EXPLORE_COUNTY_LINES_SOURCE_ID) as GeoJSONSource | undefined;
   if (!source) return;
+  const generation = (countyLinesLoadGeneration.get(map) ?? 0) + 1;
+  countyLinesLoadGeneration.set(map, generation);
   const collection = await fetchCountyPolygons();
+  if (countyLinesLoadGeneration.get(map) !== generation) {
+    // A newer load (usually with choropleth tiers) superseded this one mid-flight.
+    return;
+  }
   const joined =
     choroplethLevels.length > 0
       ? joinPopulationOntoCountyPolygons(collection, choroplethLevels)
