@@ -15,11 +15,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  buildReleaseEntityArtifacts,
-  type ReleaseSourceClaim,
-  type ReleaseSourceEntity,
-} from '@repo/domain';
+import { buildReleaseEntityArtifacts, type ReleaseSourceClaim, type ReleaseSourceEntity } from '@repo/domain';
 import { computeClaimConfidence, type SourceForConfidence } from './lib/confidence.ts';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
@@ -64,6 +60,11 @@ type EnrichmentItem = {
       readonly topicIds?: readonly string[];
       readonly eraBuckets?: readonly string[];
       readonly keywords?: readonly string[];
+      readonly location?: {
+        readonly jurisdictionLabel: string;
+        readonly locationLabel: string;
+        readonly locationPrecision: string;
+      };
     };
   };
 };
@@ -111,19 +112,11 @@ function main(): void {
       continue;
     }
     if (packet.validationIssues.length > 0) {
-      held.push({
-        subjectId: packet.subjectId,
-        title,
-        reason: `validation issues: ${packet.validationIssues.join('; ')}`,
-      });
+      held.push({ subjectId: packet.subjectId, title, reason: `validation issues: ${packet.validationIssues.join('; ')}` });
       continue;
     }
     if (!subject) {
-      held.push({
-        subjectId: packet.subjectId,
-        title,
-        reason: 'no matching subject metadata (location/kind unknown)',
-      });
+      held.push({ subjectId: packet.subjectId, title, reason: 'no matching subject metadata (location/kind unknown)' });
       continue;
     }
     if (subject.kind === 'person' && excludeIds.has(packet.subjectId)) {
@@ -142,11 +135,23 @@ function main(): void {
       held.push({ subjectId: packet.subjectId, title, reason: 'no structured claims in draft' });
       continue;
     }
-    if (!subject.jurisdictionLabel || !subject.locationLabel || !subject.locationPrecision) {
+    // Location can come from curated subject metadata (starter-seed/discovery lanes)
+    // OR the judge's own text-derived location (gap-fill lane) — but a judge-derived
+    // location still needs REAL coordinates (Wikidata, via subject.lat/lng), never a
+    // 0,0 fallback that would silently mislocate the entity.
+    const location =
+      subject.jurisdictionLabel && subject.locationLabel && subject.locationPrecision
+        ? { jurisdictionLabel: subject.jurisdictionLabel, locationLabel: subject.locationLabel, locationPrecision: subject.locationPrecision }
+        : packet.drafts.location && subject.lat !== undefined && subject.lng !== undefined
+          ? packet.drafts.location
+          : undefined;
+    if (!location) {
       held.push({
         subjectId: packet.subjectId,
         title,
-        reason: 'missing jurisdiction/location fields',
+        reason: packet.drafts.location
+          ? 'judge proposed a location but no real coordinates (Wikidata) were found for this subject'
+          : 'missing jurisdiction/location fields',
       });
       continue;
     }
@@ -157,9 +162,7 @@ function main(): void {
         belowThreshold.push(`claims[${index}]: no citationHref`);
         return;
       }
-      const sources: SourceForConfidence[] = [
-        { url: claim.citationHref, textContainsSubjectName: true },
-      ];
+      const sources: SourceForConfidence[] = [{ url: claim.citationHref, textContainsSubjectName: true }];
       if (subject.corroboratingSourceUrl && subject.corroboratingSourceUrl !== claim.citationHref) {
         sources.push({ url: subject.corroboratingSourceUrl, textContainsSubjectName: true });
       }
@@ -172,11 +175,7 @@ function main(): void {
       }
     });
     if (belowThreshold.length > 0) {
-      held.push({
-        subjectId: packet.subjectId,
-        title,
-        reason: `insufficient confidence: ${belowThreshold.join('; ')}`,
-      });
+      held.push({ subjectId: packet.subjectId, title, reason: `insufficient confidence: ${belowThreshold.join('; ')}` });
       continue;
     }
 
@@ -184,13 +183,10 @@ function main(): void {
       predicate: claim.predicate ?? 'documented_site',
       object: claim.object ?? '',
       confidenceLevel:
-        claim.confidenceLevel === 'high' ||
-        claim.confidenceLevel === 'medium' ||
-        claim.confidenceLevel === 'low'
+        claim.confidenceLevel === 'high' || claim.confidenceLevel === 'medium' || claim.confidenceLevel === 'low'
           ? claim.confidenceLevel
           : 'medium',
-      citationSource:
-        claim.citationSource ?? new URL(claim.citationHref ?? 'https://unknown').hostname,
+      citationSource: claim.citationSource ?? new URL(claim.citationHref ?? 'https://unknown').hostname,
       citationHref: claim.citationHref,
       citationLabel: claim.citationLabel ?? claim.citationSource ?? 'Source',
     }));
@@ -201,20 +197,16 @@ function main(): void {
       displayName: title,
       summary: packet.drafts.publicSummary ?? '',
       ...(packet.drafts.eraBuckets ? { eraBuckets: packet.drafts.eraBuckets } : {}),
-      ...(packet.drafts.topicIds
-        ? { topicTags: packet.drafts.topicIds, topicIds: packet.drafts.topicIds }
-        : {}),
+      ...(packet.drafts.topicIds ? { topicTags: packet.drafts.topicIds, topicIds: packet.drafts.topicIds } : {}),
       mentionedEntityIds: [],
       ...(packet.drafts.keywords ? { keywords: packet.drafts.keywords } : {}),
-      jurisdictionLabel: subject.jurisdictionLabel,
-      locationPrecision: subject.locationPrecision,
-      locationLabel: subject.locationLabel,
+      jurisdictionLabel: location.jurisdictionLabel,
+      locationPrecision: location.locationPrecision,
+      locationLabel: location.locationLabel,
       lat: subject.lat ?? 0,
       lng: subject.lng ?? 0,
       claims,
-      ...(packet.drafts.historicalContext
-        ? { historicalContext: packet.drafts.historicalContext }
-        : {}),
+      ...(packet.drafts.historicalContext ? { historicalContext: packet.drafts.historicalContext } : {}),
     };
 
     const build = buildReleaseEntityArtifacts(entry, {
@@ -222,11 +214,7 @@ function main(): void {
       generatedAt: new Date().toISOString(),
     });
     if (!build.ok) {
-      held.push({
-        subjectId: packet.subjectId,
-        title,
-        reason: `${build.reason}: ${build.message}`,
-      });
+      held.push({ subjectId: packet.subjectId, title, reason: `${build.reason}: ${build.message}` });
       continue;
     }
 
