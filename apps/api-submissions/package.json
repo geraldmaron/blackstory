@@ -7,7 +7,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "start": "node dist/index.js",
-    "test": "node --conditions development --import tsx --test src/index.test.ts src/rate-limits.test.ts src/quarantine.test.ts",
+    "test": "node --conditions development --import tsx --test src/index.test.ts src/rate-limits.test.ts src/quarantine.test.ts src/corrections/categories.test.ts src/corrections/receipt-code.test.ts src/corrections/correction-intake.test.ts src/corrections/public-status.test.ts src/corrections/idempotency-cache.test.ts src/corrections/store.test.ts src/http/handlers.test.ts src/http/server.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
