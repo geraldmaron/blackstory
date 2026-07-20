@@ -3,15 +3,25 @@
  *
  * Consumes the materialized national-timeline snapshot rows. For 1790–1860 the bar is stacked
  * enslaved (base) + free (top) so the two sum to the Black total; from 1870 on the Black total
- * is a single bar. A dashed rule marks the 2000 measurement-regime boundary ("Black alone", the
- * multiple-race methodology) so the chart never implies pre-2000 and post-2000 counts are
- * perfectly comparable, and 1870 is flagged for the documented Southern undercount. A
- * screen-reader table carries every value, including the free/enslaved split.
+ * is a single bar. Series fills stay distinct: enslaved uses copper (`--ds-viz-2`), free uses
+ * sand (`--ds-viz-4`), and post-1860 Black total uses ink (`--ds-viz-1`) so the enslaved color
+ * never continues as if slavery persists after emancipation. A dashed rule marks the 2000
+ * measurement-regime boundary ("Black alone", the multiple-race methodology) so the chart never
+ * implies pre-2000 and post-2000 counts are perfectly comparable, and 1870 is flagged for the
+ * documented Southern undercount. A screen-reader table carries every value, including the
+ * free/enslaved split.
  */
 import React from 'react';
 import type { NationalPopulationTimelineRow } from '@repo/firebase';
 import { DataChartFrame } from './DataChartFrame';
 import { formatChartCount, formatSharePct, niceMax, scaleLinear } from './chart-utils';
+
+/** Copper — enslaved segment only (1790–1860). Must not be reused for post-1860 totals. */
+const FILL_ENSLAVED = 'var(--ds-viz-2)';
+/** Sand — free Black segment stacked on enslaved (1790–1860). */
+const FILL_FREE = 'var(--ds-viz-4)';
+/** Ink — Black population total from 1870 onward (no free/enslaved split in the source). */
+const FILL_BLACK_TOTAL = 'var(--ds-viz-1)';
 
 export type PopulationByDecadeChartProps = {
   readonly rows: readonly NationalPopulationTimelineRow[];
@@ -154,7 +164,7 @@ export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeCha
           const blackTop = yScale(row.blackPopulation);
           const showLabel = index % 2 === 0 || index === rows.length - 1;
 
-          // Split decades: enslaved base + free on top; else a single Black bar.
+          // Split decades: enslaved base + free on top; else a single ink Black-total bar.
           const segments =
             row.enslavedBlackPopulation !== null && row.freeBlackPopulation !== null
               ? [
@@ -162,14 +172,13 @@ export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeCha
                     key: 'enslaved',
                     from: 0,
                     to: row.enslavedBlackPopulation,
-                    fill: 'var(--ds-accent-graphic)',
+                    fill: FILL_ENSLAVED,
                   },
                   {
                     key: 'free',
                     from: row.enslavedBlackPopulation,
                     to: row.blackPopulation,
-                    fill: 'var(--ds-accent-graphic)',
-                    opacity: 0.5,
+                    fill: FILL_FREE,
                   },
                 ]
               : [
@@ -177,7 +186,7 @@ export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeCha
                     key: 'black',
                     from: 0,
                     to: row.blackPopulation,
-                    fill: 'var(--ds-accent-graphic)',
+                    fill: FILL_BLACK_TOTAL,
                   },
                 ];
 
@@ -194,7 +203,6 @@ export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeCha
                     width={barWidth}
                     height={Math.max(0, bottom - top)}
                     fill={segment.fill}
-                    fillOpacity={segment.opacity ?? 1}
                   />
                 );
               })}
@@ -237,16 +245,23 @@ export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeCha
         <li className="ds-data-chart__legend-item">
           <span
             className="ds-data-chart__legend-swatch"
-            style={{ background: 'var(--ds-accent-graphic)' }}
+            style={{ background: FILL_ENSLAVED }}
           />
-          Enslaved / Black total
+          Enslaved (1790–1860)
         </li>
         <li className="ds-data-chart__legend-item">
           <span
             className="ds-data-chart__legend-swatch"
-            style={{ background: 'var(--ds-accent-graphic)', opacity: 0.5 }}
+            style={{ background: FILL_FREE }}
           />
-          Free (1790–1860, stacked on top)
+          Free (1790–1860)
+        </li>
+        <li className="ds-data-chart__legend-item">
+          <span
+            className="ds-data-chart__legend-swatch"
+            style={{ background: FILL_BLACK_TOTAL }}
+          />
+          Black population (1870–2020)
         </li>
       </ul>
     </DataChartFrame>
