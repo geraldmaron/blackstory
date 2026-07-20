@@ -32,7 +32,8 @@
     "historicalContext": "Buffalo Soldier units at Fort Davis mapped passes, escorted mail and wagon trains, and pursued raiders across the Trans-Pecos. Second Lieutenant Henry O. Flipper, the first Black West Point graduate, served at the post before his controversial court-martial — a story told today alongside the broader record of Black regulars on the frontier.",
     "topicIds": ["military", "frontier"],
     "mentionedEntityIds": ["ent_henry_o_flipper_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_fort_huachuca_001",
@@ -67,7 +68,8 @@
     "historicalContext": "From the 1870s through the early twentieth century, Black troopers at Huachuca mapped trails, built telegraph lines, and fought in campaigns against Apache leaders including Geronimo. The post remains an active U.S. Army installation and houses the Fort Huachuca Museum on its historic Old Post.",
     "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_fort_concho_nhl_001",
@@ -102,7 +104,8 @@
     "historicalContext": "San Angelo's fort was a supply hub for campaigns across the Llano Estacado. Black troopers here faced harsh desert duty and earned the respect — and the nickname — that frontier peoples applied to the segregated regiments across the West.",
     "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_fort_garland_museum_001",
@@ -137,7 +140,8 @@
     "historicalContext": "The San Luis Valley assignment placed Black cavalrymen between Ute communities and incoming Anglo and Hispanic settlers during a volatile period of treaty breakdown. Fort Garland today interprets both the Buffalo Soldier era and the broader military occupation of Colorado's mountain frontier.",
     "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_fort_selden_001",
@@ -172,7 +176,8 @@
     "historicalContext": "Among the children who lived at Fort Selden during the Buffalo Soldier era was Douglas MacArthur, whose father commanded the post — a reminder that Black regulars served alongside and under white officers across the Southwestern garrison network.",
     "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_camp_naco_001",
@@ -207,7 +212,8 @@
     "historicalContext": "Camp Naco's Buffalo Soldiers watched battles of the Mexican Revolution from the American side of the line while protecting railroads and towns. Community-led stabilization efforts continue to preserve the adobe officers' quarters and enlisted men's barracks.",
     "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_fort_craig_nhs_001",
@@ -242,7 +248,8 @@
     "historicalContext": "The fort's Civil War earthworks and adobe ruins sit along a trade route older than the Army itself. Buffalo Soldier patrols from Fort Craig linked a chain of posts — Selden, McRae, and Stanton — that controlled movement through Apache homelands.",
     "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_boley_historic_district_001",
@@ -277,7 +284,8 @@
     "historicalContext": "Booker T. Washington visited Boley and praised it as proof that Black towns could thrive in the West. The annual Boley Rodeo, begun in the early twentieth century, remains a living tradition of the town's ranching culture.",
     "topicIds": ["town", "community"],
     "mentionedEntityIds": ["ent_fort_concho_nhl_001", "ent_tuskegee_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_langston_ok_001",
@@ -312,7 +320,8 @@
     "historicalContext": "Unlike All-Black towns founded in Indian Territory, Langston and nearby Brooksville were planted in Oklahoma Territory during the land-run era. McCabe's Langston City Herald urged migrants to build political power through concentrated settlement — a western counterpart to Exoduster colonization in Kansas.",
     "topicIds": ["town", "community"],
     "mentionedEntityIds": ["ent_brooksville_ok_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_dearfield_001",
@@ -347,7 +356,8 @@
     "historicalContext": "Dearfield's prosperity during World War I — when homesteaders netted more than $50,000 from a single harvest — showed that Black farmers could succeed on Colorado's arid land before climate and markets turned. The Black American West Museum in Denver holds preservation efforts at the site.",
     "topicIds": ["town", "community"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_blackdom_001",
@@ -382,7 +392,8 @@
     "historicalContext": "Frank Boyer walked from Georgia to New Mexico carrying his father's stories of free land in the West. Blackdom's street names — Washington, Lincoln, and Love — mapped political aspirations onto desert homesteads at a time when Roswell's growing white population offered Black settlers few alternatives.",
     "topicIds": ["town", "community"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_tennessee_town_001",
@@ -417,7 +428,8 @@
     "historicalContext": "Topeka was the only Kansas city with an organized Exoduster relief program through the Kansas Freedmen's Relief Association. Skilled Exoduster carpenters and masons helped build the expanding state capitol while Tennessee Town's churches anchored community life a mile southwest of the dome.",
     "topicIds": ["town", "community", "migration"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_bill_pickett_memorial_001",
@@ -452,7 +464,8 @@
     "historicalContext": "Historians estimate that one in four cowboys in the late nineteenth-century cattle trade was Black, though rodeo and Hollywood later erased that presence. Pickett's bulldogging technique — biting a steer's lip to bring it down — made him a star but also underscored the raw skill Black horsemen brought to the range.",
     "topicIds": ["culture", "frontier"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_folsom_site_001",
@@ -487,7 +500,8 @@
     "historicalContext": "McJunkin spent years trying to interest scientists in the bones he found while working cattle on the High Plains. His discovery did not bring him recognition in his lifetime, but the Folsom Site now stands as a landmark where a Black cowboy's eye for the land changed American archaeology.",
     "topicIds": ["culture", "frontier"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_fort_bliss_buffalo_soldier_memorial_001",
@@ -522,6 +536,7 @@
     "historicalContext": "Buffalo Soldier units produced twenty-three Medal of Honor recipients during the Indian Wars and later conflicts. Fifty-two Buffalo Soldiers are buried at Fort Bliss National Cemetery and nearby Concordia Cemetery in El Paso.",
     "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   }
 ]

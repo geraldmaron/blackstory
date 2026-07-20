@@ -38,7 +38,8 @@
         "citationLabel": "NPS Little Rock Central High School NHS"
       }
     ],
-    "historicalContext": "The school is central to the 1957 desegregation crisis, when federal intervention enforced equal-protection mandates against state resistance. It shows how public schools became the front line of the legal and structural fight over segregation."
+    "historicalContext": "The school is central to the 1957 desegregation crisis, when federal intervention enforced equal-protection mandates against state resistance. It shows how public schools became the front line of the legal and structural fight over segregation.",
+    "related": []
   },
   {
     "id": "ent_magnolia_plantation_001",
@@ -79,7 +80,8 @@
         "citationLabel": "Magnolia Plantation Grounds Tour event tags, NPS"
       }
     ],
-    "historicalContext": "Plantation sites like Magnolia, preserved under NPS, anchor the documented history of enslavement and Creole community life to specific Louisiana ground. Federal interpretation counters romanticized estate narratives by centering Black heritage within the Cane River landscape."
+    "historicalContext": "Plantation sites like Magnolia, preserved under NPS, anchor the documented history of enslavement and Creole community life to specific Louisiana ground. Federal interpretation counters romanticized estate narratives by centering Black heritage within the Cane River landscape.",
+    "related": []
   },
   {
     "id": "ent_oakland_plantation_001",
@@ -136,7 +138,8 @@
         "citationLabel": "NPS Oakland Plantation page"
       }
     ],
-    "historicalContext": "As a preserved Creole plantation, Oakland documents the structural continuity from enslavement to post-emancipation agricultural labor systems like sharecropping, showing how Louisiana's colonial racial order persisted through Reconstruction and Jim Crow economies."
+    "historicalContext": "As a preserved Creole plantation, Oakland documents the structural continuity from enslavement to post-emancipation agricultural labor systems like sharecropping, showing how Louisiana's colonial racial order persisted through Reconstruction and Jim Crow economies.",
+    "related": []
   },
   {
     "id": "ent_marian_anderson_lincoln_memorial_concert_001",
@@ -175,6 +178,7 @@
         "citationLabel": "NPS Lincoln Memorial Steps"
       }
     ],
-    "historicalContext": "The concert occurred within the era of legally enforced segregation in public accommodations, when Black Americans were routinely barred from white venues. Such exclusions propelled direct challenges to racial boundaries that fed the broader civil-rights movement."
+    "historicalContext": "The concert occurred within the era of legally enforced segregation in public accommodations, when Black Americans were routinely barred from white venues. Such exclusions propelled direct challenges to racial boundaries that fed the broader civil-rights movement.",
+    "related": []
   }
 ]

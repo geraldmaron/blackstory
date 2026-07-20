@@ -40,7 +40,8 @@
     "historicalContext": "Ebbets Field, demolished in 1960, is anchored here rather than Cooperstown because it is the site of Robinson's specific documented first; a sidewalk marker at the housing complex now on the site marks the former home-plate location.",
     "topicIds": ["sports", "baseball", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_jack_johnson_001",
@@ -75,7 +76,8 @@
     "historicalContext": "Johnson's 1908 title fight took place in Sydney, Australia, so no U.S. ring site survives; his location here is anchored to the International Boxing Hall of Fame in Canastota, NY, where his boxing legacy is permanently enshrined.",
     "topicIds": ["sports", "boxing", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_jesse_owens_001",
@@ -110,7 +112,8 @@
     "historicalContext": "Owens's 1935 records were set at Ferry Field in Ann Arbor, Michigan, but Ohio State — his alma mater, which barred him from campus housing and away-game hotels at the time — later renamed its track and field stadium in his honor, making it the most concrete surviving U.S. site tied to his collegiate career.",
     "topicIds": ["sports", "track-and-field", "olympics", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_wilma_rudolph_001",
@@ -145,7 +148,8 @@
     "historicalContext": "A life-sized bronze statue of Rudolph crossing the finish line stands at Liberty Park's event center, which bears her name, in her hometown of Clarksville.",
     "topicIds": ["sports", "track-and-field", "olympics", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_althea_gibson_001",
@@ -180,7 +184,8 @@
     "historicalContext": "Forest Hills, then home of the U.S. National Championships, is where Gibson first broke tennis's color line in 1950 before her Grand Slam titles later in the decade.",
     "topicIds": ["sports", "tennis", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_arthur_ashe_001",
@@ -215,7 +220,8 @@
     "historicalContext": "Flushing Meadows is anchored here both as the site of Ashe's 1968 breakthrough win and as the site of the 23,200-seat stadium later named in his honor.",
     "topicIds": ["sports", "tennis", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_willie_oree_001",
@@ -250,7 +256,8 @@
     "historicalContext": "O'Ree's actual 1958 debut took place at the Montreal Forum in Canada; TD Garden, the modern home of the Bruins, is anchored here as the site of his 2022 jersey retirement, the clearest U.S. site tied to his legacy with the franchise.",
     "topicIds": ["sports", "hockey", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_charlie_sifford_001",
@@ -285,7 +292,8 @@
     "historicalContext": "The World Golf Hall of Fame relocated from St. Augustine, Florida to a new Pinehurst, NC campus in 2024; Sifford's induction is honored at its current home.",
     "topicIds": ["sports", "golf", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_muhammad_ali_001",
@@ -320,7 +328,8 @@
     "historicalContext": "Ali was born and raised in Louisville's West End; the Muhammad Ali Center, a museum and cultural center built in his honor, opened downtown in 2005 and anchors his legacy in his hometown.",
     "topicIds": ["sports", "boxing", "firsts", "civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_bill_russell_001",
@@ -355,7 +364,8 @@
     "historicalContext": "Russell's coaching and playing careers were both spent with the Boston Celtics; the Hall of Fame in Springfield, MA is the most concrete surviving site tied to both of his enshrinements.",
     "topicIds": ["sports", "basketball", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_fritz_pollard_001",
@@ -390,7 +400,8 @@
     "historicalContext": "Pollard played for and co-coached the Akron Pros in Ohio, the same state where the NFL (as the American Professional Football Association) was founded in 1920 and where the Hall of Fame now stands.",
     "topicIds": ["sports", "football", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_doug_williams_001",
@@ -425,7 +436,8 @@
     "historicalContext": "Williams's Super Bowl XXII venue in San Diego was demolished in 2020; Grambling State, where he became a star under Eddie Robinson and later returned as head coach, is the best-documented surviving site tied to his career.",
     "topicIds": ["sports", "football", "firsts", "hbcu"],
     "mentionedEntityIds": ["ent_grambling_state_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_rube_foster_001",
@@ -463,7 +475,19 @@
       "ent_negro_leagues_baseball_museum_001",
       "ent_negro_national_league_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_negro_leagues_baseball_museum_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_negro_national_league_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_satchel_paige_001",
@@ -498,7 +522,8 @@
     "historicalContext": "Paige's induction is anchored to Cooperstown because it is itself the documented first being honored — the earliest instance of a player enshrined chiefly for Negro Leagues play.",
     "topicIds": ["sports", "baseball", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_josh_gibson_001",
@@ -533,7 +558,8 @@
     "historicalContext": "Gibson's induction, like Paige's, is anchored to Cooperstown; the Homestead Grays and Pittsburgh Crawfords ballparks he played in no longer survive in a form suitable for citation.",
     "topicIds": ["sports", "baseball", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_chuck_cooper_001",
@@ -568,7 +594,8 @@
     "historicalContext": "Cooper, Earl Lloyd, and Nat Clifton together integrated the NBA within months of each other in 1950; all three are now enshrined at the Hall of Fame in Springfield, MA.",
     "topicIds": ["sports", "basketball", "firsts", "hall-of-fame"],
     "mentionedEntityIds": ["ent_earl_lloyd_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_earl_lloyd_001",
@@ -603,7 +630,8 @@
     "historicalContext": "The Washington Capitols franchise no longer exists; Lloyd's Hall of Fame enshrinement in Springfield, MA is the most concrete surviving site tied to his legacy.",
     "topicIds": ["sports", "basketball", "firsts", "hall-of-fame"],
     "mentionedEntityIds": ["ent_chuck_cooper_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_simone_biles_001",
@@ -638,7 +666,8 @@
     "historicalContext": "Coordinates represent the city of Spring, Texas, where World Champions Centre is located; a precise street-level coordinate for the gym building could not be independently verified.",
     "topicIds": ["sports", "gymnastics", "olympics", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_serena_williams_001",
@@ -673,7 +702,8 @@
     "historicalContext": "The U.S. Olympic & Paralympic Museum in Colorado Springs houses the Hall of Fame into which Williams was inducted.",
     "topicIds": ["sports", "tennis", "olympics", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_florence_griffith_joyner_001",
@@ -708,7 +738,8 @@
     "historicalContext": "The U.S. Olympic & Paralympic Museum in Colorado Springs houses the Hall of Fame into which Griffith Joyner was inducted.",
     "topicIds": ["sports", "track-and-field", "olympics", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_vonetta_flowers_001",
@@ -743,7 +774,8 @@
     "historicalContext": "The Utah Olympic Park track hosted bobsled, luge, and skeleton events during the 2002 Salt Lake City Winter Olympics and remains an active training center today.",
     "topicIds": ["sports", "olympics", "firsts", "bobsled"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_debi_thomas_001",
@@ -778,7 +810,8 @@
     "historicalContext": "Coordinates represent the city of Colorado Springs, home to the World Figure Skating Museum and Hall of Fame where Thomas is honored; a precise street-level coordinate could not be independently verified.",
     "topicIds": ["sports", "olympics", "firsts", "figure-skating"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_marian_anderson_001",
@@ -813,7 +846,14 @@
     "historicalContext": "The Metropolitan Opera House Anderson debuted in, at 1411 Broadway, was demolished in 1967; the Lincoln Memorial, an NPS-maintained site with a permanent marker commemorating her 1939 concert, is the best-preserved site tied to her legacy and is anchored here as her single most consequential public performance.",
     "topicIds": ["music", "firsts", "civil-rights", "arts"],
     "mentionedEntityIds": ["ent_marian_anderson_lincoln_memorial_concert_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_marian_anderson_lincoln_memorial_concert_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_langston_hughes_001",
@@ -848,7 +888,8 @@
     "historicalContext": "The block of East 127th Street outside the house was co-named 'Langston Hughes Place' in his honor.",
     "topicIds": ["literature", "arts", "harlem-renaissance", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_duke_ellington_001",
@@ -883,7 +924,8 @@
     "historicalContext": "The original Cotton Club building at 142nd and Lenox no longer operates as a nightclub, but the site anchors Ellington's rise to national fame via the club's live radio broadcasts.",
     "topicIds": ["music", "arts", "harlem-renaissance", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_billie_holiday_001",
@@ -918,7 +960,8 @@
     "historicalContext": "Cafe Society's building at 1 Sheridan Square has since been redeveloped; the address is anchored here as the documented site of Holiday's first performances of 'Strange Fruit.'",
     "topicIds": ["music", "arts", "civil-rights", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_bessie_smith_001",
@@ -953,7 +996,8 @@
     "historicalContext": "The Cultural Center, part museum and part performance hall, anchors Smith's legacy in her hometown.",
     "topicIds": ["music", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_dorothy_dandridge_001",
@@ -988,7 +1032,8 @@
     "historicalContext": "The Pantages Theatre, still standing on Hollywood Boulevard, hosted the Academy Awards ceremonies from 1949 to 1959, including Dandridge's historic 1955 nomination.",
     "topicIds": ["film", "firsts", "arts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_halle_berry_001",
@@ -1023,7 +1068,14 @@
     "historicalContext": "The 2002 ceremony was the first Academy Awards held at the Kodak Theatre (renamed the Dolby Theatre in 2012), which has hosted the ceremony most years since.",
     "topicIds": ["film", "firsts", "arts"],
     "mentionedEntityIds": ["ent_denzel_washington_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_denzel_washington_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_hattie_mcdaniel_001",
@@ -1058,7 +1110,14 @@
     "historicalContext": "The Ambassador Hotel, where McDaniel accepted her Oscar despite the venue's whites-only policy, was demolished in 2005; Howard University, to which she bequeathed the award, is anchored here instead as the site most concretely tied to her legacy today.",
     "topicIds": ["film", "firsts", "arts"],
     "mentionedEntityIds": ["ent_howard_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_howard_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_sidney_poitier_001",
@@ -1093,7 +1152,8 @@
     "historicalContext": "The Santa Monica Civic Auditorium hosted the Academy Awards from 1961 to 1968, including Poitier's historic 1964 win.",
     "topicIds": ["film", "firsts", "arts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_diahann_carroll_001",
@@ -1128,7 +1188,8 @@
     "historicalContext": "The 54th Street Theatre was demolished in 1970 for the New York Hilton Midtown, which now occupies the site.",
     "topicIds": ["theater", "television", "firsts", "arts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_louis_armstrong_001",
@@ -1163,7 +1224,8 @@
     "historicalContext": "The house remains largely as Armstrong and Wilson decorated it, offering a rare intact domestic record of a major 20th-century Black artist.",
     "topicIds": ["music", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_berry_gordy_001",
@@ -1198,7 +1260,14 @@
     "historicalContext": "Gordy converted the ground floor of the West Grand Boulevard house into Motown's first studio and offices, dubbing it 'Hitsville U.S.A.'; the building is preserved today as the Motown Museum.",
     "topicIds": ["music", "arts", "business", "firsts"],
     "mentionedEntityIds": ["ent_motown_museum_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_motown_museum_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_chuck_berry_001",
@@ -1233,7 +1302,8 @@
     "historicalContext": "Berry was among the small inaugural class that established the Rock and Roll Hall of Fame; the museum building in Cleveland, designed by I.M. Pei, opened in 1995.",
     "topicIds": ["music", "arts", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_charley_pride_001",
@@ -1268,7 +1338,8 @@
     "historicalContext": "Pride's induction ceremony took place at the Country Music Association Awards, held at the Grand Ole Opry House; the Hall of Fame's own museum building in downtown Nashville is anchored here as the permanent site of his enshrinement.",
     "topicIds": ["music", "arts", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_deford_bailey_001",
@@ -1303,7 +1374,8 @@
     "historicalContext": "Bailey performed on the Opry from 1927 to 1941 before being dropped amid a licensing dispute; his Hall of Fame induction six decades later formally recognized his foundational role.",
     "topicIds": ["music", "arts", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_scott_joplin_001",
@@ -1338,7 +1410,8 @@
     "historicalContext": "The rowhouse is one of the few surviving buildings directly tied to Joplin's life and composing career.",
     "topicIds": ["music", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_leontyne_price_001",
@@ -1373,7 +1446,14 @@
     "historicalContext": "Price's 1966 opening-night role, choreographed by fellow honoree Alvin Ailey, marked a high point of her long Met career and the debut of its current Lincoln Center home.",
     "topicIds": ["music", "arts", "opera", "firsts"],
     "mentionedEntityIds": ["ent_alvin_ailey_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_alvin_ailey_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_alvin_ailey_001",
@@ -1408,7 +1488,8 @@
     "historicalContext": "The company Ailey founded is now headquartered at the Joan Weill Center for Dance in Manhattan, the largest building dedicated to dance in New York City.",
     "topicIds": ["dance", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_katherine_dunham_001",
@@ -1443,7 +1524,8 @@
     "historicalContext": "Dunham settled in East St. Louis in the 1960s, founding a training center there; the Katherine Dunham Museum preserves her personal collection of African and Caribbean art.",
     "topicIds": ["dance", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_gordon_parks_001",
@@ -1478,7 +1560,8 @@
     "historicalContext": "Parks filmed 'The Learning Tree' on location in Fort Scott, his hometown, which now houses the Gordon Parks Museum on the Fort Scott Community College campus.",
     "topicIds": ["film", "photography", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_august_wilson_001",
@@ -1513,7 +1596,8 @@
     "historicalContext": "Wilson's Pittsburgh Cycle draws heavily on his childhood in the Hill District; this house, where he lived for his first twelve years, is now preserved as an arts center in his honor.",
     "topicIds": ["theater", "literature", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_maya_angelou_001",
@@ -1548,7 +1632,8 @@
     "historicalContext": "Angelou lived in Winston-Salem for over three decades while teaching at Wake Forest and is buried there; the university now houses her personal archive.",
     "topicIds": ["literature", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_aretha_franklin_001",
@@ -1583,7 +1668,8 @@
     "historicalContext": "Franklin did not attend the 1987 ceremony, reportedly due to a fear of flying; Clive Davis accepted the honor on her behalf.",
     "topicIds": ["music", "arts", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_michael_jackson_001",
@@ -1618,7 +1704,14 @@
     "historicalContext": "Motown's Hitsville U.S.A. studio, where the Jackson 5 recorded after their 1968 signing, anchors the start of Jackson's recording career.",
     "topicIds": ["music", "arts", "firsts"],
     "mentionedEntityIds": ["ent_motown_museum_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_motown_museum_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_miles_davis_001",
@@ -1653,7 +1746,8 @@
     "historicalContext": "The House of Miles preserves the original walls, ceilings, and floors of Davis's boyhood home and operates today as a museum and community arts center.",
     "topicIds": ["music", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_john_coltrane_001",
@@ -1688,7 +1782,8 @@
     "historicalContext": "Coltrane composed and rehearsed 'A Love Supreme' at this Long Island home; the National Trust for Historic Preservation named it a National Treasure in 2018.",
     "topicIds": ["music", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_nina_simone_001",
@@ -1723,7 +1818,8 @@
     "historicalContext": "The 660-square-foot house where Simone was born and raised with seven siblings is being preserved as a National Treasure through the African American Cultural Heritage Action Fund.",
     "topicIds": ["music", "arts", "civil-rights", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_zora_neale_hurston_001",
@@ -1758,7 +1854,14 @@
     "historicalContext": "Hurston's Eatonville hometown already anchors a separate place-kind entry in this catalog; her Fort Pierce gravesite is used here as the site most concretely tied to her personal legacy and rediscovery.",
     "topicIds": ["literature", "arts", "harlem-renaissance", "firsts"],
     "mentionedEntityIds": ["ent_alice_walker_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_alice_walker_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_hank_aaron_001",
@@ -1793,7 +1896,8 @@
     "historicalContext": "Atlanta-Fulton County Stadium, where Aaron broke the record, was demolished in 1997; the Atlanta Braves' current ballpark, Truist Park, commemorates the achievement with a statue and a Monument Garden displaying artifacts from the record-breaking game.",
     "topicIds": ["sports", "baseball", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_frank_robinson_001",
@@ -1828,7 +1932,8 @@
     "historicalContext": "Cleveland Municipal Stadium, site of Robinson's managerial debut, was demolished in 1996; his Hall of Fame plaque in Cooperstown (inducted as a player in 1982) anchors his legacy today.",
     "topicIds": ["sports", "baseball", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_tony_dungy_001",
@@ -1863,7 +1968,8 @@
     "historicalContext": "Super Bowl XLI was also the first Super Bowl matching two Black head coaches, Dungy and his former assistant and close friend Lovie Smith of the Bears.",
     "topicIds": ["sports", "football", "firsts", "hall-of-fame"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_alice_coachman_001",
@@ -1898,7 +2004,8 @@
     "historicalContext": "Coachman's gold medal was awarded at Wembley Stadium in London; the U.S. Olympic & Paralympic Museum in Colorado Springs, which houses the Hall of Fame she was inducted into, anchors her legacy on U.S. soil.",
     "topicIds": ["sports", "olympics", "track-and-field", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_wyomia_tyus_001",
@@ -1933,7 +2040,8 @@
     "historicalContext": "Carl Lewis matched Tyus's feat of consecutive Olympic 100m titles in 1984, sixteen years after her second win; her achievement went largely unrecognized for decades.",
     "topicIds": ["sports", "olympics", "track-and-field", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_gabby_douglas_001",
@@ -1968,7 +2076,8 @@
     "historicalContext": "Douglas trained in Iowa under coach Liang Chow after moving from her native Virginia Beach; the Smithsonian's American History Museum in Washington, DC holds artifacts from her historic 2012 performance.",
     "topicIds": ["sports", "gymnastics", "olympics", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_tommie_smith_001",
@@ -2003,7 +2112,14 @@
     "historicalContext": "Smith and Carlos were both San Jose State track athletes; the university erected the 22-foot 'Victory Salute' statue on campus in 2005 to honor their protest, since neither man was included on a medal stand at the time by the school.",
     "topicIds": ["sports", "olympics", "civil-rights", "firsts"],
     "mentionedEntityIds": ["ent_john_carlos_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_john_carlos_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_john_carlos_001",
@@ -2038,7 +2154,14 @@
     "historicalContext": "Carlos and Smith were suspended from the Olympic team and sent home following the protest; decades later both are honored as civil rights pioneers, including with this campus statue and their 2019 Hall of Fame induction.",
     "topicIds": ["sports", "olympics", "civil-rights", "firsts"],
     "mentionedEntityIds": ["ent_tommie_smith_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_tommie_smith_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_gwendolyn_brooks_001",
@@ -2073,7 +2196,8 @@
     "historicalContext": "Brooks was later named Poet Laureate of Illinois in 1968, a post she held until her death in 2000; her landmarked home stands in the Greater Grand Crossing neighborhood near the Bronzeville setting of much of her work.",
     "topicIds": ["literature", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_rita_dove_001",
@@ -2108,7 +2232,14 @@
     "historicalContext": "The Library of Congress, which appoints and hosts the U.S. Poet Laureate, anchors Dove's tenure in the post at its Thomas Jefferson Building on Capitol Hill.",
     "topicIds": ["literature", "arts", "firsts"],
     "mentionedEntityIds": ["ent_gwendolyn_brooks_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_gwendolyn_brooks_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_alice_walker_001",
@@ -2143,7 +2274,8 @@
     "historicalContext": "The driving tour includes Walker's birthplace, childhood home, and the church where she was baptized, all in and around Eatonton.",
     "topicIds": ["literature", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_phillis_wheatley_001",
@@ -2178,7 +2310,8 @@
     "historicalContext": "Wheatley's owners, the Wheatley family of Boston, worshiped at the Old South Meeting House, and Wheatley herself became a member there; the building, a key Revolutionary-era meeting site, now commemorates her legacy.",
     "topicIds": ["literature", "arts", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_jordan_peele_001",
@@ -2213,7 +2346,14 @@
     "historicalContext": "The 90th Academy Awards were held at the Dolby Theatre (formerly the Kodak Theatre), the same venue where Halle Berry made history in 2002.",
     "topicIds": ["film", "arts", "firsts"],
     "mentionedEntityIds": ["ent_halle_berry_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_halle_berry_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_denzel_washington_001",
@@ -2248,7 +2388,19 @@
     "historicalContext": "The 2002 ceremony, held at the Kodak Theatre in its first year hosting the Oscars, marked the first time Black performers won both lead acting categories in the same year.",
     "topicIds": ["film", "arts", "firsts"],
     "mentionedEntityIds": ["ent_halle_berry_001", "ent_sidney_poitier_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_halle_berry_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sidney_poitier_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_whoopi_goldberg_001",
@@ -2283,7 +2435,14 @@
     "historicalContext": "The Dorothy Chandler Pavilion hosted the Academy Awards from 1969 to 2001, including Goldberg's historic 1991 win.",
     "topicIds": ["film", "arts", "firsts"],
     "mentionedEntityIds": ["ent_hattie_mcdaniel_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_hattie_mcdaniel_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_stevie_wonder_001",
@@ -2318,6 +2477,13 @@
     "historicalContext": "Wonder's discovery and early recordings took place at Hitsville U.S.A., the Motown studio and offices preserved today as a museum.",
     "topicIds": ["music", "arts", "firsts"],
     "mentionedEntityIds": ["ent_motown_museum_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_motown_museum_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   }
 ]

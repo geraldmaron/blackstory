@@ -32,7 +32,8 @@
     "historicalContext": "Segregated booking circuits made it difficult for Black artists to develop and receive recognition; the Howard, along with theaters in Harlem, Baltimore, and Philadelphia, provided the stages on which many of the most prominent entertainers of the mid-twentieth century debuted before desegregation and urban change reshaped Washington's U Street corridor.",
     "topicIds": ["theater", "music", "culture"],
     "mentionedEntityIds": ["ent_howard_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_gem_theater_kansas_city_001",
@@ -67,7 +68,8 @@
     "historicalContext": "The Gem stood alongside the New Rialto and Eblon theaters on 18th and Vine Streets as Kansas City's Black commercial and nightlife center incubated the swing-era bands that made the district nationally synonymous with jazz.",
     "topicIds": ["theater", "music", "jazz"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_douglass_theatre_macon_001",
@@ -102,7 +104,8 @@
     "historicalContext": "The Douglass Theatre's surviving business records document Macon's place on the Chitlin Circuit and the programming choices — race films, TOBA vaudeville, and local talent shows — that shaped Black leisure in central Georgia before integration.",
     "topicIds": ["theater", "music", "blues"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_liberty_theatre_columbus_001",
@@ -137,7 +140,8 @@
     "historicalContext": "Few Southern cities had a theater built exclusively for Black patrons in the 1920s; the Liberty's scale and Martin chain ownership made it a regional anchor for race films, stage shows, and the blues traditions linked to Ma Rainey's Columbus roots.",
     "topicIds": ["theater", "music", "blues"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_carver_theatre_birmingham_001",
@@ -172,7 +176,8 @@
     "historicalContext": "Fourth Avenue's Famous and Carver theaters, the Colored Masonic Temple, and Penny Savings Bank formed a compact Black business district where Birmingham's workforce built professional and entertainment institutions barred from white downtown venues.",
     "topicIds": ["theater", "music", "jazz"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_dreamland_ballroom_omaha_001",
@@ -207,7 +212,8 @@
     "historicalContext": "North 24th Street's Dreamland anchored a Black business district that also supported Preston Love, Anna Mae Winburn, and Lloyd Hunter; activist Whitney Young spoke there on civil rights, and the building later housed community organizations including the Great Plains Black History Museum.",
     "topicIds": ["ballroom", "music", "jazz"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_royal_theatre_baltimore_001",
@@ -246,7 +252,8 @@
       "ent_douglass_theatre_macon_001",
       "ent_u_street_corridor_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ritz_theatre_jacksonville_001",
@@ -281,7 +288,8 @@
     "historicalContext": "LaVilla's railroad-era Black professional class supported churches, fraternal halls, and theaters along Davis Street; the Ritz's revival documents Northeast Florida's Gullah Geechee urban heritage after decades of highway construction and disinvestment.",
     "topicIds": ["theater", "music", "culture"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_regal_theater_chicago_001",
@@ -316,7 +324,8 @@
     "historicalContext": "The Regal and adjacent Savoy Ballroom made 47th and South Parkway Chicago's answer to Harlem; community protest kept the Regal open when Balaban & Katz attempted to close it during the Depression, preserving a flagship stage for the Great Migration's South Side cultural capital.",
     "topicIds": ["theater", "music", "jazz"],
     "mentionedEntityIds": ["ent_savoy_ballroom_chicago_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_lincoln_theatre_baton_rouge_001",
@@ -351,7 +360,8 @@
     "historicalContext": "Mid-century Baton Rouge's Black neighborhoods supported a parallel commercial life along Myrtle Walk; the Lincoln's Art Moderne design and downtown proximity made it one of the few places where African American families could see first-run films together under Jim Crow.",
     "topicIds": ["theater", "music", "culture"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_calanthean_temple_shreveport_001",
@@ -386,7 +396,8 @@
     "historicalContext": "Texas Avenue's Antioch Baptist Church, Palace Ballroom, and Calanthean Temple formed Shreveport's Black commercial spine; the temple's scale — reported as the tallest building in the city when built — signaled the economic reach of Calantheans and Black professionals under segregation.",
     "topicIds": ["ballroom", "music", "culture"],
     "mentionedEntityIds": ["ent_duke_ellington_001", "ent_louis_armstrong_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_sunset_cafe_chicago_001",
@@ -421,7 +432,8 @@
     "historicalContext": "Unlike New York's demolished Cotton Club site, the Sunset/Grand Terrace building still stands in Bronzeville with period murals — a rare physical trace of the integrated jazz incubators that made Chicago a creative capital between 1917 and the bebop era.",
     "topicIds": ["music", "jazz", "culture"],
     "mentionedEntityIds": ["ent_louis_armstrong_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_paradise_theater_detroit_001",
@@ -456,7 +468,8 @@
     "historicalContext": "Paradise Valley's Flame Show Bar, Club Harlem, and Paradise Theater channeled Great Migration wages into a dense Black entertainment economy until postwar urban renewal and the 1943 race riot reduced mixed audiences; the hall's 1970s preservation campaign saved one of Crane's finest acoustical designs.",
     "topicIds": ["theater", "music", "jazz"],
     "mentionedEntityIds": ["ent_black_bottom_paradise_valley_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_savoy_ballroom_chicago_001",
@@ -496,7 +509,8 @@
       "ent_louis_armstrong_001",
       "ent_regal_theater_chicago_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_dunbar_theatre_dc_001",
@@ -531,6 +545,7 @@
     "historicalContext": "Facing the Howard Theatre across T Street, the Dunbar gave segregated Washington a Black-owned cinema and insurance headquarters in one building — part of a U Street economy that also included the Whitelaw Hotel, True Reformer Building, and Murray Palace Casino.",
     "topicIds": ["theater", "culture", "architecture"],
     "mentionedEntityIds": ["ent_howard_theatre_dc_001", "ent_u_street_corridor_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   }
 ]

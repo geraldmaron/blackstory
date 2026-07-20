@@ -32,7 +32,8 @@
     "historicalContext": "The Planet's masthead imagery and editorials made it a visible counter to post-Reconstruction white supremacy in Virginia; Mitchell's reporting on lynching and labor disputes linked local Black readers to a wider press network that included correspondents such as Ida B. Wells.",
     "topicIds": ["publication", "press", "civil-rights"],
     "mentionedEntityIds": ["ent_ida_b_wells_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_virginia_star_newspaper_001",
@@ -67,7 +68,8 @@
     "historicalContext": "The Star's brief run illustrates how Reconstruction-era Black educators and professionals built local press institutions in the former Confederacy's capital even before the Planet became Richmond's durable weekly voice.",
     "topicIds": ["publication", "press", "reconstruction"],
     "mentionedEntityIds": ["ent_richmond_planet_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_indianapolis_recorder_001",
@@ -102,7 +104,8 @@
     "historicalContext": "Alongside the Freeman, another Indianapolis Black weekly, the Recorder gave Midwestern readers a durable alternative to Chicago-based national papers while chronicling church life, fraternal orders, and migration streams into Indiana's industrial cities.",
     "topicIds": ["publication", "press", "great-migration"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_kansas_city_call_001",
@@ -137,7 +140,8 @@
     "historicalContext": "The Call anchored Black press coverage in Kansas City's 18th and Vine corridor era, overlapping with the jazz district's institutional growth and giving readers a locally owned counterpart to nationally syndicated migration-era weeklies.",
     "topicIds": ["publication", "press", "great-migration"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_kansas_city_sun_001",
@@ -172,7 +176,8 @@
     "historicalContext": "The Sun's hospital and school campaigns show how regional Black weeklies translated community grievances into sustained editorial pressure long before national civil rights litigation dominated headlines.",
     "topicIds": ["publication", "press", "organizing"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_rising_son_kansas_city_001",
@@ -207,7 +212,8 @@
     "historicalContext": "The Rising Son predated the Kansas City Sun and Call, documenting a generation of Black civic life in Kansas City before the Great Migration dramatically expanded the city's African American population.",
     "topicIds": ["publication", "press"],
     "mentionedEntityIds": ["ent_kansas_city_sun_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_cleveland_call_and_post_001",
@@ -242,7 +248,8 @@
     "historicalContext": "Published from a Great Migration destination city on Lake Erie, the Call and Post chronicled Black labor, church, and political life in Cleveland while connecting Ohio readers to national debates over segregation and economic opportunity.",
     "topicIds": ["publication", "press", "great-migration"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_louisiana_weekly_001",
@@ -277,7 +284,8 @@
     "historicalContext": "The Weekly joined an older line of New Orleans Black papers — from Reconstruction-era tribunes to late-nineteenth-century weeklies — that kept a francophone and Gulf South readership informed when white dailies excluded Black voices.",
     "topicIds": ["publication", "press"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_weekly_pelican_001",
@@ -312,7 +320,8 @@
     "historicalContext": "The Pelican's brief run sits among New Orleans papers such as the Louisianian and later Louisiana Weekly that documented Creole and African American civic life under tightening Jim Crow governance.",
     "topicIds": ["publication", "press", "reconstruction"],
     "mentionedEntityIds": ["ent_louisiana_weekly_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_black_republican_new_orleans_001",
@@ -347,7 +356,8 @@
     "historicalContext": "The Black Republican's 1865 prospectus declared that 'the poor as well as the rich, the freedmen as well as the freemen will be heard,' capturing how press founding accompanied Reconstruction citizenship claims in the Gulf South.",
     "topicIds": ["publication", "press", "reconstruction"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_jackson_advocate_001",
@@ -382,7 +392,8 @@
     "historicalContext": "Published from the heart of a Deep South capital, the Advocate survived repeated attacks on its offices while documenting Black political life in a state where white dailies and the Sovereignty Commission surveilled civil-rights activity.",
     "topicIds": ["publication", "press", "civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mississippi_enterprise_001",
@@ -417,7 +428,8 @@
     "historicalContext": "The Enterprise's rivalry with the Advocate illustrates how even conservative Black weeklies in Jackson shaped public conversation about education and respectability politics under Jim Crow.",
     "topicIds": ["publication", "press"],
     "mentionedEntityIds": ["ent_jackson_advocate_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_dallas_express_001",
@@ -452,7 +464,8 @@
     "historicalContext": "The Express marketed itself as the South's oldest and largest Negro newspaper west of the Mississippi, giving Dallas readers a locally printed alternative when Houston and national weeklies dominated Texas Black press circulation.",
     "topicIds": ["publication", "press"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_black_dispatch_001",
@@ -487,7 +500,8 @@
     "historicalContext": "From Oklahoma City, Dunjee used the Dispatch to fight restrictive covenants and school segregation, linking Southwestern readers to national NAACP litigation strategies at a time when Oklahoma's All-Black towns were fading but urban Black communities were expanding.",
     "topicIds": ["publication", "press", "civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_savannah_tribune_001",
@@ -522,7 +536,8 @@
     "historicalContext": "The Tribune's reach extended into north Florida, making it a regional voice when Atlanta's Daily World later competed for Georgia's leading Black weekly readership.",
     "topicIds": ["publication", "press", "civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_houston_informer_001",
@@ -557,6 +572,7 @@
     "historicalContext": "Competing with the Dallas Express for Texas circulation, the Informer documented Houston's expanding Black neighborhoods and port-city labor markets during the interwar decades.",
     "topicIds": ["publication", "press"],
     "mentionedEntityIds": ["ent_dallas_express_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   }
 ]

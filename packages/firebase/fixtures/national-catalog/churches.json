@@ -40,7 +40,8 @@
     "historicalContext": "Independent Black congregations like Mother Bethel doubled as schools, mutual-aid societies, and organizing halls at a time when most civic institutions excluded Black Philadelphians.",
     "topicIds": ["church", "community", "abolition", "denomination-founding"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mother_ame_zion_001",
@@ -75,7 +76,8 @@
     "historicalContext": "New York's early Black churches were the city's first Black-controlled public institutions, organizing abolition campaigns, schools, and burial societies decades before emancipation in the state.",
     "topicIds": ["church", "community", "underground-railroad", "denomination-founding"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_first_baptist_petersburg_001",
@@ -110,7 +112,8 @@
     "historicalContext": "Petersburg held the largest free Black population in the antebellum South, and its churches were the community's schools, credit networks, and political meeting grounds.",
     "topicIds": ["church", "community", "education"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_first_african_baptist_savannah_001",
@@ -177,7 +180,8 @@
     "historicalContext": "Savannah's early Black Baptist congregations organized under slavery and built institutions — schools, missionary networks, and later a church-housed credit union — that outlasted it.",
     "topicIds": ["church", "community", "founding-era"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_african_meeting_house_001",
@@ -212,7 +216,8 @@
     "historicalContext": "Known as the 'Black Faneuil Hall,' the Meeting House shows how a single congregation's building could serve an entire community as church, school, and political assembly.",
     "topicIds": ["church", "community", "abolition", "education"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_abyssinian_baptist_001",
@@ -290,7 +295,8 @@
     "historicalContext": "Charleston's Black congregations preserved community, learning, and organized resistance through the era of slavery and after; Emanuel's two-century record made it a civic anchor for the Lowcountry.",
     "topicIds": ["church", "community", "civil-rights", "resilience"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_sixteenth_street_baptist_001",
@@ -413,14 +419,15 @@
         "id": "ent_montgomery_bus_boycott_001",
         "type": "related_to",
         "direction": "incoming"
+      },
+      {
+        "id": "ent_montgomery_bus_boycott_001",
+        "type": "occurred_at",
+        "direction": "incoming"
       }
     ],
     "topicIds": ["church", "community", "civil-rights"],
-    "mentionedEntityIds": [
-      "ent_martin_luther_king_jr_001",
-      "ent_montgomery_bus_boycott_001",
-      "montgomery-bus-boycott"
-    ],
+    "mentionedEntityIds": ["ent_martin_luther_king_jr_001", "ent_montgomery_bus_boycott_001"],
     "keywords": []
   },
   {
@@ -582,7 +589,8 @@
     "historicalContext": "In the capital, Black congregations stood as visible civic institutions within sight of federal power, hosting the funerals, conventions, and protests that marked national Black political life.",
     "topicIds": ["church", "community", "civil-rights", "national-capital"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_st_augustine_catholic_nola_001",
@@ -744,7 +752,8 @@
     "historicalContext": "When Savannah's older Black cemeteries closed, Laurel Grove South became the principal burial ground for both enslaved and free African Americans, making its surviving markers one of the richest public archives of Black life in the antebellum and Jim Crow South.",
     "topicIds": ["cemetery", "community", "burial-ground"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_evergreen_cemetery_richmond_001",
@@ -779,7 +788,8 @@
     "historicalContext": "Evergreen and its neighboring East End Cemetery formed one of the largest African American-controlled cemetery groupings in the South, giving Black Richmonders a landscaped place to bury fraternal leaders, educators, and entrepreneurs when white cemeteries remained closed to them.",
     "topicIds": ["cemetery", "community", "burial-ground"],
     "mentionedEntityIds": ["ent_east_end_cemetery_richmond_001", "ent_maggie_l_walker_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_east_end_cemetery_richmond_001",
@@ -814,7 +824,8 @@
     "historicalContext": "During Jim Crow, East End gave Black Richmond families a public arena for memorial art and fraternal display; after years of abandonment, community volunteers mapped thousands of markers to recover names that otherwise existed only in family memory.",
     "topicIds": ["cemetery", "community", "burial-ground"],
     "mentionedEntityIds": ["ent_evergreen_cemetery_richmond_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_african_cemetery_no2_lexington_001",
@@ -849,7 +860,8 @@
     "historicalContext": "The cemetery's charter required the land be held solely for burial, making it a durable expression of mutual aid in a Bluegrass city where Black benevolent societies also funded schools, fairs, and orphan care.",
     "topicIds": ["cemetery", "community", "burial-ground"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mount_auburn_cemetery_baltimore_001",
@@ -884,7 +896,8 @@
     "historicalContext": "Until Baltimore's cemeteries desegregated, Mount Auburn may have been the only burial site available to many Black families, making its monuments a ledger of church members, Civil War veterans, and civil-rights-era community leaders.",
     "topicIds": ["cemetery", "community", "burial-ground"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_union_baptist_cemetery_cincinnati_001",
@@ -919,7 +932,8 @@
     "historicalContext": "Church-owned cemeteries like Union Baptist linked worship, mutual aid, and burial rights on the Ohio River, preserving names of Underground Railroad participants and USCT soldiers when public records were thin.",
     "topicIds": ["cemetery", "community", "burial-ground"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_gospel_pilgrim_cemetery_athens_001",
@@ -954,7 +968,8 @@
     "historicalContext": "Gospel Pilgrim illustrates how post-emancipation benevolent societies pooled dues for dignified burials, creating cemeteries that doubled as outdoor archives of Black craft, politics, and faith in the Georgia piedmont.",
     "topicIds": ["cemetery", "community", "burial-ground"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_shiloh_baptist_old_site_fredericksburg_001",
@@ -989,7 +1004,8 @@
     "historicalContext": "Riverfront Black congregations like Shiloh anchored Fredericksburg's free and freed communities with schools and civic leadership long before the city elected its first African American officials in the 1970s.",
     "topicIds": ["church", "community", "education"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_allen_chapel_ame_fort_worth_001",
@@ -1024,7 +1040,8 @@
     "historicalContext": "Urban southern AME churches like Allen Chapel doubled as meeting halls and cultural anchors in segregated Fort Worth, and Pittman's design linked the congregation to a national network of Black architects trained at Tuskegee.",
     "topicIds": ["church", "community", "architecture"],
     "mentionedEntityIds": ["ent_tuskegee_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_bethel_ame_indianapolis_001",
@@ -1059,7 +1076,8 @@
     "historicalContext": "Bethel anchored Indianapolis's near-westside Black community through Reconstruction, the Great Migration, and urban renewal, linking AME discipline to mutual aid institutions that outlasted the original sanctuary.",
     "topicIds": ["church", "community", "underground-railroad"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_st_philips_episcopal_harlem_001",
@@ -1094,7 +1112,8 @@
     "historicalContext": "St. Philip's move to Harlem preceded much of the neighborhood's Black population shift, making the parish both a spiritual home and a prestige address for African American elites who shaped Harlem's twentieth-century politics and culture.",
     "topicIds": ["church", "community", "architecture"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_butler_street_cme_atlanta_001",
@@ -1129,7 +1148,8 @@
     "historicalContext": "CME congregations like Butler Street lined Auburn Avenue's church row, giving working-class Atlantans sanctuaries within walking distance of the rail jobs and retail that defined Black downtown life before suburbanization.",
     "topicIds": ["church", "community", "architecture"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mount_zion_ame_woolwich_001",
@@ -1164,7 +1184,8 @@
     "historicalContext": "South Jersey's free Black hamlets linked Quaker abolitionists, AME congregations, and wooded escape routes; Mount Zion's surviving building and burial ground document that network in brick, tombstones, and oral history.",
     "topicIds": ["church", "cemetery", "underground-railroad", "community"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_old_ship_ame_zion_montgomery_001",
@@ -1199,7 +1220,8 @@
     "historicalContext": "Old Ship's move-by-log origin story captures how enslaved and free Black Methodists claimed sacred space in the Alabama capital generations before the civil rights movement centered on Montgomery's streets.",
     "topicIds": ["church", "community", "architecture"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_first_african_baptist_lexington_001",
@@ -1234,7 +1256,8 @@
     "historicalContext": "Lexington's First African Baptist anchored a massive antebellum Black membership that built schools and mutual-aid networks in a border-state city where slavery and free Black life overlapped.",
     "topicIds": ["church", "community", "education"],
     "mentionedEntityIds": ["ent_first_african_baptist_savannah_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_wheat_street_baptist_atlanta_001",
@@ -1269,6 +1292,7 @@
     "historicalContext": "Wheat Street linked Baptist worship to Black Atlanta's economic ambitions — from washerwomen's strikes in the 1880s to Borders's housing and credit programs — making its Auburn Avenue corner a laboratory for church-led development.",
     "topicIds": ["church", "community", "civil-rights", "education"],
     "mentionedEntityIds": ["ent_martin_luther_king_jr_001", "ent_morehouse_college_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   }
 ]

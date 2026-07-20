@@ -32,7 +32,14 @@
     "historicalContext": "CORE's founders drew on Gandhian nonviolent resistance and, three years before Rosa Parks' arrest, had already begun testing direct action against Jim Crow in the urban North. The organization went on to organize the 1947 Journey of Reconciliation and the 1961 Freedom Rides.",
     "topicIds": ["civil-rights", "organizing", "direct-action", "nonviolence"],
     "mentionedEntityIds": ["ent_freedom_rides_museum_001", "ent_journey_of_reconciliation_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_core_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_sncc_founding_001",
@@ -72,9 +79,16 @@
       "ent_freedom_summer_mount_zion_001",
       "ent_martin_luther_king_jr_001",
       "ent_shaw_university_001",
-      "sncc"
+      "ent_sncc_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sncc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_sclc_founding_001",
@@ -116,9 +130,16 @@
       "ent_montgomery_improvement_association_001",
       "ent_poor_peoples_campaign_001",
       "ent_ralph_abernathy_001",
-      "sclc"
+      "ent_sclc_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_black_panther_party_founding_001",
@@ -153,7 +174,8 @@
     "historicalContext": "Newton and Seale met at Merritt College, where campus Black nationalist politics and the neighboring Lowndes County Freedom Organization's black panther emblem shaped the new party's name and symbol before it grew into a national organization.",
     "topicIds": ["black-power", "organizing", "self-defense", "community-programs"],
     "mentionedEntityIds": ["ent_lowndes_county_freedom_org_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mlk_birth_home_001",
@@ -192,7 +214,8 @@
       "ent_martin_luther_king_jr_001",
       "ent_sweet_auburn_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_dexter_parsonage_museum_001",
@@ -227,8 +250,15 @@
     "historicalContext": "No one was injured in the bombing, and King's calm response to the crowd that gathered afterward — urging nonviolence rather than retaliation — became one of the defining moments of his early leadership.",
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "commemoration"],
-    "mentionedEntityIds": ["ent_montgomery_bus_boycott_001", "montgomery-bus-boycott"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_montgomery_bus_boycott_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_montgomery_bus_boycott_001",
+        "type": "occurred_at",
+        "direction": "incoming"
+      }
+    ]
   },
   {
     "id": "ent_mlk_memorial_dc_001",
@@ -263,7 +293,8 @@
     "historicalContext": "The memorial's address, 1964 Independence Avenue, was chosen to honor the Civil Rights Act of 1964, tying the monument's setting to King's legislative legacy.",
     "topicIds": ["civil-rights", "memorial", "national-mall"],
     "mentionedEntityIds": ["ent_law_civil_rights_act_1964"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_malcolm_x_omaha_birthsite_001",
@@ -298,7 +329,8 @@
     "historicalContext": "Malcolm X's father, Earl Little, was a Baptist preacher and Marcus Garvey organizer; the family's flight from Omaha began a childhood marked by white-supremacist violence that Malcolm X later recounted in his autobiography.",
     "topicIds": ["civil-rights", "birthplace", "commemoration"],
     "mentionedEntityIds": ["ent_law_ku_klux_klan_act_1871"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_malcolm_x_boston_house_001",
@@ -333,7 +365,8 @@
     "historicalContext": "It was in Boston's Roxbury neighborhood, under his sister's roof, that the teenage Malcolm Little first encountered the nightlife and street culture he later described in his autobiography, before his imprisonment and conversion to the Nation of Islam.",
     "topicIds": ["civil-rights", "boyhood-home", "commemoration"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_audubon_ballroom_001",
@@ -369,7 +402,8 @@
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "assassination", "commemoration"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_malcolm_x_college_chicago_001",
@@ -404,7 +438,8 @@
     "historicalContext": "The renaming came the same year Chicago's Wilson Junior College became Kennedy-King College, part of a wave of civic commemorations following the 1968 assassinations of Martin Luther King Jr. and Robert F. Kennedy.",
     "topicIds": ["civil-rights", "education", "commemoration"],
     "mentionedEntityIds": ["ent_martin_luther_king_jr_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_malcolm_x_lansing_home_001",
@@ -440,7 +475,8 @@
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "childhood", "commemoration"],
     "mentionedEntityIds": ["ent_unia_harlem_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_nashville_student_movement_001",
@@ -481,7 +517,8 @@
       "ent_james_lawson_001",
       "ent_john_lewis_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_albany_movement_001",
@@ -515,8 +552,19 @@
     ],
     "historicalContext": "Martin Luther King Jr. joined the campaign in December 1961 and was jailed alongside hundreds of demonstrators; though Albany produced few immediate concrete gains, its lessons on sustaining mass nonviolent pressure directly shaped SCLC's subsequent Birmingham campaign.",
     "topicIds": ["civil-rights", "organizing", "voting-rights"],
-    "mentionedEntityIds": ["ent_charles_sherrod_001", "ent_martin_luther_king_jr_001", "sncc"],
-    "keywords": []
+    "mentionedEntityIds": [
+      "ent_charles_sherrod_001",
+      "ent_martin_luther_king_jr_001",
+      "ent_sncc_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sncc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_st_augustine_movement_001",
@@ -550,8 +598,15 @@
     ],
     "historicalContext": "National SCLC leaders left St. Augustine on July 1, 1964, the day before President Johnson signed the Civil Rights Act; local activist Dr. Robert Hayling had organized the movement since 1963 and endured beatings and Klan violence for his leadership.",
     "topicIds": ["civil-rights", "direct-action", "desegregation"],
-    "mentionedEntityIds": ["ent_martin_luther_king_jr_001", "sclc"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_martin_luther_king_jr_001", "ent_sclc_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_cambridge_movement_001",
@@ -586,7 +641,8 @@
     "historicalContext": "Richardson's willingness to accept armed self-defense alongside nonviolent tactics, and her rejection of parts of the negotiated settlement she felt fell short, made Cambridge an early bridge between the nonviolent civil rights movement and the emerging Black Power movement.",
     "topicIds": ["civil-rights", "organizing", "self-defense", "desegregation"],
     "mentionedEntityIds": ["ent_gloria_richardson_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_danville_movement_001",
@@ -622,7 +678,8 @@
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "organizing", "direct-action", "police-violence"],
     "mentionedEntityIds": ["ent_martin_luther_king_jr_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_chicago_freedom_movement_001",
@@ -656,8 +713,15 @@
     ],
     "historicalContext": "King later called the hostility he faced in Chicago worse than anything he had experienced in the South, underscoring how residential segregation in Northern cities resisted the movement's Southern-tested tactics.",
     "topicIds": ["civil-rights", "fair-housing", "northern-movement"],
-    "mentionedEntityIds": ["ent_james_bevel_001", "ent_martin_luther_king_jr_001", "sclc"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_james_bevel_001", "ent_martin_luther_king_jr_001", "ent_sclc_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_meredith_march_against_fear_001",
@@ -696,9 +760,16 @@
       "ent_james_meredith_001",
       "ent_mfdp_dnc_challenge_001",
       "ent_stokely_carmichael_001",
-      "sncc"
+      "ent_sncc_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sncc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_poor_peoples_campaign_001",
@@ -732,8 +803,19 @@
     ],
     "historicalContext": "Weeks of rain turned the encampment to mud, and thousands of police evacuated the site on June 24, 1968, the day after SCLC's National Park Service permit expired, but the campaign's Solidarity Day drew tens of thousands to the Mall in support.",
     "topicIds": ["civil-rights", "economic-justice", "poverty"],
-    "mentionedEntityIds": ["ent_martin_luther_king_jr_001", "ent_ralph_abernathy_001", "sclc"],
-    "keywords": []
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001",
+      "ent_ralph_abernathy_001",
+      "ent_sclc_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_orangeburg_massacre_001",
@@ -769,7 +851,8 @@
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "student-activism", "police-violence"],
     "mentionedEntityIds": ["ent_cleveland_sellers_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_lowndes_county_freedom_org_001",
@@ -809,9 +892,21 @@
       "ent_selma_to_montgomery_marches_001",
       "ent_sncc_founding_001",
       "ent_stokely_carmichael_001",
-      "sncc"
+      "ent_sncc_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_selma_to_montgomery_marches_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_freedom_summer_mount_zion_001",
@@ -846,8 +941,20 @@
     "historicalContext": "The Council of Federated Organizations (COFO) coordinated Freedom Summer's voter registration drives and roughly 40 Freedom Schools across Mississippi; the congregation rebuilt Mount Zion on the same site in 1966, and it has hosted annual commemorations of the three slain workers ever since.",
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "voting-rights"],
-    "mentionedEntityIds": ["cofo", "ent_cofo_001", "freedom-summer"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_cofo_001", "ent_freedom_summer_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_cofo_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_summer_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_ole_miss_integration_001",
@@ -883,7 +990,8 @@
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "higher-education", "desegregation", "federal-intervention"],
     "mentionedEntityIds": ["ent_james_meredith_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_stand_schoolhouse_door_001",
@@ -918,7 +1026,8 @@
     "historicalContext": "Vivian Malone went on to become the University of Alabama's first Black graduate in 1965; that evening, President Kennedy delivered a nationally televised civil rights address that helped set the stage for the Civil Rights Act of 1964.",
     "topicIds": ["civil-rights", "higher-education", "desegregation", "federal-intervention"],
     "mentionedEntityIds": ["ent_autherine_lucy_ua_001", "ent_law_civil_rights_act_1964"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_autherine_lucy_ua_001",
@@ -954,7 +1063,8 @@
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "higher-education", "desegregation"],
     "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_uga_integration_001",
@@ -990,7 +1100,8 @@
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "higher-education", "desegregation"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_gaston_motel_001",
@@ -1025,8 +1136,20 @@
     "historicalContext": "The motel was one of the only Birmingham establishments where Black travelers, entertainers, and civil rights leaders could safely lodge under segregation, making it a natural nerve center for the 1963 campaign.",
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "commemoration"],
-    "mentionedEntityIds": ["birmingham-campaign", "sclc"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_birmingham_campaign_001", "ent_sclc_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_birmingham_campaign_001",
+        "type": "occurred_at",
+        "direction": "incoming"
+      },
+      {
+        "id": "ent_sclc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_montgomery_improvement_association_001",
@@ -1060,12 +1183,15 @@
     ],
     "historicalContext": "Beyond running the boycott's carpool logistics and negotiating with city officials, the MIA taught nonviolence classes to prepare the Black community for the integrated buses that followed the Browder v. Gayle ruling.",
     "topicIds": ["civil-rights", "organizing"],
-    "mentionedEntityIds": [
-      "ent_martin_luther_king_jr_001",
-      "ent_montgomery_bus_boycott_001",
-      "montgomery-bus-boycott"
-    ],
-    "keywords": []
+    "mentionedEntityIds": ["ent_martin_luther_king_jr_001", "ent_montgomery_bus_boycott_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_montgomery_bus_boycott_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_martin_luther_king_jr_001",
@@ -1103,9 +1229,31 @@
       "ent_ebenezer_baptist_atlanta_001",
       "ent_lorraine_motel_001",
       "ent_montgomery_bus_boycott_001",
-      "sclc"
+      "ent_sclc_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_montgomery_bus_boycott_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_ebenezer_baptist_atlanta_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_lorraine_motel_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_malcolm_x_001",
@@ -1141,7 +1289,14 @@
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "black-nationalism", "nation-of-islam"],
     "mentionedEntityIds": ["ent_audubon_ballroom_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_audubon_ballroom_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_ella_baker_001",
@@ -1175,8 +1330,25 @@
     ],
     "historicalContext": "This entry is tied to Shaw University, Baker's own alma mater (valedictorian, 1927) and the site of the SNCC founding conference she organized, the single event most identified with her insistence on empowering young organizers rather than directing them herself.",
     "topicIds": ["civil-rights", "organizing", "grassroots-leadership"],
-    "mentionedEntityIds": ["ent_shaw_university_001", "sclc", "sncc"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_shaw_university_001", "ent_sclc_001", "ent_sncc_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_shaw_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_bayard_rustin_001",
@@ -1215,10 +1387,36 @@
       "ent_journey_of_reconciliation_001",
       "ent_march_on_washington_1963_001",
       "ent_marian_anderson_lincoln_memorial_concert_001",
-      "ent_martin_luther_king_jr_001",
-      "march-on-washington"
+      "ent_martin_luther_king_jr_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_march_on_washington_1963_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_rides_museum_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_journey_of_reconciliation_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_marian_anderson_lincoln_memorial_concert_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_martin_luther_king_jr_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_fannie_lou_hamer_001",
@@ -1252,8 +1450,25 @@
     ],
     "historicalContext": "Hamer began organizing after volunteering at a 1962 SNCC voter registration meeting in Ruleville, the Sunflower County town that remained her home and base of activism for the rest of her life.",
     "topicIds": ["civil-rights", "voting-rights"],
-    "mentionedEntityIds": ["ent_mfdp_dnc_challenge_001", "mfdp", "sncc"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_mfdp_dnc_challenge_001", "ent_mfdp_001", "ent_sncc_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mfdp_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_mfdp_dnc_challenge_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_diane_nash_001",
@@ -1292,9 +1507,16 @@
       "ent_james_bevel_001",
       "ent_law_voting_rights_act_1965",
       "ent_nashville_student_movement_001",
-      "sncc"
+      "ent_sncc_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sncc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_john_lewis_001",
@@ -1329,8 +1551,29 @@
     "historicalContext": "Lewis went on to serve as an Atlanta city councilman and then as U.S. Representative for Georgia's 5th congressional district from 1987 until his death in 2020, becoming known as the 'conscience of the Congress.'",
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "voting-rights"],
-    "mentionedEntityIds": ["ent_edmund_pettus_bridge_001", "selma", "sncc"],
-    "keywords": []
+    "mentionedEntityIds": [
+      "ent_edmund_pettus_bridge_001",
+      "ent_selma_to_montgomery_marches_001",
+      "ent_sncc_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_selma_to_montgomery_marches_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_edmund_pettus_bridge_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_stokely_carmichael_001",
@@ -1368,9 +1611,16 @@
       "ent_john_lewis_001",
       "ent_lowndes_county_freedom_org_001",
       "ent_meredith_march_against_fear_001",
-      "sncc"
+      "ent_sncc_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sncc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_fred_shuttlesworth_001",
@@ -1406,12 +1656,34 @@
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "organizing"],
     "mentionedEntityIds": [
-      "birmingham-campaign",
+      "ent_birmingham_campaign_001",
       "ent_bethel_baptist_church_collegeville_001",
       "ent_law_ku_klux_klan_act_1871",
-      "sclc"
+      "ent_sclc_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_birmingham_campaign_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_bethel_baptist_church_collegeville_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_ku_klux_klan_act_1871",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_septima_clark_001",
@@ -1446,7 +1718,8 @@
     "historicalContext": "Known as the 'Mother of the Movement,' Clark taught in Charleston and on Johns Island for decades before her firing; the South Carolina governor formally reinstated her teaching pension in 1976, acknowledging her 1956 dismissal had been unjust.",
     "topicIds": ["civil-rights", "voting-rights", "education", "citizenship-schools"],
     "mentionedEntityIds": ["ent_highlander_folk_school_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_daisy_bates_001",
@@ -1480,8 +1753,20 @@
     ],
     "historicalContext": "Bates and her husband L.C. used their newspaper, the Arkansas State Press, to advance civil rights coverage for years before the Central High crisis, cementing their home as a gathering point for the Nine and the national press corps.",
     "topicIds": ["civil-rights", "school-desegregation"],
-    "mentionedEntityIds": ["naacp", "little-rock-nine"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_naacp_001", "ent_little_rock_nine_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_naacp_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_little_rock_nine_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_james_meredith_001",
@@ -1521,7 +1806,24 @@
       "ent_meredith_march_against_fear_001",
       "ent_ole_miss_integration_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_constance_baker_motley_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_meredith_march_against_fear_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_ole_miss_integration_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_gloria_richardson_001",
@@ -1556,7 +1858,8 @@
     "historicalContext": "Richardson also participated in the Freedom Rides and the March on Washington, and the Cambridge movement's embrace of both nonviolent tactics and armed self-defense made her an early bridge figure toward the Black Power movement.",
     "topicIds": ["civil-rights", "organizing", "self-defense", "women-leaders"],
     "mentionedEntityIds": ["ent_freedom_rides_museum_001", "ent_movement_black_power_movement"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_james_lawson_001",
@@ -1593,9 +1896,16 @@
     "mentionedEntityIds": [
       "ent_freedom_rides_museum_001",
       "ent_nashville_student_movement_001",
-      "sclc"
+      "ent_sclc_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_ralph_abernathy_001",
@@ -1634,10 +1944,42 @@
       "ent_martin_luther_king_jr_001",
       "ent_montgomery_improvement_association_001",
       "ent_poor_peoples_campaign_001",
-      "montgomery-bus-boycott",
-      "sclc"
+      "ent_montgomery_bus_boycott_001",
+      "ent_sclc_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_montgomery_bus_boycott_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_first_baptist_petersburg_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_martin_luther_king_jr_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_montgomery_improvement_association_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_poor_peoples_campaign_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_ct_vivian_001",
@@ -1676,10 +2018,22 @@
       "ent_freedom_rides_museum_001",
       "ent_law_voting_rights_act_1965",
       "ent_martin_luther_king_jr_001",
-      "sclc",
-      "selma"
+      "ent_sclc_001",
+      "ent_selma_to_montgomery_marches_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_selma_to_montgomery_marches_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_hosea_williams_001",
@@ -1719,10 +2073,42 @@
       "ent_john_lewis_001",
       "ent_martin_luther_king_jr_001",
       "ent_sclc_founding_001",
-      "sclc",
-      "selma"
+      "ent_sclc_001",
+      "ent_selma_to_montgomery_marches_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_selma_to_montgomery_marches_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_edmund_pettus_bridge_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_john_lewis_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_martin_luther_king_jr_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_founding_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_amelia_boynton_robinson_001",
@@ -1757,8 +2143,20 @@
     "historicalContext": "In 1964 Boynton became the first African American woman and first female Democratic candidate to run for Congress from Alabama; she was a guest of honor when President Johnson signed the Voting Rights Act into law in August 1965.",
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "voting-rights", "women-leaders"],
-    "mentionedEntityIds": ["ent_law_voting_rights_act_1965", "selma"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_law_voting_rights_act_1965", "ent_selma_to_montgomery_marches_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_selma_to_montgomery_marches_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_voting_rights_act_1965",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_charles_sherrod_001",
@@ -1792,8 +2190,20 @@
     ],
     "historicalContext": "Sherrod remained in southwest Georgia for the rest of his life, later founding the Southwest Georgia Independent Voters Project and the New Communities Inc. agricultural collective and serving on the Albany City Council from 1976 to 1990.",
     "topicIds": ["civil-rights", "organizing", "voting-rights"],
-    "mentionedEntityIds": ["ent_albany_movement_001", "sncc"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_albany_movement_001", "ent_sncc_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sncc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_albany_movement_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_james_bevel_001",
@@ -1827,8 +2237,25 @@
     ],
     "historicalContext": "Trained by James Lawson in Nashville alongside Diane Nash (whom he married), Bevel went on to direct SCLC's Chicago open housing campaign in 1966 and to help organize the 1963 March on Washington.",
     "topicIds": ["civil-rights", "direct-action", "organizing"],
-    "mentionedEntityIds": ["ent_diane_nash_001", "ent_james_lawson_001", "sclc"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_diane_nash_001", "ent_james_lawson_001", "ent_sclc_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_diane_nash_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_james_lawson_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_robert_moses_001",
@@ -1862,8 +2289,25 @@
     ],
     "historicalContext": "Moses later founded the Algebra Project in 1982 with MacArthur Fellowship funding, extending his belief in grassroots empowerment from voting rights to mathematics literacy for underserved students.",
     "topicIds": ["civil-rights", "voting-rights"],
-    "mentionedEntityIds": ["ent_cofo_001", "freedom-summer", "sncc"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_cofo_001", "ent_freedom_summer_001", "ent_sncc_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_cofo_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_summer_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_julian_bond_001",
@@ -1897,8 +2341,20 @@
     ],
     "historicalContext": "As a Morehouse student, Bond helped found SNCC in 1960 and served as its communications director, using the Student Voice newspaper to connect sit-in and voter-registration campaigns across the South.",
     "topicIds": ["civil-rights", "voting-rights", "politics"],
-    "mentionedEntityIds": ["ent_morehouse_college_001", "sncc"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_morehouse_college_001", "ent_sncc_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sncc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_morehouse_college_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_dorothy_cotton_001",
@@ -1932,8 +2388,19 @@
     ],
     "historicalContext": "Cotton was the only woman in King's closest circle of advisors and was staying in a room next to his at the Lorraine Motel the night before his 1968 assassination in Memphis.",
     "topicIds": ["civil-rights", "voting-rights", "education", "women-leaders"],
-    "mentionedEntityIds": ["ent_lorraine_motel_001", "ent_martin_luther_king_jr_001", "sclc"],
-    "keywords": []
+    "mentionedEntityIds": [
+      "ent_lorraine_motel_001",
+      "ent_martin_luther_king_jr_001",
+      "ent_sclc_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_unita_blackwell_001",
@@ -1967,8 +2434,20 @@
     ],
     "historicalContext": "Blackwell later became a MacArthur Fellow in 1992 and the first woman to preside over the National Conference of Black Mayors, translating her civil rights organizing into decades of rural municipal leadership.",
     "topicIds": ["civil-rights", "voting-rights", "women-leaders"],
-    "mentionedEntityIds": ["ent_mfdp_dnc_challenge_001", "mfdp"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_mfdp_dnc_challenge_001", "ent_mfdp_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mfdp_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_mfdp_dnc_challenge_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_vernon_dahmer_001",
@@ -2003,8 +2482,15 @@
     "historicalContext": "Dahmer was one of the state's most successful Black farmers, with several businesses and hundreds of acres under cultivation; the Mississippi Legislature designated January 10 as Vernon Dahmer Day on the 50th anniversary of his death.",
     "sensitivityClass": "violence_associated",
     "topicIds": ["civil-rights", "voting-rights"],
-    "mentionedEntityIds": ["ent_law_ku_klux_klan_act_1871", "naacp"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_law_ku_klux_klan_act_1871", "ent_naacp_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_naacp_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_cleveland_sellers_001",
@@ -2043,9 +2529,31 @@
       "ent_freedom_summer_mount_zion_001",
       "ent_orangeburg_massacre_001",
       "ent_selma_to_montgomery_marches_001",
-      "sncc"
+      "ent_sncc_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_selma_to_montgomery_marches_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_summer_mount_zion_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_orangeburg_massacre_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_wyatt_tee_walker_001",
@@ -2080,12 +2588,24 @@
     "historicalContext": "Before joining SCLC's staff, Walker led the Petersburg, Virginia NAACP branch and CORE's Virginia operations and founded the Petersburg Improvement Association, modeling it on Montgomery's boycott organization.",
     "topicIds": ["civil-rights", "organizing"],
     "mentionedEntityIds": [
-      "birmingham-campaign",
+      "ent_birmingham_campaign_001",
       "ent_law_civil_rights_act_1964",
       "ent_martin_luther_king_jr_001",
-      "sclc"
+      "ent_sclc_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_birmingham_campaign_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_001",
+        "type": "member_of",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_journey_of_reconciliation_001",
@@ -2119,8 +2639,15 @@
     ],
     "historicalContext": "Rustin's published account of his chain-gang sentence helped inspire both Rosa Parks' 1955 refusal and the 1961 Freedom Rides that retraced much of the same route with far larger numbers and national media attention.",
     "topicIds": ["civil-rights", "direct-action", "interstate-travel"],
-    "mentionedEntityIds": ["core", "ent_bayard_rustin_001", "ent_freedom_rides_museum_001"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_core_001", "ent_bayard_rustin_001", "ent_freedom_rides_museum_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_core_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_cofo_001",
@@ -2159,7 +2686,8 @@
       "ent_freedom_vote_1963_001",
       "ent_voter_education_project_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_voter_education_project_001",
@@ -2194,7 +2722,8 @@
     "historicalContext": "Rather than register voters directly, the Project granted funds to SNCC, CORE, the NAACP, SCLC, and the National Urban League for local registration drives, becoming the movement's central financial engine for voting-rights organizing in the early 1960s.",
     "topicIds": ["civil-rights", "voting-rights", "organizing", "philanthropy"],
     "mentionedEntityIds": ["ent_national_urban_league_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_freedom_vote_1963_001",
@@ -2228,8 +2757,20 @@
     ],
     "historicalContext": "The Freedom Vote's demonstration that Black Mississippians would turn out in large numbers if given a fair chance to vote directly convinced COFO organizers to recruit hundreds of out-of-state volunteers for the far larger 1964 Freedom Summer Project.",
     "topicIds": ["civil-rights", "voting-rights"],
-    "mentionedEntityIds": ["cofo", "ent_freedom_summer_mount_zion_001", "sncc"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_cofo_001", "ent_freedom_summer_mount_zion_001", "ent_sncc_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_cofo_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_deacons_for_defense_001",
@@ -2263,8 +2804,15 @@
     ],
     "historicalContext": "Composed largely of Black military veterans experienced with firearms, the Deacons operated alongside — and sometimes in tension with — nonviolent civil rights organizations, providing armed protection during CORE campaigns and the 1966 Meredith March Against Fear.",
     "topicIds": ["civil-rights", "self-defense", "organizing"],
-    "mentionedEntityIds": ["core", "ent_meredith_march_against_fear_001"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_core_001", "ent_meredith_march_against_fear_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_core_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_mfdp_dnc_challenge_001",
@@ -2298,7 +2846,525 @@
     ],
     "historicalContext": "Although the MFDP left Atlantic City without official seats, the challenge exposed the exclusion of Black voters from Southern Democratic politics on national television and drove the party's 1968 rule change barring segregated state delegations from future conventions.",
     "topicIds": ["civil-rights", "voting-rights", "politics"],
-    "mentionedEntityIds": ["ent_fannie_lou_hamer_001", "mfdp"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_fannie_lou_hamer_001", "ent_mfdp_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mfdp_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_sclc_001",
+    "kind": "organization",
+    "displayName": "Southern Christian Leadership Conference (SCLC)",
+    "summary": "Founded in Atlanta in 1957 by Black ministers and civil rights leaders including Martin Luther King Jr., the Southern Christian Leadership Conference coordinated nonviolent mass campaigns across the South — from Birmingham and St. Augustine to the Poor People's Campaign — as a clergy-led network rooted in the Montgomery bus boycott.",
+    "eraBuckets": ["1950s", "1960s"],
+    "topicTags": ["civil-rights", "organizing", "nonviolence"],
+    "jurisdictionLabel": "Atlanta, Georgia",
+    "locationPrecision": "institution",
+    "locationLabel": "Ebenezer Baptist Church area / Auburn Avenue, Atlanta",
+    "lat": 33.7554,
+    "lng": -84.3743,
+    "claims": [
+      {
+        "predicate": "founded_in",
+        "object": "January 1957 in Atlanta as a permanent organization emerging from the Montgomery Improvement Association network, with Martin Luther King Jr. as its first president",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/southern-christian-leadership-conference.htm",
+        "citationLabel": "National Park Service: Southern Christian Leadership Conference"
+      },
+      {
+        "predicate": "coordinated",
+        "object": "nonviolent direct-action campaigns including the 1963 Birmingham Campaign, the St. Augustine movement, and the 1968 Poor People's Campaign",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/southern-christian-leadership-conference.htm",
+        "citationLabel": "National Park Service: Southern Christian Leadership Conference"
+      }
+    ],
+    "historicalContext": "SCLC gave the Montgomery bus boycott's clergy leadership a regional structure. Unlike SNCC's student-led field organizing, SCLC centered ministers and church networks while collaborating (and sometimes competing) with SNCC, CORE, and the NAACP on shared campaigns.",
+    "topicIds": ["civil-rights", "organizing", "nonviolence"],
+    "mentionedEntityIds": [
+      "ent_sclc_founding_001",
+      "ent_martin_luther_king_jr_001",
+      "ent_ralph_abernathy_001",
+      "ent_birmingham_campaign_001",
+      "ent_montgomery_bus_boycott_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_founding_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_ebenezer_baptist_atlanta_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sclc_founding_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_birmingham_campaign_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_montgomery_bus_boycott_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_sncc_001",
+    "kind": "organization",
+    "displayName": "Student Nonviolent Coordinating Committee (SNCC)",
+    "summary": "Formed at Shaw University in April 1960 under Ella Baker's convening, SNCC became the student-led engine of sit-ins, Freedom Rides follow-on work, Mississippi voter registration, Freedom Summer, and the Lowndes County Freedom Organization — prioritizing local leadership over top-down celebrity.",
+    "eraBuckets": ["1960s"],
+    "topicTags": ["civil-rights", "organizing", "student-activism"],
+    "jurisdictionLabel": "Raleigh, North Carolina",
+    "locationPrecision": "campus",
+    "locationLabel": "Shaw University, Raleigh (founding conference)",
+    "lat": 35.77207,
+    "lng": -78.6382,
+    "claims": [
+      {
+        "predicate": "founded_at",
+        "object": "Shaw University in Raleigh, North Carolina, over Easter weekend April 1960, when Ella Baker convened 126 student sit-in leaders who formed an independent coordinating committee",
+        "confidenceLevel": "high",
+        "citationSource": "snccdigital.org",
+        "citationHref": "https://snccdigital.org/events/founding-of-sncc/",
+        "citationLabel": "SNCC Digital Gateway: Founding of SNCC"
+      },
+      {
+        "predicate": "organized",
+        "object": "statewide voter-registration and Freedom Summer projects in Mississippi through COFO, and fielded organizers across the Deep South including Southwest Georgia and the Alabama Black Belt",
+        "confidenceLevel": "high",
+        "citationSource": "snccdigital.org",
+        "citationHref": "https://snccdigital.org/inside-sncc/",
+        "citationLabel": "SNCC Digital Gateway: Inside SNCC"
+      }
+    ],
+    "historicalContext": "SNCC's \"group-centered leadership\" model, urged by Baker, distinguished it from SCLC. By the mid-1960s its program ranged from nonviolent direct action to Black Power politics, while remaining a primary target of white supremacist violence in Mississippi and Alabama.",
+    "topicIds": ["civil-rights", "organizing", "student-activism"],
+    "mentionedEntityIds": [
+      "ent_sncc_founding_001",
+      "ent_ella_baker_001",
+      "ent_freedom_summer_001",
+      "ent_freedom_rides_001",
+      "ent_cofo_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sncc_founding_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_shaw_university_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_founding_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_summer_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_rides_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_cofo_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_core_001",
+    "kind": "organization",
+    "displayName": "Congress of Racial Equality (CORE)",
+    "summary": "Founded in Chicago in 1942 by an interracial Fellowship of Reconciliation circle including James Farmer, CORE pioneered sit-ins and interracial nonviolent direct action, later organizing the 1947 Journey of Reconciliation and helping launch the 1961 Freedom Rides.",
+    "eraBuckets": ["1940s", "1960s"],
+    "topicTags": ["civil-rights", "organizing", "direct-action", "nonviolence"],
+    "jurisdictionLabel": "Chicago, Illinois",
+    "locationPrecision": "city",
+    "locationLabel": "Hyde Park, Chicago (founding)",
+    "lat": 41.7943,
+    "lng": -87.5907,
+    "claims": [
+      {
+        "predicate": "founded_in",
+        "object": "1942 in Chicago by interracial students and pacifists associated with the Fellowship of Reconciliation, including James Farmer",
+        "confidenceLevel": "high",
+        "citationSource": "history.com",
+        "citationHref": "https://www.history.com/articles/congress-of-racial-equality",
+        "citationLabel": "HISTORY: Congress of Racial Equality (CORE)"
+      },
+      {
+        "predicate": "organized",
+        "object": "the 1947 Journey of Reconciliation through the Upper South and partnered on the 1961 Freedom Rides challenging segregated interstate travel",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/freedomrides.htm",
+        "citationLabel": "National Park Service: Freedom Rides"
+      }
+    ],
+    "historicalContext": "CORE's early experiments with Gandhian nonviolence shaped later mass campaigns. In the 1960s it worked alongside SNCC and COFO in the Deep South while maintaining chapters nationwide.",
+    "topicIds": ["civil-rights", "organizing", "direct-action", "nonviolence"],
+    "mentionedEntityIds": [
+      "ent_core_founding_001",
+      "ent_journey_of_reconciliation_001",
+      "ent_freedom_rides_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_core_founding_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_journey_of_reconciliation_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_core_founding_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_rides_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_mfdp_001",
+    "kind": "organization",
+    "displayName": "Mississippi Freedom Democratic Party (MFDP)",
+    "summary": "Organized in 1964 as an integrated alternative to Mississippi's segregated regular Democratic Party, the MFDP ran parallel primaries, sent a 68-delegate challenge delegation to the Atlantic City convention, and forced a national reckoning over Black political exclusion in the South.",
+    "eraBuckets": ["1960s"],
+    "topicTags": ["civil-rights", "voting-rights", "politics"],
+    "jurisdictionLabel": "Jackson, Mississippi",
+    "locationPrecision": "city",
+    "locationLabel": "Jackson, Mississippi (state organizing base)",
+    "lat": 32.2988,
+    "lng": -90.1848,
+    "claims": [
+      {
+        "predicate": "formed_in",
+        "object": "1964 to provide an open, integrated Democratic Party structure for Mississippi voters excluded from the segregated regular party",
+        "confidenceLevel": "high",
+        "citationSource": "blackpast.org",
+        "citationHref": "https://blackpast.org/african-american-history/mississippi-freedom-democratic-party/",
+        "citationLabel": "BlackPast.org: Mississippi Freedom Democratic Party"
+      },
+      {
+        "predicate": "challenged",
+        "object": "the seating of Mississippi's all-white regular delegation at the August 1964 Democratic National Convention in Atlantic City",
+        "confidenceLevel": "high",
+        "citationSource": "blackpast.org",
+        "citationHref": "https://blackpast.org/african-american-history/mississippi-freedom-democratic-party/",
+        "citationLabel": "BlackPast.org: Mississippi Freedom Democratic Party"
+      }
+    ],
+    "historicalContext": "Built through COFO's Freedom Vote and Freedom Summer infrastructure, the MFDP made Fannie Lou Hamer's testimony a national broadcast moment and helped set the stage for later Democratic Party reforms on delegate selection.",
+    "topicIds": ["civil-rights", "voting-rights", "politics"],
+    "mentionedEntityIds": [
+      "ent_mfdp_dnc_challenge_001",
+      "ent_fannie_lou_hamer_001",
+      "ent_cofo_001",
+      "ent_freedom_summer_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mfdp_dnc_challenge_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_cofo_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_summer_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_mfdp_dnc_challenge_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_birmingham_campaign_001",
+    "kind": "event",
+    "displayName": "Birmingham Campaign",
+    "summary": "In spring 1963, SCLC and the Alabama Christian Movement for Human Rights led by Fred Shuttlesworth confronted Birmingham's segregation laws with mass marches, a downtown boycott, and the children's crusade — drawing national attention after police used dogs and fire hoses, and helping build momentum for the March on Washington and federal civil rights legislation.",
+    "eraBuckets": ["1960s"],
+    "topicTags": ["civil-rights", "direct-action", "nonviolence"],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "city",
+    "locationLabel": "Kelly Ingram Park / 16th Street Baptist Church area, Birmingham",
+    "lat": 33.5165,
+    "lng": -86.8118,
+    "claims": [
+      {
+        "predicate": "launched_in",
+        "object": "April–May 1963 in Birmingham as Project C (\"Confrontation\"), coordinated by SCLC with local leadership from Fred Shuttlesworth's Alabama Christian Movement for Human Rights",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/birminghamcampaign.htm",
+        "citationLabel": "National Park Service: Birmingham Campaign"
+      },
+      {
+        "predicate": "drew_national_attention_when",
+        "object": "Birmingham police under Eugene \"Bull\" Connor used dogs and fire hoses against demonstrators, including children, images that circulated nationwide in May 1963",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/birminghamcampaign.htm",
+        "citationLabel": "National Park Service: Birmingham Campaign"
+      }
+    ],
+    "historicalContext": "King's \"Letter from Birmingham Jail,\" written during his April arrest, and the children's marches from 16th Street Baptist Church made Birmingham a turning point. The A.G. Gaston Motel served as SCLC headquarters; Kelly Ingram Park was the street-level stage.",
+    "topicIds": ["civil-rights", "direct-action", "nonviolence"],
+    "mentionedEntityIds": [
+      "ent_sclc_001",
+      "ent_fred_shuttlesworth_001",
+      "ent_martin_luther_king_jr_001",
+      "ent_gaston_motel_001",
+      "ent_kelly_ingram_park_001",
+      "ent_birmingham_civil_rights_institute_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_sclc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_gaston_motel_001",
+        "type": "occurred_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_kelly_ingram_park_001",
+        "type": "occurred_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_birmingham_civil_rights_institute_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_freedom_rides_001",
+    "kind": "event",
+    "displayName": "Freedom Rides (1961)",
+    "summary": "Beginning in May 1961, interracial teams organized by CORE — soon joined by SNCC and others — rode interstate buses through the South to enforce Supreme Court bans on segregated travel, facing mob violence in Alabama and filling Mississippi jails, until the Interstate Commerce Commission ordered desegregation of bus terminals.",
+    "eraBuckets": ["1960s"],
+    "topicTags": ["civil-rights", "direct-action", "nonviolence"],
+    "jurisdictionLabel": "Montgomery, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "Montgomery Greyhound Station (Freedom Rides Museum)",
+    "lat": 32.3765,
+    "lng": -86.3087,
+    "claims": [
+      {
+        "predicate": "began_in",
+        "object": "May 1961 when CORE launched interracial Freedom Ride teams from Washington, D.C., into the Deep South to test Boynton v. Virginia and related interstate travel rulings",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/freedomrides.htm",
+        "citationLabel": "National Park Service: Freedom Rides"
+      },
+      {
+        "predicate": "met_violence_in",
+        "object": "Anniston, Birmingham, and Montgomery, Alabama, where riders were beaten and buses attacked before continuing into Mississippi under federal and movement pressure",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/freedomrides.htm",
+        "citationLabel": "National Park Service: Freedom Rides"
+      }
+    ],
+    "historicalContext": "The rides forced a federal response and trained a generation of organizers who later staffed SNCC and COFO projects. The Montgomery Greyhound station is now the Freedom Rides Museum.",
+    "topicIds": ["civil-rights", "direct-action", "nonviolence"],
+    "mentionedEntityIds": [
+      "ent_core_001",
+      "ent_sncc_001",
+      "ent_freedom_rides_museum_001",
+      "ent_diane_nash_001",
+      "ent_john_lewis_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_core_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_rides_museum_001",
+        "type": "occurred_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_freedom_summer_001",
+    "kind": "event",
+    "displayName": "Freedom Summer (1964)",
+    "summary": "In 1964, COFO brought roughly a thousand volunteers — many northern students — into Mississippi for a statewide voter-registration, Freedom School, and MFDP organizing project. The season was marked by the murders of Chaney, Goodman, and Schwerner and by the MFDP's challenge at the Democratic National Convention.",
+    "eraBuckets": ["1960s"],
+    "topicTags": ["civil-rights", "voting-rights", "organizing"],
+    "jurisdictionLabel": "Jackson, Mississippi",
+    "locationPrecision": "city",
+    "locationLabel": "Jackson, Mississippi (COFO statewide headquarters)",
+    "lat": 32.2988,
+    "lng": -90.1848,
+    "claims": [
+      {
+        "predicate": "organized_by",
+        "object": "the Council of Federated Organizations (COFO) in summer 1964 as a statewide Mississippi project combining voter registration, Freedom Schools, and the Mississippi Freedom Democratic Party",
+        "confidenceLevel": "high",
+        "citationSource": "snccdigital.org",
+        "citationHref": "https://snccdigital.org/events/freedom-summer/",
+        "citationLabel": "SNCC Digital Gateway: Freedom Summer"
+      },
+      {
+        "predicate": "drew_national_attention_after",
+        "object": "the June 1964 murders of James Chaney, Andrew Goodman, and Michael Schwerner near Philadelphia, Mississippi, during the project's opening weeks",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/articles/freedomsummer.htm",
+        "citationLabel": "National Park Service: Freedom Summer"
+      }
+    ],
+    "historicalContext": "Freedom Summer grew from the 1963 Freedom Vote and Bob Moses's SNCC Mississippi work. Local Black leadership remained central even as national media focused on white volunteers; the MFDP challenge carried the season's political demand to Atlantic City.",
+    "topicIds": ["civil-rights", "voting-rights", "organizing"],
+    "mentionedEntityIds": [
+      "ent_cofo_001",
+      "ent_robert_moses_001",
+      "ent_mfdp_001",
+      "ent_freedom_summer_mount_zion_001",
+      "ent_sncc_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_cofo_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_freedom_summer_mount_zion_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_mfdp_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_sncc_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_little_rock_nine_001",
+    "kind": "movement",
+    "displayName": "Little Rock Nine",
+    "summary": "Nine Black students who, with NAACP support led locally by Daisy Bates, entered Little Rock Central High School in September 1957 under federal troop escort after Arkansas officials blocked desegregation — becoming the emblematic test of Brown v. Board in the South.",
+    "eraBuckets": ["1950s"],
+    "topicTags": ["civil-rights", "education", "desegregation"],
+    "jurisdictionLabel": "Little Rock, Arkansas",
+    "locationPrecision": "campus",
+    "locationLabel": "Little Rock Central High School, Little Rock",
+    "lat": 34.7368,
+    "lng": -92.2982,
+    "claims": [
+      {
+        "predicate": "entered",
+        "object": "Little Rock Central High School on September 25, 1957, under escort of the 101st Airborne after President Eisenhower federalized the Arkansas National Guard",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/chsc/learn/historyculture/index.htm",
+        "citationLabel": "National Park Service: Little Rock Central High School NHS"
+      },
+      {
+        "predicate": "supported_by",
+        "object": "the Arkansas NAACP and Daisy Bates, who mentored the students through the 1957–58 school year of harassment and state resistance",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/people/daisy-bates.htm",
+        "citationLabel": "National Park Service: Daisy Bates"
+      }
+    ],
+    "historicalContext": "The crisis made Little Rock a worldwide symbol of massive resistance. The students' endurance, Bates's organizing, and federal enforcement together defined a pivotal early implementation fight after Brown.",
+    "topicIds": ["civil-rights", "education", "desegregation"],
+    "mentionedEntityIds": [
+      "ent_daisy_bates_001",
+      "ent_little_rock_central_high_school_001",
+      "ent_little_rock_school_desegregation_crisis_001",
+      "ent_naacp_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_little_rock_school_desegregation_crisis_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_little_rock_central_high_school_001",
+        "type": "located_at",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_little_rock_central_high_school_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_naacp_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   }
 ]

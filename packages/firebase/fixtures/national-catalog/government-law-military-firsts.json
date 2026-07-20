@@ -32,7 +32,8 @@
     "historicalContext": "Revels is anchored at Alcorn rather than the U.S. Capitol because his most enduring legacy was institutional: he left the Senate after roughly a year to build the college he considered his life's real work.",
     "topicIds": ["reconstruction", "firsts", "senate", "education"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_joseph_rainey_001",
@@ -67,7 +68,14 @@
     "historicalContext": "Rainey later became, on April 29, 1874, the first Black member to preside over the House chamber, overseeing debate as Speaker pro tempore.",
     "topicIds": ["reconstruction", "firsts", "house-of-representatives"],
     "mentionedEntityIds": ["ent_fort_concho_nhl_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_fort_concho_nhl_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_blanche_k_bruce_001",
@@ -102,7 +110,8 @@
     "historicalContext": "Bruce is anchored at his Virginia birthplace marker rather than his Senate seat or his later Washington, D.C. career, since it is the site most directly and durably commemorated in his honor.",
     "topicIds": ["reconstruction", "firsts", "senate"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_pbs_pinchback_001",
@@ -137,7 +146,8 @@
     "historicalContext": "Before his brief governorship, Pinchback had already become president pro tempore of the Louisiana State Senate and acting lieutenant governor after Oscar Dunn's death in 1871.",
     "topicIds": ["reconstruction", "firsts", "governors"],
     "mentionedEntityIds": ["ent_southern_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_jonathan_jasper_wright_001",
@@ -172,7 +182,8 @@
     "historicalContext": "Wright served on the court for nearly seven years and wrote roughly ninety opinions; he remained the only Black state supreme court justice in the country for almost a century after Reconstruction ended.",
     "topicIds": ["reconstruction", "firsts", "judiciary"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_robert_smalls_001",
@@ -207,7 +218,19 @@
     "historicalContext": "Smalls represented Beaufort in Congress for five terms between 1875 and 1887 and rose to major general in the South Carolina militia, one of the era's most decorated Black public figures.",
     "topicIds": ["reconstruction", "firsts", "house-of-representatives", "civil-war"],
     "mentionedEntityIds": ["ent_core_founding_001", "ent_fort_concho_nhl_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_core_founding_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_fort_concho_nhl_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_john_mercer_langston_001",
@@ -242,7 +265,19 @@
     "historicalContext": "Until 1992, Langston remained the only Black Virginian ever elected to Congress; he was also the great-uncle of poet Langston Hughes.",
     "topicIds": ["reconstruction", "firsts", "education", "house-of-representatives"],
     "mentionedEntityIds": ["ent_howard_university_001", "ent_langston_hughes_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_howard_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_langston_hughes_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_macon_bolling_allen_001",
@@ -277,7 +312,8 @@
     "historicalContext": "Allen later moved to Charleston, South Carolina, where his firm, Whipper, Elliott, and Allen, is recognized as the first known African American law firm in the country.",
     "topicIds": ["firsts", "law"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_charlotte_e_ray_001",
@@ -312,7 +348,8 @@
     "historicalContext": "Discrimination against both her race and her gender made it impossible to sustain a law practice, and Ray later moved to New York to teach; her bar admission nonetheless became a legal precedent cited by women in other states.",
     "topicIds": ["firsts", "law", "education"],
     "mentionedEntityIds": ["ent_howard_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mifflin_wistar_gibbs_001",
@@ -347,7 +384,8 @@
     "historicalContext": "Gibbs later served as U.S. consul to Madagascar and lived out his life in Little Rock, where he died in 1915.",
     "topicIds": ["reconstruction", "firsts", "judiciary"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_john_roy_lynch_001",
@@ -382,7 +420,8 @@
     "historicalContext": "The Old Capitol, now a state history museum, maintains a permanent exhibit honoring Lynch's tenure as speaker.",
     "topicIds": ["reconstruction", "firsts", "house-of-representatives"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_alexander_augusta_001",
@@ -417,7 +456,14 @@
     "historicalContext": "Augusta also became the first Black professor of medicine in the United States, teaching at the newly founded Howard University Medical School after the war.",
     "topicIds": ["firsts", "military", "civil-war", "medicine"],
     "mentionedEntityIds": ["ent_howard_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_howard_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_martin_delany_001",
@@ -452,7 +498,8 @@
     "historicalContext": "Delany was among the era's leading proponents of Black nationalism and emigration before the war, then served the Union cause directly as its highest-ranking Black officer.",
     "topicIds": ["firsts", "military", "civil-war"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_william_harvey_carney_001",
@@ -487,7 +534,8 @@
     "historicalContext": "Carney later became one of the first documented Black postal mail carriers in New Bedford, Massachusetts.",
     "topicIds": ["firsts", "military", "civil-war"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_carl_stokes_001",
@@ -522,7 +570,8 @@
     "historicalContext": "Stokes took office the same day as Richard Hatcher of Gary, Indiana, though Stokes was inaugurated first.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": ["ent_richard_hatcher_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_richard_hatcher_001",
@@ -557,7 +606,8 @@
     "historicalContext": "Hatcher's win and Stokes's win came in the same November 1967 elections, marking the first wave of Black mayors elected in major American cities.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": ["ent_carl_stokes_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_coleman_young_001",
@@ -592,7 +642,8 @@
     "historicalContext": "Young's platform centered on police reform; as mayor, he disbanded the controversial STRESS police unit and expanded integration within the department.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_tom_bradley_001",
@@ -627,7 +678,8 @@
     "historicalContext": "Bradley rose to lieutenant in the LAPD, the highest rank a Black officer had achieved at the time, before turning to elected office.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_harold_washington_001",
@@ -662,7 +714,14 @@
     "historicalContext": "Washington's multiracial coalition and progressive agenda are widely cited as an early influence on Barack Obama's political career in Chicago.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": ["ent_barack_obama_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_barack_obama_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_david_dinkins_001",
@@ -697,7 +756,8 @@
     "historicalContext": "Before becoming mayor, Dinkins served in the New York State Assembly and as Manhattan borough president.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_wilson_goode_001",
@@ -732,7 +792,8 @@
     "historicalContext": "Goode's election capped decades of civil rights organizing and demographic change in Philadelphia city politics.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_willie_brown_001",
@@ -767,7 +828,8 @@
     "historicalContext": "Brown's fourteen years as Assembly speaker made him one of the most powerful Black elected officials in the country before he turned to City Hall.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_kenneth_gibson_001",
@@ -802,7 +864,8 @@
     "historicalContext": "Gibson served sixteen years as mayor of Newark, from 1970 to 1986, guiding the city through a period of significant fiscal and social strain.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_maynard_jackson_001",
@@ -837,7 +900,8 @@
     "historicalContext": "Jackson's administration required that Black-owned firms receive a substantial share of contracts for the new Hartsfield-Jackson airport terminal, a landmark minority-inclusion program.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ernest_morial_001",
@@ -872,7 +936,8 @@
     "historicalContext": "Morial was married to civil rights activist Sybil Haydel Morial, and their son Marc Morial later served as New Orleans mayor from 1994 to 2002.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_sharon_pratt_001",
@@ -907,7 +972,8 @@
     "historicalContext": "Pratt served one term as mayor, from 1991 to 1995, governing from the John A. Wilson Building, seat of the District's government.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_karen_bass_001",
@@ -942,7 +1008,8 @@
     "historicalContext": "Bass anchors this record at Los Angeles City Hall, the site of her mayoral inauguration, though her first legislative-leadership milestone occurred in Sacramento.",
     "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_oscar_de_priest_001",
@@ -977,7 +1044,8 @@
     "historicalContext": "De Priest was the first Black member of Congress since George White of North Carolina left office in 1901, ending a 28-year absence of Black representation in Washington.",
     "topicIds": ["firsts", "house-of-representatives"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_shirley_chisholm_001",
@@ -1012,7 +1080,14 @@
     "historicalContext": "Chisholm represented her Brooklyn district for seven terms, from 1969 to 1983, and was a founding member of the Congressional Black Caucus in 1971.",
     "topicIds": ["firsts", "house-of-representatives"],
     "mentionedEntityIds": ["ent_mfdp_dnc_challenge_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mfdp_dnc_challenge_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_edward_brooke_001",
@@ -1047,7 +1122,8 @@
     "historicalContext": "In the Senate, Brooke co-authored the Fair Housing Act of 1968 and became the first Black senator ever re-elected, in 1972.",
     "topicIds": ["firsts", "senate"],
     "mentionedEntityIds": ["ent_law_fair_housing_act_1968"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_barbara_jordan_001",
@@ -1082,7 +1158,19 @@
     "historicalContext": "Jordan gained further national attention for her televised opening statement during the 1974 House Judiciary Committee hearings on the impeachment of Richard Nixon.",
     "topicIds": ["firsts", "house-of-representatives"],
     "mentionedEntityIds": ["ent_andrew_young_001", "ent_mfdp_dnc_challenge_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_andrew_young_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_mfdp_dnc_challenge_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_andrew_young_001",
@@ -1117,7 +1205,8 @@
     "historicalContext": "Young later served as mayor of Atlanta from 1982 to 1990, continuing a career that spanned the civil rights movement, Congress, diplomacy, and city government.",
     "topicIds": ["firsts", "house-of-representatives"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_douglas_wilder_001",
@@ -1152,7 +1241,8 @@
     "historicalContext": "Wilder had previously served as Virginia's first Black lieutenant governor, elected in 1985, before his historic 1989 gubernatorial win.",
     "topicIds": ["firsts", "governors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_carol_moseley_braun_001",
@@ -1187,7 +1277,8 @@
     "historicalContext": "After leaving the Senate, Moseley Braun served as U.S. Ambassador to New Zealand and Samoa from 1999 to 2001.",
     "topicIds": ["firsts", "senate"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_deval_patrick_001",
@@ -1222,7 +1313,14 @@
     "historicalContext": "Patrick's election followed the state's first Democratic governor since Michael Dukakis left office in 1991.",
     "topicIds": ["firsts", "governors"],
     "mentionedEntityIds": ["ent_douglas_wilder_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_douglas_wilder_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_david_paterson_001",
@@ -1257,7 +1355,8 @@
     "historicalContext": "Paterson was also the first legally blind person to serve as governor of a U.S. state.",
     "topicIds": ["firsts", "governors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_augustus_hawkins_001",
@@ -1292,7 +1391,8 @@
     "historicalContext": "Hawkins later co-authored the Humphrey-Hawkins Full Employment Act of 1978, one of the signature legislative achievements of his congressional career.",
     "topicIds": ["firsts", "house-of-representatives"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_william_l_dawson_001",
@@ -1327,7 +1427,8 @@
     "historicalContext": "Dawson's committee chairmanship predated Adam Clayton Powell Jr.'s better-known 1961 chairmanship of the Education and Labor Committee by more than a decade.",
     "topicIds": ["firsts", "house-of-representatives"],
     "mentionedEntityIds": ["ent_adam_clayton_powell_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_adam_clayton_powell_001",
@@ -1362,7 +1463,8 @@
     "historicalContext": "Powell represented New York's Harlem-based district for thirteen terms before the House Democratic Caucus stripped his chairmanship in January 1967 amid a contempt case and ethics disputes.",
     "topicIds": ["firsts", "house-of-representatives"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mervyn_dymally_001",
@@ -1397,7 +1499,8 @@
     "historicalContext": "Dymally and George L. Brown of Colorado, elected the same year, were the first two African Americans elected lieutenant governor since Oscar Dunn's Reconstruction-era tenure in Louisiana.",
     "topicIds": ["firsts", "governors"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_robert_c_weaver_001",
@@ -1432,7 +1535,14 @@
     "historicalContext": "As HUD secretary, Weaver championed the Fair Housing Act of 1968, which banned housing discrimination nationwide.",
     "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": ["ent_law_fair_housing_act_1968"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_fair_housing_act_1968",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_patricia_roberts_harris_001",
@@ -1467,7 +1577,14 @@
     "historicalContext": "Harris served in the same HUD headquarters building later named for her Cabinet predecessor Robert C. Weaver, the first Black Cabinet secretary.",
     "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": ["ent_robert_c_weaver_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_robert_c_weaver_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_thurgood_marshall_001",
@@ -1502,7 +1619,14 @@
     "historicalContext": "Marshall served on the Supreme Court for 24 years, until 1991, consistently opposing the death penalty and defending civil rights and affirmative action.",
     "topicIds": ["firsts", "supreme-court", "judiciary"],
     "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_case_brown_v_board_of_education_1954",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_constance_baker_motley_001",
@@ -1537,7 +1661,8 @@
     "historicalContext": "Motley later served as Chief Judge of the Southern District of New York from 1982 to 1986, after facing a seven-month confirmation delay led by Senator James Eastland.",
     "topicIds": ["firsts", "judiciary"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_jane_bolin_001",
@@ -1572,7 +1697,8 @@
     "historicalContext": "Bolin served on the bench for forty years, through three renewed appointments, remaining the only Black woman judge in the country for two decades.",
     "topicIds": ["firsts", "judiciary"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_william_henry_hastie_001",
@@ -1607,7 +1733,8 @@
     "historicalContext": "Hastie later served as a member of the Judicial Conference of the United States and assumed senior status on the Third Circuit in 1971.",
     "topicIds": ["firsts", "judiciary"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ron_brown_001",
@@ -1642,7 +1769,8 @@
     "historicalContext": "Brown had previously chaired the Democratic National Committee from 1987 to 1993, the first African American to lead a major U.S. political party.",
     "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mike_espy_001",
@@ -1677,7 +1805,8 @@
     "historicalContext": "Espy resigned as Agriculture Secretary in October 1994 amid a gifts investigation and was later acquitted of all charges in 1998.",
     "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_alexis_herman_001",
@@ -1712,7 +1841,8 @@
     "historicalContext": "Herman served as Secretary of Labor from 1997 to 2001, under President Clinton.",
     "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_william_t_coleman_001",
@@ -1747,7 +1877,8 @@
     "historicalContext": "Coleman was awarded the Presidential Medal of Freedom in 1995 for a career spanning civil rights litigation and federal service.",
     "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954", "ent_robert_c_weaver_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_jesse_brown_001",
@@ -1782,7 +1913,8 @@
     "historicalContext": "Brown led the VA from 1993 to 1997, expanding services for female, homeless, and chemically exposed veterans while increasing the department's funding.",
     "topicIds": ["firsts", "cabinet", "military"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_hazel_oleary_001",
@@ -1817,7 +1949,8 @@
     "historicalContext": "O'Leary served as Energy Secretary from 1993 to 1997 under President Clinton.",
     "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_franklin_raines_001",
@@ -1852,7 +1985,8 @@
     "historicalContext": "Raines's OMB tenure came amid a wave of Clinton-era Black Cabinet-level appointments across federal agencies.",
     "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_rod_paige_001",
@@ -1887,7 +2021,8 @@
     "historicalContext": "Paige served as Education Secretary from 2001 to 2005 and was central to developing the No Child Left Behind Act of 2002.",
     "topicIds": ["firsts", "cabinet", "education"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_colin_powell_001",
@@ -1922,7 +2057,19 @@
     "historicalContext": "Powell served as Chairman of the Joint Chiefs at the Pentagon before his later Cabinet post; he remained, with successor Condoleezza Rice, the highest-ranking Black American in the federal executive branch until Barack Obama's 2008 election.",
     "topicIds": ["firsts", "military", "cabinet"],
     "mentionedEntityIds": ["ent_barack_obama_001", "ent_condoleezza_rice_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_barack_obama_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_condoleezza_rice_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_condoleezza_rice_001",
@@ -1957,7 +2104,14 @@
     "historicalContext": "Rice was the second consecutive Black Secretary of State, following Colin Powell, during the George W. Bush administration.",
     "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": ["ent_colin_powell_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_colin_powell_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_eric_holder_001",
@@ -1992,7 +2146,8 @@
     "historicalContext": "Holder's tenure spanned the first six years of the Obama administration, including major civil rights and voting rights enforcement initiatives.",
     "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_barack_obama_001",
@@ -2027,7 +2182,8 @@
     "historicalContext": "Obama took his oath on the Bible used at Abraham Lincoln's first 1861 inauguration, administered by Chief Justice John Roberts.",
     "topicIds": ["firsts", "president"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_kamala_harris_001",
@@ -2062,7 +2218,14 @@
     "historicalContext": "Harris was sworn in on the 100th anniversary year of the ratification of women's suffrage in the United States.",
     "topicIds": ["firsts", "vice-president"],
     "mentionedEntityIds": ["ent_thurgood_marshall_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_thurgood_marshall_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_ketanji_brown_jackson_001",
@@ -2097,7 +2260,8 @@
     "historicalContext": "The Senate confirmed Jackson 53-47 in April 2022; she took her seat when Justice Stephen Breyer's retirement took effect that June.",
     "topicIds": ["firsts", "supreme-court", "judiciary"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_loretta_lynch_001",
@@ -2132,7 +2296,8 @@
     "historicalContext": "As Attorney General from 2015 to 2017, Lynch prioritized police reform, opening a civil rights investigation of the Baltimore Police Department in her first weeks in office.",
     "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_susan_rice_001",
@@ -2167,7 +2332,14 @@
     "historicalContext": "Rice's UN ambassadorship anchors this record since it was her first singular \"first,\" carried out from the U.S. Mission's headquarters across from UN headquarters in New York.",
     "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": ["ent_condoleezza_rice_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_condoleezza_rice_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_lloyd_austin_001",
@@ -2202,7 +2374,14 @@
     "historicalContext": "Austin served as a four-star Army general before his Cabinet appointment, leading U.S. Central Command from 2013 to 2016.",
     "topicIds": ["firsts", "cabinet", "military"],
     "mentionedEntityIds": ["ent_kamala_harris_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_kamala_harris_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_henry_o_flipper_001",
@@ -2237,7 +2416,8 @@
     "historicalContext": "Flipper was dismissed from the Army in 1882 on disputed charges; the Army upgraded his discharge to honorable in 1976, and President Clinton granted him a full pardon in 1999.",
     "topicIds": ["firsts", "military", "army"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_benjamin_davis_sr_001",
@@ -2272,7 +2452,14 @@
     "historicalContext": "From 1941 to 1944, Davis Sr. conducted inspection tours of African American Army units and advised on policies affecting Black troop deployment and training.",
     "topicIds": ["firsts", "military", "army"],
     "mentionedEntityIds": ["ent_benjamin_davis_jr_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_benjamin_davis_jr_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_benjamin_davis_jr_001",
@@ -2307,7 +2494,19 @@
     "historicalContext": "The Tuskegee Airmen under Davis Jr.'s command flew more than 15,000 sorties and shot down 112 enemy aircraft, one of the most decorated fighter units of the war.",
     "topicIds": ["firsts", "military", "air-force"],
     "mentionedEntityIds": ["ent_benjamin_davis_sr_001", "ent_tuskegee_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_benjamin_davis_sr_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_tuskegee_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_charles_young_001",
@@ -2342,7 +2541,8 @@
     "historicalContext": "In 1916, Young led a cavalry charge against Pancho Villa's forces in Mexico without losing a single soldier, one of the highlights of a career that also included service as the first Black U.S. national park superintendent.",
     "topicIds": ["firsts", "military", "army"],
     "mentionedEntityIds": ["ent_wilberforce_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_doris_miller_001",
@@ -2377,7 +2577,8 @@
     "historicalContext": "Miller was killed in action in November 1943 when his escort carrier, USS Liscome Bay, was torpedoed during the Gilbert Islands campaign.",
     "topicIds": ["firsts", "military", "navy"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_vernon_baker_001",
@@ -2412,7 +2613,14 @@
     "historicalContext": "A 1993 Army-commissioned Shaw University study found systematic racial discrimination had denied Black World War II soldiers Medal of Honor consideration, leading to the 1997 awards.",
     "topicIds": ["firsts", "military", "army"],
     "mentionedEntityIds": ["ent_shaw_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_shaw_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_marcelite_harris_001",
@@ -2447,7 +2655,8 @@
     "historicalContext": "Harris retired in 1997 as the highest-ranking female officer in the Air Force and the nation's highest-ranking African American woman in the Department of Defense.",
     "topicIds": ["firsts", "military", "air-force"],
     "mentionedEntityIds": ["ent_spelman_college_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_michelle_howard_001",
@@ -2482,7 +2691,8 @@
     "historicalContext": "Howard graduated from the U.S. Naval Academy in 1982 and went on to command U.S. Naval Forces Europe-Africa and NATO's Allied Joint Force Command Naples from 2016 to 2017.",
     "topicIds": ["firsts", "military", "navy"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_roscoe_robinson_001",
@@ -2517,7 +2727,8 @@
     "historicalContext": "Robinson died in 1993 at Walter Reed Army Medical Center and was buried at Arlington National Cemetery.",
     "topicIds": ["firsts", "military", "army"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_daniel_chappie_james_001",
@@ -2552,7 +2763,8 @@
     "historicalContext": "James trained Black pilots at Tuskegee during World War II before a combat career spanning the Korean and Vietnam wars.",
     "topicIds": ["firsts", "military", "air-force"],
     "mentionedEntityIds": ["ent_tuskegee_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_samuel_gravely_001",
@@ -2587,7 +2799,8 @@
     "historicalContext": "Gravely is buried in Section 66 of Arlington National Cemetery following his death in 2004.",
     "topicIds": ["firsts", "military", "navy"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_frank_petersen_001",
@@ -2622,7 +2835,8 @@
     "historicalContext": "Petersen retired in 1988 after 38 years of service and was buried at Arlington National Cemetery following his death in 2015.",
     "topicIds": ["firsts", "military", "marine-corps"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_hazel_johnson_brown_001",
@@ -2657,7 +2871,8 @@
     "historicalContext": "Johnson-Brown served in the Army from 1955 to 1983 and went on to earn a doctorate in educational administration from the Catholic University of America.",
     "topicIds": ["firsts", "military", "army", "medicine"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_charity_adams_earley_001",
@@ -2692,7 +2907,8 @@
     "historicalContext": "In 1945, Adams commanded the 6888th Central Postal Directory Battalion, the only African American and multi-ethnic WAC unit deployed overseas, which cleared a six-month mail backlog in England in three months; she and the battalion received the Congressional Gold Medal in 2022.",
     "topicIds": ["firsts", "military", "army"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_nancy_leftenant_colon_001",
@@ -2727,7 +2943,14 @@
     "historicalContext": "Leftenant-Colon later served as a flight nurse in the Air Force and died in Amityville, New York, in January 2025 at age 104.",
     "topicIds": ["firsts", "military", "army", "medicine"],
     "mentionedEntityIds": ["ent_law_executive_order_9981_1948"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_executive_order_9981_1948",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_frederick_douglass_gov_001",
@@ -2762,7 +2985,8 @@
     "historicalContext": "This record is anchored at Cedar Hill, Douglass's Anacostia home from 1877 until his death in 1895, as his primary documented Washington residence during the years of both these government-related firsts; the site itself is catalogued separately as an existing place-kind entry.",
     "topicIds": ["firsts", "reconstruction"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_edward_dudley_001",
@@ -2797,7 +3021,8 @@
     "historicalContext": "Dudley later served as a justice of the New York State Supreme Court; his diplomatic career is commemorated in his hometown of Roanoke, Virginia.",
     "topicIds": ["firsts", "diplomacy"],
     "mentionedEntityIds": ["ent_thurgood_marshall_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_james_wormley_jones_001",
@@ -2832,7 +3057,8 @@
     "historicalContext": "Before joining the Bureau, Jones served with the Washington Metropolitan Police Department and commanded a company of the 368th Infantry, 92nd Division, in combat in France during World War I.",
     "topicIds": ["firsts", "law-enforcement"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_patrick_h_raymond_001",
@@ -2867,7 +3093,8 @@
     "historicalContext": "Raymond's father was a formerly enslaved abolitionist and early pastor of Boston's African Meeting House; Raymond served as chief until 1879 and died in Cambridge in 1892.",
     "topicIds": ["firsts", "public-safety"],
     "mentionedEntityIds": ["ent_african_meeting_house_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_lee_p_brown_001",
@@ -2902,7 +3129,8 @@
     "historicalContext": "Brown also served as Atlanta's public safety commissioner from 1978 to 1982 and as New York City police commissioner from 1990 to 1992, before leading the White House drug policy office under President Clinton.",
     "topicIds": ["firsts", "mayors", "law-enforcement"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_willie_l_williams_001",
@@ -2937,6 +3165,7 @@
     "historicalContext": "Williams served as LAPD chief until 1997 and later worked as federal security director for Atlanta's Hartsfield-Jackson International Airport.",
     "topicIds": ["firsts", "law-enforcement"],
     "mentionedEntityIds": ["ent_aamp_philadelphia_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   }
 ]

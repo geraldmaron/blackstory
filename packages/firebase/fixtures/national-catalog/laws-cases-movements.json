@@ -32,7 +32,8 @@
     "historicalContext": "The Thirteenth Amendment was the first of the three Reconstruction Amendments and the first change to the Constitution in six decades. Lincoln pushed for its passage as a permanent constitutional settlement of slavery that the wartime Emancipation Proclamation, a military order limited to Confederate territory, could not by itself guarantee.",
     "topicIds": ["civil-rights", "reconstruction", "constitutional-law", "emancipation"],
     "mentionedEntityIds": ["ent_law_emancipation_proclamation_1863"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_14th_amendment_1868",
@@ -71,7 +72,8 @@
       "ent_case_dred_scott_v_sandford_1857",
       "ent_case_loving_v_virginia_1967"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_15th_amendment_1870",
@@ -106,7 +108,8 @@
     "historicalContext": "The last of the three Reconstruction Amendments, the Fifteenth was ratified as federal troops still occupied parts of the former Confederacy. Its promise went largely unenforced for nearly a century after Reconstruction's end in 1877, until the Voting Rights Act of 1965 gave it teeth through federal oversight.",
     "topicIds": ["civil-rights", "voting-rights", "reconstruction", "constitutional-law"],
     "mentionedEntityIds": ["ent_case_guinn_v_united_states_1915", "ent_law_voting_rights_act_1965"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_civil_rights_act_1866",
@@ -145,7 +148,8 @@
       "ent_case_runyon_v_mccrary_1976",
       "ent_law_14th_amendment_1868"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_civil_rights_act_1875",
@@ -180,7 +184,8 @@
     "historicalContext": "No comparable federal public-accommodations law existed again until the Civil Rights Act of 1964. The 1883 ruling that gutted it is cataloged separately in this wave as ent_case_civil_rights_cases_1883.",
     "topicIds": ["civil-rights", "reconstruction", "law", "public-accommodations"],
     "mentionedEntityIds": ["ent_case_civil_rights_cases_1883", "ent_law_civil_rights_act_1964"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_civil_rights_act_1957",
@@ -215,7 +220,8 @@
     "historicalContext": "Weakened by Southern Democrats before passage, the Act's enforcement provisions were mild and Black voter registration barely moved in its wake, but it created the institutional machinery -- the Civil Rights Division and Civil Rights Commission -- that later, stronger civil rights laws would rely on.",
     "topicIds": ["civil-rights", "voting-rights", "law"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_civil_rights_act_1964",
@@ -250,7 +256,8 @@
     "historicalContext": "Its Title II public-accommodations provisions were unanimously upheld against Commerce Clause challenges the same year in Heart of Atlanta Motel v. United States and Katzenbach v. McClung, both cataloged in this wave, cementing the Act's constitutionality before it took full effect.",
     "topicIds": ["civil-rights", "law", "public-accommodations", "employment"],
     "mentionedEntityIds": ["ent_case_katzenbach_v_mcclung_1964"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_voting_rights_act_1965",
@@ -288,7 +295,8 @@
       "ent_case_shelby_county_v_holder_2013",
       "ent_case_south_carolina_v_katzenbach_1966"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_fair_housing_act_1968",
@@ -327,7 +335,14 @@
       "ent_law_civil_rights_act_1866",
       "ent_martin_luther_king_jr_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_civil_rights_act_1866",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_law_civil_rights_act_1991",
@@ -362,7 +377,8 @@
     "historicalContext": "Congress passed the Act specifically to reverse the effect of Wards Cove and other 1989 rulings on the disparate-impact framework the Court had built in Griggs v. Duke Power Co. (1971), cataloged in this wave, restoring employers' burden to justify tests and practices that disproportionately screened out minority applicants.",
     "topicIds": ["civil-rights", "law", "employment"],
     "mentionedEntityIds": ["ent_case_griggs_v_duke_power_1971"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_emancipation_proclamation_1863",
@@ -397,7 +413,8 @@
     "historicalContext": "As a wartime military order grounded in the President's commander-in-chief power, the Proclamation could not permanently guarantee freedom or reach loyal border states; Lincoln and Congress pursued the Thirteenth Amendment, cataloged separately in this wave, to make abolition permanent and nationwide.",
     "topicIds": ["civil-rights", "emancipation", "law"],
     "mentionedEntityIds": ["ent_law_13th_amendment_1865"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_fugitive_slave_act_1850",
@@ -433,7 +450,8 @@
     "sensitivityClass": "enslaver_or_segregationist",
     "topicIds": ["law", "enslavement", "fugitive-slave-law"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_missouri_compromise_1820",
@@ -471,7 +489,8 @@
       "ent_case_dred_scott_v_sandford_1857",
       "ent_law_kansas_nebraska_act_1854"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_kansas_nebraska_act_1854",
@@ -506,7 +525,8 @@
     "historicalContext": "By letting territorial settlers decide slavery's fate at the ballot box, the Act produced years of armed conflict between pro- and anti-slavery settlers in Kansas Territory and hardened Northern opposition to slavery's expansion, directly contributing to the collapse of the Second Party System and the rise of the Republican Party.",
     "topicIds": ["law", "enslavement", "sectionalism"],
     "mentionedEntityIds": ["ent_law_missouri_compromise_1820"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_reconstruction_act_1867",
@@ -541,7 +561,8 @@
     "historicalContext": "By placing the South under military governance and mandating Black political participation, the Act enabled the election of hundreds of Black state legislators and members of Congress during Reconstruction, a political opening that the Compromise of 1877 and Black Codes-successor Jim Crow laws later reversed.",
     "topicIds": ["reconstruction", "law", "voting-rights"],
     "mentionedEntityIds": ["ent_law_14th_amendment_1868"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_enforcement_act_1870",
@@ -581,7 +602,8 @@
       "ent_law_15th_amendment_1870",
       "ent_law_ku_klux_klan_act_1871"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_ku_klux_klan_act_1871",
@@ -616,7 +638,8 @@
     "historicalContext": "Grant's use of the Act broke the first Klan's power in South Carolina by late 1871, but the civil-rights-lawsuit provision it created lay dormant for nearly a century before becoming, as Section 1983, the primary vehicle for modern federal civil rights litigation against police and other state actors.",
     "topicIds": ["reconstruction", "law", "voting-rights"],
     "mentionedEntityIds": ["ent_core_founding_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_freedmens_bureau_act_1865",
@@ -651,7 +674,8 @@
     "historicalContext": "The Bureau built thousands of schools for freedpeople -- seeding many historically Black colleges -- but chronic underfunding, a one-year charter later extended in 1866 over another Johnson veto, and violent local resistance limited its reach; Congress allowed it to lapse in 1872.",
     "topicIds": ["reconstruction", "law", "education", "emancipation"],
     "mentionedEntityIds": ["ent_core_founding_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_executive_order_9981_1948",
@@ -686,7 +710,8 @@
     "historicalContext": "Truman issued the order after the Army resisted integration and after Black veterans organized against continued segregation following World War II service; Secretary of the Army Kenneth Royall's refusal to comply led Truman to force his retirement, and full integration proceeded gradually through the Korean War.",
     "topicIds": ["civil-rights", "military", "law"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_mississippi_black_codes_1865",
@@ -722,7 +747,14 @@
     "sensitivityClass": "enslaver_or_segregationist",
     "topicIds": ["black-codes", "reconstruction", "law", "segregation"],
     "mentionedEntityIds": ["ent_core_founding_001", "ent_law_civil_rights_act_1866"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_civil_rights_act_1866",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_law_south_carolina_black_codes_1865",
@@ -758,7 +790,8 @@
     "sensitivityClass": "enslaver_or_segregationist",
     "topicIds": ["black-codes", "reconstruction", "law", "segregation"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_louisiana_separate_car_act_1890",
@@ -794,7 +827,8 @@
     "sensitivityClass": "enslaver_or_segregationist",
     "topicIds": ["jim-crow", "segregation", "law", "transportation"],
     "mentionedEntityIds": ["ent_case_plessy_v_ferguson_1896"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_law_virginia_racial_integrity_act_1924",
@@ -830,7 +864,8 @@
     "sensitivityClass": "enslaver_or_segregationist",
     "topicIds": ["segregation", "law", "eugenics", "anti-miscegenation"],
     "mentionedEntityIds": ["ent_case_loving_v_virginia_1967"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_dred_scott_v_sandford_1857",
@@ -870,7 +905,8 @@
       "ent_law_14th_amendment_1868",
       "ent_law_missouri_compromise_1820"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_plessy_v_ferguson_1896",
@@ -905,7 +941,8 @@
     "historicalContext": "Homer Plessy, a man of mixed racial ancestry classified as Black under Louisiana law, boarded a whites-only railcar in 1892 as part of a planned test case organized by New Orleans's Comite des Citoyens. The ruling provided constitutional cover for de jure segregation across the South for the next 58 years, until Brown v. Board of Education overturned it.",
     "topicIds": ["law", "supreme-court", "segregation", "jim-crow"],
     "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_brown_v_board_of_education_1954",
@@ -945,7 +982,8 @@
       "ent_case_plessy_v_ferguson_1896",
       "ent_thurgood_marshall_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_bolling_v_sharpe_1954",
@@ -980,7 +1018,8 @@
     "historicalContext": "Because the Fifth Amendment, unlike the Fourteenth, contains no equal protection clause and applies to the federal government rather than the states, the Court read an equal-protection component into the Fifth Amendment's due process guarantee -- a doctrine now known as \"reverse incorporation\" that later applied equal-protection-style scrutiny to federal action generally.",
     "topicIds": ["law", "supreme-court", "school-desegregation", "due-process"],
     "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_loving_v_virginia_1967",
@@ -1015,7 +1054,8 @@
     "historicalContext": "Richard and Mildred Loving married in Washington, D.C. in 1958 to evade Virginia's law, then were arrested after returning to Caroline County; police found them in bed together and treated their marriage certificate as evidence of a crime. The couple accepted a suspended sentence conditioned on leaving Virginia for 25 years before the ACLU took their case to the Supreme Court.",
     "topicIds": ["law", "supreme-court", "marriage", "equal-protection"],
     "mentionedEntityIds": ["ent_law_virginia_racial_integrity_act_1924"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_shelley_v_kraemer_1948",
@@ -1053,7 +1093,8 @@
       "ent_case_corrigan_v_buckley_1926",
       "ent_case_jones_v_alfred_h_mayer_1968"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_sweatt_v_painter_1950",
@@ -1091,7 +1132,8 @@
       "ent_case_brown_v_board_of_education_1954",
       "ent_case_mclaurin_v_oklahoma_state_regents_1950"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_missouri_ex_rel_gaines_v_canada_1938",
@@ -1129,7 +1171,8 @@
       "ent_case_brown_v_board_of_education_1954",
       "ent_lincoln_university_of_missouri_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_smith_v_allwright_1944",
@@ -1164,7 +1207,8 @@
     "historicalContext": "Lonnie Smith, a Black voter in Harris County, sued election official S.S. Allwright after being denied a primary ballot. Within four years, registered Black voters across the South rose from about 200,000 to 800,000. Terry v. Adams (1953), cataloged in this wave, later closed the remaining loophole of an unofficial \"pre-primary\" used to evade this ruling.",
     "topicIds": ["law", "supreme-court", "voting-rights"],
     "mentionedEntityIds": ["ent_case_terry_v_adams_1953", "ent_law_15th_amendment_1870"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_guinn_v_united_states_1915",
@@ -1199,7 +1243,8 @@
     "historicalContext": "Despite the ruling, Oklahoma immediately adopted a new registration scheme requiring anyone who had not voted in 1914 to register within a narrow window or lose the franchise permanently, showing how quickly Southern legislatures replaced one disenfranchising device with another -- a pattern the Voting Rights Act of 1965, cataloged in this wave, was eventually designed to break.",
     "topicIds": ["law", "supreme-court", "voting-rights"],
     "mentionedEntityIds": ["ent_law_15th_amendment_1870", "ent_law_voting_rights_act_1965"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_buchanan_v_warley_1917",
@@ -1238,7 +1283,8 @@
       "ent_case_shelley_v_kraemer_1948",
       "ent_law_14th_amendment_1868"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_powell_v_alabama_1932",
@@ -1273,7 +1319,8 @@
     "historicalContext": "Nine Black teenagers, later known as the Scottsboro Boys, were accused of raping two white women aboard a freight train and were tried within days without meaningful access to counsel, receiving death sentences after one-day trials. The case was the first time the Supreme Court reversed a state conviction for violating a Bill of Rights criminal procedure guarantee; Norris v. Alabama, cataloged in this wave, addressed jury discrimination in the same prosecutions three years later.",
     "topicIds": ["law", "supreme-court", "criminal-justice", "right-to-counsel"],
     "mentionedEntityIds": ["ent_case_norris_v_alabama_1935"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_batson_v_kentucky_1986",
@@ -1308,7 +1355,8 @@
     "historicalContext": "At James Batson's Louisville burglary trial, the prosecutor used peremptory strikes to remove all four Black prospective jurors, leaving an all-white jury. The ruling reached only prosecutors' strikes at first; later cases extended the rule to defense attorneys and to civil litigants.",
     "topicIds": ["law", "supreme-court", "criminal-justice", "jury-selection"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_regents_uc_v_bakke_1978",
@@ -1343,7 +1391,8 @@
     "historicalContext": "Bakke, a white applicant rejected twice despite higher test scores than some admitted minority applicants, sued after UC Davis set aside a fixed number of seats for minority students. The decision's holding that diversity could justify some use of race in admissions stood until Students for Fair Admissions v. Harvard (2023), cataloged in this wave, overruled it.",
     "topicIds": ["law", "supreme-court", "education", "affirmative-action"],
     "mentionedEntityIds": ["ent_case_sffa_v_harvard_2023"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_green_v_new_kent_county_1968",
@@ -1378,7 +1427,8 @@
     "historicalContext": "New Kent County operated two schools, one historically for white students and one for Black students, and let families choose between them; after three years, 85 percent of Black students still attended the Black school and no white student had transferred. The ruling's \"Green factors\" -- faculty, staff, transportation, facilities, and extracurriculars -- became the standard courts used to judge desegregation progress until Milliken v. Bradley (1974), cataloged in this wave, limited how far remedies could reach.",
     "topicIds": ["law", "supreme-court", "school-desegregation"],
     "mentionedEntityIds": ["ent_case_milliken_v_bradley_1974"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_heart_of_atlanta_motel_v_us_1964",
@@ -1413,7 +1463,8 @@
     "historicalContext": "The motel's owner, who restricted rooms to white patrons, sued to block enforcement of the newly passed Civil Rights Act, arguing Congress had exceeded its power. Decided the same day as its companion case Katzenbach v. McClung, cataloged in this wave, the ruling foreclosed the primary constitutional challenge to the Act's public-accommodations provisions before they took effect nationwide.",
     "topicIds": ["law", "supreme-court", "public-accommodations", "commerce-clause"],
     "mentionedEntityIds": ["ent_case_katzenbach_v_mcclung_1964", "ent_law_civil_rights_act_1964"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_south_carolina_v_katzenbach_1966",
@@ -1451,7 +1502,8 @@
       "ent_case_shelby_county_v_holder_2013",
       "ent_law_voting_rights_act_1965"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_cooper_v_aaron_1958",
@@ -1486,7 +1538,8 @@
     "historicalContext": "Governor Faubus deployed the Arkansas National Guard in 1957 to block the Little Rock Nine from entering Central High School, prompting President Eisenhower to federalize the Guard and send the 101st Airborne. The unprecedented joint-signature opinion was the Court's emphatic response to Southern states' \"massive resistance\" strategy of defying Brown.",
     "topicIds": ["law", "supreme-court", "school-desegregation"],
     "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_shelby_county_v_holder_2013",
@@ -1524,7 +1577,8 @@
       "ent_case_south_carolina_v_katzenbach_1966",
       "ent_law_voting_rights_act_1965"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_griggs_v_duke_power_1971",
@@ -1559,7 +1613,8 @@
     "historicalContext": "Willie Griggs and other Black employees at Duke Power's Dan River plant challenged a policy adopted the day after the Civil Rights Act took effect, which required tests unrelated to the low-paid Labor Department jobs most Black workers held. The disparate-impact doctrine the case established was later narrowed by Wards Cove Packing Co. v. Atonio (1989) and restored by the Civil Rights Act of 1991, cataloged in this wave.",
     "topicIds": ["law", "supreme-court", "employment", "disparate-impact"],
     "mentionedEntityIds": ["ent_law_civil_rights_act_1991"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_runyon_v_mccrary_1976",
@@ -1593,12 +1648,15 @@
     ],
     "historicalContext": "Michael McCrary and Colin Gonzales were denied admission to private schools in Fairfax and Arlington, Virginia solely because they were Black. The ruling relied on the same Reconstruction-era statute at issue in Jones v. Alfred H. Mayer Co. (1968), cataloged in this wave, showing the Civil Rights Act of 1866's continuing reach into private conduct over a century after its passage.",
     "topicIds": ["law", "supreme-court", "education"],
-    "mentionedEntityIds": [
-      "civil-rights-act-1866",
-      "ent_case_jones_v_alfred_h_mayer_1968",
-      "ent_law_civil_rights_act_1866"
-    ],
-    "keywords": []
+    "mentionedEntityIds": ["ent_law_civil_rights_act_1866", "ent_case_jones_v_alfred_h_mayer_1968"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_civil_rights_act_1866",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_civil_rights_cases_1883",
@@ -1633,7 +1691,8 @@
     "historicalContext": "The ruling consolidated five test cases from Kansas, California, Missouri, New York, and Tennessee brought by Black plaintiffs denied accommodation in hotels, theaters, or railcars. By reading the Fourteenth Amendment's state-action requirement narrowly, the decision left Congress unable to reach private discrimination for the next 85 years, until Heart of Atlanta Motel v. United States (1964) found a new constitutional basis in the Commerce Clause -- both cataloged in this wave.",
     "topicIds": ["law", "supreme-court", "public-accommodations", "reconstruction"],
     "mentionedEntityIds": ["ent_law_civil_rights_act_1875"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_us_v_cruikshank_1876",
@@ -1668,7 +1727,8 @@
     "historicalContext": "Of 97 people indicted for the massacre, only three were convicted, and the Supreme Court overturned even those convictions, ruling that the Fourteenth Amendment's protections applied only to state action, not private violence. The decision, alongside United States v. Reese decided the same year and both cataloged in this wave, crippled federal enforcement against Klan terrorism and helped enable the violent overthrow of Reconstruction governments across the South.",
     "topicIds": ["law", "supreme-court", "reconstruction", "voting-rights"],
     "mentionedEntityIds": ["ent_case_us_v_reese_1876", "ent_law_enforcement_act_1870"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_us_v_reese_1876",
@@ -1708,7 +1768,8 @@
       "ent_law_enforcement_act_1870",
       "ent_law_voting_rights_act_1965"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_slaughterhouse_cases_1873",
@@ -1743,7 +1804,8 @@
     "historicalContext": "Although the underlying dispute involved white Louisiana butchers challenging a slaughterhouse monopoly rather than racial discrimination directly, the Court's narrow reading of the newly ratified Fourteenth Amendment set an early precedent limiting its protections -- a limitation that shaped, and constrained, every subsequent Reconstruction-era civil rights case in this wave, including the Civil Rights Cases of 1883.",
     "topicIds": ["law", "supreme-court", "reconstruction", "constitutional-law"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_berea_college_v_kentucky_1908",
@@ -1778,7 +1840,8 @@
     "historicalContext": "Berea College was founded in 1855 as one of the South's few coeducational, racially integrated colleges. Kentucky's 1904 \"Day Law\" targeted it directly, and the Supreme Court's ruling that a state could compel a chartered private corporation to segregate showed how far Jim Crow's reach extended even into institutions founded on integration.",
     "topicIds": ["law", "supreme-court", "education", "segregation"],
     "mentionedEntityIds": ["ent_case_plessy_v_ferguson_1896"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_corrigan_v_buckley_1926",
@@ -1813,7 +1876,8 @@
     "historicalContext": "The ruling let racially restrictive covenants proliferate nationwide for the next two decades, shaping residential segregation patterns in American cities long after explicit municipal zoning segregation was struck down in Buchanan v. Warley (1917), cataloged in this wave. The Supreme Court reversed course in Shelley v. Kraemer (1948), also cataloged here, holding that judicial enforcement of such covenants constitutes unconstitutional state action.",
     "topicIds": ["law", "supreme-court", "housing", "restrictive-covenants"],
     "mentionedEntityIds": ["ent_case_buchanan_v_warley_1917", "ent_case_shelley_v_kraemer_1948"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_sipuel_v_board_of_regents_1948",
@@ -1852,7 +1916,8 @@
       "ent_case_sweatt_v_painter_1950",
       "ent_thurgood_marshall_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_mclaurin_v_oklahoma_state_regents_1950",
@@ -1891,7 +1956,8 @@
       "ent_case_sipuel_v_board_of_regents_1948",
       "ent_case_sweatt_v_painter_1950"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_boynton_v_virginia_1960",
@@ -1926,7 +1992,8 @@
     "historicalContext": "Bruce Boynton, a Howard University law student traveling from Washington, D.C. to Alabama, was arrested for trespassing after sitting in the whites-only section of a Richmond bus terminal restaurant. The Congress of Racial Equality organized the 1961 Freedom Rides specifically to test Southern compliance with this ruling, sending interracial groups on interstate buses through the Deep South.",
     "topicIds": ["law", "supreme-court", "transportation", "segregation"],
     "mentionedEntityIds": ["ent_core_founding_001", "ent_freedom_rides_museum_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_naacp_v_alabama_1958",
@@ -1961,7 +2028,14 @@
     "historicalContext": "Alabama sought the NAACP's membership rolls after the organization supported the Montgomery Bus Boycott and Black students seeking to attend the state university, holding the NAACP in contempt and fining it $100,000 when it refused. The ruling protected civil rights organizations' membership privacy nationwide and paved the way for NAACP v. Button (1963), cataloged in this wave, protecting the NAACP's litigation activities as well.",
     "topicIds": ["law", "supreme-court", "first-amendment", "civil-rights"],
     "mentionedEntityIds": ["ent_case_naacp_v_button_1963", "ent_montgomery_bus_boycott_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_montgomery_bus_boycott_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_naacp_v_button_1963",
@@ -1996,7 +2070,8 @@
     "historicalContext": "Virginia passed the challenged statutes in 1956 as part of the Byrd Organization's massive-resistance campaign against Brown v. Board, aiming to cut off the NAACP's ability to organize plaintiffs and fund desegregation suits. Justice Brennan's opinion recognized litigation as \"a means for achieving the lawful objectives of equality of treatment\" and thus a form of protected political expression, safeguarding the NAACP Legal Defense Fund's core strategy for the cases throughout this wave.",
     "topicIds": ["law", "supreme-court", "first-amendment", "civil-rights"],
     "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_gomillion_v_lightfoot_1960",
@@ -2031,7 +2106,8 @@
     "historicalContext": "Tuskegee, home to the Tuskegee Institute (cataloged elsewhere in the catalog as Tuskegee University) and a Veterans Administration hospital staffed by Black professionals, had a Black voting majority that white officials sought to dilute through boundary manipulation rather than outright exclusion. The ruling established that racial gerrymandering of municipal boundaries, not just direct denial of the ballot, could violate the Fifteenth Amendment.",
     "topicIds": ["law", "supreme-court", "voting-rights", "gerrymandering"],
     "mentionedEntityIds": ["ent_law_15th_amendment_1870", "ent_tuskegee_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_bailey_v_alabama_1911",
@@ -2066,7 +2142,8 @@
     "historicalContext": "Alonzo Bailey, a Black farm laborer, took a $15 advance against a $12 monthly wage, quit after five weeks, and was criminally prosecuted for failing to repay it -- a common Southern practice that trapped Black workers in a cycle resembling slavery. Justice Hughes's opinion described the Thirteenth Amendment as \"a charter of universal civil freedom for all persons, of whatever race, color, or estate.\"",
     "topicIds": ["law", "supreme-court", "peonage", "labor"],
     "mentionedEntityIds": ["ent_law_13th_amendment_1865"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_norris_v_alabama_1935",
@@ -2101,7 +2178,8 @@
     "historicalContext": "At Norris's retrial, the county sheriff, called as a defense witness, examined the jury rolls \"from A to Z\" and could not identify a single Black name despite a substantial qualified Black population, corroborating claims of decades-long exclusion. Decided three years after Powell v. Alabama, cataloged in this wave, the ruling addressed a second constitutional defect in the same Scottsboro prosecutions.",
     "topicIds": ["law", "supreme-court", "criminal-justice", "jury-selection"],
     "mentionedEntityIds": ["ent_case_powell_v_alabama_1932"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_terry_v_adams_1953",
@@ -2136,7 +2214,8 @@
     "historicalContext": "The last in a line of white-primary cases that began with Smith v. Allwright (1944), cataloged in this wave, Terry v. Adams closed the workaround Fort Bend County had used for six decades: an unofficial pre-primary technically outside party or state control, but whose results were always ratified by the official election that followed.",
     "topicIds": ["law", "supreme-court", "voting-rights"],
     "mentionedEntityIds": ["ent_case_smith_v_allwright_1944", "ent_law_15th_amendment_1870"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_jones_v_alfred_h_mayer_1968",
@@ -2170,12 +2249,15 @@
     ],
     "historicalContext": "Joseph Lee Jones, a Black man, sued after a St. Louis County developer refused to sell him a home in the Paddock Woods subdivision solely because of his race. Decided the same month Congress passed the Fair Housing Act of 1968, cataloged in this wave, the ruling gave fair-housing plaintiffs a second, older federal statute -- reaching back to Reconstruction -- alongside the new law.",
     "topicIds": ["law", "supreme-court", "housing"],
-    "mentionedEntityIds": [
-      "civil-rights-act-1866",
-      "ent_law_civil_rights_act_1866",
-      "ent_law_fair_housing_act_1968"
-    ],
-    "keywords": []
+    "mentionedEntityIds": ["ent_law_civil_rights_act_1866", "ent_law_fair_housing_act_1968"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_civil_rights_act_1866",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_case_swann_v_charlotte_mecklenburg_1971",
@@ -2210,7 +2292,8 @@
     "historicalContext": "The approved plan bused roughly 13,000 students to integrate Charlotte's schools, and the city became nationally known as a place where court-ordered busing worked. The ruling's broad remedial authority was cut back three years later in Milliken v. Bradley (1974), cataloged in this wave, which barred courts from ordering busing across the boundaries of school districts not themselves shown to have discriminated.",
     "topicIds": ["law", "supreme-court", "school-desegregation", "busing"],
     "mentionedEntityIds": ["ent_case_milliken_v_bradley_1974"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_milliken_v_bradley_1974",
@@ -2245,7 +2328,8 @@
     "historicalContext": "The lower court had found Detroit's schools unconstitutionally segregated and ordered a metropolitan-area busing remedy spanning three counties. By confining remedies to the offending district alone, the ruling limited desegregation's reach in metropolitan areas where white residents had moved to suburbs precisely to avoid integrated city schools, a pattern scholars call \"white flight.\"",
     "topicIds": ["law", "supreme-court", "school-desegregation", "busing"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_washington_v_davis_1976",
@@ -2280,7 +2364,8 @@
     "historicalContext": "The ruling drew a sharp constitutional line distinguishing equal-protection claims, which require proof of discriminatory intent, from statutory Title VII disparate-impact claims under Griggs v. Duke Power Co. (1971), cataloged in this wave, which do not -- a distinction that continues to shape how discrimination claims are litigated depending on whether they invoke the Constitution or a civil rights statute.",
     "topicIds": ["law", "supreme-court", "employment", "equal-protection"],
     "mentionedEntityIds": ["ent_case_griggs_v_duke_power_1971"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_katzenbach_v_mcclung_1964",
@@ -2315,7 +2400,8 @@
     "historicalContext": "Ollie McClung Sr. and Jr. argued their restaurant was too small and too local to fall under federal commerce power, but the Court found the cumulative effect of similar discrimination across many small businesses was enough. Paired with Heart of Atlanta Motel v. United States, cataloged in this wave, the two rulings foreclosed the main constitutional attack on Title II before it could gain traction in lower courts.",
     "topicIds": ["law", "supreme-court", "public-accommodations", "commerce-clause"],
     "mentionedEntityIds": ["ent_law_civil_rights_act_1964"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_case_sffa_v_harvard_2023",
@@ -2350,7 +2436,8 @@
     "historicalContext": "Brought by an advocacy group representing Asian American applicants who argued Harvard's admissions process penalized them relative to other groups, the ruling marked the most significant reversal of affirmative-action doctrine since Bakke (1978), cataloged in this wave, effectively closing the diversity-rationale pathway American universities had relied on for 45 years.",
     "topicIds": ["law", "supreme-court", "education", "affirmative-action"],
     "mentionedEntityIds": ["ent_case_regents_uc_v_bakke_1978"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_movement_civil_rights_movement",
@@ -2391,7 +2478,8 @@
       "ent_martin_luther_king_jr_001",
       "ent_sclc_founding_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_movement_black_power_movement",
@@ -2430,6 +2518,7 @@
       "ent_meredith_march_against_fear_001",
       "ent_stokely_carmichael_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   }
 ]

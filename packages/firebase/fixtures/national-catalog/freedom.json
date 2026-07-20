@@ -32,7 +32,8 @@
     "historicalContext": "As an elder statesman, Douglass used Cedar Hill to host suffragists, diplomats, and civil rights leaders while serving as U.S. Marshal and Recorder of Deeds for the District. His widow, Helen Pitts Douglass, and the National Association of Colored Women's Clubs preserved the estate after his death, laying groundwork for its 1962 designation as a National Historic Site.",
     "topicIds": ["abolition", "freedom", "preservation"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_tubman_auburn_001",
@@ -67,7 +68,8 @@
     "historicalContext": "Auburn's abolitionist and women's-suffrage circles, anchored by the Seward family, gave Tubman a base for her later decades of activism. In 2017 the National Park Service combined the Home for the Aged, the nearby Tubman Residence in Fleming, and the Thompson AME Zion Church parsonage into Harriet Tubman National Historical Park.",
     "topicIds": ["underground-railroad", "freedom", "community"],
     "mentionedEntityIds": ["ent_harriet_tubman_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_tubman_underground_railroad_md_001",
@@ -102,7 +104,8 @@
     "historicalContext": "Managed jointly by the National Park Service and Maryland Park Service, the park's visitor center near Church Creek opened March 10, 2017, roughly 11 miles from Cambridge, and anchors the Harriet Tubman Underground Railroad Byway across the landscape Tubman knew as an enslaved young woman.",
     "topicIds": ["underground-railroad", "abolition", "freedom"],
     "mentionedEntityIds": ["ent_harriet_tubman_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_fort_mose_001",
@@ -137,7 +140,8 @@
     "historicalContext": "Fort Mose and Spanish St. Augustine functioned as a sanctuary for enslaved people fleeing English colonies for roughly 25 years. Designated a National Historic Landmark in 1994, the site's 1738 fort has since been reconstructed by the Florida Park Service following decades of archaeological research.",
     "topicIds": ["freedom", "military", "settlement"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_emancipation_oak_001",
@@ -223,7 +227,8 @@
     "historicalContext": "Parker's own account, later published as 'His Promised Land,' describes repeated river crossings into Kentucky to help enslaved people reach Ripley's Underground Railroad network alongside white abolitionist John Rankin. After emancipation Parker became a self-trained iron manufacturer, running the Phoenix Foundry and patenting a tobacco press and soil pulverizer.",
     "topicIds": ["underground-railroad", "abolition", "invention"],
     "mentionedEntityIds": ["ent_fort_concho_nhl_001", "ent_john_rankin_house_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_fort_monroe_001",
@@ -346,6 +351,11 @@
     "related": [
       {
         "id": "ent_niagara_movement_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_naacp_001",
         "type": "related_to",
         "direction": "outgoing"
       }
@@ -471,7 +481,8 @@
     "historicalContext": "The 54th Massachusetts recruited nationally, including Frederick Douglass's sons Lewis and Charles, with public meetings held partly at Boston's African Meeting House. Over thirty years passed between the regiment's 1863 assault on Fort Wagner and the memorial's 1897 dedication, and the site remains an active gathering place for civil rights commemoration and protest.",
     "topicIds": ["military", "memorial", "civil-war"],
     "mentionedEntityIds": ["ent_african_meeting_house_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_buffalo_soldiers_leavenworth_001",
@@ -506,7 +517,8 @@
     "historicalContext": "Comprised of freemen, formerly enslaved men, and Civil War veterans, the 9th and 10th Cavalry regiments scouted, built roads, and strung telegraph lines across the West before serving in the Spanish-American War, the Philippines, and World War II. The Commemorative Area today includes the monument, the Circle of Firsts, and the Walkway of Units, with sculpture by Eddie Dixon.",
     "topicIds": ["military", "firsts"],
     "mentionedEntityIds": ["ent_colin_powell_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_pullman_porters_001",
@@ -541,7 +553,8 @@
     "historicalContext": "The National A. Philip Randolph Pullman Porter Museum operates within the Pullman Historic District, the former company town at the center of the 1894 Pullman Strike, which President Obama designated a national monument in 2015 and Congress redesignated a National Historical Park in 2022.",
     "topicIds": ["labor", "organizing", "firsts"],
     "mentionedEntityIds": ["ent_brotherhood_sleeping_car_porters_001", "ent_core_founding_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_juneteenth_galveston_001",
@@ -576,7 +589,8 @@
     "historicalContext": "General Order No. 3 arrived two and a half years after the Emancipation Proclamation, delayed by Texas's remoteness from Union lines and the need for federal troops to enforce it. Reedy Chapel-AME, first established in 1848, was already a central gathering place for Galveston's Black community when Granger's order reached it, and Juneteenth became a federal holiday in 2021.",
     "topicIds": ["emancipation", "freedom", "military"],
     "mentionedEntityIds": ["ent_law_emancipation_proclamation_1863"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_seneca_village_001",
@@ -611,6 +625,68 @@
     "historicalContext": "Seneca Village let Black New Yorkers own property away from downtown Manhattan's overcrowding and discrimination, and property ownership was itself required for Black men to vote under New York law. A 2001 historical marker and 2011 Columbia-led archaeological excavation have helped recover the settlement's material history since its erasure.",
     "topicIds": ["community", "property-ownership", "freedom"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
+  },
+  {
+    "id": "ent_naacp_001",
+    "kind": "organization",
+    "displayName": "National Association for the Advancement of Colored People (NAACP)",
+    "summary": "Founded after the 1909 National Negro Conference in New York, the NAACP became the nation's longest-running civil rights organization, combining legal challenges, anti-lynching campaigns, and local branch organizing from Ida B. Wells's generation through Brown v. Board and the Voting Rights Act era.",
+    "eraBuckets": ["1900s", "1910s", "1960s"],
+    "topicTags": ["civil-rights", "organizing", "freedom"],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "United Charities Building area, Manhattan (founding conference)",
+    "lat": 40.7395,
+    "lng": -73.9867,
+    "claims": [
+      {
+        "predicate": "founded_from",
+        "object": "the National Negro Conference convened May 31–June 1, 1909 in New York, with the Committee of Forty adopting the NAACP name in 1910",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/exhibits/naacp/founding-and-early-years.html",
+        "citationLabel": "Library of Congress: NAACP — Founding and Early Years"
+      },
+      {
+        "predicate": "pursued",
+        "object": "a dual strategy of litigation and local branch organizing against segregation, disfranchisement, and lynching across the twentieth century",
+        "confidenceLevel": "high",
+        "citationSource": "loc.gov",
+        "citationHref": "https://www.loc.gov/exhibits/naacp/founding-and-early-years.html",
+        "citationLabel": "Library of Congress: NAACP — Founding and Early Years"
+      }
+    ],
+    "historicalContext": "Absorbing energy from the Niagara Movement, the NAACP built a national legal and branch infrastructure that later intersected with mass direct-action groups (SCLC, SNCC, CORE) while remaining the primary vehicle for many local activists and cases.",
+    "topicIds": ["civil-rights", "organizing", "freedom"],
+    "mentionedEntityIds": [
+      "ent_naacp_founding_001",
+      "ent_ida_b_wells_001",
+      "ent_niagara_movement_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_naacp_founding_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_niagara_movement_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_naacp_founding_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_niagara_movement_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   }
 ]

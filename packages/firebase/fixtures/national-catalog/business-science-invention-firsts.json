@@ -56,7 +56,8 @@
     "historicalContext": "Villa Lewaro is anchored here rather than at a birthplace because Walker built it deliberately as a monument to Black enterprise, hosting W.E.B. Du Bois, James Weldon Johnson, and other Harlem Renaissance figures; it remains the most concretely documented site tied to her achievement.",
     "topicIds": ["business", "entrepreneurship", "firsts", "philanthropy"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_maggie_l_walker_001",
@@ -99,7 +100,14 @@
     "historicalContext": "The bank Walker founded survives today as Consolidated Bank and Trust, the oldest continuously operated African American-run bank in the United States. Her Jackson Ward home, preserved by the National Park Service, is the best-documented site tied to her life and work.",
     "topicIds": ["business", "banking", "firsts", "entrepreneurship"],
     "mentionedEntityIds": ["ent_core_founding_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_core_founding_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_reginald_f_lewis_001",
@@ -137,7 +145,8 @@
       "ent_paul_laurence_dunbar_high_school_historic_001",
       "ent_reginald_lewis_museum_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ursula_burns_001",
@@ -172,7 +181,8 @@
     "historicalContext": "Xerox's world headquarters moved to Norwalk, Connecticut in 2007, shortly before Burns became president and then CEO there; the Norwalk campus is the most precisely documented site tied to the tenure that made her historic.",
     "topicIds": ["business", "technology", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_kenneth_chenault_001",
@@ -207,7 +217,8 @@
     "historicalContext": "American Express has been headquartered at 200 Vesey Street in Lower Manhattan since the mid-1980s, spanning nearly all of Chenault's tenure at the company, making it the most concretely documented site tied to his leadership.",
     "topicIds": ["business", "finance", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_robert_l_johnson_001",
@@ -250,7 +261,8 @@
     "historicalContext": "BET's Northeast Washington headquarters, where the network was run through its NYSE listing and eventual sale, is the site most directly tied to Johnson's business milestones; the company relocated its headquarters functions to New York after the Viacom sale.",
     "topicIds": ["business", "media", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_oprah_winfrey_001",
@@ -285,7 +297,8 @@
     "historicalContext": "Harpo Studios operated at this West Loop address from 1990 until production wound down in the mid-2010s; the site was demolished in 2016 and redeveloped, but its address remains the most precisely documented location tied to the business that made Winfrey a billionaire.",
     "topicIds": ["business", "media", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_cynt_marshall_001",
@@ -320,7 +333,8 @@
     "historicalContext": "Marshall retired from the Mavericks CEO role effective December 2024 after six years leading the franchise from its arena, American Airlines Center, the team's home and business headquarters throughout her tenure.",
     "topicIds": ["business", "sports", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_cathy_hughes_001",
@@ -355,7 +369,8 @@
     "historicalContext": "Urban One's Silver Spring headquarters is the company's long-documented corporate base; Hughes remains chairperson of the company she founded.",
     "topicIds": ["business", "media", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ag_gaston_001",
@@ -395,7 +410,8 @@
       "ent_martin_luther_king_jr_001",
       "ent_tuskegee_university_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_john_h_johnson_001",
@@ -430,7 +446,8 @@
     "historicalContext": "Completed in 1971 and designed by African American architect John Moutoussamy, the 820 S. Michigan Avenue tower was the first downtown Chicago high-rise designed by a Black architect and Johnson Publishing's headquarters until 2010; it is now a National Historic Landmark and Chicago Landmark.",
     "topicIds": ["business", "publishing", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_annie_malone_001",
@@ -473,7 +490,8 @@
     "historicalContext": "The Poro College building was sold and later razed in 1965 for a public housing development; the St. Ferdinand Avenue address remains the documented site of the campus that anchored The Ville as a hub of Black St. Louis business and civic life.",
     "topicIds": ["business", "entrepreneurship", "philanthropy"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_earl_g_graves_sr_001",
@@ -508,7 +526,14 @@
     "historicalContext": "Graves entered business after serving as U.S. Senator Robert F. Kennedy's administrative assistant; Black Enterprise remains a leading chronicle of African American business achievement, and Morgan State's naming reflects his standing as one of its most prominent alumni.",
     "topicIds": ["business", "publishing", "entrepreneurship"],
     "mentionedEntityIds": ["ent_morgan_state_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_morgan_state_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_bessie_coleman_001",
@@ -543,7 +568,8 @@
     "historicalContext": "Coleman studied French and self-funded travel to France for flight school since no American school would train a Black woman. She dreamed of opening a flight school for Black aviators but died in a 1926 exhibition-flight accident in Jacksonville, Florida before realizing it; her Chicago grave remains the most visited site tied to her legacy.",
     "topicIds": ["aviation", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_eugene_bullard_001",
@@ -578,7 +604,8 @@
     "historicalContext": "Bullard grew up near this site before fleeing Georgia around age 11; the United States barred Black pilots when it entered World War I, so his aviation career unfolded entirely in France. The exact address of his childhood home is not preserved, so the marker site is the most concretely documented location tied to his early life.",
     "topicIds": ["aviation", "military", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_willa_brown_001",
@@ -613,7 +640,14 @@
     "historicalContext": "Harlem Airport closed in 1956 and its 87th-and-Harlem site in Bridgeview is now a shopping center, but it remains the documented location of the school Brown ran with Coffey, whom she married in 1939; the school was one of only two non-collegiate sites nationally selected for the federal Civilian Pilot Training Program's Black training unit.",
     "topicIds": ["aviation", "firsts", "women", "education"],
     "mentionedEntityIds": ["ent_tuskegee_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_tuskegee_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_guion_bluford_001",
@@ -648,7 +682,8 @@
     "historicalContext": "Bluford was recruited as part of NASA's push, aided by Nichelle Nichols, to diversify its astronaut corps starting in 1978; STS-8 launched from Pad 39A, making it the most precise documented site of his historic flight.",
     "topicIds": ["aviation", "space", "firsts", "science"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mae_jemison_001",
@@ -683,7 +718,8 @@
     "historicalContext": "Jemison joined NASA's astronaut corps in 1987 after working as a general practitioner and Peace Corps medical officer in Liberia and Sierra Leone; she left NASA in 1993 to found a technology research company.",
     "topicIds": ["aviation", "space", "firsts", "science", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ronald_mcnair_001",
@@ -718,7 +754,8 @@
     "historicalContext": "McNair grew up the son of an auto mechanic in segregated Lake City and graduated valedictorian of his high school before earning a physics doctorate from MIT; he died along with six crewmates when Challenger broke apart 73 seconds after launch on his second spaceflight.",
     "topicIds": ["aviation", "space", "science", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_charles_bolden_001",
@@ -753,7 +790,8 @@
     "historicalContext": "Bolden led NASA headquarters in Washington through the end of the Space Shuttle program and the start of the commercial crew program; the agency's headquarters building at 300 E Street SW served as his administrative base throughout his tenure.",
     "topicIds": ["aviation", "space", "firsts", "government"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_frederick_gregory_001",
@@ -788,7 +826,8 @@
     "historicalContext": "Gregory later served as NASA Deputy Administrator during the 2003 Columbia disaster response and briefly as acting Administrator in 2005; his nephew connection to blood-plasma pioneer Charles R. Drew (his uncle) is documented in Smithsonian's profile of his family.",
     "topicIds": ["aviation", "space", "firsts", "military"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_robert_h_lawrence_001",
@@ -823,7 +862,8 @@
     "historicalContext": "When the Nixon administration canceled the Manned Orbiting Laboratory program in 1969, younger MOL astronauts transferred to NASA; had he lived, Lawrence would likely have transferred and could have been the first Black NASA astronaut to fly. NASA named an asteroid after him in 2020 in recognition of his pioneering selection.",
     "topicIds": ["aviation", "space", "firsts", "military"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_victor_glover_001",
@@ -858,7 +898,8 @@
     "historicalContext": "Both of Glover's historic missions launched from Kennedy Space Center's Launch Complex 39A, the same pad used for Apollo 11 and many shuttle missions, making it the concrete site tied to his two space-history milestones.",
     "topicIds": ["aviation", "space", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_bernard_harris_001",
@@ -893,7 +934,8 @@
     "historicalContext": "After leaving NASA, Harris founded the National Math and Science Initiative and Vesalius Ventures to expand STEM education and medical technology access.",
     "topicIds": ["aviation", "space", "firsts", "medicine"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_marlon_green_001",
@@ -928,7 +970,8 @@
     "historicalContext": "Green applied to Denver-based Continental in 1957 by omitting a photo and leaving the race question blank; when the airline rescinded its offer on learning he was Black, his case became a landmark in dismantling employment discrimination in commercial aviation nationwide. No single Denver building is documented as the site of his application, so the city is used at city-level precision.",
     "topicIds": ["aviation", "firsts", "civil-rights", "law"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_perry_young_001",
@@ -963,7 +1006,8 @@
     "historicalContext": "New York Airways management chose to hire Young in part to generate favorable publicity for its new helicopter service, despite his having fewer helicopter hours than their stated minimum; his hiring predates the more widely cited 1963 Marlon Green case by six years but involved a helicopter carrier rather than a mainline jet airline.",
     "topicIds": ["aviation", "firsts", "military"],
     "mentionedEntityIds": ["ent_marlon_green_001", "ent_tuskegee_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_katherine_johnson_001",
@@ -998,7 +1042,8 @@
     "historicalContext": "Johnson worked alongside fellow West Area Computing mathematicians Dorothy Vaughan and Mary Jackson at Langley; the three were later profiled in Margot Lee Shetterly's book and the film Hidden Figures. She retired from Langley in 1986 after a 33-year career. She died February 24, 2020.",
     "topicIds": ["science", "space", "mathematics", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_dorothy_vaughan_001",
@@ -1033,7 +1078,8 @@
     "historicalContext": "Vaughan advocated for pay and promotions for all Langley computers regardless of race, and moved into the integrated Analysis and Computation Division after 1958, where she worked on the Scout Launch Vehicle Program.",
     "topicIds": ["science", "mathematics", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mary_jackson_001",
@@ -1084,7 +1130,8 @@
     "historicalContext": "Jackson spent most of her nearly two-decade engineering career at Langley Research Center in Hampton, Virginia, but is anchored here at NASA's Washington headquarters because the agency renamed that building for her in 2021, the most concretely NASA-designated site bearing her name today.",
     "topicIds": ["science", "engineering", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_percy_julian_001",
@@ -1119,7 +1166,8 @@
     "historicalContext": "Julian's Oak Park home, where he lived and worked as a scientist and entrepreneur until his death, is the subject of ongoing local and congressional preservation efforts; the attack on the house is recounted here to document the community's resilience and Julian's determination to stay, not to center the violence itself.",
     "topicIds": ["science", "chemistry", "invention", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_charles_drew_001",
@@ -1170,7 +1218,8 @@
     "historicalContext": "Freedmen's Hospital, where Drew served as chief of surgery, was the teaching hospital affiliated with Howard's medical school and has since been succeeded by Howard University Hospital on the same Georgia Avenue campus.",
     "topicIds": ["science", "medicine", "firsts"],
     "mentionedEntityIds": ["ent_howard_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_patricia_bath_001",
@@ -1205,7 +1254,8 @@
     "historicalContext": "Bath also co-founded the American Institute for the Prevention of Blindness in 1976 to bring eye care to underserved communities; her UCLA appointment marked the start of the academic career during which she developed the Laserphaco Probe.",
     "topicIds": ["science", "medicine", "invention", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_daniel_hale_williams_001",
@@ -1240,7 +1290,8 @@
     "historicalContext": "Provident Hospital has operated at several Chicago sites since 1891; the present Cook County-operated facility at 500 East 51st Street carries on the institution Williams founded. In 1913 Williams became the first African American inducted into the American College of Surgeons.",
     "topicIds": ["science", "medicine", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ernest_everett_just_001",
@@ -1275,7 +1326,14 @@
     "historicalContext": "Just taught for years at Howard University but built his research reputation almost entirely through his Woods Hole summers, mentored by MBL director Frank Lillie; limited opportunities for Black scientists at American research universities later led him to work extensively in European laboratories as well.",
     "topicIds": ["science", "biology", "firsts"],
     "mentionedEntityIds": ["ent_howard_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_howard_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_david_blackwell_001",
@@ -1310,7 +1368,19 @@
     "historicalContext": "Before Berkeley, Blackwell was repeatedly denied faculty positions at predominantly white universities and taught at Southern University, Clark College, and Howard University, where he chaired the math department; UC Berkeley named a residence hall for him in 2018.",
     "topicIds": ["science", "mathematics", "firsts"],
     "mentionedEntityIds": ["ent_howard_university_001", "ent_southern_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_howard_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_southern_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_shirley_ann_jackson_001",
@@ -1345,7 +1415,8 @@
     "historicalContext": "Jackson researched theoretical physics at AT&T Bell Laboratories starting in 1976, later chaired the Nuclear Regulatory Commission, and has served as president of Rensselaer Polytechnic Institute in Troy, New York since 1999.",
     "topicIds": ["science", "physics", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_marie_maynard_daly_001",
@@ -1380,7 +1451,8 @@
     "historicalContext": "Daly also created a scholarship fund at Queens College, her undergraduate alma mater, to support Black students in the sciences, extending her commitment to broadening access to scientific careers.",
     "topicIds": ["science", "chemistry", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ralph_bunche_001",
@@ -1431,7 +1503,14 @@
     "historicalContext": "New York City dedicated this small park directly across First Avenue from UN Headquarters in Bunche's honor in 1979, the same stretch of Turtle Bay where he carried out much of his UN diplomatic career; it was designated the city's first 'peace park' in 1985.",
     "topicIds": ["science", "diplomacy", "firsts"],
     "mentionedEntityIds": ["ent_howard_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_howard_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_toni_morrison_001",
@@ -1482,7 +1561,14 @@
     "historicalContext": "Morrison's Nobel followed her 1988 Pulitzer Prize for Beloved; she is anchored at Princeton, where she spent 17 years on the faculty, rather than Howard, her undergraduate alma mater, which is already documented elsewhere in this catalog.",
     "topicIds": ["science", "literature", "firsts", "women"],
     "mentionedEntityIds": ["ent_howard_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_howard_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_rebecca_lee_crumpler_001",
@@ -1517,7 +1603,8 @@
     "historicalContext": "Crumpler's 1883 'A Book of Medical Discourses' was among the first medical texts published by an African American; the New England Female Medical College building no longer stands, so her rediscovered and rededicated gravesite is now the most concretely marked site tied to her life.",
     "topicIds": ["science", "medicine", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_james_mccune_smith_001",
@@ -1552,7 +1639,8 @@
     "historicalContext": "Smith trained at Glasgow because U.S. medical schools barred Black applicants; his New York practice and pharmacy, rather than his Scottish alma mater, is used here to anchor his U.S.-based career and keep this entry within the catalog's United States scope.",
     "topicIds": ["science", "medicine", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_alexa_canady_001",
@@ -1587,7 +1675,8 @@
     "historicalContext": "Canady, daughter of a Fisk- and Meharry-trained dentist and a Delta Sigma Theta national president, faced open skepticism early in her career; she came out of retirement in the 2000s to help establish pediatric neurosurgery at a Florida hospital before fully retiring in 2012.",
     "topicIds": ["science", "medicine", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ben_carson_001",
@@ -1622,7 +1711,8 @@
     "historicalContext": "Both Binder twins survived the surgery itself but were left with severe neurological disabilities and required lifelong institutional care in Germany; the operation is documented as a landmark in surgical technique even though its long-term outcome for the twins was not a full recovery.",
     "topicIds": ["science", "medicine", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_alain_locke_001",
@@ -1657,7 +1747,8 @@
     "historicalContext": "Locke's 1925 anthology 'The New Negro' helped define and promote the Harlem Renaissance as a literary and artistic movement; he taught English and later philosophy at Howard for most of his career.",
     "topicIds": ["science", "philosophy", "firsts", "arts"],
     "mentionedEntityIds": ["ent_howard_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_euphemia_lofton_haynes_001",
@@ -1692,7 +1783,8 @@
     "historicalContext": "Haynes founded and chaired the math department at Miner Teachers College, later part of the University of the District of Columbia, for nearly 30 years; her advocacy on the D.C. school board helped bring the 1967 Hobson v. Gardner ruling that ended the district's discriminatory tracking system.",
     "topicIds": ["science", "mathematics", "firsts", "women", "education"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_evelyn_boyd_granville_001",
@@ -1727,7 +1819,8 @@
     "historicalContext": "Granville and Browne earned their doctorates the same year at different universities; mathematician Euphemia Lofton Haynes preceded both by six years, earning the first PhD in mathematics by an African American woman from the Catholic University of America in 1943. Granville is anchored at Yale, the site of her own doctoral achievement.",
     "topicIds": ["science", "mathematics", "firsts", "women", "space"],
     "mentionedEntityIds": ["ent_euphemia_lofton_haynes_001", "ent_marjorie_lee_browne_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_marjorie_lee_browne_001",
@@ -1762,7 +1855,8 @@
     "historicalContext": "Browne chaired the mathematics department at North Carolina College (renamed North Carolina Central University in 1969) for much of her three-decade career there, training generations of Black mathematics teachers in the segregated South.",
     "topicIds": ["science", "mathematics", "firsts", "women", "education"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_garrett_morgan_001",
@@ -1805,7 +1899,8 @@
     "historicalContext": "Morgan moved to Cleveland in 1895 and became one of Ohio's most prolific Black inventors and entrepreneurs; the tunnel disaster site lies roughly 120 feet below Lake Erie and is not a documented visitable location, so this entry is anchored at city precision in the Cleveland community where Morgan lived and worked.",
     "topicIds": ["invention", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_frederick_mckinley_jones_001",
@@ -1840,7 +1935,8 @@
     "historicalContext": "Jones served as Thermo King's chief engineer and vice president of engineering for 15 years, generating more than 40 refrigeration-related patents that made refrigerated trucking, shipping, and rail transport practical nationwide.",
     "topicIds": ["invention", "firsts", "transportation"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_lewis_latimer_001",
@@ -1883,7 +1979,8 @@
     "historicalContext": "Latimer's Flushing home, where he lived from 1902 until his death in 1928, was relocated a short distance to a park site and preserved as a landmarked museum documenting his career as a draftsman and inventor for the U.S. Electric Lighting Company and Edison's companies.",
     "topicIds": ["invention", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_granville_woods_001",
@@ -1918,7 +2015,8 @@
     "historicalContext": "Woods registered nearly 60 patents over his career, founding the Woods Electric Company in Cincinnati before relocating to New York City in 1890 to work alongside his brother Lyates, also an inventor.",
     "topicIds": ["invention", "transportation"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_elijah_mccoy_001",
@@ -1953,7 +2051,8 @@
     "historicalContext": "McCoy settled with his family in Ypsilanti, Michigan after returning from engineering studies in Scotland; barred from engineering jobs by racial discrimination, he worked as a railroad fireman and oilman while developing his lubrication inventions, eventually forming the Elijah McCoy Manufacturing Company in 1920.",
     "topicIds": ["invention", "transportation"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_sarah_boone_001",
@@ -1988,7 +2087,8 @@
     "historicalContext": "Boone worked as a dressmaker for decades in New Haven, where she and her husband James, a bricklayer, raised eight children; she is buried with him in the city's Evergreen Cemetery.",
     "topicIds": ["invention", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_marie_van_brittan_brown_001",
@@ -2023,7 +2123,8 @@
     "historicalContext": "Brown lived most of her life in Jamaica, Queens, where rising neighborhood crime and her own irregular nursing hours motivated the invention; her patent is now held up as one of the earliest examples of a home security and surveillance system.",
     "topicIds": ["invention", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_george_washington_carver_001",
@@ -2082,7 +2183,14 @@
     "historicalContext": "Carver is anchored at his birthplace monument in Diamond, Missouri, rather than Tuskegee, since Tuskegee University's campus already appears elsewhere in this catalog; Carver is buried on the Tuskegee campus near Booker T. Washington.",
     "topicIds": ["invention", "science", "agriculture", "firsts"],
     "mentionedEntityIds": ["ent_tuskegee_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_tuskegee_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_otis_boykin_001",
@@ -2117,7 +2225,19 @@
     "historicalContext": "Boykin, valedictorian of Dallas's Booker T. Washington High School, moved to Chicago for work after studying at Fisk University; he held roughly 26 patents over his career before his 1982 death.",
     "topicIds": ["invention", "medicine"],
     "mentionedEntityIds": ["ent_fisk_university_001", "ent_tuskegee_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_fisk_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_tuskegee_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_valerie_thomas_001",
@@ -2152,7 +2272,14 @@
     "historicalContext": "Thomas, a 1964 Morgan State physics graduate, worked at NASA Goddard from the 1970s until her 1995 retirement and was inducted into the National Inventors Hall of Fame in 2018.",
     "topicIds": ["invention", "science", "space", "women"],
     "mentionedEntityIds": ["ent_morgan_state_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_morgan_state_university_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_mark_dean_001",
@@ -2187,7 +2314,8 @@
     "historicalContext": "Dean holds three of IBM's original nine patents for the 1981 IBM PC, developed at IBM's Boca Raton facility; in 1999 he led the team that built the first one-gigahertz computer processor chip.",
     "topicIds": ["invention", "technology", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_marian_croak_001",
@@ -2222,7 +2350,8 @@
     "historicalContext": "Croak's team also created text-to-donate technology that raised $130,000 after Hurricane Katrina in 2005 and $43 million after the 2010 Haiti earthquake; she has worked at Google as a vice president of engineering since 2014.",
     "topicIds": ["invention", "technology", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_jane_cooke_wright_001",
@@ -2257,7 +2386,8 @@
     "historicalContext": "Wright began her oncology career at Harlem Hospital under her father, Louis T. Wright, one of the first Black graduates of Harvard Medical School; she later moved her chemotherapy research to New York Medical College, now located in Valhalla, New York.",
     "topicIds": ["science", "medicine", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_norbert_rillieux_001",
@@ -2292,7 +2422,8 @@
     "historicalContext": "Rillieux's evaporator remains the basis for large-scale industrial evaporation processes worldwide; a precise surviving address for his 1840s refinery work was not identified, so this entry uses city-level precision for New Orleans.",
     "topicIds": ["invention", "engineering"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_thomas_l_jennings_001",
@@ -2327,7 +2458,8 @@
     "historicalContext": "As a free-born Black tradesman, Jennings could legally hold a patent under the Patent Act of 1793's citizenship requirement, unlike enslaved inventors whose work legally belonged to enslavers; his exact shop address is not consistently documented, so this entry uses city-level precision for Manhattan.",
     "topicIds": ["invention", "firsts", "civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_sarah_e_goode_001",
@@ -2362,7 +2494,8 @@
     "historicalContext": "Goode and her husband Archibald, a carpenter, ran a Chicago furniture store together; her invention addressed the needs of working-class customers living in cramped apartments who lacked space for a full bed.",
     "topicIds": ["invention", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_james_west_001",
@@ -2397,7 +2530,8 @@
     "historicalContext": "West was born at home in Prince Edward County, Virginia because the local hospital in Farmville admitted only white patients; he and Sessler were jointly inducted into the National Inventors Hall of Fame in 1999, and West also led Bell System diversity programs for women and underrepresented minority researchers.",
     "topicIds": ["invention", "technology", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_george_carruthers_001",
@@ -2432,7 +2566,8 @@
     "historicalContext": "Carruthers spent nearly his entire career at the Naval Research Laboratory starting in 1964, also designing an instrument that captured ultraviolet images of Halley's Comet and one flown on the STS-39 space shuttle mission in 1991.",
     "topicIds": ["invention", "science", "space"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_emmett_chappelle_001",
@@ -2467,7 +2602,8 @@
     "historicalContext": "Chappelle grew up on a farm in Phoenix, Arizona and earned degrees at UC Berkeley and the University of Washington before joining NASA; he received NASA's Exceptional Scientific Achievement Medal in 1994.",
     "topicIds": ["invention", "science", "space"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_solomon_carter_fuller_001",
@@ -2502,7 +2638,8 @@
     "historicalContext": "Fuller rose to associate professor of pathology and neurology at Boston University by 1921; the American Psychiatric Association established the Solomon Carter Fuller Award in 1969 to honor Black psychiatric pioneers, and his portrait hangs at APA headquarters in Washington, D.C.",
     "topicIds": ["science", "medicine", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_william_augustus_hinton_001",
@@ -2537,7 +2674,8 @@
     "historicalContext": "Barred from surgical training by racial discrimination despite graduating with honors from Harvard Medical School in 1912, Hinton built his career in laboratory science instead, publishing 'Syphilis and Its Treatment' in 1936, the first medical textbook authored by a Black American.",
     "topicIds": ["science", "medicine", "firsts"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_charles_henry_turner_001",
@@ -2572,7 +2710,8 @@
     "historicalContext": "Despite an advanced degree and more than 20 publications before 1908, Turner could not secure a university research position because of racial discrimination; his classroom research on bee and ant cognition at Sumner High School nonetheless produced findings still cited in animal behavior science today.",
     "topicIds": ["science", "biology", "firsts", "education"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_david_e_harris_001",
@@ -2607,7 +2746,8 @@
     "historicalContext": "Harris, a 1957 Ohio State graduate commissioned into the Air Force, left military service partly over race-based housing discrimination he faced on assignments; his hiring came a year after Marlon Green's Supreme Court case forced Continental Airlines to hire Black pilots.",
     "topicIds": ["aviation", "firsts", "military"],
     "mentionedEntityIds": ["ent_marlon_green_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_jill_brown_001",
@@ -2642,6 +2782,7 @@
     "historicalContext": "Brown grew up in Baltimore and took her first flying lessons with family members at 17; she left Texas International after a year and continued flying professionally for cargo carrier Zantop International Airlines.",
     "topicIds": ["aviation", "firsts", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   }
 ]

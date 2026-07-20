@@ -33,7 +33,8 @@
     "historicalContext": "The rebellion's suppression prompted South Carolina's 1740 Negro Act, which tightened restrictions on enslaved people's movement, assembly, and literacy for generations. Historians read the marchers' choice of Spanish Florida — where Fort Mose already sheltered self-emancipated people — as a deliberate, informed bid for freedom rather than a spontaneous outburst.",
     "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": ["ent_fort_mose_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ny_slave_revolt_1712_001",
@@ -69,7 +70,8 @@
     "historicalContext": "New York held one of the largest enslaved populations of any British mainland colony — roughly one in five residents was enslaved in 1712 — and enslaved and free people often worked and lived in close proximity, which colonial authorities blamed for enabling the coordinated action. The uprising is among the earliest organized slave revolts documented in what became the United States.",
     "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ny_conspiracy_1741_001",
@@ -105,7 +107,8 @@
     "historicalContext": "Whatever the underlying truth, the trials produced one of the largest mass executions in American history and were followed by tighter restrictions on enslaved New Yorkers' assembly, movement, and access to water pumps — a reminder that even a doubtful conspiracy charge could be wielded to terrorize an entire community.",
     "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_gabriels_rebellion_001",
@@ -141,7 +144,8 @@
     "historicalContext": "Gabriel modeled his plan partly on the Haitian Revolution and the rhetoric of the American and French Revolutions, and reportedly planned to spare Quakers, Methodists, and Frenchmen as potential allies. Virginia's legislature responded not with reform but with harsher restrictions on free Black residents and enslaved people's education, assembly, and hiring.",
     "topicIds": ["resistance", "rebellion", "organizing"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_pointe_coupee_conspiracy_001",
@@ -177,7 +181,8 @@
     "historicalContext": "Investigators found a copy of the French Declaration of the Rights of Man in an enslaved man's cabin, underscoring how Atlantic revolutionary ideas circulated among the enslaved population of the lower Mississippi Valley. Governor Francisco Luis Héctor de Carondelet used the conspiracy to justify stricter controls on Louisiana's enslaved population.",
     "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_german_coast_uprising_001",
@@ -213,7 +218,8 @@
     "historicalContext": "Though larger in scale than Nat Turner's later rebellion, the German Coast Uprising is comparatively little known outside Louisiana; a 2019 reenactment led by artist Dread Scott retraced the marchers' route to restore the event to public memory as an act of organized resistance rather than a footnote.",
     "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_denmark_vesey_conspiracy_001",
@@ -249,7 +255,8 @@
     "historicalContext": "Vesey had helped found Charleston's African Church (the congregation that became Emanuel AME) two years earlier, and the conspiracy's exposure led the city to shutter that church and pass some of the antebellum South's most restrictive laws on Black assembly and literacy. Vesey is honored today with a Charleston monument dedicated in 2014 after decades of public debate.",
     "topicIds": ["resistance", "rebellion", "organizing"],
     "mentionedEntityIds": ["ent_denmark_vesey_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_denmark_vesey_001",
@@ -284,7 +291,14 @@
     "historicalContext": "This entry is anchored at the Bull Street property because it is Vesey's federally designated National Historic Landmark, even though researchers now believe his actual home stood nearby and is no longer extant. He is more fully documented through the 1822 conspiracy he organized, held separately in this catalog.",
     "topicIds": ["resistance", "organizing", "freedom"],
     "mentionedEntityIds": ["ent_fort_concho_nhl_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_fort_concho_nhl_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_nat_turner_rebellion_001",
@@ -320,7 +334,8 @@
     "historicalContext": "Turner described his rebellion as a mission of divine judgment against slaveholders, framing his actions as fulfillment of prophecy rather than random violence. His confession, dictated to attorney Thomas Gray before his execution, remains a primary source for understanding his motives, though scholars caution that Gray's transcription reflects his own framing of events.",
     "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": ["ent_nat_turner_trial_site_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_nat_turner_trial_site_001",
@@ -356,7 +371,8 @@
     "historicalContext": "Distinct from the rebellion's starting point near present-day Boykins, this courthouse site represents the machinery of law that both tried Turner's rebels and, for over two centuries before 1831, had enforced Virginia's slave codes — a place where the state's response to Black resistance played out as much as the revolt itself.",
     "topicIds": ["resistance", "rebellion"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_igbo_landing_001",
@@ -392,7 +408,8 @@
     "historicalContext": "Precise casualty figures and some details of the episode vary across oral traditions and the few surviving contemporaneous accounts, but the National Park Service and Georgia Historical Society both frame the event as a deliberate act of self-determination — 'you may enslave my body, but not my mind, not my soul' — rather than a story of passive victimhood, and it became a touchstone of the 'Flying Africans' folklore later documented across the Gullah Geechee corridor.",
     "topicIds": ["resistance"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_negro_fort_001",
@@ -428,7 +445,8 @@
     "historicalContext": "Prospect Bluff represented the largest community of free Black people in North America before the Civil War, and its destruction — ordered because U.S. commanders viewed an armed, self-governing Black settlement as an intolerable threat — is considered by some historians a precipitating event of the First Seminole War. The site is preserved today within the Apalachicola National Forest and listed on the National Register of Historic Places.",
     "topicIds": ["resistance", "freedom", "community"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_great_dismal_swamp_maroons_001",
@@ -463,7 +481,8 @@
     "historicalContext": "Unlike single rebellions that ended in defeat, the Dismal Swamp's maroon communities sustained multigenerational, self-governing Black life largely outside slaveholders' control for roughly two centuries — a sustained practice of self-determination that predates and outlasted most documented armed uprisings. The 111,000-acre refuge, established by Congress in 1974, today protects both the wetland ecosystem and this archaeological record.",
     "topicIds": ["resistance", "freedom", "community"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_amistad_case_001",
@@ -498,7 +517,8 @@
     "historicalContext": "The Amistad case became a rallying point for the American abolitionist movement and helped establish the Amistad Committee, which evolved into the American Missionary Association and later laid groundwork for Connecticut's statewide Freedom Trail of nearly 160 sites.",
     "topicIds": ["resistance", "freedom"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_creole_case_001",
@@ -533,7 +553,8 @@
     "historicalContext": "Because it freed more enslaved people than any other slave-ship rebellion in U.S. history, the Creole case became a diplomatic flashpoint between the United States and Britain and a celebrated example for abolitionists, including Frederick Douglass, who fictionalized Madison Washington's leadership in his 1853 novella 'The Heroic Slave.'",
     "topicIds": ["resistance", "freedom"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_john_brown_harpers_ferry_001",
@@ -569,7 +590,8 @@
     "historicalContext": "Black raiders Copeland and Green were tried separately and hanged; Osborne Perry Anderson was the only Black participant to escape and later published an eyewitness account, 'A Voice from Harper's Ferry.' Frederick Douglass, who declined to join the raid himself, called Brown's willingness to die for Black freedom a turning point in the nation's reckoning with slavery.",
     "topicIds": ["resistance", "abolition"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_levi_coffin_house_001",
@@ -604,7 +626,8 @@
     "historicalContext": "The Coffins operated openly rather than in total secrecy, trusting their Quaker community's shared abolitionist commitment and the protection of a well-organized regional network. The house is administered today by the Indiana State Museum and Historic Sites and is part of the National Park Service's Network to Freedom program.",
     "topicIds": ["underground-railroad", "freedom"],
     "mentionedEntityIds": ["ent_fort_concho_nhl_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_william_still_001",
@@ -639,7 +662,8 @@
     "historicalContext": "Still was moved to document fugitives' stories in part by his own family history: his older brother Peter Still, left enslaved in Alabama when their mother escaped with only two of her children, walked into the Philadelphia Anti-Slavery office decades later and the two brothers recognized each other. This entry is anchored near the historic Anti-Slavery Society offices in Philadelphia's Old City, the center of Still's decades of vigilance-committee work.",
     "topicIds": ["underground-railroad", "organizing", "freedom"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_josiah_henson_site_001",
@@ -674,7 +698,8 @@
     "historicalContext": "After reaching Canada, Henson co-founded the Dawn Settlement, a self-governing community for formerly enslaved people in Ontario, and returned to the United States only as a free man and celebrated speaker. The Montgomery County site, part of the National Park Service's Network to Freedom, now includes a visitor center and the 1850s-era Riley-Bolten House.",
     "topicIds": ["underground-railroad", "freedom"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_rokeby_museum_001",
@@ -709,7 +734,8 @@
     "historicalContext": "The Robinson family's own history is layered: earlier generations of Robinsons had been enslavers before Thomas and Jemima Robinson's descendants became committed abolitionists, and the museum's exhibits address that transformation directly rather than erasing it.",
     "topicIds": ["underground-railroad", "abolition"],
     "mentionedEntityIds": ["ent_fort_concho_nhl_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_second_baptist_detroit_001",
@@ -744,7 +770,8 @@
     "historicalContext": "Frederick Douglass, Sojourner Truth, and John Brown all worked with Second Baptist's congregation, which moved to its present Monroe Street building in 1857 after a fire destroyed its original meeting hall. The church remains an active congregation today.",
     "topicIds": ["underground-railroad", "freedom", "organizing"],
     "mentionedEntityIds": ["ent_john_brown_harpers_ferry_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_niagara_falls_crossing_001",
@@ -779,7 +806,8 @@
     "historicalContext": "Niagara Falls's flourishing tourism industry employed many Black waiters and staff who quietly supported the Underground Railroad network, and the city's accessibility via the Erie Canal and multiple rail lines made it one of the most heavily trafficked northern crossing points into Canada.",
     "topicIds": ["underground-railroad", "freedom"],
     "mentionedEntityIds": ["ent_harriet_tubman_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_freedom_house_museum_001",
@@ -815,7 +843,8 @@
     "historicalContext": "Franklin and Armfield were among the wealthiest Americans of their era, building their fortune on forced separation of families; the museum today centers the perspective of the enslaved people trafficked through the site rather than the traders who profited from it, and is listed on the National Register of Historic Places.",
     "topicIds": ["freedom", "resistance"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_christiana_resistance_001",
@@ -851,7 +880,8 @@
     "historicalContext": "Federal prosecutors charged more than 30 participants, mostly Black, with treason, but a Philadelphia jury acquitted the first defendant within minutes and the government dropped the remaining cases, making Christiana a rare instance of successful armed Black self-defense against the Fugitive Slave Act rather than a story of retribution.",
     "topicIds": ["resistance", "underground-railroad"],
     "mentionedEntityIds": ["ent_law_fugitive_slave_act_1850"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_oberlin_wellington_rescue_001",
@@ -886,7 +916,8 @@
     "historicalContext": "The rescue is considered one of the events pushing the nation toward civil war, and it demonstrated the biracial character of Ohio's Underground Railroad network. Charles Langston's brother John Mercer Langston, a prominent Black attorney and later congressman, helped organize the rescuers' legal defense.",
     "topicIds": ["underground-railroad", "resistance"],
     "mentionedEntityIds": ["ent_john_mercer_langston_001", "ent_langston_ok_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_thomas_garrett_house_001",
@@ -921,7 +952,8 @@
     "historicalContext": "Garrett was convicted and fined in 1848 for helping the Hawkins family escape slavery, a judgment that left him financially devastated but did not stop his work; he continued aiding freedom seekers until his death in 1871, after which formerly enslaved Wilmington residents carried his coffin to burial.",
     "topicIds": ["underground-railroad", "freedom"],
     "mentionedEntityIds": ["ent_harriet_tubman_001", "ent_william_still_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_john_rankin_house_001",
@@ -956,7 +988,8 @@
     "historicalContext": "Ripley's riverfront position and its concentration of committed abolitionists, including Rankin and fellow conductor John P. Parker, made it one of the most active Underground Railroad crossing points on the entire Ohio River.",
     "topicIds": ["underground-railroad", "freedom"],
     "mentionedEntityIds": ["ent_john_parker_house_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_jermain_loguen_001",
@@ -991,7 +1024,19 @@
     "historicalContext": "Loguen publicly declared at Syracuse City Hall in October 1850, 'I don't respect this law. I don't fear it. I won't obey it!' — helping establish Syracuse as a self-declared 'open city' for freedom seekers. He later became a bishop of the African Methodist Episcopal Zion Church, serving until his death in 1872.",
     "topicIds": ["underground-railroad", "resistance", "abolition"],
     "mentionedEntityIds": ["ent_law_fugitive_slave_act_1850", "ent_mother_ame_zion_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_fugitive_slave_act_1850",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_mother_ame_zion_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_lewis_hayden_house_001",
@@ -1026,7 +1071,8 @@
     "historicalContext": "During the Civil War, Hayden recruited Black soldiers for the 54th Massachusetts Regiment, and he later served in the Massachusetts House of Representatives in 1873, one of the state's first Black legislators.",
     "topicIds": ["underground-railroad", "freedom"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_david_ruggles_001",
@@ -1061,7 +1107,8 @@
     "historicalContext": "Ruggles also ran the first Black-owned bookstore and printing press in the United States and published one of the earliest Black-edited magazines; he later moved to Northampton, Massachusetts, where he became known as a pioneering hydrotherapist. This entry is anchored at his documented Lispenard Street residence in Manhattan.",
     "topicIds": ["underground-railroad", "organizing", "resistance"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_harriet_jacobs_001",
@@ -1096,7 +1143,8 @@
     "historicalContext": "Jacobs later worked as a nurse and relief organizer among formerly enslaved refugees during and after the Civil War in Virginia and Georgia before settling in Washington, D.C. Many buildings from her Edenton years no longer stand, but a self-guided walking tour from the Edenton State Historic Site Visitor Center traces the sites she describes.",
     "topicIds": ["underground-railroad", "resistance", "freedom"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ona_judge_001",
@@ -1131,7 +1179,14 @@
     "historicalContext": "No structure tied to Judge's time in Greenland survives, so this entry is anchored at the town itself, honestly reflecting the limits of the physical record; a 2023 mural in Portsmouth commemorates her life. Judge refused two direct offers to return to the Washingtons' custody, telling an interviewer late in life she preferred 'death rather than to go back into slavery.'",
     "topicIds": ["resistance", "freedom"],
     "mentionedEntityIds": ["ent_george_washington_carver_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_george_washington_carver_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_north_star_newspaper_001",
@@ -1166,7 +1221,8 @@
     "historicalContext": "The North Star's masthead motto — 'Right is of no Sex, Truth is of no Color, God is the Father of us all, and we are all Brethren' — reflected Douglass's insistence on Black-led abolitionist journalism independent of white-run antislavery papers of the era.",
     "topicIds": ["abolition", "underground-railroad", "organizing"],
     "mentionedEntityIds": ["ent_harriet_tubman_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_anthony_burns_case_001",
@@ -1201,7 +1257,8 @@
     "historicalContext": "Public outrage over the Burns case shifted Massachusetts opinion sharply against the Fugitive Slave Law and led the state legislature to pass a Personal Liberty Law making the federal act nearly unenforceable there — a case where the law's brutal enforcement backfired into political defeat for slavery's federal defenders.",
     "topicIds": ["resistance", "underground-railroad"],
     "mentionedEntityIds": ["ent_law_fugitive_slave_act_1850"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_great_migration_001",
@@ -1236,7 +1293,8 @@
     "historicalContext": "Historians typically divide the migration into two waves: the First Great Migration (1916-1940), spurred partly by World War I labor demand, and the Second Great Migration (1940-1970), driven by World War II defense industry jobs and reaching further into the West Coast. The movement was an act of collective self-determination — millions of families weighing danger and opportunity and choosing, in massive numbers, to leave rather than continue living under Jim Crow.",
     "topicIds": ["great-migration", "freedom", "organizing"],
     "mentionedEntityIds": ["ent_louis_armstrong_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_chicago_defender_001",
@@ -1271,7 +1329,8 @@
     "historicalContext": "The Defender was banned or suppressed by some Southern authorities and vigilantes who recognized its power to encourage Black Southerners to leave; its distribution network of Pullman porters, who carried bundles of papers on southbound trains, made it a form of institution-building resistance in its own right, not merely a chronicle of the migration it helped cause.",
     "topicIds": ["great-migration", "organizing", "publication"],
     "mentionedEntityIds": ["ent_robert_abbott_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_pittsburgh_courier_001",
@@ -1306,7 +1365,8 @@
     "historicalContext": "The Courier was based in Pittsburgh's Hill District, itself a major Great Migration destination neighborhood, and its reporters covered the community's rapid growth from roughly 10,000 Black residents in 1890 to over 37,000 by 1920. The paper's 1942 'Double Victory' campaign later linked the fight against fascism abroad to the fight against segregation at home.",
     "topicIds": ["great-migration", "organizing", "publication"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_national_urban_league_001",
@@ -1341,7 +1401,8 @@
     "historicalContext": "Unlike the NAACP, which focused on legal and political rights, the Urban League concentrated on the practical, day-to-day work of economic self-sufficiency for Great Migration arrivals — job placement, housing assistance, and vocational training — establishing affiliates in dozens of cities as the migration accelerated through the 1910s and 1920s.",
     "topicIds": ["great-migration", "organizing"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_black_bottom_paradise_valley_001",
@@ -1376,7 +1437,8 @@
     "historicalContext": "The name 'Black Bottom' originated with French colonial settlers describing the area's dark, fertile soil, predating the Black community that later built its economic and cultural life there; Paradise Valley specifically referred to the neighborhood's entertainment district of jazz clubs and theaters that drew major touring performers through the 1940s and 1950s.",
     "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_fillmore_district_sf_001",
@@ -1415,7 +1477,8 @@
       "ent_john_coltrane_001",
       "ent_louis_armstrong_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_central_district_seattle_001",
@@ -1450,7 +1513,8 @@
     "historicalContext": "By the 1970s the Central District had become the organizing center of Seattle's civil rights movement, home to churches, Black-owned businesses, and community institutions built over nearly a century, even as discriminatory redlining had initially forced that concentration rather than freely choosing it.",
     "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_hill_district_pittsburgh_001",
@@ -1485,7 +1549,8 @@
     "historicalContext": "In the mid-1950s a substantial section of the Hill District was demolished for redevelopment, displacing about 8,000 residents — a pattern of urban renewal-driven displacement that struck Great Migration destination neighborhoods across the country, from Pittsburgh to Detroit to St. Louis.",
     "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": ["ent_duke_ellington_001", "ent_louis_armstrong_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_rondo_st_paul_001",
@@ -1520,7 +1585,8 @@
     "historicalContext": "Since 1983, the annual Rondo Days festival has celebrated the neighborhood's history and continuing legacy, and the ReConnect Rondo initiative has since organized to physically reunite the community the freeway split in two.",
     "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mill_creek_valley_stl_001",
@@ -1555,7 +1621,8 @@
     "historicalContext": "A 2023 memorial, 'Pillars of the Valley,' and a 2025 Missouri History Museum exhibit have worked to restore Mill Creek Valley to public memory; St. Louis's other major historic Black neighborhood, the Ville, survived urban renewal and remains a distinct North Side community today.",
     "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": ["ent_phillis_wheatley_001", "ent_scott_joplin_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_overtown_miami_001",
@@ -1590,7 +1657,8 @@
     "historicalContext": "Overtown's musicians and hoteliers built a self-sufficient entertainment economy precisely because segregation barred Black performers and patrons from Miami Beach's hotels and clubs — turning exclusion into an engine of Black-owned enterprise until federal highway construction displaced it.",
     "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": ["ent_billie_holiday_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_watts_los_angeles_001",
@@ -1625,7 +1693,8 @@
     "historicalContext": "By the 1940s, 95 percent of Los Angeles-area housing was effectively off-limits to Black residents through restrictive covenants, concentrating Second Great Migration arrivals into Watts and a handful of other South Los Angeles neighborhoods regardless of their individual preferences or means.",
     "topicIds": ["great-migration", "community"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ida_b_wells_001",
@@ -1660,7 +1729,8 @@
     "historicalContext": "Wells's investigative method — traveling to lynching sites, interviewing witnesses, and publishing statistical analysis in pamphlets like 'Southern Horrors' and 'A Red Record' — pioneered techniques of data journalism decades before the term existed, and she remained an outspoken organizer in Chicago's Black community, including Great Migration-era settlement work, until her death in 1931.",
     "topicIds": ["organizing", "resistance", "journalism"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_robert_abbott_001",
@@ -1695,7 +1765,8 @@
     "historicalContext": "Abbott's paper depended on an underground distribution network of Pullman porters who carried bundles south, since some Southern communities banned the Defender outright for its role in encouraging Black residents to leave. His grand-nephew John H. Sengstacke later ran the paper and helped found the National Newspaper Publishers Association.",
     "topicIds": ["great-migration", "organizing", "journalism"],
     "mentionedEntityIds": ["ent_chicago_defender_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_east_st_louis_massacre_001",
@@ -1731,7 +1802,8 @@
     "historicalContext": "The Silent Parade organized in response was itself a landmark act of collective Black political resistance — one of the first major civil rights demonstrations in American history — using disciplined, wordless protest to demand federal action against lynching and mob violence rather than framing the massacre's survivors as passive victims.",
     "topicIds": ["great-migration"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_chicago_race_riot_1919_001",
@@ -1767,7 +1839,8 @@
     "historicalContext": "The riot erupted in a city whose Black population had roughly tripled during the Great Migration's first wave, intensifying competition for housing and jobs that white mobs weaponized into violence. A 2021 initiative secured Eugene Williams a marked grave at Lincoln Cemetery, and public memorials now center the riot's Black victims by name rather than treating the violence as an anonymous statistic.",
     "topicIds": ["great-migration"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_elaine_massacre_001",
@@ -1803,7 +1876,8 @@
     "historicalContext": "The massacre is most accurately understood as the violent suppression of a labor organizing effort — Black sharecroppers exercising their right to collectively bargain — rather than a spontaneous racial conflict, and the NAACP's successful Supreme Court appeal in Moore v. Dempsey established that mob-dominated trials violated due process, a foundational precedent for federal habeas corpus review of state convictions.",
     "topicIds": ["great-migration", "organizing"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_rosewood_massacre_001",
@@ -1839,7 +1913,8 @@
     "historicalContext": "Rosewood's residents were largely self-sufficient property owners rather than a struggling community, which makes the massacre's erasure of accumulated Black wealth and multi-generational institution-building especially stark; survivors and descendants who fled preserved the town's memory in family testimony for seven decades before public reckoning began in the 1980s and 1990s.",
     "topicIds": ["great-migration"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_wilmington_massacre_1898_001",
@@ -1875,7 +1950,8 @@
     "historicalContext": "Before 1898, Wilmington had a thriving Black professional and merchant class and a functioning biracial city government, making the coup a deliberate reversal of Reconstruction-era Black political power rather than a spontaneous riot; the exodus of Black Wilmingtonians in its aftermath is considered by some historians a direct forerunner of the Great Migration's later, larger waves.",
     "topicIds": ["great-migration"],
     "mentionedEntityIds": ["ent_great_migration_001", "ent_mfdp_dnc_challenge_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_kansas_exodus_1879_001",
@@ -1914,7 +1990,8 @@
       "ent_law_ku_klux_klan_act_1871",
       "ent_nicodemus_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_benjamin_pap_singleton_001",
@@ -1949,7 +2026,8 @@
     "historicalContext": "Singleton framed Black land ownership and self-governing colonies as the only reliable protection against Southern racial violence and broken promises, telling followers he wanted them to become 'a people' rather than remain dependent on white landowners; most Dunlap settlers initially lived in dugouts before establishing permanent homes, farms, and a Freedmen's Academy planned by the Presbyterian Church.",
     "topicIds": ["great-migration", "organizing", "freedom"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_combahee_river_raid_001",
@@ -1984,7 +2062,8 @@
     "historicalContext": "The raid built directly on Tubman's Underground Railroad expertise in stealth and reconnaissance, applied here at a wartime, military scale that liberated in a single night more than ten times the number of people she guided to freedom across her entire prewar career as a conductor.",
     "topicIds": ["resistance", "freedom", "underground-railroad"],
     "mentionedEntityIds": ["ent_harriet_tubman_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_unia_harlem_001",
@@ -2019,7 +2098,8 @@
     "historicalContext": "Garvey built the UNIA into the largest Black nationalist organization in history, claiming millions of members and hundreds of branches worldwide within a few years, promoting economic self-sufficiency ventures including the Black Star Line shipping company alongside its message of racial pride and eventual return to an independent Africa.",
     "topicIds": ["great-migration", "organizing"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_green_book_001",
@@ -2054,7 +2134,8 @@
     "historicalContext": "A 1941 edition of the Green Book was displayed at the opening of the Smithsonian's National Museum of African American History and Culture in 2016, and many of the businesses it once listed have since become the focus of dedicated preservation and mapping projects documenting Black commercial life in the Jim Crow era.",
     "topicIds": ["great-migration", "organizing"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_march_on_washington_movement_1941_001",
@@ -2093,7 +2174,14 @@
       "ent_brotherhood_sleeping_car_porters_001",
       "ent_march_on_washington_1963_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_march_on_washington_1963_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_norfolk_journal_guide_001",
@@ -2128,7 +2216,8 @@
     "historicalContext": "Young steered the paper toward a gradualist, Booker T. Washington-influenced editorial line that sometimes put him at odds with more militant Black journalists of his era, but the Journal and Guide's reporting and job-listing pages served the same practical function for Virginia's Great Migration-era Black community that the Chicago Defender served in the Midwest.",
     "topicIds": ["great-migration", "organizing", "publication"],
     "mentionedEntityIds": ["ent_chicago_defender_001", "ent_tuskegee_university_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_charlotta_bass_001",
@@ -2163,6 +2252,7 @@
     "historicalContext": "Bass's paper documented and organized around the same Second Great Migration-era housing restrictions that concentrated Black Angelenos in neighborhoods like Watts, and her 1952 nomination for vice president on the Progressive Party ticket made her the first Black woman to run for that office on a national ticket.",
     "topicIds": ["great-migration", "organizing", "journalism"],
     "mentionedEntityIds": ["ent_law_ku_klux_klan_act_1871"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   }
 ]

@@ -35,7 +35,14 @@
       "ent_march_on_washington_1963_001",
       "ent_march_on_washington_movement_1941_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_march_on_washington_1963_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_coalition_black_trade_unionists_001",
@@ -70,7 +77,8 @@
     "historicalContext": "CBTU emerged when Black trade unionists concluded that AFL-CIO neutrality in 1972 would not protect Black workers from Nixon-era retrenchment; the Chicago meeting remains the largest single gathering of Black unionists in U.S. labor history and the group continues as an AFL-CIO constituency organization.",
     "topicIds": ["labor", "unions", "civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_negro_american_labor_council_001",
@@ -108,7 +116,14 @@
       "ent_brotherhood_sleeping_car_porters_001",
       "ent_march_on_washington_1963_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_march_on_washington_1963_001",
+        "type": "participated_in",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_colored_national_labor_union_001",
@@ -143,7 +158,8 @@
     "historicalContext": "Isaac Myers, a Baltimore ship-caulker who had organized the Colored Caulkers Trade Union Society, served as the CNLU's president; though the union lasted only a few years, it documented Reconstruction-era Black workers' demand for both industrial organization and agrarian reform.",
     "topicIds": ["labor", "unions", "reconstruction"],
     "mentionedEntityIds": ["ent_core_founding_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_memphis_sanitation_strike_1968_001",
@@ -178,7 +194,8 @@
     "historicalContext": "Strikers carried \"I AM A MAN\" placards that linked dignity to economic rights; Martin Luther King Jr. joined the cause as part of the Poor People's Campaign before his assassination in Memphis on April 4, 1968, and the settlement became a landmark public-sector organizing victory.",
     "topicIds": ["labor", "unions", "civil-rights"],
     "mentionedEntityIds": ["ent_martin_luther_king_jr_001", "ent_poor_peoples_campaign_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_drum_detroit_001",
@@ -213,7 +230,8 @@
     "historicalContext": "DRUM pioneered the Revolutionary Union Movement model — plant-based Black caucuses that used wildcat strikes and shop-floor newspapers when official unions would not address racial hierarchies on the assembly line; it became a core member of the League of Revolutionary Black Workers in 1969.",
     "topicIds": ["labor", "unions", "automotive"],
     "mentionedEntityIds": ["ent_league_revolutionary_black_workers_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_league_revolutionary_black_workers_001",
@@ -248,7 +266,8 @@
     "historicalContext": "The League extended the DRUM model to Eldon Avenue Gear and Lighting (ELRUM), Ford's River Rouge complex (FRUM), and non-auto workplaces including UPS and Detroit newspapers, forcing the UAW and Chrysler to confront Black workers' charges that union bureaucracy mirrored shop-floor racism.",
     "topicIds": ["labor", "unions", "black-power"],
     "mentionedEntityIds": ["ent_drum_detroit_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_mississippi_freedom_labor_union_001",
@@ -283,7 +302,8 @@
     "historicalContext": "The MFLU grew from Freedom School conversations and support from the Mississippi Freedom Democratic Party and Delta Ministry, extending civil-rights organizing into plantation labor after the 1964 Civil Rights Act; strikers later established Strike City near Cleveland, Mississippi when evicted from plantation housing.",
     "topicIds": ["labor", "agriculture", "civil-rights"],
     "mentionedEntityIds": ["ent_mfdp_dnc_challenge_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_black_workers_for_justice_001",
@@ -318,7 +338,8 @@
     "historicalContext": "Operating from a Workers Center in Rocky Mount, BWFJ later supported Schlage Lock plant workers fighting closure, families after the 1991 Imperial Foods fire in Hamlet, and the formation of UE Local 150 for North Carolina public-sector workers.",
     "topicIds": ["labor", "workers-rights", "community-organizing"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_ila_local_1422_charleston_001",
@@ -353,7 +374,8 @@
     "historicalContext": "Charleston's Black longshoremen organized strikes for higher wages within months of emancipation and built durable union institutions through Reconstruction and Jim Crow; Local 1422 leaders including Kenneth Riley Jr. carried that waterfront tradition into twenty-first-century global solidarity campaigns.",
     "topicIds": ["labor", "unions", "maritime"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_atlanta_washerwomen_strike_1881_001",
@@ -388,7 +410,8 @@
     "historicalContext": "Less than two decades after emancipation, Atlanta's washerwomen used church networks and neighborhood committees to wage one of the most organized labor campaigns in the post-Reconstruction South, demonstrating how Black women domestic workers could translate collective power into wage standards.",
     "topicIds": ["labor", "domestic-work", "women"],
     "mentionedEntityIds": ["ent_hill_district_pittsburgh_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_federation_southern_cooperatives_001",
@@ -423,7 +446,8 @@
     "historicalContext": "The Epes center served member cooperatives in more than a dozen states with workshops on cattle, greenhouse, and row-crop production while credit unions and revolving loan funds helped families resist the land loss that accelerated after the 1960s; the site is under study for National Register listing.",
     "topicIds": ["cooperatives", "agriculture", "economic-justice"],
     "mentionedEntityIds": ["ent_movement_civil_rights_movement"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_freedom_quilting_bee_001",
@@ -458,7 +482,8 @@
     "historicalContext": "Rev. Francis X. Walter's interfaith civil-rights work in west Alabama linked quilters from Gee's Bend and Alberta to New York buyers; the cooperative gave Black Belt women income and organizational experience during voting-rights and land-rights struggles in one of the poorest counties in the United States.",
     "topicIds": ["cooperatives", "craft", "civil-rights"],
     "mentionedEntityIds": ["ent_movement_civil_rights_movement"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_1199seiu_healthcare_workers_001",
@@ -493,7 +518,8 @@
     "historicalContext": "1199's hospital campaigns fused postwar civil-rights mobilization with industrial unionism in New York's voluntary hospitals; the union's 1930s Harlem pickets against segregated drugstores preceded decades of Black and Latina worker leadership in healthcare organizing across the Northeast.",
     "topicIds": ["labor", "unions", "healthcare"],
     "mentionedEntityIds": ["ent_harlem_001", "ent_martin_luther_king_jr_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_national_domestic_workers_alliance_001",
@@ -528,6 +554,7 @@
     "historicalContext": "NDWA extended a lineage from Dorothy Bolden's 1960s Atlanta domestic-worker organizing through state bill-of-rights campaigns in New York, California, and elsewhere; the Atlanta founding linked local worker centers into a national voice for a workforce historically excluded from federal labor protections.",
     "topicIds": ["labor", "domestic-work", "women"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   }
 ]

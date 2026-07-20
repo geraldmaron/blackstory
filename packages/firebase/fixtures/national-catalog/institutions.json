@@ -35,6 +35,11 @@
         "id": "ent_rosa_parks_arrest_site_001",
         "type": "located_at",
         "direction": "outgoing"
+      },
+      {
+        "id": "ent_montgomery_bus_boycott_001",
+        "type": "related_to",
+        "direction": "outgoing"
       }
     ],
     "topicIds": ["museum", "civil-rights", "education"],
@@ -158,7 +163,8 @@
     "historicalContext": "Proposals for a national museum of Black history circulated for nearly a century — Black Civil War veterans first petitioned for a memorial building in 1915 — before the 2003 legislation signed by President George W. Bush created the museum.",
     "topicIds": ["museum", "history", "culture"],
     "mentionedEntityIds": ["ent_harriet_tubman_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_dusable_museum_001",
@@ -193,7 +199,8 @@
     "historicalContext": "Founded outside white-led museum institutions during the civil rights era, the DuSable modeled community-built Black museology; Taylor-Burroughs, a poet and printmaker of the Chicago Black Renaissance, ran it from her own living room before it moved to Washington Park in 1973.",
     "topicIds": ["museum", "art", "history"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_motown_museum_001",
@@ -228,7 +235,8 @@
     "historicalContext": "From this converted photographer's studio, Motown became the most successful Black-owned record company of its era, producing a run of 1960s hits that carried Black artists to the center of American popular music.",
     "topicIds": ["music", "museum", "culture"],
     "mentionedEntityIds": ["ent_berry_gordy_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_studio_museum_harlem_001",
@@ -305,7 +313,8 @@
     "historicalContext": "Wright founded the museum after visiting a Danish memorial to World War II resistance fighters, determined that Black history deserved the same permanent institutional care; for decades it was the largest African American history museum in the country.",
     "topicIds": ["museum", "history", "culture"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_negro_leagues_baseball_museum_001",
@@ -477,7 +486,8 @@
     "historicalContext": "Philadelphia held the largest free Black population of the early republic; Richard Allen's Mother Bethel AME Church and the Free African Society were founded blocks from the museum's site, a legacy its core exhibition 'Audacious Freedom' documents.",
     "topicIds": ["museum", "history", "culture"],
     "mentionedEntityIds": ["ent_mother_bethel_ame_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_americas_black_holocaust_museum_001",
@@ -512,7 +522,8 @@
     "historicalContext": "Cameron, sixteen when a mob killed his two companions in 1930, wrote 'A Time of Terror' and built the museum to tell the full history of racial violence in America alongside the story of survival and repair; the rebuilt museum stands on the footprint of its former home.",
     "topicIds": ["museum", "history", "memory"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_whitney_plantation_001",
@@ -547,7 +558,8 @@
     "historicalContext": "The German Coast plantations along this stretch of the Mississippi were worked by thousands of enslaved people and lay at the heart of the 1811 German Coast uprising, the largest revolt of enslaved people in U.S. history; Whitney's memorials draw on Depression-era WPA interviews with formerly enslaved Louisianans.",
     "topicIds": ["museum", "history", "memory"],
     "mentionedEntityIds": ["ent_german_coast_uprising_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_freedom_center_001",
@@ -582,7 +594,8 @@
     "historicalContext": "Thousands of freedom seekers crossed the Ohio River near Cincinnati before the Civil War, sheltered by Black and white abolitionist networks in the city's riverfront neighborhoods; the museum stands deliberately at that shoreline.",
     "topicIds": ["museum", "history", "abolition"],
     "mentionedEntityIds": ["ent_levi_coffin_house_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_iaam_charleston_001",
@@ -617,7 +630,8 @@
     "historicalContext": "Charleston was the largest port of entry for enslaved Africans in North America; Gadsden's Wharf, most active in the final legal years of the trade, is among the most significant single sites of that history, which the museum spent two decades of planning to mark.",
     "topicIds": ["museum", "history", "genealogy"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_reginald_lewis_museum_001",
@@ -656,6 +670,7 @@
       "ent_reginald_f_lewis_001",
       "ent_thurgood_marshall_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   }
 ]

@@ -222,7 +222,8 @@
     "historicalContext": "Three years after Brown v. Board of Education, the Little Rock Nine tested whether the ruling would be enforced. Daisy Bates of the Arkansas NAACP mentored the students through a year of daily harassment; Ernest Green became the school's first Black graduate in May 1958.",
     "topicIds": ["civil-rights", "school-desegregation", "education", "federal-intervention"],
     "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954", "ent_daisy_bates_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_greensboro_woolworth_sit_in_site_001",
@@ -303,7 +304,8 @@
       "ent_law_civil_rights_act_1964",
       "ent_martin_luther_king_jr_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_kelly_ingram_park_001",
@@ -443,8 +445,15 @@
     ],
     "historicalContext": "Evers investigated the Emmett Till lynching, organized the Jackson boycott movement, and built NAACP chapters across Mississippi under constant threat. Myrlie Evers-Williams preserved the house and pursued the case for three decades until Byron De La Beckwith's 1994 conviction; the family donated the home to Tougaloo College in 1993.",
     "topicIds": ["civil-rights", "voting-rights", "commemoration"],
-    "mentionedEntityIds": ["naacp"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_naacp_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_naacp_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_freedom_rides_museum_001",
@@ -482,9 +491,16 @@
     "mentionedEntityIds": [
       "ent_first_baptist_petersburg_001",
       "ent_nashville_student_movement_001",
-      "freedom-rides"
+      "ent_freedom_rides_001"
     ],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_freedom_rides_001",
+        "type": "occurred_at",
+        "direction": "incoming"
+      }
+    ]
   },
   {
     "id": "ent_moton_high_school_001",
@@ -519,7 +535,8 @@
     "historicalContext": "Built for 200 students but holding 450 in tar-paper annexes, Moton embodied the inequality of 'separate but equal.' After Brown, Prince Edward County closed its entire public school system from 1959 to 1964 rather than integrate. The school was designated a National Historic Landmark in 1998 and affiliated with Brown v. Board NHP in 2022.",
     "topicIds": ["civil-rights", "school-desegregation", "student-movement", "education"],
     "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_dockum_drug_store_sit_in_001",
@@ -553,8 +570,15 @@
     ],
     "historicalContext": "The Dockum sit-in is among the earliest sustained, successful student sit-ins of the movement, predating Greensboro by eighteen months. Chester I. Lewis Reflection Square Park, with a bronze lunch-counter sculpture, now marks the corner; Ron Walters went on to become a leading political scientist.",
     "topicIds": ["civil-rights", "sit-ins", "student-movement"],
-    "mentionedEntityIds": ["naacp"],
-    "keywords": []
+    "mentionedEntityIds": ["ent_naacp_001"],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_naacp_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_clinton_twelve_001",
@@ -589,7 +613,8 @@
     "historicalContext": "Clinton desegregated a year before Little Rock, after the McSwain v. Anderson County ruling. When outside agitators stirred mobs, white and Black neighbors escorted students and the National Guard restored order; Bobby Cain became the first Black graduate of an integrated state-supported high school in the South.",
     "topicIds": ["civil-rights", "school-desegregation", "education", "youth-organizing"],
     "mentionedEntityIds": [],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_dorchester_academy_001",
@@ -624,7 +649,8 @@
     "historicalContext": "The citizenship schools begun by Septima Clark taught literacy, constitutional rights, and the mechanics of registration, quietly building the voter base the movement's marches depended on. SCLC leadership also used Dorchester for retreats, including planning sessions ahead of the 1963 Birmingham campaign.",
     "topicIds": ["civil-rights", "voting-rights", "education", "organizing-schools"],
     "mentionedEntityIds": ["ent_dorothy_cotton_001", "ent_septima_clark_001"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   },
   {
     "id": "ent_highlander_folk_school_001",
@@ -659,7 +685,14 @@
     "historicalContext": "Founded by Myles Horton in 1932, Highlander was one of the few Southern places where Black and white organizers met as equals. Septima Clark's citizenship school curriculum moved from here to the SCLC, and 'We Shall Overcome' entered the movement through Highlander's music workshops.",
     "topicIds": ["civil-rights", "organizing-schools", "labor", "education"],
     "mentionedEntityIds": ["ent_montgomery_bus_boycott_001", "ent_septima_clark_001"],
-    "keywords": []
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_montgomery_bus_boycott_001",
+        "type": "occurred_at",
+        "direction": "incoming"
+      }
+    ]
   },
   {
     "id": "ent_mason_temple_001",
@@ -742,6 +775,7 @@
     "historicalContext": "When Alabama banned the NAACP in 1956, Shuttlesworth founded the ACMHR at Bethel the same week, and the church became the launch point for challenges to bus segregation and school exclusion in Birmingham. Its partnership with the SCLC brought the 1963 Birmingham campaign that helped produce the Civil Rights Act of 1964.",
     "topicIds": ["civil-rights", "movement-churches", "direct-action", "organizing"],
     "mentionedEntityIds": ["ent_fred_shuttlesworth_001", "ent_law_civil_rights_act_1964"],
-    "keywords": []
+    "keywords": [],
+    "related": []
   }
 ]
