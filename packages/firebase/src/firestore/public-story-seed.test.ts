@@ -19,6 +19,11 @@ test('seed story catalog is exactly five Zod-valid longform articles', () => {
     for (const entityId of story.relatedEntityIds) {
       assert.match(entityId, /^ent_/);
     }
+    assert.ok(story.sources.length >= 1, `${story.slug} must cite at least one source`);
+    for (const source of story.sources) {
+      assert.match(source.url, /^https:\/\//, `${story.slug}: source must be HTTPS`);
+      assert.ok(source.label.length > 0);
+    }
     assert.equal(getSeedStoryProjection(story.slug)?.slug, story.slug);
     assert.equal(
       story.body.some((section) => section.paragraphs.some((p) => p.includes('\u2014'))),

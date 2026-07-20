@@ -125,10 +125,12 @@ export function buildStoryResearchPacket(
  * Map an approved packet onto the public story projection shape (human paste path).
  * Does not write anything. Returns a plain object for operator handoff into
  * `packages/firebase` public story seed / release fixtures.
+ * `sources` is required: public stories must ship with a cited receipt list.
  */
 export function storyPacketToSeedRecord(
   packet: StoryResearchPacket,
   publishedAt: string,
+  sources: readonly { readonly label: string; readonly url: string }[],
 ): {
   readonly slug: string;
   readonly title: string;
@@ -139,6 +141,7 @@ export function storyPacketToSeedRecord(
   readonly body: readonly StoryDraftSection[];
   readonly relatedEntityIds: readonly string[];
   readonly relatedFactIds: readonly string[];
+  readonly sources: readonly { readonly label: string; readonly url: string }[];
 } {
   const slug =
     packet.draft.slug?.trim() ||
@@ -147,6 +150,10 @@ export function storyPacketToSeedRecord(
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '') ||
     'untitled-story';
+
+  if (sources.length < 1) {
+    throw new Error('storyPacketToSeedRecord requires at least one source citation');
+  }
 
   return Object.freeze({
     slug,
@@ -158,5 +165,6 @@ export function storyPacketToSeedRecord(
     body: packet.draft.body,
     relatedEntityIds: packet.relatedEntityIds,
     relatedFactIds: packet.relatedFactIds,
+    sources: Object.freeze(sources.map((source) => Object.freeze({ ...source }))),
   });
 }

@@ -39,6 +39,32 @@ export const SEED_STORY_PROJECTIONS: readonly PublicStoryProjectionDoc[] = [
       'ent_case_sweatt_v_painter_1950',
       'ent_fort_mose_001',
     ],
+    sources: [
+      {
+        label: 'Texas State Historical Association — Guerrero Decree (1829)',
+        url: 'https://www.tshaonline.org/handbook/entries/guerrero-decree',
+      },
+      {
+        label: 'Texas State Historical Association — Joe (Alamo survivor)',
+        url: 'https://www.tshaonline.org/handbook/entries/joe',
+      },
+      {
+        label: 'The Alamo — Joe\'s account of the battle',
+        url: 'https://www.thealamo.org/remember/battle-and-revolution/joes-account',
+      },
+      {
+        label: 'National Archives — Emancipation Proclamation (1863)',
+        url: 'https://www.archives.gov/milestone-documents/emancipation-proclamation',
+      },
+      {
+        label: 'National Park Service — Fort Mose history',
+        url: 'https://www.nps.gov/foma/learn/historyculture/fort-mose.htm',
+      },
+      {
+        label: 'Cornell LII — Sweatt v. Painter, 339 U.S. 629 (1950)',
+        url: 'https://www.law.cornell.edu/supremecourt/text/339/629',
+      },
+    ],
     body: [
       {
         paragraphs: [
@@ -93,7 +119,8 @@ export const SEED_STORY_PROJECTIONS: readonly PublicStoryProjectionDoc[] = [
           'BlackStory links this narrative to dated legal and place records you can open: the ' +
             'Emancipation Proclamation as a U.S. contrast date, Sweatt v. Painter as a later Texas ' +
             'education case on the same state map, and Fort Mose as an earlier free Black settlement ' +
-            'under Spanish Florida. Check the pins. Do not take the slogan as the whole archive.',
+            'under Spanish Florida. Sources for the spine of this piece are listed below. Check the ' +
+            'pins. Do not take the slogan as the whole archive.',
         ],
       },
     ],
@@ -112,6 +139,32 @@ export const SEED_STORY_PROJECTIONS: readonly PublicStoryProjectionDoc[] = [
       'ent_law_13th_amendment_1865',
       'ent_case_sweatt_v_painter_1950',
       'ent_law_missouri_compromise_1820',
+    ],
+    sources: [
+      {
+        label: 'Tarlton Law Library — Republic of Texas Constitution (1836), General Provisions §9',
+        url: 'https://tarlton.law.utexas.edu/constitutions/republic-texas-1836/general-provisions',
+      },
+      {
+        label: 'Texas State Historical Association — Slavery',
+        url: 'https://www.tshaonline.org/handbook/entries/slavery',
+      },
+      {
+        label: 'National Archives — Treaty of Guadalupe Hidalgo (1848)',
+        url: 'https://www.archives.gov/milestone-documents/treaty-of-guadalupe-hidalgo',
+      },
+      {
+        label: 'National Archives — 13th Amendment (1865)',
+        url: 'https://www.archives.gov/milestone-documents/13th-amendment',
+      },
+      {
+        label: 'National Archives — Missouri Compromise (1820)',
+        url: 'https://www.archives.gov/milestone-documents/missouri-compromise',
+      },
+      {
+        label: 'Cornell LII — Sweatt v. Painter, 339 U.S. 629 (1950)',
+        url: 'https://www.law.cornell.edu/supremecourt/text/339/629',
+      },
     ],
     body: [
       {
@@ -182,6 +235,20 @@ export const SEED_STORY_PROJECTIONS: readonly PublicStoryProjectionDoc[] = [
     eraLabel: '1840–',
     placeLabel: 'United States',
     relatedEntityIds: ['ent_nmaahc_001', 'ent_law_voting_rights_act_1965'],
+    sources: [
+      {
+        label: 'Library of Congress — Presidential Election of 1840 resource guide',
+        url: 'https://guides.loc.gov/presidential-election-1840/introduction',
+      },
+      {
+        label: 'White House Historical Association — William Henry Harrison',
+        url: 'https://www.whitehousehistory.org/bios/william-henry-harrison',
+      },
+      {
+        label: 'National Archives — Voting Rights Act (1965)',
+        url: 'https://www.archives.gov/milestone-documents/voting-rights-act',
+      },
+    ],
     body: [
       {
         paragraphs: [
@@ -228,7 +295,8 @@ export const SEED_STORY_PROJECTIONS: readonly PublicStoryProjectionDoc[] = [
             'Anybody can play broke for an afternoon. Nobody can fake a voting record forever.',
           'BlackStory off-ramps this piece to the National Museum of African American History and ' +
             'Culture on the Mall, and to the Voting Rights Act record: places where political power, ' +
-            'franchise, and public memory are documented without needing the costume.',
+            'franchise, and public memory are documented without needing the costume. Sources for ' +
+            'the campaign record and those off-ramps are listed below.',
         ],
       },
     ],
@@ -248,6 +316,24 @@ export const SEED_STORY_PROJECTIONS: readonly PublicStoryProjectionDoc[] = [
       'ent_law_15th_amendment_1870',
       'ent_case_plessy_v_ferguson_1896',
       'ent_princeville_nc_001',
+    ],
+    sources: [
+      {
+        label: 'BlackPast.org — The Reconstruction Acts (1867)',
+        url: 'https://www.blackpast.org/african-american-history/1867-reconstruction-acts/',
+      },
+      {
+        label: 'National Archives — 15th Amendment (1870)',
+        url: 'https://www.archives.gov/milestone-documents/15th-amendment',
+      },
+      {
+        label: 'National Archives — Plessy v. Ferguson (1896)',
+        url: 'https://www.archives.gov/milestone-documents/plessy-v-ferguson',
+      },
+      {
+        label: 'N.C. Department of Natural and Cultural Resources — Princeville (1885)',
+        url: 'https://www.dncr.nc.gov/blog/2016/02/20/princeville-founded-african-americans-incorporated-1885',
+      },
     ],
     body: [
       {
@@ -287,8 +373,9 @@ export const SEED_STORY_PROJECTIONS: readonly PublicStoryProjectionDoc[] = [
             'on purpose, and the twelve years stop looking like a failed experiment. They look like ' +
             'a contested success that opponents named redemption when they undid it.',
           'BlackStory keeps the mechanism on the record: Reconstruction Act, Fifteenth Amendment, ' +
-            'Plessy, Princeville. Open those entities for citations and confidence. The story’s job ' +
-            'is to connect the spine, not to replace the receipts.',
+            'Plessy, Princeville. Sources for this piece are listed below; open related entities for ' +
+            'claim-level confidence. The story’s job is to connect the spine, not to replace the ' +
+            'entity receipts.',
         ],
       },
     ],
@@ -308,6 +395,28 @@ export const SEED_STORY_PROJECTIONS: readonly PublicStoryProjectionDoc[] = [
       'ent_case_south_carolina_v_katzenbach_1966',
       'ent_case_shelby_county_v_holder_2013',
       'ent_little_rock_central_high_001',
+    ],
+    sources: [
+      {
+        label: 'National Archives — Voting Rights Act (1965)',
+        url: 'https://www.archives.gov/milestone-documents/voting-rights-act',
+      },
+      {
+        label: 'Cornell LII — South Carolina v. Katzenbach, 383 U.S. 301 (1966)',
+        url: 'https://www.law.cornell.edu/supremecourt/text/383/301',
+      },
+      {
+        label: 'Oyez — Shelby County v. Holder (2013)',
+        url: 'https://www.oyez.org/cases/2012/12-96',
+      },
+      {
+        label: 'Brennan Center — Effects of Shelby County v. Holder on the Voting Rights Act',
+        url: 'https://www.brennancenter.org/our-work/research-reports/effects-shelby-county-v-holder-voting-rights-act',
+      },
+      {
+        label: 'National Park Service — Little Rock Central High School NHS',
+        url: 'https://www.nps.gov/chsc/index.htm',
+      },
     ],
     body: [
       {
@@ -345,9 +454,9 @@ export const SEED_STORY_PROJECTIONS: readonly PublicStoryProjectionDoc[] = [
             'labels differ. The structure rhymes.',
           'BlackStory ends this piece on records you can open today: the Voting Rights Act, ' +
             'Katzenbach, Shelby County, and Little Rock Central High as a campus-first pin for the ' +
-            'desegregation middle of the century. Read the statutes and opinions. Watch how ' +
-            'jurisdictions vote on maps and bills. That is the present bridge without a trauma hook: ' +
-            'evidence, then assertion.',
+            'desegregation middle of the century. Sources are listed below. Read the statutes and ' +
+            'opinions. Watch how jurisdictions vote on maps and bills. That is the present bridge ' +
+            'without a trauma hook: evidence, then assertion.',
         ],
       },
     ],

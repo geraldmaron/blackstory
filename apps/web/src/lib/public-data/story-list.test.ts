@@ -8,10 +8,11 @@ import { listSeedStoryProjections } from '@repo/firebase';
 import { listSnapshotStoryListItems, toStoryListItem } from './firestore-readers';
 import { listPublicStoryListItems } from './source';
 
-test('toStoryListItem omits body and relatedEntityIds', () => {
+test('toStoryListItem omits body, relatedEntityIds, and sources', () => {
   const full = listSeedStoryProjections()[0];
   assert.ok(full);
   assert.ok(full.body.length > 0);
+  assert.ok(full.sources.length > 0);
 
   const item = toStoryListItem(full);
   assert.equal(item.slug, full.slug);
@@ -22,6 +23,7 @@ test('toStoryListItem omits body and relatedEntityIds', () => {
   assert.equal(item.publishedAt, full.publishedAt);
   assert.equal('body' in item, false);
   assert.equal('relatedEntityIds' in item, false);
+  assert.equal('sources' in item, false);
 });
 
 test('listSnapshotStoryListItems matches seed corpus length and order', () => {
@@ -45,5 +47,6 @@ test('listPublicStoryListItems returns empty-safe snapshot list items', async ()
     assert.ok(item.dek.length > 0);
     assert.equal('body' in item, false);
     assert.equal('relatedEntityIds' in item, false);
+    assert.equal('sources' in item, false);
   }
 });

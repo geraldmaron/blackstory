@@ -15,6 +15,7 @@ test('story corpus lives in @repo/firebase (exactly five stories)', () => {
   for (const story of stories) {
     assert.ok(story.slug.length > 0);
     assert.ok(story.body.length > 0);
+    assert.ok(story.sources.length >= 1, `${story.slug} must list sources`);
     assert.ok(story.relatedEntityIds.every((id: string) => id.startsWith('ent_')));
     assert.equal(getSeedStoryProjection(story.slug)?.id, story.slug);
   }

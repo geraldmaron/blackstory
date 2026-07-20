@@ -201,9 +201,15 @@ test('Alamo-shaped skeleton recommends only with resolved cites and off-ramps', 
   assert.equal(packet.kind, STORY_RESEARCH_PACKET_KIND);
   assert.ok(packet.authorityLeadUrls.some((url) => url.includes('nps.gov')));
 
-  const seed = storyPacketToSeedRecord(packet, '2026-07-18');
+  const seed = storyPacketToSeedRecord(packet, '2026-07-18', [
+    {
+      label: 'National Park Service — Fort Mose history',
+      url: 'https://www.nps.gov/foma/learn/historyculture/fort-mose.htm',
+    },
+  ]);
   assert.equal(seed.slug, 'before-the-battle-cry');
   assert.equal(seed.relatedEntityIds.length, 2);
+  assert.equal(seed.sources.length, 1);
 });
 
 test('unresolved cites demote recommend to needs_evidence', () => {

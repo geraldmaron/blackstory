@@ -1,16 +1,17 @@
 /**
  * Longform story article page at `/stories/{slug}`.
  *
- * Atmosphere mast, editorial serif body, related entity off-ramps, and a copper
- * map CTA when a related entity has a geo anchor. Story bodies load from the
- * public release projection (Firestore / Firebase seed), not an apps/web corpus.
- * Emits schema.org Article JSON-LD only, never ClaimReview.
+ * Atmosphere mast, editorial serif body, required Sources footnote, related
+ * entity off-ramps, and a copper map CTA when a related entity has a geo anchor.
+ * Story bodies load from the public release projection (Firestore / Firebase seed),
+ * not an apps/web corpus. Emits schema.org Article JSON-LD only, never ClaimReview.
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
 import { AtmospherePlane, selectAtmospherePlane } from '../../../components/atmosphere';
 import { renderStoryTitle } from '../../../components/atmosphere/story-title';
+import { SourceFootnote } from '../../../components/data/SourceFootnote';
 import type { PublicEntityView } from '../../../data/public-seed';
 import {
   listPublicEntityViewsByIds,
@@ -141,6 +142,14 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
             </section>
           ))}
         </div>
+
+        <section className="ds-section ds-story-article__sources" aria-labelledby="story-sources-heading">
+          <p className="ds-section__kicker">Evidence</p>
+          <h2 className="ds-section__title" id="story-sources-heading">
+            Sources
+          </h2>
+          <SourceFootnote sources={story.sources} density="group" />
+        </section>
 
         {relatedEntities.length > 0 ? (
           <section className="ds-section" aria-labelledby="story-entities-heading">

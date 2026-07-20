@@ -131,7 +131,11 @@ importing viral rhetorical costume. Skill reference:
 `.claude/skills/black-book/story-craft/SKILL.md`. Packets use
 `story.research.packet.v1`; human approval maps an approved packet onto
 `packages/firebase/src/firestore/public-story-seed.ts` (Firestore
-`publicReleases/{id}/stories/{slug}`). Nothing auto-publishes.
+`publicReleases/{id}/stories/{slug}`). Nothing auto-publishes. Every published
+story projection **must** include a non-empty `sources` list (`label` + HTTPS
+`url`); `/stories/[slug]` renders it with `SourceFootnote` under Evidence /
+Sources. Related entities remain claim-level off-ramps — they do not replace
+the article’s own receipts.
 
 **Adapt from oral craft (keep cite-map + dignity gates):**
 

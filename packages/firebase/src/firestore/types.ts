@@ -1224,9 +1224,21 @@ export const publicStorySectionSchema = z.object({
 export type PublicStorySectionDoc = z.infer<typeof publicStorySectionSchema>;
 
 /**
+ * Story-level citation for the public article footer (label + HTTPS URL).
+ * Matches the `DataSourceRef` / SourceFootnote shape used on data and history surfaces.
+ */
+export const publicStorySourceSchema = z.object({
+  label: z.string().min(1).max(200),
+  url: z.string().url().max(2048),
+});
+
+export type PublicStorySourceDoc = z.infer<typeof publicStorySourceSchema>;
+
+/**
  * Public longform story projection under `publicReleases/{releaseId}/stories/{slug}`.
  * Editorial narrative for `/stories`; related entities resolve through the entity projection path.
- * Non-numeric by standing policy. Body prose is the article; citations live on linked entities.
+ * Non-numeric by standing policy. Body prose is the article; `sources` is the required receipt
+ * list for the piece itself (related entities remain off-ramps for claim-level confidence).
  */
 export const publicStoryProjectionSchema = z.object({
   id: z.string().min(1),
@@ -1242,17 +1254,19 @@ export const publicStoryProjectionSchema = z.object({
   placeLabel: z.string().min(1).max(120),
   body: z.array(publicStorySectionSchema).min(1),
   relatedEntityIds: z.array(z.string().min(1)).min(1),
+  sources: z.array(publicStorySourceSchema).min(1),
 });
 
 export type PublicStoryProjectionDoc = z.infer<typeof publicStoryProjectionSchema>;
 
 /**
  * Index/list projection for `/stories` — same identity fields as the full story doc,
- * without `body` or `relatedEntityIds` so list reads and caches stay small.
+ * without `body`, `relatedEntityIds`, or `sources` so list reads and caches stay small.
  */
 export const publicStoryListItemSchema = publicStoryProjectionSchema.omit({
   body: true,
   relatedEntityIds: true,
+  sources: true,
 });
 
 export type PublicStoryListItemDoc = z.infer<typeof publicStoryListItemSchema>;
