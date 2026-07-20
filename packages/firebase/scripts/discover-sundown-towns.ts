@@ -83,28 +83,25 @@ function extractTowns(wikitext: string, sourceUrl: string): readonly GapCandidat
   const candidates: GapCandidate[] = [];
   let inStateSection = false;
   let currentState: string | undefined;
+  // Citation templates ({{cite web |...}} inside <ref>...</ref>) routinely wrap
+  // across multiple wikitext lines — a bullet's full entry, including its
+  // closing </ref>, isn't always on the single line the bullet starts on.
+  // Accumulate continuation lines (anything until the next bullet or header)
+  // into one block before stripping markup, or a still-open <ref> tag leaks
+  // raw wikitext into the extracted evidence.
+  let currentBlock: string[] = [];
 
-  for (const line of lines) {
-    const level2 = /^==\s*(.+?)\s*==$/u.exec(line);
-    if (level2 && !/^===/u.test(line)) {
-      inStateSection = level2[1] === 'Sundown communities by state';
-      continue;
-    }
-    if (!inStateSection) continue;
-
-    const level3 = /^===\s*(.+?)\s*===$/u.exec(line);
-    if (level3) {
-      currentState = level3[1];
-      continue;
-    }
-
-    if (!line.startsWith('* [[')) continue;
-    const linkMatch = /^\*\s*\[\[([^|\]]+)(?:\|([^\]]+))?\]\](.*)$/u.exec(line);
-    if (!linkMatch) continue;
+  function flushBlock(): void {
+    if (currentBlock.length === 0) return;
+    const block = currentBlock.join(' ');
+    currentBlock = [];
+    const linkMatch = /^\*\s*\[\[([^|\]]+)(?:\|([^\]]+))?\]\](.*)$/su.exec(block);
+    if (!linkMatch) return;
     const [, target, displayText, restRaw] = linkMatch;
     const townTitle = (displayText ?? target ?? '').trim();
-    if (!townTitle) continue;
+    if (!townTitle) return;
     const evidence = stripWikiMarkup((restRaw ?? '').replace(/^[,:]\s*/u, ''));
+    if (!evidence) return;
 
     candidates.push({
       id: `sundown_${slugify(townTitle)}`,
@@ -120,6 +117,34 @@ function extractTowns(wikitext: string, sourceUrl: string): readonly GapCandidat
       },
     });
   }
+
+  for (const line of lines) {
+    const level2 = /^==\s*(.+?)\s*==$/u.exec(line);
+    if (level2 && !/^===/u.test(line)) {
+      flushBlock();
+      inStateSection = level2[1] === 'Sundown communities by state';
+      continue;
+    }
+    if (!inStateSection) continue;
+
+    const level3 = /^===\s*(.+?)\s*===$/u.exec(line);
+    if (level3) {
+      flushBlock();
+      currentState = level3[1];
+      continue;
+    }
+
+    if (line.startsWith('* [[')) {
+      flushBlock();
+      currentBlock = [line];
+    } else if (currentBlock.length > 0 && line.trim().length > 0) {
+      // A continuation of the current bullet's citation template.
+      currentBlock.push(line);
+    } else if (currentBlock.length > 0 && line.trim().length === 0) {
+      flushBlock();
+    }
+  }
+  flushBlock();
 
   return candidates;
 }
