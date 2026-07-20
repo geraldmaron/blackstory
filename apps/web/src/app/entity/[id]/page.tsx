@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { MapFrame, Timeline } from '@repo/ui';
 import { KindBadge, ConfidenceMark, MapsExternalLink } from '../../../components/map-experience';
+import { EntityLocationMap } from '../../../components/entity/EntityLocationMap';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
 import '../../../components/entity/entity-page.css';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
@@ -354,18 +355,28 @@ export default async function EntityPage({ params }: EntityPageProps) {
           </div>
 
           <aside className="ds-entity-aside" aria-label="Record context">
-            <MapFrame
-              title={`${entity.displayName} map context`}
-              caption="Schematic pin at public precision — not survey-grade. Use Open in maps for Google, Apple, or your default maps app."
-              pins={[
-                {
-                  id: entity.id,
-                  label: entity.displayName,
-                  x: entity.mapPin.x,
-                  y: entity.mapPin.y,
-                },
-              ]}
-            />
+            {geoAnchor ? (
+              <EntityLocationMap
+                lat={geoAnchor.lat}
+                lng={geoAnchor.lng}
+                label={entity.locationLabel}
+                precision={entity.locationPrecision}
+                caption="Public-precision street context (OpenStreetMap). Not survey-grade — use Open in maps for Google, Apple, or your default maps app."
+              />
+            ) : (
+              <MapFrame
+                title={`${entity.displayName} map context`}
+                caption="No public coordinates for this record yet. Open the national map to browse nearby archive geography."
+                pins={[
+                  {
+                    id: entity.id,
+                    label: entity.displayName,
+                    x: entity.mapPin.x,
+                    y: entity.mapPin.y,
+                  },
+                ]}
+              />
+            )}
             <p className="ds-entity-aside__cta">
               {mapsHref ? (
                 <MapsExternalLink
