@@ -609,15 +609,13 @@
   flex-direction: column;
   justify-content: flex-end;
   padding: 0 clamp(1rem, 5vw, 4rem) clamp(1rem, 3.5vh, 2.5rem);
-  pointer-events: none;
-}
-
-.ds-hero-stage > * {
+  /* Own the full hero hit-target so wheel/touch scroll the document — gaps
+     between chrome used to fall through to MapLibre and trap the page. */
   pointer-events: auto;
 }
 
-/* Legibility scrim: bottom third fades to canvas so theme ink clears WCAG
-   on top of whatever the camera shows. pointer-events stays none. */
+/* Legibility scrim: bottom fades to canvas so theme ink clears WCAG on top
+   of whatever the camera shows. Decorative only — never captures input. */
 .ds-hero-stage::before {
   content: '';
   position: absolute;
@@ -793,12 +791,6 @@
   animation: ds-rise var(--ds-duration-slow) var(--ds-easing) 0.12s both;
 }
 
-@media (max-width: 47.9375rem) {
-  .ds-hero-stage__support {
-    background: color-mix(in srgb, var(--ds-canvas) 78%, transparent);
-  }
-}
-
 .ds-hero-stage__actions {
   display: flex;
   flex-wrap: wrap;
@@ -951,7 +943,31 @@
 
 @media (max-width: 47.9375rem) {
   .ds-hero-stage {
-    height: 92svh;
+    /* Full viewport — a shorter hero left a map strip that stole scroll. */
+    height: 100svh;
+  }
+
+  /* Dense scrim: pins and state labels must not punch through ink on small screens. */
+  .ds-hero-stage::before {
+    height: 90%;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      color-mix(in srgb, var(--ds-canvas) 55%, transparent) 16%,
+      color-mix(in srgb, var(--ds-canvas) 90%, transparent) 42%,
+      color-mix(in srgb, var(--ds-canvas) 97%, transparent) 100%
+    );
+  }
+
+  .ds-hero-stage__support {
+    background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
+  }
+
+  .ds-hero-timeline__head {
+    padding: var(--ds-space-3) var(--ds-space-4);
+    margin-inline: calc(-1 * var(--ds-space-4));
+    border-radius: var(--ds-radius-sm);
+    background: color-mix(in srgb, var(--ds-canvas) 90%, transparent);
   }
 
   .ds-hero-stage__actions {

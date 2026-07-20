@@ -3,9 +3,11 @@
  * render over it (ADR-017 "Route-group layout owns the canvas"). `.ds-map-stage`
  * (`MapStage.tsx`'s sole canvas mount) is a fixed, full-viewport plate; `.ds-hero-stage` (base
  * panel styling lives in shell.css) and `.ds-explore-stage` each establish their own stacking
- * context above it so paint order never depends on DOM order vs. the canvas. The MapLibre style
- * plate follows light/dark via `colorScheme`; floating chrome uses theme-relative surface tokens
- * so instruments stay readable in either mode while the canvas stays perceptible beneath.
+ * context above it so paint order never depends on DOM order vs. the canvas. On `/` the plate is
+ * atmosphere-only (`pointer-events: none`) so document scroll owns the page; `/explore` restores
+ * hit-testing. The MapLibre style plate follows light/dark via `colorScheme`; floating chrome uses
+ * theme-relative surface tokens so instruments stay readable in either mode while the canvas stays
+ * perceptible beneath.
  */
 
 .ds-map-surface {
@@ -19,6 +21,19 @@
   height: 100dvh;
   /* Pre-style-load flash — dark ocean by default; light theme matches white plate. */
   background: #080606;
+}
+
+/* Homepage: map is atmosphere only. Hit-testing off so vertical scroll reaches
+   About + footer instead of panning/zooming the canvas. Explore re-enables. */
+.ds-map-surface:has(.ds-hero-stage) .ds-map-stage {
+  pointer-events: none;
+}
+
+/* Footer sits outside `.ds-map-surface` but the plate is viewport-fixed — raise
+   it so document scroll ends on opaque chrome, not trapped map glass. */
+.ds-shell:has([data-surface='map']) .ds-shell-footer {
+  position: relative;
+  z-index: 1;
 }
 
 [data-theme='light'] .ds-map-stage {
