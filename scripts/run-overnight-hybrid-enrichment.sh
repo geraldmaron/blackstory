@@ -76,6 +76,12 @@ if [[ -s "${HOME}/.nvm/nvm.sh" ]]; then
   nvm use 22 >/dev/null 2>&1 || nvm use default >/dev/null 2>&1 || true
 fi
 
+# Same reason: uv (for the Trafilatura extraction bridge, lib/trafilatura.ts)
+# installs to ~/.local/bin, which a systemd unit's PATH won't include.
+if [[ -d "${HOME}/.local/bin" ]]; then
+  export PATH="${HOME}/.local/bin:${PATH}"
+fi
+
 # Optional machine env (OpenRouter key, pepper, Firebase). Never commit this file.
 ENV_FILE="${ENRICHMENT_ENV_FILE:-${HOME}/.config/blackstory/enrichment.env}"
 if [[ -f "${ENV_FILE}" ]]; then
