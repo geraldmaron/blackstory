@@ -86,8 +86,8 @@
 .ds-data-chart__caption {
   margin: var(--ds-space-4) 0 0;
   color: var(--ds-ink-muted);
-  font-size: 0.9375rem;
-  line-height: 1.55;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .ds-data-chart__source {
@@ -134,12 +134,17 @@
 
 .ds-data-state-shift__title {
   margin: 0 0 var(--ds-space-2);
-  font-size: 1.125rem;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
 }
 
 .ds-data-state-shift__lede {
   margin: 0 0 var(--ds-space-5);
   max-width: 40rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .ds-data-state-shift__columns {

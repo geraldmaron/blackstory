@@ -30,17 +30,17 @@ export function HateCrimeCompositionChart({ summary }: HateCrimeCompositionChart
   const otherWidth = (otherIncidents / total) * 100;
   const participationNote =
     summary.nationalParticipatingAgenciesPct !== undefined
-      ? ` National agency participation that year: ${summary.nationalParticipatingAgenciesPct}%.`
+      ? ` That year, ${summary.nationalParticipatingAgenciesPct}% of agencies reported nationally.`
       : '';
 
   return (
     <DataChartFrame
-      title={`Reported incident composition, ${summary.year}`}
+      title={`What ${summary.year} reports were about`}
       caption={
         <>
-          Composition of voluntarily reported UCR hate crime incidents for {summary.year}.
-          Anti-Black or African American bias: {formatChartCount(summary.antiBlackIncidents)} (
-          {pct(summary.antiBlackIncidents, total)}). Other reported bias categories:{' '}
+          How {summary.year} hate crime reports break down by bias type (agencies that chose to
+          report). Anti-Black or African American bias: {formatChartCount(summary.antiBlackIncidents)}{' '}
+          ({pct(summary.antiBlackIncidents, total)}). All other reported bias categories:{' '}
           {formatChartCount(otherIncidents)} ({pct(otherIncidents, total)}).
           {participationNote}
         </>
@@ -50,12 +50,12 @@ export function HateCrimeCompositionChart({ summary }: HateCrimeCompositionChart
       ariaLabel={`Hate crime reporting composition for ${summary.year}`}
       textAlternative={
         <table className="ds-data-chart__table">
-          <caption>{`Hate crime reporting composition, ${summary.year}`}</caption>
+          <caption>{`What ${summary.year} reports were about`}</caption>
           <thead>
             <tr>
               <th scope="col">Category</th>
-              <th scope="col">Reported incidents</th>
-              <th scope="col">Share of reported incidents</th>
+              <th scope="col">Reports</th>
+              <th scope="col">Share of reports</th>
             </tr>
           </thead>
           <tbody>
@@ -104,7 +104,7 @@ export function HateCrimeCompositionChart({ summary }: HateCrimeCompositionChart
           fill="var(--ds-accent-muted)"
         />
         <text className="ds-data-chart__axis-label" x={8} y={16}>
-          Reported incidents ({formatChartCount(total)} total)
+          Reports filed ({formatChartCount(total)} total)
         </text>
       </svg>
       <ul className="ds-data-chart__legend">

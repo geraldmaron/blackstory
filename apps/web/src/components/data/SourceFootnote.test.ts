@@ -8,6 +8,7 @@ import { test } from 'node:test';
 import { DataStatStrip } from './DataStatStrip';
 import {
   dedupeSources,
+  humanSourceLabel,
   partitionStripSources,
   sourcesEqual,
   SourceFootnote,
@@ -57,8 +58,20 @@ test('SourceFootnote pluralizes and lists multiple sources', () => {
   );
   assert.match(html, />Sources</);
   assert.match(html, /ds-citation__list/);
-  assert.match(html, /fbi-ucr-hate-crime/);
-  assert.match(html, /census/);
+  assert.match(html, /FBI Hate Crime Statistics/);
+  assert.match(html, /U\.S\. Census Bureau, Decennial Census/);
+});
+
+test('humanSourceLabel keeps prose labels and remaps ingest ids', () => {
+  assert.equal(humanSourceLabel('FBI Crime Data Explorer'), 'FBI Crime Data Explorer');
+  assert.equal(
+    humanSourceLabel('us-census-acs5-2024'),
+    'U.S. Census Bureau, American Community Survey',
+  );
+  assert.equal(
+    humanSourceLabel('opportunity-insights-tract-outcomes'),
+    'Opportunity Insights, Opportunity Atlas',
+  );
 });
 
 test('DataStatStrip renders one group Source for matching sources, not one per item', () => {

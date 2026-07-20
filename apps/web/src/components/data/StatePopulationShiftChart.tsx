@@ -115,12 +115,12 @@ export function StatePopulationShiftChart({
 
   return (
     <DataChartFrame
-      title={`State Black population shift, ${fromDecade}→${toDecade}`}
-      caption={`Largest absolute movers by Black population count between ${fromDecade} and ${toDecade}. Bars extend right for gains and left for losses; share change is percentage points of each state’s total population.`}
+      title={`Where Black population rose or fell, ${fromDecade}–${toDecade}`}
+      caption={`States with the largest gains or losses in Black population between ${fromDecade} and ${toDecade}. Bars go right for gains and left for losses. Share change is percentage points of each state’s total population.`}
       ariaLabel={`Diverging bar chart of state Black population change from ${fromDecade} to ${toDecade}`}
       textAlternative={
         <table className="ds-data-chart__table">
-          <caption>{`State Black population shift, ${fromDecade}→${toDecade}`}</caption>
+          <caption>{`Where Black population rose or fell, ${fromDecade}–${toDecade}`}</caption>
           <thead>
             <tr>
               <th scope="col">State or territory</th>

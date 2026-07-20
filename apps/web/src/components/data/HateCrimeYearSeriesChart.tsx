@@ -83,13 +83,13 @@ export function HateCrimeYearSeriesChart({ summaries }: HateCrimeYearSeriesChart
 
   return (
     <DataChartFrame
-      title="Reporting metrics by year"
-      caption="Each year is shown separately — anti-Black share of reported incidents and national agency participation. Do not read year-to-year incident totals as a trend; participation coverage changed substantially over this span."
+      title="Hate crime reports by year"
+      caption="Anti-Black share of reported incidents and how many agencies joined nationally, year by year. Do not read raw incident totals as a simple trend: participation changed a lot over this span."
       sources={sources}
       ariaLabel="Multi-year hate crime reporting metrics chart"
       textAlternative={
         <table className="ds-data-chart__table">
-          <caption>Reporting metrics by year</caption>
+          <caption>Hate crime reports by year</caption>
           <thead>
             <tr>
               <th scope="col">Year</th>

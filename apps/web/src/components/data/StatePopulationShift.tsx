@@ -43,11 +43,11 @@ export function StatePopulationShift({
         stateNameByFips={stateNameByFips}
       />
       <h3 className="ds-sans ds-data-state-shift__title">
-        State shift, {fromDecade}→{toDecade}
+        States that moved most, {fromDecade}–{toDecade}
       </h3>
       <p className="ds-section__lede ds-data-state-shift__lede">
-        Where Black population counts rose or fell across states (sum of county decennial totals).
-        Share change is percentage points of each state&rsquo;s total population.
+        Where Black population rose or fell across states (sums of county census totals). Share
+        change is percentage points of each state&rsquo;s total population.
       </p>
       <div className="ds-data-state-shift__columns">
         {gains.length > 0 ? (

@@ -35,7 +35,7 @@ test('nationalChangeStripItems formats signed Δ Black and share note', () => {
   const items = nationalChangeStripItems(SAMPLE_CHANGES);
   assert.equal(items.length, 2);
   assert.match(items[0]!.value, /^\+/);
-  assert.match(items[0]!.label, /2000→2010/);
+  assert.match(items[0]!.label, /2000 to 2010/);
   assert.match(items[0]!.note, /pp/);
   assert.match(items[1]!.note, /−/);
 });

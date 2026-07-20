@@ -61,13 +61,13 @@ export function nationalChangeStripItems(changes: readonly PopulationChangeLike[
   return changes.map((change) => {
     const pct = formatPercentChange(change.blackPercentChange);
     const noteParts = [
-      `Share of total population ${formatSignedPp(change.shareChangePp)}`,
+      `Share of U.S. population ${formatSignedPp(change.shareChangePp)}`,
       ...(pct ? [`Black population ${pct}`] : []),
     ];
     return {
       id: `${change.fromDecade}-${change.toDecade}`,
       value: formatSignedCount(change.blackAbsoluteChange),
-      label: `Black population change, ${change.fromDecade}→${change.toDecade}`,
+      label: `Black population, ${change.fromDecade} to ${change.toDecade}`,
       note: noteParts.join(' · '),
       sources: [{ label: change.source, url: change.sourceUrl }],
     };
@@ -103,17 +103,17 @@ export function timelineChangeStripItems(
     const pct = formatPercentChange(change.growth.percentChange);
     const noteParts = [
       ...(change.sharePointChange !== null
-        ? [`Share of total population ${formatSignedPp(change.sharePointChange)}`]
+        ? [`Share of U.S. population ${formatSignedPp(change.sharePointChange)}`]
         : []),
       ...(pct ? [`Black population ${pct}`] : []),
       ...(change.crossesDefinitionBoundary
-        ? ['methodology change (2000 “Black alone”) — not directly comparable']
+        ? ['2000 definition change (“Black alone”) — not directly comparable']
         : []),
     ];
     return {
       id: `${change.fromDecade}-${change.toDecade}`,
       value: formatSignedCount(change.growth.absoluteChange),
-      label: `Black population change, ${change.fromDecade}→${change.toDecade}`,
+      label: `Black population, ${change.fromDecade} to ${change.toDecade}`,
       note: noteParts.join(' · '),
       sources: [source],
     };
@@ -143,5 +143,5 @@ export function formatStateChangeLine(
   row: Pick<StateChangeLike, 'blackAbsoluteChange' | 'shareChangePp'>,
   stateName: string,
 ): string {
-  return `${stateName}: ${formatSignedCount(row.blackAbsoluteChange)} Black population (${formatSignedPp(row.shareChangePp)} share)`;
+  return `${stateName}: ${formatSignedCount(row.blackAbsoluteChange)} Black people (${formatSignedPp(row.shareChangePp)} of state share)`;
 }

@@ -1,15 +1,8 @@
 /**
- * Data page: the modeling built on top of the archive — census population, ACS estimates,
- * FBI hate crime reporting, and Opportunity Atlas economic-mobility coverage — shown as
- * national rollups with mandatory source citations (public-numeric-policy category 3).
- *
- * Population section: one chart of decennial levels (counts + share annotation) plus a strip
- * of decade-over-decade Δ Black / Δ share and a state movers list — not a triple listing of
- * the same levels. County choropleth detail lives on Explore map layer models.
- *
- * HOLC (Mapping Inequality) is deliberately absent — CC BY-NC-SA rights hold.
- *
- * Page chrome (TOC, beats, numbered sections, CTAs) lives in DataSections; charts stay in
+ * Data page: national Census, neighborhood, hate crime, and Opportunity Atlas
+ * figures behind the archive, each with source citations (public-numeric-policy
+ * category 3). County map layers live on Explore; HOLC (Mapping Inequality) is
+ * deliberately absent (CC BY-NC-SA). Chrome lives in DataSections; charts in
  * components/data.
  */
 import { US_STATES } from '@repo/domain/map/geography';
@@ -36,7 +29,7 @@ import { DataSections } from './DataSections';
 export const metadata = {
   title: 'Data',
   description:
-    'Census, ACS, FBI hate crime, and economic-mobility modeling behind the archive — national rollups with full source citations.',
+    'National Census, neighborhood, hate crime, and opportunity figures behind the BlackStory archive, each with sources you can open.',
 };
 
 /** Most recent data year with a complete annual FBI UCR release at time of writing. */
@@ -104,13 +97,11 @@ export default async function DataPage() {
 
   return (
     <main className="ds-container ds-page" id="main">
-      <p className="ds-page__eyebrow">Modeling</p>
+      <p className="ds-page__eyebrow">Numbers</p>
       <h1 className="ds-page__title">Data behind the archive</h1>
       <p className="ds-page__lede">
-        The national numbers underneath BlackStory&rsquo;s map and records: population shift,
-        economic, and civil-rights context, each carrying the exact source it came from. County
-        choropleths and alternate map models live on Explore; this page is the national-scale
-        summary and the paper trail.
+        National figures that give context to the places and people in BlackStory. Every chart
+        names its source. For county maps and local layers, open Explore.
       </p>
 
       <DataSections

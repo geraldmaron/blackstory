@@ -30,7 +30,7 @@ export function AcsCoverageChart({ coverage }: AcsCoverageChartProps) {
     },
     {
       key: 'tracts',
-      label: 'Census tracts covered',
+      label: 'Neighborhoods covered',
       value: coverage.tractCount,
       fill: 'var(--ds-accent-muted)',
     },
@@ -45,18 +45,18 @@ export function AcsCoverageChart({ coverage }: AcsCoverageChartProps) {
 
   return (
     <DataChartFrame
-      title={`ACS ${coverage.vintage} coverage`}
-      caption="Geographic coverage for 5-year American Community Survey estimates in the archive — counties and census tracts with loaded profiles."
+      title={`Neighborhood estimates, ${coverage.vintage}`}
+      caption="How many counties and neighborhoods have five-year American Community Survey estimates loaded in the archive."
       sourceLabel={coverage.source}
       sourceUrl={coverage.sourceUrl}
-      ariaLabel="Bar chart of ACS county and tract coverage"
+      ariaLabel="Bar chart of county and neighborhood estimate coverage"
       textAlternative={
         <table className="ds-data-chart__table">
-          <caption>{`ACS ${coverage.vintage} coverage`}</caption>
+          <caption>{`Neighborhood estimates, ${coverage.vintage}`}</caption>
           <thead>
             <tr>
-              <th scope="col">Geography level</th>
-              <th scope="col">Units covered</th>
+              <th scope="col">Level</th>
+              <th scope="col">Places covered</th>
             </tr>
           </thead>
           <tbody>

@@ -1,8 +1,9 @@
 /**
- * Opportunity Atlas tract coverage — outcome-field counts and kfrBlackP25 distribution bins.
- * Counts tracts only; never averages percentile ranks nationally.
+ * Opportunity Atlas coverage charts: which outcome measures have neighborhood
+ * estimates, plus a bin chart of income ranks for Black children (parents near
+ * the 25th percentile). Counts neighborhoods only; never averages ranks nationally.
  *
- * Outcome-field coverage uses horizontal bars so long field names stay readable
+ * Outcome coverage uses horizontal bars so long field names stay readable
  * (vertical bars with unwrapped SVG labels overlapped at the default chart width).
  */
 import React from 'react';
@@ -75,18 +76,18 @@ export function OpportunityAtlasCoverageChart({ coverage }: OpportunityAtlasCove
   return (
     <div className="ds-data-opportunity-charts">
       <DataChartFrame
-        title="Outcome field coverage"
-        caption={`Tracts with a retained estimate for each Opportunity Atlas outcome field (2010 tract geography). Total tracts loaded: ${formatChartCount(coverage.tractCount)}.`}
+        title="Which measures we have"
+        caption={`Neighborhoods with an estimate for each Opportunity Atlas measure (2010 neighborhood boundaries). Total neighborhoods loaded: ${formatChartCount(coverage.tractCount)}.`}
         sourceLabel={coverage.source}
         sourceUrl={coverage.sourceUrl}
-        ariaLabel="Opportunity Atlas outcome field coverage chart"
+        ariaLabel="Opportunity Atlas measure coverage chart"
         textAlternative={
           <table className="ds-data-chart__table">
-            <caption>Outcome field coverage</caption>
+            <caption>Which measures we have</caption>
             <thead>
               <tr>
-                <th scope="col">Outcome field</th>
-                <th scope="col">Tracts with estimate</th>
+                <th scope="col">Measure</th>
+                <th scope="col">Neighborhoods with estimate</th>
               </tr>
             </thead>
             <tbody>
@@ -165,24 +166,24 @@ export function OpportunityAtlasCoverageChart({ coverage }: OpportunityAtlasCove
             y={fieldViewHeight - 10}
             textAnchor="middle"
           >
-            Tracts with estimate
+            Neighborhoods with estimate
           </text>
         </svg>
       </DataChartFrame>
 
       <DataChartFrame
-        title="kfrBlackP25 tract distribution"
-        caption="Histogram of retained household income ranks for Black children (parents at the 25th percentile). Bins count tracts — not people — on the Opportunity Atlas 0–100th percentile scale."
+        title="Income ranks for Black children"
+        caption="Where Black children whose parents were near the 25th income percentile land as adults, by neighborhood. Bars count neighborhoods, not people, on a 0–100 income-rank scale."
         sourceLabel={coverage.source}
         sourceUrl={coverage.sourceUrl}
-        ariaLabel="Opportunity Atlas kfrBlackP25 histogram"
+        ariaLabel="Income rank distribution for Black children by neighborhood"
         textAlternative={
           <table className="ds-data-chart__table">
-            <caption>kfrBlackP25 tract distribution</caption>
+            <caption>Income ranks for Black children</caption>
             <thead>
               <tr>
-                <th scope="col">Percentile bin</th>
-                <th scope="col">Tracts</th>
+                <th scope="col">Income rank range</th>
+                <th scope="col">Neighborhoods</th>
               </tr>
             </thead>
             <tbody>
@@ -242,7 +243,7 @@ export function OpportunityAtlasCoverageChart({ coverage }: OpportunityAtlasCove
             textAnchor="middle"
             transform={`rotate(-90 12 ${CHART_MARGIN.top + plotHeight() / 2})`}
           >
-            Tracts
+            Neighborhoods
           </text>
         </svg>
       </DataChartFrame>

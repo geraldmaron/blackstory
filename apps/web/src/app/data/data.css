@@ -163,6 +163,15 @@
   color: var(--ds-ink);
 }
 
+.ds-data-page__note {
+  margin: var(--ds-space-4) 0 0;
+  max-width: 42rem;
+  color: var(--ds-ink-muted);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
 .ds-data-page__callout {
   margin-top: var(--ds-space-4);
 }
@@ -193,13 +202,36 @@
   font-weight: 400;
 }
 
+.ds-data-page .ds-data-chart__title {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+}
+
+.ds-data-page .ds-data-chart__caption,
+.ds-data-page .ds-data-state-shift__lede {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.ds-data-page .ds-data-state-shift__title {
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
 .ds-data-page .ds-data-strip__value {
   font-weight: 400;
+  font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
 }
 
 .ds-data-page .ds-data-strip__label {
   font-weight: 400;
   letter-spacing: 0.06em;
+}
+
+.ds-data-page .ds-data-strip__note {
+  font-size: 0.8125rem;
+  line-height: 1.45;
 }
 
 .ds-data-page .ds-citation__label {

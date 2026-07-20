@@ -46,7 +46,7 @@ describe('HomeDataPulse', () => {
     assert.match(html, /104/);
     assert.match(html, /Records pinned/);
     assert.match(html, /href="\/data"/);
-    assert.match(html, /not available in this environment/);
+    assert.match(html, /not available here yet/);
   });
 
   it('renders census charts when a timeline snapshot is provided', () => {
@@ -110,9 +110,9 @@ describe('HomeDataPulse', () => {
     const html = renderToStaticMarkup(
       <HomeDataPulse recordCount={104} stateCount={24} timeline={timeline} />,
     );
-    assert.match(html, /Black population by census decade/);
-    assert.match(html, /Black population share by decade/);
-    assert.match(html, /decade-over-decade change/i);
+    assert.match(html, /Black population by decade/);
+    assert.match(html, /Share of the U\.S\. that is Black/);
+    assert.match(html, /decade-to-decade change/i);
     assert.doesNotMatch(html, /not available in this environment/);
   });
 });

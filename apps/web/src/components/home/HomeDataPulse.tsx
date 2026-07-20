@@ -49,7 +49,7 @@ export function HomeDataPulse({ recordCount, stateCount, eraSpan, timeline }: Ho
         The numbers underneath the pins.
       </h2>
       <p className="ds-section__lede">
-        Archive scale from the active release, beside national census rollups that give population
+        Archive scale from the active release, beside national census figures that give population
         context for the map — each figure carrying its source.
       </p>
 
@@ -79,7 +79,7 @@ export function HomeDataPulse({ recordCount, stateCount, eraSpan, timeline }: Ho
           {changeStripItems.length > 0 ? (
             <div className="ds-home-data-pulse__changes">
               <h3 className="ds-home-data-pulse__subhead" id="home-population-change-heading">
-                Recent decade-over-decade change
+                Recent decade-to-decade change
               </h3>
               <DataStatStrip labelledBy="home-population-change-heading" items={changeStripItems} />
             </div>
@@ -87,8 +87,8 @@ export function HomeDataPulse({ recordCount, stateCount, eraSpan, timeline }: Ho
         </div>
       ) : (
         <p className="ds-sans ds-home-data-pulse__fallback">
-          National census rollups are not available in this environment yet. The full modeling page
-          lists every series and citation when the release carries them.
+          National census figures are not available here yet. The data page lists every series and
+          citation when the release carries them.
         </p>
       )}
 

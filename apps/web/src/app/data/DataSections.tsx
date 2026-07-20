@@ -1,7 +1,8 @@
 /**
  * Data page body: on-page TOC, orientation beats, numbered model sections
  * (census, ACS, hate crime, Opportunity Atlas), and Explore/methodology hand-offs.
- * Charts and citations stay in shared `components/data/*`; this file owns chrome only.
+ * Charts and citations stay in shared `components/data/*`; this file owns chrome
+ * and reader-facing copy (plain language over modeling jargon).
  */
 import Link from 'next/link';
 import { Notice } from '@repo/ui';
@@ -25,26 +26,26 @@ import type { DataSourceRef } from '../../components/data/SourceFootnote';
 import './data.css';
 
 const PAGE_SECTIONS = [
-  { id: 'orientation', label: 'Orientation' },
+  { id: 'orientation', label: 'Start here' },
   { id: 'population', label: 'Population' },
-  { id: 'acs', label: 'ACS' },
+  { id: 'acs', label: 'Neighborhoods' },
   { id: 'hate-crime', label: 'Hate crime' },
-  { id: 'mobility', label: 'Mobility' },
-  { id: 'how-to-use', label: 'How to use' },
+  { id: 'mobility', label: 'Opportunity' },
+  { id: 'how-to-use', label: 'Next step' },
 ] as const;
 
 const ORIENTATION_BEATS = [
   {
-    kicker: 'Place first',
-    body: 'National rollups sit here. County choropleths and alternate map models live on Explore.',
+    kicker: 'National first',
+    body: 'This page is the country-wide picture. County maps and local layers live on Explore.',
   },
   {
-    kicker: 'Sources required',
-    body: 'Every figure carries its citation. Absence of a number is stated; it is never filled in.',
+    kicker: 'Sources visible',
+    body: 'Every figure links to where it came from. If a number is missing, we say so.',
   },
   {
-    kicker: 'Coverage is not proof',
-    body: 'Voluntary reporting and uneven ingest mean blank counties are about the feed, not the past.',
+    kicker: 'Gaps are not silence',
+    body: 'Uneven reporting or incomplete coverage means the feed is incomplete, not that nothing happened.',
   },
 ] as const;
 
@@ -77,9 +78,9 @@ function formatCount(value: number): string {
 function DataUnavailable({ topic }: { readonly topic: string }) {
   return (
     <p className="ds-sans ds-data-page__empty">
-      {topic} is not loaded on this release yet.{' '}
-      <Link href="/explore">Open Explore</Link> for place layers, or check back after the next
-      published release.
+      {topic} is not available on this release yet.{' '}
+      <Link href="/explore">Open the map</Link> for place layers, or check back after the next
+      update.
     </p>
   );
 }
@@ -122,15 +123,14 @@ export function DataSections({
         >
           <p className="ds-section__kicker">
             <span className="ds-kicker-index" aria-hidden="true" />
-            How to read
+            Start here
           </p>
           <h2 className="ds-section__title" id="orientation-heading">
-            National numbers with a paper trail
+            How to read these numbers
           </h2>
           <p className="ds-section__lede">
-            This page summarizes the modeling underneath the archive. Each section names the
-            publisher, shows what is loaded, and points to the map when place detail is the right
-            next step.
+            Each section names who published the data, shows what we have loaded, and points to the
+            map when you need a place view instead of a national summary.
           </p>
           <ul className="ds-data-page__beat-grid">
             {ORIENTATION_BEATS.map((beat) => (
@@ -149,16 +149,16 @@ export function DataSections({
         >
           <p className="ds-section__kicker">
             <span className="ds-kicker-index" aria-hidden="true" />
-            Census Bureau
+            U.S. Census
           </p>
           <h2 className="ds-section__title" id="population-heading">
-            Black population by decade
+            Black population over time
           </h2>
           <p className="ds-section__lede">
-            National Black population every decade from 1790 to 2020: free and enslaved counts from
-            the 1790–1860 censuses, the single Black total afterward, and modern county-summed
-            counts for 2000–2020. Historical figures come from Census Working Paper 56. The numbers
-            below show recent decade-over-decade change.
+            How many Black Americans the Census counted each decade from 1790 to 2020. Before the
+            Civil War, counts separate free and enslaved people. Later decades report one Black
+            total. Below that, you can see how the national count changed from one decade to the
+            next, and which states gained or lost the most between 2010 and 2020.
           </p>
           {timelineRows.length > 0 ? (
             <>
@@ -169,16 +169,15 @@ export function DataSections({
               {changeStripItems.length > 0 ? (
                 <>
                   <h3 className="ds-data-page__subhead" id="population-change-heading">
-                    Recent decade-over-decade change
+                    Recent decade-to-decade change
                   </h3>
                   <DataStatStrip labelledBy="population-change-heading" items={changeStripItems} />
-                  <p className="ds-sans ds-data-comparability-note">
-                    Race categories change across two centuries: the 1790–1860 censuses split Black
-                    population into free and enslaved counts; “Negro”/“colored” terminology gave way
-                    to “Black”; and 2000 introduced the “Black or African American alone”
-                    multiple-race methodology. Counts before and after 2000 are not perfectly
-                    comparable, and 1870’s Southern count is a documented undercount. The charts
-                    mark these boundaries rather than smoothing over them.
+                  <p className="ds-sans ds-data-page__note">
+                    Race labels on the Census have changed. Early counts split free and enslaved
+                    people; later forms used different words for Black identity; and from 2000 the
+                    Census allows more than one race. Those shifts mean older and newer totals are
+                    not a perfect apples-to-apples line. The charts mark those boundaries instead of
+                    hiding them.
                   </p>
                 </>
               ) : null}
@@ -194,7 +193,7 @@ export function DataSections({
               {historicalStates ? (
                 <>
                   <h3 className="ds-data-page__subhead" id="historical-state-coverage-heading">
-                    Historical state coverage (1790–1990)
+                    Historical state tables (1790–1990)
                   </h3>
                   <DataStatStrip
                     labelledBy="historical-state-coverage-heading"
@@ -208,14 +207,14 @@ export function DataSections({
                       {
                         id: 'hist-state-rows',
                         value: formatCount(historicalStates.rowCount),
-                        label: 'State-decade rows',
+                        label: 'State-by-decade records',
                         note: `${historicalStates.decadeMin}–${historicalStates.decadeMax}`,
                       },
                       {
                         id: 'hist-state-count',
                         value: formatCount(historicalStates.stateCount),
-                        label: 'States / D.C. covered',
-                        note: 'Not every state appears every decade',
+                        label: 'States and D.C. included',
+                        note: 'Not every state appears in every decade',
                       },
                     ]}
                   />
@@ -223,7 +222,7 @@ export function DataSections({
               ) : null}
             </>
           ) : (
-            <DataUnavailable topic="Census population rollups" />
+            <DataUnavailable topic="Census population figures" />
           )}
         </section>
 
@@ -233,13 +232,12 @@ export function DataSections({
             American Community Survey
           </p>
           <h2 className="ds-section__title" id="acs-heading">
-            ACS coverage (county and tract)
+            Where neighborhood estimates are available
           </h2>
           <p className="ds-section__lede">
-            Starter ACS fields (income, tenure, education, and related estimates) are ingested for
-            map and modeling use. This page shows how much geography is covered, not national
-            averages of those estimates. Open Explore when you need place-level context from the
-            same ingest.
+            The American Community Survey estimates income, housing, and education for counties and
+            neighborhoods. Here we show how much of the country is covered in our archive, not a
+            single national average of those estimates. Use Explore when you want the place view.
           </p>
           {acs ? (
             <>
@@ -253,19 +251,19 @@ export function DataSections({
                   {
                     id: 'acs-counties',
                     value: formatCount(acs.countyCount),
-                    label: 'Counties covered',
+                    label: 'Counties with estimates',
                   },
                   {
                     id: 'acs-tracts',
                     value: formatCount(acs.tractCount),
-                    label: 'Census tracts covered',
-                    note: `ACS ${acs.vintage} 5-year estimates`,
+                    label: 'Neighborhoods with estimates',
+                    note: `${acs.vintage} five-year survey`,
                   },
                 ]}
               />
             </>
           ) : (
-            <DataUnavailable topic="ACS coverage counts" />
+            <DataUnavailable topic="Neighborhood estimate coverage" />
           )}
         </section>
 
@@ -276,24 +274,23 @@ export function DataSections({
         >
           <p className="ds-section__kicker">
             <span className="ds-kicker-index" aria-hidden="true" />
-            FBI Uniform Crime Reporting
+            FBI
           </p>
           <h2 className="ds-section__title" id="hate-crime-heading">
-            Hate crime reporting
+            Reported hate crimes
           </h2>
           <p className="ds-section__lede">
-            National UCR hate crime series used for civil-rights context. Read every count beside
-            participation: agencies choose whether to report.
+            What participating police agencies reported to the FBI. Not every agency joins the
+            program, so an empty place can mean no report was filed, not that nothing happened.
           </p>
           <Notice
             className="ds-data-page__callout"
             tone="warning"
             title="Reporting is voluntary"
           >
-            Participation in the UCR hate crime program is voluntary for law enforcement agencies. A
-            county with no reported incidents means no participating agency reported one that year.
-            It is a fact about reporting, not a claim that nothing happened. Always read these
-            counts beside the national participation rate below.
+            Agencies choose whether to send hate crime reports. Always read the incident counts next
+            to the national participation rate below. That rate is the coverage context for every
+            figure in this section.
           </Notice>
           {hateCrime ? (
             <>
@@ -312,20 +309,20 @@ export function DataSections({
                   {
                     id: 'hc-incidents',
                     value: formatCount(hateCrime.incidents),
-                    label: `Reported incidents, ${latestHateCrimeYear}`,
+                    label: `Reports filed in ${latestHateCrimeYear}`,
                   },
                   {
                     id: 'hc-anti-black',
                     value: formatCount(hateCrime.antiBlackIncidents),
-                    label: 'Anti-Black or African American bias',
+                    label: 'Anti-Black bias reports',
                   },
                   ...(hateCrime.nationalParticipatingAgenciesPct !== undefined
                     ? [
                         {
                           id: 'hc-participation',
                           value: `${hateCrime.nationalParticipatingAgenciesPct}%`,
-                          label: 'Agencies participating nationally',
-                          note: 'the coverage denominator; read every count above beside this figure',
+                          label: 'Agencies that reported nationally',
+                          note: 'Read every count above next to this rate',
                         },
                       ]
                     : []),
@@ -333,7 +330,7 @@ export function DataSections({
               />
             </>
           ) : (
-            <DataUnavailable topic="FBI hate crime summaries" />
+            <DataUnavailable topic="Hate crime reporting figures" />
           )}
         </section>
 
@@ -344,16 +341,16 @@ export function DataSections({
         >
           <p className="ds-section__kicker">
             <span className="ds-kicker-index" aria-hidden="true" />
-            Opportunity Insights
+            Opportunity Atlas
           </p>
           <h2 className="ds-section__title" id="mobility-heading">
-            Economic mobility by tract
+            Opportunity by neighborhood
           </h2>
           <p className="ds-section__lede">
-            Household income rank in adulthood by race and parental income percentile, from the
-            Opportunity Atlas. Measures are tract-level. We do not publish a national average of
-            percentile ranks across differently sized tracts, because that average would itself be a
-            fabricated statistic. Coverage of the ingest is what this section shows.
+            Research on how children from similar family incomes fare as adults, neighborhood by
+            neighborhood. We show which places are covered. We do not mash those neighborhood ranks
+            into one national average, because neighborhoods are different sizes and that average
+            would mislead.
           </p>
           {opportunity ? (
             <>
@@ -367,7 +364,7 @@ export function DataSections({
                   {
                     id: 'oa-tracts',
                     value: formatCount(opportunity.tractCount),
-                    label: 'Tracts covered (2010 geography)',
+                    label: 'Neighborhoods covered',
                     note: opportunity.license,
                   },
                 ]}
@@ -388,11 +385,11 @@ export function DataSections({
             Next step
           </p>
           <h2 className="ds-section__title" id="how-to-use-heading">
-            From national rollups to place
+            Dig into a place
           </h2>
           <p className="ds-section__lede">
-            County choropleths and layer models belong on the map. Methodology explains how external
-            statistics are read beside archive records, including voluntary reporting and coverage
+            Open the map for county layers and local context. Methodology explains how we read
+            outside statistics next to archive records, including voluntary reporting and coverage
             gaps.
           </p>
           <p className="ds-data-page__actions">

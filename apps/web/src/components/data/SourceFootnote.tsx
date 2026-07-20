@@ -4,6 +4,7 @@
  *  - When a figure carries a unique extra source, render a compact inline citation
  *    under that figure only — never repeat a full SOURCE box for the same link.
  * Dedupes by URL (falling back to label). Pluralizes "Source" / "Sources".
+ * Machine source ids (kebab ingest keys) are shown as reader-facing publisher names.
  */
 import React from 'react';
 import { cx } from '@repo/ui';
@@ -14,6 +15,39 @@ export type DataSourceRef = {
   readonly label: string;
   readonly url: string;
 };
+
+/**
+ * Map persisted ingest source ids to citation text humans can recognize.
+ * Prose labels (anything with a space) pass through unchanged.
+ */
+export function humanSourceLabel(label: string): string {
+  const id = label.trim();
+  if (!id || /\s/.test(id)) return id;
+
+  if (id.startsWith('us-census-acs') || id === 'acs') {
+    return 'U.S. Census Bureau, American Community Survey';
+  }
+  if (
+    id.startsWith('us-census-decennial') ||
+    id.startsWith('us-census-historical') ||
+    id === 'census'
+  ) {
+    return 'U.S. Census Bureau, Decennial Census';
+  }
+  if (id.includes('fbi-ucr') && id.includes('hate')) {
+    return 'FBI Hate Crime Statistics';
+  }
+  if (id.includes('fbi-ucr')) {
+    return 'FBI Uniform Crime Reporting';
+  }
+  if (id.includes('opportunity')) {
+    return 'Opportunity Insights, Opportunity Atlas';
+  }
+  if (id.includes('twps') || id.includes('working-paper-56')) {
+    return 'U.S. Census Bureau, Working Paper 56';
+  }
+  return id;
+}
 
 export function sourceKey(source: DataSourceRef): string {
   const url = source.url.trim().toLowerCase();
@@ -108,14 +142,14 @@ export function SourceFootnote({ sources, density = 'group', className }: Source
       <span className="ds-citation__label">{label}</span>
       {unique.length === 1 ? (
         <a href={unique[0]!.url} target="_blank" rel="noreferrer noopener">
-          {unique[0]!.label}
+          {humanSourceLabel(unique[0]!.label)}
         </a>
       ) : (
         <ul className="ds-citation__list">
           {unique.map((source) => (
             <li key={sourceKey(source)}>
               <a href={source.url} target="_blank" rel="noreferrer noopener">
-                {source.label}
+                {humanSourceLabel(source.label)}
               </a>
             </li>
           ))}

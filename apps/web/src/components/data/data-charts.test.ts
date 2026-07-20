@@ -83,8 +83,8 @@ test('PopulationByDecadeChart renders the 1790–2020 span, the 2000 boundary, a
   );
   assert.match(html, /1790/);
   assert.match(html, /2020/);
-  assert.match(html, /Black population by census decade/);
-  assert.match(html, /Black alone/); // 2000 methodology-boundary marker
+  assert.match(html, /Black population by decade/);
+  assert.match(html, /Black alone/); // 2000 definition-boundary marker
   assert.match(html, /59,527/); // free count in the accessible table
   assert.match(html, /U\.S\. Census Bureau/);
 });
@@ -167,7 +167,7 @@ test('HateCrimeYearSeriesChart renders per-year share and participation labels',
     },
   ];
   const html = renderToStaticMarkup(createElement(HateCrimeYearSeriesChart, { summaries }));
-  assert.match(html, /Reporting metrics by year/);
+  assert.match(html, /Hate crime reports by year/);
   assert.match(html, /Anti-Black share of reported incidents/);
   assert.match(html, /Agencies participating nationally/);
   assert.match(html, /2020/);
@@ -224,8 +224,8 @@ test('OpportunityAtlasCoverageChart renders outcome coverage and histogram bins'
     license: 'Opportunity Insights data-use terms — attribution required',
   };
   const html = renderToStaticMarkup(createElement(OpportunityAtlasCoverageChart, { coverage }));
-  assert.match(html, /Outcome field coverage/);
-  assert.match(html, /kfrBlackP25 tract distribution/);
+  assert.match(html, /Which measures we have/);
+  assert.match(html, /Income ranks for Black children/);
   assert.match(html, /0–20th/);
   assert.match(html, /Opportunity Insights/);
   // Horizontal bars: compact axis labels + full names in the accessible table.
