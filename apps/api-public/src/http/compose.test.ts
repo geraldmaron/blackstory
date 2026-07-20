@@ -4,6 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { createAppCheckCircuitBreaker } from '@repo/firebase';
 import { APP_CHECK_OUTAGE_OVERRIDE_ENV } from './app-check-availability.js';
 import { createProductionHandlerDeps } from './compose.js';
 
@@ -33,5 +34,18 @@ test('createProductionHandlerDeps samples APP_CHECK_OUTAGE_OVERRIDE via appCheck
   const deps = createProductionHandlerDeps({ environment });
   assert.equal(deps.appCheckAvailability?.(), 'available');
   environment[APP_CHECK_OUTAGE_OVERRIDE_ENV] = 'outage';
+  assert.equal(deps.appCheckAvailability?.(), 'outage');
+});
+
+test('createProductionHandlerDeps wires shared circuit breaker into guard and availability', async () => {
+  const breaker = createAppCheckCircuitBreaker({
+    config: { failureThreshold: 1, windowMs: 60_000, recoveryTimeoutMs: 30_000, halfOpenSuccessThreshold: 1 },
+  });
+  const deps = createProductionHandlerDeps({ environment: EMULATOR_ENV, circuitBreaker: breaker });
+
+  assert.equal(deps.appCheckAvailability?.(), 'available');
+  await deps.appCheckGuard({
+    headers: { 'x-firebase-appcheck': 'will-fail' },
+  });
   assert.equal(deps.appCheckAvailability?.(), 'outage');
 });

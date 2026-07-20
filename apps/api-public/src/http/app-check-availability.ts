@@ -1,34 +1,43 @@
 /**
  * Resolves `HandlerDeps.appCheckAvailability` (repo-uqmm) from a manual operator kill-switch
- * environment flag — the operator-flag half of the two wiring options `handlers.ts`/`README.md`
- * document (the other being an automatic verifier-failure circuit breaker, tracked separately as
- * `repo-vdnm` in `@repo/firebase`'s scope, not implemented here). Setting `APP_CHECK_OUTAGE_OVERRIDE`
- * is a deliberate, SYSTEMIC operator action (e.g. a Cloud Run env var flip during a confirmed
- * App Check provider outage) — it must never be derived from any single request's missing/invalid
- * token, which `handlers.ts` already keeps structurally impossible by only ever reading this from
- * the environment, never from a request.
+ * environment flag and/or an automatic App Check verifier-failure circuit breaker (repo-vdnm).
+ *
+ * Manual `APP_CHECK_OUTAGE_OVERRIDE` is a deliberate, systemic operator action and always wins
+ * when set. The circuit breaker complements it by detecting sustained verifier throws without
+ * treating a lone missing/invalid token as an outage.
  */
+import type { AppCheckCircuitBreaker } from '@repo/firebase';
 import type { AppCheckAvailability } from '@repo/security';
 
 export const APP_CHECK_OUTAGE_OVERRIDE_ENV = 'APP_CHECK_OUTAGE_OVERRIDE' as const;
 
 export type ResolveAppCheckAvailabilityOptions = {
   readonly environment?: Readonly<Record<string, string | undefined>>;
+  readonly circuitBreaker?: AppCheckCircuitBreaker;
 };
 
-/** Reads the current operator override. Defaults to `'available'` — normal operation, zero
- * behavior change — unless the flag is explicitly set to a truthy/`'outage'` value. */
+function readManualOutageOverride(
+  environment: Readonly<Record<string, string | undefined>>,
+): AppCheckAvailability | undefined {
+  const raw = environment[APP_CHECK_OUTAGE_OVERRIDE_ENV]?.trim().toLowerCase();
+  return raw === '1' || raw === 'true' || raw === 'outage' ? 'outage' : undefined;
+}
+
+/** Reads the current availability signal. Defaults to `'available'` when the breaker is closed
+ * and no operator override is set. */
 export function resolveAppCheckAvailability(
   options: ResolveAppCheckAvailabilityOptions = {},
 ): AppCheckAvailability {
   const environment = options.environment ?? process.env;
-  const raw = environment[APP_CHECK_OUTAGE_OVERRIDE_ENV]?.trim().toLowerCase();
-  return raw === '1' || raw === 'true' || raw === 'outage' ? 'outage' : 'available';
+  const manualOverride = readManualOutageOverride(environment);
+  if (manualOverride === 'outage') {
+    return 'outage';
+  }
+  return options.circuitBreaker?.getAvailability() ?? 'available';
 }
 
 /** Builds the `() => AppCheckAvailability` provider `HandlerDeps.appCheckAvailability` expects,
- * sampling the environment fresh on every call so an operator's flag flip takes effect on the next
- * request without a restart. */
+ * sampling the environment and breaker fresh on every call. */
 export function createAppCheckAvailabilityProvider(
   options: ResolveAppCheckAvailabilityOptions = {},
 ): () => AppCheckAvailability {

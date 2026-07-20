@@ -220,6 +220,13 @@ export type {
   ActivateReleaseResult,
 } from './release-activation.js';
 
+export {
+  MOBILE_RELEASE_POINTER_PATH,
+  createAdminFirestoreReleaseStore,
+  createFirestoreReleaseStore,
+} from './release-store.js';
+export type { FirestoreReleaseStore, ReleaseStoreBackend } from './release-store.js';
+
 export { promoteClaimToPublicationCandidate } from './promotion.js';
 export type {
   AcceptedPromotionDoc,

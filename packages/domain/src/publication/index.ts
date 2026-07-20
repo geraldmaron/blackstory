@@ -322,3 +322,48 @@ export function createPublicEntitySnapshot<T extends JsonValue>(
     entity,
   });
 }
+
+export {
+  ReleaseActivationError,
+  activateRelease,
+  collectGarbage,
+  createInMemoryReleaseStore,
+  generateReleaseArtifacts,
+  rollbackTo,
+  sealArtifact,
+  validateGeneratedArtifacts,
+} from './release-activation.js';
+export type {
+  ActiveReleasePointer,
+  ActivationResult,
+  BoundedPointsBudget,
+  ContentIndexEntry,
+  GeneratedArtifact,
+  GeneratedRelease,
+  GenerateReleaseArtifactsInput,
+  GcOptions,
+  GcResult,
+  ReleaseArtifactKind,
+  ReleaseErrorCode,
+  ReleaseStore,
+  RollbackOptions,
+  StoredArtifact,
+  StoredRelease,
+} from './release-activation.js';
+export {
+  buildMobileBootstrapManifest,
+  bootstrapManifestToJson,
+} from './mobile-bootstrap.js';
+export type {
+  BuildMobileBootstrapManifestInput,
+  MobileArtifactHashRef,
+  MobileBootstrapManifest,
+} from './mobile-bootstrap.js';
+export {
+  publicReleaseBootstrapPath,
+  publicReleaseBoundedPointsPath,
+  publicReleaseContentIndexPath,
+  publicReleaseMapCountyAggregatesPath,
+  publicReleaseMapSourcePath,
+  publicReleaseMapStateAggregatesPath,
+} from './release-paths.js';

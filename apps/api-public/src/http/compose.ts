@@ -12,6 +12,11 @@
  * depend on where entities come from.
  */
 import type { EnvironmentLike } from '@repo/firebase';
+import {
+  createAppCheckCircuitBreaker,
+  type AppCheckCircuitBreaker,
+  type AppCheckCircuitBreakerTelemetry,
+} from '@repo/firebase';
 import { createPublicApiAppCheckGuard } from '../app-check.js';
 import { createPublicRateLimitGuard } from '../rate-limits.js';
 import { createPublicSearchGuard } from '../search-guardrails.js';
@@ -23,10 +28,23 @@ import { shouldUsePublicFirestoreDataAccess } from './live-policy.js';
 
 export type ComposeHandlerDepsOptions = {
   readonly environment?: EnvironmentLike;
+  readonly circuitBreaker?: AppCheckCircuitBreaker;
+  readonly circuitBreakerTelemetry?: AppCheckCircuitBreakerTelemetry;
+};
+
+const consoleCircuitBreakerTelemetry: AppCheckCircuitBreakerTelemetry = {
+  record(event) {
+    console.info(JSON.stringify(event));
+  },
 };
 
 export function createProductionHandlerDeps(options: ComposeHandlerDepsOptions = {}): HandlerDeps {
   const environment = options.environment ?? process.env;
+  const circuitBreaker =
+    options.circuitBreaker ??
+    createAppCheckCircuitBreaker({
+      telemetry: options.circuitBreakerTelemetry ?? consoleCircuitBreakerTelemetry,
+    });
 
   const dataAccess = shouldUsePublicFirestoreDataAccess(environment)
     ? createFirestorePublicDataAccess(createFirestoreDataAccessReaders({ environment }))
@@ -34,9 +52,9 @@ export function createProductionHandlerDeps(options: ComposeHandlerDepsOptions =
 
   return {
     dataAccess,
-    appCheckGuard: createPublicApiAppCheckGuard({ environment }),
+    appCheckGuard: createPublicApiAppCheckGuard({ environment, circuitBreaker }),
     rateLimitGuard: createPublicRateLimitGuard(),
     searchGuard: createPublicSearchGuard(),
-    appCheckAvailability: createAppCheckAvailabilityProvider({ environment }),
+    appCheckAvailability: createAppCheckAvailabilityProvider({ environment, circuitBreaker }),
   };
 }
