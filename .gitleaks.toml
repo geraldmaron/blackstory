@@ -1,0 +1,23 @@
+title = "Black Book gitleaks config"
+
+[extend]
+useDefault = true
+
+# Global allowlist matched against the exact detected secret/match text (not by path), so a
+# genuinely different secret later added to any of these same files would still be caught.
+[allowlist]
+description = "Known false positives, not credentials to rotate"
+regexes = [
+  # Firebase Web API key (apphosting.*.yaml, registered-apps.json, packages/firebase/src/constants.ts).
+  # Per Firebase's own docs this key is not a secret — access is gated by Firestore/Storage
+  # Security Rules and App Check, not by keeping the key hidden; it ships in client bundles by design.
+  '''AIzaSyCS6qbiHo3KYAkMOhVbuORCwNa9PNbChFU''',
+  # Synthetic HS256 JWT fixture ({"sub":"appcheck"}) used by apps/mobile log-redaction/crash-reporter
+  # tests to prove tokens get redacted from telemetry — not a real signed credential.
+  '''eyJhbGciOiJIUzI1NiJ9\.eyJzdWIiOiJhcHBjaGVjayJ9\.dBjftJeZ4CVPmB92K27uhbUJU1p1r_wW1gFWFOEjXk''',
+  # Prose in .beads/issues.jsonl issue descriptions that happens to match the generic-api-key heuristic
+  # (gitleaks allowlist regexes match the extracted secret capture, not the surrounding line).
+  '''DAST/provenance''',
+  # Design-token comment in packages/ui/src/tokens/colors.ts ("tokens: black/white/neutral").
+  '''black/white/neutral''',
+]
