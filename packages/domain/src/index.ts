@@ -611,6 +611,14 @@ export {
   buildMapSource,
   aggregateDecadePresence,
   buildDecadePresenceAggregates,
+  BLACK_POPULATION_CONCENTRATED_MIN,
+  BLACK_POPULATION_EMERGING_MIN,
+  bucketBlackPopulationTier,
+  buildStateBlackPopulationDensityLevels,
+  latestStatePopulationVintage,
+  parseStatePopulationIndexFile,
+  readStatePopulation,
+  sumStateBlackPopulation,
 } from './map/index.js';
 export type {
   UsStateInfo,
@@ -629,6 +637,11 @@ export type {
   StatePresenceEntityInput,
   DecadePresenceEntityInput,
   DecadeStateAggregates,
+  BlackPopulationDensityTier,
+  StateBlackPopulationDensityLevel,
+  StatePopulationIndex,
+  StatePopulationIndexFile,
+  StatePopulationRecord,
 } from './map/index.js';
 export * from './query-packs/index.js';
 export * from './discovery/index.js';

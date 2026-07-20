@@ -2,54 +2,76 @@
  * Decades-in-motion frames for the home hero (design-direction-v5 §6.1): the
  * archive rewinds newest → oldest — starting near the present end of the
  * documented record and walking toward earlier decades — then lands on the
- * full archive. Pins accumulate by earliest documented decade (≤ frame decade);
- * state fills reflect ACTIVE documented presence that decade (an entity's own
- * `eraBuckets` span, not just its arrival); that decade's relationship lines
- * trace movement between places.
+ * full archive.
  *
- * Per-decade state density is delegated to `@repo/domain`'s
- * `aggregateDecadePresence` (packages/domain/src/map/decade-presence.ts) —
- * the modeling-library primitive for "which decades is this entity
- * recognized as active in," shared with the history graph's per-decade
- * node/edge views (`../graph/decades.ts`). This module supplies the pieces
- * that ARE web-specific: which decades get a pin-arrival frame at all, and
- * the frame's actual GeoJSON feature collection/edge lines.
+ * Pins accumulate by earliest documented decade (≤ frame decade); relationship
+ * lines trace movement active that decade. State fills are driven by Census
+ * Black population when a `StatePopulationIndex` is supplied (absolute count →
+ * copper deepen via `@repo/domain/map/state-population`); without an index,
+ * fills fall back to ACTIVE documented presence (`aggregateDecadePresence`) so
+ * existing tests and degraded environments keep working.
  *
- * HONESTY RULE: every frame is driven by what the release actually documents
- * (era buckets, state aggregates, history edges) and is labeled as documented
- * records. It is NOT a population layer — Black population share by decade
- * (census bead the related workstream) rides this same density channel when its
- * ingestion lands, and replaces nothing here until the data is real.
+ * HONESTY RULE: population fills and archive pins are independent signals.
+ * When the population index is present, fills ARE census Black population for
+ * that vintage — missing state rows stay unfilled (not "zero people"). Pins
+ * remain documented records only; sparse pins never mean empty demography.
  *
  * Dignity rules carry: intensity is presence-tiered copper (documented /
- * emerging / concentrated via `buildStateDensityLevels`), never incident heat.
+ * emerging / concentrated), never incident heat.
  */
-// Both the value and the type come from the client-safe `./map/decade-presence` subpath, never
-// the top-level `@repo/domain` barrel: this module is imported by HeroStage.tsx ('use client'),
-// and the barrel transitively pulls in server-only modules (Node builtins in
-// publication/index.ts, relevance/fixtures.ts) that webpack cannot bundle for the browser. That
-// subpath's own module is import-free by design (see its doc comment) so nothing it pulls in can
-// reintroduce the problem — `StateAggregateCount` is a structural duplicate of `@repo/domain`'s
-// `MapStateAggregate` (same four fields), freely interchangeable via TypeScript's structural
-// typing with `density.ts`'s `buildStateDensityLevels`, which expects the latter.
-import { aggregateDecadePresence, type StateAggregateCount } from '@repo/domain/map/decade-presence';
+// Client-safe subpaths only — this module is imported by HeroStage.tsx ('use client').
+import {
+  aggregateDecadePresence,
+  type StateAggregateCount,
+} from '@repo/domain/map/decade-presence';
+import { US_STATES } from '@repo/domain/map/geography';
+import {
+  buildStateBlackPopulationDensityLevels,
+  latestStatePopulationVintage,
+  sumStateBlackPopulation,
+  type StatePopulationIndex,
+} from '@repo/domain/map/state-population';
 import type { ExploreMapFeature, ExploreMapFeatureCollection } from './build-explore-map-source';
 import type { HistoryEdgeLineCollection } from './build-history-edge-lines';
 import { buildStateDensityLevels, type StateDensityLevel } from './density';
+
+export type DecadeFlowDensityMode = 'population' | 'presence';
 
 export type DecadeFlowFrame = {
   /** Display label — "1870s", or FINAL_FRAME_LABEL for the closing full-archive frame. */
   readonly decade: string;
   /** Records documented by (through) this decade. */
   readonly featureCollection: ExploreMapFeatureCollection;
-  /** Presence tiers for entities ACTIVE this decade (or, on the closing frame, the
-   * complete era-agnostic archive) — documented presence, never ranked. */
+  /**
+   * State fills for this frame — Census Black population when `densityMode` is
+   * `population`, otherwise ACTIVE documented presence. Missing population rows
+   * stay omitted (unknown fill).
+   */
   readonly densityLevels: readonly StateDensityLevel[];
   /** Relationship lines active in this decade (movement, not accumulation). */
   readonly edgeCollection: HistoryEdgeLineCollection;
   readonly cumulativeCount: number;
   /** True only on the closing frame that shows the complete archive. */
   readonly isComplete: boolean;
+  /** How `densityLevels` were produced for this frame. */
+  readonly densityMode: DecadeFlowDensityMode;
+  /**
+   * National Black population for the frame vintage when known (timeline snapshot
+   * preferred; otherwise a sum of published state rows). Omitted when unknown.
+   */
+  readonly blackPopulationTotal?: number;
+  /** True when this vintage opens the 2000 measurement-regime boundary. */
+  readonly opensDefinitionBoundary?: boolean;
+};
+
+export type BuildDecadeFlowFramesOptions = {
+  /** When set, state fills encode absolute Census Black population. */
+  readonly statePopulationIndex?: StatePopulationIndex;
+  /**
+   * Optional national Black totals keyed by vintage year (`"1870"`). Preferred
+   * over summing state rows when a timeline snapshot is available.
+   */
+  readonly nationalBlackByDecade?: Readonly<Partial<Record<string, number>>>;
 };
 
 export const FINAL_FRAME_LABEL = 'Today';
@@ -86,10 +108,7 @@ function stateResolved(
 }
 
 /** Era-agnostic state presence over every state-resolved feature, dated or not — the
- * closing/complete frame's "today" density. Deliberately independent of decade-bucket
- * membership: an undated-but-located record still belongs on the map today, even though
- * it can never honestly claim a specific decade's ACTIVE presence (see
- * `aggregateDecadePresence`'s doc comment on why decade-scoped presence excludes it). */
+ * closing/complete frame's "today" density when population data is unavailable. */
 function densityOfAllFeatures(features: readonly ExploreMapFeature[]): readonly StateDensityLevel[] {
   const byState = new Map<string, { fips: string; postal: string; name: string; count: number }>();
   for (const feature of features) {
@@ -111,10 +130,7 @@ function densityOfAllFeatures(features: readonly ExploreMapFeature[]): readonly 
   return buildStateDensityLevels(aggregates);
 }
 
-/** Per-decade ACTIVE-presence density, keyed by decade label, over every state-resolved
- * feature's own `eraBuckets` span — delegates the active/cumulative aggregation to
- * `@repo/domain`'s `aggregateDecadePresence` rather than reimplementing it here.
- * Explore presence mode uses the same map so line-decade scrubbing updates state fills. */
+/** Per-decade ACTIVE-presence density, keyed by decade label. */
 export function buildActiveDensityByDecade(
   features: readonly ExploreMapFeature[],
 ): ReadonlyMap<string, readonly StateDensityLevel[]> {
@@ -135,20 +151,49 @@ function collectionOf(features: readonly ExploreMapFeature[]): ExploreMapFeature
   return { type: 'FeatureCollection', features };
 }
 
+function nationalTotalForVintage(
+  vintage: string,
+  index: StatePopulationIndex,
+  nationalBlackByDecade: Readonly<Partial<Record<string, number>>> | undefined,
+): number | undefined {
+  const fromTimeline = nationalBlackByDecade?.[vintage];
+  if (typeof fromTimeline === 'number' && Number.isFinite(fromTimeline)) {
+    return fromTimeline;
+  }
+  const summed = sumStateBlackPopulation(index, vintage);
+  return summed > 0 ? summed : undefined;
+}
+
+function populationDensityForVintage(
+  index: StatePopulationIndex,
+  vintage: string,
+): readonly StateDensityLevel[] {
+  return buildStateBlackPopulationDensityLevels(index, vintage, US_STATES).map((level) => ({
+    stateFips: level.stateFips,
+    statePostalCode: level.statePostalCode,
+    stateName: level.stateName,
+    count: level.count,
+    tier: level.tier,
+  }));
+}
+
 /**
- * One frame per decade that changes something (a record arrives or an edge is
- * active), newest → oldest so the hero starts at the present end of the
- * archive and rewinds toward earlier records, closed by a full-archive frame
- * that also carries the undated records and the all-time relationship lines.
- * Pins accumulate by arrival (earliest documented decade ≤ frame decade);
- * density reflects ACTIVE presence that decade, via `@repo/domain`'s
- * decade-presence model.
+ * One frame per decade that changes something (a record arrives, an edge is
+ * active, or — when a population index is present — a census vintage exists),
+ * newest → oldest, closed by a full-archive frame.
+ *
+ * Pins accumulate by arrival; density reflects Census Black population when
+ * `options.statePopulationIndex` is set, otherwise ACTIVE archive presence.
  */
 export function buildDecadeFlowFrames(
   collection: ExploreMapFeatureCollection,
   edgesByDecade: Readonly<Record<string, HistoryEdgeLineCollection>>,
   allTimeEdges: HistoryEdgeLineCollection = EMPTY_EDGE_LINE_COLLECTION,
+  options: BuildDecadeFlowFramesOptions = {},
 ): readonly DecadeFlowFrame[] {
+  const { statePopulationIndex, nationalBlackByDecade } = options;
+  const populationMode = Boolean(statePopulationIndex);
+
   const decadeStarts = new Set<number>();
   for (const feature of collection.features) {
     const earliest = earliestDecadeOf(feature);
@@ -158,36 +203,70 @@ export function buildDecadeFlowFrames(
     const start = decadeStartOf(label);
     if (start !== undefined) decadeStarts.add(start);
   }
+  if (statePopulationIndex) {
+    for (const vintage of statePopulationIndex.vintages) {
+      const start = decadeStartOf(vintage);
+      if (start !== undefined) decadeStarts.add(start);
+    }
+  }
 
-  const activeDensityByDecade = buildActiveDensityByDecade(collection.features);
+  const activeDensityByDecade = populationMode
+    ? undefined
+    : buildActiveDensityByDecade(collection.features);
 
   const frames: DecadeFlowFrame[] = [];
   // Newest first so autoplay and the rail both read new → old.
   for (const start of [...decadeStarts].sort((a, b) => b - a)) {
     const label = `${start}s`;
+    const vintage = String(start);
     const cumulative = collection.features.filter((feature) => {
       const earliest = earliestDecadeOf(feature);
       return earliest !== undefined && earliest <= start;
     });
+
+    const densityLevels = statePopulationIndex
+      ? populationDensityForVintage(statePopulationIndex, vintage)
+      : (activeDensityByDecade?.get(label) ?? []);
+    const blackPopulationTotal = statePopulationIndex
+      ? nationalTotalForVintage(vintage, statePopulationIndex, nationalBlackByDecade)
+      : undefined;
+
     frames.push({
       decade: label,
       featureCollection: collectionOf(cumulative),
-      densityLevels: activeDensityByDecade.get(label) ?? [],
+      densityLevels,
       edgeCollection: edgesByDecade[label] ?? EMPTY_EDGE_LINE_COLLECTION,
       cumulativeCount: cumulative.length,
       isComplete: false,
+      densityMode: populationMode ? 'population' : 'presence',
+      ...(blackPopulationTotal !== undefined ? { blackPopulationTotal } : {}),
+      // 2000 opens the alone-category measurement boundary (see population-decades meta).
+      ...(vintage === '2000' ? { opensDefinitionBoundary: true } : {}),
     });
   }
 
-  // Closing frame: the complete archive — including undated records, which
-  // never appear under a decade label they can't honestly claim.
+  // Closing frame: complete archive pins + latest population vintage fills (or
+  // era-agnostic presence when no population index).
+  const latestVintage = statePopulationIndex
+    ? latestStatePopulationVintage(statePopulationIndex)
+    : undefined;
+  const closingBlackTotal =
+    statePopulationIndex && latestVintage
+      ? nationalTotalForVintage(latestVintage, statePopulationIndex, nationalBlackByDecade)
+      : undefined;
+
   frames.push({
     decade: FINAL_FRAME_LABEL,
     featureCollection: collection,
-    densityLevels: densityOfAllFeatures(collection.features),
+    densityLevels:
+      statePopulationIndex && latestVintage
+        ? populationDensityForVintage(statePopulationIndex, latestVintage)
+        : densityOfAllFeatures(collection.features),
     edgeCollection: allTimeEdges,
     cumulativeCount: collection.features.length,
     isComplete: true,
+    densityMode: populationMode ? 'population' : 'presence',
+    ...(closingBlackTotal !== undefined ? { blackPopulationTotal: closingBlackTotal } : {}),
   });
 
   return frames;

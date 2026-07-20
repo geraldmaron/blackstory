@@ -1,16 +1,15 @@
 /**
  * Decades-in-motion frame builder: cumulative PIN reveal by earliest documented
  * decade (newest → oldest play/display order), honest handling of undated
- * records (final frame only), per-decade edge slices, and presence-tier
- * DENSITY over entities ACTIVE that decade (delegated to `@repo/domain`'s
- * `aggregateDecadePresence` — an entity whose `eraBuckets` span has already
- * ended does not inflate a later decade's density, even though its pin remains
- * on the map). The closing/complete frame's density stays era-agnostic
- * cumulative (everyone with a resolved state, dated or not) — "the map today"
- * is not itself a decade.
+ * records (final frame only), per-decade edge slices, and density fills.
+ *
+ * Without a population index, density is ACTIVE archive presence. With an index,
+ * density is absolute Census Black population (missing rows omitted); pins still
+ * accumulate from the archive independently.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import type { StatePopulationIndex } from '@repo/domain/map/state-population';
 import type { ExploreMapFeature, ExploreMapFeatureCollection } from './build-explore-map-source';
 import type { HistoryEdgeLineCollection } from './build-history-edge-lines';
 import { buildDecadeFlowFrames, FINAL_FRAME_LABEL } from './decade-flow';
@@ -79,6 +78,23 @@ const EDGE_LINE: HistoryEdgeLineCollection = {
   ],
 };
 
+const POP_INDEX: StatePopulationIndex = {
+  vintages: ['1790', '1870', '2000', '2020'],
+  states: {
+    '11': {
+      '1870': { totalPopulation: 131_700, blackPopulation: 43_404 },
+      '2000': { totalPopulation: 572_059, blackPopulation: 343_312 },
+      '2020': { totalPopulation: 689_545, blackPopulation: 285_810 },
+    },
+    '13': {
+      '1790': { totalPopulation: 82_548, blackPopulation: 29_662 },
+      '1870': { totalPopulation: 1_184_109, blackPopulation: 545_142 },
+      '2000': { totalPopulation: 8_186_453, blackPopulation: 2_349_542 },
+      '2020': { totalPopulation: 10_711_908, blackPopulation: 3_320_513 },
+    },
+  },
+};
+
 test('frames are newest-to-oldest and cumulative: later (older) decades show fewer arrivals', () => {
   const frames = buildDecadeFlowFrames(
     collectionOf([
@@ -91,8 +107,9 @@ test('frames are newest-to-oldest and cumulative: later (older) decades show few
 
   const labels = frames.map((frame) => frame.decade);
   assert.deepEqual(labels, ['1900s', '1870s', FINAL_FRAME_LABEL]);
-  assert.equal(frames[0]!.cumulativeCount, 3); // through 1900s: a + b + c
-  assert.equal(frames[1]!.cumulativeCount, 2); // through 1870s: a + c
+  assert.equal(frames[0]!.cumulativeCount, 3);
+  assert.equal(frames[1]!.cumulativeCount, 2);
+  assert.equal(frames[0]!.densityMode, 'presence');
 });
 
 test('undated records appear only in the closing full-archive frame', () => {
@@ -143,13 +160,10 @@ test('per-decade density levels cover exactly the states of entities ACTIVE that
     {},
   );
 
-  // Newest-first: 1900s then 1870s.
   assert.deepEqual(
     frames[0]!.densityLevels.map((level) => level.statePostalCode),
     ['GA'],
   );
-  // 'a' (DC) is active only in the 1870s — it must NOT inflate the 1900s density,
-  // even though its pin has already arrived by then when viewing chronologically.
   assert.deepEqual(
     frames[1]!.densityLevels.map((level) => level.statePostalCode),
     ['DC'],
@@ -161,9 +175,6 @@ test('per-decade density levels cover exactly the states of entities ACTIVE that
 });
 
 test('ACTIVE vs CUMULATIVE genuinely diverge: an entity that is no longer active drops out of a later decade\'s density, even though its pin never leaves once arrived', () => {
-  // 'new-in-1900s' exists purely so a distinct 1900s frame gets built at all — the
-  // frame axis only steps on a NEW arrival (a feature's OWN earliest decade), never
-  // on every decade a longer-lived feature's span merely touches.
   const frames = buildDecadeFlowFrames(
     collectionOf([
       feature('short-lived', ['1870s'], DC),
@@ -177,9 +188,7 @@ test('ACTIVE vs CUMULATIVE genuinely diverge: an entity that is no longer active
   const d1900s = frames.find((frame) => frame.decade === '1900s')!;
 
   assert.deepEqual(d1870s.densityLevels.map((l) => l.statePostalCode).sort(), ['DC', 'GA']);
-  // 'short-lived' (DC) is not active in the 1900s — density drops to GA only...
   assert.deepEqual(d1900s.densityLevels.map((l) => l.statePostalCode), ['GA']);
-  // ...but its pin is still on the map (cumulative reveal never removes a pin).
   assert.equal(d1900s.cumulativeCount, 3);
   assert.ok(
     d1900s.featureCollection.features.some((f) => f.properties.entityId === 'short-lived'),
@@ -198,4 +207,49 @@ test('the closing/complete frame density is era-agnostic cumulative — includes
     finalFrame.densityLevels.map((level) => level.statePostalCode).sort(),
     ['DC', 'GA'],
   );
+});
+
+test('population index drives fills from absolute Black counts and unions census vintages onto the frame axis', () => {
+  const frames = buildDecadeFlowFrames(
+    collectionOf([feature('a', ['1870s'], DC)]),
+    {},
+    undefined,
+    {
+      statePopulationIndex: POP_INDEX,
+      nationalBlackByDecade: { '1870': 4_880_009, '2020': 41_104_200 },
+    },
+  );
+
+  const labels = frames.map((frame) => frame.decade);
+  assert.ok(labels.includes('1790s'));
+  assert.ok(labels.includes('2000s'));
+  assert.ok(labels.includes('2020s'));
+  assert.equal(labels.at(-1), FINAL_FRAME_LABEL);
+
+  const d1790 = frames.find((frame) => frame.decade === '1790s')!;
+  assert.equal(d1790.densityMode, 'population');
+  assert.deepEqual(
+    d1790.densityLevels.map((level) => level.statePostalCode),
+    ['GA'],
+  );
+  assert.equal(d1790.densityLevels[0]!.count, 29_662);
+  assert.equal(d1790.cumulativeCount, 0);
+
+  const d1870 = frames.find((frame) => frame.decade === '1870s')!;
+  assert.equal(d1870.blackPopulationTotal, 4_880_009);
+  assert.equal(d1870.cumulativeCount, 1);
+  assert.ok(
+    d1870.densityLevels.some(
+      (level) => level.statePostalCode === 'GA' && level.tier === 'concentrated',
+    ),
+  );
+
+  const d2000 = frames.find((frame) => frame.decade === '2000s')!;
+  assert.equal(d2000.opensDefinitionBoundary, true);
+
+  const today = frames.at(-1)!;
+  assert.equal(today.densityMode, 'population');
+  assert.equal(today.blackPopulationTotal, 41_104_200);
+  assert.ok(today.densityLevels.some((level) => level.statePostalCode === 'GA'));
+  assert.equal(today.cumulativeCount, 1);
 });

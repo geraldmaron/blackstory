@@ -107,7 +107,7 @@ export const POPULATION_SHARE_TIER_FILL: Readonly<
 > = {
   trace: 'rgba(184, 107, 42, 0.08)',
   low: 'rgba(184, 107, 42, 0.16)',
-  mid: 'rgba(216, 161, 120, 0.28)',
+  mid: 'rgba(184, 107, 42, 0.28)',
   high: 'rgba(184, 107, 42, 0.38)',
   majority: 'rgba(184, 107, 42, 0.52)',
 };

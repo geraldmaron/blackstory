@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import { DENSITY_TIER_FILL, DIGNITY_PALETTE } from './dignity-style';
+import { DENSITY_TIER_FILL, DIGNITY_PALETTE, POPULATION_SHARE_TIER_FILL } from './dignity-style';
 import { KIND_ENCODING_ENTRIES, MAP_SEMANTIC_TONE_ENCODING } from './kind-encoding';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -136,5 +136,24 @@ test('density tiers share the same hue family (opacity scale, not hue-shift towa
   const [first, ...rest] = hues;
   for (const h of rest) {
     assert.ok(Math.abs(h - first!) < 1, 'all density tiers must share one hue, varying only opacity');
+  }
+});
+
+test('population share tiers deepen monotonically in the same copper hue (no sand break)', () => {
+  const order = ['trace', 'low', 'mid', 'high', 'majority'] as const;
+  const alphas: number[] = [];
+  const hues: number[] = [];
+  for (const tier of order) {
+    const value = POPULATION_SHARE_TIER_FILL[tier];
+    const match = /rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)/.exec(value);
+    assert.ok(match, `expected rgba() for share tier ${tier}`);
+    const rgb = [Number(match[1]), Number(match[2]), Number(match[3])] as const;
+    assert.equal(isRedHued(rgb), false, `share tier "${tier}" must not be red-hued`);
+    hues.push(hue(rgb));
+    alphas.push(Number(match[4]));
+  }
+  for (let i = 1; i < hues.length; i += 1) {
+    assert.ok(Math.abs(hues[i]! - hues[0]!) < 1, 'share tiers must share one copper hue');
+    assert.ok(alphas[i]! > alphas[i - 1]!, 'share opacity must deepen monotonically');
   }
 });

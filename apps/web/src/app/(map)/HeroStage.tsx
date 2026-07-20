@@ -5,13 +5,18 @@
  * `MapStage` canvas renders behind this (mounted once, at the `(map)` layout);
  * `HeroStage` renders the floating typography (subject morph via
  * `HeroHeadlineMorph`) and the TIMELINE INSTRUMENT — a full-width rail of
- * decade ticks that plays the archive decade by decade (decade-flow.ts),
- * scrubbable by tap, pausable, honest about what it shows (documented records,
- * never modeled population). Decade frame changes morph pins / relationship
- * lines via dual-buffer opacity crossfade and lerp presence fill colors A→B
- * per state via MapStage `{ fade: true }` — geography never empties or snaps.
- * Memorial plate names stagger-fade with each decade frame (`memorialDecade` /
- * `memorialComplete` on the same patch) — not a bulk wipe.
+ * decade ticks that plays Census Black population fills decade by decade
+ * (decade-flow.ts), with archive pins as documented-record overlays.
+ *
+ * Autoplay keeps every decennial tick; narrative beats (1790, 1860, 1870, 1910,
+ * 1940, 1970, 2000, 2020, Today) dwell longer so the rewind stays watchable.
+ * Scrubbing stays precise on the full rail.
+ *
+ * Decade frame changes morph pins / relationship lines via dual-buffer opacity
+ * crossfade and lerp presence fill colors A→B per state via MapStage
+ * `{ fade: true }` — geography never empties or snaps. Memorial plate names
+ * stagger-fade with each decade frame (`memorialDecade` / `memorialComplete`
+ * on the same patch) — not a bulk wipe.
  *
  * Engagement contract (ADR-017 "Transition contract"): state, background, entity
  * pin, and the copper CTA all fly the matching camera preset first, then funnel
@@ -37,8 +42,50 @@ import { shouldFadeDecadePatch } from '../map/decade-layer-transition';
 import { HeroHeadlineMorph } from './HeroHeadlineMorph';
 import { useMapStage } from './MapStage';
 
-/** Dwell per decade frame — slow enough to read, fast enough to feel alive. */
-const DECADE_FRAME_MS = 4800;
+/** Longer dwell on story beats so the national arc is readable. */
+const STORY_BEAT_DWELL_MS = 6400;
+/** Shorter dwell on intervening decades so the full rewind stays watchable. */
+const DEFAULT_DWELL_MS = 2800;
+
+/** Narrative beats that earn the longer autoplay dwell (plus Today). */
+const STORY_BEAT_YEARS = new Set([1790, 1860, 1870, 1910, 1940, 1970, 2000, 2020]);
+
+function dwellMsForFrame(frame: DecadeFlowFrame | undefined): number {
+  if (!frame) return DEFAULT_DWELL_MS;
+  if (frame.isComplete) return STORY_BEAT_DWELL_MS;
+  const year = Number.parseInt(frame.decade, 10);
+  if (Number.isFinite(year) && STORY_BEAT_YEARS.has(year)) return STORY_BEAT_DWELL_MS;
+  return DEFAULT_DWELL_MS;
+}
+
+function formatCount(value: number): string {
+  return new Intl.NumberFormat('en-US').format(value);
+}
+
+function timelineNoteForFrame(
+  frame: DecadeFlowFrame | undefined,
+  featureCount: number,
+  stateCount: number,
+): string {
+  if (!frame) {
+    return `${featureCount} records · ${stateCount} states`;
+  }
+
+  const recordsClause = frame.isComplete
+    ? `${formatCount(frame.cumulativeCount)} records · ${stateCount} states`
+    : `${formatCount(frame.cumulativeCount)} records documented through this decade`;
+
+  if (frame.densityMode === 'population' && frame.blackPopulationTotal !== undefined) {
+    const populationClause = `${formatCount(frame.blackPopulationTotal)} Black persons counted`;
+    const boundary =
+      frame.opensDefinitionBoundary
+        ? ' · Black alone category begins this decade'
+        : '';
+    return `${populationClause} · ${recordsClause}${boundary}`;
+  }
+
+  return recordsClause;
+}
 
 export type HeroStageProps = {
   readonly featureCollection: ExploreMapFeatureCollection;
@@ -199,14 +246,15 @@ export function HeroStage({
     jurisdictionAreaFeatures,
   ]);
 
-  // Auto-advance while playing; loops through the closing full-archive frame.
+  // Auto-advance while playing; dwell longer on narrative beats.
   useEffect(() => {
     if (!playing || dissolving || decadeFrames.length <= 1) return undefined;
-    const timer = window.setInterval(() => {
+    const frame = decadeFrames[frameIndex];
+    const timer = window.setTimeout(() => {
       setFrameIndex((index) => (index + 1) % decadeFrames.length);
-    }, DECADE_FRAME_MS);
-    return () => window.clearInterval(timer);
-  }, [playing, dissolving, decadeFrames.length]);
+    }, dwellMsForFrame(frame));
+    return () => window.clearTimeout(timer);
+  }, [playing, dissolving, decadeFrames, frameIndex]);
 
   useEffect(() => {
     const unsubscribe = [
@@ -280,11 +328,11 @@ export function HeroStage({
           records as a list.
         </Notice>
       ) : null}
-      <p className="ds-hero-stage__kicker">Documented Black history</p>
+      <p className="ds-hero-stage__kicker">Black population by decade · documented records</p>
       <HeroHeadlineMorph />
       <p className="ds-hero-stage__support">
-        Every pin is a documented record — people, places, schools, and events, each carrying its
-        evidence. Start with the places you know.
+        Fills are census Black population counts. Pins are archive evidence — they are not the
+        same story. Empty states mean not yet in the census geography that decade, not zero people.
       </p>
       <div className="ds-hero-stage__actions">
         <Link className="ds-cta ds-cta--copper" href="/locate">
@@ -303,9 +351,7 @@ export function HeroStage({
                 {currentFrame?.decade ?? FINAL_FRAME_LABEL}
               </p>
               <p className="ds-hero-timeline__note">
-                {currentFrame?.isComplete
-                  ? `${currentFrame?.cumulativeCount ?? featureCount} records · ${stateCount} states`
-                  : `${currentFrame?.cumulativeCount ?? 0} records documented through this decade`}
+                {timelineNoteForFrame(currentFrame, featureCount, stateCount)}
               </p>
             </div>
             <button

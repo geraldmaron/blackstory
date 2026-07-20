@@ -3,8 +3,18 @@
  * `HeroStage` renders the floating chrome over it; `HomeStorySections` owns the beats below
  * (design-direction-v5 §6.1): About, From the data (archive + `/data` census viz), the story
  * rail, and the "how this works" band.
+ *
+ * Decade fills load from the static Census Black-population index (twps0056 + modern county
+ * rollups); pins/edges stay archive overlays. National totals for the timeline readout come
+ * from the same timeline snapshot used on `/data` when available.
  */
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { getNationalPopulationTimelineSnapshot } from '@repo/firebase';
+import {
+  parseStatePopulationIndexFile,
+  type StatePopulationIndexFile,
+} from '@repo/domain/map/state-population';
 import { HomeStorySections } from '../../components/home/HomeStorySections';
 import type { StateStartEntry } from '../../components/home/StateStart';
 import { FEATURED_SEED_IDS } from '../../data/public-seed';
@@ -25,6 +35,19 @@ async function safe<T>(promise: Promise<T | undefined>): Promise<T | undefined> 
 
 /** How many one-tap state chips the Orient beat shows. */
 const TOP_STATE_LIMIT = 5;
+
+async function loadStatePopulationIndex() {
+  try {
+    const filePath = path.join(process.cwd(), 'public', 'geo', 'state-population-decades.json');
+    const raw = await readFile(filePath, 'utf8');
+    const payload = JSON.parse(raw) as StatePopulationIndexFile;
+    const index = parseStatePopulationIndexFile(payload);
+    if (index.vintages.length === 0 || Object.keys(index.states).length === 0) return undefined;
+    return index;
+  } catch {
+    return undefined;
+  }
+}
 
 /** Distinct states with pinned records, ordered by record count descending. */
 function tallyStates(collection: ExploreMapFeatureCollection): StateStartEntry[] {
@@ -61,9 +84,10 @@ function eraSpanOf(collection: ExploreMapFeatureCollection): string | undefined 
 }
 
 export default async function HomePage() {
-  const [base, timeline] = await Promise.all([
+  const [base, timeline, statePopulationIndex] = await Promise.all([
     loadMapStageBase(),
-    safe(getNationalPopulationTimelineSnapshot()),
+    safe(getNationalPopulationTimelineSnapshot()).then((snap) => snap ?? undefined),
+    loadStatePopulationIndex(),
   ]);
 
   // Feature the curated ids when the active release carries them; otherwise lead with whatever
@@ -79,15 +103,26 @@ export default async function HomePage() {
 
   // Decades in motion (v5 §6.1): per-decade edge lines from the history graph
   // release + cumulative record reveal over the shared feature collection.
+  // State fills prefer the Census Black-population index when present.
   const { edgeLineCatalog } = buildEdgeLineCatalog();
   const edgesByDecade: Record<string, HistoryEdgeLineCollection> = {};
   for (const [decade, slice] of Object.entries(edgeLineCatalog.byDecade)) {
     edgesByDecade[decade] = slice.lineCollection;
   }
+
+  const nationalBlackByDecade: Record<string, number> = {};
+  for (const row of timeline?.rows ?? []) {
+    nationalBlackByDecade[row.decade] = row.blackPopulation;
+  }
+
   const decadeFrames = buildDecadeFlowFrames(
     base.featureCollection,
     edgesByDecade,
     edgeLineCatalog.allTime.lineCollection,
+    {
+      ...(statePopulationIndex ? { statePopulationIndex } : {}),
+      ...(Object.keys(nationalBlackByDecade).length > 0 ? { nationalBlackByDecade } : {}),
+    },
   );
 
   return (

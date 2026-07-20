@@ -63,6 +63,24 @@ export type {
 } from './county-population.js';
 
 export {
+  BLACK_POPULATION_CONCENTRATED_MIN,
+  BLACK_POPULATION_EMERGING_MIN,
+  bucketBlackPopulationTier,
+  buildStateBlackPopulationDensityLevels,
+  latestStatePopulationVintage,
+  parseStatePopulationIndexFile,
+  readStatePopulation,
+  sumStateBlackPopulation,
+} from './state-population.js';
+export type {
+  BlackPopulationDensityTier,
+  StateBlackPopulationDensityLevel,
+  StatePopulationIndex,
+  StatePopulationIndexFile,
+  StatePopulationRecord,
+} from './state-population.js';
+
+export {
   MAP_SOURCE_DEMO_FIXTURES,
   PLACE_DC_FIXTURE,
   SCHOOL_DC_FIXTURE,
