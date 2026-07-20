@@ -12,7 +12,7 @@
       "assets": ["public web", "api-public", "CDN/cache", "Cloud Run capacity"],
       "actors": ["botnet", "scripted scraper", "opportunistic vandal"],
       "abuseCaseIds": ["AC-01"],
-      "implementationBeads": ["", "", "", "", "", "", ""],
+      "implementationBeads": ["BB-022", "BB-023", "BB-025", "BB-033", "BB-034", "BB-035", "BB-059"],
       "controls": {
         "preventive": [
           "Cloud Armor / ALB rate and geo/IP controls at edge",
@@ -45,7 +45,7 @@
       "assets": ["search API", "geocode quota", "DB CPU", "CDN hit ratio"],
       "actors": ["scraper", "cost attacker", "researcher competitor"],
       "abuseCaseIds": ["AC-02"],
-      "implementationBeads": ["", "", "", "", "", "", ""],
+      "implementationBeads": ["BB-023", "BB-024", "BB-025", "BB-026", "BB-033", "BB-049", "BB-059"],
       "controls": {
         "preventive": [
           "Normalize and strip cache-busting query params for public reads",
@@ -77,7 +77,7 @@
       "assets": ["admin console", "Firebase Auth admin users", "IAP-protected surfaces"],
       "actors": ["credential stuffer", "phisher", "account takeover"],
       "abuseCaseIds": ["AC-03"],
-      "implementationBeads": ["", "", "", "", "", ""],
+      "implementationBeads": ["BB-005", "BB-011", "BB-021", "BB-027", "BB-034", "BB-035"],
       "controls": {
         "preventive": [
           "Admin never exposed as public+role-claim-only (ADR-010)",
@@ -110,13 +110,22 @@
       "assets": ["api-public", "api-submissions", "api-internal", "admin", "DB roles"],
       "actors": ["authenticated attacker", "curious user", "compromised client"],
       "abuseCaseIds": ["AC-04"],
-      "implementationBeads": ["", "", "", "", "", "", "", ""],
+      "implementationBeads": [
+        "BB-003",
+        "BB-013",
+        "BB-015",
+        "BB-019",
+        "BB-021",
+        "BB-027",
+        "BB-028",
+        "BB-036"
+      ],
       "controls": {
         "preventive": [
           "Separate deployables and networks per ADR-005 / ",
           "Server-side authZ on every request; no client-trusted role claims for publication",
           "Object-level checks for submission/case ownership and release IDs",
-          "DB role allowlists: public read-only on public schema; research ≠ publication (ADR-003)"
+          "DB role allowlists: public read-only on public schema; research \u2260 publication (ADR-003)"
         ],
         "detective": [
           "403/401 anomaly spikes and IDOR probe patterns",
@@ -143,12 +152,12 @@
       "assets": ["submissions API", "moderation queue", "operator attention"],
       "actors": ["spammer", "coordinated brigade", "reputation launderer"],
       "abuseCaseIds": ["AC-05"],
-      "implementationBeads": ["", "", "", "", "", ""],
+      "implementationBeads": ["BB-024", "BB-025", "BB-029", "BB-032", "BB-034", "BB-055"],
       "controls": {
         "preventive": [
           "App Check + rate limits on corrections/submissions",
           "Quarantine-first intake; never write canonical history from anonymous clients",
-          "Volume ≠ truth: duplicates do not raise confidence or publish",
+          "Volume \u2260 truth: duplicates do not raise confidence or publish",
           "Cooldown and similarity clustering for near-identical submissions"
         ],
         "detective": [
@@ -176,7 +185,17 @@
       "assets": ["claims", "evidence", "public projections", "trust of corpus"],
       "actors": ["ideological adversary", "grifter", "lazy secondary mirror"],
       "abuseCaseIds": ["AC-06"],
-      "implementationBeads": ["", "", "", "", "", "", "", "", ""],
+      "implementationBeads": [
+        "BB-003",
+        "BB-016",
+        "BB-017",
+        "BB-032",
+        "BB-037",
+        "BB-043",
+        "BB-047",
+        "BB-053",
+        "BB-060"
+      ],
       "controls": {
         "preventive": [
           "Constitution gates for inclusion, confidence, and precision",
@@ -209,7 +228,7 @@
       "assets": ["quarantine store", "research candidates", "promotion pipeline"],
       "actors": ["poisoner", "SEO farmer", "compromised upstream source"],
       "abuseCaseIds": ["AC-07"],
-      "implementationBeads": ["", "", "", "", "", "", ""],
+      "implementationBeads": ["BB-029", "BB-032", "BB-037", "BB-039", "BB-040", "BB-044", "BB-060"],
       "controls": {
         "preventive": [
           "Submissions quarantine with promotion controls (/032)",
@@ -242,7 +261,7 @@
       "assets": ["workers/security", "research fetchers", "metadata store", "internal network"],
       "actors": ["SSRF attacker", "submission abuser", "malicious publisher"],
       "abuseCaseIds": ["AC-08"],
-      "implementationBeads": ["", "", "", "", "", ""],
+      "implementationBeads": ["BB-004", "BB-029", "BB-030", "BB-033", "BB-036", "BB-065"],
       "controls": {
         "preventive": [
           "No synchronous fetch of submitted URLs in user requests (ADR-010)",
@@ -275,7 +294,7 @@
       "assets": ["upload storage", "virus/content scanners", "admin viewers"],
       "actors": ["malware uploader", "polyglot file attacker"],
       "abuseCaseIds": ["AC-09"],
-      "implementationBeads": ["", "", "", "", ""],
+      "implementationBeads": ["BB-005", "BB-029", "BB-031", "BB-033", "BB-036"],
       "controls": {
         "preventive": [
           "Uploads deferred/quarantined; not served from public CDN by default",
@@ -308,7 +327,7 @@
       "assets": ["LLM research modes", "tool-using agents", "claim extraction"],
       "actors": ["document author", "compromised web page", "indirect injector"],
       "abuseCaseIds": ["AC-10"],
-      "implementationBeads": ["", "", "", "", ""],
+      "implementationBeads": ["BB-030", "BB-042", "BB-044", "BB-064", "BB-065"],
       "controls": {
         "preventive": [
           "Public rendering never invokes an LLM (invariant)",
@@ -341,7 +360,7 @@
       "assets": ["build artifacts", "deploy identities", "source integrity"],
       "actors": ["dependency attacker", "malicious Action", "compromised maintainer"],
       "abuseCaseIds": ["AC-11"],
-      "implementationBeads": ["", "", "", "", "", ""],
+      "implementationBeads": ["BB-006", "BB-008", "BB-009", "BB-010", "BB-036", "BB-062"],
       "controls": {
         "preventive": [
           "Pinned Actions; allowlist publishers",
@@ -374,7 +393,7 @@
       "assets": ["API keys", "DB credentials", "App Check secrets", "service accounts"],
       "actors": ["accidental committer", "log scraper", "client bundle inspector"],
       "abuseCaseIds": ["AC-12"],
-      "implementationBeads": ["", "", "", "", "", ""],
+      "implementationBeads": ["BB-005", "BB-009", "BB-010", "BB-011", "BB-027", "BB-034"],
       "controls": {
         "preventive": [
           "1Password / Secret Manager; no secrets in source or client bundles",
@@ -407,7 +426,7 @@
       "assets": ["Cloud SQL", "connection pools", "public/read replicas"],
       "actors": ["abuse traffic", "buggy client", "expensive query author"],
       "abuseCaseIds": ["AC-13"],
-      "implementationBeads": ["", "", "", "", "", ""],
+      "implementationBeads": ["BB-012", "BB-013", "BB-025", "BB-026", "BB-033", "BB-034"],
       "controls": {
         "preventive": [
           "Pool size caps per service; statement timeouts",
@@ -440,7 +459,16 @@
       "assets": ["GCP billing", "model APIs", "egress", "Cloud Run/Jobs"],
       "actors": ["cost attacker", "misconfigured autoscaler", "runaway worker"],
       "abuseCaseIds": ["AC-14"],
-      "implementationBeads": ["", "", "", "", "", "", "", ""],
+      "implementationBeads": [
+        "BB-005",
+        "BB-022",
+        "BB-023",
+        "BB-025",
+        "BB-033",
+        "BB-034",
+        "BB-035",
+        "BB-059"
+      ],
       "controls": {
         "preventive": [
           "Budgets and hard quotas per project/env (/033)",
@@ -464,7 +492,7 @@
           "Cost soak test gates before launch"
         ]
       },
-      "residualRisk": "GCP budget alerts are not always hard stops; residual spend can accrue until automation enforces caps—treat  hard limits as launch-critical."
+      "residualRisk": "GCP budget alerts are not always hard stops; residual spend can accrue until automation enforces caps\u2014treat  hard limits as launch-critical."
     },
     {
       "id": "T-15",
@@ -473,7 +501,16 @@
       "assets": ["living-person data", "sensitive locations", "public API responses", "logs"],
       "actors": ["doxxer", "stalker", "curious scraper", "insider"],
       "abuseCaseIds": ["AC-15"],
-      "implementationBeads": ["", "", "", "", "", "", "", ""],
+      "implementationBeads": [
+        "BB-003",
+        "BB-015",
+        "BB-019",
+        "BB-028",
+        "BB-034",
+        "BB-036",
+        "BB-050",
+        "BB-057"
+      ],
       "controls": {
         "preventive": [
           "Constitution: unknown living status treated as living",
@@ -506,7 +543,16 @@
       "assets": ["public projections", "release channel", "CDN content"],
       "actors": ["compromised admin", "broken authZ", "CI deployer"],
       "abuseCaseIds": ["AC-16"],
-      "implementationBeads": ["", "", "", "", "", "", "", ""],
+      "implementationBeads": [
+        "BB-018",
+        "BB-019",
+        "BB-021",
+        "BB-027",
+        "BB-032",
+        "BB-035",
+        "BB-044",
+        "BB-062"
+      ],
       "controls": {
         "preventive": [
           "Immutable release snapshots; activation is explicit",
@@ -539,7 +585,16 @@
       "assets": ["staging/prod isolation", "promotion UI", "release activation"],
       "actors": ["well-meaning operator", "fat-finger deployer"],
       "abuseCaseIds": ["AC-17"],
-      "implementationBeads": ["", "", "", "", "", "", "", ""],
+      "implementationBeads": [
+        "BB-005",
+        "BB-018",
+        "BB-019",
+        "BB-027",
+        "BB-035",
+        "BB-044",
+        "BB-056",
+        "BB-061"
+      ],
       "controls": {
         "preventive": [
           "Strict env isolation; no shared prod resources",
@@ -572,7 +627,7 @@
       "assets": ["adapters", "captures", "relevance ranking", "rights compliance"],
       "actors": ["upstream site change", "silent schema drift", "adversarial upstream"],
       "abuseCaseIds": ["AC-18"],
-      "implementationBeads": ["", "", "", "", "", ""],
+      "implementationBeads": ["BB-016", "BB-037", "BB-038", "BB-045", "BB-046", "BB-047"],
       "controls": {
         "preventive": [
           "Versioned adapter contracts and query packs (/038)",
@@ -604,7 +659,7 @@
       "assets": ["public corpus", "search API", "entity pages", "competitive IP"],
       "actors": ["commercial scraper", "archive bot", "hostile mirror"],
       "abuseCaseIds": ["AC-19"],
-      "implementationBeads": ["", "", "", "", "", "", ""],
+      "implementationBeads": ["BB-023", "BB-024", "BB-025", "BB-026", "BB-034", "BB-049", "BB-059"],
       "controls": {
         "preventive": [
           "Rate limits, App Check, and bot management on search and list endpoints",
