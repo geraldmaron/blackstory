@@ -21,6 +21,11 @@ import {
   markerRadiusExpression,
 } from '../../lib/map-experience/marker-size';
 import {
+  COUNTY_LABELS_MIN_ZOOM,
+  COUNTY_LINES_MIN_ZOOM,
+} from '../../lib/map-experience/us-county-lines';
+import { STATE_LABEL_FADE_END_ZOOM } from '../../lib/map-experience/state-labels';
+import {
   buildExploreMapStyle,
   ENTITY_CLUSTER_OPACITY,
   ENTITY_HALO_OPACITY,
@@ -373,6 +378,39 @@ test('county label symbol layer reads name from GeoJSON and sits above county li
     'county labels must render above county lines',
   );
   assert.ok(entityIndex > labelIndex, 'county labels must sit below entity markers');
+});
+
+test('county names stay hidden until zoomed past the state-label handoff, above the hairline gate', () => {
+  const source = buildExploreMapSource(listPublicEntities());
+  const style = buildExploreMapStyle({
+    featureCollection: source.featureCollection,
+    jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
+    layerMode: 'off',
+  });
+  const labelLayer = layerById(style, EXPLORE_COUNTY_LABEL_LAYER_ID) as {
+    minzoom?: number;
+    paint?: Record<string, unknown>;
+  };
+  const lineLayer = layerById(style, EXPLORE_COUNTY_LINES_LAYER_ID) as { minzoom?: number };
+
+  // Names gate strictly higher than the hairlines, and only once the state labels have faded.
+  assert.equal(labelLayer.minzoom, COUNTY_LABELS_MIN_ZOOM);
+  assert.equal(lineLayer.minzoom, COUNTY_LINES_MIN_ZOOM);
+  assert.ok(
+    (labelLayer.minzoom ?? 0) > (lineLayer.minzoom ?? 0),
+    'county names must not appear at the low zoom the faint hairlines do',
+  );
+  assert.ok(
+    (labelLayer.minzoom ?? 0) >= STATE_LABEL_FADE_END_ZOOM,
+    'county names must not show while state labels are still visible',
+  );
+
+  // The opacity fade-in starts fully transparent exactly at the label min zoom (no pop-in below it).
+  const opacity = labelLayer.paint?.['text-opacity'] as unknown[];
+  assert.equal(opacity[0], 'interpolate');
+  assert.deepEqual(opacity[2], ['zoom']);
+  assert.equal(opacity[3], COUNTY_LABELS_MIN_ZOOM);
+  assert.equal(opacity[4], 0);
 });
 
 test('dark colorScheme keeps the ink ocean and pageSand state bounds', () => {

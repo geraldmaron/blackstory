@@ -69,7 +69,10 @@ import {
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
-import { COUNTY_LINES_MIN_ZOOM } from '../../lib/map-experience/us-county-lines';
+import {
+  COUNTY_LABELS_MIN_ZOOM,
+  COUNTY_LINES_MIN_ZOOM,
+} from '../../lib/map-experience/us-county-lines';
 import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
 import {
   buildMemorialNameFeatures,
@@ -735,10 +738,16 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
+        // County *names* gate higher than the hairlines (`COUNTY_LABELS_MIN_ZOOM`, not
+        // `COUNTY_LINES_MIN_ZOOM`): the boundary lines are quiet context from the state frame up,
+        // but the names are held until the state labels have faded out (see the constant's doc),
+        // so the two label tiers never compete and county names only appear once counties read as
+        // useful units. MapLibre symbol collision (text-allow-overlap defaults false) then thins
+        // any remaining density automatically.
         id: EXPLORE_COUNTY_LABEL_LAYER_ID,
         type: 'symbol',
         source: EXPLORE_COUNTY_LINES_SOURCE_ID,
-        minzoom: COUNTY_LINES_MIN_ZOOM,
+        minzoom: COUNTY_LABELS_MIN_ZOOM,
         layout: {
           'text-field': ['get', 'name'],
           'text-font': ['Noto Sans Regular'],
@@ -754,9 +763,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
             'interpolate',
             ['linear'],
             ['zoom'],
-            COUNTY_LINES_MIN_ZOOM,
+            COUNTY_LABELS_MIN_ZOOM,
             0,
-            COUNTY_LINES_MIN_ZOOM + 1,
+            COUNTY_LABELS_MIN_ZOOM + 1,
             0.65,
             9,
             0.85,

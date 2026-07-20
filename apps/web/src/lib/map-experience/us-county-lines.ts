@@ -24,6 +24,15 @@ export const COUNTY_LINES_MIN_ZOOM = 4.5;
  * so the hairlines are usually decoded and tiled by the moment they become visible. */
 export const COUNTY_LINES_PREFETCH_ZOOM = COUNTY_LINES_MIN_ZOOM - 0.5;
 
+/** Zoom below which county *names* stay hidden. Higher than `COUNTY_LINES_MIN_ZOOM`: faint
+ * hairlines are useful boundary context from the state-zoom frame up, but the names are text
+ * clutter at national/state zoom and would collide with the state labels (which fade to 0 by
+ * `STATE_LABEL_FADE_END_ZOOM` = 6.2 in `state-labels.ts`). Gating names at that same 6.2 hands
+ * the label register cleanly from states to counties: states clear, then counties name in — and
+ * only once the camera is close enough (single-state frame and tighter) for a county to read as a
+ * useful unit rather than a sub-pixel sliver. */
+export const COUNTY_LABELS_MIN_ZOOM = 6.2;
+
 export type UsCountyPolygonProperties = {
   readonly name: string;
   readonly stateFips: string;
