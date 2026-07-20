@@ -4,8 +4,8 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { AppError, createLogger, type LogContext } from '@repo/observability';
-import { createSensitiveDataRedactor } from './index.ts';
+import { createSensitiveDataRedactor } from '@repo/security';
+import { AppError, createLogger, type LogContext } from './index.ts';
 
 function wiredLogger(lines: string[]) {
   const redactor = createSensitiveDataRedactor();

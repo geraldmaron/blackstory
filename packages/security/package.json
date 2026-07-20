@@ -26,7 +26,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/redaction.test.ts src/serialize.test.ts src/logging.test.ts src/rate-limits.test.ts src/query-guardrails.test.ts src/resource-controls.test.ts src/submissions/quarantine.test.ts src/url-safety/url-safety.test.ts",
+    "test": "node --conditions development --import tsx --test src/redaction.test.ts src/serialize.test.ts src/rate-limits.test.ts src/query-guardrails.test.ts src/resource-controls.test.ts src/submissions/quarantine.test.ts src/url-safety/url-safety.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
@@ -34,7 +34,6 @@
     "@repo/schemas": "workspace:*"
   },
   "devDependencies": {
-    "@repo/observability": "workspace:*",
     "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "tsx": "^4.20.3",

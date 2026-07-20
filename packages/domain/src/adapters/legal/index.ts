@@ -47,6 +47,7 @@ export const LEGAL_FIXTURE_CLIENTS = [
   'legiscan-free',
 ] as const;
 
+import type { LegalAdapterParseResult } from './types.js';
 import { createCongressGovFixtureClient } from './congress-gov/client.js';
 import { createEcfrFixtureClient } from './ecfr/client.js';
 import { createCourtListenerFixtureClient } from './courtlistener/client.js';
