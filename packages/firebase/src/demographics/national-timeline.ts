@@ -214,22 +214,24 @@ export function __resetNationalTimelineSnapshotCache(): void {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const { getFirestore } = await import('firebase-admin/firestore');
-  const { createServerFirebaseApp } = await import('../server.js');
-  const { app } = createServerFirebaseApp(process.env);
-  const firestore = getFirestore(app);
-  const snapshot = await buildNationalPopulationTimelineSnapshot(firestore);
-  const outcome = await writeNationalPopulationTimelineSnapshot(snapshot, firestore);
-  console.log(
-    JSON.stringify(
-      {
-        outcome,
-        rows: snapshot.rows.length,
-        changes: snapshot.changes.length,
-        contentHash: snapshot.contentHash,
-      },
-      null,
-      2,
-    ),
-  );
+  void (async () => {
+    const { getFirestore } = await import('firebase-admin/firestore');
+    const { createServerFirebaseApp } = await import('../server.js');
+    const { app } = createServerFirebaseApp(process.env);
+    const firestore = getFirestore(app);
+    const snapshot = await buildNationalPopulationTimelineSnapshot(firestore);
+    const outcome = await writeNationalPopulationTimelineSnapshot(snapshot, firestore);
+    console.log(
+      JSON.stringify(
+        {
+          outcome,
+          rows: snapshot.rows.length,
+          changes: snapshot.changes.length,
+          contentHash: snapshot.contentHash,
+        },
+        null,
+        2,
+      ),
+    );
+  })();
 }

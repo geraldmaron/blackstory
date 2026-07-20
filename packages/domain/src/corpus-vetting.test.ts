@@ -155,12 +155,12 @@ test('bulk batches fail closed when the vetting record points at a missing regis
   );
 });
 
-test('assertCorpusNotInExcludedLane rejects statutes/cases () and Tougaloo sundown data ()', () => {
-  assert.throws(() => assertCorpusNotInExcludedLane('statutes'), //u);
-  assert.throws(() => assertCorpusNotInExcludedLane('cases'), //u);
-  assert.throws(() => assertCorpusNotInExcludedLane('legal-corpus'), //u);
-  assert.throws(() => assertCorpusNotInExcludedLane('tougaloo-sundown-data'), //u);
-  assert.throws(() => assertCorpusNotInExcludedLane('tougaloo'), //u);
+test('assertCorpusNotInExcludedLane rejects statutes/cases and Tougaloo sundown data', () => {
+  assert.throws(() => assertCorpusNotInExcludedLane('statutes'), /bulk-intake lane/iu);
+  assert.throws(() => assertCorpusNotInExcludedLane('cases'), /bulk-intake lane/iu);
+  assert.throws(() => assertCorpusNotInExcludedLane('legal-corpus'), /bulk-intake lane/iu);
+  assert.throws(() => assertCorpusNotInExcludedLane('tougaloo-sundown-data'), /bulk-intake lane/iu);
+  assert.throws(() => assertCorpusNotInExcludedLane('tougaloo'), /bulk-intake lane/iu);
   assert.doesNotThrow(() => assertCorpusNotInExcludedLane('nrhp'));
 });
 
@@ -169,7 +169,7 @@ test('registerCorpusVetting refuses to register an excluded-lane corpus', () => 
   const vettingStore = createInMemoryCorpusVettingStore();
   assert.throws(
     () => registerCorpusVetting(registryStore, vettingStore, baseInput({ corpus: 'statutes' })),
-    //u,
+    /bulk-intake lane/iu,
   );
 });
 

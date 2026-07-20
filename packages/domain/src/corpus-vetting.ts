@@ -117,14 +117,14 @@ export const EXCLUDED_CORPUS_LANES: readonly {
 }[] = [
   {
     corpusSlugPattern: /^(statutes?|cases?|legal[-_]?corpus)$/iu,
-    ownerBead: '',
-    reason: 'Statutes and cases are \'s legal corpus lane, never the  bulk-intake lane.',
+    ownerBead: 'legal-corpus',
+    reason: 'Statutes and cases are the legal-corpus lane, never the bulk-intake lane.',
   },
   {
     corpusSlugPattern: /^tougaloo([-_]sundown([-_]data)?)?$/iu,
-    ownerBead: '',
+    ownerBead: 'exclusion-infrastructure',
     reason:
-      'Tougaloo sundown-town data is \'s exclusion-infrastructure lane, never the  bulk-intake lane.',
+      'Tougaloo sundown-town data is the exclusion-infrastructure lane, never the bulk-intake lane.',
   },
 ];
 
@@ -133,7 +133,7 @@ export function assertCorpusNotInExcludedLane(corpus: string): void {
   const match = EXCLUDED_CORPUS_LANES.find((exclusion) => exclusion.corpusSlugPattern.test(corpus));
   if (match) {
     throw new Error(
-      `Corpus "${corpus}" belongs to ${match.ownerBead}'s lane, not 's bulk-intake lane: ${match.reason}`,
+      `Corpus "${corpus}" belongs to the ${match.ownerBead} lane, not the bulk-intake lane: ${match.reason}`,
     );
   }
 }
