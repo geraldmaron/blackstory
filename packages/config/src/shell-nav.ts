@@ -42,6 +42,7 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
       { href: '/history', label: 'History' },
       { href: '/stories', label: 'Stories' },
       { href: '/data', label: 'Data' },
+      { href: '/legal', label: 'Legal' },
     ],
   },
   {
@@ -50,7 +51,6 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
       { href: '/methodology', label: 'Methodology' },
       { href: '/errata', label: 'Errata' },
       { href: '/corrections', label: 'Corrections' },
-      { href: '/legal', label: 'Legal' },
     ],
   },
   {

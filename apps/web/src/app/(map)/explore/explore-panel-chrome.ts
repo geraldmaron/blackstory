@@ -81,12 +81,30 @@ export function exploreNarrowExclusivePatch(options: {
 
 /**
  * Whether a server-supplied explore viewState should replace client chrome.
- * When the incoming shareable href matches the last client `history.replaceState`
- * write, ignore the echo so panel open/close cannot thrash.
+ *
+ * `history.replaceState` updates the address bar without updating Next's router
+ * searchParams. A later RSC refresh can therefore re-supply a *stale* `initial`
+ * (panels closed) while the live URL still has `panels=filters`. Prefer the
+ * address bar / last client push over that echo so open/close cannot thrash.
  */
 export function shouldAcceptExploreServerViewState(options: {
   readonly incomingHref: string;
   readonly lastPushedHref: string | null;
+  /** Normalized shareable href from `window.location` (optional; client only). */
+  readonly liveHref?: string | null;
 }): boolean {
-  return options.lastPushedHref !== options.incomingHref;
+  const { incomingHref, lastPushedHref, liveHref = null } = options;
+  if (lastPushedHref !== null && lastPushedHref === incomingHref) {
+    return false;
+  }
+  // Stale Next RSC: address bar still matches what we wrote, server does not.
+  if (
+    lastPushedHref !== null &&
+    liveHref !== null &&
+    liveHref === lastPushedHref &&
+    incomingHref !== lastPushedHref
+  ) {
+    return false;
+  }
+  return true;
 }

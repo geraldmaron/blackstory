@@ -319,11 +319,15 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   useEffect(() => {
     const incomingHref = shareableExploreHref(initial.viewState);
-    // Soft-nav / RSC echoes of our own `history.replaceState` must not clobber open panels.
+    const liveHref = shareableExploreHref(
+      parseExploreSearchParams(Object.fromEntries(new URLSearchParams(window.location.search))),
+    );
+    // Soft-nav / stale RSC echoes must not clobber panels open via replaceState.
     if (
       !shouldAcceptExploreServerViewState({
         incomingHref,
         lastPushedHref: lastPushedHrefRef.current,
+        liveHref,
       })
     ) {
       return;
@@ -679,7 +683,6 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       pushViewState(cleaned);
     }
     // Mount-only restore: intentional empty deps (camera + one-shot URL cleanup).
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount once
   }, []);
 
   // Back/forward: the URL changes under us via `popstate`. Restore the full shareable view

@@ -8,3 +8,6 @@ uv.lock
 .venv
 *.md
 docs/bb-001
+.beads/backup
+.beads/export-state.json
+.beads/**/*.darc

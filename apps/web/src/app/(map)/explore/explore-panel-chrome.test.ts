@@ -117,15 +117,29 @@ test('shouldAcceptExploreServerViewState ignores echo of the last client push', 
   );
   assert.equal(
     shouldAcceptExploreServerViewState({
-      incomingHref: '/explore',
-      lastPushedHref: '/explore?panels=filters',
+      incomingHref: '/explore?panels=filters',
+      lastPushedHref: null,
     }),
     true,
   );
+});
+
+test('shouldAcceptExploreServerViewState prefers live address bar over stale RSC', () => {
+  // Client opened filters via replaceState; Next still re-supplies panels-closed initial.
   assert.equal(
     shouldAcceptExploreServerViewState({
-      incomingHref: '/explore?panels=filters',
-      lastPushedHref: null,
+      incomingHref: '/explore',
+      lastPushedHref: '/explore?panels=filters',
+      liveHref: '/explore?panels=filters',
+    }),
+    false,
+  );
+  // Genuine navigation / back-forward: live URL and last push disagree with incoming → accept.
+  assert.equal(
+    shouldAcceptExploreServerViewState({
+      incomingHref: '/explore',
+      lastPushedHref: '/explore?panels=filters',
+      liveHref: '/explore',
     }),
     true,
   );
