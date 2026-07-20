@@ -329,8 +329,8 @@ whose tap target is under 44px; color-only signals; raw `<a>` internal nav.
 
 - Skip link first in DOM, visible on focus. Landmarks: banner/nav/main/contentinfo.
 - One `h1` per page; heading order never skips.
-- All text/control pairs AA in both themes (token pairs are contrast-tested; hero text sits
-  on fixed-ink → paper/stone/copper-dark pairs only).
+- All text/control pairs AA in both themes (token pairs are contrast-tested; hero text uses
+  theme ink/canvas/accent over a canvas scrim so it stays readable as the map plate flips).
 - Keyboard: every interactive element reachable and operable; the map canvas stays
   `aria-hidden` with the synchronized list as parity surface; focus lands sensibly after
   route changes (existing hero→explore handoff kept).

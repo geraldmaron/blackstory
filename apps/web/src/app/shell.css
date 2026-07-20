@@ -12,8 +12,9 @@
  * decades, citations). Caps in exactly two registers: mono data slugs and
  * sans nav/CTA labels.
  *
- * Fixed-ink surfaces (map plate, footer, bands, hero chrome) still use
- * --ds-fixed-* where the plate must not theme-flip — see base.css.
+ * Fixed-ink surfaces (footer, bands) still use --ds-fixed-* where the plate
+ * must not theme-flip — see base.css. Hero typography and timeline follow
+ * [data-theme] with the map plate (ink/canvas/accent), same as explore chrome.
  */
 
 .ds-shell {
@@ -394,10 +395,6 @@
   color: var(--ds-accent);
 }
 
-.ds-hero-stage__headline em {
-  color: var(--ds-fixed-accent);
-}
-
 .ds-page__lede {
   margin: var(--ds-space-6) 0 0;
   max-width: 42rem;
@@ -546,16 +543,35 @@
   background: var(--ds-surface-raised);
 }
 
-/* Quiet over fixed-ink (hero, bands): paper hairline + paper text. */
-.ds-cta--ghost,
-.ds-cta--ghost-dark {
+/* Ghost — hairline pill over themed surfaces (hero, cards).
+   `:link`/`:visited` beat a single class (UA visited color), so pin both. */
+.ds-cta.ds-cta--ghost:link,
+.ds-cta.ds-cta--ghost:visited,
+.ds-cta.ds-cta--ghost {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--ds-ink) 38%, transparent);
+  color: var(--ds-ink);
+}
+
+.ds-cta.ds-cta--ghost:hover {
+  border-color: var(--ds-ink);
+  background: color-mix(in srgb, var(--ds-ink) 8%, transparent);
+}
+
+/* Ghost on fixed-ink bands only — paper hairline + paper text. */
+.ds-cta.ds-cta--ghost-dark:link,
+.ds-cta.ds-cta--ghost-dark:visited,
+.ds-cta.ds-cta--ghost-dark,
+.ds-band .ds-cta.ds-cta--ghost:link,
+.ds-band .ds-cta.ds-cta--ghost:visited,
+.ds-band .ds-cta.ds-cta--ghost {
   background: transparent;
   border-color: color-mix(in srgb, var(--ds-fixed-paper) 38%, transparent);
   color: var(--ds-fixed-paper);
 }
 
-.ds-cta--ghost:hover,
-.ds-cta--ghost-dark:hover {
+.ds-cta.ds-cta--ghost-dark:hover,
+.ds-band .ds-cta.ds-cta--ghost:hover {
   border-color: var(--ds-fixed-paper);
   background: color-mix(in srgb, var(--ds-fixed-paper) 8%, transparent);
 }
@@ -582,7 +598,8 @@
 
 /* —— Hero — cinema over the live plate. Typography floats on the map;
    a bottom scrim earns the contrast; the timeline instrument closes the
-   frame. The scrim is a map-plate treatment (v5 §4 note), not page UI. ——  */
+   frame. Text + scrim follow [data-theme] with the map plate. The scrim is
+   a map-plate treatment (v5 §4 note), not page UI. ——  */
 .ds-hero-stage {
   position: relative;
   isolation: isolate;
@@ -599,8 +616,8 @@
   pointer-events: auto;
 }
 
-/* Legibility scrim: bottom third fades to ink so paper type always clears
-   WCAG on top of whatever the camera shows. pointer-events stays none. */
+/* Legibility scrim: bottom third fades to canvas so theme ink clears WCAG
+   on top of whatever the camera shows. pointer-events stays none. */
 .ds-hero-stage::before {
   content: '';
   position: absolute;
@@ -609,9 +626,9 @@
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    color-mix(in srgb, var(--ds-fixed-ink) 40%, transparent) 35%,
-    color-mix(in srgb, var(--ds-fixed-ink) 78%, transparent) 70%,
-    color-mix(in srgb, var(--ds-fixed-ink) 92%, transparent) 100%
+    color-mix(in srgb, var(--ds-canvas) 40%, transparent) 35%,
+    color-mix(in srgb, var(--ds-canvas) 78%, transparent) 70%,
+    color-mix(in srgb, var(--ds-canvas) 92%, transparent) 100%
   );
   pointer-events: none;
   z-index: -1;
@@ -622,7 +639,7 @@
   display: flex;
   align-items: center;
   gap: var(--ds-space-3);
-  color: var(--ds-fixed-accent);
+  color: var(--ds-accent);
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
   font-weight: 500;
@@ -641,7 +658,7 @@
 .ds-hero-stage__headline {
   margin: var(--ds-space-4) 0 0;
   max-width: 14ch;
-  color: var(--ds-fixed-paper);
+  color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-weight: 500;
   font-size: clamp(2.25rem, 1.6rem + 3.5vw, 4.5rem);
@@ -768,8 +785,8 @@
   padding: var(--ds-space-3) var(--ds-space-4);
   margin-inline: calc(-1 * var(--ds-space-4));
   border-radius: var(--ds-radius-sm);
-  background: color-mix(in srgb, var(--ds-fixed-ink) 62%, transparent);
-  color: var(--ds-fixed-paper);
+  background: color-mix(in srgb, var(--ds-canvas) 62%, transparent);
+  color: var(--ds-ink);
   font-family: var(--ds-font-editorial);
   font-size: 0.9375rem;
   line-height: 1.6;
@@ -778,7 +795,7 @@
 
 @media (max-width: 47.9375rem) {
   .ds-hero-stage__support {
-    background: color-mix(in srgb, var(--ds-fixed-ink) 78%, transparent);
+    background: color-mix(in srgb, var(--ds-canvas) 78%, transparent);
   }
 }
 
@@ -792,7 +809,7 @@
 
 .ds-hero-stage__count {
   margin: var(--ds-space-4) 0 0;
-  color: var(--ds-fixed-stone);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.04em;
@@ -822,7 +839,7 @@
 
 .ds-hero-timeline__decade {
   margin: 0;
-  color: var(--ds-fixed-paper);
+  color: var(--ds-ink);
   font-family: var(--ds-font-mono);
   font-size: clamp(2rem, 1.5rem + 2.4vw, 3.25rem);
   font-weight: 500;
@@ -833,7 +850,7 @@
 
 .ds-hero-timeline__note {
   margin: 0;
-  color: var(--ds-fixed-stone);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.04em;
@@ -847,10 +864,10 @@
   width: 2.75rem;
   height: 2.75rem;
   flex: 0 0 auto;
-  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-fixed-paper) 38%, transparent);
+  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-ink) 38%, transparent);
   border-radius: var(--ds-radius-full);
-  background: color-mix(in srgb, var(--ds-fixed-ink) 55%, transparent);
-  color: var(--ds-fixed-paper);
+  background: color-mix(in srgb, var(--ds-canvas) 55%, transparent);
+  color: var(--ds-ink);
   cursor: pointer;
   transition:
     border-color var(--ds-duration-fast) var(--ds-easing),
@@ -858,8 +875,8 @@
 }
 
 .ds-hero-timeline__toggle:hover {
-  border-color: var(--ds-fixed-paper);
-  background: color-mix(in srgb, var(--ds-fixed-paper) 10%, transparent);
+  border-color: var(--ds-ink);
+  background: color-mix(in srgb, var(--ds-ink) 10%, transparent);
 }
 
 .ds-hero-timeline__toggle svg {
@@ -898,14 +915,14 @@
   height: 3px;
   margin-inline: 1px;
   border-radius: 2px;
-  background: color-mix(in srgb, var(--ds-fixed-paper) 22%, transparent);
+  background: color-mix(in srgb, var(--ds-ink) 22%, transparent);
   transition:
     background-color var(--ds-duration-fast) var(--ds-easing),
     height var(--ds-duration-fast) var(--ds-easing);
 }
 
 .ds-hero-timeline__tick:hover::after {
-  background: color-mix(in srgb, var(--ds-fixed-paper) 55%, transparent);
+  background: color-mix(in srgb, var(--ds-ink) 55%, transparent);
 }
 
 .ds-hero-timeline__tick.is-passed::after {
@@ -919,7 +936,7 @@
 
 .ds-hero-timeline__tick-label {
   margin-bottom: var(--ds-space-1);
-  color: color-mix(in srgb, var(--ds-fixed-stone) 80%, transparent);
+  color: color-mix(in srgb, var(--ds-ink-muted) 80%, transparent);
   font-family: var(--ds-font-mono);
   font-size: 0.5625rem;
   letter-spacing: 0.04em;
@@ -929,7 +946,7 @@
 }
 
 .ds-hero-timeline__tick.is-current .ds-hero-timeline__tick-label {
-  color: var(--ds-fixed-accent);
+  color: var(--ds-accent);
 }
 
 @media (max-width: 47.9375rem) {
