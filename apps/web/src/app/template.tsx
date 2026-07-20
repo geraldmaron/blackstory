@@ -5,7 +5,8 @@
  * animation can run without touching persistent chrome (header/footer in layout.tsx).
  * Map surfaces under `(map)/` render `data-surface="map"`; shell.css disables the
  * transition there so the shared MapLibre canvas is never crossfaded (ADR-017).
- * Exit fade is handled by ShellPageTransition on internal link clicks.
+ * Exit-on-click fades were removed: they blanked the page before slow RSC/compile
+ * finished (story ↔ entity navigations looked broken).
  */
 import type { ReactNode } from 'react';
 import { ShellPageTransition } from '../components/ShellPageTransition';

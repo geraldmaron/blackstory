@@ -253,7 +253,7 @@
   font-weight: 600;
 }
 
-/* —— Shell page transition — opacity exit on internal nav + enter on template remount.
+/* —— Shell page transition — enter on template remount only (no exit-on-click).
    Map routes opt out via data-surface="map" (ADR-017). ——  */
 @keyframes ds-shell-page-enter {
   from {
@@ -265,32 +265,15 @@
   }
 }
 
-@keyframes ds-shell-page-exit {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
-  }
-}
-
 .ds-shell-page-transition {
   position: relative;
   isolation: isolate;
   animation: ds-shell-page-enter var(--ds-duration-base) var(--ds-easing) both;
 }
 
-.ds-shell-page-transition--exit {
-  animation: ds-shell-page-exit var(--ds-duration-base) var(--ds-easing) both;
-  pointer-events: none;
-}
-
 /* ADR-017: never signal a crossfade over the persistent map canvas subtree. */
-.ds-shell-page-transition:has([data-surface='map']),
-.ds-shell-page-transition:has([data-surface='map']).ds-shell-page-transition--exit {
+.ds-shell-page-transition:has([data-surface='map']) {
   animation: none;
-  pointer-events: auto;
 }
 
 /* —— Page field — subtle repeating motif behind non-map archive canvases.
@@ -1818,10 +1801,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-shell-page-transition,
-  .ds-shell-page-transition--exit {
+  .ds-shell-page-transition {
     animation: none;
-    pointer-events: auto;
   }
 
   .ds-hero-stage__kicker,

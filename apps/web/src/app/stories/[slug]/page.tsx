@@ -15,7 +15,7 @@ import { SourceFootnote } from '../../../components/data/SourceFootnote';
 import type { PublicEntityView } from '../../../data/public-seed';
 import {
   listPublicEntityViewsByIds,
-  listPublicStoryViews,
+  listPublicStoryListItems,
   resolvePublicStoryView,
   type PublicStoryView,
 } from '../../../lib/public-data/source';
@@ -31,7 +31,7 @@ type StoryPageProps = {
 };
 
 export async function generateStaticParams() {
-  const { data: stories } = await listPublicStoryViews();
+  const { data: stories } = await listPublicStoryListItems();
   return stories.map((story) => ({ slug: story.slug }));
 }
 
