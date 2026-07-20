@@ -98,7 +98,10 @@ jobs:
         with:
           category: /language:${{ matrix.language }}
           output: codeql-results
-          upload: always
+          # Code-scanning upload requires GitHub Advanced Security, which private personal
+          # repos cannot enable; the SARIF is retained as a build artifact below instead.
+          # Restore `upload: always` if the repo goes public or gains a GHAS license.
+          upload: never
       - name: Retain CodeQL evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
