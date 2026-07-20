@@ -73,6 +73,45 @@ function createConverter<T>(schema: z.ZodType<T>): FirestoreDataConverter<T> {
   };
 }
 
+/** Zod optional fields are `T | undefined`; domain types use exactOptionalPropertyTypes. */
+function toPublicEntityPrimaryImage(
+  image: PublicEntityProjectionDoc['primaryImage'],
+): PublicEntityPrimaryImage | undefined {
+  if (image === undefined) return undefined;
+  return {
+    url: image.url,
+    alt: image.alt,
+    credit: image.credit,
+    rightsStatus: image.rightsStatus,
+    ...(image.width !== undefined ? { width: image.width } : {}),
+    ...(image.height !== undefined ? { height: image.height } : {}),
+    ...(image.objectPath !== undefined ? { objectPath: image.objectPath } : {}),
+  };
+}
+
+function toLearningRelatedEdges(
+  related: PublicEntityProjectionDoc['related'],
+): readonly LearningRelatedEdge[] | undefined {
+  if (related === undefined) return undefined;
+  return related.map((entry) => {
+    const timespan = entry.timespan;
+    return {
+      id: entry.id,
+      type: entry.type,
+      direction: entry.direction,
+      ...(timespan !== undefined
+        ? {
+            timespan: {
+              ...(timespan.label !== undefined ? { label: timespan.label } : {}),
+              ...(timespan.validFrom !== undefined ? { validFrom: timespan.validFrom } : {}),
+              ...(timespan.validTo !== undefined ? { validTo: timespan.validTo } : {}),
+            },
+          }
+        : {}),
+    };
+  });
+}
+
 /**
  * Normalize a projection for public write: drop uncleared primaryImage, enforce
  * learning-index summary gate, then fail-closed structural redaction.

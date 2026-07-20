@@ -267,7 +267,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
       - name: Integration and migration harnesses
         run: |
-          pnpm --filter @black-book/testing exec node --import tsx --test \
+          pnpm --filter @repo/testing exec node --import tsx --test \
             src/harness/postgres.integration.test.ts \
             src/migration/migration.harness.test.ts
       - name: Apply DB foundation and role isolation checks
@@ -321,9 +321,9 @@ jobs:
           cat /tmp/firebase-emulators.log || true
           exit 1
       - name: Firebase emulator integration tests
-        run: pnpm --filter @black-book/testing exec node --import tsx --test src/harness/firebase.integration.test.ts
+        run: pnpm --filter @repo/testing exec node --import tsx --test src/harness/firebase.integration.test.ts
       - name: Firestore security rules (primary data path)
-        run: pnpm --filter @black-book/firebase test
+        run: pnpm --filter @repo/firebase test
       - name: Stop Firebase emulators
         if: always()
         run: |

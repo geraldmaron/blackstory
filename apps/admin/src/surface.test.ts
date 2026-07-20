@@ -43,9 +43,9 @@ test('admin does not share web runtime identity or app path', () => {
 test('admin source does not import apps/web handlers', () => {
   const forbiddenImportPatterns = [
     /from\s+['"]apps\/web/,
-    /from\s+['"]@black-book\/web/,
+    /from\s+['"]@repo\/web/,
     /import\s*\(\s*['"]apps\/web/,
-    /import\s*\(\s*['"]@black-book\/web/,
+    /import\s*\(\s*['"]@repo\/web/,
   ];
   for (const file of collectSourceFiles(SOURCE_ROOT)) {
     const content = readFileSync(file, 'utf8');

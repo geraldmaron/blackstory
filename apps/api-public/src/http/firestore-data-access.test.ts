@@ -101,6 +101,48 @@ test('mapProjectionToEntityV1 maps a supported projection and validates against 
   assert.equal(mapped.id, 'ent_seed_place_001');
   assert.equal(mapped.kind, 'place');
   assert.equal(mapped.recordMaturity, 'projection_stub');
+  assert.deepEqual(mapped.claims, []);
+  assert.deepEqual(mapped.timeline, []);
+  assert.equal(mapped.jurisdictionLabel, 'District of Columbia');
+  assert.equal(entityV1Schema.safeParse(mapped).success, true);
+});
+
+test('mapProjectionToEntityV1 maps inline claims and release metadata when present', () => {
+  const enriched: PublicEntityProjectionDoc = {
+    ...sampleProjection,
+    jurisdictionLabel: 'Washington, D.C.',
+    locationLabel: 'Washington, D.C.',
+    researchCoverage: 'partial',
+    generatedAt: '2026-07-19T12:00:00.000Z',
+    recordUpdatedAt: '2026-07-19T12:00:00.000Z',
+    claims: [
+      {
+        id: 'claim_seed_001',
+        predicate: 'located_in',
+        object: 'Washington, D.C.',
+        confidenceLevel: 'high',
+        citationSource: 'National Register nomination, 1973',
+        citationLabel: 'NRHP nomination',
+        citationHref: 'https://example.org/nrhp',
+        independentLineageCount: 2,
+      },
+    ],
+  };
+  const mapped = mapProjectionToEntityV1(enriched);
+  assert.ok(mapped);
+  assert.equal(mapped.recordMaturity, 'partial_enrichment');
+  assert.equal(mapped.researchCoverage, 'partial');
+  assert.equal(mapped.jurisdictionLabel, 'Washington, D.C.');
+  assert.equal(mapped.locationLabel, 'Washington, D.C.');
+  assert.equal(mapped.claims.length, 1);
+  assert.equal(mapped.claims[0]?.id, 'claim_seed_001');
+  assert.equal(mapped.claims[0]?.confidenceScore, 0.85);
+  assert.equal(mapped.claims[0]?.citation.source, 'National Register nomination, 1973');
+  assert.equal(mapped.claims[0]?.citation.href, 'https://example.org/nrhp');
+  assert.equal(mapped.claims[0]?.independentLineageCount, 2);
+  assert.deepEqual(mapped.timeline, []);
+  assert.equal(mapped.revision.generatedAt, '2026-07-19T12:00:00.000Z');
+  assert.equal(mapped.revision.recordUpdatedAt, '2026-07-19T12:00:00.000Z');
   assert.equal(entityV1Schema.safeParse(mapped).success, true);
 });
 

@@ -17,12 +17,12 @@ passes (17 files, only `zod` external, zero `node:*` built-ins, zero server-only
 and `/v1` mechanisms are therefore **implemented, not merely proposed**. Amendments:
 
 1. **§1 scope claim was imprecise.** §1 states "confirmed the real scope in this repo — `packages/domain` is
-   `@repo/domain`." Not literally true: `packages/domain` is still named **`@black-book/domain`** in its
+   `@repo/domain`." Not literally true: `packages/domain` is still named **`@repo/domain`** in its
    `package.json` (the repo is mid-rebrand); it is only *aliased* to `@repo/domain` by consumers (e.g.
-   `apps/api-public` declares `"@repo/domain": "workspace:@black-book/domain@*"`). What is unambiguously
+   `apps/api-public` declares `"@repo/domain": "workspace:*"`). What is unambiguously
    `@repo`-native is the **new** package this ADR creates, `@repo/public-contracts`. Corrected inline. The
-   binding rule stands: mobile-facing packages use the rebrand-stable `@repo/*` scope; never `@black-book/*`.
-   The repo-wide rename of the remaining `@black-book/*` packages is already tracked by **`repo-5uol` (OPEN)**.
+   binding rule stands: mobile-facing packages use the rebrand-stable `@repo/*` scope; never `@repo/*`.
+   The repo-wide rename of the remaining `@repo/*` packages is already tracked by **`repo-5uol` (OPEN)**.
 2. **Consumption path differs for mobile.** `apps/api-public` consumes the contracts via `workspace:*`, but
    `apps/mobile` is excluded from the pnpm workspace (ADR-020 §5 amendment) and consumes it via a `file:`
    dependency resolved by Metro (`extraNodeModules` + the `development` export condition). The dependency
@@ -64,7 +64,7 @@ A concrete, already-felt hazard motivates the central decision. The repo already
 
 ### 1. A new package `packages/public-contracts` with a hard client/server boundary
 
-Create (in MOB-003, not here) `packages/public-contracts`, published under the rebrand-stable `@repo` scope. This ADR fixes its **boundary rules**; MOB-003 builds it. (**Corrected 2026-07-20:** the package ships natively as `@repo/public-contracts`. Note the repo is mid-rebrand — `packages/domain` is still *named* `@black-book/domain` and only *aliased* to `@repo/domain` by consumers such as `apps/api-public` — so all new mobile-facing packages must be `@repo/*`-native, never `@black-book/*`.)
+Create (in MOB-003, not here) `packages/public-contracts`, published under the rebrand-stable `@repo` scope. This ADR fixes its **boundary rules**; MOB-003 builds it. (**Corrected 2026-07-20:** the package ships natively as `@repo/public-contracts`. Note the repo is mid-rebrand — `packages/domain` is still *named* `@repo/domain` and only *aliased* to `@repo/domain` by consumers such as `apps/api-public` — so all new mobile-facing packages must be `@repo/*`-native, never `@repo/*`.)
 
 **It MAY contain, and only these:**
 

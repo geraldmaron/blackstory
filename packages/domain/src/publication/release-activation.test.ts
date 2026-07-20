@@ -11,7 +11,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { redactLocationForPublic } from '@repo/security/redaction';
+import { redactLocationForPublic } from '@repo/security';
 import {
   DECEASED_RESIDENCE_FIXTURE,
   INSTITUTION_ATLANTA_GA_SENSITIVE_FIXTURE,

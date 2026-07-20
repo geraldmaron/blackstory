@@ -12,10 +12,14 @@
 | User-facing product name | `BlackStory` | `packages/config/src/identity.ts` (`PRODUCT_NAME`), `brand/README.txt` |
 | Internal/code identity | `black-book`, `blackbook` | repo name `blackstory` (root `package.json`), GCP project `black-book-efaaf`, domain `blackbook.app` |
 <<<<<<< HEAD
+<<<<<<< HEAD
 | Package scope | `@repo` (brand-agnostic, never renamed) | `packages/config/src/identity.ts` |
 =======
 | Package scope | `@repo` on this branch today (brand-agnostic, never renamed for product rebrands). **Known integration debt**: `origin/main` has since renamed every package to `@black-book/*` (confirmed 2026-07-19 via `git show origin/main:packages/domain/package.json`); this mobile branch (`redesign/mobile-app-build`) forked from a pre-rename snapshot and was deliberately NOT merged forward with `main` mid-build to avoid touching unrelated `apps/web` files under merge conflict, per the standing "leave the web app alone" instruction. A mechanical `@repo` → `@black-book` rename across `packages/public-contracts` and `apps/mobile` is required the next time this branch integrates with current `main` — tracked as a follow-up, not done here. | `packages/*/package.json` (this branch) vs. `origin/main:packages/*/package.json` |
 >>>>>>> cf3d669e (Add mobile app epic doc and identity decision record (carried from redesign/mobile-app-build))
+=======
+| Package scope | `@repo` on this branch today (brand-agnostic, never renamed for product rebrands). **Known integration debt**: `origin/main` has since renamed every package to `@repo/*` (confirmed 2026-07-19 via `git show origin/main:packages/domain/package.json`); this mobile branch (`redesign/mobile-app-build`) forked from a pre-rename snapshot and was deliberately NOT merged forward with `main` mid-build to avoid touching unrelated `apps/web` files under merge conflict, per the standing "leave the web app alone" instruction. A mechanical `@repo` → `@black-book` rename across `packages/public-contracts` and `apps/mobile` is required the next time this branch integrates with current `main` — tracked as a follow-up, not done here. | `packages/*/package.json` (this branch) vs. `origin/main:packages/*/package.json` |
+>>>>>>> 6c9ca7d8 (Align mobile branch package scope with @repo and harden api-public live reads.)
 | Production domain | `blackbook.app` (in use: `api.blackbook.app`, `submit.blackbook.app`) | `infra/firebase/registered-apps.json`, api routes |
 | Firebase/GCP project (prod, immutable) | `black-book-efaaf` (project number `332234323945`) | `infra/firebase/registered-apps.json` |
 | Existing Firebase web apps | `web` (`apps/web`), `admin` (`apps/admin`) | `infra/firebase/registered-apps.json` |

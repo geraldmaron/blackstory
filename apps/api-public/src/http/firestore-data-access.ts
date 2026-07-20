@@ -18,19 +18,18 @@
  *   precise living-person geography in this v1 surface) than the canonical entity kind space.
  *   A projection whose `kind` falls outside that set maps to `undefined`, which — same as an
  *   unpublished or nonexistent id — the handler cannot distinguish from a 404 (T3).
- * - The projection carries `claimIds` only, not full claim documents, so `claims`/`timeline` map to
- *   `[]` here; hydrating them would mean extra per-claim reads this pass does not add (a real,
- *   tracked gap — see `http/README.md`).
+ * - Inline `claims` on the projection map through when present; bootstrap-window stubs that carry
+ *   only `claimIds` still emit `claims: []`. No per-claim Firestore reads are added here.
+ * - `timeline` is not carried on the projection — always `[]` until a release-builder field
+ *   exists (same as `apps/web`'s `map-projection.ts`).
  * - `related` neighbor entries map straight from the projection's own `related` array (ids/types/
  *   direction/timespan only). `relatedNeighbors`/`continueLearning` (denormalized neighbor display
  *   fields) are deliberately NOT hydrated here: doing so would require reading every related
  *   entity's own projection per request — an N+1 read amplification the bead's adversarial review
  *   explicitly flags as a case to defend against, not introduce.
- * - Fields the projection does not carry at all (`jurisdictionLabel`, `locationLabel`,
- *   `relevanceExplanation`, `historicalContext` fallback, `recordMaturity`, `researchCoverage`) get
- *   the same honest "projection stub" placeholders `apps/web`'s
- *   `map-projection.ts` uses for entities with no bundled seed match — never a fabricated value
- *   dressed up as curated content.
+ * - Fields absent on bootstrap-window stubs (`jurisdictionLabel`, `locationLabel`,
+ *   `researchCoverage`, revision timestamps) fall back to the same honest placeholders
+ *   `apps/web`'s `map-projection.ts` uses — never fabricated curated content.
  */
 import {
   firestorePaths,
@@ -39,9 +38,12 @@ import {
   publicActiveReleaseSchema,
   publicEntityProjectionSchema,
   type EnvironmentLike,
+  type PublicClaimProjectionDoc,
   type PublicEntityProjectionDoc,
 } from '@repo/firebase';
+import { findUsStateForPoint } from '@repo/domain';
 import { ENTITY_KINDS, entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
+import type { ClaimV1 } from '@repo/public-contracts/v1/claim';
 import type { CanonicalSearchQuery } from '@repo/security';
 import type { FirestoreDataAccessReaders, ReleasePointer, SearchPage } from './data-access.js';
 import { searchOverEntities } from './data-access.js';
@@ -77,6 +79,15 @@ export const MAX_LIVE_SEARCH_SCAN = 500;
 
 const SUPPORTED_KINDS = new Set<string>(ENTITY_KINDS);
 
+/** View claims render a nominal score alongside the level chip; the projection carries only the
+ * level (non-numeric public-payload policy), so the score here is the level's register midpoint —
+ * a display value, never a stored ranking. Matches `apps/web`'s `NOMINAL_CONFIDENCE_SCORE`. */
+const NOMINAL_CONFIDENCE_SCORE: Record<'high' | 'medium' | 'low', number> = {
+  high: 0.85,
+  medium: 0.6,
+  low: 0.4,
+};
+
 function mapLocationPrecision(
   precision: string | undefined,
 ): EntityV1['locationPrecision'] {
@@ -84,6 +95,44 @@ function mapLocationPrecision(
     return precision;
   }
   return 'city';
+}
+
+function isDisplayableJurisdictionLabel(label: string | undefined): boolean {
+  const trimmed = label?.trim() ?? '';
+  if (trimmed.length === 0) return false;
+  return !/^unknown$/iu.test(trimmed);
+}
+
+function resolveJurisdictionLabel(projection: PublicEntityProjectionDoc): string {
+  const explicit = projection.jurisdictionLabel?.trim();
+  if (explicit && isDisplayableJurisdictionLabel(explicit)) {
+    return explicit;
+  }
+  const lat = projection.location?.lat;
+  const lng = projection.location?.lng;
+  if (typeof lat === 'number' && typeof lng === 'number') {
+    const state = findUsStateForPoint(lat, lng);
+    if (state) return state.name;
+  }
+  return 'Unknown';
+}
+
+function mapClaims(claims: readonly PublicClaimProjectionDoc[] | undefined): ClaimV1[] {
+  return (claims ?? []).map((claim) => ({
+    id: claim.id,
+    predicate: claim.predicate,
+    object: claim.object,
+    confidenceScore: NOMINAL_CONFIDENCE_SCORE[claim.confidenceLevel],
+    confidenceLevel: claim.confidenceLevel,
+    citation: {
+      source: claim.citationSource,
+      label: claim.citationLabel,
+      ...(claim.citationHref !== undefined ? { href: claim.citationHref } : {}),
+    },
+    ...(claim.independentLineageCount !== undefined
+      ? { independentLineageCount: claim.independentLineageCount }
+      : {}),
+  }));
 }
 
 /** Maps one Firestore public entity projection onto the `EntityV1` wire DTO, or `undefined` when
@@ -96,6 +145,7 @@ export function mapProjectionToEntityV1(projection: PublicEntityProjectionDoc): 
   }
 
   const location = projection.location;
+  const claims = mapClaims(projection.claims);
   const geoAnchor =
     location && location.matchMethod
       ? {
@@ -112,23 +162,26 @@ export function mapProjectionToEntityV1(projection: PublicEntityProjectionDoc): 
     displayName: projection.displayName,
     summary: projection.summary,
     topicTags: projection.topicTags ?? [],
-    jurisdictionLabel: 'Unknown',
+    jurisdictionLabel: resolveJurisdictionLabel(projection),
     locationPrecision: mapLocationPrecision(location?.precision),
-    locationLabel: projection.displayName,
+    locationLabel: projection.locationLabel ?? projection.displayName,
     relevanceExplanation:
-      'This record is served from the live public release projection. Supporting claims and ' +
-      'evidence panels may still be sparse until the full publication pipeline lands.',
+      claims.length > 0
+        ? 'Included as a documented site in the active public release; each accepted claim below cites its source.'
+        : 'This record is served from the live public release projection. Supporting claims and ' +
+          'evidence panels may still be sparse until the full publication pipeline lands.',
     historicalContext:
       projection.historicalContext ??
       'Live projection scaffolding — historical framing expands as curated release content is published.',
-    recordMaturity: 'projection_stub',
-    researchCoverage: 'minimal',
-    claims: [],
+    recordMaturity: claims.length > 0 ? 'partial_enrichment' : 'projection_stub',
+    researchCoverage:
+      projection.researchCoverage ?? (claims.length >= 2 ? 'partial' : 'minimal'),
+    claims,
     timeline: [],
     revision: {
       releaseId: projection.releaseId,
-      generatedAt: '',
-      recordUpdatedAt: '',
+      generatedAt: projection.generatedAt ?? '',
+      recordUpdatedAt: projection.recordUpdatedAt ?? '',
     },
     ...(projection.status !== undefined ? { status: projection.status } : {}),
     ...(projection.eraBuckets !== undefined ? { eraBuckets: [...projection.eraBuckets] } : {}),

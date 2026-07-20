@@ -97,3 +97,54 @@ test('locationPrecision on a served entity is one of the four public tiers (neve
   const body = res.body as { locationPrecision: string };
   assert.ok(['city', 'neighborhood', 'campus', 'institution'].includes(body.locationPrecision));
 });
+
+const VALID_CLAIM = {
+  id: 'claim_redaction_001',
+  predicate: 'documented_at',
+  object: 'Archive record',
+  confidenceScore: 0.85,
+  confidenceLevel: 'high' as const,
+  citation: {
+    source: 'D.C. Board of Education annual report, 1916',
+    label: '1916 annual report',
+    href: 'https://example.gov/dc-board-1916',
+    withheldReason: 'Protects a living person named in the underlying record.',
+    protectedFromPublicLink: true,
+    protectedReason: 'Internal-only capture flagged by legal review.',
+    internalDocumentId: 'doc_internal_9911',
+  },
+};
+
+test('citation internal-only fields are stripped before the entity payload is served', async () => {
+  const entity = makeEntity({ claims: [VALID_CLAIM as never] });
+  const res = await dispatch(makeRequest('/v1/entity/ent_dunbar_school_001'), makeDeps(entity));
+  assert.equal(res.status, 200);
+  const citation = (res.body as { claims: Record<string, unknown>[] }).claims[0]?.citation as Record<
+    string,
+    unknown
+  >;
+  assert.equal(citation.source, VALID_CLAIM.citation.source);
+  assert.equal(citation.withheldReason, VALID_CLAIM.citation.withheldReason);
+  for (const forbidden of ['protectedFromPublicLink', 'protectedReason', 'internalDocumentId']) {
+    assert.ok(!(forbidden in citation), `${forbidden} must not appear in served citation`);
+  }
+});
+
+test('served media URLs are http(s) pass-through only — no gs:// bucket ARNs on the wire', async () => {
+  const entity = makeEntity({
+    primaryImage: {
+      url: 'https://storage.googleapis.com/black-book-media/entities/ent_dunbar_school_001/primary.jpg',
+      alt: 'School building',
+      credit: 'Library of Congress',
+      rightsStatus: 'public_domain',
+      objectPath: 'entities/ent_dunbar_school_001/primary.jpg',
+      gsUri: 'gs://black-book-media/entities/ent_dunbar_school_001/primary.jpg',
+    } as never,
+  });
+  const res = await dispatch(makeRequest('/v1/entity/ent_dunbar_school_001'), makeDeps(entity));
+  assert.equal(res.status, 200);
+  const image = (res.body as { primaryImage: Record<string, unknown> }).primaryImage;
+  assert.equal(image.url, 'https://storage.googleapis.com/black-book-media/entities/ent_dunbar_school_001/primary.jpg');
+  assert.equal(image.objectPath, 'entities/ent_dunbar_school_001/primary.jpg');
+  assert.ok(!('gsUri' in image), 'internal gs:// references must not appear on the wire');
+});

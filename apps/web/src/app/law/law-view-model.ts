@@ -1,6 +1,10 @@
 /**
  * Pure view-model for the `/law` browse and detail pages. No Next.js runtime dependency.
  */
+<<<<<<< HEAD:apps/web/src/app/law/law-view-model.ts
+=======
+import { slugifyFactStatement } from '@repo/domain';
+>>>>>>> 6c9ca7d8 (Align mobile branch package scope with @repo and harden api-public live reads.):apps/web/src/app/legal/legal-view-model.ts
 import type { LegalBrowseItem } from '../../components/legal';
 import { isLawStatus } from '../../components/legal/format';
 import {
