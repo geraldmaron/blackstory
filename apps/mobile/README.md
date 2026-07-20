@@ -148,14 +148,95 @@ unaffected and is enforced via the `expo-build-properties` plugin
 (`android.minSdkVersion: 26`), confirmed present in the generated
 `android/gradle.properties` (`android.minSdkVersion=26`) after `expo prebuild`.
 
-## Firebase config — intentionally not committed
+## Firebase & EAS secret wiring (MOB-010 / MOB-018)
 
-No `GoogleService-Info.plist` / `google-services.json` exists in this repo (`.gitignore`
-blocks both explicitly). Per `docs/mobile/decisions/mobile-identity.md`, real Firebase app
-registrations for the dev/preview/prod bundle ids are a human gate (Apple/Google/EAS account
-provisioning) not yet cleared. `app.config.ts` has `TODO(MOB-010)` comments marking exactly
-where a config plugin will wire per-environment Firebase config once those registrations
-exist — do not fabricate a placeholder credential file in the meantime.
+The app is **fully wired for real Firebase** (App Check, Crashlytics, Performance) and
+**activates automatically the moment real credentials are supplied** — no code change needed.
+Until then it runs and prebuilds cleanly with those features absent and degrades gracefully
+at runtime (`src/security/app-check.ts`, `src/observability/native-bridge.ts`).
+
+### What each config input is (and whether it's a secret)
+
+| Env var (read by `app.config.ts`) | Purpose | Secret? |
+|---|---|---|
+| `APP_VARIANT` | `development` \| `preview` \| `production` identity tier | no |
+| `API_BASE_URL` / `SUBMISSIONS_BASE_URL` | public API origins (→ `extra.apiBaseUrl`) | no |
+| `APP_CHECK_ENFORCEMENT_MODE` | client-advisory `monitor`\|`enforce` (default `monitor`) | no |
+| `OBSERVABILITY_ENABLED` / `PERFORMANCE_SAMPLE_RATE` | MOB-018 kill switch + sampling | no |
+| `FIREBASE_PROJECT_ID` | public project id (default `black-book-efaaf`) | no |
+| `GOOGLE_SERVICES_INFO_PLIST` / `GOOGLE_SERVICES_JSON` | **file PATHS** to the native Firebase config | the *file* is; the path is not |
+
+All are validated at config-eval time — a bad URL, an out-of-range sample rate, an unknown
+enforcement mode, a half-set Firebase pair, or a Firebase path that doesn't exist **fails the
+build fast, by name, without printing a value**. See `.env.example` for the full template and
+`eas.json` for the committed non-secret per-profile `env` blocks.
+
+The only real secret in mobile is the `GoogleService-Info.plist` / `google-services.json`
+itself. Both are gitignored (by name anywhere, plus a `secrets/` drop dir) and are never
+committed. Supply them one of two ways:
+
+**Local dev (gitignored file path):**
+
+```bash
+cp apps/mobile/.env.example apps/mobile/.env.local   # then uncomment GOOGLE_SERVICES_* paths
+mkdir -p apps/mobile/secrets                          # gitignored
+# drop the real dev GoogleService-Info.plist / google-services.json in ./secrets
+```
+
+**EAS Build (file secrets — never printed, never committed):**
+
+```bash
+# From apps/mobile, once an EAS org exists (repo-fsxq gate #3) and `eas login` is done:
+eas env:create --environment preview    --name GOOGLE_SERVICES_INFO_PLIST --type file --value ./secrets/GoogleService-Info.plist
+eas env:create --environment preview    --name GOOGLE_SERVICES_JSON       --type file --value ./secrets/google-services.json
+eas env:create --environment production  --name GOOGLE_SERVICES_INFO_PLIST --type file --value ./secrets/GoogleService-Info.plist
+eas env:create --environment production  --name GOOGLE_SERVICES_JSON       --type file --value ./secrets/google-services.json
+```
+
+EAS exposes each file secret at build time and sets the matching env var to its on-disk path,
+which `app.config.ts` reads exactly like the local path above.
+
+### Wired vs. still human-gated (secrets-we-have vs. account UI steps)
+
+| Item | Status |
+|---|---|
+| App Check init on cold start, degrade-safe | ✅ wired (`AppProviders.tsx` → `bootstrapAppCheck`) |
+| Config-plugin slot for `@react-native-firebase/{app,app-check,crashlytics,perf}` | ✅ wired (gated on real config present) |
+| Env-driven, validated `extra` (api/firebase/enforcement/observability) | ✅ wired (this change) |
+| `.gitignore` + `.env.example` + EAS-file-secret runbook | ✅ wired (this change) |
+| Public Firebase config for `black-book-efaaf` (web/admin) | ✅ exists (`infra/firebase/registered-apps.json`) |
+| Mobile Firebase **app registrations** (iOS/Android bundle ids → GoogleService files) | ⛔ human gate — no mobile app registered yet; requires Firebase console + Apple/Google identity |
+| Apple Developer Program / Google Play Console / EAS org + billing | ⛔ human gate (`repo-fsxq`) |
+| Bundle-id availability, trademark, spend ceiling | ⛔ human gate (`repo-fsxq`) |
+
+"Secrets we have" today (in 1Password, `geralddagher-development`) are server/back-office keys
+(`BlackStory OPERATOR_CLI_PRIVACY_PEPPER`, `Gemini Blackstory Embedding`, `USCensus`, general
+dev keys) — **none of them is a mobile client credential**. There is no mobile GoogleService
+file, no EAS/Expo token, and no Apple/Play credential yet; those are the human gates above, not
+missing wiring. Do **not** fabricate a placeholder credential file to "turn Firebase on".
+
+## EAS Update / OTA (MOB-019, repo-ovn7)
+
+`expo-updates` is installed and `runtimeVersion: { policy: 'appVersion' }` is
+wired in `app.config.ts` (ADR-023 §2's OTA/rebuild fence). `updates.url` /
+`extra.eas.projectId` are gated on `EAS_PROJECT_ID`, which is unset today — no
+Expo/EAS organization has been provisioned yet (`mobile-identity.md` human
+gate #3) — so `expo-updates` currently has no update server to poll and stays
+structurally inert until that gate clears. `eas.json`'s three build profiles
+already each declare a distinct `channel` (development/preview/production),
+satisfying ADR-023 §1's "OTA can never cross an environment boundary"
+requirement.
+
+**Code-signing decision (ADR-023's 2026-07-20 adversarial-review amendment,
+threat-model T6):** EAS Update end-to-end code signing is a **paid EAS
+Production/Enterprise-plan feature**, not merely an SDK-support question. To
+keep the free-tier-first posture (ADR-023 §7), OTA ships **without** code
+signing on the free tier; the blast-radius controls are phishing-resistant MFA
+custody of the EAS org, a scoped/revocable CI-only publish token, staged
+channel rollout, and immutable-update rollback. This is **accepted risk by
+design**, with code signing recorded as a cost-gated upgrade trigger, not a
+silent gap. See `src/updates/README.md` for the full decision record, the
+human-gate activation steps, and the OTA rollback runbook (ADR-023 §6).
 
 ## Package naming — a documented discrepancy, not a guess
 

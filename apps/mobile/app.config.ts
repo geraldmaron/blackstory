@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+
 import type { ExpoConfig } from 'expo/config';
 
 /**
@@ -20,6 +22,109 @@ import type { ExpoConfig } from 'expo/config';
 type AppVariant = 'development' | 'preview' | 'production';
 
 const APP_VARIANT = (process.env.APP_VARIANT as AppVariant | undefined) ?? 'development';
+
+// --- Config validation helpers ----------------------------------------------
+//
+// app.config.ts is evaluated by `expo start` / `expo prebuild` / EAS Build, so
+// throwing here fails a MISCONFIGURED build fast and loudly rather than
+// shipping a silently-wrong binary. These helpers validate the small set of
+// env inputs this config reads. They NEVER print an env *value* that could be
+// sensitive — only its name, and for URLs/enums the offending token/protocol —
+// so a malformed input can't leak a credential into a build log. No production
+// credential is ever fabricated: unset optional inputs fall back to safe,
+// non-secret defaults, and the Firebase native config is a real file on disk
+// (or an EAS file secret), never invented here.
+
+function failConfig(message: string): never {
+  throw new Error(`[app.config] ${message}`);
+}
+
+/**
+ * Validate an optional absolute http(s) URL env var, falling back when unset.
+ * Production MUST be https (never ship cleartext attestation/API traffic);
+ * dev/preview may use http for a LAN/localhost host.
+ */
+function resolveHttpUrl(
+  name: string,
+  raw: string | undefined,
+  fallback: string,
+): string {
+  const value = (raw ?? '').trim() || fallback;
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    return failConfig(`${name} is not a valid absolute URL`);
+  }
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+    return failConfig(`${name} must be an http(s) URL (got "${parsed.protocol}//…")`);
+  }
+  if (APP_VARIANT === 'production' && parsed.protocol !== 'https:') {
+    return failConfig(
+      `${name} must use https:// for the production variant (got "${parsed.protocol}//…") — refusing to ship cleartext traffic`,
+    );
+  }
+  return value;
+}
+
+/** Parse the perf-trace sample rate, bounded to `[0, 1]`; unset → 10%. */
+function resolveSampleRate(raw: string | undefined): number {
+  if (raw === undefined || raw.trim() === '') {
+    return 0.1;
+  }
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 0 || value > 1) {
+    return failConfig(`PERFORMANCE_SAMPLE_RATE must be a number in [0, 1] (got "${raw}")`);
+  }
+  return value;
+}
+
+/**
+ * Resolve the (client-advisory) App Check enforcement stage. Unset → `monitor`.
+ * A typo is a hard error so a build can never silently mean something other
+ * than the two valid stages; `enforce` must be opted into deliberately.
+ */
+function resolveEnforcementModeEnv(raw: string | undefined): 'monitor' | 'enforce' {
+  const value = (raw ?? '').trim();
+  if (value === '' || value === 'monitor') {
+    return 'monitor';
+  }
+  if (value === 'enforce') {
+    return 'enforce';
+  }
+  return failConfig(`APP_CHECK_ENFORCEMENT_MODE must be "monitor" or "enforce" (got "${value}")`);
+}
+
+/**
+ * Resolve the Firebase native config file paths from env. The files themselves
+ * are NEVER committed (see .gitignore); their paths come from a gitignored
+ * local file or an EAS file secret at build time. Both platforms must be
+ * supplied together (a half-configured Firebase app is a misconfiguration),
+ * and a supplied path must actually exist so `expo prebuild` fails here with a
+ * clear message instead of deep inside a native plugin.
+ */
+function resolveFirebaseConfigFiles(): {
+  readonly plist: string | undefined;
+  readonly json: string | undefined;
+  readonly present: boolean;
+} {
+  const plist = process.env.GOOGLE_SERVICES_INFO_PLIST?.trim() || undefined;
+  const json = process.env.GOOGLE_SERVICES_JSON?.trim() || undefined;
+  if (Boolean(plist) !== Boolean(json)) {
+    failConfig(
+      'GOOGLE_SERVICES_INFO_PLIST (iOS) and GOOGLE_SERVICES_JSON (Android) must be set together or not at all — exactly one was provided',
+    );
+  }
+  for (const [name, file] of [
+    ['GOOGLE_SERVICES_INFO_PLIST', plist],
+    ['GOOGLE_SERVICES_JSON', json],
+  ] as const) {
+    if (file && !existsSync(file)) {
+      failConfig(`${name} points to a file that does not exist: ${file}`);
+    }
+  }
+  return { plist, json, present: Boolean(plist && json) };
+}
 
 // Bundle / application identifiers per mobile-identity.md's proposed scheme.
 // These are *proposed* identifiers (dev/preview safe to reference; the bare
@@ -58,10 +163,34 @@ const appName = APP_NAMES[APP_VARIANT];
 // clears). Until then, `expo prebuild` runs cleanly with App Check absent and
 // the client degrades gracefully (see src/security/app-check.ts). Do NOT
 // fabricate a placeholder credential file to "turn this on".
-const GOOGLE_SERVICES_INFO_PLIST = process.env.GOOGLE_SERVICES_INFO_PLIST;
-const GOOGLE_SERVICES_JSON = process.env.GOOGLE_SERVICES_JSON;
-const firebaseConfigPresent = Boolean(
-  GOOGLE_SERVICES_INFO_PLIST && GOOGLE_SERVICES_JSON,
+const firebaseConfigFiles = resolveFirebaseConfigFiles();
+const GOOGLE_SERVICES_INFO_PLIST = firebaseConfigFiles.plist;
+const GOOGLE_SERVICES_JSON = firebaseConfigFiles.json;
+const firebaseConfigPresent = firebaseConfigFiles.present;
+
+// Public, non-secret Firebase project identifier (see
+// infra/firebase/registered-apps.json — apiKey/appId/projectId are Firebase
+// *identifiers* restricted by App Check + domain, not server secrets). Only the
+// project id is surfaced to JS via `extra.firebase` for diagnostics; the actual
+// native credential is the GoogleService file copied by the config plugin, not
+// this string. Overridable per-build via env; defaults to the registered
+// production project.
+const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID?.trim() || 'black-book-efaaf';
+
+// --- API surface config (MOB-004 wire contract; MOB-016 corrections) --------
+//
+// The native reader talks to `apps/api-public` (and, once distinct, a
+// submissions host) over HTTPS. These are NON-SECRET public origins, safe to
+// bake into a build and read at runtime from `extra` (see
+// src/security/bootstrap.ts + src/features/corrections/runtime.ts). Set per
+// EAS profile via the non-secret `env` blocks in eas.json; a production build
+// is rejected above if handed a cleartext (http) origin.
+const DEFAULT_API_BASE_URL = 'https://api.blackbook.app';
+const API_BASE_URL = resolveHttpUrl('API_BASE_URL', process.env.API_BASE_URL, DEFAULT_API_BASE_URL);
+const SUBMISSIONS_BASE_URL = resolveHttpUrl(
+  'SUBMISSIONS_BASE_URL',
+  process.env.SUBMISSIONS_BASE_URL,
+  API_BASE_URL,
 );
 
 // --- Observability (crash/perf reporting) config (MOB-018) -----------------
@@ -86,16 +215,34 @@ const firebaseConfigPresent = Boolean(
 // volume/noise control plus a blunt off-switch, consistent with that same
 // budget-capped/kill-switch operating posture.
 const OBSERVABILITY_ENABLED = process.env.OBSERVABILITY_ENABLED === 'false' ? false : true;
-const PERFORMANCE_SAMPLE_RATE = process.env.PERFORMANCE_SAMPLE_RATE
-  ? Number(process.env.PERFORMANCE_SAMPLE_RATE)
-  : 0.1;
+const PERFORMANCE_SAMPLE_RATE = resolveSampleRate(process.env.PERFORMANCE_SAMPLE_RATE);
 
 // App Check enforcement STAGE (MOB-010; ADR-020 §3 monitor→enforce rollout).
 // Deliberately defaults to `monitor` — never hardcode `enforce`. Promotion is
 // an explicit operational cutover (see src/security/README.md), overridable
 // per-build via APP_CHECK_ENFORCEMENT_MODE but never to `enforce` by default.
-const APP_CHECK_ENFORCEMENT_MODE =
-  process.env.APP_CHECK_ENFORCEMENT_MODE === 'enforce' ? 'enforce' : 'monitor';
+const APP_CHECK_ENFORCEMENT_MODE = resolveEnforcementModeEnv(
+  process.env.APP_CHECK_ENFORCEMENT_MODE,
+);
+
+// --- EAS Update / OTA (MOB-019, repo-ovn7; ADR-023 §2/§7, threat-model T6) -----
+//
+// `expo-updates` is installed (this bead's fix for ADR-023's amendment #2 — it
+// was previously entirely absent). It stays STRUCTURALLY INERT until a real EAS
+// project is provisioned (mobile-identity.md human gate #3 — no Expo/EAS
+// organization exists yet): `updates.url` / `extra.eas.projectId` are gated on
+// `EAS_PROJECT_ID`, following the same guarded-slot pattern as the Firebase
+// config above. With no `updates.url`, `expo-updates` reports `Updates.isEnabled
+// === false` and never attempts a network check — safe-by-default, not a
+// silent no-op someone has to notice. Once `eas init`/`eas update:configure`
+// runs for a real project, set `EAS_PROJECT_ID` per build profile in `eas.json`
+// (or CI env) and this slot activates with no code change.
+//
+// `runtimeVersion: { policy: 'appVersion' }` is NOT gated — it is the
+// structural boundary (ADR-023 §2) that rejects an incompatible OTA bundle
+// client-side rather than shipping a crash, and costs nothing to declare ahead
+// of the EAS project existing.
+const EAS_PROJECT_ID = process.env.EAS_PROJECT_ID;
 
 const config: ExpoConfig = {
   name: appName,
@@ -112,6 +259,22 @@ const config: ExpoConfig = {
   // (`blackbook.app`) are deferred to MOB-008/MOB-020 per that doc.
   scheme: 'blackstory',
   userInterfaceStyle: 'automatic',
+  // EAS Update runtime-compatibility fence (ADR-023 §2): a JS bundle only ever
+  // installs onto a binary whose runtime version matches, so an OTA update
+  // built for an incompatible native layer is rejected client-side rather than
+  // shipped and crashed. `appVersion` policy derives the runtime version from
+  // the semantic app version above, so a native-affecting release (which must
+  // bump `version`) automatically fences its OTA channel from older binaries
+  // with no separate bookkeeping.
+  runtimeVersion: {
+    policy: 'appVersion',
+  },
+  // Gated on `EAS_PROJECT_ID` — see the comment above `EAS_PROJECT_ID`. Absent
+  // today (no EAS project provisioned), so `expo-updates` has no update server
+  // to poll and stays inert.
+  ...(EAS_PROJECT_ID
+    ? { updates: { url: `https://u.expo.dev/${EAS_PROJECT_ID}` } }
+    : {}),
   // No `newArchEnabled` toggle: SDK 56 has fully removed the legacy
   // architecture, so New Architecture is the only supported mode and the
   // config field no longer exists (confirmed against
@@ -200,6 +363,16 @@ const config: ExpoConfig = {
         imageWidth: 76,
       },
     ],
+    // ADR-024 (MOB-011, corrected 2026-07-20) / repo-umwk: the official
+    // `@maplibre/maplibre-react-native` config plugin (its own
+    // `app.plugin.js` -> `withMapLibre`, NOT a bespoke plugin authored in
+    // this repo). It injects `$MLRN.post_install(installer)` into the iOS
+    // Podfile and the matching Gradle properties on Android at `expo
+    // prebuild` time. No props are passed — the package's documented
+    // defaults (native MapLibre distribution version pinned to this SDK
+    // release, OpenGL Android location engine) match ADR-020/ADR-024's
+    // renderer choice with no override needed.
+    '@maplibre/maplibre-react-native',
     [
       // Enforces the Android API-level floor (ADR-020 SS7); iOS's floor is
       // set directly via `ios.deploymentTarget` above (a native ExpoConfig
@@ -213,10 +386,15 @@ const config: ExpoConfig = {
           // MOB-010 / ADR-020 §"USE_FRAMEWORKS=static": React Native Firebase
           // (App Check) REQUIRES static frameworks linkage, and the ADR-020
           // spike proved `pod install` succeeds with `USE_FRAMEWORKS=static`.
-          // Carrying it forward here (the CNG source of truth) makes every
-          // `expo prebuild` emit `ios.useFrameworks=static` into
-          // Podfile.properties.json so the App Check pods link correctly when
-          // the Firebase config gate clears.
+          // repo-umwk (ADR-024 "Deferred"/build gate) reconciles the SAME
+          // requirement for `@maplibre/maplibre-react-native`'s official
+          // config plugin (registered below) — its `withPodfilePostInstall`
+          // step assumes/works under static frameworks, so one shared
+          // `useFrameworks: 'static'` here satisfies both native deps rather
+          // than each plugin racing to set it. Carrying it forward here (the
+          // CNG source of truth) makes every `expo prebuild` emit
+          // `ios.useFrameworks=static` into Podfile.properties.json so the
+          // App Check pods and MapLibre pods both link correctly.
           useFrameworks: 'static',
         },
       },
@@ -253,6 +431,20 @@ const config: ExpoConfig = {
   },
   extra: {
     appVariant: APP_VARIANT,
+    // API origins read at runtime by src/security/bootstrap.ts
+    // (`createDefaultApiClient`) and src/features/corrections/runtime.ts
+    // (`resolveSubmissionsBaseUrl`). Non-secret public hosts, validated above
+    // (https required for production). Set per EAS profile via eas.json `env`.
+    apiBaseUrl: API_BASE_URL,
+    submissionsBaseUrl: SUBMISSIONS_BASE_URL,
+    // Public Firebase project identifier + a JS-visible "is a real Firebase app
+    // wired?" flag for diagnostics (does not import a native module). The real
+    // credential is the GoogleService file copied by the config plugin, not
+    // this object — see the App Check / Firebase section above.
+    firebase: {
+      projectId: FIREBASE_PROJECT_ID,
+      configPresent: firebaseConfigPresent,
+    },
     // App Check enforcement stage read at runtime by src/security/bootstrap.ts
     // (client-advisory only; server stays authoritative). Defaults to
     // `monitor` — see the cutover runbook in src/security/README.md.
@@ -262,9 +454,13 @@ const config: ExpoConfig = {
     // Defaults to enabled/10% — see src/observability/README.md.
     observabilityEnabled: OBSERVABILITY_ENABLED,
     performanceSampleRate: PERFORMANCE_SAMPLE_RATE,
-    // No `eas.projectId` yet — no EAS organization/project is provisioned
-    // (mobile-identity.md human gate #3). Added by `eas init` once that
-    // gate clears; do not hand-write a fake project id here.
+    // `eas.projectId` (required by `expo-updates` to resolve its update
+    // server) is gated on `EAS_PROJECT_ID` — see the comment above that
+    // constant. No EAS organization/project is provisioned yet
+    // (mobile-identity.md human gate #3); do not hand-write a fake project id
+    // here. `eas init` / `eas update:configure` populate the real value once
+    // that gate clears.
+    ...(EAS_PROJECT_ID ? { eas: { projectId: EAS_PROJECT_ID } } : {}),
   },
 };
 
