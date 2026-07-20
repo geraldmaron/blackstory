@@ -102,3 +102,15 @@ test('narrow exclusive patch collapses the competing primary panel', () => {
     showKey: false,
   });
 });
+
+test('resolveExploreLeftTab treats exclusive single-section open as one tab', () => {
+  // After Hide → Show filters (or tab select), only one section is URL-visible.
+  assert.equal(
+    resolveExploreLeftTab({ showFilters: true, showKey: false, preferredTab: 'key' }),
+    'filters',
+  );
+  assert.equal(
+    resolveExploreLeftTab({ showFilters: false, showKey: true, preferredTab: 'filters' }),
+    'key',
+  );
+});

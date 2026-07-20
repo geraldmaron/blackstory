@@ -46,6 +46,7 @@ import { MetaFieldLabel } from '../../../components/map-experience/MetaFieldLabe
 import { shouldFadeDecadePatch } from '../../map/decade-layer-transition';
 import { CAMERA_POINT_ZOOM, prefersReducedMotion } from '../../../lib/map-experience/camera-presets';
 import { resolveCloseCameraTarget } from '../../../lib/map-experience/close-camera';
+import { buildActiveDensityByDecade } from '../../../lib/map-experience/decade-flow';
 import {
   closestFeatures,
   emptyRadiusStatusMessage,
@@ -304,6 +305,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   useEffect(() => {
     setView(initial);
+    viewStateRef.current = initial.viewState;
     urlRadiusAppliedRef.current = null;
   }, [initial]);
 
@@ -365,19 +367,39 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       return buildCountyChoroplethLevels({
         index: populationIndex,
         mode: 'blackShare',
-        ...(popDecade ? { decade: popDecade } : {}),
+        decade: popDecade ?? '2020',
       });
     }
     if (layerMode === 'blackChange') {
       return buildCountyChoroplethLevels({
         index: populationIndex,
         mode: 'blackChange',
-        ...(popFrom ? { fromDecade: popFrom } : {}),
-        ...(popTo ? { toDecade: popTo } : {}),
+        fromDecade: popFrom ?? '2010',
+        toDecade: popTo ?? '2020',
       });
     }
     return [];
   }, [populationIndex, view.viewState]);
+
+  /** Presence fills track the line-decade scrubber (active records that decade). */
+  const presenceDensityByDecade = useMemo(
+    () => buildActiveDensityByDecade(view.allFeatures),
+    [view.allFeatures],
+  );
+
+  const presenceDensityLevels = useMemo(() => {
+    if (view.viewState.layerMode !== 'presence') return [];
+    const decade = view.viewState.decade;
+    if (decade) {
+      return presenceDensityByDecade.get(decade) ?? [];
+    }
+    return view.densityLevels;
+  }, [
+    presenceDensityByDecade,
+    view.densityLevels,
+    view.viewState.decade,
+    view.viewState.layerMode,
+  ]);
 
   // Agent B: hero landing — panel enter animation (reconcile skip is in the mount effect below).
   useEffect(() => {
@@ -442,6 +464,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   const commitViewState = useCallback(
     (next: ExploreViewState) => {
+      // Sync the ref before any async viewport debounce can merge — otherwise a map
+      // pan after Hide / Select rewrites the URL from a stale panel/selection snapshot.
+      viewStateRef.current = next;
       const edgeSlice = pickExploreEdgeSlice(view.edgeLineCatalog, next);
       const selectedEdge = next.edge ? edgeSlice.edges.find((edge) => edge.edgeId === next.edge) : undefined;
       const filtered = applyExploreFilters(view.allFeatures, next.filters, next.state);
@@ -519,7 +544,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         featureCollection: { type: 'FeatureCollection', features: filteredFeatures },
         jurisdictionAreaFeatures: view.source.jurisdictionAreaFeatures,
         layerMode: view.viewState.layerMode,
-        densityLevels: view.viewState.layerMode === 'presence' ? view.densityLevels : [],
+        densityLevels: presenceDensityLevels,
         countyChoroplethLevels: countyChoroplethLevels,
         clusteringEnabled: view.viewState.group,
         historyEdgesEnabled: view.viewState.lines,
@@ -537,7 +562,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     view.viewState.layerMode,
     view.viewState.group,
     view.viewState.decade,
-    view.densityLevels,
+    presenceDensityLevels,
     countyChoroplethLevels,
     view.viewState.lines,
     view.edgeLineCollection,
@@ -635,6 +660,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           ...(selectedEdge ? { selectedEdge } : {}),
         };
       });
+      viewStateRef.current = next;
       reconcileCamera(next, 'ease');
     }
     window.addEventListener('popstate', handlePopState);
@@ -647,9 +673,14 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     filterRegionRef.current?.focus();
   }, [fromHeroTransition, initial.viewState.selected, initial.viewState.showFilters]);
 
-  const handleHideFilters = useCallback(() => {
-    commitViewState(mergeViewState(view.viewState, { showFilters: false }));
-    if (view.viewState.showKey) setLeftTabPreference('key');
+  /** Hide collapses the whole instruments chassis — not only the active tab.
+   * Previously HIDE toggled one of showFilters/showKey, so a second click was
+   * required whenever both sections were URL-visible (the default). */
+  const handleHideInstruments = useCallback(() => {
+    setLeftTabPreference(null);
+    commitViewState(
+      mergeViewState(view.viewState, { showFilters: false, showKey: false }),
+    );
   }, [commitViewState, view.viewState]);
 
   const handleShowFilters = useCallback(() => {
@@ -657,7 +688,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     const exclusive = isExploreSinglePanelViewport()
       ? exploreNarrowExclusivePatch({ opening: 'instruments' })
       : {};
-    commitViewState(mergeViewState(view.viewState, { showFilters: true, ...exclusive }));
+    commitViewState(
+      mergeViewState(view.viewState, { showFilters: true, showKey: false, ...exclusive }),
+    );
   }, [commitViewState, view.viewState]);
 
   const handleHideResults = useCallback(() => {
@@ -671,17 +704,14 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     commitViewState(mergeViewState(view.viewState, { showResults: true, ...exclusive }));
   }, [commitViewState, view.viewState]);
 
-  const handleHideKey = useCallback(() => {
-    commitViewState(mergeViewState(view.viewState, { showKey: false }));
-    if (view.viewState.showFilters) setLeftTabPreference('filters');
-  }, [commitViewState, view.viewState]);
-
   const handleShowKey = useCallback(() => {
     setLeftTabPreference('key');
     const exclusive = isExploreSinglePanelViewport()
       ? exploreNarrowExclusivePatch({ opening: 'instruments' })
       : {};
-    commitViewState(mergeViewState(view.viewState, { showKey: true, ...exclusive }));
+    commitViewState(
+      mergeViewState(view.viewState, { showKey: true, showFilters: false, ...exclusive }),
+    );
   }, [commitViewState, view.viewState]);
 
   const handleSelectLeftTab = useCallback(
@@ -691,10 +721,14 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         ? exploreNarrowExclusivePatch({ opening: 'instruments' })
         : {};
       if (tab === 'filters') {
-        commitViewState(mergeViewState(view.viewState, { showFilters: true, ...exclusive }));
+        commitViewState(
+          mergeViewState(view.viewState, { showFilters: true, showKey: false, ...exclusive }),
+        );
         return;
       }
-      commitViewState(mergeViewState(view.viewState, { showKey: true, ...exclusive }));
+      commitViewState(
+        mergeViewState(view.viewState, { showKey: true, showFilters: false, ...exclusive }),
+      );
     },
     [commitViewState, view.viewState],
   );
@@ -869,10 +903,29 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   const handleLayerModeChange = useCallback(
     (layerMode: ExploreLayerMode) => {
+      if (layerMode === 'blackShare') {
+        commitViewState(
+          mergeViewState(view.viewState, {
+            layerMode,
+            popDecade: view.viewState.popDecade ?? '2020',
+          }),
+        );
+        return;
+      }
+      if (layerMode === 'blackChange') {
+        commitViewState(
+          mergeViewState(view.viewState, {
+            layerMode,
+            popFrom: view.viewState.popFrom ?? '2010',
+            popTo: view.viewState.popTo ?? '2020',
+          }),
+        );
+        return;
+      }
       commitViewState(
         mergeViewState(view.viewState, {
           layerMode,
-          ...(layerMode === 'off' || layerMode === 'presence' ? { clearPopulationDecades: true } : {}),
+          clearPopulationDecades: true,
         }),
       );
     },
@@ -996,6 +1049,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         // pure (React replays them during render), and `pushViewState` calls `router.replace` —
         // a Router state update that must never run mid-render.
         const next = mergeViewState(viewStateRef.current, { viewport });
+        viewStateRef.current = next;
         setView((current) => ({ ...current, viewState: next }));
         pushViewState(next);
       }, 400);
@@ -1052,8 +1106,8 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     resultsVisible,
   });
 
-  const hideActiveAriaLabel = leftTab === 'key' ? 'Hide key' : 'Hide filters';
-  const hideActiveHandler = leftTab === 'key' ? handleHideKey : handleHideFilters;
+  const hideActiveAriaLabel = 'Hide map instruments';
+  const hideActiveHandler = handleHideInstruments;
 
   return (
     /* Instruments follow the site theme (light/dark) — map plate syncs via MapStage. */

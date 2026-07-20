@@ -113,8 +113,9 @@ function densityOfAllFeatures(features: readonly ExploreMapFeature[]): readonly 
 
 /** Per-decade ACTIVE-presence density, keyed by decade label, over every state-resolved
  * feature's own `eraBuckets` span — delegates the active/cumulative aggregation to
- * `@repo/domain`'s `aggregateDecadePresence` rather than reimplementing it here. */
-function buildActiveDensityByDecade(
+ * `@repo/domain`'s `aggregateDecadePresence` rather than reimplementing it here.
+ * Explore presence mode uses the same map so line-decade scrubbing updates state fills. */
+export function buildActiveDensityByDecade(
   features: readonly ExploreMapFeature[],
 ): ReadonlyMap<string, readonly StateDensityLevel[]> {
   const entities = features.filter(stateResolved).map((feature) => ({
